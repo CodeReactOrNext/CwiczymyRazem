@@ -115,3 +115,51 @@ describe("assignAttacks", () => {
       .toEqual(b.map(x => `${x.key}:${x.eventIndex}`).sort());
   });
 });
+
+// ── What the attack struck (attackTones.ts) ─────────────────────────────────
+
+const BIN_HZ = 48000 / 4096;
+const [A3, AS3, B2, B3] = [220, 233.08, 123.47, 246.94];
+
+/** An idealised magnitude spectrum: each note's first harmonics as clean peaks. */
+const notes = (...freqs: number[]): Float32Array => {
+  const magnitudes = new Float32Array(Math.ceil(2000 / BIN_HZ) + 2);
+  for (const f of freqs) {
+    for (let h = 1; h * f < 2000; h++) {
+      const bin = Math.round((h * f) / BIN_HZ);
+      magnitudes[bin] += 1 / h;
+      magnitudes[bin - 1] += 0.3 / h;
+      magnitudes[bin + 1] += 0.3 / h;
+    }
+  }
+  return magnitudes;
+};
+
+/** An attack that struck `struck` over strings already ringing at `ringing`. */
+const struckOver = (ringing: number[], struck: number[]): DetectedNoteEvent["attack"] => {
+  return { before: notes(...ringing), after: notes(...ringing, ...struck), binHz: BIN_HZ };
+};
+
+const plain = (key: string, timeMs: number, targetFreq: number): ExpectedAttack =>
+  ({ ...exp_(key, timeMs, targetFreq), readsAttack: true });
+
+describe("assignAttacks — what the attack struck", () => {
+  it("credits a note its attack struck, though the pitch read after it is a string still ringing", () => {
+    // B3 picked under a ringing B2: the detector reads B2.
+    const event = { ...ev(0, B2), attack: struckOver([B2], [B3]) };
+    expect(assignAttacks([event], [plain("n0", 0, B3)], 130)).toHaveLength(1);
+  });
+
+  it("still credits by pitch what the attack's spectrum can't confirm — it only ever adds", () => {
+    // A string picked again while it still rings barely changes the spectrum.
+    const event = { ...ev(0, B3), attack: struckOver([B3], []) };
+    expect(assignAttacks([event], [plain("n0", 0, B3)], 130)).toHaveLength(1);
+    // Nor does it wait for the spectrum: the pitch counts right away.
+    expect(assignAttacks([{ ...ev(0, B3), attack: "reading" as const }], [plain("n0", 0, B3)], 130)).toHaveLength(1);
+  });
+
+  it("leaves bends, slides and the rest to the pitch, as before", () => {
+    const event = { ...ev(0, AS3), attack: struckOver([B3], [A3]) };
+    expect(assignAttacks([event], [exp_("n0", 0, AS3)], 130)).toHaveLength(1);
+  });
+});

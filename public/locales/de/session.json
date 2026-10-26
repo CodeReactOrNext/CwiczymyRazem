@@ -462,7 +462,13 @@
   },
   "loading": "Wird geladen…",
   "track": "Spur:",
+  "track_empty": "Diese Spur hat keine Noten",
   "loading_track": "Spur wird geladen…",
+  "loading_steps": {
+    "file": "Tabulatur wird geladen",
+    "parse": "Spuren werden gelesen",
+    "sound": "Klänge werden geladen"
+  },
   "timing_breakdown": {
     "title": "Timing",
     "grades": {

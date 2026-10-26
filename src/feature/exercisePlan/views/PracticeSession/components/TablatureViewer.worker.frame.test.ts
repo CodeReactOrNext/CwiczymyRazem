@@ -3,6 +3,7 @@ import { renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
+import { DEFAULT_PILL_METRICS, pillHeadWidth } from "./tabSpacing";
 import { useTablatureRenderData } from "./useTablatureRenderData";
 
 // Drives the worker through its message handler with a context that only records
@@ -66,6 +67,18 @@ const longPiece: TablatureMeasure[] = [
 ];
 /** Where the 7/8 half starts on the board: 80 beats × 200 px. */
 const SECOND_HALF_X = 80 * 200;
+
+/** A quarter, then a sextuplet run on the 11th fret — the run that piled up on a zoomed-out board. */
+const fastRun: TablatureMeasure[] = [
+  {
+    timeSignature: [4, 4],
+    beats: [
+      { duration: 1, notes: [{ string: 3, fret: 9 }] },
+      ...Array.from({ length: 6 }, () => ({ duration: 1 / 6, tuplet: 6, notes: [{ string: 3, fret: 11 }] })),
+      { duration: 2, notes: [] },
+    ],
+  },
+];
 const isDynamicsBar = (fill: string) => fill.startsWith("rgba(6,182,212,");
 
 function recordingContext() {
@@ -75,6 +88,7 @@ function recordingContext() {
     blurs: [] as number[],
     strokes: [] as string[],
     texts: [] as string[],
+    textXs: [] as { text: string; x: number }[],
     fills: [] as string[],
   };
   const ctx = new Proxy(state, {
@@ -82,7 +96,7 @@ function recordingContext() {
       if (prop === "drawImage") return (image: unknown, x: number, y: number) => { log.drawn.push({ image, x, y }); };
       if (prop === "stroke") return () => { log.strokes.push(String(target.strokeStyle)); };
       if (prop === "fillRect") return () => { log.fills.push(String(target.fillStyle)); };
-      if (prop === "fillText") return (text: string) => { log.texts.push(text); };
+      if (prop === "fillText") return (text: string, x: number) => { log.texts.push(text); log.textXs.push({ text, x }); };
       // Roughly a 13px font's advance, so long names come out long.
       if (prop === "measureText") return (text: string) => ({ width: text.length * 7 });
       if (prop === "createLinearGradient") return () => ({ addColorStop: () => undefined });
@@ -240,6 +254,20 @@ describe("TablatureViewer.worker — chord names", () => {
     const unnamed = await startWorker(strum(), 0.45);
     unnamed.run(FRAME_MS);
     expect(unnamed.log.strokes.filter((style) => style === PICK_COLOR)).toHaveLength(4);
+  });
+});
+
+describe("TablatureViewer.worker — fast runs", () => {
+  it("spreads a run out on a zoomed-out board, so its fret numbers don't run into each other", async () => {
+    // 0.45 of an 800 px board's 200 px beat leaves a sixteenth-sextuplet 15 px — half a pill.
+    const { run, log } = await startWorker(fastRun, 0.45);
+    run(FRAME_MS);
+
+    const xs = log.textXs.filter(({ text }) => text === "11").map(({ x }) => x);
+    expect(xs).toHaveLength(6);
+    for (let i = 1; i < xs.length; i++) {
+      expect(xs[i] - xs[i - 1]).toBeGreaterThanOrEqual(pillHeadWidth(2, DEFAULT_PILL_METRICS) + 4);
+    }
   });
 });
 

@@ -48,6 +48,25 @@ function detectTrackType(track: any): 'guitar' | 'bass' | 'drums' | 'vocals' {
   return 'guitar';
 }
 
+/** What a decoder leaves where the bytes weren't valid in its encoding. */
+const UNDECODABLE = '�';
+
+/**
+ * Guitar Pro 3–5 store text in the author's Windows code page, not UTF-8, so
+ * AlphaTab's default UTF-8 turns a Nordic "Spår" into "Sp�r". When the names
+ * come out like that, the file is read again as Windows-1252.
+ */
+function loadScore(bytes: Uint8Array): any {
+  const loader = (alphaTab as any).importer.ScoreLoader;
+  const score = loader.loadScoreFromBytes(bytes);
+  const names: unknown[] = [score?.title, score?.artist, ...(score?.tracks ?? []).map((t: any) => t.name)];
+  if (!names.some(name => typeof name === 'string' && name.includes(UNDECODABLE))) return score;
+
+  const settings = new alphaTab.Settings();
+  settings.importer.encoding = 'windows-1252';
+  return loader.loadScoreFromBytes(bytes, settings);
+}
+
 /** Parse any Guitar Pro file (GP3 / GP4 / GP5 / GPX / GP7).
  *  AlphaTab auto-detects the format from the file's binary signature.
  */
@@ -55,7 +74,7 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
   const arrayBuffer = await file.arrayBuffer();
   const uint8Array = new Uint8Array(arrayBuffer);
 
-  const score = (alphaTab as any).importer.ScoreLoader.loadScoreFromBytes(uint8Array);
+  const score = loadScore(uint8Array);
 
   if (!score || !score.tracks || score.tracks.length === 0) {
     throw new Error('Could not parse Guitar Pro file');

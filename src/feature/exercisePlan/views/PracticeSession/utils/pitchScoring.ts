@@ -36,6 +36,26 @@ interface TechniqueFlags {
 export const hasOwnAttack = (note: TechniqueFlags): boolean =>
   !note.isHammerOn && !note.isPullOff && !note.isRelease;
 
+/** The parts of a tab note that change what its attack sounds like. */
+interface AttackFlags extends TechniqueFlags {
+  isPalmMute?: boolean;
+  isGhost?: boolean;
+  isVibrato?: boolean;
+  isTap?: boolean;
+  harmonicType?: number;
+  slideIn?: number;
+}
+
+/**
+ * Whether a note is picked at its written pitch and holds it, so the spectrum
+ * of its attack can tell which note was struck (attackTones.ts). A bend or a
+ * slide is struck somewhere else, a harmonic, palm mute or ghost note leaves
+ * too little of the string, a vibrato smears it — those are read by pitch alone.
+ */
+export const hasPlainAttack = (note: AttackFlags): boolean =>
+  hasOwnAttack(note) && !note.isDead && !note.isBend && !note.isPreBend && !note.isPalmMute
+  && !note.isGhost && !note.isVibrato && !note.isTap && !note.harmonicType && !note.slideIn;
+
 /**
  * How a note's intonation is read when the exercise focuses on pitch, or null
  * for a note that has none to read (muted).

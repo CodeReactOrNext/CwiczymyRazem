@@ -7,6 +7,7 @@ import {
   createChordToneEvidence,
   harmonicFor,
   isChordToneSounding,
+  isNoteSoundingAtAnyHarmonic,
   spectrumFromAnalyser,
 } from "./chordTones";
 import { createPcmSpectrum } from "./pcmSpectrum";
@@ -39,6 +40,28 @@ describe("harmonicFor", () => {
     expect(harmonicFor(midiHz(64), binHz)).toBe(1); // E4
     expect(harmonicFor(midiHz(57), binHz)).toBe(1); // A3
     expect(harmonicFor(midiHz(40), binHz)).toBe(3); // E2 — its semitones are 5 Hz apart
+  });
+});
+
+describe("isNoteSoundingAtAnyHarmonic", () => {
+  /** A low note with the given harmonic levels, h1 first. */
+  const note = (midi: number, levels: number[]) =>
+    mix(...levels.map((level, i) => sine(midiHz(midi) * (i + 1), 0.1 * level)));
+  const E2 = midiHz(40);
+  // A dark low E: its 3rd harmonic — where E2 is first resolvable — all but gone.
+  const dark = note(40, [1, 0.8, 0.02, 0.5, 0.4, 0.3]);
+
+  it("hears a dark low note whose first resolvable harmonic is faint", () => {
+    expect(harmonicFor(E2, RATE / 8192)).toBe(3);
+    expect(isChordToneSounding(spectrumOf(dark), E2, CHORD_TONE_HIT)).toBe(false);
+    expect(isNoteSoundingAtAnyHarmonic(spectrumOf(dark), E2, CHORD_TONE_HIT)).toBe(true);
+  });
+
+  it("still doesn't hear it in the note a fret away, dark or bright", () => {
+    for (const levels of [[1, 0.8, 0.02, 0.5, 0.4, 0.3], [1, 0.7, 0.6, 0.5, 0.4, 0.3]]) {
+      expect(isNoteSoundingAtAnyHarmonic(spectrumOf(note(39, levels)), E2, CHORD_TONE_HIT)).toBe(false);
+      expect(isNoteSoundingAtAnyHarmonic(spectrumOf(note(41, levels)), E2, CHORD_TONE_HIT)).toBe(false);
+    }
   });
 });
 

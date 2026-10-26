@@ -538,7 +538,13 @@
   },
   "loading": "Loading…",
   "track": "Track:",
+  "track_empty": "No notes in this track",
   "loading_track": "Loading track…",
+  "loading_steps": {
+    "file": "Downloading the tab",
+    "parse": "Reading the tracks",
+    "sound": "Loading the sounds"
+  },
   "timing_breakdown": {
     "title": "Timing",
     "grades": {
@@ -692,7 +698,6 @@
     "hint_needs_mic": "Turn on pitch detection to learn note by note",
     "title": "Learn mode",
     "waiting": "Play the highlighted note to move on",
-    "press_play": "Press play, then play the highlighted note",
     "progress": "Note {{current}} of {{total}}",
     "passes_one": "{{count}} pass completed",
     "passes_other": "{{count}} passes completed",

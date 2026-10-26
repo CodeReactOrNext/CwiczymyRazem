@@ -30,6 +30,9 @@ export function useGpFileLoader({ rawGpFile, gpFileUrl, exerciseTitle }: UseGpFi
   // same song was almost certainly played at it, so it seeds the sync defaults
   // (see feature/backingTrack). Null until the file is parsed.
   const [gpTempo,        setGpTempo]        = useState<number | null>(null);
+  // The file the tracks above were read from (or failed to be): until it is the
+  // current one, that file is still being parsed.
+  const [parsedFile,     setParsedFile]     = useState<File | null>(null);
 
   useEffect(() => {
     if (!effectiveRawGpFile) { setParsedGpTracks(null); setGpTempo(null); return; }
@@ -43,9 +46,12 @@ export function useGpFileLoader({ rawGpFile, gpFileUrl, exerciseTitle }: UseGpFi
           pan:       t.pan,
         })));
         setGpTempo(data.tempo > 0 ? data.tempo : null);
+        setParsedFile(effectiveRawGpFile);
       })
-      .catch(() => { setParsedGpTracks(null); setGpTempo(null); });
+      .catch(() => { setParsedGpTracks(null); setGpTempo(null); setParsedFile(effectiveRawGpFile); });
   }, [effectiveRawGpFile]);
 
-  return { effectiveRawGpFile, isFetchingGpFile, parsedGpTracks, gpTempo };
+  const isParsingGpFile = !!effectiveRawGpFile && parsedFile !== effectiveRawGpFile;
+
+  return { effectiveRawGpFile, isFetchingGpFile, isParsingGpFile, parsedGpTracks, gpTempo };
 }

@@ -5,8 +5,10 @@ import { CHORD_TONE_HIT, CHORD_TONE_SUSTAIN, createChordToneEvidence, isChordTon
 import { correctOctaveForLowStrings, getAdaptiveVolumeGate, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
+import type { FillFeed, FillStep } from "../utils/fillFeed";
+import { clearFillFeed, createFillFeed, pushFillStep } from "../utils/fillFeed";
 import type { IntonationKind, LivePitch, ScoringFocus } from "../utils/pitchScoring";
-import { closerIntonation, continuationAttackFloorMs, gradeIntonation, hasOwnAttack, INTONATION_SETTLE_MS, intonationKindOf, isNearPitch, isSamePitchContinuation, liveBendAmount, medianCents, noteSettleMs } from "../utils/pitchScoring";
+import { closerIntonation, continuationAttackFloorMs, gradeIntonation, hasOwnAttack, hasPlainAttack, INTONATION_SETTLE_MS, intonationKindOf, isNearPitch, isSamePitchContinuation, liveBendAmount, medianCents, noteSettleMs } from "../utils/pitchScoring";
 import { tempoScoreFactor } from "../utils/tempoScoreFactor";
 import type { RunNote, TimingGrade } from "../utils/timingGrade";
 import { gradeTiming, isPerfectTiming, TIMING_GRADE_POINTS, timingHintFor } from "../utils/timingGrade";
@@ -57,6 +59,9 @@ interface UseNoteMatchingOptions {
   scoringFocus?: ScoringFocus;
   /** Every tab note the moment it is settled — see NoteJudgement. */
   onNoteJudged?: (judgement: NoteJudgement) => void;
+  /** The tab draws the green fill from fillFeedRef rather than from React's
+   *  copy of the hits, which then no longer refreshes just for a held note. */
+  streamFills?: boolean;
 }
 
 /**
@@ -102,7 +107,7 @@ export function useNoteMatching({
   isPlaying, startTime, audioContext, audioStartTime, alphaTabSource = null,
   effectiveBpm, rawBpm, activeTablature, isMicEnabled, currentExerciseIndex,
   speedMultiplier, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, onReset, calibratedLatencyMs,
-  scoringFocus = "timing", onNoteJudged,
+  scoringFocus = "timing", onNoteJudged, streamFills = false,
 }: UseNoteMatchingOptions) {
   // Read by the matching loop, which must not restart when the listener changes.
   const onNoteJudgedRef = useRef(onNoteJudged);
@@ -123,10 +128,14 @@ export function useNoteMatching({
   const livePitchRef = useRef<LivePitch | null>(null);
   /** When each chord tone was first heard after its attack (chordTones.ts). */
   const chordEvidenceRef = useRef(createChordToneEvidence());
+  /** Every hit and every step of a hold, the moment the loop judges it, for the
+   *  tab to draw the fill from (see fillFeed.ts). Read from a frame loop. */
+  const fillFeedRef = useRef<FillFeed>(createFillFeed());
 
   const resetGame = useCallback(() => {
     pendingIntonationRef.current.clear();
     chordEvidenceRef.current.clear();
+    clearFillFeed(fillFeedRef.current);
     livePitchRef.current = null;
     resetGameState();
   }, [resetGameState]);
@@ -135,6 +144,7 @@ export function useNoteMatching({
   useEffect(() => {
     pendingIntonationRef.current.clear();
     chordEvidenceRef.current.clear();
+    clearFillFeed(fillFeedRef.current);
   }, [currentExerciseIndex]);
 
   /** Banks a pitch-graded note once it has played out: its points, at the
@@ -325,6 +335,13 @@ export function useNoteMatching({
 
     const tick = () => {
       const now = Date.now();
+      // One reading for the whole tick: the fill steps are stamped with the
+      // same instant the position below is worked out from.
+      const audioNowSec = audioContext ? audioContext.currentTime : null;
+      /** Hands the tab a move of a note's fill, stamped with this tick. */
+      const streamFill = streamFills && audioNowSec !== null
+        ? (step: Omit<FillStep, "audioSec">) => pushFillStep(fillFeedRef.current, { ...step, audioSec: audioNowSec })
+        : null;
 
       const currentFreq   = audioRefs.frequencyRef.current;
       const currentVolume = audioRefs.rawVolumeRef.current;
@@ -361,14 +378,14 @@ export function useNoteMatching({
       const toBeats = (elapsedSec: number) => beatClock ? beatClock.toBeats(elapsedSec) : elapsedSec * beatsPerSec;
       const passClock = alphaTabSource && audioContext ? alphaTabPassClockRef.current : null;
       let loopedBeatsElapsed: number;
-      if (passClock && audioContext) {
+      if (passClock && audioNowSec !== null) {
         loopedBeatsElapsed = alphaTabPassBeats(
-          passClock, audioContext.currentTime - latencySec, toBeats, totalExBeats,
+          passClock, audioNowSec - latencySec, toBeats, totalExBeats,
           earlyWindowBeats / beatsPerSec, ALPHATAB_RESTART_GRACE_SEC * beatsPerSec,
         );
       } else {
-        const rawElapsedSec = audioContext && audioStartTime != null
-          ? audioContext.currentTime - audioStartTime
+        const rawElapsedSec = audioNowSec !== null && audioStartTime != null
+          ? audioNowSec - audioStartTime
           : (now - startTime) / 1000;
         loopedBeatsElapsed = toBeats(rawElapsedSec - latencySec) % totalExBeats;
       }
@@ -455,6 +472,7 @@ export function useNoteMatching({
               targetFreq,
               toleranceCents: baseToleranceFor(targetFreq),
               volumeGate: getDetectionGates(targetFreq, volumeGateBase).volumeGate,
+              readsAttack: hasPlainAttack(note),
               ...(isContinuation[i] && { earliestDeltaMs: continuationAttackFloorMs((beatEnd - beatStart) * msPerBeat) }),
             });
           }
@@ -572,8 +590,12 @@ export function useNoteMatching({
                 && loopedBeatsElapsed <= beatEnd
                 && currentVolume > gates.volumeGate
                 && pitchIsSounding(true)) {
-              hitNotesRef.current[noteKey] = Math.min(loopedBeatsElapsed, beatEnd);
-              needsFlushRef.current = true;
+              const heldTo = Math.min(loopedBeatsElapsed, beatEnd);
+              hitNotesRef.current[noteKey] = heldTo;
+              // The tab follows a streamed hold by itself; React only needs it
+              // where the tab reads the fill from React's copy.
+              if (streamFill) streamFill({ noteKey, beat: heldTo });
+              else needsFlushRef.current = true;
             }
             return;
           }
@@ -680,6 +702,7 @@ export function useNoteMatching({
 
               hitNotesRef.current[noteKey] = loopedBeatsElapsed;
               needsFlushRef.current = true;
+              streamFill?.({ noteKey, beat: loopedBeatsElapsed, hit: true, timing: noteTimingsRef.current[noteKey] });
             }
           } else if (isPassed) {
 
@@ -740,7 +763,7 @@ export function useNoteMatching({
       livePitchRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, startTime, audioContext, audioStartTime, alphaTabSource, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm, calibratedLatencyMs, scoringFocus, settleIntonation]);
+  }, [isPlaying, startTime, audioContext, audioStartTime, alphaTabSource, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm, calibratedLatencyMs, scoringFocus, settleIntonation, streamFills]);
 
-  return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, minScoredBpmRef, noteTimings, timingCountsRef, timingOffsetsRef, intonationCountsRef, intonationOffsetsRef, runLogRef, livePitchRef, settlePendingIntonation, resetGame, markAlphaTabPassStart };
+  return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, minScoredBpmRef, noteTimings, timingCountsRef, timingOffsetsRef, intonationCountsRef, intonationOffsetsRef, runLogRef, livePitchRef, fillFeedRef, settlePendingIntonation, resetGame, markAlphaTabPassStart };
 }

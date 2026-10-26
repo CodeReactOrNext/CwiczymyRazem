@@ -25,7 +25,7 @@ const measures: TablatureMeasure[] = [
 ];
 const steps = buildLearnSteps(measures);
 
-function setup() {
+function setup(onNotePlayed?: () => void) {
   const audioRefs = {
     frequencyRef: { current: 0 },
     volumeRef: { current: 0 },
@@ -52,7 +52,7 @@ function setup() {
   const hook = renderHook(
     (props: { active: boolean; resetKey: number }) =>
       useLearnModeMatcher({
-        steps, audioRefs, getAdjustedTargetFreq: (_string, freq) => freq, ...props,
+        steps, audioRefs, getAdjustedTargetFreq: (_string, freq) => freq, onNotePlayed, ...props,
       }),
     { initialProps: { active: true, resetKey: 0 } },
   );
@@ -128,6 +128,17 @@ describe("useLearnModeMatcher", () => {
     hook.rerender({ active: false, resetKey: 0 });
     play(A2);
     expect(hook.result.current.stepIndex).toBe(0);
+  });
+
+  it("tells the session about a note that was played, not one that was skipped or missed", () => {
+    const onNotePlayed = vi.fn();
+    const { hook, play, run } = setup(onNotePlayed);
+    play(E3);
+    act(() => hook.result.current.skip());
+    run(FRAME_MS * 2); // the skip re-arms the judge
+    expect(onNotePlayed).not.toHaveBeenCalled();
+    play(E3);
+    expect(onNotePlayed).toHaveBeenCalledTimes(1);
   });
 
   it("lets a note be skipped, and the pass be started over", () => {

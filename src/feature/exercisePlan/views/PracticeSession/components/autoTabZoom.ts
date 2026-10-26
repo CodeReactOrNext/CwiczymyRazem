@@ -1,6 +1,7 @@
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 
 import { NOTE_SPACING_MAX, NOTE_SPACING_MIN } from "./tablatureSettings";
+import { baseBeatWidth } from "./tabSpacing";
 import { TAB_BASE_HEIGHT } from "./useTablatureWorkerBridge";
 
 /**
@@ -21,11 +22,6 @@ const BLOCK_GAP = 4;
 const PILL_BREATHING = 4;
 /** The worker plays with the cursor this far into the board. */
 const CURSOR_FRACTION = 1 / 4;
-
-/** The worker's beat width at zoom 1, in world px. */
-export function baseBeatWidth(viewerWidth: number): number {
-  return Math.max(120, Math.min(200, viewerWidth / 4));
-}
 
 /** Clamps to the slider's range and rounds to a 5% step, like a value a person would pick. */
 function clampSpacing(spacing: number): number {

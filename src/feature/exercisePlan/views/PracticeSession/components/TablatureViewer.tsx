@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { FillFeed } from "feature/exercisePlan/views/PracticeSession/utils/fillFeed";
 import type { LearnFocus } from "feature/exercisePlan/views/PracticeSession/utils/learnSteps";
 import type { LivePitch } from "feature/exercisePlan/views/PracticeSession/utils/pitchScoring";
 import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
@@ -35,6 +36,8 @@ interface TablatureViewerProps {
   noteTimings?: Record<string, NoteTiming>;
   /** The bend under the cursor, read every frame to animate how far it has gone. */
   livePitchRef?: React.MutableRefObject<LivePitch | null>;
+  /** Hits and holds straight from the matching loop — the fill is drawn from them. */
+  fillFeedRef?: React.MutableRefObject<FillFeed> | null;
   currentBeatsElapsed?: number;
   hideNotes?: boolean;
   audioContext?: AudioContext | null;
@@ -106,6 +109,7 @@ const TablatureViewerInner = ({
   missedNotes = {},
   noteTimings = NO_TIMINGS,
   livePitchRef,
+  fillFeedRef = null,
   hideNotes = false,
   audioContext,
   audioStartTime,
@@ -147,7 +151,7 @@ const TablatureViewerInner = ({
   const { showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat } = useTablatureWorkerBridge({
     canvasRef, containerRef, containerSize, renderData,
     isPlaying, startTime, audioStartTime, bpm, countInRemaining,
-    hitNotes, missedNotes, noteTimings, livePitchRef, hideNotes, hideDynamicsLane,
+    hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek,
     loopStartBeat, loopEndBeat, zoom, tuningStrings, style, selection, obscured,
     quarterTurned, learnFocus,
@@ -275,6 +279,7 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.missedNotes      === next.missedNotes        &&
   prev.noteTimings      === next.noteTimings        &&
   prev.livePitchRef      === next.livePitchRef        &&
+  prev.fillFeedRef       === next.fillFeedRef         &&
   prev.hideDynamicsLane === next.hideDynamicsLane   &&
   prev.currentBeat      === next.currentBeat        &&
   prev.obscured         === next.obscured           &&

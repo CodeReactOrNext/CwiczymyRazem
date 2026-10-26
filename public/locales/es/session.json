@@ -462,7 +462,13 @@
   },
   "loading": "Cargando…",
   "track": "Pista:",
+  "track_empty": "Esta pista no tiene notas",
   "loading_track": "Cargando pista…",
+  "loading_steps": {
+    "file": "Descargando la tablatura",
+    "parse": "Leyendo las pistas",
+    "sound": "Cargando los sonidos"
+  },
   "timing_breakdown": {
     "title": "Timing",
     "grades": {

@@ -7,8 +7,11 @@
 //
 // The only difference between paths is *where the buffer comes from*; the math
 // below is the single source of truth.
-import { HIGH_STRING_MIN_FREQ } from "utils/audio/noteUtils";
+import type { AttackReading } from "utils/audio/attackTones";
+import { createAttackSpectraTap } from "utils/audio/attackTones";
+import { getAdaptiveVolumeGate, HIGH_STRING_MIN_FREQ } from "utils/audio/noteUtils";
 import type { PcmSpectrum } from "utils/audio/pcmSpectrum";
+import type { RecentAudio } from "utils/audio/recentAudio";
 
 export interface GuitarDetectors {
   /** aubio Pitch ("yinfft", 2048, 512, sampleRate), tolerance 0.7 */
@@ -21,6 +24,10 @@ export interface GuitarDetectors {
    *  shorten detection latency in the high register — see HIGH_RES_* below.
    *  Omit it and the processor behaves exactly as it did before. */
   pitchHigh?: any;
+  /** Optional aubio Pitch ("yinfast", 2048, 512): the plain YIN, used only to
+   *  correct the main detector's reading in the low register — see LOW_* below.
+   *  Omit it and the processor behaves exactly as it did before. */
+  pitchLow?: any;
 }
 
 /**
@@ -43,6 +50,13 @@ export interface DetectedNoteEvent {
   pitchHz: number;
   /** Peak raw (gain-independent) volume observed while resolving. */
   peakVolume: number;
+  /**
+   * The spectrum just before and just after the attack (attackTones.ts) —
+   * which note it struck, even under strings still ringing. "reading" until
+   * the "after" has been captured (~105 ms past the attack); null when it
+   * couldn't be read cleanly (the next attack came first) or isn't read at all.
+   */
+  attack?: AttackReading;
 }
 
 /**
@@ -74,6 +88,9 @@ export interface ProcessorTargets {
    *  of the block instead — good enough for "was there an attack lately", too
    *  coarse to grade timing by. */
   lastAttackMsRef?: React.MutableRefObject<number>;
+  /** Optional: Date.now() (block end, like lastOnsetTimeRef) of the latest
+   *  attack heard on a low string by the low-band detector — see LOW_ATTACK_*. */
+  lastLowAttackMsRef?: React.MutableRefObject<number>;
   /** Optional: whoever is listening in on the raw input (see InputTap). */
   inputTapRef?: React.MutableRefObject<InputTap | null>;
 }
@@ -88,6 +105,9 @@ export interface BufferProcessorOptions {
   /** Spectrum computed from the captured PCM itself, for a path with no
    *  AnalyserNode (native) — fed every window, read by the chord grading. */
   spectrum?: PcmSpectrum | null;
+  /** The last seconds of raw input, kept for the note-onset model — fed every
+   *  window, silent ones included, so its clock never skips. */
+  recentAudio?: RecentAudio | null;
   /** Called (already throttled to ~10Hz) the first time signal is flowing. */
   onActive?: () => void;
 }
@@ -98,8 +118,8 @@ export interface BufferProcessorOptions {
  * state persists across calls.
  */
 export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
-  const { detectors, targets, getGain, spectrum, onActive, sampleRate = 48000 } = opts;
-  const { pitch: pitchDetector, onset: onsetDetector, tick: tickDetector, pitchHigh: pitchHighDetector } = detectors;
+  const { detectors, targets, getGain, spectrum, recentAudio, onActive, sampleRate = 48000 } = opts;
+  const { pitch: pitchDetector, onset: onsetDetector, tick: tickDetector, pitchHigh: pitchHighDetector, pitchLow: pitchLowDetector } = detectors;
 
   let lastFrequencies: number[] = [];
   // Per-hop pitch estimates of the current window, reused across calls.
@@ -115,6 +135,70 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   let normalizedBuf: Float32Array | null = null;
 
   const HOP = 512;
+
+  // ── Low-string attacks ──────────────────────────────────────────────────────
+  // The onset detector (hfc) listens for a bright attack, and a low string
+  // picked softly — the thumb, a dark tone — has little brightness to give: it
+  // can pass unheard, and a lesson waiting for a new attack never moves on. So
+  // the low band (under LOW_BAND_HZ: a low E's fundamental and first harmonics)
+  // is watched on its own, through its peak envelope — which, unlike an RMS over
+  // a hop shorter than a low E's period, doesn't wobble with the wave's phase.
+  // An attack is a hop whose envelope jumps well above the hops before it, and up
+  // to where the low band recently was: two ringing strings beating out of a
+  // quiet moment don't reach that. Read off the raw input — the per-window
+  // normalisation below would flatten the jump out of a quiet start.
+  const LOW_BAND_HZ = 250;
+  /** The hop's low-band envelope against the louder of the two before it. */
+  const LOW_ATTACK_RISE = 1.6;
+  /** …and against the low band's recent peak, which halves every LOW_PEAK_HALF_LIFE_MS. */
+  const LOW_ATTACK_OF_PEAK = 0.5;
+  const LOW_PEAK_HALF_LIFE_MS = 500;
+  /** The envelope falls back this fast between wave peaks (half-life, ms). */
+  const LOW_ENVELOPE_HALF_LIFE_MS = 30;
+  const LOW_ATTACK_REFRACTORY_MS = 80;
+  // RBJ biquad low-pass (Q = 0.707) for the low band.
+  const lowW = (2 * Math.PI * LOW_BAND_HZ) / sampleRate;
+  const lowAlpha = Math.sin(lowW) / (2 * Math.SQRT1_2);
+  const lowA0 = 1 + lowAlpha;
+  const lowB0 = (1 - Math.cos(lowW)) / 2 / lowA0;
+  const lowB1 = (1 - Math.cos(lowW)) / lowA0;
+  const lowA1 = (-2 * Math.cos(lowW)) / lowA0;
+  const lowA2 = (1 - lowAlpha) / lowA0;
+  let lowX1 = 0, lowX2 = 0, lowY1 = 0, lowY2 = 0;
+  const lowRelease = Math.pow(0.5, 1000 / (sampleRate * LOW_ENVELOPE_HALF_LIFE_MS));
+  const lowPeakDecay = Math.pow(0.5, ((HOP / sampleRate) * 1000) / LOW_PEAK_HALF_LIFE_MS);
+  let lowEnvelope = 0, lowPrev1 = 0, lowPrev2 = 0, lowPeak = 0, lastLowAttackMs = 0;
+
+  /** True when a low string was struck in this window (see LOW_ATTACK_*). */
+  const detectLowAttack = (input: Float32Array, nowMs: number): boolean => {
+    const floor = targets.noiseFloorRef.current > 0 ? getAdaptiveVolumeGate(targets.noiseFloorRef.current) : 0.005;
+    let found = false;
+    for (let offset = 0; offset < input.length; offset += HOP) {
+      const end = Math.min(input.length, offset + HOP);
+      for (let i = offset; i < end; i++) {
+        const x = input[i];
+        const y = lowB0 * x + lowB1 * lowX1 + lowB0 * lowX2 - lowA1 * lowY1 - lowA2 * lowY2;
+        lowX2 = lowX1; lowX1 = x; lowY2 = lowY1; lowY1 = y;
+        const a = Math.abs(y);
+        lowEnvelope = a > lowEnvelope ? a : lowEnvelope * lowRelease;
+      }
+      // Same scale as rawVolumeRef (×10), so the noise gate applies as is.
+      const level = lowEnvelope * 10;
+      const hopEndMs = nowMs - ((input.length - end) / sampleRate) * 1000;
+      if (level > floor
+          && level > LOW_ATTACK_RISE * Math.max(lowPrev1, lowPrev2)
+          && level >= LOW_ATTACK_OF_PEAK * lowPeak
+          && hopEndMs - lastLowAttackMs > LOW_ATTACK_REFRACTORY_MS) {
+        lastLowAttackMs = hopEndMs;
+        found = true;
+      }
+      lowPeak = Math.max(level, lowPeak * lowPeakDecay);
+      lowPrev2 = lowPrev1;
+      lowPrev1 = level;
+    }
+    if (found && targets.lastLowAttackMsRef) targets.lastLowAttackMsRef.current = nowMs;
+    return found;
+  };
   const VOLUME_THRESHOLD = 0.001; // catches low E on mics with high-pass filters
 
   // ── High-register fast path (A3) ────────────────────────────────────────────
@@ -138,6 +222,32 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
    *  whole block would still be half made of the previous note. */
   const HIGH_RES_RECENT_HOPS = 3;
 
+  // ── Low-register correction ─────────────────────────────────────────────────
+  // yinfft weighs its spectrum the way the ear does. That keeps it robust on
+  // bright, busy signals and costs it accuracy at the bottom: it reads the low
+  // strings sharp — E2 by ~50 cents, and by more than a semitone when the tone
+  // is dark (thumb, neck pickup), which put a low E played right outside its
+  // window or onto the fret above. The plain YIN (yinfast — the same YIN,
+  // computed through an FFT, no weighting) reads them where they are
+  // (guitarBufferProcessor.lowstrings.test.ts).
+  //
+  // So below LOW_REFINE_MAX_HZ its reading is taken instead — but only while
+  // both name the same note, give or take yinfft's bias, which only ever points
+  // up: YIN's own weakness is octave errors, and a reading an octave away is
+  // never taken. Everywhere else yinfft stays the authority, exactly as before.
+  const LOW_REFINE_MAX_HZ = 200;
+  /** How far under yinfft the plain YIN may read and still be the same note
+   *  (yinfft's bias on a dark low E reaches ~170 cents). */
+  const LOW_REFINE_BELOW_CENTS = 200;
+  /** And how far over it — yinfft is never flat, so only noise is up here. */
+  const LOW_REFINE_ABOVE_CENTS = 50;
+
+  const refineLow = (coarse: number, fine: number): number => {
+    if (coarse <= 20 || coarse >= LOW_REFINE_MAX_HZ || fine <= 20) return coarse;
+    const cents = 1200 * Math.log2(fine / coarse);
+    return cents >= -LOW_REFINE_BELOW_CENTS && cents <= LOW_REFINE_ABOVE_CENTS ? fine : coarse;
+  };
+
   // ── Onset-anchored note events (B1) ─────────────────────────────────────────
   // A pending event collects pitch estimates from the hops that came AFTER its
   // own onset hop — never from hops belonging to the previous note. That
@@ -160,7 +270,13 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
    *  tunable fudge, which is why it is derived rather than hardcoded. Subtracting
    *  it makes onsetMs mean "when the string was struck" instead of "when we
    *  worked out that it had been". */
-  const ONSET_REPORT_LAG_MS = (2048 / sampleRate) * 1000;
+  const ONSET_WINDOW = 2048;
+  const ONSET_REPORT_LAG_MS = (ONSET_WINDOW / sampleRate) * 1000;
+  /** Every attack is also looked at as a before/after spectrum (attackTones.ts) —
+   *  only where events are wanted at all. Fed the raw input, like the chord spectrum. */
+  const attackTap = targets.noteEventsRef ? createAttackSpectraTap(sampleRate) : null;
+  /** Samples received before the current window — attackTap's clock. */
+  let samplesIn = 0;
 
   // Only the onset hop itself is dropped: its window is dominated by the note
   // that just ended, so its estimate genuinely belongs to the previous event.
@@ -176,7 +292,8 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   const ONSET_HOP_SKIP = 1;
 
   interface PendingEvent {
-    onsetMs: number;
+    /** Created at the attack, so its spectra can land on it whenever they're read. */
+    event: DetectedNoteEvent;
     long: number[];
     high: number[];
     peakVolume: number;
@@ -205,11 +322,10 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   const commitPending = () => {
     const buf = targets.noteEventsRef?.current;
     if (!pending || !buf) { pending = null; return; }
-    buf.push({
-      onsetMs: pending.onsetMs,
-      pitchHz: pickRegisterAware(pending.long, pending.high),
-      peakVolume: pending.peakVolume,
-    });
+    const { event } = pending;
+    event.pitchHz = pickRegisterAware(pending.long, pending.high);
+    event.peakVolume = pending.peakVolume;
+    buf.push(event);
     if (buf.length > EVENT_BUFFER_MAX) buf.splice(0, buf.length - EVENT_BUFFER_MAX);
     pending = null;
   };
@@ -221,6 +337,9 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     // Ungained, like the web path's analyser, which taps the source directly.
     // Before the silence gate, so a chord read after a pause isn't stale audio.
     spectrum?.push(inputBuffer);
+    const blockStart = samplesIn;
+    samplesIn += len;
+    attackTap?.push(inputBuffer);
     targets.inputTapRef?.current?.(inputBuffer, sampleRate);
 
     // 1. Apply gain and calculate RMS volume + peak from gained signal
@@ -240,6 +359,9 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     targets.rawVolumeRef.current = rawVolume;
 
     const nowMs = Date.now();
+    // Before the silence gate: an attack out of silence is the one it must not miss.
+    const isLowAttack = detectLowAttack(inputBuffer, nowMs);
+    recentAudio?.push(inputBuffer, nowMs);
 
     // 1b. Silence gate — with no signal there is nothing to detect. Skipping the
     // aubio calls (yinfft pitch + 2 onset detectors, 4 hops each ≈ 12 WASM FFT
@@ -299,15 +421,19 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
         if (targets.lastAttackMsRef) targets.lastAttackMsRef.current = onsetMs;
         if (targets.noteEventsRef) {
           commitPending(); // a new attack ends the previous one, resolved or not
+          const event: DetectedNoteEvent = { onsetMs, pitchHz: 0, peakVolume: rawVolume, attack: attackTap ? "reading" : null };
+          // The same instant in samples: this hop's end, back by the detector's window.
+          attackTap?.mark(blockStart + (hopIndex + 1) * HOP - ONSET_WINDOW, (spectra) => { event.attack = spectra; });
           pending = {
-            onsetMs,
+            event,
             long: [], high: [], peakVolume: rawVolume, longHops: 0, highHops: 0,
           };
         }
       }
       if (tickDetector.do(chunk)) isTick = true;
 
-      const hopFreq = pitchDetector.do(chunk);
+      // Both run on every hop — each keeps its own sliding window of the signal.
+      const hopFreq = refineLow(pitchDetector.do(chunk), pitchLowDetector ? pitchLowDetector.do(chunk) : 0);
       pitchConfidence = pitchDetector.getConfidence();
       if (hopFreq > 20) hopFrequencies.push(hopFreq);
       if (pending && ++pending.longHops > ONSET_HOP_SKIP && hopFreq > 20) {
@@ -329,7 +455,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
       pending.peakVolume = Math.max(pending.peakVolume, rawVolume);
       const settled = pending.long.length >= EVENT_MIN_ESTIMATES
         || pending.high.length >= EVENT_MIN_ESTIMATES * 2;
-      if (settled || nowMs - pending.onsetMs >= EVENT_RESOLVE_TIMEOUT_MS) commitPending();
+      if (settled || nowMs - pending.event.onsetMs >= EVENT_RESOLVE_TIMEOUT_MS) commitPending();
     }
 
     if (isOnset) {
@@ -398,7 +524,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     const rmsDelta = rms - prevTickRms;
     prevTickRms = rms;
     const isRmsTransient = rmsDelta > 0.006 && rms > 0.004;
-    const tickCandidate = isTick || isOnset || isRmsTransient;
+    const tickCandidate = isTick || isOnset || isRmsTransient || isLowAttack;
     if (tickCandidate && nowMs - lastTickFire > 60) {
       lastTickFire = nowMs;
       targets.lastTickTimeRef.current = nowMs;
@@ -429,5 +555,8 @@ export function createGuitarDetectors(aubio: any, sampleRate: number): GuitarDet
   const pitchHigh = new aubio.Pitch("yinfft", 1024, 256, sampleRate);
   pitchHigh.setTolerance(0.7);
 
-  return { pitch, onset, tick, pitchHigh };
+  // The plain YIN, for the low register only — see LOW_REFINE_* above.
+  const pitchLow = new aubio.Pitch("yinfast", 2048, 512, sampleRate);
+
+  return { pitch, onset, tick, pitchHigh, pitchLow };
 }

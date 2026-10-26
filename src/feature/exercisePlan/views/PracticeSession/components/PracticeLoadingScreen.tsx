@@ -4,14 +4,22 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { TbGuitarPick } from "react-icons/tb";
 
+import type { LoadingStep } from "./SessionLoadingSteps";
+import { SessionLoadingSteps } from "./SessionLoadingSteps";
+
 interface PracticeLoadingScreenProps {
   /** When true, the doors part (after the minimum delay) to reveal what's behind. */
   isReady: boolean;
+  /** What is still being loaded, shown on the doors while they stay shut. */
+  steps?: readonly LoadingStep[];
   /** Fired once the reveal animation has fully finished. */
   onDone?: () => void;
 }
 
 const MIN_DELAY_MS = 1500;
+/** The doors part after this even if something never finished loading — a
+ *  file the player can't read mustn't lock the session behind them. */
+const MAX_WAIT_MS = 45_000;
 
 // Door slide timing (must match the setTimeout that unmounts the overlay).
 const DOOR_DELAY_MS = 180;
@@ -59,9 +67,10 @@ const PanelPattern = ({ align }: { align: "left" | "right" }) => (
   </svg>
 );
 
-export const PracticeLoadingScreen = ({ isReady, onDone }: PracticeLoadingScreenProps) => {
+export const PracticeLoadingScreen = ({ isReady, steps = [], onDone }: PracticeLoadingScreenProps) => {
   const [mounted, setMounted] = useState(false);
   const [minDelayDone, setMinDelayDone] = useState(false);
+  const [gaveUp, setGaveUp] = useState(false);
   const [done, setDone] = useState(false);
 
   // Portal target only exists on the client.
@@ -72,7 +81,12 @@ export const PracticeLoadingScreen = ({ isReady, onDone }: PracticeLoadingScreen
     return () => clearTimeout(t);
   }, []);
 
-  const revealing = isReady && minDelayDone;
+  useEffect(() => {
+    const t = setTimeout(() => setGaveUp(true), MAX_WAIT_MS);
+    return () => clearTimeout(t);
+  }, []);
+
+  const revealing = (isReady || gaveUp) && minDelayDone;
 
   // Once the reveal starts, keep the overlay mounted until the doors finish,
   // then drop it and notify the parent.
@@ -114,6 +128,19 @@ export const PracticeLoadingScreen = ({ isReady, onDone }: PracticeLoadingScreen
         animate={{ scaleY: revealing ? 0 : 1, opacity: revealing ? 0 : 1 }}
         transition={{ duration: 0.35, ease: "easeIn" }}
       />
+
+      {/* What is still loading, above the seam; fades as the doors part */}
+      {steps.length > 0 && (
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center"
+          animate={{ opacity: revealing ? 0 : 1 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="rounded-lg bg-zinc-900/80 px-6 py-5">
+            <SessionLoadingSteps steps={steps} />
+          </div>
+        </motion.div>
+      )}
 
     </div>,
     document.body,

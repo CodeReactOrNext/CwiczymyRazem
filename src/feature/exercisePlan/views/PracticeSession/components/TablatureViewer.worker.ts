@@ -1,7 +1,13 @@
 /// <reference lib="webworker" />
 
+import type { FillStep } from "../utils/fillFeed";
+import type { NoteTiming } from "../utils/timingGrade";
+import { addFillSteps, clearLiveFills, createLiveFills, currentTiming, isLiveTiming, liveFillBeat, liveFillOn } from "./liveNoteFills";
 import { applyHitNotes, applyMissedNotes, createNoteHitVisualState, resetFrozenNoteState, resetNoteHitVisualState } from "./noteHitVisualState";
 import { stringRow } from "./tablatureStringRows";
+import type { BeatXMap } from "./tabSpacing";
+import { baseBeatWidth, beatToX, buildBeatXMap, xToBeat } from "./tabSpacing";
+import { audioClockNow, createAudioClock, observeAudioClock, resetAudioClock } from "./workerAudioClock";
 
 // ── Layout constants ──────────────────────────────────────────────────────────
 // World-space design height of the score. The whole drawing is scaled by
@@ -235,15 +241,24 @@ let vscale = 1;
 // <1 compresses the score so more of it fits on screen; >1 enlarges it.
 let zoom = 1;
 
+// Where every beat sits (see tabSpacing.ts) and every bar line with it, rebuilt
+// by relayout() whenever one of its inputs changes.
+let xMap: BeatXMap = buildBeatXMap([], 1, baseBeatWidth(0), { pillHeight: BLOCK_H, fretFontScale });
+let measureEndPx: number[] = [];
+
 // Playback
 let isPlaying = false;
 let startWallMs: number | null = null;
 let bpm = 120;
 let countInRemaining = 0;
 
-// Audio-clock sync (AudioContext.currentTime sent from main thread each rAF)
+// Audio-clock sync: AudioContext.currentTime readings from the main thread
+// (TICK), smoothed between them — see workerAudioClock.ts.
 let audioStartSec: number | null = null;
-let audioCurrentSec: number | null = null;
+const audioClock = createAudioClock();
+/** TICKs feed the clock. Without them (a board given no AudioContext) the fill
+ *  steps' own stamps are all it has — those only time the fills, not the cursor. */
+let clockFromTicks = false;
 
 // Visual state — hit/miss overlay bookkeeping lives in noteHitVisualState.ts
 // (see there for how HIT_NOTES/MISSED_NOTES/RESET/DATA update it) so it can be
@@ -252,10 +267,7 @@ const visual = createNoteHitVisualState();
 /** noteKey -> timing of its hit (NOTE_TIMINGS, see timingGrade.ts). Kept apart
  *  from the hit maps: it isn't frozen per pass, a re-hit note just overwrites
  *  its own entry. */
-let noteTimings: Record<string, {
-  grade: number; hint: TimingLabelKind | null; offsetBeats: number | null;
-  intonation?: { grade: number; cents: number | null };
-}> = {};
+let noteTimings: Record<string, NoteTiming> = {};
 type TimingLabelKind = "early" | "late" | "perfect";
 
 // ── Live pitch: bend gauge & note tuner ────────────────────────────────────
@@ -324,6 +336,26 @@ const HIT_ANIM_MS = 320;
 
 // Visual cache for progressive fills to prevent backward snapping during latency variance
 const noteVisualFill = new Map<string, number>();
+// Hits and holds as the matching loop streams them (FILL_STEPS) — where a note
+// has one, its fill is drawn from it rather than eased toward React's copy.
+const liveFills = createLiveFills();
+// Where the last playing frame had the cursor, to place incoming fill steps on a tile.
+let lastDispCursor = 0;
+let lastSeamless = false;
+
+/** The board tile a streamed fill step was played on: the repetition whose
+ *  copy of its beat lies nearest the cursor — matching runs behind the cursor
+ *  by the input latency, so right after a wrap that is still the tile before. */
+function liveFillTile(beat: number): number {
+  const totalW = xMap.totalX;
+  if (!lastSeamless || totalW <= 0) return 0;
+  return Math.max(0, Math.round((lastDispCursor - beatToX(xMap, beat)) / totalW));
+}
+
+/** How wide a note's fill is when held through `heldBeat`, within its block. */
+function heldFillWidth(heldBeat: number, beatPx: number, beatOffset: number, pxPerBeat: number, blockX: number, blockW: number): number {
+  return Math.max(0, Math.min(blockW, beatPx + (heldBeat - beatOffset) * pxPerBeat - blockX));
+}
 
 // ── Performance: module-level reuse ──────────────────────────────────────────
 // Reused each frame instead of allocating a new Map on every rAF tick
@@ -336,8 +368,6 @@ let needsRedraw = true;
 let isVisible = true;
 // Cache for bend badge text widths — ctx.measureText is expensive, text never changes
 const bendTextWidthCache = new Map<string, number>();
-// Wall-clock time (ms) at which the last TICK was received — used for interpolation
-let audioCurrentReceivedAt: number | null = null;
 
 // Scrub/pause position (writable by SCROLL message when paused)
 let pausedCursorPos = 0;
@@ -357,6 +387,25 @@ const LEARN_COLOR = "#22d3ee";
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 /** Motion is off when the tab's animations are, or the system asks for less. */
 const learnIsCalm = () => !hitAnimations || reducedMotion;
+
+/**
+ * Rebuilds where the beats sit after one of the inputs moved them — the notes,
+ * the board's width, the zoom, the pill size. The paused view is kept in pixels,
+ * and the pixels of every beat just changed, so it is carried over by beat: the
+ * same beat stays under the cursor and at the left edge.
+ */
+function relayout() {
+  const prev = xMap;
+  xMap = buildBeatXMap(renderBeats, totalBeats, baseBeatWidth(W) * zoom, { pillHeight: BLOCK_H, fretFontScale });
+  measureEndPx = measureEndXs.map((beat) => beatToX(xMap, beat));
+  const carry = (x: number) => beatToX(xMap, xToBeat(prev, x));
+  pausedCursorPos = carry(pausedCursorPos);
+  pausedScrollX = carry(pausedScrollX);
+  if (glide) {
+    glide.fromCursor = carry(glide.fromCursor); glide.toCursor = carry(glide.toCursor);
+    glide.fromScroll = carry(glide.fromScroll); glide.toScroll = carry(glide.toScroll);
+  }
+}
 
 // Hover preview — world-X of the measure start being hovered (null = no hover)
 let hoverStartX: number | null = null;
@@ -1199,8 +1248,7 @@ function render() {
     }
   }
 
-  const dynBW = Math.max(120, Math.min(200, W / 4)) * zoom;
-  const totalW = totalBeats * dynBW;
+  const totalW = xMap.totalX;
   // Viewport extent in world units — the context is scaled by dpr * vscale,
   // so a stretched (or shrunk) window shows the same world height (BASE_H).
   const viewW = W / vscale;
@@ -1214,12 +1262,13 @@ function render() {
   let wrappedCursor = pausedCursorPos;  // cursor within a single repetition (tile-0 space)
   let seamless = false;                 // full-exercise seamless wrap active this frame
 
+  // The audio clock now, and the moment the streamed fills are drawn at: a
+  // little behind it, so the steps around that moment are already in.
+  const audioNow = audioClockNow(audioClock, performance.now());
+  const fillRenderSec = audioNow !== null ? audioNow - liveFills.delaySec : null;
+
   if (isPlaying && countInRemaining === 0) {
-    // Interpolate audio time between infrequent TICK messages using wall clock
-    const audioNow = (audioCurrentSec !== null && audioCurrentReceivedAt !== null)
-      ? audioCurrentSec + (Date.now() - audioCurrentReceivedAt) / 1000
-      : null;
-    const elapsed = (audioStartSec !== null && audioNow !== null)
+    const elapsed = (audioStartSec !== null && audioNow !== null && clockFromTicks)
       ? (audioNow - audioStartSec)
       : startWallMs !== null ? (Date.now() - startWallMs) / 1000 : 0;
     beatsElapsed = computeBeatsElapsed(elapsed);
@@ -1230,16 +1279,19 @@ function render() {
       const loopDur = loopEndBeat - loopStartBeat;
       const relBeat = beatsElapsed - loopStartBeat;
       const loopBeat = loopStartBeat + (relBeat % loopDur);
-      dispCursor = loopBeat * dynBW;
+      dispCursor = beatToX(xMap, loopBeat);
       wrappedCursor = dispCursor;
     } else {
       // Full-exercise loop: monotonic cursor + tiled score so the ribbon scrolls
       // continuously into the next repetition with no snap-back.
       seamless = totalBeats > 0;
-      dispCursor = beatsElapsed * dynBW;
-      wrappedCursor = (totalBeats > 0 ? beatsElapsed % totalBeats : 0) * dynBW;
+      const pass = totalBeats > 0 ? Math.floor(beatsElapsed / totalBeats) : 0;
+      wrappedCursor = totalBeats > 0 ? beatToX(xMap, beatsElapsed - pass * totalBeats) : 0;
+      dispCursor = pass * totalW + wrappedCursor;
     }
     scrollX = Math.max(0, dispCursor - viewW / 4);
+    lastDispCursor = dispCursor;
+    lastSeamless = seamless;
     // Pause/seek anchor stays within a single repetition (tile-0 space)
     pausedCursorPos = wrappedCursor;
     pausedScrollX = Math.max(0, wrappedCursor - viewW / 4);
@@ -1309,14 +1361,14 @@ function render() {
     ctx.beginPath();
     ctx.moveTo(0, STAFF_TOP); ctx.lineTo(0, STAFF_TOP + 5 * STRING_SPACING);
     // Binary search for first visible measure bar, then scan forward
-    if (measureEndXs.length > 0) {
-      let lo = 0, hi = measureEndXs.length - 1;
+    if (measureEndPx.length > 0) {
+      let lo = 0, hi = measureEndPx.length - 1;
       while (lo < hi) {
         const mid = (lo + hi) >> 1;
-        if (measureEndXs[mid] * dynBW < visL) lo = mid + 1; else hi = mid;
+        if (measureEndPx[mid] < visL) lo = mid + 1; else hi = mid;
       }
-      for (let mi = lo; mi < measureEndXs.length; mi++) {
-        const x = measureEndXs[mi] * dynBW;
+      for (let mi = lo; mi < measureEndPx.length; mi++) {
+        const x = measureEndPx[mi];
         if (x > visR) break;
         ctx.moveTo(x, STAFF_TOP); ctx.lineTo(x, STAFF_TOP + 5 * STRING_SPACING);
       }
@@ -1335,8 +1387,7 @@ function render() {
     let lo = 0, hi = renderBeats.length - 1;
     while (lo < hi) {
       const mid = (lo + hi) >> 1;
-      const beatEndPx = (renderBeats[mid].offsetX + renderBeats[mid].duration) * dynBW;
-      if (beatEndPx < visL) lo = mid + 1; else hi = mid;
+      if (xMap.xs[mid + 1] < visL) lo = mid + 1; else hi = mid;
     }
     startIdx = lo;
   }
@@ -1344,8 +1395,11 @@ function render() {
   // ── Beat loop ────────────────────────────────────────────────────────────
   for (let i = startIdx; i < renderBeats.length; i++) {
     const beat = renderBeats[i];
-    const beatPx = beat.offsetX * dynBW;
-    const beatEndPx = beatPx + beat.duration * dynBW;
+    const beatPx = xMap.xs[i];
+    const beatEndPx = xMap.xs[i + 1];
+    const beatW = beatEndPx - beatPx;
+    // More than xMap.beatWidth where a fast run had to be spread out.
+    const pxPerBeat = beat.duration > 0 ? beatW / beat.duration : xMap.beatWidth;
     const beatL = beatPx + 10;
 
     if (beatL > visR) break;
@@ -1378,7 +1432,7 @@ function render() {
         if (warnThisBeat) {
           // Subtle amber column tint
           ctx.fillStyle = "rgba(251,191,36,0.07)";
-          ctx.fillRect(beatPx, 0, beat.duration * dynBW, viewH);
+          ctx.fillRect(beatPx, 0, beatW, viewH);
           // Override rest symbol color to amber
           ctx.strokeStyle = "rgba(251,191,36,0.9)";
           ctx.fillStyle = "rgba(251,191,36,0.9)";
@@ -1445,7 +1499,7 @@ function render() {
               if (drawRight) {
                 // Spans stem to stem, covering both stems' full thickness.
                 ctx.fillStyle = RHYTHM_COLOR;
-                ctx.fillRect(stemX - RHY_STEM_W / 2, beamY, beat.duration * dynBW + RHY_STEM_W, BEAM_H);
+                ctx.fillRect(stemX - RHY_STEM_W / 2, beamY, beatW + RHY_STEM_W, BEAM_H);
               } else if (!leftBeam) {
                 ctx.strokeStyle = RHYTHM_COLOR;
                 ctx.lineWidth = 1.5;
@@ -1470,7 +1524,7 @@ function render() {
     if (inView && !hideNotes) {
       // Block coordinates — same for all notes in this beat
       const blockX = beatPx + BLOCK_PAD;
-      const rawW = beat.duration * dynBW - BLOCK_PAD - BLOCK_GAP;
+      const rawW = beatW - BLOCK_PAD - BLOCK_GAP;
       const blockW = Math.max(BLOCK_H, rawW); // min size = square pill for tiny notes
       const blockRX = blockX + blockW;         // right edge (for slide tracking)
 
@@ -1492,9 +1546,14 @@ function render() {
         for (const note of beat.notes) {
           top = Math.min(top, note.noteY);
           bottom = Math.max(bottom, note.noteY);
-          const hit = reached && !!tileHit[note.noteKey];
-          // Last frame's fill — the heads below update it for this one.
-          if (hit) held = Math.max(held, isOutgoing ? blockW : (noteVisualFill.get(note.noteKey) ?? 0));
+          const liveFill = reached ? liveFillOn(liveFills, note.noteKey, tile) : undefined;
+          const hit = reached && (!!tileHit[note.noteKey] || !!liveFill);
+          // A streamed fill is known for this frame; any other is last frame's,
+          // which the heads below update.
+          const fill = isOutgoing ? blockW
+            : liveFill ? heldFillWidth(liveFillBeat(liveFill, fillRenderSec), beatPx, beat.offsetX, pxPerBeat, blockX, blockW)
+              : (noteVisualFill.get(note.noteKey) ?? 0);
+          if (hit) held = Math.max(held, fill);
           if (hit || !(reached && tileMissed[note.noteKey])) allMissed = false;
         }
         drawChordBox(blockX, blockW, top, bottom, isActive, held, allMissed ? 0.4 : 1);
@@ -1504,7 +1563,10 @@ function render() {
 
       for (const note of beat.notes) {
         const hitVal = reached ? tileHit[note.noteKey] : undefined;
-        const isHit = !!hitVal;
+        // Streamed from the matching loop: a hit shows before React's copy of it.
+        const liveFill = reached ? liveFillOn(liveFills, note.noteKey, tile) : undefined;
+        const isHit = !!hitVal || !!liveFill;
+        const noteTiming = isHit ? currentTiming(noteTimings[note.noteKey], liveFill) : undefined;
         const isDead = note.isDead;
         const isHarm = !!(note.harmonicType && note.harmonicType > 0);
         const dyn = hasDynamics && note.dynamics !== undefined ? note.dynamics : 1.0;
@@ -1514,7 +1576,7 @@ function render() {
         // stretches of the tab look muted.
         const accentDim = hasAccentedNotes && beat.inAccentedBar && !note.isAccented ? 0.25 : 1.0;
         const dynAlpha = hasDynamics && note.dynamics !== undefined ? 0.3 + 0.7 * dyn : 1.0;
-        const missedDim = reached && !tileHit[note.noteKey] && tileMissed[note.noteKey] ? 0.2 : 1.0;
+        const missedDim = reached && !isHit && tileMissed[note.noteKey] ? 0.2 : 1.0;
         const baseAlpha = dynAlpha * accentDim * ghostAlpha * missedDim;
 
         const blockY = note.noteY - BLOCK_H / 2;
@@ -1590,11 +1652,14 @@ function render() {
             if (tuner.lockAt === null && Math.abs(tuner.cents) <= TUNER_LOCK_CENTS) tuner.lockAt = frameNow;
           }
         }
-        const intonationVerdict = isHit && isHeldNote ? noteTimings[note.noteKey]?.intonation : undefined;
+        const intonationVerdict = isHeldNote ? noteTiming?.intonation : undefined;
         const finalHitColor = intonationVerdict
           ? intonationColor(intonationVerdict.grade)
           : liveTune && tuner ? intonationColorForCents(tuner.cents) : hitFill;
-        const isAnimatingHit = isHit && visual.hitTimestamps[note.noteKey] !== undefined;
+        // The earlier of the two hit times: React's copy lands a flush later.
+        const reactHitAt = visual.hitTimestamps[note.noteKey];
+        const hitAt = liveFill && liveFill.hitAt !== null && (reactHitAt === undefined || liveFill.hitAt < reactHitAt) ? liveFill.hitAt : reactHitAt;
+        const isAnimatingHit = isHit && hitAt !== undefined;
 
         // Palm-muted notes keep their string colour — the P.M. lane under the
         // staff marks them, and a grey pill read as a disabled note.
@@ -1622,7 +1687,7 @@ function render() {
         // ── Draw pill block ──────────────────────────────────────────────
         let hitAge = 0;
         if (isAnimatingHit && hitAnimations) {
-          hitAge = Math.min(1, (Date.now() - visual.hitTimestamps[note.noteKey]) / HIT_ANIM_MS);
+          hitAge = Math.min(1, (Date.now() - hitAt!) / HIT_ANIM_MS);
         }
 
         // Timing, shown as words and position rather than as a colour — only
@@ -1630,10 +1695,10 @@ function render() {
         // like any other hit. Late: the fill starts at the attack, leaving the
         // note's front open. Both: a short "Early"/"Late" over the note that
         // fades right away — and a hit close to the beat earns a green "+".
-        const timing = isHit && timingHints ? noteTimings[note.noteKey] : undefined;
+        const timing = timingHints ? noteTiming : undefined;
         const isOffBeat = timing?.hint === "early" || timing?.hint === "late";
         const offBeatPx = timing && isOffBeat && timing.offsetBeats !== null
-          ? timing.offsetBeats * dynBW
+          ? timing.offsetBeats * pxPerBeat
           : 0;
         const fillStartW = Math.max(0, Math.min(blockW - 2, offBeatPx));
 
@@ -1642,14 +1707,21 @@ function render() {
           // Frozen tail strictly behind the cursor: keep notes fully filled and
           // never touch the live cache (its note key is shared with other tiles).
           fillW = blockW;
+        } else if (liveFill) {
+          // Streamed: drawn between the matching loop's own steps, a little
+          // behind the clock (liveNoteFills.ts) — it grows at the cursor's pace
+          // and stops exactly where the note stopped ringing.
+          fillW = heldFillWidth(liveFillBeat(liveFill, fillRenderSec), beatPx, beat.offsetX, pxPerBeat, blockX, blockW);
         } else if (isHit) {
           // Green fills up to how far the note was actually SUSTAINED. `hitVal` is
           // the beat matching last confirmed the correct pitch still ringing — it
           // advances only while you hold the note and freezes the instant you stop,
           // so the fill stops exactly where you stopped instead of racing the cursor
-          // to the end. Ease the drawn width toward that target (matching flushes at
-          // ~20Hz) for a smooth grow, and never rewind — a hit only ever grows.
-          const heldX = typeof hitVal === 'number' ? hitVal * dynBW : cursorPos;
+          // to the end. Without a streamed fill (learn mode, hunts) this copy is
+          // all there is, refreshed at ~20Hz: ease the drawn width toward it, and
+          // never rewind — a hit only ever grows.
+          // hitVal is a beat; past this beat's end the fill is clamped below anyway.
+          const heldX = typeof hitVal === 'number' ? beatPx + (hitVal - beat.offsetX) * pxPerBeat : cursorPos;
           const targetFill = Math.max(0, Math.min(blockW, heldX - blockX));
           const prevFill = noteVisualFill.get(note.noteKey) || 0;
           fillW = Math.max(prevFill, prevFill + (targetFill - prevFill) * 0.4);
@@ -1825,7 +1897,7 @@ function render() {
           if (gauge && gauge.tile === tile && reached && !isOutgoing) {
             const x0 = blockX + headW + 3;
             const w = Math.max(26, Math.min(56, blockW - headW - 10));
-            const verdict = isHit ? noteTimings[note.noteKey]?.intonation ?? null : null;
+            const verdict = noteTiming?.intonation ?? null;
             const lockAge = gauge.locked ? (frameNow - gauge.lockAt) / BEND_LOCK_PULSE_MS : null;
             // Locked in or graded in tune → the hit green; graded off → the
             // board's ink; still on its way → the string's own colour.
@@ -1967,7 +2039,7 @@ function render() {
 
         // Let ring: dashed line extending past block right edge
         if (note.isLetRing) {
-          const trailEnd = Math.min(blockRX + 60, blockRX + beat.duration * dynBW * 1.5);
+          const trailEnd = Math.min(blockRX + 60, blockRX + beatW * 1.5);
           ctx.strokeStyle = note.color;
           ctx.globalAlpha = 0.35;
           ctx.lineWidth = 1.5;
@@ -2029,7 +2101,7 @@ function render() {
       }
 
       if (palmMuteX !== null && showTechniqueLabels) {
-        drawPalmMuteLabel(palmMuteX, beat.duration * dynBW, isActive);
+        drawPalmMuteLabel(palmMuteX, beatW, isActive);
       }
     }
   }
@@ -2045,11 +2117,11 @@ function render() {
     let lo = 0, hi = timeSigMarkers.length;
     while (lo < hi) {
       const mid = (lo + hi) >> 1;
-      if (timeSigMarkers[mid].x * dynBW + 10 < visL - 40) lo = mid + 1; else hi = mid;
+      if (beatToX(xMap, timeSigMarkers[mid].x) + 10 < visL - 40) lo = mid + 1; else hi = mid;
     }
     for (let mi = lo; mi < timeSigMarkers.length; mi++) {
       const marker = timeSigMarkers[mi];
-      const mx = marker.x * dynBW + 10;
+      const mx = beatToX(xMap, marker.x) + 10;
       if (mx > visR) break;
       drawText(marker.sig[0].toString(), mx, sigMidY - 10);
       drawText(marker.sig[1].toString(), mx, sigMidY + 10);
@@ -2071,12 +2143,12 @@ function render() {
     let lo = 0, hi = tupletGroups.length;
     while (lo < hi) {
       const mid = (lo + hi) >> 1;
-      if (tupletGroups[mid].x2 * dynBW - 8 < visL) lo = mid + 1; else hi = mid;
+      if (beatToX(xMap, tupletGroups[mid].x2) - 8 < visL) lo = mid + 1; else hi = mid;
     }
     for (let gi = lo; gi < tupletGroups.length; gi++) {
       const group = tupletGroups[gi];
-      const x1 = group.x1 * dynBW + 8;
-      const x2 = group.x2 * dynBW - 8;
+      const x1 = beatToX(xMap, group.x1) + 8;
+      const x2 = beatToX(xMap, group.x2) - 8;
       if (x1 > visR) break;
       const midX = (x1 + x2) / 2;
       const label = group.num.toString();
@@ -2125,13 +2197,13 @@ function render() {
 
   // ── Loop range overlay ────────────────────────────────────────────────────
   if (loopStartBeat !== null && loopEndBeat !== null && loopEndBeat > loopStartBeat) {
-    const lsx = loopStartBeat * dynBW;
-    const lex = loopEndBeat * dynBW;
+    const lsx = beatToX(xMap, loopStartBeat);
+    const lex = beatToX(xMap, loopEndBeat);
 
     // Dim the areas outside the loop range
     ctx.fillStyle = "rgba(0,0,0,0.28)";
     ctx.fillRect(0, 0, lsx, viewH);
-    ctx.fillRect(lex, 0, totalBeats * dynBW - lex, viewH);
+    ctx.fillRect(lex, 0, totalW - lex, viewH);
 
     // Loop boundary lines
     ctx.strokeStyle = "rgba(6,182,212,0.65)";
@@ -2151,8 +2223,8 @@ function render() {
   // ── Editor selection — mirrors the cell(s) picked in the tab editor grid ─
   // Playback owns the board while it runs, so this only shows when stopped.
   if (selection && !isPlaying) {
-    const selX = selection.startBeat * dynBW;
-    const selW = Math.max(6, (selection.endBeat - selection.startBeat) * dynBW);
+    const selX = beatToX(xMap, selection.startBeat);
+    const selW = Math.max(6, beatToX(xMap, selection.endBeat) - selX);
     // Flipped staff swaps which end of the string range is the upper row.
     const selRows = [stringRow(selection.startString, flipStrings), stringRow(selection.endString, flipStrings)];
     const topY = STAFF_TOP + Math.min(...selRows) * STRING_SPACING;
@@ -2195,8 +2267,8 @@ function render() {
 
     // Measure number label
     let measureIdx = 0;
-    for (let i = 0; i < measureEndXs.length; i++) {
-      if (measureEndXs[i] * dynBW > hoverStartX + 1) { measureIdx = i; break; }
+    for (let i = 0; i < measureEndPx.length; i++) {
+      if (measureEndPx[i] > hoverStartX + 1) { measureIdx = i; break; }
       measureIdx = i + 1;
     }
     ctx.fillStyle = "rgba(6,182,212,0.65)";
@@ -2214,13 +2286,14 @@ function render() {
     const calm = learnIsCalm();
     const settle = calm ? 1 : easeOutCubic(Math.min(1, (frameNow - learnTarget.since) / LEARN_SETTLE_MS));
     const breathe = calm ? 0.5 : 0.5 + 0.5 * Math.sin(frameNow / 260);
-    const colW = Math.min(1, learnTarget.beatEnd - learnTarget.beatStart) * dynBW;
+    const colX = beatToX(xMap, learnTarget.beatStart);
+    const colW = beatToX(xMap, learnTarget.beatStart + Math.min(1, learnTarget.beatEnd - learnTarget.beatStart)) - colX;
     const wash = ctx.createLinearGradient(0, 0, 0, viewH);
     wash.addColorStop(0, withAlpha(LEARN_COLOR, 0));
     wash.addColorStop(0.5, withAlpha(LEARN_COLOR, 0.06 + 0.05 * breathe));
     wash.addColorStop(1, withAlpha(LEARN_COLOR, 0));
     ctx.fillStyle = wash;
-    ctx.fillRect(learnTarget.beatStart * dynBW, 0, colW * settle, viewH);
+    ctx.fillRect(colX, 0, colW * settle, viewH);
   }
 
   // ── Cursor line + beat pulse ─────────────────────────────────────────────
@@ -2251,8 +2324,8 @@ function render() {
 
   // ── Pinned tuning gutter (drawn on top of the scrolled content) ──────────
   // Light the strings at / just ahead of the cursor. wrappedCursor is tile-0
-  // pixel space, so divide by the beat width to get the cursor beat.
-  drawTuningGutter(activeTuningStrings(dynBW > 0 ? wrappedCursor / dynBW : 0));
+  // pixel space, so the map turns it back into the cursor beat.
+  drawTuningGutter(activeTuningStrings(xToBeat(xMap, wrappedCursor)));
 
   // ── Notify main thread when cursor enters/leaves a rest beat ────────────
   if (isPlaying && countInRemaining === 0) {
@@ -2261,10 +2334,10 @@ function render() {
     let lo = 0, hi = renderBeats.length;
     while (lo < hi) {
       const mid = (lo + hi) >> 1;
-      if (renderBeats[mid].offsetX * dynBW <= wrappedCursor) lo = mid + 1; else hi = mid;
+      if (xMap.xs[mid] <= wrappedCursor) lo = mid + 1; else hi = mid;
     }
     const under = lo > 0 ? renderBeats[lo - 1] : undefined;
-    const restActive = !!under && under.isRest && wrappedCursor < (under.offsetX + under.duration) * dynBW;
+    const restActive = !!under && under.isRest && wrappedCursor < xMap.xs[lo];
     if (restActive !== lastRestActive) {
       lastRestActive = restActive;
       self.postMessage({ type: 'REST_ACTIVE', isRest: restActive });
@@ -2291,6 +2364,7 @@ self.onmessage = (e: MessageEvent) => {
       vscale = H > 0 ? H / BASE_H : 1;
       ctx = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
       ctx.setTransform(dpr * vscale, 0, 0, dpr * vscale, 0, 0);
+      relayout();
       if (rafId !== null) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(render);
       break;
@@ -2306,6 +2380,7 @@ self.onmessage = (e: MessageEvent) => {
         ctx = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
         ctx.setTransform(dpr * vscale, 0, 0, dpr * vscale, 0, 0);
       }
+      relayout();
       break;
     }
     case 'DATA': {
@@ -2322,6 +2397,7 @@ self.onmessage = (e: MessageEvent) => {
       glide = null;
       loopStartBeat = null;
       loopEndBeat   = null;
+      relayout();
       resetFrozenNoteState(visual);
       recomputeLoopSeconds();
       break;
@@ -2332,7 +2408,7 @@ self.onmessage = (e: MessageEvent) => {
       bpm = msg.bpm;
       countInRemaining = msg.countInRemaining;
       audioStartSec = msg.audioStartSec ?? null;
-      if (!isPlaying) { audioCurrentSec = null; audioCurrentReceivedAt = null; livePitch = null; }
+      if (!isPlaying) { resetAudioClock(audioClock); clockFromTicks = false; livePitch = null; }
       if (isPlaying) { hoverStartX = null; glide = null; } // clear hover when playback starts
       recomputeLoopSeconds();
       break;
@@ -2351,9 +2427,29 @@ self.onmessage = (e: MessageEvent) => {
       break;
     }
     case 'TICK': {
-      audioCurrentSec = msg.audioCurrentSec;
+      if (!clockFromTicks) { resetAudioClock(audioClock); clockFromTicks = true; }
+      observeAudioClock(audioClock, msg.audioCurrentSec, performance.now());
       livePitch = msg.pitch ?? null;
-      audioCurrentReceivedAt = Date.now();
+      break;
+    }
+    case 'FILL_STEPS': {
+      const steps = msg.steps as FillStep[];
+      const wallMs = performance.now();
+      if (!clockFromTicks) for (const step of steps) observeAudioClock(audioClock, step.audioSec, wallMs);
+      const now = Date.now();
+      const hits = addFillSteps(liveFills, steps, liveFillTile, now, audioClockNow(audioClock, wallMs));
+      // The hit's Early/Late label goes up with the hit, not a flush later.
+      if (timingHints) {
+        for (const hit of hits) {
+          if (hit.timing?.hint) timingLabels.set(hit.noteKey, { kind: hit.timing.hint, at: now });
+        }
+      }
+      needsRedraw = true;
+      break;
+    }
+    case 'FILL_RESET': {
+      clearLiveFills(liveFills);
+      needsRedraw = true;
       break;
     }
     case 'HIT_NOTES': {
@@ -2371,6 +2467,8 @@ self.onmessage = (e: MessageEvent) => {
         const prev = noteTimings[key];
         if (!t.hint) continue;
         if (prev && prev.hint === t.hint && prev.offsetBeats === t.offsetBeats) continue;
+        // Already put up when the hit streamed in.
+        if (isLiveTiming(liveFills.byKey.get(key), t)) continue;
         timingLabels.set(key, { kind: t.hint, at: now });
       }
       noteTimings = next;
@@ -2410,18 +2508,10 @@ self.onmessage = (e: MessageEvent) => {
     }
     case 'ZOOM': {
       const next = msg.zoom ?? 1;
-      if (next !== zoom && zoom > 0) {
-        // pausedCursorPos/pausedScrollX are in pixel-space — rescale so the
-        // paused view stays anchored on the same beat after the zoom change.
-        const ratio = next / zoom;
-        pausedCursorPos *= ratio;
-        pausedScrollX *= ratio;
-        if (glide) {
-          glide.fromCursor *= ratio; glide.toCursor *= ratio;
-          glide.fromScroll *= ratio; glide.toScroll *= ratio;
-        }
+      if (next !== zoom && next > 0) {
+        zoom = next;
+        relayout();
       }
-      zoom = next;
       break;
     }
     case 'STYLE': {
@@ -2456,6 +2546,8 @@ self.onmessage = (e: MessageEvent) => {
         timingHints = msg.timingHints;
         if (!timingHints) timingLabels.clear();
       }
+      // The pill size sets how much room a fast run needs.
+      if (msg.pillHeight !== undefined || msg.fretFontScale !== undefined) relayout();
       needsRedraw = true;
       break;
     }
@@ -2472,6 +2564,7 @@ self.onmessage = (e: MessageEvent) => {
       // made previously-played notes stay lit green after a restart, even
       // though the score/game state had already been reset back to zero.
       resetNoteHitVisualState(visual);
+      clearLiveFills(liveFills);
       noteTimings = {};
       timingLabels.clear();
       bendGauges.clear();

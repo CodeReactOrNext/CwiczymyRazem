@@ -1,11 +1,14 @@
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { FillFeed } from "feature/exercisePlan/views/PracticeSession/utils/fillFeed";
+import { fillFeedEnd, readFillSteps } from "feature/exercisePlan/views/PracticeSession/utils/fillFeed";
 import type { LearnFocus } from "feature/exercisePlan/views/PracticeSession/utils/learnSteps";
 import type { LivePitch } from "feature/exercisePlan/views/PracticeSession/utils/pitchScoring";
 import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import type { MutableRefObject } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { boardOffsetX, boardSpan, scrollAfterDrag } from "./tablatureDirection";
+import { baseBeatWidth, beatToX, buildBeatXMap, DEFAULT_PILL_METRICS, xToBeat } from "./tabSpacing";
 import type { TablatureRenderData } from "./useTablatureRenderData";
 
 const REST_VOLUME_THRESHOLD = 0.05;
@@ -50,6 +53,8 @@ interface WorkerBridgeOptions {
   noteTimings:     Record<string, NoteTiming>;
   /** The note under the cursor's live pitch — rides along with every TICK. */
   livePitchRef?:    MutableRefObject<LivePitch | null>;
+  /** Hits and holds straight from the matching loop, sent on every frame. */
+  fillFeedRef?:     MutableRefObject<FillFeed> | null;
   hideNotes:       boolean;
   hideDynamicsLane: boolean;
   measures:        TablatureMeasure[] | undefined;
@@ -132,7 +137,7 @@ export interface TablatureStylePatch {
 export function useTablatureWorkerBridge({
   canvasRef, containerRef, containerSize, renderData,
   isPlaying, startTime, audioStartTime, bpm, countInRemaining,
-  hitNotes, missedNotes, noteTimings, livePitchRef, hideNotes, hideDynamicsLane,
+  hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef = null, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
   loopStartBeat, loopEndBeat, zoom = 1, tuningStrings, style, selection,
   obscured = false, quarterTurned = false, learnFocus = null,
@@ -147,7 +152,6 @@ export function useTablatureWorkerBridge({
   const initScrollXRef      = useRef(0);
   const pausedScrollRef     = useRef({ scrollX: 0, cursorPos: 0 });
   const lastHoverMeasureRef = useRef<number>(-1);
-  const prevZoomRef         = useRef(zoom);
 
   const [isRestActive,    setIsRestActive]    = useState(false);
   const [showRestWarning, setShowRestWarning] = useState(false);
@@ -157,6 +161,18 @@ export function useTablatureWorkerBridge({
   // World-px the content is inset by when the tuning gutter is shown — the
   // screen→beat mapping below must subtract it to match the worker.
   const gutterW = tuningStrings && tuningStrings.length > 0 ? TAB_GUTTER_W : 0;
+
+  // Where each beat sits on the board — built from the same inputs the worker
+  // builds its own copy from (board width, zoom, pill size), so a click lands on
+  // the beat that is drawn there. A STYLE patch without pill sizes leaves the
+  // worker's last ones, so callers pass them every time (as the session does).
+  const pillHeight    = style?.pillHeight    ?? DEFAULT_PILL_METRICS.pillHeight;
+  const fretFontScale = style?.fretFontScale ?? DEFAULT_PILL_METRICS.fretFontScale;
+  const xMap = useMemo(
+    () => buildBeatXMap(renderData.renderBeats, renderData.totalBeats, baseBeatWidth(containerSize.width) * zoom, { pillHeight, fretFontScale }),
+    [renderData, containerSize.width, zoom, pillHeight, fretFontScale],
+  );
+  const prevXMapRef = useRef(xMap);
 
   // Worker lifecycle
   useEffect(() => {
@@ -234,6 +250,27 @@ export function useTablatureWorkerBridge({
     return () => cancelAnimationFrame(rafId);
   }, [isPlaying, audioContext, countInRemaining, obscured, livePitchRef]);
 
+  // What the matching loop judged since the last frame, every frame — the
+  // fill is drawn from these steps rather than from React's copy of the hits,
+  // which lags a flush behind (see liveNoteFills.ts). A covered board skips
+  // them; once uncovered it picks up from the steps arriving then.
+  useEffect(() => {
+    if (!isPlaying || !fillFeedRef || obscured) return undefined;
+    const feed = fillFeedRef.current;
+    let next = fillFeedEnd(feed);
+    let rafId: number;
+    const pump = () => {
+      const read = readFillSteps(feed, next);
+      next = read.next;
+      if (read.steps.length > 0) workerRef.current?.postMessage({ type: 'FILL_STEPS', steps: read.steps });
+      rafId = requestAnimationFrame(pump);
+    };
+    rafId = requestAnimationFrame(pump);
+    return () => cancelAnimationFrame(rafId);
+  }, [isPlaying, fillFeedRef, obscured]);
+  // Another feed (or none: learn mode, a hunt) — what the old one drew goes.
+  useEffect(() => { workerRef.current?.postMessage({ type: 'FILL_RESET' }); }, [fillFeedRef]);
+
   // Clear rest state when stopped
   useEffect(() => {
     if (!isPlaying) { setIsRestActive(false); setShowRestWarning(false); }
@@ -275,20 +312,19 @@ export function useTablatureWorkerBridge({
       endBeat:   loopEndBeat   ?? null,
     });
   }, [loopStartBeat, loopEndBeat]);
+  useEffect(() => { workerRef.current?.postMessage({ type: 'ZOOM', zoom }); }, [zoom]);
+  // Keep the main-thread scrub anchor (base for drag/seek) on the same beats the
+  // worker carries its own paused view over to whenever the layout moves.
   useEffect(() => {
-    const prev = prevZoomRef.current;
-    prevZoomRef.current = zoom;
-    // Keep the main-thread scrub anchor (base for drag/seek) aligned with the
-    // worker's rescaled pixel-space position after a zoom change.
-    if (prev > 0 && prev !== zoom) {
-      const ratio = zoom / prev;
-      pausedScrollRef.current = {
-        scrollX:   pausedScrollRef.current.scrollX   * ratio,
-        cursorPos: pausedScrollRef.current.cursorPos * ratio,
-      };
-    }
-    workerRef.current?.postMessage({ type: 'ZOOM', zoom });
-  }, [zoom]);
+    const prev = prevXMapRef.current;
+    prevXMapRef.current = xMap;
+    if (prev === xMap) return;
+    const carry = (x: number) => beatToX(xMap, xToBeat(prev, x));
+    pausedScrollRef.current = {
+      scrollX:   carry(pausedScrollRef.current.scrollX),
+      cursorPos: carry(pausedScrollRef.current.cursorPos),
+    };
+  }, [xMap]);
 
   // Reset cursor when measures or resetKey changes
   useEffect(() => {
@@ -342,9 +378,8 @@ export function useTablatureWorkerBridge({
       Date.now() - mouseDownTimeRef.current < 400
     ) {
       const rect = containerRef.current.getBoundingClientRect();
-      const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
       const worldX = boardOffsetX(clientX, boardSpan(rect, quarterTurned), rightToLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
-      let beatPos = Math.max(0, worldX / dynBW);
+      let beatPos = Math.max(0, xToBeat(xMap, worldX));
 
       // Snap to start of the measure that was clicked
       const ends = renderData.measureEndXs;
@@ -357,7 +392,7 @@ export function useTablatureWorkerBridge({
         beatPos = measureStart;
       }
 
-      const newCursorPos = beatPos * dynBW;
+      const newCursorPos = beatToX(xMap, beatPos);
       const newScrollX   = Math.max(0, newCursorPos - containerSize.width / vscale / 4);
       pausedScrollRef.current = { scrollX: newScrollX, cursorPos: newCursorPos };
       workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: newCursorPos });
@@ -372,9 +407,8 @@ export function useTablatureWorkerBridge({
   const handleHover = (clientX: number) => {
     if (isPlaying || isDraggingRef.current || !containerRef?.current || !onSeek) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
     const worldX = boardOffsetX(clientX, boardSpan(rect, quarterTurned), rightToLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
-    const beatPos = Math.max(0, worldX / dynBW);
+    const beatPos = Math.max(0, xToBeat(xMap, worldX));
 
     // Find which measure start this position snaps to
     const ends = renderData.measureEndXs;
@@ -387,7 +421,7 @@ export function useTablatureWorkerBridge({
     // Only send message when hovered measure changes
     if (measureStart === lastHoverMeasureRef.current) return;
     lastHoverMeasureRef.current = measureStart;
-    workerRef.current?.postMessage({ type: 'HOVER', startX: measureStart * dynBW });
+    workerRef.current?.postMessage({ type: 'HOVER', startX: beatToX(xMap, measureStart) });
   };
 
   const handleHoverEnd = () => {
@@ -408,8 +442,7 @@ export function useTablatureWorkerBridge({
   // Called by TablatureSection when the minimap is clicked (to keep both in sync).
   // `smooth` glides there instead of jumping — how learn mode follows the lesson.
   const seekWorker = (beat: number, smooth = false) => {
-    const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
-    const newCursorPos = beat * dynBW;
+    const newCursorPos = beatToX(xMap, beat);
     const newScrollX   = Math.max(0, newCursorPos - containerSize.width / vscale / 4);
     pausedScrollRef.current = { scrollX: newScrollX, cursorPos: newCursorPos };
     workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: newCursorPos, smooth });
@@ -426,18 +459,17 @@ export function useTablatureWorkerBridge({
   // it off-screen: the board fits fewer beats than the editor's grid, so the
   // cell being edited can sit outside the mirrored window.
   const scrollToBeat = (beat: number, keepVisibleBeat?: number | null) => {
-    const dynBW = Math.max(120, Math.min(200, containerSize.width / 4)) * zoom;
     const viewW = containerSize.width / vscale;
-    let target = beat * dynBW;
+    let target = beatToX(xMap, beat);
 
     if (keepVisibleBeat != null) {
-      const keepX  = keepVisibleBeat * dynBW;
-      const margin = Math.min(viewW / 4, dynBW);
+      const keepX  = beatToX(xMap, keepVisibleBeat);
+      const margin = Math.min(viewW / 4, xMap.beatWidth);
       if (keepX < target + margin) target = keepX - margin;
       else if (keepX > target + viewW - margin) target = keepX - viewW + margin;
     }
 
-    const maxScrollX = Math.max(0, renderData.totalBeats * dynBW - viewW);
+    const maxScrollX = Math.max(0, xMap.totalX - viewW);
     const newScrollX = Math.min(Math.max(0, target), maxScrollX);
     if (newScrollX === pausedScrollRef.current.scrollX) return;
     pausedScrollRef.current = { ...pausedScrollRef.current, scrollX: newScrollX };

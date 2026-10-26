@@ -38,6 +38,7 @@ import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
 import { OutputStalledNotice } from "./components/OutputStalledNotice";
 import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
 import { SessionDialogs } from "./components/SessionDialogs";
+import { gpLoadingSteps, isStillLoading } from "./components/SessionLoadingSteps";
 import { SongSectionMapPanel } from "./components/SongSectionMapPanel";
 import { TimingCalibrationDialog } from "./components/TimingCalibrationDialog";
 import { TuningSettingsModal } from "./components/TuningSettingsModal";
@@ -277,7 +278,7 @@ const PracticeSessionInner = ({
   const songGpFile = useSongExerciseGpFile(songItemTabId, userId ?? null);
   const gpFileUrl = currentExercise.gpFileUrl ?? songGpFile.gpFileUrl;
 
-  const { effectiveRawGpFile, isFetchingGpFile, parsedGpTracks, gpTempo } = useGpFileLoader({
+  const { effectiveRawGpFile, isFetchingGpFile, isParsingGpFile, parsedGpTracks, gpTempo } = useGpFileLoader({
     rawGpFile, gpFileUrl, exerciseTitle: currentExercise.title,
   });
 
@@ -589,7 +590,7 @@ const PracticeSessionInner = ({
   const [tabRestartKey, setTabRestartKey] = useState(0);
   const noteMatchingHandle = useRef<NoteMatchingHandle | null>(null);
 
-  const { audioTracks, trackConfigs, setTrackConfigs, backingTrackIds, gpAudioActive, effectiveAudioStartTime, tabSchedulerTickRef } = useSessionAudio({
+  const { audioTracks, trackConfigs, setTrackConfigs, backingTrackIds, gpAudioActive, gpAudioReady, effectiveAudioStartTime, tabSchedulerTickRef } = useSessionAudio({
     activeTablature, dynamicBackingTracks, effectiveRawGpFile,
     isAudioMuted, isAudioPlaying, effectiveBpm, masterVolume,
     currentExerciseId: currentExercise.id, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
@@ -607,6 +608,15 @@ const PracticeSessionInner = ({
     tuningOffsets: guitarTuning.tuning.offsets,
     bandRage: !!bossFight?.enraged,
   });
+
+  // What a Guitar Pro exercise still has to load before it can be played: the
+  // file, its tracks, the player's sounds and song. The loading screen keeps
+  // its doors shut — and the overlay covers the session — until it has.
+  const gpSteps = gpLoadingSteps(
+    { fetching: isFetchingGpFile || songGpFile.isResolving, hasFile: !!effectiveRawGpFile, parsing: isParsingGpFile, audioReady: gpAudioReady },
+    { file: t("loading_steps.file"), parse: t("loading_steps.parse"), sound: t("loading_steps.sound") },
+  );
+  const gpLoading = isStillLoading(gpSteps);
 
   /**
    * One instrument level, changed from the alignment screen's mixer.
@@ -669,15 +679,26 @@ const PracticeSessionInner = ({
   const learnModeRef = useRef(false);
   useEffect(() => { learnModeRef.current = learnEnabled; }, [learnEnabled]);
 
+  // Learn mode needs no Play: it listens as soon as it is on, and a note heard
+  // while the clock is stopped starts it — unless the exercise's time is up.
+  const handleLearnNotePlayed = useCallback(() => {
+    const durationMs = (videoDuration ?? (activeExercise.timeInMinutes || 0) * 60) * 1000;
+    if (!freeMode && durationMs > 0 && timer.getTime() >= durationMs) return;
+    startTimer();
+  }, [videoDuration, activeExercise.timeInMinutes, freeMode, timer, startTimer]);
+
   const learnProgress = useLearnModeMatcher({
     steps: learnSteps,
-    active: learnEnabled && isPlaying && isListening,
+    active: learnEnabled && isListening && sessionPhase === "ready"
+      && !showSuccessView && !reportResult && !isAligningBacking,
     audioRefs, getAdjustedTargetFreq, tuningOffsets: guitarTuning.tuning.offsets,
     resetKey: tabResetKey + tabRestartKey,
+    onNotePlayed: handleLearnNotePlayed,
   });
 
   // Learn mode and the metronome are two ways of keeping the exercise moving, so
-  // switching between them stops everything and lets the player press Play again.
+  // switching between them stops everything: learn mode restarts the clock on
+  // the first note heard, the metronome waits for Play.
   const handleSetLearnEnabled = useCallback((next: boolean) => {
     stopTimer();
     metronome.stopMetronome();
@@ -1166,7 +1187,7 @@ const PracticeSessionInner = ({
     <>
       {/* Intro splash that always plays on session mount, then parts open
           (door-reveal) to show the session beneath. */}
-      <PracticeLoadingScreen isReady />
+      <PracticeLoadingScreen isReady={!gpLoading} steps={gpSteps} />
 
       <SessionPageHead exerciseTitle={activeExercise.title} />
 
@@ -1185,7 +1206,7 @@ const PracticeSessionInner = ({
         </div>
       )}
 
-      <GpLoadingOverlay isLoading={isFetchingGpFile || songGpFile.isResolving} />
+      {gpLoading && <GpLoadingOverlay steps={gpSteps} />}
 
       {(showSuccessView || examMistakeFailed) && !reportResult && successSnapshot && (
         <ExerciseSuccessView

@@ -141,7 +141,7 @@ export function useSessionAudio({
 
   // ── AlphaTab synthesizer (GP files) ───────────────────────────────────────
 
-  useAlphaTabPlayer({
+  const { isAudioReady: gpAudioReady } = useAlphaTabPlayer({
     rawGpFile:  effectiveRawGpFile ?? null,
     bpm:        effectiveBpm,
     isPlaying:  !!effectiveRawGpFile && isAudioPlaying && !showAlphaTabScore,
@@ -219,10 +219,10 @@ export function useSessionAudio({
 
   return useMemo(() => ({
     audioTracks, trackConfigs, setTrackConfigs,
-    soundfontsReady, gpAudioActive, effectiveAudioStartTime,
+    soundfontsReady, gpAudioActive, gpAudioReady, effectiveAudioStartTime,
     alphaTabTrackConfigs, backingTrackIds: alphaTabBackingTrackIds, tabSchedulerTickRef,
   }), [
-    audioTracks, trackConfigs, soundfontsReady, gpAudioActive,
+    audioTracks, trackConfigs, soundfontsReady, gpAudioActive, gpAudioReady,
     effectiveAudioStartTime, alphaTabTrackConfigs, alphaTabBackingTrackIds
   ]);
 }

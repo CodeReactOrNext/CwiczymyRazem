@@ -1,3 +1,4 @@
+import type { DetectedNoteEvent } from "hooks/guitarBufferProcessor";
 import type { Spectrum } from "utils/audio/chordTones";
 import { harmonicFor } from "utils/audio/chordTones";
 import { describe, expect, it } from "vitest";
@@ -13,7 +14,7 @@ const FS4 = 369.99;
 const B4 = 493.88;
 
 const note = (freq: number, over: Partial<LearnTarget> = {}): LearnTarget => ({
-  noteKey: `n${Math.round(freq)}`, freq, isDead: false, hasAttack: true, ...over,
+  noteKey: `n${Math.round(freq)}`, freq, isDead: false, hasAttack: true, readsAttack: true, ...over,
 });
 
 const frame = (now: number, over: Partial<LearnFrame> = {}): LearnFrame => ({
@@ -177,7 +178,7 @@ describe("createLearnJudge — a note with no attack of its own", () => {
 });
 
 describe("createLearnJudge — a muted note", () => {
-  const muted: LearnTarget = { noteKey: "x", freq: 0, isDead: true, hasAttack: true };
+  const muted: LearnTarget = { noteKey: "x", freq: 0, isDead: true, hasAttack: true, readsAttack: false };
 
   it("waits for a fresh thud", () => {
     const judge = createLearnJudge();
@@ -238,5 +239,71 @@ describe("createLearnJudge — a chord", () => {
     judge.arm(frame(1000));
     const chord = [note(A3), note(D4)];
     expect(judge.judge(chord, frame(1100, { volume: 0.2, lastOnsetMs: 1005 }))).toBe(false);
+  });
+});
+
+// ── What the attack struck (attackTones.ts) ─────────────────────────────────
+
+describe("createLearnJudge — under strings still ringing", () => {
+  const BIN_HZ = 48000 / 4096;
+  const [AS3, B2, B3] = [233.08, 123.47, 246.94];
+  /** An idealised magnitude spectrum: each note's first harmonics as clean peaks. */
+  const notes = (...freqs: number[]): Float32Array => {
+    const magnitudes = new Float32Array(Math.ceil(2000 / BIN_HZ) + 2);
+    for (const f of freqs) {
+      for (let h = 1; h * f < 2000; h++) {
+        const bin = Math.round((h * f) / BIN_HZ);
+        magnitudes[bin] += 1 / h;
+        magnitudes[bin - 1] += 0.3 / h;
+        magnitudes[bin + 1] += 0.3 / h;
+      }
+    }
+    return magnitudes;
+  };
+  /** An attack at 1050 that struck `struck` over strings already ringing at `ringing`. */
+  const attack = (ringing: number[], struck: number[]): DetectedNoteEvent => ({
+    onsetMs: 1050, pitchHz: 0, peakVolume: 0.1,
+    attack: { before: notes(...ringing), after: notes(...ringing, ...struck), binHz: BIN_HZ },
+  });
+  const after = (t: number, event: DetectedNoteEvent, over: Partial<LearnFrame> = {}) =>
+    frame(t, { volume: 0.1, lastOnsetMs: 1100, lastAttackMs: event.onsetMs, events: [event], ...over });
+
+  it("moves on once the attack is heard to strike the note, whatever the pitch reads", () => {
+    const judge = createLearnJudge();
+    judge.arm(frame(1000, { events: [] }));
+    // B3 picked under a ringing B2: the detector reads B2.
+    expect(judge.judge([note(B3)], after(1250, attack([B2], [B3]), { freq: B2 }))).toBe(true);
+  });
+  it("still takes the pitch path when the attack's spectrum can't confirm the note — it only ever adds", () => {
+    const judge = createLearnJudge();
+    judge.arm(frame(1000, { events: [] }));
+    // A3 picked where A#3 is waited on: the attack shows A3, the pitch reads A#3 —
+    // the pitch path decides, exactly as it did before.
+    const other = attack([B3], [A3]);
+    const reading = { freq: AS3, readSpectrum: () => spectrumOf([AS3]) };
+    expect(heldFor(judge, [note(AS3)], 1110, { ...reading, volume: 0.1, lastOnsetMs: 1100, lastAttackMs: 1050, events: [other] })).toBe(true);
+  });
+});
+
+describe("createLearnJudge — a low string picked softly", () => {
+  it("takes the low-band attack the onset detector missed, for a low note", () => {
+    const judge = createLearnJudge();
+    judge.arm(frame(1000, { lastOnsetMs: 900, lastLowAttackMs: 900 }));
+    // The thumb on the low E: no onset, but the low band heard it at 1050.
+    const thumb = { freq: E2, volume: 0.1, lastOnsetMs: 900, lastLowAttackMs: 1050 };
+    expect(judge.judge([note(E2)], frame(1060, thumb))).toBe(false);
+    expect(judge.judge([note(E2)], frame(1060 + LEARN_HOLD_MS, thumb))).toBe(true);
+  });
+
+  it("doesn't count it for a note above the low strings", () => {
+    const judge = createLearnJudge();
+    judge.arm(frame(1000, { lastOnsetMs: 900, lastLowAttackMs: 900 }));
+    expect(heldFor(judge, [note(A3)], 1060, { freq: A3, volume: 0.1, lastOnsetMs: 900, lastLowAttackMs: 1050 })).toBe(false);
+  });
+
+  it("still asks for a new one: an attack before the beat started waiting is spent", () => {
+    const judge = createLearnJudge();
+    judge.arm(frame(1000, { lastOnsetMs: 900, lastLowAttackMs: 950 }));
+    expect(heldFor(judge, [note(E2)], 1100, { freq: E2, volume: 0.1, lastOnsetMs: 900, lastLowAttackMs: 950 })).toBe(false);
   });
 });

@@ -2,6 +2,8 @@
 import { useCallback,useEffect, useMemo, useRef, useState } from "react";
 import type { Spectrum } from "utils/audio/chordTones";
 import { spectrumFromAnalyser } from "utils/audio/chordTones";
+import type { RecentAudio, RecentAudioSnapshot } from "utils/audio/recentAudio";
+import { createRecentAudio, RECENT_AUDIO_SECONDS } from "utils/audio/recentAudio";
 
 import type { DetectedNoteEvent, InputTap } from "./guitarBufferProcessor";
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
@@ -28,6 +30,9 @@ export interface AudioRefs {
    *  read — what chords are graded on (utils/audio/chordTones.ts). The web path
    *  reads its AnalyserNode, the native one computes it from its own PCM. */
   readSpectrum?: () => Spectrum | null;
+  /** The last ~2.5 s of raw input with the time its newest sample arrived —
+   *  what the note-onset model reads (utils/audio/noteOnsetModel.ts). */
+  readRecentAudio?: () => RecentAudioSnapshot | null;
   /** Measured ambient noise floor (see guitarBufferProcessor.ts), same 0–1 scale
    *  as rawVolumeRef. 0 means "not measured yet this session". */
   noiseFloorRef: React.MutableRefObject<number>;
@@ -39,6 +44,10 @@ export interface AudioRefs {
   /** Precise time of the most recent attack (see guitarBufferProcessor) — what
    *  note timing is graded against. 0 until the first attack. */
   lastAttackMsRef?: React.MutableRefObject<number>;
+  /** When (Date.now(), block end) the low-band detector last heard a low string
+   *  struck — an attack too soft or dark for the onset detector (see
+   *  guitarBufferProcessor LOW_ATTACK_*). 0 until the first one. */
+  lastLowAttackMsRef?: React.MutableRefObject<number>;
   /** Set by whoever wants the raw input itself (see InputTap) — today the
    *  check for the app's own playback leaking into the mic. */
   inputTapRef?: React.MutableRefObject<InputTap | null>;
@@ -68,6 +77,7 @@ export const useAudioAnalyzer = () => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const workletNodeRef = useRef<AudioWorkletNode | null>(null);
   const analyserNodeRef = useRef<AnalyserNode | null>(null);
+  const recentAudioRef = useRef<RecentAudio | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const inputGainRef = useRef<number>(loadPersistedGain());
   const pitchDetectorRef = useRef<any>(null);
@@ -87,6 +97,7 @@ export const useAudioAnalyzer = () => {
   const lastTickTimeRef = useRef<number>(0);
   const noteEventsRef = useRef<DetectedNoteEvent[]>([]);
   const lastAttackMsRef = useRef<number>(0);
+  const lastLowAttackMsRef = useRef<number>(0);
   const inputTapRef = useRef<InputTap | null>(null);
 
   const init = useCallback(async () => {
@@ -155,13 +166,17 @@ export const useAudioAnalyzer = () => {
       });
       workletNodeRef.current = workletNode;
 
+      const recentAudio = createRecentAudio(analysisRate, RECENT_AUDIO_SECONDS);
+      recentAudioRef.current = recentAudio;
+
       const process = createGuitarBufferProcessor({
         detectors,
         getGain: () => inputGainRef.current,
         sampleRate: analysisRate,
+        recentAudio,
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
-          lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, inputTapRef,
+          lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, inputTapRef,
         },
         onActive: () => {
           setState(prev =>
@@ -234,6 +249,7 @@ export const useAudioAnalyzer = () => {
       streamRef.current = null;
     }
 
+    recentAudioRef.current = null;
     pitchDetectorRef.current = null;
     onsetDetectorRef.current = null;
     tickDetectorRef.current = null;
@@ -246,6 +262,7 @@ export const useAudioAnalyzer = () => {
     lastTickTimeRef.current = 0;
     noteEventsRef.current = [];
     lastAttackMsRef.current = 0;
+    lastLowAttackMsRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false }));
   }, []);
@@ -280,7 +297,9 @@ export const useAudioAnalyzer = () => {
     [],
   );
 
-  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, readSpectrum, noteEventsRef, lastAttackMsRef, inputTapRef };
+  const readRecentAudio = useCallback(() => recentAudioRef.current?.read() ?? null, []);
+
+  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, readSpectrum, readRecentAudio, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, inputTapRef };
 
   return useMemo(() => ({
     ...state,

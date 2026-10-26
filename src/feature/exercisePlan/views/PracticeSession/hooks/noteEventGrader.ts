@@ -17,6 +17,7 @@
 // Timing still costs: each assignment reports its own |Δt| so the caller can rate
 // the note's timing separately from whether it counted as a hit.
 import type { DetectedNoteEvent } from "hooks/guitarBufferProcessor";
+import { isStruckAt, spectraOf } from "utils/audio/attackTones";
 import { correctOctaveForLowStrings, getCentsDistance } from "utils/audio/noteUtils";
 
 export interface ExpectedAttack {
@@ -34,6 +35,9 @@ export interface ExpectedAttack {
    *  this note's — for a note whose pitch is already ringing before it is due,
    *  where an early attack of that pitch was the previous note's. */
   earliestDeltaMs?: number;
+  /** A plain picked note (pitchScoring.hasPlainAttack): an attack shown to
+   *  have struck it counts too, whatever the pitch read after it — see isCandidate. */
+  readsAttack?: boolean;
 }
 
 export interface AttackAssignment {
@@ -49,6 +53,11 @@ function isCandidate(event: DetectedNoteEvent, expected: ExpectedAttack, maxDelt
   if (Math.abs(event.onsetMs - expected.timeMs) > maxDeltaMs) return false;
   if (expected.earliestDeltaMs !== undefined && event.onsetMs - expected.timeMs < expected.earliestDeltaMs) return false;
   if (event.peakVolume < expected.volumeGate) return false;
+  // Under strings still ringing the pitch read after an attack is often one of
+  // those strings, not the note just struck. The attack's own spectrum can
+  // still show the note (attackTones.ts) — a second way in, never a way out.
+  const spectra = expected.readsAttack ? spectraOf(event.attack) : null;
+  if (spectra && isStruckAt(spectra, expected.targetFreq)) return true;
   if (event.pitchHz <= 20) return false; // never resolved — no pitch to compare
   // Same low-string 2nd-harmonic correction the live path applies; it only ever
   // relaxes toward the target this note actually expects.

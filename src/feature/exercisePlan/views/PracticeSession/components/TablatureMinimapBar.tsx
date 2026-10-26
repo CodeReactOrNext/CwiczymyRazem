@@ -269,32 +269,46 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
     paint();
   }, [beatVersion, paint]);
 
-  // Cells re-render when accuracy changes (mic mode), not just when the
-  // measure layout does.
-  const cells = useMemo(
-    () =>
-      measures.map((_, i) => {
-        const acc = measureAccuracy?.[i];
-        return (
-          <div
-            key={i}
-            className="absolute overflow-hidden rounded bg-zinc-800/70 transition-colors hover:bg-zinc-700/80"
-            style={{ left: PAD + i * UNIT, top: TOP, width: CELL, height: CELL_H }}
-          >
-            {acc != null && (
-              <div
-                className="absolute inset-x-0 bottom-0 transition-[height] duration-base ease-out"
-                style={{ height: `${Math.round(acc * 100)}%`, background: accuracyFillColor(acc) }}
-              />
-            )}
-            <div className="relative flex h-full items-center justify-center text-sm font-semibold tabular-nums text-zinc-300">
-              {i + 1}
-            </div>
-          </div>
-        );
-      }),
-    [measures, measureAccuracy],
-  );
+  // Each cell's accuracy fill, written straight to the DOM like the playhead.
+  // Accuracy changes with every hit, many times a second while playing, and a
+  // song can be hundreds of bars long: rendering that many cells again each
+  // time cost ~20 ms a hit on a 566-bar song — more than a frame.
+  const fillRefs = useRef<(HTMLDivElement | null)[]>([]);
+  /** What each fill shows now, so only the ones that changed are touched. */
+  const shownRef = useRef<(number | null)[]>([]);
+
+  // The cells themselves only change with the measure layout.
+  const cells = useMemo(() => {
+    shownRef.current = [];
+    return measures.map((_, i) => (
+      <div
+        key={i}
+        className="absolute overflow-hidden rounded bg-zinc-800/70 transition-colors hover:bg-zinc-700/80"
+        style={{ left: PAD + i * UNIT, top: TOP, width: CELL, height: CELL_H }}
+      >
+        <div
+          ref={(el) => { fillRefs.current[i] = el; }}
+          className="absolute inset-x-0 bottom-0 transition-[height] duration-base ease-out"
+          style={{ height: 0 }}
+        />
+        <div className="relative flex h-full items-center justify-center text-sm font-semibold tabular-nums text-zinc-300">
+          {i + 1}
+        </div>
+      </div>
+    ));
+  }, [measures]);
+
+  useEffect(() => {
+    const shown = shownRef.current;
+    for (let i = 0; i < measures.length; i++) {
+      const acc = measureAccuracy?.[i] ?? null;
+      const fill = fillRefs.current[i];
+      if (!fill || shown[i] === acc) continue;
+      shown[i] = acc;
+      fill.style.height = acc == null ? "0" : `${Math.round(acc * 100)}%`;
+      fill.style.background = acc == null ? "" : accuracyFillColor(acc);
+    }
+  }, [cells, measures, measureAccuracy]);
 
   if (count === 0) return null;
 

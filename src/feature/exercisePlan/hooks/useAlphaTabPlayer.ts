@@ -123,6 +123,10 @@ export const useAlphaTabPlayer = ({
   // value would then never reach AlphaTab at all, leaving it on its own defaults
   // (metronomeVolume defaults to 0 → silent click after the count-in).
   const [isPlayerReady, setIsPlayerReady] = useState(false);
+  // The file whose song the synthesizer has loaded (its MIDI generated and in),
+  // or that AlphaTab gave up on — what a loading screen waits for. A long score
+  // takes a while: the MIDI of every track is generated on load.
+  const [loadedFile, setLoadedFile] = useState<File | null>(null);
 
   useEffect(() => { isPlayingRef.current             = isPlaying;            }, [isPlaying]);
   useEffect(() => { bpmRef.current                   = bpm;                  }, [bpm]);
@@ -211,6 +215,10 @@ export const useAlphaTabPlayer = ({
       }
     });
 
+    api.midiLoaded.on(() => setLoadedFile(currentFileRef.current));
+    // A file it can't play must not keep a session waiting on it.
+    api.error.on(() => setLoadedFile(currentFileRef.current));
+
     api.playerPositionChanged.on((e: any) => {
       if (e?.endTick > 0) endTickRef.current = e.endTick;
     });
@@ -234,6 +242,7 @@ export const useAlphaTabPlayer = ({
       try { api.destroy(); } catch { /* ignore */ }
       isReadyRef.current     = false;
       setIsPlayerReady(false);
+      setLoadedFile(null);
       pendingPlayRef.current = false;
       hasStartedRef.current  = false;
       wasPausedRef.current   = false;
@@ -399,5 +408,8 @@ export const useAlphaTabPlayer = ({
     });
   }, [trackConfigs, backingTrackIds]);
 
-  return { playRef };
+  /** The current file can be played: its sounds and its song are loaded. */
+  const isAudioReady = !rawGpFile || (isPlayerReady && loadedFile === rawGpFile);
+
+  return { playRef, isAudioReady };
 };

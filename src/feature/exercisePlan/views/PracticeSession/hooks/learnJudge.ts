@@ -1,5 +1,7 @@
+import type { DetectedNoteEvent } from "hooks/guitarBufferProcessor";
+import { isStruckAt, spectraOf } from "utils/audio/attackTones";
 import type { Spectrum, ToneCriteria } from "utils/audio/chordTones";
-import { createChordToneEvidence, isChordToneSounding, spectrumPeak } from "utils/audio/chordTones";
+import { createChordToneEvidence, isChordToneSounding, isNoteSoundingAtAnyHarmonic, spectrumPeak } from "utils/audio/chordTones";
 import { correctOctaveForLowStrings, getCentsDistance, getDetectionGates } from "utils/audio/noteUtils";
 
 import type { LearnTarget } from "../utils/learnSteps";
@@ -20,7 +22,16 @@ export interface LearnFrame {
   lastOnsetMs: number;
   lastTickMs: number;
   readSpectrum?: () => Spectrum | null;
+  /** The detector's attacks, oldest first, each with what it struck (attackTones.ts). */
+  events?: readonly DetectedNoteEvent[];
+  /** When the newest attack happened, in its event's own terms (onsetMs). */
+  lastAttackMs?: number;
+  /** When the low-band detector last heard a low string struck (Date.now(), like lastOnsetMs). */
+  lastLowAttackMs?: number;
 }
+
+/** Notes under this are low enough for the low-band attack detector to hear. */
+const LOW_ATTACK_MAX_HZ = 200;
 
 /**
  * How far off its written pitch the detector's reading may sit (cents).
@@ -54,6 +65,9 @@ export function createLearnJudge() {
   /** Attacks at or before these were spent on earlier beats. */
   let spentOnset = 0;
   let spentTick = 0;
+  let spentLowAttack = 0;
+  /** The same, as the attacks' own onsetMs. */
+  let spentAttack = 0;
   /** When the current beat started to wait — a note that only changes pitch
    *  (hammer-on, pull-off) has to be heard after this. */
   let armedAt = 0;
@@ -66,13 +80,23 @@ export function createLearnJudge() {
 
   const judgeNote = (target: LearnTarget, f: LearnFrame): boolean => {
     const gate = getDetectionGates(target.freq, f.volumeGateBase).volumeGate;
+    const attacks = f.events?.filter((event) => event.onsetMs > spentAttack) ?? [];
+    // An attack whose own spectrum shows this very note struck — heard even
+    // under strings still ringing, where the pitch below follows the loudest.
+    // Only ever a second way in: the pitch path below is unchanged.
+    if (target.readsAttack && attacks.some((event) => {
+      const spectra = spectraOf(event.attack);
+      return !!spectra && event.peakVolume > gate && isStruckAt(spectra, target.freq);
+    })) return true;
+
     const heard = correctOctaveForLowStrings(f.freq, target.freq);
     let isRight = f.volume > gate && heard > 20 && Math.abs(getCentsDistance(heard, target.freq)) <= toleranceFor(target.freq);
     // The pitch detector alone is not trusted with the last word: the spectrum
-    // must show this very note too. Read only once the pitch looks right.
+    // must show this very note too — at any of its first resolvable harmonics,
+    // each held to the same bar. Read only once the pitch looks right.
     if (isRight && f.readSpectrum) {
       const live = f.readSpectrum();
-      isRight = !!live && isChordToneSounding(live, target.freq, LEARN_TONE, spectrumPeak(live));
+      isRight = !!live && isNoteSoundingAtAnyHarmonic(live, target.freq, LEARN_TONE, spectrumPeak(live));
     }
     if (!isRight) {
       rightSince = null;
@@ -80,10 +104,16 @@ export function createLearnJudge() {
     }
     rightSince ??= f.now;
     if (!target.hasAttack) return f.now - Math.max(rightSince, armedAt) >= LEARN_HOLD_MS;
-    if (f.lastOnsetMs <= spentOnset) return false;
+    // A new attack of its own. A low string picked softly (the thumb, a dark
+    // tone) can slip past the onset detector, which listens for brightness —
+    // for a low note the low-band detector's attack counts too.
+    const onset = f.lastOnsetMs > spentOnset ? f.lastOnsetMs : 0;
+    const lowAttack = target.freq < LOW_ATTACK_MAX_HZ && (f.lastLowAttackMs ?? 0) > spentLowAttack ? f.lastLowAttackMs ?? 0 : 0;
+    const attackMs = Math.max(onset, lowAttack);
+    if (attackMs === 0) return false;
     // Held since the new attack, not since the pitch happened to be right:
     // a repeated note was "right" the whole time.
-    return f.now - Math.max(rightSince, f.lastOnsetMs) >= LEARN_HOLD_MS;
+    return f.now - Math.max(rightSince, attackMs) >= LEARN_HOLD_MS;
   };
 
   const judgeChord = (tones: LearnTarget[], f: LearnFrame): boolean => {
@@ -104,6 +134,8 @@ export function createLearnJudge() {
     arm(f: LearnFrame) {
       spentOnset = f.lastOnsetMs;
       spentTick = f.lastTickMs;
+      spentLowAttack = f.lastLowAttackMs ?? 0;
+      spentAttack = Math.max(f.lastAttackMs ?? 0, f.events?.[f.events.length - 1]?.onsetMs ?? 0);
       armedAt = f.now;
       rightSince = null;
       chordEvidence.clear();

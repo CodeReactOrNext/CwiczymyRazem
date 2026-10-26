@@ -1,7 +1,7 @@
 import { getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure, TablatureNote } from "../../../types/exercise.types";
-import { hasOwnAttack } from "./pitchScoring";
+import { hasOwnAttack, hasPlainAttack } from "./pitchScoring";
 
 /**
  * Learn mode walks the tab one beat at a time instead of following a clock: the
@@ -75,6 +75,9 @@ export interface LearnTarget {
   /** A picked note has an attack of its own; a hammer-on, pull-off or release
    *  only changes the pitch of a string that is already sounding. */
   hasAttack: boolean;
+  /** Picked at its written pitch and held (pitchScoring.hasPlainAttack): its
+   *  attack's spectrum can tell which note was struck. */
+  readsAttack: boolean;
 }
 
 export function resolveLearnTargets(
@@ -83,12 +86,15 @@ export function resolveLearnTargets(
   getAdjustedTargetFreq: (string: number, baseFreq: number) => number,
 ): LearnTarget[] {
   return step.notes.map(({ note, noteKey }) => {
-    if (note.isDead) return { noteKey, freq: 0, isDead: true, hasAttack: true };
+    if (note.isDead) return { noteKey, freq: 0, isDead: true, hasAttack: true, readsAttack: false };
     // A bend is learned at the pitch it reaches, not the one it starts from.
     const bend = (note.isBend || note.isPreBend) && note.bendSemitones ? note.bendSemitones : 0;
     const base = typeof note.midiNote === "number"
       ? midiToFrequency(note.midiNote + bend)
       : getFrequencyFromTab(note.string, note.fret + bend, tuningOffsets);
-    return { noteKey, freq: getAdjustedTargetFreq(note.string, base), isDead: false, hasAttack: hasOwnAttack(note) };
+    return {
+      noteKey, freq: getAdjustedTargetFreq(note.string, base), isDead: false,
+      hasAttack: hasOwnAttack(note), readsAttack: hasPlainAttack(note),
+    };
   });
 }

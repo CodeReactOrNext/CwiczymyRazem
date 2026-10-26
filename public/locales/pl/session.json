@@ -540,7 +540,13 @@
   },
   "loading": "Ładowanie…",
   "track": "Ścieżka:",
+  "track_empty": "Ta ścieżka nie ma nut",
   "loading_track": "Ładowanie ścieżki…",
+  "loading_steps": {
+    "file": "Pobieranie tabulatury",
+    "parse": "Odczyt ścieżek",
+    "sound": "Wczytywanie brzmień"
+  },
   "timing_breakdown": {
     "title": "Timing",
     "grades": {
@@ -694,7 +700,6 @@
     "hint_needs_mic": "Włącz wykrywanie dźwięku, aby uczyć się nuta po nucie",
     "title": "Tryb nauki",
     "waiting": "Zagraj podświetloną nutę, aby przejść dalej",
-    "press_play": "Naciśnij play, a potem zagraj podświetloną nutę",
     "progress": "Nuta {{current}} z {{total}}",
     "passes_one": "{{count}} przejście ukończone",
     "passes_few": "{{count}} przejścia ukończone",

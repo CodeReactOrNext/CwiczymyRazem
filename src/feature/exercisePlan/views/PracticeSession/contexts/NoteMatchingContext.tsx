@@ -21,6 +21,7 @@ import type { NoteJudgement } from "../hooks/useNoteMatching";
 import { useNoteMatching } from "../hooks/useNoteMatching";
 import type { SlotResult } from "../hooks/useStrummingMatcher";
 import { useStrummingMatcher } from "../hooks/useStrummingMatcher";
+import type { FillFeed } from "../utils/fillFeed";
 import type { LivePitch, ScoringFocus } from "../utils/pitchScoring";
 import { summarizeIntonation } from "../utils/pitchScoring";
 import type { NoteTiming, RunNote, TimingCounts } from "../utils/timingGrade";
@@ -37,6 +38,9 @@ interface NoteMatchingContextValue {
   /** The bend or release under the cursor, refreshed every matching tick —
    *  read it from a frame loop, it never re-renders anything. */
   livePitchRef: MutableRefObject<LivePitch | null>;
+  /** Hits and holds straight from the matching loop, for the tab to draw the
+   *  fill from (fillFeed.ts); null where the tab shows React's hits only. */
+  fillFeedRef: MutableRefObject<FillFeed> | null;
   /** What the run's score rewards (see pitchScoring.ts). */
   scoringFocus: ScoringFocus;
   currentBeatsElapsedRef: MutableRefObject<number>;
@@ -161,6 +165,7 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   missedNotes: {},
   noteTimings: {},
   livePitchRef: _noPitchRef,
+  fillFeedRef: null,
   scoringFocus: "timing",
   currentBeatsElapsedRef: _fallbackRef,
   strumSlotFeedback: undefined,
@@ -302,6 +307,9 @@ export function NoteMatchingProvider({
   learn = null,
   onNoteJudged,
 }: NoteMatchingProviderProps) {
+  // Only the plain tab run draws its fill from the matching loop's own steps:
+  // hunts, strum patterns and learn mode put other marks on the board.
+  const streamFills = !customGoal && !activeStrumPattern && !learn?.enabled;
   const {
     hitNotes,
     missedNotes,
@@ -319,6 +327,7 @@ export function NoteMatchingProvider({
     intonationOffsetsRef,
     runLogRef,
     livePitchRef,
+    fillFeedRef,
     settlePendingIntonation,
     resetGame,
     markAlphaTabPassStart,
@@ -342,6 +351,7 @@ export function NoteMatchingProvider({
     calibratedLatencyMs,
     scoringFocus,
     onNoteJudged,
+    streamFills,
   });
 
   const {
@@ -618,6 +628,7 @@ export function NoteMatchingProvider({
       currentBeatsElapsedRef, strumSlotFeedback, gameState,
       noteTimings: isHunt || isStrummingExercise || isLearning ? EMPTY_TIMINGS : noteTimings,
       livePitchRef,
+      fillFeedRef: streamFills ? fillFeedRef : null,
       scoringFocus,
       maxPossibleScore: effectiveMaxPossibleScore, sessionAccuracy, sessionStats,
       noteHunt: isNoteHunt ? noteHunt : null,
@@ -643,7 +654,7 @@ export function NoteMatchingProvider({
       markAlphaTabPassStart,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, noteTimings, learn, isLearning, livePitchRef, scoringFocus, isStrummingExercise, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick, markAlphaTabPassStart],
+    [hitNotes, missedNotes, noteTimings, learn, isLearning, livePitchRef, fillFeedRef, streamFills, scoringFocus, isStrummingExercise, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick, markAlphaTabPassStart],
   );
 
   return (

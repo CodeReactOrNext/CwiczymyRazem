@@ -17,6 +17,7 @@ import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import { useTabOverlay } from "../contexts/TabOverlayContext";
+import { accuracyPerMeasure } from "../utils/measureAccuracy";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
 import { LearnModeBar } from "./LearnModeBar";
 import { MicHud } from "./MicHud";
@@ -200,7 +201,7 @@ export const TablatureSection = memo(function TablatureSection({
 }: TablatureSectionProps) {
   const { t } = useTranslation("session");
   const { overlay: tabOverlay, gameMode } = useTabOverlay();
-  const { hitNotes, missedNotes, noteTimings, livePitchRef, learn, markAlphaTabPassStart } = useNoteMatchingContext();
+  const { hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef, learn, markAlphaTabPassStart } = useNoteMatchingContext();
   const { openTimingCalibration } = useSessionUI();
   const { tuning } = useGuitarTuningContext();
   const {
@@ -405,25 +406,10 @@ export const TablatureSection = memo(function TablatureSection({
   // (`${measureIdx}-${beatIdx}-${noteIdx}`) so no extra bookkeeping is needed.
   // null = the loop hasn't reached that measure yet this pass, so the nav cell
   // stays unfilled instead of reading as a 0%.
-  const measureAccuracy = useMemo<(number | null)[] | undefined>(() => {
-    if (!isMicEnabled) return undefined;
-    return activeTablature.map((measure, mIdx) => {
-      let hit = 0;
-      let total = 0;
-      measure.beats.forEach((beat, bIdx) => {
-        beat.notes.forEach((_, nIdx) => {
-          const key = `${mIdx}-${bIdx}-${nIdx}`;
-          if (hitNotes[key]) {
-            hit++;
-            total++;
-          } else if (missedNotes[key]) {
-            total++;
-          }
-        });
-      });
-      return total > 0 ? hit / total : null;
-    });
-  }, [activeTablature, hitNotes, missedNotes, isMicEnabled]);
+  const measureAccuracy = useMemo<(number | null)[] | undefined>(
+    () => (isMicEnabled ? accuracyPerMeasure(activeTablature, hitNotes, missedNotes) : undefined),
+    [activeTablature, hitNotes, missedNotes, isMicEnabled],
+  );
 
   // Cinema keeps the picture clear of the backing track's own chrome.
   const showBackingButton = !!backingTrackStatus && !!onOpenBackingTrack && !cinema;
@@ -562,6 +548,7 @@ export const TablatureSection = memo(function TablatureSection({
               missedNotes={missedNotes}
               noteTimings={noteTimings}
               livePitchRef={livePitchRef}
+              fillFeedRef={fillFeedRef}
               currentBeatsElapsed={0}
               hideNotes={hideNotes}
               audioContext={audioContext}

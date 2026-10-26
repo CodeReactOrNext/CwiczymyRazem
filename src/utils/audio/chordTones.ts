@@ -79,15 +79,13 @@ export const spectrumPeak = ({ magnitudes, binHz }: Spectrum): number => {
   return peak;
 };
 
-/** Whether the note at `freq` is sounding in `spectrum`. */
-export const isChordToneSounding = (
+/** Whether there is a peak at `at` (Hz) standing up to the semitones beside it. */
+const peaksAt = (
   spectrum: Spectrum,
-  freq: number,
+  at: number,
   criteria: ToneCriteria,
-  peak: number = spectrumPeak(spectrum),
+  peak: number,
 ): boolean => {
-  if (peak <= 0 || freq <= 0) return false;
-  const at = freq * harmonicFor(freq, spectrum.binHz);
   const bin = strongestBin(spectrum, at);
   const { magnitudes } = spectrum;
   const level = magnitudes[bin] ?? 0;
@@ -103,6 +101,38 @@ export const isChordToneSounding = (
         levelAt(spectrum, at * SEMITONE),
       )
   );
+};
+
+/** Whether the note at `freq` is sounding in `spectrum`. */
+export const isChordToneSounding = (
+  spectrum: Spectrum,
+  freq: number,
+  criteria: ToneCriteria,
+  peak: number = spectrumPeak(spectrum),
+): boolean =>
+  peak > 0 &&
+  freq > 0 &&
+  peaksAt(spectrum, freq * harmonicFor(freq, spectrum.binHz), criteria, peak);
+
+/**
+ * Like isChordToneSounding, but any of the note's first `count` resolvable
+ * harmonics will do. Each is held to the same bar — a peak of its own, above the
+ * semitones beside it — so a note a fret away passes none of them; it only
+ * stops a dark tone (thumb, neck pickup), whose lowest resolvable harmonic can
+ * be faint, from failing a note that is plainly there.
+ */
+export const isNoteSoundingAtAnyHarmonic = (
+  spectrum: Spectrum,
+  freq: number,
+  criteria: ToneCriteria,
+  peak: number = spectrumPeak(spectrum),
+  count = 3,
+): boolean => {
+  if (peak <= 0 || freq <= 0) return false;
+  const first = harmonicFor(freq, spectrum.binHz);
+  for (let h = first; h < first + count && freq * h < SPECTRUM_TOP_HZ - 50; h++)
+    if (peaksAt(spectrum, freq * h, criteria, peak)) return true;
+  return false;
 };
 
 /**
