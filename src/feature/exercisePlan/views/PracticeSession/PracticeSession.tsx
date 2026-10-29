@@ -94,6 +94,9 @@ import type { TimingPrecision } from "./utils/timingPrecision";
 
 /** How long a solved ear-training riddle stays on screen before the next one is dealt. */
 const RIDDLE_AUTO_ADVANCE_MS = 1500;
+/** Kill switch for usePlaybackLeakGuard: off, no probe chirp, no pilot tone,
+ *  no toast, and no run is kept off the boards for playback leaking into the mic. */
+const PLAYBACK_LEAK_GUARD_ENABLED = false;
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -952,7 +955,9 @@ const PracticeSessionInner = ({
     });
   }, [t, setIsAudioMuted, setAutoBackingEnabled]);
   const playbackLeakingRef = usePlaybackLeakGuard({
-    enabled: isMicEnabled && isListening && !isEarTrainingRiddle && (hasLeaderboard(activeExercise) || !!plan.duel),
+    enabled:
+      PLAYBACK_LEAK_GUARD_ENABLED &&
+      isMicEnabled && isListening && !isEarTrainingRiddle && (hasLeaderboard(activeExercise) || !!plan.duel),
     isTabAudible: isAudioPlaying && ((hasTabSound && tabSoundLevel > 0) || autoBackingLevel > 0),
     tabLevel: Math.max(tabSoundLevel, autoBackingLevel),
     audioContext: metronome.audioContext,
