@@ -18,14 +18,14 @@ const MIN_SEGMENT = 320;
 const PAD_X = 48;
 const BOX_GAP = 80;
 
-const TRACK_TOP = 78;
+const TRACK_TOP = 30;
 const TRACK_H = 18;
 const BOX_TOP = TRACK_TOP + TRACK_H + 22;
-const CONTAINER_H = 400;
+const CONTAINER_H = 352;
 
-/** Shape and placement only — each chevron paints itself, see below. */
+/** Shape and placement only — each chevron paints itself, see below. Centred on the track. */
 const SCROLL_BUTTON_CLASS =
-  "absolute top-[78px] z-30 flex h-9 w-9 items-center justify-center rounded-full transition-background focus-visible:outline-none focus-visible:ring-1";
+  "absolute top-[21px] z-30 flex h-9 w-9 items-center justify-center rounded-full transition-background focus-visible:outline-none focus-visible:ring-1";
 
 /**
  * Every state gets its own accent, because on a ladder this long "which one is
@@ -33,6 +33,9 @@ const SCROLL_BUTTON_CLASS =
  * marks what is being built right now, cyan is where the running total stands
  * and what it unlocks next, and amber singles out the feature tiers — the ones
  * people actually scroll here for — from the content top-ups between them.
+ *
+ * No dollar amounts on the ladder except one: what the next tier still needs.
+ * Neither the running total nor any tier's cumulative goal is shown.
  */
 export const FundingProgressBar = ({
   totalRaised,
@@ -179,16 +182,6 @@ export const FundingProgressBar = ({
             <div
               className='relative'
               style={{ width: trackWidth + PAD_X * 2, height: CONTAINER_H }}>
-              {/* "You are here" bubble with a caret pointing down to the track */}
-              <div
-                className='absolute top-3 z-20 flex -translate-x-1/2 flex-col items-center'
-                style={{ left: PAD_X + fillX }}>
-                <span className='whitespace-nowrap rounded bg-cyan-500/15 px-2.5 py-1 text-base font-semibold text-cyan-300'>
-                  ${totalRaised}
-                </span>
-                <span className='h-0 w-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-cyan-500/15' />
-              </div>
-
               {/* Track */}
               <div
                 className='absolute rounded-full bg-zinc-800'
@@ -199,7 +192,7 @@ export const FundingProgressBar = ({
                   height: TRACK_H,
                 }}>
                 <div
-                  className='absolute left-0 top-0 h-full rounded-full bg-cyan-500'
+                  className='bar-shine absolute left-0 top-0 h-full rounded-full bg-cyan-500 [--shine-inset:8px]'
                   style={{ width: fillX }}
                 />
               </div>
@@ -280,17 +273,13 @@ export const FundingProgressBar = ({
                       )}
 
                       <div className='flex items-baseline justify-between gap-2'>
-                        <span
-                          className={cn(
-                            "text-base font-bold",
-                            reached
-                              ? "text-zinc-200"
-                              : isNext
-                                ? "text-cyan-300"
-                                : "text-zinc-300",
-                          )}>
-                          ${tier.goal}
-                        </span>
+                        {isNext && (
+                          <span className='text-base font-bold text-cyan-300'>
+                            {t("funding.to_go", {
+                              amount: tier.goal - totalRaised,
+                            })}
+                          </span>
+                        )}
                         <span
                           className={cn(
                             "text-[11px] font-medium",
@@ -311,7 +300,7 @@ export const FundingProgressBar = ({
                               : reached
                                 ? t("funding.funded")
                                 : isNext
-                                  ? `+$${tier.goal - totalRaised}`
+                                  ? t("funding.next_unlock")
                                   : t("funding.locked")}
                         </span>
                       </div>

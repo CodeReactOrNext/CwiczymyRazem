@@ -3,75 +3,104 @@
     "content": {
       "exercises": "+{{count}} ejercicios nuevos",
       "exercise_one": "+{{count}} ejercicio nuevo",
-      "gear": "+{{count}} guitarras y pedales nuevos"
+      "gear": "+{{count}} guitarras y pedales nuevos",
+      "achievements": "+{{count}} logros nuevos"
     },
-    "t13": {
-      "label": "Desguazar guitarras para piezas",
-      "description": "Desguaza las guitarras que no quieras. Cada guitarra se desmonta en piezas distintas, así que lo que conservas (y lo que desguazas) importa de verdad."
+    "ex-chord-changes": {
+      "topic": "Cambios de acordes",
+      "description": "Cambia de acorde a tiempo, sin la pausa antes de cada nueva forma."
     },
-    "t25": {
-      "label": "Luthier: piezas y mejoras de guitarra",
-      "description": "El equipo suelta piezas según su rareza mientras tocas, y las piezas de las guitarras que desguazas vuelven al ciclo. Gasta piezas compatibles en el Luthier para subir de nivel una guitarra o efecto y aumentar su rareza."
+    "bass": {
+      "label": "Soporte para bajo",
+      "description": "Practica no solo con guitarra, también con bajo: tablaturas de cuatro cuerdas, afinación de bajo y una detección de notas que capta los graves."
     },
-    "t51": {
-      "label": "El equipo afecta a los puntos de Fama",
-      "description": "El equipo que usas cambia cuántos puntos de Fama ganas por tipo de ejercicio, así que elige el rig adecuado para cada ejercicio."
+    "mcp": {
+      "label": "Conecta tu asistente de IA (MCP)",
+      "description": "Conecta ChatGPT o Claude a tu cuenta. Registra una sesión contándole qué practicaste, pregunta por tu progreso o pídele un plan de práctica que llegue directo a la app."
     },
-    "t61": {
-      "label": "Sincronizar pista de acompañamiento con la tablatura",
-      "description": "Pistas de acompañamiento sincronizadas con la tablatura, para que toques a tiempo sin buscar el pulso."
+    "gear-1": {
+      "topic": "Clásicos vintage",
+      "description": "Guitarras de los 50 a los 70 y los pedales con los que se tocaban: fuzz, eco de cinta, trémolo."
     },
-    "t79": {
-      "label": "Sinergia de pedalera",
-      "description": "Los efectos interactúan entre sí, así que elige y ordena tus pedales con cuidado."
+    "ex-ear-training": {
+      "topic": "Entrenamiento auditivo",
+      "description": "Pon nombre a lo que oyes: intervalos, tipos de acorde y progresiones sencillas."
     },
-    "t89": {
-      "label": "Rediseño de logros",
-      "description": "Los logros rehechos por completo, más logros nuevos. Cada uno te da algo de verdad, no solo una insignia."
+    "what-next": {
+      "label": "Qué sigue",
+      "description": "Un centro de mando que te dice qué hacer a continuación: qué ejercicio, qué plan y qué meta tienes más cerca."
     },
-    "t107": {
-      "label": "Límite de potencia de la pedalera",
-      "description": "Tu pedalera tiene un límite de potencia, así que mejórala si quieres usar efectos más potentes."
+    "journey-intervals": {
+      "label": "Ruta de aprendizaje: Intervalos",
+      "description": "Un nuevo módulo de la Ruta de aprendizaje: escucha, encuentra y toca intervalos por todo el diapasón."
     },
-    "t117": {
-      "label": "Gamificación: recompensas por completar rutas y habilidades",
-      "description": "Completa una Ruta, una Hoja de ruta o una rama de habilidades y recibe una guitarra o un efecto como recompensa."
+    "ex-scales": {
+      "topic": "Escalas",
+      "description": "Formas mayores, menores y pentatónicas, tocadas a tiempo por todo el mástil."
     },
-    "t153": {
-      "label": "Sistema de progresión del jugador",
-      "description": "Sube de nivel tocando. Desbloquea hitos, diseños de perfil y la rareza de equipo que puedes equipar."
+    "jam-room": {
+      "label": "Jam Room",
+      "description": "Genera tus propias pistas de acompañamiento para improvisar: elige tonalidad, escala y estilo, y a tocar."
     },
-    "t181": {
-      "label": "Panel configurable",
-      "description": "Elige tu propio diseño, widgets y accesos directos para el panel principal."
+    "gear-2": {
+      "topic": "Ambient y espacio",
+      "description": "Reverbs shimmer, delays largos y loopers, más guitarras pensadas para sonidos limpios y amplios."
     },
-    "t191": {
-      "label": "Desbloqueo diario",
-      "description": "Un desbloqueo temporal que se reinicia una vez al día, para darte un motivo para volver."
+    "ex-legato": {
+      "topic": "Legato",
+      "description": "Hammer-ons y pull-offs que suenan parejos y con volumen sin usar la púa."
     },
-    "t201": {
-      "label": "Perfil de guitarrista configurable",
-      "description": "Muestra lo que quieras, como quieras, con diseños desbloqueados al progresar."
+    "ex-arpeggios": {
+      "topic": "Arpegios",
+      "description": "Las notas del acorde una a una: la base de los solos melódicos."
     },
-    "t229": {
-      "label": "Modo práctica",
-      "description": "Fija objetivos por ejercicio y sigue tu progreso hacia ellos."
+    "journey-improvisation": {
+      "label": "Ruta de aprendizaje: Fundamentos de improvisación",
+      "description": "Un nuevo módulo de la Ruta de aprendizaje: tus primeros pasos improvisando, desde unas pocas notas sobre una base hasta frases cortas propias."
     },
-    "t244": {
-      "label": "Cartas de riffs",
-      "description": "Crea un mazo personal de riffs, canciones y ejercicios para repasar con repetición espaciada o tocarlo libremente cuando quieras."
+    "ex-phrasing": {
+      "topic": "Fraseo",
+      "description": "Haz que unas pocas notas digan algo: timing, silencios, bends y repetición."
     },
-    "t262": {
-      "label": "Guitarras signature en el Luthier",
-      "description": "El Luthier tiene guitarras únicas que no encontrarás en ningún otro sitio."
+    "ex-without-guitar": {
+      "topic": "Sin guitarra",
+      "description": "Perfecto para un descanso con el móvil: ejercicios que puedes hacer sin tomar la guitarra."
     },
-    "t346": {
-      "label": "Duelos",
-      "description": "Reta a otro jugador por puntos de Fama, por ejemplo a ver quién acumula más tiempo de práctica antes de que acabe el reloj."
+    "gear-3": {
+      "topic": "Limpio y brillante",
+      "description": "Semihuecas y single coils brillantes, con compresores y chorus para que los acordes suenen."
     },
-    "t415": {
-      "label": "Nuevo modo de práctica: Jefe",
-      "description": "Un nuevo modo de práctica: Jefe. Cada jefe pone un requisito real para superarlo. Consigue la puntuación y subes de nivel; si te quedas corto, quedas fuera, sin crédito parcial."
+    "ex-string-skipping": {
+      "topic": "Salto de cuerdas",
+      "description": "Salta cuerdas con limpieza, sin que suene la que no toca."
+    },
+    "boss-1": {
+      "label": "+1 jefe nuevo",
+      "description": "Un jefe nuevo con un desafío que ningún otro tiene."
+    },
+    "journey-chords": {
+      "label": "Ruta de aprendizaje: Acordes y tríadas",
+      "description": "Un nuevo módulo de la Ruta de aprendizaje: acordes abiertos, cambios limpios y tríadas a lo largo del mástil."
+    },
+    "ex-alternate-picking": {
+      "topic": "Púa alterna",
+      "description": "Púa alterna estricta entre cuerdas, de lenta y pareja a rápida."
+    },
+    "gear-4": {
+      "topic": "High Gain",
+      "description": "Guitarras de shred de rango extendido, distorsión de alta ganancia y puertas de ruido para riffs rápidos y precisos."
+    },
+    "ex-finger-independence": {
+      "topic": "Independencia de dedos",
+      "description": "Ejercicios para la mano del mástil que enseñan a cada dedo a moverse por su cuenta."
+    },
+    "ex-mystery": {
+      "topic": "???",
+      "description": "Una sorpresa. Verás qué trae cuando se desbloquee."
+    },
+    "journey-speed": {
+      "label": "Ruta de aprendizaje: Velocidad y precisión",
+      "description": "Un nuevo módulo de la Ruta de aprendizaje: gana velocidad sin perder precisión, con púa, sincronización y apagado."
     }
   },
   "funding": {

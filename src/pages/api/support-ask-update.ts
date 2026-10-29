@@ -3,6 +3,7 @@ import {
   ROADMAP_RAISED_OFFSET,
   ROADMAP_TIERS,
 } from "feature/roadmap/data/roadmap.data";
+import { tierLabel } from "feature/roadmap/utils/tierText";
 import { pickSupportVariant } from "feature/support/content/supportVariants";
 import * as admin from "firebase-admin";
 import { getFundingSnapshot } from "lib/funding/getFundingSnapshot";
@@ -72,7 +73,9 @@ export default async function handler(
       monthlyGoal: MONTHLY_RUNNING_COST,
       totalRaised,
       supporters: funding.supporters,
-      nextTierLabel: nextTier?.label ?? null,
+      // English with the topic ("+3 New Exercises: Chord Changes"); a bare
+      // pack label would read the same for every exercise drop.
+      nextTierLabel: nextTier ? tierLabel(nextTier) : null,
       nextTierAmountToGo: nextTier ? nextTier.goal - totalRaised : null,
       tiersFunded,
       tiersTotal: ROADMAP_TIERS.length,

@@ -3,75 +3,104 @@
     "content": {
       "exercises": "+{{count}} nowe ćwiczenia",
       "exercise_one": "+{{count}} nowe ćwiczenie",
-      "gear": "+{{count}} nowych gitar i efektów"
+      "gear": "+{{count}} nowych gitar i efektów",
+      "achievements": "+{{count}} nowych osiągnięć"
     },
-    "t13": {
-      "label": "Rozbieranie gitar na części",
-      "description": "Rozbieraj gitary, których nie chcesz. Różne gitary rozpadają się na różne części, więc to, co zostawiasz (i co rozbierasz), naprawdę ma znaczenie."
+    "ex-chord-changes": {
+      "topic": "Zmiany akordów",
+      "description": "Zmieniaj akordy w rytmie, bez pauzy przed każdym nowym chwytem."
     },
-    "t25": {
-      "label": "Lutnik: części i ulepszanie gitar",
-      "description": "Sprzęt zrzuca części według rzadkości, gdy grasz, a części z rozebranych gitar wracają do obiegu. Wydawaj pasujące części u Lutnika, żeby podnieść poziom gitary lub efektu i jego rzadkość."
+    "bass": {
+      "label": "Obsługa basu",
+      "description": "Ćwicz nie tylko na gitarze, ale też na basie: taby na cztery struny, strój basowy i wykrywanie dźwięków, które słyszy niskie rejestry."
     },
-    "t51": {
-      "label": "Sprzęt wpływa na punkty Fame",
-      "description": "Sprzęt, którego używasz, zmienia liczbę punktów Fame za dany typ ćwiczenia, więc dobierz odpowiedni rig do ćwiczenia."
+    "mcp": {
+      "label": "Połącz swojego asystenta AI (MCP)",
+      "description": "Podłącz ChatGPT albo Claude do swojego konta. Zapisz sesję, opisując ją jednym zdaniem, zapytaj o swoje postępy albo poproś o plan ćwiczeń, który od razu trafi do aplikacji."
     },
-    "t61": {
-      "label": "Synchronizacja podkładu z tabulaturą",
-      "description": "Podkłady do utworów zsynchronizowane z tabulaturą, żebyś grał do rytmu bez szukania beatu."
+    "gear-1": {
+      "topic": "Klasyki vintage",
+      "description": "Gitary z lat 50.–70. i efekty, przez które na nich grano: fuzz, echo taśmowe, tremolo."
     },
-    "t79": {
-      "label": "Synergia pedalboardu",
-      "description": "Efekty oddziałują na siebie, więc wybieraj i ustawiaj pedały z rozwagą."
+    "ex-ear-training": {
+      "topic": "Kształcenie słuchu",
+      "description": "Nazwij to, co słyszysz: interwały, rodzaje akordów i proste progresje."
     },
-    "t89": {
-      "label": "Przebudowa osiągnięć",
-      "description": "Osiągnięcia zrobione od nowa, plus nowe. Każde naprawdę coś daje, nie tylko odznakę."
+    "what-next": {
+      "label": "Co dalej",
+      "description": "Centrum dowodzenia, które mówi, co robić dalej: które ćwiczenie, który plan i który cel jest najbliżej."
     },
-    "t107": {
-      "label": "Limit mocy pedalboardu",
-      "description": "Pedalboard ma limit mocy, więc ulepsz go, jeśli chcesz używać mocniejszych efektów."
+    "journey-intervals": {
+      "label": "Ścieżka nauki: Interwały",
+      "description": "Nowy moduł Ścieżki nauki: słyszysz, znajdujesz i grasz interwały na całym gryfie."
     },
-    "t117": {
-      "label": "Grywalizacja: nagrody za ukończenie ścieżek i umiejętności",
-      "description": "Ukończ Ścieżkę, Roadmapę albo gałąź umiejętności i dostań gitarę lub efekt w nagrodę."
+    "ex-scales": {
+      "topic": "Skale",
+      "description": "Skale durowe, molowe i pentatoniczne, grane w rytmie na całym gryfie."
     },
-    "t153": {
-      "label": "System progresji gracza",
-      "description": "Zdobywaj poziomy, grając. Odblokowują kamienie milowe, układy profilu i rzadkość sprzętu, którą możesz założyć."
+    "jam-room": {
+      "label": "Jam Room",
+      "description": "Generuj własne podkłady do improwizacji: wybierz tonację, skalę i klimat, i graj."
     },
-    "t181": {
-      "label": "Konfigurowalny dashboard",
-      "description": "Wybierz własny układ, widgety i skróty na głównym panelu."
+    "gear-2": {
+      "topic": "Ambient i przestrzeń",
+      "description": "Reverby shimmer, długie delaye i loopery, a do tego gitary stworzone do czystych, szerokich brzmień."
     },
-    "t191": {
-      "label": "Dzienne odblokowanie",
-      "description": "Odblokowanie czasowe resetujące się raz dziennie, które daje powód, żeby wracać."
+    "ex-legato": {
+      "topic": "Legato",
+      "description": "Hammer-ony i pull-offy, które bez kostki brzmią równo i wystarczająco głośno."
     },
-    "t201": {
-      "label": "Konfigurowalny profil gitarzysty",
-      "description": "Pokaż to, co chcesz, tak jak chcesz, korzystając z układów odblokowanych progresją."
+    "ex-arpeggios": {
+      "topic": "Arpeggia",
+      "description": "Dźwięki akordu jeden po drugim: kręgosłup melodyjnych solówek."
     },
-    "t229": {
-      "label": "Tryb ćwiczeń",
-      "description": "Ustaw cele dla każdego ćwiczenia i śledź postęp w ich osiąganiu."
+    "journey-improvisation": {
+      "label": "Ścieżka nauki: Podstawy improwizacji",
+      "description": "Nowy moduł Ścieżki nauki: pierwsze kroki w improwizacji, od kilku dźwięków na podkładzie po krótkie własne frazy."
     },
-    "t244": {
-      "label": "Karty riffów",
-      "description": "Zbuduj własną talię riffów, utworów i ćwiczeń, którą powtarzasz metodą powtórek rozłożonych w czasie albo grasz swobodnie."
+    "ex-phrasing": {
+      "topic": "Frazowanie",
+      "description": "Spraw, żeby kilka dźwięków coś mówiło: timing, pauzy, bendy i powtórzenia."
     },
-    "t262": {
-      "label": "Gitary sygnowane u Lutnika",
-      "description": "Lutnik ma unikatowe gitary, których nie znajdziesz nigdzie indziej."
+    "ex-without-guitar": {
+      "topic": "Bez gitary",
+      "description": "Idealne na przerwę z telefonem: ćwiczenia, które zrobisz bez sięgania po gitarę."
     },
-    "t346": {
-      "label": "Pojedynki",
-      "description": "Wyzwij innego gracza o punkty Fame, np. kto uzbiera więcej czasu ćwiczeń, zanim skończy się zegar."
+    "gear-3": {
+      "topic": "Czysto i dźwięcznie",
+      "description": "Półpudła i jasne single coile, a do tego kompresory i chorus, żeby akordy dzwoniły."
     },
-    "t415": {
-      "label": "Nowy tryb ćwiczeń: Boss",
-      "description": "Nowy tryb ćwiczeń: Boss. Każdy boss stawia realny wymóg do zaliczenia. Osiągnij wynik i awansujesz, zabraknie — odpadasz, bez częściowego zaliczenia."
+    "ex-string-skipping": {
+      "topic": "Przeskakiwanie strun",
+      "description": "Przeskakuj przez struny czysto, bez dzwoniącej niechcianej struny."
+    },
+    "boss-1": {
+      "label": "+1 nowy boss",
+      "description": "Nowy boss z wyzwaniem, jakiego nie ma żaden inny."
+    },
+    "journey-chords": {
+      "label": "Ścieżka nauki: Akordy i triady",
+      "description": "Nowy moduł Ścieżki nauki: akordy otwarte, czyste zmiany i triady w wyższych pozycjach."
+    },
+    "ex-alternate-picking": {
+      "topic": "Kostkowanie naprzemienne",
+      "description": "Ścisłe kostkowanie góra-dół przez struny, od wolnego i równego do szybkiego."
+    },
+    "gear-4": {
+      "topic": "High Gain",
+      "description": "Gitary do shredu z rozszerzoną skalą, mocne przestery i bramki szumów do szybkich, zwartych riffów."
+    },
+    "ex-finger-independence": {
+      "topic": "Niezależność palców",
+      "description": "Ćwiczenia dla ręki na gryfie, które uczą każdy palec ruszać się niezależnie."
+    },
+    "ex-mystery": {
+      "topic": "???",
+      "description": "Niespodzianka. Zobaczysz, co jest w środku, kiedy się odblokuje."
+    },
+    "journey-speed": {
+      "label": "Ścieżka nauki: Szybkość i precyzja",
+      "description": "Nowy moduł Ścieżki nauki: szybkość bez utraty dokładności, przez kostkowanie, synchronizację i tłumienie."
     }
   },
   "funding": {

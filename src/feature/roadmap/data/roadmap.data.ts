@@ -1,24 +1,27 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  ArrowDownUp,
+  ArrowLeftRight,
   AudioLines,
-  ClipboardList,
-  Clock,
-  Gamepad2,
-  Gauge,
-  Gift,
-  Guitar,
-  Hammer,
-  Layers,
-  LayoutDashboard,
-  Plug,
-  Recycle,
-  Star,
-  Swords,
-  Target,
-  TrendingUp,
+  AudioWaveform,
+  Bell,
+  Cable,
+  CircleHelp,
+  Compass,
+  Ear,
+  Flame,
+  Hand,
+  Quote,
+  Radio,
+  Route,
+  Signal,
+  SkipForward,
+  Skull,
+  Smartphone,
+  Spline,
   Trophy,
-  UserCircle,
-  Wand2,
+  Waves,
+  Waypoints,
 } from "lucide-react";
 
 export type RoadmapStatus = "shipped" | "in_progress" | "locked";
@@ -28,11 +31,24 @@ export type TierKind = "feature" | "content";
 
 export interface RoadmapTier {
   id: string;
-  /** Lifetime total raised (USD) needed to unlock this. */
+  /** What this step costs on top of the one before it (USD). */
+  cost: number;
+  /**
+   * Lifetime total raised (USD) needed to unlock this: the running sum of every
+   * `cost` up to and including this tier. Drives the ladder, never shown — the
+   * page only ever says how much is still missing for the next step.
+   */
   goal: number;
   icon: LucideIcon;
   label: string;
   kind: TierKind;
+  /**
+   * What a content pack is about, e.g. "Chord Changes" for "+3 New Exercises"
+   * or "Vintage Classics" for "+15 New Guitars & Pedals". Packs share a label,
+   * so the topic (plus its own icon and description) is what makes each one
+   * its own step instead of the same drop again.
+   */
+  topic?: string;
   /** Optional longer explanation shown under the label in the tooltip. */
   description?: string;
   /** Marks a tier whose work is actually delivered — shown green as "Done". */
@@ -40,6 +56,8 @@ export interface RoadmapTier {
   /** Marks a tier that's being built right now — shown as "In progress". */
   inProgress?: boolean;
 }
+
+type RoadmapStep = Omit<RoadmapTier, "goal">;
 
 /**
  * Monthly running cost. Buy Me a Coffee support covers this first; everything
@@ -52,207 +70,277 @@ export const BMC_URL = "https://buymeacoffee.com/riffquest";
 
 /**
  * Snapshot of the real lifetime total (USD) at the moment the roadmap tiers
- * were reset. Subtracted from the live Buy Me a Coffee total so the tier
- * ladder above starts counting from $0 again, without touching the real
- * historical funding record in Firestore.
+ * were reset (last reset: 2026-10-29). Subtracted from the live Buy Me a Coffee
+ * total so the tier ladder above starts counting from $0 again, without
+ * touching the real historical funding record in Firestore.
  */
-export const ROADMAP_RAISED_OFFSET = 155;
+export const ROADMAP_RAISED_OFFSET = 648;
+
+/**
+ * The roadmap, step by step. Each step lists only its own cost; the cumulative
+ * goal is derived below, so reordering or repricing a step never means
+ * recomputing every goal after it by hand.
+ */
+const ROADMAP_STEPS: RoadmapStep[] = [
+  {
+    id: "ex-chord-changes",
+    cost: 30,
+    icon: ArrowLeftRight,
+    label: "+3 New Exercises",
+    topic: "Chord Changes",
+    kind: "content",
+    description:
+      "Switch chords in time, without the pause before every new shape.",
+  },
+  {
+    id: "bass",
+    cost: 40,
+    icon: AudioWaveform,
+    label: "Bass Support",
+    kind: "feature",
+    description:
+      "Practice on bass, not only guitar: four-string tabs, bass tuning and note detection that hears the low end.",
+  },
+  {
+    id: "mcp",
+    cost: 35,
+    icon: Cable,
+    label: "Connect Your AI Assistant (MCP)",
+    kind: "feature",
+    description:
+      "Connect ChatGPT or Claude to your account. Log a session by telling it what you practiced, ask about your progress, or have it build a practice plan straight into the app.",
+  },
+  {
+    id: "gear-1",
+    cost: 40,
+    icon: Radio,
+    label: "+15 New Guitars & Pedals",
+    topic: "Vintage Classics",
+    kind: "content",
+    description:
+      "Guitars from the '50s to the '70s and the pedals they were played through: fuzz, tape echo, tremolo.",
+  },
+  {
+    id: "ex-ear-training",
+    cost: 30,
+    icon: Ear,
+    label: "+3 New Exercises",
+    topic: "Ear Training",
+    kind: "content",
+    description:
+      "Name what you hear: intervals, chord qualities and simple progressions.",
+  },
+  {
+    id: "what-next",
+    cost: 35,
+    icon: Compass,
+    label: "What Next",
+    kind: "feature",
+    description:
+      "A command center that tells you what to do next: which exercise, which plan, and which goal is closest.",
+  },
+  {
+    id: "journey-intervals",
+    cost: 40,
+    icon: Route,
+    label: "Journey: Intervals",
+    kind: "feature",
+    description:
+      "A new Journey module: hear, find and play intervals all over the fretboard.",
+  },
+  {
+    id: "ex-scales",
+    cost: 35,
+    icon: Signal,
+    label: "+3 New Exercises",
+    topic: "Scales",
+    kind: "content",
+    description:
+      "Major, minor and pentatonic shapes, played in time across the whole neck.",
+  },
+  {
+    id: "jam-room",
+    cost: 45,
+    icon: AudioLines,
+    label: "Jam Room",
+    kind: "feature",
+    description:
+      "Generate your own backing tracks to improvise over: pick a key, a scale and a feel, then play.",
+  },
+  {
+    id: "gear-2",
+    cost: 35,
+    icon: Waves,
+    label: "+15 New Guitars & Pedals",
+    topic: "Ambient & Space",
+    kind: "content",
+    description:
+      "Shimmer reverbs, long delays and loopers, plus guitars made for clean, wide sounds.",
+  },
+  {
+    id: "ach-1",
+    cost: 20,
+    icon: Trophy,
+    label: "+5 New Achievements",
+    kind: "content",
+  },
+  {
+    id: "ex-legato",
+    cost: 30,
+    icon: Spline,
+    label: "+3 New Exercises",
+    topic: "Legato",
+    kind: "content",
+    description:
+      "Hammer-ons and pull-offs that sound even and loud enough without the pick.",
+  },
+  {
+    id: "ex-arpeggios",
+    cost: 40,
+    icon: Waypoints,
+    label: "+3 New Exercises",
+    topic: "Arpeggios",
+    kind: "content",
+    description:
+      "Chord tones one note at a time: the backbone of melodic solos.",
+  },
+  {
+    id: "journey-improvisation",
+    cost: 45,
+    icon: Route,
+    label: "Journey: Improvisation Fundamentals",
+    kind: "feature",
+    description:
+      "A new Journey module: your first steps in improvising, from a few notes over a backing track to short phrases of your own.",
+  },
+  {
+    id: "ex-phrasing",
+    cost: 35,
+    icon: Quote,
+    label: "+3 New Exercises",
+    topic: "Phrasing",
+    kind: "content",
+    description:
+      "Make a few notes say something: timing, space, bends and repetition.",
+  },
+  {
+    id: "ex-without-guitar",
+    cost: 40,
+    icon: Smartphone,
+    label: "+3 New Exercises",
+    topic: "Without Guitar",
+    kind: "content",
+    description:
+      "Perfect for a phone break: exercises you can do without picking up the guitar.",
+  },
+  {
+    id: "gear-3",
+    cost: 45,
+    icon: Bell,
+    label: "+15 New Guitars & Pedals",
+    topic: "Clean & Jangle",
+    kind: "content",
+    description:
+      "Semi-hollows and bright single-coils, with compressors and chorus for chords that ring.",
+  },
+  {
+    id: "ex-string-skipping",
+    cost: 40,
+    icon: SkipForward,
+    label: "+3 New Exercises",
+    topic: "String Skipping",
+    kind: "content",
+    description:
+      "Jump across strings cleanly, without the wrong one ringing out.",
+  },
+  {
+    id: "boss-1",
+    cost: 35,
+    icon: Skull,
+    label: "+1 New Boss",
+    kind: "content",
+    description: "A new boss with a challenge none of the others use.",
+  },
+  {
+    id: "ach-2",
+    cost: 20,
+    icon: Trophy,
+    label: "+5 New Achievements",
+    kind: "content",
+  },
+  {
+    id: "journey-chords",
+    cost: 35,
+    icon: Route,
+    label: "Journey: Chords & Triads",
+    kind: "feature",
+    description:
+      "A new Journey module: open chords, clean changes, and triads up the neck.",
+  },
+  {
+    id: "ex-alternate-picking",
+    cost: 45,
+    icon: ArrowDownUp,
+    label: "+3 New Exercises",
+    topic: "Alternate Picking",
+    kind: "content",
+    description:
+      "Strict down-up picking across strings, from slow and even to fast.",
+  },
+  {
+    id: "gear-4",
+    cost: 45,
+    icon: Flame,
+    label: "+15 New Guitars & Pedals",
+    topic: "High Gain",
+    kind: "content",
+    description:
+      "Extended-range shred guitars, high-gain distortion and noise gates for fast, tight riffs.",
+  },
+  {
+    id: "ach-3",
+    cost: 20,
+    icon: Trophy,
+    label: "+5 New Achievements",
+    kind: "content",
+  },
+  {
+    id: "ex-finger-independence",
+    cost: 45,
+    icon: Hand,
+    label: "+3 New Exercises",
+    topic: "Finger Independence",
+    kind: "content",
+    description:
+      "Drills for the fretting hand that teach each finger to move on its own.",
+  },
+  {
+    id: "ex-mystery",
+    cost: 45,
+    icon: CircleHelp,
+    label: "+3 New Exercises",
+    topic: "???",
+    kind: "content",
+    description: "A surprise. You'll see what's inside when it unlocks.",
+  },
+  {
+    id: "journey-speed",
+    cost: 50,
+    icon: Route,
+    label: "Journey: Speed & Precision",
+    kind: "feature",
+    description:
+      "A new Journey module: build speed without losing accuracy, through picking, synchronization and muting.",
+  },
+];
 
 /**
  * The roadmap as lifetime funding tiers. As the total raised climbs, each tier
  * unlocks — big features plus a steady stream of new content.
  */
-export const ROADMAP_TIERS: RoadmapTier[] = [
-  {
-    id: "t13",
-    goal: 13,
-    icon: Recycle,
-    label: "Scrap Guitars for Parts",
-    kind: "feature",
-    done: true,
-    description:
-      "Scrap guitars you don't want. Different guitars break down into different parts, so what you keep (and what you scrap) actually matters.",
-  },
-  {
-    id: "t25",
-    goal: 25,
-    icon: Hammer,
-    label: "Luthier: Guitar Parts & Upgrading",
-    kind: "feature",
-    done: true,
-    description:
-      "Gear drops parts by rarity as you play, and the parts you scrap from guitars you don't want feed right back in. Spend matching parts at the Luthier to level up a guitar or effect and push its rarity higher.",
-  },
-  {
-    id: "t33",
-    goal: 33,
-    icon: Target,
-    label: "+4 New Exercises",
-    kind: "content",
-    done: true,
-  },
-  {
-    id: "t41",
-    goal: 41,
-    icon: Guitar,
-    label: "+5 New Guitars & Pedals",
-    kind: "content",
-    done: true,
-  },
-  {
-    id: "t51",
-    goal: 51,
-    icon: Star,
-    label: "Gear Affects Fame Points",
-    kind: "feature",
-    done: true,
-    description:
-      "The gear you're using changes how many Fame Points you earn per exercise type, so pick the right rig for the right drill.",
-  },
-  {
-    id: "t61",
-    goal: 61,
-    icon: AudioLines,
-    label: "Sync Backing Track to Tablature",
-    kind: "feature",
-    done: true,
-    description:
-      "Backing tracks for songs synced to the tab, so you can play along in time without hunting for the beat.",
-  },
-  { id: "t69", goal: 69, icon: Target, label: "+4 New Exercises", kind: "content", done: true },
-  {
-    id: "t79",
-    goal: 79,
-    icon: Plug,
-    label: "Pedalboard Synergy",
-    kind: "feature",
-    done: true,
-    description: "Effects interact with each other, so pick and order your pedals carefully.",
-  },
-  {
-    id: "t89",
-    goal: 89,
-    icon: Trophy,
-    label: "Achievements Rework",
-    kind: "feature",
-    done: true,
-    description:
-      "A full redo of achievements, plus new ones. Each one actually gives you something, not just a badge.",
-  },
-  { id: "t97", goal: 97, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content", done: true },
-  {
-    id: "t107",
-    goal: 107,
-    icon: Gauge,
-    label: "Pedalboard Power Cap",
-    kind: "feature",
-    done: true,
-    description: "Your pedalboard has a power limit, so upgrade it if you want to run stronger effects.",
-  },
-  {
-    id: "t117",
-    goal: 117,
-    icon: Gift,
-    label: "Gamification: Path/Skill Completion Rewards",
-    kind: "feature",
-    done: true,
-    description:
-      "Finish a Journey, Roadmap, or Skill track and get a guitar or effect dropped as a reward.",
-  },
-  { id: "t125", goal: 125, icon: Target, label: "+4 New Exercises", kind: "content", done: true },
-  { id: "t133", goal: 133, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content", done: true },
-  {
-    id: "t153",
-    goal: 153,
-    icon: TrendingUp,
-    label: "Player Progression System",
-    kind: "feature",
-    done: true,
-    description:
-      "Level up from playing. Unlocks milestones, profile layouts, and which gear rarity you can equip.",
-  },
-  { id: "t161", goal: 161, icon: Target, label: "+4 New Exercises", kind: "content", done: true },
-  { id: "t171", goal: 171, icon: Target, label: "+1 New Exercise", kind: "content", done: true },
-  {
-    id: "t181",
-    goal: 181,
-    icon: LayoutDashboard,
-    label: "Configurable Dashboard",
-    kind: "feature",
-    done: true,
-    description: "Pick your own layout, widgets, and shortcuts for the main panel.",
-  },
-  {
-    id: "t191",
-    goal: 191,
-    icon: Clock,
-    label: "Daily Unlock",
-    kind: "feature",
-    done: true,
-    description: "A time-based unlock that resets once a day, giving you a reason to come back.",
-  },
-  {
-    id: "t201",
-    goal: 201,
-    icon: UserCircle,
-    label: "Configurable Guitarist Profile",
-    kind: "feature",
-    done: true,
-    description: "Show off what you want, how you want, using layouts unlocked through progression.",
-  },
-  { id: "t209", goal: 209, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content", done: true },
-  { id: "t219", goal: 219, icon: Target, label: "+1 New Exercise", kind: "content" },
-  {
-    id: "t229",
-    goal: 229,
-    icon: ClipboardList,
-    label: "Practice Mode",
-    kind: "feature",
-    description: "Set goals per exercise and track your progress toward hitting them.",
-  },
-  {
-    id: "t244",
-    goal: 244,
-    icon: Layers,
-    label: "Riff Cards",
-    kind: "feature",
-    description:
-      "Build a personal deck of riffs, songs and exercises that you can review with spaced repetition or play through freely anytime.",
-  },
-  { id: "t252", goal: 252, icon: Target, label: "+4 New Exercises", kind: "content" },
-  {
-    id: "t262",
-    goal: 262,
-    icon: Wand2,
-    label: "Signature Guitars at the Luthier",
-    kind: "feature",
-    description: "The Luthier stocks one-of-a-kind guitars you won't find anywhere else.",
-  },
-  { id: "t280", goal: 280, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content" },
-  { id: "t290", goal: 290, icon: Target, label: "+1 New Exercise", kind: "content" },
-  { id: "t308", goal: 308, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content" },
-  { id: "t318", goal: 318, icon: Target, label: "+1 New Exercise", kind: "content" },
-  { id: "t336", goal: 336, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content" },
-  {
-    id: "t346",
-    goal: 346,
-    icon: Swords,
-    label: "Duels",
-    kind: "feature",
-    description:
-      "Challenge another player for Fame Points, like who can rack up more practice time before the clock runs out.",
-  },
-  { id: "t364", goal: 364, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content" },
-  { id: "t374", goal: 374, icon: Target, label: "+1 New Exercise", kind: "content" },
-  { id: "t392", goal: 392, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content" },
-  { id: "t400", goal: 400, icon: Guitar, label: "+5 New Guitars & Pedals", kind: "content" },
-  {
-    id: "t415",
-    goal: 415,
-    icon: Gamepad2,
-    label: "New Practice Mode: Boss",
-    kind: "feature",
-    description:
-      "A new practice mode: Boss. Each boss sets a real requirement to clear. Hit the score and you level up, fall short and you're knocked out, no partial credit.",
-  },
-];
+export const ROADMAP_TIERS: RoadmapTier[] = ROADMAP_STEPS.map(
+  (step, index) => ({
+    ...step,
+    goal: ROADMAP_STEPS.slice(0, index + 1).reduce((sum, s) => sum + s.cost, 0),
+  }),
+);

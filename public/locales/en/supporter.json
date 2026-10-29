@@ -3,75 +3,104 @@
     "content": {
       "exercises": "+{{count}} New Exercises",
       "exercise_one": "+{{count}} New Exercise",
-      "gear": "+{{count}} New Guitars & Pedals"
+      "gear": "+{{count}} New Guitars & Pedals",
+      "achievements": "+{{count}} New Achievements"
     },
-    "t13": {
-      "label": "Scrap Guitars for Parts",
-      "description": "Scrap guitars you don't want. Different guitars break down into different parts, so what you keep (and what you scrap) actually matters."
+    "ex-chord-changes": {
+      "topic": "Chord Changes",
+      "description": "Switch chords in time, without the pause before every new shape."
     },
-    "t25": {
-      "label": "Luthier: Guitar Parts & Upgrading",
-      "description": "Gear drops parts by rarity as you play, and the parts you scrap from guitars you don't want feed right back in. Spend matching parts at the Luthier to level up a guitar or effect and push its rarity higher."
+    "bass": {
+      "label": "Bass Support",
+      "description": "Practice on bass, not only guitar: four-string tabs, bass tuning and note detection that hears the low end."
     },
-    "t51": {
-      "label": "Gear Affects Fame Points",
-      "description": "The gear you're using changes how many Fame Points you earn per exercise type, so pick the right rig for the right drill."
+    "mcp": {
+      "label": "Connect Your AI Assistant (MCP)",
+      "description": "Connect ChatGPT or Claude to your account. Log a session by telling it what you practiced, ask about your progress, or have it build a practice plan straight into the app."
     },
-    "t61": {
-      "label": "Sync Backing Track to Tablature",
-      "description": "Backing tracks for songs synced to the tab, so you can play along in time without hunting for the beat."
+    "gear-1": {
+      "topic": "Vintage Classics",
+      "description": "Guitars from the '50s to the '70s and the pedals they were played through: fuzz, tape echo, tremolo."
     },
-    "t79": {
-      "label": "Pedalboard Synergy",
-      "description": "Effects interact with each other, so pick and order your pedals carefully."
+    "ex-ear-training": {
+      "topic": "Ear Training",
+      "description": "Name what you hear: intervals, chord qualities and simple progressions."
     },
-    "t89": {
-      "label": "Achievements Rework",
-      "description": "A full redo of achievements, plus new ones. Each one actually gives you something, not just a badge."
+    "what-next": {
+      "label": "What Next",
+      "description": "A command center that tells you what to do next: which exercise, which plan, and which goal is closest."
     },
-    "t107": {
-      "label": "Pedalboard Power Cap",
-      "description": "Your pedalboard has a power limit, so upgrade it if you want to run stronger effects."
+    "journey-intervals": {
+      "label": "Journey: Intervals",
+      "description": "A new Journey module: hear, find and play intervals all over the fretboard."
     },
-    "t117": {
-      "label": "Gamification: Path/Skill Completion Rewards",
-      "description": "Finish a Journey, Roadmap, or Skill track and get a guitar or effect dropped as a reward."
+    "ex-scales": {
+      "topic": "Scales",
+      "description": "Major, minor and pentatonic shapes, played in time across the whole neck."
     },
-    "t153": {
-      "label": "Player Progression System",
-      "description": "Level up from playing. Unlocks milestones, profile layouts, and which gear rarity you can equip."
+    "jam-room": {
+      "label": "Jam Room",
+      "description": "Generate your own backing tracks to improvise over: pick a key, a scale and a feel, then play."
     },
-    "t181": {
-      "label": "Configurable Dashboard",
-      "description": "Pick your own layout, widgets, and shortcuts for the main panel."
+    "gear-2": {
+      "topic": "Ambient & Space",
+      "description": "Shimmer reverbs, long delays and loopers, plus guitars made for clean, wide sounds."
     },
-    "t191": {
-      "label": "Daily Unlock",
-      "description": "A time-based unlock that resets once a day, giving you a reason to come back."
+    "ex-legato": {
+      "topic": "Legato",
+      "description": "Hammer-ons and pull-offs that sound even and loud enough without the pick."
     },
-    "t201": {
-      "label": "Configurable Guitarist Profile",
-      "description": "Show off what you want, how you want, using layouts unlocked through progression."
+    "ex-arpeggios": {
+      "topic": "Arpeggios",
+      "description": "Chord tones one note at a time: the backbone of melodic solos."
     },
-    "t229": {
-      "label": "Practice Mode",
-      "description": "Set goals per exercise and track your progress toward hitting them."
+    "journey-improvisation": {
+      "label": "Journey: Improvisation Fundamentals",
+      "description": "A new Journey module: your first steps in improvising, from a few notes over a backing track to short phrases of your own."
     },
-    "t244": {
-      "label": "Riff Cards",
-      "description": "Build a personal deck of riffs, songs and exercises that you can review with spaced repetition or play through freely anytime."
+    "ex-phrasing": {
+      "topic": "Phrasing",
+      "description": "Make a few notes say something: timing, space, bends and repetition."
     },
-    "t262": {
-      "label": "Signature Guitars at the Luthier",
-      "description": "The Luthier stocks one-of-a-kind guitars you won't find anywhere else."
+    "ex-without-guitar": {
+      "topic": "Without Guitar",
+      "description": "Perfect for a phone break: exercises you can do without picking up the guitar."
     },
-    "t346": {
-      "label": "Duels",
-      "description": "Challenge another player for Fame Points, like who can rack up more practice time before the clock runs out."
+    "gear-3": {
+      "topic": "Clean & Jangle",
+      "description": "Semi-hollows and bright single-coils, with compressors and chorus for chords that ring."
     },
-    "t415": {
-      "label": "New Practice Mode: Boss",
-      "description": "A new practice mode: Boss. Each boss sets a real requirement to clear. Hit the score and you level up, fall short and you're knocked out, no partial credit."
+    "ex-string-skipping": {
+      "topic": "String Skipping",
+      "description": "Jump across strings cleanly, without the wrong one ringing out."
+    },
+    "boss-1": {
+      "label": "+1 New Boss",
+      "description": "A new boss with a challenge none of the others use."
+    },
+    "journey-chords": {
+      "label": "Journey: Chords & Triads",
+      "description": "A new Journey module: open chords, clean changes, and triads up the neck."
+    },
+    "ex-alternate-picking": {
+      "topic": "Alternate Picking",
+      "description": "Strict down-up picking across strings, from slow and even to fast."
+    },
+    "gear-4": {
+      "topic": "High Gain",
+      "description": "Extended-range shred guitars, high-gain distortion and noise gates for fast, tight riffs."
+    },
+    "ex-finger-independence": {
+      "topic": "Finger Independence",
+      "description": "Drills for the fretting hand that teach each finger to move on its own."
+    },
+    "ex-mystery": {
+      "topic": "???",
+      "description": "A surprise. You'll see what's inside when it unlocks."
+    },
+    "journey-speed": {
+      "label": "Journey: Speed & Precision",
+      "description": "A new Journey module: build speed without losing accuracy, through picking, synchronization and muting."
     }
   },
   "funding": {

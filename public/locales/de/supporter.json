@@ -3,75 +3,104 @@
     "content": {
       "exercises": "+{{count}} neue Übungen",
       "exercise_one": "+{{count}} neue Übung",
-      "gear": "+{{count}} neue Gitarren & Pedale"
+      "gear": "+{{count}} neue Gitarren & Pedale",
+      "achievements": "+{{count}} neue Erfolge"
     },
-    "t13": {
-      "label": "Gitarren in Teile zerlegen",
-      "description": "Zerlege Gitarren, die du nicht willst. Verschiedene Gitarren zerfallen in verschiedene Teile, also ist es wichtig, was du behältst (und was du zerlegst)."
+    "ex-chord-changes": {
+      "topic": "Akkordwechsel",
+      "description": "Wechsle Akkorde im Takt, ohne Pause vor jedem neuen Griff."
     },
-    "t25": {
-      "label": "Gitarrenbauer: Teile & Upgrades",
-      "description": "Equipment wirft beim Spielen Teile nach Seltenheit ab, und Teile aus zerlegten Gitarren fließen zurück. Gib passende Teile beim Gitarrenbauer aus, um eine Gitarre oder einen Effekt aufzuleveln und seine Seltenheit zu erhöhen."
+    "bass": {
+      "label": "Bass-Unterstützung",
+      "description": "Üb nicht nur Gitarre, sondern auch Bass: Tabs für vier Saiten, Bass-Stimmung und eine Tonerkennung, die die tiefen Lagen hört."
     },
-    "t51": {
-      "label": "Equipment beeinflusst Fame-Punkte",
-      "description": "Dein Equipment ändert, wie viele Fame-Punkte du pro Übungsart bekommst — wähl das richtige Rig für die richtige Übung."
+    "mcp": {
+      "label": "Verbinde deinen KI-Assistenten (MCP)",
+      "description": "Verbinde ChatGPT oder Claude mit deinem Konto. Trag eine Session ein, indem du erzählst, was du geübt hast, frag nach deinem Fortschritt oder lass dir einen Übungsplan direkt in die App bauen."
     },
-    "t61": {
-      "label": "Begleitspur mit Tabulatur synchronisieren",
-      "description": "Begleitspuren für Songs, synchron zur Tabulatur, damit du im Takt mitspielst, ohne den Beat zu suchen."
+    "gear-1": {
+      "topic": "Vintage-Klassiker",
+      "description": "Gitarren aus den 50ern bis 70ern und die Pedale, über die sie gespielt wurden: Fuzz, Bandecho, Tremolo."
     },
-    "t79": {
-      "label": "Pedalboard-Synergie",
-      "description": "Effekte beeinflussen sich gegenseitig, also wähl und ordne deine Pedale mit Bedacht."
+    "ex-ear-training": {
+      "topic": "Gehörbildung",
+      "description": "Benenne, was du hörst: Intervalle, Akkordtypen und einfache Progressionen."
     },
-    "t89": {
-      "label": "Erfolge neu gemacht",
-      "description": "Erfolge komplett überarbeitet, plus neue. Jeder bringt dir wirklich etwas, nicht nur ein Abzeichen."
+    "what-next": {
+      "label": "Wie geht's weiter",
+      "description": "Eine Kommandozentrale, die dir sagt, was als Nächstes dran ist: welche Übung, welcher Plan und welches Ziel am nächsten liegt."
     },
-    "t107": {
-      "label": "Stromlimit fürs Pedalboard",
-      "description": "Dein Pedalboard hat ein Stromlimit — rüste es auf, wenn du stärkere Effekte betreiben willst."
+    "journey-intervals": {
+      "label": "Lernpfad: Intervalle",
+      "description": "Ein neues Lernpfad-Modul: Intervalle hören, finden und auf dem ganzen Griffbrett spielen."
     },
-    "t117": {
-      "label": "Gamification: Belohnungen für Pfade & Skills",
-      "description": "Schließ einen Lernpfad, eine Roadmap oder einen Skill-Zweig ab und bekomm eine Gitarre oder einen Effekt als Belohnung."
+    "ex-scales": {
+      "topic": "Tonleitern",
+      "description": "Dur-, Moll- und Pentatonik-Formen, im Takt über das ganze Griffbrett gespielt."
     },
-    "t153": {
-      "label": "Spieler-Progressionssystem",
-      "description": "Steig durchs Spielen im Level auf. Schaltet Meilensteine, Profil-Layouts und die ausrüstbare Equipment-Seltenheit frei."
+    "jam-room": {
+      "label": "Jam Room",
+      "description": "Erstelle eigene Backing Tracks zum Improvisieren: Tonart, Tonleiter und Feeling wählen, dann losspielen."
     },
-    "t181": {
-      "label": "Anpassbares Dashboard",
-      "description": "Wähl dein eigenes Layout, Widgets und Shortcuts für das Hauptpanel."
+    "gear-2": {
+      "topic": "Ambient & Weite",
+      "description": "Shimmer-Reverbs, lange Delays und Looper, dazu Gitarren für klare, breite Sounds."
     },
-    "t191": {
-      "label": "Tägliche Freischaltung",
-      "description": "Eine zeitbasierte Freischaltung, die sich täglich zurücksetzt — ein Grund wiederzukommen."
+    "ex-legato": {
+      "topic": "Legato",
+      "description": "Hammer-ons und Pull-offs, die ohne Plektrum gleichmäßig und laut genug klingen."
     },
-    "t201": {
-      "label": "Anpassbares Gitarristen-Profil",
-      "description": "Zeig, was du willst, wie du willst, mit Layouts, die du durch Fortschritt freischaltest."
+    "ex-arpeggios": {
+      "topic": "Arpeggien",
+      "description": "Akkordtöne einzeln nacheinander: das Rückgrat melodischer Soli."
     },
-    "t229": {
-      "label": "Übungsmodus",
-      "description": "Setz Ziele pro Übung und verfolge deinen Fortschritt dorthin."
+    "journey-improvisation": {
+      "label": "Lernpfad: Grundlagen der Improvisation",
+      "description": "Ein neues Lernpfad-Modul: deine ersten Schritte beim Improvisieren, von ein paar Tönen über einem Backing Track bis zu kurzen eigenen Phrasen."
     },
-    "t244": {
-      "label": "Riff-Karten",
-      "description": "Bau dir ein eigenes Deck aus Riffs, Songs und Übungen, das du mit verteilter Wiederholung lernst oder jederzeit frei durchspielst."
+    "ex-phrasing": {
+      "topic": "Phrasierung",
+      "description": "Lass ein paar Töne etwas sagen: Timing, Pausen, Bendings und Wiederholung."
     },
-    "t262": {
-      "label": "Signature-Gitarren beim Gitarrenbauer",
-      "description": "Der Gitarrenbauer führt Einzelstücke, die du nirgendwo sonst findest."
+    "ex-without-guitar": {
+      "topic": "Ohne Gitarre",
+      "description": "Perfekt für eine Pause am Handy: Übungen, für die du die Gitarre nicht in die Hand nehmen musst."
     },
-    "t346": {
-      "label": "Duelle",
-      "description": "Fordere einen anderen Spieler um Fame-Punkte heraus, etwa wer mehr Übungszeit sammelt, bevor die Uhr abläuft."
+    "gear-3": {
+      "topic": "Clean & Jangle",
+      "description": "Halbresonanz-Gitarren und helle Single-Coils, dazu Kompressoren und Chorus für Akkorde, die klingen."
     },
-    "t415": {
-      "label": "Neuer Übungsmodus: Boss",
-      "description": "Ein neuer Übungsmodus: Boss. Jeder Boss stellt eine echte Anforderung. Erreich die Punktzahl und du steigst auf, bleibst du drunter, fliegst du raus — keine Teilpunkte."
+    "ex-string-skipping": {
+      "topic": "String Skipping",
+      "description": "Saiten sauber überspringen, ohne dass die falsche mitklingt."
+    },
+    "boss-1": {
+      "label": "+1 neuer Boss",
+      "description": "Ein neuer Boss mit einer Herausforderung, die kein anderer hat."
+    },
+    "journey-chords": {
+      "label": "Lernpfad: Akkorde & Dreiklänge",
+      "description": "Ein neues Lernpfad-Modul: offene Akkorde, saubere Wechsel und Dreiklänge den Hals hinauf."
+    },
+    "ex-alternate-picking": {
+      "topic": "Wechselschlag",
+      "description": "Strikter Wechselschlag über die Saiten, von langsam und gleichmäßig bis schnell."
+    },
+    "gear-4": {
+      "topic": "High Gain",
+      "description": "Shred-Gitarren mit erweitertem Tonumfang, High-Gain-Verzerrung und Noise Gates für schnelle, tighte Riffs."
+    },
+    "ex-finger-independence": {
+      "topic": "Fingerunabhängigkeit",
+      "description": "Übungen für die Greifhand, die jedem Finger beibringen, sich unabhängig zu bewegen."
+    },
+    "ex-mystery": {
+      "topic": "???",
+      "description": "Eine Überraschung. Was drin ist, siehst du, wenn es freigeschaltet ist."
+    },
+    "journey-speed": {
+      "label": "Lernpfad: Tempo & Präzision",
+      "description": "Ein neues Lernpfad-Modul: Tempo aufbauen, ohne an Genauigkeit zu verlieren, mit Anschlag, Synchronisation und Dämpfen."
     }
   },
   "funding": {
