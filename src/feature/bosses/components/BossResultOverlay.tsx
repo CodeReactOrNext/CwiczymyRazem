@@ -10,7 +10,7 @@ import { useBossFightStore } from "../store/bossFightStore";
 import type { BossDefinition } from "../types/boss.types";
 import { buildOf } from "../utils/boons";
 import { artPhaseFor, legPatternFor, moodFor } from "../utils/bossArt";
-import { fightAccuracy, phaseNumber, runLog } from "../utils/bossEngine";
+import { fightAccuracy, phaseNumber, runLog, runScore } from "../utils/bossEngine";
 import { BoonIcon } from "./BoonIcon";
 import { BossArt } from "./BossArt";
 import { RunChart } from "./RunChart";
@@ -50,8 +50,10 @@ export const BossResultOverlay = ({ boss }: { boss: BossDefinition }) => {
   if (typeof document === "undefined") return null;
   const phase = phaseNumber(fight);
   const build = buildOf(fight.boons);
-  // Against the record the run set out to beat; nothing to compare on a first run.
-  const gap = recordBefore && recordBefore.runs > 0 ? phase - recordBefore.bestPhase : null;
+  // Against the record the run set out to beat on its difficulty; nothing to compare on a first run there.
+  const reachedBefore = recordBefore?.reached[fight.difficulty] ?? 0;
+  const gap = recordBefore && reachedBefore > 0 ? phase - reachedBefore : null;
+  const score = runScore(fight);
   const versusRecord =
     gap === null
       ? null
@@ -103,10 +105,43 @@ export const BossResultOverlay = ({ boss }: { boss: BossDefinition }) => {
 
             <div className='grid grid-cols-2 gap-x-4 gap-y-5'>
               <Stat label={t("result.phase")} value={phase} />
-              <Stat label={t("result.damage")} value={fight.totalDamage.toLocaleString()} />
+              <Stat label={t("result.score")} value={score.total.toLocaleString()} />
               <Stat label={t("result.best_streak")} value={fight.maxCombo} />
               <Stat label={t("result.accuracy")} value={`${fightAccuracy(fight)}%`} />
+              {fight.plan.kind === "changes" && (
+                <>
+                  <Stat label={t("result.best_combo")} value={fight.bestCombo.toLocaleString()} />
+                  <Stat
+                    label={t("result.tricks")}
+                    value={`${fight.onTheOnes.toLocaleString()} · ${fight.smoothChanges.toLocaleString()}`}
+                  />
+                </>
+              )}
             </div>
+
+            <dl className='space-y-1.5 text-sm tabular-nums' aria-label={t("result.score")}>
+              <div className='flex justify-between gap-4'>
+                <dt className='text-zinc-400'>{t("result.damage")}</dt>
+                <dd className='text-zinc-200'>{score.dealt.toLocaleString()}</dd>
+              </div>
+              {score.skipped > 0 && (
+                <div className='flex justify-between gap-4'>
+                  <dt className='text-zinc-400'>{t("result.skipped", { count: fight.startPhase - 1 })}</dt>
+                  <dd className={score.banked ? "text-zinc-200" : "text-zinc-600 line-through"}>
+                    +{score.skipped.toLocaleString()}
+                  </dd>
+                </div>
+              )}
+              <div className='flex justify-between gap-4'>
+                <dt className='text-zinc-400'>{t(`difficulty.${fight.difficulty}`)}</dt>
+                <dd className='text-zinc-200'>×{score.multiplier}</dd>
+              </div>
+              {score.skipped > 0 && !score.banked && (
+                <p className='pt-1 text-left text-xs text-zinc-500'>
+                  {t("result.skipped_lost", { phase: fight.startPhase })}
+                </p>
+              )}
+            </dl>
 
             <RunChart log={runLog(fight)} t={t} />
 

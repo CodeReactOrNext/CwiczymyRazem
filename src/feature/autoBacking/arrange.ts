@@ -103,6 +103,8 @@ export interface BarSegment {
   sinceChordStart: number;
   /** The chord after this one, for approach notes. */
   next: Chord;
+  /** The chord ends with this segment, rather than carrying on into the next bar. */
+  ends: boolean;
 }
 
 export function segmentsForBar(
@@ -121,6 +123,7 @@ export function segmentsForBar(
       to: to - barStart,
       sinceChordStart: from - span.start,
       next: spans[(i + 1) % spans.length].chord,
+      ends: span.start + span.length <= barStart + barLength + EPS,
     });
   });
   return segments;

@@ -1,5 +1,5 @@
 import { ALL_FINGER_ORDERS } from "../data/fretweaver";
-import type { ChordVariation, NotesPerBeat, SpiderRoute, SpiderVariation } from "../types/boss.types";
+import type { ChangesVariation, ChordVariation, NotesPerBeat, SpiderRoute, SpiderVariation } from "../types/boss.types";
 import { notesPerBar, notesPerSecond, stringsPerPosition } from "./spiderTab";
 
 /** Powers the spider picks up from phase AFFIX_FROM on, more as it climbs. */
@@ -19,6 +19,8 @@ export const affixCountAt = (phase: number) =>
 export const MAX_MULTIPLIER_STREAK = 48;
 /** The same for chord changes, which come several times slower than notes. */
 export const CHORD_MULTIPLIER_STREAK = 16;
+/** The same for the changeling: notes, but only the chord tones among them count. */
+export const CHANGES_MULTIPLIER_STREAK = 32;
 
 /** Seconds of solid play a phase lasts: 70 in the first, 3 more a phase, two minutes at most. */
 export const phaseSecondsFor = (index: number) => Math.min(120, 70 + 3 * index);
@@ -72,6 +74,8 @@ export interface PhaseRules {
 interface PhasePlanBase {
   /** 0-based. */
   index: number;
+  /** A gate (every fifth phase): tougher, and a savepoint once reached — see dealPhase. */
+  gate?: boolean;
   slams: boolean;
   weakSpots: boolean;
   affixes: readonly Affix[];
@@ -95,8 +99,20 @@ export interface ChordPhasePlan extends PhasePlanBase {
   quakes: boolean;
 }
 
+/**
+ * One phase of the changeling's fight: a progression to solo over. Like the
+ * colossus its slams are written into the pass — rushes, where the chords
+ * change twice as often — so `slams` stays off and `quakes` says whether
+ * the pass has any.
+ */
+export interface ChangesPhasePlan extends PhasePlanBase {
+  kind: "changes";
+  variation: ChangesVariation;
+  quakes: boolean;
+}
+
 /** One phase of a fight, whichever boss deals it. */
-export type PhasePlan = SpiderPhasePlan | ChordPhasePlan;
+export type PhasePlan = SpiderPhasePlan | ChordPhasePlan | ChangesPhasePlan;
 
 export type Rng = () => number;
 

@@ -3,16 +3,17 @@ import Avatar from "components/UI/Avatar/Avatar";
 import { selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
 import { AnimatePresence, m } from "framer-motion";
 import type { Translate } from "lib/i18n/translate";
-import { Sword } from "lucide-react";
+import { Sword, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
+import { bossCuePlayer } from "../audio/bossCuePlayer";
 import { useBossText } from "../hooks/useBossText";
 import { useBossFightStore } from "../store/bossFightStore";
+import { useBossSoundStore } from "../store/bossSoundStore";
 import type { BossDefinition, BossId, BossRecord } from "../types/boss.types";
 import { buildOf } from "../utils/boons";
-import type { BossForm } from "../utils/bossArt";
-import { artPhaseFor, legPatternFor, moodFor } from "../utils/bossArt";
+import { artPhaseFor, legPatternFor, moodFor, stageStyle } from "../utils/bossArt";
 import type { BossFightState } from "../utils/bossEngine";
 import {
   fightMultiplier,
@@ -30,6 +31,7 @@ import {
   rhythmKeyOf,
   weakSpotCharge,
 } from "../utils/bossEngine";
+import { chordMood, chordTones, keyLabel } from "../utils/changesHarmony";
 import { changeLabel } from "../utils/chordTab";
 import type { ThreatId } from "../utils/phaseChanges";
 import { threatsOf } from "../utils/phaseChanges";
@@ -45,7 +47,7 @@ const SWORD_READY = 0.8;
 // ── Floating numbers ────────────────────────────────────────────────────────
 
 type ArenaZone = "boss" | "player";
-type ArenaTone = "strike" | "hurt" | "block" | "heal";
+type ArenaTone = "strike" | "combo" | "hurt" | "block" | "heal";
 
 interface ArenaEvent {
   id: number;
@@ -60,6 +62,56 @@ interface ArenaEvent {
 
 const EVENT_MS = 900;
 const MAX_EVENTS = 6;
+/** Under this a strike isn't worth holding back for the beat. */
+const MIN_SYNC_MS = 15;
+
+/**
+ * How long the arena holds the fight's newest strike back for the band's beat
+ * (bossCuePlayer.strikeDelayMs) — not at all when it broke the phase: the next
+ * one shows at once, and the strike's bar and number with it.
+ */
+const strikeHoldMs = (fight: BossFightState) => (fight.holding ? 0 : bossCuePlayer.strikeDelayMs(fight.strikeTick));
+
+/**
+ * A strike as the arena shows it: on the beat the band plays it on (see
+ * bossCuePlayer.strikeDelayMs), the boss's HP held where it was until then
+ * — the slash, the number and the bar all land with the music.
+ */
+const useStrikeOnBeat = () => {
+  const [shown, setShown] = useState(() => ({
+    tick: useBossFightStore.getState().fight.strikeTick,
+    heldHp: null as number | null,
+  }));
+  useEffect(() => {
+    const timers = new Set<number>();
+    const unsubscribe = useBossFightStore.subscribe((state, previous) => {
+      const { fight } = state;
+      const before = previous.fight;
+      if (fight.runSeed !== before.runSeed) {
+        setShown({ tick: fight.strikeTick, heldHp: null });
+        return;
+      }
+      if (fight.strikeTick <= before.strikeTick) return;
+      const tick = fight.strikeTick;
+      const delay = strikeHoldMs(fight);
+      if (delay < MIN_SYNC_MS) {
+        setShown({ tick, heldHp: null });
+        return;
+      }
+      setShown((current) => ({ tick: current.tick, heldHp: current.heldHp ?? before.bossHp }));
+      const timer = window.setTimeout(() => {
+        timers.delete(timer);
+        setShown((current) => (current.tick >= tick ? current : { tick, heldHp: null }));
+      }, delay);
+      timers.add(timer);
+    });
+    return () => {
+      unsubscribe();
+      timers.forEach((timer) => window.clearTimeout(timer));
+    };
+  }, []);
+  return shown;
+};
 
 /** The numbers one change of the fight puts up. */
 const eventsFor = (
@@ -74,6 +126,14 @@ const eventsFor = (
       tone: "strike",
       text: String(fight.lastStrike.damage),
       detail: fight.lastStrike.multiplier > 1 ? `×${fight.lastStrike.multiplier}` : undefined,
+    });
+  }
+  if (fight.bankTick > previous.bankTick && fight.lastCombo) {
+    out.push({
+      zone: "boss",
+      tone: "combo",
+      text: `+${fight.lastCombo.value}`,
+      detail: t("combo.banked", { multiplier: fight.lastCombo.multiplier }),
     });
   }
   if (fight.biteTick > previous.biteTick) {
@@ -122,12 +182,25 @@ const useArenaEvents = (t: Translate) => {
         return { ...event, id, drift: Math.sin(id * 2.4) };
       });
       if (!fresh.length) return;
-      setEvents((list) => [...list, ...fresh].slice(-MAX_EVENTS));
+      // A strike's number shows when the band plays it — on the next eighth.
+      const strikeDelay = strikeHoldMs(state.fight);
       fresh.forEach((event) => {
+        const show = () => {
+          setEvents((list) => [...list, event].slice(-MAX_EVENTS));
+          const timer = window.setTimeout(() => {
+            timers.delete(timer);
+            setEvents((list) => list.filter((e) => e.id !== event.id));
+          }, EVENT_MS);
+          timers.add(timer);
+        };
+        if (event.tone !== "strike" || strikeDelay < MIN_SYNC_MS) {
+          show();
+          return;
+        }
         const timer = window.setTimeout(() => {
           timers.delete(timer);
-          setEvents((list) => list.filter((e) => e.id !== event.id));
-        }, EVENT_MS);
+          show();
+        }, strikeDelay);
         timers.add(timer);
       });
     });
@@ -141,6 +214,7 @@ const useArenaEvents = (t: Translate) => {
 
 const TONE_CLASS: Record<ArenaTone, string> = {
   strike: "text-zinc-50",
+  combo: "text-amber-300",
   hurt: "text-orange-300",
   block: "text-emerald-300",
   heal: "text-emerald-300",
@@ -174,15 +248,19 @@ const EventLayer = ({
             <span
               className={cn(
                 "font-teko font-semibold tabular-nums",
-                e.tone === "strike"
+                e.tone === "combo"
                   ? compact
-                    ? "text-3xl"
-                    : "text-5xl"
-                  : e.tone === "block"
-                    ? "font-display text-base"
-                    : compact
-                      ? "text-xl"
-                      : "text-3xl",
+                    ? "text-4xl"
+                    : "text-6xl"
+                  : e.tone === "strike"
+                    ? compact
+                      ? "text-3xl"
+                      : "text-5xl"
+                    : e.tone === "block"
+                      ? "font-display text-base"
+                      : compact
+                        ? "text-xl"
+                        : "text-3xl",
               )}>
               {e.text}
             </span>
@@ -266,9 +344,9 @@ const HealthBar = ({
 };
 
 /** The sword fills with every hit and strikes when full; a miss shatters it. */
-const SwordMeter = ({ fight, t }: { fight: BossFightState; t: Translate }) => {
+const SwordMeter = ({ fight, strikeTick, t }: { fight: BossFightState; strikeTick: number; t: Translate }) => {
   const fill = Math.min(1, fight.charge / fight.chargeMax);
-  const strikeRef = useAnimateOn<HTMLDivElement>(fight.strikeTick, FLASH, 300);
+  const strikeRef = useAnimateOn<HTMLDivElement>(strikeTick, FLASH, 300);
   const shatterRef = useAnimateOn<HTMLDivElement>(fight.shatterTick, SHAKE, 260);
   const poisoned = fight.poisonedNotes > 0;
   const ready = !poisoned && fill >= SWORD_READY;
@@ -509,32 +587,37 @@ const ThreatIcons = ({
 
 // ── Arena ───────────────────────────────────────────────────────────────────
 
+/** The fight's sound effects on or off, in the corner of the stage. */
+const SoundToggle = ({ t, className }: { t: Translate; className?: string }) => {
+  const enabled = useBossSoundStore((s) => s.enabled);
+  const setEnabled = useBossSoundStore((s) => s.setEnabled);
+  const label = t(enabled ? "arena.sounds_off" : "arena.sounds_on");
+  const Icon = enabled ? Volume2 : VolumeX;
+  return (
+    <button
+      type='button'
+      onClick={() => setEnabled(!enabled)}
+      aria-pressed={enabled}
+      aria-label={label}
+      title={label}
+      className={cn(
+        "rounded-md p-2 text-zinc-500 transition-colors duration-fast hover:bg-zinc-800/60 hover:text-zinc-200",
+        className ?? "absolute right-2 top-2 z-20",
+      )}>
+      <Icon className='h-4 w-4' aria-hidden />
+    </button>
+  );
+};
+
 /** A leg — or a plate — for every eighth of the phase's HP gone; the molt puts them back. */
 const piecesLostFor = (fight: Pick<BossFightState, "bossHp" | "bossMaxHp">) =>
   Math.min(7, Math.floor((1 - fight.bossHp / fight.bossMaxHp) * 8));
 
-/**
- * The stage's light, in the colour of the boss's form — the spider's purple,
- * gold and enraged orange, the colossus's cyan runes, amber and orange — taken
- * half-way to grey and kept low, one gradient falling from the top: a lit
- * stage, not a coloured box.
- */
-const STAGE_LIGHT: Record<BossId, Record<BossForm, string>> = {
-  fretweaver: { 0: "120, 72, 159", 1: "165, 117, 63", 2: "174, 101, 67" },
-  colossus: { 0: "64, 115, 133", 1: "165, 117, 63", 2: "174, 101, 67" },
-};
-
-const stageStyle = (boss: BossId, form: BossForm) => {
-  const light = STAGE_LIGHT[boss][form];
-  return {
-    backgroundImage: `linear-gradient(180deg, rgba(${light}, 0.26) 0%, rgba(${light}, 0.08) 55%, rgba(9, 9, 11, 0) 100%)`,
-  };
-};
-
-/** The boss's HP bar: the spider purple, the colossus the grey of its stone. */
+/** The boss's HP bar: the spider purple, the colossus the grey of its stone, the changeling the ivory of its mask. */
 const BOSS_BAR: Record<BossId, string> = {
   fretweaver: "bg-gradient-to-l from-purple-700 to-purple-400",
   colossus: "bg-gradient-to-l from-zinc-500 to-zinc-300",
+  changeling: "bg-gradient-to-l from-zinc-400 to-zinc-100",
 };
 
 interface BossArenaProps {
@@ -559,6 +642,8 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
   const playerName = useAppSelector(selectUserName) ?? t("arena.you");
   const playerAvatar = useAppSelector(selectUserAvatar);
   const events = useArenaEvents(t);
+  const strike = useStrikeOnBeat();
+  const bossHp = strike.heldHp ?? fight.bossHp;
   const playerRef = useAnimateOn<HTMLDivElement>(fight.playerHurtTick, SHAKE, 300);
   const alert = liveAlert(fight, t);
   const lowHp = fight.playerHp / fight.playerMaxHp < LOW_HP;
@@ -566,6 +651,14 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
   const rhythm = t(rhythmKeyOf(fight.plan));
   const form = artPhaseFor(fight);
   const quake = quakeWarning(fight);
+  // The changeling is the chord being played: its face, and an orb a tone.
+  const changesLive = useBossFightStore((s) => s.changesLive);
+  const chord =
+    fight.plan.kind === "changes" ? fight.plan.variation.units[changesLive.unit ?? 0]?.chord ?? null : null;
+  const key =
+    fight.plan.kind === "changes"
+      ? `${keyLabel(fight.plan.variation.key, t)} · `
+      : "";
 
   const spider = (
     <div className={cn("relative shrink-0", compact ? "h-32 w-40" : "h-64 w-80 xl:h-80 xl:w-[25rem]")}>
@@ -573,7 +666,8 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
         boss={boss}
         className='h-full w-full'
         mood={moodFor(fight)}
-        strikeTick={fight.strikeTick}
+        // A combo paid out cuts the changeling like a strike.
+        strikeTick={strike.tick + fight.bankTick}
         biteTick={fight.biteTick}
         slamTick={fight.slamTick}
         windup={alert?.threat === "slams" || quake?.stage === "coming"}
@@ -582,8 +676,11 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
         form={form}
         molting={fight.holding && fight.draft !== null && !draftOpen}
         pattern={legPatternFor(fight.plan)}
-        webTorn={1 - fight.bossHp / fight.bossMaxHp}
-        piecesLost={piecesLostFor(fight)}
+        webTorn={1 - bossHp / fight.bossMaxHp}
+        piecesLost={piecesLostFor({ bossHp, bossMaxHp: fight.bossMaxHp })}
+        expression={chord ? chordMood(chord) : undefined}
+        changeTick={changesLive.changeTick}
+        tones={chord ? chordTones(chord).length : undefined}
         intro
       />
       <EventLayer events={events} zone='boss' compact={compact} />
@@ -613,7 +710,9 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
             </p>
             {!compact && (
               <p className='truncate text-xs text-zinc-400'>
-                {record.bestPhase > 0 ? t("arena.record", { phase: record.bestPhase }) : t("arena.you")}
+                {t(`difficulty.${fight.difficulty}`)}
+                {(record.reached[fight.difficulty] ?? 0) > 0 &&
+                  ` · ${t("arena.record", { phase: record.reached[fight.difficulty] })}`}
               </p>
             )}
           </div>
@@ -631,7 +730,7 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
         }
       />
       <EventLayer events={events} zone='player' compact={compact} />
-      <SwordMeter fight={fight} t={t} />
+      <SwordMeter fight={fight} strikeTick={strike.tick} t={t} />
       <BuildIcons fight={fight} t={t} />
     </div>
   );
@@ -645,10 +744,10 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
           </p>
           {!compact && <p className='truncate text-xs text-zinc-400'>{bossTitle}</p>}
         </div>
-        {hpNumber(fight.bossHp, fight.bossMaxHp)}
+        {hpNumber(bossHp, fight.bossMaxHp)}
       </div>
       <HealthBar
-        value={fight.bossHp}
+        value={bossHp}
         max={fight.bossMaxHp}
         from={compact ? "left" : "right"}
         size={compact ? "md" : "lg"}
@@ -676,7 +775,9 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
         {t("arena.phase", { phase: phaseNumber(fight) })}
       </p>
       <p className='mt-1.5 text-xs tabular-nums text-zinc-400'>
+        {key}
         {bpm} BPM · {rhythm}
+        {fight.plan.gate && <span className='font-medium text-amber-400'> · {t("arena.gate")}</span>}
         {fight.enraged && <span className='font-medium text-orange-400'> · {t("arena.enraged")}</span>}
       </p>
     </div>
@@ -688,7 +789,10 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
         <div className='flex items-center gap-3'>
           {spider}
           <div className='min-w-0 flex-1 space-y-3'>
-            {phaseLabel}
+            <div className='flex items-start gap-1'>
+              <div className='min-w-0 flex-1'>{phaseLabel}</div>
+              <SoundToggle t={t} className='-mr-1 -mt-1 shrink-0' />
+            </div>
             {bossSide}
           </div>
         </div>
@@ -713,6 +817,7 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
         </div>
       </div>
       <AlertPill alert={alert} boss={boss.id} compact={false} />
+      <SoundToggle t={t} />
     </div>
   );
 };

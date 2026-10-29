@@ -383,7 +383,7 @@ export const intermediateRoutineConfig: SeoLandingConfig = {
         },
         {
           kind: "paragraph",
-          text: "Here is what a real quarter looks like on those numbers. I ran this on the lead track, four technique days a week with sweep picking in the rotation, and logged it: week 1, 62 BPM clean on the three-string sweep and a recording full of the same two pentatonic licks. Week 4, 78 BPM, and the recording still had the same licks, which is normal, because technique moves before vocabulary does. Week 8, 92 BPM, and the improvisation had arpeggios in it for the first time. Week 12, 96 BPM, which is where the tempo stalled, and the interesting change was elsewhere: chord changes on the rhythm block had gone from audible gaps to none.",
+          text: "Here is what a real quarter looks like on those numbers. I ran this on the lead track, four technique days a week with sweep picking in the rotation, and logged it: week 1, 62 BPM clean on the three-string sweep and a recording full of the same two pentatonic licks. Week 4, 78 BPM, and the recording still had the same licks, which is normal, because technique moves before vocabulary does. Week 8, 92 BPM, and the improvisation had arpeggios in it for the first time. Week 12, 96 BPM, which is where the tempo stalled, and the interesting change was elsewhere: chord changes on the rhythm block had gone from audible gaps to none. If you want the app to hold that ladder for you, an [exercise goal](/features/guitar-practice-goals) takes a start tempo and a target and splits the climb into milestones.",
         },
         {
           kind: "paragraph",

@@ -3,9 +3,10 @@ import type { Translate } from "lib/i18n/translate";
 import type { NotesPerBeat } from "../types/boss.types";
 import { subdivisionKey } from "../utils/bossArt";
 import type { BossFightState } from "../utils/bossEngine";
-import { chordRhythmKey, phaseBpm } from "../utils/bossEngine";
+import { changesRhythmKey, chordRhythmKey, phaseBpm } from "../utils/bossEngine";
+import { chordTones, degreeLabel, keyLabel, noteName } from "../utils/changesHarmony";
 import type { ThreatId } from "../utils/phaseChanges";
-import { describeChordChanges, describePhaseChanges } from "../utils/phaseChanges";
+import { describeChangesChanges, describeChordChanges, describePhaseChanges } from "../utils/phaseChanges";
 import { buildSpiderTablature } from "../utils/spiderTab";
 import { ChordDiagram } from "./ChordDiagram";
 import { MiniTab } from "./MiniTab";
@@ -106,6 +107,57 @@ const chordBriefing = (fight: BossFightState, t: Translate) => {
   return { changes, lines, preview };
 };
 
+/** The lines of the changeling's briefing, and the tones of its new progression. */
+const changesBriefing = (fight: BossFightState, t: Translate) => {
+  if (fight.plan.kind !== "changes" || fight.previousPlan?.kind !== "changes") return null;
+  const changes = describeChangesChanges(fight.previousPlan, fight.plan, fight.previousBpm, phaseBpm(fight));
+  const { bpm, rhythm, key, family, progression, quakes } = changes;
+  const { variation } = fight.plan;
+  const rhythmName = (beatsPerChord: 2 | 4) => t(changesRhythmKey(beatsPerChord));
+  const lines: Line[] = [
+    {
+      label: t("briefing.tempo"),
+      value: bpm.from === bpm.to ? `${bpm.to} BPM` : `${bpm.from} → ${bpm.to} BPM`,
+      changed: bpm.from !== bpm.to,
+    },
+    {
+      label: t("briefing.rhythm"),
+      value: rhythm.changed ? `${rhythmName(rhythm.from)} → ${rhythmName(rhythm.to)}` : rhythmName(rhythm.to),
+      changed: rhythm.changed,
+    },
+    {
+      label: t("briefing.key"),
+      value: keyLabel(key.to, t),
+      changed: key.changed,
+    },
+    { label: t("briefing.chords"), value: t(`harmony_family.${family.to}`), changed: family.changed },
+    { label: t("briefing.progression"), value: progression.to.join(" → "), changed: progression.changed },
+    {
+      label: t("briefing.quakes"),
+      value: t("briefing.quakes_per_pass", { count: quakes.to }),
+      changed: quakes.changed,
+    },
+  ];
+  const preview = (
+    <figure className='space-y-1'>
+      <figcaption className='text-xs text-zinc-500'>{t("briefing.tones")}</figcaption>
+      <ul className='flex flex-wrap gap-x-6 gap-y-2'>
+        {[...new Set(variation.progression)].map((chord) => (
+          <li key={chord} className='space-y-0.5'>
+            <span className='block text-sm font-semibold text-zinc-100'>{chord}</span>
+            <span className='block text-xs tabular-nums text-zinc-400'>
+              {chordTones(chord)
+                .map((pc) => `${noteName(pc, variation.key)} ${degreeLabel(chord, pc)}`)
+                .join(" · ")}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </figure>
+  );
+  return { changes, lines, preview };
+};
+
 /**
  * What the next phase does differently, led by the one number that tells
  * how much harder it is — how much faster the notes (or the changes) come.
@@ -113,7 +165,7 @@ const chordBriefing = (fight: BossFightState, t: Translate) => {
  * dim line.
  */
 export const PhaseBriefing = ({ fight, t }: { fight: BossFightState; t: Translate }) => {
-  const briefing = spiderBriefing(fight, t) ?? chordBriefing(fight, t);
+  const briefing = spiderBriefing(fight, t) ?? chordBriefing(fight, t) ?? changesBriefing(fight, t);
   if (!briefing) return null;
   const { changes, lines, preview } = briefing;
   const { gained, lost, speedChange } = changes;

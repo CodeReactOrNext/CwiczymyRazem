@@ -1,10 +1,29 @@
 import type { SpiderMood } from "../components/FretweaverArt";
-import type { SpiderVariation } from "../types/boss.types";
+import type { BossId, SpiderVariation } from "../types/boss.types";
 import type { BossFightState } from "./bossEngine";
 import type { PhasePlan } from "./phaseGenerator";
 
 /** A boss's three looks over a fight: its first form, a stronger one, the last. */
 export type BossForm = 0 | 1 | 2;
+
+/**
+ * The stage's light, in the colour of the boss's form — the spider's purple,
+ * gold and enraged orange, the colossus's cyan runes, amber and orange — taken
+ * half-way to grey and kept low, one gradient falling from the top: a lit
+ * stage, not a coloured box.
+ */
+const STAGE_LIGHT: Record<BossId, Record<BossForm, string>> = {
+  fretweaver: { 0: "120, 72, 159", 1: "165, 117, 63", 2: "174, 101, 67" },
+  colossus: { 0: "64, 115, 133", 1: "165, 117, 63", 2: "174, 101, 67" },
+  changeling: { 0: "58, 122, 99", 1: "165, 117, 63", 2: "174, 101, 67" },
+};
+
+export const stageStyle = (boss: BossId, form: BossForm) => {
+  const light = STAGE_LIGHT[boss][form];
+  return {
+    backgroundImage: `linear-gradient(180deg, rgba(${light}, 0.26) 0%, rgba(${light}, 0.08) 55%, rgba(9, 9, 11, 0) 100%)`,
+  };
+};
 
 /**
  * The form the art draws for a phase: the first three phases, up to the

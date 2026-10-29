@@ -2,7 +2,9 @@
 
 import { FeatureList } from "feature/landing/components/FeatureList";
 import { Reveal } from "feature/landing/components/Reveal";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const features = [
   {
@@ -68,6 +70,12 @@ export const StatisticsSection = () => {
             </p>
 
             <FeatureList features={features} />
+            <Link
+              href='/features/guitar-duels'
+              className='mt-10 inline-flex items-center gap-2 text-sm font-bold text-zinc-300 transition-colors hover:text-white'>
+              Rather beat a rival than a number? Try a duel
+              <ArrowRight className='h-4 w-4' aria-hidden='true' />
+            </Link>
           </Reveal>
         </div>
       </div>

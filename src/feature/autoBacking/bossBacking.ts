@@ -4,7 +4,7 @@ import type {
   TablatureNote,
 } from "feature/exercisePlan/types/exercise.types";
 
-import type { KeysState, Section, TrackEvent } from "./arrange";
+import type { BarSegment, KeysState, Section, TrackEvent } from "./arrange";
 import {
   bassNote,
   buildMeasure,
@@ -19,6 +19,7 @@ import type { ChordSpan } from "./harmonize";
 import { spansFromChordNames } from "./harmonize";
 import type { BarInfo, TabContent } from "./noteEvents";
 import { extractTabContent, pulseOf } from "./noteEvents";
+import { HEARTBEAT } from "./synth/ambientBand";
 import type { Chord } from "./theory";
 import { chordSymbol, hasThird, pcName, QUALITY_INTERVALS } from "./theory";
 
@@ -35,11 +36,25 @@ import { chordSymbol, hasThird, pcName, QUALITY_INTERVALS } from "./theory";
  * The colossus deals chord changes and names every chord in the tab, so there
  * the band plays those chords, change for change, with the motif on their
  * tones — a backing in another key would fight the player's own chords.
+ *
+ * The changeling is soloed over, so its score is a band to solo over (see
+ * BossScore): the same chords, but time kept and the changes made plain
+ * rather than a wall of sixteenths.
  */
+
+/**
+ * What the player plays over the score: a written drill — the spider's, the
+ * colossus's — gets the battle score; an improvised solo over the changes —
+ * the changeling's — a band that comps: the kick and a chord tone on 1 and 3,
+ * where the solo's own chord tones are due, room everywhere else.
+ */
+export type BossScore = "battle" | "changes";
 
 export interface BossMusicOptions {
   /** The fight's phase, from 1 — it picks the progression and the intensity. */
   phase: number;
+  /** The battle score unless said otherwise. */
+  score?: BossScore;
 }
 
 /** E: the guitar's lowest open string, the darkest home a backing can have. */
@@ -61,6 +76,32 @@ const BOSS_SECTIONS: readonly Section[] = ["groove", "lift", "groove", "build"];
 export const bossIntensity = (phase: number) =>
   phase <= 2 ? 1 : phase <= 4 ? 2 : 3;
 
+/**
+ * The energy the band never drops below in a phase: the score is written in
+ * full and the player's run decides how much of it plays (AmbientBand.plays),
+ * but the further the fight goes, the less a miss can strip it — 1 at first,
+ * 2 from phase 5.
+ */
+export const bossEnergyFloor = (phase: number) => (bossIntensity(phase) >= 3 ? 2 : 1);
+
+/**
+ * The changes score never drops under its groove — kick, backbeat, hats, the
+ * bass in two, the line: a solo needs its time kept, so a miss only takes
+ * the extras the run has earned.
+ */
+export const CHANGES_ENERGY_FLOOR = 2;
+
+/**
+ * The layers of the score, from the live energy they need (TablatureNote.layer):
+ * 0 always — pad, the bass on the beat; 1 the kick on the beat; 2 the
+ * backbeat, eighth hats, the bass's eighths, the strings on the beat, the
+ * crash; 3 sixteenth hats and bass, the strings' runs, eighth kicks, tom
+ * pickups and fills; 4 the double kick and a crash every bar. -1: the
+ * heartbeat, while the player is in danger. The changes score layers its own
+ * parts (changesDrumBar, changesLineBar) over a floor of CHANGES_ENERGY_FLOOR.
+ */
+export const LAYER = { floor: 0, pulse: 1, groove: 2, drive: 3, peak: 4, danger: -1 } as const;
+
 const KICK = 36;
 const SNARE = 38;
 const HAT = 42;
@@ -71,16 +112,16 @@ const FLOOR_TOM = 41;
 const HIGH_TOM = 48;
 const EPS = 1e-6;
 
-const drum = (midiNote: number, dynamics: number): TablatureNote => ({
+const drum = (midiNote: number, dynamics: number, layer: number): TablatureNote => ({
   string: 1,
   fret: 0,
   midiNote,
   dynamics,
+  layer,
 });
 
 interface BossDrumContext {
   bpm: number;
-  level: number;
   section: Section;
   isFill: boolean;
   isCrash: boolean;
@@ -88,7 +129,14 @@ interface BossDrumContext {
   oddBar: boolean;
 }
 
-/** The battle kit: a kick that thickens with the phase, backbeat, hats or ride, toms. */
+const onBeat = (pos: number) => Math.abs(pos - Math.round(pos)) < EPS;
+const onEighth = (pos: number) => Math.abs(pos * 2 - Math.round(pos * 2)) < EPS;
+
+/**
+ * The battle kit, written in full and layered: a kick on the beat, the
+ * backbeat and eighth hats, then sixteenths and the eighth kick, then the
+ * double kick — which of it plays is the player's run (LAYER).
+ */
 export function bossDrumBar(bar: BarInfo, ctx: BossDrumContext): TrackEvent[] {
   const events: TrackEvent[] = [];
   const hit = (pos: number, note: TablatureNote) =>
@@ -110,47 +158,40 @@ export function bossDrumBar(bar: BarInfo, ctx: BossDrumContext): TrackEvent[] {
     ctx.isFill && fillLength > 0 ? bar.length - fillLength : Infinity;
   const before = (pos: number) => pos < fillFrom - EPS;
 
-  // Time: hats, onto the ride for the lift; sixteenths once the fight heats up.
-  const hatStep =
-    (ctx.level >= 2 || ctx.section === "build") && sixteenths && simple
-      ? 0.25
-      : 0.5;
+  // Time: hats — the ride for the lift — eighths in the groove, sixteenths to drive.
+  const hatStep = sixteenths && simple ? 0.25 : 0.5;
   for (const pos of every(hatStep, 0, bar.length)) {
     if (!before(pos) || (pos < EPS && ctx.isCrash)) continue;
-    const onBeat = Math.abs(pos - Math.round(pos)) < EPS;
-    hit(pos, drum(ctx.section === "lift" ? RIDE : HAT, onBeat ? 0.7 : 0.45));
+    hit(
+      pos,
+      drum(ctx.section === "lift" ? RIDE : HAT, onBeat(pos) ? 0.7 : 0.45, onEighth(pos) ? LAYER.groove : LAYER.drive),
+    );
   }
-  if (ctx.isCrash) hit(0, drum(CRASH, 0.7));
+  if (ctx.isCrash) hit(0, drum(CRASH, 0.7, LAYER.groove));
+  else hit(0, drum(CRASH, 0.6, LAYER.peak));
 
-  // The kick: on the beat, then eighths, then a sixteenth double kick — never
-  // on top of the backbeat.
-  const kickStep = !simple
-    ? null
-    : ctx.level === 1
-      ? 1
-      : ctx.level === 2 || !sixteenths
-        ? 0.5
-        : 0.25;
+  // The kick: on the beat, eighths, then the sixteenth double kick — never on
+  // top of the backbeat.
+  const kickStep = !simple ? null : sixteenths ? 0.25 : 0.5;
   const kicks =
     kickStep === null
       ? starts.filter((_, i) => roles[i] === "kick")
       : every(kickStep, 0, bar.length);
   for (const pos of kicks) {
     if (!before(pos) || snareAt.some((s) => Math.abs(s - pos) < EPS)) continue;
-    hit(pos, drum(KICK, Math.abs(pos - Math.round(pos)) < EPS ? 0.8 : 0.6));
+    const layer = kickStep === null || onBeat(pos) ? LAYER.pulse : onEighth(pos) ? LAYER.drive : LAYER.peak;
+    hit(pos, drum(KICK, onBeat(pos) ? 0.8 : 0.6, layer));
   }
-  for (const pos of snareAt) if (before(pos)) hit(pos, drum(SNARE, 0.82));
+  for (const pos of snareAt) if (before(pos)) hit(pos, drum(SNARE, 0.82, LAYER.groove));
 
-  // A tom pickup into every other bar once the fight is past its opening.
-  if (
-    ctx.level >= 2 &&
-    ctx.oddBar &&
-    !ctx.isFill &&
-    simple &&
-    bar.length >= 4 - EPS
-  ) {
+  // The heartbeat of a player in danger: two thumps on the bar's first beat.
+  hit(0, drum(HEARTBEAT, 0.9, LAYER.danger));
+  hit(0.3, drum(HEARTBEAT, 0.65, LAYER.danger));
+
+  // A tom pickup into every other bar.
+  if (ctx.oddBar && !ctx.isFill && simple && bar.length >= 4 - EPS) {
     [HIGH_TOM, LOW_TOM, LOW_TOM, FLOOR_TOM].forEach((note, i) =>
-      hit(bar.length - 1 + i * 0.25, drum(note, 0.6 + i * 0.06)),
+      hit(bar.length - 1 + i * 0.25, drum(note, 0.6 + i * 0.06, LAYER.drive)),
     );
   }
 
@@ -164,20 +205,29 @@ export function bossDrumBar(bar: BarInfo, ctx: BossDrumContext): TrackEvent[] {
         i >= count - 2 ? (i === count - 1 ? FLOOR_TOM : LOW_TOM) : SNARE;
       hit(
         fillFrom + (i * fillLength) / count,
-        drum(note, 0.6 + (0.38 * i) / (count - 1)),
+        drum(note, 0.6 + (0.38 * i) / (count - 1), LAYER.drive),
       );
     }
-    hit(fillFrom, drum(KICK, 0.85));
+    hit(fillFrom, drum(KICK, 0.85, LAYER.pulse));
   }
   return events;
 }
 
+/** The bass's lowest note, its open E. */
+const BASS_LOW_E = 28;
+
 /** Root of a chord in the bass's low octave, E1–D#2. */
-const bassRoot = (pc: number) => 28 + ((pc - 4 + 12) % 12);
+const bassRoot = (pc: number) => BASS_LOW_E + ((pc - 4 + 12) % 12);
+
+/** The fifth a chord really has — a diminished one's is flat. */
+const fifthOf = (chord: Chord) =>
+  QUALITY_INTERVALS[chord.quality].find((interval) => interval >= 6 && interval <= 8) ?? 7;
 
 /**
  * The ostinato: the root in sixteenths (eighths at a fast tempo) with the
  * octave on the last of each beat — the engine the whole score runs on.
+ * Layered: the beat always sounds and holds until the next note cuts it, so
+ * stripped to its floor the bass still pulses a root a beat.
  */
 export function bossBassBar(
   bar: BarInfo,
@@ -191,11 +241,13 @@ export function bossBassBar(
     for (const pos of every(step, seg.from, seg.to)) {
       const inBeat = pos - Math.floor(pos + EPS);
       const lastOfBeat = Math.abs(inBeat - (1 - step)) < EPS;
-      const onBeat = inBeat < EPS;
+      const beat = inBeat < EPS;
+      const note = bassNote(lastOfBeat ? root + 12 : root, beat ? 0.95 : 0.7);
+      note.layer = beat ? LAYER.floor : onEighth(pos) ? LAYER.groove : LAYER.drive;
       events.push({
         pos,
-        length: step * 0.8,
-        notes: [bassNote(lastOfBeat ? root + 12 : root, onBeat ? 0.95 : 0.7)],
+        length: beat ? Math.min(0.95, seg.to - pos) : step * 0.8,
+        notes: [note],
       });
     }
   }
@@ -207,10 +259,11 @@ const STRINGS_MOTIF = [0, 1, 0, 7];
 
 /** Root, fifth, octave and the chord's own third: the motif over named chords. */
 const chordMotif = (chord: Chord) => {
+  const fifth = fifthOf(chord);
   const third = hasThird(chord.quality)
     ? QUALITY_INTERVALS[chord.quality][1]
-    : 7;
-  return [0, 7, 12, third];
+    : fifth;
+  return [0, fifth, 12, third];
 };
 
 /** The strings' motif over each chord, from the E above middle C — high
@@ -228,7 +281,7 @@ export function bossStringsBar(
     const root = 64 + ((((seg.chord.root - 64) % 12) + 12) % 12);
     const motif = followChords ? chordMotif(seg.chord) : STRINGS_MOTIF;
     for (const pos of every(step, seg.from, seg.to)) {
-      const onBeat = Math.abs(pos - Math.round(pos)) < EPS;
+      const beatHit = onBeat(pos);
       events.push({
         pos,
         length: step * 0.85,
@@ -237,7 +290,8 @@ export function bossStringsBar(
             string: (state.step % 2) + 1,
             fret: 0,
             midiNote: root + motif[state.step % motif.length],
-            dynamics: onBeat ? 0.6 : 0.45,
+            dynamics: beatHit ? 0.6 : 0.45,
+            layer: beatHit ? LAYER.groove : LAYER.drive,
           },
         ],
       });
@@ -246,6 +300,190 @@ export function bossStringsBar(
   }
   return events;
 }
+
+// ── The changes score: a band to solo over ──────────────────────────────────
+
+/** Beats 1 and 3 — where the changeling wants a chord tone, so where its band leans. */
+const isStrongBeat = (pos: number) => onBeat(pos) && Math.round(pos) % 2 === 0;
+
+const sameChord = (a: Chord, b: Chord) => a.root === b.root && a.quality === b.quality;
+
+interface ChangesDrumContext {
+  bpm: number;
+  section: Section;
+  /** Where in the bar the progression comes round — the crash. */
+  tops: number[];
+  /** The progression comes round on the next bar's first beat — a fill into it. */
+  fillIn: boolean;
+}
+
+/**
+ * The kit keeps time for a solo instead of fighting it: the kick on 1 and 3,
+ * the backbeat, eighth hats (the ride for the lift). As the run builds, a
+ * push on the and of 2 and a fill into the top of the progression; at the
+ * peak, sixteenth hats. The crash marks the progression coming round and
+ * nothing else does — no double kick, no tom run every other bar.
+ */
+export function changesDrumBar(bar: BarInfo, ctx: ChangesDrumContext): TrackEvent[] {
+  const events: TrackEvent[] = [];
+  const hit = (pos: number, note: TablatureNote) => events.push({ pos, notes: [note] });
+  const crashAt = (pos: number) => ctx.tops.some((top) => Math.abs(top - pos) < EPS);
+
+  const cymbal = ctx.section === "lift" ? RIDE : HAT;
+  const sixteenths = ctx.bpm <= 125;
+  for (const pos of every(sixteenths ? 0.25 : 0.5, 0, bar.length)) {
+    if (crashAt(pos)) continue;
+    const eighth = onEighth(pos);
+    hit(pos, drum(cymbal, onBeat(pos) ? 0.62 : eighth ? 0.45 : 0.3, eighth ? LAYER.groove : LAYER.peak));
+  }
+  for (const top of ctx.tops) hit(top, drum(CRASH, 0.68, LAYER.groove));
+
+  for (const pos of every(1, 0, bar.length)) {
+    hit(pos, isStrongBeat(pos) ? drum(KICK, 0.85, LAYER.pulse) : drum(SNARE, 0.8, LAYER.groove));
+  }
+  if (bar.length >= 4 - EPS) hit(1.5, drum(KICK, 0.6, LAYER.drive));
+
+  // The heartbeat of a player in danger: two thumps on the bar's first beat.
+  hit(0, drum(HEARTBEAT, 0.9, LAYER.danger));
+  hit(0.3, drum(HEARTBEAT, 0.65, LAYER.danger));
+
+  // The fill rides on the last beat's backbeat: without the drive the bar keeps its plain four.
+  if (ctx.fillIn && bar.length >= 2) {
+    const fill = sixteenths ? [SNARE, LOW_TOM, FLOOR_TOM] : [FLOOR_TOM];
+    const step = 1 / (fill.length + 1);
+    fill.forEach((note, i) =>
+      hit(bar.length - 1 + (i + 1) * step, drum(note, 0.66 + 0.08 * i, LAYER.drive)),
+    );
+  }
+  return events;
+}
+
+/** A half step into the next root — from below, or from above where the bass runs out of strings. */
+const approachInto = (next: Chord) => {
+  const target = bassRoot(next.root);
+  return target - 1 >= BASS_LOW_E ? target - 1 : target + 1;
+};
+
+/**
+ * The bass drives in eighths whatever the run: the root from a chord's first
+ * beat, the fifth from 3 while the chord holds — the chord named on the beats
+ * the player names it on — and the last eighth before a change a half step
+ * into the next root, so the change is heard coming. It carries the band's
+ * weight, so it never drops out on a miss.
+ */
+export function changesBassBar(segments: readonly BarSegment[]): TrackEvent[] {
+  const events: TrackEvent[] = [];
+  for (const seg of segments) {
+    const root = bassRoot(seg.chord.root);
+    const fifth = root + fifthOf(seg.chord);
+    const changes = seg.ends && !sameChord(seg.next, seg.chord);
+    let held = root;
+    for (const pos of every(0.5, seg.from, seg.to)) {
+      const since = seg.sinceChordStart + pos - seg.from;
+      const strong = since < EPS || isStrongBeat(pos);
+      if (strong) held = Math.round(since) % 4 === 2 ? fifth : root;
+      const lead = !strong && changes && seg.to - pos <= 0.5 + EPS;
+      const note = bassNote(lead ? approachInto(seg.next) : held, strong ? 0.92 : lead ? 0.78 : 0.62);
+      note.layer = LAYER.floor;
+      events.push({ pos, length: 0.45, notes: [note] });
+    }
+  }
+  return events;
+}
+
+/** The line's range, A4–A5: over the pad, at the top of where a solo usually sits. */
+const LINE_LOW = 69;
+const LINE_HIGH = 81;
+/** Where the line starts out, before it has a note to move from. */
+const LINE_START = 75;
+
+/** How far the line may step past its range to keep a change smooth. */
+const LINE_STEP = 2;
+
+/** A chord's tones from `low` to `high`; the third and seventh — the ones that name it — marked. */
+const lineTones = (chord: Chord, low: number, high: number) => {
+  const intervals = QUALITY_INTERVALS[chord.quality].map((interval) => interval % 12);
+  const tones: { pitch: number; names: boolean }[] = [];
+  for (let pitch = low; pitch <= high; pitch++) {
+    const interval = (pitch - chord.root + 120) % 12;
+    if (intervals.includes(interval)) tones.push({ pitch, names: interval === 3 || interval === 4 || interval >= 10 });
+  }
+  return tones;
+};
+
+/**
+ * The tone of `chord` to move to from `from`, none of `avoid`: one a step
+ * away at most where there is one — a third or seventh before a root or
+ * fifth — else the nearest in the line's range.
+ */
+const nearestTone = (chord: Chord, from: number, avoid: readonly number[] = []) => {
+  const cost = (tone: { pitch: number; names: boolean }) => Math.abs(tone.pitch - from) + (tone.names ? 0 : 1.5);
+  const pick = (tones: { pitch: number; names: boolean }[]) =>
+    tones.reduce((best, tone) => (cost(tone) < cost(best) ? tone : best)).pitch;
+  const allowed = (tone: { pitch: number }) => !avoid.includes(tone.pitch);
+  const steps = lineTones(chord, LINE_LOW - LINE_STEP, LINE_HIGH + LINE_STEP).filter(
+    (tone) => allowed(tone) && Math.abs(tone.pitch - from) <= LINE_STEP,
+  );
+  if (steps.length) return pick(steps);
+  const tones = lineTones(chord, LINE_LOW, LINE_HIGH);
+  const options = tones.filter(allowed);
+  return pick(options.length ? options : tones);
+};
+
+/**
+ * The line: a chord tone on 1 and 3, the same beats the player's are due on,
+ * each the one nearest the last — a change moves it a step or holds a tone
+ * the two chords share, the smooth landing the combo pays for; within a chord
+ * it moves to another of its tones. As the run builds, 2 and 4 answer with a
+ * third tone of the chord, out of the line's way.
+ */
+export function changesLineBar(
+  segments: readonly BarSegment[],
+  state: { last: number | null },
+): TrackEvent[] {
+  const events: TrackEvent[] = [];
+  for (const seg of segments) {
+    const strong: { pos: number; pitch: number }[] = [];
+    for (const pos of every(1, seg.from, seg.to)) {
+      const since = seg.sinceChordStart + pos - seg.from;
+      if (since >= EPS && !isStrongBeat(pos)) continue;
+      const from = state.last ?? LINE_START;
+      // A change may hold its tone; within the chord the line moves on.
+      const pitch = nearestTone(seg.chord, from, since < EPS ? [] : [from]);
+      strong.push({ pos, pitch });
+      state.last = pitch;
+    }
+    strong.forEach(({ pos, pitch }, i) => {
+      const end = strong[i + 1]?.pos ?? seg.to;
+      events.push({
+        pos,
+        length: end - pos,
+        notes: [{ string: 1, fret: 0, midiNote: pitch, dynamics: 0.62, layer: LAYER.floor }],
+      });
+      for (const answer of every(1, pos + 1, end)) {
+        const pitches = [pitch, strong[i + 1]?.pitch ?? pitch];
+        events.push({
+          pos: answer,
+          length: 0.9,
+          notes: [
+            { string: 2, fret: 0, midiNote: nearestTone(seg.chord, pitch, pitches), dynamics: 0.45, layer: LAYER.drive },
+          ],
+        });
+      }
+    });
+  }
+  return events;
+}
+
+/** Where the progression starts over within the loop, in beats: the shortest run of its chords that repeats. */
+const progressionTops = (spans: readonly ChordSpan[]) => {
+  const n = spans.length;
+  const period =
+    Array.from({ length: n }, (_, i) => i + 1).find(
+      (p) => n % p === 0 && spans.every((span, i) => sameChord(span.chord, spans[i % p].chord)),
+    ) ?? n;
+  return spans.filter((_, i) => i % period === 0).map((span) => span.start);
+};
 
 const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
 
@@ -321,7 +559,7 @@ function pedalHarmony(
 export function generateBossBacking(
   measures: TablatureMeasure[],
   bpm: number,
-  { phase }: BossMusicOptions,
+  { phase, score = "battle" }: BossMusicOptions,
   options: { tuningOffsets?: readonly number[] },
 ): AutoBackingResult | null {
   const content = extractTabContent(measures, options.tuningOffsets);
@@ -332,12 +570,15 @@ export function generateBossBacking(
     pedalHarmony(content, phase, options.tuningOffsets);
   const loopBars = barMap.length;
   const loopStarts: number[] = [];
-  barMap.reduce((at, tabBar) => {
+  const loopLength = barMap.reduce((at, tabBar) => {
     loopStarts.push(at);
     return at + content.bars[tabBar].length;
   }, 0);
+  // Comping needs chords to comp: without names the changes score has none.
+  const comping = score === "changes" && followsTab;
+  const tops = comping ? progressionTops(spans) : [];
+  const isTop = (at: number) => tops.some((top) => Math.abs(top - (at % loopLength)) < EPS);
 
-  const level = bossIntensity(phase);
   const song: SongBar[] = songForm(loopBars, {
     evolving: true,
     withIntro: false,
@@ -350,20 +591,34 @@ export function generateBossBacking(
   const strings: TablatureMeasure[] = [];
   const padState: KeysState = { voices: null };
   const stringsState = { step: 0 };
+  const lineState: { last: number | null } = { last: null };
 
   song.forEach((songBar) => {
     const bar = content.bars[barMap[songBar.loopBar]];
-    const segments = segmentsForBar(
-      spans,
-      loopStarts[songBar.loopBar],
-      bar.length,
-    );
+    const barStart = loopStarts[songBar.loopBar];
+    const segments = segmentsForBar(spans, barStart, bar.length);
     const { section, barInSection, sectionLength } = songBar;
+    pad.push(buildMeasure(keysBar(bar, segments, "rock", padState), bar));
+    if (comping) {
+      drums.push(
+        buildMeasure(
+          changesDrumBar(bar, {
+            bpm,
+            section,
+            tops: every(0.5, 0, bar.length).filter((pos) => isTop(barStart + pos)),
+            fillIn: isTop(barStart + bar.length),
+          }),
+          bar,
+        ),
+      );
+      bass.push(buildMeasure(changesBassBar(segments), bar));
+      strings.push(buildMeasure(changesLineBar(segments, lineState), bar));
+      return;
+    }
     drums.push(
       buildMeasure(
         bossDrumBar(bar, {
           bpm,
-          level,
           section,
           isFill: barInSection === sectionLength - 1,
           isCrash: barInSection % 4 === 0,
@@ -373,7 +628,6 @@ export function generateBossBacking(
       ),
     );
     bass.push(buildMeasure(bossBassBar(bar, segments, bpm), bar));
-    pad.push(buildMeasure(keysBar(bar, segments, "rock", padState), bar));
     strings.push(
       buildMeasure(
         bossStringsBar(bar, segments, bpm, stringsState, followsTab),

@@ -94,6 +94,142 @@
         "slower": "Zmiany o {{percent}}% wolniej",
         "same_speed": "Zmiany w tym samym tempie"
       }
+    },
+    "changeling": {
+      "name": "Odmieniec",
+      "title": "Przybiera kształt każdego akordu",
+      "threats": {
+        "bites": "Szpony",
+        "quake": "Zrywy",
+        "weak_spots": "Dźwięki prowadzące",
+        "venom": "Dysonans",
+        "regen": "Przemiana",
+        "frenzy": "Wiry",
+        "web": "Kurtyna"
+      },
+      "arena": {
+        "slam": "Zryw",
+        "webbed": "Kurtyna — graj ze słuchu",
+        "poisoned": "Dysonans — ładuje się o połowę wolniej",
+        "poisoned_short": "Dysonans",
+        "regenerating": "Zmienia kształt — zadaj cios",
+        "quake_coming": "Zryw za takt — akordy zmieniają się dwa razy szybciej",
+        "quake_on": "Zryw — trafiaj dźwięk każdego akordu · zostało {{count}}",
+        "quake_on_steady": "Zryw — jeden akord może przepaść · zostało {{count}}"
+      },
+      "result": {
+        "title": "Zmiany cię pochłonęły"
+      },
+      "lair": {
+        "pitch": "Jedna niekończąca się walka bez nut do czytania. W każdej fazie odmieniec bierze nową progresję w nowej tonacji i staje się po kolei każdym akordem — improwizuj nad nim. Dźwięki akordu na 1 i 3 w takcie i skala pomiędzy ranią jego; cokolwiek innego na tych miarach albo dźwięk spoza tonacji rani ciebie. Sprawdź, jak daleko zajdziesz."
+      },
+      "rules": {
+        "sword": {
+          "body": "Na 1 i 3 w takcie zagraj dźwięk akordu, na którym jesteś — prymę, tercję, kwintę albo septymę — a naładuje go za 4. Pomiędzy ładuje każdy dźwięk skali: dźwięk akordu za 3, reszta za 1, do dwóch nut na miarę. Gryf pokazuje jedno i drugie: dźwięki akordu duże, skalę małą."
+        },
+        "strike": {
+          "body": "Pełny miecz uderza sam — tym mocniej, im dłuższa seria dźwięków akordu, aż do ×2 przy {{max}} z rzędu."
+        },
+        "combo": {
+          "title": "Graj zmiany na combo",
+          "body": "Wejdź w nowy akord na raz — pierwszą nutą najwyżej pół miary od zmiany — albo gładko, pierwszą nutą najwyżej {{smooth}} półtony od poprzedniej. Każde to trik: łącz je akord po akordzie, aż do ×{{comboMax}}. Combo uderza w Odmieńca, gdy progresja się zamyka albo gdy akord wejdzie bez triku. Błąd je zabiera."
+        },
+        "bite": {
+          "title": "Każdy akord potrzebuje dźwięku",
+          "body": "Zagraj na 1 albo 3 jako pierwsze coś innego niż dźwięk akordu, zagraj nutę spoza tonacji albo przepuść akord bez żadnego z jego dźwięków, a odmieniec sięgnie szponami. Skończy się HP — koniec biegu."
+        },
+        "slam": {
+          "title": "Przetrwaj zryw",
+          "body": "Od fazy {{slams}} odmieniec przyspiesza: przez dwa takty akordy zmieniają się dwa razy częściej. Traf dźwięk każdego z nich, a zablokujesz — blok ładuje miecz do połowy."
+        },
+        "endless": {
+          "body": "Zbij HP fazy, a odmieniec zmienia kształt: nowa tonacja, jeden akord więcej i szybsze zmiany za każdym razem — na początek trzy różne akordy. Co jakiś czas dochodzą septymy, akord zapożyczony, dominanta wtrącona albo akord zmniejszony. Najpierw dur i moll, potem skale modalne i blues. Każda zaliczona faza leczy {{heal}} HP."
+        },
+        "threats": {
+          "title": "Uczy się",
+          "body": "Od fazy {{weak}} dźwięki prowadzące — tercje i septymy, które mówią, jaki to akord — ładują miecz ×{{weakCharge}}. Od fazy {{affix}} zyskuje moce: dysonans, przemianę, wiry i kurtynę zasłaniającą tablicę."
+        }
+      },
+      "boons": {
+        "armor": {
+          "body": "Szpony zabierają o {{armorPercent}}% mniej HP. Kumuluje się."
+        },
+        "shield": {
+          "body": "Pochłania kolejne ciosy szponów: {{shieldCharges}}."
+        },
+        "thorns": {
+          "body": "Każdy cios szponów kosztuje odmieńca {{thornsPercent}}% HP fazy. Kumuluje się."
+        },
+        "secondWind": {
+          "body": "W każdej fazie {{secondWindMisses}} pudła są wybaczane: bez ciosu, seria i ładunek zostają."
+        },
+        "steadyHand": {
+          "body": "Zryw jest zablokowany, nawet gdy przepadnie {{steadyHandQuakeMisses}} akord."
+        },
+        "antidote": {
+          "name": "Słuch absolutny",
+          "body": "Dysonans cię nie rusza."
+        },
+        "clearSight": {
+          "body": "Kurtyna opada na o połowę krócej."
+        },
+        "precision": {
+          "body": "Dźwięk równo ze zmianą ładuje {{precisionPoints}} zamiast 4."
+        },
+        "momentum": {
+          "body": "Seria osiąga ×2 przy {{momentumStreak}} z rzędu zamiast {{maxStreak}}."
+        },
+        "exploit": {
+          "body": "Dźwięki prowadzące ładują miecz ×{{exploitCharge}}."
+        }
+      },
+      "preview": {
+        "armor": "Szpony {{from}} → {{to}} HP",
+        "thorns": "Za cios {{from}} → {{to}} obrażeń",
+        "steadyHand": "Akordy, które mogą przepaść w zrywie {{from}} → {{to}}",
+        "exploit": "Dźwięki prowadzące {{from}} → {{to}}"
+      },
+      "briefing": {
+        "faster": "Akordy zmieniają się o {{percent}}% szybciej",
+        "slower": "Akordy zmieniają się o {{percent}}% wolniej",
+        "same_speed": "Akordy zmieniają się w tym samym tempie",
+        "quakes": "Zrywy"
+      },
+      "guide": {
+        "open": "Jak grać",
+        "progress": "Krok {{step}} z {{count}}",
+        "back": "Wstecz",
+        "next": "Dalej",
+        "lane": {
+          "title": "Zawsze trzy akordy",
+          "body": "Na górze zawsze widzisz trzy akordy: ten, który gra teraz, następny i kolejny. Po karcie „Teraz” jedzie linia — gdy dojdzie do końca, następna karta wjeżdża na jej miejsce i zaczyna się ten akord. Pierwsza faza ma trzy akordy, każda następna dokłada jeden."
+        },
+        "accents": {
+          "title": "Na 1 i 3 — dźwięk akordu",
+          "body": "Akcenty są na 1 i 3 w każdym takcie — to wyższe kreski. Pierwsza nuta, którą na nich zagrasz, musi być dźwiękiem akordu: liczy się za 4, a kreska robi się zielona. Cokolwiek innego to pudło — kreska robi się pomarańczowa, a odmieniec drapie. Na 2 i 4 i wszędzie pomiędzy graj dowolne dźwięki skali: każdy trochę ładuje miecz.",
+          "chord": "dźwięk akordu",
+          "scale": "skala"
+        },
+        "neck": {
+          "title": "Gdzie grać",
+          "body": "Gryf podświetla jedną pozycję i idzie za twoją ręką. Duże kropki to dźwięki akordu — te na 1 i 3. Małe kropki to reszta skali, na pomiędzy. Gdy zmienia się akord, zmieniają się kropki — nad akordem spoza tonacji skala dopasowuje się do niego."
+        },
+        "combo": {
+          "title": "Triki i combo",
+          "body": "Wejdź w nowy akord dokładnie na zmianie („Na raz”) albo z nuty oddalonej najwyżej o dwa półtony („Gładko”). Triki łączą się w combo, które uderza w odmieńca, gdy progresja się zamyka. Jedno pudło i całe combo przepada.",
+          "strung": "Combo rośnie",
+          "banked": "Wypłata"
+        },
+        "watch": {
+          "title": "Co boli",
+          "body": "Każda z tych rzeczy drapie cię i zabiera combo:",
+          "outside": "Nuta spoza tonacji.",
+          "strong": "Na 1 albo 3 jako pierwsza nuta coś innego niż dźwięk akordu.",
+          "silent": "Akord przepuszczony bez żadnego ze swoich dźwięków.",
+          "rush": "Pomarańczowe akordy to szybka seria: przez dwa takty zmieniają się dwa razy szybciej — zagraj dźwięk każdego z nich.",
+          "headphones": "Graj w słuchawkach: mikrofon ma słyszeć gitarę, nie podkład."
+        }
+      }
     }
   },
   "arena": {
@@ -120,7 +256,11 @@
     "quake_on": "Wstrząs — każdy akord czysto · zostało {{count}}",
     "quake_on_steady": "Wstrząs — wolno 1 pudło · zostało {{count}}",
     "weak_change": "Teraz słaba zmiana: {{change}} — miecz ×{{multiplier}}",
-    "weak_change_label": "Słaba zmiana:"
+    "weak_change_label": "Słaba zmiana:",
+    "gate": "Brama",
+    "gate_intro": "Brama — więcej HP, mocniejsze ciosy. Dojdź tu, a następnym razem zaczniesz od tego miejsca.",
+    "sounds_on": "Włącz dźwięki walki",
+    "sounds_off": "Wyłącz dźwięki walki"
   },
   "threats": {
     "bites": "Ukąszenia",
@@ -139,6 +279,8 @@
     "phase": "Osiągnięta faza",
     "damage": "Zadane obrażenia",
     "best_streak": "Najdłuższa seria",
+    "best_combo": "Najlepsze combo",
+    "tricks": "Na raz · gładko",
     "accuracy": "Celność",
     "retry": "Walcz jeszcze raz",
     "finish": "Zakończ",
@@ -155,14 +297,30 @@
     "behind_few": "Do rekordu brakło {{count}} faz",
     "behind_many": "Do rekordu brakło {{count}} faz",
     "behind_other": "Do rekordu brakło {{count}} fazy",
-    "level_with": "Wyrównany rekord"
+    "level_with": "Wyrównany rekord",
+    "score": "Wynik",
+    "skipped_one": "Pominięta {{count}} faza",
+    "skipped_few": "Pominięte {{count}} fazy",
+    "skipped_many": "Pominiętych {{count}} faz",
+    "skipped_other": "Pominięte {{count}} fazy",
+    "skipped_lost": "Pokonaj fazę {{phase}}, żeby zaliczyć pominięte fazy."
   },
   "lair": {
     "pitch": "Jedna niekończąca się walka. W każdej fazie pająk linieje w szybszą formę z nowym ćwiczeniem — sprawdź, jak daleko zajdziesz.",
     "best_phase": "Najlepsza faza",
-    "best_damage": "Najwięcej obrażeń",
     "runs": "Biegi",
-    "fight": "Walcz"
+    "fight": "Walcz",
+    "difficulty": "Poziom trudności",
+    "difficulty_effect": "Ciosy {{damage}} · Tempo {{tempo}} · Wynik {{reward}}",
+    "start_at": "Zacznij od",
+    "phase_option": "Faza {{phase}}",
+    "next_savepoint": "Faza {{phase}} otworzy się, gdy do niej dojdziesz",
+    "skip_note_one": "Pomijasz {{count}} fazę — pokonaj fazę {{phase}}, a jej HP doliczy się do wyniku.",
+    "skip_note_few": "Pomijasz {{count}} fazy — pokonaj fazę {{phase}}, a ich HP doliczy się do wyniku.",
+    "skip_note_many": "Pomijasz {{count}} faz — pokonaj fazę {{phase}}, a ich HP doliczy się do wyniku.",
+    "skip_note_other": "Pomijasz {{count}} fazy — pokonaj fazę {{phase}}, a ich HP doliczy się do wyniku.",
+    "best_score": "Najlepszy wynik",
+    "not_fought": "Jeszcze bez walki"
   },
   "rules": {
     "title": "Jak działa walka",
@@ -193,6 +351,10 @@
     "threats": {
       "title": "Uczy się",
       "body": "Od fazy {{weak}} odsłania słabe punkty — miecz ładuje się wtedy ×{{weakCharge}}. Od fazy {{affix}} zdobywa moce: jad, regenerację, szał i sieć plutą na tabulaturę — im dalej, tym więcej naraz."
+    },
+    "gates": {
+      "title": "Bramy i punkty zapisu",
+      "body": "Co {{gate}} faz boss strzeże bramy: {{gateHp}}% więcej HP i mocniejsze ciosy. Dojdź do bramy, a następny bieg może się od niej zacząć — pominięte fazy liczą się do wyniku, gdy pokonasz tę, od której zaczynasz."
     }
   },
   "draft": {
@@ -300,7 +462,9 @@
     "quakes_per_pass_few": "{{count}} na przebieg",
     "quakes_per_pass_many": "{{count}} na przebieg",
     "quakes_per_pass_other": "{{count}} na przebieg",
-    "shapes": "Chwyty"
+    "shapes": "Chwyty",
+    "key": "Tonacja",
+    "tones": "Dźwięki akordów"
   },
   "subdivision": {
     "quarters": "ćwierćnuty",
@@ -337,5 +501,72 @@
     "power": "power chordy",
     "barre": "akordy barré",
     "seventh": "akordy septymowe"
+  },
+  "changes_rhythm": {
+    "bar": "akord na takt",
+    "half_bar": "dwa akordy na takt"
+  },
+  "key_mode": {
+    "ionian": "dur",
+    "aeolian": "moll",
+    "dorian": "dorycka",
+    "mixolydian": "miksolidyjska",
+    "harmonicMinor": "moll harmoniczna",
+    "blues": "blues"
+  },
+  "harmony_family": {
+    "triads": "trójdźwięki",
+    "sevenths": "akordy septymowe"
+  },
+  "board": {
+    "now": "Teraz",
+    "first_chord": "Pierwszy akord",
+    "first_in_one": "Pierwszy akord za {{count}} miarę",
+    "first_in_few": "Pierwszy akord za {{count}} miary",
+    "first_in_many": "Pierwszy akord za {{count}} miar",
+    "first_in_other": "Pierwszy akord za {{count}} miary",
+    "then": "Potem",
+    "next": "Następny",
+    "next_in_one": "Następny za {{count}} miarę",
+    "next_in_few": "Następny za {{count}} miary",
+    "next_in_many": "Następny za {{count}} miar",
+    "next_in_other": "Następny za {{count}} miary",
+    "passing": "przejściowa",
+    "outside": "spoza tonacji",
+    "root": "pryma",
+    "third": "tercja",
+    "fifth": "kwinta",
+    "seventh": "septyma",
+    "fretboard": "Gdzie leżą dźwięki {{chord}} na gryfie",
+    "ahead": "Następne akordy",
+    "heard": "Usłyszane nuty",
+    "beats_left_one": "Została {{count}} miara",
+    "beats_left_few": "Zostały {{count}} miary",
+    "beats_left_many": "Zostało {{count}} miar",
+    "beats_left_other": "Zostały {{count}} miary",
+    "landed": "Trafiony",
+    "legend_chord": "{{chord}} — na 1 i 3",
+    "legend_scale": "{{scale}} — pomiędzy",
+    "scale_for": "skala pod {{chord}}",
+    "miss": {
+      "outside": "{{note}} — spoza tonacji",
+      "outside_chord": "{{note}} — spoza skali pod {{chord}}",
+      "strong": "Na {{beat}}: {{note}} nie należy do {{chord}}",
+      "strong_veiled": "Na {{beat}}: {{note}} nie należy do akordu",
+      "silent": "{{chord}} minął bez żadnego swojego dźwięku",
+      "silent_veiled": "Akord minął bez żadnego swojego dźwięku"
+    }
+  },
+  "combo": {
+    "onTheOne": "Na raz",
+    "smooth": "Gładko",
+    "banked": "Combo ×{{multiplier}}",
+    "lost": "Combo stracone"
+  },
+  "difficulty": {
+    "easy": "Łatwy",
+    "normal": "Normalny",
+    "hard": "Trudny",
+    "brutal": "Brutalny"
   }
 }

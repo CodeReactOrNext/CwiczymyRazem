@@ -58,7 +58,8 @@ describe("BossResultOverlay", () => {
     expect(await screen.findByRole("dialog", {}, { timeout: 2000 })).toBeTruthy();
     expect(screen.getByText("Caught in the web")).toBeTruthy();
     expect(screen.getByText("Your run ended in phase 7.")).toBeTruthy();
-    expect(screen.getByText((4321).toLocaleString())).toBeTruthy();
+    // The score — on normal, the damage itself — and the damage line under it.
+    expect(screen.getAllByText((4321).toLocaleString())).toHaveLength(2);
     expect(screen.getByText("57")).toBeTruthy();
     expect(screen.getByText("75%")).toBeTruthy();
     expect(screen.queryByText("New record")).toBeNull();
@@ -94,7 +95,7 @@ describe("BossResultOverlay", () => {
 
   it("charts the run phase by phase and measures it against the record", async () => {
     useBossFightStore.setState((state) => ({
-      recordBefore: { bestPhase: 5, bestDamage: 3000, runs: 2 },
+      recordBefore: { bestPhase: 5, bestDamage: 3000, bestScore: 3000, reached: { normal: 5 }, runs: 2 },
       fight: {
         ...state.fight,
         phaseLog: [

@@ -756,6 +756,12 @@ export const GuitarLearningPathPage = ({
                   Mic setup and calibration, step by step
                   <ArrowRight className='h-3.5 w-3.5' aria-hidden='true' />
                 </Link>
+                <Link
+                  href='/features/desktop-guitar-practice-app'
+                  className='mt-3 flex w-fit items-center gap-1.5 text-sm font-bold text-zinc-300 transition-colors hover:text-white'>
+                  Playing through an interface? The desktop app
+                  <ArrowRight className='h-3.5 w-3.5' aria-hidden='true' />
+                </Link>
               </div>
             </Reveal>
           </div>
@@ -836,7 +842,13 @@ export const GuitarLearningPathPage = ({
                   <p className='mb-5 leading-relaxed text-zinc-400'>
                     Complete every step and a reward waits at the end of the
                     path, headed by a trophy guitar for your collection. Open it
-                    and claim it.
+                    and claim it.{" "}
+                    <Link
+                      href='/features/guitar-practice-rewards'
+                      className='font-semibold text-zinc-200 transition-colors hover:text-white'>
+                      What the collection is
+                    </Link>
+                    .
                   </p>
                   <ul className='space-y-3'>
                     {modules.map((module) => (
@@ -895,7 +907,7 @@ export const GuitarLearningPathPage = ({
               <h2 className='mb-8 text-2xl font-bold text-white'>
                 Rather set your own order?
               </h2>
-              <div className='grid gap-6 sm:grid-cols-3'>
+              <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
                 {[
                   {
                     href: "/guitar-practice-planner",
@@ -911,6 +923,11 @@ export const GuitarLearningPathPage = ({
                     href: "/daily-guitar-practice-plan",
                     title: "Daily guitar practice plan guide",
                     text: "15, 30 and 60-minute routines with example exercises and advice on what to play each day.",
+                  },
+                  {
+                    href: "/features/guitar-roadmap",
+                    title: "A roadmap for your own goal",
+                    text: "Describe the player you want to be and get phases and steps written around it, songs included.",
                   },
                 ].map((card) => (
                   <Link key={card.href} href={card.href}>

@@ -430,7 +430,7 @@ export const InteractiveGuitarPracticePage = ({
                     </Link>
                     . Players with an audio interface can also use the{" "}
                     <Link
-                      href='/wiki/desktop-app'
+                      href='/features/desktop-guitar-practice-app'
                       className='font-bold text-cyan-400 transition-colors hover:text-cyan-300'>
                       desktop app
                     </Link>{" "}
@@ -528,6 +528,19 @@ export const InteractiveGuitarPracticePage = ({
                 </Link>{" "}
                 explains why your points come from the time you log, not from
                 the hit percentage.
+              </p>
+              <p className='mt-5 leading-relaxed text-zinc-400'>
+                The same note detection runs two game modes:{" "}
+                <Link href='/features/guitar-duels' className='font-bold text-cyan-400 transition-colors hover:text-cyan-300'>
+                  guitar duels
+                </Link>
+                , where two players get one exercise and 48 hours to post the
+                better run, and{" "}
+                <Link href='/features/guitar-boss-fights' className='font-bold text-cyan-400 transition-colors hover:text-cyan-300'>
+                  boss fights
+                </Link>
+                , where every clean note charges a sword and every miss costs
+                HP.
               </p>
             </Reveal>
           </div>

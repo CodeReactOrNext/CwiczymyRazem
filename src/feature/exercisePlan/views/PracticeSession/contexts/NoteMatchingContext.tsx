@@ -12,6 +12,7 @@ import type { ChordHuntState } from "../hooks/useChordHunt";
 import { useChordHunt } from "../hooks/useChordHunt";
 import type { ClickHuntState } from "../hooks/useClickHunt";
 import { useClickHunt } from "../hooks/useClickHunt";
+import { useFreePlayFeed } from "../hooks/useFreePlayFeed";
 import type { IntervalClickState } from "../hooks/useIntervalClickHunt";
 import { useIntervalClickHunt } from "../hooks/useIntervalClickHunt";
 import type { LearnModeState } from "../hooks/useLearnModeMatcher";
@@ -22,6 +23,7 @@ import { useNoteMatching } from "../hooks/useNoteMatching";
 import type { SlotResult } from "../hooks/useStrummingMatcher";
 import { useStrummingMatcher } from "../hooks/useStrummingMatcher";
 import type { FillFeed } from "../utils/fillFeed";
+import type { FreePlayFrame } from "../utils/freePlay";
 import type { LivePitch, ScoringFocus } from "../utils/pitchScoring";
 import { summarizeIntonation } from "../utils/pitchScoring";
 import type { NoteTiming, RunNote, TimingCounts } from "../utils/timingGrade";
@@ -266,6 +268,9 @@ interface NoteMatchingProviderProps {
   learn?: LearnModeState | null;
   // every tab note the moment the matcher settles it (a game mode listening in)
   onNoteJudged?: (judgement: NoteJudgement) => void;
+  // the run's clock and every attack, frame by frame — a game mode that
+  // judges playing against something other than the tab's notes
+  onFreePlay?: (frame: FreePlayFrame) => void;
 }
 
 export function NoteMatchingProvider({
@@ -306,6 +311,7 @@ export function NoteMatchingProvider({
   playbackLeakingRef,
   learn = null,
   onNoteJudged,
+  onFreePlay,
 }: NoteMatchingProviderProps) {
   // Only the plain tab run draws its fill from the matching loop's own steps:
   // hunts, strum patterns and learn mode put other marks on the board.
@@ -352,6 +358,21 @@ export function NoteMatchingProvider({
     scoringFocus,
     onNoteJudged,
     streamFills,
+  });
+
+  useFreePlayFeed({
+    onFreePlay,
+    isPlaying,
+    startTime,
+    audioContext,
+    audioStartTime,
+    effectiveBpm,
+    activeTablature,
+    isMicEnabled,
+    getLatencyMs,
+    calibratedLatencyMs,
+    audioRefs,
+    tuningOffsets,
   });
 
   const {

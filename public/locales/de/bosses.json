@@ -95,6 +95,142 @@
         "slower": "Wechsel {{percent}} % langsamer",
         "same_speed": "Wechsel im gleichen Tempo"
       }
+    },
+    "changeling": {
+      "name": "Der Wechselbalg",
+      "title": "Trägt jeden Akkord, den er hört",
+      "threats": {
+        "bites": "Krallen",
+        "quake": "Anstürme",
+        "weak_spots": "Leittöne",
+        "venom": "Dissonanz",
+        "regen": "Gestaltwandel",
+        "frenzy": "Wirbel",
+        "web": "Vorhang"
+      },
+      "arena": {
+        "slam": "Ansturm",
+        "webbed": "Vorhang — spiel nach Gehör",
+        "poisoned": "Dissonanz — lädt halb so schnell",
+        "poisoned_short": "Dissonanz",
+        "regenerating": "Verwandelt sich — schlag zu",
+        "quake_coming": "Ansturm in einem Takt — die Akkorde wechseln doppelt so schnell",
+        "quake_on": "Ansturm — triff in jedem Akkord einen Ton · noch {{count}}",
+        "quake_on_steady": "Ansturm — ein Akkord darf durchrutschen · noch {{count}}"
+      },
+      "result": {
+        "title": "Von den Wechseln verschluckt"
+      },
+      "lair": {
+        "pitch": "Ein endloser Kampf ohne Noten zum Lesen. In jeder Phase nimmt der Wechselbalg eine neue Akkordfolge in einer neuen Tonart an und wird nacheinander zu jedem Akkord — improvisiere darüber. Triff die Akkordtöne auf 1 und 3 und spiel dazwischen die Tonleiter, und du verwundest ihn; alles andere auf diesen Schlägen oder ein Ton außerhalb der Tonart verwundet dich. Wie weit kommst du?"
+      },
+      "rules": {
+        "sword": {
+          "body": "Auf 1 und 3 spielst du einen Ton des Akkords, auf dem du bist — Grundton, Terz, Quinte oder Septime — und es lädt 4. Dazwischen lädt jeder Ton der Tonleiter: ein Akkordton 3, der Rest 1, bis zu zwei Noten pro Schlag. Das Griffbrett zeigt beides: die Akkordtöne groß, die Tonleiter klein."
+        },
+        "strike": {
+          "body": "Ein volles Schwert schlägt von selbst zu — umso härter, je länger deine Serie von Akkordtönen, bis ×2 bei {{max}} in Folge."
+        },
+        "combo": {
+          "title": "Spiel die Wechsel für ein Combo",
+          "body": "Triff einen neuen Akkord auf die Eins — seine erste Note höchstens einen halben Schlag vom Wechsel — oder gleite hinein, seine erste Note höchstens {{smooth}} Halbtöne von der davor. Jedes ist ein Trick: reih sie Akkord für Akkord aneinander, bis ×{{comboMax}}. Das Combo trifft den Wechselbalg, wenn die Progression von vorn beginnt oder ein Akkord ohne Trick landet. Ein Fehler kostet es."
+        },
+        "bite": {
+          "title": "Jeder Akkord braucht einen Ton",
+          "body": "Spiel als Erstes auf 1 oder 3 etwas anderes als einen Akkordton, spiel einen Ton außerhalb der Tonart oder lass einen Akkord ohne einen seiner Töne vorbeiziehen, und er schlägt mit den Krallen zu. Sind die HP weg, ist der Lauf vorbei."
+        },
+        "slam": {
+          "title": "Übersteh den Ansturm",
+          "body": "Ab Phase {{slams}} stürmt der Wechselbalg los: zwei Takte lang wechseln die Akkorde doppelt so schnell. Triff in jedem einen Ton, um ihn zu blocken — ein Block lädt dein Schwert zur Hälfte."
+        },
+        "endless": {
+          "body": "Bring die HP einer Phase auf null und der Wechselbalg nimmt eine neue Gestalt an: neue Tonart, ein Akkord mehr, schnellere Wechsel — zu Beginn drei verschiedene Akkorde. Ab und zu kommen Septakkorde, ein geborgter Akkord, eine Zwischendominante oder ein verminderter dazu. Erst Dur und Moll, dann die Modi und der Blues. Jede geschaffte Phase heilt dich um {{heal}} HP."
+        },
+        "threats": {
+          "title": "Er lernt",
+          "body": "Ab Phase {{weak}} laden die Leittöne — Terzen und Septimen, die sagen, was ein Akkord ist — dein Schwert ×{{weakCharge}}. Ab Phase {{affix}} gewinnt er Kräfte: Dissonanz, Gestaltwandel, Wirbel und einen Vorhang über der Tafel."
+        }
+      },
+      "boons": {
+        "armor": {
+          "body": "Krallen kosten {{armorPercent}} % weniger HP. Stapelbar."
+        },
+        "shield": {
+          "body": "Fängt die nächsten {{shieldCharges}} Krallenhiebe ab."
+        },
+        "thorns": {
+          "body": "Jeder Krallenhieb kostet den Wechselbalg {{thornsPercent}} % der HP der Phase. Stapelbar."
+        },
+        "secondWind": {
+          "body": "{{secondWindMisses}} Fehler pro Phase werden verziehen: kein Hieb, Serie und Ladung bleiben."
+        },
+        "steadyHand": {
+          "body": "Ein Ansturm ist auch mit {{steadyHandQuakeMisses}} verpasstem Akkord noch geblockt."
+        },
+        "antidote": {
+          "name": "Absolutes Gehör",
+          "body": "Dissonanz kann dir nichts anhaben."
+        },
+        "clearSight": {
+          "body": "Der Vorhang bleibt halb so lange unten."
+        },
+        "precision": {
+          "body": "Ein Ton genau auf dem Wechsel lädt {{precisionPoints}} statt 4."
+        },
+        "momentum": {
+          "body": "Deine Serie erreicht ×2 bei {{momentumStreak}} in Folge statt {{maxStreak}}."
+        },
+        "exploit": {
+          "body": "Leittöne laden dein Schwert ×{{exploitCharge}}."
+        }
+      },
+      "preview": {
+        "armor": "Krallen {{from}} → {{to}} HP",
+        "thorns": "Pro Hieb {{from}} → {{to}} Schaden",
+        "steadyHand": "Akkorde, die im Ansturm durchrutschen dürfen {{from}} → {{to}}",
+        "exploit": "Leittöne {{from}} → {{to}}"
+      },
+      "briefing": {
+        "faster": "Akkorde wechseln {{percent}} % schneller",
+        "slower": "Akkorde wechseln {{percent}} % langsamer",
+        "same_speed": "Akkorde wechseln im gleichen Tempo",
+        "quakes": "Anstürme"
+      },
+      "guide": {
+        "open": "So wird gespielt",
+        "progress": "Schritt {{step}} von {{count}}",
+        "back": "Zurück",
+        "next": "Weiter",
+        "lane": {
+          "title": "Immer drei Akkorde",
+          "body": "Oben siehst du immer drei Akkorde: den, der gerade klingt, den nächsten und den danach. Über die Jetzt-Karte läuft eine Linie — erreicht sie das Ende, rückt die nächste Karte an ihre Stelle und dieser Akkord beginnt. Die erste Phase hat drei Akkorde, jede weitere bringt einen mehr."
+        },
+        "accents": {
+          "title": "Auf 1 und 3: ein Akkordton",
+          "body": "Die Betonungen liegen auf 1 und 3 jedes Takts — die höheren Striche. Die erste Note, die du dort spielst, muss ein Ton des Akkords sein: Sie zählt 4 und der Strich wird grün. Alles andere ist ein Fehler — der Strich wird orange und der Wechselbalg kratzt dich. Auf 2 und 4 und überall dazwischen spielst du beliebige Töne der Tonleiter: Jeder lädt dein Schwert ein wenig.",
+          "chord": "Akkordton",
+          "scale": "Tonleiter"
+        },
+        "neck": {
+          "title": "Wo du spielst",
+          "body": "Das Griffbrett hebt eine Lage hervor und folgt deiner Hand. Große Punkte sind die Töne des Akkords — die für 1 und 3. Kleine Punkte sind der Rest der Tonleiter, für dazwischen. Wechselt der Akkord, wechseln die Punkte — über einem Akkord von außerhalb der Tonart passt sich die Tonleiter an."
+        },
+        "combo": {
+          "title": "Tricks und Combo",
+          "body": "Triff einen neuen Akkord genau auf dem Wechsel (Auf die Eins) oder gleite von einer Note höchstens zwei Halbtöne entfernt hinein (Fließend). Tricks reihen sich zu einem Combo, das den Wechselbalg trifft, wenn die Progression von vorn beginnt. Ein Fehler und das ganze Combo ist weg.",
+          "strung": "Combo wächst",
+          "banked": "Auszahlung"
+        },
+        "watch": {
+          "title": "Was wehtut",
+          "body": "Jedes davon kratzt dich und kostet das Combo:",
+          "outside": "Ein Ton außerhalb der Tonart.",
+          "strong": "Als erste Note auf 1 oder 3 etwas anderes als ein Akkordton.",
+          "silent": "Ein Akkord, der ohne einen einzigen seiner Töne vorbeizieht.",
+          "rush": "Orange Akkorde sind ein Ansturm: Zwei Takte lang wechseln sie doppelt so schnell — triff einen Ton von jedem.",
+          "headphones": "Spiel mit Kopfhörern: Das Mikro soll deine Gitarre hören, nicht die Begleitung."
+        }
+      }
     }
   },
   "arena": {
@@ -121,7 +257,11 @@
     "quake_on": "Beben — jeden Akkord sauber · noch {{count}}",
     "quake_on_steady": "Beben — 1 Fehler erlaubt · noch {{count}}",
     "weak_change": "Jetzt der schwache Wechsel: {{change}} — Schwert ×{{multiplier}}",
-    "weak_change_label": "Schwacher Wechsel:"
+    "weak_change_label": "Schwacher Wechsel:",
+    "gate": "Tor",
+    "gate_intro": "Ein Tor — mehr HP, härtere Treffer. Erreichst du es, kannst du nächstes Mal hier starten.",
+    "sounds_on": "Kampfsounds einschalten",
+    "sounds_off": "Kampfsounds ausschalten"
   },
   "threats": {
     "bites": "Bisse",
@@ -140,6 +280,8 @@
     "phase": "Erreichte Phase",
     "damage": "Verursachter Schaden",
     "best_streak": "Beste Serie",
+    "best_combo": "Bestes Combo",
+    "tricks": "Auf die Eins · fließend",
     "accuracy": "Genauigkeit",
     "retry": "Nochmal kämpfen",
     "finish": "Beenden",
@@ -152,14 +294,26 @@
     "ahead_other": "{{count}} Phasen über deinem Rekord",
     "behind_one": "{{count}} Phase unter deinem Rekord",
     "behind_other": "{{count}} Phasen unter deinem Rekord",
-    "level_with": "Rekord eingestellt"
+    "level_with": "Rekord eingestellt",
+    "score": "Punkte",
+    "skipped_one": "{{count}} Phase übersprungen",
+    "skipped_other": "{{count}} Phasen übersprungen",
+    "skipped_lost": "Schaff Phase {{phase}}, damit die übersprungenen Phasen zählen."
   },
   "lair": {
     "pitch": "Ein endloser Kampf. In jeder Phase häutet sich die Spinne in eine schnellere Gestalt mit einer neuen Übung — wie weit kommst du?",
     "best_phase": "Beste Phase",
-    "best_damage": "Meister Schaden",
     "runs": "Läufe",
-    "fight": "Kämpfen"
+    "fight": "Kämpfen",
+    "difficulty": "Schwierigkeit",
+    "difficulty_effect": "Treffer {{damage}} · Tempo {{tempo}} · Punkte {{reward}}",
+    "start_at": "Start bei",
+    "phase_option": "Phase {{phase}}",
+    "next_savepoint": "Phase {{phase}} öffnet sich, sobald du sie erreichst",
+    "skip_note_one": "Überspringt {{count}} Phase — schaff Phase {{phase}}, damit ihre HP in deine Punkte eingehen.",
+    "skip_note_other": "Überspringt {{count}} Phasen — schaff Phase {{phase}}, damit ihre HP in deine Punkte eingehen.",
+    "best_score": "Bestwert",
+    "not_fought": "Noch nicht gekämpft"
   },
   "rules": {
     "title": "So läuft der Kampf",
@@ -190,6 +344,10 @@
     "threats": {
       "title": "Sie lernt dazu",
       "body": "Ab Phase {{weak}} zeigt sie Schwachstellen — dein Schwert lädt dann ×{{weakCharge}}. Ab Phase {{affix}} bekommt sie Kräfte: Gift, Regeneration, Raserei und Netze über der Tabulatur, je weiter, desto mehr auf einmal."
+    },
+    "gates": {
+      "title": "Tore und Speicherpunkte",
+      "body": "Jede {{gate}}. Phase bewacht der Boss ein Tor: {{gateHp}} % mehr HP und härtere Treffer. Erreichst du ein Tor, kann dein nächster Lauf dort beginnen — übersprungene Phasen zählen zu deinen Punkten, sobald du die schaffst, bei der du startest."
     }
   },
   "draft": {
@@ -295,7 +453,9 @@
     "quakes": "Beben",
     "quakes_per_pass_one": "{{count}} pro Durchgang",
     "quakes_per_pass_other": "{{count}} pro Durchgang",
-    "shapes": "Griffe"
+    "shapes": "Griffe",
+    "key": "Tonart",
+    "tones": "Akkordtöne"
   },
   "subdivision": {
     "quarters": "Viertel",
@@ -332,5 +492,66 @@
     "power": "Powerchords",
     "barre": "Barrégriffe",
     "seventh": "Septakkorde"
+  },
+  "changes_rhythm": {
+    "bar": "ein Akkord pro Takt",
+    "half_bar": "zwei Akkorde pro Takt"
+  },
+  "key_mode": {
+    "ionian": "Dur",
+    "aeolian": "Moll",
+    "dorian": "Dorisch",
+    "mixolydian": "Mixolydisch",
+    "harmonicMinor": "harmonisch Moll",
+    "blues": "Blues"
+  },
+  "harmony_family": {
+    "triads": "Dreiklänge",
+    "sevenths": "Septakkorde"
+  },
+  "board": {
+    "now": "Jetzt",
+    "first_chord": "Erster Akkord",
+    "first_in_one": "Erster Akkord in {{count}} Schlag",
+    "first_in_other": "Erster Akkord in {{count}} Schlägen",
+    "then": "Danach",
+    "next": "Als Nächstes",
+    "next_in_one": "Nächster in {{count}} Schlag",
+    "next_in_other": "Nächster in {{count}} Schlägen",
+    "passing": "Durchgangston",
+    "outside": "außerhalb der Tonart",
+    "root": "Grundton",
+    "third": "Terz",
+    "fifth": "Quinte",
+    "seventh": "Septime",
+    "fretboard": "Wo die Töne von {{chord}} auf dem Griffbrett liegen",
+    "ahead": "Kommende Akkorde",
+    "heard": "Gehörte Töne",
+    "beats_left_one": "Noch {{count}} Schlag",
+    "beats_left_other": "Noch {{count}} Schläge",
+    "landed": "Getroffen",
+    "legend_chord": "{{chord}} — auf 1 und 3",
+    "legend_scale": "{{scale}} — dazwischen",
+    "scale_for": "Tonleiter über {{chord}}",
+    "miss": {
+      "outside": "{{note}} — außerhalb der Tonart",
+      "outside_chord": "{{note}} — außerhalb der Tonleiter über {{chord}}",
+      "strong": "Auf {{beat}}: {{note}} gehört nicht zu {{chord}}",
+      "strong_veiled": "Auf {{beat}}: {{note}} gehört nicht zum Akkord",
+      "silent": "{{chord}} ging ohne einen seiner Töne vorbei",
+      "silent_veiled": "Ein Akkord ging ohne einen seiner Töne vorbei"
+    }
+  },
+  "combo": {
+    "onTheOne": "Auf die Eins",
+    "smooth": "Fließend",
+    "banked": "Combo ×{{multiplier}}",
+    "lost": "Combo verloren"
+  },
+  "difficulty": {
+    "easy": "Leicht",
+    "normal": "Normal",
+    "hard": "Schwer",
+    "brutal": "Brutal"
   }
 }

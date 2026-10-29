@@ -1,6 +1,6 @@
-import type { ChordFamily, NotesPerBeat, SpiderRoute } from "../types/boss.types";
+import type { ChangesMode, ChordFamily, ChordUnit, HarmonyFamily, NotesPerBeat, SpiderRoute } from "../types/boss.types";
 import { passBeats } from "./chordPhaseGenerator";
-import type { Affix, ChordPhasePlan, PhasePlan, SpiderPhasePlan } from "./phaseGenerator";
+import type { Affix, ChangesPhasePlan, ChordPhasePlan, PhasePlan, SpiderPhasePlan } from "./phaseGenerator";
 import { spiderPassNotes } from "./spiderTab";
 
 /** What can threaten the player in a phase, beyond the bites every phase has. */
@@ -8,14 +8,14 @@ export type ThreatId = "slams" | "quake" | "weak_spots" | Affix;
 
 export const threatsOf = (plan: PhasePlan): ThreatId[] => [
   ...(plan.slams ? (["slams"] as const) : []),
-  ...(plan.kind === "chords" && plan.quakes ? (["quake"] as const) : []),
+  ...(plan.kind !== "spider" && plan.quakes ? (["quake"] as const) : []),
   ...(plan.weakSpots ? (["weak_spots"] as const) : []),
   ...plan.affixes,
 ];
 
-/** Notes a beat — or, on the colossus, strums a beat over the whole pass, quakes included. */
+/** Notes a beat — or, on the colossus and the changeling, chords a beat over the whole pass, quakes included. */
 export const unitsPerBeat = (plan: PhasePlan) =>
-  plan.kind === "chords"
+  plan.kind !== "spider"
     ? plan.variation.units.length / Math.max(1, passBeats(plan.variation))
     : plan.variation.notesPerBeat;
 
@@ -106,7 +106,7 @@ export interface ChordChanges extends PhaseShift {
 }
 
 /** Quakes in a pass: runs of quake strums. */
-const quakeCount = (plan: ChordPhasePlan) =>
+const quakeCount = (plan: { variation: { units: readonly ChordUnit[] } }) =>
   plan.variation.units.filter(
     (unit, i, units) => unit.quake && !units[(i - 1 + units.length) % units.length].quake,
   ).length;
@@ -132,6 +132,39 @@ export const describeChordChanges = (
       to: next.variation.progression,
       changed: previous.variation.progression.join() !== next.variation.progression.join(),
     },
+    quakes: { from: quakesBefore, to: quakesAfter, changed: quakesBefore !== quakesAfter },
+  };
+};
+
+export interface ChangesChanges extends PhaseShift {
+  rhythm: { from: 2 | 4; to: 2 | 4; changed: boolean };
+  key: { to: { tonic: number; mode: ChangesMode }; changed: boolean };
+  family: { to: HarmonyFamily; changed: boolean };
+  progression: { to: readonly string[]; changed: boolean };
+  /** Rushes in a pass. */
+  quakes: { from: number; to: number; changed: boolean };
+}
+
+/** The changeling's counterpart of describePhaseChanges. */
+export const describeChangesChanges = (
+  previous: ChangesPhasePlan,
+  next: ChangesPhasePlan,
+  previousBpm: number,
+  nextBpm: number,
+): ChangesChanges => {
+  const quakesBefore = quakeCount(previous);
+  const quakesAfter = quakeCount(next);
+  const before = previous.variation;
+  const after = next.variation;
+  return {
+    ...describePhaseShift(previous, next, previousBpm, nextBpm),
+    rhythm: { from: before.beatsPerChord, to: after.beatsPerChord, changed: before.beatsPerChord !== after.beatsPerChord },
+    key: {
+      to: after.key,
+      changed: before.key.tonic !== after.key.tonic || before.key.mode !== after.key.mode,
+    },
+    family: { to: after.family, changed: before.family !== after.family },
+    progression: { to: after.progression, changed: before.progression.join() !== after.progression.join() },
     quakes: { from: quakesBefore, to: quakesAfter, changed: quakesBefore !== quakesAfter },
   };
 };

@@ -1,4 +1,6 @@
+import { clearActiveBand, setActiveBand } from "feature/autoBacking/synth/activeBand";
 import { AmbientBand, velocityOf } from "feature/autoBacking/synth/ambientBand";
+import { rageEntryTime } from "feature/autoBacking/synth/rageEntry";
 import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Soundfont from "soundfont-player";
@@ -87,7 +89,17 @@ export const useTablatureAudio = ({
   const rageRef = useRef(rage);
   useEffect(() => {
     rageRef.current = rage;
-    bandRef.current?.setRage(rage);
+    const band = bandRef.current;
+    const ctx = audioContextRef.current;
+    const start = audioStartTimePropRef.current;
+    // Calm, or not playing: at once. A rage mid-run swells in to the next bar.
+    if (!band || !rage || !ctx || start === null) {
+      band?.setRage(rage);
+      return;
+    }
+    const at = rageEntryTime(ctx.currentTime, start, bpmRef.current || 120);
+    band.swell(ctx.currentTime + 0.02, at);
+    band.setRage(true, at);
   }, [rage, externalAudioContext]);
 
   const trackDataRef = useRef<Record<string, {
@@ -168,8 +180,11 @@ export const useTablatureAudio = ({
       bandRef.current         = new AmbientBand(audioContextRef.current, masterGainRef.current);
       bandRef.current.setTempo(bpmRef.current || 120);
       bandRef.current.setRage(rageRef.current);
+      setActiveBand(bandRef.current);
     }
+    const band = bandRef.current;
     return () => {
+      if (band) clearActiveBand(band);
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
       ownAudioContextRef.current?.close();
       // Soundfont players created below are bound to *this* context instance —
@@ -285,6 +300,8 @@ export const useTablatureAudio = ({
     const band = generated ? bandRef.current : null;
     if (band) {
       const t = Math.max(ctx.currentTime + 0.001, time);
+      // A boss score's layers come and go with the player's run.
+      if (!band.plays(note.layer, t)) return;
       const seconds = Math.max(0.05, duration);
       const bassOpen = BASS_STRING_MIDI[note.string - 1];
       if (trackType === "drums") {

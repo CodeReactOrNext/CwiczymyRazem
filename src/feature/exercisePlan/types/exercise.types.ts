@@ -68,6 +68,10 @@ export interface TablatureNote {
   harmonicType?: number;  // 0=None, 1=Natural, 2=Artificial, 3=Tapped, 4=Pinch, 5=Semi
   slideIn?: number;       // 0=None, 1=IntoFromBelow, 2=IntoFromAbove
   slideOut?: number;      // 0=None, 1=Shift, 2=Legato, 3=SlideTo
+  /** A generated backing note the band plays only from this live energy up
+   *  (0–4) — a boss score fills in and thins out with the player's run; -1:
+   *  only while the player is in danger. Absent: always. See AmbientBand.plays. */
+  layer?: number;
 }
 
 /** Picking direction marked above the tab: "down" = ⊓ (downstroke), "up" = ⋁ (upstroke). */

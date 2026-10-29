@@ -11,10 +11,10 @@ import React from 'react';
  * If a later pass measures a distribution, bring the chart back — with its
  * sample printed next to it.
  */
-const MEASURED_ON = '24 August 2026';
-const SESSIONS = '8,000+';
-const PLAYERS = '2,800+';
-const MEAN_MINUTES = 57;
+const MEASURED_ON = '29 October 2026';
+const SESSIONS = '18,600+';
+const PLAYERS = '3,980+';
+const MEAN_MINUTES = 34;
 
 export const SessionLengthStat = () => {
   return (

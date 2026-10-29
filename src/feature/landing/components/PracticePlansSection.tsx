@@ -65,12 +65,20 @@ export const PracticePlansSection = () => {
             </p>
 
             <FeatureList features={features} />
-            <Link
-              href='/guitar-practice-planner'
-              className='mt-10 inline-flex items-center gap-2 text-sm font-bold text-cyan-400 transition-colors hover:text-cyan-300'>
-              Guitar practice planner
-              <ArrowRight className='h-4 w-4' aria-hidden='true' />
-            </Link>
+            <div className='mt-10 flex flex-wrap gap-x-8 gap-y-3'>
+              <Link
+                href='/guitar-practice-planner'
+                className='inline-flex items-center gap-2 text-sm font-bold text-cyan-400 transition-colors hover:text-cyan-300'>
+                Guitar practice planner
+                <ArrowRight className='h-4 w-4' aria-hidden='true' />
+              </Link>
+              <Link
+                href='/features/guitar-roadmap'
+                className='inline-flex items-center gap-2 text-sm font-bold text-zinc-300 transition-colors hover:text-white'>
+                A roadmap around your own goal
+                <ArrowRight className='h-4 w-4' aria-hidden='true' />
+              </Link>
+            </div>
           </Reveal>
         </div>
       </div>

@@ -1,8 +1,9 @@
 import { getBoss } from "feature/bosses/data/bosses";
 import { useBossFight } from "feature/bosses/hooks/useBossFight";
 import { useBossRecord } from "feature/bosses/hooks/useBossProgress";
-import type { BossDefinition } from "feature/bosses/types/boss.types";
+import type { BossDefinition, BossDifficulty } from "feature/bosses/types/boss.types";
 import { buildBossExercise } from "feature/bosses/utils/bossExercise";
+import { parseDifficulty, validStart } from "feature/bosses/utils/difficulty";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
@@ -14,13 +15,24 @@ import { useEffect, useMemo, useState } from "react";
 interface BossFightSessionProps {
   boss: BossDefinition;
   userId: string;
+  difficulty: BossDifficulty;
+  /** The savepoint asked for — checked against the record before the run starts. */
+  askedStart: unknown;
   onLeave: () => void;
 }
 
-const BossFightSession = ({ boss, userId, onLeave }: BossFightSessionProps) => {
+interface BossFightRunProps extends BossFightSessionProps {
+  record: ReturnType<typeof useBossRecord>["record"];
+  saveRun: ReturnType<typeof useBossRecord>["saveRun"];
+}
+
+const BossFightRun = ({ boss, userId, difficulty, askedStart, record, saveRun, onLeave }: BossFightRunProps) => {
   const [isFinishing, setIsFinishing] = useState(false);
-  const { record, saveRun } = useBossRecord(userId, boss.id);
-  const { config, plan: phase, bpm } = useBossFight({ boss, record, onRunEnd: saveRun });
+  // Only a savepoint the record has opened; the first phase otherwise. Read
+  // once, on entry: the record changes as runs are banked (and rolled back
+  // when a save fails), and a new start phase would deal a new run mid-fight.
+  const [startPhase] = useState(() => validStart(record, difficulty, askedStart));
+  const { config, plan: phase, bpm } = useBossFight({ boss, record, difficulty, startPhase, onRunEnd: saveRun });
 
   const plan = useMemo<ExercisePlan>(() => {
     const exercise = buildBossExercise(boss, phase, bpm);
@@ -53,6 +65,24 @@ const BossFightSession = ({ boss, userId, onLeave }: BossFightSessionProps) => {
         onLeave();
       }}
       isFinishing={isFinishing}
+    />
+  );
+};
+
+const BossFightSession = ({ boss, userId, difficulty, askedStart, onLeave }: BossFightSessionProps) => {
+  const { record, isLoading, saveRun } = useBossRecord(userId, boss.id);
+  if (isLoading) return <PracticeLoadingScreen isReady={false} />;
+  return (
+    <BossFightRun
+      // A new difficulty or savepoint in the address is a new entry.
+      key={`${difficulty}:${String(askedStart)}`}
+      boss={boss}
+      userId={userId}
+      difficulty={difficulty}
+      askedStart={askedStart}
+      onLeave={onLeave}
+      record={record}
+      saveRun={saveRun}
     />
   );
 };
@@ -91,7 +121,13 @@ export default function BossFightPage() {
   return (
     <>
       {noIndex}
-      <BossFightSession boss={boss} userId={userAuth} onLeave={() => router.push("/bosses")} />
+      <BossFightSession
+        boss={boss}
+        userId={userAuth}
+        difficulty={parseDifficulty(router.query.difficulty)}
+        askedStart={router.query.start}
+        onLeave={() => router.push("/bosses")}
+      />
     </>
   );
 }

@@ -1,3 +1,5 @@
+import type { ChordScaleId } from "feature/autoBacking/theory";
+
 /**
  * How a pass walks the neck.
  * - `walk`: every string at one position — up the strings, then down them at
@@ -51,10 +53,36 @@ export interface ChordVariation {
   units: readonly ChordUnit[];
 }
 
-/** What a boss deals: the spider's finger drills or the colossus's chord changes. */
-export type DrillKind = "spider" | "chords";
+/** The modes the changeling's progressions are written in — chord scales of the backing's theory. */
+export type ChangesMode = Extract<
+  ChordScaleId,
+  "ionian" | "aeolian" | "dorian" | "mixolydian" | "harmonicMinor" | "blues"
+>;
 
-export type BossId = "fretweaver" | "colossus";
+/** Triads first; sevenths add the tone that names the chord's colour. */
+export type HarmonyFamily = "triads" | "sevenths";
+
+/**
+ * One progression the changeling plays over: no notes to read, only chords
+ * to solo over. The player improvises; the chord tones are what count.
+ */
+export interface ChangesVariation {
+  bpm: number;
+  /** The key the progression lives in: its tonic (C = 0) and its mode. */
+  key: { tonic: number; mode: ChangesMode };
+  family: HarmonyFamily;
+  /** The progression the pass cycles through, in order. */
+  progression: readonly string[];
+  /** Beats each chord lasts outside a rush: 4 = a bar, 2 = half a bar. */
+  beatsPerChord: 2 | 4;
+  /** The pass chord by chord, in whole 4/4 bars — rushes are its quakes. */
+  units: readonly ChordUnit[];
+}
+
+/** What a boss deals: the spider's finger drills, the colossus's chord changes, the changeling's changes to solo over. */
+export type DrillKind = "spider" | "chords" | "changes";
+
+export type BossId = "fretweaver" | "colossus" | "changeling";
 
 export interface BossDefinition {
   id: BossId;
@@ -63,12 +91,19 @@ export interface BossDefinition {
   drill: DrillKind;
 }
 
+/** How hard the player asks a fight to be: what bites cost, how fast it plays, what a run scores. */
+export type BossDifficulty = "easy" | "normal" | "hard" | "brutal";
+
 /** The player's best against one boss. */
 export interface BossRecord {
-  /** Furthest phase reached, 1-based; 0 before the first run. */
+  /** Furthest phase reached, 1-based, on any difficulty; 0 before the first run. */
   bestPhase: number;
   /** Most damage dealt in one run. */
   bestDamage: number;
+  /** Highest run score — damage and skipped phases, times the difficulty's reward. */
+  bestScore: number;
+  /** Furthest phase reached on each difficulty — what unlocks its savepoints. */
+  reached: Partial<Record<BossDifficulty, number>>;
   runs: number;
 }
 

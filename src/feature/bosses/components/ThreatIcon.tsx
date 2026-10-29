@@ -1,6 +1,7 @@
 import type { IconType } from "react-icons";
 import {
   GiAngryEyes,
+  GiClawSlashes,
   GiCrackedShield,
   GiDustCloud,
   GiEarthCrack,
@@ -11,9 +12,14 @@ import {
   GiPoisonBottle,
   GiPunch,
   GiQuakeStomp,
+  GiRegeneration,
+  GiSoundWaves,
   GiSpiderWeb,
   GiStoneWall,
   GiTargetArrows,
+  GiTheaterCurtains,
+  GiTornado,
+  GiWhirlwind,
 } from "react-icons/gi";
 
 import type { BossId } from "../types/boss.types";
@@ -32,7 +38,7 @@ const THREAT_ICONS: Record<ThreatIconId, IconType> = {
   web: GiSpiderWeb,
 };
 
-/** The same threats as the colossus wears them: fists, dust, mending stone, petrify. */
+/** The same threats as the colossus wears them — fists, dust, mending stone, petrify — and the changeling. */
 const BOSS_ICONS: Partial<Record<BossId, Partial<Record<ThreatIconId, IconType>>>> = {
   colossus: {
     bites: GiPunch,
@@ -41,6 +47,15 @@ const BOSS_ICONS: Partial<Record<BossId, Partial<Record<ThreatIconId, IconType>>
     regen: GiStoneWall,
     frenzy: GiEarthCrack,
     web: GiMedusaHead,
+  },
+  // Claws, rushes, dissonance, reshaping, whirlwinds and the curtain drawn.
+  changeling: {
+    bites: GiClawSlashes,
+    quake: GiWhirlwind,
+    venom: GiSoundWaves,
+    regen: GiRegeneration,
+    frenzy: GiTornado,
+    web: GiTheaterCurtains,
   },
 };
 

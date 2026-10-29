@@ -85,7 +85,7 @@ const dealTempo = (rng: Rng, index: number) => {
  * with aftershocks. Never the pass's first bar or touching each other, so the
  * bar before every quake is a normal one to see it coming in.
  */
-const dealQuakeStarts = (rng: Rng, index: number, aftershocks: boolean): number[] => {
+export const dealQuakeStarts = (rng: Rng, index: number, aftershocks: boolean): number[] => {
   if (index + 1 < QUAKES_FROM) return [];
   if (!aftershocks) return [randInt(rng, 2, PASS_BARS - QUAKE_BARS - 1)];
   const first = randInt(rng, 1, 2);

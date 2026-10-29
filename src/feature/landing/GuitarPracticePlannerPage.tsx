@@ -742,7 +742,7 @@ export const GuitarPracticePlannerPage = ({
               <h2 className='mb-8 text-2xl font-bold text-white'>
                 Looking for what to practise, not how to plan it?
               </h2>
-              <div className='grid gap-6 sm:grid-cols-3'>
+              <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
                 {[
                   {
                     href: "/daily-guitar-practice-plan",
@@ -758,6 +758,11 @@ export const GuitarPracticePlannerPage = ({
                     href: "/interactive-guitar-practice",
                     title: "Interactive guitar practice",
                     text: "What happens once the session starts: the tab scrolls and every note you hit is marked live.",
+                  },
+                  {
+                    href: "/features/guitar-roadmap",
+                    title: "Guitar roadmap for your goal",
+                    text: "Months of practice laid out in phases around one goal, each step with an exercise, lessons or a song.",
                   },
                 ].map((card) => (
                   <Link key={card.href} href={card.href}>

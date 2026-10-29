@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 
 describe("HeroSection", () => {
   /**
-   * The count-up used to start its motion value at 0, so the server-rendered
+   * An earlier count-up started its motion value at 0, so the server-rendered
    * HTML shipped "0+ guitarists on board" to crawlers and no-JS readers.
    */
   it("ships the real stat numbers in the server-rendered HTML", () => {

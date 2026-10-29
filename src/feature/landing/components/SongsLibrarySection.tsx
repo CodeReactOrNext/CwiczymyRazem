@@ -57,12 +57,20 @@ export const SongsLibrarySection = ({
               level and start learning with context.
             </p>
 
-            <Link
-              href='/song-library'
-              className='mb-10 inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300'>
-              Browse the song library
-              <ArrowRight className='h-3.5 w-3.5' />
-            </Link>
+            <div className='mb-10 flex flex-wrap gap-x-8 gap-y-3'>
+              <Link
+                href='/song-library'
+                className='inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300'>
+                Browse the song library
+                <ArrowRight className='h-3.5 w-3.5' />
+              </Link>
+              <Link
+                href='/features/guitar-tab-editor'
+                className='inline-flex items-center gap-1 text-sm font-semibold text-zinc-300 transition-colors hover:text-white'>
+                Or bring your own tab
+                <ArrowRight className='h-3.5 w-3.5' />
+              </Link>
+            </div>
 
             <FeatureList features={features} />
 

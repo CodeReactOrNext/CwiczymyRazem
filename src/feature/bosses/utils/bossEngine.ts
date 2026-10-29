@@ -1,13 +1,17 @@
 import type { NoteJudgement } from "feature/exercisePlan/views/PracticeSession/hooks/useNoteMatching";
 
-import type { DrillKind } from "../types/boss.types";
+import type { BossDifficulty, DrillKind } from "../types/boss.types";
 import type { BoonId, BoonStacks } from "./boons";
 import { BOON, boonBpmShift, dealDraft, stacksOf } from "./boons";
 import { subdivisionKey } from "./bossArt";
+import type { ChangeTrick } from "./changesJudge";
+import { generateChangesPhase } from "./changesPhaseGenerator";
 import { generateChordPhase } from "./chordPhaseGenerator";
 import { changeKey, changesOf } from "./chordTab";
-import type { PhasePlan } from "./phaseGenerator";
+import { DIFFICULTY, GATE_BITE, GATE_HP, isGatePhase } from "./difficulty";
+import type { ChangesPhasePlan, ChordPhasePlan, PhasePlan } from "./phaseGenerator";
 import {
+  CHANGES_MULTIPLIER_STREAK,
   CHORD_MULTIPLIER_STREAK,
   createRng,
   generatePhase,
@@ -23,7 +27,7 @@ export const PARRY_STREAK = 4;
 export const SLAM_DAMAGE = 15;
 /** A block charges the sword by this share of a full charge. */
 export const COUNTER_CHARGE = 0.5;
-export { CHORD_MULTIPLIER_STREAK, MAX_MULTIPLIER_STREAK };
+export { CHANGES_MULTIPLIER_STREAK, CHORD_MULTIPLIER_STREAK, MAX_MULTIPLIER_STREAK };
 /** A quake that isn't blocked. */
 export const QUAKE_DAMAGE = SLAM_DAMAGE;
 /** HP the player gets back for every phase cleared. */
@@ -43,6 +47,10 @@ const REROLL_EVERY = 5;
 /** The tempo boons can't push a phase past. */
 const MIN_BPM = 50;
 const MAX_BPM = 200;
+/** A changeling trick is worth this much a beat of the chord it lands — about what the chord's own notes deal. */
+const TRICK_POINTS_PER_BEAT = 0.75;
+/** The combo's multiplier: one a trick in it, up to this. */
+export const COMBO_MAX_MULTIPLIER = 4;
 
 export type FightOutcome = "lost";
 
@@ -61,8 +69,27 @@ export interface PhaseRecord {
   misses: number;
 }
 
+/** The changeling's combo: the tricks strung together change after change, and what they are worth before the multiplier. */
+export interface ChangeCombo {
+  tricks: readonly ChangeTrick[];
+  points: number;
+}
+
+/** A combo as it ended — paid out, or lost to a miss. */
+export interface ComboResult extends ChangeCombo {
+  multiplier: number;
+  /** points × multiplier. */
+  value: number;
+}
+
 export interface BossFightState {
   runSeed: number;
+  /** What bites cost, how fast the phases play and what the run scores. */
+  difficulty: BossDifficulty;
+  /** The phase the run started at, 1-based — a savepoint past the first skips the ones before it. */
+  startPhase: number;
+  /** HP of the phases skipped by starting at a savepoint — banked into the score once the first one is cleared. */
+  skippedHp: number;
   /** The phase being fought: its drill, threats and numbers. */
   plan: PhasePlan;
   /** The phase cleared last, and the tempo it was played at — what the
@@ -110,6 +137,22 @@ export interface BossFightState {
   changeMisses: Record<string, number>;
   /** …and the phase's weak spot: the change the player has missed most. */
   weakChange: string | null;
+  /**
+   * The changeling's fight only. The combo being strung, null when none is:
+   * it pays out as damage when the progression comes round or a chord lands
+   * without a trick, and a miss that breaks the streak loses it.
+   */
+  changeCombo: ChangeCombo | null;
+  /** Bumped on every landing that adds tricks to the combo. */
+  trickTick: number;
+  /** Bumped when a combo pays out, and when one is lost; the last one either way. */
+  bankTick: number;
+  bailTick: number;
+  lastCombo: ComboResult | null;
+  /** The run's tricks, by kind, and its biggest payout. */
+  onTheOnes: number;
+  smoothChanges: number;
+  bestCombo: number;
   /** Notes until the next slam, and how many of them are the warning. */
   notesToSlam: number;
   slamWindup: number;
@@ -163,9 +206,13 @@ export interface BossFightState {
 export const streakMultiplier = (streak: number, cap = MAX_MULTIPLIER_STREAK) =>
   Math.round((1 + Math.min(streak, cap) / cap) * 10) / 10;
 
-/** The streak a phase's strikes reach ×2 at: notes for the spider, changes for the colossus. */
+/** The streak a phase's strikes reach ×2 at: notes for the spider, changes for the colossus, chord tones for the changeling. */
 export const multiplierStreakFor = (plan: Pick<PhasePlan, "kind">) =>
-  plan.kind === "chords" ? CHORD_MULTIPLIER_STREAK : MAX_MULTIPLIER_STREAK;
+  plan.kind === "chords"
+    ? CHORD_MULTIPLIER_STREAK
+    : plan.kind === "changes"
+      ? CHANGES_MULTIPLIER_STREAK
+      : MAX_MULTIPLIER_STREAK;
 
 /** The same with Momentum: half as long. */
 export const momentumStreakFor = (plan: Pick<PhasePlan, "kind">) =>
@@ -186,9 +233,16 @@ export const hitPoints = (grade: 1 | 2 | 3, perfect: boolean, boons: BoonStacks 
 export const chargeMaxFor = (plan: PhasePlan, boons: BoonStacks) =>
   Math.max(3, Math.round(plan.rules.chargeMax * (1 - BOON.lightBladeCut) ** stacksOf(boons, "lightBlade")));
 
-/** The phase's tempo with the run's boons on it. */
-export const phaseBpm = (state: Pick<BossFightState, "plan" | "boons">) =>
-  Math.min(MAX_BPM, Math.max(MIN_BPM, state.plan.variation.bpm + boonBpmShift(state.boons)));
+/** The phase's tempo at the run's difficulty, with its boons on it. */
+export const phaseBpm = (state: Pick<BossFightState, "plan" | "boons"> & Partial<Pick<BossFightState, "difficulty">>) =>
+  Math.min(
+    MAX_BPM,
+    Math.max(
+      MIN_BPM,
+      Math.round(state.plan.variation.bpm * DIFFICULTY[state.difficulty ?? "normal"].tempo) +
+        boonBpmShift(state.boons),
+    ),
+  );
 
 /** The streak a slam needs to be blocked. */
 export const parryStreak = (state: Pick<BossFightState, "boons">) =>
@@ -198,9 +252,37 @@ export const parryStreak = (state: Pick<BossFightState, "boons">) =>
 export const quakeMissesAllowed = (state: Pick<BossFightState, "boons">) =>
   stacksOf(state.boons, "steadyHand") ? BOON.steadyHandQuakeMisses : 0;
 
+/** Every fifth phase the boss guards a gate: more HP to get through, and harder bites. */
+const withGate = (plan: PhasePlan): PhasePlan =>
+  isGatePhase(plan.index + 1)
+    ? {
+        ...plan,
+        gate: true,
+        rules: {
+          ...plan.rules,
+          bossHp: Math.round((plan.rules.bossHp * GATE_HP) / 10) * 10,
+          biteDamage: Math.ceil(plan.rules.biteDamage * GATE_BITE),
+        },
+      }
+    : plan;
+
 /** Deals a phase of the boss's own kind. */
 export const dealPhase = (kind: DrillKind, runSeed: number, index: number): PhasePlan =>
-  kind === "chords" ? generateChordPhase(runSeed, index) : generatePhase(runSeed, index);
+  withGate(
+    kind === "chords"
+      ? generateChordPhase(runSeed, index)
+      : kind === "changes"
+        ? generateChangesPhase(runSeed, index)
+        : generatePhase(runSeed, index),
+  );
+
+/**
+ * The phase as a looped pass of chords — the colossus's strums, the
+ * changeling's changes — or null for the spider's drill. Their quakes (the
+ * changeling's rushes) are written into the pass the same way.
+ */
+export const chordPass = (plan: PhasePlan): ChordPhasePlan | ChangesPhasePlan | null =>
+  plan.kind === "spider" ? null : plan;
 
 /**
  * The colossus's weak spot for a phase: of the changes its pass makes, the
@@ -229,14 +311,21 @@ const CHORD_RHYTHM_KEYS = {
 /** The translation key of a chord drill's rhythm. */
 export const chordRhythmKey = (beatsPerChord: 1 | 2 | 4) => CHORD_RHYTHM_KEYS[beatsPerChord];
 
+/** The translation key of how often the changeling's chords change. */
+export const changesRhythmKey = (beatsPerChord: 2 | 4) =>
+  beatsPerChord === 4 ? "changes_rhythm.bar" : "changes_rhythm.half_bar";
+
 /** The rhythm a phase is played in, as a translation key. */
 export const rhythmKeyOf = (plan: PhasePlan) =>
   plan.kind === "chords"
     ? chordRhythmKey(plan.variation.beatsPerChord)
-    : `subdivision.${subdivisionKey(plan.variation)}`;
+    : plan.kind === "changes"
+      ? changesRhythmKey(plan.variation.beatsPerChord)
+      : `subdivision.${subdivisionKey(plan.variation)}`;
 
 /** The phase's own counters, fresh: a full slam count, the first weak spot ahead. */
 const phaseStart = (plan: PhasePlan, boons: BoonStacks) => ({
+  changeCombo: null,
   lastUnit: null,
   quakeRun: null,
   quakeJudged: [],
@@ -253,13 +342,42 @@ const phaseStart = (plan: PhasePlan, boons: BoonStacks) => ({
   forgivenLeft: stacksOf(boons, "secondWind") * BOON.secondWindMisses,
 });
 
-export const createFight = (runSeed: number, kind: DrillKind = "spider"): BossFightState => {
-  const plan = dealPhase(kind, runSeed, 0);
+/** How a run is entered: on what difficulty, and from which savepoint. */
+export interface FightOptions {
+  difficulty?: BossDifficulty;
+  /** 1-based; the first phase when absent. */
+  startPhase?: number;
+}
+
+/** HP of the phases before `startPhase` in the run seeded `runSeed`. */
+const skippedHpFor = (kind: DrillKind, runSeed: number, startPhase: number) => {
+  let hp = 0;
+  for (let index = 0; index < startPhase - 1; index++) hp += dealPhase(kind, runSeed, index).rules.bossHp;
+  return hp;
+};
+
+export const createFight = (
+  runSeed: number,
+  kind: DrillKind = "spider",
+  { difficulty = "normal", startPhase = 1 }: FightOptions = {},
+): BossFightState => {
+  const start = Math.max(1, Math.floor(startPhase));
+  const plan = dealPhase(kind, runSeed, start - 1);
   return {
     runSeed,
+    difficulty,
+    startPhase: start,
+    skippedHp: skippedHpFor(kind, runSeed, start),
     plan,
     changeMisses: {},
     weakChange: weakChangeFor(plan, {}, runSeed),
+    trickTick: 0,
+    bankTick: 0,
+    bailTick: 0,
+    lastCombo: null,
+    onTheOnes: 0,
+    smoothChanges: 0,
+    bestCombo: 0,
     previousPlan: null,
     previousBpm: 0,
     bossHp: plan.rules.bossHp,
@@ -317,17 +435,38 @@ export const currentPhaseRecord = (state: BossFightState): PhaseRecord => ({
 export const runLog = (state: BossFightState): PhaseRecord[] =>
   state.holding ? state.phaseLog : [...state.phaseLog, currentPhaseRecord(state)];
 
+/** A changeling trick's worth on a chord this many beats long. */
+export const trickPoints = (beats: number) => Math.max(1, Math.round(beats * TRICK_POINTS_PER_BEAT));
+
+/** The combo's multiplier: a trick in it each, up to COMBO_MAX_MULTIPLIER. */
+export const comboMultiplier = (combo: Pick<ChangeCombo, "tricks">) =>
+  Math.min(combo.tricks.length, COMBO_MAX_MULTIPLIER);
+
+const comboResult = (combo: ChangeCombo): ComboResult => {
+  const multiplier = comboMultiplier(combo);
+  return { ...combo, multiplier, value: combo.points * multiplier };
+};
+
 /**
  * The phase's HP is gone: the boss breaks into the next, the player heals and
- * is dealt a draft of boons to pick from before it starts.
+ * is dealt a draft of boons to pick from before it starts. A changeling combo
+ * still being strung pays out as it breaks — into a boss already beaten, so
+ * like a strike's overkill it takes no HP, but it shows and counts for the
+ * best combo.
  */
 const breakIntoNextPhase = (state: BossFightState): BossFightState => {
   const plan = dealPhase(state.plan.kind, state.runSeed, state.plan.index + 1);
   const playerHp = Math.min(state.playerMaxHp, state.playerHp + PHASE_HEAL);
   const start = phaseStart(plan, state.boons);
   const cleared = state.plan.index + 1;
+  const combo = state.changeCombo ? comboResult(state.changeCombo) : null;
   return {
     ...state,
+    ...(combo && {
+      bankTick: state.bankTick + 1,
+      lastCombo: combo,
+      bestCombo: Math.max(state.bestCombo, combo.value),
+    }),
     plan,
     previousPlan: state.plan,
     previousBpm: phaseBpm(state),
@@ -376,8 +515,68 @@ const withStrike = (state: BossFightState): BossFightState => {
   return bossHp === 0 ? breakIntoNextPhase(struck) : struck;
 };
 
-const rageDamage = (state: BossFightState, damage: number) =>
+/** The combo pays out: its points × its multiplier, straight off the boss's HP. */
+const withComboBanked = (state: BossFightState): BossFightState => {
+  if (!state.changeCombo) return state;
+  const result = comboResult(state.changeCombo);
+  const bossHp = Math.max(0, state.bossHp - result.value);
+  const banked: BossFightState = {
+    ...state,
+    bossHp,
+    totalDamage: state.totalDamage + state.bossHp - bossHp,
+    changeCombo: null,
+    bankTick: state.bankTick + 1,
+    lastCombo: result,
+    bestCombo: Math.max(state.bestCombo, result.value),
+  };
+  return bossHp === 0 ? breakIntoNextPhase(banked) : banked;
+};
+
+/** A miss broke the streak: the combo being strung is lost. */
+const withComboLost = (state: BossFightState): BossFightState =>
+  state.changeCombo
+    ? { ...state, changeCombo: null, bailTick: state.bailTick + 1, lastCombo: comboResult(state.changeCombo) }
+    : state;
+
+/**
+ * A changeling chord landed. Its tricks go on the combo — paid out once the
+ * progression comes round, on the pass's last chord; a landing without one
+ * pays out what there is.
+ */
+const withLanding = (state: BossFightState, unit: number, tricks: readonly ChangeTrick[]): BossFightState => {
+  if (state.plan.kind !== "changes") return state;
+  if (!tricks.length) return withComboBanked(state);
+  const { units } = state.plan.variation;
+  const worth = trickPoints(units[unit]?.beats ?? 0) * tricks.length;
+  const next: BossFightState = {
+    ...state,
+    changeCombo: {
+      tricks: [...(state.changeCombo?.tricks ?? []), ...tricks],
+      points: (state.changeCombo?.points ?? 0) + worth,
+    },
+    trickTick: state.trickTick + 1,
+    onTheOnes: state.onTheOnes + (tricks.includes("onTheOne") ? 1 : 0),
+    smoothChanges: state.smoothChanges + (tricks.includes("smooth") ? 1 : 0),
+  };
+  return unit === units.length - 1 ? withComboBanked(next) : next;
+};
+
+const rageDamage = (state: Pick<BossFightState, "enraged">, damage: number) =>
   state.enraged ? Math.ceil(damage * RAGE_DAMAGE) : damage;
+
+/** What a bite costs right now: the phase's price, the rage, the run's difficulty and so many stacks of armor. */
+export const biteDamageFor = (
+  state: Pick<BossFightState, "plan" | "enraged" | "difficulty">,
+  armorStacks: number,
+) =>
+  Math.max(
+    1,
+    Math.round(
+      rageDamage(state, state.plan.rules.biteDamage) *
+        (1 - BOON.armorCut) ** armorStacks *
+        DIFFICULTY[state.difficulty].damage,
+    ),
+  );
 
 /** A miss: a bite — unless second wind forgives it outright or a shield takes it. */
 const withBite = (state: BossFightState): BossFightState => {
@@ -400,8 +599,7 @@ const withBite = (state: BossFightState): BossFightState => {
   next.charge = 0;
   next.biteTick += 1;
 
-  const armor = (1 - BOON.armorCut) ** stacksOf(next.boons, "armor");
-  const damage = Math.max(1, Math.round(rageDamage(next, rules.biteDamage) * armor));
+  const damage = biteDamageFor(next, stacksOf(next.boons, "armor"));
   if (next.shieldCharges > 0) {
     next.shieldCharges -= 1;
     next.lastBite = 0;
@@ -453,7 +651,7 @@ export const isRegenerating = (
  * sword (which may strike); not, it takes its damage.
  */
 const withSlam = (state: BossFightState, blocked: boolean, baseDamage: number): BossFightState => {
-  const damage = blocked ? 0 : rageDamage(state, baseDamage);
+  const damage = blocked ? 0 : Math.round(rageDamage(state, baseDamage) * DIFFICULTY[state.difficulty].damage);
   const next: BossFightState = {
     ...state,
     phaseDamageTaken: state.phaseDamageTaken + Math.min(damage, state.playerHp),
@@ -474,10 +672,10 @@ const withSlam = (state: BossFightState, blocked: boolean, baseDamage: number): 
 export const QUAKE_WARNING_BEATS = 4;
 
 /** The strum after the last one judged — the one being played or about to be. */
-export const nextStrum = (state: Pick<BossFightState, "plan" | "lastUnit">) =>
-  state.plan.kind === "chords" && state.lastUnit !== null
-    ? (state.lastUnit + 1) % state.plan.variation.units.length
-    : null;
+export const nextStrum = (state: Pick<BossFightState, "plan" | "lastUnit">) => {
+  const pass = chordPass(state.plan);
+  return pass && state.lastUnit !== null ? (state.lastUnit + 1) % pass.variation.units.length : null;
+};
 
 /** Strum `unit` makes the phase's weak change. */
 export const isWeakChange = (state: Pick<BossFightState, "plan" | "weakChange">, unit: number) =>
@@ -487,8 +685,9 @@ export const isWeakChange = (state: Pick<BossFightState, "plan" | "weakChange">,
 
 /** The quake strum `unit` belongs to, as its first strum and its length; null outside one. */
 export const quakeRunOf = (plan: PhasePlan, unit: number) => {
-  if (plan.kind !== "chords" || !plan.variation.units[unit]?.quake) return null;
-  const { units } = plan.variation;
+  const pass = chordPass(plan);
+  if (!pass?.variation.units[unit]?.quake) return null;
+  const { units } = pass.variation;
   const at = (i: number) => units[(i + units.length) % units.length];
   let start = unit;
   while (at(start - 1).quake && start - unit > -units.length) start -= 1;
@@ -510,8 +709,8 @@ export interface QuakeWarning {
 export const quakeWarning = (
   state: Pick<BossFightState, "plan" | "lastUnit" | "holding" | "outcome">,
 ): QuakeWarning | null => {
-  const { plan } = state;
-  if (plan.kind !== "chords" || !plan.quakes || state.holding || state.outcome) return null;
+  const plan = chordPass(state.plan);
+  if (!plan?.quakes || state.holding || state.outcome) return null;
   const next = nextStrum(state);
   if (next === null) return null;
   const { units } = plan.variation;
@@ -543,18 +742,19 @@ const withStrum = (
   unit: number,
   hit: boolean,
 ): BossFightState => {
-  if (state.plan.kind !== "chords") return state;
-  const { units } = state.plan.variation;
+  const pass = chordPass(state.plan);
+  if (!pass) return state;
+  const { units } = pass.variation;
   let next: BossFightState = {
     ...state,
     lastUnit: isAhead(state.lastUnit, unit, units.length) ? unit : state.lastUnit,
   };
   if (!hit) {
-    const key = changeKey(state.plan.variation, unit);
+    const key = changeKey(pass.variation, unit);
     if (key) next.changeMisses = { ...next.changeMisses, [key]: (next.changeMisses[key] ?? 0) + 1 };
   }
 
-  const run = state.plan.quakes ? quakeRunOf(state.plan, unit) : null;
+  const run = pass.quakes ? quakeRunOf(pass, unit) : null;
   if (!run) return next;
   // A strum this quake already had: the pass came round again.
   const fresh = next.quakeRun !== run.start || next.quakeJudged.includes(unit);
@@ -568,8 +768,29 @@ const withStrum = (
 
 /** A judged note — or, on the colossus, a judged strum and where it sits in the pass. */
 export type FightJudgement = Pick<NoteJudgement, "hit" | "grade" | "perfect"> & {
-  /** The strum's index in the colossus's pass. */
+  /** The strum's index in the colossus's pass; the changeling's chord a note or a call is on. */
   unit?: number;
+  /**
+   * The changeling: not a note but the call on a whole chord once it is over
+   * — landed (one of its tones sounded in it) or let go by, which bites.
+   */
+  settle?: boolean;
+  /** The changeling: a guide tone — its weak spot from the phase weak spots open. */
+  weak?: boolean;
+  /** The changeling: the note is its chord's first tone… */
+  landing?: boolean;
+  /** …and this is what it made of the change — strung into the combo. */
+  tricks?: readonly ChangeTrick[];
+};
+
+/** What every judgement ends on: the rage, and the fight lost once the HP is gone. */
+const settleOutcome = (state: BossFightState): BossFightState => {
+  if (state.holding) return state;
+  return {
+    ...state,
+    enraged: state.bossHp / state.bossMaxHp < ENRAGE_BELOW,
+    outcome: state.playerHp === 0 ? "lost" : state.outcome,
+  };
 };
 
 /**
@@ -587,9 +808,19 @@ export const applyJudgement = (
 ): BossFightState => {
   if (state.outcome || state.holding) return state;
   const { rules, affixes } = state.plan;
-  const strum = state.plan.kind === "chords" ? (judgement.unit ?? null) : null;
+  const changes = state.plan.kind === "changes";
+  // A landed chord was paid for by its notes: only the pass moves on.
+  if (changes && judgement.settle && judgement.hit) {
+    return judgement.unit === undefined ? state : settleOutcome(withStrum(state, judgement.unit, true));
+  }
+  const strum =
+    state.plan.kind === "chords" || (changes && judgement.settle) ? (judgement.unit ?? null) : null;
   let next: BossFightState = { ...state };
-  const weakSpotOpen = strum !== null ? isWeakChange(next, strum) : isWeakSpotOpen(next);
+  const weakSpotOpen = changes
+    ? state.plan.weakSpots && !!judgement.weak
+    : strum !== null
+      ? isWeakChange(next, strum)
+      : isWeakSpotOpen(next);
 
   if (judgement.hit) {
     next.combo += 1;
@@ -601,11 +832,19 @@ export const applyJudgement = (
     const points = hitPoints(judgement.grade ?? 3, judgement.perfect, next.boons);
     next.charge += Math.max(1, Math.round(points * rate));
     next.notesSinceStrike += 1;
-    next = withStrike(next);
+    // A landing's tricks go on the combo before the sword swings, so a
+    // strike that breaks the phase pays them out with the rest.
+    if (changes && judgement.landing && judgement.unit !== undefined) {
+      next = withLanding(next, judgement.unit, judgement.tricks ?? []);
+    }
     // The phase just broke — everything else waits for the next one.
+    if (next.holding) return next;
+    next = withStrike(next);
     if (next.holding) return next;
   } else {
     next = withBite(next);
+    // Second wind keeps the streak, and the combo with it.
+    if (changes && next.combo === 0) next = withComboLost(next);
   }
 
   if (next.poisonedNotes > 0) next.poisonedNotes -= 1;
@@ -647,9 +886,7 @@ export const applyJudgement = (
     if (next.holding) return next;
   }
 
-  next.enraged = next.bossHp / next.bossMaxHp < ENRAGE_BELOW;
-  if (next.playerHp === 0) next.outcome = "lost";
-  return next;
+  return settleOutcome(next);
 };
 
 /** Takes a boon from the draft: its stack, and whatever it does at once. */
@@ -704,6 +941,38 @@ export const endPhaseBreak = (state: BossFightState): BossFightState =>
 export const isSlamComing = (
   state: Pick<BossFightState, "plan" | "notesToSlam" | "slamWindup">,
 ) => state.plan.slams && state.notesToSlam <= state.slamWindup;
+
+/** What a run is worth, and how it adds up. */
+export interface RunScore {
+  /** Damage dealt over the run. */
+  dealt: number;
+  /** HP of the phases a savepoint skipped… */
+  skipped: number;
+  /** …banked only once the phase the run started at is cleared. */
+  banked: boolean;
+  /** The difficulty's reward. */
+  multiplier: number;
+  total: number;
+}
+
+/**
+ * The run's score: the damage it dealt, and the phases it skipped as if they
+ * had been fought — once it has cleared the one it started at, so a deep
+ * start can't be cashed in by falling straight away — times the difficulty.
+ */
+export const runScore = (
+  state: Pick<BossFightState, "totalDamage" | "skippedHp" | "phaseLog" | "difficulty">,
+): RunScore => {
+  const banked = state.skippedHp > 0 && state.phaseLog.length > 0;
+  const multiplier = DIFFICULTY[state.difficulty].reward;
+  return {
+    dealt: state.totalDamage,
+    skipped: state.skippedHp,
+    banked,
+    multiplier,
+    total: Math.round((state.totalDamage + (banked ? state.skippedHp : 0)) * multiplier),
+  };
+};
 
 /** 1-based phase number, as shown. */
 export const phaseNumber = (state: Pick<BossFightState, "plan">) => state.plan.index + 1;

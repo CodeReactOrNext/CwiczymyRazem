@@ -1,5 +1,6 @@
 import "react-circular-progressbar/dist/styles.css";
 
+import type { BossScore } from "feature/autoBacking/bossBacking";
 import { useAutoBacking } from "feature/autoBacking/hooks/useAutoBacking";
 import { useHeadphonesHint } from "feature/autoBacking/hooks/useHeadphonesHint";
 import { useAutoBackingStore } from "feature/autoBacking/store/autoBackingStore";
@@ -87,6 +88,7 @@ import { useSongExerciseGpFile } from "./hooks/useSongExerciseGpFile";
 import { timingInputPath, useTimingCalibration } from "./hooks/useTimingCalibration";
 import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
+import type { FreePlayFrame } from "./utils/freePlay";
 import { buildLearnSteps } from "./utils/learnSteps";
 import type { TimingPrecision } from "./utils/timingPrecision";
 
@@ -123,6 +125,17 @@ export interface GoalRunConfig {
   summaryEyebrow?: string;
 }
 
+/** The session's audio clock, for a game mode's own sounds to land on its beats. */
+export interface SessionAudioClock {
+  /** The context the metronome and the backing play on. */
+  context: AudioContext;
+  /** Audio time of the run's first beat; null while the run isn't playing. */
+  startTime: number | null;
+  bpm: number;
+  /** The session's master volume, 0–1. */
+  volume: number;
+}
+
 /**
  * Boss mode: the exercise is one level of a boss fight. The tempo is locked as
  * in an exam, the clock runs untimed, and the fight — fed every judged note —
@@ -133,6 +146,8 @@ export interface BossFightConfig {
   bpm: number;
   /** The phase being fought, from 1 — the backing's score follows it. */
   phase: number;
+  /** The score the backing plays: the battle's, or a band to solo over. */
+  score: BossScore;
   /** The boss is enraged (low on its phase's HP): the backing plays harder. */
   enraged: boolean;
   /** Above the tab, in place of the exercise's goals. Display only: the
@@ -141,6 +156,10 @@ export interface BossFightConfig {
   /** The same for the phone's smaller layout. */
   compactArena?: ReactNode;
   onNoteJudged: (judgement: NoteJudgement) => void;
+  /** The run's clock and every attack — a fight judged without a tab to match. */
+  onFreePlay?: (frame: FreePlayFrame) => void;
+  /** The session's audio clock for the fight's sounds, whenever it changes; null once it goes. */
+  onAudioClock?: (clock: SessionAudioClock | null) => void;
   /** Deals a fresh fight — BossFightSessionControls.restart calls it before it
    *  restarts the run. A plain restart (R) keeps the fight going. */
   onNewRun: () => void;
@@ -574,7 +593,7 @@ const PracticeSessionInner = ({
     tuningOffsets: guitarTuning.tuning.offsets,
     repeatCount: tabRepeatCount,
     blocked: !!effectiveRawGpFile || !!parsedGpTracks || !!riddleMeasures || (isExamMode && !!activeExercise.examBacking),
-    boss: bossFight ? { phase: bossFight.phase } : undefined,
+    boss: bossFight ? { phase: bossFight.phase, score: bossFight.score } : undefined,
   });
 
   const dynamicBackingTracks = useMemo(() => {
@@ -1067,6 +1086,24 @@ const PracticeSessionInner = ({
     isFinishing: !!isFinishing || isSubmittingReport,
   });
 
+  // The fight's sounds play on the metronome's clock, so a countdown ticks on its beats.
+  const onBossAudioClock = bossFight?.onAudioClock;
+  useEffect(() => {
+    if (!onBossAudioClock) return;
+    const context = metronome.audioContext;
+    onBossAudioClock(
+      context
+        ? {
+            context,
+            startTime: metronome.isPlaying ? (metronome.audioStartTime ?? null) : null,
+            bpm: effectiveBpm,
+            volume: masterVolume,
+          }
+        : null,
+    );
+  }, [onBossAudioClock, metronome.audioContext, metronome.audioStartTime, metronome.isPlaying, effectiveBpm, masterVolume]);
+  useEffect(() => () => onBossAudioClock?.(null), [onBossAudioClock]);
+
   // ── Ear training: mic answer matching ─────────────────────────────────────
 
   const riddleAutoAdvanceRef = useRef<number | null>(null);
@@ -1196,6 +1233,7 @@ const PracticeSessionInner = ({
       playbackLeakingRef={playbackLeakingRef}
       learn={learn}
       onNoteJudged={bossFight?.onNoteJudged}
+      onFreePlay={bossFight?.onFreePlay}
     >
     <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>
     <BpmProgressProvider exercise={currentExercise}>

@@ -4,6 +4,7 @@ import { act, cleanup, render, screen } from "@testing-library/react";
 import type { NoteJudgement } from "feature/exercisePlan/views/PracticeSession/hooks/useNoteMatching";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { bossCuePlayer } from "../audio/bossCuePlayer";
 import { FRETWEAVER } from "../data/fretweaver";
 import { useBossFightStore } from "../store/bossFightStore";
 import type { BossRecord } from "../types/boss.types";
@@ -17,7 +18,7 @@ vi.mock("store/hooks", () => ({
   useAppDispatch: () => vi.fn(),
 }));
 
-const NO_RECORD: BossRecord = { bestPhase: 0, bestDamage: 0, runs: 0 };
+const NO_RECORD: BossRecord = { bestPhase: 0, bestDamage: 0, bestScore: 0, reached: {}, runs: 0 };
 
 const note = (hit: boolean): NoteJudgement => ({
   noteKey: "0-0-0",
@@ -66,8 +67,8 @@ describe("BossArena", () => {
   });
 
   it("shows the player's record beside their name", () => {
-    renderArena(fightWith(), { bestPhase: 6, bestDamage: 4000, runs: 3 });
-    expect(screen.getByText("Record: phase 6")).toBeTruthy();
+    renderArena(fightWith(), { bestPhase: 6, bestDamage: 4000, bestScore: 4000, reached: { normal: 6 }, runs: 3 });
+    expect(screen.getByText("Normal · Record: phase 6")).toBeTruthy();
   });
 
   it("charges the sword with hits and strikes when it is full", () => {
@@ -130,6 +131,21 @@ describe("BossArena", () => {
     expect(screen.getByText("Phase 2")).toBeTruthy();
     expect(screen.getByText(`+${PHASE_HEAL}`)).toBeTruthy();
     expect(hp(50 + PHASE_HEAL, 100)).toBeTruthy();
+  });
+
+  it("holds a strike's number for the band's beat, but not one that broke the phase", () => {
+    const beat = vi.spyOn(bossCuePlayer, "strikeDelayMs").mockReturnValue(300);
+    renderArena(fightWith({ bossHp: 300 }));
+    judge(note(true), note(true), note(true));
+    expect(screen.queryByText("10")).toBeNull();
+    cleanup();
+
+    renderArena({ ...fightWith({ bossHp: 9 }), playerHp: 50 });
+    judge(note(true), note(true), note(true));
+    // The next phase is already up: the number lands with it, not over its full HP.
+    expect(screen.getByText("Phase 2")).toBeTruthy();
+    expect(screen.getByText("9")).toBeTruthy();
+    beat.mockRestore();
   });
 
   it("shows a shield catching a bite, and the run's build", () => {

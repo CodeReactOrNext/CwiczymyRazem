@@ -71,6 +71,7 @@ export function useAutoBacking({
   );
 
   const bossPhase = boss?.phase;
+  const bossScore = boss?.score;
   const result = useMemo(() => {
     if (!eligible || !measures) return null;
     const tuning = tuningKey ? tuningKey.split(",").map(Number) : undefined;
@@ -79,7 +80,7 @@ export function useAutoBacking({
       return generateBossBacking(
         measures,
         exercise.metronomeSpeed?.recommended ?? 120,
-        { phase: bossPhase },
+        { phase: bossPhase, score: bossScore },
         { tuningOffsets: tuning },
       );
     }
@@ -97,6 +98,7 @@ export function useAutoBacking({
     eligible,
     measures,
     bossPhase,
+    bossScore,
     exercise.metronomeSpeed?.recommended,
     exercise.title,
     exercise.description,

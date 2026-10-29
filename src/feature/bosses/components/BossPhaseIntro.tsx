@@ -7,6 +7,7 @@ import { useBossFightStore } from "../store/bossFightStore";
 import type { BossDefinition } from "../types/boss.types";
 import { artPhaseFor, legPatternFor } from "../utils/bossArt";
 import { phaseBpm, phaseNumber } from "../utils/bossEngine";
+import { chordMood, chordTones, keyLabel } from "../utils/changesHarmony";
 import { describePhaseShift } from "../utils/phaseChanges";
 import { BossArt } from "./BossArt";
 import { speedHeadline } from "./PhaseBriefing";
@@ -28,6 +29,12 @@ export const BossPhaseIntro = ({ boss }: { boss: BossDefinition }) => {
   const changes =
     fight?.previousPlan &&
     describePhaseShift(fight.previousPlan, fight.plan, fight.previousBpm, phaseBpm(fight));
+  // The changeling takes on its new key: it shows its first chord's face, and names the key.
+  const firstChord = fight?.plan.kind === "changes" ? fight.plan.variation.units[0].chord : null;
+  const key =
+    fight?.plan.kind === "changes"
+      ? `${keyLabel(fight.plan.variation.key, t)} · `
+      : "";
 
   return createPortal(
     <AnimatePresence>
@@ -46,6 +53,8 @@ export const BossPhaseIntro = ({ boss }: { boss: BossDefinition }) => {
               className='h-48 w-60 sm:h-56 sm:w-72'
               form={artPhaseFor(fight)}
               pattern={legPatternFor(fight.plan)}
+              expression={firstChord ? chordMood(firstChord) : undefined}
+              tones={firstChord ? chordTones(firstChord).length : undefined}
               molting
             />
             <div className='space-y-2'>
@@ -53,7 +62,11 @@ export const BossPhaseIntro = ({ boss }: { boss: BossDefinition }) => {
                 {t("arena.phase", { phase: phaseNumber(fight) })}
               </p>
               {changes && <p className='text-lg text-zinc-300'>{speedHeadline(changes.speedChange, t)}</p>}
-              <p className='text-sm tabular-nums text-zinc-500'>{phaseBpm(fight)} BPM</p>
+              {fight.plan.gate && <p className='text-sm font-medium text-amber-400'>{t("arena.gate_intro")}</p>}
+              <p className='text-sm tabular-nums text-zinc-500'>
+                {key}
+                {phaseBpm(fight)} BPM
+              </p>
             </div>
             {changes && changes.gained.length > 0 && (
               <ul className='flex flex-wrap justify-center gap-x-5 gap-y-2'>

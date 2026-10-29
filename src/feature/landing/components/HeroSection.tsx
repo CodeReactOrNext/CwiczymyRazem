@@ -3,20 +3,12 @@ import { GuitarPatternBackground } from "components/GuitarPatternBackground/Guit
 import { Logo } from "components/Logo/Logo";
 import { HERO_STATS } from "feature/landing/data/heroStats";
 import type { Transition, Variants } from "framer-motion";
-import {
-  animate,
-  motion,
-  useInView,
-  useMotionValue,
-  useReducedMotion,
-  useTransform,
-} from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { trackSignupCtaClicked } from "lib/signupFunnel";
 import { ArrowRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
 
 const StaticCTA = () => (
   <div className='flex flex-col items-center gap-2'>
@@ -64,60 +56,16 @@ const headlineLine: Variants = {
  * separate depth planes. The tilt is static CSS, so reduced motion only
  * skips the entrance animation, not the composition.
  */
-/**
- * Count-up stat driven by a motion value rendered straight into the DOM,
- * so the rolling number never re-renders the React tree.
- *
- * The motion value starts at the *final* number, not at 0: that way the
- * server-rendered HTML (and anything reading the page without running the
- * animation - crawlers, LLM scrapers, no-JS users) contains the real count
- * instead of "0+". The roll-up is re-seeded from 0 only once the row is
- * about to scroll into view, so nobody sees the number drop back.
- */
-const StatCounter = ({
-  value,
-  label,
-  delay,
-  shouldReduceMotion,
-  shouldAnimate,
-}: {
-  value: number;
-  label: string;
-  delay: number;
-  shouldReduceMotion: boolean;
-  shouldAnimate: boolean;
-}) => {
-  const count = useMotionValue(value);
-  // Stats are rounded down before being written to heroStats.ts, so the
-  // trailing "+" signals a floor, not a fake-precise exact count.
-  const display = useTransform(
-    count,
-    (v) => `${Math.round(v).toLocaleString("en-US")}+`,
-  );
-
-  useEffect(() => {
-    if (shouldReduceMotion || !shouldAnimate) {
-      count.set(value);
-      return undefined;
-    }
-    count.set(0);
-    const controls = animate(count, value, {
-      duration: 1.8,
-      delay,
-      ease: easeOutExpo,
-    });
-    return () => controls.stop();
-  }, [count, value, delay, shouldReduceMotion, shouldAnimate]);
-
-  return (
-    <div className='flex flex-col items-center gap-1'>
-      <motion.span className='font-teko text-5xl font-semibold tabular-nums leading-none text-white sm:text-6xl'>
-        {display}
-      </motion.span>
-      <span className='text-sm font-medium text-zinc-400'>{label}</span>
-    </div>
-  );
-};
+// Stats are rounded down before being written to heroStats.ts, so the
+// trailing "+" signals a floor, not a fake-precise exact count.
+const Stat = ({ value, label }: { value: number; label: string }) => (
+  <div className='flex flex-col items-center gap-1'>
+    <span className='font-teko text-5xl font-semibold tabular-nums leading-none text-white sm:text-6xl'>
+      {`${value.toLocaleString("en-US")}+`}
+    </span>
+    <span className='text-sm font-medium text-zinc-400'>{label}</span>
+  </div>
+);
 
 const HeroPerspectiveStage = ({
   shouldReduceMotion,
@@ -200,13 +148,6 @@ const HeroPerspectiveStage = ({
 
 export const HeroSection = () => {
   const shouldReduceMotion = useReducedMotion();
-  // Fires ~300px before the stats row reaches the viewport, so the count-up
-  // restarts from 0 while the numbers are still off-screen.
-  const statsRef = useRef<HTMLDivElement>(null);
-  const statsInView = useInView(statsRef, {
-    once: true,
-    margin: "0px 0px 300px 0px",
-  });
 
   return (
     <section className='relative flex min-h-[100dvh] flex-col overflow-hidden bg-zinc-950'>
@@ -276,27 +217,11 @@ export const HeroSection = () => {
         <HeroPerspectiveStage shouldReduceMotion={!!shouldReduceMotion} />
       </motion.div>
 
-      <motion.div
-        ref={statsRef}
-        className='relative z-20 mx-auto flex w-full max-w-4xl flex-col items-center gap-10 px-6 pb-24 pt-16 sm:flex-row sm:justify-center sm:gap-20 sm:pt-20'
-        initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.7,
-          delay: shouldReduceMotion ? 0 : 0.7,
-          ease: easeOutExpo,
-        }}>
-        {HERO_STATS.map((stat, i) => (
-          <StatCounter
-            key={stat.label}
-            value={stat.value}
-            label={stat.label}
-            delay={0.9 + i * 0.15}
-            shouldReduceMotion={!!shouldReduceMotion}
-            shouldAnimate={statsInView}
-          />
+      <div className='relative z-20 mx-auto flex w-full max-w-4xl flex-col items-center gap-10 px-6 pb-24 pt-16 sm:flex-row sm:justify-center sm:gap-20 sm:pt-20'>
+        {HERO_STATS.map((stat) => (
+          <Stat key={stat.label} value={stat.value} label={stat.label} />
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 };

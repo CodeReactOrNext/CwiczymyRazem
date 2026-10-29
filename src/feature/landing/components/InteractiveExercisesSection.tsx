@@ -45,12 +45,20 @@ export const InteractiveExercisesSection = () => {
             detection and it&apos;s Guitar Hero, on a real guitar: every note
             you hit lights up as you play.
           </p>
-          <Link
-            href='/interactive-guitar-practice'
-            className='mt-6 inline-flex items-center gap-2 text-sm font-bold text-cyan-400 transition-colors hover:text-cyan-300'>
-            See a session with note feedback, step by step
-            <ArrowRight className='h-4 w-4' aria-hidden='true' />
-          </Link>
+          <div className='mt-6 flex flex-wrap gap-x-8 gap-y-3'>
+            <Link
+              href='/interactive-guitar-practice'
+              className='inline-flex items-center gap-2 text-sm font-bold text-cyan-400 transition-colors hover:text-cyan-300'>
+              See a session with note feedback, step by step
+              <ArrowRight className='h-4 w-4' aria-hidden='true' />
+            </Link>
+            <Link
+              href='/features/desktop-guitar-practice-app'
+              className='inline-flex items-center gap-2 text-sm font-bold text-zinc-300 transition-colors hover:text-white'>
+              Playing through an interface? Get the desktop app
+              <ArrowRight className='h-4 w-4' aria-hidden='true' />
+            </Link>
+          </div>
         </Reveal>
 
         <Reveal delay={0.1}>

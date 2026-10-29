@@ -138,6 +138,10 @@ export const guitarPracticeJournalConfig: SeoLandingConfig = {
         },
         {
           kind: "paragraph",
+          text: "The digital side can also do the adding up for you. A [guitar progress tracker](/features/guitar-progress-tracker) turns each logged session into time per category, a streak, points and skills, so the weekly review starts from numbers instead of memory.",
+        },
+        {
+          kind: "paragraph",
           text: "With a free Riff Quest account you can record a session in the app and review your practice history. The printable journal stays separate: handwritten notes are not imported automatically. You can also [build a practice plan](/guitar-practice-planner) before the session and keep the PDF beside your guitar.",
         },
       ],

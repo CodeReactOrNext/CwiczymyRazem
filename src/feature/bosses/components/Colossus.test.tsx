@@ -107,7 +107,7 @@ describe("the colossus's draft", () => {
 describe("the colossus's fight in the store", () => {
   it("gathers a chord's tones into one strum", () => {
     const onRunEnd = vi.fn();
-    renderHook(() => useBossFight({ boss: COLOSSUS, record: EMPTY_RECORD, onRunEnd }));
+    renderHook(() => useBossFight({ boss: COLOSSUS, record: EMPTY_RECORD, difficulty: "normal", startPhase: 1, onRunEnd }));
     act(() => useBossFightStore.setState({ fight: chordFightWith(quiet) }));
     const tones = chordNotes("G").map((_, i) => `0-0-${i}`);
     expect(tones).toHaveLength(6);
@@ -124,7 +124,7 @@ describe("the colossus's fight in the store", () => {
 
   it("deals the colossus's own fight on entry", () => {
     const onRunEnd = vi.fn();
-    const { result } = renderHook(() => useBossFight({ boss: COLOSSUS, record: EMPTY_RECORD, onRunEnd }));
+    const { result } = renderHook(() => useBossFight({ boss: COLOSSUS, record: EMPTY_RECORD, difficulty: "normal", startPhase: 1, onRunEnd }));
     expect(result.current.plan.kind).toBe("chords");
   });
 });

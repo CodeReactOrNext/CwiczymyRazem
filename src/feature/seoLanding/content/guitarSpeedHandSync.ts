@@ -55,6 +55,8 @@ export const guitarSpeedHandSyncConfig: SeoLandingConfig = {
           commentary: [
             "1-2-3-4 is only the first of 24 possible finger orders — and the other 23 are where the real synchronization work lives. Orders like 1-3-2-4 and 4-2-3-1 break the finger-roll habit your hand defaults to, forcing each finger to act on its own schedule.",
             "Practice one permutation per day rather than all of them badly. The full permutation set is in the Riff Quest library, sequenced from natural to brain-bending.",
+            "All 24 orders are also in the pool of [guitar duels](/features/guitar-duels), where you and another player get the same permutation and 48 hours to post the cleaner run.",
+            "Or take them into a [boss fight](/features/guitar-boss-fights): the Fretweaver deals a new permutation every phase and comes back a little faster each time you clear one.",
           ],
         },
         {
@@ -178,6 +180,10 @@ export const guitarSpeedHandSyncConfig: SeoLandingConfig = {
         {
           kind: "paragraph",
           text: "Speed comes from a systematic tempo climb, not from playing fast and hoping. The method: find the tempo where you play a drill perfectly three times in a row, then raise it 4 BPM. When you hit a wall, drop 10 BPM and rebuild. Slow-fast-slow beats fast-only, every time — and the drill below tells you honestly where the wall is.",
+        },
+        {
+          kind: "paragraph",
+          text: "The same climb can be set up as a [tempo goal](/features/guitar-practice-goals): pick the drill, where you are and where you want to be, and the app lays out the milestones in between, each cleared by three clean runs the microphone scores.",
         },
         {
           kind: "exercise",

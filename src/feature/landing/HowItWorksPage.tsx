@@ -5,6 +5,20 @@ import { YouTube } from "components/Blog/YouTube";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { Footer } from "feature/landing/components/Footer";
+import type {
+  PlanDemoExercise,
+  PlanDemoProps,
+} from "feature/landing/components/howItWorks/StepDemos";
+import {
+  PlanDemo,
+  PlayDemo,
+  ProgressDemo,
+} from "feature/landing/components/howItWorks/StepDemos";
+import type { CategoryDifficultyFilter } from "feature/practice/utils/autoPlan";
+import {
+  countExercises,
+  filterExercises,
+} from "feature/practice/utils/autoPlan";
 import { m } from "framer-motion";
 import { useInView } from "framer-motion";
 import { ArrowRight, ChevronRight } from "lucide-react";
@@ -15,6 +29,48 @@ import { useRef } from "react";
 /* ─────────────────────────────────────────────
    Data
 ───────────────────────────────────────────── */
+/**
+ * Step 01 replays the Auto Plan: 30 minutes, two cells of the focus grid
+ * ticked, and a plan of real exercises from those cells that adds up to 30.
+ * The grid's counts and "N exercises match" come from the library itself.
+ */
+const PLAN_DEMO_PICKS: PlanDemoProps["picks"] = [
+  { category: "technique", difficulty: "medium" },
+  { category: "theory", difficulty: "hard" },
+];
+const PLAN_DEMO_IDS = [
+  "spider_basic",
+  "smooth_chord_transitions",
+  "fretboard_mastery",
+  "guide_tone_voice_leading",
+];
+const planDemoExercises: PlanDemoExercise[] = PLAN_DEMO_IDS.flatMap((id) =>
+  exercisesAgregat
+    .filter((exercise) => exercise.id === id)
+    .map((exercise) => ({
+      title: exercise.title,
+      minutes: exercise.timeInMinutes,
+      category: exercise.category,
+      difficulty: exercise.difficulty,
+    })),
+);
+const planDemoMatches = PLAN_DEMO_PICKS.reduce<{
+  filter: CategoryDifficultyFilter;
+  counts: number[];
+}>(
+  ({ filter, counts }, { category, difficulty }) => {
+    const next = {
+      ...filter,
+      [category]: [...(filter[category] ?? []), difficulty],
+    };
+    return {
+      filter: next,
+      counts: [...counts, filterExercises(exercisesAgregat, next).length],
+    };
+  },
+  { filter: {}, counts: [exercisesAgregat.length] },
+).counts;
+
 const steps = [
   {
     number: "01",
@@ -50,18 +106,29 @@ const steps = [
         href: "/features/guitar-learning-path",
       },
       {
+        label: "Player roadmaps",
+        sub: "a step-by-step path built around one guitarist's goal",
+        href: "/features/guitar-roadmap",
+      },
+      {
         label: "Guitar Pro import",
         sub: "attach your own tabs to songs or plans",
+        href: "/features/guitar-tab-editor",
       },
       {
         label: "Create your own plan",
         sub: "pick exercises, upload GP files, attach videos or photos to any step",
       },
     ],
-    screenshot: "/images/how-it-works/step-1.webp",
-    screenshotWidth: 906,
-    screenshotHeight: 466,
-    screenshotAlt: "Riff Quest song library screen",
+    demo: (
+      <PlanDemo
+        counts={countExercises(exercisesAgregat)}
+        picks={PLAN_DEMO_PICKS}
+        matches={planDemoMatches}
+        exercises={planDemoExercises}
+        minutes={30}
+      />
+    ),
     color: "text-cyan-400",
     line: "bg-cyan-500",
   },
@@ -85,18 +152,31 @@ const steps = [
         sub: "keep perfect time with an adjustable click track",
       },
       {
-        label: "BPM progress tracker",
-        sub: "mark BPM milestones as you push your speed further",
+        label: "BPM goals",
+        sub: "set a target tempo, climb to it, then keep it in rotation",
+        href: "/features/guitar-practice-goals",
       },
       {
         label: "Interactive tab player",
         sub: "animated Guitar Pro tabs that scroll in sync with your session",
       },
+      {
+        label: "Boss fights",
+        sub: "an endless fight where every clean note hits the boss",
+        href: "/features/guitar-boss-fights",
+      },
+      {
+        label: "Duels",
+        sub: "the same exercise as another player, 48 hours, best run wins",
+        href: "/features/guitar-duels",
+      },
+      {
+        label: "Desktop app",
+        sub: "your audio interface through its own driver, lower latency",
+        href: "/features/desktop-guitar-practice-app",
+      },
     ],
-    screenshot: "/images/how-it-works/step-2.webp",
-    screenshotWidth: 956,
-    screenshotHeight: 534,
-    screenshotAlt: "Riff Quest active practice session",
+    demo: <PlayDemo />,
     color: "text-emerald-400",
     line: "bg-emerald-500",
   },
@@ -108,6 +188,7 @@ const steps = [
       {
         label: "Time, XP & level per category",
         sub: "technique, theory, ear training, and creativity, each tracked separately",
+        href: "/features/guitar-progress-tracker",
       },
       {
         label: "Achievements",
@@ -115,7 +196,8 @@ const steps = [
       },
       {
         label: "Leaderboard",
-        sub: "see how you rank against other guitarists globally",
+        sub: "monthly seasons where everyone starts from zero",
+        href: "/features/guitar-practice-leaderboard",
       },
       {
         label: "Activity charts",
@@ -123,17 +205,15 @@ const steps = [
       },
       {
         label: "Guitar Arsenal",
-        sub: "collect virtual guitars as you level up",
+        sub: "spend the Fame your practice earns on virtual guitars and pedals",
+        href: "/features/guitar-practice-rewards",
       },
       {
         label: "Fame Points shop",
         sub: "spend Fame Points to unlock rare guitars and cosmetics",
       },
     ],
-    screenshot: "/images/how-it-works/step-3.webp",
-    screenshotWidth: 726,
-    screenshotHeight: 370,
-    screenshotAlt: "Riff Quest progress report screen",
+    demo: <ProgressDemo />,
     color: "text-violet-400",
     line: "bg-violet-500",
   },
@@ -152,8 +232,8 @@ function StepSection({
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const isEven = index % 2 === 0;
-  // Steps 01 and 02 are UI-heavy screenshots that were unreadable at half
-  // width, so they get the wider column; step 03 stays at 1:1.
+  // Steps 01 and 02 are UI-heavy demos that were unreadable at half width,
+  // so they get the wider column; step 03 stays at 1:1.
   const wideImage = index < 2;
 
   return (
@@ -228,17 +308,8 @@ function StepSection({
           </ul>
         </div>
 
-        {/* ── Image column ── */}
-        <div className={`${!isEven ? "lg:order-1" : ""}`}>
-          <Image
-            src={step.screenshot}
-            alt={step.screenshotAlt}
-            width={step.screenshotWidth}
-            height={step.screenshotHeight}
-            sizes='(min-width: 1024px) 720px, 100vw'
-            className='h-auto w-full'
-          />
-        </div>
+        {/* ── Demo column: the screenshot, animated ── */}
+        <div className={`${!isEven ? "lg:order-1" : ""}`}>{step.demo}</div>
       </div>
     </m.div>
   );

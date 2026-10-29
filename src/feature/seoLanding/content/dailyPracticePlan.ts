@@ -243,7 +243,7 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
         {
           kind: "cta",
           title: "Riff Quest is the infrastructure",
-          text: "Streaks, a GitHub-style practice heatmap, session logging, XP and a community leaderboard — plus every exercise above with interactive tabs and real-time feedback. The plan lives in the app so your willpower doesn't have to carry it.",
+          text: "Streaks, a GitHub-style practice heatmap, [session logging, XP and levels](/features/guitar-progress-tracker) and a [community leaderboard](/features/guitar-practice-leaderboard) — plus every exercise above with interactive tabs and real-time feedback. The plan lives in the app so your willpower doesn't have to carry it.",
         },
         {
           kind: "paragraph",

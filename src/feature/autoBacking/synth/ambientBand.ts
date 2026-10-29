@@ -62,6 +62,27 @@ function saturationCurve(drive: number): Float32Array<ArrayBuffer> {
   return curve;
 }
 
+/** Below this the bus's ceiling passes the signal untouched. */
+const CEILING_KNEE = 0.75;
+/** What the ceiling lets out at the most — anything louder is rounded off under it. */
+const CEILING_MAX = 0.97;
+
+/**
+ * A soft ceiling after the limiter: straight through below CEILING_KNEE
+ * (−2.5 dBFS), then rounded off toward CEILING_MAX. The limiter's attack lets
+ * a hit's first milliseconds through; this keeps them from clipping.
+ */
+function ceilingCurve(): Float32Array<ArrayBuffer> {
+  const curve = new Float32Array(1024) as Float32Array<ArrayBuffer>;
+  const room = CEILING_MAX - CEILING_KNEE;
+  for (let i = 0; i < curve.length; i++) {
+    const x = (i / (curve.length - 1)) * 2 - 1;
+    const over = Math.abs(x) - CEILING_KNEE;
+    curve[i] = over <= 0 ? x : Math.sign(x) * (CEILING_KNEE + room * Math.tanh(over / room));
+  }
+  return curve;
+}
+
 /**
  * The metallic part of a TR-808 cymbal: six square waves at inharmonic
  * ratios of a 40 Hz fundamental. Through a band-pass and a high-pass this is
@@ -114,6 +135,22 @@ const stopAt = (oscillators: OscillatorNode[], when: number) => {
   }
 };
 
+/** A hit of the fight the band plays — see AmbientBand.accent. */
+export type BandAccent = "strike" | "impact" | "block" | "crash";
+
+/** The energy a band plays at when nothing steers it: every layer. */
+export const FULL_ENERGY = 4;
+/** How far up the sword's charge opens the pad and arpeggio filters, Hz. */
+const TENSION_HZ = 2200;
+/** The pad and arpeggio, a little darker or brighter with every step of energy, Hz. */
+const ENERGY_BRIGHTNESS_HZ = 350;
+/** A heartbeat in the kit: a pitchless thump (GM2's mute surdo). */
+export const HEARTBEAT = 86;
+
+/** The bus low-pass wide open, and where a hit taken muffles it to. */
+const DIP_OPEN_HZ = 20000;
+const DIP_HZ = 1200;
+
 export class AmbientBand {
   /**
    * Where every generated track ends up — the band's own bus, with a limiter
@@ -133,27 +170,66 @@ export class AmbientBand {
   private readonly lfoDepth: GainNode;
   private readonly kickCurve = saturationCurve(1.6);
   private readonly bassCurve = saturationCurve(1.2);
-  /** A boss in a rage: the band plays harder on the fly (see setRage). */
-  private rage = false;
+  /** A boss in a rage: the band plays harder on the fly from this time on (see setRage); null when calm. */
+  private rageFrom: number | null = null;
+  /**
+   * The fight's hits, played by the band (accent, roll). Dry, and around the
+   * dip into the limiter: noise muffled to a narrow low band reads as a pitch
+   * to the note detector, a broadband one doesn't.
+   */
+  private readonly accents: GainNode;
+  /** A low-pass over the whole bus, wide open but for a hit taken (dip). */
+  private readonly dipFilter: BiquadFilterNode;
+  /**
+   * The live energy, as steps in time — from `at` on, the layers up to
+   * `level` play (see plays). Empty while nothing steers the band: then it
+   * plays everything, as any backing but a boss's does.
+   */
+  private energySteps: { at: number; level: number }[] = [];
+  /** The player is in danger: the heartbeat layer plays. */
+  private danger = false;
+  /** The sword's charge, as Hz added to every pad and arpeggio filter — the build before a strike. */
+  private readonly tension: ConstantSourceNode | null;
 
   constructor(
     private readonly ctx: BaseAudioContext,
     output: AudioNode,
   ) {
-    // ── Bus: trim, then a limiter. The compressor adds its own make-up gain
-    // (about +3.4 dB at these settings); the trim takes it back off, so the
-    // band only changes where a peak would have gone over. ──
+    // ── Bus: trim, a limiter, a soft ceiling. The trim drives the band into
+    // the limiter — at a track's 80%, about −14.5 dBFS RMS with only a pulse,
+    // −11 with everything (a boss in a rage too), against −19.5 and −15.5 when
+    // it only took the limiter's make-up gain back off — and the ceiling
+    // rounds off what gets past it: peaks stay under −0.5 dBFS. ──
     const trim = ctx.createGain();
-    trim.gain.value = 0.66;
+    trim.gain.value = 1.2;
     const limiter = ctx.createDynamicsCompressor();
     limiter.threshold.value = -6;
     limiter.knee.value = 0;
     limiter.ratio.value = 20;
     limiter.attack.value = 0.001;
     limiter.release.value = 0.1;
-    trim.connect(limiter);
-    limiter.connect(output);
+    const ceiling = ctx.createWaveShaper();
+    ceiling.curve = ceilingCurve();
+    ceiling.oversample = "2x";
+    this.dipFilter = ctx.createBiquadFilter();
+    this.dipFilter.type = "lowpass";
+    this.dipFilter.frequency.value = DIP_OPEN_HZ;
+    this.dipFilter.Q.value = 0.7;
+    trim.connect(this.dipFilter);
+    this.dipFilter.connect(limiter);
+    limiter.connect(ceiling);
+    ceiling.connect(output);
     this.bus = trim;
+    // Trimmed like the bus, for the same make-up gain.
+    this.accents = ctx.createGain();
+    this.accents.gain.value = trim.gain.value;
+    this.accents.connect(limiter);
+
+    this.tension = typeof ctx.createConstantSource === "function" ? ctx.createConstantSource() : null;
+    if (this.tension) {
+      this.tension.offset.value = 0;
+      this.tension.start();
+    }
 
     // ── Hall ──
     this.reverbInput = ctx.createGain();
@@ -211,6 +287,7 @@ export class AmbientBand {
     echoOut.connect(this.reverbInput);
     this.setTempo(90);
 
+
     // One slow sweep shared by every pad voice's filter: the pad breathes.
     const lfo = ctx.createOscillator();
     lfo.frequency.value = 0.09;
@@ -225,10 +302,164 @@ export class AmbientBand {
    * The boss has enraged — play the rest of the phase harder without
    * rewriting a note: a double kick under every hi-hat, a tom under every
    * snare, louder crashes and wider-open filters on everything pitched.
-   * Takes effect from the next note scheduled.
+   * From the notes at `from` on (the next bar's downbeat, say); from the
+   * next note scheduled when absent.
    */
-  setRage(on: boolean) {
-    this.rage = on;
+  setRage(on: boolean, from = 0) {
+    this.rageFrom = on ? from : null;
+  }
+
+  /** The band plays a note at `time` in a rage. */
+  private raging(time: number) {
+    return this.rageFrom !== null && time >= this.rageFrom;
+  }
+
+  /**
+   * A quiet swell into the rage: filtered noise opening up and growing from
+   * `from` to `to`, where a soft wash lands with the band's first harder
+   * bar — so the rage comes in on the music, not on whatever note was next.
+   */
+  swell(from: number, to: number) {
+    const ctx = this.ctx;
+    const length = Math.max(0.2, to - from);
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.Q.value = 0.8;
+    filter.frequency.setValueAtTime(320, from);
+    filter.frequency.exponentialRampToValueAtTime(4800, from + length);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, from);
+    gain.gain.exponentialRampToValueAtTime(0.045, from + length);
+    gain.gain.setValueAtTime(0.045, from + length);
+    gain.gain.exponentialRampToValueAtTime(0.0001, from + length + 0.12);
+    filter.connect(gain);
+    gain.connect(this.bus);
+    this.noise(from, length + 0.15, filter, () => {
+      filter.disconnect();
+      gain.disconnect();
+    });
+    this.wash(from + length, 0.5, this.bus);
+  }
+
+  /** The context the band plays on. */
+  get context(): BaseAudioContext {
+    return this.ctx;
+  }
+
+  /**
+   * A hit of the fight played by the band at `at` — the caller puts it on
+   * the grid. Only voices with no steady pitch (claps, washes, hats, a noise
+   * thump), since the mic is open: the band's kick, snare body, rim and toms
+   * all have one.
+   * - `strike`: the player's sword lands — a wash on a thump.
+   * - `impact`: a slam lands on the player — everything at once, the pad and
+   *   bass ducked, the band muffled for a moment.
+   * - `block`: a slam blocked — a bright open hat over a light clap.
+   * - `crash`: a quake begins.
+   */
+  accent(kind: BandAccent, at: number) {
+    const out = this.accents;
+    switch (kind) {
+      case "strike":
+        // The drop: a strike lands as the band's biggest hit.
+        this.thump(at, 1, out);
+        this.wash(at, 1, out);
+        this.clap(at, 0.75, out);
+        this.duckAt(at, 0.9);
+        return;
+      case "impact":
+        this.thump(at, 1, out);
+        this.clap(at, 1, out);
+        this.wash(at, 1, out);
+        this.duckAt(at, 1);
+        this.dip(at, 0.4);
+        return;
+      case "block":
+        this.metal(at, 1, out, 0.4, 0.1, 9000);
+        this.clap(at, 0.6, out);
+        return;
+      case "crash":
+        this.thump(at, 0.85, out);
+        this.wash(at, 1, out);
+        this.duckAt(at, 0.8);
+        return;
+    }
+  }
+
+  /**
+   * A clap roll building from `from` to `to` — the band telling a slam is
+   * coming: eighths, then sixteenths over the last beat, louder all the way.
+   */
+  roll(from: number, to: number, beat: number) {
+    if (to <= from || beat <= 0) return;
+    const hits: number[] = [];
+    for (let t = from; t < to - beat - 1e-6; t += beat / 2) hits.push(t);
+    for (let t = Math.max(from, to - beat); t < to - 1e-6; t += beat / 4) hits.push(t);
+    const span = Math.max(1e-6, to - from);
+    for (const t of hits) this.clap(t, 0.35 + 0.6 * ((t - from) / span), this.accents);
+  }
+
+  // ── Playing along with the player ─────────────────────────────────────
+
+  /**
+   * The band plays layers up to `level` (0–4) from `at` on. A new call
+   * replaces whatever was planned for after it — a miss cuts a boost short.
+   */
+  setEnergy(level: number, at: number) {
+    const now = this.ctx.currentTime;
+    const kept = this.energySteps.filter((step) => step.at < at);
+    // Of the steps already gone, only the one in force still matters.
+    const current = kept.filter((step) => step.at <= now).pop();
+    this.energySteps = [...(current ? [current] : []), ...kept.filter((step) => step.at > now), { at, level }];
+  }
+
+  /** The energy at `time`; null while nothing steers the band. */
+  energyAt(time: number): number | null {
+    if (!this.energySteps.length) return null;
+    let level = this.energySteps[0].level;
+    for (const step of this.energySteps) if (step.at <= time) level = step.level;
+    return level;
+  }
+
+  /** The player is in danger (or no longer): the heartbeat layer comes in or goes. */
+  setDanger(on: boolean) {
+    this.danger = on;
+  }
+
+  /** The sword's charge, 0–1: the pad and arpeggio open up toward a strike. */
+  setTension(amount: number, at: number) {
+    this.tension?.offset.setTargetAtTime(Math.max(0, Math.min(1, amount)) * TENSION_HZ, at, 0.12);
+  }
+
+  /** Back to an ordinary backing: every layer, no heartbeat, no tension. */
+  resetLive() {
+    this.energySteps = [];
+    this.danger = false;
+    this.tension?.offset.cancelScheduledValues(0);
+    if (this.tension) this.tension.offset.value = 0;
+  }
+
+  /** Whether a note of layer `layer` plays at `time` (see TablatureNote.layer). */
+  plays(layer: number | undefined, time: number) {
+    if (layer === undefined) return true;
+    if (layer < 0) return this.danger;
+    return layer <= (this.energyAt(time) ?? FULL_ENERGY);
+  }
+
+  /** Hz the energy at `time` takes off or puts on a filter — none while nothing steers it. */
+  private brightness(time: number) {
+    const level = this.energyAt(time);
+    return level === null ? 0 : (level - 2) * ENERGY_BRIGHTNESS_HZ;
+  }
+
+  /** The band muffled for `seconds` from `at` — a hit taken. */
+  dip(at: number, seconds: number) {
+    const frequency = this.dipFilter.frequency;
+    frequency.cancelScheduledValues(at);
+    frequency.setValueAtTime(DIP_OPEN_HZ, at);
+    frequency.exponentialRampToValueAtTime(DIP_HZ, at + 0.03);
+    frequency.setValueAtTime(DIP_HZ, at + seconds * 0.5);
+    frequency.exponentialRampToValueAtTime(DIP_OPEN_HZ, at + seconds);
   }
 
   setTempo(bpm: number) {
@@ -439,9 +670,13 @@ export class AmbientBand {
 
     const filter = ctx.createBiquadFilter();
     filter.type = "lowpass";
-    filter.frequency.value = 1500 + 1000 * velocity + (this.rage ? 900 : 0);
+    filter.frequency.value = Math.max(
+      400,
+      1500 + 1000 * velocity + (this.raging(time) ? 900 : 0) + this.brightness(time),
+    );
     filter.Q.value = 0.9;
     this.lfoDepth.connect(filter.frequency);
+    this.tension?.connect(filter.frequency);
 
     const panner = ctx.createStereoPanner();
     panner.pan.value = PAD_PANS[voiceIndex % PAD_PANS.length];
@@ -460,6 +695,7 @@ export class AmbientBand {
     for (const osc of oscillators) osc.start(time);
     oscillators[0].addEventListener("ended", () => {
       this.lfoDepth.disconnect(filter.frequency);
+      this.tension?.disconnect(filter.frequency);
       filter.disconnect();
       gain.disconnect();
       panner.disconnect();
@@ -503,10 +739,11 @@ export class AmbientBand {
     filter.type = "lowpass";
     filter.Q.value = 2;
     filter.frequency.setValueAtTime(
-      3200 + 1500 * velocity + (this.rage ? 1500 : 0),
+      Math.max(800, 3200 + 1500 * velocity + (this.raging(time) ? 1500 : 0) + this.brightness(time)),
       time,
     );
     filter.frequency.setTargetAtTime(700, time, 0.08);
+    this.tension?.connect(filter.frequency);
 
     const panner = ctx.createStereoPanner();
     panner.pan.value = side === 1 ? -0.35 : 0.35;
@@ -522,6 +759,7 @@ export class AmbientBand {
     for (const osc of oscillators) osc.start(time);
     stopAt(oscillators, time + 0.8);
     oscillators[0].addEventListener("ended", () => {
+      this.tension?.disconnect(filter.frequency);
       filter.disconnect();
       gain.disconnect();
       panner.disconnect();
@@ -556,7 +794,7 @@ export class AmbientBand {
     filter.type = "lowpass";
     filter.Q.value = 1.1;
     filter.frequency.setValueAtTime(
-      1100 + 600 * velocity + (this.rage ? 500 : 0),
+      1100 + 600 * velocity + (this.raging(time) ? 500 : 0),
       time,
     );
     filter.frequency.setTargetAtTime(520 + 260 * velocity, time, 0.07);
@@ -602,11 +840,11 @@ export class AmbientBand {
       case 39:
       case 40:
         this.snare(time, v, destination);
-        if (this.rage) this.tom(time, v * 0.8, destination, 105);
+        if (this.raging(time)) this.tom(time, v * 0.8, destination, 105);
         break;
       case 42:
       case 44:
-        if (this.rage) this.kick(time, v * 0.45, destination, false);
+        if (this.raging(time)) this.kick(time, v * 0.45, destination, false);
         this.chokeHat(trackId, time);
         this.metal(
           time,
@@ -635,6 +873,9 @@ export class AmbientBand {
       case 43:
       case 45:
         this.tom(time, v, destination, 105);
+        break;
+      case HEARTBEAT:
+        this.thump(time, v, destination);
         break;
       case 47:
       case 48:
@@ -712,7 +953,11 @@ export class AmbientBand {
     });
 
     // The pad and bass make room for it — the pulse electronic music breathes with.
-    if (!duck) return;
+    if (duck) this.duckAt(time, v);
+  }
+
+  /** The pad and bass dip under a hit at `time`, deeper the harder it is. */
+  private duckAt(time: number, v: number) {
     for (const ducker of this.ducks.values()) {
       ducker.forget(time - 1);
       ducker.moveTo(1 - (1 - DUCK_DEPTH) * (0.6 + 0.4 * v), time, 0.006);
@@ -720,8 +965,42 @@ export class AmbientBand {
     }
   }
 
+  /** A broadband low thump — a kick's weight without its pitched sine. */
+  private thump(time: number, v: number, destination: AudioNode) {
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 900;
+    filter.Q.value = 0.3;
+    const { gain } = this.hit(time, 0.9 * v, 0.22, destination, 0.002);
+    filter.connect(gain);
+    this.noise(time, 0.3, filter, () => {
+      filter.disconnect();
+      gain.disconnect();
+    });
+  }
+
   /** Clap, body and tail: an electronic snare that still has a pitch. */
   private snare(time: number, v: number, destination: AudioNode) {
+    this.clap(time, v, destination);
+    const body = this.ctx.createOscillator();
+    body.type = "triangle";
+    body.frequency.setValueAtTime(210, time);
+    body.frequency.exponentialRampToValueAtTime(165, time + 0.06);
+    const { gain: bodyGain } = this.hit(
+      time,
+      0.32 * (0.4 + 0.6 * v),
+      0.1,
+      destination,
+      0.001,
+    );
+    body.connect(bodyGain);
+    body.onended = () => bodyGain.disconnect();
+    body.start(time);
+    body.stop(time + 0.2);
+  }
+
+  /** The snare's clap alone: three quick noise bursts and a short tail, no pitch. */
+  private clap(time: number, v: number, destination: AudioNode) {
     const ctx = this.ctx;
     const level = 0.3 * (0.4 + 0.6 * v);
 
@@ -744,22 +1023,6 @@ export class AmbientBand {
       band.disconnect();
       clapGain.disconnect();
     });
-
-    const body = ctx.createOscillator();
-    body.type = "triangle";
-    body.frequency.setValueAtTime(210, time);
-    body.frequency.exponentialRampToValueAtTime(165, time + 0.06);
-    const { gain: bodyGain } = this.hit(
-      time,
-      0.32 * (0.4 + 0.6 * v),
-      0.1,
-      destination,
-      0.001,
-    );
-    body.connect(bodyGain);
-    body.onended = () => bodyGain.disconnect();
-    body.start(time);
-    body.stop(time + 0.2);
   }
 
   private rim(time: number, v: number, destination: AudioNode) {
@@ -835,7 +1098,7 @@ export class AmbientBand {
     filter.frequency.value = 3200;
     const { gain } = this.hit(
       time,
-      0.08 * (0.5 + 0.5 * v) * (this.rage ? 1.6 : 1),
+      0.08 * (0.5 + 0.5 * v) * (this.raging(time) ? 1.6 : 1),
       1.8,
       destination,
       0.03,

@@ -94,6 +94,142 @@
         "slower": "Cambios un {{percent}} % más lentos",
         "same_speed": "Cambios a la misma velocidad"
       }
+    },
+    "changeling": {
+      "name": "El Cambiaformas",
+      "title": "Adopta cada acorde que oye",
+      "threats": {
+        "bites": "Garras",
+        "quake": "Arrebatos",
+        "weak_spots": "Notas guía",
+        "venom": "Disonancia",
+        "regen": "Metamorfosis",
+        "frenzy": "Torbellinos",
+        "web": "Telón"
+      },
+      "arena": {
+        "slam": "Arrebato",
+        "webbed": "Telón — toca de oído",
+        "poisoned": "Disonancia — carga a la mitad",
+        "poisoned_short": "Disonancia",
+        "regenerating": "Cambia de forma — golpéalo",
+        "quake_coming": "Arrebato en un compás — los acordes cambian el doble de rápido",
+        "quake_on": "Arrebato — toca una nota de cada acorde · quedan {{count}}",
+        "quake_on_steady": "Arrebato — un acorde puede escaparse · quedan {{count}}"
+      },
+      "result": {
+        "title": "Los cambios te engulleron"
+      },
+      "lair": {
+        "pitch": "Un combate sin fin y sin nada que leer. En cada fase el cambiaformas adopta una progresión nueva en una tonalidad nueva y se convierte en cada acorde por turno — improvisa encima. Las notas del acorde en el 1 y el 3 y la escala entre medias lo hieren a él; cualquier otra cosa en esos pulsos, o una nota fuera de la tonalidad, te hiere a ti. A ver hasta dónde llegas."
+      },
+      "rules": {
+        "sword": {
+          "body": "En el 1 y el 3, toca una nota del acorde en el que estás — fundamental, tercera, quinta o séptima — y la carga con 4. Entre medias carga cualquier nota de la escala: una nota del acorde 3, el resto 1, hasta dos notas por pulso. El mástil muestra las dos cosas: las notas del acorde grandes, la escala pequeña."
+        },
+        "strike": {
+          "body": "Una espada llena golpea sola — más fuerte cuanto más larga tu racha de notas del acorde, hasta ×2 con {{max}} seguidas."
+        },
+        "combo": {
+          "title": "Toca los cambios en combo",
+          "body": "Entra en un acorde nuevo en el uno — su primera nota a medio pulso del cambio como mucho — o deslízate a él, su primera nota a {{smooth}} semitonos como mucho de la anterior. Cada uno es un truco: encadénalos acorde tras acorde, hasta ×{{comboMax}}. El combo golpea al Cambiaformas cuando la progresión vuelve a empezar o cuando un acorde entra sin truco. Un fallo lo pierde."
+        },
+        "bite": {
+          "title": "Cada acorde necesita una nota",
+          "body": "Toca primero en el 1 o el 3 algo que no sea una nota del acorde, toca una nota fuera de la tonalidad o deja pasar un acorde sin ninguna de sus notas, y te dará un zarpazo. Sin PV, se acaba la partida."
+        },
+        "slam": {
+          "title": "Aguanta el arrebato",
+          "body": "Desde la fase {{slams}} el cambiaformas se arrebata: durante dos compases los acordes cambian el doble de rápido. Toca una nota de cada uno para bloquearlo — un bloqueo carga media espada."
+        },
+        "endless": {
+          "body": "Deja a cero los PV de una fase y el cambiaformas toma otra forma: tonalidad nueva, un acorde más y cambios más rápidos cada vez — al principio tres acordes distintos. De vez en cuando se suman séptimas, un acorde prestado, una dominante secundaria o uno disminuido. Primero mayor y menor, luego los modos y el blues. Cada fase superada te cura {{heal}} PV."
+        },
+        "threats": {
+          "title": "Aprende",
+          "body": "Desde la fase {{weak}} las notas guía — terceras y séptimas, las que dicen qué acorde es — cargan tu espada ×{{weakCharge}}. Desde la fase {{affix}} gana poderes: disonancia, metamorfosis, torbellinos y un telón sobre el tablero."
+        }
+      },
+      "boons": {
+        "armor": {
+          "body": "Los zarpazos quitan un {{armorPercent}} % menos de PV. Se acumula."
+        },
+        "shield": {
+          "body": "Absorbe los próximos {{shieldCharges}} zarpazos."
+        },
+        "thorns": {
+          "body": "Cada zarpazo le cuesta al cambiaformas un {{thornsPercent}} % de los PV de la fase. Se acumula."
+        },
+        "secondWind": {
+          "body": "{{secondWindMisses}} fallos por fase se perdonan: sin zarpazo, la racha y la carga se quedan."
+        },
+        "steadyHand": {
+          "body": "Un arrebato sigue bloqueado aunque se escape {{steadyHandQuakeMisses}} acorde."
+        },
+        "antidote": {
+          "name": "Oído absoluto",
+          "body": "La disonancia no te afecta."
+        },
+        "clearSight": {
+          "body": "El telón dura la mitad."
+        },
+        "precision": {
+          "body": "Una nota justo en el cambio carga {{precisionPoints}} en vez de 4."
+        },
+        "momentum": {
+          "body": "Tu racha llega a ×2 con {{momentumStreak}} seguidas en vez de {{maxStreak}}."
+        },
+        "exploit": {
+          "body": "Las notas guía cargan tu espada ×{{exploitCharge}}."
+        }
+      },
+      "preview": {
+        "armor": "Zarpazo {{from}} → {{to}} PV",
+        "thorns": "Por zarpazo {{from}} → {{to}} de daño",
+        "steadyHand": "Acordes que pueden escaparse {{from}} → {{to}}",
+        "exploit": "Notas guía {{from}} → {{to}}"
+      },
+      "briefing": {
+        "faster": "Los acordes cambian un {{percent}} % más rápido",
+        "slower": "Los acordes cambian un {{percent}} % más lento",
+        "same_speed": "Los acordes cambian a la misma velocidad",
+        "quakes": "Arrebatos"
+      },
+      "guide": {
+        "open": "Cómo se juega",
+        "progress": "Paso {{step}} de {{count}}",
+        "back": "Atrás",
+        "next": "Siguiente",
+        "lane": {
+          "title": "Siempre tres acordes",
+          "body": "Arriba siempre ves tres acordes: el que suena ahora, el siguiente y el que viene después. Una línea recorre la tarjeta Ahora — cuando llega al final, la siguiente tarjeta ocupa su lugar y empieza ese acorde. La primera fase tiene tres acordes; cada fase siguiente suma uno."
+        },
+        "accents": {
+          "title": "En el 1 y el 3: una nota del acorde",
+          "body": "Los acentos caen en el 1 y el 3 de cada compás — las marcas más altas. La primera nota que toques ahí tiene que ser del acorde: vale 4 y la marca se pone verde. Cualquier otra cosa es un fallo — la marca se pone naranja y el cambiaformas te araña. En el 2 y el 4, y en cualquier punto intermedio, toca cualquier nota de la escala: cada una carga un poco tu espada.",
+          "chord": "nota del acorde",
+          "scale": "escala"
+        },
+        "neck": {
+          "title": "Dónde tocar",
+          "body": "El mástil ilumina una posición y sigue a tu mano. Los puntos grandes son las notas del acorde — las del 1 y el 3. Los pequeños son el resto de la escala, para entre medias. Cuando cambia el acorde, cambian los puntos — sobre un acorde de fuera de la tonalidad, la escala se adapta a él."
+        },
+        "combo": {
+          "title": "Trucos y combo",
+          "body": "Entra en un acorde nuevo justo en su cambio (En el uno) o desde una nota a dos semitonos como mucho (Suave). Los trucos se encadenan en un combo que golpea al cambiaformas cuando la progresión vuelve a empezar. Un fallo y el combo entero se pierde.",
+          "strung": "Combo en marcha",
+          "banked": "Cobrado"
+        },
+        "watch": {
+          "title": "Qué duele",
+          "body": "Cada una de estas cosas te araña y te quita el combo:",
+          "outside": "Una nota fuera de la tonalidad.",
+          "strong": "Como primera nota en el 1 o el 3, algo que no sea una nota del acorde.",
+          "silent": "Un acorde que pasa sin ninguna de sus notas.",
+          "rush": "Los acordes naranjas son una ráfaga: durante dos compases cambian el doble de rápido — toca una nota de cada uno.",
+          "headphones": "Toca con auriculares: el micro tiene que oír tu guitarra, no el acompañamiento."
+        }
+      }
     }
   },
   "arena": {
@@ -120,7 +256,11 @@
     "quake_on": "Terremoto — cada acorde limpio · quedan {{count}}",
     "quake_on_steady": "Terremoto — se permite 1 fallo · quedan {{count}}",
     "weak_change": "Ahora el cambio débil: {{change}} — espada ×{{multiplier}}",
-    "weak_change_label": "Cambio débil:"
+    "weak_change_label": "Cambio débil:",
+    "gate": "Puerta",
+    "gate_intro": "Una puerta — más PV, golpes más duros. Alcánzala y la próxima vez podrás empezar aquí.",
+    "sounds_on": "Activar los sonidos del combate",
+    "sounds_off": "Desactivar los sonidos del combate"
   },
   "threats": {
     "bites": "Mordiscos",
@@ -139,6 +279,8 @@
     "phase": "Fase alcanzada",
     "damage": "Daño infligido",
     "best_streak": "Mejor racha",
+    "best_combo": "Mejor combo",
+    "tricks": "En el uno · suave",
     "accuracy": "Precisión",
     "retry": "Luchar de nuevo",
     "finish": "Terminar",
@@ -151,14 +293,26 @@
     "ahead_other": "{{count}} fases más que tu récord",
     "behind_one": "A {{count}} fase de tu récord",
     "behind_other": "A {{count}} fases de tu récord",
-    "level_with": "Igualas tu récord"
+    "level_with": "Igualas tu récord",
+    "score": "Puntuación",
+    "skipped_one": "{{count}} fase saltada",
+    "skipped_other": "{{count}} fases saltadas",
+    "skipped_lost": "Supera la fase {{phase}} para sumar las fases saltadas."
   },
   "lair": {
     "pitch": "Un combate sin fin. En cada fase la araña muda a una forma más rápida con un ejercicio nuevo: a ver hasta dónde llegas.",
     "best_phase": "Mejor fase",
-    "best_damage": "Más daño",
     "runs": "Partidas",
-    "fight": "Luchar"
+    "fight": "Luchar",
+    "difficulty": "Dificultad",
+    "difficulty_effect": "Golpes {{damage}} · Tempo {{tempo}} · Puntuación {{reward}}",
+    "start_at": "Empezar en",
+    "phase_option": "Fase {{phase}}",
+    "next_savepoint": "La fase {{phase}} se abre cuando la alcances",
+    "skip_note_one": "Te saltas {{count}} fase — supera la fase {{phase}} para sumar sus PV a tu puntuación.",
+    "skip_note_other": "Te saltas {{count}} fases — supera la fase {{phase}} para sumar sus PV a tu puntuación.",
+    "best_score": "Mejor puntuación",
+    "not_fought": "Aún sin combatir"
   },
   "rules": {
     "title": "Cómo funciona el combate",
@@ -189,6 +343,10 @@
     "threats": {
       "title": "Aprende",
       "body": "Desde la fase {{weak}} muestra puntos débiles: tu espada carga ×{{weakCharge}} mientras están abiertos. Desde la fase {{affix}} gana poderes: veneno, regeneración, frenesí y redes sobre la tablatura, más a la vez cuanto más avances."
+    },
+    "gates": {
+      "title": "Puertas y puntos de guardado",
+      "body": "Cada {{gate}} fases el jefe guarda una puerta: {{gateHp}} % más PV y golpes más duros. Alcanza una puerta y tu siguiente partida puede empezar ahí — las fases que te saltes cuentan para tu puntuación cuando superes aquella en la que empiezas."
     }
   },
   "draft": {
@@ -294,7 +452,9 @@
     "quakes": "Terremotos",
     "quakes_per_pass_one": "{{count}} por vuelta",
     "quakes_per_pass_other": "{{count}} por vuelta",
-    "shapes": "Posiciones"
+    "shapes": "Posiciones",
+    "key": "Tonalidad",
+    "tones": "Notas de los acordes"
   },
   "subdivision": {
     "quarters": "negras",
@@ -331,5 +491,66 @@
     "power": "power chords",
     "barre": "acordes con cejilla",
     "seventh": "acordes de séptima"
+  },
+  "changes_rhythm": {
+    "bar": "un acorde por compás",
+    "half_bar": "dos acordes por compás"
+  },
+  "key_mode": {
+    "ionian": "mayor",
+    "aeolian": "menor",
+    "dorian": "dórico",
+    "mixolydian": "mixolidio",
+    "harmonicMinor": "menor armónica",
+    "blues": "blues"
+  },
+  "harmony_family": {
+    "triads": "tríadas",
+    "sevenths": "acordes de séptima"
+  },
+  "board": {
+    "now": "Ahora",
+    "first_chord": "Primer acorde",
+    "first_in_one": "Primer acorde en {{count}} pulso",
+    "first_in_other": "Primer acorde en {{count}} pulsos",
+    "then": "Después",
+    "next": "Siguiente",
+    "next_in_one": "Siguiente en {{count}} pulso",
+    "next_in_other": "Siguiente en {{count}} pulsos",
+    "passing": "de paso",
+    "outside": "fuera de la tonalidad",
+    "root": "fundamental",
+    "third": "tercera",
+    "fifth": "quinta",
+    "seventh": "séptima",
+    "fretboard": "Dónde están las notas de {{chord}} en el mástil",
+    "ahead": "Próximos acordes",
+    "heard": "Notas oídas",
+    "beats_left_one": "Queda {{count}} pulso",
+    "beats_left_other": "Quedan {{count}} pulsos",
+    "landed": "Acertado",
+    "legend_chord": "{{chord}} — en el 1 y el 3",
+    "legend_scale": "{{scale}} — entre medias",
+    "scale_for": "escala sobre {{chord}}",
+    "miss": {
+      "outside": "{{note}}: fuera de la tonalidad",
+      "outside_chord": "{{note}}: fuera de la escala sobre {{chord}}",
+      "strong": "En el {{beat}}: {{note}} no es nota de {{chord}}",
+      "strong_veiled": "En el {{beat}}: {{note}} no es nota del acorde",
+      "silent": "{{chord}} pasó sin ninguna de sus notas",
+      "silent_veiled": "Un acorde pasó sin ninguna de sus notas"
+    }
+  },
+  "combo": {
+    "onTheOne": "En el uno",
+    "smooth": "Suave",
+    "banked": "Combo ×{{multiplier}}",
+    "lost": "Combo perdido"
+  },
+  "difficulty": {
+    "easy": "Fácil",
+    "normal": "Normal",
+    "hard": "Difícil",
+    "brutal": "Brutal"
   }
 }

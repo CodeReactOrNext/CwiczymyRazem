@@ -2,6 +2,7 @@ import type { BoonId } from "./boons";
 import { BOON, stacksOf } from "./boons";
 import type { BossFightState } from "./bossEngine";
 import {
+  biteDamageFor,
   chargeMaxFor,
   momentumStreakFor,
   multiplierStreakFor,
@@ -29,11 +30,8 @@ export const boonPreview = (fight: BossFightState, id: BoonId): BoonPreview | nu
   const n = stacksOf(fight.boons, id);
   const plus = { ...fight.boons, [id]: n + 1 };
   switch (id) {
-    case "armor": {
-      const bite = fight.plan.rules.biteDamage;
-      const cut = (stacks: number) => Math.max(1, Math.round(bite * (1 - BOON.armorCut) ** stacks));
-      return { from: cut(n), to: cut(n + 1) };
-    }
+    case "armor":
+      return { from: biteDamageFor(fight, n), to: biteDamageFor(fight, n + 1) };
     case "shield":
       return { from: fight.shieldCharges, to: fight.shieldCharges + BOON.shieldCharges };
     case "vitality":
@@ -49,8 +47,8 @@ export const boonPreview = (fight: BossFightState, id: BoonId): BoonPreview | nu
     case "secondWind":
       return { from: fight.forgivenLeft, to: fight.forgivenLeft + BOON.secondWindMisses };
     case "steadyHand":
-      // The colossus's quakes are blocked by missing no more than so many chords.
-      return fight.plan.kind === "chords"
+      // The colossus's quakes and the changeling's rushes are blocked by missing no more than so many chords.
+      return fight.plan.kind !== "spider"
         ? { from: quakeMissesAllowed(fight), to: BOON.steadyHandQuakeMisses }
         : { from: parryStreak(fight), to: BOON.steadyHandStreak };
     case "blade": {
