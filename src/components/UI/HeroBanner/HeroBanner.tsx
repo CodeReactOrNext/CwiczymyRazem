@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
@@ -20,6 +21,8 @@ interface HeroBannerProps {
   leftContent?: ReactNode;
   /** Replaces the default gap above `leftContent` — for a banner that needs to stay short. */
   leftContentClassName?: string;
+  /** Added to the right column, e.g. `hidden md:flex` when phones show that content elsewhere. */
+  rightContentClassName?: string;
   /** Spans the full banner width, below both columns. */
   footerContent?: ReactNode;
   children?: ReactNode;
@@ -42,6 +45,7 @@ export const HeroBanner = ({
   className = "",
   leftContent,
   leftContentClassName,
+  rightContentClassName,
   footerContent,
   children,
   compact = false,
@@ -55,7 +59,9 @@ export const HeroBanner = ({
       className={`relative flex rounded-none md:rounded-xl items-start border-none overflow-hidden md:overflow-visible ${!compact && hasFigures ? 'min-h-[220px] md:min-h-[160px] lg:min-h-[180px]' : ''} ${className}`}
     >
       {/* Backgrounds Container (Clipped) */}
-      <div className="absolute inset-0 rounded-none md:rounded-xl overflow-hidden pointer-events-none z-0">
+      {/* rounded-[inherit]: a full-bleed caller passes !rounded-none, and a
+          radius of its own here left the orange glow with a rounded corner. */}
+      <div className="absolute inset-0 rounded-[inherit] overflow-hidden pointer-events-none z-0">
         {/* Base background — matches page bg so it bleeds in */}
         <div className="absolute inset-0 bg-background" />
 
@@ -146,18 +152,15 @@ export const HeroBanner = ({
         </div>
 
         {(buttonText || rightContent || children) && (
-          <div className="flex flex-col items-start md:items-end shrink-0 z-10 w-auto gap-4 md:gap-0">
+          <div className={`flex flex-col items-start md:items-end shrink-0 z-10 w-auto gap-4 md:gap-0 ${rightContentClassName ?? ""}`}>
             {rightContent && (
               <div className="pt-1">{rightContent}</div>
             )}
             {!rightContent && buttonText && (
-              <button
-                onClick={onClick}
-                className="group/btn rounded-md bg-white text-zinc-950 px-5 py-2.5 text-sm font-medium shadow-lg transition-all duration-base flex items-center gap-2 active:scale-95 shrink-0"
-              >
+              <Button onClick={onClick} className="group/btn h-10 shrink-0 px-5">
                 {buttonText}
-                <ArrowRight className="h-4 w-4 transition-transform duration-base group-hover/btn:translate-x-1" />
-              </button>
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-base group-hover/btn:translate-x-1" />
+              </Button>
             )}
             {children && <div className="w-full md:w-auto md:mb-1">{children}</div>}
           </div>

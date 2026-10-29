@@ -185,7 +185,7 @@ const LevelCard = ({
           })}
           className='h-2.5 overflow-hidden rounded-full bg-zinc-800/60'>
           <div
-            className='h-full rounded-full bg-cyan-400 transition-[width] duration-slow'
+            className='bar-shine h-full rounded-full bg-cyan-400 transition-[width] duration-slow'
             style={{ width: `${percent}%` }}
           />
         </div>

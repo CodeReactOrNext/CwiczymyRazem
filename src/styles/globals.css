@@ -391,3 +391,34 @@ a {
   z-index: 0;
   font-family: Georgia, serif;
 }
+
+/* Cartoon shine on a progress fill: a short lighter strip across the upper part
+   of the bar, kept clear of the rounded ends. Flat — no glow, no gradient.
+   Needs a fill about 8px tall or more to read; on a thinner bar it is a smudge.
+   --shine-inset pushes the strip further in on a thick bar with wide caps.
+   :where() keeps position: relative at zero specificity, so a fill that is
+   already `absolute` stays absolute. */
+:where(.bar-shine) {
+  position: relative;
+}
+
+.bar-shine::after {
+  content: "";
+  position: absolute;
+  left: var(--shine-inset, 4px);
+  right: var(--shine-inset, 4px);
+  top: 22%;
+  height: max(1px, 28%);
+  border-radius: 9999px;
+  background-color: rgb(255 255 255 / 0.35);
+  pointer-events: none;
+}
+
+/* Whole pixels where round() exists: 28% of a 10px bar is 2.8px, which smears
+   across three rows instead of sitting as one crisp strip. */
+@supports (top: round(1%, 1px)) {
+  .bar-shine::after {
+    top: round(22%, 1px);
+    height: max(1px, round(28%, 1px));
+  }
+}

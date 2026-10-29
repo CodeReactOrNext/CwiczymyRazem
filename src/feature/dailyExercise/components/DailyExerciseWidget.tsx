@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
@@ -141,7 +142,7 @@ export const DailyExerciseWidget = () => {
           </span>
           <Link
             href={`/practice/exercise/${exercise.id}`}
-            className='inline-flex h-11 items-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900'>
+            className={cn(buttonVariants(), "h-11 px-5")}>
             <Play size={16} className='fill-current' />
             {me ? t("daily_exercise.beat_score") : t("daily_exercise.play")}
           </Link>

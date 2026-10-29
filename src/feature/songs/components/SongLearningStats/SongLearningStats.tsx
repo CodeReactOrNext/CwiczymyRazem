@@ -59,9 +59,9 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
          </div>
          <div className="mt-auto space-y-2.5">
              <h3 className="text-3xl font-black text-white">{learnedPercentage.toFixed(0)}%</h3>
-             <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-900/50">
+             <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-900/50">
                 <div
-                    className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.3)]"
+                    className="bar-shine h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400"
                     style={{ width: `${learnedPercentage}%` }}
                 />
              </div>

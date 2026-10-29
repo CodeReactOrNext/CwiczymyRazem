@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { HeroBanner } from "components/UI/HeroBanner";
@@ -123,6 +124,25 @@ const ProfileLandingLayout = ({
   // No special guitar equipped falls back to the brand cyan, not to a rarity.
   const glowColor = equippedRarity ? getRarityColor(equippedRarity) : "#0891b2";
 
+  // Song tier + level ring, rendered twice: beside Practice on phones and in
+  // the right column from md up (CSS picks one, so nothing flashes on load).
+  const renderProgress = (ringSize: number | undefined) => (
+    <div className='flex items-center gap-4'>
+      <SongTierBadge
+        learnedSongs={songs?.learned}
+        isLoading={isSongsLoading}
+        isError={isSongsError}
+        isOwnProfile
+        onClick={() => router.push("/songs?view=board")}
+      />
+      <LevelProgressCircle
+        lvl={userStats?.lvl ?? 1}
+        points={userStats?.points ?? 0}
+        size={ringSize}
+      />
+    </div>
+  );
+
   return (
     <div className='flex flex-col rounded-xl border-none bg-second-600 shadow-sm'>
       {/* A new player's first job is the Getting Started card — the hero
@@ -155,10 +175,14 @@ const ProfileLandingLayout = ({
                   }}
                 />
 
-                {/* Guitar with CSS fade on the right side */}
+                {/* Guitar with CSS fade on the right side. On a phone it lies
+                    across the banner at the same angle as on desktop, body
+                    bottom-left and neck rising behind the progress. Stood
+                    upright (-90°) it needed the old tall banner; in the short
+                    one only the neck was left inside. */}
                 <img
                   src={getRankBadgeSrc(imgPath, "large")}
-                  className='pointer-events-none absolute left-[0%] top-[-15%] h-[300px] max-w-none -rotate-[90deg] opacity-[0.75] md:left-[8%] md:top-[-35%] md:h-[480px] md:-rotate-[15deg]'
+                  className='pointer-events-none absolute left-[-8%] top-[-12%] h-[250px] max-w-none -rotate-[15deg] opacity-[0.75] md:left-[8%] md:top-[-35%] md:h-[480px]'
                   style={{
                     filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
                     WebkitMaskImage:
@@ -171,6 +195,10 @@ const ProfileLandingLayout = ({
               </div>
             ) : null
           }
+          // Phones get the progress beside the Practice button (leftContent);
+          // as its own column it stacked under the banner text and doubled the
+          // banner's height.
+          rightContentClassName='hidden md:flex'
           rightContent={
             <div
               className={cn(
@@ -180,39 +208,28 @@ const ProfileLandingLayout = ({
               <span className='hidden text-xs font-semibold text-zinc-400 md:block'>
                 {t("landing.your_progress", "Your progress")}
               </span>
-              <div className='flex items-center gap-4'>
-                {/* Song tier badge */}
-                <SongTierBadge
-                  learnedSongs={songs?.learned}
-                  isLoading={isSongsLoading}
-                  isError={isSongsError}
-                  isOwnProfile
-                  onClick={() => router.push("/songs?view=board")}
-                />
-
-                {/* Level ring */}
-                <LevelProgressCircle
-                  lvl={userStats?.lvl ?? 1}
-                  points={userStats?.points ?? 0}
-                  size={isSpecialGuitar ? undefined : 80}
-                />
-              </div>
+              {renderProgress(isSpecialGuitar ? undefined : 80)}
             </div>
           }
           leftContent={
             <div className='flex flex-col gap-3'>
-              <div className='flex flex-row flex-wrap items-center gap-3'>
-                <button
+              <div className='flex flex-row flex-wrap items-center justify-between gap-3'>
+                <Button
                   onClick={() => router.push("/timer")}
-                  className='group/btn flex min-h-11 items-center gap-2 rounded-[8px] bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-all duration-base active:scale-95'>
+                  className='group/btn h-11 px-5'>
                   Practice
-                  <ArrowRight className='h-4 w-4 transition-transform duration-base group-hover/btn:translate-x-1' />
-                </button>
+                  <ArrowRight className='ml-2 h-4 w-4 transition-transform duration-base group-hover/btn:translate-x-1' />
+                </Button>
+                <div className='select-none rounded-xl bg-zinc-900/50 p-2 md:hidden'>
+                  {renderProgress(64)}
+                </div>
               </div>
+              {/* Desktop only: on a phone Practice already resumes the
+                  routine, and the extra row cost a third of the screen. */}
               {lastSession && (
                 <button
                   onClick={() => router.push(lastSession.href)}
-                  className='group/last flex min-h-11 w-fit max-w-full items-center gap-3 rounded-[8px] bg-zinc-800/70 px-4 py-2.5 text-left transition-colors duration-base hover:bg-zinc-700/70 active:scale-95'>
+                  className='group/last hidden min-h-11 w-fit max-w-full items-center gap-3 rounded-[8px] bg-zinc-800/70 px-4 py-2.5 text-left transition-colors duration-base hover:bg-zinc-700/70 active:scale-95 md:flex'>
                   <History className='h-5 w-5 shrink-0 text-cyan-400' />
                   <span className='flex min-w-0 flex-col'>
                     <span className='text-xs text-zinc-400'>

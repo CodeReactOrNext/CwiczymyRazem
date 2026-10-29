@@ -1,4 +1,6 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { Skeleton } from "assets/components/ui/skeleton";
+import { cn } from "assets/lib/utils";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { FundingStatusBlock } from "feature/roadmap/components/FundingStatusBlock";
 import { ROADMAP_RAISED_OFFSET } from "feature/roadmap/data/roadmap.data";
@@ -68,7 +70,12 @@ export const SupportBanner = () => {
           />
         )}
 
-        <span className='flex w-full shrink-0 items-center justify-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-900 transition-background group-hover:bg-white sm:w-auto sm:text-sm'>
+        <span
+          className={cn(
+            buttonVariants(),
+            // The whole banner is the link, so hovering it lights the button too.
+            "w-full shrink-0 gap-1.5 text-xs group-hover:bg-primary/90 sm:w-auto sm:text-sm",
+          )}>
           <span>{t("support.cta")}</span>
           <ArrowRight
             size={16}

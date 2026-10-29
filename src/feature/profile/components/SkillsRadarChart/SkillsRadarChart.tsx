@@ -119,11 +119,10 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
               {/* Enhanced Progress Bar */}
               <div className='relative h-2 w-full overflow-hidden rounded-full bg-zinc-800/50 shadow-inner'>
                 <div
-                  className='h-full rounded-full shadow-lg transition-all duration-1000 ease-out'
+                  className='bar-shine h-full rounded-full transition-all duration-1000 ease-out'
                   style={{
                     width: `${skill.percent}%`,
                     background: `linear-gradient(90deg, ${skill.color}, ${skill.color}dd)`,
-                    boxShadow: `0 0 10px ${skill.color}60, inset 0 1px 0 rgba(255,255,255,0.2)`,
                   }}></div>
               </div>
             </div>

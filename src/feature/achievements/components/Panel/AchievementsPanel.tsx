@@ -80,7 +80,7 @@ export const AchievementsPanel = ({
         </div>
         <div className='h-2 overflow-hidden rounded-full bg-zinc-800'>
           <div
-            className='h-full rounded-full bg-cyan-500'
+            className='bar-shine h-full rounded-full bg-cyan-500'
             style={{ width: `${earnedPercent}%` }}
           />
         </div>

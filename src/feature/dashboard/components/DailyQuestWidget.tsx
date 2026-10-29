@@ -175,9 +175,9 @@ export const DailyQuestWidget = () => {
                     {task.progress}/{task.target}
                   </span>
                 </div>
-                <div className='mt-2 h-1 overflow-hidden rounded-full bg-zinc-900/80'>
+                <div className='mt-2 h-2.5 overflow-hidden rounded-full bg-zinc-900/80'>
                   <div
-                    className='h-full rounded-full bg-cyan-400 transition-[width] duration-slow'
+                    className='bar-shine h-full rounded-full bg-cyan-400 transition-[width] duration-slow'
                     style={{ width: `${progressPercent(task)}%` }}
                   />
                 </div>

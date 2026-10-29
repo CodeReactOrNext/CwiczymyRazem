@@ -333,7 +333,7 @@ const HealthBar = ({
       />
       <div
         className={cn(
-          "absolute inset-y-0 rounded-full transition-[width,background-color] duration-fast",
+          "bar-shine absolute inset-y-0 rounded-full transition-[width,background-color] duration-fast",
           anchor,
           fillClass,
         )}
@@ -366,7 +366,7 @@ const SwordMeter = ({ fight, strikeTick, t }: { fight: BossFightState; strikeTic
         aria-valuenow={Math.min(fight.charge, fight.chargeMax)}>
         <div
           className={cn(
-            "absolute inset-y-0 left-0 rounded-full transition-[width,background-color] duration-fast",
+            "bar-shine absolute inset-y-0 left-0 rounded-full transition-[width,background-color] duration-fast",
             poisoned ? "bg-purple-400" : ready ? "bg-zinc-50 motion-safe:animate-pulse" : "bg-zinc-400",
           )}
           style={{ width: `${fill * 100}%` }}

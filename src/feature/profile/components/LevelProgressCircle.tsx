@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useId } from "react";
 import { getPointsToLvlUp } from "utils/gameLogic";
 
 interface LevelProgressCircleProps {
@@ -31,6 +32,12 @@ export const LevelProgressCircle = ({
   const arcOffset = arcC * (1 - xpPercent / 100);
 
   const finalSize = size || 100;
+  // Per instance: the dashboard renders one ring for phones and one for
+  // desktop, and a shared id would point both at whichever defs come first —
+  // gradients inside a display:none copy do not paint.
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const gradId = `lvlArcGrad-${uid}`;
+  const glowId = `lvlGlow-${uid}`;
 
   return (
     <div className={`relative flex flex-col items-center gap-1 ${className}`}>
@@ -41,11 +48,11 @@ export const LevelProgressCircle = ({
           viewBox="0 0 100 100"
           className={cn("relative shrink-0", !size && "md:w-[120px] md:h-[120px]")}>
           <defs>
-            <linearGradient id="lvlArcGradDash" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#a5f3fc" />
               <stop offset="100%" stopColor="#0891b2" />
             </linearGradient>
-            <filter id="lvlGlowDash" x="-30%" y="-30%" width="160%" height="160%">
+            <filter id={glowId} x="-30%" y="-30%" width="160%" height="160%">
               <feGaussianBlur stdDeviation="2.5" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
@@ -60,13 +67,13 @@ export const LevelProgressCircle = ({
             cy="50"
             r={arcR}
             fill="none"
-            stroke="url(#lvlArcGradDash)"
+            stroke={`url(#${gradId})`}
             strokeWidth="6"
             strokeLinecap="round"
             strokeDasharray={arcC}
             strokeDashoffset={arcOffset}
             transform="rotate(-90 50 50)"
-            filter="url(#lvlGlowDash)"
+            filter={`url(#${glowId})`}
           />
           <text
             x="50"

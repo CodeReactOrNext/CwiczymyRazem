@@ -144,9 +144,9 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                     )}
                   </div>
                   <div className="mt-2.5 flex items-center gap-2">
-                    <div className="h-1 flex-1 overflow-hidden rounded-full bg-zinc-800/80">
+                    <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-zinc-800/80">
                       <div
-                        className={cn("h-full rounded-full transition-[width] duration-slow ease-out", isComplete ? "bg-emerald-500" : cfg.bar)}
+                        className={cn("bar-shine h-full rounded-full transition-[width] duration-slow ease-out", isComplete ? "bg-emerald-500" : cfg.bar)}
                         style={{ width: `${pct}%` }}
                       />
                     </div>
