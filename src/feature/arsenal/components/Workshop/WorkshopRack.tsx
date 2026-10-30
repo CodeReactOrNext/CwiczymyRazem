@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
@@ -71,7 +72,7 @@ export const WorkshopRack = ({
           <button
             key={f.id}
             onClick={() => setFilter(f.id)}
-            className={cn(
+            className={cn(PRESSABLE, "border-b-black/25", 
               "flex flex-1 items-center justify-center gap-1.5 rounded px-2 py-1.5 text-xs font-semibold transition-colors",
               "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
               filter === f.id

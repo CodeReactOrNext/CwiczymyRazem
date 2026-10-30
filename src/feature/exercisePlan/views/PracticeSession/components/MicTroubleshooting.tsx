@@ -1,4 +1,4 @@
-import { Button } from "assets/components/ui/button";
+import { Button, PRESSABLE_KEY } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -187,15 +187,17 @@ export const MicTroubleshooting = ({
   return (
     <>
       {compact ? (
-        <RippleButton
+        <button
+          type='button'
           onClick={() => setIsOpen(true)}
           title={t("mic_help.title")}
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 transition-all hover:text-white active:scale-90",
+            PRESSABLE_KEY,
+            "flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 transition-colors hover:text-white",
             className,
           )}>
           <Bug className='h-3 w-3' />
-        </RippleButton>
+        </button>
       ) : (
         <RippleButton
           onClick={() => setIsOpen(true)}

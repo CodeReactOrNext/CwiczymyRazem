@@ -1,3 +1,4 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -5,7 +6,6 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
-import { RippleButton } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, ChevronDown, Snail } from "lucide-react";
 
@@ -69,10 +69,12 @@ export function SpeedDropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <RippleButton
+        <button
+          type='button'
           title={title}
           className={cn(
-            "flex items-center rounded-lg outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50 active:scale-95",
+            PRESSABLE_KEY,
+            "flex items-center rounded-lg outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
             h,
             compact ? "gap-1.5 px-2" : "gap-2 px-3",
             isSlowed
@@ -120,7 +122,7 @@ export function SpeedDropdown({
               compact ? "h-3 w-3" : "h-3.5 w-3.5",
             )}
           />
-        </RippleButton>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align='center'

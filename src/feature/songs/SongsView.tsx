@@ -12,7 +12,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove,sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { Button } from "assets/components/ui/button";
+import { Button, PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { Ripple } from "components/Ripple/Ripple";
@@ -654,9 +654,10 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                             }
                           }}
                           className={cn(
-                            "relative flex h-11 w-11 items-center justify-center rounded-lg font-bold transition-all active:scale-90",
+                            PRESSABLE,
+                            "relative flex h-11 w-11 items-center justify-center rounded-lg border-b-black/30 font-bold transition-colors",
                             isActive
-                              ? "shadow-lg shadow-black/20"
+                              ? ""
                               : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white"
                           )}
                           style={{
@@ -695,10 +696,10 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
 
                     <div className="flex items-center gap-2">
                       <Button
-                        variant="ghost"
+                        variant="subtle"
                         onClick={() => setIsFilterSheetOpen(true)}
                         className={cn(
-                          "relative h-12 flex-1 bg-zinc-900/60 px-6 font-bold text-zinc-300 hover:bg-zinc-800 md:flex-initial transition-all active:scale-95",
+                          "relative h-12 flex-1 bg-zinc-900/60 px-6 font-bold text-zinc-300 hover:bg-zinc-800 md:flex-initial",
                           hasFilters && "bg-cyan-500/5 text-cyan-400"
                         )}
                       >

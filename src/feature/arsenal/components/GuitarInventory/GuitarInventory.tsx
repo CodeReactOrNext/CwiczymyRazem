@@ -1,3 +1,5 @@
+import { PRESSABLE } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import {
   GUITAR_DEFINITIONS,
   GUITARS_BY_ID,
@@ -249,7 +251,7 @@ export const GuitarInventory = ({
               <button
                 onClick={() => setIsBulkSellOpen(true)}
                 disabled={isSellingBulk || isScrappingBulk}
-                className='flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20'
+                className={cn(PRESSABLE, "flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20 border-b-black/30")}
                 title={t("stash.dupes_guitars_hint")}>
                 <Layers size={14} />
                 {t("collection.clear_dupes", { count: duplicates.ids.length })}

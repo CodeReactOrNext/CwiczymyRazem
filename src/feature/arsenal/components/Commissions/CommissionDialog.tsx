@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -185,7 +186,7 @@ export const CommissionDialog = ({
         {delivered ? (
           <button
             onClick={close}
-            className='rounded-lg bg-zinc-100 px-5 py-3.5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-white'>
+            className={cn(PRESSABLE, "rounded-lg bg-zinc-100 px-5 py-3.5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-white border-b-black/25")}>
             {t("mods.done")}
           </button>
         ) : (
@@ -193,7 +194,7 @@ export const CommissionDialog = ({
             <button
               onClick={close}
               disabled={commission.isPending}
-              className='rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44'>
+              className={cn(PRESSABLE, "rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44 border-b-black/30")}>
               {t("common.cancel")}
             </button>
             <button

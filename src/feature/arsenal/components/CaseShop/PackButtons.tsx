@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { CASE_PACK_SIZES } from "feature/arsenal/data/caseDefinitions";
 import { useTranslation } from "hooks/useTranslation";
@@ -38,7 +39,7 @@ export const PackButtons = ({
             onClick={() => onOpen(size)}
             disabled={!canAfford || isOpening}
             aria-label={t("cases.open_pack", { count: size })}
-            className={cn(
+            className={cn(PRESSABLE, "border-b-black/30", 
               "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
               canAfford
                 ? "bg-arsenal-bg text-zinc-200 hover:bg-arsenal-card"

@@ -67,6 +67,7 @@ const PodiumTile = ({
       </span>
       <span className='block text-xs tabular-nums text-zinc-400'>
         {formatScore(entry.score)} · {entry.accuracy}%
+        {entry.bpm ? ` · ${entry.bpm} BPM` : null}
       </span>
     </span>
   </li>

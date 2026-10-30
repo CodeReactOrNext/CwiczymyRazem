@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { useTranslation } from "hooks/useTranslation";
@@ -216,15 +217,14 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
         />
 
         <div className="relative">
-          <div className="mb-6 flex w-fit items-center gap-2 rounded-lg bg-zinc-900/50 p-1 px-1.5 backdrop-blur-md">
-            <button
-              onClick={onBack}
-              className="group flex items-center gap-1.5 rounded px-2.5 py-1 text-[10px] font-semibold text-zinc-400 transition-background hover:bg-white/5 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <ChevronLeft size={12} strokeWidth={3} className="transition-transform group-hover:-translate-x-0.5" />
-              {t("path.modules")}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onBack}
+            className={cn(buttonVariants({ variant: "subtle", size: "sm" }), "group mb-6 gap-1.5 text-zinc-400")}
+          >
+            <ChevronLeft size={12} strokeWidth={3} className="transition-transform group-hover:-translate-x-0.5" />
+            {t("path.modules")}
+          </button>
 
           <div>
             <h1 className="font-display text-3xl font-black tracking-tight text-zinc-100 md:text-4xl">

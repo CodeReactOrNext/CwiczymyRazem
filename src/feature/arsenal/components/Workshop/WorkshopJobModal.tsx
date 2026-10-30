@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -328,14 +329,14 @@ export const WorkshopJobModal = ({
             <div className='flex flex-col gap-3 sm:flex-row-reverse'>
               <button
                 onClick={close}
-                className='rounded-lg bg-zinc-100 px-5 py-3.5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-white sm:flex-1'>
+                className={cn(PRESSABLE, "rounded-lg bg-zinc-100 px-5 py-3.5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-white sm:flex-1 border-b-black/25")}>
                 {t("mods.done")}
               </button>
               {nextJobs.map((next) => (
                 <button
                   key={next.job}
                   onClick={() => goTo(next.job)}
-                  className='rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-zinc-700 hover:text-white sm:flex-1'>
+                  className={cn(PRESSABLE, "rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-zinc-700 hover:text-white sm:flex-1 border-b-black/30")}>
                   {next.label}
                 </button>
               ))}
@@ -360,13 +361,13 @@ export const WorkshopJobModal = ({
               <button
                 onClick={close}
                 disabled={isPending}
-                className='rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44'>
+                className={cn(PRESSABLE, "rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44 border-b-black/30")}>
                 {t("common.cancel")}
               </button>
               <button
                 onClick={runRepair}
                 disabled={!repairQuote.canRepair || isPending}
-                className={cn(
+                className={cn(PRESSABLE, "border-b-black/30", 
                   "flex flex-1 items-center justify-center gap-2.5 rounded-lg px-5 py-3.5 text-sm font-bold transition-colors",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400",
                   "disabled:pointer-events-none disabled:opacity-40",
@@ -459,13 +460,13 @@ export const WorkshopJobModal = ({
               <button
                 onClick={close}
                 disabled={isPending}
-                className='rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44'>
+                className={cn(PRESSABLE, "rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44 border-b-black/30")}>
                 {t("common.cancel")}
               </button>
               <button
                 onClick={runBuild}
                 disabled={!buildQuote.canBuild || isPending}
-                className={cn(
+                className={cn(PRESSABLE, "border-b-black/30", 
                   "flex flex-1 items-center justify-center gap-2.5 rounded-lg px-5 py-3.5 text-sm font-bold transition-colors",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400",
                   "disabled:pointer-events-none disabled:opacity-40",

@@ -1,3 +1,5 @@
+import { PRESSABLE } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import type { ConditionGrade } from "feature/arsenal/data/itemStats";
 import { getConditionGrade } from "feature/arsenal/data/itemStats";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
@@ -62,7 +64,7 @@ export const GateRow = ({
         <button
           type='button'
           onClick={onRestore}
-          className='flex shrink-0 items-center gap-2 self-start rounded-lg bg-amber-500/15 px-4 py-2.5 text-sm font-bold text-amber-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 hover:bg-amber-500/25 sm:self-center'>
+          className={cn(PRESSABLE, "flex shrink-0 items-center gap-2 self-start rounded-lg bg-amber-500/15 px-4 py-2.5 text-sm font-bold text-amber-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 hover:bg-amber-500/25 sm:self-center border-b-black/30")}>
           {t("workshop.go_to_restoration")}
           <ArrowRight size={15} />
         </button>

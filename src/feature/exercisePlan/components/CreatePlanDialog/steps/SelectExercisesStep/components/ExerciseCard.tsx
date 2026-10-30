@@ -1,4 +1,5 @@
 import { Badge } from "assets/components/ui/badge";
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
@@ -176,7 +177,7 @@ export const ExerciseCard = ({
                   onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
                   aria-label={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                   aria-pressed={isFavorite}
-                  className={cn(
+                  className={cn(PRESSABLE, "border-b-black/30", 
                     "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden ring-1",
                     isFavorite
                       ? "bg-rose-500/15 text-rose-400 ring-rose-500/30 hover:bg-rose-500/25 hover:text-rose-300"
@@ -190,7 +191,7 @@ export const ExerciseCard = ({
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onPreview?.(exercise); }}
-                className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 ring-1 ring-white/10"
+                className={cn(PRESSABLE, "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 ring-1 ring-white/10 border-b-black/30")}
                 title={t("plans:preview_details")}
               >
                 <Info className="h-4 w-4" />
@@ -232,7 +233,7 @@ export const ExerciseCard = ({
                    onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
                    aria-label={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                    aria-pressed={isFavorite}
-                   className={cn(
+                   className={cn(PRESSABLE, "border-b-black/30", 
                      "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden ring-1",
                      isFavorite
                        ? "bg-rose-500/15 text-rose-400 ring-rose-500/30"
@@ -245,7 +246,7 @@ export const ExerciseCard = ({
                <button
                  type="button"
                  onClick={(e) => { e.stopPropagation(); onPreview?.(exercise); }}
-                 className="flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden bg-white/5 text-zinc-400 ring-1 ring-white/10"
+                 className={cn(PRESSABLE, "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden bg-white/5 text-zinc-400 ring-1 ring-white/10 border-b-black/30")}
                >
                  <Info className="h-4 w-4" />
                </button>

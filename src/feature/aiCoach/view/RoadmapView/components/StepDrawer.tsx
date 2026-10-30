@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { Chip } from "assets/components/ui/chip";
 import {
   Drawer,
@@ -101,8 +102,11 @@ const NavButton = ({ direction, target, onClick }: NavButtonProps) => {
       type='button'
       onClick={onClick}
       disabled={!target}
+      // The subtle key's face: on the drawer's zinc-950 a fainter one leaves the
+      // lip nothing to be darker than.
       className={cn(
-        "flex min-w-0 items-center gap-3 rounded-lg bg-zinc-900/40 px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 hover:bg-zinc-800/60",
+        PRESSABLE,
+        "flex min-w-0 items-center gap-3 rounded-lg border-b-black/30 bg-white/10 px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 hover:bg-white/15",
         isNext && "flex-row-reverse text-right",
       )}>
       <Icon className='h-4 w-4 shrink-0 text-zinc-400' />

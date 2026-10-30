@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -277,13 +278,16 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
   /** What each fill shows now, so only the ones that changed are touched. */
   const shownRef = useRef<(number | null)[]>([]);
 
-  // The cells themselves only change with the measure layout.
+  // The cells themselves only change with the measure layout. Each is a key
+  // with a lip: the face is opaque zinc-800, as the old zinc-800/70 over the
+  // strip left no shade between face and page for a darker lip to show. The
+  // accuracy fill is positioned inside the border, so it rises above the lip.
   const cells = useMemo(() => {
     shownRef.current = [];
     return measures.map((_, i) => (
       <div
         key={i}
-        className="absolute overflow-hidden rounded bg-zinc-800/70 transition-colors hover:bg-zinc-700/80"
+        className={`${PRESSABLE} absolute overflow-hidden rounded border-b-black/30 bg-zinc-800 transition-colors hover:bg-zinc-700`}
         style={{ left: PAD + i * UNIT, top: TOP, width: CELL, height: CELL_H }}
       >
         <div

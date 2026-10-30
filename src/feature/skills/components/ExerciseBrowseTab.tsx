@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { Chip, chipVariants } from "assets/components/ui/chip";
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
@@ -165,7 +166,7 @@ const SEARCH_ALIASES: Record<string, string> = {
 };
 
 const filterPill = (active: boolean, big = false) =>
-  cn(
+  cn(PRESSABLE, "border-b-black/30", 
     chipVariants({ color: active ? "cyan" : "gray" }),
     "cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
     // The sheet's pills are finger-sized; the desktop bar keeps its compact look.
@@ -930,7 +931,7 @@ export const ExerciseBrowseTab = ({
         {isLocked ? (
           <button
             onClick={onShowUpgrade}
-            className="flex shrink-0 items-center gap-1 rounded bg-amber-500/10 px-3 py-2 text-[13px] font-bold text-amber-500 transition-colors hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
+            className={cn(PRESSABLE, "flex shrink-0 items-center gap-1 rounded bg-amber-500/10 px-3 py-2 text-[13px] font-bold text-amber-500 transition-colors hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50 border-b-black/30")}
           >
             <Lock size={12} />
             Pro
@@ -938,7 +939,7 @@ export const ExerciseBrowseTab = ({
         ) : (
           <button
             onClick={() => handleStart(exercise)}
-            className="flex shrink-0 items-center gap-1 rounded bg-zinc-100 py-2 pl-3 pr-3.5 text-[13px] font-bold text-zinc-950 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className={cn(PRESSABLE, "flex shrink-0 items-center gap-1 rounded bg-zinc-100 py-2 pl-3 pr-3.5 text-[13px] font-bold text-zinc-950 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border-b-black/25")}
           >
             <ChevronRight size={14} strokeWidth={2.5} />
             Start
@@ -1054,7 +1055,7 @@ export const ExerciseBrowseTab = ({
             </div>
             <button
               onClick={() => setShowFilters(true)}
-              className={cn(
+              className={cn(PRESSABLE, "border-b-black/30", 
                 "flex h-11 shrink-0 items-center gap-1.5 rounded-lg px-3.5 text-[13px] font-bold transition-colors sm:hidden",
                 activeFilterCount > 0 ? "bg-cyan-500/15 text-cyan-400" : "bg-zinc-800/70 text-zinc-400"
               )}
@@ -1182,13 +1183,13 @@ export const ExerciseBrowseTab = ({
               <button
                 onClick={clearFilters}
                 disabled={activeFilterCount === 0}
-                className="h-11 rounded-lg bg-zinc-900 px-4 text-sm font-bold text-zinc-400 transition-colors disabled:opacity-40"
+                className={cn(PRESSABLE, "h-11 rounded-lg bg-zinc-900 px-4 text-sm font-bold text-zinc-400 transition-colors disabled:opacity-40 border-b-black/25")}
               >
                 Clear
               </button>
               <button
                 onClick={() => setShowFilters(false)}
-                className="h-11 flex-1 rounded-lg bg-zinc-100 text-sm font-bold text-zinc-950 transition-colors active:bg-zinc-300"
+                className={cn(PRESSABLE, "h-11 flex-1 rounded-lg bg-zinc-100 text-sm font-bold text-zinc-950 transition-colors active:bg-zinc-300 border-b-black/25")}
               >
                 Show {totalMatches} exercise{totalMatches !== 1 ? "s" : ""}
               </button>
@@ -1255,7 +1256,7 @@ export const ExerciseBrowseTab = ({
                       clearFilters();
                       setSearchQuery("");
                     }}
-                    className="h-9 rounded-lg bg-zinc-800 px-4 text-[13px] font-bold text-zinc-200 transition-colors hover:bg-zinc-700"
+                    className={cn(PRESSABLE, "h-9 rounded-lg bg-zinc-800 px-4 text-[13px] font-bold text-zinc-200 transition-colors hover:bg-zinc-700 border-b-black/30")}
                   >
                     Reset filters
                   </button>

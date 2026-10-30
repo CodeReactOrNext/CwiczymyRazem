@@ -1,9 +1,11 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
@@ -180,7 +182,7 @@ export const MarketListingCard = ({
         <button
           onClick={onCancel}
           disabled={isCancelling}
-          className='flex h-9 items-center justify-center gap-1.5 rounded-lg bg-zinc-800 text-xs font-semibold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 hover:bg-zinc-700 hover:text-white'>
+          className={cn(PRESSABLE, "flex h-9 items-center justify-center gap-1.5 rounded-lg bg-zinc-800 text-xs font-semibold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 hover:bg-zinc-700 hover:text-white border-b-black/30")}>
           <X size={13} strokeWidth={2.5} />
           {isCancelling ? t("market.cancelling") : t("market.cancel_listing")}
         </button>

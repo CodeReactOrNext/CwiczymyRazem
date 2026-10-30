@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
@@ -107,7 +108,7 @@ export const ExerciseGrid = ({
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="flex items-center justify-center w-[34px] h-[34px] rounded-[8px] border border-white/5 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-all duration-base backdrop-blur-md active:scale-95"
+            className={cn(PRESSABLE, "flex items-center justify-center w-[34px] h-[34px] rounded-[8px] border border-white/5 border-b-[3px] border-b-black/30 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-colors duration-base backdrop-blur-md border-b-black/30 border-b-[3px]")}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -125,11 +126,11 @@ export const ExerciseGrid = ({
                 <button
                   key={`page-${page}`}
                   onClick={() => setCurrentPage(page as number)}
-                  className={cn(
-                    "flex items-center justify-center w-[34px] h-[34px] rounded-[8px] text-[12px] font-bold transition-all duration-base backdrop-blur-md active:scale-95",
+                  className={cn(PRESSABLE, "border-b-black/30", 
+                    "flex items-center justify-center w-[34px] h-[34px] rounded-[8px] text-[12px] font-bold transition-colors duration-base backdrop-blur-md",
                     currentPage === page
                       ? "bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 shadow-[0_0_10px_-2px_rgba(6,182,212,0.2)]"
-                      : "border border-white/5 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 hover:border-white/10"
+                      : "border border-white/5 border-b-[3px] border-b-black/30 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 hover:border-white/10"
                   )}
                 >
                   {page}
@@ -141,7 +142,7 @@ export const ExerciseGrid = ({
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="flex items-center justify-center w-[34px] h-[34px] rounded-[8px] border border-white/5 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-all duration-base backdrop-blur-md active:scale-95"
+            className={cn(PRESSABLE, "flex items-center justify-center w-[34px] h-[34px] rounded-[8px] border border-white/5 border-b-[3px] border-b-black/30 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none transition-colors duration-base backdrop-blur-md border-b-black/30 border-b-[3px]")}
           >
             <ChevronRight className="w-4 h-4" />
           </button>

@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -70,8 +71,8 @@ const ActionButton = ({
     <button
       onClick={onAction}
       disabled={disabled}
-      className={cn(
-        "flex shrink-0 items-center justify-center gap-2 rounded-lg px-6 py-3.5 text-sm font-bold transition-colors click-behavior",
+      className={cn(PRESSABLE, "border-b-black/30", 
+        "flex shrink-0 items-center justify-center gap-2 rounded-lg px-6 py-3.5 text-sm font-bold transition-colors ",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400",
         "disabled:pointer-events-none disabled:opacity-40",
         rolls
@@ -127,8 +128,8 @@ const RemoveButton = ({
           onClick={onRemove}
           disabled={disabled}
           aria-label={t("mods.remove_aria", { fame })}
-          className={cn(
-            "flex shrink-0 items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-4 py-3.5 text-sm font-bold text-zinc-400 transition-colors click-behavior",
+          className={cn(PRESSABLE, "border-b-black/30", 
+            "flex shrink-0 items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-4 py-3.5 text-sm font-bold text-zinc-400 transition-colors ",
             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400/60",
             "disabled:pointer-events-none disabled:opacity-40",
             "hover:bg-red-500/15 hover:text-red-300",
@@ -291,8 +292,8 @@ const SalvagedRow = ({
     <button
       onClick={onFit}
       disabled={slotsFull || busy}
-      className={cn(
-        "flex shrink-0 items-center justify-center gap-2 rounded-lg px-6 py-3.5 text-sm font-bold transition-colors click-behavior",
+      className={cn(PRESSABLE, "border-b-black/30", 
+        "flex shrink-0 items-center justify-center gap-2 rounded-lg px-6 py-3.5 text-sm font-bold transition-colors ",
         "bg-purple-500/20 text-purple-200 hover:bg-purple-500/30",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-400",
         "disabled:pointer-events-none disabled:opacity-40",

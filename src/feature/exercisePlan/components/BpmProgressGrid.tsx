@@ -1,5 +1,5 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { CheckIcon } from "lucide-react";
 
@@ -10,6 +10,8 @@ interface BpmProgressGridProps {
   onToggle: (bpm: number) => void;
   isLoading?: boolean;
   readOnly?: boolean;
+  /** Skip the title + count row, e.g. when a dialog already shows its own. */
+  hideHeader?: boolean;
 }
 
 export const BpmProgressGrid = ({
@@ -19,25 +21,30 @@ export const BpmProgressGrid = ({
   onToggle,
   isLoading = false,
   readOnly = false,
+  hideHeader = false,
 }: BpmProgressGridProps) => {
   const { t } = useTranslation("plans");
   if (bpmStages.length === 0) return null;
 
   const completedCount = completedBpms.length;
   const totalCount = bpmStages.length;
+  const isInteractive = !readOnly && !isLoading;
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-zinc-500">
-          {t("bpm_progress")}
-        </span>
-        <span className="text-[10px] font-bold text-white">
-          {completedCount}/{totalCount}
-        </span>
-      </div>
+      {!hideHeader && (
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-zinc-400">
+            {t("bpm_progress")}
+          </span>
+          <span className="font-mono text-xs font-bold tabular-nums text-zinc-300">
+            {completedCount}/{totalCount}
+          </span>
+        </div>
+      )}
 
-      <div className="flex flex-wrap gap-1.5">
+      {/* Equal columns instead of flex-wrap, so a short last row lines up with the rest. */}
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(3.5rem,1fr))] gap-2">
         {bpmStages.map((bpm) => {
           const isCompleted = completedBpms.includes(bpm);
           const isRecommended = bpm === recommendedBpm;
@@ -45,54 +52,27 @@ export const BpmProgressGrid = ({
           return (
             <button
               key={bpm}
-              onClick={() => !readOnly && !isLoading && onToggle(bpm)}
-              disabled={readOnly || isLoading}
+              type="button"
+              aria-pressed={isCompleted}
+              onClick={() => isInteractive && onToggle(bpm)}
+              disabled={!isInteractive}
               className={cn(
-                "relative group flex items-center justify-center rounded-md px-2.5 py-1.5 text-xs font-mono font-bold transition-all select-none",
-                "border min-w-[44px]",
+                PRESSABLE_KEY,
+                "flex h-10 select-none items-center justify-center gap-1 rounded-lg font-mono text-sm font-bold tabular-nums transition-colors",
+                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
                 isCompleted
-                  ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-600/40"
-                  : "border-white/5 bg-zinc-900/60 text-zinc-300",
-                isRecommended &&
-                  !isCompleted &&
-                  "border-cyan-500/30 bg-cyan-500/5 text-cyan-300",
-                !readOnly &&
-                  !isLoading &&
-                  !isCompleted &&
-                  "hover:bg-zinc-800/80 hover:border-white/10 hover:text-white cursor-pointer",
-                !readOnly &&
-                  !isLoading &&
-                  isCompleted &&
-                  "hover:border-emerald-500/30 hover:bg-emerald-500/10 cursor-pointer",
-                (readOnly || isLoading) && "cursor-default"
+                  ? "bg-emerald-500/10 text-emerald-400"
+                  : "bg-zinc-800/60 text-zinc-300",
+                isRecommended && !isCompleted && "text-cyan-400",
+                isInteractive &&
+                  (isCompleted
+                    ? "hover:bg-emerald-500/20"
+                    : "hover:bg-zinc-700/60 hover:text-white"),
+                !isInteractive && "cursor-default"
               )}
             >
-              {/* BPM number — with strikethrough when completed */}
-              <span
-                className={cn(
-                  "relative transition-all duration-base",
-                  isCompleted && "line-through decoration-emerald-500/60 decoration-2"
-                )}
-              >
-                {bpm}
-              </span>
-
-              {/* Check icon on completed */}
-              <AnimatePresence>
-                {isCompleted && (
-                  <motion.span
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                    className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
-                  >
-                    <CheckIcon size='1em' className="h-1.5 w-1.5" />
-                  </motion.span>
-                )}
-              </AnimatePresence>
-
-
+              {isCompleted && <CheckIcon className="h-3.5 w-3.5 shrink-0" />}
+              {bpm}
             </button>
           );
         })}

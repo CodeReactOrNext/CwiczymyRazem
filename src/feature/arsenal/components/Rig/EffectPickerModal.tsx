@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
@@ -91,7 +92,7 @@ export const EffectPickerModal = ({
               onSelect(null);
               onClose();
             }}
-            className='mb-6 w-full rounded-lg bg-zinc-800/40 py-3 text-xs font-bold capitalize tracking-widest text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white'>
+            className={cn(PRESSABLE, "mb-6 w-full rounded-lg bg-zinc-800/40 py-3 text-xs font-bold capitalize tracking-widest text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white border-b-black/30")}>
             {t("picker.remove_from_slot")}
           </button>
         )}

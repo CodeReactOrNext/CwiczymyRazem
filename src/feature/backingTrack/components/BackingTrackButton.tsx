@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Music2, Plus } from "lucide-react";
@@ -27,7 +28,8 @@ export function BackingTrackButton({ status, onClick, className }: BackingTrackB
       onClick={onClick}
       title={t(`bar.hint_${status}`)}
       className={cn(
-        "flex shrink-0 items-center gap-1.5 rounded-lg bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50 hover:bg-white/10 hover:text-zinc-100",
+        buttonVariants({ variant: "subtle", size: "sm" }),
+        "shrink-0 justify-start gap-1.5 [&_svg]:size-3.5",
         className,
       )}>
       {status === "empty" ? (

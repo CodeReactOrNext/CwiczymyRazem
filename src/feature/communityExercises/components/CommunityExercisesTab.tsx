@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import {
@@ -389,7 +390,7 @@ const ExerciseDetails = ({
       <button
         onClick={() => onThank(exercise.id)}
         disabled={isOwnExercise || hasThanked || isThanksLoading}
-        className={cn(
+        className={cn(PRESSABLE, "border-b-black/30", 
           "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed",
           hasThanked
             ? "bg-amber-500/15 text-amber-300"
@@ -425,7 +426,7 @@ const StartButton = ({
       e.stopPropagation();
       onStart(exercise);
     }}
-    className='flex items-center gap-1.5 rounded bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
+    className={cn(PRESSABLE, "flex items-center gap-1.5 rounded bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white border-b-black/25")}>
     <StartIcon size={12} strokeWidth={2.5} />
     {t("start")}
   </button>
@@ -846,7 +847,7 @@ export const CommunityExercisesTab = ({
   };
 
   const filterPill = (active: boolean) =>
-    cn(
+    cn(PRESSABLE, "border-b-black/30", 
       "whitespace-nowrap rounded px-3 py-1 text-[11px] font-semibold capitalize transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
       active
         ? "bg-cyan-500/15 text-cyan-300"
@@ -987,7 +988,7 @@ export const CommunityExercisesTab = ({
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={safePage === 1}
-              className='flex items-center gap-1.5 rounded bg-zinc-800/50 px-3 py-1.5 text-xs font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200'>
+              className={cn(PRESSABLE, "flex items-center gap-1.5 rounded bg-zinc-800/50 px-3 py-1.5 text-xs font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200 border-b-black/30")}>
               <ChevronLeft size={13} />
               {t("previous")}
             </button>
@@ -1007,7 +1008,7 @@ export const CommunityExercisesTab = ({
                   <button
                     key={p}
                     onClick={() => setPage(p)}
-                    className={cn(
+                    className={cn(PRESSABLE, "border-b-black/30", 
                       "h-7 min-w-[28px] rounded px-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                       isActive
                         ? "bg-zinc-700 text-white"
@@ -1021,7 +1022,7 @@ export const CommunityExercisesTab = ({
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={safePage === totalPages}
-              className='flex items-center gap-1.5 rounded bg-zinc-800/50 px-3 py-1.5 text-xs font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200'>
+              className={cn(PRESSABLE, "flex items-center gap-1.5 rounded bg-zinc-800/50 px-3 py-1.5 text-xs font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:enabled:bg-zinc-800 hover:enabled:text-zinc-200 border-b-black/30")}>
               {t("next")}
               <ChevronRight size={13} />
             </button>

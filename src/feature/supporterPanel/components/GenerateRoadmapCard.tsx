@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import type { RoadmapVisibility } from "feature/aiCoach/types/roadmap.types";
@@ -324,7 +325,10 @@ export const GenerateRoadmapCard = ({
           <button
             type='button'
             onClick={() => setExpanded(true)}
-            className='flex shrink-0 items-center justify-center gap-2 rounded-lg bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
+            className={cn(
+              PRESSABLE,
+              "flex shrink-0 items-center justify-center gap-2 rounded-lg border-b-black/25 bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white",
+            )}>
             <Sparkles size={15} />
             {t("panel.generate.create")}
             <span className='ml-0.5 flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 tabular-nums'>
@@ -560,7 +564,10 @@ export const GenerateRoadmapCard = ({
               type='button'
               onClick={() => void handleContinue()}
               disabled={!goalReady}
-              className='flex min-h-11 shrink-0 items-center justify-center gap-2.5 rounded-lg bg-zinc-100 px-5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 hover:bg-white'>
+              className={cn(
+                PRESSABLE,
+                "flex min-h-11 shrink-0 items-center justify-center gap-2.5 rounded-lg border-b-black/25 bg-zinc-100 px-5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 hover:bg-white",
+              )}>
               {t("panel.generate.continue")}
               <ArrowRight size={16} />
             </button>

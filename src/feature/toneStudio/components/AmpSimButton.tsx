@@ -1,3 +1,4 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AudioSelect } from "feature/toneStudio/components/AudioSelect";
 import { InputMeter } from "feature/toneStudio/components/InputMeter";
@@ -315,13 +316,15 @@ export const AmpSimButton = ({
         )}
       </RippleButton>
     ) : (
-      <RippleButton
+      <button
+        type='button'
         onClick={toggleOpen}
         title={needsAttention ? statusLine : t("amp_button.title")}
         className={cn(
-          "flex items-center rounded-lg outline-none transition-all focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50 active:scale-95",
+          PRESSABLE_KEY,
+          "flex items-center rounded-lg outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
           compact
-            ? "h-8 w-8 justify-center active:scale-90"
+            ? "h-8 w-8 justify-center"
             : cn("gap-2 px-4", h),
           triggerColor,
         )}>
@@ -340,7 +343,7 @@ export const AmpSimButton = ({
                 : t("amp_button.amp_caps")}
           </span>
         )}
-      </RippleButton>
+      </button>
     );
 
   const showInterface = () => {

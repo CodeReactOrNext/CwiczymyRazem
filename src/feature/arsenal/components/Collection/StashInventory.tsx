@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -184,10 +185,10 @@ interface StashInventoryProps {
 }
 
 const bulkButtonClass =
-  "flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20";
+  `${PRESSABLE} flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20 border-b-black/30`;
 
 const arrangeButtonClass =
-  "flex items-center gap-2 rounded-lg bg-zinc-800/60 px-3 py-2 text-xs font-bold text-zinc-300 transition-colors hover:bg-zinc-700/60 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60";
+  `${PRESSABLE} flex items-center gap-2 rounded-lg bg-zinc-800/60 px-3 py-2 text-xs font-bold text-zinc-300 transition-colors hover:bg-zinc-700/60 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60 border-b-black/30`;
 
 /**
  * The orders Tidy up can lay the board out in, said as what the player gets

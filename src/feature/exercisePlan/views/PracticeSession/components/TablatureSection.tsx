@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { BackingTrackButton } from "feature/backingTrack/components/BackingTrackButton";
 import type { BackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
@@ -45,6 +46,19 @@ const ZOOM_STEP = 0.05;
 const clampZoom = (z: number) =>
   Math.round(Math.min(NOTE_SPACING_MAX, Math.max(NOTE_SPACING_MIN, z)) * 100) /
   100;
+
+/** The small pressable chips beside the tab, matched to BackingTrackButton. */
+const TOOL_CHIP = cn(
+  buttonVariants({ variant: "subtle", size: "sm" }),
+  "justify-start gap-1.5 [&_svg]:size-3.5",
+);
+
+/** Keys floating over the notation: an opaque face, so the tab can't show through. */
+const tabKey = (size: "default" | "icon") =>
+  cn(
+    buttonVariants({ variant: "subtle", size }),
+    "bg-zinc-800 hover:bg-zinc-700 [&_svg]:size-3.5",
+  );
 
 interface TablatureSectionProps {
   /** The fitted note spacing and any later change to it are remembered under this. */
@@ -114,18 +128,16 @@ function TablatureZoomControl({ zoom, resetTo, onChange }: TablatureZoomControlP
   const { t } = useTranslation("session");
   const atMin = zoom <= NOTE_SPACING_MIN + 1e-6;
   const atMax = zoom >= NOTE_SPACING_MAX - 1e-6;
-  const btn =
-    "flex h-7 w-7 items-center justify-center rounded-md text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent";
 
   return (
-    <div className='flex items-center gap-0.5 rounded-lg border border-white/10 bg-zinc-900/85 px-1 py-1 backdrop-blur-sm'>
+    <div className='flex items-center gap-1'>
       <button
         type='button'
         onClick={() => onChange(zoom - ZOOM_STEP)}
         disabled={atMin}
         title={t("tab.zoom_out_hint")}
         aria-label={t("tab.zoom_out")}
-        className={btn}>
+        className={tabKey("icon")}>
         <ZoomOut className='h-3.5 w-3.5' />
       </button>
       <button
@@ -133,7 +145,8 @@ function TablatureZoomControl({ zoom, resetTo, onChange }: TablatureZoomControlP
         onClick={() => onChange(resetTo)}
         title={t("tab.reset_zoom")}
         aria-label={t("tab.reset_zoom")}
-        className='font-mono min-w-[3rem] rounded-md px-1.5 text-center text-[11px] font-semibold tabular-nums text-zinc-300 transition-colors hover:bg-white/10 hover:text-white'>
+        // A readout between the keys, not a key itself; a click still resets.
+        className='font-mono min-w-[3rem] rounded px-1 text-center text-[11px] font-semibold tabular-nums text-zinc-300 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-ring hover:text-white'>
         {Math.round(zoom * 100)}%
       </button>
       <button
@@ -142,7 +155,7 @@ function TablatureZoomControl({ zoom, resetTo, onChange }: TablatureZoomControlP
         disabled={atMax}
         title={t("tab.zoom_in_hint")}
         aria-label={t("tab.zoom_in")}
-        className={btn}>
+        className={tabKey("icon")}>
         <ZoomIn className='h-3.5 w-3.5' />
       </button>
     </div>
@@ -158,7 +171,7 @@ function TablatureSettingsButton({ onOpen }: { onOpen: () => void }) {
       onClick={onOpen}
       title={t("tab.settings")}
       aria-label={t("tab.settings")}
-      className='flex h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-900/85 px-2.5 text-zinc-300 outline-none backdrop-blur-sm transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50 hover:bg-zinc-800 hover:text-white'>
+      className={cn(tabKey("default"), "h-9 gap-1.5 px-2.5")}>
       <Settings2 className='h-3.5 w-3.5 shrink-0' />
       <span className='text-[11px] font-semibold'>{t("tab.look")}</span>
     </button>
@@ -454,7 +467,7 @@ export const TablatureSection = memo(function TablatureSection({
               setLoopEnd(null);
             }}
             title={t("tab.remove_loop")}
-            className='flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-zinc-100'>
+            className={TOOL_CHIP}>
             <X className='h-3.5 w-3.5' />
             <span>{t("tab.clear_loop")}</span>
           </button>
@@ -468,7 +481,7 @@ export const TablatureSection = memo(function TablatureSection({
               type='button'
               onClick={openTimingCalibration}
               title={t("tab.calibrate_hint")}
-              className='flex shrink-0 items-center gap-1.5 rounded-lg bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50 hover:bg-white/10 hover:text-zinc-100'>
+              className={cn(TOOL_CHIP, "shrink-0")}>
               <Timer className='h-3.5 w-3.5' />
               <span>{t("timing.title")}</span>
             </button>

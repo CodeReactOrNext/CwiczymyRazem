@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Ticket } from "lucide-react";
@@ -31,7 +32,7 @@ export const FreeCaseButton = ({
   <button
     onClick={onClick}
     disabled={isOpening}
-    className={cn(
+    className={cn(PRESSABLE, "border-b-black/30", 
       "flex items-center justify-between gap-2 rounded-lg bg-cyan-500/10 px-4 py-2.5 text-xs font-bold capitalize tracking-wide text-cyan-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-cyan-500/20",
       isOpening && "cursor-wait opacity-70",
       className,

@@ -18,6 +18,9 @@ import * as React from "react";
  * the 2px that would hang below, so the bottom edge stays put while the face
  * and its label go down together. Animating the border width instead reflowed
  * the label, which moved 3px against the face's 2px, a pixel at a time.
+ * Only the bottom edge is clipped — the other three sides sit 100vmax out, so
+ * whatever a button carries outside itself (the session Start's "Press Start"
+ * bubble, a badge, a glow, the focus ring) stays visible while it is held.
  *
  * It snaps rather than tweens: a 2px move is too short to animate without the
  * text either stepping pixel by pixel or losing ClearType while the layer is
@@ -25,10 +28,35 @@ import * as React from "react";
  * standalone `translate` property composes with a caller's -translate-y-1/2
  * instead of replacing it.
  *
- * Each variant colours the lip itself — outline keeps its border colour.
+ * Each variant colours the lip itself — outline keeps its border colour. A
+ * hand-built key on a near-black page uses PRESSABLE with a border-b-black/*
+ * of its own, and a face light enough for the darker lip to stand out.
  */
 const PRESSABLE =
-  "font-semibold border-b-[3px] active:[translate:0_2px] active:[clip-path:inset(-4px_-4px_2px_-4px)]";
+  "font-semibold border-b-[3px] active:[translate:0_2px] active:[clip-path:inset(-100vmax_-100vmax_2px_-100vmax)]";
+
+/**
+ * The same key for a hand-built button that paints its own face, like the
+ * session toolbars' chips, whose colour changes with their state. Put it first
+ * in cn() so the caller's font weight wins, and leave transition-all out: it
+ * would tween the press.
+ *
+ * Here the lip is a shadow, not a darker face: bg-clip-padding keeps the face
+ * off the border, so the lip is black/30 over the page, whatever the face. A
+ * zinc-800 chip on the toolbar's ~#1a1a1d sits too close to it for a darkened
+ * face to show — black/30 of it landed on the page's own shade, and the lip
+ * only appeared on hover, when the face got lighter.
+ */
+const PRESSABLE_KEY = `${PRESSABLE} bg-clip-padding border-b-black/30`;
+
+/**
+ * PRESSABLE for a key that only labels a bigger clickable — a whole card that
+ * is the button. It sinks when the card is pressed anywhere, not just on the
+ * key itself; the card needs `group`. The caller colours the lip, as with
+ * PRESSABLE.
+ */
+const PRESSABLE_IN_GROUP =
+  "font-semibold border-b-[3px] group-active:[translate:0_2px] group-active:[clip-path:inset(-100vmax_-100vmax_2px_-100vmax)]";
 
 const buttonVariants = cva(
   "inline-flex font-openSans items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -53,6 +81,16 @@ const buttonVariants = cva(
         secondary: [
           PRESSABLE,
           "border-b-black/25 bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ],
+        // The grey chip of dark chrome: session bars, the sidebar's icons. The
+        // face is white/10, not the old chips' white/5: a darker lip under a
+        // fainter face sank into the near-black page, and the key just read
+        // 3px shorter. This shade keeps the lip between face and page on both
+        // zinc-950 and the sidebar's card. Not PRESSABLE_KEY's shadow: on the
+        // near-black session bars nothing reads darker than the page.
+        subtle: [
+          PRESSABLE,
+          "border-b-black/30 bg-white/10 text-zinc-300 hover:bg-white/15 hover:text-white",
         ],
         // No lip on a button without a face — just the 1px press.
         ghost: "hover:bg-accent hover:text-accent-foreground active:[translate:0_1px]",
@@ -113,4 +151,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
-export { Button, buttonVariants };
+export { Button, buttonVariants, PRESSABLE, PRESSABLE_IN_GROUP, PRESSABLE_KEY };

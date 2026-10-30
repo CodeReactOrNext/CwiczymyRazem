@@ -1,3 +1,4 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import {
   Tooltip,
@@ -420,7 +421,7 @@ export const PlanCard = ({
           {onPreview && (
             <button
               type="button"
-              className="h-10 rounded-full px-3 text-xs font-semibold text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="h-10 rounded-lg px-3 text-xs font-semibold text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               onClick={(e) => {
                 e.stopPropagation();
                 onPreview();
@@ -434,7 +435,8 @@ export const PlanCard = ({
           <button
             type="button"
             className={cn(
-              "flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-white/10 px-4 text-xs font-semibold text-zinc-100 transition-colors duration-base",
+              PRESSABLE_KEY,
+              "flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg bg-white/10 px-4 text-xs font-semibold text-zinc-100 transition-colors duration-base",
               "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60",
               style.cta
             )}

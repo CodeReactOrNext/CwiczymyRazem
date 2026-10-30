@@ -1,3 +1,5 @@
+import { PRESSABLE } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { getModResaleValue } from "feature/arsenal/data/resale";
 import { getModDef } from "feature/arsenal/data/workshop";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
@@ -81,7 +83,7 @@ export const SalvagedModCard = ({
             <button
               onClick={() => onListClick(mod.id)}
               disabled={isListing}
-              className='flex items-center justify-center gap-2 rounded-lg bg-amber-500/15 px-4 py-3 text-sm font-bold text-amber-300 transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-amber-500/25'>
+              className={cn(PRESSABLE, "flex items-center justify-center gap-2 rounded-lg bg-amber-500/15 px-4 py-3 text-sm font-bold text-amber-300 transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-amber-500/25 border-b-black/30")}>
               <Store size={16} />
               {isListing ? t("market.listing") : t("market.sell_on_market")}
             </button>
@@ -91,7 +93,7 @@ export const SalvagedModCard = ({
             <button
               onClick={() => onSellClick(mod.id)}
               disabled={isSelling}
-              className='flex items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-4 py-3 text-sm font-bold text-zinc-200 transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-red-500/15 hover:text-red-300'>
+              className={cn(PRESSABLE, "flex items-center justify-center gap-2 rounded-lg bg-zinc-800/60 px-4 py-3 text-sm font-bold text-zinc-200 transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-red-500/15 hover:text-red-300 border-b-black/30")}>
               <FameCoin size={16} />
               {t("common.sell_for", { fame: resale })}
             </button>

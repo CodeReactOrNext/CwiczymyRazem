@@ -1,5 +1,5 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { RippleButton } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { GraduationCap } from "lucide-react";
 import { memo } from "react";
@@ -26,12 +26,14 @@ export const LearnModeButton = memo(function LearnModeButton({ compact = false }
 
   return (
     <SessionTooltip label={hint}>
-      <RippleButton
+      <button
+        type='button'
         onClick={() => learn.setEnabled(!learn.enabled)}
         disabled={needsMic}
         aria-pressed={learn.enabled}
         className={cn(
-          "flex items-center gap-2 rounded-lg px-4 font-semibold outline-none transition-all focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50 active:scale-95",
+          PRESSABLE_KEY,
+          "flex items-center gap-2 rounded-lg px-4 font-semibold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
           compact ? "h-8 px-2" : "h-12",
           learn.enabled
             ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
@@ -40,7 +42,7 @@ export const LearnModeButton = memo(function LearnModeButton({ compact = false }
         )}>
         <GraduationCap className='h-4 w-4 shrink-0' />
         {!compact && <span className='text-[10px] font-semibold tracking-wide'>{t("learn.button")}</span>}
-      </RippleButton>
+      </button>
     </SessionTooltip>
   );
 });

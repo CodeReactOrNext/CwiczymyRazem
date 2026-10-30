@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -518,7 +519,7 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
         <button
           type='button'
           onClick={() => onOpenPicker(index)}
-          className='flex items-center gap-2.5 rounded px-3 py-1.5 text-base font-medium text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-100/10 hover:text-white'>
+          className={cn(PRESSABLE, "flex items-center gap-2.5 rounded px-3 py-1.5 text-base font-medium text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-100/10 hover:text-white border-b-black/25")}>
           <CirclePlus size={22} strokeWidth={1.4} className='text-zinc-300' />
           {t("card.equip")}
         </button>
@@ -558,7 +559,7 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
           <button
             type='button'
             onClick={() => onOpenPicker(index)}
-            className='flex items-center gap-2 rounded px-2.5 py-1.5 text-sm font-medium text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-100/10 hover:text-white'>
+            className={cn(PRESSABLE, "flex items-center gap-2 rounded px-2.5 py-1.5 text-sm font-medium text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-100/10 hover:text-white border-b-black/25")}>
             <ArrowLeftRight size={16} className='text-zinc-300' />
             {t("rack.change")}
           </button>

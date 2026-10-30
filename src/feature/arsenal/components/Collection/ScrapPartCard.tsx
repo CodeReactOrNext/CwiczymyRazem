@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { FUSION_FAME_COST, getFusionQuote, getMaxFusionCrafts } from "feature/arsenal/data/fusion";
@@ -31,7 +32,7 @@ interface ScrapPartCardProps {
     or pays on the right. The price never wraps onto a second line, and Fame
     keeps its amber so the coin isn't a dark smudge on a dark button. */
 const billButtonClass =
-  "flex items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-40";
+  `${PRESSABLE} flex items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-40 border-b-black/30`;
 
 /** The quieter second option under each bill — trimming one off the stack. */
 const minorButtonClass =

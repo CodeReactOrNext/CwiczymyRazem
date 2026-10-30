@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
 import { PageTabs } from "components/PageTabs/PageTabs";
@@ -207,20 +208,19 @@ const MyExercisesPage: NextPageWithLayout = () => {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-3">
-              <button
-                onClick={handleCreate}
-                className="flex items-center gap-2 px-5 py-2.5 bg-zinc-100 hover:bg-white text-zinc-950 text-sm font-semibold rounded-lg transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                <Music2 size={16} />
+              <Button onClick={handleCreate} size="lg" className="px-5">
+                <Music2 className="mr-2" />
                 {t("my_exercises.with_tab")}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="subtle"
+                size="lg"
                 onClick={handleCreateWithoutTab}
-                className="flex items-center gap-2 px-5 py-2.5 bg-zinc-800/60 hover:bg-zinc-800 text-zinc-200 text-sm font-semibold rounded-lg transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="px-5"
               >
-                <FileText size={16} />
+                <FileText className="mr-2" />
                 {t("my_exercises.instructions_only")}
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
@@ -280,66 +280,78 @@ const MyExercisesPage: NextPageWithLayout = () => {
                 </div>
 
                 {/* Play */}
-                <button
+                <Button
+                  variant="subtle"
+                  size="sm"
                   onClick={() => setActiveExercise(buildChallenge(ex))}
-                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-800/60 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 text-xs font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="shrink-0"
                 >
-                  <Play size={12} fill="currentColor" />
+                  <Play fill="currentColor" className="mr-1.5" />
                   {t("my_exercises.practice")}
-                </button>
+                </Button>
 
                 {/* View in community — only for public */}
                 {ex.isPublic && (
-                  <button
+                  <Button
+                    variant="subtle"
+                    size="sm"
                     onClick={() => router.push("/profile/skills?tab=community")}
-                    className="shrink-0 px-3 py-1.5 rounded bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 text-xs font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    className="shrink-0"
                   >
                     {t("my_exercises.view")}
-                  </button>
+                  </Button>
                 )}
 
                 {/* Visibility */}
                 {ex.isPublic ? (
-                  <button
+                  <Button
+                    variant="subtle"
+                    size="icon"
                     onClick={() => handleToggleVisibility(ex)}
                     disabled={togglingId === ex.id}
-                    className="shrink-0 p-2 rounded bg-zinc-800/60 text-zinc-400 hover:text-cyan-400 hover:bg-zinc-800 disabled:opacity-40 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    className="h-8 w-8 shrink-0 hover:text-cyan-400"
                     title={t("my_exercises.make_private")}
                     aria-label={t("my_exercises.make_private")}
                   >
-                    <Lock size={14} />
-                  </button>
+                    <Lock />
+                  </Button>
                 ) : (
-                  <button
+                  <Button
+                    variant="subtle"
+                    size="sm"
                     onClick={() => handleToggleVisibility(ex)}
                     disabled={togglingId === ex.id}
-                    className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded bg-zinc-800/60 text-zinc-300 hover:bg-zinc-800 hover:text-emerald-400 disabled:opacity-40 text-xs font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    className="shrink-0 hover:text-emerald-400"
                   >
-                    <Globe size={12} />
+                    <Globe className="mr-1.5" />
                     {t("my_exercises.make_public")}
-                  </button>
+                  </Button>
                 )}
 
                 {/* Edit */}
-                <button
+                <Button
+                  variant="subtle"
+                  size="icon"
                   onClick={() => handleEdit(ex)}
-                  className="shrink-0 p-2 rounded bg-zinc-800/60 text-zinc-400 hover:text-cyan-400 hover:bg-zinc-800 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="h-8 w-8 shrink-0 hover:text-cyan-400"
                   title={t("my_exercises.edit")}
                   aria-label={t("my_exercises.edit")}
                 >
-                  <Pencil size={14} />
-                </button>
+                  <Pencil />
+                </Button>
 
                 {/* Delete */}
-                <button
+                <Button
+                  variant="subtle"
+                  size="icon"
                   onClick={() => handleDelete(ex.id)}
                   disabled={deletingId === ex.id}
-                  className="shrink-0 p-2 rounded bg-zinc-800/60 text-zinc-400 hover:text-rose-400 hover:bg-zinc-800 disabled:opacity-40 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="h-8 w-8 shrink-0 hover:text-rose-400"
                   title={t("my_exercises.delete")}
                   aria-label={t("my_exercises.delete")}
                 >
-                  <Trash2 size={14} />
-                </button>
+                  <Trash2 />
+                </Button>
               </div>
             ))}
 

@@ -110,13 +110,13 @@ export const FinishSessionDialog = ({
 
         <DialogFooter className='mt-8 flex flex-col gap-2 sm:flex-row'>
           <Button
-            variant='ghost'
-            className='flex-1 rounded-lg bg-white/5 text-sm font-semibold text-zinc-300 transition-background hover:bg-white/10 hover:text-white'
+            variant='subtle'
+            className='flex-1 text-sm'
             onClick={() => onOpenChange(false)}>
             {t("common:cancel")}
           </Button>
           <Button
-            className='flex-1 rounded-lg bg-white text-sm font-bold text-black transition-background hover:bg-zinc-200'
+            className='flex-1 text-sm font-bold'
             loading={isLoading}
             disabled={disabled}
             onClick={onConfirm}>

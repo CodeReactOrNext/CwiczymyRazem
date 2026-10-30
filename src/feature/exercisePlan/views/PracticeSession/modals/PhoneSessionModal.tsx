@@ -489,14 +489,14 @@ export function PhoneSessionModal({
                     <div className="flex-1" />
 
                     {currentExerciseIndex > 0 && (
-                      <Button onClick={handleBackExerciseClick} variant="ghost" size="icon"
-                        className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white">
+                      <Button onClick={handleBackExerciseClick} variant="subtle" size="icon"
+                        className="h-11 w-11 shrink-0 text-zinc-400">
                         <SkipBack size='1em' className="h-4 w-4" />
                       </Button>
                     )}
                     {hasTablature && (
-                      <Button onClick={handleRestart} variant="ghost" size="icon"
-                        className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-amber-400 hover:text-amber-300">
+                      <Button onClick={handleRestart} variant="subtle" size="icon"
+                        className="h-11 w-11 shrink-0 text-amber-400 hover:text-amber-300">
                         <RotateCcw size='1em' className="h-4 w-4" />
                       </Button>
                     )}
@@ -505,7 +505,7 @@ export function PhoneSessionModal({
                     <Button
                       onClick={handleToggleTimer}
                       size="icon"
-                      className="h-12 w-12 shrink-0 rounded-lg bg-white text-black transition-colors click-behavior hover:bg-zinc-200"
+                      className="h-12 w-12 shrink-0"
                     >
                       {isPlaying ? <Pause size='1em' className='h-4 w-4' /> : <PlayIcon size='1em' className='h-4 w-4' />}
                     </Button>
@@ -514,8 +514,8 @@ export function PhoneSessionModal({
                       <Button
                         onClick={isLastExercise ? onFinish : handleNextExerciseClick}
                         disabled={isFinishing || isSubmittingReport }
-                        variant="ghost" size="icon"
-                        className="h-11 w-11 shrink-0 rounded-lg bg-white/5 text-zinc-400 hover:text-white"
+                        variant="subtle" size="icon"
+                        className="h-11 w-11 shrink-0 text-zinc-400"
                       >
                         {isFinishing || isSubmittingReport
                           ? <div className="h-3 w-3 animate-spin rounded-lg border-2 border-zinc-500/20 border-t-zinc-500" />

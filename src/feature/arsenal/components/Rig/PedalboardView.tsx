@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
@@ -100,7 +101,7 @@ const NOTICE_MS = 8000;
 /** One key of the zoom control that floats over the case on a touch screen.
     Thumb-sized, unlit, and out of the way until it is aimed at. */
 const ZOOM_KEY =
-  "flex h-10 w-10 items-center justify-center rounded-lg bg-black/70 text-zinc-200 backdrop-blur-sm transition-colors active:bg-black/90 disabled:opacity-25";
+  `${PRESSABLE} flex h-10 w-10 items-center justify-center rounded-lg bg-black/70 text-zinc-200 backdrop-blur-sm transition-colors active:bg-black/90 disabled:opacity-25 border-b-black/30`;
 
 /** Says it twice: a toast you cannot miss, and a line that stays on the board. */
 const announce = (message: string, setNotice: (value: string) => void) => {

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "assets/components/ui/button";
+import { Button, PRESSABLE } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -365,10 +365,10 @@ export const SelectExercisesStep = ({
                 key={id}
                 type="button"
                 onClick={() => setSourceTab(id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded text-sm font-bold transition-colors ${
+                className={`${PRESSABLE} flex items-center gap-2 px-4 py-2 rounded border-b-black/30 text-sm font-bold transition-colors ${
                   sourceTab === id
                     ? "bg-zinc-800 text-white"
-                    : "text-zinc-500 hover:text-zinc-300"
+                    : "bg-white/[0.04] text-zinc-500 hover:bg-white/[0.08] hover:text-zinc-300"
                 }`}
               >
                 <Icon size={14} />
@@ -381,7 +381,7 @@ export const SelectExercisesStep = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="ghost"
+                variant="subtle"
                 className="h-10 rounded-lg bg-zinc-800/60 px-4 text-sm font-semibold text-zinc-200 hover:bg-zinc-700/60 hover:text-white">
                 <Plus className="h-4 w-4" />
                 {t("select.create_exercise")}
@@ -477,7 +477,7 @@ export const SelectExercisesStep = ({
         <Button
           onClick={onNext}
           disabled={selectedExercises.length === 0}
-          className="shrink-0 flex items-center gap-2 h-11 px-6 bg-white text-black hover:bg-zinc-200 rounded-lg font-bold transition-all disabled:opacity-40">
+          className="shrink-0 flex items-center gap-2 h-11 px-6 bg-white text-black hover:bg-zinc-200 rounded-lg font-bold transition-colors disabled:opacity-40">
           {t("select.next_step")}
           <ArrowRight className="h-4 w-4" />
         </Button>

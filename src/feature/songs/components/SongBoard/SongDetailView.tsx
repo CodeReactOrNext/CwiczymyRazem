@@ -9,7 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "assets/components/ui/alert-dialog";
-import { Button } from "assets/components/ui/button";
+import { Button, PRESSABLE_KEY } from "assets/components/ui/button";
 import { 
   Tooltip, 
   TooltipContent, 
@@ -321,12 +321,12 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
          {onBack && (
            <div className={cn("relative z-20 pt-4 px-4", !showBackOnDesktop && "xl:hidden")}>
               <Button
-                variant="ghost"
+                variant="subtle"
                 size="sm"
                 onClick={() => runAfterSnapshot(onBack)}
-                className="gap-2 text-zinc-400 hover:text-white bg-white/5 backdrop-blur-md rounded-full px-4"
+                className="text-zinc-400 backdrop-blur-md px-4"
               >
-                <ArrowLeft size={16} />
+                <ArrowLeft size={16} className="mr-1.5" />
                 <span className="text-xs font-bold">{backLabel ?? t("detail.back_to_library")}</span>
               </Button>
            </div>
@@ -387,7 +387,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                      onPractice(song);
                    }
                  }}
-                 className="relative h-14 w-full sm:w-auto overflow-hidden px-8 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold flex items-center justify-center transition-all active:scale-95 shadow-xl border-none"
+                 className="relative h-14 w-full sm:w-auto overflow-hidden px-8 font-semibold"
                >
                  <span className="pointer-events-none absolute inset-y-0 -left-1/4 w-1/3 animate-shine bg-gradient-to-r from-transparent via-black/[0.07] to-transparent" />
                  {status
@@ -788,7 +788,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                      <button
                         type="button"
                         onClick={() => router.push(`/timer/song/${song.id}`)}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/5 py-3 text-xs font-semibold text-zinc-300 transition-colors hover:bg-white/10"
+                        className={cn(PRESSABLE_KEY, "flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-800 py-3 text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-700")}
                      >
                         <Plus className="h-4 w-4" />
                         {t("detail.add_section")}

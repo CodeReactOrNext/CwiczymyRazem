@@ -1,3 +1,4 @@
+import { PRESSABLE, PRESSABLE_KEY } from "assets/components/ui/button";
 import {
   Tabs,
   TabsContent,
@@ -162,18 +163,21 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
 
     const favoritePlans = filteredPlans.filter((p) => favoritePlanIds.includes(p.id));
 
+    // Keys like the rest of the app: the picked one white with a lighter lip,
+    // the others zinc-800 with the shadow lip that reads on this mid-dark page.
     const chipClass = (active: boolean) =>
       cn(
-        "shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold tracking-wide transition-colors",
+        active ? PRESSABLE : PRESSABLE_KEY,
+        "h-8 shrink-0 rounded-lg px-3 text-xs font-semibold tracking-wide transition-colors",
         active
-          ? "bg-zinc-100 text-zinc-900"
-          : "bg-zinc-900/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+          ? "border-b-black/25 bg-zinc-100 text-zinc-900"
+          : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200"
       );
 
     return (
       <>
         {availableCategories.length > 1 && (
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => setCategoryFilter("all")}

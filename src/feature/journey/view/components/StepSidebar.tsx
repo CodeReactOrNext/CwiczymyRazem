@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song } from "feature/songs/types/songs.type";
@@ -79,7 +80,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
           onClick={onClose}
           data-vaul-no-drag
           aria-label={t("sidebar.close")}
-          className="absolute right-4 top-4 z-10 rounded-full bg-zinc-900/70 p-2 text-zinc-300 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:right-6 sm:top-6"
+          className={cn(buttonVariants({ variant: "subtle", size: "icon" }), "absolute right-4 top-4 z-10 sm:right-6 sm:top-6")}
         >
           <X size={20} />
         </button>
@@ -241,7 +242,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                   onComplete(step.id);
                 }}
                 disabled={isLocked || isSaving || !canComplete}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                className={cn(buttonVariants(), "h-11 w-full gap-2 text-sm font-bold")}
               >
                 {isSaving ? t("sidebar.saving") : t("sidebar.done_complete")}
                 <CheckCircle2 size={18} />
@@ -258,7 +259,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
             <button
               onClick={handleStartExercise}
               disabled={isLocked}
-              className="flex items-center justify-center gap-2 rounded-lg bg-zinc-800/60 py-3 text-sm font-bold text-zinc-100 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+              className={cn(buttonVariants({ variant: "subtle" }), "h-11 gap-2 text-sm font-bold text-zinc-100")}
             >
               <Play size={16} fill="currentColor" />
               {t("sidebar.practice")}
@@ -270,7 +271,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
                 router.push(`/practice/exercise/${step.suggestedExerciseId}?mode=exam&bpm=${bpm}&stepId=${step.id}&moduleId=${moduleId}`);
               }}
               disabled={isLocked}
-              className="flex items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+              className={cn(buttonVariants(), "h-11 gap-2 text-sm font-bold")}
             >
               <Target size={16} />
               {isCompleted ? t("sidebar.retake") : t("sidebar.exam")}

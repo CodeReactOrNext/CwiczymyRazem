@@ -1,5 +1,6 @@
 "use client";
 
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { motion, useReducedMotion } from "framer-motion";
@@ -196,7 +197,7 @@ export const ArsenalScene = ({
             onClick={() => closeRef.current()}
             disabled={!settled}
             tabIndex={settled ? 0 : -1}
-            className='h-11 min-w-40 shrink-0 rounded-lg bg-white px-6 text-sm font-medium text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 disabled:pointer-events-none hover:bg-zinc-200'
+            className={cn(PRESSABLE, "h-11 min-w-40 shrink-0 rounded-lg bg-white px-6 text-sm font-medium text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 disabled:pointer-events-none hover:bg-zinc-200 border-b-black/25")}
             initial={{ opacity: 0 }}
             animate={{ opacity: settled ? 1 : 0 }}
             transition={{ duration: 0.3 }}>

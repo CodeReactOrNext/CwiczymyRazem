@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 
@@ -35,7 +36,7 @@ export const OpenCaseButton = ({
       <button
         onClick={onClick}
         disabled={!canAfford || isOpening}
-        className={cn(
+        className={cn(PRESSABLE, "border-b-black/30", 
           "flex items-center justify-center gap-2.5 rounded-lg px-5 py-3 text-sm font-bold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-300/60",
           canAfford
             ? "bg-amber-400 text-zinc-950 hover:bg-amber-300"
@@ -63,7 +64,7 @@ export const OpenCaseButton = ({
     <button
       onClick={onClick}
       disabled={!canAfford || isOpening}
-      className={cn(
+      className={cn(PRESSABLE, "border-b-black/30", 
         "flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold capitalize tracking-wide transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
         fameCost !== undefined && "justify-between",
         isSolid

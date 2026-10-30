@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import {
   Select,
@@ -81,11 +82,12 @@ const VIEWS: { id: CollectionView; label: string; Icon: typeof LayoutGrid }[] =
     `h-full` so every chip fills the shared 36px control height set on its group. */
 const segmentClass = (isActive: boolean) =>
   cn(
-    "flex h-full items-center justify-center gap-1.5 rounded px-3 text-xs font-semibold transition-colors",
+    PRESSABLE,
+    "flex h-full items-center justify-center gap-1.5 rounded border-b-black/30 px-3 text-xs font-semibold transition-colors",
     "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
     isActive
       ? "bg-arsenal-accent/15 text-arsenal-accent"
-      : "text-arsenal-text-tertiary hover:bg-white/[0.06] hover:text-arsenal-text-primary",
+      : "bg-white/[0.04] text-arsenal-text-tertiary hover:bg-white/[0.08] hover:text-arsenal-text-primary",
   );
 
 /**
@@ -162,7 +164,7 @@ export const CollectionToolbar = ({
         onValueChange={(value) => onSortChange(value as CollectionSort)}>
         <SelectTrigger
           aria-label={t("collection.sort_by")}
-          className='h-9 w-full shrink-0 gap-2 border-0 bg-arsenal-bg px-3 text-xs font-semibold text-arsenal-text-primary sm:w-[9.5rem]'>
+          className={cn('h-9 w-full shrink-0 gap-2 border-0', PRESSABLE, 'border-b-black/30 bg-arsenal-bg px-3 text-xs font-semibold text-arsenal-text-primary sm:w-[9.5rem]')}>
           <span className='flex items-center gap-1.5 text-arsenal-text-tertiary'>
             <ArrowUpDown size={13} aria-hidden />
             {t("collection.sort_prefix")}

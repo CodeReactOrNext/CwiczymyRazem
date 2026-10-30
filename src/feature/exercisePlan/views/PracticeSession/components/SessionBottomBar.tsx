@@ -98,9 +98,9 @@ const SessionBottomBarComponent = ({
         {/* Left: Exit */}
         <div className="flex-1 flex items-center justify-start gap-4">
           <Button
-            variant="ghost"
+            variant="subtle"
             onClick={handleExitClick}
-            className="rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
+            className="font-bold text-[11px] tracking-wide text-zinc-400 px-4 gap-2"
           >
             <LogOut size='1em' />
             {t("common:practice.exit")}
@@ -128,8 +128,8 @@ const SessionBottomBarComponent = ({
           {currentExerciseIndex > 0 && (
             <Button
               size="sm"
-              variant="ghost"
-              className="rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
+              variant="subtle"
+              className="font-bold text-[11px] tracking-wide text-zinc-400 px-4 gap-2"
               onClick={onGoToPreviousExercise}
             >
               <SkipBack size='1em' /> {t("common:back") || "Back"}
@@ -141,10 +141,10 @@ const SessionBottomBarComponent = ({
                 <span tabIndex={finishDisabled ? 0 : -1}>
                   <Button
                     size="sm"
-                    variant="ghost"
+                    variant="subtle"
                     loading={isFinishing || isSubmittingReport}
                     className={cn(
-                      "rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2",
+                      "font-bold text-[11px] tracking-wide text-zinc-400 px-4 gap-2",
                       finishDisabled && "opacity-50 cursor-not-allowed"
                     )}
                     disabled={finishDisabled}
@@ -164,13 +164,11 @@ const SessionBottomBarComponent = ({
           {!examMode && (
             <div className="flex flex-col items-end gap-1">
               <Button
-                variant="ghost"
+                variant={isLastExercise ? "default" : "subtle"}
                 loading={isFinishing || isSubmittingReport}
                 className={cn(
-                  "rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior",
-                  isLastExercise
-                    ? "h-10 px-5 bg-white text-black shadow-lg shadow-white/20 hover:bg-zinc-200 hover:text-black"
-                    : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
+                  "font-bold text-[11px] tracking-wide",
+                  isLastExercise ? "h-10 px-5" : "px-4",
                   isLastExercise && finishDisabled && "opacity-50 cursor-not-allowed"
                 )}
                 onClick={
@@ -234,7 +232,7 @@ const SessionBottomBarComponent = ({
           {!finishDisabled && (
             <div className='flex flex-col gap-2'>
               <Button
-                className='h-10 w-full rounded-lg bg-white text-sm font-bold text-black shadow-none transition-background hover:bg-zinc-200'
+                className='h-10 w-full text-sm font-bold'
                 loading={isFinishing || isSubmittingReport}
                 onClick={async () => { setShowExitDialog(false); await onFinishSession({ earlyFinish: isEarlyFinish }); }}>
                 <Check size='1em' className='mr-2' />
@@ -250,21 +248,16 @@ const SessionBottomBarComponent = ({
 
           <div className='flex flex-col-reverse gap-2 sm:flex-row'>
             <Button
-              variant='ghost'
-              className='flex-1 rounded-lg bg-white/5 text-sm font-semibold text-zinc-400 transition-background hover:bg-red-500/10 hover:text-red-400'
+              variant='subtle'
+              className='flex-1 text-sm text-zinc-400 hover:bg-red-500/15 hover:text-red-400'
               onClick={() => { setShowExitDialog(false); onClose?.(); }}>
               <LogOut size='1em' className='mr-2' />
               {finishDisabled ? t("session:exit.exit") : t("session:exit.exit_no_save")}
             </Button>
             <Button
               ref={stayButtonRef}
-              variant='ghost'
-              className={cn(
-                "flex-1 rounded-lg text-sm font-semibold transition-background",
-                finishDisabled
-                  ? "bg-white font-bold text-black hover:bg-zinc-200 hover:text-black"
-                  : "bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white",
-              )}
+              variant={finishDisabled ? "default" : "subtle"}
+              className={cn("flex-1 text-sm", finishDisabled && "font-bold")}
               onClick={() => setShowExitDialog(false)}>
               {t("session:exit.stay")}
             </Button>

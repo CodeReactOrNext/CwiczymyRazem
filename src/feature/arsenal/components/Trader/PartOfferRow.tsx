@@ -1,3 +1,5 @@
+import { PRESSABLE } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import {
   PART_TIER_COLORS,
 } from "feature/arsenal/data/partDefinitions";
@@ -51,7 +53,7 @@ const PickerButton = ({
       {...hold}
       disabled={disabled}
       aria-label={label}
-      className='flex h-8 w-8 shrink-0 touch-manipulation select-none items-center justify-center rounded-md text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:bg-zinc-100/10 hover:text-white'>
+      className={cn(PRESSABLE, "flex h-8 w-8 shrink-0 touch-manipulation select-none items-center justify-center rounded-md text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:bg-zinc-100/10 hover:text-white border-b-black/25")}>
       <Icon size={13} strokeWidth={3} />
     </button>
   );
@@ -194,7 +196,7 @@ export const PartOfferRow = ({
                   }}
                   disabled={maxQty < 1 || qty === fillTo}
                   aria-label={`${fameBound ? t("trader.max") : t("trader.all")} ${fillTo}`}
-                  className='h-8 w-11 shrink-0 rounded-md text-xs font-semibold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:bg-zinc-100/10 hover:text-white'>
+                  className={cn(PRESSABLE, "h-8 w-11 shrink-0 rounded-md text-xs font-semibold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:bg-zinc-100/10 hover:text-white border-b-black/25")}>
                   {fameBound ? t("trader.max") : t("trader.all")}
                 </button>
               </>

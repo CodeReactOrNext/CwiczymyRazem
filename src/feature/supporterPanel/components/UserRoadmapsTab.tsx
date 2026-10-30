@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { PRESSABLE_IN_GROUP } from "assets/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -662,10 +663,11 @@ const RoadmapTile = ({
       <span
         aria-hidden
         className={cn(
+          PRESSABLE_IN_GROUP,
           "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors",
           run
-            ? "bg-white text-zinc-950 group-hover:bg-zinc-200"
-            : "bg-zinc-800 text-zinc-200 group-hover:bg-zinc-700",
+            ? "border-b-black/25 bg-white text-zinc-950 group-hover:bg-zinc-200"
+            : "border-b-black/30 bg-zinc-800 text-zinc-200 group-hover:bg-zinc-700",
         )}>
         {action}
         <ArrowRight size={16} />

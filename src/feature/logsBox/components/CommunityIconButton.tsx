@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { useUnreadMessages as useUnreadChatMessages } from "feature/chat/hooks/useUnreadMessages";
 import { guildChatPath } from "feature/chat/services/chatService";
 import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
@@ -39,16 +40,18 @@ export const CommunityIconButton = ({ onOpen }: CommunityIconButtonProps) => {
     .join(", ");
 
   return (
-    <button
+    <Button
       type='button'
+      variant='subtle'
+      size='icon'
       onClick={() => {
         onOpen?.();
         setOpen(true);
       }}
       title={t("community.title")}
       aria-label={label}
-      className='group relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-[8px] bg-white/5 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-white/20 hover:bg-white/10'>
-      <MessagesSquare className='h-4 w-4 text-zinc-400 transition-colors group-hover:text-white' />
+      className='group h-11 w-11'>
+      <MessagesSquare className='text-zinc-400 transition-colors group-hover:text-white' />
       {unreadCount > 0 && (
         <span className='absolute right-0.5 top-0.5 flex h-5 min-w-5 select-none items-center justify-center rounded-full bg-cyan-500 px-1 text-xs font-bold leading-none text-zinc-950'>
           {unreadCount > 9 ? "9+" : unreadCount}
@@ -57,6 +60,6 @@ export const CommunityIconButton = ({ onOpen }: CommunityIconButtonProps) => {
       {hasUnreadMessage && (
         <span className='absolute left-1 top-1 h-2 w-2 rounded-full bg-red-500' />
       )}
-    </button>
+    </Button>
   );
 };

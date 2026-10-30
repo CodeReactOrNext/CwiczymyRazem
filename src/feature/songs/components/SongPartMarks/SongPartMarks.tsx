@@ -1,3 +1,4 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -119,19 +120,25 @@ export const SongPartMarks = ({
                   aria-label={meta.label}
                   aria-pressed={isMarked}
                   aria-disabled={!isInteractive}
-                  whileTap={isInteractive ? { scale: 0.85 } : undefined}
+                  // The full-size chips are keys that sink on the press; the tiny
+                  // card ones have no room for a lip and keep the squeeze.
+                  whileTap={isInteractive && isSm ? { scale: 0.85 } : undefined}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleToggle(part);
                   }}
                   className={cn(
                     "relative flex items-center justify-center rounded-[4px] transition-colors duration-base",
-                    isSm ? "h-6 w-6" : "h-10 gap-2 whitespace-nowrap px-3.5",
+                    isSm
+                      ? "h-6 w-6"
+                      : cn(PRESSABLE_KEY, "h-10 gap-2 whitespace-nowrap rounded-lg px-3.5"),
                     isCovered
                       ? "bg-zinc-700/40 text-zinc-500"
                       : isMarked
                       ? meta.activeChip
-                      : "bg-white/5 text-zinc-500",
+                      : isSm
+                      ? "bg-white/5 text-zinc-500"
+                      : "bg-zinc-800 text-zinc-400",
                     isInteractive && !isMarked && "hover:text-zinc-300",
                     isInteractive ? "cursor-pointer" : "cursor-default"
                   )}

@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "assets/components/ui/alert-dialog";
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Play, Trash2 } from "lucide-react";
@@ -152,7 +153,10 @@ export const GoalCard = ({ uid, goal, onDelete }: GoalCardProps) => {
 
         <Link
           href={`/practice/goal/${goal.id}`}
-          className='mt-auto flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-white px-6 text-sm font-semibold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 hover:bg-zinc-200 sm:w-auto sm:self-start'>
+          className={cn(
+            buttonVariants(),
+            "mt-auto h-11 w-full px-6 sm:w-auto sm:self-start",
+          )}>
           <Play className='h-4 w-4 fill-current' />
           {t("card.start_at", { bpm: goal.stageBpm })}
         </Link>

@@ -1,5 +1,7 @@
 "use client";
 
+import { PRESSABLE } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
@@ -338,7 +340,7 @@ export const MergeAnimation = ({
       <motion.button
         type='button'
         onClick={finish}
-        className='h-11 min-w-40 rounded-lg bg-white px-6 text-sm font-medium text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-zinc-200'
+        className={cn(PRESSABLE, "h-11 min-w-40 rounded-lg bg-white px-6 text-sm font-medium text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 hover:bg-zinc-200 border-b-black/25")}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: reduceMotion ? 0 : SETTLE, duration: 0.3 }}>

@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -70,9 +71,9 @@ interface LastRoll {
 
 /** The one primary button in these dialogs: white, not the interaction cyan. */
 const PRIMARY =
-  "rounded-lg bg-zinc-100 px-6 py-2.5 text-sm font-bold text-zinc-900 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-300 disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-400";
+  `${PRESSABLE} rounded-lg bg-zinc-100 px-6 py-2.5 text-sm font-bold text-zinc-900 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-300 disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-400 border-b-black/25`;
 const SECONDARY =
-  "rounded-lg bg-zinc-800 px-5 py-2.5 text-sm font-semibold text-zinc-200 transition-colors hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+  `${PRESSABLE} rounded-lg bg-zinc-800 px-5 py-2.5 text-sm font-semibold text-zinc-200 transition-colors hover:bg-zinc-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border-b-black/30`;
 
 /**
  * Every value a roll can land on, one cell each: amber below what the mod

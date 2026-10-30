@@ -1,3 +1,4 @@
+import { buttonVariants, PRESSABLE } from "assets/components/ui/button";
 import { Dialog, DialogContent } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
 import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
@@ -28,6 +29,13 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { SiGuitarpro } from "react-icons/si";
 import { toast } from "sonner";
+
+// Each mode is one big key — the subtle face with its lip, like the app's other
+// buttons — rather than a bordered card. The icons keep their colour.
+const MODE_KEY = cn(
+  PRESSABLE,
+  "group flex w-full items-center gap-4 rounded-lg border-b-black/30 bg-white/10 p-4 text-left transition-colors hover:bg-white/15",
+);
 
 type Phase = "pick" | "attach";
 type AttachTab = "library" | "import";
@@ -154,25 +162,25 @@ export function SongPracticePickerModal({
             {/* Free practice */}
             <button
               onClick={handleFreePractice}
-              className="group flex w-full items-center gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 text-left transition-all hover:border-white/10 hover:bg-white/[0.06] active:scale-[0.99]"
+              className={MODE_KEY}
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 border border-white/5 border-t-indigo-500/40 border-l-indigo-500/20 shadow-lg transition-all duration-base">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-indigo-500/15">
                 <CassetteTape size='1em' className="h-5 w-5 text-indigo-400" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-white">{t("picker.free_practice")}</p>
-                <p className="text-[11px] text-zinc-500">{t("picker.free_practice_hint")}</p>
+                <p className="text-[11px] text-zinc-400">{t("picker.free_practice_hint")}</p>
               </div>
-              <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600 transition-colors group-hover:text-zinc-400" />
+              <ChevronRight className="h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-300" />
             </button>
 
             {/* GP5 practice */}
             {isPremium ? (
               <button
                 onClick={handleGp5Practice}
-                className="group flex w-full items-center gap-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 text-left transition-all hover:border-cyan-500/30 hover:bg-cyan-500/10 active:scale-[0.99]"
+                className={MODE_KEY}
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 border border-white/5 border-t-cyan-500/40 border-l-cyan-500/20 shadow-lg transition-all duration-base">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15">
                   <SiGuitarpro className="h-5 w-5 text-cyan-400" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -183,10 +191,10 @@ export function SongPracticePickerModal({
                       <span className="truncate text-[11px] text-cyan-400/70">{progress?.gpFileName}</span>
                     </div>
                   ) : (
-                    <p className="text-[11px] text-zinc-500">{t("picker.gp_practice_hint")}</p>
+                    <p className="text-[11px] text-zinc-400">{t("picker.gp_practice_hint")}</p>
                   )}
                 </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-cyan-600 transition-colors group-hover:text-cyan-400" />
+                <ChevronRight className="h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-300" />
               </button>
             ) : (
               <div className="relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.02] p-4 opacity-70">
@@ -222,14 +230,14 @@ export function SongPracticePickerModal({
               <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={() => setPhase("attach")}
-                  className="flex-1 rounded-lg border border-white/5 px-3 py-2 text-xs font-bold text-zinc-500 transition-colors hover:border-white/10 hover:text-zinc-300"
+                  className={cn(buttonVariants({ variant: "subtle", size: "sm" }), "flex-1 font-bold text-zinc-400")}
                 >
                   {t("picker.change_gp")}
                 </button>
                 <button
                   onClick={handleDetach}
                   disabled={isDetaching}
-                  className="flex items-center gap-1.5 rounded-lg border border-red-500/20 px-3 py-2 text-xs font-bold text-red-500/70 transition-colors hover:border-red-500/30 hover:text-red-400 disabled:opacity-50"
+                  className={cn(buttonVariants({ variant: "subtle", size: "sm" }), "gap-1.5 font-bold text-red-400/80 hover:bg-red-500/15 hover:text-red-400 [&_svg]:size-3")}
                 >
                   {isDetaching ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -244,16 +252,16 @@ export function SongPracticePickerModal({
             {/* Manual log — for practice that happened outside the app */}
             <button
               onClick={handleManualLog}
-              className="group mt-2 flex w-full items-center gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 text-left transition-all hover:border-white/10 hover:bg-white/[0.06] active:scale-[0.99]"
+              className={cn(MODE_KEY, "mt-2")}
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-white/5 border-t-emerald-500/40 border-l-emerald-500/20 shadow-lg transition-all duration-base">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15">
                 <NotebookPen className="h-5 w-5 text-emerald-400" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-white">{t("picker.log_practice")}</p>
-                <p className="text-[11px] text-zinc-500">{t("picker.log_practice_hint")}</p>
+                <p className="text-[11px] text-zinc-400">{t("picker.log_practice_hint")}</p>
               </div>
-              <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600 transition-colors group-hover:text-zinc-400" />
+              <ChevronRight className="h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-300" />
             </button>
           </div>
         )}

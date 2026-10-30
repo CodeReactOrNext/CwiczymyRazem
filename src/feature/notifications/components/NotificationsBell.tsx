@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +16,6 @@ import {
   placeSuffix,
 } from "feature/notifications/services/notification.service";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { useDateFnsLocale } from "lib/i18n/dateLocale";
 import { Interpolate } from "lib/i18n/Interpolate";
@@ -41,7 +41,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/router";
-import { type ReactNode, useRef, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 const chatLabel = (verb: "mentioned" | "replied") =>
@@ -345,49 +345,18 @@ export const NotificationsBell = () => {
       router.push(href);
     }
   };
-  const [ripples, setRipples] = useState<
-    { id: number; x: number; y: number }[]
-  >([]);
-  const rippleId = useRef(0);
-
-  const spawnRipple = (e: React.PointerEvent<HTMLButtonElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const id = rippleId.current++;
-    setRipples((prev) => [
-      ...prev,
-      { id, x: e.clientX - rect.left, y: e.clientY - rect.top },
-    ]);
-  };
-
-  const removeRipple = (id: number) =>
-    setRipples((prev) => prev.filter((r) => r.id !== id));
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <motion.button
-          onPointerDown={spawnRipple}
-          whileTap={{ scale: 0.88 }}
-          transition={{ type: "spring", stiffness: 500, damping: 25 }}
+        <Button
+          variant='subtle'
+          size='icon'
           aria-label={unreadCount > 0 ? t("bell.aria_unread", { count: unreadCount }) : t("bell.aria")}
-          className='group relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-[8px] bg-white/5 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-white/20 data-[state=open]:bg-white/10 data-[state=open]:ring-1 data-[state=open]:ring-white/15 hover:bg-white/10'>
-          <AnimatePresence>
-            {ripples.map((r) => (
-              <motion.span
-                key={r.id}
-                initial={{ scale: 0, opacity: 0.6 }}
-                animate={{ scale: 2.5, opacity: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.55, ease: "easeOut" }}
-                onAnimationComplete={() => removeRipple(r.id)}
-                style={{ left: r.x, top: r.y }}
-                className='pointer-events-none absolute h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50'
-              />
-            ))}
-          </AnimatePresence>
+          className='group h-11 w-11 data-[state=open]:bg-white/15'>
           <Bell
             className={cn(
-              "h-4 w-4 text-zinc-400 transition-colors group-hover:text-white",
+              "text-zinc-400 transition-colors group-hover:text-white",
               "group-data-[state=open]:text-white",
             )}
           />
@@ -396,7 +365,7 @@ export const NotificationsBell = () => {
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
-        </motion.button>
+        </Button>
       </DropdownMenuTrigger>
       {/* Portalled outside the app's theme wrapper, so it brings `dark-theme` along — without it
           the initial-avatar fill (`bg-tertiary-400`) resolves to nothing and the letter vanishes.

@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
@@ -59,7 +60,7 @@ export const ExerciseFilters = ({
           type='button'
           onClick={() => setShowMore((v) => !v)}
           aria-expanded={showMore}
-          className={cn(
+          className={cn(PRESSABLE, "border-b-black/30", 
             "flex h-[42px] shrink-0 items-center gap-2 rounded-lg px-4 text-xs font-semibold transition-colors",
             showMore || activeExtraFilters > 0
               ? "bg-cyan-500/15 text-cyan-300"
@@ -83,8 +84,8 @@ export const ExerciseFilters = ({
             <div className="flex flex-wrap gap-2">
                 <button
                     onClick={() => onCategoryChange("all")}
-                    className={cn(
-                        "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-base",
+                    className={cn(PRESSABLE, "border-b-black/30", 
+                        "px-3.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors duration-base",
                         selectedCategory === "all"
                             ? "bg-cyan-500/15 text-cyan-300"
                             : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
@@ -96,8 +97,8 @@ export const ExerciseFilters = ({
                     <button
                         key={category}
                         onClick={() => onCategoryChange(category)}
-                        className={cn(
-                            "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-base flex items-center",
+                        className={cn(PRESSABLE, "border-b-black/30", 
+                            "px-3.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors duration-base flex items-center",
                             selectedCategory === category
                                 ? "bg-cyan-500/15 text-cyan-300"
                                 : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
@@ -127,8 +128,8 @@ export const ExerciseFilters = ({
                     <button
                         key={diff}
                         onClick={() => onDifficultyChange(diff)}
-                        className={cn(
-                            "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-base capitalize",
+                        className={cn(PRESSABLE, "border-b-black/30", 
+                            "px-3.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors duration-base capitalize",
                             selectedDifficulty === diff
                                 ? "bg-cyan-500/15 text-cyan-300"
                                 : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
@@ -173,8 +174,8 @@ export const ExerciseFilters = ({
                 <div className="flex flex-wrap gap-2 pl-1 mt-1 animate-in fade-in slide-in-from-top-2 duration-base">
                   <button
                     onClick={() => { onSkillChange("all"); setIsSkillOpen(false); }}
-                    className={cn(
-                      "px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-base",
+                    className={cn(PRESSABLE, "border-b-black/30", 
+                      "px-3.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors duration-base",
                       selectedSkill === "all"
                         ? "bg-cyan-500/15 text-cyan-300"
                         : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"
@@ -189,8 +190,8 @@ export const ExerciseFilters = ({
                       <button
                         key={skill}
                         onClick={() => { onSkillChange(skill); setIsSkillOpen(false); }}
-                        className={cn(
-                          "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[11px] scale-100 active:scale-95 font-medium transition-all duration-base",
+                        className={cn(PRESSABLE, "border-b-black/30", 
+                          "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors duration-base",
                           selectedSkill === skill
                             ? "bg-cyan-500/15 text-cyan-300"
                             : "bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white"

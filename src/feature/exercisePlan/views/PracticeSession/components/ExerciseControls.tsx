@@ -81,10 +81,7 @@ const ExerciseControls = ({
             onClick={toggleTimer}
             className={cn(
               variant === "centered" ? (size === "lg" ? "h-14 px-8 w-auto" : size === "sm" ? "h-10 px-5 w-auto" : "h-12 px-6 w-auto") : "w-full",
-              "rounded-lg font-black transition-background click-behavior   relative",
-              isPlaying
-                ? "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20"
-                : "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20 animate-pulse"
+              "font-black"
             )}>
             {!isPlaying && !startHintSeen && (
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 whitespace-nowrap z-[60] pointer-events-none">
@@ -115,12 +112,9 @@ const ExerciseControls = ({
        {handleRestart && (
          <Button
            size={size === "lg" ? "lg" : "default"}
-           variant="ghost"
+           variant="subtle"
            onClick={handleRestart}
-           className={cn(
-             btnSizes[size],
-             "rounded-lg transition-all click-behavior text-zinc-400 hover:text-white hover:bg-white/5 border border-white/5"
-           )}
+           className={cn(btnSizes[size], "text-zinc-400")}
            title={t("controls.restart")}
          >
            <svg 
@@ -142,11 +136,9 @@ const ExerciseControls = ({
       {variant !== "centered" && !isLastExercise && (
         <Button
           size={size === "lg" ? "lg" : "default"}
-          variant='ghost'
+          variant='subtle'
           onClick={handleNextExercise}
-          className={cn(
-            "flex-1 rounded-lg transition-background click-behavior",
-          )}>
+          className='flex-1'>
           <SkipForward size='1em' className={iconSizes[size]} />
         </Button>
       )}

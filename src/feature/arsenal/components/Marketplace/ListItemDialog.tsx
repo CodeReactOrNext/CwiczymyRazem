@@ -1,3 +1,5 @@
+import { PRESSABLE } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { AnimatePresence, m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { fade } from "lib/motion/motion";
@@ -116,13 +118,13 @@ export const ListItemDialog = ({
               <button
                 onClick={onCancel}
                 disabled={isLoading}
-                className='flex-1 rounded bg-zinc-700 px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50 hover:bg-zinc-600'>
+                className={cn(PRESSABLE, "flex-1 rounded bg-zinc-700 px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50 hover:bg-zinc-600 border-b-black/30")}>
                 {t("common.cancel")}
               </button>
               <button
                 onClick={() => canConfirm && onConfirm(parsed)}
                 disabled={!canConfirm}
-                className='flex-1 rounded bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-amber-700'>
+                className={cn(PRESSABLE, "flex-1 rounded bg-amber-600 px-4 py-2 text-sm font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40 hover:bg-amber-700 border-b-black/30")}>
                 {isLoading ? t("market.listing") : t("market.list_item")}
               </button>
             </div>

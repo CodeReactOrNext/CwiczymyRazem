@@ -1,3 +1,4 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -81,9 +82,11 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
+          type='button'
           title={t("view_menu.hint")}
           className={cn(
-            "flex items-center gap-2 rounded-lg outline-none transition-all active:scale-95",
+            PRESSABLE_KEY,
+            "flex items-center gap-2 rounded-lg outline-none transition-colors",
             "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
             h,
             compact ? "px-2" : "px-4",

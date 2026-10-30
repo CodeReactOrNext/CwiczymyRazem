@@ -1,3 +1,4 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,7 +7,6 @@ import {
 } from "assets/components/ui/dropdown-menu";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
-import { RippleButton } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, Lock, Minus, Plus } from "lucide-react";
 import { memo, useRef, useState } from "react";
@@ -79,6 +79,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   };
 
   const stepBtn = cn(
+    PRESSABLE_KEY,
     "flex items-center justify-center shrink-0 rounded-lg bg-zinc-900/60 text-zinc-200 transition-colors hover:bg-zinc-700 hover:text-white disabled:opacity-40 disabled:hover:bg-zinc-900/60",
     compact ? "h-7 w-7" : "h-8 w-8",
   );
@@ -109,7 +110,8 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
         )}
 
         <SessionTooltip label={t("quick.slower_hint")} keys={["↓"]}>
-          <RippleButton
+          <button
+            type='button'
             className={stepBtn}
             onClick={() => setBpm(Math.max(minBpm, bpm - 1))}
             disabled={bpm <= minBpm}
@@ -118,7 +120,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
               strokeWidth={2.5}
             />
-          </RippleButton>
+          </button>
         </SessionTooltip>
 
         {isEditing ? (
@@ -166,7 +168,8 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
         )}
 
         <SessionTooltip label={t("quick.faster_hint")} keys={["↑"]}>
-          <RippleButton
+          <button
+            type='button'
             className={stepBtn}
             onClick={() => setBpm(Math.min(maxBpm, bpm + 1))}
             disabled={bpm >= maxBpm}
@@ -175,7 +178,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
               strokeWidth={2.5}
             />
-          </RippleButton>
+          </button>
         </SessionTooltip>
 
         {metronome.setSubdivision && (

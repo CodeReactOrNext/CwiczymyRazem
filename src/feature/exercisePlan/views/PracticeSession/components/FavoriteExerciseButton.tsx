@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
@@ -47,11 +48,12 @@ export const FavoriteExerciseButton = ({
       aria-pressed={isFavorite}
       title={isFavorite ? t("remove_favorite") : t("add_favorite")}
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-lg ring-1 transition-colors duration-base",
-        compact ? "h-6 w-6" : "h-9 w-9",
+        buttonVariants({ variant: "subtle", size: "icon" }),
+        "shrink-0",
+        compact ? "h-6 w-6 [&_svg]:size-3.5" : "h-9 w-9",
         isFavorite
-          ? "bg-rose-500/15 text-rose-400 ring-rose-500/30 hover:bg-rose-500/25 hover:text-rose-300"
-          : "bg-white/5 text-zinc-400 ring-white/10 hover:bg-rose-500/10 hover:text-rose-300",
+          ? "bg-rose-500/15 text-rose-400 hover:bg-rose-500/25 hover:text-rose-300"
+          : "text-zinc-400 hover:bg-rose-500/10 hover:text-rose-300",
         className
       )}
     >

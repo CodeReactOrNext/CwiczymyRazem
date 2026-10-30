@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { ShoppingCart } from "lucide-react";
@@ -50,8 +51,8 @@ export const BuyButton = ({
       onClick={onClick}
       disabled={isBuying || !canAfford}
       title={!canAfford ? t("buy.not_enough_fame_points") : undefined}
-      className={cn(
-        "flex items-center justify-between gap-3 rounded-lg font-bold transition-colors duration-fast click-behavior",
+      className={cn(PRESSABLE, "border-b-black/30", 
+        "flex items-center justify-between gap-3 rounded-lg font-bold transition-colors duration-fast ",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
         size === "sm" ? "h-9 px-3 text-xs" : "h-10 px-4 text-sm",
         canAfford

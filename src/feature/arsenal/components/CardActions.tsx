@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react";
@@ -93,7 +94,7 @@ export const CardActionRow = ({
  * sitting there permanently would shout over the item itself.
  */
 const cardAction = cva(
-  "flex items-center justify-center rounded-lg bg-zinc-800/40 font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50 disabled:cursor-not-allowed disabled:opacity-30",
+  `${PRESSABLE} flex items-center justify-center rounded-lg bg-zinc-800/40 font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50 disabled:cursor-not-allowed disabled:opacity-30 border-b-black/30`,
   {
     variants: {
       layout: {

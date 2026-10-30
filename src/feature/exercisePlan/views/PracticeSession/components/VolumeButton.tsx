@@ -1,9 +1,9 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "assets/components/ui/dropdown-menu";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { AutoBackingSection } from "feature/autoBacking/components/AutoBackingSection";
 import { useAutoBackingStore } from "feature/autoBacking/store/autoBackingStore";
-import { RippleButton } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { Volume1, Volume2, VolumeX } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
@@ -75,24 +75,30 @@ export const VolumeButton = ({
     : Volume2;
 
   const trigger = mobile ? (
-    <RippleButton
+    <button
+      type='button'
       title={t("volume.title")}
-      className='flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-lg bg-zinc-800 text-zinc-400 transition-all active:scale-95'>
+      className={cn(
+        PRESSABLE_KEY,
+        "flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-lg bg-zinc-800 text-zinc-400 transition-colors",
+      )}>
       <VolumeIcon className='h-4 w-4 shrink-0' strokeWidth={2.5} />
       <span className='truncate text-[10px] font-semibold tracking-wide'>{t("volume.title")}</span>
-    </RippleButton>
+    </button>
   ) : (
-    <RippleButton
+    <button
+      type='button'
       aria-label={t("volume.title")}
       className={cn(
-        "flex items-center justify-center shrink-0 rounded-lg transition-all outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
-        compact ? "h-8 w-8 active:scale-90" : cn("w-12 active:scale-95", h),
+        PRESSABLE_KEY,
+        "flex items-center justify-center shrink-0 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
+        compact ? "h-8 w-8" : cn("w-12", h),
         isBoosted
           ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
           : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
       )}>
       <VolumeIcon className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={2.5} />
-    </RippleButton>
+    </button>
   );
 
   return (

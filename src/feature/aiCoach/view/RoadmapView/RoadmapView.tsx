@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
@@ -131,7 +132,7 @@ const StepMapButton = ({
       type='button'
       data-step-id={connector ? step.id : undefined}
       onClick={onClick}
-      className={cn(
+      className={cn(PRESSABLE, "border-b-black/30", 
         "flex items-center gap-2.5 rounded px-3 py-2.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
         STEP_CLS[status],
         fullWidth ? "w-full" : "max-w-[260px]",
@@ -191,7 +192,7 @@ const CheckpointMapButton = ({
       type='button'
       data-check-id={connector ? phase.id : undefined}
       onClick={onClick}
-      className={cn(
+      className={cn(PRESSABLE, "border-b-black/30", 
         "flex items-center gap-2.5 rounded px-3 py-2.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
         CHECK_CLS[state],
         fullWidth ? "w-full" : "max-w-[260px]",
@@ -1722,7 +1723,10 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                 <button
                   type='button'
                   onClick={() => openCheckpoint(checkpointUpNext.phase.id)}
-                  className='group flex min-w-0 flex-1 items-center gap-4 rounded-lg bg-amber-500/10 px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-amber-500/15'>
+                  className={cn(
+                    PRESSABLE,
+                    "group flex min-w-0 flex-1 items-center gap-4 rounded-lg border-b-black/30 bg-amber-500/10 px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-amber-500/15",
+                  )}>
                   <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400'>
                     <ClipboardCheck className='h-4 w-4' />
                   </span>
@@ -1746,7 +1750,10 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                 <button
                   type='button'
                   onClick={() => openStep(upNext)}
-                  className='group flex min-w-0 flex-1 items-center gap-4 rounded-lg bg-cyan-500/10 px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-cyan-500/15'>
+                  className={cn(
+                    PRESSABLE,
+                    "group flex min-w-0 flex-1 items-center gap-4 rounded-lg border-b-black/30 bg-cyan-500/10 px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-cyan-500/15",
+                  )}>
                   <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
                     <Play className='h-4 w-4' fill='currentColor' />
                   </span>

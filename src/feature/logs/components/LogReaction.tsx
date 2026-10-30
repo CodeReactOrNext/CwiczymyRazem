@@ -1,4 +1,5 @@
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import { PRESSABLE } from "assets/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -198,12 +199,12 @@ export const LogReaction = ({
                 ? `Motivated. This activity earned ${totalFame} Fame`
                 : `Motivate ${recipient} and give them ${fameAmount} Fame`
             }
-            className={cn(
+            className={cn(PRESSABLE, "border-b-black/30", 
               "group relative flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-[color,background-color,transform] duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:gap-2 sm:px-3 sm:text-[13px]",
               // A motivated row lights up amber; one still waiting for you stays neutral.
               isReacted
                 ? "cursor-default bg-amber-500/15 text-amber-300"
-                : "cursor-pointer bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-300 active:scale-95",
+                : "cursor-pointer bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-300",
               showHint && !isReacted && "ring-1 ring-amber-400/40",
             )}>
             {showHint && !isReacted && (
