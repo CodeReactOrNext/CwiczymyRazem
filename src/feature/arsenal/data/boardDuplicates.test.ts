@@ -134,7 +134,7 @@ describe("readBoardLevel", () => {
     expect(board.duplicates).toHaveLength(1);
     expect(board.duplicates[0]).toMatchObject({
       model: TS808,
-      name: "TS-808 Overdrive",
+      name: "Moss Drive",
       penalty: board.penalty,
     });
     expect(board.duplicates[0].copies.map((copy) => copy.itemId)).toEqual([
@@ -165,7 +165,7 @@ describe("readBoardLevel", () => {
   });
 
   it("treats a promoted copy as the same model, and as the better one", () => {
-    // Nine builds is three promotions: a Common TS-808 minted as Common, now
+    // Nine builds is three promotions: a Common Moss Drive minted as Common, now
     // Epic. The ladder changes what a copy is worth, never what it is.
     const promoted = pedal("promoted", TS808, { buildLevel: 9 });
     const plain = pedal("plain", TS808);
@@ -238,11 +238,11 @@ describe("describeDuplicateCopy", () => {
     const board = readBoardLevel(boardOf(["a", "b", "c"]), stash);
     const second = board.copies.get("b")!;
     const third = board.copies.get("c")!;
-    expect(describeDuplicateCopy(second, "TS-808 Overdrive")).toContain(
-      "second TS-808 Overdrive on the board — it adds half its level",
+    expect(describeDuplicateCopy(second, "Moss Drive")).toContain(
+      "second Moss Drive on the board — it adds half its level",
     );
-    expect(describeDuplicateCopy(third, "TS-808 Overdrive")).toContain(
-      "third TS-808 Overdrive on the board — it adds nothing",
+    expect(describeDuplicateCopy(third, "Moss Drive")).toContain(
+      "third Moss Drive on the board — it adds nothing",
     );
   });
 
@@ -251,8 +251,8 @@ describe("describeDuplicateCopy", () => {
     const board = readBoardLevel(boardOf(["a", "b"]), stash);
     const best = board.copies.get("a")!;
 
-    const line = describeDuplicateCopy(best, "TS-808 Overdrive");
-    expect(line).toContain("2 copies of TS-808 Overdrive");
+    const line = describeDuplicateCopy(best, "Moss Drive");
+    expect(line).toContain("2 copies of Moss Drive");
     expect(line).toContain("counts in full");
   });
 });

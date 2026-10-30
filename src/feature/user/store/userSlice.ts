@@ -180,6 +180,11 @@ const userSlice = createSlice({
         state.currentUserStats.fame = Math.max(0, payload);
       }
     },
+    setStreakRestDays: (state, { payload }: PayloadAction<boolean>) => {
+      if (state.currentUserStats) {
+        state.currentUserStats.streakRestDays = payload;
+      }
+    },
     // Challenges removed
     generateDailyQuest: (state, action: PayloadAction<{ randomExercise?: { id: string; title: string } } | undefined>) => {
       if (!state.currentUserStats) return;
@@ -637,6 +642,7 @@ export const {
   addFame,
   setFame,
   setSelectedGuitar,
+  setStreakRestDays,
   setFavoritePlan,
   setFavoriteExercise,
   setFavoriteSong,

@@ -203,7 +203,7 @@ const FREE_EXERCISE_IDS = new Set([
   "gp_music_theory_essential",
   "gp_drop2_chords_arpeggios",
   "gp_pentatonic_tutorial",
-  // Song-guide riff previews — free
+  // Riff Vault — free
   "master_of_puppets_riff_preview",
   "seven_nation_army_riff_preview",
 ]);

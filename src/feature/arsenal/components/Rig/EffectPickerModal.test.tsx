@@ -8,7 +8,7 @@ import { EffectPickerModal } from "./EffectPickerModal";
 
 afterEach(cleanup);
 
-/** Effect 1 is EchoPath, effect 2 the TS-808 — both plain, no rolled extras. */
+/** Effect 1 is EchoPath, effect 2 the Moss Drive — both plain, no rolled extras. */
 const copy = (
   id: string,
   effectId: number,
@@ -43,7 +43,7 @@ describe("EffectPickerModal", () => {
     );
 
     expect(echoPathTiles()).toHaveLength(3);
-    expect(screen.getAllByRole("button", { name: /TS-808/ })).toHaveLength(1);
+    expect(screen.getAllByRole("button", { name: /Moss Drive/ })).toHaveLength(1);
   });
 
   it("leaves the spare copies pickable while the fitted one is taken", () => {

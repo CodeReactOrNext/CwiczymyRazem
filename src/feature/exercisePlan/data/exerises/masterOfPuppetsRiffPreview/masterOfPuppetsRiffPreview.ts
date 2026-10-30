@@ -15,13 +15,14 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 // chord 2 from chord 3, and chord 3 (a half note) rings for the rest of the
 // bar. Bar 4 resolves the descent as single notes on string 6: 5-4-3-2-1.
 export const masterOfPuppetsRiffPreviewExercise: Exercise = {
+  // Legacy id from the riff's old song-based name — it is a Firestore key, keep it.
   id: "master_of_puppets_riff_preview",
   addedAt: "2026-08-06",
-  title: "Riff Vault — Master of Puppets",
+  title: "Riff Vault — Chromatic Engine",
   description:
-    "A short excerpt from the song's iconic palm-muted opening riff, including its power-chord accents.",
+    "A palm-muted chromatic riff over an open-string pedal, broken up by power-chord accents.",
   whyItMatters:
-    "This is the riff that opens (and keeps returning through) the whole song: chromatic palm-muted picking that snaps into power chords, testing both alternate-picking stamina and clean chord transitions.",
+    "Chromatic palm-muted picking that snaps into power chords and back, testing both alternate-picking stamina and clean chord transitions.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 2,

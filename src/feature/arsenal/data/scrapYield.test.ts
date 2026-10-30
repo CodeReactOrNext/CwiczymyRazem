@@ -68,7 +68,7 @@ describe("getScrapYield", () => {
   });
 
   it("hands out more slots the rarer the gear is", () => {
-    const bom = getGuitarBom(24); // Stratocaster — four slots deep
+    const bom = getGuitarBom(24); // S-Contour — four slots deep
     const counts = ALL_RARITIES.map(
       (r) => bomSlots(getScrapYield({ bom, rarity: r })).length,
     );
@@ -103,7 +103,7 @@ describe("getScrapYield", () => {
   });
 
   it("locks no part type behind rarity — a Common still gives its headline part", () => {
-    // 24 = Stratocaster (Common). Pickups lead its salvage order, so they come off
+    // 24 = S-Contour (Common). Pickups lead its salvage order, so they come off
     // even at the bottom of the pool, just at Standard.
     const parts = getScrapYield({ bom: getGuitarBom(24), rarity: "Common" });
     expect(bomSlots(parts)).toEqual([
@@ -138,7 +138,7 @@ describe("getScrapYield", () => {
   });
 
   it("yields Unique parts only from Mythic gear, and only where they show", () => {
-    // 43 = Stratocaster Heavy Relic (Mythic) — [pickup, neck, body, tuners]
+    // 43 = S-Contour Heavy Relic (Mythic) — [pickup, neck, body, tuners]
     const mythic = getScrapYield({ bom: getGuitarBom(43), rarity: "Mythic" });
     expect(tierOf(mythic, "pickup")).toBe("Unique");
     expect(tierOf(mythic, "body")).toBe("Unique");

@@ -27,7 +27,7 @@ Dos de ellas —aprender una canción y despejar una casilla del Mapa de escalas
 
 Practica en días consecutivos y cada sesión de ese día vale más. La bonificación se aplica a tu tiempo de práctica *y* a tus puntos de hábitos, y es lo más parecido a un truco que tiene la app.
 
-<ProgressLadder items="Día 1::La racha empieza, aún sin bonificación|Día 2::+20 % en todo lo que registres ese día|Día 3::+30 %|Día 4::+40 %|Día 5 y siguientes::+50 %, el máximo" highlight="Día 5 y siguientes" caption="Pierde un día y vuelve a cero. Una sesión de 10 minutos basta para mantenerla." />
+<ProgressLadder items="Día 1::La racha empieza, aún sin bonificación|Día 2::+20 % en todo lo que registres ese día|Día 3::+30 %|Día 4::+40 %|Día 5 y siguientes::+50 %, el máximo" highlight="Día 5 y siguientes" caption="Un día perdido a la semana es día de descanso y la racha sigue. Pierde más y vuelve a cero. Una sesión de 10 minutos basta para mantenerla." />
 
 <BlogAlert type="tip">
 Aparecer diez minutos en un día ocupado vale más que un domingo de tres horas. La racha premia la frecuencia, no las hazañas.

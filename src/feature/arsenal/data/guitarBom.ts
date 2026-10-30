@@ -21,7 +21,7 @@ import type { ScrapBom } from "../types/arsenal.types";
  * lists and that test will tell you what you broke.
  */
 
-/** Three pickups on a full harness — Stratocaster layout, bolt-on neck. */
+/** Three pickups on a full harness — S-Contour layout, bolt-on neck. */
 const STRAT: ScrapBom = [
   { partId: "pickup", qty: 3 },
   { partId: "neck", qty: 1 },
@@ -76,7 +76,7 @@ const TWIN: ScrapBom = [
  * it does.
  *
  * Slot one is doing real work here: it is the only place outside the four
- * Legendary Stratocasters that a Legendary pickup exists at all, since the tier
+ * Legendary S-Contours that a Legendary pickup exists at all, since the tier
  * is reachable only from the first two slots of a Legendary donor. Move the
  * pickups back down and the entire Legendary supply is one guitar model again.
  */

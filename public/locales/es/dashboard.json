@@ -169,7 +169,10 @@
     "bonus": "+{{pct}} % de puntos en cada sesión",
     "done_today": "Hoy ya está hecho.",
     "not_yet": "Aún no has registrado nada hoy. Una sesión corta mantiene la racha.",
-    "practice_now": "Practicar ahora"
+    "practice_now": "Practicar ahora",
+    "rest_free": "Día de descanso disponible. Sáltate un día esta semana y tu racha sigue.",
+    "rest_used": "Ya usaste el día de descanso de esta semana. El siguiente llega el lunes.",
+    "rest_yesterday": "Ayer fue tu día de descanso. Toca hoy para mantener la racha."
   },
   "rank": {
     "title": "Tu posición",

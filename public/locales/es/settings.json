@@ -109,5 +109,12 @@
     "notifications": "Notificaciones",
     "security": "Seguridad",
     "google_auth": "Autenticación con Google"
+  },
+  "streak": {
+    "title": "Racha",
+    "subtitle": "Cómo se cuenta tu racha diaria.",
+    "label": "Día de descanso",
+    "description": "Saltarte un día a la semana (de lunes a domingo) no rompe tu racha, aunque tampoco la alarga. Dos días seguidos sin tocar siempre la rompen.",
+    "error": "No se pudo guardar. Inténtalo de nuevo."
   }
 }

@@ -10,6 +10,7 @@ import { getReconciledStreak } from "./getReconciledStreak";
 import {
   getLongestStreakFromActivityLog,
   getStreakFromActivityLog,
+  hasRestDays,
 } from "./getStreakFromActivityLog";
 import { getUpdatedActualDayWithoutBreak } from "./getUpdatedActualDayWithoutBreak";
 import { levelUpUser } from "./levelUpUser";
@@ -38,6 +39,7 @@ export {
   getReminderHourUtc,
   getStreakFromActivityLog,
   getUpdatedActualDayWithoutBreak,
+  hasRestDays,
   isValidTimeZone,
   levelUpUser,
   makeRatingData,

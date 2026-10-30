@@ -2,7 +2,8 @@
   "changelog": {
     "empty": "Diesen Monat keine Einträge",
     "new": "Neu",
-    "bug_fix": "Fehlerbehebung"
+    "bug_fix": "Fehlerbehebung",
+    "play_video": "Video abspielen: {{title}}"
   },
   "open_in_practice_log": "Im Übungsprotokoll öffnen",
   "activity": "Aktivität",

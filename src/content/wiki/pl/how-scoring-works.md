@@ -27,7 +27,7 @@ Dwie z tych rzeczy — nauka utworu i ukończenie pola na Mapie skal — trafiaj
 
 Ćwicz w kolejne dni, a każda sesja tego dnia jest warta więcej. Premia dotyczy twojego czasu ćwiczeń *i* punktów za nawyki i jest najbliższą rzeczą kodu oszusta, jaką ma aplikacja.
 
-<ProgressLadder items="Dzień 1::Seria się zaczyna, jeszcze bez premii|Dzień 2::+20% do wszystkiego, co zapiszesz tego dnia|Dzień 3::+30%|Dzień 4::+40%|Dzień 5 i dalej::+50%, maksimum" highlight="Dzień 5 i dalej" caption="Opuść dzień, a wraca do zera. Do jej podtrzymania wystarczy 10-minutowa sesja." />
+<ProgressLadder items="Dzień 1::Seria się zaczyna, jeszcze bez premii|Dzień 2::+20% do wszystkiego, co zapiszesz tego dnia|Dzień 3::+30%|Dzień 4::+40%|Dzień 5 i dalej::+50%, maksimum" highlight="Dzień 5 i dalej" caption="Jeden opuszczony dzień w tygodniu to dzień przerwy i seria trwa dalej. Opuść więcej, a wraca do zera. Do jej podtrzymania wystarczy 10-minutowa sesja." />
 
 <BlogAlert type="tip">
 Pojawienie się na dziesięć minut w zajęty dzień bije trzygodzinną niedzielę. Seria nagradza częstotliwość, a nie bohaterskie wyczyny.

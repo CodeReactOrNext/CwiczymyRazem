@@ -14,7 +14,7 @@ import {
   YAxis,
 } from "recharts";
 import type { StatisticsDataInterface } from "types/api.types";
-import { getReconciledStreak } from "utils/gameLogic";
+import { getReconciledStreak, hasRestDays } from "utils/gameLogic";
 
 const DAILY_GOAL_MIN = 15;
 const DAILY_GOAL_MS = DAILY_GOAL_MIN * 60 * 1000;
@@ -121,6 +121,7 @@ export const PracticeStatsWidget = ({
     actualDayWithoutBreak,
     lastReportDate,
     reportDates: reportList.map((r) => r.date),
+    restDays: hasRestDays(userStats),
   });
 
   const weekStart = startOfWeek(today, { weekStartsOn: 1 });

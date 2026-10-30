@@ -2784,9 +2784,9 @@
       }
     },
     "master_of_puppets_riff_preview": {
-      "title": "Cámara de riffs — Master of Puppets",
-      "description": "Un breve fragmento del icónico riff de apertura con palm mute de la canción, incluidos sus acentos de power chord.",
-      "whyItMatters": "Este es el riff que abre (y sigue volviendo durante) toda la canción: púa cromática con palm mute que salta a power chords, poniendo a prueba tanto la resistencia de la púa alterna como las transiciones limpias de acordes.",
+      "title": "Cámara de riffs — Motor cromático",
+      "description": "Un riff cromático con palm mute sobre una cuerda al aire como pedal, interrumpido por acentos de power chord.",
+      "whyItMatters": "Púa cromática con palm mute que salta a power chords y vuelve, poniendo a prueba tanto la resistencia de la púa alterna como las transiciones limpias de acordes.",
       "instructions": {
         "0": "Silencia con palm mute la púa de notas sueltas; deja que los power chords suenen brevemente antes de la siguiente frase.",
         "1": "Mantén un pulso constante de corcheas; la cuerda al aire actúa como nota pedal bajo las notas pisadas."
@@ -2796,9 +2796,9 @@
       }
     },
     "seven_nation_army_riff_preview": {
-      "title": "Cámara de riffs — Seven Nation Army",
-      "description": "El icónico riff de cuatro notas de la canción, todo en la cuerda La.",
-      "whyItMatters": "Una cuerda, una forma que se repite: la anacrusa sincopada y las notas sostenidas son lo que lo hace reconocible al instante, no la digitación.",
+      "title": "Cámara de riffs — Marcha de estadio",
+      "description": "Un riff de cuatro notas tocado entero en la cuerda La.",
+      "whyItMatters": "Una cuerda, una forma que se repite: la anacrusa sincopada y las notas sostenidas llevan el riff, no la digitación.",
       "instructions": {
         "0": "Silencia con palm mute las otras cinco cuerdas para que solo suene la cuerda La: esa es la verdadera habilidad aquí, no la digitación.",
         "1": "Clava la anacrusa sincopada en las dos primeras notas antes de preocuparte por la velocidad."
@@ -2808,8 +2808,8 @@
       }
     },
     "sweet_child_o_mine_riff_preview": {
-      "title": "Cámara de riffs — Sweet Child O' Mine",
-      "description": "El icónico riff de introducción de Slash con saltos de cuerda, el patrón «de circo» que abre la canción.",
+      "title": "Cámara de riffs — Carrusel de saltos",
+      "description": "Un patrón «de circo» con saltos de cuerda que gira en bucle entre cuerdas no contiguas.",
       "whyItMatters": "La mano de la púa salta entre cuerdas no contiguas en un bucle fijo: la precisión, no la velocidad, es todo el reto, y sirve además de calentamiento diario de exactitud.",
       "instructions": {
         "0": "Pulsa en púa alterna estricta (abajo-arriba, sin excepciones) para que el patrón de saltos se estabilice solo a tempo.",
@@ -2820,11 +2820,11 @@
       }
     },
     "thunderstruck_riff_preview": {
-      "title": "Cámara de riffs — Thunderstruck",
-      "description": "El famoso riff de introducción en una sola cuerda de Angus Young, íntegramente en púa alterna, sin tapping ni hammer-ons.",
+      "title": "Cámara de riffs — Tormenta en una cuerda",
+      "description": "Un riff en una sola cuerda contra la cuerda al aire, íntegramente en púa alterna, sin tapping ni hammer-ons.",
       "whyItMatters": "Una célula de cuatro notas repetida a velocidad en una sola cuerda: todo el reto es la uniformidad de la mano de la púa y el silenciado de cuerdas, no la forma en sí.",
       "instructions": {
-        "0": "Pulsa cada nota en púa alterna (abajo-arriba, sin excepciones): eso es lo que hay en el disco, no hammer-ons.",
+        "0": "Pulsa cada nota en púa alterna (abajo-arriba, sin excepciones), sin hammer-ons ni pull-offs.",
         "1": "Apoya con suavidad los dedos de la mano que pisa en las cuerdas vecinas para que solo suene la cuerda Si."
       },
       "tips": {
@@ -2832,8 +2832,8 @@
       }
     },
     "crazy_train_riff_preview": {
-      "title": "Cámara de riffs — Crazy Train",
-      "description": "El riff de galope con palm mute de la canción, anclado en la cuerda Mi grave con notas pisadas en la cuerda La encima.",
+      "title": "Cámara de riffs — Galope de medianoche",
+      "description": "Un riff de galope con palm mute, anclado en la cuerda Mi grave con notas pisadas en la cuerda La encima.",
       "whyItMatters": "El groove vive en el contraste entre la nota pedal muy silenciada y las notas pisadas más abiertas por encima: acierta ese contraste y el riff tiene groove; fállalo y suena plano.",
       "instructions": {
         "0": "Mantén la cuerda Mi grave bien silenciada con palm mute todo el tiempo; deja que las notas de la cuerda La suenen algo más abiertas por contraste.",

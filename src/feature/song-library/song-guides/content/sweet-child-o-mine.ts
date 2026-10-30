@@ -1,5 +1,3 @@
-import { sweetChildOMineRiffPreviewExercise } from "feature/exercisePlan/data/exerises/sweetChildOMineRiffPreview/sweetChildOMineRiffPreview";
-
 import type { SongGuide } from "../types";
 
 export const sweetChildOMine: SongGuide = {
@@ -154,15 +152,6 @@ export const sweetChildOMine: SongGuide = {
     ],
     hardestSummary:
       "The hardest sixteen bars are the second solo's climactic runs: the fastest playing in the song and the moment where clean alternate picking either exists or doesn't. Almost as hard, in a sneakier way: making the first solo's slow bends actually sing. Speed can be scheduled; taste has to be practiced deliberately.",
-  },
-  riffPreview: {
-    heading: "Riff preview",
-    intro: "A short tab from the song's iconic intro riff.",
-    measures: sweetChildOMineRiffPreviewExercise.tablature!,
-    bpm: sweetChildOMineRiffPreviewExercise.metronomeSpeed!.recommended,
-    bpmMin: sweetChildOMineRiffPreviewExercise.metronomeSpeed!.min,
-    bpmMax: sweetChildOMineRiffPreviewExercise.metronomeSpeed!.max,
-    practiceExerciseId: sweetChildOMineRiffPreviewExercise.id,
   },
   timeline: {
     heading: "Honest timelines",
@@ -351,7 +340,6 @@ export const sweetChildOMine: SongGuide = {
     },
   ],
   sectionOrder: [
-    "riffPreview",
     "verdict",
     "custom:riff-anatomy",
     "videoLessons",

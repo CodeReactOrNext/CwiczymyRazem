@@ -153,6 +153,11 @@ export interface StatisticsDataInterface {
   timeZone?: string;
   /** UTC hour bucket the streak reminder cron picks this user up on. */
   reminderHourUtc?: number;
+  /**
+   * One missed day a week does not break the streak (see getStreakWalk). A
+   * player setting; absent means on, so only an explicit `false` turns it off.
+   */
+  streakRestDays?: boolean;
   guitarStartDate: Timestamp | null;
   songLists?: {
     wantToLearn: string[];

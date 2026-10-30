@@ -5,7 +5,7 @@ import type { GuitarSpec } from "../types/arsenal.types";
  *
  * Sister file to `guitarBom.ts`, and deliberately not derived from it. The BOM is a
  * salvage priority; this is hardware. Gating mods on the BOM confused the two and
- * produced the exact opposite of what it meant to: a Stratocaster could not be
+ * produced the exact opposite of what it meant to: a S-Contour could not be
  * fitted with a brass tremolo block (its BOM lists no bridge) while a Telecaster
  * and a Les Paul could, and no set-neck guitar in the game could take fret work,
  * because a glued-in neck is never salvaged.
@@ -28,7 +28,7 @@ const SOLID_ELECTRIC = {
   headstock: true,
 } as const;
 
-/** Stratocaster, three singles, six-screw synchronised tremolo. */
+/** S-Contour, three singles, six-screw synchronised tremolo. */
 export const S_TYPE: GuitarSpec = {
   ...SOLID_ELECTRIC,
   bridge: "vintage-trem",

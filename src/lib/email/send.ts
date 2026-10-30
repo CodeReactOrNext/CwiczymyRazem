@@ -75,7 +75,7 @@ export async function sendStreakReminderEmail({
 
   const deadline = formatHoursLeft(hoursLeft);
   const subjects: Record<StreakEmailVariant, string> = {
-    d1: `Your ${streakDays}-day streak ends ${deadline} — practice now`,
+    d1: `Your day ends ${deadline} — keep your ${streakDays}-day streak going`,
     d3: "It's been 3 days. Time to pick up the guitar again",
   };
 

@@ -227,6 +227,7 @@ export interface UserTooltipData {
     dayWithoutBreak: number;
     habitCount: number;
     lastReportDate: string;
+    streakRestDays?: boolean;
     lvl: number;
     maxPoints: number;
     points: number;
@@ -273,6 +274,7 @@ export const firebaseGetUserTooltipData = async (
         dayWithoutBreak: userData.statistics.dayWithoutBreak || 0,
         habitCount: userData.statistics.habitsCount || 0,
         lastReportDate: userData.statistics.lastReportDate || "",
+        streakRestDays: userData.statistics.streakRestDays,
         lvl: userData.statistics.lvl || 0,
         maxPoints: userData.statistics.maxPoints || 0,
         points: userData.statistics.points || 0,

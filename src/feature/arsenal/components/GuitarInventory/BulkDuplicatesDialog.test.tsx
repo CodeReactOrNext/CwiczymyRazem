@@ -10,7 +10,7 @@ afterEach(cleanup);
 const items = [
   {
     id: "a",
-    name: "Fairmont Stratocaster",
+    name: "Fairmont S-Contour",
     rarity: "Epic" as const,
     level: 24,
     value: 90,

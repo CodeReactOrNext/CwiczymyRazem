@@ -27,7 +27,10 @@ import type { ReactElement } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import { getLongestStreakFromActivityLog } from "utils/gameLogic";
+import {
+  getLongestStreakFromActivityLog,
+  hasRestDays,
+} from "utils/gameLogic";
 
 const ExportButton = ({ label, onClick }: { label: string; onClick: () => void }) => (
   <button
@@ -67,7 +70,8 @@ const ProfileActivityPage = () => {
           getLongestStreakFromActivityLog(
             (reportList ?? []).map(
               (report: { date: Date | string }) => report.date
-            )
+            ),
+            { restDays: hasRestDays(userStats) }
           )
         ),
       }

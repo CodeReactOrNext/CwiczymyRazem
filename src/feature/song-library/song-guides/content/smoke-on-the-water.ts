@@ -357,7 +357,7 @@ export const smokeOnTheWater: SongGuide = {
       id: "fourths-shapes",
       heading: "The four shapes",
       intro:
-        "The entire riff is these four positions on the D and G strings, in the order 0-3-5, 0-3-6-5, 0-3-5, 3-0.",
+        "The entire riff moves between these four positions on the D and G strings.",
       chords: [
         {
           name: "G (open pair)",

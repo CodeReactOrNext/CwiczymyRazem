@@ -50,7 +50,7 @@ const PodiumTile = ({
   place: number;
   isMe: boolean;
 }) => (
-  <li className={cn(TILE, isMe ? "bg-cyan-500/10" : "sm:bg-zinc-800/40")}>
+  <li className={cn(TILE, isMe && "bg-cyan-500/10")}>
     <PlaceNumber place={place} />
     <Avatar
       avatarURL={entry.avatar || undefined}
@@ -76,7 +76,7 @@ const PodiumTile = ({
 const OpenTile = ({ place }: { place: number }) => {
   const { t } = useTranslation("dashboard");
   return (
-    <li className={cn(TILE, "sm:bg-zinc-800/20")}>
+    <li className={TILE}>
       <PlaceNumber place={place} />
       <span className='size-8 shrink-0 rounded-full bg-zinc-800/80' />
       <span className='min-w-0'>

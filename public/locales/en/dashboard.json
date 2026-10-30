@@ -169,7 +169,10 @@
     "bonus": "+{{pct}}% points on every session",
     "done_today": "Today is in the bag.",
     "not_yet": "Nothing logged yet today. A short session keeps it alive.",
-    "practice_now": "Practice now"
+    "practice_now": "Practice now",
+    "rest_free": "Rest day available. Skip one day this week and your streak stays.",
+    "rest_used": "This week's rest day is used. The next one comes on Monday.",
+    "rest_yesterday": "Yesterday was your rest day. Play today to keep the streak."
   },
   "rank": {
     "title": "Your rank",

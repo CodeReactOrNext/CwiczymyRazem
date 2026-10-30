@@ -109,5 +109,12 @@
     "notifications": "Powiadomienia",
     "security": "Bezpieczeństwo",
     "google_auth": "Logowanie przez Google"
+  },
+  "streak": {
+    "title": "Seria",
+    "subtitle": "Jak liczona jest Twoja seria dni.",
+    "label": "Dzień przerwy",
+    "description": "Jeden opuszczony dzień w tygodniu (od poniedziałku do niedzieli) nie przerywa serii, ale też jej nie wydłuża. Dwa dni przerwy pod rząd zawsze ją kończą.",
+    "error": "Nie udało się zapisać. Spróbuj ponownie."
   }
 }

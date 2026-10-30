@@ -5,12 +5,13 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 // low E string despite how it sounds on the record (that's a pitch-shift
 // pedal, not a different string). Two full repeats of the two-bar riff.
 export const sevenNationArmyRiffPreviewExercise: Exercise = {
+  // Legacy id from the riff's old song-based name — it is a Firestore key, keep it.
   id: "seven_nation_army_riff_preview",
   addedAt: "2026-08-06",
-  title: "Riff Vault — Seven Nation Army",
-  description: "The song's iconic four-note riff, all on the A string.",
+  title: "Riff Vault — Stadium March",
+  description: "A four-note riff played entirely on the A string.",
   whyItMatters:
-    "One string, one repeating shape — the syncopated pickup and the held notes are what make it instantly recognizable, not the fretting.",
+    "One string, one repeating shape — the syncopated pickup and the held notes carry the riff, not the fretting.",
   difficulty: "easy",
   category: "technique",
   timeInMinutes: 2,

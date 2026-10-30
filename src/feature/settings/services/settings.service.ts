@@ -86,6 +86,16 @@ export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
 };
 
 /**
+ * Rest days live in `statistics` rather than beside the other preferences
+ * because the streak is computed wherever the stats are read — someone else's
+ * profile and tooltip included — and they have to count it the same way.
+ */
+export const firebaseUpdateStreakRestDays = async (enabled: boolean) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, { "statistics.streakRestDays": enabled });
+};
+
+/**
  * Saving the toggles in Settings is also an answer to "may we email you?" —
  * any one left on is a yes — so the consent record is written with them.
  * Returns that record as the client keeps it.

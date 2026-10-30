@@ -2,7 +2,8 @@
   "changelog": {
     "empty": "No hay entradas este mes",
     "new": "Nuevo",
-    "bug_fix": "Corrección de error"
+    "bug_fix": "Corrección de error",
+    "play_video": "Reproducir vídeo: {{title}}"
   },
   "open_in_practice_log": "Abrir en el diario de práctica",
   "activity": "Actividad",

@@ -14,13 +14,13 @@ describe("StashTile", () => {
       <StashTile
         color='#f43f5e'
         imageSrc='/guitar.webp'
-        label='Fender Stratocaster'
+        label='Fairmont S-Contour'
         onClick={onClick}
       />,
     );
 
     fireEvent.click(
-      screen.getByRole("button", { name: "Fender Stratocaster" }),
+      screen.getByRole("button", { name: "Fairmont S-Contour" }),
     );
     expect(onClick).toHaveBeenCalledOnce();
   });

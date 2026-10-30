@@ -1,5 +1,3 @@
-import { masterOfPuppetsRiffPreviewExercise } from "feature/exercisePlan/data/exerises/masterOfPuppetsRiffPreview/masterOfPuppetsRiffPreview";
-
 import type { SongGuide } from "../types";
 
 export const masterOfPuppets: SongGuide = {
@@ -154,15 +152,6 @@ export const masterOfPuppets: SongGuide = {
     ],
     hardestSummary:
       "The hardest part isn't a moment; it's the accumulation. Bars 1–8 of the main riff are achievable for most intermediates at 180 BPM. The song asks for 212, and asks again, and again, for eight minutes. That's why the tempo ladder below matters more than any tab.",
-  },
-  riffPreview: {
-    heading: "Riff preview",
-    intro: "A short tab from the song's iconic opening riff.",
-    measures: masterOfPuppetsRiffPreviewExercise.tablature!,
-    bpm: masterOfPuppetsRiffPreviewExercise.metronomeSpeed!.recommended,
-    bpmMin: masterOfPuppetsRiffPreviewExercise.metronomeSpeed!.min,
-    bpmMax: masterOfPuppetsRiffPreviewExercise.metronomeSpeed!.max,
-    practiceExerciseId: masterOfPuppetsRiffPreviewExercise.id,
   },
   timeline: {
     heading: "Realistic timelines (yes, months)",
@@ -343,7 +332,6 @@ export const masterOfPuppets: SongGuide = {
     },
   ],
   sectionOrder: [
-    "riffPreview",
     "videoLessons",
     "verdict",
     "songMap",

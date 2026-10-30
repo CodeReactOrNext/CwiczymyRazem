@@ -2,7 +2,8 @@
   "changelog": {
     "empty": "No entries this month",
     "new": "New",
-    "bug_fix": "Bug fix"
+    "bug_fix": "Bug fix",
+    "play_video": "Play video: {{title}}"
   },
   "open_in_practice_log": "Open in Practice Log",
   "activity": "Activity",

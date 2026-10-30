@@ -5,18 +5,19 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 // open B string again, alternate-picked throughout and shifted up the neck
 // as the underlying chords change (bars 1-2 vs. bars 3-4).
 export const thunderstruckRiffPreviewExercise: Exercise = {
+  // Legacy id from the riff's old song-based name — it is a Firestore key, keep it.
   id: "thunderstruck_riff_preview",
   addedAt: "2026-08-06",
-  title: "Riff Vault — Thunderstruck",
+  title: "Riff Vault — One-String Storm",
   description:
-    "Angus Young's famous one-string intro riff, fully alternate-picked, no tapping or hammer-ons involved.",
+    "A one-string riff against the open string, fully alternate-picked, no tapping or hammer-ons involved.",
   whyItMatters:
     "One four-note cell repeated at speed on a single string — the whole challenge is picking-hand evenness and string muting, not the shape itself.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 2,
   instructions: [
-    "Alternate-pick every note (down-up, no exceptions) — that's what's actually on the record, not hammer-ons.",
+    "Alternate-pick every note (down-up, no exceptions) — no hammer-ons or pull-offs.",
     "Rest your fretting-hand fingers lightly on the neighboring strings so only the B string rings out.",
   ],
   tips: [

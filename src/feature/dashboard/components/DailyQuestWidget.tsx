@@ -8,7 +8,7 @@ import {
   ensureQuestForToday,
 } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
-import { CheckCircle2, ChevronRight, Gift, Swords } from "lucide-react";
+import { CheckCircle2, Gift, Swords } from "lucide-react";
 import Router from "next/router";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -55,7 +55,7 @@ const DailyQuestSkeleton = () => {
         {Array.from({ length: 3 }).map((_, i) => (
           <div
             key={i}
-            className='flex min-h-[52px] items-center justify-between rounded-sm bg-zinc-800/60 px-3 py-2.5'>
+            className='flex min-h-[52px] items-center justify-between rounded-sm px-3 py-2.5'>
             <div className='h-3 w-40 rounded bg-white/[0.08]' />
             <div className='h-3 w-8 rounded bg-white/[0.08]' />
           </div>
@@ -154,8 +154,8 @@ export const DailyQuestWidget = () => {
           task.isCompleted ? (
             <div
               key={task.id}
-              className='flex min-h-[52px] items-center justify-between gap-3 rounded-sm bg-green-900/25 px-3 py-2.5 text-green-400/70'>
-              <span className='text-xs font-medium tracking-wide line-through opacity-50'>
+              className='flex min-h-[52px] items-center justify-between gap-3 rounded-sm px-3 py-2.5 text-green-400/70'>
+              <span className='text-sm font-medium tracking-wide line-through opacity-50'>
                 {taskLabel(task)}
               </span>
               <CheckCircle2 size={16} className='shrink-0 text-green-500/70' />
@@ -165,13 +165,13 @@ export const DailyQuestWidget = () => {
               key={task.id}
               type='button'
               onClick={() => openTask(task)}
-              className='group flex min-h-[52px] w-full items-center gap-3 rounded-sm bg-zinc-800/80 px-3 py-2.5 text-left text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-700/80 hover:text-zinc-100'>
+              className='group flex min-h-[52px] w-full items-center gap-3 rounded-sm px-3 py-2.5 text-left text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-800/40 hover:text-zinc-100'>
               <div className='min-w-0 flex-1'>
                 <div className='flex items-baseline justify-between gap-3'>
-                  <span className='text-xs font-medium tracking-wide'>
+                  <span className='text-sm font-medium tracking-wide'>
                     {taskLabel(task)}
                   </span>
-                  <span className='shrink-0 text-xs font-semibold tabular-nums text-zinc-200'>
+                  <span className='shrink-0 text-sm font-semibold tabular-nums text-zinc-200'>
                     {task.progress}/{task.target}
                   </span>
                 </div>
@@ -182,10 +182,6 @@ export const DailyQuestWidget = () => {
                   />
                 </div>
               </div>
-              <ChevronRight
-                size={16}
-                className='shrink-0 text-zinc-500 transition-transform group-hover:translate-x-0.5 group-hover:text-zinc-100'
-              />
             </button>
           ),
         )}

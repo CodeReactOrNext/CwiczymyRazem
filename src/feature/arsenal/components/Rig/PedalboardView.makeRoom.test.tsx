@@ -31,7 +31,7 @@ beforeEach(() => {
 const ROWS = geometryOf(0).rowYPct;
 
 /**
- * The starting case packed solid with twelve EchoPaths, and a TS-808 that came
+ * The starting case packed solid with twelve EchoPaths, and a Moss Drive that came
  * along with them and found nowhere to stand — so it is parked below the case.
  */
 const fullBoard = (): ArsenalUserData => {
@@ -100,8 +100,8 @@ describe("making room on a full board", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /find room/i }));
 
-    expect(screen.getByText(/no room for TS-808 Overdrive/i)).toBeTruthy();
-    // Every EchoPath is as wide as the TS-808, so any of them would do.
+    expect(screen.getByText(/no room for Moss Drive/i)).toBeTruthy();
+    // Every EchoPath is as wide as the Moss Drive, so any of them would do.
     expect(screen.getAllByText("Swap")).toHaveLength(12);
   });
 

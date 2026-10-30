@@ -193,7 +193,7 @@ interface PedalDcPlugProps {
  * The loom runs under the enclosures, which is right for cable and wrong for
  * the plug: a plug is the one part that has to be seen *in* its socket, and a
  * good few enclosures draw that socket flush on the top face, a unit or so in
- * from the edge — the EchoPath, the TS-808, the Stellar OD, the Amber Forge
+ * from the edge — the EchoPath, the Moss Drive, the Stellar OD, the Amber Forge
  * Wood. A plug painted under the artwork stops dead at the edge and leaves the
  * hole showing beside it. So it lives inside the pedal's own element, over the
  * image and under the unplug control, in a box sized in board units and placed

@@ -966,11 +966,11 @@ export const ROADMAP_STEP_EXAMPLE: RoadmapStepExample = {
     },
     {
       heading: "How to practice",
-      body: "Play Riff Vault — Master of Puppets and listen for the exact moment the palm-muted run ends and the power chord sounds. Practice the excerpt in two parts: 8 bars of only palm-muted chromatic picking, then 8 bars of only the power-chord accents. Then link them and play the full excerpt, watching that each shift lands on the beat and each power chord rings cleanly.",
+      body: "Play Riff Vault — Chromatic Engine and listen for the exact moment the palm-muted run ends and the power chord sounds. Practice the excerpt in two parts: 8 bars of only palm-muted chromatic picking, then 8 bars of only the power-chord accents. Then link them and play the full excerpt, watching that each shift lands on the beat and each power chord rings cleanly.",
     },
   ],
   successCriteria:
-    "Play the Riff Vault — Master of Puppets excerpt looped at 140 BPM with palm-muted notes on the low strings clean and even, snap into each power chord with full ringing notes and no audible fret buzz, and change from muted run to chord within one 16th-note window for 12 consecutive repeats.",
+    "Play the Riff Vault — Chromatic Engine excerpt looped at 140 BPM with palm-muted notes on the low strings clean and even, snap into each power chord with full ringing notes and no audible fret buzz, and change from muted run to chord within one 16th-note window for 12 consecutive repeats.",
   sessionsRequired: 8,
   exerciseId: "master_of_puppets_riff_preview",
   song: {

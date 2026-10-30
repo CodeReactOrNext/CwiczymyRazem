@@ -47,7 +47,11 @@ import {
   getDateFromPast,
   inputTimeConverter,
 } from "utils/converter";
-import { getClientReportContext, getDailyStreakMultiplier } from "utils/gameLogic";
+import {
+  getClientReportContext,
+  getDailyStreakMultiplier,
+  hasRestDays,
+} from "utils/gameLogic";
 import { resolveInternalPath } from "utils/resolveInternalPath";
 import { i18n } from "utils/translation";
 
@@ -399,7 +403,8 @@ const ReportView = () => {
           practiced: { exerciseIds: [], skillIds: [], customIds: [rotation] },
         }),
       ...getClientReportContext(
-        (reportList ?? []).map((report: { date: Date | string }) => report.date)
+        (reportList ?? []).map((report: { date: Date | string }) => report.date),
+        hasRestDays(currentUserStats)
       ),
     };
 

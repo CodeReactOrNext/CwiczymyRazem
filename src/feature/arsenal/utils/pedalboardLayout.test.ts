@@ -496,7 +496,7 @@ describe("createJackResolver", () => {
   });
 
   it("takes power where its own artwork prints the inlet, not mid-edge", () => {
-    // Effect 3 is a Friedman-style box: `9V DC IN` is the last nut on the top
+    // Effect 3 is a Forge-style box: `9V DC IN` is the last nut on the top
     // strip, well right of centre, while its signal pair stays on the sides.
     const resolve = createJackResolver([owned("forge", 3)]);
     const jacks = resolve("forge");
@@ -509,7 +509,7 @@ describe("createJackResolver", () => {
   });
 
   it("seats the plug down in a socket drawn flush on the top face", () => {
-    // Effect 2, the TS-808, draws its square DC jack on the enclosure's top
+    // Effect 2, the Moss Drive, draws its square DC jack on the enclosure's top
     // face, a unit or so in from the edge — so the tip has to go in that far.
     const dc = createDcResolver(createJackResolver([owned("ts", 2)]))("ts");
     expect(dc.x).toBeCloseTo(0.5, 1);

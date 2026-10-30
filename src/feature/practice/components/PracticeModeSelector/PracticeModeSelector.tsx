@@ -1,4 +1,4 @@
-import { buttonVariants } from "assets/components/ui/button";
+import { buttonVariants, PRESSABLE_KEY } from "assets/components/ui/button";
 import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
@@ -213,7 +213,7 @@ export const PracticeModeSelector = () => {
     <button
       type='button'
       onClick={() => nav(href, id)}
-      className='relative flex min-h-[52px] w-full items-center gap-3 overflow-hidden rounded-lg bg-zinc-800/50 px-3.5 text-left transition-background hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
+      className={cn(PRESSABLE_KEY, "relative flex min-h-[52px] w-full items-center gap-3 overflow-hidden rounded-lg bg-zinc-800/50 px-3.5 text-left transition-background hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring")}>
       <Ripple className='bg-white/15' />
       {loadingMode === id ? (
         <Loader2 className='h-[18px] w-[18px] shrink-0 animate-spin text-zinc-400' />
@@ -255,7 +255,7 @@ export const PracticeModeSelector = () => {
                     key={session.at}
                     type='button'
                     onClick={() => nav(session.href, `resume-${session.at}`)}
-                    className='group relative flex shrink-0 items-center gap-2 overflow-hidden rounded-full bg-zinc-800/60 py-2 pl-3.5 pr-3 text-left transition-background hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+                    className={cn(PRESSABLE_KEY, "group relative flex shrink-0 items-center gap-2 overflow-hidden rounded-full bg-zinc-800/60 py-2 pl-3.5 pr-3 text-left font-medium transition-background hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring")}>
                     <Ripple className='bg-white/15' />
                     {loadingMode === `resume-${session.at}` && (
                       <Loader2 className='h-3.5 w-3.5 shrink-0 animate-spin text-zinc-200' />

@@ -14,6 +14,7 @@ import { useAppSelector } from "store/hooks";
 import {
   getLongestStreakFromActivityLog,
   getReconciledStreak,
+  hasRestDays,
 } from "utils/gameLogic";
 
 import type { AchievementContext } from "../types";
@@ -86,17 +87,19 @@ export const useAchievementContext = (): AchievementContext | null => {
   return useMemo(() => {
     if (!currentUserStats || !userSongs) return null;
 
+    const restDays = hasRestDays(currentUserStats);
     const { dayWithoutBreak: currentStreak } = getReconciledStreak({
       actualDayWithoutBreak: currentUserStats.actualDayWithoutBreak ?? 0,
       lastReportDate: currentUserStats.lastReportDate,
       reportDates,
+      restDays,
     });
 
     // The record only ever climbs: a log that has been trimmed (or has not
     // loaded yet) must not talk a player out of a badge they already hold.
     const longestStreak = Math.max(
       currentUserStats.dayWithoutBreak ?? 0,
-      getLongestStreakFromActivityLog(reportDates)
+      getLongestStreakFromActivityLog(reportDates, { restDays })
     );
 
     return {

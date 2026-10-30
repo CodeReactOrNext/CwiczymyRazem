@@ -3,7 +3,7 @@ import { useActivityLog } from 'components/ActivityLog/hooks/useActivityLog';
 import { isAutoPlanId, isRecognizedPracticePlan } from 'feature/exercisePlan/utils/isRecognizedPracticePlan';
 import { collectPlanSongPractice, pickPrimaryPlanSong } from 'feature/exercisePlan/utils/planSongPractice';
 import { collectPracticed } from 'feature/rotation/utils/lastPracticed';
-import { selectUserAuth } from 'feature/user/store/userSlice';
+import { selectCurrentUserStats, selectUserAuth } from 'feature/user/store/userSlice';
 import { updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
 import { updateQuestProgress } from 'feature/user/store/userSlice.questActions';
 import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
@@ -11,7 +11,7 @@ import posthog from 'posthog-js';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { getLocalDateKey } from 'utils/converter';
-import { getClientReportContext } from 'utils/gameLogic';
+import { getClientReportContext, hasRestDays } from 'utils/gameLogic';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
 import { computeSkillPointsGained } from '../utils/skillPoints';
@@ -26,6 +26,9 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const userAuth = useAppSelector(selectUserAuth);
+  const restDays = useAppSelector((state) =>
+    hasRestDays(selectCurrentUserStats(state))
+  );
   const { reportList } = useActivityLog(userAuth as string);
 
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
@@ -120,7 +123,8 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           ...(!plan.duel && micPerformance && { micPerformance }),
           ...(!plan.duel && earTrainingPerformance && { earTrainingPerformance }),
           ...getClientReportContext(
-            ((reportList as any[]) ?? []).map((report) => report.date)
+            ((reportList as any[]) ?? []).map((report) => report.date),
+            restDays
           ),
         };
 
@@ -261,7 +265,7 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         setIsSubmittingReport(false);
       }
     },
-    [plan, avatar, completedExercises, dispatch, queryClient, reportList, userAuth]
+    [plan, avatar, completedExercises, dispatch, queryClient, reportList, restDays, userAuth]
   );
 
   const activityDataToUse = useMemo(() => {

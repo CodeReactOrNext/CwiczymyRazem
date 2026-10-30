@@ -109,5 +109,12 @@
     "notifications": "Benachrichtigungen",
     "security": "Sicherheit",
     "google_auth": "Google-OAuth-Anmeldung"
+  },
+  "streak": {
+    "title": "Serie",
+    "subtitle": "Wie deine Tagesserie gezählt wird.",
+    "label": "Ruhetag",
+    "description": "Ein verpasster Tag pro Woche (Montag bis Sonntag) beendet deine Serie nicht, verlängert sie aber auch nicht. Zwei verpasste Tage hintereinander beenden sie immer.",
+    "error": "Speichern fehlgeschlagen. Versuch es noch einmal."
   }
 }

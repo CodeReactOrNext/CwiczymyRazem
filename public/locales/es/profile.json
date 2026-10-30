@@ -432,7 +432,8 @@
       "2": "Día 3",
       "3": "Día 4",
       "4": "Día 5+"
-    }
+    },
+    "rest_day": "Saltarte un día a la semana no rompe tu racha."
   },
   "repertoire": {
     "empty_owner": "Las canciones aparecen aquí cuando las marcas como aprendidas en tu tablero de canciones.",

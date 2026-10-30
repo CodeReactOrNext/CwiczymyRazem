@@ -17,7 +17,7 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { ProfileInterface } from "types/ProfileInterface";
-import { getReconciledStreak } from "utils/gameLogic";
+import { getReconciledStreak, hasRestDays } from "utils/gameLogic";
 
 import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights";
 import { ProfileArsenal } from "./components/ProfileArsenal";
@@ -64,6 +64,7 @@ const ProfileLayout = ({
   const { dayWithoutBreak: streak } = getReconciledStreak({
     actualDayWithoutBreak: statistics.actualDayWithoutBreak || 0,
     lastReportDate,
+    restDays: hasRestDays(statistics),
     reportDates: (reportList ?? []).map(
       (report: { date: Date | string }) => report.date,
     ),

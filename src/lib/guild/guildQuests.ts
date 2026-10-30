@@ -124,7 +124,8 @@ const num = (value: unknown): number => Number(value) || 0;
  * Whether a stored streak is still alive. `streakDays` is written on every
  * report and never cleared by silence, so a member who stopped a fortnight ago
  * still carries the number — the day of their last practice says whether it
- * still counts. Two days of grace covers the time zones the day key is kept in.
+ * still counts. Three days of grace covers a rest day (one missed day a week
+ * does not break a streak) plus the time zones the day key is kept in.
  */
 const liveStreak = (
   statistics: Record<string, any> | undefined,
@@ -141,7 +142,7 @@ const liveStreak = (
   const lastDay = statistics?.lastPracticeLocalDay;
   if (typeof lastDay !== "string") return days;
 
-  const cutoff = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000)
+  const cutoff = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)
     .toISOString()
     .slice(0, 10);
   return lastDay >= cutoff ? days : 0;

@@ -41,15 +41,17 @@ const resolveTimeZone = (): string => {
 
 export const getClientReportContext = (
   reportDates: Array<Date | string | null | undefined>,
+  /** The player's rest-day setting (`statistics.streakRestDays`). */
+  restDays: boolean = true,
   now: Date = new Date()
 ): ClientReportContext => ({
   clientTodayISO: getLocalDayKey(now),
   clientNowISO: now.toISOString(),
   clientDisplayStreak: getStreakFromActivityLog(
     reportDates,
-    { includeToday: true },
+    { includeToday: true, restDays },
     now
   ),
-  clientLongestStreak: getLongestStreakFromActivityLog(reportDates),
+  clientLongestStreak: getLongestStreakFromActivityLog(reportDates, { restDays }),
   clientTimeZone: resolveTimeZone(),
 });

@@ -169,7 +169,10 @@
     "bonus": "+{{pct}}% punktów za każdą sesję",
     "done_today": "Dzisiejszy dzień zaliczony.",
     "not_yet": "Dziś jeszcze nic nie zapisano. Krótka sesja utrzyma serię.",
-    "practice_now": "Ćwicz teraz"
+    "practice_now": "Ćwicz teraz",
+    "rest_free": "Dzień przerwy dostępny. Opuść jeden dzień w tym tygodniu, a seria zostanie.",
+    "rest_used": "Dzień przerwy w tym tygodniu wykorzystany. Kolejny od poniedziałku.",
+    "rest_yesterday": "Wczoraj był Twój dzień przerwy. Zagraj dziś, żeby utrzymać serię."
   },
   "rank": {
     "title": "Twoja pozycja",

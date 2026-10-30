@@ -35,11 +35,14 @@ const fmtPts = (n: number) => (Number.isInteger(n) ? `${n}` : n.toFixed(1));
 
 interface ScoreBreakdownTooltipProps {
   streak: number;
+  /** Whether the player has rest days on, which adds the rule under the ladder. */
+  restDays?: boolean;
   children: ReactNode;
 }
 
 export const ScoreBreakdownTooltip = ({
   streak,
+  restDays = false,
   children,
 }: ScoreBreakdownTooltipProps) => {
   const { t } = useTranslation("profile");
@@ -137,6 +140,12 @@ export const ScoreBreakdownTooltip = ({
                 );
               })}
             </div>
+
+            {restDays && (
+              <p className='text-xs text-zinc-400'>
+                {t("score_tooltip.rest_day")}
+              </p>
+            )}
           </div>
         </TooltipContent>
       </Tooltip>

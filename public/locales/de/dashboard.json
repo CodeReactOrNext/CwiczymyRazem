@@ -169,7 +169,10 @@
     "bonus": "+{{pct}} % Punkte auf jede Session",
     "done_today": "Heute ist erledigt.",
     "not_yet": "Heute noch nichts eingetragen. Eine kurze Session hält die Serie am Leben.",
-    "practice_now": "Jetzt üben"
+    "practice_now": "Jetzt üben",
+    "rest_free": "Ruhetag verfügbar. Lass diese Woche einen Tag aus, und deine Serie bleibt.",
+    "rest_used": "Der Ruhetag dieser Woche ist verbraucht. Der nächste kommt am Montag.",
+    "rest_yesterday": "Gestern war dein Ruhetag. Spiel heute, damit die Serie hält."
   },
   "rank": {
     "title": "Dein Rang",

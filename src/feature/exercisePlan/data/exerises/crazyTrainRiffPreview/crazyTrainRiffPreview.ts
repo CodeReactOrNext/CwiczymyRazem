@@ -4,11 +4,12 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 // pedal-tone pattern on the low E string with fretted notes on the A string
 // layered on top, alternating between two bars (three full repeats).
 export const crazyTrainRiffPreviewExercise: Exercise = {
+  // Legacy id from the riff's old song-based name — it is a Firestore key, keep it.
   id: "crazy_train_riff_preview",
   addedAt: "2026-08-06",
-  title: "Riff Vault — Crazy Train",
+  title: "Riff Vault — Midnight Gallop",
   description:
-    "The song's palm-muted gallop riff, pinned to the low E string with fretted notes on the A string layered on top.",
+    "A palm-muted gallop riff, pinned to the low E string with fretted notes on the A string layered on top.",
   whyItMatters:
     "The groove lives in the contrast between the tightly muted pedal note and the more open fretted notes above it — get that contrast right and the riff grooves; miss it and it sounds flat.",
   difficulty: "medium",

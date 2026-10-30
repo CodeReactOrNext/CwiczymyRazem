@@ -1,5 +1,3 @@
-import { crazyTrainRiffPreviewExercise } from "feature/exercisePlan/data/exerises/crazyTrainRiffPreview/crazyTrainRiffPreview";
-
 import type { SongGuide } from "../types";
 
 export const crazyTrain: SongGuide = {
@@ -163,15 +161,6 @@ export const crazyTrain: SongGuide = {
     ],
     hardestSummary:
       "Every riff-based section in this song is learnable inside a few weeks by an early-intermediate player. The solo is a genuinely different skill level: tapping, fast legato, and pinch harmonics stacked into one 30-second passage, and it's the entire reason this song outranks most other 'first real riff' songs on difficulty.",
-  },
-  riffPreview: {
-    heading: "Riff preview",
-    intro: "A short tab from the song's main gallop riff.",
-    measures: crazyTrainRiffPreviewExercise.tablature!,
-    bpm: crazyTrainRiffPreviewExercise.metronomeSpeed!.recommended,
-    bpmMin: crazyTrainRiffPreviewExercise.metronomeSpeed!.min,
-    bpmMax: crazyTrainRiffPreviewExercise.metronomeSpeed!.max,
-    practiceExerciseId: crazyTrainRiffPreviewExercise.id,
   },
   timeline: {
     heading: "Realistic timelines",
@@ -370,7 +359,6 @@ export const crazyTrain: SongGuide = {
     },
   ],
   sectionOrder: [
-    "riffPreview",
     "videoLessons",
     "verdict",
     "songMap",

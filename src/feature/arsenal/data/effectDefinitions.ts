@@ -9,7 +9,7 @@ import type {
  * straight in from the neighbour.
  *
  * Only pedals whose artwork puts the *signal* in and out up there are listed.
- * Several others (the Friedman and Ronin enclosures) carry a top strip too, but
+ * Several others (the Forge and Ronin enclosures) carry a top strip too, but
  * theirs holds stereo, expression and power while the mono in and out stay on
  * the sides where their own arrows point — those keep the default.
  *
@@ -81,7 +81,7 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
   },
   {
     id: 2,
-    name: "TS-808 Overdrive",
+    name: "Moss Drive",
     brand: "K",
     type: "Overdrive",
     imageId: 2,
@@ -98,7 +98,7 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
   {
     id: 4,
     name: "Amber Forge AF",
-    brand: "Friedman",
+    brand: "Forge",
     type: "Overdrive",
     imageId: 4,
     rarity: "Epic",
@@ -114,7 +114,7 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
   {
     id: 6,
     name: "Stellar OD",
-    brand: "JHS",
+    brand: "Stellar",
     type: "Overdrive",
     imageId: 6,
     rarity: "Rare",
@@ -268,7 +268,7 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
   {
     id: 22,
     name: "The Astral Forge",
-    brand: "Friedman",
+    brand: "Forge",
     type: "Fuzz",
     imageId: 23,
     rarity: "Legendary",
@@ -276,7 +276,7 @@ export const EFFECT_DEFINITIONS: EffectDefinition[] = [
   {
     id: 23,
     name: "The Cobalt Cavern",
-    brand: "Friedman",
+    brand: "Forge",
     type: "Delay",
     imageId: 24,
     rarity: "Epic",

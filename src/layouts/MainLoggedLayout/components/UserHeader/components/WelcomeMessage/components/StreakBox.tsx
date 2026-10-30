@@ -5,10 +5,10 @@ import { ScoreBreakdownTooltip } from "feature/profile/components/ScoreBreakdown
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { useRemoteSessionRefresh } from "hooks/useRemoteSessionRefresh";
 import { useTranslation } from "hooks/useTranslation";
-import { Flame } from "lucide-react";
+import { Coffee, Flame } from "lucide-react";
 import { useRouter } from "next/router";
 import { useAppSelector } from "store/hooks";
-import { getReconciledStreak } from "utils/gameLogic";
+import { getReconciledStreak, hasRestDays } from "utils/gameLogic";
 
 export const StreakBox = () => {
   const { t } = useTranslation("nav");
@@ -31,16 +31,18 @@ export const StreakBox = () => {
 
   // The stored counter can drift from the truth in either direction after a
   // timezone slip; the activity log (local time) is authoritative once loaded.
-  const { didPracticeToday, dayWithoutBreak } = getReconciledStreak({
+  const restDays = hasRestDays(userStats);
+  const { didPracticeToday, dayWithoutBreak, restDayDates } = getReconciledStreak({
     actualDayWithoutBreak,
     lastReportDate,
     reportDates: (reportList ?? []).map(
       (report: { date: Date | string }) => report.date
     ),
+    restDays,
   });
 
   return (
-    <ScoreBreakdownTooltip streak={dayWithoutBreak}>
+    <ScoreBreakdownTooltip streak={dayWithoutBreak} restDays={restDays}>
     <div
       onClick={() => router.push("/practice-log")}
       className='flex h-11 cursor-pointer items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-zinc-800/70'>
@@ -70,6 +72,10 @@ export const StreakBox = () => {
           
           const isToday = isSameDay(dayDate, today);
           const isActive = hasReport || (isToday && didPracticeToday);
+          // A missed day the streak was carried over — shown, not hidden, so
+          // the player sees the rule at work on the strip they already read.
+          const isRest =
+            !isActive && restDayDates.some((rest) => isSameDay(rest, dayDate));
 
           return (
             <div
@@ -78,11 +84,13 @@ export const StreakBox = () => {
                 "flex h-6 w-6 items-center justify-center rounded-[4px] text-xs font-bold transition-all duration-base",
                 isActive
                   ? "bg-white text-zinc-900 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                  : "bg-zinc-800 text-zinc-300"
+                  : isRest
+                    ? "bg-zinc-700 text-zinc-200"
+                    : "bg-zinc-800 text-zinc-300"
               )}
-              title={dayDate.toDateString()}
+              title={isRest ? t("streak_rest_day") : dayDate.toDateString()}
             >
-              {dayLabel}
+              {isRest ? <Coffee size={12} aria-label={t("streak_rest_day")} /> : dayLabel}
             </div>
           );
         })}

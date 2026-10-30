@@ -2784,9 +2784,9 @@
       }
     },
     "master_of_puppets_riff_preview": {
-      "title": "Riff-Tresor — Master of Puppets",
-      "description": "Ein kurzer Ausschnitt aus dem ikonischen, palm-gemuteten Eröffnungsriff des Songs, einschließlich seiner Powerchord-Akzente.",
-      "whyItMatters": "Das ist das Riff, das den ganzen Song eröffnet (und immer wieder zurückkehrt): chromatisches Spiel mit Palm Mute, das in Powerchords einschnappt und sowohl die Ausdauer im Wechselschlag als auch saubere Akkordwechsel prüft.",
+      "title": "Riff-Tresor — Chromatische Maschine",
+      "description": "Ein chromatisches, palm-gemutetes Riff über einer Leersaite als Orgelpunkt, unterbrochen von Powerchord-Akzenten.",
+      "whyItMatters": "Chromatisches Spiel mit Palm Mute, das in Powerchords einschnappt und wieder zurück, und sowohl die Ausdauer im Wechselschlag als auch saubere Akkordwechsel prüft.",
       "instructions": {
         "0": "Dämpfe das Einzelnotenspiel mit Palm Mute; lass die Powerchords kurz ausklingen, bevor die nächste Phrase kommt.",
         "1": "Halte einen stetigen Achtelpuls; die Leersaite wirkt als Orgelpunkt unter den gegriffenen Noten."
@@ -2796,9 +2796,9 @@
       }
     },
     "seven_nation_army_riff_preview": {
-      "title": "Riff-Tresor — Seven Nation Army",
-      "description": "Das ikonische Viernoten-Riff des Songs, ganz auf der A-Saite.",
-      "whyItMatters": "Eine Saite, eine sich wiederholende Form — der synkopierte Auftakt und die gehaltenen Noten machen es sofort erkennbar, nicht das Greifen.",
+      "title": "Riff-Tresor — Stadionmarsch",
+      "description": "Ein Viernoten-Riff, komplett auf der A-Saite.",
+      "whyItMatters": "Eine Saite, eine sich wiederholende Form — der synkopierte Auftakt und die gehaltenen Noten tragen das Riff, nicht das Greifen.",
       "instructions": {
         "0": "Dämpfe die anderen fünf Saiten mit Palm Mute, damit nur die A-Saite klingt — das ist hier die eigentliche Fähigkeit, nicht das Greifen.",
         "1": "Meistere den synkopierten Auftakt auf den ersten zwei Noten, bevor du dich um Geschwindigkeit sorgst."
@@ -2808,8 +2808,8 @@
       }
     },
     "sweet_child_o_mine_riff_preview": {
-      "title": "Riff-Tresor — Sweet Child O' Mine",
-      "description": "Slashs ikonisches Intro-Riff mit Saitensprüngen, das „Zirkus“-Muster, das den Song eröffnet.",
+      "title": "Riff-Tresor — Saitensprung-Karussell",
+      "description": "Ein „Zirkus“-Muster mit Saitensprüngen, das in einer Schleife über nicht benachbarte Saiten läuft.",
       "whyItMatters": "Die Anschlaghand springt in einer festen Schleife zwischen nicht benachbarten Saiten — Präzision, nicht Tempo, ist die ganze Herausforderung, und es dient zugleich als tägliches Genauigkeits-Warm-up.",
       "instructions": {
         "0": "Schlage strikt im Wechsel an (Ab-Auf, ohne Ausnahme), damit sich das Sprungmuster im Tempo selbst stabilisiert.",
@@ -2820,11 +2820,11 @@
       }
     },
     "thunderstruck_riff_preview": {
-      "title": "Riff-Tresor — Thunderstruck",
-      "description": "Angus Youngs berühmtes Einsaiten-Intro-Riff, komplett im Wechselschlag, ohne Tapping oder Hammer-ons.",
+      "title": "Riff-Tresor — Sturm auf einer Saite",
+      "description": "Ein Riff auf einer einzigen Saite gegen die Leersaite, komplett im Wechselschlag, ohne Tapping oder Hammer-ons.",
       "whyItMatters": "Eine Viernoten-Zelle, auf einer einzelnen Saite schnell wiederholt — die ganze Herausforderung sind Gleichmäßigkeit der Anschlaghand und Saitendämpfung, nicht die Form selbst.",
       "instructions": {
-        "0": "Schlage jede Note im Wechsel an (Ab-Auf, ohne Ausnahme) — so ist es auf der Aufnahme, nicht mit Hammer-ons.",
+        "0": "Schlage jede Note im Wechsel an (Ab-Auf, ohne Ausnahme) — ohne Hammer-ons oder Pull-offs.",
         "1": "Leg die Finger der Greifhand locker auf die Nachbarsaiten, damit nur die B-Saite klingt."
       },
       "tips": {
@@ -2832,8 +2832,8 @@
       }
     },
     "crazy_train_riff_preview": {
-      "title": "Riff-Tresor — Crazy Train",
-      "description": "Das palm-gemutete Galopp-Riff des Songs, an der tiefen E-Saite verankert, mit gegriffenen Noten auf der A-Saite darüber.",
+      "title": "Riff-Tresor — Mitternachtsgalopp",
+      "description": "Ein palm-gemutetes Galopp-Riff, an der tiefen E-Saite verankert, mit gegriffenen Noten auf der A-Saite darüber.",
       "whyItMatters": "Der Groove lebt im Kontrast zwischen der straff gedämpften Orgelpunktnote und den offeneren gegriffenen Noten darüber — triffst du diesen Kontrast, groovt das Riff; verfehlst du ihn, klingt es flach.",
       "instructions": {
         "0": "Halte die tiefe E-Saite durchgehend straff mit Palm Mute gedämpft; lass die A-Saiten-Noten zum Kontrast etwas offener klingen.",

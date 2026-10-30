@@ -30,23 +30,23 @@ const entry = (
 
 describe("matchesQuery", () => {
   it("matches everything for an empty or blank query", () => {
-    expect(matchesQuery("Fairmont Stratocaster", "")).toBe(true);
-    expect(matchesQuery("Fairmont Stratocaster", "   ")).toBe(true);
+    expect(matchesQuery("Fairmont S-Contour", "")).toBe(true);
+    expect(matchesQuery("Fairmont S-Contour", "   ")).toBe(true);
   });
 
   it("ignores case and surrounding whitespace", () => {
-    expect(matchesQuery("Fairmont Stratocaster", "  STRAT ")).toBe(true);
+    expect(matchesQuery("Fairmont S-Contour", "  CONTOUR ")).toBe(true);
   });
 
   it("matches the brand as well as the model", () => {
-    expect(matchesQuery("Fairmont Stratocaster", "fairmont")).toBe(true);
-    expect(matchesQuery("Fairmont Stratocaster", "grayson")).toBe(false);
+    expect(matchesQuery("Fairmont S-Contour", "fairmont")).toBe(true);
+    expect(matchesQuery("Fairmont S-Contour", "grayson")).toBe(false);
   });
 });
 
 describe("filterEntries", () => {
   const entries = [
-    entry("a", "Fairmont Stratocaster", "Common", 1, 1),
+    entry("a", "Fairmont S-Contour", "Common", 1, 1),
     entry("b", "Grayson Lewis Palmer", "Rare", 2, 2),
   ];
 
@@ -137,7 +137,7 @@ describe("sortEntries", () => {
 describe("filterAndSortEntries", () => {
   it("filters first, then sorts, and returns the raw items", () => {
     const entries = [
-      entry("a", "Fairmont Stratocaster", "Common", 1, 1),
+      entry("a", "Fairmont S-Contour", "Common", 1, 1),
       entry("b", "Fairmont Telecaster", "Legendary", 2, 2),
       entry("c", "Grayson Lewis Palmer", "Epic", 3, 3),
     ];

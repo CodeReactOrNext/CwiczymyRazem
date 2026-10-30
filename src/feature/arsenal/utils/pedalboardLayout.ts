@@ -819,12 +819,12 @@ export const DEFAULT_DC_JACK = { x: 0.5, y: 0 };
  * Measured off the artwork the same way `EFFECT_JACK_Y` is. Two kinds of
  * enclosure need it:
  *
- * - **A nut on the edge, off centre.** The Friedman-style boxes and the compact
+ * - **A nut on the edge, off centre.** The Forge-style boxes and the compact
  *   `AT-10`/`GE-10`/`Aethernaut` family print the inlet last in their top strip,
  *   after the stereo and expression sockets, labelled `9V DC IN` — around
  *   `0.80` and `0.76` of the width respectively. `y` is `0`: the nut reaches the
  *   top of the image, and the plug stands on it.
- * - **A socket set into the top face.** The EchoPath, the TS-808, the Stellar OD
+ * - **A socket set into the top face.** The EchoPath, the Moss Drive, the Stellar OD
  *   and the Amber Forge Wood draw a square barrel jack flush on the enclosure,
  *   a unit or so in from the edge; the Forest Drive and Nova Drive a raised one
  *   between their two brass nuts. `y` is where the plug's tip has to go to sit

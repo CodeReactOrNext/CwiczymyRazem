@@ -1,6 +1,10 @@
-import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
+import {
+  type ChangelogVideo,
+  ChangelogVideoCard,
+} from "components/Changelog/ChangelogVideoCard";
 import { DashboardSection } from "components/Layout";
+import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import {
   Bug,
@@ -23,11 +27,13 @@ import {
   Upload,
   Users,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 interface ChangelogGroup {
   category: string | null;
   items: string[];
+  /** From bare `- <YouTube link>` lines, see `parseVideoLink`. */
+  videos?: ChangelogVideo[];
 }
 
 interface ChangelogEntry {
@@ -94,22 +100,96 @@ const parseItem = (raw: string): { category: string | null; text: string } => {
   return { category, text };
 };
 
+const VIDEO_URL_RULES: Array<{ test: RegExp; vertical: boolean }> = [
+  {
+    test: /^https?:\/\/(?:www\.|m\.)?youtube\.com\/shorts\/([\w-]{11})(?:[?#/]\S*)?$/,
+    vertical: true,
+  },
+  {
+    test: /^https?:\/\/youtu\.be\/([\w-]{11})(?:[?#]\S*)?$/,
+    vertical: false,
+  },
+  {
+    test: /^https?:\/\/(?:www\.|m\.)?youtube\.com\/watch\?(?:\S*&)?v=([\w-]{11})(?:[&#]\S*)?$/,
+    vertical: false,
+  },
+];
+
+export const parseVideoLink = (raw: string): ChangelogVideo | null => {
+  const line = raw.trim();
+
+  for (const { test, vertical } of VIDEO_URL_RULES) {
+    const id = line.match(test)?.[1];
+    if (id) return { id, vertical };
+  }
+
+  return null;
+};
+
+// `- 🎬 Title — <YouTube link>`: a video with a title and no description. The
+// title has no word limit, unlike a category in front of text.
+const parseTitledVideo = (
+  raw: string,
+): { title: string | null; video: ChangelogVideo } | null => {
+  const separatorIndex = raw.lastIndexOf(" — ");
+  if (separatorIndex === -1) return null;
+
+  const video = parseVideoLink(raw.slice(separatorIndex + " — ".length));
+  if (!video) return null;
+
+  const title = raw
+    .slice(0, separatorIndex)
+    .replace(/^[^\p{L}0-9]+/u, "")
+    .trim();
+  return { title: title || null, video };
+};
+
+// A video link on its own line belongs to the item right above it, so it is
+// rendered under that item's category instead of as a line of text. A group
+// that already has a video is closed: the next item opens a new block, so
+// every video stays with the text it illustrates.
 const groupItemsByCategory = (rawItems: string[]): ChangelogGroup[] => {
   const groups: ChangelogGroup[] = [];
   const groupIndexByCategory = new Map<string, number>();
+  let lastGroup: ChangelogGroup | null = null;
 
-  rawItems.forEach((raw) => {
-    const { category, text } = parseItem(raw);
+  const getOrCreateGroup = (category: string | null): ChangelogGroup => {
     const key = category ?? "";
     const existingIndex = groupIndexByCategory.get(key);
-
-    if (existingIndex !== undefined) {
-      groups[existingIndex].items.push(text);
-      return;
+    if (existingIndex !== undefined && !groups[existingIndex].videos) {
+      return groups[existingIndex];
     }
 
     groupIndexByCategory.set(key, groups.length);
-    groups.push({ category, items: [text] });
+    const group: ChangelogGroup = { category, items: [] };
+    groups.push(group);
+    return group;
+  };
+
+  rawItems.forEach((raw) => {
+    const video = parseVideoLink(raw);
+
+    if (video) {
+      const group = lastGroup ?? getOrCreateGroup(null);
+      group.videos = [...(group.videos ?? []), video];
+      return;
+    }
+
+    const titledVideo = parseTitledVideo(raw);
+
+    if (titledVideo) {
+      lastGroup = {
+        category: titledVideo.title,
+        items: [],
+        videos: [titledVideo.video],
+      };
+      groups.push(lastGroup);
+      return;
+    }
+
+    const { category, text } = parseItem(raw);
+    lastGroup = getOrCreateGroup(category);
+    lastGroup.items.push(text);
   });
 
   return groups;
@@ -288,12 +368,45 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
                   </span>
                 )}
               </div>
-              <div className='space-y-6'>
+              {/* Text blocks take a full row; videos with only a title flow
+                  next to each other, like a shelf of covers. */}
+              <div className='flex flex-wrap gap-x-4 gap-y-6'>
                 {entry.groups.map((group, groupIdx) => {
+                  if (group.items.length === 0 && group.videos) {
+                    return (
+                      <Fragment key={groupIdx}>
+                        {group.videos.map((video) => (
+                          <figure
+                            key={video.id}
+                            className={
+                              video.vertical
+                                ? "w-[calc(50%-0.5rem)] sm:w-56"
+                                : "w-full sm:max-w-2xl"
+                            }>
+                            <ChangelogVideoCard
+                              video={video}
+                              title={group.category ?? "YouTube"}
+                              className='w-full'
+                            />
+                            {group.category && (
+                              <figcaption className='mt-3 text-sm font-semibold leading-snug text-zinc-100'>
+                                {group.category}
+                              </figcaption>
+                            )}
+                          </figure>
+                        ))}
+                      </Fragment>
+                    );
+                  }
+
                   const CategoryIcon = getCategoryIcon(group.category);
+                  // Shorts are tall: beside the text they read like a post
+                  // in a feed, under it they stack into a tower.
+                  const videosBesideText =
+                    group.videos?.every((video) => video.vertical) ?? false;
 
                   return (
-                    <div key={groupIdx}>
+                    <div key={groupIdx} className='w-full'>
                       {group.category && (
                         <div className='mb-2.5 flex items-center gap-3'>
                           <span className='flex h-6 w-6 flex-shrink-0 items-center justify-center rounded bg-zinc-800/60'>
@@ -307,30 +420,63 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
                           </p>
                         </div>
                       )}
-                      <ul className={cn("space-y-2", group.category && "pl-9")}>
-                        {group.items.map((item, itemIdx) => {
-                          const isBug = isBugFixItem(item);
+                      <div
+                        className={cn(
+                          group.category && "pl-9",
+                          videosBesideText &&
+                            "flex flex-col gap-4 sm:flex-row-reverse sm:items-start sm:gap-8",
+                        )}>
+                        <ul
+                          className={cn(
+                            "space-y-2",
+                            videosBesideText && "min-w-0 flex-1",
+                          )}>
+                          {group.items.map((item, itemIdx) => {
+                            const isBug = isBugFixItem(item);
 
-                          return (
-                            <li
-                              key={itemIdx}
-                              className='flex items-start gap-2.5 text-sm leading-relaxed text-zinc-300'>
-                              {isBug ? (
-                                <Bug
-                                  className='mt-1 h-3.5 w-3.5 flex-shrink-0 text-red-400/80'
-                                  aria-label={t("changelog.bug_fix")}
-                                />
-                              ) : (
-                                <span
-                                  className='mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-zinc-600'
-                                  aria-hidden
-                                />
-                              )}
-                              <span>{item}</span>
-                            </li>
-                          );
-                        })}
-                      </ul>
+                            return (
+                              <li
+                                key={itemIdx}
+                                className='flex items-start gap-2.5 text-sm leading-relaxed text-zinc-300'>
+                                {isBug ? (
+                                  <Bug
+                                    className='mt-1 h-3.5 w-3.5 flex-shrink-0 text-red-400/80'
+                                    aria-label={t("changelog.bug_fix")}
+                                  />
+                                ) : (
+                                  <span
+                                    className='mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-zinc-600'
+                                    aria-hidden
+                                  />
+                                )}
+                                <span>{item}</span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                        {group.videos && (
+                          <div
+                            className={cn(
+                              "flex flex-wrap gap-3",
+                              videosBesideText ? "shrink-0" : "mt-4",
+                            )}>
+                            {group.videos.map((video) => (
+                              <ChangelogVideoCard
+                                key={video.id}
+                                video={video}
+                                title={
+                                  group.category ?? group.items[0] ?? "YouTube"
+                                }
+                                className={
+                                  video.vertical
+                                    ? "w-48 sm:w-64"
+                                    : "w-full max-w-2xl"
+                                }
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}

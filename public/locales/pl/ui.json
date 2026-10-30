@@ -2,7 +2,8 @@
   "changelog": {
     "empty": "Brak wpisów w tym miesiącu",
     "new": "Nowe",
-    "bug_fix": "Poprawka błędu"
+    "bug_fix": "Poprawka błędu",
+    "play_video": "Odtwórz film: {{title}}"
   },
   "open_in_practice_log": "Otwórz w dzienniku ćwiczeń",
   "activity": "Aktywność",

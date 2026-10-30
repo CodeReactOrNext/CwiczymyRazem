@@ -27,7 +27,7 @@ Two of these — learning a song and clearing a Scale Map box — go on your lif
 
 Practise on consecutive days and every session that day is worth more. The bonus applies to your practice time *and* your habit points, and it's the closest thing the app has to a cheat code.
 
-<ProgressLadder items="Day 1::The streak starts, with no bonus yet|Day 2::+20% on everything you log that day|Day 3::+30%|Day 4::+40%|Day 5 and beyond::+50%, the maximum" highlight="Day 5 and beyond" caption="Miss a day and it goes back to zero. A 10-minute session is enough to keep it." />
+<ProgressLadder items="Day 1::The streak starts, with no bonus yet|Day 2::+20% on everything you log that day|Day 3::+30%|Day 4::+40%|Day 5 and beyond::+50%, the maximum" highlight="Day 5 and beyond" caption="One missed day a week is a rest day and the streak carries on. Miss more than that and it goes back to zero. A 10-minute session is enough to keep it." />
 
 <BlogAlert type="tip">
 Showing up for ten minutes on a busy day beats a three-hour Sunday. The streak rewards frequency, not heroics.

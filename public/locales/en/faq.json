@@ -43,7 +43,7 @@
   "desktop_description": "Yes, for Windows, macOS and Linux. It is the same account and the same data as the website, so a session logged on the desktop appears in the browser on your phone a second later. The reason it exists is audio: the desktop app talks to your audio interface directly, which means far lower latency than a browser tab can manage.",
 
   "streak_break_title": "What happens if I miss a day?",
-  "streak_break_description": "The streak resets to zero and you start counting again. Nothing else is touched: your points, level, skills, songs, achievements and gear all stay exactly where they were. Ten minutes is enough to keep a streak alive, which is why a short session on a busy day is worth more to you than a long one at the weekend.",
+  "streak_break_description": "One missed day a week is a rest day: your streak carries on, it just doesn't grow that day. You can switch rest days off in Settings. Miss two days in a row, or a second day in the same week, and the streak resets to zero and you start counting again. Nothing else is touched: your points, level, skills, songs, achievements and gear all stay exactly where they were. Ten minutes is enough to keep a streak alive, which is why a short session on a busy day is worth more to you than a long one at the weekend.",
 
   "points_rate_title": "How many points is an hour of practice worth?",
   "points_rate_description": "Practice pays 22 points an hour before multipliers, plus a point for each good habit you tick when you save the session. The streak then multiplies the whole thing: day one pays the plain rate, and the multiplier climbs from day two up to a ceiling of one and a half times on day five. Consistency is worth more than volume, by design.",

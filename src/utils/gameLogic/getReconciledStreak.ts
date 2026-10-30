@@ -1,5 +1,5 @@
 import { getDisplayStreak } from "./getDisplayStreak";
-import { getStreakFromActivityLog } from "./getStreakFromActivityLog";
+import { getStreakWalk } from "./getStreakFromActivityLog";
 
 /** Local calendar-day key (timezone-safe; never serializes through UTC). */
 const localDayKey = (d: Date): string =>
@@ -25,12 +25,16 @@ interface ReconciledStreakInput {
    * session, which only "fixes itself" on a hard page refresh.
    */
   assumePracticedToday?: boolean;
+  /** The streak owner's rest-day setting (`statistics.streakRestDays`). */
+  restDays?: boolean;
 }
 
 export interface ReconciledStreak {
   didPracticeToday: boolean;
   /** Streak value to render (0 when the streak is broken). */
   dayWithoutBreak: number;
+  /** Missed days the streak was carried over (local midnights), newest first. */
+  restDayDates: Date[];
 }
 
 /**
@@ -64,6 +68,7 @@ export const getReconciledStreak = (
     lastReportDate,
     reportDates,
     assumePracticedToday = false,
+    restDays = true,
   }: ReconciledStreakInput,
   now: Date = new Date()
 ): ReconciledStreak => {
@@ -76,7 +81,10 @@ export const getReconciledStreak = (
   // passes that flag right after a submission, and the stored counter was
   // already updated by that very submission (see reportUpdateUserState).
   if (validDates.length === 0) {
-    return getDisplayStreak({ actualDayWithoutBreak, lastReportDate }, now);
+    return {
+      ...getDisplayStreak({ actualDayWithoutBreak, lastReportDate }, now),
+      restDayDates: [],
+    };
   }
 
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -87,11 +95,11 @@ export const getReconciledStreak = (
   // The log already contains today's report when present, so the streak walk
   // counts it without any optimistic nudge from the stored state — unless the
   // caller already knows today was just practiced and the log hasn't caught up.
-  const dayWithoutBreak = getStreakFromActivityLog(
+  const { streak, restDayDates } = getStreakWalk(
     validDates,
-    { includeToday: assumePracticedToday },
+    { includeToday: assumePracticedToday, restDays },
     now
   );
 
-  return { didPracticeToday, dayWithoutBreak };
+  return { didPracticeToday, dayWithoutBreak: streak, restDayDates };
 };

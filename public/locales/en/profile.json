@@ -434,7 +434,8 @@
       "2": "Day 3",
       "3": "Day 4",
       "4": "Day 5+"
-    }
+    },
+    "rest_day": "One missed day a week won't break your streak."
   },
   "repertoire": {
     "empty_owner": "Songs land here once you mark them as learned on your song board.",

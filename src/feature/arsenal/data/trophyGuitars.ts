@@ -44,11 +44,11 @@
 export const ROADMAP_TROPHY_GUITARS: Readonly<Record<string, number | string>> =
   {
     // John Mayer — the tungsten Strat.
-    "58c48c07-c673-42fe-ba6b-493a9fb27274": 68, // Fairmont Stratocaster Tungsten
+    "58c48c07-c673-42fe-ba6b-493a9fb27274": 68, // Fairmont S-Contour Tungsten
     // Adam Jones — the silverburst single-cut he is never seen without.
     "f078b316-705e-416d-b831-a842fdff7a24": 69, // Louis Carver Eclipse Silverburst
     // Hendrix — the white Strat.
-    "0cbc5208-e56a-428f-8465-a0510e7b1f88": 67, // Fairmont Stratocaster Olympic White
+    "0cbc5208-e56a-428f-8465-a0510e7b1f88": 67, // Fairmont S-Contour Olympic White
     // Petrucci — the graphic superstrat.
     "2a4fbdde-83a5-4588-8bc1-6c79c626ac73": 71, // Izanor JTY Kaleido
     // Marty Friedman — the pointy one.
@@ -56,7 +56,7 @@ export const ROADMAP_TROPHY_GUITARS: Readonly<Record<string, number | string>> =
     // Improvisation — an all-rounder.
     "5431b95a-0733-4595-ae38-d600b132cbbe": 19, // Grayson Lewis Palmer Custom Shop
     // Rhythm — a workhorse.
-    "d44c57a7-c2e4-4115-9abb-dde4d318e5f7": 50, // Fairmont Stratocaster Heavy Relic
+    "d44c57a7-c2e4-4115-9abb-dde4d318e5f7": 50, // Fairmont S-Contour Heavy Relic
   };
 
 /** Every guitar model that is a roadmap trophy, and therefore undroppable. */

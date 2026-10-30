@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   getLongestStreakFromActivityLog,
   getStreakFromActivityLog,
+  getStreakWalk,
 } from "../getStreakFromActivityLog";
 
 // Server stores the log date as UTC-midnight of the user's local day; the
@@ -183,5 +184,90 @@ describe("getLongestStreakFromActivityLog", () => {
     );
 
     expect(getLongestStreakFromActivityLog(reports)).toBe(120);
+  });
+});
+
+describe("rest days", () => {
+  // November 2026 sits after REST_DAYS_SINCE. Mon Nov 2 – Sun Nov 8 is one
+  // week, Mon Nov 9 – Sun Nov 15 the next.
+  const nov = (d: number) => localDate(2026, 10, d);
+  const days = (...list: number[]) => list.map(nov);
+  const keys = (dates: Date[]) => dates.map((d) => d.getDate());
+
+  it("carries the streak over one missed day without counting it", () => {
+    const walk = getStreakWalk(days(2, 3, 5), {}, nov(5));
+
+    expect(walk.streak).toBe(3);
+    expect(keys(walk.restDayDates)).toEqual([4]);
+  });
+
+  it("keeps the streak alive the day after a rest day, before today is played", () => {
+    const walk = getStreakWalk(days(2, 3), {}, nov(5));
+
+    expect(walk.streak).toBe(2);
+    expect(keys(walk.restDayDates)).toEqual([4]);
+  });
+
+  it("breaks on two missed days in a row", () => {
+    expect(getStreakFromActivityLog(days(2, 3), {}, nov(6))).toBe(0);
+  });
+
+  it("breaks on a second missed day in the same week", () => {
+    // Nov 3 took the week's rest day, so the Nov 5 gap ends the run.
+    const walk = getStreakWalk(days(2, 4, 6), {}, nov(6));
+
+    expect(walk.streak).toBe(1);
+    expect(walk.restDayDates).toEqual([]);
+  });
+
+  it("never moves a rest day once it has been shown", () => {
+    // Wednesday: Nov 3 is the rest day. A miss on Thursday must not move it
+    // there, it ends the streak instead.
+    expect(keys(getStreakWalk(days(2, 4), {}, nov(4)).restDayDates)).toEqual([3]);
+    expect(keys(getStreakWalk(days(2, 4), {}, nov(5)).restDayDates)).toEqual([3]);
+    expect(getStreakWalk(days(2, 4), {}, nov(6)).streak).toBe(0);
+  });
+
+  it("gives every week its own rest day", () => {
+    const walk = getStreakWalk(days(5, 7, 8, 9, 11), {}, nov(11));
+
+    expect(walk.streak).toBe(5);
+    expect(keys(walk.restDayDates)).toEqual([10, 6]);
+  });
+
+  it("does nothing when the player switched rest days off", () => {
+    const walk = getStreakWalk(days(2, 3, 5), { restDays: false }, nov(5));
+
+    expect(walk.streak).toBe(1);
+    expect(walk.restDayDates).toEqual([]);
+  });
+
+  it("treats missed days before REST_DAYS_SINCE as plain gaps", () => {
+    const reports = [
+      localDate(2026, 9, 22),
+      // Oct 23 missed, before the rule started
+      localDate(2026, 9, 24),
+      localDate(2026, 9, 25),
+    ];
+
+    expect(getStreakFromActivityLog(reports, {}, localDate(2026, 9, 25))).toBe(2);
+  });
+
+  it("counts rest days into the longest run as well", () => {
+    expect(getLongestStreakFromActivityLog(days(2, 3, 5, 6))).toBe(4);
+    expect(
+      getLongestStreakFromActivityLog(days(2, 3, 5, 6), { restDays: false })
+    ).toBe(2);
+  });
+
+  it("never puts the record below the streak the player is shown", () => {
+    // Nov 3 is the rest day, so the Nov 5 gap starts a new run.
+    const reports = days(2, 4, 6, 7, 8);
+    const current = getStreakFromActivityLog(reports, {}, nov(8));
+
+    expect(current).toBe(3);
+    expect(getLongestStreakFromActivityLog(reports)).toBeGreaterThanOrEqual(
+      current
+    );
   });
 });

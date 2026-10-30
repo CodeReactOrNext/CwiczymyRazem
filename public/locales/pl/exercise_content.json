@@ -2784,9 +2784,9 @@
       }
     },
     "master_of_puppets_riff_preview": {
-      "title": "Skarbiec riffów — Master of Puppets",
-      "description": "Krótki fragment kultowego, wyciszonego dłonią riffu otwierającego utwór, razem z jego akcentami power chordów.",
-      "whyItMatters": "To riff, który otwiera (i wraca przez) cały utwór: chromatyczne granie z palm mute, które przechodzi w power chordy, sprawdzając zarówno wytrzymałość naprzemiennego uderzania, jak i czyste przejścia akordów.",
+      "title": "Skarbiec riffów — Chromatyczna maszyna",
+      "description": "Chromatyczny riff z palm mute nad pustą struną, przerywany akcentami power chordów.",
+      "whyItMatters": "Chromatyczne granie z palm mute, które przechodzi w power chordy i z powrotem, sprawdzając zarówno wytrzymałość naprzemiennego uderzania, jak i czyste przejścia akordów.",
       "instructions": {
         "0": "Wyciszaj palm mutem granie pojedynczych nut; pozwól power chordom krótko wybrzmieć przed następną frazą.",
         "1": "Utrzymuj równy puls ósemkowy; pusta struna działa jak dźwięk pedałowy pod chwytanymi nutami."
@@ -2796,9 +2796,9 @@
       }
     },
     "seven_nation_army_riff_preview": {
-      "title": "Skarbiec riffów — Seven Nation Army",
-      "description": "Kultowy czteronutowy riff utworu, w całości na strunie A.",
-      "whyItMatters": "Jedna struna, jeden powtarzający się kształt — synkopowany przedtakt i przytrzymane nuty sprawiają, że riff jest od razu rozpoznawalny, a nie chwyty.",
+      "title": "Skarbiec riffów — Stadionowy marsz",
+      "description": "Czteronutowy riff grany w całości na strunie A.",
+      "whyItMatters": "Jedna struna, jeden powtarzający się kształt — riff niosą synkopowany przedtakt i przytrzymane nuty, a nie chwyty.",
       "instructions": {
         "0": "Wyciszaj pozostałe pięć strun palm mutem, żeby brzmiała tylko struna A — to tu prawdziwa umiejętność, nie chwyty.",
         "1": "Opanuj synkopowany przedtakt na pierwszych dwóch nutach, zanim zaczniesz myśleć o szybkości."
@@ -2808,8 +2808,8 @@
       }
     },
     "sweet_child_o_mine_riff_preview": {
-      "title": "Skarbiec riffów — Sweet Child O' Mine",
-      "description": "Kultowy riff otwierający Slasha z przeskokami strun, wzór „cyrkowy”, który otwiera utwór.",
+      "title": "Skarbiec riffów — Karuzela przeskoków",
+      "description": "Wzór „cyrkowy” z przeskokami strun, krążący w pętli po niesąsiadujących strunach.",
       "whyItMatters": "Prawa ręka przeskakuje między niesąsiadującymi strunami w stałej pętli — całym wyzwaniem jest precyzja, nie szybkość, i działa to też jako codzienna rozgrzewka dokładności.",
       "instructions": {
         "0": "Uderzaj ściśle naprzemiennie (w dół–w górę, bez wyjątków), aby wzór przeskoków sam się ustabilizował w tempie.",
@@ -2820,11 +2820,11 @@
       }
     },
     "thunderstruck_riff_preview": {
-      "title": "Skarbiec riffów — Thunderstruck",
-      "description": "Słynny jednostrunowy riff otwierający Angusa Younga, w całości naprzemiennym uderzaniem, bez tappingu i hammer-onów.",
+      "title": "Skarbiec riffów — Burza na jednej strunie",
+      "description": "Riff na jednej strunie z pustą struną w tle, w całości naprzemiennym uderzaniem, bez tappingu i hammer-onów.",
       "whyItMatters": "Jedna czteronutowa komórka powtarzana szybko na jednej strunie — całym wyzwaniem jest równość prawej ręki i wyciszanie strun, nie sam kształt.",
       "instructions": {
-        "0": "Uderzaj każdą nutę naprzemiennie (w dół–w górę, bez wyjątków) — tak jest na nagraniu, a nie hammer-onami.",
+        "0": "Uderzaj każdą nutę naprzemiennie (w dół–w górę, bez wyjątków) — bez hammer-onów i pull-offów.",
         "1": "Oprzyj lekko palce lewej ręki na sąsiednich strunach, żeby brzmiała tylko struna B."
       },
       "tips": {
@@ -2832,8 +2832,8 @@
       }
     },
     "crazy_train_riff_preview": {
-      "title": "Skarbiec riffów — Crazy Train",
-      "description": "Riff galopowy utworu z palm mute, przypięty do niskiej struny E, z chwytanymi nutami na strunie A nałożonymi na wierzch.",
+      "title": "Skarbiec riffów — Nocny galop",
+      "description": "Galopujący riff z palm mute, przypięty do niskiej struny E, z chwytanymi nutami na strunie A nałożonymi na wierzch.",
       "whyItMatters": "Groove żyje w kontraście między ciasno wyciszoną nutą pedałową a bardziej otwartymi chwytanymi nutami nad nią — trafisz ten kontrast, a riff groovuje; chybisz, a brzmi płasko.",
       "instructions": {
         "0": "Trzymaj niską strunę E ciasno wyciszoną palm mutem przez cały czas; pozwól nutom ze struny A brzmieć nieco swobodniej dla kontrastu.",

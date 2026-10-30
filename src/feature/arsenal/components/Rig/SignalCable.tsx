@@ -481,7 +481,7 @@ interface CouplerProps {
  *
  * It is laid socket to socket, not level. Two enclosures rarely wear their
  * jacks at the same height — a compact box carries its pair a good way above
- * where a Friedman-style one does — and a rigid coupler between them stands at
+ * where a Forge-style one does — and a rigid coupler between them stands at
  * whatever angle joins the two holes. Drawn level from one of them it left the
  * other ring hanging in the air a plug's width above the nut it was meant to be
  * seated in.

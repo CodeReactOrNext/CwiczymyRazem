@@ -27,7 +27,7 @@ Zwei davon — einen Song lernen und ein Scale-Map-Feld abschließen — gehen a
 
 Übe an aufeinanderfolgenden Tagen, und jede Session an diesem Tag ist mehr wert. Der Bonus gilt für deine Übungszeit *und* deine Gewohnheitspunkte und ist das Nächste an einem Cheat-Code, was die App hat.
 
-<ProgressLadder items="Tag 1::Die Serie beginnt, noch ohne Bonus|Tag 2::+20 % auf alles, was du an diesem Tag einträgst|Tag 3::+30 %|Tag 4::+40 %|Tag 5 und danach::+50 %, das Maximum" highlight="Tag 5 und danach" caption="Verpasse einen Tag, und sie fällt auf null zurück. Eine 10-minütige Session reicht, um sie zu halten." />
+<ProgressLadder items="Tag 1::Die Serie beginnt, noch ohne Bonus|Tag 2::+20 % auf alles, was du an diesem Tag einträgst|Tag 3::+30 %|Tag 4::+40 %|Tag 5 und danach::+50 %, das Maximum" highlight="Tag 5 und danach" caption="Ein verpasster Tag pro Woche ist ein Ruhetag, und die Serie läuft weiter. Verpasse mehr, und sie fällt auf null zurück. Eine 10-minütige Session reicht, um sie zu halten." />
 
 <BlogAlert type="tip">
 Zehn Minuten an einem vollen Tag zu erscheinen schlägt einen dreistündigen Sonntag. Die Serie belohnt Häufigkeit, nicht Heldentaten.

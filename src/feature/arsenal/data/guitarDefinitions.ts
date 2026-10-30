@@ -275,7 +275,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 24,
     imageId: "special/24",
-    name: "Stratocaster",
+    name: "S-Contour",
     brand: "Fairmont",
     rarity: "Common",
     yearFrom: 1990,
@@ -309,7 +309,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 27,
     imageId: "special/27",
-    name: "Stratocaster",
+    name: "S-Contour",
     brand: "Fairmont",
     rarity: "Epic",
     yearFrom: 1990,
@@ -409,7 +409,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 36,
     imageId: "special/37",
-    name: "Stratocaster",
+    name: "S-Contour",
     brand: "Fairmont",
     rarity: "Epic",
     yearFrom: 1990,
@@ -487,7 +487,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 43,
     imageId: "special/44",
-    name: "Stratocaster Heavy Relic",
+    name: "S-Contour Heavy Relic",
     brand: "Fairmont",
     rarity: "Mythic",
     yearFrom: 1960,
@@ -498,7 +498,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 44,
     imageId: "special/45",
-    name: "Stratocaster Custom",
+    name: "S-Contour Custom",
     brand: "Fairmont",
     rarity: "Legendary",
     yearFrom: 1959,
@@ -532,7 +532,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 47,
     imageId: "special/48",
-    name: "Stratocaster Natural",
+    name: "S-Contour Natural",
     brand: "Fairmont",
     rarity: "Rare",
     yearFrom: 1970,
@@ -543,7 +543,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 48,
     imageId: "special/49",
-    name: "Stratocaster Heavy Relic",
+    name: "S-Contour Heavy Relic",
     brand: "Fairmont",
     rarity: "Legendary",
     yearFrom: 1960,
@@ -554,7 +554,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 49,
     imageId: "special/50",
-    name: "Stratocaster Heavy Relic",
+    name: "S-Contour Heavy Relic",
     brand: "Fairmont",
     rarity: "Legendary",
     yearFrom: 1960,
@@ -565,7 +565,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 50,
     imageId: "special/51",
-    name: "Stratocaster Heavy Relic",
+    name: "S-Contour Heavy Relic",
     brand: "Fairmont",
     rarity: "Legendary",
     yearFrom: 1960,
@@ -632,7 +632,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 56,
     imageId: "special/57",
-    name: "Stratocaster Racing Green",
+    name: "S-Contour Racing Green",
     brand: "Fairmont",
     rarity: "Rare",
     yearFrom: 1990,
@@ -665,7 +665,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 59,
     imageId: "special/60",
-    name: "Stratocaster Shoreline Gold",
+    name: "S-Contour Shoreline Gold",
     brand: "Fairmont",
     rarity: "Epic",
     yearFrom: 1970,
@@ -759,7 +759,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 67,
     imageId: "special/68",
-    name: "Stratocaster Olympic White",
+    name: "S-Contour Olympic White",
     brand: "Fairmont",
     rarity: "Mythic",
     yearFrom: 1968,
@@ -770,7 +770,7 @@ export const GUITAR_DEFINITIONS: GuitarDefinition[] = [
   {
     id: 68,
     imageId: "special/69",
-    name: "Stratocaster Tungsten",
+    name: "S-Contour Tungsten",
     brand: "Fairmont",
     rarity: "Mythic",
     yearFrom: 1988,

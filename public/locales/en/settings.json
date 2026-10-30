@@ -109,5 +109,12 @@
     "notifications": "Notifications",
     "security": "Security",
     "google_auth": "Google OAuth Authentication"
+  },
+  "streak": {
+    "title": "Streak",
+    "subtitle": "How your daily streak is counted.",
+    "label": "Rest day",
+    "description": "One missed day a week (Monday to Sunday) won't break your streak, though it won't add a day either. Two missed days in a row always end it.",
+    "error": "Couldn't save. Try again."
   }
 }

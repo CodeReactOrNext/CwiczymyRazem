@@ -1,5 +1,3 @@
-import { thunderstruckRiffPreviewExercise } from "feature/exercisePlan/data/exerises/thunderstruckRiffPreview/thunderstruckRiffPreview";
-
 import type { SongGuide } from "../types";
 
 export const thunderstruck: SongGuide = {
@@ -151,15 +149,6 @@ export const thunderstruck: SongGuide = {
     ],
     hardestSummary:
       "The intro riff takes minutes to understand and weeks to play clean at full tempo: that gap between 'I get it' and 'I can do it at speed' is where the entire difficulty rating lives. Nothing later in the song asks for more.",
-  },
-  riffPreview: {
-    heading: "Riff preview",
-    intro: "A short tab from the song's iconic intro riff.",
-    measures: thunderstruckRiffPreviewExercise.tablature!,
-    bpm: thunderstruckRiffPreviewExercise.metronomeSpeed!.recommended,
-    bpmMin: thunderstruckRiffPreviewExercise.metronomeSpeed!.min,
-    bpmMax: thunderstruckRiffPreviewExercise.metronomeSpeed!.max,
-    practiceExerciseId: thunderstruckRiffPreviewExercise.id,
   },
   timeline: {
     heading: "Honest timelines",
@@ -358,7 +347,6 @@ export const thunderstruck: SongGuide = {
     },
   ],
   sectionOrder: [
-    "riffPreview",
     "videoLessons",
     "verdict",
     "songMap",

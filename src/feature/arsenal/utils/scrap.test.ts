@@ -26,7 +26,7 @@ describe("getGuitarScrapYield", () => {
   });
 
   it("tiers the yield off the guitar's rarity", () => {
-    // 24 = Fairmont Stratocaster (Common), 44 = Stratocaster Custom (Legendary).
+    // 24 = Fairmont S-Contour (Common), 44 = S-Contour Custom (Legendary).
     // Same archetype, so the headline slot is the same part in both.
     expect(tierOf(getGuitarScrapYield({}, guitar(24)), "pickup")).toBe(
       "Standard",
@@ -52,7 +52,7 @@ describe("getGuitarScrapYield", () => {
   });
 
   it("yields Unique showpiece parts from a Mythic guitar", () => {
-    // 43 = Stratocaster Heavy Relic (Mythic)
+    // 43 = S-Contour Heavy Relic (Mythic)
     const parts = getGuitarScrapYield({}, guitar(43));
     expect(tierOf(parts, "pickup")).toBe("Unique");
     expect(tierOf(parts, "body")).toBe("Unique");
@@ -61,7 +61,7 @@ describe("getGuitarScrapYield", () => {
   });
 
   it("upgrades the part matching a rolled feature", () => {
-    // 44 = Stratocaster Custom (Legendary) — reaches the neck slot.
+    // 44 = S-Contour Custom (Legendary) — reaches the neck slot.
     const plain = getGuitarScrapYield({}, guitar(44));
     const upgraded = getGuitarScrapYield(
       { features: [{ id: "graphite-neck", points: 2 }] },
@@ -72,7 +72,7 @@ describe("getGuitarScrapYield", () => {
     expect(tierOf(upgraded, "neck")).toBe("Legendary");
 
     // On cheaper gear the same feature does move the needle.
-    const cheapPlain = getGuitarScrapYield({}, guitar(47)); // Rare Stratocaster
+    const cheapPlain = getGuitarScrapYield({}, guitar(47)); // Rare S-Contour
     const cheapUpgraded = getGuitarScrapYield(
       { features: [{ id: "graphite-neck", points: 2 }] },
       guitar(47),
@@ -84,7 +84,7 @@ describe("getGuitarScrapYield", () => {
 
 describe("getEffectScrapYield", () => {
   it("strips a cheap pedal down to its headline part", () => {
-    // 2 = TS-808 Overdrive (Common) — one slot, and diodes lead an overdrive.
+    // 2 = Moss Drive (Common) — one slot, and diodes lead an overdrive.
     expect(
       getEffectScrapYield({}, effect(2)).filter((p) => p.partId !== "screws"),
     ).toEqual([{ partId: "diode", tier: "Standard", qty: 2 }]);

@@ -69,7 +69,7 @@ describe("guitar specs — the roster", () => {
 
 describe("guitar specs — the rules", () => {
   it("puts a tremolo block only on a guitar with a tremolo", () => {
-    expect(modsOn(24)).toContain("brass-trem-block"); // Stratocaster
+    expect(modsOn(24)).toContain("brass-trem-block"); // S-Contour
     expect(modsOn(16)).toContain("brass-trem-block"); // Floyd superstrat
     expect(modsOn(40)).toContain("brass-trem-block"); // PRS vibrato
 

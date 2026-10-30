@@ -19,7 +19,11 @@ import {
   Area, AreaChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ReferenceLine, ResponsiveContainer, XAxis,
 } from "recharts";
 import type { StatisticsDataInterface } from "types/api.types";
-import { getDailyStreakMultiplier, getReconciledStreak } from "utils/gameLogic";
+import {
+  getDailyStreakMultiplier,
+  getReconciledStreak,
+  hasRestDays,
+} from "utils/gameLogic";
 
 import { RewardBreakdown } from "./components/RewardBreakdown";
 import { SessionLeaderboardCard } from "./components/SessionLeaderboardCard";
@@ -164,6 +168,7 @@ const RatingPopUpLayout = ({
     lastReportDate: currentUserStats.lastReportDate ?? "",
     reportDates: activityData.map((d) => d.date),
     assumePracticedToday: true,
+    restDays: hasRestDays(currentUserStats),
   });
   const streakBonusPct = Math.round(getDailyStreakMultiplier(streak) * 100);
 

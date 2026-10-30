@@ -432,7 +432,8 @@
       "2": "Dzień 3",
       "3": "Dzień 4",
       "4": "Dzień 5+"
-    }
+    },
+    "rest_day": "Jeden opuszczony dzień w tygodniu nie przerywa serii."
   },
   "repertoire": {
     "empty_owner": "Utwory pojawią się tu, gdy oznaczysz je jako opanowane na tablicy utworów.",

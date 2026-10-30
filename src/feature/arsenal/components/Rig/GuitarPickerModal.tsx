@@ -33,7 +33,7 @@ export const GuitarPickerModal = ({
   onSelect,
   onClose,
 }: GuitarPickerModalProps) => {
-  // One tile per copy, not per model: two Stratocasters can be a level 3 and a
+  // One tile per copy, not per model: two S-Contours can be a level 3 and a
   // level 17, and a picker that shows only one of them cannot say which. Ordered
   // the way the stash orders itself — rarest first, copies together, best first.
   const items = filterAndSortEntries(getGuitarEntries(inventory), "", "rarity");

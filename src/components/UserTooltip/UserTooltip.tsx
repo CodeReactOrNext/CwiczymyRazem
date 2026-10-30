@@ -24,7 +24,7 @@ import type { CurrentActivityInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
 import type { UserTooltipData } from "utils/firebase/client/firebase.utils";
 import { firebaseGetUserTooltipData } from "utils/firebase/client/firebase.utils";
-import { getReconciledStreak } from "utils/gameLogic";
+import { getReconciledStreak, hasRestDays } from "utils/gameLogic";
 
 const StatsBox = ({
   Icon,
@@ -96,6 +96,7 @@ export const UserTooltip = ({
           const { dayWithoutBreak } = getReconciledStreak({
             actualDayWithoutBreak: data.statistics.actualDayWithoutBreak,
             lastReportDate: data.statistics.lastReportDate,
+            restDays: hasRestDays(data.statistics),
             reportDates: logs.map((log) =>
               log?.reportDate?.seconds
                 ? new Date(log.reportDate.seconds * 1000)

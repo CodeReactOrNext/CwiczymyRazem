@@ -4,11 +4,12 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 // the string-skipping loop (D string -> B string, clearing the G string)
 // that repeats with the bass note walking underneath.
 export const sweetChildOMineRiffPreviewExercise: Exercise = {
+  // Legacy id from the riff's old song-based name — it is a Firestore key, keep it.
   id: "sweet_child_o_mine_riff_preview",
   addedAt: "2026-08-06",
-  title: "Riff Vault — Sweet Child O' Mine",
+  title: "Riff Vault — Carousel Skip",
   description:
-    "Slash's iconic string-skipping intro riff, the 'circus' pattern that opens the song.",
+    "A string-skipping 'circus' pattern that loops across non-adjacent strings.",
   whyItMatters:
     "The picking hand leaps between non-adjacent strings in a fixed loop — precision, not speed, is the whole challenge, and it doubles as a daily accuracy warm-up.",
   difficulty: "medium",

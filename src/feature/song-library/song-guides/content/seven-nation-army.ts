@@ -1,5 +1,3 @@
-import { sevenNationArmyRiffPreviewExercise } from "feature/exercisePlan/data/exerises/sevenNationArmyRiffPreview/sevenNationArmyRiffPreview";
-
 import type { SongGuide } from "../types";
 
 export const sevenNationArmy: SongGuide = {
@@ -146,15 +144,6 @@ export const sevenNationArmy: SongGuide = {
     ],
     hardestSummary:
       "The riff will never be the hard part. The solo is where the song's real difficulty lives, and it's entirely optional if all you want is the part everyone recognizes.",
-  },
-  riffPreview: {
-    heading: "Riff preview",
-    intro: "A short tab from the song's iconic riff.",
-    measures: sevenNationArmyRiffPreviewExercise.tablature!,
-    bpm: sevenNationArmyRiffPreviewExercise.metronomeSpeed!.recommended,
-    bpmMin: sevenNationArmyRiffPreviewExercise.metronomeSpeed!.min,
-    bpmMax: sevenNationArmyRiffPreviewExercise.metronomeSpeed!.max,
-    practiceExerciseId: sevenNationArmyRiffPreviewExercise.id,
   },
   timeline: {
     heading: "How long will it actually take?",
@@ -346,7 +335,6 @@ export const sevenNationArmy: SongGuide = {
     },
   ],
   sectionOrder: [
-    "riffPreview",
     "videoLessons",
     "verdict",
     "songMap",

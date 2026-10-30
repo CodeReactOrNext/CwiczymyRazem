@@ -209,7 +209,7 @@ export default function StreakReminderEmail({
   const accentMuted = isD1 ? colors.redMuted : colors.goldMuted;
 
   const previewText = isD1
-    ? `🔥 Your ${days}-day streak ends ${deadline} — one session saves it`
+    ? `🔥 Your day ends ${deadline} — one session keeps your ${days}-day streak going`
     : `Hey ${displayName}, it's been 3 days. Time to play something.`;
 
   return (
@@ -225,13 +225,13 @@ export default function StreakReminderEmail({
           <Section style={card}>
             {isD1 ? (
               <>
-                <Text style={eyebrow(accentColor)}>Streak at risk</Text>
+                <Text style={eyebrow(accentColor)}>Keep it going</Text>
                 <Heading style={heading}>
-                  {displayName}, your streak ends {deadline}
+                  {displayName}, today ends {deadline}
                 </Heading>
                 <Text style={paragraph}>
-                  You&apos;ve built something real. Don&apos;t let one missed
-                  day reset it — a single session today is all it takes.
+                  You&apos;ve built something real. A single session today
+                  keeps it growing.
                 </Text>
 
                 <Section style={streakHero(accentBg)}>
@@ -248,7 +248,7 @@ export default function StreakReminderEmail({
 
                 <Section style={buttonWrap}>
                   <Button href={timerUrl} style={ctaButton(colors.cyan)}>
-                    Save my streak now
+                    Practice now
                   </Button>
                 </Section>
               </>

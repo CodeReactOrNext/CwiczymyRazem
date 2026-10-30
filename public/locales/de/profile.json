@@ -432,7 +432,8 @@
       "2": "Tag 3",
       "3": "Tag 4",
       "4": "Tag 5+"
-    }
+    },
+    "rest_day": "Ein verpasster Tag pro Woche beendet deine Serie nicht."
   },
   "repertoire": {
     "empty_owner": "Songs landen hier, sobald du sie auf deinem Song-Board als gelernt markierst.",

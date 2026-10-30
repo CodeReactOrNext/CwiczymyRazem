@@ -16,6 +16,7 @@ import {
 } from "feature/aiCoach/utils/lessonProgress";
 import { LESSON_TITLE_PREFIX } from "feature/logs/utils/loggedPractice";
 import {
+  selectCurrentUserStats,
   selectUserAuth,
   selectUserAvatar,
   setActivity,
@@ -34,7 +35,7 @@ import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { DailyQuestTaskType } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
-import { getClientReportContext } from "utils/gameLogic";
+import { getClientReportContext, hasRestDays } from "utils/gameLogic";
 
 const SKILL_OPTIONS: {
   id: SkillsType;
@@ -107,6 +108,9 @@ const LessonPracticeModal = ({
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
   const userAvatar = useAppSelector(selectUserAvatar);
+  const restDays = useAppSelector((state) =>
+    hasRestDays(selectCurrentUserStats(state))
+  );
   const { reportList } = useActivityLog(userAuth || "");
   const timer = useTimer();
   const [restored] = useState(() => loadLessonProgress(lesson.videoId));
@@ -233,6 +237,7 @@ const LessonPracticeModal = ({
       avatarUrl: userAvatar ?? null,
       ...getClientReportContext(
         ((reportList as any[]) ?? []).map((report) => report.date),
+        restDays,
       ),
     };
 
