@@ -1,0 +1,223 @@
+{
+  "page": {
+    "title": "Kalendarz",
+    "subtitle": "Twoje utwory, cele i roadmapy rozpisane na dni",
+    "eyebrow": "Biblioteka"
+  },
+  "week": {
+    "today": "Dziś",
+    "this_week": "Ten tydzień",
+    "next_week": "Następny tydzień",
+    "last_week": "Poprzedni tydzień",
+    "previous": "Poprzedni tydzień",
+    "next": "Następny tydzień",
+    "clear": "Wyczyść ten tydzień",
+    "planned": "Zaplanowane",
+    "played": "Zagrane",
+    "days": "Dni ćwiczeń"
+  },
+  "actions": {
+    "add": "Dodaj",
+    "autoplan": "Auto-plan"
+  },
+  "empty": {
+    "title": "Nic nie zaplanowano na ten tydzień",
+    "body": "Powiedz plannerowi, ile masz czasu, a rozpisze dni z Twoich utworów, celów tempa i roadmapy, na Twoim poziomie. Możesz też dodać wszystko ręcznie.",
+    "cta": "Zaplanuj tydzień"
+  },
+  "day": {
+    "progress": "Zagrane z zaplanowanych",
+    "empty": "Dodaj ćwiczenia",
+    "nothing_past": "Nic nie zaplanowano",
+    "complete": "Wszystko zagrane",
+    "add": "Dodaj do tego dnia"
+  },
+  "item": {
+    "menu": "Opcje: {{title}}",
+    "warmup": "Rozgrzewka",
+    "mark_done": "Oznacz jako zagrane",
+    "undo_done": "Oznacz jako niezagrane",
+    "open_goal": "Otwórz cel",
+    "open_step": "Otwórz krok roadmapy",
+    "move": "Przenieś na",
+    "remove": "Usuń",
+    "goal_bpm": "Cel · {{bpm}} BPM"
+  },
+  "kinds": {
+    "exercise": "Ćwiczenie",
+    "song": "Utwór",
+    "goal": "Cel",
+    "roadmap": "Roadmapa",
+    "custom": "Własne"
+  },
+  "areas": {
+    "technique": "Technika",
+    "songs": "Utwory",
+    "theory": "Teoria",
+    "hearing": "Słuch",
+    "creativity": "Kreatywność"
+  },
+  "levels": {
+    "beginner": {
+      "name": "Początkujący",
+      "hint": "Pierwszy rok"
+    },
+    "intermediate": {
+      "name": "Średni",
+      "hint": "Znam podstawy"
+    },
+    "advanced": {
+      "name": "Zaawansowany",
+      "hint": "Gram od lat"
+    }
+  },
+  "time": {
+    "minutes_one": "{{count}} min",
+    "minutes_few": "{{count}} min",
+    "minutes_many": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "hours_one": "{{count}} h",
+    "hours_few": "{{count}} h",
+    "hours_many": "{{count}} h",
+    "hours_other": "{{count}} h",
+    "hours_minutes": "{{hours}} h {{minutes}} min",
+    "minutes_short": "{{count}} min"
+  },
+  "planner": {
+    "title": "Auto-plan",
+    "reshuffle": "Przetasuj",
+    "rest_day": "Dzień wolny",
+    "apply_one": "Wypełnij {{count}} dzień",
+    "apply_few": "Wypełnij {{count}} dni",
+    "apply_many": "Wypełnij {{count}} dni",
+    "apply_other": "Wypełnij {{count}} dni",
+    "footer_keep": "To, co dodałeś ręcznie, i to, co już zagrałeś, zostaje na miejscu.",
+    "footer_replace": "Wszystko jeszcze niezagrane w tych dniach zostanie zastąpione.",
+    "range": {
+      "label": "Dni",
+      "rest_of_week": "Reszta tygodnia",
+      "next_week": "Następny tydzień",
+      "two_weeks": "Oba"
+    },
+    "minutes": {
+      "label": "Czas dziennie"
+    },
+    "level": {
+      "label": "Twój poziom"
+    },
+    "focus": {
+      "label": "Postaw na",
+      "hint": "Wybrane obszary dostaną większą część czasu. Bez wyboru: równa mieszanka."
+    },
+    "sources": {
+      "label": "Bierz z",
+      "hint": "To, nad czym już pracujesz w innych miejscach aplikacji.",
+      "songs": "Utwory, których się uczysz",
+      "songs_learning_one": "{{count}} w nauce",
+      "songs_learning_few": "{{count}} w nauce",
+      "songs_learning_many": "{{count}} w nauce",
+      "songs_learning_other": "{{count}} w nauce",
+      "songs_wishlist_one": "{{count}} na liście życzeń",
+      "songs_wishlist_few": "{{count}} na liście życzeń",
+      "songs_wishlist_many": "{{count}} na liście życzeń",
+      "songs_wishlist_other": "{{count}} na liście życzeń",
+      "songs_empty": "Dodaj utwory, których się uczysz",
+      "goals": "Cele tempa",
+      "goals_empty": "Ustaw cel tempa",
+      "roadmaps": "Krok roadmapy",
+      "roadmaps_empty": "Zacznij roadmapę"
+    },
+    "advanced": {
+      "label": "Opcje zaawansowane",
+      "hint": "Skille, dzień po dniu, różnorodność, intensywność, rozgrzewka",
+      "show": "Pokaż",
+      "hide": "Ukryj"
+    },
+    "weekdays": {
+      "label": "Czas w poszczególne dni",
+      "hint": "Puste pole = czas z góry. 0 = dzień wolny.",
+      "rest": "Wolne",
+      "presets": {
+        "same": "Codziennie tyle samo",
+        "weekends_off": "Wolne weekendy",
+        "longer_weekends": "Dłuższe weekendy",
+        "every_other": "Co drugi dzień"
+      }
+    },
+    "variety": {
+      "label": "Różnorodność",
+      "steady": "Stała",
+      "steady_hint": "Te same ćwiczenia",
+      "balanced": "Zbalansowana",
+      "balanced_hint": "Trochę powtórek",
+      "explore": "Odkrywaj",
+      "explore_hint": "Codziennie coś nowego"
+    },
+    "intensity": {
+      "label": "Intensywność",
+      "light": "Lekko",
+      "light_hint": "Łatwiej, krótkie bloki",
+      "steady": "Równo",
+      "steady_hint": "Na Twoim poziomie",
+      "push": "Docisk",
+      "push_hint": "Trudniej, dłuższe bloki"
+    },
+    "max_items": {
+      "label": "Bloków dziennie",
+      "hint": "Najwyżej, z rozgrzewką"
+    },
+    "toggles": {
+      "warmup": "Najpierw rozgrzewka",
+      "warmup_hint": "Każdy dzień zaczyna się od 5 minut łatwego ćwiczenia.",
+      "lightDay": "Jeden lżejszy dzień",
+      "lightDay_hint": "Skraca o połowę jeden dzień w środku tygodnia, żeby było czym oddychać.",
+      "keepManual": "Zostaw to, co dodałem",
+      "keepManual_hint": "Planuj wokół rzeczy wstawionych ręcznie."
+    },
+    "subtitle": "Twój czas, poziom, utwory i cele — rozpisane na dni",
+    "back": "Wróć do kalendarza",
+    "summary": {
+      "blocks_one": "{{count}} blok",
+      "blocks_few": "{{count}} bloki",
+      "blocks_many": "{{count}} bloków",
+      "blocks_other": "{{count}} bloku",
+      "rest_one": "{{count}} dzień wolny",
+      "rest_few": "{{count}} dni wolne",
+      "rest_many": "{{count}} dni wolnych",
+      "rest_other": "{{count}} dnia wolnego"
+    },
+    "skills": {
+      "label": "Skille",
+      "hint": "Tylko ćwiczenia, które trenują wybrane skille. Bez wyboru: dowolny skill.",
+      "clear_one": "Wyczyść {{count}}",
+      "clear_few": "Wyczyść {{count}}",
+      "clear_many": "Wyczyść {{count}}",
+      "clear_other": "Wyczyść {{count}}"
+    }
+  },
+  "add": {
+    "title": "Dodaj: {{day}}",
+    "description": "Każde kliknięcie dodaje jeden blok o długości ustawionej niżej.",
+    "length": "Długość",
+    "search": "Szukaj",
+    "no_results": "Nic nie pasuje.",
+    "add_item": "Dodaj {{title}}",
+    "done": "Gotowe",
+    "custom_title": "Co ćwiczysz",
+    "custom_note": "Notatka (opcjonalnie)",
+    "custom_area": "Obszar",
+    "custom_submit": "Dodaj do tego dnia",
+    "custom_added": "Dodano {{title}}"
+  },
+  "toast": {
+    "error": "Nie udało się zapisać. Spróbuj ponownie.",
+    "nothing_to_play": "W tym dniu nie zostało nic do zagrania.",
+    "planned_one": "Zaplanowano {{count}} dzień",
+    "planned_few": "Zaplanowano {{count}} dni",
+    "planned_many": "Zaplanowano {{count}} dni",
+    "planned_other": "Zaplanowano {{count}} dni",
+    "cleared": "Wyczyszczono ten tydzień",
+    "removed": "Usunięto",
+    "undo": "Cofnij"
+  }
+}

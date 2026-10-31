@@ -373,6 +373,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/songs")) return "songs";
     if (pathname.startsWith("/profile/activity")) return "progress";
     if (pathname.startsWith("/profile/achievements")) return "progress";
+    if (pathname.startsWith("/profile/skill-points")) return "progress";
     if (pathname.startsWith("/practice-log")) return "progress";
     if (pathname.startsWith("/goals")) return "progress";
     if (pathname === "/summary") return "progress";
@@ -389,6 +390,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/tab-editor")) return "library";
     if (pathname.startsWith("/favorites")) return "library";
     if (pathname.startsWith("/rotation")) return "library";
+    if (pathname.startsWith("/calendar")) return "library";
     if (pathname.startsWith("/recordings")) return "community";
     if (pathname.startsWith("/settings")) return "settings";
     if (pathname.startsWith("/roadmap")) return "roadmap";

@@ -16,6 +16,7 @@ import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowRight,
   Brain,
+  CalendarDays,
   CassetteTape,
   ClipboardCheck,
   ClipboardList,
@@ -147,6 +148,7 @@ const createLinkClass = cn(
 const MY_STUFF = [
   { id: "favorites", Icon: Heart, href: "/favorites" },
   { id: "rotation", Icon: Repeat, href: "/rotation" },
+  { id: "calendar", Icon: CalendarDays, href: "/calendar" },
   { id: "my_plans", Icon: ClipboardCheck, href: "/plans" },
   { id: "my_exercises", Icon: Music2, href: "/my-exercises" },
   { id: "player_roadmaps", Icon: Signpost, href: "/my-roadmaps" },

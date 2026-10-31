@@ -103,6 +103,9 @@
     "rotation": {
       "label": "Rotation"
     },
+    "calendar": {
+      "label": "Kalender"
+    },
     "my_exercises": {
       "label": "Meine Übungen"
     },

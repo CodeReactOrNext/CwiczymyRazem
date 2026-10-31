@@ -1,0 +1,205 @@
+{
+  "page": {
+    "title": "Kalender",
+    "subtitle": "Deine Songs, Ziele und Roadmaps Tag für Tag",
+    "eyebrow": "Bibliothek"
+  },
+  "week": {
+    "today": "Heute",
+    "this_week": "Diese Woche",
+    "next_week": "Nächste Woche",
+    "last_week": "Letzte Woche",
+    "previous": "Vorherige Woche",
+    "next": "Nächste Woche",
+    "clear": "Diese Woche leeren",
+    "planned": "Geplant",
+    "played": "Gespielt",
+    "days": "Übungstage"
+  },
+  "actions": {
+    "add": "Hinzufügen",
+    "autoplan": "Auto-Plan"
+  },
+  "empty": {
+    "title": "Für diese Woche ist nichts geplant",
+    "body": "Sag dem Planer, wie viel Zeit du hast, und er verteilt deine Songs, Tempoziele und deine Roadmap auf die Tage, passend zu deinem Level. Oder füge alles von Hand hinzu.",
+    "cta": "Woche planen"
+  },
+  "day": {
+    "progress": "Gespielt von geplant",
+    "empty": "Übung hinzufügen",
+    "nothing_past": "Nichts geplant",
+    "complete": "Alles gespielt",
+    "add": "Zu diesem Tag hinzufügen"
+  },
+  "item": {
+    "menu": "Optionen für {{title}}",
+    "warmup": "Aufwärmen",
+    "mark_done": "Als gespielt markieren",
+    "undo_done": "Als nicht gespielt markieren",
+    "open_goal": "Ziel öffnen",
+    "open_step": "Roadmap-Schritt öffnen",
+    "move": "Verschieben auf",
+    "remove": "Entfernen",
+    "goal_bpm": "Ziel · {{bpm}} BPM"
+  },
+  "kinds": {
+    "exercise": "Übung",
+    "song": "Song",
+    "goal": "Ziel",
+    "roadmap": "Roadmap",
+    "custom": "Eigenes"
+  },
+  "areas": {
+    "technique": "Technik",
+    "songs": "Songs",
+    "theory": "Theorie",
+    "hearing": "Gehör",
+    "creativity": "Kreativität"
+  },
+  "levels": {
+    "beginner": {
+      "name": "Anfänger",
+      "hint": "Erstes Jahr"
+    },
+    "intermediate": {
+      "name": "Fortgeschritten",
+      "hint": "Grundlagen sitzen"
+    },
+    "advanced": {
+      "name": "Profi",
+      "hint": "Spiele seit Jahren"
+    }
+  },
+  "time": {
+    "minutes_one": "{{count}} Min.",
+    "minutes_other": "{{count}} Min.",
+    "hours_one": "{{count}} Std.",
+    "hours_other": "{{count}} Std.",
+    "hours_minutes": "{{hours}} Std. {{minutes}} Min.",
+    "minutes_short": "{{count}} Min."
+  },
+  "planner": {
+    "title": "Auto-Plan",
+    "reshuffle": "Neu mischen",
+    "rest_day": "Ruhetag",
+    "apply_one": "{{count}} Tag füllen",
+    "apply_other": "{{count}} Tage füllen",
+    "footer_keep": "Was du von Hand hinzugefügt oder schon gespielt hast, bleibt.",
+    "footer_replace": "Alles noch nicht Gespielte an diesen Tagen wird ersetzt.",
+    "range": {
+      "label": "Tage",
+      "rest_of_week": "Rest der Woche",
+      "next_week": "Nächste Woche",
+      "two_weeks": "Beides"
+    },
+    "minutes": {
+      "label": "Zeit pro Tag"
+    },
+    "level": {
+      "label": "Dein Level"
+    },
+    "focus": {
+      "label": "Schwerpunkt",
+      "hint": "Gewählte Bereiche bekommen mehr Zeit. Ohne Auswahl: gleichmäßiger Mix."
+    },
+    "sources": {
+      "label": "Quellen",
+      "hint": "Woran du in der App schon arbeitest.",
+      "songs": "Songs, die du lernst",
+      "songs_learning_one": "{{count}} in Arbeit",
+      "songs_learning_other": "{{count}} in Arbeit",
+      "songs_wishlist_one": "{{count}} auf der Wunschliste",
+      "songs_wishlist_other": "{{count}} auf der Wunschliste",
+      "songs_empty": "Songs zum Lernen hinzufügen",
+      "goals": "Tempoziele",
+      "goals_empty": "Tempoziel setzen",
+      "roadmaps": "Roadmap-Schritt",
+      "roadmaps_empty": "Roadmap starten"
+    },
+    "advanced": {
+      "label": "Erweiterte Optionen",
+      "hint": "Skills, Tag für Tag, Abwechslung, Intensität, Aufwärmen",
+      "show": "Anzeigen",
+      "hide": "Ausblenden"
+    },
+    "weekdays": {
+      "label": "Zeit pro Wochentag",
+      "hint": "Leer = Zeit von oben. 0 = Ruhetag.",
+      "rest": "Ruhe",
+      "presets": {
+        "same": "Jeden Tag gleich",
+        "weekends_off": "Wochenenden frei",
+        "longer_weekends": "Längere Wochenenden",
+        "every_other": "Jeden zweiten Tag"
+      }
+    },
+    "variety": {
+      "label": "Abwechslung",
+      "steady": "Konstant",
+      "steady_hint": "Wenige feste Übungen",
+      "balanced": "Ausgewogen",
+      "balanced_hint": "Einige Wiederholungen",
+      "explore": "Entdecken",
+      "explore_hint": "Täglich etwas Neues"
+    },
+    "intensity": {
+      "label": "Intensität",
+      "light": "Leicht",
+      "light_hint": "Einfacher, kurze Blöcke",
+      "steady": "Normal",
+      "steady_hint": "Auf deinem Level",
+      "push": "Fordernd",
+      "push_hint": "Schwerer, längere Blöcke"
+    },
+    "max_items": {
+      "label": "Blöcke pro Tag",
+      "hint": "Höchstens, inkl. Aufwärmen"
+    },
+    "toggles": {
+      "warmup": "Zuerst aufwärmen",
+      "warmup_hint": "Jeder Tag beginnt mit 5 Minuten einer leichten Übung.",
+      "lightDay": "Ein leichterer Tag",
+      "lightDay_hint": "Halbiert einen Tag in der Wochenmitte, damit die Woche Luft hat.",
+      "keepManual": "Meine Einträge behalten",
+      "keepManual_hint": "Um das herum planen, was du von Hand eingetragen hast."
+    },
+    "subtitle": "Deine Zeit, dein Level, deine Songs und Ziele — Tag für Tag",
+    "back": "Zurück zum Kalender",
+    "summary": {
+      "blocks_one": "{{count}} Block",
+      "blocks_other": "{{count}} Blöcke",
+      "rest_one": "{{count}} Ruhetag",
+      "rest_other": "{{count}} Ruhetage"
+    },
+    "skills": {
+      "label": "Skills",
+      "hint": "Nur Übungen, die die gewählten Skills trainieren. Ohne Auswahl: jeder Skill.",
+      "clear_one": "{{count}} entfernen",
+      "clear_other": "{{count}} entfernen"
+    }
+  },
+  "add": {
+    "title": "Hinzufügen: {{day}}",
+    "description": "Jeder Tipp fügt einen Block mit der unten eingestellten Länge hinzu.",
+    "length": "Länge",
+    "search": "Suchen",
+    "no_results": "Keine Treffer.",
+    "add_item": "{{title}} hinzufügen",
+    "done": "Fertig",
+    "custom_title": "Was du üben willst",
+    "custom_note": "Notiz (optional)",
+    "custom_area": "Bereich",
+    "custom_submit": "Zu diesem Tag hinzufügen",
+    "custom_added": "{{title}} hinzugefügt"
+  },
+  "toast": {
+    "error": "Speichern fehlgeschlagen. Versuch es noch einmal.",
+    "nothing_to_play": "An diesem Tag ist nichts mehr zu spielen.",
+    "planned_one": "{{count}} Tag geplant",
+    "planned_other": "{{count}} Tage geplant",
+    "cleared": "Diese Woche geleert",
+    "removed": "Entfernt",
+    "undo": "Rückgängig"
+  }
+}

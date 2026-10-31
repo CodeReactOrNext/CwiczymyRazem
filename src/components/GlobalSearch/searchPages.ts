@@ -3,6 +3,7 @@ import { SHORTCUTS } from "feature/dashboard/data/shortcutCatalog";
 import type { LucideIcon } from "lucide-react";
 import {
   Calculator,
+  CalendarDays,
   CalendarRange,
   Guitar,
   HandHeart,
@@ -12,6 +13,7 @@ import {
   ScrollText,
   Signpost,
   Skull,
+  Sparkles,
   Swords,
   Target,
   Timer,
@@ -58,9 +60,11 @@ const EXTRA_PAGES: SearchPage[] = [
   { id: "bosses", label: "Boss Fights", titleKey: "practice_hub:modes.bosses.title", href: "/bosses", icon: Skull, group: "practice", keywords: "boss" },
   { id: "duels", label: "Duels", titleKey: "nav:duels", href: "/duels", icon: Swords, group: "community", keywords: "duel 1v1 versus" },
   { id: "rotation", label: "Rotation", titleKey: "practice_hub:modes.rotation.title", href: "/rotation", icon: Repeat, group: "library" },
+  { id: "calendar", label: "Calendar", titleKey: "practice_hub:modes.calendar.title", href: "/calendar", icon: CalendarDays, group: "library", keywords: "schedule planner week auto plan" },
   { id: "player-roadmaps", label: "Player Roadmaps", titleKey: "practice_hub:modes.player_roadmaps.title", href: "/my-roadmaps", icon: Signpost, group: "library" },
   { id: "practice-log", label: "Practice Log", href: "/practice-log", icon: ScrollText, group: "progress", keywords: "history sessions" },
   { id: "goals", label: "Goals", href: "/goals", icon: Target, group: "progress" },
+  { id: "skill-points", label: "Skill Points", href: "/profile/skill-points", icon: Sparkles, group: "progress", keywords: "skills technique theory hearing creativity" },
   { id: "achievements", label: "Achievements", href: "/profile/achievements", icon: Medal, group: "progress", keywords: "badges" },
   { id: "profile", label: "Profile", href: "/profile", icon: User, group: "progress" },
   { id: "leaderboard", label: "Leaderboard", href: "/leaderboard", icon: Trophy, group: "community", keywords: "ranking" },

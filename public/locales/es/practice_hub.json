@@ -73,6 +73,9 @@
     "rotation": {
       "title": "Rotación"
     },
+    "calendar": {
+      "title": "Calendario"
+    },
     "my_plans": {
       "title": "Mis planes"
     },

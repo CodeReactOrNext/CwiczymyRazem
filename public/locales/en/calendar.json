@@ -1,0 +1,205 @@
+{
+  "page": {
+    "title": "Calendar",
+    "subtitle": "Your songs, goals and roadmaps laid out day by day",
+    "eyebrow": "Library"
+  },
+  "week": {
+    "today": "Today",
+    "this_week": "This week",
+    "next_week": "Next week",
+    "last_week": "Last week",
+    "previous": "Previous week",
+    "next": "Next week",
+    "clear": "Clear this week",
+    "planned": "Planned",
+    "played": "Played",
+    "days": "Practice days"
+  },
+  "actions": {
+    "add": "Add",
+    "autoplan": "Auto-plan"
+  },
+  "empty": {
+    "title": "Nothing planned this week",
+    "body": "Tell the planner how much time you have and it lays out the days from your songs, tempo goals and roadmap, at your level. Or add things by hand.",
+    "cta": "Plan my week"
+  },
+  "day": {
+    "progress": "Played of planned",
+    "empty": "Add practice",
+    "nothing_past": "Nothing planned",
+    "complete": "All played",
+    "add": "Add to this day"
+  },
+  "item": {
+    "menu": "Options for {{title}}",
+    "warmup": "Warm-up",
+    "mark_done": "Mark as played",
+    "undo_done": "Mark as not played",
+    "open_goal": "Open goal",
+    "open_step": "Open roadmap step",
+    "move": "Move to",
+    "remove": "Remove",
+    "goal_bpm": "Goal · {{bpm}} BPM"
+  },
+  "kinds": {
+    "exercise": "Exercise",
+    "song": "Song",
+    "goal": "Goal",
+    "roadmap": "Roadmap",
+    "custom": "Your own"
+  },
+  "areas": {
+    "technique": "Technique",
+    "songs": "Songs",
+    "theory": "Theory",
+    "hearing": "Ear",
+    "creativity": "Creativity"
+  },
+  "levels": {
+    "beginner": {
+      "name": "Beginner",
+      "hint": "First year"
+    },
+    "intermediate": {
+      "name": "Intermediate",
+      "hint": "Know the basics"
+    },
+    "advanced": {
+      "name": "Advanced",
+      "hint": "Years of playing"
+    }
+  },
+  "time": {
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "hours_one": "{{count}} h",
+    "hours_other": "{{count}} h",
+    "hours_minutes": "{{hours}} h {{minutes}} min",
+    "minutes_short": "{{count}} min"
+  },
+  "planner": {
+    "title": "Auto-plan",
+    "reshuffle": "Reshuffle",
+    "rest_day": "Rest day",
+    "apply_one": "Fill {{count}} day",
+    "apply_other": "Fill {{count}} days",
+    "footer_keep": "What you added by hand and what you already played stay put.",
+    "footer_replace": "Everything not yet played on these days gets replaced.",
+    "range": {
+      "label": "Days",
+      "rest_of_week": "Rest of this week",
+      "next_week": "Next week",
+      "two_weeks": "Both"
+    },
+    "minutes": {
+      "label": "Time a day"
+    },
+    "level": {
+      "label": "Your level"
+    },
+    "focus": {
+      "label": "Lean on",
+      "hint": "Picked areas get a bigger share of the time. None picked: an even mix."
+    },
+    "sources": {
+      "label": "Draw from",
+      "hint": "What you're already working on elsewhere in the app.",
+      "songs": "Songs you're learning",
+      "songs_learning_one": "{{count}} learning",
+      "songs_learning_other": "{{count}} learning",
+      "songs_wishlist_one": "{{count}} on your wish list",
+      "songs_wishlist_other": "{{count}} on your wish list",
+      "songs_empty": "Add songs you're learning",
+      "goals": "Tempo goals",
+      "goals_empty": "Set a tempo goal",
+      "roadmaps": "Roadmap step",
+      "roadmaps_empty": "Start a roadmap"
+    },
+    "advanced": {
+      "label": "Advanced options",
+      "hint": "Skills, day by day, variety, intensity, warm-up",
+      "show": "Show",
+      "hide": "Hide"
+    },
+    "weekdays": {
+      "label": "Time per weekday",
+      "hint": "Empty uses the time above. 0 makes it a rest day.",
+      "rest": "Rest",
+      "presets": {
+        "same": "Same every day",
+        "weekends_off": "Weekends off",
+        "longer_weekends": "Longer weekends",
+        "every_other": "Every other day"
+      }
+    },
+    "variety": {
+      "label": "Variety",
+      "steady": "Steady",
+      "steady_hint": "Same few drills",
+      "balanced": "Balanced",
+      "balanced_hint": "Some repeats",
+      "explore": "Explore",
+      "explore_hint": "Something new daily"
+    },
+    "intensity": {
+      "label": "Intensity",
+      "light": "Light",
+      "light_hint": "Easier, short blocks",
+      "steady": "Steady",
+      "steady_hint": "At your level",
+      "push": "Push",
+      "push_hint": "Harder, longer blocks"
+    },
+    "max_items": {
+      "label": "Blocks a day",
+      "hint": "At most, warm-up included"
+    },
+    "toggles": {
+      "warmup": "Warm up first",
+      "warmup_hint": "Each day opens with 5 minutes of an easy drill.",
+      "lightDay": "One lighter day",
+      "lightDay_hint": "Halves one midweek day so the week has room to breathe.",
+      "keepManual": "Keep what I added",
+      "keepManual_hint": "Plan around the things you put on a day by hand."
+    },
+    "subtitle": "Your time, your level, your songs and goals — laid out day by day",
+    "back": "Back to calendar",
+    "summary": {
+      "blocks_one": "{{count}} block",
+      "blocks_other": "{{count}} blocks",
+      "rest_one": "{{count}} rest day",
+      "rest_other": "{{count}} rest days"
+    },
+    "skills": {
+      "label": "Skills",
+      "hint": "Only drills that train the skills you pick. Nothing picked: any skill.",
+      "clear_one": "Clear {{count}}",
+      "clear_other": "Clear {{count}}"
+    }
+  },
+  "add": {
+    "title": "Add to {{day}}",
+    "description": "Each tap adds one block at the length below.",
+    "length": "Length",
+    "search": "Search",
+    "no_results": "Nothing matches.",
+    "add_item": "Add {{title}}",
+    "done": "Done",
+    "custom_title": "What to practise",
+    "custom_note": "Note (optional)",
+    "custom_area": "Area",
+    "custom_submit": "Add to this day",
+    "custom_added": "Added {{title}}"
+  },
+  "toast": {
+    "error": "Couldn't save that. Try again.",
+    "nothing_to_play": "Nothing left to play on this day.",
+    "planned_one": "Planned {{count}} day",
+    "planned_other": "Planned {{count}} days",
+    "cleared": "Cleared this week",
+    "removed": "Removed",
+    "undo": "Undo"
+  }
+}

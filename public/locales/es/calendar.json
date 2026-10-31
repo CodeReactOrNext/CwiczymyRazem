@@ -1,0 +1,205 @@
+{
+  "page": {
+    "title": "Calendario",
+    "subtitle": "Tus canciones, metas y roadmaps repartidos día a día",
+    "eyebrow": "Biblioteca"
+  },
+  "week": {
+    "today": "Hoy",
+    "this_week": "Esta semana",
+    "next_week": "La próxima semana",
+    "last_week": "La semana pasada",
+    "previous": "Semana anterior",
+    "next": "Semana siguiente",
+    "clear": "Vaciar esta semana",
+    "planned": "Planeado",
+    "played": "Tocado",
+    "days": "Días de práctica"
+  },
+  "actions": {
+    "add": "Añadir",
+    "autoplan": "Auto-plan"
+  },
+  "empty": {
+    "title": "No hay nada planeado esta semana",
+    "body": "Dile al planificador cuánto tiempo tienes y repartirá tus canciones, metas de tempo y tu roadmap en los días, a tu nivel. O añádelo todo a mano.",
+    "cta": "Planear mi semana"
+  },
+  "day": {
+    "progress": "Tocado de lo planeado",
+    "empty": "Añadir práctica",
+    "nothing_past": "Nada planeado",
+    "complete": "Todo tocado",
+    "add": "Añadir a este día"
+  },
+  "item": {
+    "menu": "Opciones de {{title}}",
+    "warmup": "Calentamiento",
+    "mark_done": "Marcar como tocado",
+    "undo_done": "Marcar como no tocado",
+    "open_goal": "Abrir meta",
+    "open_step": "Abrir paso del roadmap",
+    "move": "Mover a",
+    "remove": "Quitar",
+    "goal_bpm": "Meta · {{bpm}} BPM"
+  },
+  "kinds": {
+    "exercise": "Ejercicio",
+    "song": "Canción",
+    "goal": "Meta",
+    "roadmap": "Roadmap",
+    "custom": "Propio"
+  },
+  "areas": {
+    "technique": "Técnica",
+    "songs": "Canciones",
+    "theory": "Teoría",
+    "hearing": "Oído",
+    "creativity": "Creatividad"
+  },
+  "levels": {
+    "beginner": {
+      "name": "Principiante",
+      "hint": "Primer año"
+    },
+    "intermediate": {
+      "name": "Intermedio",
+      "hint": "Domino lo básico"
+    },
+    "advanced": {
+      "name": "Avanzado",
+      "hint": "Años tocando"
+    }
+  },
+  "time": {
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "hours_one": "{{count}} h",
+    "hours_other": "{{count}} h",
+    "hours_minutes": "{{hours}} h {{minutes}} min",
+    "minutes_short": "{{count}} min"
+  },
+  "planner": {
+    "title": "Auto-plan",
+    "reshuffle": "Barajar",
+    "rest_day": "Día de descanso",
+    "apply_one": "Rellenar {{count}} día",
+    "apply_other": "Rellenar {{count}} días",
+    "footer_keep": "Lo que añadiste a mano y lo que ya tocaste se queda.",
+    "footer_replace": "Todo lo que aún no tocaste en estos días se reemplaza.",
+    "range": {
+      "label": "Días",
+      "rest_of_week": "Resto de la semana",
+      "next_week": "Próxima semana",
+      "two_weeks": "Ambas"
+    },
+    "minutes": {
+      "label": "Tiempo al día"
+    },
+    "level": {
+      "label": "Tu nivel"
+    },
+    "focus": {
+      "label": "Prioriza",
+      "hint": "Las áreas elegidas reciben más tiempo. Sin elegir: una mezcla equilibrada."
+    },
+    "sources": {
+      "label": "Tomar de",
+      "hint": "Lo que ya estás trabajando en otras partes de la app.",
+      "songs": "Canciones que aprendes",
+      "songs_learning_one": "{{count}} aprendiendo",
+      "songs_learning_other": "{{count}} aprendiendo",
+      "songs_wishlist_one": "{{count}} en tu lista de deseos",
+      "songs_wishlist_other": "{{count}} en tu lista de deseos",
+      "songs_empty": "Añade canciones que estés aprendiendo",
+      "goals": "Metas de tempo",
+      "goals_empty": "Fija una meta de tempo",
+      "roadmaps": "Paso del roadmap",
+      "roadmaps_empty": "Empieza un roadmap"
+    },
+    "advanced": {
+      "label": "Opciones avanzadas",
+      "hint": "Skills, día a día, variedad, intensidad, calentamiento",
+      "show": "Mostrar",
+      "hide": "Ocultar"
+    },
+    "weekdays": {
+      "label": "Tiempo por día de la semana",
+      "hint": "Vacío = el tiempo de arriba. 0 = día de descanso.",
+      "rest": "Descanso",
+      "presets": {
+        "same": "Igual cada día",
+        "weekends_off": "Fines de semana libres",
+        "longer_weekends": "Fines de semana largos",
+        "every_other": "Un día sí, otro no"
+      }
+    },
+    "variety": {
+      "label": "Variedad",
+      "steady": "Constante",
+      "steady_hint": "Pocos ejercicios fijos",
+      "balanced": "Equilibrada",
+      "balanced_hint": "Algunas repeticiones",
+      "explore": "Explorar",
+      "explore_hint": "Algo nuevo cada día"
+    },
+    "intensity": {
+      "label": "Intensidad",
+      "light": "Suave",
+      "light_hint": "Más fácil, bloques cortos",
+      "steady": "Normal",
+      "steady_hint": "A tu nivel",
+      "push": "Exigente",
+      "push_hint": "Más difícil, bloques largos"
+    },
+    "max_items": {
+      "label": "Bloques al día",
+      "hint": "Como máximo, con calentamiento"
+    },
+    "toggles": {
+      "warmup": "Calentar primero",
+      "warmup_hint": "Cada día empieza con 5 minutos de un ejercicio fácil.",
+      "lightDay": "Un día más ligero",
+      "lightDay_hint": "Reduce a la mitad un día de mitad de semana para dar respiro.",
+      "keepManual": "Mantener lo que añadí",
+      "keepManual_hint": "Planear alrededor de lo que pusiste a mano."
+    },
+    "subtitle": "Tu tiempo, tu nivel, tus canciones y metas, día a día",
+    "back": "Volver al calendario",
+    "summary": {
+      "blocks_one": "{{count}} bloque",
+      "blocks_other": "{{count}} bloques",
+      "rest_one": "{{count}} día de descanso",
+      "rest_other": "{{count}} días de descanso"
+    },
+    "skills": {
+      "label": "Skills",
+      "hint": "Solo ejercicios que entrenan los skills elegidos. Sin elegir: cualquier skill.",
+      "clear_one": "Quitar {{count}}",
+      "clear_other": "Quitar {{count}}"
+    }
+  },
+  "add": {
+    "title": "Añadir: {{day}}",
+    "description": "Cada toque añade un bloque con la duración de abajo.",
+    "length": "Duración",
+    "search": "Buscar",
+    "no_results": "No hay coincidencias.",
+    "add_item": "Añadir {{title}}",
+    "done": "Listo",
+    "custom_title": "Qué practicar",
+    "custom_note": "Nota (opcional)",
+    "custom_area": "Área",
+    "custom_submit": "Añadir a este día",
+    "custom_added": "Añadido: {{title}}"
+  },
+  "toast": {
+    "error": "No se pudo guardar. Inténtalo de nuevo.",
+    "nothing_to_play": "No queda nada por tocar este día.",
+    "planned_one": "{{count}} día planeado",
+    "planned_other": "{{count}} días planeados",
+    "cleared": "Semana vaciada",
+    "removed": "Quitado",
+    "undo": "Deshacer"
+  }
+}

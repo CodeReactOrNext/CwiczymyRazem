@@ -28,6 +28,7 @@ export type NavPagesTypes =
   | "my-roadmaps"
   | "favorites"
   | "rotation"
+  | "calendar"
   | "roadmap"
   | "practice-log"
   | "goals"
