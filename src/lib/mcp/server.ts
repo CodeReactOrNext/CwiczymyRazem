@@ -13,10 +13,12 @@ import { registerProgressTools } from "./tools/progress";
 // review rejects instructions that steer Claude's behaviour.
 const INSTRUCTIONS = `riff.quest is a guitar practice app: players log sessions, play exercises the mic scores against a tab, set tempo goals and learn songs.
 - Every tool acts for the one signed-in player; there is no access to other players' data.
-- The player's profile and history come from the get_* tools; how the app's mechanics work (points, Fame, streaks, goals) is documented in the wiki that search_wiki searches.
+- The player's profile and history come from the riffquest_get_* tools; how the app's mechanics work (points, Fame, streaks, goals) is documented in the wiki that riffquest_search_wiki searches.
 - Library content (exercise and song texts, wiki) is in English.
-- Tabs use the JSON format get_tab_format describes; validate_tablature checks one without saving it.
-- The write tools (plans, song list, goals, exercises) change the player's account and are limited to 20 changes a day, at most 10 of them new exercises.
+- Players are guitarists, not programmers. Tabs travel between the tools as JSON (the format riffquest_get_tab_format describes); players read them as plain-text tabs, which every tool that takes or returns a tab also gives (asciiTab), or in the tab preview.
+- Days in history, calendar and weak spots are the player's own calendar days, in the time zone saved in their profile.
+- riffquest_validate_tablature checks a tab without saving it.
+- The write tools (plans, song list, goals, exercises) change the player's account and are limited to 20 changes a day, at most 10 of them new exercises; every write answer says how many are left today (changesLeftToday, newExercisesLeftToday).
 - Saved items come back with a link that opens them in the app.`;
 
 /**

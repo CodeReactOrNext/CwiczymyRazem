@@ -13,8 +13,15 @@ AI client ──POST JSON-RPC, Authorization: Bearer rq_…──▶ src/app/api
                                                              │ (stateless, JSON responses, one server per request)
                                                              ├─ lib/mcp/auth.ts      token (personal or OAuth) → { uid, scopes } + 60 req/min
                                                              ├─ lib/mcp/server.ts    tools, prompts, resource
-                                                             └─ lib/mcp/tools/*      Firestore via Admin SDK, scoped to uid
+                                                             ├─ lib/mcp/tools/*      Firestore via Admin SDK, scoped to uid
+                                                             ├─ lib/mcp/data.ts      reads the tool groups share (user, own exercise, skills, days)
+                                                             └─ lib/mcp/results.ts   answers, annotations, paging, size limit, errors
 ```
+
+The rate limit is one read and one write per request, without a transaction:
+an atomic increment on the token's minute counter (`countRequest` in
+`auth.ts`). A client calling tools in parallel would otherwise have its
+transactions on the one token doc collide and retry.
 
 - **No tool takes a user id.** The Admin SDK bypasses `firestore.rules`, so the
   `uid` from the token is the only access control. Keep it that way.
@@ -22,33 +29,91 @@ AI client ──POST JSON-RPC, Authorization: Bearer rq_…──▶ src/app/api
   (`/api/mcp-tokens`). The token is shown once; only the hash is stored. Up to 5
   per player, read-only or read + write.
 - Daily write limits per player: `mcpUsage/{uid}` — 20 changes, of which 10 new
-  exercises. Both collections are Admin-only (the default deny in
+  exercises. Every write answer carries `changesLeftToday` and
+  `newExercisesLeftToday` (`countWrite` in `auth.ts`), so a client knows before
+  it hits the limit. Both collections are Admin-only (the default deny in
   `firestore.rules` covers them — no rules change).
 
 ## Tools
 
+Every tool name starts with `riffquest_`, so it can't clash with another
+server's `list_exercises` or `get_goals` in clients that don't namespace tools
+per server.
+
 | Group | Tools |
 | --- | --- |
-| Progress (read) | `get_profile_summary`, `get_practice_history`, `get_calendar`, `get_skill_breakdown`, `get_weak_spots`, `get_goals`, `get_exercise_stats` |
-| Catalog (read) | `list_exercise_taxonomy`, `list_exercises`, `get_exercise`, `list_songs`, `get_song`, `get_daily_exercise`, `get_monthly_challenge`, `search_wiki` |
-| Plans (write) | `list_my_plans`, `create_practice_plan`, `update_practice_plan`, `add_song_to_list`, `set_exercise_goal` |
-| Own exercises | `get_tab_format`, `validate_tablature`, `get_exercise_tablature`, `get_my_exercises`, `create_exercise`, `update_exercise` |
+| Progress (read) | `riffquest_get_profile_summary`, `riffquest_get_practice_history`, `riffquest_get_calendar`, `riffquest_get_skill_breakdown`, `riffquest_get_weak_spots`, `riffquest_get_goals`, `riffquest_get_exercise_stats`, `riffquest_get_recent_runs` |
+| Catalog (read) | `riffquest_list_exercise_taxonomy`, `riffquest_list_exercises`, `riffquest_get_exercise`, `riffquest_list_songs`, `riffquest_get_song`, `riffquest_get_daily_exercise`, `riffquest_get_monthly_challenge`, `riffquest_search_wiki` |
+| Plans (write) | `riffquest_list_my_plans`, `riffquest_create_practice_plan`, `riffquest_update_practice_plan`, `riffquest_add_song_to_list`, `riffquest_set_exercise_goal` |
+| Own exercises | `riffquest_get_tab_format`, `riffquest_validate_tablature`, `riffquest_preview_tab`, `riffquest_get_exercise_tablature`, `riffquest_get_my_exercises`, `riffquest_create_exercise`, `riffquest_update_exercise` |
 
 Prompts: `weekly_review`, `plan_next_session`, `write_exercise`.
-Resource: `riffquest://docs/tab-format` (same text as `get_tab_format`).
+Resource: `riffquest://docs/tab-format` (same text as `riffquest_get_tab_format`).
 
 For the Claude connector directory review (enforced in `server.test.ts`): every
-tool has a `title`; read tools carry `readOnlyHint: true`, write tools
+tool has a `title` and all four annotations spelled out (a missing
+`openWorldHint` reads as `true`). Read tools use `READ_TOOL_ANNOTATIONS`, writes
 `WRITE_TOOL_ANNOTATIONS` (`destructiveHint: true`, so Claude asks before each
-call). Tool descriptions and the server instructions describe what a tool
-does and never tell the model how to behave. Unexpected errors come back with
-the cause in plain words and a reference that matches the server log.
+call), or `IDEMPOTENT_WRITE_TOOL_ANNOTATIONS` for the four that leave the
+account as it was when repeated. Tool descriptions and the server instructions
+describe what a tool does and never tell the model how to behave — only the
+prompts, which the player starts, ask for anything. Unexpected errors come back
+with the cause in plain words and a reference that matches the server log.
+
+How tools answer (`results.ts`, all tested):
+
+- **Strict input** (`strictInput`): an argument a tool doesn't take is an error,
+  not silently dropped — a misspelt filter would come back as unfiltered results.
+- **Structured output**: every answer is JSON text plus the same object as
+  `structuredContent`. The Firestore-free tools also declare an `outputSchema`
+  (`get_exercise`, `list_exercises`, `list_exercise_taxonomy`,
+  `get_daily_exercise`, `search_wiki`, `validate_tablature`); the SDK checks
+  every answer against it, so `server.test.ts` fits every library exercise in.
+- **Paging**: lists take `offset` / `limit` and answer `total`, `hasMore`,
+  `nextOffset` (`pageOf`).
+- **Size**: an answer over 25 000 characters is cut from the end and says how to
+  get the rest (`fittedResult`) — long histories, long tabs. The tool list
+  itself goes into every conversation, so `server.test.ts` holds it to a budget
+  (35 000 characters; 33 600 now): descriptions say what a tool does in a line,
+  limits that apply to every write live once in the server instructions, and
+  `outputSchema` isn't repeated (`get_daily_exercise` answers in
+  `get_exercise`'s shape without declaring it again).
+- **Recent runs** (`get_recent_runs`): runs live under each exercise
+  (`users/{uid}/exerciseRuns/{exerciseId}/runs`) with no player or exercise
+  field to query across them. The tool finds the exercises first — the session
+  report stamps every played exercise in `users/{uid}/settings/rotation`
+  (`lastPracticed.exercise`), plus the open goals — then reads each one's runs
+  (at most 25 exercises, one query each). Runs of an exercise played in no
+  logged session and no open goal don't show up.
+- **Days** in history, calendar and weak spots are the player's own days, in
+  `statistics.timeZone` from the profile; a `timeZone` argument overrides it.
+- **ChatGPT**: OpenAI's function calling refuses `"items": [ … ]` (a tuple) in an
+  input schema and ChatGPT then hides the whole tool — that is what once hid
+  every tab tool there. A test keeps tuples out of every input schema.
 
 Deliberately left out: anything social (leaderboard, guilds, duels, chat),
 publishing exercises, marking songs learned (awards points), logging practice
 (points must come from real playing), roadmaps and the OpenAI-backed searches.
 
 ## Tabs
+
+Clients don't see the app's `TablatureMeasure`. They read and write the format
+in `lib/mcp/tablature/tabJson.ts`, which names things the way musicians do:
+
+```json
+{ "timeSignature": "4/4", "measures": [ { "beats": [
+  { "duration": "eighth", "pick": "down", "notes": [{ "string": 3, "fret": 5 }] },
+  { "duration": "eighth", "notes": [{ "string": 3, "fret": 7, "techniques": ["hammer-on"] }] },
+  { "duration": "quarter", "dots": 1, "notes": [{ "string": 2, "fret": 8, "bend": { "semitones": 2 } }] },
+  { "duration": "eighth", "rest": true },
+  { "duration": "half", "chord": "C", "notes": [ … ] } ] } ] }
+```
+
+`tabToMeasures` / `measuresToTab` map it to the stored form and back; the test
+carries every library tab there and back without changing what's played.
+What the format has no words for (`midiNote`, bend curves, loop-only measures)
+stays out of what clients read. `renderAsciiTab` draws the plain-text tab every
+tab tool returns as `asciiTab` — what the player sees instead of the JSON.
 
 `lib/mcp/tablature/validateTablature.ts` checks a tab before it is saved:
 measure length = time signature, strings 1–6 (1 = high e), frets 0–24, real note
@@ -57,7 +122,34 @@ values, one note per string per beat, then a dry run through
 that rejects a shipped exercise is the rule's fault. The guide the model reads
 lives in `lib/mcp/content/tabFormat.ts`; its example is tested to pass.
 
-The Claude skill for players is in `docs/mcp/riff-quest-tabs/SKILL.md`.
+## Talking to players
+
+Players are guitarists. The server instructions say that tabs travel as JSON and
+players read them as `asciiTab`; the prompts ask for no JSON, tool or field
+names. Two Claude skills go further — `docs/mcp/riff-quest-coach/SKILL.md`
+(how to talk about practice) and `docs/mcp/riff-quest-tabs/SKILL.md` (writing
+exercises). Skills only reach Claude, and only when the player adds them; every
+other client gets the instructions, descriptions, prompts and tool answers.
+
+The wiki text `riffquest_search_wiki` returns keeps the words inside wiki
+components (`FaqList`, `ProgressLadder`, `StepList`…): that is where the
+numbers players ask about live.
+
+## Evaluation
+
+`docs/mcp/evals/riff-quest.xml` — 10 read-only questions a model answers with
+the tools alone (library, wiki and tab tools, same answer for every account).
+`lib/mcp/evals.test.ts` solves each one through the tools and fails when an
+answer in the file no longer holds. To score a model on them, use
+`scripts/evaluation.py` from the mcp-builder skill against a running server
+with a personal token; it calls the Anthropic API, so it needs
+`ANTHROPIC_API_KEY` in your shell (local only — nothing in hosting):
+
+```
+python .agents/skills/mcp-builder/scripts/evaluation.py docs/mcp/evals/riff-quest.xml \
+  -t http -u http://localhost:3000/api/mcp -H "Authorization: Bearer rq_…" \
+  -m claude-sonnet-5-5
+```
 
 ## Connecting
 

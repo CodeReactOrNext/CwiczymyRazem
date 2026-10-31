@@ -31,7 +31,7 @@ export const TAB_LIMITS = {
 // Kept in step with tablatureToAlphaTex: the note values alphaTex has a code for,
 // and the tuplets it knows a default denominator for.
 const DURATION_CODES = [1, 2, 4, 8, 16, 32, 64];
-const TUPLET_DENOMINATORS: Record<number, number> = {
+export const TUPLET_DENOMINATORS: Record<number, number> = {
   3: 2,
   5: 4,
   6: 4,
@@ -217,14 +217,14 @@ export function validateTablature(
     ) {
       errors.push({
         measure: m,
-        message: `timeSignature must be [beats, noteValue] like [4, 4] or [6, 8], got ${JSON.stringify(timeSignature)}`,
+        message: `the time signature must look like 4/4 or 6/8, got ${Array.isArray(timeSignature) ? timeSignature.join("/") : JSON.stringify(timeSignature)}`,
       });
     }
     if (beats.length === 0) {
       errors.push({
         measure: m,
         message:
-          "the measure has no beats — use a beat with notes: [] for a rest",
+          "the measure has no beats — a silent measure is a rest that fills it",
       });
     }
     if (beats.length > TAB_LIMITS.maxBeatsPerMeasure) {
@@ -266,7 +266,10 @@ export function validateTablature(
       }
 
       if (notes.length > stringCount) {
-        errors.push({ ...at, message: `at most ${stringCount} notes in one beat` });
+        errors.push({
+          ...at,
+          message: `at most ${stringCount} notes in one beat`,
+        });
       }
       const strings = notes.map((note) => note.string);
       if (new Set(strings).size !== strings.length) {
@@ -285,7 +288,7 @@ export function validateTablature(
           if (previous === undefined) {
             warnings.push({
               ...at,
-              message: `${kind} on string ${note.string} has no earlier note on that string to start from — flag the note you arrive at, not the picked one`,
+              message: `${kind} on string ${note.string} has no earlier note on that string to start from — it belongs on the note you arrive at, not the picked one`,
             });
           } else if (note.isHammerOn && note.fret <= previous) {
             warnings.push({

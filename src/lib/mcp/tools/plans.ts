@@ -1,15 +1,10 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { CommunityExercise } from "feature/communityExercises/types";
-import {
-  communityDocId,
-  communityToExercise,
-} from "feature/communityExercises/utils/communityToExercise";
+import { communityToExercise } from "feature/communityExercises/utils/communityToExercise";
 import {
   autoStepBpm,
   clampGoalBpm,
   isGoalEligibleExercise,
 } from "feature/exerciseGoals/utils/goalRules";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { EXERCISE_PLANS_COLLECTION } from "feature/exercisePlan/services/constants";
 import type {
   DifficultyLevel,
@@ -20,19 +15,22 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { z } from "zod";
 
 import { consumeWriteQuota, type McpContext } from "../auth";
+import { exercisesById, readOwnExercise, userRef } from "../data";
 import { firestore } from "../db";
 import {
   appLink,
   errorResult,
+  IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
   jsonResult,
   McpToolError,
+  pageInput,
+  pageOf,
+  READ_TOOL_ANNOTATIONS,
   runTool,
+  strictInput,
   WRITE_TOOL_ANNOTATIONS,
 } from "../results";
 
-const exercisesById = new Map(
-  exercisesAgregat.map((exercise) => [exercise.id, exercise]),
-);
 const MAX_PLAN_ITEMS = 20;
 const DIFFICULTY_ORDER: DifficultyLevel[] = [
   "beginner",
@@ -42,26 +40,26 @@ const DIFFICULTY_ORDER: DifficultyLevel[] = [
 ];
 
 const planItem = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("exercise"),
-    id: z
-      .string()
-      .min(1)
-      .max(120)
-      .describe("Library exercise id, or one of the player's own exercise ids"),
-    minutes: z.number().int().min(1).max(60).optional(),
-  }),
-  z.object({
-    type: z.literal("song"),
-    songId: z.string().min(1).max(120),
-    minutes: z.number().int().min(1).max(60).optional(),
-    mode: z
-      .enum(["gp", "sections"])
-      .optional()
-      .describe(
-        "gp: the player's attached Guitar Pro tab (only if they attached one); sections: the YouTube section map",
-      ),
-  }),
+  z
+    .object({
+      type: z.literal("exercise"),
+      id: z.string().min(1).max(120).describe("Library or own exercise id"),
+      minutes: z.number().int().min(1).max(60).optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("song"),
+      songId: z.string().min(1).max(120),
+      minutes: z.number().int().min(1).max(60).optional(),
+      mode: z
+        .enum(["gp", "sections"])
+        .optional()
+        .describe(
+          "gp: their Guitar Pro tab, if attached; sections: the video map",
+        ),
+    })
+    .strict(),
 ]);
 
 type PlanItemInput = z.infer<typeof planItem>;
@@ -88,21 +86,6 @@ const sanitize = (value: unknown): unknown => {
   return value;
 };
 
-/** The player's own exercise behind an id, plain or `community-` prefixed. */
-async function readOwnExercise(
-  uid: string,
-  id: string,
-): Promise<CommunityExercise | null> {
-  const docId = communityDocId(id) ?? id;
-  const snapshot = await firestore
-    .collection("communityExercises")
-    .doc(docId)
-    .get();
-  const data = snapshot.data();
-  if (!data || data.authorId !== uid) return null;
-  return { ...(data as CommunityExercise), id: snapshot.id };
-}
-
 /** Turns the model's list of items into the plan items the app stores. */
 async function resolveItems(
   uid: string,
@@ -124,7 +107,7 @@ async function resolveItems(
             `Item ${index + 1}: no exercise "${item.id}" in the library or among your own exercises.`,
           );
         }
-        const exercise = communityToExercise(own);
+        const exercise = communityToExercise(own.data);
         return {
           ...exercise,
           timeInMinutes: item.minutes ?? exercise.timeInMinutes,
@@ -133,17 +116,12 @@ async function resolveItems(
 
       const [song, progress] = await Promise.all([
         firestore.collection("songs").doc(item.songId).get(),
-        firestore
-          .collection("users")
-          .doc(uid)
-          .collection("songProgress")
-          .doc(item.songId)
-          .get(),
+        userRef(uid).collection("songProgress").doc(item.songId).get(),
       ]);
       const data = song.data();
       if (!data)
         throw new McpToolError(
-          `Item ${index + 1}: no song "${item.songId}" — find ids with list_songs.`,
+          `Item ${index + 1}: no song "${item.songId}" — find ids with riffquest_list_songs.`,
         );
       if (item.mode === "gp" && !progress.data()?.gpFileId) {
         throw new McpToolError(
@@ -198,65 +176,64 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
     const data = snapshot.data();
     if (!data || data.userId !== uid)
       throw new McpToolError(
-        `No plan "${planId}" of yours — see list_my_plans.`,
+        `No plan "${planId}" of yours — see riffquest_list_my_plans.`,
       );
     return { ref: snapshot.ref, data };
   }
 
   server.registerTool(
-    "list_my_plans",
+    "riffquest_list_my_plans",
     {
       title: "My practice plans",
       description:
-        "The player's own practice plans (routines) with their items and a link that starts each one.",
-      annotations: { readOnlyHint: true },
+        "The player's practice plans, most recently changed first, with their items and a link that starts each. Paged.",
+      inputSchema: strictInput(pageInput(10, 30)),
+      annotations: READ_TOOL_ANNOTATIONS,
     },
-    () =>
-      runTool("list_my_plans", async () => {
+    ({ offset, limit }) =>
+      runTool("riffquest_list_my_plans", async () => {
         const snapshot = await plans().where("userId", "==", uid).get();
-        return jsonResult(
-          snapshot.docs
-            .map((doc) => {
-              const data = doc.data();
-              const items = ((data.exercises ?? []) as Exercise[]).map(
-                itemSummary,
-              );
-              return {
-                id: doc.id,
-                title: data.title,
-                description: data.description ?? "",
-                totalMinutes: items.reduce(
-                  (sum, item) => sum + (item.minutes ?? 0),
-                  0,
-                ),
-                items,
-                updatedAt: data.updatedAt?.toDate?.().toISOString() ?? null,
-                url: planLink(doc.id),
-              };
-            })
-            .sort((a, b) =>
-              (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""),
-            ),
-        );
+        const all = snapshot.docs
+          .map((doc) => {
+            const data = doc.data();
+            const items = ((data.exercises ?? []) as Exercise[]).map(
+              itemSummary,
+            );
+            return {
+              id: doc.id,
+              title: data.title,
+              description: data.description ?? "",
+              totalMinutes: items.reduce(
+                (sum, item) => sum + (item.minutes ?? 0),
+                0,
+              ),
+              items,
+              updatedAt: data.updatedAt?.toDate?.().toISOString() ?? null,
+              url: planLink(doc.id),
+            };
+          })
+          .sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""));
+        const page = pageOf(all, offset, limit ?? 10);
+        return jsonResult({ ...page.meta, plans: page.items });
       }),
   );
 
   server.registerTool(
-    "create_practice_plan",
+    "riffquest_create_practice_plan",
     {
       title: "Create a practice plan",
-      description: `Saves a new private practice plan (routine) for the player: library exercises, their own exercises and library songs, in order, ${MAX_PLAN_ITEMS} items at most. Returns a link that starts it. Counts toward the daily change limit.`,
-      inputSchema: {
+      description: `Saves a new private practice plan: library exercises, the player's own exercises and songs, in order (up to ${MAX_PLAN_ITEMS}). Returns a link that starts it.`,
+      inputSchema: strictInput({
         title: z.string().min(1).max(80),
         description: z.string().max(500).optional(),
         items: z.array(planItem).min(1).max(MAX_PLAN_ITEMS),
-      },
+      }),
       annotations: WRITE_TOOL_ANNOTATIONS,
     },
     ({ title, description, items }) =>
-      runTool("create_practice_plan", async () => {
+      runTool("riffquest_create_practice_plan", async () => {
         const exercises = await resolveItems(uid, items);
-        await consumeWriteQuota(context, "write");
+        const left = await consumeWriteQuota(context, "write");
         const now = Timestamp.now();
         const ref = await plans().add(
           sanitize({
@@ -273,6 +250,7 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
           }) as FirebaseFirestore.DocumentData,
         );
         return jsonResult({
+          ...left,
           id: ref.id,
           title,
           totalMinutes: exercises.reduce((sum, e) => sum + e.timeInMinutes, 0),
@@ -283,21 +261,21 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
   );
 
   server.registerTool(
-    "update_practice_plan",
+    "riffquest_update_practice_plan",
     {
       title: "Update a practice plan",
       description:
-        "Changes one of the player's own plans. `items`, when given, replaces the whole list in the order given. Counts toward the daily change limit.",
-      inputSchema: {
+        "Changes one of the player's plans; `items` replaces the whole list.",
+      inputSchema: strictInput({
         planId: z.string().min(1).max(120),
         title: z.string().min(1).max(80).optional(),
         description: z.string().max(500).optional(),
         items: z.array(planItem).min(1).max(MAX_PLAN_ITEMS).optional(),
-      },
-      annotations: WRITE_TOOL_ANNOTATIONS,
+      }),
+      annotations: IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
     },
     ({ planId, title, description, items }) =>
-      runTool("update_practice_plan", async () => {
+      runTool("riffquest_update_practice_plan", async () => {
         if (
           title === undefined &&
           description === undefined &&
@@ -309,7 +287,7 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
         }
         const { ref } = await readOwnPlan(planId);
         const exercises = items ? await resolveItems(uid, items) : undefined;
-        await consumeWriteQuota(context, "write");
+        const left = await consumeWriteQuota(context, "write");
         await ref.update(
           sanitize({
             ...(title !== undefined ? { title: title.trim() } : {}),
@@ -322,6 +300,7 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
         );
         const { data } = await readOwnPlan(planId);
         return jsonResult({
+          ...left,
           id: planId,
           title: data.title,
           items: ((data.exercises ?? []) as Exercise[]).map(itemSummary),
@@ -331,32 +310,30 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
   );
 
   server.registerTool(
-    "add_song_to_list",
+    "riffquest_add_song_to_list",
     {
       title: "Add a song to my list",
       description:
-        "Puts a library song on the player's list as wantToLearn or learning. Marking a song learned stays in the app — it awards points only after real practice time. Counts toward the daily change limit.",
-      inputSchema: {
+        "Puts a library song on the player's list as wantToLearn or learning. Marking it learned stays in the app, where it awards points.",
+      inputSchema: strictInput({
         songId: z.string().min(1).max(120),
         status: z.enum(["wantToLearn", "learning"]),
-      },
-      annotations: WRITE_TOOL_ANNOTATIONS,
+      }),
+      annotations: IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
     },
     ({ songId, status }) =>
-      runTool("add_song_to_list", async () => {
+      runTool("riffquest_add_song_to_list", async () => {
         const songRef = firestore.collection("songs").doc(songId);
-        const userSongRef = firestore
-          .collection("users")
-          .doc(uid)
-          .collection("userSongs")
-          .doc(songId);
+        const userSongRef = userRef(uid).collection("userSongs").doc(songId);
         const [song, current] = await Promise.all([
           songRef.get(),
           userSongRef.get(),
         ]);
         const data = song.data();
         if (!data)
-          return errorResult(`No song "${songId}" — find ids with list_songs.`);
+          return errorResult(
+            `No song "${songId}" — find ids with riffquest_list_songs.`,
+          );
         const oldStatus = current.data()?.status ?? null;
         if (oldStatus === "learned") {
           return errorResult(
@@ -372,7 +349,7 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
           });
         }
 
-        await consumeWriteQuota(context, "write");
+        const left = await consumeWriteQuota(context, "write");
         const practicing: string[] = data.practicingUsers ?? [];
         await Promise.all([
           practicing.includes(uid)
@@ -394,6 +371,7 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
           ),
         ]);
         return jsonResult({
+          ...left,
           songId,
           title: data.title,
           artist: data.artist,
@@ -405,12 +383,12 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
   );
 
   server.registerTool(
-    "set_exercise_goal",
+    "riffquest_set_exercise_goal",
     {
       title: "Set a tempo goal",
       description:
-        "Opens a tempo goal on a mic-scored exercise: a path of milestones from startBpm up to targetBpm, each cleared by 3 clean runs in goal mode. One open goal per exercise — an existing one is returned as is. Counts toward the daily change limit.",
-      inputSchema: {
+        "Opens a tempo goal on a mic-scored exercise: milestones from startBpm to targetBpm, 3 clean runs each. An open goal on the exercise is returned as it is.",
+      inputSchema: strictInput({
         exerciseId: z.string().min(1).max(120),
         targetBpm: z.number().int().min(20).max(400),
         startBpm: z
@@ -425,15 +403,15 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
           .enum(["streak", "total"])
           .optional()
           .describe("streak: clean runs in a row; total: any clean runs"),
-      },
-      annotations: WRITE_TOOL_ANNOTATIONS,
+      }),
+      annotations: IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
     },
     ({ exerciseId, targetBpm, startBpm, strictness, counting }) =>
-      runTool("set_exercise_goal", async () => {
+      runTool("riffquest_set_exercise_goal", async () => {
         let exercise: Exercise | undefined = exercisesById.get(exerciseId);
         if (!exercise) {
           const own = await readOwnExercise(uid, exerciseId);
-          exercise = own ? communityToExercise(own) : undefined;
+          exercise = own ? communityToExercise(own.data) : undefined;
         }
         if (!exercise) return errorResult(`No exercise "${exerciseId}".`);
         if (!isGoalEligibleExercise(exercise)) {
@@ -442,10 +420,7 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
           );
         }
 
-        const goals = firestore
-          .collection("users")
-          .doc(uid)
-          .collection("exerciseGoals");
+        const goals = userRef(uid).collection("exerciseGoals");
         const open = (
           await goals.where("exerciseId", "==", exercise.id).get()
         ).docs.find((doc) => doc.data().status !== "completed");
@@ -464,7 +439,7 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
           clampGoalBpm(startBpm ?? exercise.metronomeSpeed?.min ?? 60),
           target,
         );
-        await consumeWriteQuota(context, "write");
+        const left = await consumeWriteQuota(context, "write");
         const now = Timestamp.now();
         const ref = goals.doc();
         await ref.set({
@@ -483,6 +458,7 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
           updatedAt: now,
         });
         return jsonResult({
+          ...left,
           id: ref.id,
           exerciseId: exercise.id,
           startBpm: start,

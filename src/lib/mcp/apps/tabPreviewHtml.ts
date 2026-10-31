@@ -1,5 +1,5 @@
 /**
- * The MCP App behind `preview_tab`: a tab + notation view with playback that
+ * The MCP App behind `riffquest_preview_tab`: a tab + notation view with playback that
  * Claude renders inside the conversation.
  *
  * It runs in the host's sandbox, not on riff.quest, so everything comes from

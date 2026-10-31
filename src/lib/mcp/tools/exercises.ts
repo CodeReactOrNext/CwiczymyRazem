@@ -1,10 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CreateCommunityExerciseInput } from "feature/communityExercises/types";
-import {
-  communityDocId,
-  communityExerciseId,
-} from "feature/communityExercises/utils/communityToExercise";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { communityExerciseId } from "feature/communityExercises/utils/communityToExercise";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { FieldValue } from "firebase-admin/firestore";
@@ -13,18 +9,36 @@ import { z } from "zod";
 
 import { consumeWriteQuota, type McpContext } from "../auth";
 import { TAB_FORMAT_GUIDE } from "../content/tabFormat";
+import {
+  COMMUNITY_EXERCISES,
+  exercisesById,
+  readOwnExercise,
+  userRef,
+} from "../data";
 import { firestore } from "../db";
 import {
   appLink,
   errorResult,
+  fittedResult,
+  IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
   jsonResult,
   McpToolError,
+  pageInput,
+  pageOf,
+  READ_TOOL_ANNOTATIONS,
   runTool,
+  strictInput,
   WRITE_TOOL_ANNOTATIONS,
 } from "../results";
 import {
+  checkTab,
+  measuresToTab,
+  renderAsciiTab,
+  type TabJson,
+  tabSchema,
+} from "../tablature/tabJson";
+import {
   formatTabIssues,
-  TAB_LIMITS,
   validateTablature,
 } from "../tablature/validateTablature";
 import {
@@ -33,66 +47,10 @@ import {
   SKILL_IDS,
 } from "./catalog";
 
-const exercisesById = new Map(
-  exercisesAgregat.map((exercise) => [exercise.id, exercise]),
-);
-const COLLECTION = "communityExercises";
-
-// The JSON schema the client sees. Ranges a model gets wrong in a way a
-// message can explain (string side, measure length) are left to
-// validateTablature, which says where and why instead of a bare type error.
-const noteSchema = z.object({
-  string: z.number().describe("Guitar: 1 = high e … 6 = low E. Bass: 1 = G … 4 = low E"),
-  fret: z.number().describe("0–24"),
-  isHammerOn: z.boolean().optional(),
-  isPullOff: z.boolean().optional(),
-  isBend: z.boolean().optional(),
-  bendSemitones: z.number().optional(),
-  isPreBend: z.boolean().optional(),
-  isRelease: z.boolean().optional(),
-  isVibrato: z.boolean().optional(),
-  isTap: z.boolean().optional(),
-  isAccented: z.boolean().optional(),
-  isGhost: z.boolean().optional(),
-  isDead: z.boolean().optional(),
-  isPalmMute: z.boolean().optional(),
-  isLetRing: z.boolean().optional(),
-  isStaccato: z.boolean().optional(),
-  harmonicType: z.number().optional(),
-  slideIn: z.number().optional(),
-  slideOut: z.number().optional(),
-  dynamics: z.number().optional(),
-});
-
-const beatSchema = z.object({
-  duration: z
-    .number()
-    .describe("In quarter notes: 1 quarter, 0.5 eighth, 0.25 sixteenth"),
-  notes: z
-    .array(noteSchema)
-    .max(TAB_LIMITS.maxNotesPerBeat)
-    .describe("Empty = rest"),
-  tuplet: z.number().int().optional(),
-  pickStroke: z.enum(["down", "up"]).optional(),
-  chordName: z.string().max(20).optional(),
-});
-
-export const tablatureSchema = z
-  .array(
-    z.object({
-      timeSignature: z.tuple([z.number().int(), z.number().int()]),
-      beats: z.array(beatSchema).max(TAB_LIMITS.maxBeatsPerMeasure),
-    }),
-  )
-  .min(1)
-  .max(TAB_LIMITS.maxMeasures);
-
 export const instrumentSchema = z
   .enum(["guitar", "bass"])
   .optional()
-  .describe(
-    "guitar (default): 6 strings, 1 = high e. bass: 4-string bass in standard tuning, 1 = G, 4 = low E",
-  );
+  .describe("Default guitar; bass = 4-string, standard tuning");
 
 const exerciseFields = {
   title: z.string().min(3).max(80),
@@ -106,13 +64,12 @@ const exerciseFields = {
       max: z.number().int().min(20).max(400),
       recommended: z.number().int().min(20).max(400),
     })
-    .describe(
-      "Metronome range: comfortable start, goal, and the tempo to begin at",
-    ),
+    .strict()
+    .describe("Comfortable start, goal, and the tempo to begin at"),
   minutes: z.number().int().min(1).max(30),
   instructions: z.array(z.string().min(3).max(300)).min(1).max(8),
   tips: z.array(z.string().min(3).max(300)).max(6).optional(),
-  tablature: tablatureSchema,
+  tab: tabSchema,
   instrument: instrumentSchema,
 };
 
@@ -124,10 +81,15 @@ const myExercisesUrl = appLink("/my-exercises");
 const editorUrl = (id: string) =>
   appLink(`/tab-editor?edit=${encodeURIComponent(id)}`);
 
-/** Checks everything a save needs, or throws with every problem listed. */
+/**
+ * Checks everything a save needs, or throws with every problem listed. A new
+ * `tab` is mapped to the stored form on the way; `storedTab` is the saved one,
+ * re-checked when only the instrument changes.
+ */
 function checkExercise(
   fields: Partial<ExerciseFields>,
   instrument: Instrument,
+  storedTab?: TablatureMeasure[],
 ) {
   const problems: string[] = [];
   const warnings: string[] = [];
@@ -139,26 +101,33 @@ function checkExercise(
       );
     }
   }
-  if (fields.tablature) {
-    const result = validateTablature(
-      fields.tablature as TablatureMeasure[],
-      instrument,
-    );
+  let measures: TablatureMeasure[] | undefined;
+  if (fields.tab || storedTab) {
+    const checked = fields.tab
+      ? checkTab(fields.tab, instrument)
+      : {
+          measures: storedTab!,
+          validation: validateTablature(storedTab!, instrument),
+        };
+    measures = fields.tab ? checked.measures : undefined;
     problems.push(
-      ...formatTabIssues(result.errors).map((line) => `tablature: ${line}`),
+      ...formatTabIssues(checked.validation.errors).map(
+        (line) => `tab: ${line}`,
+      ),
     );
-    warnings.push(...formatTabIssues(result.warnings));
+    warnings.push(...formatTabIssues(checked.validation.warnings));
   }
   if (problems.length > 0) {
     throw new McpToolError(
       `Not saved. Fix these and try again:\n- ${problems.join("\n- ")}`,
     );
   }
-  return warnings;
+  return { warnings, measures };
 }
 
 const toStored = (
   fields: Partial<ExerciseFields>,
+  measures: TablatureMeasure[] | undefined,
 ): Partial<CreateCommunityExerciseInput> => {
   const stored: Partial<CreateCommunityExerciseInput> = {};
   if (fields.title !== undefined) stored.title = fields.title.trim();
@@ -177,41 +146,46 @@ const toStored = (
   if (fields.tips !== undefined)
     stored.tips = fields.tips.map((line) => line.trim());
   if (fields.instrument !== undefined) stored.instrument = fields.instrument;
-  if (fields.tablature !== undefined) {
+  if (measures !== undefined) {
     // Through JSON once: drops undefined optionals, which Firestore refuses.
     stored.tablature = JSON.parse(
-      JSON.stringify(fields.tablature),
+      JSON.stringify(measures),
     ) as TablatureMeasure[];
   }
   return stored;
 };
 
+/** A tab as a client gets it back: the JSON to work with, the text tab to show. */
+const tabOut = (measures: TablatureMeasure[], instrument: Instrument) => ({
+  tab: measuresToTab(measures) satisfies TabJson,
+  asciiTab: renderAsciiTab(measures, instrument),
+});
+
 export function registerExerciseTools(server: McpServer, context: McpContext) {
   const { uid } = context;
-  const exercises = () => firestore.collection(COLLECTION);
+  const exercises = () => firestore.collection(COMMUNITY_EXERCISES);
 
   async function readOwn(id: string) {
-    const docId = communityDocId(id) ?? id;
-    const snapshot = await exercises().doc(docId).get();
-    const data = snapshot.data();
-    if (!data || data.authorId !== uid) {
+    const own = await readOwnExercise(uid, id);
+    if (!own) {
       throw new McpToolError(
-        `No exercise "${id}" of yours — see get_my_exercises.`,
+        `No exercise "${id}" of yours — see riffquest_get_my_exercises.`,
       );
     }
-    return { ref: snapshot.ref, id: snapshot.id, data };
+    return own;
   }
 
   server.registerTool(
-    "get_tab_format",
+    "riffquest_get_tab_format",
     {
       title: "Tab format guide",
       description:
-        "The riff.quest tab format (JSON measures → beats → notes): the rules validate_tablature enforces, the techniques it supports and a worked example.",
-      annotations: { readOnlyHint: true },
+        "The tab format guide: shape, rules, techniques and a worked example.",
+      inputSchema: strictInput({}),
+      annotations: READ_TOOL_ANNOTATIONS,
     },
     () =>
-      runTool("get_tab_format", async () => ({
+      runTool("riffquest_get_tab_format", async () => ({
         content: [{ type: "text", text: TAB_FORMAT_GUIDE }],
       })),
   );
@@ -228,118 +202,161 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
   );
 
   server.registerTool(
-    "validate_tablature",
+    "riffquest_validate_tablature",
     {
       title: "Check a tab",
       description:
-        "Checks a tab without saving anything: every measure adds up to its time signature, strings and frets are on the neck, durations are real note values. Lists each problem with its measure and beat.",
-      inputSchema: { tablature: tablatureSchema, instrument: instrumentSchema },
-      annotations: { readOnlyHint: true },
+        "Checks a tab without saving it: measure lengths, strings, frets, techniques. Lists each problem by measure and beat, and returns the tab as text (asciiTab).",
+      inputSchema: strictInput({
+        tab: tabSchema,
+        instrument: instrumentSchema,
+      }),
+      outputSchema: {
+        ok: z.boolean(),
+        errors: z.array(z.string()),
+        warnings: z.array(z.string()),
+        stats: z.object({
+          measures: z.number(),
+          beats: z.number(),
+          notes: z.number(),
+        }),
+        asciiTab: z.string(),
+      },
+      annotations: READ_TOOL_ANNOTATIONS,
     },
-    ({ tablature, instrument }) =>
-      runTool("validate_tablature", async () => {
-        const result = validateTablature(
-          tablature as TablatureMeasure[],
-          instrument ?? "guitar",
-        );
+    ({ tab, instrument }) =>
+      runTool("riffquest_validate_tablature", async () => {
+        const kind = instrument ?? "guitar";
+        const { measures, validation } = checkTab(tab, kind);
         return jsonResult({
-          ok: result.ok,
-          errors: formatTabIssues(result.errors),
-          warnings: formatTabIssues(result.warnings),
-          stats: result.stats,
+          ok: validation.ok,
+          errors: formatTabIssues(validation.errors),
+          warnings: formatTabIssues(validation.warnings),
+          stats: validation.stats,
+          asciiTab: renderAsciiTab(measures, kind),
         });
       }),
   );
 
   server.registerTool(
-    "get_exercise_tablature",
+    "riffquest_get_exercise_tablature",
     {
       title: "Read an exercise's tab",
       description:
-        "The tab of a library exercise or one of the player's own, in the same JSON format create_exercise takes.",
-      inputSchema: { id: z.string().min(1).max(120) },
-      annotations: { readOnlyHint: true },
-    },
-    ({ id }) =>
-      runTool("get_exercise_tablature", async () => {
-        const library = exercisesById.get(id);
-        if (library) {
-          if (!library.tablature?.length)
-            return errorResult(`"${library.title}" has no tab.`);
-          return jsonResult({
-            id,
-            title: library.title,
-            instrument: library.instrument ?? "guitar",
-            bpm: library.metronomeSpeed,
-            tablature: library.tablature,
-          });
-        }
-        const own = await readOwn(id);
-        return jsonResult({
-          id: communityExerciseId(own.id),
-          title: own.data.title,
-          instrument: own.data.instrument ?? "guitar",
-          bpm: own.data.metronomeSpeed,
-          tablature: own.data.tablature ?? [],
-        });
+        "The tab of a library or own exercise: as JSON in the format riffquest_create_exercise takes (tab) and as text (asciiTab). Long tabs in parts with fromMeasure / toMeasure.",
+      inputSchema: strictInput({
+        id: z.string().min(1).max(120),
+        fromMeasure: z
+          .number()
+          .int()
+          .min(1)
+          .optional()
+          .describe("First measure to return, counted from 1 (default 1)"),
+        toMeasure: z
+          .number()
+          .int()
+          .min(1)
+          .optional()
+          .describe("Last measure to return (default: the last one)"),
       }),
-  );
-
-  server.registerTool(
-    "get_my_exercises",
-    {
-      title: "My exercises",
-      description:
-        "Exercises the player made themselves (in the app or through create_exercise), newest first.",
-      annotations: { readOnlyHint: true },
+      annotations: READ_TOOL_ANNOTATIONS,
     },
-    () =>
-      runTool("get_my_exercises", async () => {
-        const snapshot = await exercises().where("authorId", "==", uid).get();
-        return jsonResult(
-          snapshot.docs
-            .map((doc) => {
-              const data = doc.data();
-              return {
-                id: communityExerciseId(doc.id),
-                title: data.title,
-                category: data.category,
-                difficulty: data.difficulty,
-                skills: data.relatedSkills ?? [],
-                bpm: data.metronomeSpeed ?? null,
-                minutes: data.timeInMinutes,
-                instrument: data.instrument ?? "guitar",
-                tabMeasures: data.tablature?.length ?? 0,
-                isPublic: data.isPublic === true,
-                createdAt: data.createdAt?.toDate?.().toISOString() ?? null,
-                editUrl: editorUrl(doc.id),
-              };
-            })
-            .sort((a, b) =>
-              (b.createdAt ?? "").localeCompare(a.createdAt ?? ""),
-            ),
+    ({ id, fromMeasure, toMeasure }) =>
+      runTool("riffquest_get_exercise_tablature", async () => {
+        const library = exercisesById.get(id);
+        const source = library
+          ? {
+              id,
+              title: library.title,
+              instrument: library.instrument ?? "guitar",
+              bpm: library.metronomeSpeed,
+              tablature: library.tablature ?? [],
+            }
+          : await readOwn(id).then((own) => ({
+              id: communityExerciseId(own.id),
+              title: own.data.title,
+              instrument: own.data.instrument ?? "guitar",
+              bpm: own.data.metronomeSpeed,
+              tablature: own.data.tablature ?? [],
+            }));
+        if (!source.tablature.length)
+          return errorResult(`"${source.title}" has no tab.`);
+
+        const total = source.tablature.length;
+        const first = fromMeasure ?? 1;
+        const last = Math.min(toMeasure ?? total, total);
+        if (first > last) {
+          return errorResult(
+            `"${source.title}" has ${total} measures — fromMeasure has to be between 1 and ${total}, and not after toMeasure.`,
+          );
+        }
+        const { tablature, ...about } = source;
+        return fittedResult(
+          (shown) => ({
+            ...about,
+            totalMeasures: total,
+            fromMeasure: first,
+            toMeasure: first + shown.length - 1,
+            ...tabOut(shown, about.instrument),
+          }),
+          tablature.slice(first - 1, last),
+          "Ask for the rest with fromMeasure set to the measure after toMeasure.",
         );
       }),
   );
 
   server.registerTool(
-    "create_exercise",
+    "riffquest_get_my_exercises",
+    {
+      title: "My exercises",
+      description: "Exercises the player made themselves, newest first. Paged.",
+      inputSchema: strictInput(pageInput(20, 50)),
+      annotations: READ_TOOL_ANNOTATIONS,
+    },
+    ({ offset, limit }) =>
+      runTool("riffquest_get_my_exercises", async () => {
+        const snapshot = await exercises().where("authorId", "==", uid).get();
+        const all = snapshot.docs
+          .map((doc) => {
+            const data = doc.data();
+            return {
+              id: communityExerciseId(doc.id),
+              title: data.title,
+              category: data.category,
+              difficulty: data.difficulty,
+              skills: data.relatedSkills ?? [],
+              bpm: data.metronomeSpeed ?? null,
+              minutes: data.timeInMinutes,
+              instrument: data.instrument ?? "guitar",
+              tabMeasures: data.tablature?.length ?? 0,
+              isPublic: data.isPublic === true,
+              createdAt: data.createdAt?.toDate?.().toISOString() ?? null,
+              editUrl: editorUrl(doc.id),
+            };
+          })
+          .sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
+        const page = pageOf(all, offset, limit ?? 20);
+        return jsonResult({ ...page.meta, exercises: page.items });
+      }),
+  );
+
+  server.registerTool(
+    "riffquest_create_exercise",
     {
       title: "Create an exercise from a tab",
       description:
-        "Saves a new exercise with a tab as the player's PRIVATE exercise (My exercises) — only the player sees it; publishing is done in the app. The tab (in the format get_tab_format describes) is validated first and nothing is saved if it has errors. Set instrument to bass for a 4-string bass exercise. Counts toward the daily limit of new exercises.",
-      inputSchema: exerciseFields,
+        "Saves a new exercise with a tab as the player's private exercise (publishing is done in the app). The tab is checked first and nothing is saved if it has errors. Returns the tab as text (asciiTab) and a link to play it.",
+      inputSchema: strictInput(exerciseFields),
       annotations: WRITE_TOOL_ANNOTATIONS,
     },
     (fields) =>
-      runTool("create_exercise", async () => {
-        const warnings = checkExercise(fields, fields.instrument ?? "guitar");
-        await consumeWriteQuota(context, "exercise");
-        const user = (
-          await firestore.collection("users").doc(uid).get()
-        ).data();
+      runTool("riffquest_create_exercise", async () => {
+        const instrument = fields.instrument ?? "guitar";
+        const { warnings, measures } = checkExercise(fields, instrument);
+        const left = await consumeWriteQuota(context, "exercise");
+        const user = (await userRef(uid).get()).data();
         const ref = await exercises().add({
-          ...toStored(fields),
+          ...toStored(fields, measures),
           tips: fields.tips?.map((line) => line.trim()) ?? [],
           videoUrl: null,
           imageUrl: null,
@@ -354,65 +371,60 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
           createdAt: FieldValue.serverTimestamp(),
         });
         return jsonResult({
+          ...left,
           id: communityExerciseId(ref.id),
           title: fields.title,
           saved: true,
           warnings,
+          asciiTab: renderAsciiTab(measures ?? [], instrument),
           playUrl: myExercisesUrl,
           editUrl: editorUrl(ref.id),
-          usage: `Use id "${communityExerciseId(ref.id)}" in create_practice_plan or set_exercise_goal.`,
+          usage: `Use id "${communityExerciseId(ref.id)}" in riffquest_create_practice_plan or riffquest_set_exercise_goal.`,
         });
       }),
   );
 
   server.registerTool(
-    "update_exercise",
+    "riffquest_update_exercise",
     {
       title: "Update my exercise",
       description:
-        "Changes one of the player's own exercises. Only the fields you pass change; a new tablature replaces the old one and is validated first. Counts toward the daily change limit.",
-      inputSchema: {
-        id: z.string().min(1).max(120),
-        ...Object.fromEntries(
-          Object.entries(exerciseFields).map(([key, schema]) => [
-            key,
-            schema.optional(),
-          ]),
-        ),
-      } as { id: z.ZodString } & {
-        [K in keyof typeof exerciseFields]: z.ZodOptional<
-          (typeof exerciseFields)[K]
-        >;
-      },
-      annotations: WRITE_TOOL_ANNOTATIONS,
+        "Changes one of the player's own exercises: only the fields given. A new tab is checked first.",
+      inputSchema: z
+        .object(exerciseFields)
+        .partial()
+        .extend({ id: z.string().min(1).max(120) })
+        .strict(),
+      annotations: IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
     },
     ({ id, ...fields }) =>
-      runTool("update_exercise", async () => {
+      runTool("riffquest_update_exercise", async () => {
         const own = await readOwn(id);
-        const changes = toStored(fields as Partial<ExerciseFields>);
-        if (Object.keys(changes).length === 0)
+        if (Object.keys(fields).length === 0)
           return errorResult("Nothing to change — pass at least one field.");
         // A switch of instrument re-checks the stored tab against the new string count.
         const instrument: Instrument =
           fields.instrument ?? own.data.instrument ?? "guitar";
-        const warnings = checkExercise(
-          {
-            ...(fields as Partial<ExerciseFields>),
-            tablature:
-              fields.tablature ??
-              (fields.instrument ? own.data.tablature : undefined),
-          },
+        const { warnings, measures } = checkExercise(
+          fields,
           instrument,
+          !fields.tab && fields.instrument ? own.data.tablature : undefined,
         );
-        await consumeWriteQuota(context, "write");
+        const changes = toStored(fields, measures);
+        const left = await consumeWriteQuota(context, "write");
         await own.ref.update({
           ...changes,
           updatedAt: FieldValue.serverTimestamp(),
         });
         return jsonResult({
+          ...left,
           id: communityExerciseId(own.id),
-          updated: Object.keys(changes),
+          // The names the client sent, not the stored ones (bpm, not metronomeSpeed).
+          updated: Object.keys(fields),
           warnings,
+          ...(measures
+            ? { asciiTab: renderAsciiTab(measures, instrument) }
+            : {}),
           playUrl: myExercisesUrl,
           editUrl: editorUrl(own.id),
         });

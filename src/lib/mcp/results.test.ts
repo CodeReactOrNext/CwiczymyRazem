@@ -20,14 +20,14 @@ describe("runTool errors", () => {
 
   it("passes a tool's own refusals through word for word", async () => {
     const own = await runTool(
-      "get_exercise",
+      "riffquest_get_exercise",
       failWith(new McpToolError('No exercise "x".')),
     );
     expect(own).toMatchObject({ isError: true });
     expect(textOf(own)).toBe('No exercise "x".');
 
     const quota = await runTool(
-      "create_exercise",
+      "riffquest_create_exercise",
       failWith(new McpQuotaError("Daily limit reached.")),
     );
     expect(textOf(quota)).toBe("Daily limit reached.");
@@ -36,13 +36,13 @@ describe("runTool errors", () => {
   it("names a database timeout, says a retry helps and quotes a logged reference", async () => {
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const result = await runTool(
-      "get_goals",
+      "riffquest_get_goals",
       failWith(Object.assign(new Error("deadline"), { code: 4 })),
     );
     const text = textOf(result);
     expect(result.isError).toBe(true);
     expect(text).toMatch(
-      /^get_goals didn't complete: the riff.quest database didn't answer in time\./,
+      /^riffquest_get_goals didn't complete: the riff.quest database didn't answer in time\./,
     );
     expect(text).toMatch(/Retrying in a few seconds should work\./);
     expect(text).not.toMatch(/may or may not have been saved/);
@@ -55,7 +55,7 @@ describe("runTool errors", () => {
   it("warns that a failed write may have landed", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const result = await runTool(
-      "create_practice_plan",
+      "riffquest_create_practice_plan",
       failWith(Object.assign(new Error("x"), { code: "aborted" })),
     );
     expect(textOf(result)).toMatch(
@@ -69,7 +69,7 @@ describe("runTool errors", () => {
   it("never leaks the underlying error's message", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const result = await runTool(
-      "get_song",
+      "riffquest_get_song",
       failWith(new Error("secret internal path /srv/keys")),
     );
     expect(textOf(result)).toMatch(

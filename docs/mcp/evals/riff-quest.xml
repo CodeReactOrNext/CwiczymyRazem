@@ -1,0 +1,50 @@
+<!--
+  Evaluation of the riff.quest MCP server (mcp-builder skill, phase 4): can a
+  model answer realistic questions with the tools alone? Every question is
+  read-only and uses only library, wiki and tab tools, so the answers are the
+  same for every account. src/lib/mcp/evals.test.ts re-derives each answer
+  through the tools — when the library changes, that test says which answer
+  moved.
+-->
+<evaluation>
+  <qa_pair>
+    <question>In the riff.quest exercise library, look at the easy exercises that train legato and have a tab the microphone scores. Which of them goes up to the highest top tempo (maximum metronome BPM)? Answer with its exercise id.</question>
+    <answer>hammer_on_sequence_5_7_9</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>The library exercise titled "Spider — One Note Per Beat": on which string does its last measure begin? Answer with the string's letter as written on a guitar tab (e, B, G, D, A or E).</question>
+    <answer>e</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>The library exercise "Spider — Shifting Up the Neck" is mostly in 4/4. Which other time signature appears in its tab?</question>
+    <answer>2/4</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In riff.quest's exercise taxonomy, which skill category has the most guitar skills? Answer with the category name.</question>
+    <answer>technique</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>According to the riff.quest wiki, what accuracy does a run need to count as clean in a tempo goal set to Relaxed? Answer as a percentage, like 50%.</question>
+    <answer>80%</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>According to the riff.quest wiki, how many missed days a week can a player have as rest days without losing their streak? Answer with a number.</question>
+    <answer>1</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Using riff.quest's tab checker, write one 6/8 measure made only of dotted quarter notes on the open low E string, so that it passes the check. How many notes does that measure have?</question>
+    <answer>2</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>At what tempo does the library exercise "Spider — String Skipping" recommend starting? Answer with the BPM number.</question>
+    <answer>80</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Among the library exercises whose title starts with "Spider" and whose only skill is finger independence, which one goes up to the fastest maximum tempo? Answer with its exercise id.</question>
+    <answer>spider_stairs_hard</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>The library exercise "Meter — 3/4 ↔ 5/8" alternates two meters. How many of the measures in its tab are in 5/8?</question>
+    <answer>4</answer>
+  </qa_pair>
+</evaluation>

@@ -5,7 +5,6 @@ import {
   getDailyDayKey,
   getDailyExercise,
 } from "feature/dailyExercise/utils/dailyExercise";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import fs from "fs";
@@ -15,18 +14,19 @@ import path from "path";
 import { z } from "zod";
 
 import type { McpContext } from "../auth";
+import { exercisesById, userRef } from "../data";
 import { firestore } from "../db";
 import {
   appLink,
   errorResult,
   jsonResult,
   msToMinutes,
+  pageInput,
+  pageOf,
+  READ_TOOL_ANNOTATIONS,
   runTool,
+  strictInput,
 } from "../results";
-
-const exercisesById = new Map(
-  exercisesAgregat.map((exercise) => [exercise.id, exercise]),
-);
 
 export const EXERCISE_CATEGORIES = [
   "technique",
@@ -62,6 +62,28 @@ const matchesText = (haystack: string, query: string) => {
     .every((word) => text.includes(word));
 };
 
+/** What exerciseDetails returns — the output schema of the tools that answer with it. */
+export const exerciseDetailsShape = {
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  whyItMatters: z.string().nullable(),
+  category: z.string(),
+  difficulty: z.string(),
+  skills: z.array(z.string()),
+  minutes: z.number(),
+  bpm: z
+    .object({ min: z.number(), max: z.number(), recommended: z.number() })
+    .nullable()
+    .describe("null: played without a metronome"),
+  instructions: z.array(z.string()),
+  tips: z.array(z.string()),
+  hasTab: z.boolean(),
+  tabMeasures: z.number(),
+  scoredByMic: z.boolean(),
+  url: z.string(),
+};
+
 /** A library exercise as the model reads it, without the tab itself. */
 export const exerciseDetails = (exercise: Exercise) => ({
   id: exercise.id,
@@ -81,12 +103,21 @@ export const exerciseDetails = (exercise: Exercise) => ({
   url: exerciseLink(exercise.id),
 });
 
+const pageMeta = {
+  total: z.number(),
+  count: z.number(),
+  offset: z.number(),
+  hasMore: z.boolean(),
+  nextOffset: z.number().optional(),
+};
+
 const songSummary = (id: string, data: FirebaseFirestore.DocumentData) => ({
   id,
   title: data.title,
   artist: data.artist,
+  // 0 is "nobody rated it yet", not "trivial".
   difficulty:
-    typeof data.avgDifficulty === "number"
+    typeof data.avgDifficulty === "number" && data.avgDifficulty > 0
       ? Math.round(data.avgDifficulty * 10) / 10
       : null,
   tier: data.tier ?? null,
@@ -94,6 +125,9 @@ const songSummary = (id: string, data: FirebaseFirestore.DocumentData) => ({
   popularity: data.popularity ?? 0,
   url: appLink(`/songs?songId=${encodeURIComponent(id)}`),
 });
+
+/** The deepest a song search pages — each page reads every song it skips. */
+const MAX_SONG_OFFSET = 150;
 
 const WIKI_DIR = path.join(process.cwd(), "src/content/wiki");
 
@@ -106,6 +140,51 @@ interface WikiDoc {
 }
 
 let wikiCache: WikiDoc[] | null = null;
+
+const COMPONENT_TAG =
+  /<\/?[A-Z][\w.]*((?:\s+[\w-]+(?:=(?:"[^"]*"|'[^']*'|\{[^}]*\}))?)*)\s*\/?>/g;
+
+/** Component props that are wiring, not words: video ids, image paths, styling, links. */
+const NON_TEXT_PROPS = new Set([
+  "id",
+  "src",
+  "href",
+  "type",
+  "links",
+  "highlight",
+  "maxWidth",
+]);
+
+/**
+ * The words of one wiki component (`<ProgressLadder items="Day 2::+20%|…" />`):
+ * its attribute values, with `a::b|c::d` lists as lines. The facts players
+ * ask about — streak bonuses, FAQ answers — live in these props.
+ */
+export const componentText = (attributes: string) =>
+  Array.from(
+    attributes.matchAll(/([\w-]+)=(?:"([^"]*)"|'([^']*)')/g),
+    ([, name, double, single]) =>
+      NON_TEXT_PROPS.has(name) ? "" : (double ?? single),
+  )
+    .filter(Boolean)
+    .map((value) =>
+      value.includes("|") || value.includes("::")
+        ? value
+            .split("|")
+            .map((item) => `- ${item.split("::").join(": ")}`)
+            .join("\n")
+        : value,
+    )
+    .join("\n");
+
+/** A wiki article as plain text, its components flattened into their words. */
+export const wikiPlainText = (content: string) =>
+  content
+    .replace(COMPONENT_TAG, (_, attributes: string) =>
+      attributes ? `\n${componentText(attributes)}\n` : " ",
+    )
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 
 /** The English articles as plain text — read once per server instance. */
 const loadWiki = (): WikiDoc[] => {
@@ -123,11 +202,7 @@ const loadWiki = (): WikiDoc[] => {
         title: data.title as string,
         section: data.section as string,
         description: (data.description as string) ?? "",
-        // Wiki components carry their words in props; the tags themselves are noise.
-        text: content
-          .replace(/<\/?[A-Z][^>]*>/g, " ")
-          .replace(/\n{3,}/g, "\n\n")
-          .trim(),
+        text: wikiPlainText(content),
       };
     })
     .filter((doc) => doc.slug && doc.title);
@@ -136,18 +211,23 @@ const loadWiki = (): WikiDoc[] => {
 
 export function registerCatalogTools(server: McpServer, context: McpContext) {
   server.registerTool(
-    "list_exercise_taxonomy",
+    "riffquest_list_exercise_taxonomy",
     {
       title: "Exercise taxonomy",
-      description:
-        "The categories, difficulty levels and guitar skill ids exercises use — the values list_exercises and create_exercise accept.",
-      annotations: { readOnlyHint: true },
+      description: "The category, difficulty and skill ids exercises use.",
+      inputSchema: strictInput({}),
+      outputSchema: {
+        categories: z.array(z.string()),
+        difficulties: z.array(z.string()),
+        skills: z.array(z.object({ id: z.string(), category: z.string() })),
+      },
+      annotations: READ_TOOL_ANNOTATIONS,
     },
     () =>
-      runTool("list_exercise_taxonomy", async () =>
+      runTool("riffquest_list_exercise_taxonomy", async () =>
         jsonResult({
-          categories: EXERCISE_CATEGORIES,
-          difficulties: EXERCISE_DIFFICULTIES,
+          categories: [...EXERCISE_CATEGORIES],
+          difficulties: [...EXERCISE_DIFFICULTIES],
           skills: guitarSkills.map((skill) => ({
             id: skill.id,
             category: skill.category,
@@ -157,12 +237,12 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
   );
 
   server.registerTool(
-    "list_exercises",
+    "riffquest_list_exercises",
     {
       title: "Find exercises",
       description:
-        "Searches the riff.quest exercise library (English titles and descriptions). All filters are optional and combine; `text` matches every word. Returns short entries; get_exercise has the full details.",
-      inputSchema: {
+        "Searches the exercise library (English). Filters combine; `text` matches every word. Short entries, paged; riffquest_get_exercise has the details.",
+      inputSchema: strictInput({
         text: z.string().max(100).optional(),
         skill: z.enum(SKILL_IDS).optional(),
         category: z.enum(EXERCISE_CATEGORIES).optional(),
@@ -171,12 +251,26 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
           .boolean()
           .optional()
           .describe("Only exercises with a tab the mic scores"),
-        limit: z.number().int().min(1).max(50).optional(),
+        ...pageInput(20, 50),
+      }),
+      outputSchema: {
+        ...pageMeta,
+        exercises: z.array(
+          z.object({
+            id: z.string(),
+            title: z.string(),
+            category: z.string(),
+            difficulty: z.string(),
+            kind: z.string(),
+            skills: z.array(z.string()),
+            minutes: z.number().nullable(),
+          }),
+        ),
       },
-      annotations: { readOnlyHint: true },
+      annotations: READ_TOOL_ANNOTATIONS,
     },
-    ({ text, skill, category, difficulty, withTabOnly, limit }) =>
-      runTool("list_exercises", async () => {
+    ({ text, skill, category, difficulty, withTabOnly, offset, limit }) =>
+      runTool("riffquest_list_exercises", async () => {
         const matches = EXERCISE_CATALOG.filter(
           (entry) =>
             (!skill || entry.skills.includes(skill)) &&
@@ -190,9 +284,10 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
                 text,
               )),
         );
+        const page = pageOf(matches, offset, limit ?? 20);
         return jsonResult({
-          total: matches.length,
-          exercises: matches.slice(0, limit ?? 20).map((entry) => ({
+          ...page.meta,
+          exercises: page.items.map((entry) => ({
             id: entry.id,
             title: entry.title,
             category: entry.category,
@@ -206,42 +301,58 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
   );
 
   server.registerTool(
-    "get_exercise",
+    "riffquest_get_exercise",
     {
       title: "Exercise details",
       description:
-        "One library exercise: description, instructions, tips, BPM range, skills and a link that opens it in the app.",
-      inputSchema: { id: z.string().min(1).max(120) },
-      annotations: { readOnlyHint: true },
+        "One library exercise: description, instructions, tips, BPM range, skills and a link.",
+      inputSchema: strictInput({ id: z.string().min(1).max(120) }),
+      outputSchema: exerciseDetailsShape,
+      annotations: READ_TOOL_ANNOTATIONS,
     },
     ({ id }) =>
-      runTool("get_exercise", async () => {
+      runTool("riffquest_get_exercise", async () => {
         const exercise = exercisesById.get(id);
         if (!exercise)
           return errorResult(
-            `No library exercise "${id}". Find ids with list_exercises; your own exercises are in get_my_exercises.`,
+            `No library exercise "${id}". Find ids with riffquest_list_exercises; your own exercises are in riffquest_get_my_exercises.`,
           );
         return jsonResult(exerciseDetails(exercise));
       }),
   );
 
   server.registerTool(
-    "list_songs",
+    "riffquest_list_songs",
     {
       title: "Find songs",
       description:
-        "Searches the song library by the start of a title or artist name. Without `text` it returns the most popular songs. Difficulty is the players' average rating, 1–10.",
-      inputSchema: {
+        "Searches the song library by the start of a title or artist (\"metal\" finds Metallica; a word mid-title doesn't match). Without text: the most popular. Difficulty is the players' average, 1–10. Paged.",
+      inputSchema: strictInput({
         text: z.string().max(80).optional(),
         maxDifficulty: z.number().min(1).max(10).optional(),
-        limit: z.number().int().min(1).max(30).optional(),
-      },
-      annotations: { readOnlyHint: true },
+        offset: z
+          .number()
+          .int()
+          .min(0)
+          .max(MAX_SONG_OFFSET)
+          .optional()
+          .describe("How many songs to skip, for the next page (default 0)"),
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(30)
+          .optional()
+          .describe("Songs per page (default 15)"),
+      }),
+      annotations: READ_TOOL_ANNOTATIONS,
     },
-    ({ text, maxDifficulty, limit }) =>
-      runTool("list_songs", async () => {
+    ({ text, maxDifficulty, offset, limit }) =>
+      runTool("riffquest_list_songs", async () => {
         const songs = firestore.collection("songs");
         const size = limit ?? 15;
+        // Firestore can't skip without reading — every page reads what it skips.
+        const window = (offset ?? 0) + size;
         const query = text?.trim().toLowerCase();
         const snapshots = query
           ? await Promise.all(
@@ -249,14 +360,14 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
                 songs
                   .where(field, ">=", query)
                   .where(field, "<=", `${query}`)
-                  .limit(size)
+                  .limit(window)
                   .get(),
               ),
             )
           : [
               await songs
                 .orderBy("popularity", "desc")
-                .limit(size * 2)
+                .limit(window * 2)
                 .get(),
             ];
 
@@ -271,31 +382,47 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
               !maxDifficulty ||
               (song.difficulty !== null && song.difficulty <= maxDifficulty),
           )
-          .sort((a, b) => b.popularity - a.popularity)
-          .slice(0, size);
-        return jsonResult({ songs: results });
+          .sort((a, b) => b.popularity - a.popularity);
+        // Only a window of the library is read, so there's no total to give —
+        // just whether a query filled its window (more songs past it).
+        const {
+          items,
+          meta: { total: _readOnly, ...meta },
+        } = pageOf(results, offset, size);
+        const filled = snapshots.some(
+          (snapshot) => snapshot.size >= (query ? window : window * 2),
+        );
+        const hasMore = meta.hasMore || filled;
+        return jsonResult({
+          ...meta,
+          hasMore,
+          ...(hasMore ? { nextOffset: meta.offset + items.length } : {}),
+          songs: items,
+        });
       }),
   );
 
   server.registerTool(
-    "get_song",
+    "riffquest_get_song",
     {
       title: "Song details",
       description:
-        "One song from the library, with the player's own status for it (wantToLearn / learning / learned) and how long they have practiced it.",
-      inputSchema: { id: z.string().min(1).max(120) },
-      annotations: { readOnlyHint: true },
+        "One song, with the player's status for it and their practice time on it.",
+      inputSchema: strictInput({ id: z.string().min(1).max(120) }),
+      annotations: READ_TOOL_ANNOTATIONS,
     },
     ({ id }) =>
-      runTool("get_song", async () => {
-        const user = firestore.collection("users").doc(context.uid);
+      runTool("riffquest_get_song", async () => {
+        const user = userRef(context.uid);
         const [song, status, progress] = await Promise.all([
           firestore.collection("songs").doc(id).get(),
           user.collection("userSongs").doc(id).get(),
           user.collection("songProgress").doc(id).get(),
         ]);
         if (!song.exists)
-          return errorResult(`No song "${id}". Find ids with list_songs.`);
+          return errorResult(
+            `No song "${id}". Find ids with riffquest_list_songs.`,
+          );
         return jsonResult({
           ...songSummary(song.id, song.data()!),
           yourStatus: status.data()?.status ?? null,
@@ -305,15 +432,17 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
   );
 
   server.registerTool(
-    "get_daily_exercise",
+    "riffquest_get_daily_exercise",
     {
       title: "Exercise of the day",
       description:
-        "Today's exercise of the day — the same one for every player, changing at midnight UTC.",
-      annotations: { readOnlyHint: true },
+        "Today's exercise of the day — the same for everyone, changing at midnight UTC.",
+      inputSchema: strictInput({}),
+      // Same shape as get_exercise's — declared once there, to keep the list short.
+      annotations: READ_TOOL_ANNOTATIONS,
     },
     () =>
-      runTool("get_daily_exercise", async () => {
+      runTool("riffquest_get_daily_exercise", async () => {
         const day = getDailyDayKey();
         const exercise = getDailyExercise(day);
         if (!exercise) return errorResult("No exercise of the day today.");
@@ -326,14 +455,15 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
   );
 
   server.registerTool(
-    "get_monthly_challenge",
+    "riffquest_get_monthly_challenge",
     {
       title: "Monthly challenge",
-      description: `This month's challenge: the ${CHALLENGE_SONG_COUNT} songs the community voted for. Players record themselves playing them.`,
-      annotations: { readOnlyHint: true },
+      description: `This month's challenge: the ${CHALLENGE_SONG_COUNT} songs the community voted for.`,
+      inputSchema: strictInput({}),
+      annotations: READ_TOOL_ANNOTATIONS,
     },
     () =>
-      runTool("get_monthly_challenge", async () => {
+      runTool("riffquest_get_monthly_challenge", async () => {
         const id = currentChallengeId();
         const doc = await firestore.collection("challenges").doc(id).get();
         if (!doc.exists)
@@ -353,7 +483,8 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
               id: song.songId,
               title: song.title,
               artist: song.artist,
-              difficulty: song.avgDifficulty ?? null,
+              // 0 is "nobody rated it yet", not "trivial".
+              difficulty: song.avgDifficulty || null,
             }),
           ),
           url: appLink("/challenges"),
@@ -362,22 +493,33 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
   );
 
   server.registerTool(
-    "search_wiki",
+    "riffquest_search_wiki",
     {
       title: "Search the wiki",
       description:
-        "Searches the riff.quest player wiki — how points, Fame, streaks, goals, modes and other app mechanics work. Returns the best-matching articles with links, and the full text of the top one on request.",
-      inputSchema: {
+        "Searches the player wiki on how the app works (points, Fame, streaks, goals, modes): best matches with links; `full` adds the top article's text.",
+      inputSchema: strictInput({
         text: z.string().min(2).max(100),
         full: z
           .boolean()
           .optional()
           .describe("Return the whole text of the best match"),
+      }),
+      outputSchema: {
+        results: z.array(
+          z.object({
+            title: z.string(),
+            section: z.string(),
+            description: z.string(),
+            url: z.string(),
+            text: z.string().optional(),
+          }),
+        ),
       },
-      annotations: { readOnlyHint: true },
+      annotations: READ_TOOL_ANNOTATIONS,
     },
     ({ text, full }) =>
-      runTool("search_wiki", async () => {
+      runTool("riffquest_search_wiki", async () => {
         const words = normalize(text).split(/\s+/).filter(Boolean);
         const scored = loadWiki()
           .map((doc) => {
@@ -397,15 +539,15 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
           .slice(0, 5);
         if (scored.length === 0)
           return errorResult(`Nothing in the wiki matches "${text}".`);
-        return jsonResult(
-          scored.map(({ doc }, index) => ({
+        return jsonResult({
+          results: scored.map(({ doc }, index) => ({
             title: doc.title,
-            section: doc.section,
+            section: doc.section ?? "",
             description: doc.description,
             url: appLink(`/wiki/${doc.slug}`),
             ...(full && index === 0 ? { text: doc.text.slice(0, 12_000) } : {}),
           })),
-        );
+        });
       }),
   );
 }

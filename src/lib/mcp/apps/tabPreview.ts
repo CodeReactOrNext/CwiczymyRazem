@@ -1,23 +1,25 @@
 import {
-  RESOURCE_MIME_TYPE,
   registerAppResource,
   registerAppTool,
+  RESOURCE_MIME_TYPE,
 } from "@modelcontextprotocol/ext-apps/server";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import {
   alphaTexStaffHeader,
   tablatureToAlphaTex,
 } from "feature/exercisePlan/views/PracticeSession/components/AlphaTabScoreViewer/tablatureToAlphaTex";
-import { BASS_TUNINGS, BASS_STANDARD_TUNING_ID } from "utils/audio/tunings";
+import { BASS_STANDARD_TUNING_ID, BASS_TUNINGS } from "utils/audio/tunings";
 import { z } from "zod";
 
-import { jsonResult, runTool } from "../results";
 import {
-  formatTabIssues,
-  validateTablature,
-} from "../tablature/validateTablature";
-import { instrumentSchema, tablatureSchema } from "../tools/exercises";
+  jsonResult,
+  READ_TOOL_ANNOTATIONS,
+  runTool,
+  strictInput,
+} from "../results";
+import { checkTab, renderAsciiTab, tabSchema } from "../tablature/tabJson";
+import { formatTabIssues } from "../tablature/validateTablature";
+import { instrumentSchema } from "../tools/exercises";
 import { CDN, TAB_PREVIEW_HTML } from "./tabPreviewHtml";
 
 const RESOURCE_URI = "ui://riff-quest/tab-preview.html";
@@ -27,9 +29,9 @@ const BASS_STANDARD = BASS_TUNINGS.find(
 )!;
 
 /**
- * `preview_tab` — shows a tab as tab + notation with playback, inside the
+ * `riffquest_preview_tab` — shows a tab as tab + notation with playback, inside the
  * conversation (an MCP App). Saves nothing: it is the look before
- * `create_exercise`. Clients without MCP Apps get the same check as text.
+ * `riffquest_create_exercise`. Clients without MCP Apps get the same check as text.
  */
 export function registerTabPreviewApp(server: McpServer) {
   registerAppResource(
@@ -57,25 +59,24 @@ export function registerTabPreviewApp(server: McpServer) {
 
   registerAppTool(
     server,
-    "preview_tab",
+    "riffquest_preview_tab",
     {
       title: "Preview a tab",
       description:
-        "Shows a tab as tablature and standard notation with playback, in the format get_tab_format describes, together with the validation result. Saves nothing.",
-      inputSchema: {
-        tablature: tablatureSchema,
+        "Shows a tab as tablature and notation with playback, with the check result. Saves nothing.",
+      inputSchema: strictInput({
+        tab: tabSchema,
         instrument: instrumentSchema,
         title: z.string().max(80).optional(),
         bpm: z.number().int().min(20).max(400).optional(),
-      },
-      annotations: { readOnlyHint: true, openWorldHint: false },
+      }),
+      annotations: READ_TOOL_ANNOTATIONS,
       _meta: { ui: { resourceUri: RESOURCE_URI } },
     },
-    ({ tablature, instrument, title, bpm }) =>
-      runTool("preview_tab", async () => {
-        const measures = tablature as TablatureMeasure[];
+    ({ tab, instrument, title, bpm }) =>
+      runTool("riffquest_preview_tab", async () => {
         const kind = instrument ?? "guitar";
-        const result = validateTablature(measures, kind);
+        const { measures, validation: result } = checkTab(tab, kind);
         const tempo = bpm ?? 90;
         let tex: string | null = null;
         try {
@@ -95,9 +96,10 @@ export function registerTabPreviewApp(server: McpServer) {
           ok: result.ok,
           errors: formatTabIssues(result.errors),
           warnings: formatTabIssues(result.warnings),
+          asciiTab: renderAsciiTab(measures, kind),
           tex,
         };
-        return { ...jsonResult(data), structuredContent: data };
+        return jsonResult(data);
       }),
   );
 }
