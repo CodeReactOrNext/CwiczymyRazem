@@ -1,7 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
+import { registerTabPreviewApp } from "./apps/tabPreview";
 import type { McpContext } from "./auth";
 import { registerPrompts } from "./prompts";
+import { APP_URL, appLink } from "./results";
 import { registerCatalogTools } from "./tools/catalog";
 import { registerExerciseTools } from "./tools/exercises";
 import { registerPlanTools } from "./tools/plans";
@@ -23,7 +25,30 @@ const INSTRUCTIONS = `riff.quest is a guitar practice app: players log sessions,
  */
 export function createRiffQuestMcpServer(context: McpContext) {
   const server = new McpServer(
-    { name: "riff-quest", title: "riff.quest", version: "1.0.0" },
+    {
+      name: "riff-quest",
+      title: "riff.quest",
+      version: "1.0.0",
+      websiteUrl: APP_URL,
+      // Shown next to the connector by clients that read server icons.
+      icons: [
+        {
+          src: appLink("/images/logolight.svg"),
+          mimeType: "image/svg+xml",
+          sizes: ["any"],
+        },
+        {
+          src: appLink("/favicon/android-chrome-512x512.png"),
+          mimeType: "image/png",
+          sizes: ["512x512"],
+        },
+        {
+          src: appLink("/favicon/android-chrome-192x192.png"),
+          mimeType: "image/png",
+          sizes: ["192x192"],
+        },
+      ],
+    },
     {
       instructions: INSTRUCTIONS,
       capabilities: { tools: {}, prompts: {}, resources: {} },
@@ -33,6 +58,7 @@ export function createRiffQuestMcpServer(context: McpContext) {
   registerCatalogTools(server, context);
   registerPlanTools(server, context);
   registerExerciseTools(server, context);
+  registerTabPreviewApp(server);
   registerPrompts(server);
   return server;
 }

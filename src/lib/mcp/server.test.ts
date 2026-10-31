@@ -61,6 +61,7 @@ describe("riff.quest MCP server", () => {
         "list_exercises",
         "list_my_plans",
         "list_songs",
+        "preview_tab",
         "search_wiki",
         "set_exercise_goal",
         "update_exercise",

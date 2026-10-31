@@ -33,6 +33,13 @@ note    = { string: 1-6, fret: 0-24, ...techniques }
 \`tuplet: 3\` — three of them fill one quarter. Triplet sixteenths: \`1/6\` with \`tuplet: 3\`.
 Sextuplet sixteenths: \`1/6\` with \`tuplet: 6\`. Quintuplet sixteenths: \`0.2\` with \`tuplet: 5\`.
 
+## Bass
+
+Set \`instrument: "bass"\` on the exercise (and on \`validate_tablature\`) for a 4-string bass
+in standard tuning. Then \`string\` is **1–4: 1 = G, 2 = D, 3 = A, 4 = low E** — the
+top line of a bass tab is string 1. Everything else (durations, measures, rests,
+techniques) works the same. Without \`instrument\` the tab is a guitar tab.
+
 ## Techniques (all optional, on the note)
 
 - \`isHammerOn\` / \`isPullOff\` — on the note you ARRIVE at, not the picked one.
@@ -75,6 +82,7 @@ Sextuplet sixteenths: \`1/6\` with \`tuplet: 6\`. Quintuplet sixteenths: \`0.2\`
 ## Workflow
 
 1. Write the tab, call \`validate_tablature\`, fix every error it lists (it names measure and beat).
-2. \`create_exercise\` — saved as the player's private exercise, with a link to play it.
-3. After the player tries it, adjust with \`update_exercise\`.
+2. \`preview_tab\` shows it as tablature and notation with playback, in clients that display MCP Apps.
+3. \`create_exercise\` — saved as the player's private exercise, with a link to play it.
+4. After the player tries it, adjust with \`update_exercise\`.
 `;

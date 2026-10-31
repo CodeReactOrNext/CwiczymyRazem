@@ -4,6 +4,7 @@ import type {
   TablatureNote,
 } from "feature/exercisePlan/types/exercise.types";
 import { tablatureToAlphaTex } from "feature/exercisePlan/views/PracticeSession/components/AlphaTabScoreViewer/tablatureToAlphaTex";
+import type { Instrument } from "utils/audio/tunings";
 
 /**
  * Checks a tab written by an AI client before it is saved as an exercise.
@@ -86,21 +87,29 @@ const isInt = (value: unknown): value is number =>
 
 const round = (value: number) => Math.round(value * 1000) / 1000;
 
+/** Strings per instrument, and how the error names the outer ones. */
+const STRINGS: Record<Instrument, { count: number; range: string }> = {
+  guitar: { count: 6, range: "1–6 (1 = high e, 6 = low E)" },
+  bass: { count: 4, range: "1–4 on bass (1 = G, 4 = low E)" },
+};
+
 function checkNote(
   note: TablatureNote,
   at: { measure: number; beat: number },
   errors: TabIssue[],
   warnings: TabIssue[],
+  instrument: Instrument,
 ) {
   const where = `string ${note.string}, fret ${note.fret}`;
+  const strings = STRINGS[instrument];
   if (
     !isInt(note.string) ||
     note.string < TAB_LIMITS.minString ||
-    note.string > TAB_LIMITS.maxString
+    note.string > strings.count
   ) {
     errors.push({
       ...at,
-      message: `string must be a whole number 1–6 (1 = high E, 6 = low E), got ${note.string}`,
+      message: `string must be a whole number ${strings.range}, got ${note.string}`,
     });
   }
   if (!isInt(note.fret) || note.fret < 0 || note.fret > TAB_LIMITS.maxFret) {
@@ -172,7 +181,11 @@ function checkNote(
   }
 }
 
-export function validateTablature(measures: TablatureMeasure[]): TabValidation {
+export function validateTablature(
+  measures: TablatureMeasure[],
+  instrument: Instrument = "guitar",
+): TabValidation {
+  const stringCount = STRINGS[instrument].count;
   const errors: TabIssue[] = [];
   const warnings: TabIssue[] = [];
   const stats = { measures: measures.length, beats: 0, notes: 0 };
@@ -252,8 +265,8 @@ export function validateTablature(measures: TablatureMeasure[]): TabValidation {
         });
       }
 
-      if (notes.length > TAB_LIMITS.maxNotesPerBeat) {
-        errors.push({ ...at, message: "at most 6 notes in one beat" });
+      if (notes.length > stringCount) {
+        errors.push({ ...at, message: `at most ${stringCount} notes in one beat` });
       }
       const strings = notes.map((note) => note.string);
       if (new Set(strings).size !== strings.length) {
@@ -265,7 +278,7 @@ export function validateTablature(measures: TablatureMeasure[]): TabValidation {
       }
 
       notes.forEach((note) => {
-        checkNote(note, at, errors, warnings);
+        checkNote(note, at, errors, warnings, instrument);
         if ((note.isHammerOn || note.isPullOff) && isInt(note.fret)) {
           const previous = lastFretOnString.get(note.string);
           const kind = note.isHammerOn ? "hammer-on" : "pull-off";

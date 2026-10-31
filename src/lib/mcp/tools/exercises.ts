@@ -8,6 +8,7 @@ import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { FieldValue } from "firebase-admin/firestore";
+import type { Instrument } from "utils/audio/tunings";
 import { z } from "zod";
 
 import { consumeWriteQuota, type McpContext } from "../auth";
@@ -41,7 +42,7 @@ const COLLECTION = "communityExercises";
 // message can explain (string side, measure length) are left to
 // validateTablature, which says where and why instead of a bare type error.
 const noteSchema = z.object({
-  string: z.number().describe("1 = high e … 6 = low E"),
+  string: z.number().describe("Guitar: 1 = high e … 6 = low E. Bass: 1 = G … 4 = low E"),
   fret: z.number().describe("0–24"),
   isHammerOn: z.boolean().optional(),
   isPullOff: z.boolean().optional(),
@@ -86,6 +87,13 @@ export const tablatureSchema = z
   .min(1)
   .max(TAB_LIMITS.maxMeasures);
 
+export const instrumentSchema = z
+  .enum(["guitar", "bass"])
+  .optional()
+  .describe(
+    "guitar (default): 6 strings, 1 = high e. bass: 4-string bass in standard tuning, 1 = G, 4 = low E",
+  );
+
 const exerciseFields = {
   title: z.string().min(3).max(80),
   description: z.string().min(10).max(600),
@@ -105,6 +113,7 @@ const exerciseFields = {
   instructions: z.array(z.string().min(3).max(300)).min(1).max(8),
   tips: z.array(z.string().min(3).max(300)).max(6).optional(),
   tablature: tablatureSchema,
+  instrument: instrumentSchema,
 };
 
 type ExerciseFields = {
@@ -116,7 +125,10 @@ const editorUrl = (id: string) =>
   appLink(`/tab-editor?edit=${encodeURIComponent(id)}`);
 
 /** Checks everything a save needs, or throws with every problem listed. */
-function checkExercise(fields: Partial<ExerciseFields>) {
+function checkExercise(
+  fields: Partial<ExerciseFields>,
+  instrument: Instrument,
+) {
   const problems: string[] = [];
   const warnings: string[] = [];
   if (fields.bpm) {
@@ -128,7 +140,10 @@ function checkExercise(fields: Partial<ExerciseFields>) {
     }
   }
   if (fields.tablature) {
-    const result = validateTablature(fields.tablature as TablatureMeasure[]);
+    const result = validateTablature(
+      fields.tablature as TablatureMeasure[],
+      instrument,
+    );
     problems.push(
       ...formatTabIssues(result.errors).map((line) => `tablature: ${line}`),
     );
@@ -161,6 +176,7 @@ const toStored = (
     stored.instructions = fields.instructions.map((line) => line.trim());
   if (fields.tips !== undefined)
     stored.tips = fields.tips.map((line) => line.trim());
+  if (fields.instrument !== undefined) stored.instrument = fields.instrument;
   if (fields.tablature !== undefined) {
     // Through JSON once: drops undefined optionals, which Firestore refuses.
     stored.tablature = JSON.parse(
@@ -217,12 +233,15 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
       title: "Check a tab",
       description:
         "Checks a tab without saving anything: every measure adds up to its time signature, strings and frets are on the neck, durations are real note values. Lists each problem with its measure and beat.",
-      inputSchema: { tablature: tablatureSchema },
+      inputSchema: { tablature: tablatureSchema, instrument: instrumentSchema },
       annotations: { readOnlyHint: true },
     },
-    ({ tablature }) =>
+    ({ tablature, instrument }) =>
       runTool("validate_tablature", async () => {
-        const result = validateTablature(tablature as TablatureMeasure[]);
+        const result = validateTablature(
+          tablature as TablatureMeasure[],
+          instrument ?? "guitar",
+        );
         return jsonResult({
           ok: result.ok,
           errors: formatTabIssues(result.errors),
@@ -250,6 +269,7 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
           return jsonResult({
             id,
             title: library.title,
+            instrument: library.instrument ?? "guitar",
             bpm: library.metronomeSpeed,
             tablature: library.tablature,
           });
@@ -258,6 +278,7 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
         return jsonResult({
           id: communityExerciseId(own.id),
           title: own.data.title,
+          instrument: own.data.instrument ?? "guitar",
           bpm: own.data.metronomeSpeed,
           tablature: own.data.tablature ?? [],
         });
@@ -287,6 +308,7 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
                 skills: data.relatedSkills ?? [],
                 bpm: data.metronomeSpeed ?? null,
                 minutes: data.timeInMinutes,
+                instrument: data.instrument ?? "guitar",
                 tabMeasures: data.tablature?.length ?? 0,
                 isPublic: data.isPublic === true,
                 createdAt: data.createdAt?.toDate?.().toISOString() ?? null,
@@ -305,13 +327,13 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
     {
       title: "Create an exercise from a tab",
       description:
-        "Saves a new exercise with a tab as the player's PRIVATE exercise (My exercises) — only the player sees it; publishing is done in the app. The tab (in the format get_tab_format describes) is validated first and nothing is saved if it has errors. Counts toward the daily limit of new exercises.",
+        "Saves a new exercise with a tab as the player's PRIVATE exercise (My exercises) — only the player sees it; publishing is done in the app. The tab (in the format get_tab_format describes) is validated first and nothing is saved if it has errors. Set instrument to bass for a 4-string bass exercise. Counts toward the daily limit of new exercises.",
       inputSchema: exerciseFields,
       annotations: WRITE_TOOL_ANNOTATIONS,
     },
     (fields) =>
       runTool("create_exercise", async () => {
-        const warnings = checkExercise(fields);
+        const warnings = checkExercise(fields, fields.instrument ?? "guitar");
         await consumeWriteQuota(context, "exercise");
         const user = (
           await firestore.collection("users").doc(uid).get()
@@ -370,7 +392,18 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
         const changes = toStored(fields as Partial<ExerciseFields>);
         if (Object.keys(changes).length === 0)
           return errorResult("Nothing to change — pass at least one field.");
-        const warnings = checkExercise(fields as Partial<ExerciseFields>);
+        // A switch of instrument re-checks the stored tab against the new string count.
+        const instrument: Instrument =
+          fields.instrument ?? own.data.instrument ?? "guitar";
+        const warnings = checkExercise(
+          {
+            ...(fields as Partial<ExerciseFields>),
+            tablature:
+              fields.tablature ??
+              (fields.instrument ? own.data.tablature : undefined),
+          },
+          instrument,
+        );
         await consumeWriteQuota(context, "write");
         await own.ref.update({
           ...changes,

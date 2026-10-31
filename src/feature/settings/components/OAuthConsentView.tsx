@@ -5,6 +5,7 @@ import type { User } from "firebase/auth";
 import { useTranslation } from "hooks/useTranslation";
 import { rememberOAuthReturn } from "lib/mcp/oauth/postLoginRedirect";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { auth } from "utils/firebase/client/firebase.utils";
@@ -104,7 +105,15 @@ export const OAuthConsentView = () => {
   return (
     <main className='flex min-h-screen items-center justify-center bg-zinc-950 px-4 py-16'>
       <div className='w-full max-w-md space-y-8 rounded-2xl bg-zinc-900/60 p-8'>
-        <p className='text-sm font-semibold text-zinc-400'>riff.quest</p>
+        {/* Not the shared Logo: that one links home, and leaving this page drops the connection. */}
+        <Image
+          src='/images/longlightlogo.svg'
+          alt='riff.quest'
+          width={176}
+          height={32}
+          className='h-8 w-auto'
+          priority
+        />
 
         {!described || user === undefined ? (
           <div className='flex justify-center py-8'>
