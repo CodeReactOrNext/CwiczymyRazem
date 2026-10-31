@@ -365,6 +365,7 @@
     "copy": "Copy",
     "paste": "Paste",
     "cut": "Cut",
-    "clear_area": "Clear Area"
+    "clear_area": "Clear Area",
+    "bass_blocked": "A bass tab has four strings — clear the notes on strings 5–6 first ({{count}})."
   }
 }

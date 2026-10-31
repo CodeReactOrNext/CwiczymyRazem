@@ -67,7 +67,13 @@ function loadPersistedGain(): number {
   return DEFAULT_GAIN;
 }
 
-export const useAudioAnalyzer = () => {
+export interface GuitarAudioInputOptions {
+  /** The player is on bass — listens down to a five-string's low B (see
+   *  guitarBufferProcessor BASS_*). Read live, so it can change mid-session. */
+  bass?: boolean;
+}
+
+export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {}) => {
   const [state, setState] = useState<AudioAnalyzerState>({
     isListening: false,
     error: null,
@@ -99,6 +105,8 @@ export const useAudioAnalyzer = () => {
   const lastAttackMsRef = useRef<number>(0);
   const lastLowAttackMsRef = useRef<number>(0);
   const inputTapRef = useRef<InputTap | null>(null);
+  const bassRef = useRef(bass);
+  useEffect(() => { bassRef.current = bass; }, [bass]);
 
   const init = useCallback(async () => {
     try {
@@ -174,6 +182,7 @@ export const useAudioAnalyzer = () => {
         getGain: () => inputGainRef.current,
         sampleRate: analysisRate,
         recentAudio,
+        isBass: () => bassRef.current,
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
           lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, inputTapRef,

@@ -1,7 +1,7 @@
 import type { PickStroke, TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { useMemo } from "react";
 
-import { stringRow } from "./tablatureStringRows";
+import { STRING_COUNT, stringRow } from "./tablatureStringRows";
 
 export const STRING_SPACING = 32;
 export const NOTE_RADIUS    = 11;
@@ -10,7 +10,7 @@ export const STRING_COLORS  = ["#f87171", "#fb923c", "#facc15", "#4ade80", "#60a
 
 export interface NoteRD {
   noteKey: string;
-  /** 1–6 string number (1 = high e). */
+  /** 1-based string number (1 = the highest string). */
   string: number;
   noteY: number;
   fret: number;
@@ -85,6 +85,8 @@ export function useTablatureRenderData(
   stringSpacing: number = STRING_SPACING,
   /** Upside-down staff (low E on top). Must match the worker's own flag. */
   flipStrings: boolean = false,
+  /** Lines on the staff — 4 for a bass tab. Must match the worker's own count. */
+  stringCount: number = STRING_COUNT,
 ): TablatureRenderData {
   return useMemo(() => {
     if (!measures) return EMPTY;
@@ -117,7 +119,7 @@ export function useTablatureRenderData(
           return {
             noteKey:       `${mIdx}-${bIdx}-${nIdx}`,
             string:        note.string,
-            noteY:         STAFF_TOP + stringRow(note.string, flipStrings) * stringSpacing,
+            noteY:         STAFF_TOP + stringRow(note.string, flipStrings, stringCount) * stringSpacing,
             fret:          note.fret,
             color:         palette[note.string - 1] ?? "#ffffff",
             isAccented:    note.isAccented,
@@ -143,7 +145,7 @@ export function useTablatureRenderData(
 
         // Highest note = smallest row, which is the LOW E once the staff is
         // flipped — so this has to be picked by row, not by string number.
-        const topRow = beat.notes.length > 0 ? Math.min(...beat.notes.map(n => stringRow(n.string, flipStrings))) : 0;
+        const topRow = beat.notes.length > 0 ? Math.min(...beat.notes.map(n => stringRow(n.string, flipStrings, stringCount))) : 0;
         renderBeats.push({
           offsetX:        currentX,
           duration:       beat.duration,
@@ -192,5 +194,5 @@ export function useTablatureRenderData(
     });
 
     return { totalBeats: currentX, renderBeats, measureEndXs, timeSigMarkers, tupletGroups, tempoMap, hasAccentedNotes: hasAccents, hasDynamics: hasDyn };
-  }, [measures, palette, stringSpacing, flipStrings]);
+  }, [measures, palette, stringSpacing, flipStrings, stringCount]);
 }

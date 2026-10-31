@@ -9,7 +9,9 @@ export type PlaybackState = {
   isMetronomeMuted: boolean;
   speedMultiplier: number;
   showAlphaTabScore: boolean;
-  selectedGpTrackIdx: number;
+  /** The Guitar Pro track the player picked; null until they pick one — the
+   *  session then chooses (the bass track for a bass player, else the first). */
+  selectedGpTrackIdx: number | null;
 };
 
 type PlaybackAction =
@@ -40,7 +42,7 @@ function createInitialState(): PlaybackState {
     isMetronomeMuted: false,
     speedMultiplier: 1,
     showAlphaTabScore: normalizeDefaultViewMode(defaultViewMode) === "notation",
-    selectedGpTrackIdx: 0,
+    selectedGpTrackIdx: null,
   };
 }
 
@@ -95,7 +97,7 @@ function playbackReducer(
         ...state,
         isMetronomeMuted: false,
         speedMultiplier: 1,
-        selectedGpTrackIdx: 0,
+        selectedGpTrackIdx: null,
         ...action.payload,
       };
     default:

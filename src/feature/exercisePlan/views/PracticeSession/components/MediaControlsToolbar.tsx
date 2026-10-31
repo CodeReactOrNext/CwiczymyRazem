@@ -111,7 +111,9 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
     preferredTuning,
     isLocked: isTuningLocked,
     openModal: openTuningSettings,
+    instrument,
   } = useGuitarTuningContext();
+  const tuningKey = instrument === "bass" ? "bass_tuning" : "guitar_tuning";
 
   // In exam mode the speed control is always hidden (tempo is fixed). The backing
   // track (guitar) toggle is hidden too, unless the exam explicitly keeps it
@@ -205,7 +207,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               title={
                 isTuningLocked
                   ? t("media.tuning_locked")
-                  : t("media.guitar_tuning")
+                  : t(`media.${tuningKey}`)
               }
               className={cn(
                 PRESSABLE_KEY,
@@ -388,7 +390,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               title={
                 isTuningLocked
                   ? t("media.tuning_locked")
-                  : t("media.guitar_tuning_named", { name: preferredTuning.name })
+                  : t(`media.${tuningKey}_named`, { name: preferredTuning.name })
               }
               className={cn(
                 PRESSABLE_KEY,
@@ -553,7 +555,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               label={
                 isTuningLocked
                   ? t("media.tuning_locked")
-                  : t("media.guitar_tuning_change")
+                  : t(`media.${tuningKey}_change`)
               }>
               <button
                 type='button'

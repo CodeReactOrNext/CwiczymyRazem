@@ -3,6 +3,7 @@ import type { EarQuizConfig } from "feature/exercisePlan/logic/earQuiz/earQuiz.t
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import type { SongArrangement } from "feature/songs/types/songs.type";
 import type { StaticImageData } from "next/image";
+import type { Instrument } from "utils/audio/tunings";
 
 
 export type DifficultyLevel = "beginner" | "easy" | "medium" | "hard";
@@ -163,6 +164,8 @@ export interface BackingTrack {
   name: string;
   measures: TablatureMeasure[];
   trackType?: TabTrackType;
+  /** Strings on the instrument, when the track says (a Guitar Pro import does) — 4 for most basses. */
+  stringCount?: number;
   pan?: number; // -1.0 (left) to 1.0 (right)
   /** Written by the auto-backing generator rather than imported or authored —
    *  played on the synthesised backing band (feature/autoBacking/synth). */
@@ -207,6 +210,8 @@ export interface Exercise {
     url: string;
   }[];
   tablature?: TablatureMeasure[];
+  /** What the tablature is written for — a bass tab numbers its strings 1 (G) … 4 (E). Absent = guitar. */
+  instrument?: Instrument;
   backingTracks?: BackingTrack[];
   gpFileUrl?: string;
   hideTablatureNotes?: boolean;

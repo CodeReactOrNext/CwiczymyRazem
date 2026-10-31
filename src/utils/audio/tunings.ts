@@ -1,7 +1,16 @@
 import { correctOctaveForLowStrings, getCentsDistance, midiToFrequency, midiToNoteName, STANDARD_OPEN_STRING_MIDI } from "./noteUtils";
 
-/** Semitone offset from standard tuning, per string. Index 0 = string 1 (high E) … index 5 = string 6 (low E). */
+/** Semitone offset from standard GUITAR tuning, per string. Index 0 = string 1 (high E) … index 5 = string 6 (low E).
+ *  A bass is expressed the same way — its G string as string 1 sitting 21 semitones under the guitar's high E —
+ *  so every consumer that turns a string + fret into a pitch (getFrequencyFromTab) needs no idea of the instrument. */
 export type TuningOffsets = readonly [number, number, number, number, number, number];
+
+export type Instrument = "guitar" | "bass";
+
+export const INSTRUMENTS: readonly Instrument[] = ["guitar", "bass"];
+
+export const isInstrument = (value: unknown): value is Instrument =>
+  value === "guitar" || value === "bass";
 
 export interface GuitarTuningPreset {
   id: string;
@@ -9,28 +18,60 @@ export interface GuitarTuningPreset {
   /** Note names low → high, shown as a compact hint next to the name. */
   notation: string;
   offsets: TuningOffsets;
+  instrument: Instrument;
+  /** How many strings the instrument has — 1 … stringCount carry the offsets above, the rest are unused. */
+  stringCount: number;
 }
 
 export const STANDARD_TUNING_ID = "standard";
+export const BASS_STANDARD_TUNING_ID = "bass-standard";
+
+const guitar = (id: string, name: string, notation: string, offsets: TuningOffsets): GuitarTuningPreset =>
+  ({ id, name, notation, offsets, instrument: "guitar", stringCount: 6 });
 
 export const GUITAR_TUNINGS: GuitarTuningPreset[] = [
-  { id: STANDARD_TUNING_ID, name: "Standard",           notation: "E A D G B E",       offsets: [0, 0, 0, 0, 0, 0] },
-  { id: "drop-d",           name: "Drop D",              notation: "D A D G B E",       offsets: [0, 0, 0, 0, 0, -2] },
-  { id: "half-step-down",   name: "Half Step Down",      notation: "Eb Ab Db Gb Bb Eb", offsets: [-1, -1, -1, -1, -1, -1] },
-  { id: "whole-step-down",  name: "Whole Step Down",     notation: "D G C F A D",       offsets: [-2, -2, -2, -2, -2, -2] },
-  { id: "drop-c-sharp",     name: "Drop C#/Db",          notation: "Db Ab Db Gb Bb Eb", offsets: [-1, -1, -1, -1, -1, -3] },
-  { id: "drop-c",           name: "Drop C",              notation: "C G C F A D",       offsets: [-2, -2, -2, -2, -2, -4] },
-  { id: "open-d",           name: "Open D",              notation: "D A D F# A D",      offsets: [-2, -2, -1, 0, 0, -2] },
-  { id: "open-g",           name: "Open G",              notation: "D G D G B D",       offsets: [-2, 0, 0, 0, -2, -2] },
-  { id: "dadgad",           name: "DADGAD",              notation: "D A D G A D",       offsets: [-2, -2, 0, 0, 0, -2] },
+  guitar(STANDARD_TUNING_ID, "Standard",        "E A D G B E",       [0, 0, 0, 0, 0, 0]),
+  guitar("drop-d",           "Drop D",          "D A D G B E",       [0, 0, 0, 0, 0, -2]),
+  guitar("half-step-down",   "Half Step Down",  "Eb Ab Db Gb Bb Eb", [-1, -1, -1, -1, -1, -1]),
+  guitar("whole-step-down",  "Whole Step Down", "D G C F A D",       [-2, -2, -2, -2, -2, -2]),
+  guitar("drop-c-sharp",     "Drop C#/Db",      "Db Ab Db Gb Bb Eb", [-1, -1, -1, -1, -1, -3]),
+  guitar("drop-c",           "Drop C",          "C G C F A D",       [-2, -2, -2, -2, -2, -4]),
+  guitar("open-d",           "Open D",          "D A D F# A D",      [-2, -2, -1, 0, 0, -2]),
+  guitar("open-g",           "Open G",          "D G D G B D",       [-2, 0, 0, 0, -2, -2]),
+  guitar("dadgad",           "DADGAD",          "D A D G A D",       [-2, -2, 0, 0, 0, -2]),
 ];
 
+/** A bass preset from its open strings' MIDI notes, string 1 (highest) first. */
+const bass = (id: string, name: string, notation: string, openMidi: readonly number[]): GuitarTuningPreset => {
+  const offsets = [1, 2, 3, 4, 5, 6].map(string =>
+    string <= openMidi.length ? openMidi[string - 1] - STANDARD_OPEN_STRING_MIDI[string] : 0);
+  return { id, name, notation, offsets: offsets as unknown as TuningOffsets, instrument: "bass", stringCount: openMidi.length };
+};
+
+export const BASS_TUNINGS: GuitarTuningPreset[] = [
+  bass(BASS_STANDARD_TUNING_ID, "Standard",        "E A D G",     [43, 38, 33, 28]),
+  bass("bass-drop-d",          "Drop D",          "D A D G",     [43, 38, 33, 26]),
+  bass("bass-half-step-down",  "Half Step Down",  "Eb Ab Db Gb", [42, 37, 32, 27]),
+  bass("bass-whole-step-down", "Whole Step Down", "D G C F",     [41, 36, 31, 26]),
+  bass("bass-drop-c",          "Drop C",          "C G C F",     [41, 36, 31, 24]),
+  bass("bass-5-standard",      "5-String",        "B E A D G",   [43, 38, 33, 28, 23]),
+];
+
+const ALL_TUNINGS = [...GUITAR_TUNINGS, ...BASS_TUNINGS];
+
+export const getTuningsFor = (instrument: Instrument): GuitarTuningPreset[] =>
+  instrument === "bass" ? BASS_TUNINGS : GUITAR_TUNINGS;
+
+export const getStandardTuningId = (instrument: Instrument): string =>
+  instrument === "bass" ? BASS_STANDARD_TUNING_ID : STANDARD_TUNING_ID;
+
+/** The preset with this id — guitar or bass — falling back to standard guitar tuning. */
 export function getTuningPreset(id: string | null | undefined): GuitarTuningPreset {
-  return GUITAR_TUNINGS.find(t => t.id === id) ?? GUITAR_TUNINGS[0];
+  return ALL_TUNINGS.find(t => t.id === id) ?? GUITAR_TUNINGS[0];
 }
 
 export function isStandardTuning(id: string | null | undefined): boolean {
-  return !id || id === STANDARD_TUNING_ID;
+  return !id || id === STANDARD_TUNING_ID || id === BASS_STANDARD_TUNING_ID;
 }
 
 /**
@@ -49,14 +90,14 @@ export function getUniformTuningShift(offsets?: readonly number[]): number {
 }
 
 export interface TuningStringRef {
-  string: number; // 1-6
+  string: number; // 1 … stringCount
   name: string;   // e.g. "D2"
   hz: number;
 }
 
-/** Reference pitch for each open string under the given tuning, low string (6) first — the order the tuner/calibration wizard walks through. */
+/** Reference pitch for each open string under the given tuning, lowest string first — the order the tuner/calibration wizard walks through. */
 export function getTuningStrings(tuning: GuitarTuningPreset): TuningStringRef[] {
-  return [6, 5, 4, 3, 2, 1].map(string => {
+  return Array.from({ length: tuning.stringCount }, (_, i) => tuning.stringCount - i).map(string => {
     const midi = STANDARD_OPEN_STRING_MIDI[string] + tuning.offsets[string - 1];
     return { string, name: midiToNoteName(midi), hz: midiToFrequency(midi) };
   });

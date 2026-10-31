@@ -37,6 +37,7 @@ import { useEffect, useState } from "react";
 import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
+import type { Instrument } from "utils/audio/tunings";
 
 interface CreateCustomExerciseDialogProps {
   open: boolean;
@@ -82,6 +83,7 @@ export const CreateCustomExerciseDialog = ({
   // GP file state
   const [gpTablature, setGpTablature] = useState<TablatureMeasure[] | null>(null);
   const [gpBackingTracks, setGpBackingTracks] = useState<BackingTrack[] | null>(null);
+  const [gpInstrument, setGpInstrument] = useState<Instrument>("guitar");
   const [gpFileName, setGpFileName] = useState<string | null>(null);
   const [gpRawFile, setGpRawFile] = useState<File | null>(null);
   const [gpFileCleared, setGpFileCleared] = useState(false);
@@ -127,6 +129,7 @@ export const CreateCustomExerciseDialog = ({
         } else if (initialData.tablature && initialData.tablature.length > 0) {
           setGpTablature(initialData.tablature);
           setGpBackingTracks(initialData.backingTracks ?? null);
+          setGpInstrument(initialData.instrument ?? "guitar");
           setGpFileName("(existing GP data)");
         } else {
           setGpFileName(null);
@@ -145,9 +148,11 @@ export const CreateCustomExerciseDialog = ({
     tempo: number,
     trackName: string,
     backingTracks: BackingTrack[],
-    rawFile: File
+    rawFile: File,
+    instrument: Instrument
   ) => {
     setGpTablature(measures);
+    setGpInstrument(instrument);
     setGpBackingTracks(backingTracks);
     setGpFileName(fileName);
     setGpRawFile(rawFile);
@@ -253,6 +258,7 @@ export const CreateCustomExerciseDialog = ({
       // Only store inline tablature when there is no GP file URL — avoids Firestore 1MB limit
       ...(!hasGpFile && gpTablature && { tablature: gpTablature }),
       ...(!hasGpFile && gpBackingTracks && gpBackingTracks.length > 0 && { backingTracks: gpBackingTracks }),
+      ...(!hasGpFile && gpTablature && gpInstrument === "bass" && { instrument: gpInstrument }),
       ...(effectiveGpFileUrl && { gpFileUrl: effectiveGpFileUrl }),
     };
 
@@ -273,6 +279,7 @@ export const CreateCustomExerciseDialog = ({
         imageUrl: newExercise.imageUrl ?? null,
         ...(newExercise.gpFileUrl && { gpFileUrl: newExercise.gpFileUrl }),
         ...(newExercise.backingTracks && { backingTracks: newExercise.backingTracks }),
+        ...(newExercise.instrument && { instrument: newExercise.instrument }),
         // Always private — the plan creator is not a publishing flow. The user
         // can publish it later from My Exercises.
         isPublic: false,

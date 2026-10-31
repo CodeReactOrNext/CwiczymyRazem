@@ -21,6 +21,7 @@ import {
   useTablatureStyle,
 } from "./tablatureSettings";
 import { TablatureSettingsDialog } from "./TablatureSettingsDialog";
+import { tuningGutterStrings } from "./tablatureStringRows";
 import { TablatureViewer } from "./TablatureViewer";
 import { useAutoTabZoom } from "./useAutoTabZoom";
 import {
@@ -100,7 +101,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   const { t } = useTranslation("session");
   const { hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef } = useNoteMatchingContext();
   const { overlay: tabOverlay } = useTabOverlay();
-  const { tuning } = useGuitarTuningContext();
+  const { tuning, stringCount } = useGuitarTuningContext();
   const {
     settings,
     palette,
@@ -152,17 +153,11 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
     zoomScale: MOBILE_FIT,
   });
 
-  // Left-gutter tuning legend, same mapping as the desktop section: the notation
-  // runs low→high, so index 0 is string 6.
+  // Left-gutter tuning legend, same mapping as the desktop section.
   const tuningStrings = useMemo<TuningGutterString[]>(() => {
     if (!settings.showTuningGutter) return [];
-    const names = tuning.notation.split(/\s+/);
-    return [1, 2, 3, 4, 5, 6].map((string) => ({
-      string,
-      label: names[6 - string] ?? "",
-      color: palette[string - 1] ?? "#ffffff",
-    }));
-  }, [tuning.notation, palette, settings.showTuningGutter]);
+    return tuningGutterStrings(tuning.notation, stringCount, palette);
+  }, [tuning.notation, stringCount, palette, settings.showTuningGutter]);
 
   const atMin = zoom <= NOTE_SPACING_MIN + 1e-6;
   const atMax = zoom >= NOTE_SPACING_MAX - 1e-6;
@@ -210,6 +205,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
             zoom={zoom * MOBILE_FIT}
             heightPx={viewerHeight}
             tuningStrings={tuningStrings}
+            stringCount={stringCount}
             style={style}
             ambientGlow={settings.ambientGlow}
             palette={palette}

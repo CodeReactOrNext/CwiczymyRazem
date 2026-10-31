@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { getFrequencyFromTab } from "./noteUtils";
 import {
+  BASS_STANDARD_TUNING_ID,
+  BASS_TUNINGS,
   findNearestTuningString,
+  getStandardTuningId,
   getTuningPreset,
+  getTuningsFor,
   getTuningStrings,
   GUITAR_TUNINGS,
   isStandardTuning,
@@ -56,6 +60,43 @@ describe("tunings", () => {
     const standardFreq = getFrequencyFromTab(1, 0);
     const dropDFreq = getFrequencyFromTab(1, 0, dropD.offsets);
     expect(dropDFreq).toBeCloseTo(standardFreq, 5);
+  });
+});
+
+describe("bass tunings", () => {
+  it("reads a standard bass's open strings an octave under the guitar's four lowest", () => {
+    const standard = getTuningPreset(BASS_STANDARD_TUNING_ID);
+    expect(standard.instrument).toBe("bass");
+    expect(standard.stringCount).toBe(4);
+    expect(getTuningStrings(standard).map(s => s.name)).toEqual(["E1", "A1", "D2", "G2"]);
+  });
+
+  it("turns a string + fret into the bass's pitch through the same offsets", () => {
+    const standard = getTuningPreset(BASS_STANDARD_TUNING_ID);
+    // String 4 (E1), fret 5 = A1; string 1 (G2), fret 12 = G3.
+    expect(getFrequencyFromTab(4, 5, standard.offsets)).toBeCloseTo(55, 3);
+    expect(getFrequencyFromTab(1, 12, standard.offsets)).toBeCloseTo(196, 2);
+  });
+
+  it("gives a five-string its low B as string 5", () => {
+    const five = getTuningPreset("bass-5-standard");
+    expect(five.stringCount).toBe(5);
+    expect(getTuningStrings(five)[0]).toMatchObject({ string: 5, name: "B0" });
+  });
+
+  it("keeps every preset at six offsets and the strings it doesn't have at zero", () => {
+    BASS_TUNINGS.forEach(tuning => {
+      expect(tuning.offsets).toHaveLength(6);
+      tuning.offsets.slice(tuning.stringCount).forEach(offset => expect(offset).toBe(0));
+    });
+  });
+
+  it("lists and defaults per instrument", () => {
+    expect(getTuningsFor("guitar")).toBe(GUITAR_TUNINGS);
+    expect(getTuningsFor("bass")).toBe(BASS_TUNINGS);
+    expect(getStandardTuningId("bass")).toBe(BASS_STANDARD_TUNING_ID);
+    expect(isStandardTuning(BASS_STANDARD_TUNING_ID)).toBe(true);
+    expect(isStandardTuning("bass-drop-d")).toBe(false);
   });
 });
 

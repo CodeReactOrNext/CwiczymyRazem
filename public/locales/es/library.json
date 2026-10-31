@@ -365,6 +365,7 @@
     "copy": "Copiar",
     "paste": "Pegar",
     "cut": "Cortar",
-    "clear_area": "Borrar zona"
+    "clear_area": "Borrar zona",
+    "bass_blocked": "Una tablatura de bajo tiene cuatro cuerdas: primero borra las notas de las cuerdas 5–6 ({{count}})."
   }
 }

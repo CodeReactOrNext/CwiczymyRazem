@@ -288,6 +288,7 @@ export const useTablatureAudio = ({
     duration: number,
     trackType: TabTrackType = "guitar",
     generated = false,
+    trackOffsets?: readonly number[],
   ) => {
     const ctx       = audioContextRef.current;
     const trackGain = trackInputsRef.current[trackId] ?? trackGainsRef.current[trackId];
@@ -331,7 +332,10 @@ export const useTablatureAudio = ({
         bass:        bassPlayerRef.current,
         vocals:      vocalsPlayerRef.current,
       };
-      playStringNote(ctx, note, time, trackGain, Math.max(0.01, duration), trackType, trackId, activeNodesRef.current, players, tuningOffsets);
+      // A track in the player's own tuning carries it; otherwise the shared
+      // offsets retune guitar tracks only (a backing bass keeps standard tuning).
+      const offsets = trackOffsets ?? (trackType === "guitar" ? tuningOffsets : undefined);
+      playStringNote(ctx, note, time, trackGain, Math.max(0.01, duration), trackType, trackId, activeNodesRef.current, players, offsets);
     }
   }, [tuningOffsets]);
 
@@ -436,7 +440,7 @@ export const useTablatureAudio = ({
 
         if (!track.isMuted && !isLate) {
           beat.notes.forEach((n: TablatureNote) => {
-            playNote(n, t, track.id, beatDuration, track.trackType ?? "guitar", track.generated);
+            playNote(n, t, track.id, beatDuration, track.trackType ?? "guitar", track.generated, track.tuningOffsets);
           });
         }
 

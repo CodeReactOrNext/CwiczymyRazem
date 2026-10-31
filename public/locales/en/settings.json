@@ -108,7 +108,8 @@
     "tablature": "Tablature",
     "notifications": "Notifications",
     "security": "Security",
-    "google_auth": "Google OAuth Authentication"
+    "google_auth": "Google OAuth Authentication",
+    "ai": "AI assistants"
   },
   "streak": {
     "title": "Streak",
@@ -116,5 +117,50 @@
     "label": "Rest day",
     "description": "One missed day a week (Monday to Sunday) won't break your streak, though it won't add a day either. Two missed days in a row always end it.",
     "error": "Couldn't save. Try again."
+  },
+  "mcp": {
+    "title": "AI assistants (MCP)",
+    "subtitle": "Connect Claude, Cursor or another AI app to your riff.quest account. It can read your practice, plan sessions and write exercises with tabs.",
+    "server_url": "Server address",
+    "copy": "Copy",
+    "copied": "Copied",
+    "new_token": "New token",
+    "label_placeholder": "Name, e.g. Claude on my laptop",
+    "allow_writes": "Allow changes",
+    "allow_writes_description": "Let the assistant save plans, goals, songs and exercises (up to 20 changes a day). Without it, it can only read.",
+    "create": "Create token",
+    "token_once": "Copy this token now — it won't be shown again.",
+    "claude_code": "Claude Code",
+    "other_clients": "Other apps: add a remote MCP server with this address and the header Authorization: Bearer <token>.",
+    "your_tokens": "Your tokens",
+    "no_tokens": "No tokens yet.",
+    "read_only": "Read only",
+    "read_write": "Read and change",
+    "last_used": "Last used {{date}}",
+    "never_used": "Never used",
+    "revoke": "Revoke",
+    "revoked": "Token revoked",
+    "error": "Something went wrong. Try again.",
+    "connector_hint": "In claude.ai or Claude Desktop: Settings → Connectors → Add custom connector, paste this address and sign in. No token needed.",
+    "connected_apps": "Connected apps",
+    "no_apps": "No apps connected yet.",
+    "connected_on": "Connected {{date}}",
+    "disconnect": "Disconnect",
+    "disconnected": "App disconnected"
+  },
+  "oauth": {
+    "title": "{{app}} wants to connect to your riff.quest account",
+    "subtitle": "It will be able to see your practice history, goals, skills and songs, and use the exercise library.",
+    "returns_to": "After you decide, you'll go back to",
+    "published_by": "App published by",
+    "loopback_warning": "This app runs on your own computer. Only allow it if you started it yourself just now.",
+    "can_read": "Read your practice data — always included.",
+    "signed_in_as": "Signed in as {{name}}",
+    "allow": "Allow",
+    "deny": "Cancel",
+    "sign_in": "Sign in to continue",
+    "invalid_title": "This connection request isn't valid",
+    "invalid_description": "Go back to the app and try connecting again. If it keeps happening, the app may not support riff.quest yet.",
+    "error": "Something went wrong. Try again."
   }
 }

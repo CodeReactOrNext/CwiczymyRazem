@@ -42,6 +42,7 @@ import {
 } from "feature/exercisePlan/utils/pickStrokes";
 import {
   readTabEditorDraft,
+  readTabEditorDraftInstrument,
   saveTabEditorDraft,
 } from "feature/exercisePlan/utils/tabEditorDraft";
 import {
@@ -67,6 +68,8 @@ import {
 } from "feature/exercisePlan/utils/tabSelection";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
+import { InstrumentPicker } from "feature/tuner/components/InstrumentPicker";
+import { useInstrumentPreferenceStore } from "feature/tuner/store/instrumentPreferenceStore";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import type { Translate } from "lib/i18n/translate";
@@ -89,7 +92,8 @@ import {
 } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import type { Instrument } from "utils/audio/tunings";
 
 type ArticulationType =
   | "isHammerOn"
@@ -296,8 +300,11 @@ const beatCellAlign = (width: number) =>
 // one undo instead of flooding the whole buffer.
 const HISTORY_COALESCE_MS = 600;
 
-// String 1 (top row) = high e, string 6 = low E — standard tuning labels.
-const STRING_LABELS = ["e", "B", "G", "D", "A", "E"];
+// String 1 (top row) = the highest string — standard tuning labels per instrument.
+const STRING_LABELS: Record<Instrument, string[]> = {
+  guitar: ["e", "B", "G", "D", "A", "E"],
+  bass: ["G", "D", "A", "E"],
+};
 
 // Row height of one string in the grid — keep in sync with the h-8 cells. Cell
 // *widths* come from the beat's duration instead (see tabGridLayout).
@@ -552,6 +559,10 @@ export default function TabEditor() {
   const [measures, setMeasures] = useState<TablatureMeasure[]>([
     createMeasure(),
   ]);
+  // What the tab is written for — a bass tab has four rows, G on top.
+  const [instrument, setInstrument] = useState<Instrument>("guitar");
+  const stringLabels = STRING_LABELS[instrument];
+  const stringCount = stringLabels.length;
   const [bpm, setBpm] = useState(BPM_FALLBACK);
   // Holds what's literally in the BPM field while it's being typed, so the box
   // can sit empty or half-typed ("12" on the way to "120") instead of snapping
@@ -707,10 +718,11 @@ export default function TabEditor() {
   useEffect(() => {
     let cancelled = false;
 
-    const seed = (initial: TablatureMeasure[]) => {
+    const seed = (initial: TablatureMeasure[], tabInstrument: Instrument) => {
       if (cancelled) return;
       measuresRef.current = initial;
       setMeasures(initial);
+      setInstrument(tabInstrument);
       setHistory({
         entries: [JSON.stringify(initial)],
         idx: 0,
@@ -725,16 +737,17 @@ export default function TabEditor() {
 
       const draft = readTabEditorDraft(editId);
       if (draft && draft.length > 0) {
-        seed(draft);
+        seed(draft, readTabEditorDraftInstrument(editId) ?? "guitar");
         return;
       }
       if (!editId) {
-        seed([createMeasure()]);
+        // A new tab starts on whatever the player plays.
+        seed([createMeasure()], useInstrumentPreferenceStore.getState().instrument);
         return;
       }
       getCommunityExerciseById(editId).then((exercise) => {
         const saved = exercise?.tablature ?? [];
-        seed(saved.length > 0 ? saved : [createMeasure()]);
+        seed(saved.length > 0 ? saved : [createMeasure()], exercise?.instrument ?? "guitar");
       });
     };
 
@@ -751,16 +764,48 @@ export default function TabEditor() {
   // saved draft with the default measures before the restore is committed.
   useEffect(() => {
     if (!isSeeded) return;
-    saveTabEditorDraft(editId, measures);
-  }, [isSeeded, editId, measures]);
+    saveTabEditorDraft(editId, measures, instrument);
+  }, [isSeeded, editId, measures, instrument]);
 
+  // One track, sounding as the instrument it's written for.
+  const audioTracks = useMemo(
+    () => [{ id: "main", measures, volume: 1, isMuted, trackType: instrument }],
+    [measures, isMuted, instrument],
+  );
   useTablatureAudio({
-    measures,
+    tracks: audioTracks,
     bpm,
     isPlaying,
     startTime,
-    isMuted,
   });
+
+  /**
+   * Switches what the tab is written for. Going to bass is refused while
+   * strings 5–6 still hold notes: a bass tab has nowhere to draw them, and
+   * dropping them here would leave undo restoring notes the grid can't show.
+   */
+  const changeInstrument = (next: Instrument) => {
+    if (next === instrument) return;
+    const outOfRange = measures.reduce(
+      (count, measure) =>
+        count +
+        measure.beats.reduce(
+          (beatCount, beat) =>
+            beatCount +
+            beat.notes.filter((note) => note.string > STRING_LABELS[next].length)
+              .length,
+          0,
+        ),
+      0,
+    );
+    if (outOfRange > 0) {
+      showToast(t("tab_editor.bass_blocked", { count: outOfRange }), "error");
+      return;
+    }
+    setInstrument(next);
+    setSelectedCell(null);
+    setActiveSelection(null);
+  };
 
   const startPlayback = () => {
     setStartTime(Date.now());
@@ -863,12 +908,14 @@ export default function TabEditor() {
       fileName: string,
       tempo: number,
       trackName: string,
+      trackInstrument: Instrument,
     ) => {
       if (!importedMeasures || importedMeasures.length === 0) {
         showToast(t("tab_editor.no_track_notes"), "error");
         return;
       }
       commit(importedMeasures);
+      setInstrument(trackInstrument);
       if (tempo > 0) setBpm(Math.round(tempo));
       setSelectedCell(null);
       setActiveSelection(null);
@@ -1379,7 +1426,7 @@ export default function TabEditor() {
         const notes = [...targetBeat.notes];
         beat.notes.forEach((note) => {
           const string = note.string + stringOffset;
-          if (string < 1 || string > 6) return;
+          if (string < 1 || string > stringCount) return;
           const existing = notes.findIndex((n) => n.string === string);
           const pasted = { ...note, string };
           if (existing > -1) notes[existing] = pasted;
@@ -1415,7 +1462,7 @@ export default function TabEditor() {
       commit(next);
       showToast(t("tab_editor.pattern_applied"), "success");
     },
-    [clipboard, selectedCell, commit, showToast, t],
+    [clipboard, selectedCell, stringCount, commit, showToast, t],
   );
 
   const handleCopySelection = useCallback(() => {
@@ -1724,13 +1771,14 @@ export default function TabEditor() {
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
         setActiveSelection(null);
-        if (stringIdx < 5)
+        if (stringIdx < stringCount - 1)
           setSelectedCell({ ...selectedCell, stringIdx: stringIdx + 1 });
       }
     },
     [
       selectedCell,
       measures,
+      stringCount,
       handlePasteAtCursor,
       handleCopySelection,
       handleDeleteSelection,
@@ -2010,7 +2058,7 @@ export default function TabEditor() {
     const bIdx = beatIndexAtX(measures[mIdx].beats, e.clientX - rect.left);
     const sIdx = Math.max(
       0,
-      Math.min(5, Math.floor((e.clientY - rect.top) / CELL_SIZE)),
+      Math.min(stringCount - 1, Math.floor((e.clientY - rect.top) / CELL_SIZE)),
     );
     return { bIdx, sIdx };
   };
@@ -2061,6 +2109,12 @@ export default function TabEditor() {
             </div>
 
             <div className='flex flex-wrap items-center gap-3'>
+              <InstrumentPicker
+                value={instrument}
+                onChange={changeInstrument}
+                size='sm'
+                className='w-44'
+              />
               <div className='flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/60 p-1'>
                 <button
                   onClick={() => setIsGpModalOpen(true)}
@@ -2228,7 +2282,7 @@ export default function TabEditor() {
 
               <Button
                 onClick={() => {
-                  saveTabEditorDraft(editId, measures);
+                  saveTabEditorDraft(editId, measures, instrument);
                   router.push(
                     editId
                       ? `/tab-editor/publish?edit=${editId}`
@@ -2285,12 +2339,16 @@ export default function TabEditor() {
                       fileName,
                       tempo,
                       trackName,
+                      _backingTracks,
+                      _rawFile,
+                      trackInstrument,
                     ) =>
                       handleGpImported(
                         importedMeasures,
                         fileName,
                         tempo,
                         trackName,
+                        trackInstrument,
                       )
                     }
                   />
@@ -2310,6 +2368,7 @@ export default function TabEditor() {
             <div className='relative p-4'>
               <TablatureViewer
                 measures={measures}
+                stringCount={stringCount}
                 bpm={bpm}
                 isPlaying={isPlaying}
                 startTime={startTime}
@@ -2346,7 +2405,7 @@ export default function TabEditor() {
             </div>
             <div className='p-5'>
               <div className='flex'>
-                {/* String labels (standard tuning, high e on top) */}
+                {/* String labels (standard tuning, highest string on top) */}
                 <div className='mr-2 flex flex-col pt-[25px]'>
                   {/* Lane legend — lines up with the picking row above the strings. */}
                   <span
@@ -2354,7 +2413,7 @@ export default function TabEditor() {
                     title={t("tab_editor.picking_direction")}>
                     <PickStrokeIcon stroke='down' size={10} />
                   </span>
-                  {STRING_LABELS.map((label, sIdx) => (
+                  {stringLabels.map((label, sIdx) => (
                     <span
                       key={sIdx}
                       className='flex h-8 w-5 items-center justify-end pr-1 text-[10px] font-bold text-zinc-500'>
@@ -2607,7 +2666,7 @@ export default function TabEditor() {
                                       startsGroup(bIdx) &&
                                         "border-l border-zinc-800",
                                     )}>
-                                    {[0, 1, 2, 3, 4, 5].map((sIdx) => {
+                                    {stringLabels.map((_, sIdx) => {
                                       const note = beat.notes.find(
                                         (n) => n.string === sIdx + 1,
                                       );
@@ -2742,7 +2801,7 @@ export default function TabEditor() {
                                           endMeasure: mIdx,
                                           endBeat: bIdx,
                                           startString: 0,
-                                          endString: 5,
+                                          endString: stringCount - 1,
                                         }));
                                         return;
                                       }
@@ -2757,7 +2816,7 @@ export default function TabEditor() {
                                         endMeasure: mIdx,
                                         endBeat: bIdx,
                                         startString: 0,
-                                        endString: 5,
+                                        endString: stringCount - 1,
                                       });
                                     }}
                                     title={t(
@@ -2834,7 +2893,7 @@ export default function TabEditor() {
                       {t("tab_editor.cell_summary", {
                         measure: selectedCell.measureIdx + 1,
                         beat: selectedCell.beatIdx + 1,
-                        string: STRING_LABELS[selectedCell.stringIdx],
+                        string: stringLabels[selectedCell.stringIdx],
                       })}
                     </>
                   )}

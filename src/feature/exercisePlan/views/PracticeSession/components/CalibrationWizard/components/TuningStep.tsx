@@ -85,7 +85,7 @@ export const TuningStep = React.memo(function TuningStep({
           className="text-center text-sm text-zinc-400 mb-2"
         >
           Play open string{" "}<span className="text-white font-bold">{str.name}</span>
-          {str.id === 6 ? " — thickest" : str.id === 1 ? " — thinnest" : ""}
+          {str.id === strings.length ? " — thickest" : str.id === 1 ? " — thinnest" : ""}
         </motion.p>
       </AnimatePresence>
 

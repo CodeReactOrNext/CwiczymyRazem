@@ -24,7 +24,10 @@
     "mic_tools_hint": "Mikrofon-Tools: Neu kalibrieren, Stimmgerät, Fehlerbehebung",
     "mic_tools": "Mikrofon-Tools",
     "mic_not_working": "Mikrofon funktioniert nicht?",
-    "boost_hint": "Hebe die Guitar-Pro-Wiedergabe über 100 % an, wenn sie zu leise ist."
+    "boost_hint": "Hebe die Guitar-Pro-Wiedergabe über 100 % an, wenn sie zu leise ist.",
+    "bass_tuning": "Bassstimmung",
+    "bass_tuning_named": "Bassstimmung: {{name}}",
+    "bass_tuning_change": "Bassstimmung – zum Ändern klicken"
   },
   "mic_help": {
     "title": "Mikrofon-Fehlerbehebung",
@@ -552,7 +555,14 @@
     "tap_tone": "Tippe auf einen Ton, um ihn aufzudecken"
   },
   "tuning_modal": {
-    "description": "Wähle, wie deine Gitarre gestimmt ist — Tonerkennung und Begleitaudio werden an diese Stimmung angepasst."
+    "description": "Wähle, wie deine Gitarre gestimmt ist — Tonerkennung und Begleitaudio werden an diese Stimmung angepasst.",
+    "instrument": "Instrument",
+    "guitar": "Gitarre",
+    "bass": "Bass",
+    "tunings": "Stimmung",
+    "bass_description": "Wähle, wie dein Bass gestimmt ist — Tonerkennung und Begleitaudio werden an diese Stimmung angepasst.",
+    "instrument_lock_bass": "Diese Übung ist für Bass geschrieben.",
+    "instrument_lock_guitar": "Diese Übung ist für Gitarre geschrieben."
   },
   "header": {
     "close_session": "Session schließen",

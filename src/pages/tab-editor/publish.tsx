@@ -16,6 +16,7 @@ import { hasTablatureNotes } from "feature/exercisePlan/utils/hasTablatureNotes"
 import {
   clearTabEditorDraft,
   readTabEditorDraft,
+  readTabEditorDraftInstrument,
 } from "feature/exercisePlan/utils/tabEditorDraft";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
@@ -41,6 +42,7 @@ import type { ReactElement, ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
+import type { Instrument } from "utils/audio/tunings";
 
 const CATEGORIES: { value: ExerciseCategory; label: string }[] = [
   { value: "technique", label: "Technique" },
@@ -136,6 +138,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
   const publishRequested = router.query.publish === "1";
 
   const [tablature, setTablature] = useState<TablatureMeasure[]>([]);
+  const [instrument, setInstrument] = useState<Instrument>("guitar");
   // A Guitar Pro upload from the plan creator. The Tab Editor can't open those,
   // so the way back leads to My Exercises instead of an empty grid.
   const [hasGpFile, setHasGpFile] = useState(false);
@@ -159,7 +162,10 @@ const PublishExercisePage: NextPageWithLayout = () => {
   useEffect(() => {
     if (!router.isReady) return;
     const draft = readTabEditorDraft(editId);
-    if (draft) setTablature(draft);
+    if (draft) {
+      setTablature(draft);
+      setInstrument(readTabEditorDraftInstrument(editId) ?? "guitar");
+    }
   }, [router.isReady, editId]);
 
   // In edit mode, load the existing exercise and prefill the form.
@@ -184,6 +190,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
       setHasGpFile(!!ex.gpFileUrl);
       // Fall back to the saved tablature if the editor draft was lost.
       setTablature((prev) => (prev.length > 0 ? prev : (ex.tablature ?? [])));
+      if (!readTabEditorDraft(editId)) setInstrument(ex.instrument ?? "guitar");
     });
   }, [editId, publishRequested]);
 
@@ -227,6 +234,8 @@ const PublishExercisePage: NextPageWithLayout = () => {
       instructions: instructions.filter((i) => i.trim()),
       tips: tips.filter((t) => t.trim()),
       tablature: hasTab ? tablature : [],
+      // Always written, so turning a bass tab back into a guitar one sticks on update.
+      instrument,
       isPublic,
     };
 
@@ -421,6 +430,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   <div className='overflow-hidden rounded-lg'>
                     <TablatureViewer
                       measures={tablature}
+                      stringCount={instrument === "bass" ? 4 : undefined}
                       bpm={80}
                       isPlaying={false}
                       startTime={null}

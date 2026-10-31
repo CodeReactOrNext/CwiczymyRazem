@@ -1,3 +1,4 @@
+import type { GuitarAudioInputOptions } from "./useAudioAnalyzer";
 import { useAudioAnalyzer } from "./useAudioAnalyzer";
 import { useNativeAudioAnalyzer } from "./useNativeAudioAnalyzer";
 
@@ -20,9 +21,9 @@ import { useNativeAudioAnalyzer } from "./useNativeAudioAnalyzer";
  * need their own `window.nativeAudio` check to offer interface selection or
  * connection status.
  */
-export const useGuitarAudioInput = () => {
-  const web = useAudioAnalyzer();
-  const native = useNativeAudioAnalyzer();
+export const useGuitarAudioInput = (options: GuitarAudioInputOptions = {}) => {
+  const web = useAudioAnalyzer(options);
+  const native = useNativeAudioAnalyzer(options);
 
   const isNative = typeof window !== "undefined" && !!window.nativeAudio;
   return isNative

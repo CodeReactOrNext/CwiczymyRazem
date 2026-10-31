@@ -28,8 +28,11 @@ export const TunerPanel = ({
   onInstrumentChange,
   onTuningChange,
 }: TunerPanelProps) => {
-  const { isListening, error, init, close, audioRefs } = useAudioAnalyzer();
   const strings = useMemo(() => getTunerStrings(tuning), [tuning]);
+  // A bass's low E (41 Hz) sits under what the guitar detector can hear.
+  const { isListening, error, init, close, audioRefs } = useAudioAnalyzer({
+    bass: strings.some((string) => string.hz < 50),
+  });
   const { cents, hasNote, activeIndex, tuned } = useStringTuner(
     audioRefs.frequencyRef,
     audioRefs.volumeRef,

@@ -365,6 +365,7 @@
     "copy": "Kopieren",
     "paste": "Einfügen",
     "cut": "Ausschneiden",
-    "clear_area": "Bereich leeren"
+    "clear_area": "Bereich leeren",
+    "bass_blocked": "Ein Bass-Tab hat vier Saiten — entferne zuerst die Noten auf den Saiten 5–6 ({{count}})."
   }
 }

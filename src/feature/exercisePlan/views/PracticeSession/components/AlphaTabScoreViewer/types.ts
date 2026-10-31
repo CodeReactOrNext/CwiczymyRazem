@@ -15,6 +15,8 @@ export interface AlphaTabScoreViewerProps {
   measures?: TablatureMeasure[];
   /** Tempo baked into the generated alphaTex when there's no rawGpFile (ignored otherwise). */
   baseTempo?: number;
+  /** Staff metadata for the generated alphaTex — a bass's strings and clef (alphaTexStaffHeader). */
+  staffHeader?: string;
   /** "score" = standard notation, "tab" = guitar tablature */
   mode?: "score" | "tab";
   /** True only after count-in — mirrors session's isAudioPlaying */

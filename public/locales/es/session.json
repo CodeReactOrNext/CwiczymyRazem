@@ -24,7 +24,10 @@
     "mic_tools_hint": "Herramientas del micrófono: recalibrar, afinador, solución de problemas",
     "mic_tools": "Herramientas del micrófono",
     "mic_not_working": "¿No funciona el micrófono?",
-    "boost_hint": "Sube la reproducción de Guitar Pro por encima del 100 % si suena demasiado baja."
+    "boost_hint": "Sube la reproducción de Guitar Pro por encima del 100 % si suena demasiado baja.",
+    "bass_tuning": "Afinación del bajo",
+    "bass_tuning_named": "Afinación del bajo: {{name}}",
+    "bass_tuning_change": "Afinación del bajo: haz clic para cambiarla"
   },
   "mic_help": {
     "title": "Problemas con el micrófono",
@@ -552,7 +555,14 @@
     "tap_tone": "Toca una nota para revelarla"
   },
   "tuning_modal": {
-    "description": "Elige cómo está afinada tu guitarra — la detección de tono y el audio de acompañamiento se ajustarán a esta afinación."
+    "description": "Elige cómo está afinada tu guitarra — la detección de tono y el audio de acompañamiento se ajustarán a esta afinación.",
+    "instrument": "Instrumento",
+    "guitar": "Guitarra",
+    "bass": "Bajo",
+    "tunings": "Afinación",
+    "bass_description": "Elige cómo está afinado tu bajo — la detección de tono y el audio de acompañamiento se ajustarán a esta afinación.",
+    "instrument_lock_bass": "Este ejercicio está escrito para bajo.",
+    "instrument_lock_guitar": "Este ejercicio está escrito para guitarra."
   },
   "header": {
     "close_session": "Cerrar sesión de práctica",

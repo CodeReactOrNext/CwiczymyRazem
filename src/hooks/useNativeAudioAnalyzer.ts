@@ -8,7 +8,7 @@ import { createRecentAudio, RECENT_AUDIO_SECONDS } from "utils/audio/recentAudio
 
 import type { DetectedNoteEvent, InputTap } from "./guitarBufferProcessor";
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
-import type { AudioRefs } from "./useAudioAnalyzer";
+import type { AudioRefs, GuitarAudioInputOptions } from "./useAudioAnalyzer";
 import { readPersistedChannel } from "./useNativeAudioDevices";
 
 // Mirrors useAudioAnalyzer's public contract so PracticeSession is agnostic to
@@ -57,7 +57,7 @@ interface NativeAnalyzerState {
   connectionStatus: ConnectionIssueInfo["status"] | "ok";
 }
 
-export const useNativeAudioAnalyzer = () => {
+export const useNativeAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {}) => {
   const [state, setState] = useState<NativeAnalyzerState>({
     isListening: false,
     error: null,
@@ -91,6 +91,8 @@ export const useNativeAudioAnalyzer = () => {
   const spectrumRef = useRef<PcmSpectrum | null>(null);
   const recentAudioRef = useRef<RecentAudio | null>(null);
   const inputTapRef = useRef<InputTap | null>(null);
+  const bassRef = useRef(bass);
+  useEffect(() => { bassRef.current = bass; }, [bass]);
 
   // Accumulator: native blocks (e.g. 256 frames) → 2048-sample analysis windows
   const windowBufRef = useRef<Float32Array>(new Float32Array(WINDOW_SIZE));
@@ -273,6 +275,7 @@ export const useNativeAudioAnalyzer = () => {
         sampleRate: info.sampleRate,
         spectrum,
         recentAudio,
+        isBass: () => bassRef.current,
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
           lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, inputTapRef,

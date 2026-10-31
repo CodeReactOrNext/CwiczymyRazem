@@ -28,6 +28,7 @@ export const communityToExercise = (ce: CommunityExercise): Exercise => ({
   metronomeSpeed: ce.metronomeSpeed,
   relatedSkills: ce.relatedSkills,
   tablature: ce.tablature,
+  ...(ce.instrument === "bass" && { instrument: ce.instrument }),
   videoUrl: ce.videoUrl,
   imageUrl: ce.imageUrl,
   gpFileUrl: ce.gpFileUrl,

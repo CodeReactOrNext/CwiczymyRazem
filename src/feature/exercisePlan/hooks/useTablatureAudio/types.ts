@@ -10,6 +10,10 @@ export interface AudioTrackConfig {
   pan?:       number; // -1.0 (left) to 1.0 (right)
   /** See BackingTrack.generated. */
   generated?: boolean;
+  /** The player's own tuning (offsets from standard GUITAR strings, see
+   *  TuningOffsets) for the track they play — pitches it even when it's a bass.
+   *  Takes over from `tuningOffsets` below for this track. */
+  tuningOffsets?: readonly number[];
 }
 
 export interface UseTablatureAudioProps {

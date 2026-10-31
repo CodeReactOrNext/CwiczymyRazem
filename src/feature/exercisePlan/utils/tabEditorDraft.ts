@@ -1,3 +1,5 @@
+import type { Instrument } from "utils/audio/tunings";
+
 import type { TablatureMeasure } from "../types/exercise.types";
 
 const DRAFT_KEY = "tab-editor-draft";
@@ -6,6 +8,8 @@ type StoredDraft = {
   /** Community exercise the draft belongs to, or null for a brand new one. */
   exerciseId: string | null;
   measures: TablatureMeasure[];
+  /** What the tab is written for; absent in drafts from before the bass. */
+  instrument?: Instrument;
 };
 
 /**
@@ -18,9 +22,10 @@ type StoredDraft = {
 export const saveTabEditorDraft = (
   exerciseId: string | null,
   measures: TablatureMeasure[],
+  instrument: Instrument = "guitar",
 ) => {
   try {
-    const draft: StoredDraft = { exerciseId, measures };
+    const draft: StoredDraft = { exerciseId, measures, instrument };
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
   } catch {}
 };
@@ -47,6 +52,23 @@ export const readTabEditorDraft = (
     if (!draft || !Array.isArray(draft.measures)) return null;
     if ((draft.exerciseId ?? null) !== exerciseId) return null;
     return draft.measures;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * The instrument the stored draft is written for, under the same ownership
+ * rule as readTabEditorDraft — null when the draft is another exercise's or
+ * there is none, so the caller falls back to the exercise's own.
+ */
+export const readTabEditorDraftInstrument = (
+  exerciseId: string | null,
+): Instrument | null => {
+  if (!readTabEditorDraft(exerciseId)) return null;
+  try {
+    const parsed = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? "null");
+    return parsed?.instrument === "bass" ? "bass" : "guitar";
   } catch {
     return null;
   }

@@ -1,7 +1,8 @@
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { BASS_STANDARD_TUNING_ID, getTuningPreset, STANDARD_TUNING_ID } from "utils/audio/tunings";
 import { describe, expect, it } from "vitest";
 
-import { tablatureToAlphaTex } from "./tablatureToAlphaTex";
+import { alphaTexStaffHeader, tablatureToAlphaTex } from "./tablatureToAlphaTex";
 
 describe("tablatureToAlphaTex", () => {
   it("renders plain quarter notes with tempo + time signature header", () => {
@@ -253,5 +254,22 @@ describe("tablatureToAlphaTex", () => {
     ];
 
     expect(tablatureToAlphaTex(measures, 120)).toBe("\\tempo 120 \\ts 4 4 12.1{be (0 0 30 2 60 0)}.4 |");
+  });
+});
+
+describe("tablatureToAlphaTex on bass", () => {
+  const bar: TablatureMeasure[] = [
+    { timeSignature: [4, 4], beats: [{ notes: [{ string: 4, fret: 0 }], duration: 4 }] },
+  ];
+
+  it("gives a bass its strings, the bass clef and a bass sound before the first bar", () => {
+    const header = alphaTexStaffHeader(getTuningPreset(BASS_STANDARD_TUNING_ID));
+    expect(header).toBe("\\instrument 33 \\tuning (G2 D2 A1 E1) \\clef F4");
+    expect(tablatureToAlphaTex(bar, 120, header).startsWith(`${header} \\tempo 120`)).toBe(true);
+  });
+
+  it("leaves a guitar's tab as it was", () => {
+    expect(alphaTexStaffHeader(getTuningPreset(STANDARD_TUNING_ID))).toBe("");
+    expect(tablatureToAlphaTex(bar, 120, "")).toBe(tablatureToAlphaTex(bar, 120));
   });
 });

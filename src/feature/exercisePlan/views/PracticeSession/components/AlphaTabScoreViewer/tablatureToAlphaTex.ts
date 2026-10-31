@@ -1,4 +1,6 @@
 import type { TablatureBeat, TablatureMeasure, TablatureNote } from "feature/exercisePlan/types/exercise.types";
+import { midiToNoteName, STANDARD_OPEN_STRING_MIDI } from "utils/audio/noteUtils";
+import type { GuitarTuningPreset } from "utils/audio/tunings";
 
 // alphaTex duration codes are the denominator of the note value (4 = quarter, 8 = eighth, …).
 // Our own model stores duration as a fraction of a quarter note, so the code is 4 / duration.
@@ -192,12 +194,29 @@ function effectiveTimeSignature(beats: TablatureBeat[], timeSignature: [number, 
  * Pro file. Lets the ~180 built-in exercises (which only ever ship `tablature`,
  * never a `.gp` file) render standard notation, not just tab.
  */
-export function tablatureToAlphaTex(measures: TablatureMeasure[], baseTempo = 120): string {
+/**
+ * Staff metadata for a tab that isn't on a six-string guitar — a bass gets its
+ * own open strings, the bass clef and a bass sound for the score's playback.
+ * Empty for a guitar, which is what AlphaTab assumes anyway.
+ */
+export function alphaTexStaffHeader(
+  tuning: Pick<GuitarTuningPreset, "instrument" | "offsets" | "stringCount">,
+): string {
+  if (tuning.instrument !== "bass") return "";
+  const openStrings = Array.from({ length: tuning.stringCount }, (_, i) =>
+    midiToNoteName(STANDARD_OPEN_STRING_MIDI[i + 1] + tuning.offsets[i]));
+  // GM program 33 = Electric Bass (finger).
+  return `\\instrument 33 \\tuning (${openStrings.join(" ")}) \\clef F4`;
+}
+
+export function tablatureToAlphaTex(measures: TablatureMeasure[], baseTempo = 120, staffHeader = ""): string {
   let prevTimeSignature: [number, number] | null = null;
   const hammerPullOrigins = collectHammerPullOrigins(measures);
 
   const bars = measures.map((measure, index) => {
     const meta: string[] = [];
+    // Staff metadata has to come before the first bar's own.
+    if (index === 0 && staffHeader) meta.push(staffHeader);
     if (index === 0) meta.push(`\\tempo ${Math.round(baseTempo)}`);
     if (measure.tempoChange) meta.push(`\\tempo ${Math.round(baseTempo * measure.tempoChange)}`);
     const [numerator, denominator] = effectiveTimeSignature(measure.beats, measure.timeSignature);

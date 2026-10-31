@@ -1,5 +1,4 @@
 import { Badge } from "assets/components/ui/badge";
-import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { Button } from "assets/components/ui/button";
 import {
   Dialog,
@@ -7,14 +6,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { useTablatureStyle } from "feature/exercisePlan/views/PracticeSession/components/tablatureSettings";
+import { tuningGutterStrings } from "feature/exercisePlan/views/PracticeSession/components/tablatureStringRows";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import type { TuningGutterString } from "feature/exercisePlan/views/PracticeSession/components/useTablatureWorkerBridge";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
 import { Clock, Play } from "lucide-react";
 import { useMemo } from "react";
+import { getStandardTuningId, getTuningPreset } from "utils/audio/tunings";
 import { convertMsToHMS } from "utils/converter";
 
 import { ExercisePreviewActions } from "./ExercisePreviewActions";
@@ -27,9 +29,6 @@ interface ExercisePreviewDialogProps {
    *  building a plan and picking exercises for it. */
   hidePlanActions?: boolean;
 }
-
-/** Standard tuning, low→high — exercises are written for it. */
-const STANDARD_TUNING = ["E", "A", "D", "G", "B", "E"];
 
 // Same size the settings preview draws the tab at.
 const PREVIEW_HEIGHT = 340;
@@ -49,14 +48,12 @@ export function ExercisePreviewDialog({
   // preview reads exactly like the tab they get in the session.
   const { settings, palette, isLightBoard, style } = useTablatureStyle();
 
+  // Exercises are written for standard tuning — a bass's when they're for bass.
+  const tuning = getTuningPreset(getStandardTuningId(exercise?.instrument ?? "guitar"));
   const tuningStrings = useMemo<TuningGutterString[]>(() => {
     if (!settings.showTuningGutter) return [];
-    return [1, 2, 3, 4, 5, 6].map((string) => ({
-      string,
-      label: STANDARD_TUNING[6 - string] ?? "",
-      color: palette[string - 1] ?? "#ffffff",
-    }));
-  }, [palette, settings.showTuningGutter]);
+    return tuningGutterStrings(tuning.notation, tuning.stringCount, palette);
+  }, [tuning, palette, settings.showTuningGutter]);
 
   if (!exercise) return null;
 
@@ -130,6 +127,7 @@ export function ExercisePreviewDialog({
                     style={style}
                     palette={palette}
                     tuningStrings={tuningStrings}
+                    stringCount={tuning.stringCount}
                     ambientGlow={false}
                     isLightBoard={isLightBoard}
                   />

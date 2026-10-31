@@ -6,6 +6,7 @@ import type { TablatureMeasure } from "../types/exercise.types";
 import {
   clearTabEditorDraft,
   readTabEditorDraft,
+  readTabEditorDraftInstrument,
   saveTabEditorDraft,
 } from "./tabEditorDraft";
 
@@ -63,5 +64,22 @@ describe("tabEditorDraft", () => {
     clearTabEditorDraft();
     expect(readTabEditorDraft("ex-1")).toBeNull();
     expect(localStorage.getItem(DRAFT_KEY)).toBeNull();
+  });
+});
+
+describe("tabEditorDraft instrument", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("remembers a bass tab with its own exercise only", () => {
+    saveTabEditorDraft("ex-1", measures(3), "bass");
+    expect(readTabEditorDraftInstrument("ex-1")).toBe("bass");
+    expect(readTabEditorDraftInstrument("ex-2")).toBeNull();
+  });
+
+  it("reads a draft from before the bass as guitar", () => {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ exerciseId: null, measures: measures(1) }));
+    expect(readTabEditorDraftInstrument(null)).toBe("guitar");
   });
 });

@@ -51,6 +51,7 @@ const buildChallenge = (ex: CommunityExercise): DashboardExercise => ({
       metronomeSpeed: ex.metronomeSpeed,
       relatedSkills: ex.relatedSkills,
       tablature: ex.tablature,
+      ...(ex.instrument === "bass" && { instrument: ex.instrument }),
       // Set on exercises saved from the plan creator instead of the Tab Editor —
       // without the GP file a published one opens as an empty exercise.
       videoUrl: ex.videoUrl,
@@ -328,6 +329,7 @@ const ExerciseDetails = ({
       <div className='overflow-hidden rounded-lg border border-zinc-800'>
         <TablatureViewer
           measures={exercise.tablature}
+          stringCount={exercise.instrument === "bass" ? 4 : undefined}
           bpm={exercise.metronomeSpeed?.recommended ?? 80}
           isPlaying={false}
           startTime={null}

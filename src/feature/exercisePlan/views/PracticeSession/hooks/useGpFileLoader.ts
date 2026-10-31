@@ -43,6 +43,7 @@ export function useGpFileLoader({ rawGpFile, gpFileUrl, exerciseTitle }: UseGpFi
           name:      t.name,
           measures:  t.measures,
           trackType: t.trackType as BackingTrack["trackType"],
+          stringCount: t.stringCount,
           pan:       t.pan,
         })));
         setGpTempo(data.tempo > 0 ? data.tempo : null);

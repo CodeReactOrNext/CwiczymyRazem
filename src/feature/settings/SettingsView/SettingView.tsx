@@ -15,6 +15,7 @@ import EmailChange from "feature/settings/components/EmailChange";
 import EmailNotificationSettings from "feature/settings/components/EmailNotificationSettings";
 import { GuitarStartDate } from "feature/settings/components/GuitarStartDate";
 import { LanguageSettings } from "feature/settings/components/LanguageSettings";
+import { McpTokensSettings } from "feature/settings/components/McpTokensSettings";
 import MediaLinks from "feature/settings/components/MediaLinks";
 import PasswordChange from "feature/settings/components/PasswordChange";
 import ProfileBasics from "feature/settings/components/ProfileBasics";
@@ -25,7 +26,7 @@ import SettingsLayout from "feature/settings/SettingsLayout";
 import { getUserProvider } from "feature/user/store/userSlice.asyncThunk";
 import type { UserInfo } from "firebase/auth";
 import { useTranslation } from "hooks/useTranslation";
-import { Bell, Guitar, Lock, Share2, User } from "lucide-react";
+import { Bell, Bot, Guitar, Lock, Share2, User } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "store/hooks";
@@ -35,6 +36,7 @@ const SETTINGS_TABS = [
   { value: "socials", label: "Social Media", Icon: Share2 },
   { value: "tablature", label: "Tablature", Icon: Guitar },
   { value: "notifications", label: "Notifications", Icon: Bell },
+  { value: "ai", label: "AI assistants", Icon: Bot },
   { value: "security", label: "Security", Icon: Lock },
 ] as const;
 
@@ -109,6 +111,10 @@ const SettingsView = () => {
 
             <TabsContent value="notifications" className="mt-0">
               <EmailNotificationSettings />
+            </TabsContent>
+
+            <TabsContent value="ai" className="mt-0">
+              <McpTokensSettings />
             </TabsContent>
 
             <TabsContent value="security" className="mt-0 space-y-6">

@@ -108,7 +108,8 @@
     "tablature": "Tabulatura",
     "notifications": "Powiadomienia",
     "security": "Bezpieczeństwo",
-    "google_auth": "Logowanie przez Google"
+    "google_auth": "Logowanie przez Google",
+    "ai": "Asystenci AI"
   },
   "streak": {
     "title": "Seria",
@@ -116,5 +117,50 @@
     "label": "Dzień przerwy",
     "description": "Jeden opuszczony dzień w tygodniu (od poniedziałku do niedzieli) nie przerywa serii, ale też jej nie wydłuża. Dwa dni przerwy pod rząd zawsze ją kończą.",
     "error": "Nie udało się zapisać. Spróbuj ponownie."
+  },
+  "mcp": {
+    "title": "Asystenci AI (MCP)",
+    "subtitle": "Podłącz Claude, Cursora albo inną aplikację AI do swojego konta riff.quest. Będzie widzieć Twoje ćwiczenie, planować sesje i pisać ćwiczenia z tabami.",
+    "server_url": "Adres serwera",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano",
+    "new_token": "Nowy token",
+    "label_placeholder": "Nazwa, np. Claude na laptopie",
+    "allow_writes": "Pozwól na zmiany",
+    "allow_writes_description": "Asystent może zapisywać plany, cele, utwory i ćwiczenia (do 20 zmian dziennie). Bez tego tylko czyta.",
+    "create": "Utwórz token",
+    "token_once": "Skopiuj ten token teraz — nie pokażemy go ponownie.",
+    "claude_code": "Claude Code",
+    "other_clients": "Inne aplikacje: dodaj zdalny serwer MCP z tym adresem i nagłówkiem Authorization: Bearer <token>.",
+    "your_tokens": "Twoje tokeny",
+    "no_tokens": "Nie masz jeszcze tokenów.",
+    "read_only": "Tylko odczyt",
+    "read_write": "Odczyt i zmiany",
+    "last_used": "Ostatnio użyty {{date}}",
+    "never_used": "Jeszcze nie użyty",
+    "revoke": "Unieważnij",
+    "revoked": "Token unieważniony",
+    "error": "Coś poszło nie tak. Spróbuj ponownie.",
+    "connector_hint": "W claude.ai lub Claude Desktop: Ustawienia → Konektory → Dodaj własny konektor, wklej ten adres i zaloguj się. Token nie jest potrzebny.",
+    "connected_apps": "Połączone aplikacje",
+    "no_apps": "Nie masz jeszcze połączonych aplikacji.",
+    "connected_on": "Połączono {{date}}",
+    "disconnect": "Odłącz",
+    "disconnected": "Aplikacja odłączona"
+  },
+  "oauth": {
+    "title": "{{app}} chce połączyć się z Twoim kontem riff.quest",
+    "subtitle": "Będzie widzieć Twoją historię ćwiczeń, cele, skille i utwory oraz korzystać z biblioteki ćwiczeń.",
+    "returns_to": "Po decyzji wrócisz do",
+    "published_by": "Aplikację udostępnia",
+    "loopback_warning": "Ta aplikacja działa na Twoim komputerze. Zezwól tylko wtedy, gdy to Twoja aplikacja, uruchomiona przed chwilą.",
+    "can_read": "Odczyt danych o Twoim ćwiczeniu — zawsze.",
+    "signed_in_as": "Zalogowano jako {{name}}",
+    "allow": "Zezwól",
+    "deny": "Anuluj",
+    "sign_in": "Zaloguj się, żeby kontynuować",
+    "invalid_title": "Ta prośba o połączenie jest nieprawidłowa",
+    "invalid_description": "Wróć do aplikacji i spróbuj połączyć się jeszcze raz. Jeśli to się powtarza, aplikacja może jeszcze nie obsługiwać riff.quest.",
+    "error": "Coś poszło nie tak. Spróbuj ponownie."
   }
 }

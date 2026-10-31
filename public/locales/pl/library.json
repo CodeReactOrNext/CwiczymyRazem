@@ -391,6 +391,7 @@
     "copy": "Kopiuj",
     "paste": "Wklej",
     "cut": "Wytnij",
-    "clear_area": "Wyczyść obszar"
+    "clear_area": "Wyczyść obszar",
+    "bass_blocked": "Tab basowy ma cztery struny — najpierw wyczyść nuty na strunach 5–6 ({{count}})."
   }
 }

@@ -20,6 +20,7 @@ import { useSessionUI } from "../contexts/SessionUIContext";
 import { useTabOverlay } from "../contexts/TabOverlayContext";
 import { accuracyPerMeasure } from "../utils/measureAccuracy";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
+import { alphaTexStaffHeader } from "./AlphaTabScoreViewer/tablatureToAlphaTex";
 import { LearnModeBar } from "./LearnModeBar";
 import { MicHud } from "./MicHud";
 import { TablatureMinimapBar } from "./TablatureMinimapBar";
@@ -30,6 +31,7 @@ import {
   useTablatureStyle,
 } from "./tablatureSettings";
 import { TablatureSettingsDialog } from "./TablatureSettingsDialog";
+import { tuningGutterStrings } from "./tablatureStringRows";
 import { TablatureViewer } from "./TablatureViewer";
 import { useAutoTabZoom } from "./useAutoTabZoom";
 import {
@@ -216,7 +218,7 @@ export const TablatureSection = memo(function TablatureSection({
   const { overlay: tabOverlay, gameMode } = useTabOverlay();
   const { hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef, learn, markAlphaTabPassStart } = useNoteMatchingContext();
   const { openTimingCalibration } = useSessionUI();
-  const { tuning } = useGuitarTuningContext();
+  const { tuning, stringCount } = useGuitarTuningContext();
   const {
     settings,
     palette,
@@ -232,19 +234,14 @@ export const TablatureSection = memo(function TablatureSection({
   const { measureEndXs, totalBeats } = renderData;
 
   // Left-gutter tuning legend for the flat tab: each string's tuned note under
-  // the active tuning (notation is low→high, so index 0 = string 6 … 5 = string 1).
+  // the active tuning.
   // The worker decides which strings light up live from the playback cursor.
   const tuningStrings = useMemo<TuningGutterString[]>(() => {
     // Empty list = no gutter drawn and no content inset, which is exactly what
     // turning the gutter off should do — no worker-side flag needed.
     if (!settings.showTuningGutter) return [];
-    const names = tuning.notation.split(/\s+/);
-    return [1, 2, 3, 4, 5, 6].map((string) => ({
-      string,
-      label: names[6 - string] ?? "",
-      color: palette[string - 1] ?? "#ffffff",
-    }));
-  }, [tuning.notation, palette, settings.showTuningGutter]);
+    return tuningGutterStrings(tuning.notation, stringCount, palette);
+  }, [tuning.notation, stringCount, palette, settings.showTuningGutter]);
 
   const [loopStart, setLoopStart] = useState<number | null>(null);
   const [loopEnd, setLoopEnd] = useState<number | null>(null);
@@ -521,6 +518,7 @@ export const TablatureSection = memo(function TablatureSection({
             rawGpFile={rawGpFile}
             measures={activeTablature}
             baseTempo={baseTempo}
+            staffHeader={alphaTexStaffHeader(tuning)}
             mode='score'
             isPlaying={isAudioPlaying && showAlphaTabScore}
             countInRemaining={countInRemaining}
@@ -580,6 +578,7 @@ export const TablatureSection = memo(function TablatureSection({
               zoom={zoom}
               heightPx={height}
               tuningStrings={tuningStrings}
+              stringCount={stringCount}
               style={tabStyle}
               cinema={cinema}
               ambientGlow={settings.ambientGlow}

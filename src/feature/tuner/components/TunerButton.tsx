@@ -27,8 +27,8 @@ interface TunerButtonProps {
  */
 export const TunerButton = ({ h = "h-7" }: TunerButtonProps) => {
   const { t } = useTranslation("desktop");
-  const audio = useGuitarAudioInput();
-  const { tuning } = useGuitarTuning({ isGpFile: false, isExamMode: false });
+  const { tuning, instrument } = useGuitarTuning({ isGpFile: false, isExamMode: false });
+  const audio = useGuitarAudioInput({ bass: instrument === "bass" });
   const sessionSource = useSessionTunerStore((s) => s.source);
   // "own" opens the tuner's own capture, "session" borrows the practice
   // session's input.

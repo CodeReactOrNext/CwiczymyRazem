@@ -122,6 +122,8 @@ export interface TablatureStylePatch {
   stringSpacing?: number;
   /** Draw the staff upside down — low E on the top line. */
   flipStrings?: boolean;
+  /** Lines on the staff — 4 for a bass tab. stringSpacing is then the spread-out gap (staffLineSpacing). */
+  stringCount?: number;
   /** Mirror the board so the music runs right to left. */
   rightToLeft?: boolean;
   /** Fret-number colour, or "auto" to pick per pill from its brightness. */

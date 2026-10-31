@@ -24,7 +24,10 @@
     "mic_tools_hint": "Narzędzia mikrofonu: kalibracja, stroik, rozwiązywanie problemów",
     "mic_tools": "Narzędzia mikrofonu",
     "mic_not_working": "Mikrofon nie działa?",
-    "boost_hint": "Podgłośnij odtwarzanie Guitar Pro powyżej 100%, jeśli jest za ciche."
+    "boost_hint": "Podgłośnij odtwarzanie Guitar Pro powyżej 100%, jeśli jest za ciche.",
+    "bass_tuning": "Strój basu",
+    "bass_tuning_named": "Strój basu: {{name}}",
+    "bass_tuning_change": "Strój basu — kliknij, aby zmienić"
   },
   "mic_help": {
     "title": "Problemy z mikrofonem",
@@ -630,7 +633,14 @@
     "tap_tone": "Stuknij dźwięk, żeby go odsłonić"
   },
   "tuning_modal": {
-    "description": "Wybierz strój gitary — wykrywanie wysokości i podkład zostaną do niego dopasowane."
+    "description": "Wybierz strój gitary — wykrywanie wysokości i podkład zostaną do niego dopasowane.",
+    "instrument": "Instrument",
+    "guitar": "Gitara",
+    "bass": "Bas",
+    "tunings": "Strój",
+    "bass_description": "Wybierz strój basu — wykrywanie wysokości i podkład zostaną do niego dopasowane.",
+    "instrument_lock_bass": "To ćwiczenie jest napisane na bas.",
+    "instrument_lock_guitar": "To ćwiczenie jest napisane na gitarę."
   },
   "header": {
     "close_session": "Zamknij sesję",

@@ -6,6 +6,8 @@ interface GpTrack {
   measures: TablatureMeasure[];
   trackType: 'guitar' | 'bass' | 'drums' | 'vocals';
   pan: number; // -1.0 to 1.0
+  /** Strings on the track's instrument — 4 for most basses, 7 for a seven-string. */
+  stringCount: number;
 }
 
 export interface ParsedGp {
@@ -353,6 +355,7 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
       measures,
       trackType,
       pan,
+      stringCount: staff.stringCount || 6,
     });
   });
 

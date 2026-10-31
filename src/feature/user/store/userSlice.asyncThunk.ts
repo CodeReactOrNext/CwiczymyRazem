@@ -8,6 +8,7 @@ import { firebaseAnswerEmailConsent, firebaseRestartUserStats, firebaseUpdateBan
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { getAdditionalUserInfo, GoogleAuthProvider } from "firebase/auth";
+import { takeOAuthReturn } from "lib/mcp/oauth/postLoginRedirect";
 import { clearQuerySnapshot } from "lib/querySnapshot/querySnapshot";
 import Router from "next/router";
 import { signIn, signOut } from "next-auth/react";
@@ -79,7 +80,8 @@ const enterApp = async (idToken: string, destination: string) => {
   const result = await signIn("credentials", { idToken, redirect: false });
   if (!result?.ok) throw new Error(result?.error ?? "session-not-created");
   // Not awaited: the thunk resolves (and fills the store) while the route loads.
-  void Router.push(destination);
+  // A player who signed in from the OAuth consent screen goes back to it.
+  void Router.push(takeOAuthReturn() ?? destination);
 };
 
 export const logInViaGoogle = createAsyncThunk(

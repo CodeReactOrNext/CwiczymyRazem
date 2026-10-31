@@ -81,8 +81,9 @@ export function playStringNote(
   trackId: string,
   activeNodes: Map<string, any>,
   players: StringPlayers,
-  /** Per-string semitone offset from standard tuning (index 0 = string 1 … index 5 = string 6).
-   *  Only applies to guitar tracks without a real midiNote — GP imports and bass already carry their own pitch. */
+  /** Per-string semitone offset from standard GUITAR tuning (index 0 = string 1 … index 5 = string 6).
+   *  When given, the strings are pitched from it on any track — a bass in the player's own
+   *  tuning included (see TuningOffsets); without it a bass track plays standard bass tuning. */
   tuningOffsets?: readonly number[],
 ): void {
   const t = Math.max(ctx.currentTime + 0.001, time);
@@ -98,10 +99,11 @@ export function playStringNote(
     midiNote = note.midiNote;
     freq     = 440 * Math.pow(2, (midiNote - 69) / 12);
   } else {
-    const midiBase = trackType === "bass" ? BASS_STRING_MIDI[note.string - 1] : GUITAR_STRING_MIDI[note.string - 1];
-    const freqBase = trackType === "bass" ? BASS_STRING_FREQS[note.string - 1] : GUITAR_STRING_FREQS[note.string - 1];
+    const isStandardBass = trackType === "bass" && !tuningOffsets;
+    const midiBase = isStandardBass ? BASS_STRING_MIDI[note.string - 1] : GUITAR_STRING_MIDI[note.string - 1];
+    const freqBase = isStandardBass ? BASS_STRING_FREQS[note.string - 1] : GUITAR_STRING_FREQS[note.string - 1];
     if (midiBase === undefined || freqBase === undefined) return;
-    const offset = trackType === "guitar" ? (tuningOffsets?.[note.string - 1] ?? 0) : 0;
+    const offset = isStandardBass ? 0 : (tuningOffsets?.[note.string - 1] ?? 0);
     midiNote = midiBase + note.fret + offset;
     freq     = freqBase * Math.pow(2, (note.fret + offset) / 12);
   }

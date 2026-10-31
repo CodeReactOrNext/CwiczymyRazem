@@ -2,11 +2,13 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
+import { useInstrumentPreferenceStore } from "feature/tuner/store/instrumentPreferenceStore";
 import { useTranslation } from "hooks/useTranslation";
 import { AlertCircle, Drum,FileMusic, Music as MusicIcon, Upload, Zap } from "lucide-react";
 import { useCallback, useMemo,useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import type { Instrument } from "utils/audio/tunings";
 
 import type { ParsedGp} from "../../services/gp5Parser.service";
 import { GP_EXTENSIONS,isGpFile, parseGpFile } from "../../services/gp5Parser.service";
@@ -21,7 +23,9 @@ interface ImportTablatureProps {
     tempo: number,
     trackName: string,
     backingTracks: BackingTrack[],
-    rawFile: File
+    rawFile: File,
+    /** What the picked track is played on — a bass track's strings are 1 (G) … 4 (E). */
+    instrument: Instrument
   ) => void;
   className?: string;
 }
@@ -45,10 +49,14 @@ function buildBackingTracks(data: ParsedGp, selectedIdx: number): BackingTrack[]
       name: t.name,
       measures: t.measures,
       trackType: t.trackType as BackingTrack["trackType"],
+      stringCount: t.stringCount,
       pan: t.pan,
     }))
     .filter((_, idx) => idx !== selectedIdx);
 }
+
+const instrumentOf = (track: ParsedGp["tracks"][number]): Instrument =>
+  track.trackType === 'bass' ? 'bass' : 'guitar';
 
 export const ImportTablature = ({ onImported, className }: ImportTablatureProps) => {
   const { t } = useTranslation("songs");
@@ -56,6 +64,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
   const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<ParsedGp | null>(null);
   const [selectedTrackIndex, setSelectedTrackIndex] = useState(0);
+  const preferredInstrument = useInstrumentPreferenceStore((s) => s.instrument);
 
   const selectedTrack = parsedData?.tracks[selectedTrackIndex] ?? null;
   const showTabPreview = selectedTrack?.trackType !== 'drums';
@@ -79,9 +88,12 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
 
     try {
       const data = await parseGpFile(selectedFile);
+      // A bass player starts on the file's bass track.
+      const index = Math.max(0, preferredInstrument === 'bass' ? data.tracks.findIndex((track) => track.trackType === 'bass') : 0);
+      const track = data.tracks[index];
       setParsedData(data);
-      setSelectedTrackIndex(0);
-      onImported(data.tracks[0].measures, selectedFile.name, data.tempo, data.tracks[0].name, buildBackingTracks(data, 0), selectedFile);
+      setSelectedTrackIndex(index);
+      onImported(track.measures, selectedFile.name, data.tempo, track.name, buildBackingTracks(data, index), selectedFile, instrumentOf(track));
       toast.success(`"${selectedFile.name}" imported successfully!`);
     } catch (error) {
       console.error("Failed to parse Guitar Pro file:", error);
@@ -91,12 +103,13 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
     } finally {
       setIsParsing(false);
     }
-  }, [onImported]);
+  }, [onImported, preferredInstrument, t]);
 
   const handleTrackSelect = (index: number) => {
     setSelectedTrackIndex(index);
     if (parsedData && file) {
-      onImported(parsedData.tracks[index].measures, file.name, parsedData.tempo, parsedData.tracks[index].name, buildBackingTracks(parsedData, index), file);
+      const track = parsedData.tracks[index];
+      onImported(track.measures, file.name, parsedData.tempo, track.name, buildBackingTracks(parsedData, index), file, instrumentOf(track));
     }
   };
 
@@ -167,6 +180,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
             <div className="relative group">
               <TablatureViewer
                 measures={previewMeasures}
+                stringCount={selectedTrack?.stringCount}
                 bpm={parsedData.tempo}
                 isPlaying={false}
                 startTime={null}

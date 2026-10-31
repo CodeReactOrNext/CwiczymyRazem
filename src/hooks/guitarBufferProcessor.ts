@@ -28,6 +28,10 @@ export interface GuitarDetectors {
    *  correct the main detector's reading in the low register — see LOW_* below.
    *  Omit it and the processor behaves exactly as it did before. */
   pitchLow?: any;
+  /** Optional aubio Pitch ("yinfast", 4096 at 48 kHz, 512): the plain YIN over a window
+   *  long enough for a bass's bottom octave — consulted only while the player is
+   *  on bass (see BASS_* below). Omit it and bass reads like a guitar. */
+  pitchBass?: any;
 }
 
 /**
@@ -110,6 +114,9 @@ export interface BufferProcessorOptions {
   recentAudio?: RecentAudio | null;
   /** Called (already throttled to ~10Hz) the first time signal is flowing. */
   onActive?: () => void;
+  /** Whether the player is on bass right now (read fresh each call) — turns on
+   *  the deep bass YIN, so switching instruments needs no new detectors. */
+  isBass?: () => boolean;
 }
 
 /**
@@ -118,8 +125,8 @@ export interface BufferProcessorOptions {
  * state persists across calls.
  */
 export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
-  const { detectors, targets, getGain, spectrum, recentAudio, onActive, sampleRate = 48000 } = opts;
-  const { pitch: pitchDetector, onset: onsetDetector, tick: tickDetector, pitchHigh: pitchHighDetector, pitchLow: pitchLowDetector } = detectors;
+  const { detectors, targets, getGain, spectrum, recentAudio, onActive, isBass, sampleRate = 48000 } = opts;
+  const { pitch: pitchDetector, onset: onsetDetector, tick: tickDetector, pitchHigh: pitchHighDetector, pitchLow: pitchLowDetector, pitchBass: pitchBassDetector } = detectors;
 
   let lastFrequencies: number[] = [];
   // Per-hop pitch estimates of the current window, reused across calls.
@@ -248,6 +255,27 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     return cents >= -LOW_REFINE_BELOW_CENTS && cents <= LOW_REFINE_ABOVE_CENTS ? fine : coarse;
   };
 
+  // ── Bass register ───────────────────────────────────────────────────────────
+  // A YIN can only find periods up to half its window: 2048 samples at 48 kHz
+  // stop at ~47 Hz, above a bass's low E (41 Hz) — yinfft reads E1–F#1 as
+  // whatever harmonic it can see, and a dark G1/A1 already a fourth or more
+  // sharp. On bass a 4096-sample plain YIN reaches ~23 Hz (a five-string's B0
+  // at 31 Hz included) and is taken under BASS_REFINE_MAX_HZ — unless it sits an
+  // octave or more under the main reading: yinfft's errors there only ever point
+  // up, while YIN's own are sub-octaves, and those are never taken
+  // (guitarBufferProcessor.bass.test.ts).
+  const BASS_REFINE_MAX_HZ = 100;
+  /** How far under the main reading the deep YIN may sit — B0 read by yinfft lands ~760 cents sharp. */
+  const BASS_REFINE_BELOW_CENTS = 1000;
+  const BASS_REFINE_ABOVE_CENTS = 50;
+
+  const refineBass = (coarse: number, deep: number): number => {
+    if (deep <= 20 || deep >= BASS_REFINE_MAX_HZ) return coarse;
+    if (coarse <= 20) return deep;
+    const cents = 1200 * Math.log2(deep / coarse);
+    return cents >= -BASS_REFINE_BELOW_CENTS && cents <= BASS_REFINE_ABOVE_CENTS ? deep : coarse;
+  };
+
   // ── Onset-anchored note events (B1) ─────────────────────────────────────────
   // A pending event collects pitch estimates from the hops that came AFTER its
   // own onset hop — never from hops belonging to the previous note. That
@@ -258,6 +286,10 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   // turn out to be".
   /** Estimates needed before an attack's pitch is considered settled. */
   const EVENT_MIN_ESTIMATES = 3;
+  /** On bass the deep YIN's window is twice as long, so it needs more hops past
+   *  the attack before it stops hearing the note before (BASS_* above) — ~53 ms
+   *  of them, which is 5 hops at 48 kHz. */
+  const BASS_EVENT_MIN_ESTIMATES = Math.max(5, Math.round((5 * sampleRate) / 48000));
   /** Give up waiting for a pitch this long after the attack (ms). Dead/muted
    *  notes never resolve one, and the grader still wants the timing. */
   const EVENT_RESOLVE_TIMEOUT_MS = 180;
@@ -302,6 +334,8 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     highHops: number;
   }
   let pending: PendingEvent | null = null;
+  /** Set per window from isBass — see BASS_* above. */
+  let bassActive = false;
 
   const median = (xs: number[]): number => {
     if (xs.length === 0) return 0;
@@ -333,6 +367,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   return function process(inputBuffer: Float32Array) {
     const len = inputBuffer.length;
     const gain = getGain();
+    bassActive = !!pitchBassDetector && !!isBass?.();
     if (!normalizedBuf || normalizedBuf.length !== len) normalizedBuf = new Float32Array(len);
     // Ungained, like the web path's analyser, which taps the source directly.
     // Before the silence gate, so a chord read after a pause isn't stale audio.
@@ -433,7 +468,8 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
       if (tickDetector.do(chunk)) isTick = true;
 
       // Both run on every hop — each keeps its own sliding window of the signal.
-      const hopFreq = refineLow(pitchDetector.do(chunk), pitchLowDetector ? pitchLowDetector.do(chunk) : 0);
+      const guitarFreq = refineLow(pitchDetector.do(chunk), pitchLowDetector ? pitchLowDetector.do(chunk) : 0);
+      const hopFreq = bassActive ? refineBass(guitarFreq, pitchBassDetector.do(chunk)) : guitarFreq;
       pitchConfidence = pitchDetector.getConfidence();
       if (hopFreq > 20) hopFrequencies.push(hopFreq);
       if (pending && ++pending.longHops > ONSET_HOP_SKIP && hopFreq > 20) {
@@ -453,7 +489,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
 
     if (pending) {
       pending.peakVolume = Math.max(pending.peakVolume, rawVolume);
-      const settled = pending.long.length >= EVENT_MIN_ESTIMATES
+      const settled = pending.long.length >= (bassActive ? BASS_EVENT_MIN_ESTIMATES : EVENT_MIN_ESTIMATES)
         || pending.high.length >= EVENT_MIN_ESTIMATES * 2;
       if (settled || nowMs - pending.event.onsetMs >= EVENT_RESOLVE_TIMEOUT_MS) commitPending();
     }
@@ -538,7 +574,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   };
 }
 
-/** Build the three aubio detectors with the app's tuned parameters. */
+/** Build the aubio detectors with the app's tuned parameters. */
 export function createGuitarDetectors(aubio: any, sampleRate: number): GuitarDetectors {
   const pitch = new aubio.Pitch("yinfft", 2048, 512, sampleRate);
   pitch.setTolerance(0.7);
@@ -558,5 +594,11 @@ export function createGuitarDetectors(aubio: any, sampleRate: number): GuitarDet
   // The plain YIN, for the low register only — see LOW_REFINE_* above.
   const pitchLow = new aubio.Pitch("yinfast", 2048, 512, sampleRate);
 
-  return { pitch, onset, tick, pitchHigh, pitchLow };
+  // The deep YIN for bass — idle unless the processor is told it's on bass.
+  // Sized by time, not samples: half of it has to hold a ~43 ms period (B0 at
+  // 23 Hz with margin), 4096 at 44.1/48 kHz and 8192 at 96 kHz.
+  const bassWindow = 2 ** Math.ceil(Math.log2(sampleRate / 12));
+  const pitchBass = new aubio.Pitch("yinfast", bassWindow, 512, sampleRate);
+
+  return { pitch, onset, tick, pitchHigh, pitchLow, pitchBass };
 }

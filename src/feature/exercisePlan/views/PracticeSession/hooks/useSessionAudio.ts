@@ -49,6 +49,8 @@ interface UseSessionAudioOptions {
   /** Per-string semitone offset from standard tuning, applied to the custom (non-GP) synth so the
    *  background guitar matches the player's chosen tuning. */
   tuningOffsets?:          readonly number[];
+  /** The player is on bass: the main track sounds as one, and only it takes their tuning. */
+  isBass?:                 boolean;
   /** A boss fight's boss is enraged: the generated backing's band plays harder. */
   bandRage?:               boolean;
 }
@@ -60,7 +62,7 @@ export function useSessionAudio({
   isMetronomeMuted, metronomeVolume, showAlphaTabScore, examMode, examBacking,
   metronomeAudioContext, metronomeStartTime, metronomeAudioStartTime,
   stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce, autoStopAfterFirstLoop,
-  onAlphaTabAudioContextReady, onAlphaTabLoopRestart, tabRestartKey, pendingSeekBeatRef, tuningOffsets, bandRage = false,
+  onAlphaTabAudioContextReady, onAlphaTabLoopRestart, tabRestartKey, pendingSeekBeatRef, tuningOffsets, isBass = false, bandRage = false,
 }: UseSessionAudioOptions) {
   // ── Track configs ──────────────────────────────────────────────────────────
 
@@ -99,7 +101,10 @@ export function useSessionAudio({
       measures:  activeTablature || [],
       volume:    trackConfigs.main?.volume ?? 1,
       isMuted:   trackConfigs.main?.isMuted ?? isAudioMuted,
-      trackType: "guitar", pan: 0,
+      trackType: isBass ? "bass" : "guitar", pan: 0,
+      // A bass's offsets only make sense on its own strings — see the shared
+      // `tuningOffsets` below, which then stays off the backing guitars.
+      ...(isBass && { tuningOffsets }),
     }];
     if (dynamicBackingTracks) {
       dynamicBackingTracks.forEach(track => {
@@ -112,7 +117,7 @@ export function useSessionAudio({
       });
     }
     return tracks;
-  }, [activeTablature, dynamicBackingTracks, trackConfigs, isAudioMuted]);
+  }, [activeTablature, dynamicBackingTracks, trackConfigs, isAudioMuted, isBass, tuningOffsets]);
 
   // ── AlphaTab loop anchor (re-sync cursor on every loop restart) ────────────
 
@@ -213,7 +218,7 @@ export function useSessionAudio({
     audioStartTime: effectiveAudioStartTime,
     disabled:       !!effectiveRawGpFile || showAlphaTabScore,
     repeatCount:    tabRepeatCount,
-    tuningOffsets,
+    tuningOffsets:  isBass ? undefined : tuningOffsets,
     rage:           bandRage,
   });
 

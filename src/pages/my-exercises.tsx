@@ -57,6 +57,7 @@ const buildChallenge = (ex: CommunityExercise): DashboardExercise => ({
     metronomeSpeed: ex.metronomeSpeed,
     relatedSkills: ex.relatedSkills,
     tablature: ex.tablature,
+    ...(ex.instrument === "bass" && { instrument: ex.instrument }),
     // Set on exercises saved from the plan creator instead of the Tab Editor
     videoUrl: ex.videoUrl,
     imageUrl: ex.imageUrl,
@@ -105,7 +106,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
   // Straight to the details form. The draft is re-seeded from the exercise's own
   // saved tab so a leftover draft can't overwrite it on save.
   const openDetailsForm = (ex: CommunityExercise, publish = false) => {
-    saveTabEditorDraft(ex.id, ex.tablature ?? []);
+    saveTabEditorDraft(ex.id, ex.tablature ?? [], ex.instrument);
     router.push(`/tab-editor/publish?edit=${ex.id}${publish ? "&publish=1" : ""}`);
   };
 
@@ -116,7 +117,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
       openDetailsForm(ex);
       return;
     }
-    saveTabEditorDraft(ex.id, ex.tablature ?? []);
+    saveTabEditorDraft(ex.id, ex.tablature ?? [], ex.instrument);
     router.push(`/tab-editor?edit=${ex.id}`);
   };
 

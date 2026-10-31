@@ -6,15 +6,20 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
+import { InstrumentPicker } from "feature/tuner/components/InstrumentPicker";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, Lock } from "lucide-react";
-import { GUITAR_TUNINGS } from "utils/audio/tunings";
+import { getTuningsFor } from "utils/audio/tunings";
 
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 
 export const TuningSettingsModal = () => {
   const { t } = useTranslation("session");
-  const { isModalOpen, closeModal, preferredTuning, setTuningId, isLocked, lockReason, tuning } = useGuitarTuningContext();
+  const {
+    isModalOpen, closeModal, preferredTuning, setTuningId, isLocked, lockReason, tuning,
+    instrument, setInstrument, instrumentLockReason,
+  } = useGuitarTuningContext();
+  const isBass = instrument === "bass";
 
   return (
     <Dialog open={isModalOpen} onOpenChange={(open) => { if (!open) closeModal(); }}>
@@ -24,11 +29,22 @@ export const TuningSettingsModal = () => {
           becomes unresponsive with no visible way to close it. */}
       <DialogContent className="max-w-md z-[99999999]">
         <DialogHeader>
-          <DialogTitle>{t("media.guitar_tuning")}</DialogTitle>
+          <DialogTitle>{t(isBass ? "media.bass_tuning" : "media.guitar_tuning")}</DialogTitle>
           <DialogDescription>
-            {t("tuning_modal.description")}
+            {t(isBass ? "tuning_modal.bass_description" : "tuning_modal.description")}
           </DialogDescription>
         </DialogHeader>
+
+        <div className="space-y-2">
+          <InstrumentPicker
+            value={instrument}
+            onChange={setInstrument}
+            disabled={!!instrumentLockReason}
+          />
+          {instrumentLockReason && (
+            <p className="text-xs text-zinc-500">{instrumentLockReason}</p>
+          )}
+        </div>
 
         {isLocked && (
           <div className="flex items-start gap-3 rounded-lg bg-amber-500/10 p-3">
@@ -48,7 +64,7 @@ export const TuningSettingsModal = () => {
             isLocked && "pointer-events-none opacity-40"
           )}
         >
-          {GUITAR_TUNINGS.map((option) => {
+          {getTuningsFor(instrument).map((option) => {
             const isSelected = option.id === preferredTuning.id;
             return (
               <button

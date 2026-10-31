@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { stringRow } from "./tablatureStringRows";
+import { staffLineSpacing, stringRow } from "./tablatureStringRows";
 
 describe("stringRow", () => {
   it("puts the high e on the top line by default", () => {
@@ -19,5 +19,18 @@ describe("stringRow", () => {
       const rows = strings.map((string) => stringRow(string, flipped));
       expect([...rows].sort()).toEqual([0, 1, 2, 3, 4, 5]);
     }
+  });
+});
+
+describe("a four-string staff", () => {
+  it("puts the G on top and the E on the bottom line", () => {
+    expect(stringRow(1, false, 4)).toBe(0);
+    expect(stringRow(4, false, 4)).toBe(3);
+    expect(stringRow(4, true, 4)).toBe(0);
+  });
+
+  it("spreads its lines over the height six strings take", () => {
+    expect(staffLineSpacing(32, 4) * 3).toBe(32 * 5);
+    expect(staffLineSpacing(32)).toBe(32);
   });
 });

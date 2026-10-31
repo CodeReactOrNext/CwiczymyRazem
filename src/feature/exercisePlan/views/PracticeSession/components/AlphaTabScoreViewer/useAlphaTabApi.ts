@@ -14,6 +14,8 @@ interface UseAlphaTabApiOptions {
   measures?: TablatureMeasure[];
   /** Tempo baked into the generated alphaTex when there's no rawGpFile (ignored otherwise). */
   baseTempo?: number;
+  /** Staff metadata for the generated alphaTex — a bass's strings and clef (alphaTexStaffHeader). */
+  staffHeader?: string;
   mode: "score" | "tab";
   /** Black board with white ink instead of the default white paper. */
   notationDarkMode?: boolean;
@@ -62,6 +64,7 @@ export function useAlphaTabApi({
   rawGpFile,
   measures,
   baseTempo = 120,
+  staffHeader = "",
   mode,
   notationDarkMode = false,
   notationZoom = 1,
@@ -213,7 +216,7 @@ export function useAlphaTabApi({
     } else if (measures && measures.length > 0) {
       // No Guitar Pro file (built-in exercises never ship one) — render the score from
       // our own tablature format by converting it to alphaTex instead of api.load().
-      api.tex(tablatureToAlphaTex(measures, baseTempo));
+      api.tex(tablatureToAlphaTex(measures, baseTempo, staffHeader));
     }
 
     return () => {
@@ -225,7 +228,7 @@ export function useAlphaTabApi({
       scoreRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawGpFile, measures, mode, notationDarkMode, notationZoom, notationSpacing, justifyLastSystem]);
+  }, [rawGpFile, measures, staffHeader, mode, notationDarkMode, notationZoom, notationSpacing, justifyLastSystem]);
 
   // Per-track mute / volume — independent of which track is rendered visually.
   // trackConfigs and backingTrackIds MUST be memoized by the caller.

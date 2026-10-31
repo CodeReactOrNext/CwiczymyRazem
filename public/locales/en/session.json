@@ -24,7 +24,10 @@
     "mic_tools_hint": "Mic tools: recalibrate, tuner, troubleshooting",
     "mic_tools": "Mic tools",
     "mic_not_working": "Mic not working?",
-    "boost_hint": "Boost the Guitar Pro playback above 100% if it sounds too quiet."
+    "boost_hint": "Boost the Guitar Pro playback above 100% if it sounds too quiet.",
+    "bass_tuning": "Bass tuning",
+    "bass_tuning_named": "Bass tuning: {{name}}",
+    "bass_tuning_change": "Bass tuning — click to change"
   },
   "mic_help": {
     "title": "Microphone troubleshooting",
@@ -628,7 +631,14 @@
     "tap_tone": "Tap a tone to reveal it"
   },
   "tuning_modal": {
-    "description": "Choose how your guitar is tuned — pitch detection and backing audio will be matched to this tuning."
+    "description": "Choose how your guitar is tuned — pitch detection and backing audio will be matched to this tuning.",
+    "instrument": "Instrument",
+    "guitar": "Guitar",
+    "bass": "Bass",
+    "tunings": "Tuning",
+    "bass_description": "Choose how your bass is tuned — pitch detection and backing audio will be matched to this tuning.",
+    "instrument_lock_bass": "This exercise is written for bass.",
+    "instrument_lock_guitar": "This exercise is written for guitar."
   },
   "header": {
     "close_session": "Close session",

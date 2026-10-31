@@ -21,6 +21,10 @@ let STRING_SPACING = 32;
 // bakes the same order into every note's noteY, so the two must never drift
 // apart; everything derived from a string NUMBER here goes through stringRow().
 let flipStrings = false;
+// Lines on the staff — 4 for a bass tab. Driven by STYLE together with a
+// STRING_SPACING spread so the staff keeps its height (staffLineSpacing), which
+// is why everything sized by 5 * STRING_SPACING below needs no count.
+let stringCount = 6;
 // Mirrored board (music running right to left). The flip itself is a CSS
 // transform on the canvas element — the worker only needs to know about it so
 // the text it draws does not come out backwards (see drawText).
@@ -141,11 +145,20 @@ function withAlpha(hex: string, a: number): string {
 }
 
 // Staff lines batched into 3 alpha groups (pairs: 0+5, 1+4, 2+3)
-const STAFF_LINE_GROUPS: { alpha: number; indices: number[] }[] = [
-  { alpha: 0.45, indices: [0, 5] },
-  { alpha: 0.33, indices: [1, 4] },
-  { alpha: 0.21, indices: [2, 3] },
-];
+// Outer lines strongest, fading towards the middle — paired from both edges in.
+const STAFF_LINE_ALPHAS = [0.45, 0.33, 0.21];
+function staffLineGroups(count: number): { alpha: number; indices: number[] }[] {
+  const groups: { alpha: number; indices: number[] }[] = [];
+  for (let i = 0; i < Math.ceil(count / 2); i++) {
+    const pair = count - 1 - i;
+    groups.push({
+      alpha: STAFF_LINE_ALPHAS[Math.min(i, STAFF_LINE_ALPHAS.length - 1)],
+      indices: pair === i ? [i] : [i, pair],
+    });
+  }
+  return groups;
+}
+let STAFF_LINE_GROUPS = staffLineGroups(stringCount);
 
 // ── Shared types (mirrored from TablatureViewer.tsx) ──────────────────────────
 interface NoteRD {
@@ -1073,7 +1086,7 @@ function drawTuningGutter(active: Set<number>) {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (const st of tuningStrings) {
-    const y = STAFF_TOP + stringRow(st.string, flipStrings) * STRING_SPACING;
+    const y = STAFF_TOP + stringRow(st.string, flipStrings, stringCount) * STRING_SPACING;
     const top = y - pillH / 2;
     // Notes are hidden (ear training) → light every string so we don't leak
     // which one is coming next; otherwise only the strings about to be played.
@@ -2226,7 +2239,7 @@ function render() {
     const selX = beatToX(xMap, selection.startBeat);
     const selW = Math.max(6, beatToX(xMap, selection.endBeat) - selX);
     // Flipped staff swaps which end of the string range is the upper row.
-    const selRows = [stringRow(selection.startString, flipStrings), stringRow(selection.endString, flipStrings)];
+    const selRows = [stringRow(selection.startString, flipStrings, stringCount), stringRow(selection.endString, flipStrings, stringCount)];
     const topY = STAFF_TOP + Math.min(...selRows) * STRING_SPACING;
     const botY = STAFF_TOP + Math.max(...selRows) * STRING_SPACING;
 
@@ -2528,6 +2541,10 @@ self.onmessage = (e: MessageEvent) => {
       if (msg.background !== undefined) bgColor = msg.background;
       if (msg.stringSpacing !== undefined) STRING_SPACING = msg.stringSpacing;
       if (msg.flipStrings !== undefined) flipStrings = msg.flipStrings;
+      if (msg.stringCount !== undefined && msg.stringCount !== stringCount) {
+        stringCount = msg.stringCount;
+        STAFF_LINE_GROUPS = staffLineGroups(stringCount);
+      }
       if (msg.rightToLeft !== undefined) rightToLeft = msg.rightToLeft;
       if (msg.fretText !== undefined) fretTextColor = msg.fretText;
       if (msg.ink !== undefined) {

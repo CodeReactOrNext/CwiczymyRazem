@@ -22,6 +22,10 @@ const nextConfig = {
   turbopack: {},
   bundlePagesRouterDependencies: true,
   serverExternalPackages: ["@openai/agents"],
+  // search_wiki in the MCP server reads the articles from disk at request time.
+  outputFileTracingIncludes: {
+    "/api/mcp": ["./src/content/wiki/**/*"],
+  },
   webpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,

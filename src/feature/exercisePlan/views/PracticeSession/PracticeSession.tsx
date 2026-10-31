@@ -11,6 +11,7 @@ import { getBackingTrackStatus } from "feature/backingTrack/utils/backingTrackSt
 import { useLocalizedPlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { saveLastSession } from "feature/practice/utils/lastSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
+import { useInstrumentPreferenceStore } from "feature/tuner/store/instrumentPreferenceStore";
 import { useSessionTunerStore } from "feature/tuner/store/sessionTunerStore";
 import { selectUserAuth,selectUserInfo} from "feature/user/store/userSlice";
 import { useGuitarAudioInput } from "hooks/useGuitarAudioInput";
@@ -25,6 +26,7 @@ import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } f
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
+import type { Instrument } from "utils/audio/tunings";
 
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
 import { DEFAULT_ACCENT_PATTERN, stepsPerBeat } from "../../components/Metronome/utils/accentPattern";
@@ -305,12 +307,6 @@ const PracticeSessionInner = ({
     rawGpFile, gpFileUrl, exerciseTitle: currentExercise.title,
   });
 
-  // ── Guitar tuning (pitch detection + background guitar match the player's own tuning) ──
-  // Locked to Standard for Guitar Pro imports (the file already encodes its own tuning)
-  // and during exams (prepared only for standard tuning).
-  const isGpFile = !!effectiveRawGpFile || !!gpFileUrl;
-  const guitarTuning = useGuitarTuning({ isGpFile, isExamMode });
-
   useEffect(() => {
     posthog.capture("practice_session_started", { plan_title: plan.title, exercise_count: plan.exercises.length });
     // Feed the "Last Session" shortcuts (dashboard + practice hub). Exams and
@@ -538,8 +534,34 @@ const PracticeSessionInner = ({
   // a device-wide preference, so it's lazily restored from storage on the first render.
   const [masterVolume, setMasterVolume] = useState(() => loadGlobalMasterVolume() ?? 1);
 
+  // ── Instrument + tuning (pitch detection + background guitar match the player's own) ──
+  // Until the player picks a Guitar Pro track, a bass player — or the song's
+  // Bass arrangement — gets the file's bass track.
+  const preferredInstrument = useInstrumentPreferenceStore((s) => s.instrument);
+  const wantsBassTrack = preferredInstrument === "bass" || plan.song?.arrangement === "bass";
+  const autoGpTrackIdx = useMemo(
+    () => Math.max(0, wantsBassTrack ? (parsedGpTracks?.findIndex((track) => track.trackType === "bass") ?? -1) : 0),
+    [parsedGpTracks, wantsBassTrack],
+  );
+  const gpTrackIdx = selectedGpTrackIdx ?? autoGpTrackIdx;
+  const gpTrack = parsedGpTracks?.[gpTrackIdx];
+  const gpTrackType = gpTrack?.trackType;
+  // What the notes are written for: a Guitar Pro track says so itself, a tab
+  // exercise carries it (guitar unless marked bass). Anything else — a timer, a
+  // hunt — follows the player's own pick.
+  const contentInstrument: Instrument | undefined = parsedGpTracks
+    ? gpTrackType === "bass" ? "bass" : gpTrackType === "guitar" ? "guitar" : undefined
+    : riddleMeasures || activeExercise.tablature?.length
+      ? activeExercise.instrument ?? "guitar"
+      : undefined;
+  // Locked to Standard for Guitar Pro imports (the file already encodes its own tuning)
+  // and during exams (prepared only for standard tuning).
+  const isGpFile = !!effectiveRawGpFile || !!gpFileUrl;
+  const guitarTuning = useGuitarTuning({ isGpFile, isExamMode, contentInstrument, contentStringCount: gpTrack?.stringCount });
+  const isBass = guitarTuning.instrument === "bass";
+
   const rawTablature = riddleMeasures
-    || (parsedGpTracks ? parsedGpTracks[selectedGpTrackIdx]?.measures : undefined)
+    || (parsedGpTracks ? parsedGpTracks[gpTrackIdx]?.measures : undefined)
     || activeExercise.tablature;
 
   /**
@@ -600,10 +622,10 @@ const PracticeSessionInner = ({
   });
 
   const dynamicBackingTracks = useMemo(() => {
-    if (parsedGpTracks && parsedGpTracks.length > 1) return parsedGpTracks.filter((_, idx) => idx !== selectedGpTrackIdx);
+    if (parsedGpTracks && parsedGpTracks.length > 1) return parsedGpTracks.filter((_, idx) => idx !== gpTrackIdx);
     if (activeExercise.backingTracks?.length) return activeExercise.backingTracks;
     return autoBacking.tracks;
-  }, [parsedGpTracks, selectedGpTrackIdx, activeExercise.backingTracks, autoBacking.tracks]);
+  }, [parsedGpTracks, gpTrackIdx, activeExercise.backingTracks, autoBacking.tracks]);
 
   const planHasTablature = useMemo(() => plan.exercises.some(ex => willHaveTablature(ex) || ex.riddleConfig?.mode === "sequenceRepeat"), [plan.exercises]);
   const planHasStrumming = useMemo(() => plan.exercises.some(ex => ex.strummingPatterns && ex.strummingPatterns.length > 0), [plan.exercises]);
@@ -616,7 +638,7 @@ const PracticeSessionInner = ({
   const { audioTracks, trackConfigs, setTrackConfigs, backingTrackIds, gpAudioActive, gpAudioReady, effectiveAudioStartTime, tabSchedulerTickRef } = useSessionAudio({
     activeTablature, dynamicBackingTracks, effectiveRawGpFile,
     isAudioMuted, isAudioPlaying, effectiveBpm, masterVolume,
-    currentExerciseId: currentExercise.id, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
+    currentExerciseId: currentExercise.id, selectedGpTrackIdx: gpTrackIdx, tabRepeatCount, loopsCompletedRef,
     autoStopAfterFirstLoop: isEarTrainingRiddle,
     isMetronomeMuted, metronomeVolume: metronome.volume, showAlphaTabScore, examMode: isExamMode,
     examBacking: activeExercise.examBacking,
@@ -629,6 +651,7 @@ const PracticeSessionInner = ({
     tabRestartKey,
     pendingSeekBeatRef: metronome.pendingSeekBeatRef,
     tuningOffsets: guitarTuning.tuning.offsets,
+    isBass,
     bandRage: !!bossFight?.enraged,
   });
 
@@ -668,7 +691,7 @@ const PracticeSessionInner = ({
 
   // ── Calibration + mic ─────────────────────────────────────────────────────
 
-  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain, isNative, selectDevice, selectChannel } = useGuitarAudioInput();
+  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain, isNative, selectDevice, selectChannel } = useGuitarAudioInput({ bass: isBass });
   // The player's measured latency for the input path in use — the browser and the
   // desktop app keep separate measurements (different capture chains).
   const calibratedLatencyMs = timingByPath[timingInputPath(isNative)].latencyMs;
@@ -1371,7 +1394,7 @@ const PracticeSessionInner = ({
         currentExerciseIndex={currentExerciseIndex} completedExercises={completedExercises}
         handleExerciseSelect={handleExerciseSelect} isMicEnabled={isMicEnabled}
         allGpTracks={parsedGpTracks} showAlphaTabScore={showAlphaTabScore}
-        selectedGpTrackIdx={selectedGpTrackIdx} setSelectedGpTrackIdx={setSelectedGpTrackIdx}
+        selectedGpTrackIdx={gpTrackIdx} setSelectedGpTrackIdx={setSelectedGpTrackIdx}
         handleToggleAlphaTabScore={handleToggleAlphaTabScore}
         effectiveRawGpFile={effectiveRawGpFile} activeTablature={activeTablature}
         isAudioPlaying={isAudioPlaying} metronomeStartTime={metronome.startTime}

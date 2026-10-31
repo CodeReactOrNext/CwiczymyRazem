@@ -6,12 +6,13 @@ import type { LivePitch } from "feature/exercisePlan/views/PracticeSession/utils
 import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import { useTranslation } from "hooks/useTranslation";
 import { SkipBack } from "lucide-react";
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 
 import { CountInOverlay } from "./CountInOverlay";
 import { mirrorBoardStyle, pointerAlongBoard } from "./tablatureDirection";
+import { staffLineSpacing } from "./tablatureStringRows";
 import { useAmbientMicGlow } from "./useAmbientMicGlow";
-import { useTablatureRenderData } from "./useTablatureRenderData";
+import { STRING_SPACING, useTablatureRenderData } from "./useTablatureRenderData";
 import type { TablatureSelection, TablatureStylePatch, TuningGutterString } from "./useTablatureWorkerBridge";
 import { TAB_BASE_HEIGHT, useTablatureWorkerBridge } from "./useTablatureWorkerBridge";
 
@@ -73,6 +74,8 @@ interface TablatureViewerProps {
   /** Per-string tuning legend for the left gutter (string 1 = high e … 6 = low E).
    *  Passed only from the practice session; omit elsewhere to keep the plain tab. */
   tuningStrings?: TuningGutterString[];
+  /** Lines on the staff — 4 for a bass tab. Omit for the guitar's six. */
+  stringCount?: number;
   /** Look settings forwarded to the worker (pill shape, colours, visible layers). */
   style?: TablatureStylePatch;
   /** Cinema mode: all but drop the board colour so the backing video shows
@@ -127,7 +130,8 @@ const TablatureViewerInner = ({
   zoom = 1,
   heightPx = TAB_BASE_HEIGHT,
   tuningStrings,
-  style,
+  stringCount,
+  style: baseStyle,
   cinema = false,
   selection,
   ambientGlow = true,
@@ -143,10 +147,19 @@ const TablatureViewerInner = ({
 
   const [containerSize, setContainerSize] = useState({ width: 0, height: 256 });
 
+  // Any other number of strings than six goes to the worker as part of the
+  // look, with the gap between lines spread so the staff keeps its height.
+  const style = useMemo<TablatureStylePatch | undefined>(
+    () => stringCount === undefined
+      ? baseStyle
+      : { ...baseStyle, stringCount, stringSpacing: staffLineSpacing(baseStyle?.stringSpacing ?? STRING_SPACING, stringCount) },
+    [baseStyle, stringCount],
+  );
+
   // The worker draws the gutter and the selection at rows it works out itself,
   // so it must receive the very same spacing and string order this render data
   // was built with (both come from `style`).
-  const renderData = useTablatureRenderData(measures, palette, style?.stringSpacing, style?.flipStrings);
+  const renderData = useTablatureRenderData(measures, palette, style?.stringSpacing, style?.flipStrings, style?.stringCount);
 
   const { showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat } = useTablatureWorkerBridge({
     canvasRef, containerRef, containerSize, renderData,
@@ -288,6 +301,7 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.zoom             === next.zoom               &&
   prev.heightPx         === next.heightPx           &&
   prev.tuningStrings    === next.tuningStrings      &&
+  prev.stringCount      === next.stringCount        &&
   prev.style            === next.style              &&
   prev.selection        === next.selection          &&
   prev.ambientGlow      === next.ambientGlow        &&
