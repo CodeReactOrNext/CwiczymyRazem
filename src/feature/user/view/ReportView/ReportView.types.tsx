@@ -52,6 +52,9 @@ export interface ReportFormikInterface {
   /** YouTube id of the lesson a lesson session played along to. */
   lessonVideoId?: string;
   skillPointsGained?: Record<string, number>;
+  /** Practice time per guitar skill in ms. An exercise training several skills
+   *  counts its whole time for each, so the values may sum past the session. */
+  skillTimeGained?: Record<string, number>;
   exerciseRecords?: {
     micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
     earTrainingHighScore?: { exerciseTitle: string; score: number };

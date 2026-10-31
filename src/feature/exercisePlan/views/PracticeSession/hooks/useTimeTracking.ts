@@ -7,7 +7,8 @@ import type { SkillsType } from 'types/skillsTypes';
 
 import { useSessionTimeStore } from './sessionTimeStore';
 
-type TrackedExercise = Pick<Exercise, 'id' | 'category' | 'songData'>;
+type TrackedExercise = Pick<Exercise, 'id' | 'category' | 'songData'> &
+  Partial<Pick<Exercise, 'relatedSkills'>>;
 
 export const useTimeTracking = (timer: useTimerInterface, currentExercise: TrackedExercise) => {
   const dispatch = useAppDispatch();
@@ -16,6 +17,8 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: Track
   // sessionTimeStore.songTime) — that is how a song inside a routine counts
   // towards the time spent with it, the same as the song timer does.
   const songId = currentExercise.songData?.songId;
+  // Joined so a fresh array with the same skills does not restart the ticker.
+  const skillKey = (currentExercise.relatedSkills ?? []).join(',');
 
   useEffect(() => {
     lastTickRef.current = null;
@@ -51,7 +54,9 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: Track
         // The same tick, kept session-scoped — this is what gets reported, so
         // time left over in Redux from an earlier, unreported session cannot
         // leak into this session's category split.
-        useSessionTimeStore.getState().add(skillType, delta, songId);
+        useSessionTimeStore
+          .getState()
+          .add(skillType, delta, songId, skillKey ? skillKey.split(',') : undefined);
 
         lastTickRef.current = now;
       }
@@ -70,7 +75,7 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: Track
       // flush the partial second so it isn't lost on pause/exercise change/finish
       flush();
     };
-  }, [timer.timerEnabled, currentExercise.category, currentExercise.id, songId, dispatch]);
+  }, [timer.timerEnabled, currentExercise.category, currentExercise.id, songId, skillKey, dispatch]);
 
   return {};
 };

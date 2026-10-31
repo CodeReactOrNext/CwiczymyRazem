@@ -58,4 +58,17 @@ describe("sessionTimeStore song time", () => {
 
     expect(useSessionTimeStore.getState().songTime).toEqual({});
   });
+
+  it("gives every skill of the exercise the whole tick", () => {
+    const { add } = useSessionTimeStore.getState();
+    add("technique", 5000, undefined, ["tapping", "alternate_picking"]);
+    add("technique", 1000, undefined, ["tapping"]);
+
+    const state = useSessionTimeStore.getState();
+    expect(state.skillTime).toEqual({ tapping: 6000, alternate_picking: 5000 });
+    expect(state.time.technique).toBe(6000);
+
+    state.reset();
+    expect(useSessionTimeStore.getState().skillTime).toEqual({});
+  });
 });

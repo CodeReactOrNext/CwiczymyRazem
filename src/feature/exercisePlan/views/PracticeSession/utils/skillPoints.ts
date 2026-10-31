@@ -33,3 +33,16 @@ export const computeSkillPointsGained = (
     }
     return acc;
   }, {});
+
+/**
+ * The session's per-skill time as whole milliseconds, without the skills that
+ * got no measurable time — what the report sends as `skillTimeGained`.
+ */
+export const roundSkillTime = (
+  skillTime: Record<string, number>,
+): Record<string, number> =>
+  Object.fromEntries(
+    Object.entries(skillTime)
+      .map(([skillId, ms]) => [skillId, Math.round(ms)] as const)
+      .filter(([, ms]) => ms > 0),
+  );

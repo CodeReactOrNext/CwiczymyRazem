@@ -168,6 +168,10 @@ export interface StatisticsDataInterface {
     unlockedSkills: {
       [key: string]: number;
     };
+    /** All-time practice per guitar skill, in ms. Tracked from 2026-10-31 on. */
+    timeSpent?: {
+      [key: string]: number;
+    };
   };
   dailyQuest?: DailyQuest | null;
   fame?: number;

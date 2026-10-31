@@ -14,7 +14,7 @@ import { getLocalDateKey } from 'utils/converter';
 import { getClientReportContext, hasRestDays } from 'utils/gameLogic';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
-import { computeSkillPointsGained } from '../utils/skillPoints';
+import { computeSkillPointsGained, roundSkillTime } from '../utils/skillPoints';
 
 interface UseSessionReportingProps {
   plan: ExercisePlan;
@@ -54,6 +54,9 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
       /** Time the session measured on each song item of the plan, by song id
        *  (sessionTimeStore.songTime). A slice of `timerData`, not on top of it. */
       songTime: Record<string, number> = {},
+      /** Time per guitar skill, by skill id (sessionTimeStore.skillTime). Each
+       *  skill carries its exercises' whole time, so these overlap. */
+      skillTime: Record<string, number> = {},
       /** Set when the player ended the session early, before the bar the
        *  session set for itself. The practice time is still logged and scores
        *  still stand — the skill points are what an early finish gives up. */
@@ -114,6 +117,7 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           // A boss level's exercise is generated — there is no id to open it by.
           ...(!plan.song && !plan.duel && !plan.boss && { exerciseIds: plan.exercises.map((exercise) => exercise.id) }),
           ...(!plan.song && !plan.boss && collectPracticed(plan.exercises, completedExercises)),
+          skillTimeGained: roundSkillTime(skillTime),
           skillPointsGained: options?.skipSkillPoints
             ? {}
             : computeSkillPointsGained(plan.exercises, completedExercises),

@@ -162,7 +162,7 @@ export const usePracticeSessionState = ({
     ) => {
       // Both read in the same breath: the song shares are a slice of the
       // category totals and must come from the same snapshot.
-      const { time, songTime } = useSessionTimeStore.getState();
+      const { time, songTime, skillTime } = useSessionTimeStore.getState();
       return handleFinishSession(
         time,
         timer.stopTimer,
@@ -170,6 +170,7 @@ export const usePracticeSessionState = ({
         micPerformance,
         earTrainingPerformance,
         songTime,
+        skillTime,
         options
       );
     },

@@ -62,6 +62,12 @@ import {
 import { RaportSchema } from "./helpers/RaportShcema";
 import { buildSaveSummary } from "./helpers/saveSummary";
 import {
+  MAX_SKILL_MINUTES,
+  type SkillMinutes,
+  sumSkillMinutesByCategory,
+  toSkillTimeGained,
+} from "./helpers/sessionSkills";
+import {
   buildSongsSessionTitle,
   createPickedSong,
   MAX_SESSION_SONGS,
@@ -74,11 +80,15 @@ import {
 } from "./helpers/sessionSongs";
 import type { ReportFormikInterface } from "./ReportView.types";
 import SavedTimeBanner from "./SavedTimeBanner";
+import SessionSkillPicker from "./SessionSkillPicker";
 import SessionSongPicker, { type SongCategory } from "./SessionSongPicker";
 
 type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
 type SessionMode = "free" | "songs";
+
+/** How a free session's time is entered: per category, or per guitar skill. */
+type FreeInput = "categories" | "skills";
 
 /** Tag labels double as ids; this is the key their translation lives under. */
 const tagKey = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/g, "_");
@@ -113,6 +123,8 @@ const ReportView = () => {
   const [sessionMode, setSessionMode] = useState<SessionMode>(
     pickedSongs.length > 0 ? "songs" : "free"
   );
+  const [freeInput, setFreeInput] = useState<FreeInput>("categories");
+  const [skillMinutes, setSkillMinutes] = useState<SkillMinutes>({});
   const autoApplyTimer = applyTimer === "true";
   const { t } = useTranslation("report");
   const intlLocale = useIntlLocale();
@@ -325,10 +337,50 @@ const ReportView = () => {
     );
   };
 
+  /**
+   * By-skill entry owns the category boxes the same way songs do: each box is
+   * the sum of its skills' minutes.
+   */
+  const applySkillTimes = (next: SkillMinutes, setFieldValue: SetFieldValue) => {
+    const totals = sumSkillMinutesByCategory(next);
+    setMinutesField("techniqueHours", "techniqueMinutes", totals.technique, setFieldValue);
+    setMinutesField("theoryHours", "theoryMinutes", totals.theory, setFieldValue);
+    setMinutesField("hearingHours", "hearingMinutes", totals.hearing, setFieldValue);
+    setMinutesField("creativityHours", "creativityMinutes", totals.creativity, setFieldValue);
+  };
+
+  const toggleSkill = (skillId: string, setFieldValue: SetFieldValue) => {
+    const next = { ...skillMinutes };
+    if (skillId in next) delete next[skillId];
+    else next[skillId] = 0;
+    setSkillMinutes(next);
+    applySkillTimes(next, setFieldValue);
+  };
+
+  const setSkillMinutesFor = (skillId: string, minutes: number, setFieldValue: SetFieldValue) => {
+    const next = {
+      ...skillMinutes,
+      [skillId]: Math.max(0, Math.min(minutes, MAX_SKILL_MINUTES)),
+    };
+    setSkillMinutes(next);
+    applySkillTimes(next, setFieldValue);
+  };
+
+  const switchFreeInput = (input: FreeInput, setFieldValue: SetFieldValue) => {
+    if (input === freeInput) return;
+    setFreeInput(input);
+    // Either side owns the boxes; switching starts that side from empty rather
+    // than leaving time on the boxes the skills no longer explain.
+    setSkillMinutes({});
+    applySkillTimes({}, setFieldValue);
+  };
+
   const switchSessionMode = (mode: SessionMode, setFieldValue: SetFieldValue) => {
     setSessionMode(mode);
 
     if (mode === "songs") {
+      setFreeInput("categories");
+      setSkillMinutes({});
       // Tags and songs both write `reportTitle`; keep only one of them alive.
       setSelectedTags([]);
       applySongTimes(pickedSongs, setFieldValue);
@@ -391,6 +443,8 @@ const ReportView = () => {
     const enrichedInputData = {
       ...inputData,
       songs: loggedSongs,
+      ...(sessionMode === "free" &&
+        freeInput === "skills" && { skillTimeGained: toSkillTimeGained(skillMinutes) }),
       // Everything that still reads a single song (activity feed, practice log,
       // rating popup) gets the one this session leaned on the most.
       songId: primarySong?.songId,
@@ -547,6 +601,9 @@ const ReportView = () => {
   // and one-off confirmations are cleared — Formik remounts with fresh values.
   const logAnotherSession = () => {
     setPickedSongs((songs) => songs.map((song) => createPickedSong(song)));
+    setSkillMinutes((skills) =>
+      Object.fromEntries(Object.keys(skills).map((skillId) => [skillId, 0]))
+    );
     setAcceptExceedingTime(false);
     setAcceptLongTime(false);
     setSubmittedValues(null);
@@ -712,6 +769,37 @@ const ReportView = () => {
                       />
                     ) : (
                       <>
+                        <div className='mb-6 flex gap-1'>
+                          {([
+                            { input: "categories" as const, label: "By category" },
+                            { input: "skills" as const, label: "By skill" },
+                          ]).map(({ input, label }) => (
+                            <button
+                              key={input}
+                              type='button'
+                              aria-pressed={freeInput === input}
+                              onClick={() => switchFreeInput(input, setFieldValue)}
+                              className={cn(
+                                "rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
+                                freeInput === input
+                                  ? "bg-zinc-800 text-zinc-100"
+                                  : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+                              )}>
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+
+                        {freeInput === "skills" ? (
+                          <SessionSkillPicker
+                            value={skillMinutes}
+                            onToggle={(skillId) => toggleSkill(skillId, setFieldValue)}
+                            onSetMinutes={(skillId, minutes) =>
+                              setSkillMinutesFor(skillId, minutes, setFieldValue)
+                            }
+                          />
+                        ) : (
+                        <>
                         {hasSavedTime && (
                           <SavedTimeBanner
                             timerData={timerData}
@@ -740,6 +828,8 @@ const ReportView = () => {
                             )
                           )}
                         </div>
+                        </>
+                        )}
                       </>
                     )}
                     <div className='mt-10'>

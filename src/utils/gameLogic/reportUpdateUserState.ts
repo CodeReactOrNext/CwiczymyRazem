@@ -19,6 +19,27 @@ import {
 } from "./index";
 import { getReminderHourUtc, isValidTimeZone } from "./localDay";
 
+/**
+ * Adds a report's per-skill time to the stored totals. The payload comes from
+ * the client, so each entry is kept only if it is a sane skill id and a
+ * positive duration, and is capped at the session's own length — under the
+ * whole-time-per-skill rule no single skill can get more than that.
+ */
+export const addSkillTime = (
+  stored: Record<string, number> | undefined,
+  gained: Record<string, number> | undefined,
+  sessionMs: number
+): Record<string, number> => {
+  const totals = { ...(stored ?? {}) };
+  Object.entries(gained ?? {}).forEach(([skillId, ms]) => {
+    if (!/^[a-z_-]{1,40}$/.test(skillId)) return;
+    const value = Math.min(Number(ms), sessionMs);
+    if (!Number.isFinite(value) || value <= 0) return;
+    totals[skillId] = (totals[skillId] ?? 0) + Math.round(value);
+  });
+  return totals;
+};
+
 interface updateUserStatsProps {
   currentUserStats: StatisticsDataInterface;
   inputData: ReportFormikInterface;
@@ -198,7 +219,12 @@ export const reportUpdateUserStats = ({
           acc[skillId] = currentPoints + pointsGained;
           return acc;
         }, {} as Record<string, number>) : {})
-      }
+      },
+      timeSpent: addSkillTime(
+        currentUserStats.skills?.timeSpent,
+        inputData.skillTimeGained,
+        sumTime
+      ),
     },
     points: points + raiting.totalPoints,
     lvl: updatedLevel,

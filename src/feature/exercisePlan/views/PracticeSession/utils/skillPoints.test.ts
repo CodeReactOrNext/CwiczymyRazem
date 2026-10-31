@@ -1,7 +1,7 @@
 import type { DifficultyLevel, Exercise } from "feature/exercisePlan/types/exercise.types";
 import { describe, expect, it } from "vitest";
 
-import { computeSkillPointsGained } from "./skillPoints";
+import { computeSkillPointsGained, roundSkillTime } from "./skillPoints";
 
 const exercise = (difficulty: DifficultyLevel, relatedSkills: string[]) =>
   ({ difficulty, relatedSkills } as unknown as Exercise);
@@ -46,5 +46,11 @@ describe("computeSkillPointsGained", () => {
 
   it("skips exercises that train no skill", () => {
     expect(computeSkillPointsGained([exercise("hard", [])], [0])).toEqual({});
+  });
+});
+
+describe("roundSkillTime", () => {
+  it("rounds to whole ms and drops skills with no time", () => {
+    expect(roundSkillTime({ legato: 1500.6, tapping: 0.2 })).toEqual({ legato: 1501 });
   });
 });

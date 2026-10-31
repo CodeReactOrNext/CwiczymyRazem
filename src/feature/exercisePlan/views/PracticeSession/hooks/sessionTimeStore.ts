@@ -19,7 +19,18 @@ interface SessionTimeStore {
    * progress wants to know.
    */
   songTime: Record<string, number>;
-  add: (skill: SkillsType, ms: number, songId?: string) => void;
+  /**
+   * Time per guitar skill (exercise `relatedSkills`). Each skill of the
+   * exercise gets the whole tick — an exercise training two skills counts its
+   * minutes for both — so these do not add up to `time`.
+   */
+  skillTime: Record<string, number>;
+  add: (
+    skill: SkillsType,
+    ms: number,
+    songId?: string,
+    skillIds?: readonly string[]
+  ) => void;
   reset: () => void;
 }
 
@@ -38,7 +49,8 @@ interface SessionTimeStore {
 export const useSessionTimeStore = create<SessionTimeStore>()((set) => ({
   time: EMPTY,
   songTime: {},
-  add: (skill, ms, songId) =>
+  skillTime: {},
+  add: (skill, ms, songId, skillIds) =>
     set((state) => ({
       time: { ...state.time, [skill]: state.time[skill] + ms },
       // One tick, two ledgers: the song's share is a view over the category
@@ -47,8 +59,16 @@ export const useSessionTimeStore = create<SessionTimeStore>()((set) => ({
       ...(songId
         ? { songTime: { ...state.songTime, [songId]: (state.songTime[songId] ?? 0) + ms } }
         : {}),
+      ...(skillIds && skillIds.length > 0
+        ? {
+            skillTime: skillIds.reduce(
+              (acc, skillId) => ({ ...acc, [skillId]: (acc[skillId] ?? 0) + ms }),
+              state.skillTime
+            ),
+          }
+        : {}),
     })),
-  reset: () => set({ time: EMPTY, songTime: {} }),
+  reset: () => set({ time: EMPTY, songTime: {}, skillTime: {} }),
 }));
 
 /** Total ms tracked in the running session, across every category. */

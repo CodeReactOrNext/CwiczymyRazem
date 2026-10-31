@@ -36,4 +36,6 @@ export interface UserSkills {
   unlockedSkills: {
     [skillId in GuitarSkillId]?: number;
   } & { [key: string]: number };
+  /** All-time practice per skill, in ms. */
+  timeSpent?: Record<string, number>;
 }
