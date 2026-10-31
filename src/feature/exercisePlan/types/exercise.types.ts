@@ -389,6 +389,9 @@ export interface ExercisePlan {
    *  is generated, so nothing public links to it by id. */
   boss?: {
     id: string;
+    /** The furthest phase the session has cleared, 1-based — absent until it
+     *  clears one. Its log names it in the activity feed. */
+    clearedPhase?: number;
   };
 }
 

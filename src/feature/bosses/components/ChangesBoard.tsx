@@ -284,6 +284,8 @@ export const ChordLane = ({ variation, live, current, started, veiled, t, stillA
               exit={{ opacity: 0, x: -48 }}
               transition={transitions.base}
               data-slot={slot}
+              // What the changeling aims at when its chord is let go by (BossShots).
+              data-changes-unit={unit}
               className={cn(
                 "min-w-0 flex-1 space-y-3 rounded-lg px-4 py-3 transition-colors duration-fast",
                 now
@@ -322,8 +324,8 @@ export const ChordLane = ({ variation, live, current, started, veiled, t, stillA
 /**
  * What the changeling's player reads in place of a tab: the lane of chords —
  * the one being played, its beats and where the run is in them, and the two
- * after it; the last notes heard, or the combo while one is strung; and the
- * neck — the chord's notes and the scale's, the one place they are shown —
+ * after it; the last notes heard; the combo while one is strung, and the
+ * neck under it — the chord's notes and the scale's, the one place they are shown —
  * with where the note just played sits. Laid over the session's tab
  * (TabOverlayContext) — the rests under it only keep the clock. A curtain
  * hides the tones and the way ahead.
@@ -333,7 +335,6 @@ export const ChangesBoard = ({ boss }: { boss: BossDefinition }) => {
   const plan = useBossFightStore((s) => s.fight.plan);
   const live = useBossFightStore((s) => s.changesLive);
   const veiled = useBossFightStore((s) => isWebbed(s.fight) && !s.fight.outcome && !s.fight.holding);
-  const comboLive = useBossFightStore((s) => s.fight.changeCombo !== null);
   const comboEnding = useComboEnding();
   const miss = useFreshMiss(live.lastMiss);
   if (plan.kind !== "changes") return null;
@@ -354,13 +355,8 @@ export const ChangesBoard = ({ boss }: { boss: BossDefinition }) => {
     <div className='absolute inset-0 z-20 flex flex-col gap-3 overflow-hidden rounded-lg bg-zinc-900 px-5 py-4 text-left'>
       <ChordLane variation={variation} live={live} current={current} started={started} veiled={veiled} t={t} />
 
-      <div className='relative flex min-h-9 flex-wrap items-center justify-between gap-x-6 gap-y-2'>
-        <NoteTrail
-          trail={live.trail}
-          variation={variation}
-          t={t}
-          className={comboLive || comboEnding ? "invisible" : undefined}
-        />
+      <div className='flex min-h-9 flex-wrap items-center justify-between gap-x-6 gap-y-2'>
+        <NoteTrail trail={live.trail} variation={variation} t={t} />
         {/* A bite's reason takes the legend's place while it is fresh. */}
         <div className='ml-auto' aria-live='polite'>
           {miss ? (
@@ -369,23 +365,27 @@ export const ChangesBoard = ({ boss }: { boss: BossDefinition }) => {
             !veiled && <Legend chord={chord} scale={scaleName} t={t} />
           )}
         </div>
-        <ComboHud ending={comboEnding} t={t} className='absolute inset-y-0 left-0 z-10' />
       </div>
 
-      <div className='flex min-h-0 flex-1 items-center justify-center'>
-        {veiled ? (
-          <p className='text-center text-sm font-medium text-zinc-400'>{t("arena.webbed")}</p>
-        ) : (
-          <ChangesFretboard
-            chord={chord}
-            scale={chordScale(chord, variation.key)}
-            musicKey={variation.key}
-            start={position}
-            guideTones={plan.weakSpots}
-            played={live.lastNote}
-            label={t("board.fretboard", { chord })}
-          />
-        )}
+      {/* The combo right over the neck, where the eyes already are; its row
+          stays put whether one is strung or not, so the neck never jumps. */}
+      <div className='flex min-h-0 flex-1 flex-col items-center gap-1'>
+        <ComboHud ending={comboEnding} t={t} className='h-10 shrink-0 justify-center' />
+        <div className='flex min-h-0 w-full flex-1 items-center justify-center'>
+          {veiled ? (
+            <p className='text-center text-sm font-medium text-zinc-400'>{t("arena.webbed")}</p>
+          ) : (
+            <ChangesFretboard
+              chord={chord}
+              scale={chordScale(chord, variation.key)}
+              musicKey={variation.key}
+              start={position}
+              guideTones={plan.weakSpots}
+              played={live.lastNote}
+              label={t("board.fretboard", { chord })}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

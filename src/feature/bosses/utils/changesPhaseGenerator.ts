@@ -21,7 +21,7 @@ const BEATS_PER_BAR = 4;
 /** Different chords in the first phase — one more every phase after it, up to MAX_CHORDS. */
 export const FIRST_CHORDS = 3;
 export const MAX_CHORDS = 7;
-const MIN_BPM = 66;
+const MIN_BPM = 60;
 const MAX_BPM = 150;
 /**
  * Chord tones a beat a solid soloist lands — between quarters and eighths,
@@ -30,10 +30,11 @@ const MAX_BPM = 150;
 export const EXPECTED_HITS_PER_BEAT = 1.2;
 
 /**
- * Chord changes a second: 0.3 at the start (a chord a bar at 72 BPM), 6% more
- * every phase, one a second at most — two chords a bar at 120.
+ * Chord changes a second: 0.25 at the start (a chord a bar at 60 BPM), 4% more
+ * every phase — a solo needs room to think, so the curve climbs gently — one a
+ * second at most, two chords a bar at 120.
  */
-export const targetChangesPerSecond = (index: number) => Math.min(1, 0.3 * 1.06 ** index);
+export const targetChangesPerSecond = (index: number) => Math.min(1, 0.25 * 1.04 ** index);
 
 /** Major and minor for five phases, then the modes, the blues, harmonic minor. */
 const modesFor = (index: number): ChangesMode[] =>

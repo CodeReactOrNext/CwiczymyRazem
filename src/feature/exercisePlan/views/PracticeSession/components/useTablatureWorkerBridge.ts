@@ -3,6 +3,7 @@ import type { FillFeed } from "feature/exercisePlan/views/PracticeSession/utils/
 import { fillFeedEnd, readFillSteps } from "feature/exercisePlan/views/PracticeSession/utils/fillFeed";
 import type { LearnFocus } from "feature/exercisePlan/views/PracticeSession/utils/learnSteps";
 import type { LivePitch } from "feature/exercisePlan/views/PracticeSession/utils/pitchScoring";
+import type { TabNotePoint } from "feature/exercisePlan/views/PracticeSession/utils/tabNoteLocator";
 import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import type { MutableRefObject } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -26,6 +27,11 @@ export const TAB_BASE_HEIGHT = 300;
  * must subtract it. Keep in sync with GUTTER_W in TablatureViewer.worker.ts.
  */
 export const TAB_GUTTER_W = 36;
+
+/** How far in from the board's left edge a long note is aimed at once its start has gone (CSS px)… */
+const AIM_MARGIN_PX = 24;
+/** …and how far back from the end of its tail (world px), while the tail is on the board. */
+const AIM_TAIL_PX = 30;
 
 /** One string's entry in the left tuning gutter (string 1 = high e … 6 = low E).
  *  Which strings light up is decided live by the worker from the playback cursor
@@ -478,5 +484,67 @@ export function useTablatureWorkerBridge({
     workerRef.current?.postMessage({ type: 'SCROLL', scrollX: newScrollX, cursorPos: pausedScrollRef.current.cursorPos });
   };
 
-  return { showRestWarning, isRestActive, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat };
+  /**
+   * Where note `noteKey` is drawn `aheadSec` from now, in page px — or null
+   * when it is off the board. What a game mode aims at: a boss's shot at a
+   * missed note, led so it lands where the note will have scrolled to.
+   *
+   * A long note (a held chord) is judged once it is over, by when its start
+   * has scrolled away: the point aimed at is its tail, or the part of it
+   * still on the board — `along` its length, 0–1, handed back so the same
+   * spot can be followed later (then it is placed even off the board). A
+   * chord is aimed at in the middle of its strings.
+   *
+   * Mirrors the worker's playback scroll for a steady tempo and a full-tab
+   * loop — the boss tabs' case; a sub-loop or a turned board is not aimed at.
+   */
+  const locateNote = (noteKey: string, aheadSec = 0, along?: number): TabNotePoint | null => {
+    const canvas = canvasRef.current;
+    const W = containerSize.width;
+    const H = containerSize.height;
+    if (!canvas || quarterTurned || W <= 0 || H <= 0 || renderData.totalBeats <= 0) return null;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
+
+    const index = renderData.renderBeats.findIndex((beat) => beat.notes.some((note) => note.noteKey === noteKey));
+    if (index < 0) return null;
+    const beat = renderData.renderBeats[index];
+    const noteY = beat.notes.reduce((sum, note) => sum + note.noteY, 0) / beat.notes.length;
+
+    const elapsed =
+      audioContext && audioStartTime != null
+        ? audioContext.currentTime - audioStartTime
+        : startTime !== null
+          ? (Date.now() - startTime) / 1000
+          : null;
+    const viewW = W / vscale;
+    let scrollX = pausedScrollRef.current.scrollX;
+    let shift = 0;
+    if (isPlaying && elapsed !== null) {
+      const beats = Math.max(0, elapsed + aheadSec) * (bpm / 60);
+      const pass = Math.floor(beats / renderData.totalBeats);
+      const wrapped = beats - pass * renderData.totalBeats;
+      const cursor = pass * xMap.totalX + beatToX(xMap, wrapped);
+      // Judged late enough that the tab came round: the note is the last pass's.
+      shift = pass * xMap.totalX - (beat.offsetX > wrapped ? xMap.totalX : 0);
+      scrollX = Math.max(0, cursor - viewW / 4);
+    }
+    // From the note's head to the end of its tail, in world px.
+    const head = xMap.xs[index] + 4 + pillHeight / 2 + shift;
+    const span = Math.max(0, (xMap.xs[index + 1] ?? xMap.totalX) + shift - pillHeight / 2 - head);
+    // Its tail end, or the first part of it still on the board.
+    const onBoard = scrollX - gutterW + AIM_MARGIN_PX / vscale;
+    const share =
+      along ?? (span > 0 ? Math.min(1, Math.max(Math.max(0, span - AIM_TAIL_PX) / span, (onBoard - head) / span)) : 0);
+    const x = (gutterW + head + share * span - scrollX) * vscale;
+    if (along === undefined && (x < 0 || x > W)) return null;
+    return {
+      x: rect.left + ((rightToLeft ? W - x : x) * rect.width) / W,
+      y: rect.top + (noteY * vscale * rect.height) / H,
+      board: containerRef?.current ?? null,
+      along: share,
+    };
+  };
+
+  return { showRestWarning, isRestActive, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat, locateNote };
 }

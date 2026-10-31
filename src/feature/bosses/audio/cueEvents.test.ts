@@ -14,8 +14,12 @@ describe("the music of a run", () => {
   it("plays the bare pulse after a miss, more of the score the longer the streak", () => {
     const fight = fightWith();
     expect(musicEnergy({ ...fight, combo: 0 })).toBe(1);
-    expect(musicEnergy({ ...fight, combo: 5 })).toBe(2);
+    // A few notes are no run yet: the band waits for one before it builds.
+    expect(musicEnergy({ ...fight, combo: 5 })).toBe(1);
+    expect(musicEnergy({ ...fight, combo: 12 })).toBe(2);
     expect(musicEnergy({ ...fight, combo: 24 })).toBe(3);
+    // The double kick only once the streak is at ×2.
+    expect(musicEnergy({ ...fight, combo: 40 })).toBe(3);
     expect(musicEnergy({ ...fight, combo: 48 })).toBe(4);
     // Late in the fight a miss can only strip it so far.
     expect(musicEnergy({ ...fight, combo: 0, plan: { ...fight.plan, index: 6 } })).toBe(2);
@@ -32,10 +36,11 @@ describe("the music of a run", () => {
     });
   });
 
-  it("drops the band at once on a miss and builds it on the beat", () => {
+  it("moves the battle score on the bar line, a layer a bar", () => {
     const fight = { ...fightWith(), combo: 30 };
-    expect(cueEvents({ ...fight, combo: 0 }, fight)).toContainEqual({ kind: "energy", level: 1, drop: true });
-    expect(cueEvents({ ...fight, combo: 40 }, fight)).toContainEqual({ kind: "energy", level: 4, drop: false });
+    const bar = { everyBeats: 4, glide: true };
+    expect(cueEvents({ ...fight, combo: 0 }, fight)).toContainEqual({ kind: "energy", level: 1, drop: true, ...bar });
+    expect(cueEvents({ ...fight, combo: 48 }, fight)).toContainEqual({ kind: "energy", level: 4, drop: false, ...bar });
   });
 
   it("builds tension with the sword and calls the danger of low HP", () => {
@@ -47,7 +52,7 @@ describe("the music of a run", () => {
   it("starts a new run from the bare pulse, calm", () => {
     const fight = { ...fightWith(), combo: 30, playerHp: 10 };
     expect(cueEvents({ ...fight, runSeed: fight.runSeed + 1, combo: 0, playerHp: 100 }, fight)).toEqual([
-      { kind: "energy", level: 1, drop: true },
+      { kind: "energy", level: 1, drop: true, glide: true },
       { kind: "tension", amount: 0 },
       { kind: "danger", on: false },
     ]);

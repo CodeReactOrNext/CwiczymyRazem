@@ -305,14 +305,18 @@
     "runs": "Partidas",
     "fight": "Luchar",
     "difficulty": "Dificultad",
-    "difficulty_effect": "Golpes {{damage}} · Tempo {{tempo}} · Puntuación {{reward}}",
+    "effect_damage": "Daño recibido",
+    "effect_tempo": "Tempo",
+    "effect_score": "Puntuación",
     "start_at": "Empezar en",
     "phase_option": "Fase {{phase}}",
     "next_savepoint": "La fase {{phase}} se abre cuando la alcances",
     "skip_note_one": "Te saltas {{count}} fase — supera la fase {{phase}} para sumar sus PV a tu puntuación.",
     "skip_note_other": "Te saltas {{count}} fases — supera la fase {{phase}} para sumar sus PV a tu puntuación.",
     "best_score": "Mejor puntuación",
-    "not_fought": "Aún sin combatir"
+    "not_fought": "Aún sin combatir",
+    "desktop_only": "Las peleas contra jefes no están disponibles en el móvil",
+    "desktop_hint": "Una pelea necesita una pantalla grande para leer la tablatura a tiempo. Abre riff.quest en un portátil u ordenador para enfrentarte a este jefe."
   },
   "rules": {
     "title": "Cómo funciona el combate",

@@ -38,6 +38,12 @@ export const onPlayhead = (listener: () => void) => {
 };
 
 
+/** A miss the boss punished, and the note it was on. */
+export interface MissShot {
+  noteKey: string;
+  biteTick: number;
+}
+
 interface BossFightStore {
   fight: BossFightState;
   /** The changeling's fight only — see ChangesLive. */
@@ -46,6 +52,10 @@ interface BossFightStore {
   newRecord: boolean;
   /** The record the run just lost was measured against. */
   recordBefore: BossRecord | null;
+  /** The furthest phase the earlier runs of this fight cleared, 0 for none — see sessionClearedPhase. */
+  sessionCleared: number;
+  /** The tab note the boss last bit the player for, by the bite (fight.biteTick) — what it shoots at. */
+  missShot: MissShot | null;
   setRunVerdict: (verdict: { newRecord: boolean; recordBefore: BossRecord }) => void;
   /** A new run against the same boss, on the same difficulty from the same savepoint, freshly dealt; a seed only to replay one (tests). */
   newRun: (seed?: number) => void;
@@ -95,8 +105,15 @@ const freshRun = (fight: BossFightState) => {
   changes.reset();
   changesPlan = null;
   setPlayhead(null);
-  return { fight, newRecord: false, recordBefore: null, draftOpen: false, changesLive: IDLE_CHANGES };
+  return { fight, newRecord: false, recordBefore: null, draftOpen: false, changesLive: IDLE_CHANGES, missShot: null };
 };
+
+/**
+ * The furthest phase the fight has cleared since it was entered, over every
+ * run in it — 0 until one is. What the session's log tells the feed.
+ */
+export const sessionClearedPhase = (state: Pick<BossFightStore, "fight" | "sessionCleared">) =>
+  Math.max(state.sessionCleared, state.fight.phaseLog.at(-1)?.phase ?? 0);
 
 /**
  * The fight in progress. Outside React on purpose: notes arrive from the
@@ -108,23 +125,30 @@ export const useBossFightStore = create<BossFightStore>()((set, get) => ({
   changesLive: IDLE_CHANGES,
   newRecord: false,
   recordBefore: null,
+  sessionCleared: 0,
+  missShot: null,
   setRunVerdict: ({ newRecord, recordBefore }) => set({ newRecord, recordBefore }),
   newRun: (seed = newRunSeed()) =>
-    set((state) =>
-      freshRun(
+    set((state) => ({
+      ...freshRun(
         createFight(seed, state.fight.plan.kind, {
           difficulty: state.fight.difficulty,
           startPhase: state.fight.startPhase,
         }),
       ),
-    ),
-  enterFight: (kind, { seed = newRunSeed(), ...options } = {}) => set(freshRun(createFight(seed, kind, options))),
+      sessionCleared: sessionClearedPhase(state),
+    })),
+  enterFight: (kind, { seed = newRunSeed(), ...options } = {}) =>
+    set({ ...freshRun(createFight(seed, kind, options)), sessionCleared: 0 }),
   judge: (judgement) =>
     set((state) => {
       const input = toFightJudgement(state.fight, judgement);
       if (!input) return state;
       const fight = applyJudgement(state.fight, input);
-      return fight === state.fight ? state : { fight };
+      if (fight === state.fight) return state;
+      // A strum that bites is settled by its last tone — the shot lands on the chord all the same.
+      const bit = fight.biteTick > state.fight.biteTick;
+      return bit ? { fight, missShot: { noteKey: judgement.noteKey, biteTick: fight.biteTick } } : { fight };
     }),
   feedFreePlay: (frame) => {
     const { fight: start, changesLive } = get();

@@ -6,6 +6,7 @@ import {
   createRng,
   generatePhase,
   SLAMS_FROM,
+  SPIDER_LADDER,
   targetNotesPerSecond,
   WEAK_SPOTS_FROM,
 } from "./phaseGenerator";
@@ -53,6 +54,32 @@ describe("generatePhase", () => {
         const { patterns, descendPatterns = [] } = generatePhase(seed, index).variation;
         for (const p of [...patterns, ...descendPatterns]) {
           expect(p.split("").sort().join("")).toBe("1234");
+        }
+      }
+    }
+  });
+
+  it("brings one new thing into the drill at a time", () => {
+    const mirrored = ["1234", "4321"];
+    for (const seed of SEEDS) {
+      for (const index of PHASES) {
+        const { route, patterns, descendPatterns = [], notesPerBeat } = generatePhase(seed, index).variation;
+        const at = `${seed}/${index}`;
+        if (index < SPIDER_LADDER.mirror) expect(patterns, at).toEqual(["1234"]);
+        if (index < SPIDER_LADDER.fingerOrders) expect(mirrored, at).toEqual(expect.arrayContaining([...patterns]));
+        if (index < SPIDER_LADDER.skip) expect(route, at).toBe("walk");
+        if (index < SPIDER_LADDER.diagonal) expect(route, at).not.toBe("diagonal");
+        if (index < SPIDER_LADDER.triplets) expect(notesPerBeat, at).toBeLessThan(3);
+        if (index < SPIDER_LADDER.sixteenths) expect(notesPerBeat, at).toBeLessThan(4);
+        // A new route comes on fingers already known, a lone order at a time.
+        if (route === "skip" && index < SPIDER_LADDER.skipAnyOrder) {
+          expect(mirrored, at).toEqual(expect.arrayContaining([...patterns]));
+        }
+        if (index < SPIDER_LADDER.mixed) {
+          expect(patterns, at).toHaveLength(1);
+          // Back down on the same order, or its mirror — never another one.
+          const [p] = patterns;
+          expect([p, p.split("").reverse().join("")], at).toContain(descendPatterns[0]);
         }
       }
     }

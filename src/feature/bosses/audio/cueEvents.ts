@@ -11,9 +11,11 @@ export type CueEvent =
   | { kind: "now"; cue: BossCue; tick?: number }
   /**
    * The band's energy follows the run: up on the next beat, down at once after
-   * a miss (`drop`) — or both on the next of every `everyBeats` beats.
+   * a miss (`drop`) — or both on the next of every `everyBeats` beats. The
+   * battle score `glide`s: a layer every `everyBeats` at most, never a jump,
+   * and a strike lifts it a layer rather than to the double kick.
    */
-  | { kind: "energy"; level: number; drop: boolean; everyBeats?: number }
+  | { kind: "energy"; level: number; drop: boolean; everyBeats?: number; glide?: boolean }
   /** The sword's charge, 0–1 — the build toward a strike. */
   | { kind: "tension"; amount: number }
   /** The player's HP is low (or no longer): the heartbeat. */
@@ -29,24 +31,39 @@ export const DANGER_HP = 0.25;
 const GROOVE_STREAK = 3;
 
 /**
+ * Where on the way to ×2 the battle score takes on its groove, its drive and
+ * its peak — the double kick only once the streak is there. A spider's
+ * streak counts notes, a dozen of them a couple of beats: the band waits for
+ * a real run before it builds.
+ */
+const BATTLE_STEPS = [1 / 6, 0.5, 1] as const;
+
+/**
  * How much of the score the band plays for this run (AmbientBand.plays): the
- * bare pulse after a miss, the groove once a streak gets going, the drive past
- * a third of the way to ×2, everything near it — never under the phase's floor.
+ * bare pulse after a miss, the groove once a streak gets going, the drive
+ * halfway to ×2 and everything at it (the changeling's band: a third of the
+ * way, and near it) — never under the phase's floor.
  */
 export const musicEnergy = (fight: BossFightState) => {
   const progress = fightMultiplier(fight) - 1;
+  const [groove, drive, peak] = fight.plan.kind === "changes" ? [0, 0.3, 0.7] : BATTLE_STEPS;
   const level =
-    fight.combo < GROOVE_STREAK ? 1 : progress < 0.3 ? 2 : progress < 0.7 ? 3 : 4;
+    fight.combo < GROOVE_STREAK || progress < groove ? 1 : progress < drive ? 2 : progress < peak ? 3 : 4;
   const floor = fight.plan.kind === "changes" ? CHANGES_ENERGY_FLOOR : bossEnergyFloor(fight.plan.index + 1);
   return Math.max(floor, level);
 };
 
+/** A bar of the spider's and the colossus's 4/4. */
+const BAR_BEATS = 4;
+
 /**
  * A solo over the changes is judged on beats 1 and 3, and its band moves
- * with it there: up or down on the next of them, not on the next eighth.
+ * with it there: up or down on the next of them, not on the next eighth. The
+ * battle score moves on the bar line, a layer a bar — a streak builds it bar
+ * by bar, a miss winds it down, nothing comes in mid-bar.
  */
 const energyGrid = (fight: BossFightState) =>
-  fight.plan.kind === "changes" ? { everyBeats: STRONG_BEAT_EVERY } : {};
+  fight.plan.kind === "changes" ? { everyBeats: STRONG_BEAT_EVERY } : { everyBeats: BAR_BEATS, glide: true };
 
 const tensionOf = (fight: BossFightState) =>
   fight.chargeMax > 0 ? Math.min(1, fight.charge / fight.chargeMax) : 0;
@@ -76,7 +93,7 @@ export const cueEvents = (next: BossFightState, previous: BossFightState): CueEv
   // A new run: silent, the band back to the start of it.
   if (next.runSeed !== previous.runSeed) {
     return [
-      { kind: "energy", level: musicEnergy(next), drop: true },
+      { kind: "energy", level: musicEnergy(next), drop: true, ...(next.plan.kind !== "changes" && { glide: true }) },
       { kind: "tension", amount: 0 },
       { kind: "danger", on: false },
     ];

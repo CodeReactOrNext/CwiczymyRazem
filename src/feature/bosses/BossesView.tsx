@@ -4,6 +4,7 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { m } from "framer-motion";
 import type { Translate } from "lib/i18n/translate";
 import { fadeUp } from "lib/motion/motion";
+import { Loader2, Monitor, Swords } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
@@ -56,7 +57,7 @@ const ruleVars = (boss: BossDefinition) => ({
 
 const RecordStat = ({ value, label }: { value: string | number; label: string }) => (
   <div>
-    <p className='font-teko text-4xl leading-none tabular-nums text-zinc-100'>{value}</p>
+    <p className='font-teko text-5xl leading-none tabular-nums text-zinc-100'>{value}</p>
     <p className='mt-1 text-xs text-zinc-400'>{label}</p>
   </div>
 );
@@ -80,6 +81,48 @@ const Option = ({
     )}>
     {children}
   </button>
+);
+
+/** A difficulty on the setup: its name over a pip per level, so the four read as a climb at a glance. */
+const DifficultyOption = ({
+  level,
+  selected,
+  onClick,
+  children,
+}: {
+  level: number;
+  selected: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) => (
+  <button
+    type='button'
+    aria-pressed={selected}
+    onClick={onClick}
+    className={cn(
+      "flex flex-col items-start gap-2.5 rounded-lg px-4 py-3 text-left text-sm font-semibold transition-colors duration-fast",
+      selected ? "bg-zinc-100 text-zinc-950" : "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100",
+    )}>
+    {children}
+    <span className='flex gap-1' aria-hidden>
+      {DIFFICULTIES.map((d, i) => (
+        <span
+          key={d}
+          className={cn(
+            "h-1 w-4 rounded-full",
+            i <= level ? (selected ? "bg-zinc-950" : "bg-zinc-400") : selected ? "bg-zinc-950/15" : "bg-zinc-700",
+          )}
+        />
+      ))}
+    </span>
+  </button>
+);
+
+const Effect = ({ label, value }: { label: string; value: string }) => (
+  <div>
+    <p className='text-xs text-zinc-500'>{label}</p>
+    <p className='mt-0.5 text-sm font-semibold tabular-nums text-zinc-100'>{value}</p>
+  </div>
 );
 
 /** "−15%", "+10%", "±0%". */
@@ -112,35 +155,33 @@ const FightSetup = ({
   const savepoints = savepointsFor(record, difficulty);
   const effect = DIFFICULTY[difficulty];
   return (
-    <div className='space-y-5'>
-      <div className='space-y-2'>
-        <p className='text-xs text-zinc-400'>{t("lair.difficulty")}</p>
-        <div className='flex flex-wrap gap-2' role='group' aria-label={t("lair.difficulty")}>
-          {DIFFICULTIES.map((d) => (
-            <Option key={d} selected={d === difficulty} onClick={() => onDifficulty(d)}>
+    <div className='space-y-6'>
+      <div className='space-y-3'>
+        <p className='text-sm text-zinc-400'>{t("lair.difficulty")}</p>
+        <div className='grid grid-cols-2 gap-2 sm:grid-cols-4' role='group' aria-label={t("lair.difficulty")}>
+          {DIFFICULTIES.map((d, i) => (
+            <DifficultyOption key={d} level={i} selected={d === difficulty} onClick={() => onDifficulty(d)}>
               {t(`difficulty.${d}`)}
-            </Option>
+            </DifficultyOption>
           ))}
         </div>
-        <p className='text-xs tabular-nums text-zinc-500'>
-          {t("lair.difficulty_effect", {
-            damage: `×${effect.damage}`,
-            tempo: signedPercent(effect.tempo),
-            reward: `×${effect.reward}`,
-          })}
-        </p>
+        <div className='flex flex-wrap gap-x-8 gap-y-2 pt-1'>
+          <Effect label={t("lair.effect_damage")} value={`×${effect.damage}`} />
+          <Effect label={t("lair.effect_tempo")} value={signedPercent(effect.tempo)} />
+          <Effect label={t("lair.effect_score")} value={`×${effect.reward}`} />
+        </div>
       </div>
 
       {savepoints.length > 1 && (
-        <div className='space-y-2'>
-          <p className='text-xs text-zinc-400'>{t("lair.start_at")}</p>
+        <div className='space-y-3'>
+          <p className='text-sm text-zinc-400'>{t("lair.start_at")}</p>
           <div className='flex flex-wrap items-center gap-2' role='group' aria-label={t("lair.start_at")}>
             {savepoints.map((phase) => (
               <Option key={phase} selected={phase === start} onClick={() => onStart(phase)}>
                 {t("lair.phase_option", { phase })}
               </Option>
             ))}
-            <span className='px-1 text-xs text-zinc-600'>
+            <span className='px-1 text-xs text-zinc-500'>
               {t("lair.next_savepoint", { phase: nextSavepoint(record, difficulty) })}
             </span>
           </div>
@@ -152,6 +193,17 @@ const FightSetup = ({
     </div>
   );
 };
+
+/** In place of the setup and Fight below `lg`: a fight needs the room and the tab speed of a computer screen. */
+const DesktopOnlyNotice = ({ t }: { t: Translate }) => (
+  <div className='flex gap-4 rounded-lg bg-zinc-950/40 p-5 lg:hidden'>
+    <Monitor className='mt-0.5 size-5 shrink-0 text-zinc-400' aria-hidden />
+    <div className='space-y-1'>
+      <p className='text-sm font-semibold text-zinc-100'>{t("lair.desktop_only")}</p>
+      <p className='text-sm text-zinc-400'>{t("lair.desktop_hint")}</p>
+    </div>
+  </div>
+);
 
 /**
  * A boss on the select strip: its portrait, its name and how far you got.
@@ -202,12 +254,12 @@ const RosterTile = ({
 
 /**
  * The picked boss on its lit stage, the way it will meet you in the fight:
- * large, dropping in as it is picked, with the record against it and how the
- * next run is entered.
+ * large, standing on the stage's floor, dropping in as it is picked, with the
+ * record against it and how the next run is entered.
  */
 const BossLair = ({ boss }: { boss: BossDefinition }) => {
   const uid = useAppSelector(selectUserAuth);
-  const { record, isLoading } = useBossRecord(uid ?? null, boss.id);
+  const { record } = useBossRecord(uid ?? null, boss.id);
   const { t, bossName, bossTitle } = useBossText(boss);
   const difficulty = useBossLobbyStore((s) => s.difficulty);
   const setDifficulty = useBossLobbyStore((s) => s.setDifficulty);
@@ -220,22 +272,36 @@ const BossLair = ({ boss }: { boss: BossDefinition }) => {
   const guideSeen = useBossLobbyStore((s) => s.guidesSeen.includes(boss.id));
   const markGuideSeen = useBossLobbyStore((s) => s.markGuideSeen);
   const [guideOpen, setGuideOpen] = useState(false);
+  // The fight's page takes a moment to load — the key shows it is on its way.
+  const [entering, setEntering] = useState(false);
 
   return (
     <section className='overflow-hidden rounded-lg bg-zinc-900/40' style={stageStyle(boss.id, 0)}>
-      <div className='grid items-center gap-8 p-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-12 lg:p-10'>
-        <BossArt
-          boss={boss}
-          className='mx-auto aspect-[480/380] w-full max-w-xl'
-          pattern={[1, 3, 2, 4]}
-          webTorn={0}
-          intro
-        />
-        <m.div className='space-y-8' initial='hidden' animate='visible' variants={fadeUp}>
-          <div className='space-y-1'>
+      <div className='grid lg:min-h-[32rem] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]'>
+        {/* The boss stands on the stage's floor, its feet in the shade at the bottom edge. */}
+        <div className='relative flex items-end justify-center px-6 pt-8 lg:px-10 lg:pt-12'>
+          <BossArt
+            boss={boss}
+            className='aspect-[480/380] w-full max-w-md lg:max-w-2xl'
+            pattern={[1, 3, 2, 4]}
+            webTorn={0}
+            intro
+          />
+          <div
+            aria-hidden
+            className='pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-zinc-950/60 to-transparent'
+          />
+        </div>
+
+        <m.div
+          className='flex flex-col justify-center gap-8 p-6 lg:py-12 lg:pl-2 lg:pr-12'
+          initial='hidden'
+          animate='visible'
+          variants={fadeUp}>
+          <div className='space-y-2'>
             <p className='text-sm text-zinc-400'>{bossTitle}</p>
-            <h1 className='font-display text-4xl font-semibold text-zinc-100'>{bossName}</h1>
-            <p className='max-w-prose pt-2 text-sm text-zinc-400'>{t("lair.pitch")}</p>
+            <h1 className='font-display text-4xl font-semibold tracking-tight text-zinc-100 lg:text-5xl'>{bossName}</h1>
+            <p className='max-w-prose pt-1 text-sm leading-relaxed text-zinc-400'>{t("lair.pitch")}</p>
           </div>
 
           {record.runs > 0 && (
@@ -246,40 +312,48 @@ const BossLair = ({ boss }: { boss: BossDefinition }) => {
             </div>
           )}
 
-          <FightSetup
-            record={record}
-            difficulty={difficulty}
-            onDifficulty={setDifficulty}
-            start={start}
-            onStart={setChosenStart}
-            t={t}
-          />
+          <div className='hidden space-y-8 lg:block'>
+            <FightSetup
+              record={record}
+              difficulty={difficulty}
+              onDifficulty={setDifficulty}
+              start={start}
+              onStart={setChosenStart}
+              t={t}
+            />
 
-          <div className='flex flex-wrap items-center gap-3'>
-            <Button
-              asChild
-              disabled={isLoading}
-              className='h-12 w-full bg-white text-base text-zinc-950 shadow-none hover:bg-zinc-200 sm:w-auto sm:px-14'>
-              <Link
-                href={fightHref}
-                onClick={(event) => {
-                  // The first time, the fight waits for how it is played.
-                  if (!hasGuide || guideSeen) return;
-                  event.preventDefault();
-                  setGuideOpen(true);
-                }}>
-                {t("lair.fight")}
-              </Link>
-            </Button>
-            {hasGuide && (
+            <div className='flex flex-wrap items-center gap-3'>
               <Button
-                type='button'
-                onClick={() => setGuideOpen(true)}
-                className='h-12 w-full bg-zinc-800 px-8 text-base text-zinc-100 shadow-none hover:bg-zinc-700 sm:w-auto'>
-                {t("guide.open")}
+                asChild
+                className='h-14 min-w-56 gap-3 bg-white px-10 text-lg text-zinc-950 shadow-none hover:bg-zinc-200 [&_svg]:size-5'>
+                <Link
+                  href={fightHref}
+                  onClick={(event) => {
+                    if (event.metaKey || event.ctrlKey || event.shiftKey) return;
+                    // The first time, the fight waits for how it is played.
+                    if (hasGuide && !guideSeen) {
+                      event.preventDefault();
+                      setGuideOpen(true);
+                      return;
+                    }
+                    setEntering(true);
+                  }}>
+                  {entering ? <Loader2 className='animate-spin' aria-hidden /> : <Swords aria-hidden />}
+                  {t("lair.fight")}
+                </Link>
               </Button>
-            )}
+              {hasGuide && (
+                <Button
+                  type='button'
+                  onClick={() => setGuideOpen(true)}
+                  className='h-14 bg-zinc-800 px-8 text-base text-zinc-100 shadow-none hover:bg-zinc-700'>
+                  {t("guide.open")}
+                </Button>
+              )}
+            </div>
           </div>
+
+          <DesktopOnlyNotice t={t} />
         </m.div>
       </div>
       {hasGuide && (

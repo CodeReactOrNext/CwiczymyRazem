@@ -9,6 +9,7 @@ import { getCurrentSeason } from "feature/leadboard/services/getCurrentSeason";
 import { firebaseAddLogReport } from "feature/logs/services/addLogReport.service";
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
 import {
+  sanitizeBossRun,
   sanitizeLessonVideoId,
   sanitizeLoggedExerciseIds,
 } from "feature/logs/utils/loggedPractice";
@@ -380,7 +381,8 @@ export default async function handler(
         {
           exerciseIds: sanitizeLoggedExerciseIds(inputData.exerciseIds),
           lessonVideoId: sanitizeLessonVideoId(inputData.lessonVideoId),
-        }
+        },
+        sanitizeBossRun(inputData.bossRun)
       ));
     }
 

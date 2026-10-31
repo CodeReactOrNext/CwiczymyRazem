@@ -150,6 +150,14 @@ export interface FirebaseLogsInterface {
      */
     rank?: number;
   };
+  /** A boss fight that got past at least one phase — see LoggedBossRun. */
+  bossRun?: LoggedBossRun;
+}
+
+/** A boss fight's session in the feed: the furthest phase it cleared, 1-based. */
+export interface LoggedBossRun {
+  bossId: string;
+  phase: number;
 }
 
 interface FirebaseLogsAchievementsInterface {

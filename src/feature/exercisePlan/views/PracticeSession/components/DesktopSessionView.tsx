@@ -284,8 +284,11 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                 )}
 
                 <div className={cn("flex flex-col items-center justify-center text-center", p.currentExercise.isPlayalong ? "mb-6 mt-0" : "mb-12 mt-4")}>
+                  {/* Above the content: a boss's arena hangs its boss down over
+                      the top of the tab, past the overlays laid on the tab;
+                      how far, and the gap under it, are the arena's. */}
                   {!p.backingCinema && p.heroSlot && (
-                    <div className="mb-8 w-full">{p.heroSlot}</div>
+                    <div className="relative z-30 w-full">{p.heroSlot}</div>
                   )}
                   {!p.backingCinema && !p.heroSlot && (
                     <ExerciseHeroHeader

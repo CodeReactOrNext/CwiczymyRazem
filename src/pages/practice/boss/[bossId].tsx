@@ -1,6 +1,7 @@
-import { getBoss } from "feature/bosses/data/bosses";
+import { BOSS_PLAN_PREFIX, getBoss } from "feature/bosses/data/bosses";
 import { useBossFight } from "feature/bosses/hooks/useBossFight";
 import { useBossRecord } from "feature/bosses/hooks/useBossProgress";
+import { sessionClearedPhase, useBossFightStore } from "feature/bosses/store/bossFightStore";
 import type { BossDefinition, BossDifficulty } from "feature/bosses/types/boss.types";
 import { buildBossExercise } from "feature/bosses/utils/bossExercise";
 import { parseDifficulty, validStart } from "feature/bosses/utils/difficulty";
@@ -34,10 +35,12 @@ const BossFightRun = ({ boss, userId, difficulty, askedStart, record, saveRun, o
   const [startPhase] = useState(() => validStart(record, difficulty, askedStart));
   const { config, plan: phase, bpm } = useBossFight({ boss, record, difficulty, startPhase, onRunEnd: saveRun });
 
+  const clearedPhase = useBossFightStore(sessionClearedPhase) || undefined;
+
   const plan = useMemo<ExercisePlan>(() => {
     const exercise = buildBossExercise(boss, phase, bpm);
     return {
-      id: `boss-${boss.id}`,
+      id: `${BOSS_PLAN_PREFIX}${boss.id}`,
       title: boss.name,
       description: boss.title,
       category: exercise.category,
@@ -47,9 +50,9 @@ const BossFightRun = ({ boss, userId, difficulty, askedStart, record, saveRun, o
       updatedAt: new Date(),
       userId,
       image: null,
-      boss: { id: boss.id },
+      boss: { id: boss.id, ...(clearedPhase && { clearedPhase }) },
     };
-  }, [boss, phase, bpm, userId]);
+  }, [boss, phase, bpm, userId, clearedPhase]);
 
   // The store still holds the last fight until the entry effect deals this
   // boss's — don't hand the session another boss's tab in between.

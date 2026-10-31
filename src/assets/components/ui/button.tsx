@@ -127,13 +127,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
 
     // asChild renders the consumer's element (e.g. a Link) — Slot needs a single child.
+    // It gets the children as they are: wrapped in the label span, the span
+    // would take the button's classes and the link would shrink to its text,
+    // the only part of the key that clicked.
     if (asChild) {
       return (
         <Slot
           className={cn(buttonVariants({ variant, size, className }))}
           ref={ref}
           {...({ disabled: disabled || loading, ...props } as any)}>
-          {content}
+          {children}
         </Slot>
       );
     }

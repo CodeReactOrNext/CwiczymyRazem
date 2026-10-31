@@ -17,8 +17,10 @@ const LEAD_SEC = 0.02;
 const HURT_BEATS = 0.75;
 /** A strike lands on the next eighth — on the music, never more than half a beat late. */
 const STRIKE_GRID = 2;
-/** After a strike the band plays everything for a bar. */
+/** After a strike the band plays everything for a bar (the battle score: a layer more, to the bar line). */
 const BOOST_BEATS = 4;
+/** The most a strike lifts the battle score to — the drive, the double kick left to the streak. */
+const STRIKE_ENERGY = 3;
 /** A strike's time this long gone belongs to a run before this one, seconds. */
 const STALE_STRIKE_SEC = 2;
 
@@ -34,11 +36,38 @@ let clock: SessionAudioClock | null = null;
 let output: GainNode | null = null;
 let enabled = true;
 
-/** What the band should be playing for the run, whatever band there is to tell. */
-const music = { level: 1, tension: 0, danger: false };
+/**
+ * What the band should be playing for the run, whatever band there is to
+ * tell; `glide`: the battle score, which moves a layer a bar (CueEvent).
+ */
+const music = { level: 1, tension: 0, danger: false, glide: false };
 /** When the last strike lands, and until when its boost runs (audio time). */
 let strikeAt = 0;
 let boostUntil = 0;
+/** The energy the run itself steers the band to, strikes' boosts left out (audio time). */
+let steps: { at: number; level: number }[] = [];
+
+const steeredAt = (time: number) => {
+  let level: number | null = null;
+  for (const step of steps) if (step.at <= time) level = step.level;
+  return level;
+};
+
+/** The run's energy from `at` on — whatever was planned after it goes. */
+const steer = (band: AmbientBand, level: number, at: number) => {
+  steps = [...steps.filter((step) => step.at < at), { at, level }];
+  band.setEnergy(level, at);
+};
+
+/** A layer a bar from `at` on, from where the run had the band toward `level`. */
+const glideTo = (band: AmbientBand, level: number, at: number, bar: number) => {
+  let current = steeredAt(at - 1e-6) ?? level;
+  for (let time = at; ; time += bar) {
+    current += Math.sign(level - current);
+    steer(band, current, time);
+    if (current === level) return;
+  }
+};
 /** Where each strike lands, by its tick — the arena times its slash by it. */
 const strikeTimes = new Map<number, number>();
 /** The band (and the run) the music was last handed to. */
@@ -77,7 +106,7 @@ const tune = () => {
   if (!band || (tuned?.band === band && tuned.startTime === clock.startTime)) return;
   tuned = { band, startTime: clock.startTime };
   const now = clock.context.currentTime;
-  band.setEnergy(music.level, now);
+  steer(band, music.level, now);
   band.setDanger(music.danger);
   band.setTension(music.tension, now);
 };
@@ -117,6 +146,7 @@ export const bossCuePlayer = {
       activeBand()?.resetLive();
       tuned = null;
       strikeTimes.clear();
+      steps = [];
       return;
     }
     if (output) outputFor(next);
@@ -136,7 +166,10 @@ export const bossCuePlayer = {
 
   play(event: CueEvent) {
     // The music follows the run whether or not there is a band to tell.
-    if (event.kind === "energy") music.level = event.level;
+    if (event.kind === "energy") {
+      music.level = event.level;
+      music.glide = !!event.glide;
+    }
     if (event.kind === "tension") music.tension = event.amount;
     if (event.kind === "danger") music.danger = event.on;
     if (!clock || clock.context.state !== "running") return;
@@ -152,10 +185,13 @@ export const bossCuePlayer = {
         if (event.drop) {
           // A miss: the groove goes on the next eighth, and any boost with it.
           boostUntil = 0;
-          band.setEnergy(event.level, nextGridTime(now, startTime, bpm, event.everyBeats ? 1 / event.everyBeats : 2));
+          const fall = nextGridTime(now, startTime, bpm, event.everyBeats ? 1 / event.everyBeats : 2);
+          if (event.glide && event.everyBeats) glideTo(band, event.level, fall, event.everyBeats * beat);
+          else steer(band, event.level, fall);
         } else {
-          const rise = nextGridTime(now, startTime, bpm, event.everyBeats ? 1 / event.everyBeats : 1);
-          band.setEnergy(event.level, Math.max(rise, boostUntil));
+          const rise = Math.max(nextGridTime(now, startTime, bpm, event.everyBeats ? 1 / event.everyBeats : 1), boostUntil);
+          if (event.glide && event.everyBeats) glideTo(band, event.level, rise, event.everyBeats * beat);
+          else steer(band, event.level, rise);
         }
         return;
       case "tension":
@@ -174,11 +210,20 @@ export const bossCuePlayer = {
       if (event.cue === "strike" && event.tick !== undefined && startTime !== null) {
         const time = strikeTimeFor(event.tick) ?? now;
         strikeAt = time;
-        if (band) {
+        if (band && music.glide) {
+          // The battle score: a layer up till the bar line, short of the
+          // double kick unless the run is already there — then on from where
+          // the run has it.
+          band.accent("strike", time);
+          const steered = steeredAt(time) ?? music.level;
+          band.setEnergy(Math.max(steered, Math.min(steered + 1, STRIKE_ENERGY)), time);
+          boostUntil = nextGridTime(time + BOOST_BEATS * beat, startTime, bpm, 1 / BOOST_BEATS);
+          glideTo(band, music.level, boostUntil, BOOST_BEATS * beat);
+        } else if (band) {
           band.accent("strike", time);
           band.setEnergy(FULL_ENERGY, time);
           boostUntil = time + BOOST_BEATS * beat;
-          band.setEnergy(music.level, boostUntil);
+          steer(band, music.level, boostUntil);
         } else {
           at("strike", time);
         }

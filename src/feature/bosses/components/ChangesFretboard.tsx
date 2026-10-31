@@ -172,6 +172,8 @@ export const ChangesFretboard = ({
         flashes.map(({ string, fret }) => (
           <m.circle
             key={`${played.tick}-${string}-${fret}`}
+            // What the changeling aims at when the note was wrong (BossShots).
+            data-changes-played=''
             cx={fretX(fret)}
             cy={stringY(string)}
             fill='none'

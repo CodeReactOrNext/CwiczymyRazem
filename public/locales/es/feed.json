@@ -58,6 +58,8 @@
   "plan_hint": "Haz clic para ver qué practica este plan",
   "lesson_hint": "Haz clic para ver esta lección",
   "exercise_hint": "Haz clic para ver y empezar este ejercicio",
+  "boss_hint": "Haz clic para ir a los combates contra jefes",
+  "boss_phase_cleared": "{{boss}} · fase {{phase}} superada",
   "ranking_hint": "Haz clic para ver la clasificación de este ejercicio",
   "new_since_last_visit": "Nuevo desde tu última visita",
   "show_more": "Mostrar más",

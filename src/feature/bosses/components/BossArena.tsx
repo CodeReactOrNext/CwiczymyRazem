@@ -37,7 +37,98 @@ import type { ThreatId } from "../utils/phaseChanges";
 import { threatsOf } from "../utils/phaseChanges";
 import { BoonIcon } from "./BoonIcon";
 import { BossArt } from "./BossArt";
+import { BossShots } from "./BossShots";
 import { ThreatIcon } from "./ThreatIcon";
+
+/**
+ * How far the boss hangs down over the top of the tab on a desktop — a
+ * quarter of its box (h-64, xl:h-80), into the rhythm row above the strings,
+ * never onto them. TAB_EDGE_Y is where that puts the tab's top edge in the
+ * art's viewBox, for what the boss ties to it.
+ */
+const HANG = "-mb-16 xl:-mb-20";
+const TAB_EDGE_Y = 380 * 0.75;
+
+/** A few web points (art viewBox) and where on the tab's edge each is tied — the right side mirrors them. */
+const WEB_TIES = [
+  { from: { x: 25, y: 230 }, to: -220 },
+  { from: { x: 72, y: 187 }, to: -400 },
+  { from: { x: 60, y: 262 }, to: -90 },
+];
+
+/** Where the colossus's weight cracks the tab's edge, out from its feet. */
+const EDGE_CRACKS = [
+  "M120 285 L96 281 L70 288 L38 283 L4 290",
+  "M70 288 L58 298 L42 302",
+  "M360 285 L386 289 L410 282 L444 288 L478 283",
+  "M410 282 L424 272 L440 270",
+];
+
+/** Rubble knocked off the edge where it cracked: [x, y, size] in the art's viewBox. */
+const EDGE_RUBBLE: [number, number, number][] = [
+  [52, 272, 7],
+  [22, 296, 5],
+  [96, 276, 4],
+  [398, 290, 6],
+  [436, 274, 5],
+  [466, 296, 7],
+];
+
+/**
+ * What ties the boss to the tab under it, drawn in the art's viewBox and past
+ * its edges: the spider's web is anchored to the tab's top edge by a few
+ * strands, the colossus cracks it where it stands. Behind the art.
+ */
+const TabTies = ({ boss }: { boss: BossId }) =>
+  boss === "changeling" ? null : (
+    <svg
+      viewBox='0 0 480 380'
+      className='pointer-events-none absolute inset-0 h-full w-full overflow-visible'
+      aria-hidden>
+      {boss === "fretweaver"
+        ? WEB_TIES.flatMap(({ from, to }) =>
+            [1, -1].map((side) => {
+              const x1 = side === 1 ? from.x : 480 - from.x;
+              const x2 = side === 1 ? to : 480 - to;
+              const sag = (from.y + TAB_EDGE_Y) / 2 + 14;
+              const d = `M${x1} ${from.y} Q${(x1 + x2) / 2} ${sag} ${x2} ${TAB_EDGE_Y}`;
+              return (
+                <g key={`${from.x}-${side}`}>
+                  {/* A strand of two fibres, glued to the edge with a dab of silk. */}
+                  <path d={d} fill='none' stroke='#a1a1aa' strokeOpacity={0.6} strokeWidth={1.4} vectorEffect='non-scaling-stroke' />
+                  <path
+                    d={d}
+                    transform='translate(0 3)'
+                    fill='none'
+                    stroke='#71717a'
+                    strokeOpacity={0.45}
+                    strokeWidth={1}
+                    vectorEffect='non-scaling-stroke'
+                  />
+                  <ellipse cx={x2} cy={TAB_EDGE_Y} rx={6} ry={3} fill='#d4d4d8' fillOpacity={0.55} />
+                </g>
+              );
+            }),
+          )
+        : EDGE_CRACKS.map((d) => (
+            <path
+              key={d}
+              d={d}
+              fill='none'
+              stroke='#a1a1aa'
+              strokeOpacity={0.7}
+              strokeWidth={2}
+              strokeLinejoin='round'
+              strokeLinecap='round'
+              vectorEffect='non-scaling-stroke'
+            />
+          ))}
+      {boss === "colossus" &&
+        EDGE_RUBBLE.map(([x, y, size]) => (
+          <rect key={x} x={x} y={y} width={size} height={size} fill='#52525b' transform={`rotate(${x % 40} ${x} ${y})`} />
+        ))}
+    </svg>
+  );
 
 /** Under this share of HP the player's bar warns. */
 const LOW_HP = 0.25;
@@ -504,7 +595,7 @@ const ALERT_BAR: Record<LiveAlert["tone"], string> = {
   info: "bg-zinc-400",
 };
 
-/** The live alert, large and over the stage — read in a glance from the tab. */
+/** The live alert, large and under the boss's threats — read in a glance from the tab. */
 const AlertPill = ({
   alert,
   boss,
@@ -521,10 +612,7 @@ const AlertPill = ({
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0 }}
-        className={cn(
-          "pointer-events-none z-20 flex flex-col gap-1.5 rounded-lg bg-zinc-950/85 px-3 py-2",
-          compact ? "w-full" : "absolute bottom-3 left-1/2 w-max max-w-md -translate-x-1/2",
-        )}
+        className='pointer-events-none flex w-full flex-col gap-1.5 rounded-lg bg-zinc-950/85 px-3 py-2'
         role='status'>
         <span
           className={cn(
@@ -645,6 +733,7 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
   const strike = useStrikeOnBeat();
   const bossHp = strike.heldHp ?? fight.bossHp;
   const playerRef = useAnimateOn<HTMLDivElement>(fight.playerHurtTick, SHAKE, 300);
+  const artRef = useRef<HTMLDivElement>(null);
   const alert = liveAlert(fight, t);
   const lowHp = fight.playerHp / fight.playerMaxHp < LOW_HP;
   const bpm = phaseBpm(fight);
@@ -661,7 +750,8 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
       : "";
 
   const spider = (
-    <div className={cn("relative shrink-0", compact ? "h-32 w-40" : "h-64 w-80 xl:h-80 xl:w-[25rem]")}>
+    <div ref={artRef} className={cn("relative shrink-0", compact ? "h-32 w-40" : "h-64 w-80 xl:h-80 xl:w-[25rem]")}>
+      {!compact && <TabTies boss={boss.id} />}
       <BossArt
         boss={boss}
         className='h-full w-full'
@@ -802,22 +892,29 @@ export const BossArena = ({ boss, record, compact = false }: BossArenaProps) => 
     );
   }
 
+  // No stage of its own on a desktop: the fight sits on the page and the boss
+  // hangs down over the top of the tab (HANG), so the arena leads into the
+  // drill instead of standing over it. The sides line up with its head. Clicks
+  // go through to the tab under it — only the sides and the sound take them.
   return (
-    <div className='relative w-full overflow-hidden rounded-lg bg-zinc-900/60 text-left' style={stageStyle(boss.id, form)}>
-      <div className='grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-10 px-10 pb-6 pt-5'>
-        <div className='flex justify-end'>
-          <div className='w-full max-w-md'>{playerSide}</div>
+    <div className={cn("pointer-events-none relative w-full text-left", HANG)}>
+      <div className='grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-10 px-10'>
+        <div className='flex justify-end pt-16'>
+          <div className='pointer-events-auto w-full max-w-md'>{playerSide}</div>
         </div>
         <div className='flex flex-col items-center gap-2'>
           {phaseLabel}
           {spider}
         </div>
-        <div className='flex justify-start'>
-          <div className='w-full max-w-md'>{bossSide}</div>
+        <div className='flex justify-start pt-16'>
+          <div className='pointer-events-auto w-full max-w-md space-y-4'>
+            {bossSide}
+            <AlertPill alert={alert} boss={boss.id} compact={false} />
+          </div>
         </div>
       </div>
-      <AlertPill alert={alert} boss={boss.id} compact={false} />
-      <SoundToggle t={t} />
+      <SoundToggle t={t} className='pointer-events-auto absolute right-2 top-2 z-20' />
+      <BossShots boss={boss.id} artRef={artRef} />
     </div>
   );
 };

@@ -1,4 +1,6 @@
+import { getBoss } from "feature/bosses/data/bosses";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import type { LoggedBossRun } from "feature/logs/types/logs.type";
 
 /** What `LessonPracticeModal` puts before a lesson's title in the session's report title. */
 export const LESSON_TITLE_PREFIX = "Lesson: ";
@@ -27,6 +29,18 @@ export const sanitizeLoggedExerciseIds = (
     .slice(0, MAX_LOGGED_EXERCISES);
 
   return ids.length > 0 ? ids : undefined;
+};
+
+/** Far past any run anyone plays — phases get faster every time, topping out around 30. */
+const MAX_BOSS_PHASE = 999;
+
+/** A boss run as the client reported it, or `undefined` unless it names a boss and a phase cleared. */
+export const sanitizeBossRun = (value: unknown): LoggedBossRun | undefined => {
+  if (!value || typeof value !== "object") return undefined;
+  const { bossId, phase } = value as Record<string, unknown>;
+  if (typeof bossId !== "string" || !getBoss(bossId)) return undefined;
+  if (typeof phase !== "number" || !Number.isInteger(phase) || phase < 1 || phase > MAX_BOSS_PHASE) return undefined;
+  return { bossId, phase };
 };
 
 /** A lesson's YouTube id, or `undefined` for anything that isn't shaped like one. */

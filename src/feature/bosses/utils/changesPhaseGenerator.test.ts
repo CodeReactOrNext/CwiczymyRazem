@@ -72,7 +72,7 @@ describe("generateChangesPhase", () => {
     for (const seed of SEEDS) {
       for (let index = 0; index < 30; index++) {
         const { variation } = generateChangesPhase(seed, index);
-        expect(variation.bpm).toBeGreaterThanOrEqual(66);
+        expect(variation.bpm).toBeGreaterThanOrEqual(60);
         expect(variation.bpm).toBeLessThanOrEqual(150);
         const beats = variation.units.reduce((sum, unit) => sum + unit.beats, 0);
         expect(beats % 4).toBe(0);

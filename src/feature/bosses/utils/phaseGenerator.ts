@@ -156,9 +156,35 @@ export const targetNotesPerSecond = (index: number) => Math.min(12, 1.08 ** inde
 const MIN_BPM = 55;
 const MAX_BPM = 180;
 
+/**
+ * The 0-based phase each new thing in the spider's drill comes in at — one at
+ * a time, a few phases apart, so nothing new lands on top of something else
+ * new: 4321 next to 1234, other finger orders (one a phase), triplets, string
+ * skipping (on 1234/4321 alone at first), sixteenths, two orders mixed, all
+ * 24 orders, the diagonal.
+ */
+export const SPIDER_LADDER = {
+  mirror: 3,
+  fingerOrders: 6,
+  triplets: 9,
+  skip: 12,
+  skipAnyOrder: 15,
+  sixteenths: 16,
+  mixed: 18,
+  allOrders: 22,
+  diagonal: 25,
+  diagonalAnyOrder: 28,
+} as const;
+
 /** Subdivisions the spider may deal at a phase — from quarters to sixteenths. */
 const subdivisionsFor = (index: number): NotesPerBeat[] =>
-  index < 9 ? [1, 2] : index < 16 ? [2, 3] : index < 22 ? [2, 3, 4] : [3, 4];
+  index < SPIDER_LADDER.triplets
+    ? [1, 2]
+    : index < SPIDER_LADDER.sixteenths
+      ? [2, 3]
+      : index < SPIDER_LADDER.allOrders
+        ? [2, 3, 4]
+        : [3, 4];
 
 /** A subdivision whose tempo for the wanted speed stays playable, then the tempo. */
 const dealTempo = (rng: Rng, index: number) => {
@@ -174,27 +200,54 @@ const dealTempo = (rng: Rng, index: number) => {
   return { notesPerBeat, bpm: clamp(bpmFor(notesPerBeat), MIN_BPM, MAX_BPM) };
 };
 
-/** Finger orders grow from 1234 alone to all 24, more of them per phase. */
-const dealPatterns = (rng: Rng, index: number) => {
+/** The finger orders after 1234 and its mirror, before all 24. */
+const FIRST_ORDERS = ["1234", "4321", "1324", "4231", "1243", "3421"];
+
+const reversed = (pattern: string) => pattern.split("").reverse().join("");
+
+/**
+ * Finger orders grow from 1234 alone to all 24 (SPIDER_LADDER): one order a
+ * phase until they mix, and a route still new to the player keeps to
+ * 1234/4321 — a new route and a new order never come at once. A lone order
+ * goes back down the same or mirrored; mixed ones may go down on others.
+ */
+const dealPatterns = (rng: Rng, index: number, route: SpiderRoute) => {
+  const ladder = SPIDER_LADDER;
+  const newRoute =
+    (route === "skip" && index < ladder.skipAnyOrder) ||
+    (route === "diagonal" && index < ladder.diagonalAnyOrder);
   const pool =
-    index < 3
+    index < ladder.mirror
       ? ["1234"]
-      : index < 6
+      : index < ladder.fingerOrders || newRoute
         ? ["1234", "4321"]
-        : index < 10
-          ? ["1234", "4321", "1324", "4231", "1243", "3421"]
+        : index < ladder.allOrders
+          ? FIRST_ORDERS
           : ALL_FINGER_ORDERS;
-  const count = index < 6 ? 1 : index < 10 ? randInt(rng, 1, 2) : index < 14 ? randInt(rng, 2, 4) : randInt(rng, 3, 6);
+  const count =
+    index < ladder.mixed || newRoute
+      ? 1
+      : index < ladder.allOrders
+        ? randInt(rng, 1, 2)
+        : index < 30
+          ? randInt(rng, 2, 4)
+          : randInt(rng, 3, 6);
   const patterns = shuffled(rng, pool).slice(0, count);
   const descendPatterns =
     rng() < 0.5
-      ? patterns.map((p) => p.split("").reverse().join(""))
-      : shuffled(rng, pool).slice(0, count);
+      ? patterns.map(reversed)
+      : count === 1
+        ? patterns
+        : shuffled(rng, pool).slice(0, count);
   return { patterns, descendPatterns };
 };
 
 const routesFor = (index: number): SpiderRoute[] =>
-  index < 6 ? ["walk"] : index < 10 ? ["walk", "skip"] : ["walk", "walk", "skip", "diagonal"];
+  index < SPIDER_LADDER.skip
+    ? ["walk"]
+    : index < SPIDER_LADDER.diagonal
+      ? ["walk", "skip"]
+      : ["walk", "walk", "skip", "diagonal"];
 
 /**
  * Where the pass goes. Its length is picked so it fills whole 4/4 bars at the
@@ -258,8 +311,8 @@ const rulesFor = (variation: SpiderVariation, index: number, affixes: readonly A
 export const generatePhase = (runSeed: number, index: number): SpiderPhasePlan => {
   const rng = createRng(phaseSeed(runSeed, index));
   const { notesPerBeat, bpm } = dealTempo(rng, index);
-  const { patterns, descendPatterns } = dealPatterns(rng, index);
   const route = pick(rng, routesFor(index));
+  const { patterns, descendPatterns } = dealPatterns(rng, index, route);
   const positions = dealPositions(rng, route, notesPerBeat);
   const variation: SpiderVariation = { bpm, notesPerBeat, patterns, descendPatterns, route, positions };
   const affixes = dealAffixes(rng, index);

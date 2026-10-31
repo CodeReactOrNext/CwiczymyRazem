@@ -409,6 +409,67 @@ export const useTablatureSettings = create<TablatureSettingsStore>()(
   ),
 );
 
+/** The settings that make up the board's look. */
+type TablatureLookSettings = Pick<
+  TablatureSettings,
+  | "pillPreset"
+  | "noteStyle"
+  | "hitColor"
+  | "fretFontScale"
+  | "fretTextColor"
+  | "stringSpacing"
+  | "flipStrings"
+  | "rightToLeft"
+  | "showRhythmLane"
+  | "showChordNames"
+  | "showMeasureLines"
+  | "showTechniqueLabels"
+  | "hitAnimations"
+  | "timingHints"
+>;
+
+/**
+ * The worker STYLE patch for these settings on this palette and board. Pure,
+ * so places without the settings store (the MCP tab preview, on the server)
+ * get the very same look from `DEFAULT_SETTINGS`.
+ */
+export function tablatureStylePatch(
+  settings: TablatureLookSettings,
+  palette: readonly string[],
+  board: TablatureBackground,
+): TablatureStylePatch {
+  const pill =
+    PILL_PRESETS[settings.pillPreset] ??
+    PILL_PRESETS[DEFAULT_SETTINGS.pillPreset];
+  const hit =
+    HIT_COLORS[settings.hitColor] ?? HIT_COLORS[DEFAULT_SETTINGS.hitColor];
+  const fretText =
+    FRET_TEXT_COLORS[settings.fretTextColor] ??
+    FRET_TEXT_COLORS[DEFAULT_SETTINGS.fretTextColor];
+  return {
+    pillHeight: pill.height,
+    pillCorner: pill.corner,
+    noteTails: settings.noteStyle !== "bar",
+    fretFontScale: settings.fretFontScale,
+    stringColors: palette,
+    hitFill: hit.fill,
+    hitGlow: hit.glow,
+    background: board.color,
+    ink: board.ink,
+    stringSpacing: settings.stringSpacing,
+    flipStrings: settings.flipStrings,
+    rightToLeft: settings.rightToLeft,
+    // "auto" is resolved per pill inside the worker, which knows each note's colour.
+    fretText: fretText.color ?? "auto",
+    showRhythmLane: settings.showRhythmLane,
+    showChordNames: settings.showChordNames,
+    showMeasureLines: settings.showMeasureLines,
+    showTechniqueLabels: settings.showTechniqueLabels,
+    hitAnimations: settings.hitAnimations,
+    timingHints: settings.timingHints,
+  };
+}
+
 /**
  * Resolves the stored settings into what the renderers actually consume: the
  * worker STYLE patch plus the raw palette (which has to reach the render data
@@ -434,63 +495,69 @@ export function useTablatureStyle(): {
   const board =
     BACKGROUNDS[settings.background] ??
     BACKGROUNDS[DEFAULT_SETTINGS.background];
-  const background = board.color;
 
-  const style = useMemo<TablatureStylePatch>(() => {
-    const pill =
-      PILL_PRESETS[settings.pillPreset] ??
-      PILL_PRESETS[DEFAULT_SETTINGS.pillPreset];
-    const hit =
-      HIT_COLORS[settings.hitColor] ?? HIT_COLORS[DEFAULT_SETTINGS.hitColor];
-    const fretText =
-      FRET_TEXT_COLORS[settings.fretTextColor] ??
-      FRET_TEXT_COLORS[DEFAULT_SETTINGS.fretTextColor];
-    return {
-      pillHeight: pill.height,
-      pillCorner: pill.corner,
-      noteTails: settings.noteStyle !== "bar",
-      fretFontScale: settings.fretFontScale,
-      stringColors: palette,
-      hitFill: hit.fill,
-      hitGlow: hit.glow,
-      background,
-      ink: board.ink,
-      stringSpacing: settings.stringSpacing,
-      flipStrings: settings.flipStrings,
-      rightToLeft: settings.rightToLeft,
-      // "auto" is resolved per pill inside the worker, which knows each note's colour.
-      fretText: fretText.color ?? "auto",
-      showRhythmLane: settings.showRhythmLane,
-      showChordNames: settings.showChordNames,
-      showMeasureLines: settings.showMeasureLines,
-      showTechniqueLabels: settings.showTechniqueLabels,
-      hitAnimations: settings.hitAnimations,
-      timingHints: settings.timingHints,
-    };
-  }, [
-    palette,
-    background,
-    board.ink,
-    settings.pillPreset,
-    settings.noteStyle,
-    settings.hitColor,
-    settings.fretFontScale,
-    settings.fretTextColor,
-    settings.stringSpacing,
-    settings.flipStrings,
-    settings.rightToLeft,
-    settings.showRhythmLane,
-    settings.showChordNames,
-    settings.showMeasureLines,
-    settings.showTechniqueLabels,
-    settings.hitAnimations,
-    settings.timingHints,
-  ]);
+  const {
+    pillPreset,
+    noteStyle,
+    hitColor,
+    fretFontScale,
+    fretTextColor,
+    stringSpacing,
+    flipStrings,
+    rightToLeft,
+    showRhythmLane,
+    showChordNames,
+    showMeasureLines,
+    showTechniqueLabels,
+    hitAnimations,
+    timingHints,
+  } = settings;
+  const style = useMemo<TablatureStylePatch>(
+    () =>
+      tablatureStylePatch(
+        {
+          pillPreset,
+          noteStyle,
+          hitColor,
+          fretFontScale,
+          fretTextColor,
+          stringSpacing,
+          flipStrings,
+          rightToLeft,
+          showRhythmLane,
+          showChordNames,
+          showMeasureLines,
+          showTechniqueLabels,
+          hitAnimations,
+          timingHints,
+        },
+        palette,
+        board,
+      ),
+    [
+      palette,
+      board,
+      pillPreset,
+      noteStyle,
+      hitColor,
+      fretFontScale,
+      fretTextColor,
+      stringSpacing,
+      flipStrings,
+      rightToLeft,
+      showRhythmLane,
+      showChordNames,
+      showMeasureLines,
+      showTechniqueLabels,
+      hitAnimations,
+      timingHints,
+    ],
+  );
 
   return {
     settings,
     palette,
-    background,
+    background: board.color,
     isLightBoard: !!board.isLight,
     style,
   };

@@ -54,7 +54,7 @@ export const useComboEnding = () => {
 };
 
 interface ComboHudProps {
-  /** From useComboEnding — the board holds it, to clear the space under the HUD while it is up. */
+  /** From useComboEnding — the board holds it for the HUD. */
   ending: ComboEnding | null;
   t: Translate;
   className?: string;

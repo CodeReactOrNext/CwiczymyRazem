@@ -181,6 +181,14 @@ export class ActivityLogFormatter implements GeneralLogFormatter {
             : `🎧 Ear training: **${log.earTrainingPerformance.score}** poprawnych${place}`
         );
       }
+      if (log.bossRun) {
+        const boss = log.exerciseTitle ?? log.bossRun.bossId;
+        performanceLines.push(
+          isEn
+            ? `💀 ${boss}: phase **${log.bossRun.phase}** cleared`
+            : `💀 ${boss}: zaliczona faza **${log.bossRun.phase}**`
+        );
+      }
 
       if (performanceLines.length > 0) {
         embed.fields?.push({

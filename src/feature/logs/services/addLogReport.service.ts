@@ -2,6 +2,7 @@ import type { AchievementList } from "feature/achievements/types";
 import { formatDiscordMessage } from "feature/discordBot/formatters/formatDiscordMessage";
 import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
 import { logger } from "feature/logger/Logger";
+import type { LoggedBossRun } from "feature/logs/types/logs.type";
 import type { ReportSongEntry } from "feature/user/view/ReportView/ReportView.types";
 import {
   collection,
@@ -48,7 +49,9 @@ export const firebaseAddLogReport = async (
   micPerformance?: { score: number; accuracy: number; bpm?: number; rank?: number },
   earTrainingPerformance?: { score: number; rank?: number },
   /** What the session practiced, so the feed can open it — already sanitized by the caller. */
-  practiced?: { exerciseIds?: string[]; lessonVideoId?: string }
+  practiced?: { exerciseIds?: string[]; lessonVideoId?: string },
+  /** A boss fight's furthest phase cleared — already sanitized by the caller. */
+  bossRun?: LoggedBossRun
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -77,6 +80,7 @@ export const firebaseAddLogReport = async (
     ...(earTrainingPerformance && { earTrainingPerformance }),
     ...(practiced?.exerciseIds && { exerciseIds: practiced.exerciseIds }),
     ...(practiced?.lessonVideoId && { lessonVideoId: practiced.lessonVideoId }),
+    ...(bossRun && { bossRun }),
     ...songDetails,
     ...(skillPointsGained && Object.keys(skillPointsGained).length > 0 && { skillPointsGained }),
     ...(newRecords && { newRecords }),

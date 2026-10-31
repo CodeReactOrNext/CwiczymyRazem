@@ -5,6 +5,7 @@ import {
   getLessonTitle,
   LESSON_TITLE_PREFIX,
   resolveLoggedExercises,
+  sanitizeBossRun,
   sanitizeLessonVideoId,
   sanitizeLoggedExerciseIds,
 } from "./loggedPractice";
@@ -94,5 +95,25 @@ describe("resolveLoggedExercises", () => {
 
   it("is empty for older logs that carry no ids", () => {
     expect(resolveLoggedExercises(undefined, catalog)).toEqual([]);
+  });
+});
+
+describe("sanitizeBossRun", () => {
+  it("keeps a known boss and a whole phase cleared", () => {
+    expect(sanitizeBossRun({ bossId: "fretweaver", phase: 7 })).toEqual({ bossId: "fretweaver", phase: 7 });
+  });
+
+  it("drops anything else", () => {
+    for (const value of [
+      undefined,
+      "fretweaver",
+      { bossId: "dragon", phase: 3 },
+      { bossId: "fretweaver", phase: 0 },
+      { bossId: "fretweaver", phase: 2.5 },
+      { bossId: "fretweaver", phase: "7" },
+      { bossId: "fretweaver", phase: 100000 },
+    ]) {
+      expect(sanitizeBossRun(value)).toBeUndefined();
+    }
   });
 });

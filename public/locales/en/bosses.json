@@ -306,14 +306,18 @@
     "runs": "Runs",
     "fight": "Fight",
     "difficulty": "Difficulty",
-    "difficulty_effect": "Bites {{damage}} · Tempo {{tempo}} · Score {{reward}}",
+    "effect_damage": "Damage taken",
+    "effect_tempo": "Tempo",
+    "effect_score": "Score",
     "start_at": "Start at",
     "phase_option": "Phase {{phase}}",
     "next_savepoint": "Phase {{phase}} opens once you reach it",
     "skip_note_one": "Skips {{count}} phase — clear phase {{phase}} to bank its HP into your score.",
     "skip_note_other": "Skips {{count}} phases — clear phase {{phase}} to bank their HP into your score.",
     "best_score": "Best score",
-    "not_fought": "Not fought yet"
+    "not_fought": "Not fought yet",
+    "desktop_only": "Boss fights aren't supported on mobile",
+    "desktop_hint": "A fight needs a big screen to read the tab at speed. Open riff.quest on a laptop or desktop to take this boss on."
   },
   "rules": {
     "title": "How the fight works",

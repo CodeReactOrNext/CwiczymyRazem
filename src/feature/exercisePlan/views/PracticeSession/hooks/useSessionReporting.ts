@@ -126,6 +126,7 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
           ...(!plan.duel && exerciseRecords && { exerciseRecords }),
           ...(!plan.duel && micPerformance && { micPerformance }),
           ...(!plan.duel && earTrainingPerformance && { earTrainingPerformance }),
+          ...(plan.boss?.clearedPhase && { bossRun: { bossId: plan.boss.id, phase: plan.boss.clearedPhase } }),
           ...getClientReportContext(
             ((reportList as any[]) ?? []).map((report) => report.date),
             restDays

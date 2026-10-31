@@ -37,6 +37,7 @@ import type {
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 // challengesList removed
+import { BOSS_PLAN_PREFIX } from "feature/bosses/data/bosses";
 import { AVATAR_SHRINK } from "feature/chat/chatLayout";
 import { welcomeGoalPhrase } from "feature/chat/utils/systemMessages";
 import { communityDocId } from "feature/communityExercises/utils/communityToExercise";
@@ -147,6 +148,7 @@ import {
   PartyPopper,
   Shield,
   ShoppingCart,
+  Skull,
   Star,
   Tag,
   Target,
@@ -1807,9 +1809,11 @@ const GroupedLogLine = ({
   // leave a ten-song routine looking like one song. An ad-hoc single-exercise
   // session carries a planId as well (the library wraps the exercise in a
   // throwaway plan), so a title the catalog still knows stays an exercise.
+  // A boss fight files its boss as the session's title: a fight to go to, not a plan to open.
+  const bossTitle = genericLog.planId?.startsWith(BOSS_PLAN_PREFIX) ? sessionTitle : null;
   const planTitle = plan
     ? plan.title
-    : genericLog.planId && sessionTitle && !matchedExercise
+    : genericLog.planId && sessionTitle && !matchedExercise && !bossTitle
       ? sessionTitle
       : null;
   // `songTitle` only ever holds the song that got the most time, so on a routine
@@ -1891,6 +1895,19 @@ const GroupedLogLine = ({
         </span>
       )}
 
+      {bossTitle && (
+        <Link href='/bosses' title={t("feed:boss_hint")} className={TOUCH_TARGET}>
+          <Chip color='amber' className='cursor-pointer text-left'>
+            <Skull className='h-3.5 w-3.5 shrink-0' />
+            <span className='underline-offset-2 hover:underline'>
+              {genericLog.bossRun
+                ? t("feed:boss_phase_cleared", { boss: bossTitle, phase: genericLog.bossRun.phase })
+                : bossTitle}
+            </span>
+          </Chip>
+        </Link>
+      )}
+
       {planTitle && (
         <PracticedChip
           color='cyan'
@@ -1914,6 +1931,7 @@ const GroupedLogLine = ({
 
       {sessionTitle &&
         !planTitle &&
+        !bossTitle &&
         !genericLog.songTitle &&
         (lessonTitle ? (
           <PracticedChip

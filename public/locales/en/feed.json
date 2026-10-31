@@ -58,6 +58,8 @@
   "plan_hint": "Click to see what this plan practices",
   "lesson_hint": "Click to watch this lesson",
   "exercise_hint": "Click to preview and start this exercise",
+  "boss_hint": "Click to go to the boss fights",
+  "boss_phase_cleared": "{{boss}} · phase {{phase}} cleared",
   "ranking_hint": "Click to view the ranking for this exercise",
   "new_since_last_visit": "New since your last visit",
   "show_more": "Show more",

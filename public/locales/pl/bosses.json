@@ -311,7 +311,9 @@
     "runs": "Biegi",
     "fight": "Walcz",
     "difficulty": "Poziom trudności",
-    "difficulty_effect": "Ciosy {{damage}} · Tempo {{tempo}} · Wynik {{reward}}",
+    "effect_damage": "Otrzymywane obrażenia",
+    "effect_tempo": "Tempo",
+    "effect_score": "Wynik",
     "start_at": "Zacznij od",
     "phase_option": "Faza {{phase}}",
     "next_savepoint": "Faza {{phase}} otworzy się, gdy do niej dojdziesz",
@@ -320,7 +322,9 @@
     "skip_note_many": "Pomijasz {{count}} faz — pokonaj fazę {{phase}}, a ich HP doliczy się do wyniku.",
     "skip_note_other": "Pomijasz {{count}} fazy — pokonaj fazę {{phase}}, a ich HP doliczy się do wyniku.",
     "best_score": "Najlepszy wynik",
-    "not_fought": "Jeszcze bez walki"
+    "not_fought": "Jeszcze bez walki",
+    "desktop_only": "Walki z bossami nie są obsługiwane na urządzeniach mobilnych",
+    "desktop_hint": "Walka wymaga dużego ekranu, żeby nadążyć za tabulaturą. Otwórz riff.quest na laptopie lub komputerze, żeby zmierzyć się z tym bossem."
   },
   "rules": {
     "title": "Jak działa walka",

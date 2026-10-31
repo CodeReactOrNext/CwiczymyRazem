@@ -61,6 +61,8 @@ export interface ReportFormikInterface {
   };
   micPerformance?: { score: number; accuracy: number; bpm?: number; rank?: number };
   earTrainingPerformance?: { score: number; rank?: number };
+  /** A boss fight's session: the furthest phase it cleared (see sanitizeBossRun). */
+  bossRun?: { bossId: string; phase: number };
   clientTodayISO?: string;
   clientNowISO?: string;
   clientDisplayStreak?: number;

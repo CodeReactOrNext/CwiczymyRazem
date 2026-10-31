@@ -122,6 +122,17 @@ values, one note per string per beat, then a dry run through
 that rejects a shipped exercise is the rule's fault. The guide the model reads
 lives in `lib/mcp/content/tabFormat.ts`; its example is tested to pass.
 
+`riffquest_preview_tab` is an MCP App (`lib/mcp/apps/tabPreview.ts`): the
+practice session's tab board in its default look, with notation one tab away.
+The board is the session's own `TablatureViewer.worker`, run on the page's
+thread and bundled with a small driver (`lib/mcp/apps/tabBoard/`) into
+`lib/mcp/apps/generated/tabBoardBundle.ts` by `node scripts/buildMcpTabBoard.mjs`
+— rerun it after touching the worker or the board; `tabBoardBundle.test.ts`
+fails while the committed bundle is stale. AlphaTab (from jsDelivr) draws the
+notation and plays the sound for both views; the board's cursor follows its
+player. The model gets only the check and the `asciiTab`; the board's data and
+the alphaTex go in `structuredContent` for the view.
+
 ## Talking to players
 
 Players are guitarists. The server instructions say that tabs travel as JSON and

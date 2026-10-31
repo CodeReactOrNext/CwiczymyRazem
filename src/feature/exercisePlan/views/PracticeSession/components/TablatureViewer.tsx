@@ -3,6 +3,7 @@ import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types
 import type { FillFeed } from "feature/exercisePlan/views/PracticeSession/utils/fillFeed";
 import type { LearnFocus } from "feature/exercisePlan/views/PracticeSession/utils/learnSteps";
 import type { LivePitch } from "feature/exercisePlan/views/PracticeSession/utils/pitchScoring";
+import { registerTabNoteLocator } from "feature/exercisePlan/views/PracticeSession/utils/tabNoteLocator";
 import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import { useTranslation } from "hooks/useTranslation";
 import { SkipBack } from "lucide-react";
@@ -161,7 +162,7 @@ const TablatureViewerInner = ({
   // was built with (both come from `style`).
   const renderData = useTablatureRenderData(measures, palette, style?.stringSpacing, style?.flipStrings, style?.stringCount);
 
-  const { showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat } = useTablatureWorkerBridge({
+  const { showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat, locateNote } = useTablatureWorkerBridge({
     canvasRef, containerRef, containerSize, renderData,
     isPlaying, startTime, audioStartTime, bpm, countInRemaining,
     hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef, hideNotes, hideDynamicsLane,
@@ -171,6 +172,16 @@ const TablatureViewerInner = ({
   });
   const along = (pointer: { clientX: number; clientY: number }) =>
     pointerAlongBoard(pointer, quarterTurned);
+
+  // Offer the notes to a game mode that aims at them — the latest layout, one registration.
+  const locateNoteRef = useRef(locateNote);
+  useEffect(() => {
+    locateNoteRef.current = locateNote;
+  });
+  useEffect(
+    () => registerTabNoteLocator((noteKey, aheadSec, share) => locateNoteRef.current(noteKey, aheadSec, share)),
+    [],
+  );
 
   // Expose seekWorker so parent (TablatureSection minimap) can drive the canvas cursor
   useEffect(() => {

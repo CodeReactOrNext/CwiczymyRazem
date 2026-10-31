@@ -457,9 +457,10 @@ const GLYPH_REST = {
 
 (function loadBravura() {
   try {
-    const g = self as unknown as { fonts?: { add: (f: FontFace) => void } };
+    // `bravuraUrl` is set only where this runs off riff.quest (the MCP tab preview).
+    const g = self as unknown as { fonts?: { add: (f: FontFace) => void }; bravuraUrl?: string };
     if (!g.fonts || typeof FontFace === "undefined") return;
-    const face = new FontFace("Bravura", "url(/alphatab/font/Bravura.woff2)");
+    const face = new FontFace("Bravura", `url(${g.bravuraUrl ?? "/alphatab/font/Bravura.woff2"})`);
     face.load().then(f => { g.fonts!.add(f); bravuraReady = true; needsRedraw = true; })
       .catch(() => { /* keep the hand-drawn fallback */ });
   } catch { /* FontFace / worker fonts unsupported — keep the fallback */ }

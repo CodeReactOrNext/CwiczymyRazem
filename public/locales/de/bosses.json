@@ -306,14 +306,18 @@
     "runs": "Läufe",
     "fight": "Kämpfen",
     "difficulty": "Schwierigkeit",
-    "difficulty_effect": "Treffer {{damage}} · Tempo {{tempo}} · Punkte {{reward}}",
+    "effect_damage": "Erlittener Schaden",
+    "effect_tempo": "Tempo",
+    "effect_score": "Punkte",
     "start_at": "Start bei",
     "phase_option": "Phase {{phase}}",
     "next_savepoint": "Phase {{phase}} öffnet sich, sobald du sie erreichst",
     "skip_note_one": "Überspringt {{count}} Phase — schaff Phase {{phase}}, damit ihre HP in deine Punkte eingehen.",
     "skip_note_other": "Überspringt {{count}} Phasen — schaff Phase {{phase}}, damit ihre HP in deine Punkte eingehen.",
     "best_score": "Bestwert",
-    "not_fought": "Noch nicht gekämpft"
+    "not_fought": "Noch nicht gekämpft",
+    "desktop_only": "Bosskämpfe werden auf Mobilgeräten nicht unterstützt",
+    "desktop_hint": "Für einen Kampf brauchst du einen großen Bildschirm, um die Tabulatur im Tempo zu lesen. Öffne riff.quest auf einem Laptop oder Computer, um diesen Boss herauszufordern."
   },
   "rules": {
     "title": "So läuft der Kampf",
