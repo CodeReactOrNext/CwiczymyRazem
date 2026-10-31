@@ -82,6 +82,20 @@ const along = (a: Point, c: Point, b: Point, steps = 8) =>
 const evenTimes = (count: number) =>
   Array.from({ length: count }, (_, i) => i / (count - 1));
 
+/**
+ * An opacity that flashes to `peak` and fades, from 0: a delayed keyframe
+ * animation shows its first keyframe while it waits — it must be the hidden one.
+ */
+const flash = (peak: number, delay: number, duration: number) => ({
+  value: [0, peak, 0],
+  transition: {
+    delay,
+    duration,
+    times: [0, 0.02, 1],
+    ease: "easeOut" as Easing,
+  },
+});
+
 /** What hit rides the target from the impact on, then fades. */
 const riding = (to: Point, end: Point, impact: number, stuck: number) => ({
   initial: { x: to.x, y: to.y, opacity: 0 },
@@ -112,8 +126,13 @@ const ImpactRing = ({
     stroke={color}
     strokeWidth={2}
     initial={{ r: 4, opacity: 0 }}
-    animate={{ r: radius, opacity: [0.95, 0] }}
-    transition={{ delay, duration: 0.38, ease: "easeOut" }}
+    animate={{ r: radius, opacity: flash(0.95, delay, 0.38).value }}
+    transition={{
+      delay,
+      duration: 0.38,
+      ease: "easeOut",
+      opacity: flash(0.95, delay, 0.38).transition,
+    }}
   />
 );
 
@@ -194,8 +213,8 @@ const ShotFx = ({ shot, boss }: { shot: Shot; boss: BossId }) => {
         r={14}
         fill='#fafafa'
         initial={{ opacity: 0 }}
-        animate={{ opacity: [0.95, 0] }}
-        transition={{ delay: impact, duration: 0.14, ease: "easeOut" }}
+        animate={{ opacity: flash(0.95, impact, 0.14).value }}
+        transition={flash(0.95, impact, 0.14).transition}
       />
       <g transform={`translate(${f(to.x)} ${f(to.y)})`}>
         {SPARKS.map((d) => (
@@ -206,8 +225,13 @@ const ShotFx = ({ shot, boss }: { shot: Shot; boss: BossId }) => {
             strokeWidth={2}
             strokeLinecap='round'
             initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: [1, 0] }}
-            transition={{ delay: impact, duration: 0.24, ease: "easeOut" }}
+            animate={{ pathLength: 1, opacity: flash(1, impact, 0.24).value }}
+            transition={{
+              delay: impact,
+              duration: 0.24,
+              ease: "easeOut",
+              opacity: flash(1, impact, 0.24).transition,
+            }}
           />
         ))}
       </g>
@@ -485,7 +509,7 @@ const RockShot = ({ shot }: { shot: Shot }) => {
           r={7 - i}
           fill={STONE_LIGHT}
           initial={{ cx: from.x, cy: from.y, opacity: 0 }}
-          animate={{ cx: xs, cy: ys, opacity: [0.35, 0.3, 0] }}
+          animate={{ cx: xs, cy: ys, opacity: [0, 0.35, 0.3, 0] }}
           transition={{
             cx: {
               delay: WINDUP_S + i * 0.035,
@@ -502,7 +526,7 @@ const RockShot = ({ shot }: { shot: Shot }) => {
             opacity: {
               delay: WINDUP_S + i * 0.035,
               duration: flight,
-              times: [0, 0.8, 1],
+              times: [0, 0.02, 0.8, 1],
             },
           }}
         />
@@ -540,8 +564,13 @@ const RockShot = ({ shot }: { shot: Shot }) => {
         stroke={SILK_DIM}
         strokeWidth={2}
         initial={{ rx: 6, ry: 2, opacity: 0 }}
-        animate={{ rx: 58, ry: 16, opacity: [0.9, 0] }}
-        transition={{ delay: impact, duration: 0.45, ease: "easeOut" }}
+        animate={{ rx: 58, ry: 16, opacity: flash(0.9, impact, 0.45).value }}
+        transition={{
+          delay: impact,
+          duration: 0.45,
+          ease: "easeOut",
+          opacity: flash(0.9, impact, 0.45).transition,
+        }}
       />
       <ImpactRing at={to} delay={impact} radius={28} />
 
@@ -557,7 +586,7 @@ const RockShot = ({ shot }: { shot: Shot }) => {
             animate={{
               x: [-size, x * 0.6, x],
               y: [-size, -up, 24],
-              opacity: [1, 1, 0],
+              opacity: [0, 1, 1, 0],
               rotate: x * 6,
             }}
             transition={{
@@ -565,6 +594,11 @@ const RockShot = ({ shot }: { shot: Shot }) => {
               duration: 0.6,
               times: [0, 0.4, 1],
               ease: ["easeOut", "easeIn"],
+              opacity: {
+                delay: impact,
+                duration: 0.6,
+                times: [0, 0.02, 0.6, 1],
+              },
             }}
           />
         ))}
@@ -575,11 +609,12 @@ const RockShot = ({ shot }: { shot: Shot }) => {
             cy={-4}
             fill={STONE_LIGHT}
             initial={{ r: 3, opacity: 0 }}
-            animate={{ r: 15, opacity: [0.4, 0] }}
+            animate={{ r: 15, opacity: flash(0.4, impact + 0.03, 0.7).value }}
             transition={{
               delay: impact + 0.03,
               duration: 0.7,
               ease: "easeOut",
+              opacity: flash(0.4, impact + 0.03, 0.7).transition,
             }}
           />
         ))}
@@ -683,8 +718,18 @@ const ShardShot = ({ shot }: { shot: Shot }) => {
             d='M-3 -1 L3 -2 L0 3 Z'
             fill={MASK}
             initial={{ x: 0, y: 0, opacity: 0 }}
-            animate={{ x, y, opacity: [1, 0], rotate: x * 8 }}
-            transition={{ delay: impact, duration: 0.5, ease: "easeOut" }}
+            animate={{
+              x,
+              y,
+              opacity: flash(1, impact, 0.5).value,
+              rotate: x * 8,
+            }}
+            transition={{
+              delay: impact,
+              duration: 0.5,
+              ease: "easeOut",
+              opacity: flash(1, impact, 0.5).transition,
+            }}
           />
         ))}
         <m.g
