@@ -1,7 +1,7 @@
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
+import { LIBRARY_TABS } from "constants/navTabs";
 import { GoalsView } from "feature/exerciseGoals/components/GoalsView";
-import { useProgressTabs } from "feature/profile/hooks/useProgressTabs";
 import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
@@ -10,7 +10,6 @@ import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const GoalsPage: NextPageWithLayout = () => {
   const { t } = useTranslation("goals");
-  const tabs = useProgressTabs();
 
   return (
     <div className='bg-second-600 flex min-h-screen flex-col overflow-visible rounded-lg'>
@@ -23,7 +22,7 @@ const GoalsPage: NextPageWithLayout = () => {
         className='mb-6 min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]'
       />
       <div className='px-3 md:px-6 lg:px-8'>
-        <PageTabs tabs={tabs} activeHref='/goals' ariaLabel='Progress sections' />
+        <PageTabs tabs={LIBRARY_TABS} activeHref='/goals' ariaLabel='My stuff sections' />
       </div>
       <GoalsView />
     </div>

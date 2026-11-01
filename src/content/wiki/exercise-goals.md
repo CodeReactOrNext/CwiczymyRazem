@@ -10,7 +10,7 @@ A goal is one exercise and the tempo you want to play it at, reached in small st
 
 ## Setting a goal
 
-<ClickPath steps="Progress|Goals|New goal" caption="Pick an exercise, the start tempo and the goal tempo, how clean a run must be and how the clean runs add up." />
+<ClickPath steps="My Stuff|Goals|New goal" caption="Pick an exercise, the start tempo and the goal tempo, how clean a run must be and how the clean runs add up." />
 
 Goals work on exercises that have a tablature and a metronome tempo, because those are the ones the microphone can score note by note. Hunts, strumming patterns, listening quizzes and songs can't take a goal. Exercises you wrote yourself in the Tab Editor work too, private ones included: switch the list to **My Exercises**.
 
@@ -20,7 +20,7 @@ The start tempo begins at the bottom of the exercise's own range and the goal te
 
 ## Playing in goal mode
 
-<ClickPath steps="Progress|Goals|Play at 85 BPM" caption="Opens the exercise with the metronome at your current milestone." />
+<ClickPath steps="My Stuff|Goals|Play at 85 BPM" caption="Opens the exercise with the metronome at your current milestone." />
 
 A goal run is the exercise played for its full time with the microphone on. When the timer runs out, the summary tells you whether the run was clean and how many clean runs you have at this milestone. Press **Try again** for the next run.
 

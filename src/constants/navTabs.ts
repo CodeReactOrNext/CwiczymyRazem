@@ -20,6 +20,7 @@ import {
 export const LIBRARY_TABS: PageTab[] = [
   { label: "Favorites", href: "/favorites", icon: Heart },
   { label: "Rotation", href: "/rotation", icon: Repeat },
+  { label: "Goals", href: "/goals", icon: Target },
   { label: "Calendar", href: "/calendar", icon: CalendarDays },
   { label: "My Plans", href: "/plans", icon: ListChecks },
   { label: "My Exercises", href: "/my-exercises", icon: Dumbbell },
@@ -30,7 +31,6 @@ export const PROGRESS_TABS: PageTab[] = [
   { label: "Activity", href: "/profile/activity", icon: Activity },
   { label: "Skills", href: "/profile/skill-points", icon: Sparkles },
   { label: "Practice Log", href: "/practice-log", icon: ScrollText },
-  { label: "Goals", href: "/goals", icon: Target },
   { label: "Milestones", href: "/summary", icon: Milestone },
   { label: "Achievements", href: "/profile/achievements", icon: Medal },
 ];

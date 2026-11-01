@@ -1,8 +1,9 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
 import { mirrorStyle, uprightTransform, useHandednessStore, useIsLeftHanded } from "hooks/useHandedness";
 import { useTranslation } from "hooks/useTranslation";
-import { type CSSProperties, useCallback, useId, useState } from "react";
+import { type CSSProperties, memo, useCallback, useId, useState } from "react";
 
 interface ClickableFretboardProps {
   startFret: number;
@@ -82,6 +83,7 @@ export function FullNeckToggle({ value, onChange }: { value: boolean; onChange: 
       aria-pressed={value}
       onClick={() => onChange(!value)}
       className={cn(
+        PRESSABLE_KEY,
         "rounded px-3 py-1.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
         value ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20" : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-700/60",
       )}
@@ -102,6 +104,7 @@ export function LeftyToggle() {
       aria-pressed={leftHanded}
       onClick={() => setLeftHanded(!leftHanded)}
       className={cn(
+        PRESSABLE_KEY,
         "rounded px-3 py-1.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
         leftHanded ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20" : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-700/60",
       )}
@@ -113,6 +116,8 @@ export function LeftyToggle() {
 
 const TIME_PILL_W = 165;
 const TIME_PILL_H = 60;
+// Square the mic's pulsing ring is drawn in — its r=30 circle plus the stroke.
+const LIVE_RING_BOX = 70;
 
 const CELL_W = 190;
 const ROW_H = 75;
@@ -160,8 +165,11 @@ const STRING_INACTIVE_WIDTHS = [1, 1.1, 1.3, 1.5, 1.8, 2.2];
  *
  * Without `onCellClick` it renders read-only — the "play this on your guitar"
  * board, where progress comes from the mic instead of taps.
+ *
+ * Memoised: the panels around it re-render on every tick of the note countdown,
+ * and nothing on the neck changes with it.
  */
-export function ClickableFretboard({
+export const ClickableFretboard = memo(function ClickableFretboard({
   startFret,
   endFret,
   strings,
@@ -223,19 +231,37 @@ export function ClickableFretboard({
   const leftHanded = useIsLeftHanded();
   const upright = (anchorX: number) => uprightTransform(anchorX, leftHanded);
 
+  // Percent box of the overlay layer for a rect in viewBox units.
+  const overlayBox = (x: number, y: number, w: number, h: number): CSSProperties => ({
+    left: `${(x / vw) * 100}%`,
+    top: `${(y / vh) * 100}%`,
+    width: `${(w / vw) * 100}%`,
+    height: `${(h / vh) * 100}%`,
+  });
+
+  const liveCell = (() => {
+    if (!liveKey || found.has(liveKey)) return null;
+    const [stringNum, fret] = liveKey.split("-").map(Number);
+    if (!isInScope(stringNum) || fret < startFret || fret > endFret) return null;
+    return { cx: colX(fret) + colWidth(fret) / 2, cy: rowY(stringNum - 1) + ROW_H / 2 };
+  })();
+
   return (
     <div className="w-full overflow-x-auto">
+      <div
+        className="relative mx-auto min-w-[var(--fretboard-min-w)] sm:min-w-0"
+        style={{
+          width: `min(100%, ${vw}px)`,
+          "--fretboard-min-w": `${Math.round(vw * (MIN_COL_PX / CELL_W))}px`,
+        } as CSSProperties}>
         <svg
           viewBox={`0 0 ${vw} ${vh}`}
-          className="min-w-[var(--fretboard-min-w)] sm:min-w-0"
           style={{
-            width: `min(100%, ${vw}px)`,
+            width: "100%",
             height: "auto",
             display: "block",
-            margin: "0 auto",
-            "--fretboard-min-w": `${Math.round(vw * (MIN_COL_PX / CELL_W))}px`,
             transform: mirrorStyle(leftHanded),
-          } as CSSProperties}
+          }}
           aria-label={leftHanded ? t("fretboard.aria_lefty") : t("fretboard.aria")}
         >
           <defs>
@@ -511,23 +537,11 @@ export function ClickableFretboard({
                       width={w - 2}
                       height={ROW_H - 2}
                       fill="transparent"
-                      className="cursor-pointer transition-colors hover:fill-zinc-200/10"
+                      // No colour transition: tweening a fill inside the <svg>
+                      // repaints the whole neck for every frame of it, on every
+                      // cell the pointer crosses.
+                      className="cursor-pointer hover:fill-zinc-200/10"
                       onClick={() => onCellClick!(stringNum, fret)}
-                    />
-                  )}
-                  {!isFound && liveKey === key && (
-                    <motion.circle
-                      cx={cx}
-                      cy={cy}
-                      r={30}
-                      fill="none"
-                      stroke="#34d399"
-                      strokeWidth={5}
-                      initial={{ opacity: 0.9, scale: 0.75 }}
-                      animate={{ opacity: [0.9, 0.2, 0.9], scale: [0.75, 1.15, 0.75] }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-                      style={{ transformOrigin: `${cx}px ${cy}px` }}
-                      className="pointer-events-none"
                     />
                   )}
                   {isMarked && (
@@ -557,55 +571,82 @@ export function ClickableFretboard({
             return cells;
           })}
 
-          {/* One-shot flash on the last clicked cell — keyed by click id so it
-              replays on every click without needing local state/timers; framer-motion
-              animates itself to opacity 0 and simply stays there until the next key. */}
-          {lastClick && isInScope(lastClick.string) && (
-            <motion.rect
-              key={lastClick.id}
-              x={colX(lastClick.fret)}
-              y={rowY(lastClick.string - 1)}
-              width={colWidth(lastClick.fret)}
-              height={ROW_H}
-              fill={lastClick.correct ? "#34d399" : "#ef4444"}
-              initial={{ opacity: 0.6 }}
-              animate={{ opacity: 0 }}
-              transition={{ duration: 0.45 }}
-              className="pointer-events-none"
-            />
-          )}
-
-          {/* "✓ 1.3s" tooltip — how long it took to find this position, floating
-              above the cell (below it if the cell is on the top row, so it never
-              gets clipped by the fret numbers). */}
-          {lastClick && lastClick.correct && lastClick.elapsedSeconds !== undefined && isInScope(lastClick.string) && (() => {
-            const cellCenterX = colX(lastClick.fret) + colWidth(lastClick.fret) / 2;
-            const rowTop = rowY(lastClick.string - 1);
-            const above = rowTop - TIME_PILL_H - 10 >= 0;
-            const pillY = above ? rowTop - TIME_PILL_H - 10 : rowTop + ROW_H + 10;
-            const pillX = cellCenterX - TIME_PILL_W / 2;
-            return (
-              <motion.g
-                key={`time-${lastClick.id}`}
-                initial={{ opacity: 0, y: above ? 6 : -6, scale: 0.7 }}
-                animate={{ opacity: [0, 1, 1, 0], y: [above ? 6 : -6, 0, 0, above ? -6 : 6], scale: [0.7, 1, 1, 0.95] }}
-                transition={{ duration: 1.4, times: [0, 0.15, 0.75, 1] }}
-                className="pointer-events-none"
-              >
-                <g transform={upright(cellCenterX)}>
-                  <rect x={pillX} y={pillY} width={TIME_PILL_W} height={TIME_PILL_H} rx={12} fill="#18181b" stroke="#10b981" strokeWidth={2.5} />
-                  <circle cx={pillX + 32} cy={pillY + TIME_PILL_H / 2} r={17} fill="#10b981" />
-                  <text x={pillX + 32} y={pillY + TIME_PILL_H / 2 + 7} textAnchor="middle" fontSize={20} fontWeight="bold" fill="#052e1f">
-                    ✓
-                  </text>
-                  <text x={pillX + 58} y={pillY + TIME_PILL_H / 2 + 9} textAnchor="start" fontSize={27} fontWeight="800" fill="#ffffff">
-                    {lastClick.elapsedSeconds.toFixed(1)}s
-                  </text>
-                </g>
-              </motion.g>
-            );
-          })()}
       </svg>
+
+      {/* Everything that animates lives here, outside the neck's <svg>. Animating
+          an element inside an SVG repaints the whole drawing every frame — the
+          full-width neck with its gradients — while these are plain boxes the
+          browser can fade and move on the compositor without touching it.
+          Positioned in percentages of the viewBox, so they track the neck at any
+          width, and mirrored the same way it is. */}
+      <div className="pointer-events-none absolute inset-0" style={{ transform: mirrorStyle(leftHanded) }}>
+        {liveCell && (
+          <motion.div
+            className="absolute"
+            style={overlayBox(liveCell.cx - LIVE_RING_BOX / 2, liveCell.cy - LIVE_RING_BOX / 2, LIVE_RING_BOX, LIVE_RING_BOX)}
+            initial={{ opacity: 0.9, scale: 0.75 }}
+            animate={{ opacity: [0.9, 0.2, 0.9], scale: [0.75, 1.15, 0.75] }}
+            transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}>
+            <svg viewBox={`0 0 ${LIVE_RING_BOX} ${LIVE_RING_BOX}`} className="block h-full w-full">
+              <circle cx={LIVE_RING_BOX / 2} cy={LIVE_RING_BOX / 2} r={30} fill="none" stroke="#34d399" strokeWidth={5} />
+            </svg>
+          </motion.div>
+        )}
+
+        {/* One-shot flash on the last clicked cell — keyed by click id so it
+            replays on every click without needing local state/timers; framer-motion
+            animates itself to opacity 0 and simply stays there until the next key. */}
+        {lastClick && isInScope(lastClick.string) && (
+          <motion.div
+            key={lastClick.id}
+            className="absolute"
+            style={{
+              ...overlayBox(colX(lastClick.fret), rowY(lastClick.string - 1), colWidth(lastClick.fret), ROW_H),
+              backgroundColor: lastClick.correct ? "#34d399" : "#ef4444",
+            }}
+            initial={{ opacity: 0.6 }}
+            animate={{ opacity: 0 }}
+            transition={{ duration: 0.45 }}
+          />
+        )}
+
+        {/* "✓ 1.3s" tooltip — how long it took to find this position, floating
+            above the cell (below it if the cell is on the top row, so it never
+            gets clipped by the fret numbers). */}
+        {lastClick && lastClick.correct && lastClick.elapsedSeconds !== undefined && isInScope(lastClick.string) && (() => {
+          const cellCenterX = colX(lastClick.fret) + colWidth(lastClick.fret) / 2;
+          const rowTop = rowY(lastClick.string - 1);
+          const above = rowTop - TIME_PILL_H - 10 >= 0;
+          const pillY = above ? rowTop - TIME_PILL_H - 10 : rowTop + ROW_H + 10;
+          const pillX = cellCenterX - TIME_PILL_W / 2;
+          // 6 viewBox units of drift, as a share of the pill's own height.
+          const drift = `${(6 / TIME_PILL_H) * 100}%`;
+          const driftBack = `-${(6 / TIME_PILL_H) * 100}%`;
+          return (
+            <motion.div
+              key={`time-${lastClick.id}`}
+              className="absolute"
+              style={overlayBox(pillX, pillY, TIME_PILL_W, TIME_PILL_H)}
+              initial={{ opacity: 0, y: above ? drift : driftBack, scale: 0.7 }}
+              animate={{ opacity: [0, 1, 1, 0], y: [above ? drift : driftBack, "0%", "0%", above ? driftBack : drift], scale: [0.7, 1, 1, 0.95] }}
+              transition={{ duration: 1.4, times: [0, 0.15, 0.75, 1] }}>
+              {/* The pill is symmetric about the cell, so only its content needs
+                  turning back the right way round under the mirror. */}
+              <svg viewBox={`0 0 ${TIME_PILL_W} ${TIME_PILL_H}`} className="block h-full w-full overflow-visible" style={{ transform: mirrorStyle(leftHanded) }}>
+                <rect x={1.25} y={1.25} width={TIME_PILL_W - 2.5} height={TIME_PILL_H - 2.5} rx={12} fill="#18181b" stroke="#10b981" strokeWidth={2.5} />
+                <circle cx={32} cy={TIME_PILL_H / 2} r={17} fill="#10b981" />
+                <text x={32} y={TIME_PILL_H / 2 + 7} textAnchor="middle" fontSize={20} fontWeight="bold" fill="#052e1f">
+                  ✓
+                </text>
+                <text x={58} y={TIME_PILL_H / 2 + 9} textAnchor="start" fontSize={27} fontWeight="800" fill="#ffffff">
+                  {lastClick.elapsedSeconds.toFixed(1)}s
+                </text>
+              </svg>
+            </motion.div>
+          );
+        })()}
+      </div>
+      </div>
     </div>
   );
-}
+});

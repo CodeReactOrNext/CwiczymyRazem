@@ -84,6 +84,9 @@
     },
     "player_roadmaps": {
       "title": "Ścieżki graczy"
+    },
+    "goals": {
+      "title": "Cele"
     }
   },
   "tags": {

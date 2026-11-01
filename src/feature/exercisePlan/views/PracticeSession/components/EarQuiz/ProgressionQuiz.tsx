@@ -1,4 +1,3 @@
-import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { DegreeId } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 import {
@@ -14,9 +13,12 @@ import { useState } from "react";
 import { useEarQuizPlayback } from "../../hooks/useEarQuizPlayback";
 import {
   ListenButton,
-  QuizReveal,
+  QuizActionSwap,
+  QuizNote,
+  QuizPrimaryButton,
+  QuizPrimarySlot,
+  QuizQuestion,
   QuizSecondaryButton,
-  QuizVerdict,
 } from "./EarQuizChrome";
 
 interface ProgressionQuizProps {
@@ -108,32 +110,38 @@ export function ProgressionQuiz({
     onAnswer(checkProgressionAnswer(question, slots).every(Boolean));
   };
 
+  // The chord names are already under each slot once answered, so the note
+  // line carries where the progression turns up instead.
+  const roundVerdict = isAnswered
+    ? {
+        isCorrect,
+        answer: formatDegrees(question.degrees),
+        explanation: t("quiz.heard_in", { songs: question.heardIn }),
+      }
+    : null;
+
   return (
     <>
-      <div className='flex flex-col items-center gap-4 py-2'>
-        <p className='text-center text-lg font-semibold text-zinc-100'>
-          {t("quiz.which_progression")}
-        </p>
+      <div className='flex flex-col items-center gap-3'>
+        <QuizQuestion question={t("quiz.which_progression")} verdict={roundVerdict} />
         <div className='flex flex-wrap items-center justify-center gap-3'>
-          <ListenButton
-            onClick={toggleProgression}
-            isPlaying={isPlaying}
-            label={t("quiz.play_progression")}
-            hasPlayed={hasPlayed}
-          />
-          <QuizSecondaryButton
-            onClick={playTonic}
-            icon={<Music2 className='h-4 w-4' />}>
+          <QuizPrimarySlot isAnswered={isAnswered} onNext={onNext}>
+            <ListenButton
+              onClick={toggleProgression}
+              isPlaying={isPlaying}
+              label={t("quiz.play_progression")}
+              hasPlayed={hasPlayed}
+            />
+          </QuizPrimarySlot>
+          <QuizSecondaryButton onClick={playTonic} icon={<Music2 />}>
             {t("quiz.hear_tonic")}
           </QuizSecondaryButton>
         </div>
-        <p className='text-center text-xs text-zinc-500'>
-          {t("quiz.key_of_build", { key: question.keyName })}
-        </p>
+        <QuizNote hint={t("quiz.key_of_build", { key: question.keyName })} verdict={roundVerdict} />
       </div>
 
       {/* The answer side — one block, so it sits beside the question when sideways */}
-      <div className='flex flex-col gap-6 shortwide:gap-4'>
+      <div className='flex flex-col gap-5 shortwide:gap-4'>
         {/* Slots the tiles drop into */}
         <div className='flex flex-wrap items-center justify-center gap-3'>
           {slots.map((slot, index) => {
@@ -192,43 +200,25 @@ export function ProgressionQuiz({
           ))}
         </div>
 
-        {!isAnswered && (
-          <div className='flex flex-wrap items-center justify-center gap-3'>
-            <Button
-              onClick={submit}
-              disabled={!isComplete}
-              className='h-10 gap-2 bg-zinc-100 font-semibold text-zinc-900 hover:bg-white'>
-              <Check className='h-4 w-4' />
-              {t("quiz.check")}
-            </Button>
-            <Button
-              variant='ghost'
-              onClick={clearAll}
-              disabled={slots.every((slot) => slot === null)}
-              className='h-10 gap-2 text-zinc-400 hover:text-zinc-100'>
-              <Undo2 className='h-4 w-4' />
-              {t("quiz.clear")}
-            </Button>
-          </div>
-        )}
-      </div>
-
-      <QuizReveal show={isAnswered}>
-        <QuizVerdict
-          isCorrect={isCorrect}
-          answer={formatDegrees(question.degrees)}
-          explanation={question.chords.map((chord) => chord.name).join("  ·  ")}
-          footnote={t("quiz.heard_in", { songs: question.heardIn })}
-          onNext={onNext}
-          extraAction={
-            <QuizSecondaryButton
-              onClick={playProgression}
-              icon={<Music2 className='h-4 w-4' />}>
+        <QuizActionSwap
+          isAnswered={isAnswered}
+          answered={
+            <QuizSecondaryButton onClick={playProgression} icon={<Music2 />} className='h-10'>
               {t("quiz.play_it_again")}
             </QuizSecondaryButton>
-          }
-        />
-      </QuizReveal>
+          }>
+          <QuizPrimaryButton onClick={submit} disabled={!isComplete} icon={<Check />}>
+            {t("quiz.check")}
+          </QuizPrimaryButton>
+          <QuizSecondaryButton
+            onClick={clearAll}
+            disabled={slots.every((slot) => slot === null)}
+            icon={<Undo2 />}
+            className='h-10'>
+            {t("quiz.clear")}
+          </QuizSecondaryButton>
+        </QuizActionSwap>
+      </div>
     </>
   );
 }

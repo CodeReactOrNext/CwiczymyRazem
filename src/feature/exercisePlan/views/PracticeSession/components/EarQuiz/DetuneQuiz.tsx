@@ -1,5 +1,4 @@
-import { Button } from "assets/components/ui/button";
-import { Slider } from "assets/components/ui/slider";
+import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "assets/lib/utils";
 import { useDetuneDrone } from "feature/exercisePlan/hooks/useDetuneDrone";
 import type { DetuneQuestion } from "feature/exercisePlan/logic/earQuiz/questions";
@@ -8,13 +7,22 @@ import {
   isDetuneSolved,
   remainingDetuneCents,
 } from "feature/exercisePlan/logic/earQuiz/questions";
+import { motion } from "framer-motion";
 import { fractionAlongX, useQuarterTurn } from "hooks/useQuarterTurn";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, Pause, Play } from "lucide-react";
 import { type PointerEvent, useState } from "react";
 import { midiToFrequency } from "utils/audio/noteUtils";
 
-import { QuizReveal, QuizVerdict } from "./EarQuizChrome";
+import {
+  ListenButton,
+  QuizActionSwap,
+  QuizNote,
+  QuizPrimaryButton,
+  QuizPrimarySlot,
+  QuizQuestion,
+  QuizSecondaryButton,
+} from "./EarQuizChrome";
 
 interface DetuneQuizProps {
   question: DetuneQuestion;
@@ -27,6 +35,8 @@ interface DetuneQuizProps {
 /** Slider travel each way. Wider than the largest error a question can start
  *  with, so the in-tune point is always reachable without ever sitting at an end. */
 const SLIDER_RANGE_CENTS = 60;
+/** Scale marks every 10 cents; the centre and the ±30s drawn longer. */
+const TICKS = Array.from({ length: (SLIDER_RANGE_CENTS * 2) / 10 + 1 }, (_, i) => i * 10 - SLIDER_RANGE_CENTS);
 
 export function DetuneQuiz({
   question,
@@ -91,39 +101,45 @@ export function DetuneQuiz({
         window: question.toleranceCents,
       });
 
+  // Where a cent value sits along the track, in the same terms Radix places
+  // the thumb — the marks live in a box inset by half the thumb, so the two line up.
+  const along = (cents: number) =>
+    `${((cents + SLIDER_RANGE_CENTS) / (SLIDER_RANGE_CENTS * 2)) * 100}%`;
+  const targetCents = -question.offsetCents;
+  const verdict = isAnswered
+    ? {
+        isCorrect,
+        answer: verdictLine,
+        explanation:
+          beats < 0.15
+            ? t("quiz.no_beating")
+            : t("quiz.beating", { beats: beats.toFixed(1) }),
+        footnote: t("quiz.detune_footnote"),
+      }
+    : null;
+
   return (
     <>
-      <div className='flex flex-col items-center gap-4 py-2'>
-        <p className='text-center text-lg font-semibold text-zinc-100'>
-          {t("quiz.tune_second")}
-        </p>
-        <Button
-          size='lg'
-          onClick={drone.toggle}
-          className={cn(
-            "h-12 min-w-[188px] gap-2 text-base font-semibold",
-            drone.isPlaying
-              ? "bg-zinc-800/60 text-zinc-200 hover:bg-zinc-800"
-              : "bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25",
-          )}>
-          {drone.isPlaying ? (
-            <Pause className='h-4 w-4' />
-          ) : (
-            <Play className='h-4 w-4' />
-          )}
-          {drone.isPlaying ? t("quiz.stop_notes") : t("quiz.play_both")}
-        </Button>
-        <p className='text-center text-xs text-zinc-500'>
-          Reference: {question.referenceName} — listen for the wobble and slide
-          it away
-        </p>
+      <div className='flex flex-col items-center gap-3'>
+        <QuizQuestion question={t("quiz.tune_second")} verdict={verdict} />
+        <QuizPrimarySlot isAnswered={isAnswered} onNext={onNext}>
+          <ListenButton
+            onClick={drone.toggle}
+            isPlaying={drone.isPlaying}
+            label={t("quiz.play_both")}
+          />
+        </QuizPrimarySlot>
+        <QuizNote
+          hint={<>Reference: {question.referenceName} — listen for the wobble and slide it away</>}
+          verdict={verdict}
+        />
       </div>
 
       {/* The answer side — one block, so it sits beside the question when sideways */}
-      <div className='flex flex-col gap-6 shortwide:gap-4'>
-        <div className='space-y-4 px-1 sm:px-6'>
+      <div className='flex flex-col gap-5 shortwide:gap-4'>
+        <div className='space-y-2.5 px-1 sm:px-4'>
           <div className='touch-none' {...turnedDrag}>
-            <Slider
+            <SliderPrimitive.Root
               value={[sliderCents]}
               onValueChange={([value]) => !isAnswered && setSliderCents(value)}
               min={-SLIDER_RANGE_CENTS}
@@ -131,57 +147,83 @@ export function DetuneQuiz({
               step={1}
               disabled={isAnswered}
               aria-label={t("quiz.second_pitch")}
-              className='py-3'
-            />
+              className='relative flex h-14 w-full cursor-pointer touch-none select-none items-center data-[disabled]:cursor-default'>
+              {/* A bipolar control: no filled range from the left, just a groove
+                  with a scale — the centre is where the note started, not the answer. */}
+              <SliderPrimitive.Track className='relative h-full w-full grow overflow-hidden rounded-lg bg-zinc-800/50'>
+                <div className='absolute inset-y-0 left-[7px] right-[7px]'>
+                  {TICKS.map((cents) => (
+                    <span
+                      key={cents}
+                      className={cn(
+                        "absolute top-1/2 w-px -translate-x-1/2 -translate-y-1/2 rounded-full",
+                        cents === 0 ? "h-6 bg-zinc-500" : cents % 30 === 0 ? "h-4 bg-zinc-600" : "h-2.5 bg-zinc-700",
+                      )}
+                      style={{ left: along(cents) }}
+                    />
+                  ))}
+                  {/* Answered: where in tune actually was, and how wide the window. */}
+                  {isAnswered && (
+                    <motion.div
+                      initial={{ opacity: 0, scaleY: 0.4 }}
+                      animate={{ opacity: 1, scaleY: 1 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                      className='absolute inset-y-1.5 -translate-x-1/2 rounded-md bg-emerald-500/20'
+                      style={{
+                        left: along(targetCents),
+                        width: `${(question.toleranceCents / SLIDER_RANGE_CENTS) * 100}%`,
+                      }}>
+                      <span className='absolute inset-y-1 left-1/2 w-0.5 -translate-x-1/2 rounded-full bg-emerald-400' />
+                    </motion.div>
+                  )}
+                </div>
+              </SliderPrimitive.Track>
+              <SliderPrimitive.Thumb
+                className={cn(
+                  "block h-11 w-3.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-100/40 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900",
+                  !isAnswered && "bg-zinc-100 hover:bg-white",
+                  isAnswered && (solved ? "bg-emerald-400" : "bg-red-400"),
+                )}
+              />
+            </SliderPrimitive.Root>
           </div>
-          <div className='flex items-center justify-between text-xs text-zinc-500'>
-            <span>{t("quiz.flatter")}</span>
+          <div className='flex items-center justify-between text-xs font-medium text-zinc-500'>
+            <span>♭ {t("quiz.flatter")}</span>
             <span
               className={cn(
-                isAnswered && (solved ? "text-emerald-400" : "text-red-400"),
+                "tabular-nums",
+                isAnswered && (solved ? "font-bold text-emerald-400" : "font-bold text-red-400"),
               )}>
               {isAnswered
                 ? `${remaining > 0 ? "+" : ""}${Math.round(remaining)} cents`
                 : "no numbers — trust your ears"}
             </span>
-            <span>{t("quiz.sharper")}</span>
+            <span>{t("quiz.sharper")} ♯</span>
           </div>
         </div>
 
-        {!isAnswered && (
-          <div className='flex justify-center'>
-            <Button
-              onClick={submit}
-              className='h-10 gap-2 bg-zinc-100 font-semibold text-zinc-900 hover:bg-white'>
-              <Check className='h-4 w-4' />
-              That&apos;s in tune
-            </Button>
-          </div>
-        )}
+        <QuizActionSwap
+          isAnswered={isAnswered}
+          answered={
+            // Next took the drone button's place up top, so it carries on
+            // here — snapping in tune is only worth it if you can hear it.
+            <>
+              <QuizSecondaryButton
+                onClick={drone.toggle}
+                icon={drone.isPlaying ? <Pause /> : <Play />}
+                className='h-10'>
+                {drone.isPlaying ? t("quiz.stop_notes") : t("quiz.play_both")}
+              </QuizSecondaryButton>
+              <QuizSecondaryButton onClick={snapToPitch} icon={<Check />} className='h-10'>
+                {t("quiz.snap")}
+              </QuizSecondaryButton>
+            </>
+          }>
+          <QuizPrimaryButton onClick={submit} icon={<Check />}>
+            That&apos;s in tune
+          </QuizPrimaryButton>
+        </QuizActionSwap>
       </div>
-
-      <QuizReveal show={isAnswered}>
-        <QuizVerdict
-          isCorrect={isCorrect}
-          answer={verdictLine}
-          explanation={
-            beats < 0.15
-              ? t("quiz.no_beating")
-              : t("quiz.beating", { beats: beats.toFixed(1) })
-          }
-          footnote={t("quiz.detune_footnote")}
-          onNext={onNext}
-          extraAction={
-            <Button
-              variant='ghost'
-              onClick={snapToPitch}
-              className='h-10 gap-2 bg-zinc-800/40 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100'>
-              <Play className='h-4 w-4' />
-              {t("quiz.snap")}
-            </Button>
-          }
-        />
-      </QuizReveal>
     </>
   );
 }

@@ -10,9 +10,10 @@ import { useEarQuizPlayback } from "../../hooks/useEarQuizPlayback";
 import {
   AnswerTile,
   ListenButton,
-  QuizReveal,
+  QuizNote,
+  QuizPrimarySlot,
+  QuizQuestion,
   QuizSecondaryButton,
-  QuizVerdict,
 } from "./EarQuizChrome";
 
 interface ScaleModeQuizProps {
@@ -80,30 +81,41 @@ export function ScaleModeQuiz({
   const scaleName = (id: ScaleModeId) =>
     t(`quiz.scales.${id}.name`, SCALE_MODES[id].name);
 
+  const verdict = isAnswered
+    ? {
+        isCorrect,
+        answer: `${question.rootName} ${scaleName(question.scale)}`,
+        explanation: t(
+          `quiz.scales.${question.scale}.character`,
+          answerScale.character,
+        ),
+        footnote: t("quiz.listen_for", {
+          tell: t(`quiz.scales.${question.scale}.tell`, answerScale.tell),
+          formula: answerScale.formula,
+        }),
+      }
+    : null;
+
   return (
     <>
-      <div className='flex flex-col items-center gap-4 py-2'>
-        <p className='text-center text-lg font-semibold text-zinc-100'>
-          {t("quiz.which_scale")}
-        </p>
+      <div className='flex flex-col items-center gap-3'>
+        <QuizQuestion question={t("quiz.which_scale")} verdict={verdict} />
         <div className='flex flex-wrap items-center justify-center gap-3'>
-          <ListenButton
-            onClick={toggleScale}
-            isPlaying={isPlaying}
-            label={t("quiz.play_scale")}
-            hasPlayed={hasPlayed}
-          />
+          <QuizPrimarySlot isAnswered={isAnswered} onNext={onNext}>
+            <ListenButton
+              onClick={toggleScale}
+              isPlaying={isPlaying}
+              label={t("quiz.play_scale")}
+              hasPlayed={hasPlayed}
+            />
+          </QuizPrimarySlot>
           <QuizSecondaryButton
             onClick={() => playScale(SLOW_NOTE_SECONDS)}
-            icon={<Snail className='h-4 w-4' />}>
-            {t("quiz.play_slowly")}
+            icon={<Snail />}>
+            {isAnswered ? t("quiz.hear_again_slowly") : t("quiz.play_slowly")}
           </QuizSecondaryButton>
         </div>
-        <p className='text-center text-xs text-zinc-500'>
-          {isAnswered
-            ? t("quiz.root", { root: question.rootName })
-            : t("quiz.root_held")}
-        </p>
+        <QuizNote hint={t("quiz.root_held")} verdict={verdict} />
       </div>
 
       <div
@@ -129,34 +141,11 @@ export function ScaleModeQuiz({
               disabled={isAnswered}
               state={state}
               title={scaleName(id)}
-              subtitle={isAnswered ? scale.formula : undefined}
+              subtitle={scale.formula}
             />
           );
         })}
       </div>
-
-      <QuizReveal show={isAnswered}>
-        <QuizVerdict
-          isCorrect={isCorrect}
-          answer={`${question.rootName} ${scaleName(question.scale)}`}
-          explanation={t(
-            `quiz.scales.${question.scale}.character`,
-            answerScale.character,
-          )}
-          footnote={t("quiz.listen_for", {
-            tell: t(`quiz.scales.${question.scale}.tell`, answerScale.tell),
-            formula: answerScale.formula,
-          })}
-          onNext={onNext}
-          extraAction={
-            <QuizSecondaryButton
-              onClick={() => playScale(SLOW_NOTE_SECONDS)}
-              icon={<Snail className='h-4 w-4' />}>
-              {t("quiz.hear_again_slowly")}
-            </QuizSecondaryButton>
-          }
-        />
-      </QuizReveal>
     </>
   );
 }

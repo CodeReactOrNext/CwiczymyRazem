@@ -84,6 +84,9 @@
     },
     "player_roadmaps": {
       "title": "Rutas de jugadores"
+    },
+    "goals": {
+      "title": "Objetivos"
     }
   },
   "tags": {

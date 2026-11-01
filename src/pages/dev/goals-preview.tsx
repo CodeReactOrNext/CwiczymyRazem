@@ -4,7 +4,7 @@ import "lib/i18n/fullCatalog";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { PROGRESS_TABS } from "constants/navTabs";
+import { LIBRARY_TABS } from "constants/navTabs";
 import { GoalRunVerdict } from "feature/exerciseGoals/components/GoalRunVerdict";
 import { GoalsPanel } from "feature/exerciseGoals/components/GoalsPanel";
 import {
@@ -317,7 +317,7 @@ const PanelPreview = () => {
           />
           <div className='px-3 md:px-6 lg:px-8'>
             <PageTabs
-              tabs={PROGRESS_TABS}
+              tabs={LIBRARY_TABS}
               activeHref='/goals'
               ariaLabel='Progress sections'
             />

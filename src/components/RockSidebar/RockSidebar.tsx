@@ -375,7 +375,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/profile/achievements")) return "progress";
     if (pathname.startsWith("/profile/skill-points")) return "progress";
     if (pathname.startsWith("/practice-log")) return "progress";
-    if (pathname.startsWith("/goals")) return "progress";
+    if (pathname.startsWith("/goals")) return "library";
     if (pathname === "/summary") return "progress";
     if (pathname.startsWith("/challenges")) return "community";
     if (pathname.startsWith("/duels")) return "community";

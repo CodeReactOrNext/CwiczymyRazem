@@ -1,3 +1,4 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { Checkbox } from "assets/components/ui/checkbox";
 import { Label } from "assets/components/ui/label";
 import { cn } from "assets/lib/utils";
@@ -51,7 +52,8 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
   const targetNote = huntTarget ?? targetNoteProp;
   // Memoized so the note-audio hooks below don't see a fresh array every render.
   const targetPositions = useMemo(() => clickHunt?.targetPositions ?? [], [clickHunt?.targetPositions]);
-  const foundKeys = clickHunt?.foundKeys ?? [];
+  // Stable when nothing was found, so the memoised neck skips the countdown ticks.
+  const foundKeys = useMemo(() => clickHunt?.foundKeys ?? [], [clickHunt?.foundKeys]);
   const lastClick = clickHunt?.lastClick ?? null;
   const score = clickHunt?.gameState.score ?? 0;
 
@@ -164,7 +166,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
             <button
               type="button"
               onClick={advanceHunt}
-              className="inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+              className={cn(PRESSABLE_KEY, "inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring")}>
               Next <ArrowRight size='1em' className="h-3.5 w-3.5 text-zinc-400" />
             </button>
           )}
@@ -176,7 +178,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
               type="button"
               onClick={playReference}
               disabled={referenceMidi === null}
-              className="inline-flex items-center gap-2 rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+              className={cn(PRESSABLE_KEY, "inline-flex items-center gap-2 rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50")}
               title={t("click_hunt.play_note")}>
               <Volume2 size='1em' className="h-3 w-3 text-zinc-400" /> Hear it
             </button>

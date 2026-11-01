@@ -35,6 +35,7 @@ import {
   Signpost,
   Skull,
   Swords,
+  Target,
   WandSparkles,
 } from "lucide-react";
 import Link from "next/link";
@@ -148,6 +149,7 @@ const createLinkClass = cn(
 const MY_STUFF = [
   { id: "favorites", Icon: Heart, href: "/favorites" },
   { id: "rotation", Icon: Repeat, href: "/rotation" },
+  { id: "goals", Icon: Target, href: "/goals" },
   { id: "calendar", Icon: CalendarDays, href: "/calendar" },
   { id: "my_plans", Icon: ClipboardCheck, href: "/plans" },
   { id: "my_exercises", Icon: Music2, href: "/my-exercises" },

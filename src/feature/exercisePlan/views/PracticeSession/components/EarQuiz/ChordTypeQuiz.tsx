@@ -10,9 +10,10 @@ import { useEarQuizPlayback } from "../../hooks/useEarQuizPlayback";
 import {
   AnswerTile,
   ListenButton,
-  QuizReveal,
+  QuizNote,
+  QuizPrimarySlot,
+  QuizQuestion,
   QuizSecondaryButton,
-  QuizVerdict,
 } from "./EarQuizChrome";
 
 interface ChordTypeQuizProps {
@@ -62,30 +63,37 @@ export function ChordTypeQuiz({
   const qualityName = (id: ChordQualityId) =>
     t(`quiz.chords.${id}.name`, CHORD_QUALITIES[id].name);
 
+  const verdict = isAnswered
+    ? {
+        isCorrect,
+        answer: `${question.rootName}${answerQuality.suffix} — ${qualityName(question.quality)}`,
+        explanation: t(
+          `quiz.chords.${question.quality}.character`,
+          answerQuality.character,
+        ),
+      }
+    : null;
+
   return (
     <>
-      <div className='flex flex-col items-center gap-4 py-2'>
-        <p className='text-center text-lg font-semibold text-zinc-100'>
-          {t("quiz.which_chord")}
-        </p>
+      <div className='flex flex-col items-center gap-3'>
+        <QuizQuestion question={t("quiz.which_chord")} verdict={verdict} />
         <div className='flex flex-wrap items-center justify-center gap-3'>
-          <ListenButton
-            onClick={toggleChord}
-            isPlaying={isPlaying}
-            label={t("quiz.play_chord")}
-            hasPlayed={hasPlayed}
-          />
+          <QuizPrimarySlot isAnswered={isAnswered} onNext={onNext}>
+            <ListenButton
+              onClick={toggleChord}
+              isPlaying={isPlaying}
+              label={t("quiz.play_chord")}
+              hasPlayed={hasPlayed}
+            />
+          </QuizPrimarySlot>
           <QuizSecondaryButton
             onClick={() => playChord(ARPEGGIO_SPREAD)}
-            icon={<AudioWaveform className='h-4 w-4' />}>
-            {t("quiz.one_note")}
+            icon={<AudioWaveform />}>
+            {isAnswered ? t("quiz.hear_again_slowly") : t("quiz.one_note")}
           </QuizSecondaryButton>
         </div>
-        <p className='text-center text-xs text-zinc-500'>
-          {isAnswered
-            ? t("quiz.root", { root: question.rootName })
-            : t("quiz.root_moves")}
-        </p>
+        <QuizNote hint={t("quiz.root_moves")} verdict={verdict} />
       </div>
 
       <div
@@ -111,31 +119,11 @@ export function ChordTypeQuiz({
               disabled={isAnswered}
               state={state}
               title={qualityName(id)}
-              subtitle={isAnswered ? quality.formula : undefined}
+              subtitle={quality.formula}
             />
           );
         })}
       </div>
-
-      <QuizReveal show={isAnswered}>
-        <QuizVerdict
-          isCorrect={isCorrect}
-          answer={`${question.rootName}${answerQuality.suffix} — ${qualityName(question.quality)}`}
-          explanation={t(
-            `quiz.chords.${question.quality}.character`,
-            answerQuality.character,
-          )}
-          footnote={t("quiz.formula", { formula: answerQuality.formula })}
-          onNext={onNext}
-          extraAction={
-            <QuizSecondaryButton
-              onClick={() => playChord(ARPEGGIO_SPREAD)}
-              icon={<AudioWaveform className='h-4 w-4' />}>
-              {t("quiz.hear_again_slowly")}
-            </QuizSecondaryButton>
-          }
-        />
-      </QuizReveal>
     </>
   );
 }

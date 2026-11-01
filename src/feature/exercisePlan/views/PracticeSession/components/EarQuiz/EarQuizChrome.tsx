@@ -1,4 +1,4 @@
-import { Button } from "assets/components/ui/button";
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
@@ -12,9 +12,41 @@ import {
   Trophy,
   X,
 } from "lucide-react";
-import { type ReactNode, useEffect, useRef } from "react";
+import type { ReactNode } from "react";
 
 import type { EarQuizStats } from "../../hooks/useEarQuizGame";
+
+/** One labelled counter in the header — a bare flame and a number read as
+ *  nothing in particular, so each one says what it counts. */
+function QuizStat({
+  icon,
+  value,
+  label,
+  tone,
+}: {
+  icon: ReactNode;
+  value: number;
+  label: string;
+  tone: string;
+}) {
+  return (
+    <span className='flex items-center gap-2 rounded-lg bg-zinc-800/40 px-3 py-1.5'>
+      <span className={cn("flex [&_svg]:h-4 [&_svg]:w-4", tone)} aria-hidden>
+        {icon}
+      </span>
+      {/* Keyed on the value so a new streak count pops in. */}
+      <motion.span
+        key={value}
+        initial={{ scale: 1.4, opacity: 0.4 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 420, damping: 20 }}
+        className={cn("text-sm font-bold", value > 0 ? "text-zinc-100" : "text-zinc-500")}>
+        {value}
+      </motion.span>
+      <span className='text-xs font-medium text-zinc-500'>{label}</span>
+    </span>
+  );
+}
 
 /** Header: what the quiz is, and how the session is going. */
 export function EarQuizHeader({
@@ -27,6 +59,7 @@ export function EarQuizHeader({
   /** Sideways the timer nudge rides in this row instead of taking one of its own. */
   hint?: ReactNode;
 }) {
+  const { t } = useTranslation("session");
   const accuracy =
     stats.answered > 0
       ? Math.round((stats.correct / stats.answered) * 100)
@@ -34,35 +67,56 @@ export function EarQuizHeader({
 
   return (
     <div className='flex flex-wrap items-center justify-between gap-x-6 gap-y-2'>
-      <p className='text-sm font-medium text-zinc-400'>{label}</p>
+      <p className='text-sm font-semibold text-zinc-400'>{label}</p>
       {hint}
 
-      <div className='flex items-center gap-5 text-xs tabular-nums text-zinc-400'>
+      <div className='flex items-center gap-2 tabular-nums'>
         {accuracy !== null && (
-          <span>
-            <span className='font-semibold text-zinc-100'>{stats.correct}</span>
-            <span className='text-zinc-500'>/{stats.answered}</span>
-            <span className='ml-1.5 text-zinc-500'>{accuracy}%</span>
+          <span className='flex items-baseline gap-1.5 rounded-lg bg-zinc-800/40 px-3 py-1.5 text-sm'>
+            <span className='font-bold text-zinc-100'>
+              {stats.correct}
+              <span className='font-medium text-zinc-500'>/{stats.answered}</span>
+            </span>
+            <span className='text-xs font-medium text-zinc-500'>{accuracy}%</span>
           </span>
         )}
-        <span
-          className={cn(
-            "flex items-center gap-1.5",
-            stats.streak > 0 ? "text-orange-400" : "text-zinc-500",
-          )}>
-          <Flame className='h-3.5 w-3.5' aria-hidden />
-          <span className='font-semibold'>{stats.streak}</span>
-        </span>
+        <QuizStat
+          icon={<Flame />}
+          value={stats.streak}
+          label={t("quiz.streak", "Streak")}
+          tone={stats.streak > 0 ? "text-orange-400" : "text-zinc-500"}
+        />
         {stats.bestStreak > 0 && (
-          <span className='flex items-center gap-1.5 text-amber-400'>
-            <Trophy className='h-3.5 w-3.5' aria-hidden />
-            <span className='font-semibold'>{stats.bestStreak}</span>
-          </span>
+          <QuizStat
+            icon={<Trophy />}
+            value={stats.bestStreak}
+            label={t("quiz.best_streak", "Best")}
+            tone='text-amber-400'
+          />
         )}
       </div>
     </div>
   );
 }
+
+/**
+ * Every quiz button is the same game-style key. Plain buttons rather than
+ * <Button>: that one wraps its children in a span without the gap, so the icon
+ * sat glued to the label.
+ */
+const QUIZ_KEY = cn(
+  PRESSABLE_KEY,
+  "inline-flex items-center justify-center gap-2.5 rounded-lg px-5 text-sm font-bold transition-colors",
+  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40",
+  "[&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0",
+);
+
+/** The white key: the one thing to press next. */
+const PRIMARY_FACE = "bg-zinc-100 text-zinc-900 hover:bg-white";
+const SECONDARY_FACE = "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-700/60 hover:text-zinc-100";
+
+/** Same footprint for the listen button and the Next that takes its place. */
+const PRIMARY_SIZE = "h-11 min-w-[168px]";
 
 interface ListenButtonProps {
   onClick: () => void;
@@ -83,27 +137,18 @@ export function ListenButton({
 }: ListenButtonProps) {
   const { t } = useTranslation("session");
   return (
-    <Button
-      size='lg'
+    <button
+      type='button'
       onClick={onClick}
-      className={cn(
-        "h-12 min-w-[168px] gap-2 bg-cyan-500/15 text-base font-semibold text-cyan-300 hover:bg-cyan-500/25",
-        className,
-      )}>
-      {isPlaying ? (
-        <Square className='h-4 w-4' />
-      ) : hasPlayed ? (
-        <RotateCcw className='h-4 w-4' />
-      ) : (
-        <Play className='h-4 w-4' />
-      )}
+      className={cn(QUIZ_KEY, PRIMARY_SIZE, PRIMARY_FACE, className)}>
+      {isPlaying ? <Square /> : hasPlayed ? <RotateCcw /> : <Play />}
       {isPlaying ? t("quiz.stop") : hasPlayed ? t("quiz.play_again") : (label ?? t("quiz.play"))}
-    </Button>
+    </button>
   );
 }
 
-/** Secondary listening aid (arpeggio, tonic reference, slow replay …). */
-export function QuizSecondaryButton({
+/** White action key for the in-card steps (Check, That's in tune). */
+export function QuizPrimaryButton({
   onClick,
   icon,
   children,
@@ -115,29 +160,229 @@ export function QuizSecondaryButton({
   disabled?: boolean;
 }) {
   return (
-    <Button
-      size='lg'
-      variant='ghost'
+    <button
+      type='button'
       onClick={onClick}
       disabled={disabled}
-      className='h-12 gap-2 bg-zinc-800/40 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100'>
+      className={cn(QUIZ_KEY, "h-10", PRIMARY_FACE)}>
       {icon}
       {children}
-    </Button>
+    </button>
+  );
+}
+
+/** Secondary listening aid (arpeggio, tonic reference, slow replay …). */
+export function QuizSecondaryButton({
+  onClick,
+  icon,
+  children,
+  disabled,
+  className,
+}: {
+  onClick: () => void;
+  icon?: ReactNode;
+  children: ReactNode;
+  disabled?: boolean;
+  className?: string;
+}) {
+  return (
+    <button
+      type='button'
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(QUIZ_KEY, "h-11", SECONDARY_FACE, className)}>
+      {icon}
+      {children}
+    </button>
+  );
+}
+
+/**
+ * Cross-fades one piece of the card into another in the same spot. Both are
+ * stacked in a single grid cell while they swap, so the card never collapses
+ * and re-grows around them — nothing below moves.
+ */
+function QuizSwap({
+  swapKey,
+  children,
+  className,
+}: {
+  swapKey: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("grid w-full justify-items-center [&>*]:col-start-1 [&>*]:row-start-1", className)}>
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={swapKey}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8, pointerEvents: "none" }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+          className='flex w-full justify-center'>
+          {children}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export interface QuizVerdictInfo {
+  isCorrect: boolean;
+  /** The answer, spelled out: "C7 — Dominant 7". */
+  answer: string;
+  /** Why it sounds like that. */
+  explanation?: string;
+  /** Extra hint after the explanation, e.g. songs the progression shows up in. */
+  footnote?: string;
+}
+
+/**
+ * The question line. Once answered it turns into the verdict in place — the
+ * answer, marked right or wrong — instead of a verdict box opening under the
+ * card and shoving everything down.
+ */
+export function QuizQuestion({
+  question,
+  verdict,
+}: {
+  question: string;
+  verdict?: QuizVerdictInfo | null;
+}) {
+  const { t } = useTranslation("session");
+  return (
+    <QuizSwap swapKey={verdict ? "verdict" : "question"}>
+      {verdict ? (
+        <p
+          className={cn(
+            "flex items-center justify-center gap-2.5 text-center text-xl font-bold tracking-tight",
+            verdict.isCorrect ? "text-emerald-400" : "text-red-400",
+          )}>
+          <motion.span
+            initial={{ scale: 0.4 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 500, damping: 18 }}
+            className={cn(
+              "flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
+              verdict.isCorrect ? "bg-emerald-500/20" : "bg-red-500/20",
+            )}>
+            {verdict.isCorrect ? (
+              <Check className='h-4 w-4' strokeWidth={3} aria-label={t("quiz.correct")} />
+            ) : (
+              <X className='h-4 w-4' strokeWidth={3} aria-label={t("quiz.wrong")} />
+            )}
+          </motion.span>
+          {verdict.answer}
+        </p>
+      ) : (
+        <p className='text-center text-xl font-bold tracking-tight text-zinc-100'>
+          {question}
+        </p>
+      )}
+    </QuizSwap>
+  );
+}
+
+/**
+ * The small line under the listen buttons: a hint while the round is open, the
+ * teaching moment once it's answered. Two lines are always reserved for it, so
+ * a longer explanation doesn't move the answers below.
+ */
+export function QuizNote({
+  hint,
+  verdict,
+}: {
+  hint: ReactNode;
+  verdict?: QuizVerdictInfo | null;
+}) {
+  return (
+    <QuizSwap swapKey={verdict ? "verdict" : "hint"} className='min-h-[2.5rem]'>
+      {verdict ? (
+        <p className='max-w-xl text-center text-sm leading-5 text-zinc-300'>
+          {verdict.explanation}
+          {verdict.footnote && (
+            <span className='text-zinc-500'> {verdict.footnote}</span>
+          )}
+        </p>
+      ) : (
+        <p className='max-w-xl text-center text-xs leading-5 text-zinc-500'>{hint}</p>
+      )}
+    </QuizSwap>
+  );
+}
+
+/**
+ * The listen button's slot. Answered, Next takes its place at the same size —
+ * the way on sits where the eye already is, and the row keeps its shape.
+ */
+export function QuizPrimarySlot({
+  isAnswered,
+  onNext,
+  children,
+}: {
+  isAnswered: boolean;
+  onNext: () => void;
+  children: ReactNode;
+}) {
+  const { t } = useTranslation("session");
+  return (
+    <QuizSwap swapKey={isAnswered ? "next" : "listen"} className='w-auto'>
+      {isAnswered ? (
+        <button
+          type='button'
+          onClick={onNext}
+          className={cn(QUIZ_KEY, PRIMARY_SIZE, PRIMARY_FACE)}>
+          {t("quiz.next")}
+          <ArrowRight />
+        </button>
+      ) : (
+        children
+      )}
+    </QuizSwap>
+  );
+}
+
+/** Swaps a quiz's in-card action row (Check / Clear …) for its answered one. */
+export function QuizActionSwap({
+  isAnswered,
+  answered,
+  children,
+}: {
+  isAnswered: boolean;
+  answered: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <QuizSwap swapKey={isAnswered ? "answered" : "open"}>
+      <div className='flex flex-wrap items-center justify-center gap-3'>
+        {isAnswered ? answered : children}
+      </div>
+    </QuizSwap>
   );
 }
 
 type AnswerState = "idle" | "correct" | "wrong" | "muted";
+
+const TILE_MOTION: Record<AnswerState, { scale?: number[]; x?: number[] }> = {
+  idle: {},
+  correct: { scale: [1, 1.06, 1] },
+  wrong: { x: [0, -7, 7, -5, 5, -2, 0] },
+  muted: {},
+};
 
 interface AnswerTileProps {
   onClick: () => void;
   state: AnswerState;
   disabled?: boolean;
   title: string;
+  /** Shown once the round is answered. Always laid out (just hidden until then),
+   *  so revealing it doesn't make the tile taller. */
   subtitle?: string;
 }
 
-/** One option in an answer grid — big tap target, verdict shown by background. */
+/** One option in an answer grid — big tap target, verdict shown by background
+ *  and a small pop (right) or shake (wrong). */
 export function AnswerTile({
   onClick,
   state,
@@ -146,105 +391,31 @@ export function AnswerTile({
   subtitle,
 }: AnswerTileProps) {
   return (
-    <button
+    <motion.button
       type='button'
       onClick={onClick}
       disabled={disabled}
+      animate={TILE_MOTION[state]}
+      transition={{ duration: state === "wrong" ? 0.4 : 0.3, ease: "easeOut" }}
       className={cn(
-        "flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-lg px-4 py-3 text-center transition-colors",
+        "flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-lg px-4 py-2.5 text-center transition-colors duration-base",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none",
         state === "idle" && "bg-zinc-800/40 text-zinc-100 hover:bg-zinc-800",
-        state === "correct" && "bg-emerald-500/10 text-emerald-400",
-        state === "wrong" && "bg-red-500/10 text-red-400",
+        state === "correct" && "bg-emerald-500/15 text-emerald-300",
+        state === "wrong" && "bg-red-500/15 text-red-300",
         state === "muted" && "bg-zinc-800/20 text-zinc-500",
       )}>
-      <span className='text-sm font-semibold leading-tight'>{title}</span>
-      {subtitle && (
-        <span className='text-xs leading-tight opacity-70'>{subtitle}</span>
-      )}
-    </button>
-  );
-}
-
-interface QuizVerdictProps {
-  isCorrect: boolean;
-  /** The answer, spelled out: "C7 — Dominant 7". */
-  answer: string;
-  /** Why it sounds like that. */
-  explanation?: string;
-  /** Extra line, e.g. songs the progression shows up in. */
-  footnote?: string;
-  onNext: () => void;
-  /** Optional listen-again control rendered next to Next. */
-  extraAction?: ReactNode;
-}
-
-/** Verdict + the teaching moment + the way on to the next round. */
-export function QuizVerdict({
-  isCorrect,
-  answer,
-  explanation,
-  footnote,
-  onNext,
-  extraAction,
-}: QuizVerdictProps) {
-  const { t } = useTranslation("session");
-  // On a short screen (a phone held sideways) the verdict opens under the fold — bring it,
-  // and the way on to the next round, into view.
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    ref.current?.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
-  }, []);
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.18 }}
-      className={cn(
-        "flex flex-col gap-4 rounded-lg p-4 sm:p-5",
-        isCorrect ? "bg-emerald-500/10" : "bg-red-500/10",
-      )}>
-      <div className='flex items-start gap-3'>
+      <span className='text-base font-bold leading-tight'>{title}</span>
+      {subtitle !== undefined && (
         <span
           className={cn(
-            "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-            isCorrect
-              ? "bg-emerald-500/20 text-emerald-400"
-              : "bg-red-500/20 text-red-400",
+            "text-xs font-medium leading-tight tracking-wide opacity-70 transition-opacity duration-base",
+            state === "idle" && "invisible opacity-0",
           )}>
-          {isCorrect ? (
-            <Check className='h-4 w-4' aria-label={t("quiz.correct")} />
-          ) : (
-            <X className='h-4 w-4' aria-label={t("quiz.wrong")} />
-          )}
+          {subtitle}
         </span>
-
-        <div className='min-w-0 space-y-1.5'>
-          <p
-            className={cn(
-              "text-base font-semibold",
-              isCorrect ? "text-emerald-400" : "text-red-400",
-            )}>
-            {answer}
-          </p>
-          {explanation && (
-            <p className='text-sm text-zinc-300'>{explanation}</p>
-          )}
-          {footnote && <p className='text-xs text-zinc-400'>{footnote}</p>}
-        </div>
-      </div>
-
-      <div className='flex flex-wrap items-center gap-3'>
-        <Button
-          onClick={onNext}
-          className='h-10 gap-2 bg-zinc-100 font-semibold text-zinc-900 hover:bg-white'>
-          {t("quiz.next")}
-          <ArrowRight className='h-4 w-4' />
-        </Button>
-        {extraAction}
-      </div>
-    </motion.div>
+      )}
+    </motion.button>
   );
 }
 
@@ -252,7 +423,7 @@ export function QuizVerdict({
 export function EarQuizCard({ children }: { children: ReactNode }) {
   return (
     <div className='mx-auto w-full max-w-3xl'>
-      <div className='flex flex-col gap-6 rounded-lg bg-zinc-900/60 p-5 sm:p-6 shortwide:gap-4 shortwide:p-4'>
+      <div className='flex flex-col gap-5 rounded-lg bg-zinc-900/60 p-5 sm:p-6 shortwide:gap-4 shortwide:p-4'>
         {children}
       </div>
     </div>
@@ -267,18 +438,5 @@ export function StartTimerHint({ className }: { className?: string }) {
       <Play className='h-3 w-3' aria-hidden />
       {t("quiz.start_hint")}
     </p>
-  );
-}
-
-/** Fades a block in when it appears (verdicts, revealed hints). */
-export function QuizReveal({
-  show,
-  children,
-}: {
-  show: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <AnimatePresence initial={false}>{show ? children : null}</AnimatePresence>
   );
 }

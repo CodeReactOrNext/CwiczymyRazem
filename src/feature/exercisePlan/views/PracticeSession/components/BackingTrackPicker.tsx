@@ -90,7 +90,7 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries, compact = fal
   );
 
   const searchAgain = (
-    <Button variant='ghost' size='sm' onClick={search} className='text-zinc-400 hover:text-zinc-100'>
+    <Button variant='subtle' size='sm' onClick={search}>
       <RefreshCw className="mr-1.5" />
       {t("backing.search_again")}
     </Button>
@@ -205,7 +205,7 @@ export function BackingVideoPlayer({ videoId, onChangeClick }: BackingVideoPlaye
           allowFullScreen
         />
       </div>
-      <Button variant='ghost' size='sm' onClick={onChangeClick} className='text-zinc-400 hover:text-zinc-100'>
+      <Button variant='subtle' size='sm' onClick={onChangeClick}>
         <FaYoutube className="mr-1.5" />
         {t("backing.change")}
       </Button>
