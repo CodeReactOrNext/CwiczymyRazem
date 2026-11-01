@@ -1,4 +1,4 @@
-import { Button } from "assets/components/ui/button";
+import { Button, PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
 import {
@@ -216,41 +216,41 @@ export const PlaylistsView = ({
   return (
     <div className="space-y-8 p-4 sm:p-6 md:p-10 animate-in fade-in-50 duration-base">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="space-y-3">
-          <h1 className="text-2xl font-bold text-white">{t("view.title")}</h1>
-          <div className="flex w-fit rounded-xl bg-zinc-900/50 p-1">
-            <button
-              type="button"
-              onClick={() => setTab("mine")}
-              className={cn(
-                "relative flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition-all",
+        <h1 className="sr-only">{t("view.title")}</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            aria-pressed={tab === "mine"}
+            onClick={() => setTab("mine")}
+            className={cn(
+                PRESSABLE,
+                "flex h-10 items-center gap-2 rounded-lg border-b-black/30 px-4 text-sm transition-colors",
                 tab === "mine"
-                  ? "bg-zinc-800 text-white shadow-lg"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  ? "border-b-black/25 bg-white text-zinc-900"
+                  : "bg-white/10 text-zinc-400 hover:bg-white/15 hover:text-zinc-200"
               )}
-            >
-              <Ripple />
-              <ListMusic size={14} className={tab === "mine" ? "text-white" : ""} />
-              {t("view.yours")}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setTab("discover");
-                posthog.capture("playlist_action", { action: "open_discover" });
-              }}
-              className={cn(
-                "relative flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition-all",
+          >
+            <ListMusic size={15} className={tab === "mine" ? "text-zinc-900" : "text-zinc-500"} />
+            {t("view.yours")}
+          </button>
+          <button
+            type="button"
+            aria-pressed={tab === "discover"}
+            onClick={() => {
+              setTab("discover");
+              posthog.capture("playlist_action", { action: "open_discover" });
+            }}
+            className={cn(
+                PRESSABLE,
+                "flex h-10 items-center gap-2 rounded-lg border-b-black/30 px-4 text-sm transition-colors",
                 tab === "discover"
-                  ? "bg-zinc-800 text-white shadow-lg"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  ? "border-b-black/25 bg-white text-zinc-900"
+                  : "bg-white/10 text-zinc-400 hover:bg-white/15 hover:text-zinc-200"
               )}
-            >
-              <Ripple />
-              <Compass size={14} className={tab === "discover" ? "text-white" : ""} />
-              {t("view.discover")}
-            </button>
-          </div>
+          >
+            <Compass size={15} className={tab === "discover" ? "text-zinc-900" : "text-zinc-500"} />
+            {t("view.discover")}
+          </button>
         </div>
 
         {showCreateButton && (

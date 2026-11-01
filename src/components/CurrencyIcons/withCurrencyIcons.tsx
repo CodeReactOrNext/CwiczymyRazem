@@ -14,8 +14,8 @@ import {
  */
 
 const CURRENCY_ART = {
-  points: "/images/points.png",
-  fame: "/images/coin.png",
+  points: "/images/tokens/pick.png",
+  fame: "/images/tokens/coin.png",
 } as const;
 
 type Currency = keyof typeof CURRENCY_ART;

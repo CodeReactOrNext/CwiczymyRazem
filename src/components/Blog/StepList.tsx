@@ -26,16 +26,16 @@ export const StepList = ({ steps }: StepListProps) => {
       {items.map((step, index) => (
         <div
           key={step.title}
-          className='flex gap-4 rounded-lg bg-zinc-900/40 p-5'>
-          <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400'>
+          className='flex gap-4 rounded-lg bg-zinc-900/40 p-5 light:bg-zinc-100'>
+          <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-sm font-bold text-cyan-400 light:text-cyan-700'>
             {index + 1}
           </div>
           <div className='min-w-0'>
-            <div className='font-bold text-white'>
+            <div className='font-bold text-white light:text-zinc-900'>
               {withCurrencyIcons(step.title)}
             </div>
             {step.description && (
-              <p className='mt-1 text-sm leading-relaxed text-zinc-400'>
+              <p className='mt-1 text-sm leading-relaxed text-zinc-400 light:text-zinc-600'>
                 {withCurrencyIcons(step.description)}
               </p>
             )}

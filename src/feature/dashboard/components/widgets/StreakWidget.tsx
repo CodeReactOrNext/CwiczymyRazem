@@ -2,7 +2,7 @@ import { Card } from "assets/components/ui/card";
 import { isSameWeek, isYesterday } from "date-fns";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, Coffee, Flame } from "lucide-react";
+import { ArrowRight, Coffee } from "lucide-react";
 import Link from "next/link";
 import {
   getDailyStreakMultiplier,
@@ -44,8 +44,6 @@ export const StreakWidget = () => {
   return (
     <Card className='flex h-full flex-col p-5 sm:p-6'>
       <WidgetHeader
-        icon={Flame}
-        iconClassName='text-orange-400'
         title={t("streak.title")}
       />
 

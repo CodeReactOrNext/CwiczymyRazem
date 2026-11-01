@@ -28,7 +28,7 @@ export const PhotoBlock = ({ src, alt, caption, ratio = 'landscape', width, heig
         type="button"
         data-zoomable
         aria-label={`Enlarge image: ${alt}`}
-        className="group relative block w-full cursor-zoom-in overflow-hidden rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500">
+        className="group relative block w-full cursor-zoom-in overflow-hidden rounded-lg transition-opacity hover:opacity-90 light:bg-zinc-100 light:p-2 sm:light:p-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500">
         <img
           src={src}
           alt={alt}
@@ -36,7 +36,7 @@ export const PhotoBlock = ({ src, alt, caption, ratio = 'landscape', width, heig
           height={height}
           loading="lazy"
           decoding="async"
-          className={`w-full rounded-lg ${ratioClass}`}
+          className={`w-full rounded-lg light:rounded ${ratioClass}`}
         />
         <span
           aria-hidden="true"
@@ -44,7 +44,7 @@ export const PhotoBlock = ({ src, alt, caption, ratio = 'landscape', width, heig
           <Maximize2 className="h-4 w-4" />
         </span>
       </button>
-      {caption && <figcaption className="mt-3 text-sm text-zinc-400">{caption}</figcaption>}
+      {caption && <figcaption className="mt-3 text-sm text-zinc-400 light:text-zinc-500">{caption}</figcaption>}
     </figure>
   );
 };

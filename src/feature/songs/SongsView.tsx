@@ -527,25 +527,22 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                               <button
                                 key={section.key}
                                 onClick={() => setBoardTab(section.key)}
+                                aria-pressed={isActive}
                                 className={cn(
-                                  "relative flex items-center gap-2.5 rounded-lg py-2 pl-2 pr-4 text-base font-semibold transition-colors active:scale-95",
+                                  PRESSABLE,
+                                  "relative flex h-10 items-center gap-2 rounded-lg border-b-black/30 px-4 text-sm transition-colors",
                                   isActive
-                                    ? "bg-zinc-800/60 text-white"
-                                    : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
+                                    ? "border-b-black/25 bg-white text-zinc-900"
+                                    : "bg-white/10 text-zinc-400 hover:bg-white/15 hover:text-zinc-200"
                                 )}>
-                                <Ripple />
-                                <span
-                                  className={cn(
-                                    "flex h-8 w-8 items-center justify-center rounded-[4px]",
-                                    isActive ? "bg-white/10 text-zinc-100" : "bg-white/5 text-zinc-500"
-                                  )}>
+                                <span className={cn("flex", isActive ? "text-zinc-900" : "text-zinc-500")}>
                                   {section.icon}
                                 </span>
                                 {section.title}
                                 <span
                                   className={cn(
                                     "text-xs font-bold",
-                                    isActive ? "text-zinc-400" : "text-zinc-600"
+                                    "text-zinc-500"
                                   )}>
                                   {section.songs.length}
                                 </span>
@@ -553,10 +550,10 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                             );
                           })}
                           <Button
-                            variant="ghost"
+                            variant="subtle"
                             onClick={() => handleSwitchView("explore")}
-                            className="ml-auto h-10 rounded-lg bg-white/5 px-4 text-sm font-semibold text-zinc-200 hover:bg-white/10 hover:text-white">
-                            <Plus />
+                            className="ml-auto h-10 px-4 text-zinc-200">
+                            <Plus className="mr-1.5" />
                             {t("view.add_songs")}
                           </Button>
                         </div>

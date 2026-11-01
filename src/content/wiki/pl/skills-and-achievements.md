@@ -14,18 +14,22 @@ Aplikacja śledzi 23 pojedyncze umiejętności gitarowe (naprzemienne kostkowani
 
 Mapa biegnie z góry na dół, od Podstaw przez Technikę, Teorię i gryf, Rytm i groove, Ekspresję i styl oraz Kształcenie słuchu do Kreatywności, i kończy się na Mistrzostwie. Każdy kamień milowy rozgałęzia się w gałęzie nazwane od umiejętności (Kostkowanie naprzemienne, Legato, Polowania kliknięciem, Wzory bicia…), a każda gałąź to łańcuch kropek uporządkowanych od najłatwiejszych. Małe przerwy dzielą łańcuch na stopnie trudności, a słabe kreski pod każdym stopniem mówią, jak jest trudny: jedna dla początkujących, do czterech dla trudnych. Zielona kropka to ćwiczenie, które zagrałeś, ciemna kropka wciąż czeka, a kłódka oznacza ćwiczenie Pro. Dokładnie jedna kropka na całej mapie nosi pierścień: ćwiczenie, na którym jesteś. Okrąg kamienia milowego wypełnia się, gdy grasz jego ćwiczenia, i staje się w pełni zielony, gdy zrobisz każde z nich.
 
-Każda gałąź niesie w nagłówku poziom swojej umiejętności, tę samą liczbę, którą liczy podsumowanie kategorii. Dwie gałęzie trenujące tę samą umiejętność pokazują ten sam poziom, bo to ta sama umiejętność rozbita na dwa odcinki mapy. Gałęzie, których jeszcze nie dotykałeś, mają przyciemnioną nazwę, więc te, nad którymi pracujesz, się wyróżniają.
+Każda gałąź niesie w nagłówku poziom swojej umiejętności. Dwie gałęzie trenujące tę samą umiejętność pokazują ten sam poziom, bo to ta sama umiejętność rozbita na dwa odcinki mapy. Gałęzie, których jeszcze nie dotykałeś, mają przyciemnioną nazwę, więc te, nad którymi pracujesz, się wyróżniają.
 
 Najedź na kropkę, żeby zobaczyć, czym jest, kliknij ją, by podejrzeć i rozpocząć; kliknij nazwę umiejętności, by otworzyć pełną listę dla tej umiejętności.
 
 Przeciągaj gdziekolwiek, by przesuwać, albo użyj klawiszy strzałek. Przyciski plus i minus przybliżają, tak samo Ctrl i kółko myszy, a przycisk dopasowania przywraca całą szerokość. Otwórz mapę po sesji, a wyląduje na twoim następnym ćwiczeniu, a nie na górze.
 
-Każde ćwiczenie, które ukończysz w ramach zapisanej sesji, zasila umiejętności, którymi jest oznaczone. Nie ma limitu ani poziomu, na który się awansuje. Umiejętność to bieżąca suma, która tylko rośnie, więc liczba jest zapisem poświęconej uwagi, a nie oceną.
+Każde ćwiczenie, które ukończysz w ramach zapisanej sesji, zasila umiejętności, którymi jest oznaczone. Nie ma limitu: umiejętność to bieżąca suma, która tylko rośnie, więc liczba jest zapisem poświęconej uwagi, a nie oceną.
 
 Luki są sednem. Gałąź z jedną wypełnioną kropką i ośmioma pustymi nie jest niedostateczną oceną, to krótka lista: te puste kropki to ćwiczenia, które mógłbyś zrobić dziś wieczorem.
 
+<ClickPath steps="Postępy|Umiejętności" caption="Każda rozpoczęta umiejętność z poziomem, czasem ćwiczenia i dystansem do następnego poziomu." />
+
+Punkty umiejętności wyznaczają jej poziom. Pierwszy awans wymaga 5 punktów, a każdy kolejny o 5 więcej niż poprzedni, więc pierwsze poziomy wpadają po sesji czy dwóch, a dalsze wymagają prawdziwej pracy. Pasek pod każdą umiejętnością to droga do jej następnego poziomu, a nie porównanie z innymi umiejętnościami, więc prawie pełny pasek oznacza, że awans jest blisko.
+
 <BlogAlert type="info">
-Ta sama liczba jest nazwana „XP” na liście umiejętności i „Poziom” w podsumowaniu kategorii. To ta sama wartość pokazana na dwa sposoby i nic nie jest śledzone dwa razy.
+Liczba przy kategorii to suma punktów jej umiejętności, a nie ich poziomów. Poziom ma pojedyncza umiejętność.
 </BlogAlert>
 
 Używaj tego jak lustra, a nie celu: jeśli teoria ledwo ruszyła w ciągu miesiąca, to jest tu użyteczna informacja, a Ćwicz → Katalog ćwiczeń pozwala wybrać ćwiczenie dokładnie na tę lukę.

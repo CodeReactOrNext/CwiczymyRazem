@@ -12,7 +12,7 @@ interface RewardIconProps {
 
 export const PointsIcon = ({ className }: RewardIconProps) => (
   <img
-    src='/images/points.png'
+    src='/images/tokens/pick.png'
     alt='points'
     className={cn("h-4 w-4 shrink-0 object-contain", className)}
   />
@@ -20,7 +20,7 @@ export const PointsIcon = ({ className }: RewardIconProps) => (
 
 export const FameIcon = ({ className }: RewardIconProps) => (
   <img
-    src='/images/coin.png'
+    src='/images/tokens/coin.png'
     alt='fame'
     className={cn("h-4 w-4 shrink-0 object-contain", className)}
   />

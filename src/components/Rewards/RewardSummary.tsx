@@ -72,7 +72,7 @@ export const RewardSummary = ({
       {reward.fame > 0 && (
         <span className={cn(row, "tabular-nums text-amber-400")}>
           <img
-            src='/images/coin.png'
+            src='/images/tokens/coin.png'
             alt=''
             className='shrink-0 object-contain'
             style={{ width: iconSize, height: iconSize }}

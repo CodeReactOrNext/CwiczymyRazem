@@ -369,29 +369,6 @@ a {
   }
 }
 
-/* Blog blockquote styling with quote icon */
-.prose blockquote {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.prose blockquote::before {
-  content: '\201C';
-  position: absolute;
-  top: 0.5rem;
-  left: 0;
-  font-size: 4.5rem;
-  font-weight: 600;
-  color: rgb(34 211 238 / 0.25);
-  line-height: 1;
-  margin: 0;
-  z-index: 0;
-  font-family: Georgia, serif;
-}
-
 /* Cartoon shine on a progress fill: a short lighter strip across the upper part
    of the bar, kept clear of the rounded ends. Flat — no glow, no gradient.
    Needs a fill about 8px tall or more to read; on a thinner bar it is a smudge.

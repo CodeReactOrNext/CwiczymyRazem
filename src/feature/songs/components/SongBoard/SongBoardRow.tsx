@@ -249,7 +249,7 @@ export const SongBoardRow = ({
             "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             isFavorite
               ? "bg-rose-500/15 text-rose-400 hover:bg-rose-500/25 hover:text-rose-300"
-              : "bg-white/5 text-zinc-200 hover:bg-white/15 hover:text-white",
+              : "bg-white/10 text-zinc-200 hover:bg-white/15 hover:text-white",
           )}>
           <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
         </button>
@@ -262,7 +262,7 @@ export const SongBoardRow = ({
           e.stopPropagation();
           onPractice();
         }}
-        className={cn(PRESSABLE, "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/5 text-zinc-200 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/15 hover:text-white border-b-black/30")}>
+        className={cn(PRESSABLE, "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10 text-zinc-200 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/15 hover:text-white border-b-black/30")}>
         <Play className='h-4 w-4 fill-current' />
       </button>
     </div>

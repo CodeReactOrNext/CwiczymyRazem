@@ -91,7 +91,7 @@ const typeConfig = {
     label: (_n: any, t: Translate) => t("bell.comment"),
   },
   reaction: {
-    icon: <img src='/images/coin.png' alt='' className='object-contain' />,
+    icon: <img src='/images/tokens/coin.png' alt='' className='object-contain' />,
     tone: "amber",
     // Reactions recorded before the amount was stored have no number to show, so they just say
     // what happened instead of quoting one that was never actually awarded.
@@ -100,7 +100,7 @@ const typeConfig = {
         <span className='inline-flex items-center gap-1'>
           {t("bell.reaction_fame", { fame: n.fameAwarded })}
           <img
-            src='/images/coin.png'
+            src='/images/tokens/coin.png'
             alt='coin'
             className='h-3 w-3 object-contain'
           />
@@ -136,7 +136,7 @@ const typeConfig = {
           }}
         />
         <img
-          src='/images/coin.png'
+          src='/images/tokens/coin.png'
           alt='coin'
           className='h-3 w-3 object-contain'
         />
@@ -154,7 +154,7 @@ const typeConfig = {
         />{" "}
         {t("bell.you_got", { fame: n.fameAwarded })}
         <img
-          src='/images/coin.png'
+          src='/images/tokens/coin.png'
           alt='coin'
           className='h-3 w-3 object-contain'
         />
@@ -172,7 +172,7 @@ const typeConfig = {
         />{" "}
         {t("bell.you_got", { fame: n.fameAwarded })}
         <img
-          src='/images/coin.png'
+          src='/images/tokens/coin.png'
           alt='coin'
           className='h-3 w-3 object-contain'
         />
@@ -190,7 +190,7 @@ const typeConfig = {
         />{" "}
         {t("bell.you_got", { fame: n.fameAwarded })}
         <img
-          src='/images/coin.png'
+          src='/images/tokens/coin.png'
           alt='coin'
           className='h-3 w-3 object-contain'
         />
@@ -208,7 +208,7 @@ const typeConfig = {
         />{" "}
         {t("bell.you_got", { fame: n.fameAwarded })}
         <img
-          src='/images/coin.png'
+          src='/images/tokens/coin.png'
           alt='coin'
           className='h-3 w-3 object-contain'
         />

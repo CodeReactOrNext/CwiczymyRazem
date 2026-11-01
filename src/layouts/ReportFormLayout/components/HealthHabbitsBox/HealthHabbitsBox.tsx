@@ -106,7 +106,7 @@ const HealthHabbitsBox = ({
                   className='flex shrink-0 items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-xs font-bold text-emerald-400 duration-base animate-in fade-in zoom-in-95 slide-in-from-right-1'>
                   +{HABBITS_POINTS_VALUE}
                   <img
-                    src='/images/points.png'
+                    src='/images/tokens/pick.png'
                     alt='points'
                     className='h-3.5 w-3.5 object-contain'
                   />

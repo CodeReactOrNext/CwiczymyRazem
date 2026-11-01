@@ -105,7 +105,7 @@ export const OfferRowPrice = ({
 }: OfferRowPriceProps) => (
   <div className='order-2 flex items-baseline justify-end gap-1.5 tabular-nums xl:order-none xl:justify-start'>
     <img
-      src='/images/coin.png'
+      src='/images/tokens/coin.png'
       alt=''
       aria-hidden
       className='h-5 w-5 self-center object-contain'

@@ -12,7 +12,7 @@ export const SongTierTable = () => {
   const tiers = getAllTiers().filter((tier) => tier.tier !== '?');
 
   return (
-    <div className="not-prose my-10 overflow-hidden rounded-lg bg-zinc-900/40">
+    <div className="not-prose my-10 overflow-hidden rounded-lg bg-zinc-900/40 light:bg-zinc-100">
       <div>
         {tiers.map((tier) => {
           const detail = tierDetails[tier.tier] ?? { range: '', desc: '' };
@@ -26,10 +26,10 @@ export const SongTierTable = () => {
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-baseline gap-x-2">
-                  <span className="text-sm font-bold text-white">{tier.label}</span>
-                  <span className="text-sm font-medium text-zinc-300">{detail.range}</span>
+                  <span className="text-sm font-bold text-white light:text-zinc-900">{tier.label}</span>
+                  <span className="text-sm font-medium text-zinc-300 light:text-zinc-700">{detail.range}</span>
                 </div>
-                <p className="mt-0.5 text-sm leading-relaxed text-zinc-400">{detail.desc}</p>
+                <p className="mt-0.5 text-sm leading-relaxed text-zinc-400 light:text-zinc-600">{detail.desc}</p>
               </div>
             </div>
           );

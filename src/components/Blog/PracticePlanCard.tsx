@@ -27,10 +27,10 @@ const ICONS: Record<string, LucideIcon> = {
 };
 
 const COLORS: Record<string, { iconTile: string }> = {
-  teal: { iconTile: 'bg-teal-500/10 text-teal-400' },
-  amber: { iconTile: 'bg-amber-500/10 text-amber-400' },
-  emerald: { iconTile: 'bg-emerald-500/10 text-emerald-400' },
-  blue: { iconTile: 'bg-blue-500/10 text-blue-400' },
+  teal: { iconTile: 'bg-teal-500/10 text-teal-400 light:text-teal-700' },
+  amber: { iconTile: 'bg-amber-500/10 text-amber-400 light:text-amber-700' },
+  emerald: { iconTile: 'bg-emerald-500/10 text-emerald-400 light:text-emerald-700' },
+  blue: { iconTile: 'bg-blue-500/10 text-blue-400 light:text-blue-700' },
 };
 
 export const PracticePlanCard = ({
@@ -50,33 +50,33 @@ export const PracticePlanCard = ({
   return (
     <Link
       href={href}
-      className="not-prose group relative my-6 flex flex-col overflow-hidden rounded-lg bg-zinc-900/40 p-5 no-underline transition-colors hover:bg-zinc-900/60"
+      className="not-prose group relative my-6 flex flex-col overflow-hidden rounded-lg bg-zinc-900/40 p-5 no-underline transition-colors hover:bg-zinc-900/60 light:bg-zinc-100 light:hover:bg-zinc-200/70"
     >
       <div className="relative mb-3 flex items-center gap-2.5">
         <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded ${style.iconTile}`}>
           <Icon className="h-4 w-4" />
         </div>
-        <span className="text-xs font-medium capitalize text-zinc-300">{category}</span>
-        <span className="text-xs font-medium capitalize text-zinc-400">{difficulty}</span>
+        <span className="text-xs font-medium capitalize text-zinc-300 light:text-zinc-800">{category}</span>
+        <span className="text-xs font-medium capitalize text-zinc-400 light:text-zinc-600">{difficulty}</span>
       </div>
 
       <div className="relative">
-        <h4 className="m-0 text-lg font-bold leading-tight tracking-tight text-white">{title}</h4>
-        <p className="mt-1 text-sm leading-relaxed text-zinc-400">{description}</p>
+        <h4 className="m-0 text-lg font-bold leading-tight tracking-tight text-white light:text-zinc-900">{title}</h4>
+        <p className="mt-1 text-sm leading-relaxed text-zinc-400 light:text-zinc-600">{description}</p>
       </div>
 
       <div className="relative mt-5 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-400 light:text-zinc-600">
             <Clock className="h-3.5 w-3.5 text-zinc-500" />
             <span>{minutes} min</span>
           </div>
-          <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-400 light:text-zinc-600">
             <ListChecks className="h-3.5 w-3.5 text-zinc-500" />
             <span>{exercises}</span>
           </div>
         </div>
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-zinc-200 transition-colors group-hover:bg-white group-hover:text-zinc-950">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-zinc-200 transition-colors group-hover:bg-white group-hover:text-zinc-950 light:bg-zinc-900/5 light:text-zinc-700 light:group-hover:bg-zinc-900 light:group-hover:text-white">
           <ArrowUpRight className="h-4 w-4" />
         </div>
       </div>

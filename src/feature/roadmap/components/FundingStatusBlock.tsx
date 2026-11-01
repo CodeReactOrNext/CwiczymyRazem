@@ -1,7 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { tierLabel } from "feature/roadmap/utils/tierText";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, TriangleAlert } from "lucide-react";
 
 import { getFundingStatus } from "../utils/fundingStatus";
 
@@ -30,17 +29,13 @@ export const FundingStatusBlock = ({
   const { t } = useTranslation("supporter");
   const { isCovered, costPct, nextTier, toGo, tierPct, showsTier } =
     getFundingStatus(totalRaised, raisedThisMonth);
-  const NextTierIcon = nextTier?.icon;
 
   return (
     <div className={cn("min-w-0", className)}>
       <div className='flex items-center justify-between gap-4 text-xs sm:text-sm'>
         {showsTier && nextTier ? (
           <>
-            <span className='flex min-w-0 items-center gap-1.5 text-zinc-300'>
-              {NextTierIcon && (
-                <NextTierIcon size={14} className='shrink-0 text-cyan-400' />
-              )}
+            <span className='flex min-w-0 items-center text-zinc-300'>
               <span className='truncate'>
                 {t("funding.next_unlock")}{" "}
                 <span className='font-medium text-zinc-100'>
@@ -54,12 +49,7 @@ export const FundingStatusBlock = ({
           </>
         ) : (
           <>
-            <span className='flex min-w-0 items-center gap-1.5'>
-              {isCovered ? (
-                <Check size={14} className='shrink-0 text-emerald-400' />
-              ) : (
-                <TriangleAlert size={14} className='shrink-0 text-orange-400' />
-              )}
+            <span className='flex min-w-0 items-center'>
               <span
                 className={cn(
                   "truncate font-medium",
@@ -72,10 +62,10 @@ export const FundingStatusBlock = ({
         )}
       </div>
 
-      <div className='mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800'>
+      <div className='mt-2 h-2.5 w-full overflow-hidden rounded-full bg-zinc-800/80'>
         <div
           className={cn(
-            "h-full rounded-full transition-all",
+            "bar-shine h-full rounded-full transition-[width] duration-slow ease-out",
             showsTier
               ? "bg-gradient-to-r from-cyan-500 to-cyan-400"
               : isCovered
@@ -88,25 +78,14 @@ export const FundingStatusBlock = ({
 
       <div className='mt-3 flex items-center justify-between gap-4 text-xs text-zinc-400'>
         {showsTier ? (
-          <span className='flex min-w-0 items-center gap-1.5'>
-            <Check size={12} className='shrink-0 text-emerald-400' />
-            <span className='truncate'>{t("funding.covered")}</span>
-          </span>
+          <span className='truncate'>{t("funding.covered")}</span>
         ) : nextTier ? (
-          <>
-            <span className='flex min-w-0 items-center gap-1.5'>
-              {NextTierIcon && <NextTierIcon size={12} className='shrink-0' />}
-              <span className='truncate'>
-                {t("funding.next_unlock")}{" "}
-                <span className='font-medium text-zinc-300'>
-                  {tierLabel(nextTier, t)}
-                </span>
-              </span>
+          <span className='truncate'>
+            {t("funding.next_unlock")}{" "}
+            <span className='font-medium text-zinc-300'>
+              {tierLabel(nextTier, t)}
             </span>
-            <span className='shrink-0 font-medium text-zinc-300'>
-              {t("funding.to_go", { amount: toGo })}
-            </span>
-          </>
+          </span>
         ) : (
           <span className='font-medium text-emerald-400'>
             {t("funding.all_funded")}

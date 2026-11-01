@@ -145,7 +145,6 @@ import {
   Map as MapIcon,
   MonitorPlay,
   Music,
-  PartyPopper,
   Shield,
   ShoppingCart,
   Skull,
@@ -1166,9 +1165,6 @@ const FirebaseLogsDonationItem = ({
       />
       <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-orange-500/15 via-transparent to-transparent' />
       <div className='relative z-10 flex flex-wrap items-center gap-3 px-3 py-3 sm:px-5 sm:py-4'>
-        <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500/15'>
-          <PartyPopper size={16} className='text-orange-400' />
-        </div>
         <div className='min-w-0 flex-1'>
           <p className='text-xs font-semibold text-orange-400'>
             {t("new_supporter")}
@@ -1200,7 +1196,7 @@ const FirebaseLogsDonationItem = ({
               avatarUrl={avatarUrl ?? undefined}
               guildBadge={guildBadge}
               avatarClassName={AVATAR_SHRINK}
-              nameClassName='sm:ml-2'
+              nameClassName='text-[15px] text-zinc-100 sm:ml-2'
               guildBadgeClassName='hidden sm:inline-flex'
             />
           </span>
@@ -1227,7 +1223,7 @@ const FirebaseLogsDonationItem = ({
 /** One activity line's content, wrapping in its own column. */
 const GroupedLine = ({ children }: { children: React.ReactNode }) => (
   <div className='flex items-center gap-2'>
-    <div className='flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-2'>
+    <div className='flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-2'>
       {children}
     </div>
   </div>
@@ -1258,7 +1254,7 @@ const LeaderboardPlace = ({ rank }: { rank: number }) => {
   const { t } = useTranslation("feed");
   return (
   <>
-    <span className='text-zinc-400'>|</span>
+    <span aria-hidden className='text-zinc-600'>·</span>
     <span
       title={t("leaderboard_place_hint")}
       className={cn(
@@ -1284,14 +1280,14 @@ const MicPerformanceStats = ({
     <span className='font-semibold tabular-nums text-white'>
       {performance.score}
     </span>
-    <span className='text-zinc-400'>|</span>
+    <span aria-hidden className='text-zinc-600'>·</span>
     <span className='font-semibold tabular-nums text-white'>
       {performance.accuracy}%
     </span>
     {/* Older logs and metronome-less exercises carry no tempo — say nothing rather than guess one. */}
     {performance.bpm != null && (
       <>
-        <span className='text-zinc-400'>|</span>
+        <span aria-hidden className='text-zinc-600'>·</span>
         <span className='font-semibold tabular-nums text-white'>
           {performance.bpm}
         </span>
@@ -1540,7 +1536,7 @@ const GroupedLogLine = ({
           <span className='inline-flex items-center gap-1 tabular-nums'>
             {marketLog.price}
             <img
-              src='/images/coin.png'
+              src='/images/tokens/coin.png'
               alt='coin'
               className='h-4 w-4 object-contain'
             />
@@ -1591,7 +1587,7 @@ const GroupedLogLine = ({
           <span className='inline-flex items-center gap-1 tabular-nums'>
             {purchaseLog.price}
             <img
-              src='/images/coin.png'
+              src='/images/tokens/coin.png'
               alt='coin'
               className='h-4 w-4 object-contain'
             />
@@ -1768,7 +1764,7 @@ const GroupedLogLine = ({
           <span className='inline-flex items-center gap-1 tabular-nums'>
             +{questLog.points}
             <img
-              src='/images/points.png'
+              src='/images/tokens/pick.png'
               alt='points'
               className='h-4 w-4 object-contain'
             />
@@ -1854,7 +1850,7 @@ const GroupedLogLine = ({
               <span className='flex items-center gap-1 text-cyan-500'>
                 +{genericLog.points}
                 <img
-                  src='/images/points.png'
+                  src='/images/tokens/pick.png'
                   alt='points'
                   className='h-5 w-5 object-contain'
                 />
@@ -2074,11 +2070,11 @@ const GroupedLogItem = ({
                 avatarUrl={avatarUrl ?? undefined}
                 guildBadge={guildBadge}
                 avatarClassName={AVATAR_SHRINK}
-                nameClassName='sm:ml-2'
+                nameClassName='text-[15px] text-zinc-100 sm:ml-2'
                 guildBadgeClassName='hidden sm:inline-flex'
               />
             </span>
-            <span className='hidden shrink-0 items-center gap-1.5 text-[11px] text-zinc-400 sm:flex'>
+            <span className='hidden shrink-0 items-center gap-1.5 text-xs text-zinc-400 sm:flex'>
               {isNew && (
                 <span
                   aria-label={t("new_since_last_visit")}
@@ -2095,7 +2091,7 @@ const GroupedLogItem = ({
 
         <div
           className={cn(
-            "col-span-2 row-start-2 flex min-w-0 flex-col gap-4 sm:gap-2.5",
+            "col-span-2 row-start-2 flex min-w-0 flex-col gap-4 sm:gap-3",
             reactionLogId && "sm:col-span-1",
           )}>
           {group.logs.map((log, index) => (

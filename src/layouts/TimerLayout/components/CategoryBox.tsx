@@ -48,7 +48,6 @@ const CategoryBox = ({
 
   const [shadowIntensity, setShadowIntensity] = useState(2);
   const [shadowOpacity, setShadowOpacity] = useState(0.15);
-  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     if (!isActive) return;
@@ -152,11 +151,10 @@ const CategoryBox = ({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border-[0.5px] bg-[#171717] p-5 text-white transition-all duration-base ${
+      className={`relative overflow-hidden rounded-xl bg-[#171717] p-5 text-white transition-colors duration-base ${
         isActive ? "z-10" : ""
       } ${showControls ? "cursor-pointer" : ""}`}
       style={{
-        borderColor: chosen ? `${skillColor}4D` : "rgba(255, 255, 255, 0.05)",
         boxShadow: isActive
           ? `0 0 ${shadowBlur}px ${shadowSize}px ${skillColor}${Math.round(
               shadowOpacity * 100,
@@ -164,12 +162,10 @@ const CategoryBox = ({
           : chosen
             ? `0 1px 3px ${skillColor}20, 0 1px 2px ${skillColor}30`
             : "",
-        transform: showControls && isHovered && !isActive ? "scale(1.01)" : "",
         ...getGradientStyle(),
       }}
       onClick={handleCardClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}>
+>
       {isActive && (
         <span className='absolute right-3 top-3 z-10 inline-block h-3 w-3 animate-pulse rounded-full bg-green-500 shadow-sm' />
       )}
@@ -184,15 +180,12 @@ const CategoryBox = ({
               ? `${skillColor}${isActive ? "30" : "20"}`
               : "rgba(100, 100, 100, 0.15)",
             transition: "all 0.5s ease",
-            border: chosen
-              ? `1px solid ${skillColor}${isActive ? "50" : "30"}`
-              : "1px solid rgba(150, 150, 150, 0.2)",
           }}>
           {renderCategoryIcon()}
         </div>
         <span
           translate='no'
-          className={`text-sm font-medium md:text-base ${
+          className={`text-base font-semibold ${
             isActive ? "text-white" : "text-gray-300"
           }`}>
           {title}
@@ -205,7 +198,7 @@ const CategoryBox = ({
         }`}>
         <h3
           translate='no'
-          className={`text-xl font-bold tabular-nums tracking-wide md:text-3xl ${
+          className={`text-2xl font-bold leading-none tabular-nums md:text-3xl ${
             isActive ? "text-white" : "text-gray-200"
           }`}>
           {formatCategoryTime(time)}
@@ -214,7 +207,7 @@ const CategoryBox = ({
         <div className='flex items-center gap-1 text-base'>
           <span
             translate='no'
-            className={`whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-medium md:text-sm ${
+            className={`whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-medium ${
               chosen ? "" : "bg-gray-700/30 text-gray-400"
             }`}
             style={
@@ -234,13 +227,8 @@ const CategoryBox = ({
 
       {showControls && (
         <Button
-          variant={isActive ? "default" : "outline"}
-          size='sm'
-          className={`relative z-10 w-full transition-all duration-base ${
-            isActive
-              ? "border-none shadow-md hover:shadow-lg"
-              : "border-gray-700 bg-black/40 text-white hover:border-gray-600 hover:bg-black/60"
-          }`}
+          variant={isActive ? "default" : "subtle"}
+          className='relative z-10 h-10 w-full'
           onClick={(e) => {
             e.stopPropagation();
             handleCardClick();

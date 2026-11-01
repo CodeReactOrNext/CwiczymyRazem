@@ -40,14 +40,14 @@ export const Checklist = ({ items }: ChecklistProps) => {
   const parsed = parseItems(items);
 
   return (
-    <dl className='not-prose my-8 grid gap-x-12 gap-y-6 rounded-lg bg-zinc-900/40 px-6 py-6 md:grid-cols-2 md:px-8 md:py-7'>
+    <dl className='not-prose my-8 grid gap-x-12 gap-y-6 rounded-lg bg-zinc-900/40 px-6 py-6 light:bg-zinc-100 md:grid-cols-2 md:px-8 md:py-7'>
       {parsed.map((item) => (
         <div key={item.title}>
-          <dt className='font-bold leading-snug text-white'>
+          <dt className='font-bold leading-snug text-white light:text-zinc-900'>
             {withCurrencyIcons(item.title)}
           </dt>
           {item.description && (
-            <dd className='mt-1 text-sm leading-relaxed text-zinc-400'>
+            <dd className='mt-1 text-sm leading-relaxed text-zinc-400 light:text-zinc-600'>
               {withCurrencyIcons(item.description)}
             </dd>
           )}

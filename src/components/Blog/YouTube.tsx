@@ -20,7 +20,7 @@ interface YouTubeProps {
  */
 export const YouTube = ({ id, title, caption, className }: YouTubeProps) => (
   <figure className={cn("not-prose my-10", className)}>
-    <div className='overflow-hidden rounded-lg bg-zinc-900/40 p-2 sm:p-3'>
+    <div className='overflow-hidden rounded-lg bg-zinc-900/40 p-2 light:bg-zinc-100 sm:p-3'>
       <div className='relative aspect-video'>
         <iframe
           src={`https://www.youtube.com/embed/${id}`}
@@ -33,7 +33,7 @@ export const YouTube = ({ id, title, caption, className }: YouTubeProps) => (
       </div>
     </div>
     {caption && (
-      <figcaption className='mt-3 text-xs text-zinc-400'>
+      <figcaption className='mt-3 text-xs text-zinc-400 light:text-zinc-500'>
         {withCurrencyIcons(caption)}
       </figcaption>
     )}

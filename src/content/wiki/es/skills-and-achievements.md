@@ -14,18 +14,22 @@ La app sigue 23 habilidades individuales de guitarra (púa alterna, legato, bend
 
 El mapa va de arriba abajo, desde Fundamentos pasando por Técnica, Teoría y diapasón, Ritmo y groove, Expresión y estilo y Entrenamiento auditivo hasta Creatividad, y acaba en Mastery. Cada hito se abre en ramas con el nombre de una habilidad (Púa alterna, Legato, Caza con clic, Patrones de rasgueo…), y cada rama es una cadena de puntos ordenados de más fácil a más difícil. Pequeños huecos dividen una cadena en escalones de dificultad, y las marcas tenues bajo cada escalón te dicen lo difícil que es: una para principiante, hasta cuatro para difícil. Un punto verde es un ejercicio que has tocado, un punto oscuro sigue esperando y un candado marca un ejercicio Pro. Exactamente un punto de todo el mapa lleva un anillo: el ejercicio por el que vas. El círculo de un hito se va llenando a medida que tocas sus ejercicios y se vuelve verde sólido cuando están todos hechos.
 
-Cada rama lleva en su cabecera el nivel de su habilidad, el mismo número que cuenta el resumen de categoría. Dos ramas que entrenan la misma habilidad muestran el mismo nivel, porque es la misma habilidad repartida en dos tramos del mapa. Las ramas que aún no has tocado tienen un nombre más tenue, para que destaquen aquellas en las que estás trabajando.
+Cada rama lleva en su cabecera el nivel de su habilidad. Dos ramas que entrenan la misma habilidad muestran el mismo nivel, porque es la misma habilidad repartida en dos tramos del mapa. Las ramas que aún no has tocado tienen un nombre más tenue, para que destaquen aquellas en las que estás trabajando.
 
 Pasa el ratón por un punto para ver qué es, haz clic para previsualizarlo y empezarlo; haz clic en el nombre de una habilidad para abrir la lista completa de esa habilidad.
 
 Arrastra en cualquier parte para desplazarte, o usa las teclas de flecha. Los botones más y menos hacen zoom, igual que Ctrl y la rueda del ratón, y el botón de ajustar recupera todo el ancho. Abre el mapa tras una sesión y aterriza en tu próximo ejercicio en lugar de arriba del todo.
 
-Cada ejercicio que completas como parte de una sesión registrada alimenta las habilidades con las que está etiquetado. No hay tope ni nada a lo que subir de nivel. Una habilidad es un total acumulado que solo sube, así que el número es un registro de atención prestada, no una nota.
+Cada ejercicio que completas como parte de una sesión registrada alimenta las habilidades con las que está etiquetado. No hay tope: una habilidad es un total acumulado que solo sube, así que el número es un registro de atención prestada, no una nota.
 
 Los huecos son el objetivo. Una rama con un punto lleno y ocho vacíos no es una mala nota, es una lista de candidatos: esos puntos vacíos son ejercicios que podrías hacer esta noche.
 
+<ClickPath steps="Progreso|Habilidades" caption="Cada habilidad que ya has tocado, con su nivel, su tiempo de práctica y lo que le falta para el siguiente nivel." />
+
+Los puntos de una habilidad deciden su nivel. La primera subida pide 5 puntos y cada una de las siguientes 5 más que la anterior, así que los primeros niveles llegan en una o dos sesiones y los siguientes cuestan trabajo de verdad. La barra bajo cada habilidad es el camino a su siguiente nivel, no una comparación con tus otras habilidades, así que una barra casi llena significa que la subida está cerca.
+
 <BlogAlert type="info">
-El mismo número se llama «XP» en la lista de habilidades y «Nivel» en el resumen de categoría. Es el mismo valor mostrado de dos maneras y nada se registra dos veces.
+El número junto a una categoría es la suma de los puntos de sus habilidades, no de sus niveles. El nivel es de cada habilidad por separado.
 </BlogAlert>
 
 Úsalo como espejo y no como objetivo: si la teoría apenas se ha movido en un mes, esa es la información útil aquí, y Práctica → Ejercicios te deja elegir un ejercicio justo para ese hueco.

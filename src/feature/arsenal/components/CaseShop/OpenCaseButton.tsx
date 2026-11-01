@@ -45,7 +45,7 @@ export const OpenCaseButton = ({
           className,
         )}>
         <img
-          src='/images/coin.png'
+          src='/images/tokens/coin.png'
           alt=''
           className={cn(
             "h-5 w-5 object-contain",
@@ -89,7 +89,7 @@ export const OpenCaseButton = ({
             !canAfford && "text-red-400",
           )}>
           <img
-            src='/images/coin.png'
+            src='/images/tokens/coin.png'
             alt=''
             className={cn(
               "h-5 w-5 object-contain",

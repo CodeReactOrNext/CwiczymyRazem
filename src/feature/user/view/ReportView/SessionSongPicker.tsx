@@ -186,10 +186,10 @@ const PickedSongRow = ({
     <div className='flex items-center gap-3'>
       <SongCover coverUrl={coverUrl ?? song.coverUrl} />
       <div className='min-w-0 flex-1'>
-        <p translate='no' className='truncate text-sm font-bold text-zinc-100'>
+        <p translate='no' className='truncate text-base font-semibold text-zinc-100'>
           {song.title}
         </p>
-        <p translate='no' className='truncate text-xs text-zinc-300'>
+        <p translate='no' className='truncate text-sm text-zinc-400'>
           {song.artist}
         </p>
       </div>
@@ -413,11 +413,11 @@ const SessionSongPicker = ({
           </div>
 
           <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-1'>
-            <p className='text-sm text-zinc-300'>
+            <p className='text-sm text-zinc-400'>
               {t("technique")}{" "}
-              <span className='font-bold text-white'>{totals.technique}m</span> ·{" "}
+              <span className='font-semibold text-zinc-100 tabular-nums'>{totals.technique}m</span> ·{" "}
               {t("hearing")}{" "}
-              <span className='font-bold text-white'>{totals.hearing}m</span>
+              <span className='font-semibold text-zinc-100 tabular-nums'>{totals.hearing}m</span>
             </p>
 
             <button
@@ -469,7 +469,7 @@ const SessionSongPicker = ({
             ) : (
               groups.map((group) => (
                 <div key={group.label} className='space-y-1'>
-                  <p className='px-2 text-[10px] font-bold tracking-wide text-zinc-500'>
+                  <p className='px-2 text-xs font-semibold text-zinc-500'>
                     {group.label}
                   </p>
                   {group.songs.map((song) => {

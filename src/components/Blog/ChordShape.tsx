@@ -47,7 +47,7 @@ export const ChordShape = ({
   const positions = parsePairs(fingers);
 
   return (
-    <figure className='not-prose my-10 flex flex-col gap-7 rounded-lg bg-zinc-900/40 p-6 md:flex-row md:gap-9 md:p-8'>
+    <figure className='not-prose my-10 flex flex-col gap-7 rounded-lg bg-zinc-900/40 p-6 light:bg-zinc-100 md:flex-row md:gap-9 md:p-8'>
       <div className='shrink-0'>
         <img
           src={src}
@@ -64,23 +64,23 @@ export const ChordShape = ({
         <dl className='space-y-3'>
           {positions.map((position) => (
             <div key={position.label} className='flex flex-wrap gap-x-2'>
-              <dt className='font-bold text-white'>{position.label}</dt>
-              <dd className='text-zinc-400'>{position.detail}</dd>
+              <dt className='font-bold text-white light:text-zinc-900'>{position.label}</dt>
+              <dd className='text-zinc-400 light:text-zinc-600'>{position.detail}</dd>
             </div>
           ))}
           <div className='flex flex-wrap gap-x-2'>
-            <dt className='font-bold text-white'>Strum from</dt>
-            <dd className='text-zinc-400'>{lowest}</dd>
+            <dt className='font-bold text-white light:text-zinc-900'>Strum from</dt>
+            <dd className='text-zinc-400 light:text-zinc-600'>{lowest}</dd>
           </div>
         </dl>
 
-        <p className='text-sm leading-relaxed text-zinc-400'>
-          <span className='font-bold text-white'>Listen for </span>
+        <p className='text-sm leading-relaxed text-zinc-400 light:text-zinc-600'>
+          <span className='font-bold text-white light:text-zinc-900'>Listen for </span>
           {listen}
         </p>
 
-        <p className='text-sm leading-relaxed text-zinc-400'>
-          <span className='font-bold text-white'>Try this </span>
+        <p className='text-sm leading-relaxed text-zinc-400 light:text-zinc-600'>
+          <span className='font-bold text-white light:text-zinc-900'>Try this </span>
           {practice}
         </p>
       </div>

@@ -15,12 +15,11 @@ import { extractFaqs, renderBlogContent } from 'lib/blogContent';
 import { getExerciseLandingHref } from 'lib/exerciseLandingLink';
 import type { PracticeLink } from 'lib/internalLinks';
 import { getPracticeLink } from 'lib/internalLinks';
-import { ChevronRight, List } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 
 
@@ -53,28 +52,6 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
     damping: 30,
     restDelta: 0.001
   });
-
-  const [activeId, setActiveId] = useState<string>('');
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '-20% 0% -35% 0%' }
-    );
-
-    headings.forEach((heading) => {
-      const el = document.getElementById(heading.id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [headings]);
 
   // Frontmatter images are either site-relative paths or already-absolute CDN URLs.
   const absoluteImage = frontmatter.image?.startsWith('http')
@@ -198,7 +175,7 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
         />
       </Head>
 
-      <main className="min-h-screen bg-zinc-950 text-zinc-300">
+      <main className="min-h-screen bg-zinc-950">
         <motion.div
           className="fixed top-0 left-0 right-0 z-[60] h-1 bg-cyan-500 origin-left"
           style={{ scaleX }}
@@ -216,61 +193,37 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
           </div>
         </nav>
 
-        <div className="pt-24 px-4 sm:px-6 mx-auto max-w-6xl overflow-hidden">
-          <div className="flex items-center gap-2 text-xs text-zinc-400 mb-8">
-            <Link href="/" className="hover:text-zinc-200 transition-colors">Home</Link>
-            <ChevronRight className="h-3 w-3" />
-            <Link href="/blog" className="hover:text-zinc-200 transition-colors">Blog</Link>
-            <ChevronRight className="h-3 w-3" />
-            <span className="text-zinc-200 truncate max-w-[200px]">{frontmatter.title}</span>
-          </div>
-        </div>
+        {/* The reading page is white: long-form text reads more easily dark on
+            light. `light` switches the shared MDX components and cards to
+            their light look; only the nav and the footer stay dark. */}
+        <div className="light bg-white px-4 pb-20 pt-28 text-zinc-700 sm:px-6 sm:pt-32">
+          <div className="mx-auto max-w-[680px]">
+            <div className="mb-8 flex items-center gap-2 text-xs text-zinc-500">
+              <Link href="/" className="transition-colors hover:text-zinc-900">Home</Link>
+              <ChevronRight className="h-3 w-3" />
+              <Link href="/blog" className="transition-colors hover:text-zinc-900">Blog</Link>
+              <ChevronRight className="h-3 w-3" />
+              <span className="max-w-[200px] truncate text-zinc-700">{frontmatter.title}</span>
+            </div>
 
-        <BlogHeader
-          title={frontmatter.title}
-          description={frontmatter.heroSubtitle || frontmatter.description}
-          date={frontmatter.date}
-          updatedAt={frontmatter.updatedAt}
-          readTime={`${readingMinutes} min`}
-          image={frontmatter.image}
-          author={frontmatter.author}
-          authorImage={authorProfile?.image}
-          lang={lang}
-        />
+            <BlogHeader
+              title={frontmatter.title}
+              description={frontmatter.heroSubtitle || frontmatter.description}
+              date={frontmatter.date}
+              updatedAt={frontmatter.updatedAt}
+              readTime={`${readingMinutes} min`}
+              image={frontmatter.image}
+              author={frontmatter.author}
+              authorImage={authorProfile?.image}
+              lang={lang}
+            />
 
-        <article lang={lang} className="mx-auto max-w-6xl px-4 py-12 min-w-0 sm:px-6">
-          <div className="flex flex-col lg:flex-row gap-12">
-            {/* Sidebar ToC */}
-            <aside className="hidden lg:block w-64 shrink-0 overflow-y-auto max-h-[calc(100vh-200px)] sticky top-32">
-              <div className="flex items-center gap-2 mb-6 text-white font-bold text-lg">
-                <List className="h-5 w-5 text-cyan-500" />
-                Table of Contents
-              </div>
-              <nav className="flex flex-col gap-3">
-                {headings.map((heading) => (
-                  <a
-                    key={heading.id}
-                    href={`#${heading.id}`}
-                    className={`rounded py-1.5 text-sm transition-background hover:text-cyan-400 ${
-                      heading.level === 3 ? 'pl-8 pr-4' : 'px-4'
-                    } ${
-                      activeId === heading.id
-                        ? 'bg-cyan-500/10 text-cyan-400 font-medium'
-                        : 'text-zinc-400'
-                    }`}
-                  >
-                    {heading.text}
-                  </a>
-                ))}
-              </nav>
-            </aside>
-
-            <div className="flex-1 min-w-0 max-w-full lg:max-w-[40rem] mx-auto lg:mx-0 overflow-hidden">
-              {/* Phone-sized screens have no sidebar. Collapsed by default so the
-                  article itself, not a 25-item list, is what follows the hero. */}
+            <article lang={lang} className="mt-12">
+              {/* Collapsed by default so the article itself, not a 25-item
+                  list, is what follows the header. */}
               {headings.length > 0 && (
-                <details className="mb-10 rounded-lg bg-zinc-900/40 p-5 lg:hidden">
-                  <summary className="cursor-pointer text-sm font-bold text-white">
+                <details className="mb-12 rounded-lg bg-zinc-100 p-5">
+                  <summary className="cursor-pointer text-sm font-bold text-zinc-900">
                     On this page
                   </summary>
                   <nav className="mt-4 flex flex-col gap-3">
@@ -278,7 +231,7 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
                       <a
                         key={heading.id}
                         href={`#${heading.id}`}
-                        className={`text-sm text-zinc-400 transition-colors hover:text-cyan-400 ${
+                        className={`text-sm text-zinc-600 transition-colors hover:text-cyan-700 ${
                           heading.level === 3 ? 'pl-4' : ''
                         }`}
                       >
@@ -291,13 +244,13 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
 
               <ZoomableImages>
                 <div
-                  className="prose prose-invert prose-lg max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-balance prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-5 prose-h2:text-white prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-white prose-p:text-zinc-400 prose-p:leading-relaxed prose-p:my-6 prose-ul:my-6 prose-ol:my-6 prose-li:my-3 prose-li:text-zinc-400 prose-li:leading-relaxed prose-a:text-cyan-400 hover:prose-a:text-cyan-300 prose-hr:my-12 prose-hr:border-0 prose-table:my-8 prose-th:text-white prose-th:py-3 prose-td:py-3 prose-td:text-zinc-400"
+                  className="prose prose-zinc prose-lg max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-balance prose-headings:text-zinc-900 prose-h2:text-[1.75rem] prose-h2:leading-tight prose-h2:mt-16 prose-h2:mb-5 prose-h3:text-xl prose-h3:font-bold prose-h3:mt-10 prose-h3:mb-3 prose-p:text-zinc-700 prose-p:leading-[1.75] prose-strong:text-zinc-900 prose-li:my-2 prose-li:text-zinc-700 prose-li:leading-[1.75] prose-a:font-semibold prose-a:text-cyan-700 prose-a:decoration-cyan-700/30 prose-a:underline-offset-4 hover:prose-a:decoration-cyan-700 prose-hr:my-12 prose-hr:border-0 prose-th:text-zinc-900 prose-td:text-zinc-700"
                   dangerouslySetInnerHTML={{ __html: contentHtml }}
                 />
               </ZoomableImages>
 
               {authorProfile && (
-                <div className="mt-12">
+                <div className="mt-16">
                   <AuthorBio
                     name={authorProfile.name}
                     image={authorProfile.image}
@@ -306,25 +259,23 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
                   />
                 </div>
               )}
-            </div>
+            </article>
           </div>
-        </article>
 
-        {practiceLink && (
-          <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-            <div>
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-                <h2 className="text-2xl font-bold text-white">Put It Into Practice</h2>
+          {practiceLink && (
+            <section className="mx-auto mt-24 max-w-5xl">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Put It Into Practice</h2>
                 <Link
                   href={practiceLink.href}
-                  className="inline-flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-cyan-700 transition-colors hover:text-cyan-800"
                 >
                   {practiceLink.label} <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
 
               {practiceExercises.length > 0 && (
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {practiceExercises.map((exercise) => (
                     <ExerciseCard
                       key={exercise.id}
@@ -334,14 +285,12 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
                   ))}
                 </div>
               )}
-            </div>
-          </section>
-        )}
+            </section>
+          )}
 
-        {relatedBlogs.length > 0 && (
-          <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-8">
+          {relatedBlogs.length > 0 && (
+            <section className="mx-auto mt-24 max-w-5xl">
+              <h2 className="mb-8 text-2xl font-bold tracking-tight text-zinc-900">
                 Read Also
               </h2>
 
@@ -350,9 +299,9 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
                   <BlogCard key={blog.slug} blog={blog} />
                 ))}
               </div>
-            </div>
-          </section>
-        )}
+            </section>
+          )}
+        </div>
 
         <Footer />
       </main>

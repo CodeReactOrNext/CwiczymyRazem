@@ -221,7 +221,7 @@ export const UserTooltip = ({
                   )}
                 />
                 <StatsBox
-                  Icon={() => <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />}
+                  Icon={() => <img src="/images/tokens/pick.png" alt="points" className="h-5 w-5 object-contain" />}
                   label={t("tooltip.points")}
                   value={userData.statistics.totalPoints}
                 />
@@ -231,7 +231,7 @@ export const UserTooltip = ({
                   value={userData.statistics.level}
                 />
                 <StatsBox
-                  Icon={() => <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain" />}
+                  Icon={() => <img src="/images/tokens/coin.png" alt="coin" className="h-5 w-5 object-contain" />}
                   label={"Fame"}
                   value={userData.statistics.fame}
                 />

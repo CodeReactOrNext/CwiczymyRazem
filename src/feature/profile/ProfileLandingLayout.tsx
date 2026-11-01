@@ -10,17 +10,16 @@ import { getRankBadgeSrc, isGuitarImageId } from "feature/arsenal/utils/guitarIm
 import { DashboardWidgets } from "feature/dashboard/components/DashboardWidgets";
 import type { DashboardDataContextValue } from "feature/dashboard/context/DashboardContext";
 import { DashboardDataProvider } from "feature/dashboard/context/DashboardContext";
+import { DuelEloBadge } from "feature/duels/components/DuelEloBadge";
 import { useGettingStartedProgress } from "feature/onboarding/hooks/useGettingStartedProgress";
-import type { LastSessionInfo } from "feature/practice/utils/lastSession";
-import { loadLastSession } from "feature/practice/utils/lastSession";
 import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
 import { SongTierBadge } from "feature/profile/components/SongTierBadge";
 import { getTrendData } from "feature/profile/utils/getTrendData";
 import { useUserSongs } from "feature/songs/hooks/useUserSongs";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, History } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { convertMsToHM } from "utils/converter";
@@ -48,10 +47,6 @@ const ProfileLandingLayout = ({
     isLoading: isSongsLoading,
     isError: isSongsError,
   } = useUserSongs(userAuth);
-  // Read on the first render, not in an effect: the dashboard only renders in
-  // the browser (AppLayout shows the shell on the server), and setting it a
-  // frame later grew the hero by the "Last session" row after it was painted.
-  const [lastSession] = useState<LastSessionInfo | null>(() => loadLastSession());
   const { item: equippedGuitar } = useEquippedGuitar(userAuth);
   const {
     progress: gettingStarted,
@@ -127,7 +122,8 @@ const ProfileLandingLayout = ({
   // Song tier + level ring, rendered twice: beside Practice on phones and in
   // the right column from md up (CSS picks one, so nothing flashes on load).
   const renderProgress = (ringSize: number | undefined) => (
-    <div className='flex items-center gap-4'>
+    <div className='flex items-center gap-8'>
+      <DuelEloBadge uid={userAuth} />
       <SongTierBadge
         learnedSongs={songs?.learned}
         isLoading={isSongsLoading}
@@ -203,11 +199,8 @@ const ProfileLandingLayout = ({
             <div
               className={cn(
                 "relative flex select-none flex-col gap-2 rounded-xl bg-zinc-900/50",
-                isSpecialGuitar ? "p-3 md:p-4" : "p-3",
+                isSpecialGuitar ? "px-8 py-5 md:px-10 md:py-6" : "px-8 py-4",
               )}>
-              <span className='hidden text-xs font-semibold text-zinc-400 md:block'>
-                {t("landing.your_progress", "Your progress")}
-              </span>
               {renderProgress(isSpecialGuitar ? undefined : 80)}
             </div>
           }
@@ -216,32 +209,14 @@ const ProfileLandingLayout = ({
               <div className='flex flex-row flex-wrap items-center justify-between gap-3'>
                 <Button
                   onClick={() => router.push("/timer")}
-                  className='group/btn h-11 px-5'>
+                  className='group/btn h-14 px-8 text-base font-semibold'>
                   Practice
-                  <ArrowRight className='ml-2 h-4 w-4 transition-transform duration-base group-hover/btn:translate-x-1' />
+                  <ArrowRight className='ml-2 h-5 w-5 transition-transform duration-base group-hover/btn:translate-x-1' />
                 </Button>
                 <div className='select-none rounded-xl bg-zinc-900/50 p-2 md:hidden'>
                   {renderProgress(64)}
                 </div>
               </div>
-              {/* Desktop only: on a phone Practice already resumes the
-                  routine, and the extra row cost a third of the screen. */}
-              {lastSession && (
-                <button
-                  onClick={() => router.push(lastSession.href)}
-                  className='group/last hidden min-h-11 w-fit max-w-full items-center gap-3 rounded-[8px] bg-zinc-800/70 px-4 py-2.5 text-left transition-colors duration-base hover:bg-zinc-700/70 active:scale-95 md:flex'>
-                  <History className='h-5 w-5 shrink-0 text-cyan-400' />
-                  <span className='flex min-w-0 flex-col'>
-                    <span className='text-xs text-zinc-400'>
-                      {t("landing.last_session", "Last session")}
-                    </span>
-                    <span className='truncate text-sm font-semibold text-zinc-100'>
-                      {t("landing.continue", "Continue")}: {lastSession.title}
-                    </span>
-                  </span>
-                  <ArrowRight className='h-4 w-4 shrink-0 text-zinc-300 transition-transform duration-base group-hover/last:translate-x-1' />
-                </button>
-              )}
             </div>
           }
         />

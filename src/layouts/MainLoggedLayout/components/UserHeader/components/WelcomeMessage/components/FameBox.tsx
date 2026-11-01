@@ -24,8 +24,8 @@ export const FameBox = () => {
             className='hidden h-11 cursor-pointer items-center justify-center gap-2 rounded-lg bg-amber-500/10 px-3 py-2 shadow-sm backdrop-blur-sm md:flex hover:bg-amber-500/20 transition-colors'
           >
             <img
-              src="/images/coin.png"
-              alt="coin"
+              src="/images/tokens/coin.png"
+              alt="fame"
               className="h-6 w-6 object-contain"
             />
             <span className='text-xs font-bold text-amber-400'>

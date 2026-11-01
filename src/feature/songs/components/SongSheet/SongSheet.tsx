@@ -328,7 +328,7 @@ const SongSheet = ({
                       <p className="mt-1 flex items-center gap-1">
                         {t("sheet.you_receive", { amount: RATE_SONG_FAME_REWARD })}
                         <img
-                          src="/images/coin.png"
+                          src="/images/tokens/coin.png"
                           alt="fame"
                           className="h-4 w-4 object-contain"
                         />

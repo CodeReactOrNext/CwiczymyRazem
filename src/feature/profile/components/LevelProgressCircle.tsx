@@ -102,12 +102,12 @@ export const LevelProgressCircle = ({
       </div>
       {showLabel && (
         <div className="hidden md:flex flex-col items-center gap-0.5">
-          <span className="text-[11px] font-semibold tracking-[0.1em] text-zinc-400">Level {lvl} XP</span>
+          <span className="text-[11px] font-semibold tracking-[0.1em] text-zinc-400">XP</span>
           <div className="flex items-center gap-1.5">
             <span className="text-xs tabular-nums text-zinc-400">
               {ptsInLevel.toLocaleString()} / {lvlRange.toLocaleString()}
             </span>
-            <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain opacity-80" />
+            <img src="/images/tokens/pick.png" alt="points" className="h-5 w-5 object-contain opacity-80" />
           </div>
         </div>
       )}

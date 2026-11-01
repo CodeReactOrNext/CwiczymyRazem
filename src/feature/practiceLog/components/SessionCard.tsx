@@ -48,7 +48,7 @@ const PointsStat = ({
     className={cn("flex items-center gap-1.5 tabular-nums", className)}
   >
     <img
-      src="/images/points.png"
+      src="/images/tokens/pick.png"
       alt=""
       aria-hidden
       className="h-4 w-4 shrink-0 object-contain"

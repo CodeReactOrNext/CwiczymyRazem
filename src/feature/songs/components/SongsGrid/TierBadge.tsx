@@ -1,6 +1,25 @@
 import { cn } from "assets/lib/utils";
 import type { Song } from "feature/songs/types/songs.type";
-import { getSongTier } from "feature/songs/utils/getSongTier";
+import { getSongTier, getTierImage } from "feature/songs/utils/getSongTier";
+
+type Tier = ReturnType<typeof getSongTier>;
+
+interface TierPickProps {
+    tier: Tier;
+    className?: string;
+    style?: React.CSSProperties;
+}
+
+/** The tier as a guitar-pick image; size it with h-/w- classes. */
+export const TierPick = ({ tier, className, style }: TierPickProps) => (
+    <img
+        src={getTierImage(tier.tier)}
+        alt={tier.label}
+        draggable={false}
+        className={cn("h-8 w-8 shrink-0 select-none object-contain", className)}
+        style={style}
+    />
+);
 
 interface TierBadgeProps {
     song?: Pick<Song, "tier" | "avgDifficulty">;
@@ -13,16 +32,5 @@ export const TierBadge = ({ song, difficulty, className, style }: TierBadgeProps
     const avgDifficulty = difficulty ?? song?.avgDifficulty ?? 0;
     const tier = getSongTier(avgDifficulty === 0 ? "?" : (song?.tier || avgDifficulty));
 
-    return (
-        <div 
-            className={cn("flex h-8 w-8 items-center justify-center rounded-[4px] text-xs font-black", className)}
-            style={{
-                backgroundColor: `${tier.color}20`,
-                color: tier.color,
-                ...style
-            }}
-        >
-            {tier.tier}
-        </div>
-    );
+    return <TierPick tier={tier} className={className} style={style} />;
 };

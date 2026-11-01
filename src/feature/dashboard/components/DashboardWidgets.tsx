@@ -120,39 +120,39 @@ export const DashboardWidgets = () => {
                     type='button'
                     variant='outline'
                     size='sm'
-                    className='h-11 gap-1.5'
+                    className='h-11 px-4'
                     onClick={() => setIsAddOpen(true)}>
-                    <Plus size={14} />
+                    <Plus aria-hidden className='mr-2' />
                     {t("customize.add_widget")}
                   </Button>
                   <Button
                     type='button'
                     variant='ghost'
                     size='sm'
-                    className='h-11 gap-1.5'
+                    className='h-11 px-4'
                     disabled={isDefaultLayout(layout)}
                     onClick={() => updateLayout(normalizeLayout(undefined))}>
-                    <RotateCcw size={14} />
+                    <RotateCcw aria-hidden className='mr-2' />
                     {t("customize.reset")}
                   </Button>
                   <Button
                     type='button'
                     size='sm'
-                    className='h-11 gap-1.5'
+                    className='h-11 px-4'
                     onClick={() => setIsEditing(false)}>
-                    <Check size={14} />
+                    <Check aria-hidden className='mr-2' />
                     {t("customize.done")}
                   </Button>
                 </>
               ) : (
                 <Button
                   type='button'
-                  variant='ghost'
+                  variant='subtle'
                   size='sm'
-                  className='h-11 gap-1.5 text-zinc-400 hover:text-zinc-100'
+                  className='h-9 px-4'
                   disabled={isLoading}
                   onClick={() => setIsEditing(true)}>
-                  <Settings2 size={14} />
+                  <Settings2 aria-hidden className='mr-2' />
                   {t("customize.customize")}
                 </Button>
               )}
@@ -184,7 +184,7 @@ export const DashboardWidgets = () => {
                   setIsEditing(true);
                   setIsAddOpen(true);
                 }}>
-                <Plus size={14} />
+                <Plus aria-hidden className='mr-2' />
                 {t("customize.add_widget")}
               </Button>
             </div>

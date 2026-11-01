@@ -335,5 +335,18 @@
       "improvisation": "Improvisación",
       "composition": "Composición"
     }
+  },
+  "points_panel": {
+    "eyebrow": "Puntos de habilidad",
+    "title": "Tus habilidades",
+    "subtitle": "Cada ejercicio que terminas sube de nivel las habilidades que entrena",
+    "total_label": "puntos de habilidad",
+    "started": "{{started}} de {{total}} habilidades empezadas",
+    "pts": "pts",
+    "not_started": "Sin empezar",
+    "nothing_yet": "Todavía no has practicado nada aquí.",
+    "lvl": "Nv.",
+    "to_next": "{{count}} para Nv. {{level}}",
+    "xp": "XP"
   }
 }

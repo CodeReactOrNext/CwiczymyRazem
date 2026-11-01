@@ -19,7 +19,7 @@ export const PatternBackground = ({ icon, strokeClass, opacity = 0.08 }: Pattern
 
   return (
     <svg
-      className='pointer-events-none absolute inset-0 h-full w-full rounded-lg'
+      className='pointer-events-none absolute inset-0 h-full w-full rounded-lg light:hidden'
       style={{ opacity }}
       aria-hidden='true'
     >

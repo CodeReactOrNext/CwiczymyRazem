@@ -22,7 +22,7 @@ describe("SongTierBadge", () => {
   it("shows the tier once enough learned songs are rated", () => {
     render(<SongTierBadge learnedSongs={learnedSongs(6, 8)} />);
 
-    expect(screen.getByText("A")).toBeTruthy();
+    expect(screen.getByRole("img", { name: "A-Tier" })).toBeTruthy();
     expect(screen.getByText("A-Tier")).toBeTruthy();
   });
 

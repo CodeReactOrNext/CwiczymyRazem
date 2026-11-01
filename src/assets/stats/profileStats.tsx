@@ -14,7 +14,7 @@ import { convertMsToHM } from "utils/converter";
 import { i18n } from "utils/translation";
 
 const PointsIcon = ({ className }: { className?: string }) => (
-  <img src="/images/points.png" alt="points" className={className} />
+  <img src="/images/tokens/pick.png" alt="points" className={className} />
 );
 
 export const getUserStatsField = (userStats: StatisticsDataInterface) => {

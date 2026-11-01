@@ -72,7 +72,7 @@ export const LevelBar = ({
               <span className='font-bold text-cyan-400'>
                 <span className="flex items-center gap-1">
                   {Math.round(progressPercent)}% 
-                  <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
+                  <img src="/images/tokens/pick.png" alt="points" className="h-3 w-3 object-contain" />
                 </span>
               </span>
               <span className={cn("font-medium text-white/40", isMini ? "text-[9px]" : "text-xs")}>
@@ -101,7 +101,7 @@ export const LevelBar = ({
               {pointsInThisLevel.toLocaleString()} /{" "}
               <span className="flex items-center gap-1">
                 {levelXpDifference.toLocaleString()} 
-                <img src="/images/points.png" alt="points" className="h-3 w-3 object-contain" />
+                <img src="/images/tokens/pick.png" alt="points" className="h-3 w-3 object-contain" />
               </span>
             </span>
           </div>

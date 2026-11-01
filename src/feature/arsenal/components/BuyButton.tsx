@@ -84,7 +84,7 @@ export const BuyButton = ({
             : "text-arsenal-text-tertiary",
         )}>
         <img
-          src='/images/coin.png'
+          src='/images/tokens/coin.png'
           alt=''
           className={cn(
             "object-contain",

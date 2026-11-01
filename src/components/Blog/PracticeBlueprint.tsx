@@ -44,10 +44,10 @@ const BLOCK_COLORS = [
  * appear as whole literal strings. Four lengths is well past what a post needs. */
 const PEER = ["peer/len0", "peer/len1", "peer/len2", "peer/len3"];
 const TAB_ON = [
-  "peer-checked/len0:bg-zinc-800 peer-checked/len0:text-zinc-100 peer-focus-visible/len0:ring-1 peer-focus-visible/len0:ring-cyan-500",
-  "peer-checked/len1:bg-zinc-800 peer-checked/len1:text-zinc-100 peer-focus-visible/len1:ring-1 peer-focus-visible/len1:ring-cyan-500",
-  "peer-checked/len2:bg-zinc-800 peer-checked/len2:text-zinc-100 peer-focus-visible/len2:ring-1 peer-focus-visible/len2:ring-cyan-500",
-  "peer-checked/len3:bg-zinc-800 peer-checked/len3:text-zinc-100 peer-focus-visible/len3:ring-1 peer-focus-visible/len3:ring-cyan-500",
+  "peer-checked/len0:bg-zinc-800 peer-checked/len0:text-zinc-100 light:peer-checked/len0:bg-zinc-900 light:peer-checked/len0:text-white peer-focus-visible/len0:ring-1 peer-focus-visible/len0:ring-cyan-500",
+  "peer-checked/len1:bg-zinc-800 peer-checked/len1:text-zinc-100 light:peer-checked/len1:bg-zinc-900 light:peer-checked/len1:text-white peer-focus-visible/len1:ring-1 peer-focus-visible/len1:ring-cyan-500",
+  "peer-checked/len2:bg-zinc-800 peer-checked/len2:text-zinc-100 light:peer-checked/len2:bg-zinc-900 light:peer-checked/len2:text-white peer-focus-visible/len2:ring-1 peer-focus-visible/len2:ring-cyan-500",
+  "peer-checked/len3:bg-zinc-800 peer-checked/len3:text-zinc-100 light:peer-checked/len3:bg-zinc-900 light:peer-checked/len3:text-white peer-focus-visible/len3:ring-1 peer-focus-visible/len3:ring-cyan-500",
 ];
 const PANEL_ON = [
   "peer-checked/len0:block",
@@ -149,15 +149,15 @@ export const PracticeBlueprint = ({
                     BLOCK_COLORS[i % BLOCK_COLORS.length],
                   )}
                 />
-                <span className='text-[15px] font-medium text-zinc-100'>
+                <span className='text-[15px] font-medium text-zinc-100 light:text-zinc-900'>
                   {block.label}
                 </span>
-                <span className='ml-auto shrink-0 text-sm tabular-nums text-zinc-400'>
+                <span className='ml-auto shrink-0 text-sm tabular-nums text-zinc-400 light:text-zinc-600'>
                   {minutesAt(block, index)} min
                 </span>
               </div>
               {block.focus && (
-                <p className='m-0 ml-[18px] mt-1 text-sm leading-relaxed text-zinc-400'>
+                <p className='m-0 ml-[18px] mt-1 text-sm leading-relaxed text-zinc-400 light:text-zinc-600'>
                   {block.focus}
                 </p>
               )}
@@ -165,7 +165,7 @@ export const PracticeBlueprint = ({
           ))}
         </ol>
 
-        <p className='m-0 mt-6 text-xs text-zinc-400'>
+        <p className='m-0 mt-6 text-xs text-zinc-400 light:text-zinc-600'>
           {total} minutes total
           {note ? `. ${note}` : ""}
         </p>
@@ -176,7 +176,7 @@ export const PracticeBlueprint = ({
   // The radios sit first and the tabs and panels after them, because `peer-checked`
   // compiles to a sibling selector and only reaches elements that follow the input.
   return (
-    <div className='not-prose my-10 flex flex-wrap items-center gap-1 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+    <div className='not-prose my-10 flex flex-wrap items-center gap-1 rounded-lg bg-zinc-900/40 p-5 light:bg-zinc-100 sm:p-6'>
       {showTabs &&
         tabs.map((label, index) => (
           <input
@@ -190,7 +190,7 @@ export const PracticeBlueprint = ({
         ))}
 
       {title && (
-        <p className='m-0 mr-auto text-[15px] font-semibold text-zinc-100'>
+        <p className='m-0 mr-auto text-[15px] font-semibold text-zinc-100 light:text-zinc-900'>
           {title}
         </p>
       )}
@@ -201,7 +201,7 @@ export const PracticeBlueprint = ({
             key={`${group}-tab-${label}`}
             htmlFor={`${group}-${index}`}
             className={cn(
-              "cursor-pointer rounded px-2.5 py-1 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800/50 hover:text-zinc-200",
+              "cursor-pointer rounded px-2.5 py-1 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800/50 hover:text-zinc-200 light:text-zinc-600 light:hover:bg-zinc-200 light:hover:text-zinc-900",
               TAB_ON[index],
             )}>
             {label}

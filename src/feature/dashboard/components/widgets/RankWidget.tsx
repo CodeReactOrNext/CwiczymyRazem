@@ -1,11 +1,10 @@
-import { useTranslation } from "hooks/useTranslation";
-import { useIntlLocale } from "lib/i18n/dateLocale";
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { useUserRank } from "feature/leadboard/hooks/useUserRank";
 import { getCurrentSeasonId } from "feature/leadboard/services/getCurrentSeason";
-import { Trophy } from "lucide-react";
+import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import { useState } from "react";
 
 import { WidgetHeader, WidgetLink } from "./WidgetHeader";
@@ -69,8 +68,6 @@ export const RankWidget = () => {
   return (
     <Card className='flex h-full flex-col p-5 sm:p-6'>
       <WidgetHeader
-        icon={Trophy}
-        iconClassName='text-amber-400'
         title={t("rank.title")}
         action={<WidgetLink href='/seasons'>{t("rank.rankings")}</WidgetLink>}
       />

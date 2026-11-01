@@ -128,7 +128,7 @@ const SessionSkillPicker = ({
               className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-4 sm:p-5'>
               <div className='flex items-center gap-2'>
                 <CategoryIcon className='h-4 w-4 text-zinc-400' />
-                <h4 className='text-sm font-semibold text-zinc-200'>
+                <h4 className='text-base font-semibold text-zinc-100'>
                   {t(`categories.${category}` as never)}
                 </h4>
               </div>
@@ -143,7 +143,7 @@ const SessionSkillPicker = ({
                       aria-pressed={isPicked}
                       onClick={() => onToggle(skill.id)}
                       className={cn(
-                        "min-h-9 rounded px-3 py-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40 sm:min-h-0 sm:px-2.5 sm:py-1.5",
+                        "min-h-9 rounded px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40 sm:min-h-0 sm:px-2.5 sm:py-1.5",
                         isPicked
                           ? "bg-zinc-100 text-zinc-950 hover:bg-zinc-300"
                           : "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-700/60 hover:text-white",

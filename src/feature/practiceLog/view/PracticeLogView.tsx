@@ -229,7 +229,7 @@ export const PracticeLogView = () => {
                             <span>{convertMsToHM(group.totalTimeMs)}</span>
                             <span className='flex items-center gap-1'>
                               <img
-                                src='/images/points.png'
+                                src='/images/tokens/pick.png'
                                 alt=''
                                 aria-hidden
                                 className='h-3 w-3 object-contain'

@@ -6,7 +6,7 @@ import { FundingStatusBlock } from "feature/roadmap/components/FundingStatusBloc
 import { ROADMAP_RAISED_OFFSET } from "feature/roadmap/data/roadmap.data";
 import { useBuyMeACoffeeFunding } from "feature/roadmap/hooks/useBuyMeACoffeeFunding";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, Heart } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export const SupportBanner = () => {
@@ -35,8 +35,13 @@ export const SupportBanner = () => {
       <div className='relative z-10 flex flex-wrap items-center gap-x-12 gap-y-6'>
         {/* Full width until lg, same as RoadmapPitch — the shrink-0 CTA plus the
             gap would otherwise leave the copy a couple of characters per line. */}
-        <div className='flex w-full min-w-0 items-start gap-3.5 lg:w-auto lg:flex-1'>
-          <Heart size={18} className='mt-0.5 shrink-0 text-orange-400' />
+        <div className='flex w-full min-w-0 items-center gap-4 lg:w-auto lg:flex-1'>
+          <img
+            src='/images/tokens/heart.png'
+            alt=''
+            aria-hidden
+            className='size-12 shrink-0 object-contain'
+          />
           <div className='min-w-0'>
             <p className='text-sm font-semibold text-zinc-100 sm:text-base'>
               {t("support.title")}

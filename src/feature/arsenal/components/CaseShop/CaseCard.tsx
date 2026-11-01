@@ -214,7 +214,7 @@ export const CaseCard = ({
         <div className='flex items-center justify-between gap-4'>
           <span className='flex items-center gap-2 text-sm font-bold tabular-nums'>
             <img
-              src='/images/coin.png'
+              src='/images/tokens/coin.png'
               alt=''
               className={cn(
                 "h-5 w-5 object-contain",

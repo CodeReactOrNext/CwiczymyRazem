@@ -16,21 +16,21 @@ export const StatRow = ({ stats, caption }: StatRowProps) => {
   });
 
   return (
-    <div className='not-prose my-10 rounded-lg bg-zinc-900/40 p-6'>
+    <div className='not-prose my-10 rounded-lg bg-zinc-900/40 p-6 light:bg-zinc-100'>
       <div className={cn('grid gap-6', items.length >= 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2')}>
         {items.map((item) => (
           <div key={item.label}>
-            <p className='text-4xl font-bold text-cyan-400'>
+            <p className='text-4xl font-bold text-cyan-400 light:text-cyan-700'>
               {withCurrencyIcons(item.value)}
             </p>
-            <p className='mt-1 text-sm text-zinc-400'>
+            <p className='mt-1 text-sm text-zinc-400 light:text-zinc-600'>
               {withCurrencyIcons(item.label)}
             </p>
           </div>
         ))}
       </div>
       {caption && (
-        <p className='mt-4 text-sm text-zinc-400'>
+        <p className='mt-4 text-sm text-zinc-400 light:text-zinc-600'>
           {withCurrencyIcons(caption)}
         </p>
       )}

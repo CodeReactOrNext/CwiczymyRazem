@@ -1,9 +1,8 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
 import { useUserSongs } from "feature/songs/hooks/useUserSongs";
-import { Music2 } from "lucide-react";
+import { useTranslation } from "hooks/useTranslation";
 
 import { WidgetHeader, WidgetLink } from "./WidgetHeader";
 
@@ -20,7 +19,6 @@ export const SongsWidget = () => {
   return (
     <div>
       <WidgetHeader
-        icon={Music2}
         title={t("songs.title")}
         className='mb-3 px-1'
         action={<WidgetLink href='/songs?view=board'>{t("songs.board")}</WidgetLink>}

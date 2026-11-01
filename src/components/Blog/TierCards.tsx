@@ -18,7 +18,7 @@ interface Tier {
 const tiers: Tier[] = [
   {
     icon: Sprout,
-    badgeClass: 'bg-emerald-500/10 text-emerald-300',
+    badgeClass: 'bg-emerald-500/10 text-emerald-300 light:text-emerald-800',
     title: 'Building the basics',
     time: 'from 15–30 min/day',
     description:
@@ -26,7 +26,7 @@ const tiers: Tier[] = [
   },
   {
     icon: Flame,
-    badgeClass: 'bg-amber-500/10 text-amber-300',
+    badgeClass: 'bg-amber-500/10 text-amber-300 light:text-amber-800',
     title: 'Working on obstacles',
     time: 'from 45–90 min/day',
     description:
@@ -34,7 +34,7 @@ const tiers: Tier[] = [
   },
   {
     icon: Trophy,
-    badgeClass: 'bg-purple-500/10 text-purple-300',
+    badgeClass: 'bg-purple-500/10 text-purple-300 light:text-purple-800',
     title: 'Refining and maintaining',
     time: 'around 60 min/day',
     description:
@@ -48,15 +48,15 @@ export const TierCards = () => {
       {tiers.map((tier) => {
         const Icon = tier.icon;
         return (
-          <div key={tier.title} className="rounded-lg bg-zinc-900/40 p-5">
+          <div key={tier.title} className="rounded-lg bg-zinc-900/40 p-5 light:bg-zinc-100">
             <div className="flex items-center gap-2.5">
-              <Icon className="h-5 w-5 text-zinc-400" />
-              <p className="font-bold text-white">{tier.title}</p>
+              <Icon className="h-5 w-5 text-zinc-400 light:text-zinc-500" />
+              <p className="font-bold text-white light:text-zinc-900">{tier.title}</p>
             </div>
             <span className={`mt-3 inline-block rounded-lg px-2.5 py-1 text-xs font-semibold ${tier.badgeClass}`}>
               {tier.time}
             </span>
-            <p className="mt-3 text-sm leading-relaxed text-zinc-400">{tier.description}</p>
+            <p className="mt-3 text-sm leading-relaxed text-zinc-400 light:text-zinc-600">{tier.description}</p>
           </div>
         );
       })}

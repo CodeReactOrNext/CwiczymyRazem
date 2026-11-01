@@ -1,14 +1,13 @@
 import { format } from 'date-fns';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Calendar, Clock, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import Image from 'next/image';
-import React, { useRef } from 'react';
+import React from 'react';
 
 interface BlogHeaderProps {
   title: string;
   description: string;
   date: string;
-  /** Shown next to the publish date when the post has actually been revised. */
+  /** Shown instead of the publish date when the post has actually been revised. */
   updatedAt?: string;
   image: string;
   author?: string;
@@ -19,95 +18,58 @@ interface BlogHeaderProps {
   lang?: string;
 }
 
+/**
+ * Post header on the white reading page: title, lead, byline, then the cover
+ * image — all in the same column as the text below. The old full-bleed parallax
+ * hero put the title over a darkened photo; here nothing competes with the words.
+ */
 export const BlogHeader = ({ title, description, date, updatedAt, image, author, authorImage, readTime = "5 min", lang = "en" }: BlogHeaderProps) => {
   const showUpdated = Boolean(updatedAt) && updatedAt !== date;
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"]
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
+  const shownDate = showUpdated
+    ? `Updated ${format(new Date(updatedAt as string), 'MMM dd, yyyy')}`
+    : format(new Date(date), 'MMM dd, yyyy');
 
   return (
-    <div ref={ref} lang={lang} className="relative min-h-[500px] w-full overflow-hidden bg-zinc-950">
-      {/* Parallax Background Image */}
-      <motion.div
-        style={{ y, scale }}
-        className="absolute inset-0 z-0"
-      >
-        <div className="absolute inset-0 bg-black/30 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/80 via-transparent to-transparent z-10" />
-        
-        <motion.img
-          initial={{ scale: 1.15, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          src={image}
-          alt={title}
-          className="h-full w-full object-cover"
-        />
-      </motion.div>
+    <header lang={lang}>
+      <h1 className="text-balance text-4xl font-extrabold leading-[1.1] tracking-tight text-zinc-900 md:text-5xl">
+        {title}
+      </h1>
 
-      {/* Content */}
-      <div className="relative z-20 flex h-full items-center pt-32 pb-16 md:items-end md:pt-32 md:pb-24">
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
-          <motion.div
-            style={{ opacity }}
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="max-w-4xl"
-          >
-            {/* Title */}
-            <h1 className="mb-6 text-balance text-4xl font-bold leading-[1.1] tracking-tight text-white md:text-5xl lg:text-6xl">
-              {title}
-            </h1>
-            
-            {/* Description */}
-            <p className="mb-8 max-w-2xl text-lg text-zinc-300/90 md:text-xl font-normal leading-relaxed">
-              {description}
-            </p>
+      <p className="mt-5 text-xl leading-relaxed text-zinc-600">
+        {description}
+      </p>
 
-            {/* Metadata Footer */}
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-zinc-400 pt-6">
-              <div className="flex items-center gap-2">
-                {authorImage ? (
-                  <Image
-                    src={authorImage}
-                    alt={author || "Riff Quest"}
-                    width={32}
-                    height={32}
-                    className="h-8 w-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900">
-                    <User className="h-4 w-4 text-cyan-400" />
-                  </div>
-                )}
-                <span className="font-medium text-zinc-200">{author || "Riff Quest"}</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-zinc-500" />
-                <span>
-                  {showUpdated
-                    ? `Updated ${format(new Date(updatedAt as string), 'MMM dd, yyyy')}`
-                    : format(new Date(date), 'MMM dd, yyyy')}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-zinc-500" />
-                <span>{readTime} read</span>
-              </div>
-            </div>
-          </motion.div>
+      <div className="mt-8 flex items-center gap-3">
+        {authorImage ? (
+          <Image
+            src={authorImage}
+            alt={author || "Riff Quest"}
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-full object-cover"
+          />
+        ) : (
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100">
+            <User className="h-4 w-4 text-zinc-500" />
+          </div>
+        )}
+        <div className="text-sm">
+          <p className="font-semibold text-zinc-900">{author || "Riff Quest"}</p>
+          <p className="text-zinc-500">
+            {shownDate} · {readTime} read
+          </p>
         </div>
       </div>
-    </div>
+
+      <img
+        src={image}
+        alt={title}
+        width={1280}
+        height={720}
+        fetchPriority="high"
+        decoding="async"
+        className="mt-10 aspect-video w-full rounded-lg object-cover"
+      />
+    </header>
   );
 };

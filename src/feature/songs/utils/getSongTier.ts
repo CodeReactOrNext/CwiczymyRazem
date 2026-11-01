@@ -72,6 +72,17 @@ export const getSongTier = (ratingOrTier: number | string): SongTier => {
   }
 };
 
+const TIER_IMAGES: Record<SongTier['tier'], string> = {
+  S: '/images/tiers/s.png',
+  A: '/images/tiers/a.png',
+  B: '/images/tiers/b.png',
+  C: '/images/tiers/c.png',
+  D: '/images/tiers/d.png',
+  '?': '/images/tiers/unknown.png',
+};
+
+export const getTierImage = (tier: SongTier['tier']) => TIER_IMAGES[tier];
+
 let memoizedTiers: SongTier[] | null = null;
 
 export const getAllTiers = (): SongTier[] => {

@@ -335,5 +335,18 @@
       "improvisation": "Improwizacja",
       "composition": "Kompozycja"
     }
+  },
+  "points_panel": {
+    "eyebrow": "Punkty umiejętności",
+    "title": "Twoje umiejętności",
+    "subtitle": "Każde ukończone ćwiczenie podnosi poziom umiejętności, które trenuje",
+    "total_label": "punkty umiejętności",
+    "started": "Rozpoczęte: {{started}} z {{total}}",
+    "pts": "pkt",
+    "not_started": "Nierozpoczęte",
+    "nothing_yet": "Brak ćwiczeń w tej kategorii.",
+    "lvl": "Poz.",
+    "to_next": "{{count}} do poz. {{level}}",
+    "xp": "XP"
   }
 }

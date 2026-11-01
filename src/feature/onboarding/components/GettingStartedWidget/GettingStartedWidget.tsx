@@ -368,7 +368,7 @@ export const GettingStartedWidget = () => {
                   <span className='flex items-center gap-1 rounded-md bg-amber-500 px-2.5 py-1 text-[10px] font-bold text-zinc-950 transition-colors group-hover:bg-amber-400 sm:text-xs'>
                     {t("checklist.claim", { badge: node.badge })}
                     <img
-                      src='/images/coin.png'
+                      src='/images/tokens/coin.png'
                       alt='fame'
                       className='h-3 w-3 object-contain sm:h-3.5 sm:w-3.5'
                     />
@@ -384,7 +384,7 @@ export const GettingStartedWidget = () => {
                         {node.badge}
                       </span>
                       <img
-                        src='/images/coin.png'
+                        src='/images/tokens/coin.png'
                         alt='fame'
                         className={cn(
                           "h-3 w-3 object-contain sm:h-3.5 sm:w-3.5",
@@ -495,7 +495,7 @@ export const GettingStartedWidget = () => {
                 +{REWARD_FAME_AMOUNT}
               </span>
               <img
-                src='/images/coin.png'
+                src='/images/tokens/coin.png'
                 alt='fame'
                 className='h-8 w-8 object-contain'
               />

@@ -129,7 +129,7 @@ const Floaters = ({
         COIN_LANES.map((lane, i) => (
           <motion.img
             key={`${delta.id}-${i}`}
-            src='/images/coin.png'
+            src='/images/tokens/coin.png'
             alt=''
             className='absolute h-3.5 w-3.5 object-contain'
             initial={{ opacity: 0, x: lane * 1.6, y: 46 + (i % 2) * 10 }}
@@ -181,7 +181,7 @@ export const FameWallet = ({ fame }: FameWalletProps) => {
   const coin = (
     <motion.img
       key={last?.id ?? "coin"}
-      src='/images/coin.png'
+      src='/images/tokens/coin.png'
       alt=''
       aria-hidden
       className='h-4 w-4 object-contain'

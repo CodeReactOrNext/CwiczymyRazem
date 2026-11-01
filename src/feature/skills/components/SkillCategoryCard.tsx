@@ -2,6 +2,7 @@ import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
+import { getSkillLevel } from "feature/skills/utils/skillLevel";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 
@@ -66,7 +67,7 @@ export const SkillCategoryCard = ({
           {unlockedSkills.length > 0 ? (
             <div className="flex flex-col gap-2">
               {unlockedSkills.map((skill) => {
-                const level = userSkills.unlockedSkills[skill.id] || 0;
+                const level = getSkillLevel(userSkills.unlockedSkills[skill.id] || 0);
                 return (
                   <div
                     key={skill.id}

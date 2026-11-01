@@ -123,7 +123,7 @@ export const BoxRewardBlock = ({
           />
           <span className='relative flex items-center gap-1 text-[10px] font-bold tabular-nums leading-none text-amber-400'>
             <img
-              src='/images/coin.png'
+              src='/images/tokens/coin.png'
               alt=''
               className='h-3 w-3 object-contain'
             />

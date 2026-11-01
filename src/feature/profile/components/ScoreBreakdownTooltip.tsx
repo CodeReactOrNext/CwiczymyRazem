@@ -92,7 +92,7 @@ export const ScoreBreakdownTooltip = ({
                 <span className='flex items-center gap-1 font-bold tabular-nums text-white'>
                   {pointsPerHour}
                   <img
-                    src='/images/points.png'
+                    src='/images/tokens/pick.png'
                     alt='points'
                     className='h-4 w-4 object-contain'
                   />
@@ -103,7 +103,7 @@ export const ScoreBreakdownTooltip = ({
                 <span className='flex items-center gap-1 font-bold tabular-nums text-white'>
                   {fmtPts(pointsPerHabit)}
                   <img
-                    src='/images/points.png'
+                    src='/images/tokens/pick.png'
                     alt='points'
                     className='h-4 w-4 object-contain'
                   />

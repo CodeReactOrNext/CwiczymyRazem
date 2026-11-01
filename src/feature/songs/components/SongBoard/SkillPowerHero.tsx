@@ -1,10 +1,11 @@
-import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
-import { Interpolate } from "lib/i18n/Interpolate";
+import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import type { NextTierProgress } from "feature/songs/utils/difficulty.utils";
 import { MIN_LEARNED_SONGS_FOR_TIER } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { Clock, Music2, Star, TrendingUp } from "lucide-react";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
+import { Clock, Star, TrendingUp } from "lucide-react";
 
 interface SkillPowerHeroProps {
   skillPower: number;
@@ -71,17 +72,13 @@ const NextTierHint = ({
   const { t } = useTranslation("songs");
   const nextTier = getSongTier(nextTierProgress.nextTier);
   return (
-    <div
-      className={cn(
-        "flex flex-wrap items-center justify-center gap-x-1.5 rounded-lg bg-white/5 px-3 py-2 text-center",
-        className,
-      )}>
-      <span className='text-xs font-bold text-zinc-200'>
+    <div className={cn("flex flex-col gap-1", className)}>
+      <span className='text-sm font-semibold text-zinc-200'>
         {nextTierProgress.songsNeeded > 1
           ? t("power.more_songs", { count: nextTierProgress.songsNeeded })
           : t("power.more_song_one")}
       </span>
-      <span className='text-[11px] leading-tight text-zinc-500'>
+      <span className='text-xs text-zinc-500'>
         <Interpolate
           text={t("power.as_hard_as")}
           values={{
@@ -103,20 +100,7 @@ const TierBadge = ({
 }: {
   playerTier: any;
   className?: string;
-}) => (
-  <div
-    className={cn(
-      "flex items-center justify-center rounded-lg font-black shadow-2xl",
-      className,
-    )}
-    style={{
-      color: playerTier.color,
-      backgroundColor: "rgba(10,10,10,0.8)",
-      boxShadow: `0 0 40px ${playerTier.color}15`,
-    }}>
-    {playerTier.tier}
-  </div>
-);
+}) => <TierPick tier={getSongTier(playerTier.tier)} className={className} />;
 
 export const SkillPowerHero = ({
   skillPower,
@@ -170,126 +154,55 @@ export const SkillPowerHero = ({
     );
   }
 
+  const stats = [
+    { label: t("power.mastered"), value: learnedCount },
+    { label: t("power.total"), value: totalCount },
+    { label: t("power.time_spent"), value: formatPracticeTime(totalPracticeMs) },
+  ];
+
+  // One row on desktop: the pick sits next to the score it belongs to, the
+  // stats and the next-tier hint follow it, instead of three islands spread
+  // across the full width.
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-lg bg-zinc-900/40 p-4 backdrop-blur-xl sm:p-8",
+        "flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-4 sm:p-6 lg:flex-row lg:items-center lg:gap-10",
         className,
       )}>
-      {/* Background Decorative Elements */}
-      <div className='absolute -right-20 -top-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-[80px]' />
-      <div className='absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-emerald-500/5 blur-[80px]' />
-
-      <div className='relative z-10 flex flex-col gap-5 md:flex-row md:items-center md:justify-between md:gap-8'>
-        {/* Header + score. Below md the tier badge rides along on the right so
-            the two tallest blocks share one row instead of stacking. */}
-        <div className='flex items-center justify-between gap-4 md:block'>
-          <div className='space-y-4 sm:space-y-6'>
-            <div className='flex items-center gap-3'>
-              <div className='flex h-9 w-9 items-center justify-center rounded-[4px] bg-white/5 text-zinc-300 shadow-lg sm:h-10 sm:w-10'>
-                <TrendingUp size={18} />
-              </div>
-              <div>
-                <h2 className='text-sm font-bold leading-none text-zinc-500'>
-                  {t("power.title")}
-                </h2>
-                <p className='mt-1 text-[11px] leading-tight text-zinc-600 sm:text-xs'>
-                  {t("power.subtitle")}
-                </p>
-              </div>
-            </div>
-
-            <div className='flex items-baseline gap-3 sm:gap-4'>
-              <span className='text-5xl font-black tracking-tighter text-white sm:text-7xl'>
-                {skillPower.toFixed(1)}
-              </span>
-              <span className='text-base font-bold leading-none text-white sm:text-xl'>
-                {t("power.score")}
-              </span>
-            </div>
-          </div>
-
-          <div className='flex shrink-0 flex-col items-center gap-1.5 md:hidden'>
-            <TierBadge playerTier={playerTier} className='h-16 w-16 text-3xl' />
-            <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
-              {t("power.current_tier")}
-            </span>
-          </div>
-        </div>
-
-        <div className='flex flex-col gap-6 sm:flex-row sm:items-center'>
-          <div className='grid grid-cols-3 gap-3 rounded-lg bg-white/5 p-3 sm:gap-8 sm:bg-transparent sm:p-0'>
-            <div className='space-y-1.5 sm:space-y-2.5'>
-              <p className='text-[10px] font-bold tracking-wider text-zinc-500'>
-                {t("power.mastered")}
-              </p>
-              <div className='flex items-center gap-2'>
-                <Music2 size={14} className='text-zinc-500' />
-                <span className='text-lg font-bold text-white'>
-                  {learnedCount}
-                </span>
-              </div>
-            </div>
-            <div className='space-y-1.5 sm:space-y-2.5'>
-              <p className='text-[10px] font-bold tracking-wider text-zinc-500'>
-                {t("power.total")}
-              </p>
-              <div className='flex items-center gap-2'>
-                <Star size={14} className='text-zinc-500' />
-                <span className='text-lg font-bold text-white'>
-                  {totalCount}
-                </span>
-              </div>
-            </div>
-            <div className='space-y-1.5 sm:space-y-2.5'>
-              <p className='text-[10px] font-bold tracking-wider text-zinc-500'>
-                {t("power.time_spent")}
-              </p>
-              <div className='flex items-center gap-2'>
-                <Clock size={14} className='text-zinc-500' />
-                <span className='whitespace-nowrap text-lg font-bold text-white'>
-                  {formatPracticeTime(totalPracticeMs)}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className='hidden h-16 w-px bg-white/5 md:block' />
-
-          <div className='hidden flex-col items-center md:flex'>
-            <TierBadge
-              playerTier={playerTier}
-              className='mb-3 h-24 w-24 text-4xl'
-            />
-            {isTierLocked ? (
-              <TierUnlockTrack learnedCount={learnedCount} className='w-28' />
-            ) : (
-              <div className='flex flex-col items-center gap-2'>
-                <span className='text-xs font-bold tracking-wider text-zinc-500'>
-                  {t("power.current_tier")}
-                </span>
-                {nextTierProgress && (
-                  <NextTierHint
-                    nextTierProgress={nextTierProgress}
-                    className='flex-col gap-1'
-                  />
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Same footer, full width on phones instead of squeezed under the badge. */}
-        <div className='md:hidden'>
-          {isTierLocked ? (
-            <TierUnlockTrack learnedCount={learnedCount} />
-          ) : (
-            nextTierProgress && (
-              <NextTierHint nextTierProgress={nextTierProgress} />
-            )
-          )}
+      <div className='flex items-center gap-4 sm:gap-5'>
+        <TierBadge
+          playerTier={playerTier}
+          className='h-16 w-16 sm:h-20 sm:w-20'
+        />
+        <div className='min-w-0'>
+          <h2 className='text-sm font-medium text-zinc-400'>
+            {t("power.title")}
+          </h2>
+          <p className='mt-1.5 text-4xl font-black leading-none tracking-tight text-white tabular-nums sm:text-5xl'>
+            {skillPower.toFixed(1)}
+          </p>
         </div>
       </div>
+
+      {/* Same rhythm as the score: label on top, value under it. */}
+      <dl className='grid grid-cols-3 gap-4 rounded-lg bg-white/5 p-3 sm:gap-10 lg:ml-auto lg:bg-transparent lg:p-0'>
+        {stats.map(({ label, value }) => (
+          <div key={label} className='min-w-0'>
+            <dt className='text-sm font-medium text-zinc-400'>{label}</dt>
+            <dd className='mt-1.5 whitespace-nowrap text-xl font-bold leading-none text-white tabular-nums sm:text-2xl'>
+              {value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      {isTierLocked ? (
+        <TierUnlockTrack learnedCount={learnedCount} className='lg:w-40' />
+      ) : (
+        nextTierProgress && (
+          <NextTierHint nextTierProgress={nextTierProgress} className='lg:w-52' />
+        )
+      )}
     </div>
   );
 };

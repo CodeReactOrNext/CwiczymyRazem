@@ -569,7 +569,7 @@ export const CaseOpeningModal = ({
                       <span className="flex items-center gap-3">
                         <span>{t("common.sell")}</span>
                         <span className="flex items-center gap-1.5 text-amber-400">
-                          <img src="/images/coin.png" alt="" className="h-5 w-5 object-contain" />
+                          <img src="/images/tokens/coin.png" alt="" className="h-5 w-5 object-contain" />
                           {sellValue}
                         </span>
                       </span>
@@ -592,14 +592,14 @@ export const CaseOpeningModal = ({
                           <span>{t("opening.open_another", { name: labels.caseName(caseDef) })}</span>
                           {openAgainPayment?.kind === "fame" ? (
                             <span className="flex items-center gap-1.5 text-amber-400">
-                              <img src="/images/coin.png" alt="" className="h-5 w-5 object-contain" />
+                              <img src="/images/tokens/coin.png" alt="" className="h-5 w-5 object-contain" />
                               {openAgainPayment.cost}
                             </span>
                           ) : openAgainPayment?.kind === "token" ? (
                             <span className="text-emerald-400">{t("view.free_cases", { count: 1 })}</span>
                           ) : (
                             <span className="flex items-center gap-1.5 text-zinc-500">
-                              <img src="/images/coin.png" alt="" className="h-5 w-5 object-contain opacity-50" />
+                              <img src="/images/tokens/coin.png" alt="" className="h-5 w-5 object-contain opacity-50" />
                               {t("opening.cost_needed", { cost: caseDef.fameCost })}
                             </span>
                           )}

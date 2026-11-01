@@ -123,7 +123,7 @@ export const MarketListingCard = ({
         {isOwn && (
           <span className='flex shrink-0 items-center gap-1 font-black text-amber-400'>
             <img
-              src='/images/coin.png'
+              src='/images/tokens/coin.png'
               alt='coin'
               className='h-4 w-4 object-contain'
             />

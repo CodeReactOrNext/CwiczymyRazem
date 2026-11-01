@@ -16,24 +16,24 @@ export const SessionTimeline = ({ blocks, title }: SessionTimelineProps) => {
 
   return (
     <div className="not-prose my-10 space-y-4">
-      {title && <p className="text-sm font-medium text-zinc-200">{title}</p>}
+      {title && <p className="text-sm font-medium text-zinc-200 light:text-zinc-900">{title}</p>}
 
       <div className="space-y-2">
         {segments.map((segment, i) => (
-          <div key={segment.label} className="relative flex items-baseline gap-4 overflow-hidden rounded-lg bg-zinc-900/40 px-4 py-3">
+          <div key={segment.label} className="relative flex items-baseline gap-4 overflow-hidden rounded-lg bg-zinc-900/40 px-4 py-3 light:bg-zinc-100">
             <div
               aria-hidden="true"
               className="absolute inset-y-0 left-0 bg-cyan-500/10"
               style={{ width: `${total > 0 ? (segment.minutes / total) * 100 : 0}%` }}
             />
-            <span className="relative text-sm font-medium text-cyan-400 shrink-0 w-6">{i + 1}.</span>
-            <span className="relative text-white flex-1">{segment.label}</span>
-            <span className="relative text-zinc-400 shrink-0">{segment.minutes} min</span>
+            <span className="relative text-sm font-medium text-cyan-400 shrink-0 light:text-cyan-700 w-6">{i + 1}.</span>
+            <span className="relative text-white flex-1 light:text-zinc-900">{segment.label}</span>
+            <span className="relative text-zinc-400 shrink-0 light:text-zinc-600">{segment.minutes} min</span>
           </div>
         ))}
       </div>
 
-      <p className="text-sm text-zinc-400 pt-2">{total} minutes total</p>
+      <p className="text-sm text-zinc-400 pt-2 light:text-zinc-600">{total} minutes total</p>
     </div>
   );
 };

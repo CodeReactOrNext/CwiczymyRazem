@@ -362,17 +362,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             </div>
 
             <div className="shrink-0 hidden sm:flex flex-col items-end gap-3">
-               <div
-                 className="h-16 w-16 md:h-20 md:w-20 rounded-lg flex flex-col items-center justify-center relative overflow-hidden transition-all shadow-lg"
-                 style={{
-                   backgroundColor: `${tier.color}10`,
-                   boxShadow: `0 0 20px ${tier.color}15`
-                 }}
-               >
-                   <div className="absolute inset-0 opacity-10" style={{ backgroundColor: tier.color }} />
-                   <span className="text-3xl md:text-4xl font-black relative z-10" style={{ color: tier.color }}>{tier.tier}</span>
-                   <span className="text-[8px] md:text-[10px] font-bold capitalize relative z-10" style={{ color: `${tier.color}90` }}>{t("detail.tier")}</span>
-               </div>
+               <TierBadge song={song} className="h-16 w-16 md:h-20 md:w-20" />
             </div>
          </div>
 

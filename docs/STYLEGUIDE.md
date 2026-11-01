@@ -64,6 +64,15 @@ Aplikacja jest **dark-only**. Nie ma trybu jasnego do utrzymywania.
 - Motyw `dark-theme` (z `tailwindcss-themer`) jest aktywny globalnie.
 - **Nie pisz** wariantów `dark:` ani jasnych domyślnych — od razu projektuj na ciemnym tle.
 
+**Wyjątek: strona posta na blogu** (`/blog/[slug]`) jest biała — długi tekst czyta się lepiej
+ciemny na jasnym (wzór: blog Duolingo). Treść siedzi w kontenerze z klasą `light`
+(`bg-white`, tekst `zinc-700`, nagłówki `zinc-900`, kolumna 680px). Komponenty z
+`src/components/Blog` renderują się też w ciemnej wiki i na landingach, więc mają **obie**
+wersje: zwykłe ciemne klasy + nadpisania wariantem `light:` (np.
+`bg-zinc-900/40 light:bg-zinc-100`, `text-zinc-400 light:text-zinc-600`,
+`text-cyan-400 light:text-cyan-700`). Dodając lub zmieniając komponent bloga, dopisz mu
+wersję `light:`. Poza blogiem wariantu `light:` nie używaj.
+
 ---
 
 ## 4. Kolory — co REALNIE stosować

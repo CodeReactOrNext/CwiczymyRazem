@@ -151,12 +151,8 @@ const FreeTimerIntervalAlert = ({ elapsedMs, isRunning }: FreeTimerIntervalAlert
 
         <Button
           onClick={() => setEnabled((prev) => !prev)}
-          className={cn(
-            "h-11 w-full rounded-lg text-sm font-medium transition-colors",
-            enabled
-              ? "bg-cyan-500 text-black hover:bg-cyan-400"
-              : "bg-zinc-800 text-white hover:bg-zinc-700"
-          )}
+          variant={enabled ? "default" : "subtle"}
+          className='h-11 w-full'
           aria-label={enabled ? t("interval_alert.disable") : t("interval_alert.enable")}>
           {enabled ? (
             <>

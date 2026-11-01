@@ -1,4 +1,5 @@
 import { evaluate } from '@mdx-js/mdx';
+import { cn } from 'assets/lib/utils';
 import { ActionCard } from 'components/Blog/ActionCard';
 import { AppCard } from 'components/Blog/AppCard';
 import { BlogAlert } from 'components/Blog/BlogAlert';
@@ -6,7 +7,6 @@ import { Checklist } from 'components/Blog/Checklist';
 import { ChordShape } from 'components/Blog/ChordShape';
 import { ExercisePromo } from 'components/Blog/ExercisePromo';
 import { MajorScaleDiagram } from 'components/Blog/MajorScaleDiagram';
-import { PatternBackground } from 'components/Blog/PatternBackground';
 import { PhotoBlock } from 'components/Blog/PhotoBlock';
 import { PhotoCompare } from 'components/Blog/PhotoCompare';
 import { PracticeBlueprint } from 'components/Blog/PracticeBlueprint';
@@ -42,6 +42,24 @@ const nodeText = (node: React.ReactNode): string => {
     return nodeText((node as { props?: { children?: React.ReactNode } }).props?.children);
   }
   return '';
+};
+
+/** Header cells in a markdown table's first row: how wide the table needs to be. */
+const columnCount = (node: React.ReactNode): number => {
+  let count = 0;
+  const walk = (child: React.ReactNode): boolean => {
+    if (!child || typeof child !== 'object') return false;
+    if (Array.isArray(child)) return child.some(walk);
+    const { props } = child as { props?: { children?: React.ReactNode } };
+    const kids = ([] as React.ReactNode[]).concat(props?.children ?? []);
+    if ((child as { type?: unknown }).type === 'tr') {
+      count = kids.filter((kid) => kid && typeof kid === 'object').length;
+      return true;
+    }
+    return walk(kids);
+  };
+  walk(node);
+  return count;
 };
 
 /**
@@ -85,34 +103,34 @@ const createComponents = (nextHeadingId: (text: string) => string) => ({
   ),
   // Content images live below the fold; lazy-load them to cut initial page weight
   img: (props: any) => <img loading='lazy' decoding='async' {...props} />,
-  // The article column is `overflow-hidden`, so a wide comparison table used to
-  // get clipped on a phone rather than scrolled. Give each table its own scroll
-  // container and a minimum width, so the columns stay readable and swipeable.
-  table: ({ children, ...rest }: any) => (
-    <div className='my-8 overflow-x-auto' role='region' aria-label='Table, scrolls horizontally' tabIndex={0}>
-      <table {...rest} className='my-0 min-w-[34rem] [&_thead]:border-0 [&_tbody_tr]:border-0 [&_tbody_tr:nth-child(odd)]:bg-zinc-900/40 [&_th:first-child]:pl-4 [&_td:first-child]:pl-4 [&_th:last-child]:pr-4 [&_td:last-child]:pr-4'>{children}</table>
-    </div>
-  ),
-  // Expert-quote blockquotes get the same repeating-icon treatment as BlogAlert,
-  // just smaller/tighter so the box doesn't dominate the page
+  // Each table gets its own scroll container and a minimum width, so on a phone
+  // the columns stay readable and swipeable instead of being squeezed. Tables of
+  // four or more columns also step out past the 680px text column on desktop:
+  // five columns in 680px wrap every cell into a narrow word stack.
+  table: ({ children, ...rest }: any) => {
+    const wide = columnCount(children) >= 4;
+    return (
+      <div
+        className={cn('my-10 overflow-x-auto rounded-lg bg-zinc-50', wide && 'lg:-mx-20')}
+        role='region'
+        aria-label='Table, scrolls horizontally'
+        tabIndex={0}>
+        <table
+          {...rest}
+          className={cn('my-0 w-full text-[15px] leading-relaxed [&_tbody_tr]:border-0 [&_tbody_tr:nth-child(even)]:bg-zinc-100/70 [&_td:first-child]:pl-5 [&_td:first-child]:font-semibold [&_td:first-child]:text-zinc-900 [&_td:last-child]:pr-5 [&_td]:px-3 [&_td]:py-3.5 [&_td]:align-top [&_th:first-child]:pl-5 [&_th:last-child]:pr-5 [&_th]:bg-zinc-100 [&_th]:px-3 [&_th]:py-3.5 [&_th]:align-bottom [&_th]:text-sm [&_th]:font-semibold [&_thead]:border-0', wide ? 'min-w-[46rem]' : 'min-w-[34rem]')}>
+          {children}
+        </table>
+      </div>
+    );
+  },
+  // A quoted source reads as a pull quote: larger type between two short rules,
+  // with no box around it, so it sets itself apart by size rather than by colour.
   blockquote: ({ children, ...rest }: any) => (
-    <div className='relative my-10 overflow-hidden rounded-lg bg-zinc-800/40 px-6 py-8 sm:px-10'>
-      <PatternBackground
-        icon={
-          <g>
-            <path d='M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z' />
-            <path d='M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z' />
-          </g>
-        }
-        strokeClass='stroke-cyan-400'
-      />
-      <blockquote
-        {...rest}
-        className='relative m-0 border-0 text-lg italic leading-relaxed text-zinc-200 [&>p]:m-0 [&>p]:before:content-none [&>p]:after:content-none'
-      >
-        {children}
-      </blockquote>
-    </div>
+    <blockquote
+      {...rest}
+      className='relative my-12 border-0 py-7 pl-0 text-xl font-medium not-italic leading-relaxed text-zinc-900 before:absolute before:left-0 before:top-0 before:h-0.5 before:w-14 before:rounded-full before:bg-zinc-900 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-14 after:rounded-full after:bg-zinc-900 [&>p]:m-0 [&>p]:text-zinc-900 [&>p]:before:content-none [&>p]:after:content-none'>
+      {children}
+    </blockquote>
   ),
   // Source citations are written as `[\[5\]](url)`; render them as small,
   // superscript-style markers so they read as footnotes, not body links
@@ -122,7 +140,7 @@ const createComponents = (nextHeadingId: (text: string) => string) => ({
     return (
       <a
         {...rest}
-        className={isCitation ? 'relative -top-[0.4em] align-baseline text-xs leading-none text-zinc-400 no-underline hover:text-zinc-200' : undefined}
+        className={isCitation ? 'relative -top-[0.4em] align-baseline text-xs font-normal leading-none text-zinc-500 no-underline hover:text-zinc-900' : undefined}
       >
         {children}
       </a>

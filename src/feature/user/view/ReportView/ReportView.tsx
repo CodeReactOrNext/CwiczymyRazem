@@ -746,12 +746,12 @@ const ReportView = () => {
                           type='button'
                           onClick={() => switchSessionMode(mode, setFieldValue)}
                           className={cn(
-                            "flex flex-1 items-center justify-center gap-2 rounded py-2.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
+                            "flex flex-1 items-center justify-center gap-2 rounded py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
                             sessionMode === mode
                               ? "bg-cyan-500/10 text-cyan-400"
                               : "text-zinc-500 hover:text-zinc-300"
                           )}>
-                          <Icon className='h-3.5 w-3.5' />
+                          <Icon className='h-4 w-4' />
                           {label}
                         </button>
                       ))}
@@ -836,10 +836,10 @@ const ReportView = () => {
                       <div className="flex flex-col items-center gap-4 md:items-end">
                         <div className='flex items-center rounded-lg bg-zinc-900/60 px-6 py-4 backdrop-blur-md'>
                           <div className="mr-6 flex flex-col items-start">
-                            <span className='mb-0.5 text-[9px] font-semibold tracking-wide text-zinc-400'>
+                            <span className='mb-1.5 text-xs font-medium text-zinc-400'>
                               {t("total_time")}
                             </span>
-                            <span className='font-mono text-2xl font-bold leading-none text-zinc-100'>
+                            <span className='text-3xl font-bold leading-none text-zinc-100 tabular-nums'>
                                {convertMsToHM(getSumTime(values))}
                             </span>
                           </div>
@@ -864,13 +864,13 @@ const ReportView = () => {
                         )}
                         {isStep1Done ? (
                           <div className="mt-2 flex items-center gap-3 pr-4 duration-slow animate-in fade-in slide-in-from-top-2">
-                             <p className="text-[10px] font-semibold tracking-wide text-emerald-400">
+                             <p className="text-sm font-semibold text-emerald-400">
                                 {t("form.more_details")}
                              </p>
                              <ArrowDown className="h-5 w-5 animate-bounce text-emerald-500" />
                           </div>
                         ) : (
-                          <p className="mt-1 text-sm text-zinc-300">{t("form.add_time_hint")}</p>
+                          <p className="mt-1 text-sm text-zinc-500">{t("form.add_time_hint")}</p>
                         )}
                       </div>
                     </div>
@@ -893,7 +893,7 @@ const ReportView = () => {
                         <h3 className='font-display text-xl font-bold tracking-tight text-zinc-100'>
                            {isSongMode ? t("form.healthy_habits") : t("form.focus_habits")}
                         </h3>
-                        <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-400">{t("form.optional")}</span>
+                        <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-xs font-medium text-zinc-400">{t("form.optional")}</span>
                       </div>
                     </div>
 
@@ -918,7 +918,7 @@ const ReportView = () => {
                               onChange={(e) => { setSelectedTags([]); setFieldValue("reportTitle", e.target.value); }}
                             />
                             {errors.reportTitle && (
-                              <p className="mt-1.5 text-[10px] font-semibold tracking-wide text-red-400">
+                              <p className="mt-1.5 text-xs font-medium text-red-400">
                                 {errors.reportTitle}
                               </p>
                             )}
@@ -972,7 +972,7 @@ const ReportView = () => {
                               ]},
                             ].map((group) => (
                               <div key={group.label} className="space-y-2">
-                                <p className="text-[10px] font-bold tracking-wide text-zinc-400">
+                                <p className="text-xs font-semibold text-zinc-400">
                                   {group.icon} {t(`tag_groups.${tagKey(group.label)}`, group.label)}
                                 </p>
                                 <div className='flex flex-wrap gap-2'>
@@ -992,7 +992,7 @@ const ReportView = () => {
                                           });
                                         }}
                                         className={cn(
-                                          "group flex items-center gap-1.5 rounded border border-transparent px-3 py-1.5 text-[10px] font-bold tracking-wide transition-[background-color,color,transform] duration-fast active:click-behavior-second focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
+                                          "group flex items-center gap-1.5 rounded border border-transparent px-3 py-1.5 text-xs font-semibold transition-[background-color,color,transform] duration-fast active:click-behavior-second focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
                                           isActive
                                             ? "border-cyan-500/30 bg-cyan-500/10 text-zinc-100"
                                             : "bg-zinc-800/60 text-zinc-400 hover:bg-cyan-500/10 hover:text-cyan-400"
@@ -1066,7 +1066,7 @@ const ReportView = () => {
                           <h3 className='font-display text-lg font-bold text-zinc-100'>
                              {t("form.finalize")}
                           </h3>
-                          <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-zinc-400">{t("form.optional_details")}</span>
+                          <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-xs font-medium text-zinc-400">{t("form.optional_details")}</span>
                         </div>
                       </div>
 

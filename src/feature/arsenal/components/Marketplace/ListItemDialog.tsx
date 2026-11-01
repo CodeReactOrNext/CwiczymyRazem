@@ -71,7 +71,7 @@ export const ListItemDialog = ({
             </label>
             <div className='mb-1.5 flex items-center gap-2'>
               <img
-                src='/images/coin.png'
+                src='/images/tokens/coin.png'
                 alt='coin'
                 className='h-4 w-4 object-contain'
               />
@@ -100,7 +100,7 @@ export const ListItemDialog = ({
               <span className='text-zinc-400'>{t("market.listing_fee")}</span>
               <span className='flex items-center gap-1.5 font-bold text-amber-400'>
                 <img
-                  src='/images/coin.png'
+                  src='/images/tokens/coin.png'
                   alt='coin'
                   className='h-3.5 w-3.5 object-contain'
                 />

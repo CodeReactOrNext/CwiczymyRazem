@@ -222,13 +222,8 @@ export const PracticeModeSelector = () => {
       ) : (
         <Icon className='h-[18px] w-[18px] shrink-0 text-zinc-400' />
       )}
-      <span className='flex min-w-0 flex-col'>
-        <span className='text-sm font-semibold text-zinc-100'>
-          {t(`modes.${id}.title`)}
-        </span>
-        <span className='text-xs text-zinc-400'>
-          {t(`modes.${id}.description`)}
-        </span>
+      <span className='min-w-0 truncate text-sm font-semibold text-zinc-100'>
+        {t(`modes.${id}.title`)}
       </span>
     </button>
   );

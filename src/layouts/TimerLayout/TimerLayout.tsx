@@ -11,14 +11,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "assets/components/ui/alert-dialog";
-import { Button } from "assets/components/ui/button";
+import { Button, PRESSABLE } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft, ArrowRight, Clock,Loader2, Play, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Play, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
@@ -372,20 +372,20 @@ const TimerLayout = ({
 
             <div className='grid min-w-0 flex-1 grid-cols-1 gap-6 lg:content-center lg:gap-10'>
               {chosenSkill ? (
-                <div className='space-y-2'>
-                  <p className='text-sm text-zinc-500'>
+                <div>
+                  <p className='text-sm font-medium text-zinc-400'>
                     {t("currently_exercising")}
                   </p>
-                  <div className='flex items-center gap-2'>
+                  <div className='mt-1.5 flex items-center gap-2.5'>
                     <BlinkingDot isActive={timerEnabled} />
-                    <span translate="no" className='font-medium text-white sm:text-lg'>
+                    <span translate="no" className='text-2xl font-bold text-white'>
                       {getSkillName(chosenSkill)}
                     </span>
                   </div>
                 </div>
               ) : (
-                <div className='space-y-3'>
-                  <p className='font-medium text-white sm:text-lg'>
+                <div className='space-y-4'>
+                  <p className='text-lg font-semibold text-white'>
                     {t("choose_practising")}
                   </p>
                   {/* One column where this middle column gets squeezed between
@@ -397,7 +397,7 @@ const TimerLayout = ({
                         key={skill.id}
                         type='button'
                         onClick={() => startSkill(skill.id)}
-                        className='flex min-w-0 items-center gap-2.5 rounded-lg bg-zinc-800/60 px-4 py-3 text-left text-sm font-semibold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
+                        className={cn(PRESSABLE, "flex min-w-0 items-center gap-2.5 rounded-lg border-b-black/30 bg-white/10 px-4 py-3 text-left text-sm text-zinc-100 transition-colors hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring")}>
                         <Play className='h-3.5 w-3.5 shrink-0 fill-current' style={{ color: skill.color }} />
                         <span translate="no" className='min-w-0 break-words'>{skill.title}</span>
                       </button>
@@ -406,14 +406,13 @@ const TimerLayout = ({
                 </div>
               )}
 
-              <div className='space-y-2'>
-                <p className='text-sm text-zinc-500'>{t("total_time")}</p>
-                <div className='flex items-center gap-2'>
-                  <Clock size='1em' className='h-5 w-5 text-zinc-500' />
-                  <span translate="no" className='font-medium text-white sm:text-lg'>
-                    {convertMsToHMS(sumTime)}
-                  </span>
-                </div>
+              <div>
+                <p className='text-sm font-medium text-zinc-400'>
+                  {t("total_time")}
+                </p>
+                <p translate="no" className='mt-1.5 text-2xl font-bold leading-none text-white tabular-nums'>
+                  {convertMsToHMS(sumTime)}
+                </p>
               </div>
             </div>
 
@@ -456,31 +455,28 @@ const TimerLayout = ({
             {onResetTimer && (
               <Button
                 onClick={() => setResetDialogOpen(true)}
-                variant='outline'
-                size='lg'
-                className='px-4 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base text-zinc-400 hover:text-white border-white/10'
+                variant='subtle'
+                className='h-11 px-5'
                 disabled={isFinishing || sumTime === 0}
               >
-                <RotateCcw className="h-4 w-4 mr-2" />
+                <RotateCcw className='mr-2 h-4 w-4' />
                 {t("reset_button")}
               </Button>
             )}
             {!hasTrackedTime ? (
             <Button
               onClick={onBack}
-              className='px-6 py-2.5 text-sm sm:px-8 sm:py-3 sm:text-base min-w-[140px]'
-              variant='outline'
-              size='lg'
+              className='h-11 min-w-[140px] px-6'
+              variant='subtle'
             >
-              <ArrowLeft className='h-4 w-4' />
+              <ArrowLeft className='mr-2 h-4 w-4' />
               {t("back_to_practice")}
             </Button>
             ) : (
             <Button
               onClick={timerSubmitHandler}
-              className='px-6 py-2.5 text-sm sm:px-8 sm:py-3 sm:text-base min-w-[140px]'
+              className='h-11 min-w-[140px] px-6'
               variant='default'
-              size='lg'
               disabled={isFinishing}
             >
               {isFinishing ? (

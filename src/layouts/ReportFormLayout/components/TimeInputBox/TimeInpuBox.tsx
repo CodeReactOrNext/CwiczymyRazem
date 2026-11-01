@@ -176,7 +176,7 @@ const TimeInputBox = ({
             </div>
             <div className='flex items-center gap-1.5'>
               <span
-                className={`md:text-md font-sans text-sm ${
+                className={`text-base font-semibold ${
                   hasValue ? "text-zinc-100" : "text-zinc-300"
                 }`}>
                 {title}
@@ -243,7 +243,7 @@ const TimeInputBox = ({
                   />
                 )}
               </div>
-              <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
+              <span className='text-xs font-medium text-zinc-500'>
                 {t("hours")}
               </span>
             </div>
@@ -287,7 +287,7 @@ const TimeInputBox = ({
                   />
                 )}
               </div>
-              <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
+              <span className='text-xs font-medium text-zinc-500'>
                 {t("minutes")}
               </span>
             </div>

@@ -15,7 +15,7 @@ import {
   toggleShortcut,
 } from "feature/dashboard/utils/dashboardLayout";
 import { useTranslation } from "hooks/useTranslation";
-import { SlidersHorizontal, X, Zap } from "lucide-react";
+import { SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
 
 import { WidgetHeader } from "./WidgetHeader";
@@ -39,7 +39,6 @@ export const ShortcutsWidget = () => {
     return (
       <Card className='p-5 sm:p-6'>
         <WidgetHeader
-          icon={Zap}
           title={t("shortcuts.title")}
           action={
             <span className='text-xs tabular-nums text-zinc-400'>
@@ -140,7 +139,7 @@ export const ShortcutsWidget = () => {
 
   return (
     <Card className='p-5 sm:p-6'>
-      <WidgetHeader icon={Zap} title={t("shortcuts.title")} />
+      <WidgetHeader title={t("shortcuts.title")} />
       {selected.length === 0 && custom.length === 0 ? (
         <p className='text-sm text-zinc-400'>
           {t("shortcuts.empty")}

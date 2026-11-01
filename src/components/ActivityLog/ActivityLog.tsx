@@ -131,7 +131,7 @@ export const ActivityLogView = ({
         aria-busy={isLoading}
         className={`transition-opacity duration-base ${isLoading ? "pointer-events-none animate-pulse opacity-50" : "opacity-100"}`}>
          <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
-          <h3 className='text-xl font-semibold text-white mr-2'>Activity</h3>
+          <h3 className='mr-2 text-base font-semibold text-zinc-100'>Activity</h3>
 
           <div className='flex gap-0.5 rounded-lg bg-white/10 p-0.5'>
             {yearButtons.map((yearValue) => (

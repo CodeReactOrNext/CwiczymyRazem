@@ -440,7 +440,7 @@ function LevelGoalCard({
       >
         <Lock size={18} />
         <span>{t("page.unlock_once")}</span>
-        <img src="/images/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
+        <img src="/images/tokens/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
         <span className="tabular-nums">{nextLevel.cost}</span>
         {!canAfford && (
           <span className="text-xs font-medium text-zinc-500">
@@ -464,7 +464,7 @@ function LevelGoalCard({
       >
         <Sparkles size={18} />
         <span>{t("page.claim_reward")}</span>
-        <img src="/images/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
+        <img src="/images/tokens/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
         <span className="tabular-nums">+{nextLevel.reward}</span>
       </button>
     );
@@ -491,7 +491,7 @@ function LevelGoalCard({
     // reward preview stays plain text; it only becomes a button once claimable
     actionButton = (
       <p className="flex items-center gap-2 text-[13px] text-zinc-500">
-        <img src="/images/coin.png" alt="Fame" className="h-4 w-4 shrink-0 object-contain" />
+        <img src="/images/tokens/coin.png" alt="Fame" className="h-4 w-4 shrink-0 object-contain" />
         <span>
           <Interpolate
             text={t("page.reward_line")}
@@ -570,13 +570,13 @@ function LevelGoalCard({
           {isLocked ? (
             <>
               <p className="flex items-center justify-end gap-1 text-xs font-semibold text-zinc-500 line-through">
-                <img src="/images/coin.png" alt="" className="h-3 w-3 object-contain opacity-50" />
+                <img src="/images/tokens/coin.png" alt="" className="h-3 w-3 object-contain opacity-50" />
                 <span className="tabular-nums">
                   {t("page.cost_once", { cost: nextLevel.cost })}
                 </span>
               </p>
               <p className="mt-0.5 flex items-center justify-end gap-1 font-black leading-none text-amber-400">
-                <img src="/images/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
+                <img src="/images/tokens/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
                 <span className="text-2xl tabular-nums">+{nextLevel.reward}</span>
                 <span className="text-sm text-zinc-500">{t("page.per_week")}</span>
               </p>

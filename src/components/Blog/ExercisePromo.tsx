@@ -24,7 +24,7 @@ export const ExercisePromo = ({ exerciseId, label = 'Try it yourself' }: Exercis
 
   return (
     <div className="not-prose my-10">
-      <div className="mb-3 text-xs font-bold text-cyan-400">{label}</div>
+      <div className="mb-3 text-xs font-bold text-cyan-400 light:text-cyan-700">{label}</div>
       <ExerciseCard
         exercise={{
           id: exercise.id,

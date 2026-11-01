@@ -8,7 +8,7 @@ import {
   ensureQuestForToday,
 } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
-import { CheckCircle2, Gift, Swords } from "lucide-react";
+import { CheckCircle2, Gift } from "lucide-react";
 import Router from "next/router";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -43,9 +43,8 @@ const DailyQuestSkeleton = () => {
   return (
     <Card className='flex-col justify-between p-5 sm:p-6'>
       <div className='mb-5 flex items-start gap-3'>
-        <Swords size={18} className='mt-px shrink-0 text-zinc-700' />
         <div>
-          <h3 className='text-[12px] font-semibold tracking-wide text-zinc-400'>
+          <h3 className='text-base font-semibold text-zinc-100'>
             {t("daily_quests.title")}
           </h3>
           <div className='mt-2 h-3 w-40 rounded bg-white/[0.06]' />
@@ -114,9 +113,8 @@ export const DailyQuestWidget = () => {
   return (
     <Card className='flex-col justify-between p-5 sm:p-6'>
       <div className='mb-5 flex items-start gap-3'>
-        <Swords size={18} className='mt-px shrink-0 text-zinc-700' />
         <div className='min-w-0'>
-          <h3 className='text-[12px] font-semibold tracking-wide text-zinc-400'>
+          <h3 className='text-base font-semibold text-zinc-100'>
             {t("daily_quests.title")}
           </h3>
           {/* The reward is for the whole set, so it sits next to the rule that
@@ -131,7 +129,7 @@ export const DailyQuestWidget = () => {
               <span className='flex items-center gap-1 font-semibold text-cyan-400'>
                 +{DAILY_QUEST_POINTS_REWARD}
                 <img
-                  src='/images/points.png'
+                  src='/images/tokens/pick.png'
                   alt='points'
                   className='h-4 w-4 object-contain'
                 />
@@ -139,7 +137,7 @@ export const DailyQuestWidget = () => {
               <span className='flex items-center gap-1 font-semibold text-amber-400'>
                 +{DAILY_QUEST_FAME_REWARD}
                 <img
-                  src='/images/coin.png'
+                  src='/images/tokens/coin.png'
                   alt='fame'
                   className='h-4 w-4 object-contain'
                 />
@@ -197,13 +195,13 @@ export const DailyQuestWidget = () => {
               points: DAILY_QUEST_POINTS_REWARD,
             })}{" "}
             <img
-              src='/images/points.png'
+              src='/images/tokens/pick.png'
               alt='points'
               className='h-5 w-5 object-contain'
             />
             + {DAILY_QUEST_FAME_REWARD}{" "}
             <img
-              src='/images/coin.png'
+              src='/images/tokens/coin.png'
               alt='fame'
               className='h-5 w-5 object-contain'
             />

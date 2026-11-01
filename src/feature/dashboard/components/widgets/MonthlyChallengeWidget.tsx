@@ -1,6 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
-import { Interpolate } from "lib/i18n/Interpolate";
-import type { Translate } from "lib/i18n/translate";
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { SubmitRecordingDialog } from "feature/challenges/components/SubmitRecordingDialog";
@@ -15,7 +12,10 @@ import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { SongPracticePickerLauncher } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerLauncher";
 import { selectUserName } from "feature/user/store/userSlice";
 import type { Timestamp } from "firebase/firestore";
-import { Check, Medal, Music, Play, Plus } from "lucide-react";
+import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
+import type { Translate } from "lib/i18n/translate";
+import { Check, Music, Play, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -61,7 +61,6 @@ export const MonthlyChallengeWidget = () => {
   return (
     <Card className='flex h-full flex-col p-5 sm:p-6'>
       <WidgetHeader
-        icon={Medal}
         title={t("challenge.title")}
         action={<WidgetLink href='/challenges'>{t("challenge.open")}</WidgetLink>}
       />

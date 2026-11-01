@@ -73,7 +73,7 @@ const spillStyle = ({
 
 const Coin = ({ className }: { className?: string }) => (
   <img
-    src='/images/coin.png'
+    src='/images/tokens/coin.png'
     alt=''
     className={cn("object-contain", className)}
   />

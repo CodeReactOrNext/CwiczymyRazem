@@ -105,7 +105,7 @@ export const SuccessRewardCard = ({
                  className="flex items-end gap-2 text-white"
               >
                  <span className="text-5xl sm:text-6xl font-bold tabular-nums tracking-tight">+{displayedPoints}</span>
-                 <img src="/images/points.png" alt="points" className="h-10 w-10 object-contain mb-2" />
+                 <img src="/images/tokens/pick.png" alt="points" className="h-10 w-10 object-contain mb-2" />
               </motion.div>
               {fameEarned != null && fameEarned > 0 && (
                 <motion.div
@@ -114,7 +114,7 @@ export const SuccessRewardCard = ({
                   transition={{ delay: 0.8 }}
                   className="flex items-center gap-1.5 mt-1"
                 >
-                  <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain" />
+                  <img src="/images/tokens/coin.png" alt="coin" className="h-5 w-5 object-contain" />
                   <span className="text-sm font-black text-amber-400 tracking-widest">+{fameEarned} Fame</span>
                 </motion.div>
               )}

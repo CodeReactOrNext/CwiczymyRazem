@@ -115,6 +115,9 @@
     "profile_activity": {
       "label": "Aktywność"
     },
+    "profile_skill_points": {
+      "label": "Umiejętności"
+    },
     "practice_log": {
       "label": "Dziennik ćwiczeń"
     },

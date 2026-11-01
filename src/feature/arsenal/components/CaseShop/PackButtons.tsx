@@ -53,7 +53,7 @@ export const PackButtons = ({
                 canAfford ? "text-amber-400" : "text-red-400",
               )}>
               <img
-                src='/images/coin.png'
+                src='/images/tokens/coin.png'
                 alt=''
                 className={cn(
                   "h-4 w-4 object-contain",

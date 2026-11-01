@@ -10,7 +10,7 @@ import { WidgetHeader } from "feature/dashboard/components/widgets/WidgetHeader"
 import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { CalendarClock, Clock, Play } from "lucide-react";
+import { Clock, Play } from "lucide-react";
 import Link from "next/link";
 import { useAppSelector } from "store/hooks";
 
@@ -37,7 +37,7 @@ const TILE = "flex min-w-0 items-center gap-3 rounded-lg px-3 py-2 sm:px-4 sm:py
 
 const PlaceNumber = ({ place }: { place: number }) => (
   <span className='w-5 shrink-0 text-center text-sm font-bold tabular-nums text-zinc-400'>
-    {place}
+    {place}.
   </span>
 );
 
@@ -79,13 +79,8 @@ const OpenTile = ({ place }: { place: number }) => {
     <li className={TILE}>
       <PlaceNumber place={place} />
       <span className='size-8 shrink-0 rounded-full bg-zinc-800/80' />
-      <span className='min-w-0'>
-        <span className='block truncate text-sm font-semibold text-zinc-400'>
-          {t("daily_exercise.open_spot")}
-        </span>
-        <span className='block truncate text-xs text-zinc-400'>
-          {t("daily_exercise.open_spot_hint")}
-        </span>
+      <span className='min-w-0 truncate text-sm font-semibold text-zinc-400'>
+        {t("daily_exercise.open_spot")}
       </span>
     </li>
   );
@@ -108,7 +103,7 @@ export const DailyExerciseWidget = () => {
   if (!exercise) {
     return (
       <Card className='flex h-full flex-col p-5 sm:p-6'>
-        <WidgetHeader icon={CalendarClock} title={t("daily_exercise.title")} />
+        <WidgetHeader title={t("daily_exercise.title")} />
         <p className='text-sm text-zinc-400'>{t("daily_exercise.none_today")}</p>
       </Card>
     );
@@ -116,7 +111,7 @@ export const DailyExerciseWidget = () => {
 
   return (
     <Card className='flex h-full flex-col p-5 sm:p-6'>
-      <WidgetHeader icon={CalendarClock} title={t("daily_exercise.title")} />
+      <WidgetHeader title={t("daily_exercise.title")} />
 
       <div className='flex flex-wrap items-center gap-4'>
         {board?.prize ? (
@@ -136,17 +131,17 @@ export const DailyExerciseWidget = () => {
           )}
         </div>
 
-        <div className='flex shrink-0 items-center gap-4'>
-          <span className='flex items-center gap-1.5 text-xs tabular-nums text-zinc-400'>
-            <Clock size={12} className='text-zinc-500' />
-            {t("daily_exercise.new_in", { time: formatTimeLeft(msLeft) })}
-          </span>
+        <div className='flex shrink-0 flex-col items-center gap-2'>
           <Link
             href={`/practice/exercise/${exercise.id}`}
             className={cn(buttonVariants(), "h-11 px-5")}>
             <Play size={16} className='fill-current' />
             {me ? t("daily_exercise.beat_score") : t("daily_exercise.play")}
           </Link>
+          <span className='flex items-center gap-1.5 text-xs tabular-nums text-zinc-400'>
+            <Clock size={12} className='text-zinc-500' />
+            {t("daily_exercise.new_in", { time: formatTimeLeft(msLeft) })}
+          </span>
         </div>
       </div>
 
@@ -158,7 +153,7 @@ export const DailyExerciseWidget = () => {
         </div>
       ) : leaderboard.isError ? (
         <p className='mt-6 text-sm text-zinc-400'>{t("daily_exercise.board_error")}</p>
-      ) : (
+      ) : (board?.top?.length ?? 0) === 0 ? null : (
         <ol className={cn(PODIUM_GRID, "mt-6")}>
           {dailyPodium(board?.top ?? [], me).map((slot, i) =>
             slot ? (

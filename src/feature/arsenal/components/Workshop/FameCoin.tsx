@@ -7,7 +7,7 @@
  */
 export const FameCoin = ({ size = 18 }: { size?: number }) => (
   <img
-    src='/images/coin.png'
+    src='/images/tokens/coin.png'
     alt=''
     aria-hidden
     width={size}

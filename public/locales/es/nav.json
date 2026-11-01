@@ -115,6 +115,9 @@
     "profile_activity": {
       "label": "Actividad"
     },
+    "profile_skill_points": {
+      "label": "Habilidades"
+    },
     "practice_log": {
       "label": "Registro de práctica"
     },

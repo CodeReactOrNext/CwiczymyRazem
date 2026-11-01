@@ -29,12 +29,12 @@ const PANES = [
   {
     key: "wrong" as const,
     Icon: X,
-    chip: "bg-red-500/10 text-red-400",
+    chip: "bg-red-500/10 text-red-400 light:text-red-700",
   },
   {
     key: "right" as const,
     Icon: Check,
-    chip: "bg-emerald-500/10 text-emerald-400",
+    chip: "bg-emerald-500/10 text-emerald-400 light:text-emerald-700",
   },
 ];
 
@@ -53,7 +53,7 @@ export const PhotoCompare = ({
   };
 
   return (
-    <figure className='not-prose my-10 w-full rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+    <figure className='not-prose my-10 w-full rounded-lg bg-zinc-900/40 p-5 light:bg-zinc-100 sm:p-6'>
       <div className='grid gap-6 sm:grid-cols-2'>
         {PANES.map(({ key, Icon, chip }) => {
           const pane = panes[key];
@@ -90,7 +90,7 @@ export const PhotoCompare = ({
       </div>
 
       {caption && (
-        <figcaption className='mt-6 text-sm leading-relaxed text-zinc-400'>
+        <figcaption className='mt-6 text-sm leading-relaxed text-zinc-400 light:text-zinc-600'>
           {caption}
         </figcaption>
       )}

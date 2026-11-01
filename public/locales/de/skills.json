@@ -335,5 +335,18 @@
       "improvisation": "Improvisation",
       "composition": "Komposition"
     }
+  },
+  "points_panel": {
+    "eyebrow": "Skillpunkte",
+    "title": "Deine Skills",
+    "subtitle": "Jede abgeschlossene Übung bringt die Skills voran, die sie trainiert",
+    "total_label": "Skillpunkte",
+    "started": "{{started}} von {{total}} Skills begonnen",
+    "pts": "Pkt.",
+    "not_started": "Nicht begonnen",
+    "nothing_yet": "Hier hast du noch nichts geübt.",
+    "lvl": "Lvl",
+    "to_next": "Noch {{count}} bis Lvl {{level}}",
+    "xp": "XP"
   }
 }

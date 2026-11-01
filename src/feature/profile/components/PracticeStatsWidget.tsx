@@ -3,7 +3,6 @@ import { cn } from "assets/lib/utils";
 import { addDays, format, isSameDay, startOfWeek } from "date-fns";
 import { useTranslation } from "hooks/useTranslation";
 import { useDateFnsLocale, useIntlLocale } from "lib/i18n/dateLocale";
-import { Flame } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -169,22 +168,12 @@ export const PracticeStatsWidget = ({
       <div className="flex flex-col flex-1 gap-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Flame size='1em'
-              className={cn(
-                "text-lg transition-all duration-slow",
-                dayWithoutBreak > 0
-                  ? "text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.6)]"
-                  : "text-zinc-700"
-              )}
-            />
-            <span className="text-[12px] font-semibold text-zinc-400 tracking-wide">{t("week_widget.this_week")}</span>
-          </div>
+          <h3 className="text-base font-semibold text-zinc-100">{t("week_widget.this_week")}</h3>
           <div className="flex items-center gap-3">
             {dayWithoutBreak > 0 && (
-              <div className="flex items-center gap-1.5">
-                <span className="text-base font-black text-white tabular-nums">{dayWithoutBreak}</span>
-                <span className="text-[11px] text-white/80 font-bold tracking-tight">{t("layout.facts.streak")}</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold leading-none text-zinc-50 tabular-nums">{dayWithoutBreak}</span>
+                <span className="text-sm font-medium text-zinc-400">{t("layout.facts.streak")}</span>
               </div>
             )}
           </div>
@@ -214,12 +203,12 @@ export const PracticeStatsWidget = ({
                   const showCheck = day.isGoalMet;
                   const showX = isPast && !day.isGoalMet;
 
-                  const labelColor = day.isGoalMet
-                    ? "#4ade80"
-                    : day.isToday
-                    ? "#e4e4e7"
+                  const labelColor = day.isToday
+                    ? "#f4f4f5"
                     : day.isFuture
-                    ? "#3f3f46"
+                    ? "#52525b"
+                    : day.isGoalMet
+                    ? "#a1a1aa"
                     : "#71717a";
 
                   const cx = Number(x);
@@ -233,7 +222,7 @@ export const PracticeStatsWidget = ({
                         y={labelY}
                         textAnchor="middle"
                         fontSize={12}
-                        fontWeight={700}
+                        fontWeight={day.isToday ? 600 : 500}
                         fill={labelColor}
                       >
                         {payload.value}
@@ -266,9 +255,9 @@ export const PracticeStatsWidget = ({
                 label={{
                   value: "15 min",
                   position: "right",
-                  fill: "rgba(255,255,255,0.7)",
-                  fontSize: 10,
-                  fontWeight: 700,
+                  fill: "#71717a",
+                  fontSize: 11,
+                  fontWeight: 500,
                 }}
               />
 
@@ -304,12 +293,16 @@ export const PracticeStatsWidget = ({
                     fill = "rgba(255,255,255,0.06)";
                   }
 
-                  const labelColor = payload.isGoalMet ? "#4ade80" : "#ffffff";
+                  const labelColor = payload.isGoalMet ? "#f4f4f5" : "#a1a1aa";
                   const label = formatBarLabel(payload.totalMs);
 
                   return (
                     <g>
                       <rect x={x} y={y} width={width} height={height} fill={fill} rx={3} ry={3} />
+                      {/* Same white strip as the bar-shine on /journey's bars, laid across the top of a cleared day. */}
+                      {payload.isGoalMet && height >= 16 && width > 12 && (
+                        <rect x={x + 6} y={y + 5} width={4} height={height - 10} fill="rgba(255,255,255,0.35)" rx={2} ry={2} />
+                      )}
                       {label && (
                         <text
                           x={x + width / 2}

@@ -14,18 +14,22 @@ The app tracks 23 individual guitar skills (alternate picking, legato, bending, 
 
 The map runs top to bottom, from Foundations through Technique, Theory & Fretboard, Rhythm & Groove, Expression & Style and Ear Training to Creativity, and ends at Mastery. Each milestone fans out into branches named after a skill (Alternate Picking, Legato, Click Hunts, Strumming Patterns…), and each branch is a chain of dots ordered easiest first. Small gaps split a chain into difficulty steps, and the faint marks under each step tell you how hard it is: one for beginner, up to four for hard. A green dot is an exercise you've played, a dark dot is still waiting, and a padlock marks a Pro exercise. Exactly one dot on the whole map wears a ring: the exercise you're up to. A milestone's circle fills up as you play its exercises and turns solid green once every one of them is done.
 
-Each branch carries its skill's level in its header, the same number the category summary counts. Two branches that train the same skill show the same level, because it is the same skill split into two stretches of the map. Branches you haven't touched yet have a dimmer name, so the ones you're working on stand out.
+Each branch carries its skill's level in its header. Two branches that train the same skill show the same level, because it is the same skill split into two stretches of the map. Branches you haven't touched yet have a dimmer name, so the ones you're working on stand out.
 
 Hover a dot to see what it is, click it to preview and start it; click a skill's name to open the full list for that skill.
 
 Drag anywhere to pan, or use the arrow keys. The plus and minus buttons zoom, as does Ctrl and the scroll wheel, and the fit button brings the whole width back. Open the map after a session and it lands on your next exercise rather than at the top.
 
-Every exercise you complete as part of a logged session feeds the skills it's tagged with. There's no cap and nothing to level up into. A skill is a running total that only ever goes up, so the number is a record of attention paid, not a grade.
+Every exercise you complete as part of a logged session feeds the skills it's tagged with. There's no cap: a skill is a running total that only ever goes up, so the number is a record of attention paid, not a grade.
 
 The gaps are the point. A branch with one filled dot and eight hollow ones isn't a failing grade, it's a shortlist: those hollow dots are exercises you could do tonight.
 
+<ClickPath steps="Progress|Skills" caption="Every skill you've touched, with its level, its practice time and how far it is to the next level." />
+
+A skill's points decide its level. The first level-up takes 5 points and every level after needs 5 more than the one before, so the first few come within a session or two and the later ones take real work. The bar under each skill is the road to its next level, not a comparison with your other skills, so a nearly full bar means a level-up is close.
+
 <BlogAlert type="info">
-The same number is labelled "XP" in the skill list and "Level" on the category summary. It's the same value shown two ways, and nothing is being tracked twice.
+The number next to a category is its skills' points added up, not their levels. Levels belong to single skills.
 </BlogAlert>
 
 Use it as a mirror rather than a target: if theory has barely moved in a month, that's the useful information here, and Practice → Exercises lets you pick a drill for exactly that gap.

@@ -381,7 +381,7 @@ const RatingPopUpLayout = ({
                 <span className="font-teko text-8xl font-bold leading-none tabular-nums text-cyan-400">
                   +{displayedPoints}
                 </span>
-                <img src="/images/points.png" alt="points" className="h-12 w-12 object-contain" />
+                <img src="/images/tokens/pick.png" alt="points" className="h-12 w-12 object-contain" />
               </div>
 
               <RewardBreakdown rows={pointRows} delay={0.5} className="mt-7" />
@@ -389,7 +389,7 @@ const RatingPopUpLayout = ({
               {fame > 0 && (
                 <div className="mt-10">
                   <div className="flex items-center justify-center gap-2.5">
-                    <img src="/images/coin.png" alt="" className="h-7 w-7 object-contain" />
+                    <img src="/images/tokens/coin.png" alt="" className="h-7 w-7 object-contain" />
                     <span className="font-teko text-5xl font-bold leading-none tabular-nums text-amber-400">
                       +{fame}
                     </span>

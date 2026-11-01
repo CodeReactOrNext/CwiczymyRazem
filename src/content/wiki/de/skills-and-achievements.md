@@ -14,18 +14,22 @@ Die App verfolgt 23 einzelne Gitarrenfähigkeiten (Wechselschlag, Legato, Bendin
 
 Die Karte verläuft von oben nach unten, von Grundlagen über Technik, Theorie & Griffbrett, Rhythmus & Groove, Ausdruck & Stil und Gehörbildung bis zu Kreativität, und endet bei Mastery. Jeder Meilenstein fächert sich in Äste auf, benannt nach einer Fähigkeit (Wechselschlag, Legato, Klickjagd, Schlagmuster…), und jeder Ast ist eine Kette von Punkten, das Leichteste zuerst. Kleine Lücken teilen eine Kette in Schwierigkeitsstufen, und die blassen Striche unter jeder Stufe sagen dir, wie schwer sie ist: einer für Anfänger, bis zu vier für schwer. Ein grüner Punkt ist eine Übung, die du gespielt hast, ein dunkler Punkt wartet noch, und ein Vorhängeschloss markiert eine Pro-Übung. Genau ein Punkt auf der ganzen Karte trägt einen Ring: die Übung, bei der du gerade bist. Der Kreis eines Meilensteins füllt sich, während du seine Übungen spielst, und wird komplett grün, sobald jede davon erledigt ist.
 
-Jeder Ast trägt das Level seiner Fähigkeit in der Kopfzeile, dieselbe Zahl, die die Kategorienzusammenfassung zählt. Zwei Äste, die dieselbe Fähigkeit trainieren, zeigen dasselbe Level, weil es dieselbe Fähigkeit ist, auf zwei Abschnitte der Karte verteilt. Äste, die du noch nicht berührt hast, haben einen blasseren Namen, damit die, an denen du arbeitest, hervorstechen.
+Jeder Ast trägt das Level seiner Fähigkeit in der Kopfzeile. Zwei Äste, die dieselbe Fähigkeit trainieren, zeigen dasselbe Level, weil es dieselbe Fähigkeit ist, auf zwei Abschnitte der Karte verteilt. Äste, die du noch nicht berührt hast, haben einen blasseren Namen, damit die, an denen du arbeitest, hervorstechen.
 
 Fahr mit der Maus über einen Punkt, um zu sehen, was er ist, klick ihn an, um ihn anzusehen und zu starten; klick den Namen einer Fähigkeit an, um die vollständige Liste für diese Fähigkeit zu öffnen.
 
 Zieh irgendwo, um zu verschieben, oder nutze die Pfeiltasten. Die Plus- und Minus-Schaltflächen zoomen, ebenso Strg und das Mausrad, und die Anpassen-Schaltfläche bringt die ganze Breite zurück. Öffne die Karte nach einer Session, und sie landet bei deiner nächsten Übung statt ganz oben.
 
-Jede Übung, die du als Teil einer eingetragenen Session abschließt, speist die Fähigkeiten, mit denen sie markiert ist. Es gibt keine Obergrenze und nichts, in das man aufsteigt. Eine Fähigkeit ist eine laufende Summe, die nur steigt, die Zahl ist also ein Nachweis geschenkter Aufmerksamkeit, keine Note.
+Jede Übung, die du als Teil einer eingetragenen Session abschließt, speist die Fähigkeiten, mit denen sie markiert ist. Es gibt keine Obergrenze: Eine Fähigkeit ist eine laufende Summe, die nur steigt, die Zahl ist also ein Nachweis geschenkter Aufmerksamkeit, keine Note.
 
 Die Lücken sind der Punkt. Ein Ast mit einem gefüllten Punkt und acht hohlen ist keine schlechte Note, sondern eine Kandidatenliste: Diese hohlen Punkte sind Übungen, die du heute Abend machen könntest.
 
+<ClickPath steps="Fortschritt|Skills" caption="Jede Fähigkeit, die du schon angefangen hast, mit ihrem Level, ihrer Übungszeit und dem Weg zum nächsten Level." />
+
+Die Punkte einer Fähigkeit bestimmen ihr Level. Der erste Aufstieg braucht 5 Punkte und jeder weitere 5 mehr als der vorige, die ersten Level kommen also nach ein, zwei Sessions, die späteren kosten echte Arbeit. Der Balken unter jeder Fähigkeit ist der Weg zum nächsten Level, kein Vergleich mit deinen anderen Fähigkeiten, ein fast voller Balken heißt also, dass der Aufstieg nah ist.
+
 <BlogAlert type="info">
-Dieselbe Zahl heißt in der Fähigkeitenliste „XP“ und in der Kategorienzusammenfassung „Level“. Es ist derselbe Wert auf zwei Arten gezeigt, und nichts wird doppelt verfolgt.
+Die Zahl neben einer Kategorie ist die Summe der Punkte ihrer Fähigkeiten, nicht ihrer Level. Ein Level hat immer eine einzelne Fähigkeit.
 </BlogAlert>
 
 Nutze es als Spiegel statt als Ziel: Wenn sich die Theorie in einem Monat kaum bewegt hat, ist das hier die nützliche Information, und Üben → Übungen lässt dich eine Übung genau für diese Lücke wählen.

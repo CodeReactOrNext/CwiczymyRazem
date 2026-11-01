@@ -68,12 +68,8 @@ const FreeTimerMetronome = () => {
 
         <Button
           onClick={handleTogglePlay}
-          className={cn(
-            "h-11 w-full rounded-lg text-sm font-medium transition-colors",
-            metronome.isPlaying
-              ? "bg-cyan-500 text-black hover:bg-cyan-400"
-              : "bg-zinc-800 text-white hover:bg-zinc-700"
-          )}
+          variant={metronome.isPlaying ? "default" : "subtle"}
+          className='h-11 w-full'
           aria-label={metronome.isPlaying ? t("metronome.stop") : t("metronome.start")}>
           {metronome.isPlaying ? (
             <>

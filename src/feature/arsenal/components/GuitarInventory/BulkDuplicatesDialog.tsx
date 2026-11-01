@@ -218,7 +218,7 @@ export const BulkDuplicatesDialog = ({
                   </div>
                   <span className='flex flex-shrink-0 items-center gap-1 text-xs font-bold text-amber-400'>
                     <img
-                      src='/images/coin.png'
+                      src='/images/tokens/coin.png'
                       alt='coin'
                       className='h-3 w-3 object-contain'
                     />
@@ -244,7 +244,7 @@ export const BulkDuplicatesDialog = ({
             amount={fameReward}
             mark={
               <img
-                src='/images/coin.png'
+                src='/images/tokens/coin.png'
                 alt='coin'
                 className='h-4 w-4 object-contain'
               />

@@ -20,6 +20,7 @@ import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { SkillRoadmapMobile } from "feature/skills/roadmap/SkillRoadmapMobile";
 import { SkillRoadmapView } from "feature/skills/roadmap/SkillRoadmapView";
 import type { UserSkills } from "feature/skills/skills.types";
+import { getSkillLevels } from "feature/skills/utils/skillLevel";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useIsCompactViewport } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
@@ -135,6 +136,12 @@ export const SkillDashboard = ({
   }, [router.isReady, router.query]);
 
   const totalXP = Object.values(userSkills.unlockedSkills).reduce((sum: number, val: number) => sum + val, 0);
+  // Branches show the skill's level, not its raw points — the same level the
+  // Progress → Skills tab shows.
+  const skillLevels = useMemo(
+    () => getSkillLevels(userSkills.unlockedSkills),
+    [userSkills.unlockedSkills],
+  );
 
   const localizedExercises = useLocalizedExercises(exercisesAgregat);
   const exercisesByCategory = useMemo(() => {
@@ -322,7 +329,7 @@ export const SkillDashboard = ({
           {isCompact ? (
             <SkillRoadmapMobile
               progressMap={progressMap}
-              skillLevels={userSkills.unlockedSkills}
+              skillLevels={skillLevels}
               isPremium={isPremium}
               onStartExercise={handleStartChallenge}
               onShowUpgrade={() => setShowUpgradeModal(true)}
@@ -331,7 +338,7 @@ export const SkillDashboard = ({
             <div className="h-full w-full">
               <SkillRoadmapView
                 progressMap={progressMap}
-                skillLevels={userSkills.unlockedSkills}
+                skillLevels={skillLevels}
                 isPremium={isPremium}
                 onStartExercise={handleStartChallenge}
                 onShowUpgrade={() => setShowUpgradeModal(true)}

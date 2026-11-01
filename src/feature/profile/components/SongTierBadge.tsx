@@ -4,13 +4,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import {
   getGatedSkillPower,
   MIN_LEARNED_SONGS_FOR_TIER,
 } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
-import { Lock } from "lucide-react";
 
 interface SongTierBadgeProps {
   /** Learned songs of the profile owner. Undefined once the fetch has failed. */
@@ -91,19 +91,7 @@ export const SongTierBadge = ({
       {isLoading ? (
         <div className='h-14 w-14 shrink-0 animate-pulse rounded-xl bg-zinc-800/60' />
       ) : (
-        <div
-          className='flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg'
-          style={{
-            color: tier.color,
-            backgroundColor: "rgba(10,10,10,0.9)",
-            borderColor: `${tier.color}40`,
-          }}>
-          {hasTier || isError ? (
-            tier.tier
-          ) : (
-            <Lock className='h-5 w-5 text-zinc-500' aria-hidden />
-          )}
-        </div>
+        <TierPick tier={tier} className='h-14 w-14' />
       )}
       {isLoading ? (
         <div className='h-3 w-16 animate-pulse rounded bg-zinc-800/60' />

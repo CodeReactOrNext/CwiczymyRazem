@@ -18,35 +18,35 @@ const MEAN_MINUTES = 34;
 
 export const SessionLengthStat = () => {
   return (
-    <div className="not-prose my-10 rounded-lg bg-zinc-900/40 p-6">
-      <p className="text-sm font-medium text-zinc-200">
+    <div className="not-prose my-10 rounded-lg bg-zinc-900/40 p-6 light:bg-zinc-100">
+      <p className="text-sm font-medium text-zinc-200 light:text-zinc-900">
         How long does a logged Riff Quest session actually run?
       </p>
 
-      <p className="mt-6 text-5xl font-bold tracking-tight text-cyan-400">
+      <p className="mt-6 text-5xl font-bold tracking-tight text-cyan-400 light:text-cyan-700">
         {MEAN_MINUTES} min
       </p>
-      <p className="mt-2 text-sm text-zinc-300">
+      <p className="mt-2 text-sm text-zinc-300 light:text-zinc-700">
         Mean length of a completed practice session.
       </p>
 
-      <dl className="mt-6 space-y-1.5 text-sm text-zinc-400">
+      <dl className="mt-6 space-y-1.5 text-sm text-zinc-400 light:text-zinc-600">
         <div className="flex gap-2">
-          <dt className="font-medium text-zinc-300">Sample:</dt>
+          <dt className="font-medium text-zinc-300 light:text-zinc-900">Sample:</dt>
           <dd>
             every completed practice report logged by {PLAYERS} players &mdash;{' '}
             {SESSIONS} sessions in total &mdash; measured {MEASURED_ON}.
           </dd>
         </div>
         <div className="flex gap-2">
-          <dt className="font-medium text-zinc-300">Unit:</dt>
+          <dt className="font-medium text-zinc-300 light:text-zinc-900">Unit:</dt>
           <dd>
             one logged session, not one person&apos;s day. Someone who practises
             twice on a Tuesday appears twice.
           </dd>
         </div>
         <div className="flex gap-2">
-          <dt className="font-medium text-zinc-300">Duration:</dt>
+          <dt className="font-medium text-zinc-300 light:text-zinc-900">Duration:</dt>
           <dd>
             the total time recorded on that session, summed and divided by the
             session count.
@@ -54,7 +54,7 @@ export const SessionLengthStat = () => {
         </div>
       </dl>
 
-      <p className="mt-5 text-sm leading-relaxed text-zinc-400">
+      <p className="mt-5 text-sm leading-relaxed text-zinc-400 light:text-zinc-600">
         We publish the mean and nothing else because the mean is all the
         aggregate returns. There is no median here, and no split by skill level,
         because neither is measured &mdash; and a mean of this shape is easily

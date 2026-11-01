@@ -21,6 +21,17 @@ const shortwide = plugin(function ({ addVariant }) {
   ]);
 });
 
+/**
+ * `light:` — styles for a white page inside the dark app, on anything under `.light`.
+ * Blog posts read on white (long-form text is easier dark-on-light), while the same
+ * MDX components also render in the dark wiki and landings, so a component carries
+ * both looks: its usual dark classes plus `light:` overrides. The ancestor selector
+ * adds a class of specificity, so the override wins without `!important`.
+ */
+const lightSurface = plugin(function ({ addVariant }) {
+  addVariant("light", ".light &");
+});
+
 const rotateX = plugin(function ({ addUtilities }) {
   addUtilities({
     ".rotate-x-20": {
@@ -565,6 +576,7 @@ module.exports = {
     glassEffects,
     borderRadius,
     shortwide,
+    lightSurface,
     require("tailwindcss-animate"),
     require("@tailwindcss/typography"),
   ],

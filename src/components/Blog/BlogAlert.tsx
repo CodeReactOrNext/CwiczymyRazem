@@ -9,32 +9,32 @@ interface BlogAlertProps {
 
 const config = {
   info: {
-    baseClass: 'bg-blue-500/5 text-blue-200',
-    textClass: 'text-blue-200',
+    baseClass: 'bg-blue-500/5 text-blue-200 light:bg-blue-50 light:text-blue-950',
+    textClass: 'text-blue-200 light:text-blue-800',
     strokeClass: 'stroke-blue-400',
     title: 'Note'
   },
   warning: {
-    baseClass: 'bg-amber-500/5 text-amber-200',
-    textClass: 'text-amber-200',
+    baseClass: 'bg-amber-500/5 text-amber-200 light:bg-amber-50 light:text-amber-950',
+    textClass: 'text-amber-200 light:text-amber-800',
     strokeClass: 'stroke-amber-400',
     title: 'Warning'
   },
   tip: {
-    baseClass: 'bg-emerald-500/5 text-emerald-200',
-    textClass: 'text-emerald-200',
+    baseClass: 'bg-emerald-500/5 text-emerald-200 light:bg-emerald-50 light:text-emerald-950',
+    textClass: 'text-emerald-200 light:text-emerald-800',
     strokeClass: 'stroke-emerald-400',
     title: 'Tip'
   },
   important: {
-    baseClass: 'bg-purple-500/5 text-purple-200',
-    textClass: 'text-purple-200',
+    baseClass: 'bg-purple-500/5 text-purple-200 light:bg-purple-50 light:text-purple-950',
+    textClass: 'text-purple-200 light:text-purple-800',
     strokeClass: 'stroke-violet-400',
     title: 'Important'
   },
   takeaway: {
-    baseClass: 'bg-rose-500/5 text-rose-200',
-    textClass: 'text-rose-200',
+    baseClass: 'bg-rose-500/5 text-rose-200 light:bg-rose-50 light:text-rose-950',
+    textClass: 'text-rose-200 light:text-rose-800',
     strokeClass: 'stroke-rose-400',
     title: 'Takeaway'
   }
@@ -73,13 +73,13 @@ export const BlogAlert = ({ type = 'info', children }: BlogAlertProps) => {
   const { baseClass, textClass, strokeClass, title } = config[type];
 
   return (
-    <div className={`relative my-8 overflow-hidden rounded-lg p-8 ${baseClass}`}>
+    <div className={`relative my-10 overflow-hidden rounded-lg p-5 sm:p-7 ${baseClass}`}>
       <PatternBackground icon={ICONS[type]} strokeClass={strokeClass} />
       <div className='relative'>
         <div className={`mb-2 text-sm font-bold ${textClass}`}>
           {title}
         </div>
-        <div className='text-base leading-relaxed'>{children}</div>
+        <div className='text-base leading-relaxed [&>:first-child]:mt-0 [&>:last-child]:mb-0'>{children}</div>
       </div>
     </div>
   );

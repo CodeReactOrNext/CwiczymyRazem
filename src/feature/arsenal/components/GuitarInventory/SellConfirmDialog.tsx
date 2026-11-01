@@ -46,7 +46,7 @@ export const SellConfirmDialog = ({
               <p className='mb-1 text-xs text-zinc-400'>{t("sell.you_receive")}</p>
               <div className='flex items-center justify-center gap-2'>
                 <img
-                  src='/images/coin.png'
+                  src='/images/tokens/coin.png'
                   alt='coin'
                   className='h-4 w-4 object-contain'
                 />

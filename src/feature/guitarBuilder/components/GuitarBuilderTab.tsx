@@ -194,7 +194,7 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
           <span className='flex items-center gap-2'>
             {editing ? t("builder.rebuild_guitar") : t("builder.build_guitar")}
             <span className='flex items-center gap-1 text-amber-600'>
-              <img src='/images/coin.png' alt='' className='h-4 w-4' />
+              <img src='/images/tokens/coin.png' alt='' className='h-4 w-4' />
               {cost}
             </span>
           </span>
