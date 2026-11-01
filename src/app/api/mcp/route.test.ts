@@ -90,13 +90,16 @@ describe("POST /api/mcp", () => {
     authenticate.mockResolvedValue({
       ok: false,
       status: 403,
-      error: "Connecting an AI assistant to riff.quest is a supporter perk.",
+      error:
+        "Connecting an AI assistant to riff.quest is a perk for riff.quest supporters.",
     });
     const response = await POST(initialize);
     expect(response.status).toBe(403);
     // signing in again wouldn't help, so no challenge that would start it
     expect(response.headers.get("www-authenticate")).toBeNull();
-    expect((await response.json()).error.message).toMatch(/supporter perk/);
+    expect((await response.json()).error.message).toMatch(
+      /perk for riff.quest supporters/,
+    );
   });
 
   it("is a 429 with Retry-After over the rate limit", async () => {

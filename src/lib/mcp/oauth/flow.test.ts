@@ -239,7 +239,7 @@ describe("OAuth flow, as claude.ai runs it", () => {
     ).toMatchObject({
       ok: false,
       status: 403,
-      error: expect.stringMatching(/supporter perk/),
+      error: expect.stringMatching(/perk for riff.quest supporters/),
     });
     store.set("users/player-1", { isSupport: true });
 

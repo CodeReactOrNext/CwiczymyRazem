@@ -6,10 +6,14 @@
  *
  * No imports on purpose — the settings and consent screens read these too.
  */
-export const SUPPORTER_PAGE_URL = "https://riff.quest/supporter";
-
-/** What the MCP server answers a token whose player has no badge (HTTP 403). */
-export const MCP_SUPPORTERS_ONLY_MESSAGE = `Connecting an AI assistant to riff.quest is a supporter perk. Any donation unlocks it: ${SUPPORTER_PAGE_URL}`;
+/**
+ * What the MCP server answers a token whose player has no badge (HTTP 403).
+ * It names the requirement and nothing more: no link to the supporter page or
+ * a donation. That page starts a payment, and the AI app directories (ChatGPT
+ * explicitly) don't allow a connector to send users to one.
+ */
+export const MCP_SUPPORTERS_ONLY_MESSAGE =
+  "Connecting an AI assistant to riff.quest is a perk for riff.quest supporters.";
 
 /** The error code the APIs answer with, for the UI to show the perk notice. */
 export const MCP_SUPPORTERS_ONLY_ERROR = "supporters_only";
