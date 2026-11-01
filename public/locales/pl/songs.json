@@ -317,7 +317,9 @@
     "no_files": "Brak zapisanych plików",
     "no_files_hint": "Przejdź do zakładki Import, aby dodać plik",
     "attach_error": "Nie udało się dołączyć pliku",
-    "save_error": "Nie udało się zapisać pliku"
+    "save_error": "Nie udało się zapisać pliku",
+    "desktop_only": "Tylko na tym komputerze",
+    "desktop_only_missing": "Ta tabulatura jest zapisana w aplikacji desktopowej na innym komputerze"
   },
   "sheet": {
     "spotify": "Odtwarzanie Spotify",

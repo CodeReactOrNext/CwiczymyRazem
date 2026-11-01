@@ -193,7 +193,10 @@
     "no_limit": "Sin límite",
     "duration": "Duración",
     "minutes": "{{count}} min",
-    "start": "Empezar a practicar"
+    "start": "Empezar a practicar",
+    "desktop_only": "Solo en este ordenador",
+    "desktop_only_hint": "Guardado por la app de escritorio en este ordenador, no en la nube. No aparecerá en riff.quest desde el navegador ni en otro dispositivo.",
+    "quota_desktop": "{{count}} archivos · guardados en este ordenador, sin límite de tamaño"
   },
   "tab_editor": {
     "n_quarters": "{{n}} negras",

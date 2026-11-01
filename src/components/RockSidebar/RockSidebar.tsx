@@ -464,7 +464,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     {
       id: "progress",
       name: t("progress"),
-      href: "/profile/activity",
+      // The dot means a milestone reward waits — land on it, not on Activity.
+      href: hasUnclaimedMilestone ? "/summary" : "/profile/activity",
       icon: <TrendingUp size={18} />,
       showBadge: hasUnclaimedMilestone,
     },

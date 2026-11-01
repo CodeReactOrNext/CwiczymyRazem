@@ -27,6 +27,7 @@ const { createZoom } = require("./zoom");
 const toneStore = require("./toneStore");
 const vstScanner = require("./vst/vstScanner");
 const backingTrackStore = require("./backingTrackStore");
+const gpFileStore = require("./gpFileStore");
 const { requireMicrophoneAccess } = require("./macPermissions");
 
 const isDev = !app.isPackaged;
@@ -599,6 +600,13 @@ ipcMain.handle("backing:save-assignment", (_e, songId, patch) =>
   backingTrackStore.saveAssignment(songId, patch),
 );
 ipcMain.handle("backing:clear-assignment", (_e, songId) => backingTrackStore.clearAssignment(songId));
+
+// ── Guitar Pro library (local, no size/count cap — see gpFileStore.js) ───────
+ipcMain.handle("gp:list-files", () => gpFileStore.listFiles());
+ipcMain.handle("gp:save-file", (_e, name, data, folderId) => gpFileStore.saveFile(name, data, folderId));
+ipcMain.handle("gp:read-file", (_e, id) => gpFileStore.readFile(id));
+ipcMain.handle("gp:move-file", (_e, id, folderId) => gpFileStore.moveFile(id, folderId));
+ipcMain.handle("gp:delete-file", (_e, id) => gpFileStore.deleteFile(id));
 
 // ── Tray / dock integration ──────────────────────────────────────────────────
 function createTray() {

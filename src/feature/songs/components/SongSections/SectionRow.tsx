@@ -1,3 +1,4 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { MasteryLevel, SongSection } from "feature/songs/types/songSection.type";
 import { useTranslation } from "hooks/useTranslation";
@@ -252,7 +253,10 @@ export const SectionRow = ({
             type="button"
             onClick={() => onPlay(section)}
             title={t("sections.play_from_here")}
-            className="p-2 sm:p-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-white/5 transition-all"
+            className={cn(
+              PRESSABLE_KEY,
+              "p-2 sm:p-1.5 rounded-lg bg-zinc-800/60 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+            )}
           >
             <Play className="h-4 w-4 fill-current" />
           </button>
@@ -262,10 +266,11 @@ export const SectionRow = ({
             onClick={() => onLoop(section)}
             title={isLooping ? t("sections.stop_loop") : t("sections.loop")}
             className={cn(
-              "p-2 sm:p-1.5 rounded-lg transition-all",
+              PRESSABLE_KEY,
+              "p-2 sm:p-1.5 rounded-lg transition-colors",
               isLooping
                 ? "text-cyan-400 bg-cyan-500/10"
-                : "text-zinc-500 hover:text-white hover:bg-white/5"
+                : "bg-zinc-800/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
             )}
           >
             <Repeat2 className="h-4 w-4" />
@@ -284,7 +289,10 @@ export const SectionRow = ({
               type="button"
               onClick={() => onDelete(section.id)}
               title={t("sections.delete")}
-              className="p-2 sm:p-1.5 rounded-lg text-zinc-700 hover:text-red-400 hover:bg-red-500/10 transition-all"
+              className={cn(
+                PRESSABLE_KEY,
+                "p-2 sm:p-1.5 rounded-lg bg-zinc-800/60 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+              )}
             >
               <Trash2 className="h-4 w-4" />
             </button>

@@ -318,7 +318,9 @@
     "no_files": "No saved files",
     "no_files_hint": "Switch to the Import tab to add a file",
     "attach_error": "Failed to attach file",
-    "save_error": "Failed to save file"
+    "save_error": "Failed to save file",
+    "desktop_only": "Only on this computer",
+    "desktop_only_missing": "This tab is saved in the desktop app on another computer"
   },
   "sheet": {
     "spotify": "Spotify playback",

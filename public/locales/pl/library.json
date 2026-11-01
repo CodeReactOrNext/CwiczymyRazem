@@ -205,7 +205,10 @@
     "no_limit": "Bez limitu",
     "duration": "Czas trwania",
     "minutes": "{{count}} min",
-    "start": "Zacznij ćwiczyć"
+    "start": "Zacznij ćwiczyć",
+    "desktop_only": "Tylko na tym komputerze",
+    "desktop_only_hint": "Zapisany przez aplikację desktopową na tym komputerze, nie w chmurze. Nie zobaczysz go na riff.quest w przeglądarce ani na innym urządzeniu.",
+    "quota_desktop": "Pliki: {{count}} · zapisywane na tym komputerze, bez limitu rozmiaru"
   },
   "tab_editor": {
     "n_quarters": "{{n}} ćwierćnut",

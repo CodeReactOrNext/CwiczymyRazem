@@ -32,10 +32,11 @@ import {
   deleteUserGpFile,
   fetchGpFileAsFile,
   getUserGpFiles,
+  isLocalGpLibraryAvailable,
   MAX_GP_FILE_SIZE_BYTES,
   MAX_USER_GP_FILES,
   moveUserGpFile,
-  uploadUserGpFile,
+  saveUserGpFile,
   type UserGpFile,
 } from "feature/songs/services/userGpFiles.service";
 import {
@@ -67,6 +68,7 @@ import {
   GripVertical,
   Infinity,
   Loader2,
+  Monitor,
   Music2,
   Play,
   Trash2,
@@ -77,7 +79,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page.d";
@@ -171,6 +173,8 @@ function buildExercise(
   };
 }
 
+const noopSubscribe = () => () => {};
+
 /** Flattens folders into a move-target list: top-level folders followed by their direct subfolders. */
 function flattenFoldersForMove(folders: GpFolder[]): { folder: GpFolder; depth: number }[] {
   const roots = folders.filter((f) => !f.parentId);
@@ -191,6 +195,9 @@ const GpTabsPage: NextPageWithLayout = () => {
   const userInfo = useAppSelector(selectUserInfo);
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
   const router = useRouter();
+  // The desktop app saves files on this computer: no size or count cap. Read
+  // after hydration so the server-rendered markup (always "cloud") matches.
+  const isLocalLibrary = useSyncExternalStore(noopSubscribe, isLocalGpLibraryAvailable, () => false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [files, setFiles] = useState<UserGpFile[]>([]);
@@ -277,10 +284,16 @@ const GpTabsPage: NextPageWithLayout = () => {
     return trail;
   }, [currentFolder, folders]);
 
+  // A desktop-only file can outlive its folder: on the web the folder looks empty
+  // and can be deleted. Such files fall back to the root instead of vanishing.
+  const folderOf = (file: UserGpFile) =>
+    file.folderId && folders.some((f) => f.id === file.folderId) ? file.folderId : null;
   const visibleFolders = folders.filter((f) => (f.parentId ?? null) === currentFolderId);
-  const visibleFiles = files.filter((f) => (f.folderId ?? null) === currentFolderId);
+  const visibleFiles = files.filter((f) => folderOf(f) === currentFolderId);
   const moveTargets = useMemo(() => flattenFoldersForMove(folders), [folders]);
-  const atFileCap = files.length >= MAX_USER_GP_FILES;
+  // Only cloud files count towards the cap, and the desktop never adds any.
+  const cloudFileCount = files.filter((f) => f.location === "cloud").length;
+  const atFileCap = !isLocalLibrary && cloudFileCount >= MAX_USER_GP_FILES;
 
   const openFilePicker = () => {
     if (atFileCap) {
@@ -348,7 +361,7 @@ const GpTabsPage: NextPageWithLayout = () => {
     incoming.forEach((file) => {
       if (!isGpFile(file.name)) {
         invalidNames.push(file.name);
-      } else if (file.size > MAX_GP_FILE_SIZE_BYTES) {
+      } else if (!isLocalLibrary && file.size > MAX_GP_FILE_SIZE_BYTES) {
         oversizedNames.push(file.name);
       } else {
         validFiles.push(file);
@@ -373,7 +386,9 @@ const GpTabsPage: NextPageWithLayout = () => {
     }
     if (validFiles.length === 0) return;
 
-    const remainingSlots = MAX_USER_GP_FILES - files.length;
+    const remainingSlots = isLocalLibrary
+      ? validFiles.length
+      : MAX_USER_GP_FILES - cloudFileCount;
     if (remainingSlots <= 0) {
       toast.error(
         t("gp.limit_reached", { max: MAX_USER_GP_FILES }),
@@ -409,7 +424,7 @@ const GpTabsPage: NextPageWithLayout = () => {
         prev.map((item, idx) => (idx === i ? { ...item, status: "uploading" } : item))
       );
       try {
-        const uploadedFile = await uploadUserGpFile(userId, file, {
+        const uploadedFile = await saveUserGpFile(userId, file, {
           folderId: currentFolderId,
           onProgress: ({ progress }) =>
             setUploadQueue((prev) =>
@@ -463,7 +478,7 @@ const GpTabsPage: NextPageWithLayout = () => {
     setDeletingId(file.id);
     if (staged?.gpFile.id === file.id) setStaged(null);
     try {
-      await deleteUserGpFile(userId, file.id, file.storagePath);
+      await deleteUserGpFile(userId, file);
       setFiles((prev) => prev.filter((f) => f.id !== file.id));
       toast.success(t("gp.deleted", { name: file.name }));
     } catch {
@@ -474,9 +489,9 @@ const GpTabsPage: NextPageWithLayout = () => {
   };
 
   const handleMoveFile = async (file: UserGpFile, folderId: string | null) => {
-    if (!userId || file.folderId === folderId) return;
+    if (!userId || folderOf(file) === folderId) return;
     try {
-      await moveUserGpFile(userId, file.id, folderId);
+      await moveUserGpFile(userId, file, folderId);
       setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, folderId } : f)));
       toast.success(t("gp.moved", { name: file.name }));
     } catch {
@@ -688,11 +703,13 @@ const GpTabsPage: NextPageWithLayout = () => {
                 atFileCap ? "text-amber-400" : "text-zinc-400"
               )}
             >
-              {t("gp.quota", {
-                used: files.length,
-                max: MAX_USER_GP_FILES,
-                size: formatSize(MAX_GP_FILE_SIZE_BYTES),
-              })}
+              {isLocalLibrary
+                ? t("gp.quota_desktop", { count: files.length })
+                : t("gp.quota", {
+                    used: cloudFileCount,
+                    max: MAX_USER_GP_FILES,
+                    size: formatSize(MAX_GP_FILE_SIZE_BYTES),
+                  })}
             </span>
             {canCreateFolderHere && (
               <Button
@@ -786,7 +803,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             {visibleFolders.length > 0 && (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {visibleFolders.map((folder) => {
-                  const childFileCount = files.filter((f) => f.folderId === folder.id).length;
+                  const childFileCount = files.filter((f) => folderOf(f) === folder.id).length;
                   const childFolderCount = folders.filter((f) => f.parentId === folder.id).length;
                   const isDeleting = deletingFolderId === folder.id;
                   const isDropTarget = dragOverFolderId === folder.id;
@@ -877,6 +894,14 @@ const GpTabsPage: NextPageWithLayout = () => {
                         {ext.replace(".", "").toUpperCase()} · {formatSize(file.size)} ·{" "}
                         {formatDate(file.uploadedAt, intlLocale)}
                       </p>
+                      {file.location === "local" && (
+                        <p
+                          title={t("gp.desktop_only_hint")}
+                          className="mt-1 inline-flex items-center gap-1.5 text-xs font-medium text-amber-300/90">
+                          <Monitor className="h-3 w-3 shrink-0" />
+                          {t("gp.desktop_only")}
+                        </p>
+                      )}
                     </div>
 
                     {/* Actions */}
@@ -894,13 +919,13 @@ const GpTabsPage: NextPageWithLayout = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          {file.folderId !== null && (
+                          {folderOf(file) !== null && (
                             <DropdownMenuItem onClick={() => handleMoveFile(file, null)}>
                               {t("gp.all_files_no_folder")}
                             </DropdownMenuItem>
                           )}
                           {moveTargets
-                            .filter(({ folder }) => folder.id !== file.folderId)
+                            .filter(({ folder }) => folder.id !== folderOf(file))
                             .map(({ folder, depth }) => (
                               <DropdownMenuItem
                                 key={folder.id}

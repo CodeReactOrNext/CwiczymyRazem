@@ -203,6 +203,22 @@ contextBridge.exposeInMainWorld("backingTracks", {
   clearAssignment: (songId) => ipcRenderer.invoke("backing:clear-assignment", songId),
 });
 
+// Guitar Pro library kept on this computer instead of Firebase Storage, so the
+// web build's 1.5 MB / 50 file caps don't apply (see feature/songs/services/
+// userGpFiles.service on the renderer side). Files saved here never sync.
+contextBridge.exposeInMainWorld("gpLibrary", {
+  isAvailable: true,
+
+  listFiles: () => ipcRenderer.invoke("gp:list-files"),
+  /** Stores bytes the renderer already holds; resolves the new file's metadata,
+   *  rejects on a non-GP name or an implausibly large file. */
+  saveFile: (name, data, folderId) => ipcRenderer.invoke("gp:save-file", name, data, folderId ?? null),
+  /** { id, name, data } or null when the file is gone. */
+  readFile: (id) => ipcRenderer.invoke("gp:read-file", id),
+  moveFile: (id, folderId) => ipcRenderer.invoke("gp:move-file", id, folderId ?? null),
+  deleteFile: (id) => ipcRenderer.invoke("gp:delete-file", id),
+});
+
 // App-shell integration: design-matched context menu + tray/dock quick actions
 // (see components/ElectronIntegrations on the renderer side).
 contextBridge.exposeInMainWorld("electronApp", {

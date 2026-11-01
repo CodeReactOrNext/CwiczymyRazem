@@ -6,7 +6,9 @@ import { ArrangementPicker } from "feature/songs/components/Arrangements/Arrange
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
 import {
   getUserGpFiles,
-  uploadUserGpFile,
+  isLocalGpFileId,
+  isLocalGpLibraryAvailable,
+  saveUserGpFile,
   type UserGpFile,
 } from "feature/songs/services/userGpFiles.service";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
@@ -21,6 +23,7 @@ import {
   FolderOpen,
   Link2Off,
   Loader2,
+  Monitor,
   NotebookPen,
   Upload,
 } from "lucide-react";
@@ -71,6 +74,9 @@ export function SongPracticePickerModal({
   );
 
   const hasGpFile = !!progress?.gpFileId;
+  // Saved by the desktop app, which keeps GP files on that computer only.
+  const isDesktopOnlyGpFile = isLocalGpFileId(progress?.gpFileId);
+  const isGpFileElsewhere = isDesktopOnlyGpFile && !isLocalGpLibraryAvailable();
   const arrangementQuery = arrangement ? `?arrangement=${arrangement}` : "";
 
   const handleFreePractice = () => {
@@ -185,9 +191,18 @@ export function SongPracticePickerModal({
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-white">{t("picker.gp_practice")}</p>
-                  {hasGpFile ? (
+                  {hasGpFile && isGpFileElsewhere ? (
                     <div className="mt-0.5 flex items-center gap-1.5">
-                      <FileMusic className="h-3 w-3 shrink-0 text-cyan-400/70" />
+                      <Monitor className="h-3 w-3 shrink-0 text-amber-300/90" />
+                      <span className="text-[11px] text-amber-300/90">{t("picker.desktop_only_missing")}</span>
+                    </div>
+                  ) : hasGpFile ? (
+                    <div className="mt-0.5 flex items-center gap-1.5">
+                      {isDesktopOnlyGpFile ? (
+                        <Monitor className="h-3 w-3 shrink-0 text-amber-300/90" />
+                      ) : (
+                        <FileMusic className="h-3 w-3 shrink-0 text-cyan-400/70" />
+                      )}
                       <span className="truncate text-[11px] text-cyan-400/70">{progress?.gpFileName}</span>
                     </div>
                   ) : (
@@ -364,7 +379,15 @@ function GpFileLibraryPicker({
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cyan-500/20 bg-cyan-500/10">
             <FileMusic className="h-4 w-4 text-cyan-400" />
           </div>
-          <p className="min-w-0 flex-1 truncate text-sm font-bold text-white">{file.name}</p>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold text-white">{file.name}</p>
+            {file.location === "local" && (
+              <p className="mt-0.5 flex items-center gap-1 text-[11px] text-amber-300/90">
+                <Monitor className="h-3 w-3 shrink-0" />
+                {t("picker.desktop_only")}
+              </p>
+            )}
+          </div>
           {loadingId === file.id ? (
             <Loader2 className="h-4 w-4 shrink-0 animate-spin text-cyan-400" />
           ) : (
@@ -396,7 +419,7 @@ function GpFileImporter({
   ) => {
     setIsSaving(true);
     try {
-      const uploaded = await uploadUserGpFile(userId, rawFile);
+      const uploaded = await saveUserGpFile(userId, rawFile);
       await onAttached(uploaded.id, uploaded.name);
     } catch {
       toast.error(t("picker.save_error"));

@@ -1,4 +1,4 @@
-import { Button } from "assets/components/ui/button";
+import { Button, PRESSABLE_KEY } from "assets/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -6,7 +6,11 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { extractVideoId } from "feature/songs/utils/youtube.utils";
+import {
+  extractVideoId,
+  pickSongSpeeds,
+  SONG_SPEED_FALLBACK,
+} from "feature/songs/utils/youtube.utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Link, Lock, LockKeyholeOpen, Pencil, Search } from "lucide-react";
 import {
@@ -53,6 +57,8 @@ interface YouTubeSongPlayerProps {
   onPlayingChange?: (playing: boolean) => void;
   /** Whether the video is up, rather than the link form. */
   onVideoShownChange?: (shown: boolean) => void;
+  /** The speeds this video can play at, for a parent that draws the speed control. */
+  onSpeedsChange?: (speeds: number[]) => void;
 }
 
 export const YouTubeSongPlayer = forwardRef<
@@ -74,6 +80,7 @@ export const YouTubeSongPlayer = forwardRef<
       playbackRate,
       onPlayingChange,
       onVideoShownChange,
+      onSpeedsChange,
     },
     ref,
   ) => {
@@ -85,6 +92,7 @@ export const YouTubeSongPlayer = forwardRef<
     const [inputError, setInputError] = useState(false);
     const [internalSpeed, setSpeed] = useState(1);
     const speed = playbackRate ?? internalSpeed;
+    const [speeds, setSpeeds] = useState(SONG_SPEED_FALLBACK);
     const [suggestions, setSuggestions] = useState<YouTubeSuggestion[]>([]);
 
     useEffect(() => {
@@ -146,6 +154,9 @@ export const YouTubeSongPlayer = forwardRef<
       const dur = event.target.getDuration?.() ?? 0;
       onDurationReady(dur);
       event.target.setPlaybackRate?.(speed);
+      const available = pickSongSpeeds(event.target.getAvailablePlaybackRates?.());
+      setSpeeds(available);
+      onSpeedsChange?.(available);
     };
 
     const handleSpeedChange = (rate: number) => {
@@ -230,20 +241,18 @@ export const YouTubeSongPlayer = forwardRef<
                 }}
                 onKeyDown={(e) => e.key === "Enter" && handleSaveUrl()}
               />
-              <Button
-                onClick={handleSaveUrl}
-                className='h-10 rounded-lg border-none bg-cyan-500/10 px-5 text-sm font-bold text-cyan-400 transition-colors hover:bg-cyan-500/20'>
+              <Button onClick={handleSaveUrl} className='h-10 px-5 font-bold'>
                 {t("youtube_player.save")}
               </Button>
               {isEditing && (
                 <Button
-                  variant='ghost'
+                  variant='subtle'
                   onClick={() => {
                     setIsEditing(false);
                     setUrlInput("");
                     setInputError(false);
                   }}
-                  className='h-10 rounded-lg text-zinc-500 hover:bg-white/5 hover:text-white'>
+                  className='h-10 px-5'>
                   {t("reset_dialog.cancel")}
                 </Button>
               )}
@@ -327,7 +336,10 @@ export const YouTubeSongPlayer = forwardRef<
                 setUrlInput(youtubeUrl ?? "");
                 setIsEditing(true);
               }}
-              className='flex items-center gap-1.5 rounded-lg bg-zinc-800/40 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
+              className={cn(
+                PRESSABLE_KEY,
+                "flex items-center gap-1.5 rounded-lg bg-zinc-800/60 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100",
+              )}>
               <Pencil className='h-3.5 w-3.5' />
               {t("youtube.change_link")}
             </button>
@@ -350,18 +362,20 @@ export const YouTubeSongPlayer = forwardRef<
             <span className='mr-1 text-xs font-medium text-zinc-500'>
               {t("youtube_player.speed")}
             </span>
-            {[0.5, 0.75, 1, 1.25, 1.5].map((rate) => (
+            {speeds.map((rate) => (
               <button
                 key={rate}
                 type='button'
                 onClick={() => handleSpeedChange(rate)}
+                aria-pressed={speed === rate}
                 className={cn(
-                  "rounded-lg px-3 py-1.5 text-xs font-bold transition-colors",
+                  PRESSABLE_KEY,
+                  "rounded-lg px-3 py-1.5 text-xs font-bold tabular-nums transition-colors",
                   speed === rate
                     ? "bg-cyan-500/10 text-cyan-400"
-                    : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+                    : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
                 )}>
-                {rate === 1 ? "1×" : `${rate}×`}
+                {rate}×
               </button>
             ))}
 
@@ -373,10 +387,11 @@ export const YouTubeSongPlayer = forwardRef<
                       type='button'
                       onClick={onLockToggle}
                       className={cn(
-                        "flex h-8 items-center gap-2 rounded-lg px-3 transition-all",
+                        PRESSABLE_KEY,
+                        "flex h-8 items-center gap-2 rounded-lg px-3 transition-colors",
                         isLocked
                           ? "bg-amber-500/10 text-amber-400"
-                          : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+                          : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
                       )}>
                       {isLocked ? (
                         <Lock className='h-3.5 w-3.5' />

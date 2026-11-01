@@ -25,7 +25,6 @@ interface UsePracticeSessionStateProps {
 
 export const usePracticeSessionState = ({
   plan,
-  onFinish,
   forceFullDuration,
   freeMode,
   skillRewardSkillId,
@@ -121,8 +120,14 @@ export const usePracticeSessionState = ({
       } else {
         resetTimerFn();
       }
-    }, onFinish);
-  }, [currentExerciseIndex, timer, saveTime, getTime, baseHandleNextExercise, plan.exercises.length, onFinish]);
+    });
+    // No onFinish past the last exercise. The only thing that gets here is a
+    // playalong video running out (the Next button turns into Finish on the
+    // last item), and handing that to the page's onFinish navigated away
+    // without saving the session — the time was left for the report page to
+    // "recover" and the run never counted toward quests. The session stays
+    // put with the timer stopped; Finish saves it like any other run.
+  }, [currentExerciseIndex, timer, saveTime, getTime, baseHandleNextExercise, plan.exercises.length]);
 
   const jumpToExercise = (index: number) => {
     saveTime(currentExerciseIndex, timer.getTime());

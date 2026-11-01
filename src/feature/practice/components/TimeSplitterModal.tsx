@@ -86,23 +86,25 @@ export const TimeSplitterModal = ({
           <section className='space-y-3'>
             <p className='text-sm font-medium text-zinc-300'>{t("time_splitter.question")}</p>
             <div className='rounded-lg bg-zinc-900/60 p-4'>
+              {/* Each side sits over its own part of the bar: technique is the
+                  filled range from the left, hearing the rest of the track. */}
               <div className='flex items-end justify-between gap-4'>
                 <div>
                   <p className='text-xs text-zinc-400'>
-                    {t("time_splitter.hearing")}
-                    <span className='ml-1.5 tabular-nums text-zinc-500'>{hearingPercent}%</span>
+                    {t("time_splitter.technique")}
+                    <span className='ml-1.5 tabular-nums text-zinc-500'>{techniquePercent}%</span>
                   </p>
-                  <p className='mt-1 text-2xl font-semibold tabular-nums text-cyan-400'>
-                    {convertMsToHMS(hearingTime)}
+                  <p className='mt-1 text-2xl font-semibold tabular-nums text-amber-400'>
+                    {convertMsToHMS(techniqueTime)}
                   </p>
                 </div>
                 <div className='text-right'>
                   <p className='text-xs text-zinc-400'>
-                    <span className='mr-1.5 tabular-nums text-zinc-500'>{techniquePercent}%</span>
-                    {t("time_splitter.technique")}
+                    <span className='mr-1.5 tabular-nums text-zinc-500'>{hearingPercent}%</span>
+                    {t("time_splitter.hearing")}
                   </p>
-                  <p className='mt-1 text-2xl font-semibold tabular-nums text-amber-400'>
-                    {convertMsToHMS(techniqueTime)}
+                  <p className='mt-1 text-2xl font-semibold tabular-nums text-cyan-400'>
+                    {convertMsToHMS(hearingTime)}
                   </p>
                 </div>
               </div>
@@ -111,8 +113,7 @@ export const TimeSplitterModal = ({
                 onValueChange={(val) => setTechniquePercent(val[0])}
                 max={100}
                 step={5}
-                aria-label={`${t("time_splitter.hearing")} / ${t("time_splitter.technique")}`}
-                className='mt-5 cursor-pointer py-2 [&_[data-slot=slider-range]]:bg-amber-400 [&_[data-slot=slider-track]]:bg-cyan-400/80 [&_[role=slider]]:h-5 [&_[role=slider]]:w-5 [&_[role=slider]]:border-0 [&_[role=slider]]:bg-zinc-100 [&_[role=slider]]:shadow-none'
+                aria-label={`${t("time_splitter.technique")} / ${t("time_splitter.hearing")}`}                className='mt-5 cursor-pointer py-2 [&_[data-slot=slider-range]]:bg-amber-400 [&_[data-slot=slider-track]]:h-3 [&_[data-slot=slider-track]]:bg-cyan-400 [&_[role=slider]]:h-6 [&_[role=slider]]:w-6 [&_[role=slider]]:border-4 [&_[role=slider]]:border-zinc-900 [&_[role=slider]]:bg-zinc-100 [&_[role=slider]]:shadow-none'
               />
             </div>
           </section>

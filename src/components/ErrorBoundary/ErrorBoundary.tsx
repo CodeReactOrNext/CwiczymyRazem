@@ -1,5 +1,5 @@
-import * as Sentry from "@sentry/nextjs";
 import { Button } from "assets/components/ui/button";
+import { captureException } from "lib/sentry/sentryClient";
 import { AlertTriangle, Home,RefreshCcw } from "lucide-react";
 import Link from "next/link";
 import type { ErrorInfo, ReactNode } from 'react';
@@ -32,7 +32,7 @@ class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
-    Sentry.captureException(error, {
+    captureException(error, {
       contexts: {
         react: { componentStack: errorInfo.componentStack },
       },

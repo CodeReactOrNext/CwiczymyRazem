@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { resolveUserGpFileUrl } from "feature/songs/services/userGpFiles.service";
 import { getUserSongProgress } from "feature/songs/services/userSongProgress.service";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
 
 interface SongGpFile {
   downloadUrl: string;
@@ -19,10 +18,7 @@ export const resolveSongGpFile = async (
   const progress = await getUserSongProgress(userId, songId);
   if (!progress?.gpFileId || !progress.gpFileName) return null;
 
-  const gpFileSnap = await getDoc(doc(db, "users", userId, "gpFiles", progress.gpFileId));
-  if (!gpFileSnap.exists()) return null;
-
-  const { downloadUrl } = gpFileSnap.data() as { downloadUrl?: string };
+  const downloadUrl = await resolveUserGpFileUrl(userId, progress.gpFileId);
   return downloadUrl ? { downloadUrl, fileName: progress.gpFileName } : null;
 };
 

@@ -1,3 +1,4 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { Minus, Plus } from "lucide-react";
 import type { ReactNode } from "react";
@@ -99,7 +100,10 @@ export const Stepper = ({ value, min, max, onChange, label }: StepperProps) => (
       onClick={() => onChange(Math.max(min, value - 1))}
       disabled={value <= min}
       aria-label={`${label} −`}
-      className='flex h-10 w-10 items-center justify-center rounded text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:opacity-40 hover:bg-zinc-700 lg:h-8 lg:w-8'>
+      className={cn(
+        PRESSABLE_KEY,
+        "flex h-10 w-10 items-center justify-center rounded bg-zinc-700/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:opacity-40 hover:bg-zinc-700 lg:h-8 lg:w-8",
+      )}>
       <Minus className='h-3.5 w-3.5' />
     </button>
     <span className='w-8 text-center text-sm font-semibold tabular-nums text-zinc-100'>
@@ -110,7 +114,10 @@ export const Stepper = ({ value, min, max, onChange, label }: StepperProps) => (
       onClick={() => onChange(Math.min(max, value + 1))}
       disabled={value >= max}
       aria-label={`${label} +`}
-      className='flex h-10 w-10 items-center justify-center rounded text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:opacity-40 hover:bg-zinc-700 lg:h-8 lg:w-8'>
+      className={cn(
+        PRESSABLE_KEY,
+        "flex h-10 w-10 items-center justify-center rounded bg-zinc-700/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:opacity-40 hover:bg-zinc-700 lg:h-8 lg:w-8",
+      )}>
       <Plus className='h-3.5 w-3.5' />
     </button>
   </div>

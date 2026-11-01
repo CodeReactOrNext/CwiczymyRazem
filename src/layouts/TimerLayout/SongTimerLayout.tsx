@@ -14,7 +14,6 @@ import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowLeft,
-  CheckCircle2,
   Keyboard,
   Music,
   Pause,
@@ -176,20 +175,17 @@ export const SongTimerLayout = ({
               {formatTime(time)}
             </div>
 
-            <button
+            <Button
               onClick={toggleTimer}
-              className={cn(
-                "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all",
-                timerEnabled
-                  ? "bg-zinc-800 text-white hover:bg-zinc-700"
-                  : "bg-white text-black hover:bg-zinc-100",
-              )}>
+              variant={timerEnabled ? "subtle" : "default"}
+              size='icon'
+              className='h-10 w-10 shrink-0'>
               {timerEnabled ? (
                 <Pause className='h-4 w-4 fill-current' />
               ) : (
                 <Play className='ml-0.5 h-4 w-4 fill-current' />
               )}
-            </button>
+            </Button>
 
             {/* Electron-only amp simulator (renders nothing on web). Non-compact
                 so the "AMP"/"AMP ON" label is visible, not just a bare icon. */}
@@ -197,9 +193,8 @@ export const SongTimerLayout = ({
 
             <Button
               onClick={handleFinish}
-              className='ml-1 gap-2 rounded-lg px-3 sm:ml-3 sm:px-4'>
-              <span className='hidden sm:inline'>{t("finish")}</span>
-              <CheckCircle2 className='h-4 w-4' />
+              className='ml-1 h-10 rounded-lg px-4 sm:ml-3'>
+              {t("finish")}
             </Button>
           </div>
 

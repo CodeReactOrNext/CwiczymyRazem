@@ -3,33 +3,20 @@
 // z Turbopackiem, jak i z webpackiem — w przeciwieństwie do starego
 // `sentry.client.config.ts`, który wstrzykiwał wyłącznie webpackowy plugin Sentry.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
+//
+// SDK nie jest tu importowane statycznie: ładuje się dopiero po `load`, gdy
+// przeglądarka jest bezczynna (lib/sentry/sentryClient). Błędy sprzed startu są
+// buforowane i wysyłane, gdy Sentry wystartuje.
 
-import * as Sentry from "@sentry/nextjs";
+import type * as Sentry from "@sentry/nextjs";
 import {
-  SENTRY_CONSOLE_LOG_LEVELS,
-  SENTRY_ENABLED,
-  sharedSentryOptions,
-} from "lib/sentry/sentryOptions";
+  bufferEarlyErrors,
+  getLoadedSentry,
+  loadSentryWhenIdle,
+} from "lib/sentry/sentryClient";
 
-if (SENTRY_ENABLED) {
-  Sentry.init({
-    ...sharedSentryOptions,
+bufferEarlyErrors();
+loadSentryWhenIdle();
 
-    integrations: [
-      // console.warn / console.error trafiają do Sentry Logs
-      Sentry.consoleLoggingIntegration({
-        levels: [...SENTRY_CONSOLE_LOG_LEVELS],
-      }),
-    ],
-
-    // 10% zwykłych sesji + 100% sesji z błędem trafia do Session Replay.
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
-  });
-
-  // Session Replay is not set up here: public pages (landing, blog, song
-  // guides) never load it. The logged-in shell starts it — see
-  // lib/sentry/loadSentryReplay.
-}
-
-export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
+export const onRouterTransitionStart: typeof Sentry.captureRouterTransitionStart =
+  (...args) => getLoadedSentry()?.captureRouterTransitionStart(...args);

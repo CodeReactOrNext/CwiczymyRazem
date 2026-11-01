@@ -317,7 +317,9 @@
     "no_files": "No hay archivos guardados",
     "no_files_hint": "Ve a la pestaña Importar para añadir un archivo",
     "attach_error": "No se pudo adjuntar el archivo",
-    "save_error": "No se pudo guardar el archivo"
+    "save_error": "No se pudo guardar el archivo",
+    "desktop_only": "Solo en este ordenador",
+    "desktop_only_missing": "Esta tablatura está guardada en la app de escritorio de otro ordenador"
   },
   "sheet": {
     "spotify": "Reproducción en Spotify",

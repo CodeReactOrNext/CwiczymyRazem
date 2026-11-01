@@ -6,7 +6,7 @@ import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { ensureSongIsLearning } from "feature/songs/services/udateSongStatus";
-import { fetchGpFileAsFile } from "feature/songs/services/userGpFiles.service";
+import { fetchGpFileAsFile, resolveUserGpFileUrl } from "feature/songs/services/userGpFiles.service";
 import {
   getUserSongProgress,
   type UserSongProgress,
@@ -62,10 +62,9 @@ export default function SongPracticePage() {
         let rawGpFile: File | undefined;
         if (progress?.gpFileId && progress.gpFileName) {
           try {
-            // We need the downloadUrl — fetch it from gpFiles subcollection
-            const gpFileSnap = await getDoc(doc(db, "users", userId, "gpFiles", progress.gpFileId));
-            if (gpFileSnap.exists()) {
-              const { downloadUrl } = gpFileSnap.data() as { downloadUrl: string };
+            // Null for a desktop-only file opened outside that desktop app.
+            const downloadUrl = await resolveUserGpFileUrl(userId, progress.gpFileId);
+            if (downloadUrl) {
               rawGpFile = await fetchGpFileAsFile(downloadUrl, progress.gpFileName);
             }
           } catch {

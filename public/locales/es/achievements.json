@@ -4,6 +4,11 @@
   "veryRare": "Muy raro",
   "empty": "Vacío",
   "epic": "Épico",
+  "page": {
+    "eyebrow": "Colección",
+    "title": "Logros",
+    "subtitle": "Insignias que ganas practicando — unas comunes, otras raras"
+  },
   "panel": {
     "earnedHeadline": "{{owned}} de {{total}} logros conseguidos",
     "globalColumn": "% de todos los jugadores",

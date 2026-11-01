@@ -4,6 +4,11 @@
   "veryRare": "Very Rare",
   "empty": "Empty",
   "epic": "Epic",
+  "page": {
+    "eyebrow": "Collection",
+    "title": "Achievements",
+    "subtitle": "Badges you earn by practising — some common, some rare"
+  },
   "panel": {
     "earnedHeadline": "{{owned}} of {{total}} achievements earned",
     "globalColumn": "% of all players",

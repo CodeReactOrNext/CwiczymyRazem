@@ -317,7 +317,9 @@
     "no_files": "Keine gespeicherten Dateien",
     "no_files_hint": "Wechsle zum Import-Tab, um eine Datei hinzuzufügen",
     "attach_error": "Datei konnte nicht angehängt werden",
-    "save_error": "Datei konnte nicht gespeichert werden"
+    "save_error": "Datei konnte nicht gespeichert werden",
+    "desktop_only": "Nur auf diesem Computer",
+    "desktop_only_missing": "Diese Tabulatur ist in der Desktop-App auf einem anderen Computer gespeichert"
   },
   "sheet": {
     "spotify": "Spotify-Wiedergabe",

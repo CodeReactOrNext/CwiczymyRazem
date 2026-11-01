@@ -13,7 +13,8 @@ import posthog from "posthog-js";
 import type { RootState } from "store/store";
 import type { DailyQuest, DailyQuestCategoryMinutes, DailyQuestTaskType } from "types/api.types";
 import { auth, db } from "utils/firebase/client/firebase.utils";
-import { getPointsToLvlUp, levelUpUser } from "utils/gameLogic";
+import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
+import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
 import { isSameQuest, mergeDailyQuests } from "./dailyQuest.merge";
 import { getQuestDayKey, isQuestDrawnFor } from "./questDay";

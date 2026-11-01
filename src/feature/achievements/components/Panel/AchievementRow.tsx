@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { RewardBadge } from "components/Rewards/RewardBadge";
 import { useTranslation } from "hooks/useTranslation";
@@ -178,15 +179,13 @@ export const AchievementRow = memo(
           )}
 
           {canClaim && (
-            <button
+            <Button
+              size='sm'
               onClick={() => onClaim?.(data.id)}
               disabled={isClaiming}
-              className={cn(
-                "shrink-0 rounded-lg bg-zinc-100 px-3 py-1.5 text-[0.6875rem] font-bold capitalize tracking-wide text-zinc-900 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                isClaiming && "cursor-wait opacity-70",
-              )}>
+              className='shrink-0 px-4'>
               {t("panel.rewards.claim")}
-            </button>
+            </Button>
           )}
 
           <span className={cn("shrink-0 text-sm font-bold tabular-nums", PERCENT[state])}>

@@ -4,6 +4,11 @@
   "veryRare": "Sehr selten",
   "empty": "Leer",
   "epic": "Episch",
+  "page": {
+    "eyebrow": "Sammlung",
+    "title": "Erfolge",
+    "subtitle": "Abzeichen, die du durchs Üben verdienst — manche häufig, manche selten"
+  },
   "panel": {
     "earnedHeadline": "{{owned}} von {{total}} Erfolgen erreicht",
     "globalColumn": "% aller Spieler",

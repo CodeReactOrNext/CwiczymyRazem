@@ -1,7 +1,7 @@
-import { cn } from "assets/lib/utils";
+import { Button } from "assets/components/ui/button";
 import { RewardSummary } from "components/Rewards/RewardSummary";
 import { useTranslation } from "hooks/useTranslation";
-import { Gift, Ticket } from "lucide-react";
+import { Gift, PackageOpen, Ticket } from "lucide-react";
 
 import type { AchievementReward } from "../../data/achievementRewards";
 
@@ -42,10 +42,10 @@ export const ClaimRewardsBanner = ({
 
   if (waiting === 0) {
     return (
-      <div className='flex items-center gap-3 rounded-lg bg-cyan-500/[0.07] px-5 py-4'>
+      <div className='flex items-center gap-3 rounded-lg bg-zinc-800/50 px-5 py-4'>
         <Ticket
           size={18}
-          className='shrink-0 text-cyan-300'
+          className='shrink-0 text-amber-300'
           strokeWidth={2.5}
         />
         <p className='text-sm text-zinc-300'>
@@ -56,12 +56,12 @@ export const ClaimRewardsBanner = ({
   }
 
   return (
-    <div className='flex flex-col gap-5 rounded-lg bg-cyan-500/[0.07] p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8'>
+    <div className='flex flex-col gap-5 rounded-lg bg-zinc-800/50 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8'>
       <div className='flex min-w-0 flex-col gap-2'>
         <p className='flex items-center gap-2 text-sm font-bold text-zinc-100'>
           <Gift
             size={16}
-            className='shrink-0 text-cyan-300'
+            className='shrink-0 text-amber-300'
             strokeWidth={2.5}
           />
           {t(
@@ -81,15 +81,16 @@ export const ClaimRewardsBanner = ({
         )}
       </div>
 
-      <button
+      {/* The app's own key, full width on a phone where it sits under the
+          list, and sized up on desktop — it is the only action on the page. */}
+      <Button
+        size='lg'
         onClick={onClaimAll}
-        disabled={isClaiming}
-        className={cn(
-          "shrink-0 rounded-lg bg-zinc-100 px-5 py-2.5 text-xs font-bold capitalize tracking-wide text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white",
-          isClaiming && "cursor-wait opacity-70",
-        )}>
+        loading={isClaiming}
+        className='w-full shrink-0 px-6 sm:w-auto'>
+        {!isClaiming && <PackageOpen className='mr-2' />}
         {isClaiming ? t("panel.rewards.claiming") : t("panel.rewards.claimAll")}
-      </button>
+      </Button>
     </div>
   );
 };

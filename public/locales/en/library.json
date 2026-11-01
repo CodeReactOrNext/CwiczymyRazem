@@ -193,7 +193,10 @@
     "no_limit": "No Limit",
     "duration": "Duration",
     "minutes": "{{count}} min",
-    "start": "Start Practice"
+    "start": "Start Practice",
+    "desktop_only": "Only on this computer",
+    "desktop_only_hint": "Saved by the desktop app on this computer, not in the cloud. It won't show up on riff.quest in a browser or on another device.",
+    "quota_desktop": "{{count}} files · saved on this computer, no size limit"
   },
   "tab_editor": {
     "n_quarters": "{{n}} quarter notes",

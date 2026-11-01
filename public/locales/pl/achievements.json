@@ -4,6 +4,11 @@
   "veryRare": "Bardzo rzadkie",
   "empty": "Pusto",
   "epic": "Epickie",
+  "page": {
+    "eyebrow": "Kolekcja",
+    "title": "Osiągnięcia",
+    "subtitle": "Odznaki zdobywane za ćwiczenie — jedne częste, inne rzadkie"
+  },
   "panel": {
     "earnedHeadline": "Zdobyte osiągnięcia: {{owned}} z {{total}}",
     "globalColumn": "% wszystkich graczy",

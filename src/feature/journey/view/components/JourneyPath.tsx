@@ -44,13 +44,14 @@ function PathNode({
           disabled={isLocked}
           aria-label={step.title}
           className={cn(
-            "relative flex h-20 w-20 items-center justify-center rounded-full transition-[transform,box-shadow,background-color] duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed",
+            "relative flex h-20 w-20 items-center justify-center rounded-full transition-[transform,box-shadow,background-color] duration-100 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed",
             isLocked &&
-              "bg-zinc-700 text-zinc-500 shadow-[0_4px_0_0_rgb(24,24,27)]",
+              "bg-zinc-700 text-zinc-500 shadow-[0_6px_0_0_rgb(24,24,27)]",
+            // Duolingo-style key: hover sinks it halfway into its lip, click bottoms it out
             isCompleted &&
-              "bg-emerald-500 text-zinc-950 shadow-[0_5px_0_0_rgb(4,120,87)] hover:bg-emerald-400 active:translate-y-[5px] active:shadow-none",
+              "bg-emerald-500 text-zinc-950 shadow-[0_7px_0_0_rgb(4,120,87)] hover:translate-y-[3px] hover:bg-emerald-400 hover:shadow-[0_4px_0_0_rgb(4,120,87)] active:translate-y-[7px] active:shadow-none",
             isCurrent &&
-              "bg-cyan-500 text-zinc-950 shadow-[0_5px_0_0_rgb(14,116,144)] hover:bg-cyan-400 active:translate-y-[5px] active:shadow-none"
+              "bg-cyan-500 text-zinc-950 shadow-[0_7px_0_0_rgb(14,116,144)] hover:translate-y-[3px] hover:bg-cyan-400 hover:shadow-[0_4px_0_0_rgb(14,116,144)] active:translate-y-[7px] active:shadow-none"
           )}
         >
           {/* Glossy top-light — sells the extruded/3D read */}

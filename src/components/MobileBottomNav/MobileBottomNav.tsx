@@ -127,17 +127,25 @@ export const MobileBottomNav = ({
         isMenuOpen && "pointer-events-auto"
       )}>
       <div className="mx-auto flex max-w-md items-stretch justify-around gap-0.5">
-        {navItems.map((item) => (
-          <BottomNavItem
-            key={item.href}
-            label={t(item.label)}
-            href={item.href}
-            icon={item.icon}
-            active={!isMenuOpen && isActive(item.href)}
-            onNavigate={onNavigate}
-            showBadge={item.href === "/profile/activity" && hasUnclaimedMilestone}
-          />
-        ))}
+        {navItems.map((item) => {
+          const isProgress = item.href === "/profile/activity";
+          const showBadge = isProgress && hasUnclaimedMilestone;
+          return (
+            <BottomNavItem
+              key={item.href}
+              label={t(item.label)}
+              // The dot means a milestone reward waits — land on it, not on Activity.
+              href={showBadge ? "/summary" : item.href}
+              icon={item.icon}
+              active={
+                !isMenuOpen &&
+                (isActive(item.href) || (isProgress && router.pathname === "/summary"))
+              }
+              onNavigate={onNavigate}
+              showBadge={showBadge}
+            />
+          );
+        })}
 
         <button
           onClick={(e) => {

@@ -1,3 +1,5 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import type { MasteryLevel, SongSection } from "feature/songs/types/songSection.type";
 import { SECTION_COLORS } from "feature/songs/types/songSection.type";
 import { useTranslation } from "hooks/useTranslation";
@@ -54,7 +56,10 @@ export const SectionList = ({
                   key={name}
                   type="button"
                   onClick={() => onAddNamed(name)}
-                  className="px-3 py-1.5 rounded-full bg-white/[0.04] text-xs font-medium text-zinc-400 hover:bg-white/[0.09] hover:text-white transition-colors"
+                  className={cn(
+                    PRESSABLE_KEY,
+                    "px-3 py-1.5 rounded-full bg-zinc-800/60 text-xs font-medium text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
+                  )}
                 >
                   {name}
                 </button>
@@ -90,7 +95,10 @@ export const SectionList = ({
         <button
           type="button"
           onClick={() => onAdd()}
-          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-white/[0.03] text-xs font-medium text-white hover:bg-white/5 transition-all mt-1"
+          className={cn(
+            PRESSABLE_KEY,
+            "w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-zinc-800/60 text-xs font-medium text-white hover:bg-zinc-800 transition-colors mt-1"
+          )}
         >
           <Plus className="h-4 w-4" />
           {t("sections.add")}

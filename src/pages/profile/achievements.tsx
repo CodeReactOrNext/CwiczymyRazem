@@ -1,9 +1,11 @@
 import MainContainer from "components/MainContainer";
 import { PageTabs } from "components/PageTabs/PageTabs";
+import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { AchievementsPanel } from "feature/achievements";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import { useProgressTabs } from "feature/profile/hooks/useProgressTabs";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import { useAppSelector } from "store/hooks";
@@ -17,12 +19,21 @@ import { withAuthInitialProps } from "utils/auth/authInitialProps";
  * carry a motion instance apiece — mounts until a player asks for it.
  */
 const ProfileAchievementsPage = () => {
+  const { t } = useTranslation("achievements");
   const userAuth = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
   const tabs = useProgressTabs();
 
   return (
-    <MainContainer>
+    <MainContainer noBorder>
+      <HeroBanner
+        title={t("page.title")}
+        subtitle={t("page.subtitle")}
+        eyebrow={t("page.eyebrow")}
+        backgroundContent={<HeroPattern />}
+        className='min-h-[140px] w-full !rounded-none !shadow-none md:min-h-[120px] lg:min-h-[160px]'
+      />
+
       <div className='p-4'>
         <div className='mb-6'>
           <PageTabs

@@ -193,7 +193,10 @@
     "no_limit": "Kein Limit",
     "duration": "Dauer",
     "minutes": "{{count}} Min.",
-    "start": "Üben starten"
+    "start": "Üben starten",
+    "desktop_only": "Nur auf diesem Computer",
+    "desktop_only_hint": "Von der Desktop-App auf diesem Computer gespeichert, nicht in der Cloud. Im Browser auf riff.quest und auf anderen Geräten ist die Datei nicht sichtbar.",
+    "quota_desktop": "{{count}} Dateien · auf diesem Computer gespeichert, ohne Größenlimit"
   },
   "tab_editor": {
     "n_quarters": "{{n}} Viertelnoten",

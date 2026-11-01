@@ -1,4 +1,8 @@
-import { Button } from "assets/components/ui/button";
+import {
+  Button,
+  PRESSABLE_IN_GROUP,
+  PRESSABLE_KEY,
+} from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -70,7 +74,7 @@ const CandidateRow = ({
       type='button'
       onClick={onAdd}
       aria-label={label}
-      className='flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800/70'>
+      className='group flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800/70'>
       <RotationThumb
         display={display}
         className='h-10 w-10'
@@ -88,11 +92,13 @@ const CandidateRow = ({
         </span>
       </span>
       <span
+        // The whole row is the button, so the key sinks wherever it is pressed.
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors",
+          PRESSABLE_IN_GROUP,
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border-b-black/40 transition-colors",
           isAdded
-            ? "bg-emerald-500/10 text-emerald-400"
-            : "bg-zinc-800 text-zinc-300",
+            ? "bg-emerald-500/15 text-emerald-400"
+            : "bg-zinc-700 text-zinc-200",
         )}>
         {isAdded ? <Check className='h-4 w-4' /> : <Plus className='h-4 w-4' />}
       </span>
@@ -274,7 +280,8 @@ export const AddItemDialog = ({
                 }}
                 aria-pressed={tab === value}
                 className={cn(
-                  "h-9 shrink-0 rounded-lg px-3.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
+                  PRESSABLE_KEY,
+                  "h-9 shrink-0 rounded-lg px-3.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
                   tab === value
                     ? "bg-zinc-700 text-zinc-100"
                     : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
@@ -348,7 +355,8 @@ export const AddItemDialog = ({
                     aria-checked={customArea === area}
                     onClick={() => setCustomArea(area)}
                     className={cn(
-                      "flex h-9 items-center gap-2 rounded-lg px-3.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
+                      PRESSABLE_KEY,
+                      "flex h-9 items-center gap-2 rounded-lg px-3.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
                       customArea === area
                         ? "bg-zinc-700 text-zinc-100"
                         : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",

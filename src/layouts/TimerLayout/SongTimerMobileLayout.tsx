@@ -1,5 +1,5 @@
 import { Accordion } from "assets/components/ui/accordion";
-import { Button } from "assets/components/ui/button";
+import { Button, PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { SectionTimeline } from "feature/songs/components/SongSections/SectionTimeline";
 import { MarkSectionStrip } from "feature/songs/components/SongSessionMobile/MarkSectionStrip";
@@ -8,6 +8,7 @@ import { SessionTransport } from "feature/songs/components/SongSessionMobile/Ses
 import { YouTubeSongPlayer } from "feature/songs/components/YouTubeSongPlayer";
 import type { SongSectionMapController } from "feature/songs/hooks/useSongSectionMap";
 import type { Song } from "feature/songs/types/songs.type";
+import { SONG_SPEED_FALLBACK } from "feature/songs/utils/youtube.utils";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
 import {
@@ -22,8 +23,6 @@ import { useEffect, useRef, useState } from "react";
 
 import FreeTimerMetronome from "./components/FreeTimerMetronome";
 import { SongNotesCard } from "./components/SongNotesCard";
-
-const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5];
 
 const formatTime = (ms: number) => {
   const totalSeconds = Math.floor(ms / 1000);
@@ -124,6 +123,7 @@ export const SongTimerMobileLayout = ({
   const [isVideoShown, setIsVideoShown] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const [speeds, setSpeeds] = useState(SONG_SPEED_FALLBACK);
   /** The section just marked, while its name and start are still being settled. */
   const [markedId, setMarkedId] = useState<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
@@ -227,6 +227,7 @@ export const SongTimerMobileLayout = ({
           onDurationReady={setDuration}
           onPlay={timer.startTimer}
           playbackRate={speed}
+          onSpeedsChange={setSpeeds}
           onPlayingChange={setIsVideoPlaying}
           onVideoShownChange={setIsVideoShown}
           songTitle={song.title}
@@ -278,15 +279,17 @@ export const SongTimerMobileLayout = ({
             <span className='shrink-0 text-xs font-medium text-zinc-400'>
               {t("youtube_player.speed")}
             </span>
-            <div className='grid flex-1 grid-cols-5 gap-1.5'>
-              {SPEEDS.map((rate) => (
+            {/* As many as the video offers — wraps rather than squeezing. */}
+            <div className='flex flex-1 flex-wrap gap-1.5'>
+              {speeds.map((rate) => (
                 <button
                   key={rate}
                   type='button'
                   onClick={() => setSpeed(rate)}
                   aria-pressed={speed === rate}
                   className={cn(
-                    "h-9 rounded-lg text-xs font-bold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                    PRESSABLE_KEY,
+                    "h-9 min-w-12 flex-1 rounded-lg px-2 text-xs font-bold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                     speed === rate
                       ? "bg-cyan-500/10 text-cyan-400"
                       : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
@@ -330,7 +333,10 @@ export const SongTimerMobileLayout = ({
             playerRef.current?.editVideo();
             topRef.current?.scrollIntoView({ behavior: "smooth" });
           }}
-          className='flex h-12 w-full items-center gap-3 rounded-lg bg-zinc-900/40 px-4 text-sm font-medium text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800/60 hover:text-zinc-100'>
+          className={cn(
+            PRESSABLE_KEY,
+            "flex h-12 w-full items-center gap-3 rounded-lg bg-zinc-800/60 px-4 text-sm font-medium text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100",
+          )}>
           <Pencil className='h-4 w-4 text-zinc-400' />
           {t("youtube.change_link")}
         </button>

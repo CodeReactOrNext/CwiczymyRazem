@@ -1,3 +1,4 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { MasteryLevel } from "feature/songs/types/songSection.type";
 import { MASTERY_LABELS } from "feature/songs/types/songSection.type";
@@ -64,8 +65,11 @@ export const MasteryBadge = ({
         type='button'
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "flex w-28 items-center justify-center gap-1 whitespace-nowrap rounded-lg px-2 py-0.5 text-center text-xs font-medium transition-colors",
+          PRESSABLE_KEY,
+          "flex w-28 items-center justify-center gap-1 whitespace-nowrap rounded-lg px-2 py-1 text-center text-xs font-medium transition-colors",
           MASTERY_STYLES[mastery],
+          // A key needs a face; "Not learned" has none of its own.
+          mastery === 0 && "bg-zinc-800/60 hover:bg-zinc-800",
         )}>
         {t(`sections.mastery_${mastery}`, MASTERY_LABELS[mastery])}
         <ChevronDown

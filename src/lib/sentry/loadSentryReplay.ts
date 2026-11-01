@@ -1,5 +1,4 @@
-import * as Sentry from "@sentry/nextjs";
-
+import { loadSentry } from "./sentryClient";
 import { SENTRY_ENABLED } from "./sentryOptions";
 
 let requested = false;
@@ -11,7 +10,7 @@ let requested = false;
  * public pages, which are where search visitors land and where load speed
  * matters for ranking. It is fetched from Sentry's CDN once the browser is idle,
  * so it never competes with the first render. Sample rates come from
- * `Sentry.init` in instrumentation-client. Errors thrown before it arrives are
+ * `Sentry.init` in ./sentryClient. Errors thrown before it arrives are
  * still reported, only without a replay attached.
  */
 export function loadSentryReplay(): void {
@@ -19,8 +18,12 @@ export function loadSentryReplay(): void {
   requested = true;
 
   const load = () => {
-    Sentry.lazyLoadIntegration("replayIntegration")
-      .then((replayIntegration) => Sentry.addIntegration(replayIntegration()))
+    loadSentry()
+      ?.then(async (Sentry) => {
+        const replayIntegration =
+          await Sentry.lazyLoadIntegration("replayIntegration");
+        Sentry.addIntegration(replayIntegration());
+      })
       .catch(() => {
         // Blocked by an ad blocker or offline: replay is optional.
         requested = false;

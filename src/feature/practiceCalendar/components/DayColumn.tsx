@@ -134,7 +134,8 @@ export const DayColumn = ({
             <Button
               onClick={onPlay}
               className={cn(
-                "h-11 flex-1 rounded-lg px-3 text-sm focus-visible:ring-1 focus-visible:ring-zinc-400 lg:h-9 lg:text-[13px]",
+                // Button wraps its children in a span, so the gap goes there.
+                "h-11 flex-1 rounded-lg px-3 text-sm focus-visible:ring-1 focus-visible:ring-zinc-400 lg:h-9 lg:text-[13px] [&>span]:gap-2",
                 isToday
                   ? "border-b-black/25 bg-white text-zinc-950 hover:bg-zinc-200"
                   : "border-b-black/40 bg-zinc-800 text-zinc-100 hover:bg-zinc-700",
