@@ -69,6 +69,18 @@ export const MCP_CHARACTER_LIMIT = 25_000;
  * dropped — a misspelt filter would otherwise come back as unfiltered results
  * the model takes for filtered ones.
  */
+/**
+ * A Firestore document id from the model. A "/" would make it a path into a
+ * subcollection (`songs/<id>/<sub>/<doc>`), and every tool would then read or
+ * write a document it was never meant to, so ids with one are refused.
+ */
+export const docId = () =>
+  z
+    .string()
+    .min(1)
+    .max(120)
+    .regex(/^[^/]+$/, "An id never contains \"/\"");
+
 export const strictInput = <T extends z.ZodRawShape>(shape: T) =>
   z.object(shape).strict();
 

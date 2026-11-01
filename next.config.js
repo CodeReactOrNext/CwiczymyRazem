@@ -472,6 +472,16 @@ const nextConfig = {
           },
         ],
       },
+      // The OAuth consent screen is never framed by anyone, not even the
+      // analytics replay above: an Allow button inside someone else's page is a
+      // clickjacking target. Listed last, so it overrides the rule above.
+      {
+        source: "/oauth/:path*",
+        headers: [
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "X-Frame-Options", value: "DENY" },
+        ],
+      },
     ];
   },
 };

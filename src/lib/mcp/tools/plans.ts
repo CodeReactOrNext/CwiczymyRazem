@@ -19,6 +19,7 @@ import { exercisesById, readOwnExercise, userRef } from "../data";
 import { firestore } from "../db";
 import {
   appLink,
+  docId,
   errorResult,
   IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
   jsonResult,
@@ -43,14 +44,14 @@ const planItem = z.discriminatedUnion("type", [
   z
     .object({
       type: z.literal("exercise"),
-      id: z.string().min(1).max(120).describe("Library or own exercise id"),
+      id: docId().describe("Library or own exercise id"),
       minutes: z.number().int().min(1).max(60).optional(),
     })
     .strict(),
   z
     .object({
       type: z.literal("song"),
-      songId: z.string().min(1).max(120),
+      songId: docId(),
       minutes: z.number().int().min(1).max(60).optional(),
       mode: z
         .enum(["gp", "sections"])
@@ -267,7 +268,7 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
       description:
         "Changes one of the player's plans; `items` replaces the whole list.",
       inputSchema: strictInput({
-        planId: z.string().min(1).max(120),
+        planId: docId(),
         title: z.string().min(1).max(80).optional(),
         description: z.string().max(500).optional(),
         items: z.array(planItem).min(1).max(MAX_PLAN_ITEMS).optional(),
@@ -316,7 +317,7 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
       description:
         "Puts a library song on the player's list as wantToLearn or learning. Marking it learned stays in the app, where it awards points.",
       inputSchema: strictInput({
-        songId: z.string().min(1).max(120),
+        songId: docId(),
         status: z.enum(["wantToLearn", "learning"]),
       }),
       annotations: IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
@@ -389,7 +390,7 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
       description:
         "Opens a tempo goal on a mic-scored exercise: milestones from startBpm to targetBpm, 3 clean runs each. An open goal on the exercise is returned as it is.",
       inputSchema: strictInput({
-        exerciseId: z.string().min(1).max(120),
+        exerciseId: docId(),
         targetBpm: z.number().int().min(20).max(400),
         startBpm: z
           .number()

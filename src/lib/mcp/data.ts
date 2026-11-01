@@ -99,15 +99,22 @@ export async function exerciseExists(uid: string, id: string) {
   return !!data && (data.authorId === uid || data.isPublic === true);
 }
 
-/** An exercise's title: the library's, or the community exercise's; null when gone. */
-export async function exerciseTitle(id: string): Promise<string | null> {
+/**
+ * An exercise's title: the library's, or a community exercise the player may
+ * see (their own, or published); null when gone or someone else's private one.
+ */
+export async function exerciseTitle(
+  uid: string,
+  id: string,
+): Promise<string | null> {
   const library = exercisesById.get(id);
   if (library) return library.title;
   const docId = communityDocId(id) ?? id;
   const data = (
     await firestore.collection(COMMUNITY_EXERCISES).doc(docId).get()
   ).data();
-  return (data?.title as string | undefined) ?? null;
+  if (!data || (data.authorId !== uid && data.isPublic !== true)) return null;
+  return (data.title as string | undefined) ?? null;
 }
 
 /**

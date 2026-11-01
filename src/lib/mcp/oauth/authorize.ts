@@ -142,6 +142,7 @@ export const describeAuthorization = (request: ValidAuthorization) => ({
     request.client.kind === "cimd"
       ? new URL(request.client.clientId).host
       : null,
+  unverifiedName: request.client.kind === "dcr",
   redirectHost: new URL(request.redirectUri).host,
   loopback: isLoopbackOnly([request.redirectUri]),
   scopes: request.scopes,

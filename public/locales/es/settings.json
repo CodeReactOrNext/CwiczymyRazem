@@ -164,6 +164,8 @@
     "sign_in": "Inicia sesión para continuar",
     "invalid_title": "Esta solicitud de conexión no es válida",
     "invalid_description": "Vuelve a la app e inténtalo de nuevo. Si sigue pasando, puede que la app aún no sea compatible con riff.quest.",
-    "error": "Algo salió mal. Inténtalo de nuevo."
+    "error": "Algo salió mal. Inténtalo de nuevo.",
+    "unverified_name": "La app eligió este nombre ella misma; riff.quest no puede confirmarlo. Revisa la dirección a la que vuelves.",
+    "back_to": "Volver a {{host}}"
   }
 }

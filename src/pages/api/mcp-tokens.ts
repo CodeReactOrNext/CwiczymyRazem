@@ -39,7 +39,9 @@ export default async function handler(
 
   let uid: string;
   try {
-    uid = (await auth.verifyIdToken(idToken)).uid;
+    // checkRevoked: a session ended with "sign out everywhere" or a password
+    // change can't mint a token that would outlive it.
+    uid = (await auth.verifyIdToken(idToken, true)).uid;
   } catch {
     return res.status(401).json({ error: "Unauthorized" });
   }

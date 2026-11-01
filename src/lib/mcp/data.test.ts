@@ -1,4 +1,3 @@
-import { FieldValue } from "firebase-admin/firestore";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("utils/firebase/api/firebase.config", () => ({
@@ -6,13 +5,7 @@ vi.mock("utils/firebase/api/firebase.config", () => ({
   auth: {},
 }));
 
-import {
-  countRequest,
-  countWrite,
-  MCP_EXERCISES_PER_DAY,
-  MCP_REQUESTS_PER_MINUTE,
-  MCP_WRITES_PER_DAY,
-} from "./auth";
+import { countWrite, MCP_EXERCISES_PER_DAY, MCP_WRITES_PER_DAY } from "./auth";
 import {
   countUserSongs,
   logDay,
@@ -190,33 +183,6 @@ describe("days in the player's time zone", () => {
     expect(todayIn("Asia/Tokyo", new Date("2026-10-31T16:00:00Z"))).toBe(
       "2026-11-01",
     );
-  });
-});
-
-describe("countRequest", () => {
-  const now = new Date("2026-10-31T12:00:30Z");
-  const bucket = Math.floor(now.getTime() / 60_000);
-
-  it("starts a new minute with a plain write and counts within it atomically", () => {
-    expect(countRequest(undefined, now)).toEqual({
-      allowed: true,
-      update: { minute: { bucket, count: 1 } },
-    });
-    expect(countRequest({ bucket: bucket - 1, count: 99 }, now)).toEqual({
-      allowed: true,
-      update: { minute: { bucket, count: 1 } },
-    });
-    const same = countRequest({ bucket, count: 5 }, now);
-    expect(same).toEqual({
-      allowed: true,
-      update: { "minute.count": FieldValue.increment(1) },
-    });
-  });
-
-  it("refuses once the minute is used up", () => {
-    expect(
-      countRequest({ bucket, count: MCP_REQUESTS_PER_MINUTE }, now),
-    ).toEqual({ allowed: false });
   });
 });
 

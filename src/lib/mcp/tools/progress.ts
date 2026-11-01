@@ -20,6 +20,7 @@ import {
 } from "../data";
 import {
   appLink,
+  docId,
   errorResult,
   fittedResult,
   jsonResult,
@@ -492,7 +493,7 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
       description:
         "The player's scored runs of one exercise (newest last, default 40): tempo, accuracy and timing.",
       inputSchema: strictInput({
-        exerciseId: z.string().min(1).max(120),
+        exerciseId: docId(),
         limit: z
           .number()
           .int()
@@ -618,7 +619,7 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
               .filter((run) => todayIn(zone, new Date(run.at)) >= from);
             return {
               exerciseId,
-              title: runs.length ? await exerciseTitle(exerciseId) : null,
+              title: runs.length ? await exerciseTitle(uid, exerciseId) : null,
               runs,
             };
           }),

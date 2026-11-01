@@ -107,6 +107,11 @@ vi.mock("utils/firebase/api/firebase.config", () => ({
   firestore: fakeFirestore,
   auth: {},
 }));
+// The real fetcher opens sockets; its own checks are tested in cimdFetch.test.ts.
+vi.mock("./cimdFetch", () => ({
+  CimdFetchError: class extends Error {},
+  fetchPublicJson: vi.fn(),
+}));
 vi.mock("dns/promises", () => ({
   lookup: vi.fn(async (host: string) =>
     host === "internal.example"
@@ -115,7 +120,9 @@ vi.mock("dns/promises", () => ({
   ),
 }));
 
-const { authenticateMcpRequest } = await import("../auth");
+const { fetchPublicJson } = await import("./cimdFetch");
+const { authenticateMcpRequest, MCP_REQUESTS_PER_MINUTE } =
+  await import("../auth");
 const {
   checkAuthorizationRequest,
   decideAuthorization,
@@ -251,10 +258,13 @@ describe("OAuth flow, as claude.ai runs it", () => {
     const client = await registerClient({
       redirect_uris: ["https://claude.ai/api/mcp/auth_callback"],
     });
-    const { code, verifier } = await connect(
+    const { code, verifier, tokens } = await connect(
       client.client_id,
       "https://claude.ai/api/mcp/auth_callback",
     );
+    expect(
+      (await authenticateMcpRequest(mcpRequest(tokens.access_token))).ok,
+    ).toBe(true);
     await expect(
       exchangeAuthorizationCode({
         code,
@@ -263,6 +273,11 @@ describe("OAuth flow, as claude.ai runs it", () => {
         codeVerifier: verifier,
       }),
     ).rejects.toMatchObject({ code: "invalid_grant" });
+    // the code came back, so it leaked: what it was exchanged for is revoked
+    expect(
+      (await authenticateMcpRequest(mcpRequest(tokens.access_token))).ok,
+    ).toBe(false);
+    expect(await listConnectedApps("player-1")).toEqual([]);
 
     // a fresh code with the wrong verifier is refused — and spent all the same
     const { challenge } = pkcePair();
@@ -398,6 +413,36 @@ describe("OAuth flow, as claude.ai runs it", () => {
       error: "Token expired",
     });
   });
+
+  it("limits requests per player and minute, across all their tokens", async () => {
+    const client = await registerClient({
+      redirect_uris: ["https://claude.ai/api/mcp/auth_callback"],
+    });
+    const redirect = "https://claude.ai/api/mcp/auth_callback";
+    const first = await connect(client.client_id, redirect);
+    const second = await connect(client.client_id, redirect);
+    const minute = new Date("2026-11-01T12:00:10Z");
+    const call = (token: string, at = minute) =>
+      authenticateMcpRequest(mcpRequest(token), at);
+
+    // half from each connection: a second connection doesn't double the limit
+    for (let i = 0; i < MCP_REQUESTS_PER_MINUTE; i++) {
+      const token =
+        i % 2 ? first.tokens.access_token : second.tokens.access_token;
+      expect((await call(token)).ok).toBe(true);
+    }
+    expect(await call(first.tokens.access_token)).toMatchObject({
+      ok: false,
+      status: 429,
+    });
+    expect(await call(second.tokens.access_token)).toMatchObject({
+      ok: false,
+      status: 429,
+    });
+    // a new minute starts from zero
+    const next = new Date("2026-11-01T12:01:05Z");
+    expect((await call(first.tokens.access_token, next)).ok).toBe(true);
+  });
 });
 
 describe("authorization request checks", () => {
@@ -472,31 +517,26 @@ describe("Client ID Metadata Documents", () => {
   const CLAUDE_CODE = "https://claude.ai/oauth/claude-code-client-metadata";
 
   beforeEach(() => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(
-        async (url: string) =>
-          new Response(
-            JSON.stringify({
-              client_id: url,
-              client_name: "Claude Code",
-              redirect_uris: [
-                "http://localhost/callback",
-                "http://127.0.0.1/callback",
-              ],
-              token_endpoint_auth_method: "none",
-            }),
-            { status: 200 },
-          ),
-      ),
-    );
+    vi.mocked(fetchPublicJson).mockReset();
+    vi.mocked(fetchPublicJson).mockImplementation(async (url: string) => ({
+      status: 200,
+      text: JSON.stringify({
+        client_id: url,
+        client_name: "Claude Code",
+        redirect_uris: [
+          "http://localhost/callback",
+          "http://127.0.0.1/callback",
+        ],
+        token_endpoint_auth_method: "none",
+      }),
+    }));
   });
 
   it("fetches, validates and caches the document, and matches loopback on any port", async () => {
     const client = await resolveClient(CLAUDE_CODE);
     expect(client).toMatchObject({ kind: "cimd", name: "Claude Code" });
     await resolveClient(CLAUDE_CODE);
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetchPublicJson).toHaveBeenCalledTimes(1);
 
     const { tokens, check } = await connect(
       CLAUDE_CODE,
@@ -520,18 +560,17 @@ describe("Client ID Metadata Documents", () => {
     await expect(resolveClient("http://claude.ai/client.json")).rejects.toThrow(
       /unknown client_id/,
     );
-    expect(fetch).not.toHaveBeenCalled();
+    expect(fetchPublicJson).not.toHaveBeenCalled();
   });
 
   it("rejects a document whose client_id isn't its own URL", async () => {
-    vi.mocked(fetch).mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({
-          client_id: "https://other.example/x",
-          redirect_uris: ["https://a.example/cb"],
-        }),
-      ),
-    );
+    vi.mocked(fetchPublicJson).mockResolvedValueOnce({
+      status: 200,
+      text: JSON.stringify({
+        client_id: "https://other.example/x",
+        redirect_uris: ["https://a.example/cb"],
+      }),
+    });
     await expect(
       resolveClient("https://claude.ai/fake-metadata"),
     ).rejects.toThrow(/doesn't match/);

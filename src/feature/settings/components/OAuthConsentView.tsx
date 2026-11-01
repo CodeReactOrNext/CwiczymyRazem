@@ -16,6 +16,8 @@ interface ConsentRequest {
   clientName: string;
   clientUri: string | null;
   clientHost: string | null;
+  /** Registered on the spot (DCR): the name is whatever the app typed in. */
+  unverifiedName: boolean;
   redirectHost: string;
   loopback: boolean;
   scopes: ("read" | "write")[];
@@ -46,7 +48,8 @@ export const OAuthConsentView = () => {
   const router = useRouter();
   const [described, setDescribed] = useState<Described | null>(null);
   const [user, setUser] = useState<User | null | undefined>(undefined);
-  const [allowWrite, setAllowWrite] = useState(true);
+  // Off until the player turns it on: reading is the safe default.
+  const [allowWrite, setAllowWrite] = useState(false);
   const [busy, setBusy] = useState(false);
   // Connecting is a supporter perk; known per signed-in player, so a switch of
   // account never shows the previous answer.
@@ -65,9 +68,10 @@ export const OAuthConsentView = () => {
         params: queryParams(router.query),
       })
       .then(({ data }) => {
-        // a request that is wrong but trustworthy goes straight back to the app
-        if ("redirect" in data) window.location.replace(data.redirect);
-        else setDescribed(data);
+        // A wrong request from a known app goes back to it — but only on the
+        // player's click: any site can register an app with its own redirect,
+        // and bouncing on load would make this page an open redirector.
+        setDescribed(data);
       })
       .catch((error) =>
         setDescribed({
@@ -143,6 +147,8 @@ export const OAuthConsentView = () => {
   const request =
     described && "request" in described ? described.request : null;
   const error = described && "error" in described ? described.error : null;
+  const bounce =
+    described && "redirect" in described ? described.redirect : null;
 
   return (
     <main className='flex min-h-screen items-center justify-center bg-zinc-950 px-4 py-16'>
@@ -160,6 +166,21 @@ export const OAuthConsentView = () => {
         {!described || user === undefined ? (
           <div className='flex justify-center py-8'>
             <Loader2 className='h-6 w-6 animate-spin text-zinc-500' />
+          </div>
+        ) : bounce ? (
+          <div className='space-y-4'>
+            <h1 className='text-xl font-bold text-zinc-100'>
+              {t("oauth.invalid_title")}
+            </h1>
+            <p className='text-sm text-zinc-400'>
+              {t("oauth.invalid_description")}
+            </p>
+            <Button
+              variant='ghost'
+              className='w-full'
+              onClick={() => window.location.assign(bounce)}>
+              {t("oauth.back_to", { host: new URL(bounce).host })}
+            </Button>
           </div>
         ) : error ? (
           <div className='space-y-3'>
@@ -194,6 +215,9 @@ export const OAuthConsentView = () => {
                   {t("oauth.published_by")}{" "}
                   <span className='font-mono'>{request.clientHost}</span>
                 </p>
+              )}
+              {request.unverifiedName && (
+                <p className='text-amber-300'>{t("oauth.unverified_name")}</p>
               )}
               {request.loopback && (
                 <p className='text-amber-300'>{t("oauth.loopback_warning")}</p>

@@ -18,10 +18,12 @@ AI client ──POST JSON-RPC, Authorization: Bearer rq_…──▶ src/app/api
                                                              └─ lib/mcp/results.ts   answers, annotations, paging, size limit, errors
 ```
 
-The rate limit is one read and one write per request, without a transaction:
-an atomic increment on the token's minute counter (`countRequest` in
-`auth.ts`). A client calling tools in parallel would otherwise have its
-transactions on the one token doc collide and retry.
+The rate limit is per player, not per token (`withinRequestLimit` in
+`auth.ts`): one doc per player and minute, `mcpRateLimits/{uid}_{minute}`,
+counted in a transaction. A plain read-then-increment let parallel requests
+all read the same count and pass; a burst so dense the transaction gives up
+retrying counts as over the limit. Per player, so connecting the same account
+again and again doesn't multiply it.
 
 - **No tool takes a user id.** The Admin SDK bypasses `firestore.rules`, so the
   `uid` from the token is the only access control. Keep it that way.
@@ -48,7 +50,9 @@ transactions on the one token doc collide and retry.
   `oauthCodes`, plus the doc `mcpUsage/{uid}`.
 - Tokens: `mcpTokens/{sha256(token)}`, created in Settings → AI assistants
   (`/api/mcp-tokens`). The token is shown once; only the hash is stored. Up to 5
-  per player, read-only or read + write.
+  per player, read-only or read + write, each valid for a year. Creating one
+  (and approving the consent screen) verifies the Firebase id token with
+  `checkRevoked`, so an ended session can't mint access that outlives it.
 - Daily write limits per player: `mcpUsage/{uid}` — 20 changes, of which 10 new
   exercises. Every write answer carries `changesLeftToday` and
   `newExercisesLeftToday` (`countWrite` in `auth.ts`), so a client knows before
@@ -225,9 +229,9 @@ browser──GET  /oauth/authorize?…──▶ consent screen (login if needed)
 | Piece | Where |
 | --- | --- |
 | Metadata | `src/app/.well-known/*/route.ts`, built in `lib/mcp/oauth/config.ts` from the request origin (works on previews and localhost) |
-| Clients | `lib/mcp/oauth/clients.ts` — CIMD fetched with an SSRF guard (https, default port, DNS name resolving only to public IPs, 5 s, 64 KB) and cached 1 h; DCR stored as `rqc_…` |
-| Consent | `/oauth/authorize` (`feature/settings/components/OAuthConsentView.tsx`) + `/api/oauth/authorize` — the request is checked on `describe` and again on `decide`; the redirect host is always shown, with a warning for loopback-only clients |
-| Codes & tokens | `lib/mcp/oauth/grants.ts` — one-time codes (5 min), access tokens in `mcpTokens` with `grantId` / `expiresAt` / `resource`, refresh tokens rotated on every use; a reused refresh token revokes the whole grant |
+| Clients | `lib/mcp/oauth/clients.ts` — CIMD fetched by `cimdFetch.ts`: https on the default port, no redirects, 5 s for the whole exchange, body cut off past 64 KB, and the public-address check runs inside the socket's own DNS lookup (no DNS-rebinding gap between check and connect); only global unicast addresses pass (`isPublicAddress`). Cached 1 h; lookups from the consent endpoint are limited to 60 per IP and hour. DCR stored as `rqc_…`; client names lose control and bidi characters |
+| Consent | `/oauth/authorize` (`feature/settings/components/OAuthConsentView.tsx`) + `/api/oauth/authorize` — the request is checked on `describe` and again on `decide`; the redirect host is always shown, with a warning for loopback-only clients and for DCR clients (their name is self-chosen); writes are off until the player turns them on. A wrong request from a known client goes back to it only on the player's click — never on load, or the page would be an open redirector for any registered redirect. Never framed: `frame-ancestors 'none'` + `X-Frame-Options: DENY` on `/oauth/*` (next.config.js) |
+| Codes & tokens | `lib/mcp/oauth/grants.ts` — one-time codes (5 min), access tokens in `mcpTokens` with `grantId` / `expiresAt` / `resource`, refresh tokens rotated on every use; a reused refresh token or a reused code revokes the whole grant (a spent code stays as a tombstone with its `grantId` until it would have expired) |
 | Settings | Settings → AI assistants lists connected apps; Disconnect kills their tokens at once |
 
 Redirect URIs: exact match, except loopback (`localhost`, `127.0.0.1`), where
@@ -236,9 +240,10 @@ hosted Claude apps use `https://claude.ai/api/mcp/auth_callback`.
 
 New collections, all Admin SDK only and covered by the default deny in
 `firestore.rules`: `oauthClients`, `oauthCodes`, `oauthGrants`,
-`oauthRefreshTokens`, `oauthRateLimits`. No env variables. Expired codes and
-spent refresh tokens stay behind; a Firestore TTL policy on `expiresAt` for
-`oauthCodes` and `oauthRefreshTokens` would clean them up.
+`oauthRefreshTokens`, `oauthRateLimits`, plus `mcpRateLimits`. No env variables.
+Expired docs stay behind until a Firestore TTL policy on `expiresAt` is set
+(console → Firestore → TTL) for `oauthCodes`, `oauthRefreshTokens`,
+`mcpTokens` and `mcpRateLimits` — not configured from code.
 
 A player who has to sign in on the consent screen is sent back to it after
 login (`lib/mcp/oauth/postLoginRedirect.ts`, read in the login thunk).

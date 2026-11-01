@@ -54,6 +54,17 @@ interface CodeDoc {
   expiresAt: Timestamp;
 }
 
+/**
+ * What a code becomes once exchanged: kept until it would have expired, so a
+ * second attempt with it is recognised — and the grant it produced revoked.
+ */
+interface SpentCodeDoc {
+  usedAt: Timestamp;
+  /** The grant the one successful exchange made; absent if it was refused. */
+  grantId?: string;
+  expiresAt: Timestamp;
+}
+
 interface GrantDoc {
   uid: string;
   clientId: string;
@@ -168,7 +179,25 @@ function issueTokens(
   return { response, accessTokenId, refreshTokenId };
 }
 
-/** grant_type=authorization_code. The code is spent whatever the outcome. */
+/** Revokes a grant and its live tokens inside a transaction. */
+function revokeInTransaction(
+  transaction: Transaction,
+  grantId: string,
+  grant: GrantDoc,
+  now: number,
+) {
+  transaction.update(grants().doc(grantId), {
+    revokedAt: Timestamp.fromMillis(now),
+  });
+  transaction.delete(accessTokens().doc(grant.accessTokenId));
+  transaction.delete(refreshTokens().doc(grant.refreshTokenId));
+}
+
+/**
+ * grant_type=authorization_code. The code is spent whatever the outcome, and a
+ * spent code coming back means it leaked: the grant it made is revoked
+ * (OAuth 2.1 §4.1.3).
+ */
 export async function exchangeAuthorizationCode(
   input: {
     code: string;
@@ -186,16 +215,35 @@ export async function exchangeAuthorizationCode(
   const outcome = await firestore.runTransaction(
     async (transaction): Promise<TokenResponse | OAuthGrantError> => {
       const snapshot = await transaction.get(codeRef);
-      const code = snapshot.data() as CodeDoc | undefined;
-      if (!code)
+      const stored = snapshot.data() as CodeDoc | SpentCodeDoc | undefined;
+      if (!stored || "usedAt" in stored) {
+        if (stored?.grantId) {
+          const grantRef = grants().doc(stored.grantId);
+          const grant = (await transaction.get(grantRef)).data() as
+            | GrantDoc
+            | undefined;
+          if (grant && !grant.revokedAt)
+            revokeInTransaction(transaction, stored.grantId, grant, now);
+        }
         return new OAuthGrantError(
           "invalid_grant",
           "unknown or already used code",
         );
-      transaction.delete(codeRef);
+      }
+      const code = stored;
+      const spend = (grantId?: string) => {
+        const spent: SpentCodeDoc = {
+          usedAt: Timestamp.fromMillis(now),
+          expiresAt: code.expiresAt,
+          ...(grantId ? { grantId } : {}),
+        };
+        transaction.set(codeRef, spent);
+      };
 
-      const fail = (message: string) =>
-        new OAuthGrantError("invalid_grant", message);
+      const fail = (message: string) => {
+        spend();
+        return new OAuthGrantError("invalid_grant", message);
+      };
       if (code.expiresAt.toMillis() < now) return fail("code expired");
       if (code.clientId !== input.clientId)
         return fail("code was issued to another client");
@@ -224,26 +272,13 @@ export async function exchangeAuthorizationCode(
         refreshTokenId: tokens.refreshTokenId,
       };
       transaction.set(grantRef, grant);
+      spend(grantRef.id);
       return tokens.response;
     },
   );
 
   if (outcome instanceof OAuthGrantError) throw outcome;
   return outcome;
-}
-
-/** Revokes a grant and its live tokens inside a transaction. */
-function revokeInTransaction(
-  transaction: Transaction,
-  grantId: string,
-  grant: GrantDoc,
-  now: number,
-) {
-  transaction.update(grants().doc(grantId), {
-    revokedAt: Timestamp.fromMillis(now),
-  });
-  transaction.delete(accessTokens().doc(grant.accessTokenId));
-  transaction.delete(refreshTokens().doc(grant.refreshTokenId));
 }
 
 /**

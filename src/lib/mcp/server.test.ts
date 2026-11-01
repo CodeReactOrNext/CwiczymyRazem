@@ -12,6 +12,7 @@ vi.mock("utils/firebase/api/firebase.config", () => ({
 }));
 
 import { TAB_FORMAT_GUIDE } from "./content/tabFormat";
+import { firestore } from "./db";
 import { createRiffQuestMcpServer } from "./server";
 import { checkTab, tabSchema } from "./tablature/tabJson";
 import { exerciseDetails, exerciseDetailsShape } from "./tools/catalog";
@@ -330,5 +331,41 @@ describe("tab format guide", () => {
     const { validation } = checkTab(tabSchema.parse(JSON.parse(example!)));
     expect(validation.errors).toEqual([]);
     expect(validation.warnings).toEqual([]);
+  });
+});
+
+describe("ids from the model", () => {
+  let client: Client;
+
+  beforeEach(async () => {
+    const server = createRiffQuestMcpServer({
+      uid: "player-1",
+      tokenId: "t",
+      scopes: ["read", "write"],
+    });
+    const [clientSide, serverSide] = InMemoryTransport.createLinkedPair();
+    await server.connect(serverSide);
+    client = new Client({ name: "test", version: "1.0.0" });
+    await client.connect(clientSide);
+  });
+
+  afterEach(async () => {
+    await client.close();
+  });
+
+  // A "/" turns a document id into a path into a subcollection
+  // (songs/<id>/<sub>/<doc>), so every id from the model is refused with one
+  // before any tool reaches the database.
+  it.each([
+    ["riffquest_get_song", { id: "song-1/ratings/someone" }],
+    ["riffquest_add_song_to_list", { songId: "a/b/c", status: "learning" }],
+    ["riffquest_get_exercise_stats", { exerciseId: "x/runs/y" }],
+    ["riffquest_get_exercise_tablature", { id: "community-a/b/c" }],
+  ])("refuses an id with a slash in %s", async (name, args) => {
+    vi.mocked(firestore.collection).mockClear();
+    const result = await client.callTool({ name, arguments: args });
+    expect(result.isError).toBe(true);
+    expect(textOf(result)).toMatch(/never contains/);
+    expect(firestore.collection).not.toHaveBeenCalled();
   });
 });

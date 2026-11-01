@@ -164,6 +164,8 @@
     "sign_in": "Zum Fortfahren anmelden",
     "invalid_title": "Diese Verbindungsanfrage ist ungültig",
     "invalid_description": "Geh zurück zur App und versuch es noch einmal. Wenn das weiter passiert, unterstützt die App riff.quest vielleicht noch nicht.",
-    "error": "Etwas ist schiefgelaufen. Versuch es noch einmal."
+    "error": "Etwas ist schiefgelaufen. Versuch es noch einmal.",
+    "unverified_name": "Die App hat sich diesen Namen selbst gegeben; riff.quest kann ihn nicht bestätigen. Prüf die Adresse, zu der du zurückkommst.",
+    "back_to": "Zurück zu {{host}}"
   }
 }

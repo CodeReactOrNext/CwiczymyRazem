@@ -31,18 +31,25 @@ export interface McpTokenDoc {
   createdAt: Timestamp;
   lastUsedAt: Timestamp | null;
   revokedAt: Timestamp | null;
-  /** Requests in the current minute, for the rate limit. */
-  minute?: { bucket: number; count: number };
   /** Set on access tokens issued through OAuth: the connected app they belong to. */
   grantId?: string;
-  /** OAuth access tokens expire; personal tokens don't. */
+  /** OAuth access tokens: an hour. Personal tokens: a year (older ones have none). */
   expiresAt?: Timestamp;
   /** OAuth: the MCP server URL the token was issued for (RFC 8707 audience). */
   resource?: string;
 }
 
+/**
+ * A personal token lives a year: a token that leaked with a stolen session
+ * shouldn't keep working forever after the session itself is gone.
+ */
+export const PERSONAL_TOKEN_TTL_MS = 365 * 24 * 60 * 60 * 1000;
+
 /** Personal tokens only — OAuth access tokens are listed as connected apps instead. */
 const isPersonal = (doc: McpTokenDoc) => !doc.grantId;
+
+const isLive = (doc: McpTokenDoc, now = Date.now()) =>
+  !doc.expiresAt || doc.expiresAt.toMillis() > now;
 
 /** What the settings page lists — never the token or its hash's full form. */
 export interface McpTokenSummary {
@@ -82,9 +89,10 @@ export async function createMcpToken(
     .where("uid", "==", uid)
     .where("revokedAt", "==", null)
     .get();
-  const personal = active.docs.filter((doc) =>
-    isPersonal(doc.data() as McpTokenDoc),
-  );
+  const personal = active.docs.filter((doc) => {
+    const data = doc.data() as McpTokenDoc;
+    return isPersonal(data) && isLive(data);
+  });
   if (personal.length >= MAX_TOKENS_PER_USER) throw new McpTokenLimitError();
 
   const token = `${TOKEN_PREFIX}${randomBytes(32).toString("base64url")}`;
@@ -97,6 +105,7 @@ export async function createMcpToken(
     createdAt: Timestamp.now(),
     lastUsedAt: null,
     revokedAt: null,
+    expiresAt: Timestamp.fromMillis(Date.now() + PERSONAL_TOKEN_TTL_MS),
   };
   await tokens().doc(id).set(doc);
   return { token, summary: toSummary(id, doc) };
@@ -108,7 +117,10 @@ export async function listMcpTokens(uid: string): Promise<McpTokenSummary[]> {
     .where("revokedAt", "==", null)
     .get();
   return snapshot.docs
-    .filter((doc) => isPersonal(doc.data() as McpTokenDoc))
+    .filter((doc) => {
+      const data = doc.data() as McpTokenDoc;
+      return isPersonal(data) && isLive(data);
+    })
     .map((doc) => toSummary(doc.id, doc.data() as McpTokenDoc))
     .sort((a, b) => b.createdAt - a.createdAt);
 }

@@ -164,6 +164,8 @@
     "sign_in": "Sign in to continue",
     "invalid_title": "This connection request isn't valid",
     "invalid_description": "Go back to the app and try connecting again. If it keeps happening, the app may not support riff.quest yet.",
-    "error": "Something went wrong. Try again."
+    "error": "Something went wrong. Try again.",
+    "unverified_name": "The app chose this name itself; riff.quest can't confirm it. Check the address it sends you back to.",
+    "back_to": "Back to {{host}}"
   }
 }

@@ -4,10 +4,20 @@ import {
   decideAuthorization,
   describeAuthorization,
 } from "lib/mcp/oauth/authorize";
+import { isCimdClientId } from "lib/mcp/oauth/clients";
 import { requestOrigin } from "lib/mcp/oauth/config";
+import { withinIpLimit } from "lib/mcp/oauth/http";
 import { MCP_SUPPORTERS_ONLY_ERROR, readMcpAccess } from "lib/mcp/supporter";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth } from "utils/firebase/api/firebase.config";
+
+/**
+ * Looking up a URL client_id (CIMD) can make riff.quest fetch that URL, and
+ * this endpoint needs no account — so per IP it gets a ceiling. A player's
+ * browser opens the screen a handful of times; a script fanning out fetches
+ * through riff.quest hits this.
+ */
+const CIMD_LOOKUPS_PER_HOUR = 60;
 
 const PARAM_NAMES = [
   "response_type",
@@ -60,7 +70,15 @@ export default async function handler(
   const origin = requestOrigin(req.headers);
 
   try {
-    const check = await checkAuthorizationRequest(readParams(params), origin);
+    const request = readParams(params);
+    if (
+      request.client_id &&
+      isCimdClientId(request.client_id) &&
+      !(await withinIpLimit(req, "cimd", CIMD_LOOKUPS_PER_HOUR))
+    ) {
+      return res.status(429).json({ error: "Too many requests — try later" });
+    }
+    const check = await checkAuthorizationRequest(request, origin);
     if (!check.ok) {
       return check.fatal
         ? res.status(400).json({ error: check.error })
@@ -78,7 +96,8 @@ export default async function handler(
     if (!idToken) return res.status(401).json({ error: "Unauthorized" });
     let uid: string;
     try {
-      uid = (await auth.verifyIdToken(idToken)).uid;
+      // checkRevoked: an ended session can't approve a connection
+      uid = (await auth.verifyIdToken(idToken, true)).uid;
     } catch {
       return res.status(401).json({ error: "Unauthorized" });
     }

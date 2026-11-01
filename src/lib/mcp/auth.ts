@@ -45,29 +45,43 @@ const bearer = (request: Request) => {
   return scheme?.toLowerCase() === "bearer" && value ? value.trim() : null;
 };
 
+/** One doc per player per minute: `{uid}_{minute}`, counted in a transaction. */
+export const MCP_RATE_LIMITS_COLLECTION = "mcpRateLimits";
+
 /**
- * The rate limit's step for one request. No transaction: every MCP message is
- * a request, and a client calling tools in parallel would have its
- * transactions on the one token doc collide and retry. An atomic increment
- * doesn't — at the price of a few requests over the limit in a burst, which a
- * rate limit can live with.
+ * Counts one request against the player's minute — per player, not per token,
+ * so connecting the same account again and again doesn't multiply the limit.
+ * A transaction, because a plain read-then-write let parallel requests all
+ * read the same count and pass. A burst so dense the transaction gives up
+ * retrying is itself over the limit.
  */
-export const countRequest = (
-  minute: McpTokenDoc["minute"],
+export async function withinRequestLimit(
+  uid: string,
   now: Date,
-): { allowed: false } | { allowed: true; update: Record<string, unknown> } => {
-  const bucket = Math.floor(now.getTime() / 60_000);
-  const sameMinute = minute?.bucket === bucket;
-  if (sameMinute && minute.count >= MCP_REQUESTS_PER_MINUTE) {
-    return { allowed: false };
+): Promise<boolean> {
+  const minute = Math.floor(now.getTime() / 60_000);
+  const ref = firestore
+    .collection(MCP_RATE_LIMITS_COLLECTION)
+    .doc(`${uid}_${minute}`);
+  try {
+    return await firestore.runTransaction(async (transaction) => {
+      const count =
+        ((await transaction.get(ref)).data()?.count as number | undefined) ?? 0;
+      if (count >= MCP_REQUESTS_PER_MINUTE) return false;
+      transaction.set(ref, {
+        uid,
+        count: count + 1,
+        // for a Firestore TTL policy: the doc is useless a minute later
+        expiresAt: Timestamp.fromMillis((minute + 2) * 60_000),
+      });
+      return true;
+    });
+  } catch (error) {
+    // ABORTED: the transaction lost to its own siblings too many times
+    if ((error as { code?: unknown }).code === 10) return false;
+    throw error;
   }
-  return {
-    allowed: true,
-    update: sameMinute
-      ? { "minute.count": FieldValue.increment(1) }
-      : { minute: { bucket, count: 1 } },
-  };
-};
+}
 
 export async function authenticateMcpRequest(
   request: Request,
@@ -108,11 +122,10 @@ export async function authenticateMcpRequest(
     return { ok: false, status: 403, error: MCP_SUPPORTERS_ONLY_MESSAGE };
   }
 
-  const usage = countRequest(data.minute, now);
-  if (!usage.allowed) {
+  if (!(await withinRequestLimit(data.uid, now))) {
     return { ok: false, status: 429, error: "Too many requests — slow down" };
   }
-  await ref.update({ ...usage.update, lastUsedAt: Timestamp.fromDate(now) });
+  await ref.update({ lastUsedAt: Timestamp.fromDate(now) });
   return {
     ok: true,
     context: { uid: data.uid, tokenId, scopes: data.scopes ?? ["read"] },

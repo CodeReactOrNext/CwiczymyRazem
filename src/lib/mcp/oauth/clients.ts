@@ -3,6 +3,7 @@ import { Timestamp } from "firebase-admin/firestore";
 import { isIP } from "net";
 
 import { firestore } from "../db";
+import { CimdFetchError, fetchPublicJson } from "./cimdFetch";
 import { isAllowedRedirectUri, randomSecret, sha256Hex } from "./security";
 
 /**
@@ -35,8 +36,28 @@ export class OAuthClientError extends Error {}
 
 const clients = () => firestore.collection(OAUTH_CLIENTS_COLLECTION);
 
-const cleanName = (value: unknown) =>
-  typeof value === "string" && value.trim() ? value.trim().slice(0, 80) : null;
+/** Control characters and bidi marks/overrides (LRM, RLM, LRE…RLO, LRI…PDI). */
+const isHidden = (code: number) =>
+  code < 0x20 ||
+  (code >= 0x7f && code <= 0x9f) ||
+  code === 0x200e ||
+  code === 0x200f ||
+  (code >= 0x202a && code <= 0x202e) ||
+  (code >= 0x2066 && code <= 0x2069);
+
+/**
+ * A client name fit to show on the consent screen: no control characters and
+ * no bidi overrides, which could make the name read as something it isn't.
+ */
+const cleanName = (value: unknown) => {
+  if (typeof value !== "string") return null;
+  const name = Array.from(value)
+    .filter((char) => !isHidden(char.codePointAt(0) ?? 0))
+    .join("")
+    .trim()
+    .slice(0, 80);
+  return name || null;
+};
 
 const cleanUri = (value: unknown) => {
   if (typeof value !== "string") return null;
@@ -67,10 +88,39 @@ const cleanRedirectUris = (value: unknown): string[] => {
 
 // --- Client ID Metadata Documents -------------------------------------------
 
-/** Private, loopback, link-local and other non-public ranges — never fetched. */
-const isPublicAddress = (address: string) => {
+/** An IPv6 address as its eight 16-bit groups; null when it isn't one. */
+const ipv6Groups = (address: string): number[] | null => {
+  let text = address.toLowerCase();
+  // a trailing dotted IPv4 (::ffff:1.2.3.4) becomes two groups
+  const dotted = text.match(/(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+  if (dotted) {
+    const [a, b, c, d] = dotted.slice(1).map(Number);
+    text = `${text.slice(0, dotted.index)}${((a << 8) | b).toString(16)}:${((c << 8) | d).toString(16)}`;
+  }
+  const [head, tail] = text.split("::");
+  const part = (side: string | undefined) =>
+    side ? side.split(":").map((group) => parseInt(group, 16)) : [];
+  const left = part(head);
+  const right = part(tail);
+  if (tail !== undefined && left.length + right.length > 7) return null;
+  const groups =
+    tail === undefined
+      ? left
+      : [...left, ...Array(8 - left.length - right.length).fill(0), ...right];
+  return groups.length === 8 && groups.every((g) => g >= 0 && g <= 0xffff)
+    ? groups
+    : null;
+};
+
+/**
+ * Only ordinary public unicast addresses are fetched. IPv4: everything private,
+ * shared, loopback, link-local, benchmarking, documentation, multicast or
+ * reserved is out. IPv6: only global unicast (2000::/3), minus 6to4, Teredo
+ * and the documentation range; an IPv4-mapped address is judged as IPv4.
+ */
+export const isPublicAddress = (address: string): boolean => {
   if (isIP(address) === 4) {
-    const [a, b] = address.split(".").map(Number);
+    const [a, b, c] = address.split(".").map(Number);
     return !(
       a === 0 ||
       a === 10 ||
@@ -78,18 +128,33 @@ const isPublicAddress = (address: string) => {
       (a === 100 && b >= 64 && b <= 127) ||
       (a === 169 && b === 254) ||
       (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 0 && (c === 0 || c === 2)) ||
       (a === 192 && b === 168) ||
+      (a === 198 && (b === 18 || b === 19)) ||
+      (a === 198 && b === 51 && c === 100) ||
+      (a === 203 && b === 0 && c === 113) ||
       a >= 224
     );
   }
-  const v6 = address.toLowerCase();
-  if (v6.startsWith("::ffff:")) return isPublicAddress(v6.slice(7));
-  return !(
-    v6 === "::" ||
-    v6 === "::1" ||
-    v6.startsWith("fc") ||
-    v6.startsWith("fd") ||
-    v6.startsWith("fe80")
+  const groups = isIP(address) === 6 ? ipv6Groups(address) : null;
+  if (!groups) return false;
+  const mapped =
+    groups.slice(0, 5).every((g) => g === 0) && groups[5] === 0xffff;
+  if (mapped) {
+    const v4 = [
+      groups[6] >> 8,
+      groups[6] & 255,
+      groups[7] >> 8,
+      groups[7] & 255,
+    ];
+    return isPublicAddress(v4.join("."));
+  }
+  const [first, second] = groups;
+  return (
+    first >= 0x2000 &&
+    first <= 0x3fff &&
+    first !== 0x2002 &&
+    !(first === 0x2001 && (second === 0 || second === 0xdb8))
   );
 };
 
@@ -140,23 +205,25 @@ async function assertFetchableClientId(clientId: string) {
 
 async function fetchCimd(clientId: string): Promise<OAuthClient> {
   await assertFetchableClientId(clientId);
-  let response: Response;
+  let response: { status: number; text: string };
   try {
-    response = await fetch(clientId, {
-      headers: { Accept: "application/json" },
-      redirect: "error",
-      signal: AbortSignal.timeout(CIMD_TIMEOUT_MS),
+    response = await fetchPublicJson(clientId, {
+      timeoutMs: CIMD_TIMEOUT_MS,
+      maxBytes: CIMD_MAX_BYTES,
+      isPublicAddress,
     });
-  } catch {
-    throw new OAuthClientError("couldn't fetch the client metadata document");
+  } catch (error) {
+    throw new OAuthClientError(
+      error instanceof CimdFetchError
+        ? `client metadata document: ${error.message}`
+        : "couldn't fetch the client metadata document",
+    );
   }
-  if (!response.ok)
+  if (response.status < 200 || response.status >= 300)
     throw new OAuthClientError(
       `client metadata document answered ${response.status}`,
     );
-  const text = await response.text();
-  if (text.length > CIMD_MAX_BYTES)
-    throw new OAuthClientError("client metadata document is too large");
+  const { text } = response;
 
   let document: Record<string, unknown>;
   try {

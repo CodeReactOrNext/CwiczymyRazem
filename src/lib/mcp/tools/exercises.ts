@@ -18,6 +18,7 @@ import {
 import { firestore } from "../db";
 import {
   appLink,
+  docId,
   errorResult,
   fittedResult,
   IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
@@ -245,7 +246,7 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
       description:
         "The tab of a library or own exercise: as JSON in the format riffquest_create_exercise takes (tab) and as text (asciiTab). Long tabs in parts with fromMeasure / toMeasure.",
       inputSchema: strictInput({
-        id: z.string().min(1).max(120),
+        id: docId(),
         fromMeasure: z
           .number()
           .int()
@@ -393,7 +394,7 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
       inputSchema: z
         .object(exerciseFields)
         .partial()
-        .extend({ id: z.string().min(1).max(120) })
+        .extend({ id: docId() })
         .strict(),
       annotations: IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
     },

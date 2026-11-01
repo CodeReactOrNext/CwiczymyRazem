@@ -18,6 +18,7 @@ import { exercisesById, userRef } from "../data";
 import { firestore } from "../db";
 import {
   appLink,
+  docId,
   errorResult,
   jsonResult,
   msToMinutes,
@@ -306,7 +307,7 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
       title: "Exercise details",
       description:
         "One library exercise: description, instructions, tips, BPM range, skills and a link.",
-      inputSchema: strictInput({ id: z.string().min(1).max(120) }),
+      inputSchema: strictInput({ id: docId() }),
       outputSchema: exerciseDetailsShape,
       annotations: READ_TOOL_ANNOTATIONS,
     },
@@ -408,7 +409,7 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
       title: "Song details",
       description:
         "One song, with the player's status for it and their practice time on it.",
-      inputSchema: strictInput({ id: z.string().min(1).max(120) }),
+      inputSchema: strictInput({ id: docId() }),
       annotations: READ_TOOL_ANNOTATIONS,
     },
     ({ id }) =>
