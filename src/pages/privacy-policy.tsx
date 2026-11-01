@@ -127,7 +127,7 @@ const PrivacyPolicyPage: NextPageWithLayout = () => {
             <section>
               <h2 className="text-2xl font-bold text-white mb-4">6. Your Rights</h2>
               <p>
-                You can ask us at any time for a copy of your data or for your account to be deleted. Email <a href="mailto:mjablosnkidev@gmail.com" className="text-cyan-400 hover:underline">mjablosnkidev@gmail.com</a> from the address on your account, or message us on Discord, and we&apos;ll handle it within 30 days.
+                You can ask us at any time for a copy of your data or for your account to be deleted. Email <a href="mailto:mjablonskidev@gmail.com" className="text-cyan-400 hover:underline">mjablonskidev@gmail.com</a> from the address on your account, or message us on Discord, and we&apos;ll handle it within 30 days.
               </p>
               <p className="mt-4">
                 Deleting your account removes your sign-in, profile, practice history, statistics, plans, goals, songs, files, recordings and AI assistant connections. Things other players rely on are anonymized instead of removed, so their plans and conversations don&apos;t break: your chat messages and published community exercises stay under &ldquo;Deleted player&rdquo;, your marketplace listings are taken down, and leadership of a guild you run passes to another member.
@@ -137,7 +137,7 @@ const PrivacyPolicyPage: NextPageWithLayout = () => {
             <section>
               <h2 className="text-2xl font-bold text-white mb-4">7. Contact Us</h2>
               <p>
-                If you have any questions about this Privacy Policy or want your data deleted, email us at <a href="mailto:mjablosnkidev@gmail.com" className="text-cyan-400 hover:underline">mjablosnkidev@gmail.com</a> or reach out on our <Link href="https://discord.gg/6yJmsZW2Ne" className="text-cyan-400 hover:underline">Discord server</Link>.
+                If you have any questions about this Privacy Policy or want your data deleted, email us at <a href="mailto:mjablonskidev@gmail.com" className="text-cyan-400 hover:underline">mjablonskidev@gmail.com</a> or reach out on our <Link href="https://discord.gg/6yJmsZW2Ne" className="text-cyan-400 hover:underline">Discord server</Link>.
               </p>
             </section>
 
