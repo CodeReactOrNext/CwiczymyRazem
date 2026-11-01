@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import { OAuthConsentView } from "feature/settings/components/OAuthConsentView";
 import type { NextPage } from "next";
 import Head from "next/head";

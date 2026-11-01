@@ -2,19 +2,19 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://riff.quest/wiki</loc>
-    <lastmod>2026-09-28</lastmod>
+    <lastmod>2026-11-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://riff.quest/wiki/ai-coach-and-weekly-milestones</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://riff.quest/wiki/arsenal-and-gear</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -31,32 +31,38 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://riff.quest/wiki/exercise-goals</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://riff.quest/wiki/exercise-plans-and-auto-plan</loc>
-    <lastmod>2026-09-13</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://riff.quest/wiki/fame</loc>
-    <lastmod>2026-09-02</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://riff.quest/wiki/getting-started</loc>
-    <lastmod>2026-09-08</lastmod>
+    <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://riff.quest/wiki/how-scoring-works</loc>
-    <lastmod>2026-08-22</lastmod>
+    <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://riff.quest/wiki/journey-and-scale-tree</loc>
-    <lastmod>2026-09-28</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -68,19 +74,19 @@
   </url>
   <url>
     <loc>https://riff.quest/wiki/monthly-challenges</loc>
-    <lastmod>2026-09-02</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://riff.quest/wiki/note-detection</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://riff.quest/wiki/practice-modes-overview</loc>
-    <lastmod>2026-08-15</lastmod>
+    <lastmod>2026-10-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -97,8 +103,14 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://riff.quest/wiki/rotation</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://riff.quest/wiki/skills-and-achievements</loc>
-    <lastmod>2026-09-17</lastmod>
+    <lastmod>2026-11-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

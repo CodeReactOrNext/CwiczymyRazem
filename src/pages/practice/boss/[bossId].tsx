@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import { BOSS_PLAN_PREFIX, getBoss } from "feature/bosses/data/bosses";
 import { useBossFight } from "feature/bosses/hooks/useBossFight";
 import { useBossRecord } from "feature/bosses/hooks/useBossProgress";

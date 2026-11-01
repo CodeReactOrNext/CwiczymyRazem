@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import type { PatternType } from "feature/exercisePlan/scales/patternGenerators";
 import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";

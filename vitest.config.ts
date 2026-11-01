@@ -15,5 +15,6 @@ export default defineConfig({
     // Pliki, które faktycznie potrzebują DOM-u, deklarują `// @vitest-environment jsdom`
     // w pierwszej linii.
     environment: "node",
+    setupFiles: ["./vitest.setup.ts"],
   },
 });

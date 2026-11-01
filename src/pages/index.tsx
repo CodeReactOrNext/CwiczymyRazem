@@ -1,6 +1,10 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { serializeExercises } from "feature/exercises/lib/serializeExercise";
-import { featuredGuideSongIds } from "feature/landing/data/featuredGuides";
+import type { FeaturedGuideLink } from "feature/landing/data/featuredGuides";
+import {
+  featuredGuideLinks,
+  featuredGuideSongIds,
+} from "feature/landing/data/featuredGuides";
 import LandingPage from "feature/landing/LandingPage";
 import {
   getTabPreview,
@@ -24,18 +28,24 @@ interface HomeProps {
     timeInMinutes: number;
     tabPreview?: TabPreviewNote[];
   }>;
+  catalogSize: number;
+  featuredGuides: FeaturedGuideLink[];
   guideLiveData: PathSongLiveDataMap;
 }
 
 const Home: NextPageWithLayout<HomeProps> = ({
   blogs,
   spotlightExercises,
+  catalogSize,
+  featuredGuides,
   guideLiveData,
 }) => {
   return (
     <LandingPage
       blogs={blogs}
       spotlightExercises={spotlightExercises}
+      catalogSize={catalogSize}
+      featuredGuides={featuredGuides}
       guideLiveData={guideLiveData}
     />
   );
@@ -67,6 +77,10 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
     props: {
       blogs,
       spotlightExercises,
+      catalogSize: exercisesAgregat.filter(
+        (exercise) => !exercise.isHiddenFromLibrary,
+      ).length,
+      featuredGuides: featuredGuideLinks,
       guideLiveData,
     },
   };

@@ -12,7 +12,10 @@ import { LibrarySongGrid } from "feature/song-library/components/LibrarySongGrid
 import { LibraryStatsBar } from "feature/song-library/components/LibraryStatsBar";
 import { LibraryTierGuide } from "feature/song-library/components/LibraryTierGuide";
 import type { LibrarySong } from "feature/song-library/services/getSongsForStaticProps";
-import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
+import type {
+  GuideCardData,
+  PathSongLiveDataMap,
+} from "feature/song-library/song-guides/types";
 
 const faqQuestions = [
   {
@@ -55,6 +58,7 @@ const faqQuestions = [
 interface LibraryLandingPageProps {
   songs: LibrarySong[];
   totalSongs: number;
+  guides: GuideCardData[];
   guideLiveData: PathSongLiveDataMap;
   /** Firestore song id -> slug of the difficulty guide written for it. */
   guideSlugBySongId: Record<string, string>;
@@ -63,6 +67,7 @@ interface LibraryLandingPageProps {
 const LibraryLandingPage = ({
   songs,
   totalSongs,
+  guides,
   guideLiveData,
   guideSlugBySongId,
 }: LibraryLandingPageProps) => {
@@ -79,7 +84,7 @@ const LibraryLandingPage = ({
           totalSongs={totalSongs}
           guideSlugBySongId={guideSlugBySongId}
         />
-        <LibraryGuidesSection guideLiveData={guideLiveData} />
+        <LibraryGuidesSection guides={guides} guideLiveData={guideLiveData} />
         <LibraryTierGuide />
         <LibraryCTASection />
         <LibraryFaqSection questions={faqQuestions} />

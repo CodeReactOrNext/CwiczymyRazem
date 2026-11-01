@@ -10,7 +10,7 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
   updatedAt: "2026-09-15",
   intro: [
     "As a beginner, you should practice four things on guitar: fretting-hand accuracy, picking consistency, chord changes, and timing. Every exercise on this page trains one of those, takes under ten minutes, and comes with an interactive tab you can play along with for free.",
-    "This is not a random list of beginner guitar drills. It is the same sequence we give new players inside [Riff Quest](/how-it-works): start with one string, add fingers one at a time, and only stack complexity once the previous step feels boring. If you want these drills pre-arranged into a schedule, jump to the [15-minute routine](#a-15-minute-beginner-guitar-practice-routine) below or print the [free practice sheet](#free-guitar-practice-sheet-for-beginners). Starting on an electric? The [four drills to begin with](#beginner-electric-guitar-exercises-where-to-start) are picked out further down. For the wider plan, see the full [daily guitar practice plan](/daily-guitar-practice-plan) or our breakdown of [how long to practice guitar daily](/blog/how-long-practice-guitar-daily).",
+    "This is not a random list of beginner guitar drills. It is the same sequence we give new players inside [Riff Quest](/how-it-works): start with one string, add fingers one at a time, and only stack complexity once the previous step feels boring. If you want these drills pre-arranged into a schedule, jump to the [15-minute session](#putting-the-drills-into-a-15-minute-session) below or print the [free practice sheet](#free-guitar-practice-sheet-for-beginners). Starting on an electric? The [four drills to begin with](#beginner-electric-guitar-exercises-where-to-start) are picked out further down. For the wider plan, see the full [daily guitar practice plan](/daily-guitar-practice-plan) or our breakdown of [how long to practice guitar daily](/blog/how-long-practice-guitar-daily).",
   ],
   sections: [
     {
@@ -140,11 +140,11 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
       ],
     },
     {
-      heading: "A 15-Minute Beginner Guitar Practice Routine",
+      heading: "Putting the Drills Into a 15-Minute Session",
       blocks: [
         {
           kind: "paragraph",
-          text: "Here is how the drills above fit into a daily 15-minute session. This beginner guitar practice routine covers all four fundamentals, and it is intentionally repetitive — you will run the same plan for two to three weeks, raising tempos slightly, before swapping anything out.",
+          text: "Here is how the drills above fit into a daily 15-minute session. It covers all four fundamentals, and it is intentionally repetitive — you will run the same plan for two to three weeks, raising tempos slightly, before swapping anything out. The full [guitar practice routine for beginners](/blog/guitar-practice-routine-builder) adds a week-by-week progression and the 60-second chord-change test that shows whether it is working.",
         },
         {
           kind: "schedule",
@@ -214,7 +214,7 @@ export const beginnerGuitarExercisesConfig: SeoLandingConfig = {
         },
         {
           kind: "paragraph",
-          text: "Once the four checkpoints are met, fold them into a real session rather than practicing them forever: the [15-minute routine](#a-15-minute-beginner-guitar-practice-routine) below is the same material with times attached, and the [practice sheet](#free-guitar-practice-sheet-for-beginners) is that session on paper.",
+          text: "Once the four checkpoints are met, fold them into a real session rather than practicing them forever: the [15-minute session](#putting-the-drills-into-a-15-minute-session) above is the same material with times attached, and the [practice sheet](#free-guitar-practice-sheet-for-beginners) is that session on paper.",
         },
       ],
     },

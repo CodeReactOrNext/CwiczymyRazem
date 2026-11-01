@@ -2,9 +2,14 @@ import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { describe, expect, it } from "vitest";
 
+import { EN_APP_CATALOG } from "./fullCatalog";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "./locales";
 import type { TranslationDict } from "./namespaces";
-import { EN_CATALOG, TRANSLATION_NAMESPACES } from "./namespaces";
+import {
+  CORE_NAMESPACES,
+  EN_CORE_CATALOG,
+  TRANSLATION_NAMESPACES,
+} from "./namespaces";
 
 /**
  * The files the browser fetches at runtime, checked against the namespace list the
@@ -59,9 +64,14 @@ describe("translation files", () => {
     }
   });
 
-  it("bundles the English catalog for every namespace", () => {
+  it("bundles English for every namespace, each in exactly one catalog", () => {
     for (const namespace of TRANSLATION_NAMESPACES) {
-      expect(EN_CATALOG[namespace]).toBeDefined();
+      const inCore = EN_CORE_CATALOG[namespace] !== undefined;
+      const inApp = EN_APP_CATALOG[namespace] !== undefined;
+      expect(inCore !== inApp, namespace).toBe(true);
+      expect(inCore, namespace).toBe(
+        (CORE_NAMESPACES as readonly string[]).includes(namespace),
+      );
     }
   });
 

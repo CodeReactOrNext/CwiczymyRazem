@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import { getUserExercisePlan } from "feature/exercisePlan/services/getUserExercisePlan";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
@@ -5,6 +8,7 @@ import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/Prac
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -36,7 +40,15 @@ export default function PracticePage() {
   }, [id, userAuth, router, t]);
 
   if (!plan) {
-    return <PracticeLoadingScreen isReady={false} />;
+    // A user's private plan: crawlers only ever get this loading screen.
+    return (
+      <>
+        <Head>
+          <meta name='robots' content='noindex, nofollow' />
+        </Head>
+        <PracticeLoadingScreen isReady={false} />
+      </>
+    );
   }
 
   return (

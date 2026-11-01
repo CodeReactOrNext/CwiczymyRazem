@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";

@@ -4,14 +4,21 @@ import { persist } from "zustand/middleware";
 
 import type { AppLocale } from "./locales";
 import { DEFAULT_LOCALE, normalizeLocale } from "./locales";
-import type { TranslationDict, TranslationNamespace } from "./namespaces";
-import { EN_CATALOG } from "./namespaces";
+import type {
+  LocaleCatalog,
+  TranslationDict,
+  TranslationNamespace,
+} from "./namespaces";
+import { EN_CORE_CATALOG } from "./namespaces";
 import type { CatalogsByLocale } from "./translate";
 
 interface LocaleState {
   /** The player's chosen language. English until they pick another one. */
   locale: AppLocale;
-  /** Everything loaded so far, English included (bundled, never fetched). */
+  /**
+   * Everything loaded so far. English starts as the core namespaces; the rest of
+   * English is registered by `./fullCatalog` (bundled, never fetched).
+   */
   catalogs: CatalogsByLocale;
   /**
    * Overlay files already asked for, keyed `<locale>/<namespace>`. Lives in the
@@ -31,7 +38,7 @@ export const useLocaleStore = create<LocaleState>()(
   persist(
     (set) => ({
       locale: DEFAULT_LOCALE,
-      catalogs: { en: EN_CATALOG },
+      catalogs: { en: { ...EN_CORE_CATALOG } },
       requested: {},
       setLocale: (locale) => set({ locale: normalizeLocale(locale) }),
     }),
@@ -50,6 +57,47 @@ export const useLocaleStore = create<LocaleState>()(
     },
   ),
 );
+
+/**
+ * Adds bundled English namespaces to the store. Called by `./fullCatalog` while
+ * its module evaluates, i.e. before anything that imports it renders.
+ */
+export function registerEnglish(dicts: LocaleCatalog): void {
+  // zustand renders the server pass and hydration from getInitialState(), not
+  // from the current state, so the English registered here has to land in the
+  // initial state too — otherwise SSR prints raw keys for these namespaces.
+  Object.assign(
+    useLocaleStore.getInitialState().catalogs[DEFAULT_LOCALE] ?? {},
+    dicts,
+  );
+  // And a new object for subscribers, for the late safety-net load below.
+  useLocaleStore.setState((state) => ({
+    catalogs: {
+      ...state.catalogs,
+      [DEFAULT_LOCALE]: { ...state.catalogs[DEFAULT_LOCALE], ...dicts },
+    },
+  }));
+}
+
+let fullCatalogRequested = false;
+
+/**
+ * Safety net for a component that asks for app-only English on a page that did
+ * not import `./fullCatalog` (publicCatalog.test.ts is meant to prevent this).
+ * The catalog arrives a moment later and the component re-renders with it.
+ */
+function loadFullEnglish(): void {
+  if (fullCatalogRequested) return;
+  fullCatalogRequested = true;
+  if (process.env.NODE_ENV !== "production") {
+    console.warn(
+      "[i18n] App-only English namespace used on a page without lib/i18n/fullCatalog — loading it late.",
+    );
+  }
+  import("./fullCatalog").catch(() => {
+    fullCatalogRequested = false;
+  });
+}
 
 async function fetchNamespace(
   locale: AppLocale,
@@ -91,14 +139,18 @@ async function fetchNamespace(
 /**
  * Makes sure the overlay files for these namespaces are on their way.
  *
- * Called from render effects, so it has to be cheap and idempotent: English needs
- * nothing, anything already loaded needs nothing, and the rest is fetched once.
+ * Called from render effects, so it has to be cheap and idempotent: anything
+ * already loaded needs nothing, and the rest is fetched once.
  */
 export function loadNamespaces(
   locale: AppLocale,
   namespaces: readonly TranslationNamespace[],
 ): void {
-  if (locale === DEFAULT_LOCALE || typeof window === "undefined") return;
+  if (typeof window === "undefined") return;
+
+  const english = useLocaleStore.getState().catalogs[DEFAULT_LOCALE];
+  if (namespaces.some((namespace) => !english?.[namespace])) loadFullEnglish();
+  if (locale === DEFAULT_LOCALE) return;
 
   const loaded = useLocaleStore.getState().catalogs[locale];
   for (const namespace of namespaces) {

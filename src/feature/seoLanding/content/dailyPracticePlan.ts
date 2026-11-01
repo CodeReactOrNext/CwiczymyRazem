@@ -3,7 +3,7 @@ import type { SeoLandingConfig } from "../types/seoLanding.types";
 export const dailyPracticePlanConfig: SeoLandingConfig = {
   slug: "daily-guitar-practice-plan",
   title: "Daily Guitar Practice Plan: Routines for 15, 30 and 60 Minutes",
-  metaTitle: "Daily Guitar Practice Plan + Free Routine PDF",
+  metaTitle: "Daily Guitar Practice Schedule & Routine + Free PDF",
   metaDescription:
     "Free daily guitar practice routine PDF with 15, 30 and 60-minute schedules, a printable session log, and exercises to match each block.",
   publishedAt: "2026-07-20",

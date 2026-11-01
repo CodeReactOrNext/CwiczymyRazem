@@ -22,7 +22,7 @@ export const ScoreControls = ({
   uiReady,
   uiPlaying,
 }: ScoreControlsProps) => {
-  const { t } = useTranslation("session");
+  const { t } = useTranslation("common");
   const progress = totalMs > 0 ? (currentMs / totalMs) * 100 : 0;
 
   return (
@@ -41,7 +41,7 @@ export const ScoreControls = ({
       </span>
 
       {!uiReady && (
-        <span className="text-[10px] text-zinc-500 animate-pulse">{t("loading")}</span>
+        <span className="text-[10px] text-zinc-500 animate-pulse">{t("loading.loading_text")}</span>
       )}
       {uiReady && uiPlaying && (
         <span className="text-[10px] text-blue-400">▶</span>

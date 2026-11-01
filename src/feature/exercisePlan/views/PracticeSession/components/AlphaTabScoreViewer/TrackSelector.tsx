@@ -9,14 +9,16 @@ interface TrackSelectorProps {
   onSelect: (idx: number) => void;
 }
 
-/** Renders track-selection buttons. Hidden when there is only one track. */
-export const TrackSelector = ({ tracks, selectedIdx, onSelect }: TrackSelectorProps) => {
+/**
+ * Split out so single-track scores (the public song-guide riffs) never ask for
+ * the app-only `session` namespace, which public pages do not bundle.
+ */
+const TrackButtons = ({ tracks, selectedIdx, onSelect }: TrackSelectorProps) => {
   const { t } = useTranslation("session");
-  if (tracks.length <= 1) return null;
 
   return (
     <div className="flex items-center gap-1.5 flex-wrap">
-      <span className="text-[10px] text-zinc-500 shrink-0">{t("track")}</span>
+      <span className="text-[10px] text-zinc-500 shrink-0">{t("track", "Track")}</span>
       {tracks.map((track) => (
         <button
           key={track.idx}
@@ -35,3 +37,7 @@ export const TrackSelector = ({ tracks, selectedIdx, onSelect }: TrackSelectorPr
     </div>
   );
 };
+
+/** Renders track-selection buttons. Hidden when there is only one track. */
+export const TrackSelector = (props: TrackSelectorProps) =>
+  props.tracks.length <= 1 ? null : <TrackButtons {...props} />;

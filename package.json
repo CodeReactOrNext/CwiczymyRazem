@@ -44,6 +44,7 @@
     "backfill-section-maps": "vitest run --mode backfill-section-maps scripts/backfillSongSectionMaps.test.ts",
     "backfill-achievement-stats": "vitest run --mode achievement-stats scripts/backfillAchievementStats.test.ts",
     "update-hero-stats": "vitest run --mode hero-stats scripts/updateHeroStats.test.ts",
+    "session-length-stats": "vitest run --mode session-stats --reporter=verbose scripts/sessionLengthStats.test.ts",
     "blog-stats": "vitest run --mode blog-stats scripts/blogStats.test.ts",
     "knip": "knip",
     "email": "email dev --dir src/lib/email/templates --port 3001"

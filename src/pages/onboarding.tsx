@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import OnboardingView from "feature/onboarding/view";
 import { LocalizedRegion } from "lib/i18n/LocalizedRegion";
 import type { NextPage } from "next";

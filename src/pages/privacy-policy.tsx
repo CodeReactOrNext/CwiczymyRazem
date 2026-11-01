@@ -15,7 +15,7 @@ const PrivacyPolicyPage: NextPageWithLayout = () => {
     <>
       <Head>
         <title>Privacy Policy — How Riff Quest Handles Your Practice Data</title>
-        <meta name="description" content="Privacy Policy for Riff Quest. We value your privacy and are transparent about how we handle your data. Learn how we protect your guitar practice information and personal details." />
+        <meta name="description" content="How Riff Quest collects, stores and protects your guitar practice data and account details, and how to export or delete them." />
         <link rel='canonical' href='https://riff.quest/privacy-policy' />
         <meta property="og:title" content="Privacy Policy — How Riff Quest Handles Your Practice Data" />
         <meta property="og:description" content="Privacy Policy for Riff Quest. We value your privacy and are transparent about how we handle your data." />

@@ -1,7 +1,12 @@
+// App-only English text; public pages that skip AppLayout never download it.
+import "lib/i18n/fullCatalog";
+
 import { selectAutoLogInFailed, selectCurrentUserStats, selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
 import { usePresence } from "hooks/usePresence";
 import { AppShellSkeleton } from "layouts/AppLayout/AppShellSkeleton";
 import MainLoggedLayout from "layouts/MainLoggedLayout/MainLoggedLayout";
+import { loadSentryReplay } from "lib/sentry/loadSentryReplay";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import React, { useEffect } from "react";
@@ -39,6 +44,11 @@ const AppLayout = ({
   // (auth + stats loaded, no redirect fires, nothing ever fills the name).
   const isAuthenticated = !!(userAuth && userStats);
 
+  // Session Replay only inside the logged-in app, never on public pages.
+  useEffect(() => {
+    if (isAuthenticated) loadSentryReplay();
+  }, [isAuthenticated]);
+
   useEffect(() => {
     if (status === "unauthenticated" && !isPublic) {
       router.push("/");
@@ -59,7 +69,18 @@ const AppLayout = ({
   }
 
   if (status === "loading" || !isAuthenticated) {
-    return <AppShellSkeleton />;
+    return (
+      <>
+        {/* What a crawler gets for a logged-in-only page: a skeleton with the
+            site-wide default title and description. Keep it out of the index. */}
+        {!isPublic && (
+          <Head>
+            <meta key='robots' name='robots' content='noindex, nofollow' />
+          </Head>
+        )}
+        <AppShellSkeleton />
+      </>
+    );
   }
 
   return (

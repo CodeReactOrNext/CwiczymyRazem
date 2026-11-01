@@ -1,8 +1,10 @@
+import type { HowItWorksStats } from "feature/landing/data/howItWorksStats";
+import { getHowItWorksStats } from "feature/landing/data/howItWorksStats";
 import { HowItWorksPage } from "feature/landing/HowItWorksPage";
-import type { NextPage } from "next";
+import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
 
-const HowItWorks: NextPage = () => {
+const HowItWorks: NextPage<{ stats: HowItWorksStats }> = ({ stats }) => {
   return (
     <>
       <Head>
@@ -28,9 +30,13 @@ const HowItWorks: NextPage = () => {
         />
         <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
       </Head>
-      <HowItWorksPage />
+      <HowItWorksPage stats={stats} />
     </>
   );
 };
+
+export const getStaticProps: GetStaticProps<{
+  stats: HowItWorksStats;
+}> = async () => ({ props: { stats: getHowItWorksStats() } });
 
 export default HowItWorks;

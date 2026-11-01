@@ -2,10 +2,10 @@
 
 import { cn } from "assets/lib/utils";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
-import { AlphaTabScoreViewer } from "feature/exercisePlan/views/PracticeSession/components/AlphaTabScoreViewer/AlphaTabScoreViewer";
 import { MountOnVisible } from "feature/seoLanding/components/MountOnVisible";
 import { notationEmbedHeightPx } from "feature/seoLanding/lib/notationEmbedHeight";
 import { Minus, Pause, Play, Plus, Volume2, VolumeX } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 
 interface GuideRiffPlayerProps {
@@ -15,6 +15,17 @@ interface GuideRiffPlayerProps {
   bpmMax?: number;
   className?: string;
 }
+
+// AlphaTab is ~300 KB gzipped. A static import put it in the initial bundle of
+// every song guide (all of them render this component's module), even though
+// the viewer only mounts once MountOnVisible scrolls it into view.
+const AlphaTabScoreViewer = dynamic(
+  () =>
+    import(
+      "feature/exercisePlan/views/PracticeSession/components/AlphaTabScoreViewer/AlphaTabScoreViewer"
+    ).then((mod) => mod.AlphaTabScoreViewer),
+  { ssr: false },
+);
 
 const BPM_STEP = 2;
 const DEFAULT_BPM_MIN = 40;

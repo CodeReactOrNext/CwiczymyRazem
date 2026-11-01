@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import { GoalRunVerdict } from "feature/exerciseGoals/components/GoalRunVerdict";
 import { getExerciseGoal, recordGoalRun } from "feature/exerciseGoals/services/exerciseGoals.service";
 import { getGoalExercise } from "feature/exerciseGoals/services/goalExercises.service";

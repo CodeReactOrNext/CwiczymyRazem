@@ -2,7 +2,7 @@
 
 import { FeatureList } from "feature/landing/components/FeatureList";
 import { Reveal } from "feature/landing/components/Reveal";
-import { featuredGuides } from "feature/landing/data/featuredGuides";
+import type { FeaturedGuideLink } from "feature/landing/data/featuredGuides";
 import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ArrowRight } from "lucide-react";
@@ -10,6 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface SongsLibrarySectionProps {
+  featuredGuides?: FeaturedGuideLink[];
   guideLiveData?: PathSongLiveDataMap;
 }
 
@@ -33,6 +34,7 @@ const features = [
 ];
 
 export const SongsLibrarySection = ({
+  featuredGuides = [],
   guideLiveData = {},
 }: SongsLibrarySectionProps) => {
   return (
@@ -87,7 +89,7 @@ export const SongsLibrarySection = ({
                   const liveRating =
                     live && live.avgDifficulty > 0 ? live : undefined;
                   const tier = getSongTier(
-                    liveRating?.tier ?? guide.editorial.difficulty,
+                    liveRating?.tier ?? guide.editorialDifficulty,
                   );
                   return (
                     <Link

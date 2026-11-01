@@ -25,7 +25,7 @@ export const LibrarySEO = ({ songs, totalSongs, faqQuestions }: LibrarySEOProps)
   const title = `${countPrefix}Guitar Songs Ranked by Difficulty | Riff Quest`;
   const description = `Browse ${
     totalSongs > 0 ? `${totalSongs}+ ` : ""
-  }guitar songs ranked by real community difficulty ratings. Filter by tier (S through D), genre, and skill level. Find your next song to learn — free to explore.`;
+  }guitar songs ranked by real community difficulty ratings. Filter by tier (S–D), genre and skill level to find your next song. Free.`;
   const keywords =
     "guitar song library, learn guitar songs, song difficulty guitar, guitar tier list, guitar practice songs, community rated guitar songs, guitar repertoire, song difficulty ratings";
 

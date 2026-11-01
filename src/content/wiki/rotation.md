@@ -1,6 +1,6 @@
 ---
 title: "Rotation"
-description: "Keep the songs, exercises, skills and your own practice items in your hands: the ones you haven't played for the longest come up first, and one tap starts a short session with them."
+description: "Keep songs, exercises, skills and your own items in rotation: the ones you haven't played longest come up first, and one tap starts a short session."
 slug: "rotation"
 section: "Songs & Library"
 order: 2

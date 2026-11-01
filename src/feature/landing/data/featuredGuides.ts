@@ -23,6 +23,27 @@ export const featuredGuides: SongGuide[] = FEATURED_GUIDE_SLUGS.map((slug) =>
   getSongGuideBySlug(slug),
 ).filter((guide): guide is SongGuide => Boolean(guide));
 
+/**
+ * What the landing strip renders, resolved in getStaticProps. The strip must not
+ * import the guide registry itself: that pulled the full text of every guide
+ * (~450 KB) into the home page bundle.
+ */
+export interface FeaturedGuideLink {
+  slug: string;
+  title: string;
+  songId: string | null;
+  editorialDifficulty: number;
+}
+
+export const featuredGuideLinks: FeaturedGuideLink[] = featuredGuides.map(
+  (guide) => ({
+    slug: guide.slug,
+    title: guide.title,
+    songId: guide.songId ?? null,
+    editorialDifficulty: guide.editorial.difficulty,
+  }),
+);
+
 /** Firestore ids to hydrate with live ratings for the strip's tier badges. */
 export const featuredGuideSongIds: string[] = featuredGuides
   .map((guide) => guide.songId)

@@ -1,9 +1,11 @@
+import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ArrowRight, ChevronRight, Music } from "lucide-react";
 import Link from "next/link";
 
 import type { GuideLiveData, SongGuide } from "../types";
+import { MIN_RATINGS_TO_HEADLINE } from "../utils/composeGuideSeo";
 
 interface GuideHeroProps {
   guide: SongGuide;
@@ -14,6 +16,13 @@ export const GuideHero = ({ guide, liveData }: GuideHeroProps) => {
   const difficulty = liveData.song?.avgDifficulty || guide.editorial.difficulty;
   const tier = getSongTier(difficulty);
   const coverUrl = liveData.song?.coverUrl;
+  // The same score the difficulty-led <title> promises, said in the first line
+  // under the H1 so the answer to "is it hard?" is not buried in the sidebar.
+  const ratingsCount = liveData.song?.ratingsCount ?? 0;
+  const verdict =
+    liveData.song && ratingsCount >= MIN_RATINGS_TO_HEADLINE
+      ? `Rated ${liveData.song.avgDifficulty.toFixed(1)}/10 (${tier.label}) by ${ratingsCount} guitarists who learned it.`
+      : null;
   const updatedLabel = new Date(guide.updatedAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -74,7 +83,18 @@ export const GuideHero = ({ guide, liveData }: GuideHeroProps) => {
             <h1 className='font-display max-w-3xl text-balance text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl'>
               {guide.h1}
             </h1>
-            <p className='mt-5 max-w-3xl text-lg font-bold leading-snug text-zinc-100'>
+            {verdict && (
+              <p
+                className='mt-5 text-sm font-semibold'
+                style={{ color: tier.color }}>
+                {verdict}
+              </p>
+            )}
+            <p
+              className={cn(
+                'max-w-3xl text-lg font-bold leading-snug text-zinc-100',
+                verdict ? 'mt-2' : 'mt-5',
+              )}>
               {guide.quickAnswer}
             </p>
             <div className='mt-6 space-y-4'>

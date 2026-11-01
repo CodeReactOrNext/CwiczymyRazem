@@ -78,3 +78,40 @@ export const composeGuideDescription = (
     ? first
     : guide.seo.metaDescription;
 };
+
+/** Title cutoff — Google truncates around 60–65 characters. */
+const TITLE_MAX = 65;
+
+/** Below this many ratings the score is too thin to headline a title. */
+export const MIN_RATINGS_TO_HEADLINE = 5;
+
+/**
+ * Difficulty-led title for guides whose biggest open query cluster is
+ * "is {song} hard to play (on guitar)" / "how hard is {song}". Those queries
+ * sat at position 6–8 with 0% CTR under both the lookup titles and the
+ * "How to Play …" titles, so the title now echoes the question and answers it
+ * with the community score — a number nobody else in that SERP has.
+ *
+ * Falls back to the hand-written title when the song has too few ratings or
+ * no variant fits, so a thin or missing score never reaches the SERP.
+ */
+export const composeGuideTitle = (
+  guide: SongGuide,
+  liveData: GuideLiveData,
+): string => {
+  const song = liveData.song;
+  if (!song || song.ratingsCount < MIN_RATINGS_TO_HEADLINE) {
+    return guide.seo.metaTitle;
+  }
+
+  const rating = song.avgDifficulty.toFixed(1);
+  const candidates = [
+    `Is ${guide.title} Hard to Play on Guitar? Rated ${rating}/10`,
+    `Is ${guide.title} Hard to Play? Rated ${rating}/10`,
+  ];
+
+  return (
+    candidates.find((candidate) => candidate.length <= TITLE_MAX) ??
+    guide.seo.metaTitle
+  );
+};

@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import { Button } from "assets/components/ui/button";
 import {
   Tooltip,

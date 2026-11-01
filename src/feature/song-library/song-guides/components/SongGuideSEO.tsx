@@ -2,14 +2,16 @@ import { getAuthorProfile } from "lib/authors";
 import Head from "next/head";
 
 import type { GuideFaqEntry, GuideLiveData, SongGuide } from "../types";
-import { composeGuideDescription } from "../utils/composeGuideSeo";
+import {
+  composeGuideDescription,
+  composeGuideTitle,
+} from "../utils/composeGuideSeo";
 
 /**
  * Guides whose description is generated from `lookup` data instead of the
  * hand-written `seo` block, so the snippet still answers "{song} bpm / key /
- * tuning". Titles are always hand-written: the generated lookup titles were
- * dropped on 2026-10-04 for "How to Play …" titles aimed at learn-to-play
- * queries (0.66% CTR vs 0.14% for bpm lookups in the 2026-10-03 GSC export).
+ * tuning". (Lookup titles were tried 2026-08-14 and 2026-09-05, "How to
+ * Play …" titles from 2026-10-04; neither moved CTR.)
  */
 const LOOKUP_SEO_SLUGS = new Set([
   "master-of-puppets",
@@ -17,6 +19,23 @@ const LOOKUP_SEO_SLUGS = new Set([
   "hotel-california",
   "sweet-child-o-mine",
   "nothing-else-matters",
+]);
+
+/**
+ * Guides titled "Is {song} Hard to Play on Guitar? Rated x/10" from the live
+ * community score (test started 2026-11-01). Chosen by GSC volume of
+ * "is {song} hard" / "how hard is {song}" queries in the 3 months to
+ * 2026-10-30: MoP ~3.3k impressions, then Stairway, Hotel California, Nothing
+ * Else Matters, Enter Sandman and Seek & Destroy ("how bad is seek and
+ * destroy" alone 830), all at position 5–9 with 0% CTR.
+ */
+const DIFFICULTY_TITLE_SLUGS = new Set([
+  "master-of-puppets",
+  "stairway-to-heaven",
+  "hotel-california",
+  "nothing-else-matters",
+  "enter-sandman",
+  "seek-and-destroy",
 ]);
 
 interface SongGuideSEOProps {
@@ -36,7 +55,9 @@ export const SongGuideSEO = ({
   const authorProfile = getAuthorProfile(guide.author);
 
   const useLookupSeo = LOOKUP_SEO_SLUGS.has(guide.slug);
-  const metaTitle = guide.seo.metaTitle;
+  const metaTitle = DIFFICULTY_TITLE_SLUGS.has(guide.slug)
+    ? composeGuideTitle(guide, liveData)
+    : guide.seo.metaTitle;
   const metaDescription = useLookupSeo
     ? composeGuideDescription(guide, liveData)
     : guide.seo.metaDescription;

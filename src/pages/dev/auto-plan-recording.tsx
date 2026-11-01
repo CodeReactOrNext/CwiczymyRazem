@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import MainContainer from "components/MainContainer";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";

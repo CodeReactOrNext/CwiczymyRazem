@@ -1,67 +1,77 @@
 import React from 'react';
 
 /**
- * Replaces the old SessionLengthChart, which plotted a "15 min median" next to
- * a "54 min average" — two numbers from no stated sample, and the median was
- * never measured at all. The aggregate query behind `npm run update-hero-stats`
- * returns a session count and a summed duration and nothing else, so a mean is
- * the only session-length figure we can publish honestly. Everything below is
- * the last measured pass (see src/feature/landing/data/heroStats.ts).
+ * Real session-length distribution from the Riff Quest `logs` collection,
+ * measured by `npm run session-length-stats` (scripts/sessionLengthStats.test.ts).
+ * Rerun it and paste the printed numbers here; nothing on this card is estimated.
  *
- * If a later pass measures a distribution, bring the chart back — with its
- * sample printed next to it.
+ * Until 2026-11-01 this card showed only a mean, because the aggregate query
+ * behind the hero stats returns a count and a sum. It also credited the sample
+ * to every registered account (3,980) instead of the players who actually logged
+ * a session (854). The script reads each session's duration, so the card now
+ * shows medians and quartiles with the true sample.
  */
-const MEASURED_ON = '29 October 2026';
-const SESSIONS = '18,600+';
-const PLAYERS = '3,980+';
-const MEAN_MINUTES = 34;
+const MEASURED_ON = '1 November 2026';
+const PLAYERS = '854';
+const SESSIONS = '18,473';
+const PRACTICE_DAYS = '6,958';
+const DAY_MEDIAN = 51;
+const DAY_P25 = 20;
+const DAY_P75 = 110;
+const SESSION_MEDIAN = 9;
+const SESSION_MEAN = 35;
+
+const Figure = ({ value, label }: { value: string; label: string }) => (
+  <div>
+    <p className="text-4xl font-bold tracking-tight text-cyan-400 light:text-cyan-700">
+      {value}
+    </p>
+    <p className="mt-2 text-sm text-zinc-300 light:text-zinc-700">{label}</p>
+  </div>
+);
 
 export const SessionLengthStat = () => {
   return (
     <div className="not-prose my-10 rounded-lg bg-zinc-900/40 p-6 light:bg-zinc-100">
       <p className="text-sm font-medium text-zinc-200 light:text-zinc-900">
-        How long does a logged Riff Quest session actually run?
+        How long do Riff Quest players actually practise?
       </p>
 
-      <p className="mt-6 text-5xl font-bold tracking-tight text-cyan-400 light:text-cyan-700">
-        {MEAN_MINUTES} min
-      </p>
-      <p className="mt-2 text-sm text-zinc-300 light:text-zinc-700">
-        Mean length of a completed practice session.
-      </p>
+      <div className="mt-6 grid gap-6 sm:grid-cols-2">
+        <Figure
+          value={`${DAY_MEDIAN} min`}
+          label={`Median practice day. Half of all practice days fall between ${DAY_P25} and ${DAY_P75} minutes.`}
+        />
+        <Figure
+          value={`${SESSION_MEDIAN} min`}
+          label={`Median single session (mean ${SESSION_MEAN} min). Many sessions are one short exercise.`}
+        />
+      </div>
 
       <dl className="mt-6 space-y-1.5 text-sm text-zinc-400 light:text-zinc-600">
         <div className="flex gap-2">
           <dt className="font-medium text-zinc-300 light:text-zinc-900">Sample:</dt>
           <dd>
-            every completed practice report logged by {PLAYERS} players &mdash;{' '}
-            {SESSIONS} sessions in total &mdash; measured {MEASURED_ON}.
+            {SESSIONS} completed practice sessions logged by {PLAYERS} players,
+            grouped into {PRACTICE_DAYS} practice days; measured {MEASURED_ON}.
           </dd>
         </div>
         <div className="flex gap-2">
-          <dt className="font-medium text-zinc-300 light:text-zinc-900">Unit:</dt>
+          <dt className="font-medium text-zinc-300 light:text-zinc-900">Practice day:</dt>
           <dd>
-            one logged session, not one person&apos;s day. Someone who practises
-            twice on a Tuesday appears twice.
+            all the time one player logged on one calendar day (UTC), across
+            however many sessions that took.
           </dd>
         </div>
         <div className="flex gap-2">
-          <dt className="font-medium text-zinc-300 light:text-zinc-900">Duration:</dt>
+          <dt className="font-medium text-zinc-300 light:text-zinc-900">Caveat:</dt>
           <dd>
-            the total time recorded on that session, summed and divided by the
-            session count.
+            durations are what players logged, including hand-entered reports, so
+            the long tail (a few hundred sessions over four hours) is noisy. The
+            medians are barely affected by it; the mean is.
           </dd>
         </div>
       </dl>
-
-      <p className="mt-5 text-sm leading-relaxed text-zinc-400 light:text-zinc-600">
-        We publish the mean and nothing else because the mean is all the
-        aggregate returns. There is no median here, and no split by skill level,
-        because neither is measured &mdash; and a mean of this shape is easily
-        pulled upward by a minority of long sessions, so read it as &ldquo;what
-        the total divided by the count comes to&rdquo;, not as &ldquo;what a
-        typical session looks like&rdquo;.
-      </p>
     </div>
   );
 };

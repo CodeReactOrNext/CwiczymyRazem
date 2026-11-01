@@ -2,23 +2,14 @@
 
 import { cn } from "assets/lib/utils";
 import { YouTube } from "components/Blog/YouTube";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { Footer } from "feature/landing/components/Footer";
-import type {
-  PlanDemoExercise,
-  PlanDemoProps,
-} from "feature/landing/components/howItWorks/StepDemos";
 import {
   PlanDemo,
   PlayDemo,
   ProgressDemo,
 } from "feature/landing/components/howItWorks/StepDemos";
-import type { CategoryDifficultyFilter } from "feature/practice/utils/autoPlan";
-import {
-  countExercises,
-  filterExercises,
-} from "feature/practice/utils/autoPlan";
+import type { HowItWorksStats } from "feature/landing/data/howItWorksStats";
+import { PLAN_DEMO_PICKS } from "feature/landing/data/planDemoPicks";
 import { m } from "framer-motion";
 import { useInView } from "framer-motion";
 import { ArrowRight, ChevronRight } from "lucide-react";
@@ -29,49 +20,8 @@ import { useRef } from "react";
 /* ─────────────────────────────────────────────
    Data
 ───────────────────────────────────────────── */
-/**
- * Step 01 replays the Auto Plan: 30 minutes, two cells of the focus grid
- * ticked, and a plan of real exercises from those cells that adds up to 30.
- * The grid's counts and "N exercises match" come from the library itself.
- */
-const PLAN_DEMO_PICKS: PlanDemoProps["picks"] = [
-  { category: "technique", difficulty: "medium" },
-  { category: "theory", difficulty: "hard" },
-];
-const PLAN_DEMO_IDS = [
-  "spider_basic",
-  "smooth_chord_transitions",
-  "fretboard_mastery",
-  "guide_tone_voice_leading",
-];
-const planDemoExercises: PlanDemoExercise[] = PLAN_DEMO_IDS.flatMap((id) =>
-  exercisesAgregat
-    .filter((exercise) => exercise.id === id)
-    .map((exercise) => ({
-      title: exercise.title,
-      minutes: exercise.timeInMinutes,
-      category: exercise.category,
-      difficulty: exercise.difficulty,
-    })),
-);
-const planDemoMatches = PLAN_DEMO_PICKS.reduce<{
-  filter: CategoryDifficultyFilter;
-  counts: number[];
-}>(
-  ({ filter, counts }, { category, difficulty }) => {
-    const next = {
-      ...filter,
-      [category]: [...(filter[category] ?? []), difficulty],
-    };
-    return {
-      filter: next,
-      counts: [...counts, filterExercises(exercisesAgregat, next).length],
-    };
-  },
-  { filter: {}, counts: [exercisesAgregat.length] },
-).counts;
-
-const steps = [
+/** Library numbers arrive as props (see data/howItWorksStats). */
+const buildSteps = (stats: HowItWorksStats) => [
   {
     number: "01",
     title: "Practice your way,\ntrack it all in one place",
@@ -84,7 +34,7 @@ const steps = [
       {
         label: "Single exercises",
         sub: "exercises categorized by skill",
-        count: exercisesAgregat.length,
+        count: stats.exerciseCount,
       },
       {
         label: "Configurable exercises",
@@ -93,7 +43,7 @@ const steps = [
       {
         label: "Ready-made training plans",
         sub: "structured programs you can follow from day one",
-        count: defaultPlans.length,
+        count: stats.planCount,
         href: "/guitar-practice-planner",
       },
       {
@@ -122,10 +72,10 @@ const steps = [
     ],
     demo: (
       <PlanDemo
-        counts={countExercises(exercisesAgregat)}
+        counts={stats.categoryCounts}
         picks={PLAN_DEMO_PICKS}
-        matches={planDemoMatches}
-        exercises={planDemoExercises}
+        matches={stats.planDemoMatches}
+        exercises={stats.planDemoExercises}
         minutes={30}
       />
     ),
@@ -226,7 +176,7 @@ function StepSection({
   step,
   index,
 }: {
-  step: (typeof steps)[0];
+  step: ReturnType<typeof buildSteps>[number];
   index: number;
 }) {
   const ref = useRef(null);
@@ -318,7 +268,8 @@ function StepSection({
 /* ─────────────────────────────────────────────
    Main Page
 ───────────────────────────────────────────── */
-export const HowItWorksPage = () => {
+export const HowItWorksPage = ({ stats }: { stats: HowItWorksStats }) => {
+  const steps = buildSteps(stats);
   return (
     <div className='min-h-screen overflow-x-hidden bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/20'>
       {/* ── Nav ── */}

@@ -1,6 +1,5 @@
 "use client";
 
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { LandingExerciseCard } from "feature/landing/components/LandingExerciseCard";
 import { Reveal } from "feature/landing/components/Reveal";
 import type { TabPreviewNote } from "feature/landing/lib/tabPreview";
@@ -12,13 +11,11 @@ import {
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-/** Counted from the catalogue rather than hard-coded: the headline said 144
- *  long after the library had grown past 200 (SEO audit 2026-09-05). */
-const CATALOG_SIZE = exercisesAgregat.filter(
-  (exercise) => !exercise.isHiddenFromLibrary,
-).length;
-
 interface ExerciseCatalogPreviewProps {
+  /** Counted from the catalogue in getStaticProps rather than hard-coded: the
+   *  headline said 144 long after the library had grown past 200 (SEO audit
+   *  2026-09-05). Not imported here: the catalogue is ~950 KB of JS. */
+  catalogSize: number;
   exercises: Array<{
     id: string;
     title: string;
@@ -31,6 +28,7 @@ interface ExerciseCatalogPreviewProps {
 }
 
 export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
+  catalogSize,
   exercises,
 }) => {
   return (
@@ -44,7 +42,7 @@ export const ExerciseCatalogPreview: React.FC<ExerciseCatalogPreviewProps> = ({
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8'>
         <Reveal className='mx-auto mb-12 max-w-2xl text-center'>
           <h2 className='mb-6 font-landingHeading text-4xl font-extrabold leading-tight tracking-[-0.03em] text-white sm:text-5xl'>
-            {CATALOG_SIZE} exercises ready to learn
+            {catalogSize} exercises ready to learn
           </h2>
 
           <p className='mb-4 text-lg leading-relaxed text-zinc-400'>

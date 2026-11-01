@@ -8,6 +8,7 @@ import type {
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
 import { LandingStickyNav } from "feature/landing/components/LandingStickyNav";
+import type { FeaturedGuideLink } from "feature/landing/data/featuredGuides";
 import { jakartaLanding } from "feature/landing/lib/fonts";
 import type { TabPreviewNote } from "feature/landing/lib/tabPreview";
 import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
@@ -77,12 +78,16 @@ interface LandingPageProps {
     timeInMinutes: number;
     tabPreview?: TabPreviewNote[];
   }>;
+  catalogSize: number;
+  featuredGuides: FeaturedGuideLink[];
   guideLiveData?: PathSongLiveDataMap;
 }
 
 const LandingPage = ({
   blogs,
   spotlightExercises = [],
+  catalogSize,
+  featuredGuides,
   guideLiveData = {},
 }: LandingPageProps) => {
   const faqGroups: faqGroupInterface[] = [
@@ -157,11 +162,17 @@ const LandingPage = ({
         <HeroSection />
         <InteractiveExercisesSection />
         {spotlightExercises.length > 0 && (
-          <ExerciseCatalogPreview exercises={spotlightExercises} />
+          <ExerciseCatalogPreview
+            catalogSize={catalogSize}
+            exercises={spotlightExercises}
+          />
         )}
         <StatisticsSection />
         <SectionSeam from='900' to='950' />
-        <SongsLibrarySection guideLiveData={guideLiveData} />
+        <SongsLibrarySection
+          featuredGuides={featuredGuides}
+          guideLiveData={guideLiveData}
+        />
         <PracticePlansSection />
         <TestimonialsSection />
         <MidCTASection />

@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import { getDuelExercise } from "feature/duels/data/duelPool";
 import { fetchDuel } from "feature/duels/services/duels.service";
 import type {

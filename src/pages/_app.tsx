@@ -30,7 +30,6 @@ const teko = Teko({
 import Analytics from "components/Analytics/Analytics";
 import { DesktopUpdateRequired } from "components/DesktopUpdateRequired";
 import { ElectronIntegrations } from "components/ElectronIntegrations";
-import { ElectronTitleBar } from "components/ElectronTitleBar";
 import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
 import { RouteProgress } from "components/RouteProgress/RouteProgress";
 import { DesktopNotifications } from "feature/notifications/components/DesktopNotifications";
@@ -60,6 +59,13 @@ const AuthSyncWrapper = ({ children }: { children: React.ReactNode }) => {
 
     return <>{children}</>;
 }
+
+// Desktop-only chrome (tuner, amp sim, window controls) with the app's full
+// English catalog — a separate chunk the web build never downloads.
+const ElectronTitleBar = dynamic(
+  () => import("components/ElectronTitleBar").then((mod) => mod.ElectronTitleBar),
+  { ssr: false },
+);
 
 const sharedHead = (
   <Head>
@@ -107,7 +113,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                 <TooltipProvider>
                   <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground ${isElectron ? "pt-10" : ""}`}>
                     <LocalizedChrome>
-                      <ElectronTitleBar />
+                      {isElectron && <ElectronTitleBar />}
                       <ElectronIntegrations />
                       <DesktopNotifications />
                       <DesktopUpdateRequired />

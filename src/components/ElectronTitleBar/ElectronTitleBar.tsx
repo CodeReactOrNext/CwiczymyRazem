@@ -1,8 +1,12 @@
-import { useTranslation } from "hooks/useTranslation";
+// The tuner and amp-sim buttons render app-only namespaces; this module is
+// loaded lazily by _app, inside Electron only.
+import "lib/i18n/fullCatalog";
+
 import { cn } from "assets/lib/utils";
 import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import { TunerButton } from "feature/tuner/components/TunerButton";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronLeft, ChevronRight, House } from "lucide-react";
 import { useRouter } from "next/router";
 import { createPortal } from "react-dom";

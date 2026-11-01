@@ -1,16 +1,20 @@
 "use client";
 
-import { songGuides } from "feature/song-library/song-guides/content";
-import type { PathSongLiveDataMap } from "feature/song-library/song-guides/types";
+import type {
+  GuideCardData,
+  PathSongLiveDataMap,
+} from "feature/song-library/song-guides/types";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ArrowRight, Music } from "lucide-react";
 import Link from "next/link";
 
 interface LibraryGuidesSectionProps {
+  guides: GuideCardData[];
   guideLiveData: PathSongLiveDataMap;
 }
 
 export const LibraryGuidesSection = ({
+  guides,
   guideLiveData,
 }: LibraryGuidesSectionProps) => {
   return (
@@ -28,10 +32,10 @@ export const LibraryGuidesSection = ({
         </div>
 
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-          {songGuides.map((guide) => {
+          {guides.map((guide) => {
             const live = guide.songId ? guideLiveData[guide.songId] : undefined;
             const liveRating = live && live.avgDifficulty > 0 ? live : undefined;
-            const difficulty = liveRating?.avgDifficulty ?? guide.editorial.difficulty;
+            const difficulty = liveRating?.avgDifficulty ?? guide.editorialDifficulty;
             const tier = getSongTier(liveRating?.tier ?? difficulty);
             const coverUrl = live?.coverUrl ?? null;
 
@@ -79,7 +83,7 @@ export const LibraryGuidesSection = ({
                   </div>
                 </div>
                 <p className='mb-4 flex-1 text-sm leading-relaxed text-zinc-400'>
-                  {guide.editorial.oneLiner}
+                  {guide.oneLiner}
                 </p>
                 <span className='flex items-center gap-1.5 text-sm font-medium text-cyan-400 transition-colors group-hover:text-cyan-300'>
                   Read the guide

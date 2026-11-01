@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import { GuitarBuilderTab } from "feature/guitarBuilder/components/GuitarBuilderTab";

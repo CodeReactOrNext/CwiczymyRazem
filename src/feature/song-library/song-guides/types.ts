@@ -320,3 +320,16 @@ export type PathSongLiveDataMap = Record<
   string,
   { coverUrl: string | null; avgDifficulty: number; tier: string }
 >;
+
+/**
+ * The few fields a guide card on /song-library shows, picked in getStaticProps.
+ * Cards must not import the guide registry: it is the full text of every guide.
+ */
+export interface GuideCardData {
+  slug: string;
+  title: string;
+  artist: string;
+  songId: string | null;
+  editorialDifficulty: number;
+  oneLiner: string;
+}

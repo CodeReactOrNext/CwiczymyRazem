@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import AdminLogin from "feature/admin/components/AdminLogin";
 import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
 import type { SupportSearchResult } from "feature/admin/hooks/useAdminSupport";

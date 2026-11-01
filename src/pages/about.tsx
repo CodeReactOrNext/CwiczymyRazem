@@ -18,7 +18,7 @@ const AboutPage: NextPageWithLayout = () => {
         <title>About Riff Quest - Built by Guitarists</title>
         <meta
           name='description'
-          content='Learn about Riff Quest, the intelligent guitar practice assistant built by guitarists for guitarists. Track progress, compete with friends, and see visible improvement.'
+          content='Riff Quest is a free guitar practice tracker built by guitarists: log sessions, follow plans, rate songs by difficulty and see your progress.'
         />
         <link rel='canonical' href='https://riff.quest/about' />
         <meta
@@ -27,7 +27,7 @@ const AboutPage: NextPageWithLayout = () => {
         />
         <meta
           property='og:description'
-          content='Learn about Riff Quest, the intelligent guitar practice assistant built by guitarists for guitarists. Track progress, compete with friends, and see visible improvement.'
+          content='Riff Quest is a free guitar practice tracker built by guitarists: log sessions, follow plans, rate songs by difficulty and see your progress.'
         />
         <meta property='og:url' content='https://riff.quest/about' />
         <meta property='og:type' content='website' />

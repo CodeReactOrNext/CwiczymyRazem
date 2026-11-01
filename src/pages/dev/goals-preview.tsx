@@ -1,3 +1,6 @@
+// App page outside AppLayout: register the app-only English namespaces.
+import "lib/i18n/fullCatalog";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
