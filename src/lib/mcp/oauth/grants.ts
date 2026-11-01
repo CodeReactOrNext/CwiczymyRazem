@@ -321,25 +321,37 @@ export interface ConnectedApp {
   lastRefreshedAt: number | null;
 }
 
-export async function listConnectedApps(uid: string): Promise<ConnectedApp[]> {
+export async function listConnectedApps(
+  uid: string,
+  now = Date.now(),
+): Promise<ConnectedApp[]> {
   const snapshot = await grants()
     .where("uid", "==", uid)
     .where("revokedAt", "==", null)
     .get();
-  return snapshot.docs
-    .map((doc) => {
-      const grant = doc.data() as GrantDoc;
-      return {
-        id: doc.id,
-        name: grant.clientName,
-        uri: grant.clientUri,
-        redirectHost: grant.redirectHost,
-        scopes: grant.scopes,
-        connectedAt: grant.createdAt.toMillis(),
-        lastRefreshedAt: grant.refreshedAt?.toMillis() ?? null,
-      };
-    })
-    .sort((a, b) => b.connectedAt - a.connectedAt);
+  return (
+    snapshot.docs
+      // A connection whose last refresh token ran out without being used is
+      // over, even though nothing marked it: the app has to sign in again.
+      .filter((doc) => {
+        const grant = doc.data() as GrantDoc;
+        const lastIssued = (grant.refreshedAt ?? grant.createdAt).toMillis();
+        return lastIssued + REFRESH_TOKEN_TTL_S * 1000 > now;
+      })
+      .map((doc) => {
+        const grant = doc.data() as GrantDoc;
+        return {
+          id: doc.id,
+          name: grant.clientName,
+          uri: grant.clientUri,
+          redirectHost: grant.redirectHost,
+          scopes: grant.scopes,
+          connectedAt: grant.createdAt.toMillis(),
+          lastRefreshedAt: grant.refreshedAt?.toMillis() ?? null,
+        };
+      })
+      .sort((a, b) => b.connectedAt - a.connectedAt)
+  );
 }
 
 /** Disconnects an app: its tokens stop working at once. False when it isn't the player's. */

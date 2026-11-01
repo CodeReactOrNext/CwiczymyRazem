@@ -192,6 +192,8 @@ async function connect(
 
 beforeEach(() => {
   store.clear();
+  // AI assistants are a supporter perk; the player in these flows has the badge
+  store.set("users/player-1", { isSupport: true });
 });
 
 describe("OAuth flow, as claude.ai runs it", () => {
@@ -223,6 +225,16 @@ describe("OAuth flow, as claude.ai runs it", () => {
       ok: true,
       context: { uid: "player-1", scopes: ["read", "write"] },
     });
+    // the badge goes: the same token is refused on its very next request
+    store.set("users/player-1", { isSupport: false });
+    expect(
+      await authenticateMcpRequest(mcpRequest(tokens.access_token)),
+    ).toMatchObject({
+      ok: false,
+      status: 403,
+      error: expect.stringMatching(/supporter perk/),
+    });
+    store.set("users/player-1", { isSupport: true });
 
     const apps = await listConnectedApps("player-1");
     expect(apps).toHaveLength(1);
@@ -230,6 +242,9 @@ describe("OAuth flow, as claude.ai runs it", () => {
       name: "Claude",
       redirectHost: "claude.ai",
     });
+    // unused past the refresh token's life, the connection is over
+    const lapsed = Date.now() + 91 * 24 * 60 * 60 * 1000;
+    expect(await listConnectedApps("player-1", lapsed)).toEqual([]);
   });
 
   it("spends a code once and checks PKCE, client and redirect", async () => {

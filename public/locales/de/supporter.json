@@ -148,6 +148,10 @@
       },
       "5": {
         "title": "Der Supporter-Kanal"
+      },
+      "6": {
+        "title": "Dein KI-Assistent, verbunden",
+        "body": "Verbinde Claude oder einen anderen KI-Assistenten mit deinem Konto: Er liest dein Üben, plant Sessions und schreibt Übungen mit Tabs."
       }
     }
   },
@@ -309,7 +313,8 @@
       "perks": {
         "0": "Sieh, was gerade gebaut wird, und stimm ab, was als Nächstes kommt",
         "1": "Wähl das Equipment, das ins Arsenal und in die Kisten kommt",
-        "2": "Bestimm die Challenge, die die ganze App diese Woche spielt"
+        "2": "Bestimm die Challenge, die die ganze App diese Woche spielt",
+        "3": "Verbinde Claude oder einen anderen KI-Assistenten mit deinem Konto"
       },
       "email": "Nutze die E-Mail-Adresse dieses Kontos, um Supporter freizuschalten.",
       "email_known": "Nutze die E-Mail-Adresse dieses Kontos, um Supporter freizuschalten: {{email}}.",

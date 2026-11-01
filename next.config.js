@@ -439,6 +439,15 @@ const nextConfig = {
   },
   async headers() {
     return [
+      // The MCP tab preview (lib/mcp/apps/tabPreviewHtml.ts) runs in Claude's
+      // sandbox on another origin and loads these as a module script, a web
+      // font and a fetched soundfont — all cross-origin requests that need CORS.
+      ...["/alphatab/:path*", "/soundfont/:path*", "/mcp-app/:path*"].map(
+        (source) => ({
+          source,
+          headers: [{ key: "Access-Control-Allow-Origin", value: "*" }],
+        }),
+      ),
       {
         source: "/(.*)",
         headers: [

@@ -2,7 +2,13 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { getServerDateKey } from "utils/converter/getServerDateKey";
 
 import { firestore } from "./db";
+import {
+  MCP_EXERCISES_PER_DAY,
+  MCP_REQUESTS_PER_MINUTE,
+  MCP_WRITES_PER_DAY,
+} from "./limits";
 import { mcpResource, originOf, sameResource } from "./oauth/config";
+import { MCP_SUPPORTERS_ONLY_MESSAGE, readMcpAccess } from "./supporter";
 import {
   hashMcpToken,
   looksLikeMcpToken,
@@ -23,16 +29,15 @@ export interface McpContext {
   scopes: McpScope[];
 }
 
-/** HTTP requests one token may make in a minute — every MCP message is one. */
-export const MCP_REQUESTS_PER_MINUTE = 60;
-/** Writes a player may make through MCP in a day, across all their tokens. */
-export const MCP_WRITES_PER_DAY = 20;
-/** Of those, how many may create a new exercise. */
-export const MCP_EXERCISES_PER_DAY = 10;
+export {
+  MCP_EXERCISES_PER_DAY,
+  MCP_REQUESTS_PER_MINUTE,
+  MCP_WRITES_PER_DAY,
+} from "./limits";
 
 export type McpAuthResult =
   | { ok: true; context: McpContext }
-  | { ok: false; status: 401 | 429; error: string };
+  | { ok: false; status: 401 | 403 | 429; error: string };
 
 const bearer = (request: Request) => {
   const header = request.headers.get("authorization") ?? "";
@@ -94,6 +99,13 @@ export async function authenticateMcpRequest(
       status: 401,
       error: "Token was issued for another server",
     };
+  }
+
+  // A supporter perk, checked on every request: a token made while the player
+  // had the badge stops working the moment it's gone. Nothing gets through —
+  // not initialize, not the tool list.
+  if (!(await readMcpAccess(data.uid))) {
+    return { ok: false, status: 403, error: MCP_SUPPORTERS_ONLY_MESSAGE };
   }
 
   const usage = countRequest(data.minute, now);

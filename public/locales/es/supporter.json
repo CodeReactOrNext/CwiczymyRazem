@@ -148,6 +148,10 @@
       },
       "5": {
         "title": "El canal de supporters"
+      },
+      "6": {
+        "title": "Tu asistente de IA, conectado",
+        "body": "Conecta Claude u otro asistente de IA a tu cuenta: lee tu práctica, planifica sesiones y escribe ejercicios con tablatura."
       }
     }
   },
@@ -309,7 +313,8 @@
       "perks": {
         "0": "Mira lo que se construye ahora y vota lo que viene después",
         "1": "Elige el equipo que entra en el Arsenal y en las cajas",
-        "2": "Decide el reto que juega toda la app esa semana"
+        "2": "Decide el reto que juega toda la app esa semana",
+        "3": "Conecta Claude u otro asistente de IA a tu cuenta"
       },
       "email": "Usa el correo de esta cuenta para desbloquear Supporter.",
       "email_known": "Usa el correo de esta cuenta para desbloquear Supporter: {{email}}.",

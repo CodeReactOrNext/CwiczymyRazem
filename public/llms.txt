@@ -34,6 +34,7 @@
 
 - Riff Quest is **free forever**. There are no premium tiers, subscriptions, or paywalls.
 - The project is sustained voluntarily by the community via [Buy Me a Coffee](https://buymeacoffee.com/riffquest).
+- Supporters (any donation) get extras on top: the supporter panel and [connecting an AI assistant](https://riff.quest/features/ai-guitar-practice-assistant) such as Claude or ChatGPT to their account. Practising itself is never behind a payment.
 
 ## Technical Details
 

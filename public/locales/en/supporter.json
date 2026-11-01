@@ -148,6 +148,10 @@
       },
       "5": {
         "title": "The supporter channel"
+      },
+      "6": {
+        "title": "Your AI assistant, connected",
+        "body": "Connect Claude or another AI assistant to your account: it reads your practice, plans sessions and writes exercises with tabs."
       }
     }
   },
@@ -286,7 +290,8 @@
       "perks": {
         "0": "Watch what is being built now and vote on what comes next",
         "1": "Pick the gear that goes into the Arsenal and the cases",
-        "2": "Set the challenge the whole app plays for that week"
+        "2": "Set the challenge the whole app plays for that week",
+        "3": "Connect Claude or another AI assistant to your account"
       },
       "email": "Use the email this account is on to unlock Supporter.",
       "email_known": "Use the email this account is on to unlock Supporter: {{email}}.",

@@ -1,9 +1,11 @@
 import { Button } from "assets/components/ui/button";
 import { Switch } from "assets/components/ui/switch";
 import axios from "axios";
+import { McpSupporterNotice } from "feature/settings/components/McpSupporterNotice";
 import type { User } from "firebase/auth";
 import { useTranslation } from "hooks/useTranslation";
 import { rememberOAuthReturn } from "lib/mcp/oauth/postLoginRedirect";
+import { MCP_SUPPORTERS_ONLY_ERROR } from "lib/mcp/supporterPerk";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -46,6 +48,12 @@ export const OAuthConsentView = () => {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [allowWrite, setAllowWrite] = useState(true);
   const [busy, setBusy] = useState(false);
+  // Connecting is a supporter perk; known per signed-in player, so a switch of
+  // account never shows the previous answer.
+  const [access, setAccess] = useState<{
+    uid: string;
+    hasAccess: boolean;
+  } | null>(null);
 
   useEffect(() => auth.onAuthStateChanged(setUser), []);
 
@@ -72,6 +80,33 @@ export const OAuthConsentView = () => {
       );
   }, [router.isReady, router.query, t]);
 
+  useEffect(() => {
+    if (!user || !router.isReady) return undefined;
+    let cancelled = false;
+    user
+      .getIdToken()
+      .then((idToken) =>
+        axios.post<{ hasAccess: boolean }>("/api/oauth/authorize", {
+          action: "access",
+          params: queryParams(router.query),
+          idToken,
+        }),
+      )
+      .then(({ data }) => {
+        if (!cancelled) setAccess({ uid: user.uid, hasAccess: data.hasAccess });
+      })
+      // Unknown is not a no: leave Allow open. The server checks the badge
+      // again on Allow, and a refusal there shows the notice.
+      .catch(() => {
+        if (!cancelled) setAccess({ uid: user.uid, hasAccess: true });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user, router.isReady, router.query]);
+
+  const hasAccess = user && access?.uid === user.uid ? access.hasAccess : null;
+
   const signIn = () => {
     rememberOAuthReturn(window.location.pathname + window.location.search);
     void router.push("/login");
@@ -92,8 +127,15 @@ export const OAuthConsentView = () => {
         },
       );
       window.location.assign(data.redirect);
-    } catch {
+    } catch (error) {
       setBusy(false);
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.data?.error === MCP_SUPPORTERS_ONLY_ERROR
+      ) {
+        setAccess({ uid: user.uid, hasAccess: false });
+        return;
+      }
       setDescribed({ error: t("oauth.error") });
     }
   };
@@ -158,28 +200,46 @@ export const OAuthConsentView = () => {
               )}
             </div>
 
-            <div className='space-y-4'>
-              <p className='text-sm text-zinc-200'>{t("oauth.can_read")}</p>
-              {request.scopes.includes("write") && (
-                <div className='flex items-center justify-between gap-6'>
-                  <div className='min-w-0'>
-                    <p className='text-sm text-zinc-200'>
-                      {t("mcp.allow_writes")}
-                    </p>
-                    <p className='mt-1 text-sm text-zinc-400'>
-                      {t("mcp.allow_writes_description")}
-                    </p>
+            {hasAccess !== false && (
+              <div className='space-y-4'>
+                <p className='text-sm text-zinc-200'>{t("oauth.can_read")}</p>
+                {request.scopes.includes("write") && (
+                  <div className='flex items-center justify-between gap-6'>
+                    <div className='min-w-0'>
+                      <p className='text-sm text-zinc-200'>
+                        {t("mcp.allow_writes")}
+                      </p>
+                      <p className='mt-1 text-sm text-zinc-400'>
+                        {t("mcp.allow_writes_description")}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={allowWrite}
+                      onChange={() => setAllowWrite((value) => !value)}
+                      aria-label={t("mcp.allow_writes")}
+                    />
                   </div>
-                  <Switch
-                    checked={allowWrite}
-                    onChange={() => setAllowWrite((value) => !value)}
-                    aria-label={t("mcp.allow_writes")}
-                  />
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
-            {user ? (
+            {user && hasAccess === false ? (
+              <div className='space-y-4'>
+                <p className='text-xs text-zinc-500'>
+                  {t("oauth.signed_in_as", {
+                    name: user.displayName || user.email || "",
+                  })}
+                </p>
+                <McpSupporterNotice />
+                <Button
+                  variant='ghost'
+                  onClick={() => decide(false)}
+                  disabled={busy}
+                  className='w-full'>
+                  {t("oauth.deny")}
+                </Button>
+              </div>
+            ) : user ? (
               <div className='space-y-4'>
                 <p className='text-xs text-zinc-500'>
                   {t("oauth.signed_in_as", {
@@ -189,7 +249,7 @@ export const OAuthConsentView = () => {
                 <div className='flex gap-3'>
                   <Button
                     onClick={() => decide(true)}
-                    disabled={busy}
+                    disabled={busy || hasAccess === null}
                     className='flex-1'>
                     {t("oauth.allow")}
                   </Button>

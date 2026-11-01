@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import type { McpContext } from "../auth";
 import {
+  countUserSongs,
   exerciseExists,
   exerciseTitle,
   logDay,
@@ -218,7 +219,10 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
     },
     () =>
       runTool("riffquest_get_profile_summary", async () => {
-        const user = await readUser(uid);
+        const [user, songCounts] = await Promise.all([
+          readUser(uid),
+          countUserSongs(uid),
+        ]);
         const stats = user.statistics;
         const time = stats?.time;
         return jsonResult({
@@ -248,11 +252,7 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
                 .toISOString()
                 .slice(0, 10)
             : null,
-          songCounts: {
-            wantToLearn: stats?.songLists?.wantToLearn?.length ?? 0,
-            learning: stats?.songLists?.learning?.length ?? 0,
-            learned: stats?.songLists?.learned?.length ?? 0,
-          },
+          songCounts,
           profileUrl: appLink(`/user/${uid}`),
         });
       }),

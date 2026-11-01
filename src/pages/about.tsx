@@ -135,9 +135,9 @@ const AboutPage: NextPageWithLayout = () => {
                   Completely Free
                 </h3>
                 <p className='text-sm leading-relaxed'>
-                  Every feature — practice tracking, plans, scoring,
+                  Everything you practise with — tracking, plans, scoring,
                   leaderboards, songs — is free, forever. No credit card, no
-                  premium tier, no paywalls.
+                  premium tier. Supporters get a few extras on top.
                 </p>
               </div>
               <div className='rounded-lg bg-amber-500/10 p-6'>

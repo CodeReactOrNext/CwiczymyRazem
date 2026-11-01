@@ -35,7 +35,11 @@ describe("POST /api/mcp", () => {
   beforeEach(() => {
     authenticate.mockResolvedValue({
       ok: true,
-      context: { uid: "player-1", tokenId: "t", scopes: ["read"] },
+      context: {
+        uid: "player-1",
+        tokenId: "t",
+        scopes: ["read"],
+      },
     });
   });
 
@@ -82,6 +86,19 @@ describe("POST /api/mcp", () => {
     );
   });
 
+  it("is a 403 that says why for a player without the supporter badge", async () => {
+    authenticate.mockResolvedValue({
+      ok: false,
+      status: 403,
+      error: "Connecting an AI assistant to riff.quest is a supporter perk.",
+    });
+    const response = await POST(initialize);
+    expect(response.status).toBe(403);
+    // signing in again wouldn't help, so no challenge that would start it
+    expect(response.headers.get("www-authenticate")).toBeNull();
+    expect((await response.json()).error.message).toMatch(/supporter perk/);
+  });
+
   it("is a 429 with Retry-After over the rate limit", async () => {
     authenticate.mockResolvedValue({
       ok: false,
@@ -98,5 +115,40 @@ describe("POST /api/mcp", () => {
     const anonymous = await GET(new Request("http://localhost/api/mcp"));
     expect(anonymous.status).toBe(401);
     expect(anonymous.headers.get("www-authenticate")).not.toMatch(/error=/);
+  });
+
+  describe("Origin", () => {
+    const withOrigin = (origin: string) => {
+      const request = rpc("tools/list");
+      request.headers.set("Origin", origin);
+      return request;
+    };
+
+    it("refuses a page on another site before looking at the token", async () => {
+      authenticate.mockClear();
+      const response = await POST(withOrigin("https://evil.example"));
+      expect(response.status).toBe(403);
+      expect(authenticate).not.toHaveBeenCalled();
+      expect((await GET(withOrigin("https://evil.example"))).status).toBe(403);
+    });
+
+    it("refuses a rebound name even when Origin and Host agree", async () => {
+      const request = new Request("https://evil.example/api/mcp", {
+        method: "POST",
+        headers: {
+          Host: "evil.example",
+          Origin: "https://evil.example",
+          Authorization: "Bearer rq_test",
+        },
+        body: "{}",
+      });
+      expect((await POST(request)).status).toBe(403);
+    });
+
+    it("lets riff.quest, local dev and clients that send none through", async () => {
+      expect((await POST(withOrigin("https://riff.quest"))).status).toBe(200);
+      expect((await POST(withOrigin("http://localhost"))).status).toBe(200);
+      expect((await POST(rpc("tools/list"))).status).toBe(200);
+    });
   });
 });

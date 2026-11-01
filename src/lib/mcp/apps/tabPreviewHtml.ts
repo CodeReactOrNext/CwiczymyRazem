@@ -5,9 +5,13 @@ import { TAB_BOARD_JS } from "./generated/tabBoardBundle";
  * with notation one tab away and playback for both, rendered by Claude inside
  * the conversation.
  *
- * It runs in the host's sandbox, not on riff.quest, so everything comes from
- * jsDelivr — the one origin the resource's CSP declares — or is inlined: the
- * board is the session's own renderer, bundled (scripts/buildMcpTabBoard.mjs).
+ * It runs in the host's sandbox, not on riff.quest, so every file it loads comes
+ * from riff.quest itself — the one origin the resource's CSP declares — or is
+ * inlined: the board is the session's own renderer, bundled
+ * (scripts/buildMcpTabBoard.mjs). Not a public CDN: the connector directory
+ * requires the developer to own every resource the UI fetches. The files sit in
+ * public/ (alphatab/, soundfont/, mcp-app/) and next.config.js sends them with
+ * CORS, which module scripts, fonts and the soundfont fetch all need.
  * AlphaTab draws the notation and plays the sound in both views; the board's
  * cursor follows its player. Neither uses web workers (a sandboxed iframe can't
  * spawn them from another origin). The alphaTex and the board's data are built
@@ -15,18 +19,27 @@ import { TAB_BOARD_JS } from "./generated/tabBoardBundle";
  */
 export const ALPHATAB_VERSION = "1.8.1";
 export const EXT_APPS_VERSION = "1.7.5";
-export const CDN = "https://cdn.jsdelivr.net";
+/** Production riff.quest: the sandbox can't reach a preview or localhost anyway. */
+export const ASSET_ORIGIN = "https://riff.quest";
 
-const ALPHATAB = `${CDN}/npm/@coderline/alphatab@${ALPHATAB_VERSION}/dist`;
-const EXT_APPS = `${CDN}/npm/@modelcontextprotocol/ext-apps@${EXT_APPS_VERSION}/dist/src/app-with-deps.js`;
+/** Copies of the npm packages' dist files, checked byte for byte by a test. */
+export const TAB_PREVIEW_ASSETS = {
+  alphaTab: "/alphatab/alphaTab.min.js",
+  fontDirectory: "/alphatab/font/",
+  bravura: "/alphatab/font/Bravura.woff2",
+  soundFont: "/soundfont/sonivox.sf2",
+  extApps: `/mcp-app/ext-apps-${EXT_APPS_VERSION}.js`,
+} as const;
+
+const asset = (path: string) => `${ASSET_ORIGIN}${path}`;
 
 export const TAB_PREVIEW_HTML = `<!doctype html>
 <html>
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<script src="${ALPHATAB}/alphaTab.min.js"></script>
-<script>window.RIFF_TAB_BRAVURA_URL = "${ALPHATAB}/font/Bravura.woff2";</script>
+<script src="${asset(TAB_PREVIEW_ASSETS.alphaTab)}"></script>
+<script>window.RIFF_TAB_BRAVURA_URL = "${asset(TAB_PREVIEW_ASSETS.bravura)}";</script>
 <script>${TAB_BOARD_JS}</script>
 <style>
   :root { color-scheme: light dark; --bg: #fafafa; --fg: #18181b; --muted: #71717a; --panel: #f4f4f5; --active: #e4e4e7; }
@@ -79,7 +92,7 @@ export const TAB_PREVIEW_HTML = `<!doctype html>
   <div id="score" hidden></div>
   <div id="issues"></div>
 <script type="module">
-  import { App } from "${EXT_APPS}";
+  import { App } from "${asset(TAB_PREVIEW_ASSETS.extApps)}";
 
   const $ = (id) => document.getElementById(id);
   const app = new App({ name: "riff.quest tab preview", version: "1.0.0" });
@@ -138,9 +151,9 @@ export const TAB_PREVIEW_HTML = `<!doctype html>
 
   const mountPlayer = (tex) => {
     api = new alphaTab.AlphaTabApi($("score"), {
-      core: { useWorkers: false, fontDirectory: "${ALPHATAB}/font/" },
+      core: { useWorkers: false, fontDirectory: "${asset(TAB_PREVIEW_ASSETS.fontDirectory)}" },
       display: { layoutMode: alphaTab.LayoutMode.Page, scale: 0.9 },
-      player: { enablePlayer: true, enableCursor: true, soundFont: "${ALPHATAB}/soundfont/sonivox.sf2" },
+      player: { enablePlayer: true, enableCursor: true, soundFont: "${asset(TAB_PREVIEW_ASSETS.soundFont)}" },
     });
     api.playerReady.on(() => { $("play").disabled = false; });
     api.renderFinished.on(() => { notationDrawn = true; });

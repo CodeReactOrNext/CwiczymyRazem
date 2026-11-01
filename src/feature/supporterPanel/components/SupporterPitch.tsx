@@ -51,7 +51,7 @@ export const SupporterPitch = () => {
           {t("panel.pitch.intro")}
         </p>
         <ul className='max-w-2xl space-y-1.5 text-sm text-zinc-300'>
-          {[0, 1, 2]
+          {[0, 1, 2, 3]
             .map((i) => t(`panel.pitch.perks.${i}`))
             .map((perk) => (
               <li key={perk} className='flex gap-2'>

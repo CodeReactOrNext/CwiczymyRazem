@@ -1,4 +1,5 @@
 import { listConnectedApps, revokeConnectedApp } from "lib/mcp/oauth/grants";
+import { MCP_SUPPORTERS_ONLY_ERROR, readMcpAccess } from "lib/mcp/supporter";
 import {
   createMcpToken,
   listMcpTokens,
@@ -20,8 +21,9 @@ type Body = {
 
 /**
  * Settings → AI assistants: lists, creates and revokes the player's MCP
- * tokens, and lists and disconnects the apps connected through OAuth. POST-only with the Firebase id token in the body, like the other
- * player-scoped routes. The new token is in the create response and nowhere
+ * tokens, and lists and disconnects the apps connected through OAuth. Creating
+ * a token needs the supporter badge. POST-only with the Firebase id token in
+ * the body, like the other player-scoped routes. The new token is in the create response and nowhere
  * else — only its hash is stored.
  */
 export default async function handler(
@@ -44,11 +46,12 @@ export default async function handler(
 
   try {
     if (action === "list") {
-      const [tokens, apps] = await Promise.all([
+      const [tokens, apps, hasAccess] = await Promise.all([
         listMcpTokens(uid),
         listConnectedApps(uid),
+        readMcpAccess(uid),
       ]);
-      return res.status(200).json({ tokens, apps });
+      return res.status(200).json({ tokens, apps, hasAccess });
     }
     if (action === "disconnect") {
       if (typeof id !== "string" || !id)
@@ -59,6 +62,10 @@ export default async function handler(
         : res.status(404).json({ error: "Not found" });
     }
     if (action === "create") {
+      // A supporter perk. Listing, revoking and disconnecting stay open, so a
+      // player whose badge lapsed can still clean up what they made.
+      if (!(await readMcpAccess(uid)))
+        return res.status(403).json({ error: MCP_SUPPORTERS_ONLY_ERROR });
       const scopes: McpScope[] = write ? ["read", "write"] : ["read"];
       const created = await createMcpToken(
         uid,

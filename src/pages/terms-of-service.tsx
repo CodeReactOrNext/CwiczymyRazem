@@ -120,7 +120,7 @@ const TermsOfServicePage: NextPageWithLayout = () => {
             <section>
               <h2 className="text-2xl font-bold text-white mb-4">8. Termination</h2>
               <p>
-                We reserve the right to suspend or terminate your account at any time if you violate these Terms. You may also delete your account at any time from the settings menu.
+                We reserve the right to suspend or terminate your account at any time if you violate these Terms. You may also ask us to delete your account at any time, as described in our <Link href="/privacy-policy" className="text-cyan-400 hover:underline">Privacy Policy</Link>.
               </p>
             </section>
 

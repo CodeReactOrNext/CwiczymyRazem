@@ -35,8 +35,10 @@ const jsonRpcError = (
  * A 401 points the client at the OAuth metadata (RFC 9728) — that is what
  * starts the sign-in in claude.ai. `error` only when a token was sent: a
  * request without one isn't an invalid token, just an anonymous one (RFC 6750).
+ * A 403 is a good token without the supporter badge: no challenge, signing in
+ * again wouldn't change the answer, and the message says how to unlock it.
  */
-const refuse = (request: Request, status: 401 | 429, message: string) =>
+const refuse = (request: Request, status: 401 | 403 | 429, message: string) =>
   jsonRpcError(
     status,
     message,
@@ -47,10 +49,39 @@ const refuse = (request: Request, status: 401 | 429, message: string) =>
             request.headers.has("authorization") ? "invalid_token" : undefined,
           ),
         }
-      : { "Retry-After": "60" },
+      : status === 429
+        ? { "Retry-After": "60" }
+        : {},
   );
 
+/** Production origins a browser may call from. */
+const ALLOWED_ORIGINS = new Set([
+  "https://riff.quest",
+  "https://www.riff.quest",
+]);
+/** Local dev and Vercel previews: only ever their own origin. */
+const DEV_ORIGIN =
+  /^(http:\/\/(localhost|127\.0\.0\.1)(:\d+)?|https:\/\/[a-z0-9-]+\.vercel\.app)$/;
+
+/**
+ * DNS rebinding guard the MCP transport spec asks for. A browser always sends
+ * `Origin`, and it has to be one of riff.quest's own. Comparing it with the
+ * request's Host alone would not do: in a rebinding attack both carry the
+ * attacker's name. Server-side clients (claude.ai, ChatGPT, Claude Code,
+ * Cursor) send no Origin and pass; the token check still applies to them.
+ */
+const isForeignOrigin = (request: Request) => {
+  const origin = request.headers.get("origin")?.toLowerCase();
+  if (origin === undefined) return false;
+  if (ALLOWED_ORIGINS.has(origin)) return false;
+  return !(DEV_ORIGIN.test(origin) && origin === originOf(request));
+};
+
+const forbidden = () => jsonRpcError(403, "Origin not allowed");
+
 export async function POST(request: Request) {
+  if (isForeignOrigin(request)) return forbidden();
+
   const auth = await authenticateMcpRequest(request);
   if (!auth.ok) return refuse(request, auth.status, auth.error);
 
@@ -83,6 +114,7 @@ const methodNotAllowed = () =>
 
 /** Without a token GET answers like POST, so a client probing with it still finds the sign-in. */
 export async function GET(request: Request) {
+  if (isForeignOrigin(request)) return forbidden();
   if (!request.headers.has("authorization")) {
     return refuse(request, 401, "Missing or malformed token");
   }

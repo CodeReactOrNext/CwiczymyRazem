@@ -1,6 +1,7 @@
 import type { CommunityExercise } from "feature/communityExercises/types";
 import { communityDocId } from "feature/communityExercises/utils/communityToExercise";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import type { SongStatus } from "feature/songs/types/songs.type";
 import type { StatisticsDataInterface } from "types/api.types";
 import { getLocalDayKey, isValidTimeZone } from "utils/gameLogic/localDay";
 
@@ -31,6 +32,27 @@ export async function readUser(uid: string): Promise<McpUserDoc> {
   const data = (await userRef(uid).get()).data();
   if (!data) throw new McpToolError("No riff.quest profile for this token.");
   return data as McpUserDoc;
+}
+
+const SONG_STATUSES: SongStatus[] = ["wantToLearn", "learning", "learned"];
+
+/**
+ * How many songs sit on each of the player's lists. The lists live in
+ * `userSongs`, one doc per song — `statistics.songLists` is a leftover nothing
+ * writes any more, and reading it showed every list empty.
+ */
+export async function countUserSongs(
+  uid: string,
+): Promise<Record<SongStatus, number>> {
+  const songs = userRef(uid).collection("userSongs");
+  const counts = await Promise.all(
+    SONG_STATUSES.map((status) =>
+      songs.where("status", "==", status).count().get(),
+    ),
+  );
+  return Object.fromEntries(
+    SONG_STATUSES.map((status, index) => [status, counts[index].data().count]),
+  ) as Record<SongStatus, number>;
 }
 
 /**

@@ -28,15 +28,11 @@ import {
 } from "utils/audio/tunings";
 import { z } from "zod";
 
-import {
-  READ_TOOL_ANNOTATIONS,
-  runTool,
-  strictInput,
-} from "../results";
+import { READ_TOOL_ANNOTATIONS, runTool, strictInput } from "../results";
 import { checkTab, renderAsciiTab, tabSchema } from "../tablature/tabJson";
 import { formatTabIssues } from "../tablature/validateTablature";
 import { instrumentSchema } from "../tools/exercises";
-import { CDN, TAB_PREVIEW_HTML } from "./tabPreviewHtml";
+import { ASSET_ORIGIN, TAB_PREVIEW_HTML } from "./tabPreviewHtml";
 
 const RESOURCE_URI = "ui://riff-quest/tab-preview.html";
 
@@ -74,7 +70,10 @@ export function defaultBoard(
         : {
             ...style,
             stringCount: tuning.stringCount,
-            stringSpacing: staffLineSpacing(DEFAULT_SETTINGS.stringSpacing, tuning.stringCount),
+            stringSpacing: staffLineSpacing(
+              DEFAULT_SETTINGS.stringSpacing,
+              tuning.stringCount,
+            ),
           },
     tuningStrings: DEFAULT_SETTINGS.showTuningGutter
       ? tuningGutterStrings(tuning.notation, tuning.stringCount, palette)
@@ -102,8 +101,12 @@ export function registerTabPreviewApp(server: McpServer) {
           text: TAB_PREVIEW_HTML,
           _meta: {
             ui: {
-              // AlphaTab, its font and soundfont, and the app SDK — all from jsDelivr.
-              csp: { resourceDomains: [CDN], connectDomains: [CDN] },
+              // AlphaTab, its font and soundfont, and the app SDK — all served by
+              // riff.quest itself (the directory wants every resource owned).
+              csp: {
+                resourceDomains: [ASSET_ORIGIN],
+                connectDomains: [ASSET_ORIGIN],
+              },
               prefersBorder: false,
             },
           },
@@ -160,7 +163,8 @@ export function registerTabPreviewApp(server: McpServer) {
           structuredContent: {
             ...summary,
             tex,
-            board: measures.length > 0 ? defaultBoard(measures, tempo, kind) : null,
+            board:
+              measures.length > 0 ? defaultBoard(measures, tempo, kind) : null,
           },
         };
       }),

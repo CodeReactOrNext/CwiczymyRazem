@@ -146,7 +146,10 @@
     "no_apps": "Aún no hay apps conectadas.",
     "connected_on": "Conectada el {{date}}",
     "disconnect": "Desconectar",
-    "disconnected": "App desconectada"
+    "disconnected": "App desconectada",
+    "supporters_title": "Una ventaja de supporter",
+    "supporters_description": "Conectar Claude u otro asistente de IA a tu cuenta se desbloquea con cualquier donación a riff.quest. Practicar, registrar sesiones y todo lo demás sigue siendo gratis para todos.",
+    "supporters_cta": "Hazte supporter"
   },
   "oauth": {
     "title": "{{app}} quiere conectarse a tu cuenta de riff.quest",

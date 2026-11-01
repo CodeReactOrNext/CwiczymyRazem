@@ -13,9 +13,52 @@ import {
   MCP_REQUESTS_PER_MINUTE,
   MCP_WRITES_PER_DAY,
 } from "./auth";
-import { logDay, resolveTimeZone, skillProgress, todayIn } from "./data";
+import {
+  countUserSongs,
+  logDay,
+  resolveTimeZone,
+  skillProgress,
+  todayIn,
+} from "./data";
+import { firestore } from "./db";
 import { fittedResult, MCP_CHARACTER_LIMIT, pageOf } from "./results";
 import { type ScoredRun, summarizeRuns } from "./tools/progress";
+
+describe("countUserSongs", () => {
+  it("counts the player's userSongs per status, not the stale statistics field", async () => {
+    const statuses = ["learning", "learning", "learned", "wantToLearn"];
+    const paths: string[] = [];
+    Object.assign(firestore, {
+      collection: (users: string) => ({
+        doc: (uid: string) => ({
+          collection: (songs: string) => {
+            paths.push(`${users}/${uid}/${songs}`);
+            return {
+              where: (_field: string, _op: string, status: string) => ({
+                count: () => ({
+                  get: async () => ({
+                    data: () => ({
+                      count: statuses.filter((s) => s === status).length,
+                    }),
+                  }),
+                }),
+              }),
+            };
+          },
+        }),
+      }),
+    });
+
+    expect(await countUserSongs("player-1")).toEqual({
+      wantToLearn: 1,
+      learning: 2,
+      learned: 1,
+    });
+    expect(paths).toEqual(["users/player-1/userSongs"]);
+    // the mock is shared by every test in this file
+    Reflect.deleteProperty(firestore, "collection");
+  });
+});
 
 describe("countWrite", () => {
   it("says what a write leaves of the day, and starts a new day from zero", () => {

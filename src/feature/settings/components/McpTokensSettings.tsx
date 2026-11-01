@@ -8,6 +8,7 @@ import {
 } from "assets/components/ui/card";
 import { Input } from "assets/components/ui/input";
 import { Switch } from "assets/components/ui/switch";
+import { McpSupporterNotice } from "feature/settings/components/McpSupporterNotice";
 import {
   type ConnectedApp,
   createMcpToken,
@@ -17,6 +18,7 @@ import {
   revokeMcpToken,
 } from "feature/settings/services/mcpTokens.service";
 import { useTranslation } from "hooks/useTranslation";
+import { MCP_SUPPORTERS_ONLY_ERROR } from "lib/mcp/supporterPerk";
 import { Check, Copy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -54,6 +56,8 @@ const CodeLine = ({ value }: { value: string }) => (
  * address alone (claude.ai and other OAuth clients sign in through the consent
  * screen and show up under connected apps), or a personal token for clients
  * that take a header. A new token is shown once — only its hash is stored.
+ * It is a supporter perk: without the badge the tab says so instead, and keeps
+ * only what the player already has, so they can still revoke it.
  */
 export const McpTokensSettings = () => {
   const { t } = useTranslation("settings");
@@ -63,16 +67,22 @@ export const McpTokensSettings = () => {
   const [allowWrites, setAllowWrites] = useState(false);
   const [busy, setBusy] = useState(false);
   const [newToken, setNewToken] = useState<string | null>(null);
+  // null until the server says — a failed load must not show a supporter the
+  // perk notice, so it stays unknown and the tab says the load failed.
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
     listMcpAccess()
       .then((access) => {
         setTokens(access.tokens);
         setApps(access.apps);
+        setHasAccess(access.hasAccess);
       })
       .catch(() => {
         setTokens([]);
         setApps([]);
+        setLoadFailed(true);
       });
   }, []);
 
@@ -84,6 +94,14 @@ export const McpTokensSettings = () => {
       setTokens((current) => [summary, ...(current ?? [])]);
       setLabel("");
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === MCP_SUPPORTERS_ONLY_ERROR
+      ) {
+        // the badge went while the tab was open
+        setHasAccess(false);
+        return;
+      }
       toast.error(
         error instanceof Error && error.message
           ? error.message
@@ -125,131 +143,146 @@ export const McpTokensSettings = () => {
         <CardDescription>{t("mcp.subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className='space-y-8'>
-        <div className='space-y-2'>
-          <p className='text-sm font-semibold text-zinc-200'>
-            {t("mcp.server_url")}
-          </p>
-          <CodeLine value={url} />
-          <p className='text-sm text-zinc-400'>{t("mcp.connector_hint")}</p>
-        </div>
+        {hasAccess === false && <McpSupporterNotice />}
+        {loadFailed && (
+          <p className='text-sm text-zinc-400'>{t("mcp.error")}</p>
+        )}
 
-        <div className='space-y-3'>
-          <p className='text-sm font-semibold text-zinc-200'>
-            {t("mcp.connected_apps")}
-          </p>
-          {apps?.length === 0 && (
-            <p className='text-sm text-zinc-500'>{t("mcp.no_apps")}</p>
-          )}
-          {apps?.map((app) => (
-            <div
-              key={app.id}
-              className='flex items-center justify-between gap-4 rounded-lg bg-zinc-900/40 px-4 py-3'>
-              <div className='min-w-0'>
-                <p className='truncate text-sm font-semibold text-zinc-200'>
-                  {app.name}
-                </p>
-                <p className='mt-1 text-xs text-zinc-500'>
-                  <span className='font-mono'>{app.redirectHost}</span>
-                  {" · "}
-                  {app.scopes.includes("write")
-                    ? t("mcp.read_write")
-                    : t("mcp.read_only")}
-                  {" · "}
-                  {t("mcp.connected_on", {
-                    date: new Date(app.connectedAt).toLocaleDateString(),
-                  })}
-                </p>
-              </div>
-              <Button
-                variant='ghost'
-                size='sm'
-                onClick={() => disconnect(app.id)}>
-                {t("mcp.disconnect")}
-              </Button>
-            </div>
-          ))}
-        </div>
-
-        <div className='space-y-4 rounded-lg bg-zinc-900/40 p-4'>
-          <p className='text-sm font-semibold text-zinc-200'>
-            {t("mcp.new_token")}
-          </p>
-          <Input
-            value={label}
-            maxLength={40}
-            onChange={(event) => setLabel(event.target.value)}
-            placeholder={t("mcp.label_placeholder")}
-          />
-          <div className='flex items-center justify-between gap-6'>
-            <div className='min-w-0'>
-              <p className='text-sm text-zinc-200'>{t("mcp.allow_writes")}</p>
-              <p className='mt-1 text-sm text-zinc-400'>
-                {t("mcp.allow_writes_description")}
-              </p>
-            </div>
-            <Switch
-              checked={allowWrites}
-              onChange={() => setAllowWrites((value) => !value)}
-              aria-label={t("mcp.allow_writes")}
-            />
+        {hasAccess && (
+          <div className='space-y-2'>
+            <p className='text-sm font-semibold text-zinc-200'>
+              {t("mcp.server_url")}
+            </p>
+            <CodeLine value={url} />
+            <p className='text-sm text-zinc-400'>{t("mcp.connector_hint")}</p>
           </div>
-          <Button onClick={create} disabled={busy}>
-            {t("mcp.create")}
-          </Button>
+        )}
 
-          {newToken && (
-            <div className='space-y-3 pt-2'>
-              <p className='text-sm text-amber-300'>{t("mcp.token_once")}</p>
-              <CodeLine value={newToken} />
-              <p className='pt-2 text-sm text-zinc-400'>
-                {t("mcp.claude_code")}
-              </p>
-              <CodeLine
-                value={`claude mcp add --transport http riff-quest ${url} --header "Authorization: Bearer ${newToken}"`}
-              />
-              <p className='text-sm text-zinc-400'>{t("mcp.other_clients")}</p>
-            </div>
-          )}
-        </div>
+        {(hasAccess || !!apps?.length) && (
+          <div className='space-y-3'>
+            <p className='text-sm font-semibold text-zinc-200'>
+              {t("mcp.connected_apps")}
+            </p>
+            {apps?.length === 0 && (
+              <p className='text-sm text-zinc-500'>{t("mcp.no_apps")}</p>
+            )}
+            {apps?.map((app) => (
+              <div
+                key={app.id}
+                className='flex items-center justify-between gap-4 rounded-lg bg-zinc-900/40 px-4 py-3'>
+                <div className='min-w-0'>
+                  <p className='truncate text-sm font-semibold text-zinc-200'>
+                    {app.name}
+                  </p>
+                  <p className='mt-1 text-xs text-zinc-500'>
+                    <span className='font-mono'>{app.redirectHost}</span>
+                    {" · "}
+                    {app.scopes.includes("write")
+                      ? t("mcp.read_write")
+                      : t("mcp.read_only")}
+                    {" · "}
+                    {t("mcp.connected_on", {
+                      date: new Date(app.connectedAt).toLocaleDateString(),
+                    })}
+                  </p>
+                </div>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={() => disconnect(app.id)}>
+                  {t("mcp.disconnect")}
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
 
-        <div className='space-y-3'>
-          <p className='text-sm font-semibold text-zinc-200'>
-            {t("mcp.your_tokens")}
-          </p>
-          {tokens?.length === 0 && (
-            <p className='text-sm text-zinc-500'>{t("mcp.no_tokens")}</p>
-          )}
-          {tokens?.map((token) => (
-            <div
-              key={token.id}
-              className='flex items-center justify-between gap-4 rounded-lg bg-zinc-900/40 px-4 py-3'>
+        {hasAccess && (
+          <div className='space-y-4 rounded-lg bg-zinc-900/40 p-4'>
+            <p className='text-sm font-semibold text-zinc-200'>
+              {t("mcp.new_token")}
+            </p>
+            <Input
+              value={label}
+              maxLength={40}
+              onChange={(event) => setLabel(event.target.value)}
+              placeholder={t("mcp.label_placeholder")}
+            />
+            <div className='flex items-center justify-between gap-6'>
               <div className='min-w-0'>
-                <p className='truncate text-sm font-semibold text-zinc-200'>
-                  {token.label}
-                </p>
-                <p className='mt-1 text-xs text-zinc-500'>
-                  <span className='font-mono'>{token.hint}…</span>
-                  {" · "}
-                  {token.scopes.includes("write")
-                    ? t("mcp.read_write")
-                    : t("mcp.read_only")}
-                  {" · "}
-                  {token.lastUsedAt
-                    ? t("mcp.last_used", {
-                        date: new Date(token.lastUsedAt).toLocaleDateString(),
-                      })
-                    : t("mcp.never_used")}
+                <p className='text-sm text-zinc-200'>{t("mcp.allow_writes")}</p>
+                <p className='mt-1 text-sm text-zinc-400'>
+                  {t("mcp.allow_writes_description")}
                 </p>
               </div>
-              <Button
-                variant='ghost'
-                size='sm'
-                onClick={() => revoke(token.id)}>
-                {t("mcp.revoke")}
-              </Button>
+              <Switch
+                checked={allowWrites}
+                onChange={() => setAllowWrites((value) => !value)}
+                aria-label={t("mcp.allow_writes")}
+              />
             </div>
-          ))}
-        </div>
+            <Button onClick={create} disabled={busy}>
+              {t("mcp.create")}
+            </Button>
+
+            {newToken && (
+              <div className='space-y-3 pt-2'>
+                <p className='text-sm text-amber-300'>{t("mcp.token_once")}</p>
+                <CodeLine value={newToken} />
+                <p className='pt-2 text-sm text-zinc-400'>
+                  {t("mcp.claude_code")}
+                </p>
+                <CodeLine
+                  value={`claude mcp add --transport http riff-quest ${url} --header "Authorization: Bearer ${newToken}"`}
+                />
+                <p className='text-sm text-zinc-400'>
+                  {t("mcp.other_clients")}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {(hasAccess || !!tokens?.length) && (
+          <div className='space-y-3'>
+            <p className='text-sm font-semibold text-zinc-200'>
+              {t("mcp.your_tokens")}
+            </p>
+            {tokens?.length === 0 && (
+              <p className='text-sm text-zinc-500'>{t("mcp.no_tokens")}</p>
+            )}
+            {tokens?.map((token) => (
+              <div
+                key={token.id}
+                className='flex items-center justify-between gap-4 rounded-lg bg-zinc-900/40 px-4 py-3'>
+                <div className='min-w-0'>
+                  <p className='truncate text-sm font-semibold text-zinc-200'>
+                    {token.label}
+                  </p>
+                  <p className='mt-1 text-xs text-zinc-500'>
+                    <span className='font-mono'>{token.hint}…</span>
+                    {" · "}
+                    {token.scopes.includes("write")
+                      ? t("mcp.read_write")
+                      : t("mcp.read_only")}
+                    {" · "}
+                    {token.lastUsedAt
+                      ? t("mcp.last_used", {
+                          date: new Date(token.lastUsedAt).toLocaleDateString(),
+                        })
+                      : t("mcp.never_used")}
+                  </p>
+                </div>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={() => revoke(token.id)}>
+                  {t("mcp.revoke")}
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

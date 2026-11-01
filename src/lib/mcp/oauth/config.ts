@@ -89,7 +89,7 @@ export const protectedResourceMetadata = (origin: string) => ({
   scopes_supported: [...OAUTH_SCOPES],
   bearer_methods_supported: ["header"],
   resource_name: "riff.quest",
-  resource_documentation: `${origin}/wiki`,
+  resource_documentation: `${origin}/wiki/ai-assistants`,
 });
 
 /** RFC 8414 authorization server metadata. */
@@ -106,7 +106,7 @@ export const authorizationServerMetadata = (origin: string) => ({
   token_endpoint_auth_methods_supported: ["none"],
   code_challenge_methods_supported: ["S256"],
   client_id_metadata_document_supported: true,
-  service_documentation: `${origin}/wiki`,
+  service_documentation: `${origin}/wiki/ai-assistants`,
 });
 
 /** The challenge a 401 from /api/mcp carries, pointing the client at the metadata. */

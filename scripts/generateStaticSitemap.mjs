@@ -33,12 +33,13 @@ const INFO_PAGES = [
   { path: '/features/guitar-practice-leaderboard', lastmod: '2026-10-29', changefreq: 'monthly', priority: '0.8' },
   { path: '/features/guitar-progress-tracker', lastmod: '2026-10-29', changefreq: 'monthly', priority: '0.8' },
   { path: '/features/guitar-boss-fights', lastmod: '2026-10-29', changefreq: 'monthly', priority: '0.8' },
+  { path: '/features/ai-guitar-practice-assistant', lastmod: '2026-11-01', changefreq: 'monthly', priority: '0.8' },
   { path: '/contact', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.5' },
   { path: '/tools', lastmod: '2026-09-08', changefreq: 'monthly', priority: '0.6' },
   { path: '/tools/tuner', lastmod: '2026-09-08', changefreq: 'monthly', priority: '0.8' },
   { path: '/tools/metronome', lastmod: '2026-09-24', changefreq: 'monthly', priority: '0.8' },
-  { path: '/privacy-policy', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.3' },
-  { path: '/terms-of-service', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.3' },
+  { path: '/privacy-policy', lastmod: '2026-11-01', changefreq: 'monthly', priority: '0.3' },
+  { path: '/terms-of-service', lastmod: '2026-11-01', changefreq: 'monthly', priority: '0.3' },
 ];
 
 const extractField = (source, field) => {

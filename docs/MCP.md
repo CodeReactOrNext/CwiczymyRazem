@@ -25,6 +25,27 @@ transactions on the one token doc collide and retry.
 
 - **No tool takes a user id.** The Admin SDK bypasses `firestore.rules`, so the
   `uid` from the token is the only access control. Keep it that way.
+- **Supporters only** (`lib/mcp/supporter.ts`, constants in `supporterPerk.ts`):
+  the `isSupport` badge (or `role: "admin"`) is the ticket. Three doors check
+  it on the server: approving the consent screen (`/api/oauth/authorize`
+  `decide`, plus an `access` action so the screen can say so up front),
+  creating a personal token (`/api/mcp-tokens` `create`), and every MCP
+  request (`authenticateMcpRequest`): without the badge every MCP request,
+  `initialize` and `tools/list` included, is a 403 whose JSON-RPC error
+  carries the perk notice — no `WWW-Authenticate`, since signing in again
+  wouldn't help. The badge is re-read on every request, so losing it ends
+  access at once. Listing, revoking and disconnecting stay open for lapsed
+  supporters. The directory reviewers' test account needs the badge.
+- **Origin check** (DNS rebinding, required by the MCP transport spec): a
+  browser's `Origin` must be `https://riff.quest` / `https://www.riff.quest`,
+  or a localhost / `*.vercel.app` origin equal to the request's own; anything
+  else gets a 403 before the token is looked at. Comparing with the Host
+  header alone wouldn't stop rebinding (both carry the attacker's name).
+  Server-side clients send no `Origin` and pass.
+- **Deleting a player's account by hand** (the privacy policy promises it on
+  request): their MCP data is keyed by token hash, not under `users/{uid}`.
+  Delete by `uid` from `mcpTokens`, `oauthGrants`, `oauthRefreshTokens`,
+  `oauthCodes`, plus the doc `mcpUsage/{uid}`.
 - Tokens: `mcpTokens/{sha256(token)}`, created in Settings → AI assistants
   (`/api/mcp-tokens`). The token is shown once; only the hash is stored. Up to 5
   per player, read-only or read + write.
@@ -128,9 +149,15 @@ The board is the session's own `TablatureViewer.worker`, run on the page's
 thread and bundled with a small driver (`lib/mcp/apps/tabBoard/`) into
 `lib/mcp/apps/generated/tabBoardBundle.ts` by `node scripts/buildMcpTabBoard.mjs`
 — rerun it after touching the worker or the board; `tabBoardBundle.test.ts`
-fails while the committed bundle is stale. AlphaTab (from jsDelivr) draws the
-notation and plays the sound for both views; the board's cursor follows its
-player. The model gets only the check and the `asciiTab`; the board's data and
+fails while the committed bundle is stale. AlphaTab draws the notation and
+plays the sound for both views; the board's cursor follows its player. Every
+file the view loads comes from riff.quest itself, never a public CDN (the
+directory policy requires owning every resource the UI fetches):
+`public/alphatab/`, `public/soundfont/` and `public/mcp-app/ext-apps-<version>.js`,
+sent with CORS by `next.config.js`. After bumping `@coderline/alphatab` or
+`@modelcontextprotocol/ext-apps`, copy the new dist files there and update the
+versions in `tabPreviewHtml.ts` — `tabPreviewAssets.test.ts` fails until the
+copies match npm byte for byte. The model gets only the check and the `asciiTab`; the board's data and
 the alphaTex go in `structuredContent` for the view.
 
 ## Talking to players
@@ -170,6 +197,13 @@ python .agents/skills/mcp-builder/scripts/evaluation.py docs/mcp/evals/riff-ques
   then `/mcp` to sign in — or skip OAuth with a personal token:
   `--header "Authorization: Bearer rq_…"`.
 - Anything else: OAuth if it supports it, a personal token in the header otherwise.
+
+The player-facing version is the wiki article `src/content/wiki/ai-assistants.md`
+(`/wiki/ai-assistants`, in all four languages) — the documentation URL for the
+connector directory listing, and what `service_documentation` /
+`resource_documentation` in the OAuth metadata point at. The privacy policy
+has a matching section (5. AI Assistants). Change the tools, limits or token
+lifetimes → update both.
 
 ## OAuth
 

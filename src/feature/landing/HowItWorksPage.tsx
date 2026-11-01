@@ -125,6 +125,11 @@ const buildSteps = (stats: HowItWorksStats) => [
         sub: "your audio interface through its own driver, lower latency",
         href: "/features/desktop-guitar-practice-app",
       },
+      {
+        label: "AI assistants",
+        sub: "Claude or ChatGPT reads your practice and plans with you, for supporters",
+        href: "/features/ai-guitar-practice-assistant",
+      },
     ],
     demo: <PlayDemo />,
     color: "text-emerald-400",

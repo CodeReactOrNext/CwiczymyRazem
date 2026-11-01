@@ -7,7 +7,10 @@ export type { ConnectedApp, McpTokenSummary };
 
 /** Settings → AI assistants. Everything goes through /api/mcp-tokens (Admin SDK). */
 const call = async <T>(body: Record<string, unknown>): Promise<T> => {
-  const idToken = await auth.currentUser!.getIdToken();
+  // Settings can mount before Firebase has restored the session.
+  await auth.authStateReady();
+  if (!auth.currentUser) throw new Error("");
+  const idToken = await auth.currentUser.getIdToken();
   try {
     const { data } = await axios.post<T>("/api/mcp-tokens", {
       idToken,
@@ -23,7 +26,12 @@ const call = async <T>(body: Record<string, unknown>): Promise<T> => {
 };
 
 export const listMcpAccess = () =>
-  call<{ tokens: McpTokenSummary[]; apps: ConnectedApp[] }>({ action: "list" });
+  call<{
+    tokens: McpTokenSummary[];
+    apps: ConnectedApp[];
+    /** The supporter badge — without it no new token or connection. */
+    hasAccess: boolean;
+  }>({ action: "list" });
 
 export const createMcpToken = (label: string, write: boolean) =>
   call<{ token: string; summary: McpTokenSummary }>({

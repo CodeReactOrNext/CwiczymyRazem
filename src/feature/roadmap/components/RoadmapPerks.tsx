@@ -7,7 +7,15 @@ import {
 } from "feature/supporterPanel/constants/supporterPanel.constants";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
-import { ArrowRight, Guitar, Map, Package, Shield, Target } from "lucide-react";
+import {
+  ArrowRight,
+  Bot,
+  Guitar,
+  Map,
+  Package,
+  Shield,
+  Target,
+} from "lucide-react";
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
 import { FaDiscord } from "react-icons/fa6";
@@ -67,6 +75,11 @@ const PERKS: Perk[] = [
       </>
     ),
   },
+  {
+    icon: Bot,
+    title: "Your AI assistant, connected",
+    body: "Connect Claude or another AI assistant to your account: it reads your practice, plans sessions and writes exercises with tabs.",
+  },
 ];
 
 export const RoadmapPerks = () => {
@@ -92,7 +105,10 @@ export const RoadmapPerks = () => {
             {t("perks.title")}
           </h2>
           <p className='mt-1.5 text-sm leading-relaxed text-zinc-400'>
-            {t("perks.tokens", { welcome: SUPPORTER_WELCOME_TOKENS, perDollar: TOKENS_PER_DOLLAR })}
+            {t("perks.tokens", {
+              welcome: SUPPORTER_WELCOME_TOKENS,
+              perDollar: TOKENS_PER_DOLLAR,
+            })}
           </p>
         </div>
 
@@ -114,7 +130,9 @@ export const RoadmapPerks = () => {
           <li key={title} className='flex gap-3.5'>
             <Icon size={18} className='mt-0.5 shrink-0 text-amber-400' />
             <div className='min-w-0'>
-              <p className='text-sm font-semibold text-zinc-100'>{t(`perks.items.${i}.title`, title)}</p>
+              <p className='text-sm font-semibold text-zinc-100'>
+                {t(`perks.items.${i}.title`, title)}
+              </p>
               <p className='mt-1 text-sm leading-relaxed text-zinc-400'>
                 {typeof body === "string" ? (
                   t(`perks.items.${i}.body`, body)

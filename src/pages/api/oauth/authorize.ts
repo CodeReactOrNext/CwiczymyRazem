@@ -5,6 +5,7 @@ import {
   describeAuthorization,
 } from "lib/mcp/oauth/authorize";
 import { requestOrigin } from "lib/mcp/oauth/config";
+import { MCP_SUPPORTERS_ONLY_ERROR, readMcpAccess } from "lib/mcp/supporter";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth } from "utils/firebase/api/firebase.config";
 
@@ -34,6 +35,8 @@ const readParams = (raw: unknown): AuthorizationParams => {
 /**
  * The server half of the consent screen at /oauth/authorize.
  * - `describe`: checks the request and returns what the screen shows. No account needed.
+ * - `access`: whether the signed-in player may connect at all (a supporter perk),
+ *   so the screen can say so before they press Allow.
  * - `decide`: the player's Allow / Cancel, with their Firebase id token. The
  *   request is checked again here — the page's copy of it proves nothing.
  * Either way the answer is a URL to send the browser to, or an error to show.
@@ -69,7 +72,7 @@ export default async function handler(
         .status(200)
         .json({ request: describeAuthorization(check.request) });
     }
-    if (action !== "decide")
+    if (action !== "decide" && action !== "access")
       return res.status(400).json({ error: "Unknown action" });
 
     if (!idToken) return res.status(401).json({ error: "Unauthorized" });
@@ -78,6 +81,13 @@ export default async function handler(
       uid = (await auth.verifyIdToken(idToken)).uid;
     } catch {
       return res.status(401).json({ error: "Unauthorized" });
+    }
+    if (action === "access") {
+      return res.status(200).json({ hasAccess: await readMcpAccess(uid) });
+    }
+    // Connecting is a supporter perk; Cancel still sends the app its answer.
+    if (approve === true && !(await readMcpAccess(uid))) {
+      return res.status(403).json({ error: MCP_SUPPORTERS_ONLY_ERROR });
     }
     const redirect = await decideAuthorization(
       check.request,

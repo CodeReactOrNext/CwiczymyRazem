@@ -114,6 +114,13 @@
   </url>
 
   <url>
+    <loc>https://riff.quest/features/ai-guitar-practice-assistant</loc>
+    <lastmod>2026-11-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://riff.quest/contact</loc>
     <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
@@ -143,14 +150,14 @@
 
   <url>
     <loc>https://riff.quest/privacy-policy</loc>
-    <lastmod>2026-07-03</lastmod>
+    <lastmod>2026-11-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
 
   <url>
     <loc>https://riff.quest/terms-of-service</loc>
-    <lastmod>2026-07-03</lastmod>
+    <lastmod>2026-11-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>

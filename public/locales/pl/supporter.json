@@ -148,6 +148,10 @@
       },
       "5": {
         "title": "Kanał supporterów"
+      },
+      "6": {
+        "title": "Twój asystent AI, podłączony",
+        "body": "Podłącz Claude'a albo innego asystenta AI do konta: czyta twoje ćwiczenie, planuje sesje i pisze ćwiczenia z tabami."
       }
     }
   },
@@ -313,7 +317,8 @@
       "perks": {
         "0": "Obserwuj, co powstaje teraz, i głosuj, co będzie dalej",
         "1": "Wybieraj sprzęt, który trafi do Arsenału i do skrzynek",
-        "2": "Ustal wyzwanie, w które cała aplikacja gra w danym tygodniu"
+        "2": "Ustal wyzwanie, w które cała aplikacja gra w danym tygodniu",
+        "3": "Podłącz Claude'a albo innego asystenta AI do konta"
       },
       "email": "Użyj adresu e-mail tego konta, żeby odblokować Wspierającego.",
       "email_known": "Użyj adresu e-mail tego konta, żeby odblokować Wspierającego: {{email}}.",
