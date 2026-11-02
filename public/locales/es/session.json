@@ -280,6 +280,7 @@
     "root": "Raíz: {{root}}",
     "root_held": "La raíz suena de fondo: mide cada nota respecto a ella",
     "hear_again_slowly": "Escuchar otra vez, despacio",
+    "hear_from_root": "Escuchar {{name}} desde {{root}}",
     "which_chord": "¿Qué tipo de acorde es?",
     "play_chord": "Reproducir acorde",
     "one_note": "Nota a nota",

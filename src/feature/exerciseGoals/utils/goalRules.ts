@@ -10,6 +10,12 @@ import type {
 /** Clean runs at the target tempo that finish a goal. */
 export const GOAL_CLEAN_RUNS_REQUIRED = 3;
 
+/** How many scored runs of one exercise are kept — older ones are deleted. */
+export const RUN_HISTORY_LIMIT = 30;
+
+/** users/{uid}/settings/{RUN_HISTORY_DOC} — which exercises have runs, and when the last one was. */
+export const RUN_HISTORY_DOC = "runHistory";
+
 /**
  * Lowest accuracy a run may have to count as clean. 90 matches the bar the
  * scale tree already sets for its record runs; the other two are the player's
@@ -137,7 +143,21 @@ type JudgedGoal = Pick<
 >;
 
 /**
- * What a goal-mode run does to its goal. A run is judged at the current
+ * Whether a run played outside goal mode — in a plan, a routine, the library —
+ * is judged by the exercise's open goal. It has to be a real attempt at the
+ * milestone: the exercise played for its full time, at the milestone's tempo or
+ * faster. A slower run is a warm-up; it only goes on the chart, so it never
+ * breaks a streak the way a slow run in goal mode does.
+ */
+export const takesPracticeRun = (
+  goal: Pick<ExerciseGoal, "status" | "stageBpm">,
+  run: GoalRunInput,
+  isFullLength: boolean,
+): boolean =>
+  goal.status === "active" && isFullLength && run.bpm >= goal.stageBpm;
+
+/**
+ * What a judged run does to its goal. A run is judged at the current
  * milestone; the clean runs that fill it move the goal on to the next one, and
  * the ones that fill the last finish the goal. A finished goal stays finished —
  * a run played on it afterwards is judged but changes nothing.

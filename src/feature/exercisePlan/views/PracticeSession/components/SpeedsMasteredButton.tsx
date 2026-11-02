@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
+import { RunHistory } from "feature/exerciseGoals/components/RunHistory";
 import { useTranslation } from "hooks/useTranslation";
 import { Check,X } from "lucide-react";
 import { memo, useState } from "react";
@@ -73,7 +74,7 @@ export const SpeedsMasteredButton = memo(function SpeedsMasteredButton({
             dialog goes full-screen on phones, far too much for a row of chips. */}
         <DialogContent
           hideCloseButton
-          className='left-[50%] top-[50%] z-[99999999] h-auto w-[calc(100%-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%] gap-6 rounded-lg border-0 bg-zinc-900 p-5 text-white shadow-none sm:p-6'
+          className='left-[50%] top-[50%] z-[99999999] h-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%] gap-6 overflow-y-auto rounded-lg border-0 bg-zinc-900 p-5 text-white shadow-none sm:p-6'
           overlayClassName='z-[99999998]'>
           <div className='flex items-center gap-3'>
             <DialogTitle className='text-base font-semibold tracking-normal text-zinc-100'>
@@ -102,6 +103,10 @@ export const SpeedsMasteredButton = memo(function SpeedsMasteredButton({
             onToggle={onBpmToggle}
             isLoading={isBpmLoading}
             hideHeader
+          />
+          <RunHistory
+            exerciseId={exercise.id}
+            floorBpm={exercise.metronomeSpeed!.min}
           />
         </DialogContent>
       </Dialog>

@@ -43,7 +43,9 @@
     "metric_label": "Co pokazuje wykres",
     "metric_tempo": "Tempo",
     "metric_timing": "Timing",
-    "stage": "Kamień milowy {{bpm}} BPM"
+    "stage": "Kamień milowy {{bpm}} BPM",
+    "empty_history": "Tu pojawią się Twoje przebiegi ocenione mikrofonem, każdy w swoim tempie.",
+    "accuracy_line": "Celność"
   },
   "create": {
     "title": "Nowy cel",
@@ -91,8 +93,9 @@
     "mine_left_out": "Jeszcze {{count}} twoich ćwiczeń potrzebuje tabulatury i zakresu tempa, żeby dostać cel."
   },
   "history": {
-    "reached_on": "Osiągnięty {{date}}",
-    "raise": "Podnieś poprzeczkę"
+    "title": "Twoje ostatnie przebiegi",
+    "hint": "Ostatnie {{count}} przebiegów tego ćwiczenia ocenionych mikrofonem. Większe kropki to przebiegi ocenione przez cel.",
+    "loading": "Wczytuję przebiegi…"
   },
   "delete_confirm": {
     "title": "Usunąć ten cel?",
@@ -128,5 +131,10 @@
     "tight_zone": "Idealnie (do {{ms}} ms)",
     "explainer": "Jak daleko od bitu typowo lądują Twoje nuty w każdym przebiegu — wyżej na wykresie znaczy dokładniej. Timing zależy od kalibracji opóźnienia, więc jeśli każdy przebieg przesuwa się w tę samą stronę, skalibruj raz.",
     "empty": "Timing pojawi się po przebiegach ocenionych mikrofonem. Starsze sesje go nie zapisywały."
+  },
+  "practice_run": {
+    "clean": "Czysty przebieg na {{bpm}} BPM — {{count}} z {{required}} do kamienia milowego celu.",
+    "not_clean": "Przebieg na {{bpm}} BPM nie zaliczył się do celu jako czysty.",
+    "next_stage": "Następny: {{bpm}} BPM."
   }
 }

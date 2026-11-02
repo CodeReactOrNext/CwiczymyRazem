@@ -43,7 +43,9 @@
     "metric_label": "What the chart shows",
     "metric_tempo": "Tempo",
     "metric_timing": "Timing",
-    "stage": "Milestone {{bpm}} BPM"
+    "stage": "Milestone {{bpm}} BPM",
+    "empty_history": "Your runs scored with the mic show up here, at the tempo each was played.",
+    "accuracy_line": "Accuracy"
   },
   "create": {
     "title": "New goal",
@@ -87,8 +89,9 @@
     "mine_left_out": "{{count}} more of yours need a tab and a tempo range to take a goal."
   },
   "history": {
-    "reached_on": "Reached {{date}}",
-    "raise": "Raise the bar"
+    "title": "Your last runs",
+    "hint": "The last {{count}} runs the mic scored on this exercise. Bigger dots are runs your goal judged.",
+    "loading": "Loading your runs…"
   },
   "delete_confirm": {
     "title": "Delete this goal?",
@@ -124,5 +127,10 @@
     "tight_zone": "Dead on (within {{ms}} ms)",
     "explainer": "How far your notes typically land from the beat in each run — higher on the chart is tighter. Timing depends on latency calibration, so calibrate once if every run leans the same way.",
     "empty": "Timing shows up after runs scored with the mic on. Older sessions didn't record it."
+  },
+  "practice_run": {
+    "clean": "Clean run at {{bpm}} BPM — {{count}} of {{required}} for your goal's milestone.",
+    "not_clean": "Run at {{bpm}} BPM didn't count as clean for your goal.",
+    "next_stage": "Next up: {{bpm}} BPM."
   }
 }

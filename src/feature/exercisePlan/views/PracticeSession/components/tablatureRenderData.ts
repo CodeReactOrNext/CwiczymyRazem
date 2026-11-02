@@ -51,7 +51,8 @@ export interface BeatRD {
   inAccentedBar: boolean;
 }
 
-export interface TimeSigMarker { x: number; sig: [number, number]; }
+/** `beatIdx` — the bar's first beat in renderBeats, whose notes the digits would sit on. */
+export interface TimeSigMarker { x: number; sig: [number, number]; beatIdx: number; }
 export interface TupletGroup   { x1: number; x2: number; num: number; }
 export interface TempoPoint    { beatPos: number; ratio: number; }
 
@@ -105,7 +106,7 @@ export function buildTablatureRenderData(
   measures.forEach((measure, mIdx) => {
     const sig = measure.timeSignature;
     if (!prevSig || prevSig[0] !== sig[0] || prevSig[1] !== sig[1]) {
-      timeSigMarkers.push({ x: currentX, sig });
+      timeSigMarkers.push({ x: currentX, sig, beatIdx: renderBeats.length });
       prevSig = sig;
     }
 

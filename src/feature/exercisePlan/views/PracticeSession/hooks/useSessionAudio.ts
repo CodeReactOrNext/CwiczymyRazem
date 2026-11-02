@@ -218,6 +218,7 @@ export function useSessionAudio({
     audioStartTime: effectiveAudioStartTime,
     disabled:       !!effectiveRawGpFile || showAlphaTabScore,
     repeatCount:    tabRepeatCount,
+    singlePass:     autoStopAfterFirstLoop,
     tuningOffsets:  isBass ? undefined : tuningOffsets,
     rage:           bandRage,
   });

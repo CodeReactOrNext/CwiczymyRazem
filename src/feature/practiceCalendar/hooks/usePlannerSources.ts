@@ -11,8 +11,10 @@ import { rotationQueryKey } from "feature/rotation/hooks/useRotation";
 import { getRotation } from "feature/rotation/services/rotation.service";
 import type { LastPracticedMap } from "feature/rotation/types/rotation.types";
 import { useUserSongs } from "feature/songs/hooks/useUserSongs";
+import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.service";
 import { useMemo } from "react";
 
+import { defaultSongMode } from "../utils/calendarItems";
 import type {
   PlannerGoal,
   PlannerRoadmapStep,
@@ -27,6 +29,8 @@ export interface PlannerSources {
   lastPracticed: Record<string, number>;
   /** All the stamps — songs too — for telling which slots were played. */
   practicedStamps: LastPracticedMap | null;
+  /** Songs the player attached a Guitar Pro file to — the ones a tab slot can play. */
+  gpSongIds: ReadonlySet<string>;
   isLoading: boolean;
 }
 
@@ -68,6 +72,23 @@ export const usePlannerSources = (uid: string | null): PlannerSources => {
     enabled: !!uid,
   });
 
+  // Same query and key as the routine builder, so the two share the cache.
+  const songProgressQuery = useQuery({
+    queryKey: ["user-song-progress", uid],
+    queryFn: () => getAllUserSongProgress(uid!),
+    enabled: !!uid,
+    staleTime: 5 * 60 * 1000,
+  });
+  const gpSongIds = useMemo(
+    () =>
+      new Set(
+        (songProgressQuery.data ?? [])
+          .filter((progress) => !!progress.gpFileId)
+          .map((progress) => progress.songId),
+      ),
+    [songProgressQuery.data],
+  );
+
   const roadmapsQuery = useQuery({
     queryKey: ["practice-calendar-roadmaps", uid],
     queryFn: async () => {
@@ -92,6 +113,7 @@ export const usePlannerSources = (uid: string | null): PlannerSources => {
         coverUrl?: string;
       }): PlannerSong => ({
         status,
+        mode: defaultSongMode(gpSongIds.has(song.id)),
         song: {
           id: song.id,
           title: song.title,
@@ -103,7 +125,7 @@ export const usePlannerSources = (uid: string | null): PlannerSources => {
       ...songLists.learning.map(toRef("learning")),
       ...songLists.wantToLearn.map(toRef("wantToLearn")),
     ].slice(0, MAX_SONGS);
-  }, [songLists]);
+  }, [songLists, gpSongIds]);
 
   const plannerGoals = useMemo<PlannerGoal[]>(
     () =>
@@ -168,11 +190,12 @@ export const usePlannerSources = (uid: string | null): PlannerSources => {
                 coverUrl: step.suggestedSong.coverUrl,
               }),
             },
+            songMode: defaultSongMode(gpSongIds.has(step.suggestedSong.id)),
           }),
         },
       ];
     });
-  }, [roadmapsQuery.data]);
+  }, [roadmapsQuery.data, gpSongIds]);
 
   return {
     songs,
@@ -180,11 +203,13 @@ export const usePlannerSources = (uid: string | null): PlannerSources => {
     roadmapSteps,
     lastPracticed: rotationQuery.data?.lastPracticed.exercise ?? {},
     practicedStamps: rotationQuery.data?.lastPracticed ?? null,
+    gpSongIds,
     isLoading:
       !uid ||
       songsLoading ||
       goalsLoading ||
       rotationQuery.isLoading ||
-      roadmapsQuery.isLoading,
+      roadmapsQuery.isLoading ||
+      songProgressQuery.isLoading,
   };
 };

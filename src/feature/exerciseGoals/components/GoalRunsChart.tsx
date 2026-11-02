@@ -19,6 +19,7 @@ import type { ExerciseRun } from "../types/exerciseGoal.types";
 const COLORS = {
   line: "rgb(82, 82, 91)", // zinc-600
   practice: "rgb(161, 161, 170)", // zinc-400
+  accuracy: "rgba(251, 191, 36, 0.75)", // amber-400
   clean: "rgb(52, 211, 153)", // emerald-400
   notClean: "rgb(113, 113, 122)", // zinc-500
   target: "rgba(52, 211, 153, 0.5)",
@@ -53,10 +54,10 @@ interface DotProps {
   payload?: ChartPoint;
 }
 
-/** Goal runs are the ones that can finish the goal, so they get the bigger mark. */
+/** Runs a goal judged are the ones that can finish it, so they get the bigger mark. */
 const RunDot = ({ cx, cy, payload }: DotProps) => {
   if (cx === undefined || cy === undefined || !payload) return null;
-  if (payload.source === "practice") {
+  if (payload.clean === null) {
     return <circle cx={cx} cy={cy} r={3} fill={COLORS.practice} />;
   }
   return payload.clean ? (
@@ -89,7 +90,7 @@ const RunTooltip = ({ active, payload, metric }: RunTooltipProps) => {
   if (!point) return null;
 
   const kind =
-    point.source === "practice"
+    point.clean === null
       ? t("chart.practice_run")
       : point.clean
         ? t("chart.clean_goal_run")
@@ -133,12 +134,17 @@ const RunTooltip = ({ active, payload, metric }: RunTooltipProps) => {
 
 interface GoalRunsChartProps {
   runs: ExerciseRun[];
-  targetBpm: number;
+  /** The goal's tempo, drawn as the line to reach; leave out for an exercise without a goal. */
+  targetBpm?: number;
   /** The milestone being played for — drawn as its own line while it is below the goal. */
   stageBpm?: number;
   /** Where the axis may start when there are no runs to set it — the exercise's own floor. */
   floorBpm?: number;
   metric?: GoalChartMetric;
+  /** Draws each run's accuracy as a second line on the tempo chart, on its own % axis. */
+  showAccuracy?: boolean;
+  /** Off leaves the tempo line out — only with the accuracy line on. */
+  showTempo?: boolean;
 }
 
 /** Round tick steps, so the axis reads 90 · 100 · 110 rather than 94 · 103 · 112. */
@@ -146,10 +152,13 @@ const TICK_STEPS = [5, 10, 20, 25, 50, 100];
 
 export const bpmAxis = (
   bpms: number[],
-  targetBpm: number,
+  targetBpm?: number,
 ): { domain: [number, number]; ticks: number[] } => {
-  const low = Math.min(targetBpm, ...bpms);
-  const high = Math.max(targetBpm, ...bpms);
+  const all = targetBpm === undefined ? bpms : [targetBpm, ...bpms];
+  // Nothing to place at all: the metronome's fallback tempo.
+  if (!all.length) all.push(60);
+  const low = Math.min(...all);
+  const high = Math.max(...all);
   const step =
     TICK_STEPS.find((candidate) => (high - low) / candidate <= 4) ?? 100;
   const from = Math.max(0, Math.floor((low - step / 2) / step) * step);
@@ -157,6 +166,21 @@ export const bpmAxis = (
   const ticks: number[] = [];
   for (let tick = from; tick <= to; tick += step) ticks.push(tick);
   return { domain: [from, to], ticks };
+};
+
+/**
+ * The accuracy axis tops out at 100% and starts a round ten below the sloppiest
+ * run, so the climb fills the height instead of hugging the top of 0–100.
+ */
+export const accuracyAxis = (
+  accuracies: number[],
+): { domain: [number, number]; ticks: number[] } => {
+  const lowest = Math.min(100, ...accuracies);
+  const from = Math.max(0, Math.floor((lowest - 5) / 10) * 10);
+  const step = 100 - from > 40 ? 20 : 10;
+  const ticks: number[] = [];
+  for (let tick = 100; tick >= from; tick -= step) ticks.unshift(tick);
+  return { domain: [ticks[0], 100], ticks };
 };
 
 /**
@@ -199,6 +223,8 @@ export const GoalRunsChart = ({
   stageBpm,
   floorBpm,
   metric = "tempo",
+  showAccuracy = false,
+  showTempo = true,
 }: GoalRunsChartProps) => {
   const { t } = useTranslation("goals");
   const isTiming = metric === "timing";
@@ -219,10 +245,11 @@ export const GoalRunsChart = ({
   }));
   const isEmpty = data.length === 0;
   const chartData: Record<string, unknown>[] = isEmpty
-    ? emptySpan(isTiming ? PERFECT_TIMING_MS : targetBpm)
+    ? emptySpan(isTiming ? PERFECT_TIMING_MS : (targetBpm ?? floorBpm ?? 0))
     : data.map((point) => ({ ...point }));
 
-  const showStage = stageBpm !== undefined && stageBpm < targetBpm;
+  const showStage =
+    stageBpm !== undefined && targetBpm !== undefined && stageBpm < targetBpm;
   const axis = isTiming
     ? timingAxis(shown.map((run) => run.timingOffsetMs ?? 0))
     : bpmAxis(
@@ -235,15 +262,25 @@ export const GoalRunsChart = ({
         targetBpm,
       );
   const dataKey = isTiming ? "timingOffsetMs" : "bpm";
-  const hasGoalRuns = shown.some((run) => run.source === "goal");
+  const hasGoalRuns = shown.some((run) => run.clean !== null);
+  const withAccuracy = showAccuracy && !isTiming && !isEmpty;
+  // The run line stays whenever it is the only one there is to draw.
+  const withMain = showTempo || !withAccuracy;
+  const accuracy = accuracyAxis(shown.map((run) => run.accuracy));
 
   return (
     <div className='space-y-3'>
-      <div className='relative h-56 w-full'>
+      {/* recharts makes the chart focusable and rings it on click — no line wanted */}
+      <div className='relative h-56 w-full [&_.recharts-surface]:outline-none [&_.recharts-wrapper]:outline-none'>
         <ResponsiveContainer width='100%' height='100%'>
           <LineChart
             data={chartData}
-            margin={{ top: 8, right: 12, bottom: 0, left: -16 }}>
+            margin={{
+              top: 8,
+              right: withAccuracy ? -8 : 12,
+              bottom: 0,
+              left: withMain ? -16 : 12,
+            }}>
             <CartesianGrid stroke={COLORS.grid} vertical={false} />
             <XAxis dataKey='index' hide padding={{ left: 8, right: 8 }} />
             <YAxis
@@ -252,12 +289,26 @@ export const GoalRunsChart = ({
               // Timing: tighter is better, so tighter sits higher — the line
               // climbs as the playing cleans up, the same way the tempo line does.
               reversed={isTiming}
+              hide={!withMain}
               allowDecimals={false}
               tick={{ fill: COLORS.axis, fontSize: 11 }}
               tickLine={false}
               axisLine={false}
               width={44}
             />
+            {withAccuracy && (
+              <YAxis
+                yAxisId='accuracy'
+                orientation='right'
+                domain={accuracy.domain}
+                ticks={accuracy.ticks}
+                tickFormatter={(value: number) => `${value}%`}
+                tick={{ fill: COLORS.axis, fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+                width={44}
+              />
+            )}
             {isTiming ? (
               <ReferenceArea
                 y1={0}
@@ -266,13 +317,16 @@ export const GoalRunsChart = ({
                 strokeOpacity={0}
               />
             ) : (
-              <ReferenceLine
-                y={targetBpm}
-                stroke={COLORS.target}
-                strokeDasharray='5 4'
-              />
+              withMain &&
+              targetBpm !== undefined && (
+                <ReferenceLine
+                  y={targetBpm}
+                  stroke={COLORS.target}
+                  strokeDasharray='5 4'
+                />
+              )
             )}
-            {!isTiming && showStage && (
+            {!isTiming && withMain && showStage && (
               <ReferenceLine
                 y={stageBpm}
                 stroke={COLORS.stage}
@@ -285,21 +339,43 @@ export const GoalRunsChart = ({
                 content={<RunTooltip metric={metric} />}
               />
             )}
-            <Line
-              dataKey={isEmpty ? "value" : dataKey}
-              type='monotone'
-              stroke={isEmpty ? "transparent" : COLORS.line}
-              strokeWidth={1.5}
-              dot={isEmpty ? false : <RunDot />}
-              activeDot={false}
-              isAnimationActive={false}
-            />
+            {withAccuracy && (
+              <Line
+                yAxisId='accuracy'
+                dataKey='accuracy'
+                // Straight segments: a smoothed curve swings past the runs and
+                // draws waves the playing never had.
+                type='linear'
+                stroke={COLORS.accuracy}
+                strokeWidth={1.5}
+                dot={{ r: 2.5, fill: COLORS.accuracy, strokeWidth: 0 }}
+                activeDot={false}
+                isAnimationActive={false}
+              />
+            )}
+            {withMain && (
+              <Line
+                dataKey={isEmpty ? "value" : dataKey}
+                type='monotone'
+                stroke={isEmpty ? "transparent" : COLORS.line}
+                strokeWidth={1.5}
+                dot={isEmpty ? false : <RunDot />}
+                activeDot={false}
+                isAnimationActive={false}
+              />
+            )}
           </LineChart>
         </ResponsiveContainer>
         {isEmpty && (
           <div className='pointer-events-none absolute inset-0 flex items-center justify-center pl-8'>
             <p className='max-w-xs rounded-lg bg-zinc-950/80 px-4 py-3 text-center text-sm text-zinc-400'>
-              {isTiming ? t("timing.empty") : t("chart.empty")}
+              {isTiming
+                ? t("timing.empty")
+                : t(
+                    targetBpm === undefined
+                      ? "chart.empty_history"
+                      : "chart.empty",
+                  )}
             </p>
           </div>
         )}
@@ -311,22 +387,33 @@ export const GoalRunsChart = ({
             {t("timing.tight_zone", { ms: PERFECT_TIMING_MS })}
           </span>
         ) : (
-          <span className='flex items-center gap-2'>
-            <LegendDot className='w-4 border-t-2 border-dashed border-emerald-400/60' />
-            {t("chart.target", { bpm: targetBpm })}
-          </span>
+          withMain &&
+          targetBpm !== undefined && (
+            <span className='flex items-center gap-2'>
+              <LegendDot className='w-4 border-t-2 border-dashed border-emerald-400/60' />
+              {t("chart.target", { bpm: targetBpm })}
+            </span>
+          )
         )}
-        {!isTiming && showStage && (
+        {!isTiming && withMain && showStage && (
           <span className='flex items-center gap-2'>
             <LegendDot className='w-4 border-t-2 border-dotted border-zinc-300/50' />
             {t("chart.stage", { bpm: stageBpm })}
           </span>
         )}
-        <span className='flex items-center gap-2'>
-          <LegendDot className='h-1.5 w-1.5 rounded-full bg-zinc-400' />
-          {t("chart.practice_run")}
-        </span>
-        {hasGoalRuns && (
+        {withMain && (
+          <span className='flex items-center gap-2'>
+            <LegendDot className='h-1.5 w-1.5 rounded-full bg-zinc-400' />
+            {t("chart.practice_run")}
+          </span>
+        )}
+        {withAccuracy && (
+          <span className='flex items-center gap-2'>
+            <LegendDot className='w-4 border-t-2 border-amber-400/75' />
+            {t("chart.accuracy_line")}
+          </span>
+        )}
+        {withMain && hasGoalRuns && (
           <>
             <span className='flex items-center gap-2'>
               <LegendDot className='h-2.5 w-2.5 rounded-full bg-emerald-400' />

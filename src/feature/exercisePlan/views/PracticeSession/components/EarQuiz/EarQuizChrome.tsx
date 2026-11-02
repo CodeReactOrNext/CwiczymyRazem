@@ -10,6 +10,7 @@ import {
   RotateCcw,
   Square,
   Trophy,
+  Volume2,
   X,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -379,6 +380,11 @@ interface AnswerTileProps {
   /** Shown once the round is answered. Always laid out (just hidden until then),
    *  so revealing it doesn't make the tile taller. */
   subtitle?: string;
+  /** Answered, the tile plays its own option instead — set to its label
+   *  ("Hear Minor 7 from C") so the speaker icon has words behind it. */
+  listenLabel?: string;
+  /** This tile's option is the one sounding right now. */
+  isSounding?: boolean;
 }
 
 /** One option in an answer grid — big tap target, verdict shown by background
@@ -389,22 +395,47 @@ export function AnswerTile({
   disabled,
   title,
   subtitle,
+  listenLabel,
+  isSounding,
 }: AnswerTileProps) {
+  const isListenable = listenLabel !== undefined;
   return (
     <motion.button
       type='button'
       onClick={onClick}
       disabled={disabled}
+      title={listenLabel}
+      aria-label={listenLabel}
       animate={TILE_MOTION[state]}
       transition={{ duration: state === "wrong" ? 0.4 : 0.3, ease: "easeOut" }}
       className={cn(
-        "flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-lg px-4 py-2.5 text-center transition-colors duration-base",
+        // px-10 keeps the corner listen button clear of the label, before and
+        // after it appears, so the text never re-wraps when the round settles.
+        "group relative flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-lg px-10 py-2.5 text-center transition-colors duration-base",
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none",
         state === "idle" && "bg-zinc-800/40 text-zinc-100 hover:bg-zinc-800",
         state === "correct" && "bg-emerald-500/15 text-emerald-300",
         state === "wrong" && "bg-red-500/15 text-red-300",
         state === "muted" && "bg-zinc-800/20 text-zinc-500",
+        isListenable && state === "correct" && "hover:bg-emerald-500/25",
+        isListenable && state === "wrong" && "hover:bg-red-500/25",
+        isListenable && state === "muted" && "hover:bg-zinc-800/50 hover:text-zinc-300",
+        isSounding && state === "muted" && "bg-zinc-800/50 text-zinc-300",
       )}>
+      {/* Pinned to the corner so turning into a player doesn't grow the tile. */}
+      {isListenable && (
+        <motion.span
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", stiffness: 420, damping: 22 }}
+          aria-hidden
+          className={cn(
+            "absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-current transition-colors duration-base group-hover:bg-white/20",
+            isSounding && "bg-white/25",
+          )}>
+          <Volume2 className={cn("h-4 w-4", isSounding && "animate-pulse")} />
+        </motion.span>
+      )}
       <span className='text-base font-bold leading-tight'>{title}</span>
       {subtitle !== undefined && (
         <span

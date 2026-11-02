@@ -50,6 +50,10 @@
     "roadmap": "Roadmap",
     "custom": "Your own"
   },
+  "song_modes": {
+    "gp": "Tab",
+    "sections": "Sections"
+  },
   "areas": {
     "technique": "Technique",
     "songs": "Songs",
@@ -184,6 +188,8 @@
     "description": "Each tap adds one block at the length below.",
     "length": "Length",
     "search": "Search",
+    "practise_with": "Practise with",
+    "no_tab": "No Guitar Pro file attached — add one on the song page.",
     "no_results": "Nothing matches.",
     "add_item": "Add {{title}}",
     "done": "Done",

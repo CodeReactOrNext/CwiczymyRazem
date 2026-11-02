@@ -1,3 +1,5 @@
+import type { SongPracticeMode } from "feature/exercisePlan/types/exercise.types";
+
 /**
  * What a calendar slot plays.
  * - "exercise": one exercise from the catalog.
@@ -57,6 +59,12 @@ export interface CalendarItem {
   exerciseId?: string;
   /** Song slots, and roadmap steps about a song. */
   song?: CalendarSongRef;
+  /**
+   * Song slots: over the attached Guitar Pro tab or over the section map
+   * (video + sections). Slots from before the choice have none and fall back
+   * to the tab when one is attached, else the section map.
+   */
+  songMode?: SongPracticeMode;
   /** Goal slots: the tempo goal, and the milestone it was planned at. */
   goalId?: string;
   bpm?: number;

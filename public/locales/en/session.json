@@ -280,6 +280,7 @@
     "root": "Root: {{root}}",
     "root_held": "The root is held underneath — measure every note against it",
     "hear_again_slowly": "Hear it again, slowly",
+    "hear_from_root": "Hear {{name}} from {{root}}",
     "which_chord": "What kind of chord is this?",
     "play_chord": "Play chord",
     "one_note": "One note at a time",

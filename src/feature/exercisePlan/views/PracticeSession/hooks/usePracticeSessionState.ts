@@ -65,7 +65,17 @@ export const usePracticeSessionState = ({
 
   const isSkillExercise = !!skillRewardSkillId || !!forceFullDuration;
 
-  const duration = videoDuration !== null ? videoDuration : (currentExercise.timeInMinutes || 0) * 60;
+  // A song item's slot stretches to its tab: an 8-minute song in a 5-minute
+  // slot would be cut off mid-solo. Keyed by item, so it never outlives it.
+  const [tabDuration, setTabDurationState] = useState<{ exerciseId: string; seconds: number } | null>(null);
+  const setTabDuration = useCallback((exerciseId: string, seconds: number | null) => {
+    setTabDurationState(seconds === null ? null : { exerciseId, seconds: Math.ceil(seconds) });
+  }, []);
+  const tabSeconds = tabDuration?.exerciseId === currentExercise.id ? tabDuration.seconds : 0;
+
+  const duration = videoDuration !== null
+    ? videoDuration
+    : Math.max((currentExercise.timeInMinutes || 0) * 60, tabSeconds);
 
   const {
     completedExercises,
@@ -159,6 +169,7 @@ export const usePracticeSessionState = ({
     resetSuccessView: () => setShowSuccessView(false),
     setVideoDuration,
     videoDuration,
+    setTabDuration,
     autoSubmitReport: (
       exerciseRecords?: any,
       micPerformance?: any,
@@ -195,7 +206,7 @@ export const usePracticeSessionState = ({
     currentExerciseIndex, exerciseKey, showCompleteDialog, isMobileView,
     isFullSessionModalOpen, isMounted, currentExercise, isLastExercise,
     setShowCompleteDialog, handleNextExercise, timer, showSuccessView,
-    restartFullSession, setVideoDuration, videoDuration, handleFinishSession,
+    restartFullSession, setVideoDuration, videoDuration, setTabDuration, handleFinishSession,
     canFinishSession, hasLoggedPractice, isSkillExercise, isSubmittingReport,
     completedExercises, reportResult, currentUserStats, previousUserStats,
     planTitleString, activityDataToUse

@@ -282,6 +282,7 @@
     "root": "Dźwięk podstawowy: {{root}}",
     "root_held": "Tonika brzmi cały czas pod spodem — odnoś do niej każdy kolejny dźwięk",
     "hear_again_slowly": "Posłuchaj jeszcze raz, powoli",
+    "hear_from_root": "Posłuchaj: {{name}} od {{root}}",
     "which_chord": "Jaki to rodzaj akordu?",
     "play_chord": "Odtwórz akord",
     "one_note": "Po jednym dźwięku",

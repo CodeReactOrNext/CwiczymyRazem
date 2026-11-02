@@ -1,6 +1,6 @@
 ---
 title: "Übungsziele"
-description: "Lege fest, wo du bei einer Übung startest und welches Tempo du erreichen willst, und klettere dann Etappe für Etappe, je drei saubere Durchläufe, im Zielmodus."
+description: "Lege fest, wo du bei einer Übung startest und welches Tempo du erreichen willst, und klettere dann Etappe für Etappe, je drei saubere Durchläufe."
 slug: "exercise-goals"
 section: "Skill Development"
 order: 4
@@ -31,12 +31,14 @@ Der dritte saubere Durchlauf schließt die Etappe ab. Die Zusammenfassung sagt d
 <ProgressLadder items="80 BPM::3 saubere Durchläufe|85 BPM::3 saubere Durchläufe|90 BPM::3 saubere Durchläufe|120 BPM::Ziel erreicht" highlight="85 BPM" />
 
 <BlogAlert type="info">
-Nur Zieldurchläufe können eine Etappe abschließen. Normales Üben derselben Übung erscheint trotzdem im Diagramm des Ziels, du siehst also den Weg nach oben, es zählt aber nie zu den drei sauberen Durchläufen.
+Ein Durchlauf außerhalb des Zielmodus zählt auch, in einer Routine oder einem Plan, wenn du die Übung ihre volle Zeit lang im Tempo der Etappe oder schneller spielst. Eine Meldung nach der Übung sagt dir, ob er sauber war und wie viele saubere Durchläufe du hast. Langsamere Durchläufe landen nur im Diagramm, ein Aufwärmen setzt deinen Zähler also nie zurück.
 </BlogAlert>
 
 ## Das Diagramm
 
-Jedes Ziel zeigt die Etappe, auf der du bist, einen Balken mit einem Segment pro Etappe (grüne sind abgeschlossen) und ein Diagramm deiner bewerteten Durchläufe bei dieser Übung. Das Tempo des Ziels ist eine gestrichelte grüne Linie und die aktuelle Etappe eine gepunktete graue. Kleine graue Punkte sind normales Üben, grüne Punkte sind saubere Zieldurchläufe, und hohle Punkte sind Zieldurchläufe, die nicht zählten.
+Jedes Ziel zeigt die Etappe, auf der du bist, einen Balken mit einem Segment pro Etappe (grüne sind abgeschlossen) und ein Diagramm deiner bewerteten Durchläufe bei dieser Übung. Das Tempo des Ziels ist eine gestrichelte grüne Linie und die aktuelle Etappe eine gepunktete graue. Kleine graue Punkte sind Durchläufe, die das Ziel nicht bewertet hat, grüne Punkte sind saubere Durchläufe, und hohle Punkte sind Durchläufe, die nicht sauber waren.
+
+Die App behält die letzten 30 bewerteten Durchläufe jeder Übung, mit Ziel oder ohne. Du kannst sie dir auch mitten im Üben ansehen: Öffne in der Session **Gemeisterte Tempi** und scrolle zu **Deine letzten Durchgänge**.
 
 Das Diagramm beginnt vor dem Ziel: Sessions, in denen du genau diese eine Übung mit eingeschaltetem Mikrofon geübt hast, erscheinen ebenfalls, ein neues Ziel öffnet sich also auf dem Aufstieg, der dorthin führte. Sessions einer Routine mit mehreren Übungen nicht, weil sich das Ergebnis nicht auf eine Übung festnageln lässt.
 

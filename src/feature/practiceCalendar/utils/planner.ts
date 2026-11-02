@@ -2,6 +2,7 @@ import type {
   DifficultyLevel,
   Exercise,
   ExerciseCategory,
+  SongPracticeMode,
 } from "feature/exercisePlan/types/exercise.types";
 
 import type {
@@ -26,6 +27,8 @@ export interface PlannerSong {
   song: CalendarSongRef;
   /** Songs being learned come up more often than the ones on the wish list. */
   status: "learning" | "wantToLearn";
+  /** Tab or section map — see defaultSongMode. */
+  mode?: SongPracticeMode;
 }
 
 export interface PlannerGoal {
@@ -44,6 +47,7 @@ export interface PlannerRoadmapStep {
   title: string;
   exerciseId?: string;
   song?: CalendarSongRef;
+  songMode?: SongPracticeMode;
 }
 
 export interface PlannerInput {
@@ -544,6 +548,7 @@ export const planDays = (input: PlannerInput): PlannerResult => {
           note: step.roadmapTitle,
           ...(exercise && { exerciseId: exercise.id }),
           ...(step.song && { song: step.song }),
+          ...(step.song && step.songMode && { songMode: step.songMode }),
         });
       }
     }
@@ -586,6 +591,7 @@ export const planDays = (input: PlannerInput): PlannerResult => {
             auto: true,
             done: false,
             song: entry.song,
+            ...(entry.mode && { songMode: entry.mode }),
           });
           placed = true;
           break;

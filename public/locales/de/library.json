@@ -1,6 +1,12 @@
 {
   "sections": "Bibliotheksbereiche",
   "cancel": "Abbrechen",
+  "sort": {
+    "label": "Sortieren",
+    "newest": "Neueste zuerst",
+    "oldest": "Älteste zuerst",
+    "name": "Name (A–Z)"
+  },
   "my_exercises": {
     "title": "Meine Übungen",
     "subtitle": "Erstelle eigene Gitarrenübungen — behalte sie für dich oder teile sie mit der Community",

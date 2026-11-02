@@ -50,6 +50,10 @@
     "roadmap": "Roadmapa",
     "custom": "Własne"
   },
+  "song_modes": {
+    "gp": "Tabulatura",
+    "sections": "Sekcje"
+  },
   "areas": {
     "technique": "Technika",
     "songs": "Utwory",
@@ -200,6 +204,8 @@
     "description": "Każde kliknięcie dodaje jeden blok o długości ustawionej niżej.",
     "length": "Długość",
     "search": "Szukaj",
+    "practise_with": "Ćwicz z",
+    "no_tab": "Brak pliku Guitar Pro — dodaj go na stronie utworu.",
     "no_results": "Nic nie pasuje.",
     "add_item": "Dodaj {{title}}",
     "done": "Gotowe",

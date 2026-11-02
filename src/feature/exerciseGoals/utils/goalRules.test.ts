@@ -15,6 +15,7 @@ import {
   nextStageBpm,
   raisedTargetBpm,
   STRICTNESS_ACCURACY,
+  takesPracticeRun,
 } from "./goalRules";
 
 const goal = (overrides: Partial<ExerciseGoal> = {}): ExerciseGoal => ({
@@ -264,6 +265,58 @@ describe("isGoalEligibleExercise", () => {
         ...base,
         noteHuntConfig: { rotateSeconds: 10 },
       }),
+    ).toBe(false);
+  });
+});
+
+describe("takesPracticeRun", () => {
+  it("judges a full-length run at the milestone tempo", () => {
+    expect(
+      takesPracticeRun(
+        goal({ stageBpm: 100 }),
+        { bpm: 100, accuracy: 50 },
+        true,
+      ),
+    ).toBe(true);
+  });
+
+  it("judges a faster run too", () => {
+    expect(
+      takesPracticeRun(
+        goal({ stageBpm: 100 }),
+        { bpm: 110, accuracy: 95 },
+        true,
+      ),
+    ).toBe(true);
+  });
+
+  it("leaves a slower run on the chart, so a warm-up never breaks a streak", () => {
+    expect(
+      takesPracticeRun(
+        goal({ stageBpm: 100 }),
+        { bpm: 95, accuracy: 100 },
+        true,
+      ),
+    ).toBe(false);
+  });
+
+  it("leaves a run cut short", () => {
+    expect(
+      takesPracticeRun(
+        goal({ stageBpm: 100 }),
+        { bpm: 100, accuracy: 100 },
+        false,
+      ),
+    ).toBe(false);
+  });
+
+  it("leaves a reached goal alone", () => {
+    expect(
+      takesPracticeRun(
+        goal({ stageBpm: 100, status: "completed" }),
+        { bpm: 120, accuracy: 100 },
+        true,
+      ),
     ).toBe(false);
   });
 });

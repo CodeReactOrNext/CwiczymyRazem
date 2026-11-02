@@ -1,6 +1,7 @@
 import type {
   Exercise,
   ExercisePlan,
+  SongPracticeMode,
 } from "feature/exercisePlan/types/exercise.types";
 import { songToExercise } from "feature/exercisePlan/utils/songToExercise";
 import type { LastPracticedMap } from "feature/rotation/types/rotation.types";
@@ -37,6 +38,14 @@ export const isItemDone = (
   return typeof stamp === "number" && toDateKey(new Date(stamp)) === date;
 };
 
+/**
+ * How a song is practised when nobody picked: an attached tab was attached on
+ * purpose, so it wins (as in routines); without one only the section map can
+ * be played.
+ */
+export const defaultSongMode = (hasGpFile: boolean): SongPracticeMode =>
+  hasGpFile ? "gp" : "sections";
+
 const textSlot = (item: CalendarItem, area: PracticeArea): Exercise => ({
   id: `${CALENDAR_EXERCISE_PREFIX}${item.id}`,
   title: item.title ?? "",
@@ -54,11 +63,14 @@ const textSlot = (item: CalendarItem, area: PracticeArea): Exercise => ({
  * Turns a day's slots into one practice session, in their order and at their
  * lengths. A goal slot opens with the metronome at the goal's milestone; a
  * slot that no longer resolves (an exercise gone from the catalog) is left out.
+ * Song slots saved before the tab / section map choice get the default mode,
+ * going by the songs the player attached a tab to.
  */
 export const buildDayPlan = (
   date: string,
   items: CalendarItem[],
   catalog: ReadonlyMap<string, Exercise>,
+  gpSongIds: ReadonlySet<string> = new Set(),
 ): ExercisePlan | null => {
   const exercises: Exercise[] = [];
   const used = new Set<string>();
@@ -66,7 +78,11 @@ export const buildDayPlan = (
   items.forEach((item) => {
     let exercise: Exercise | null = null;
     if (item.song && (item.kind === "song" || item.kind === "roadmap")) {
-      exercise = songToExercise(item.song, item.minutes);
+      exercise = songToExercise(
+        item.song,
+        item.minutes,
+        item.songMode ?? defaultSongMode(gpSongIds.has(item.song.id)),
+      );
     } else if (item.exerciseId && catalog.has(item.exerciseId)) {
       const base = catalog.get(item.exerciseId)!;
       exercise = {

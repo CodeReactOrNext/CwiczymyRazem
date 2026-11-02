@@ -43,7 +43,9 @@
     "metric_label": "Qué muestra la gráfica",
     "metric_tempo": "Tempo",
     "metric_timing": "Timing",
-    "stage": "Etapa {{bpm}} BPM"
+    "stage": "Etapa {{bpm}} BPM",
+    "empty_history": "Aquí aparecerán tus pasadas puntuadas con el micrófono, al tempo en que tocaste cada una.",
+    "accuracy_line": "Precisión"
   },
   "create": {
     "title": "Nuevo objetivo",
@@ -87,8 +89,9 @@
     "mine_left_out": "{{count}} ejercicios tuyos más necesitan una tablatura y un rango de tempo para tener un objetivo."
   },
   "history": {
-    "reached_on": "Alcanzado el {{date}}",
-    "raise": "Subir el listón"
+    "title": "Tus últimas pasadas",
+    "hint": "Las últimas {{count}} pasadas de este ejercicio puntuadas con el micrófono. Los puntos grandes son pasadas que juzgó tu objetivo.",
+    "loading": "Cargando tus pasadas…"
   },
   "delete_confirm": {
     "title": "¿Eliminar este objetivo?",
@@ -124,5 +127,10 @@
     "tight_zone": "Exacto (hasta {{ms}} ms)",
     "explainer": "Lo lejos del pulso que suelen caer tus notas en cada pasada — más arriba es más preciso. El timing depende de la calibración de latencia: si todas las pasadas se desvían hacia el mismo lado, calibra una vez.",
     "empty": "El timing aparece tras pasadas puntuadas con el micrófono. Las sesiones antiguas no lo guardaban."
+  },
+  "practice_run": {
+    "clean": "Pasada limpia a {{bpm}} BPM — {{count}} de {{required}} para el hito de tu objetivo.",
+    "not_clean": "La pasada a {{bpm}} BPM no contó como limpia para tu objetivo.",
+    "next_stage": "Siguiente: {{bpm}} BPM."
   }
 }

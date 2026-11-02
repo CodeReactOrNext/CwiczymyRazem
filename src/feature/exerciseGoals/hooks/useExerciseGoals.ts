@@ -75,6 +75,17 @@ export const useExerciseGoals = (uid: string | null) => {
 };
 
 /**
+ * The exercise's kept runs, oldest first. Read again on every mount, so a run
+ * saved since the last look shows up.
+ */
+export const useExerciseRuns = (uid: string | null, exerciseId: string) =>
+  useQuery({
+    queryKey: exerciseRunsKey(uid, exerciseId),
+    queryFn: () => getExerciseRuns(uid!, exerciseId),
+    enabled: !!uid,
+  });
+
+/**
  * Everything the goal chart draws for one exercise: the runs tracked since the
  * exercise first had a goal, and before them the scored sessions the activity
  * log remembers — so a fresh goal opens on the climb that led to it.

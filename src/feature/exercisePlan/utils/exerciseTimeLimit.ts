@@ -12,6 +12,22 @@ export const RUN_TIME_MIN_TOLERANCE_MS = 15_000;
 
 const catalogMinutesById = new Map(exercisesAgregat.map((exercise) => [exercise.id, exercise.timeInMinutes]));
 
+/** One attempt's own length in ms, before any slack; null without a fixed time. */
+const getExerciseLengthMs = (
+  exercise: Pick<Exercise, "id" | "timeInMinutes" | "songData">,
+  videoDurationSeconds?: number | null
+): number | null => {
+  const minutes =
+    catalogMinutesById.get(exercise.id) ??
+    (exercise.songData ? DEFAULT_SONG_EXERCISE_MINUTES : exercise.timeInMinutes);
+  // A play-along runs as long as its video, which may outlast the listed time.
+  const seconds = Math.max((minutes || 0) * 60, videoDurationSeconds ?? 0);
+  return seconds > 0 ? seconds * 1000 : null;
+};
+
+const runTimeToleranceMs = (lengthMs: number) =>
+  Math.max(lengthMs * RUN_TIME_TOLERANCE_RATIO, RUN_TIME_MIN_TOLERANCE_MS);
+
 /**
  * How long one attempt at the exercise lasts, in ms — what makes scores on its
  * leaderboard comparable. A plan may give a catalogue exercise any slot it likes
@@ -24,14 +40,22 @@ export const getExerciseTimeLimitMs = (
   exercise: Pick<Exercise, "id" | "timeInMinutes" | "songData">,
   videoDurationSeconds?: number | null
 ): number | null => {
-  const minutes =
-    catalogMinutesById.get(exercise.id) ??
-    (exercise.songData ? DEFAULT_SONG_EXERCISE_MINUTES : exercise.timeInMinutes);
-  // A play-along runs as long as its video, which may outlast the listed time.
-  const seconds = Math.max((minutes || 0) * 60, videoDurationSeconds ?? 0);
-  if (seconds <= 0) return null;
-  const limitMs = seconds * 1000;
-  return limitMs + Math.max(limitMs * RUN_TIME_TOLERANCE_RATIO, RUN_TIME_MIN_TOLERANCE_MS);
+  const lengthMs = getExerciseLengthMs(exercise, videoDurationSeconds);
+  return lengthMs === null ? null : lengthMs + runTimeToleranceMs(lengthMs);
+};
+
+/**
+ * Whether a run lasted a whole attempt at the exercise, give or take the same
+ * slack — what a run outside goal mode needs before a goal will judge it. A
+ * longer run passes: playing on past the time makes it no easier.
+ */
+export const isRunFullLength = (
+  exercise: Pick<Exercise, "id" | "timeInMinutes" | "songData">,
+  runMs: number,
+  videoDurationSeconds?: number | null
+): boolean => {
+  const lengthMs = getExerciseLengthMs(exercise, videoDurationSeconds);
+  return lengthMs === null || runMs >= lengthMs - runTimeToleranceMs(lengthMs);
 };
 
 /**

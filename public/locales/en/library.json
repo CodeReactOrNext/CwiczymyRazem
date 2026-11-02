@@ -1,6 +1,12 @@
 {
   "sections": "Library sections",
   "cancel": "Cancel",
+  "sort": {
+    "label": "Sort",
+    "newest": "Newest first",
+    "oldest": "Oldest first",
+    "name": "Name (A–Z)"
+  },
   "my_exercises": {
     "title": "My Exercises",
     "subtitle": "Create your own guitar exercises — keep them private or share them with the community",

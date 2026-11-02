@@ -1,6 +1,6 @@
 ---
 title: "Objetivos de ejercicio"
-description: "Fija desde dónde empiezas y el tempo que quieres alcanzar en un ejercicio, y luego sube etapa a etapa, con tres pasadas limpias en cada una, en modo objetivo."
+description: "Fija desde dónde empiezas y el tempo que quieres alcanzar en un ejercicio, y luego sube etapa a etapa, con tres pasadas limpias en cada una."
 slug: "exercise-goals"
 section: "Skill Development"
 order: 4
@@ -31,12 +31,14 @@ La tercera pasada limpia supera la etapa. El resumen te dice cuál viene a conti
 <ProgressLadder items="80 BPM::3 pasadas limpias|85 BPM::3 pasadas limpias|90 BPM::3 pasadas limpias|120 BPM::Objetivo alcanzado" highlight="85 BPM" />
 
 <BlogAlert type="info">
-Solo las pasadas de objetivo pueden superar una etapa. La práctica normal del mismo ejercicio sigue apareciendo en el gráfico del objetivo, así que ves el camino hacia arriba, pero nunca cuenta para las tres pasadas limpias.
+Una pasada fuera del modo objetivo también cuenta, en una rutina o un plan, si tocas el ejercicio durante todo su tiempo al tempo de la etapa o más rápido. Un mensaje al terminar el ejercicio te dice si fue limpia y cuántas pasadas limpias llevas. Las pasadas más lentas solo aparecen en el gráfico, así que un calentamiento nunca reinicia tu cuenta.
 </BlogAlert>
 
 ## El gráfico
 
-Cada objetivo muestra la etapa en la que estás, una barra con un segmento por etapa (las verdes están superadas) y un gráfico de tus pasadas puntuadas en ese ejercicio. El tempo del objetivo es una línea verde discontinua y la etapa actual una gris punteada. Los puntos grises pequeños son práctica normal, los puntos verdes son pasadas de objetivo limpias y los puntos huecos son pasadas de objetivo que no contaron.
+Cada objetivo muestra la etapa en la que estás, una barra con un segmento por etapa (las verdes están superadas) y un gráfico de tus pasadas puntuadas en ese ejercicio. El tempo del objetivo es una línea verde discontinua y la etapa actual una gris punteada. Los puntos grises pequeños son pasadas que el objetivo no juzgó, los puntos verdes son pasadas limpias y los puntos huecos son pasadas que no fueron limpias.
+
+La app guarda las últimas 30 pasadas puntuadas de cada ejercicio, con objetivo o sin él. También puedes verlas en plena práctica: abre **Velocidades dominadas** en la sesión y baja hasta **Tus últimas pasadas**.
 
 El gráfico empieza antes que el objetivo: las sesiones en las que practicaste ese único ejercicio con el micrófono activado también aparecen, así que un objetivo nuevo se abre sobre la subida que llevó a él. Las sesiones de una rutina con varios ejercicios no, porque la puntuación no se puede atribuir a un solo ejercicio.
 

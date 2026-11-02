@@ -1,6 +1,10 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ExerciseGoal } from "feature/exerciseGoals/types/exerciseGoal.types";
-import { goalStages } from "feature/exerciseGoals/utils/goalRules";
+import {
+  goalStages,
+  RUN_HISTORY_DOC,
+  RUN_HISTORY_LIMIT,
+} from "feature/exerciseGoals/utils/goalRules";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { FieldPath, Timestamp } from "firebase-admin/firestore";
@@ -445,7 +449,7 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
     {
       title: "Tempo goals",
       description:
-        "The player's tempo goals, newest first: target BPM, current milestone and clean runs at it (3 clear a milestone). Paged.",
+        "The player's tempo goals, newest first: target BPM, current milestone and clean runs at it (3 clear a milestone; goal mode or a full-length run at the milestone tempo anywhere). Paged.",
       inputSchema: strictInput({
         includeCompleted: z.boolean().optional(),
         ...pageInput(20, 50),
@@ -490,17 +494,18 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
     "riffquest_get_exercise_stats",
     {
       title: "Exercise stats",
-      description:
-        "The player's scored runs of one exercise (newest last, default 40): tempo, accuracy and timing.",
+      description: `The player's scored runs of one exercise (the app keeps the last ${RUN_HISTORY_LIMIT}, newest last): tempo, accuracy, timing, and clean when a goal judged it.`,
       inputSchema: strictInput({
         exerciseId: docId(),
         limit: z
           .number()
           .int()
           .min(1)
-          .max(100)
+          .max(RUN_HISTORY_LIMIT)
           .optional()
-          .describe("How many of the newest runs (default 40)"),
+          .describe(
+            `How many of the newest runs (default ${RUN_HISTORY_LIMIT})`,
+          ),
       }),
       annotations: READ_TOOL_ANNOTATIONS,
     },
@@ -511,7 +516,7 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
           .doc(exerciseId)
           .collection("runs")
           .orderBy("createdAt", "desc")
-          .limit(limit ?? 40)
+          .limit(limit ?? RUN_HISTORY_LIMIT)
           .get();
         // No runs is either "never played" or a wrong id — say which.
         if (snapshot.empty && !(await exerciseExists(uid, exerciseId))) {
@@ -572,12 +577,28 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
         const since = Date.parse(`${from}T00:00:00Z`) - 14 * 60 * 60 * 1000;
 
         // Runs sit under each exercise, so first find which exercises were
-        // played: the session report stamps every one in the rotation doc,
-        // and goal runs belong to the open goals.
-        const [rotation, goals] = await Promise.all([
+        // played: every saved run stamps its exercise in the run history
+        // index. Runs saved before the index existed are found the old way —
+        // the session report stamps played exercises in the rotation doc, and
+        // goal runs belong to the open goals.
+        const [history, rotation, goals] = await Promise.all([
+          userRef(uid).collection("settings").doc(RUN_HISTORY_DOC).get(),
           userRef(uid).collection("settings").doc("rotation").get(),
           userRef(uid).collection("exerciseGoals").get(),
         ]);
+        const indexed = Object.entries(
+          (history.data()?.exercises ?? {}) as Record<
+            string,
+            { lastRunAt?: Timestamp; title?: string }
+          >,
+        )
+          .map(([id, entry]) => ({
+            id,
+            at: entry.lastRunAt ? toMillis(entry.lastRunAt) : 0,
+            title: typeof entry.title === "string" ? entry.title : null,
+          }))
+          .filter((entry) => entry.at >= since)
+          .sort((a, b) => b.at - a.at);
         const stamped = Object.entries(
           (rotation.data()?.lastPracticed?.exercise ?? {}) as Record<
             string,
@@ -590,10 +611,13 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
         const goalIds = goals.docs
           .filter((goal) => goal.data().status !== "completed")
           .map((goal) => goal.data().exerciseId as string);
-        const ids = Array.from(new Set([...stamped, ...goalIds])).slice(
-          0,
-          MAX_RECENT_EXERCISES,
-        );
+        const ids = Array.from(
+          new Set([
+            ...indexed.map((entry) => entry.id),
+            ...stamped,
+            ...goalIds,
+          ]),
+        ).slice(0, MAX_RECENT_EXERCISES);
 
         const perExercise = await Promise.all(
           ids.map(async (exerciseId) => {
@@ -617,9 +641,14 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
                 };
               })
               .filter((run) => todayIn(zone, new Date(run.at)) >= from);
+            const indexedTitle = indexed.find(
+              (entry) => entry.id === exerciseId,
+            )?.title;
             return {
               exerciseId,
-              title: runs.length ? await exerciseTitle(uid, exerciseId) : null,
+              title: runs.length
+                ? (indexedTitle ?? (await exerciseTitle(uid, exerciseId)))
+                : null,
               runs,
             };
           }),

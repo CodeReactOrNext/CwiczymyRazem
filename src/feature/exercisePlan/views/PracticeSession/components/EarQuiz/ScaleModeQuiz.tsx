@@ -1,7 +1,10 @@
 import { cn } from "assets/lib/utils";
 import type { ScaleModeId } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 import type { ScaleModeQuestion } from "feature/exercisePlan/logic/earQuiz/questions";
-import { SCALE_MODES } from "feature/exercisePlan/logic/earQuiz/scaleModes";
+import {
+  buildScaleMidi,
+  SCALE_MODES,
+} from "feature/exercisePlan/logic/earQuiz/scaleModes";
 import { useTranslation } from "hooks/useTranslation";
 import { Snail } from "lucide-react";
 import { useState } from "react";
@@ -42,9 +45,11 @@ export function ScaleModeQuiz({
   const { isPlaying, play, stop } = useEarQuizPlayback();
   const [picked, setPicked] = useState<ScaleModeId | null>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
+  /** Which option is sounding, once the tiles have turned into players. */
+  const [auditioned, setAuditioned] = useState<ScaleModeId | null>(null);
 
-  const playScale = (noteSeconds: number) => {
-    const runSeconds = question.midis.length * noteSeconds;
+  const playRun = (midis: number[], noteSeconds: number) => {
+    const runSeconds = midis.length * noteSeconds;
     play(
       [
         // Tonic drone underneath — without it Dorian and Aeolian are the same
@@ -56,7 +61,7 @@ export function ScaleModeQuiz({
           spread: 0.04,
           gain: DRONE_GAIN,
         },
-        ...question.midis.map((midi, index) => ({
+        ...midis.map((midi, index) => ({
           midis: [midi],
           at: 0.35 + index * noteSeconds,
           duration: NOTE_DURATION,
@@ -64,6 +69,11 @@ export function ScaleModeQuiz({
       ],
       runSeconds + 1.4,
     );
+  };
+
+  const playScale = (noteSeconds: number) => {
+    playRun(question.midis, noteSeconds);
+    setAuditioned(null);
     setHasPlayed(true);
   };
 
@@ -71,8 +81,14 @@ export function ScaleModeQuiz({
   // never reads as "cut the scale off".
   const toggleScale = () => (isPlaying ? stop() : playScale(NOTE_SECONDS));
 
+  // Answered, every tile plays its own mode over the same drone, so the guess
+  // can be heard against the mode that actually played.
   const handlePick = (scale: ScaleModeId) => {
-    if (isAnswered) return;
+    if (isAnswered) {
+      playRun(buildScaleMidi(question.rootMidi, scale), NOTE_SECONDS);
+      setAuditioned(scale);
+      return;
+    }
     setPicked(scale);
     onAnswer(scale === question.scale);
   };
@@ -138,10 +154,18 @@ export function ScaleModeQuiz({
             <AnswerTile
               key={id}
               onClick={() => handlePick(id)}
-              disabled={isAnswered}
               state={state}
               title={scaleName(id)}
               subtitle={scale.formula}
+              listenLabel={
+                isAnswered
+                  ? t("quiz.hear_from_root", {
+                      name: scaleName(id),
+                      root: question.rootName,
+                    })
+                  : undefined
+              }
+              isSounding={isPlaying && auditioned === id}
             />
           );
         })}

@@ -50,6 +50,10 @@
     "roadmap": "Roadmap",
     "custom": "Propio"
   },
+  "song_modes": {
+    "gp": "Tab",
+    "sections": "Secciones"
+  },
   "areas": {
     "technique": "Técnica",
     "songs": "Canciones",
@@ -184,6 +188,8 @@
     "description": "Cada toque añade un bloque con la duración de abajo.",
     "length": "Duración",
     "search": "Buscar",
+    "practise_with": "Practicar con",
+    "no_tab": "No hay archivo de Guitar Pro adjunto: añade uno en la página de la canción.",
     "no_results": "No hay coincidencias.",
     "add_item": "Añadir {{title}}",
     "done": "Listo",

@@ -136,6 +136,28 @@ describe("planDays", () => {
     );
   });
 
+  it("lays songs on with the mode their source picked", () => {
+    const { days } = planDays(
+      input(
+        { minutesPerDay: 60 },
+        {
+          songs: [
+            {
+              song: { id: "s1", title: "Song One", artist: "A" },
+              status: "learning",
+              mode: "sections",
+            },
+          ],
+        },
+      ),
+    );
+    const songSlots = WEEK.flatMap((date) => days[date]).filter(
+      (item) => item.kind === "song",
+    );
+    expect(songSlots.length).toBeGreaterThan(0);
+    songSlots.forEach((item) => expect(item.songMode).toBe("sections"));
+  });
+
   it("gives focused areas a bigger share", () => {
     const even = planDays(input({ minutesPerDay: 60, warmup: false }));
     const focused = planDays(

@@ -43,7 +43,9 @@
     "metric_label": "Was das Diagramm zeigt",
     "metric_tempo": "Tempo",
     "metric_timing": "Timing",
-    "stage": "Etappe {{bpm}} BPM"
+    "stage": "Etappe {{bpm}} BPM",
+    "empty_history": "Hier erscheinen deine mit Mikrofon bewerteten Durchgänge, im Tempo, in dem du sie gespielt hast.",
+    "accuracy_line": "Genauigkeit"
   },
   "create": {
     "title": "Neues Ziel",
@@ -87,8 +89,9 @@
     "mine_left_out": "{{count}} weitere Übungen von dir brauchen eine Tabulatur und einen Tempobereich für ein Ziel."
   },
   "history": {
-    "reached_on": "Erreicht am {{date}}",
-    "raise": "Latte höher legen"
+    "title": "Deine letzten Durchgänge",
+    "hint": "Die letzten {{count}} vom Mikrofon bewerteten Durchgänge dieser Übung. Größere Punkte sind Durchgänge, die dein Ziel bewertet hat.",
+    "loading": "Durchgänge werden geladen…"
   },
   "delete_confirm": {
     "title": "Dieses Ziel löschen?",
@@ -124,5 +127,10 @@
     "tight_zone": "Genau (bis {{ms}} ms)",
     "explainer": "Wie weit deine Noten in jedem Durchgang typischerweise vom Schlag entfernt landen — weiter oben ist genauer. Das Timing hängt von der Latenzkalibrierung ab: Wenn jeder Durchgang in dieselbe Richtung zieht, kalibriere einmal.",
     "empty": "Das Timing erscheint nach Durchgängen, die mit Mikrofon bewertet wurden. Ältere Sitzungen haben es nicht gespeichert."
+  },
+  "practice_run": {
+    "clean": "Sauberer Durchgang bei {{bpm}} BPM — {{count}} von {{required}} für den Meilenstein deines Ziels.",
+    "not_clean": "Der Durchgang bei {{bpm}} BPM zählt nicht als sauber für dein Ziel.",
+    "next_stage": "Als Nächstes: {{bpm}} BPM."
   }
 }

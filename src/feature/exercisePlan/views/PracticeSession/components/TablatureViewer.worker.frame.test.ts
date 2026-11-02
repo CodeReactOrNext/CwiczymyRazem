@@ -303,4 +303,17 @@ describe("TablatureViewer.worker — looking things up along the song", () => {
     expect(log.texts).not.toContain("4");
     expect(log.fills.filter(isDynamicsBar)).toHaveLength(0);
   });
+
+  it("leaves the time signature out when the bar opens on a note under its digits", async () => {
+    // The ear-training riddle a player reported: a "4" peeking out under the G
+    // string's "6" read as a double stop.
+    const riddle: TablatureMeasure[] = [{
+      timeSignature: [4, 4],
+      beats: [[3, 6], [2, 7], [2, 9], [1, 10]].map(([string, fret]) => ({ duration: 1, notes: [{ string, fret }] })),
+    }];
+    const { run, log } = await startWorker(riddle);
+    run(FRAME_MS);
+    expect(log.texts).toEqual(expect.arrayContaining(["6", "7", "9", "10"]));
+    expect(log.texts).not.toContain("4");
+  });
 });

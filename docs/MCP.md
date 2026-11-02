@@ -103,13 +103,19 @@ How tools answer (`results.ts`, all tested):
   limits that apply to every write live once in the server instructions, and
   `outputSchema` isn't repeated (`get_daily_exercise` answers in
   `get_exercise`'s shape without declaring it again).
-- **Recent runs** (`get_recent_runs`): runs live under each exercise
-  (`users/{uid}/exerciseRuns/{exerciseId}/runs`) with no player or exercise
-  field to query across them. The tool finds the exercises first — the session
-  report stamps every played exercise in `users/{uid}/settings/rotation`
-  (`lastPracticed.exercise`), plus the open goals — then reads each one's runs
-  (at most 25 exercises, one query each). Runs of an exercise played in no
-  logged session and no open goal don't show up.
+- **Recent runs** (`get_recent_runs`): every run scored with the mic is kept
+  under its exercise (`users/{uid}/exerciseRuns/{exerciseId}/runs`, the last 30
+  — `RUN_HISTORY_LIMIT`), with no player or exercise field to query across
+  them. Each saved run stamps its exercise in `users/{uid}/settings/runHistory`
+  (`exercises.{id}`: `title`, `lastRunAt`, `count`), so the tool reads that one
+  doc to find the recently played exercises, then reads each one's runs (at
+  most 25 exercises, one query each). Runs saved before the index existed are
+  still found the old way: the rotation doc's `lastPracticed.exercise` stamps
+  and the open goals.
+- **Clean runs**: a run carries `clean` when a goal judged it — every goal-mode
+  run, and a run played anywhere else that lasted the exercise's full time at
+  the goal's milestone tempo or faster (`takesPracticeRun`). Other runs have
+  `clean: null`.
 - **Days** in history, calendar and weak spots are the player's own days, in
   `statistics.timeZone` from the profile; a `timeZone` argument overrides it.
 - **ChatGPT**: OpenAI's function calling refuses `"items": [ … ]` (a tuple) in an

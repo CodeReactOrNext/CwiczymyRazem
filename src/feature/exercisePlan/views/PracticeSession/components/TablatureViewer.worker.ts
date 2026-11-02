@@ -205,7 +205,7 @@ interface BeatRD {
   inAccentedBar?: boolean;
 }
 
-interface TimeSigMarker { x: number; sig: [number, number]; }
+interface TimeSigMarker { x: number; sig: [number, number]; beatIdx: number; }
 interface TupletGroup { x1: number; x2: number; num: number; }
 interface TempoPoint { beatPos: number; ratio: number; }
 
@@ -2123,6 +2123,8 @@ function render() {
   // ── Time signature markers ───────────────────────────────────────────────
   if (timeSigMarkers.length > 0) {
     const sigMidY = STAFF_TOP + STRING_SPACING * 2.5;
+    // Half the digit stack (two 14px digits ±10 px from the middle) plus half a pill.
+    const sigClearance = 17 + BLOCK_H / 2;
     ctx.fillStyle = withAlpha(inkColor, 0.45);
     ctx.font = "bold 14px Inter, sans-serif";
     ctx.textAlign = "center";
@@ -2137,6 +2139,11 @@ function render() {
       const marker = timeSigMarkers[mi];
       const mx = beatToX(xMap, marker.x) + 10;
       if (mx > visR) break;
+      // The digits land on the bar's opening pill. One poking out below a fret
+      // read as a second note — a "4" under a "6" passed for a double stop — so
+      // the signature steps aside wherever that first beat has a note under it.
+      const opening = hideNotes ? undefined : renderBeats[marker.beatIdx];
+      if (opening?.notes.some((n) => Math.abs(n.noteY - sigMidY) < sigClearance)) continue;
       drawText(marker.sig[0].toString(), mx, sigMidY - 10);
       drawText(marker.sig[1].toString(), mx, sigMidY + 10);
     }

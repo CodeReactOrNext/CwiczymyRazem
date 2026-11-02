@@ -47,16 +47,26 @@ describe("EarQuizPanel — chord quality", () => {
     render(<EarQuizPanel config={CHORD_CONFIG} exerciseId='test_chord_quiz' />);
 
     fireEvent.click(button(/Major/));
+    const verdict = screen.getByText(
+      / — (Major|Minor|Dominant 7|Sus4)$/,
+    ).textContent;
 
-    // Every option is locked once the verdict is in — no second guess.
-    ["Major", "Minor", "Dominant 7", "Sus4"].forEach((label) => {
-      expect(button(new RegExp(label)).disabled).toBe(true);
-    });
+    // Once the verdict is in, the options turn into players for comparison —
+    // tapping another one plays it instead of taking a second guess.
+    fireEvent.click(button(/Hear Minor from/));
+    fireEvent.click(button(/Hear Sus4 from/));
+
+    expect(screen.getByText("/1")).toBeDefined();
+    expect(
+      screen.getByText(/ — (Major|Minor|Dominant 7|Sus4)$/).textContent,
+    ).toBe(verdict);
 
     fireEvent.click(button(/Next/));
 
     expect(screen.queryByRole("button", { name: /Next/ })).toBeNull();
-    expect(button(/Major/).disabled).toBe(false);
+    expect(
+      screen.queryByRole("button", { name: /Hear Major from/ }),
+    ).toBeNull();
     expect(screen.getByText("What kind of chord is this?")).toBeDefined();
   });
 });
@@ -140,5 +150,9 @@ describe("EarQuizPanel — scales and modes", () => {
 
     expect(button(/Next/)).toBeDefined();
     expect(screen.getByText(/Listen for the .+ — 1 /)).toBeDefined();
+
+    // Every mode can now be heard from the same root, Dorian included.
+    fireEvent.click(button(/Hear Aeolian .* from/));
+    expect(screen.getByText("/1")).toBeDefined();
   });
 });

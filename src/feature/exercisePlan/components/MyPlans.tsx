@@ -43,6 +43,9 @@ import { deleteExercisePlan } from "feature/exercisePlan/services/deleteExercise
 import { logger } from "feature/logger/Logger";
 import { determinePlanDifficulty } from "feature/exercisePlan/utils/determinePlanDifficulty";
 import { determinePlanCategory } from "feature/exercisePlan/utils/deteminePlanCategory";
+import { LibrarySortSelect } from "components/LibrarySortSelect/LibrarySortSelect";
+import { useLibrarySort } from "hooks/useLibrarySort";
+import { sortLibraryItems } from "utils/librarySort";
 
 const getLocalizedTitle = (value: string | { en?: string; pl?: string } | undefined): string => {
   if (!value) return '';
@@ -95,6 +98,11 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   const [internalTab, setInternalTab] = useState(
     hideTabs.includes("routines") ? "my_plans" : "routines"
   );
+  const [sort, setSort] = useLibrarySort("riffquest.myPlansSort");
+  const sortedPlans = sortLibraryItems(plans, sort, (plan) => ({
+    title: plan.title ?? "",
+    createdAtMs: plan.createdAt?.getTime() ?? null,
+  }));
   const activeTab = controlledTab ?? internalTab;
   const setActiveTab = (tab: string) => {
     setInternalTab(tab);
@@ -386,12 +394,18 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
               </div>
             </div>
           ) : (
+            <>
+            {plans.length > 1 && (
+              <div className="mb-6 flex justify-end">
+                <LibrarySortSelect value={sort} onChange={setSort} />
+              </div>
+            )}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
             >
-              {plans.map((plan) => (
+              {sortedPlans.map((plan) => (
                 <PlanCard
                   key={plan.id}
                   plan={plan}
@@ -403,6 +417,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
                 />
               ))}
             </motion.div>
+            </>
           )}
         </TabsContent>
       </Tabs>

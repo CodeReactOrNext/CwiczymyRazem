@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
+import { LibrarySortSelect } from "components/LibrarySortSelect/LibrarySortSelect";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LIBRARY_TABS } from "constants/navTabs";
@@ -11,6 +12,7 @@ import { clearTabEditorDraft, saveTabEditorDraft } from "feature/exercisePlan/ut
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useLibrarySort } from "hooks/useLibrarySort";
 import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import { FileText, Globe, Lock, Music2, Pencil, Play, Plus, Star, Trash2 } from "lucide-react";
@@ -21,6 +23,7 @@ import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuthInitialProps } from "utils/auth/authInitialProps";
+import { sortLibraryItems } from "utils/librarySort";
 
 const DIFFICULTY_COLORS: Record<string, string> = {
   beginner: "bg-sky-500/15 text-sky-400 border-sky-500/20",
@@ -82,6 +85,11 @@ const MyExercisesPage: NextPageWithLayout = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [activeExercise, setActiveExercise] = useState<DashboardExercise | null>(null);
+  const [sort, setSort] = useLibrarySort("riffquest.myExercisesSort");
+  const sortedExercises = sortLibraryItems(exercises, sort, (ex) => ({
+    title: ex.title ?? "",
+    createdAtMs: ex.createdAt?.toMillis?.() ?? null,
+  }));
 
   useEffect(() => {
     if (!userAuth) return;
@@ -226,7 +234,12 @@ const MyExercisesPage: NextPageWithLayout = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {exercises.map(ex => (
+            {exercises.length > 1 && (
+              <div className="mb-6 flex justify-end">
+                <LibrarySortSelect value={sort} onChange={setSort} />
+              </div>
+            )}
+            {sortedExercises.map(ex => (
               <div
                 key={ex.id}
                 className="flex items-center gap-4 bg-zinc-900/40 hover:bg-zinc-900/60 rounded-lg px-5 py-4 transition-background"

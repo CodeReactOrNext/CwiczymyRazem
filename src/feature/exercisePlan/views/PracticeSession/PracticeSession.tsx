@@ -223,7 +223,7 @@ const PracticeSessionInner = ({
     isFullSessionModalOpen, isMounted, currentExercise,
     isLastExercise, setShowCompleteDialog, handleNextExercise,
     startTimer, stopTimer, resetTimer, showSuccessView, resetSuccessView,
-    videoDuration, setVideoDuration, setTimerTime, autoSubmitReport,
+    videoDuration, setVideoDuration, setTabDuration, setTimerTime, autoSubmitReport,
     isSubmittingReport, reportResult, currentUserStats, previousUserStats,
     planTitleString,  timer, activityDataToUse,
     jumpToExercise,  canFinishSession, hasLoggedPractice,
@@ -611,6 +611,18 @@ const PracticeSessionInner = ({
     tempoRulerRef.current = sessionTempoRuler.isConstant ? null : sessionTempoRuler;
   }, [sessionTempoRuler]);
 
+  // A song item's slot stretches to one pass of its tab at the speed it is
+  // played — a rotation song gets 5 minutes, and an 8-minute song stopped at 5
+  // never gets played through.
+  const songTabSeconds = songItemTabId && parsedGpTracks && effectiveBpm > 0
+    ? (sessionTempoRuler.totalWarped * 60) / effectiveBpm
+    : null;
+  useEffect(() => {
+    setTabDuration(currentExercise.id, songTabSeconds);
+  }, [currentExercise.id, songTabSeconds, setTabDuration]);
+  const exerciseDurationSeconds = videoDuration
+    ?? Math.max((activeExercise.timeInMinutes || 0) * 60, Math.ceil(songTabSeconds ?? 0));
+
   // A generated band for tab exercises that bring no accompaniment of their own.
   const autoBacking = useAutoBacking({
     exercise: activeExercise,
@@ -728,10 +740,10 @@ const PracticeSessionInner = ({
   // Learn mode needs no Play: it listens as soon as it is on, and a note heard
   // while the clock is stopped starts it — unless the exercise's time is up.
   const handleLearnNotePlayed = useCallback(() => {
-    const durationMs = (videoDuration ?? (activeExercise.timeInMinutes || 0) * 60) * 1000;
+    const durationMs = exerciseDurationSeconds * 1000;
     if (!freeMode && durationMs > 0 && timer.getTime() >= durationMs) return;
     startTimer();
-  }, [videoDuration, activeExercise.timeInMinutes, freeMode, timer, startTimer]);
+  }, [exerciseDurationSeconds, freeMode, timer, startTimer]);
 
   const learnProgress = useLearnModeMatcher({
     steps: learnSteps,
@@ -942,7 +954,8 @@ const PracticeSessionInner = ({
     activeExercise, currentExercise, isMicEnabled, earTrainingScore, noteMatchingHandle,
     sessionBpm: effectiveBpm,
     recordGoalChartRuns: !isGoalMode,
-    videoDurationSeconds: videoDuration,
+    // A song played through its whole tab is a whole run, however long the song.
+    videoDurationSeconds: videoDuration ?? songTabSeconds,
     duelId: plan.duel?.id ?? null,
     learnModeRef,
   });
@@ -1193,12 +1206,12 @@ const PracticeSessionInner = ({
   // Electron shell: keep the display awake + taskbar progress (web: no-op).
   useDesktopSessionIntegration({
     timer,
-    durationInSeconds: videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60,
+    durationInSeconds: exerciseDurationSeconds,
     freeMode,
   });
 
   useEffect(() => {
-    const duration = videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60;
+    const duration = exerciseDurationSeconds;
     if (freeMode || duration === 0) return;
 
     return timer.subscribe((time) => {
@@ -1207,7 +1220,7 @@ const PracticeSessionInner = ({
       if (isPlaying) stopTimer();
       if (metronome.isPlaying) metronome.toggleMetronome();
     });
-  }, [timer, isPlaying, metronome, stopTimer, freeMode, videoDuration, activeExercise.timeInMinutes]);
+  }, [timer, isPlaying, metronome, stopTimer, freeMode, exerciseDurationSeconds]);
 
   useEffect(() => {
     const header = document.querySelector("header.sticky") as HTMLElement | null;
@@ -1263,7 +1276,7 @@ const PracticeSessionInner = ({
       onNoteJudged={bossFight?.onNoteJudged}
       onFreePlay={bossFight?.onFreePlay}
     >
-    <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>
+    <TimerProvider timer={timer} durationInSeconds={exerciseDurationSeconds} freeMode={freeMode}>
     <BpmProgressProvider exercise={currentExercise}>
     <SessionUIProvider>
     <TabOverlayProvider value={tabOverlayValue}>

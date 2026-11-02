@@ -30,6 +30,9 @@ export interface UseTablatureAudioProps {
   disabled?:      boolean;
   /** Times to play the loop (0 = infinite) */
   repeatCount?:   number;
+  /** Play the first pass only and never schedule a note of the next one — an
+   *  ear-training riddle asks once. onLoopComplete still fires at its end. */
+  singlePass?:    boolean;
   /** Per-string semitone offset from standard tuning (index 0 = string 1 … index 5 = string 6),
    *  applied to guitar-track notes so the background instrument matches the player's own tuning. */
   tuningOffsets?: readonly number[];

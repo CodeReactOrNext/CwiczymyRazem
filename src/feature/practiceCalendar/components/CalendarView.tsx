@@ -143,7 +143,7 @@ export const CalendarView = () => {
     const open = week.byDate[date]
       .filter((entry) => !entry.done)
       .map((entry) => entry.item);
-    const plan = buildDayPlan(date, open, EXERCISES_BY_ID);
+    const plan = buildDayPlan(date, open, EXERCISES_BY_ID, sources.gpSongIds);
     if (!plan) {
       toast.error(t("toast.nothing_to_play"));
       return;

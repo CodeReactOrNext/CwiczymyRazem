@@ -50,6 +50,10 @@
     "roadmap": "Roadmap",
     "custom": "Eigenes"
   },
+  "song_modes": {
+    "gp": "Tab",
+    "sections": "Abschnitte"
+  },
   "areas": {
     "technique": "Technik",
     "songs": "Songs",
@@ -184,6 +188,8 @@
     "description": "Jeder Tipp fügt einen Block mit der unten eingestellten Länge hinzu.",
     "length": "Länge",
     "search": "Suchen",
+    "practise_with": "Üben mit",
+    "no_tab": "Keine Guitar-Pro-Datei angehängt – füge eine auf der Seite des Songs hinzu.",
     "no_results": "Keine Treffer.",
     "add_item": "{{title}} hinzufügen",
     "done": "Fertig",

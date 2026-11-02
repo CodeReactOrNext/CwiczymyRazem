@@ -1,6 +1,12 @@
 {
   "sections": "Secciones de la biblioteca",
   "cancel": "Cancelar",
+  "sort": {
+    "label": "Ordenar",
+    "newest": "Más recientes",
+    "oldest": "Más antiguos",
+    "name": "Nombre (A–Z)"
+  },
   "my_exercises": {
     "title": "Mis ejercicios",
     "subtitle": "Crea tus propios ejercicios de guitarra — guárdalos en privado o compártelos con la comunidad",

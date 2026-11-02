@@ -3,15 +3,18 @@ import { findDailyDayKeyFor } from "feature/dailyExercise/utils/dailyExercise";
 import { duelScoreKind } from "feature/duels/data/duelPool";
 import { submitDuelRun } from "feature/duels/services/duels.service";
 import { recordPracticeRun } from "feature/exerciseGoals/services/exerciseGoals.service";
+import { judgedRunNotice } from "feature/exerciseGoals/utils/judgedRunNotice";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import type { RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
 import { markExerciseCompleted, saveLeaderboardEntry, updateClickHighScore, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
 import type { Exercise, ScoredRun } from "../../../types/exercise.types";
-import { isRunWithinExerciseTime } from "../../../utils/exerciseTimeLimit";
+import { isRunFullLength, isRunWithinExerciseTime } from "../../../utils/exerciseTimeLimit";
 import { hasLeaderboard } from "../../../utils/hasLeaderboard";
 import { isClickAnsweredMode } from "../../../utils/huntModes";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
@@ -26,8 +29,8 @@ interface UseScoreSavingOptions {
   /** Tempo the run is actually being played at — metronome BPM × speed multiplier. */
   sessionBpm:           number;
   /**
-   * Put each scored run on its exercise's goal chart (when the exercise has an
-   * open goal). Off in goal mode, which saves its runs itself — as goal runs.
+   * Save each scored run into its exercise's run history, where an open goal
+   * may judge it. Off in goal mode, which saves its runs itself — as goal runs.
    */
   recordGoalChartRuns?: boolean;
   /** Length of the play-along video the exercise runs to, when it has one. */
@@ -75,6 +78,7 @@ export function useScoreSaving({
   const userAuth   = useAppSelector(selectUserAuth);
   const userName   = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
+  const { t: tGoals } = useTranslation("goals");
   const exerciseRecordsRef = useRef<ScoreRecords>({});
   // Read through a ref: `saveCurrentScores` is reached from callbacks that
   // deliberately freeze their deps (the exam auto-finish, the dev shortcut), and
@@ -168,10 +172,18 @@ export function useScoreSaving({
         submitDailyExerciseScore({ dayKey: dailyDayKey, exerciseId: exId, score: snap.score, accuracy: snap.accuracy, bpm: runBpm })
           .catch((error) => console.error("Daily exercise score was not saved", error));
       }
-      // Practice runs draw the climb on the goal chart. Not awaited, and the
-      // service swallows its own errors — the chart is never worth a stalled finish.
-      if (recordGoalChartRuns && runBpm) {
-        void recordPracticeRun(userAuth, exId, { bpm: runBpm, accuracy: snap.accuracy }, snap.timingPrecision ?? null);
+      // Every scored run goes into the exercise's run history, and an open goal
+      // judges the ones that were a real attempt at its milestone. Not awaited,
+      // and the service swallows its own errors — never worth a stalled finish.
+      if (recordGoalChartRuns && runBpm && !learnModeRef?.current) {
+        const isFullLength = isRunFullLength(activeExercise, snap.runMs ?? 0, videoDurationSeconds);
+        void recordPracticeRun(userAuth, activeExercise, { bpm: runBpm, accuracy: Math.round(snap.accuracy) }, snap.timingPrecision ?? null, isFullLength)
+          .then((judged) => {
+            const notice = judged && judgedRunNotice(judged, Math.round(snap.accuracy), tGoals);
+            if (!notice) return;
+            const show = notice.tone === "success" ? toast.success : toast;
+            show(notice.title, { description: notice.description });
+          });
       }
       if (result.isNewRecord) {
         exerciseRecordsRef.current = {

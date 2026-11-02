@@ -1,6 +1,6 @@
 ---
 title: "Exercise Goals"
-description: "Set where you start and the tempo you want to reach on an exercise, then climb milestone by milestone, three clean runs at each, in goal mode."
+description: "Set where you start and the tempo you want to reach on an exercise, then climb milestone by milestone, three clean runs at each."
 slug: "exercise-goals"
 section: "Skill Development"
 order: 4
@@ -31,12 +31,14 @@ The third clean run clears the milestone. The summary tells you which one comes 
 <ProgressLadder items="80 BPM::3 clean runs|85 BPM::3 clean runs|90 BPM::3 clean runs|120 BPM::Goal reached" highlight="85 BPM" />
 
 <BlogAlert type="info">
-Only goal runs can clear a milestone. Ordinary practice of the same exercise still shows up on the goal's chart, so you can see the way up, but it never counts toward the three clean runs.
+A run outside goal mode counts too, in a routine or a plan, when you play the exercise for its full time at the milestone's tempo or faster. A message after the exercise tells you whether it was clean and how many clean runs you have. Slower runs only show up on the chart, so a warm-up never starts your count over.
 </BlogAlert>
 
 ## The chart
 
-Every goal shows the milestone you're on, a bar with one segment per milestone (green ones are cleared), and a chart of your scored runs on that exercise. The goal's tempo is a dashed green line and the current milestone a dotted grey one. Small grey dots are ordinary practice, green dots are clean goal runs, and hollow dots are goal runs that didn't count.
+Every goal shows the milestone you're on, a bar with one segment per milestone (green ones are cleared), and a chart of your scored runs on that exercise. The goal's tempo is a dashed green line and the current milestone a dotted grey one. Small grey dots are runs the goal didn't judge, green dots are clean runs, and hollow dots are runs that weren't clean.
+
+The app keeps the last 30 scored runs of every exercise, with a goal or without one. You can look at them in the middle of practice too: open **Speeds mastered** in the session and scroll down to **Your last runs**.
 
 The chart starts before the goal does: sessions where you practised that one exercise with the microphone on show up too, so a new goal opens on the climb that led to it. Sessions of a routine with several exercises don't, because the score can't be pinned to one exercise.
 

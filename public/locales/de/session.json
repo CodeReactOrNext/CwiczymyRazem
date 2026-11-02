@@ -280,6 +280,7 @@
     "root": "Grundton: {{root}}",
     "root_held": "Der Grundton liegt darunter – miss jeden Ton daran",
     "hear_again_slowly": "Nochmal langsam hören",
+    "hear_from_root": "{{name}} von {{root}} anhören",
     "which_chord": "Was für ein Akkord ist das?",
     "play_chord": "Akkord abspielen",
     "one_note": "Ton für Ton",

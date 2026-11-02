@@ -1,6 +1,6 @@
 ---
 title: "Cele ćwiczeń"
-description: "Ustaw, od czego zaczynasz i jakie tempo chcesz osiągnąć w ćwiczeniu, a potem wspinaj się kamień milowy po kamieniu milowym, po trzy czyste przebiegi na każdym, w trybie celu."
+description: "Ustaw, od czego zaczynasz i jakie tempo chcesz osiągnąć w ćwiczeniu, a potem wspinaj się kamień milowy po kamieniu milowym, po trzy czyste przebiegi na każdym."
 slug: "exercise-goals"
 section: "Skill Development"
 order: 4
@@ -31,12 +31,14 @@ Trzeci czysty przebieg zalicza kamień milowy. Podsumowanie mówi, który jest n
 <ProgressLadder items="80 BPM::3 czyste przebiegi|85 BPM::3 czyste przebiegi|90 BPM::3 czyste przebiegi|120 BPM::Cel osiągnięty" highlight="85 BPM" />
 
 <BlogAlert type="info">
-Kamień milowy mogą zaliczyć tylko przebiegi celu. Zwykłe ćwiczenie tego samego ćwiczenia nadal pojawia się na wykresie celu, więc widzisz drogę w górę, ale nigdy nie liczy się do trzech czystych przebiegów.
+Przebieg poza trybem celu też się liczy, w rutynie albo w planie, jeśli zagrasz ćwiczenie przez cały jego czas w tempie kamienia milowego albo szybciej. Po ćwiczeniu komunikat powie, czy przebieg był czysty i ile czystych przebiegów już masz. Wolniejsze przebiegi trafiają tylko na wykres, więc rozgrzewka nigdy nie zeruje licznika.
 </BlogAlert>
 
 ## Wykres
 
-Każdy cel pokazuje kamień milowy, na którym jesteś, pasek z jednym segmentem na kamień milowy (zielone są zaliczone) i wykres twoich ocenionych przebiegów w tym ćwiczeniu. Tempo celu to przerywana zielona linia, a obecny kamień milowy kropkowana szara. Małe szare kropki to zwykłe ćwiczenie, zielone kropki to czyste przebiegi celu, a puste kropki to przebiegi celu, które się nie liczyły.
+Każdy cel pokazuje kamień milowy, na którym jesteś, pasek z jednym segmentem na kamień milowy (zielone są zaliczone) i wykres twoich ocenionych przebiegów w tym ćwiczeniu. Tempo celu to przerywana zielona linia, a obecny kamień milowy kropkowana szara. Małe szare kropki to przebiegi, których cel nie oceniał, zielone kropki to czyste przebiegi, a puste kropki to przebiegi, które nie były czyste.
+
+Aplikacja trzyma 30 ostatnich ocenionych przebiegów każdego ćwiczenia, z celem albo bez. Możesz je obejrzeć także w trakcie ćwiczenia: otwórz **Opanowane tempa** w sesji i przewiń do **Twoje ostatnie przebiegi**.
 
 Wykres zaczyna się przed celem: sesje, w których ćwiczyłeś to jedno ćwiczenie z włączonym mikrofonem, też się pojawiają, więc nowy cel otwiera się na wspinaczce, która do niego doprowadziła. Sesje rutyny z kilkoma ćwiczeniami nie, bo wyniku nie da się przypiąć do jednego ćwiczenia.
 

@@ -15,12 +15,15 @@ import {
   collection,
   deleteDoc,
   doc,
+  getCountFromServer,
+  increment,
   limit,
   orderBy,
   query,
   runTransaction,
   Timestamp,
   where,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import {
@@ -32,12 +35,19 @@ import {
 import type {
   ExerciseGoal,
   ExerciseRun,
+  ExerciseRunSource,
   GoalRunInput,
   GoalRunOutcome,
   NewExerciseGoal,
   RunTiming,
 } from "../types/exerciseGoal.types";
-import { applyGoalRun, DEFAULT_STEP_BPM } from "../utils/goalRules";
+import {
+  applyGoalRun,
+  DEFAULT_STEP_BPM,
+  RUN_HISTORY_DOC,
+  RUN_HISTORY_LIMIT,
+  takesPracticeRun,
+} from "../utils/goalRules";
 
 /**
  * users/{uid}/exerciseGoals/{goalId} — one doc per goal, finished ones kept as
@@ -46,17 +56,23 @@ import { applyGoalRun, DEFAULT_STEP_BPM } from "../utils/goalRules";
  */
 const GOALS = "exerciseGoals";
 /**
- * users/{uid}/exerciseRuns/{exerciseId}/runs/{runId} — the runs drawn on an
- * exercise's goal chart. Keyed by exercise rather than by goal, so the chart
- * carries on across a raised bar.
+ * users/{uid}/exerciseRuns/{exerciseId}/runs/{runId} — every scored run of an
+ * exercise, the latest RUN_HISTORY_LIMIT of them. Keyed by exercise rather than
+ * by goal, so the chart carries on across a raised bar.
  */
 const RUNS = "exerciseRuns";
-/** How many runs the chart reads back. */
-const CHART_RUN_LIMIT = 80;
 
 const goalsCollection = (uid: string) => collection(db, "users", uid, GOALS);
 const runsCollection = (uid: string, exerciseId: string) =>
   collection(db, "users", uid, RUNS, exerciseId, "runs");
+/**
+ * users/{uid}/settings/runHistory — `exercises.{exerciseId}`: the title, when
+ * the last run was played and how many runs are kept. Runs sit under each
+ * exercise, so this is how a reader finds the recently played ones without
+ * walking them all, and the count is what trims them to RUN_HISTORY_LIMIT.
+ */
+const runHistoryRef = (uid: string) =>
+  doc(db, "users", uid, "settings", RUN_HISTORY_DOC);
 
 const toMillis = (value: unknown): number | null =>
   value instanceof Timestamp
@@ -189,7 +205,7 @@ export const deleteExerciseGoal = async (
   await deleteDoc(doc(goalsCollection(uid), goalId));
 };
 
-/** The runs of one exercise, oldest first, the latest CHART_RUN_LIMIT of them. */
+/** The runs of one exercise, oldest first, the latest RUN_HISTORY_LIMIT of them. */
 export const getExerciseRuns = async (
   uid: string,
   exerciseId: string,
@@ -198,7 +214,7 @@ export const getExerciseRuns = async (
     query(
       runsCollection(uid, exerciseId),
       orderBy("createdAt", "desc"),
-      limit(CHART_RUN_LIMIT),
+      limit(RUN_HISTORY_LIMIT),
     ),
   );
   return snapshot.docs.map((d) => toRun(d, exerciseId)).reverse();
@@ -274,35 +290,6 @@ export const getExerciseHistory = async (
   }
 };
 
-/**
- * Puts a regular practice run on the chart — only for an exercise with an open
- * goal, since the chart is the only place runs are shown. Practice runs never
- * count toward the goal; that takes goal mode.
- */
-export const recordPracticeRun = async (
-  uid: string,
-  exerciseId: string,
-  run: GoalRunInput,
-  timing: RunTiming | null = null,
-): Promise<void> => {
-  try {
-    const goal = await getActiveGoalFor(uid, exerciseId);
-    if (!goal) return;
-    await trackedSetDoc(doc(runsCollection(uid, exerciseId)), {
-      bpm: run.bpm,
-      accuracy: run.accuracy,
-      timingOffsetMs: timing?.medianOffsetMs ?? null,
-      timingBiasMs: timing?.biasMs ?? null,
-      source: "practice",
-      goalId: goal.id,
-      clean: null,
-      createdAt: Timestamp.now(),
-    });
-  } catch (error) {
-    logger.error(error, { context: "recordPracticeRun" });
-  }
-};
-
 /** Ticks the exercise's "Speeds mastered" ladder up to a tempo played clean. */
 const tickBpmLadder = async (
   uid: string,
@@ -345,39 +332,88 @@ const onStageCleared = async (
   ]);
 };
 
+/** A run its goal judged, and where that left the goal. */
+export interface JudgedRun {
+  goal: ExerciseGoal;
+  outcome: GoalRunOutcome;
+}
+
+interface SaveRunOptions {
+  source: ExerciseRunSource;
+  /** The goal the run may be judged against; null saves it unjudged. */
+  goalId: string | null;
+  /** Whether the goal, as the transaction reads it, takes this run. */
+  judges: (goal: ExerciseGoal) => boolean;
+}
+
 /**
- * Judges a goal-mode run and saves it: the run goes on the chart and the goal's
- * count — or its milestone, when the run cleared one — moves in the same transaction, so two runs finishing close together
- * can't both read the count the other one is about to change.
+ * Saves one scored run and, when its goal takes it, moves the goal's count — or
+ * its milestone, when the run cleared one — in the same transaction, so two runs
+ * finishing close together can't both read the count the other one is about to
+ * change. The run history index is stamped on the way.
  */
-export const recordGoalRun = async (
+const saveRun = async (
   uid: string,
-  goalId: string,
-  exercise: Exercise,
+  exercise: Pick<Exercise, "id" | "title">,
   run: GoalRunInput,
-  timing: RunTiming | null = null,
-): Promise<{ goal: ExerciseGoal; outcome: GoalRunOutcome }> => {
-  const goalRef = doc(goalsCollection(uid), goalId);
+  timing: RunTiming | null,
+  { source, goalId, judges }: SaveRunOptions,
+): Promise<{
+  judged: JudgedRun | null;
+  exerciseId: string;
+  keptRuns: number | null;
+}> => {
+  const historyRef = runHistoryRef(uid);
+  const goalRef = goalId ? doc(goalsCollection(uid), goalId) : null;
 
-  const result = await runTransaction(db, async (transaction) => {
-    const snapshot = await transaction.get(goalRef);
-    if (!snapshot.exists()) throw new Error(`Goal ${goalId} not found`);
-    const goal = toGoal(snapshot);
-    const outcome = applyGoalRun(goal, run);
+  return runTransaction(db, async (transaction) => {
+    const [history, goalSnapshot] = await Promise.all([
+      transaction.get(historyRef),
+      goalRef ? transaction.get(goalRef) : Promise.resolve(null),
+    ]);
+    if (goalSnapshot && !goalSnapshot.exists()) {
+      throw new Error(`Goal ${goalId} not found`);
+    }
+    const goal = goalSnapshot ? toGoal(goalSnapshot) : null;
+    const outcome = goal && judges(goal) ? applyGoalRun(goal, run) : null;
     const now = Timestamp.now();
+    // The goal's own id for the exercise, as goal runs were always kept under it.
+    const exerciseId = goal?.exerciseId ?? exercise.id;
 
-    transaction.set(doc(runsCollection(uid, goal.exerciseId)), {
+    transaction.set(doc(runsCollection(uid, exerciseId)), {
       bpm: run.bpm,
       accuracy: run.accuracy,
       timingOffsetMs: timing?.medianOffsetMs ?? null,
       timingBiasMs: timing?.biasMs ?? null,
-      source: "goal",
-      goalId,
-      clean: outcome.clean,
+      source,
+      goalId: goal?.id ?? null,
+      clean: outcome?.clean ?? null,
       createdAt: now,
     });
 
-    if (goal.status !== "active") return { goal, outcome };
+    // Runs saved before the index existed aren't counted — trimRuns counts them.
+    const counted = history.data()?.exercises?.[exerciseId]?.count;
+    const keptRuns = typeof counted === "number" ? counted + 1 : null;
+    transaction.set(
+      historyRef,
+      {
+        exercises: {
+          [exerciseId]: {
+            title: exercise.title,
+            lastRunAt: now,
+            ...(keptRuns !== null ? { count: keptRuns } : {}),
+          },
+        },
+      },
+      { merge: true },
+    );
+
+    if (!goal || !outcome || !goalRef) {
+      return { judged: null, exerciseId, keptRuns };
+    }
+    if (goal.status !== "active") {
+      return { judged: { goal, outcome }, exerciseId, keptRuns };
+    }
 
     // A cleared milestone opens the next one with an empty count; the last
     // one keeps its full count on the finished goal.
@@ -401,14 +437,116 @@ export const recordGoalRun = async (
         ? { status: "completed" as const, completedAt: now.toMillis() }
         : {}),
     };
-    return { goal: updated, outcome };
+    return { judged: { goal: updated, outcome }, exerciseId, keptRuns };
   });
+};
 
-  if (result.outcome.stageCleared) {
-    await onStageCleared(uid, result.goal, exercise, result.outcome).catch(
+/** Most old runs one trim deletes — a batch takes 500 writes. */
+const MAX_TRIMMED_RUNS = 400;
+
+/**
+ * Keeps the exercise's latest RUN_HISTORY_LIMIT runs and deletes the older ones.
+ * `keptRuns` is the count the index holds; null when it holds none yet (runs
+ * saved before it), and then they are counted here once.
+ */
+const trimRuns = async (
+  uid: string,
+  exerciseId: string,
+  keptRuns: number | null,
+): Promise<void> => {
+  const runs = runsCollection(uid, exerciseId);
+  const count = keptRuns ?? (await getCountFromServer(runs)).data().count;
+  const excess = count - RUN_HISTORY_LIMIT;
+  if (excess <= 0 && keptRuns !== null) return;
+
+  const batch = writeBatch(db);
+  let deleted = 0;
+  if (excess > 0) {
+    const oldest = await trackedGetDocs(
+      query(
+        runs,
+        orderBy("createdAt", "asc"),
+        limit(Math.min(excess, MAX_TRIMMED_RUNS)),
+      ),
+    );
+    oldest.docs.forEach((runDoc) => batch.delete(runDoc.ref));
+    deleted = oldest.size;
+  }
+  // A known count only moves by what was deleted: a run saved meanwhile has
+  // already added itself to it.
+  batch.set(
+    runHistoryRef(uid),
+    {
+      exercises: {
+        [exerciseId]: {
+          count: keptRuns === null ? count - deleted : increment(-deleted),
+        },
+      },
+    },
+    { merge: true },
+  );
+  await batch.commit();
+};
+
+/** What follows a saved run, none of it worth failing the run over. */
+const afterRun = async (
+  uid: string,
+  exercise: Exercise,
+  { judged, exerciseId, keptRuns }: Awaited<ReturnType<typeof saveRun>>,
+) => {
+  void trimRuns(uid, exerciseId, keptRuns).catch((error) =>
+    logger.error(error, { context: "trimRuns" }),
+  );
+  if (judged?.outcome.stageCleared) {
+    await onStageCleared(uid, judged.goal, exercise, judged.outcome).catch(
       (error) => logger.error(error, { context: "onStageCleared" }),
     );
   }
+};
 
-  return result;
+/**
+ * Saves a run played outside goal mode — in a plan, a routine, the library. It
+ * always goes into the exercise's history; when the exercise has an open goal
+ * and the run was a real attempt at its milestone (see takesPracticeRun), the
+ * goal judges it just like a goal-mode run. Resolves to that judgement, or null.
+ */
+export const recordPracticeRun = async (
+  uid: string,
+  exercise: Exercise,
+  run: GoalRunInput,
+  timing: RunTiming | null,
+  isFullLength: boolean,
+): Promise<JudgedRun | null> => {
+  try {
+    const goal = await getActiveGoalFor(uid, exercise.id);
+    const saved = await saveRun(uid, exercise, run, timing, {
+      source: "practice",
+      goalId: goal?.id ?? null,
+      judges: (current) => takesPracticeRun(current, run, isFullLength),
+    });
+    await afterRun(uid, exercise, saved);
+    return saved.judged;
+  } catch (error) {
+    logger.error(error, { context: "recordPracticeRun" });
+    return null;
+  }
+};
+
+/** Judges a goal-mode run against its goal and saves it. */
+export const recordGoalRun = async (
+  uid: string,
+  goalId: string,
+  exercise: Exercise,
+  run: GoalRunInput,
+  timing: RunTiming | null = null,
+): Promise<JudgedRun> => {
+  const saved = await saveRun(uid, exercise, run, timing, {
+    source: "goal",
+    goalId,
+    judges: () => true,
+  });
+  // saveRun throws when the goal is gone, and a goal-mode run is always judged.
+  if (!saved.judged) throw new Error(`Goal ${goalId} did not judge the run`);
+  await afterRun(uid, exercise, saved);
+  return saved.judged;
 };

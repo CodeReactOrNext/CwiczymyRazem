@@ -12,6 +12,7 @@ import {
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import type { SongPracticeMode } from "feature/exercisePlan/types/exercise.types";
 import { RotationThumb } from "feature/rotation/components/RotationThumb";
 import { Check, Plus, Search } from "lucide-react";
 import Link from "next/link";
@@ -43,6 +44,8 @@ const DEFAULT_MINUTES: Record<Tab, number> = {
   custom: 15,
 };
 
+const SONG_MODES: SongPracticeMode[] = ["sections", "gp"];
+
 const MAX_LISTED = 60;
 
 type Draft = Omit<CalendarItem, "id" | "minutes" | "auto" | "done" | "role">;
@@ -54,11 +57,19 @@ interface AddItemDialogProps {
   onClose: () => void;
 }
 
+interface Candidate {
+  key: string;
+  draft: Draft;
+  /** Why it cannot be added right now — e.g. a tab slot for a song without a tab. */
+  unavailable?: string;
+}
+
 interface CandidateRowProps {
   display: CalendarItemDisplay;
   area: PracticeArea;
   isAdded: boolean;
   label: string;
+  unavailable?: string;
   onAdd: () => void;
 }
 
@@ -67,14 +78,16 @@ const CandidateRow = ({
   area,
   isAdded,
   label,
+  unavailable,
   onAdd,
 }: CandidateRowProps) => (
   <li>
     <button
       type='button'
       onClick={onAdd}
+      disabled={!!unavailable}
       aria-label={label}
-      className='group flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800/70'>
+      className='group flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 hover:bg-zinc-800/70'>
       <RotationThumb
         display={display}
         className='h-10 w-10'
@@ -88,7 +101,7 @@ const CandidateRow = ({
           <span
             className={cn("h-1.5 w-1.5 shrink-0 rounded-full", AREA_DOT[area])}
           />
-          <span className='truncate'>{display.subtitle}</span>
+          <span className='truncate'>{unavailable ?? display.subtitle}</span>
         </span>
       </span>
       <span
@@ -126,8 +139,10 @@ export const AddItemDialog = ({
   const [customTitle, setCustomTitle] = useState("");
   const [customNote, setCustomNote] = useState("");
   const [customArea, setCustomArea] = useState<PracticeArea>("creativity");
+  // Every song can be played over its section map; the tab needs a file attached.
+  const [songMode, setSongMode] = useState<SongPracticeMode>("sections");
 
-  const candidates = useMemo<{ key: string; draft: Draft }[]>(() => {
+  const candidates = useMemo<Candidate[]>(() => {
     if (tab === "exercise") {
       return exercisesAgregat
         .filter((exercise) => !exercise.songData)
@@ -143,7 +158,9 @@ export const AddItemDialog = ({
     if (tab === "song") {
       return sources.songs.map(({ song }) => ({
         key: `song:${song.id}`,
-        draft: { kind: "song", area: "songs", song },
+        draft: { kind: "song", area: "songs", song, songMode },
+        ...(songMode === "gp" &&
+          !sources.gpSongIds.has(song.id) && { unavailable: t("add.no_tab") }),
       }));
     }
     if (tab === "goal") {
@@ -186,12 +203,13 @@ export const AddItemDialog = ({
             note: step.roadmapTitle,
             ...(exercise && { exerciseId: exercise.id }),
             ...(step.song && { song: step.song }),
+            ...(step.song && step.songMode && { songMode: step.songMode }),
           },
         };
       });
     }
     return [];
-  }, [tab, sources]);
+  }, [tab, sources, songMode, t]);
 
   const listed = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -307,6 +325,36 @@ export const AddItemDialog = ({
             </div>
           </div>
 
+          {tab === "song" && (
+            <div className='flex items-center justify-between gap-4'>
+              <span className='text-sm text-zinc-400'>
+                {t("add.practise_with")}
+              </span>
+              <div
+                role='radiogroup'
+                aria-label={t("add.practise_with")}
+                className='flex gap-1'>
+                {SONG_MODES.map((mode) => (
+                  <button
+                    key={mode}
+                    type='button'
+                    role='radio'
+                    aria-checked={songMode === mode}
+                    onClick={() => setSongMode(mode)}
+                    className={cn(
+                      PRESSABLE_KEY,
+                      "h-9 rounded-lg px-3.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
+                      songMode === mode
+                        ? "bg-zinc-700 text-zinc-100"
+                        : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
+                    )}>
+                    {t(`song_modes.${mode}`)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {(tab === "exercise" || tab === "song") && (
             <Input
               value={search}
@@ -390,13 +438,14 @@ export const AddItemDialog = ({
             )
           ) : (
             <ul className='space-y-1'>
-              {listed.map(({ key, draft, display }) => (
+              {listed.map(({ key, draft, display, unavailable }) => (
                 <CandidateRow
                   key={key}
                   display={display}
                   area={draft.area}
                   isAdded={added.has(key)}
                   label={t("add.add_item", { title: display.title })}
+                  unavailable={unavailable}
                   onAdd={() => add(key, draft)}
                 />
               ))}

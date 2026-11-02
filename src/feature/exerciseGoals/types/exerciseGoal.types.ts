@@ -52,8 +52,9 @@ export interface NewExerciseGoal {
 }
 
 /**
- * Where a run was played. Only goal-mode runs can finish a goal; practice runs
- * are there to draw the way up to it.
+ * Where a run was played: goal mode, or anywhere else (a plan, a routine, the
+ * library). A practice run counts toward the goal too when it was a full-length
+ * attempt at the milestone's tempo — see takesPracticeRun.
  */
 export type ExerciseRunSource = "goal" | "practice";
 
@@ -67,7 +68,7 @@ export interface ExerciseRun {
   accuracy: number;
   source: ExerciseRunSource;
   goalId: string | null;
-  /** Whether a goal run met its goal; null for practice runs. */
+  /** Whether the run met its goal; null for a run no goal judged. */
   clean: boolean | null;
   /** Epoch ms. */
   createdAt: number;

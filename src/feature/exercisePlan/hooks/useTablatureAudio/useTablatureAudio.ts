@@ -26,6 +26,7 @@ export const useTablatureAudio = ({
   audioStartTime,
   disabled = false,
   repeatCount = 0,
+  singlePass = false,
   tuningOffsets,
   rage = false,
 }: UseTablatureAudioProps) => {
@@ -49,6 +50,8 @@ export const useTablatureAudio = ({
   const audioStartTimePropRef    = useRef<number | null>(null);
   const repeatCountRef           = useRef(repeatCount);
   useEffect(() => { repeatCountRef.current = repeatCount; }, [repeatCount]);
+  const singlePassRef            = useRef(singlePass);
+  useEffect(() => { singlePassRef.current = singlePass; }, [singlePass]);
   const trackStatesRef           = useRef<Record<string, { beatIdx: number }>>({});
   const pendingLoopCompleteTimeoutsRef = useRef<Set<number>>(new Set());
 
@@ -418,6 +421,11 @@ export const useTablatureAudio = ({
             else { loopCount = rc - 1; localIdx = loopStartIdx + (afterFirst - totalMiddle); }
           }
         }
+
+        // A single pass ends where the loop would wrap. Stopping is left to the
+        // caller's onLoopComplete, which only fires after the last note has rung
+        // out — the lookahead had the next pass's opening notes queued by then.
+        if (singlePassRef.current && loopCount > 0) break;
 
         let beatAudioTime: number;
         if (loopCount === 0) {

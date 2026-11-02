@@ -65,6 +65,30 @@ describe("buildDayPlan", () => {
     expect(plan.exercises[2].metronomeSpeed?.recommended).toBe(132);
   });
 
+  it("plays a song slot in the mode it was added with", () => {
+    const song = { id: "s1", title: "T", artist: "A" };
+    const plan = buildDayPlan(
+      "2026-11-02",
+      [item({ kind: "song", area: "songs", song, songMode: "sections" })],
+      CATALOG,
+      new Set(["s1"]),
+    )!;
+    expect(plan.exercises[0].songData?.mode).toBe("sections");
+  });
+
+  it("gives older song slots the tab only when one is attached", () => {
+    const slot = item({
+      kind: "song",
+      area: "songs",
+      song: { id: "s1", title: "T", artist: "A" },
+    });
+    const modeWith = (gpSongIds: Set<string>) =>
+      buildDayPlan("2026-11-02", [slot], CATALOG, gpSongIds)!.exercises[0]
+        .songData?.mode;
+    expect(modeWith(new Set(["s1"]))).toBe("gp");
+    expect(modeWith(new Set())).toBe("sections");
+  });
+
   it("gives custom slots and bare roadmap steps a plain timer slot", () => {
     const plan = buildDayPlan(
       "2026-11-02",

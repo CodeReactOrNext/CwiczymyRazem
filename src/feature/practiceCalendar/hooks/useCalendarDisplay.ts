@@ -25,7 +25,17 @@ export const useCalendarDisplay = () => {
   const describe = useCallback(
     (item: CalendarItem): CalendarItemDisplay => {
       if (item.kind === "song" && item.song) {
-        return describeRotation({ type: "song", addedAt: 0, ...item.song });
+        const base = describeRotation({
+          type: "song",
+          addedAt: 0,
+          ...item.song,
+        });
+        return item.songMode
+          ? {
+              ...base,
+              subtitle: `${base.subtitle} · ${t(`song_modes.${item.songMode}`)}`,
+            }
+          : base;
       }
       if (item.kind === "goal") {
         const base = item.exerciseId

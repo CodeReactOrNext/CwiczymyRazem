@@ -1,5 +1,8 @@
 import { cn } from "assets/lib/utils";
-import { CHORD_QUALITIES } from "feature/exercisePlan/logic/earQuiz/chordQualities";
+import {
+  buildChordMidi,
+  CHORD_QUALITIES,
+} from "feature/exercisePlan/logic/earQuiz/chordQualities";
 import type { ChordQualityId } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 import type { ChordTypeQuestion } from "feature/exercisePlan/logic/earQuiz/questions";
 import { useTranslation } from "hooks/useTranslation";
@@ -40,12 +43,18 @@ export function ChordTypeQuiz({
   const { isPlaying, play, stop } = useEarQuizPlayback();
   const [picked, setPicked] = useState<ChordQualityId | null>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
+  /** Which option is sounding, once the tiles have turned into players. */
+  const [auditioned, setAuditioned] = useState<ChordQualityId | null>(null);
+
+  const strum = (midis: number[], spread: number) =>
+    play(
+      [{ midis, at: 0, duration: CHORD_DURATION, spread }],
+      CHORD_DURATION + spread * midis.length,
+    );
 
   const playChord = (spread: number) => {
-    play(
-      [{ midis: question.midis, at: 0, duration: CHORD_DURATION, spread }],
-      CHORD_DURATION + spread * question.midis.length,
-    );
+    strum(question.midis, spread);
+    setAuditioned(null);
     setHasPlayed(true);
   };
 
@@ -53,8 +62,14 @@ export function ChordTypeQuiz({
   // otherwise pressing it mid-chord would just cut the sound off.
   const toggleChord = () => (isPlaying ? stop() : playChord(STRUM_SPREAD));
 
+  // Answered, every tile plays its own quality on the round's root, so the
+  // wrong guess can be heard right next to the chord it was mistaken for.
   const handlePick = (quality: ChordQualityId) => {
-    if (isAnswered) return;
+    if (isAnswered) {
+      strum(buildChordMidi(question.rootMidi, quality), STRUM_SPREAD);
+      setAuditioned(quality);
+      return;
+    }
     setPicked(quality);
     onAnswer(quality === question.quality);
   };
@@ -116,10 +131,18 @@ export function ChordTypeQuiz({
             <AnswerTile
               key={id}
               onClick={() => handlePick(id)}
-              disabled={isAnswered}
               state={state}
               title={qualityName(id)}
               subtitle={quality.formula}
+              listenLabel={
+                isAnswered
+                  ? t("quiz.hear_from_root", {
+                      name: qualityName(id),
+                      root: question.rootName,
+                    })
+                  : undefined
+              }
+              isSounding={isPlaying && auditioned === id}
             />
           );
         })}
