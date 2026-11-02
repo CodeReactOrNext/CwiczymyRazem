@@ -385,7 +385,7 @@ export function useTablatureWorkerBridge({
       Math.abs(clientX - mouseDownXRef.current) < 5 &&
       Date.now() - mouseDownTimeRef.current < 400
     ) {
-      const rect = containerRef.current.getBoundingClientRect();
+      const rect = (canvasRef.current ?? containerRef.current).getBoundingClientRect();
       const worldX = boardOffsetX(clientX, boardSpan(rect, quarterTurned), rightToLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
       let beatPos = Math.max(0, xToBeat(xMap, worldX));
 
@@ -414,7 +414,7 @@ export function useTablatureWorkerBridge({
 
   const handleHover = (clientX: number) => {
     if (isPlaying || isDraggingRef.current || !containerRef?.current || !onSeek) return;
-    const rect = containerRef.current.getBoundingClientRect();
+    const rect = (canvasRef.current ?? containerRef.current).getBoundingClientRect();
     const worldX = boardOffsetX(clientX, boardSpan(rect, quarterTurned), rightToLeft) / vscale - gutterW + pausedScrollRef.current.scrollX;
     const beatPos = Math.max(0, xToBeat(xMap, worldX));
 

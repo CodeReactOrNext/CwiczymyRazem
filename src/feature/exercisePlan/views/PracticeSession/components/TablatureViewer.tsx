@@ -204,8 +204,16 @@ const TablatureViewerInner = ({
   useAmbientMicGlow(ambientGlowRef, volumeRef, frequencyRef, ambientGlow && !obscured);
 
   useEffect(() => {
+    // The canvas fills the content box, so the padding is not board: counting it
+    // made the bitmap wider and taller than the box it is shown in.
     const update = () => {
-      if (containerRef.current) setContainerSize({ width: containerRef.current.clientWidth, height: containerRef.current.clientHeight });
+      const el = containerRef.current;
+      if (!el) return;
+      const pad = getComputedStyle(el);
+      setContainerSize({
+        width:  Math.max(0, el.clientWidth  - parseFloat(pad.paddingLeft) - parseFloat(pad.paddingRight)),
+        height: Math.max(0, el.clientHeight - parseFloat(pad.paddingTop)  - parseFloat(pad.paddingBottom)),
+      });
     };
     update();
     const ro = new ResizeObserver(update);

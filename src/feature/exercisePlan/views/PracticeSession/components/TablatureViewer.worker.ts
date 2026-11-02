@@ -1223,8 +1223,7 @@ function drawRestSymbol(x: number, dur: number) {
 }
 
 // ── Main render frame ─────────────────────────────────────────────────────────
-function render() {
-  rafId = requestAnimationFrame(render);
+function paintFrame() {
   if (!ctx || W === 0) return;
 
   // Covered: skip the paint but keep `needsRedraw` intact, so uncovering repaints
@@ -2372,6 +2371,20 @@ function render() {
   } else if (lastRestActive) {
     lastRestActive = false;
     self.postMessage({ type: 'REST_ACTIVE', isRest: false });
+  }
+}
+
+function render() {
+  rafId = requestAnimationFrame(render);
+  try {
+    paintFrame();
+  } catch (err) {
+    // A frame that threw between save and restore leaves its clip, transform and
+    // state stack behind, and every later frame would draw under them. Drop them
+    // and repaint next frame; the error still surfaces.
+    ctx?.reset?.();
+    needsRedraw = true;
+    throw err;
   }
 }
 
