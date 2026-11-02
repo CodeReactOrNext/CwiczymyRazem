@@ -1327,6 +1327,12 @@ function render() {
     : activeTile;
 
   // ── Clear & translate ────────────────────────────────────────────────────
+  // Set every frame, not only on INIT/RESIZE: a context restored after a GPU
+  // reset (or a frame that threw between save and restore) is left on the
+  // identity transform. The board then draws at 1/(dpr·vscale) of its size and
+  // the clear stops short of the right edge, so every note scrolled past piles
+  // up in the uncleared strip.
+  ctx.setTransform(dpr * vscale, 0, 0, dpr * vscale, 0, 0);
   ctx.clearRect(0, 0, viewW, viewH);
   ctx.save();
   ctx.translate(contentLeft - scrollX, 0);
@@ -2385,6 +2391,13 @@ self.onmessage = (e: MessageEvent) => {
       vscale = H > 0 ? H / BASE_H : 1;
       ctx = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
       ctx.setTransform(dpr * vscale, 0, 0, dpr * vscale, 0, 0);
+      // The GPU dropped the context and gave it back blank: repaint even while
+      // paused, and rebuild the cached bitmaps, which may have been lost with it.
+      canvas.addEventListener?.('contextrestored', () => {
+        hitGlowSprites.clear();
+        chordTagSprites.clear();
+        needsRedraw = true;
+      });
       relayout();
       if (rafId !== null) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(render);
