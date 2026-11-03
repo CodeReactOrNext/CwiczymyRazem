@@ -6,7 +6,8 @@
     "stash": "Stash",
     "quests": "Quests",
     "upgrades": "Upgrades",
-    "kit": "Kit"
+    "kit": "Kit",
+    "studio": "Studio"
   },
   "tab_locked": "{{label}} — join a guild first",
   "seats_taken": "{{count}} of {{limit}} seats taken",
@@ -19,7 +20,8 @@
     "chat": "The chat is for the people you play with.",
     "stash": "The shelf belongs to a guild, and you are not in one.",
     "quests": "Quests are cleared by a guild, and you are not in one yet.",
-    "upgrades": "Upgrades are paid for by a guild, and you are not in one yet."
+    "upgrades": "Upgrades are paid for by a guild, and you are not in one yet.",
+    "studio": "The studio belongs to a guild, and you are not in one yet."
   },
   "header": {
     "founded_by": "Founded by {{name}}.",
@@ -810,6 +812,128 @@
       "rocket": "Rocket",
       "compass": "Compass",
       "anchor": "Anchor"
+    }
+  },
+  "studio": {
+    "intro": "Your guild's rehearsal room. Anyone in the guild can spend the guild's Fame on it, and the weekly board pins up who is putting in the hours.",
+    "treasury": "The guild's Fame",
+    "treasury_hint": "Members put Fame in from the Upgrades tab.",
+    "room_level": "Room level {{level}} of {{max}}",
+    "gear_cap": "Gear goes up to level {{cap}} here · {{built}} of {{total}} levels built",
+    "move_to": "Move to the {{room}}",
+    "maxed": "Fully upgraded",
+    "needs_room": "Needs the {{room}} first",
+    "short": "The guild is {{count}} Fame short",
+    "not_built": "Not built yet",
+    "build": "Build: {{name}}",
+    "upgrade_to": "Upgrade to {{name}}",
+    "level_of": "Level {{level}} of {{max}}",
+    "empty_spot": "{{name}} · empty spot",
+    "week_so_far": "This week so far",
+    "week_note": "Counted from Monday, fresh every week.",
+    "unlocks_at": "{{title}} · level {{level}}",
+    "nobody_yet": "Nobody yet",
+    "bought": "Done: {{name}}",
+    "moved": "Moved to the {{room}}",
+    "failed": "Could not buy that",
+    "loading": "Opening the studio…",
+    "load_failed": "The studio did not open. Try again in a moment.",
+    "awards": {
+      "hours": "Most hours",
+      "sessions": "Most sessions",
+      "streak": "Longest streak",
+      "points": "Most points"
+    },
+    "values": {
+      "hours": "{{value}} h",
+      "sessions": "{{value}}",
+      "streak": "{{value}} d",
+      "points": "{{value}}"
+    },
+    "rooms": {
+      "r1": "Garage",
+      "r2": "Rehearsal space",
+      "r3": "Project studio",
+      "r4": "Pro studio"
+    },
+    "items": {
+      "board": {
+        "name": "Weekly board",
+        "l1": "Cork board",
+        "l2": "Board and ledge",
+        "l3": "Fairy-lit board",
+        "l4": "Showcase board"
+      },
+      "amp": {
+        "name": "Amp",
+        "l1": "Practice combo",
+        "l2": "Tube combo",
+        "l3": "Half stack",
+        "l4": "Full stack"
+      },
+      "drums": {
+        "name": "Drum kit",
+        "l1": "Practice pad",
+        "l2": "Used kit",
+        "l3": "Full kit",
+        "l4": "Studio kit"
+      },
+      "mic": {
+        "name": "Microphone",
+        "l1": "Dynamic mic",
+        "l2": "Boom stand",
+        "l3": "Condenser",
+        "l4": "Vintage tube mic"
+      },
+      "monitors": {
+        "name": "Monitors",
+        "l1": "Desk speakers",
+        "l2": "Near-fields",
+        "l3": "Monitors on stands",
+        "l4": "Main monitors"
+      },
+      "panels": {
+        "name": "Acoustic panels",
+        "l1": "Foam squares",
+        "l2": "Foam wedges",
+        "l3": "Fabric panels",
+        "l4": "Treated room"
+      },
+      "walls": {
+        "name": "Walls",
+        "l1": "Gig posters",
+        "l2": "Framed records",
+        "l3": "Gallery wall",
+        "l4": "Wall of fame"
+      },
+      "sofa": {
+        "name": "Sofa",
+        "l1": "Camping chair",
+        "l2": "Old sofa",
+        "l3": "Leather couch",
+        "l4": "Lounge corner"
+      },
+      "desk": {
+        "name": "Mixing desk",
+        "l1": "Laptop",
+        "l2": "Audio interface",
+        "l3": "Small console",
+        "l4": "Large console"
+      },
+      "tape": {
+        "name": "Tape machine",
+        "l1": "Cassette deck",
+        "l2": "4-track",
+        "l3": "Reel-to-reel",
+        "l4": "2-inch tape machine"
+      },
+      "bench": {
+        "name": "Luthier bench",
+        "l1": "Toolbox",
+        "l2": "Workbench",
+        "l3": "Bench with a vice",
+        "l4": "Full luthier shop"
+      }
     }
   }
 }

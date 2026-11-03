@@ -30,7 +30,10 @@
     "empty": "Übung hinzufügen",
     "nothing_past": "Nichts geplant",
     "complete": "Alles gespielt",
-    "add": "Zu diesem Tag hinzufügen"
+    "add": "Zu diesem Tag hinzufügen",
+    "repeat": "Diesen Tag wiederholen",
+    "linked_one": "Synchron mit {{count}} anderen Tag",
+    "linked_other": "Synchron mit {{count}} anderen Tagen"
   },
   "item": {
     "menu": "Optionen für {{title}}",
@@ -41,14 +44,16 @@
     "open_step": "Roadmap-Schritt öffnen",
     "move": "Verschieben auf",
     "remove": "Entfernen",
-    "goal_bpm": "Ziel · {{bpm}} BPM"
+    "goal_bpm": "Ziel · {{bpm}} BPM",
+    "change_length": "Länge ändern"
   },
   "kinds": {
     "exercise": "Übung",
     "song": "Song",
     "goal": "Ziel",
     "roadmap": "Roadmap",
-    "custom": "Eigenes"
+    "custom": "Eigenes",
+    "routine": "Routine"
   },
   "song_modes": {
     "gp": "Tab",
@@ -186,7 +191,6 @@
   "add": {
     "title": "Hinzufügen: {{day}}",
     "description": "Jeder Tipp fügt einen Block mit der unten eingestellten Länge hinzu.",
-    "length": "Länge",
     "search": "Suchen",
     "practise_with": "Üben mit",
     "no_tab": "Keine Guitar-Pro-Datei angehängt – füge eine auf der Seite des Songs hinzu.",
@@ -197,7 +201,15 @@
     "custom_note": "Notiz (optional)",
     "custom_area": "Bereich",
     "custom_submit": "Zu diesem Tag hinzufügen",
-    "custom_added": "{{title}} hinzugefügt"
+    "custom_added": "{{title}} hinzugefügt",
+    "length_minutes": "Länge (Min.)",
+    "routine_hint": "Jeder Eintrag behält die Länge aus der Routine.",
+    "routine_summary_one": "{{count}} Eintrag · {{time}}",
+    "routine_summary_other": "{{count}} Einträge · {{time}}",
+    "routine_added": "{{title}} hinzugefügt",
+    "routines_own": "Deine Routinen",
+    "routines_ready": "Fertige Routinen",
+    "loading": "Lädt…"
   },
   "toast": {
     "error": "Speichern fehlgeschlagen. Versuch es noch einmal.",
@@ -206,6 +218,39 @@
     "planned_other": "{{count}} Tage geplant",
     "cleared": "Diese Woche geleert",
     "removed": "Entfernt",
-    "undo": "Rückgängig"
+    "undo": "Rückgängig",
+    "linked_one": "{{count}} Tag jetzt synchron",
+    "linked_other": "{{count}} Tage jetzt synchron",
+    "copied_one": "Auf {{count}} Tag kopiert",
+    "copied_other": "Auf {{count}} Tage kopiert",
+    "unlinked": "Dieser Tag steht jetzt für sich"
+  },
+  "length": {
+    "title": "Länge",
+    "save": "Speichern"
+  },
+  "repeat": {
+    "title": "{{day}} wiederholen",
+    "description": "Wähle die Tage, die dasselbe Training bekommen. Was dort gerade steht, wird ersetzt.",
+    "linked_with_one": "Synchron mit {{count}} anderen Tag",
+    "linked_with_other": "Synchron mit {{count}} anderen Tagen",
+    "unlink": "Nicht mehr synchronisieren",
+    "same_weekday_one": "Gleicher Wochentag nächste Woche",
+    "same_weekday_other": "Gleicher Wochentag, {{count}} Wochen lang",
+    "sync": "Synchron halten",
+    "sync_on_hint": "Änderst du einen dieser Tage, ziehen die anderen mit. Jeder behält seine eigenen Häkchen.",
+    "sync_off_hint": "Eine einmalige Kopie — danach geht jeder Tag seinen eigenen Weg.",
+    "replaces_one": "Ersetzt, was an {{count}} Tag geplant ist.",
+    "replaces_other": "Ersetzt, was an {{count}} Tagen geplant ist.",
+    "apply_one": "Auf {{count}} Tag kopieren",
+    "apply_other": "Auf {{count}} Tage kopieren"
+  },
+  "to_calendar": {
+    "button": "Zum Kalender",
+    "title": "Zum Kalender hinzufügen",
+    "day": "Tag",
+    "submit": "Am {{day}} hinzufügen",
+    "added": "Am {{day}} hinzugefügt",
+    "open": "Öffnen"
   }
 }

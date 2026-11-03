@@ -8,12 +8,72 @@ import type { LastPracticedMap } from "feature/rotation/types/rotation.types";
 
 import type { CalendarItem, PracticeArea } from "../types/calendar.types";
 import { toDateKey } from "./calendarDates";
+import { categoryToArea } from "./planner";
 
 /** Plan-item id of a slot that plays no catalog exercise (a custom slot, a roadmap step with nothing linked). */
 export const CALENDAR_EXERCISE_PREFIX = "calendar-";
 
 export const newItemId = () =>
   `m-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+
+/** How long one slot set by hand may be, in whole minutes. */
+export const MIN_SLOT_MINUTES = 1;
+export const MAX_SLOT_MINUTES = 180;
+
+const MAX_NOTE_LENGTH = 140;
+
+/**
+ * A routine's items as slots of one day, in its order and at its lengths.
+ * Songs stay songs; an exercise outside the catalog (one of the player's own)
+ * has nothing to resolve to later, so it comes over as a custom slot carrying
+ * its name and description.
+ */
+export const planToItems = (
+  plan: Pick<ExercisePlan, "exercises">,
+  catalog: ReadonlyMap<string, Exercise>,
+): CalendarItem[] =>
+  plan.exercises.map((exercise): CalendarItem => {
+    const base: Pick<
+      CalendarItem,
+      "id" | "minutes" | "role" | "auto" | "done"
+    > = {
+      id: newItemId(),
+      minutes: Math.min(
+        MAX_SLOT_MINUTES,
+        Math.max(MIN_SLOT_MINUTES, Math.round(exercise.timeInMinutes)),
+      ),
+      role: "main",
+      auto: false,
+      done: false,
+    };
+    const { songData } = exercise;
+    if (songData) {
+      return {
+        ...base,
+        kind: "song",
+        area: "songs",
+        song: {
+          id: songData.songId,
+          title: songData.title,
+          artist: songData.artist,
+          ...(songData.coverUrl && { coverUrl: songData.coverUrl }),
+        },
+        ...(songData.mode && { songMode: songData.mode }),
+      };
+    }
+    const area = categoryToArea(exercise.category);
+    if (catalog.has(exercise.id)) {
+      return { ...base, kind: "exercise", area, exerciseId: exercise.id };
+    }
+    const note = exercise.description?.trim().slice(0, MAX_NOTE_LENGTH);
+    return {
+      ...base,
+      kind: "custom",
+      area,
+      title: exercise.title,
+      ...(note && { note }),
+    };
+  });
 
 export const sumMinutes = (items: Pick<CalendarItem, "minutes">[]) =>
   items.reduce((sum, item) => sum + item.minutes, 0);
@@ -94,7 +154,12 @@ export const buildDayPlan = (
             metronomeSpeed: { ...base.metronomeSpeed, recommended: item.bpm },
           }),
       };
-    } else if (item.kind === "custom" || item.kind === "roadmap") {
+    } else if (
+      item.kind === "custom" ||
+      item.kind === "roadmap" ||
+      // A goal on one of the player's own exercises: its name on a plain timer.
+      (item.kind === "goal" && item.title)
+    ) {
       exercise = textSlot(item, item.area);
     }
     if (!exercise || used.has(exercise.id)) return;

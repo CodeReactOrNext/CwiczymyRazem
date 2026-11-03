@@ -16,6 +16,7 @@
   "card": {
     "rules": "{{accuracy}}% Genauigkeit · {{counting}}",
     "delete": "Ziel löschen",
+    "edit": "Ziel bearbeiten",
     "stage_of": "Etappe {{index}} von {{total}}",
     "path_label": "Etappen auf dem Weg zum Ziel",
     "stage_done": "{{bpm}} BPM, geschafft",
@@ -88,6 +89,14 @@
     "mine_left_out_one": "1 weitere Übung von dir braucht eine Tabulatur und einen Tempobereich für ein Ziel.",
     "mine_left_out": "{{count}} weitere Übungen von dir brauchen eine Tabulatur und einen Tempobereich für ein Ziel."
   },
+  "edit": {
+    "title": "Ziel bearbeiten",
+    "description": "Ändere die Tempi oder die Regeln für {{exercise}}. Bereits geschaffte Etappen bleiben geschafft.",
+    "save": "Änderungen speichern",
+    "picks_up": "Du machst bei {{bpm}} BPM weiter.",
+    "runs_kept": "Deine sauberen Durchläufe ({{runs}} von {{total}}) bleiben erhalten.",
+    "runs_reset": "Deine bisherigen sauberen Durchläufe ({{runs}} von {{total}}) zählen neu."
+  },
   "history": {
     "title": "Deine letzten Durchgänge",
     "hint": "Die letzten {{count}} vom Mikrofon bewerteten Durchgänge dieser Übung. Größere Punkte sind Durchgänge, die dein Ziel bewertet hat.",
@@ -102,7 +111,8 @@
   "toast": {
     "created": "Ziel gesetzt",
     "deleted": "Ziel gelöscht",
-    "error": "Etwas ist schiefgelaufen. Versuche es erneut."
+    "error": "Etwas ist schiefgelaufen. Versuche es erneut.",
+    "updated": "Ziel aktualisiert"
   },
   "verdict": {
     "saving": "Durchgang wird gespeichert…",

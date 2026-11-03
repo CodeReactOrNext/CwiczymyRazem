@@ -70,6 +70,12 @@ export const EFFECT_BOM_BY_TYPE: Record<EffectType, ScrapBom> = {
     { partId: "enclosure", qty: 1 },
     { partId: "pot", qty: 1 },
   ],
+  // A volume pulse: one LFO, and the rate and depth pots are most of the box.
+  Tremolo: [
+    { partId: "pot", qty: 2 },
+    { partId: "enclosure", qty: 1 },
+    { partId: "opamp", qty: 1 },
+  ],
   // A treadle: the sweep pot is the thing worth having.
   Wah: [
     { partId: "pot", qty: 1 },

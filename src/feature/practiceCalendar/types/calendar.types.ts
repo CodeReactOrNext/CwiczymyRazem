@@ -129,8 +129,15 @@ export interface PlannerPrefs {
   skills: string[];
 }
 
+/**
+ * Days that share one routine: date key → id of its group. An edit to one
+ * day of a group is copied to the others; each day keeps its own ticks.
+ */
+export type CalendarLinks = Record<string, string>;
+
 /** `users/{uid}/settings/calendar` */
 export interface CalendarDoc {
   days: CalendarDays;
   prefs: PlannerPrefs | null;
+  links: CalendarLinks;
 }

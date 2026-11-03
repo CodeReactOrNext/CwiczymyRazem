@@ -20,6 +20,7 @@ export type EffectType =
   | "Flanger"
   | "Boost"
   | "Vibrato"
+  | "Tremolo"
   | "Tuner";
 
 /**

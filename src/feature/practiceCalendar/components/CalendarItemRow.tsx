@@ -5,7 +5,7 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
-import { Check, ExternalLink, RotateCcw, Trash2 } from "lucide-react";
+import { Check, ExternalLink, RotateCcw, Timer, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import { useCalendarDisplay } from "../hooks/useCalendarDisplay";
@@ -21,13 +21,15 @@ interface CalendarItemRowProps {
   /** The days of the shown week, Monday first — where a slot can be moved. */
   weekDates: string[];
   onToggleDone: () => void;
+  onChangeLength: () => void;
   onMove: (date: string) => void;
   onRemove: () => void;
 }
 
 /**
  * One slot of a day: the area's dot, what it plays and for how long. A tap
- * opens its menu — tick it off, move it, open its goal or roadmap step.
+ * opens its menu — tick it off, change its length, move it, open its goal or
+ * roadmap step.
  */
 export const CalendarItemRow = ({
   item,
@@ -35,6 +37,7 @@ export const CalendarItemRow = ({
   date,
   weekDates,
   onToggleDone,
+  onChangeLength,
   onMove,
   onRemove,
 }: CalendarItemRowProps) => {
@@ -98,6 +101,12 @@ export const CalendarItemRow = ({
               {done ? t("item.undo_done") : t("item.mark_done")}
             </DropdownMenuItem>
           )}
+          <DropdownMenuItem
+            onSelect={onChangeLength}
+            className='gap-2.5 rounded-lg py-2 focus:bg-zinc-800'>
+            <Timer className='h-4 w-4 text-zinc-400' />
+            {t("item.change_length")}
+          </DropdownMenuItem>
           {href && (
             <DropdownMenuItem
               asChild

@@ -30,7 +30,12 @@
     "empty": "Dodaj ćwiczenia",
     "nothing_past": "Nic nie zaplanowano",
     "complete": "Wszystko zagrane",
-    "add": "Dodaj do tego dnia"
+    "add": "Dodaj do tego dnia",
+    "repeat": "Powtórz ten dzień",
+    "linked_one": "Zsynchronizowany z {{count}} innym dniem",
+    "linked_few": "Zsynchronizowany z {{count}} innymi dniami",
+    "linked_many": "Zsynchronizowany z {{count}} innymi dniami",
+    "linked_other": "Zsynchronizowany z {{count}} innymi dniami"
   },
   "item": {
     "menu": "Opcje: {{title}}",
@@ -41,14 +46,16 @@
     "open_step": "Otwórz krok roadmapy",
     "move": "Przenieś na",
     "remove": "Usuń",
-    "goal_bpm": "Cel · {{bpm}} BPM"
+    "goal_bpm": "Cel · {{bpm}} BPM",
+    "change_length": "Zmień długość"
   },
   "kinds": {
     "exercise": "Ćwiczenie",
     "song": "Utwór",
     "goal": "Cel",
     "roadmap": "Roadmapa",
-    "custom": "Własne"
+    "custom": "Własne",
+    "routine": "Rutyna"
   },
   "song_modes": {
     "gp": "Tabulatura",
@@ -202,7 +209,6 @@
   "add": {
     "title": "Dodaj: {{day}}",
     "description": "Każde kliknięcie dodaje jeden blok o długości ustawionej niżej.",
-    "length": "Długość",
     "search": "Szukaj",
     "practise_with": "Ćwicz z",
     "no_tab": "Brak pliku Guitar Pro — dodaj go na stronie utworu.",
@@ -213,7 +219,17 @@
     "custom_note": "Notatka (opcjonalnie)",
     "custom_area": "Obszar",
     "custom_submit": "Dodaj do tego dnia",
-    "custom_added": "Dodano {{title}}"
+    "custom_added": "Dodano {{title}}",
+    "length_minutes": "Długość (min)",
+    "routine_hint": "Każdy element zachowuje długość ustawioną w rutynie.",
+    "routine_summary_one": "{{count}} element · {{time}}",
+    "routine_summary_few": "{{count}} elementy · {{time}}",
+    "routine_summary_many": "{{count}} elementów · {{time}}",
+    "routine_summary_other": "{{count}} elementu · {{time}}",
+    "routine_added": "Dodano: {{title}}",
+    "routines_own": "Twoje rutyny",
+    "routines_ready": "Gotowe",
+    "loading": "Wczytywanie…"
   },
   "toast": {
     "error": "Nie udało się zapisać. Spróbuj ponownie.",
@@ -224,6 +240,51 @@
     "planned_other": "Zaplanowano {{count}} dni",
     "cleared": "Wyczyszczono ten tydzień",
     "removed": "Usunięto",
-    "undo": "Cofnij"
+    "undo": "Cofnij",
+    "linked_one": "{{count}} dzień zsynchronizowany",
+    "linked_few": "{{count}} dni zsynchronizowane",
+    "linked_many": "{{count}} dni zsynchronizowanych",
+    "linked_other": "{{count}} dnia zsynchronizowane",
+    "copied_one": "Skopiowano na {{count}} dzień",
+    "copied_few": "Skopiowano na {{count}} dni",
+    "copied_many": "Skopiowano na {{count}} dni",
+    "copied_other": "Skopiowano na {{count}} dnia",
+    "unlinked": "Ten dzień jest teraz osobny"
+  },
+  "length": {
+    "title": "Długość",
+    "save": "Zapisz"
+  },
+  "repeat": {
+    "title": "Powtórz: {{day}}",
+    "description": "Wybierz dni, które dostaną ten sam trening. To, co jest na nich teraz, zostanie zastąpione.",
+    "linked_with_one": "Zsynchronizowany z {{count}} innym dniem",
+    "linked_with_few": "Zsynchronizowany z {{count}} innymi dniami",
+    "linked_with_many": "Zsynchronizowany z {{count}} innymi dniami",
+    "linked_with_other": "Zsynchronizowany z {{count}} innymi dniami",
+    "unlink": "Przestań synchronizować",
+    "same_weekday_one": "Ten sam dzień w przyszłym tygodniu",
+    "same_weekday_few": "Ten sam dzień tygodnia przez {{count}} tygodnie",
+    "same_weekday_many": "Ten sam dzień tygodnia przez {{count}} tygodni",
+    "same_weekday_other": "Ten sam dzień tygodnia przez {{count}} tygodnia",
+    "sync": "Synchronizuj",
+    "sync_on_hint": "Zmień jeden z tych dni, a pozostałe pójdą za nim. Każdy ma własne odhaczenia.",
+    "sync_off_hint": "Jednorazowa kopia — potem każdy dzień idzie swoją drogą.",
+    "replaces_one": "Zastąpi to, co zaplanowane na {{count}} dzień.",
+    "replaces_few": "Zastąpi to, co zaplanowane na {{count}} dni.",
+    "replaces_many": "Zastąpi to, co zaplanowane na {{count}} dni.",
+    "replaces_other": "Zastąpi to, co zaplanowane na {{count}} dnia.",
+    "apply_one": "Kopiuj na {{count}} dzień",
+    "apply_few": "Kopiuj na {{count}} dni",
+    "apply_many": "Kopiuj na {{count}} dni",
+    "apply_other": "Kopiuj na {{count}} dnia"
+  },
+  "to_calendar": {
+    "button": "Dodaj do kalendarza",
+    "title": "Dodaj do kalendarza",
+    "day": "Dzień",
+    "submit": "Dodaj: {{day}}",
+    "added": "Dodano: {{day}}",
+    "open": "Otwórz"
   }
 }

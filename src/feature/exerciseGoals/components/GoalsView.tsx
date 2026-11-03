@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
 import { useExerciseGoals } from "../hooks/useExerciseGoals";
-import type { NewExerciseGoal } from "../types/exerciseGoal.types";
+import type { GoalEdit, NewExerciseGoal } from "../types/exerciseGoal.types";
 import { GoalsPanel } from "./GoalsPanel";
 
 /**
@@ -17,8 +17,15 @@ export const GoalsView = () => {
   const { t } = useTranslation("goals");
   const router = useRouter();
   const uid = useAppSelector(selectUserAuth);
-  const { goals, isLoading, createGoal, isCreating, deleteGoal } =
-    useExerciseGoals(uid);
+  const {
+    goals,
+    isLoading,
+    createGoal,
+    isCreating,
+    updateGoal,
+    isUpdating,
+    deleteGoal,
+  } = useExerciseGoals(uid);
   const completedId =
     typeof router.query.completed === "string" ? router.query.completed : null;
 
@@ -26,6 +33,17 @@ export const GoalsView = () => {
     try {
       await createGoal(goal);
       toast.success(t("toast.created"));
+      return true;
+    } catch {
+      toast.error(t("toast.error"));
+      return false;
+    }
+  };
+
+  const handleUpdate = async (goalId: string, edit: GoalEdit) => {
+    try {
+      await updateGoal({ goalId, edit });
+      toast.success(t("toast.updated"));
       return true;
     } catch {
       toast.error(t("toast.error"));
@@ -49,6 +67,8 @@ export const GoalsView = () => {
       isLoading={!uid || isLoading}
       isCreating={isCreating}
       onCreate={handleCreate}
+      isUpdating={isUpdating}
+      onUpdate={handleUpdate}
       onDelete={handleDelete}
       completedId={completedId}
       onCompletedSeen={() =>

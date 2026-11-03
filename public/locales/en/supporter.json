@@ -124,32 +124,34 @@
     "title": "What you get",
     "tokens": "Supporting turns into tokens: {{welcome}} land with the badge and {{perDollar}} more for every dollar after that. They never expire, and they buy a say over what gets built.",
     "open_panel": "Open the supporter panel",
+    "spend_title": "What tokens buy",
+    "badge_title": "Comes with the badge",
     "discord_body": "A supporter role on {{discord}} and a channel where I show what I am building before it ships.",
     "items": {
-      "0": {
+      "roadmap": {
         "title": "The roadmap board",
-        "body": "Post what you want built and back the ideas other supporters posted."
+        "body": "Post what you want built and back the ideas other supporters posted.",
+        "price": "{{post}} to post an idea, {{back}} to back one"
       },
-      "1": {
+      "gear": {
         "title": "Gear you picked",
-        "body": "Propose a guitar or a pedal for the Arsenal, or back somebody else's spec."
+        "body": "Propose a guitar or a pedal for the Arsenal, or back somebody else's spec.",
+        "price": "{{post}} to propose, {{back}} to back one"
       },
-      "2": {
+      "case": {
         "title": "The supporter case",
-        "body": "Vote on which items get a seat in the next supporter case."
+        "body": "Vote on which items get a seat in the next supporter case.",
+        "price": "{{vote}} per vote"
       },
-      "3": {
+      "guild": {
         "title": "A guild of your own",
-        "body": "Found one with its own name and tag, a shared stash and a harder practice week."
+        "body": "Found one with its own name and tag, a shared stash and a harder practice week.",
+        "price": "{{found}} to found one"
       },
-      "4": {
-        "title": "The next challenge",
-        "body": "Pick the community challenge everybody plays next week."
-      },
-      "5": {
+      "discord": {
         "title": "The supporter channel"
       },
-      "6": {
+      "ai": {
         "title": "Your AI assistant, connected",
         "body": "Connect Claude or another AI assistant to your account: it reads your practice, plans sessions and writes exercises with tabs."
       }
@@ -290,7 +292,7 @@
       "perks": {
         "0": "Watch what is being built now and vote on what comes next",
         "1": "Pick the gear that goes into the Arsenal and the cases",
-        "2": "Set the challenge the whole app plays for that week",
+        "2": "Found a guild with its own name, tag and shared stash",
         "3": "Connect Claude or another AI assistant to your account"
       },
       "email": "Use the email this account is on to unlock Supporter.",

@@ -124,32 +124,34 @@
     "title": "Co dostajesz",
     "tokens": "Wsparcie zamienia się w tokeny: {{welcome}} przychodzi razem z odznaką, a potem {{perDollar}} za każdego kolejnego dolara. Nie wygasają i dają głos w tym, co powstanie.",
     "open_panel": "Otwórz panel supportera",
+    "spend_title": "Na co idą tokeny",
+    "badge_title": "W pakiecie z odznaką",
     "discord_body": "Rola supportera na {{discord}} i kanał, na którym pokazuję, co buduję, zanim to wyjdzie.",
     "items": {
-      "0": {
+      "roadmap": {
         "title": "Tablica roadmapy",
-        "body": "Zgłaszaj, co chcesz, żeby powstało, i popieraj pomysły innych supporterów."
+        "body": "Zgłaszaj, co chcesz, żeby powstało, i popieraj pomysły innych supporterów.",
+        "price": "{{post}} za pomysł, {{back}} za poparcie"
       },
-      "1": {
+      "gear": {
         "title": "Sprzęt, który wybrałeś",
-        "body": "Zaproponuj gitarę albo efekt do Arsenału lub poprzyj czyjąś propozycję."
+        "body": "Zaproponuj gitarę albo efekt do Arsenału lub poprzyj czyjąś propozycję.",
+        "price": "{{post}} za propozycję, {{back}} za poparcie"
       },
-      "2": {
+      "case": {
         "title": "Skrzynka supporterów",
-        "body": "Głosuj, które przedmioty trafią do następnej skrzynki supporterów."
+        "body": "Głosuj, które przedmioty trafią do następnej skrzynki supporterów.",
+        "price": "{{vote}} za głos"
       },
-      "3": {
+      "guild": {
         "title": "Własna gildia",
-        "body": "Załóż gildię z własną nazwą i tagiem, wspólnym schowkiem i trudniejszym tygodniem ćwiczeń."
+        "body": "Załóż gildię z własną nazwą i tagiem, wspólnym schowkiem i trudniejszym tygodniem ćwiczeń.",
+        "price": "{{found}} za założenie"
       },
-      "4": {
-        "title": "Następne wyzwanie",
-        "body": "Wybierz wyzwanie społeczności, które wszyscy zagrają w przyszłym tygodniu."
-      },
-      "5": {
+      "discord": {
         "title": "Kanał supporterów"
       },
-      "6": {
+      "ai": {
         "title": "Twój asystent AI, podłączony",
         "body": "Podłącz Claude'a albo innego asystenta AI do konta: czyta twoje ćwiczenie, planuje sesje i pisze ćwiczenia z tabami."
       }
@@ -317,7 +319,7 @@
       "perks": {
         "0": "Obserwuj, co powstaje teraz, i głosuj, co będzie dalej",
         "1": "Wybieraj sprzęt, który trafi do Arsenału i do skrzynek",
-        "2": "Ustal wyzwanie, w które cała aplikacja gra w danym tygodniu",
+        "2": "Załóż gildię z własną nazwą, tagiem i wspólnym schowkiem",
         "3": "Podłącz Claude'a albo innego asystenta AI do konta"
       },
       "email": "Użyj adresu e-mail tego konta, żeby odblokować Wspierającego.",

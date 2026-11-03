@@ -6,7 +6,8 @@
     "stash": "Schowek",
     "quests": "Zadania",
     "upgrades": "Ulepszenia",
-    "kit": "Wygląd"
+    "kit": "Wygląd",
+    "studio": "Studio"
   },
   "tab_locked": "{{label}} — najpierw dołącz do gildii",
   "seats_taken": "Zajęte miejsca: {{count}} z {{limit}}",
@@ -19,7 +20,8 @@
     "chat": "Czat jest dla ludzi, z którymi grasz.",
     "stash": "Półka należy do gildii, a Ty w żadnej nie jesteś.",
     "quests": "Zadania zalicza gildia, a Ty jeszcze w żadnej nie jesteś.",
-    "upgrades": "Za ulepszenia płaci gildia, a Ty jeszcze w żadnej nie jesteś."
+    "upgrades": "Za ulepszenia płaci gildia, a Ty jeszcze w żadnej nie jesteś.",
+    "studio": "Studio należy do gildii, a Ty jeszcze w żadnej nie jesteś."
   },
   "header": {
     "founded_by": "Założyciel: {{name}}.",
@@ -834,6 +836,131 @@
       "rocket": "Rakieta",
       "compass": "Kompas",
       "anchor": "Kotwica"
+    }
+  },
+  "studio": {
+    "intro": "Sala prób Waszej gildii. Każdy członek może wydawać na nią Fame gildii, a tablica tygodnia pokazuje, kto gra najwięcej.",
+    "treasury": "Fame gildii",
+    "treasury_hint": "Członkowie wpłacają Fame w zakładce Ulepszenia.",
+    "room_level": "Poziom pokoju {{level}} z {{max}}",
+    "gear_cap": "Sprzęt do poziomu {{cap}} · zbudowano {{built}} z {{total}} poziomów",
+    "move_to": "Przenieś się: {{room}}",
+    "maxed": "W pełni ulepszone",
+    "needs_room": "Najpierw potrzebne: {{room}}",
+    "short": "Gildii brakuje {{count}} Fame",
+    "not_built": "Jeszcze nie zbudowano",
+    "build": "Zbuduj: {{name}}",
+    "upgrade_to": "Ulepsz: {{name}}",
+    "level_of": "Poziom {{level}} z {{max}}",
+    "empty_spot": "{{name}} · puste miejsce",
+    "week_so_far": "Ten tydzień",
+    "week_note": "Liczone od poniedziałku, co tydzień od nowa.",
+    "unlocks_at": "{{title}} · poziom {{level}}",
+    "nobody_yet": "Jeszcze nikt",
+    "bought": "Gotowe: {{name}}",
+    "moved": "Przeniesiono: {{room}}",
+    "failed": "Nie udało się tego kupić",
+    "loading": "Otwieram studio…",
+    "load_failed": "Nie udało się otworzyć studia. Spróbuj za chwilę.",
+    "awards": {
+      "hours": "Najwięcej godzin",
+      "sessions": "Najwięcej sesji",
+      "streak": "Najdłuższa seria",
+      "points": "Najwięcej punktów"
+    },
+    "values": {
+      "hours": "{{value}} h",
+      "sessions": "{{value}}",
+      "streak_one": "{{value}} dzień",
+      "streak_few": "{{value}} dni",
+      "streak_many": "{{value}} dni",
+      "streak_other": "{{value}} dni",
+      "points": "{{value}}"
+    },
+    "rooms": {
+      "r1": "Garaż",
+      "r2": "Sala prób",
+      "r3": "Studio domowe",
+      "r4": "Studio profesjonalne"
+    },
+    "items": {
+      "board": {
+        "name": "Tablica tygodnia",
+        "l1": "Tablica korkowa",
+        "l2": "Tablica z półką",
+        "l3": "Tablica z lampkami",
+        "l4": "Tablica wystawowa"
+      },
+      "amp": {
+        "name": "Wzmacniacz",
+        "l1": "Combo do ćwiczeń",
+        "l2": "Lampowe combo",
+        "l3": "Half stack",
+        "l4": "Full stack"
+      },
+      "drums": {
+        "name": "Perkusja",
+        "l1": "Pad do ćwiczeń",
+        "l2": "Używany zestaw",
+        "l3": "Pełny zestaw",
+        "l4": "Zestaw studyjny"
+      },
+      "mic": {
+        "name": "Mikrofon",
+        "l1": "Mikrofon dynamiczny",
+        "l2": "Statyw z wysięgnikiem",
+        "l3": "Mikrofon pojemnościowy",
+        "l4": "Lampowy mikrofon vintage"
+      },
+      "monitors": {
+        "name": "Monitory",
+        "l1": "Głośniki biurkowe",
+        "l2": "Monitory bliskiego pola",
+        "l3": "Monitory na statywach",
+        "l4": "Monitory główne"
+      },
+      "panels": {
+        "name": "Panele akustyczne",
+        "l1": "Kwadraty z pianki",
+        "l2": "Kliny z pianki",
+        "l3": "Panele z tkaniny",
+        "l4": "Wytłumiony pokój"
+      },
+      "walls": {
+        "name": "Ściany",
+        "l1": "Plakaty z koncertów",
+        "l2": "Płyty w ramkach",
+        "l3": "Galeria na ścianie",
+        "l4": "Ściana sławy"
+      },
+      "sofa": {
+        "name": "Kanapa",
+        "l1": "Krzesło turystyczne",
+        "l2": "Stara kanapa",
+        "l3": "Skórzana kanapa",
+        "l4": "Kącik wypoczynkowy"
+      },
+      "desk": {
+        "name": "Stół mikserski",
+        "l1": "Laptop",
+        "l2": "Interfejs audio",
+        "l3": "Mała konsoleta",
+        "l4": "Duża konsoleta"
+      },
+      "tape": {
+        "name": "Magnetofon",
+        "l1": "Magnetofon kasetowy",
+        "l2": "Portastudio 4-śladowe",
+        "l3": "Magnetofon szpulowy",
+        "l4": "Magnetofon 2-calowy"
+      },
+      "bench": {
+        "name": "Warsztat lutniczy",
+        "l1": "Skrzynka z narzędziami",
+        "l2": "Stół warsztatowy",
+        "l3": "Stół z imadłem",
+        "l4": "Pełna pracownia lutnicza"
+      }
     }
   }
 }

@@ -59,7 +59,7 @@ const guildRef = (id: string): DocumentReference =>
   firestore.collection("guilds").doc(id);
 
 /** Report fields summed for the time metrics; sessions are a count, points a sum. */
-const REPORT_TIME_FIELDS: Record<
+export const REPORT_TIME_FIELDS: Record<
   Exclude<QuestReportField, "sessions" | "points">,
   string
 > = {
@@ -70,7 +70,7 @@ const REPORT_TIME_FIELDS: Record<
   creativity: "timeSumary.creativityTime",
 };
 
-const REPORT_POINTS_FIELD = "totalPoints";
+export const REPORT_POINTS_FIELD = "totalPoints";
 
 const isTimeField = (field: QuestReportField): boolean =>
   field !== "sessions" && field !== "points";
@@ -127,7 +127,7 @@ const num = (value: unknown): number => Number(value) || 0;
  * still counts. Three days of grace covers a rest day (one missed day a week
  * does not break a streak) plus the time zones the day key is kept in.
  */
-const liveStreak = (
+export const liveStreak = (
   statistics: Record<string, any> | undefined,
   now: Date,
 ): number => {

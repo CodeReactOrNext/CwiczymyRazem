@@ -3,7 +3,12 @@ import { describe, expect, it } from "vitest";
 
 import { nextRoadmapStep } from "../hooks/usePlannerSources";
 import type { CalendarItem } from "../types/calendar.types";
-import { buildDayPlan, isItemDone, itemHref } from "./calendarItems";
+import {
+  buildDayPlan,
+  isItemDone,
+  itemHref,
+  planToItems,
+} from "./calendarItems";
 
 const exercise = (id: string): Exercise => ({
   id,
@@ -169,5 +174,96 @@ describe("nextRoadmapStep", () => {
     expect(nextRoadmapStep(roadmap, {})?.id).toBe("a");
     expect(nextRoadmapStep(roadmap, { a: 2 })?.id).toBe("b");
     expect(nextRoadmapStep(roadmap, { a: 2, b: 3, c: 2 })).toBeNull();
+  });
+});
+
+describe("planToItems", () => {
+  const plan = {
+    exercises: [
+      { ...exercise("ex1"), timeInMinutes: 7.4 },
+      {
+        ...exercise("song-s1"),
+        timeInMinutes: 12,
+        songData: {
+          songId: "s1",
+          title: "T",
+          artist: "A",
+          mode: "gp" as const,
+        },
+      },
+      {
+        ...exercise("community-x"),
+        title: "My drill",
+        description: "Slow, then fast",
+        category: "creativity" as const,
+        timeInMinutes: 0,
+      },
+    ],
+  };
+
+  it("keeps the routine's order and lengths, to the minute", () => {
+    const items = planToItems(plan, CATALOG);
+    expect(items.map((slot) => slot.kind)).toEqual([
+      "exercise",
+      "song",
+      "custom",
+    ]);
+    expect(items.map((slot) => slot.minutes)).toEqual([7, 12, 1]);
+    expect(items.every((slot) => !slot.auto && !slot.done)).toBe(true);
+    expect(new Set(items.map((slot) => slot.id)).size).toBe(3);
+  });
+
+  it("brings songs over with their mode", () => {
+    const [, song] = planToItems(plan, CATALOG);
+    expect(song).toMatchObject({
+      area: "songs",
+      song: { id: "s1", title: "T", artist: "A" },
+      songMode: "gp",
+    });
+  });
+
+  it("turns an exercise outside the catalog into a custom slot", () => {
+    const [, , custom] = planToItems(plan, CATALOG);
+    expect(custom).toMatchObject({
+      area: "creativity",
+      title: "My drill",
+      note: "Slow, then fast",
+    });
+    expect(custom.exerciseId).toBeUndefined();
+  });
+
+  it("plays back through buildDayPlan", () => {
+    const dayPlan = buildDayPlan(
+      "2026-11-02",
+      planToItems(plan, CATALOG),
+      CATALOG,
+    );
+    expect(dayPlan?.exercises.map((entry) => entry.timeInMinutes)).toEqual([
+      7, 12, 1,
+    ]);
+  });
+});
+
+describe("buildDayPlan with a goal outside the catalog", () => {
+  it("plays it on a plain timer under the goal's name", () => {
+    const plan = buildDayPlan(
+      "2026-11-03",
+      [
+        item({
+          kind: "goal",
+          exerciseId: "community-abc",
+          goalId: "g1",
+          bpm: 60,
+          title: "My own drill",
+          minutes: 8,
+        }),
+      ],
+      CATALOG,
+    );
+    expect(plan?.exercises).toHaveLength(1);
+    expect(plan?.exercises[0]).toMatchObject({
+      title: "My own drill",
+      timeInMinutes: 8,
+    });
   });
 });

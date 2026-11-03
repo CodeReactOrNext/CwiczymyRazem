@@ -580,7 +580,7 @@ export const AutoPlanView = () => {
     range: PlanRange,
   ) => {
     try {
-      await Promise.all([calendar.setDays(days), calendar.savePrefs(prefs)]);
+      await Promise.all([calendar.applyPlan(days), calendar.savePrefs(prefs)]);
       const filled = Object.values(days).filter(
         (items) => items.length > 0,
       ).length;

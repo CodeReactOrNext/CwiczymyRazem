@@ -6,11 +6,13 @@ import {
   getExerciseGoals,
   getExerciseHistory,
   getExerciseRuns,
+  updateExerciseGoal,
 } from "../services/exerciseGoals.service";
 import { getOwnExercises } from "../services/goalExercises.service";
 import type {
   ExerciseGoal,
   ExerciseRun,
+  GoalEdit,
   NewExerciseGoal,
 } from "../types/exerciseGoal.types";
 
@@ -32,7 +34,7 @@ export const useOwnExercises = (uid: string | null) =>
     staleTime: 5 * 60 * 1000,
   });
 
-/** The player's goals, open and reached, with create/delete that refresh the list. */
+/** The player's goals, open and reached, with create/edit/delete that refresh the list. */
 export const useExerciseGoals = (uid: string | null) => {
   const queryClient = useQueryClient();
 
@@ -55,6 +57,18 @@ export const useExerciseGoals = (uid: string | null) => {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ goalId, edit }: { goalId: string; edit: GoalEdit }) =>
+      updateExerciseGoal(uid!, goalId, edit),
+    onSuccess: (updated) => {
+      queryClient.setQueryData<ExerciseGoal[]>(
+        exerciseGoalsKey(uid),
+        (goals = []) =>
+          goals.map((goal) => (goal.id === updated.id ? updated : goal)),
+      );
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (goalId: string) => deleteExerciseGoal(uid!, goalId),
     onSuccess: (_, goalId) => {
@@ -70,6 +84,8 @@ export const useExerciseGoals = (uid: string | null) => {
     isLoading: goalsQuery.isLoading,
     createGoal: createMutation.mutateAsync,
     isCreating: createMutation.isPending,
+    updateGoal: updateMutation.mutateAsync,
+    isUpdating: updateMutation.isPending,
     deleteGoal: deleteMutation.mutateAsync,
   };
 };

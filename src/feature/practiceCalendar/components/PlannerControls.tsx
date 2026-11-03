@@ -2,6 +2,7 @@ import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { Minus, Plus } from "lucide-react";
 import type { ReactNode } from "react";
+import { useState } from "react";
 
 interface SegmentedProps<T extends string> {
   value: T;
@@ -92,6 +93,83 @@ interface StepperProps {
   onChange: (value: number) => void;
   label: string;
 }
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
+/**
+ * A length in whole minutes: typed, or nudged a minute at a time. The field
+ * may be left empty while typing; it settles back to a valid value on blur.
+ */
+export const MinutesInput = ({
+  value,
+  min,
+  max,
+  onChange,
+  label,
+}: StepperProps) => {
+  const [text, setText] = useState(String(value));
+  const [lastValue, setLastValue] = useState(value);
+  // Follow outside changes (a quick pick, a reset) without an effect.
+  if (value !== lastValue) {
+    setLastValue(value);
+    setText(String(value));
+  }
+
+  const nudge = (by: number) => onChange(clamp(value + by, min, max));
+
+  return (
+    <div className='flex items-center gap-1 rounded-lg bg-zinc-800/50 p-1'>
+      <button
+        type='button'
+        onClick={() => nudge(-1)}
+        disabled={value <= min}
+        aria-label={`${label} −`}
+        className={cn(
+          PRESSABLE_KEY,
+          "flex h-10 w-10 items-center justify-center rounded bg-zinc-700/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:opacity-40 hover:bg-zinc-700 lg:h-8 lg:w-8",
+        )}>
+        <Minus className='h-3.5 w-3.5' />
+      </button>
+      <input
+        type='text'
+        inputMode='numeric'
+        value={text}
+        aria-label={label}
+        onChange={(event) => {
+          const digits = event.target.value.replace(/\D/g, "").slice(0, 3);
+          setText(digits);
+          const parsed = parseInt(digits, 10);
+          if (parsed >= min && parsed <= max) onChange(parsed);
+        }}
+        onBlur={() => setText(String(value))}
+        onFocus={(event) => event.target.select()}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowUp") {
+            event.preventDefault();
+            nudge(1);
+          }
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            nudge(-1);
+          }
+        }}
+        className='h-10 w-12 rounded bg-transparent text-center text-sm font-semibold tabular-nums text-zinc-100 focus-visible:bg-zinc-900/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 lg:h-8'
+      />
+      <button
+        type='button'
+        onClick={() => nudge(1)}
+        disabled={value >= max}
+        aria-label={`${label} +`}
+        className={cn(
+          PRESSABLE_KEY,
+          "flex h-10 w-10 items-center justify-center rounded bg-zinc-700/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:opacity-40 hover:bg-zinc-700 lg:h-8 lg:w-8",
+        )}>
+        <Plus className='h-3.5 w-3.5' />
+      </button>
+    </div>
+  );
+};
 
 export const Stepper = ({ value, min, max, onChange, label }: StepperProps) => (
   <div className='flex items-center gap-1 rounded-lg bg-zinc-800/50 p-1'>

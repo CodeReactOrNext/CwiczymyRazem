@@ -16,6 +16,7 @@
   "card": {
     "rules": "{{accuracy}}% de precisión · {{counting}}",
     "delete": "Eliminar objetivo",
+    "edit": "Editar objetivo",
     "stage_of": "Etapa {{index}} de {{total}}",
     "path_label": "Etapas hasta el objetivo",
     "stage_done": "{{bpm}} BPM, superada",
@@ -88,6 +89,14 @@
     "mine_left_out_one": "1 ejercicio tuyo más necesita una tablatura y un rango de tempo para tener un objetivo.",
     "mine_left_out": "{{count}} ejercicios tuyos más necesitan una tablatura y un rango de tempo para tener un objetivo."
   },
+  "edit": {
+    "title": "Editar objetivo",
+    "description": "Cambia los tempos o las reglas de {{exercise}}. Las etapas que ya superaste siguen superadas.",
+    "save": "Guardar cambios",
+    "picks_up": "Sigues desde {{bpm}} BPM.",
+    "runs_kept": "Tus pasadas limpias ({{runs}} de {{total}}) se mantienen.",
+    "runs_reset": "Tus pasadas limpias hasta ahora ({{runs}} de {{total}}) vuelven a empezar."
+  },
   "history": {
     "title": "Tus últimas pasadas",
     "hint": "Las últimas {{count}} pasadas de este ejercicio puntuadas con el micrófono. Los puntos grandes son pasadas que juzgó tu objetivo.",
@@ -102,7 +111,8 @@
   "toast": {
     "created": "Objetivo fijado",
     "deleted": "Objetivo eliminado",
-    "error": "Algo salió mal. Inténtalo de nuevo."
+    "error": "Algo salió mal. Inténtalo de nuevo.",
+    "updated": "Objetivo actualizado"
   },
   "verdict": {
     "saving": "Guardando la pasada…",

@@ -11,7 +11,7 @@ import {
 import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Play, Trash2 } from "lucide-react";
+import { Pencil, Play, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -31,15 +31,19 @@ const CHART_METRICS: GoalChartMetric[] = ["tempo", "timing"];
 interface GoalCardProps {
   uid: string;
   goal: ExerciseGoal;
+  onEdit: (goal: ExerciseGoal) => void;
   onDelete: (goalId: string) => Promise<void>;
 }
+
+const ICON_BUTTON =
+  "flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500 hover:bg-zinc-800 hover:text-zinc-200";
 
 /**
  * An open goal: the path of milestones up to its tempo with the current one
  * marked, the clean runs counted there, the runs that led here, and the way
  * into goal mode.
  */
-export const GoalCard = ({ uid, goal, onDelete }: GoalCardProps) => {
+export const GoalCard = ({ uid, goal, onEdit, onDelete }: GoalCardProps) => {
   const { t } = useTranslation("goals");
   const { runs, isLoading } = useExerciseProgress(
     uid,
@@ -83,13 +87,22 @@ export const GoalCard = ({ uid, goal, onDelete }: GoalCardProps) => {
               })}
             </p>
           </div>
-          <button
-            type='button'
-            onClick={() => setIsConfirmingDelete(true)}
-            aria-label={t("card.delete")}
-            className='flex h-8 w-8 shrink-0 items-center justify-center rounded text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500 hover:bg-zinc-800 hover:text-zinc-200'>
-            <Trash2 className='h-4 w-4' />
-          </button>
+          <div className='flex shrink-0 gap-1'>
+            <button
+              type='button'
+              onClick={() => onEdit(goal)}
+              aria-label={t("card.edit")}
+              className={ICON_BUTTON}>
+              <Pencil className='h-4 w-4' />
+            </button>
+            <button
+              type='button'
+              onClick={() => setIsConfirmingDelete(true)}
+              aria-label={t("card.delete")}
+              className={ICON_BUTTON}>
+              <Trash2 className='h-4 w-4' />
+            </button>
+          </div>
         </div>
 
         <div className='space-y-4'>

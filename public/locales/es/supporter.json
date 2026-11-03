@@ -124,32 +124,34 @@
     "title": "Qué obtienes",
     "tokens": "Apoyar se convierte en tokens: {{welcome}} llegan con la insignia y {{perDollar}} más por cada dólar después. Nunca caducan y te dan voz sobre lo que se construye.",
     "open_panel": "Abrir el panel de supporter",
+    "spend_title": "Qué compran los tokens",
+    "badge_title": "Viene con la insignia",
     "discord_body": "Un rol de supporter en {{discord}} y un canal donde enseño lo que estoy construyendo antes de lanzarlo.",
     "items": {
-      "0": {
+      "roadmap": {
         "title": "El tablero de la hoja de ruta",
-        "body": "Publica lo que quieres que se construya y apoya las ideas de otros supporters."
+        "body": "Publica lo que quieres que se construya y apoya las ideas de otros supporters.",
+        "price": "{{post}} por idea, {{back}} por apoyar una"
       },
-      "1": {
+      "gear": {
         "title": "Equipo elegido por ti",
-        "body": "Propón una guitarra o un pedal para el Arsenal, o apoya la propuesta de otro."
+        "body": "Propón una guitarra o un pedal para el Arsenal, o apoya la propuesta de otro.",
+        "price": "{{post}} por propuesta, {{back}} por apoyar una"
       },
-      "2": {
+      "case": {
         "title": "La caja de supporters",
-        "body": "Vota qué objetos entran en la próxima caja de supporters."
+        "body": "Vota qué objetos entran en la próxima caja de supporters.",
+        "price": "{{vote}} por voto"
       },
-      "3": {
+      "guild": {
         "title": "Un gremio propio",
-        "body": "Funda uno con su propio nombre y etiqueta, un almacén compartido y una semana de práctica más dura."
+        "body": "Funda uno con su propio nombre y etiqueta, un almacén compartido y una semana de práctica más dura.",
+        "price": "{{found}} por fundarlo"
       },
-      "4": {
-        "title": "El próximo desafío",
-        "body": "Elige el desafío de la comunidad que todos tocarán la semana que viene."
-      },
-      "5": {
+      "discord": {
         "title": "El canal de supporters"
       },
-      "6": {
+      "ai": {
         "title": "Tu asistente de IA, conectado",
         "body": "Conecta Claude u otro asistente de IA a tu cuenta: lee tu práctica, planifica sesiones y escribe ejercicios con tablatura."
       }
@@ -313,7 +315,7 @@
       "perks": {
         "0": "Mira lo que se construye ahora y vota lo que viene después",
         "1": "Elige el equipo que entra en el Arsenal y en las cajas",
-        "2": "Decide el reto que juega toda la app esa semana",
+        "2": "Funda un gremio con su propio nombre, etiqueta y almacén compartido",
         "3": "Conecta Claude u otro asistente de IA a tu cuenta"
       },
       "email": "Usa el correo de esta cuenta para desbloquear Supporter.",

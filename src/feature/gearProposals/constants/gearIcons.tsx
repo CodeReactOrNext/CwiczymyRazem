@@ -35,6 +35,7 @@ const EFFECT_ICONS: Record<EffectType, LucideIcon> = {
   Phaser: Wind,
   Flanger: AudioWaveform,
   Vibrato: Activity,
+  Tremolo: Activity,
   Wah: Volume2,
   Compressor: Minimize2,
   EQ: SlidersHorizontal,

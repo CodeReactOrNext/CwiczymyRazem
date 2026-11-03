@@ -34,13 +34,16 @@ import {
   weekDates,
 } from "../utils/calendarDates";
 import { buildDayPlan, isItemDone } from "../utils/calendarItems";
+import { linkedSiblings } from "../utils/linkedDays";
 import { AddItemDialog } from "./AddItemDialog";
 import type { DayEntry } from "./DayColumn";
 import { DayColumn } from "./DayColumn";
 import { DayStrip } from "./DayStrip";
+import { ItemLengthDialog } from "./ItemLengthDialog";
+import { RepeatDayDialog } from "./RepeatDayDialog";
 import { WeekOverview } from "./WeekOverview";
 
-const DATE_KEY = /^d{4}-d{2}-d{2}$/;
+const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/;
 
 const EXERCISES_BY_ID = new Map(
   exercisesAgregat.map((exercise) => [exercise.id, exercise]),
@@ -72,6 +75,11 @@ export const CalendarView = () => {
     return typeof week === "string" && DATE_KEY.test(week) ? week : today;
   });
   const [dialog, setDialog] = useState<{ date: string } | null>(null);
+  const [repeating, setRepeating] = useState<string | null>(null);
+  const [resizing, setResizing] = useState<{
+    date: string;
+    itemId: string;
+  } | null>(null);
   const [session, setSession] = useState<ActiveSession | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
 
@@ -159,12 +167,13 @@ export const CalendarView = () => {
     const before = Object.fromEntries(
       dates.map((date) => [date, calendar.days[date] ?? []]),
     );
+    const linksBefore = calendar.links;
     try {
       await calendar.clearDays(dates, false);
       toast(t("toast.cleared"), {
         action: {
           label: t("toast.undo"),
-          onClick: () => void calendar.setDays(before),
+          onClick: () => void calendar.restore(before, linksBefore),
         },
       });
     } catch {
@@ -186,6 +195,54 @@ export const CalendarView = () => {
       fail();
     }
   };
+
+  const repeatDay = async (
+    source: string,
+    targets: string[],
+    link: boolean,
+  ) => {
+    setRepeating(null);
+    const before = Object.fromEntries(
+      [source, ...targets, ...linkedSiblings(calendar.links, source)].map(
+        (date) => [date, calendar.days[date] ?? []],
+      ),
+    );
+    const linksBefore = calendar.links;
+    try {
+      await calendar.duplicateDay(source, targets, link);
+      posthog.capture("calendar_day_repeated", {
+        days: targets.length,
+        linked: link,
+      });
+      toast(
+        link
+          ? t("toast.linked", { count: targets.length })
+          : t("toast.copied", { count: targets.length }),
+        {
+          action: {
+            label: t("toast.undo"),
+            onClick: () => void calendar.restore(before, linksBefore),
+          },
+        },
+      );
+    } catch {
+      fail();
+    }
+  };
+
+  const unlinkDay = (date: string) => {
+    setRepeating(null);
+    void calendar
+      .unlinkDay(date)
+      .then(() => toast(t("toast.unlinked")))
+      .catch(fail);
+  };
+
+  const resizingItem = resizing
+    ? (calendar.days[resizing.date] ?? []).find(
+        (item) => item.id === resizing.itemId,
+      )
+    : undefined;
 
   if (session) {
     return (
@@ -214,11 +271,14 @@ export const CalendarView = () => {
       isToday={date === today}
       isPast={date < today}
       weekDates={dates}
+      linkedCount={linkedSiblings(calendar.links, date).length}
       onAdd={() => setDialog({ date })}
+      onRepeat={() => setRepeating(date)}
       onPlay={() => playDay(date)}
       onToggleDone={(itemId) =>
         void calendar.toggleDone(date, itemId).catch(fail)
       }
+      onChangeLength={(itemId) => setResizing({ date, itemId })}
       onMove={(itemId, to) =>
         void calendar.moveItem(date, to, itemId).catch(fail)
       }
@@ -384,9 +444,36 @@ export const CalendarView = () => {
             day: "numeric",
             month: "short",
           })}
+          uid={uid}
           sources={sources}
           onAdd={(item) => calendar.addItem(dialog.date, item)}
+          onAddMany={(items) => calendar.addItems(dialog.date, items)}
           onClose={() => setDialog(null)}
+        />
+      )}
+
+      {repeating && (
+        <RepeatDayDialog
+          source={repeating}
+          today={today}
+          days={calendar.days}
+          siblings={linkedSiblings(calendar.links, repeating)}
+          onApply={(targets, link) => void repeatDay(repeating, targets, link)}
+          onUnlink={() => unlinkDay(repeating)}
+          onClose={() => setRepeating(null)}
+        />
+      )}
+
+      {resizing && resizingItem && (
+        <ItemLengthDialog
+          item={resizingItem}
+          onSave={(minutes) => {
+            setResizing(null);
+            void calendar
+              .updateItem(resizing.date, resizing.itemId, { minutes })
+              .catch(fail);
+          }}
+          onClose={() => setResizing(null)}
         />
       )}
     </div>

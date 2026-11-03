@@ -13,7 +13,9 @@ import { describe, expect, it } from "vitest";
 import { EFFECT_DEFINITIONS } from "./effectDefinitions";
 
 const expansion = EFFECT_DEFINITIONS.filter(
-  (effect) => Number(effect.id) >= 35 && Number(effect.id) <= 54,
+  (effect) =>
+    (Number(effect.id) >= 35 && Number(effect.id) <= 54) ||
+    (Number(effect.id) >= 55 && Number(effect.id) <= 60),
 );
 
 describe("pedal geometry measured from the shipped artwork", () => {

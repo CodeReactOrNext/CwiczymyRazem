@@ -30,7 +30,10 @@
     "empty": "Add practice",
     "nothing_past": "Nothing planned",
     "complete": "All played",
-    "add": "Add to this day"
+    "add": "Add to this day",
+    "repeat": "Repeat this day",
+    "linked_one": "In sync with {{count}} other day",
+    "linked_other": "In sync with {{count}} other days"
   },
   "item": {
     "menu": "Options for {{title}}",
@@ -41,14 +44,16 @@
     "open_step": "Open roadmap step",
     "move": "Move to",
     "remove": "Remove",
-    "goal_bpm": "Goal · {{bpm}} BPM"
+    "goal_bpm": "Goal · {{bpm}} BPM",
+    "change_length": "Change length"
   },
   "kinds": {
     "exercise": "Exercise",
     "song": "Song",
     "goal": "Goal",
     "roadmap": "Roadmap",
-    "custom": "Your own"
+    "custom": "Your own",
+    "routine": "Routine"
   },
   "song_modes": {
     "gp": "Tab",
@@ -186,7 +191,6 @@
   "add": {
     "title": "Add to {{day}}",
     "description": "Each tap adds one block at the length below.",
-    "length": "Length",
     "search": "Search",
     "practise_with": "Practise with",
     "no_tab": "No Guitar Pro file attached — add one on the song page.",
@@ -197,7 +201,15 @@
     "custom_note": "Note (optional)",
     "custom_area": "Area",
     "custom_submit": "Add to this day",
-    "custom_added": "Added {{title}}"
+    "custom_added": "Added {{title}}",
+    "length_minutes": "Length (min)",
+    "routine_hint": "Each item keeps the length it has in the routine.",
+    "routine_summary_one": "{{count}} item · {{time}}",
+    "routine_summary_other": "{{count}} items · {{time}}",
+    "routine_added": "Added {{title}}",
+    "routines_own": "Your routines",
+    "routines_ready": "Ready-made",
+    "loading": "Loading…"
   },
   "toast": {
     "error": "Couldn't save that. Try again.",
@@ -206,6 +218,39 @@
     "planned_other": "Planned {{count}} days",
     "cleared": "Cleared this week",
     "removed": "Removed",
-    "undo": "Undo"
+    "undo": "Undo",
+    "linked_one": "{{count}} day now in sync",
+    "linked_other": "{{count}} days now in sync",
+    "copied_one": "Copied to {{count}} day",
+    "copied_other": "Copied to {{count}} days",
+    "unlinked": "This day stands on its own now"
+  },
+  "length": {
+    "title": "Length",
+    "save": "Save"
+  },
+  "repeat": {
+    "title": "Repeat {{day}}",
+    "description": "Pick the days that get the same practice. What's on them now is replaced.",
+    "linked_with_one": "In sync with {{count}} other day",
+    "linked_with_other": "In sync with {{count}} other days",
+    "unlink": "Stop syncing",
+    "same_weekday_one": "Same weekday next week",
+    "same_weekday_other": "Same weekday for {{count}} weeks",
+    "sync": "Keep in sync",
+    "sync_on_hint": "Change one of these days and the others follow. Each keeps its own ticks.",
+    "sync_off_hint": "A one-time copy — each day goes its own way after.",
+    "replaces_one": "Replaces what's planned on {{count}} day.",
+    "replaces_other": "Replaces what's planned on {{count}} days.",
+    "apply_one": "Copy to {{count}} day",
+    "apply_other": "Copy to {{count}} days"
+  },
+  "to_calendar": {
+    "button": "Add to calendar",
+    "title": "Add to calendar",
+    "day": "Day",
+    "submit": "Add on {{day}}",
+    "added": "Added on {{day}}",
+    "open": "Open"
   }
 }

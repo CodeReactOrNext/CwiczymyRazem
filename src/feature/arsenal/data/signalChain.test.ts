@@ -41,6 +41,7 @@ const ALL_TYPES: EffectType[] = [
   "Flanger",
   "Boost",
   "Vibrato",
+  "Tremolo",
   "Tuner",
 ];
 

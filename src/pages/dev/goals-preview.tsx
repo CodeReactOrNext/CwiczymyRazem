@@ -16,7 +16,10 @@ import type {
   ExerciseRun,
   NewExerciseGoal,
 } from "feature/exerciseGoals/types/exerciseGoal.types";
-import { isGoalEligibleExercise } from "feature/exerciseGoals/utils/goalRules";
+import {
+  applyGoalEdit,
+  isGoalEligibleExercise,
+} from "feature/exerciseGoals/utils/goalRules";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { ExerciseSuccessView } from "feature/exercisePlan/views/PracticeSession/components/ExerciseSuccessView";
 import dynamic from "next/dynamic";
@@ -328,6 +331,17 @@ const PanelPreview = () => {
             isLoading={false}
             isCreating={false}
             onCreate={handleCreate}
+            isUpdating={false}
+            onUpdate={async (goalId, edit) => {
+              setGoals((current) =>
+                current.map((g) =>
+                  g.id === goalId
+                    ? { ...g, ...edit, ...applyGoalEdit(g, edit) }
+                    : g,
+                ),
+              );
+              return true;
+            }}
             onDelete={async (goalId) =>
               setGoals((current) => current.filter((g) => g.id !== goalId))
             }

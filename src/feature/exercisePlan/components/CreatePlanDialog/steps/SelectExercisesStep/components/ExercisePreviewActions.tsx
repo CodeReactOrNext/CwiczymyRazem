@@ -15,6 +15,7 @@ import type {
   ExercisePlan,
 } from "feature/exercisePlan/types/exercise.types";
 import { logger } from "feature/logger/Logger";
+import { AddToCalendarButton } from "feature/practiceCalendar/components/AddToCalendarButton";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
 import { useTranslation } from "hooks/useTranslation";
@@ -98,7 +99,7 @@ export function AddToPlanMenu({ exercise, userId }: AddToPlanMenuProps) {
   );
 }
 
-/** Heart + "Add to plan" for the preview footer. Renders nothing for guests. */
+/** Heart, "Add to calendar" and "Add to plan" for the preview footer. Renders nothing for guests. */
 export function ExercisePreviewActions({ exercise }: { exercise: Exercise }) {
   const { t } = useTranslation("plans");
   const dispatch = useAppDispatch();
@@ -135,6 +136,7 @@ export function ExercisePreviewActions({ exercise }: { exercise: Exercise }) {
         )}>
         <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
       </Button>
+      <AddToCalendarButton exercise={exercise} uid={userAuth} />
       <AddToPlanMenu exercise={exercise} userId={userAuth} />
     </>
   );

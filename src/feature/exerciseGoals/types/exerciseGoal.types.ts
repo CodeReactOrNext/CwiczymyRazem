@@ -51,6 +51,12 @@ export interface NewExerciseGoal {
   counting: GoalCounting;
 }
 
+/** What may change on an open goal: its path and its rules, never the exercise. */
+export type GoalEdit = Pick<
+  ExerciseGoal,
+  "startBpm" | "targetBpm" | "stepBpm" | "strictness" | "counting"
+>;
+
 /**
  * Where a run was played: goal mode, or anywhere else (a plan, a routine, the
  * library). A practice run counts toward the goal too when it was a full-length

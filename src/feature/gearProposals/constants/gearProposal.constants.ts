@@ -17,6 +17,7 @@ export const EFFECT_TYPES: EffectType[] = [
   "Phaser",
   "Flanger",
   "Vibrato",
+  "Tremolo",
   "Wah",
   "Compressor",
   "EQ",

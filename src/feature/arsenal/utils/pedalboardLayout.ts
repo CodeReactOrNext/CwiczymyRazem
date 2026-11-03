@@ -177,6 +177,12 @@ export const EFFECT_IMAGE_ASPECT: Record<number | string, number> = {
   53: 472 / 800,
   54: 451 / 800,
   55: 436 / 800,
+  56: 727 / 735,
+  57: 673 / 483,
+  58: 570 / 619,
+  59: 492 / 749,
+  60: 559 / 736,
+  61: 525 / 761,
 };
 
 /** How finely `packInOrder` walks a row past a tall enclosure above it. */

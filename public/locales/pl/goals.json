@@ -16,6 +16,7 @@
   "card": {
     "rules": "{{accuracy}}% celności · {{counting}}",
     "delete": "Usuń cel",
+    "edit": "Edytuj cel",
     "stage_of": "Kamień milowy {{index}} z {{total}}",
     "path_label": "Kamienie milowe w drodze do celu",
     "stage_done": "{{bpm}} BPM, zaliczone",
@@ -92,6 +93,14 @@
     "mine_left_out_many": "Jeszcze {{count}} twoich ćwiczeń potrzebuje tabulatury i zakresu tempa, żeby dostać cel.",
     "mine_left_out": "Jeszcze {{count}} twoich ćwiczeń potrzebuje tabulatury i zakresu tempa, żeby dostać cel."
   },
+  "edit": {
+    "title": "Edytuj cel",
+    "description": "Zmień tempa albo zasady dla {{exercise}}. Zaliczone już kamienie milowe zostają zaliczone.",
+    "save": "Zapisz zmiany",
+    "picks_up": "Grasz dalej od {{bpm}} BPM.",
+    "runs_kept": "Twoje czyste przebiegi ({{runs}} z {{total}}) zostają.",
+    "runs_reset": "Twoje dotychczasowe czyste przebiegi ({{runs}} z {{total}}) liczą się od nowa."
+  },
   "history": {
     "title": "Twoje ostatnie przebiegi",
     "hint": "Ostatnie {{count}} przebiegów tego ćwiczenia ocenionych mikrofonem. Większe kropki to przebiegi ocenione przez cel.",
@@ -106,7 +115,8 @@
   "toast": {
     "created": "Cel ustawiony",
     "deleted": "Cel usunięty",
-    "error": "Coś poszło nie tak. Spróbuj ponownie."
+    "error": "Coś poszło nie tak. Spróbuj ponownie.",
+    "updated": "Cel zaktualizowany"
   },
   "verdict": {
     "saving": "Zapisuję przebieg…",

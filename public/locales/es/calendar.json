@@ -30,7 +30,10 @@
     "empty": "Añadir práctica",
     "nothing_past": "Nada planeado",
     "complete": "Todo tocado",
-    "add": "Añadir a este día"
+    "add": "Añadir a este día",
+    "repeat": "Repetir este día",
+    "linked_one": "Sincronizado con {{count}} día más",
+    "linked_other": "Sincronizado con {{count}} días más"
   },
   "item": {
     "menu": "Opciones de {{title}}",
@@ -41,14 +44,16 @@
     "open_step": "Abrir paso del roadmap",
     "move": "Mover a",
     "remove": "Quitar",
-    "goal_bpm": "Meta · {{bpm}} BPM"
+    "goal_bpm": "Meta · {{bpm}} BPM",
+    "change_length": "Cambiar duración"
   },
   "kinds": {
     "exercise": "Ejercicio",
     "song": "Canción",
     "goal": "Meta",
     "roadmap": "Roadmap",
-    "custom": "Propio"
+    "custom": "Propio",
+    "routine": "Rutina"
   },
   "song_modes": {
     "gp": "Tab",
@@ -186,7 +191,6 @@
   "add": {
     "title": "Añadir: {{day}}",
     "description": "Cada toque añade un bloque con la duración de abajo.",
-    "length": "Duración",
     "search": "Buscar",
     "practise_with": "Practicar con",
     "no_tab": "No hay archivo de Guitar Pro adjunto: añade uno en la página de la canción.",
@@ -197,7 +201,15 @@
     "custom_note": "Nota (opcional)",
     "custom_area": "Área",
     "custom_submit": "Añadir a este día",
-    "custom_added": "Añadido: {{title}}"
+    "custom_added": "Añadido: {{title}}",
+    "length_minutes": "Duración (min)",
+    "routine_hint": "Cada elemento mantiene la duración que tiene en la rutina.",
+    "routine_summary_one": "{{count}} elemento · {{time}}",
+    "routine_summary_other": "{{count}} elementos · {{time}}",
+    "routine_added": "Añadido: {{title}}",
+    "routines_own": "Tus rutinas",
+    "routines_ready": "Rutinas listas",
+    "loading": "Cargando…"
   },
   "toast": {
     "error": "No se pudo guardar. Inténtalo de nuevo.",
@@ -206,6 +218,39 @@
     "planned_other": "{{count}} días planeados",
     "cleared": "Semana vaciada",
     "removed": "Quitado",
-    "undo": "Deshacer"
+    "undo": "Deshacer",
+    "linked_one": "{{count}} día sincronizado",
+    "linked_other": "{{count}} días sincronizados",
+    "copied_one": "Copiado a {{count}} día",
+    "copied_other": "Copiado a {{count}} días",
+    "unlinked": "Este día va por su cuenta ahora"
+  },
+  "length": {
+    "title": "Duración",
+    "save": "Guardar"
+  },
+  "repeat": {
+    "title": "Repetir {{day}}",
+    "description": "Elige los días que tendrán la misma práctica. Lo que haya en ellos ahora se reemplaza.",
+    "linked_with_one": "Sincronizado con {{count}} día más",
+    "linked_with_other": "Sincronizado con {{count}} días más",
+    "unlink": "Dejar de sincronizar",
+    "same_weekday_one": "El mismo día la semana que viene",
+    "same_weekday_other": "El mismo día durante {{count}} semanas",
+    "sync": "Mantener sincronizados",
+    "sync_on_hint": "Cambia uno de estos días y los demás le siguen. Cada uno guarda sus propias marcas.",
+    "sync_off_hint": "Una copia única: después cada día va por su lado.",
+    "replaces_one": "Reemplaza lo planeado en {{count}} día.",
+    "replaces_other": "Reemplaza lo planeado en {{count}} días.",
+    "apply_one": "Copiar a {{count}} día",
+    "apply_other": "Copiar a {{count}} días"
+  },
+  "to_calendar": {
+    "button": "Añadir al calendario",
+    "title": "Añadir al calendario",
+    "day": "Día",
+    "submit": "Añadir el {{day}}",
+    "added": "Añadido el {{day}}",
+    "open": "Abrir"
   }
 }

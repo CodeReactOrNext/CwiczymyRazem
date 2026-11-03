@@ -17,11 +17,13 @@ import { useMemo, useState } from "react";
 
 import { useOwnExercises } from "../hooks/useExerciseGoals";
 import type {
+  ExerciseGoal,
   GoalCounting,
   GoalStrictness,
   NewExerciseGoal,
 } from "../types/exerciseGoal.types";
 import {
+  applyGoalEdit,
   autoStepBpm,
   clampGoalBpm,
   GOAL_CLEAN_RUNS_REQUIRED,
@@ -152,13 +154,16 @@ interface CreateGoalDialogProps {
   initialCounting?: GoalCounting;
   title?: string;
   description?: string;
+  /** Editing an open goal: says where it will pick up and whether its count stays. */
+  editing?: ExerciseGoal;
 }
 
 /**
  * Sets a goal: an exercise, the tempo to start from and the one to reach — the
  * milestones between them are laid out from the two — how clean a run must be
- * and whether each milestone's three clean runs need to come in a row. Mounted only while
- * open, so every opening starts from a fresh form.
+ * and whether each milestone's three clean runs need to come in a row. The same
+ * form edits an open goal, its exercise fixed. Mounted only while open, so
+ * every opening starts from a fresh form.
  */
 export const CreateGoalDialog = ({
   uid,
@@ -173,6 +178,7 @@ export const CreateGoalDialog = ({
   initialCounting = "streak",
   title,
   description,
+  editing,
 }: CreateGoalDialogProps) => {
   const { t } = useTranslation("goals");
   const localizeExercise = useLocalizeExercise();
@@ -238,8 +244,22 @@ export const CreateGoalDialog = ({
     const step = autoStepBpm(start, target);
     return { start, target, step, stages: goalPath(start, target, step) };
   }, [areBpmsValid, isOrderValid, startBpm, bpm]);
+  // The goal being edited is the one open goal its exercise may have.
   const canSave =
-    !!exercise && !!path && !busyExerciseIds.has(exercise.id) && !isSaving;
+    !!exercise &&
+    !!path &&
+    (!!editing || !busyExerciseIds.has(exercise.id)) &&
+    !isSaving;
+  const edited =
+    editing && path
+      ? applyGoalEdit(editing, {
+          startBpm: path.start,
+          targetBpm: path.target,
+          stepBpm: path.step,
+          strictness,
+          counting,
+        })
+      : null;
 
   const pickExercise = (picked: Exercise) => {
     setExerciseId(picked.id);
@@ -419,6 +439,21 @@ export const CreateGoalDialog = ({
                   <p className='text-sm tabular-nums leading-relaxed text-zinc-200'>
                     {path.stages.join(" → ")}
                   </p>
+                  {editing && edited && (
+                    <p className='pt-1 text-xs text-zinc-400'>
+                      {t("edit.picks_up", { bpm: edited.stageBpm })}
+                      {editing.cleanRuns > 0 &&
+                        ` ${t(
+                          edited.cleanRuns > 0
+                            ? "edit.runs_kept"
+                            : "edit.runs_reset",
+                          {
+                            runs: editing.cleanRuns,
+                            total: GOAL_CLEAN_RUNS_REQUIRED,
+                          },
+                        )}`}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -487,7 +522,7 @@ export const CreateGoalDialog = ({
             onClick={() => void handleSave()}
             disabled={!canSave}
             className='h-11 rounded-lg bg-white px-6 font-semibold text-zinc-950 hover:bg-zinc-200'>
-            {t("create.save")}
+            {editing ? t("edit.save") : t("create.save")}
           </Button>
         </div>
       </DialogContent>

@@ -36,12 +36,14 @@ import type {
   ExerciseGoal,
   ExerciseRun,
   ExerciseRunSource,
+  GoalEdit,
   GoalRunInput,
   GoalRunOutcome,
   NewExerciseGoal,
   RunTiming,
 } from "../types/exerciseGoal.types";
 import {
+  applyGoalEdit,
   applyGoalRun,
   DEFAULT_STEP_BPM,
   RUN_HISTORY_DOC,
@@ -195,6 +197,32 @@ export const createExerciseGoal = async (
     createdAt: now.toMillis(),
     completedAt: null,
   };
+};
+
+/**
+ * Changes an open goal's path or rules — read and written in one transaction,
+ * so a run judged meanwhile isn't lost under the edit. See applyGoalEdit for
+ * where the goal picks up. A goal reached in the meantime is left as it is.
+ */
+export const updateExerciseGoal = async (
+  uid: string,
+  goalId: string,
+  edit: GoalEdit,
+): Promise<ExerciseGoal> => {
+  const ref = doc(goalsCollection(uid), goalId);
+  return runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(ref);
+    if (!snapshot.exists()) throw new Error(`Goal ${goalId} not found`);
+    const goal = toGoal(snapshot);
+    if (goal.status !== "active") return goal;
+    const progress = applyGoalEdit(goal, edit);
+    transaction.update(ref, {
+      ...edit,
+      ...progress,
+      updatedAt: Timestamp.now(),
+    });
+    return { ...goal, ...edit, ...progress };
+  });
 };
 
 /** Removes a goal. Its runs stay on the exercise's chart. */

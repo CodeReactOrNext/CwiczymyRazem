@@ -14,6 +14,7 @@ import { GuildCover } from "feature/guilds/components/GuildCover";
 import { GuildMembersTab } from "feature/guilds/components/GuildMembersTab";
 import { GuildQuestsTab } from "feature/guilds/components/GuildQuestsTab";
 import { GuildStashTab } from "feature/guilds/components/GuildStashTab";
+import { GuildStudioPanel } from "feature/guilds/components/GuildStudioPanel";
 import { GuildUpgradesTab } from "feature/guilds/components/GuildUpgradesTab";
 import { useGuilds } from "feature/guilds/hooks/useGuilds";
 import type { Guild } from "feature/guilds/types/guild.types";
@@ -24,6 +25,7 @@ import {
   Coins,
   Lock,
   MessageSquare,
+  Music,
   Palette,
   Shield,
   Target,
@@ -37,6 +39,7 @@ type GuildTab =
   | "chat"
   | "stash"
   | "quests"
+  | "studio"
   | "upgrades"
   | "kit";
 
@@ -59,6 +62,7 @@ const TABS: {
   { id: "chat", label: "tabs.chat", icon: MessageSquare, needsGuild: true },
   { id: "stash", label: "tabs.stash", icon: Boxes, needsGuild: true },
   { id: "quests", label: "tabs.quests", icon: Target, needsGuild: true },
+  { id: "studio", label: "tabs.studio", icon: Music, needsGuild: true },
   { id: "upgrades", label: "tabs.upgrades", icon: Coins, needsGuild: true },
   {
     id: "kit",
@@ -271,6 +275,17 @@ export const GuildsView = () => {
           ) : (
             <NeedsAGuild
               what={t("needs_guild.quests")}
+              onBrowse={() => setTab("browse")}
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent value='studio' className='mt-0'>
+          {myGuild ? (
+            <GuildStudioPanel />
+          ) : (
+            <NeedsAGuild
+              what={t("needs_guild.studio")}
               onBrowse={() => setTab("browse")}
             />
           )}

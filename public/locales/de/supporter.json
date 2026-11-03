@@ -124,32 +124,34 @@
     "title": "Was du bekommst",
     "tokens": "Unterstützung wird zu Tokens: {{welcome}} kommen mit dem Abzeichen und {{perDollar}} mehr für jeden weiteren Dollar. Sie verfallen nie und geben dir ein Mitspracherecht, was gebaut wird.",
     "open_panel": "Supporter-Panel öffnen",
+    "spend_title": "Was Tokens kaufen",
+    "badge_title": "Kommt mit dem Abzeichen",
     "discord_body": "Eine Supporter-Rolle auf {{discord}} und ein Kanal, in dem ich zeige, woran ich baue, bevor es erscheint.",
     "items": {
-      "0": {
+      "roadmap": {
         "title": "Das Roadmap-Board",
-        "body": "Poste, was gebaut werden soll, und unterstütze die Ideen anderer Supporter."
+        "body": "Poste, was gebaut werden soll, und unterstütze die Ideen anderer Supporter.",
+        "price": "{{post}} pro Idee, {{back}} fürs Unterstützen"
       },
-      "1": {
+      "gear": {
         "title": "Equipment nach deiner Wahl",
-        "body": "Schlag eine Gitarre oder ein Pedal fürs Arsenal vor oder unterstütze den Vorschlag eines anderen."
+        "body": "Schlag eine Gitarre oder ein Pedal fürs Arsenal vor oder unterstütze den Vorschlag eines anderen.",
+        "price": "{{post}} pro Vorschlag, {{back}} fürs Unterstützen"
       },
-      "2": {
+      "case": {
         "title": "Die Supporter-Kiste",
-        "body": "Stimm ab, welche Items einen Platz in der nächsten Supporter-Kiste bekommen."
+        "body": "Stimm ab, welche Items einen Platz in der nächsten Supporter-Kiste bekommen.",
+        "price": "{{vote}} pro Stimme"
       },
-      "3": {
+      "guild": {
         "title": "Eine eigene Gilde",
-        "body": "Gründe eine mit eigenem Namen und Tag, gemeinsamem Lager und einer härteren Übungswoche."
+        "body": "Gründe eine mit eigenem Namen und Tag, gemeinsamem Lager und einer härteren Übungswoche.",
+        "price": "{{found}} für die Gründung"
       },
-      "4": {
-        "title": "Die nächste Challenge",
-        "body": "Wähl die Community-Challenge, die nächste Woche alle spielen."
-      },
-      "5": {
+      "discord": {
         "title": "Der Supporter-Kanal"
       },
-      "6": {
+      "ai": {
         "title": "Dein KI-Assistent, verbunden",
         "body": "Verbinde Claude oder einen anderen KI-Assistenten mit deinem Konto: Er liest dein Üben, plant Sessions und schreibt Übungen mit Tabs."
       }
@@ -313,7 +315,7 @@
       "perks": {
         "0": "Sieh, was gerade gebaut wird, und stimm ab, was als Nächstes kommt",
         "1": "Wähl das Equipment, das ins Arsenal und in die Kisten kommt",
-        "2": "Bestimm die Challenge, die die ganze App diese Woche spielt",
+        "2": "Gründe eine Gilde mit eigenem Namen, Tag und gemeinsamem Lager",
         "3": "Verbinde Claude oder einen anderen KI-Assistenten mit deinem Konto"
       },
       "email": "Nutze die E-Mail-Adresse dieses Kontos, um Supporter freizuschalten.",

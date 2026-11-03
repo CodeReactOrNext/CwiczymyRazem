@@ -12,9 +12,15 @@ import {
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import type { SongPracticeMode } from "feature/exercisePlan/types/exercise.types";
+import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import { useUserExercisePlans } from "feature/exercisePlan/hooks/useExercisePlans";
+import { useLocalizePlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
+import type {
+  ExercisePlan,
+  SongPracticeMode,
+} from "feature/exercisePlan/types/exercise.types";
 import { RotationThumb } from "feature/rotation/components/RotationThumb";
-import { Check, Plus, Search } from "lucide-react";
+import { Check, ListChecks, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -29,18 +35,32 @@ import type {
 } from "../types/calendar.types";
 import { PRACTICE_AREAS } from "../types/calendar.types";
 import { AREA_DOT } from "../utils/areaStyles";
-import { newItemId } from "../utils/calendarItems";
+import {
+  MAX_SLOT_MINUTES,
+  MIN_SLOT_MINUTES,
+  newItemId,
+  planToItems,
+  sumMinutes,
+} from "../utils/calendarItems";
 import { categoryToArea } from "../utils/planner";
-import { Stepper } from "./PlannerControls";
+import { MinutesInput } from "./PlannerControls";
 
-type Tab = "exercise" | "song" | "goal" | "roadmap" | "custom";
-const TABS: Tab[] = ["exercise", "song", "goal", "roadmap", "custom"];
+type Tab = "exercise" | "song" | "goal" | "roadmap" | "routine" | "custom";
+const TABS: Tab[] = [
+  "exercise",
+  "song",
+  "goal",
+  "roadmap",
+  "routine",
+  "custom",
+];
 
 const DEFAULT_MINUTES: Record<Tab, number> = {
   exercise: 10,
   song: 10,
   goal: 10,
   roadmap: 10,
+  routine: 10,
   custom: 15,
 };
 
@@ -48,12 +68,19 @@ const SONG_MODES: SongPracticeMode[] = ["sections", "gp"];
 
 const MAX_LISTED = 60;
 
+const EXERCISES_BY_ID = new Map(
+  exercisesAgregat.map((exercise) => [exercise.id, exercise]),
+);
+
 type Draft = Omit<CalendarItem, "id" | "minutes" | "auto" | "done" | "role">;
 
 interface AddItemDialogProps {
+  uid: string | null;
   dateLabel: string;
   sources: PlannerSources;
   onAdd: (item: CalendarItem) => Promise<unknown>;
+  /** A whole routine at once — its slots in one write. */
+  onAddMany: (items: CalendarItem[]) => Promise<unknown>;
   onClose: () => void;
 }
 
@@ -66,7 +93,8 @@ interface Candidate {
 
 interface CandidateRowProps {
   display: CalendarItemDisplay;
-  area: PracticeArea;
+  /** Leaves the dot out when the row is not one area — a routine. */
+  area?: PracticeArea;
   isAdded: boolean;
   label: string;
   unavailable?: string;
@@ -98,9 +126,14 @@ const CandidateRow = ({
           {display.title}
         </span>
         <span className='mt-0.5 flex items-center gap-2 truncate text-xs text-zinc-400'>
-          <span
-            className={cn("h-1.5 w-1.5 shrink-0 rounded-full", AREA_DOT[area])}
-          />
+          {area && (
+            <span
+              className={cn(
+                "h-1.5 w-1.5 shrink-0 rounded-full",
+                AREA_DOT[area],
+              )}
+            />
+          )}
           <span className='truncate'>{unavailable ?? display.subtitle}</span>
         </span>
       </span>
@@ -121,17 +154,21 @@ const CandidateRow = ({
 
 /**
  * Puts something on one day by hand: an exercise from the catalog, a song
- * being learned, an open goal, the next roadmap step, or anything of the
- * player's own. Each tap adds one slot at the length set on top; the dialog
- * stays open for the next.
+ * being learned, an open goal, the next roadmap step, a whole routine, or
+ * anything of the player's own. Each tap adds one slot at the length set on
+ * top — a routine adds all its items at their own lengths; the dialog stays
+ * open for the next.
  */
 export const AddItemDialog = ({
+  uid,
   dateLabel,
   sources,
   onAdd,
+  onAddMany,
   onClose,
 }: AddItemDialogProps) => {
   const { describe, formatMinutes, t } = useCalendarDisplay();
+  const localizePlan = useLocalizePlan();
   const [tab, setTab] = useState<Tab>("exercise");
   const [search, setSearch] = useState("");
   const [minutes, setMinutes] = useState(DEFAULT_MINUTES.exercise);
@@ -141,6 +178,36 @@ export const AddItemDialog = ({
   const [customArea, setCustomArea] = useState<PracticeArea>("creativity");
   // Every song can be played over its section map; the tab needs a file attached.
   const [songMode, setSongMode] = useState<SongPracticeMode>("sections");
+  // Read only once the tab is opened — most visits never need them.
+  const ownPlans = useUserExercisePlans(tab === "routine" ? uid : null);
+
+  const routines = useMemo(() => {
+    if (tab !== "routine") return [];
+    const needle = search.trim().toLowerCase();
+    return [
+      ...(ownPlans.data ?? []).map((plan) => ({ plan, own: true })),
+      ...defaultPlans.map((plan) => ({ plan, own: false })),
+    ]
+      .map(({ plan, own }) => ({ own, plan: localizePlan(plan) }))
+      .filter(
+        ({ plan }) =>
+          plan.exercises.length > 0 &&
+          (!needle || plan.title.toLowerCase().includes(needle)),
+      )
+      .map(({ own, plan }) => ({
+        own,
+        plan,
+        key: `routine:${plan.id}`,
+        display: {
+          title: plan.title,
+          subtitle: t("add.routine_summary", {
+            count: plan.exercises.length,
+            time: formatMinutes(sumMinutes(planToItems(plan, EXERCISES_BY_ID))),
+          }),
+          Icon: ListChecks,
+        },
+      }));
+  }, [tab, search, ownPlans.data, localizePlan, formatMinutes, t]);
 
   const candidates = useMemo<Candidate[]>(() => {
     if (tab === "exercise") {
@@ -250,6 +317,16 @@ export const AddItemDialog = ({
     }
   };
 
+  const addRoutine = async (key: string, plan: ExercisePlan) => {
+    try {
+      await onAddMany(planToItems(plan, EXERCISES_BY_ID));
+      setAdded((current) => new Set(current).add(key));
+      toast.success(t("add.routine_added", { title: plan.title }));
+    } catch {
+      toast.error(t("toast.error"));
+    }
+  };
+
   const addCustom = async () => {
     const title = customTitle.trim();
     if (!title) return;
@@ -265,7 +342,7 @@ export const AddItemDialog = ({
   };
 
   const emptyState: Record<
-    Exclude<Tab, "exercise" | "custom">,
+    Exclude<Tab, "exercise" | "routine" | "custom">,
     { text: string; href: string }
   > = {
     song: { text: t("planner.sources.songs_empty"), href: "/songs" },
@@ -275,7 +352,7 @@ export const AddItemDialog = ({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className='flex flex-col gap-6 border-0 bg-zinc-900 shadow-none sm:max-h-[90vh] sm:max-w-lg sm:p-8'>
+      <DialogContent className='flex flex-col gap-6 border-0 bg-zinc-900 shadow-none sm:max-h-[90vh] sm:max-w-2xl sm:p-8'>
         <div className='space-y-2 pr-10'>
           <DialogTitle className='text-xl font-bold text-zinc-100'>
             {t("add.title", { day: dateLabel })}
@@ -309,21 +386,22 @@ export const AddItemDialog = ({
             ))}
           </div>
 
-          <div className='flex items-center justify-between gap-4'>
-            <span className='text-sm text-zinc-400'>{t("add.length")}</span>
-            <div className='flex items-center gap-3'>
-              <span className='w-16 text-right text-sm font-semibold tabular-nums text-zinc-100'>
-                {formatMinutes(minutes)}
+          {tab === "routine" ? (
+            <p className='text-sm text-zinc-400'>{t("add.routine_hint")}</p>
+          ) : (
+            <div className='flex items-center justify-between gap-4'>
+              <span className='text-sm text-zinc-400'>
+                {t("add.length_minutes")}
               </span>
-              <Stepper
-                value={minutes / 5}
-                min={1}
-                max={24}
-                onChange={(steps) => setMinutes(steps * 5)}
-                label={t("add.length")}
+              <MinutesInput
+                value={minutes}
+                min={MIN_SLOT_MINUTES}
+                max={MAX_SLOT_MINUTES}
+                onChange={setMinutes}
+                label={t("add.length_minutes")}
               />
             </div>
-          </div>
+          )}
 
           {tab === "song" && (
             <div className='flex items-center justify-between gap-4'>
@@ -355,7 +433,7 @@ export const AddItemDialog = ({
             </div>
           )}
 
-          {(tab === "exercise" || tab === "song") && (
+          {(tab === "exercise" || tab === "song" || tab === "routine") && (
             <Input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
@@ -368,7 +446,38 @@ export const AddItemDialog = ({
         </div>
 
         <div className='-mx-2 min-h-[12rem] flex-1 overflow-y-auto px-2'>
-          {tab === "custom" ? (
+          {tab === "routine" ? (
+            routines.length === 0 ? (
+              <p className='px-1 py-4 text-sm text-zinc-500'>
+                {ownPlans.isLoading ? t("add.loading") : t("add.no_results")}
+              </p>
+            ) : (
+              <div className='space-y-5'>
+                {([true, false] as const).map((own) => {
+                  const group = routines.filter((entry) => entry.own === own);
+                  if (group.length === 0) return null;
+                  return (
+                    <div key={String(own)}>
+                      <p className='px-2.5 pb-2 text-xs text-zinc-500'>
+                        {own ? t("add.routines_own") : t("add.routines_ready")}
+                      </p>
+                      <ul className='space-y-1'>
+                        {group.map(({ key, plan, display }) => (
+                          <CandidateRow
+                            key={key}
+                            display={display}
+                            isAdded={added.has(key)}
+                            label={t("add.add_item", { title: display.title })}
+                            onAdd={() => addRoutine(key, plan)}
+                          />
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </div>
+            )
+          ) : tab === "custom" ? (
             <form
               className='space-y-5 px-1'
               onSubmit={(event) => {

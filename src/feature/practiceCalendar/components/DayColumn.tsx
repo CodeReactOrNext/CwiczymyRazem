@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { Check, Play, Plus } from "lucide-react";
+import { Check, CopyPlus, Link2, Play, Plus } from "lucide-react";
 
 import { useCalendarDisplay } from "../hooks/useCalendarDisplay";
 import type { CalendarItem } from "../types/calendar.types";
@@ -17,17 +17,21 @@ interface DayColumnProps {
   isToday: boolean;
   isPast: boolean;
   weekDates: string[];
+  /** How many other days share this day's routine. */
+  linkedCount: number;
   onAdd: () => void;
+  onRepeat: () => void;
   onPlay: () => void;
   onToggleDone: (itemId: string) => void;
+  onChangeLength: (itemId: string) => void;
   onMove: (itemId: string, to: string) => void;
   onRemove: (itemId: string) => void;
 }
 
 /**
  * One day of the week: its date, how much of it is played, its slots, and a
- * Play that runs what is left of it as one session. Columns on desktop, a
- * stack of cards on a phone.
+ * Play that runs what is left of it as one session, and a way to repeat it on
+ * other days. Columns on desktop, a stack of cards on a phone.
  */
 export const DayColumn = ({
   date,
@@ -35,9 +39,12 @@ export const DayColumn = ({
   isToday,
   isPast,
   weekDates,
+  linkedCount,
   onAdd,
+  onRepeat,
   onPlay,
   onToggleDone,
+  onChangeLength,
   onMove,
   onRemove,
 }: DayColumnProps) => {
@@ -49,6 +56,8 @@ export const DayColumn = ({
   const left = planned - played;
   const complete = entries.length > 0 && left === 0;
   const progress = planned > 0 ? played / planned : 0;
+  const repeatLabel =
+    linkedCount > 0 ? t("day.linked", { count: linkedCount }) : t("day.repeat");
 
   return (
     <section
@@ -78,16 +87,36 @@ export const DayColumn = ({
             {formatDate(date, { day: "numeric" })}
           </span>
         </div>
-        {planned > 0 && (
-          <span
-            className={cn(
-              "flex items-center gap-1 pt-0.5 text-xs tabular-nums",
-              complete ? "text-emerald-400" : "text-zinc-400",
-            )}>
-            {complete && <Check className='h-3.5 w-3.5' aria-hidden />}
-            {formatMinutes(planned)}
-          </span>
-        )}
+        <div className='flex items-center gap-2 pt-0.5'>
+          {/* One way in to repeating the day; linked, it shows the link instead. */}
+          {entries.length > 0 && (
+            <button
+              type='button'
+              onClick={onRepeat}
+              title={repeatLabel}
+              aria-label={repeatLabel}
+              className={cn(
+                "-m-1 flex items-center rounded p-1 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+                linkedCount > 0 ? "text-zinc-300" : "text-zinc-500",
+              )}>
+              {linkedCount > 0 ? (
+                <Link2 className='h-3.5 w-3.5' aria-hidden />
+              ) : (
+                <CopyPlus className='h-3.5 w-3.5' aria-hidden />
+              )}
+            </button>
+          )}
+          {planned > 0 && (
+            <span
+              className={cn(
+                "flex items-center gap-1 text-xs tabular-nums",
+                complete ? "text-emerald-400" : "text-zinc-400",
+              )}>
+              {complete && <Check className='h-3.5 w-3.5' aria-hidden />}
+              {formatMinutes(planned)}
+            </span>
+          )}
+        </div>
       </header>
 
       <div
@@ -121,6 +150,7 @@ export const DayColumn = ({
               date={date}
               weekDates={weekDates}
               onToggleDone={() => onToggleDone(item.id)}
+              onChangeLength={() => onChangeLength(item.id)}
               onMove={(to) => onMove(item.id, to)}
               onRemove={() => onRemove(item.id)}
             />

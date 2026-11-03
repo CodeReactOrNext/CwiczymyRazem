@@ -221,6 +221,21 @@ export const GUITAR_BOMS: Record<number, ScrapBom> = {
     { partId: "pot", qty: 1 },
     { partId: "bridge", qty: 1 },
   ],
+  // Vintage Classics.
+  90: TWIN,
+  91: TWIN,
+  92: TWIN,
+  93: SINGLECUT,
+  94: SINGLECUT,
+  95: SINGLECUT,
+  // Lap steel — one pickup on a cast body, nothing else worth pulling.
+  96: [
+    { partId: "pickup", qty: 1 },
+    { partId: "body", qty: 1 },
+    { partId: "tuners", qty: 1 },
+  ],
+  97: SINGLECUT,
+  98: SINGLECUT,
 };
 
 /** Fallback for any guitar id added before its BOM is authored. */

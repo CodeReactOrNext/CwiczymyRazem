@@ -156,7 +156,7 @@ export const SIGNAL_STAGES: readonly SignalStage[] = [
   {
     id: "modulation",
     label: "Modulation",
-    types: ["Phaser", "Flanger", "Chorus", "Vibrato"],
+    types: ["Phaser", "Flanger", "Chorus", "Vibrato", "Tremolo"],
     why: "Moves a settled tone around. Order within the family is taste.",
   },
   {

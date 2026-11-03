@@ -16,6 +16,12 @@ const expansionGuitars = GUITAR_DEFINITIONS.filter(
 const expansionEffects = EFFECT_DEFINITIONS.filter(
   (e) => Number(e.id) >= 35 && Number(e.id) <= 54,
 );
+const vintageGuitars = GUITAR_DEFINITIONS.filter(
+  (g) => Number(g.id) >= 90 && Number(g.id) <= 98,
+);
+const vintageEffects = EFFECT_DEFINITIONS.filter(
+  (e) => Number(e.id) >= 55 && Number(e.id) <= 60,
+);
 
 describe("arsenal catalogue assets", () => {
   it("gives every pedal a unique id and art slot in its rarity pool", () => {
@@ -73,6 +79,42 @@ describe("arsenal catalogue assets", () => {
       const metadata = await sharp(file).metadata();
       expect(metadata.hasAlpha, guitar.name).toBe(true);
       expect(metadata.width!, guitar.name).toBeGreaterThan(metadata.height!);
+    }
+  });
+  it("ships the Vintage Classics drop: transparent art in every size, droppable", async () => {
+    expect(vintageGuitars).toHaveLength(9);
+    expect(vintageEffects).toHaveLength(6);
+    for (const guitar of vintageGuitars) {
+      expect(DROPPABLE_GUITARS).toContain(guitar);
+      for (const size of ["small", "medium", "large"] as const) {
+        const src = getRankBadgeSrc(guitar.imageId, size);
+        expect(existsSync(join(process.cwd(), "public", src)), src).toBe(true);
+      }
+      const file = join(
+        process.cwd(),
+        "public",
+        getRankBadgeSrc(guitar.imageId, "large"),
+      );
+      const metadata = await sharp(file).metadata();
+      expect(metadata.hasAlpha, guitar.name).toBe(true);
+      expect(metadata.width!, guitar.name).toBeGreaterThan(metadata.height!);
+    }
+    for (const effect of vintageEffects) {
+      for (const size of ["small", "medium", "full"] as const) {
+        const src = getEffectImageSrc(effect.imageId, size);
+        expect(existsSync(join(process.cwd(), "public", src)), src).toBe(true);
+      }
+      const file = join(
+        process.cwd(),
+        "public",
+        getEffectImageSrc(effect.imageId, "full"),
+      );
+      const metadata = await sharp(file).metadata();
+      expect(metadata.hasAlpha, effect.name).toBe(true);
+      expect(EFFECT_IMAGE_ASPECT[effect.imageId], effect.name).toBeCloseTo(
+        metadata.width! / metadata.height!,
+        5,
+      );
     }
   });
 });

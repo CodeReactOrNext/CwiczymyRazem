@@ -6,7 +6,8 @@
     "stash": "Almacén",
     "quests": "Misiones",
     "upgrades": "Mejoras",
-    "kit": "Estilo"
+    "kit": "Estilo",
+    "studio": "Estudio"
   },
   "tab_locked": "{{label}} — únete primero a un gremio",
   "seats_taken": "{{count}} de {{limit}} plazas ocupadas",
@@ -19,7 +20,8 @@
     "chat": "El chat es para la gente con la que tocas.",
     "stash": "El estante pertenece a un gremio, y no estás en ninguno.",
     "quests": "Las misiones las completa un gremio, y todavía no estás en ninguno.",
-    "upgrades": "Las mejoras las paga un gremio, y todavía no estás en ninguno."
+    "upgrades": "Las mejoras las paga un gremio, y todavía no estás en ninguno.",
+    "studio": "El estudio pertenece a un gremio, y todavía no estás en ninguno."
   },
   "header": {
     "founded_by": "Fundado por {{name}}.",
@@ -810,6 +812,128 @@
       "rocket": "Cohete",
       "compass": "Brújula",
       "anchor": "Ancla"
+    }
+  },
+  "studio": {
+    "intro": "La sala de ensayo de vuestro gremio. Cualquier miembro puede gastar en ella la Fame del gremio, y el tablón semanal muestra quién toca más.",
+    "treasury": "La Fame del gremio",
+    "treasury_hint": "Los miembros aportan Fame en la pestaña Mejoras.",
+    "room_level": "Nivel de sala {{level}} de {{max}}",
+    "gear_cap": "Equipo hasta nivel {{cap}} · {{built}} de {{total}} niveles construidos",
+    "move_to": "Mudarse a: {{room}}",
+    "maxed": "Mejorado al máximo",
+    "needs_room": "Primero hace falta: {{room}}",
+    "short": "Al gremio le faltan {{count}} de Fame",
+    "not_built": "Aún sin construir",
+    "build": "Construir: {{name}}",
+    "upgrade_to": "Mejorar a: {{name}}",
+    "level_of": "Nivel {{level}} de {{max}}",
+    "empty_spot": "{{name}} · hueco libre",
+    "week_so_far": "Esta semana",
+    "week_note": "Se cuenta desde el lunes y empieza de cero cada semana.",
+    "unlocks_at": "{{title}} · nivel {{level}}",
+    "nobody_yet": "Nadie todavía",
+    "bought": "Hecho: {{name}}",
+    "moved": "Mudado a: {{room}}",
+    "failed": "No se pudo comprar",
+    "loading": "Abriendo el estudio…",
+    "load_failed": "El estudio no se abrió. Vuelve a intentarlo en un momento.",
+    "awards": {
+      "hours": "Más horas",
+      "sessions": "Más sesiones",
+      "streak": "Racha más larga",
+      "points": "Más puntos"
+    },
+    "values": {
+      "hours": "{{value}} h",
+      "sessions": "{{value}}",
+      "streak": "{{value}} d",
+      "points": "{{value}}"
+    },
+    "rooms": {
+      "r1": "Garaje",
+      "r2": "Local de ensayo",
+      "r3": "Estudio casero",
+      "r4": "Estudio profesional"
+    },
+    "items": {
+      "board": {
+        "name": "Tablón semanal",
+        "l1": "Tablón de corcho",
+        "l2": "Tablón con repisa",
+        "l3": "Tablón con guirnalda",
+        "l4": "Tablón de exposición"
+      },
+      "amp": {
+        "name": "Amplificador",
+        "l1": "Combo de práctica",
+        "l2": "Combo a válvulas",
+        "l3": "Half stack",
+        "l4": "Full stack"
+      },
+      "drums": {
+        "name": "Batería",
+        "l1": "Pad de práctica",
+        "l2": "Batería usada",
+        "l3": "Batería completa",
+        "l4": "Batería de estudio"
+      },
+      "mic": {
+        "name": "Micrófono",
+        "l1": "Micro dinámico",
+        "l2": "Pie de jirafa",
+        "l3": "Micro de condensador",
+        "l4": "Micro de válvulas vintage"
+      },
+      "monitors": {
+        "name": "Monitores",
+        "l1": "Altavoces de escritorio",
+        "l2": "Monitores de campo cercano",
+        "l3": "Monitores con soportes",
+        "l4": "Monitores principales"
+      },
+      "panels": {
+        "name": "Paneles acústicos",
+        "l1": "Cuadrados de espuma",
+        "l2": "Cuñas de espuma",
+        "l3": "Paneles de tela",
+        "l4": "Sala tratada"
+      },
+      "walls": {
+        "name": "Paredes",
+        "l1": "Carteles de conciertos",
+        "l2": "Discos enmarcados",
+        "l3": "Pared de galería",
+        "l4": "Muro de la fama"
+      },
+      "sofa": {
+        "name": "Sofá",
+        "l1": "Silla de camping",
+        "l2": "Sofá viejo",
+        "l3": "Sofá de cuero",
+        "l4": "Rincón lounge"
+      },
+      "desk": {
+        "name": "Mesa de mezclas",
+        "l1": "Portátil",
+        "l2": "Interfaz de audio",
+        "l3": "Consola pequeña",
+        "l4": "Consola grande"
+      },
+      "tape": {
+        "name": "Grabadora de cinta",
+        "l1": "Pletina de casete",
+        "l2": "Portaestudio de 4 pistas",
+        "l3": "Magnetófono de bobinas",
+        "l4": "Grabadora de 2 pulgadas"
+      },
+      "bench": {
+        "name": "Banco de luthier",
+        "l1": "Caja de herramientas",
+        "l2": "Banco de trabajo",
+        "l3": "Banco con tornillo",
+        "l4": "Taller de luthier completo"
+      }
     }
   }
 }

@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ExerciseGoal } from "../types/exerciseGoal.types";
 import {
+  applyGoalEdit,
   applyGoalRun,
   autoStepBpm,
   clampGoalBpm,
@@ -318,5 +319,67 @@ describe("takesPracticeRun", () => {
         true,
       ),
     ).toBe(false);
+  });
+});
+
+describe("applyGoalEdit", () => {
+  const edit = (overrides = {}) => ({
+    startBpm: 80,
+    targetBpm: 120,
+    stepBpm: 10,
+    strictness: "standard" as const,
+    counting: "streak" as const,
+    ...overrides,
+  });
+  const current = goal({
+    startBpm: 80,
+    targetBpm: 120,
+    stepBpm: 10,
+    stageBpm: 100,
+    cleanRuns: 2,
+  });
+
+  it("keeps the milestone and its runs when only the target moves up", () => {
+    expect(applyGoalEdit(current, edit({ targetBpm: 140 }))).toEqual({
+      stageBpm: 100,
+      cleanRuns: 2,
+    });
+  });
+
+  it("picks up at the next milestone of a new path, starting the count over", () => {
+    expect(applyGoalEdit(current, edit({ stepBpm: 15 }))).toEqual({
+      stageBpm: 105,
+      cleanRuns: 0,
+    });
+  });
+
+  it("lands on the target when it came down past the current milestone", () => {
+    expect(applyGoalEdit(current, edit({ targetBpm: 95 }))).toEqual({
+      stageBpm: 95,
+      cleanRuns: 2,
+    });
+  });
+
+  it("moves up to a start tempo raised past the current milestone", () => {
+    expect(applyGoalEdit(current, edit({ startBpm: 110 }))).toEqual({
+      stageBpm: 110,
+      cleanRuns: 0,
+    });
+  });
+
+  it("starts the count over when the accuracy bar goes up", () => {
+    expect(applyGoalEdit(current, edit({ strictness: "strict" }))).toEqual({
+      stageBpm: 100,
+      cleanRuns: 0,
+    });
+  });
+
+  it("keeps the count for a looser bar or a different way of counting", () => {
+    expect(
+      applyGoalEdit(
+        current,
+        edit({ strictness: "relaxed", counting: "total" }),
+      ),
+    ).toEqual({ stageBpm: 100, cleanRuns: 2 });
   });
 });

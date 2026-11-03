@@ -2,6 +2,7 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 import type {
   ExerciseGoal,
+  GoalEdit,
   GoalRunInput,
   GoalRunOutcome,
   GoalStrictness,
@@ -213,4 +214,27 @@ export const applyGoalRun = (
     cleanRuns: goal.counting === "streak" ? 0 : goal.cleanRuns,
     streakReset: goal.counting === "streak" && goal.cleanRuns > 0,
   };
+};
+
+/**
+ * Where an edited goal picks up. The milestones below the current one stay
+ * cleared, so the goal carries on from the first milestone of the new path at
+ * or above it — the target, when the target came down past it. The clean runs
+ * counted there stay when every one of them would still be clean: the
+ * milestone is no faster and the accuracy bar no higher. How runs add up
+ * doesn't matter to the ones already counted — they were clean either way.
+ */
+export const applyGoalEdit = (
+  goal: Pick<ExerciseGoal, "stageBpm" | "strictness" | "cleanRuns">,
+  edit: GoalEdit,
+): Pick<ExerciseGoal, "stageBpm" | "cleanRuns"> => {
+  const stageBpm =
+    goalPath(edit.startBpm, edit.targetBpm, edit.stepBpm).find(
+      (bpm) => bpm >= goal.stageBpm,
+    ) ?? edit.targetBpm;
+  const keepsRuns =
+    stageBpm <= goal.stageBpm &&
+    STRICTNESS_ACCURACY[edit.strictness] <=
+      STRICTNESS_ACCURACY[goal.strictness];
+  return { stageBpm, cleanRuns: keepsRuns ? goal.cleanRuns : 0 };
 };

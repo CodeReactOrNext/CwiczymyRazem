@@ -1,3 +1,4 @@
+import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { useRotationDisplay } from "feature/rotation/hooks/useRotationDisplay";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
@@ -8,6 +9,8 @@ import type { IconType } from "react-icons";
 
 import type { CalendarItem } from "../types/calendar.types";
 import { fromDateKey } from "../utils/calendarDates";
+
+const CATALOG_IDS = new Set(exercisesAgregat.map((exercise) => exercise.id));
 
 export interface CalendarItemDisplay {
   title: string;
@@ -38,13 +41,16 @@ export const useCalendarDisplay = () => {
           : base;
       }
       if (item.kind === "goal") {
-        const base = item.exerciseId
-          ? describeRotation({
-              type: "exercise",
-              id: item.exerciseId,
-              addedAt: 0,
-            })
-          : null;
+        // One of the player's own exercises isn't in the catalog — the goal
+        // carries its name, where the catalog lookup would show the bare id.
+        const base =
+          item.exerciseId && CATALOG_IDS.has(item.exerciseId)
+            ? describeRotation({
+                type: "exercise",
+                id: item.exerciseId,
+                addedAt: 0,
+              })
+            : null;
         return {
           title: base?.title ?? item.title ?? "",
           subtitle: item.bpm

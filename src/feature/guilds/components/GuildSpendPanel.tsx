@@ -241,7 +241,9 @@ export const PledgeButton = ({
       type='button'
       disabled={disabled}
       onClick={onClick}
-      className={cn(PRESSABLE, "border-b-black/30", 
+      className={cn(
+        PRESSABLE,
+        "border-b-black/30",
         "flex items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-sm font-bold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40",
         finishes ? look.buttonStrong : look.button,
       )}>

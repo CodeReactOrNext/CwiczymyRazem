@@ -1,7 +1,15 @@
+import { PRESSABLE } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { DISCORD_INVITE_URL } from "constants/community";
 import {
+  GEAR_BACK_COST,
+  GEAR_PROPOSAL_COST,
+  GUILD_FOUNDING_COST,
+  IDEA_BACK_COST,
+  IDEA_COST,
+  SLATE_VOTE_COST,
   SUPPORTER_WELCOME_TOKENS,
   TOKENS_PER_DOLLAR,
 } from "feature/supporterPanel/constants/supporterPanel.constants";
@@ -11,76 +19,121 @@ import {
   ArrowRight,
   Bot,
   Guitar,
-  Map,
+  Map as MapIcon,
   Package,
   Shield,
-  Target,
 } from "lucide-react";
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
 import { FaDiscord } from "react-icons/fa6";
 
 interface Perk {
+  id: string;
   icon: ComponentType<{ size?: number; className?: string }>;
-  title: string;
-  body: ReactNode;
+  /** Token prices for the `{{slots}}` of the perk's price line. */
+  price?: Record<string, number>;
 }
 
 /**
  * What the person paying gets back. Every entry is a tab of the supporter
  * panel, so this is a preview of /supporter rather than a second place where
- * perks are invented, and the token figures are read from the panel's own
- * constants, so a rebalance never leaves this page quoting last month's rate.
+ * perks are invented, and the prices are read from the panel's own constants,
+ * so a rebalance never leaves this page quoting last month's rate.
+ *
+ * Split by how they are paid for: the boards the tokens are spent on, each
+ * with its price, so "they buy a say" reads as a menu rather than a promise,
+ * and the two things the badge brings on its own.
  */
-const PERKS: Perk[] = [
+const SPEND_PERKS: Perk[] = [
   {
-    icon: Map,
-    title: "The roadmap board",
-    body: "Post what you want built and back the ideas other supporters posted.",
+    id: "roadmap",
+    icon: MapIcon,
+    price: { post: IDEA_COST, back: IDEA_BACK_COST },
   },
   {
+    id: "gear",
     icon: Guitar,
-    title: "Gear you picked",
-    body: "Propose a guitar or a pedal for the Arsenal, or back somebody else's spec.",
+    price: { post: GEAR_PROPOSAL_COST, back: GEAR_BACK_COST },
   },
-  {
-    icon: Package,
-    title: "The supporter case",
-    body: "Vote on which items get a seat in the next supporter case.",
-  },
-  {
-    icon: Shield,
-    title: "A guild of your own",
-    body: "Found one with its own name and tag, a shared stash and a harder practice week.",
-  },
-  {
-    icon: Target,
-    title: "The next challenge",
-    body: "Pick the community challenge everybody plays next week.",
-  },
-  {
-    icon: FaDiscord,
-    title: "The supporter channel",
-    body: (
-      <>
-        A supporter role on{" "}
-        <a
-          href={DISCORD_INVITE_URL}
-          target='_blank'
-          rel='noopener noreferrer'
-          className='text-amber-300 underline decoration-amber-500/40 underline-offset-2 transition-colors hover:text-amber-200 hover:decoration-amber-400'>
-          Discord
-        </a>{" "}
-        and a channel where I show what I am building before it ships.
-      </>
-    ),
-  },
-  {
-    icon: Bot,
-    title: "Your AI assistant, connected",
-    body: "Connect Claude or another AI assistant to your account: it reads your practice, plans sessions and writes exercises with tabs.",
-  },
+  { id: "case", icon: Package, price: { vote: SLATE_VOTE_COST } },
+  { id: "guild", icon: Shield, price: { found: GUILD_FOUNDING_COST } },
 ];
+
+const BADGE_PERKS: Perk[] = [
+  { id: "discord", icon: FaDiscord },
+  { id: "ai", icon: Bot },
+];
+
+const TokenAmount = ({ amount }: { amount: number }) => (
+  <span className='inline-flex items-center gap-1 align-[-2px] font-semibold tabular-nums text-amber-300'>
+    <SupportToken size={13} />
+    {amount}
+  </span>
+);
+
+const toAmounts = (price: Record<string, number>) =>
+  Object.fromEntries(
+    Object.entries(price).map(([slot, amount]) => [
+      slot,
+      <TokenAmount key={slot} amount={amount} />,
+    ]),
+  );
+
+const DiscordLink = () => (
+  <a
+    href={DISCORD_INVITE_URL}
+    target='_blank'
+    rel='noopener noreferrer'
+    className='text-amber-300 underline decoration-amber-500/40 underline-offset-2 transition-colors hover:text-amber-200 hover:decoration-amber-400'>
+    Discord
+  </a>
+);
+
+const PerkRow = ({ perk }: { perk: Perk }) => {
+  const { t } = useTranslation("supporter");
+  const { id, icon: Icon, price } = perk;
+  return (
+    <li className='flex gap-3.5'>
+      <Icon size={18} className='mt-0.5 shrink-0 text-amber-400' />
+      <div className='min-w-0'>
+        <p className='text-sm font-semibold text-zinc-100'>
+          {t(`perks.items.${id}.title`)}
+        </p>
+        <p className='mt-1 text-sm leading-relaxed text-zinc-400'>
+          {id === "discord" ? (
+            <Interpolate
+              text={t("perks.discord_body")}
+              values={{ discord: <DiscordLink /> }}
+            />
+          ) : (
+            t(`perks.items.${id}.body`)
+          )}
+        </p>
+        {price && (
+          <p className='mt-2 text-xs text-zinc-500'>
+            <Interpolate
+              text={t(`perks.items.${id}.price`)}
+              values={toAmounts(price)}
+            />
+          </p>
+        )}
+      </div>
+    </li>
+  );
+};
+
+const PerkGroup = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) => (
+  <div className='min-w-0'>
+    <p className='text-xs font-semibold text-zinc-500'>{title}</p>
+    {children}
+  </div>
+);
 
 export const RoadmapPerks = () => {
   const { t } = useTranslation("supporter");
@@ -105,16 +158,22 @@ export const RoadmapPerks = () => {
             {t("perks.title")}
           </h2>
           <p className='mt-1.5 text-sm leading-relaxed text-zinc-400'>
-            {t("perks.tokens", {
-              welcome: SUPPORTER_WELCOME_TOKENS,
-              perDollar: TOKENS_PER_DOLLAR,
-            })}
+            <Interpolate
+              text={t("perks.tokens")}
+              values={{
+                welcome: <TokenAmount amount={SUPPORTER_WELCOME_TOKENS} />,
+                perDollar: <TokenAmount amount={TOKENS_PER_DOLLAR} />,
+              }}
+            />
           </p>
         </div>
 
         <Link
           href='/supporter'
-          className='group flex shrink-0 items-center gap-1.5 rounded-lg bg-amber-500/15 px-4 py-2.5 text-sm font-semibold text-amber-300 transition-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50 hover:bg-amber-500/25'>
+          className={cn(
+            PRESSABLE,
+            "group flex shrink-0 items-center gap-1.5 rounded-lg border-b-black/30 bg-amber-500/15 px-4 py-2.5 text-sm text-amber-300 transition-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50 hover:bg-amber-500/25",
+          )}>
           {t("perks.open_panel")}
           <ArrowRight
             size={16}
@@ -123,40 +182,26 @@ export const RoadmapPerks = () => {
         </Link>
       </div>
 
-      {/* Plain rows, not tiles: six tinted boxes were the loudest thing on the
-          page, and on a phone they nested a card inside a card. */}
-      <ul className='relative mt-8 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3'>
-        {PERKS.map(({ icon: Icon, title, body }, i) => (
-          <li key={title} className='flex gap-3.5'>
-            <Icon size={18} className='mt-0.5 shrink-0 text-amber-400' />
-            <div className='min-w-0'>
-              <p className='text-sm font-semibold text-zinc-100'>
-                {t(`perks.items.${i}.title`, title)}
-              </p>
-              <p className='mt-1 text-sm leading-relaxed text-zinc-400'>
-                {typeof body === "string" ? (
-                  t(`perks.items.${i}.body`, body)
-                ) : (
-                  <Interpolate
-                    text={t("perks.discord_body")}
-                    values={{
-                      discord: (
-                        <a
-                          href={DISCORD_INVITE_URL}
-                          target='_blank'
-                          rel='noopener noreferrer'
-                          className='text-amber-300 underline decoration-amber-500/40 underline-offset-2 transition-colors hover:text-amber-200 hover:decoration-amber-400'>
-                          Discord
-                        </a>
-                      ),
-                    }}
-                  />
-                )}
-              </p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {/* Plain rows, not tiles: tinted boxes were the loudest thing on the
+          page, and on a phone they nested a card inside a card. The two groups
+          are told apart by their labels and the gap between them. */}
+      <div className='relative mt-10 grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]'>
+        <PerkGroup title={t("perks.spend_title")}>
+          <ul className='mt-4 grid gap-x-10 gap-y-7 sm:grid-cols-2'>
+            {SPEND_PERKS.map((perk) => (
+              <PerkRow key={perk.id} perk={perk} />
+            ))}
+          </ul>
+        </PerkGroup>
+
+        <PerkGroup title={t("perks.badge_title")}>
+          <ul className='mt-4 grid gap-x-10 gap-y-7 sm:grid-cols-2 lg:grid-cols-1'>
+            {BADGE_PERKS.map((perk) => (
+              <PerkRow key={perk.id} perk={perk} />
+            ))}
+          </ul>
+        </PerkGroup>
+      </div>
     </section>
   );
 };

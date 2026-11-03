@@ -1,0 +1,266 @@
+{
+  "drums-1": {
+    "left": 563,
+    "top": 394,
+    "width": 140,
+    "height": 201
+  },
+  "drums-2": {
+    "left": 461,
+    "top": 318,
+    "width": 352,
+    "height": 266
+  },
+  "mic-1": {
+    "left": 426,
+    "top": 520,
+    "width": 131,
+    "height": 303
+  },
+  "tape-1": {
+    "left": 732,
+    "top": 403,
+    "width": 182,
+    "height": 152
+  },
+  "desk-1": {
+    "left": 876,
+    "top": 359,
+    "width": 204,
+    "height": 166
+  },
+  "monitors-1": {
+    "left": 1013,
+    "top": 413,
+    "width": 160,
+    "height": 123
+  },
+  "panels-1": {
+    "left": 827,
+    "top": 191,
+    "width": 280,
+    "height": 187
+  },
+  "sofa-1": {
+    "left": 235,
+    "top": 502,
+    "width": 152,
+    "height": 233
+  },
+  "sofa-2": {
+    "left": 165,
+    "top": 412,
+    "width": 319,
+    "height": 373
+  },
+  "amp-1": {
+    "left": 995,
+    "top": 696,
+    "width": 140,
+    "height": 135
+  },
+  "amp-2": {
+    "left": 963,
+    "top": 649,
+    "width": 206,
+    "height": 185
+  },
+  "amp-3": {
+    "left": 945,
+    "top": 565,
+    "width": 228,
+    "height": 263
+  },
+  "amp-4": {
+    "left": 983,
+    "top": 474,
+    "width": 213,
+    "height": 345
+  },
+  "bench-1": {
+    "left": 169,
+    "top": 782,
+    "width": 249,
+    "height": 162
+  },
+  "walls-1": {
+    "left": 445,
+    "top": 125,
+    "width": 318,
+    "height": 215
+  },
+  "walls-2": {
+    "left": 424,
+    "top": 121,
+    "width": 339,
+    "height": 305
+  },
+  "walls-4": {
+    "left": 436,
+    "top": 104,
+    "width": 357,
+    "height": 268
+  },
+  "drums-3": {
+    "left": 405,
+    "top": 274,
+    "width": 384,
+    "height": 280
+  },
+  "drums-4": {
+    "left": 385,
+    "top": 275,
+    "width": 471,
+    "height": 321
+  },
+  "mic-2": {
+    "left": 385,
+    "top": 441,
+    "width": 199,
+    "height": 426
+  },
+  "mic-3": {
+    "left": 408,
+    "top": 471,
+    "width": 202,
+    "height": 373
+  },
+  "mic-4": {
+    "left": 435,
+    "top": 528,
+    "width": 113,
+    "height": 291
+  },
+  "walls-3": {
+    "left": 423,
+    "top": 122,
+    "width": 359,
+    "height": 322
+  },
+  "monitors-2": {
+    "left": 1053,
+    "top": 401,
+    "width": 211,
+    "height": 218
+  },
+  "monitors-3": {
+    "left": 1051,
+    "top": 360,
+    "width": 129,
+    "height": 261
+  },
+  "monitors-4": {
+    "left": 855,
+    "top": 282,
+    "width": 332,
+    "height": 280
+  },
+  "panels-2": {
+    "left": 813,
+    "top": 168,
+    "width": 301,
+    "height": 224
+  },
+  "sofa-3": {
+    "left": 164,
+    "top": 420,
+    "width": 325,
+    "height": 334
+  },
+  "sofa-4": {
+    "left": 168,
+    "top": 246,
+    "width": 348,
+    "height": 485
+  },
+  "desk-2": {
+    "left": 859,
+    "top": 317,
+    "width": 260,
+    "height": 261
+  },
+  "desk-3": {
+    "left": 870,
+    "top": 317,
+    "width": 283,
+    "height": 243
+  },
+  "desk-4": {
+    "left": 864,
+    "top": 281,
+    "width": 309,
+    "height": 329
+  },
+  "panels-3": {
+    "left": 809,
+    "top": 140,
+    "width": 306,
+    "height": 269
+  },
+  "panels-4": {
+    "left": 759,
+    "top": 134,
+    "width": 366,
+    "height": 240
+  },
+  "tape-3": {
+    "left": 708,
+    "top": 357,
+    "width": 192,
+    "height": 227
+  },
+  "tape-4": {
+    "left": 655,
+    "top": 228,
+    "width": 219,
+    "height": 321
+  },
+  "bench-2": {
+    "left": 204,
+    "top": 774,
+    "width": 192,
+    "height": 165
+  },
+  "bench-3": {
+    "left": 100,
+    "top": 715,
+    "width": 394,
+    "height": 265
+  },
+  "tape-2": {
+    "left": 731,
+    "top": 427,
+    "width": 249,
+    "height": 145
+  },
+  "bench-4": {
+    "left": 168,
+    "top": 702,
+    "width": 358,
+    "height": 251
+  },
+  "board-1": {
+    "left": 599,
+    "top": 501,
+    "width": 348,
+    "height": 336
+  },
+  "board-2": {
+    "left": 599,
+    "top": 500,
+    "width": 346,
+    "height": 336
+  },
+  "board-3": {
+    "left": 598,
+    "top": 501,
+    "width": 348,
+    "height": 335
+  },
+  "board-4": {
+    "left": 571,
+    "top": 450,
+    "width": 398,
+    "height": 387
+  }
+}

@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Coffee } from "lucide-react";
@@ -13,7 +14,8 @@ interface SupportCtaProps {
 /**
  * The one action on the page. Same white button the HeroBanner and the
  * dashboard SupportBanner use, so wherever it is repeated it reads as the
- * primary thing to do and not as another tinted panel.
+ * primary thing to do and not as another tinted panel. Pressed like every
+ * other key in the app: the lip is the face darkened by the black border.
  */
 export const SupportCta = ({
   className,
@@ -26,7 +28,8 @@ export const SupportCta = ({
     target='_blank'
     rel='noopener noreferrer'
     className={cn(
-      "flex items-center justify-center gap-2 rounded-lg bg-zinc-100 px-5 py-3 text-sm font-semibold text-zinc-950 transition-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300/60 hover:bg-white",
+      PRESSABLE,
+      "border-b-black/25 flex items-center justify-center gap-2 rounded-lg bg-zinc-100 px-5 py-3 text-sm font-semibold text-zinc-950 transition-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300/60 hover:bg-white",
       className,
     )}>
     <Coffee size={16} />

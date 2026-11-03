@@ -10,6 +10,8 @@ import { DexView } from "./DexView";
 
 afterEach(cleanup);
 
+const GUITAR_WALLS = Math.ceil(GUITAR_DEFINITIONS.length / 18);
+
 /** The Dex reads only the four collection fields; the rest of the account is irrelevant here. */
 const account = (overrides: Partial<ArsenalUserData> = {}) =>
   ({
@@ -33,7 +35,7 @@ describe("DexView", () => {
     expect(slotNumbers()).toEqual(
       Array.from({ length: 18 }, (_, i) => String(i + 1).padStart(2, "0")),
     );
-    expect(screen.getByText("1 / 5")).toBeTruthy();
+    expect(screen.getByText(`1 / ${GUITAR_WALLS}`)).toBeTruthy();
     // Nothing discovered: every plate is a question mark.
     expect(screen.getAllByText("???")).toHaveLength(18);
   });
@@ -42,7 +44,7 @@ describe("DexView", () => {
     render(<DexView data={account()} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Next wall" }));
-    expect(screen.getByText("2 / 5")).toBeTruthy();
+    expect(screen.getByText(`2 / ${GUITAR_WALLS}`)).toBeTruthy();
     expect(slotNumbers()[0]).toBe("19");
 
     fireEvent.click(screen.getByRole("button", { name: /Pedals/ }));

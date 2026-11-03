@@ -6,6 +6,7 @@ import type {
   CalendarDoc,
   CalendarItem,
   CalendarItemKind,
+  CalendarLinks,
   PlannerPrefs,
   PracticeArea,
 } from "../types/calendar.types";
@@ -122,10 +123,24 @@ const parsePrefs = (raw: unknown): PlannerPrefs | null => {
   };
 };
 
+const parseLinks = (raw: unknown): CalendarLinks => {
+  if (!raw || typeof raw !== "object") return {};
+  return Object.fromEntries(
+    Object.entries(raw as Record<string, unknown>).filter(
+      (entry): entry is [string, string] =>
+        DATE_KEY.test(entry[0]) && !!str(entry[1]),
+    ),
+  );
+};
+
 export const getCalendar = async (uid: string): Promise<CalendarDoc> => {
   const snap = await getDoc(calendarRef(uid));
   const data = snap.exists() ? snap.data() : {};
-  return { days: parseDays(data.days), prefs: parsePrefs(data.prefs) };
+  return {
+    days: parseDays(data.days),
+    prefs: parsePrefs(data.prefs),
+    links: parseLinks(data.links),
+  };
 };
 
 /** Firestore rejects `undefined`, so optional fields are only written when set. */
@@ -137,12 +152,14 @@ const toStored = (item: CalendarItem) =>
 /**
  * Writes the given days and drops the ones in `prune` — old days fall off the
  * doc so it never grows past what the calendar shows. Days not named are left
- * alone by the merge.
+ * alone by the merge. `links` names the days whose group changed; `null`
+ * takes a day out of its group.
  */
 export const saveCalendarDays = (
   uid: string,
   days: CalendarDays,
   prune: string[] = [],
+  links: Record<string, string | null> = {},
 ) =>
   setDoc(
     calendarRef(uid),
@@ -156,6 +173,14 @@ export const saveCalendarDays = (
         ),
         ...Object.fromEntries(prune.map((key) => [key, deleteField()])),
       },
+      ...(Object.keys(links).length > 0 && {
+        links: Object.fromEntries(
+          Object.entries(links).map(([key, group]) => [
+            key,
+            group ?? deleteField(),
+          ]),
+        ),
+      }),
     },
     { merge: true },
   );

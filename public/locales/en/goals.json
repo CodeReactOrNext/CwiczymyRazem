@@ -16,6 +16,7 @@
   "card": {
     "rules": "{{accuracy}}% accuracy · {{counting}}",
     "delete": "Delete goal",
+    "edit": "Edit goal",
     "stage_of": "Milestone {{index}} of {{total}}",
     "path_label": "Milestones on the way to the goal",
     "stage_done": "{{bpm}} BPM, cleared",
@@ -88,6 +89,14 @@
     "mine_left_out_one": "1 more of yours needs a tab and a tempo range to take a goal.",
     "mine_left_out": "{{count}} more of yours need a tab and a tempo range to take a goal."
   },
+  "edit": {
+    "title": "Edit goal",
+    "description": "Change the tempos or the rules for {{exercise}}. Milestones you have already cleared stay cleared.",
+    "save": "Save changes",
+    "picks_up": "You pick up at {{bpm}} BPM.",
+    "runs_kept": "Your clean runs there ({{runs}} of {{total}}) carry over.",
+    "runs_reset": "Your clean runs so far ({{runs}} of {{total}}) start over."
+  },
   "history": {
     "title": "Your last runs",
     "hint": "The last {{count}} runs the mic scored on this exercise. Bigger dots are runs your goal judged.",
@@ -102,7 +111,8 @@
   "toast": {
     "created": "Goal set",
     "deleted": "Goal deleted",
-    "error": "Something went wrong. Try again."
+    "error": "Something went wrong. Try again.",
+    "updated": "Goal updated"
   },
   "verdict": {
     "saving": "Saving the run…",

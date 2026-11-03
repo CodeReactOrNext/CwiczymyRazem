@@ -302,7 +302,7 @@ export const TRAIT_DEFINITIONS: TraitDef[] = [
     label: "Texture Lab",
     description: "Fame/h on creativity practice.",
     kind: "effect",
-    appliesTo: ["Chorus", "Phaser", "Vibrato"],
+    appliesTo: ["Chorus", "Phaser", "Vibrato", "Tremolo"],
     clock: "creativity",
     min: 8.5,
     max: 13,

@@ -182,7 +182,7 @@ export const EFFECT_FEATURES: EffectFeatureDef[] = [
     category: "versatility",
     min: 2,
     max: 4,
-    appliesTo: ["Delay", "Chorus", "Phaser", "Flanger", "Vibrato"],
+    appliesTo: ["Delay", "Chorus", "Phaser", "Flanger", "Vibrato", "Tremolo"],
   },
   {
     id: "stereo-io",
@@ -206,6 +206,7 @@ export const EFFECT_FEATURES: EffectFeatureDef[] = [
       "Flanger",
       "EQ",
       "Vibrato",
+      "Tremolo",
     ],
   },
   {
@@ -222,6 +223,7 @@ export const EFFECT_FEATURES: EffectFeatureDef[] = [
       "Flanger",
       "Chorus",
       "Vibrato",
+      "Tremolo",
     ],
   },
   {

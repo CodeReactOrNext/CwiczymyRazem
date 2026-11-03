@@ -6,7 +6,8 @@
     "stash": "Lager",
     "quests": "Quests",
     "upgrades": "Upgrades",
-    "kit": "Look"
+    "kit": "Look",
+    "studio": "Studio"
   },
   "tab_locked": "{{label}} — tritt zuerst einer Gilde bei",
   "seats_taken": "{{count}} von {{limit}} Plätzen belegt",
@@ -19,7 +20,8 @@
     "chat": "Der Chat ist für die Leute, mit denen du spielst.",
     "stash": "Das Regal gehört einer Gilde, und du bist in keiner.",
     "quests": "Quests werden von einer Gilde geschafft, und du bist noch in keiner.",
-    "upgrades": "Upgrades bezahlt eine Gilde, und du bist noch in keiner."
+    "upgrades": "Upgrades bezahlt eine Gilde, und du bist noch in keiner.",
+    "studio": "Das Studio gehört einer Gilde, und du bist noch in keiner."
   },
   "header": {
     "founded_by": "Gegründet von {{name}}.",
@@ -810,6 +812,128 @@
       "rocket": "Rakete",
       "compass": "Kompass",
       "anchor": "Anker"
+    }
+  },
+  "studio": {
+    "intro": "Der Proberaum eurer Gilde. Jedes Mitglied kann Fame der Gilde dafür ausgeben, und das Wochenbrett zeigt, wer am meisten spielt.",
+    "treasury": "Fame der Gilde",
+    "treasury_hint": "Mitglieder zahlen Fame im Tab Upgrades ein.",
+    "room_level": "Raumstufe {{level}} von {{max}}",
+    "gear_cap": "Ausrüstung bis Stufe {{cap}} · {{built}} von {{total}} Stufen gebaut",
+    "move_to": "Umziehen: {{room}}",
+    "maxed": "Voll ausgebaut",
+    "needs_room": "Braucht zuerst: {{room}}",
+    "short": "Der Gilde fehlen {{count}} Fame",
+    "not_built": "Noch nicht gebaut",
+    "build": "Bauen: {{name}}",
+    "upgrade_to": "Ausbauen: {{name}}",
+    "level_of": "Stufe {{level}} von {{max}}",
+    "empty_spot": "{{name}} · freier Platz",
+    "week_so_far": "Diese Woche",
+    "week_note": "Ab Montag gezählt, jede Woche neu.",
+    "unlocks_at": "{{title}} · Stufe {{level}}",
+    "nobody_yet": "Noch niemand",
+    "bought": "Fertig: {{name}}",
+    "moved": "Umgezogen: {{room}}",
+    "failed": "Das konnte nicht gekauft werden",
+    "loading": "Studio wird geöffnet…",
+    "load_failed": "Das Studio ließ sich nicht öffnen. Versuch es gleich noch einmal.",
+    "awards": {
+      "hours": "Meiste Stunden",
+      "sessions": "Meiste Sessions",
+      "streak": "Längste Serie",
+      "points": "Meiste Punkte"
+    },
+    "values": {
+      "hours": "{{value}} Std.",
+      "sessions": "{{value}}",
+      "streak": "{{value}} T.",
+      "points": "{{value}}"
+    },
+    "rooms": {
+      "r1": "Garage",
+      "r2": "Proberaum",
+      "r3": "Projektstudio",
+      "r4": "Profistudio"
+    },
+    "items": {
+      "board": {
+        "name": "Wochenbrett",
+        "l1": "Korkbrett",
+        "l2": "Brett mit Ablage",
+        "l3": "Brett mit Lichterkette",
+        "l4": "Vitrinenbrett"
+      },
+      "amp": {
+        "name": "Verstärker",
+        "l1": "Übungscombo",
+        "l2": "Röhrencombo",
+        "l3": "Halfstack",
+        "l4": "Fullstack"
+      },
+      "drums": {
+        "name": "Schlagzeug",
+        "l1": "Übungspad",
+        "l2": "Gebrauchtes Set",
+        "l3": "Komplettes Set",
+        "l4": "Studio-Set"
+      },
+      "mic": {
+        "name": "Mikrofon",
+        "l1": "Dynamisches Mikro",
+        "l2": "Galgenstativ",
+        "l3": "Kondensatormikro",
+        "l4": "Vintage-Röhrenmikro"
+      },
+      "monitors": {
+        "name": "Monitore",
+        "l1": "Schreibtischlautsprecher",
+        "l2": "Nahfeldmonitore",
+        "l3": "Monitore auf Ständern",
+        "l4": "Hauptmonitore"
+      },
+      "panels": {
+        "name": "Akustikpaneele",
+        "l1": "Schaumstoffquadrate",
+        "l2": "Schaumstoffkeile",
+        "l3": "Stoffpaneele",
+        "l4": "Optimierter Raum"
+      },
+      "walls": {
+        "name": "Wände",
+        "l1": "Konzertposter",
+        "l2": "Gerahmte Platten",
+        "l3": "Bilderwand",
+        "l4": "Ruhmeswand"
+      },
+      "sofa": {
+        "name": "Sofa",
+        "l1": "Campingstuhl",
+        "l2": "Altes Sofa",
+        "l3": "Ledercouch",
+        "l4": "Lounge-Ecke"
+      },
+      "desk": {
+        "name": "Mischpult",
+        "l1": "Laptop",
+        "l2": "Audio-Interface",
+        "l3": "Kleines Pult",
+        "l4": "Großes Pult"
+      },
+      "tape": {
+        "name": "Bandmaschine",
+        "l1": "Kassettendeck",
+        "l2": "4-Spur-Recorder",
+        "l3": "Tonbandgerät",
+        "l4": "2-Zoll-Bandmaschine"
+      },
+      "bench": {
+        "name": "Werkbank",
+        "l1": "Werkzeugkiste",
+        "l2": "Werkbank",
+        "l3": "Werkbank mit Schraubstock",
+        "l4": "Komplette Gitarrenbauwerkstatt"
+      }
     }
   }
 }
