@@ -216,10 +216,10 @@ export const STUDIO_ROOM_LEVELS = [
  * Guild Fame to take a piece of gear from level `i` to `i + 1` (index 0 builds
  * it). The same for every piece, so the price is the level, not the piece.
  */
-export const STUDIO_ITEM_COSTS = [100, 300, 800, 2000] as const;
+export const STUDIO_ITEM_COSTS = [10_000, 30_000, 80_000, 200_000] as const;
 
 /** Guild Fame to take the room from level `i + 1` to `i + 2`. */
-export const STUDIO_ROOM_COSTS = [1500, 5000, 12000] as const;
+export const STUDIO_ROOM_COSTS = [150_000, 500_000, 1_200_000] as const;
 
 /** What the weekly board ranks; a level-n board pins the first n. */
 export type StudioBoardStat = "hours" | "sessions" | "streak" | "points";

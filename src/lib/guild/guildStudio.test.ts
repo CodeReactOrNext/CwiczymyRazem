@@ -149,20 +149,20 @@ describe("readPurchase", () => {
 
 describe("buyStudioStep", () => {
   it("builds a piece out of the guild's Fame, whoever in the guild asks", async () => {
-    seedGuild({ treasury: { fame: 500 } });
+    seedGuild({ treasury: { fame: 50_000 } });
 
     expect(
       await buyStudioStep(session("bob"), { kind: "item", id: "amp" }),
     ).toEqual({ ok: true, paid: STUDIO_ITEM_COSTS[0], level: 1 });
     expect(guild().studio).toEqual({ roomLevel: 1, items: { amp: 1 } });
-    expect(guild().treasury.fame).toBe(500 - STUDIO_ITEM_COSTS[0]);
+    expect(guild().treasury.fame).toBe(50_000 - STUDIO_ITEM_COSTS[0]);
     expect(guild().treasury.spent).toBe(STUDIO_ITEM_COSTS[0]);
   });
 
   it("leaves the deposits the quests count alone", async () => {
-    seedGuild({ treasury: { fame: 500, deposits: { ann: 500 } } });
+    seedGuild({ treasury: { fame: 50_000, deposits: { ann: 50_000 } } });
     await buyStudioStep(session("ann"), { kind: "item", id: "amp" });
-    expect(guild().treasury.deposits).toEqual({ ann: 500 });
+    expect(guild().treasury.deposits).toEqual({ ann: 50_000 });
   });
 
   it("moves the room up a level", async () => {
@@ -186,17 +186,17 @@ describe("buyStudioStep", () => {
 
   it("refuses a step the room does not allow yet", async () => {
     seedGuild({
-      treasury: { fame: 10_000 },
+      treasury: { fame: 10_000_000 },
       studio: { roomLevel: 1, items: { amp: 1 } },
     });
     expect(
       await buyStudioStep(session("ann"), { kind: "item", id: "amp" }),
     ).toMatchObject({ ok: false, status: 409 });
-    expect(guild().treasury.fame).toBe(10_000);
+    expect(guild().treasury.fame).toBe(10_000_000);
   });
 
   it("refuses somebody who is not in a guild", async () => {
-    seedGuild({ treasury: { fame: 500 } });
+    seedGuild({ treasury: { fame: 50_000 } });
     store.set("users/nomad", { displayName: "nomad" });
     expect(
       await buyStudioStep(session("nomad"), { kind: "room" }),

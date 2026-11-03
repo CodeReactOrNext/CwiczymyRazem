@@ -56,7 +56,7 @@ const WEEK: WeeklyMemberStats<GuildMember>[] = (
 }));
 
 const FIXTURES: Record<string, { studio: GuildStudio; bank: number }> = {
-  fresh: { studio: EMPTY_STUDIO, bank: 600 },
+  fresh: { studio: EMPTY_STUDIO, bank: 60_000 },
   mid: {
     studio: {
       roomLevel: 2,
@@ -71,7 +71,7 @@ const FIXTURES: Record<string, { studio: GuildStudio; bank: number }> = {
         panels: 1,
       },
     },
-    bank: 2400,
+    bank: 240_000,
   },
   full: {
     studio: {

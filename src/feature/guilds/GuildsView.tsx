@@ -5,6 +5,12 @@ import {
   TabsTrigger,
 } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
+import {
+  tabNavFadeClass,
+  tabNavListClass,
+  tabNavTriggerClass,
+} from "components/PageTabs/tabNav";
+import { useRailEdges } from "components/PageTabs/useRailEdges";
 import Chat from "feature/chat/Chat";
 import { guildChatPath } from "feature/chat/services/chatService";
 import { GuildBanner } from "feature/guilds/components/GuildBanner";
@@ -78,9 +84,6 @@ const TABS: {
  * white pill on a dark strip. Two top-level tab bars that disagree read as two
  * different apps.
  */
-const tabTriggerClass =
-  "shrink-0 gap-2 rounded-lg px-3 py-2 text-sm font-bold text-zinc-400 transition-colors hover:text-zinc-200 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 data-[state=active]:shadow-none data-[state=active]:hover:bg-zinc-200 sm:px-4";
-
 /** Shown on the tabs that only mean anything from inside a guild. */
 const NeedsAGuild = ({
   what,
@@ -183,6 +186,7 @@ const NoGuildHeader = ({ isLoading }: { isLoading: boolean }) => {
 export const GuildsView = () => {
   const { t } = useTranslation("guilds");
   const [tab, setTab] = useState<GuildTab>("browse");
+  const { ref: railRef, edges } = useRailEdges<HTMLDivElement>();
   const { data, isLoading } = useGuilds(true);
 
   const myGuild = data?.guilds.find((guild) => guild.id === data.myGuildId);
@@ -209,7 +213,9 @@ export const GuildsView = () => {
         value={active}
         onValueChange={(next) => setTab(next as GuildTab)}
         className='space-y-8'>
-        <TabsList className='no-scrollbar h-auto w-full max-w-full justify-start gap-1 overflow-x-auto rounded-lg bg-zinc-900/60 p-1'>
+        <TabsList
+          ref={railRef}
+          className={cn(tabNavListClass, tabNavFadeClass(edges))}>
           {tabs.map(({ id, label, icon: Icon, needsGuild }) => {
             const locked = needsGuild && !myGuild;
 
@@ -218,7 +224,7 @@ export const GuildsView = () => {
                 key={id}
                 value={id}
                 title={locked ? t("tab_locked", { label: t(label) }) : t(label)}
-                className={cn(tabTriggerClass, locked && "text-zinc-500")}>
+                className={cn(tabNavTriggerClass, locked && "text-zinc-500")}>
                 {locked ? <Lock size={14} /> : <Icon size={16} />}
                 {/* On a phone only the open tab carries its label, so all six
                     stay on one strip; from sm up every one is named. */}

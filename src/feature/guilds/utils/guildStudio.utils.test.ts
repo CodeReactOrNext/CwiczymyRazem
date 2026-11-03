@@ -45,9 +45,9 @@ describe("guild studio catalog", () => {
 
 describe("item upgrades", () => {
   it("builds a piece and takes the price from the bank", () => {
-    const result = upgradeItem(EMPTY_STUDIO, "amp", 500);
+    const result = upgradeItem(EMPTY_STUDIO, "amp", 50_000);
     expect(result?.studio.items.amp).toBe(1);
-    expect(result?.bank).toBe(500 - STUDIO_ITEM_COSTS[0]);
+    expect(result?.bank).toBe(50_000 - STUDIO_ITEM_COSTS[0]);
   });
 
   it("refuses when the bank is short and says by how much", () => {
@@ -87,7 +87,7 @@ describe("item upgrades", () => {
 
 describe("room upgrades", () => {
   it("climbs to the last room and no further", () => {
-    let state = { studio: EMPTY_STUDIO, bank: 1e6 };
+    let state = { studio: EMPTY_STUDIO, bank: 1e8 };
     for (let i = 1; i < STUDIO_ROOM_LEVELS.length; i++) {
       const next = upgradeRoom(state.studio, state.bank);
       expect(next).not.toBeNull();
