@@ -20,7 +20,7 @@ export const stringRepetitionExercise: Exercise = {
   whyItMatters: "This exercise trains clean string switching while keeping a steady rhythm. It helps improve picking accuracy and control between strings.",
   metronomeSpeed: {
     min: 40,
-    max: 140,
+    max: 180,
     recommended: 60
   },
   relatedSkills: ["rhythm"],
