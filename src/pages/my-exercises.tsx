@@ -1,11 +1,15 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
 import { LibrarySortSelect } from "components/LibrarySortSelect/LibrarySortSelect";
+import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LIBRARY_TABS } from "constants/navTabs";
-import { deleteCommunityExercise, getUserCommunityExercises, setCommunityExerciseVisibility } from "feature/communityExercises/services/communityExerciseService";
+import { userCommunityExercisesQuery } from "feature/communityExercises/hooks/communityExerciseQueries";
+import { deleteCommunityExercise, setCommunityExerciseVisibility } from "feature/communityExercises/services/communityExerciseService";
 import type { CommunityExercise } from "feature/communityExercises/types";
 import { isReadyToPublish } from "feature/communityExercises/utils/isReadyToPublish";
 import { clearTabEditorDraft, saveTabEditorDraft } from "feature/exercisePlan/utils/tabEditorDraft";
@@ -18,7 +22,7 @@ import AppLayout from "layouts/AppLayout";
 import { FileText, Globe, Lock, Music2, Pencil, Play, Plus, Star, Trash2 } from "lucide-react";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
@@ -76,12 +80,21 @@ const buildChallenge = (ex: CommunityExercise): DashboardExercise => ({
   tablature: ex.tablature,
 });
 
+const NO_EXERCISES: CommunityExercise[] = [];
+
 const MyExercisesPage: NextPageWithLayout = () => {
   const router = useRouter();
   const { t } = useTranslation("library");
   const userAuth = useAppSelector(selectUserAuth);
-  const [exercises, setExercises] = useState<CommunityExercise[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const exercisesQuery = userCommunityExercisesQuery(userAuth ?? "");
+  const { data: exercises = NO_EXERCISES, isPending: isLoading } = useQuery({
+    ...exercisesQuery,
+    enabled: !!userAuth,
+  });
+  // Edits made here go straight into the cached list.
+  const setExercises = (update: (prev: CommunityExercise[]) => CommunityExercise[]) =>
+    queryClient.setQueryData(exercisesQuery.queryKey, (prev) => update(prev ?? []));
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [activeExercise, setActiveExercise] = useState<DashboardExercise | null>(null);
@@ -90,14 +103,6 @@ const MyExercisesPage: NextPageWithLayout = () => {
     title: ex.title ?? "",
     createdAtMs: ex.createdAt?.toMillis?.() ?? null,
   }));
-
-  useEffect(() => {
-    if (!userAuth) return;
-    getUserCommunityExercises(userAuth).then(data => {
-      setExercises(data);
-      setIsLoading(false);
-    });
-  }, [userAuth]);
 
   const handleCreate = () => {
     clearTabEditorDraft();
@@ -199,185 +204,189 @@ const MyExercisesPage: NextPageWithLayout = () => {
       </div>
 
       <div className="px-4 lg:px-6 pb-24">
-        {isLoading ? (
-          <div className="space-y-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-20 bg-zinc-900/40 rounded-lg animate-pulse" />
-            ))}
-          </div>
-        ) : exercises.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-6 text-center">
-            <div className="w-16 h-16 rounded-lg bg-zinc-900/60 flex items-center justify-center">
-              <Music2 className="text-zinc-500" size={28} />
+        <LoadingSwap
+          isLoading={isLoading}
+          skeleton={
+            <div className="space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} variant="block" className="h-20" />
+              ))}
             </div>
-            <div className="space-y-2">
-              <p className="text-zinc-100 font-semibold">{t("my_exercises.empty_title")}</p>
-              <p className="text-zinc-400 text-sm max-w-sm">
-                {t("my_exercises.empty_body")}
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <Button onClick={handleCreate} size="lg" className="px-5">
-                <Music2 className="mr-2" />
-                {t("my_exercises.with_tab")}
-              </Button>
-              <Button
-                variant="subtle"
-                size="lg"
-                onClick={handleCreateWithoutTab}
-                className="px-5"
-              >
-                <FileText className="mr-2" />
-                {t("my_exercises.instructions_only")}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {exercises.length > 1 && (
-              <div className="mb-6 flex justify-end">
-                <LibrarySortSelect value={sort} onChange={setSort} />
+          }>
+          {exercises.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 gap-6 text-center">
+              <div className="w-16 h-16 rounded-lg bg-zinc-900/60 flex items-center justify-center">
+                <Music2 className="text-zinc-500" size={28} />
               </div>
-            )}
-            {sortedExercises.map(ex => (
-              <div
-                key={ex.id}
-                className="flex items-center gap-4 bg-zinc-900/40 hover:bg-zinc-900/60 rounded-lg px-5 py-4 transition-background"
-              >
-                {/* Title + meta */}
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold text-zinc-100 truncate">{ex.title}</p>
-                    {ex.isPublic ? (
-                      <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
-                        <Globe size={9} />
-                        {t("my_exercises.public")}
-                      </span>
-                    ) : (
-                      <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border border-cyan-500/30 bg-cyan-500/10 text-cyan-400">
-                        <Lock size={9} />
-                        {t("my_exercises.private")}
-                      </span>
-                    )}
-                  </div>
-                  {ex.description && (
-                    <p className="text-xs text-zinc-500 truncate">{ex.description}</p>
-                  )}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider border", CATEGORY_COLORS[ex.category] ?? CATEGORY_COLORS.mixed)}>
-                      {t(`common:categories.${ex.category}`, ex.category)}
-                    </span>
-                    <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider border", DIFFICULTY_COLORS[ex.difficulty])}>
-                      {t(`common:difficulty.${ex.difficulty}`, ex.difficulty)}
-                    </span>
-                    {ex.metronomeSpeed && (
-                      <span className="text-[10px] text-zinc-500 font-mono">
-                        {ex.metronomeSpeed.min}–{ex.metronomeSpeed.max} BPM
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Rating */}
-                <div className="flex flex-col items-end gap-0.5 shrink-0">
-                  {ex.isPublic && ex.ratingCount > 0 ? (
-                    <>
-                      <div className="flex items-center gap-1">
-                        <Star size={12} className="text-amber-400" fill="currentColor" />
-                        <span className="text-sm font-bold text-zinc-200">{ex.averageRating.toFixed(1)}</span>
-                      </div>
-                      <span className="text-[10px] text-zinc-500">{t("my_exercises.ratings", { count: ex.ratingCount })}</span>
-                    </>
-                  ) : ex.isPublic ? (
-                    <span className="text-[10px] text-zinc-500">{t("my_exercises.no_ratings")}</span>
-                  ) : null}
-                </div>
-
-                {/* Play */}
+              <div className="space-y-2">
+                <p className="text-zinc-100 font-semibold">{t("my_exercises.empty_title")}</p>
+                <p className="text-zinc-400 text-sm max-w-sm">
+                  {t("my_exercises.empty_body")}
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <Button onClick={handleCreate} size="lg" className="px-5">
+                  <Music2 className="mr-2" />
+                  {t("my_exercises.with_tab")}
+                </Button>
                 <Button
                   variant="subtle"
-                  size="sm"
-                  onClick={() => setActiveExercise(buildChallenge(ex))}
-                  className="shrink-0"
+                  size="lg"
+                  onClick={handleCreateWithoutTab}
+                  className="px-5"
                 >
-                  <Play fill="currentColor" className="mr-1.5" />
-                  {t("my_exercises.practice")}
+                  <FileText className="mr-2" />
+                  {t("my_exercises.instructions_only")}
                 </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {exercises.length > 1 && (
+                <div className="mb-6 flex justify-end">
+                  <LibrarySortSelect value={sort} onChange={setSort} />
+                </div>
+              )}
+              {sortedExercises.map(ex => (
+                <div
+                  key={ex.id}
+                  className="flex items-center gap-4 bg-zinc-900/40 hover:bg-zinc-900/60 rounded-lg px-5 py-4 transition-background"
+                >
+                  {/* Title + meta */}
+                  <div className="flex-1 min-w-0 space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-zinc-100 truncate">{ex.title}</p>
+                      {ex.isPublic ? (
+                        <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+                          <Globe size={9} />
+                          {t("my_exercises.public")}
+                        </span>
+                      ) : (
+                        <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border border-cyan-500/30 bg-cyan-500/10 text-cyan-400">
+                          <Lock size={9} />
+                          {t("my_exercises.private")}
+                        </span>
+                      )}
+                    </div>
+                    {ex.description && (
+                      <p className="text-xs text-zinc-500 truncate">{ex.description}</p>
+                    )}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider border", CATEGORY_COLORS[ex.category] ?? CATEGORY_COLORS.mixed)}>
+                        {t(`common:categories.${ex.category}`, ex.category)}
+                      </span>
+                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider border", DIFFICULTY_COLORS[ex.difficulty])}>
+                        {t(`common:difficulty.${ex.difficulty}`, ex.difficulty)}
+                      </span>
+                      {ex.metronomeSpeed && (
+                        <span className="text-[10px] text-zinc-500 font-mono">
+                          {ex.metronomeSpeed.min}–{ex.metronomeSpeed.max} BPM
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-                {/* View in community — only for public */}
-                {ex.isPublic && (
+                  {/* Rating */}
+                  <div className="flex flex-col items-end gap-0.5 shrink-0">
+                    {ex.isPublic && ex.ratingCount > 0 ? (
+                      <>
+                        <div className="flex items-center gap-1">
+                          <Star size={12} className="text-amber-400" fill="currentColor" />
+                          <span className="text-sm font-bold text-zinc-200">{ex.averageRating.toFixed(1)}</span>
+                        </div>
+                        <span className="text-[10px] text-zinc-500">{t("my_exercises.ratings", { count: ex.ratingCount })}</span>
+                      </>
+                    ) : ex.isPublic ? (
+                      <span className="text-[10px] text-zinc-500">{t("my_exercises.no_ratings")}</span>
+                    ) : null}
+                  </div>
+
+                  {/* Play */}
                   <Button
                     variant="subtle"
                     size="sm"
-                    onClick={() => router.push("/profile/skills?tab=community")}
+                    onClick={() => setActiveExercise(buildChallenge(ex))}
                     className="shrink-0"
                   >
-                    {t("my_exercises.view")}
+                    <Play fill="currentColor" className="mr-1.5" />
+                    {t("my_exercises.practice")}
                   </Button>
-                )}
 
-                {/* Visibility */}
-                {ex.isPublic ? (
+                  {/* View in community — only for public */}
+                  {ex.isPublic && (
+                    <Button
+                      variant="subtle"
+                      size="sm"
+                      onClick={() => router.push("/profile/skills?tab=community")}
+                      className="shrink-0"
+                    >
+                      {t("my_exercises.view")}
+                    </Button>
+                  )}
+
+                  {/* Visibility */}
+                  {ex.isPublic ? (
+                    <Button
+                      variant="subtle"
+                      size="icon"
+                      onClick={() => handleToggleVisibility(ex)}
+                      disabled={togglingId === ex.id}
+                      className="h-8 w-8 shrink-0 hover:text-cyan-400"
+                      title={t("my_exercises.make_private")}
+                      aria-label={t("my_exercises.make_private")}
+                    >
+                      <Lock />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="subtle"
+                      size="sm"
+                      onClick={() => handleToggleVisibility(ex)}
+                      disabled={togglingId === ex.id}
+                      className="shrink-0 hover:text-emerald-400"
+                    >
+                      <Globe className="mr-1.5" />
+                      {t("my_exercises.make_public")}
+                    </Button>
+                  )}
+
+                  {/* Edit */}
                   <Button
                     variant="subtle"
                     size="icon"
-                    onClick={() => handleToggleVisibility(ex)}
-                    disabled={togglingId === ex.id}
+                    onClick={() => handleEdit(ex)}
                     className="h-8 w-8 shrink-0 hover:text-cyan-400"
-                    title={t("my_exercises.make_private")}
-                    aria-label={t("my_exercises.make_private")}
+                    title={t("my_exercises.edit")}
+                    aria-label={t("my_exercises.edit")}
                   >
-                    <Lock />
+                    <Pencil />
                   </Button>
-                ) : (
+
+                  {/* Delete */}
                   <Button
                     variant="subtle"
-                    size="sm"
-                    onClick={() => handleToggleVisibility(ex)}
-                    disabled={togglingId === ex.id}
-                    className="shrink-0 hover:text-emerald-400"
+                    size="icon"
+                    onClick={() => handleDelete(ex.id)}
+                    disabled={deletingId === ex.id}
+                    className="h-8 w-8 shrink-0 hover:text-rose-400"
+                    title={t("my_exercises.delete")}
+                    aria-label={t("my_exercises.delete")}
                   >
-                    <Globe className="mr-1.5" />
-                    {t("my_exercises.make_public")}
+                    <Trash2 />
                   </Button>
-                )}
+                </div>
+              ))}
 
-                {/* Edit */}
-                <Button
-                  variant="subtle"
-                  size="icon"
-                  onClick={() => handleEdit(ex)}
-                  className="h-8 w-8 shrink-0 hover:text-cyan-400"
-                  title={t("my_exercises.edit")}
-                  aria-label={t("my_exercises.edit")}
-                >
-                  <Pencil />
-                </Button>
-
-                {/* Delete */}
-                <Button
-                  variant="subtle"
-                  size="icon"
-                  onClick={() => handleDelete(ex.id)}
-                  disabled={deletingId === ex.id}
-                  className="h-8 w-8 shrink-0 hover:text-rose-400"
-                  title={t("my_exercises.delete")}
-                  aria-label={t("my_exercises.delete")}
-                >
-                  <Trash2 />
-                </Button>
-              </div>
-            ))}
-
-            <button
-              onClick={handleCreate}
-              className="w-full mt-4 py-4 bg-zinc-900/40 hover:bg-zinc-900/60 rounded-lg flex items-center justify-center gap-2 text-zinc-500 hover:text-cyan-400 text-sm font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <Plus size={16} />
-              {t("my_exercises.create_another")}
-            </button>
-          </div>
-        )}
+              <button
+                onClick={handleCreate}
+                className="w-full mt-4 py-4 bg-zinc-900/40 hover:bg-zinc-900/60 rounded-lg flex items-center justify-center gap-2 text-zinc-500 hover:text-cyan-400 text-sm font-semibold transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <Plus size={16} />
+                {t("my_exercises.create_another")}
+              </button>
+            </div>
+          )}
+        </LoadingSwap>
       </div>
     </div>
   );

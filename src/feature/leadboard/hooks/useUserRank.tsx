@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
-import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
+import { selectConfirmedUserAuth, selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { doc, getDoc } from "firebase/firestore";
 import { useAppSelector } from "store/hooks";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -55,7 +55,11 @@ export const useUserRank = (
 
   const scoreToQuery =
     view === "seasonal" ? seasonalPoints : view === "gear" ? gearLevel : globalPoints;
+  // Counting other players' docs needs Firebase signed in, not just the
+  // profile restored from the last visit.
+  const isAuthConfirmed = !!useAppSelector(selectConfirmedUserAuth);
   const canQueryRank =
+    isAuthConfirmed &&
     !!userAuth &&
     scoreToQuery !== null &&
     scoreToQuery !== undefined &&

@@ -1,8 +1,11 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { PRESSABLE } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { communityExercisesQuery } from "feature/communityExercises/hooks/communityExerciseQueries";
 import {
-  getCommunityExercises,
   getUserRatingForExercise,
   getUserThanksForExercise,
   incrementExercisePlayCount,
@@ -646,6 +649,8 @@ const ExerciseCard = ({
   </div>
 );
 
+const NO_EXERCISES: CommunityExercise[] = [];
+
 interface CommunityExercisesTabProps {
   onStartExercise: (challenge: DashboardExercise) => void;
 }
@@ -655,8 +660,17 @@ export const CommunityExercisesTab = ({
 }: CommunityExercisesTabProps) => {
   const { t } = useTranslation(["community", "exercises"]);
   const userAuth = useAppSelector(selectUserAuth);
-  const [exercises, setExercises] = useState<CommunityExercise[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: exercises = NO_EXERCISES, isPending: isLoading } = useQuery(
+    communityExercisesQuery(),
+  );
+  // Local bumps (a rating, a thanks, a play) go into the cached list.
+  const setExercises = (
+    update: (prev: CommunityExercise[]) => CommunityExercise[],
+  ) =>
+    queryClient.setQueryData(communityExercisesQuery().queryKey, (prev) =>
+      update(prev ?? []),
+    );
   const [userRatings, setUserRatings] = useState<Record<string, number | null>>(
     {},
   );
@@ -676,20 +690,17 @@ export const CommunityExercisesTab = ({
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    getCommunityExercises().then((data) => {
-      setExercises(data);
-      setIsLoading(false);
-    });
-  }, []);
+  // Keyed by the ids, not the list: a rating or a play count bumped in the list
+  // (or the list re-read in the background) must not read every rating again.
+  const exerciseIdsKey = exercises.map((ex) => ex.id).join(",");
 
   useEffect(() => {
-    if (!userAuth || exercises.length === 0) return;
+    if (!userAuth || !exerciseIdsKey) return;
     const fetchRatings = async () => {
       const pairs = await Promise.all(
-        exercises.map(async (ex) => ({
-          id: ex.id,
-          rating: await getUserRatingForExercise(ex.id, userAuth),
+        exerciseIdsKey.split(",").map(async (id) => ({
+          id,
+          rating: await getUserRatingForExercise(id, userAuth),
         })),
       );
       const map: Record<string, number | null> = {};
@@ -699,15 +710,15 @@ export const CommunityExercisesTab = ({
       setUserRatings(map);
     };
     fetchRatings();
-  }, [userAuth, exercises]);
+  }, [userAuth, exerciseIdsKey]);
 
   useEffect(() => {
-    if (!userAuth || exercises.length === 0) return;
+    if (!userAuth || !exerciseIdsKey) return;
     const fetchThanks = async () => {
       const pairs = await Promise.all(
-        exercises.map(async (ex) => ({
-          id: ex.id,
-          thanked: await getUserThanksForExercise(ex.id, userAuth),
+        exerciseIdsKey.split(",").map(async (id) => ({
+          id,
+          thanked: await getUserThanksForExercise(id, userAuth),
         })),
       );
       const map: Record<string, boolean> = {};
@@ -717,7 +728,7 @@ export const CommunityExercisesTab = ({
       setUserThanks(map);
     };
     fetchThanks();
-  }, [userAuth, exercises]);
+  }, [userAuth, exerciseIdsKey]);
 
   const filteredExercises = useMemo(() => {
     const q = searchQuery.toLowerCase();
@@ -919,70 +930,75 @@ export const CommunityExercisesTab = ({
 
       {/* List */}
       <div className='flex flex-col gap-3'>
-        <p className='text-xs text-zinc-500'>
-          {t(filteredExercises.length === 1 ? "count_one" : "count", { count: filteredExercises.length })} · {t("sorted_by_rating")}
-          {totalPages > 1 && (
-            <span className='ml-1'>
-              — {t("page_of", { page: safePage, total: totalPages })}
-            </span>
-          )}
-        </p>
-
         {isLoading ? (
-          <div className='flex flex-col gap-3'>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className='h-16 animate-pulse rounded-lg bg-zinc-900/40'
-              />
-            ))}
-          </div>
-        ) : pageExercises.length === 0 ? (
-          <div className='rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 py-12 text-center text-sm text-zinc-500'>
-            {exercises.length === 0
-              ? t("empty")
-              : t("no_match")}
-          </div>
+          <Skeleton className='h-4 w-48' />
         ) : (
-          <>
-            {/* Desktop table */}
-            <div className='hidden overflow-x-auto xl:block'>
-              <table className='w-full table-fixed border-separate border-spacing-y-3 text-sm'>
-                <thead>
-                  <tr>
-                    {/* The title column takes whatever the fixed ones leave, so
-                        the Start column never gets pushed past the edge. */}
-                    <th className='px-4 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      {t("col_exercise")}
-                    </th>
-                    <th className='w-24 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      {t("difficulty")}
-                    </th>
-                    <th className='w-16 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      {t("col_min")}
-                    </th>
-                    <th className='w-28 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
-                      {t("col_rating")}
-                    </th>
-                    <th className='w-28 px-3 pb-2'></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pageExercises.map((ex, idx) => (
-                    <ExerciseRow key={ex.id} {...rowProps(ex, idx)} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <p className='text-xs text-zinc-500'>
+            {t(filteredExercises.length === 1 ? "count_one" : "count", { count: filteredExercises.length })} · {t("sorted_by_rating")}
+            {totalPages > 1 && (
+              <span className='ml-1'>
+                — {t("page_of", { page: safePage, total: totalPages })}
+              </span>
+            )}
+          </p>
+        )}
 
-            {/* Mobile cards */}
-            <div className='flex flex-col gap-3 xl:hidden'>
-              {pageExercises.map((ex, idx) => (
-                <ExerciseCard key={ex.id} {...rowProps(ex, idx)} />
+        <LoadingSwap
+          isLoading={isLoading}
+          skeleton={
+            <div className='flex flex-col gap-3'>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} variant='block' className='h-16' />
               ))}
             </div>
-          </>
-        )}
+          }>
+          {pageExercises.length === 0 ? (
+            <div className='rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 py-12 text-center text-sm text-zinc-500'>
+              {exercises.length === 0
+                ? t("empty")
+                : t("no_match")}
+            </div>
+          ) : (
+            <>
+              {/* Desktop table */}
+              <div className='hidden overflow-x-auto xl:block'>
+                <table className='w-full table-fixed border-separate border-spacing-y-3 text-sm'>
+                  <thead>
+                    <tr>
+                      {/* The title column takes whatever the fixed ones leave, so
+                          the Start column never gets pushed past the edge. */}
+                      <th className='px-4 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                        {t("col_exercise")}
+                      </th>
+                      <th className='w-24 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                        {t("difficulty")}
+                      </th>
+                      <th className='w-16 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                        {t("col_min")}
+                      </th>
+                      <th className='w-28 px-3 pb-2 text-left text-[11px] font-bold tracking-wider text-zinc-500'>
+                        {t("col_rating")}
+                      </th>
+                      <th className='w-28 px-3 pb-2'></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pageExercises.map((ex, idx) => (
+                      <ExerciseRow key={ex.id} {...rowProps(ex, idx)} />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile cards */}
+              <div className='flex flex-col gap-3 xl:hidden'>
+                {pageExercises.map((ex, idx) => (
+                  <ExerciseCard key={ex.id} {...rowProps(ex, idx)} />
+                ))}
+              </div>
+            </>
+          )}
+        </LoadingSwap>
 
         {/* Pagination */}
         {totalPages > 1 && (

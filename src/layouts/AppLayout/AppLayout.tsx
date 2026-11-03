@@ -2,6 +2,7 @@
 import "lib/i18n/fullCatalog";
 
 import { selectAutoLogInFailed, selectCurrentUserStats, selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
+import { useIsCompactViewport } from "hooks/useMediaQuery";
 import { usePresence } from "hooks/usePresence";
 import { AppShellSkeleton } from "layouts/AppLayout/AppShellSkeleton";
 import MainLoggedLayout from "layouts/MainLoggedLayout/MainLoggedLayout";
@@ -9,15 +10,25 @@ import { loadSentryReplay } from "lib/sentry/loadSentryReplay";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
+import type { ParsedUrlQuery } from "querystring";
 import React, { useEffect } from "react";
 import { useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
+
+type LayoutVariant = "primary" | "secondary" | "landing" | "fullscreen";
 
 interface AppLayoutProps {
   children: React.ReactNode;
   pageId: NavPagesTypes;
   subtitle?: string; // Kept for compatibility, unused
-  variant?: "primary" | "secondary" | "landing" | "fullscreen";
+  /**
+   * A function for a page whose variant follows the URL or the viewport (the
+   * skill map is full-screen, its list tabs are not). Resolved here rather than
+   * in a wrapper around AppLayout: every page's getLayout must return AppLayout
+   * itself, or React sees a different element and remounts the whole shell —
+   * sidebar, header, drawer — on the way in and out of that page.
+   */
+  variant?: LayoutVariant | ((route: { query: ParsedUrlQuery; isCompact: boolean }) => LayoutVariant);
   wide?: boolean;
   isPublic?: boolean;
 }
@@ -32,6 +43,9 @@ const AppLayout = ({
   usePresence();
   const { status } = useSession();
   const router = useRouter();
+  const isCompact = useIsCompactViewport();
+  const resolvedVariant =
+    typeof variant === "function" ? variant({ query: router.query, isCompact }) : variant;
 
   const userAuth = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
@@ -86,7 +100,7 @@ const AppLayout = ({
   return (
     <MainLoggedLayout
       pageId={pageId}
-      variant={variant}
+      variant={resolvedVariant}
       wide={wide}
       userStats={userStats}
       userName={userName ?? ""}

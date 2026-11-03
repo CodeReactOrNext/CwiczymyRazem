@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { LeadboardLayout } from "feature/leadboard/components/LeadboardLayout";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import type { LeaderboardViewType } from "./hooks/useLeaderboard";
@@ -68,10 +67,8 @@ export const LeadboardView = ({
     staleTime: 5 * 60 * 1000,
   });
 
-  if (!usersData.length && !isLoading) {
-    return <PageLoadingLayout />;
-  }
-
+  // No early placeholder: LeadboardLayout draws its own header right away and
+  // a table skeleton in the list, and an empty board gets its empty state.
   return (
     <LeadboardLayout
       usersData={usersData}

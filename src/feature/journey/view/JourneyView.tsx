@@ -1,7 +1,7 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Drawer, DrawerContent } from "assets/components/ui/drawer";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ import type {
   JourneyStepWithStatus,
 } from "../types/journey.types";
 import { JourneyPath } from "./components/JourneyPath";
+import { JourneyPathSkeleton, ModuleSelectionSkeleton } from "./components/JourneySkeletons";
 import { ModuleSelectionScreen } from "./components/ModuleSelectionScreen";
 import { StepSidebar } from "./components/StepSidebar";
 
@@ -76,10 +77,41 @@ const JourneyView: React.FC = () => {
   const userAuth = useAppSelector(selectUserAuth);
   const router = useRouter();
 
-  const [progressDoc, setProgressDoc] = useState<JourneyProgressDocument | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [showModuleSelection, setShowModuleSelection] = useState(true);
-  const [selectedModuleId, setSelectedModuleId] = useState(journeyModules[0].id);
+  const queryClient = useQueryClient();
+  const progressQueryKey = useMemo(() => ["journeyProgress", userAuth], [userAuth]);
+  // Cached, so coming back to Journey shows the path at once. Still re-read on
+  // every visit: steps get finished elsewhere too (an exam in the session player).
+  const {
+    data: progressDoc = null,
+    isPending: loading,
+    isError,
+  } = useQuery({
+    queryKey: progressQueryKey,
+    queryFn: async () =>
+      (await firebaseGetJourneyProgress(userAuth as string)) ??
+      (await firebaseInitJourneyProgress(userAuth as string)),
+    enabled: !!userAuth,
+    refetchOnMount: "always",
+  });
+  // Optimistic edits go straight into the cached document.
+  const setProgressDoc = useCallback(
+    (
+      next:
+        | JourneyProgressDocument
+        | null
+        | ((current: JourneyProgressDocument | null) => JourneyProgressDocument | null)
+    ) =>
+      queryClient.setQueryData<JourneyProgressDocument | null>(progressQueryKey, (current) =>
+        typeof next === "function" ? next(current ?? null) : next
+      ),
+    [queryClient, progressQueryKey]
+  );
+  // Seeded from the URL, not only by the effect below: with the progress cached,
+  // the first render is already the real one and must not flash the module list.
+  const [showModuleSelection, setShowModuleSelection] = useState(() => !router.query.module);
+  const [selectedModuleId, setSelectedModuleId] = useState(() =>
+    typeof router.query.module === "string" ? router.query.module : journeyModules[0].id
+  );
   const [selectedStep, setSelectedStep] = useState<JourneyStepWithStatus | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -96,22 +128,8 @@ const JourneyView: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!userAuth) return;
-    setLoading(true);
-    firebaseGetJourneyProgress(userAuth as string)
-      .then(async (doc) => {
-        if (!doc) {
-          const initial = await firebaseInitJourneyProgress(userAuth as string);
-          setProgressDoc(initial);
-        } else {
-          setProgressDoc(doc);
-        }
-      })
-      .catch(() => {
-        toast.error(t("toast.load_failed"));
-      })
-      .finally(() => setLoading(false));
-  }, [userAuth]);
+    if (isError) toast.error(t("toast.load_failed"));
+  }, [isError, t]);
 
   // Restore module + step from URL query params (runs once after progress loads)
   useEffect(() => {
@@ -206,7 +224,7 @@ const JourneyView: React.FC = () => {
         setIsSaving(false);
       }
     },
-    [userAuth, progressDoc, selectedModuleId, handleCloseModal]
+    [userAuth, progressDoc, selectedModuleId, handleCloseModal, setProgressDoc]
   );
 
   const handleStartStep = useCallback(
@@ -237,11 +255,13 @@ const JourneyView: React.FC = () => {
         // Silent fail — not critical
       }
     },
-    [userAuth, selectedModuleId]
+    [userAuth, selectedModuleId, setProgressDoc]
   );
 
   if (loading) {
-    return <PageLoadingLayout />;
+    // A link straight into a module (back from an exam, a shared step) opens on
+    // the path; everything else on the module list.
+    return router.query.module ? <JourneyPathSkeleton /> : <ModuleSelectionSkeleton />;
   }
 
   if (showModuleSelection) {

@@ -132,11 +132,11 @@ interface SongRowSkeletonProps {
 
 export const SongRowSkeleton = ({ className }: SongRowSkeletonProps) => (
   <div className={cn("flex items-center gap-3 p-2", className)}>
-    <div className="h-14 w-14 shrink-0 animate-pulse rounded-md bg-zinc-800" />
+    <div className="h-14 w-14 shrink-0 animate-pulse rounded-md bg-zinc-800/60" />
     <div className="min-w-0 flex-1 space-y-2">
-      <div className="h-3.5 w-2/3 animate-pulse rounded-[4px] bg-zinc-800" />
-      <div className="h-3 w-1/3 animate-pulse rounded-[4px] bg-zinc-800" />
+      <div className="h-3.5 w-2/3 animate-pulse rounded-[4px] bg-zinc-800/60" />
+      <div className="h-3 w-1/3 animate-pulse rounded-[4px] bg-zinc-800/60" />
     </div>
-    <div className="h-8 w-8 shrink-0 animate-pulse rounded-[4px] bg-zinc-800" />
+    <div className="h-8 w-8 shrink-0 animate-pulse rounded-[4px] bg-zinc-800/60" />
   </div>
 );

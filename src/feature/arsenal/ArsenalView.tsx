@@ -280,7 +280,7 @@ const ArsenalTabs = () => {
               {isLoading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-5 gap-3">
                   {Array.from({ length: 10 }).map((_, i) => (
-                    <Skeleton key={i} className="h-36 rounded-lg bg-zinc-800/50" />
+                    <Skeleton key={i} variant="block" className="h-36" />
                   ))}
                 </div>
               ) : data ? (
@@ -302,7 +302,7 @@ const ArsenalTabs = () => {
                 {isLoading ? (
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                     {Array.from({ length: 10 }).map((_, i) => (
-                      <Skeleton key={i} className="h-56 rounded-lg bg-zinc-800/50" />
+                      <Skeleton key={i} variant="block" className="h-56" />
                     ))}
                   </div>
                 ) : data ? (
@@ -315,7 +315,7 @@ const ArsenalTabs = () => {
               {isLoading ? (
                 <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                   {Array.from({ length: 12 }).map((_, i) => (
-                    <Skeleton key={i} className="h-44 rounded-lg bg-zinc-800/50" />
+                    <Skeleton key={i} variant="block" className="h-44" />
                   ))}
                 </div>
               ) : data ? (
@@ -325,7 +325,7 @@ const ArsenalTabs = () => {
 
             <TabsContent value="builder" className="mt-4">
               {isLoading ? (
-                <Skeleton className="h-[40rem] rounded-lg bg-zinc-800/50" />
+                <Skeleton variant="block" className="h-[40rem]" />
               ) : data ? (
                 <GuitarBuilderTab data={data} fame={fame} />
               ) : null}

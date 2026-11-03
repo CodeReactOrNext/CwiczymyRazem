@@ -1,7 +1,5 @@
 import { LeadboardView } from "feature/leadboard/LeadboardView";
-import useAutoLogIn from "hooks/useAutoLogIn";
 import AppLayout from "layouts/AppLayout";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
 import Head from "next/head";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
@@ -9,12 +7,8 @@ import type { NextPageWithLayout } from "types/page";
 
 
 const LeaderBoardPage: NextPageWithLayout = () => {
-  const { isLoggedIn } = useAutoLogIn({
-    redirects: {
-      loggedOut: "/login",
-    },
-  });
-
+  // AppLayout renders the page only once the player is signed in and redirects
+  // otherwise, so the view needs no gate (or placeholder) of its own.
   const siteUrl = "https://riff.quest/leaderboard";
 
   return (
@@ -22,7 +16,7 @@ const LeaderBoardPage: NextPageWithLayout = () => {
       <Head>
         <link rel='canonical' href={siteUrl} />
       </Head>
-      {isLoggedIn ? <LeadboardView /> : <PageLoadingLayout />}
+      <LeadboardView />
     </div>
   );
 };

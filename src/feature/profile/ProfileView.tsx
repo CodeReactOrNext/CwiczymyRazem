@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getUserStatsField } from "assets/stats/profileStats";
+import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
+import { ProfileSkeleton } from "feature/profile/components/ProfileSkeleton";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { userProfileQuery } from "feature/profile/hooks/userProfileQuery";
 import ProfileLayout from "feature/profile/ProfileLayout";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useEffect } from "react";
@@ -27,16 +28,19 @@ const ProfileView = () => {
     }
   }, [profileId]);
 
-  return userData ? (
-    <ProfileLayout
-      // One mount per profile: the layout state is seeded from the doc.
-      key={profileId}
-      statsField={getUserStatsField(userData?.statistics) as StatsFieldProps[]}
-      userData={userData}
-      userAuth={profileId as string}
-    />
-  ) : (
-    <PageLoadingLayout />
+  return (
+    // Keyed too, so opening another profile fades its content in afresh.
+    <LoadingSwap key={profileId} isLoading={!userData} skeleton={<ProfileSkeleton />}>
+      {() => (
+        <ProfileLayout
+          // One mount per profile: the layout state is seeded from the doc.
+          key={profileId}
+          statsField={getUserStatsField(userData!.statistics) as StatsFieldProps[]}
+          userData={userData!}
+          userAuth={profileId as string}
+        />
+      )}
+    </LoadingSwap>
   );
 };
 

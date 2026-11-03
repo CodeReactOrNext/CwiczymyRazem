@@ -38,7 +38,7 @@ const TABS: { id: ChallengeTab; label: string; icon: typeof Swords }[] = [
 const BoardSkeleton = () => (
   <div className='space-y-2'>
     {Array.from({ length: 5 }, (_, i) => (
-      <div key={i} className='h-14 animate-pulse rounded-lg bg-zinc-900/60' />
+      <div key={i} className='h-14 animate-pulse rounded-lg bg-zinc-900/40' />
     ))}
   </div>
 );

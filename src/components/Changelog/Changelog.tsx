@@ -326,7 +326,7 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
   if (isLoading) {
     return (
       <DashboardSection compact>
-        <div className='h-64 animate-pulse rounded-lg bg-zinc-800/50' />
+        <div className='h-64 animate-pulse rounded-lg bg-zinc-900/40' />
       </DashboardSection>
     );
   }

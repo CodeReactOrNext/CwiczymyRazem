@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
+import { selectConfirmedUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useMemo,useState } from "react";
+import { useAppSelector } from "store/hooks";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 
@@ -42,6 +44,11 @@ export const useLeaderboard = ({
   const [selectedSeason, setSelectedSeason] = useState<string>("");
   const [pageCursors, setPageCursors] = useState<{ [key: number]: any }>({ 1: null });
 
+  // The board reads other players' docs, which needs Firebase signed in. On a
+  // boot from the saved profile the page is already up before that — wait for
+  // it (the list shows its skeleton meanwhile) rather than fail the first read.
+  const isAuthConfirmed = !!useAppSelector(selectConfirmedUserAuth);
+
   // 1. Fetch Seasons
   const { data: seasonsData = { seasons: [], currentSeasonId: "" } } = useQuery({
     queryKey: ["leaderboard", "seasons"],
@@ -64,7 +71,9 @@ export const useLeaderboard = ({
   }, [seasonsData.currentSeasonId]);
 
   // 2. Fetch Leaderboard Data
-  const { data: leaderboardData, isLoading: isLeaderboardLoading } = useQuery({
+  // isPending, not isLoading: the seasonal board waits (disabled) until a season
+  // is picked, and should read as loading meanwhile, not as an empty board.
+  const { data: leaderboardData, isPending: isLeaderboardLoading } = useQuery({
     queryKey: ["leaderboard", view, selectedSeason, initialSortBy, currentPage],
     queryFn: async () => {
       const cursor = pageCursors[currentPage];
@@ -77,7 +86,7 @@ export const useLeaderboard = ({
       }
       return getGlobalLeaderboard(initialSortBy, itemsPerPage, cursor);
     },
-    enabled: view !== "seasonal" || !!selectedSeason,
+    enabled: isAuthConfirmed && (view !== "seasonal" || !!selectedSeason),
   });
 
   // Track next page cursor

@@ -1,18 +1,12 @@
 import { ArsenalView } from "feature/arsenal/ArsenalView";
-import useAutoLogIn from "hooks/useAutoLogIn";
 import AppLayout from "layouts/AppLayout";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
 import Head from "next/head";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 
 const ArsenalPage: NextPageWithLayout = () => {
-  const { isLoggedIn } = useAutoLogIn({
-    redirects: {
-      loggedOut: "/login",
-    },
-  });
-
+  // AppLayout renders the page only once the player is signed in and redirects
+  // otherwise, so the view needs no gate (or placeholder) of its own.
   return (
     <>
       <Head>
@@ -20,7 +14,7 @@ const ArsenalPage: NextPageWithLayout = () => {
         <meta name="description" content="Collect and equip guitars with your Fame Points." />
         <meta name='robots' content='noindex' />
       </Head>
-      {isLoggedIn ? <ArsenalView /> : <PageLoadingLayout />}
+      <ArsenalView />
     </>
   );
 };
