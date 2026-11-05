@@ -19,7 +19,7 @@ const tablature: TablatureMeasure[] = [0, 1, 2].map((shift) => {
     beats: PERMUTATIONS.flatMap((frets) =>
       frets.map((fret, i) => ({
         duration: 0.25,
-        notes: [{ string: strings[i], fret }],
+        notes: [{ string: strings[i], fret, finger: (fret - 9) as 1 | 2 | 3 | 4 }],
       }))
     ),
   };

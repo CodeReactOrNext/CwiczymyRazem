@@ -69,17 +69,18 @@ per server.
 | --- | --- |
 | Progress (read) | `riffquest_get_profile_summary`, `riffquest_get_practice_history`, `riffquest_get_calendar`, `riffquest_get_skill_breakdown`, `riffquest_get_weak_spots`, `riffquest_get_goals`, `riffquest_get_exercise_stats`, `riffquest_get_recent_runs` |
 | Catalog (read) | `riffquest_list_exercise_taxonomy`, `riffquest_list_exercises`, `riffquest_get_exercise`, `riffquest_list_songs`, `riffquest_get_song`, `riffquest_get_daily_exercise`, `riffquest_get_monthly_challenge`, `riffquest_search_wiki` |
-| Plans (write) | `riffquest_list_my_plans`, `riffquest_create_practice_plan`, `riffquest_update_practice_plan`, `riffquest_add_song_to_list`, `riffquest_set_exercise_goal` |
+| Plans (write) | `riffquest_list_my_plans`, `riffquest_create_practice_plan`, `riffquest_update_practice_plan`, `riffquest_add_song_to_list`, `riffquest_set_exercise_goal`, `riffquest_update_exercise_goal` |
+| Practice log (write) | `riffquest_log_practice` |
 | Own exercises | `riffquest_get_tab_format`, `riffquest_validate_tablature`, `riffquest_preview_tab`, `riffquest_get_exercise_tablature`, `riffquest_get_my_exercises`, `riffquest_create_exercise`, `riffquest_update_exercise` |
 
-Prompts: `weekly_review`, `plan_next_session`, `write_exercise`.
+Prompts: `weekly_review`, `plan_next_session`, `log_session`, `write_exercise`.
 Resource: `riffquest://docs/tab-format` (same text as `riffquest_get_tab_format`).
 
 For the Claude connector directory review (enforced in `server.test.ts`): every
 tool has a `title` and all four annotations spelled out (a missing
 `openWorldHint` reads as `true`). Read tools use `READ_TOOL_ANNOTATIONS`, writes
 `WRITE_TOOL_ANNOTATIONS` (`destructiveHint: true`, so Claude asks before each
-call), or `IDEMPOTENT_WRITE_TOOL_ANNOTATIONS` for the four that leave the
+call), or `IDEMPOTENT_WRITE_TOOL_ANNOTATIONS` for the five that leave the
 account as it was when repeated. Tool descriptions and the server instructions
 describe what a tool does and never tell the model how to behave — only the
 prompts, which the player starts, ask for anything. Unexpected errors come back
@@ -99,7 +100,7 @@ How tools answer (`results.ts`, all tested):
 - **Size**: an answer over 25 000 characters is cut from the end and says how to
   get the rest (`fittedResult`) — long histories, long tabs. The tool list
   itself goes into every conversation, so `server.test.ts` holds it to a budget
-  (35 000 characters; 33 600 now): descriptions say what a tool does in a line,
+  (37 000 characters; ~36 700 now — raised from 35 000 for the practice log and goal edit): descriptions say what a tool does in a line,
   limits that apply to every write live once in the server instructions, and
   `outputSchema` isn't repeated (`get_daily_exercise` answers in
   `get_exercise`'s shape without declaring it again).
@@ -125,6 +126,24 @@ How tools answer (`results.ts`, all tested):
 Deliberately left out: anything social (leaderboard, guilds, duels, chat),
 publishing exercises, marking songs learned (awards points), logging practice
 (points must come from real playing), roadmaps and the OpenAI-backed searches.
+
+## Practice log
+
+`riffquest_log_practice` (`tools/practiceLog.ts`) builds the same `inputData`
+the report form sends and files it through `lib/report/submitPracticeReport` —
+the function `/api/user/report` calls too, so points, Fame, streak,
+achievements, skill time, the feed entry and Rotation stamps match a manual
+log. Time comes in three parts that add up: `minutes` by category, `skills`
+(each skill's minutes go to its category and to `skills.timeSpent`, no skill
+points — like the form's "By skill"), and `songs` (playing → technique,
+`listeningMinutes` → hearing; song progress and the move to "learning" are
+written after the report, as the form does).
+
+Differences from the form: quests don't move (they are Redux, client-side),
+and no `clientDisplayStreak` is sent, so the streak comes from the stored
+counter. The day is the profile's `statistics.timeZone`. Over 6 h, or longer
+than the time since the last log (`isLastReportTimeExceeded`), needs
+`confirmed: true` — the form's two confirmation pop-ups.
 
 ## Tabs
 

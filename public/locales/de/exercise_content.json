@@ -3655,6 +3655,91 @@
         "1": "Beginne in langsamem Tempo (z. B. 60 BPM) und steigere die Geschwindigkeit erst, wenn die Koordination präzise ist.",
         "2": "Zähle die Unterteilungen laut („1 und 2 und 3 und 4 und“), um deine körperliche Bewegung im inneren Rhythmus zu verankern."
       }
+    },
+    "finger_pair_dyads": {
+      "title": "Zweiklänge — Fingerpaare",
+      "description": "Zwei Finger landen genau gleichzeitig auf benachbarten Saiten, dann tauschst du sie gegen die anderen beiden. Das ist die Grundbewegung jedes sauberen Akkordwechsels.",
+      "whyItMatters": "Ein Akkordwechsel bedeutet, dass mehrere Finger als eine Form landen. Die meisten setzen sie nacheinander, das kostet Zeit und der erste Anschlag des neuen Akkords klingt unsauber. Fingerpaare, die gemeinsam landen und in einer Bewegung mit dem nächsten Paar tauschen, trainieren genau diese Gewohnheit, noch bevor du an Griffe denkst.",
+      "instructions": {
+        "0": "Ein Finger pro Bund: Zeigefinger im 5., Mittelfinger im 6., Ringfinger im 7., kleiner Finger im 8. Die kleine Zahl neben jeder Note zeigt den Finger.",
+        "1": "Spiel beide Töne eines Paars zusammen, ein Paar pro Metronomklick.",
+        "2": "Tausch die Paare in einer Bewegung: Finger 1 und 3 heben ab, sobald 2 und 4 landen.",
+        "3": "Geh von den Saiten E und A hinauf bis B und hohes e und dann wieder zurück."
+      },
+      "tips": {
+        "0": "Heb die Finger zwischen den Paaren nur ein bis zwei Millimeter an.",
+        "1": "Wenn ein Ton vor dem anderen kommt, werd langsamer. Es geht ums gemeinsame Landen.",
+        "2": "Drück nur so fest, dass nichts schnarrt, mit dem Daumen hinter dem Hals etwa auf Höhe des Mittelfingers.",
+        "3": "Wenn ein ganzer Durchgang sauber ist, erhöh das Tempo um 5 BPM."
+      }
+    },
+    "sus_ornaments_d_a_e": {
+      "title": "Sus-Verzierungen — D, A, E",
+      "description": "Halte D, A und E, während ein Finger oben eine Note hinzufügt oder loslässt – so wird jeder Akkord zu einer kleinen Melodie aus sus2- und sus4-Farben.",
+      "whyItMatters": "Sus2- und sus4-Verzierungen lassen einen einfachen Akkord wie ein Song klingen: Ein Finger bewegt sich, der Rest des Griffs klingt weiter. Es ist auch der erste Schritt zur Fingerunabhängigkeit im Akkord. Du lernst, eine Form sauber gedrückt zu halten, während daneben ein einzelner Finger arbeitet, ohne die Nachbarsaiten abzudämpfen.",
+      "instructions": {
+        "0": "Schlage jeden Griff einmal an und lass ihn zwei Metronomklicks lang klingen. Jeder Akkord dauert zwei Takte: Akkord, Verzierung, Akkord, Verzierung.",
+        "1": "D: Der kleine Finger fügt die hohe e-Saite im 3. Bund hinzu (Dsus4), dann lässt der Mittelfinger e los (Dsus2).",
+        "2": "A (Finger 1-2-3): Der kleine Finger nimmt B im 3. Bund (Asus4), dann lässt der Ringfinger B los (Asus2).",
+        "3": "E: Der kleine Finger landet auf G im 2. Bund, während der Zeigefinger abhebt – Esus4. Die kleine Zahl neben jeder Note zeigt den Finger."
+      },
+      "tips": {
+        "0": "Halte die Finger, die sich nicht bewegen, den ganzen Takt gedrückt – es wechselt immer nur ein Finger.",
+        "1": "Lass den beweglichen Finger auf der Fingerkuppe landen, damit er die Nachbarsaite nicht berührt.",
+        "2": "Schlage anfangs langsam an und hör auf die höchste Saite: Nur die Verzierungsnote ändert sich.",
+        "3": "Wenn der ganze Durchgang sauber klingt, erhöhe das Tempo um 5 BPM."
+      }
+    },
+    "sus_ornaments_am_c_g": {
+      "title": "Sus-Verzierungen — Am, C, G",
+      "description": "Verziere Am, C und G mit sus4-, sus2- und add9-Tönen, bei denen ein Finger seine Saite an einen anderen übergibt.",
+      "whyItMatters": "Bei Am, C und G kommt nicht einfach ein Finger dazu: Ein Finger lässt los, genau wenn ein anderer landet, oft auf einer anderen Saite. Dieser Tausch ist die eigentliche Fähigkeit hinter sauberem, musikalischem Akkordspiel. Langsam auf vertrauten Griffen geübt, gewöhnt sich die Hand daran, einzelne Finger zu bewegen, während der Akkord weiterklingt.",
+      "instructions": {
+        "0": "Schlage jeden Griff einmal an und lass ihn zwei Metronomklicks lang klingen. Jeder Akkord dauert zwei Takte: Akkord, Verzierung, Akkord, Verzierung.",
+        "1": "Am: Der Zeigefinger lässt B los, während der kleine Finger auf B im 3. Bund landet (Asus4). Für Asus2 lässt der Zeigefinger einfach los.",
+        "2": "C: Für Csus4 lässt der Mittelfinger los und der kleine Finger nimmt D im 3. Bund; für Cadd9 lässt der Zeigefinger los und der kleine Finger nimmt B im 3. Bund.",
+        "3": "G wird mit 3-2-4 gegriffen, damit der Zeigefinger frei ist und B im 1. Bund für Gsus4 hinzufügen kann. Die kleine Zahl neben jeder Note zeigt den Finger."
+      },
+      "tips": {
+        "0": "Mach den Tausch in einer Bewegung: Der abhebende und der landende Finger treffen sich auf demselben Klick.",
+        "1": "Lass den Ringfinger bei C und G auf seinem Basston – er hält den Akkord an seinem Platz.",
+        "2": "Wenn eine Saite verstummt, sobald der kleine Finger landet, wölbe ihn stärker und drücke näher am Bundstäbchen.",
+        "3": "Wenn der ganze Durchgang sauber klingt, erhöhe das Tempo um 5 BPM."
+      }
+    },
+    "sus_ornaments_full_progression": {
+      "title": "Sus-Verzierungen — ganze Progression",
+      "description": "Alle Sus-Verzierungen von D, A, E, Am, C und G in einer Progression. Jeder Griff klingt zwei Schläge lang, und Sus-Formen bilden Brücken zwischen den Akkorden.",
+      "whyItMatters": "Verzierungen klingen erst natürlich, wenn sie durch die Akkordwechsel weiterfließen. In dieser Progression haben die Sus-Formen eine doppelte Aufgabe: Sie schmücken jeden Akkord und sind zugleich der Schritt zum nächsten, weil sie Finger mit ihm teilen. Weil jeder Griff zwei Schläge klingt, hat der bewegliche Finger Zeit, sauber zu landen, während die Hand schon den nächsten Wechsel plant – genau das verlangen echte Rhythmusgitarren-Parts.",
+      "instructions": {
+        "0": "Schlage jeden Griff einmal an und lass ihn zwei Metronomklicks lang klingen. Jeder Akkord dauert zwei Takte.",
+        "1": "Die Progression ist C – Am – E – A – D – G und zurück zu C. Ab E ist jeder Akkord die Dominante des nächsten, sodass jeder Wechsel in den folgenden Akkord zieht.",
+        "2": "A wird hier mit 2-3-4 gegriffen: Asus4 ist der kleine Finger, der auf B in den 3. Bund rückt, Asus2 ist der kleine Finger, der loslässt. G ist 3-2-4, damit der Zeigefinger für Gsus4 frei ist.",
+        "3": "Der letzte Griff vor einem neuen Akkord gehört oft schon zu ihm. Die kleine Zahl neben jeder Note zeigt den Finger."
+      },
+      "tips": {
+        "0": "Cadd9 → Asus4: Der kleine Finger bleibt auf B im 3. Bund und der Mittelfinger auf D im 2. – nur der Ringfinger bewegt sich.",
+        "1": "Dsus4 → G: Lass den kleinen Finger auf der hohen e-Saite im 3. Bund – es ist in beiden Formen derselbe Ton.",
+        "2": "Gsus4 → C: Der Zeigefinger liegt schon auf B im 1. Bund, und der Ringfinger wechselt nur von der tiefen E- auf die A-Saite, im selben Bund.",
+        "3": "Esus4 → A: Heb die flache 2-3-4-Form ab und setz sie eine Saite höher wieder auf. Beginne bei 50 BPM und erhöhe nach jedem sauberen Durchgang um 5 BPM."
+      }
+    },
+    "bass_line_chord_changes": {
+      "title": "Basslinie zwischen Akkorden",
+      "description": "Verbinde Akkorde mit einer laufenden Basslinie in C-Dur und a-Moll: eine absteigende Tonleiter, ein chromatischer Abstieg unter Am und Durchgangstöne vor jedem Wechsel.",
+      "whyItMatters": "Den Akkord auf der Eins zu wechseln ist nur die halbe Begleitung – gute Gitarristen verbinden die Akkorde, sodass der Bass eine eigene Linie singt. Ein Finger greift also den Basston, während die anderen den Griff halten oder schon zum nächsten unterwegs sind. Das baut echte Fingerunabhängigkeit in Akkorden auf und lässt einfache Progressionen voll und bewusst klingen.",
+      "instructions": {
+        "0": "In Phrase 1 und 2 bekommt jeder Akkord zwei Schläge: erst den Basston, dann den Akkord auf den Saiten D, G, B und e.",
+        "1": "Phrase 1: Der Bass läuft C H A G F E abwärts, dann F G. Phrase 2: Halte den Am-Griff und lass den kleinen Finger auf der tiefen E-Saite absteigen – Bünde 4, 3, 2 – vor F, E und Am.",
+        "2": "Phrase 3: ein Akkord pro Takt, der Basston auf Schlag 4 führt zum nächsten Akkord.",
+        "3": "F ist ein volles Barré im 1. Bund. Die kleine Zahl neben jeder Note zeigt den Finger."
+      },
+      "tips": {
+        "0": "Der Ringfinger verlässt kaum den 3. Bund: C, G/H, Em/G, F und G reichen ihn auf demselben Bund weiter.",
+        "1": "Bei Am → C bleiben Zeige- und Mittelfinger liegen – nur der Ringfinger wandert von G im 2. Bund auf A im 2. und A im 3.",
+        "2": "Spiel den Basston etwas lauter als den Akkord, damit die Linie gut zu hören ist.",
+        "3": "Beginne bei 40–50 BPM; wenn alle zwölf Takte sauber sind, erhöhe das Tempo um 5 BPM."
+      }
     }
   },
   "plan": {

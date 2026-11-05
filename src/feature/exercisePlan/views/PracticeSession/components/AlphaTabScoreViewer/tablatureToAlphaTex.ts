@@ -129,6 +129,8 @@ function noteEffects(note: TablatureNote, isHammerPullOrigin: boolean): string {
   if (note.harmonicType && HARMONIC_TAGS[note.harmonicType]) effects.push(HARMONIC_TAGS[note.harmonicType]);
   if (note.slideIn && SLIDE_IN_TAGS[note.slideIn]) effects.push(SLIDE_IN_TAGS[note.slideIn]);
   if (note.slideOut && SLIDE_OUT_TAGS[note.slideOut]) effects.push(SLIDE_OUT_TAGS[note.slideOut]);
+  // alphaTex counts the thumb as 1, so our index finger (1) is its 2.
+  if (note.finger) effects.push(`lf ${note.finger + 1}`);
   return effects.length > 0 ? `{${effects.join(" ")}}` : "";
 }
 

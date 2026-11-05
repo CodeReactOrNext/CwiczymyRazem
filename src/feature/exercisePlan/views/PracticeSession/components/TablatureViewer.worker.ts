@@ -187,6 +187,8 @@ interface NoteRD {
   harmonicType?: number;
   slideIn?: number;
   slideOut?: number;
+  /** Fretting-hand finger (1 = index … 4 = pinky). */
+  finger?: number;
 }
 
 interface BeatRD {
@@ -542,6 +544,26 @@ function drawPickStroke(stroke: "down" | "up", x: number) {
     ctx.lineTo(x + half, PICK_Y - PICK_H / 2);
   }
   ctx.stroke();
+}
+
+// ── Fingering badge ───────────────────────────────────────────────────────────
+const FINGER_R = 7.5;
+
+/** The fretting finger as a small disc in the board's ink, centred on (x, y). */
+function drawFingerBadge(finger: number, x: number, y: number, alpha: number) {
+  if (!ctx) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = withAlpha(inkColor, 0.9);
+  ctx.beginPath();
+  ctx.arc(x, y, FINGER_R, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = bgColor;
+  ctx.font = "700 10px Inter, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  drawText(String(finger), x, y + 0.5);
+  ctx.restore();
 }
 
 // ── Palm mute ─────────────────────────────────────────────────────────────────
@@ -1976,6 +1998,18 @@ function paintFrame() {
           let text = note.fret.toString();
           if (note.isGhost) text = `(${text})`;
           drawText(text, labelX, note.noteY);
+        }
+
+        // ── Fingering badge ───────────────────────────────────────────────
+        // Which fretting finger plays the note, on the note itself so a chord's
+        // or a dyad's fingers can't be mixed up. It sits on the tail, right of
+        // the fret number; a beat too narrow for that tucks it on the head's
+        // top-right corner instead.
+        if (note.finger) {
+          const fitsBeside = blockW - headW >= FINGER_R * 2 + 6;
+          const fx = fitsBeside ? blockX + headW + 3 + FINGER_R : blockX + headW - 1;
+          const fy = fitsBeside ? note.noteY : blockY + 1;
+          drawFingerBadge(note.finger, fx, fy, baseAlpha);
         }
 
         // ── Technique labels ──────────────────────────────────────────────

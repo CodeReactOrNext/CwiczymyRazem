@@ -10,7 +10,7 @@ import type { ChordSpan } from "./harmonize";
 import type { BarInfo } from "./noteEvents";
 import { pulseOf } from "./noteEvents";
 import type { Chord } from "./theory";
-import { QUALITY_INTERVALS } from "./theory";
+import { bassOf, QUALITY_INTERVALS } from "./theory";
 
 const EPS = 1e-6;
 
@@ -396,7 +396,7 @@ const fifthOf = (chord: Chord) => (chord.quality === "dim" ? 6 : 7);
 /** A half step into the next root — from below, or from above where the
  *  bass has no lower string. */
 function approach(next: Chord): number {
-  const target = bassRoot(next.root);
+  const target = bassRoot(bassOf(next));
   return target - 1 >= BASS_OPEN[3] ? target - 1 : target + 1;
 }
 
@@ -417,9 +417,11 @@ export function bassBar(
   const starts = groupStarts(bar);
 
   for (const seg of segments) {
-    const root = bassRoot(seg.chord.root);
-    const fifth = root + fifthOf(seg.chord);
-    const changes = seg.next.root !== seg.chord.root;
+    const root = bassRoot(bassOf(seg.chord));
+    // Over a slash bass the line is the point: hold the named note, no fifth.
+    const fifth =
+      seg.chord.bass !== undefined ? root : root + fifthOf(seg.chord);
+    const changes = bassOf(seg.next) !== bassOf(seg.chord);
     const span = seg.to - seg.from;
 
     if (!simple || groove === "compound") {

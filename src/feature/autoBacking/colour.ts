@@ -85,6 +85,8 @@ export function colourChord(
   melody: readonly BackingNote[],
   keyPcs: ReadonlySet<number>,
 ): Chord {
+  // A slash chord is a voice-leading step: its colour is the bass line.
+  if (chord.bass !== undefined) return chord;
   const base = new Set(chordTonesOf(chord));
   const total = melody.reduce((sum, note) => sum + note.weight, 0);
   for (const quality of COLOURS[chord.quality] ?? []) {

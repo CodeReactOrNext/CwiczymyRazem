@@ -198,6 +198,8 @@ const WRITE_TOOLS = new Set([
   "riffquest_update_practice_plan",
   "riffquest_add_song_to_list",
   "riffquest_set_exercise_goal",
+  "riffquest_update_exercise_goal",
+  "riffquest_log_practice",
   "riffquest_create_exercise",
   "riffquest_update_exercise",
 ]);

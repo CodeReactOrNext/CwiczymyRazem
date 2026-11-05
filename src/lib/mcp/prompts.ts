@@ -70,6 +70,40 @@ export function registerPrompts(server: McpServer) {
   );
 
   server.registerPrompt(
+    "log_session",
+    {
+      title: "Log a practice session",
+      description:
+        "Records a session the player played away from the app — by category, skill or song.",
+      argsSchema: {
+        session: z
+          .string()
+          .describe(
+            "What you played and for how long, e.g. 20 min alternate picking, 15 min Back in Black",
+          ),
+      },
+    },
+    ({ session }) => ({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: [
+              `Log this guitar session on riff.quest: ${session}`,
+              "1. Split the time the way I described it: technique practice to the matching skill (riffquest_get_skill_breakdown lists them), songs to the song (find it with riffquest_list_songs), anything else to a category. The parts add up, so don't count the same minutes twice.",
+              "2. If something is unclear (how long, which song, which day), ask me instead of guessing.",
+              "3. Read the session back to me in one line and ask before saving. Then log it once with riffquest_log_practice.",
+              "4. Tell me what it earned: points, Fame, my streak, and any new level or achievement.",
+              "Talk to me as a guitarist, not a programmer: no JSON, tool names, field names or ids — just the music and the numbers.",
+            ].join("\n"),
+          },
+        },
+      ],
+    }),
+  );
+
+  server.registerPrompt(
     "write_exercise",
     {
       title: "Write an exercise with a tab",

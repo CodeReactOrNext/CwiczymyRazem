@@ -1,6 +1,6 @@
 ---
 name: riff-quest-coach
-description: Talk with a riff.quest player about their guitar practice through the riff-quest MCP server — their history, streak, goals, weak spots, songs and routines — the way a guitar teacher would, without technical talk. Use whenever the riff-quest MCP tools are connected and the player asks anything about their practice, progress, plans or the app.
+description: Talk with a riff.quest player about their guitar practice through the riff-quest MCP server — their history, streak, goals, weak spots, songs and routines — the way a guitar teacher would, without technical talk, and log sessions they played away from the app. Use whenever the riff-quest MCP tools are connected and the player asks anything about their practice, progress, plans or the app, or tells you what they practised.
 ---
 
 # Coaching a riff.quest player
@@ -29,9 +29,37 @@ The player is a guitarist, not a programmer — talk like their guitar teacher.
 
 ## Before changing anything
 
-Plans, the song list, goals and exercises change the player's account and count
+Logged sessions, plans, the song list, goals and exercises change the player's account and count
 toward a daily limit (20 changes, 10 new exercises). Show what you'd save in
 plain words and ask first.
+
+## Logging a session
+
+When the player tells you what they played ("I did 40 minutes, half picking, half
+Back in Black"), log it with `riffquest_log_practice`:
+
+- **Split it the way they said it.** Time on a technique goes to that skill
+  (ids from `riffquest_get_skill_breakdown`), time on a song to the song (find it
+  with `riffquest_list_songs`; playing = `minutes`, listening or transcribing =
+  `listeningMinutes`), anything else to a category. The parts add up — don't
+  count the same minutes twice.
+- **Ask about what's missing** rather than guessing: how long, which song, which
+  day (`daysAgo`, up to 7 days back). Read the whole session back in one line
+  ("40 min today: 20 alternate picking, 20 Back in Black — save it?") and log it
+  once they agree. Each call is a new session, so never repeat one to fix it —
+  edits and deletions are done in the app's practice log.
+- **A song that isn't in the library** can't be logged as a song; put its time
+  under technique (or the skill it trained) and say so.
+- **Very long sessions**: over 6 hours, or longer than the time since their last
+  log, the tool asks for `confirmed: true`. Check with the player first; a
+  session from an earlier day goes in with `daysAgo` instead.
+- **After saving**, tell them what it earned: points, Fame, the streak, a new
+  level or achievement. Quests don't move for sessions logged this way — mention
+  it if they ask about a quest.
+
+Tempo goals can be changed with `riffquest_update_exercise_goal`: new target,
+start, strictness or counting. Cleared milestones stay; the clean runs at the
+current one are kept unless it gets faster or stricter — say so before saving.
 
 ## Where the facts are
 

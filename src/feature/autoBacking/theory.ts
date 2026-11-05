@@ -56,6 +56,7 @@ export type ChordQuality =
   | "min9"
   | "madd9"
   | "sus2"
+  | "sus4"
   | "9"
   | "m7b5";
 
@@ -74,6 +75,8 @@ export const QUALITY_INTERVALS: Record<ChordQuality, readonly number[]> = {
   madd9: [0, 3, 7, 14],
   // Root, fifth, ninth: the open, third-less chord ambient pads live on.
   sus2: [0, 7, 14],
+  // Fourth in place of the third: named by the tab, never chosen by the harmonizer.
+  sus4: [0, 5, 7],
   "9": [0, 4, 10, 14],
   m7b5: [0, 3, 6, 10],
 };
@@ -91,6 +94,7 @@ const QUALITY_SUFFIX: Record<ChordQuality, string> = {
   min9: "m9",
   madd9: "m(add9)",
   sus2: "sus2",
+  sus4: "sus4",
   "9": "9",
   m7b5: "m7b5",
 };
@@ -98,10 +102,15 @@ const QUALITY_SUFFIX: Record<ChordQuality, string> = {
 export interface Chord {
   root: PitchClass;
   quality: ChordQuality;
+  /** Slash bass ("G/B" → B). Only a tab names one; the harmonizer never does. */
+  bass?: PitchClass;
 }
 
 export const sameChord = (a: Chord, b: Chord) =>
-  a.root === b.root && a.quality === b.quality;
+  a.root === b.root && a.quality === b.quality && a.bass === b.bass;
+
+/** The note the bass plays under the chord: its slash bass, else its root. */
+export const bassOf = (chord: Chord): PitchClass => chord.bass ?? chord.root;
 
 export const chordTonesOf = (chord: Chord): PitchClass[] =>
   QUALITY_INTERVALS[chord.quality].map(
@@ -110,7 +119,7 @@ export const chordTonesOf = (chord: Chord): PitchClass[] =>
 
 /** Does the chord carry a third — i.e. say major or minor out loud? */
 export const hasThird = (quality: ChordQuality) =>
-  quality !== "5" && quality !== "sus2";
+  quality !== "5" && quality !== "sus2" && quality !== "sus4";
 
 // ── Scales ────────────────────────────────────────────────────────────────────
 
@@ -258,7 +267,9 @@ export const pcName = (pc: PitchClass, flats = false) =>
   (flats ? FLAT_NAMES : SHARP_NAMES)[pcOf(pc)];
 
 export const chordSymbol = (chord: Chord, flats = false) =>
-  pcName(chord.root, flats) + QUALITY_SUFFIX[chord.quality];
+  pcName(chord.root, flats) +
+  QUALITY_SUFFIX[chord.quality] +
+  (chord.bass !== undefined ? `/${pcName(chord.bass, flats)}` : "");
 
 // ── Chord vocabulary per scale ────────────────────────────────────────────────
 

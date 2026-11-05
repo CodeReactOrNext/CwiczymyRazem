@@ -127,7 +127,7 @@
     "new_token": "Nowy token",
     "label_placeholder": "Nazwa, np. Claude na laptopie",
     "allow_writes": "Pozwól na zmiany",
-    "allow_writes_description": "Asystent może zapisywać plany, cele, utwory i ćwiczenia (do 20 zmian dziennie). Bez tego tylko czyta.",
+    "allow_writes_description": "Asystent może zapisywać plany, cele, utwory, ćwiczenia i czas ćwiczeń (do 20 zmian dziennie). Bez tego tylko czyta.",
     "create": "Utwórz token",
     "token_once": "Skopiuj ten token teraz — nie pokażemy go ponownie.",
     "claude_code": "Claude Code",
@@ -149,7 +149,28 @@
     "disconnected": "Aplikacja odłączona",
     "supporters_title": "Perk dla supporterów",
     "supporters_description": "Podłączenie Claude'a albo innego asystenta AI do konta odblokowuje dowolna wpłata na riff.quest. Ćwiczenie, zapisywanie sesji i cała reszta zostają darmowe dla wszystkich.",
-    "supporters_cta": "Zostań supporterem"
+    "supporters_cta": "Zostań supporterem",
+    "guide": {
+      "title": "Jak połączyć",
+      "subtitle": "Wybierz swoją aplikację. Każda loguje się przez riff.quest, więc token nie jest potrzebny.",
+      "claude_1": "W Claudzie w przeglądarce albo w aplikacji na komputer otwórz Ustawienia, potem Konektory, i wybierz dodanie własnego konektora (Add custom connector).",
+      "claude_2": "Nazwij go riff.quest, wklej adres serwera z góry i naciśnij Dodaj. Potem naciśnij Połącz obok niego.",
+      "claude_3": "Trafisz na riff.quest. Zaloguj się, włącz Pozwól na zmiany, jeśli ma zapisywać plany, cele, utwory i czas ćwiczeń, i naciśnij Zezwól.",
+      "claude_4": "W nowej rozmowie otwórz menu +, wejdź w Konektory i upewnij się, że riff.quest jest włączony. Od teraz działa też w aplikacji mobilnej Claude.",
+      "chatgpt_1": "W ChatGPT otwórz Ustawienia, potem Apps & Connectors, potem Ustawienia zaawansowane, i włącz Developer mode.",
+      "chatgpt_2": "Wróć do Apps & Connectors i naciśnij Create. Nazwij go riff.quest, wklej adres serwera, wybierz OAuth i utwórz.",
+      "chatgpt_3": "Zaloguj się na stronie riff.quest, która się otworzy, i naciśnij Zezwól. W rozmowie włącz riff.quest z menu + w sekcji Developer mode.",
+      "cursor_1": "Dodaj serwer do pliku konfiguracji MCP albo do .cursor/mcp.json w projekcie.",
+      "cursor_2": "Otwórz Cursor Settings, znajdź riff-quest w Tools & MCP i naciśnij Connect.",
+      "cursor_3": "Zaloguj się na stronie riff.quest, która się otworzy, i naciśnij Zezwól. Narzędzia pojawią się w czatach Agenta.",
+      "claude_code_1": "Dodaj serwer w terminalu.",
+      "claude_code_2": "Uruchom Claude Code, wpisz /mcp, wybierz riff-quest i Authenticate.",
+      "claude_code_3": "Przeglądarka otworzy riff.quest. Zaloguj się, naciśnij Zezwól i wróć do terminala.",
+      "codex_1": "Dodaj serwer w terminalu.",
+      "codex_2": "Zaloguj się do niego.",
+      "codex_3": "Przeglądarka otworzy riff.quest. Zaloguj się i naciśnij Zezwól. Przy następnym uruchomieniu Codexa riff.quest będzie dostępny.",
+      "then": "Po połączeniu aplikacja pojawi się niżej w Połączonych aplikacjach i tam w każdej chwili ją odetniesz. Nie wiesz, o co zapytać? Spróbuj „Podsumuj mój ostatni tydzień ćwiczeń” albo „Zapisz 30 minut kostkowania naprzemiennego”."
+    }
   },
   "oauth": {
     "title": "{{app}} chce połączyć się z Twoim kontem riff.quest",

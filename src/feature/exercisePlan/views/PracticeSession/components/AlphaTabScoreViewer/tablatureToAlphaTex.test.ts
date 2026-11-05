@@ -166,6 +166,23 @@ describe("tablatureToAlphaTex", () => {
     );
   });
 
+  it("emits fretting-hand fingering as lf, shifted past alphaTex's thumb", () => {
+    const measures: TablatureMeasure[] = [
+      {
+        timeSignature: [4, 4],
+        beats: [
+          { duration: 1, notes: [{ string: 6, fret: 5, finger: 1 }, { string: 5, fret: 7, finger: 3 }] },
+          { duration: 1, notes: [{ string: 6, fret: 8, finger: 4 }] },
+        ],
+      },
+    ];
+
+    const tex = tablatureToAlphaTex(measures, 120);
+    expect(tex).toContain("5.6{lf 2}");
+    expect(tex).toContain("7.5{lf 4}");
+    expect(tex).toContain("8.6{lf 5}");
+  });
+
   it("un-compresses a triplet's real sounding duration back to its notated base + {tu 3}", () => {
     // Real sounding duration of a triplet eighth is 1/3 of a quarter (3 fit in the time
     // of 2 eighths = 1 quarter). The previous conversion fed that real fraction straight

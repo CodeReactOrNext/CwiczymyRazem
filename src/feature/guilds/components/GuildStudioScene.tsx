@@ -77,6 +77,14 @@ const NOTE_PAPER: Record<StudioBoardStat, string> = {
 };
 
 /**
+ * The leader's name as a share of the note's width: it shrinks with length so
+ * a long nick still fits the ~80% between the margins (a bold glyph is about
+ * 0.62em wide), and only truncates once it hits the floor.
+ */
+const nameShare = (name: string) =>
+  Math.max(0.07, Math.min(0.12, 0.8 / (0.62 * Math.max(1, name.length))));
+
+/**
  * One category's sticky note on the board: its title and the week's leader,
  * big enough to read from across the room — the full podium is in the panel.
  * Placed in the board sprite's own frame so it scales with it; type is sized
@@ -98,6 +106,7 @@ const RankingNote = ({
   const em = (share: number) =>
     `${((note.width * scale * share) / W) * 100}cqw`;
   const leader = note.podium[0];
+  const name = leader?.member.displayName.split(/\s+/)[0] ?? "";
   return (
     <span
       className={cn(
@@ -122,8 +131,8 @@ const RankingNote = ({
           {/* First name only: it has to read at a glance. */}
           <span
             className='max-w-full truncate font-bold'
-            style={{ fontSize: em(0.15) }}>
-            {leader.member.displayName.split(/\s+/)[0]}
+            style={{ fontSize: em(nameShare(name)) }}>
+            {name}
           </span>
           <span
             className='font-bold tabular-nums'

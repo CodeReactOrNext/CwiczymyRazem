@@ -3655,6 +3655,91 @@
         "1": "Zacznij w wolnym tempie (np. 60 BPM) i przyspieszaj dopiero wtedy, gdy koordynacja jest precyzyjna.",
         "2": "Licz podziały na głos („1 i 2 i 3 i 4 i”), aby zablokować ruch ciała w wewnętrznym rytmie."
       }
+    },
+    "finger_pair_dyads": {
+      "title": "Dwudźwięki — pary palców",
+      "description": "Dwa palce lądują w tym samym momencie na sąsiednich strunach, a potem zamieniasz je na dwa pozostałe. To podstawowy ruch każdej czystej zmiany akordu.",
+      "whyItMatters": "Zmiana akordu to kilka palców lądujących jako jeden kształt. Większość osób stawia je po kolei, przez co traci czas, a pierwsze uderzenie nowego akordu brzmi nierówno. Ćwiczenie par palców, które lądują razem i zamieniają się z kolejną parą jednym ruchem, buduje nawyk stawiania całego kształtu naraz, zanim jeszcze zaczniesz myśleć o chwytach.",
+      "instructions": {
+        "0": "Jeden palec na próg: wskazujący na 5., środkowy na 6., serdeczny na 7., mały na 8. Mała cyfra obok nuty pokazuje palec.",
+        "1": "Zagraj obie nuty pary razem, jedną parę na każde kliknięcie metronomu.",
+        "2": "Zamieniaj pary jednym ruchem: palce 1 i 3 odrywają się w chwili, gdy lądują 2 i 4.",
+        "3": "Idź od strun E i A w górę do B i e, a potem wróć w dół."
+      },
+      "tips": {
+        "0": "Między parami odrywaj palce tylko na 1–2 mm.",
+        "1": "Jeśli jedna nuta wchodzi przed drugą, zwolnij. Chodzi o to, żeby lądowały razem.",
+        "2": "Dociskaj tylko tyle, żeby nic nie brzęczało. Kciuk trzymaj za gryfem, mniej więcej za środkowym palcem.",
+        "3": "Gdy cały przebieg jest czysty, podnieś tempo o 5 BPM."
+      }
+    },
+    "sus_ornaments_d_a_e": {
+      "title": "Ozdobniki sus — D, A, E",
+      "description": "Trzymasz D, A i E, a jeden palec dokłada albo zdejmuje nutę na górze. Każdy akord zamienia się w małą melodię z barw sus2 i sus4.",
+      "whyItMatters": "Ozdobniki sus2 i sus4 sprawiają, że zwykły akord zaczyna brzmieć jak utwór: jeden palec się rusza, a reszta chwytu dalej brzmi. To też pierwszy krok niezależności palców w akordzie. Uczysz się trzymać kształt czysto dociśnięty, gdy obok pracuje pojedynczy palec, i nie wyciszać przy tym sąsiednich strun.",
+      "instructions": {
+        "0": "Uderz każdy chwyt raz i pozwól mu brzmieć przez dwa kliknięcia metronomu. Każdy akord zajmuje dwa takty: akord, ozdobnik, akord, ozdobnik.",
+        "1": "D: mały palec dokłada wysokie e na 3. progu (Dsus4), potem środkowy puszcza e (Dsus2).",
+        "2": "A (palce 1-2-3): mały palec bierze B na 3. progu (Asus4), potem serdeczny puszcza B (Asus2).",
+        "3": "E: mały palec ląduje na G na 2. progu, a wskazujący się podnosi — Esus4. Mała cyfra obok nuty pokazuje palec."
+      },
+      "tips": {
+        "0": "Palce, które się nie ruszają, trzymaj dociśnięte przez cały takt — naraz zmienia się tylko jeden palec.",
+        "1": "Ruchomy palec niech ląduje na samej opuszce, żeby nie dotykał sąsiedniej struny.",
+        "2": "Na początku uderzaj powoli i słuchaj najwyższej struny: zmienia się tylko nuta ozdobnika.",
+        "3": "Gdy cały przebieg brzmi czysto, podnieś tempo o 5 BPM."
+      }
+    },
+    "sus_ornaments_am_c_g": {
+      "title": "Ozdobniki sus — Am, C, G",
+      "description": "Ozdabiaj Am, C i G nutami sus4, sus2 i add9 — tu jeden palec oddaje strunę drugiemu.",
+      "whyItMatters": "Przy Am, C i G ozdobnik to nie tylko dołożony palec: jeden palec puszcza strunę w tej samej chwili, w której ląduje drugi, często na innej strunie. Ta zamiana to prawdziwa umiejętność stojąca za czystym, muzycznym graniem akordów. Ćwiczona powoli na znanych chwytach sprawia, że dłoń swobodnie rusza pojedynczymi palcami, a akord dalej brzmi.",
+      "instructions": {
+        "0": "Uderz każdy chwyt raz i pozwól mu brzmieć przez dwa kliknięcia metronomu. Każdy akord zajmuje dwa takty: akord, ozdobnik, akord, ozdobnik.",
+        "1": "Am: wskazujący puszcza B, a mały palec ląduje na B na 3. progu (Asus4). Przy Asus2 wskazujący po prostu puszcza.",
+        "2": "C: przy Csus4 środkowy puszcza, a mały bierze D na 3. progu. Przy Cadd9 wskazujący puszcza, a mały bierze B na 3. progu.",
+        "3": "G grasz palcami 3-2-4, więc wskazujący jest wolny i dokłada B na 1. progu (Gsus4). Mała cyfra obok nuty pokazuje palec."
+      },
+      "tips": {
+        "0": "Rób zamianę jednym ruchem: palec, który się podnosi, i palec, który ląduje, spotykają się na tym samym kliknięciu.",
+        "1": "W C i G trzymaj serdeczny na nucie basowej — to on utrzymuje akord na miejscu.",
+        "2": "Jeśli po wejściu małego palca gaśnie struna, bardziej go zegnij i dociśnij bliżej progu.",
+        "3": "Gdy cały przebieg brzmi czysto, podnieś tempo o 5 BPM."
+      }
+    },
+    "sus_ornaments_full_progression": {
+      "title": "Ozdobniki sus — pełna progresja",
+      "description": "Wszystkie ozdobniki sus z D, A, E, Am, C i G w jednej progresji. Każdy chwyt brzmi przez dwie ćwierćnuty, a kształty sus są mostami między akordami.",
+      "whyItMatters": "Ozdobniki brzmią naturalnie dopiero wtedy, gdy płyną dalej przez zmiany akordów. W tej progresji kształty sus mają podwójną rolę: zdobią akord i są krokiem do następnego, bo dzielą z nim palce. Każdy chwyt brzmi przez dwie ćwierćnuty, więc ruchomy palec ma czas czysto wylądować, a dłoń już planuje następną zmianę — dokładnie tego wymagają prawdziwe partie gitary rytmicznej.",
+      "instructions": {
+        "0": "Uderz każdy chwyt raz i pozwól mu brzmieć przez dwa kliknięcia metronomu. Każdy akord zajmuje dwa takty.",
+        "1": "Progresja to C – Am – E – A – D – G i z powrotem do C. Od E każdy akord jest dominantą następnego, więc każda zmiana ciągnie do kolejnego akordu.",
+        "2": "A grasz tu palcami 2-3-4: Asus4 to mały palec przesunięty na B na 3. próg, Asus2 to mały puszczający strunę. G grasz 3-2-4, więc wskazujący jest wolny do Gsus4.",
+        "3": "Ostatni chwyt przed nowym akordem często już do niego należy. Mała cyfra obok nuty pokazuje palec."
+      },
+      "tips": {
+        "0": "Cadd9 → Asus4: mały palec zostaje na B na 3. progu, a środkowy na D na 2. — rusza się tylko serdeczny.",
+        "1": "Dsus4 → G: trzymaj mały palec na wysokim e na 3. progu — to ta sama nuta w obu chwytach.",
+        "2": "Gsus4 → C: wskazujący już leży na B na 1. progu, a serdeczny przechodzi tylko z niskiego E na A, na tym samym progu.",
+        "3": "Esus4 → A: podnieś płaski kształt 2-3-4 i postaw go o strunę cieńszą. Zacznij od 50 BPM i dodawaj 5 BPM po każdym czystym przebiegu."
+      }
+    },
+    "bass_line_chord_changes": {
+      "title": "Linia basu między akordami",
+      "description": "Łącz akordy chodzącą linią basu w C-dur i a-moll: schodząca gama, chromatyczne zejście pod Am i nuty przejściowe przed każdą zmianą.",
+      "whyItMatters": "Zmiana akordu na „raz” to tylko połowa akompaniamentu — dobrzy gitarzyści łączą akordy tak, że bas śpiewa własną linię. To znaczy, że jeden palec gra nutę basu, a pozostałe trzymają chwyt albo już idą do następnego. Takie granie buduje prawdziwą niezależność palców w akordach i sprawia, że proste progresje brzmią pełnie i świadomie.",
+      "instructions": {
+        "0": "We frazach 1 i 2 każdy akord trwa dwie ćwierćnuty: najpierw nuta basu, potem akord na strunach D, G, B i e.",
+        "1": "Fraza 1: bas schodzi C B A G F E, potem F G. Fraza 2: trzymaj chwyt Am, a małym palcem schodź po niskiej strunie E — progi 4, 3, 2 — przed F, E i Am.",
+        "2": "Fraza 3: jeden akord na takt, a nuta basu na „cztery” prowadzi do następnego akordu.",
+        "3": "F to pełne barré na 1. progu. Mała cyfra obok nuty pokazuje palec."
+      },
+      "tips": {
+        "0": "Serdeczny prawie nie opuszcza 3. progu: C, G/B, Em/G, F i G przekazują go dalej po tym samym progu.",
+        "1": "Przy Am → C trzymaj wskazujący i środkowy — idzie tylko serdeczny, z G na 2. progu na A na 2. i A na 3.",
+        "2": "Nutę basu graj odrobinę głośniej niż akord, żeby linię było dobrze słychać.",
+        "3": "Zacznij od 40–50 BPM. Gdy wszystkie dwanaście taktów jest czystych, podnieś tempo o 5 BPM."
+      }
     }
   },
   "plan": {

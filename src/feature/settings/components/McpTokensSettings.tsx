@@ -8,6 +8,7 @@ import {
 } from "assets/components/ui/card";
 import { Input } from "assets/components/ui/input";
 import { Switch } from "assets/components/ui/switch";
+import { McpConnectGuide } from "feature/settings/components/McpConnectGuide";
 import { McpSupporterNotice } from "feature/settings/components/McpSupporterNotice";
 import {
   type ConnectedApp,
@@ -154,9 +155,10 @@ export const McpTokensSettings = () => {
               {t("mcp.server_url")}
             </p>
             <CodeLine value={url} />
-            <p className='text-sm text-zinc-400'>{t("mcp.connector_hint")}</p>
           </div>
         )}
+
+        {hasAccess && <McpConnectGuide url={url} />}
 
         {(hasAccess || !!apps?.length) && (
           <div className='space-y-3'>

@@ -122,6 +122,11 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 // Exercises available for free — all others require Pro
 const FREE_EXERCISE_IDS = new Set([
   "spider_basic",
+  "finger_pair_dyads",
+  "sus_ornaments_d_a_e",
+  "sus_ornaments_am_c_g",
+  "sus_ornaments_full_progression",
+  "bass_line_chord_changes",
   "spider_one_string",
   "spider_permutation_1234",
   "spider_legato_basic",
@@ -209,6 +214,7 @@ const FREE_EXERCISE_IDS = new Set([
 ]);
 
 import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePlan/data/exerises/alternatePickingPentatonicAPositions/alternatePickingPentatonicAPositions";
+import { bassLineChordChangesExercise } from "feature/exercisePlan/data/exerises/bassLineChordChanges/bassLineChordChanges";
 import { bendAndReleaseExercise } from "feature/exercisePlan/data/exerises/bendAndRelease/bendAndRelease";
 import { buildTheChordExercise } from "feature/exercisePlan/data/exerises/buildTheChord/buildTheChord";
 import { chickenPickinExercise } from "feature/exercisePlan/data/exerises/chickenPickin/chickenPickin";
@@ -231,6 +237,7 @@ import {
 } from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
 import { expressiveBendPhrasingExercise } from "feature/exercisePlan/data/exerises/expressiveBendPhrasing/expressiveBendPhrasing";
 import { fingerIndependence1aExercise } from "feature/exercisePlan/data/exerises/fingerIndependence1a/fingerIndependence1a";
+import { fingerPairDyadsExercise } from "feature/exercisePlan/data/exerises/fingerPairDyads/fingerPairDyads";
 import { fingerstyleArpeggiosExercise } from "feature/exercisePlan/data/exerises/fingerstyleArpeggios/fingerstyleArpeggios";
 import { firstBendExercise } from "feature/exercisePlan/data/exerises/firstBend/firstBend";
 import { firstBendHalfStepExercise } from "feature/exercisePlan/data/exerises/firstBendHalfStep/firstBendHalfStep";
@@ -300,6 +307,11 @@ import { stringSkippingArpeggiosExercise } from "feature/exercisePlan/data/exeri
 import { stringSkippingBasicExercise } from "feature/exercisePlan/data/exerises/stringSkippingBasic/stringSkippingBasic";
 import { stringSkippingMelodicExercise } from "feature/exercisePlan/data/exerises/stringSkippingMelodic/stringSkippingMelodic";
 import { stringSkippingTwoNotesExercise } from "feature/exercisePlan/data/exerises/stringSkippingTwoNotes/stringSkippingTwoNotes";
+import {
+  susOrnamentsAmCGExercise,
+  susOrnamentsDAEExercise,
+  susOrnamentsFullProgressionExercise,
+} from "feature/exercisePlan/data/exerises/susOrnaments/susOrnaments";
 import { sweep5StringCascadeExercise } from "feature/exercisePlan/data/exerises/sweep5StringCascade/sweep5StringCascade";
 import { sweepNeoclassicalExercise } from "feature/exercisePlan/data/exerises/sweepNeoclassical/sweepNeoclassical";
 import { sweepPicking3StringExercise } from "feature/exercisePlan/data/exerises/sweepPicking3String/sweepPicking3String";
@@ -455,6 +467,11 @@ const rawExercises: Exercise[] = [
   alternatePickingCrossStringExercise,
   alternatePickingPentatonicAPositionsExercise,
   fingerIndependence1aExercise,
+  fingerPairDyadsExercise,
+  susOrnamentsDAEExercise,
+  susOrnamentsAmCGExercise,
+  susOrnamentsFullProgressionExercise,
+  bassLineChordChangesExercise,
   mutingDisciplineDrillExercise,
   speedBurstChromaticBlitzExercise,
   legatoHammerPullRunExercise,

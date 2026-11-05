@@ -105,7 +105,7 @@ describe("harmonize", () => {
       ),
     );
     expect(result.source).toBe("tab");
-    expect(symbols(result)).toEqual(["A", "D"]);
+    expect(symbols(result)).toEqual(["A/C#", "D"]);
   });
 
   it("starts a scale run's backing on the tonic and never puts an avoid note under it", () => {
@@ -147,12 +147,18 @@ describe("harmonize", () => {
 
 describe("parseChordSymbol", () => {
   it.each([
-    ["A/C#", { root: 9, quality: "maj" }],
+    ["A/C#", { root: 9, quality: "maj", bass: 1 }],
+    ["Am/G#", { root: 9, quality: "min", bass: 8 }],
+    ["C/C", { root: 0, quality: "maj" }],
     ["Gm", { root: 7, quality: "min" }],
     ["E5", { root: 4, quality: "5" }],
     ["Cmaj7", { root: 0, quality: "maj7" }],
     ["Bbm7", { root: 10, quality: "min7" }],
     ["F#dim", { root: 6, quality: "dim" }],
+    ["Dsus2", { root: 2, quality: "sus2" }],
+    ["Asus4", { root: 9, quality: "sus4" }],
+    ["Gsus", { root: 7, quality: "sus4" }],
+    ["Cadd9", { root: 0, quality: "add9" }],
   ] as const)("%s", (symbol, chord) => {
     expect(parseChordSymbol(symbol)).toEqual(chord);
   });

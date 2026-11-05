@@ -127,7 +127,7 @@
     "new_token": "Neues Token",
     "label_placeholder": "Name, z. B. Claude auf dem Laptop",
     "allow_writes": "Änderungen erlauben",
-    "allow_writes_description": "Der Assistent darf Pläne, Ziele, Songs und Übungen speichern (bis zu 20 Änderungen am Tag). Ohne das kann er nur lesen.",
+    "allow_writes_description": "Der Assistent darf Pläne, Ziele, Songs, Übungen und Übungszeit speichern (bis zu 20 Änderungen am Tag). Ohne das kann er nur lesen.",
     "create": "Token erstellen",
     "token_once": "Kopiere dieses Token jetzt — es wird nicht noch einmal angezeigt.",
     "claude_code": "Claude Code",
@@ -149,7 +149,28 @@
     "disconnected": "App getrennt",
     "supporters_title": "Ein Supporter-Vorteil",
     "supporters_description": "Claude oder einen anderen KI-Assistenten mit deinem Konto zu verbinden, schaltet jede Spende an riff.quest frei. Üben, Sessions eintragen und alles andere bleibt für alle kostenlos.",
-    "supporters_cta": "Supporter werden"
+    "supporters_cta": "Supporter werden",
+    "guide": {
+      "title": "So verbindest du dich",
+      "subtitle": "Wähle deine App. Alle melden sich über riff.quest an, du brauchst also kein Token.",
+      "claude_1": "Öffne in Claude im Browser oder in der Desktop-App die Einstellungen, dann Konnektoren, und wähle Eigenen Konnektor hinzufügen (Add custom connector).",
+      "claude_2": "Nenn ihn riff.quest, füge die Serveradresse von oben ein und drück Hinzufügen. Drück danach Verbinden daneben.",
+      "claude_3": "Du landest auf riff.quest. Melde dich an, schalte Änderungen erlauben ein, wenn er Pläne, Ziele, Songs und Übungszeit speichern soll, und drück Erlauben.",
+      "claude_4": "Öffne in einem neuen Chat das +-Menü, geh zu Konnektoren und prüf, dass riff.quest an ist. Ab jetzt klappt es auch in der Claude-App auf dem Handy.",
+      "chatgpt_1": "Öffne in ChatGPT die Einstellungen, dann Apps & Connectors, dann Erweitert, und schalte den Developer mode ein.",
+      "chatgpt_2": "Drück zurück in Apps & Connectors auf Create. Nenn ihn riff.quest, füge die Serveradresse ein, wähle OAuth und leg ihn an.",
+      "chatgpt_3": "Melde dich auf der riff.quest-Seite an, die sich öffnet, und drück Erlauben. Schalte riff.quest im Chat über das +-Menü unter Developer mode ein.",
+      "cursor_1": "Trag den Server in deine MCP-Konfigurationsdatei ein, oder in .cursor/mcp.json in einem Projekt.",
+      "cursor_2": "Öffne die Cursor Settings, such riff-quest unter Tools & MCP und drück Connect.",
+      "cursor_3": "Melde dich auf der riff.quest-Seite an, die sich öffnet, und drück Erlauben. Die Werkzeuge erscheinen in Agent-Chats.",
+      "claude_code_1": "Füg den Server im Terminal hinzu.",
+      "claude_code_2": "Starte Claude Code, tipp /mcp, wähl riff-quest und dann Authenticate.",
+      "claude_code_3": "Dein Browser öffnet riff.quest. Melde dich an, drück Erlauben und geh zurück ins Terminal.",
+      "codex_1": "Füg den Server im Terminal hinzu.",
+      "codex_2": "Melde dich daran an.",
+      "codex_3": "Dein Browser öffnet riff.quest. Melde dich an und drück Erlauben. Beim nächsten Start von Codex ist riff.quest da.",
+      "then": "Nach dem Verbinden steht die App unten unter Verbundene Apps, und dort kannst du sie jederzeit trennen. Keine Idee, was du fragen sollst? Probier „Fass meine letzte Übungswoche zusammen“ oder „Trag 30 Minuten Wechselschlag ein“."
+    }
   },
   "oauth": {
     "title": "{{app}} möchte sich mit deinem riff.quest-Konto verbinden",

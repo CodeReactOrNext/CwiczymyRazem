@@ -247,10 +247,15 @@ const ROOTS: Record<string, number> = {
 };
 
 export function parseChordSymbol(symbol: string): Chord | null {
-  const match = /^([A-G])([#b]?)([^/]*)/.exec(symbol.trim());
+  const match = /^([A-G])([#b]?)([^/]*)(?:\/([A-G])([#b]?))?/.exec(
+    symbol.trim(),
+  );
   if (!match) return null;
-  const root =
-    (ROOTS[match[1]] + (match[2] === "#" ? 1 : match[2] === "b" ? 11 : 0)) % 12;
+  const pitchOf = (letter: string, accidental: string) =>
+    (ROOTS[letter] + (accidental === "#" ? 1 : accidental === "b" ? 11 : 0)) %
+    12;
+  const root = pitchOf(match[1], match[2]);
+  const bass = match[4] ? pitchOf(match[4], match[5] ?? "") : undefined;
   const suffix = match[3].trim();
   let quality: ChordQuality = "maj";
   if (/^(maj7|M7|Δ)/.test(suffix)) quality = "maj7";
@@ -259,7 +264,12 @@ export function parseChordSymbol(symbol: string): Chord | null {
   else if (/^(m|min|-)(?!aj)/.test(suffix)) quality = "min";
   else if (/^7/.test(suffix)) quality = "7";
   else if (/^5/.test(suffix)) quality = "5";
-  return { root, quality };
+  else if (/^sus2/.test(suffix)) quality = "sus2";
+  else if (/^sus/.test(suffix)) quality = "sus4";
+  else if (/^add9/.test(suffix)) quality = "add9";
+  return bass === undefined || bass === root
+    ? { root, quality }
+    : { root, quality, bass };
 }
 
 function closeSpans(spans: ChordSpan[], total: number): ChordSpan[] {

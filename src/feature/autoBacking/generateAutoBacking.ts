@@ -23,7 +23,7 @@ import { detectKey, keyFromText } from "./keyDetection";
 import type { BarInfo, TabContent } from "./noteEvents";
 import { extractTabContent } from "./noteEvents";
 import type { Chord, ScaleId } from "./theory";
-import { chordSymbol, pcName, usesFlats } from "./theory";
+import { chordSymbol, hasThird, pcName, usesFlats } from "./theory";
 
 export interface AutoBackingOptions {
   measures: TablatureMeasure[];
@@ -371,7 +371,7 @@ export function generateAutoBacking(
   const fromChord = (chord: Chord): AutoBackingSummary["key"] => ({
     tonic: pcName(chord.root, flats),
     scale:
-      chord.quality === "5" || chord.quality === "sus2"
+      !hasThird(chord.quality)
         ? null
         : chord.quality === "min" || chord.quality === "min7"
           ? "minor"

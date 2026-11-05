@@ -1,6 +1,12 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { communityToExercise } from "feature/communityExercises/utils/communityToExercise";
+import type {
+  GoalCounting,
+  GoalEdit,
+  GoalStrictness,
+} from "feature/exerciseGoals/types/exerciseGoal.types";
 import {
+  applyGoalEdit,
   autoStepBpm,
   clampGoalBpm,
   isGoalEligibleExercise,
@@ -465,6 +471,118 @@ export function registerPlanTools(server: McpServer, context: McpContext) {
           startBpm: start,
           targetBpm: target,
           stepBpm: autoStepBpm(start, target),
+          url: appLink("/goals"),
+        });
+      }),
+  );
+
+  server.registerTool(
+    "riffquest_update_exercise_goal",
+    {
+      title: "Edit a tempo goal",
+      description:
+        "Changes an open tempo goal; omitted fields stay. Cleared milestones stay; clean runs stay unless the milestone gets faster or stricter.",
+      inputSchema: strictInput({
+        goalId: docId(),
+        targetBpm: z.number().int().min(20).max(400).optional(),
+        startBpm: z.number().int().min(20).max(400).optional(),
+        strictness: z.enum(["relaxed", "standard", "strict"]).optional(),
+        counting: z.enum(["streak", "total"]).optional(),
+      }),
+      annotations: IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
+    },
+    ({ goalId, targetBpm, startBpm, strictness, counting }) =>
+      runTool("riffquest_update_exercise_goal", async () => {
+        if (
+          targetBpm === undefined &&
+          startBpm === undefined &&
+          strictness === undefined &&
+          counting === undefined
+        ) {
+          return errorResult(
+            "Nothing to change — pass targetBpm, startBpm, strictness or counting.",
+          );
+        }
+        const ref = userRef(uid).collection("exerciseGoals").doc(goalId);
+        const goalOf = (data: FirebaseFirestore.DocumentData) => {
+          const start: number = data.startBpm ?? data.targetBpm;
+          return {
+            exerciseTitle: (data.exerciseTitle ?? "") as string,
+            targetBpm: data.targetBpm as number,
+            startBpm: start,
+            stageBpm: (data.stageBpm ?? start) as number,
+            strictness: (data.strictness ?? "standard") as GoalStrictness,
+            counting: (data.counting ?? "streak") as GoalCounting,
+            cleanRuns: (data.cleanRuns ?? 0) as number,
+            active: data.status !== "completed",
+          };
+        };
+        const editOf = (goal: ReturnType<typeof goalOf>): GoalEdit => {
+          const start = clampGoalBpm(startBpm ?? goal.startBpm);
+          const target = clampGoalBpm(targetBpm ?? goal.targetBpm);
+          return {
+            startBpm: start,
+            targetBpm: target,
+            stepBpm: autoStepBpm(start, target),
+            strictness: strictness ?? goal.strictness,
+            counting: counting ?? goal.counting,
+          };
+        };
+
+        const snapshot = await ref.get();
+        const data = snapshot.data();
+        if (!data) {
+          return errorResult(
+            `No goal "${goalId}" — find ids with riffquest_get_goals.`,
+          );
+        }
+        const current = goalOf(data);
+        if (!current.active) {
+          return errorResult(
+            "That goal is already reached — set a new one with riffquest_set_exercise_goal.",
+          );
+        }
+        const checked = editOf(current);
+        if (checked.startBpm > checked.targetBpm) {
+          return errorResult(
+            `startBpm (${checked.startBpm}) can't be above targetBpm (${checked.targetBpm}).`,
+          );
+        }
+
+        const left = await consumeWriteQuota(context, "write");
+        // Read again inside the transaction, so a run judged meanwhile isn't
+        // lost under the edit — the same as the app's own edit.
+        const result = await firestore.runTransaction(async (transaction) => {
+          const fresh = await transaction.get(ref);
+          const freshData = fresh.data();
+          if (!freshData) throw new McpToolError(`No goal "${goalId}".`);
+          const goal = goalOf(freshData);
+          if (!goal.active) return { goal, edit: null, progress: null };
+          const edit = editOf(goal);
+          const progress = applyGoalEdit(goal, edit);
+          transaction.update(ref, {
+            ...edit,
+            ...progress,
+            updatedAt: Timestamp.now(),
+          });
+          return { goal, edit, progress };
+        });
+
+        if (!result.edit || !result.progress) {
+          return errorResult(
+            "That goal was reached in the meantime — set a new one with riffquest_set_exercise_goal.",
+          );
+        }
+        return jsonResult({
+          ...left,
+          id: goalId,
+          exerciseTitle: result.goal.exerciseTitle,
+          ...result.edit,
+          stageBpm: result.progress.stageBpm,
+          cleanRuns: result.progress.cleanRuns,
+          cleanRunsKept:
+            result.goal.cleanRuns > 0 &&
+            result.progress.cleanRuns === result.goal.cleanRuns,
           url: appLink("/goals"),
         });
       }),

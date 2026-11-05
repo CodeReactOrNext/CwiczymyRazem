@@ -625,6 +625,31 @@
     "permanent": true
   },
   {
+    "source": "/exercises/finger-pair-dyads",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/sus-ornaments-d-a-e",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/sus-ornaments-am-c-g",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/sus-ornaments-full-progression",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/bass-line-chord-changes",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
     "source": "/exercises/muting-discipline-drill",
     "destination": "/intermediate-guitar-practice-routine#muting-discipline-drill",
     "permanent": true

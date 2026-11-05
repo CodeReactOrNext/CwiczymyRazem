@@ -32,6 +32,8 @@ export interface NoteRD {
   harmonicType?: number;
   slideIn?: number;
   slideOut?: number;
+  /** Fretting-hand finger (1 = index … 4 = pinky). */
+  finger?: number;
 }
 
 export interface BeatRD {
@@ -143,6 +145,7 @@ export function buildTablatureRenderData(
           harmonicType:  note.harmonicType,
           slideIn:       note.slideIn,
           slideOut:      note.slideOut,
+          finger:        note.finger,
         };
       });
 

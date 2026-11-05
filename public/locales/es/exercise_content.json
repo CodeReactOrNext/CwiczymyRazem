@@ -3655,6 +3655,91 @@
         "1": "Empieza a tempo lento (p. ej., 60 BPM) y sube la velocidad solo cuando la coordinación sea precisa.",
         "2": "Cuenta las subdivisiones en voz alta («1 y 2 y 3 y 4 y») para fijar tu movimiento físico al ritmo interno."
       }
+    },
+    "finger_pair_dyads": {
+      "title": "Díadas — pares de dedos",
+      "description": "Dos dedos caen exactamente a la vez en cuerdas vecinas y luego los cambias por los otros dos. Es el movimiento básico de todo cambio de acorde limpio.",
+      "whyItMatters": "Un cambio de acorde son varios dedos que caen como una sola forma. La mayoría los coloca uno tras otro, lo que cuesta tiempo y hace que el primer rasgueo del nuevo acorde suene desigual. Entrenar pares de dedos que caen juntos y se cambian con el siguiente par en un solo movimiento crea ese hábito antes de pensar en posiciones de acordes.",
+      "instructions": {
+        "0": "Un dedo por traste: índice en el 5, medio en el 6, anular en el 7, meñique en el 8. El número pequeño junto a cada nota indica el dedo.",
+        "1": "Toca las dos notas del par a la vez, un par por cada clic del metrónomo.",
+        "2": "Cambia de par en un solo movimiento: los dedos 1 y 3 se levantan en cuanto caen el 2 y el 4.",
+        "3": "Sube desde las cuerdas Mi y La hasta Si y Mi aguda, y luego vuelve a bajar."
+      },
+      "tips": {
+        "0": "Entre pares, levanta los dedos solo uno o dos milímetros.",
+        "1": "Si una nota suena antes que la otra, baja el tempo. Lo importante es que caigan juntas.",
+        "2": "Presiona solo lo necesario para que no trastee, con el pulgar detrás del mástil, más o menos a la altura del dedo medio.",
+        "3": "Cuando una pasada completa salga limpia, sube el tempo 5 BPM."
+      }
+    },
+    "sus_ornaments_d_a_e": {
+      "title": "Adornos sus — D, A, E",
+      "description": "Mantén D, A y E mientras un dedo añade o suelta una nota arriba, y convierte cada acorde en una pequeña melodía de colores sus2 y sus4.",
+      "whyItMatters": "Los adornos sus2 y sus4 hacen que un acorde sencillo empiece a sonar como una canción: un dedo se mueve mientras el resto del acorde sigue sonando. También es el primer paso de la independencia de dedos dentro de un acorde. Aprendes a mantener una forma limpia y presionada mientras un solo dedo trabaja a su lado, sin apagar las cuerdas vecinas.",
+      "instructions": {
+        "0": "Rasguea cada forma una vez y déjala sonar durante dos clics del metrónomo. Cada acorde ocupa dos compases: acorde, adorno, acorde, adorno.",
+        "1": "D: el meñique añade la e aguda en el traste 3 (Dsus4) y luego el medio suelta la e (Dsus2).",
+        "2": "A (dedos 1-2-3): el meñique toma la B en el traste 3 (Asus4) y luego el anular suelta la B (Asus2).",
+        "3": "E: el meñique cae en la G traste 2 mientras el índice se levanta: Esus4. El número pequeño junto a cada nota indica el dedo."
+      },
+      "tips": {
+        "0": "Mantén presionados todo el compás los dedos que no se mueven: solo cambia un dedo a la vez.",
+        "1": "Que el dedo que se mueve caiga con la yema, para no tocar la cuerda de al lado.",
+        "2": "Al principio rasguea despacio y escucha la cuerda más aguda: solo cambia la nota del adorno.",
+        "3": "Cuando toda la pasada suene limpia, sube el tempo 5 BPM."
+      }
+    },
+    "sus_ornaments_am_c_g": {
+      "title": "Adornos sus — Am, C, G",
+      "description": "Adorna Am, C y G con notas sus4, sus2 y add9, donde un dedo le pasa su cuerda a otro.",
+      "whyItMatters": "En Am, C y G el adorno no es solo añadir un dedo: un dedo suelta en el mismo momento en que otro cae, a menudo en otra cuerda. Ese intercambio es la verdadera habilidad detrás de tocar acordes de forma limpia y musical. Practicarlo despacio en acordes conocidos acostumbra a la mano a mover dedos sueltos mientras el acorde sigue sonando.",
+      "instructions": {
+        "0": "Rasguea cada forma una vez y déjala sonar durante dos clics del metrónomo. Cada acorde ocupa dos compases: acorde, adorno, acorde, adorno.",
+        "1": "Am: el índice suelta la B mientras el meñique cae en la B traste 3 (Asus4); para Asus2 el índice simplemente suelta.",
+        "2": "C: para Csus4 el medio suelta y el meñique toma la D traste 3; para Cadd9 el índice suelta y el meñique toma la B traste 3.",
+        "3": "G se toca con 3-2-4, así el índice queda libre para añadir la B traste 1 en Gsus4. El número pequeño junto a cada nota indica el dedo."
+      },
+      "tips": {
+        "0": "Haz el intercambio en un solo movimiento: el dedo que sube y el que cae se encuentran en el mismo clic.",
+        "1": "En C y G mantén el anular en su nota de bajo: sujeta el acorde en su sitio.",
+        "2": "Si una cuerda se apaga cuando cae el meñique, arquéalo más y presiona más cerca del traste.",
+        "3": "Cuando toda la pasada suene limpia, sube el tempo 5 BPM."
+      }
+    },
+    "sus_ornaments_full_progression": {
+      "title": "Adornos sus — progresión completa",
+      "description": "Todos los adornos sus de D, A, E, Am, C y G en una progresión. Cada forma suena durante dos tiempos y las formas sus sirven de puente entre acordes.",
+      "whyItMatters": "Los adornos solo suenan naturales cuando siguen fluyendo a través de los cambios de acorde. En esta progresión las formas sus cumplen dos funciones: adornan cada acorde y son el paso hacia el siguiente, porque comparten dedos con él. Como cada forma suena dos tiempos, el dedo que se mueve tiene tiempo de caer limpio mientras la mano ya prepara el siguiente cambio, justo lo que piden las partes reales de guitarra rítmica.",
+      "instructions": {
+        "0": "Rasguea cada forma una vez y déjala sonar durante dos clics del metrónomo. Cada acorde ocupa dos compases.",
+        "1": "La progresión es C – Am – E – A – D – G y de vuelta a C. Desde E, cada acorde es la dominante del siguiente, así que cada cambio empuja hacia el acorde que sigue.",
+        "2": "Aquí A se toca con 2-3-4: Asus4 es el meñique subiendo a la B traste 3 y Asus2 es el meñique soltando. G es 3-2-4, así el índice queda libre para Gsus4.",
+        "3": "La última forma antes de un acorde nuevo a menudo ya le pertenece. El número pequeño junto a cada nota indica el dedo."
+      },
+      "tips": {
+        "0": "Cadd9 → Asus4: el meñique se queda en la B traste 3 y el medio en la D traste 2; solo se mueve el anular.",
+        "1": "Dsus4 → G: deja el meñique en la e aguda traste 3; es la misma nota en ambas formas.",
+        "2": "Gsus4 → C: el índice ya está en la B traste 1 y el anular solo cruza de la E grave a la A, en el mismo traste.",
+        "3": "Esus4 → A: levanta la forma plana 2-3-4 y colócala una cuerda más aguda. Empieza a 50 BPM y sube 5 BPM tras cada pasada limpia."
+      }
+    },
+    "bass_line_chord_changes": {
+      "title": "Línea de bajo entre acordes",
+      "description": "Une acordes con una línea de bajo caminante en Do mayor y La menor: una escala descendente, un descenso cromático bajo Am y notas de paso antes de cada cambio.",
+      "whyItMatters": "Cambiar de acorde en el tiempo uno es solo la mitad del acompañamiento: los buenos guitarristas conectan los acordes para que el bajo cante su propia línea. Eso significa pisar una nota de bajo con un dedo mientras los demás sujetan el acorde o ya van hacia el siguiente. Entrenarlo desarrolla una verdadera independencia de dedos dentro de los acordes y hace que las progresiones sencillas suenen llenas e intencionadas.",
+      "instructions": {
+        "0": "En las frases 1 y 2 cada acorde dura dos tiempos: primero la nota de bajo y luego el acorde en las cuerdas D, G, B y e.",
+        "1": "Frase 1: el bajo baja C B A G F E y luego F G. Frase 2: mantén el acorde de Am y baja el meñique por la E grave —trastes 4, 3, 2— antes de F, E y Am.",
+        "2": "Frase 3: un acorde por compás, y la nota de bajo del tiempo 4 lleva al siguiente acorde.",
+        "3": "F es una cejilla completa en el traste 1. El número pequeño junto a cada nota indica el dedo."
+      },
+      "tips": {
+        "0": "El anular casi no sale del traste 3: C, G/B, Em/G, F y G se lo pasan por el mismo traste.",
+        "1": "De Am a C mantén el índice y el medio: solo camina el anular, de G traste 2 a A traste 2 y A traste 3.",
+        "2": "Toca la nota de bajo un poco más fuerte que el acorde para que la línea se oiga bien.",
+        "3": "Empieza a 40–50 BPM; cuando los doce compases salgan limpios, sube el tempo 5 BPM."
+      }
     }
   },
   "plan": {

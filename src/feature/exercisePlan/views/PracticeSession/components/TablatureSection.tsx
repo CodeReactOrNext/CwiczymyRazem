@@ -21,6 +21,7 @@ import { useTabOverlay } from "../contexts/TabOverlayContext";
 import { accuracyPerMeasure } from "../utils/measureAccuracy";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
 import { alphaTexStaffHeader } from "./AlphaTabScoreViewer/tablatureToAlphaTex";
+import { FingeringHand } from "./FingeringHand/FingeringHand";
 import { LearnModeBar } from "./LearnModeBar";
 import { MicHud } from "./MicHud";
 import { TablatureMinimapBar } from "./TablatureMinimapBar";
@@ -544,7 +545,18 @@ export const TablatureSection = memo(function TablatureSection({
         <div className='px-2 pt-0'>
           {minimapRow}
           <LearnModeBar />
-          <div ref={boardRef} className='relative'>
+          <div className='flex items-stretch gap-2'>
+          {/* The hand for the current grip — draws nothing unless the notes carry fingering. */}
+          {!hideNotes && !cinema && !obscured && (
+            <FingeringHand
+              measures={activeTablature}
+              currentBeatRef={currentBeatRef}
+              restingBeat={shownBeat}
+              isPlaying={isMetronomePlaying && countInRemaining === 0}
+              boardHeight={height}
+            />
+          )}
+          <div ref={boardRef} className='relative min-w-0 flex-1'>
             {tabOverlay}
             <TablatureViewer
               measures={activeTablature}
@@ -594,6 +606,7 @@ export const TablatureSection = memo(function TablatureSection({
               />
             </div>
             <TablatureResizeHandle height={height} onChange={setHeight} />
+          </div>
           </div>
         </div>
       )}
