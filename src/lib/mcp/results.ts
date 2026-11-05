@@ -202,6 +202,7 @@ const WRITE_TOOLS = new Set([
   "riffquest_log_practice",
   "riffquest_create_exercise",
   "riffquest_update_exercise",
+  "riffquest_set_calendar_days",
 ]);
 
 export async function runTool(

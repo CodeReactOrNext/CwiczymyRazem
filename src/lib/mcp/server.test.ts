@@ -54,6 +54,7 @@ describe("riff.quest MCP server", () => {
         "riffquest_get_goals",
         "riffquest_get_monthly_challenge",
         "riffquest_get_my_exercises",
+        "riffquest_get_planned_days",
         "riffquest_get_practice_history",
         "riffquest_get_profile_summary",
         "riffquest_get_recent_runs",
@@ -68,6 +69,7 @@ describe("riff.quest MCP server", () => {
         "riffquest_list_songs",
         "riffquest_preview_tab",
         "riffquest_search_wiki",
+        "riffquest_set_calendar_days",
         "riffquest_set_exercise_goal",
         "riffquest_update_exercise",
         "riffquest_update_exercise_goal",
@@ -110,6 +112,7 @@ describe("riff.quest MCP server", () => {
       "riffquest_create_exercise",
       "riffquest_create_practice_plan",
       "riffquest_log_practice",
+      "riffquest_set_calendar_days",
       "riffquest_set_exercise_goal",
       "riffquest_update_exercise",
       "riffquest_update_exercise_goal",
@@ -124,6 +127,7 @@ describe("riff.quest MCP server", () => {
       .sort();
     expect(repeatableWrites).toEqual([
       "riffquest_add_song_to_list",
+      "riffquest_set_calendar_days",
       "riffquest_set_exercise_goal",
       "riffquest_update_exercise",
       "riffquest_update_exercise_goal",
@@ -133,10 +137,11 @@ describe("riff.quest MCP server", () => {
 
   // Clients load the whole tool list into every conversation. It was 39.6k
   // characters before the trim; a new tool should fit without growing it back.
-  // Raised from 35k for the practice log and goal edit (~2.8k together).
+  // Raised from 35k for the practice log and goal edit (~2.8k together),
+  // then from 37k for the calendar read and write (~2.9k together).
   it("keeps the tool list within its size budget", async () => {
     const { tools } = await client.listTools();
-    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(37_000);
+    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(40_000);
   });
 
   it("refuses arguments a tool doesn't take", async () => {

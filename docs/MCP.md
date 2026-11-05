@@ -70,6 +70,7 @@ per server.
 | Progress (read) | `riffquest_get_profile_summary`, `riffquest_get_practice_history`, `riffquest_get_calendar`, `riffquest_get_skill_breakdown`, `riffquest_get_weak_spots`, `riffquest_get_goals`, `riffquest_get_exercise_stats`, `riffquest_get_recent_runs` |
 | Catalog (read) | `riffquest_list_exercise_taxonomy`, `riffquest_list_exercises`, `riffquest_get_exercise`, `riffquest_list_songs`, `riffquest_get_song`, `riffquest_get_daily_exercise`, `riffquest_get_monthly_challenge`, `riffquest_search_wiki` |
 | Plans (write) | `riffquest_list_my_plans`, `riffquest_create_practice_plan`, `riffquest_update_practice_plan`, `riffquest_add_song_to_list`, `riffquest_set_exercise_goal`, `riffquest_update_exercise_goal` |
+| Calendar (read/write) | `riffquest_get_planned_days`, `riffquest_set_calendar_days` — writes `users/{uid}/settings/calendar` (owner-only, no rules change). A written day replaces its slots, leaves its repeat group, and a slot playing what the day already had keeps its id and tick |
 | Practice log (write) | `riffquest_log_practice` |
 | Own exercises | `riffquest_get_tab_format`, `riffquest_validate_tablature`, `riffquest_preview_tab`, `riffquest_get_exercise_tablature`, `riffquest_get_my_exercises`, `riffquest_create_exercise`, `riffquest_update_exercise` |
 

@@ -4,6 +4,7 @@ import { registerTabPreviewApp } from "./apps/tabPreview";
 import type { McpContext } from "./auth";
 import { registerPrompts } from "./prompts";
 import { APP_URL, appLink } from "./results";
+import { registerCalendarTools } from "./tools/calendar";
 import { registerCatalogTools } from "./tools/catalog";
 import { registerExerciseTools } from "./tools/exercises";
 import { registerPlanTools } from "./tools/plans";
@@ -17,9 +18,9 @@ const INSTRUCTIONS = `riff.quest is a guitar practice app: players log sessions,
 - The player's profile and history come from the riffquest_get_* tools; how the app's mechanics work (points, Fame, streaks, goals) is documented in the wiki that riffquest_search_wiki searches.
 - Library content (exercise and song texts, wiki) is in English.
 - Players are guitarists, not programmers. Tabs travel between the tools as JSON (the format riffquest_get_tab_format describes); players read them as plain-text tabs, which every tool that takes or returns a tab also gives (asciiTab), or in the tab preview.
-- Days in history, calendar and weak spots are the player's own calendar days, in the time zone saved in their profile.
+- Days in history, calendar (practised and planned) and weak spots are the player's own calendar days, in the time zone saved in their profile.
 - riffquest_validate_tablature checks a tab without saving it.
-- The write tools (practice log, plans, song list, goals, exercises) change the player's account and are limited to 20 changes a day, at most 10 of them new exercises; every write answer says how many are left today (changesLeftToday, newExercisesLeftToday).
+- The write tools (practice log, plans, calendar, song list, goals, exercises) change the player's account and are limited to 20 changes a day, at most 10 of them new exercises; every write answer says how many are left today (changesLeftToday, newExercisesLeftToday).
 - Saved items come back with a link that opens them in the app.`;
 
 /**
@@ -60,6 +61,7 @@ export function createRiffQuestMcpServer(context: McpContext) {
   registerProgressTools(server, context);
   registerCatalogTools(server, context);
   registerPlanTools(server, context);
+  registerCalendarTools(server, context);
   registerExerciseTools(server, context);
   registerPracticeLogTools(server, context);
   registerTabPreviewApp(server);

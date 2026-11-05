@@ -6,7 +6,7 @@ section: "Practice"
 order: 6
 ---
 
-riff.quest can talk to the AI assistant you already use. Connect Claude (or another app that supports connectors) to your account and you can ask it things like "what have I been neglecting this month?" or "write me a legato exercise in A minor at 90 BPM", and it answers from your real practice history instead of guessing. It can also save what you agree on: a practice plan, a tempo goal, a song on your list, a new exercise with its tab, or a session you played away from the app. riff.quest doesn't run any AI for this. All the thinking happens in your assistant, and riff.quest only hands it your data and saves the changes you approve.
+riff.quest can talk to the AI assistant you already use. Connect Claude (or another app that supports connectors) to your account and you can ask it things like "what have I been neglecting this month?" or "write me a legato exercise in A minor at 90 BPM", and it answers from your real practice history instead of guessing. It can also save what you agree on: a practice plan, your week on the practice calendar, a tempo goal, a song on your list, a new exercise with its tab, or a session you played away from the app. riff.quest doesn't run any AI for this. All the thinking happens in your assistant, and riff.quest only hands it your data and saves the changes you approve.
 
 It's a supporter perk: any donation to riff.quest unlocks it for your account, while practising and everything else stays free for everyone. [Become a supporter](/supporter) and you can connect right away, and cut the connection off at any moment.
 
@@ -14,7 +14,7 @@ It's a supporter perk: any donation to riff.quest unlocks it for your account, w
 
 Add the connector once, in Claude on the web or in the Claude desktop app. After that it works in the Claude mobile app too.
 
-<StepList steps="Copy the server address::In riff.quest, open Settings and the AI assistants tab. The Server address at the top has a Copy button next to it|Add it as a connector in Claude::In Claude, open Settings, then Connectors, and choose Add custom connector. Give it a name, paste the address and add it|Sign in::Claude sends you to a riff.quest page. Sign in if you aren't already|Decide what it may do::The page says which app is asking and where you'll be sent back. Reading your practice is always included; switch on Allow changes if you want it to save plans, goals, songs, exercises and practice time too. Press Allow|Ask away::Back in Claude, start a new chat and ask about your practice. By default, Claude asks before each change it wants to save" />
+<StepList steps="Copy the server address::In riff.quest, open Settings and the AI assistants tab. The Server address at the top has a Copy button next to it|Add it as a connector in Claude::In Claude, open Settings, then Connectors, and choose Add custom connector. Give it a name, paste the address and add it|Sign in::Claude sends you to a riff.quest page. Sign in if you aren't already|Decide what it may do::The page says which app is asking and where you'll be sent back. Reading your practice is always included; switch on Allow changes if you want it to save plans, calendar days, goals, songs, exercises and practice time too. Press Allow|Ask away::Back in Claude, start a new chat and ask about your practice. By default, Claude asks before each change it wants to save" />
 
 <ClickPath steps="Settings|AI assistants" caption="Where the server address lives, and where you come back later to see or disconnect your apps." />
 
@@ -28,12 +28,12 @@ Any app that supports remote MCP connectors, such as ChatGPT, Cursor or Claude C
 
 ## What it can do
 
-<Checklist items="Read your progress::Your profile, practice history, calendar, skills, weak spots, tempo goals and recent scored runs|Browse the library::Exercises, songs, the exercise of the day, the monthly challenge and this wiki|Plan with you::Create and edit practice plans, add songs to your list, and set or adjust tempo goals|Log your practice::Note down a session you played without the app, split by category, skill or song. It earns points, Fame and keeps your streak, just like logging it yourself|Write exercises::Turn a tab into an exercise of your own, check it, preview it with playback and fix it later" />
+<Checklist items="Read your progress::Your profile, practice history, calendar (what you played and what you planned), skills, weak spots, tempo goals and recent scored runs|Browse the library::Exercises, songs, the exercise of the day, the monthly challenge and this wiki|Plan with you::Create and edit practice plans, fill in or rearrange your practice calendar, add songs to your list, and set or adjust tempo goals|Log your practice::Note down a session you played without the app, split by category, skill or song. It earns points, Fame and keeps your streak, just like logging it yourself|Write exercises::Turn a tab into an exercise of your own, check it, preview it with playback and fix it later" />
 
 It can't touch anything outside your own account. It doesn't see other players' data, can't post anything, and can't join rankings, guilds or duels on your behalf. Exercises it creates are private to you.
 
 <BlogAlert type="tip">
-Some things to try: "Review my last week of practice", "Plan a 30-minute session around my weakest skill", "Set a goal of 140 BPM on my alternate picking exercise", "Log 40 minutes: 20 on alternate picking and 20 on Back in Black", or paste a riff and ask "make this an exercise I can practise".
+Some things to try: "Review my last week of practice", "Plan a 30-minute session around my weakest skill", "Set up my practice week in the calendar, 40 minutes a day, rest on Sunday", "Set a goal of 140 BPM on my alternate picking exercise", "Log 40 minutes: 20 on alternate picking and 20 on Back in Black", or paste a riff and ask "make this an exercise I can practise".
 </BlogAlert>
 
 ## Limits

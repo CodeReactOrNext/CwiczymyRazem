@@ -306,7 +306,7 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
     {
       title: "Practice calendar",
       description:
-        "Minutes practiced on each day of one month, in the player's own days.",
+        "Minutes practiced (not planned) on each day of one month, in the player's own days.",
       inputSchema: strictInput({
         month: z
           .string()

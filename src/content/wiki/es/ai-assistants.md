@@ -6,7 +6,7 @@ section: "Practice"
 order: 6
 ---
 
-riff.quest puede hablar con el asistente de IA que ya usas. Conecta Claude (u otra app que admita conectores) a tu cuenta y pregúntale cosas como «¿qué estoy descuidando este mes?» o «escríbeme un ejercicio de legato en la menor a 90 BPM», y te responderá con tu historial real de práctica en lugar de adivinar. También puede guardar lo que acordéis: un plan de práctica, una meta de tempo, una canción en tu lista, un ejercicio nuevo con su tablatura o una sesión que tocaste fuera de la app. riff.quest no ejecuta ninguna IA para esto. Todo el razonamiento ocurre en tu asistente; riff.quest solo le pasa tus datos y guarda los cambios que apruebes.
+riff.quest puede hablar con el asistente de IA que ya usas. Conecta Claude (u otra app que admita conectores) a tu cuenta y pregúntale cosas como «¿qué estoy descuidando este mes?» o «escríbeme un ejercicio de legato en la menor a 90 BPM», y te responderá con tu historial real de práctica en lugar de adivinar. También puede guardar lo que acordéis: un plan de práctica, tu semana en el calendario de práctica, una meta de tempo, una canción en tu lista, un ejercicio nuevo con su tablatura o una sesión que tocaste fuera de la app. riff.quest no ejecuta ninguna IA para esto. Todo el razonamiento ocurre en tu asistente; riff.quest solo le pasa tus datos y guarda los cambios que apruebes.
 
 Es una ventaja de supporter: cualquier donación a riff.quest la desbloquea para tu cuenta, mientras que practicar y todo lo demás sigue siendo gratis para todos. [Hazte supporter](/supporter) y podrás conectar enseguida, y cortar la conexión cuando quieras.
 
@@ -14,7 +14,7 @@ Es una ventaja de supporter: cualquier donación a riff.quest la desbloquea para
 
 El conector se añade una vez, en Claude en la web o en la app de escritorio. Después funciona también en la app móvil de Claude.
 
-<StepList steps="Copia la dirección del servidor::En riff.quest, abre Ajustes y la pestaña AI assistants. La dirección del servidor de arriba tiene un botón Copiar al lado|Añádela como conector en Claude::En Claude, abre Ajustes, luego Conectores, y añade un conector personalizado. Ponle un nombre, pega la dirección y añádelo|Inicia sesión::Claude te lleva a una página de riff.quest. Inicia sesión si aún no lo has hecho|Decide qué puede hacer::La página muestra qué app lo pide y adónde volverás. Leer tu práctica siempre va incluido; activa Permitir cambios si quieres que también guarde planes, metas, canciones, ejercicios y tiempo de práctica. Pulsa Permitir|Pregunta::De vuelta en Claude, abre un chat nuevo y pregunta por tu práctica. Por defecto, Claude pregunta antes de cada cambio que quiera guardar" />
+<StepList steps="Copia la dirección del servidor::En riff.quest, abre Ajustes y la pestaña AI assistants. La dirección del servidor de arriba tiene un botón Copiar al lado|Añádela como conector en Claude::En Claude, abre Ajustes, luego Conectores, y añade un conector personalizado. Ponle un nombre, pega la dirección y añádelo|Inicia sesión::Claude te lleva a una página de riff.quest. Inicia sesión si aún no lo has hecho|Decide qué puede hacer::La página muestra qué app lo pide y adónde volverás. Leer tu práctica siempre va incluido; activa Permitir cambios si quieres que también guarde planes, días del calendario, metas, canciones, ejercicios y tiempo de práctica. Pulsa Permitir|Pregunta::De vuelta en Claude, abre un chat nuevo y pregunta por tu práctica. Por defecto, Claude pregunta antes de cada cambio que quiera guardar" />
 
 <ClickPath steps="Ajustes|AI assistants" caption="Aquí está la dirección del servidor, y aquí vuelves luego para ver o desconectar tus apps." />
 
@@ -28,12 +28,12 @@ Cualquier app que admita conectores MCP remotos, como ChatGPT, Cursor o Claude C
 
 ## Qué puede hacer
 
-<Checklist items="Leer tu progreso::Tu perfil, historial de práctica, calendario, habilidades, puntos débiles, metas de tempo y tus últimas pasadas puntuadas|Explorar la biblioteca::Ejercicios, canciones, el ejercicio del día, el reto del mes y esta wiki|Planificar contigo::Crear y editar planes de práctica, añadir canciones a tu lista, y fijar o ajustar metas de tempo|Registrar tu práctica::Anotar una sesión que tocaste sin la app, repartida por categoría, habilidad o canción. Da puntos y Fame y mantiene tu racha, igual que si la registraras tú|Escribir ejercicios::Convertir una tablatura en un ejercicio propio, comprobarlo, previsualizarlo con reproducción y corregirlo después" />
+<Checklist items="Leer tu progreso::Tu perfil, historial de práctica, calendario (lo que tocaste y lo que planificaste), habilidades, puntos débiles, metas de tempo y tus últimas pasadas puntuadas|Explorar la biblioteca::Ejercicios, canciones, el ejercicio del día, el reto del mes y esta wiki|Planificar contigo::Crear y editar planes de práctica, rellenar o reorganizar tu calendario de práctica, añadir canciones a tu lista, y fijar o ajustar metas de tempo|Registrar tu práctica::Anotar una sesión que tocaste sin la app, repartida por categoría, habilidad o canción. Da puntos y Fame y mantiene tu racha, igual que si la registraras tú|Escribir ejercicios::Convertir una tablatura en un ejercicio propio, comprobarlo, previsualizarlo con reproducción y corregirlo después" />
 
 No toca nada fuera de tu cuenta. No ve datos de otros jugadores, no puede publicar nada y no te inscribe en rankings, gremios ni duelos. Los ejercicios que crea son privados.
 
 <BlogAlert type="tip">
-Para empezar: «Resume mi última semana de práctica», «Planifica una sesión de 30 minutos en torno a mi habilidad más floja», «Pon una meta de 140 BPM en mi ejercicio de púa alterna», «Registra 40 minutos: 20 de púa alterna y 20 de Back in Black», o pega un riff y pide «haz de esto un ejercicio».
+Para empezar: «Resume mi última semana de práctica», «Planifica una sesión de 30 minutos en torno a mi habilidad más floja», «Organiza mi semana de práctica en el calendario, 40 minutos al día, domingo libre», «Pon una meta de 140 BPM en mi ejercicio de púa alterna», «Registra 40 minutos: 20 de púa alterna y 20 de Back in Black», o pega un riff y pide «haz de esto un ejercicio».
 </BlogAlert>
 
 ## Límites

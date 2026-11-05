@@ -54,7 +54,7 @@ describe("POST /api/mcp", () => {
 
   it("lists the tools and runs one, statelessly, request by request", async () => {
     const list = await (await POST(rpc("tools/list"))).json();
-    expect(list.result.tools.length).toBe(28);
+    expect(list.result.tools.length).toBe(32);
 
     const call = await (
       await POST(

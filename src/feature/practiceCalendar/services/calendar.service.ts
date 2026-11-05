@@ -5,77 +5,16 @@ import type {
   CalendarDays,
   CalendarDoc,
   CalendarItem,
-  CalendarItemKind,
-  CalendarLinks,
   PlannerPrefs,
   PracticeArea,
 } from "../types/calendar.types";
 import { PLAYER_LEVELS, PRACTICE_AREAS } from "../types/calendar.types";
+import { parseDays, parseLinks } from "../utils/calendarParse";
 import { DEFAULT_PLANNER_PREFS } from "../utils/planner";
 
 /** Owner-only like the rest of `settings` — the plan pays nothing out, so the client writes it. */
 const calendarRef = (uid: string) =>
   doc(db, "users", uid, "settings", "calendar");
-
-const KINDS: CalendarItemKind[] = [
-  "exercise",
-  "song",
-  "goal",
-  "roadmap",
-  "custom",
-];
-const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/;
-
-const str = (value: unknown) =>
-  typeof value === "string" && value ? value : undefined;
-
-const parseItem = (raw: unknown): CalendarItem | null => {
-  if (!raw || typeof raw !== "object") return null;
-  const data = raw as Record<string, unknown>;
-  const kind = KINDS.find((candidate) => candidate === data.kind);
-  const area = PRACTICE_AREAS.find((candidate) => candidate === data.area);
-  if (!kind || !area || typeof data.id !== "string") return null;
-  if (typeof data.minutes !== "number" || data.minutes <= 0) return null;
-
-  const song = data.song as Record<string, unknown> | undefined;
-  return {
-    id: data.id,
-    kind,
-    area,
-    minutes: Math.round(data.minutes),
-    role: data.role === "warmup" ? "warmup" : "main",
-    auto: data.auto === true,
-    done: data.done === true,
-    ...(str(data.exerciseId) && { exerciseId: str(data.exerciseId) }),
-    ...(song &&
-      str(song.id) && {
-        song: {
-          id: song.id as string,
-          title: str(song.title) ?? "",
-          artist: str(song.artist) ?? "",
-          ...(str(song.coverUrl) && { coverUrl: str(song.coverUrl) }),
-        },
-      }),
-    ...(str(data.goalId) && { goalId: str(data.goalId) }),
-    ...(typeof data.bpm === "number" && { bpm: data.bpm }),
-    ...(str(data.roadmapId) && { roadmapId: str(data.roadmapId) }),
-    ...(str(data.stepId) && { stepId: str(data.stepId) }),
-    ...(str(data.title) && { title: str(data.title) }),
-    ...(str(data.note) && { note: str(data.note) }),
-  };
-};
-
-const parseDays = (raw: unknown): CalendarDays => {
-  const days: CalendarDays = {};
-  if (!raw || typeof raw !== "object") return days;
-  Object.entries(raw as Record<string, unknown>).forEach(([key, items]) => {
-    if (!DATE_KEY.test(key) || !Array.isArray(items)) return;
-    days[key] = items
-      .map(parseItem)
-      .filter((item): item is CalendarItem => item !== null);
-  });
-  return days;
-};
 
 const parsePrefs = (raw: unknown): PlannerPrefs | null => {
   if (!raw || typeof raw !== "object") return null;
@@ -121,16 +60,6 @@ const parsePrefs = (raw: unknown): PlannerPrefs | null => {
         )
       : [],
   };
-};
-
-const parseLinks = (raw: unknown): CalendarLinks => {
-  if (!raw || typeof raw !== "object") return {};
-  return Object.fromEntries(
-    Object.entries(raw as Record<string, unknown>).filter(
-      (entry): entry is [string, string] =>
-        DATE_KEY.test(entry[0]) && !!str(entry[1]),
-    ),
-  );
 };
 
 export const getCalendar = async (uid: string): Promise<CalendarDoc> => {

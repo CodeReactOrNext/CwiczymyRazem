@@ -6,7 +6,7 @@ section: "Practice"
 order: 6
 ---
 
-riff.quest potrafi rozmawiać z asystentem AI, którego już używasz. Podłącz Claude'a (albo inną aplikację obsługującą konektory) do swojego konta i pytaj na przykład „co zaniedbuję w tym miesiącu?” albo „napisz mi ćwiczenie legato w a-moll na 90 BPM”, a odpowie na podstawie twojej prawdziwej historii ćwiczeń, zamiast zgadywać. Może też zapisać to, na co się umówicie: plan ćwiczeń, cel tempa, utwór na liście, nowe ćwiczenie z tabem albo sesję zagraną poza aplikacją. riff.quest nie uruchamia przy tym żadnego AI. Całe myślenie dzieje się w twoim asystencie, a riff.quest tylko podaje mu twoje dane i zapisuje zmiany, na które się zgodzisz.
+riff.quest potrafi rozmawiać z asystentem AI, którego już używasz. Podłącz Claude'a (albo inną aplikację obsługującą konektory) do swojego konta i pytaj na przykład „co zaniedbuję w tym miesiącu?” albo „napisz mi ćwiczenie legato w a-moll na 90 BPM”, a odpowie na podstawie twojej prawdziwej historii ćwiczeń, zamiast zgadywać. Może też zapisać to, na co się umówicie: plan ćwiczeń, twój tydzień w kalendarzu ćwiczeń, cel tempa, utwór na liście, nowe ćwiczenie z tabem albo sesję zagraną poza aplikacją. riff.quest nie uruchamia przy tym żadnego AI. Całe myślenie dzieje się w twoim asystencie, a riff.quest tylko podaje mu twoje dane i zapisuje zmiany, na które się zgodzisz.
 
 To perk dla supporterów: dowolna wpłata na riff.quest odblokowuje go na twoim koncie, a ćwiczenie i cała reszta zostają darmowe dla wszystkich. [Zostań supporterem](/supporter), a połączysz się od razu i odetniesz połączenie w każdej chwili.
 
@@ -14,7 +14,7 @@ To perk dla supporterów: dowolna wpłata na riff.quest odblokowuje go na twoim 
 
 Konektor dodajesz raz, w Claudzie w przeglądarce albo w aplikacji Claude na komputer. Potem działa też w aplikacji mobilnej.
 
-<StepList steps="Skopiuj adres serwera::W riff.quest otwórz Ustawienia i zakładkę AI assistants. Adres serwera na górze ma obok przycisk Kopiuj|Dodaj go jako konektor w Claudzie::W Claudzie otwórz Ustawienia, potem Konektory i wybierz dodanie własnego konektora. Nadaj mu nazwę, wklej adres i dodaj|Zaloguj się::Claude przeniesie cię na stronę riff.quest. Zaloguj się, jeśli jeszcze nie jesteś|Zdecyduj, co mu wolno::Strona pokazuje, która aplikacja prosi o dostęp i dokąd wrócisz. Odczyt twojego ćwiczenia jest zawsze w pakiecie; włącz Pozwól na zmiany, jeśli ma też zapisywać plany, cele, utwory, ćwiczenia i czas ćwiczeń. Naciśnij Zezwól|Pytaj::Wróć do Claude'a, zacznij nową rozmowę i zapytaj o swoje ćwiczenie. Domyślnie Claude pyta przed każdą zmianą, którą chce zapisać" />
+<StepList steps="Skopiuj adres serwera::W riff.quest otwórz Ustawienia i zakładkę AI assistants. Adres serwera na górze ma obok przycisk Kopiuj|Dodaj go jako konektor w Claudzie::W Claudzie otwórz Ustawienia, potem Konektory i wybierz dodanie własnego konektora. Nadaj mu nazwę, wklej adres i dodaj|Zaloguj się::Claude przeniesie cię na stronę riff.quest. Zaloguj się, jeśli jeszcze nie jesteś|Zdecyduj, co mu wolno::Strona pokazuje, która aplikacja prosi o dostęp i dokąd wrócisz. Odczyt twojego ćwiczenia jest zawsze w pakiecie; włącz Pozwól na zmiany, jeśli ma też zapisywać plany, dni w kalendarzu, cele, utwory, ćwiczenia i czas ćwiczeń. Naciśnij Zezwól|Pytaj::Wróć do Claude'a, zacznij nową rozmowę i zapytaj o swoje ćwiczenie. Domyślnie Claude pyta przed każdą zmianą, którą chce zapisać" />
 
 <ClickPath steps="Ustawienia|AI assistants" caption="Tu jest adres serwera i tu wracasz później, żeby zobaczyć lub odłączyć swoje aplikacje." />
 
@@ -28,12 +28,12 @@ Każda aplikacja obsługująca zdalne konektory MCP, na przykład ChatGPT, Curso
 
 ## Co potrafi
 
-<Checklist items="Czyta twoje postępy::Profil, historię ćwiczeń, kalendarz, umiejętności, słabe punkty, cele tempa i ostatnie ocenione przebiegi|Przegląda bibliotekę::Ćwiczenia, utwory, ćwiczenie dnia, wyzwanie miesiąca i tę wiki|Planuje razem z tobą::Tworzy i edytuje plany ćwiczeń, dodaje utwory do twojej listy, ustawia i zmienia cele tempa|Zapisuje twoje ćwiczenie::Notuje sesję zagraną bez aplikacji, rozbitą na kategorie, umiejętności albo utwory. Daje punkty, Fame i podtrzymuje serię, tak jak raport wpisany ręcznie|Pisze ćwiczenia::Zamienia tab w twoje własne ćwiczenie, sprawdza je, pokazuje podgląd z odtwarzaniem i poprawia później" />
+<Checklist items="Czyta twoje postępy::Profil, historię ćwiczeń, kalendarz (co zagrałeś i co zaplanowałeś), umiejętności, słabe punkty, cele tempa i ostatnie ocenione przebiegi|Przegląda bibliotekę::Ćwiczenia, utwory, ćwiczenie dnia, wyzwanie miesiąca i tę wiki|Planuje razem z tobą::Tworzy i edytuje plany ćwiczeń, wypełnia i przestawia twój kalendarz ćwiczeń, dodaje utwory do twojej listy, ustawia i zmienia cele tempa|Zapisuje twoje ćwiczenie::Notuje sesję zagraną bez aplikacji, rozbitą na kategorie, umiejętności albo utwory. Daje punkty, Fame i podtrzymuje serię, tak jak raport wpisany ręcznie|Pisze ćwiczenia::Zamienia tab w twoje własne ćwiczenie, sprawdza je, pokazuje podgląd z odtwarzaniem i poprawia później" />
 
 Nie dotknie niczego poza twoim kontem. Nie widzi danych innych graczy, nie może niczego publikować, nie zapisze cię też do rankingów, gildii ani pojedynków. Ćwiczenia, które tworzy, są prywatne.
 
 <BlogAlert type="tip">
-Na początek: „Podsumuj mój ostatni tydzień ćwiczeń”, „Zaplanuj 30-minutową sesję wokół mojej najsłabszej umiejętności”, „Ustaw cel 140 BPM na moim ćwiczeniu z kostkowania naprzemiennego”, „Zapisz 40 minut: 20 na kostkowanie naprzemienne i 20 na Back in Black” albo wklej riff i poproś „zrób z tego ćwiczenie, które mogę ćwiczyć”.
+Na początek: „Podsumuj mój ostatni tydzień ćwiczeń”, „Zaplanuj 30-minutową sesję wokół mojej najsłabszej umiejętności”, „Rozpisz mi tydzień w kalendarzu, 40 minut dziennie, niedziela wolna”, „Ustaw cel 140 BPM na moim ćwiczeniu z kostkowania naprzemiennego”, „Zapisz 40 minut: 20 na kostkowanie naprzemienne i 20 na Back in Black” albo wklej riff i poproś „zrób z tego ćwiczenie, które mogę ćwiczyć”.
 </BlogAlert>
 
 ## Limity

@@ -6,7 +6,7 @@ section: "Practice"
 order: 6
 ---
 
-riff.quest kann mit dem KI-Assistenten reden, den du ohnehin benutzt. Verbinde Claude (oder eine andere App, die Konnektoren unterstützt) mit deinem Konto und frag zum Beispiel „was vernachlässige ich diesen Monat?“ oder „schreib mir eine Legato-Übung in a-Moll mit 90 BPM“, und die Antwort kommt aus deiner echten Übungshistorie statt aus Raterei. Er kann auch speichern, worauf ihr euch einigt: einen Übungsplan, ein Tempoziel, einen Song auf deiner Liste, eine neue Übung mit Tab oder eine Session, die du ohne die App gespielt hast. riff.quest lässt dafür keine KI laufen. Das ganze Denken passiert in deinem Assistenten; riff.quest reicht ihm nur deine Daten und speichert die Änderungen, die du erlaubst.
+riff.quest kann mit dem KI-Assistenten reden, den du ohnehin benutzt. Verbinde Claude (oder eine andere App, die Konnektoren unterstützt) mit deinem Konto und frag zum Beispiel „was vernachlässige ich diesen Monat?“ oder „schreib mir eine Legato-Übung in a-Moll mit 90 BPM“, und die Antwort kommt aus deiner echten Übungshistorie statt aus Raterei. Er kann auch speichern, worauf ihr euch einigt: einen Übungsplan, deine Woche im Übungskalender, ein Tempoziel, einen Song auf deiner Liste, eine neue Übung mit Tab oder eine Session, die du ohne die App gespielt hast. riff.quest lässt dafür keine KI laufen. Das ganze Denken passiert in deinem Assistenten; riff.quest reicht ihm nur deine Daten und speichert die Änderungen, die du erlaubst.
 
 Es ist ein Supporter-Vorteil: Jede Spende an riff.quest schaltet ihn für dein Konto frei, Üben und alles andere bleibt für alle kostenlos. [Werde Supporter](/supporter), dann kannst du sofort verbinden und die Verbindung jederzeit kappen.
 
@@ -14,7 +14,7 @@ Es ist ein Supporter-Vorteil: Jede Spende an riff.quest schaltet ihn für dein K
 
 Den Konnektor fügst du einmal hinzu, in Claude im Browser oder in der Claude-Desktop-App. Danach funktioniert er auch in der Claude-App fürs Handy.
 
-<StepList steps="Serveradresse kopieren::Öffne in riff.quest die Einstellungen und den Tab AI assistants. Neben der Serveradresse oben steht ein Kopieren-Button|Als Konnektor in Claude hinzufügen::Öffne in Claude die Einstellungen, dann Konnektoren, und füge einen eigenen Konnektor hinzu. Gib ihm einen Namen, füge die Adresse ein und bestätige|Anmelden::Claude schickt dich auf eine riff.quest-Seite. Melde dich an, falls du es noch nicht bist|Festlegen, was er darf::Die Seite zeigt, welche App fragt und wohin du zurückkommst. Lesen ist immer dabei; schalte Änderungen erlauben ein, wenn er auch Pläne, Ziele, Songs, Übungen und Übungszeit speichern soll. Drück Erlauben|Loslegen::Zurück in Claude startest du einen neuen Chat und fragst nach deinem Üben. Standardmäßig fragt Claude vor jeder Änderung, die er speichern will" />
+<StepList steps="Serveradresse kopieren::Öffne in riff.quest die Einstellungen und den Tab AI assistants. Neben der Serveradresse oben steht ein Kopieren-Button|Als Konnektor in Claude hinzufügen::Öffne in Claude die Einstellungen, dann Konnektoren, und füge einen eigenen Konnektor hinzu. Gib ihm einen Namen, füge die Adresse ein und bestätige|Anmelden::Claude schickt dich auf eine riff.quest-Seite. Melde dich an, falls du es noch nicht bist|Festlegen, was er darf::Die Seite zeigt, welche App fragt und wohin du zurückkommst. Lesen ist immer dabei; schalte Änderungen erlauben ein, wenn er auch Pläne, Kalendertage, Ziele, Songs, Übungen und Übungszeit speichern soll. Drück Erlauben|Loslegen::Zurück in Claude startest du einen neuen Chat und fragst nach deinem Üben. Standardmäßig fragt Claude vor jeder Änderung, die er speichern will" />
 
 <ClickPath steps="Einstellungen|AI assistants" caption="Hier steht die Serveradresse, und hierher kommst du später zurück, um deine Apps zu sehen oder zu trennen." />
 
@@ -28,12 +28,12 @@ Jede App, die Remote-MCP-Konnektoren unterstützt, etwa ChatGPT, Cursor oder Cla
 
 ## Was er kann
 
-<Checklist items="Deinen Fortschritt lesen::Profil, Übungshistorie, Kalender, Skills, Schwachstellen, Tempoziele und die letzten bewerteten Durchläufe|Die Bibliothek durchsuchen::Übungen, Songs, die Übung des Tages, die Monats-Challenge und dieses Wiki|Mit dir planen::Übungspläne anlegen und bearbeiten, Songs zu deiner Liste hinzufügen, Tempoziele setzen und anpassen|Dein Üben eintragen::Eine Session, die du ohne die App gespielt hast, nach Kategorie, Skill oder Song aufgeteilt eintragen. Sie bringt Punkte und Fame und hält deine Serie, genau wie ein selbst eingetragener Bericht|Übungen schreiben::Aus einem Tab eine eigene Übung machen, sie prüfen, mit Wiedergabe ansehen und später korrigieren" />
+<Checklist items="Deinen Fortschritt lesen::Profil, Übungshistorie, Kalender (was du gespielt und was du geplant hast), Skills, Schwachstellen, Tempoziele und die letzten bewerteten Durchläufe|Die Bibliothek durchsuchen::Übungen, Songs, die Übung des Tages, die Monats-Challenge und dieses Wiki|Mit dir planen::Übungspläne anlegen und bearbeiten, deinen Übungskalender füllen oder umstellen, Songs zu deiner Liste hinzufügen, Tempoziele setzen und anpassen|Dein Üben eintragen::Eine Session, die du ohne die App gespielt hast, nach Kategorie, Skill oder Song aufgeteilt eintragen. Sie bringt Punkte und Fame und hält deine Serie, genau wie ein selbst eingetragener Bericht|Übungen schreiben::Aus einem Tab eine eigene Übung machen, sie prüfen, mit Wiedergabe ansehen und später korrigieren" />
 
 Außerhalb deines Kontos fasst er nichts an. Er sieht keine Daten anderer Spieler, kann nichts veröffentlichen, und er meldet dich weder für Ranglisten noch für Gilden oder Duelle an. Übungen, die er anlegt, sind privat.
 
 <BlogAlert type="tip">
-Zum Ausprobieren: „Fass meine letzte Übungswoche zusammen“, „Plane eine 30-Minuten-Session um meinen schwächsten Skill“, „Setz ein Ziel von 140 BPM für meine Wechselschlag-Übung“, „Trag 40 Minuten ein: 20 Wechselschlag und 20 Back in Black“, oder füg ein Riff ein und frag „mach daraus eine Übung“.
+Zum Ausprobieren: „Fass meine letzte Übungswoche zusammen“, „Plane eine 30-Minuten-Session um meinen schwächsten Skill“, „Leg mir die Übungswoche im Kalender an, 40 Minuten am Tag, sonntags frei“, „Setz ein Ziel von 140 BPM für meine Wechselschlag-Übung“, „Trag 40 Minuten ein: 20 Wechselschlag und 20 Back in Black“, oder füg ein Riff ein und frag „mach daraus eine Übung“.
 </BlogAlert>
 
 ## Limits

@@ -112,8 +112,8 @@ const PrivacyPolicyPage: NextPageWithLayout = () => {
                 You can connect an AI assistant you use, such as Claude, ChatGPT or Cursor, to your account through our MCP server. It is a supporter perk, and it is off until you set it up yourself, either by signing in from the assistant and pressing &ldquo;Allow&rdquo;, or by creating a personal token in Settings &rarr; AI assistants.
               </p>
               <ul className="list-disc pl-6 space-y-2">
-                <li><strong>What the assistant can read:</strong> your profile summary (display name, level, points, streak), practice history and calendar, skills, tempo goals, practice plans, songs on your lists, your own exercises and scored runs, plus the public exercise library and wiki. It never receives your password, email address or payment details, and it can&apos;t see other players&apos; private data.</li>
-                <li><strong>What it can change:</strong> only if you allow changes, it can save practice plans, tempo goals, songs on your lists and private exercises, up to 20 changes a day. It can&apos;t log practice time, change your points, publish anything or change your account settings.</li>
+                <li><strong>What the assistant can read:</strong> your profile summary (display name, level, points, streak), practice history and calendar (including the days you planned), skills, tempo goals, practice plans, songs on your lists, your own exercises and scored runs, plus the public exercise library and wiki. It never receives your password, email address or payment details, and it can&apos;t see other players&apos; private data.</li>
+                <li><strong>What it can change:</strong> only if you allow changes, it can save practice plans, days on your practice calendar, tempo goals, songs on your lists and private exercises, and log practice sessions you played outside the app, up to 20 changes a day. It can&apos;t change your points directly, publish anything or change your account settings.</li>
                 <li><strong>Who receives the data:</strong> the data goes only to the assistant you connected, and only when it asks for it during your conversation. We don&apos;t run any AI model for this and don&apos;t send your data to AI providers on our own. Once the assistant has received data, it is part of your conversation there and is handled under that provider&apos;s privacy policy (for example Anthropic&apos;s for Claude or OpenAI&apos;s for ChatGPT).</li>
                 <li><strong>What we store:</strong> for each connection, the app&apos;s name and address, what you allowed it to do, and when it was connected and last used; for personal tokens, the name you gave them. Tokens are stored only as one-way hashes, never in readable form. We also keep a daily count of changes per account and, to stop abuse of the sign-in pages, an hourly request count keyed by a one-way hash of the IP address.</li>
                 <li><strong>How long:</strong> access tokens from signing in expire after 1 hour and are renewed automatically; the connection itself lapses after 90 days without use. Personal tokens last until you revoke them. Connection records are kept until you disconnect, and are deleted together with the rest of your data if you ask us to delete your account (see Your Rights).</li>
@@ -142,7 +142,7 @@ const PrivacyPolicyPage: NextPageWithLayout = () => {
             </section>
 
             <p className="pt-8 text-sm italic">
-              Last updated: November 1, 2026
+              Last updated: November 5, 2026
             </p>
           </div>
         </div>
