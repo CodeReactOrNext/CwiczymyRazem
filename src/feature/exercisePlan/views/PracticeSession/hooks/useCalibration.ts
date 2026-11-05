@@ -38,7 +38,12 @@ function saveCalibrationToStorage(data: CalibrationData): void {
   // Disabled
 }
 
-export function useCalibration(planHasTablature: boolean) {
+/**
+ * @param micRequired exams, goal runs and duels only count mic-scored runs —
+ *   closing the setup wizard there must not leave the session running with
+ *   the mic off, so it goes back to the mic prompt instead.
+ */
+export function useCalibration(planHasTablature: boolean, micRequired = false) {
   const [sessionPhase, setSessionPhase] = useState<SessionPhase>(() => {
     const pref = loadMicPreference();
     if (pref !== null || !planHasTablature) return "ready";
@@ -53,8 +58,10 @@ export function useCalibration(planHasTablature: boolean) {
   const existingStoredData = null;
   const existingCalibrationTimestamp = 0;
 
+  // The preference is only saved once the wizard finishes: saving it here left
+  // "on" in storage while a cancelled wizard kept the mic off, so the next
+  // session silently turned it on and this one never asked again.
   const handleEnableMic = useCallback(() => {
-    saveMicPreference(true);
     setSessionPhase("calibrating");
   }, []);
 
@@ -68,6 +75,7 @@ export function useCalibration(planHasTablature: boolean) {
     if (existingStoredData) {
       setCalibrationData(existingStoredData);
     }
+    saveMicPreference(true);
     setIsMicEnabled(true);
     setSessionPhase("ready");
   }, [existingStoredData]);
@@ -78,13 +86,15 @@ export function useCalibration(planHasTablature: boolean) {
 
   const handleCalibrationComplete = useCallback((data: CalibrationData) => {
     // We no longer save offset data
+    saveMicPreference(true);
     setIsMicEnabled(true);
     setSessionPhase("ready");
   }, []);
 
   const handleCalibrationCancel = useCallback(() => {
-    setSessionPhase("ready");
-  }, []);
+    // Recalibrating with the mic already on just closes the wizard.
+    setSessionPhase(micRequired && !isMicEnabled ? "mic_prompt" : "ready");
+  }, [micRequired, isMicEnabled]);
 
   const getAdjustedTargetFreq = useCallback(
     (stringNumber: number, baseFreq: number): number => {

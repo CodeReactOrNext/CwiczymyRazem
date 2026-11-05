@@ -74,9 +74,11 @@ interface MicModeDialogProps {
   examMode?: boolean;
   onEnableMic: () => void;
   onSkipMic: () => void;
+  /** Exam only — the prompt can't be skipped there, so this is its way out. */
+  onLeave?: () => void;
 }
 
-export const MicModeDialog = ({ isOpen, examMode, onEnableMic, onSkipMic }: MicModeDialogProps) => {
+export const MicModeDialog = ({ isOpen, examMode, onEnableMic, onSkipMic, onLeave }: MicModeDialogProps) => {
   const { t } = useTranslation("calibration");
   return (
     <>
@@ -123,6 +125,11 @@ export const MicModeDialog = ({ isOpen, examMode, onEnableMic, onSkipMic }: MicM
             {!examMode && (
               <Button variant="ghost" onClick={onSkipMic} className="w-full text-zinc-500 hover:text-zinc-300">
                 {t("mic_mode.skip")}
+              </Button>
+            )}
+            {examMode && onLeave && (
+              <Button variant="ghost" onClick={onLeave} className="w-full text-zinc-500 hover:text-zinc-300">
+                {t("common:practice.exit")}
               </Button>
             )}
           </DialogFooter>

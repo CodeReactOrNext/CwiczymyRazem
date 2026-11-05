@@ -84,6 +84,7 @@ export const ROADMAP_RAISED_OFFSET = 648;
 const ROADMAP_STEPS: RoadmapStep[] = [
   {
     id: "ex-chord-changes",
+    done: true,
     cost: 30,
     icon: ArrowLeftRight,
     label: "+3 New Exercises",
@@ -94,6 +95,7 @@ const ROADMAP_STEPS: RoadmapStep[] = [
   },
   {
     id: "bass",
+    done: true,
     cost: 40,
     icon: AudioWaveform,
     label: "Bass Support",
@@ -103,6 +105,7 @@ const ROADMAP_STEPS: RoadmapStep[] = [
   },
   {
     id: "mcp",
+    done: true,
     cost: 35,
     icon: Cable,
     label: "Connect Your AI Assistant (MCP)",
@@ -112,6 +115,7 @@ const ROADMAP_STEPS: RoadmapStep[] = [
   },
   {
     id: "gear-1",
+    done: true,
     cost: 40,
     icon: Radio,
     label: "+15 New Guitars & Pedals",

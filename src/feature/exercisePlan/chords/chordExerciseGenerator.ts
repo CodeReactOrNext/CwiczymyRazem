@@ -86,7 +86,7 @@ export function generateChordExercise(config: ChordExerciseConfig): Exercise {
     description,
     difficulty: chords.length > 2 ? 'medium' : 'easy',
     category: 'technique',
-    timeInMinutes: 10,
+    timeInMinutes: 2.5,
     instructions,
     tips: [
       `Use the 'anchor finger' technique if chords share a finger position.`,

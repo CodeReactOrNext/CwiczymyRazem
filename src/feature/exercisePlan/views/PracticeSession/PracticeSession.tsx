@@ -712,7 +712,14 @@ const PracticeSessionInner = ({
     sessionPhase, isMicEnabled: _isMicEnabled, handleEnableMic, handleSkipMic,
     handleReuseCalibration, handleRecalibrate, handleCalibrationComplete, handleCalibrationCancel,
     getAdjustedTargetFreq, existingCalibrationTimestamp, setIsMicEnabled: updateMicPersistence, setSessionPhase,
-  } = useCalibration(planHasTablature);
+  } = useCalibration(planHasTablature, (isExamMode || isGoalMode || !!plan.duel) && !currentExercise.disableMic);
+  // The wizard opens the input itself and enables the mic only when it
+  // finishes — closing it early has to close that stream too, or the tuner keeps
+  // reading the guitar and the mic looks on while nothing is being scored.
+  const handleCalibrationCancelAndClose = useCallback(() => {
+    if (!_isMicEnabled) closeAudio();
+    handleCalibrationCancel();
+  }, [_isMicEnabled, closeAudio, handleCalibrationCancel]);
 
   // disableMic marks exercises with nothing to detect (click drills, improv
   // prompts, backing-track jams). It has to gate the mic HERE, not just the mic
@@ -1099,7 +1106,9 @@ const PracticeSessionInner = ({
     handleNextExerciseClick, handleMicToggle, handleAudioToggle,
     handleExerciseSelect, handleEarTrainingGuessed, handleNoteMatchingReset,
   } = useSessionControls({
-    shortcutsDisabled: isAligningBacking || !!bossFight?.isOver || !!bossFight?.isHolding,
+    // The mic prompt and setup wizard sit over the session too: Space on one of
+    // their buttons would otherwise start the run (and an exam's clock) behind them.
+    shortcutsDisabled: isAligningBacking || !!bossFight?.isOver || !!bossFight?.isHolding || sessionPhase !== "ready",
     isPlaying, stopTimer, startTimer, resetTimer, metronome,
     currentExercise, currentExerciseIndex, isLastExercise, jumpToExercise,
     handleNextExercise, restartFullSession,
@@ -1475,10 +1484,10 @@ const PracticeSessionInner = ({
         exerciseTitle={currentExercise.title} exerciseDuration={currentExercise.timeInMinutes}
         onFinish={onFinish} handleRestart={handleRestart}
         sessionPhase={sessionPhase} examMode={isExamMode}
-        handleEnableMic={handleEnableMic} handleSkipMic={handleSkipMic}
+        handleEnableMic={handleEnableMic} handleSkipMic={handleSkipMic} onLeave={onClose}
         existingCalibrationTimestamp={existingCalibrationTimestamp}
         handleReuseCalibration={handleReuseCalibration} handleRecalibrate={handleRecalibrate}
-        handleCalibrationCancel={handleCalibrationCancel} handleCalibrationComplete={handleCalibrationComplete}
+        handleCalibrationCancel={handleCalibrationCancelAndClose} handleCalibrationComplete={handleCalibrationComplete}
         audioInit={initAudio} audioClose={closeAudio} audioRefs={audioRefs}
         isListening={isListening} inputGain={inputGain} setInputGain={setInputGain}
         isNative={isNative} onSelectDevice={selectDevice} onSelectChannel={selectChannel}

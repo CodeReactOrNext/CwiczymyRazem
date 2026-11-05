@@ -27,6 +27,8 @@ interface SessionDialogsProps {
   examMode?: boolean;
   handleEnableMic: () => void;
   handleSkipMic: () => void;
+  /** Leaves the session from the exam mic prompt, which has no skip. */
+  onLeave?: () => void;
   existingCalibrationTimestamp: number | null;
   handleReuseCalibration: () => void;
   handleRecalibrate: () => void;
@@ -63,6 +65,7 @@ export const SessionDialogs = ({
   examMode,
   handleEnableMic,
   handleSkipMic,
+  onLeave,
   existingCalibrationTimestamp,
   handleReuseCalibration,
   handleRecalibrate,
@@ -127,6 +130,7 @@ export const SessionDialogs = ({
         examMode={examMode}
         onEnableMic={handleEnableMic}
         onSkipMic={handleSkipMic}
+        onLeave={onLeave}
       />
 
       <CalibrationChoiceDialog
