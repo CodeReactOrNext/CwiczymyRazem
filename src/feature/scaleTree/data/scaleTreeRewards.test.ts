@@ -9,6 +9,7 @@ import {
   getBoxCompletion,
   getBoxNodes,
   getBoxReward,
+  getClaimableScaleBoxes,
   getScaleNodes,
   isFinaleBox,
 } from "./scaleTreeRewards";
@@ -238,5 +239,33 @@ describe("getBoxCompletion", () => {
       total: 0,
       isComplete: false,
     });
+  });
+});
+
+describe("getClaimableScaleBoxes", () => {
+  const scaleType = SCALES[0];
+  const position = boxesOf(scaleType)[0];
+
+  it("lists nothing for a player who has cleared nothing", () => {
+    expect(getClaimableScaleBoxes(new Map(), [])).toEqual([]);
+  });
+
+  it("lists a cleared box that has not been claimed", () => {
+    const boxes = getClaimableScaleBoxes(clearedBox(scaleType, position), []);
+    expect(boxes).toHaveLength(1);
+    expect(boxes[0]).toMatchObject({
+      scaleType,
+      position,
+      rewardId: boxRewardId(scaleType, position),
+      reward: getBoxReward(scaleType, position),
+    });
+  });
+
+  it("drops a box once its reward is in the ledger", () => {
+    expect(
+      getClaimableScaleBoxes(clearedBox(scaleType, position), [
+        boxRewardId(scaleType, position),
+      ]),
+    ).toEqual([]);
   });
 });

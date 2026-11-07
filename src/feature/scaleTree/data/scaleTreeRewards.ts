@@ -177,3 +177,36 @@ export const getBoxCompletion = (
   nodes: readonly ScaleTreeNodeDef[] = SCALE_TREE_NODES,
 ): ScaleCompletion =>
   countCleared(getBoxNodes(scaleType, position, nodes), progress);
+
+export interface ClaimableScaleBox {
+  scaleType: string;
+  position: number;
+  rewardId: string;
+  reward: RewardPayout;
+}
+
+/**
+ * Every finished box whose reward is still waiting, across all trees.
+ *
+ * Built from the same two halves the block on the tree uses — the box cleared
+ * off the tempo record, its id not yet in the ledger — so a box listed here is
+ * exactly one the claim route will pay.
+ */
+export const getClaimableScaleBoxes = (
+  progress: BpmProgressMap,
+  claimedIds: readonly string[],
+  nodes: readonly ScaleTreeNodeDef[] = SCALE_TREE_NODES,
+): ClaimableScaleBox[] => {
+  const claimed = new Set(claimedIds);
+
+  return Object.entries(SCALE_TREE_POSITIONS).flatMap(([scaleType, positions]) =>
+    positions.flatMap((position) => {
+      const rewardId = boxRewardId(scaleType, position);
+      if (claimed.has(rewardId)) return [];
+      if (!getBoxCompletion(scaleType, position, progress, nodes).isComplete) return [];
+
+      const reward = getBoxReward(scaleType, position, nodes);
+      return reward ? [{ scaleType, position, rewardId, reward }] : [];
+    }),
+  );
+};
