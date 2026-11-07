@@ -24,6 +24,8 @@ import { GuildStudioPanel } from "feature/guilds/components/GuildStudioPanel";
 import { GuildUpgradesTab } from "feature/guilds/components/GuildUpgradesTab";
 import { useGuilds } from "feature/guilds/hooks/useGuilds";
 import type { Guild } from "feature/guilds/types/guild.types";
+import type { GuildTab } from "feature/guilds/utils/guildTab";
+import { parseGuildTab } from "feature/guilds/utils/guildTab";
 import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -37,17 +39,8 @@ import {
   Target,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useRouter } from "next/router";
 
-type GuildTab =
-  | "browse"
-  | "members"
-  | "chat"
-  | "stash"
-  | "quests"
-  | "studio"
-  | "upgrades"
-  | "kit";
 
 const TABS: {
   id: GuildTab;
@@ -185,7 +178,14 @@ const NoGuildHeader = ({ isLoading }: { isLoading: boolean }) => {
 
 export const GuildsView = () => {
   const { t } = useTranslation("guilds");
-  const [tab, setTab] = useState<GuildTab>("browse");
+  // URL-driven (?tab=quests) so links from elsewhere — What Next, notifications —
+  // can open the right tab.
+  const router = useRouter();
+  const tab = parseGuildTab(router.query.tab);
+  const setTab = (next: GuildTab) =>
+    router.replace({ query: { ...router.query, tab: next } }, undefined, {
+      shallow: true,
+    });
   const { ref: railRef, edges } = useRailEdges<HTMLDivElement>();
   const { data, isLoading } = useGuilds(true);
 
