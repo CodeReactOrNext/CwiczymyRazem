@@ -68,6 +68,7 @@ export const TRANSLATION_NAMESPACES = [
   "toast",
   "tone_studio",
   "ui",
+  "what_next",
   "wiki",
   "yup_errors",
 ] as const;

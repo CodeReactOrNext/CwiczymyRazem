@@ -1,0 +1,40 @@
+{
+  "page": {
+    "eyebrow": "Dein Weg",
+    "subtitle": "Was du jetzt spielst, was heute fällig ist und welches Ziel am nächsten ist"
+  },
+  "widget": {
+    "open": "Ganzer Weg"
+  },
+  "hero": {
+    "eyebrow": "Nächster Schritt",
+    "play": "Spielen",
+    "open": "Öffnen",
+    "minutes": "Etwa {{count}} Min."
+  },
+  "session": {
+    "title": "Oder spiele eine Session vom Anfang deines Weges",
+    "minutes": "{{count}} min"
+  },
+  "lanes": {
+    "today": "Heute",
+    "inProgress": "In Arbeit",
+    "week": "Diese Woche und Saison",
+    "horizon": "Am Horizont"
+  },
+  "claims": {
+    "title": "Bereit zum Abholen",
+    "claim_all": "Alles abholen"
+  },
+  "menu": {
+    "label": "Weitere Optionen",
+    "today": "Nicht heute",
+    "week": "Für eine Woche ausblenden",
+    "snoozed": "Ausgeblendet. Es kommt von selbst zurück."
+  },
+  "time_left": "noch {{time}}",
+  "empty": {
+    "title": "Dein Weg ist frei",
+    "body": "Für heute ist alles erledigt. Spiel, was du willst, oder schau, was als Nächstes kommt."
+  }
+}

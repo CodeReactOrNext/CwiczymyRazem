@@ -52,6 +52,7 @@ import supporter from "../../../public/locales/en/supporter.json";
 import tab_settings from "../../../public/locales/en/tab_settings.json";
 import timer from "../../../public/locales/en/timer.json";
 import tone_studio from "../../../public/locales/en/tone_studio.json";
+import what_next from "../../../public/locales/en/what_next.json";
 import wiki from "../../../public/locales/en/wiki.json";
 import { registerEnglish } from "./localeStore";
 import type { LocaleCatalog } from "./namespaces";
@@ -101,6 +102,7 @@ export const EN_APP_CATALOG: LocaleCatalog = {
   tab_settings,
   timer,
   tone_studio,
+  what_next,
   wiki,
 };
 
