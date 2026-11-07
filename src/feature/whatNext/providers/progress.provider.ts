@@ -48,7 +48,7 @@ export const goalActions = (s: WhatNextSnapshot): NextAction[] => {
     ];
   }
 
-  return active.map((goal) => {
+  return active.map((goal): NextAction => {
     const stages = goalStages(goal);
     const index = Math.max(0, stages.indexOf(goal.stageBpm));
     const next = nextStageBpm(goal, goal.stageBpm);
@@ -59,14 +59,20 @@ export const goalActions = (s: WhatNextSnapshot): NextAction[] => {
       kind: "continue" as const,
       isPractice: true,
       playerSet: true,
-      title: {
-        key: "goals.title",
-        params: {
-          title: goal.exerciseTitle,
-          bpm: goal.stageBpm,
-          target: goal.targetBpm,
-        },
-      },
+      title:
+        next === null
+          ? {
+              key: "goals.title_final",
+              params: { title: goal.exerciseTitle, target: goal.targetBpm },
+            }
+          : {
+              key: "goals.title",
+              params: {
+                title: goal.exerciseTitle,
+                bpm: goal.stageBpm,
+                target: goal.targetBpm,
+              },
+            },
       reason:
         next === null
           ? {

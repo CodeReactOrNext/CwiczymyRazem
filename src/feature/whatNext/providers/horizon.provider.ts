@@ -18,6 +18,8 @@ export const progressionActions = (s: WhatNextSnapshot): NextAction[] => {
 
   const feature = next.unlocks.find((unlock) => unlock.kind === "feature");
   const pointsLeft = pointsToReachLvl(s.points, next.lvl);
+  // Already over the line: the level-up lands with the next save, nothing to aim for.
+  if (pointsLeft <= 0) return [];
 
   return [
     {

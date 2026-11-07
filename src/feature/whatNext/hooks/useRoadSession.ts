@@ -1,4 +1,3 @@
-import { Button } from "assets/components/ui/button";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import type { PracticeArea } from "feature/practiceCalendar/types/calendar.types";
@@ -8,11 +7,14 @@ import { useNextMessage } from "feature/whatNext/hooks/useNextMessage";
 import type { RankedAction } from "feature/whatNext/types/whatNext.types";
 import {
   pickSessionItems,
-  SESSION_LENGTHS,
   toCalendarItems,
 } from "feature/whatNext/utils/buildSession";
 import posthog from "posthog-js";
+import { useCallback } from "react";
 import { toast } from "sonner";
+
+/** How long "play the whole road" runs. */
+export const ROAD_SESSION_MINUTES = 30;
 
 const EXERCISES_BY_ID = new Map(
   exercisesAgregat.map((exercise) => [exercise.id, exercise]),
@@ -27,57 +29,33 @@ const exerciseArea = (exerciseId: string): PracticeArea => {
     : "technique";
 };
 
-interface SessionLauncherProps {
-  ranked: RankedAction[];
-  onStart: (plan: ExercisePlan) => void;
-}
-
 /**
- * "Play 15 / 30 / 45 minutes": the top of the road packed into one session,
- * built by the calendar's own day builder so it plays like any planned day.
+ * The road as one session: its playable steps, in order, packed into
+ * `ROAD_SESSION_MINUTES` by the calendar's own day builder. Null when nothing
+ * on the road can be played in a session.
  */
-export const SessionLauncher = ({ ranked, onStart }: SessionLauncherProps) => {
+export const useRoadSession = (ranked: RankedAction[] | undefined) => {
   const { t } = useNextMessage();
-  const playable = ranked.some((action) => action.sessionItem);
+  const playable = !!ranked?.some((action) => action.sessionItem);
 
-  const start = (minutes: number) => {
-    const picks = pickSessionItems(ranked, minutes);
+  const build = useCallback((): ExercisePlan | null => {
+    if (!ranked) return null;
+    const picks = pickSessionItems(ranked, ROAD_SESSION_MINUTES);
     const plan = buildDayPlan(
       toDateKey(new Date()),
       toCalendarItems(picks, exerciseArea),
       EXERCISES_BY_ID,
     );
     if (!plan) {
-      toast.error(t("session.nothing"));
-      return;
+      toast.error(t("road.nothing_to_play"));
+      return null;
     }
     posthog.capture("what_next_session_started", {
-      minutes,
+      minutes: ROAD_SESSION_MINUTES,
       items: plan.exercises.length,
     });
-    onStart({
-      ...plan,
-      id: `what-next-${minutes}`,
-      title: t("session.started"),
-    });
-  };
+    return { ...plan, id: "what-next-road", title: t("road.session_title") };
+  }, [ranked, t]);
 
-  if (!playable) return null;
-
-  return (
-    <div className='flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-4'>
-      <p className='text-sm text-zinc-400'>{t("session.title")}</p>
-      <div className='flex gap-2'>
-        {SESSION_LENGTHS.map((minutes) => (
-          <Button
-            key={minutes}
-            size='sm'
-            variant='subtle'
-            onClick={() => start(minutes)}>
-            {t("session.minutes", { count: minutes })}
-          </Button>
-        ))}
-      </div>
-    </div>
-  );
+  return { playable, build };
 };

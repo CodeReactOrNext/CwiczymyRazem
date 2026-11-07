@@ -1,12 +1,10 @@
 import { useWhatNextStore } from "feature/whatNext/store/whatNext.store";
-import type {
-  NextAction,
-  NextActionLane,
-} from "feature/whatNext/types/whatNext.types";
+import type { NextAction } from "feature/whatNext/types/whatNext.types";
 import posthog from "posthog-js";
 import { useCallback } from "react";
 
-export type WhatNextPlacement = NextActionLane | "hero";
+/** The first stop of the road, or any stop after it. */
+export type WhatNextPlacement = "hero" | "step";
 
 /**
  * A tap on an action: remembered (so an action tapped and left undone steps

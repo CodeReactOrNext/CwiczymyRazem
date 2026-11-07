@@ -1,30 +1,20 @@
 {
   "page": {
-    "eyebrow": "Twoja droga",
-    "title": "What Next",
-    "subtitle": "Co zagrać teraz, co trzeba zrobić dziś i który cel jest najbliżej"
+    "title": "What Next"
   },
   "widget": {
     "title": "What Next",
     "open": "Cała droga"
   },
-  "hero": {
-    "eyebrow": "Następny krok",
+  "road": {
+    "start": "Start",
     "play": "Graj",
     "open": "Otwórz",
-    "minutes": "Około {{count}} min"
-  },
-  "session": {
-    "title": "Albo zagraj sesję z początku swojej drogi",
-    "minutes": "{{count}} min",
-    "nothing": "Na twojej drodze nie ma jeszcze nic, co dałoby się zagrać jako sesję",
-    "started": "Sesja z What Next"
-  },
-  "lanes": {
-    "today": "Dziś",
-    "inProgress": "W toku",
-    "week": "Ten tydzień i sezon",
-    "horizon": "Na horyzoncie"
+    "not_today": "Nie dziś",
+    "chest": "Nagrody",
+    "play_all": "Zagraj całą drogę · {{count}} min",
+    "nothing_to_play": "Na twojej drodze nie ma jeszcze nic, co dałoby się zagrać jako sesję",
+    "session_title": "Twoja droga"
   },
   "claims": {
     "title": "Do odebrania",
@@ -52,13 +42,6 @@
     "free_cases_many": "{{count}} darmowych skrzynek do otwarcia",
     "free_cases_other": "{{count}} darmowej skrzynki do otwarcia"
   },
-  "menu": {
-    "label": "Więcej opcji",
-    "today": "Nie dziś",
-    "week": "Ukryj na tydzień",
-    "snoozed": "Ukryte. Wróci samo."
-  },
-  "time_left": "zostało {{time}}",
   "empty": {
     "title": "Droga czysta",
     "body": "Na dziś wszystko zrobione. Zagraj, co chcesz, albo zobacz, co przed tobą."
@@ -107,6 +90,7 @@
   },
   "goals": {
     "title": "{{title}}: {{bpm}} → {{target}} BPM",
+    "title_final": "{{title}}: {{target}} BPM",
     "reason_one": "Do następnego kamienia milowego: {{count}} czyste przejście w {{bpm}} BPM",
     "reason_few": "Do następnego kamienia milowego: {{count}} czyste przejścia w {{bpm}} BPM",
     "reason_many": "Do następnego kamienia milowego: {{count}} czystych przejść w {{bpm}} BPM",

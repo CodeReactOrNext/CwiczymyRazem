@@ -320,3 +320,7 @@ F0–F3 zrobione. Kod w `src/feature/whatNext/`, strona `src/pages/next.tsx`, wi
 - **`useClaimMilestone`** czyta uid ze store'a zamiast z kontekstu Home, żeby odbierać można było też z `/next`.
 
 **Nie zrobione (F4):** endpoint `/api/what-next`, narzędzie MCP `get_what_next`, strojenie wag. To ostatnie wymaga danych z PostHoga po wdrożeniu.
+
+## 10. Zmiana UI: jedna droga (2026-11-07)
+
+Na prośbę właściciela UI uproszczone do jednej drogi w stylu Duolingo: okrągłe kroki zygzakiem połączone kropkami, „Start” nad pierwszym krokiem, po stuknięciu kroku dymek z nazwą, jednym zdaniem „dlaczego”, przyciskiem Graj i „Nie dziś”. Nagrody to prezent na drodze zaraz po pierwszym kroku. Sekcje (Dziś / W toku / Tydzień / Horyzont), odliczania, Fame przy wierszach, menu „ukryj na tydzień” i wybór 15/30/45 min zniknęły. Zostało jedno „Zagraj całą drogę · 30 min”. Silnik i ranking bez zmian. Podgląd na danych testowych: `/dev/what-next-preview` (`?view=widget`, `?state=empty`).

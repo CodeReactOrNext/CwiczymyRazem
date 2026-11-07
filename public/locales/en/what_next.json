@@ -1,30 +1,20 @@
 {
   "page": {
-    "eyebrow": "Your road",
-    "title": "What Next",
-    "subtitle": "What to play now, what is due today, and which goal is closest"
+    "title": "What Next"
   },
   "widget": {
     "title": "What Next",
     "open": "Full road"
   },
-  "hero": {
-    "eyebrow": "Next step",
+  "road": {
+    "start": "Start",
     "play": "Play",
     "open": "Open",
-    "minutes": "About {{count}} min"
-  },
-  "session": {
-    "title": "Or play a session from the top of your road",
-    "minutes": "{{count}} min",
-    "nothing": "Nothing on your road can be played as a session yet",
-    "started": "Session from What Next"
-  },
-  "lanes": {
-    "today": "Today",
-    "inProgress": "In progress",
-    "week": "This week and season",
-    "horizon": "On the horizon"
+    "not_today": "Not today",
+    "chest": "Rewards",
+    "play_all": "Play the whole road · {{count}} min",
+    "nothing_to_play": "Nothing on your road can be played as a session yet",
+    "session_title": "Your road"
   },
   "claims": {
     "title": "Ready to collect",
@@ -42,13 +32,6 @@
     "free_cases_one": "{{count}} free case to open",
     "free_cases_other": "{{count}} free cases to open"
   },
-  "menu": {
-    "label": "More options",
-    "today": "Not today",
-    "week": "Hide for a week",
-    "snoozed": "Hidden. It comes back on its own."
-  },
-  "time_left": "{{time}} left",
   "empty": {
     "title": "Your road is clear",
     "body": "Everything for today is done. Play anything you like, or look at what is coming up."
@@ -95,6 +78,7 @@
   },
   "goals": {
     "title": "{{title}}: {{bpm}} → {{target}} BPM",
+    "title_final": "{{title}}: {{target}} BPM",
     "reason_one": "{{count}} clean run left at {{bpm}} BPM to reach the next milestone",
     "reason_other": "{{count}} clean runs left at {{bpm}} BPM to reach the next milestone",
     "reason_final_one": "Last milestone: {{count}} clean run left at {{bpm}} BPM",

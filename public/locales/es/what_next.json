@@ -1,38 +1,21 @@
 {
-  "page": {
-    "eyebrow": "Tu camino",
-    "subtitle": "Qué tocar ahora, qué vence hoy y qué objetivo tienes más cerca"
-  },
   "widget": {
     "open": "Camino completo"
   },
-  "hero": {
-    "eyebrow": "Siguiente paso",
+  "road": {
+    "start": "Empezar",
     "play": "Tocar",
     "open": "Abrir",
-    "minutes": "Unos {{count}} min"
-  },
-  "session": {
-    "title": "O toca una sesión desde el principio de tu camino",
-    "minutes": "{{count}} min"
-  },
-  "lanes": {
-    "today": "Hoy",
-    "inProgress": "En curso",
-    "week": "Esta semana y temporada",
-    "horizon": "En el horizonte"
+    "not_today": "Hoy no",
+    "chest": "Recompensas",
+    "play_all": "Tocar todo el camino · {{count}} min",
+    "nothing_to_play": "Todavía no hay nada en tu camino que se pueda tocar como sesión",
+    "session_title": "Tu camino"
   },
   "claims": {
     "title": "Listo para recoger",
     "claim_all": "Recoger todo"
   },
-  "menu": {
-    "label": "Más opciones",
-    "today": "Hoy no",
-    "week": "Ocultar una semana",
-    "snoozed": "Oculto. Vuelve solo."
-  },
-  "time_left": "quedan {{time}}",
   "empty": {
     "title": "Camino despejado",
     "body": "Todo lo de hoy está hecho. Toca lo que quieras o mira lo que viene."

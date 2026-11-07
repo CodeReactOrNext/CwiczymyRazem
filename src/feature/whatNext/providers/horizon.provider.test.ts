@@ -11,9 +11,15 @@ import {
 
 describe("progressionActions", () => {
   it("names the next rung of the level ladder", () => {
-    const [action] = progressionActions(snapshot({ lvl: 10 }));
+    const [action] = progressionActions(snapshot({ lvl: 10, points: 0 }));
     expect(action.title.params).toEqual({ lvl: getNextMilestone(10)!.lvl });
     expect(action.kind).toBe("horizon");
+  });
+
+  it("stays quiet once the points are already over the line", () => {
+    expect(
+      progressionActions(snapshot({ lvl: 1, points: 10_000_000 })),
+    ).toEqual([]);
   });
 
   it("says which feature a rung opens", () => {
