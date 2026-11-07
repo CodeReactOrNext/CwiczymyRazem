@@ -27,8 +27,9 @@ export const MAX_CUSTOM_SHORTCUT_LABEL = 40;
  * not part of the layout at all.
  */
 export const DEFAULT_LAYOUT: DashboardLayout = {
-  version: 1,
+  version: 2,
   widgets: [
+    { id: "what-next", size: "full" },
     { id: "daily-quests", size: "half" },
     { id: "practice-stats", size: "half" },
     { id: "daily-exercise", size: "full" },
@@ -78,9 +79,15 @@ const normalizeShortcuts = (raw: unknown): ShortcutId[] => {
 
 /** Same-origin paths only, so a stored shortcut can never send anyone off-site. */
 export const isInternalHref = (href: unknown): href is string =>
-  typeof href === "string" && href.startsWith("/") && !href.startsWith("//") && !href.includes("\\");
+  typeof href === "string" &&
+  href.startsWith("/") &&
+  !href.startsWith("//") &&
+  !href.includes("\\");
 
-const normalizeCustomShortcuts = (raw: unknown, room: number): CustomShortcut[] => {
+const normalizeCustomShortcuts = (
+  raw: unknown,
+  room: number,
+): CustomShortcut[] => {
   if (!Array.isArray(raw)) return [];
   const seen = new Set<string>();
   const shortcuts: CustomShortcut[] = [];
@@ -100,6 +107,19 @@ const normalizeCustomShortcuts = (raw: unknown, room: number): CustomShortcut[] 
 };
 
 /**
+ * A layout saved before What Next existed gets it on top, once. The version
+ * moves to 2 with the next save, so a player who then removes the card keeps
+ * it removed.
+ */
+const addWhatNextOnce = (
+  widgets: WidgetPlacement[],
+  storedVersion: unknown,
+): WidgetPlacement[] =>
+  storedVersion === 2 || widgets.some((w) => w.id === "what-next")
+    ? widgets
+    : [{ id: "what-next", size: "full" }, ...widgets];
+
+/**
  * Turns whatever is stored into a layout the page can render: unknown cards
  * (removed from the app since) are dropped, duplicates collapse to their first
  * occurrence, bad sizes fall back to the card's default, and a missing list
@@ -108,7 +128,7 @@ const normalizeCustomShortcuts = (raw: unknown, room: number): CustomShortcut[] 
 export const normalizeLayout = (raw: unknown): DashboardLayout => {
   if (!raw || typeof raw !== "object") {
     return {
-      version: 1,
+      version: 2,
       widgets: DEFAULT_LAYOUT.widgets.map((w) => ({ ...w })),
       shortcuts: [...DEFAULT_LAYOUT.shortcuts],
       customShortcuts: [],
@@ -117,8 +137,8 @@ export const normalizeLayout = (raw: unknown): DashboardLayout => {
   const data = raw as Record<string, unknown>;
   const shortcuts = normalizeShortcuts(data.shortcuts);
   return {
-    version: 1,
-    widgets: normalizeWidgets(data.widgets),
+    version: 2,
+    widgets: addWhatNextOnce(normalizeWidgets(data.widgets), data.version),
     shortcuts,
     customShortcuts: normalizeCustomShortcuts(
       data.customShortcuts,

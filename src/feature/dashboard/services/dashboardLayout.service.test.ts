@@ -68,9 +68,13 @@ describe("dashboardLayout.service", () => {
 
     const layout = await firebaseGetDashboardLayout("uid-1");
 
+    // Saved before What Next: the card is added on top, once.
     expect(layout).toEqual({
-      version: 1,
-      widgets: [{ id: "streak", size: "half" }],
+      version: 2,
+      widgets: [
+        { id: "what-next", size: "full" },
+        { id: "streak", size: "half" },
+      ],
       shortcuts: ["wiki"],
       customShortcuts: [],
     });
@@ -80,19 +84,31 @@ describe("dashboardLayout.service", () => {
     vi.mocked(setDoc).mockResolvedValue(undefined as never);
 
     await firebaseSaveDashboardLayout("uid-1", {
-      version: 1,
+      version: 2,
       widgets: [{ id: "rank", size: "half" }],
       shortcuts: ["settings"],
-      customShortcuts: [{ id: "custom-a", label: "No guitar", href: "/profile/skills?tab=browse" }],
+      customShortcuts: [
+        {
+          id: "custom-a",
+          label: "No guitar",
+          href: "/profile/skills?tab=browse",
+        },
+      ],
     });
 
     expect(setDoc).toHaveBeenCalledWith(
       { path: "users/uid-1/settings/dashboard" },
       {
-        version: 1,
+        version: 2,
         widgets: [{ id: "rank", size: "half" }],
         shortcuts: ["settings"],
-        customShortcuts: [{ id: "custom-a", label: "No guitar", href: "/profile/skills?tab=browse" }],
+        customShortcuts: [
+          {
+            id: "custom-a",
+            label: "No guitar",
+            href: "/profile/skills?tab=browse",
+          },
+        ],
         updatedAt: { __serverTimestamp: true },
       },
       { merge: true },

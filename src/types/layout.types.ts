@@ -1,5 +1,6 @@
 export type NavPagesTypes =
   | "profile"
+  | "what-next"
   | "exercise"
   | "report"
   | "leadboard"

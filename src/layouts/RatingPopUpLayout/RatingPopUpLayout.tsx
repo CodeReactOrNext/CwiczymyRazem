@@ -8,6 +8,7 @@ import { AchievementCard, useAchievementContext } from "feature/achievements";
 import type { ScoredRun } from "feature/exercisePlan/types/exercise.types";
 import { NextUpCard } from "feature/progression/components/NextUpCard";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
+import { WhatNextWidget } from "feature/whatNext/components/WhatNextWidget";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
@@ -492,6 +493,9 @@ const RatingPopUpLayout = ({
 
           {/* ── The climb ahead, and anything already owed ── */}
           <NextUpCard />
+
+          {/* ── What to play next, now that this session is in ── */}
+          <WhatNextWidget />
 
           {/* ── Session time + Streak ── */}
           <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2">

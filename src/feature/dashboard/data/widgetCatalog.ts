@@ -16,6 +16,7 @@ import {
   Activity,
   BarChart3,
   CalendarClock,
+  Compass,
   Flame,
   Gift,
   History,
@@ -56,6 +57,15 @@ export const WIDGET_GROUP_ORDER: WidgetGroup[] = [
 ];
 
 const DEFINITIONS: Record<StaticWidgetId, Omit<WidgetDefinition, "id">> = {
+  "what-next": {
+    title: "What Next",
+    description:
+      "The one thing to play next, rewards waiting to be collected, and what comes after.",
+    icon: Compass,
+    group: "practice",
+    defaultSize: "full",
+    resizable: true,
+  },
   "daily-quests": {
     title: "Daily quests",
     description: "Today's three tasks and the Claim button.",

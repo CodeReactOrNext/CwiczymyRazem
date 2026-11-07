@@ -44,6 +44,7 @@ import {
   BookOpen,
   CassetteTape,
   ChevronDown,
+  Compass,
   Download,
   Flame,
   Heart,
@@ -362,6 +363,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const getActiveProfileSection = () => {
     const { pathname } = router;
     if (pathname === "/dashboard" || pathname === "/profile") return "home";
+    if (pathname === "/next") return "what-next";
     if (pathname.startsWith("/timer")) return "practice";
     if (pathname === "/report") return "practice";
     if (pathname.startsWith("/gp-tabs")) return "practice";
@@ -441,6 +443,14 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const mainNavigation = [
     { id: "home", name: t("home"), href: "/dashboard", icon: <Home size={18} /> },
+    // Right under Home: it is the answer to "what do I do now?", which is
+    // the question Home is opened with.
+    {
+      id: "what-next",
+      name: t("what_next"),
+      href: "/next",
+      icon: <Compass size={18} />,
+    },
     {
       id: "practice",
       name: t("practice"),
