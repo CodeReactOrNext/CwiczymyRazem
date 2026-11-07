@@ -4,7 +4,7 @@ import type {
 } from "feature/whatNext/types/whatNext.types";
 import { describe, expect, it } from "vitest";
 
-import { buildRoad, windOffset } from "./buildRoad";
+import { buildRoad } from "./buildRoad";
 
 const action = (id: string): RankedAction => ({
   id,
@@ -56,13 +56,5 @@ describe("buildRoad", () => {
 
   it("cuts the road to its length", () => {
     expect(buildRoad(result(), 2)).toHaveLength(2);
-  });
-});
-
-describe("windOffset", () => {
-  it("winds out and back, starting in the middle", () => {
-    expect([0, 1, 2, 3, 4, 5, 6, 7, 8].map(windOffset)).toEqual([
-      0, 56, 84, 56, 0, -56, -84, -56, 0,
-    ]);
   });
 });

@@ -35,8 +35,3 @@ export const buildRoad = (
 
   return stops.slice(0, length);
 };
-
-/** Sideways shift of each stop on the page, in px — the road winds instead of running straight. */
-const WIND = [0, 56, 84, 56, 0, -56, -84, -56];
-
-export const windOffset = (index: number): number => WIND[index % WIND.length];

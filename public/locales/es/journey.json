@@ -37,7 +37,8 @@
     "steps": "{{done}}/{{total}} pasos"
   },
   "path": {
-    "modules": "Módulos"
+    "modules": "Módulos",
+    "start": "Empezar"
   },
   "modules": {
     "title": "Ruta de aprendizaje",

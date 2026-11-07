@@ -1,13 +1,14 @@
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
+import { RoadPathNode } from "components/RoadPath/RoadPathNode";
 import {
   WidgetHeader,
   WidgetLink,
 } from "feature/dashboard/components/widgets/WidgetHeader";
 import {
   RoadStopBubble,
-  RoadStopNode,
+  useStopLook,
 } from "feature/whatNext/components/RoadStopView";
 import { useNextMessage } from "feature/whatNext/hooks/useNextMessage";
 import { useRoadSelection } from "feature/whatNext/hooks/useRoadSelection";
@@ -58,6 +59,7 @@ export const WhatNextRoadStrip = ({
   ) => void;
 }) => {
   const { t } = useNextMessage();
+  const look = useStopLook();
   const road = useMemo(() => buildRoad(result, WIDGET_STOPS), [result]);
   const [selected, select] = useRoadSelection(road);
   const open = road.find((stop) => stop.id === selected);
@@ -87,11 +89,12 @@ export const WhatNextRoadStrip = ({
           <li
             key={stop.id}
             style={{ transform: `translateY(${WAVE[index] ?? 0}px)` }}>
-            <RoadStopNode
-              stop={stop}
+            <RoadPathNode
+              {...look(stop, index === 0 ? 26 : 20)}
               size={index === 0 ? "md" : "sm"}
+              halo='none'
               selected={stop.id === selected}
-              onSelect={() => select(stop.id)}
+              onClick={() => select(stop.id)}
             />
           </li>
         ))}

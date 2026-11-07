@@ -1,6 +1,8 @@
 import { Skeleton } from "assets/components/ui/skeleton";
+import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
 import MainContainer from "components/MainContainer";
+import { roadWaveX } from "components/RoadPath/RoadPath";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { WhatNextRoad } from "feature/whatNext/components/WhatNextRoad";
@@ -11,18 +13,17 @@ import {
 } from "feature/whatNext/hooks/useRoadSession";
 import { useTrackAction } from "feature/whatNext/hooks/useTrackAction";
 import { useWhatNext } from "feature/whatNext/hooks/useWhatNext";
-import { windOffset } from "feature/whatNext/utils/buildRoad";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useEffect, useRef, useState } from "react";
 
 const RoadSkeleton = () => (
-  <div className='flex flex-col items-center gap-10 pt-16'>
+  <div className='flex flex-col items-center gap-14 pt-12'>
     {Array.from({ length: 5 }).map((_, index) => (
       <Skeleton
         key={index}
-        className='h-16 w-16 rounded-full'
-        style={{ transform: `translateX(${windOffset(index)}px)` }}
+        className='h-20 w-20 rounded-full'
+        style={{ transform: `translateX(${roadWaveX(index)}px)` }}
       />
     ))}
   </div>
@@ -79,8 +80,10 @@ export const WhatNextView = () => {
   ) : null;
 
   return (
-    <div className='mx-auto w-full max-w-md px-4 pb-24 pt-6'>
-      <h1 className='text-center font-display text-2xl font-bold text-zinc-100'>
+    <div className='relative min-h-full overflow-hidden rounded-lg bg-zinc-950 px-3 pb-24 pt-8 md:px-10'>
+      {/* The same tiled watermark Journey's road runs over. */}
+      <GuitarPatternBackground className='pointer-events-none absolute inset-0 h-full w-full' />
+      <h1 className='relative text-center font-display text-3xl font-black tracking-tight text-zinc-100'>
         {t("page.title")}
       </h1>
       <LoadingSwap isLoading={isLoading || !result} skeleton={<RoadSkeleton />}>

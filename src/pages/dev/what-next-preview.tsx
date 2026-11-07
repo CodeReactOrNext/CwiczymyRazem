@@ -6,6 +6,9 @@ import {
   WidgetHeader,
   WidgetLink,
 } from "feature/dashboard/components/widgets/WidgetHeader";
+import { journeyModules } from "feature/journey/data/journeyModules";
+import { buildModuleWithStatus } from "feature/journey/utils/journeyStatus";
+import { JourneyPath } from "feature/journey/view/components/JourneyPath";
 import { WhatNextRoad } from "feature/whatNext/components/WhatNextRoad";
 import { WhatNextRoadStrip } from "feature/whatNext/components/WhatNextWidget";
 import type { WhatNextSnapshot } from "feature/whatNext/types/whatNext.types";
@@ -20,6 +23,7 @@ import { useMemo, useState } from "react";
  * from any nav; renders nothing outside development.
  *
  *   ?view=widget   only the Home card
+ *   ?view=journey  Journey's road, on the same shared component
  *   ?state=empty   nothing left to do
  */
 const HOUR = 60 * 60 * 1000;
@@ -122,6 +126,26 @@ const fixture = (now: number, empty: boolean): WhatNextSnapshot =>
         ],
       };
 
+/** The first module with three steps done and the fourth started. */
+const journeyModule = () => {
+  const first = journeyModules[0];
+  const steps = first.stages.flatMap((stage) => stage.steps);
+  return buildModuleWithStatus(first, {
+    userId: "dev",
+    updatedAt: "",
+    moduleProgress: {
+      [first.id]: {
+        steps: Object.fromEntries([
+          ...steps
+            .slice(0, 3)
+            .map((step) => [step.id, { completed: true, stars: 3 as const }]),
+          [steps[3].id, { completed: false, startedAt: "2026-11-01" }],
+        ]),
+      },
+    },
+  });
+};
+
 const WhatNextPreview = () => {
   const router = useRouter();
   const [client] = useState(() => new QueryClient());
@@ -137,7 +161,13 @@ const WhatNextPreview = () => {
   return (
     <QueryClientProvider client={client}>
       <div className='min-h-screen bg-zinc-950 px-4 py-8'>
-        {router.query.view === "widget" ? (
+        {router.query.view === "journey" ? (
+          <JourneyPath
+            module={journeyModule()}
+            onStepClick={() => undefined}
+            onBack={() => undefined}
+          />
+        ) : router.query.view === "widget" ? (
           <div className='mx-auto max-w-2xl'>
             <Card className='flex flex-col p-5 sm:p-6'>
               <WidgetHeader

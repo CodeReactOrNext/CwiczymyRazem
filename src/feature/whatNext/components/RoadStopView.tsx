@@ -1,5 +1,5 @@
+import type { RoadTone } from "components/RoadPath/RoadPathNode";
 import { ClaimStrip } from "feature/whatNext/components/ClaimStrip";
-import { RoadNode } from "feature/whatNext/components/RoadNode";
 import { SOURCE_ICONS } from "feature/whatNext/components/sourceIcons";
 import {
   BubbleFrame,
@@ -10,47 +10,46 @@ import type { ClaimItem } from "feature/whatNext/types/whatNext.types";
 import type { RoadStop } from "feature/whatNext/utils/buildRoad";
 import { Gift } from "lucide-react";
 import type { ReactNode } from "react";
+import { useCallback } from "react";
 
-/** The round key for one stop, coloured by what it is. */
-export const RoadStopNode = ({
-  stop,
-  size,
-  selected,
-  onSelect,
-}: {
-  stop: RoadStop;
-  size: "lg" | "md" | "sm";
-  selected: boolean;
-  onSelect: () => void;
-}) => {
+export interface StopLook {
+  tone: RoadTone;
+  icon: ReactNode;
+  title: string;
+  startLabel?: string;
+}
+
+/**
+ * How a What Next stop looks on a road: the first step is the one to start
+ * (cyan, with Start over it), rewards are the amber gift, a streak keeps its
+ * orange, and everything after is open road.
+ */
+export const useStopLook = () => {
   const { t, text } = useNextMessage();
 
-  if (stop.kind === "chest") {
-    return (
-      <RoadNode
-        icon={Gift}
-        label={t("road.chest")}
-        tone='chest'
-        size={size}
-        selected={selected}
-        onClick={onSelect}
-      />
-    );
-  }
-
-  const { action, isFirst } = stop;
-  return (
-    <RoadNode
-      icon={SOURCE_ICONS[action.source]}
-      label={text(action.title)}
-      tone={
-        action.source === "streak" ? "streak" : isFirst ? "current" : "next"
+  return useCallback(
+    (stop: RoadStop, iconSize: number): StopLook => {
+      if (stop.kind === "chest") {
+        return {
+          tone: "chest",
+          icon: <Gift size={iconSize} strokeWidth={2.5} aria-hidden />,
+          title: t("road.chest"),
+        };
       }
-      size={size}
-      selected={selected}
-      startLabel={isFirst ? t("road.start") : undefined}
-      onClick={onSelect}
-    />
+      const Icon = SOURCE_ICONS[stop.action.source];
+      return {
+        tone:
+          stop.action.source === "streak"
+            ? "streak"
+            : stop.isFirst
+              ? "current"
+              : "open",
+        icon: <Icon size={iconSize} strokeWidth={2.5} aria-hidden />,
+        title: text(stop.action.title),
+        startLabel: stop.isFirst ? t("road.start") : undefined,
+      };
+    },
+    [t, text],
   );
 };
 
