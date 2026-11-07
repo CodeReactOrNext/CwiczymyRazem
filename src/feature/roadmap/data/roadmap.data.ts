@@ -136,6 +136,7 @@ const ROADMAP_STEPS: RoadmapStep[] = [
   },
   {
     id: "what-next",
+    done: true,
     cost: 35,
     icon: Compass,
     label: "What Next",

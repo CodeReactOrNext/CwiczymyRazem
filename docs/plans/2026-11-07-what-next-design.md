@@ -303,3 +303,20 @@ Bez Firestore w v1, więc bez zmian w regułach. Synchronizacja między urządze
 1. ~~Czy `/next` ma być osobną stroną z widgetem na Home, czy zastąpić górę Home?~~ **Ustalone (2026-11-07):** osobna strona `/next` + widget `what-next` na Home.
 2. ~~Czy ekonomia arsenalu ma się pojawiać?~~ **Ustalone:** tylko pasek „Odbierz” (darmowe skrzynki). Bez pity, tradera, rynku i nowych przedmiotów.
 3. ~~Nazwa w UI?~~ **Ustalone:** „What Next”.
+
+## 9. Dostarczone (2026-11-07)
+
+F0–F3 zrobione. Kod w `src/feature/whatNext/`, strona `src/pages/next.tsx`, wiki `src/content/wiki/what-next.md` (+ pl/de/es).
+
+**Zgodnie z planem:** providery jako czyste funkcje z testami, `RANK_WEIGHTS` w jednym miejscu (`utils/rankActions.ts`), scenariusze całej drogi w `utils/buildWhatNext.test.ts`, pasek „Odbierz” (quest, kamienie milowe i odznaki odbierane w miejscu; skrzynki, boxy skal, questy gildii i punkty umiejętności jako linki), snooze/klik w zustand + localStorage, widget na Home, strona `/next` z czterema sekcjami, „Zagraj 15/30/45 min”, blok What Next na ekranie po sesji, eventy PostHog (`what_next_viewed`, `what_next_action_clicked`, `what_next_claim`, `what_next_claim_all`, `what_next_snoozed`, `what_next_session_started`).
+
+**Odstępstwa:**
+- **Onboarding** liczony z `sessionCount` i liczby utworów, a nie z `getGettingStartedProgress`. Checklista i tak stoi nad kartami na Home, a pełny hook ciągnie arsenal.
+- **Nagrody za moduły Journey i roadmapy** nie trafiają do paska: nie ma helpera, który mówi, że są do odebrania, a odbiera się je na końcu modułu w ich własnym UI.
+- **Helpery logów (F0 #5)** wylądowały w `useWhatNextSnapshot` (ostatni plan, minuty w kategoriach z 7 dni), bo nikt inny ich nie potrzebuje.
+- **„Zagraj X min”**: otwarte pytanie z 4.5 rozstrzygnięte pozytywnie. `buildDayPlan` przyjmuje dowolne pozycje, więc akcje zamieniamy na pozycje kalendarza (`toCalendarItems`) i gramy przez `PracticeSession`, bez zapisu do kalendarza.
+- **Zakres widgetu vs. strony**: widget nie czyta drzewka skal, sezonu, gildii, odznak i bossów (dodatkowe odczyty); te źródła wypełniają tylko dolne sekcje strony.
+- **Layout Home**: wersja 1 → 2. Layout zapisany w wersji 1 dostaje widget na górze raz; po zapisie w wersji 2 usunięcie karty jest trwałe.
+- **`useClaimMilestone`** czyta uid ze store'a zamiast z kontekstu Home, żeby odbierać można było też z `/next`.
+
+**Nie zrobione (F4):** endpoint `/api/what-next`, narzędzie MCP `get_what_next`, strojenie wag. To ostatnie wymaga danych z PostHoga po wdrożeniu.
