@@ -15,60 +15,15 @@ import {
   firebaseStartJourneyStep,
 } from "../services/journey.service";
 import type {
-  JourneyModule,
   JourneyModuleWithStatus,
   JourneyProgressDocument,
-  JourneyStep,
-  JourneyStepProgress,
   JourneyStepWithStatus,
 } from "../types/journey.types";
+import { buildModuleWithStatus } from "../utils/journeyStatus";
 import { JourneyPath } from "./components/JourneyPath";
 import { JourneyPathSkeleton, ModuleSelectionSkeleton } from "./components/JourneySkeletons";
 import { ModuleSelectionScreen } from "./components/ModuleSelectionScreen";
 import { StepSidebar } from "./components/StepSidebar";
-
-// ─── Progress merging ─────────────────────────────────────────────────────────
-
-function mergeStepsWithProgress(
-  steps: JourneyStep[],
-  savedSteps: Record<string, JourneyStepProgress> | undefined
-): JourneyStepWithStatus[] {
-  return steps.map((step) => {
-    const saved = savedSteps?.[step.id];
-
-    if (saved?.completed) return { ...step, status: "completed", stars: saved.stars };
-    if (saved?.startedAt && !saved.completed) return { ...step, status: "in-progress" };
-    if (step.order === 1) return { ...step, status: "available" };
-
-    const prev = steps.find((s) => s.order === step.order - 1);
-    if (prev && savedSteps?.[prev.id]?.completed) return { ...step, status: "available" };
-
-    return { ...step, status: "locked" };
-  });
-}
-
-function buildModuleWithStatus(
-  module: JourneyModule,
-  progressDoc: JourneyProgressDocument | null
-): JourneyModuleWithStatus {
-  const savedModule = progressDoc?.moduleProgress?.[module.id];
-  const allSteps = module.stages.flatMap((s) => s.steps);
-  const stepsWithStatus = mergeStepsWithProgress(allSteps, savedModule?.steps);
-
-  const stages = module.stages.map((stage) => ({
-    ...stage,
-    steps: stepsWithStatus.filter((s) => s.stageId === stage.id),
-  }));
-
-  const completedCount = stepsWithStatus.filter((s) => s.status === "completed").length;
-
-  return {
-    ...module,
-    stages,
-    completedCount,
-    totalCount: allSteps.length,
-  };
-}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
