@@ -15,7 +15,6 @@ import { useTonePresets } from "hooks/useTonePresets";
 import { useTranslation } from "hooks/useTranslation";
 import {
   AppWindow,
-  ChevronRight,
   Loader2,
   Power,
   RefreshCw,
@@ -39,6 +38,9 @@ interface AmpSimButtonProps {
    *  "toolbar" (default) is the session/timer toolbar's square button. */
   variant?: "toolbar" | "titlebar";
 }
+
+/** The popover's tabs: the two sound sources, then the interface. */
+type PopoverTab = "builtin" | "vst" | "interface";
 
 /** The three buffer sizes a player actually chooses between — the full smp
  *  list lives in Tone Studio for the curious. */
@@ -126,14 +128,15 @@ export const AmpSimButton = ({
       : null;
   const [open, setOpen] = useState(false);
   const { t } = useTranslation("tone_studio");
-  // Interface/latency are "set once" settings — folded away so the things
-  // touched every session (power, preset, level) stay on top.
-  const [interfaceOpen, setInterfaceOpen] = useState(false);
+  // The sound source being played — the built-in chain unless VST is both
+  // available and chosen.
+  const soundMode: "builtin" | "vst" =
+    vst.available && amp.params.toneMode === "vst" ? "vst" : "builtin";
+  const [tab, setTab] = useState<PopoverTab>(soundMode);
   const [naming, setNaming] = useState(false);
   const [presetName, setPresetName] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
-  const interfaceRef = useRef<HTMLDivElement>(null);
   // The popover renders in a body-level portal, placed off the trigger: inside
   // the session toolbar it was clipped by the toolbar's overflow.
   const [placement, setPlacement] = useState<PopoverPlacement | null>(null);
@@ -184,7 +187,21 @@ export const AmpSimButton = ({
       return;
     }
     if (rootRef.current) setPlacement(placePopover(rootRef.current));
+    // Opens on the sound that is playing.
+    setTab(soundMode);
     setOpen(true);
+  };
+
+  const tabs: { key: PopoverTab; label: string }[] = [
+    { key: "builtin", label: t("mode.builtin_short") },
+    ...(vst.available ? [{ key: "vst" as const, label: t("mode.vst_short") }] : []),
+    { key: "interface", label: t("amp_button.interface") },
+  ];
+
+  /** A sound tab is also the switch to that sound. */
+  const selectTab = (key: PopoverTab) => {
+    setTab(key);
+    if (key !== "interface" && key !== soundMode) amp.setToneMode(key);
   };
 
   const handleSelectDevice = async (id: number) => {
@@ -220,7 +237,6 @@ export const AmpSimButton = ({
     if (saved) amp.setActivePresetId(saved.id);
   };
 
-  const selectedDevice = devices.find((d) => d.id === selectedId);
   const sampleRate = amp.info?.sampleRate || 48000;
   const bufferMs = (size: number) => ((size / sampleRate) * 1000).toFixed(1);
   const latencyChoices = LATENCY_PRESETS.some((p) => p.size === amp.bufferSize)
@@ -346,21 +362,10 @@ export const AmpSimButton = ({
       </button>
     );
 
-  const showInterface = () => {
-    setInterfaceOpen(true);
-    // The disclosure sits at the bottom of a popover that may have to scroll.
-    requestAnimationFrame(() =>
-      interfaceRef.current?.scrollIntoView({
-        block: "nearest",
-        behavior: "smooth",
-      }),
-    );
-  };
-
   const hasAlerts =
     !!amp.error ||
     !!amp.overload ||
-    (health === "glitchy" && !interfaceOpen) ||
+    (health === "glitchy" && tab !== "interface") ||
     amp.connectionIssue?.status === "recovered";
 
   return (
@@ -461,10 +466,10 @@ export const AmpSimButton = ({
                             ` ${t("amp_button.overload_nam_hint")}`}
                       </p>
                     )}
-                    {health === "glitchy" && !interfaceOpen && (
+                    {health === "glitchy" && tab !== "interface" && (
                       <button
                         type='button'
-                        onClick={showInterface}
+                        onClick={() => setTab("interface")}
                         className='rounded-lg bg-amber-500/10 px-3 py-2 text-left text-[11px] text-amber-400 transition-colors hover:bg-amber-500/15'>
                         {t("amp_button.dropouts_detected")}
                       </button>
@@ -478,126 +483,204 @@ export const AmpSimButton = ({
                 )}
               </section>
 
-              {/* ── Sound: the preset and what it runs through ───────────────── */}
+              {/* ── Sound source and setup, one tab at a time. The first two
+                  are the sound itself — picking one switches to it, the same
+                  as Tone Studio's top-rail switch; the third is the interface. ── */}
               <section className='flex flex-col gap-5'>
-                <div className='flex flex-col gap-2'>
-                  <AudioSelect
-                    size='sm'
-                    label={t("amp_button.preset")}
-                    labelRight={
-                      modified ? (
-                        <span className='text-[11px] text-amber-400'>
-                          {t("amp_button.modified")}
-                        </span>
-                      ) : undefined
-                    }
-                    value={amp.activePresetId ?? ""}
-                    onValueChange={handleSelectPreset}
-                    placeholder={
-                      presets.length
-                        ? t("amp_button.select_preset")
-                        : t("amp_button.no_presets")
-                    }
-                    options={presets.map((p) => ({
-                      value: p.id,
-                      label: p.name,
-                      hint: p.builtIn ? t("rack.built_in") : undefined,
-                    }))}
-                  />
-
-                  {modified &&
-                    activePreset &&
-                    (naming ? (
-                      <div className='flex items-center gap-2'>
-                        <input
-                          type='text'
-                          autoFocus
-                          value={presetName}
-                          onChange={(e) => setPresetName(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") handleSaveAs();
-                            if (e.key === "Escape") {
-                              e.stopPropagation();
-                              setNaming(false);
-                            }
-                          }}
-                          placeholder={t("amp_button.new_preset_name")}
-                          className='h-8 min-w-0 flex-1 rounded-lg bg-zinc-800/70 px-3 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/40'
-                        />
-                        <button
-                          type='button'
-                          onClick={handleSaveAs}
-                          disabled={!presetName.trim()}
-                          className={cn(
-                            smallButton,
-                            "bg-white text-zinc-950 hover:bg-zinc-200",
-                          )}>
-                          <Save size={13} />
-                          {t("presets.save")}
-                        </button>
-                        <button
-                          type='button'
-                          onClick={() => setNaming(false)}
-                          title={t("common.cancel")}
-                          className={cn(
-                            smallButton,
-                            "px-2 text-zinc-400 hover:bg-zinc-800 hover:text-white",
-                          )}>
-                          <X size={13} />
-                        </button>
-                      </div>
-                    ) : (
-                      // The preset's own actions, small and right under it —
-                      // they act on the select, not on the amp.
-                      <div className='-ml-2 flex items-center gap-1'>
-                        <button
-                          type='button'
-                          onClick={handleRevert}
-                          title={t("amp_button.revert_hint", {
-                            name: activePreset.name,
-                          })}
-                          className={ghostButton}>
-                          <RotateCcw size={12} />
-                          {t("amp_button.revert")}
-                        </button>
-                        {activePreset.builtIn ? (
-                          <button
-                            type='button'
-                            onClick={() => setNaming(true)}
-                            title={t("amp_button.builtin_readonly")}
-                            className={ghostButton}>
-                            <Save size={12} />
-                            {t("amp_button.save_as")}
-                          </button>
-                        ) : (
-                          <button
-                            type='button'
-                            onClick={handleUpdatePreset}
-                            title={t("presets.overwrite_hint", {
-                              name: activePreset.name,
-                            })}
-                            className={ghostButton}>
-                            <Save size={12} />
-                            {t("amp_button.update_preset")}
-                          </button>
+                <div
+                  role='tablist'
+                  aria-label={t("mode.switch_label")}
+                  className='grid gap-1 rounded-lg bg-zinc-950/60 p-1'
+                  style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
+                  {tabs.map(({ key, label }) => {
+                    const selected = tab === key;
+                    // Which sound is playing stays marked while the
+                    // interface tab is open.
+                    const playing = key !== "interface" && key === soundMode && tab === "interface";
+                    return (
+                      <button
+                        key={key}
+                        type='button'
+                        role='tab'
+                        aria-selected={selected}
+                        onClick={() => selectTab(key)}
+                        className={cn(
+                          "flex h-8 min-w-0 items-center justify-center gap-1.5 rounded px-2 text-sm transition-colors",
+                          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
+                          selected
+                            ? "bg-zinc-700/70 font-medium text-zinc-100"
+                            : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200",
+                        )}>
+                        <span className='truncate'>{label}</span>
+                        {playing && (
+                          <span aria-hidden className='h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400' />
                         )}
-                      </div>
-                    ))}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {rackSlots ? (
+                {tab === "builtin" && (
+                  <div className='flex flex-col gap-5'>
+                    <div className='flex flex-col gap-2'>
+                      <AudioSelect
+                        size='sm'
+                        label={t("amp_button.preset")}
+                        labelRight={
+                          modified ? (
+                            <span className='text-[11px] text-amber-400'>
+                              {t("amp_button.modified")}
+                            </span>
+                          ) : undefined
+                        }
+                        value={amp.activePresetId ?? ""}
+                        onValueChange={handleSelectPreset}
+                        placeholder={
+                          presets.length
+                            ? t("amp_button.select_preset")
+                            : t("amp_button.no_presets")
+                        }
+                        options={presets.map((p) => ({
+                          value: p.id,
+                          label: p.name,
+                          hint: p.builtIn ? t("rack.built_in") : undefined,
+                        }))}
+                      />
+
+                      {modified &&
+                        activePreset &&
+                        (naming ? (
+                          <div className='flex items-center gap-2'>
+                            <input
+                              type='text'
+                              autoFocus
+                              value={presetName}
+                              onChange={(e) => setPresetName(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") handleSaveAs();
+                                if (e.key === "Escape") {
+                                  e.stopPropagation();
+                                  setNaming(false);
+                                }
+                              }}
+                              placeholder={t("amp_button.new_preset_name")}
+                              className='h-8 min-w-0 flex-1 rounded-lg bg-zinc-800/70 px-3 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/40'
+                            />
+                            <button
+                              type='button'
+                              onClick={handleSaveAs}
+                              disabled={!presetName.trim()}
+                              className={cn(
+                                smallButton,
+                                "bg-white text-zinc-950 hover:bg-zinc-200",
+                              )}>
+                              <Save size={13} />
+                              {t("presets.save")}
+                            </button>
+                            <button
+                              type='button'
+                              onClick={() => setNaming(false)}
+                              title={t("common.cancel")}
+                              className={cn(
+                                smallButton,
+                                "px-2 text-zinc-400 hover:bg-zinc-800 hover:text-white",
+                              )}>
+                              <X size={13} />
+                            </button>
+                          </div>
+                        ) : (
+                          // The preset's own actions, small and right under it —
+                          // they act on the select, not on the amp.
+                          <div className='-ml-2 flex items-center gap-1'>
+                            <button
+                              type='button'
+                              onClick={handleRevert}
+                              title={t("amp_button.revert_hint", {
+                                name: activePreset.name,
+                              })}
+                              className={ghostButton}>
+                              <RotateCcw size={12} />
+                              {t("amp_button.revert")}
+                            </button>
+                            {activePreset.builtIn ? (
+                              <button
+                                type='button'
+                                onClick={() => setNaming(true)}
+                                title={t("amp_button.builtin_readonly")}
+                                className={ghostButton}>
+                                <Save size={12} />
+                                {t("amp_button.save_as")}
+                              </button>
+                            ) : (
+                              <button
+                                type='button'
+                                onClick={handleUpdatePreset}
+                                title={t("presets.overwrite_hint", {
+                                  name: activePreset.name,
+                                })}
+                                className={ghostButton}>
+                                <Save size={12} />
+                                {t("amp_button.update_preset")}
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                    <div className='flex flex-col gap-1.5'>
+                      <span className='text-xs text-zinc-400'>
+                        {t("amp_button.chain")}
+                      </span>
+                      <div className='flex flex-wrap gap-1.5'>
+                        {CHAIN_BLOCKS.map((block) => {
+                          const active = block.isActive(amp.params);
+                          const label = chainBlockLabel(block, amp.params, t);
+                          const chip = cn(
+                            "rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors",
+                            active
+                              ? CHIP_ON[block.accent]
+                              : "bg-zinc-800/60 text-zinc-500",
+                          );
+                          const toggle = block.toggle;
+                          if (!toggle) {
+                            return (
+                              <span key={block.key} className={chip}>
+                                {label}
+                              </span>
+                            );
+                          }
+                          return (
+                            <button
+                              key={block.key}
+                              type='button'
+                              onClick={() => amp.setParams(toggle(amp.params))}
+                              title={
+                                active
+                                  ? t("rack.bypass", { name: label })
+                                  : t("amp_button.enable", { name: label })
+                              }
+                              className={cn(
+                                chip,
+                                !active && "hover:text-zinc-300",
+                              )}>
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {tab === "vst" && (
                   <div className='flex flex-col gap-1.5'>
-                    <span className='text-xs text-zinc-400'>
-                      {t("amp_button.vst_rack")}
-                    </span>
-                    {rackSlots.length === 0 && (
-                      <span className='text-[11px] text-zinc-500'>
+                    {(rackSlots ?? []).length === 0 && (
+                      <span className='text-sm text-zinc-400'>
                         {t("amp_button.vst_rack_empty")}
                       </span>
                     )}
                     {/* One row per plugin: the name bypasses it, the square opens
                         its own window — no trip to Tone Studio mid-session. */}
-                    {rackSlots.map((slot) => (
+                    {(rackSlots ?? []).map((slot) => (
                       <div key={slot.id} className='flex items-center gap-1.5'>
                         <button
                           type='button'
@@ -642,150 +725,78 @@ export const AmpSimButton = ({
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className='flex flex-col gap-1.5'>
-                    <span className='text-xs text-zinc-400'>
-                      {t("amp_button.chain")}
-                    </span>
-                    <div className='flex flex-wrap gap-1.5'>
-                      {CHAIN_BLOCKS.map((block) => {
-                        const active = block.isActive(amp.params);
-                        const label = chainBlockLabel(block, amp.params, t);
-                        const chip = cn(
-                          "rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors",
-                          active
-                            ? CHIP_ON[block.accent]
-                            : "bg-zinc-800/60 text-zinc-500",
-                        );
-                        const toggle = block.toggle;
-                        if (!toggle) {
+                )}
+
+                {tab === "interface" && (
+                  <div className='flex flex-col gap-5'>
+                    <AudioSelect
+                      size='sm'
+                      label={`${t("settings.input")}${api ? ` (${api})` : ""}`}
+                      labelRight={
+                        <RippleButton
+                          onClick={() => refresh()}
+                          title={t("settings.refresh_hint")}
+                          className='rounded p-0.5 text-zinc-500 transition-colors hover:text-white'>
+                          <RefreshCw
+                            size={12}
+                            className={loading ? "animate-spin" : ""}
+                          />
+                        </RippleButton>
+                      }
+                      value={selectedId !== null ? String(selectedId) : ""}
+                      onValueChange={(v) => handleSelectDevice(Number(v))}
+                      placeholder={
+                        devices.length
+                          ? t("amp_button.select_interface")
+                          : t("amp_button.no_input_devices")
+                      }
+                      options={devices.map((d) => ({
+                        value: String(d.id),
+                        label: d.name,
+                        hint: t("settings.channels_in", {
+                          count: d.inputChannels,
+                        }),
+                      }))}
+                    />
+
+                    <div className='flex flex-col gap-1.5'>
+                      <span className='text-xs text-zinc-400'>
+                        {t("status.latency")}
+                      </span>
+                      <div className='grid grid-cols-3 gap-1.5'>
+                        {latencyChoices.map((choice) => {
+                          const active = choice.size === amp.bufferSize;
                           return (
-                            <span key={block.key} className={chip}>
-                              {label}
-                            </span>
+                            <button
+                              key={choice.size}
+                              type='button'
+                              onClick={() => amp.setBufferSize(choice.size)}
+                              disabled={amp.isBusy}
+                              title={t("amp_button.samples", {
+                                count: choice.size,
+                              })}
+                              className={cn(
+                                "flex flex-col items-center rounded-lg py-1.5 transition-colors disabled:opacity-50",
+                                active
+                                  ? "bg-cyan-500/15 text-cyan-300"
+                                  : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
+                              )}>
+                              <span className='text-[11px] font-medium'>
+                                {latencyLabel(choice.label)}
+                              </span>
+                              <span className='text-[10px] opacity-70'>
+                                ~{bufferMs(choice.size)} ms
+                              </span>
+                            </button>
                           );
-                        }
-                        return (
-                          <button
-                            key={block.key}
-                            type='button'
-                            onClick={() => amp.setParams(toggle(amp.params))}
-                            title={
-                              active
-                                ? t("rack.bypass", { name: label })
-                                : t("amp_button.enable", { name: label })
-                            }
-                            className={cn(
-                              chip,
-                              !active && "hover:text-zinc-300",
-                            )}>
-                            {label}
-                          </button>
-                        );
-                      })}
+                        })}
+                      </div>
+                      <span className='text-[11px] text-zinc-500'>
+                        {t("amp_button.crackling")}
+                      </span>
                     </div>
                   </div>
                 )}
-              </section>
-
-              {/* ── Setup: picked once, folded away afterwards ───────────────── */}
-              <section className='flex flex-col gap-3'>
-                <div ref={interfaceRef} className='flex flex-col gap-3'>
-                  <button
-                    type='button'
-                    onClick={() => setInterfaceOpen((v) => !v)}
-                    aria-expanded={interfaceOpen}
-                    className='-mx-2 flex items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-zinc-800/60'>
-                    <ChevronRight
-                      size={14}
-                      className={cn(
-                        "shrink-0 text-zinc-500 transition-transform",
-                        interfaceOpen && "rotate-90",
-                      )}
-                    />
-                    <span className='text-xs text-zinc-400'>
-                      {t("amp_button.interface")}
-                    </span>
-                    {!interfaceOpen && (
-                      <span className='min-w-0 flex-1 truncate text-right text-[11px] text-zinc-500'>
-                        {selectedDevice
-                          ? `${selectedDevice.name} · ${amp.bufferSize} smp`
-                          : t("amp_button.not_set_up")}
-                      </span>
-                    )}
-                  </button>
-
-                  {interfaceOpen && (
-                    <>
-                      <AudioSelect
-                        size='sm'
-                        label={`${t("settings.input")}${api ? ` (${api})` : ""}`}
-                        labelRight={
-                          <RippleButton
-                            onClick={() => refresh()}
-                            title={t("settings.refresh_hint")}
-                            className='rounded p-0.5 text-zinc-500 transition-colors hover:text-white'>
-                            <RefreshCw
-                              size={12}
-                              className={loading ? "animate-spin" : ""}
-                            />
-                          </RippleButton>
-                        }
-                        value={selectedId !== null ? String(selectedId) : ""}
-                        onValueChange={(v) => handleSelectDevice(Number(v))}
-                        placeholder={
-                          devices.length
-                            ? t("amp_button.select_interface")
-                            : t("amp_button.no_input_devices")
-                        }
-                        options={devices.map((d) => ({
-                          value: String(d.id),
-                          label: d.name,
-                          hint: t("settings.channels_in", {
-                            count: d.inputChannels,
-                          }),
-                        }))}
-                      />
-
-                      <div className='flex flex-col gap-1.5'>
-                        <span className='text-xs text-zinc-400'>
-                          {t("status.latency")}
-                        </span>
-                        <div className='grid grid-cols-3 gap-1.5'>
-                          {latencyChoices.map((choice) => {
-                            const active = choice.size === amp.bufferSize;
-                            return (
-                              <button
-                                key={choice.size}
-                                type='button'
-                                onClick={() => amp.setBufferSize(choice.size)}
-                                disabled={amp.isBusy}
-                                title={t("amp_button.samples", {
-                                  count: choice.size,
-                                })}
-                                className={cn(
-                                  "flex flex-col items-center rounded-lg py-1.5 transition-colors disabled:opacity-50",
-                                  active
-                                    ? "bg-cyan-500/15 text-cyan-300"
-                                    : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-                                )}>
-                                <span className='text-[11px] font-medium'>
-                                  {latencyLabel(choice.label)}
-                                </span>
-                                <span className='text-[10px] opacity-70'>
-                                  ~{bufferMs(choice.size)} ms
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                        <span className='text-[11px] text-zinc-500'>
-                          {t("amp_button.crackling")}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
 
                 <Link
                   href='/tone-studio'
