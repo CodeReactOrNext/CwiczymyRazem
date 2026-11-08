@@ -12,7 +12,6 @@ import type { ShortcutId } from "feature/dashboard/data/shortcutCatalog";
  * cannot be moved or hidden.
  */
 export const WIDGET_IDS = [
-  "what-next",
   "daily-quests",
   "daily-exercise",
   "practice-stats",
@@ -59,11 +58,7 @@ export interface CustomShortcut {
 }
 
 export interface DashboardLayout {
-  /**
-   * 2 since What Next: a layout saved at 1 gets the card added on top once,
-   * after which removing it sticks.
-   */
-  version: 2;
+  version: 1;
   /** Visible cards, top to bottom. Anything not listed is hidden. */
   widgets: WidgetPlacement[];
   /** Destinations pinned to the Shortcuts card, in the order they were picked. */

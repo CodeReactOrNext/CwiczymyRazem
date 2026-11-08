@@ -7,7 +7,6 @@ import type { WidgetId } from "feature/dashboard/types/dashboard.types";
 import { RecentSessionsWidget } from "feature/practiceLog/components/RecentSessionsWidget";
 import { PracticeStatsWidget } from "feature/profile/components/PracticeStatsWidget";
 import { NextUpCard } from "feature/progression/components/NextUpCard";
-import { WhatNextWidget } from "feature/whatNext/components/WhatNextWidget";
 
 import { MilestoneCard } from "./MilestoneCard";
 import { MonthlyChallengeWidget } from "./MonthlyChallengeWidget";
@@ -30,8 +29,6 @@ export const WidgetContent = ({ id }: { id: WidgetId }) => {
   if (isMilestoneWidgetId(id)) return <MilestoneCard widgetId={id} />;
 
   switch (id) {
-    case "what-next":
-      return <WhatNextWidget />;
     case "daily-quests":
       return <DailyQuestWidget />;
     case "daily-exercise":

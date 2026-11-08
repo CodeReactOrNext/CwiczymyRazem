@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { PracticeLevelsState } from "feature/aiSummary/services/practiceLevels.service";
 import { firebaseClaimLevel } from "feature/aiSummary/services/practiceLevels.service";
+import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { practiceLevelsQueryKey } from "feature/dashboard/hooks/useMilestoneProgress";
-import { addFame, selectUserAuth } from "feature/user/store/userSlice";
+import { addFame } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { playUiSound } from "lib/uiSounds/uiSounds";
 import { toast } from "sonner";
-import { useAppDispatch, useAppSelector } from "store/hooks";
+import { useAppDispatch } from "store/hooks";
 
 export interface ClaimMilestoneInput {
   id: number;
@@ -21,8 +22,7 @@ export interface ClaimMilestoneInput {
  * straight away, and both go back if the write fails.
  */
 export const useClaimMilestone = () => {
-  // From the store rather than Home's context, so What Next can claim too.
-  const userAuth = useAppSelector(selectUserAuth) ?? "";
+  const { userAuth } = useDashboardData();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const { t } = useTranslation("dashboard");

@@ -31,7 +31,7 @@ import {
 const layoutWith = (
   widgets: DashboardLayout["widgets"],
   shortcuts: DashboardLayout["shortcuts"] = [],
-): DashboardLayout => ({ version: 2, widgets, shortcuts, customShortcuts: [] });
+): DashboardLayout => ({ version: 1, widgets, shortcuts, customShortcuts: [] });
 
 describe("widget catalog", () => {
   it("lists the fixed cards first, then one card per milestone tier", () => {
@@ -84,33 +84,6 @@ describe("widget catalog", () => {
 });
 
 describe("normalizeLayout", () => {
-  it("puts What Next on top of a layout saved before it existed, once", () => {
-    const old = normalizeLayout({
-      version: 1,
-      widgets: [{ id: "streak", size: "half" }],
-    });
-    expect(old.version).toBe(2);
-    expect(old.widgets.map((w) => w.id)).toEqual(["what-next", "streak"]);
-
-    // Saved again without it: the player took it off, and that sticks.
-    expect(
-      normalizeLayout({
-        ...old,
-        widgets: [{ id: "streak", size: "half" }],
-      }).widgets.map((w) => w.id),
-    ).toEqual(["streak"]);
-  });
-
-  it("leaves What Next where an old layout already had it", () => {
-    const layout = normalizeLayout({
-      widgets: [
-        { id: "streak", size: "half" },
-        { id: "what-next", size: "full" },
-      ],
-    });
-    expect(layout.widgets.map((w) => w.id)).toEqual(["streak", "what-next"]);
-  });
-
   it("falls back to the default when nothing is stored", () => {
     expect(normalizeLayout(undefined)).toEqual(DEFAULT_LAYOUT);
     expect(normalizeLayout(null)).toEqual(DEFAULT_LAYOUT);
@@ -120,7 +93,7 @@ describe("normalizeLayout", () => {
   it("returns fresh arrays rather than aliasing the default", () => {
     const layout = normalizeLayout(undefined);
     layout.widgets.push({ id: "streak", size: "half" });
-    expect(DEFAULT_LAYOUT.widgets).toHaveLength(5);
+    expect(DEFAULT_LAYOUT.widgets).toHaveLength(4);
   });
 
   it("drops cards an older layout still lists but the app has since retired", () => {
@@ -128,7 +101,6 @@ describe("normalizeLayout", () => {
     // layout now, and the combined milestones card was replaced by one card per
     // tier. None of them may come back as an arrangeable card.
     const layout = normalizeLayout({
-      version: 2,
       widgets: [
         { id: "getting-started", size: "full" },
         { id: "daily-quests", size: "half" },
@@ -142,7 +114,6 @@ describe("normalizeLayout", () => {
 
   it("drops cards the app no longer has and collapses duplicates", () => {
     const layout = normalizeLayout({
-      version: 2,
       widgets: [
         { id: "streak", size: "half" },
         { id: "retired-widget", size: "half" },
@@ -159,7 +130,6 @@ describe("normalizeLayout", () => {
 
   it("repairs bad sizes and forces full width on cards that cannot shrink", () => {
     const layout = normalizeLayout({
-      version: 2,
       widgets: [
         { id: "daily-quests", size: "huge" },
         { id: "activity-log", size: "half" },
@@ -172,7 +142,7 @@ describe("normalizeLayout", () => {
   });
 
   it("keeps an emptied list empty — hiding everything is a choice, not a missing field", () => {
-    expect(normalizeLayout({ version: 2, widgets: [] }).widgets).toEqual([]);
+    expect(normalizeLayout({ widgets: [] }).widgets).toEqual([]);
     expect(normalizeLayout({}).widgets).toEqual(DEFAULT_LAYOUT.widgets);
   });
 
@@ -299,7 +269,6 @@ describe("editing", () => {
 
   it("drops a saved milestone card whose tier no longer exists", () => {
     const layout = normalizeLayout({
-      version: 2,
       widgets: [
         { id: milestoneWidgetId(LEVELS[0].id), size: "half" },
         { id: `milestone-${LEVELS.length + 5}`, size: "half" },
@@ -337,10 +306,7 @@ describe("custom shortcuts", () => {
 
   it("refuses off-site links and empty names", () => {
     expect(
-      addCustomShortcut(DEFAULT_LAYOUT, {
-        label: "x",
-        href: "https://evil.example",
-      }),
+      addCustomShortcut(DEFAULT_LAYOUT, { label: "x", href: "https://evil.example" }),
     ).toBe(DEFAULT_LAYOUT);
     expect(
       addCustomShortcut(DEFAULT_LAYOUT, { label: "x", href: "//evil.example" }),
@@ -363,7 +329,6 @@ describe("custom shortcuts", () => {
 
   it("keeps only valid stored custom shortcuts, within the room left", () => {
     const layout = normalizeLayout({
-      version: 2,
       widgets: [],
       shortcuts: ["wiki"],
       customShortcuts: [
