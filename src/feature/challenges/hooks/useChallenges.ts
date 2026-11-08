@@ -3,6 +3,7 @@ import {
   ensureCurrentChallenge,
   getChallenge,
   getChallengeSubmissions,
+  getMyChallengeSubmissions,
   getPastChallenges,
   invalidateChallengeCaches,
 } from "feature/challenges/services/challenges.service";
@@ -56,6 +57,21 @@ export const useChallengeSubmissions = (challengeId: string | undefined) =>
     queryFn: () => getChallengeSubmissions(challengeId as string),
     enabled: !!challengeId,
     staleTime: STALE_TIME,
+  });
+
+/**
+ * Only the player's own recordings. Sits under the board's key, so submitting
+ * a recording (which invalidates the board) refreshes it too.
+ */
+export const useMyChallengeSubmissions = (
+  challengeId: string | undefined,
+  uid: string | null | undefined,
+) =>
+  useQuery({
+    queryKey: ["challengeSubmissions", challengeId, "mine", uid],
+    queryFn: () => getMyChallengeSubmissions(challengeId!, uid!),
+    enabled: !!challengeId && !!uid,
+    staleTime: 5 * 60 * 1000,
   });
 
 export const usePastChallenges = () =>

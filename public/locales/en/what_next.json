@@ -1,6 +1,7 @@
 {
   "page": {
-    "title": "What Next"
+    "title": "What Next",
+    "subtitle": "Your next steps in one road. Some stops show a part of the app you haven't tried yet — they're not lessons, just a quick tour so you get the most out of riff.quest."
   },
   "widget": {
     "title": "What Next",
@@ -11,39 +12,75 @@
     "play": "Play",
     "open": "Open",
     "not_today": "Not today",
-    "chest": "Rewards",
     "play_all": "Play the whole road · {{count}} min",
     "nothing_to_play": "Nothing on your road can be played as a session yet",
     "session_title": "Your road"
   },
-  "claims": {
-    "title": "Ready to collect",
-    "claim_all": "Collect all",
-    "daily_quest": "Daily quest reward",
-    "milestone": "Weekly goal: {{name}}",
-    "achievements_one": "{{count}} badge reward",
-    "achievements_other": "{{count}} badge rewards",
-    "scale_boxes_one": "{{count}} scale tree box",
-    "scale_boxes_other": "{{count}} scale tree boxes",
-    "guild_quests_one": "{{count}} guild quest reward",
-    "guild_quests_other": "{{count}} guild quest rewards",
-    "skill_points_one": "{{count}} skill point to spend",
-    "skill_points_other": "{{count}} skill points to spend",
-    "free_cases_one": "{{count}} free case to open",
-    "free_cases_other": "{{count}} free cases to open"
+  "perks": {
+    "streak_one": "Keeps your {{count}}-day streak",
+    "streak_other": "Keeps your {{count}}-day streak",
+    "quest": "Counts toward today’s daily quest"
+  },
+  "discover": {
+    "title": "Discover the app",
+    "hint": "Not a lesson — just a quick look at another part of the app.",
+    "to_case_one": "{{count}} more goal to a free case",
+    "to_case_other": "{{count}} more goals to a free case",
+    "case_tomorrow": "Free case ready — it lands in your stash tomorrow (one a day)",
+    "case_collected_one": "Free case added. Open it in the Arsenal",
+    "case_collected_other": "{{count}} free cases added. Open them in the Arsenal",
+    "items": {
+      "first_session": "Play your first session",
+      "first_guitar": "Collect your first guitar",
+      "first_song": "Add a song you want to learn",
+      "tempo_goal": "Set a tempo goal",
+      "second_day": "Come back for a second day",
+      "practice_plan": "Play a ready-made plan",
+      "journey_step": "Finish a Journey step",
+      "play_song": "Practise a song",
+      "daily_exercise": "Play the exercise of the day",
+      "auto_plan": "Generate and play an auto plan",
+      "all_categories": "Try theory, ear training and creativity",
+      "open_case": "Open a case in the Arsenal",
+      "weekly_goal": "Collect a weekly goal",
+      "favorite": "Add something to your favourites",
+      "customize": "Customize your Home or profile",
+      "skill_tree": "Clear your first tempo in the skill tree",
+      "scale_tree": "Clear your first shape in the scale tree",
+      "calendar": "Plan your week in the calendar",
+      "rotation": "Add something to your rotation",
+      "own_plan": "Create your own plan",
+      "own_exercise": "Write your own exercise",
+      "boss": "Face a boss",
+      "rig": "Build your rig in Tone Studio",
+      "achievement": "Unlock your first badge",
+      "duel": "Play your first duel",
+      "challenge": "Join the monthly challenge: vote or record",
+      "guild": "Join a guild"
+    },
+    "go": "Let’s go",
+    "later": "Not this week"
+  },
+  "goals": {
+    "title": "{{title}}: {{bpm}} → {{target}} BPM",
+    "title_final": "{{title}}: {{target}} BPM",
+    "reason_one": "{{count}} clean run left at {{bpm}} BPM to reach the next milestone",
+    "reason_other": "{{count}} clean runs left at {{bpm}} BPM to reach the next milestone",
+    "reason_final_one": "Last milestone: {{count}} clean run left at {{bpm}} BPM",
+    "reason_final_other": "Last milestone: {{count}} clean runs left at {{bpm}} BPM",
+    "create": {
+      "title": "Set a tempo goal",
+      "reason": "Pick an exercise and the tempo you want. It is split into milestones you can reach."
+    }
   },
   "empty": {
-    "title": "Your road is clear",
-    "body": "Everything for today is done. Play anything you like, or look at what is coming up."
+    "title": "All done for today",
+    "body": "Nothing is waiting. Play anything you like."
   },
   "onboarding": {
     "first_session": {
       "title": "Play your first session",
-      "reason": "Ten minutes is enough. It starts your streak and your first guitar is waiting."
-    },
-    "first_song": {
-      "title": "Add a song you want to learn",
-      "reason": "Songs are half of what you practise here. Pick one to work towards."
+      "reason": "Ten minutes is enough. It starts your streak and your first goal toward a free case."
     }
   },
   "streak": {
@@ -75,18 +112,6 @@
     "not_played": "Play the exercise before the duel closes",
     "lock_in": "Lock in your best score when you are happy with it",
     "opponent_ready": "Your opponent has locked in. Your turn to finish it."
-  },
-  "goals": {
-    "title": "{{title}}: {{bpm}} → {{target}} BPM",
-    "title_final": "{{title}}: {{target}} BPM",
-    "reason_one": "{{count}} clean run left at {{bpm}} BPM to reach the next milestone",
-    "reason_other": "{{count}} clean runs left at {{bpm}} BPM to reach the next milestone",
-    "reason_final_one": "Last milestone: {{count}} clean run left at {{bpm}} BPM",
-    "reason_final_other": "Last milestone: {{count}} clean runs left at {{bpm}} BPM",
-    "create": {
-      "title": "Set a tempo goal",
-      "reason": "Pick an exercise and the tempo you want. It is split into milestones you can reach."
-    }
   },
   "journey": {
     "title": "Journey: {{step}}",

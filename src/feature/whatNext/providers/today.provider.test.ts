@@ -4,52 +4,16 @@ import {
   HOUR,
   NOW,
   snapshot,
-  song,
 } from "feature/whatNext/utils/testSnapshot";
-import type { DailyQuest } from "types/api.types";
 import { describe, expect, it } from "vitest";
 
 import {
   calendarActions,
   dailyExerciseActions,
-  dailyQuestActions,
   duelActions,
   onboardingActions,
   streakActions,
 } from "./today.provider";
-
-const quest = (overrides: Partial<DailyQuest> = {}): DailyQuest => ({
-  date: "2026-11-07",
-  isRewardClaimed: false,
-  tasks: [
-    {
-      id: "t1",
-      type: "auto_plan",
-      title: "Auto plan",
-      isCompleted: true,
-      progress: 1,
-      target: 1,
-    },
-    {
-      id: "t2",
-      type: "practice_theory_time",
-      title: "Theory",
-      isCompleted: false,
-      progress: 4,
-      target: 10,
-    },
-    {
-      id: "t3",
-      type: "practice_specific_exercise",
-      title: "Practice: Spider",
-      isCompleted: false,
-      progress: 0,
-      target: 1,
-      exerciseId: "spider_1",
-    },
-  ],
-  ...overrides,
-});
 
 const duel = (overrides: Partial<DuelView> = {}): DuelView => ({
   id: "d1",
@@ -79,19 +43,10 @@ describe("onboardingActions", () => {
     expect(actions.map((a) => a.id)).toEqual(["onboarding:first-session"]);
   });
 
-  it("asks for a first song once the library is known to be empty", () => {
-    const actions = onboardingActions(
-      snapshot({ songs: { learning: [], wantToLearn: [], learnedCount: 0 } }),
-    );
-    expect(actions.map((a) => a.id)).toEqual(["onboarding:first-song"]);
-  });
-
-  it("stays quiet for a player who has both", () => {
+  it("stays quiet once a session is logged — the rest are What Next goals", () => {
     expect(
       onboardingActions(
-        snapshot({
-          songs: { learning: [song()], wantToLearn: [], learnedCount: 0 },
-        }),
+        snapshot({ songs: { learning: [], wantToLearn: [], learnedCount: 0 } }),
       ),
     ).toEqual([]);
   });
@@ -123,34 +78,6 @@ describe("streakActions", () => {
         snapshot({
           streak: { dayWithoutBreak: 0, didPracticeToday: false, dayEndsAt },
         }),
-      ),
-    ).toEqual([]);
-  });
-});
-
-describe("dailyQuestActions", () => {
-  it("lists only the unfinished tasks, linked where they are done", () => {
-    const actions = dailyQuestActions(snapshot({ dailyQuest: quest() }));
-    expect(actions.map((a) => a.href)).toEqual([
-      "/timer/plans",
-      "/profile/skills?exerciseId=spider_1",
-    ]);
-    expect(actions[0].progress).toEqual({ value: 4, max: 10 });
-  });
-
-  it("makes the named exercise playable in a session", () => {
-    const [, specific] = dailyQuestActions(snapshot({ dailyQuest: quest() }));
-    expect(specific.sessionItem).toEqual({
-      kind: "exercise",
-      exerciseId: "spider_1",
-      minutes: 10,
-    });
-  });
-
-  it("is empty once the reward is taken", () => {
-    expect(
-      dailyQuestActions(
-        snapshot({ dailyQuest: quest({ isRewardClaimed: true }) }),
       ),
     ).toEqual([]);
   });

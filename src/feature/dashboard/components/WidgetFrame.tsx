@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cn } from "assets/lib/utils";
@@ -7,6 +6,7 @@ import type {
   WidgetPlacement,
   WidgetSize,
 } from "feature/dashboard/types/dashboard.types";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Columns2,
   EyeOff,

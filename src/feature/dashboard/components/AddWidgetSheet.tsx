@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import {
   Sheet,
   SheetContent,
@@ -11,6 +10,7 @@ import {
   WIDGET_GROUP_LABELS,
   WIDGET_GROUP_ORDER,
 } from "feature/dashboard/data/widgetCatalog";
+import { useTranslation } from "hooks/useTranslation";
 import { Plus } from "lucide-react";
 
 type SheetItem<Id extends string> = Pick<

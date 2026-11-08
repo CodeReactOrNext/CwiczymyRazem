@@ -1,4 +1,7 @@
 {
+  "page": {
+    "subtitle": "Deine nächsten Schritte auf einem Weg. Manche Stationen zeigen dir einen Teil der App, den du noch nicht kennst – keine Lektionen, nur eine kurze Tour durch riff.quest."
+  },
   "widget": {
     "open": "Ganzer Weg"
   },
@@ -7,17 +10,57 @@
     "play": "Spielen",
     "open": "Öffnen",
     "not_today": "Nicht heute",
-    "chest": "Belohnungen",
     "play_all": "Ganzen Weg spielen · {{count}} min",
     "nothing_to_play": "Auf deinem Weg lässt sich noch nichts als Session spielen",
     "session_title": "Dein Weg"
   },
-  "claims": {
-    "title": "Bereit zum Abholen",
-    "claim_all": "Alles abholen"
+  "perks": {
+    "streak_one": "Hält deine Serie von {{count}} Tag",
+    "streak_other": "Hält deine Serie von {{count}} Tagen",
+    "quest": "Zählt für die heutigen Tagesquests"
+  },
+  "discover": {
+    "title": "Entdecke die App",
+    "hint": "Keine Lektion – nur ein kurzer Blick auf einen weiteren Teil der App.",
+    "to_case_one": "Noch {{count}} Ziel bis zum kostenlosen Case",
+    "to_case_other": "Noch {{count}} Ziele bis zum kostenlosen Case",
+    "case_tomorrow": "Gratis-Kiste bereit – sie landet morgen im Arsenal (eine pro Tag)",
+    "case_collected_one": "Kostenloses Case erhalten. Öffne es im Arsenal",
+    "case_collected_other": "{{count}} kostenlose Cases erhalten. Öffne sie im Arsenal",
+    "items": {
+      "first_session": "Spiel deine erste Session",
+      "first_guitar": "Hol dir deine erste Gitarre",
+      "first_song": "Füge einen Song hinzu, den du lernen willst",
+      "tempo_goal": "Setz dir ein Tempoziel",
+      "second_day": "Komm an einem zweiten Tag wieder",
+      "practice_plan": "Spiel einen fertigen Plan",
+      "journey_step": "Schließ einen Journey-Schritt ab",
+      "play_song": "Übe einen Song",
+      "daily_exercise": "Spiel die Übung des Tages",
+      "auto_plan": "Erstell und spiel einen Auto-Plan",
+      "all_categories": "Probier Theorie, Gehörbildung und Kreativität",
+      "open_case": "Öffne eine Kiste im Arsenal",
+      "weekly_goal": "Hol dir ein Wochenziel ab",
+      "favorite": "Füge etwas zu deinen Favoriten hinzu",
+      "customize": "Pass dein Dashboard oder Profil an",
+      "skill_tree": "Schaff dein erstes Tempo im Skill-Baum",
+      "scale_tree": "Schaff deine erste Form im Skalen-Baum",
+      "calendar": "Plane deine Woche im Kalender",
+      "rotation": "Füge etwas zu deiner Rotation hinzu",
+      "own_plan": "Erstell deinen eigenen Plan",
+      "own_exercise": "Schreib deine eigene Übung",
+      "boss": "Stell dich einem Boss",
+      "rig": "Bau dein Rig im Tone Studio",
+      "achievement": "Schalte dein erstes Abzeichen frei",
+      "duel": "Spiel dein erstes Duell",
+      "challenge": "Mach bei der Monats-Challenge mit: abstimmen oder aufnehmen",
+      "guild": "Tritt einer Gilde bei"
+    },
+    "go": "Los geht’s",
+    "later": "Nicht diese Woche"
   },
   "empty": {
-    "title": "Dein Weg ist frei",
-    "body": "Für heute ist alles erledigt. Spiel, was du willst, oder schau, was als Nächstes kommt."
+    "title": "Für heute alles erledigt",
+    "body": "Nichts wartet. Spiel, was du willst."
   }
 }

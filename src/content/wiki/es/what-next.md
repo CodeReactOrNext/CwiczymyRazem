@@ -1,35 +1,35 @@
 ---
 title: "What Next"
-description: "Un solo camino de pasos que te dice qué tocar a continuación, teniendo en cuenta todo lo que hay en la app."
+description: "Un camino corto de tres paradas que te dice qué tocar a continuación, con partes nuevas de la app para probar por el camino y una caja gratis por cada cinco."
 slug: "what-next"
 section: "Start Here"
 order: 3
 ---
 
-En la app pasan muchas cosas: misiones diarias, el ejercicio del día, tu racha, objetivos de tempo, el calendario, Journey, roadmaps, canciones, el reto del mes, duelos y más. What Next lo mira todo a la vez y lo ordena en un solo camino de pasos, para que nunca tengas que pensar por dónde empezar.
+En la app pasan muchas cosas: misiones diarias, el ejercicio del día, tu racha, objetivos de tempo, el calendario, Journey, roadmaps, canciones, el reto del mes, duelos y más. What Next mira todo eso y traza un camino corto de tres paradas, para que nunca tengas que decidir por dónde empezar.
 
-<ClickPath steps="What Next" caption="Está en el menú justo debajo de Inicio. Un trozo corto del mismo camino aparece arriba en Inicio y en la pantalla después de cada sesión." />
+<ClickPath steps="What Next" caption="Está en el menú justo debajo de Inicio. Las mismas tres paradas aparecen en la pantalla después de cada sesión." />
 
-## Paso a paso
+## La primera parada
 
-El camino empieza en el paso marcado con **Empezar**: lo que más vale la pena tocar ahora mismo. Toca cualquier paso para ver qué es y por qué está en tu camino, y luego **Tocar** para ir directamente a él. Los pasos siguientes van en el orden en que importan: un plazo que se acerca, un objetivo que tienes cerca, una canción que llevas tiempo sin tocar.
+El camino empieza en la parada marcada con **Empezar**: la única cosa que más vale la pena tocar ahora. Siempre sale de tu propia práctica: un plan que estás tocando, un objetivo de tempo al que estás cerca, el siguiente paso de Journey o una canción que hace tiempo que no tocas. Tócala para ver por qué se eligió y luego **Tocar** para ir directo.
 
-El primer paso siempre es algo para tocar. La única excepción es una racha a la que le quedan pocas horas: entonces mantenerla va primero.
+Debajo del nombre puedes ver qué más resuelve esa sesión. **Mantiene tu racha** significa que hoy todavía no has tocado y cualquier sesión la mantiene. **Cuenta para las misiones diarias de hoy** significa que hace avanzar una de las tareas de hoy. No necesitas un calentamiento aparte solo para tacharlas.
 
-## Recompensas en el camino
+## Descubre la app
 
-Cuando hay algo para recoger, aparece un regalo en el camino justo después del primer paso. Tócalo para ver qué hay dentro: la recompensa de la misión diaria, un objetivo semanal cumplido, recompensas de insignias y más. **Recoger todo** recoge de un toque todo lo que se puede recoger ahí.
+Las demás paradas se turnan entre tu siguiente práctica y una parte de la app que todavía no has probado, como tu primer objetivo de tempo, un plan ya hecho, el árbol de escalas o una pelea contra un jefe. Un objetivo cuenta cuando de verdad lo usas, no cuando solo abres su página. Cada **5 objetivos hechos dan una caja gratis**: va directa a tus cajas gratis del Arsenal, y la barra bajo el camino te dice cuántos objetivos faltan para la siguiente. Solo cuenta lo que hagas a partir de ahora, no lo que ya habías hecho antes. Si uno no es para ti, elige **Esta semana no** y se aparta siete días. Hay 25 en total; los gremios y los objetivos semanales aparecen solo desde el nivel que los desbloquea.
 
 ## Tocar todo el camino
 
-<ClickPath steps="What Next|Empezar|Tocar todo el camino" caption="Debajo del primer paso." />
+<ClickPath steps="What Next|Empezar|Tocar todo el camino" caption="Debajo de la primera parada, en la página What Next." />
 
-Esto mete los pasos de tu camino, en orden, en una sesión de 30 minutos. Da puntos, Fame y tiempo de práctica como cualquier otra sesión, y al terminar vuelves a un camino actualizado.
+Esto pone los pasos jugables de tu camino, en orden, en una sesión de 30 minutos. Da puntos, Fame y tiempo de práctica como cualquier otra sesión.
 
 ## Hoy no
 
-Si un paso no encaja hoy, tócalo y elige **Hoy no**. Volverá mañana.
+Si la primera parada no encaja hoy, tócala y elige **Hoy no**. Lo siguiente sube a su lugar, y lo que saltaste vuelve mañana.
 
-<FaqList items="¿Por qué el primer paso no es mi misión diaria?::Las tareas de la misión diaria también están en el camino. El primer paso es lo que más vale la pena tocar ahora, muchas veces un objetivo que tienes cerca o una canción olvidada.|¿What Next cambia lo que gano?::No. Solo sugiere. Los puntos, la Fame y las recompensas funcionan igual que antes, toques donde toques.|¿Puedo quitar el camino de Inicio?::Sí. Personaliza Inicio y quítalo. What Next sigue en el menú.|¿Por qué desapareció un paso?::Se completó, se le acabó el tiempo o elegiste Hoy no." />
+<FaqList items="¿Por qué mi misión diaria no es la primera parada?::Porque cualquier sesión la hace avanzar. La primera parada es tu propia práctica, y te dice cuándo también cuenta para la misión.|¿What Next cambia lo que gano?::No, salvo una caja gratis por cada cinco partes de la app que pruebes por primera vez. Los puntos, el Fame y las recompensas funcionan igual que antes, toques donde toques.|¿Por qué desapareció una parada?::Se completó, se acabó su tiempo o elegiste Hoy no." />
 
 <ReadNext links="Panel y misiones diarias::/wiki/dashboard-and-daily-quests|Objetivos de tempo::/wiki/exercise-goals|Rotación::/wiki/rotation" />

@@ -102,6 +102,43 @@ export const getChallengeSubmissions = async (
 };
 
 /**
+ * One player's recordings on a board — at most one per song. For views that
+ * only need "which songs did I clear": the whole board grows with the roster,
+ * this stays at five documents. Served from the full board when that is
+ * already in memory.
+ */
+export const getMyChallengeSubmissions = async (
+  challengeId: string,
+  userId: string,
+): Promise<ChallengeSubmission[]> => {
+  const board = memoryCache.get(`challenges:submissions:${challengeId}`) as
+    | ChallengeSubmission[]
+    | null;
+  if (board) return board.filter((s) => s.userId === userId);
+
+  const cacheKey = `challenges:submissions:${challengeId}:${userId}`;
+  const cached = memoryCache.get(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const q = query(
+      collection(db, SUBMISSIONS_COLLECTION),
+      where("challengeId", "==", challengeId),
+      where("userId", "==", userId),
+    );
+    const snap = await trackedGetDocs(q);
+    const submissions = snap.docs.map(
+      (d) => ({ id: d.id, ...d.data() }) as ChallengeSubmission,
+    );
+    memoryCache.set(cacheKey, submissions, CACHE_TTL);
+    return submissions;
+  } catch (error) {
+    logger.error(error, { context: "getMyChallengeSubmissions" });
+    return [];
+  }
+};
+
+/**
  * Asks the backend to draw this month's board if it hasn't been drawn yet.
  * Idempotent and best-effort — the board is created by the Admin SDK so the
  * vote count can't be forged on the way in.

@@ -6,10 +6,11 @@ import {
   computeProgressData,
   isoWeekKey,
 } from "feature/aiSummary/utils/milestoneLogic";
+import { bossRecordsQueryKey } from "feature/bosses/hooks/useBossProgress";
 import { getBossRecords } from "feature/bosses/services/bossProgress.service";
 import {
-  useChallengeSubmissions,
   useCurrentChallenge,
+  useMyChallengeSubmissions,
 } from "feature/challenges/hooks/useChallenges";
 import {
   challengeWindow,
@@ -51,7 +52,6 @@ import { getClaimableScaleBoxes } from "feature/scaleTree/data/scaleTreeRewards"
 import {
   collectBpms,
   computeNodeStatuses,
-  fetchAllBpmProgress,
   isExerciseCleared,
 } from "feature/scaleTree/services/scaleTree.service";
 import { buildSkillRoadmap } from "feature/skills/roadmap/skillRoadmap.data";
@@ -189,25 +189,40 @@ export const useWhatNextSnapshot = (
     staleTime: STALE_TIME,
   });
   const challengeQuery = useCurrentChallenge();
-  const submissionsQuery = useChallengeSubmissions(challengeQuery.data?.id);
+  // Only the player's own recordings: the whole board grows with the roster.
+  const submissionsQuery = useMyChallengeSubmissions(
+    challengeQuery.data?.id,
+    uid,
+  );
   const duelsQuery = useDuelOverview(uid);
 
   // ── Page only ─────────────────────────────────────────────────────────────
-  const scaleQuery = useQuery({
-    queryKey: ["what-next", "scale-progress", uid],
-    queryFn: () => fetchAllBpmProgress(uid!),
-    enabled: !!uid && full,
-    staleTime: STALE_TIME,
-  });
+  // The scale tree reads the same `exerciseBpmProgress` documents as the skill
+  // tree above, so it is cut from that read instead of downloading them again.
+  const scaleProgress = useMemo(
+    () =>
+      full && bpmQuery.data
+        ? new Map(
+            [...bpmQuery.data].map(([id, data]) => [
+              id,
+              data.completedBpms ?? [],
+            ]),
+          )
+        : undefined,
+    [full, bpmQuery.data],
+  );
   const guildsUnlocked = isFeatureUnlocked("guilds", lvl);
   const guildsQuery = useGuilds(full && !!uid && guildsUnlocked);
   const bossQuery = useQuery({
-    queryKey: ["what-next", "bosses", uid],
+    // The bosses' own key: a run saved in the lair lands here too.
+    queryKey: bossRecordsQueryKey(uid),
     queryFn: () => getBossRecords(uid!),
     enabled: !!uid && full,
     staleTime: STALE_TIME,
   });
-  const achievementContext = useAchievementContext();
+  // Badges only fill the page; on Home and after a session they would cost
+  // an Arsenal request and the songs read for nothing.
+  const achievementContext = useAchievementContext({ enabled: full });
   const [seasonId] = useState(getCurrentSeasonId);
   // Without a season id the rank hook reads nothing, which is what the Home card wants.
   const seasonal = useUserRank("seasonal", full ? seasonId : undefined);
@@ -366,7 +381,6 @@ export const useWhatNextSnapshot = (
         ? getClearedSongIds(submissionsQuery.data, uid)
         : undefined;
 
-    const scaleProgress = scaleQuery.data?.bpms;
     const scaleStatuses = scaleProgress
       ? computeNodeStatuses(scaleProgress)
       : undefined;
@@ -566,7 +580,7 @@ export const useWhatNextSnapshot = (
     rotationQuery.data,
     challengeQuery.data,
     submissionsQuery.data,
-    scaleQuery.data,
+    scaleProgress,
     guildsQuery.data,
     neighborsQuery.data,
     achievementContext,

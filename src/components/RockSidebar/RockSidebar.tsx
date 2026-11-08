@@ -443,19 +443,17 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
   const mainNavigation = [
     { id: "home", name: t("home"), href: "/dashboard", icon: <Home size={18} /> },
-    // Right under Home: it is the answer to "what do I do now?", which is
-    // the question Home is opened with.
-    {
-      id: "what-next",
-      name: t("what_next"),
-      href: "/next",
-      icon: <Compass size={18} />,
-    },
     {
       id: "practice",
       name: t("practice"),
       href: "/timer",
       icon: <Timer size={18} />,
+    },
+    {
+      id: "what-next",
+      name: t("what_next"),
+      href: "/next",
+      icon: <Compass size={18} />,
     },
     // Its own entry rather than one of the practice modes: it is the guided
     // start, and the page new accounts open most after the dashboard.

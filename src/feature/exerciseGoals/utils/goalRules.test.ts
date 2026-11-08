@@ -230,6 +230,38 @@ describe("applyGoalRun on a path", () => {
       applyGoalRun(onPath({ stageBpm: 85 }), { bpm: 82, accuracy: 99 }),
     ).toMatchObject({ clean: false, reason: "too_slow", stageBpm: 85 });
   });
+
+  it("jumps a clean run faster than the milestone to the highest one it reached", () => {
+    expect(
+      applyGoalRun(onPath({ cleanRuns: 2 }), { bpm: 87, accuracy: 95 }),
+    ).toMatchObject({
+      clean: true,
+      stageBpm: 85,
+      cleanRuns: 1,
+      stageCleared: false,
+      nextStageBpm: 85,
+    });
+  });
+
+  it("counts runs on from the milestone it jumped to", () => {
+    const outcome = applyGoalRun(
+      onPath({ stageBpm: 85, cleanRuns: GOAL_CLEAN_RUNS_REQUIRED - 1 }),
+      { bpm: 87, accuracy: 95 },
+    );
+    expect(outcome).toMatchObject({ stageCleared: true, nextStageBpm: 90 });
+  });
+
+  it("jumps no further than the target", () => {
+    expect(
+      applyGoalRun(onPath(), { bpm: 140, accuracy: 95 }),
+    ).toMatchObject({ stageBpm: 90, cleanRuns: 1, justCompleted: false });
+  });
+
+  it("doesn't jump on a fast run that isn't clean", () => {
+    expect(
+      applyGoalRun(onPath({ cleanRuns: 1 }), { bpm: 90, accuracy: 50 }),
+    ).toMatchObject({ clean: false, stageBpm: 80, cleanRuns: 0 });
+  });
 });
 
 describe("raisedTargetBpm", () => {

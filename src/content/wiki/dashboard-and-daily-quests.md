@@ -22,12 +22,12 @@ The middle of Home is a stack of cards, and you decide which cards are in it and
 - **Shortcuts** is a card of your own quick links. While you're customizing, tap the destinations you want on it. Up to eight fit.
 - **Reset** puts the original Home back. **Done** closes the toolbars.
 
-Three things stay put no matter what: the getting-started checklist at the top, and the support banner and the community feed at the bottom. They cannot be moved or hidden.
+Two things stay put no matter what: the support banner and the community feed at the bottom. They cannot be moved or hidden.
 
 Your layout is saved to your account, so it looks the same in the browser and in the desktop app.
 
 <BlogAlert type="tip">
-Some cards only appear when they have something to say. The getting-started checklist goes away on its own once you've claimed it. No need to hide them yourself.
+Some cards only appear when they have something to say, and step aside on their own when they don't. No need to hide them yourself.
 </BlogAlert>
 
 ## Daily quests

@@ -1,6 +1,7 @@
 {
   "page": {
-    "title": "What Next"
+    "title": "What Next",
+    "subtitle": "Twoje kolejne kroki w jednej drodze. Część przystanków pokazuje fragment aplikacji, którego jeszcze nie znasz — to nie lekcje, tylko krótkie oprowadzanie, żebyś lepiej poznał riff.quest."
   },
   "widget": {
     "title": "What Next",
@@ -11,49 +12,85 @@
     "play": "Graj",
     "open": "Otwórz",
     "not_today": "Nie dziś",
-    "chest": "Nagrody",
     "play_all": "Zagraj całą drogę · {{count}} min",
     "nothing_to_play": "Na twojej drodze nie ma jeszcze nic, co dałoby się zagrać jako sesję",
     "session_title": "Twoja droga"
   },
-  "claims": {
-    "title": "Do odebrania",
-    "claim_all": "Odbierz wszystko",
-    "daily_quest": "Nagroda za daily quest",
-    "milestone": "Cel tygodnia: {{name}}",
-    "achievements_one": "{{count}} nagroda za odznakę",
-    "achievements_few": "{{count}} nagrody za odznaki",
-    "achievements_many": "{{count}} nagród za odznaki",
-    "achievements_other": "{{count}} nagrody za odznaki",
-    "scale_boxes_one": "{{count}} box w drzewku skal",
-    "scale_boxes_few": "{{count}} boxy w drzewku skal",
-    "scale_boxes_many": "{{count}} boxów w drzewku skal",
-    "scale_boxes_other": "{{count}} boxu w drzewku skal",
-    "guild_quests_one": "{{count}} nagroda za quest gildii",
-    "guild_quests_few": "{{count}} nagrody za questy gildii",
-    "guild_quests_many": "{{count}} nagród za questy gildii",
-    "guild_quests_other": "{{count}} nagrody za questy gildii",
-    "skill_points_one": "{{count}} punkt umiejętności do wydania",
-    "skill_points_few": "{{count}} punkty umiejętności do wydania",
-    "skill_points_many": "{{count}} punktów umiejętności do wydania",
-    "skill_points_other": "{{count}} punktu umiejętności do wydania",
-    "free_cases_one": "{{count}} darmowa skrzynka do otwarcia",
-    "free_cases_few": "{{count}} darmowe skrzynki do otwarcia",
-    "free_cases_many": "{{count}} darmowych skrzynek do otwarcia",
-    "free_cases_other": "{{count}} darmowej skrzynki do otwarcia"
+  "perks": {
+    "streak_one": "Utrzymuje streak: {{count}} dzień",
+    "streak_few": "Utrzymuje streak: {{count}} dni",
+    "streak_many": "Utrzymuje streak: {{count}} dni",
+    "streak_other": "Utrzymuje streak: {{count}} dnia",
+    "quest": "Liczy się do dzisiejszego daily questa"
+  },
+  "discover": {
+    "title": "Poznaj aplikację",
+    "hint": "To nie lekcja, tylko szybki rzut oka na kolejną część aplikacji.",
+    "to_case_one": "Jeszcze {{count}} cel do darmowej skrzynki",
+    "to_case_few": "Jeszcze {{count}} cele do darmowej skrzynki",
+    "to_case_many": "Jeszcze {{count}} celów do darmowej skrzynki",
+    "to_case_other": "Jeszcze {{count}} celu do darmowej skrzynki",
+    "case_tomorrow": "Darmowa skrzynka gotowa — trafi do Arsenału jutro (jedna dziennie)",
+    "case_collected_one": "Darmowa skrzynka dodana. Otwórz ją w Arsenale",
+    "case_collected_few": "{{count}} darmowe skrzynki dodane. Otwórz je w Arsenale",
+    "case_collected_many": "{{count}} darmowych skrzynek dodanych. Otwórz je w Arsenale",
+    "case_collected_other": "{{count}} darmowej skrzynki dodane. Otwórz je w Arsenale",
+    "items": {
+      "first_session": "Zagraj pierwszą sesję",
+      "first_guitar": "Odbierz swoją pierwszą gitarę",
+      "first_song": "Dodaj utwór, którego chcesz się nauczyć",
+      "tempo_goal": "Ustaw cel tempa",
+      "second_day": "Wróć drugiego dnia",
+      "practice_plan": "Zagraj gotowy plan",
+      "journey_step": "Ukończ krok Journey",
+      "play_song": "Poćwicz utwór",
+      "daily_exercise": "Zagraj ćwiczenie dnia",
+      "auto_plan": "Wygeneruj i zagraj auto plan",
+      "all_categories": "Spróbuj teorii, słuchu i kreatywności",
+      "open_case": "Otwórz skrzynkę w Arsenalu",
+      "weekly_goal": "Odbierz cel tygodnia",
+      "favorite": "Dodaj coś do ulubionych",
+      "customize": "Dostosuj swój pulpit albo profil",
+      "skill_tree": "Zalicz pierwsze tempo w drzewku umiejętności",
+      "scale_tree": "Zalicz pierwszy kształt w drzewku skal",
+      "calendar": "Zaplanuj tydzień w kalendarzu",
+      "rotation": "Dodaj coś do rotacji",
+      "own_plan": "Stwórz własny plan",
+      "own_exercise": "Napisz własne ćwiczenie",
+      "boss": "Zmierz się z bossem",
+      "rig": "Złóż swój rig w Tone Studio",
+      "achievement": "Zdobądź pierwszą odznakę",
+      "duel": "Rozegraj pierwszy duel",
+      "challenge": "Weź udział w challenge’u miesiąca: zagłosuj albo nagraj",
+      "guild": "Dołącz do gildii"
+    },
+    "go": "Do dzieła",
+    "later": "Nie w tym tygodniu"
+  },
+  "goals": {
+    "title": "{{title}}: {{bpm}} → {{target}} BPM",
+    "title_final": "{{title}}: {{target}} BPM",
+    "reason_one": "Do następnego kamienia milowego: {{count}} czyste przejście w {{bpm}} BPM",
+    "reason_few": "Do następnego kamienia milowego: {{count}} czyste przejścia w {{bpm}} BPM",
+    "reason_many": "Do następnego kamienia milowego: {{count}} czystych przejść w {{bpm}} BPM",
+    "reason_other": "Do następnego kamienia milowego: {{count}} czystego przejścia w {{bpm}} BPM",
+    "reason_final_one": "Ostatni kamień milowy: {{count}} czyste przejście w {{bpm}} BPM",
+    "reason_final_few": "Ostatni kamień milowy: {{count}} czyste przejścia w {{bpm}} BPM",
+    "reason_final_many": "Ostatni kamień milowy: {{count}} czystych przejść w {{bpm}} BPM",
+    "reason_final_other": "Ostatni kamień milowy: {{count}} czystego przejścia w {{bpm}} BPM",
+    "create": {
+      "title": "Ustaw cel tempa",
+      "reason": "Wybierz ćwiczenie i tempo, które chcesz osiągnąć. Droga podzieli się na kamienie milowe."
+    }
   },
   "empty": {
-    "title": "Droga czysta",
-    "body": "Na dziś wszystko zrobione. Zagraj, co chcesz, albo zobacz, co przed tobą."
+    "title": "Na dziś wszystko zrobione",
+    "body": "Nic nie czeka. Zagraj, na co masz ochotę."
   },
   "onboarding": {
     "first_session": {
       "title": "Zagraj pierwszą sesję",
-      "reason": "Wystarczy dziesięć minut. Zaczniesz streak, a czeka na ciebie pierwsza gitara."
-    },
-    "first_song": {
-      "title": "Dodaj utwór, którego chcesz się nauczyć",
-      "reason": "Utwory to połowa tego, co tu ćwiczysz. Wybierz jeden, do którego będziesz dążyć."
+      "reason": "Wystarczy dziesięć minut. Zaczniesz streak i pierwszy cel do darmowej skrzynki."
     }
   },
   "streak": {
@@ -87,22 +124,6 @@
     "not_played": "Zagraj ćwiczenie, zanim duel się zamknie",
     "lock_in": "Zatwierdź najlepszy wynik, kiedy będziesz z niego zadowolony",
     "opponent_ready": "Przeciwnik już zatwierdził wynik. Twoja kolej, żeby zakończyć."
-  },
-  "goals": {
-    "title": "{{title}}: {{bpm}} → {{target}} BPM",
-    "title_final": "{{title}}: {{target}} BPM",
-    "reason_one": "Do następnego kamienia milowego: {{count}} czyste przejście w {{bpm}} BPM",
-    "reason_few": "Do następnego kamienia milowego: {{count}} czyste przejścia w {{bpm}} BPM",
-    "reason_many": "Do następnego kamienia milowego: {{count}} czystych przejść w {{bpm}} BPM",
-    "reason_other": "Do następnego kamienia milowego: {{count}} czystego przejścia w {{bpm}} BPM",
-    "reason_final_one": "Ostatni kamień milowy: {{count}} czyste przejście w {{bpm}} BPM",
-    "reason_final_few": "Ostatni kamień milowy: {{count}} czyste przejścia w {{bpm}} BPM",
-    "reason_final_many": "Ostatni kamień milowy: {{count}} czystych przejść w {{bpm}} BPM",
-    "reason_final_other": "Ostatni kamień milowy: {{count}} czystego przejścia w {{bpm}} BPM",
-    "create": {
-      "title": "Ustaw cel tempa",
-      "reason": "Wybierz ćwiczenie i tempo, które chcesz osiągnąć. Droga podzieli się na kamienie milowe."
-    }
   },
   "journey": {
     "title": "Journey: {{step}}",

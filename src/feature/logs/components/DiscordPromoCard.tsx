@@ -1,3 +1,4 @@
+import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { DISCORD_INVITE_URL } from "constants/community";
@@ -51,7 +52,10 @@ export const DiscordPromoCard = ({
           href={DISCORD_INVITE_URL}
           target='_blank'
           rel='noopener noreferrer'
-          className='mt-2 inline-flex min-h-11 items-center gap-2 rounded-lg bg-white px-4 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400'>
+          className={cn(
+            PRESSABLE,
+            "mt-2 inline-flex min-h-11 items-center gap-2 rounded-lg border-b-zinc-400 bg-white px-4 text-sm text-zinc-950 transition-colors hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400",
+          )}>
           <FaDiscord size={22} />
           {t("discord_promo.join")}
         </a>

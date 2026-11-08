@@ -37,7 +37,6 @@ import {
 } from "feature/dashboard/utils/dashboardLayout";
 import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 import { LogsBoxSkeleton } from "feature/logsBox/view/LogsBoxView/LogsBoxView";
-import { GettingStartedWidget } from "feature/onboarding/components/GettingStartedWidget/GettingStartedWidget";
 import { MountOnVisible } from "feature/seoLanding/components/MountOnVisible";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, Plus, RotateCcw, Settings2 } from "lucide-react";
@@ -51,8 +50,7 @@ import { WidgetContent } from "./widgets/WidgetContent";
 const GRID = "grid grid-cols-1 gap-6 lg:grid-cols-2";
 
 /**
- * Everything under the hero. The getting-started checklist at the top and
- * the support banner and community feed at the bottom are fixed; between
+ * Everything under the hero. The support banner and community feed at the bottom are fixed; between
  * them sit the player's cards in the player's order, plus the Customize mode
  * that changes both. Every change is saved as it is made, so Done only closes
  * the toolbars.
@@ -97,12 +95,7 @@ export const DashboardWidgets = () => {
 
   return (
     <DashboardLayoutProvider value={contextValue}>
-      {/* A flex column, not space-y: the checklist renders nothing once it is
-          claimed, and a gap skips a hidden child where a margin would not. */}
       <div className='flex flex-col gap-6'>
-        <div className='empty:hidden'>
-          <GettingStartedWidget />
-        </div>
 
         <div className='space-y-4'>
           <div className='flex flex-wrap items-center justify-between gap-3'>

@@ -1,11 +1,12 @@
-import { Skeleton } from "assets/components/ui/skeleton";
-import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { Card } from "assets/components/ui/card";
 import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
 import MainContainer from "components/MainContainer";
-import { roadWaveX } from "components/RoadPath/RoadPath";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
-import { WhatNextRoad } from "feature/whatNext/components/WhatNextRoad";
+import {
+  RoadStripSkeleton,
+  WhatNextRoadStrip,
+} from "feature/whatNext/components/WhatNextWidget";
 import { useNextMessage } from "feature/whatNext/hooks/useNextMessage";
 import {
   ROAD_SESSION_MINUTES,
@@ -16,18 +17,6 @@ import { useWhatNext } from "feature/whatNext/hooks/useWhatNext";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useEffect, useRef, useState } from "react";
-
-const RoadSkeleton = () => (
-  <div className='flex flex-col items-center gap-14 pt-12'>
-    {Array.from({ length: 5 }).map((_, index) => (
-      <Skeleton
-        key={index}
-        className='h-20 w-20 rounded-full'
-        style={{ transform: `translateX(${roadWaveX(index)}px)` }}
-      />
-    ))}
-  </div>
-);
 
 /** The What Next page: the road, and the session it can turn into. */
 export const WhatNextView = () => {
@@ -46,7 +35,6 @@ export const WhatNextView = () => {
     posthog.capture("what_next_viewed", {
       scope: "page",
       hero_source: result.hero?.source ?? null,
-      claims: result.claims.length,
       actions: result.ranked.length,
     });
   }, [result, isLoading]);
@@ -80,19 +68,29 @@ export const WhatNextView = () => {
   ) : null;
 
   return (
-    <div className='relative min-h-full overflow-hidden rounded-lg bg-zinc-950 px-3 pb-24 pt-8 md:px-10'>
-      {/* The same tiled watermark Journey's road runs over. */}
-      <GuitarPatternBackground className='pointer-events-none absolute inset-0 h-full w-full' />
-      <h1 className='relative text-center font-display text-3xl font-black tracking-tight text-zinc-100'>
+    <div className='mx-auto w-full max-w-3xl px-3 pb-24 pt-8 md:px-6'>
+      <h1 className='font-display text-3xl font-black tracking-tight text-zinc-100'>
         {t("page.title")}
       </h1>
-      <LoadingSwap isLoading={isLoading || !result} skeleton={<RoadSkeleton />}>
-        {() =>
-          result && (
-            <WhatNextRoad result={result} playRoad={playRoad} onOpen={track} />
-          )
-        }
-      </LoadingSwap>
+      <p className='mt-2 max-w-xl text-sm leading-relaxed text-zinc-400'>
+        {t("page.subtitle")}
+      </p>
+      {/* The same card as after a session, with "play the whole road" added. */}
+      <Card className='mt-6 flex flex-col p-5 sm:p-6'>
+        <LoadingSwap
+          isLoading={isLoading || !result}
+          skeleton={<RoadStripSkeleton />}>
+          {() =>
+            result && (
+              <WhatNextRoadStrip
+                result={result}
+                playRoad={playRoad}
+                onOpen={track}
+              />
+            )
+          }
+        </LoadingSwap>
+      </Card>
     </div>
   );
 };

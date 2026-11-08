@@ -69,47 +69,5 @@
       "label": "Mein bisheriges Üben eintragen",
       "description": "Verfolge Zeit, Serie und Fortschritt"
     }
-  },
-  "checklist": {
-    "title": "Erste Schritte",
-    "intro": "2-Min-Intro",
-    "dismiss": "Checkliste Erste Schritte ausblenden",
-    "claim": "{{badge}} abholen",
-    "first_session": "Erste Session",
-    "first_song": "Erster Song",
-    "second_day": "An einem 2. Tag üben",
-    "first_guitar": "Erste Gitarre",
-    "after_first": "Nach deiner ersten Session",
-    "tomorrow": "Morgen verfügbar",
-    "play_today": "Heute spielen zum Abschließen",
-    "open_case": "Öffne eine Kiste"
-  },
-  "intro": {
-    "title": "Willkommen bei Riff Quest",
-    "description": "Zwei Minuten dazu, was das ist und wie es funktioniert.",
-    "cta": "Verstanden"
-  },
-  "first_song": {
-    "title": "Füge einen Song hinzu, den du spielen willst",
-    "description": "Behalte Songs im Blick, die du lernen willst, gerade lernst oder schon kannst.",
-    "step1": "Geh zur Songs-Seite und klicke auf diesen Button:",
-    "add_button": "Neuen Song hinzufügen",
-    "step2": "Gib Interpret und Titel eines Songs ein, den du gern spielen würdest. Schon in der Bibliothek? Wähle einfach den Treffer. Noch nicht da? Kein Problem — du fügst ihn hinzu:",
-    "artist": "Interpret",
-    "song_title": "Songtitel",
-    "step3": "Sag der App, wo du mit diesem Song stehst. Später kannst du ihn Abschnitt für Abschnitt üben und zusehen, wie deine Beherrschung wächst:",
-    "want": "Will ich lernen",
-    "want_sub": "Für später als Inspiration speichern",
-    "learning": "Lerne ich",
-    "learning_sub": "Konzentriere dich heute auf diesen Song",
-    "learned": "Gelernt",
-    "learned_sub": "Gemeistert und im Repertoire",
-    "cta": "Songs durchsuchen"
-  },
-  "reward": {
-    "title": "Zieh deine erste Gitarre",
-    "description": "Du hast deine erste Session gespielt — hol dir deinen Fame und öffne eine Kiste.",
-    "body": "Das reicht genau, um eine Kiste im Arsenal zu öffnen. Hol es dir, und du landest dort, bereit, deine Gitarre zu wählen.",
-    "cta": "Abholen & Gitarre wählen"
   }
 }

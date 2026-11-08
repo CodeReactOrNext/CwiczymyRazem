@@ -2,17 +2,28 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useNextMessage } from "feature/whatNext/hooks/useNextMessage";
 import { useWhatNextStore } from "feature/whatNext/store/whatNext.store";
-import type { NextAction } from "feature/whatNext/types/whatNext.types";
+import type {
+  NextAction,
+  NextMessage,
+} from "feature/whatNext/types/whatNext.types";
 import { m } from "framer-motion";
 import { popIn } from "lib/motion/motion";
-import { ArrowRight, Play } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { ArrowRight, Flame, Play, Swords } from "lucide-react";
 import Link from "next/link";
 import posthog from "posthog-js";
 import type { ReactNode } from "react";
 import { getLocalDayEnd } from "utils/gameLogic/resetSchedule";
 
+const PERK_ICONS: Record<string, { icon: LucideIcon; className: string }> = {
+  "perks.streak": { icon: Flame, className: "text-orange-400" },
+  "perks.quest": { icon: Swords, className: "text-amber-400" },
+};
+
 interface StepBubbleProps {
   action: NextAction;
+  /** What playing it also takes care of — the streak, the daily quest. */
+  perks?: NextMessage[];
   onOpen: () => void;
   /** Under the main button — "play the whole road" on the first step. */
   extra?: ReactNode;
@@ -59,6 +70,7 @@ export const BubbleFrame = ({
  */
 export const StepBubble = ({
   action,
+  perks = [],
   onOpen,
   extra,
   variant = "card",
@@ -78,11 +90,29 @@ export const StepBubble = ({
 
   return (
     <BubbleFrame variant={variant} pointerOffset={pointerOffset}>
-      <h3 className='font-display text-lg font-semibold text-zinc-100'>
+      <h3 className='font-display text-xl font-bold leading-tight text-zinc-50'>
         {text(action.title)}
       </h3>
       {action.reason && (
-        <p className='mt-1 text-sm text-zinc-400'>{text(action.reason)}</p>
+        <p className='mt-1.5 text-sm leading-relaxed text-zinc-400'>{text(action.reason)}</p>
+      )}
+      {perks.length > 0 && (
+        <ul className='mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1.5'>
+          {perks.map((perk) => {
+            const look = PERK_ICONS[perk.key];
+            const PerkIcon = look?.icon;
+            return (
+              <li
+                key={perk.key}
+                className='flex items-center gap-1.5 text-xs text-zinc-300'>
+                {PerkIcon && (
+                  <PerkIcon size={14} className={look.className} aria-hidden />
+                )}
+                {text(perk)}
+              </li>
+            );
+          })}
+        </ul>
       )}
 
       <Button asChild size='lg' className='mt-4 w-full'>

@@ -35,11 +35,8 @@ export const RANK_WEIGHTS = {
   /** Some sources matter more than their kind says. */
   source: {
     onboarding: 3,
-    streak: 1.1,
     progression: 0.8,
   } as Partial<Record<NextActionSource, number>>,
-  /** A streak this close to midnight takes the hero spot whatever else is open. */
-  streakRescueHours: 3,
   /** Top slots on the road that may not share a source. */
   diverseTop: 3,
 };
@@ -111,21 +108,20 @@ export const rankActions = (
 };
 
 /**
- * The one action shown big: the best-ranked thing to *play*. A streak about to
- * break takes it from anything, because nothing else is lost at midnight.
+ * Sources that never lead: the exercise of the day is its own board with its
+ * own prize, a side quest next to the player's practice, not the practice.
  */
-export const pickHero = (
-  ranked: RankedAction[],
-  now: number,
-): RankedAction | null => {
-  const rescue = ranked.find(
-    (action) =>
-      action.source === "streak" &&
-      action.deadlineAt !== undefined &&
-      action.deadlineAt - now < RANK_WEIGHTS.streakRescueHours * HOUR_MS,
-  );
-  return rescue ?? ranked.find((action) => action.isPractice) ?? null;
-};
+const NEVER_HERO: ReadonlySet<NextActionSource> = new Set(["dailyExercise"]);
+
+/**
+ * The one action shown big: the best-ranked thing to *play* from the player's
+ * own practice. The streak and the daily quest are not candidates — any
+ * session keeps them, so they ride along as perks (see heroPerks).
+ */
+export const pickHero = (ranked: RankedAction[]): RankedAction | null =>
+  ranked.find(
+    (action) => action.isPractice && !NEVER_HERO.has(action.source),
+  ) ?? null;
 
 export const laneOf = (action: NextAction, now: number): NextActionLane => {
   if (action.kind === "expiring") return "today";

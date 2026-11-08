@@ -109,32 +109,28 @@ describe("pickHero", () => {
       ],
       { now: NOW },
     );
-    expect(pickHero(ranked, NOW)?.id).toBe("goal");
+    expect(pickHero(ranked)?.id).toBe("goal");
   });
 
-  it("gives the spot to a streak about to break", () => {
+  it("never gives the spot to the exercise of the day", () => {
     const ranked = rankActions(
       [
         action({
-          id: "goal",
-          source: "goals",
-          progress: { value: 9, max: 10 },
-          playerSet: true,
-        }),
-        action({
-          id: "streak",
-          source: "streak",
+          id: "daily",
+          source: "dailyExercise",
           kind: "expiring",
-          deadlineAt: NOW + 2 * HOUR,
+          deadlineAt: NOW + HOUR,
         }),
+        action({ id: "song", source: "songs" }),
       ],
       { now: NOW },
     );
-    expect(pickHero(ranked, NOW)?.id).toBe("streak");
+    expect(ranked[0].id).toBe("daily");
+    expect(pickHero(ranked)?.id).toBe("song");
   });
 
   it("is null with nothing to play", () => {
-    expect(pickHero([], NOW)).toBeNull();
+    expect(pickHero([])).toBeNull();
   });
 });
 

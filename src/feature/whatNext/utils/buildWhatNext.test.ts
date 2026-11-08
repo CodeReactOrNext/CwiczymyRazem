@@ -26,9 +26,6 @@ describe("buildWhatNext", () => {
       }),
     );
     expect(result.hero?.id).toBe("onboarding:first-session");
-    expect(result.lanes.inProgress.map((a) => a.id)).toContain(
-      "onboarding:first-song",
-    );
   });
 
   it("puts a nearly finished goal ahead of an old song", () => {
@@ -46,7 +43,7 @@ describe("buildWhatNext", () => {
     expect(result.hero?.source).toBe("goals");
   });
 
-  it("rescues a streak in its last hours", () => {
+  it("keeps a streak through the player's own practice, not a filler step", () => {
     const result = buildWhatNext(
       snapshot({
         goals: [goal({ stageBpm: 120, cleanRuns: 2 })],
@@ -55,23 +52,45 @@ describe("buildWhatNext", () => {
           didPracticeToday: false,
           dayEndsAt: NOW + 2 * HOUR,
         },
-      }),
-    );
-    expect(result.hero?.source).toBe("streak");
-  });
-
-  it("never offers a claim as the thing to play", () => {
-    const result = buildWhatNext(
-      snapshot({
-        rewards: {
-          caseTokens: 3,
-          achievementsClaimable: 2,
-          achievementsPending: { fame: 50, caseTokens: 0, parts: [] },
+        dailyQuest: {
+          date: "2026-11-07",
+          isRewardClaimed: false,
+          tasks: [
+            {
+              id: "t1",
+              type: "practice_total_time",
+              title: "15 minutes",
+              isCompleted: false,
+              progress: 0,
+              target: 15,
+            },
+          ],
         },
       }),
     );
-    expect(result.claims).toHaveLength(2);
-    expect(result.hero?.source).not.toBe("claims");
+    expect(result.hero?.source).toBe("goals");
+    expect(result.perks.map((perk) => perk.key)).toEqual([
+      "perks.streak",
+      "perks.quest",
+    ]);
+    expect(result.ranked.map((a) => a.source)).not.toContain("streak");
+    expect(result.ranked.map((a) => a.source)).not.toContain("dailyQuest");
+  });
+
+  it("falls back to a short streak session when there is nothing of their own", () => {
+    const result = buildWhatNext(
+      snapshot({
+        quickPick: { exerciseId: "e1", title: "Warm-up" },
+        streak: {
+          dayWithoutBreak: 8,
+          didPracticeToday: false,
+          dayEndsAt: NOW + 5 * HOUR,
+        },
+      }),
+    );
+    expect(result.hero?.source).toBe("streak");
+    expect(result.ranked[0].id).toBe(result.hero?.id);
+    expect(result.perks).toEqual([]);
   });
 
   it("keeps the hero out of the lanes below it", () => {

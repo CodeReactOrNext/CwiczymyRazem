@@ -9,8 +9,9 @@ import {
 import { journeyModules } from "feature/journey/data/journeyModules";
 import { buildModuleWithStatus } from "feature/journey/utils/journeyStatus";
 import { JourneyPath } from "feature/journey/view/components/JourneyPath";
-import { WhatNextRoad } from "feature/whatNext/components/WhatNextRoad";
 import { WhatNextRoadStrip } from "feature/whatNext/components/WhatNextWidget";
+import { FEATURE_GOAL_IDS } from "feature/whatNext/data/featureGoals";
+import { featureGoalsQueryKey } from "feature/whatNext/hooks/useFeatureGoals";
 import type { WhatNextSnapshot } from "feature/whatNext/types/whatNext.types";
 import { buildWhatNext } from "feature/whatNext/utils/buildWhatNext";
 import dynamic from "next/dynamic";
@@ -22,7 +23,7 @@ import { useMemo, useState } from "react";
  * with no Firebase, so the UI can be screenshotted headlessly. Not linked
  * from any nav; renders nothing outside development.
  *
- *   ?view=widget   only the Home card
+ *   ?view=widget   the card after a session
  *   ?view=journey  Journey's road, on the same shared component
  *   ?state=empty   nothing left to do
  */
@@ -148,7 +149,18 @@ const journeyModule = () => {
 
 const WhatNextPreview = () => {
   const router = useRouter();
-  const [client] = useState(() => new QueryClient());
+  const [client] = useState(() => {
+    const queryClient = new QueryClient();
+    // No one is signed in here: seed the goals under the signed-out key, two
+    // done since the baseline and three to go to the next free case.
+    const done = new Set(["first_session", "first_song"]);
+    queryClient.setQueryData([...featureGoalsQueryKey(null), 0], {
+      goals: FEATURE_GOAL_IDS.map((id) => ({ id, done: done.has(id) })),
+      cases: { counted: 2, earned: 0, paid: 0, owed: 0, toNext: 3 },
+      paidNow: 0,
+    });
+    return queryClient;
+  });
   const [now] = useState(() => Date.now());
   const empty = router.query.state === "empty";
   const result = useMemo(
@@ -178,19 +190,21 @@ const WhatNextPreview = () => {
             </Card>
           </div>
         ) : (
-          <div className='mx-auto w-full max-w-md'>
-            <h1 className='text-center font-display text-2xl font-bold text-zinc-100'>
+          <div className='mx-auto w-full max-w-3xl'>
+            <h1 className='font-display text-3xl font-black tracking-tight text-zinc-100'>
               What Next
             </h1>
-            <WhatNextRoad
-              result={result}
-              onOpen={() => undefined}
-              playRoad={
-                <span className='text-xs font-semibold text-cyan-400'>
-                  Play the whole road · 30 min
-                </span>
-              }
-            />
+            <Card className='mt-6 flex flex-col p-5 sm:p-6'>
+              <WhatNextRoadStrip
+                result={result}
+                onOpen={() => undefined}
+                playRoad={
+                  <span className='text-xs font-semibold text-cyan-400'>
+                    Play the whole road · 30 min
+                  </span>
+                }
+              />
+            </Card>
           </div>
         )}
       </div>

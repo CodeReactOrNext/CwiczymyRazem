@@ -33,7 +33,7 @@ export const HeroAuthButtons = () => {
         {isLoggedIn ? (
           <div className='flex flex-col items-center'>
             <Link href='/dashboard'>
-              <Button className='h-14 rounded-lg border-none bg-white px-10 text-lg font-bold text-black transition-colors hover:bg-zinc-50 active:scale-[0.98]'>
+              <Button className='h-14 rounded-lg border-b-zinc-400 bg-white px-10 text-lg font-bold text-black transition-colors hover:bg-zinc-100'>
                 <span className='flex items-center gap-2'>
                   <LayoutDashboard className='h-5 w-5' />
                   Go to Dashboard
@@ -47,7 +47,7 @@ export const HeroAuthButtons = () => {
               <Link
                 href='/signup'
                 onClick={() => trackSignupCtaClicked("landing_hero")}>
-                <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-base hover:bg-zinc-50 active:scale-[0.98]'>
+                <Button className='group/btn h-14 rounded-lg border-b-zinc-400 bg-white px-8 text-base font-bold text-black transition-colors duration-base hover:bg-zinc-100'>
                   <span className='flex items-center gap-3 whitespace-nowrap'>
                     Start tracking
                     <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-base group-hover/btn:translate-x-1.5' />
@@ -57,7 +57,7 @@ export const HeroAuthButtons = () => {
               <Button
                 onClick={handleGoogleLogin}
                 disabled={isGoogleFetching}
-                className='flex h-14 items-center gap-3 rounded-lg bg-zinc-900 px-8 text-base font-semibold text-white transition-colors hover:bg-zinc-800'>
+                className='flex h-14 items-center gap-3 rounded-lg border-b-zinc-950 bg-zinc-800 px-8 text-base font-semibold text-white transition-colors hover:bg-zinc-700'>
                 <FcGoogle className='mr-2 h-5 w-5' /> Continue with Google
               </Button>
             </div>

@@ -22,12 +22,12 @@ Start to ekran, na którym lądujesz. Jest zbudowany, by w około pięć sekund 
 - **Skróty** to karta twoich własnych szybkich linków. Podczas dostosowywania stuknij miejsca docelowe, które chcesz na niej mieć. Mieści się do ośmiu.
 - **Resetuj** przywraca oryginalny Start. **Gotowe** zamyka paski narzędzi.
 
-Trzy rzeczy zostają na miejscu niezależnie od wszystkiego: lista kontrolna na początek na górze oraz baner wsparcia i feed społeczności na dole. Nie da się ich przesunąć ani ukryć.
+Dwie rzeczy zostają na miejscu niezależnie od wszystkiego: baner wsparcia i feed społeczności na dole. Nie da się ich przesunąć ani ukryć.
 
 Twój układ jest zapisywany na koncie, więc wygląda tak samo w przeglądarce i w aplikacji na komputer.
 
 <BlogAlert type="tip">
-Niektóre karty pojawiają się tylko wtedy, gdy mają coś do powiedzenia. Lista kontrolna na początek znika sama, gdy ją odbierzesz. Nie musisz ich ukrywać sam.
+Niektóre karty pojawiają się tylko wtedy, gdy mają coś do powiedzenia, a potem same znikają. Nie musisz ich ukrywać sam.
 </BlogAlert>
 
 ## Dzienne zadania

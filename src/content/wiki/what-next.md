@@ -1,35 +1,35 @@
 ---
 title: "What Next"
-description: "One road of steps that tells you what to play next, across everything in the app."
+description: "A short road of three stops that tells you what to play next, with new parts of the app to try along the way and a free case for every five."
 slug: "what-next"
 section: "Start Here"
 order: 3
 ---
 
-The app has a lot going on: daily quests, the exercise of the day, your streak, tempo goals, the calendar, Journey, roadmaps, songs, the monthly challenge, duels and more. What Next looks at all of it and lays it out as one road of steps, so you never have to decide where to start.
+The app has a lot going on: daily quests, the exercise of the day, your streak, tempo goals, the calendar, Journey, roadmaps, songs, the monthly challenge, duels and more. What Next looks at all of it and lays out a short road of three stops, so you never have to decide where to start.
 
-<ClickPath steps="What Next" caption="It sits right under Home in the menu. A short piece of the same road is at the top of Home and on the screen after every session." />
+<ClickPath steps="What Next" caption="It sits right under Home in the menu. The same three stops show up on the screen after every session." />
 
-## One step at a time
+## The first stop
 
-The road starts at the step marked **Start**: the one thing most worth playing right now. Tap any step to see what it is and why it is on your road, then **Play** to go straight into it. The steps below it come in the order they matter: a deadline coming up, a goal you are close to, a song you have not touched for a while.
+The road starts at the stop marked **Start**: the one thing most worth playing right now. It is always something from your own practice: a plan you have been playing, a tempo goal you are close to, the next Journey step, a song you have not touched for a while. Tap it to see why it was picked, then **Play** to go straight into it.
 
-The first step is always something to play. The one exception is a streak with only a few hours left: then keeping it alive comes first.
+Under its name you may see what else that session takes care of. **Keeps your streak** means you have not played today yet, and any session keeps it going. **Counts toward today's daily quest** means it moves one of today's tasks forward. You do not need a separate warm-up just to tick those off.
 
-## Rewards on the road
+## Discover the app
 
-When something is waiting to be collected, a gift appears on the road right after the first step. Tap it to see what is inside: the daily quest reward, a weekly goal you met, badge rewards and more. **Collect all** takes everything that can be collected there in one tap.
+The other stops take turns between your next practice and a part of the app you have not tried yet, such as your first tempo goal, a ready-made plan, the scale tree or a boss fight. One counts once you actually use it, not when you only open its page. Every **5 done earn a free case**: it lands straight in your free cases in the Arsenal, and the bar under the road shows how many goals are left to the next one. Only what you do from now on counts, not what you had already done before. If one is not for you, choose **Not this week** and it steps aside for seven days. There are 25 in all; guilds and weekly goals only appear once you reach the level that opens them.
 
 ## Play the whole road
 
-<ClickPath steps="What Next|Start|Play the whole road" caption="Under the first step." />
+<ClickPath steps="What Next|Start|Play the whole road" caption="Under the first stop, on the What Next page." />
 
-This puts the steps of your road into one 30-minute session, in order. It earns points, Fame and practice time like any other session, and when you finish you come back to an updated road.
+This puts the playable steps of your road into one 30-minute session, in order. It earns points, Fame and practice time like any other session.
 
 ## Not today
 
-If a step does not fit today, tap it and choose **Not today**. It comes back tomorrow.
+If the first stop does not fit today, tap it and choose **Not today**. The next thing moves up, and the one you skipped comes back tomorrow.
 
-<FaqList items="Why is the first step not my daily quest?::Daily quest tasks are on the road too. The first step is whatever matters most to play right now, often a goal you are close to or a song you have neglected.|Does What Next change what I earn?::No. It only suggests. Points, Fame and rewards work exactly as before, wherever you play.|Can I take the road off Home?::Yes. Customise Home and remove it. What Next stays in the menu.|Why did a step disappear?::It was done, its time ran out, or you chose Not today." />
+<FaqList items="Why is my daily quest not the first stop?::Because any session moves it forward. The first stop is your own practice, and it tells you when it also counts toward the quest.|Does What Next change what I earn?::No, apart from a free case for every five parts of the app you try for the first time. Points, Fame and rewards work exactly as before, wherever you play.|Why did a stop disappear?::It was done, its time ran out, or you chose Not today." />
 
 <ReadNext links="Dashboard and Daily Quests::/wiki/dashboard-and-daily-quests|Exercise Goals::/wiki/exercise-goals|Rotation::/wiki/rotation" />

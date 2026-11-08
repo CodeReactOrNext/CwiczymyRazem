@@ -11,18 +11,3 @@ export interface OnboardingResult {
   planId?: string;
 }
 
-/**
- * Persisted progress for the dashboard "Getting Started" checklist shown to new users.
- * The steps themselves (first session, first song, a second day of practice) are
- * derived at read time from existing user data instead of being stored here, so
- * they can't drift or be ticked off by a click.
- */
-export interface GettingStartedQuestState {
-  rewardClaimed: boolean;
-  dismissed: boolean;
-}
-
-export const GETTING_STARTED_QUEST_DEFAULTS: GettingStartedQuestState = {
-  rewardClaimed: false,
-  dismissed: false,
-};

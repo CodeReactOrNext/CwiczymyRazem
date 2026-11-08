@@ -6,12 +6,14 @@ import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { getEquippedRarity } from "feature/arsenal/data/equippedGuitar";
 import { guitarDefinitionByImageId } from "feature/arsenal/data/guitarDefinitions";
 import { useEquippedGuitar } from "feature/arsenal/hooks/useUserArsenal";
-import { getRankBadgeSrc, isGuitarImageId } from "feature/arsenal/utils/guitarImage";
+import {
+  getRankBadgeSrc,
+  isGuitarImageId,
+} from "feature/arsenal/utils/guitarImage";
 import { DashboardWidgets } from "feature/dashboard/components/DashboardWidgets";
 import type { DashboardDataContextValue } from "feature/dashboard/context/DashboardContext";
 import { DashboardDataProvider } from "feature/dashboard/context/DashboardContext";
 import { DuelEloBadge } from "feature/duels/components/DuelEloBadge";
-import { useGettingStartedProgress } from "feature/onboarding/hooks/useGettingStartedProgress";
 import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
 import { SongTierBadge } from "feature/profile/components/SongTierBadge";
 import { getTrendData } from "feature/profile/utils/getTrendData";
@@ -48,20 +50,6 @@ const ProfileLandingLayout = ({
     isError: isSongsError,
   } = useUserSongs(userAuth);
   const { item: equippedGuitar } = useEquippedGuitar(userAuth);
-  const {
-    progress: gettingStarted,
-    isLoading: isGettingStartedLoading,
-    wasHiddenLastVisit,
-  } = useGettingStartedProgress(
-    userAuth,
-    userStats?.sessionCount ?? 0,
-    reportList,
-  );
-  // Until the checklist's data is in, go by what the last visit found, so a
-  // player past onboarding gets the hero with the page instead of seconds later.
-  const showHero = isGettingStartedLoading
-    ? wasHiddenLastVisit
-    : !gettingStarted?.isVisible;
 
   const todayStr = new Date().toDateString();
   const lastReportDate = userStats?.lastReportDate
@@ -141,86 +129,81 @@ const ProfileLandingLayout = ({
 
   return (
     <div className='flex flex-col rounded-xl border-none bg-second-600 shadow-sm'>
-      {/* A new player's first job is the Getting Started card — the hero
-          (practice button, level, song tier) waits until it is done. */}
-      {showHero && (
-        <HeroBanner
-          title={
-            isTodayCompleted ? t("landing.great_job") : t("landing.start_today")
-          }
-          // The tall banner is there to frame a special guitar; without one it
-          // would only push the dashboard down, so it shrinks to its content.
-          compact={!isSpecialGuitar}
-          leftContentClassName={isSpecialGuitar ? undefined : "mt-0"}
-          className={cn(
-            "w-full !flex-row !items-center !justify-between !rounded-none !shadow-none",
-            isSpecialGuitar &&
-              "min-h-[160px] md:min-h-[200px] lg:min-h-[240px]",
-          )}
-          backgroundContent={
-            isSpecialGuitar ? (
-              <div className='absolute inset-0 z-0 overflow-hidden rounded-none md:rounded-xl'>
-                {/* Glow Blur on the left */}
-                <div
-                  className='pointer-events-none absolute left-[0%] top-[-10%] opacity-25 blur-[80px] md:left-[5%] md:top-[-15%] md:opacity-30'
-                  style={{
-                    backgroundColor: glowColor,
-                    width: "350px",
-                    height: "350px",
-                    borderRadius: "50%",
-                  }}
-                />
+      <HeroBanner
+        title={
+          isTodayCompleted ? t("landing.great_job") : t("landing.start_today")
+        }
+        // The tall banner is there to frame a special guitar; without one it
+        // would only push the dashboard down, so it shrinks to its content.
+        compact={!isSpecialGuitar}
+        leftContentClassName={isSpecialGuitar ? undefined : "mt-0"}
+        className={cn(
+          "w-full !flex-row !items-center !justify-between !rounded-none !shadow-none",
+          isSpecialGuitar && "min-h-[160px] md:min-h-[200px] lg:min-h-[240px]",
+        )}
+        backgroundContent={
+          isSpecialGuitar ? (
+            <div className='absolute inset-0 z-0 overflow-hidden rounded-none md:rounded-xl'>
+              {/* Glow Blur on the left */}
+              <div
+                className='pointer-events-none absolute left-[0%] top-[-10%] opacity-25 blur-[80px] md:left-[5%] md:top-[-15%] md:opacity-30'
+                style={{
+                  backgroundColor: glowColor,
+                  width: "350px",
+                  height: "350px",
+                  borderRadius: "50%",
+                }}
+              />
 
-                {/* Guitar with CSS fade on the right side. On a phone it lies
+              {/* Guitar with CSS fade on the right side. On a phone it lies
                     across the banner at the same angle as on desktop, body
                     bottom-left and neck rising behind the progress. Stood
                     upright (-90°) it needed the old tall banner; in the short
                     one only the neck was left inside. */}
-                <img
-                  src={getRankBadgeSrc(imgPath, "large")}
-                  className='pointer-events-none absolute left-[-8%] top-[-12%] h-[250px] max-w-none -rotate-[15deg] opacity-[0.75] md:left-[8%] md:top-[-35%] md:h-[480px]'
-                  style={{
-                    filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
-                    WebkitMaskImage:
-                      "linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)",
-                    maskImage:
-                      "linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)",
-                  }}
-                  alt='Background Guitar'
-                />
-              </div>
-            ) : null
-          }
-          // Phones get the progress beside the Practice button (leftContent);
-          // as its own column it stacked under the banner text and doubled the
-          // banner's height.
-          rightContentClassName='hidden md:flex'
-          rightContent={
-            <div
-              className={cn(
-                "relative flex select-none flex-col gap-2 rounded-xl bg-zinc-900/50",
-                isSpecialGuitar ? "px-8 py-5 md:px-10 md:py-6" : "px-8 py-4",
-              )}>
-              {renderProgress(isSpecialGuitar ? undefined : 80)}
+              <img
+                src={getRankBadgeSrc(imgPath, "large")}
+                className='pointer-events-none absolute left-[-8%] top-[-12%] h-[250px] max-w-none -rotate-[15deg] opacity-[0.75] md:left-[8%] md:top-[-35%] md:h-[480px]'
+                style={{
+                  filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
+                  WebkitMaskImage:
+                    "linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)",
+                  maskImage:
+                    "linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)",
+                }}
+                alt='Background Guitar'
+              />
             </div>
-          }
-          leftContent={
-            <div className='flex flex-col gap-3'>
-              <div className='flex flex-row flex-wrap items-center justify-between gap-3'>
-                <Button
-                  onClick={() => router.push("/timer")}
-                  className='group/btn h-14 px-8 text-base font-semibold'>
-                  Practice
-                  <ArrowRight className='ml-2 h-5 w-5 transition-transform duration-base group-hover/btn:translate-x-1' />
-                </Button>
-                <div className='select-none rounded-xl bg-zinc-900/50 p-2 md:hidden'>
-                  {renderProgress(64)}
-                </div>
+          ) : null
+        }
+        // Phones get the progress beside the Practice button (leftContent);
+        // as its own column it stacked under the banner text and doubled the
+        // banner's height.
+        rightContentClassName='hidden md:flex'
+        rightContent={
+          <div
+            className={cn(
+              "relative flex select-none flex-col gap-2 rounded-xl bg-zinc-900/50",
+              isSpecialGuitar ? "px-8 py-5 md:px-10 md:py-6" : "px-8 py-4",
+            )}>
+            {renderProgress(isSpecialGuitar ? undefined : 80)}
+          </div>
+        }
+        leftContent={
+          <div className='flex flex-col gap-3'>
+            <div className='flex flex-row flex-wrap items-center justify-between gap-3'>
+              <Button
+                onClick={() => router.push("/timer")}
+                className='group/btn h-14 px-8 text-base font-semibold'>
+                Practice
+                <ArrowRight className='ml-2 h-5 w-5 transition-transform duration-base group-hover/btn:translate-x-1' />
+              </Button>
+              <div className='select-none rounded-xl bg-zinc-900/50 p-2 md:hidden'>
+                {renderProgress(64)}
               </div>
             </div>
-          }
-        />
-      )}
+          </div>
+        }
+      />
 
       <div className='relative z-10 p-4 md:mt-6 md:p-6'>
         <DashboardDataProvider value={dashboardData}>

@@ -13,7 +13,6 @@ import type { DailyQuest } from "types/api.types";
 
 /** Which part of the app an action comes from — one per provider. */
 export type NextActionSource =
-  | "claims"
   | "onboarding"
   | "streak"
   | "dailyQuest"
@@ -104,7 +103,7 @@ export interface NextAction {
   id: string;
   source: NextActionSource;
   kind: NextActionKind;
-  /** Only playing can lead — gear and claims never take the hero spot. */
+  /** Only playing can lead — gear never takes the hero spot. */
   isPractice: boolean;
   title: NextMessage;
   reason?: NextMessage;
@@ -125,21 +124,10 @@ export interface RankedAction extends NextAction {
   score: number;
 }
 
-/** A reward that can be taken right now, without playing. */
-export interface ClaimItem {
-  id: string;
-  label: NextMessage;
-  reward?: NextActionReward;
-  /** Claimed in place by the strip; without it, the item links to where it is claimed. */
-  claim?: "dailyQuest" | "achievements" | "milestones";
-  /** For a weekly goal: which tier and week the claim is for. */
-  milestone?: { id: number; name: string; reward: number; weekKey: string };
-  href: string;
-}
-
 export interface WhatNextResult {
-  claims: ClaimItem[];
   hero: RankedAction | null;
+  /** What playing the hero also takes care of — the streak, the daily quest. */
+  perks: NextMessage[];
   lanes: Record<NextActionLane, RankedAction[]>;
   /** Everything ranked, hero included, for the session builder. */
   ranked: RankedAction[];

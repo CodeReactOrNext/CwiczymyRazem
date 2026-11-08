@@ -22,12 +22,12 @@ El centro de Inicio es una pila de tarjetas, y tú decides qué tarjetas hay y e
 - **Atajos** es una tarjeta con tus propios enlaces rápidos. Mientras personalizas, toca los destinos que quieras en ella. Caben hasta ocho.
 - **Restablecer** devuelve el Inicio original. **Hecho** cierra las barras de herramientas.
 
-Tres cosas se quedan en su sitio pase lo que pase: la lista de primeros pasos de arriba, y el banner de apoyo y el feed de la comunidad de abajo. No se pueden mover ni ocultar.
+Dos cosas se quedan en su sitio pase lo que pase: el banner de apoyo y el feed de la comunidad de abajo. No se pueden mover ni ocultar.
 
 Tu diseño se guarda en tu cuenta, así que se ve igual en el navegador y en la app de escritorio.
 
 <BlogAlert type="tip">
-Algunas tarjetas solo aparecen cuando tienen algo que decir. La lista de primeros pasos desaparece sola una vez que la has reclamado. No hace falta que las ocultes tú.
+Algunas tarjetas solo aparecen cuando tienen algo que decir, y luego desaparecen solas. No hace falta que las ocultes tú.
 </BlogAlert>
 
 ## Misiones diarias

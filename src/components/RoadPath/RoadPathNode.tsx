@@ -8,7 +8,6 @@ import type { CSSProperties, ReactNode, Ref } from "react";
  * - `current` — where the player is now.
  * - `open` — reachable, not started.
  * - `locked` — not reachable yet.
- * - `chest` — rewards waiting.
  * - `streak` — a streak to keep alive today.
  */
 export type RoadTone =
@@ -16,7 +15,6 @@ export type RoadTone =
   | "current"
   | "open"
   | "locked"
-  | "chest"
   | "streak";
 
 const FACE: Record<RoadTone, string> = {
@@ -24,7 +22,6 @@ const FACE: Record<RoadTone, string> = {
   current: "bg-cyan-500 text-zinc-950 hover:bg-cyan-400",
   open: "bg-zinc-700 text-zinc-100 hover:bg-zinc-600",
   locked: "bg-zinc-700 text-zinc-500",
-  chest: "bg-amber-500 text-zinc-950 hover:bg-amber-400",
   streak: "bg-orange-500 text-zinc-950 hover:bg-orange-400",
 };
 
@@ -34,7 +31,6 @@ const LIP: Record<RoadTone, string> = {
   current: "rgb(14,116,144)",
   open: "rgb(39,39,42)",
   locked: "rgb(24,24,27)",
-  chest: "rgb(180,83,9)",
   streak: "rgb(194,65,12)",
 };
 
@@ -44,7 +40,6 @@ const SELECTED_HALO: Record<RoadTone, string> = {
   current: "bg-cyan-950",
   open: "bg-zinc-800",
   locked: "bg-zinc-900",
-  chest: "bg-amber-950",
   streak: "bg-orange-950",
 };
 

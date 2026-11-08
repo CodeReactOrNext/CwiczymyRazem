@@ -1,4 +1,7 @@
 {
+  "page": {
+    "subtitle": "Tus próximos pasos en un solo camino. Algunas paradas te muestran una parte de la app que aún no conoces: no son lecciones, solo un recorrido rápido por riff.quest."
+  },
   "widget": {
     "open": "Camino completo"
   },
@@ -7,17 +10,57 @@
     "play": "Tocar",
     "open": "Abrir",
     "not_today": "Hoy no",
-    "chest": "Recompensas",
     "play_all": "Tocar todo el camino · {{count}} min",
     "nothing_to_play": "Todavía no hay nada en tu camino que se pueda tocar como sesión",
     "session_title": "Tu camino"
   },
-  "claims": {
-    "title": "Listo para recoger",
-    "claim_all": "Recoger todo"
+  "perks": {
+    "streak_one": "Mantiene tu racha de {{count}} día",
+    "streak_other": "Mantiene tu racha de {{count}} días",
+    "quest": "Cuenta para las misiones diarias de hoy"
+  },
+  "discover": {
+    "title": "Descubre la app",
+    "hint": "No es una lección, solo un vistazo rápido a otra parte de la app.",
+    "to_case_one": "{{count}} objetivo más para una caja gratis",
+    "to_case_other": "{{count}} objetivos más para una caja gratis",
+    "case_tomorrow": "Caja gratis lista: llega a tu Arsenal mañana (una al día)",
+    "case_collected_one": "Caja gratis añadida. Ábrela en el Arsenal",
+    "case_collected_other": "{{count}} cajas gratis añadidas. Ábrelas en el Arsenal",
+    "items": {
+      "first_session": "Toca tu primera sesión",
+      "first_guitar": "Recoge tu primera guitarra",
+      "first_song": "Añade una canción que quieras aprender",
+      "tempo_goal": "Fija un objetivo de tempo",
+      "second_day": "Vuelve un segundo día",
+      "practice_plan": "Toca un plan ya hecho",
+      "journey_step": "Completa un paso de Journey",
+      "play_song": "Practica una canción",
+      "daily_exercise": "Toca el ejercicio del día",
+      "auto_plan": "Genera y toca un plan automático",
+      "all_categories": "Prueba teoría, oído y creatividad",
+      "open_case": "Abre una caja en el Arsenal",
+      "weekly_goal": "Recoge un objetivo semanal",
+      "favorite": "Añade algo a tus favoritos",
+      "customize": "Personaliza tu inicio o tu perfil",
+      "skill_tree": "Supera tu primer tempo en el árbol de habilidades",
+      "scale_tree": "Supera tu primera forma en el árbol de escalas",
+      "calendar": "Planifica tu semana en el calendario",
+      "rotation": "Añade algo a tu rotación",
+      "own_plan": "Crea tu propio plan",
+      "own_exercise": "Escribe tu propio ejercicio",
+      "boss": "Enfréntate a un jefe",
+      "rig": "Monta tu equipo en Tone Studio",
+      "achievement": "Desbloquea tu primera insignia",
+      "duel": "Juega tu primer duelo",
+      "challenge": "Participa en el reto del mes: vota o graba",
+      "guild": "Únete a un gremio"
+    },
+    "go": "Vamos",
+    "later": "Esta semana no"
   },
   "empty": {
-    "title": "Camino despejado",
-    "body": "Todo lo de hoy está hecho. Toca lo que quieras o mira lo que viene."
+    "title": "Todo listo por hoy",
+    "body": "No hay nada pendiente. Toca lo que quieras."
   }
 }

@@ -157,6 +157,15 @@ export const takesPracticeRun = (
 ): boolean =>
   goal.status === "active" && isFullLength && run.bpm >= goal.stageBpm;
 
+/** The highest milestone at or below the given tempo — never below the current one. */
+export const skippedStageBpm = (
+  goal: Pick<ExerciseGoal, "startBpm" | "targetBpm" | "stepBpm" | "stageBpm">,
+  bpm: number,
+): number =>
+  goalStages(goal)
+    .filter((stage) => stage <= bpm)
+    .reduce((highest, stage) => Math.max(highest, stage), goal.stageBpm);
+
 /**
  * What a judged run does to its goal. A run is judged at the current
  * milestone; the clean runs that fill it move the goal on to the next one, and
@@ -164,9 +173,20 @@ export const takesPracticeRun = (
  * a run played on it afterwards is judged but changes nothing.
  */
 export const applyGoalRun = (
-  goal: JudgedGoal,
+  judgedGoal: JudgedGoal,
   run: GoalRunInput,
 ): GoalRunOutcome => {
+  // A clean run faster than the milestone skips the milestones below its
+  // tempo: the goal jumps to the highest one the run reached and counts the
+  // run there, instead of crediting one small step per three runs.
+  const reached =
+    judgedGoal.status === "active" && isRunClean(run, judgedGoal)
+      ? skippedStageBpm(judgedGoal, run.bpm)
+      : judgedGoal.stageBpm;
+  const goal =
+    reached > judgedGoal.stageBpm
+      ? { ...judgedGoal, stageBpm: reached, cleanRuns: 0 }
+      : judgedGoal;
   const clean = isRunClean(run, goal);
   const reason = clean
     ? "clean"

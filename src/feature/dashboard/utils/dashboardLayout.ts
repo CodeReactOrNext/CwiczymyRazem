@@ -23,8 +23,8 @@ export const MAX_CUSTOM_SHORTCUT_LABEL = 40;
 /**
  * What the arrangeable part of Home looked like before it could be customised
  * — so an account that has never touched the layout sees exactly the page it
- * always did. The checklist above and the banner and feed below are fixed and
- * not part of the layout at all.
+ * always did. The banner and feed below are fixed and not part of the layout
+ * at all.
  */
 export const DEFAULT_LAYOUT: DashboardLayout = {
   version: 1,

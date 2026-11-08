@@ -1,4 +1,3 @@
-import { getQuestTaskHref } from "feature/user/store/dailyQuest.routes";
 import type {
   NextAction,
   WhatNextSnapshot,
@@ -8,8 +7,9 @@ import type {
 export const DEFAULT_SLOT_MINUTES = 10;
 
 /**
- * A player who has never logged a session has one thing to do. A player with
- * no songs gets one more nudge, since songs are half of what the app tracks.
+ * A player who has never logged a session has one thing to do. Everything
+ * after it — the first song, the first goal — is a "use it once" goal of
+ * What Next (see feature/whatNext/data/featureGoals), not a step here.
  */
 export const onboardingActions = (s: WhatNextSnapshot): NextAction[] => {
   const actions: NextAction[] = [];
@@ -33,24 +33,6 @@ export const onboardingActions = (s: WhatNextSnapshot): NextAction[] => {
           minutes: DEFAULT_SLOT_MINUTES,
         },
       }),
-    });
-  }
-
-  if (
-    s.songs &&
-    s.songs.learning.length +
-      s.songs.wantToLearn.length +
-      s.songs.learnedCount ===
-      0
-  ) {
-    actions.push({
-      id: "onboarding:first-song",
-      source: "onboarding",
-      kind: "start",
-      isPractice: false,
-      title: { key: "onboarding.first_song.title" },
-      reason: { key: "onboarding.first_song.reason" },
-      href: "/songs?view=explore",
     });
   }
 
@@ -85,50 +67,6 @@ export const streakActions = (s: WhatNextSnapshot): NextAction[] => {
       }),
     },
   ];
-};
-
-/** Each unfinished task of today's quest; the reward itself is a claim. */
-export const dailyQuestActions = (s: WhatNextSnapshot): NextAction[] => {
-  const quest = s.dailyQuest;
-  if (!quest || quest.isRewardClaimed) return [];
-
-  return quest.tasks
-    .filter((task) => !task.isCompleted)
-    .map((task) => ({
-      id: `daily-quest:${quest.date}:${task.id}`,
-      source: "dailyQuest" as const,
-      kind: "expiring" as const,
-      isPractice: true,
-      title:
-        task.type === "practice_specific_exercise"
-          ? {
-              key: "dashboard:daily_quests.tasks.practice_specific_exercise",
-              params: { exercise: task.title.replace(/^Practice: /, "") },
-            }
-          : { key: `dashboard:daily_quests.tasks.${task.type}` },
-      reason: {
-        key: "daily_quest.reason",
-        params: {
-          progress: Math.min(task.progress, task.target),
-          target: task.target,
-        },
-      },
-      href: getQuestTaskHref(task),
-      deadlineAt: s.streak?.dayEndsAt,
-      progress: {
-        value: Math.min(task.progress, task.target),
-        max: task.target,
-      },
-      reward: s.dailyQuestReward,
-      ...(task.type === "practice_specific_exercise" &&
-        task.exerciseId && {
-          sessionItem: {
-            kind: "exercise" as const,
-            exerciseId: task.exerciseId,
-            minutes: DEFAULT_SLOT_MINUTES,
-          },
-        }),
-    }));
 };
 
 /** Today's shared board: play it once, or climb it if not first. */

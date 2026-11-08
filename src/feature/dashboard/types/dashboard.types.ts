@@ -6,9 +6,8 @@ import type { ShortcutId } from "feature/dashboard/data/shortcutCatalog";
  *
  * Two kinds of card are missing from this list. The individual milestone cards
  * are generated from the tier table instead (see `MilestoneWidgetId`), so a new
- * tier becomes an addable card on its own. And three parts of Home are not
- * cards at all: the getting-started checklist above them, and the support
- * banner and community feed below. Those always sit in the same place and
+ * tier becomes an addable card on its own. And two parts of Home are not
+ * cards at all: the support banner and community feed below them. Those always sit in the same place and
  * cannot be moved or hidden.
  */
 export const WIDGET_IDS = [

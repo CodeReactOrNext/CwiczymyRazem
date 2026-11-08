@@ -23,12 +23,10 @@ import {
   Target,
   TrendingUp,
   Trophy,
-  Wand2,
 } from "lucide-react";
 
 /** One icon per source, so a row says where it comes from before it is read. */
 export const SOURCE_ICONS: Record<NextActionSource, LucideIcon> = {
-  claims: Wand2,
   onboarding: Sparkles,
   streak: Flame,
   dailyQuest: Swords,

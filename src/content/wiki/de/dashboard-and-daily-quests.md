@@ -22,12 +22,12 @@ Die Mitte von Start ist ein Stapel Karten, und du entscheidest, welche Karten da
 - **Shortcuts** ist eine Karte mit deinen eigenen Schnelllinks. Tippe beim Anpassen die Ziele an, die du darauf haben willst. Bis zu acht passen drauf.
 - **Zurücksetzen** bringt das ursprüngliche Start zurück. **Fertig** schließt die Werkzeugleisten.
 
-Drei Dinge bleiben, egal was du tust, an Ort und Stelle: die Einstiegs-Checkliste oben sowie das Support-Banner und der Community-Feed unten. Sie lassen sich nicht verschieben oder ausblenden.
+Zwei Dinge bleiben, egal was du tust, an Ort und Stelle: das Support-Banner und der Community-Feed unten. Sie lassen sich nicht verschieben oder ausblenden.
 
 Dein Layout wird in deinem Konto gespeichert, sieht also im Browser und in der Desktop-App gleich aus.
 
 <BlogAlert type="tip">
-Manche Karten erscheinen nur, wenn sie etwas zu sagen haben. Die Einstiegs-Checkliste verschwindet von selbst, sobald du sie eingelöst hast. Du musst sie nicht selbst ausblenden.
+Manche Karten erscheinen nur, wenn sie etwas zu sagen haben, und verschwinden danach von selbst. Du musst sie nicht selbst ausblenden.
 </BlogAlert>
 
 ## Tägliche Quests

@@ -53,18 +53,24 @@ const EMPTY_INPUT_DATA: ReportFormikInterface = {
   avatarUrl: null,
 };
 
-export const useAchievementContext = (): AchievementContext | null => {
+/**
+ * `enabled: false` reads nothing and returns null — for a caller that only
+ * needs the context on some of its screens but cannot call hooks conditionally.
+ */
+export const useAchievementContext = ({
+  enabled = true,
+}: { enabled?: boolean } = {}): AchievementContext | null => {
   const currentUserId = useAppSelector(selectUserAuth);
   const currentUserStats = useAppSelector(selectCurrentUserStats);
 
   // Gear progress bars need the stash. It is the same cached query the Arsenal
   // itself runs, so opening a profile after the Arsenal costs no extra request.
-  const { data: arsenal } = useArsenalData();
+  const { data: arsenal } = useArsenalData(enabled);
 
   const { data: userSongs } = useQuery({
     queryKey: ["user-songs", currentUserId],
     queryFn: () => getUserSongs(currentUserId!),
-    enabled: !!currentUserId,
+    enabled: enabled && !!currentUserId,
     staleTime: 10 * 60 * 1000,
   });
 
@@ -74,7 +80,10 @@ export const useAchievementContext = (): AchievementContext | null => {
   // and is read back in the viewer's local time, so it is what every other
   // streak in the UI is already reconciled against (see getReconciledStreak).
   // Same all-time query the header streak runs, so it is served from cache.
-  const { reportList } = useActivityLogReports(currentUserId ?? "", "all");
+  const { reportList } = useActivityLogReports(
+    enabled ? (currentUserId ?? "") : "",
+    "all",
+  );
 
   const reportDates = useMemo(
     () => (reportList ?? []).map((report) => report.date),
@@ -85,7 +94,7 @@ export const useAchievementContext = (): AchievementContext | null => {
   // checks twice over from it, and a fresh literal every render would defeat
   // that memo on every unrelated re-render.
   return useMemo(() => {
-    if (!currentUserStats || !userSongs) return null;
+    if (!enabled || !currentUserStats || !userSongs) return null;
 
     const restDays = hasRestDays(currentUserStats);
     const { dayWithoutBreak: currentStreak } = getReconciledStreak({
@@ -113,5 +122,5 @@ export const useAchievementContext = (): AchievementContext | null => {
       sessionResults: EMPTY_SESSION_RESULTS,
       inputData: EMPTY_INPUT_DATA,
     };
-  }, [currentUserStats, userSongs, arsenal, reportDates]);
+  }, [enabled, currentUserStats, userSongs, arsenal, reportDates]);
 };

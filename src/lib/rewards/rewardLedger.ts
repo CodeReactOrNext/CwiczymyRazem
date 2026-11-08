@@ -47,6 +47,26 @@ export interface RewardLedger {
    * quietly swallow rungs that were genuinely earned.
    */
   levelBaseline: number | null;
+  /**
+   * What Next's "use it once" goals seen done, by goal id. Done never turns
+   * back into not done, so a goal on this list is not looked up again: the
+   * state route stops reading a dozen collections for it on every visit.
+   */
+  doneFeatureGoals: string[];
+  /**
+   * The goals already done when the goals first saw the account. Same idea as
+   * `levelBaseline`: they were done before the goals existed and earn
+   * nothing; every five done since earn a free case. Empty for an account
+   * that was new then. Null until sealed, then never moved again.
+   */
+  featureGoalBaseline: string[] | null;
+  /** Free cases already paid for goals — see `feature/whatNext/utils/featureGoalCases`. */
+  featureGoalCasesPaid: number;
+  /**
+   * Server day key of the last free case paid for goals. At most one is paid a
+   * day; the rest stay owed and come one a day after.
+   */
+  featureGoalCaseDay: string | null;
   /** Unspent free cases. One opens any case on the shelf without paying Fame. */
   caseTokens: number;
 }
@@ -58,6 +78,10 @@ export const EMPTY_REWARD_LEDGER: RewardLedger = {
   claimedRoadmaps: [],
   claimedLevels: [],
   levelBaseline: null,
+  doneFeatureGoals: [],
+  featureGoalBaseline: null,
+  featureGoalCasesPaid: 0,
+  featureGoalCaseDay: null,
   caseTokens: 0,
 };
 
@@ -79,6 +103,7 @@ export const readRewardLedger = (
   const stored = (data?.rewards ?? {}) as Partial<RewardLedger>;
   const tokens = Number(stored.caseTokens);
   const baseline = stored.levelBaseline;
+  const goalCases = Number(stored.featureGoalCasesPaid);
 
   return {
     claimedAchievements: readIds(
@@ -94,6 +119,16 @@ export const readRewardLedger = (
     levelBaseline:
       typeof baseline === "number" && Number.isFinite(baseline) && baseline >= 1
         ? Math.floor(baseline)
+        : null,
+    doneFeatureGoals: readIds(stored.doneFeatureGoals),
+    featureGoalBaseline: Array.isArray(stored.featureGoalBaseline)
+      ? readIds(stored.featureGoalBaseline)
+      : null,
+    featureGoalCasesPaid:
+      Number.isFinite(goalCases) && goalCases > 0 ? Math.floor(goalCases) : 0,
+    featureGoalCaseDay:
+      typeof stored.featureGoalCaseDay === "string"
+        ? stored.featureGoalCaseDay
         : null,
     caseTokens: Number.isFinite(tokens) && tokens > 0 ? Math.floor(tokens) : 0,
   };

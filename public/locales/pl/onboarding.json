@@ -69,47 +69,5 @@
       "label": "Zapisuj ćwiczenia, które już robię",
       "description": "Śledź czas, serię i postępy"
     }
-  },
-  "checklist": {
-    "title": "Pierwsze kroki",
-    "intro": "Wprowadzenie (2 min)",
-    "dismiss": "Ukryj listę pierwszych kroków",
-    "claim": "Odbierz {{badge}}",
-    "first_session": "Pierwsza sesja",
-    "first_song": "Pierwszy utwór",
-    "second_day": "Ćwicz drugiego dnia",
-    "first_guitar": "Pierwsza gitara",
-    "after_first": "Po pierwszej sesji",
-    "tomorrow": "Dostępne jutro",
-    "play_today": "Zagraj dziś, żeby ukończyć",
-    "open_case": "Otwórz skrzynkę"
-  },
-  "intro": {
-    "title": "Witaj w Riff Quest",
-    "description": "Dwie minuty o tym, czym to jest i jak działa.",
-    "cta": "Rozumiem"
-  },
-  "first_song": {
-    "title": "Dodaj utwór, który chcesz grać",
-    "description": "Śledź utwory, które chcesz poznać, których się uczysz albo które już umiesz.",
-    "step1": "Wejdź na stronę Utwory i kliknij ten przycisk:",
-    "add_button": "Dodaj nowy utwór",
-    "step2": "Wpisz wykonawcę i tytuł dowolnego utworu, który chciałbyś zagrać. Jest już w bibliotece? Po prostu wybierz go. Nie ma go? Nie szkodzi — właśnie go dodajesz:",
-    "artist": "Wykonawca",
-    "song_title": "Tytuł utworu",
-    "step3": "Powiedz aplikacji, na jakim etapie jesteś z tym utworem. Później przećwiczysz go fragment po fragmencie i zobaczysz, jak rośnie twoje opanowanie:",
-    "want": "Chcę się nauczyć",
-    "want_sub": "Zapisz na później jako inspirację",
-    "learning": "Uczę się",
-    "learning_sub": "Skup się dziś na tym utworze",
-    "learned": "Opanowane",
-    "learned_sub": "Opanowany i w repertuarze",
-    "cta": "Przeglądaj utwory"
-  },
-  "reward": {
-    "title": "Wylosuj swoją pierwszą gitarę",
-    "description": "Zagrałeś pierwszą sesję — odbierz Fame i otwórz skrzynkę.",
-    "body": "To dokładnie tyle, ile trzeba, żeby otworzyć skrzynkę w Arsenale. Odbierz nagrodę, a trafisz tam gotowy do wyboru gitary.",
-    "cta": "Odbierz i wybierz gitarę"
   }
 }
