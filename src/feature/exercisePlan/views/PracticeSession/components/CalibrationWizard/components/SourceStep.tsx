@@ -1,14 +1,49 @@
 import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Headphones, Mic, Plug,X } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import Image from "next/image";
 import { useResponsiveStore } from "store/useResponsiveStore";
+
+import { CloseButton } from "./CloseButton";
 
 export type InputSource = "interface" | "microphone";
 
 interface SourceStepProps {
   onSelect: (source: InputSource) => void;
   onCancel: () => void;
+}
+
+const Header = ({ title, onCancel, closeLabel }: { title: string; onCancel: () => void; closeLabel: string }) => (
+  <div className="mb-8 flex items-center justify-between gap-3">
+    <h2 className="text-xl font-semibold text-zinc-50">{title}</h2>
+    <CloseButton onClick={onCancel} label={closeLabel} />
+  </div>
+);
+
+/** One way in, pictured: the picture says what the title means at a glance. */
+function SourceCard({
+  image, title, description, onClick,
+}: {
+  image: string;
+  title: string;
+  description: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex flex-col items-center gap-6 rounded-lg bg-zinc-900/40 px-6 py-8 transition-colors hover:bg-zinc-800/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
+    >
+      <div className="relative h-36 w-full">
+        <Image src={image} alt="" fill sizes="300px" className="select-none object-contain" draggable={false} />
+      </div>
+      <div className="space-y-1.5 text-center">
+        <p className="text-base font-semibold text-zinc-100">{title}</p>
+        <p className="text-sm leading-relaxed text-zinc-400">{description}</p>
+      </div>
+    </button>
+  );
 }
 
 /**
@@ -19,41 +54,27 @@ interface SourceStepProps {
 const MobileMicSource = ({ onSelect, onCancel }: SourceStepProps) => {
   const { t } = useTranslation("calibration");
   return (
-    <div className="flex flex-col px-6 py-6 text-white h-full">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-bold tracking-tight">{t("source.title")}</h2>
-        <button
-          onClick={onCancel}
-          className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors"
-        >
-          <X size={16} />
-        </button>
-      </div>
+    <div className="flex flex-1 flex-col px-6 py-8 text-white sm:px-12 sm:py-10">
+      <Header title={t("source.title")} onCancel={onCancel} closeLabel={t("close")} />
 
-      <div className="flex flex-col items-center gap-5 rounded-lg bg-zinc-900/40 px-5 py-8 text-center">
-        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-400">
-          <Headphones className="h-7 w-7" />
-        </span>
+      <div className="flex flex-col items-center gap-6 rounded-lg bg-zinc-900/40 px-5 py-8 text-center">
+        <div className="relative h-40 w-full">
+          <Image src="/images/setup/headphones.webp" alt="" fill sizes="240px" className="select-none object-contain" draggable={false} priority />
+        </div>
         <div className="space-y-2">
-          <p className="font-bold text-white">{t("source.mobile_headphones")}</p>
-          <p className="text-sm leading-relaxed text-zinc-400">
-            {t("source.mobile_headphones_body")}
-          </p>
+          <p className="text-base font-semibold text-zinc-100">{t("source.mobile_headphones")}</p>
+          <p className="text-sm leading-relaxed text-zinc-400">{t("source.mobile_headphones_body")}</p>
         </div>
       </div>
 
       <p className="mt-5 text-center text-sm text-zinc-400">{t("source.mobile_body")}</p>
 
-      <Button onClick={() => onSelect("microphone")} className="mt-6 h-12 w-full font-bold">
-        {t("source.continue")}
-      </Button>
-
-      <button
-        onClick={onCancel}
-        className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors text-center py-3 mt-2"
-      >
-        {t("skip_calibration")}
-      </button>
+      <div className="mt-auto flex justify-end pt-8">
+        <Button onClick={() => onSelect("microphone")} className="h-11 gap-2 px-6 text-base font-semibold">
+          {t("source.continue")}
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 };
@@ -63,81 +84,26 @@ export const SourceStep = ({ onSelect, onCancel }: SourceStepProps) => {
   const isMobile = useResponsiveStore((state) => state.isMobile);
   if (isMobile) return <MobileMicSource onSelect={onSelect} onCancel={onCancel} />;
   return (
-    <div className="flex flex-col px-6 py-6 text-white h-full">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold tracking-tight">{t("source.title")}</h2>
-        <button
-          onClick={onCancel}
-          className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors"
-        >
-          <X size={16} />
-        </button>
-      </div>
-      
-      <p className="text-zinc-400 text-sm mb-4 font-medium">{t("source.question")}</p>
+    <div className="flex flex-1 flex-col px-6 py-8 text-white sm:px-12 sm:py-10">
+      <Header title={t("source.title")} onCancel={onCancel} closeLabel={t("close")} />
 
-      <div className="grid grid-cols-2 gap-3">
+      <p className="mb-6 text-base text-zinc-300">{t("source.question")}</p>
+
+      <div className="mb-8 grid grid-cols-2 gap-4">
         <SourceCard
-          icon={<Plug size='1em' className="text-4xl" />}
+          image="/images/setup/interface.webp"
           title={t("source.interface")}
           description={t("source.interface_desc")}
-          accentClass="hover:bg-cyan-500/5 group-hover:text-cyan-400"
-          iconIdleClass="text-zinc-500"
-          iconActiveClass="group-hover:text-cyan-400"
           onClick={() => onSelect("interface")}
         />
         <SourceCard
-          icon={<Mic size='1em' className="text-4xl" />}
+          image="/images/setup/microphone.webp"
           title={t("source.mic")}
           description={t("source.mic_desc")}
-          accentClass="hover:bg-emerald-500/5"
-          iconIdleClass="text-zinc-500"
-          iconActiveClass="group-hover:text-emerald-400"
           onClick={() => onSelect("microphone")}
         />
       </div>
 
-      <button
-        onClick={onCancel}
-        className="text-xs text-zinc-700 hover:text-zinc-500 transition-colors text-center py-3 mt-6"
-      >
-        {t("skip_calibration")}
-      </button>
     </div>
   );
 };
-
-function SourceCard({
-  icon, title, description, accentClass, iconIdleClass, iconActiveClass, onClick,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: React.ReactNode;
-  accentClass: string;
-  iconIdleClass: string;
-  iconActiveClass: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "group flex flex-col items-center justify-center gap-5 p-6 rounded-lg bg-zinc-900/40 transition-all",
-        accentClass
-      )}
-    >
-      <div className={cn(
-        "w-20 h-20 rounded-lg bg-zinc-800/80 flex items-center justify-center transition-all",
-        accentClass
-      )}>
-        <span className={cn("transition-colors", iconIdleClass, iconActiveClass)}>
-          {icon}
-        </span>
-      </div>
-      <div className="text-center">
-        <p className="font-bold text-white text-sm">{title}</p>
-        <p className="text-[11px] text-zinc-500 mt-1.5 leading-relaxed">{description}</p>
-      </div>
-    </button>
-  );
-}

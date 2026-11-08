@@ -18,6 +18,9 @@ export interface FillStep {
   beat: number;
   /** The step that hits the note; the ones after it only hold it. */
   hit?: true;
+  /** The hold earned the whole note: the fill closes to `beat` (its end) with
+   *  a short ease instead of following the cursor (see sustainCredit.ts). */
+  complete?: true;
   /** The hit's timing — only on the hit, and only where the board shows timing. */
   timing?: NoteTiming;
 }

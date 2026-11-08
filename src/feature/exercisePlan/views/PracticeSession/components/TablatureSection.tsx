@@ -3,7 +3,7 @@ import { cn } from "assets/lib/utils";
 import { BackingTrackButton } from "feature/backingTrack/components/BackingTrackButton";
 import type { BackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
 import { useTranslation } from "hooks/useTranslation";
-import { Settings2, Timer, X, ZoomIn, ZoomOut } from "lucide-react";
+import { RefreshCw, Settings2, Timer, X, ZoomIn, ZoomOut } from "lucide-react";
 import React, {
   memo,
   useCallback,
@@ -217,8 +217,13 @@ export const TablatureSection = memo(function TablatureSection({
 }: TablatureSectionProps) {
   const { t } = useTranslation("session");
   const { overlay: tabOverlay, gameMode } = useTabOverlay();
-  const { hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef, learn, markAlphaTabPassStart } = useNoteMatchingContext();
-  const { openTimingCalibration } = useSessionUI();
+  const { hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef, learn, markAlphaTabPassStart, calibratedLatencyMs, estimateLatencyMs } = useNoteMatchingContext();
+  // The latency tab timing is judged with: the measured one, else the formula
+  // estimate (only meaningful once the input is open).
+  const timingLatencyLabel = calibratedLatencyMs !== null
+    ? `${calibratedLatencyMs} ms`
+    : isListening ? `~${Math.round(estimateLatencyMs())} ms` : null;
+  const { openTimingCalibration, openMicSetup } = useSessionUI();
   const { tuning, stringCount } = useGuitarTuningContext();
   const {
     settings,
@@ -482,6 +487,24 @@ export const TablatureSection = memo(function TablatureSection({
               className={cn(TOOL_CHIP, "shrink-0")}>
               <Timer className='h-3.5 w-3.5' />
               <span>{t("timing.title")}</span>
+              {timingLatencyLabel && (
+                <span
+                  className={cn("tabular-nums", calibratedLatencyMs === null && "text-zinc-500")}
+                  title={calibratedLatencyMs === null ? t("timing.estimate") : undefined}>
+                  ({timingLatencyLabel})
+                </span>
+              )}
+            </button>
+          )}
+          {isMicEnabled && (
+            // The same wizard as the mic menu's "Recalibrate", where it was
+            // hard to find: input, level, tuning, timing.
+            <button
+              type='button'
+              onClick={openMicSetup}
+              className={cn(TOOL_CHIP, "shrink-0")}>
+              <RefreshCw className='h-3.5 w-3.5' />
+              <span>{t("media.recalibrate")}</span>
             </button>
           )}
           {showBackingButton && backingTrackStatus && onOpenBackingTrack && (

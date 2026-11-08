@@ -1,6 +1,8 @@
 import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronLeft, Mic, X } from "lucide-react";
+import { ChevronLeft, Mic } from "lucide-react";
+
+import { CloseButton } from "./CloseButton";
 
 interface PermissionStepProps {
   isLoading: boolean;
@@ -12,7 +14,7 @@ interface PermissionStepProps {
 export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: PermissionStepProps) => {
   const { t } = useTranslation("calibration");
   return (
-    <div className="flex h-full flex-col px-6 py-6 text-white">
+    <div className="flex flex-1 flex-col px-6 py-8 text-white sm:px-12 sm:py-10">
       <div className="flex items-center justify-between mb-8">
         <button
           onClick={onBack}
@@ -20,9 +22,7 @@ export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: Permiss
         >
           <ChevronLeft size={20} />
         </button>
-        <button onClick={onCancel} className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors">
-          <X size='1em' className="h-4 w-4" />
-        </button>
+        <CloseButton onClick={onCancel} label={t("close")} />
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-6">

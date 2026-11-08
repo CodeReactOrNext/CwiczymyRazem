@@ -111,6 +111,21 @@ describe("createGuitarBufferProcessor pitch stabilization", () => {
   });
 });
 
+describe("createGuitarBufferProcessor input peak", () => {
+  it("reports the window's loudest raw sample, whatever the input gain", () => {
+    const targets = { ...makeTargets(), inputPeakRef: { current: 0 } };
+    const process = createGuitarBufferProcessor({
+      detectors: makeDetectors([110, 110, 110, 110]),
+      targets,
+      getGain: () => 4,
+    });
+    const window = new Float32Array(2048).fill(0.1);
+    window[100] = -0.98;
+    process(window);
+    expect(targets.inputPeakRef.current).toBeCloseTo(0.98, 5);
+  });
+});
+
 describe("createGuitarBufferProcessor noise-floor tracking", () => {
   it("does not update the noise floor until silence is confirmed (2+ windows)", () => {
     const targets = makeTargets();
@@ -232,5 +247,38 @@ describe("createGuitarBufferProcessor spectrum without an AnalyserNode (native p
     const heard = spectrum.read()!;
     expect(isChordToneSounding(heard, 440, { ratio: 0.6, floor: 0.05 })).toBe(true);
     expect(isChordToneSounding(heard, 466.16, { ratio: 0.6, floor: 0.05 })).toBe(false); // A#4
+  });
+});
+
+describe("createGuitarBufferProcessor soft (spectral-flux) attacks", () => {
+  it("dates the strum detector's attack like the onset detector's, without touching it", () => {
+    let calls = 0;
+    const detectors: GuitarDetectors = {
+      ...makeDetectors([110]),
+      // Fires on the window's third hop only.
+      strum: { do: () => ++calls === 3 },
+    };
+    const targets = { ...makeTargets(), lastAttackMsRef: { current: 0 }, lastSoftAttackMsRef: { current: 0 } };
+    const now = vi.spyOn(Date, "now").mockReturnValue(10_000);
+    const process = createGuitarBufferProcessor({ detectors, targets, getGain: () => 1, sampleRate: 48000 });
+    process(loudWindow());
+    now.mockRestore();
+    const hopMs = (512 / 48000) * 1000;
+    // The block ends at 10 000; hop 3 of 4 ends one hop earlier, less the 2048-sample window.
+    expect(targets.lastSoftAttackMsRef.current).toBeCloseTo(10_000 - hopMs - (2048 / 48000) * 1000, 6);
+    expect(targets.lastAttackMsRef.current).toBe(0);
+  });
+
+  it("keeps listening through silence, and stays idle when nobody reads it", () => {
+    let calls = 0;
+    const detectors: GuitarDetectors = { ...makeDetectors([110]), strum: { do: () => { calls++; return false; } } };
+    const silent = () => new Float32Array(2048);
+    const read = createGuitarBufferProcessor({ detectors, targets: { ...makeTargets(), lastSoftAttackMsRef: { current: 0 } }, getGain: () => 1 });
+    read(silent()); read(silent()); read(silent());
+    expect(calls).toBe(12);
+    calls = 0;
+    const unread = createGuitarBufferProcessor({ detectors, targets: makeTargets(), getGain: () => 1 });
+    unread(loudWindow());
+    expect(calls).toBe(0);
   });
 });

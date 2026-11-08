@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { FillStep } from "../utils/fillFeed";
 import type { NoteTiming } from "../utils/timingGrade";
-import { addFillSteps, clearLiveFills, createLiveFills, currentTiming, isLiveTiming, liveFillBeat, liveFillOn } from "./liveNoteFills";
+import { addFillSteps, clearLiveFills, COMPLETE_SEC, createLiveFills, currentTiming, isLiveTiming, liveFillBeat, liveFillOn } from "./liveNoteFills";
 
 const LATE: NoteTiming = { grade: 2, hint: "late", offsetBeats: 0.1 };
 const onTile = (tile: number) => () => tile;
@@ -39,6 +39,25 @@ describe("liveNoteFills", () => {
     for (let frame = 0; frame < 30; frame++) shown.push(liveFillBeat(fill, frame / 60));
     const growth = shown.slice(1).map((beat, i) => beat - shown[i]);
     for (const step of growth) expect(step).toBeCloseTo(2 / 60, 6);
+  });
+
+  it("closes a completed note to its end with a short ease-out", () => {
+    const fills = createLiveFills();
+    addFillSteps(fills, [hit("k", 1, 0), hold("k", 1.1, 0.4)], onTile(0), 0, null);
+    addFillSteps(fills, [{ noteKey: "k", audioSec: 1.12, beat: 1, complete: true }], onTile(0), 0, null);
+    const fill = liveFillOn(fills, "k", 0)!;
+
+    expect(liveFillBeat(fill, 1.1)).toBeCloseTo(0.4, 9);
+    const third = liveFillBeat(fill, 1.12 + COMPLETE_SEC / 3);
+    expect(third).toBeGreaterThan(0.75);
+    expect(third).toBeLessThan(1);
+    expect(liveFillBeat(fill, 1.12 + COMPLETE_SEC)).toBeCloseTo(1, 9);
+  });
+
+  it("shows a completed note whole at once while paused", () => {
+    const fills = createLiveFills();
+    addFillSteps(fills, [hit("k", 1, 0), hold("k", 1.1, 0.4), { noteKey: "k", audioSec: 1.12, beat: 1, complete: true }], onTile(0), 0, null);
+    expect(liveFillBeat(liveFillOn(fills, "k", 0)!, null)).toBeCloseTo(1, 9);
   });
 
   it("never draws a fill back", () => {

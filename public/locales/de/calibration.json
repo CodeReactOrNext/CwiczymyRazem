@@ -1,5 +1,7 @@
 {
-  "skip_calibration": "Kalibrierung überspringen",
+  "skip_calibration": "Einrichtung überspringen",
+  "close": "Schließen",
+  "back": "Zurück",
   "setup": {
     "title_native": "Audio-Einrichtung",
     "title_interface": "Audio-Interface einrichten",
@@ -7,34 +9,37 @@
     "connecting": "Verbinde…",
     "start_listening": "Zuhören starten",
     "grant": "Mikrofonzugriff erlauben",
-    "signal_level": "Signalpegel",
-    "too_quiet": "Zu leise – schlag eine Saite an",
-    "good_level": "Guter Pegel ✓",
+    "signal_level": "Signal",
     "input_sensitivity": "Eingangsempfindlichkeit",
-    "play_notes": "Spiel ein paar Töne… {{seconds}} s",
-    "calibrated": "Kalibriert ✓",
-    "auto_gain": "Gain automatisch kalibrieren",
+    "play_notes": "Spiel ganz normal… {{seconds}} s",
+    "auto_gain": "Empfindlichkeit automatisch einstellen",
     "tune_guitar": "Gitarre stimmen",
     "headphones": "Kabelgebundene Kopfhörer nutzen",
-    "headphones_body": "Ohne Kopfhörer nimmt das Mikrofon den Backing Track aus den Lautsprechern auf und erzeugt falsche Erkennungen.",
     "quiet": "Such dir einen ruhigen Ort",
-    "quiet_body": "Hintergrundgeräusche erzeugen falsche Notenerkennungen. Schließ Türen und mach Musik aus.",
     "interface": "Interface",
-    "refresh": "Geräteliste aktualisieren",
+    "refresh": "Aktualisieren",
     "no_inputs": "Keine Eingabegeräte gefunden",
-    "inputs": "{{count}} Eingänge",
-    "which_jack": "An welcher Buchse steckt deine Gitarre?",
-    "channel": "Kanal {{n}}",
-    "native_hint": "Native Aufnahme mit geringer Latenz – umgeht den Browser komplett. Steck deine Gitarre direkt ins Interface oben.",
-    "output_auto": "Ausgang: {{label}} (auto)",
-    "matched": "abgestimmt",
-    "change": "Ändern",
+    "channel": "Eingang {{n}}",
     "output": "Ausgang",
     "no_outputs": "Keine Ausgabegeräte gefunden",
-    "output_hint": "Sollte zum Interface oben passen, damit Wiedergabe und Aufnahme dasselbe Gerät nutzen.",
     "output_hint_asio4all": "ASIO4ALL belegt dein ganzes Interface, inklusive Ausgänge, deshalb kann das Metronom darüber nicht spielen. Wähle hier einen anderen Ausgang (z. B. die Lautsprecher deines Computers) oder schalte im ASIO4ALL-Panel den Ausgang des Interfaces ab und lass nur den Eingang aktiv.",
-    "before_start": "Bevor du startest",
-    "before_start_body": "Stell sicher, dass dein Interface als Mikrofoneingang des Browsers gewählt ist und deine Gitarre eingesteckt ist. Den Gain stellst du im nächsten Schritt ein."
+    "before_start_body": "Wähl dein Interface als Mikrofon des Browsers (Mikrofon-Symbol in der Adressleiste).",
+    "level": {
+      "silent": "Kein Signal. Spiel etwas",
+      "good": "Deine Gitarre ist zu hören",
+      "clipping": "Übersteuert. Eingang am Interface leiser drehen"
+    },
+    "auto": {
+      "no_signal": "Wir haben nichts gehört, die Empfindlichkeit bleibt unverändert. Klick noch einmal und spiel während der ganzen Messung, wie in einer Übung.",
+      "ok": "Empfindlichkeit auf {{gain}}× gesetzt.",
+      "clipping": "Empfindlichkeit auf {{gain}}× gesetzt, aber das Signal übersteuert schon, bevor es die App erreicht. Dreh den Gain am Interface herunter (oder halte die Gitarre weiter vom Mikrofon weg) und miss erneut.",
+      "at_max": "Selbst auf Maximum ({{gain}}×) ist die Gitarre leise. Dreh den Gain am Interface auf oder rück das Mikrofon näher heran.",
+      "noisy": "Empfindlichkeit auf {{gain}}× gesetzt, aber die Gitarre hebt sich kaum vom Hintergrundrauschen ab. Das kann die Empfindlichkeit nicht beheben. Sorg für mehr Ruhe oder rück das Mikrofon näher an die Gitarre."
+    },
+    "guitar_input": "Gitarren-Eingang",
+    "next": "Weiter",
+    "waiting_signal": "Spiel etwas, um weiterzugehen",
+    "ready": "Deine Gitarre ist zu hören. Du kannst weiter."
   },
   "output_stall": {
     "title": "Das Metronom kann nicht spielen",
@@ -43,23 +48,41 @@
     "asio4all": "Nutzt du ASIO4ALL? Lass in seinem Panel nur den Eingang deines Interfaces aktiv und achte darauf, dass dort keine andere Soundkarte angehakt ist.",
     "close": "Schließen"
   },
+  "sustain": {
+    "title": "Sustain-Test",
+    "play": "Spiel {{note}} auf der {{string}}. Saite, {{fret}}. Bund, und lass ihn ausklingen.",
+    "waiting": "Warte auf {{note}}…",
+    "wrong": "Das ist eine andere Note. Spiel {{note}}",
+    "holding": "Halten…",
+    "clipping_live": "Übersteuert. Der Eingang ist zu laut",
+    "pass": "Die App hört die Note bis zum Ende. Tab-Noten füllen sich ganz.",
+    "gain": "Die Note brach nach {{seconds}} s ab. Erhöhe unten die Empfindlichkeit und spiel sie noch einmal.",
+    "quiet": "Die Note verklang nach {{seconds}} s. Das Signal ist zu schwach. Dreh den Gain am Interface auf (oder rück das Mikrofon näher) und spiel sie noch einmal.",
+    "pitch": "Der Ton ist nach {{seconds}} s von {{note}} weggedriftet. Stimm nach oder spiel sauberer und versuch es noch einmal.",
+    "clipping": "Das Signal übersteuert, bevor es die App erreicht. Dreh den Gain am Interface herunter (oder spiel leiser) und spiel die Note noch einmal.",
+    "too_hot": "Die Empfindlichkeit ist zu hoch. Die Note schlägt bis zum Maximum aus, und Hintergrundrauschen wird als Note erkannt. Senk unten die Empfindlichkeit (oder stell sie automatisch ein) und spiel noch einmal.",
+    "again": "Noch einmal spielen",
+    "next": "Weiter"
+  },
   "tuning": {
-    "wrong_string": "Falsche Saite?",
     "play_open": "Spiel die leere {{string}}-Saite",
-    "in_tune": "Gestimmt – weiter halten…",
+    "in_tune": "Genau. Halten…",
     "sharp": "zu hoch ↓ runterstimmen",
     "flat": "zu tief ↑ hochstimmen",
     "title": "Gitarre stimmen",
     "flat_label": "Tief",
     "sharp_label": "Hoch",
-    "next_string": "Nächste Saite",
-    "finish": "Kalibrierung abschließen",
     "skip_string": "Saite überspringen",
-    "redo": "Diese Saite wiederholen",
-    "already_tuned": "Meine Gitarre ist schon gestimmt"
+    "already_tuned": "Meine Gitarre ist schon gestimmt",
+    "string_of": "Saite {{current}} von {{total}}",
+    "thickest": "die dickste",
+    "thinnest": "die dünnste",
+    "waiting": "Warte auf einen Ton…",
+    "sounds_like": "Das klingt nach der {{string}}-Saite",
+    "tuned": "Gestimmt ✓"
   },
   "source": {
-    "title": "Gitarren-Kalibrierung",
+    "title": "Gitarre anschließen",
     "question": "Wie ist deine Gitarre mit dem Computer verbunden?",
     "interface": "Audio-Interface",
     "interface_desc": "USB- oder Thunderbolt-Audio-Interface",
@@ -72,11 +95,16 @@
   },
   "summary": {
     "title": "Fertig",
-    "ready": "Alles bereit!",
-    "body": "Deine Kalibrierung ist abgeschlossen. Wenn die Erkennung noch leicht danebenliegt, stimm die Gitarre nach oder passe die Eingangsempfindlichkeit an.",
-    "good_luck": "Viel Erfolg!",
-    "save": "Speichern & schließen",
-    "discard": "Verwerfen"
+    "ready": "Dein Mikrofon ist an",
+    "body": "Die App hört deine Gitarre und bewertet dein Spiel.",
+    "tuning": "Stimmen",
+    "tuning_count": "{{tuned}} von {{total}} Saiten",
+    "tuning_skipped": "übersprungen",
+    "latency": "Klangverzögerung",
+    "latency_measured": "{{ms}} ms · gemessen",
+    "latency_estimate": "~{{ms}} ms · geschätzt",
+    "latency_later": "Miss sie jederzeit mit der Schaltfläche „Timing kalibrieren“ über der Tabulatur, damit die Timing-Bewertung zu dem passt, was du hörst.",
+    "start": "Los geht's"
   },
   "permission": {
     "title": "Mikrofonzugriff",
@@ -106,5 +134,8 @@
     "body": "Dieser Plan enthält Tab-Übungen. Aktiviere dein Mikrofon, damit das System deiner Gitarre zuhört und dein Spiel in Echtzeit bewertet.",
     "enable": "Mikrofon aktivieren",
     "skip": "Überspringen"
+  },
+  "timing_step": {
+    "skip": "Überspringen, die Schätzung reicht vorerst"
   }
 }

@@ -1,5 +1,7 @@
 {
-  "skip_calibration": "Skip calibration",
+  "skip_calibration": "Skip setup",
+  "close": "Close",
+  "back": "Back",
   "setup": {
     "title_native": "Audio Setup",
     "title_interface": "Audio Interface Setup",
@@ -7,34 +9,37 @@
     "connecting": "Connecting…",
     "start_listening": "Start Listening",
     "grant": "Grant Microphone Access",
-    "signal_level": "Signal Level",
-    "too_quiet": "Too quiet — strum a string",
-    "good_level": "Good level ✓",
+    "signal_level": "Signal",
     "input_sensitivity": "Input Sensitivity",
-    "play_notes": "Play a few notes… {{seconds}}s",
-    "calibrated": "Calibrated ✓",
-    "auto_gain": "Auto-Calibrate Gain",
+    "play_notes": "Play normally… {{seconds}}s",
+    "auto_gain": "Set sensitivity automatically",
     "tune_guitar": "Tune Guitar",
     "headphones": "Use wired headphones",
-    "headphones_body": "Without headphones the mic picks up the backing track through your speakers and causes false detections.",
     "quiet": "Find a quiet spot",
-    "quiet_body": "Background noise causes false note detections. Close doors and turn off any music.",
     "interface": "Interface",
-    "refresh": "Refresh device list",
+    "refresh": "Refresh",
     "no_inputs": "No input devices found",
-    "inputs": "{{count}} in",
-    "which_jack": "Which jack is your guitar plugged into?",
-    "channel": "Channel {{n}}",
-    "native_hint": "Native low-latency capture — bypasses the browser entirely. Plug your guitar straight into the interface above.",
-    "output_auto": "Output: {{label}} (auto)",
-    "matched": "matched",
-    "change": "Change",
+    "channel": "Input {{n}}",
     "output": "Output",
     "no_outputs": "No output devices found",
-    "output_hint": "Should match the interface above so audio and capture use the same device.",
     "output_hint_asio4all": "ASIO4ALL locks your whole interface, outputs included, so the metronome can't play through it. Pick a different output here (e.g. your computer's speakers), or turn off the interface's output in the ASIO4ALL panel and keep only its input.",
-    "before_start": "Before you start",
-    "before_start_body": "Make sure your interface is selected as the browser's microphone input and your guitar is plugged in. You'll set the gain level on the next screen."
+    "before_start_body": "Pick your interface as the browser's microphone (mic icon in the address bar).",
+    "level": {
+      "silent": "No signal. Play something",
+      "good": "Hearing your guitar",
+      "clipping": "Clipping. Turn the input down on your interface"
+    },
+    "auto": {
+      "no_signal": "We didn't hear anything, so the sensitivity wasn't changed. Click again and keep playing for the whole measurement, the way you would in an exercise.",
+      "ok": "Sensitivity set to {{gain}}×.",
+      "clipping": "Sensitivity set to {{gain}}×, but the signal clips before it reaches the app. Turn the gain down on your interface (or move the guitar away from the mic) and measure again.",
+      "at_max": "Even at the maximum ({{gain}}×) the guitar is quiet. Turn up the gain on your interface or move the mic closer.",
+      "noisy": "Sensitivity set to {{gain}}×, but the guitar barely stands out from the background noise. Sensitivity can't fix that. Quiet the room or move the mic closer to the guitar."
+    },
+    "guitar_input": "Guitar input",
+    "next": "Next",
+    "waiting_signal": "Play something to continue",
+    "ready": "You can continue. The app hears your guitar."
   },
   "output_stall": {
     "title": "The metronome can't play",
@@ -43,23 +48,41 @@
     "asio4all": "Using ASIO4ALL? In its panel, keep only your interface's input switched on, and make sure no other sound card is ticked there.",
     "close": "Close"
   },
+  "sustain": {
+    "title": "Sustain check",
+    "play": "Play {{note}} on string {{string}}, fret {{fret}}, and let it ring.",
+    "waiting": "Waiting for {{note}}…",
+    "wrong": "That's a different note. Play {{note}}",
+    "holding": "Hold it…",
+    "clipping_live": "Clipping. The input is too loud",
+    "pass": "The app hears the note to the end. Tab notes will fill all the way.",
+    "gain": "The note cut off after {{seconds}}s. Raise the sensitivity below and play it again.",
+    "quiet": "The note faded out after {{seconds}}s. The signal is too weak. Turn up the gain on your interface (or move the mic closer) and play it again.",
+    "pitch": "The pitch drifted off {{note}} after {{seconds}}s. Tune up or play it cleaner, then try again.",
+    "clipping": "The signal clips before it reaches the app. Turn the gain down on your interface (or play softer) and play it again.",
+    "too_hot": "The sensitivity is too high. The note pins the meter, and background noise will start passing for notes. Lower the sensitivity below (or set it automatically) and play it again.",
+    "again": "Play it again",
+    "next": "Next"
+  },
   "tuning": {
-    "wrong_string": "Wrong string?",
     "play_open": "Play the open {{string}} string",
-    "in_tune": "In tune — keep holding…",
+    "in_tune": "Spot on. Hold it…",
     "sharp": "sharp ↓ tune down",
     "flat": "flat ↑ tune up",
     "title": "Tune Your Guitar",
     "flat_label": "Flat",
     "sharp_label": "Sharp",
-    "next_string": "Next String",
-    "finish": "Finish Calibration",
     "skip_string": "Skip String",
-    "redo": "Redo this string",
-    "already_tuned": "My guitar is already tuned"
+    "already_tuned": "My guitar is already tuned",
+    "string_of": "String {{current}} of {{total}}",
+    "thickest": "thickest",
+    "thinnest": "thinnest",
+    "waiting": "Waiting for a note…",
+    "sounds_like": "That sounds like the {{string}} string",
+    "tuned": "In tune ✓"
   },
   "source": {
-    "title": "Guitar Calibration",
+    "title": "Connect your guitar",
     "question": "How is your guitar connected to the computer?",
     "interface": "Audio Interface",
     "interface_desc": "USB or Thunderbolt audio interface",
@@ -71,12 +94,17 @@
     "continue": "Continue"
   },
   "summary": {
-    "title": "All Done",
-    "ready": "Everything's ready!",
-    "body": "Your calibration is complete. If you feel the detection is still slightly off, consider re-tuning your guitar or adjusting the input sensitivity.",
-    "good_luck": "Good luck!",
-    "save": "Save & Close",
-    "discard": "Discard"
+    "title": "All set",
+    "ready": "Your mic is on",
+    "body": "The app hears your guitar and will score your playing.",
+    "tuning": "Tuning",
+    "tuning_count": "{{tuned}} of {{total}} strings",
+    "tuning_skipped": "skipped",
+    "latency": "Sound delay",
+    "latency_measured": "{{ms}} ms · measured",
+    "latency_estimate": "~{{ms}} ms · estimate",
+    "latency_later": "Measure it any time with the “Calibrate timing” button above the tab, so timing grades match what you hear.",
+    "start": "Let's play"
   },
   "permission": {
     "title": "Microphone Access",
@@ -95,7 +123,7 @@
   "choice": {
     "title": "Existing Calibration",
     "body": "You have calibration data from {{date}}.",
-    "old": "This calibration is over 30 days old — consider recalibrating for best accuracy.",
+    "old": "This calibration is over 30 days old. Consider recalibrating for best accuracy.",
     "reuse": "Use Existing",
     "recalibrate": "Recalibrate"
   },
@@ -106,5 +134,8 @@
     "body": "This plan contains tablature exercises. Enable your microphone so the system can listen to your guitar and score your playing in real time.",
     "enable": "Enable Mic",
     "skip": "Skip"
+  },
+  "timing_step": {
+    "skip": "Skip, the estimate will do for now"
   }
 }

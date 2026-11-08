@@ -36,6 +36,10 @@ const MAX_DELAY_SEC = 0.12;
 /** How fast the delay comes back down once steps arrive on time again. */
 const DELAY_RELAX_SEC = 0.0002;
 const MAX_SAMPLES = 64;
+/** How long a completed note's fill takes to close to its end, eased out. */
+export const COMPLETE_SEC = 0.18;
+/** Share of the way it has closed a third of the way through. */
+const COMPLETE_EASE_MID = 0.7;
 
 export const createLiveFills = (): LiveFills => ({ byKey: new Map(), delaySec: 0.05 });
 
@@ -66,7 +70,16 @@ export function addFillSteps(
       if (step.hit) hits.push(step);
     }
     const last = fill.samples[fill.samples.length - 1];
-    if (last && step.audioSec <= last.audioSec) {
+    if (step.complete && !step.hit) {
+      // The note earned its whole length: close the fill from where it is to
+      // the end over COMPLETE_SEC, easing out — a jump, but one the eye follows.
+      const from = last ? last.beat : fill.shownBeat;
+      const at = Math.max(step.audioSec, last ? last.audioSec : step.audioSec);
+      fill.samples.push(
+        { audioSec: at + COMPLETE_SEC / 3, beat: from + (step.beat - from) * COMPLETE_EASE_MID },
+        { audioSec: at + COMPLETE_SEC, beat: step.beat },
+      );
+    } else if (last && step.audioSec <= last.audioSec) {
       // currentTime moves in audio callbacks, so two ticks can read the same one.
       last.beat = Math.max(last.beat, step.beat);
     } else {

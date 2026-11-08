@@ -17,7 +17,7 @@ describe("useCalibration", () => {
     expect(result.current.sessionPhase).toBe("calibrating");
     expect(localStorage.getItem(MIC_PREFERENCE_KEY)).toBeNull();
 
-    act(() => result.current.handleCalibrationComplete({ offsets: {}, timestamp: 0 }));
+    act(() => result.current.handleCalibrationComplete());
     expect(result.current.isMicEnabled).toBe(true);
     expect(result.current.sessionPhase).toBe("ready");
     expect(localStorage.getItem(MIC_PREFERENCE_KEY)).toBe("true");

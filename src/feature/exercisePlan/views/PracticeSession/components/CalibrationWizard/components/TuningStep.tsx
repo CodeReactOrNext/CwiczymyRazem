@@ -4,188 +4,138 @@ import { ArcTuner } from "feature/tuner/components/ArcTuner";
 import { AnimatePresence, motion } from "framer-motion";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useTranslation } from "hooks/useTranslation";
-import { X } from "lucide-react";
 import React from "react";
 
-import type { CalibrationOffsets } from "../../../hooks/useCalibration";
 import type { GuitarString } from "../calibration.constants";
-import { useTuningFrequency } from "../hooks/useTuningFrequency";
+import { useTuningWalk } from "../hooks/useTuningWalk";
+import { CLOSE_CENTS, IN_TUNE_CENTS } from "../tuneHold";
+import { CloseButton } from "./CloseButton";
+import { hasHeadstockArt,HeadstockGuide } from "./HeadstockGuide";
 import { StringProgress } from "./StringProgress";
 
 interface TuningStepProps {
-  currentIndex:  number;
-  offsets:       CalibrationOffsets;
-  sampleCount:   number;
-  stringState:   "listening" | "done";
-  currentOffset: number | null;
-  audioRefs:     AudioRefs;
+  audioRefs:   AudioRefs;
+  isListening: boolean;
   /** Reference pitches to tune to — follows the player's selected guitar tuning. */
-  strings:       GuitarString[];
-  onRetry:       () => void;
-  onAdvance:     () => void;
-  onCancel:      () => void;
-  /** Ends the wizard with the mic on, skipping the strings that are left. */
+  strings:     GuitarString[];
+  /** All strings tuned or skipped. */
+  onFinish:    (tunedCount: number) => void;
+  onCancel:    () => void;
+  /** Skips the strings that are left. */
   onAlreadyTuned: () => void;
 }
 
+const TONE_TEXT = {
+  idle:  "text-zinc-600",
+  good:  "text-emerald-400",
+  close: "text-amber-400",
+  far:   "text-red-400",
+} as const;
+
+/** Plain guitar tuning, string by string — nothing is measured or saved here. */
 export const TuningStep = React.memo(function TuningStep({
-  currentIndex, offsets, sampleCount, stringState, currentOffset,
-  audioRefs, strings, onRetry, onAdvance, onCancel, onAlreadyTuned,
+  audioRefs, isListening, strings, onFinish, onCancel, onAlreadyTuned,
 }: TuningStepProps) {
   const { t } = useTranslation("calibration");
-  const str = strings[currentIndex];
-  const { cents, hasNote } = useTuningFrequency(audioRefs, str.hz);
+  const { index, current, tuned, currentDone, reading, advance, goTo } =
+    useTuningWalk({ audioRefs, strings, isListening, onFinish });
 
-  const abs          = Math.abs(cents);
-  const isInTune     = hasNote && abs < 10;
-  const isClose      = hasNote && abs < 25;
-  const isWrongString = hasNote && abs > 200;
-  const captureProgress = sampleCount / 8; // MIN_SAMPLES
+  const { cents, otherStringIndex, progress } = reading;
+  const hasNote  = cents !== null;
+  const abs      = Math.abs(cents ?? 0);
+  const isInTune = currentDone || (hasNote && abs <= IN_TUNE_CENTS);
+  const isClose  = hasNote && abs <= CLOSE_CENTS;
 
-
-
-  const statusText = isWrongString ? t("tuning.wrong_string")
-    : !hasNote    ? t("tuning.play_open", { string: str.name })
-    : isInTune    ? t("tuning.in_tune")
+  const statusText = currentDone ? t("tuning.tuned")
+    : otherStringIndex !== null ? t("tuning.sounds_like", { string: strings[otherStringIndex].name })
+    : !hasNote ? t("tuning.waiting")
+    : isInTune ? t("tuning.in_tune")
     : `${Math.round(abs)}¢ ${cents > 0 ? t("tuning.sharp") : t("tuning.flat")}`;
 
-  const statusColor = isWrongString ? "text-zinc-500"
-    : !hasNote  ? "text-zinc-600"
-    : isInTune  ? "text-emerald-400"
-    : isClose   ? "text-amber-400"
-    : "text-red-400";
+  const tone = !hasNote && !currentDone ? "idle"
+    : isInTune ? "good"
+    : otherStringIndex !== null ? "idle"
+    : isClose ? "close"
+    : "far";
+
+  const position = index === 0 ? t("tuning.thickest") : index === strings.length - 1 ? t("tuning.thinnest") : null;
+  const showHeadstock = hasHeadstockArt(strings);
 
   return (
-    <div className="flex h-full flex-col px-5 py-5 text-white">
-      <div className="flex items-start justify-between mb-3">
+    <div className="flex flex-1 flex-col px-6 py-8 text-white sm:px-12 sm:py-10">
+      <div className="flex items-start justify-between mb-5">
         <div>
-          <h2 className="text-base font-bold tracking-tight">{t("tuning.title")}</h2>
-          <p className="text-[10px] text-zinc-600 font-bold tracking-widest mt-0.5">
-            String {currentIndex + 1} of {strings.length}
+          <h2 className="text-xl font-semibold text-zinc-50">{t("tuning.title")}</h2>
+          <p className="mt-1 text-sm text-zinc-400">
+            {t("tuning.string_of", { current: index + 1, total: strings.length })}
           </p>
         </div>
-        <button onClick={onCancel} className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors">
-          <X size='1em' className="h-4 w-4" />
-        </button>
+        <CloseButton onClick={onCancel} label={t("close")} />
       </div>
 
-
-
-      <div className="h-0.5 w-full rounded-full bg-zinc-800 overflow-hidden mb-4">
-        <motion.div className="h-full bg-cyan-500"
-          animate={{ width: `${(Object.keys(offsets).length / strings.length) * 100}%` }}
-          transition={{ type: "spring", stiffness: 200, damping: 28 }}
-        />
-      </div>
-
-      <div className="mb-3"><StringProgress currentIndex={currentIndex} offsets={offsets} strings={strings} /></div>
+      <StringProgress currentIndex={index} tuned={tuned} strings={strings} onSelect={goTo} />
 
       <AnimatePresence mode="wait">
-        <motion.p key={currentIndex} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
-          className="text-center text-sm text-zinc-400 mb-2"
+        <motion.p key={index} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+          className="mt-5 text-center text-sm text-zinc-400"
         >
-          Play open string{" "}<span className="text-white font-bold">{str.name}</span>
-          {str.id === strings.length ? " — thickest" : str.id === 1 ? " — thinnest" : ""}
+          {t("tuning.play_open", { string: current.name })}
+          {position && <span className="text-zinc-500"> · {position}</span>}
         </motion.p>
       </AnimatePresence>
 
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="w-full max-w-xs flex flex-col items-center">
-          <ArcTuner cents={cents} hasNote={hasNote} />
+      <div className={cn(
+        "mt-4 flex-1 items-center",
+        showHeadstock ? "grid gap-6 sm:grid-cols-2 sm:gap-10" : "flex flex-col justify-center",
+      )}>
+        {/* Which string, which tuner — on the art of a real headstock. */}
+        {showHeadstock && (
+          <div className="h-[220px] sm:h-[340px]">
+            <HeadstockGuide strings={strings} currentId={current.id} tuned={tuned} inTune={isInTune} />
+          </div>
+        )}
+        <div className="mx-auto w-full max-w-md flex flex-col items-center">
+          <ArcTuner cents={currentDone ? 0 : (cents ?? 0)} hasNote={hasNote || currentDone} />
           <div className="flex justify-between w-full px-3 -mt-1 mb-2">
-            <span className="text-[9px] font-bold tracking-widest text-zinc-700">← {t("tuning.flat_label")}</span>
-            <span className="text-[9px] font-bold tracking-widest text-zinc-700">{t("tuning.sharp_label")} →</span>
+            <span className="text-xs text-zinc-600">← {t("tuning.flat_label")}</span>
+            <span className="text-xs text-zinc-600">{t("tuning.sharp_label")} →</span>
           </div>
 
           <div className="text-center space-y-0.5 mb-3">
-            <div className={cn("text-5xl font-black tracking-tighter tabular-nums transition-colors duration-base",
-              !hasNote && "text-zinc-700",
-              hasNote && !isInTune && !isClose && "text-red-400",
-              isClose && !isInTune && "text-amber-400",
-              isInTune && "text-emerald-400"
-            )}>{str.name}</div>
-            <div className={cn("text-sm font-mono font-bold tabular-nums transition-colors duration-base",
-              !hasNote && "text-zinc-700",
-              hasNote && !isInTune && !isClose && "text-red-400/70",
-              isClose && !isInTune && "text-amber-400/70",
-              isInTune && "text-emerald-400/70"
-            )}>
-              {hasNote ? `${cents >= 0 ? "+" : ""}${Math.round(cents)}¢` : "—"}
+            <div className={cn("text-5xl font-black tracking-tighter tabular-nums transition-colors duration-base", TONE_TEXT[tone])}>
+              {current.name}
+            </div>
+            <div className={cn("text-sm font-mono font-bold tabular-nums transition-colors duration-base", TONE_TEXT[tone])}>
+              {hasNote && !currentDone ? `${cents >= 0 ? "+" : ""}${Math.round(cents)}¢` : " "}
             </div>
           </div>
 
-          <AnimatePresence mode="wait">
-
-              <div key="status" className="w-full">
-                <p className={cn("text-sm font-medium text-center min-h-[1.25rem] transition-colors duration-base", statusColor)}>
-                  {statusText}
-                </p>
-                <div className="w-full mt-6 space-y-2">
-                  <div className="h-3 w-full rounded-lg bg-zinc-950 overflow-hidden shadow-inner">
-                    <motion.div
-                      className={cn(
-                        "h-full rounded-lg relative",
-                        isInTune ? "bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.6)]" : "bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]"
-                      )}
-                      animate={{ width: `${captureProgress * 100}%` }}
-                      transition={{ duration: 0.1 }}
-                    >
-                      {captureProgress > 0 && captureProgress < 1 && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
-                      )}
-                    </motion.div>
-                  </div>
-
-                </div>
-              </div>
-          </AnimatePresence>
+          <p className={cn("text-sm font-medium text-center min-h-[1.25rem] transition-colors duration-base", TONE_TEXT[tone])}>
+            {statusText}
+          </p>
+          {/* How long the string has held in tune — it ticks off once this fills. */}
+          <div className="mt-4 h-1.5 w-full rounded-lg bg-zinc-800 overflow-hidden">
+            <motion.div
+              className="h-full rounded-lg bg-emerald-500"
+              animate={{ width: `${(currentDone ? 1 : progress) * 100}%` }}
+              transition={{ duration: 0.1 }}
+            />
+          </div>
         </div>
       </div>
 
-        <div className="w-full mt-8 space-y-3">
-          <motion.div
-            animate={stringState === "done" ? {
-              x: [0, -1, 1, -1, 1, 0],
-              transition: {
-                duration: 0.4,
-                repeat: Infinity,
-                repeatDelay: 2
-              }
-            } : {}}
-          >
-            <Button
-              onClick={onAdvance}
-              variant={stringState === "done" ? "default" : "secondary"}
-              className={cn(
-                "w-full h-12 transition-all duration-base",
-                stringState === "done" && "ring-2 ring-emerald-500/50 ring-offset-2 ring-offset-zinc-950 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
-              )}
-            >
-              {stringState === "done" 
-                ? (currentIndex < strings.length - 1 ? t("tuning.next_string") : t("tuning.finish"))
-                : t("tuning.skip_string")
-              }
-            </Button>
-          </motion.div>
-          
-          {stringState === "done" && (
-            <Button 
-              variant="ghost"
-              onClick={onRetry}
-              className="w-full h-8 text-zinc-500 hover:text-zinc-300"
-            >
-              {t("tuning.redo")}
-            </Button>
-          )}
-
-          <button
-            type="button"
-            onClick={onAlreadyTuned}
-            className="w-full py-1 text-center text-xs text-zinc-500 transition-colors hover:text-zinc-300"
-          >
-            {t("tuning.already_tuned")}
-          </button>
-        </div>
+      <div className="w-full mt-8 space-y-2">
+        <Button onClick={advance} variant="secondary" disabled={currentDone} className="w-full h-11">
+          {t("tuning.skip_string")}
+        </Button>
+        <button
+          type="button"
+          onClick={onAlreadyTuned}
+          className="w-full py-2 text-center text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+        >
+          {t("tuning.already_tuned")}
+        </button>
+      </div>
     </div>
   );
 });

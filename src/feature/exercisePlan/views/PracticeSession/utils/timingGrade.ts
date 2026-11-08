@@ -67,8 +67,14 @@ const CLOSE_SHARE = 1.2;
 const CLOSE_MIN_MS = 140;
 const CLOSE_MAX_MS = 200;
 /** Added flat to both windows at every note length — the owner loosened the
- *  grades by this much on top of the scaled windows above. */
-const LOOSEN_MS = 30;
+ *  grades by this much on top of the scaled windows above (30 ms, then another
+ *  30 ms on 2026-11-08). */
+const LOOSEN_MS = 60;
+
+/** Extra ms either side of a note's due time in which an attack still credits
+ *  the note at all (useNoteMatching's hit window) — loosened by the owner on
+ *  2026-11-08 on top of the tempo-scaled window. */
+export const HIT_WINDOW_LOOSEN_MS = 30;
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 

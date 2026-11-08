@@ -127,6 +127,8 @@ interface DesktopSessionViewProps {
    *  the session's own audio, so playback runs on — the notation just stops
    *  drawing frames into pixels the overlay is covering. */
   backingAligning?:         boolean;
+  /** The mic setup wizard covers the session — the tab needn't draw under it. */
+  setupOpen?:               boolean;
   skillRewardSkillId?:      string;
   skillRewardAmount?:       number;
 }
@@ -344,7 +346,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     onOpenBackingTrack={p.onOpenBackingTrack}
                     songSectionMapSlot={p.songSectionMapSlot}
                     cinema={p.backingCinema}
-                    obscured={p.backingAligning}
+                    obscured={p.backingAligning || p.setupOpen}
                   />
                 </div>
 

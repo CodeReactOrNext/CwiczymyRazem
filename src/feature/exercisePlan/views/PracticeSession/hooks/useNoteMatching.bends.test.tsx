@@ -141,7 +141,7 @@ describe("useNoteMatching — a picked note after a release to the same pitch", 
   });
 
   it("still grades a genuinely late pick as late", () => {
-    const { result, playUntil } = setup("timing", { phantomOnsetMs: 3350, pickOffsetMs: 150 });
+    const { result, playUntil } = setup("timing", { phantomOnsetMs: 3350, pickOffsetMs: 200 });
     playUntil(5000);
     const timing = result.current.noteTimings[STRAIGHT];
     expect(timing.grade).toBe(2);
@@ -186,7 +186,7 @@ describe("useNoteMatching — run log", () => {
 
 describe("useNoteMatching — pitch-focused scoring", () => {
   it("scores a bend on how close it got and doesn't charge for timing", () => {
-    const { result, playUntil } = setup("pitch", { bendPeakCents: -30, releaseLandCents: 5, pickOffsetMs: 150 });
+    const { result, playUntil } = setup("pitch", { bendPeakCents: -30, releaseLandCents: 5, pickOffsetMs: 200 });
     playUntil(5000);
     const timings = result.current.noteTimings;
     expect(timings[BEND].intonation).toEqual({ grade: 2, cents: -30 });

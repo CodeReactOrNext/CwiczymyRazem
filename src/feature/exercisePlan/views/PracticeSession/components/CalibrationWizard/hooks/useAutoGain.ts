@@ -1,43 +1,70 @@
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { type AutoGainResult, computeAutoGain, signalGate } from "../inputLevel";
+
+const DURATION_MS = 3000;
+
+export type AutoGainPhase = "idle" | "measuring" | "done";
+
+/**
+ * Listens to a few seconds of playing and sets the input gain from it.
+ * Measures the raw (ungained) level, so moving the slider mid-measurement
+ * can't skew it, and reports what it found instead of always "done" — no
+ * playing, clipping, too quiet even at full gain, or buried in noise.
+ */
 export function useAutoGain(
   audioRefs: AudioRefs,
   inputGain: number,
   onInputGainChange: (v: number) => void,
 ) {
-  const [autoState, setAutoState] = useState<"idle" | "measuring" | "done">("idle");
-  const [countdown, setCountdown] = useState(2);
-  const autoRAFRef = useRef(0);
-  const samplesRef = useRef<number[]>([]);
-  const startRef   = useRef(0);
+  const [phase, setPhase] = useState<AutoGainPhase>("idle");
+  const [countdown, setCountdown] = useState(Math.ceil(DURATION_MS / 1000));
+  const [result, setResult] = useState<AutoGainResult | null>(null);
+  const rafRef = useRef(0);
+  const gainRef = useRef(inputGain);
+  useEffect(() => { gainRef.current = inputGain; }, [inputGain]);
 
-  useEffect(() => () => cancelAnimationFrame(autoRAFRef.current), []);
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
 
   const startAutoGain = useCallback(() => {
-    const DURATION = 2000;
-    setAutoState("measuring");
-    setCountdown(2);
-    samplesRef.current = [];
-    startRef.current   = Date.now();
+    cancelAnimationFrame(rafRef.current);
+    setPhase("measuring");
+    setResult(null);
+    setCountdown(Math.ceil(DURATION_MS / 1000));
+    const rawLevels: number[] = [];
+    let rawPeak = 0;
+    const start = performance.now();
 
-    const measure = () => {
-      const vol     = audioRefs.volumeRef.current;
-      if (vol > 0.01) samplesRef.current.push(vol);
-      const elapsed = Date.now() - startRef.current;
-      setCountdown(Math.max(0, Math.ceil((DURATION - elapsed) / 1000)));
-      if (elapsed < DURATION) { autoRAFRef.current = requestAnimationFrame(measure); return; }
-      const s = samplesRef.current;
-      if (s.length > 3) {
-        const sorted = [...s].sort((a, b) => a - b);
-        const p85    = sorted[Math.floor(sorted.length * 0.85)];
-        onInputGainChange(Math.round(Math.max(0.5, Math.min(10, inputGain * (0.40 / p85))) * 10) / 10);
+    const measure = (now: number) => {
+      const raw = audioRefs.rawVolumeRef.current;
+      if (raw > signalGate(audioRefs.noiseFloorRef.current)) rawLevels.push(raw);
+      rawPeak = Math.max(rawPeak, audioRefs.inputPeakRef?.current ?? 0);
+
+      const elapsed = now - start;
+      if (elapsed < DURATION_MS) {
+        setCountdown(Math.max(1, Math.ceil((DURATION_MS - elapsed) / 1000)));
+        rafRef.current = requestAnimationFrame(measure);
+        return;
       }
-      setAutoState("done");
-      setTimeout(() => setAutoState("idle"), 2000);
+      const outcome = computeAutoGain({
+        rawLevels,
+        rawPeak,
+        noiseFloor: audioRefs.noiseFloorRef.current,
+        currentGain: gainRef.current,
+      });
+      if (outcome.status !== "no_signal") onInputGainChange(outcome.gain);
+      setResult(outcome);
+      setPhase("done");
     };
-    autoRAFRef.current = requestAnimationFrame(measure);
-  }, [audioRefs, inputGain, onInputGainChange]);
+    rafRef.current = requestAnimationFrame(measure);
+  }, [audioRefs, onInputGainChange]);
 
-  return { autoState, countdown, startAutoGain };
+  /** Forget the last result — the player moved the slider themselves. */
+  const clearResult = useCallback(() => {
+    setResult(null);
+    setPhase((p) => (p === "measuring" ? p : "idle"));
+  }, []);
+
+  return { phase, countdown, result, startAutoGain, clearResult };
 }

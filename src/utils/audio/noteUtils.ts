@@ -168,6 +168,19 @@ export interface DetectionGates {
   volumeGate: number;
 }
 
+/** Base pitch tolerance for matching a note, in cents. */
+export const NOTE_MATCH_CENTS = 45;
+
+/**
+ * How far a reading may sit from an expected note and still be it. Low notes get
+ * more room: thick strings drift sharp on the attack and are harder to tune.
+ */
+export function getBaseToleranceCents(targetFreq: number): number {
+  return targetFreq < 100 ? NOTE_MATCH_CENTS + 25
+    : targetFreq < 165 ? NOTE_MATCH_CENTS + 15
+      : NOTE_MATCH_CENTS;
+}
+
 /**
  * Register-adaptive detection gates for an expected note. Notes at/above the
  * high-string split get a relaxed volume gate; everything below keeps the base

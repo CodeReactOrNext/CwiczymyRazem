@@ -85,12 +85,14 @@ export const useNativeAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions
   const noteEventsRef = useRef<DetectedNoteEvent[]>([]);
   const lastAttackMsRef = useRef<number>(0);
   const lastLowAttackMsRef = useRef<number>(0);
+  const lastSoftAttackMsRef = useRef<number>(0);
   // No Web Audio graph here, so no AnalyserNode: chords are graded on a
   // spectrum computed from the PCM itself (see pcmSpectrum.ts). Built per
   // stream, for its negotiated sample rate.
   const spectrumRef = useRef<PcmSpectrum | null>(null);
   const recentAudioRef = useRef<RecentAudio | null>(null);
   const inputTapRef = useRef<InputTap | null>(null);
+  const inputPeakRef = useRef<number>(0);
   const bassRef = useRef(bass);
   useEffect(() => { bassRef.current = bass; }, [bass]);
 
@@ -278,7 +280,7 @@ export const useNativeAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions
         isBass: () => bassRef.current,
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
-          lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, inputTapRef,
+          lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, lastSoftAttackMsRef, inputTapRef, inputPeakRef,
         },
         onActive: () => {
           setState(prev =>
@@ -352,6 +354,7 @@ export const useNativeAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions
     frequencyRef.current = 0;
     volumeRef.current = 0;
     rawVolumeRef.current = 0;
+    inputPeakRef.current = 0;
     noiseFloorRef.current = 0;
     confidenceRef.current = 0;
     lastOnsetTimeRef.current = 0;
@@ -359,6 +362,7 @@ export const useNativeAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions
     noteEventsRef.current = [];
     lastAttackMsRef.current = 0;
     lastLowAttackMsRef.current = 0;
+    lastSoftAttackMsRef.current = 0;
     ipcDelayEmaRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false, streamInfo: null, connectionStatus: "ok" }));
@@ -434,7 +438,7 @@ export const useNativeAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions
 
   const audioRefs: AudioRefs = {
     frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef,
-    lastTickTimeRef, confidenceRef, readSpectrum, readRecentAudio, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, inputTapRef,
+    lastTickTimeRef, confidenceRef, readSpectrum, readRecentAudio, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, lastSoftAttackMsRef, inputTapRef, inputPeakRef,
   };
 
   return useMemo(() => ({

@@ -9,12 +9,17 @@ interface SessionUIContextType {
   isTimingCalibrationOpen: boolean;
   openTimingCalibration: () => void;
   closeTimingCalibration: () => void;
+  /** Opens the mic setup wizard again (input, level, tuning, timing). */
+  openMicSetup: () => void;
 }
 
 const SessionUIContext = createContext<SessionUIContextType | undefined>(undefined);
 
-export const SessionUIProvider: React.FC<{ children: React.ReactNode }> = ({
+const noop = () => { /* no mic setup outside a session */ };
+
+export const SessionUIProvider: React.FC<{ children: React.ReactNode; onOpenMicSetup?: () => void }> = ({
   children,
+  onOpenMicSetup = noop,
 }) => {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [backingVideoId, setBackingVideoId] = useState<string | null>(null);
@@ -29,6 +34,7 @@ export const SessionUIProvider: React.FC<{ children: React.ReactNode }> = ({
     <SessionUIContext.Provider value={{
       isLeaderboardOpen, openLeaderboard, closeLeaderboard, backingVideoId, setBackingVideoId,
       isTimingCalibrationOpen, openTimingCalibration, closeTimingCalibration,
+      openMicSetup: onOpenMicSetup,
     }}>
       {children}
     </SessionUIContext.Provider>

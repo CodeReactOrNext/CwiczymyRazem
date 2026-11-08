@@ -8,16 +8,16 @@ const sixteenth = (bpm: number) => 60000 / bpm / 4;
 describe("timingWindowsFor", () => {
   it("caps the windows on long notes", () => {
     // A quarter at 60 BPM — a full second.
-    expect(timingWindowsFor(1000)).toEqual({ onTimeMs: 130, closeMs: 230 });
+    expect(timingWindowsFor(1000)).toEqual({ onTimeMs: 160, closeMs: 260 });
   });
 
   it("scales with the note in between", () => {
     // Sixteenths at 120 BPM — 125 ms.
-    expect(timingWindowsFor(sixteenth(120))).toEqual({ onTimeMs: 105, closeMs: 180 });
+    expect(timingWindowsFor(sixteenth(120))).toEqual({ onTimeMs: 135, closeMs: 210 });
   });
 
   it("never drops below the measurement error, however short the note", () => {
-    expect(timingWindowsFor(sixteenth(220))).toEqual({ onTimeMs: 100, closeMs: 170 });
+    expect(timingWindowsFor(sixteenth(220))).toEqual({ onTimeMs: 130, closeMs: 200 });
   });
 });
 
@@ -29,18 +29,20 @@ describe("gradeTiming", () => {
   });
 
   it("gives a 2 for a little off, a 1 for clearly off", () => {
-    expect(gradeTiming(150, 500)).toBe(2);
-    expect(gradeTiming(250, 500)).toBe(1);
+    expect(gradeTiming(200, 500)).toBe(2);
+    expect(gradeTiming(300, 500)).toBe(1);
   });
 
   it("costs the same early as late", () => {
-    expect(gradeTiming(-150, 500)).toBe(gradeTiming(150, 500));
-    expect(gradeTiming(-250, 500)).toBe(gradeTiming(250, 500));
+    expect(gradeTiming(-200, 500)).toBe(gradeTiming(200, 500));
+    expect(gradeTiming(-300, 500)).toBe(gradeTiming(300, 500));
   });
 
   it("grades on the window edges inclusively", () => {
-    expect(gradeTiming(130, 1000)).toBe(3);
-    expect(gradeTiming(230, 1000)).toBe(2);
+    expect(gradeTiming(160, 1000)).toBe(3);
+    expect(gradeTiming(161, 1000)).toBe(2);
+    expect(gradeTiming(260, 1000)).toBe(2);
+    expect(gradeTiming(261, 1000)).toBe(1);
   });
 
   it("gives full marks when the attack could not be measured", () => {
@@ -58,8 +60,8 @@ describe("timingHintFor", () => {
   it("says nothing between the + and a plain slip, whatever the grade", () => {
     expect(timingHintFor(81)).toBeNull();
     expect(timingHintFor(-180)).toBeNull();
-    expect(gradeTiming(150, 500)).toBe(2);
-    expect(timingHintFor(150)).toBeNull();
+    expect(gradeTiming(170, 500)).toBe(2);
+    expect(timingHintFor(170)).toBeNull();
   });
 
   it("calls early or late only past 180 ms", () => {

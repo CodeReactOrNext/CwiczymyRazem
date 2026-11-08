@@ -42,6 +42,8 @@ interface UseSessionControlsOptions {
   updateMicPersistence:   (enabled: boolean) => void;
   isAudioMuted:           boolean;
   setIsAudioMuted:        Dispatch<SetStateAction<boolean>>;
+  /** A backing plays under the tab — the guitar toggle is remembered apart. */
+  hasBacking?:            boolean;
   speedMultiplier:        number;
   setSpeedMultiplier:     (payload: number | ((prev: number) => number)) => void;
   setEarTrainingScore:    Dispatch<SetStateAction<number>>;
@@ -62,7 +64,7 @@ export function useSessionControls({
   currentExercise, currentExerciseIndex, isLastExercise, jumpToExercise,
   handleNextExercise, restartFullSession,
   isMicEnabled, closeAudio, updateMicPersistence,
-  isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier,
+  isAudioMuted, setIsAudioMuted, hasBacking = false, speedMultiplier, setSpeedMultiplier,
   setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
   saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
   tabRestartKey, setTabRestartKey,
@@ -154,8 +156,8 @@ export function useSessionControls({
   const handleAudioToggle = useCallback(() => {
     const newMuted = !isAudioMuted;
     setIsAudioMuted(newMuted);
-    saveGuitarPlaybackPreference(!newMuted);
-  }, [isAudioMuted, setIsAudioMuted]);
+    saveGuitarPlaybackPreference(!newMuted, hasBacking);
+  }, [isAudioMuted, setIsAudioMuted, hasBacking]);
 
   const handleExerciseSelect = useCallback((idx: number) => {
     stopTimer(); metronome.restartMetronome(); jumpToExercise(idx);

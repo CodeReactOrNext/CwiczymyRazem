@@ -134,3 +134,25 @@ describe("useSessionControls — tempo hotkeys", () => {
     expect(options.handleNextExercise).not.toHaveBeenCalled();
   });
 });
+
+describe("useSessionControls — guitar toggle", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
+
+  it("remembers the guitar over a backing apart from the guitar on its own", () => {
+    const { options } = buildOptions();
+    const { result, rerender } = renderHook((props: { hasBacking: boolean }) =>
+      useSessionControls({ ...options, isAudioMuted: true, hasBacking: props.hasBacking }), { initialProps: { hasBacking: true } });
+
+    result.current.handleAudioToggle();
+    expect(options.setIsAudioMuted).toHaveBeenLastCalledWith(false);
+    expect(localStorage.getItem("guitar_playback_with_backing")).toBe("true");
+    expect(localStorage.getItem("guitar_playback_enabled")).toBeNull();
+
+    rerender({ hasBacking: false });
+    result.current.handleAudioToggle();
+    expect(localStorage.getItem("guitar_playback_enabled")).toBe("true");
+  });
+});

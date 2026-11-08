@@ -13,6 +13,7 @@
 
 import type { ExpectedAttack } from "feature/exercisePlan/views/PracticeSession/hooks/noteEventGrader";
 import { assignAttacks } from "feature/exercisePlan/views/PracticeSession/hooks/noteEventGrader";
+import { HIT_WINDOW_LOOSEN_MS } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import { getCentsDistance } from "utils/audio/noteUtils";
 import { describe, expect,it, vi } from "vitest";
 
@@ -232,7 +233,7 @@ async function measureScoring(label: string, f0s: number[], bpm: number, subdivi
 
   // Same window the matcher derives from tempo (useNoteMatching).
   const beatDurationMs = 60000 / bpm;
-  const maxDeltaMs = Math.min(420, Math.max(130, beatDurationMs * 0.30));
+  const maxDeltaMs = Math.min(420, Math.max(130, beatDurationMs * 0.30)) + HIT_WINDOW_LOOSEN_MS;
 
   const expected: ExpectedAttack[] = notes.map((note, i) => ({
     key: `n${i}`,

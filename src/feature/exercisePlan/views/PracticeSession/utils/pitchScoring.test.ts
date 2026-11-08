@@ -81,8 +81,8 @@ describe("isSamePitchContinuation", () => {
 
 describe("continuationAttackFloorMs", () => {
   it("lets an attack be early by no more than the 'close' window", () => {
-    expect(continuationAttackFloorMs(923)).toBe(-230);
-    expect(continuationAttackFloorMs(100)).toBe(-170);
+    expect(continuationAttackFloorMs(923)).toBe(-260);
+    expect(continuationAttackFloorMs(100)).toBe(-200);
   });
 });
 

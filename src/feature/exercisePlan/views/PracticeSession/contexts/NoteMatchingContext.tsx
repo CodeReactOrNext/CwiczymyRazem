@@ -104,6 +104,10 @@ interface NoteMatchingContextValue {
   learn: LearnModeState | null;
   /** The notation view's AlphaTab has just started the tab over (see useNoteMatching). */
   markAlphaTabPassStart: () => void;
+  /** The player's measured timing latency for this input path; null = not measured. */
+  calibratedLatencyMs: number | null;
+  /** The formula latency tab timing falls back to while nothing is measured. */
+  estimateLatencyMs: () => number;
 }
 
 // ── Imperative handle (what PracticeSession reads in event handlers) ──────────
@@ -197,6 +201,8 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   registerIntervalClick: () => { /* no-op default */ },
   learn: null,
   markAlphaTabPassStart: () => { /* no-op default */ },
+  calibratedLatencyMs: null,
+  estimateLatencyMs: () => 0,
 });
 
 // ── Provider ──────────────────────────────────────────────────────────────────
@@ -679,9 +685,11 @@ export function NoteMatchingProvider({
       registerFretClick,
       registerIntervalClick,
       markAlphaTabPassStart,
+      calibratedLatencyMs: calibratedLatencyMs ?? null,
+      estimateLatencyMs: getLatencyMs,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, noteTimings, learn, isLearning, livePitchRef, fillFeedRef, streamFills, scoringFocus, isStrummingExercise, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick, markAlphaTabPassStart],
+    [hitNotes, missedNotes, noteTimings, learn, isLearning, livePitchRef, fillFeedRef, streamFills, scoringFocus, isStrummingExercise, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick, markAlphaTabPassStart, calibratedLatencyMs, getLatencyMs],
   );
 
   return (

@@ -74,7 +74,7 @@
     "title": "Calibrar el tempo",
     "intro": "Los altavoces, auriculares e interfaces de audio añaden un retardo entre el clic que oyes y la nota que captamos. Toca al ritmo de unos clics y mediremos el tuyo, para que la valoración del tempo coincida con lo que oyes.",
     "step1": "Usa los altavoces o auriculares con los que practicas.",
-    "step2": "Pulsa la cuerda de mi grave al aire en cada clic y déjala sonar: no la apagues entre clics. {{bpm}} BPM, {{countIn}} clics para prepararte y luego {{clicks}} que cuentan.",
+    "step2": "En cada clic toca lo que quieras: una nota o un acorde. {{bpm}} BPM, {{countIn}} clics para prepararte y luego {{clicks}} que cuentan.",
     "step3": "Toca con el clic, no antes.",
     "now_using": "Ahora se usa",
     "measured_here": "medido en este navegador",

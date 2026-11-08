@@ -639,6 +639,29 @@ const PracticeSessionInner = ({
     return autoBacking.tracks;
   }, [parsedGpTracks, gpTrackIdx, activeExercise.backingTracks, autoBacking.tracks]);
 
+  // ── The tab's guitar starts off over a backing ────────────────────────────
+  // With a band (generated, the exercise's own, a GP file's other tracks or the
+  // song's recording) the player is the guitar — the tab's own copy on top only
+  // doubles them. The backing can arrive after the exercise opens (a GP file
+  // parses, a recording loads) or be switched off mid-way, so this follows it
+  // rather than deciding once in the reset above. The toggle under a backing is
+  // its own remembered choice; the per-exercise saved flag is left out on purpose
+  // — it is written on every BPM or mic change, so it mostly holds the old default.
+  const hasBacking = !isExamMode && !isEarTrainingRiddle
+    && (!!dynamicBackingTracks?.length || backingTrack.stems.length > 0);
+  const backingDefaultRef = useRef<{ exerciseId: string; hasBacking: boolean } | null>(null);
+  useEffect(() => {
+    const prev = backingDefaultRef.current;
+    backingDefaultRef.current = { exerciseId: currentExercise.id, hasBacking };
+    if (hasBacking) {
+      setIsAudioMuted(!(loadGuitarPlaybackPreference(true) ?? false));
+    } else if (prev?.exerciseId === currentExercise.id && prev.hasBacking) {
+      // The backing went away mid-exercise: the guitar goes back to its usual default.
+      setIsAudioMuted(!(loadGuitarPlaybackPreference() ?? true));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentExercise.id, hasBacking]);
+
   const planHasTablature = useMemo(() => plan.exercises.some(ex => willHaveTablature(ex) || ex.riddleConfig?.mode === "sequenceRepeat"), [plan.exercises]);
   const planHasStrumming = useMemo(() => plan.exercises.some(ex => ex.strummingPatterns && ex.strummingPatterns.length > 0), [plan.exercises]);
 
@@ -720,6 +743,9 @@ const PracticeSessionInner = ({
     if (!_isMicEnabled) closeAudio();
     handleCalibrationCancel();
   }, [_isMicEnabled, closeAudio, handleCalibrationCancel]);
+  // The timing measurement (the dialog, or the setup wizard's step) plays its
+  // own clicks — the session's timer and metronome must not run under them.
+  const stopSessionPlayback = () => { stopTimer(); metronome.stopMetronome(); };
 
   // disableMic marks exercises with nothing to detect (click drills, improv
   // prompts, backing-track jams). It has to gate the mic HERE, not just the mic
@@ -1113,7 +1139,7 @@ const PracticeSessionInner = ({
     currentExercise, currentExerciseIndex, isLastExercise, jumpToExercise,
     handleNextExercise, restartFullSession,
     isMicEnabled, closeAudio, updateMicPersistence,
-    isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier,
+    isAudioMuted, setIsAudioMuted, hasBacking, speedMultiplier, setSpeedMultiplier,
     setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
     saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
     tabRestartKey, setTabRestartKey,
@@ -1287,7 +1313,7 @@ const PracticeSessionInner = ({
     >
     <TimerProvider timer={timer} durationInSeconds={exerciseDurationSeconds} freeMode={freeMode}>
     <BpmProgressProvider exercise={currentExercise}>
-    <SessionUIProvider>
+    <SessionUIProvider onOpenMicSetup={handleRecalibrate}>
     <TabOverlayProvider value={tabOverlayValue}>
     <>
       {/* Intro splash that always plays on session mount, then parts open
@@ -1445,6 +1471,7 @@ const PracticeSessionInner = ({
         songSectionMapSlot={isMobileView ? undefined : songSectionMapSlot}
         heroSlot={bossFight?.arena}
         backingAligning={isAligningBacking}
+        setupOpen={sessionPhase === "calibrating"}
         countInRemaining={(metronome as any).countInRemaining ?? 0}
         frequencyRef={audioRefs.frequencyRef} volumeRef={audioRefs.volumeRef}
         isListening={isListening} metronomeAudioContext={metronome.audioContext}
@@ -1489,9 +1516,11 @@ const PracticeSessionInner = ({
         existingCalibrationTimestamp={existingCalibrationTimestamp}
         handleReuseCalibration={handleReuseCalibration} handleRecalibrate={handleRecalibrate}
         handleCalibrationCancel={handleCalibrationCancelAndClose} handleCalibrationComplete={handleCalibrationComplete}
-        audioInit={initAudio} audioClose={closeAudio} audioRefs={audioRefs}
+        audioInit={initAudio} audioRefs={audioRefs}
         isListening={isListening} inputGain={inputGain} setInputGain={setInputGain}
         isNative={isNative} onSelectDevice={selectDevice} onSelectChannel={selectChannel}
+        timingAudioContext={metronome.audioContext} estimateLatencyMs={getLatencyMs}
+        onBeforeTimingRun={stopSessionPlayback}
         exerciseId={activeExercise.id} isMounted={isMounted}
         hasReportResult={!!reportResult} showSuccessView={showSuccessView}
         isLastExercise={isLastExercise}
@@ -1501,7 +1530,7 @@ const PracticeSessionInner = ({
         audioRefs={audioRefs} audioContext={metronome.audioContext}
         isListening={isListening} isNative={isNative} estimateLatencyMs={getLatencyMs}
         onEnableMic={() => { if (isMicEnabled) void initAudio(); else updateMicPersistence(true); }}
-        onBeforeStart={() => { stopTimer(); metronome.stopMetronome(); }}
+        onBeforeStart={stopSessionPlayback}
       />
 
       {/* Dev-only shortcut for exams with no hunt panel to host the button —

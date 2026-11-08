@@ -1,5 +1,7 @@
 {
-  "skip_calibration": "Pomiń kalibrację",
+  "skip_calibration": "Pomiń konfigurację",
+  "close": "Zamknij",
+  "back": "Wstecz",
   "setup": {
     "title_native": "Konfiguracja audio",
     "title_interface": "Konfiguracja interfejsu audio",
@@ -7,34 +9,37 @@
     "connecting": "Łączenie…",
     "start_listening": "Zacznij nasłuchiwać",
     "grant": "Zezwól na mikrofon",
-    "signal_level": "Poziom sygnału",
-    "too_quiet": "Za cicho — uderz w strunę",
-    "good_level": "Dobry poziom ✓",
+    "signal_level": "Sygnał",
     "input_sensitivity": "Czułość wejścia",
-    "play_notes": "Zagraj kilka dźwięków… {{seconds}} s",
-    "calibrated": "Skalibrowano ✓",
-    "auto_gain": "Automatyczna kalibracja wzmocnienia",
+    "play_notes": "Graj normalnie… {{seconds}} s",
+    "auto_gain": "Ustaw czułość automatycznie",
     "tune_guitar": "Nastrój gitarę",
     "headphones": "Użyj słuchawek przewodowych",
-    "headphones_body": "Bez słuchawek mikrofon zbiera podkład z głośników i powoduje fałszywe wykrycia.",
     "quiet": "Znajdź ciche miejsce",
-    "quiet_body": "Hałas w tle powoduje fałszywe wykrycia dźwięków. Zamknij drzwi i wyłącz muzykę.",
     "interface": "Interfejs",
-    "refresh": "Odśwież listę urządzeń",
+    "refresh": "Odśwież",
     "no_inputs": "Nie znaleziono urządzeń wejściowych",
-    "inputs": "wejścia: {{count}}",
-    "which_jack": "Do którego wejścia podłączona jest gitara?",
-    "channel": "Kanał {{n}}",
-    "native_hint": "Natywne przechwytywanie z niskim opóźnieniem — całkowicie omija przeglądarkę. Podłącz gitarę bezpośrednio do interfejsu powyżej.",
-    "output_auto": "Wyjście: {{label}} (auto)",
-    "matched": "dopasowane",
-    "change": "Zmień",
+    "channel": "Wejście {{n}}",
     "output": "Wyjście",
     "no_outputs": "Nie znaleziono urządzeń wyjściowych",
-    "output_hint": "Powinno pasować do interfejsu powyżej, żeby dźwięk i nagrywanie szły przez to samo urządzenie.",
     "output_hint_asio4all": "ASIO4ALL blokuje cały interfejs, razem z wyjściami, więc metronom nie zagra przez niego. Wybierz tu inne wyjście (np. głośniki komputera) albo w panelu ASIO4ALL wyłącz wyjście interfejsu i zostaw samo wejście.",
-    "before_start": "Zanim zaczniesz",
-    "before_start_body": "Upewnij się, że interfejs jest wybrany jako wejście mikrofonowe przeglądarki, a gitara jest podłączona. Wzmocnienie ustawisz na następnym ekranie."
+    "before_start_body": "Wybierz interfejs jako mikrofon przeglądarki (ikona mikrofonu przy pasku adresu).",
+    "level": {
+      "silent": "Brak sygnału. Zagraj coś",
+      "good": "Słyszę gitarę",
+      "clipping": "Przester. Ścisz wejście na interfejsie"
+    },
+    "auto": {
+      "no_signal": "Nic nie usłyszeliśmy, więc czułość została bez zmian. Kliknij jeszcze raz i graj przez cały pomiar, tak jak w ćwiczeniu.",
+      "ok": "Czułość ustawiona na {{gain}}×.",
+      "clipping": "Czułość ustawiona na {{gain}}×, ale sygnał przesterowuje się, zanim dotrze do aplikacji. Skręć gain na interfejsie (albo odsuń gitarę od mikrofonu) i zmierz jeszcze raz.",
+      "at_max": "Nawet na maksimum ({{gain}}×) gitara jest cicha. Podkręć gain na interfejsie albo przysuń mikrofon.",
+      "noisy": "Czułość ustawiona na {{gain}}×, ale gitara ledwo przebija się przez szum tła. Tego czułość nie naprawi. Wycisz otoczenie albo przysuń mikrofon bliżej gitary."
+    },
+    "guitar_input": "Wejście z gitarą",
+    "next": "Dalej",
+    "waiting_signal": "Zagraj coś, żeby przejść dalej",
+    "ready": "Słyszę gitarę. Możesz iść dalej."
   },
   "output_stall": {
     "title": "Metronom nie może zagrać",
@@ -43,23 +48,41 @@
     "asio4all": "Używasz ASIO4ALL? W jego panelu zostaw włączone tylko wejście interfejsu i upewnij się, że żadna inna karta dźwiękowa nie jest tam zaznaczona.",
     "close": "Zamknij"
   },
+  "sustain": {
+    "title": "Test wybrzmienia",
+    "play": "Zagraj {{note}} na {{string}}. strunie, {{fret}}. próg, i pozwól jej wybrzmieć.",
+    "waiting": "Czekam na {{note}}…",
+    "wrong": "To inna nuta. Zagraj {{note}}",
+    "holding": "Trzymaj…",
+    "clipping_live": "Przester. Wejście jest za głośne",
+    "pass": "Aplikacja słyszy nutę do końca. Nuty w tabulaturze wypełnią się w całości.",
+    "gain": "Nuta urwała się po {{seconds}} s. Zwiększ czułość poniżej i zagraj jeszcze raz.",
+    "quiet": "Nuta ucichła po {{seconds}} s. Sygnał jest za słaby. Podkręć gain na interfejsie (albo przysuń mikrofon) i zagraj jeszcze raz.",
+    "pitch": "Dźwięk odjechał od {{note}} po {{seconds}} s. Nastrój gitarę albo zagraj czyściej i spróbuj jeszcze raz.",
+    "clipping": "Sygnał przesterowuje się, zanim dotrze do aplikacji. Skręć gain na interfejsie (albo graj lżej) i zagraj jeszcze raz.",
+    "too_hot": "Za duża czułość. Nuta dobija do maksimum, a szum tła zacznie udawać nuty. Zmniejsz czułość poniżej (albo ustaw ją automatycznie) i zagraj jeszcze raz.",
+    "again": "Zagraj jeszcze raz",
+    "next": "Dalej"
+  },
   "tuning": {
-    "wrong_string": "Zła struna?",
     "play_open": "Zagraj pustą strunę {{string}}",
-    "in_tune": "Nastrojona — trzymaj dalej…",
+    "in_tune": "Czysto. Trzymaj…",
     "sharp": "za wysoko ↓ obniż",
     "flat": "za nisko ↑ podciągnij",
     "title": "Nastrój gitarę",
     "flat_label": "Nisko",
     "sharp_label": "Wysoko",
-    "next_string": "Następna struna",
-    "finish": "Zakończ kalibrację",
     "skip_string": "Pomiń strunę",
-    "redo": "Powtórz tę strunę",
-    "already_tuned": "Moja gitara jest już nastrojona"
+    "already_tuned": "Moja gitara jest już nastrojona",
+    "string_of": "Struna {{current}} z {{total}}",
+    "thickest": "najgrubsza",
+    "thinnest": "najcieńsza",
+    "waiting": "Czekam na dźwięk…",
+    "sounds_like": "To brzmi jak struna {{string}}",
+    "tuned": "Nastrojona ✓"
   },
   "source": {
-    "title": "Kalibracja gitary",
+    "title": "Podłącz gitarę",
     "question": "Jak gitara jest podłączona do komputera?",
     "interface": "Interfejs audio",
     "interface_desc": "Interfejs audio USB lub Thunderbolt",
@@ -72,11 +95,16 @@
   },
   "summary": {
     "title": "Gotowe",
-    "ready": "Wszystko gotowe!",
-    "body": "Kalibracja zakończona. Jeśli wykrywanie nadal wydaje się trochę nietrafione, nastrój gitarę jeszcze raz albo dostosuj czułość wejścia.",
-    "good_luck": "Powodzenia!",
-    "save": "Zapisz i zamknij",
-    "discard": "Odrzuć"
+    "ready": "Mikrofon jest włączony",
+    "body": "Aplikacja słyszy gitarę i będzie oceniać Twoją grę.",
+    "tuning": "Strojenie",
+    "tuning_count": "{{tuned}} z {{total}} strun",
+    "tuning_skipped": "pominięte",
+    "latency": "Opóźnienie dźwięku",
+    "latency_measured": "{{ms}} ms · zmierzone",
+    "latency_estimate": "~{{ms}} ms · szacunek",
+    "latency_later": "Zmierzysz je w każdej chwili przyciskiem „Kalibracja timingu” nad tabulaturą. Wtedy oceny timingu zgadzają się z tym, co słyszysz.",
+    "start": "Zaczynamy"
   },
   "permission": {
     "title": "Dostęp do mikrofonu",
@@ -95,7 +123,7 @@
   "choice": {
     "title": "Istniejąca kalibracja",
     "body": "Masz dane kalibracji z dnia {{date}}.",
-    "old": "Ta kalibracja ma ponad 30 dni — rozważ ponowną kalibrację dla najlepszej dokładności.",
+    "old": "Ta kalibracja ma ponad 30 dni. Rozważ ponowną kalibrację dla najlepszej dokładności.",
     "reuse": "Użyj istniejącej",
     "recalibrate": "Skalibruj ponownie"
   },
@@ -106,5 +134,8 @@
     "body": "Ten plan zawiera ćwiczenia z tabulaturą. Włącz mikrofon, żeby system mógł słuchać gitary i oceniać Twoją grę na bieżąco.",
     "enable": "Włącz mikrofon",
     "skip": "Pomiń"
+  },
+  "timing_step": {
+    "skip": "Pomiń, na razie wystarczy szacunek"
   }
 }

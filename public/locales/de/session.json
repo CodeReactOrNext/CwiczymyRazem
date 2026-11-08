@@ -74,7 +74,7 @@
     "title": "Timing kalibrieren",
     "intro": "Lautsprecher, Kopfhörer und Audio-Interfaces fügen jeweils eine Verzögerung zwischen dem Klick, den du hörst, und dem Ton, den wir erfassen, hinzu. Spiel zu ein paar Klicks mit und wir messen deine, damit die Timing-Bewertung zu dem passt, was du hörst.",
     "step1": "Nutze die Lautsprecher oder Kopfhörer, mit denen du übst.",
-    "step2": "Zupf bei jedem Klick die leere tiefe E-Saite und lass sie klingen – nicht zwischen den Klicks abdämpfen. {{bpm}} BPM, {{countIn}} Klicks zum Einstimmen, dann {{clicks}} gezählte.",
+    "step2": "Spiel bei jedem Klick irgendetwas: eine Note oder einen Akkord. {{bpm}} BPM, {{countIn}} Klicks zum Einzählen, dann {{clicks}} gezählte.",
     "step3": "Spiel mit dem Klick, nicht davor.",
     "now_using": "Aktuell",
     "measured_here": "in diesem Browser gemessen",

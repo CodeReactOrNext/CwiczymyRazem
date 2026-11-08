@@ -2,16 +2,17 @@ import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { Spectrum } from "utils/audio/chordTones";
 import { CHORD_TONE_HIT, CHORD_TONE_SUSTAIN, createChordToneEvidence, isChordToneSounding, spectrumPeak } from "utils/audio/chordTones";
-import { correctOctaveForLowStrings, getAdaptiveVolumeGate, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, getSustainVolumeGate, midiToFrequency } from "utils/audio/noteUtils";
+import { correctOctaveForLowStrings, getAdaptiveVolumeGate, getBaseToleranceCents, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, getSustainVolumeGate, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import type { FillFeed, FillStep } from "../utils/fillFeed";
 import { clearFillFeed, createFillFeed, pushFillStep } from "../utils/fillFeed";
 import type { IntonationKind, LivePitch, ScoringFocus } from "../utils/pitchScoring";
 import { closerIntonation, continuationAttackFloorMs, gradeIntonation, hasOwnAttack, hasPlainAttack, INTONATION_SETTLE_MS, intonationKindOf, isNearPitch, isSamePitchContinuation, liveBendAmount, medianCents, noteSettleMs } from "../utils/pitchScoring";
+import { heldFillTarget } from "../utils/sustainCredit";
 import { tempoScoreFactor } from "../utils/tempoScoreFactor";
 import type { RunNote, TimingGrade } from "../utils/timingGrade";
-import { gradeTiming, isPerfectTiming, TIMING_GRADE_POINTS, timingHintFor } from "../utils/timingGrade";
+import { gradeTiming, HIT_WINDOW_LOOSEN_MS, isPerfectTiming, TIMING_GRADE_POINTS, timingHintFor } from "../utils/timingGrade";
 import { MAX_TIMED_NOTES } from "../utils/timingPrecision";
 import type { AlphaTabPassClock, AlphaTabSource } from "./alphaTabPassClock";
 import { addAlphaTabPassStart, ALPHATAB_RESTART_GRACE_SEC, alphaTabPassBeats, createAlphaTabPassClock } from "./alphaTabPassClock";
@@ -20,7 +21,6 @@ import { assignAttacks } from "./noteEventGrader";
 import { buildTempoMap, createBeatClock } from "./tempoBeatClock";
 import { useGameState } from "./useGameState";
 
-const CENTS_TOLERANCE      = 45;
 const VOLUME_GATE          = 0.005;
 
 interface UseNoteMatchingOptions {
@@ -305,10 +305,7 @@ export function useNoteMatching({
       };
     };
 
-    const baseToleranceFor = (targetFreq: number) =>
-      targetFreq < 100 ? CENTS_TOLERANCE + 25
-        : targetFreq < 165 ? CENTS_TOLERANCE + 15
-          : CENTS_TOLERANCE;
+    const baseToleranceFor = getBaseToleranceCents;
 
     // Single picked notes whose pitch a long previous note already leaves
     // ringing (see isSamePitchContinuation). The exercise loops, so the first
@@ -373,7 +370,9 @@ export function useNoteMatching({
       const beatsPerSec      = effectiveBpm / 60;
       const beatDurationMs   = 60000 / effectiveBpm;
       const onsetRecencyMs   = Math.min(800, Math.max(200, beatDurationMs * 0.8));
-      const windowMs         = Math.min(420, Math.max(130, beatDurationMs * 0.30));
+      // How far off the beat an attack may land and still credit the note at
+      // all; the owner loosened it by HIT_WINDOW_LOOSEN_MS on top of the scaled part.
+      const windowMs         = Math.min(420, Math.max(130, beatDurationMs * 0.30)) + HIT_WINDOW_LOOSEN_MS;
       const windowBeats      = (windowMs / 1000) * beatsPerSec;
       const earlyWindowBeats = (Math.max(16, Math.min(50, beatDurationMs * 0.05)) / 1000) * beatsPerSec;
 
@@ -568,8 +567,8 @@ export function useNoteMatching({
             // The one narrow exception: correctOctaveForLowStrings undoes a
             // *specific, already-known* 2nd-harmonic misdetection on low strings
             // (E2/A2/D3) — the same fix already shipped in the tuner
-            // (useTuningFrequency.ts) and calibration wizard
-            // (useCalibrationCapture.ts) for the exact same detector quirk,
+            // (findNearestTuningString) and the setup wizard's tuning step
+            // (useTuningWalk.ts) for the exact same detector quirk,
             // just never ported to actual gameplay matching. Unlike the removed
             // broad harmonic-ratio matching above, this only ever applies when
             // the *target* is below 165 Hz, not to every note everywhere.
@@ -604,11 +603,14 @@ export function useNoteMatching({
                 // noise floor: the pitch check right after keeps noise out.
                 && currentVolume > getDetectionGates(targetFreq, sustainGateBase).volumeGate
                 && pitchIsSounding(true)) {
-              const heldTo = Math.min(loopedBeatsElapsed, beatEnd);
-              hitNotesRef.current[noteKey] = heldTo;
+              // Held through most of its length, the note fills to its end
+              // right away (sustainCredit.ts) — its fading tail no longer
+              // decides whether it looks fully played.
+              const fill = heldFillTarget(loopedBeatsElapsed, beatStart, beatEnd);
+              hitNotesRef.current[noteKey] = fill.beat;
               // The tab follows a streamed hold by itself; React only needs it
               // where the tab reads the fill from React's copy.
-              if (streamFill) streamFill({ noteKey, beat: heldTo });
+              if (streamFill) streamFill(fill.complete ? { noteKey, beat: fill.beat, complete: true } : { noteKey, beat: fill.beat });
               else needsFlushRef.current = true;
             }
             return;

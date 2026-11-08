@@ -1,25 +1,26 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useGuitarTuningContext } from "../../contexts/GuitarTuningContext";
-import type { CalibrationData } from "../../hooks/useCalibration";
-import { buildStringRefs } from "./calibration.constants";
+import { useCalibratedLatencyMs } from "../../hooks/useTimingCalibration";
+import { buildStringRefs, sustainTestTarget } from "./calibration.constants";
 import { MicErrorScreen } from "./components/MicErrorScreen";
 import { PermissionStep } from "./components/PermissionStep";
 import { SetupStep } from "./components/SetupStep";
 import { type InputSource, SourceStep } from "./components/SourceStep";
-import { SummaryStep } from "./components/SummaryStep";
+import { type SetupSummary, SummaryStep } from "./components/SummaryStep";
+import { SustainStep, type SustainTarget } from "./components/SustainStep";
+import { TimingStep } from "./components/TimingStep";
 import { TuningStep } from "./components/TuningStep";
-import { useCalibrationCapture } from "./hooks/useCalibrationCapture";
 
 interface CalibrationWizardProps {
   isOpen:            boolean;
-  onComplete:        (data: CalibrationData) => void;
+  /** Setup finished — the mic goes on. */
+  onComplete:        () => void;
   onCancel:          () => void;
   audioInit:         () => Promise<void>;
-  audioClose:        () => void;
   audioRefs:         AudioRefs;
   isListening:       boolean;
   inputGain:         number;
@@ -27,128 +28,173 @@ interface CalibrationWizardProps {
   isNative:          boolean;
   onSelectDevice?:   (deviceId: number) => Promise<void>;
   onSelectChannel?:  (channel: number) => Promise<void>;
+  /** The session metronome's context, so the timing clicks take the session's output path. */
+  timingAudioContext: AudioContext | null;
+  /** Formula latency, used until the player measures theirs. */
+  estimateLatencyMs: () => number;
+  /** Stops the session's own playback before the timing run's clicks. */
+  onBeforeTimingRun: () => void;
 }
 
-export const CalibrationWizard = ({
-  isOpen, onComplete, onCancel, audioInit, audioRefs,
-  isListening, inputGain, onInputGainChange, isNative, onSelectDevice, onSelectChannel,
+type Step = "source" | "permission" | "setup" | "sustain" | "tuning" | "timing" | "summary";
+
+const SLIDE = {
+  initial: { opacity: 0, x: 30 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -20 },
+  transition: { duration: 0.18 },
+};
+
+const WizardBody = ({
+  onComplete, onCancel, audioInit, audioRefs, isListening, inputGain, onInputGainChange,
+  isNative, onSelectDevice, onSelectChannel, timingAudioContext, estimateLatencyMs, onBeforeTimingRun,
 }: CalibrationWizardProps) => {
-  const [step,        setStep]        = useState<"source" | "permission" | "setup" | "tuning" | "summary">("source");
+  // Native (Electron) capture has no "interface vs. microphone" distinction
+  // (it's one device list) and no browser permission prompt — it starts at
+  // device selection instead of the web-only source/permission steps.
+  const [step,        setStep]        = useState<Step>(isNative ? "setup" : "source");
   const [inputSource, setInputSource] = useState<InputSource>("interface");
   const [isGranting,  setIsGranting]  = useState(false);
   const [micError,    setMicError]    = useState(false);
+  const [summary,     setSummary]     = useState<SetupSummary | null>(null);
+  const [tunedCount,  setTunedCount]  = useState<number | null>(null);
 
   const { tuning } = useGuitarTuningContext();
   const strings = useMemo(() => buildStringRefs(tuning), [tuning]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    // Native (Electron) capture has no "interface vs. microphone" distinction
-    // (it's one device list) and no browser permission prompt — skip straight
-    // to device selection instead of the web-only source/permission steps.
-    setStep(isNative ? "setup" : "source");
-    setIsGranting(false);
-    setMicError(false);
-  }, [isOpen, isNative]);
-
-  const { currentStringIndex, stringState, offsets, currentOffset, sampleCount, handleRetry, advanceString } =
-    useCalibrationCapture({ step: step === "permission" || step === "source" ? "setup" : step, isOpen, isListening, audioRefs, strings, onAllStringsDone: () => setStep("summary") });
+  const sustainTarget = useMemo<SustainTarget>(() => sustainTestTarget(strings), [strings]);
+  const savedLatencyMs = useCalibratedLatencyMs(isNative);
 
   const handleGrant = useCallback(async () => {
     setIsGranting(true);
-    try { 
-      await audioInit(); 
+    try {
+      await audioInit();
       setStep("setup");
     }
     catch { setMicError(true); }
     finally { setIsGranting(false); }
   }, [audioInit]);
 
-  const handleCancel  = useCallback(() => onCancel(), [onCancel]);
-  const handleConfirm = useCallback(() => onComplete({ offsets, timestamp: Date.now() }), [offsets, onComplete]);
+  const showSummary = useCallback((count: number | null, measuredMs: number | null) => {
+    const latencyMs = measuredMs ?? savedLatencyMs;
+    setSummary({
+      tunedCount: count,
+      stringCount: strings.length,
+      latencyMs: latencyMs ?? Math.round(estimateLatencyMs()),
+      latencyMeasured: latencyMs !== null,
+    });
+    setStep("summary");
+  }, [savedLatencyMs, strings.length, estimateLatencyMs]);
 
-  if (!isOpen) return null;
+  // Timing is only asked for while this input path has never been measured.
+  const afterTuning = useCallback((count: number | null) => {
+    setTunedCount(count);
+    if (savedLatencyMs === null) setStep("timing");
+    else showSummary(count, null);
+  }, [savedLatencyMs, showSummary]);
 
-  return createPortal(
-    <div className="fixed inset-0 z-[99999999] flex items-center justify-center bg-black/70 backdrop-blur-sm font-openSans">
-      <div className="relative w-full max-w-lg mx-4 bg-zinc-950 rounded-lg shadow-2xl overflow-y-auto max-h-[90dvh]">
+  return (
+    <div className="fixed inset-0 z-[99999999] flex items-center justify-center bg-black/80 font-openSans">
+      <div role="dialog" aria-modal="true" className="relative mx-4 flex max-h-[92dvh] min-h-[min(760px,92dvh)] w-full max-w-3xl flex-col overflow-y-auto rounded-lg bg-zinc-950">
         {micError ? (
-          <MicErrorScreen onRetry={() => { setMicError(false); handleGrant(); }} onCancel={handleCancel} />
+          <MicErrorScreen onRetry={() => { setMicError(false); void handleGrant(); }} onCancel={onCancel} />
         ) : (
           <AnimatePresence mode="wait">
             {step === "source" && (
-              <motion.div key="source"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.18 }}
-              >
+              <motion.div key="source" {...SLIDE} className="flex flex-1 flex-col" initial={{ opacity: 0 }}>
                 <SourceStep
                   onSelect={(source) => {
                     setInputSource(source);
                     setStep(isListening ? "setup" : "permission");
                   }}
-                  onCancel={handleCancel}
+                  onCancel={onCancel}
                 />
               </motion.div>
             )}
             {step === "permission" && (
-              <motion.div key="permission"
-                initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.18 }}
-              >
+              <motion.div key="permission" {...SLIDE} className="flex flex-1 flex-col">
                 <PermissionStep
                   isLoading={isGranting}
                   onGrant={handleGrant}
                   onBack={() => setStep("source")}
-                  onCancel={handleCancel}
+                  onCancel={onCancel}
                 />
               </motion.div>
             )}
             {step === "setup" && (
-              <motion.div key="setup"
-                initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.18 }}
-              >
+              <motion.div key="setup" {...SLIDE} className="flex flex-1 flex-col">
                 <SetupStep
                   isListening={isListening} isLoading={isGranting}
                   inputSource={inputSource}
                   audioRefs={audioRefs} inputGain={inputGain}
-                  onInputGainChange={onInputGainChange}
                   isNative={isNative} onSelectDevice={onSelectDevice} onSelectChannel={onSelectChannel}
                   onGrant={handleGrant}
+                  onNext={() => setStep("sustain")}
+                  onBack={() => (isNative ? onCancel() : setStep(isListening ? "source" : "permission"))}
+                  onCancel={onCancel}
+                />
+              </motion.div>
+            )}
+            {step === "sustain" && (
+              <motion.div key="sustain" {...SLIDE} className="flex flex-1 flex-col">
+                <SustainStep
+                  audioRefs={audioRefs}
+                  isListening={isListening}
+                  strings={strings}
+                  target={sustainTarget}
+                  inputGain={inputGain}
+                  onInputGainChange={onInputGainChange}
                   onNext={() => setStep("tuning")}
-                  onBack={() => (isNative ? handleCancel() : setStep(isListening ? "source" : "permission"))}
-                  onCancel={handleCancel}
+                  onBack={() => setStep("setup")}
+                  onCancel={onCancel}
                 />
               </motion.div>
             )}
             {step === "tuning" && (
-              <motion.div key="tuning"
-                initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.22 }}
-              >
+              <motion.div key="tuning" {...SLIDE} className="flex flex-1 flex-col">
                 <TuningStep
-                  currentIndex={currentStringIndex} offsets={offsets}
-                  sampleCount={sampleCount} stringState={stringState}
-                  currentOffset={currentOffset} audioRefs={audioRefs}
+                  audioRefs={audioRefs}
+                  isListening={isListening}
                   strings={strings}
-                  onRetry={handleRetry} onAdvance={advanceString} onCancel={handleCancel}
-                  // Offsets aren't used any more, so finishing early only turns the mic on.
-                  onAlreadyTuned={handleConfirm}
+                  onFinish={afterTuning}
+                  onAlreadyTuned={() => afterTuning(null)}
+                  onCancel={onCancel}
                 />
               </motion.div>
             )}
-            {step === "summary" && (
-              <motion.div key="summary"
-                initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
-                transition={{ duration: 0.22 }}
-              >
-                <SummaryStep offsets={offsets} onConfirm={handleConfirm} onCancel={handleCancel} />
+            {step === "timing" && (
+              <motion.div key="timing" {...SLIDE} className="flex flex-1 flex-col">
+                <TimingStep
+                  audioRefs={audioRefs}
+                  audioContext={timingAudioContext}
+                  isListening={isListening}
+                  isNative={isNative}
+                  estimateLatencyMs={estimateLatencyMs}
+                  onBeforeStart={onBeforeTimingRun}
+                  onEnableMic={() => void handleGrant()}
+                  onDone={(ms) => showSummary(tunedCount, ms)}
+                  onSkip={() => showSummary(tunedCount, null)}
+                  onCancel={onCancel}
+                />
+              </motion.div>
+            )}
+            {step === "summary" && summary && (
+              <motion.div key="summary" {...SLIDE} className="flex flex-1 flex-col" exit={{ opacity: 0 }}>
+                <SummaryStep summary={summary} onConfirm={onComplete} />
               </motion.div>
             )}
           </AnimatePresence>
         )}
       </div>
-    </div>,
-    document.body
+    </div>
   );
+};
+
+/**
+ * First-run setup when the mic is turned on: input → level → tuning → timing.
+ * Each open starts from scratch — the body remounts, so nothing carries over
+ * from a wizard closed halfway.
+ */
+export const CalibrationWizard = (props: CalibrationWizardProps) => {
+  if (!props.isOpen) return null;
+  return createPortal(<WizardBody {...props} />, document.body);
 };

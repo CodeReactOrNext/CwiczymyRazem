@@ -32,6 +32,9 @@ export interface GuitarDetectors {
    *  long enough for a bass's bottom octave — consulted only while the player is
    *  on bass (see BASS_* below). Omit it and bass reads like a guitar. */
   pitchBass?: any;
+  /** Optional aubio Onset ("specflux", 2048, 512), threshold 0.6: the strumming
+   *  matcher's second ear — see lastSoftAttackMsRef. Omit it and nothing reads it. */
+  strum?: any;
 }
 
 /**
@@ -95,8 +98,20 @@ export interface ProcessorTargets {
   /** Optional: Date.now() (block end, like lastOnsetTimeRef) of the latest
    *  attack heard on a low string by the low-band detector — see LOW_ATTACK_*. */
   lastLowAttackMsRef?: React.MutableRefObject<number>;
+  /** Optional: time of the latest attack the spectral-flux detector heard, dated
+   *  like lastAttackMsRef. It hears what hfc misses in strumming — an up stroke
+   *  over a chord still ringing, a strum through a compressed or driven tone,
+   *  which barely raise the level but change the spectrum — and also hears things
+   *  that aren't strums (a palm mute, fingers lifting for a chord change). Good
+   *  for crediting an expected strum, not for calling a rest wrong
+   *  (guitarBufferProcessor.strums.test.ts). */
+  lastSoftAttackMsRef?: React.MutableRefObject<number>;
   /** Optional: whoever is listening in on the raw input (see InputTap). */
   inputTapRef?: React.MutableRefObject<InputTap | null>;
+  /** Optional: the latest window's loudest raw (ungained) sample, 0–1. Near 1
+   *  the interface or mic is clipping before the app ever sees the signal —
+   *  the one level problem the app's own input gain cannot fix. */
+  inputPeakRef?: React.MutableRefObject<number>;
 }
 
 export interface BufferProcessorOptions {
@@ -127,6 +142,8 @@ export interface BufferProcessorOptions {
 export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   const { detectors, targets, getGain, spectrum, recentAudio, onActive, isBass, sampleRate = 48000 } = opts;
   const { pitch: pitchDetector, onset: onsetDetector, tick: tickDetector, pitchHigh: pitchHighDetector, pitchLow: pitchLowDetector, pitchBass: pitchBassDetector } = detectors;
+  // Only run when someone reads it.
+  const strumDetector = targets.lastSoftAttackMsRef ? detectors.strum : null;
 
   let lastFrequencies: number[] = [];
   // Per-hop pitch estimates of the current window, reused across calls.
@@ -395,6 +412,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     const rawRms = gain > 0 ? rms / gain : rms;
     const rawVolume = Math.max(0, Math.min(1, rawRms * 10));
     targets.rawVolumeRef.current = rawVolume;
+    if (targets.inputPeakRef) targets.inputPeakRef.current = gain > 0 ? peak / gain : peak;
 
     const nowMs = Date.now();
     // Before the silence gate: an attack out of silence is the one it must not miss.
@@ -418,6 +436,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
           const chunk = onsetBuf.subarray(offset, offset + HOP);
           onsetDetector.do(chunk);
           tickDetector.do(chunk);
+          strumDetector?.do(chunk);
         }
         // Signal stopped — whatever attack was still resolving is over.
         commitPending();
@@ -483,6 +502,9 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
         }
       }
       if (tickDetector.do(onsetChunk)) isTick = true;
+      if (strumDetector?.do(onsetChunk)) {
+        targets.lastSoftAttackMsRef!.current = nowMs - (totalHops - 1 - hopIndex) * hopMs - ONSET_REPORT_LAG_MS;
+      }
 
       // Both run on every hop — each keeps its own sliding window of the signal.
       const guitarFreq = refineLow(pitchDetector.do(chunk), pitchLowDetector ? pitchLowDetector.do(chunk) : 0);
@@ -604,6 +626,12 @@ export function createGuitarDetectors(aubio: any, sampleRate: number): GuitarDet
   const tick = new aubio.Onset("specflux", 2048, 512, sampleRate);
   tick.setThreshold(0.15);
 
+  // The same spectral flux for strumming, stricter: at 0.15 it lands on a quarter
+  // of a pattern's rests (palm mutes, chord changes), at 0.6 on 15% while still
+  // hearing ~94% of the strums (guitarBufferProcessor.strums.test.ts).
+  const strum = new aubio.Onset("specflux", 2048, 512, sampleRate);
+  strum.setThreshold(0.6);
+
   // Half-length window for the high register — see the HIGH_RES_* block above.
   const pitchHigh = new aubio.Pitch("yinfft", 1024, 256, sampleRate);
   pitchHigh.setTolerance(0.7);
@@ -617,5 +645,5 @@ export function createGuitarDetectors(aubio: any, sampleRate: number): GuitarDet
   const bassWindow = 2 ** Math.ceil(Math.log2(sampleRate / 12));
   const pitchBass = new aubio.Pitch("yinfast", bassWindow, 512, sampleRate);
 
-  return { pitch, onset, tick, pitchHigh, pitchLow, pitchBass };
+  return { pitch, onset, tick, pitchHigh, pitchLow, pitchBass, strum };
 }

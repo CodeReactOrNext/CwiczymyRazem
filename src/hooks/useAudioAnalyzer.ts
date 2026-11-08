@@ -48,9 +48,15 @@ export interface AudioRefs {
    *  struck — an attack too soft or dark for the onset detector (see
    *  guitarBufferProcessor LOW_ATTACK_*). 0 until the first one. */
   lastLowAttackMsRef?: React.MutableRefObject<number>;
+  /** The spectral-flux detector's latest attack, dated like lastAttackMsRef —
+   *  hears more strums than it, and more that aren't (see guitarBufferProcessor). */
+  lastSoftAttackMsRef?: React.MutableRefObject<number>;
   /** Set by whoever wants the raw input itself (see InputTap) — today the
    *  check for the app's own playback leaking into the mic. */
   inputTapRef?: React.MutableRefObject<InputTap | null>;
+  /** The latest window's loudest raw (ungained) sample, 0–1 — near 1 the input
+   *  is clipping before it reaches us (see guitarBufferProcessor). */
+  inputPeakRef?: React.MutableRefObject<number>;
 }
 
 const GAIN_STORAGE_KEY = "audio_input_gain";
@@ -104,7 +110,9 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
   const noteEventsRef = useRef<DetectedNoteEvent[]>([]);
   const lastAttackMsRef = useRef<number>(0);
   const lastLowAttackMsRef = useRef<number>(0);
+  const lastSoftAttackMsRef = useRef<number>(0);
   const inputTapRef = useRef<InputTap | null>(null);
+  const inputPeakRef = useRef<number>(0);
   const bassRef = useRef(bass);
   useEffect(() => { bassRef.current = bass; }, [bass]);
 
@@ -240,7 +248,7 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
         isBass: () => bassRef.current,
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
-          lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, inputTapRef,
+          lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, lastSoftAttackMsRef, inputTapRef, inputPeakRef,
         },
         onActive: () => {
           setState(prev =>
@@ -296,6 +304,7 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
     frequencyRef.current = 0;
     volumeRef.current = 0;
     rawVolumeRef.current = 0;
+    inputPeakRef.current = 0;
     noiseFloorRef.current = 0;
     confidenceRef.current = 0;
     lastOnsetTimeRef.current = 0;
@@ -303,6 +312,7 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
     noteEventsRef.current = [];
     lastAttackMsRef.current = 0;
     lastLowAttackMsRef.current = 0;
+    lastSoftAttackMsRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false }));
   }, [releaseResources]);
@@ -350,7 +360,7 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
 
   const readRecentAudio = useCallback(() => recentAudioRef.current?.read() ?? null, []);
 
-  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, readSpectrum, readRecentAudio, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, inputTapRef };
+  const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, readSpectrum, readRecentAudio, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, lastSoftAttackMsRef, inputTapRef, inputPeakRef };
 
   return useMemo(() => ({
     ...state,

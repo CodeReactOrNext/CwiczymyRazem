@@ -4,6 +4,7 @@ import { cn } from "assets/lib/utils";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useTranslation } from "hooks/useTranslation";
 import { Mic, Timer } from "lucide-react";
+import Image from "next/image";
 
 import { useSessionUI } from "../contexts/SessionUIContext";
 import { timingInputPath, useCalibratedLatencyMs, useTimingCalibration } from "../hooks/useTimingCalibration";
@@ -12,20 +13,6 @@ import { useTimingCalibrationRun } from "../hooks/useTimingCalibrationRun";
 import type { CalibrationResult } from "../utils/timingCalibration";
 import { CALIBRATION_BPM, CALIBRATION_CLICKS, CALIBRATION_COUNT_IN, CALIBRATION_MIN_HITS } from "../utils/timingCalibration";
 import { TimingHitMap } from "./TimingHitMap";
-
-interface TimingCalibrationDialogProps {
-  audioRefs: AudioRefs;
-  /** The session metronome's context, so the clicks take the session's output path. */
-  audioContext: AudioContext | null;
-  isListening: boolean;
-  /** Desktop app native capture — its measurement is kept apart from the browser's. */
-  isNative: boolean;
-  /** The formula-based latency used while uncalibrated, shown for comparison. */
-  estimateLatencyMs: () => number;
-  onEnableMic: () => void;
-  /** Stops the session's own playback — its clicks would land on top of ours. */
-  onBeforeStart: () => void;
-}
 
 const PRIMARY = "h-10 flex-1 rounded-lg bg-white text-sm font-semibold text-zinc-950 hover:bg-zinc-200";
 const SECONDARY = "h-10 flex-1 rounded-lg bg-zinc-800 text-sm font-medium text-zinc-100 hover:bg-zinc-700";
@@ -40,8 +27,10 @@ const Step = ({ n, children }: { n: number; children: React.ReactNode }) => (
 );
 
 const IdleStep = ({
-  isListening, isNative, savedLatencyMs, estimateLatencyMs, onStart, onEnableMic, onUseEstimate,
+  inDialog, isListening, isNative, savedLatencyMs, estimateLatencyMs, onStart, onEnableMic, onUseEstimate,
 }: {
+  /** Radix's DialogDescription only works inside a Dialog — the setup wizard isn't one. */
+  inDialog: boolean;
   isListening: boolean;
   isNative: boolean;
   savedLatencyMs: number | null;
@@ -51,11 +40,23 @@ const IdleStep = ({
   onUseEstimate: () => void;
 }) => {
   const { t } = useTranslation("session");
+  const Description = inDialog ? DialogDescription : "p";
   return (
   <>
-    <DialogDescription className='mt-4 text-sm leading-relaxed text-zinc-400'>
+    {/* Play along with the click — the picture says it before the text does. */}
+    <div className='relative mx-auto mt-6 h-36 w-full'>
+      <Image
+        src='/images/setup/timing.webp'
+        alt=''
+        fill
+        sizes='160px'
+        className='select-none object-contain'
+        draggable={false}
+      />
+    </div>
+    <Description className='mt-6 text-sm leading-relaxed text-zinc-400'>
       {t("timing.intro")}
-    </DialogDescription>
+    </Description>
 
     <ol className='mt-6 space-y-3 text-sm text-zinc-300'>
       <Step n={1}>{t("timing.step1")}</Step>
@@ -74,12 +75,12 @@ const IdleStep = ({
       {savedLatencyMs !== null ? (
         <>
           <span className='font-semibold tabular-nums text-zinc-100'>{savedLatencyMs} ms</span>
-          <span className='text-zinc-400'> — {t(isNative ? "timing.measured_here_desktop" : "timing.measured_here")}</span>
+          <span className='text-zinc-400'> · {t(isNative ? "timing.measured_here_desktop" : "timing.measured_here")}</span>
         </>
       ) : (
         <>
           <span className='font-semibold tabular-nums text-zinc-100'>~{Math.round(estimateLatencyMs())} ms</span>
-          <span className='text-zinc-400'> — {t("timing.estimate")}</span>
+          <span className='text-zinc-400'> · {t("timing.estimate")}</span>
         </>
       )}
     </div>
@@ -232,23 +233,34 @@ const ResultStep = ({
   );
 };
 
+interface TimingCalibrationPanelProps {
+  audioRefs: AudioRefs;
+  /** The session metronome's context, so the clicks take the session's output path. */
+  audioContext: AudioContext | null;
+  isListening: boolean;
+  /** Desktop app native capture — its measurement is kept apart from the browser's. */
+  isNative: boolean;
+  /** The formula-based latency used while uncalibrated, shown for comparison. */
+  estimateLatencyMs: () => number;
+  onEnableMic: () => void;
+  /** Stops the session's own playback — its clicks would land on top of ours. */
+  onBeforeStart: () => void;
+  /** A measurement was kept. */
+  onSaved: (latencyMs: number) => void;
+  inDialog?: boolean;
+}
+
 /**
- * Measures how late the player's attacks reach us after a click, end to end,
- * so tab-note timing grades line up with what the player actually hears.
+ * The measurement itself — intro, click run, result — without a frame, so the
+ * timing dialog and the first-run setup wizard share it.
  */
-export const TimingCalibrationDialog = ({
-  audioRefs, audioContext, isListening, isNative, estimateLatencyMs, onEnableMic, onBeforeStart,
-}: TimingCalibrationDialogProps) => {
-  const { t } = useTranslation("session");
-  const { isTimingCalibrationOpen, closeTimingCalibration } = useSessionUI();
+export const TimingCalibrationPanel = ({
+  audioRefs, audioContext, isListening, isNative, estimateLatencyMs, onEnableMic, onBeforeStart, onSaved,
+  inDialog = false,
+}: TimingCalibrationPanelProps) => {
   const savedLatencyMs = useCalibratedLatencyMs(isNative);
   const setLatency = useTimingCalibration((s) => s.setLatency);
   const { state, start, reset } = useTimingCalibrationRun({ audioRefs, audioContext });
-
-  const close = () => {
-    reset();
-    closeTimingCalibration();
-  };
 
   const handleStart = () => {
     onBeforeStart();
@@ -257,11 +269,50 @@ export const TimingCalibrationDialog = ({
 
   const handleSave = (latencyMs: number) => {
     setLatency(timingInputPath(isNative), latencyMs);
-    close();
+    onSaved(latencyMs);
   };
 
   return (
-    <Dialog open={isTimingCalibrationOpen} onOpenChange={(open) => !open && close()}>
+    <>
+      {state.phase === "idle" && (
+        <IdleStep
+          inDialog={inDialog}
+          isListening={isListening}
+          isNative={isNative}
+          savedLatencyMs={savedLatencyMs}
+          estimateLatencyMs={estimateLatencyMs}
+          onStart={handleStart}
+          onEnableMic={onEnableMic}
+          onUseEstimate={() => setLatency(timingInputPath(isNative), null)}
+        />
+      )}
+
+      {state.phase === "running" && <RunningStep state={state} onCancel={reset} />}
+
+      {state.phase === "done" && (
+        <ResultStep
+          result={state.result}
+          savedLatencyMs={savedLatencyMs}
+          estimateLatencyMs={estimateLatencyMs}
+          onSave={handleSave}
+          onRetry={handleStart}
+        />
+      )}
+    </>
+  );
+};
+
+/**
+ * Measures how late the player's attacks reach us after a click, end to end,
+ * so tab-note timing grades line up with what the player actually hears.
+ * The panel unmounts with the dialog's content, which stops a run in progress.
+ */
+export const TimingCalibrationDialog = (props: Omit<TimingCalibrationPanelProps, "onSaved" | "inDialog">) => {
+  const { t } = useTranslation("session");
+  const { isTimingCalibrationOpen, closeTimingCalibration } = useSessionUI();
+
+  return (
+    <Dialog open={isTimingCalibrationOpen} onOpenChange={(open) => !open && closeTimingCalibration()}>
       {/* Above the session's full-screen layer (z-[999999] desktop, z-[9999999]
           mobile) — at the default z-50 it opens behind it, invisible. */}
       <DialogContent
@@ -272,30 +323,7 @@ export const TimingCalibrationDialog = ({
             <Timer className='h-4 w-4 text-zinc-400' />
             <DialogTitle className='text-base font-semibold text-zinc-100'>{t("timing.title")}</DialogTitle>
           </div>
-
-          {state.phase === "idle" && (
-            <IdleStep
-              isListening={isListening}
-              isNative={isNative}
-              savedLatencyMs={savedLatencyMs}
-              estimateLatencyMs={estimateLatencyMs}
-              onStart={handleStart}
-              onEnableMic={onEnableMic}
-              onUseEstimate={() => setLatency(timingInputPath(isNative), null)}
-            />
-          )}
-
-          {state.phase === "running" && <RunningStep state={state} onCancel={reset} />}
-
-          {state.phase === "done" && (
-            <ResultStep
-              result={state.result}
-              savedLatencyMs={savedLatencyMs}
-              estimateLatencyMs={estimateLatencyMs}
-              onSave={handleSave}
-              onRetry={handleStart}
-            />
-          )}
+          <TimingCalibrationPanel {...props} inDialog onSaved={closeTimingCalibration} />
         </div>
       </DialogContent>
     </Dialog>

@@ -1,5 +1,7 @@
 {
-  "skip_calibration": "Saltar calibración",
+  "skip_calibration": "Omitir configuración",
+  "close": "Cerrar",
+  "back": "Atrás",
   "setup": {
     "title_native": "Configuración de audio",
     "title_interface": "Configurar interfaz de audio",
@@ -7,34 +9,37 @@
     "connecting": "Conectando…",
     "start_listening": "Empezar a escuchar",
     "grant": "Permitir el micrófono",
-    "signal_level": "Nivel de señal",
-    "too_quiet": "Muy bajo: toca una cuerda",
-    "good_level": "Buen nivel ✓",
+    "signal_level": "Señal",
     "input_sensitivity": "Sensibilidad de entrada",
-    "play_notes": "Toca unas notas… {{seconds}} s",
-    "calibrated": "Calibrado ✓",
-    "auto_gain": "Calibrar ganancia automáticamente",
+    "play_notes": "Toca con normalidad… {{seconds}} s",
+    "auto_gain": "Ajustar la sensibilidad automáticamente",
     "tune_guitar": "Afinar guitarra",
     "headphones": "Usa auriculares con cable",
-    "headphones_body": "Sin auriculares, el micrófono capta la pista de acompañamiento de los altavoces y provoca detecciones falsas.",
     "quiet": "Busca un sitio tranquilo",
-    "quiet_body": "El ruido de fondo provoca detecciones falsas. Cierra las puertas y apaga la música.",
     "interface": "Interfaz",
-    "refresh": "Actualizar lista de dispositivos",
+    "refresh": "Actualizar",
     "no_inputs": "No se encontraron dispositivos de entrada",
-    "inputs": "{{count}} entradas",
-    "which_jack": "¿En qué entrada está conectada tu guitarra?",
-    "channel": "Canal {{n}}",
-    "native_hint": "Captura nativa de baja latencia: evita por completo el navegador. Conecta la guitarra directamente a la interfaz de arriba.",
-    "output_auto": "Salida: {{label}} (auto)",
-    "matched": "emparejada",
-    "change": "Cambiar",
+    "channel": "Entrada {{n}}",
     "output": "Salida",
     "no_outputs": "No se encontraron dispositivos de salida",
-    "output_hint": "Debería coincidir con la interfaz de arriba para que el audio y la captura usen el mismo dispositivo.",
     "output_hint_asio4all": "ASIO4ALL bloquea toda tu interfaz, salidas incluidas, así que el metrónomo no puede sonar por ella. Elige aquí otra salida (p. ej. los altavoces del ordenador) o, en el panel de ASIO4ALL, desactiva la salida de la interfaz y deja solo la entrada.",
-    "before_start": "Antes de empezar",
-    "before_start_body": "Asegúrate de que tu interfaz está seleccionada como entrada de micrófono del navegador y de que la guitarra está conectada. Ajustarás la ganancia en la siguiente pantalla."
+    "before_start_body": "Elige tu interfaz como micrófono del navegador (icono del micrófono en la barra de direcciones).",
+    "level": {
+      "silent": "Sin señal. Toca algo",
+      "good": "Se oye tu guitarra",
+      "clipping": "Saturación. Baja la entrada en la interfaz"
+    },
+    "auto": {
+      "no_signal": "No hemos oído nada, así que la sensibilidad no ha cambiado. Pulsa otra vez y sigue tocando durante toda la medición, como en un ejercicio.",
+      "ok": "Sensibilidad ajustada a {{gain}}×.",
+      "clipping": "Sensibilidad ajustada a {{gain}}×, pero la señal satura antes de llegar a la app. Baja la ganancia de la interfaz (o aleja la guitarra del micrófono) y vuelve a medir.",
+      "at_max": "Incluso al máximo ({{gain}}×) la guitarra suena baja. Sube la ganancia de la interfaz o acerca el micrófono.",
+      "noisy": "Sensibilidad ajustada a {{gain}}×, pero la guitarra apenas destaca sobre el ruido de fondo. La sensibilidad no puede arreglarlo. Busca un sitio más silencioso o acerca el micrófono a la guitarra."
+    },
+    "guitar_input": "Entrada de la guitarra",
+    "next": "Siguiente",
+    "waiting_signal": "Toca algo para continuar",
+    "ready": "Se oye tu guitarra. Puedes continuar."
   },
   "output_stall": {
     "title": "El metrónomo no puede sonar",
@@ -43,23 +48,41 @@
     "asio4all": "¿Usas ASIO4ALL? En su panel deja activada solo la entrada de tu interfaz y comprueba que no haya otra tarjeta de sonido marcada.",
     "close": "Cerrar"
   },
+  "sustain": {
+    "title": "Prueba de sustain",
+    "play": "Toca {{note}} en la cuerda {{string}}, traste {{fret}}, y déjala sonar.",
+    "waiting": "Esperando {{note}}…",
+    "wrong": "Esa es otra nota. Toca {{note}}",
+    "holding": "Mantenla…",
+    "clipping_live": "Saturación. La entrada está demasiado alta",
+    "pass": "La app oye la nota hasta el final: las notas de la tablatura se rellenarán por completo.",
+    "gain": "La nota se cortó a los {{seconds}} s. Sube la sensibilidad abajo y vuelve a tocarla.",
+    "quiet": "La nota se apagó a los {{seconds}} s: la señal es demasiado débil. Sube la ganancia de la interfaz (o acerca el micrófono) y vuelve a tocarla.",
+    "pitch": "El sonido se desvió de {{note}} a los {{seconds}} s. Afina o toca más limpio y vuelve a intentarlo.",
+    "clipping": "La señal satura antes de llegar a la app. Baja la ganancia de la interfaz (o toca más suave) y vuelve a tocarla.",
+    "too_hot": "La sensibilidad es demasiado alta: la nota llega al máximo y el ruido de fondo empezará a pasar por notas. Baja la sensibilidad abajo (o ajústala automáticamente) y vuelve a tocar.",
+    "again": "Tocar otra vez",
+    "next": "Siguiente"
+  },
   "tuning": {
-    "wrong_string": "¿Cuerda equivocada?",
     "play_open": "Toca la cuerda {{string}} al aire",
-    "in_tune": "Afinada: mantén la nota…",
+    "in_tune": "Justo. Mantenla…",
     "sharp": "alta ↓ baja la afinación",
     "flat": "baja ↑ sube la afinación",
     "title": "Afina tu guitarra",
     "flat_label": "Bajo",
     "sharp_label": "Alto",
-    "next_string": "Siguiente cuerda",
-    "finish": "Terminar calibración",
     "skip_string": "Saltar cuerda",
-    "redo": "Repetir esta cuerda",
-    "already_tuned": "Mi guitarra ya está afinada"
+    "already_tuned": "Mi guitarra ya está afinada",
+    "string_of": "Cuerda {{current}} de {{total}}",
+    "thickest": "la más gruesa",
+    "thinnest": "la más fina",
+    "waiting": "Esperando una nota…",
+    "sounds_like": "Suena a la cuerda {{string}}",
+    "tuned": "Afinada ✓"
   },
   "source": {
-    "title": "Calibración de la guitarra",
+    "title": "Conecta tu guitarra",
     "question": "¿Cómo está conectada tu guitarra al ordenador?",
     "interface": "Interfaz de audio",
     "interface_desc": "Interfaz de audio USB o Thunderbolt",
@@ -72,11 +95,16 @@
   },
   "summary": {
     "title": "Listo",
-    "ready": "¡Todo preparado!",
-    "body": "La calibración ha terminado. Si la detección sigue algo desajustada, vuelve a afinar la guitarra o ajusta la sensibilidad de entrada.",
-    "good_luck": "¡Suerte!",
-    "save": "Guardar y cerrar",
-    "discard": "Descartar"
+    "ready": "Tu micrófono está activado",
+    "body": "La app oye tu guitarra y puntuará cómo tocas.",
+    "tuning": "Afinación",
+    "tuning_count": "{{tuned}} de {{total}} cuerdas",
+    "tuning_skipped": "omitida",
+    "latency": "Retardo del sonido",
+    "latency_measured": "{{ms}} ms · medido",
+    "latency_estimate": "~{{ms}} ms · estimado",
+    "latency_later": "Mídelo cuando quieras con el botón «Calibrar el tempo» encima de la tablatura, para que la puntuación del ritmo coincida con lo que oyes.",
+    "start": "A tocar"
   },
   "permission": {
     "title": "Acceso al micrófono",
@@ -106,5 +134,8 @@
     "body": "Este plan incluye ejercicios con tablatura. Activa el micrófono para que el sistema escuche tu guitarra y puntúe cómo tocas en tiempo real.",
     "enable": "Activar micrófono",
     "skip": "Saltar"
+  },
+  "timing_step": {
+    "skip": "Omitir, de momento basta con la estimación"
   }
 }

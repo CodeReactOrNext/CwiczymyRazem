@@ -1,17 +1,7 @@
 import { useCallback,useState } from "react";
 
-export interface CalibrationOffsets {
-  [stringNumber: number]: number; // cents: + = sharp, − = flat
-}
-
-export interface CalibrationData {
-  offsets: CalibrationOffsets;
-  timestamp: number;
-}
-
 type SessionPhase = "mic_prompt" | "calibration_choice" | "calibrating" | "ready";
 
-const STORAGE_KEY = "guitar_calibration_data";
 const MIC_PREFERENCE_KEY = "mic_tracking_enabled";
 
 function loadMicPreference(): boolean | null {
@@ -30,14 +20,6 @@ function saveMicPreference(enabled: boolean): void {
   } catch { }
 }
 
-function loadCalibrationFromStorage(): CalibrationData | null {
-  return null;
-}
-
-function saveCalibrationToStorage(data: CalibrationData): void {
-  // Disabled
-}
-
 /**
  * @param micRequired exams, goal runs and duels only count mic-scored runs —
  *   closing the setup wizard there must not leave the session running with
@@ -53,9 +35,8 @@ export function useCalibration(planHasTablature: boolean, micRequired = false) {
     const pref = loadMicPreference();
     return pref ?? false;
   });
-  const [calibrationData, setCalibrationData] = useState<CalibrationData | null>(null);
-
-  const existingStoredData = null;
+  // Nothing from the setup wizard is stored any more (its tuning step is a
+  // plain tuner), so there is never an earlier setup to offer reusing.
   const existingCalibrationTimestamp = 0;
 
   // The preference is only saved once the wizard finishes: saving it here left
@@ -72,20 +53,16 @@ export function useCalibration(planHasTablature: boolean, micRequired = false) {
   }, []);
 
   const handleReuseCalibration = useCallback(() => {
-    if (existingStoredData) {
-      setCalibrationData(existingStoredData);
-    }
     saveMicPreference(true);
     setIsMicEnabled(true);
     setSessionPhase("ready");
-  }, [existingStoredData]);
+  }, []);
 
   const handleRecalibrate = useCallback(() => {
     setSessionPhase("calibrating");
   }, []);
 
-  const handleCalibrationComplete = useCallback((data: CalibrationData) => {
-    // We no longer save offset data
+  const handleCalibrationComplete = useCallback(() => {
     saveMicPreference(true);
     setIsMicEnabled(true);
     setSessionPhase("ready");
@@ -106,7 +83,6 @@ export function useCalibration(planHasTablature: boolean, micRequired = false) {
   return {
     sessionPhase,
     isMicEnabled,
-    calibrationData,
     handleEnableMic,
     handleSkipMic,
     handleReuseCalibration,

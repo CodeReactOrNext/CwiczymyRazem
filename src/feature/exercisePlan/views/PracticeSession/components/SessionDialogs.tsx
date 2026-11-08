@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useTranslation } from "hooks/useTranslation";
 import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -33,16 +34,19 @@ interface SessionDialogsProps {
   handleReuseCalibration: () => void;
   handleRecalibrate: () => void;
   handleCalibrationCancel: () => void;
-  handleCalibrationComplete: (data: any) => void;
+  handleCalibrationComplete: () => void;
   audioInit: () => Promise<void>;
-  audioClose: () => void;
-  audioRefs: any;
+  audioRefs: AudioRefs;
   isListening: boolean;
   inputGain: number;
   setInputGain: (v: number) => void;
   isNative: boolean;
   onSelectDevice?: (deviceId: number) => Promise<void>;
   onSelectChannel?: (channel: number) => Promise<void>;
+  /** The session metronome's context — the wizard's timing step clicks on it. */
+  timingAudioContext: AudioContext | null;
+  estimateLatencyMs: () => number;
+  onBeforeTimingRun: () => void;
 
   // Leaderboard
   exerciseId: string;
@@ -72,7 +76,6 @@ export const SessionDialogs = ({
   handleCalibrationCancel,
   handleCalibrationComplete,
   audioInit,
-  audioClose,
   audioRefs,
   isListening,
   inputGain,
@@ -80,6 +83,9 @@ export const SessionDialogs = ({
   isNative,
   onSelectDevice,
   onSelectChannel,
+  timingAudioContext,
+  estimateLatencyMs,
+  onBeforeTimingRun,
   exerciseId,
   isMounted,
   hasReportResult,
@@ -146,7 +152,6 @@ export const SessionDialogs = ({
         onComplete={handleCalibrationComplete}
         onCancel={handleCalibrationCancel}
         audioInit={audioInit}
-        audioClose={audioClose}
         audioRefs={audioRefs}
         isListening={isListening}
         inputGain={inputGain}
@@ -154,6 +159,9 @@ export const SessionDialogs = ({
         isNative={isNative}
         onSelectDevice={onSelectDevice}
         onSelectChannel={onSelectChannel}
+        timingAudioContext={timingAudioContext}
+        estimateLatencyMs={estimateLatencyMs}
+        onBeforeTimingRun={onBeforeTimingRun}
       />
 
       <EarTrainingLeaderboardDialog
