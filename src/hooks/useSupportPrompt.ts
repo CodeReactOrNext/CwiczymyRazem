@@ -1,3 +1,5 @@
+import type { SupportModalVariant } from "feature/support/components/SupportModal";
+import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import {
   selectCurrentUserStats,
   selectUserAuth,
@@ -17,6 +19,10 @@ const MIN_SESSIONS = 5;
 // user just because a month went by.
 const MIN_DAYS_SINCE_SHOWN = 1;
 const MIN_SESSIONS_SINCE_SHOWN = 1;
+
+// Supporters get a thank-you instead of the ask. Saying thanks every day is
+// noise, so it comes back at most once a month.
+const MIN_DAYS_SINCE_SHOWN_SUPPORTER = 30;
 
 // Extra cooldown in days after each explicit dismissal (index = dismissCount - 1).
 // Never fully suppressed — repeat-dismissers land on the last value (40) forever.
@@ -59,9 +65,15 @@ export const useSupportPrompt = () => {
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
   const userStats = useAppSelector(selectCurrentUserStats);
+  const { isSupport, isLoading: isRosterLoading } = useSupportTeam();
+  const isSupporter = isSupport(userAuth);
+  const variant: SupportModalVariant = isSupporter ? "thanks" : "ask";
 
   useEffect(() => {
     if (!userAuth || !userInfo || !userStats) return;
+    // Until the roster lands everyone reads as a non-supporter; waiting keeps
+    // a supporter from being asked for money they already gave.
+    if (isRosterLoading) return;
 
     const ls = getLsState();
 
@@ -83,8 +95,11 @@ export const useSupportPrompt = () => {
       );
       const daysSinceShown = (Date.now() - lastShownMs) / 86_400_000;
       const sessionsSinceShown = userStats.sessionCount - lastShownSessionCount;
+      const minDaysSinceShown = isSupporter
+        ? MIN_DAYS_SINCE_SHOWN_SUPPORTER
+        : MIN_DAYS_SINCE_SHOWN;
       if (
-        daysSinceShown < MIN_DAYS_SINCE_SHOWN ||
+        daysSinceShown < minDaysSinceShown ||
         sessionsSinceShown < MIN_SESSIONS_SINCE_SHOWN
       ) {
         return;
@@ -124,7 +139,7 @@ export const useSupportPrompt = () => {
       });
     }, 3000);
     return () => clearTimeout(timer);
-  }, [userAuth, userInfo, userStats]);
+  }, [userAuth, userInfo, userStats, isRosterLoading, isSupporter]);
 
   const markAsDismissed = async () => {
     if (!userAuth) return;
@@ -146,5 +161,5 @@ export const useSupportPrompt = () => {
     setShow(false);
   };
 
-  return { show, markAsDismissed, markAsDonate };
+  return { show, variant, markAsDismissed, markAsDonate };
 };

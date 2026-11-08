@@ -205,7 +205,14 @@
   "modal": {
     "why": "Dlaczego wspierać Riff Quest?",
     "body": "Riff Quest to projekt jednej osoby, darmowy i budowany otwarcie. Twoje wsparcie najpierw pokrywa domenę, hosting i bazę danych. Wszystko ponad to finansuje roadmapę: nowe ćwiczenia, sprzęt i funkcje, odblokowywane próg po progu, w miarę jak społeczność je finansuje.",
-    "later": "Może później"
+    "later": "Może później",
+    "thanks": {
+      "title": "Dzięki, {{name}}",
+      "title_no_name": "Dzięki, że wspierasz Riff Quest",
+      "body": "Jesteś jedną z osób, dzięki którym Riff Quest zostaje darmowy dla wszystkich. Twoje wsparcie opłaca serwery i zamienia pomysły z roadmapy w funkcje, z których korzysta każdy gracz. To dla mnie naprawdę dużo znaczy, dziękuję.",
+      "tokens_hint": "Wydasz je na pomysły z planu rozwoju, sprzęt i następną skrzynkę wspierających.",
+      "close": "Wracam do ćwiczeń"
+    }
   },
   "badge": {
     "label": "Wspierający",

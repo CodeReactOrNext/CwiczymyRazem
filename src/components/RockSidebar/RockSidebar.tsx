@@ -325,6 +325,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   } = useFeedbackPrompt();
   const {
     show: showSupportPrompt,
+    variant: supportPromptVariant,
     markAsDismissed: markSupportAsDismissed,
     markAsDonate: markSupportAsDonate,
   } = useSupportPrompt();
@@ -834,6 +835,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
 
       <SupportModal
         isOpen={showSupportPrompt && !emailConsentPrompt.blocksOtherPrompts}
+        variant={supportPromptVariant}
         onClose={markSupportAsDismissed}
         onDonate={markSupportAsDonate}
       />

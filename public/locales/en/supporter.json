@@ -205,7 +205,14 @@
   "modal": {
     "why": "Why support Riff Quest?",
     "body": "Riff Quest is a one person project, free and built in the open. Your support covers the domain, hosting, and database first. Everything raised on top of that funds the roadmap: new exercises, gear, and features, unlocked tier by tier as the community funds them.",
-    "later": "Maybe later"
+    "later": "Maybe later",
+    "thanks": {
+      "title": "Thank you, {{name}}",
+      "title_no_name": "Thank you for backing Riff Quest",
+      "body": "You are one of the people keeping Riff Quest free for everyone. Your support pays the hosting bill and turns roadmap ideas into features every player gets to use. It genuinely means a lot to me, thank you.",
+      "tokens_hint": "Spend them on roadmap ideas, gear and the next supporter case.",
+      "close": "Back to practice"
+    }
   },
   "panel": {
     "title": "Supporter panel",

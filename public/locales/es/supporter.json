@@ -205,7 +205,14 @@
   "modal": {
     "why": "¿Por qué apoyar Riff Quest?",
     "body": "Riff Quest es un proyecto de una sola persona, gratis y construido en abierto. Tu apoyo cubre primero el dominio, el alojamiento y la base de datos. Todo lo que se recauda por encima financia la hoja de ruta: nuevos ejercicios, equipo y funciones, desbloqueados nivel a nivel a medida que la comunidad los financia.",
-    "later": "Quizá más tarde"
+    "later": "Quizá más tarde",
+    "thanks": {
+      "title": "Gracias, {{name}}",
+      "title_no_name": "Gracias por apoyar Riff Quest",
+      "body": "Eres una de las personas que mantienen Riff Quest gratis para todos. Tu apoyo paga los servidores y convierte las ideas de la hoja de ruta en funciones que puede usar cualquier jugador. De verdad significa mucho para mí, gracias.",
+      "tokens_hint": "Gástalos en ideas para la hoja de ruta, equipo y la próxima caja de supporters.",
+      "close": "Volver a practicar"
+    }
   },
   "badge": {
     "label": "Supporter",
