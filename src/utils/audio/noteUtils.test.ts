@@ -6,10 +6,13 @@ import {
   getAdaptiveVolumeGate,
   getDetectionGates,
   getExpectationBiasedTolerance,
+  getSustainVolumeGate,
   HIGH_STRING_MIN_FREQ,
   NOISE_GATE_ABSOLUTE_CEIL,
   NOISE_GATE_ABSOLUTE_FLOOR,
   NOISE_GATE_MULTIPLIER,
+  SUSTAIN_GATE_ABSOLUTE_FLOOR,
+  SUSTAIN_GATE_MULTIPLIER,
 } from "./noteUtils";
 
 const BASE_VOLUME_GATE = 0.005;
@@ -83,6 +86,28 @@ describe("getAdaptiveVolumeGate", () => {
   it("never goes above the absolute ceiling for a very noisy room", () => {
     expect(getAdaptiveVolumeGate(1)).toBe(NOISE_GATE_ABSOLUTE_CEIL);
     expect(getAdaptiveVolumeGate(0.1)).toBe(NOISE_GATE_ABSOLUTE_CEIL);
+  });
+});
+
+describe("getSustainVolumeGate", () => {
+  it("falls back to the fixed gate until the noise floor is measured", () => {
+    expect(getSustainVolumeGate(0, BASE_VOLUME_GATE)).toBe(BASE_VOLUME_GATE);
+  });
+
+  it("sits nearer a quiet floor than the attack gate's absolute floor allows", () => {
+    // A clean interface turned down: floor 0.0004 → attack gate 0.002, sustain 0.0008.
+    expect(getSustainVolumeGate(0.0004, BASE_VOLUME_GATE)).toBeCloseTo(0.0004 * SUSTAIN_GATE_MULTIPLIER);
+    expect(getSustainVolumeGate(0.0004, BASE_VOLUME_GATE)).toBeLessThan(getAdaptiveVolumeGate(0.0004));
+  });
+
+  it("keeps its own absolute floor", () => {
+    expect(getSustainVolumeGate(0.00001, BASE_VOLUME_GATE)).toBe(SUSTAIN_GATE_ABSOLUTE_FLOOR);
+  });
+
+  it("is never stricter than the attack gate", () => {
+    for (const floor of [0.0001, 0.001, 0.003, 0.01, 0.1]) {
+      expect(getSustainVolumeGate(floor, BASE_VOLUME_GATE)).toBeLessThanOrEqual(getAdaptiveVolumeGate(floor));
+    }
   });
 });
 

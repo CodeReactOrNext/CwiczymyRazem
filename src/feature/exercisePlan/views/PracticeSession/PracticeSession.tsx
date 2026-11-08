@@ -703,7 +703,7 @@ const PracticeSessionInner = ({
 
   // ── Calibration + mic ─────────────────────────────────────────────────────
 
-  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, inputGain, setInputGain, isNative, selectDevice, selectChannel } = useGuitarAudioInput({ bass: isBass });
+  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, getAttackLatencyMs, inputGain, setInputGain, isNative, selectDevice, selectChannel } = useGuitarAudioInput({ bass: isBass });
   // The player's measured latency for the input path in use — the browser and the
   // desktop app keep separate measurements (different capture chains).
   const calibratedLatencyMs = timingByPath[timingInputPath(isNative)].latencyMs;
@@ -1262,7 +1262,7 @@ const PracticeSessionInner = ({
       effectiveBpm={effectiveBpm} rawBpm={metronome.bpm}
       activeTablature={isEarTrainingRiddle ? undefined : activeTablature}
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
-      speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} calibratedLatencyMs={calibratedLatencyMs} audioRefs={audioRefs}
+      speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} getAttackLatencyMs={getAttackLatencyMs} calibratedLatencyMs={calibratedLatencyMs} audioRefs={audioRefs}
       scoringFocus={currentExercise.scoringFocus}
       getAdjustedTargetFreq={getAdjustedTargetFreq} tuningOffsets={guitarTuning.tuning.offsets}
       activeStrumPattern={activeStrumPattern}

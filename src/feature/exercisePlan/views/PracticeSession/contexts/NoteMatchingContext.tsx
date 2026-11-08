@@ -220,6 +220,8 @@ interface NoteMatchingProviderProps {
   currentExerciseIndex: number;
   speedMultiplier: number;
   getLatencyMs: () => number;
+  /** getLatencyMs() without the analysis window, for attack times — tab note matching only. */
+  getAttackLatencyMs: () => number;
   /** Measured latency from the timing calibration — tab note matching only. */
   calibratedLatencyMs?: number | null;
   /** What the score rewards beyond hitting the notes — tab exercises only. */
@@ -288,6 +290,7 @@ export function NoteMatchingProvider({
   currentExerciseIndex,
   speedMultiplier,
   getLatencyMs,
+  getAttackLatencyMs,
   calibratedLatencyMs,
   scoringFocus = "timing",
   audioRefs,
@@ -350,6 +353,7 @@ export function NoteMatchingProvider({
     currentExerciseIndex,
     speedMultiplier,
     getLatencyMs,
+    getAttackLatencyMs,
     audioRefs,
     getAdjustedTargetFreq,
     tuningOffsets,
@@ -388,6 +392,8 @@ export function NoteMatchingProvider({
     isMicEnabled,
     audioRefs,
     getLatencyMs,
+    getAttackLatencyMs,
+    calibratedLatencyMs,
     currentExerciseIndex,
   });
 

@@ -233,3 +233,27 @@ export function getAdaptiveVolumeGate(noiseFloor: number): number {
   const scaled = noiseFloor * NOISE_GATE_MULTIPLIER;
   return Math.min(NOISE_GATE_ABSOLUTE_CEIL, Math.max(NOISE_GATE_ABSOLUTE_FLOOR, scaled));
 }
+
+// ── Sustain gate ──────────────────────────────────────────────────────────────
+// A note already hit only has to keep ringing, and its pitch has to keep
+// reading right on top of that — noise can't pass the pitch check, so the level
+// bar can sit much nearer the floor than the one that decides "was this played".
+// The adaptive gate's absolute floor (0.002, raw) cut a quiet interface's
+// decaying notes off while still 5× above its noise: 24 of 78 two-second notes
+// on a real DI 30 dB down (guitarBufferProcessor.realdi.test.ts). The level is
+// raw, so the app's input gain never helps here.
+
+/** Multiples of the measured noise floor a held note must stay above (~6 dB). */
+export const SUSTAIN_GATE_MULTIPLIER = 2;
+/** Absolute lower bound for the sustain gate. */
+export const SUSTAIN_GATE_ABSOLUTE_FLOOR = 0.0005;
+
+/**
+ * Volume gate for a note that was already hit and only has to keep ringing.
+ * Until the noise floor is measured (0) it is `fallback` — the same fixed gate
+ * the attack uses. Pass the result as `getDetectionGates`'s `baseVolumeGate`.
+ */
+export function getSustainVolumeGate(noiseFloor: number, fallback: number): number {
+  if (noiseFloor <= 0) return fallback;
+  return Math.min(getAdaptiveVolumeGate(noiseFloor), Math.max(SUSTAIN_GATE_ABSOLUTE_FLOOR, noiseFloor * SUSTAIN_GATE_MULTIPLIER));
+}

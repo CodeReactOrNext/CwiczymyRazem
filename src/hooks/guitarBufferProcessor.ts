@@ -140,6 +140,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   // Reused across calls — windows have a fixed size, so allocating per call
   // (~23×/s) only produced GC churn on the main thread.
   let normalizedBuf: Float32Array | null = null;
+  let onsetBuf: Float32Array | null = null;
 
   const HOP = 512;
 
@@ -369,6 +370,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     const gain = getGain();
     bassActive = !!pitchBassDetector && !!isBass?.();
     if (!normalizedBuf || normalizedBuf.length !== len) normalizedBuf = new Float32Array(len);
+    if (!onsetBuf || onsetBuf.length !== len) onsetBuf = new Float32Array(len);
     // Ungained, like the web path's analyser, which taps the source directly.
     // Before the silence gate, so a chord read after a pause isn't stale audio.
     spectrum?.push(inputBuffer);
@@ -382,6 +384,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     let peak = 0;
     for (let i = 0; i < len; i++) {
       const s = inputBuffer[i] * gain;
+      onsetBuf[i] = s;
       sum += s * s;
       const abs = Math.abs(s);
       if (abs > peak) peak = abs;
@@ -406,6 +409,16 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     // see the fresh transient and fire normally.
     if (rms <= VOLUME_THRESHOLD) {
       if (++silentWindows >= 2) {
+        // The onset detectors still hear the silence (their verdicts ignored):
+        // they judge an attack against the frames before it, and skipping these
+        // left them comparing a note that starts out of silence with the tail of
+        // the last one — no jump, no onset. A clean DI goes silent between notes
+        // and lost half its attacks that way (guitarBufferProcessor.realdi.test.ts).
+        for (let offset = 0; offset < len; offset += HOP) {
+          const chunk = onsetBuf.subarray(offset, offset + HOP);
+          onsetDetector.do(chunk);
+          tickDetector.do(chunk);
+        }
         // Signal stopped — whatever attack was still resolving is over.
         commitPending();
         lastFrequencies = [];
@@ -447,8 +460,12 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     let hopIndex = 0;
     for (let offset = 0; offset < len; offset += HOP, hopIndex++) {
       const chunk = normalizedBuf.subarray(offset, offset + HOP);
+      // Onsets are a jump in level, so their detectors get the gained signal
+      // as it is — normalising each window to the same peak flattened exactly
+      // that jump (a quiet tail and the attack after it both read full scale).
+      const onsetChunk = onsetBuf.subarray(offset, offset + HOP);
 
-      if (onsetDetector.do(chunk)) {
+      if (onsetDetector.do(onsetChunk)) {
         isOnset = true;
         // nowMs stamps the END of the block; walk back to this hop, then
         // back again by the detector's own one-window reporting lag.
@@ -465,7 +482,7 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
           };
         }
       }
-      if (tickDetector.do(chunk)) isTick = true;
+      if (tickDetector.do(onsetChunk)) isTick = true;
 
       // Both run on every hop — each keeps its own sliding window of the signal.
       const guitarFreq = refineLow(pitchDetector.do(chunk), pitchLowDetector ? pitchLowDetector.do(chunk) : 0);

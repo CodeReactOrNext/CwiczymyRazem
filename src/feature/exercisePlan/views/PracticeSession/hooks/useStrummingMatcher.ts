@@ -24,6 +24,10 @@ interface UseStrummingMatcherOptions {
   isMicEnabled: boolean;
   audioRefs: AudioRefs;
   getLatencyMs: () => number;
+  /** getLatencyMs() without the analysis window — the lag lastAttackMsRef still carries. */
+  getAttackLatencyMs?: () => number;
+  /** The player's measured latency (timing calibration), already on attack times. */
+  calibratedLatencyMs?: number | null;
   currentExerciseIndex: number;
 }
 
@@ -37,6 +41,8 @@ export function useStrummingMatcher({
   isMicEnabled,
   audioRefs,
   getLatencyMs,
+  getAttackLatencyMs,
+  calibratedLatencyMs,
   currentExerciseIndex,
 }: UseStrummingMatcherOptions) {
   // ── Refs (all mutation happens here, never triggers re-render) ──────────────
@@ -87,7 +93,6 @@ export function useStrummingMatcher({
       const elapsedMs  = now - startTime;
       if (elapsedMs < 0) { rafIdRef.current = requestAnimationFrame(tick); return; }
 
-      const latency         = getLatencyMs();
       const slotDurationMs  = (60000 / bpm) / pattern.subdivisions;
       const toleranceMs     = slotDurationMs * 0.37;
       const totalSlotsNow   = Math.floor(elapsedMs / slotDurationMs);
@@ -134,8 +139,17 @@ export function useStrummingMatcher({
       }
 
       // ── Onset detection ────────────────────────────────────────────────
-      const lastOnset = audioRefs.lastOnsetTimeRef.current;
+      // The attack's own time (dated back to the hop it landed in, less the
+      // analysis window), with the latency that time still carries — measured
+      // when calibrated. lastOnsetTimeRef only stamps the end of the block, up
+      // to a block late, and is the fallback where no attack time exists.
+      const attackMs = audioRefs.lastAttackMsRef?.current ?? 0;
+      const useAttack = attackMs > 0;
+      const lastOnset = useAttack ? attackMs : audioRefs.lastOnsetTimeRef.current;
       if (lastOnset > 0 && lastOnset !== lastProcessedOnsetRef.current) {
+        const latency = useAttack
+          ? calibratedLatencyMs ?? (getAttackLatencyMs ?? getLatencyMs)()
+          : getLatencyMs();
         const compensated = lastOnset - latency;
         const onsetElapsed = compensated - startTime;
         if (onsetElapsed > 0) {
@@ -194,7 +208,7 @@ export function useStrummingMatcher({
     rafIdRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafIdRef.current);
    
-  }, [isPlaying, startTime, bpm, pattern, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs]);
+  }, [isPlaying, startTime, bpm, pattern, isMicEnabled, currentExerciseIndex, getLatencyMs, getAttackLatencyMs, calibratedLatencyMs, audioRefs]);
 
   return { slotFeedback, gameState, sessionAccuracy, sessionStats, resetGame };
 }

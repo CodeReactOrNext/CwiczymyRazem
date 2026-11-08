@@ -422,6 +422,13 @@ export const useNativeAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions
     return captureMs + windowMs + ipcMs;
   }, []);
 
+  /** getLatencyMs() for an attack time — without the window, which the
+   *  processor already takes off every onset (see useAudioAnalyzer). */
+  const getAttackLatencyMs = useCallback(() => {
+    const sr = streamInfoRef.current?.sampleRate || 48000;
+    return getLatencyMs() - (WINDOW_SIZE / sr) * 1000;
+  }, [getLatencyMs]);
+
   const readSpectrum = useCallback(() => spectrumRef.current?.read() ?? null, []);
   const readRecentAudio = useCallback(() => recentAudioRef.current?.read() ?? null, []);
 
@@ -436,8 +443,9 @@ export const useNativeAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions
     close,
     audioRefs,
     getLatencyMs,
+    getAttackLatencyMs,
     setInputGain,
     selectDevice,
     selectChannel,
-  }), [state, init, close, audioRefs, getLatencyMs, setInputGain, selectDevice, selectChannel]);
+  }), [state, init, close, audioRefs, getLatencyMs, getAttackLatencyMs, setInputGain, selectDevice, selectChannel]);
 };

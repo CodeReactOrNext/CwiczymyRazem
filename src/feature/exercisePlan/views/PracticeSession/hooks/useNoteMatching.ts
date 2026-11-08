@@ -2,7 +2,7 @@ import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { Spectrum } from "utils/audio/chordTones";
 import { CHORD_TONE_HIT, CHORD_TONE_SUSTAIN, createChordToneEvidence, isChordToneSounding, spectrumPeak } from "utils/audio/chordTones";
-import { correctOctaveForLowStrings, getAdaptiveVolumeGate, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, midiToFrequency } from "utils/audio/noteUtils";
+import { correctOctaveForLowStrings, getAdaptiveVolumeGate, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, getSustainVolumeGate, midiToFrequency } from "utils/audio/noteUtils";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import type { FillFeed, FillStep } from "../utils/fillFeed";
@@ -46,6 +46,10 @@ interface UseNoteMatchingOptions {
   currentExerciseIndex: number;
   speedMultiplier: number;
   getLatencyMs: () => number;
+  /** getLatencyMs() without the analysis window — the lag an attack time
+   *  (onsetMs, lastAttackMsRef) still carries, since the processor dates onsets
+   *  back by the window. Optional: without it attacks are timed against getLatencyMs(). */
+  getAttackLatencyMs?: () => number;
   audioRefs: AudioRefs;
   getAdjustedTargetFreq: (string: number, baseFreq: number) => number;
   /** Per-string semitone offset from standard tuning (index 0 = string 1 … index 5 = string 6).
@@ -106,7 +110,7 @@ interface PendingIntonation {
 export function useNoteMatching({
   isPlaying, startTime, audioContext, audioStartTime, alphaTabSource = null,
   effectiveBpm, rawBpm, activeTablature, isMicEnabled, currentExerciseIndex,
-  speedMultiplier, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, onReset, calibratedLatencyMs,
+  speedMultiplier, getLatencyMs, getAttackLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, onReset, calibratedLatencyMs,
   scoringFocus = "timing", onNoteJudged, streamFills = false,
 }: UseNoteMatchingOptions) {
   // Read by the matching loop, which must not restart when the listener changes.
@@ -353,6 +357,7 @@ export function useNoteMatching({
       const volumeGateBase = audioRefs.noiseFloorRef.current > 0
         ? getAdaptiveVolumeGate(audioRefs.noiseFloorRef.current)
         : VOLUME_GATE;
+      const sustainGateBase = getSustainVolumeGate(audioRefs.noiseFloorRef.current, VOLUME_GATE);
 
       // Lazy spectrum — read at most once per tick, only for chord beats, with
       // its loudest peak (what every chord tone's level is held against).
@@ -375,6 +380,13 @@ export function useNoteMatching({
       // Position on the clock the user hears (audio context), tempo-map-aware,
       // shifted back by the input latency so windows line up with the played note.
       const latencySec = (calibratedLatencyMs ?? getLatencyMs()) / 1000;
+      // Attack times are dated back by the analysis window already, so they're
+      // due that much sooner than the clock above (which carries the window for
+      // the pitch readings). A calibrated latency was measured on attack times
+      // to begin with — nothing to take off.
+      const attackEarlierMs = calibratedLatencyMs == null && getAttackLatencyMs
+        ? Math.max(0, getLatencyMs() - getAttackLatencyMs())
+        : 0;
       const toBeats = (elapsedSec: number) => beatClock ? beatClock.toBeats(elapsedSec) : elapsedSec * beatsPerSec;
       const passClock = alphaTabSource && audioContext ? alphaTabPassClockRef.current : null;
       let loopedBeatsElapsed: number;
@@ -465,10 +477,10 @@ export function useNoteMatching({
             if (targetFreq <= 0) continue;
             expected.push({
               key: noteKey,
-              // Expected attack time in the events' own timestamp domain: both
-              // sides are latency-compensated by getLatencyMs() via
-              // loopedBeatsElapsed, so they line up without a second correction.
-              timeMs: now + (beatStart - loopedBeatsElapsed) * msPerBeat,
+              // Expected attack time in the events' own timestamp domain:
+              // loopedBeatsElapsed carries the latency, less the window the
+              // events were already dated back by (attackEarlierMs).
+              timeMs: now + (beatStart - loopedBeatsElapsed) * msPerBeat - attackEarlierMs,
               targetFreq,
               toleranceCents: baseToleranceFor(targetFreq),
               volumeGate: getDetectionGates(targetFreq, volumeGateBase).volumeGate,
@@ -588,7 +600,9 @@ export function useNoteMatching({
             if (typeof existingHit === "number"
                 && loopedBeatsElapsed > existingHit
                 && loopedBeatsElapsed <= beatEnd
-                && currentVolume > gates.volumeGate
+                // A held note needs only to clear the sustain gate, nearer the
+                // noise floor: the pitch check right after keeps noise out.
+                && currentVolume > getDetectionGates(targetFreq, sustainGateBase).volumeGate
                 && pitchIsSounding(true)) {
               const heldTo = Math.min(loopedBeatsElapsed, beatEnd);
               hitNotesRef.current[noteKey] = heldTo;
@@ -645,7 +659,7 @@ export function useNoteMatching({
                 // (muted note) leaves no precise time — neither can be timed.
                 const attackMs = audioRefs.lastAttackMsRef?.current ?? 0;
                 if (!requiresOnset || !hasRecentOnset || attackMs <= 0) return null;
-                const deltaMs = attackMs - dueMs;
+                const deltaMs = attackMs - (dueMs - attackEarlierMs);
                 // An attack before the floor was the previous note's — a
                 // repeated pitch still ringing, say. This note's own attack
                 // wasn't seen, so there is nothing to time.
@@ -763,7 +777,7 @@ export function useNoteMatching({
       livePitchRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, startTime, audioContext, audioStartTime, alphaTabSource, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm, calibratedLatencyMs, scoringFocus, settleIntonation, streamFills]);
+  }, [isPlaying, startTime, audioContext, audioStartTime, alphaTabSource, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, getAttackLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm, calibratedLatencyMs, scoringFocus, settleIntonation, streamFills]);
 
   return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, minScoredBpmRef, noteTimings, timingCountsRef, timingOffsetsRef, intonationCountsRef, intonationOffsetsRef, runLogRef, livePitchRef, fillFeedRef, settlePendingIntonation, resetGame, markAlphaTabPassStart };
 }

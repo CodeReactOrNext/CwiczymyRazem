@@ -108,15 +108,67 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
   const bassRef = useRef(bass);
   useEffect(() => { bassRef.current = bass; }, [bass]);
 
+  /** Bumped by every init() and close() — see init(). */
+  const generationRef = useRef(0);
+
+  /** Disconnects and closes whatever input is open; leaves the readings alone. */
+  const releaseResources = useCallback(() => {
+    if (resumeHandlerRef.current) {
+      document.removeEventListener("pointerdown", resumeHandlerRef.current);
+      document.removeEventListener("keydown", resumeHandlerRef.current);
+      document.removeEventListener("visibilitychange", resumeHandlerRef.current);
+      resumeHandlerRef.current = null;
+    }
+    if (workletNodeRef.current) {
+      workletNodeRef.current.port.onmessage = null;
+      workletNodeRef.current.disconnect();
+      workletNodeRef.current = null;
+    }
+    if (analyserNodeRef.current) {
+      analyserNodeRef.current.disconnect();
+      analyserNodeRef.current = null;
+    }
+    if (sourceRef.current) {
+      sourceRef.current.disconnect();
+      sourceRef.current = null;
+    }
+    if (audioContextRef.current) {
+      if (audioContextRef.current.state !== "closed") audioContextRef.current.close().catch(() => { /* already closing */ });
+      audioContextRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+  }, []);
+
   const init = useCallback(async () => {
+    // Same guard as useNativeAudioAnalyzer's: init() awaits getUserMedia, the
+    // aubio wasm and the worklet, and a close() — switching exercises — or a
+    // second init() can land in between. Without it the stale call finished
+    // anyway: a stream left open after close(), or two worklets writing the same
+    // refs, which only a page reload cleared. A newer call or close() bumps the
+    // generation; a stale call closes what it opened itself and leaves the rest.
+    const myGeneration = ++generationRef.current;
+    // An input already open (init() again without close()) goes first.
+    releaseResources();
+    let stream: MediaStream | null = null;
+    let audioContext: AudioContext | null = null;
+    const isStale = () => {
+      if (myGeneration === generationRef.current) return false;
+      stream?.getTracks().forEach(track => track.stop());
+      if (audioContext && audioContext.state !== "closed") audioContext.close().catch(() => { /* already closing */ });
+      return true;
+    };
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: false,
           noiseSuppression: false,
           autoGainControl: false,
         }
       });
+      if (isStale()) return;
       streamRef.current = stream;
 
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
@@ -125,7 +177,7 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
       // Interfaces running at 96/176.4/192 kHz are brought down to ~48 kHz by the
       // worklet instead, so aubio's 2048-sample window still holds enough
       // periods of low E.
-      const audioContext = new AudioContextClass();
+      audioContext = new AudioContextClass() as AudioContext;
       audioContextRef.current = audioContext;
       const decimation = getDecimationFactor(audioContext.sampleRate);
       const analysisRate = audioContext.sampleRate / decimation;
@@ -139,6 +191,7 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
       // cleared up after switching browsers (fresh autoplay/activation state).
       if (audioContext.state === "suspended") {
         try { await audioContext.resume(); } catch { /* ignore */ }
+        if (isStale()) return;
       }
 
       const source = audioContext.createMediaStreamSource(stream);
@@ -156,6 +209,7 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
       const AubioModule = await import("aubiojs");
       const Aubio = AubioModule.default || AubioModule;
       const aubio = await Aubio();
+      if (isStale()) return;
 
       const detectors = createGuitarDetectors(aubio, analysisRate);
       pitchDetectorRef.current = detectors.pitch;
@@ -168,6 +222,7 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
       const workletUrl = URL.createObjectURL(blob);
       await audioContext.audioWorklet.addModule(workletUrl);
       URL.revokeObjectURL(workletUrl);
+      if (isStale()) return;
 
       const workletNode = new AudioWorkletNode(audioContext, "guitar-input-processor", {
         processorOptions: { decimation },
@@ -224,39 +279,15 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
       setState(prev => ({ ...prev, isListening: true, error: null }));
 
     } catch (err: any) {
+      if (isStale()) return; // a newer call owns the outcome now
       console.error("Error initializing audio analyzer:", err);
       setState(prev => ({ ...prev, error: err.message || "Microphone access denied" }));
     }
-  }, []);
+  }, [releaseResources]);
 
   const close = useCallback(() => {
-    if (resumeHandlerRef.current) {
-      document.removeEventListener("pointerdown", resumeHandlerRef.current);
-      document.removeEventListener("keydown", resumeHandlerRef.current);
-      document.removeEventListener("visibilitychange", resumeHandlerRef.current);
-      resumeHandlerRef.current = null;
-    }
-    if (workletNodeRef.current) {
-      workletNodeRef.current.port.onmessage = null;
-      workletNodeRef.current.disconnect();
-      workletNodeRef.current = null;
-    }
-    if (analyserNodeRef.current) {
-      analyserNodeRef.current.disconnect();
-      analyserNodeRef.current = null;
-    }
-    if (sourceRef.current) {
-      sourceRef.current.disconnect();
-      sourceRef.current = null;
-    }
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
+    generationRef.current++; // invalidate any in-flight init() (see init above)
+    releaseResources();
 
     recentAudioRef.current = null;
     pitchDetectorRef.current = null;
@@ -274,7 +305,7 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
     lastLowAttackMsRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false }));
-  }, []);
+  }, [releaseResources]);
 
   useEffect(() => {
     return () => {
@@ -301,6 +332,17 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
     return baseLatency + outputLatency + bufferLatency + 30;
   }, []);
 
+  /** getLatencyMs() for an attack time (onsetMs / lastAttackMsRef): those are
+   *  already dated back by the analysis window (guitarBufferProcessor's
+   *  ONSET_REPORT_LAG_MS), so counting the window again made every attack look
+   *  ~45 ms early — a player had to play late to be graded on time. */
+  const getAttackLatencyMs = useCallback(() => {
+    const ctx = audioContextRef.current;
+    if (!ctx) return getLatencyMs();
+    const analysisRate = ctx.sampleRate / getDecimationFactor(ctx.sampleRate);
+    return getLatencyMs() - (2048 / analysisRate) * 1000;
+  }, [getLatencyMs]);
+
   const readSpectrum = useCallback(
     () => (analyserNodeRef.current ? spectrumFromAnalyser(analyserNodeRef.current) : null),
     [],
@@ -316,6 +358,7 @@ export const useAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {})
     close,
     audioRefs,
     getLatencyMs,
+    getAttackLatencyMs,
     setInputGain,
-  }), [state, init, close, audioRefs, getLatencyMs, setInputGain]);
+  }), [state, init, close, audioRefs, getLatencyMs, getAttackLatencyMs, setInputGain]);
 };
