@@ -12,5 +12,18 @@
   "forgot_password": "Nie pamiętasz hasła?",
   "reset_password_success": "Wysłaliśmy e-mail do resetu hasła. Sprawdź swoją skrzynkę.",
   "reset_password_error": "Nie udało się wysłać e-maila do resetu hasła. Upewnij się, że adres e-mail jest poprawny.",
-  "enter_email_error": "Najpierw wpisz swój adres e-mail."
+  "enter_email_error": "Najpierw wpisz swój adres e-mail.",
+  "desktop": {
+    "title": "Zaloguj się do aplikacji riff.quest",
+    "subtitle": "Google nie pozwala logować się wewnątrz aplikacji desktopowych, więc logujesz się tutaj, w przeglądarce. Aplikacja przejmie logowanie zaraz potem.",
+    "continue_as": "Kontynuuj jako {{name}}",
+    "other_account": "Użyj innego konta Google",
+    "done_title": "Zalogowano",
+    "done_body": "Wróć do aplikacji riff.quest. Tę kartę możesz zamknąć.",
+    "invalid_title": "Ten link logowania nie działa",
+    "invalid_body": "Zacznij logowanie jeszcze raz z aplikacji riff.quest.",
+    "error": "Nie udało się zalogować. Spróbuj ponownie.",
+    "waiting": "Dokończ logowanie w przeglądarce.",
+    "cancel": "Anuluj"
+  }
 }

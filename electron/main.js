@@ -29,6 +29,7 @@ const vstScanner = require("./vst/vstScanner");
 const backingTrackStore = require("./backingTrackStore");
 const gpFileStore = require("./gpFileStore");
 const { requireMicrophoneAccess } = require("./macPermissions");
+const desktopAuth = require("./desktopAuth");
 
 const isDev = !app.isPackaged;
 const isMac = process.platform === "darwin";
@@ -213,17 +214,11 @@ function createWindow() {
   });
 
   // window.open / target=_blank → the OS browser, never a second Electron
-  // window. Exception: OAuth popups (Google / Firebase auth) must stay in-app,
-  // the flow completes through window.opener.
+  // window. Google sign-in included: Google blocks it inside Electron, so it
+  // runs in the browser through auth:google-sign-in below.
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     try {
-      const { hostname } = new URL(url);
-      if (
-        hostname === "accounts.google.com" ||
-        hostname.endsWith(".firebaseapp.com")
-      ) {
-        return { action: "allow" };
-      }
+      new URL(url);
     } catch {
       return { action: "deny" };
     }
@@ -366,6 +361,21 @@ ipcMain.handle("window:zoom-in", () => (zoom ? zoom.zoomIn() : 1));
 ipcMain.handle("window:zoom-out", () => (zoom ? zoom.zoomOut() : 1));
 ipcMain.handle("window:zoom-reset", () => (zoom ? zoom.reset() : 1));
 ipcMain.handle("window:get-zoom", () => (zoom ? zoom.get() : 1));
+
+// ── Google sign-in in the system browser (electron/desktopAuth.js) ───────────
+// Resolves { ok, token, isNewUser } | { ok: false, reason }; the renderer
+// finishes with signInWithCustomToken.
+ipcMain.handle("auth:google-sign-in", async () => {
+  const outcome = await desktopAuth.signInWithGoogle({
+    appUrl: START_URL,
+    openExternal: (url) => shell.openExternal(url),
+  });
+  // The player is in the browser now; bring the app back once it is done.
+  if (outcome.ok) showMainWindow();
+  return outcome;
+});
+
+ipcMain.handle("auth:cancel-google-sign-in", () => desktopAuth.cancelSignIn());
 
 // ── Desktop integration IPC (offline retry, keep-awake, taskbar progress) ────
 ipcMain.handle("app:retry-connect", () => {

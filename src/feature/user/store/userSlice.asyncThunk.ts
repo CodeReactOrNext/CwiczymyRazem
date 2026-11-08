@@ -28,6 +28,7 @@ import {
   firebaseLogUserOut,
   firebaseReauthenticateUser,
   firebaseSignInWithCredential,
+  firebaseSignInWithCustomToken,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
 } from "utils/firebase/client/firebase.utils";
@@ -84,14 +85,36 @@ const enterApp = async (idToken: string, destination: string) => {
   void Router.push(takeOAuthReturn() ?? destination);
 };
 
+/**
+ * Google sign-in: a popup on the web; in the desktop app, the player's own
+ * browser (/desktop-login), since Google refuses to sign in inside Electron.
+ * Resolves null when the player gave up on the browser sign-in.
+ */
+const signInWithGoogle = async (): Promise<{ user: User; isNewUser: boolean } | null> => {
+  const desktopSignIn = typeof window !== "undefined" ? window.electronApp?.signInWithGoogle : undefined;
+  if (desktopSignIn) {
+    const outcome = await desktopSignIn();
+    if (!outcome.ok) {
+      if (outcome.reason === "timeout") throw Object.assign(new Error("timeout"), { code: "auth/timeout" });
+      if (outcome.reason === "server-error") throw new Error("desktop-sign-in-failed");
+      return null; // cancelled, or replaced by a newer click
+    }
+    const { user } = await firebaseSignInWithCustomToken(outcome.token);
+    return { user, isNewUser: outcome.isNewUser };
+  }
+  const result = await firebaseSignInWithGooglePopup();
+  return { user: result.user, isNewUser: !!getAdditionalUserInfo(result)?.isNewUser };
+};
+
 export const logInViaGoogle = createAsyncThunk(
   "user/logInViaGoogle",
   async () => {
     try {
-      const result = await firebaseSignInWithGooglePopup();
-      const { user } = result;
+      const signedIn = await signInWithGoogle();
+      if (!signedIn) return Promise.reject();
+      const { user } = signedIn;
       const token = await user.getIdToken();
-      const callbackUrl = getGoogleLanding(!!getAdditionalUserInfo(result)?.isNewUser, user, "google");
+      const callbackUrl = getGoogleLanding(signedIn.isNewUser, user, "google");
       const userData = await fetchUserData(user);
       await enterApp(token, callbackUrl);
       posthog.identify(user.uid, { email: user.email ?? undefined, name: user.displayName ?? undefined });

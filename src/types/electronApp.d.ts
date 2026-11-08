@@ -53,6 +53,19 @@ export interface ElectronInstallUpdateResult {
   reason?: string;
 }
 
+export type ElectronGoogleSignInResult =
+  | {
+      ok: true;
+      /** Firebase custom token — finish with signInWithCustomToken. */
+      token: string;
+      /** The Google account was created during this sign-in. */
+      isNewUser: boolean;
+    }
+  | {
+      ok: false;
+      reason: "cancelled" | "superseded" | "timeout" | "server-error";
+    };
+
 export interface ElectronAppApi {
   isAvailable: true;
   /** Installed desktop app version (electron-builder packages the root package.json version). */
@@ -87,6 +100,11 @@ export interface ElectronAppApi {
   checkForUpdates?: () => Promise<ElectronUpdaterState | null>;
   /** Open this platform's installer download in the browser (0.2.0+). */
   openUpdateDownload?: () => Promise<void>;
+  /** Google sign-in in the system browser (newer shells only — older ones
+   *  still sign in through an in-app popup, which Google may refuse). */
+  signInWithGoogle?: () => Promise<ElectronGoogleSignInResult>;
+  /** Stop waiting for the browser sign-in started by signInWithGoogle. */
+  cancelGoogleSignIn?: () => Promise<void>;
 }
 
 declare global {

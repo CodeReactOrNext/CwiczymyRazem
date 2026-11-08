@@ -4,6 +4,7 @@ import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { cn } from "assets/lib/utils";
 import { onboardingHref } from "feature/onboarding/analytics/onboardingAnalytics";
+import { DesktopGoogleSignInHint } from "feature/user/components/DesktopGoogleSignInHint/DesktopGoogleSignInHint";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
   createAccount,
@@ -192,6 +193,7 @@ const SingupView = () => {
                   {t("signup:google_button")}
                 </span>
               </Button>
+              <DesktopGoogleSignInHint />
 
             <div className="relative my-4 sm:my-6">
                 <div className="absolute inset-0 flex items-center">

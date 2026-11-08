@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { DesktopGoogleSignInHint } from "feature/user/components/DesktopGoogleSignInHint/DesktopGoogleSignInHint";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
   logInViaEmail,
@@ -220,6 +221,7 @@ const LoginView = () => {
                     {t("login:google_button")}
                   </span>
                 </Button>
+                <DesktopGoogleSignInHint />
               </div>
             </div>
           </div>

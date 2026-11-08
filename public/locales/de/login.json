@@ -12,5 +12,18 @@
   "forgot_password": "Passwort vergessen?",
   "reset_password_success": "Wir haben dir eine E-Mail zum Zurücksetzen des Passworts geschickt. Sieh in deinem Postfach nach.",
   "reset_password_error": "Die E-Mail zum Zurücksetzen des Passworts konnte nicht gesendet werden. Prüfe, ob die E-Mail-Adresse stimmt.",
-  "enter_email_error": "Gib zuerst deine E-Mail-Adresse ein."
+  "enter_email_error": "Gib zuerst deine E-Mail-Adresse ein.",
+  "desktop": {
+    "title": "Bei der riff.quest-App anmelden",
+    "subtitle": "Google erlaubt keine Anmeldung innerhalb von Desktop-Apps, daher meldest du dich hier im Browser an. Die App übernimmt die Anmeldung gleich danach.",
+    "continue_as": "Weiter als {{name}}",
+    "other_account": "Anderes Google-Konto verwenden",
+    "done_title": "Du bist angemeldet",
+    "done_body": "Kehre zur riff.quest-App zurück. Diesen Tab kannst du schließen.",
+    "invalid_title": "Dieser Anmeldelink funktioniert nicht",
+    "invalid_body": "Starte die Anmeldung erneut aus der riff.quest-App.",
+    "error": "Anmeldung fehlgeschlagen. Versuche es erneut.",
+    "waiting": "Schließe die Anmeldung in deinem Browser ab.",
+    "cancel": "Abbrechen"
+  }
 }

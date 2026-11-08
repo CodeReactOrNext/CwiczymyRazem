@@ -8,6 +8,7 @@ import {
   reauthenticateWithCredential,
   sendPasswordResetEmail,
   signInWithCredential,
+  signInWithCustomToken,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -52,6 +53,9 @@ export const firebaseSignInWithGooglePopup = () =>
 
 export const firebaseSignInWithCredential = (credential: any) =>
   signInWithCredential(auth, credential);
+
+export const firebaseSignInWithCustomToken = (token: string) =>
+  signInWithCustomToken(auth, token);
 
 export const db =
   typeof window !== "undefined"

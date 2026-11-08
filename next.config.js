@@ -482,6 +482,15 @@ const nextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
         ],
       },
+      // Same for the desktop app's Google sign-in: its "Continue as" button
+      // hands a login to whatever listens on the given loopback port.
+      {
+        source: "/desktop-login",
+        headers: [
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "X-Frame-Options", value: "DENY" },
+        ],
+      },
     ];
   },
 };

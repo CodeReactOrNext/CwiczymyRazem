@@ -14,5 +14,18 @@
   "forgot_password": "Forgot your password?",
   "reset_password_success": "A password reset email has been sent. Please check your inbox.",
   "reset_password_error": "An error occurred while sending the password reset email. Make sure the email address is correct.",
-  "enter_email_error": "Please enter your email address first."
+  "enter_email_error": "Please enter your email address first.",
+  "desktop": {
+    "title": "Sign in to the riff.quest app",
+    "subtitle": "Google doesn't allow signing in inside desktop apps, so you sign in here, in your browser. The app picks it up right after.",
+    "continue_as": "Continue as {{name}}",
+    "other_account": "Use another Google account",
+    "done_title": "You're signed in",
+    "done_body": "Go back to the riff.quest app. You can close this tab.",
+    "invalid_title": "This sign-in link doesn't work",
+    "invalid_body": "Start the sign-in again from the riff.quest app.",
+    "error": "Couldn't sign you in. Try again.",
+    "waiting": "Finish signing in in your browser.",
+    "cancel": "Cancel"
+  }
 }

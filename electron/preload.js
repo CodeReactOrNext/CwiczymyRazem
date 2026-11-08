@@ -292,6 +292,14 @@ contextBridge.exposeInMainWorld("electronApp", {
 
   /** Opens this platform's installer download for the latest version in the browser. */
   openUpdateDownload: () => ipcRenderer.invoke("app:open-update-download"),
+
+  /** Google sign-in in the system browser — Google refuses it inside Electron.
+   *  Resolves { ok: true, token, isNewUser } (a Firebase custom token) or
+   *  { ok: false, reason: "cancelled" | "superseded" | "timeout" | "server-error" }. */
+  signInWithGoogle: () => ipcRenderer.invoke("auth:google-sign-in"),
+
+  /** Stops waiting for the browser sign-in started above. */
+  cancelGoogleSignIn: () => ipcRenderer.invoke("auth:cancel-google-sign-in"),
 });
 
 // Frameless window controls: the renderer draws its own title bar (see
