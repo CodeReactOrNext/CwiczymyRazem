@@ -219,7 +219,7 @@
     "failed": "Prüfung nicht bestanden",
     "flawless": "Fehlerfreie Leistung.",
     "nice_work": "Gute Arbeit – noch ein paar Durchgänge, dann sitzt jede Note.",
-    "missed_by": "Um {{points}} Pkt. verpasst. Versuch es noch einmal!",
+    "missed_by": "{{points}} unter den 80 % Trefferquote, die du brauchst. Versuch es noch einmal!",
     "total_score": "Gesamtscore",
     "grade": "Note",
     "accuracy": "Genauigkeit",

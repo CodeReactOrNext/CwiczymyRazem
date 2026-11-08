@@ -219,7 +219,7 @@
     "failed": "Examen suspendido",
     "flawless": "Interpretación impecable.",
     "nice_work": "Buen trabajo: unos intentos más y clavarás cada nota.",
-    "missed_by": "Te faltaron {{points}} pts. ¡Inténtalo otra vez!",
+    "missed_by": "Te faltó un {{points}} para el 80 % de precisión necesario. ¡Inténtalo otra vez!",
     "total_score": "Puntuación total",
     "grade": "Nota",
     "accuracy": "Precisión",

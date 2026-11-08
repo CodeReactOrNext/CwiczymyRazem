@@ -1317,6 +1317,7 @@ const PracticeSessionInner = ({
         <ExerciseSuccessView
           planTitle={planTitleString} examMode={isExamMode}
           score={examMistakeFailed ? 0 : successSnapshot.score} maxScore={successSnapshot.maxPossibleScore}
+          examAccuracy={examMistakeFailed ? 0 : successSnapshot.accuracy}
           stats={
             hasTrackedPerformance && !isEarTrainingRiddle
               ? { accuracy: examMistakeFailed ? 0 : successSnapshot.accuracy, maxStreak: successSnapshot.maxCombo }

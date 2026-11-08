@@ -219,7 +219,7 @@
     "failed": "Exam Failed",
     "flawless": "Flawless performance.",
     "nice_work": "Nice work — a couple more runs and you'll nail every note.",
-    "missed_by": "Missed by {{points}} pts. Give it another shot!",
+    "missed_by": "{{points}} short of the 80% accuracy you need. Give it another shot!",
     "total_score": "Total score",
     "grade": "Grade",
     "accuracy": "Accuracy",

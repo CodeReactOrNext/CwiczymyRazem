@@ -46,11 +46,14 @@ export const firebaseCompleteJourneyStep = async (
   } as any);
 };
 
+/** Accuracy (0–100) needed for each exam star; the first one is the pass mark. */
+export const EXAM_STAR_ACCURACY = [80, 90, 95] as const;
+
 /** Accuracy is on a 0–100 scale. Pass threshold: 80%. Stars: ≥95% = 3, ≥90% = 2, ≥80% = 1. Returns null if failed. */
 export function accuracyToStars(accuracy: number): 1 | 2 | 3 | null {
-  if (accuracy >= 95) return 3;
-  if (accuracy >= 90) return 2;
-  if (accuracy >= 80) return 1;
+  if (accuracy >= EXAM_STAR_ACCURACY[2]) return 3;
+  if (accuracy >= EXAM_STAR_ACCURACY[1]) return 2;
+  if (accuracy >= EXAM_STAR_ACCURACY[0]) return 1;
   return null;
 }
 

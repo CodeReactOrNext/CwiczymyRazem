@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { ChartContainer, ChartTooltip } from "assets/components/ui/chart";
 import { cn } from "assets/lib/utils";
 import confetti from "canvas-confetti";
+import { accuracyToStars, EXAM_STAR_ACCURACY } from "feature/journey/services/journey.service";
 import { animate, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
@@ -30,6 +31,10 @@ interface ExerciseSuccessViewProps {
   examMode?: boolean;
   score?: number;
   maxScore?: number;
+  /** Accuracy (0–100) the exam is judged on — the value handed to
+   *  onExamComplete, so the verdict here matches the stars that get saved.
+   *  Falls back to stats.accuracy. */
+  examAccuracy?: number;
   stats?: ExerciseStats;
   timeline?: ('hit' | 'miss' | 'perfect' | 'early' | 'late')[];
   /** Hits per timing grade — shown under the stats when the run was timed. */
@@ -110,6 +115,7 @@ export const ExerciseSuccessView = ({
   examMode = false,
   score,
   maxScore,
+  examAccuracy,
   stats,
   timeline,
   timing,
@@ -127,31 +133,25 @@ export const ExerciseSuccessView = ({
   const [displayScore, setDisplayScore] = useState(0);
 
   const isExam = examMode && typeof score !== 'undefined' && typeof maxScore !== 'undefined';
-  const passThreshold = isExam ? Math.ceil(maxScore! * 0.85) : 0;
-  const isPassed = isExam ? score! >= passThreshold : true;
-  const nextStarDist = isExam ? Math.max(0, passThreshold - score!) : 0;
-
   const hasStats = !!stats;
   const displayStats = stats ?? {};
   const accuracy = displayStats.accuracy ?? 0;
   const tierKey = getTierFromAccuracy(accuracy);
   const tier = TIERS[tierKey];
 
-  let stars = 0;
-  let starProgress = 0;
+  // An exam is passed on accuracy alone, by the same rule that saves its stars
+  // (accuracyToStars). The score still weighs timing and combo, but a clean run
+  // that was early on the beat shouldn't read "failed" next to 98% accuracy.
+  const passAccuracy = examAccuracy ?? accuracy;
+  const stars = isExam ? accuracyToStars(passAccuracy) ?? 0 : 0;
+  const isPassed = isExam ? stars > 0 : true;
+  const accuracyToPass = isExam ? Math.max(0, Math.ceil(EXAM_STAR_ACCURACY[0] - passAccuracy)) : 0;
 
-  if (isExam && maxScore! > 0) {
-    if (score! >= maxScore! * 0.95) {
-      stars = 3; starProgress = 100;
-    } else if (score! >= maxScore! * 0.9) {
-      stars = 2;
-      starProgress = ((score! - maxScore! * 0.9) / (maxScore! * 0.05)) * 100;
-    } else if (score! >= maxScore! * 0.8) {
-      stars = 1;
-      starProgress = ((score! - maxScore! * 0.8) / (maxScore! * 0.1)) * 100;
-    } else {
-      starProgress = (score! / (maxScore! * 0.8)) * 100;
-    }
+  let starProgress = 100;
+  if (isExam && stars < 3) {
+    const from = stars === 0 ? 0 : EXAM_STAR_ACCURACY[stars - 1];
+    const to = EXAM_STAR_ACCURACY[stars as 0 | 1 | 2];
+    starProgress = Math.min(100, Math.max(0, ((passAccuracy - from) / (to - from)) * 100));
   }
 
   const hasTimeline = !!timeline && timeline.length > 0;
@@ -271,7 +271,7 @@ export const ExerciseSuccessView = ({
                           <Interpolate
                             text={t('session:success.missed_by')}
                             values={{
-                              points: <span className="text-zinc-200 font-semibold">{Math.ceil(nextStarDist)}</span>,
+                              points: <span className="text-zinc-200 font-semibold">{accuracyToPass}%</span>,
                             }}
                           />
                         )
