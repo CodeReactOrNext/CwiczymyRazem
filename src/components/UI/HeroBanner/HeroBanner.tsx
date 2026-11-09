@@ -80,8 +80,9 @@ export const HeroBanner = ({
         <div className="light-hide absolute inset-0 bg-gradient-to-r from-second-600 via-second-600/90 via-60% to-transparent md:rounded-tl-2xl" />
 
         {/* Renders after the fade so custom elements remain highly visible.
-            Decorative only — the light theme keeps the banner flat. */}
-        <div className="light-hide contents">{backgroundContent}</div>
+            Not hidden in the light theme: callers put real content here (the
+            dashboard's equipped guitar); the icon patterns hide themselves. */}
+        {backgroundContent}
 
         {/* Bottom edge fade — ties the banner into the cards below */}
         <div className="light-hide absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-second-600/60 to-transparent" />

@@ -10,6 +10,8 @@ import { useState } from "react";
 import { useAppDispatch } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
 
+const GUITAR = "special/2";
+
 const DEMO_STATS: StatisticsDataInterface = {
   ...statisticsInitial,
   lvl: 24,
@@ -35,7 +37,10 @@ export default function HomePreviewPage() {
       restoreUserSnapshot({
         userAuth: "dev-home-preview",
         // feedbackAskedAt: keeps the feedback survey from covering the page.
-        userInfo: { displayName: "Riffer", feedbackAskedAt: Date.now() } as unknown as UserSnapshot["userInfo"],
+        userInfo: { displayName: "Riffer", feedbackAskedAt: Date.now(),
+          // A case guitar, so the hero shows its big guitar.
+          selectedGuitar: GUITAR,
+        } as unknown as UserSnapshot["userInfo"],
         currentUserStats: DEMO_STATS,
       }),
     );

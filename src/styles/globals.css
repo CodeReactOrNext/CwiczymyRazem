@@ -818,3 +818,10 @@ html.theme-light:has([data-app-shell]) .recharts-dot[stroke="#09090b"] {
 html.theme-light:has([data-app-shell]) .scale-board {
   background-color: #111114 !important;
 }
+
+/* The ink support cards keep the dark theme's icon pattern (owner's call):
+   white icons, faint — only the pattern svg, not the warm wash beside it. */
+html.theme-light:has([data-app-shell]) .support-warm svg.light-hide {
+  display: block !important;
+  opacity: 0.07;
+}

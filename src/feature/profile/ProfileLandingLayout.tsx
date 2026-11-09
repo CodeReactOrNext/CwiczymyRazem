@@ -146,7 +146,7 @@ const ProfileLandingLayout = ({
             <div className='absolute inset-0 z-0 overflow-hidden rounded-none md:rounded-xl'>
               {/* Glow Blur on the left */}
               <div
-                className='pointer-events-none absolute left-[0%] top-[-10%] opacity-25 blur-[80px] md:left-[5%] md:top-[-15%] md:opacity-30'
+                className='light-hide pointer-events-none absolute left-[0%] top-[-10%] opacity-25 blur-[80px] md:left-[5%] md:top-[-15%] md:opacity-30'
                 style={{
                   backgroundColor: glowColor,
                   width: "350px",
@@ -162,7 +162,7 @@ const ProfileLandingLayout = ({
                     one only the neck was left inside. */}
               <img
                 src={getRankBadgeSrc(imgPath, "large")}
-                className='pointer-events-none absolute left-[-8%] top-[-12%] h-[250px] max-w-none -rotate-[15deg] opacity-[0.75] md:left-[8%] md:top-[-35%] md:h-[480px]'
+                className='light-flat pointer-events-none absolute left-[-8%] top-[-12%] h-[250px] max-w-none -rotate-[15deg] opacity-[0.75] md:left-[8%] md:top-[-35%] md:h-[480px]'
                 style={{
                   filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
                   WebkitMaskImage:

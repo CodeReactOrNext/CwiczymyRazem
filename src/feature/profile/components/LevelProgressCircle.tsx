@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useColorTheme } from "lib/colorTheme/colorTheme";
 import { useId } from "react";
 import { getPointsToLvlUp } from "utils/gameLogic";
 
@@ -38,6 +39,10 @@ export const LevelProgressCircle = ({
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const gradId = `lvlArcGrad-${uid}`;
   const glowId = `lvlGlow-${uid}`;
+  // SVG attributes can't read the theme's CSS variables. On a light page the
+  // dark disc turned to a grey smudge under a white number — the light theme
+  // gets a solid ink coin with a gold ring (owner's pick, variant E), no glow.
+  const isLight = useColorTheme() === "light";
 
   return (
     <div className={`relative flex flex-col items-center gap-1 ${className}`}>
@@ -49,8 +54,8 @@ export const LevelProgressCircle = ({
           className={cn("relative shrink-0", !size && "md:w-[120px] md:h-[120px]")}>
           <defs>
             <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#a5f3fc" />
-              <stop offset="100%" stopColor="#0891b2" />
+              <stop offset="0%" stopColor={isLight ? "#fde68a" : "#a5f3fc"} />
+              <stop offset="100%" stopColor={isLight ? "#f59e0b" : "#0891b2"} />
             </linearGradient>
             <filter id={glowId} x="-30%" y="-30%" width="160%" height="160%">
               <feGaussianBlur stdDeviation="2.5" result="blur" />
@@ -60,8 +65,8 @@ export const LevelProgressCircle = ({
               </feMerge>
             </filter>
           </defs>
-          <circle cx="50" cy="50" r="46" fill="rgba(0,0,0,0.45)" />
-          <circle cx="50" cy="50" r={arcR} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
+          <circle cx="50" cy="50" r="46" fill={isLight ? "#18181b" : "rgba(0,0,0,0.45)"} />
+          <circle cx="50" cy="50" r={arcR} fill="none" stroke={isLight ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.1)"} strokeWidth="6" />
           <circle
             cx="50"
             cy="50"
@@ -73,13 +78,13 @@ export const LevelProgressCircle = ({
             strokeDasharray={arcC}
             strokeDashoffset={arcOffset}
             transform="rotate(-90 50 50)"
-            filter={`url(#${glowId})`}
+            filter={isLight ? undefined : `url(#${glowId})`}
           />
           <text
             x="50"
             y="51"
             textAnchor="middle"
-            fill="white"
+            fill='white'
             fontSize="24"
             fontWeight="900"
             style={{ fontFamily: "system-ui, sans-serif" }}
@@ -90,7 +95,7 @@ export const LevelProgressCircle = ({
             x="50"
             y="69"
             textAnchor="middle"
-            fill="#67e8f9"
+            fill={isLight ? "#fbbf24" : "#67e8f9"}
             fontSize="15"
             fontWeight="700"
             letterSpacing="2"
