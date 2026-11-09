@@ -1,4 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { buttonVariants } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import {
@@ -1043,7 +1045,7 @@ function RulesAlert() {
     <div className="relative rounded-lg border border-zinc-800 bg-zinc-900/50 px-6 py-5 pr-14 sm:px-7 sm:py-6">
       <button
         onClick={dismiss}
-        className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-300 transition-colors"
+        className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute top-4 right-4")}
         aria-label={t("page.dismiss")}
       >
         <X size={16} />

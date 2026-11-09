@@ -1,6 +1,7 @@
 "use client"
 
 import * as SheetPrimitive from "@radix-ui/react-dialog"
+import { buttonVariants } from "assets/components/ui/button"
 import { cn } from "assets/lib/utils"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
@@ -64,8 +65,13 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-full opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <X className="h-5 w-5 text-zinc-500" />
+      {/* Close is a key like every other button — face, lip and press. */}
+      <SheetPrimitive.Close
+        className={cn(
+          buttonVariants({ variant: "ghost", size: "icon" }),
+          "absolute right-4 top-4 z-10",
+        )}>
+        <X />
         <span className="sr-only">Close</span>
       </SheetPrimitive.Close>
     </SheetPrimitive.Content>

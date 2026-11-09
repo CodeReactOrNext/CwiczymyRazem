@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -115,7 +116,7 @@ export const ChangelogVideoCard = ({
             className='absolute inset-0 h-full w-full'
           />
         </div>
-        <DialogClose className='absolute -top-12 right-0 rounded-full bg-zinc-900/80 p-2 text-zinc-300 transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800 hover:text-white'>
+        <DialogClose className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute -top-12 right-0")}>
           <X className='h-5 w-5' aria-hidden />
           <span className='sr-only'>{t("close")}</span>
         </DialogClose>

@@ -1,4 +1,4 @@
-import { PRESSABLE } from "assets/components/ui/button";
+import { buttonVariants,PRESSABLE } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -455,7 +455,7 @@ export const ModSlotDialog = ({
             onClick={close}
             disabled={mod.isPending}
             aria-label={t("common.close")}
-            className='rounded-md p-1.5 text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
+            className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
             <X size={18} />
           </button>
         </div>

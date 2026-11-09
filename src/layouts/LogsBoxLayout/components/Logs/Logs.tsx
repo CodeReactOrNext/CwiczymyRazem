@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import {
   Chip,
   type ChipProps,
@@ -337,7 +338,7 @@ const CardModal = ({
         <button
           onClick={onClose}
           aria-label={t("close")}
-          className='absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white'>
+          className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute -right-2 -top-2 z-10")}>
           <X size={15} />
         </button>
         {children}

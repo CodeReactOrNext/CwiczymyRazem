@@ -1,4 +1,4 @@
-import { PRESSABLE_KEY } from "assets/components/ui/button";
+import { buttonVariants, PRESSABLE_KEY } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import {
   Tooltip,
@@ -423,7 +423,7 @@ export const PlanCard = ({
           {onPreview && (
             <button
               type="button"
-              className="h-10 rounded-lg px-3 text-xs font-semibold text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className={cn(buttonVariants({ variant: "ghost" }), "h-10 px-3 text-xs font-semibold")}
               onClick={(e) => {
                 e.stopPropagation();
                 onPreview();

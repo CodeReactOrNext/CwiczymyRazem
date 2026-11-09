@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
@@ -165,7 +166,7 @@ export function ScaleNodeModal({
               <button
                 onClick={onClose}
                 aria-label={t("modal.close")}
-                className='-mr-1 -mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-400 transition-background hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+                className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "-mr-1 -mt-1 shrink-0")}>
                 <X className='h-4 w-4' />
               </button>
             </div>

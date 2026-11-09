@@ -24,7 +24,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 // Ordered like the loop the module is built around: get gear, look at what you
@@ -118,6 +118,14 @@ const ArsenalTabs = () => {
     isTabVisible(tabParam as ArsenalTab)
       ? (tabParam as ArsenalTab)
       : "cases";
+
+  // Keep the active chip in view on the phone's sideways-scrolling tab row — a
+  // deep link to Dex would otherwise open with its tab past the screen's edge.
+  useEffect(() => {
+    railRef.current
+      ?.querySelector<HTMLElement>('[data-state="active"]')
+      ?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+  }, [activeTab, railRef]);
 
   const handleTabChange = (tab: string) => {
     router.replace({ query: { ...router.query, tab } }, undefined, { shallow: true });
@@ -248,15 +256,14 @@ const ArsenalTabs = () => {
 
                 return (
                   <TabsTrigger key={tab} value={tab} className={arsenalTabTriggerClass}>
-                    {/* The new-drop dot rides on the icon, where it reads the same whether
-                        the label sits under it (phones) or beside it. */}
+                    {/* The new-drop dot rides on the icon. */}
                     <span className="relative shrink-0">
                       <Icon size={16} />
                       {hasNewDrop && (
                         <span className="absolute -right-1.5 -top-1 h-2 w-2 rounded-full bg-arsenal-accent shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
                       )}
                     </span>
-                    <span className="max-w-full truncate">{t(`view.tabs.${tab}`)}</span>
+                    <span className="whitespace-nowrap">{t(`view.tabs.${tab}`)}</span>
                   </TabsTrigger>
                 );
               })}

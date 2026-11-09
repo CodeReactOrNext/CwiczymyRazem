@@ -1,4 +1,4 @@
-import { PRESSABLE } from "assets/components/ui/button";
+import { buttonVariants,PRESSABLE } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -318,7 +318,7 @@ export const WorkshopJobModal = ({
             onClick={close}
             disabled={isPending}
             aria-label={t("common.close")}
-            className='rounded-lg p-2 text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60 disabled:opacity-40 hover:bg-zinc-800 hover:text-zinc-200'>
+            className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
             <X size={16} />
           </button>
         </div>

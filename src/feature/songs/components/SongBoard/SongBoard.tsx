@@ -1,4 +1,4 @@
-import { Button } from "assets/components/ui/button";
+import { Button, buttonVariants } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -45,7 +45,7 @@ export const SongBoard = ({ song, progress, isOpen, onClose, onPractice }: SongB
           {/* Close Button */}
           <button 
             onClick={onClose}
-            className="absolute top-6 right-6 z-50 p-2 rounded-full bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-all border border-white/5"
+            className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute top-6 right-6 z-50")}
           >
             <X className="h-5 w-5" />
           </button>

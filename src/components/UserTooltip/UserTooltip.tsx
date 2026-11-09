@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -309,7 +310,7 @@ export const UserTooltip = ({
                 <button
                   onClick={() => setOpen(false)}
                   aria-label={t("ui:close")}
-                  className="absolute right-2 top-2 z-30 flex h-7 w-7 items-center justify-center rounded-full bg-gray-900/80 text-gray-200 shadow-lg hover:text-white"
+                  className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute right-2 top-2 z-30")}
                 >
                   <X size={15} />
                 </button>

@@ -1,4 +1,5 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { X } from "lucide-react";
 import * as React from "react";
@@ -18,7 +19,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "font-openSans app-scrim fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "font-openSans app-scrim fixed inset-0 z-[115] bg-black/80 sm:z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className,
     )}
     {...props}
@@ -44,14 +45,28 @@ const DialogContent = React.forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          "font-openSans fixed left-0 top-0 z-50 grid h-[100dvh] w-full gap-4 overflow-y-auto border bg-background p-6 shadow-lg duration-base data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 sm:left-[50%] sm:top-[50%] sm:h-auto sm:translate-x-[-50%] sm:translate-y-[-50%] sm:overflow-visible sm:rounded-lg short:p-4 sm:short:max-h-[calc(100dvh-1.5rem)] sm:short:overflow-y-auto",
+          // Phones: a native bottom sheet — pinned to the bottom edge, as tall as
+          // its content (up to 92% of the screen), rounded on top, sliding up,
+          // above the bottom tab bar (z-[120] over its z-[100]) and clear of the
+          // home indicator. From `sm` up: the centred dialog it always was.
+          "font-openSans fixed inset-x-0 bottom-0 z-[120] grid max-h-[92dvh] w-full gap-4 overflow-y-auto rounded-t-[22px] border-0 bg-background px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] pt-9 shadow-lg duration-base data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-full data-[state=closed]:slide-out-to-bottom-full sm:inset-x-auto sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:z-50 sm:h-auto sm:max-h-none sm:translate-x-[-50%] sm:translate-y-[-50%] sm:overflow-visible sm:rounded-lg sm:border sm:p-6 sm:data-[state=open]:slide-in-from-bottom-0 sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 short:p-4 sm:short:max-h-[calc(100dvh-1.5rem)] sm:short:overflow-y-auto",
           className,
         )}
         {...props}>
+        {/* The sheet's grab handle — phones only, where the dialog is a sheet. */}
+        <span
+          aria-hidden
+          className='pointer-events-none absolute left-1/2 top-2.5 h-1.5 w-10 -translate-x-1/2 rounded-full bg-zinc-600/70 sm:hidden'
+        />
         {children}
+        {/* Close is a key like every other button — face, lip and press. */}
         {!hideCloseButton && (
-          <DialogPrimitive.Close className='absolute right-4 top-4 z-[100] rounded-full bg-black/50 p-2 text-white/70 outline-none backdrop-blur-md transition-all focus:ring-2 focus:ring-cyan-500/50 hover:bg-black/80 hover:text-white sm:right-6 sm:top-6'>
-            <X className='h-5 w-5' />
+          <DialogPrimitive.Close
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon" }),
+              "absolute right-4 top-4 z-[100] sm:right-6 sm:top-6",
+            )}>
+            <X />
             <span className='sr-only'>Close</span>
           </DialogPrimitive.Close>
         )}

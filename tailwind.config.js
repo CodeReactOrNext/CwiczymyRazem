@@ -138,6 +138,12 @@ const borderRadius = plugin(function ({ addUtilities }) {
   });
 });
 module.exports = {
+  // Hover styles only where there is a real hover (a mouse). On a phone a tap
+  // used to leave the button "hovered" until the next tap elsewhere — native
+  // apps have press feedback (active:) and nothing sticky after it.
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   content: [
     "src/pages/**/*.{js,ts,jsx,tsx}",
     "src/feature/**/*.{js,ts,jsx,tsx}",

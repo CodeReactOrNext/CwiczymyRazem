@@ -1,4 +1,4 @@
-import { PRESSABLE_KEY } from "assets/components/ui/button";
+import { buttonVariants,PRESSABLE_KEY } from "assets/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -92,7 +92,7 @@ export const SpeedsMasteredButton = memo(function SpeedsMasteredButton({
             </DialogDescription>
             <DialogClose
               aria-label={t("close")}
-              className='-mr-2 ml-auto flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400'>
+              className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "-mr-2 ml-auto")}>
               <X className='h-4 w-4' />
             </DialogClose>
           </div>

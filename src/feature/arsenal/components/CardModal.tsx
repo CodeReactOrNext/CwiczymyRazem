@@ -1,3 +1,5 @@
+import { buttonVariants } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { X } from "lucide-react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
@@ -29,7 +31,7 @@ export const CardModal = ({ onClose, children }: CardModalProps) => {
         <button
           onClick={onClose}
           aria-label='Close'
-          className='absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-zinc-300 shadow-lg hover:text-white'>
+          className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute -right-2 -top-2 z-10")}>
           <X size={15} />
         </button>
         {children}

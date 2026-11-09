@@ -1,3 +1,5 @@
+import { buttonVariants } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { PLAN_FEATURES as FEATURES, PLAN_PRICING as PRICING } from "feature/premium/data/plans";
 import { selectUserInfo } from "feature/user/store/userSlice";
 import { AnimatePresence, m } from "framer-motion";
@@ -278,7 +280,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
             
             <button
               onClick={onClose}
-              className="absolute right-6 top-6 z-50 flex h-10 w-10 items-center justify-center rounded bg-white/5 text-zinc-400 transition-all hover:bg-white/10 hover:text-white"
+              className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute right-6 top-6 z-50")}
             >
               <X size={18} />
             </button>

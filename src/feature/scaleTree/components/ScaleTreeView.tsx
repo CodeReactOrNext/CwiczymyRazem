@@ -1,3 +1,5 @@
+import { buttonVariants } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'hooks/useTranslation';
 import { ArrowLeft, Menu, X } from 'lucide-react';
@@ -157,7 +159,7 @@ export function ScaleTreeView() {
               <div className="relative">
                 <button
                   onClick={() => setIsSidebarOpen(false)}
-                  className="absolute right-2 top-2 z-50 flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-400 transition-background hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute right-2 top-2 z-50")}
                   aria-label={t('view.close_sidebar')}
                 >
                   <X className="h-4 w-4" />

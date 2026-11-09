@@ -18,6 +18,7 @@ import {
   Brain,
   CalendarDays,
   CassetteTape,
+  ChevronRight,
   ClipboardCheck,
   ClipboardList,
   Clock,
@@ -86,9 +87,11 @@ const ModeRow = ({
         createRipple(e);
         if (!loading) onActivate();
       }}
-      className='relative flex min-h-[68px] w-full items-center gap-4 overflow-hidden rounded-lg px-3.5 py-2.5 text-left transition-background hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
+      // A native list row: icon on a filled tile, a chevron that says "goes
+      // somewhere", and a pressed state you see under the finger (active:).
+      className='relative flex min-h-[68px] w-full items-center gap-3.5 overflow-hidden rounded-lg px-3 py-2.5 text-left transition-background hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:bg-zinc-800/80 active:click-behavior'>
       {ripple}
-      <span className='flex h-6 w-6 shrink-0 items-center justify-center text-zinc-400'>
+      <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] bg-zinc-800/80 text-zinc-300'>
         {loading ? (
           <Loader2 className='h-5 w-5 animate-spin' />
         ) : (
@@ -131,6 +134,7 @@ const ModeRow = ({
             : progress.label}
         </span>
       ) : null}
+      <ChevronRight aria-hidden className='h-4 w-4 shrink-0 text-zinc-600' />
     </button>
   );
 };

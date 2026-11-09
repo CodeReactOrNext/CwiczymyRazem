@@ -1,4 +1,4 @@
-import { Button } from "assets/components/ui/button";
+import { Button, buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import { PageTabs } from "components/PageTabs/PageTabs";
@@ -310,26 +310,26 @@ export const CalendarView = () => {
       <div className='space-y-8 px-3 py-6 md:px-6 md:py-8 lg:px-8'>
         <div className='flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex items-center gap-4'>
-            <div className='flex items-center gap-1 rounded-lg bg-zinc-900/60 p-1'>
+            <div className='flex items-center gap-1.5'>
               <button
                 type='button'
                 onClick={() => setWeekAnchor(addDays(shownMonday, -7))}
                 aria-label={t("week.previous")}
-                className='flex h-9 w-9 items-center justify-center rounded text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800'>
+                className={buttonVariants({ variant: "ghost", size: "icon" })}>
                 <ChevronLeft className='h-4 w-4' />
               </button>
               <button
                 type='button'
                 onClick={() => setWeekAnchor(today)}
                 disabled={shownMonday === currentMonday}
-                className='h-9 rounded px-3 text-sm font-medium text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:text-zinc-500 hover:bg-zinc-800 disabled:hover:bg-transparent'>
+                className={buttonVariants({ variant: "ghost" })}>
                 {t("week.today")}
               </button>
               <button
                 type='button'
                 onClick={() => setWeekAnchor(addDays(shownMonday, 7))}
                 aria-label={t("week.next")}
-                className='flex h-9 w-9 items-center justify-center rounded text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800'>
+                className={buttonVariants({ variant: "ghost", size: "icon" })}>
                 <ChevronRight className='h-4 w-4' />
               </button>
             </div>

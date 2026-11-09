@@ -1,4 +1,4 @@
-import { PRESSABLE } from "assets/components/ui/button";
+import { buttonVariants,PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
@@ -75,7 +75,7 @@ export const EffectPickerModal = ({
           <button
             onClick={onClose}
             aria-label={t("common.close")}
-            className='rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-white'>
+            className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
             <X size={18} />
           </button>
         </div>

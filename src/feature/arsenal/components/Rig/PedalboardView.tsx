@@ -1,4 +1,4 @@
-import { PRESSABLE } from "assets/components/ui/button";
+import { buttonVariants,PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
@@ -1871,7 +1871,7 @@ export const PedalboardView = ({
                       aria-label={t("board.take_off_name", {
                         name: effect.name,
                       })}
-                      className='absolute -right-1.5 -top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded border border-zinc-500 bg-black/90 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:border-zinc-300 hover:text-white'>
+                      className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute -right-1.5 -top-1.5 z-10")}>
                       <X size={8} />
                     </button>
                   </>
@@ -2132,7 +2132,7 @@ export const PedalboardView = ({
                     <button
                       onClick={(e) => handleRemove(placement.itemId, e)}
                       aria-label={t("board.remove_name", { name: effect.name })}
-                      className='absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded bg-black/90 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-white'>
+                      className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute -right-2 -top-1.5")}>
                       <X size={8} />
                     </button>
                   )}

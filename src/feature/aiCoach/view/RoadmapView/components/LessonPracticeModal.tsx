@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -301,7 +302,7 @@ const LessonPracticeModal = ({
               <button
                 type='button'
                 aria-label={t("drawer.close")}
-                className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
+                className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "shrink-0")}>
                 <X className='h-4 w-4' />
               </button>
             </DialogClose>

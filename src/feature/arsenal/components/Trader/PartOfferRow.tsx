@@ -197,7 +197,7 @@ export const PartOfferRow = ({
                   }}
                   disabled={maxQty < 1 || qty === fillTo}
                   aria-label={`${fameBound ? t("trader.max") : t("trader.all")} ${fillTo}`}
-                  className={cn(PRESSABLE, "h-8 w-11 shrink-0 rounded-md text-xs font-semibold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:bg-zinc-100/10 hover:text-white border-b-black/25")}>
+                  className={cn(PRESSABLE, "h-8 w-11 shrink-0 rounded-md bg-zinc-800/60 text-xs font-semibold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-30 hover:bg-zinc-100/10 hover:text-white border-b-black/25")}>
                   {fameBound ? t("trader.max") : t("trader.all")}
                 </button>
               </>

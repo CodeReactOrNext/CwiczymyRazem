@@ -1,4 +1,4 @@
-import { Button } from "assets/components/ui/button";
+import { Button, buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useNextMessage } from "feature/whatNext/hooks/useNextMessage";
 import { useWhatNextStore } from "feature/whatNext/store/whatNext.store";
@@ -131,7 +131,7 @@ export const StepBubble = ({
         <button
           type='button'
           onClick={notToday}
-          className='rounded px-1 text-xs font-medium text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:text-zinc-200'>
+          className={buttonVariants({ variant: "ghost", size: "sm" })}>
           {t("road.not_today")}
         </button>
       </div>

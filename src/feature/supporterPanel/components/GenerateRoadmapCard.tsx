@@ -1,4 +1,4 @@
-import { PRESSABLE } from "assets/components/ui/button";
+import { buttonVariants,PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import type { RoadmapVisibility } from "feature/aiCoach/types/roadmap.types";
@@ -378,7 +378,7 @@ export const GenerateRoadmapCard = ({
               }}
               aria-label={t("panel.generate.close_builder")}
               title={t("panel.close")}
-              className='flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
+              className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
               <X size={18} />
             </button>
           )}

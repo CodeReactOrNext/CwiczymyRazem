@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -58,7 +59,7 @@ const PreviewModal = ({
         <button
           onClick={onClose}
           aria-label={t("dex.close_preview")}
-          className='absolute -right-2 -top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-white'>
+          className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute -right-2 -top-2 z-10")}>
           <X size={15} />
         </button>
         {children}

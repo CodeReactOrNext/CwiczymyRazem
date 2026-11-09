@@ -1,4 +1,6 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
+import { cn } from "assets/lib/utils";
 import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
 import MainContainer from "components/MainContainer";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
@@ -62,7 +64,7 @@ export const WhatNextView = () => {
         const plan = roadSession.build();
         if (plan) setSession(plan);
       }}
-      className='rounded px-1 text-xs font-semibold text-cyan-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:text-cyan-300'>
+      className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-cyan-400 hover:text-cyan-300")}>
       {t("road.play_all", { count: ROAD_SESSION_MINUTES })}
     </button>
   ) : null;

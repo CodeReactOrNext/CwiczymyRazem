@@ -92,8 +92,12 @@ const buttonVariants = cva(
           PRESSABLE,
           "border-b-black/30 bg-white/10 text-zinc-300 hover:bg-white/15 hover:text-white",
         ],
-        // No lip on a button without a face — just the 1px press.
-        ghost: "hover:bg-accent hover:text-accent-foreground active:[translate:0_1px]",
+        // Every button reads as a key (owner's call, 2026-11): the quiet one
+        // gets a faint face and the same lip, instead of floating text.
+        ghost: [
+          PRESSABLE,
+          "border-b-black/25 bg-zinc-800/60 text-zinc-200 hover:bg-zinc-800 hover:text-white",
+        ],
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

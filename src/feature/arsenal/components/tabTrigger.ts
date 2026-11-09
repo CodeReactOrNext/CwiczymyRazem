@@ -13,13 +13,15 @@
  * gets the one interaction colour, as a 2px underline, and nothing else in
  * this row is coloured.
  *
- * On phones the tabs are cells of a 4×2 grid, label under the icon, so all eight are on screen
- * and every one is named — an icon row there showed only the active tab's label and cut Market
- * and Dex off past the edge. From `sm` up they're the rail again, label beside the icon.
+ * On phones it is a native app's chip row: one line that scrolls sideways, the
+ * label beside the icon, the active tab a filled pill (the fades at the rail's
+ * ends say there is more). It stays pinned at the top while the tab scrolls.
+ * The 4×2/4×3 grid it replaces cost three rows of screen before any content.
+ * From `sm` up they're the underlined rail again.
  */
 export const arsenalTabTriggerClass =
-  "min-w-0 flex-col gap-1 rounded-none border-b-2 border-transparent bg-transparent px-1 py-2 text-xs font-semibold text-arsenal-text-tertiary shadow-none transition-colors duration-fast hover:text-arsenal-text-primary data-[state=active]:border-arsenal-accent data-[state=active]:bg-transparent data-[state=active]:text-arsenal-text-primary data-[state=active]:shadow-none sm:shrink-0 sm:flex-row sm:gap-2 sm:px-4 sm:py-3 sm:text-sm";
+  "shrink-0 snap-start flex-row gap-1.5 rounded-full border-0 bg-zinc-800/60 px-3.5 py-2 text-sm font-semibold text-arsenal-text-secondary shadow-none transition-colors duration-fast hover:text-arsenal-text-primary data-[state=active]:bg-arsenal-accent data-[state=active]:text-arsenal-bg data-[state=active]:shadow-none sm:gap-2 sm:rounded-none sm:border-b-2 sm:border-transparent sm:bg-transparent sm:px-4 sm:py-3 sm:text-arsenal-text-tertiary sm:data-[state=active]:border-arsenal-accent sm:data-[state=active]:bg-transparent sm:data-[state=active]:text-arsenal-text-primary";
 
-/** The grid on phones, the scrolling rail from `sm` up — see `arsenalTabTriggerClass`. */
+/** The chip row on phones (pinned while scrolling), the rail from `sm` up — see above. */
 export const arsenalTabListClass =
-  "grid h-auto w-full grid-cols-4 gap-1 rounded-none bg-transparent p-0 overflow-x-auto no-scrollbar sm:flex sm:max-w-full sm:justify-start sm:border-b sm:border-arsenal-border";
+  "sticky top-0 z-30 -mx-4 flex h-auto w-auto snap-x scroll-px-4 justify-start gap-2 overflow-x-auto rounded-none bg-zinc-950/95 px-4 py-2.5 no-scrollbar backdrop-blur-md sm:static sm:mx-0 sm:w-full sm:max-w-full sm:gap-1 sm:border-b sm:border-arsenal-border sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none";

@@ -122,6 +122,25 @@ a {
 
 * {
   box-sizing: border-box;
+  /* No grey flash on tap — controls give their own press feedback. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Native feel on touch: a tap on a control is a tap (no double-tap-to-zoom
+   delay), and holding a button does not start selecting its label. */
+button,
+a,
+[role="button"],
+[role="tab"],
+label {
+  touch-action: manipulation;
+}
+button,
+[role="button"],
+[role="tab"] {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 @keyframes hover-effect {
