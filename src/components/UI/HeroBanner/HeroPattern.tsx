@@ -87,7 +87,9 @@ export const HeroPattern = ({
   return (
     <svg
       aria-hidden="true"
-      className={`absolute inset-0 h-full w-full ${className}`}
+      // light-hide: a texture drawn for a dark page — the app's light theme
+      // drops it (public pages never render the app shell, so they keep it).
+      className={`light-hide absolute inset-0 h-full w-full ${className}`}
       style={{ maskImage, WebkitMaskImage: maskImage }}
     >
       <defs>

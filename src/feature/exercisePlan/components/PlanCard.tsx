@@ -177,7 +177,9 @@ export const PlanCard = ({
   return (
     <Card
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden p-5 rounded-lg transition-background bg-gradient-to-br",
+        // light-plain + light-card: the light theme drops the tinted fade for a
+        // clean white card; the category colour stays on the icon tile.
+        "light-plain light-card group relative flex flex-col justify-between overflow-hidden p-5 rounded-lg transition-background bg-gradient-to-br",
         style.gradient,
         isLoading && "opacity-80 pointer-events-none",
         !isLocked && "click-behavior",
@@ -194,7 +196,7 @@ export const PlanCard = ({
       <div
         aria-hidden
         className={cn(
-          "pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full blur-3xl opacity-40 transition-opacity duration-slow group-hover:opacity-75",
+          "light-hide pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full blur-3xl opacity-40 transition-opacity duration-slow group-hover:opacity-75",
           isLocked ? "bg-zinc-500/15" : style.glow
         )}
       />
@@ -202,7 +204,7 @@ export const PlanCard = ({
       <Icon
         aria-hidden
         className={cn(
-          "pointer-events-none absolute -right-6 -top-6 h-28 w-28 opacity-[0.12] transition-opacity duration-slow group-hover:opacity-[0.18]",
+          "light-hide pointer-events-none absolute -right-6 -top-6 h-28 w-28 opacity-[0.12] transition-opacity duration-slow group-hover:opacity-[0.18]",
           isLocked ? "text-zinc-500" : style.text
         )}
       />

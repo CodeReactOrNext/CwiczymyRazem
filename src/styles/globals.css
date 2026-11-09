@@ -523,6 +523,13 @@ html.theme-light:has([data-app-shell]) .force-dark {
 html.theme-light:has([data-app-shell]) .light-hide {
   display: none !important;
 }
+html.theme-light:has([data-app-shell]) .light-plain {
+  background-image: none !important;
+}
+/* A card whose dark surface came from its gradient: give it a white one. */
+html.theme-light:has([data-app-shell]) .light-card {
+  background-color: #ffffff !important;
+}
 html.theme-light:has([data-app-shell]) .light-flat {
   filter: none !important;
   box-shadow: none !important;
@@ -752,4 +759,43 @@ html.theme-light:has([data-app-shell]) .support-warm [class*="bg-zinc-800/60"]:h
 html.theme-light:has([data-app-shell]) {
   --road-lip-open: #a1a1aa;
   --road-lip-locked: #c4c4c9;
+}
+
+/* Recharts on a light page. The charts pass white strokes/fills as SVG
+   attributes (grid rgba(255,255,255,.1), axis text .5) — invisible on white.
+   CSS beats presentation attributes, so the scaffolding is re-inked here; the
+   data series keep their own colours. */
+html.theme-light:has([data-app-shell]) .recharts-cartesian-grid line,
+html.theme-light:has([data-app-shell]) .recharts-polar-grid line,
+html.theme-light:has([data-app-shell]) .recharts-polar-grid path {
+  stroke: rgb(24 24 27 / 0.1);
+}
+html.theme-light:has([data-app-shell]) .recharts-cartesian-axis-line,
+html.theme-light:has([data-app-shell]) .recharts-cartesian-axis-tick-line {
+  stroke: rgb(24 24 27 / 0.2);
+}
+html.theme-light:has([data-app-shell]) .recharts-cartesian-axis-tick text,
+html.theme-light:has([data-app-shell]) .recharts-polar-angle-axis-tick text,
+html.theme-light:has([data-app-shell]) .recharts-polar-radius-axis-tick text,
+html.theme-light:has([data-app-shell]) .recharts-label,
+html.theme-light:has([data-app-shell]) .recharts-reference-line text {
+  fill: #52525b;
+  stroke: none;
+}
+html.theme-light:has([data-app-shell]) .recharts-tooltip-cursor {
+  stroke: rgb(24 24 27 / 0.2);
+}
+html.theme-light:has([data-app-shell]) .recharts-reference-line line {
+  stroke: rgb(24 24 27 / 0.25);
+}
+/* Active dots carry a near-black ring to cut them out of a dark plot. */
+html.theme-light:has([data-app-shell]) .recharts-active-dot circle,
+html.theme-light:has([data-app-shell]) .recharts-dot[stroke="#09090b"] {
+  stroke: #ffffff;
+}
+
+/* Scale Map board: a game board drawn for a dark page (force-dark keeps its
+   nodes); its 30% dark wash turned to mud on a light page — make it solid. */
+html.theme-light:has([data-app-shell]) .scale-board {
+  background-color: #111114 !important;
 }

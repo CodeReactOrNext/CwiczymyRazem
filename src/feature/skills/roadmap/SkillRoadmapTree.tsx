@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
+import { useColorTheme } from "lib/colorTheme/colorTheme";
 import { memo, useLayoutEffect, useRef } from "react";
 
 import type { RoadmapTier } from "./skillRoadmap.data";
@@ -39,7 +40,7 @@ interface SkillRoadmapTreeProps {
  * three accents are reserved for the states a player acts on: what is done,
  * what is next, and what needs Pro.
  */
-const INK = {
+const INK_DARK = {
   page: "#09090b", // zinc-950, the surface the map is drawn on
   line: "#27272a", // zinc-800, structure
   lineLit: "#3f3f46", // zinc-700, structure on a path already walked
@@ -54,6 +55,29 @@ const INK = {
   next: "#22d3ee", // cyan-400, up next
   locked: "#a16207", // yellow-700, Pro
 };
+
+/**
+ * The same roles on the light app theme: the map sits on a pale page, so the
+ * structure goes to light greys and the text to ink. SVG attributes cannot read
+ * CSS variables, hence a second palette picked per render.
+ */
+const INK_LIGHT: typeof INK_DARK = {
+  page: "#ebebee",
+  line: "#d4d4d8",
+  lineLit: "#a1a1aa",
+  slot: "#cfcfd4",
+  mark: "#c4c4c9",
+  ring: "#a1a1aa",
+  title: "#18181b",
+  label: "#27272a",
+  muted: "#52525b",
+  faint: "#71717a",
+  done: "#059669",
+  next: "#0891b2",
+  locked: "#a16207",
+};
+
+const useInk = () => (useColorTheme() === "light" ? INK_LIGHT : INK_DARK);
 
 /** Inter, the app's body face — set explicitly because SVG ignores the cascade. */
 const FONT = "Inter, ui-sans-serif, system-ui, sans-serif";
@@ -113,7 +137,9 @@ const DifficultyPips = ({
   x: number;
   y: number;
   level: number;
-}) => (
+}) => {
+  const INK = useInk();
+  return (
   <g aria-hidden='true'>
     {Array.from({ length: level }, (_, i) => (
       <circle
@@ -125,7 +151,8 @@ const DifficultyPips = ({
       />
     ))}
   </g>
-);
+  );
+};
 
 /** Dot identity plus where it currently sits on screen. */
 const hoverFor = (
@@ -155,6 +182,7 @@ const Dot = ({
   x: number;
   y: number;
 }) => {
+  const INK = useInk();
   const r = G.dotRadius;
   if (state === "completed") {
     return <circle cx={x} cy={y} r={r} fill={INK.done} />;
@@ -229,6 +257,7 @@ const BranchHeader = ({
   started: boolean;
   type: TypeScale;
 }) => {
+  const INK = useInk();
   const nameRef = useRef<SVGTextElement>(null);
   const levelRef = useRef<SVGTextElement>(null);
   const { t } = useTranslation("skills");
@@ -321,6 +350,7 @@ const Branch = ({
   onNodeClick: SkillRoadmapTreeProps["onNodeClick"];
   onBranchClick: SkillRoadmapTreeProps["onBranchClick"];
 }) => {
+  const INK = useInk();
   const started = branch.nodes.some(
     (n) => progress.states.get(n.id) === "completed",
   );
@@ -451,6 +481,7 @@ const Stop = ({
   total: number;
   type: TypeScale;
 }) => {
+  const INK = useInk();
   const r = G.milestoneRadius;
   const share = total > 0 ? completed / total : 0;
   const done = total > 0 && completed === total;
@@ -553,6 +584,8 @@ export const SkillRoadmapTree = memo(function SkillRoadmapTree({
   scale = 1,
   animate = true,
 }: SkillRoadmapTreeProps) {
+  const INK = useInk();
+
   const labels = useSkillRoadmapLabels();
   const tierById = new Map(tiers.map((tier) => [tier.id, tier]));
   const type = typeScaleFor(scale);
