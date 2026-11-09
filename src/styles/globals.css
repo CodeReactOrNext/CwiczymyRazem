@@ -682,6 +682,8 @@ html.theme-light:has([data-app-shell]) {
   --tx-6ee7b7: #047857;
   --tx-52525b: #a1a1aa;
   --affix-panel: rgba(24, 24, 27, 0.04);
+  /* Card footer band (market seller/price/Buy): a light well, not a black wash. */
+  --card-footer: rgba(24, 24, 27, 0.035);
 }
 html.theme-light:has([data-app-shell]) .force-dark {
   --ink-mix: 0%;
@@ -694,7 +696,7 @@ html.theme-light:has([data-app-shell]) .force-dark {
   --tx-ff7f7f: initial; --tx-ffbf7f: initial; --tx-ffff7f: initial;
   --tx-7fff7f: initial; --tx-7fffff: initial;
   --tx-f5a524: initial; --tx-7dd3fc: initial; --tx-6ee7b7: initial;
-  --tx-52525b: initial; --affix-panel: initial;
+  --tx-52525b: initial; --affix-panel: initial; --card-footer: initial;
 }
 
 /* Rig display (GuitarRack). The lit niches stay exactly as in the dark theme

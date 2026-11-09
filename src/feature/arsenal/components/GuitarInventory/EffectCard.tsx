@@ -338,7 +338,7 @@ export const EffectCard = ({
           className='relative z-10 flex-shrink-0 border-t'
           style={{
             borderColor: `${rs.baseColor}20`,
-            background: "rgba(0,0,0,0.35)",
+            background: "var(--card-footer, rgba(0,0,0,0.35))",
           }}>
           {footer}
         </div>
