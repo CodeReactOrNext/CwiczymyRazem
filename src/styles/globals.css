@@ -562,6 +562,7 @@ html.theme-light:has([data-app-shell]) .light-plain {
 /* A card whose dark surface came from its gradient: give it a white one. */
 html.theme-light:has([data-app-shell]) .light-card {
   background-color: #ffffff !important;
+  border-color: transparent !important;
 }
 html.theme-light:has([data-app-shell]) .light-flat {
   filter: none !important;
@@ -846,4 +847,14 @@ html.theme-light:has([data-app-shell]) .support-warm svg.light-hide {
 html.theme-light:has([data-app-shell]) .nav-active {
   background-color: #18181b !important;
   color: #ffffff !important;
+}
+
+/* Ink & gold: the accent chip (Chip color="cyan" — practiced plan/exercise
+   links in the feed, "Most used"…) is an ink badge with gold text on light. */
+html.theme-light:has([data-app-shell]) .chip-cyan:not(.force-dark *) {
+  background-color: #18181b !important;
+  color: #fbbf24 !important;
+}
+html.theme-light:has([data-app-shell]) .chip-cyan:not(.force-dark *):hover {
+  background-color: #27272a !important;
 }

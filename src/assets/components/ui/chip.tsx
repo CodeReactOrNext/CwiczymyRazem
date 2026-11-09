@@ -7,7 +7,8 @@ const chipVariants = cva(
   {
     variants: {
       color: {
-        cyan: "bg-cyan-950/30 text-cyan-400 hover:bg-cyan-950/50",
+        // chip-cyan: an ink badge with gold text in the light theme (globals.css).
+        cyan: "chip-cyan bg-cyan-950/30 text-cyan-400 hover:bg-cyan-950/50",
         emerald: "bg-emerald-950/30 text-emerald-400 hover:bg-emerald-950/50",
         purple: "bg-purple-950/30 text-purple-400 hover:bg-purple-950/50",
         amber: "bg-amber-950/30 text-amber-400 hover:bg-amber-950/50",

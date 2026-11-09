@@ -183,7 +183,10 @@ const themeVariables = () => {
       light[varName(name, shade)] = hexToRgb(lightPalette[ACCENT_LIGHT_MAP[shade]]);
       if (name === "cyan") {
         dark[`--c-cyan-t-${shade}`] = hexToRgb(palette[shade]);
-        light[`--c-cyan-t-${shade}`] = "24 24 27";
+        // Tints of the dark shades (700–950 at /30–/50) were drawn to be a
+        // faint wash on near-black; on white they must stay faint too, so
+        // they wash in a mid grey rather than ink.
+        light[`--c-cyan-t-${shade}`] = Number(shade) >= 700 ? "113 113 122" : "24 24 27";
       }
     }
   }
