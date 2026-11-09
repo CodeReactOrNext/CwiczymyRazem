@@ -61,7 +61,7 @@ export function PremiumFeaturePreview({
         {/* Preview Image with Glow */}
         {previewImagePath && (
           <div className="mb-24 relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-orange-500/20 to-cyan-500/20 rounded-md blur-2xl opacity-50 group-hover:opacity-75 transition duration-1000 group-hover:duration-base" />
+            <div className="absolute -inset-1 light-hide bg-gradient-to-r from-cyan-500/20 via-orange-500/20 to-cyan-500/20 rounded-md blur-2xl opacity-50 group-hover:opacity-75 transition duration-1000 group-hover:duration-base" />
             <div className="relative rounded-md overflow-hidden bg-zinc-900 shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/40 to-transparent pointer-events-none z-10" />
               <div className="relative w-full aspect-[16/9]">

@@ -149,7 +149,7 @@ export const RoadmapPerks = () => {
         maskImage='linear-gradient(to right, black 0%, transparent 55%)'
         gradient={["#fbbf24", "#f97316"]}
       />
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-transparent' />
+      <div className='pointer-events-none absolute inset-0 light-tint bg-gradient-to-r from-amber-500/10 via-transparent to-transparent' />
 
       <div className='relative flex flex-wrap items-start justify-between gap-x-12 gap-y-5'>
         <div className='min-w-0 max-w-2xl'>

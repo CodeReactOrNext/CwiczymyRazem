@@ -10,7 +10,7 @@
 
 /** Blueprint navy, lit from where the part sits rather than flat across the plate. */
 export const PLATE_WASH =
-  "radial-gradient(circle at 50% 42%, #16305a 0%, #0e2143 55%, #081527 100%)";
+  "radial-gradient(circle at 50% 42%, var(--ars-bp-1) 0%, var(--ars-bp-2) 55%, var(--ars-bp-3) 100%)";
 
 /**
  * The same idea at card strength: a tint, not a colour. A whole job card washed as
@@ -36,7 +36,8 @@ export const hatchWash = (line: string, step = 9) =>
 export const dotWash = (dot: string) =>
   `radial-gradient(${dot} 1px, transparent 1.6px)`;
 
-export const GRID_LINE = "rgba(147,190,255,0.09)";
+/** Theme-aware (globals.css → --ars-bp-*): a pale drafting sheet in the light theme. */
+export const GRID_LINE = "var(--ars-bp-grid)";
 
 /** A drafting plate's two layers, ready to hand to `style` — grid over wash. */
 export const plateStyle = (cell: string, wash: string = PLATE_WASH) => ({

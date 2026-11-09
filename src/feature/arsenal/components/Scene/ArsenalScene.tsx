@@ -134,7 +134,7 @@ export const ArsenalScene = ({
       role='status'
       // Clipped sideways: shards and sparks fly past the edge of a phone, and
       // must not open a horizontal scrollbar mid-scene.
-      className='fixed inset-0 z-[1100] overflow-y-auto overflow-x-hidden bg-black/95'
+      className='force-dark fixed inset-0 z-[1100] overflow-y-auto overflow-x-hidden bg-black/95'
       style={{ pointerEvents: "auto" }}
       onPointerDown={(e) => e.stopPropagation()}
       initial={{ opacity: 0 }}

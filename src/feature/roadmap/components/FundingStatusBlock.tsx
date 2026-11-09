@@ -43,7 +43,7 @@ export const FundingStatusBlock = ({
                 </span>
               </span>
             </span>
-            <span className='shrink-0 font-semibold text-cyan-400'>
+            <span className='funding-amount shrink-0 font-semibold text-cyan-400'>
               {t("funding.to_go", { amount: toGo })}
             </span>
           </>
@@ -62,10 +62,10 @@ export const FundingStatusBlock = ({
         )}
       </div>
 
-      <div className='mt-2 h-2.5 w-full overflow-hidden rounded-full bg-zinc-800/80'>
+      <div className='funding-track mt-2 h-2.5 w-full overflow-hidden rounded-full bg-zinc-800/80'>
         <div
           className={cn(
-            "bar-shine h-full rounded-full transition-[width] duration-slow ease-out",
+            "funding-bar bar-shine h-full rounded-full transition-[width] duration-slow ease-out",
             showsTier
               ? "bg-gradient-to-r from-cyan-500 to-cyan-400"
               : isCovered

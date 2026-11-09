@@ -191,7 +191,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   return (
     <div className={cn(
       "relative w-full overflow-hidden rounded-xl",
-      cinema ? "bg-transparent" : "bg-[#1a1a1d] shadow-xl shadow-black/40"
+      cinema ? "bg-transparent" : "bg-zinc-900 shadow-xl shadow-black/40"
     )}>
 
       {/* Tablature exercises dock the HUD next to their minimap; everything else gets it here.

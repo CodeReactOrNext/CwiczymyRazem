@@ -4,6 +4,7 @@ const plugin = require("tailwindcss/plugin");
 const motion = require("./src/lib/motion/tokens.json");
 const ms = (n) => `${n}ms`;
 const bezier = (p) => `cubic-bezier(${p.join(", ")})`;
+const { themedColors, themeVariables } = require("./src/styles/colorThemePalette");
 /** @type {import('tailwindcss').Config} */
 
 /**
@@ -30,6 +31,11 @@ const shortwide = plugin(function ({ addVariant }) {
  */
 const lightSurface = plugin(function ({ addVariant }) {
   addVariant("light", ".light &");
+});
+
+/** The colour variables behind themedColors(): dark on :root, light under the app's light theme. */
+const colorThemeVariables = plugin(function ({ addBase }) {
+  addBase(themeVariables());
 });
 
 const rotateX = plugin(function ({ addUtilities }) {
@@ -280,26 +286,11 @@ module.exports = {
           info: "#22D3EE",
         },
 
-        // Cyan accent (same hue as old `main` but clean scale)
-        cyan: {
-          50: "#ECFEFF",
-          100: "#CFFAFE",
-          200: "#A5F3FC",
-          300: "#67E8F9",
-          400: "#22D3EE", // primary accent
-          500: "#06B6D4",
-          600: "#0891B2",
-          700: "#0E7490",
-          800: "#155E75",
-          900: "#164E63",
-        },
-
-        // Emerald accent (success/secondary)
-        emerald: {
-          400: "#34D399",
-          500: "#10B981",
-          600: "#059669",
-        },
+        // zinc / white / black and the accent palettes resolve through CSS
+        // variables so the app can switch to a light theme — see
+        // src/styles/colorThemePalette.js. (Cyan and emerald keep the custom
+        // shades they had here; they live in that file now.)
+        ...themedColors(),
 
         // Arsenal design system — scoped to this one feature (not a global
         // palette swap): three flat surface levels instead of the various
@@ -308,18 +299,8 @@ module.exports = {
         // src/feature/arsenal for usage; gold stays reserved for Fame and
         // rarity keeps its own colors (RARITY_STYLES) — this token set is
         // deliberately just surfaces, interaction and text.
-        arsenal: {
-          bg: "#101113",
-          section: "#17191D",
-          card: "#1E2126",
-          border: "#30343B",
-          accent: "#FFFFFF",
-          text: {
-            primary: "#F2F4F7",
-            secondary: "#B4BAC4",
-            tertiary: "#8C95A3",
-          },
-        },
+        // arsenal: { bg, section, card, border, accent, text.* } — comes from
+        // themedColors() so it follows the light theme too.
 
         // Ivory — the single light-background section on the landing page
         // (see docs/STYLEGUIDE.md §3: app is otherwise dark-only). Values are
@@ -577,6 +558,7 @@ module.exports = {
     borderRadius,
     shortwide,
     lightSurface,
+    colorThemeVariables,
     require("tailwindcss-animate"),
     require("@tailwindcss/typography"),
   ],

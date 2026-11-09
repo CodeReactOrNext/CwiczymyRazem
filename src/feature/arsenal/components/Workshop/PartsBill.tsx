@@ -3,6 +3,7 @@ import {
 } from "feature/arsenal/data/partDefinitions";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
+import { readableText } from "lib/colorTheme/colorTheme";
 
 import { PartIcon } from "../Parts/PartIcon";
 
@@ -46,7 +47,7 @@ export const PartsBill = ({ parts, title }: PartsBillProps) => {
               </span>
               <span
                 className='text-[10px] font-semibold'
-                style={{ color: PART_TIER_COLORS[part.tier] }}>
+                style={{ color: readableText(PART_TIER_COLORS[part.tier]) }}>
                 {labels.partTier(part.tier)}
               </span>
             </span>

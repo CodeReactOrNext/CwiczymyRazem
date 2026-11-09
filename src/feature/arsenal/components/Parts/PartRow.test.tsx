@@ -18,8 +18,11 @@ describe("PartRow", () => {
     // it is exactly the row this was meant to replace.
     const plate = container.querySelector<HTMLElement>('[aria-hidden="true"]');
     expect(plate).not.toBeNull();
-    // Epic is #a855f7, which the DOM hands back as rgb components.
-    expect(plate!.style.backgroundImage).toContain("168, 85, 247");
+    // Epic is #a855f7. The plate's light sits inside a theme variable now
+    // (var(--ars-plate-image, …)), so the DOM keeps it as written — accept the
+    // hex as well as the rgb components a plain gradient is normalised to.
+    const style = (plate!.getAttribute("style") ?? "").toLowerCase();
+    expect(style.includes("#a855f7") || style.includes("168, 85, 247")).toBe(true);
   });
 
   it("leaves a cost that is not a part unsocketed", () => {

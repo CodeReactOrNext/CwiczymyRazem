@@ -528,7 +528,8 @@ export const TablatureSection = memo(function TablatureSection({
         // pb clears the session's bottom bar (fixed, ~65px tall).
         cinema
           ? "fixed inset-x-0 bottom-0 z-20 mb-0 bg-transparent px-6 pb-[80px]"
-          : "mb-4 bg-[#0f0f12]",
+          // The board keeps its own (dark) look in the light theme too.
+          : "force-dark mb-4 bg-[#0f0f12]",
       )}>
       {canShowAlphaTabScore && scoreEverShown && (
         <div

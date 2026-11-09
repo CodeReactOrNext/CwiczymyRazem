@@ -1029,17 +1029,17 @@ const FirebaseLogsSupportAskItem = ({
 
   return (
     <div
-      className={`relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-base ${
+      className={`force-dark support-warm relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-base ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       {/* Same tiled icon pattern and warm glow as the "Help build Riff Quest" banner
           (feature/dashboard/components/SupportBanner.tsx), so the funding story looks
           the same wherever it shows up. */}
       <HeroPattern
-        className='opacity-[0.08]'
+        className='light-hide opacity-[0.08]'
         maskImage='linear-gradient(to right, black 0%, transparent 55%)'
       />
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-transparent' />
+      <div className='pointer-events-none absolute inset-0 light-hide bg-gradient-to-r from-orange-500/10 via-transparent to-transparent' />
       <div className='relative z-10 flex flex-wrap items-center gap-3 px-3 py-3 sm:px-5 sm:py-4'>
         <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500/10'>
           <Heart size={16} className='text-orange-400' fill='currentColor' />
@@ -1156,14 +1156,14 @@ const FirebaseLogsDonationItem = ({
 
   return (
     <div
-      className={`relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-base ${
+      className={`force-dark support-warm relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-base ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       <HeroPattern
-        className='opacity-[0.1]'
+        className='light-hide opacity-[0.1]'
         maskImage='linear-gradient(to right, black 0%, transparent 60%)'
       />
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-orange-500/15 via-transparent to-transparent' />
+      <div className='pointer-events-none absolute inset-0 light-hide bg-gradient-to-r from-orange-500/15 via-transparent to-transparent' />
       <div className='relative z-10 flex flex-wrap items-center gap-3 px-3 py-3 sm:px-5 sm:py-4'>
         <div className='min-w-0 flex-1'>
           <p className='text-xs font-semibold text-orange-400'>

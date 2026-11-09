@@ -80,6 +80,9 @@ export const HeroPattern = ({
   const maskId = `${patternId}-mask`;
   const resolvedVariant: PatternVariant = variant ?? (withHeart ? "heart" : withShuffle ? "shuffle" : "guitar");
   const [IconA, IconB, IconC, IconD] = ICON_SETS[resolvedVariant];
+  // As a luminance mask the icons must stay pure white in either app theme
+  // (`text-white` turns dark in the light theme and would hide the gradient).
+  const iconClass = gradient ? "text-[#fff]" : "text-white";
 
   return (
     <svg
@@ -98,16 +101,16 @@ export const HeroPattern = ({
           patternTransform="rotate(-15)"
         >
           <g transform="translate(20, 20)">
-            <IconA size={32} className="text-white" strokeWidth={1.5} />
+            <IconA size={32} className={iconClass} strokeWidth={1.5} />
           </g>
           <g transform="translate(100, 40)">
-            <IconB size={28} className="text-white" strokeWidth={1.5} />
+            <IconB size={28} className={iconClass} strokeWidth={1.5} />
           </g>
           <g transform="translate(40, 100)">
-            <IconC size={30} className="text-white" strokeWidth={1.5} />
+            <IconC size={30} className={iconClass} strokeWidth={1.5} />
           </g>
           <g transform="translate(110, 110)">
-            <IconD size={32} className="text-white" strokeWidth={1.5} />
+            <IconD size={32} className={iconClass} strokeWidth={1.5} />
           </g>
         </pattern>
 

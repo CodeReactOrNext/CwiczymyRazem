@@ -4,6 +4,7 @@ import {
   rowOf,
   STASH_COLUMNS,
 } from "feature/arsenal/utils/stashLayout";
+import { useColorTheme } from "lib/colorTheme/colorTheme";
 import type { CSSProperties, ReactNode, RefObject } from "react";
 
 export const STASH_GAP = 6;
@@ -42,13 +43,20 @@ export const StashBoard = ({
   label,
   children,
   className,
-}: StashBoardProps) => (
+}: StashBoardProps) => {
+  // Light theme: a flat grey cabinet of white sockets instead of the dark
+  // recessed one — no inset shadows, just two background tones.
+  const isLight = useColorTheme() === "light";
+  return (
   <div
     className={cn(
       "overflow-x-auto rounded-lg p-3 transition-shadow",
       className,
     )}
-    style={{
+    style={isLight ? {
+      background: receiving ? "rgba(34,211,238,0.12)" : "rgb(var(--c-zinc-800) / 0.6)",
+      boxShadow: receiving ? "inset 0 0 0 1px rgba(8,145,178,0.6)" : undefined,
+    } : {
       background: receiving
         ? "linear-gradient(180deg, rgba(34,211,238,0.16) 0%, rgba(9,9,11,0.85) 22%, rgba(9,9,11,0.92) 100%)"
         : "linear-gradient(180deg, rgba(39,39,42,0.55) 0%, rgba(9,9,11,0.85) 22%, rgba(9,9,11,0.92) 100%)",
@@ -86,10 +94,12 @@ export const StashBoard = ({
           style={{
             gridColumn: columnOf(i) + 1,
             gridRow: rowOf(i) + 1,
-            background:
-              "linear-gradient(160deg, rgba(24,24,27,0.9) 0%, rgba(9,9,11,0.9) 100%)",
-            boxShadow:
-              "inset 0 0 0 1px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.035)",
+            background: isLight
+              ? "rgb(var(--c-zinc-900) / 0.7)"
+              : "linear-gradient(160deg, rgba(24,24,27,0.9) 0%, rgba(9,9,11,0.9) 100%)",
+            boxShadow: isLight
+              ? undefined
+              : "inset 0 0 0 1px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.035)",
           }}
         />
       ))}
@@ -115,7 +125,8 @@ export const StashBoard = ({
       {children}
     </div>
   </div>
-);
+  );
+};
 
 /** Which cell a pointer is over, or null when it is off the board. */
 export const cellFromPoint = (

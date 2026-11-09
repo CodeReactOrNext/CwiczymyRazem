@@ -11,6 +11,7 @@ import {
   tabNavTriggerClass,
 } from "components/PageTabs/tabNav";
 import { useRailEdges } from "components/PageTabs/useRailEdges";
+import { AppearanceSettings } from "feature/settings/components/AppearanceSettings";
 import EmailChange from "feature/settings/components/EmailChange";
 import EmailNotificationSettings from "feature/settings/components/EmailNotificationSettings";
 import { GuitarStartDate } from "feature/settings/components/GuitarStartDate";
@@ -97,6 +98,7 @@ const SettingsView = () => {
               <ProfileBasics />
               <GuitarStartDate />
               <LanguageSettings />
+              <AppearanceSettings />
               <StreakSettings />
               <SoundSettings />
             </TabsContent>

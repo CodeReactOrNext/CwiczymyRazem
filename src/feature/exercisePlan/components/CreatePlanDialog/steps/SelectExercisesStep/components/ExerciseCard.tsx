@@ -77,7 +77,7 @@ export const ExerciseCard = ({
          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,rgba(255,255,255,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-slow pointer-events-none" />
       )}
       {isSelected && (
-         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-20%,rgba(6,182,212,0.15),transparent_60%)] pointer-events-none" />
+         <div className="absolute inset-0 light-hide bg-[radial-gradient(ellipse_at_50%_-20%,rgba(6,182,212,0.15),transparent_60%)] pointer-events-none" />
       )}
 
       {/* Main content wrapper */}

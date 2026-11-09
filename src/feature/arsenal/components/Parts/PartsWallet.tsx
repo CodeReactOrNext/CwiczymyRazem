@@ -8,6 +8,7 @@ import {
   getWalletTierTotals,
   groupWalletByPart,
 } from "feature/arsenal/utils/scrap";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { Wrench } from "lucide-react";
 import { useMemo } from "react";
 
@@ -45,7 +46,7 @@ export const PartsWallet = ({ parts, className }: PartsWalletProps) => {
               </span>
               <span
                 className='text-[11px] font-semibold'
-                style={{ color: PART_TIER_COLORS[tier] }}>
+                style={{ color: readableText(PART_TIER_COLORS[tier]) }}>
                 {labels.partTier(tier)}
               </span>
             </span>
@@ -91,7 +92,7 @@ export const PartsWallet = ({ parts, className }: PartsWalletProps) => {
                     </TierPlate>
                     <span
                       className='text-[9px] font-bold'
-                      style={{ color: PART_TIER_COLORS[t.tier] }}>
+                      style={{ color: readableText(PART_TIER_COLORS[t.tier]) }}>
                       {labels.partTier(t.tier)}
                     </span>
                   </span>

@@ -15,6 +15,7 @@ import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { buildDexLookup } from "feature/arsenal/utils/dex";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { readableText,useColorTheme } from "lib/colorTheme/colorTheme";
 import { Clock3 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -50,6 +51,9 @@ export const DailyCaseCard = ({
 }: DailyCaseCardProps) => {
   const caseDef = CASE_DEFINITIONS.daily;
   const labels = useArsenalLabels();
+  // Light theme: the pool tiles go flat — a plain rarity tint, no lit edge,
+  // corner glow or contact shadow.
+  const isLight = useColorTheme() === "light";
   const { t } = labels;
   const canAfford = currentFame >= caseDef.fameCost;
 
@@ -78,7 +82,9 @@ export const DailyCaseCard = ({
           crop trims top and bottom; anchoring at 25% keeps the raised lid
           whole and gives up floor instead. The band clips it, so nothing
           runs under the tiles below. */}
-      <div className='relative min-h-[22rem] overflow-hidden'>
+      {/* force-dark: the render is composed on near-black, so the band stays a
+          dark photo banner in the light theme instead of melting into white. */}
+      <div className='force-dark relative min-h-[22rem] overflow-hidden bg-arsenal-section'>
         <img
           src='/images/case-featured-hero.webp'
           alt=''
@@ -90,7 +96,7 @@ export const DailyCaseCard = ({
             wash from the left for the copy, a fade at the foot, and a touch
             of dark at the top so the ceiling of the render goes quiet. */}
         <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-arsenal-section via-arsenal-section/70 to-transparent lg:via-arsenal-section/20' />
-        <div className='pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-arsenal-section via-arsenal-section/50 to-transparent' />
+        <div className='light-hide pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-arsenal-section via-arsenal-section/50 to-transparent' />
         <div className='pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-arsenal-section/50 to-transparent' />
 
         <div className='relative flex min-h-[22rem] flex-col justify-center gap-5 p-6 sm:p-8 lg:max-w-[46%]'>
@@ -169,14 +175,23 @@ export const DailyCaseCard = ({
                           spreads across the tile the same way. The bottom
                           darkens so the tile reads as sitting on the panel. */}
                       <div
-                        className='rounded-xl p-px shadow-[0_10px_18px_-12px_rgba(0,0,0,0.6)]'
-                        style={{
-                          background: `linear-gradient(45deg, ${rs.baseColor}a6 0%, ${rs.baseColor}40 30%, rgba(244,244,245,0.10) 60%, rgba(244,244,245,0.10) 100%)`,
-                        }}>
-                        <div className='relative flex aspect-square items-center justify-center overflow-hidden rounded-[11px] bg-arsenal-bg'>
+                        className={cn(
+                          "rounded-xl p-px",
+                          !isLight && "shadow-[0_10px_18px_-12px_rgba(0,0,0,0.6)]",
+                        )}
+                        style={
+                          isLight
+                            ? undefined
+                            : {
+                                background: `linear-gradient(45deg, ${rs.baseColor}a6 0%, ${rs.baseColor}40 30%, rgba(244,244,245,0.10) 60%, rgba(244,244,245,0.10) 100%)`,
+                              }
+                        }>
+                        <div
+                          className='relative flex aspect-square items-center justify-center overflow-hidden rounded-[11px] bg-arsenal-bg'
+                          style={isLight ? { backgroundColor: `${rs.baseColor}1f` } : undefined}>
                           {/* Soft pool of light tucked into the bottom-left corner */}
                           <div
-                            className='pointer-events-none absolute -bottom-1/3 -left-1/3 h-full w-full rounded-full opacity-90 blur-2xl transition-opacity group-hover:opacity-100'
+                            className='light-hide pointer-events-none absolute -bottom-1/3 -left-1/3 h-full w-full rounded-full opacity-90 blur-2xl transition-opacity group-hover:opacity-100'
                             style={{
                               background: `radial-gradient(circle at center, ${rs.baseColor}8c 0%, ${rs.baseColor}26 50%, transparent 72%)`,
                             }}
@@ -184,7 +199,7 @@ export const DailyCaseCard = ({
                           {/* Contact shadow only: a pool of dark right under
                               the instrument's base, as if it stood on the
                               tile — no shadow on the silhouette itself. */}
-                          <div className='pointer-events-none absolute bottom-[4%] left-1/2 h-[7%] w-[52%] -translate-x-1/2 rounded-[100%] bg-black/85 blur-[5px]' />
+                          <div className='light-hide pointer-events-none absolute bottom-[4%] left-1/2 h-[7%] w-[52%] -translate-x-1/2 rounded-[100%] bg-black/85 blur-[5px]' />
                           <div className='relative z-10 flex h-[86%] w-[86%] items-center justify-center transition-transform duration-base'>
                             <img
                               src={imageSrc}
@@ -215,7 +230,7 @@ export const DailyCaseCard = ({
                         </p>
                         <p
                           className='mt-1 pl-4 text-[13px] font-medium'
-                          style={{ color: rs.baseColor }}>
+                          style={{ color: readableText(rs.baseColor) }}>
                           {labels.rarity(entry.def.rarity)}
                         </p>
                       </div>
@@ -228,12 +243,12 @@ export const DailyCaseCard = ({
                     <div className='mt-2.5 flex items-baseline justify-between gap-4'>
                       <span
                         className='text-[11px] font-semibold'
-                        style={{ color: rs.baseColor }}>
+                        style={{ color: readableText(rs.baseColor) }}>
                         {labels.rarity(entry.def.rarity)}
                       </span>
                       <span
                         className='text-lg font-black tabular-nums'
-                        style={{ color: rs.baseColor }}>
+                        style={{ color: readableText(rs.baseColor) }}>
                         {chance !== undefined
                           ? `${(chance * 100).toFixed(1)}%`
                           : "—"}

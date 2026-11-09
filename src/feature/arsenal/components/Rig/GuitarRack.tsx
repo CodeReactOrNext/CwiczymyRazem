@@ -24,6 +24,7 @@ import {
   useReducedMotion,
   useTransform,
 } from "framer-motion";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { ArrowLeftRight, CirclePlus, MoreVertical, Trash2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 
@@ -389,7 +390,8 @@ const Bay = ({
       <div
         ref={bayRef}
         className={cn(
-          "relative flex h-[26rem] flex-col items-center overflow-hidden md:row-start-1 md:h-[36rem]",
+          // force-dark + rig-bay: see DisplayBay.
+          "force-dark rig-bay relative flex h-[26rem] flex-col items-center overflow-hidden md:row-start-1 md:h-[36rem]",
           BAY_COLUMN[index],
         )}
         style={{ background: WALL }}>
@@ -431,7 +433,8 @@ const Bay = ({
     <div
       ref={bayRef}
       className={cn(
-        "group relative flex h-[26rem] flex-col items-center overflow-hidden md:row-start-1 md:h-[36rem]",
+        // force-dark + rig-bay: see DisplayBay.
+        "force-dark rig-bay group relative flex h-[26rem] flex-col items-center overflow-hidden md:row-start-1 md:h-[36rem]",
         onShowCard ? "cursor-pointer" : "cursor-default",
         BAY_COLUMN[index],
       )}
@@ -545,7 +548,7 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
           </p>
           <p className='mt-0.5 truncate text-sm text-zinc-300'>
             {guitar.brand} <span className='text-zinc-600'>·</span>{" "}
-            <span className='font-medium' style={{ color: rs.baseColor }}>
+            <span className='font-medium' style={{ color: readableText(rs.baseColor) }}>
               {labels.rarity(rarity)}
             </span>{" "}
             <span className='text-zinc-600'>·</span>{" "}
@@ -593,7 +596,7 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
           className='max-w-[14rem]'
         />
         <p className='text-sm'>
-          <span className='font-medium' style={{ color: grade.color }}>
+          <span className='font-medium' style={{ color: readableText(grade.color) }}>
             {labels.condition(grade)}
           </span>{" "}
           <span className='text-zinc-500'>{t("rack.condition_word")}</span>
@@ -648,9 +651,9 @@ export const GuitarRack = ({
 
   return (
     <div
-      className='rounded-lg bg-arsenal-card p-1.5'
+      className='rig-wall rounded-lg bg-arsenal-card p-1.5'
       style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)" }}>
-      <div className='grid grid-cols-1 gap-px overflow-hidden rounded bg-black/60 md:grid-cols-3 md:grid-rows-[auto_auto]'>
+      <div className='rig-grid grid grid-cols-1 gap-px overflow-hidden rounded bg-black/60 md:grid-cols-3 md:grid-rows-[auto_auto]'>
         {([0, 1, 2] as const).map((index) => {
           const item = itemOf(slots[index]);
           return [
@@ -666,7 +669,7 @@ export const GuitarRack = ({
             <div
               key={`plate-${index}`}
               className={cn(
-                "bg-arsenal-section md:row-start-2",
+                "rig-plate bg-arsenal-section md:row-start-2",
                 BAY_COLUMN[index],
               )}>
               {onOpenPicker && onRemove ? (
@@ -714,7 +717,11 @@ export const DisplayBay = ({
   return (
     <div
       className={cn(
-        "relative flex h-[26rem] flex-col items-center overflow-hidden md:h-[36rem]",
+        // force-dark: the lit niche is the showcase, so the light theme keeps it
+        // exactly as it is in the dark one — lamp, beam, shadows. Only its
+        // setting changes there (rig-bay / rig-wall in globals.css): each bay
+        // becomes its own rounded card with a white label under it.
+        "force-dark rig-bay relative flex h-[26rem] flex-col items-center overflow-hidden md:h-[36rem]",
         className,
       )}
       style={{ background: WALL }}>

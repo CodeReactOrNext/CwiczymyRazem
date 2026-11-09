@@ -21,14 +21,14 @@ export const FameBox = () => {
         <TooltipTrigger asChild>
           <button
             onClick={() => router.push("/arsenal")}
-            className='hidden h-11 cursor-pointer items-center justify-center gap-2 rounded-lg bg-amber-500/10 px-3 py-2 shadow-sm backdrop-blur-sm md:flex hover:bg-amber-500/20 transition-colors'
+            className='fame-chip hidden h-11 cursor-pointer items-center justify-center gap-2 rounded-lg bg-amber-500/10 px-3 py-2 shadow-sm backdrop-blur-sm md:flex hover:bg-amber-500/20 transition-colors'
           >
             <img
               src="/images/tokens/coin.png"
               alt="fame"
               className="h-6 w-6 object-contain"
             />
-            <span className='text-xs font-bold text-amber-400'>
+            <span className='fame-chip-text text-xs font-bold text-amber-400'>
               {fame.toLocaleString()}
             </span>
           </button>

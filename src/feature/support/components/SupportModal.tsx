@@ -207,7 +207,7 @@ export function SupportModal({
           />
           <div className='relative w-full max-w-md overflow-hidden rounded-md bg-zinc-950 p-8'>
             {!isThanks && (
-              <div className='pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-amber-500/10 blur-[100px]' />
+              <div className='light-hide pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-amber-500/10 blur-[100px]' />
             )}
 
             <Button

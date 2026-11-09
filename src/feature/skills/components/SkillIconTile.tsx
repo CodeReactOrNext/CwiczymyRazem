@@ -9,22 +9,22 @@ import type { IconType } from "react-icons";
  */
 const TILE_COLORS: Record<string, { bg: string; edge: string; text: string }> = {
   technique: {
-    bg: "bg-gradient-to-br from-rose-500/20 to-rose-500/5",
+    bg: "light-tint bg-gradient-to-br from-rose-500/20 to-rose-500/5",
     edge: "border border-white/5 border-l-rose-500/20 border-t-rose-500/40",
     text: "text-rose-400",
   },
   theory: {
-    bg: "bg-gradient-to-br from-indigo-500/20 to-indigo-500/5",
+    bg: "light-tint bg-gradient-to-br from-indigo-500/20 to-indigo-500/5",
     edge: "border border-white/5 border-l-indigo-500/20 border-t-indigo-500/40",
     text: "text-indigo-400",
   },
   hearing: {
-    bg: "bg-gradient-to-br from-emerald-500/20 to-emerald-500/5",
+    bg: "light-tint bg-gradient-to-br from-emerald-500/20 to-emerald-500/5",
     edge: "border border-white/5 border-l-emerald-500/20 border-t-emerald-500/40",
     text: "text-emerald-400",
   },
   creativity: {
-    bg: "bg-gradient-to-br from-amber-500/20 to-amber-500/5",
+    bg: "light-tint bg-gradient-to-br from-amber-500/20 to-amber-500/5",
     edge: "border border-white/5 border-l-amber-500/20 border-t-amber-500/40",
     text: "text-amber-400",
   },

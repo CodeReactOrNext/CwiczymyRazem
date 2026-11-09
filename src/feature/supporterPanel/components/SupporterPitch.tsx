@@ -37,7 +37,7 @@ export const SupporterPitch = () => {
         maskImage='linear-gradient(to right, black 0%, transparent 55%)'
         gradient={["#fbbf24", "#f97316"]}
       />
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-transparent' />
+      <div className='pointer-events-none absolute inset-0 light-tint bg-gradient-to-r from-amber-500/10 via-transparent to-transparent' />
 
       <span className='relative flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/10 text-amber-400'>
         <Heart size={24} fill='currentColor' />

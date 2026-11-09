@@ -7,6 +7,7 @@ import {
 import { cn } from "assets/lib/utils";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useTranslation } from "hooks/useTranslation";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { Info } from "lucide-react";
 
 import type { CaseDefinition, GuitarRarity } from "../../types/arsenal.types";
@@ -44,7 +45,7 @@ export const RarityOddsTable = ({
           <div key={rarity} className='flex items-center gap-2'>
             <span
               className='w-16 flex-shrink-0 text-[10px] font-semibold capitalize tracking-wider'
-              style={{ color: rs.baseColor }}>
+              style={{ color: readableText(rs.baseColor) }}>
               {labels.rarity(rarity)}
             </span>
             <div className='h-1 flex-1 overflow-hidden rounded bg-black/40'>
@@ -59,7 +60,7 @@ export const RarityOddsTable = ({
             </div>
             <span
               className='w-12 flex-shrink-0 text-right text-[11px] font-bold'
-              style={{ color: rs.baseColor }}>
+              style={{ color: readableText(rs.baseColor) }}>
               {(prob * 100).toFixed(1)}%
             </span>
           </div>

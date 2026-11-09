@@ -99,7 +99,7 @@ export const JobCard = ({
       */}
       <span
         aria-hidden
-        className='pointer-events-none absolute inset-0 opacity-40 transition-opacity group-hover:opacity-60'
+        className='light-hide pointer-events-none absolute inset-0 opacity-40 transition-opacity group-hover:opacity-60'
         style={PLATES[accent]}
       />
       {ready && !disabled && <ReadyShine />}

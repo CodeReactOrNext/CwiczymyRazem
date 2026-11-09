@@ -215,7 +215,7 @@ export function SongPracticePickerModal({
               <div className="relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.02] p-4 opacity-70">
                 {/* Locked overlay */}
                 <div className="flex items-center gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 border border-white/5 border-t-cyan-500/20 border-l-cyan-500/10 shadow-lg">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg light-tint bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 border border-white/5 border-t-cyan-500/20 border-l-cyan-500/10 shadow-lg">
                     <SiGuitarpro className="h-5 w-5 text-zinc-600" />
                   </div>
                   <div className="min-w-0 flex-1">

@@ -1,5 +1,6 @@
 import { GlobalSearch } from "components/GlobalSearch/GlobalSearch";
 import { LanguageSwitcher } from "components/LanguageSwitcher/LanguageSwitcher";
+import { ThemeToggle } from "components/ThemeToggle/ThemeToggle";
 import UserNav from "components/UserNav";
 import { FameBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/FameBox";
 import { PointsBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/PointsBox";
@@ -46,6 +47,7 @@ const UserHeader = (_props: UserHeaderProps) => {
           {/* Right Section - Actions */}
             <div className='flex items-center gap-2'>
               <GlobalSearch />
+              <ThemeToggle />
               <LanguageSwitcher />
 
               {/* Profile, settings and log out all live in the account menu */}

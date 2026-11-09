@@ -35,7 +35,7 @@ export const DiscordPromoCard = ({
         className='opacity-[0.1]'
         maskImage='linear-gradient(to left, black 0%, transparent 60%)'
       />
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-l from-indigo-500/15 via-transparent to-transparent' />
+      <div className='pointer-events-none absolute inset-0 light-tint bg-gradient-to-l from-indigo-500/15 via-transparent to-transparent' />
 
       <div className='relative z-10 flex flex-col items-start gap-2 px-4 py-5 sm:max-w-[70%] sm:px-6'>
         <p className='flex items-center gap-2 text-xs font-semibold text-indigo-300'>

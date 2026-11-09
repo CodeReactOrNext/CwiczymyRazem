@@ -10,6 +10,7 @@ import {
 import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getWalletTierTotals } from "feature/arsenal/utils/scrap";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { Interpolate } from "lib/i18n/Interpolate";
 import { Coins, Merge, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
@@ -270,7 +271,7 @@ export const BulkDuplicatesDialog = ({
                         </span>
                         <span
                           className='text-[10px] font-semibold'
-                          style={{ color: PART_TIER_COLORS[tier] }}>
+                          style={{ color: readableText(PART_TIER_COLORS[tier]) }}>
                           {labels.partTier(tier)}
                         </span>
                       </span>

@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { hasPity } from "feature/arsenal/utils/pity";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { Interpolate } from "lib/i18n/Interpolate";
 import type { ReactNode } from "react";
 
@@ -138,7 +139,7 @@ export const CaseCard = ({
       )}>
       {/* Tier tint — a wash off the top edge instead of a tier-colored frame. */}
       <div
-        className='pointer-events-none absolute inset-0'
+        className='light-hide pointer-events-none absolute inset-0'
         style={{
           background: `radial-gradient(120% 80% at 50% 0%, ${meta.wash} 0%, transparent 70%)`,
         }}
@@ -157,14 +158,14 @@ export const CaseCard = ({
           actually meets the shadow instead of hovering above it. */}
       <div className='relative flex h-40 items-end justify-center pb-2 sm:h-44'>
         <div
-          className='pointer-events-none absolute left-1/2 top-1/2 h-24 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[48px]'
+          className='light-hide pointer-events-none absolute left-1/2 top-1/2 h-24 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[48px]'
           style={{
             background: `radial-gradient(ellipse at center, ${meta.color}33 0%, ${meta.color}0d 55%, transparent 80%)`,
           }}
         />
         <div
           className={cn(
-            "pointer-events-none absolute bottom-1 left-1/2 rounded-[100%] blur-[6px]",
+            "light-hide pointer-events-none absolute bottom-1 left-1/2 rounded-[100%] blur-[6px]",
             isEffectCase
               ? "h-[22%] w-[58%] translate-x-[-44%] -rotate-[8deg]"
               : "h-[16%] w-[74%] translate-x-[-46%] -rotate-[14deg]",
@@ -189,7 +190,7 @@ export const CaseCard = ({
             text={title}
             values={{
               tier: (
-                <span style={{ color: meta.color }}>
+                <span style={{ color: readableText(meta.color) }}>
                   {t(`cases.tier_word.${tier}`, tierWord)}
                 </span>
               ),

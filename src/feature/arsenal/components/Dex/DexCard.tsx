@@ -6,6 +6,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+import { readableText,useColorTheme } from "lib/colorTheme/colorTheme";
 import { Archive, CheckCircle2, Lock, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -109,6 +110,9 @@ export const DexCard = ({
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [previewOpen, setPreviewOpen] = useState(false);
   const labels = useArsenalLabels();
+  // Light theme: a flat white card lit only by the rarity — the lamp, the
+  // bevel and the sunk recess are a dark-room look and go.
+  const isLight = useColorTheme() === "light";
   const { t } = labels;
   const rs = RARITY_STYLES[rarity];
   // Discovery is the record; the stash is what the player holds today. An entry
@@ -129,22 +133,35 @@ export const DexCard = ({
         hasPreview && "cursor-pointer",
         !hasPreview && "cursor-help",
       )}
-      style={{
-        background:
-          "linear-gradient(180deg, #33363c 0%, #24272c 6%, #1a1c20 55%, #0e0f11 100%)",
-        boxShadow: "0 10px 22px -12px rgba(0,0,0,0.9)",
-      }}>
+      style={
+        isLight
+          ? { background: "rgb(var(--c-zinc-900))" }
+          : {
+              background:
+                "linear-gradient(180deg, #33363c 0%, #24272c 6%, #1a1c20 55%, #0e0f11 100%)",
+              boxShadow: "0 10px 22px -12px rgba(0,0,0,0.9)",
+            }
+      }>
       <div
-        className='relative h-full w-full overflow-hidden rounded-[4px] bg-[#0f1013] transition-colors group-focus-visible:bg-[#131418]'
-        style={{
-          boxShadow:
-            "inset 0 14px 28px rgba(0,0,0,0.85), inset 0 -8px 18px rgba(0,0,0,0.6), inset 6px 0 14px -8px rgba(0,0,0,0.8), inset -6px 0 14px -8px rgba(0,0,0,0.8)",
-        }}>
+        className={cn(
+          "relative h-full w-full overflow-hidden rounded-[4px] transition-colors",
+          isLight
+            ? "bg-zinc-900 group-focus-visible:bg-zinc-800/60"
+            : "bg-[#0f1013] group-focus-visible:bg-[#131418]",
+        )}
+        style={
+          isLight
+            ? undefined
+            : {
+                boxShadow:
+                  "inset 0 14px 28px rgba(0,0,0,0.85), inset 0 -8px 18px rgba(0,0,0,0.6), inset 6px 0 14px -8px rgba(0,0,0,0.8), inset -6px 0 14px -8px rgba(0,0,0,0.8)",
+              }
+        }>
         {/* Lamp and its pool of light. Lit slots get warm tungsten pouring
             down the back wall; a locked slot keeps a dead bulb and a
             barely-there grey wash. */}
         <div
-          className='pointer-events-none absolute inset-x-0 top-0 h-4/5'
+          className='light-hide pointer-events-none absolute inset-x-0 top-0 h-4/5'
           style={{
             background: discovered
               ? "radial-gradient(75% 80% at 50% 0%, rgba(255,196,120,0.28) 0%, rgba(255,196,120,0.08) 45%, transparent 75%)"
@@ -153,14 +170,14 @@ export const DexCard = ({
         />
         <div
           className={cn(
-            "pointer-events-none absolute left-1/2 top-0 h-[3px] w-8 -translate-x-1/2 rounded-b-full",
+            "light-hide pointer-events-none absolute left-1/2 top-0 h-[3px] w-8 -translate-x-1/2 rounded-b-full",
             discovered
               ? "bg-amber-200 shadow-[0_0_10px_2px_rgba(255,214,150,0.55)]"
               : "bg-zinc-700",
           )}
         />
         {/* Floor of the recess: a faint lighter band the shadow can fall on. */}
-        <div className='pointer-events-none absolute inset-x-0 bottom-0 h-[18%] bg-gradient-to-t from-white/[0.04] to-transparent' />
+        <div className='light-hide pointer-events-none absolute inset-x-0 bottom-0 h-[18%] bg-gradient-to-t from-white/[0.04] to-transparent' />
 
         <span className='absolute left-2.5 top-2 text-[11px] font-semibold tabular-nums text-zinc-500'>
           {formatSlotNumber(number)}
@@ -182,7 +199,7 @@ export const DexCard = ({
               }}
             />
           )}
-          <div className='pointer-events-none absolute bottom-[1%] left-1/2 h-[4%] w-[44%] -translate-x-1/2 rounded-[100%] bg-black/85 blur-[5px]' />
+          <div className='light-hide pointer-events-none absolute bottom-[1%] left-1/2 h-[4%] w-[44%] -translate-x-1/2 rounded-[100%] bg-black/85 blur-[5px]' />
           <img
             src={imageSrc}
             alt={
@@ -193,7 +210,9 @@ export const DexCard = ({
               imageRotated ? "max-w-none -rotate-90" : "max-w-[92%]",
             )}
             style={
-              discovered ? undefined : { filter: "brightness(0) invert(0.16)" }
+              discovered
+                ? undefined
+                : { filter: `brightness(0) invert(${isLight ? 0.86 : 0.16})` }
             }
             draggable={false}
             loading='lazy'
@@ -228,7 +247,7 @@ export const DexCard = ({
             />
             <span
               style={{
-                color: rs.baseColor,
+                color: readableText(rs.baseColor),
                 opacity: discovered ? 0.95 : 0.55,
               }}>
               {labels.rarity(rarity)}

@@ -41,6 +41,12 @@
     "subtitle": "Applies to the app on this device.",
     "work_in_progress": "Translations are still being written — anything not translated yet stays in English."
   },
+  "appearance": {
+    "title": "Appearance",
+    "subtitle": "Applies to the app on this device. Public pages stay dark.",
+    "dark": "Dark",
+    "light": "Light"
+  },
   "sounds": {
     "title": "Sounds",
     "subtitle": "Applies to the app on this device.",

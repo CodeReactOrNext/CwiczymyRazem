@@ -399,3 +399,330 @@ a {
     height: max(1px, round(28%, 1px));
   }
 }
+
+/* ── Light theme (logged-in app only) ─────────────────────────────────────────
+   Palette colours (zinc, white, black, accents) switch through the variables in
+   src/styles/colorThemePalette.js. This block covers what doesn't go through
+   that palette: shadcn tokens, the themer tokens, the scrollbar and raw CSS.
+   Same selector as the palette — the class alone does nothing on public pages. */
+html.theme-light:has([data-app-shell]) {
+  color-scheme: light;
+  color: #18181b;
+  background-color: #eaeaed;
+}
+
+html.theme-light:has([data-app-shell]) body {
+  color: #18181b;
+  background-color: #eaeaed;
+}
+
+html.theme-light:has([data-app-shell]),
+html.theme-light:has([data-app-shell]) .dark {
+  --background: 240 5% 96%;
+  --foreground: 240 6% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 6% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 6% 10%;
+  --primary: 240 6% 10%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 5% 90%;
+  --secondary-foreground: 240 6% 10%;
+  --muted: 240 5% 90%;
+  --muted-foreground: 240 4% 36%;
+  --accent: 240 5% 90%;
+  --accent-foreground: 240 6% 10%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5% 86%;
+  --input: 240 5% 86%;
+  --ring: 240 6% 10%;
+}
+
+html.theme-light:has([data-app-shell]) .dark-theme {
+  --colors-mainText: 24, 24, 27;
+  --colors-secondText: 82, 82, 91;
+  --colors-tertiary: 82, 82, 91;
+  --colors-tertiary-DEFAULT: 82, 82, 91;
+  --colors-second: 255, 255, 255;
+  --colors-second-DEFAULT: 255, 255, 255;
+  --colors-second-400: 212, 212, 216;
+  --colors-second-500: 255, 255, 255;
+  --colors-second-600: 244, 244, 245;
+  --colors-main-opposed-bg: 228, 228, 231;
+}
+
+html.theme-light:has([data-app-shell]) ::-webkit-scrollbar-track {
+  background-color: #eaeaed;
+}
+
+html.theme-light:has([data-app-shell]) ::-webkit-scrollbar-thumb {
+  background-color: #a1a1aa;
+  border-color: #eaeaed;
+}
+
+html.theme-light:has([data-app-shell]) ::-webkit-scrollbar-thumb:hover {
+  background-color: #71717a;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  html.theme-light:has([data-app-shell]) {
+    scrollbar-color: #a1a1aa #eaeaed;
+  }
+}
+
+html.theme-light:has([data-app-shell]) .glass-card {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+html.theme-light:has([data-app-shell]) .glass-card-hover {
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+/* The logos are drawn in off-white for the dark app — flip them to ink. */
+html.theme-light:has([data-app-shell]) img[src*="logolight.svg"],
+html.theme-light:has([data-app-shell]) img[src*="longlightlogo.svg"] {
+  filter: invert(1);
+}
+
+/* Dialog / sheet backdrops: `bg-black/80` would turn into a white wash in the
+   light theme — keep a dark, lighter scrim instead. */
+html.theme-light:has([data-app-shell]) .app-scrim {
+  background-color: rgb(24 24 27 / 0.4);
+}
+
+/* force-dark subtrees (see colorThemePalette.js) also get the dark shadcn and
+   themer tokens and the dark text colour back. */
+html.theme-light:has([data-app-shell]) .force-dark {
+  color-scheme: dark;
+  color: #f5f5f5;
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 10%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 0 0% 9%;
+  --secondary: 0 0% 14.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 14.9%;
+  --muted-foreground: 0 0% 63.9%;
+  --accent: 0 0% 14.9%;
+  --accent-foreground: 0 0% 98%;
+  --border: 0 0% 14.9%;
+  --input: 0 0% 14.9%;
+  --ring: 0 0% 83.1%;
+  --colors-mainText: 255, 255, 255;
+  --colors-secondText: 181, 181, 181;
+}
+
+/* Light-theme helpers. `light-hide`: decorative glows, washes and icon patterns
+   drawn for a dark page — on a light one they read as smudges, so they go.
+   `light-flat`: drops shadows/drop-shadows (the light theme is flat). */
+html.theme-light:has([data-app-shell]) .light-hide {
+  display: none !important;
+}
+html.theme-light:has([data-app-shell]) .light-flat {
+  filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Arsenal materials, read from inline styles (TierPlate, StashTile, the
+   workshop's blueprint plates). Dark: a black socket, a deep hollow, art lifted
+   by a drop shadow. Light: a pale tile lit only by its tier colour — no hollow,
+   no shadows. */
+:root {
+  --ars-plate: #0b0b0e;
+  --ars-plate-tint: 0%;
+  --ars-hollow: rgba(0, 0, 0, 0.82);
+  --ars-rim-hi: rgba(255, 255, 255, 0.06);
+  --ars-drop: rgba(0, 0, 0, 0.7);
+  --ars-art-shadow: rgba(0, 0, 0, 0.7);
+  --ars-chip-shadow: rgba(0, 0, 0, 0.95);
+  --ars-bp-1: #16305a;
+  --ars-bp-2: #0e2143;
+  --ars-bp-3: #081527;
+  --ars-bp-grid: rgba(147, 190, 255, 0.09);
+  --ars-bench-1: #241912;
+  --ars-bench-2: #1d140e;
+  --ars-bench-3: #160f0a;
+  --ars-bench-dot: rgba(255, 214, 170, 0.07);
+}
+html.theme-light:has([data-app-shell]) {
+  --ars-plate: #ffffff;
+  --ars-plate-tint: 9%;
+  --ars-plate-image: none;
+  --ars-emblem: #ffffff;
+  --ars-hollow: transparent;
+  --ars-rim-hi: transparent;
+  --ars-drop: transparent;
+  --ars-art-shadow: transparent;
+  --ars-chip-shadow: transparent;
+  --ars-bp-1: #eef4fd;
+  --ars-bp-2: #e3ecfa;
+  --ars-bp-3: #d8e4f6;
+  --ars-bp-grid: rgba(37, 99, 235, 0.1);
+  --ars-bench-1: #faf6f1;
+  --ars-bench-2: #f5efe7;
+  --ars-bench-3: #efe7dc;
+  --ars-bench-dot: rgba(120, 80, 40, 0.1);
+}
+
+/* The game-key lip (PRESSABLE in ui/button: a 3px black-tinted bottom border).
+   With black inverted in the light theme it read as a smudged shadow — flat
+   keys instead; the 2px press still works. Dark (force-dark) cards keep it. */
+html.theme-light:has([data-app-shell]) [class*="border-b-[3px]"]:not(.force-dark *) {
+  border-bottom-color: transparent !important;
+}
+
+/* `light-tint`: a decorative tint gradient (from-X/10 to-transparent and the
+   like). On a light page the fade reads as a stain — flatten it to its first
+   stop, a plain tint. */
+html.theme-light:has([data-app-shell]) .light-tint {
+  background-image: linear-gradient(var(--tw-gradient-from), var(--tw-gradient-from)) !important;
+}
+
+/* The light theme is flat: Tailwind's shadow-* / drop-shadow-* utilities (and
+   the arbitrary glows built on them) resolve to nothing. Rings share
+   box-shadow but use their own variables, so focus rings stay. */
+html.theme-light:has([data-app-shell]) *,
+html.theme-light:has([data-app-shell]) *::before,
+html.theme-light:has([data-app-shell]) *::after {
+  --tw-shadow: 0 0 #0000 !important;
+  --tw-shadow-colored: 0 0 #0000 !important;
+  --tw-drop-shadow: drop-shadow(0 0 #0000) !important;
+}
+
+/* readableText() (lib/colorTheme): bright accent hexes used as text — rarity,
+   part tiers, condition grades, case tiers — darkened to the 700 step of the
+   same hue so they read on white. Dark theme leaves these undefined. */
+html.theme-light:has([data-app-shell]) {
+  --tx-a1a1aa: #52525b;
+  --tx-d4d4d8: #52525b;
+  --tx-9ca3af: #4b5563;
+  --tx-10b981: #047857;
+  --tx-34d399: #047857;
+  --tx-3b82f6: #1d4ed8;
+  --tx-38bdf8: #0369a1;
+  --tx-818cf8: #4338ca;
+  --tx-a855f7: #7e22ce;
+  --tx-c084fc: #7e22ce;
+  --tx-f43f5e: #be123c;
+  --tx-fbbf24: #b45309;
+  --tx-f59e0b: #b45309;
+  --tx-67e8f9: #0e7490;
+  --tx-06b6d4: #0e7490;
+  --tx-d4a373: #92400e;
+  --tx-b45454: #991b1b;
+}
+html.theme-light:has([data-app-shell]) .force-dark {
+  --tx-a1a1aa: initial; --tx-d4d4d8: initial; --tx-9ca3af: initial;
+  --tx-10b981: initial; --tx-34d399: initial; --tx-3b82f6: initial;
+  --tx-38bdf8: initial; --tx-818cf8: initial; --tx-a855f7: initial;
+  --tx-c084fc: initial; --tx-f43f5e: initial; --tx-fbbf24: initial;
+  --tx-f59e0b: initial; --tx-67e8f9: initial; --tx-06b6d4: initial;
+  --tx-d4a373: initial; --tx-b45454: initial;
+}
+
+/* Rig display (GuitarRack). The lit niches stay exactly as in the dark theme
+   (force-dark) — the light theme only resets their setting: no dark case and
+   no seams, each bay its own rounded card with a white label under it. */
+html.theme-light:has([data-app-shell]) .rig-bay {
+  border-radius: 12px;
+}
+html.theme-light:has([data-app-shell]) .rig-grid .rig-bay {
+  border-radius: 12px 12px 0 0;
+}
+html.theme-light:has([data-app-shell]) .rig-wall {
+  background: transparent;
+  padding: 0;
+  box-shadow: none !important;
+}
+html.theme-light:has([data-app-shell]) .rig-grid {
+  background: transparent;
+  overflow: visible;
+  column-gap: 16px;
+  row-gap: 0;
+}
+html.theme-light:has([data-app-shell]) .rig-plate {
+  background: #ffffff;
+  border-radius: 0 0 12px 12px;
+  margin-bottom: 16px;
+}
+@media (min-width: 768px) {
+  html.theme-light:has([data-app-shell]) .rig-plate {
+    margin-bottom: 0;
+  }
+}
+/* Light-theme material values must not leak into a force-dark subtree. */
+html.theme-light:has([data-app-shell]) .force-dark {
+  --ars-emblem: initial;
+}
+
+/* Hand-rolled modal backdrops (`fixed inset-0 … bg-black/70`, or an absolute
+   one with a backdrop blur). With black inverted they washed the page white —
+   a dark, lighter scrim instead, like app-scrim. Hover tints over thumbnails
+   (absolute, no blur) are left alone, and so are force-dark stages. */
+html.theme-light:has([data-app-shell])
+  :is(.fixed.inset-0, .absolute.inset-0[class*="backdrop-blur"])[class*="bg-black/"]:not(.force-dark, .force-dark *) {
+  background-color: rgb(24 24 27 / 0.4) !important;
+}
+
+/* Warm accents on a light page. Amber/orange at 10% over grey turns to beige
+   with muddy orange text on it — these get clean warm pairs instead: the Fame
+   chip in the header and the "Get the desktop app" strip under the sidebar. */
+html.theme-light:has([data-app-shell]) .fame-chip {
+  background-color: #fef3c7 !important;
+}
+html.theme-light:has([data-app-shell]) .fame-chip:hover {
+  background-color: #fde68a !important;
+}
+html.theme-light:has([data-app-shell]) .fame-chip-text {
+  color: #92400e !important;
+}
+html.theme-light:has([data-app-shell]) .desktop-cta {
+  background-color: #fff7ed !important;
+}
+html.theme-light:has([data-app-shell]) .desktop-cta:hover {
+  background-color: #ffedd5 !important;
+}
+html.theme-light:has([data-app-shell]) .desktop-cta-icon {
+  background-color: #ffedd5 !important;
+  color: #c2410c !important;
+}
+html.theme-light:has([data-app-shell]) .desktop-cta-text {
+  color: #c2410c !important;
+}
+
+/* Support / supporter cards (SupportBanner, the feed's donation cards). In the
+   light theme they are the one ink card on the page (force-dark keeps their
+   contents in the dark palette): a solid near-black surface, the funding bar
+   and amount in orange instead of cyan. Scoped here — /roadmap keeps its bar. */
+html.theme-light:has([data-app-shell]) .support-warm {
+  background-color: #18181b !important;
+}
+html.theme-light:has([data-app-shell]) a.support-warm:hover {
+  background-color: #222226 !important;
+}
+html.theme-light:has([data-app-shell]) .support-warm .funding-amount {
+  color: #fb923c !important;
+}
+html.theme-light:has([data-app-shell]) .support-warm .funding-track {
+  background-color: #3f3f46 !important;
+}
+html.theme-light:has([data-app-shell]) .support-warm .funding-bar {
+  background-image: none !important;
+  background-color: #fb923c !important;
+}
+
+/* The Motivate key (LogReaction) on an ink supporter card: its zinc-800/60
+   face disappears into #18181b — give it a face and text that read. */
+html.theme-light:has([data-app-shell]) .support-warm [class*="bg-zinc-800/60"] {
+  background-color: #34343a !important;
+  color: #f4f4f5 !important;
+}
+html.theme-light:has([data-app-shell]) .support-warm [class*="bg-zinc-800/60"]:hover {
+  background-color: #3f3f46 !important;
+}

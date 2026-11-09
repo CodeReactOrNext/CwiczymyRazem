@@ -7,9 +7,10 @@ import type { ReactNode } from "react";
  * under a faint plotted dot grid. Its own material on purpose — mods
  * lie on blueprint navy, and a part must never pass for a mod at a glance.
  */
+// Theme-aware (globals.css → --ars-bench-*): pale maple in the light theme.
 const BENCH_WASH =
-  "radial-gradient(circle at 50% 45%, #241912 0%, #1d140e 60%, #160f0a 100%)";
-const BENCH_DOT = "rgba(255,214,170,0.07)";
+  "radial-gradient(circle at 50% 45%, var(--ars-bench-1) 0%, var(--ars-bench-2) 60%, var(--ars-bench-3) 100%)";
+const BENCH_DOT = "var(--ars-bench-dot)";
 
 interface PartPlateProps {
   children: ReactNode;

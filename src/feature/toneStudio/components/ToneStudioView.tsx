@@ -163,8 +163,9 @@ export const ToneStudioView = () => {
     // show five units side by side without crowding, and the amp's faceplate is
     // a landscape panel that only gets better with room.
     <div className='mx-auto w-full max-w-[1400px] p-3 sm:p-6'>
+      {/* force-dark: the chassis is hardware — it stays dark in the light theme. */}
       <div
-        className='relative overflow-hidden rounded-xl'
+        className='force-dark relative overflow-hidden rounded-xl'
         style={{
           backgroundImage: CHASSIS_WASH,
           boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",

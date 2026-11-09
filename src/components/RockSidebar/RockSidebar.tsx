@@ -658,13 +658,19 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
           href={DESKTOP_APP_RELEASES_URL}
           target='_blank'
           rel='noreferrer'
-          className='relative -mx-4 -mb-4 mt-10 flex items-center gap-3 overflow-hidden bg-orange-500/10 px-7 py-4 transition-all duration-base hover:bg-orange-500/15 active:scale-[0.98]'>
-          <GuitarPatternBackground opacity={0.14} scale={0.5} color='#fb923c' />
-          <span className='relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500/20 text-orange-400'>
+          // desktop-cta*: a clean warm strip in the light theme (globals.css).
+          className='desktop-cta relative -mx-4 -mb-4 mt-10 flex items-center gap-3 overflow-hidden bg-orange-500/10 px-7 py-4 transition-all duration-base hover:bg-orange-500/15 active:scale-[0.98]'>
+          <GuitarPatternBackground
+            opacity={0.14}
+            scale={0.5}
+            color='#fb923c'
+            className='light-hide pointer-events-none absolute inset-0 h-full w-full'
+          />
+          <span className='desktop-cta-icon relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500/20 text-orange-400'>
             <Download size={18} />
           </span>
           <div className='relative min-w-0 flex-1'>
-            <p className='text-sm font-semibold text-orange-300'>
+            <p className='desktop-cta-text text-sm font-semibold text-orange-300'>
               {t("get_desktop_app")}
             </p>
           </div>

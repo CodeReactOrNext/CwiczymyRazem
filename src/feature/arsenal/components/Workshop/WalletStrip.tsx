@@ -3,6 +3,7 @@ import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import { getWalletTierTotals } from "feature/arsenal/utils/scrap";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { ChevronDown, Wrench } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -57,7 +58,7 @@ export const WalletStrip = ({ parts }: WalletStripProps) => {
                 </span>
                 <span
                   className='text-[11px] font-semibold'
-                  style={{ color: PART_TIER_COLORS[tier] }}>
+                  style={{ color: readableText(PART_TIER_COLORS[tier]) }}>
                   {labels.partTier(tier)}
                 </span>
               </span>

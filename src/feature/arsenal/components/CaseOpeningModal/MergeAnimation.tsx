@@ -136,7 +136,7 @@ export const MergeAnimation = ({
   return createPortal(
     <motion.div
       role='status'
-      className='fixed inset-0 z-[1100] flex flex-col items-center justify-center gap-6 bg-black/95 px-4'
+      className='force-dark fixed inset-0 z-[1100] flex flex-col items-center justify-center gap-6 bg-black/95 px-4'
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.25 }}>

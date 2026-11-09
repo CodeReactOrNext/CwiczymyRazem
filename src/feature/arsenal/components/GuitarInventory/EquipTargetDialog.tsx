@@ -12,6 +12,7 @@ import {
 } from "feature/arsenal/data/itemStats";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { readableText } from "lib/colorTheme/colorTheme";
 import type { LucideIcon } from "lucide-react";
 import { Guitar, User, X } from "lucide-react";
 
@@ -244,7 +245,7 @@ export const EquipTargetDialog = ({
                         <>
                           <span
                             className='break-words text-xs font-semibold leading-snug'
-                            style={{ color: holder.color }}>
+                            style={{ color: readableText(holder.color) }}>
                             {holder.name}
                           </span>
                           <span className='text-[11px] text-zinc-500'>

@@ -33,7 +33,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
       {/* Total Songs */}
       <div className="rounded-lg p-4 text-card-foreground flex flex-col bg-zinc-900/40 shadow-sm h-full backdrop-blur-sm">
          <div className="flex items-center gap-3 mb-6">
-            <div className="h-8 w-8 rounded-[4px] bg-gradient-to-br from-zinc-500/20 to-zinc-500/5 flex items-center justify-center text-zinc-400 border border-white/5 border-t-zinc-500/40 border-l-zinc-500/20 shadow-lg">
+            <div className="h-8 w-8 rounded-[4px] light-tint bg-gradient-to-br from-zinc-500/20 to-zinc-500/5 flex items-center justify-center text-zinc-400 border border-white/5 border-t-zinc-500/40 border-l-zinc-500/20 shadow-lg">
                <Music2 className="h-4 w-4" />
             </div>
             <span className="text-[10px] font-bold text-zinc-400">{t("total_songs")}</span>
@@ -50,7 +50,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
       <div className="rounded-lg p-4 text-card-foreground flex flex-col bg-zinc-900/40 shadow-sm h-full backdrop-blur-sm">
          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-               <div className="h-8 w-8 rounded-[4px] bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center text-emerald-400 border border-white/5 border-t-emerald-500/40 border-l-emerald-500/20 shadow-lg">
+               <div className="h-8 w-8 rounded-[4px] light-tint bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center text-emerald-400 border border-white/5 border-t-emerald-500/40 border-l-emerald-500/20 shadow-lg">
                   <Trophy className="h-4 w-4" />
                </div>
                <span className="text-[10px] font-bold text-zinc-400">{t("completion_rate")}</span>
@@ -71,7 +71,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
       {/* Player Tier */}
       <div className="rounded-lg p-4 text-card-foreground flex flex-col bg-zinc-900/40 shadow-sm h-full backdrop-blur-sm">
          <div className="flex items-center gap-3 mb-6">
-            <div className="h-8 w-8 rounded-[4px] bg-gradient-to-br from-amber-500/20 to-amber-500/5 flex items-center justify-center text-amber-400 border border-white/5 border-t-amber-500/40 border-l-amber-500/20 shadow-lg">
+            <div className="h-8 w-8 rounded-[4px] light-tint bg-gradient-to-br from-amber-500/20 to-amber-500/5 flex items-center justify-center text-amber-400 border border-white/5 border-t-amber-500/40 border-l-amber-500/20 shadow-lg">
                <Star className="h-4 w-4" />
             </div>
             <span className="text-[10px] font-bold text-zinc-400">{t("your_skill_tier", "Skill tier")}</span>

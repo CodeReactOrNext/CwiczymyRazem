@@ -7,6 +7,7 @@ import {
   getComponent,
   levelRange,
 } from "feature/guitarBuilder/utils/components";
+import { readableText } from "lib/colorTheme/colorTheme";
 
 import { BuyButton } from "../BuyButton";
 import { getRarityColor } from "../RarityBadge";
@@ -69,7 +70,7 @@ export const ComponentOfferRow = ({
         name={def.name}
         detail={
           <>
-            <span style={{ color: rarityColor }}>
+            <span style={{ color: readableText(rarityColor) }}>
               {labels.rarity(def.rarity)}
             </span>
             <span className='text-zinc-400'>

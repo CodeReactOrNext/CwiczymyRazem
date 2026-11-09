@@ -99,7 +99,7 @@ export const EarTrainingLeaderboardDialog = ({
                     className={cn(
                       "flex items-center gap-4 p-4 rounded-lg transition-all",
                       isCurrentUser
-                        ? "bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20"
+                        ? "light-tint bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20"
                         : "bg-zinc-900/40"
                     )}
                   >

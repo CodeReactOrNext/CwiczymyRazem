@@ -1,3 +1,4 @@
+import { useColorTheme } from "lib/colorTheme/colorTheme";
 import { memo, useCallback, useEffect, useRef } from "react";
 import type { ReportListInterface } from "types/api.types";
 
@@ -23,6 +24,28 @@ const getPointRatings = (report: ReportListInterface | undefined) => {
   if (points >= 0) return "ok";
   if (points === 0) return "zero";
   return null;
+};
+
+/**
+ * Light theme ramp: an empty day is a pale grey cell and more practice reads
+ * darker, the way a light contribution graph does — the dark ramp (bright on
+ * near-black) would put the busiest days at the palest cyan on white.
+ */
+const getLightRatingColor = (rating: string | null) => {
+  switch (rating) {
+    case "super":
+      return "#0E7490";
+    case "great":
+      return "#0891B2";
+    case "nice":
+      return "#06B6D4";
+    case "ok":
+      return "#67E8F9";
+    case "zero":
+      return "#CFFAFE";
+    default:
+      return "#E4E4E7";
+  }
 };
 
 const getRatingColor = (rating: string | null) => {
@@ -69,6 +92,7 @@ const ActivityCalendarCanvas = ({
   onClick,
 }: ActivityCalendarCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isLight = useColorTheme() === "light";
   const highlightRef = useRef<HTMLDivElement>(null);
 
   const cols = Math.ceil(datasWithReports.length / 7);
@@ -100,13 +124,15 @@ const ActivityCalendarCanvas = ({
       const y = row * CELL_SIZE;
 
       const rating = item ? getPointRatings(item.report) : null;
-      ctx.fillStyle = getRatingColor(rating);
+      ctx.fillStyle = isLight ? getLightRatingColor(rating) : getRatingColor(rating);
       drawRoundedRect(ctx, x, y, SQUARE_SIZE, SQUARE_SIZE, BORDER_RADIUS);
       ctx.fill();
 
       if (item?.report?.exceriseTitle || item?.report?.isDateBackReport) {
-        ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = "#ffffff";
+        // The marker for a day with an exercise / a back-dated report.
+        const mark = isLight ? "#164E63" : "#ffffff";
+        ctx.fillStyle = mark;
+        ctx.strokeStyle = mark;
         ctx.lineWidth = 1;
         ctx.beginPath();
         if (item.report.isDateBackReport) {
@@ -118,7 +144,7 @@ const ActivityCalendarCanvas = ({
         }
       }
     });
-  }, [datasWithReports, canvasWidth, canvasHeight]);
+  }, [datasWithReports, canvasWidth, canvasHeight, isLight]);
 
   useEffect(() => {
     drawCanvas();

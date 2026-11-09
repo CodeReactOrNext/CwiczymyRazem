@@ -7,6 +7,7 @@ import {
   useReducedMotion,
   useTransform,
 } from "framer-motion";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { useEffect } from "react";
 
 import type { buildLevel } from "../utils/components";
@@ -81,7 +82,7 @@ export const BuildPlate = ({ name, summary, pulse }: BuildPlateProps) => {
               key={pulse.key}
               aria-hidden
               className='pointer-events-none absolute -top-1 right-0 font-sans text-sm font-semibold tabular-nums'
-              style={{ color: pulse.color }}
+              style={{ color: readableText(pulse.color) }}
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: [0, 1, 1, 0], y: -22 }}
               transition={{ duration: 1.1, times: [0, 0.15, 0.7, 1] }}>

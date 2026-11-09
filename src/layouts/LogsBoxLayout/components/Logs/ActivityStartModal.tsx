@@ -117,8 +117,8 @@ export const ActivityStartModal = ({
         className='z-[120] flex flex-col gap-6 overflow-hidden rounded-lg bg-zinc-950/95 p-6 backdrop-blur-3xl sm:max-w-[480px]'>
         {/* Cyan wash over the top of the card — same treatment the header block
             used to carry, now spanning the whole (borderless) panel. */}
-        <div className='pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-cyan-500/10 to-transparent' />
-        <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.15),transparent_70%)]' />
+        <div className='pointer-events-none absolute inset-x-0 top-0 h-48 light-tint bg-gradient-to-b from-cyan-500/10 to-transparent' />
+        <div className='pointer-events-none absolute inset-0 light-hide bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.15),transparent_70%)]' />
 
         <DialogHeader className='relative space-y-2 text-left'>
           <span className='text-xs font-semibold text-cyan-400'>

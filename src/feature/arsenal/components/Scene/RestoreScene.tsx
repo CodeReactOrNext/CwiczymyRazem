@@ -7,6 +7,7 @@ import {
 } from "feature/arsenal/data/itemStats";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { motion } from "framer-motion";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { EASE } from "lib/motion/motion";
 import { ArrowRight } from "lucide-react";
 
@@ -209,7 +210,7 @@ export const RestoreScene = ({
         {/* Grade: what it was, then what it is. */}
         <div className='flex items-center gap-3 text-sm font-bold'>
           <motion.span
-            style={{ color: fromGrade.color }}
+            style={{ color: readableText(fromGrade.color) }}
             animate={{ opacity: restored ? 0.5 : 1 }}
             transition={{ duration: 0.3 }}>
             {labels.condition(fromGrade)}
@@ -219,7 +220,7 @@ export const RestoreScene = ({
               <ArrowRight size={14} className='text-zinc-600' />
               <motion.span
                 className='text-base font-black will-change-transform'
-                style={{ color: toGrade.color }}
+                style={{ color: readableText(toGrade.color) }}
                 initial={{ opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{

@@ -285,7 +285,7 @@ export function PhoneSessionModal({
             {/* In the drawer, where every arrangement can reach them — the screen itself has no
                 room under the exercise sideways. */}
             {currentExercise.links && currentExercise.links.length > 0 && (
-              <div className="space-y-3 rounded-lg bg-gradient-to-br from-red-500/10 to-zinc-900/40 p-4">
+              <div className="space-y-3 rounded-lg light-tint bg-gradient-to-br from-red-500/10 to-zinc-900/40 p-4">
                 <div className="text-xs font-bold tracking-widest text-red-400">
                   {t("instructions.support_author")}
                 </div>

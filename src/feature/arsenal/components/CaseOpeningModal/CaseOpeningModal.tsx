@@ -20,6 +20,7 @@ import { ComponentThumb } from "feature/guitarBuilder/components/ComponentThumb"
 import { COMPONENT_DEFS, SLOT_LABELS } from "feature/guitarBuilder/data/components";
 import type { ComponentDef } from "feature/guitarBuilder/types/guitarBuilder.types";
 import { AnimatePresence, motion } from "framer-motion";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -252,7 +253,8 @@ export const CaseOpeningModal = ({
     <AnimatePresence>
       {isOpen && strip.length > 0 && (
         <motion.div
-          className="fixed inset-0 z-[1000] flex flex-col items-center overflow-y-auto py-4 sm:py-6"
+          // force-dark: the opening is a show on a black stage, in either theme.
+          className="force-dark fixed inset-0 z-[1000] flex flex-col items-center overflow-y-auto py-4 sm:py-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -371,7 +373,7 @@ export const CaseOpeningModal = ({
                                   slot: t(`builder.slots.${item.def.slot}`, SLOT_LABELS[item.def.slot]),
                                 })}
                         </span>
-                        <span className="text-[11px] font-bold capitalize tracking-wide text-center leading-tight truncate w-full" style={{ color: rs.baseColor }}>
+                        <span className="text-[11px] font-bold capitalize tracking-wide text-center leading-tight truncate w-full" style={{ color: readableText(rs.baseColor) }}>
                           {item.def.name}
                         </span>
                       </div>
@@ -397,7 +399,7 @@ export const CaseOpeningModal = ({
                     transition={{ type: "spring", stiffness: 220, damping: 16, delay: 0.15 }}
                     className="font-display text-3xl sm:text-4xl font-black capitalize tracking-wide"
                     style={{
-                      color: rarityStyles.baseColor,
+                      color: readableText(rarityStyles.baseColor),
                       textShadow: `0 0 32px ${rarityStyles.baseColor}88`,
                     }}
                   >

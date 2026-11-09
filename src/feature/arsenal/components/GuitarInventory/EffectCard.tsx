@@ -33,6 +33,7 @@ import {
   rarityLockLvl,
   usePlayerLvl,
 } from "feature/progression/hooks/usePlayerLvl";
+import { readableText,useColorTheme } from "lib/colorTheme/colorTheme";
 import { Boxes, Merge, Store, Trash2, Unplug, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
@@ -110,6 +111,8 @@ export const EffectCard = ({
   // Read here, above the guard, for the same reason the trait hooks are.
   const playerLvl = usePlayerLvl();
   const labels = useArsenalLabels();
+  // Light theme: a white card with a flat rarity tint — no fade, glow or shadow.
+  const isLight = useColorTheme() === "light";
   const { t } = labels;
 
   const effect = EFFECTS_BY_ID.get(item.effectId);
@@ -141,10 +144,12 @@ export const EffectCard = ({
       className='group relative flex h-full flex-col overflow-hidden'
       style={{
         borderRadius: 10,
-        backgroundColor: "#111116",
-        backgroundImage: `linear-gradient(160deg, ${rs.baseColor}${holo ? "14" : "35"} 0%, #111116 55%)`,
+        backgroundColor: isLight ? "#ffffff" : "#111116",
+        backgroundImage: isLight
+          ? `linear-gradient(${rs.baseColor}0f, ${rs.baseColor}0f)`
+          : `linear-gradient(160deg, ${rs.baseColor}${holo ? "14" : "35"} 0%, #111116 55%)`,
         border: `1px solid ${rs.baseColor}28`,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.6)",
+        boxShadow: isLight ? undefined : "0 4px 20px rgba(0,0,0,0.6)",
         contain: "layout style paint",
       }}>
       {/* Grain overlay */}
@@ -190,7 +195,7 @@ export const EffectCard = ({
         <div className='min-w-0'>
           <p
             className='text-xs font-semibold leading-none'
-            style={{ color: rs.baseColor }}>
+            style={{ color: readableText(rs.baseColor) }}>
             {effect.brand}
           </p>
           <p className='mt-1 truncate text-[16px] font-extrabold leading-tight text-white'>
@@ -198,7 +203,7 @@ export const EffectCard = ({
           </p>
           <p
             className='mt-0.5 text-[9px] font-medium capitalize tracking-[0.15em]'
-            style={{ color: rs.baseColor, opacity: 0.7 }}>
+            style={{ color: readableText(rs.baseColor), opacity: 0.7 }}>
             {labels.rarity(rarity)} · {labels.effectType(effect.type)}
           </p>
           {effect.description && (
@@ -238,7 +243,7 @@ export const EffectCard = ({
         {/* Rarity glow backdrop. Turned down on a locked pedal: the glow is the
             tier's light, and the whole point is that it is not on yet. */}
         <div
-          className='pointer-events-none absolute inset-0 z-0 flex translate-y-[60px] items-center justify-center'
+          className='light-hide pointer-events-none absolute inset-0 z-0 flex translate-y-[60px] items-center justify-center'
           style={{ opacity: lockedLvl != null ? 0.2 : 0.5 }}>
           <div
             className='absolute h-[170px] w-[170px] rounded-full blur-[34px]'

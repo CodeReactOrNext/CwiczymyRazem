@@ -32,6 +32,7 @@ import {
   rarityLockLvl,
   usePlayerLvl,
 } from "feature/progression/hooks/usePlayerLvl";
+import { readableText,useColorTheme } from "lib/colorTheme/colorTheme";
 import { Boxes, Check, Lock, Merge, Store, Trash2, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
@@ -115,6 +116,8 @@ export const GuitarCard = ({
   // Read here, above the guard, for the same reason the trait hooks are.
   const playerLvl = usePlayerLvl();
   const labels = useArsenalLabels();
+  // Light theme: a white card with a flat rarity tint — no fade, glow or shadow.
+  const isLight = useColorTheme() === "light";
   const { t } = labels;
 
   const guitar = GUITARS_BY_ID.get(item.guitarId);
@@ -170,10 +173,12 @@ export const GuitarCard = ({
       )}
       style={{
         borderRadius: 10,
-        backgroundColor: "#111116",
-        backgroundImage: `linear-gradient(160deg, ${rs.baseColor}${holo ? "14" : "35"} 0%, #111116 55%)`,
+        backgroundColor: isLight ? "#ffffff" : "#111116",
+        backgroundImage: isLight
+          ? `linear-gradient(${rs.baseColor}0f, ${rs.baseColor}0f)`
+          : `linear-gradient(160deg, ${rs.baseColor}${holo ? "14" : "35"} 0%, #111116 55%)`,
         border: `1px solid ${rs.baseColor}28`,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.6)",
+        boxShadow: isLight ? undefined : "0 4px 20px rgba(0,0,0,0.6)",
         contain: "layout style paint",
       }}>
       {/* Grain overlay */}
@@ -219,7 +224,7 @@ export const GuitarCard = ({
         <div className='min-w-0'>
           <p
             className='text-[10px] font-semibold leading-none tracking-wider'
-            style={{ color: rs.baseColor }}>
+            style={{ color: readableText(rs.baseColor) }}>
             {guitar.brand}
           </p>
           <p className='mt-1 truncate text-[16px] font-extrabold leading-tight text-white'>
@@ -227,7 +232,7 @@ export const GuitarCard = ({
           </p>
           <p
             className='mt-0.5 text-[9px] font-medium capitalize tracking-[0.15em]'
-            style={{ color: rs.baseColor, opacity: 0.7 }}>
+            style={{ color: readableText(rs.baseColor), opacity: 0.7 }}>
             {labels.rarity(rarity)}
           </p>
         </div>
@@ -263,7 +268,7 @@ export const GuitarCard = ({
             the tier's light, and the whole point is that it is not on yet. */}
         <div
           className={cn(
-            "pointer-events-none absolute inset-0 z-0 flex translate-y-[60px] items-center justify-center",
+            "light-hide pointer-events-none absolute inset-0 z-0 flex translate-y-[60px] items-center justify-center",
             lockedLvl != null ? "opacity-20" : "opacity-50",
           )}>
           <div

@@ -189,7 +189,7 @@ export function UpgradeContent() {
             </p>
           </div>
 
-          <div className="h-px w-full bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent mb-8 relative z-10" />
+          <div className="h-px w-full light-tint bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent mb-8 relative z-10" />
 
           <ul className="flex flex-col gap-4 flex-1 mb-10 relative z-10">
             {isPro ? (

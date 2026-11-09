@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { getConditionGrade } from "feature/arsenal/data/itemStats";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { ArrowRight } from "lucide-react";
 
 import { ConditionMeter } from "../ConditionMeter";
@@ -38,7 +39,7 @@ const Side = ({
           className='self-start rounded px-3 py-1 text-sm font-bold'
           style={{
             backgroundColor: `${grade.color}${after ? "1f" : "14"}`,
-            color: grade.color,
+            color: readableText(grade.color),
             opacity: after ? 1 : 0.7,
           }}>
           {labels.condition(grade)}

@@ -19,6 +19,7 @@ import type {
 } from "feature/arsenal/types/arsenal.types";
 import { describeBlocker } from "feature/arsenal/utils/workshopBlockers";
 import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { Hammer, Wrench } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -115,11 +116,13 @@ export const WorkshopBench = ({
           the hero on it: nameplate top left, the instrument itself big in the
           pool of light, and one status bar underneath — grade and level, the
           two numbers every job below is about to move. */}
-      <div className='relative flex flex-col gap-4 overflow-hidden rounded-lg bg-[#0f1013] p-5 sm:p-7'>
+      {/* bg-zinc-900 + the dark wash: the light theme drops the wash (light-hide)
+          and keeps a plain white bench. */}
+      <div className='relative flex flex-col gap-4 overflow-hidden rounded-lg bg-zinc-900 p-5 sm:p-7'>
         {/* The bench is a dark surface under one warm lamp, top left, with the
             item's own colour bleeding onto it behind the instrument. */}
         <div
-          className='pointer-events-none absolute inset-0'
+          className='light-hide pointer-events-none absolute inset-0'
           style={{
             backgroundImage: [
               "radial-gradient(60% 55% at 30% 0%, rgba(255,190,110,0.22) 0%, rgba(255,190,110,0.05) 45%, transparent 72%)",
@@ -133,7 +136,7 @@ export const WorkshopBench = ({
         <div className='relative flex flex-col gap-1'>
           <span
             className='text-[11px] font-semibold tracking-[0.18em]'
-            style={{ color: rs.baseColor }}>
+            style={{ color: readableText(rs.baseColor) }}>
             {entry.brand} · {labels.rarity(entry.rarity)}
           </span>
           <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
@@ -167,7 +170,7 @@ export const WorkshopBench = ({
         <div className='relative mx-auto flex w-full max-w-md items-center gap-4 rounded-lg bg-zinc-950/70 px-4 py-2.5'>
           <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
             <span className='flex items-baseline gap-2 text-sm font-bold'>
-              <span style={{ color: grade.color }}>
+              <span style={{ color: readableText(grade.color) }}>
                 {labels.condition(grade)}
               </span>
               {entry.restored && (

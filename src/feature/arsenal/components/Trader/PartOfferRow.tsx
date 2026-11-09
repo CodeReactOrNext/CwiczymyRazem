@@ -6,6 +6,7 @@ import {
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { TraderPartOffer } from "feature/arsenal/types/trader.types";
 import { useHoldRepeat } from "hooks/useHoldRepeat";
+import { readableText } from "lib/colorTheme/colorTheme";
 import type { LucideIcon } from "lucide-react";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
@@ -117,7 +118,7 @@ export const PartOfferRow = ({
         }
         name={labels.part(offer.partId)}
         detail={
-          <span style={{ color: tierColor }}>{labels.partTier(offer.tier)}</span>
+          <span style={{ color: readableText(tierColor) }}>{labels.partTier(offer.tier)}</span>
         }
       />
 

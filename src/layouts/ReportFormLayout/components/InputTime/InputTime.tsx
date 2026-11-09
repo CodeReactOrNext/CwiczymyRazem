@@ -62,8 +62,8 @@ const InputTime = ({
         whileHover={{ scale: 1.1, y: -1 }}
         whileTap={{ scale: 0.9 }}
         transition={{ type: "spring", stiffness: 400, damping: 15 }}
-        className='flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#1c1c22]/80 to-[#15151a]/80 text-white shadow-sm transition-all hover:from-[#25252a]/80 hover:to-[#1a1a1f]/80 hover:shadow'>
-        <ChevronUp size='1em' className='text-xs text-[#4a7edd]/80' />
+        className='flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900/80 text-white transition-all hover:bg-zinc-800/80'>
+        <ChevronUp size='1em' className='text-xs text-blue-500/80' />
       </motion.button>
 
       <div className='relative my-2'>
@@ -72,11 +72,11 @@ const InputTime = ({
           transition={{ type: "spring", stiffness: 400, damping: 25 }}>
           <input
             id={name}
-            className={`w-16 rounded-lg bg-gradient-to-b from-[#0c0c0e]/80 to-[#0a0a0c]/80 py-2 text-center text-xl font-medium outline-none backdrop-blur-sm transition-all ${
+            className={`w-16 rounded-lg bg-zinc-950/80 py-2 text-center text-xl font-medium outline-none backdrop-blur-sm transition-all ${
               isError
                 ? "border-error-300 border shadow-[0_0_5px_0_rgba(239,68,68,0.2)]"
                 : hasValue
-                ? "border border-gray-700/30 text-white shadow-sm"
+                ? "border border-gray-700/30 text-white"
                 : "border border-gray-800/20 text-gray-400 hover:border-gray-700/30"
             }`}
             type='text'
@@ -102,8 +102,8 @@ const InputTime = ({
         whileHover={{ scale: 1.1, y: 1 }}
         whileTap={{ scale: 0.9 }}
         transition={{ type: "spring", stiffness: 400, damping: 15 }}
-        className='flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#1c1c22]/80 to-[#15151a]/80 text-white shadow-sm transition-all hover:from-[#25252a]/80 hover:to-[#1a1a1f]/80 hover:shadow'>
-        <ChevronDown size='1em' className='text-xs text-[#4a7edd]/80' />
+        className='flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900/80 text-white transition-all hover:bg-zinc-800/80'>
+        <ChevronDown size='1em' className='text-xs text-blue-500/80' />
       </motion.button>
     </div>
   );

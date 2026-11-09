@@ -20,6 +20,8 @@ export const AppShellSkeleton = () => {
   return (
     <div
       aria-busy='true'
+      // Counts as the app shell for the light theme (see lib/colorTheme).
+      data-app-shell
       aria-label='Loading'
       className={cn(
         "flex overflow-hidden bg-zinc-950",

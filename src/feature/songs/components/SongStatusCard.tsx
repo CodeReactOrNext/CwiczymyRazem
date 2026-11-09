@@ -121,7 +121,7 @@ export const SongStatusCard = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none"
+                    className="absolute inset-0 light-tint bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none"
                   />
                 )}
               </AnimatePresence>

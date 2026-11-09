@@ -52,9 +52,9 @@ export const plateHollow = ({
   ringWidth = 1,
 }: Omit<PlateStyleOptions, "glow">): string =>
   [
-    `inset 0 0 ${Math.round(size * 0.28)}px ${Math.round(size * 0.09)}px rgba(0,0,0,0.82)`,
+    `inset 0 0 ${Math.round(size * 0.28)}px ${Math.round(size * 0.09)}px var(--ars-hollow)`,
     `inset 0 0 0 ${ringWidth}px ${ringColor ?? `${color}6b`}`,
-    "inset 0 1px 0 rgba(255,255,255,0.06)",
+    "inset 0 1px 0 var(--ars-rim-hi)",
   ].join(",");
 
 /** Background and shadow of a plate, for callers that own the rest of the box. */
@@ -65,16 +65,19 @@ export const plateStyle = ({
   ringWidth = 1,
   glow,
 }: PlateStyleOptions): CSSProperties => ({
-  backgroundColor: "#0b0b0e",
-  backgroundImage: [
+  // Theme-aware materials (globals.css → --ars-*). Light theme: no pooled
+  // light — the plate is a flat tint of the tier colour (--ars-plate-tint) and
+  // --ars-plate-image switches the gradients off.
+  backgroundColor: `color-mix(in srgb, ${color} var(--ars-plate-tint), var(--ars-plate))`,
+  backgroundImage: `var(--ars-plate-image, ${[
     // The tier's light, centred on the thing itself
     `radial-gradient(66% 52% at 50% 46%, ${color}42 0%, ${color}12 48%, transparent 78%)`,
     // A little of it pooling on the floor of the socket
     `linear-gradient(180deg, transparent 62%, ${color}2b 100%)`,
-  ].join(","),
+  ].join(",")})`,
   boxShadow: [
     plateHollow({ color, size, ringColor, ringWidth }),
-    glow ?? "0 1px 2px rgba(0,0,0,0.7)",
+    glow ?? "0 1px 2px var(--ars-drop)",
   ].join(","),
 });
 
@@ -119,8 +122,8 @@ export const TierPlate = ({
 
     {count != null && count > 0 && (
       <span
-        className='absolute bottom-0.5 right-0.5 rounded-[3px] bg-black/80 px-1 py-0.5 text-[10px] font-black tabular-nums leading-none text-zinc-100'
-        style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.9)" }}>
+        className='absolute bottom-0.5 right-0.5 rounded-[3px] bg-zinc-950/80 px-1 py-0.5 text-[10px] font-black tabular-nums leading-none text-zinc-100'
+        style={{ boxShadow: "0 1px 3px var(--ars-drop)" }}>
         ×{count}
       </span>
     )}

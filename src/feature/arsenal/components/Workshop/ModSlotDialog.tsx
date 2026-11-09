@@ -21,6 +21,7 @@ import {
 } from "feature/arsenal/utils/modSlotOptions";
 import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
 import { AnimatePresence, motion } from "framer-motion";
+import { readableText } from "lib/colorTheme/colorTheme";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -203,7 +204,7 @@ const RerollStep = ({
                     {labels.part(line.partId)}
                   </p>
                   <p className='mt-0.5 truncate text-xs'>
-                    <span style={{ color: tierColor }}>{line.tier}</span>
+                    <span style={{ color: readableText(tierColor) }}>{line.tier}</span>
                     <span
                       className={cn(
                         "tabular-nums",

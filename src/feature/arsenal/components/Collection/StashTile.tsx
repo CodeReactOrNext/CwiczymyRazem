@@ -180,7 +180,7 @@ export const StashTile = ({
   // towards is the opposite of that — it should still be the thing their eye
   // lands on, just visibly not running yet.
   const artFilter = lockedArtFilter(
-    "drop-shadow(0 3px 7px rgba(0,0,0,0.7))",
+    "drop-shadow(0 3px 7px var(--ars-art-shadow))",
     locked,
   );
 
@@ -197,7 +197,7 @@ export const StashTile = ({
         ? `0 0 9px ${MOD_ACCENT}52`
         : inUse
           ? "0 0 10px rgba(251,191,36,0.35)"
-          : "0 1px 2px rgba(0,0,0,0.7)";
+          : "0 1px 2px var(--ars-drop)";
 
   const plate: CSSProperties = {
     gridColumn: column != null ? column + 1 : undefined,
@@ -255,7 +255,7 @@ export const StashTile = ({
       {/* The tier's light lifts under the cursor — the socket itself never moves */}
       <span
         aria-hidden
-        className='pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100'
+        className='light-hide pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100'
         style={{
           background: `radial-gradient(58% 48% at 50% 48%, ${color}3d 0%, transparent 74%)`,
         }}
@@ -355,7 +355,7 @@ export const StashTile = ({
           status={dexStatus}
           size={12}
           className='absolute right-0.5 top-0.5'
-          style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.95))" }}
+          style={{ filter: "drop-shadow(0 1px 2px var(--ars-chip-shadow))" }}
         />
       )}
 
@@ -368,7 +368,7 @@ export const StashTile = ({
           size={11}
           aria-hidden
           className='absolute bottom-0.5 right-0.5'
-          style={{ color, filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.95))" }}
+          style={{ color, filter: "drop-shadow(0 1px 2px var(--ars-chip-shadow))" }}
         />
       )}
 
@@ -382,7 +382,7 @@ export const StashTile = ({
           size={11}
           aria-hidden
           className='absolute bottom-0.5 left-0.5 fill-amber-400 text-amber-400'
-          style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.95))" }}
+          style={{ filter: "drop-shadow(0 1px 2px var(--ars-chip-shadow))" }}
         />
       )}
 
@@ -390,7 +390,7 @@ export const StashTile = ({
           its colour rather than its shape — plain zinc digits, and the ×
           that says out loud this is "how many", not "how good". */}
       {count != null && count > 0 && (
-        <span className='absolute bottom-1 right-1 rounded bg-black/85 px-1.5 py-1 text-xs font-black tabular-nums leading-none text-zinc-100'>
+        <span className='absolute bottom-1 right-1 rounded bg-zinc-950/85 px-1.5 py-1 text-xs font-black tabular-nums leading-none text-zinc-100'>
           ×{count}
         </span>
       )}

@@ -2,6 +2,7 @@
 
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { motion } from "framer-motion";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { ArrowRight } from "lucide-react";
 
 import { CountUp } from "../CaseOpeningModal/CountUp";
@@ -144,7 +145,7 @@ export const BuildScene = ({
               className='rounded px-3 py-1.5 text-sm font-bold'
               style={{
                 backgroundColor: `${subject.color}14`,
-                color: subject.color,
+                color: readableText(subject.color),
               }}
               initial={{ opacity: 1 }}
               animate={{ opacity: 0.5 }}
@@ -156,7 +157,7 @@ export const BuildScene = ({
               className='rounded px-4 py-1.5 text-base font-black will-change-transform'
               style={{
                 backgroundColor: `${after.color}1f`,
-                color: after.color,
+                color: readableText(after.color),
               }}
               initial={{ opacity: 0, scale: 0.6 }}
               animate={{ opacity: 1, scale: 1 }}

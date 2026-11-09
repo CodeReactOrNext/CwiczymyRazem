@@ -6,6 +6,7 @@ import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import { getPartResaleValue } from "feature/arsenal/data/resale";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { PartId, PartTier } from "feature/arsenal/types/arsenal.types";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { ArrowRight } from "lucide-react";
 
 import { PartIcon } from "../Parts/PartIcon";
@@ -136,7 +137,7 @@ export const ScrapPartCard = ({
             <div className='flex flex-col items-center gap-1 text-center'>
               <span
                 className='text-sm font-black'
-                style={{ color: PART_TIER_COLORS[quote.outputTier] }}>
+                style={{ color: readableText(PART_TIER_COLORS[quote.outputTier]) }}>
                 {labels.partName(quote.outputTier, partId)}
               </span>
               <span className='text-[11px] text-zinc-500'>

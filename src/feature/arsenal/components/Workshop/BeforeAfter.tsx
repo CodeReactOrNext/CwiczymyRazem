@@ -3,6 +3,7 @@ import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { getConditionGrade } from "feature/arsenal/data/itemStats";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { GuitarRarity } from "feature/arsenal/types/arsenal.types";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { ArrowRight } from "lucide-react";
 
 import { ConditionMeter } from "../ConditionMeter";
@@ -113,7 +114,7 @@ export const ConditionDelta = ({ from, to }: ConditionDeltaProps) => {
       <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
         <span
           className='text-[10px] font-bold'
-          style={{ color: toGrade.color }}>
+          style={{ color: readableText(toGrade.color) }}>
           {labels.condition(toGrade)}
         </span>
         <ConditionMeter condition={to} showLabel={false} />

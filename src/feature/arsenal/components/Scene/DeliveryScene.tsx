@@ -2,6 +2,7 @@
 
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { AnimatePresence, motion } from "framer-motion";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { EASE } from "lib/motion/motion";
 
 import type {
@@ -152,7 +153,7 @@ export const DeliveryScene = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: FLIP_FOR, duration: 0.3 }}>
         {isNewToDex && (
-          <span className='text-sm font-bold' style={{ color: subject.color }}>
+          <span className='text-sm font-bold' style={{ color: readableText(subject.color) }}>
             {t("scene.delivery.new_dex")}
           </span>
         )}

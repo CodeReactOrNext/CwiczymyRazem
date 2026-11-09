@@ -1,3 +1,4 @@
+import { COLOR_THEME_BOOT_SCRIPT } from "lib/colorTheme/colorTheme";
 import Document, { Head, Html, Main, NextScript } from "next/document";
 
 class MyDocument extends Document {
@@ -5,6 +6,8 @@ class MyDocument extends Document {
     return (
       <Html lang='en' className='dark'>
         <Head>
+          {/* The app's light theme, set before paint — see lib/colorTheme. */}
+          <script dangerouslySetInnerHTML={{ __html: COLOR_THEME_BOOT_SCRIPT }} />
           <link
             rel='icon'
             type='image/svg+xml'

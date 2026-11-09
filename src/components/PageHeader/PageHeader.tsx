@@ -14,7 +14,7 @@ export const PageHeader = ({ title, subtitle, actions, icon }: PageHeaderProps) 
       <div className="absolute left-0 top-0 h-full w-[3px] rounded-l-2xl bg-gradient-to-b from-cyan-400 via-cyan-500/60 to-transparent" />
 
       {/* Subtle radial glow */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_left_center,rgba(6,182,212,0.07)_0%,transparent_65%)]" />
+      <div className="pointer-events-none absolute inset-0 light-hide bg-[radial-gradient(ellipse_at_left_center,rgba(6,182,212,0.07)_0%,transparent_65%)]" />
 
       <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3.5">

@@ -5,6 +5,7 @@ import {
   getConditionTier,
 } from "feature/arsenal/data/itemStats";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+import { readableText } from "lib/colorTheme/colorTheme";
 
 interface ConditionMeterProps {
   condition: number;
@@ -62,9 +63,9 @@ export const ConditionMeter = ({
               </span>
             )}
             <span
-              className='text-[10px] font-bold tracking-wider'
+              className='light-flat text-[10px] font-bold tracking-wider'
               style={{
-                color: dimmed ? "#a1a1aa" : grade.color,
+                color: readableText(dimmed ? "#a1a1aa" : grade.color),
                 textShadow: dimmed ? undefined : `0 0 8px ${grade.color}55`,
               }}>
               {gradeLabel}

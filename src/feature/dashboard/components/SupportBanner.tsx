@@ -23,15 +23,21 @@ export const SupportBanner = () => {
   return (
     <Link
       href='/roadmap'
-      className='group relative block overflow-hidden rounded-lg bg-zinc-800/50 p-5 transition-background hover:bg-zinc-800/70 sm:p-7'>
+      // force-dark + support-warm: in the light theme this is the one dark card
+      // on the page (globals.css) — ink surface, orange bar and amount, the
+      // white key. The dark theme is unchanged.
+      className='force-dark support-warm group relative block overflow-hidden rounded-lg bg-zinc-800/50 p-5 transition-background hover:bg-zinc-800/70 sm:p-7'>
+      {/* Light theme: the pattern and the warm wash go (light-hide) — on a pale
+          card they read as a peach stain. The heart and the progress bar carry
+          the colour there. */}
       <HeroPattern
-        className='opacity-[0.08]'
+        className='light-hide opacity-[0.08]'
         maskImage='linear-gradient(to right, black 0%, transparent 55%)'
       />
       {/* The warm wash and the heart stay on regardless of funding state — tying
           them to `isCovered` made the banner flip tint the moment the funding
           request resolved. The actual status still lives in FundingStatusBlock. */}
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-transparent' />
+      <div className='pointer-events-none absolute inset-0 light-hide bg-gradient-to-r from-orange-500/10 via-transparent to-transparent' />
       <div className='relative z-10 flex flex-wrap items-center gap-x-12 gap-y-6'>
         {/* Full width until lg, same as RoadmapPitch — the shrink-0 CTA plus the
             gap would otherwise leave the copy a couple of characters per line. */}

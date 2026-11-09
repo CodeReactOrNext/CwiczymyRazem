@@ -33,13 +33,16 @@ export const LevelEmblem = ({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-full",
+        // light-flat + the palette disc: a white coin with a rarity rim in the
+        // light theme, the old dark one (with its glow) in the dark theme.
+        "light-flat flex flex-col items-center justify-center rounded-full",
         className,
       )}
       style={{
         width: size,
         height: size,
-        background: "radial-gradient(circle at 50% 35%, #1c1c22, #0d0d10)",
+        background:
+          "var(--ars-emblem, radial-gradient(circle at 50% 35%, #1c1c22, #0d0d10))",
         border: `1.5px solid ${dimmed ? "#3f3f46" : rs.baseColor}`,
         boxShadow: dimmed
           ? "inset 0 0 6px rgba(0,0,0,0.6)"

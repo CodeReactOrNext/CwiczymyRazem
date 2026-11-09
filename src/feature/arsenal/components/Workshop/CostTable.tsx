@@ -4,6 +4,7 @@ import {
 } from "feature/arsenal/data/partDefinitions";
 import type { RecipeLine } from "feature/arsenal/data/workshop";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { Check, CircleAlert, CircleCheck } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -41,7 +42,7 @@ const Row = ({ icon, label, tier, need, have }: RowProps) => {
           {label}
         </span>
         {tier && (
-          <span className='text-xs font-semibold' style={{ color: tier.color }}>
+          <span className='text-xs font-semibold' style={{ color: readableText(tier.color) }}>
             {tier.label}
           </span>
         )}

@@ -10,6 +10,7 @@ import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
 import { isAtLeast } from "feature/arsenal/utils/pity";
 import { ComponentThumb } from "feature/guitarBuilder/components/ComponentThumb";
 import { motion, useReducedMotion } from "framer-motion";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { Interpolate } from "lib/i18n/Interpolate";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -71,7 +72,7 @@ const OpeningStage = ({
   return createPortal(
     <motion.div
       role='status'
-      className='fixed inset-0 z-[1000] flex flex-col items-center justify-center gap-8 bg-black/95 px-4'
+      className='force-dark fixed inset-0 z-[1000] flex flex-col items-center justify-center gap-8 bg-black/95 px-4'
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}>
       {art && (
@@ -238,7 +239,8 @@ export const CasePackModal = ({
 
   return createPortal(
     <motion.div
-      className='fixed inset-0 z-[1000] flex flex-col items-center overflow-y-auto py-6'
+      // force-dark: the opening is a show on a black stage, in either theme.
+      className='force-dark fixed inset-0 z-[1000] flex flex-col items-center overflow-y-auto py-6'
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}>
       <div
@@ -419,7 +421,7 @@ export const CasePackModal = ({
                             damping: 16,
                           }}
                           className='absolute right-2 top-2 z-30 rounded bg-zinc-950/80 px-1.5 py-0.5 text-[11px] font-black tabular-nums'
-                          style={{ color: rs.baseColor }}>
+                          style={{ color: readableText(rs.baseColor) }}>
                           +{result.merge.gain}
                         </motion.span>
                       )}
@@ -427,7 +429,7 @@ export const CasePackModal = ({
                     <div className='flex flex-1 flex-col gap-1 px-3 py-3'>
                       <span
                         className='truncate text-xs font-bold'
-                        style={{ color: rs.baseColor }}>
+                        style={{ color: readableText(rs.baseColor) }}>
                         {name}
                       </span>
                       <span className='text-[11px] font-medium text-zinc-500'>

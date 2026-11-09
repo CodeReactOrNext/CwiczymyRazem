@@ -345,7 +345,7 @@ export const InstalledMods = ({
           alt={name}
           onLoad={() => setLoadedSrc(heroImageSrc)}
           className={cn(
-            "relative z-10 shrink-0 object-contain drop-shadow-[0_18px_18px_rgba(0,0,0,0.55)]",
+            "light-flat relative z-10 shrink-0 object-contain drop-shadow-[0_18px_18px_rgba(0,0,0,0.55)]",
             rotate
               ? "aspect-square h-full max-w-none -rotate-90"
               : "h-full max-h-full w-full max-w-full",

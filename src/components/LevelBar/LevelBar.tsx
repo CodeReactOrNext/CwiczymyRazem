@@ -50,7 +50,7 @@ export const LevelBar = ({
       {showBadge && (
         <div
           className={cn(
-            "flex shrink-0 items-center justify-center rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/20 to-cyan-600/30 shadow-lg",
+            "flex shrink-0 items-center justify-center rounded-lg border border-cyan-500/30 light-tint bg-gradient-to-br from-cyan-500/20 to-cyan-600/30 shadow-lg",
             isMini ? "h-8 w-8" : "h-10 w-10"
           )}>
           <span

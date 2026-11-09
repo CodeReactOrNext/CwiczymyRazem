@@ -56,13 +56,30 @@ import { cn } from "assets/lib/utils"; // clsx + tailwind-merge
 
 ---
 
-## 3. Tryb: tylko ciemny
+## 3. Tryb: ciemny (+ jasny motyw aplikacji z palety)
 
-Aplikacja jest **dark-only**. Nie ma trybu jasnego do utrzymywania.
+Projektujesz **na ciemnym tle**. Zalogowana aplikacja ma też jasny motyw (Ustawienia →
+Profil → Wygląd), ale robi się go **na poziomie palety**, nie w komponentach:
 
 - `body`: tło `#09090b` (`bg-zinc-950`), tekst `#f5f5f5`, font Inter, `darkMode: 'class'`.
 - Motyw `dark-theme` (z `tailwindcss-themer`) jest aktywny globalnie.
 - **Nie pisz** wariantów `dark:` ani jasnych domyślnych — od razu projektuj na ciemnym tle.
+- `zinc`, `white`, `black`, akcenty (`cyan`, `amber`, `emerald`…) i `arsenal-*` to zmienne CSS
+  (`src/styles/colorThemePalette.js`). Pod `html.theme-light` **i** gdy na stronie jest powłoka
+  aplikacji (`[data-app-shell]`) dostają jasne wartości: `zinc-950` = szare tło, `zinc-900` =
+  biała karta, `white` ↔ ciemny tekst, akcenty 300/400 ciemnieją. Landing/blog zostają ciemne.
+- Żeby nowy kod działał w obu motywach: **kolory z palety, nie hex** (`bg-[#1a1a1d]`, inline
+  `rgba(...)` się nie przełączą).
+- Powierzchnia „sprzętowa”, która ma zostać ciemna (wzmacniacz, tablica tabulatury) → klasa
+  `force-dark` na kontenerze — przywraca w nim ciemne zmienne.
+- Tło overlayu modala: klasa `app-scrim` (jest w `ui/dialog|sheet|drawer|alert-dialog`).
+- Jasny motyw jest **płaski**: `shadow-*`/`drop-shadow-*` i „warga” przycisków (`border-b-[3px]`)
+  znikają globalnie. Dekoracje rysowane pod ciemną stronę oznaczaj klasami:
+  `light-hide` (poświaty, wzory ikon, mgiełki — chowane), `light-tint` (gradient-tint
+  `from-X/10 to-transparent` → płaski kolor), `light-flat` (bez filtrów/cieni na elemencie).
+- Inline style z kolorem: zamiast hexów `rgb(var(--c-zinc-800))` / `var(--ars-*)` (materiały
+  Arsenalu w `globals.css`) albo `useColorTheme()` z `lib/colorTheme`, gdy wariant jasny to inny
+  układ warstw (np. `DexCard`, `GuitarCard`).
 
 **Wyjątek: strona posta na blogu** (`/blog/[slug]`) jest biała — długi tekst czyta się lepiej
 ciemny na jasnym (wzór: blog Duolingo). Treść siedzi w kontenerze z klasą `light`

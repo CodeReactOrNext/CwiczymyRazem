@@ -27,14 +27,15 @@ export const SpecTags = ({ tags, className }: SpecTagsProps) => {
           <div
             className='absolute left-[3px] z-10 h-[5px] w-[5px] rounded-full'
             style={{
-              background: "#0f0f12",
-              border: "1px solid rgba(255,255,255,0.12)",
+              // Palette colours, so the tag follows the light theme too.
+              background: "rgb(var(--c-zinc-950))",
+              border: "1px solid rgb(var(--c-white) / 0.12)",
             }}
           />
           <div
             className='truncate text-[9px] font-semibold tracking-wide text-zinc-300'
             style={{
-              background: "linear-gradient(135deg, #28282e, #1b1b21)",
+              background: "rgb(var(--c-zinc-800))",
               borderRadius: "2px 3px 3px 2px",
               clipPath: "polygon(8px 0%, 100% 0%, 100% 100%, 8px 100%, 0% 50%)",
               paddingLeft: "14px",

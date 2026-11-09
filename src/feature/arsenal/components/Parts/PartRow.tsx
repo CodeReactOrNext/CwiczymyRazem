@@ -6,6 +6,7 @@ import {
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { PartId, PartTier } from "feature/arsenal/types/arsenal.types";
 import { motion } from "framer-motion";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { Check } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -158,7 +159,7 @@ export const PartRow = ({
           {tier && (
             <span
               className='text-xs font-semibold'
-              style={{ color: tierColor }}>
+              style={{ color: readableText(tierColor) }}>
               {tierName}
             </span>
           )}
@@ -179,7 +180,7 @@ export const PartRow = ({
                   "font-semibold",
                   dense ? "text-[10px]" : "text-sm",
                 )}
-                style={{ color: tierColor }}>
+                style={{ color: readableText(tierColor) }}>
                 {tierName}
               </span>
             )}

@@ -74,21 +74,22 @@ export const HeroBanner = ({
         )}
 
         {/* Warm spot on the right — more prominent orange glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_100%_at_85%_100%,rgba(234,88,12,0.3),transparent_70%)]" />
+        <div className="light-hide absolute inset-0 bg-[radial-gradient(ellipse_55%_100%_at_85%_100%,rgba(234,88,12,0.3),transparent_70%)]" />
 
         {/* Left-to-right fade so text stays readable — only rounded on desktop */}
-        <div className="absolute inset-0 bg-gradient-to-r from-second-600 via-second-600/90 via-60% to-transparent md:rounded-tl-2xl" />
+        <div className="light-hide absolute inset-0 bg-gradient-to-r from-second-600 via-second-600/90 via-60% to-transparent md:rounded-tl-2xl" />
 
-        {/* Renders after the fade so custom elements remain highly visible */}
-        {backgroundContent}
+        {/* Renders after the fade so custom elements remain highly visible.
+            Decorative only — the light theme keeps the banner flat. */}
+        <div className="light-hide contents">{backgroundContent}</div>
 
         {/* Bottom edge fade — ties the banner into the cards below */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-second-600/60 to-transparent" />
+        <div className="light-hide absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-second-600/60 to-transparent" />
       </div>
 
       {/* Glow blob behind the figures */}
       {(characterImage || secondaryImage) && (
-        <div className="absolute bottom-[-60px] right-[-20px] w-[340px] h-[340px] bg-orange-900/20 blur-[80px] rounded-full pointer-events-none" />
+        <div className="light-hide absolute bottom-[-60px] right-[-20px] w-[340px] h-[340px] bg-orange-900/20 blur-[80px] rounded-full pointer-events-none" />
       )}
 
       {/* Metronome — tucked beside the guitarist */}
@@ -97,7 +98,7 @@ export const HeroBanner = ({
           src={secondaryImage}
           alt=""
           aria-hidden="true"
-          className="absolute bottom-0 right-[80px] xxs:right-[100px] xs:right-[120px] md:right-[220px] lg:right-[250px] h-[65%] xs:h-[75%] max-h-[240px] w-auto object-contain object-bottom pointer-events-none select-none z-[2]"
+          className="absolute bottom-0 right-[80px] xxs:right-[100px] xs:right-[120px] md:right-[220px] lg:right-[250px] h-[65%] xs:h-[75%] max-h-[240px] w-auto object-contain object-bottom pointer-events-none select-none z-[2] light-flat"
           style={{ filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.5))" }}
         />
       )}
@@ -108,7 +109,7 @@ export const HeroBanner = ({
           src={characterImage}
           alt=""
           aria-hidden="true"
-          className="absolute bottom-0 right-[-20px] xxs:right-[-40px] xs:right-[-60px] h-[80%] xxs:h-[85%] xs:h-[90%] max-h-[280px] md:right-[-8px] md:h-[130%] md:max-h-[420px] w-auto object-contain object-bottom pointer-events-none select-none z-[3]"
+          className="absolute bottom-0 right-[-20px] xxs:right-[-40px] xs:right-[-60px] h-[80%] xxs:h-[85%] xs:h-[90%] max-h-[280px] md:right-[-8px] md:h-[130%] md:max-h-[420px] w-auto object-contain object-bottom pointer-events-none select-none z-[3] light-flat"
           style={{ filter: "drop-shadow(0 8px 40px rgba(0,0,0,0.6))" }}
         />
       )}
