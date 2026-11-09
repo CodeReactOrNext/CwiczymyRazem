@@ -353,6 +353,11 @@
       "wantToLearn": "Chcę się nauczyć",
       "learned": "Opanowane utwory"
     },
+    "sections_short": {
+      "learning": "Uczę się",
+      "wantToLearn": "Chcę",
+      "learned": "Opanowane"
+    },
     "add_songs": "Dodaj utwory",
     "no_match": "Brak utworów pasujących do „{{query}}”",
     "check_other_tabs": "Tu nic nie ma — sprawdź pozostałe zakładki.",

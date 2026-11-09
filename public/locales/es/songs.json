@@ -353,6 +353,11 @@
       "wantToLearn": "Quiero aprender",
       "learned": "Canciones dominadas"
     },
+    "sections_short": {
+      "learning": "Aprendiendo",
+      "wantToLearn": "Pendientes",
+      "learned": "Dominadas"
+    },
     "add_songs": "Añadir canciones",
     "no_match": "Ninguna canción coincide con «{{query}}»",
     "check_other_tabs": "Aquí no hay nada: mira en las otras pestañas.",

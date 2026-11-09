@@ -7,6 +7,7 @@ import { getSongTier } from "feature/songs/utils/getSongTier";
 import { SONG_COVER_STYLE, songCoverLayoutId } from "feature/songs/utils/songCoverLayout";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { m } from "framer-motion";
+import { inkAccent } from "lib/colorTheme/colorTheme";
 import { transitions } from "lib/motion/motion";
 import { useSharedElement } from "lib/motion/useSharedElement";
 import { Music, Star } from "lucide-react";
@@ -80,7 +81,7 @@ export const SongCardRow = ({
         {/* Tier pinned to the cover so it never squeezes the title */}
         <span
           className="absolute right-1 top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-[4px] bg-black/70 px-1 text-[10px] font-black leading-none backdrop-blur-sm"
-          style={{ color: tier.color }}
+          style={{ color: inkAccent(tier.color) }}
         >
           {tier.tier}
         </span>

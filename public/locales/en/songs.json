@@ -354,6 +354,11 @@
       "wantToLearn": "Want to learn",
       "learned": "Mastered songs"
     },
+    "sections_short": {
+      "learning": "Learning",
+      "wantToLearn": "Want",
+      "learned": "Mastered"
+    },
     "add_songs": "Add songs",
     "no_match": "No songs match “{{query}}”",
     "check_other_tabs": "Nothing here — check the other tabs.",

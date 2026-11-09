@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { addSong } from "feature/songs/services/addSong";
@@ -10,6 +9,8 @@ import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { Timestamp } from "firebase/firestore";
+import { useTranslation } from "hooks/useTranslation";
+import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import { Check, Loader2, Music, Plus, Search } from "lucide-react";
 import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
@@ -117,7 +118,7 @@ const SongPickerRow = ({
       <RowText title={song.title} subtitle={song.artist} />
       <span
         className="shrink-0 rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold"
-        style={{ backgroundColor: `${tier.color}14`, color: tier.color }}
+        style={{ backgroundColor: inkWash(tier.color, 12), color: inkAccent(tier.color) }}
       >
         {tier.tier}
       </span>

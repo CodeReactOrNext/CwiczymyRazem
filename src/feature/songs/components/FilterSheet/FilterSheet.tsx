@@ -1,4 +1,4 @@
-import { Button } from "assets/components/ui/button";
+import { Button, PRESSABLE } from "assets/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -17,6 +17,7 @@ import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
 import { getAllTiers } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
+import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import { ArrowUpDown, Check, Music, X } from "lucide-react";
 import React from "react";
 
@@ -141,12 +142,13 @@ const FilterSheet = ({
                       key={t.tier}
                       onClick={() => toggleTier(t.tier)}
                       className={cn(
-                        "relative flex aspect-square items-center justify-center rounded-lg text-sm font-black transition-all active:scale-95",
-                        isActive ? "scale-105 shadow-lg brightness-110" : "opacity-30 grayscale-[0.8] hover:opacity-70 hover:grayscale-0"
+                        PRESSABLE,
+                        "relative flex aspect-square items-center justify-center rounded-lg border-b-black/30 text-sm font-black transition-colors",
+                        !isActive && "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white"
                       )}
                       style={{
-                        backgroundColor: isActive ? `${t.color}20` : "rgba(255,255,255,0.02)",
-                        color: t.color,
+                        backgroundColor: isActive ? inkWash(t.color, 16) : undefined,
+                        color: isActive ? inkAccent(t.color) : undefined,
                       }}
                     >
                       <Ripple />

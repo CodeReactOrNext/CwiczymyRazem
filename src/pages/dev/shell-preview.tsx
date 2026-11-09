@@ -1,7 +1,9 @@
 // App page outside AppLayout: register the app-only English namespaces.
 import "lib/i18n/fullCatalog";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { statisticsInitial } from "constants/userStatisticsInitialData";
+import type { Song } from "feature/songs/types/songs.type";
 import { restoreUserSnapshot } from "feature/user/store/userSlice";
 import type { UserSnapshot } from "feature/user/store/userSnapshot";
 import MainLoggedLayout from "layouts/MainLoggedLayout/MainLoggedLayout";
@@ -86,10 +88,29 @@ const LOADED: Record<string, ComponentType> = Object.fromEntries(
  * library, recordings, feeds, rankings) loads. Renders nothing outside
  * development.
  */
+const demoSong = (id: string, title: string, artist: string, tier: string): Song =>
+  ({ id, title, artist, tier, difficulties: [], createdBy: "dev", isVerified: true }) as unknown as Song;
+
+const DEMO_USER_SONGS = {
+  learning: [
+    demoSong("demo-1", "Free Fallin’", "Tom Petty", "D"),
+    demoSong("demo-2", "Do I Wanna Know?", "Arctic Monkeys", "C"),
+    demoSong("demo-3", "Master of Puppets", "Metallica", "A"),
+    demoSong("demo-4", "Little Wing", "Jimi Hendrix", "B"),
+  ],
+  wantToLearn: [demoSong("demo-5", "Iron Man", "Black Sabbath", "C"), demoSong("demo-6", "Dream On", "Aerosmith", "B")],
+  learned: Array.from({ length: 24 }, (_, i) => demoSong(`demo-l${i}`, `Mastered song ${i + 1}`, "Various", "C")),
+};
+
 export default function ShellPreviewPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const queryClient = useQueryClient();
   useState(() => {
+    // The song board reads the player's own list; a fake uid has none, so a
+    // few demo songs stand in for it (Board tab only, nothing is written).
+    queryClient.setQueryDefaults(["user-songs", "dev-shell-preview"], { staleTime: Infinity });
+    queryClient.setQueryData(["user-songs", "dev-shell-preview"], DEMO_USER_SONGS);
     dispatch(
       restoreUserSnapshot({
         userAuth: "dev-shell-preview",

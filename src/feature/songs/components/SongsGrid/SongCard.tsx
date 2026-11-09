@@ -14,7 +14,7 @@ import { SONG_COVER_STYLE, songCoverLayoutId } from "feature/songs/utils/songCov
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { readableText } from "lib/colorTheme/colorTheme";
+import { inkWash, readableText } from "lib/colorTheme/colorTheme";
 import { transitions } from "lib/motion/motion";
 import { useSharedElement } from "lib/motion/useSharedElement";
 import {
@@ -118,7 +118,7 @@ export const SongCard = ({
         ) : (
           <div
             className="flex h-full w-full items-center justify-center text-white/30"
-            style={{ background: `linear-gradient(135deg, ${tier.color}26, ${tier.color}0d)` }}
+            style={{ background: `linear-gradient(135deg, ${inkWash(tier.color, 15)}, ${inkWash(tier.color, 5)})` }}
           >
             <Music className="h-10 w-10" />
           </div>
@@ -257,12 +257,12 @@ export const SongCard = ({
           {/* Tier / difficulty badge */}
           <div
             className="flex shrink-0 items-center gap-2 rounded-[4px] px-2 py-1"
-            style={{ backgroundColor: `${tier.color}14` }}
+            style={{ backgroundColor: inkWash(tier.color, 12) }}
           >
             <span className="text-[11px] font-semibold leading-none" style={{ color: readableText(tier.color) }}>
               {tier.tier}
             </span>
-            <span className="h-3 w-px" style={{ backgroundColor: `${tier.color}33` }} />
+            <span className="h-3 w-px" style={{ backgroundColor: inkWash(tier.color, 20) }} />
             <span className="text-sm font-semibold leading-none tabular-nums" style={{ color: readableText(tier.color) }}>
               {avgDifficulty.toFixed(1)}
             </span>

@@ -1,6 +1,9 @@
 import type {
+  Activators,
   DragEndEvent,
-  DragStartEvent} from "@dnd-kit/core";
+  DragStartEvent,
+  SensorInstance,
+} from "@dnd-kit/core";
 import {
   closestCenter,
   defaultDropAnimationSideEffects,
@@ -37,6 +40,7 @@ import { getGatedSkillPower, getSongsUntilNextTier } from "feature/songs/utils/d
 import { getAllTiers,getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
+import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import {
   LayoutGrid,
   Library as LibraryIcon,
@@ -57,6 +61,14 @@ import { useAppSelector } from "store/hooks";
 interface SongsViewProps {
   view?: "explore" | "management" | string;
   initialSongId?: string;
+}
+
+// A sensor with no activators never starts a drag. Swapped in for the real
+// ones on phones so DndContext always gets the same number of sensors —
+// it feeds them to a useEffect deps array, which must not change size.
+class InertSensor implements SensorInstance {
+  static activators: Activators<object> = [];
+  autoScrollEnabled = false;
 }
 
 const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
@@ -189,18 +201,16 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
 
   const disableDnd = isMobile;
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
+  const activeSensors = useSensors(
+    useSensor(disableDnd ? InertSensor : PointerSensor, {
       activationConstraint: {
          distance: 8,
       }
     }),
-    useSensor(KeyboardSensor, {
+    useSensor(disableDnd ? InertSensor : KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-
-  const activeSensors = disableDnd ? [] : sensors;
 
   const findContainer = (id: string): SongStatus | undefined => {
     if (id === "wantToLearn" || id === "learning" || id === "learned") return id as SongStatus;
@@ -451,7 +461,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                 />
               </div>
             ) : view === 'board' ? (
-              <div className="space-y-10 animate-in fade-in-50 slide-in-from-bottom-4 duration-slow">
+              <div className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-4 duration-slow sm:space-y-10">
                 <SkillPowerHero
                   skillPower={skillPower}
                   playerTier={playerTier}
@@ -462,17 +472,32 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                 />
 
                 {totalSongsCount > 0 && (
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  // Phones: one row — the search field (count inside it, the
+                  // way a native list shows it) and an Add key beside it.
+                  <div className="flex items-center gap-2 sm:justify-between sm:gap-3">
                     <div className="relative flex-1 sm:max-w-xs">
-                      <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-600" />
+                      <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500 sm:left-3 sm:h-3.5 sm:w-3.5 sm:text-zinc-600" />
                       <input
                         value={boardSearchQuery}
                         onChange={(e) => setBoardSearchQuery(e.target.value)}
                         placeholder={t("view.search_yours")}
-                        className="h-10 w-full rounded-lg border-none bg-zinc-900/50 pl-9 pr-3 text-sm text-white placeholder:text-zinc-500 transition-all focus:bg-zinc-900/70 focus:outline-none focus:ring-4 focus:ring-cyan-500/5"
+                        className="h-11 w-full rounded-full border-none bg-zinc-800/60 pl-10 pr-12 text-base text-white placeholder:text-zinc-500 transition-all focus:bg-zinc-900/70 focus:outline-none focus:ring-4 focus:ring-cyan-500/5 sm:h-10 sm:rounded-lg sm:bg-zinc-900/50 sm:pl-9 sm:pr-3 sm:text-sm"
                       />
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold tabular-nums text-zinc-500 sm:hidden">
+                        {totalSongsCount}
+                      </span>
                     </div>
-                    <div className="flex shrink-0 items-center gap-2 rounded-lg bg-zinc-900/40 px-4 py-2 text-xs font-bold text-zinc-400">
+                    <Button
+                      variant="subtle"
+                      size="icon"
+                      onClick={() => handleSwitchView("explore")}
+                      aria-label={t("view.add_songs")}
+                      className="h-11 w-11 shrink-0 rounded-full text-zinc-200 sm:hidden">
+                      <Plus />
+                    </Button>
+                    <div className="hidden shrink-0 items-center gap-2 rounded-lg bg-zinc-900/40 px-4 py-2 text-xs font-bold text-zinc-400 sm:flex">
                       <LibraryIcon size={14} />
                       {totalSongsCount === 1
   ? t("view.total_one")
@@ -481,7 +506,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                   </div>
                 )}
 
-                <div className="space-y-10">
+                <div className="space-y-4 sm:space-y-10">
                   {totalSongsCount > 0 && (() => {
                     const query = boardSearchQuery.toLowerCase().trim();
                     const matchesQuery = (song: Song) =>
@@ -493,18 +518,21 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                       {
                         key: "learning",
                         title: t("view.sections.learning"),
+                        short: t("view.sections_short.learning"),
                         icon: <Play size={15} className="fill-current" />,
                         songs: userSongs.learning.filter(matchesQuery),
                       },
                       {
                         key: "wantToLearn",
                         title: t("view.sections.wantToLearn"),
+                        short: t("view.sections_short.wantToLearn"),
                         icon: <Music size={15} />,
                         songs: userSongs.wantToLearn.filter(matchesQuery),
                       },
                       {
                         key: "learned",
                         title: t("view.sections.learned"),
+                        short: t("view.sections_short.learned"),
                         icon: <Trophy size={15} />,
                         songs: userSongs.learned.filter(matchesQuery),
                       },
@@ -519,8 +547,12 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                       sections.find((s) => s.key === activeTab) ?? sections[0];
 
                     return (
-                      <div className="space-y-6">
-                        <div className="flex flex-wrap items-center gap-2">
+                      <div className="space-y-3 sm:space-y-6">
+                        {/* Phones: a three-key segmented control across the
+                            width (icon + count over a short label) instead of
+                            chips wrapping onto two rows; Add moved up beside
+                            the search field. */}
+                        <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
                           {sections.map((section) => {
                             const isActive = section.key === activeTab;
                             return (
@@ -530,18 +562,24 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                                 aria-pressed={isActive}
                                 className={cn(
                                   PRESSABLE,
-                                  "relative flex h-10 items-center gap-2 rounded-lg border-b-black/30 px-4 text-sm transition-colors",
+                                  "relative flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl border-b-black/30 px-2 py-2.5 text-xs transition-colors sm:h-10 sm:flex-row sm:gap-2 sm:rounded-lg sm:px-4 sm:py-0 sm:text-sm",
                                   isActive
                                     ? "border-b-black/25 bg-white text-zinc-900"
                                     : "bg-white/10 text-zinc-400 hover:bg-white/15 hover:text-zinc-200"
                                 )}>
-                                <span className={cn("flex", isActive ? "text-zinc-900" : "text-zinc-500")}>
+                                <span className={cn("flex items-center gap-1.5", isActive ? "text-zinc-900" : "text-zinc-500")}>
                                   {section.icon}
+                                  <span className="text-sm font-bold tabular-nums sm:hidden">
+                                    {section.songs.length}
+                                  </span>
                                 </span>
-                                {section.title}
+                                <span className="w-full truncate text-center font-semibold sm:hidden">
+                                  {section.short}
+                                </span>
+                                <span className="hidden sm:inline">{section.title}</span>
                                 <span
                                   className={cn(
-                                    "text-xs font-bold",
+                                    "hidden text-xs font-bold sm:inline",
                                     "text-zinc-500"
                                   )}>
                                   {section.songs.length}
@@ -552,7 +590,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                           <Button
                             variant="subtle"
                             onClick={() => handleSwitchView("explore")}
-                            className="ml-auto h-10 px-4 text-zinc-200">
+                            className="ml-auto hidden h-10 px-4 text-zinc-200 sm:inline-flex">
                             <Plus className="mr-1.5" />
                             {t("view.add_songs")}
                           </Button>
@@ -658,8 +696,8 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                               : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white"
                           )}
                           style={{
-                            backgroundColor: isActive ? `${tier.color}25` : "",
-                            color: isActive ? tier.color : "",
+                            backgroundColor: isActive ? inkWash(tier.color, 16) : "",
+                            color: isActive ? inkAccent(tier.color) : "",
                           }}
                         >
                           <Ripple />

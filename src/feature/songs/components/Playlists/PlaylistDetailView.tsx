@@ -65,6 +65,7 @@ import {
   selectUserName,
 } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
+import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import {
   ArrowDownToLine,
   ArrowLeft,
@@ -177,7 +178,7 @@ const TrackRow = ({
   const tierChip = (
     <span
       className="hidden shrink-0 rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold sm:inline"
-      style={{ backgroundColor: `${tier.color}14`, color: tier.color }}
+      style={{ backgroundColor: inkWash(tier.color, 12), color: inkAccent(tier.color) }}
     >
       {tier.tier}
     </span>

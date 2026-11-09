@@ -250,7 +250,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
               {sortedExercises.map(ex => (
                 <div
                   key={ex.id}
-                  className="flex items-center gap-4 bg-zinc-900/40 hover:bg-zinc-900/60 rounded-lg px-5 py-4 transition-background"
+                  className="flex flex-col gap-3 bg-zinc-900/40 hover:bg-zinc-900/60 rounded-xl px-4 py-4 transition-background sm:flex-row sm:items-center sm:gap-4 sm:rounded-lg sm:px-5"
                 >
                   {/* Title + meta */}
                   <div className="flex-1 min-w-0 space-y-1.5">
@@ -286,8 +286,12 @@ const MyExercisesPage: NextPageWithLayout = () => {
                     </div>
                   </div>
 
+                  {/* Phones: the actions drop under the title as one row of keys
+                      (Practice takes the spare width) instead of squeezing the
+                      title column down to a sliver. */}
+                  <div className="flex items-center gap-2 sm:gap-4">
                   {/* Rating */}
-                  <div className="flex flex-col items-end gap-0.5 shrink-0">
+                  <div className="hidden flex-col items-end gap-0.5 shrink-0 sm:flex">
                     {ex.isPublic && ex.ratingCount > 0 ? (
                       <>
                         <div className="flex items-center gap-1">
@@ -306,7 +310,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                     variant="subtle"
                     size="sm"
                     onClick={() => setActiveExercise(buildChallenge(ex))}
-                    className="shrink-0"
+                    className="h-10 flex-1 shrink-0 sm:h-9 sm:flex-none"
                   >
                     <Play fill="currentColor" className="mr-1.5" />
                     {t("my_exercises.practice")}
@@ -331,7 +335,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                       size="icon"
                       onClick={() => handleToggleVisibility(ex)}
                       disabled={togglingId === ex.id}
-                      className="h-8 w-8 shrink-0 hover:text-cyan-400"
+                      className="h-10 w-10 shrink-0 sm:h-8 sm:w-8 hover:text-cyan-400"
                       title={t("my_exercises.make_private")}
                       aria-label={t("my_exercises.make_private")}
                     >
@@ -343,7 +347,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                       size="sm"
                       onClick={() => handleToggleVisibility(ex)}
                       disabled={togglingId === ex.id}
-                      className="shrink-0 hover:text-emerald-400"
+                      className="h-10 shrink-0 sm:h-9 hover:text-emerald-400"
                     >
                       <Globe className="mr-1.5" />
                       {t("my_exercises.make_public")}
@@ -355,7 +359,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                     variant="subtle"
                     size="icon"
                     onClick={() => handleEdit(ex)}
-                    className="h-8 w-8 shrink-0 hover:text-cyan-400"
+                    className="h-10 w-10 shrink-0 sm:h-8 sm:w-8 hover:text-cyan-400"
                     title={t("my_exercises.edit")}
                     aria-label={t("my_exercises.edit")}
                   >
@@ -368,12 +372,13 @@ const MyExercisesPage: NextPageWithLayout = () => {
                     size="icon"
                     onClick={() => handleDelete(ex.id)}
                     disabled={deletingId === ex.id}
-                    className="h-8 w-8 shrink-0 hover:text-rose-400"
+                    className="h-10 w-10 shrink-0 sm:h-8 sm:w-8 hover:text-rose-400"
                     title={t("my_exercises.delete")}
                     aria-label={t("my_exercises.delete")}
                   >
                     <Trash2 />
                   </Button>
+                  </div>
                 </div>
               ))}
 

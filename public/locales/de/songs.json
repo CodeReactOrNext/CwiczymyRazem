@@ -353,6 +353,11 @@
       "wantToLearn": "Will ich lernen",
       "learned": "Gemeisterte Songs"
     },
+    "sections_short": {
+      "learning": "Am Lernen",
+      "wantToLearn": "Geplant",
+      "learned": "Gemeistert"
+    },
     "add_songs": "Songs hinzufügen",
     "no_match": "Keine Songs passen zu „{{query}}“",
     "check_other_tabs": "Hier ist nichts – sieh in den anderen Tabs nach.",

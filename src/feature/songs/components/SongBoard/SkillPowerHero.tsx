@@ -5,7 +5,8 @@ import { MIN_LEARNED_SONGS_FOR_TIER } from "feature/songs/utils/difficulty.utils
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
-import { Clock, Star, TrendingUp } from "lucide-react";
+import { ChevronDown, Clock, Star, TrendingUp } from "lucide-react";
+import { useState } from "react";
 
 interface SkillPowerHeroProps {
   skillPower: number;
@@ -113,6 +114,9 @@ export const SkillPowerHero = ({
 }: SkillPowerHeroProps) => {
   const { t } = useTranslation("songs");
   const isTierLocked = learnedCount < MIN_LEARNED_SONGS_FOR_TIER;
+  // Phones: the hero folds to one row (pick + score) so the song list starts
+  // above the fold; the stats and the next-tier hint open on a tap.
+  const [isOpen, setIsOpen] = useState(false);
 
   // Nothing mastered yet: a 0.0 score would read as a rating, and the big card
   // pushes the song list (the actual next step) to the bottom of the screen.
@@ -166,26 +170,40 @@ export const SkillPowerHero = ({
   return (
     <div
       className={cn(
-        "flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-4 sm:p-6 lg:flex-row lg:items-center lg:gap-10",
+        "flex flex-col gap-4 rounded-xl bg-zinc-900/40 p-3 sm:gap-5 sm:rounded-lg sm:p-6 lg:flex-row lg:items-center lg:gap-10",
         className,
       )}>
-      <div className='flex items-center gap-4 sm:gap-5'>
+      <button
+        type='button'
+        onClick={() => setIsOpen((open) => !open)}
+        aria-expanded={isOpen}
+        className='flex w-full items-center gap-4 text-left focus-visible:outline-none sm:pointer-events-none sm:w-auto sm:gap-5'>
         <TierBadge
           playerTier={playerTier}
-          className='h-16 w-16 sm:h-20 sm:w-20'
+          className='h-12 w-12 shrink-0 sm:h-20 sm:w-20'
         />
-        <div className='min-w-0'>
+        <div className='min-w-0 flex-1'>
           <h2 className='text-sm font-medium text-zinc-400'>
             {t("power.title")}
           </h2>
-          <p className='mt-1.5 text-4xl font-black leading-none tracking-tight text-white tabular-nums sm:text-5xl'>
+          <p className='mt-1 text-3xl font-black leading-none tracking-tight text-white tabular-nums sm:mt-1.5 sm:text-5xl'>
             {skillPower.toFixed(1)}
           </p>
         </div>
-      </div>
+        <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-zinc-400 sm:hidden'>
+          <ChevronDown
+            size={18}
+            className={cn("transition-transform duration-fast", isOpen && "rotate-180")}
+          />
+        </span>
+      </button>
 
       {/* Same rhythm as the score: label on top, value under it. */}
-      <dl className='grid grid-cols-3 gap-4 rounded-lg bg-white/5 p-3 sm:gap-10 lg:ml-auto lg:bg-transparent lg:p-0'>
+      <dl
+        className={cn(
+          "grid-cols-3 gap-4 rounded-lg bg-white/5 p-3 sm:grid sm:gap-10 lg:ml-auto lg:bg-transparent lg:p-0",
+          isOpen ? "grid" : "hidden",
+        )}>
         {stats.map(({ label, value }) => (
           <div key={label} className='min-w-0'>
             <dt className='text-sm font-medium text-zinc-400'>{label}</dt>
@@ -197,10 +215,16 @@ export const SkillPowerHero = ({
       </dl>
 
       {isTierLocked ? (
-        <TierUnlockTrack learnedCount={learnedCount} className='lg:w-40' />
+        <TierUnlockTrack
+          learnedCount={learnedCount}
+          className={cn("lg:w-40", !isOpen && "hidden sm:flex")}
+        />
       ) : (
         nextTierProgress && (
-          <NextTierHint nextTierProgress={nextTierProgress} className='lg:w-52' />
+          <NextTierHint
+            nextTierProgress={nextTierProgress}
+            className={cn("lg:w-52", !isOpen && "hidden sm:flex")}
+          />
         )
       )}
     </div>
