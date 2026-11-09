@@ -1,4 +1,5 @@
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+import { readableText } from "lib/colorTheme/colorTheme";
 
 interface Affix {
   id: string;
@@ -34,22 +35,22 @@ export const CardAffixes = ({ features }: CardAffixesProps) => {
   return (
     <div
       className='relative z-10 flex flex-shrink-0 flex-col gap-1 px-3 py-3'
-      style={{ background: "rgba(0,0,0,0.28)" }}>
+      style={{ background: "var(--affix-panel, rgba(0,0,0,0.28))" }}>
       {sorted.map((f) => {
         const isSignature = f.id === signature?.id;
         return (
           <div key={f.id} className='flex items-baseline gap-2 leading-snug'>
             <span
               className='flex-shrink-0 text-[11px]'
-              style={{ color: isSignature ? "#f59e0b" : "#52525b" }}>
+              style={{ color: readableText(isSignature ? "#f59e0b" : "#52525b") }}>
               {isSignature ? "★" : "◆"}
             </span>
             <span
               className='truncate text-[12px]'
-              style={{ color: isSignature ? "#f5a524" : "#d4d4d8" }}>
+              style={{ color: readableText(isSignature ? "#f5a524" : "#d4d4d8") }}>
               <span
                 className='font-bold'
-                style={{ color: isSignature ? "#fbbf24" : "#7dd3fc" }}>
+                style={{ color: readableText(isSignature ? "#fbbf24" : "#7dd3fc") }}>
                 +{f.points}
               </span>{" "}
               {labels.mod(f.id, f.label)}

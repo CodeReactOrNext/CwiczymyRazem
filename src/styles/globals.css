@@ -676,6 +676,12 @@ html.theme-light:has([data-app-shell]) {
   --tx-ffff7f: #a16207;
   --tx-7fff7f: #15803d;
   --tx-7fffff: #0e7490;
+  /* Arsenal card mods and traits (CardAffixes, CardTraits). */
+  --tx-f5a524: #92400e;
+  --tx-7dd3fc: #0369a1;
+  --tx-6ee7b7: #047857;
+  --tx-52525b: #a1a1aa;
+  --affix-panel: rgba(24, 24, 27, 0.04);
 }
 html.theme-light:has([data-app-shell]) .force-dark {
   --ink-mix: 0%;
@@ -687,6 +693,8 @@ html.theme-light:has([data-app-shell]) .force-dark {
   --tx-d4a373: initial; --tx-b45454: initial;
   --tx-ff7f7f: initial; --tx-ffbf7f: initial; --tx-ffff7f: initial;
   --tx-7fff7f: initial; --tx-7fffff: initial;
+  --tx-f5a524: initial; --tx-7dd3fc: initial; --tx-6ee7b7: initial;
+  --tx-52525b: initial; --affix-panel: initial;
 }
 
 /* Rig display (GuitarRack). The lit niches stay exactly as in the dark theme

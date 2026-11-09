@@ -15,6 +15,7 @@ import {
 import type { ResolvedTrait } from "feature/arsenal/data/traits";
 import { formatTraitValue } from "feature/arsenal/data/traits";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { useMemo } from "react";
 
 import { ARSENAL_QUERY_KEY } from "../hooks/useArsenalData";
@@ -140,14 +141,14 @@ export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
             <div className='flex items-baseline gap-2 leading-snug'>
               <span
                 className='flex-shrink-0 text-[11px]'
-                style={{ color: unmet ? "#52525b" : EMERALD }}>
+                style={{ color: readableText(unmet ? "#52525b" : EMERALD) }}>
                 {marker}
               </span>
               <span
                 className={cn(
                   "truncate text-[12px] font-bold capitalize tracking-wide",
                 )}
-                style={{ color: unmet ? "#71717a" : EMERALD }}>
+                style={{ color: readableText(unmet ? "#71717a" : EMERALD) }}>
                 {labels.traitLabel(trait)}
               </span>
               <span className='font-mono ml-auto flex flex-shrink-0 items-baseline gap-1.5 text-[12px] font-bold tabular-nums'>
@@ -156,14 +157,14 @@ export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
                     ×{units}
                   </span>
                 )}
-                <span style={{ color: unmet ? "#71717a" : "#6ee7b7" }}>
+                <span style={{ color: readableText(unmet ? "#71717a" : "#6ee7b7") }}>
                   {formatTraitValue(shown)} Fame/h
                 </span>
               </span>
             </div>
             <p
               className='pl-[19px] text-[10px] leading-snug'
-              style={{ color: unmet ? "#52525b" : "#a1a1aa" }}>
+              style={{ color: readableText(unmet ? "#52525b" : "#a1a1aa") }}>
               {labels.traitDescription(trait)}
             </p>
           </div>
