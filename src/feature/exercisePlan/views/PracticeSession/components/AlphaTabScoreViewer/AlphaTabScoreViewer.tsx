@@ -167,7 +167,9 @@ export const AlphaTabScoreViewer = ({
   }, [metronomeVolume, isMetronomeMuted, uiReady]);
 
   return (
-    <div className={cn("w-full flex flex-col rounded-xl overflow-hidden", className)}>
+    // force-dark: the score is paper (bg-white) or a dark board by the player's
+    // own setting, never by the app theme — the light palette would swap them.
+    <div className={cn("force-dark w-full flex flex-col rounded-xl overflow-hidden", className)}>
 
       {/* Score viewport — must be the scrollable parent so AT cursor follows.
           Wrapped in a relative box so the resize handle can sit over its bottom edge. */}
