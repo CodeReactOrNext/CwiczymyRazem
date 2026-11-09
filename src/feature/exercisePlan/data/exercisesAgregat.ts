@@ -145,6 +145,9 @@ const FREE_EXERCISE_IDS = new Set([
   "chord_spotlight_drill",
   "down_picking_doom_pulse",
   "first_melody",
+  "first_riff_open_strings",
+  "first_riff_pentatonic",
+  "first_riff_lead_lick",
   "quarter_notes_drill",
   "pentatonic_string_crossing_3",
   "rhythm_triole",
@@ -242,6 +245,7 @@ import { fingerstyleArpeggiosExercise } from "feature/exercisePlan/data/exerises
 import { firstBendExercise } from "feature/exercisePlan/data/exerises/firstBend/firstBend";
 import { firstBendHalfStepExercise } from "feature/exercisePlan/data/exerises/firstBendHalfStep/firstBendHalfStep";
 import { firstMelodyExercise } from "feature/exercisePlan/data/exerises/firstMelody/firstMelody";
+import { firstRiffExercises } from "feature/exercisePlan/data/exerises/firstRiff/firstRiff";
 import { fretboardRegionHuntExercise } from "feature/exercisePlan/data/exerises/fretboardRegionHunt/fretboardRegionHunt";
 import { fretClickAHighExercise } from "feature/exercisePlan/data/exerises/fretClickAHigh/fretClickAHigh";
 import { fretClickAOpenExercise } from "feature/exercisePlan/data/exerises/fretClickAOpen/fretClickAOpen";
@@ -548,6 +552,7 @@ const rawExercises: Exercise[] = [
   vibratoFingerIsolationExercise,
   stringSkippingTwoNotesExercise,
   firstMelodyExercise,
+  ...firstRiffExercises,
   quarterNotesDrillExercise,
   pentatonicStringCrossing3Exercise,
   tripletsDrillExercise,

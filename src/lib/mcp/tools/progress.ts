@@ -218,7 +218,7 @@ export function registerProgressTools(server: McpServer, context: McpContext) {
     {
       title: "Profile summary",
       description:
-        "The player's profile: level, points, Fame, streak, time per category, sessions, song lists and their time zone.",
+        "The player's profile: level, points, Fame, streak, time per category, sessions, how many songs are on each list (the songs: riffquest_get_my_songs) and their time zone.",
       inputSchema: strictInput({}),
       annotations: READ_TOOL_ANNOTATIONS,
     },

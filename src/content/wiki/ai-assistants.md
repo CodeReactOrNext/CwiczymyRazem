@@ -28,7 +28,7 @@ Any app that supports remote MCP connectors, such as ChatGPT, Cursor or Claude C
 
 ## What it can do
 
-<Checklist items="Read your progress::Your profile, practice history, calendar (what you played and what you planned), skills, weak spots, tempo goals and recent scored runs|Browse the library::Exercises, songs, the exercise of the day, the monthly challenge and this wiki|Plan with you::Create and edit practice plans, fill in or rearrange your practice calendar, add songs to your list, and set or adjust tempo goals|Log your practice::Note down a session you played without the app, split by category, skill or song. It earns points, Fame and keeps your streak, just like logging it yourself|Write exercises::Turn a tab into an exercise of your own, check it, preview it with playback and fix it later" />
+<Checklist items="Read your progress::Your profile, practice history, calendar (what you played and what you planned), skills, weak spots, tempo goals, your song lists and recent scored runs|Browse the library::Exercises, songs, the exercise of the day, the monthly challenge and this wiki|Plan with you::Create and edit practice plans, fill in or rearrange your practice calendar, add songs to your list, and set or adjust tempo goals|Log your practice::Note down a session you played without the app, split by category, skill or song. It earns points, Fame and keeps your streak, just like logging it yourself|Write exercises::Turn a tab into an exercise of your own, check it, preview it with playback and fix it later" />
 
 It can't touch anything outside your own account. It doesn't see other players' data, can't post anything, and can't join rankings, guilds or duels on your behalf. Exercises it creates are private to you.
 
@@ -38,7 +38,7 @@ Some things to try: "Review my last week of practice", "Plan a 30-minute session
 
 ## Limits
 
-<StatRow stats="20:changes a day|10:new exercises a day|60:requests a minute" />
+<StatRow stats="35:changes a day|10:new exercises a day|60:requests a minute" />
 
 Reading never counts against the daily limit. Every change the assistant saves tells it how many are left today, so it can warn you before you run out.
 

@@ -57,5 +57,9 @@
   "last_7_days": "ostatnie 7 dni",
   "skill_balance": "Równowaga umiejętności",
   "previous": "Poprzedni",
-  "new_achievements": "Nowe osiągnięcia"
+  "new_achievements": "Nowe osiągnięcia",
+  "recent_runs": {
+    "title": "Jak ostatnio szło Ci to ćwiczenie",
+    "runs": "ostatnie przebiegi: {{count}} · {{from}} → {{to}} BPM"
+  }
 }

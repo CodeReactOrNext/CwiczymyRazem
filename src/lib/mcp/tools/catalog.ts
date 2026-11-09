@@ -127,6 +127,8 @@ const songSummary = (id: string, data: FirebaseFirestore.DocumentData) => ({
   url: appLink(`/songs?songId=${encodeURIComponent(id)}`),
 });
 
+const SONG_LIST_STATUSES = ["learned", "learning", "wantToLearn"] as const;
+
 /** The deepest a song search pages — each page reads every song it skips. */
 const MAX_SONG_OFFSET = 150;
 
@@ -428,6 +430,67 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
           ...songSummary(song.id, song.data()!),
           yourStatus: status.data()?.status ?? null,
           yourPracticeMinutes: msToMinutes(progress.data()?.totalPracticeMs),
+        });
+      }),
+  );
+
+  server.registerTool(
+    "riffquest_get_my_songs",
+    {
+      title: "My song lists",
+      description:
+        "The songs on the player's own lists (learned, learning, wantToLearn) in their order, with practice minutes. Paged.",
+      inputSchema: strictInput({
+        status: z
+          .enum(SONG_LIST_STATUSES)
+          .optional()
+          .describe("One list; all three without it"),
+        ...pageInput(30, 100),
+      }),
+      annotations: READ_TOOL_ANNOTATIONS,
+    },
+    ({ status, offset, limit }) =>
+      runTool("riffquest_get_my_songs", async () => {
+        const user = userRef(context.uid);
+        const lists = user.collection("userSongs");
+        const snapshot = await (
+          status ? lists.where("status", "==", status) : lists
+        ).get();
+        // Backing-track sync and section maps write docs here too; only a
+        // status puts a song on a list. The doc id is the song id.
+        const entries = snapshot.docs
+          .map((doc) => ({ id: doc.id, data: doc.data() }))
+          .filter(({ data }) => SONG_LIST_STATUSES.includes(data.status))
+          .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+        const { items, meta } = pageOf(entries, offset, limit ?? 30);
+        if (!items.length) return jsonResult({ ...meta, songs: [] });
+
+        const [songs, progress] = await Promise.all([
+          firestore.getAll(
+            ...items.map(({ id }) => firestore.collection("songs").doc(id)),
+          ),
+          firestore.getAll(
+            ...items.map(({ id }) => user.collection("songProgress").doc(id)),
+          ),
+        ]);
+        return jsonResult({
+          ...meta,
+          songs: items.map(({ id, data }, index) => {
+            const song = songs[index].data();
+            return {
+              ...(song
+                ? songSummary(id, song)
+                : {
+                    id,
+                    title: data.title ?? null,
+                    artist: data.artist ?? null,
+                  }),
+              status: data.status,
+              practiceMinutes: msToMinutes(
+                progress[index].data()?.totalPracticeMs,
+              ),
+            };
+          }),
         });
       }),
   );

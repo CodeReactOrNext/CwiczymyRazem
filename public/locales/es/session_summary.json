@@ -57,5 +57,9 @@
   "last_7_days": "últimos 7 días",
   "skill_balance": "Equilibrio de habilidades",
   "previous": "Anterior",
-  "new_achievements": "Nuevos logros"
+  "new_achievements": "Nuevos logros",
+  "recent_runs": {
+    "title": "Cómo te ha ido últimamente con este ejercicio",
+    "runs": "últimos {{count}} intentos · {{from}} → {{to}} BPM"
+  }
 }

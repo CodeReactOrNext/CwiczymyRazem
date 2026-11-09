@@ -679,6 +679,7 @@ export function generateBossBacking(
       key: { tonic: pcName(tonic), scale: null },
       chords: spans.map((span) => chordSymbol(span.chord)),
       groove: "boss",
+      style: "ambient",
       bars: loopBars,
     },
   };

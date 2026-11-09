@@ -4,6 +4,7 @@ import type {
   TabTrackType,
 } from "feature/exercisePlan/types/exercise.types";
 
+import type { BandStyleId } from "../styles";
 import { Envelope } from "./envelope";
 
 /**
@@ -122,6 +123,124 @@ const SENDS: Partial<Record<TabTrackType, { reverb: number; echo: number }>> = {
   arp: { reverb: 0.35, echo: 0.5 },
 };
 
+// ── Styles ───────────────────────────────────────────────────────────────────
+
+interface KitPreset {
+  kick: {
+    /** Hz the pitch drops from, and to. */
+    from: number;
+    to: number;
+    /** Seconds the drop takes. */
+    sweep: number;
+    decay: number;
+    level: number;
+    /** The noise click on the front; 0 for none. */
+    click: number;
+  };
+  /** What the snare note plays. */
+  snare: "soft" | "dusty" | "gated" | "clap" | "heavy";
+  /** The hi-hat's band, level and closed decay; the open hat's decay. */
+  hat: { band: number; level: number; decay: number; open: number };
+  /** Tom pitches, relative to the soft kit's. */
+  toms: number;
+}
+
+/** The instruments and the room of one band style (see feature/autoBacking/styles). */
+interface BandPreset {
+  /** What a keys note plays: the wide pad, an electric piano, a brassy poly
+   *  synth, a short house stab or slow strings. */
+  pad: "pad" | "ep" | "brass" | "stab" | "strings";
+  bass: "sub" | "round" | "pluck" | "reese";
+  arp: "pluck" | "bell" | "square";
+  kit: KitPreset;
+  /** The hall's and the echo's return levels, and how long the echo keeps repeating. */
+  hall: number;
+  echo: number;
+  feedback: number;
+  /** A low-pass over the whole band, Hz — lofi's darker, older sound. */
+  tone: number;
+}
+
+const SOFT_KIT: KitPreset = {
+  kick: { from: 180, to: 50, sweep: 0.06, decay: 0.28, level: 0.4, click: 0.24 },
+  snare: "soft",
+  hat: { band: 10000, level: 0.17, decay: 0.05, open: 0.3 },
+  toms: 1,
+};
+
+const PRESETS: Record<BandStyleId, BandPreset> = {
+  ambient: {
+    pad: "pad",
+    bass: "sub",
+    arp: "pluck",
+    kit: SOFT_KIT,
+    hall: 0.75,
+    echo: 0.7,
+    feedback: 0.38,
+    tone: 20000,
+  },
+  lofi: {
+    pad: "ep",
+    bass: "round",
+    arp: "bell",
+    kit: {
+      kick: { from: 150, to: 46, sweep: 0.05, decay: 0.24, level: 0.44, click: 0 },
+      snare: "dusty",
+      hat: { band: 8000, level: 0.15, decay: 0.035, open: 0.22 },
+      toms: 0.9,
+    },
+    hall: 0.5,
+    echo: 0.35,
+    feedback: 0.28,
+    tone: 9000,
+  },
+  synthwave: {
+    pad: "brass",
+    bass: "pluck",
+    arp: "square",
+    kit: {
+      kick: { from: 200, to: 48, sweep: 0.045, decay: 0.3, level: 0.44, click: 0.3 },
+      snare: "gated",
+      hat: { band: 10000, level: 0.14, decay: 0.04, open: 0.25 },
+      toms: 1,
+    },
+    hall: 0.85,
+    echo: 0.75,
+    feedback: 0.42,
+    tone: 20000,
+  },
+  house: {
+    pad: "stab",
+    bass: "pluck",
+    arp: "pluck",
+    kit: {
+      kick: { from: 230, to: 50, sweep: 0.04, decay: 0.4, level: 0.34, click: 0.16 },
+      snare: "clap",
+      hat: { band: 10000, level: 0.13, decay: 0.04, open: 0.18 },
+      toms: 1,
+    },
+    hall: 0.6,
+    echo: 0.6,
+    feedback: 0.35,
+    tone: 20000,
+  },
+  dark: {
+    pad: "strings",
+    bass: "reese",
+    arp: "bell",
+    kit: {
+      kick: { from: 170, to: 42, sweep: 0.05, decay: 0.36, level: 0.46, click: 0.35 },
+      snare: "heavy",
+      hat: { band: 9000, level: 0.15, decay: 0.05, open: 0.3 },
+      toms: 0.8,
+    },
+    hall: 0.9,
+    echo: 0.5,
+    feedback: 0.4,
+    tone: 14000,
+  },
+};
+
 /** The kick pushes the pad and bass down this far, then lets them back up. */
 const DUCK_DEPTH = 0.55;
 
@@ -190,6 +309,15 @@ export class AmbientBand {
   private danger = false;
   /** The sword's charge, as Hz added to every pad and arpeggio filter — the build before a strike. */
   private readonly tension: ConstantSourceNode | null;
+  /** Who plays: the instruments and room of the current style. */
+  private preset: BandPreset = PRESETS.ambient;
+  private readonly hallReturn: GainNode;
+  private readonly echoReturn: GainNode;
+  private readonly echoFeedback: GainNode;
+  /** The style's low-pass over the whole band. */
+  private readonly toneFilter: BiquadFilterNode;
+  /** A slow pitch wobble, cents — the electric piano's worn tape. */
+  private readonly wobble: GainNode;
 
   constructor(
     private readonly ctx: BaseAudioContext,
@@ -215,7 +343,12 @@ export class AmbientBand {
     this.dipFilter.type = "lowpass";
     this.dipFilter.frequency.value = DIP_OPEN_HZ;
     this.dipFilter.Q.value = 0.7;
-    trim.connect(this.dipFilter);
+    this.toneFilter = ctx.createBiquadFilter();
+    this.toneFilter.type = "lowpass";
+    this.toneFilter.frequency.value = PRESETS.ambient.tone;
+    this.toneFilter.Q.value = 0.5;
+    trim.connect(this.toneFilter);
+    this.toneFilter.connect(this.dipFilter);
     this.dipFilter.connect(limiter);
     limiter.connect(ceiling);
     ceiling.connect(output);
@@ -239,7 +372,8 @@ export class AmbientBand {
     convolver.buffer = buildImpulse(ctx, 3.4, 2.6);
     const wet = ctx.createGain();
     // The whole band sits a few dB under full scale: the tab's guitar plays on top.
-    wet.gain.value = 0.75;
+    wet.gain.value = PRESETS.ambient.hall;
+    this.hallReturn = wet;
     // A reverb tail with lows in it is mud: the hall keeps only the middle.
     const hallLow = ctx.createBiquadFilter();
     hallLow.type = "highpass";
@@ -265,13 +399,15 @@ export class AmbientBand {
     thin.type = "highpass";
     thin.frequency.value = 280;
     const feedback = ctx.createGain();
-    feedback.gain.value = 0.38;
+    feedback.gain.value = PRESETS.ambient.feedback;
+    this.echoFeedback = feedback;
     const left = ctx.createStereoPanner();
     left.pan.value = -0.7;
     const right = ctx.createStereoPanner();
     right.pan.value = 0.7;
     const echoOut = ctx.createGain();
-    echoOut.gain.value = 0.7;
+    echoOut.gain.value = PRESETS.ambient.echo;
+    this.echoReturn = echoOut;
     this.echoInput.connect(thin);
     thin.connect(tone);
     tone.connect(this.echoLeft);
@@ -295,6 +431,35 @@ export class AmbientBand {
     this.lfoDepth.gain.value = 450;
     lfo.connect(this.lfoDepth);
     lfo.start();
+
+    const wobbler = ctx.createOscillator();
+    wobbler.frequency.value = 0.55;
+    this.wobble = ctx.createGain();
+    this.wobble.gain.value = 7;
+    wobbler.connect(this.wobble);
+    wobbler.start();
+  }
+
+  /**
+   * The band to play in — see feature/autoBacking/styles. Notes already
+   * scheduled keep the instruments they started on. Unknown or absent: ambient.
+   */
+  setStyle(style: BandStyleId | undefined) {
+    const preset = (style && PRESETS[style]) || PRESETS.ambient;
+    if (preset === this.preset) return;
+    this.preset = preset;
+    const now = this.ctx.currentTime;
+    // Anchored where each one is: a target set off from an unanchored value
+    // is where some engines (node-web-audio-api) jump.
+    const glide = (param: AudioParam, value: number) => {
+      param.cancelScheduledValues(now);
+      param.setValueAtTime(param.value, now);
+      param.setTargetAtTime(value, now, 0.05);
+    };
+    glide(this.hallReturn.gain, preset.hall);
+    glide(this.echoReturn.gain, preset.echo);
+    glide(this.echoFeedback.gain, preset.feedback);
+    glide(this.toneFilter.frequency, preset.tone);
   }
 
   /** Dotted-eighth echo at the session tempo — an eighth when that would be too long. */
@@ -646,6 +811,20 @@ export class AmbientBand {
     duration: number,
     destination: AudioNode,
   ) {
+    switch (this.preset.pad) {
+      case "ep":
+        this.playEp(slot, voiceIndex, key, velocity, time, duration, destination);
+        return;
+      case "stab":
+        this.playStab(voiceIndex, key, velocity, time, destination);
+        return;
+      case "brass":
+      case "strings":
+        this.playHeld(slot, voiceIndex, key, velocity, time, duration, destination);
+        return;
+      default:
+        break;
+    }
     const previous = this.pads.get(slot);
     if (previous && previous.key === key && time <= previous.end + TIE_GAP) {
       // Tied over: back up to full if the fade had begun in the gap, hold on.
@@ -714,6 +893,205 @@ export class AmbientBand {
     stopAt(voice.oscillators, when + release + 0.2);
   }
 
+  /**
+   * An electric piano tone: a sine whose twin modulates it hard on the
+   * strike and gently after (the bark that settles into a bell), a quick
+   * tine on top, a slow tape wobble. Struck afresh every time — a piano
+   * that swelled like a pad would sound bowed.
+   */
+  private playEp(
+    slot: string,
+    voiceIndex: number,
+    key: number,
+    velocity: number,
+    time: number,
+    duration: number,
+    destination: AudioNode,
+  ) {
+    const previous = this.pads.get(slot);
+    if (previous) this.fade(previous, time, 0.06);
+
+    const ctx = this.ctx;
+    const frequency = midiToHz(key);
+    const peak = 0.08 * (0.55 + 0.45 * velocity);
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    envelope.set(0, time);
+    envelope.rampTo(peak, time + 0.004);
+    envelope.approach(peak * 0.3, time + 0.004, 0.9);
+
+    const carrier = ctx.createOscillator();
+    carrier.type = "sine";
+    carrier.frequency.value = frequency;
+    const modulator = ctx.createOscillator();
+    modulator.type = "sine";
+    modulator.frequency.value = frequency;
+    const index = ctx.createGain();
+    index.gain.setValueAtTime(frequency * (1.8 + 1.8 * velocity), time);
+    index.gain.setTargetAtTime(frequency * 0.45, time, 0.22);
+    modulator.connect(index);
+    index.connect(carrier.frequency);
+    this.wobble.connect(carrier.detune);
+
+    const tine = ctx.createOscillator();
+    tine.type = "sine";
+    tine.frequency.value = frequency * 6;
+    const tineGain = ctx.createGain();
+    tineGain.gain.setValueAtTime(0.3 * velocity, time);
+    tineGain.gain.setTargetAtTime(0, time, 0.05);
+    tine.connect(tineGain);
+
+    const warm = ctx.createBiquadFilter();
+    warm.type = "lowpass";
+    warm.frequency.value = 4500;
+    warm.Q.value = 0.5;
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = PAD_PANS[voiceIndex % PAD_PANS.length] * 0.7;
+
+    carrier.connect(warm);
+    tineGain.connect(warm);
+    warm.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    const oscillators = [carrier, modulator, tine];
+    for (const osc of oscillators) osc.start(time);
+    carrier.addEventListener("ended", () => {
+      this.wobble.disconnect(carrier.detune);
+      index.disconnect();
+      tineGain.disconnect();
+      warm.disconnect();
+      gain.disconnect();
+      panner.disconnect();
+    });
+
+    const voice: PadVoice = { key, peak, envelope, oscillators, end: time };
+    this.fade(voice, time + duration, 0.35);
+    this.pads.set(slot, voice);
+  }
+
+  /**
+   * A house stab: detuned saws through a filter that slams shut, gone in a
+   * moment — the echo and hall carry it on.
+   */
+  private playStab(
+    voiceIndex: number,
+    key: number,
+    velocity: number,
+    time: number,
+    destination: AudioNode,
+  ) {
+    const ctx = this.ctx;
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    const peak = 0.12 * (0.6 + 0.4 * velocity);
+    envelope.set(0, time);
+    envelope.rampTo(peak, time + 0.003);
+    envelope.approach(0, time + 0.003, 0.14);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.Q.value = 3;
+    filter.frequency.setValueAtTime(3200 + 1200 * velocity, time);
+    filter.frequency.setTargetAtTime(450, time, 0.08);
+
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = PAD_PANS[voiceIndex % PAD_PANS.length];
+
+    const frequency = midiToHz(key);
+    const oscillators = [-9, 0, 9].map((cents) =>
+      this.oscillator("sawtooth", frequency, cents, 0.33, filter),
+    );
+    filter.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    for (const osc of oscillators) osc.start(time);
+    stopAt(oscillators, time + 1);
+    oscillators[0].addEventListener("ended", () => {
+      filter.disconnect();
+      gain.disconnect();
+      panner.disconnect();
+    });
+  }
+
+  /**
+   * A held chord tone on a poly synth: synthwave's brass (two saws and a sub
+   * square, the filter blooming open on the strike) or the dark band's
+   * strings (three wide saws, a slow bow, a long release). Tied over a
+   * restrike like the pad.
+   */
+  private playHeld(
+    slot: string,
+    voiceIndex: number,
+    key: number,
+    velocity: number,
+    time: number,
+    duration: number,
+    destination: AudioNode,
+  ) {
+    const strings = this.preset.pad === "strings";
+    const release = strings ? 2.6 : 0.7;
+    const previous = this.pads.get(slot);
+    if (previous && previous.key === key && time <= previous.end + TIE_GAP) {
+      previous.envelope.glideTo(previous.peak, Math.max(time, this.ctx.currentTime), 0.06);
+      this.fade(previous, time + duration, release);
+      return;
+    }
+    if (previous) this.fade(previous, time, strings ? 0.9 : 0.15);
+
+    const ctx = this.ctx;
+    const peak = (strings ? 0.085 : 0.08) * (0.65 + 0.35 * velocity);
+    const attack = strings
+      ? Math.min(1.2, Math.max(0.3, duration * 0.45))
+      : 0.02;
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    envelope.set(0, time);
+    envelope.rampTo(peak, time + attack);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    const rage = this.raging(time) ? 900 : 0;
+    if (strings) {
+      filter.Q.value = 0.7;
+      filter.frequency.value = 1100 + 500 * velocity + rage;
+      this.lfoDepth.connect(filter.frequency);
+    } else {
+      filter.Q.value = 2.2;
+      const open = 2200 + 1400 * velocity + rage;
+      filter.frequency.setValueAtTime(450, time);
+      filter.frequency.linearRampToValueAtTime(open, time + 0.07);
+      filter.frequency.setTargetAtTime(1300 + 500 * velocity + rage, time + 0.07, 0.4);
+    }
+
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = PAD_PANS[voiceIndex % PAD_PANS.length] * (strings ? 1.4 : 1);
+
+    const frequency = midiToHz(key);
+    const oscillators = strings
+      ? [-14, 0, 14].map((cents) =>
+          this.oscillator("sawtooth", frequency, cents, 0.3, filter),
+        )
+      : [
+          this.oscillator("sawtooth", frequency, -8, 0.35, filter),
+          this.oscillator("sawtooth", frequency, 8, 0.35, filter),
+          this.oscillator("square", frequency / 2, 0, 0.16, filter),
+        ];
+    filter.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    for (const osc of oscillators) osc.start(time);
+    oscillators[0].addEventListener("ended", () => {
+      if (strings) this.lfoDepth.disconnect(filter.frequency);
+      filter.disconnect();
+      gain.disconnect();
+      panner.disconnect();
+    });
+
+    const voice: PadVoice = { key, peak, envelope, oscillators, end: time };
+    this.fade(voice, time + duration, release);
+    this.pads.set(slot, voice);
+  }
+
   // ── Arpeggio ─────────────────────────────────────────────────────────────
 
   /**
@@ -728,6 +1106,14 @@ export class AmbientBand {
     destination: AudioNode,
     side: number,
   ) {
+    if (this.preset.arp === "bell") {
+      this.playBell(key, velocity, time, destination, side);
+      return;
+    }
+    if (this.preset.arp === "square") {
+      this.playSquareArp(key, velocity, time, duration, destination, side);
+      return;
+    }
     const ctx = this.ctx;
     const gain = ctx.createGain();
     const envelope = new Envelope(gain.gain);
@@ -766,6 +1152,91 @@ export class AmbientBand {
     });
   }
 
+  /** A soft FM bell: a sine with a modulator three times up, ringing out. */
+  private playBell(
+    key: number,
+    velocity: number,
+    time: number,
+    destination: AudioNode,
+    side: number,
+  ) {
+    const ctx = this.ctx;
+    const frequency = midiToHz(key);
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    envelope.set(0, time);
+    envelope.rampTo(0.075 * (0.5 + 0.5 * velocity), time + 0.003);
+    envelope.approach(0, time + 0.003, 0.38);
+
+    const carrier = ctx.createOscillator();
+    carrier.type = "sine";
+    carrier.frequency.value = frequency;
+    const modulator = ctx.createOscillator();
+    modulator.type = "sine";
+    modulator.frequency.value = frequency * 3;
+    const index = ctx.createGain();
+    index.gain.setValueAtTime(frequency * 1.4, time);
+    index.gain.setTargetAtTime(frequency * 0.08, time, 0.12);
+    modulator.connect(index);
+    index.connect(carrier.frequency);
+
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = side === 1 ? -0.4 : 0.4;
+    carrier.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    carrier.start(time);
+    modulator.start(time);
+    stopAt([carrier, modulator], time + 2);
+    carrier.addEventListener("ended", () => {
+      index.disconnect();
+      gain.disconnect();
+      panner.disconnect();
+    });
+  }
+
+  /** Synthwave's arpeggio: a resonant square that snaps shut, short enough for sixteenths. */
+  private playSquareArp(
+    key: number,
+    velocity: number,
+    time: number,
+    duration: number,
+    destination: AudioNode,
+    side: number,
+  ) {
+    const ctx = this.ctx;
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    envelope.set(0, time);
+    envelope.rampTo(0.06 * (0.5 + 0.5 * velocity), time + 0.003);
+    envelope.approach(0, time + 0.003, Math.min(0.09, duration / 2));
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.Q.value = 5;
+    filter.frequency.setValueAtTime(
+      Math.max(900, 1600 + 2600 * velocity + (this.raging(time) ? 1500 : 0) + this.brightness(time)),
+      time,
+    );
+    filter.frequency.setTargetAtTime(650, time, 0.05);
+    this.tension?.connect(filter.frequency);
+
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = side === 1 ? -0.3 : 0.3;
+    const oscillators = [this.oscillator("square", midiToHz(key), 0, 0.5, filter)];
+    filter.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    oscillators[0].start(time);
+    stopAt(oscillators, time + 0.6);
+    oscillators[0].addEventListener("ended", () => {
+      this.tension?.disconnect(filter.frequency);
+      filter.disconnect();
+      gain.disconnect();
+      panner.disconnect();
+    });
+  }
+
   // ── Bass ─────────────────────────────────────────────────────────────────
 
   /** A warm sub bass, one note at a time per slot — a new note takes over. */
@@ -779,6 +1250,10 @@ export class AmbientBand {
   ) {
     const previous = this.basses.get(slot);
     if (previous) this.fade(previous, time, 0.04);
+    if (this.preset.bass !== "sub") {
+      this.playStyledBass(slot, key, velocity, time, duration, destination);
+      return;
+    }
 
     const ctx = this.ctx;
     const peak = 0.2 * (0.6 + 0.4 * velocity);
@@ -818,6 +1293,86 @@ export class AmbientBand {
     this.basses.set(slot, voice);
   }
 
+  /**
+   * The other styles' basses:
+   * - `round` (lofi): a sine with its octave, plucked and dying away like a
+   *   string, behind a fixed low-pass.
+   * - `pluck` (synthwave, house): saw and square through a resonant filter
+   *   that opens on the note and closes behind it.
+   * - `reese` (dark): two saws beating against each other over a sine sub.
+   */
+  private playStyledBass(
+    slot: string,
+    key: number,
+    velocity: number,
+    time: number,
+    duration: number,
+    destination: AudioNode,
+  ) {
+    const ctx = this.ctx;
+    const kind = this.preset.bass;
+    const frequency = midiToHz(key);
+    const rage = this.raging(time) ? 500 : 0;
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    let oscillators: OscillatorNode[];
+    let peak: number;
+
+    if (kind === "round") {
+      peak = 0.24 * (0.6 + 0.4 * velocity);
+      envelope.set(0, time);
+      envelope.rampTo(peak, time + 0.012);
+      envelope.approach(peak * 0.45, time + 0.012, 0.45);
+      filter.Q.value = 0.7;
+      filter.frequency.value = 800 + 300 * velocity + rage;
+      oscillators = [
+        this.oscillator("sine", frequency, 0, 0.8, filter),
+        this.oscillator("triangle", frequency * 2, 0, 0.25, filter),
+        // A trace of saw, so the line still reads on a laptop speaker.
+        this.oscillator("sawtooth", frequency, 0, 0.12, filter),
+      ];
+    } else if (kind === "pluck") {
+      peak = 0.2 * (0.6 + 0.4 * velocity);
+      envelope.set(0, time);
+      envelope.rampTo(peak, time + 0.004);
+      envelope.approach(peak * 0.7, time + 0.004, 0.18);
+      filter.Q.value = 4;
+      filter.frequency.setValueAtTime(500 + 1500 * velocity + rage, time);
+      filter.frequency.setTargetAtTime(340 + rage * 0.5, time, 0.09);
+      oscillators = [
+        this.oscillator("sine", frequency, 0, 0.55, filter),
+        this.oscillator("sawtooth", frequency, 0, 0.35, filter),
+        this.oscillator("square", frequency, -7, 0.2, filter),
+      ];
+    } else {
+      peak = 0.19 * (0.6 + 0.4 * velocity);
+      envelope.set(0, time);
+      envelope.rampTo(peak, time + 0.015);
+      envelope.approach(peak * 0.85, time + 0.015, 0.3);
+      filter.Q.value = 1.3;
+      filter.frequency.value = 600 + 200 * velocity + rage;
+      oscillators = [
+        this.oscillator("sine", frequency, 0, 0.6, filter),
+        this.oscillator("sawtooth", frequency, -16, 0.32, filter),
+        this.oscillator("sawtooth", frequency, 16, 0.32, filter),
+      ];
+    }
+
+    filter.connect(gain);
+    gain.connect(destination);
+    for (const osc of oscillators) osc.start(time);
+    oscillators[0].addEventListener("ended", () => {
+      filter.disconnect();
+      gain.disconnect();
+    });
+
+    const voice: Voice = { envelope, oscillators, end: time };
+    this.fade(voice, time + duration, kind === "reese" ? 0.2 : 0.1);
+    this.basses.set(slot, voice);
+  }
+
   // ── Drums ────────────────────────────────────────────────────────────────
 
   /** An 808-flavoured kit, on the General MIDI notes the arranger writes. */
@@ -839,7 +1394,7 @@ export class AmbientBand {
       case 38:
       case 39:
       case 40:
-        this.snare(time, v, destination);
+        this.styledSnare(time, v, destination);
         if (this.raging(time)) this.tom(time, v * 0.8, destination, 105);
         break;
       case 42:
@@ -850,13 +1405,24 @@ export class AmbientBand {
           time,
           v,
           destination,
-          note.midiNote === 44 ? 0.03 : 0.05,
-          0.17,
+          this.preset.kit.hat.decay * (note.midiNote === 44 ? 0.6 : 1),
+          this.preset.kit.hat.level,
+          this.preset.kit.hat.band,
         );
         break;
       case 46:
         this.chokeHat(trackId, time);
-        this.openHats.set(trackId, this.metal(time, v, destination, 0.3, 0.12));
+        this.openHats.set(
+          trackId,
+          this.metal(
+            time,
+            v,
+            destination,
+            this.preset.kit.hat.open,
+            this.preset.kit.hat.level * 0.7,
+            this.preset.kit.hat.band,
+          ),
+        );
         break;
       case 51:
       case 53:
@@ -872,7 +1438,7 @@ export class AmbientBand {
       case 41:
       case 43:
       case 45:
-        this.tom(time, v, destination, 105);
+        this.tom(time, v, destination, 105 * this.preset.kit.toms);
         break;
       case HEARTBEAT:
         this.thump(time, v, destination);
@@ -880,7 +1446,7 @@ export class AmbientBand {
       case 47:
       case 48:
       case 50:
-        this.tom(time, v, destination, 155);
+        this.tom(time, v, destination, 155 * this.preset.kit.toms);
         break;
       default:
         break;
@@ -929,28 +1495,31 @@ export class AmbientBand {
     shaper.curve = this.kickCurve;
     shaper.connect(destination);
 
+    const kit = this.preset.kit.kick;
     const osc = ctx.createOscillator();
     osc.type = "sine";
-    osc.frequency.setValueAtTime(180, time);
-    osc.frequency.exponentialRampToValueAtTime(50, time + 0.06);
-    const { gain } = this.hit(time, 0.4 * (0.5 + 0.5 * v), 0.28, shaper, 0.002);
+    osc.frequency.setValueAtTime(kit.from, time);
+    osc.frequency.exponentialRampToValueAtTime(kit.to, time + kit.sweep);
+    const { gain } = this.hit(time, kit.level * (0.5 + 0.5 * v), kit.decay, shaper, 0.002);
     osc.connect(gain);
     osc.onended = () => {
       gain.disconnect();
       shaper.disconnect();
     };
     osc.start(time);
-    osc.stop(time + 0.6);
+    osc.stop(time + Math.max(0.6, kit.decay * 2));
 
-    const click = ctx.createBiquadFilter();
-    click.type = "highpass";
-    click.frequency.value = 2500;
-    const { gain: clickGain } = this.hit(time, 0.24 * v, 0.012, shaper, 0.0005);
-    click.connect(clickGain);
-    this.noise(time, 0.02, click, () => {
-      click.disconnect();
-      clickGain.disconnect();
-    });
+    if (kit.click > 0) {
+      const click = ctx.createBiquadFilter();
+      click.type = "highpass";
+      click.frequency.value = 2500;
+      const { gain: clickGain } = this.hit(time, kit.click * v, 0.012, shaper, 0.0005);
+      click.connect(clickGain);
+      this.noise(time, 0.02, click, () => {
+        click.disconnect();
+        clickGain.disconnect();
+      });
+    }
 
     // The pad and bass make room for it — the pulse electronic music breathes with.
     if (duck) this.duckAt(time, v);
@@ -977,6 +1546,103 @@ export class AmbientBand {
       filter.disconnect();
       gain.disconnect();
     });
+  }
+
+  /**
+   * The snare of the style's kit:
+   * - `soft`: the clap with a pitched body (snare below).
+   * - `dusty`: a short, dark noise crack over a small body — a sampled snare
+   *   off an old record.
+   * - `gated`: the soft snare under a burst of bright noise held flat and cut
+   *   dead: the gated-reverb snare of the 80s.
+   * - `clap`: the house clap alone.
+   * - `heavy`: a lower, fatter body and a longer crack.
+   */
+  private styledSnare(time: number, v: number, destination: AudioNode) {
+    switch (this.preset.kit.snare) {
+      case "dusty":
+        this.crack(time, 0.3 * (0.4 + 0.6 * v), 0.11, 1800, 6000, destination);
+        this.body(time, v, destination, 190, 160, 0.24, 0.08);
+        return;
+      case "gated": {
+        this.snare(time, v, destination);
+        const band = this.ctx.createBiquadFilter();
+        band.type = "bandpass";
+        band.frequency.value = 2400;
+        band.Q.value = 0.5;
+        const gain = this.ctx.createGain();
+        const envelope = new Envelope(gain.gain);
+        const level = 0.13 * (0.4 + 0.6 * v);
+        envelope.set(0, time);
+        envelope.rampTo(level, time + 0.004);
+        envelope.rampTo(level * 0.75, time + 0.2);
+        envelope.rampTo(0, time + 0.23);
+        band.connect(gain);
+        gain.connect(destination);
+        this.noise(time, 0.25, band, () => {
+          band.disconnect();
+          gain.disconnect();
+        });
+        return;
+      }
+      case "clap":
+        this.clap(time, v * 0.95, destination);
+        return;
+      case "heavy":
+        this.clap(time, v * 0.75, destination);
+        this.crack(time, 0.2 * (0.4 + 0.6 * v), 0.18, 2500, 9000, destination);
+        this.body(time, v, destination, 180, 140, 0.42, 0.14);
+        return;
+      default:
+        this.snare(time, v, destination);
+    }
+  }
+
+  /** Noise through a band and a low-pass, struck: the crack of a snare. */
+  private crack(
+    time: number,
+    level: number,
+    decay: number,
+    band: number,
+    lowpass: number,
+    destination: AudioNode,
+  ) {
+    const bandpass = this.ctx.createBiquadFilter();
+    bandpass.type = "bandpass";
+    bandpass.frequency.value = band;
+    bandpass.Q.value = 0.9;
+    const dark = this.ctx.createBiquadFilter();
+    dark.type = "lowpass";
+    dark.frequency.value = lowpass;
+    const { gain } = this.hit(time, level, decay, destination, 0.001);
+    bandpass.connect(dark);
+    dark.connect(gain);
+    this.noise(time, decay * 2 + 0.05, bandpass, () => {
+      bandpass.disconnect();
+      dark.disconnect();
+      gain.disconnect();
+    });
+  }
+
+  /** A snare's pitched body: a triangle dropping from `from` to `to` Hz. */
+  private body(
+    time: number,
+    v: number,
+    destination: AudioNode,
+    from: number,
+    to: number,
+    level: number,
+    decay: number,
+  ) {
+    const body = this.ctx.createOscillator();
+    body.type = "triangle";
+    body.frequency.setValueAtTime(from, time);
+    body.frequency.exponentialRampToValueAtTime(to, time + 0.06);
+    const { gain } = this.hit(time, level * (0.4 + 0.6 * v), decay, destination, 0.001);
+    body.connect(gain);
+    body.onended = () => gain.disconnect();
+    body.start(time);
+    body.stop(time + decay * 2 + 0.05);
   }
 
   /** Clap, body and tail: an electronic snare that still has a pitch. */

@@ -14,6 +14,7 @@ import type { TablatureMeasure } from "../../../types/exercise.types";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useTabOverlay } from "../contexts/TabOverlayContext";
+import { useTabPlayUntilStore } from "../hooks/tabPlayUntilStore";
 import {
   NOTE_SPACING_MAX,
   NOTE_SPACING_MIN,
@@ -100,6 +101,8 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
 }: MobileTablaturePanelProps) {
   const { t } = useTranslation("session");
   const { hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef } = useNoteMatchingContext();
+  // The exercise's time ends the tab at the last bar it fits (tabPlayUntil.ts).
+  const playUntilBeat = useTabPlayUntilStore(s => s.until?.beat ?? null);
   const { overlay: tabOverlay } = useTabOverlay();
   const { tuning, stringCount } = useGuitarTuningContext();
   const {
@@ -202,6 +205,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
             fillFeedRef={fillFeedRef}
             currentBeatsElapsed={0}
             resetKey={resetKey}
+            playUntilBeat={playUntilBeat}
             zoom={zoom * MOBILE_FIT}
             heightPx={viewerHeight}
             tuningStrings={tuningStrings}

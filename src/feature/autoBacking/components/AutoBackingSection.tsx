@@ -5,6 +5,51 @@ import { GiDrumKit } from "react-icons/gi";
 
 import type { AutoBackingSummary } from "../generateAutoBacking";
 import { useAutoBackingStore } from "../store/autoBackingStore";
+import type { BandStylePreference } from "../styles";
+import { BAND_STYLES } from "../styles";
+
+const STYLE_CHOICES: readonly BandStylePreference[] = ["auto", ...BAND_STYLES];
+
+/**
+ * Who plays the backing: "Auto" lets each exercise pick its band, the rest
+ * put the same band on every exercise. Auto names the band it picked.
+ */
+function StylePicker({ playing }: { playing: AutoBackingSummary["style"] }) {
+  const { t } = useTranslation("session");
+  const style = useAutoBackingStore((state) => state.style);
+  const setStyle = useAutoBackingStore((state) => state.setStyle);
+  return (
+    <div className='mt-3'>
+      <p className='text-[10px] text-zinc-500'>
+        {t("auto_backing.style.label")}
+      </p>
+      <div className='mt-1.5 flex flex-wrap gap-1'>
+        {STYLE_CHOICES.map((choice) => {
+          const active = choice === style;
+          return (
+            <button
+              key={choice}
+              type='button'
+              onClick={() => setStyle(choice)}
+              aria-pressed={active}
+              className={cn(
+                "rounded px-2 py-1 text-[11px] font-medium transition-colors",
+                active
+                  ? "bg-white/10 text-white"
+                  : "bg-white/[0.03] text-zinc-500 hover:text-zinc-300",
+              )}>
+              {choice === "auto"
+                ? t("auto_backing.style.auto", {
+                    style: t(`auto_backing.style.${playing}`),
+                  })
+                : t(`auto_backing.style.${choice}`)}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 /** Past this many chords the line stops being readable at a glance. */
 const MAX_CHORDS = 8;
@@ -82,6 +127,10 @@ export const AutoBackingSection = ({
         />
       </div>
       <Summary summary={summary} />
+      {/* A boss fight plays its own score, whatever band was picked. */}
+      {enabled && summary.groove !== "boss" && (
+        <StylePicker playing={summary.style} />
+      )}
       <p className='mt-2 text-[10px] leading-relaxed text-zinc-500'>
         {enabled ? t("auto_backing.headphones") : t("auto_backing.description")}
       </p>

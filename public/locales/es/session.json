@@ -374,11 +374,25 @@
       "blues": "{{tonic}} blues",
       "root": "Raíz {{tonic}}"
     },
+    "style": {
+      "label": "Banda",
+      "auto": "Auto ({{style}})",
+      "ambient": "Ambient",
+      "lofi": "Lo-fi",
+      "synthwave": "Synthwave",
+      "house": "House",
+      "dark": "Oscuro"
+    },
     "track": {
       "drums": "Batería",
       "bass": "Bajo",
       "keys": "Pad",
-      "arp": "Arpegio"
+      "arp": "Arpegio",
+      "keys_ambient": "Pad",
+      "keys_lofi": "Piano eléctrico",
+      "keys_synthwave": "Sintetizador",
+      "keys_house": "Stabs",
+      "keys_dark": "Cuerdas"
     },
     "headphones_toast": {
       "title": "La pista de acompañamiento está activada",

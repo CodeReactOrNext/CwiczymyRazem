@@ -1,4 +1,4 @@
-import type { BendPoint, TablatureMeasure, TabTrackType } from "../../types/exercise.types";
+import type { BackingTrack, BendPoint, TablatureMeasure, TabTrackType } from "../../types/exercise.types";
 
 export interface AudioTrackConfig {
   id:         string;
@@ -10,6 +10,8 @@ export interface AudioTrackConfig {
   pan?:       number; // -1.0 (left) to 1.0 (right)
   /** See BackingTrack.generated. */
   generated?: boolean;
+  /** See BackingTrack.bandStyle. */
+  bandStyle?: BackingTrack["bandStyle"];
   /** The player's own tuning (offsets from standard GUITAR strings, see
    *  TuningOffsets) for the track they play — pitches it even when it's a bass.
    *  Takes over from `tuningOffsets` below for this track. */
@@ -33,6 +35,9 @@ export interface UseTablatureAudioProps {
   /** Play the first pass only and never schedule a note of the next one — an
    *  ear-training riddle asks once. onLoopComplete still fires at its end. */
   singlePass?:    boolean;
+  /** Warped beats after `audioStartTime` past which nothing more is scheduled —
+   *  the end of the last bar the exercise's time fits. null/omitted = no end. */
+  stopAtWarpedBeat?: number | null;
   /** Per-string semitone offset from standard tuning (index 0 = string 1 … index 5 = string 6),
    *  applied to guitar-track notes so the background instrument matches the player's own tuning. */
   tuningOffsets?: readonly number[];

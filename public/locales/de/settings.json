@@ -127,7 +127,7 @@
     "new_token": "Neues Token",
     "label_placeholder": "Name, z. B. Claude auf dem Laptop",
     "allow_writes": "Änderungen erlauben",
-    "allow_writes_description": "Der Assistent darf Pläne, Ziele, Songs, Übungen und Übungszeit speichern (bis zu 20 Änderungen am Tag). Ohne das kann er nur lesen.",
+    "allow_writes_description": "Der Assistent darf Pläne, Ziele, Songs, Übungen und Übungszeit speichern (bis zu 35 Änderungen am Tag). Ohne das kann er nur lesen.",
     "create": "Token erstellen",
     "token_once": "Kopiere dieses Token jetzt — es wird nicht noch einmal angezeigt.",
     "claude_code": "Claude Code",

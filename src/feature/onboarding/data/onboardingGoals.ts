@@ -1,7 +1,18 @@
+import {
+  FIRST_RIFF_SECONDS,
+  firstRiffExercises,
+} from "feature/exercisePlan/data/exerises/firstRiff/firstRiff";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
+import type {
+  Exercise,
+  ExercisePlan,
+} from "feature/exercisePlan/types/exercise.types";
 
-import type { OnboardingGoal, OnboardingLevel } from "../types";
+import type {
+  OnboardingGoal,
+  OnboardingLevel,
+  OnboardingPlayChoice,
+} from "../types";
 
 export interface LevelOption {
   level: OnboardingLevel;
@@ -45,6 +56,8 @@ export interface GoalOption {
   href: string | null;
   /** The levels this answer makes sense for. */
   levels: OnboardingLevel[];
+  /** Left out on phones, where it led nowhere. */
+  hiddenOnPhone?: boolean;
   /** A real screen or photo from the app, so the player sees where they land. */
   image: string;
   /** object-position for the image crop. */
@@ -62,7 +75,11 @@ export const SONGS_HREF = "/songs?view=management";
 /**
  * The second question: what did the player come here for? Each answer only
  * shows up for the levels it fits — someone who has played for years is not
- * offered learning guitar from scratch, and a beginner has no routine to log.
+ * offered learning guitar from scratch.
+ *
+ * The roadmap answer is desktop-only: from 24.10 to 05.11.2026 eight phone
+ * players picked it and none of them started a session. "Log the practice I
+ * already do" is gone everywhere, since 8 of ~150 players picked it.
  */
 export const GOAL_OPTIONS: GoalOption[] = [
   {
@@ -98,22 +115,20 @@ export const GOAL_OPTIONS: GoalOption[] = [
     description: "A step-by-step path, like playing in the style of your hero",
     href: "/ai-coach",
     levels: ["some", "experienced"],
+    hiddenOnPhone: true,
     image: "/images/roadmap/hendrix.webp",
     imagePosition: "object-[50%_20%]",
   },
-  {
-    goal: "log",
-    label: "Log the practice I already do",
-    description: "Track your time, streak and progress",
-    href: "/report",
-    levels: ["some", "experienced"],
-    image: "/images/wiki/log-session-time.webp",
-    imagePosition: "object-left-top",
-  },
 ];
 
-export const getGoalOptions = (level: OnboardingLevel): GoalOption[] =>
-  GOAL_OPTIONS.filter((option) => option.levels.includes(level));
+export const getGoalOptions = (
+  level: OnboardingLevel,
+  { isPhone = false }: { isPhone?: boolean } = {},
+): GoalOption[] =>
+  GOAL_OPTIONS.filter(
+    (option) =>
+      option.levels.includes(level) && !(isPhone && option.hiddenOnPhone),
+  );
 
 /**
  * Plans offered on the plan step, per level — all free and short enough for a
@@ -165,3 +180,63 @@ export const getPlanHref = (planId: string): string =>
 
 export const ALL_PLANS_HREF = "/timer/plans";
 export const ALL_PLANS_COUNT = defaultPlans.length;
+
+/**
+ * The quiet answers under the first-riff card: both show the app without
+ * dropping the player into an exercise.
+ */
+export const LOOK_AROUND_CHOICES: Exclude<OnboardingPlayChoice, "play">[] = [
+  "browse",
+  "no_guitar",
+];
+
+export const LOOK_AROUND_LABELS: Record<
+  Exclude<OnboardingPlayChoice, "play">,
+  string
+> = {
+  browse: "Look around first",
+  no_guitar: "I don't have a guitar yet",
+};
+
+/**
+ * A crop of the real practice screen (tabs-live-mobile.webp): coloured notes
+ * on the strings, the same thing the first riff shows a moment later.
+ */
+export const FIRST_RIFF_IMAGE = "/images/onboarding/first-riff-tab.webp";
+
+/** The 40-second first riff for each level (feature/exercisePlan/data/exerises/firstRiff). */
+export const FIRST_RIFF_EXERCISE_IDS: Record<OnboardingLevel, string> = {
+  new: "first_riff_open_strings",
+  some: "first_riff_pentatonic",
+  experienced: "first_riff_lead_lick",
+};
+
+export const getFirstRiffExercise = (level: OnboardingLevel): Exercise => {
+  const exercise = firstRiffExercises.find(
+    (ex) => ex.id === FIRST_RIFF_EXERCISE_IDS[level],
+  );
+  if (!exercise) throw new Error(`No first riff for level ${level}`);
+  return exercise;
+};
+
+/** "0:40" — the riff's length as the session timer shows it. */
+export const FIRST_RIFF_DURATION_LABEL = `${Math.floor(FIRST_RIFF_SECONDS / 60)}:${String(
+  FIRST_RIFF_SECONDS % 60,
+).padStart(2, "0")}`;
+
+export const isOnboardingLevel = (value: unknown): value is OnboardingLevel =>
+  value === "new" || value === "some" || value === "experienced";
+
+/** Where "Yes, let's play" goes; the source rides along so the way back keeps it. */
+export const getFirstRiffHref = (
+  level: OnboardingLevel,
+  source: string,
+): string =>
+  `/onboarding/first-riff?${new URLSearchParams({ level, from: source })}`;
+
+/** Back from the first riff: straight to the goal question, the level already known. */
+export const getAfterFirstRiffHref = (
+  level: OnboardingLevel,
+  source: string,
+): string =>
+  `/onboarding?${new URLSearchParams({ step: "goal", level, played: "1", from: source })}`;

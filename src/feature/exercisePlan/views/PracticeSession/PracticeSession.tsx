@@ -65,6 +65,7 @@ import {
   savePracticeSessionSettings,
 } from "./helpers/practiceSessionSettings";
 import { strumSynthVolume } from "./helpers/strumSynthVolume";
+import { useTabPlayUntilStore } from "./hooks/tabPlayUntilStore";
 import type { TempoRuler } from "./hooks/tempoBeatClock";
 import { createTempoRulerFromMeasures } from "./hooks/tempoBeatClock";
 import { useBossFightSession } from "./hooks/useBossFightSession";
@@ -92,6 +93,7 @@ import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
 import type { FreePlayFrame } from "./utils/freePlay";
 import { buildLearnSteps } from "./utils/learnSteps";
+import { tabPlayUntil } from "./utils/tabPlayUntil";
 import type { TimingPrecision } from "./utils/timingPrecision";
 
 /** How long a solved ear-training riddle stays on screen before the next one is dealt. */
@@ -197,6 +199,12 @@ interface PracticeSessionProps {
   skipExitDialog?:     boolean;
   goalRun?:            GoalRunConfig;
   bossFight?:          BossFightConfig;
+  /**
+   * The mic question was answered before the session: "setup" opens on the
+   * setup wizard, "off" starts without the mic. Either way the "use the mic?"
+   * prompt is skipped.
+   */
+  micStart?:           "setup" | "off";
 }
 
 const SessionPageHead = ({ exerciseTitle }: { exerciseTitle: string }) => {
@@ -210,6 +218,7 @@ const PracticeSessionInner = ({
   plan, rawGpFile, onFinish, onClose, isFinishing, autoReport,
   forceFullDuration, freeMode: freeModeProp, skillRewardSkillId, skillRewardAmount,
   examMode: examModeProp, examBpm, onExamComplete, skipExitDialog = false, goalRun, bossFight,
+  micStart,
 }: PracticeSessionProps) => {
   const { t } = useTranslation("session");
   // A boss level runs as an exam at the level's tempo (locked tempo, mic on,
@@ -311,8 +320,9 @@ const PracticeSessionInner = ({
     posthog.capture("practice_session_started", { plan_title: plan.title, exercise_count: plan.exercises.length });
     // Feed the "Last Session" shortcuts (dashboard + practice hub). Exams and
     // goal runs are deliberately excluded — re-entering either is not
-    // "practicing again", and a reached goal's link would lead nowhere.
-    if (!isExamMode && !isGoalMode) {
+    // "practicing again", and a reached goal's link would lead nowhere. So is
+    // the onboarding's first riff: its way out leads back into the onboarding.
+    if (!isExamMode && !isGoalMode && !router.pathname.startsWith("/onboarding")) {
       saveLastSession({ title: planTitleString, href: router.asPath });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -690,6 +700,34 @@ const PracticeSessionInner = ({
     bandRage: !!bossFight?.enraged,
   });
 
+  // ── The tab ends with the time ────────────────────────────────────────────
+  // A looping tab used to run straight into the time-up, so the last bars on
+  // the board were ones nobody could finish. Each time playback starts, the
+  // remaining time is laid over the tab: the last bar that ends a second before
+  // the timer does is where the board stops drawing, the synth and the band
+  // stop playing, and the matcher stops expecting notes. Left out where the
+  // tab is not ours to cut — AlphaTab plays a GP file itself, an exam runs on
+  // its backing, a riddle plays once.
+  const setTabPlayUntil = useTabPlayUntilStore(s => s.setUntil);
+  const cutsTabAtTimeUp = !freeMode && exerciseDurationSeconds > 0 && !isExamMode
+    && !isEarTrainingRiddle && !effectiveRawGpFile && !showAlphaTabScore;
+  useEffect(() => {
+    const ctx = metronome.audioContext;
+    if (!cutsTabAtTimeUp || !isAudioPlaying || !ctx || effectiveAudioStartTime == null) {
+      setTabPlayUntil(null);
+      return;
+    }
+    // Both clocks are read at the same moment, so the answer is right whenever
+    // this runs — at the first beat, after a resume, after a re-anchor.
+    const remainingSec = exerciseDurationSeconds - timer.getTime() / 1000;
+    const endSec = ctx.currentTime - effectiveAudioStartTime + remainingSec;
+    setTabPlayUntil(tabPlayUntil(activeTablature, sessionTempoRuler, effectiveBpm, endSec));
+  }, [
+    cutsTabAtTimeUp, isAudioPlaying, metronome.audioContext, effectiveAudioStartTime,
+    exerciseDurationSeconds, timer, activeTablature, sessionTempoRuler, effectiveBpm, setTabPlayUntil,
+  ]);
+  useEffect(() => () => setTabPlayUntil(null), [setTabPlayUntil]);
+
   // What a Guitar Pro exercise still has to load before it can be played: the
   // file, its tracks, the player's sounds and song. The loading screen keeps
   // its doors shut — and the overlay covers the session — until it has.
@@ -735,7 +773,7 @@ const PracticeSessionInner = ({
     sessionPhase, isMicEnabled: _isMicEnabled, handleEnableMic, handleSkipMic,
     handleReuseCalibration, handleRecalibrate, handleCalibrationComplete, handleCalibrationCancel,
     getAdjustedTargetFreq, existingCalibrationTimestamp, setIsMicEnabled: updateMicPersistence, setSessionPhase,
-  } = useCalibration(planHasTablature, (isExamMode || isGoalMode || !!plan.duel) && !currentExercise.disableMic);
+  } = useCalibration(planHasTablature, (isExamMode || isGoalMode || !!plan.duel) && !currentExercise.disableMic, micStart);
   // The wizard opens the input itself and enables the mic only when it
   // finishes — closing it early has to close that stream too, or the tuner keeps
   // reading the guitar and the mic looks on while nothing is being scored.

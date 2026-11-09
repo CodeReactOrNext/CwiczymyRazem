@@ -9,10 +9,35 @@ import { groupHits, groupStarts, isSimpleMeter } from "./grooves";
 import type { ChordSpan } from "./harmonize";
 import type { BarInfo } from "./noteEvents";
 import { pulseOf } from "./noteEvents";
+import type { BandStyleId } from "./styles";
 import type { Chord } from "./theory";
 import { bassOf, QUALITY_INTERVALS } from "./theory";
 
 const EPS = 1e-6;
+
+/**
+ * The grooves a style may replace with its own figures, in a plain 4/4 bar.
+ * The others carry the feel themselves (a shuffle's triplets, a waltz's
+ * three, a thrash skank) and keep their patterns, played on the style's kit.
+ */
+const RESTYLED_GROOVES: ReadonlySet<GrooveId> = new Set([
+  "rock",
+  "pop",
+  "ballad",
+]);
+
+/** A whole 4/4 bar the style plays its own figures in. */
+const styledBar = (
+  bar: BarInfo,
+  groove: GrooveId,
+  style: BandStyleId | undefined,
+): style is Exclude<BandStyleId, "ambient" | "dark"> =>
+  style !== undefined &&
+  style !== "ambient" &&
+  style !== "dark" &&
+  RESTYLED_GROOVES.has(groove) &&
+  isSimpleMeter(bar.timeSignature) &&
+  Math.abs(bar.length - 4) < EPS;
 
 // ── Seeded randomness — the same exercise always gets the same backing ───────
 
@@ -165,6 +190,8 @@ export interface DrumBarContext {
   section?: Section;
   /** In the second half of its section — where a build starts to push. */
   late?: boolean;
+  /** Who plays: lofi, synthwave and house have their own beats in 4/4. */
+  style?: BandStyleId;
 }
 
 /** Positions from `from` to `to` every `step`. */
@@ -236,6 +263,109 @@ function cymbalGrid(
     : grid;
 }
 
+/**
+ * A style's own beat over a 4/4 bar, up to where a fill takes over.
+ * - lofi: a lazy boom-bap — kick on the one and the "and" of three, a ghost
+ *   kick now and then, quiet eighth hats that never hit two alike.
+ * - synthwave: kick on one and three, the big snare on two and four,
+ *   sixteenth hats (eighths when fast); the lift drives a kick on every beat.
+ * - house: four on the floor, a clap on two and four, the open hat on every
+ *   "and"; the lift fills the sixteenths in between.
+ */
+function styledDrums(
+  style: Exclude<BandStyleId, "ambient" | "dark">,
+  ctx: DrumBarContext,
+  fillFrom: number,
+  hit: (pos: number, note: TablatureNote) => void,
+) {
+  const { bpm, rng, section = "groove" } = ctx;
+  const lift = section === "lift";
+  const pushing = section === "build" && !!ctx.late;
+  const play = (pos: number, note: number, dynamics: number) => {
+    if (pos >= fillFrom - EPS) return;
+    if (pos < EPS && ctx.isCrash && (note === HAT || note === RIDE)) return;
+    hit(pos, drum(note, dynamics));
+  };
+
+  if (style === "lofi") {
+    const cymbal = lift ? RIDE : HAT;
+    for (const pos of every(0.5, 0, 4)) {
+      const onBeat = Math.abs(pos % 1) < EPS;
+      // Never two hats alike: a drum machine is what lofi plays against.
+      play(pos, cymbal, (onBeat ? 0.5 : 0.3) + rng() * 0.12);
+    }
+    if (pushing) for (const pos of every(0.5, 2, 4)) play(pos + 0.25, HAT, 0.2);
+    play(0, KICK, 0.9);
+    play(2.5, KICK, 0.75);
+    if (rng() < 0.4) play(1.75, KICK, 0.45);
+    if (lift && rng() < 0.5) play(3.5, OPEN_HAT, 0.4);
+    play(1, SNARE, 0.75);
+    play(3, SNARE, 0.8);
+    if (rng() < 0.3) play(3.75, SIDE_STICK, 0.3);
+    return;
+  }
+
+  if (style === "synthwave") {
+    const step = bpm <= 110 || pushing ? 0.25 : 0.5;
+    for (const pos of every(step, 0, 4)) {
+      const onBeat = Math.abs(pos % 1) < EPS;
+      const onEighth = Math.abs((pos * 2) % 1) < EPS;
+      play(pos, HAT, onBeat ? 0.6 : onEighth ? 0.42 : 0.26);
+    }
+    for (const beat of lift || pushing ? [0, 1, 2, 3] : [0, 2])
+      play(beat, KICK, beat % 2 === 0 ? 0.95 : 0.75);
+    if (!lift && rng() < 0.4) play(2.5, KICK, 0.65);
+    play(1, SNARE, 0.9);
+    play(3, SNARE, 0.95);
+    return;
+  }
+
+  // House.
+  for (const beat of [0, 1, 2, 3]) play(beat, KICK, 0.95);
+  for (const beat of [1, 3]) play(beat, SNARE, 0.85);
+  for (const beat of [0, 1, 2, 3]) play(beat + 0.5, OPEN_HAT, 0.5);
+  if (lift || pushing)
+    for (const beat of [0, 1, 2, 3]) {
+      play(beat + 0.25, HAT, 0.24);
+      play(beat + 0.75, HAT, 0.3);
+    }
+}
+
+/** A run of snare into the toms over the last `fillLength` beats, from `fillFrom`. */
+function drumFill(
+  groove: GrooveId,
+  simple: boolean,
+  longFill: boolean,
+  bpm: number,
+  fillFrom: number,
+  fillLength: number,
+  hit: (pos: number, note: TablatureNote) => void,
+) {
+  const triplet = groove === "shuffle" || !simple;
+  const count = triplet
+    ? 3
+    : longFill
+      ? bpm <= 110
+        ? 8
+        : 4
+      : bpm <= 120
+        ? 4
+        : 2;
+  const sequence =
+    count >= 4
+      ? [...Array<number>(count - 2).fill(SNARE), HIGH_TOM, LOW_TOM]
+      : count === 3
+        ? [SNARE, HIGH_TOM, LOW_TOM]
+        : [SNARE, LOW_TOM];
+  sequence.forEach((note, i) => {
+    hit(
+      fillFrom + (i * fillLength) / count,
+      drum(note, 0.6 + (0.35 * i) / (count - 1)),
+    );
+  });
+  hit(fillFrom, drum(KICK, 0.8));
+}
+
 export function drumBar(bar: BarInfo, ctx: DrumBarContext): TrackEvent[] {
   const { groove, bpm, rng, section = "groove" } = ctx;
   const events: TrackEvent[] = [];
@@ -267,6 +397,14 @@ export function drumBar(bar: BarInfo, ctx: DrumBarContext): TrackEvent[] {
   const fillLength = longFill ? 2 : bar.length >= 2 ? Math.min(pulse, 1.5) : 0;
   const fillFrom =
     ctx.isFill && fillLength > 0 ? bar.length - fillLength : Infinity;
+
+  if (styledBar(bar, groove, ctx.style)) {
+    if (ctx.isCrash) hit(0, drum(CRASH, 0.8));
+    styledDrums(ctx.style, ctx, fillFrom, hit);
+    if (fillFrom < Infinity)
+      drumFill(groove, simple, longFill, bpm, fillFrom, fillLength, hit);
+    return events;
+  }
 
   const cymbals = cymbalGrid(groove, bar, {
     ride: section === "lift",
@@ -342,31 +480,8 @@ export function drumBar(bar: BarInfo, ctx: DrumBarContext): TrackEvent[] {
     }
   }
 
-  if (fillFrom < Infinity) {
-    const triplet = groove === "shuffle" || !simple;
-    const count = triplet
-      ? 3
-      : longFill
-        ? bpm <= 110
-          ? 8
-          : 4
-        : bpm <= 120
-          ? 4
-          : 2;
-    const sequence =
-      count >= 4
-        ? [...Array<number>(count - 2).fill(SNARE), HIGH_TOM, LOW_TOM]
-        : count === 3
-          ? [SNARE, HIGH_TOM, LOW_TOM]
-          : [SNARE, LOW_TOM];
-    sequence.forEach((note, i) => {
-      hit(
-        fillFrom + (i * fillLength) / count,
-        drum(note, 0.6 + (0.35 * i) / (count - 1)),
-      );
-    });
-    hit(fillFrom, drum(KICK, 0.8));
-  }
+  if (fillFrom < Infinity)
+    drumFill(groove, simple, longFill, bpm, fillFrom, fillLength, hit);
   return events;
 }
 
@@ -405,6 +520,7 @@ export function bassBar(
   segments: readonly BarSegment[],
   playedGroove: GrooveId,
   section: Section = "groove",
+  style?: BandStyleId,
 ): TrackEvent[] {
   const events: TrackEvent[] = [];
   // The bass waits out the intro and drops out for the breakdown — the dip a
@@ -415,6 +531,7 @@ export function bassBar(
     events.push({ pos, length, notes: [bassNote(pitch, dynamics)] });
   const simple = isSimpleMeter(bar.timeSignature);
   const starts = groupStarts(bar);
+  const styled = styledBar(bar, groove, style) ? style : null;
 
   for (const seg of segments) {
     const root = bassRoot(bassOf(seg.chord));
@@ -423,6 +540,49 @@ export function bassBar(
       seg.chord.bass !== undefined ? root : root + fifthOf(seg.chord);
     const changes = bassOf(seg.next) !== bassOf(seg.chord);
     const span = seg.to - seg.from;
+
+    if (styled === "synthwave") {
+      // The octave pulse: root and the octave above it in eighths.
+      const positions = every(0.5, seg.from, seg.to);
+      positions.forEach((pos, i) => {
+        const last = i === positions.length - 1;
+        const pitch =
+          last && changes && span >= 2
+            ? approach(seg.next)
+            : root + (i % 2 === 1 ? 12 : 0);
+        add(pos, pitch, 0.4, i % 2 === 0 ? 0.85 : 0.65);
+      });
+      continue;
+    }
+    if (styled === "house") {
+      // Off the beat, between the kicks — the bass and the kick never meet.
+      every(1, seg.from, seg.to).forEach((beat, i, beats) => {
+        if (beat + 0.5 >= seg.to - EPS) return;
+        const last = i === beats.length - 1;
+        const pitch =
+          last && changes && span >= 2
+            ? approach(seg.next)
+            : root + (i % 4 === 2 ? 12 : 0);
+        add(beat + 0.5, pitch, 0.38, 0.85);
+      });
+      continue;
+    }
+    if (styled === "lofi") {
+      // Long root under the electric piano, a pickup into the fifth.
+      for (let pos = seg.from; pos < seg.to - EPS; pos += 4) {
+        const room = seg.to - pos;
+        add(pos, root, Math.min(1.4, room), 0.9);
+        if (room > 1.5 + EPS) add(pos + 1.5, root, 0.4, 0.55);
+        if (room > 2.5 + EPS)
+          add(
+            pos + 2.5,
+            changes && room <= 4 + EPS ? approach(seg.next) : fifth,
+            Math.min(1.3, room - 2.5),
+            0.8,
+          );
+      }
+      continue;
+    }
 
     if (!simple || groove === "compound") {
       // Odd and compound meters: root on each group, the fifth on alternate ones.
@@ -570,10 +730,12 @@ export function keysBar(
   segments: readonly BarSegment[],
   groove: GrooveId,
   state: KeysState,
+  style?: BandStyleId,
 ): TrackEvent[] {
   const events: TrackEvent[] = [];
   const simple = isSimpleMeter(bar.timeSignature);
   const starts = groupStarts(bar);
+  const styled = styledBar(bar, groove, style) ? style : null;
 
   for (const seg of segments) {
     const voices = voiceLead(seg.chord, state.voices);
@@ -581,8 +743,32 @@ export function keysBar(
     if (voices.length === 0) continue;
     const add = (pos: number, length: number, dynamics: number) =>
       events.push({ pos, length, notes: keysChord(voices, dynamics) });
+    /** Hits at these beats of every four from the chord's start, each held until the next. */
+    const comp = (
+      offsets: number[],
+      length: (gap: number) => number,
+      dynamics: number[],
+    ) => {
+      for (let window = seg.from; window < seg.to - EPS; window += 4) {
+        const hits = offsets
+          .map((offset) => window + offset)
+          .filter((pos) => pos < seg.to - EPS);
+        hits.forEach((pos, i) => {
+          const gap =
+            (i + 1 < hits.length ? hits[i + 1] : Math.min(seg.to, window + 4)) -
+            pos;
+          add(pos, length(gap), dynamics[i % dynamics.length]);
+        });
+      }
+    };
 
-    if (groove === "waltz" && simple) {
+    if (styled === "lofi") {
+      // The electric piano comps: on the one, then pushed onto the "and" of two.
+      comp([0, 1.5], (gap) => gap * 0.92, [0.42, 0.34]);
+    } else if (styled === "house") {
+      // Short stabs on the tresillo, three over the bar's eight eighths.
+      comp([0, 1.5, 3], (gap) => Math.min(0.35, gap), [0.42, 0.36, 0.38]);
+    } else if (groove === "waltz" && simple) {
       every(1, seg.from, seg.to).forEach((pos) => {
         if (Math.abs(pos) > EPS) add(pos, 0.7, 0.36);
       });
@@ -621,6 +807,10 @@ export function keysBar(
 
 /** Up and back down the chord, the arpeggiator's oldest pattern. */
 const ARP_PATTERN = [0, 1, 2, 3, 2, 1];
+const ARP_PATTERNS: Partial<Record<BandStyleId, readonly number[]>> = {
+  synthwave: [0, 1, 2, 3],
+  lofi: [2, 0, 3, 1],
+};
 const ARP_FLOOR = 62;
 
 /** Up to four chord tones from the D above middle C upwards. */
@@ -650,15 +840,28 @@ export function arpBar(
   segments: readonly BarSegment[],
   bpm: number,
   state: ArpState,
+  style?: BandStyleId,
 ): TrackEvent[] {
   const events: TrackEvent[] = [];
-  const step = bpm > 125 ? 1 : 0.5;
+  // Synthwave runs straight up the chord in sixteenths; lofi plinks a slow
+  // broken chord in quarters; the rest go up and back in eighths.
+  const step =
+    style === "synthwave"
+      ? bpm <= 100
+        ? 0.25
+        : 0.5
+      : style === "lofi"
+        ? 1
+        : bpm > 125
+          ? 1
+          : 0.5;
+  const pattern = ARP_PATTERNS[style ?? "ambient"] ?? ARP_PATTERN;
   for (const seg of segments) {
     const tones = arpTones(seg.chord);
     for (const pos of every(step, seg.from, seg.to)) {
       const index = Math.min(
         tones.length - 1,
-        ARP_PATTERN[state.step % ARP_PATTERN.length],
+        pattern[state.step % pattern.length],
       );
       const onBeat = Math.abs(pos - Math.round(pos)) < EPS;
       events.push({

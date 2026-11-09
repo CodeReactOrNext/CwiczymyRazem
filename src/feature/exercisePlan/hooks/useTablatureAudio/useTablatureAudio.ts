@@ -27,6 +27,7 @@ export const useTablatureAudio = ({
   disabled = false,
   repeatCount = 0,
   singlePass = false,
+  stopAtWarpedBeat = null,
   tuningOffsets,
   rage = false,
 }: UseTablatureAudioProps) => {
@@ -52,6 +53,8 @@ export const useTablatureAudio = ({
   useEffect(() => { repeatCountRef.current = repeatCount; }, [repeatCount]);
   const singlePassRef            = useRef(singlePass);
   useEffect(() => { singlePassRef.current = singlePass; }, [singlePass]);
+  const stopAtWarpedBeatRef      = useRef(stopAtWarpedBeat);
+  useEffect(() => { stopAtWarpedBeatRef.current = stopAtWarpedBeat; }, [stopAtWarpedBeat]);
   const trackStatesRef           = useRef<Record<string, { beatIdx: number }>>({});
   const pendingLoopCompleteTimeoutsRef = useRef<Set<number>>(new Set());
 
@@ -237,6 +240,8 @@ export const useTablatureAudio = ({
   useEffect(() => {
     const ctx = audioContextRef.current;
     if (!ctx || !masterGainRef.current) return;
+    // The generated tracks say which band plays them (lofi, synthwave…).
+    bandRef.current?.setStyle(activeTracks.find(t => t.generated && t.bandStyle)?.bandStyle);
     const currentIds = new Set(activeTracks.map(t => t.id));
     Object.keys(trackGainsRef.current).forEach(id => {
       if (!currentIds.has(id)) {
@@ -387,6 +392,10 @@ export const useTablatureAudio = ({
     const tracks         = activeTracksRef.current;
     const refTrackId     = tracks.length > 0 ? tracks[0].id : null;
     const startAudio     = startAudioTimeRef.current;
+    // The exercise's time runs out before the next bar would finish: every
+    // track, the band included, falls silent at the end of the last whole bar.
+    const stopAtWarped   = stopAtWarpedBeatRef.current;
+    const stopAtTime     = stopAtWarped === null ? Infinity : startAudio + stopAtWarped * secondsPerBeat - 1e-4;
 
     tracks.forEach(track => {
       const data  = trackDataRef.current[track.id];
@@ -436,6 +445,7 @@ export const useTablatureAudio = ({
         }
 
         if (beatAudioTime >= lookaheadTime) break;
+        if (beatAudioTime >= stopAtTime) break;
         if (localIdx >= N) { state.beatIdx++; continue; }
 
         const beat         = data.flattened[localIdx];

@@ -70,6 +70,8 @@ interface WorkerBridgeOptions {
   onSeek?:         (beatPosition: number) => void;
   loopStartBeat?:  number | null;
   loopEndBeat?:    number | null;
+  /** Beats after the start (counted across passes) past which nothing is drawn. */
+  playUntilBeat?:  number | null;
   zoom?:           number;
   /** Left-gutter tuning legend; when non-empty the worker insets the content by TAB_GUTTER_W. */
   tuningStrings?:  TuningGutterString[];
@@ -147,7 +149,7 @@ export function useTablatureWorkerBridge({
   isPlaying, startTime, audioStartTime, bpm, countInRemaining,
   hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef = null, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
-  loopStartBeat, loopEndBeat, zoom = 1, tuningStrings, style, selection,
+  loopStartBeat, loopEndBeat, playUntilBeat = null, zoom = 1, tuningStrings, style, selection,
   obscured = false, quarterTurned = false, learnFocus = null,
 }: WorkerBridgeOptions) {
   const workerRef           = useRef<Worker | null>(null);
@@ -320,6 +322,7 @@ export function useTablatureWorkerBridge({
       endBeat:   loopEndBeat   ?? null,
     });
   }, [loopStartBeat, loopEndBeat]);
+  useEffect(() => { workerRef.current?.postMessage({ type: 'PLAY_UNTIL', beat: playUntilBeat }); }, [playUntilBeat]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'ZOOM', zoom }); }, [zoom]);
   // Keep the main-thread scrub anchor (base for drag/seek) on the same beats the
   // worker carries its own paused view over to whenever the layout moves.

@@ -452,11 +452,25 @@
       "blues": "{{tonic}} bluesowa",
       "root": "Podstawa {{tonic}}"
     },
+    "style": {
+      "label": "Zespół",
+      "auto": "Auto ({{style}})",
+      "ambient": "Ambient",
+      "lofi": "Lo-fi",
+      "synthwave": "Synthwave",
+      "house": "House",
+      "dark": "Mroczny"
+    },
     "track": {
       "drums": "Perkusja",
       "bass": "Bas",
       "keys": "Pad",
-      "arp": "Arpeggio"
+      "arp": "Arpeggio",
+      "keys_ambient": "Pad",
+      "keys_lofi": "Pianino elektryczne",
+      "keys_synthwave": "Syntezator",
+      "keys_house": "Akordy",
+      "keys_dark": "Smyczki"
     },
     "headphones_toast": {
       "title": "Podkład jest włączony",

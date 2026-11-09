@@ -374,11 +374,25 @@
       "blues": "{{tonic}} Blues",
       "root": "Grundton {{tonic}}"
     },
+    "style": {
+      "label": "Band",
+      "auto": "Auto ({{style}})",
+      "ambient": "Ambient",
+      "lofi": "Lo-fi",
+      "synthwave": "Synthwave",
+      "house": "House",
+      "dark": "Düster"
+    },
     "track": {
       "drums": "Schlagzeug",
       "bass": "Bass",
       "keys": "Pad",
-      "arp": "Arpeggio"
+      "arp": "Arpeggio",
+      "keys_ambient": "Pad",
+      "keys_lofi": "E-Piano",
+      "keys_synthwave": "Synth",
+      "keys_house": "Stabs",
+      "keys_dark": "Streicher"
     },
     "headphones_toast": {
       "title": "Der Backing Track ist an",

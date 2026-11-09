@@ -14,6 +14,7 @@ vi.mock("feature/autoBacking/synth/ambientBand", () => ({
     bus = {};
     setTempo() {}
     setRage() {}
+    setStyle() {}
     stopAll() {}
     insert(_type: unknown, gain: unknown) { return gain; }
     attachSends() { return []; }

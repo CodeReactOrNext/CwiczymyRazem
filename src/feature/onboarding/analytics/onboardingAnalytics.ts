@@ -1,6 +1,10 @@
 import posthog from "posthog-js";
 
-import type { OnboardingGoal, OnboardingLevel } from "../types";
+import type {
+  OnboardingGoal,
+  OnboardingLevel,
+  OnboardingPlayChoice,
+} from "../types";
 
 /**
  * Every choice the onboarding asks for, as its own event — PostHog funnels
@@ -14,7 +18,7 @@ import type { OnboardingGoal, OnboardingLevel } from "../types";
  */
 
 /** `songs` explains what learning songs here looks like (no tabs) before the player commits to it. */
-export type OnboardingStep = "level" | "goal" | "plan" | "songs";
+export type OnboardingStep = "level" | "play" | "goal" | "plan" | "songs";
 
 /**
  * Wall-clock timing for time-on-step and total duration. Kept out of the
@@ -81,6 +85,87 @@ export const trackOnboardingLevelChosen = (props: {
   });
 };
 
+/**
+ * The answer to "got your guitar with you?". Its funnel goes on through
+ * onboarding_first_riff_opened, practice_session_finished and
+ * onboarding_first_riff_returned.
+ */
+export const trackOnboardingPlayChosen = (props: {
+  choice: OnboardingPlayChoice;
+  level: OnboardingLevel;
+  timeOnStepMs: number;
+  source: OnboardingSource;
+}) => {
+  posthog.capture("onboarding_play_chosen", {
+    choice: props.choice,
+    level: props.level,
+    time_on_step_ms: props.timeOnStepMs,
+    source: props.source,
+    $set: { onboarding_play_choice: props.choice },
+  });
+};
+
+/** The first-riff page loaded its exercise; the mic setup opens next. */
+export const trackOnboardingFirstRiffOpened = (props: {
+  level: OnboardingLevel;
+  exerciseId: string;
+  source: OnboardingSource;
+}) => {
+  posthog.capture("onboarding_first_riff_opened", {
+    level: props.level,
+    exercise_id: props.exerciseId,
+    source: props.source,
+  });
+};
+
+/** The answer to "can you use a microphone?" before the first riff. */
+export const trackOnboardingFirstRiffMicChosen = (props: {
+  level: OnboardingLevel;
+  withMic: boolean;
+  source: OnboardingSource;
+}) => {
+  posthog.capture("onboarding_first_riff_mic_chosen", {
+    level: props.level,
+    with_mic: props.withMic,
+    source: props.source,
+  });
+};
+
+/**
+ * The walk-through before the first riff ended and the session opens —
+ * played through to "Let's play" or skipped (`slides_seen` says how far).
+ */
+export const trackOnboardingFirstRiffIntroDone = (props: {
+  level: OnboardingLevel;
+  withMic: boolean;
+  skipped: boolean;
+  slidesSeen: number;
+  source: OnboardingSource;
+}) => {
+  posthog.capture("onboarding_first_riff_intro_done", {
+    level: props.level,
+    with_mic: props.withMic,
+    skipped: props.skipped,
+    slides_seen: props.slidesSeen,
+    source: props.source,
+  });
+};
+
+/**
+ * Back on the onboarding after the first riff, finished or not (the
+ * session's own practice_session_finished tells which). Sent instead of a
+ * second onboarding_viewed.
+ */
+export const trackOnboardingFirstRiffReturned = (props: {
+  level: OnboardingLevel;
+  source: OnboardingSource;
+}) => {
+  posthog.capture("onboarding_first_riff_returned", {
+    level: props.level,
+    source: props.source,
+  });
+};
+
 export const trackOnboardingGoalChosen = (props: {
   goal: OnboardingGoal;
   level: OnboardingLevel;
@@ -133,6 +218,7 @@ export const trackOnboardingCompleted = (props: {
   level: OnboardingLevel;
   goal: OnboardingGoal;
   planId: string | null;
+  playChoice: OnboardingPlayChoice | null;
   destination: string;
   durationMs: number;
   source: OnboardingSource;
@@ -141,6 +227,7 @@ export const trackOnboardingCompleted = (props: {
     level: props.level,
     goal: props.goal,
     plan_id: props.planId,
+    play_choice: props.playChoice,
     destination: props.destination,
     duration_ms: props.durationMs,
     source: props.source,

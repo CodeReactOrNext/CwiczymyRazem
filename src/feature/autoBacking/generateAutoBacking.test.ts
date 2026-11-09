@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 import { buildMeasure } from "./arrange";
 import { isAutoBackingEligible } from "./eligibility";
 import { AUTO_TRACK_IDS, generateAutoBacking } from "./generateAutoBacking";
+import { BAND_STYLES } from "./styles";
 import {
   A_MINOR_PENTATONIC_BOX,
   bar,
@@ -221,7 +222,7 @@ describe("generateAutoBacking", () => {
     expect(halfStepDown.summary.key?.tonic).toBe("G#");
   });
 
-  it("drops the keyboard from metal", () => {
+  it("gives metal the dark band, strings above the riff", () => {
     const riff = bar(
       eighths([
         [6, 0],
@@ -240,9 +241,14 @@ describe("generateAutoBacking", () => {
       title: "Metal Gallop",
     })!;
     expect(result.summary.groove).toBe("metal");
-    expect(result.tracks.some((track) => track.trackType === "keys")).toBe(
-      false,
+    // The dark band plays it: its strings stay up above the riff.
+    expect(result.summary.style).toBe("dark");
+    const strings = result.tracks.find((track) => track.trackType === "keys")!;
+    const pitches = strings.measures.flatMap((measure) =>
+      measure.beats.flatMap((beat) => beat.notes.map((note) => note.midiNote!)),
     );
+    expect(pitches.length).toBeGreaterThan(0);
+    expect(Math.min(...pitches)).toBeGreaterThanOrEqual(52);
   });
 
   it("follows odd and compound meters bar by bar", () => {
@@ -282,6 +288,36 @@ describe("the exercise library", () => {
       expect(result, exercise.id).not.toBeNull();
       expectAligned(result!.tracks, exercise.tablature!);
     }
+  });
+
+  it.each(BAND_STYLES)("stays on the clock when the player picks %s", (style) => {
+    for (const exercise of eligible) {
+      const result = generateAutoBacking({
+        measures: exercise.tablature!,
+        bpm: exercise.metronomeSpeed?.recommended ?? 80,
+        title: exercise.title,
+        seed: exercise.id,
+        style,
+      });
+      expect(result?.summary.style, `${exercise.id} ${style}`).toBe(style);
+      expect(result!.tracks.every((track) => track.bandStyle === style)).toBe(true);
+      expectAligned(result!.tracks, exercise.tablature!);
+    }
+  }, 30_000);
+
+  it("doesn't play the whole library in one style", () => {
+    const styles = new Set(
+      eligible.map(
+        (exercise) =>
+          generateAutoBacking({
+            measures: exercise.tablature!,
+            bpm: exercise.metronomeSpeed?.recommended ?? 80,
+            title: exercise.title,
+            seed: exercise.id,
+          })!.summary.style,
+      ),
+    );
+    expect(styles.size).toBeGreaterThanOrEqual(4);
   });
 });
 

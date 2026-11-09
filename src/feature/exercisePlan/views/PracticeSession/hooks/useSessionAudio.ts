@@ -9,6 +9,7 @@ import { useTablatureAudio } from "../../../hooks/useTablatureAudio";
 import type { BackingTrack } from "../../../types/exercise.types";
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { loadGlobalTrackVolume, saveGlobalTrackVolume } from "../helpers/practiceSessionSettings";
+import { useTabPlayUntilStore } from "./tabPlayUntilStore";
 
 interface UseSessionAudioOptions {
   activeTablature:         TablatureMeasure[] | undefined;
@@ -113,6 +114,7 @@ export function useSessionAudio({
           volume:    trackConfigs[track.id]?.volume ?? 0.8,
           isMuted:   trackConfigs[track.id]?.isMuted ?? false,
           trackType: track.trackType, pan: track.pan, generated: track.generated,
+          bandStyle: track.bandStyle,
         });
       });
     }
@@ -185,6 +187,9 @@ export function useSessionAudio({
 
   useEffect(() => { loopsCompletedRef.current = 0; }, [currentExerciseId]);
 
+  // Where the exercise's time leaves the tab (see tabPlayUntil.ts).
+  const tabStopAtWarpedBeat = useTabPlayUntilStore(s => s.until?.warped ?? null);
+
   // Disabled whenever the AlphaTab score/notation view is shown — that view owns
   // its own synth (either the GP file's or a generated-alphaTex render of the same
   // tablature), so leaving this custom synth running too would double up the audio.
@@ -219,6 +224,7 @@ export function useSessionAudio({
     disabled:       !!effectiveRawGpFile || showAlphaTabScore,
     repeatCount:    tabRepeatCount,
     singlePass:     autoStopAfterFirstLoop,
+    stopAtWarpedBeat: tabStopAtWarpedBeat,
     tuningOffsets:  isBass ? undefined : tuningOffsets,
     rage:           bandRage,
   });

@@ -20,7 +20,7 @@ const INSTRUCTIONS = `riff.quest is a guitar practice app: players log sessions,
 - Players are guitarists, not programmers. Tabs travel between the tools as JSON (the format riffquest_get_tab_format describes); players read them as plain-text tabs, which every tool that takes or returns a tab also gives (asciiTab), or in the tab preview.
 - Days in history, calendar (practised and planned) and weak spots are the player's own calendar days, in the time zone saved in their profile.
 - riffquest_validate_tablature checks a tab without saving it.
-- The write tools (practice log, plans, calendar, song list, goals, exercises) change the player's account and are limited to 20 changes a day, at most 10 of them new exercises; every write answer says how many are left today (changesLeftToday, newExercisesLeftToday).
+- The write tools (practice log, plans, calendar, song list, goals, exercises) change the player's account and are limited to 35 changes a day, at most 10 of them new exercises; every write answer says how many are left today (changesLeftToday, newExercisesLeftToday).
 - Saved items come back with a link that opens them in the app.`;
 
 /**

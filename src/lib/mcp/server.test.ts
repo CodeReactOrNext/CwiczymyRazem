@@ -54,6 +54,7 @@ describe("riff.quest MCP server", () => {
         "riffquest_get_goals",
         "riffquest_get_monthly_challenge",
         "riffquest_get_my_exercises",
+        "riffquest_get_my_songs",
         "riffquest_get_planned_days",
         "riffquest_get_practice_history",
         "riffquest_get_profile_summary",
@@ -138,10 +139,11 @@ describe("riff.quest MCP server", () => {
   // Clients load the whole tool list into every conversation. It was 39.6k
   // characters before the trim; a new tool should fit without growing it back.
   // Raised from 35k for the practice log and goal edit (~2.8k together),
-  // then from 37k for the calendar read and write (~2.9k together).
+  // then from 37k for the calendar read and write (~2.9k together), then
+  // from 40k for the player's own song lists (~0.7k).
   it("keeps the tool list within its size budget", async () => {
     const { tools } = await client.listTools();
-    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(40_000);
+    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(41_000);
   });
 
   it("refuses arguments a tool doesn't take", async () => {
@@ -333,6 +335,96 @@ describe("riff.quest MCP server", () => {
       arguments: { month: "October" },
     });
     expect(result.isError).toBe(true);
+  });
+
+  it("lists the player's own songs, one list or all, in their order", async () => {
+    type Ref = { path: string; id: string };
+    const userSongs: Record<string, Record<string, unknown>> = {
+      a: { status: "learned", order: 2 },
+      b: { status: "learning", order: 0 },
+      // A backing-track sync doc, on no list.
+      c: { backing: { offsetMs: 0 } },
+      // Gone from the library, still on the list.
+      d: { status: "learned", order: 1, title: "Old Song", artist: "Band" },
+    };
+    const library: Record<string, Record<string, unknown>> = {
+      "songs/a": { title: "Song A", artist: "Artist A" },
+      "songs/b": { title: "Song B", artist: "Artist B" },
+      "songProgress/a": { totalPracticeMs: 600_000 },
+    };
+    const snapshotOf = (ids: string[]) => ({
+      docs: ids.map((id) => ({ id, data: () => userSongs[id] })),
+    });
+    const refs = (path: string) => ({
+      doc: (id: string): Ref => ({ path, id }),
+    });
+    const userSongsCollection = {
+      get: async () => snapshotOf(Object.keys(userSongs)),
+      where: (_field: string, _op: string, status: string) => ({
+        get: async () =>
+          snapshotOf(
+            Object.keys(userSongs).filter(
+              (id) => userSongs[id].status === status,
+            ),
+          ),
+      }),
+    };
+    vi.mocked(firestore.collection).mockImplementation(((name: string) =>
+      name === "users"
+        ? {
+            doc: () => ({
+              collection: (sub: string) =>
+                sub === "userSongs" ? userSongsCollection : refs(sub),
+            }),
+          }
+        : refs(name)) as unknown as typeof firestore.collection);
+    Object.assign(firestore, {
+      getAll: async (...docs: Ref[]) =>
+        docs.map((ref) => ({ data: () => library[`${ref.path}/${ref.id}`] })),
+    });
+
+    try {
+      const learned = JSON.parse(
+        textOf(
+          await client.callTool({
+            name: "riffquest_get_my_songs",
+            arguments: { status: "learned" },
+          }),
+        ),
+      );
+      expect(learned.total).toBe(2);
+      expect(learned.songs).toEqual([
+        {
+          id: "d",
+          title: "Old Song",
+          artist: "Band",
+          status: "learned",
+          practiceMinutes: 0,
+        },
+        expect.objectContaining({
+          id: "a",
+          title: "Song A",
+          status: "learned",
+          practiceMinutes: 10,
+        }),
+      ]);
+
+      const all = JSON.parse(
+        textOf(
+          await client.callTool({
+            name: "riffquest_get_my_songs",
+            arguments: {},
+          }),
+        ),
+      );
+      expect(all.songs.map((song: { id: string }) => song.id)).toEqual([
+        "b",
+        "d",
+        "a",
+      ]);
+    } finally {
+      vi.mocked(firestore.collection).mockReset();
+    }
   });
 });
 

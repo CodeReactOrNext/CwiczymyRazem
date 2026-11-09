@@ -18,6 +18,7 @@ import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import { useTabOverlay } from "../contexts/TabOverlayContext";
+import { useTabPlayUntilStore } from "../hooks/tabPlayUntilStore";
 import { accuracyPerMeasure } from "../utils/measureAccuracy";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
 import { alphaTexStaffHeader } from "./AlphaTabScoreViewer/tablatureToAlphaTex";
@@ -251,6 +252,8 @@ export const TablatureSection = memo(function TablatureSection({
 
   const [loopStart, setLoopStart] = useState<number | null>(null);
   const [loopEnd, setLoopEnd] = useState<number | null>(null);
+  // The exercise's time ends the tab at the last bar it fits (tabPlayUntil.ts).
+  const playUntilBeat = useTabPlayUntilStore(s => s.until?.beat ?? null);
   /**
    * The live playhead, in beats.
    *
@@ -607,6 +610,7 @@ export const TablatureSection = memo(function TablatureSection({
               obscured={obscured}
               loopStartBeat={loopStart}
               loopEndBeat={loopEnd}
+              playUntilBeat={playUntilBeat}
               seekWorkerRef={seekWorkerRef}
               learnFocus={learn?.enabled ? learn.focus : null}
               viewerWidthRef={viewerWidthRef}

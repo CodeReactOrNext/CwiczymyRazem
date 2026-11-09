@@ -54,4 +54,23 @@ describe("useCalibration", () => {
     expect(result.current.sessionPhase).toBe("ready");
     expect(result.current.isMicEnabled).toBe(true);
   });
+
+  it("opens on the wizard when the mic was already said yes to, unless it is set up", () => {
+    const fresh = renderHook(() => useCalibration(true, false, "setup"));
+    expect(fresh.result.current.sessionPhase).toBe("calibrating");
+
+    localStorage.setItem(MIC_PREFERENCE_KEY, "true");
+    const setUp = renderHook(() => useCalibration(true, false, "setup"));
+    expect(setUp.result.current.sessionPhase).toBe("ready");
+    expect(setUp.result.current.isMicEnabled).toBe(true);
+  });
+
+  it("starts with the mic off, without remembering it, when the player said no", () => {
+    localStorage.setItem(MIC_PREFERENCE_KEY, "true");
+    const { result } = renderHook(() => useCalibration(true, false, "off"));
+
+    expect(result.current.sessionPhase).toBe("ready");
+    expect(result.current.isMicEnabled).toBe(false);
+    expect(localStorage.getItem(MIC_PREFERENCE_KEY)).toBe("true");
+  });
 });

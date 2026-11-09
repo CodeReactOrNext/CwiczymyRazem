@@ -6,8 +6,26 @@
   "level_step": {
     "title": "How long have you been playing?"
   },
+  "play_step": {
+    "title": "Got your guitar with you?",
+    "riff_title": "Play your first riff",
+    "riff_levels": {
+      "new": "Three open strings, no fretting.",
+      "some": "A minor pentatonic, up and down at {{bpm}} BPM.",
+      "experienced": "A pentatonic lick in eighth notes at {{bpm}} BPM."
+    },
+    "riff_mic": "Your mic hears every note you hit.",
+    "start": "Let's play",
+    "options": {
+      "browse": "Look around first",
+      "no_guitar": "I don't have a guitar yet"
+    }
+  },
   "goal_step": {
-    "title": "What brings you to Riff Quest?"
+    "title": "What brings you to Riff Quest?",
+    "title_after_play": "Where to next?",
+    "title_no_guitar": "Have a look around first",
+    "no_guitar_hint": "No guitar yet? You can already check these out:"
   },
   "plan_step": {
     "title": "Pick a plan to start with",
@@ -64,10 +82,61 @@
     "roadmap": {
       "label": "Follow a roadmap to a goal",
       "description": "A step-by-step path, like playing in the style of your hero"
+    }
+  },
+  "first_riff_intro": {
+    "mic_question": {
+      "title": "Can you use a microphone?",
+      "description": "The one in your phone or laptop is enough.",
+      "yes": "Yes, use the mic",
+      "no": "No, I'll play without it"
     },
-    "log": {
-      "label": "Log the practice I already do",
-      "description": "Track your time, streak and progress"
+    "next": "Next",
+    "back": "Back",
+    "start": "Let's play",
+    "skip": "Skip",
+    "phone_panel": "On a phone, it's in the panel you open from the bottom bar.",
+    "slides": {
+      "tempo": {
+        "beginner": {
+          "title": "Play with the click",
+          "body": "The metronome keeps the beat. Hit the string when the cursor reaches the note. Too fast? Slow it down here."
+        },
+        "player": {
+          "title": "Tempo: {{bpm}} BPM",
+          "body": "Change it here, any time."
+        }
+      },
+      "mic": {
+        "beginner": {
+          "title": "The mic listens",
+          "body": "Every note you hit lights up. You can turn it off here."
+        },
+        "player": {
+          "title": "Every note is scored",
+          "body": "Hits, timing and accuracy from the mic. Turn it off here."
+        }
+      },
+      "no_mic": {
+        "beginner": {
+          "title": "Just play along",
+          "body": "No mic, no scoring. Play with the tab, your time still counts."
+        },
+        "player": {
+          "title": "Just play along",
+          "body": "No mic, no scoring. Play with the tab, your time still counts."
+        }
+      },
+      "tab": {
+        "beginner": {
+          "title": "Read the tab your way",
+          "body": "Lines are strings, numbers are frets, 0 is an open string. Make it bigger here."
+        },
+        "player": {
+          "title": "Set up the tab",
+          "body": "Zoom and look, right under the tab."
+        }
+      }
     }
   }
 }

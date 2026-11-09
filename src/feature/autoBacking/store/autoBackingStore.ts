@@ -2,12 +2,18 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import type { AutoBackingSummary } from "../generateAutoBacking";
+import type { BandStylePreference } from "../styles";
+import { isBandStyle } from "../styles";
 
 interface AutoBackingState {
   /** The player's choice — remembered on this device, like track volumes.
    *  On until they turn it off. */
   enabled: boolean;
   setEnabled: (enabled: boolean) => void;
+  /** The band the player wants on every exercise, or "auto": each exercise
+   *  picks its own. Remembered on this device. */
+  style: BandStylePreference;
+  setStyle: (style: BandStylePreference) => void;
   /** The one-time "wear headphones with the mic on" note has been shown. */
   headphonesHintShown: boolean;
   markHeadphonesHintShown: () => void;
@@ -27,6 +33,8 @@ export const useAutoBackingStore = create<AutoBackingState>()(
     (set) => ({
       enabled: true,
       setEnabled: (enabled) => set({ enabled }),
+      style: "auto",
+      setStyle: (style) => set({ style }),
       headphonesHintShown: false,
       markHeadphonesHintShown: () => set({ headphonesHintShown: true }),
       available: false,
@@ -42,12 +50,23 @@ export const useAutoBackingStore = create<AutoBackingState>()(
         return {
           enabled: version < 1 ? true : (stored.enabled ?? true),
           headphonesHintShown: stored.headphonesHintShown ?? false,
+          style: isBandStyle(stored.style) ? stored.style : "auto",
         };
       },
       partialize: (state) => ({
         enabled: state.enabled,
         headphonesHintShown: state.headphonesHintShown,
+        style: state.style,
       }),
+      // A style this build no longer has falls back to letting the exercise choose.
+      merge: (persisted, current) => {
+        const stored = (persisted ?? {}) as Partial<AutoBackingState>;
+        return {
+          ...current,
+          ...stored,
+          style: isBandStyle(stored.style) ? stored.style : "auto",
+        };
+      },
     },
   ),
 );

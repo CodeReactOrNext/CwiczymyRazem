@@ -1065,6 +1065,21 @@
     "permanent": true
   },
   {
+    "source": "/exercises/first-riff-open-strings",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/first-riff-pentatonic",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/first-riff-lead-lick",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
     "source": "/exercises/quarter-notes-drill",
     "destination": "/beginner-guitar-exercises#quarter-notes-drill",
     "permanent": true

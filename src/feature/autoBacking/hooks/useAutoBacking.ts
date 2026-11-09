@@ -51,6 +51,7 @@ export function useAutoBacking({
 }: UseAutoBackingOptions): UseAutoBackingResult {
   const { t } = useTranslation("session");
   const enabled = useAutoBackingStore((state) => state.enabled);
+  const style = useAutoBackingStore((state) => state.style);
   const setSession = useAutoBackingStore((state) => state.setSession);
 
   const eligible =
@@ -93,6 +94,7 @@ export function useAutoBacking({
       repeatCount,
       keyHint,
       seed: exercise.id,
+      style,
     });
   }, [
     eligible,
@@ -106,16 +108,20 @@ export function useAutoBacking({
     tuningKey,
     repeatCount,
     keyHint,
+    style,
   ]);
 
   const names = useMemo<Record<string, string>>(
     () => ({
       [AUTO_TRACK_IDS.drums]: t("auto_backing.track.drums", "Drums"),
       [AUTO_TRACK_IDS.bass]: t("auto_backing.track.bass", "Bass"),
-      [AUTO_TRACK_IDS.keys]: t("auto_backing.track.keys", "Pad"),
+      [AUTO_TRACK_IDS.keys]: t(
+        `auto_backing.track.keys_${result?.summary.style ?? "ambient"}`,
+        "Pad",
+      ),
       [AUTO_TRACK_IDS.arp]: t("auto_backing.track.arp", "Arpeggio"),
     }),
-    [t],
+    [t, result?.summary.style],
   );
 
   const tracks = useMemo(

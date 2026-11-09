@@ -22,6 +22,8 @@ import type { HarmonyKind, KeyHint } from "./keyDetection";
 import { detectKey, keyFromText } from "./keyDetection";
 import type { BarInfo, TabContent } from "./noteEvents";
 import { extractTabContent } from "./noteEvents";
+import type { BandStyleId, BandStylePreference } from "./styles";
+import { chooseStyle } from "./styles";
 import type { Chord, ScaleId } from "./theory";
 import { chordSymbol, hasThird, pcName, usesFlats } from "./theory";
 
@@ -43,6 +45,8 @@ export interface AutoBackingOptions {
   keyHint?: KeyHint;
   /** Same seed, same backing — drum variations are picked from it. */
   seed?: string;
+  /** The band to play it: the player's pick, or "auto" to let the exercise choose. */
+  style?: BandStylePreference;
 }
 
 export interface AutoBackingSummary {
@@ -55,6 +59,8 @@ export interface AutoBackingSummary {
   /** Chord symbols in playing order, one per change. */
   chords: string[];
   groove: GrooveId;
+  /** The band playing it. */
+  style: BandStyleId;
   /** Bars in one loop of the harmony. */
   bars: number;
 }
@@ -241,8 +247,18 @@ export function generateAutoBacking(
     kind: plan.kind,
   });
 
+  // Its own draw, so the style never shifts the drums' variations.
+  const seed = options.seed ?? JSON.stringify(measures).slice(0, 2000);
+  const style = chooseStyle(
+    groove,
+    bpm,
+    createRng(`${seed}:style`),
+    options.style,
+  );
+
   const withChords = plan.kind !== "rhythm" && plan.spans.length > 0;
-  const withKeys = withChords && !NO_KEYS.has(groove);
+  // The dark band's strings sit high and quiet enough to go over a riff.
+  const withKeys = withChords && (!NO_KEYS.has(groove) || style === "dark");
   const withArp = withKeys && onsetDensity(content) <= SPARSE_DENSITY;
 
   // Where each bar of the harmony loop starts, in loop beats.
@@ -280,6 +296,7 @@ export function generateAutoBacking(
           bpm,
           rng,
           section,
+          style,
           late: barInSection >= sectionLength / 2,
           // Fills close a phrase. In the song: every section's last bar; in a
           // plain loop: its end, and every fourth bar of a long one.
@@ -304,6 +321,7 @@ export function generateAutoBacking(
           segmentsForBar(plan.spans, loopStart, bar.length),
           groove,
           section,
+          style,
         ),
         bar,
         songBar,
@@ -312,12 +330,18 @@ export function generateAutoBacking(
     const padSegments = segmentsForBar(padSpans, loopStart, bar.length);
     if (withKeys)
       keys.push(
-        measureFor(keysBar(bar, padSegments, groove, keysState), bar, songBar),
+        measureFor(
+          keysBar(bar, padSegments, groove, keysState, style),
+          bar,
+          songBar,
+        ),
       );
     if (withArp) {
       arp.push(
         measureFor(
-          section === "intro" ? [] : arpBar(bar, padSegments, bpm, arpState),
+          section === "intro"
+            ? []
+            : arpBar(bar, padSegments, bpm, arpState, style),
           bar,
           songBar,
         ),
@@ -333,6 +357,7 @@ export function generateAutoBacking(
       trackType: "drums",
       pan: 0,
       generated: true,
+      bandStyle: style,
     },
   ];
   if (withChords) {
@@ -343,6 +368,7 @@ export function generateAutoBacking(
       trackType: "bass",
       pan: 0,
       generated: true,
+      bandStyle: style,
     });
   }
   if (withKeys) {
@@ -353,6 +379,7 @@ export function generateAutoBacking(
       trackType: "keys",
       pan: -0.2,
       generated: true,
+      bandStyle: style,
     });
   }
   if (withArp) {
@@ -363,6 +390,7 @@ export function generateAutoBacking(
       trackType: "arp",
       pan: 0.15,
       generated: true,
+      bandStyle: style,
     });
   }
 
@@ -370,12 +398,11 @@ export function generateAutoBacking(
   const flats = key ? usesFlats(key.tonic, key.scale.chordScale) : false;
   const fromChord = (chord: Chord): AutoBackingSummary["key"] => ({
     tonic: pcName(chord.root, flats),
-    scale:
-      !hasThird(chord.quality)
-        ? null
-        : chord.quality === "min" || chord.quality === "min7"
-          ? "minor"
-          : "major",
+    scale: !hasThird(chord.quality)
+      ? null
+      : chord.quality === "min" || chord.quality === "min7"
+        ? "minor"
+        : "major",
   });
   let summaryKey: AutoBackingSummary["key"] = null;
   if (plan.source === "tab" && plan.spans.length) {
@@ -405,6 +432,7 @@ export function generateAutoBacking(
         chordSymbol(span.chord, flats),
       ),
       groove,
+      style,
       bars: barMap.length,
     },
   };

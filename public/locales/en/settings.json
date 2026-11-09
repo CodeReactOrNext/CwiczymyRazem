@@ -127,7 +127,7 @@
     "new_token": "New token",
     "label_placeholder": "Name, e.g. Claude on my laptop",
     "allow_writes": "Allow changes",
-    "allow_writes_description": "Let the assistant save plans, goals, songs, exercises and practice time (up to 20 changes a day). Without it, it can only read.",
+    "allow_writes_description": "Let the assistant save plans, goals, songs, exercises and practice time (up to 35 changes a day). Without it, it can only read.",
     "create": "Create token",
     "token_once": "Copy this token now — it won't be shown again.",
     "claude_code": "Claude Code",

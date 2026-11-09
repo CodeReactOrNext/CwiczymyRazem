@@ -127,7 +127,7 @@
     "new_token": "Token nuevo",
     "label_placeholder": "Nombre, p. ej. Claude en el portátil",
     "allow_writes": "Permitir cambios",
-    "allow_writes_description": "El asistente puede guardar planes, metas, canciones, ejercicios y tiempo de práctica (hasta 20 cambios al día). Sin esto, solo lee.",
+    "allow_writes_description": "El asistente puede guardar planes, metas, canciones, ejercicios y tiempo de práctica (hasta 35 cambios al día). Sin esto, solo lee.",
     "create": "Crear token",
     "token_once": "Copia este token ahora: no se volverá a mostrar.",
     "claude_code": "Claude Code",

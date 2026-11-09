@@ -434,6 +434,10 @@ let selection: { startBeat: number; endBeat: number; startString: number; endStr
 let loopStartBeat: number | null = null;
 let loopEndBeat:   number | null = null;
 
+// The exercise's time runs out here — beats after the start, counted across
+// passes (null = the tab loops on). Nothing is drawn past it while playing.
+let playUntilBeat: number | null = null;
+
 // Rest-active state — track changes to avoid flooding main thread
 let lastRestActive = false;
 
@@ -1358,6 +1362,20 @@ function paintFrame() {
   ctx.save();
   ctx.translate(contentLeft - scrollX, 0);
 
+  // ── Where the exercise's time runs out ───────────────────────────────────
+  // Bars the remaining time can't fit are not drawn at all: everything from the
+  // end of the last one that fits is clipped away, staff lines included, so
+  // the board ends there instead of offering music that will be cut short.
+  let playUntilX: number | null = null;
+  if (seamless && playUntilBeat !== null && totalBeats > 0) {
+    const pass = Math.floor(playUntilBeat / totalBeats + 1e-9);
+    playUntilX = pass * totalW + beatToX(xMap, playUntilBeat - pass * totalBeats);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(viewL, -viewH, Math.max(0, playUntilX - viewL), viewH * 3);
+    ctx.clip();
+  }
+
   // ── Staff lines — 3 batched groups (drawn once across the viewport) ──────
   if (!hideNotes) {
     const lineL = Math.max(0, scrollX);
@@ -2238,6 +2256,20 @@ function paintFrame() {
     ctx.restore();
   } // end per-tile loop
 
+  if (playUntilX !== null) {
+    ctx.restore();
+    // A closing double bar where the music stops.
+    if (!hideNotes && playUntilX >= viewL && playUntilX <= viewR) {
+      const top = STAFF_TOP;
+      const bottom = STAFF_TOP + 5 * STRING_SPACING;
+      ctx.strokeStyle = withAlpha(inkColor, 0.55);
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(playUntilX - 6, top); ctx.lineTo(playUntilX - 6, bottom); ctx.stroke();
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(playUntilX - 1.5, top); ctx.lineTo(playUntilX - 1.5, bottom); ctx.stroke();
+    }
+  }
+
   // ── Progress overlay — played notes fade out into the backdrop to the left ──
   // A left→right gradient over the already-played span: near-opaque at the left
   // edge (notes dissolve into the #09090b viewer background as they scroll off)
@@ -2505,6 +2537,11 @@ self.onmessage = (e: MessageEvent) => {
     case 'LOOP_RANGE': {
       loopStartBeat = msg.startBeat ?? null;
       loopEndBeat   = msg.endBeat   ?? null;
+      break;
+    }
+    case 'PLAY_UNTIL': {
+      playUntilBeat = typeof msg.beat === 'number' && Number.isFinite(msg.beat) ? msg.beat : null;
+      needsRedraw = true;
       break;
     }
     case 'TICK': {

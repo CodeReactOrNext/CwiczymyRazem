@@ -24,14 +24,26 @@ function saveMicPreference(enabled: boolean): void {
  * @param micRequired exams, goal runs and duels only count mic-scored runs —
  *   closing the setup wizard there must not leave the session running with
  *   the mic off, so it goes back to the mic prompt instead.
+ * @param micStart the player already answered the mic question before the
+ *   session (the onboarding's first riff), so it is not asked again:
+ *   "setup" opens straight on the setup wizard (unless the mic is already set
+ *   up), "off" starts with the mic off — without saving that as the player's
+ *   preference, so the next session still offers it.
  */
-export function useCalibration(planHasTablature: boolean, micRequired = false) {
+export function useCalibration(
+  planHasTablature: boolean,
+  micRequired = false,
+  micStart?: "setup" | "off",
+) {
   const [sessionPhase, setSessionPhase] = useState<SessionPhase>(() => {
     const pref = loadMicPreference();
-    if (pref !== null || !planHasTablature) return "ready";
+    if (!planHasTablature || micStart === "off") return "ready";
+    if (micStart === "setup") return pref === true ? "ready" : "calibrating";
+    if (pref !== null) return "ready";
     return "mic_prompt";
   });
   const [isMicEnabled, setIsMicEnabled] = useState(() => {
+    if (micStart === "off") return false;
     const pref = loadMicPreference();
     return pref ?? false;
   });

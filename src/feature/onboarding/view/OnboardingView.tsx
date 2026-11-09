@@ -33,9 +33,11 @@ import {
   trackOnboardingBack,
   trackOnboardingCompleted,
   trackOnboardingDesktopHintContinued,
+  trackOnboardingFirstRiffReturned,
   trackOnboardingGoalChosen,
   trackOnboardingLevelChosen,
   trackOnboardingPlanChosen,
+  trackOnboardingPlayChosen,
   trackOnboardingSkipped,
   trackOnboardingViewed,
 } from "../analytics/onboardingAnalytics";
@@ -43,17 +45,25 @@ import type { GoalOption } from "../data/onboardingGoals";
 import {
   ALL_PLANS_COUNT,
   ALL_PLANS_HREF,
+  FIRST_RIFF_DURATION_LABEL,
+  FIRST_RIFF_IMAGE,
+  getFirstRiffExercise,
+  getFirstRiffHref,
   getGoalOptions,
   getOnboardingPlans,
   getPlanHref,
   getPlanMinutes,
+  isOnboardingLevel,
   LEVEL_OPTIONS,
+  LOOK_AROUND_CHOICES,
+  LOOK_AROUND_LABELS,
   SONGS_HREF,
 } from "../data/onboardingGoals";
 import { firebaseSaveOnboarding } from "../services/onboarding.service";
 import type {
   OnboardingGoal,
   OnboardingLevel,
+  OnboardingPlayChoice,
   OnboardingResult,
 } from "../types";
 
@@ -67,17 +77,33 @@ const FOCUS_RING =
 type Step = OnboardingStep | "desktop";
 
 /**
- * The progress bar's segment for each step: the questions, then the third
+ * The progress bar's segment for each step: the questions, then the last
  * one for whatever follows the goal — plan picker or the songs explainer.
  */
 const PROGRESS: Record<Step, number> = {
   level: 0,
-  goal: 1,
-  plan: 2,
-  songs: 2,
-  desktop: 2,
+  play: 1,
+  goal: 2,
+  plan: 3,
+  songs: 3,
+  desktop: 3,
 };
-const PROGRESS_SEGMENTS = 3;
+const PROGRESS_SEGMENTS = 4;
+
+/**
+ * Where the onboarding opens: the first question, or — back from the first
+ * riff (`?step=goal&level=…&played=1`) — the goal question with the level
+ * already answered.
+ */
+const readStart = (
+  query: Record<string, string | string[] | undefined>,
+): { step: Step; level: OnboardingLevel; returnedFromRiff: boolean } => {
+  const level = Array.isArray(query.level) ? query.level[0] : query.level;
+  if (query.step === "goal" && query.played === "1" && isOnboardingLevel(level)) {
+    return { step: "goal", level, returnedFromRiff: true };
+  }
+  return { step: "level", level: "new", returnedFromRiff: false };
+};
 
 const StepHeading = ({
   title,
@@ -322,16 +348,97 @@ const GoalTile = ({
 };
 
 /**
+ * The answer we hope for, as the one card on the step: a crop of the real
+ * practice screen, what the riff is for this level, its length the way the
+ * session timer will show it, and a white key to start.
+ */
+const FirstRiffCard = ({
+  level,
+  isPending,
+  disabled,
+  onPlay,
+}: {
+  level: OnboardingLevel;
+  isPending: boolean;
+  disabled: boolean;
+  onPlay: () => void;
+}) => {
+  const { t } = useTranslation("onboarding");
+  const bpm = getFirstRiffExercise(level).metronomeSpeed?.recommended;
+
+  return (
+    <div className='overflow-hidden rounded-lg bg-zinc-900'>
+      <div className='relative aspect-[2/1] sm:aspect-[972/280]'>
+        <Image
+          src={FIRST_RIFF_IMAGE}
+          alt=''
+          fill
+          sizes='(min-width: 640px) 512px, 100vw'
+          className='object-cover object-left'
+        />
+        {/* The screenshot's own near-black runs into the card instead of ending on an edge. */}
+        <span
+          aria-hidden
+          className='absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent to-zinc-900'
+        />
+      </div>
+      <div className='space-y-5 p-5 sm:p-6'>
+        <div>
+          {/* The length sits beside the title only; the description below gets
+              the card's full width, or a phone squeezes it to four lines. */}
+          <div className='flex items-center justify-between gap-4'>
+            <h2 className='min-w-0 text-xl font-semibold text-zinc-100'>
+              {t("play_step.riff_title")}
+            </h2>
+            <span className='shrink-0 font-teko text-5xl font-medium leading-none tabular-nums text-zinc-100'>
+              {FIRST_RIFF_DURATION_LABEL}
+            </span>
+          </div>
+          <p className='mt-1 text-sm leading-relaxed text-zinc-400'>
+            <span className='block'>
+              {t(`play_step.riff_levels.${level}`, { bpm: bpm ?? "" })}
+            </span>
+            <span className='block'>{t("play_step.riff_mic")}</span>
+          </p>
+        </div>
+        <Button
+          size='lg'
+          className='w-full'
+          onClick={onPlay}
+          disabled={disabled}>
+          {isPending ? (
+            <Loader2 className='h-4 w-4 animate-spin' />
+          ) : (
+            t("play_step.start")
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+/**
  * How long the player has played decides which answers the next question
  * offers, and which plans the plan step lists. Every answer shows the real
  * screen it leads to, and picking the plan stays the player's call — from a
  * short list for their level or the full library.
+ *
+ * Between the two sits "got your guitar with you?": a yes plays a 40-second
+ * first riff (its own page) and comes back here for the goal; the other
+ * answers show what the app has without opening a session.
  */
 const OnboardingView = () => {
   const router = useRouter();
   const { t } = useTranslation("onboarding");
-  const [step, setStep] = useState<Step>("level");
-  const [level, setLevel] = useState<OnboardingLevel>("new");
+  // The query is in place on the first render (the page has getInitialProps).
+  const [start] = useState(() => readStart(router.query));
+  const [step, setStep] = useState<Step>(start.step);
+  const [level, setLevel] = useState<OnboardingLevel>(start.level);
+  const [playChoice, setPlayChoice] = useState<OnboardingPlayChoice | null>(
+    start.returnedFromRiff ? "play" : null,
+  );
+  // Looking around: the answers show the app, none of them opens an exercise.
+  const isBrowsing = playChoice === "browse" || playChoice === "no_guitar";
   const [pending, setPending] = useState<string | null>(null);
   // Held by the desktop step while a phone player reads it.
   const [destination, setDestination] = useState<{
@@ -343,10 +450,15 @@ const OnboardingView = () => {
   const source = parseOnboardingSource(router.query.from);
   // Time-on-step and total duration for the events below.
   const [clock] = useState(createOnboardingClock);
+  const goals = getGoalOptions(level, { isPhone: isMobile });
 
   useEffect(() => {
     clock.restart();
-    trackOnboardingViewed(source);
+    if (start.returnedFromRiff) {
+      trackOnboardingFirstRiffReturned({ level: start.level, source });
+    } else {
+      trackOnboardingViewed(source);
+    }
     // Once per mount — a re-render must not count as a second view.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -371,16 +483,22 @@ const OnboardingView = () => {
       level,
       goal: result.goal,
       planId: result.planId ?? null,
+      playChoice,
       destination: href,
       durationMs: clock.total(),
       source,
     });
-    await firebaseSaveOnboarding({ level, ...result }).catch(() => null);
+    await firebaseSaveOnboarding({
+      level,
+      ...result,
+      playChoice: playChoice ?? undefined,
+    }).catch(() => null);
     // After the save: the feed's welcome row reads the goal and plan off the user document.
     void addPlayerJoinedLog();
     // The answers are saved by now, so a phone player who closes the tab on
-    // the desktop step loses nothing.
-    if (isMobile) {
+    // the desktop step loses nothing. Someone who just played their first riff
+    // on the phone has seen it work there, so they skip the step.
+    if (isMobile && playChoice !== "play") {
       clock.takeStep();
       void router.prefetch(href);
       setDestination({ href, goal: result.goal });
@@ -411,6 +529,23 @@ const OnboardingView = () => {
       source,
     });
     setLevel(next);
+    setStep("play");
+  };
+
+  const handlePlayChoice = (choice: OnboardingPlayChoice) => {
+    if (pending) return;
+    trackOnboardingPlayChosen({
+      choice,
+      level,
+      timeOnStepMs: clock.takeStep(),
+      source,
+    });
+    setPlayChoice(choice);
+    if (choice === "play") {
+      setPending("play");
+      void router.push(getFirstRiffHref(level, source));
+      return;
+    }
     setStep("goal");
   };
 
@@ -420,11 +555,17 @@ const OnboardingView = () => {
       goal: option.goal,
       level,
       position,
-      optionsShown: getGoalOptions(level).map((o) => o.goal),
+      optionsShown: goals.map((o) => o.goal),
       timeOnStepMs: clock.takeStep(),
       source,
     });
     if (option.href === null) {
+      // A player looking around gets the plan library, not a plan opened
+      // on the practice screen.
+      if (isBrowsing) {
+        finish({ goal: option.goal }, ALL_PLANS_HREF, option.goal);
+        return;
+      }
       setStep("plan");
       return;
     }
@@ -482,7 +623,6 @@ const OnboardingView = () => {
     void addPlayerJoinedLog();
   };
 
-  const goals = getGoalOptions(level);
   const stepIndex = PROGRESS[step];
 
   return (
@@ -562,11 +702,57 @@ const OnboardingView = () => {
           </StepBody>
         )}
 
+        {step === "play" && (
+          <StepBody key='play'>
+            <StepHeading
+              title={t("play_step.title")}
+              onBack={pending ? undefined : () => goTo("level")}
+            />
+            <div className='mx-auto max-w-lg'>
+              <FirstRiffCard
+                level={level}
+                isPending={pending === "play"}
+                disabled={!!pending}
+                onPlay={() => handlePlayChoice("play")}
+              />
+              {/* The other answers stay quiet: rows, not cards, under the one we hope for. */}
+              <div className='mt-6 space-y-1'>
+                {LOOK_AROUND_CHOICES.map((choice) => (
+                  <button
+                    key={choice}
+                    type='button'
+                    disabled={!!pending}
+                    onClick={() => handlePlayChoice(choice)}
+                    className={cn(
+                      "group flex w-full items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-sm text-zinc-300 transition-colors hover:bg-zinc-900 hover:text-zinc-100",
+                      FOCUS_RING,
+                    )}>
+                    {t(`play_step.options.${choice}`, LOOK_AROUND_LABELS[choice])}
+                    <ArrowRight className='h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-200' />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </StepBody>
+        )}
+
         {step === "goal" && (
           <StepBody key='goal'>
             <StepHeading
-              title={t("goal_step.title")}
-              onBack={pending ? undefined : () => goTo("level")}
+              title={t(
+                start.returnedFromRiff
+                  ? "goal_step.title_after_play"
+                  : playChoice === "no_guitar"
+                    ? "goal_step.title_no_guitar"
+                    : "goal_step.title",
+              )}
+              // One line so the tiles read as what's worth a look without a guitar.
+              description={
+                playChoice === "no_guitar"
+                  ? t("goal_step.no_guitar_hint")
+                  : undefined
+              }
+              onBack={pending ? undefined : () => goTo("play")}
             />
             <div className='grid gap-4 sm:grid-cols-2'>
               {goals.map((option, index) => (

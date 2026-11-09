@@ -8,7 +8,6 @@ import { AchievementCard, useAchievementContext } from "feature/achievements";
 import type { ScoredRun } from "feature/exercisePlan/types/exercise.types";
 import { NextUpCard } from "feature/progression/components/NextUpCard";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import { WhatNextWidget } from "feature/whatNext/components/WhatNextWidget";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
@@ -26,6 +25,7 @@ import {
   hasRestDays,
 } from "utils/gameLogic";
 
+import { RecentRunsCard } from "./components/RecentRunsCard";
 import { RewardBreakdown } from "./components/RewardBreakdown";
 import { SessionLeaderboardCard } from "./components/SessionLeaderboardCard";
 import { SessionNoteForm } from "./components/SessionNoteForm";
@@ -494,8 +494,8 @@ const RatingPopUpLayout = ({
           {/* ── The climb ahead, and anything already owed ── */}
           <NextUpCard />
 
-          {/* ── What to play next, now that this session is in ── */}
-          <WhatNextWidget />
+          {/* ── How this session's exercises went over their last runs ── */}
+          <RecentRunsCard runs={scoredRuns} />
 
           {/* ── Session time + Streak ── */}
           <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2">

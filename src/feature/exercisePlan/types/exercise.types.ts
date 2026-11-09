@@ -1,3 +1,4 @@
+import type { BandStyleId } from "feature/autoBacking/styles";
 import type { MetronomeGrid } from "feature/exercisePlan/components/Metronome/utils/meterGrid";
 import type { EarQuizConfig } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 import type { GuitarSkillId } from "feature/skills/skills.types";
@@ -173,6 +174,8 @@ export interface BackingTrack {
   /** Written by the auto-backing generator rather than imported or authored —
    *  played on the synthesised backing band (feature/autoBacking/synth). */
   generated?: boolean;
+  /** The generated band that plays it (feature/autoBacking/styles) — absent = ambient. */
+  bandStyle?: BandStyleId;
 }
 
 /** The two ways a song from the library can be practised inside a routine. */

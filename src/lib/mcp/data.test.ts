@@ -72,7 +72,11 @@ describe("countWrite", () => {
   });
 
   it("caps new exercises by the changes left, too", () => {
-    const usage = { day: "2026-10-31", writes: 18, exercises: 2 };
+    const usage = {
+      day: "2026-10-31",
+      writes: MCP_WRITES_PER_DAY - 2,
+      exercises: 2,
+    };
     expect(countWrite(usage, "2026-10-31", "write")).toMatchObject({
       left: { changesLeftToday: 1, newExercisesLeftToday: 1 },
     });
@@ -86,7 +90,11 @@ describe("countWrite", () => {
         day,
         "write",
       ),
-    ).toEqual({ refused: expect.stringMatching(/20 changes/) });
+    ).toEqual({
+      refused: expect.stringMatching(
+        new RegExp(`${MCP_WRITES_PER_DAY} changes`),
+      ),
+    });
     expect(
       countWrite(
         { day, writes: 3, exercises: MCP_EXERCISES_PER_DAY },

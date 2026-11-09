@@ -13,6 +13,7 @@ export const firebaseSaveOnboarding = async (result: OnboardingResult) => {
       level: result.level,
       goal: result.goal,
       planId: result.planId ?? null,
+      playChoice: result.playChoice ?? null,
       completedAt: serverTimestamp(),
     },
   });

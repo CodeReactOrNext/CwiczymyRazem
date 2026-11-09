@@ -18,6 +18,7 @@ import type { AlphaTabPassClock, AlphaTabSource } from "./alphaTabPassClock";
 import { addAlphaTabPassStart, ALPHATAB_RESTART_GRACE_SEC, alphaTabPassBeats, createAlphaTabPassClock } from "./alphaTabPassClock";
 import type { ExpectedAttack } from "./noteEventGrader";
 import { assignAttacks } from "./noteEventGrader";
+import { useTabPlayUntilStore } from "./tabPlayUntilStore";
 import { buildTempoMap, createBeatClock } from "./tempoBeatClock";
 import { useGameState } from "./useGameState";
 
@@ -389,6 +390,8 @@ export function useNoteMatching({
       const toBeats = (elapsedSec: number) => beatClock ? beatClock.toBeats(elapsedSec) : elapsedSec * beatsPerSec;
       const passClock = alphaTabSource && audioContext ? alphaTabPassClockRef.current : null;
       let loopedBeatsElapsed: number;
+      /** Score beat (counted across passes) the current pass started at; null on AlphaTab's own clock. */
+      let passStartBeat: number | null = null;
       if (passClock && audioNowSec !== null) {
         loopedBeatsElapsed = alphaTabPassBeats(
           passClock, audioNowSec - latencySec, toBeats, totalExBeats,
@@ -398,8 +401,23 @@ export function useNoteMatching({
         const rawElapsedSec = audioNowSec !== null && audioStartTime != null
           ? audioNowSec - audioStartTime
           : (now - startTime) / 1000;
-        loopedBeatsElapsed = toBeats(rawElapsedSec - latencySec) % totalExBeats;
+        const absBeats = toBeats(rawElapsedSec - latencySec);
+        loopedBeatsElapsed = absBeats % totalExBeats;
+        passStartBeat = absBeats - loopedBeatsElapsed;
       }
+      // The exercise's time ends before these bars would (see tabPlayUntil.ts):
+      // the board doesn't show them, so they are neither expected nor missed.
+      const playUntilBeat = passStartBeat === null ? null : useTabPlayUntilStore.getState().until?.beat ?? null;
+      const cutInPass = playUntilBeat === null || passStartBeat === null ? Infinity : playUntilBeat - passStartBeat;
+      const isCutOff = (beatStart: number): boolean => {
+        if (cutInPass === Infinity) return false;
+        // Right after a wrap, the last notes of the pass before are still in
+        // their late window — they sit a whole tab earlier.
+        const start = loopedBeatsElapsed < earlyWindowBeats && beatStart > totalExBeats / 2
+          ? beatStart - totalExBeats
+          : beatStart;
+        return start >= cutInPass - 1e-6;
+      };
       const hasRecentOnset     = (now - lastOnsetTime) < onsetRecencyMs;
       const hasRecentTick      = (now - lastTickTime)  < onsetRecencyMs;
 
@@ -464,6 +482,7 @@ export function useNoteMatching({
           if (beatStart > loopedBeatsElapsed + earlyWindowBeats + 1) break;
           // Chords are graded on the spectrum, not on a single pitch.
           if (beat.notes.length !== 1) continue;
+          if (isCutOff(beatStart)) continue;
           const inWindow = loopedBeatsElapsed >= beatStart - earlyWindowBeats
             && loopedBeatsElapsed <= beatEnd + windowBeats;
           if (!inWindow) continue;
@@ -509,6 +528,7 @@ export function useNoteMatching({
       for (let i = startIdx; i < flatBeats.length; i++) {
         const { beat, beatStart, beatEnd, notes } = flatBeats[i];
         if (beatStart > loopedBeatsElapsed + earlyWindowBeats + 1) break;
+        if (isCutOff(beatStart)) continue;
 
         // On the grid the pass after wraps straight on, so the last note's late
         // window spills into it. An AlphaTab pass runs past its end instead and

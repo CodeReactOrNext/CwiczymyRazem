@@ -57,6 +57,9 @@ interface TablatureViewerProps {
   obscured?: boolean;
   loopStartBeat?: number | null;
   loopEndBeat?: number | null;
+  /** The exercise's time runs out here (beats after the start, across passes):
+   *  the board draws nothing past it. null = the tab loops on. */
+  playUntilBeat?: number | null;
   /** Populated by the viewer so callers (e.g. minimap) can drive the canvas cursor without a canvas click */
   seekWorkerRef?: React.MutableRefObject<((beat: number, smooth?: boolean) => void) | null>;
   /** Populated with a "park the view at this beat" callback — lets a caller mirror
@@ -125,6 +128,7 @@ const TablatureViewerInner = ({
   obscured = false,
   loopStartBeat,
   loopEndBeat,
+  playUntilBeat = null,
   seekWorkerRef,
   scrollToBeatRef,
   viewerWidthRef,
@@ -167,7 +171,7 @@ const TablatureViewerInner = ({
     isPlaying, startTime, audioStartTime, bpm, countInRemaining,
     hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek,
-    loopStartBeat, loopEndBeat, zoom, tuningStrings, style, selection, obscured,
+    loopStartBeat, loopEndBeat, playUntilBeat, zoom, tuningStrings, style, selection, obscured,
     quarterTurned, learnFocus,
   });
   const along = (pointer: { clientX: number; clientY: number }) =>
@@ -317,6 +321,7 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.obscured         === next.obscured           &&
   prev.loopStartBeat    === next.loopStartBeat      &&
   prev.loopEndBeat      === next.loopEndBeat         &&
+  prev.playUntilBeat    === next.playUntilBeat       &&
   prev.zoom             === next.zoom               &&
   prev.heightPx         === next.heightPx           &&
   prev.tuningStrings    === next.tuningStrings      &&

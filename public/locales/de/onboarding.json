@@ -6,8 +6,26 @@
   "level_step": {
     "title": "Wie lange spielst du schon?"
   },
+  "play_step": {
+    "title": "Hast du deine Gitarre zur Hand?",
+    "riff_title": "Spiel dein erstes Riff",
+    "riff_levels": {
+      "new": "Drei leere Saiten, ohne Greifen.",
+      "some": "A-Moll-Pentatonik rauf und runter, {{bpm}} BPM.",
+      "experienced": "Ein Pentatonik-Lick in Achteln, {{bpm}} BPM."
+    },
+    "riff_mic": "Dein Mikro hört jede Note, die du spielst.",
+    "start": "Los geht's",
+    "options": {
+      "browse": "Erst mal umschauen",
+      "no_guitar": "Ich habe noch keine Gitarre"
+    }
+  },
   "goal_step": {
-    "title": "Was führt dich zu Riff Quest?"
+    "title": "Was führt dich zu Riff Quest?",
+    "title_after_play": "Wie geht's weiter?",
+    "title_no_guitar": "Schau dich erst mal um",
+    "no_guitar_hint": "Noch keine Gitarre? Das hier kannst du dir schon ansehen:"
   },
   "plan_step": {
     "title": "Wähle einen Plan für den Start",
@@ -64,10 +82,61 @@
     "roadmap": {
       "label": "Einer Roadmap zu einem Ziel folgen",
       "description": "Ein Weg Schritt für Schritt, etwa im Stil deines Idols zu spielen"
+    }
+  },
+  "first_riff_intro": {
+    "mic_question": {
+      "title": "Kannst du ein Mikrofon nutzen?",
+      "description": "Das im Handy oder Laptop reicht.",
+      "yes": "Ja, Mikro nutzen",
+      "no": "Nein, ich spiele ohne"
     },
-    "log": {
-      "label": "Mein bisheriges Üben eintragen",
-      "description": "Verfolge Zeit, Serie und Fortschritt"
+    "next": "Weiter",
+    "back": "Zurück",
+    "start": "Los geht's",
+    "skip": "Überspringen",
+    "phone_panel": "Auf dem Handy findest du das im Panel, das du über die untere Leiste öffnest.",
+    "slides": {
+      "tempo": {
+        "beginner": {
+          "title": "Spiel mit dem Klick",
+          "body": "Das Metronom gibt den Takt vor. Schlag die Saite an, wenn der Cursor die Note erreicht. Zu schnell? Hier bremst du."
+        },
+        "player": {
+          "title": "Tempo: {{bpm}} BPM",
+          "body": "Hier änderst du es, jederzeit."
+        }
+      },
+      "mic": {
+        "beginner": {
+          "title": "Das Mikro hört zu",
+          "body": "Jede getroffene Note leuchtet auf. Hier schaltest du es aus."
+        },
+        "player": {
+          "title": "Jede Note wird bewertet",
+          "body": "Treffer, Timing und Genauigkeit übers Mikro. Hier schaltest du es aus."
+        }
+      },
+      "no_mic": {
+        "beginner": {
+          "title": "Spiel einfach mit",
+          "body": "Ohne Mikro wird nichts bewertet. Du spielst mit dem Tab, deine Zeit zählt trotzdem."
+        },
+        "player": {
+          "title": "Spiel einfach mit",
+          "body": "Ohne Mikro wird nichts bewertet. Du spielst mit dem Tab, deine Zeit zählt trotzdem."
+        }
+      },
+      "tab": {
+        "beginner": {
+          "title": "Der Tab nach deinem Geschmack",
+          "body": "Linien sind Saiten, Zahlen sind Bünde, 0 ist eine leere Saite. Hier vergrößerst du ihn."
+        },
+        "player": {
+          "title": "Tab einstellen",
+          "body": "Zoom und Ansicht direkt unter dem Tab."
+        }
+      }
     }
   }
 }

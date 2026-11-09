@@ -6,8 +6,26 @@
   "level_step": {
     "title": "Od jak dawna grasz?"
   },
+  "play_step": {
+    "title": "Masz gitarę pod ręką?",
+    "riff_title": "Zagraj pierwszy riff",
+    "riff_levels": {
+      "new": "Trzy puste struny, bez przyciskania.",
+      "some": "Pentatonika a-moll w górę i w dół, {{bpm}} BPM.",
+      "experienced": "Zagrywka pentatoniczna ósemkami, {{bpm}} BPM."
+    },
+    "riff_mic": "Mikrofon słyszy każdą zagraną nutę.",
+    "start": "Gramy",
+    "options": {
+      "browse": "Najpierw się rozejrzę",
+      "no_guitar": "Nie mam jeszcze gitary"
+    }
+  },
   "goal_step": {
-    "title": "Co cię sprowadza do Riff Quest?"
+    "title": "Co cię sprowadza do Riff Quest?",
+    "title_after_play": "Co dalej?",
+    "title_no_guitar": "Na razie się rozejrzyj",
+    "no_guitar_hint": "Bez gitary możesz już obczaić to:"
   },
   "plan_step": {
     "title": "Wybierz plan na start",
@@ -64,10 +82,61 @@
     "roadmap": {
       "label": "Idź roadmapą do celu",
       "description": "Ścieżka krok po kroku, np. do gry w stylu twojego idola"
+    }
+  },
+  "first_riff_intro": {
+    "mic_question": {
+      "title": "Możesz użyć mikrofonu?",
+      "description": "Wystarczy ten w telefonie albo laptopie.",
+      "yes": "Tak, włącz mikrofon",
+      "no": "Nie, zagram bez niego"
     },
-    "log": {
-      "label": "Zapisuj ćwiczenia, które już robię",
-      "description": "Śledź czas, serię i postępy"
+    "next": "Dalej",
+    "back": "Wstecz",
+    "start": "Gramy",
+    "skip": "Pomiń",
+    "phone_panel": "Na telefonie znajdziesz to w panelu, który otwierasz z dolnego paska.",
+    "slides": {
+      "tempo": {
+        "beginner": {
+          "title": "Graj z metronomem",
+          "body": "Metronom wybija rytm. Uderz strunę, gdy kursor dojdzie do nuty. Za szybko? Zwolnij tutaj."
+        },
+        "player": {
+          "title": "Tempo: {{bpm}} BPM",
+          "body": "Zmienisz je tutaj, w każdej chwili."
+        }
+      },
+      "mic": {
+        "beginner": {
+          "title": "Mikrofon cię słucha",
+          "body": "Każda trafiona nuta się podświetla. Tutaj go wyłączysz."
+        },
+        "player": {
+          "title": "Każda nuta jest oceniana",
+          "body": "Trafienia, timing i celność z mikrofonu. Tutaj go wyłączysz."
+        }
+      },
+      "no_mic": {
+        "beginner": {
+          "title": "Po prostu pograj",
+          "body": "Bez mikrofonu nic nie jest oceniane. Grasz z tabem, a czas i tak się liczy."
+        },
+        "player": {
+          "title": "Po prostu pograj",
+          "body": "Bez mikrofonu nic nie jest oceniane. Grasz z tabem, a czas i tak się liczy."
+        }
+      },
+      "tab": {
+        "beginner": {
+          "title": "Tab ustawisz po swojemu",
+          "body": "Linie to struny, cyfry to progi, 0 to pusta struna. Tutaj go powiększysz."
+        },
+        "player": {
+          "title": "Wygląd tabu",
+          "body": "Powiększenie i widok ustawisz tuż pod tabem."
+        }
+      }
     }
   }
 }
