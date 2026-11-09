@@ -6,6 +6,7 @@ import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
+import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import { Check, FileMusic, Library, ListVideo, Loader2, Music, Plus } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -41,7 +42,7 @@ const TierChip = ({ song }: { song: Song }) => {
   return (
     <span
       className='shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold'
-      style={{ backgroundColor: `${tier.color}14`, color: tier.color }}>
+      style={{ backgroundColor: inkWash(tier.color, 12), color: inkAccent(tier.color) }}>
       {tier.tier}
     </span>
   );

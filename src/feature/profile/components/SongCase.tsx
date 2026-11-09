@@ -2,6 +2,7 @@ import type { Song } from "feature/songs/types/songs.type";
 import { formatPlayTime } from "feature/songs/utils/arrangements.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
+import { inkAccent } from "lib/colorTheme/colorTheme";
 import { Clock } from "lucide-react";
 
 import { ShinyCover } from "./ShinyCover";
@@ -73,7 +74,7 @@ export const SongCase = ({
               </p>
               <p
                 className='mt-3 text-xs font-semibold'
-                style={{ color: tier.color }}>
+                style={{ color: inkAccent(tier.color) }}>
                 {tier.label}
               </p>
               {(practiceTimes?.[song.id] ?? 0) > 0 && (

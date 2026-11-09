@@ -5,6 +5,7 @@ import { formatPlayTime } from "feature/songs/utils/arrangements.utils";
 import { getAllTiers, getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
+import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import { Clock, Music } from "lucide-react";
 import { useMemo } from "react";
 import { useAppSelector } from "store/hooks";
@@ -141,17 +142,17 @@ export const SongSkillShowcase = ({
                   "flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[11px] font-black",
                   tier.bgColor,
                 )}
-                style={{ color: tier.color }}>
+                style={{ color: inkAccent(tier.color) }}>
                 {tier.tier}
               </div>
               <span
                 className='text-xs font-black'
-                style={{ color: tier.color }}>
+                style={{ color: inkAccent(tier.color) }}>
                 {tier.label}
               </span>
               <div
                 className='h-px flex-1 rounded'
-                style={{ backgroundColor: `${tier.color}20` }}
+                style={{ backgroundColor: inkWash(tier.color, 14) }}
               />
               <span className='text-[11px] font-bold text-zinc-500'>
                 {songs.length}

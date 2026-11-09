@@ -10,6 +10,7 @@ import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { useSong } from "feature/songs/hooks/useSong";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
+import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import { ChevronUp, ExternalLink, Music } from "lucide-react";
 import Link from "next/link";
 
@@ -98,8 +99,8 @@ export const SongPreviewDialog = ({
                 <span
                   className='mt-2 inline-block rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold'
                   style={{
-                    backgroundColor: `${tier.color}14`,
-                    color: tier.color,
+                    backgroundColor: inkWash(tier.color, 12),
+                    color: inkAccent(tier.color),
                   }}>
                   {tier.tier === "?" ? tier.label : tier.tier}
                 </span>
