@@ -227,7 +227,7 @@ export const ProfileHeader = ({
           {isSpecialGuitar ? (
             <div className='absolute inset-0 z-0 overflow-hidden rounded-none md:rounded-xl'>
               <div
-                className='pointer-events-none absolute left-[0%] top-[-10%] opacity-25 blur-[80px] md:left-[5%] md:top-[-15%] md:opacity-30'
+                className='light-hide pointer-events-none absolute left-[0%] top-[-10%] opacity-25 blur-[80px] md:left-[5%] md:top-[-15%] md:opacity-30'
                 style={{
                   backgroundColor: glowColor,
                   width: "350px",
@@ -239,7 +239,11 @@ export const ProfileHeader = ({
                 src={getRankBadgeSrc(imgPath, "large")}
                 className='pointer-events-none absolute left-[0%] top-[-15%] h-[300px] max-w-none -rotate-[90deg] opacity-[0.75] md:left-[8%] md:top-[-35%] md:h-[480px] md:-rotate-[15deg]'
                 style={{
-                  filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
+                  // Light: a 90% black 40px shadow turns into a grey smear on a pale
+                  // banner, so the guitar sits on a short soft one instead.
+                  filter: isLight
+                    ? "drop-shadow(0 6px 12px rgba(0,0,0,0.18))"
+                    : `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
                   WebkitMaskImage:
                     "linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)",
                   maskImage:

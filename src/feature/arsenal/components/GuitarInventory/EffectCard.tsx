@@ -146,7 +146,7 @@ export const EffectCard = ({
         borderRadius: 10,
         backgroundColor: isLight ? "#ffffff" : "#111116",
         backgroundImage: isLight
-          ? `linear-gradient(${rs.baseColor}0f, ${rs.baseColor}0f)`
+          ? "none"
           : `linear-gradient(160deg, ${rs.baseColor}${holo ? "14" : "35"} 0%, #111116 55%)`,
         border: `1px solid ${rs.baseColor}28`,
         boxShadow: isLight ? undefined : "0 4px 20px rgba(0,0,0,0.6)",
@@ -154,7 +154,7 @@ export const EffectCard = ({
       }}>
       {/* Grain overlay */}
       <div
-        className='pointer-events-none absolute inset-0 z-0'
+        className='light-hide pointer-events-none absolute inset-0 z-0'
         style={{
           backgroundImage: NOISE_BG,
           backgroundSize: "180px 180px",
@@ -165,7 +165,7 @@ export const EffectCard = ({
 
       {/* Subtle structural grid across the whole card */}
       <div
-        className='pointer-events-none absolute inset-0 z-0'
+        className='light-hide pointer-events-none absolute inset-0 z-0'
         style={{
           backgroundImage: [
             `linear-gradient(${rs.baseColor} 1px, transparent 1px)`,
@@ -190,6 +190,9 @@ export const EffectCard = ({
         />
       )}
 
+      {/* Light theme, "ink header" (owner's pick): name and condition sit on
+          an ink band drawn in the dark theme's own colours, over a white body. */}
+      <div className={cn("flex-shrink-0", isLight && "force-dark bg-[#18181b]")}>
       {/* Brand + Name + Rarity·Type / Serial */}
       <div className='flex flex-shrink-0 items-start justify-between gap-2 px-3 pb-1.5 pt-3'>
         <div className='min-w-0'>
@@ -224,6 +227,7 @@ export const EffectCard = ({
       <div className='flex-shrink-0 px-3 pb-2.5'>
         <ConditionMeter condition={condition} restored={item.restored} />
       </div>
+      </div>
 
       {/* Effect image */}
       <div
@@ -236,7 +240,9 @@ export const EffectCard = ({
         <div
           className='pointer-events-none absolute inset-0 z-0'
           style={{
-            background: `radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 40%, transparent 72%)`,
+            background: isLight
+              ? "radial-gradient(65% 60% at 50% 48%, #ffffff 0%, #f1f1f3 80%)"
+              : `radial-gradient(60% 55% at 50% 48%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 40%, transparent 72%)`,
           }}
         />
 
@@ -254,7 +260,11 @@ export const EffectCard = ({
         </div>
 
         {/* Level emblem + New flag */}
-        <div className='absolute left-2 top-2 z-20 flex flex-col items-start gap-1.5'>
+        <div
+          className={cn(
+            "absolute left-2 top-2 z-20 flex flex-col items-start gap-1.5",
+            isLight && "force-dark",
+          )}>
           {level > 0 && (
             <LevelEmblem level={level} rarity={rarity} title={t("card.effect.level")} />
           )}
@@ -270,7 +280,7 @@ export const EffectCard = ({
         {/* Year / country tags on the right */}
         <SpecTags
           tags={[item.year, item.country]}
-          className='absolute right-2 top-3 z-20'
+          className={cn("absolute right-2 top-3 z-20", isLight && "force-dark")}
         />
 
         <img

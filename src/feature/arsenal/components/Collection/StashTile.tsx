@@ -7,6 +7,7 @@ import {
 import { cn } from "assets/lib/utils";
 import type { DexStatus } from "feature/arsenal/utils/dex";
 import { lockedArtFilter } from "feature/progression/components/RarityLock";
+import { useColorTheme } from "lib/colorTheme/colorTheme";
 import { Lock, Star } from "lucide-react";
 import type {
   CSSProperties,
@@ -174,6 +175,10 @@ export const StashTile = ({
   onClick,
 }: StashTileProps) => {
   const isMobile = useResponsiveStore((state) => state.isMobile);
+  // Light theme, "studio" (owner's pick): a pale grey socket lit from the
+  // middle instead of a pastel tier tint, the level in an ink chip, and the
+  // tier reduced to a dot in the corner. Rings (drop target, in use) stay.
+  const isLight = useColorTheme() === "light";
 
   // Locked gear goes unlit rather than faint: `dimmed` (0.28) is for a piece the
   // filters have pushed out of the way, and a Mythic the player is working
@@ -222,6 +227,16 @@ export const StashTile = ({
     // edge — so the hollow and the rim are laid back over the contents below and
     // the plate itself keeps only the tier's light and its outward glow.
     boxShadow: glow,
+    ...(isLight
+      ? {
+          backgroundColor: "#ececef",
+          backgroundImage:
+            "radial-gradient(65% 60% at 50% 45%, #ffffff 0%, #ececef 80%)",
+          boxShadow: ringColor
+            ? `inset 0 0 0 ${ringWidth}px ${ringColor}`
+            : "none",
+        }
+      : {}),
   };
 
   const tile = (
@@ -236,7 +251,7 @@ export const StashTile = ({
       title={label}
       aria-label={label}
       className={cn(
-        "group relative flex h-full w-full select-none items-center justify-center overflow-hidden rounded-sm",
+        "stash-socket group relative flex h-full w-full select-none items-center justify-center overflow-hidden rounded-sm",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70",
         dragHandlers && "cursor-grab active:cursor-grabbing",
         disabled && "cursor-not-allowed",
@@ -245,7 +260,7 @@ export const StashTile = ({
       {/* Grain, blended into the plate rather than laid over it as a haze */}
       <span
         aria-hidden
-        className='pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay'
+        className='light-hide pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay'
         style={{
           backgroundImage: PLATE_NOISE_BG,
           backgroundSize: "140px 140px",
@@ -313,12 +328,16 @@ export const StashTile = ({
         aria-hidden
         className='pointer-events-none absolute inset-0 rounded-sm'
         style={{
-          boxShadow: plateHollow({
-            color,
-            size: SOCKET_SIZE,
-            ringColor,
-            ringWidth,
-          }),
+          boxShadow: isLight
+            ? ringColor
+              ? `inset 0 0 0 ${ringWidth}px ${ringColor}`
+              : "none"
+            : plateHollow({
+                color,
+                size: SOCKET_SIZE,
+                ringColor,
+                ringWidth,
+              }),
         }}
       />
 
@@ -336,10 +355,22 @@ export const StashTile = ({
       {level != null && level > 0 && (
         <span
           className='absolute left-1 top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded px-1.5 text-xs font-black tabular-nums leading-none'
-          style={{ color, background: "rgba(0,0,0,0.85)" }}>
+          style={
+            isLight
+              ? { color: "#ffffff", background: "#18181b" }
+              : { color, background: "rgba(0,0,0,0.85)" }
+          }>
           {levelPrefix}
           {level}
         </span>
+      )}
+
+      {isLight && !inUse && !dexStatus && (
+        <span
+          aria-hidden
+          className='absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full'
+          style={{ backgroundColor: color }}
+        />
       )}
 
       {inUse && (

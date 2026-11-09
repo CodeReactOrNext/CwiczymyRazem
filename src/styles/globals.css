@@ -871,6 +871,16 @@ html.theme-light:has([data-app-shell]) .chip-cyan:not(.force-dark *):hover {
   background-color: #27272a !important;
 }
 
+/* Stash "studio" sockets (StashTile): builder parts carry their own bench
+   plate (PartPlate); inside a stash socket it takes the studio greys too,
+   so a whole shelf reads as one surface. Mod blueprints keep their sheet. */
+html.theme-light:has([data-app-shell]) .stash-socket:not(.force-dark *) {
+  --ars-bench-1: #ffffff;
+  --ars-bench-2: #f1f1f3;
+  --ars-bench-3: #ececef;
+  --ars-bench-dot: transparent;
+}
+
 /* Achievement icons (AchievementIcon) are tinted by rarity in colours picked
    to glow on black — white, ice blue, pale yellow. On white they vanish, so
    the light theme takes the same hues at their deep end. */
