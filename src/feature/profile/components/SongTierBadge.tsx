@@ -11,6 +11,7 @@ import {
 } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
+import { inkAccent } from "lib/colorTheme/colorTheme";
 
 interface SongTierBadgeProps {
   /** Learned songs of the profile owner. Undefined once the fetch has failed. */
@@ -98,7 +99,7 @@ export const SongTierBadge = ({
       ) : (
         <span
           className='text-[11px] font-medium'
-          style={{ color: hasTier ? tier.color : UNRATED_COLOR }}>
+          style={{ color: inkAccent(hasTier ? tier.color : UNRATED_COLOR) }}>
           {subLabel}
         </span>
       )}

@@ -20,6 +20,7 @@ import {
   resolveTitle,
 } from "feature/profile/utils/profileLayout";
 import type { Song } from "feature/songs/types/songs.type";
+import { useColorTheme } from "lib/colorTheme/colorTheme";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import { Flame } from "lucide-react";
 import type { ReactNode } from "react";
@@ -78,6 +79,7 @@ export const ProfileHeader = ({
     selectedGuitar,
   } = userData;
   const labels = useProfileLabels();
+  const isLight = useColorTheme() === "light";
   const { t } = labels;
   const intlLocale = useIntlLocale();
   const facts = new Set(layout.facts);
@@ -278,7 +280,9 @@ export const ProfileHeader = ({
                       <stop offset='100%' stopColor={accent.base} />
                     </linearGradient>
                   </defs>
-                  <circle cx='50' cy='50' r='46' fill='rgba(0,0,0,0.45)' />
+                  {/* Light theme: the same ink coin as Home's level ring — a 45% black
+                      wash over a pale banner reads as a grey smudge. */}
+                  <circle cx='50' cy='50' r='46' fill={isLight ? "#18181b" : "rgba(0,0,0,0.45)"} />
                   <circle
                     cx='50'
                     cy='50'
@@ -303,7 +307,7 @@ export const ProfileHeader = ({
                     x='50'
                     y='54'
                     textAnchor='middle'
-                    fill='white'
+                    fill='#ffffff'
                     fontSize='24'
                     fontWeight='900'
                     style={{ fontFamily: "system-ui, sans-serif" }}>
@@ -343,7 +347,7 @@ export const ProfileHeader = ({
           </div>
 
           {(factItems.length > 0 || showLinks) && (
-            <div className='space-y-3 rounded-xl bg-zinc-950/60 px-4 py-3 backdrop-blur-md'>
+            <div className='light-card space-y-3 rounded-xl bg-zinc-950/60 px-4 py-3 backdrop-blur-md'>
               {factItems.length > 0 && (
                 <dl className='grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap'>
                   {factItems}
