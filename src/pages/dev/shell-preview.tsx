@@ -65,6 +65,7 @@ const PAGES: Record<string, PreviewPage> = {
   achievements: { load: () => import("../profile/achievements"), pageId: "profile" },
   myExercises: { load: () => import("../my-exercises"), pageId: "profile" },
   plans: { load: () => import("../timer/plans"), pageId: "profile" },
+  freeTimer: { load: () => import("../timer/practice"), pageId: "profile" },
   autoPlan: { load: () => import("../timer/auto"), pageId: "profile" },
   scaleTree: { load: () => import("../scale-tree"), pageId: "profile" },
   myRoadmaps: { load: () => import("../my-roadmaps"), pageId: "profile" },

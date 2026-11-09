@@ -34,15 +34,15 @@ const getPointRatings = (report: ReportListInterface | undefined) => {
 const getLightRatingColor = (rating: string | null) => {
   switch (rating) {
     case "super":
-      return "#0E7490";
+      return "#92400E";
     case "great":
-      return "#0891B2";
+      return "#B45309";
     case "nice":
-      return "#06B6D4";
+      return "#D97706";
     case "ok":
-      return "#67E8F9";
+      return "#F59E0B";
     case "zero":
-      return "#CFFAFE";
+      return "#FCD34D";
     default:
       return "#E4E4E7";
   }
@@ -130,7 +130,7 @@ const ActivityCalendarCanvas = ({
 
       if (item?.report?.exceriseTitle || item?.report?.isDateBackReport) {
         // The marker for a day with an exercise / a back-dated report.
-        const mark = isLight ? "#164E63" : "#ffffff";
+        const mark = isLight ? "#18181B" : "#ffffff";
         ctx.fillStyle = mark;
         ctx.strokeStyle = mark;
         ctx.lineWidth = 1;

@@ -28,7 +28,8 @@ const FACE: Record<RoadTone, string> = {
 /** The key's lip: the same hue, a few shades down. */
 const LIP: Record<RoadTone, string> = {
   done: "rgb(4,120,87)",
-  current: "rgb(14,116,144)",
+  // The light theme's accent is orange — its lip follows (--road-lip-current).
+  current: "var(--road-lip-current, rgb(14,116,144))",
   // Light theme lifts these (globals.css → --road-lip-*): pale grey faces.
   open: "var(--road-lip-open, rgb(39,39,42))",
   locked: "var(--road-lip-locked, rgb(24,24,27))",

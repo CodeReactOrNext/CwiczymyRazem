@@ -2,6 +2,7 @@ import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { addDays, format, isSameDay, startOfWeek } from "date-fns";
 import { useTranslation } from "hooks/useTranslation";
+import { useColorTheme } from "lib/colorTheme/colorTheme";
 import { useDateFnsLocale, useIntlLocale } from "lib/i18n/dateLocale";
 import {
   Bar,
@@ -100,12 +101,47 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 const DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+/**
+ * Chart ink per theme. Recharts takes these as SVG attributes, which cannot read
+ * the theme's CSS variables, so the light page gets its own set: the white
+ * scaffolding and today's white label vanished on a light card.
+ */
+const CHART_INK = {
+  dark: {
+    today: "#f4f4f5",
+    future: "#52525b",
+    met: "#a1a1aa",
+    missed: "#71717a",
+    barLabelMet: "#f4f4f5",
+    barLabel: "#a1a1aa",
+    track: "rgba(255,255,255,0.03)",
+    cursor: "rgba(255,255,255,0.04)",
+    goalLine: "rgba(255,255,255,0.35)",
+    empty: "rgba(255,255,255,0.06)",
+    progress: "rgba(6,182,212,0.6)",
+  },
+  light: {
+    today: "#18181b",
+    future: "#a1a1aa",
+    met: "#52525b",
+    missed: "#71717a",
+    barLabelMet: "#18181b",
+    barLabel: "#52525b",
+    track: "rgba(24,24,27,0.05)",
+    cursor: "rgba(24,24,27,0.05)",
+    goalLine: "rgba(24,24,27,0.3)",
+    empty: "rgba(24,24,27,0.08)",
+    progress: "rgba(217,119,6,0.85)",
+  },
+};
+
 export const PracticeStatsWidget = ({
   userStats,
   reportList,
   className,
 }: PracticeStatsWidgetProps) => {
   const { t } = useTranslation("profile");
+  const ink = CHART_INK[useColorTheme()];
   const today = new Date();
   const dateFnsLocale = useDateFnsLocale();
   const intlLocale = useIntlLocale();
@@ -204,12 +240,12 @@ export const PracticeStatsWidget = ({
                   const showX = isPast && !day.isGoalMet;
 
                   const labelColor = day.isToday
-                    ? "#f4f4f5"
+                    ? ink.today
                     : day.isFuture
-                    ? "#52525b"
+                    ? ink.future
                     : day.isGoalMet
-                    ? "#a1a1aa"
-                    : "#71717a";
+                    ? ink.met
+                    : ink.missed;
 
                   const cx = Number(x);
                   const labelY = Number(y) + 12;
@@ -250,7 +286,7 @@ export const PracticeStatsWidget = ({
 
               <ReferenceLine
                 y={DAILY_GOAL_MIN}
-                stroke="rgba(255,255,255,0.35)"
+                stroke={ink.goalLine}
                 strokeDasharray="4 3"
                 label={{
                   value: "15 min",
@@ -263,7 +299,7 @@ export const PracticeStatsWidget = ({
 
               <Tooltip
                 content={<CustomTooltip />}
-                cursor={{ fill: "rgba(255,255,255,0.04)" }}
+                cursor={{ fill: ink.cursor }}
                 allowEscapeViewBox={{ x: false, y: true }}
                 wrapperStyle={{ zIndex: 20 }}
               />
@@ -272,7 +308,7 @@ export const PracticeStatsWidget = ({
                 dataKey="minutes"
                 maxBarSize={36}
                 isAnimationActive={false}
-                background={{ fill: "rgba(255,255,255,0.03)", radius: 3 }}
+                background={{ fill: ink.track, radius: 3 }}
                 shape={(props: any) => {
                   const { x, y, width, height, payload } = props;
                   const isUnfulfilled = !payload.isGoalMet && !payload.isFuture && !payload.isToday;
@@ -284,16 +320,16 @@ export const PracticeStatsWidget = ({
                     return <g />;
                   }
 
-                  let fill = "rgba(6,182,212,0.6)";
+                  let fill = ink.progress;
                   if (payload.isGoalMet) {
                     fill = "rgba(74,222,128,0.75)";
                   } else if (isUnfulfilled) {
                     fill = "rgba(239, 68, 68, 0.4)";
                   } else if (payload.minutes === 0) {
-                    fill = "rgba(255,255,255,0.06)";
+                    fill = ink.empty;
                   }
 
-                  const labelColor = payload.isGoalMet ? "#f4f4f5" : "#a1a1aa";
+                  const labelColor = payload.isGoalMet ? ink.barLabelMet : ink.barLabel;
                   const label = formatBarLabel(payload.totalMs);
 
                   return (

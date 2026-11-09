@@ -73,7 +73,7 @@ const INK_LIGHT: typeof INK_DARK = {
   muted: "#52525b",
   faint: "#71717a",
   done: "#059669",
-  next: "#0891b2",
+  next: "#d97706",
   locked: "#a16207",
 };
 

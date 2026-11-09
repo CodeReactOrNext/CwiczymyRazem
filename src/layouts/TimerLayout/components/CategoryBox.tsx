@@ -133,7 +133,9 @@ const CategoryBox = ({
     const gradientColor2 = `${skillColor}05`;
 
     return {
-      background: `linear-gradient(135deg, #171717 0%, ${gradientColor1} 45%, ${gradientColor2} 55%, #171717 100%)`,
+      // The card's own surface from the palette (a white card in the light
+      // theme), the skill colour washed through it.
+      background: `linear-gradient(135deg, rgb(var(--c-zinc-900)) 0%, ${gradientColor1} 45%, ${gradientColor2} 55%, rgb(var(--c-zinc-900)) 100%)`,
       backgroundSize: "400% 400%",
       animation: isActive ? "subtleGradientAnimation 8s ease infinite" : "none",
     };
@@ -151,7 +153,7 @@ const CategoryBox = ({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-[#171717] p-5 text-white transition-colors duration-base ${
+      className={`relative overflow-hidden rounded-xl bg-zinc-900 p-5 text-white transition-colors duration-base ${
         isActive ? "z-10" : ""
       } ${showControls ? "cursor-pointer" : ""}`}
       style={{

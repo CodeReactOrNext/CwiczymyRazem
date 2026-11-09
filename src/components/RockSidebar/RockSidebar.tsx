@@ -121,7 +121,7 @@ const SidebarNavLink = ({
       }}
       className={`relative flex min-h-11 items-center gap-3 overflow-hidden rounded-lg px-3 py-2 text-sm font-medium transition-all duration-base active:scale-[0.98] ${
         isActive
-          ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
+          ? "nav-active bg-cyan-500/10 text-cyan-300 shadow-sm"
           : muted
             ? "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
             : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
@@ -241,7 +241,7 @@ const SidebarExpandableNavLink = ({
       <div
         className={`relative flex items-center overflow-hidden rounded-lg text-sm font-medium transition-all duration-base ${
           isActive
-            ? "bg-cyan-500/10 text-cyan-300 shadow-sm"
+            ? "nav-active bg-cyan-500/10 text-cyan-300 shadow-sm"
             : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
         }`}>
         <Link

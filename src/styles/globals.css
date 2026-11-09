@@ -459,6 +459,20 @@ html.theme-light:has([data-app-shell]) .dark {
 }
 
 html.theme-light:has([data-app-shell]) .dark-theme {
+  /* The themer's "main" accent follows the light theme's gold. */
+  --colors-main: 217, 119, 6;
+  --colors-main-bg: 217, 119, 6;
+  --colors-main-calendar: 217, 119, 6;
+  --colors-main-50: 244, 244, 245;
+  --colors-main-100: 228, 228, 231;
+  --colors-main-200: 212, 212, 216;
+  --colors-main-300: 180, 83, 9;
+  --colors-main-400: 217, 119, 6;
+  --colors-main-500: 217, 119, 6;
+  --colors-main-600: 217, 119, 6;
+  --colors-main-700: 180, 83, 9;
+  --colors-main-800: 146, 64, 14;
+  --colors-main-900: 120, 53, 15;
   --colors-mainText: 24, 24, 27;
   --colors-secondText: 82, 82, 91;
   --colors-tertiary: 82, 82, 91;
@@ -753,14 +767,14 @@ html.theme-light:has([data-app-shell]) a.support-warm:hover {
   background-color: #222226 !important;
 }
 html.theme-light:has([data-app-shell]) .support-warm .funding-amount {
-  color: #fb923c !important;
+  color: #fbbf24 !important;
 }
 html.theme-light:has([data-app-shell]) .support-warm .funding-track {
   background-color: #3f3f46 !important;
 }
 html.theme-light:has([data-app-shell]) .support-warm .funding-bar {
   background-image: none !important;
-  background-color: #fb923c !important;
+  background-color: #f59e0b !important;
 }
 
 /* The Motivate key (LogReaction) on an ink supporter card: its zinc-800/60
@@ -778,6 +792,7 @@ html.theme-light:has([data-app-shell]) .support-warm [class*="bg-zinc-800/60"]:h
 html.theme-light:has([data-app-shell]) {
   --road-lip-open: #a1a1aa;
   --road-lip-locked: #c4c4c9;
+  --road-lip-current: #b45309;
 }
 
 /* Recharts on a light page. The charts pass white strokes/fills as SVG
@@ -824,4 +839,11 @@ html.theme-light:has([data-app-shell]) .scale-board {
 html.theme-light:has([data-app-shell]) .support-warm svg.light-hide {
   display: block !important;
   opacity: 0.07;
+}
+
+/* Ink & gold: the active sidebar entry is an ink pill — white label, its
+   icon and dot in the gold accent (they draw full cyan, which is gold here). */
+html.theme-light:has([data-app-shell]) .nav-active {
+  background-color: #18181b !important;
+  color: #ffffff !important;
 }

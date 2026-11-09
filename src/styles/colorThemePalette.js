@@ -133,6 +133,18 @@ const themedColors = () => {
     colors[name] = {};
     for (const shade of SHADES) colors[name][shade] = withAlpha(varName(name, shade));
   }
+  // cyan is the app's interaction accent. The light theme ("ink & gold") splits
+  // it by use: a faint tint (an explicit alpha below 1 — bg-cyan-500/10, hover
+  // washes) reads its --c-cyan-t-* variable, which is ink there, so selections
+  // are neutral greys instead of pastel; a full colour (text, bars, solid
+  // fills) reads --c-cyan-*, which is gold. In the dark theme both are cyan.
+  for (const shade of SHADES) {
+    colors.cyan[shade] = ({ opacityValue }) => {
+      const alpha = opacityValue === undefined ? "1" : String(opacityValue);
+      const isTint = /^(0|0?\.\d+)$/.test(alpha);
+      return `rgb(var(${isTint ? `--c-cyan-t-${shade}` : varName("cyan", shade)}) / ${alpha})`;
+    };
+  }
   const arsenal = (key) => withAlpha(`--c-arsenal-${key}`);
   colors.arsenal = {
     bg: arsenal("bg"),
@@ -163,9 +175,16 @@ const themeVariables = () => {
   }
   for (const name of ACCENTS) {
     const palette = paletteOf(name);
+    // Light theme "ink & gold" (owner's pick): full cyan is gold (the amber
+    // scale), tinted cyan is ink — see themedColors().
+    const lightPalette = name === "cyan" ? paletteOf("amber") : palette;
     for (const shade of SHADES) {
       dark[varName(name, shade)] = hexToRgb(palette[shade]);
-      light[varName(name, shade)] = hexToRgb(palette[ACCENT_LIGHT_MAP[shade]]);
+      light[varName(name, shade)] = hexToRgb(lightPalette[ACCENT_LIGHT_MAP[shade]]);
+      if (name === "cyan") {
+        dark[`--c-cyan-t-${shade}`] = hexToRgb(palette[shade]);
+        light[`--c-cyan-t-${shade}`] = "24 24 27";
+      }
     }
   }
   for (const [key, [darkHex, lightHex]] of Object.entries(ARSENAL)) {
