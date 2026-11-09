@@ -870,3 +870,19 @@ html.theme-light:has([data-app-shell]) .chip-cyan:not(.force-dark *) {
 html.theme-light:has([data-app-shell]) .chip-cyan:not(.force-dark *):hover {
   background-color: #27272a !important;
 }
+
+/* Achievement icons (AchievementIcon) are tinted by rarity in colours picked
+   to glow on black — white, ice blue, pale yellow. On white they vanish, so
+   the light theme takes the same hues at their deep end. */
+html.theme-light:has([data-app-shell]) .text-achievements-common:not(.force-dark *) {
+  color: #52525b !important;
+}
+html.theme-light:has([data-app-shell]) .text-achievements-rare:not(.force-dark *) {
+  color: #0e7490 !important;
+}
+html.theme-light:has([data-app-shell]) .text-achievements-veryRare:not(.force-dark *) {
+  color: #b45309 !important;
+}
+html.theme-light:has([data-app-shell]) .text-achievements-epic:not(.force-dark *) {
+  color: #6d28d9 !important;
+}

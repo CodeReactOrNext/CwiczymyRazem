@@ -1319,6 +1319,10 @@ const PracticeSessionInner = ({
 
   return (
     <GuitarTuningProvider value={guitarTuning}>
+    {/* The session pages (/practice/exercise, boss, duel, goal…) render outside
+        the app shell, and the light palette only switches on while a
+        [data-app-shell] is on the page — this keeps the player's theme. */}
+    <span data-app-shell hidden />
     <NoteMatchingProvider
       handleRef={noteMatchingHandle} isPlaying={isPlaying} startTime={metronome.startTime}
       audioContext={metronome.audioContext} audioStartTime={metronome.audioStartTime}
