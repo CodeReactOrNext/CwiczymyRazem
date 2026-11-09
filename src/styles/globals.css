@@ -652,6 +652,7 @@ html.theme-light:has([data-app-shell]) *::after {
    part tiers, condition grades, case tiers — darkened to the 700 step of the
    same hue so they read on white. Dark theme leaves these undefined. */
 html.theme-light:has([data-app-shell]) {
+  --ink-mix: 45%;
   --tx-a1a1aa: #52525b;
   --tx-d4d4d8: #52525b;
   --tx-9ca3af: #4b5563;
@@ -677,6 +678,7 @@ html.theme-light:has([data-app-shell]) {
   --tx-7fffff: #0e7490;
 }
 html.theme-light:has([data-app-shell]) .force-dark {
+  --ink-mix: 0%;
   --tx-a1a1aa: initial; --tx-d4d4d8: initial; --tx-9ca3af: initial;
   --tx-10b981: initial; --tx-34d399: initial; --tx-3b82f6: initial;
   --tx-38bdf8: initial; --tx-818cf8: initial; --tx-a855f7: initial;

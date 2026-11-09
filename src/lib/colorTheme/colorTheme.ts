@@ -56,5 +56,18 @@ export const COLOR_THEME_BOOT_SCRIPT = `try{if(localStorage.getItem(${JSON.strin
  * known bright hex to a darker shade of the same hue (see globals.css). Only
  * for text — backgrounds and tints keep the raw hex.
  */
+/**
+ * Any accent hex (a guild's colour, an item rarity) as ink that reads in both
+ * themes, for hexes too many to map one by one like readableText does. It is
+ * the hex mixed with black by --ink-mix: 0% in the dark theme (the hex as is),
+ * about half in the light one, which turns a glowing cyan into a deep teal.
+ */
+export const inkAccent = (hex: string): string =>
+  `color-mix(in srgb, ${hex}, #000 var(--ink-mix, 0%))`;
+
+/** A faint wash of inkAccent(hex), for a chip or plate behind that ink. */
+export const inkWash = (hex: string, percent: number): string =>
+  `color-mix(in srgb, ${inkAccent(hex)} ${percent}%, transparent)`;
+
 export const readableText = (hex: string | undefined): string | undefined =>
   hex && /^#[0-9a-fA-F]{6}$/.test(hex) ? `var(--tx-${hex.slice(1).toLowerCase()}, ${hex})` : hex;

@@ -1,3 +1,4 @@
+import { inkAccent } from "lib/colorTheme/colorTheme";
 import type { CSSProperties } from "react";
 
 /**
@@ -243,7 +244,9 @@ export const frameStyle = (
   const colour = safe(hex);
   // Every mark below except frame:solid's cutout letters is drawn straight in
   // the accent — fine on the app's dark cards, unreadable on a white one.
-  const mark = tone === "light" ? darken(colour, 0.35) : colour;
+  // The dark tone also darkens through inkAccent once the app is in its light
+  // theme (a no-op in the dark one).
+  const mark = tone === "light" ? darken(colour, 0.35) : inkAccent(colour);
   // frame:double's gap is painted in the surface it sits on, so it reads as a
   // gap whatever the badge lands on: near-black on the app's dark pages,
   // white on the light tooltip card.

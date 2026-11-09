@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "assets/components/ui/select";
 import { useTranslation } from "hooks/useTranslation";
+import { useColorTheme } from "lib/colorTheme/colorTheme";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import * as React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
@@ -108,6 +109,11 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
   }, [processedData]);
 
   const chartColor = isNegative ? "#f43f5e" : "#10b981";
+  // SVG attributes can't read the palette's CSS variables, so the axis ink is
+  // picked here: white washes on the dark card, zinc ink on the light one.
+  const isLight = useColorTheme() === "light";
+  const ink = (alpha: number) =>
+    isLight ? `rgba(24,24,27,${Math.min(1, alpha * 1.3)})` : `rgba(255,255,255,${alpha})`;
 
   return (
     <Card className={className}>
@@ -168,7 +174,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
             <CartesianGrid
               vertical={false}
               strokeDasharray='3 3'
-              stroke='rgba(255,255,255,0.1)'
+              stroke={ink(0.1)}
             />
             <XAxis
               dataKey='date'
@@ -176,7 +182,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
               axisLine={false}
               tickMargin={12}
               minTickGap={32}
-              stroke='rgba(255,255,255,0.5)'
+              stroke={ink(0.5)}
               className='font-openSans text-xs font-bold'
               tickFormatter={(value) => {
                 const date = new Date(value);
@@ -191,7 +197,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
               axisLine={false}
               tickMargin={12}
               width={40}
-              stroke='rgba(255,255,255,0.5)'
+              stroke={ink(0.5)}
               className='font-openSans text-xs font-bold'
               tickCount={5}
               domain={[0, (dataMax: number) => {
@@ -206,7 +212,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
             />
             <ChartTooltip
               cursor={{
-                stroke: "rgba(255,255,255,0.2)",
+                stroke: ink(0.2),
                 strokeWidth: 1,
                 strokeDasharray: "3 3",
               }}
@@ -255,7 +261,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
                     r={3}
                     fill={chartColor}
                     strokeWidth={1.5}
-                    stroke='#09090b'
+                    stroke={isLight ? "#ffffff" : "#09090b"}
                     fillOpacity={1}
                   />
                 );

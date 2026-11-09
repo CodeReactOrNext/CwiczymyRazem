@@ -48,7 +48,7 @@ export const CaseProgress = ({ className }: { className?: string }) => {
           className='h-full rounded-full bg-amber-400 px-2 pt-1 transition-[width] duration-500'
           style={{ width: `${(filled / FEATURE_GOALS_PER_CASE) * 100}%` }}>
           {/* The light catching the top of the bar. */}
-          <div className='h-1 rounded-full bg-white/35' />
+          <div className='light-hide h-1 rounded-full bg-white/35' />
         </div>
       </div>
     </div>

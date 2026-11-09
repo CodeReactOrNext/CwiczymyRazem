@@ -12,6 +12,7 @@ import {
   shiftHue,
   tint,
 } from "feature/guilds/utils/guildCosmetics.style";
+import { inkAccent } from "lib/colorTheme/colorTheme";
 import { describe, expect, it } from "vitest";
 
 const stringify = (styles: object[]): string =>
@@ -137,7 +138,7 @@ describe("bannerLook", () => {
 
 describe("frameStyle and crestStyle", () => {
   it("colour the tag and the crest with the accent", () => {
-    expect(frameStyle("frame:plain", "#a78bfa")).toEqual({ color: "#a78bfa" });
+    expect(frameStyle("frame:plain", "#a78bfa")).toEqual({ color: inkAccent("#a78bfa") });
     expect(frameStyle("frame:heavy", "#a78bfa").boxShadow).toContain("#a78bfa");
     expect(crestStyle("#a78bfa").color).toBe("#a78bfa");
     expect(crestStyle("#a78bfa").backgroundImage).toContain("#a78bfa");
@@ -158,7 +159,7 @@ describe("frameStyle and crestStyle", () => {
     });
     for (const frame of GUILD_FRAMES) {
       if (frame.id === "frame:solid") continue;
-      expect(frameStyle(frame.id, "#a78bfa").color).toBe("#a78bfa");
+      expect(frameStyle(frame.id, "#a78bfa").color).toBe(inkAccent("#a78bfa"));
     }
   });
 
@@ -169,7 +170,7 @@ describe("frameStyle and crestStyle", () => {
   });
 
   it("fall back to grey rather than to an unset colour", () => {
-    expect(frameStyle("frame:ring", "").color).toBe("#a1a1aa");
+    expect(frameStyle("frame:ring", "").color).toBe(inkAccent("#a1a1aa"));
     expect(crestStyle("").color).toBe("#a1a1aa");
   });
 

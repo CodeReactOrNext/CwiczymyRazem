@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
+import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import * as React from "react";
 
 const chipVariants = cva(
@@ -38,8 +39,8 @@ Chip.displayName = "Chip";
 /** Translucent tinted fill + full-strength hex text, for `color="custom"` chips driven by a
  * runtime hex (rarity/tier colors) instead of a fixed Tailwind color name. */
 export const getChipCustomStyle = (hex: string): React.CSSProperties => ({
-  backgroundColor: `${hex}1a`,
-  color: hex,
+  backgroundColor: inkWash(hex, 10),
+  color: inkAccent(hex),
 });
 
 export { Chip, chipVariants };
