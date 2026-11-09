@@ -117,7 +117,7 @@ const NominationRow = ({
             <Music className='h-4 w-4' />
           </div>
         )}
-        <span className='absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100'>
+        <span className='force-dark absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100'>
           <Play className='h-4 w-4 fill-current' />
         </span>
       </div>

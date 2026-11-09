@@ -56,9 +56,11 @@ export const GuitarPatternBackground = ({
 
   return (
     <svg
-      className={
+      // light-hide: a texture drawn for a dark page; the app's light theme drops
+      // it (public pages never render the app shell, so they keep it).
+      className={`light-hide ${
         className ?? "pointer-events-none absolute inset-0 h-full w-full"
-      }
+      }`}
       style={{ opacity }}
       aria-hidden='true'>
       <defs>

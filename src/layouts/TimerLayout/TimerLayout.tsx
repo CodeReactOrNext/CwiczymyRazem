@@ -117,7 +117,8 @@ const AnimatedTimerDisplay = ({
   };
 
   return (
-    <div className='relative h-64 w-64'>
+    // force-dark: the dial is a dark disc in either theme, and so is its text.
+    <div className='force-dark relative h-64 w-64'>
       {/* Ciemne tło timera z kolorowym gradientem */}
       <div
         className='absolute inset-0 rounded-full bg-black/80'

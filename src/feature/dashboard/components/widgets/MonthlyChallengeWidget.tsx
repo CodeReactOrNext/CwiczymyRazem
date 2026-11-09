@@ -111,7 +111,7 @@ export const MonthlyChallengeWidget = () => {
                       ) : (
                         <Music size={14} className='text-zinc-500' />
                       )}
-                      <span className='absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100'>
+                      <span className='force-dark absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100'>
                         <Play size={14} className='fill-current' />
                       </span>
                     </span>

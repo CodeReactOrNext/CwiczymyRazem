@@ -14,6 +14,7 @@ import { SONG_COVER_STYLE, songCoverLayoutId } from "feature/songs/utils/songCov
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { transitions } from "lib/motion/motion";
 import { useSharedElement } from "lib/motion/useSharedElement";
 import {
@@ -124,7 +125,7 @@ export const SongCard = ({
         )}
 
         {/* Top scrim for badge legibility */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent" />
+        <div className="force-dark pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent" />
 
         {/* Status badge (top-left) */}
         {userStatus && (() => {
@@ -258,11 +259,11 @@ export const SongCard = ({
             className="flex shrink-0 items-center gap-2 rounded-[4px] px-2 py-1"
             style={{ backgroundColor: `${tier.color}14` }}
           >
-            <span className="text-[11px] font-semibold leading-none" style={{ color: tier.color }}>
+            <span className="text-[11px] font-semibold leading-none" style={{ color: readableText(tier.color) }}>
               {tier.tier}
             </span>
             <span className="h-3 w-px" style={{ backgroundColor: `${tier.color}33` }} />
-            <span className="text-sm font-semibold leading-none tabular-nums" style={{ color: tier.color }}>
+            <span className="text-sm font-semibold leading-none tabular-nums" style={{ color: readableText(tier.color) }}>
               {avgDifficulty.toFixed(1)}
             </span>
           </div>

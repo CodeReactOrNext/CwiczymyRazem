@@ -28,7 +28,7 @@ export const GuideVideoLessons = ({ lessons }: GuideVideoLessonsProps) => {
                 loading='lazy'
                 className='h-full w-full object-cover'
               />
-              <div className='absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/50'>
+              <div className='force-dark absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/50'>
                 <div className='flex h-11 w-11 items-center justify-center rounded-full bg-red-600/90'>
                   <FaYoutube className='h-6 w-6 text-white' />
                 </div>

@@ -169,7 +169,7 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries, compact = fal
               >
                 <div className="relative overflow-hidden rounded">
                   <img src={video.thumbnail} alt="" className="aspect-video w-full object-cover" />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="force-dark absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                     <div className="rounded-full bg-white p-2.5 text-black">
                       <Play className="h-3.5 w-3.5 translate-x-px" />
                     </div>

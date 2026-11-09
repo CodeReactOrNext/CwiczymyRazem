@@ -34,7 +34,8 @@ export default function HomePreviewPage() {
     dispatch(
       restoreUserSnapshot({
         userAuth: "dev-home-preview",
-        userInfo: { displayName: "Riffer" } as UserSnapshot["userInfo"],
+        // feedbackAskedAt: keeps the feedback survey from covering the page.
+        userInfo: { displayName: "Riffer", feedbackAskedAt: Date.now() } as unknown as UserSnapshot["userInfo"],
         currentUserStats: DEMO_STATS,
       }),
     );

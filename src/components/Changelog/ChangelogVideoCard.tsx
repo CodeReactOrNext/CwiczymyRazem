@@ -74,7 +74,7 @@ export const ChangelogVideoCard = ({
           />
           <span
             aria-hidden
-            className='absolute inset-0 flex items-center justify-center bg-black/10 transition-colors duration-fast group-hover:bg-black/30'>
+            className='force-dark absolute inset-0 flex items-center justify-center bg-black/10 transition-colors duration-fast group-hover:bg-black/30'>
             <span className='flex h-12 w-12 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors duration-fast group-hover:bg-black/80'>
               <Play className='ml-0.5 h-5 w-5 fill-current' />
             </span>

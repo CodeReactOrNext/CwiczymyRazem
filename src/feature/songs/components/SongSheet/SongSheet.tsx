@@ -169,7 +169,7 @@ const SongSheet = ({
                   className="h-full w-full object-cover" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent" />
-                <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
+                <div className="force-dark absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
               </>
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-zinc-900">

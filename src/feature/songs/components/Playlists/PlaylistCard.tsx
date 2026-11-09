@@ -53,7 +53,7 @@ export const PlaylistCard = ({
         {/* Kind badge for special playlists (mirrors the song status badge) */}
         {meta.badge && (
           <>
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-black/40 to-transparent" />
+            <div className="force-dark pointer-events-none absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-black/40 to-transparent" />
             <div
               className={cn(
                 "absolute left-2 top-2 flex h-7 items-center gap-1.5 rounded-[4px] bg-zinc-900/80 px-2 shadow-md ring-1 backdrop-blur-md",

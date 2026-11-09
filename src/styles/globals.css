@@ -570,11 +570,22 @@ html.theme-light:has([data-app-shell]) {
   --ars-bench-dot: rgba(120, 80, 40, 0.1);
 }
 
-/* The game-key lip (PRESSABLE in ui/button: a 3px black-tinted bottom border).
-   With black inverted in the light theme it read as a smudged shadow — flat
-   keys instead; the 2px press still works. Dark (force-dark) cards keep it. */
-html.theme-light:has([data-app-shell]) [class*="border-b-[3px]"]:not(.force-dark *) {
-  border-bottom-color: transparent !important;
+/* The game-key lip (PRESSABLE in ui/button: a 3px black-tinted bottom
+   border). Black is inverted in the light theme, so a border-b-black/* lip
+   would turn white — pin it back to a dark tint. A near-black key (primary, or
+   a bg-white face that the light theme turns to ink) gets a slightly lighter
+   face and a solid black lip, or the lip would vanish into the face. */
+html.theme-light:has([data-app-shell]) [class*="border-b-[3px]"][class*="border-b-black"]:not(.force-dark *) {
+  border-bottom-color: rgb(0 0 0 / 0.22) !important;
+}
+html.theme-light:has([data-app-shell])
+  :is(.bg-primary, .bg-white)[class*="border-b-[3px]"]:not(.force-dark *) {
+  background-color: #27272a !important;
+  border-bottom-color: #000000 !important;
+}
+html.theme-light:has([data-app-shell])
+  :is(.bg-primary, .bg-white)[class*="border-b-[3px]"]:not(.force-dark *):hover {
+  background-color: #34343a !important;
 }
 
 /* `light-tint`: a decorative tint gradient (from-X/10 to-transparent and the
@@ -586,8 +597,9 @@ html.theme-light:has([data-app-shell]) .light-tint {
 
 /* The light theme is flat: Tailwind's shadow-* / drop-shadow-* utilities (and
    the arbitrary glows built on them) resolve to nothing. Rings share
-   box-shadow but use their own variables, so focus rings stay. */
-html.theme-light:has([data-app-shell]) *,
+   box-shadow but use their own variables, so focus rings stay. Road keys
+   (RoadPathNode, style --lip) are exempt: their shadow *is* the key's lip. */
+html.theme-light:has([data-app-shell]) *:not([style*="--lip"]),
 html.theme-light:has([data-app-shell]) *::before,
 html.theme-light:has([data-app-shell]) *::after {
   --tw-shadow: 0 0 #0000 !important;
@@ -616,6 +628,12 @@ html.theme-light:has([data-app-shell]) {
   --tx-06b6d4: #0e7490;
   --tx-d4a373: #92400e;
   --tx-b45454: #991b1b;
+  /* Song tiers (getSongTier): pastel S–E on a dark page. */
+  --tx-ff7f7f: #b91c1c;
+  --tx-ffbf7f: #c2410c;
+  --tx-ffff7f: #a16207;
+  --tx-7fff7f: #15803d;
+  --tx-7fffff: #0e7490;
 }
 html.theme-light:has([data-app-shell]) .force-dark {
   --tx-a1a1aa: initial; --tx-d4d4d8: initial; --tx-9ca3af: initial;
@@ -624,6 +642,8 @@ html.theme-light:has([data-app-shell]) .force-dark {
   --tx-c084fc: initial; --tx-f43f5e: initial; --tx-fbbf24: initial;
   --tx-f59e0b: initial; --tx-67e8f9: initial; --tx-06b6d4: initial;
   --tx-d4a373: initial; --tx-b45454: initial;
+  --tx-ff7f7f: initial; --tx-ffbf7f: initial; --tx-ffff7f: initial;
+  --tx-7fff7f: initial; --tx-7fffff: initial;
 }
 
 /* Rig display (GuitarRack). The lit niches stay exactly as in the dark theme
@@ -725,4 +745,11 @@ html.theme-light:has([data-app-shell]) .support-warm [class*="bg-zinc-800/60"] {
 }
 html.theme-light:has([data-app-shell]) .support-warm [class*="bg-zinc-800/60"]:hover {
   background-color: #3f3f46 !important;
+}
+
+/* Road keys (Journey) on a light page: the grey stops' lips were near-black
+   under a pale face — lift them to a grey a few shades down, like the others. */
+html.theme-light:has([data-app-shell]) {
+  --road-lip-open: #a1a1aa;
+  --road-lip-locked: #c4c4c9;
 }

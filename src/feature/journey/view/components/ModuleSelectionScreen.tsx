@@ -84,7 +84,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
     <div className="relative min-h-screen w-full overflow-y-auto overflow-x-hidden bg-zinc-950">
       {/* Ambient depth — keeps the page from reading as flat black */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[420px]"
+        className="light-hide pointer-events-none absolute inset-x-0 top-0 h-[420px]"
         style={{ background: "radial-gradient(60% 100% at 50% 0%, rgba(6,182,212,0.08) 0%, transparent 70%)" }}
         aria-hidden
       />

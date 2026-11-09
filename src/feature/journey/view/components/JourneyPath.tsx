@@ -157,7 +157,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
       <div className='relative overflow-hidden px-6 py-10 md:px-10'>
         <GuitarPatternBackground className='pointer-events-none absolute inset-0 h-full w-full' />
         <div
-          className='pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full opacity-30'
+          className='light-hide pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full opacity-30'
           style={{
             background:
               "radial-gradient(ellipse at center, rgba(6,182,212,0.25) 0%, transparent 70%)",

@@ -89,7 +89,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
               : undefined,
           }}
         />
-        <div className='absolute inset-0 flex items-center justify-center bg-black/40 transition-colors group-hover/thumb:bg-black/25'>
+        <div className='force-dark absolute inset-0 flex items-center justify-center bg-black/40 transition-colors group-hover/thumb:bg-black/25'>
           <span className='rounded-full bg-white/15 p-3.5 backdrop-blur-sm transition-colors group-hover/thumb:bg-white/25'>
             <Play className='h-6 w-6 fill-current text-white' />
           </span>

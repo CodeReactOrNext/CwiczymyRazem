@@ -170,7 +170,7 @@ const Lamp = ({ color, level }: LampProps) => {
       />
       {/* The wall darkens just above the floor, so the floor reads as a lit
           surface meeting a dark one rather than as a stripe on the wall. */}
-      <div className='pointer-events-none absolute inset-x-0 bottom-[2%] h-1/5 bg-gradient-to-t from-black/75 to-transparent' />
+      <div className='force-dark pointer-events-none absolute inset-x-0 bottom-[2%] h-1/5 bg-gradient-to-t from-black/75 to-transparent' />
       {/* The floor: the wall's own bottom colour, lit where the beam lands on
           it and falling into shadow toward both sides — the lit patch is an
           ellipse, the lightening of the surface fades out sideways with it,

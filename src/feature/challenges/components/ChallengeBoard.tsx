@@ -133,7 +133,7 @@ const ChallengeRow = ({
               <Music className='h-5 w-5' />
             </div>
           )}
-          <span className='absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100'>
+          <span className='force-dark absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100'>
             <Play className='h-5 w-5 fill-current' />
           </span>
         </div>

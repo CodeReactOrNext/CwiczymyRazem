@@ -29,8 +29,9 @@ const FACE: Record<RoadTone, string> = {
 const LIP: Record<RoadTone, string> = {
   done: "rgb(4,120,87)",
   current: "rgb(14,116,144)",
-  open: "rgb(39,39,42)",
-  locked: "rgb(24,24,27)",
+  // Light theme lifts these (globals.css → --road-lip-*): pale grey faces.
+  open: "var(--road-lip-open, rgb(39,39,42))",
+  locked: "var(--road-lip-locked, rgb(24,24,27))",
   streak: "rgb(194,65,12)",
 };
 
@@ -133,7 +134,7 @@ export const RoadPathNode = ({
           {!locked && (
             <span
               aria-hidden
-              className='pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/30 via-white/0 to-black/10'
+              className='light-hide pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/30 via-white/0 to-black/10'
             />
           )}
           <span className='relative'>{icon}</span>

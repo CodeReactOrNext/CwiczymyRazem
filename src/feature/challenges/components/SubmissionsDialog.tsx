@@ -82,7 +82,7 @@ export const SubmissionsDialog = ({
                     ) : (
                       <Music className='h-4 w-4 text-zinc-600' />
                     )}
-                    <span className='absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100'>
+                    <span className='force-dark absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100'>
                       <Play className='h-5 w-5 fill-current' />
                     </span>
                   </span>

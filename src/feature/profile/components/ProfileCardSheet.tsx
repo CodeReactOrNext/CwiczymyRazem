@@ -368,7 +368,7 @@ const StyleTab = ({ layout, onChange, earned }: EditorProps) => {
                     banner.layers ??
                     "radial-gradient(ellipse 55% 100% at 85% 100%, rgba(234,88,12,0.3), transparent 70%), #18181b",
                 }}>
-                <span className='absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent px-2.5 pb-2 pt-6'>
+                <span className='force-dark absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent px-2.5 pb-2 pt-6'>
                   <span
                     className={cn(
                       "text-xs font-semibold",
@@ -380,7 +380,7 @@ const StyleTab = ({ layout, onChange, earned }: EditorProps) => {
                   {!isUnlocked && <Lock size={12} className='text-zinc-400' />}
                 </span>
                 {!isUnlocked && (
-                  <span className='absolute inset-0 flex items-center bg-black/60 px-3 text-[11px] leading-snug text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100'>
+                  <span className='force-dark absolute inset-0 flex items-center bg-black/60 px-3 text-[11px] leading-snug text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100'>
                     {L.bannerRequirement(banner)}
                   </span>
                 )}

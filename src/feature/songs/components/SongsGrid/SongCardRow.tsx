@@ -85,7 +85,7 @@ export const SongCardRow = ({
           {tier.tier}
         </span>
         {statusMeta && StatusIcon && (
-          <div className="absolute inset-x-0 bottom-0 flex items-end justify-start bg-gradient-to-t from-black/60 to-transparent p-1">
+          <div className="force-dark absolute inset-x-0 bottom-0 flex items-end justify-start bg-gradient-to-t from-black/60 to-transparent p-1">
             <StatusIcon className={cn("h-3.5 w-3.5 drop-shadow", statusMeta.color)} />
           </div>
         )}

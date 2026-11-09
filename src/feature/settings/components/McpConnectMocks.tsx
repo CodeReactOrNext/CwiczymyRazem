@@ -292,7 +292,7 @@ export const ClaudeAddConnectorScreen = ({ url }: { url: string }) => (
   <BrowserFrame url='claude.ai/settings/connectors' tab='Settings - Claude'>
     <div className='relative h-full'>
       <ClaudeSettings dim />
-      <div className='absolute inset-0 flex items-center justify-center bg-black/40'>
+      <div className='force-dark absolute inset-0 flex items-center justify-center bg-black/40'>
         <div
           className='w-[420px] space-y-4 rounded-2xl p-6'
           style={{ background: CLAUDE.card, color: CLAUDE.text }}>
