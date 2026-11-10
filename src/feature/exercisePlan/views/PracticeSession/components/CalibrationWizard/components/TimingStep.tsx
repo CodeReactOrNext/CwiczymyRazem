@@ -31,7 +31,7 @@ export const TimingStep = ({
 }: TimingStepProps) => {
   const { t } = useTranslation(["calibration", "session"]);
   return (
-    <div className="flex flex-1 flex-col px-6 py-8 text-white sm:px-12 sm:py-10">
+    <div className="flex flex-1 flex-col px-5 py-5 text-white sm:px-12 sm:py-10 shortwide:px-8 shortwide:py-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <Timer className="h-4 w-4 text-zinc-400" />
@@ -54,7 +54,7 @@ export const TimingStep = ({
       <button
         type="button"
         onClick={onSkip}
-        className="mt-6 py-2 text-center text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+        className="mt-6 py-2 text-center text-xs text-zinc-500 transition-colors hover:text-zinc-300 shortwide:mt-2"
       >
         {t("calibration:timing_step.skip")}
       </button>

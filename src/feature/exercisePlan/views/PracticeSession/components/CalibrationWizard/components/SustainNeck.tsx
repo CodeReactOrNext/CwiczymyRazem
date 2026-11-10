@@ -4,7 +4,7 @@ import { memo } from "react";
 
 import type { GuitarString } from "../calibration.constants";
 
-const FRETS = 7;
+const DEFAULT_FRETS = 7;
 const CELL_W = 64;
 const ROW_H = 30;
 const LEFT = 44;
@@ -27,7 +27,7 @@ const LABEL_ON = "#fafafa";
 // Memoised: the step around it re-renders ~20×/s while the test runs, the neck
 // only when the dot lights up.
 export const SustainNeck = memo(function SustainNeck({
-  strings, string, fret, note, lit,
+  strings, string, fret, note, lit, frets: FRETS = DEFAULT_FRETS,
 }: {
   strings: GuitarString[];
   /** String number of the note (1 = thinnest). */
@@ -36,6 +36,8 @@ export const SustainNeck = memo(function SustainNeck({
   note: string;
   /** The note is being heard — the dot lights up. */
   lit: boolean;
+  /** Frets drawn — fewer on a phone, so the labels stay readable at its width. */
+  frets?: number;
 }) {
   const { t } = useTranslation("session");
   const leftHanded = useIsLeftHanded();

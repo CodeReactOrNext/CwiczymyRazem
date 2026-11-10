@@ -41,10 +41,14 @@ const IdleStep = ({
 }) => {
   const { t } = useTranslation("session");
   const Description = inDialog ? DialogDescription : "p";
+  // In the setup wizard on a phone held sideways: the picture and the why on the left, the
+  // steps and Start on the right. The dialog is too narrow for two columns.
+  const sideways = !inDialog;
   return (
-  <>
+  <div className={cn(sideways && "shortwide:grid shortwide:grid-cols-2 shortwide:items-start shortwide:gap-x-10")}>
+    <div>
     {/* Play along with the click — the picture says it before the text does. */}
-    <div className='relative mx-auto mt-6 h-36 w-full'>
+    <div className={cn("relative mx-auto mt-4 h-28 w-full sm:mt-6 sm:h-36", sideways && "shortwide:h-24")}>
       <Image
         src='/images/setup/timing.webp'
         alt=''
@@ -54,11 +58,14 @@ const IdleStep = ({
         draggable={false}
       />
     </div>
-    <Description className='mt-6 text-sm leading-relaxed text-zinc-400'>
+    <Description className={cn("mt-6 text-sm leading-relaxed text-zinc-400", sideways && "shortwide:mt-3")}>
       {t("timing.intro")}
     </Description>
+    </div>
 
-    <ol className='mt-6 space-y-3 text-sm text-zinc-300'>
+    <div>
+
+    <ol className={cn("mt-6 space-y-3 text-sm text-zinc-300", sideways && "shortwide:mt-4 shortwide:space-y-2")}>
       <Step n={1}>{t("timing.step1")}</Step>
       <Step n={2}>
         {t("timing.step2", {
@@ -70,7 +77,7 @@ const IdleStep = ({
       <Step n={3}>{t("timing.step3")}</Step>
     </ol>
 
-    <div className='mt-6 rounded-lg bg-zinc-900/60 px-4 py-3 text-sm'>
+    <div className={cn("mt-6 rounded-lg bg-zinc-900/60 px-4 py-3 text-sm", sideways && "shortwide:mt-3")}>
       <span className='text-zinc-400'>{t("timing.now_using")} </span>
       {savedLatencyMs !== null ? (
         <>
@@ -85,7 +92,7 @@ const IdleStep = ({
       )}
     </div>
 
-    <div className='mt-6 flex gap-2.5'>
+    <div className={cn("mt-6 flex gap-2.5", sideways && "shortwide:mt-3")}>
       {isListening ? (
         <Button onClick={onStart} className={PRIMARY}>{t("start")}</Button>
       ) : (
@@ -104,7 +111,8 @@ const IdleStep = ({
         {t("timing.forget")}
       </button>
     )}
-  </>
+    </div>
+  </div>
   );
 };
 

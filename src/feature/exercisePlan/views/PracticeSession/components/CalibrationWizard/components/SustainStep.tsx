@@ -5,6 +5,7 @@ import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useTranslation } from "hooks/useTranslation";
 import { ChevronLeft, ChevronRight, type LucideIcon, Music2, RefreshCw, Volume1, Volume2 } from "lucide-react";
 import React from "react";
+import { useResponsiveStore } from "store/useResponsiveStore";
 
 import type { GuitarString } from "../calibration.constants";
 import { useAutoGain } from "../hooks/useAutoGain";
@@ -96,6 +97,7 @@ export const SustainStep = React.memo(function SustainStep({
   const { t } = useTranslation("calibration");
   const { state, retry, passedOnce, lastFail } = useSustainCheck({ audioRefs, targetHz: target.hz, active: isListening });
   const autoGain = useAutoGain(audioRefs, inputGain, onInputGainChange);
+  const isMobile = useResponsiveStore((s) => s.isMobile);
 
   const progress = sustainProgress(state);
   const done = state.phase === "done";
@@ -119,8 +121,8 @@ export const SustainStep = React.memo(function SustainStep({
     : isWrongNote(state) || (state.phase === "holding" && state.clipped) ? "text-amber-400" : "text-zinc-300";
 
   return (
-    <div className="flex flex-1 flex-col px-6 py-8 text-white sm:px-12 sm:py-10">
-      <div className="mb-8 flex items-center justify-between gap-3">
+    <div className="flex flex-1 flex-col px-5 py-5 text-white sm:px-12 sm:py-10 shortwide:px-8 shortwide:py-4">
+      <div className="mb-6 flex items-center justify-between gap-3 sm:mb-8 shortwide:mb-3">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -135,25 +137,27 @@ export const SustainStep = React.memo(function SustainStep({
         <CloseButton onClick={onCancel} label={t("close")} />
       </div>
 
-      <div className="flex flex-1 flex-col gap-8">
-        <p className="text-lg font-medium text-zinc-100">
+      {/* Sideways: where to play on the left, what was heard and the gain on the right. */}
+      <div className="flex flex-1 flex-col gap-6 sm:gap-8 shortwide:grid shortwide:grid-cols-2 shortwide:grid-rows-[auto_auto_auto_1fr] shortwide:gap-x-10 shortwide:gap-y-4 shortwide:[grid-template-areas:'prompt_note'_'neck_note'_'neck_gain'_'neck_next']">
+        <p className="text-base font-medium text-zinc-100 sm:text-lg shortwide:text-base shortwide:[grid-area:prompt]">
           {t("sustain.play", { note: target.name, string: target.string, fret: target.fret })}
         </p>
 
         {/* Where to play it — a small neck, it only has to point at one spot. */}
-        <div className="mx-auto w-full max-w-md">
+        <div className="mx-auto w-full max-w-md shortwide:self-start shortwide:[grid-area:neck]">
           <SustainNeck
             strings={strings}
             string={target.string}
             fret={target.fret}
             note={target.name}
             lit={state.phase === "holding" || passed}
+            frets={isMobile ? target.fret + 1 : undefined}
           />
         </div>
 
         {/* How long it rang: the note as the tab draws it, filling as it is
             heard. The tick is the share that fills a tab note whole. */}
-        <div className="space-y-3">
+        <div className="space-y-3 shortwide:[grid-area:note]">
           <div className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
               <NoteLength progress={passed ? 1 : progress} failed={done && !passed} />
@@ -184,10 +188,10 @@ export const SustainStep = React.memo(function SustainStep({
 
         {/* Sensitivity: what's coming in (the wave), the slider, and the
             automatic setting as a plain link beside the value. */}
-        <div className="space-y-3">
-          <div className="flex items-baseline justify-between gap-3">
-            <span className="text-sm font-medium text-zinc-200">{t("setup.input_sensitivity")}</span>
-            <div className="flex items-baseline gap-4">
+        <div className="space-y-3 shortwide:[grid-area:gain]">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+            <span className="whitespace-nowrap text-sm font-medium text-zinc-200">{t("setup.input_sensitivity")}</span>
+            <div className="flex items-baseline gap-4 whitespace-nowrap">
               <button
                 type="button"
                 onClick={autoGain.startAutoGain}
@@ -215,8 +219,8 @@ export const SustainStep = React.memo(function SustainStep({
         </div>
 
         {/* No way past without the check: the note has to ring to the end. */}
-        <div className="mt-auto flex justify-end">
-          <Button onClick={onNext} disabled={!passedOnce} className="h-11 gap-2 px-6 text-base font-semibold">
+        <div className="mt-auto flex justify-end shortwide:[grid-area:next]">
+          <Button onClick={onNext} disabled={!passedOnce} className="h-12 w-full gap-2 px-6 text-base font-semibold sm:h-11 sm:w-auto">
             {t("sustain.next")}
             <ChevronRight className="h-4 w-4" />
           </Button>

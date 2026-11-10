@@ -94,7 +94,19 @@ const WizardBody = ({
 
   return (
     <div className="fixed inset-0 z-[99999999] flex items-center justify-center bg-black/80 font-openSans">
-      <div role="dialog" aria-modal="true" className="relative mx-4 flex max-h-[92dvh] min-h-[min(760px,92dvh)] w-full max-w-3xl flex-col overflow-y-auto rounded-lg bg-zinc-950">
+      {/* A phone gets the whole screen, upright or sideways — a floating card
+          there only lost height to its margins and pushed every step into
+          scrolling. */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="relative flex h-dvh w-full flex-col overflow-y-auto overscroll-contain bg-zinc-950 sm:mx-4 sm:h-auto sm:max-h-[92dvh] sm:min-h-[min(760px,92dvh)] sm:max-w-3xl sm:rounded-lg shortwide:m-0 shortwide:h-dvh shortwide:max-h-none shortwide:min-h-0 shortwide:max-w-none shortwide:rounded-none"
+        style={{
+          paddingTop: "env(safe-area-inset-top, 0px)",
+          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          paddingLeft: "env(safe-area-inset-left, 0px)",
+          paddingRight: "env(safe-area-inset-right, 0px)",
+        }}>
         {micError ? (
           <MicErrorScreen onRetry={() => { setMicError(false); void handleGrant(); }} onCancel={onCancel} />
         ) : (

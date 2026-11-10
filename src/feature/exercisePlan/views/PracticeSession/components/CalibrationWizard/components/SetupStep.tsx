@@ -206,8 +206,8 @@ export const SetupStep = React.memo(function SetupStep({
     : t("setup.title_mic");
 
   return (
-    <div className="flex flex-1 flex-col px-6 py-8 text-white sm:px-12 sm:py-10">
-      <div className="mb-8 flex items-center justify-between gap-3">
+    <div className="flex flex-1 flex-col px-5 py-5 text-white sm:px-12 sm:py-10 shortwide:px-8 shortwide:py-4">
+      <div className="mb-6 flex items-center justify-between gap-3 sm:mb-8 shortwide:mb-3">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -242,12 +242,12 @@ export const SetupStep = React.memo(function SetupStep({
           {isListening ? (
             // No further until the guitar has actually been heard: every
             // later step listens to it.
-            <Button onClick={onNext} disabled={!heard} className="h-11 gap-2 px-6 text-base font-semibold">
+            <Button onClick={onNext} disabled={!heard} className="h-12 w-full gap-2 px-6 text-base font-semibold sm:h-11 sm:w-auto">
               {t("setup.next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={onGrant} disabled={isLoading} className="h-11 gap-2 px-6 text-base font-semibold">
+            <Button onClick={onGrant} disabled={isLoading} className="h-12 w-full gap-2 px-6 text-base font-semibold sm:h-11 sm:w-auto">
               {isLoading ? t("setup.connecting") : isNative ? t("setup.start_listening") : t("setup.grant")}
             </Button>
           )}

@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { useIsLandscape } from "hooks/useIsLandscape";
 import { useTranslation } from "hooks/useTranslation";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
@@ -14,7 +15,7 @@ interface SourceStepProps {
 }
 
 const Header = ({ title, onCancel, closeLabel }: { title: string; onCancel: () => void; closeLabel: string }) => (
-  <div className="mb-8 flex items-center justify-between gap-3">
+  <div className="mb-6 flex items-center justify-between gap-3 sm:mb-8 shortwide:mb-3">
     <h2 className="text-xl font-semibold text-zinc-50">{title}</h2>
     <CloseButton onClick={onCancel} label={closeLabel} />
   </div>
@@ -54,11 +55,11 @@ function SourceCard({
 const MobileMicSource = ({ onSelect, onCancel }: SourceStepProps) => {
   const { t } = useTranslation("calibration");
   return (
-    <div className="flex flex-1 flex-col px-6 py-8 text-white sm:px-12 sm:py-10">
+    <div className="flex flex-1 flex-col px-5 py-5 text-white sm:px-12 sm:py-10 shortwide:px-8 shortwide:py-4">
       <Header title={t("source.title")} onCancel={onCancel} closeLabel={t("close")} />
 
-      <div className="flex flex-col items-center gap-6 rounded-lg bg-zinc-900/40 px-5 py-8 text-center">
-        <div className="relative h-40 w-full">
+      <div className="flex flex-col items-center gap-6 rounded-lg bg-zinc-900/40 px-5 py-8 text-center shortwide:flex-row shortwide:gap-8 shortwide:px-8 shortwide:py-5 shortwide:text-left">
+        <div className="relative h-40 w-full shortwide:h-32 shortwide:w-40 shortwide:shrink-0">
           <Image src="/images/setup/headphones.webp" alt="" fill sizes="240px" className="select-none object-contain" draggable={false} priority />
         </div>
         <div className="space-y-2">
@@ -67,10 +68,10 @@ const MobileMicSource = ({ onSelect, onCancel }: SourceStepProps) => {
         </div>
       </div>
 
-      <p className="mt-5 text-center text-sm text-zinc-400">{t("source.mobile_body")}</p>
+      <p className="mt-5 text-center text-sm text-zinc-400 shortwide:mt-3">{t("source.mobile_body")}</p>
 
-      <div className="mt-auto flex justify-end pt-8">
-        <Button onClick={() => onSelect("microphone")} className="h-11 gap-2 px-6 text-base font-semibold">
+      <div className="mt-auto flex justify-end pt-8 shortwide:pt-4">
+        <Button onClick={() => onSelect("microphone")} className="h-12 w-full gap-2 px-6 text-base font-semibold sm:h-11 sm:w-auto">
           {t("source.continue")}
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -82,9 +83,11 @@ const MobileMicSource = ({ onSelect, onCancel }: SourceStepProps) => {
 export const SourceStep = ({ onSelect, onCancel }: SourceStepProps) => {
   const { t } = useTranslation("calibration");
   const isMobile = useResponsiveStore((state) => state.isMobile);
-  if (isMobile) return <MobileMicSource onSelect={onSelect} onCancel={onCancel} />;
+  // A phone held sideways is wider than the mobile breakpoint, but it is still a phone.
+  const isPhoneSideways = useIsLandscape();
+  if (isMobile || isPhoneSideways) return <MobileMicSource onSelect={onSelect} onCancel={onCancel} />;
   return (
-    <div className="flex flex-1 flex-col px-6 py-8 text-white sm:px-12 sm:py-10">
+    <div className="flex flex-1 flex-col px-5 py-5 text-white sm:px-12 sm:py-10 shortwide:px-8 shortwide:py-4">
       <Header title={t("source.title")} onCancel={onCancel} closeLabel={t("close")} />
 
       <p className="mb-6 text-base text-zinc-300">{t("source.question")}</p>

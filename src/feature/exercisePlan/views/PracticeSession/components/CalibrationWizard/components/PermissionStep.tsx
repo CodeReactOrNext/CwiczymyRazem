@@ -14,8 +14,8 @@ interface PermissionStepProps {
 export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: PermissionStepProps) => {
   const { t } = useTranslation("calibration");
   return (
-    <div className="flex flex-1 flex-col px-6 py-8 text-white sm:px-12 sm:py-10">
-      <div className="flex items-center justify-between mb-8">
+    <div className="flex flex-1 flex-col px-5 py-5 text-white sm:px-12 sm:py-10 shortwide:px-8 shortwide:py-4">
+      <div className="flex items-center justify-between mb-8 shortwide:mb-2">
         <button
           onClick={onBack}
           className="rounded-full p-1.5 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors"
@@ -25,8 +25,8 @@ export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: Permiss
         <CloseButton onClick={onCancel} label={t("close")} />
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center text-center gap-6">
-        <div className="relative w-40 h-40 rounded-lg overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.15)] bg-zinc-900/60 flex items-center justify-center">
+      <div className="flex-1 flex flex-col items-center justify-center text-center gap-6 shortwide:gap-3">
+        <div className="relative w-40 h-40 shortwide:w-24 shortwide:h-24 rounded-lg overflow-hidden shadow-[0_0_30px_rgba(16,185,129,0.15)] bg-zinc-900/60 flex items-center justify-center">
           <Mic size='1em' className="text-6xl text-emerald-400/80" />
         </div>
 
@@ -37,7 +37,7 @@ export const PermissionStep = ({ isLoading, onGrant, onBack, onCancel }: Permiss
           </p>
         </div>
 
-        <div className="w-full space-y-3 pt-4">
+        <div className="w-full space-y-3 pt-4 shortwide:mx-auto shortwide:max-w-sm shortwide:pt-1">
           <Button
             onClick={onGrant}
             disabled={isLoading}

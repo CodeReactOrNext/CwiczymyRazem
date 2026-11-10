@@ -33,7 +33,7 @@ export const SummaryStep = React.memo(function SummaryStep({
   const { tunedCount, stringCount, latencyMs, latencyMeasured } = summary;
 
   return (
-    <div className="flex flex-1 flex-col px-6 py-8 text-white sm:px-12 sm:py-10">
+    <div className="flex flex-1 flex-col px-5 py-5 text-white sm:px-12 sm:py-10 shortwide:px-8 shortwide:py-4">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-bold tracking-tight">{t("summary.title")}</h2>
         <CloseButton onClick={onConfirm} label={t("close")} />
@@ -70,7 +70,7 @@ export const SummaryStep = React.memo(function SummaryStep({
         <p className="mt-3 text-xs leading-relaxed text-zinc-500">{t("summary.latency_later")}</p>
       )}
 
-      <Button onClick={onConfirm} className="mt-8 h-12 w-full font-bold">
+      <Button onClick={onConfirm} className="mt-8 h-12 w-full font-bold shortwide:mt-5">
         {t("summary.start")}
       </Button>
     </div>
