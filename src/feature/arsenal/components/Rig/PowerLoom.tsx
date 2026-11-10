@@ -51,11 +51,24 @@ const DC_CORE = "#b45309";
 const DC_CORE_LIVE = "#f59e0b";
 
 /** The brick's own body, and the copper its outputs are ringed in. */
-const BRICK_FACE = "#17181c";
+const BRICK_FACE = "#3c3f47";
 const BRICK_EDGE = "#0a0a0c";
 const COPPER = "#b45309";
-/** The machined edges that catch the light: chamfers, screw heads, grooves. */
-const BRICK_BRIGHT = "#5c626d";
+/**
+ * How much face an output needs either side of its own centre before an end cap
+ * may start: room for its lamp, and for the number printed beside it.
+ */
+const OUTPUT_CLEAR = 2.1;
+
+/** The cooling slots: how wide a cut is, how they are spaced, and banked. */
+const VENT_W = 0.3;
+const VENT_PITCH = 0.82;
+const VENT_SLOTS = 7;
+const VENT_BANK_GAP = 2.6;
+/** …and how far a bank keeps off the badge and the rating plate. */
+const VENT_MARGIN = 3;
+/** A long brick is not a grille: past this many banks the face stays plain. */
+const VENT_MAX_BANKS = 5;
 
 interface DcPlugProps {
   at: Point;
@@ -285,6 +298,11 @@ export const PowerRail = ({
   const bay = `${uid}-bay`;
   const sheen = `${uid}-sheen`;
   const halo = `${uid}-halo`;
+  const ring = `${uid}-ring`;
+  const screw = `${uid}-screw`;
+  const lens = `${uid}-lens`;
+  const soft = `${uid}-soft`;
+  const grain = `${uid}-grain`;
 
   const { brick, supply } = rail;
   /** What is silkscreened on it: whose it is, and how many pedals it feeds. */
@@ -301,9 +319,15 @@ export const PowerRail = ({
    *
    * Capped as a share of the body as well as in units, because the smallest
    * brick in the shop is a quarter the length of the biggest and a fixed block
-   * would eat most of its face.
+   * would eat most of its face — and capped again by the outputs themselves,
+   * because the biggest brick is squeezed to fit its case and a full-width block
+   * would sit on top of its first and last jack.
    */
-  const capW = Math.min(3.6, brick.w * 0.13);
+  const pitch = brick.w / Math.max(1, supply.outputs);
+  const capW = Math.max(
+    1.5,
+    Math.min(3.6, brick.w * 0.13, pitch / 2 - OUTPUT_CLEAR),
+  );
   const inner = { x: brick.x + capW, w: brick.w - capW * 2 };
   const bottom = brick.y + brick.h;
   /** The bay the outputs are recessed into, milled along the underside. */
@@ -313,9 +337,14 @@ export const PowerRail = ({
   const ledY = brick.y + brick.h * 0.446;
   /** …and the silkscreen, on the clear stretch of face above them. */
   const nameY = brick.y + brick.h * 0.29;
+  /** The groove that parts the two: badge above it, lamps and outputs below. */
+  const grooveY = brick.y + brick.h * 0.342;
   /** Where the mains lead leaves the left cap, and how far it has to travel. */
   const leadY = brick.y + brick.h * 0.44;
   const leadRun = brick.x + 3;
+  const lead = `M ${brick.x + 0.4} ${leadY} C ${brick.x - leadRun * 0.34} ${
+    leadY + 0.25
+  } ${brick.x - leadRun * 0.66} ${RAIL_H - 0.75} ${-3} ${RAIL_H - 0.2}`;
 
   /**
    * The name, split where a brand splits: the make in ink, the model number in
@@ -327,6 +356,44 @@ export const PowerRail = ({
   const brand = named?.[1] || name;
   const model = named?.[2] ?? "";
 
+  /** The rating plate at the far end of the face. */
+  const plateW = legend.length * 0.78 + 2;
+  const plateX = inner.x + inner.w - 0.4 - plateW + 0.4;
+
+  /**
+   * Cooling slots, in banks, on whatever face is left between the badge and the
+   * rating plate. A supply is the one box on a board that has to shed heat, and
+   * the slots are most of what tells it apart from a patch bay at a glance. The
+   * smallest brick has no face to spare and goes without, which is also true of
+   * the small ones on a shelf.
+   */
+  const badgeEnd =
+    inner.x +
+    0.9 +
+    brand.length * 1.43 +
+    (model ? 0.72 + model.length * 1.06 : 0);
+  const ventRoom = plateX - VENT_MARGIN - (badgeEnd + VENT_MARGIN);
+  const bankW = VENT_SLOTS * VENT_PITCH - (VENT_PITCH - VENT_W);
+  const banks = Math.min(
+    VENT_MAX_BANKS,
+    Math.max(
+      0,
+      Math.floor((ventRoom + VENT_BANK_GAP) / (bankW + VENT_BANK_GAP)),
+    ),
+  );
+  const ventsW = banks * bankW + Math.max(0, banks - 1) * VENT_BANK_GAP;
+  const ventsX = badgeEnd + VENT_MARGIN + (ventRoom - ventsW) / 2;
+  const vents = Array.from({ length: banks * VENT_SLOTS }, (_, index) => {
+    const bank = Math.floor(index / VENT_SLOTS);
+    return (
+      ventsX +
+      bank * (bankW + VENT_BANK_GAP) +
+      (index % VENT_SLOTS) * VENT_PITCH
+    );
+  });
+  const ventTop = brick.y + 0.74;
+  const ventH = grooveY - 0.38 - ventTop;
+
   return (
     <svg
       viewBox={`0 0 ${rail.geo.viewW} ${RAIL_H}`}
@@ -334,50 +401,95 @@ export const PowerRail = ({
       className='pointer-events-none absolute inset-0 h-full w-full'
       aria-hidden>
       <defs>
-        {/* Brushed aluminium: lit in bands rather than in one smooth ramp. The
-            little reversals are what read as grain instead of as a gradient. */}
+        {/* Anodised aluminium, a clear step lighter than the case it is racked
+            on — a brick the colour of its own background is a strip of trim.
+            Lit in bands rather than in one smooth ramp: the little reversals
+            are what read as a brushed face instead of as a gradient. */}
         <linearGradient id={face} x1='0' y1='0' x2='0' y2='1'>
-          <stop offset='0%' stopColor='#43464f' />
-          <stop offset='7%' stopColor='#2e3138' />
-          <stop offset='19%' stopColor='#383b43' />
-          <stop offset='34%' stopColor='#2a2c33' />
+          <stop offset='0%' stopColor='#70747f' />
+          <stop offset='6%' stopColor='#4c4f59' />
+          <stop offset='18%' stopColor='#575b66' />
+          <stop offset='33%' stopColor='#454851' />
           <stop offset='52%' stopColor={BRICK_FACE} />
-          <stop offset='72%' stopColor='#212329' />
-          <stop offset='90%' stopColor='#15161a' />
-          <stop offset='100%' stopColor='#0e0f12' />
+          <stop offset='72%' stopColor='#34363d' />
+          <stop offset='90%' stopColor='#25272c' />
+          <stop offset='100%' stopColor='#17181c' />
         </linearGradient>
-        {/* A cast end block is grittier than the extrusion and turns over
-            harder at the top, because it is a thicker piece of metal. */}
+        {/* A cast end block is black where the extrusion is grey, and turns
+            over harder at the top, because it is a thicker piece of metal. */}
         <linearGradient id={cap} x1='0' y1='0' x2='0' y2='1'>
-          <stop offset='0%' stopColor='#3c3f47' />
-          <stop offset='22%' stopColor='#23252b' />
-          <stop offset='60%' stopColor='#16171b' />
+          <stop offset='0%' stopColor='#4a4d56' />
+          <stop offset='14%' stopColor='#24262b' />
+          <stop offset='60%' stopColor='#17181c' />
           <stop offset='100%' stopColor='#08090b' />
         </linearGradient>
         {/* The bay is a hole, so it is darkest at the top, under the lip. */}
         <linearGradient id={bay} x1='0' y1='0' x2='0' y2='1'>
           <stop offset='0%' stopColor='#000000' />
-          <stop offset='45%' stopColor='#0a0b0d' />
-          <stop offset='100%' stopColor='#1c1d23' />
+          <stop offset='45%' stopColor='#08090b' />
+          <stop offset='100%' stopColor='#17181d' />
         </linearGradient>
         {/* One soft sweep of light down the length of it. A metre of extrusion
             is never lit evenly end to end, and the unevenness is most of what
             separates a machined body from a rounded rectangle. */}
         <linearGradient id={sheen} x1='0' y1='0' x2='1' y2='0'>
           <stop offset='0%' stopColor='#ffffff' stopOpacity={0} />
-          <stop offset='16%' stopColor='#ffffff' stopOpacity={0.05} />
+          <stop offset='16%' stopColor='#ffffff' stopOpacity={0.07} />
           <stop offset='30%' stopColor='#ffffff' stopOpacity={0} />
-          <stop offset='58%' stopColor='#ffffff' stopOpacity={0.065} />
+          <stop offset='58%' stopColor='#ffffff' stopOpacity={0.09} />
           <stop offset='76%' stopColor='#ffffff' stopOpacity={0} />
-          <stop offset='93%' stopColor='#ffffff' stopOpacity={0.035} />
+          <stop offset='93%' stopColor='#ffffff' stopOpacity={0.05} />
           <stop offset='100%' stopColor='#ffffff' stopOpacity={0} />
         </linearGradient>
         {/* What a lit pilot lamp throws on the metal around it. */}
         <radialGradient id={halo}>
-          <stop offset='0%' stopColor={DC_CORE_LIVE} stopOpacity={0.5} />
-          <stop offset='45%' stopColor={DC_CORE_LIVE} stopOpacity={0.16} />
+          <stop offset='0%' stopColor={DC_CORE_LIVE} stopOpacity={0.55} />
+          <stop offset='45%' stopColor={DC_CORE_LIVE} stopOpacity={0.18} />
           <stop offset='100%' stopColor={DC_CORE_LIVE} stopOpacity={0} />
         </radialGradient>
+        {/* The turned collar round a jack: lit from above like everything else
+            here, which is what makes it a ring of metal and not a ring of ink. */}
+        <linearGradient id={ring} x1='0' y1='0' x2='0' y2='1'>
+          <stop offset='0%' stopColor='#f2b877' />
+          <stop offset='38%' stopColor={COPPER} />
+          <stop offset='100%' stopColor='#4a2205' />
+        </linearGradient>
+        <radialGradient id={screw} cx='0.38' cy='0.3' r='0.8'>
+          <stop offset='0%' stopColor='#aab0bb' />
+          <stop offset='55%' stopColor='#555a64' />
+          <stop offset='100%' stopColor='#1d1f24' />
+        </radialGradient>
+        {/* An LED that is off is still a lens — smoked amber, not a hole. */}
+        <radialGradient id={lens} cx='0.4' cy='0.32' r='0.75'>
+          <stop offset='0%' stopColor='#6b4a1c' />
+          <stop offset='100%' stopColor='#22170a' />
+        </radialGradient>
+        <filter id={soft} x='-10%' y='-60%' width='120%' height='240%'>
+          <feGaussianBlur stdDeviation='0.55' />
+        </filter>
+        {/* The brushing itself: noise stretched hard along the length of the
+            body, so it comes out as fine streaks the way a linished face does. */}
+        <filter
+          id={grain}
+          x='0'
+          y='0'
+          width='100%'
+          height='100%'
+          colorInterpolationFilters='sRGB'>
+          <feTurbulence
+            type='fractalNoise'
+            baseFrequency='0.035 2.6'
+            numOctaves={2}
+            seed={7}
+            result='noise'
+          />
+          <feColorMatrix
+            in='noise'
+            type='matrix'
+            values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1.6 0 0 0 -0.62'
+          />
+          <feComposite in2='SourceGraphic' operator='in' />
+        </filter>
       </defs>
 
       {/* The stubs go down first, so each one disappears behind the enclosure
@@ -409,58 +521,65 @@ export const PowerRail = ({
 
       {/* The mains lead, out of the left cap and away into the case. It always
           leaves the frame, whatever the brick's length: a lead that stops in
-          mid-air on a short brick is a lead plugged into nothing. */}
+          mid-air on a short brick is a lead plugged into nothing. Three passes
+          — the shadow it lies in, the jacket, and the line of light along the
+          top of it — because one flat stroke is a drawn line, not a cable. */}
+      <g fill='none' strokeLinecap='round'>
+        <path
+          d={lead}
+          stroke='#000000'
+          strokeWidth={DC_JACKET_W + 0.9}
+          opacity={0.4}
+          transform='translate(0 0.45)'
+        />
+        <path d={lead} stroke='#101114' strokeWidth={DC_JACKET_W + 0.35} />
+        <path
+          d={lead}
+          stroke='#ffffff'
+          strokeWidth={0.2}
+          opacity={0.13}
+          transform='translate(0 -0.3)'
+        />
+      </g>
+      {/* …and the strain relief it leaves through: a moulded boot, tapering
+          away from the cap, cut with the ribs that let it flex. */}
       <path
-        d={`M ${brick.x + 0.4} ${leadY} C ${brick.x - leadRun * 0.34} ${
-          leadY + 0.25
-        } ${brick.x - leadRun * 0.66} ${RAIL_H - 0.75} ${-3} ${RAIL_H - 0.2}`}
-        fill='none'
-        stroke={DC_JACKET}
-        strokeWidth={DC_JACKET_W + 0.25}
-        strokeLinecap='round'
+        d={`M ${brick.x + 0.4} ${leadY - 0.86} L ${brick.x - 2.5} ${leadY - 0.6} Q ${brick.x - 2.95} ${leadY} ${brick.x - 2.5} ${leadY + 0.6} L ${brick.x + 0.4} ${leadY + 0.86} Z`}
+        fill='#1d1f24'
       />
-      {/* …and the strain-relief boot it leaves through. */}
-      <rect
-        x={brick.x - 2.5}
-        y={leadY - 0.68}
-        width={2.9}
-        height={1.36}
-        rx={0.55}
-        fill='#1b1c21'
-      />
-      <rect
-        x={brick.x - 2.5}
-        y={leadY - 0.68}
-        width={2.9}
-        height={0.4}
-        rx={0.2}
+      <path
+        d={`M ${brick.x + 0.4} ${leadY - 0.86} L ${brick.x - 2.5} ${leadY - 0.6} L ${brick.x - 2.5} ${leadY - 0.34} L ${brick.x + 0.4} ${leadY - 0.5} Z`}
         fill='#ffffff'
-        opacity={0.07}
+        opacity={0.09}
+      />
+      {[0.55, 1.1, 1.65, 2.2].map((back) => (
+        <rect
+          key={back}
+          x={brick.x - back - 0.09}
+          y={leadY - 0.8 + back * 0.08}
+          width={0.18}
+          height={1.6 - back * 0.16}
+          fill='#000000'
+          opacity={0.6}
+        />
+      ))}
+
+      {/* The shadow the whole thing sits in: soft, and thrown down and a little
+          wide, so the brick reads as standing on the case rather than as
+          printed on it. */}
+      <rect
+        x={brick.x - 0.2}
+        y={brick.y + 0.9}
+        width={brick.w + 0.4}
+        height={brick.h - 0.2}
+        rx={0.9}
+        fill='#000000'
+        opacity={0.8}
+        filter={`url(#${soft})`}
       />
 
-      {/* The shadow the whole thing sits in — two passes, so it falls off
-          instead of stopping dead, and the brick reads as standing on the case
-          rather than as printed on it. */}
-      <rect
-        x={brick.x - 0.5}
-        y={brick.y + 1.1}
-        width={brick.w + 1}
-        height={brick.h}
-        rx={1}
-        fill='#000000'
-        opacity={0.3}
-      />
-      <rect
-        x={brick.x}
-        y={brick.y + 0.4}
-        width={brick.w}
-        height={brick.h}
-        rx={0.7}
-        fill='#000000'
-        opacity={0.6}
-      />
-
-      {/* The extrusion itself, and the sweep of light down the length of it. */}
+      {/* The extrusion itself, the brushing on it, and the sweep of light down
+          the length of it. */}
       <rect
         x={brick.x}
         y={brick.y}
@@ -470,6 +589,14 @@ export const PowerRail = ({
         fill={`url(#${face})`}
         stroke={BRICK_EDGE}
         strokeWidth={0.2}
+      />
+      <rect
+        x={inner.x}
+        y={brick.y + 0.12}
+        width={inner.w}
+        height={bayTop - brick.y - 0.12}
+        filter={`url(#${grain})`}
+        opacity={0.36}
       />
       <rect
         x={brick.x}
@@ -489,7 +616,7 @@ export const PowerRail = ({
         height={0.13}
         rx={0.07}
         fill='#ffffff'
-        opacity={0.3}
+        opacity={0.42}
       />
       <rect
         x={brick.x + 0.55}
@@ -497,22 +624,53 @@ export const PowerRail = ({
         width={brick.w - 1.1}
         height={0.34}
         fill='#ffffff'
-        opacity={0.06}
+        opacity={0.07}
       />
 
-      {/* Two grooves pulled the length of the extrusion, the way a die leaves
-          them. They are what says this body was drawn through something. */}
-      {[0.86, 1.06].map((at, index) => (
-        <rect
-          key={at}
-          x={inner.x - 1.4}
-          y={brick.y + at}
-          width={inner.w + 2.8}
-          height={index === 0 ? 0.14 : 0.08}
-          fill={index === 0 ? "#000000" : "#ffffff"}
-          opacity={index === 0 ? 0.45 : 0.11}
-        />
-      ))}
+      {/* A groove pulled the length of the extrusion, the way a die leaves
+          one — under the badge rather than through it, so it also parts the
+          face into the band that is read and the band that is plugged into. */}
+      <rect
+        x={inner.x}
+        y={grooveY}
+        width={inner.w}
+        height={0.15}
+        fill='#000000'
+        opacity={0.5}
+      />
+      <rect
+        x={inner.x}
+        y={grooveY + 0.15}
+        width={inner.w}
+        height={0.08}
+        fill='#ffffff'
+        opacity={0.13}
+      />
+
+      {/* The cooling slots: each one a cut, dark inside, with the far wall of
+          it catching a little light. */}
+      {ventH > 0.5 &&
+        vents.map((x) => (
+          <g key={x}>
+            <rect
+              x={x}
+              y={ventTop}
+              width={VENT_W}
+              height={ventH}
+              rx={VENT_W / 2}
+              fill='#050506'
+              opacity={0.85}
+            />
+            <rect
+              x={x + VENT_W}
+              y={ventTop + 0.12}
+              width={0.07}
+              height={ventH - 0.24}
+              fill='#ffffff'
+              opacity={0.14}
+            />
+          </g>
+        ))}
 
       {/* …and the dark turn of the bottom edge, under everything else. */}
       <rect
@@ -550,7 +708,7 @@ export const PowerRail = ({
         width={inner.w + 0.8}
         height={0.14}
         fill='#ffffff'
-        opacity={0.16}
+        opacity={0.22}
       />
       <rect
         x={inner.x - 0.4}
@@ -558,7 +716,7 @@ export const PowerRail = ({
         width={inner.w + 0.8}
         height={0.13}
         fill='#ffffff'
-        opacity={0.12}
+        opacity={0.14}
       />
 
       {/* A cast end cap at each end, bolted through top and bottom. Drawn over
@@ -581,7 +739,7 @@ export const PowerRail = ({
             width={0.16}
             height={brick.h - 0.24}
             fill='#000000'
-            opacity={0.55}
+            opacity={0.7}
           />
           <rect
             x={side === 0 ? x + capW - 0.24 : x + 0.16}
@@ -589,7 +747,7 @@ export const PowerRail = ({
             width={0.08}
             height={brick.h - 0.24}
             fill='#ffffff'
-            opacity={0.07}
+            opacity={0.09}
           />
           <rect
             x={x + 0.5}
@@ -598,29 +756,28 @@ export const PowerRail = ({
             height={0.13}
             rx={0.07}
             fill='#ffffff'
-            opacity={0.26}
+            opacity={0.3}
           />
-          {[0.3, 0.72].map((at) => (
-            <g key={at}>
-              <circle
-                cx={x + capW / 2}
-                cy={brick.y + brick.h * at}
-                r={0.46}
-                fill='#0a0b0e'
-                stroke={BRICK_BRIGHT}
-                strokeWidth={0.15}
-              />
-              {/* The slot, so it reads as a fastener rather than as a hole. */}
-              <line
-                x1={x + capW / 2 - 0.25}
-                y1={brick.y + brick.h * at - 0.25}
-                x2={x + capW / 2 + 0.25}
-                y2={brick.y + brick.h * at + 0.25}
-                stroke={BRICK_BRIGHT}
-                strokeWidth={0.15}
-              />
-            </g>
-          ))}
+          {[0.3, 0.72].map((at) => {
+            const cx = x + capW / 2;
+            const cy = brick.y + brick.h * at;
+            return (
+              <g key={at}>
+                {/* The counterbore, then the head sitting down in it. */}
+                <circle cx={cx} cy={cy} r={0.62} fill='#000000' opacity={0.7} />
+                <circle cx={cx} cy={cy} r={0.48} fill={`url(#${screw})`} />
+                {/* The slot, so it reads as a fastener rather than as a rivet. */}
+                <line
+                  x1={cx - 0.3}
+                  y1={cy - 0.24}
+                  x2={cx + 0.3}
+                  y2={cy + 0.24}
+                  stroke='#08090b'
+                  strokeWidth={0.17}
+                />
+              </g>
+            );
+          })}
         </g>
       ))}
 
@@ -629,8 +786,8 @@ export const PowerRail = ({
           that is the bite ink has on a brushed face, and one flat grey string
           is the difference between a badge and a label. */}
       {[
-        { dy: 0.11, ink: "#000000", mark: "#000000", opacity: 0.5 },
-        { dy: 0, ink: "#d7dce4", mark: DC_CORE_LIVE, opacity: 0.72 },
+        { dy: 0.11, ink: "#000000", mark: "#000000", opacity: 0.55 },
+        { dy: 0, ink: "#e4e7ec", mark: DC_CORE_LIVE, opacity: 0.86 },
       ].map((pass) => (
         <text
           key={pass.ink}
@@ -658,29 +815,29 @@ export const PowerRail = ({
           stamped, and far enough from the name that neither is reading as part
           of the other. */}
       <rect
-        x={inner.x + inner.w - 0.4 - legend.length * 0.78 - 1.6}
+        x={plateX}
         y={nameY - 1.18}
-        width={legend.length * 0.78 + 0.4 + 1.6}
+        width={plateW}
         height={1.66}
         rx={0.28}
-        fill='#000000'
-        opacity={0.42}
+        fill='#08090b'
+        opacity={0.72}
       />
       <rect
-        x={inner.x + inner.w - 0.4 - legend.length * 0.78 - 1.6}
+        x={plateX}
         y={nameY + 0.41}
-        width={legend.length * 0.78 + 0.4 + 1.6}
+        width={plateW}
         height={0.07}
         rx={0.03}
         fill='#ffffff'
-        opacity={0.12}
+        opacity={0.16}
       />
       <text
         x={inner.x + inner.w - 2.1}
         y={nameY}
         textAnchor='end'
         fill='#d7dce4'
-        opacity={live ? 0.8 : 0.4}
+        opacity={live ? 0.85 : 0.45}
         fontSize={1.16}
         letterSpacing={0.16}
         fontFamily='ui-sans-serif, system-ui, sans-serif'
@@ -693,14 +850,14 @@ export const PowerRail = ({
         cy={nameY - 0.4}
         r={0.42}
         fill='#08090b'
-        stroke='#33363d'
+        stroke='#4b4f58'
         strokeWidth={0.09}
       />
       <circle
         cx={inner.x + inner.w - 1.25}
         cy={nameY - 0.4}
         r={0.26}
-        fill={live ? "#34d399" : "#1a1b20"}
+        fill={live ? "#34d399" : "#12261f"}
       />
       {live && (
         <circle
@@ -722,31 +879,42 @@ export const PowerRail = ({
                 a lamp sunk in a bezel whether or not it is on, so an unused
                 output reads as dark rather than as missing. */}
             {on && (
-              <circle cx={socket.x} cy={ledY} r={1.4} fill={`url(#${halo})`} />
+              <circle cx={socket.x} cy={ledY} r={1.5} fill={`url(#${halo})`} />
             )}
             <circle
               cx={socket.x}
               cy={ledY}
-              r={0.4}
-              fill='#08090b'
-              stroke='#33363d'
+              r={0.42}
+              fill='#050506'
+              stroke='#7a7f8a'
               strokeWidth={0.09}
             />
             <circle
               cx={socket.x}
               cy={ledY}
-              r={0.25}
-              fill={on ? "#f0a51c" : "#1a1b20"}
+              r={0.27}
+              fill={on ? "#f5a81c" : `url(#${lens})`}
             />
-            {on && (
-              <circle
-                cx={socket.x}
-                cy={ledY - 0.06}
-                r={0.12}
-                fill='#fef3c7'
-                opacity={0.9}
-              />
-            )}
+            <circle
+              cx={socket.x - 0.05}
+              cy={ledY - 0.08}
+              r={on ? 0.12 : 0.07}
+              fill={on ? "#fef3c7" : "#ffffff"}
+              opacity={on ? 0.95 : 0.3}
+            />
+            {/* The output's number, silkscreened beside its lamp. Nobody needs
+                to read it; a row of numbered holes is simply what the business
+                end of a supply looks like. */}
+            <text
+              x={socket.x + 0.82}
+              y={ledY + 0.3}
+              fill='#e4e7ec'
+              opacity={0.5}
+              fontSize={0.84}
+              fontFamily='ui-sans-serif, system-ui, sans-serif'
+              fontWeight={700}>
+              {socket.index + 1}
+            </text>
 
             {/* The counterbore the jack is sunk into. Drawn whether or not the
                 hole is filled, because it is machined into the metal and a
@@ -769,27 +937,20 @@ export const PowerRail = ({
                   cx={socket.x}
                   cy={socket.y}
                   r={SOCKET_R + 0.2}
-                  fill={COPPER}
-                  opacity={0.45}
-                />
-                <circle
-                  cx={socket.x}
-                  cy={socket.y}
-                  r={SOCKET_R + 0.2}
-                  fill='none'
+                  fill={`url(#${ring})`}
                   stroke='#000000'
-                  strokeWidth={0.1}
-                  opacity={0.45}
+                  strokeWidth={0.08}
+                  opacity={0.9}
                 />
                 <circle
                   cx={socket.x}
                   cy={socket.y}
-                  r={SOCKET_R}
+                  r={SOCKET_R - 0.08}
                   fill='#050506'
                 />
                 {/* The shadow the near lip of the hole casts down inside it. */}
                 <path
-                  d={`M ${socket.x - SOCKET_R} ${socket.y} A ${SOCKET_R} ${SOCKET_R} 0 0 1 ${socket.x + SOCKET_R} ${socket.y}`}
+                  d={`M ${socket.x - SOCKET_R + 0.08} ${socket.y} A ${SOCKET_R - 0.08} ${SOCKET_R - 0.08} 0 0 1 ${socket.x + SOCKET_R - 0.08} ${socket.y}`}
                   fill='none'
                   stroke='#000000'
                   strokeWidth={0.3}
@@ -800,22 +961,13 @@ export const PowerRail = ({
                   cx={socket.x}
                   cy={socket.y}
                   r={SOCKET_R * 0.3}
-                  fill='#41454e'
+                  fill='#565b66'
                 />
                 <circle
-                  cx={socket.x}
-                  cy={socket.y - SOCKET_R * 0.08}
+                  cx={socket.x - SOCKET_R * 0.06}
+                  cy={socket.y - SOCKET_R * 0.1}
                   r={SOCKET_R * 0.14}
-                  fill='#767c88'
-                />
-                {/* One highlight off the rim, so it reads as metal, not a dot. */}
-                <path
-                  d={`M ${socket.x - SOCKET_R * 0.82} ${socket.y - SOCKET_R * 0.62} A ${SOCKET_R + 0.2} ${SOCKET_R + 0.2} 0 0 1 ${socket.x + SOCKET_R * 0.4} ${socket.y - SOCKET_R * 1.02}`}
-                  fill='none'
-                  stroke='#ffffff'
-                  strokeWidth={0.16}
-                  strokeLinecap='round'
-                  opacity={0.32}
+                  fill='#b6bcc8'
                 />
               </>
             )}
