@@ -51,6 +51,8 @@
     "tuning_gutter_desc": "Nombres de cuerdas fijos a la izquierda",
     "measure_lines": "Líneas divisorias",
     "measure_lines_desc": "Separadores verticales de compás",
+    "counting": "Conteo",
+    "counting_desc": "«1 e & a» bajo el pentagrama: cómo contar el compás",
     "technique": "Marcas de técnica",
     "technique_desc": "H/P, bendings, PM, vibrato, armónicos, púa ⊓/⋁"
   },

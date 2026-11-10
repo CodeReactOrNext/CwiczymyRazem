@@ -139,6 +139,7 @@ export interface TablatureStylePatch {
   showRhythmLane?: boolean;
   showChordNames?: boolean;
   showMeasureLines?: boolean;
+  showCounting?: boolean;
   showTechniqueLabels?: boolean;
   hitAnimations?: boolean;
   timingHints?: boolean;

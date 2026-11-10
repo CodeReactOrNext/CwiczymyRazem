@@ -2,9 +2,13 @@
 
 import type { FillStep } from "../utils/fillFeed";
 import type { NoteTiming } from "../utils/timingGrade";
+import type { BeatCount } from "./beatCounting";
+import { beatCountLabels, beatTickPositions } from "./beatCounting";
 import { addFillSteps, clearLiveFills, createLiveFills, currentTiming, isLiveTiming, liveFillBeat, liveFillOn } from "./liveNoteFills";
 import { applyHitNotes, applyMissedNotes, createNoteHitVisualState, resetFrozenNoteState, resetNoteHitVisualState } from "./noteHitVisualState";
-import { stringRow } from "./tablatureStringRows";
+import type { PalmMuteRun } from "./palmMuteRuns";
+import { palmMuteRuns } from "./palmMuteRuns";
+import { staffLineWidth, stringRow } from "./tablatureStringRows";
 import type { BeatXMap } from "./tabSpacing";
 import { baseBeatWidth, beatToX, buildBeatXMap, xToBeat } from "./tabSpacing";
 import { audioClockNow, createAudioClock, observeAudioClock, resetAudioClock } from "./workerAudioClock";
@@ -34,6 +38,12 @@ let rightToLeft = false;
 // first notes don't hide behind the labels. Keep in sync with TAB_GUTTER_W in
 // useTablatureWorkerBridge.ts.
 const GUTTER_W = 36;
+/** Thickness of the nut drawn on the gutter's right edge. */
+const NUT_W = 4.5;
+/** Outline (and X) of a dead note. */
+const DEAD_NOTE_EDGE = "#6b7280";
+/** A dead note's sustain tail. */
+const DEAD_NOTE_FILL = "#374151";
 // Pill geometry. Height and corner radius are overwritten by the PILL_STYLE
 // message so the player can pick a note-pill shape; the defaults below mirror
 // the "rounded" preset in tablaturePillPresets.ts.
@@ -122,6 +132,8 @@ let fretFontScale = 1;
 let showRhythmLane = true;
 let showChordNames = true;
 let showMeasureLines = true;
+/** "1 e & a" under the staff. */
+let showCounting = true;
 let showTechniqueLabels = true;
 let hitAnimations = true;
 /** Timing feedback on the notes — labels and the late fill (STYLE.timingHints). */
@@ -144,21 +156,21 @@ function withAlpha(hex: string, a: number): string {
   return out;
 }
 
-// Staff lines batched into 3 alpha groups (pairs: 0+5, 1+4, 2+3)
-// Outer lines strongest, fading towards the middle — paired from both edges in.
-const STAFF_LINE_ALPHAS = [0.45, 0.33, 0.21];
-function staffLineGroups(count: number): { alpha: number; indices: number[] }[] {
-  const groups: { alpha: number; indices: number[] }[] = [];
-  for (let i = 0; i < Math.ceil(count / 2); i++) {
-    const pair = count - 1 - i;
-    groups.push({
-      alpha: STAFF_LINE_ALPHAS[Math.min(i, STAFF_LINE_ALPHAS.length - 1)],
-      indices: pair === i ? [i] : [i, pair],
-    });
-  }
-  return groups;
-}
-let STAFF_LINE_GROUPS = staffLineGroups(stringCount);
+/** How much of the board's ink a string line carries before its own colour is mixed in. */
+const STAFF_LINE_INK = 0.42;
+/** How far a string line leans towards its string's colour. */
+const STAFF_LINE_TINT = 0.45;
+/** The neck: a faint surface under the strings, setting them apart from the rhythm lane. */
+const NECK_ALPHA = 0.04;
+/** Every other bar's stretch of neck is this much stronger, so bars can be counted at a glance. */
+const BAR_WASH_ALPHA = 0.035;
+/** The winding on the wound strings: fine gaps in the board's colour along the line. */
+const WINDING_DASH = [1, 1.5];
+const WINDING_PERIOD = 2.5;
+const WINDING_ALPHA = 0.3;
+/** How far the neck reaches past the outer strings — clear of the pills, short of the row below. */
+const neckPad = () => BLOCK_H / 2 + 5;
+
 
 // ── Shared types (mirrored from TablatureViewer.tsx) ──────────────────────────
 interface NoteRD {
@@ -204,7 +216,6 @@ interface BeatRD {
   isRest: boolean;
   tuplet?: number;
   pickStroke?: "down" | "up";
-  inAccentedBar?: boolean;
 }
 
 interface TimeSigMarker { x: number; sig: [number, number]; beatIdx: number; }
@@ -214,6 +225,32 @@ interface TempoPoint { beatPos: number; ratio: number; }
 // ── Worker state ──────────────────────────────────────────────────────────────
 let canvas: OffscreenCanvas | null = null;
 let ctx: OffscreenCanvasRenderingContext2D | null = null;
+
+// Sustain tails fade out along their length. A gradient is built once per
+// colour and (whole-pixel) width, starting at x = 0: the tail is drawn under a
+// translate, which carries the gradient along with it.
+const tailFades = new Map<string, Map<number, CanvasGradient>>();
+/** What a `w`-wide tail of `color` is filled with: the colour dying away to the right. */
+function tailFade(color: string, w: number): CanvasGradient | string {
+  if (!ctx || color.length !== 7 || color[0] !== "#") return color;
+  let byWidth = tailFades.get(color);
+  if (!byWidth) {
+    if (tailFades.size >= COLOR_CACHE_MAX) tailFades.clear();
+    byWidth = new Map();
+    tailFades.set(color, byWidth);
+  } else if (byWidth.size >= COLOR_CACHE_MAX) {
+    byWidth.clear();
+  }
+  const key = Math.max(1, Math.round(w));
+  let fade = byWidth.get(key);
+  if (!fade) {
+    fade = ctx.createLinearGradient(0, 0, key, 0);
+    fade.addColorStop(0, color);
+    fade.addColorStop(1, withAlpha(color, 0.12));
+    byWidth.set(key, fade);
+  }
+  return fade;
+}
 
 /**
  * Every string of text on the board, drawn so it reads forwards on a mirrored
@@ -260,6 +297,11 @@ let zoom = 1;
 // by relayout() whenever one of its inputs changes.
 let xMap: BeatXMap = buildBeatXMap([], 1, baseBeatWidth(0), { pillHeight: BLOCK_H, fretFontScale });
 let measureEndPx: number[] = [];
+/** How each beat is counted ("1 e & a") — parallel to renderBeats, recomputed with the data. */
+let beatCounts: (BeatCount | null)[] = [];
+/** The counted beats inside the bars: in quarter notes, and where they land on the board. */
+let beatTickBeats: number[] = [];
+let beatTickPx: number[] = [];
 
 // Playback
 let isPlaying = false;
@@ -413,6 +455,7 @@ function relayout() {
   const prev = xMap;
   xMap = buildBeatXMap(renderBeats, totalBeats, baseBeatWidth(W) * zoom, { pillHeight: BLOCK_H, fretFontScale });
   measureEndPx = measureEndXs.map((beat) => beatToX(xMap, beat));
+  beatTickPx = beatTickBeats.map((beat) => beatToX(xMap, beat));
   const carry = (x: number) => beatToX(xMap, xToBeat(prev, x));
   pausedCursorPos = carry(pausedCursorPos);
   pausedScrollX = carry(pausedScrollX);
@@ -456,6 +499,20 @@ const RHY_GLYPH_FONT = `${RHY_GLYPH_PX}px Bravura`;
 // SMuFL codepoints (Bravura is SMuFL-compliant).
 const GLYPH_NOTEHEAD = { whole: "", half: "", black: "" };
 const GLYPH_FLAG_UP: Record<number, string> = { 1: "", 2: "", 3: "" }; // 8th / 16th / 32nd
+/** timeSig0 — the ten engraved time-signature digits follow it in order. */
+const GLYPH_TIME_SIG_0 = 0xe080;
+const TIME_SIG_PX = 34;
+const TIME_SIG_FONT = `${TIME_SIG_PX}px Bravura`;
+const timeSigGlyphs = new Map<number, string>();
+/** A time-signature number as Bravura's engraved numerals. */
+function timeSigGlyph(n: number): string {
+  let glyph = timeSigGlyphs.get(n);
+  if (glyph === undefined) {
+    glyph = Array.from(n.toString(), (d) => String.fromCharCode(GLYPH_TIME_SIG_0 + Number(d))).join("");
+    timeSigGlyphs.set(n, glyph);
+  }
+  return glyph;
+}
 const GLYPH_REST = {
   whole: "", half: "", quarter: "",
   eighth: "", sixteenth: "", thirtysecond: "",
@@ -510,7 +567,27 @@ function fretFont(px: number): string {
   }
   return font;
 }
-const TECHNIQUE_FONT = "bold 9px Inter";
+const TECHNIQUE_FONT = "bold 9px Inter, sans-serif";
+/** Height of a beat tick on the neck's edge. */
+const BEAT_TICK_H = 5;
+/** How far short of the neck's edges a bar line stops. */
+const BAR_LINE_INSET = 3;
+/** The palm-mute row, measured from the bottom of the lowest pill — clear of the neck's edge. */
+const PM_ROW_GAP = 15;
+/** The counting row, below the palm-mute row. */
+const COUNT_ROW_GAP = 14;
+/** "1 e & a" under the staff. */
+const COUNT_FONT = "bold 9px Inter, sans-serif";
+/** The playback cursor while it runs. */
+const CURSOR_COLOR = "#06b6d4";
+/** Width of the wake trailing the cursor. */
+const CURSOR_WAKE_W = 26;
+/** Bar number at a bar line. */
+const BAR_NUMBER_FONT = "bold 11px Inter, sans-serif";
+/** Free space two heads need between them for the slur's letter to sit there. */
+const HP_TUCK_ROOM = 12;
+/** Hammer-on / pull-off letter over a slur. */
+const HP_FONT = "bold 11px Inter, sans-serif";
 /** Tuplet number widths — the bracket arms stop short of the number. */
 const tupletLabelWidths = new Map<number, number>();
 
@@ -524,6 +601,46 @@ function mixHex(from: string, to: string, amt: number): string {
     return Math.round(a + (b - a) * amt);
   };
   return `rgb(${mix(1)}, ${mix(3)}, ${mix(5)})`;
+}
+
+const pillEdges = new Map<string, string>();
+/** The hairline round a filled pill: its own colour, a good step darker. */
+function pillEdge(hex: string): string {
+  let edge = pillEdges.get(hex);
+  if (edge === undefined) {
+    edge = mixHex(hex, "#000000", 0.38);
+    if (pillEdges.size >= COLOR_CACHE_MAX) pillEdges.clear();
+    pillEdges.set(hex, edge);
+  }
+  return edge;
+}
+
+type BoardTintRole = "line" | "tile" | "tileInk";
+const boardTints = new Map<string, string>();
+let boardTintsFor = "";
+/**
+ * A string's colour worked into the board, kept per board: its staff line (the
+ * board's ink leaning towards the string), and its gutter tile and that tile's
+ * letter while the string isn't about to be played.
+ */
+function boardTint(role: BoardTintRole, stringColor: string | undefined): string {
+  const board = bgColor + inkColor;
+  if (board !== boardTintsFor) {
+    boardTints.clear();
+    boardTintsFor = board;
+  }
+  const key = role + (stringColor ?? "");
+  let color = boardTints.get(key);
+  if (color === undefined) {
+    const neutral = mixHex(bgColor, inkColor, STAFF_LINE_INK);
+    if (!stringColor) color = neutral;
+    else if (role === "line") color = mixHex(neutral, stringColor, STAFF_LINE_TINT);
+    else if (role === "tile") color = mixHex(bgColor, stringColor, 0.3);
+    else color = mixHex(stringColor, inkColor, 0.35);
+    if (boardTints.size >= COLOR_CACHE_MAX) boardTints.clear();
+    boardTints.set(key, color);
+  }
+  return color;
 }
 
 // ── Pick stroke marker ────────────────────────────────────────────────────────
@@ -571,25 +688,39 @@ function drawFingerBadge(finger: number, x: number, y: number, alpha: number) {
 }
 
 // ── Palm mute ─────────────────────────────────────────────────────────────────
+/** Stretches of palm-muted beats — recomputed with the render data. */
+let pmRuns: PalmMuteRun[] = [];
 // Measured once — the label and its font never change.
 let palmMuteLabelW = 0;
 
 /**
- * "P.M." under a palm-muted beat, centred on its note head, in the row below
- * the staff. One per muted note rather than a span line, so nothing runs under
- * the notes that ring. `room` is the beat's width: too narrow a beat gets "PM".
+ * One "P.M." for a whole run of palm-muted beats, in the row below the staff:
+ * the label under the first muted note, a dashed line to the last, and a hook
+ * up where the muting ends. `x0` is the first head's left edge, `x1` the last
+ * head's right edge, `room` the run's full width — a run too narrow for the
+ * label gets "PM", and one too short for a line gets the label alone.
  */
-function drawPalmMuteLabel(x: number, room: number, live: boolean) {
+function drawPalmMuteSpan(x0: number, x1: number, room: number, live: boolean) {
   if (!ctx) return;
   const staffBottom = STAFF_TOP + 5 * STRING_SPACING;
   // Held inside the board when wide string spacing leaves little room under the staff.
-  const y = Math.min(BASE_H - 7, staffBottom + BLOCK_H / 2 + 11);
+  const y = Math.min(BASE_H - 7, staffBottom + BLOCK_H / 2 + PM_ROW_GAP);
   ctx.font = "bold 11px Inter, sans-serif";
-  ctx.textAlign = "center";
+  ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillStyle = withAlpha(inkColor, live ? 0.95 : 0.6);
   if (palmMuteLabelW === 0) palmMuteLabelW = ctx.measureText("P.M.").width;
-  drawText(palmMuteLabelW + 6 <= room ? "P.M." : "PM", x, y);
+  const fits = palmMuteLabelW + 6 <= room;
+  drawText(fits ? "P.M." : "PM", x0, y);
+  const lineX = x0 + palmMuteLabelW + 5;
+  if (!fits || x1 - lineX < 8) return;
+  ctx.strokeStyle = withAlpha(inkColor, live ? 0.7 : 0.4);
+  ctx.lineWidth = 1.2;
+  ctx.lineCap = "butt";
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(lineX, y); ctx.lineTo(x1, y); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x1, y - 5); ctx.stroke();
 }
 
 // ── Bend badge ────────────────────────────────────────────────────────────────
@@ -599,30 +730,34 @@ function drawBendBadge(
   bx: number, by: number, noteY: number,
 ) {
   if (!ctx) return;
-  ctx.font = "bold 16px Inter, sans-serif";
+  ctx.font = "bold 14px Inter, sans-serif";
   const fullText = `${icon} ${label}`;
   let tw = bendTextWidthCache.get(fullText);
   if (tw === undefined) { tw = ctx.measureText(fullText).width; bendTextWidthCache.set(fullText, tw); }
-  const padX = 8, bw = tw + padX * 2, bh = 24, r = 6;
+  const padX = 7, bw = tw + padX * 2, bh = 22, r = 6;
+  // The box is wider than the head it labels: on the opening note it would
+  // slide under the tuning gutter, so it stops at the board's left edge while
+  // the connector stays on the note.
+  const cx = Math.max(bx, bw / 2 + 2);
 
   ctx.fillStyle = bgColor;
   ctx.beginPath();
-  ctx.moveTo(bx - bw / 2 + r, by - bh / 2);
-  ctx.lineTo(bx + bw / 2 - r, by - bh / 2);
-  ctx.arcTo(bx + bw / 2, by - bh / 2, bx + bw / 2, by - bh / 2 + r, r);
-  ctx.lineTo(bx + bw / 2, by + bh / 2 - r);
-  ctx.arcTo(bx + bw / 2, by + bh / 2, bx + bw / 2 - r, by + bh / 2, r);
-  ctx.lineTo(bx - bw / 2 + r, by + bh / 2);
-  ctx.arcTo(bx - bw / 2, by + bh / 2, bx - bw / 2, by + bh / 2 - r, r);
-  ctx.lineTo(bx - bw / 2, by - bh / 2 + r);
-  ctx.arcTo(bx - bw / 2, by - bh / 2, bx - bw / 2 + r, by - bh / 2, r);
+  ctx.moveTo(cx - bw / 2 + r, by - bh / 2);
+  ctx.lineTo(cx + bw / 2 - r, by - bh / 2);
+  ctx.arcTo(cx + bw / 2, by - bh / 2, cx + bw / 2, by - bh / 2 + r, r);
+  ctx.lineTo(cx + bw / 2, by + bh / 2 - r);
+  ctx.arcTo(cx + bw / 2, by + bh / 2, cx + bw / 2 - r, by + bh / 2, r);
+  ctx.lineTo(cx - bw / 2 + r, by + bh / 2);
+  ctx.arcTo(cx - bw / 2, by + bh / 2, cx - bw / 2, by + bh / 2 - r, r);
+  ctx.lineTo(cx - bw / 2, by - bh / 2 + r);
+  ctx.arcTo(cx - bw / 2, by - bh / 2, cx - bw / 2 + r, by - bh / 2, r);
   ctx.closePath();
   ctx.fill();
 
-  ctx.strokeStyle = textColor; ctx.lineWidth = 2; ctx.stroke();
+  ctx.strokeStyle = textColor; ctx.lineWidth = 1.5; ctx.stroke();
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  drawText(fullText, bx, by + 1);
+  drawText(fullText, cx, by + 0.5);
 
   const lsy = by + bh / 2;
   const ley = noteY - 1; // noteY = top edge of block passed by caller
@@ -883,7 +1018,7 @@ function drawChordBox(x: number, w: number, topY: number, bottomY: number, activ
   const h = bottomY - topY + BLOCK_H + CHORD_BOX_PAD * 2;
   const r = BLOCK_CORNER + CHORD_BOX_PAD;
   ctx.fillStyle = inkColor;
-  ctx.globalAlpha = (active ? 0.13 : 0.07) * dim;
+  ctx.globalAlpha = (active ? 0.09 : 0.045) * dim;
   drawPill(x, y, w, h, r);
   ctx.fill();
   if (heldW > 0) {
@@ -952,9 +1087,9 @@ function hitGlowSprite(w: number): OffscreenCanvas | null {
 const CHORD_FONT = "600 13px Inter, sans-serif";
 const CHORD_TAG_H = 15;
 const CHORD_TAG_PAD_X = 6;
-const CHORD_TAG_RADIUS = 4;
-/** Tag's left edge from the beat start: past the notehead and pick mark. */
-const CHORD_TAG_X = 19;
+const CHORD_TAG_RADIUS = CHORD_TAG_H / 2;
+/** Tag's left edge from the centre of the beat's head: past the notehead and pick mark. */
+const CHORD_TAG_X = 10;
 /** Room between the tag and the tops of the pills under it — kept small so the
  *  tag also stays below the rhythm lane's noteheads. */
 const CHORD_TAG_GAP = 2;
@@ -964,7 +1099,7 @@ const chordTagSprites = new Map<string, OffscreenCanvas>();
 
 /** Paints a `w`-wide chord tag with its top-left corner at the origin of `g`. */
 function paintChordTag(g: OffscreenCanvasRenderingContext2D, label: string, w: number) {
-  g.fillStyle = mixHex(bgColor, inkColor, 0.12);
+  g.fillStyle = mixHex(bgColor, inkColor, 0.08);
   g.beginPath();
   pillPath(0, 0, w, CHORD_TAG_H, CHORD_TAG_RADIUS, g);
   g.fill();
@@ -1109,6 +1244,12 @@ function drawTuningGutter(active: Set<number>) {
   ctx.fillStyle = edge;
   ctx.fillRect(GUTTER_W - 10, 0, 10, viewH);
 
+  // The nut: the bar the strings run from. An object on the board, not a
+  // divider — it is what makes the staff read as a neck.
+  ctx.fillStyle = withAlpha(inkColor, 0.8);
+  drawPill(GUTTER_W - NUT_W + 1, STAFF_TOP - 6, NUT_W, 5 * STRING_SPACING + 12, NUT_W / 2);
+  ctx.fill();
+
   const pillX = 4, pillW = 26, pillH = BLOCK_H, r = BLOCK_CORNER;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -1119,20 +1260,18 @@ function drawTuningGutter(active: Set<number>) {
     // which one is coming next; otherwise only the strings about to be played.
     const lit = hideNotes || active.has(st.string);
 
-    ctx.globalAlpha = lit ? 1 : 0.3;
-    ctx.fillStyle = lit ? st.color : "#3f3f46";
+    // A string that isn't up next keeps a dimmed tile in its own colour, so the
+    // tile, the line and the pills on it still read as one string.
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = lit ? st.color : boardTint("tile", st.color);
     drawPill(pillX, top, pillW, pillH, r);
-    ctx.fill();
-    // Top-half sheen — same treatment as the fret pills.
-    ctx.fillStyle = "rgba(255,255,255,0.14)";
-    drawPill(pillX + 1, top + 1, pillW - 2, pillH / 2 - 1, r);
     ctx.fill();
 
     ctx.globalAlpha = lit ? 1 : 0.6;
     // Lit pills carry the string colour, so they follow the fret-number setting;
     // dimmed ones sit on a neutral grey and keep their own readable tone.
     const litInk = fretTextColor === "auto" ? readableInk(st.color) : fretTextColor;
-    ctx.fillStyle = lit ? litInk : "#d4d4d8";
+    ctx.fillStyle = lit ? litInk : boardTint("tileInk", st.color);
     ctx.font = "bold 13px Inter, sans-serif";
     drawText(st.label, pillX + pillW / 2, y + 0.5);
   }
@@ -1376,19 +1515,34 @@ function paintFrame() {
     ctx.clip();
   }
 
-  // ── Staff lines — 3 batched groups (drawn once across the viewport) ──────
+  // ── The neck and its strings — by gauge, in their colours (drawn once) ────
   if (!hideNotes) {
     const lineL = Math.max(0, scrollX);
     const lineR = seamless ? scrollX + viewW + 10 : Math.min(totalW, scrollX + viewW + 10);
-    ctx.lineWidth = 1;
-    for (const grp of STAFF_LINE_GROUPS) {
-      ctx.strokeStyle = withAlpha(inkColor, grp.alpha);
+    ctx.fillStyle = withAlpha(inkColor, NECK_ALPHA);
+    ctx.fillRect(lineL, STAFF_TOP - neckPad(), lineR - lineL, 5 * STRING_SPACING + neckPad() * 2);
+    ctx.lineCap = "butt";
+    for (let row = 0; row < stringCount; row++) {
+      const y = STAFF_TOP + row * STRING_SPACING;
+      const width = staffLineWidth(row, flipStrings, stringCount);
+      const stringNumber = flipStrings ? stringCount - row : row + 1;
+      ctx.strokeStyle = boardTint("line", stringColors[stringNumber - 1]);
+      ctx.lineWidth = width;
       ctx.beginPath();
-      for (const i of grp.indices) {
-        const y = STAFF_TOP + i * STRING_SPACING;
-        ctx.moveTo(lineL, y); ctx.lineTo(lineR, y);
-      }
+      ctx.moveTo(lineL, y); ctx.lineTo(lineR, y);
       ctx.stroke();
+      if (width > 1) {
+        // The winding. Its phase is tied to the board, not to the line's left
+        // end, so it stays put on the string while the tab scrolls.
+        ctx.strokeStyle = withAlpha(bgColor, WINDING_ALPHA);
+        ctx.setLineDash(WINDING_DASH);
+        ctx.lineDashOffset = lineL % WINDING_PERIOD;
+        ctx.beginPath();
+        ctx.moveTo(lineL, y); ctx.lineTo(lineR, y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.lineDashOffset = 0;
+      }
     }
   }
 
@@ -1413,12 +1567,56 @@ function paintFrame() {
     ctx.save();
     ctx.translate(tileOff, 0);
 
-  // ── Measure lines — single batched path ─────────────────────────────────
-  if (showMeasureLines) {
-    ctx.strokeStyle = withAlpha(inkColor, 0.25);
+  // ── Bars — alternate wash, numbers, beat ticks ───────────────────────────
+  // Every other bar's stretch of neck sits on a faint wash and each bar carries
+  // its number at its opening bar line (the first one goes without, as in
+  // print). Parity runs on across repetitions so two unwashed bars never meet
+  // at the loop seam.
+  const neckTop = STAFF_TOP - neckPad();
+  const neckBottom = STAFF_TOP + 5 * STRING_SPACING + neckPad();
+  if (showMeasureLines && !hideNotes && measureEndPx.length > 0) {
+    ctx.font = BAR_NUMBER_FONT;
+    ctx.textAlign = "right";
+    ctx.textBaseline = "bottom";
+    for (let mi = 0; mi < measureEndPx.length; mi++) {
+      const barL = mi === 0 ? 0 : measureEndPx[mi - 1];
+      const barR = measureEndPx[mi];
+      if (barR < visL) continue;
+      if (barL > visR) break;
+      if ((tile * measureEndPx.length + mi) % 2 === 1) {
+        ctx.fillStyle = withAlpha(inkColor, BAR_WASH_ALPHA);
+        ctx.fillRect(barL, neckTop, barR - barL, neckBottom - neckTop);
+      }
+      if (mi > 0) {
+        ctx.fillStyle = withAlpha(inkColor, 0.6);
+        drawText(String(mi + 1), barL - 5, STAFF_TOP - 5);
+      }
+    }
+
+    // The beats inside each bar, ticked on both edges of the neck.
+    ctx.strokeStyle = withAlpha(inkColor, 0.3);
     ctx.lineWidth = 1;
+    ctx.lineCap = "butt";
     ctx.beginPath();
-    ctx.moveTo(0, STAFF_TOP); ctx.lineTo(0, STAFF_TOP + 5 * STRING_SPACING);
+    for (const x of beatTickPx) {
+      if (x < visL) continue;
+      if (x > visR) break;
+      ctx.moveTo(x, neckTop); ctx.lineTo(x, neckTop + BEAT_TICK_H);
+      ctx.moveTo(x, neckBottom); ctx.lineTo(x, neckBottom - BEAT_TICK_H);
+    }
+    ctx.stroke();
+  }
+
+  // ── Measure lines — single batched path ─────────────────────────────────
+  // Drawn like frets: heavier than a string, across the whole neck.
+  if (showMeasureLines) {
+    const barTop = neckTop + BAR_LINE_INSET;
+    const barBottom = neckBottom - BAR_LINE_INSET;
+    ctx.strokeStyle = withAlpha(inkColor, 0.4);
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(0, barTop); ctx.lineTo(0, barBottom);
     // Binary search for first visible measure bar, then scan forward
     if (measureEndPx.length > 0) {
       let lo = 0, hi = measureEndPx.length - 1;
@@ -1429,10 +1627,21 @@ function paintFrame() {
       for (let mi = lo; mi < measureEndPx.length; mi++) {
         const x = measureEndPx[mi];
         if (x > visR) break;
-        ctx.moveTo(x, STAFF_TOP); ctx.lineTo(x, STAFF_TOP + 5 * STRING_SPACING);
+        ctx.moveTo(x, barTop); ctx.lineTo(x, barBottom);
       }
     }
     ctx.stroke();
+
+    // The last bar closes with a final bar line: thin, then thick.
+    const endX = measureEndPx[measureEndPx.length - 1];
+    if (endX !== undefined && endX >= visL && endX <= visR) {
+      ctx.strokeStyle = withAlpha(inkColor, 0.5);
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(endX - 7, barTop); ctx.lineTo(endX - 7, barBottom); ctx.stroke();
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(endX - 1.5, barTop); ctx.lineTo(endX - 1.5, barBottom); ctx.stroke();
+    }
+    ctx.lineCap = "butt";
   }
 
   // Track last rendered note pos per string for slide lines: string# → { x, y, slideOut }
@@ -1459,7 +1668,9 @@ function paintFrame() {
     const beatW = beatEndPx - beatPx;
     // More than xMap.beatWidth where a fast run had to be spread out.
     const pxPerBeat = beat.duration > 0 ? beatW / beat.duration : xMap.beatWidth;
-    const beatL = beatPx + 10;
+    // Centre of the beat's head: the rhythm lane's notehead, the pill and the
+    // count under the staff share one column.
+    const beatL = beatPx + BLOCK_PAD + BLOCK_H / 2;
 
     if (beatL > visR) break;
 
@@ -1477,7 +1688,7 @@ function paintFrame() {
     // marks then give way to it (below) instead of being drawn through its text.
     const chordTagBefore = chordTagEnd;
     if (beat.chordName && inView && showChordNames) {
-      chordTagEnd = drawChordTag(beat.chordName, beatPx + CHORD_TAG_X, STAFF_TOP - BLOCK_H / 2 - CHORD_TAG_GAP - CHORD_TAG_H);
+      chordTagEnd = drawChordTag(beat.chordName, beatL + CHORD_TAG_X, STAFF_TOP - BLOCK_H / 2 - CHORD_TAG_GAP - CHORD_TAG_H);
     }
 
     // Rhythm notation
@@ -1589,8 +1800,6 @@ function paintFrame() {
 
       // Badge Y: above the topmost block in this beat
       const bendBadgeY = beat.topNoteY - BLOCK_H / 2 - 28;
-      // Head centre of the beat's first palm-muted note — where its "P.M." goes.
-      let palmMuteX: number | null = null;
 
       // A chord is one strum, so it is drawn as one thing: its fret numbers
       // stacked where it is struck, and a single box for as long as it rings
@@ -1616,6 +1825,21 @@ function paintFrame() {
           if (hit || !(reached && tileMissed[note.noteKey])) allMissed = false;
         }
         drawChordBox(blockX, blockW, top, bottom, isActive, held, allMissed ? 0.4 : 1);
+        // Inside the box each string rings on in its own colour, dying away.
+        const ringX = blockX + BLOCK_H / 2;
+        const ringW = blockW - BLOCK_H / 2 - CHORD_BOX_PAD - 2;
+        if (ringW > BLOCK_H) {
+          const ringH = Math.max(6, Math.round(BLOCK_H * 0.42));
+          ctx.globalAlpha = (isActive ? 0.75 : 0.55) * (allMissed ? 0.4 : 1);
+          ctx.translate(ringX, 0);
+          for (const note of beat.notes) {
+            ctx.fillStyle = tailFade(note.color, ringW);
+            drawPill(0, note.noteY - ringH / 2, ringW, ringH, ringH / 2);
+            ctx.fill();
+          }
+          ctx.translate(-ringX, 0);
+          ctx.globalAlpha = 1;
+        }
       }
       // Heads sized for a tail: a chord's, or every note's with tails on.
       const headsOnly = noteTails || isChordBox;
@@ -1630,13 +1854,9 @@ function paintFrame() {
         const isHarm = !!(note.harmonicType && note.harmonicType > 0);
         const dyn = hasDynamics && note.dynamics !== undefined ? note.dynamics : 1.0;
         const ghostAlpha = 1.0; // Disabled transparency for ghost notes
-        // Unaccented notes step back so the accents pop — but only in a bar that
-        // has accents. Dimming every bar for one accented passage made whole
-        // stretches of the tab look muted.
-        const accentDim = hasAccentedNotes && beat.inAccentedBar && !note.isAccented ? 0.25 : 1.0;
         const dynAlpha = hasDynamics && note.dynamics !== undefined ? 0.3 + 0.7 * dyn : 1.0;
         const missedDim = reached && !isHit && tileMissed[note.noteKey] ? 0.2 : 1.0;
-        const baseAlpha = dynAlpha * accentDim * ghostAlpha * missedDim;
+        const baseAlpha = dynAlpha * ghostAlpha * missedDim;
 
         const blockY = note.noteY - BLOCK_H / 2;
         // A note is drawn as a solid "head" (where you pick it, carrying the fret
@@ -1662,7 +1882,6 @@ function paintFrame() {
         };
         // Bar mode keeps the label in the left "head" of the long block.
         const labelX = headsOnly ? blockX + headW / 2 : blockX + Math.min(blockW / 2, BLOCK_H * 0.65);
-        if (note.isPalmMute && palmMuteX === null) palmMuteX = labelX;
 
         // ── Slide-in line ────────────────────────────────────────────────
         if (note.slideIn && note.slideIn > 0) {
@@ -1722,8 +1941,12 @@ function paintFrame() {
 
         // Palm-muted notes keep their string colour — the P.M. lane under the
         // staff marks them, and a grey pill read as a disabled note.
-        if (!isHit && isDead) fillColor = "#374151";
-        // Active/hit notes get a lighter block instead of a white digit.
+        // An open string and a dead note are drawn hollow — an outline on the
+        // board's own colour — so "nothing fretted" reads before the digit does.
+        // Played (or, for an open string, under the cursor) they fill in like
+        // any other note: a lighter block instead of a white digit.
+        const isHollow = !isHarm && !isHit && (isDead || (note.fret === 0 && !isActive));
+        if (isHollow) fillColor = bgColor;
         else if (isActive || isHit) fillColor = lightenHex(note.color, 0.72);
 
         // ── Active glow — translucent ring behind the head ────────────────
@@ -1794,7 +2017,7 @@ function paintFrame() {
         if (isHarm) {
           // Harmonic: outlined pill
           const col = note.harmonicType === 1 ? note.color : "#e879f9";
-          ctx.globalAlpha = ghostAlpha * accentDim;
+          ctx.globalAlpha = ghostAlpha;
           if (hasTail) {
             ctx.fillStyle = (isHit ? hitFill : col) + "33";
             drawPill(tailX, tailY, tailW, tailH, tailH / 2);
@@ -1821,13 +2044,15 @@ function paintFrame() {
         } else {
           const alpha = isHit ? 1.0 : baseAlpha;
 
-          // Sustain tail: the string's colour, dimmed so the head stays the
-          // thing your eye lands on. Dead notes keep their grey.
+          // Sustain tail: the string's colour, dying away along its length so
+          // the head stays the thing your eye lands on. Dead notes keep their grey.
           if (hasTail) {
-            ctx.globalAlpha = alpha * (isActive ? 0.6 : 0.38);
-            ctx.fillStyle = isDead ? fillColor : note.color;
-            drawPill(tailX, tailY, tailW, tailH, tailH / 2);
+            ctx.globalAlpha = alpha * (isActive ? 0.8 : 0.6);
+            ctx.fillStyle = tailFade(isDead ? DEAD_NOTE_FILL : note.color, tailW);
+            ctx.translate(tailX, 0);
+            drawPill(0, tailY, tailW, tailH, tailH / 2);
             ctx.fill();
+            ctx.translate(-tailX, 0);
           }
 
           ctx.globalAlpha = alpha;
@@ -1852,8 +2077,29 @@ function paintFrame() {
           ctx.fill();
           ctx.shadowBlur = 0;
 
+          if (isHollow) {
+            ctx.strokeStyle = isDead ? DEAD_NOTE_EDGE : note.color;
+            ctx.lineWidth = 2;
+            drawPill(blockX + 1, blockY + 1, headW - 2, BLOCK_H - 2, Math.max(0, BLOCK_CORNER - 1));
+            ctx.stroke();
+          } else {
+            // A hairline in the pill's own colour, darker: a crisp contour on any board.
+            ctx.strokeStyle = pillEdge(note.color);
+            ctx.lineWidth = 1;
+            drawPill(blockX + 0.5, blockY + 0.5, headW - 1, BLOCK_H - 1, BLOCK_CORNER);
+            ctx.stroke();
+          }
+          // An accent is a ring round its note. (Dimming the rest of the bar
+          // instead made whole stretches of the tab look switched off.)
+          if (note.isAccented && hasAccentedNotes) {
+            ctx.strokeStyle = withAlpha(inkColor, 0.9);
+            ctx.lineWidth = 1.5;
+            drawPill(blockX - 2.5, blockY - 2.5, headW + 5, BLOCK_H + 5, BLOCK_CORNER + 2.5);
+            ctx.stroke();
+          }
+
           // Solid bar keeps its original sheen: a lighter strip on the top half.
-          if (!headsOnly && !isDead) {
+          if (!headsOnly && !isHollow) {
             ctx.fillStyle = "rgba(255,255,255,0.14)";
             drawPill(blockX + 1, blockY + 1, blockW - 2, BLOCK_H / 2 - 1, BLOCK_CORNER);
             ctx.fill();
@@ -1887,7 +2133,7 @@ function paintFrame() {
 
           // Dead note X over the pill
           if (isDead) {
-            ctx.strokeStyle = isActive ? "#94a3b8" : "#6b7280";
+            ctx.strokeStyle = isActive ? "#94a3b8" : DEAD_NOTE_EDGE;
             ctx.lineWidth = 2.5;
             const xr = 6, cx = labelX;
             ctx.beginPath();
@@ -2008,14 +2254,15 @@ function paintFrame() {
         // ── Fret label ────────────────────────────────────────────────────
         if (!isDead) {
           // "auto" reads the pill's own colour, so a dark palette gets light digits.
-          ctx.fillStyle = fretTextColor === "auto" ? readableInk(note.color) : fretTextColor;
+          // A hollow pill shows the board through, so its digit is in the board's ink.
+          ctx.fillStyle = isHollow ? inkColor : fretTextColor === "auto" ? readableInk(note.color) : fretTextColor;
           ctx.font = fretFont(fs);
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
 
           let text = note.fret.toString();
           if (note.isGhost) text = `(${text})`;
-          drawText(text, labelX, note.noteY);
+          drawText(text, labelX, note.noteY + 0.5);
         }
 
         // ── Fingering badge ───────────────────────────────────────────────
@@ -2058,11 +2305,16 @@ function paintFrame() {
             const x0 = prev.cx;
             const x1 = blockX + headW / 2;
             const midX = (x0 + x1) / 2;
-            const slurY = note.noteY - BLOCK_H / 2 + 1;
-            const arcH = Math.min(28, Math.max(16, (x1 - x0) * 0.4));
+            // Just clear of the heads, so the arc rests on them instead of digging in.
+            const slurY = note.noteY - BLOCK_H / 2 - 2;
+            // On the top string a full arc and its letter would climb into the
+            // rhythm lane: the arc stays flat there, and the letter goes between
+            // the two heads instead — where there is room for it.
+            const tucked = slurY < STAFF_TOP + STRING_SPACING / 2 && x1 - x0 - headW >= HP_TUCK_ROOM;
+            const arcH = tucked ? 10 : Math.min(28, Math.max(16, (x1 - x0) * 0.4));
 
             ctx.strokeStyle = hpColor;
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 2;
             ctx.lineCap = "round";
             ctx.beginPath();
             ctx.moveTo(x0, slurY);
@@ -2070,15 +2322,17 @@ function paintFrame() {
             ctx.stroke();
 
             // Label at apex of arc
+            // A quadratic peaks halfway to its control point — the label sits on
+            // that apex, not up at the control point where it floated loose.
             ctx.fillStyle = hpColor;
-            ctx.font = "bold 12px Inter";
+            ctx.font = HP_FONT;
             ctx.textAlign = "center";
-            ctx.textBaseline = "bottom";
-            drawText(label, midX, slurY - arcH - 3);
+            ctx.textBaseline = tucked ? "middle" : "bottom";
+            drawText(label, midX, tucked ? note.noteY - 1 : slurY - arcH / 2 - 3);
           } else {
             // No previous note visible – fallback to label above block
             ctx.fillStyle = hpColor;
-            ctx.font = "bold 12px Inter";
+            ctx.font = HP_FONT;
             ctx.textAlign = "center";
             ctx.textBaseline = "bottom";
             drawText(label, labelX, blockY - 3);
@@ -2093,7 +2347,7 @@ function paintFrame() {
 
         // Harmonic badge
         if (isHarm) {
-          ctx.font = "bold 8px Inter";
+          ctx.font = "bold 8px Inter, sans-serif";
           ctx.fillStyle = note.harmonicType === 1 ? "#a3e635" : "#f0abfc";
           const hLabel = note.harmonicType === 1 ? "N.H." : note.harmonicType === 2 ? "A.H."
             : note.harmonicType === 3 ? "T.H." : note.harmonicType === 4 ? "P.H." : "S.H.";
@@ -2130,12 +2384,10 @@ function paintFrame() {
               : note.bendSemitones ? `${note.bendSemitones / 2}` : "")
             : note.isPreBend ? "PB" : "R";
           const bIcon = note.isRelease ? "\u2193" : "\u2191";
-          const bgCol = note.isBend ? (isHit ? "#064e3b" : "#7e22ce")
-            : note.isPreBend ? (isHit ? "#064e3b" : "#4c1d95")
-              : (isHit ? "#064e3b" : "#312e81");
-          const txCol = note.isBend ? (isHit ? "#34d399" : "#f0abfc")
-            : note.isPreBend ? (isHit ? "#34d399" : "#ddd6fe")
-              : (isHit ? "#34d399" : "#c7d2fe");
+          // In the string's own colour, like the slurs; the arrow and the
+          // label tell a bend, a pre-bend and a release apart.
+          const bgCol = isHit ? "#064e3b" : mixHex(bgColor, note.color, 0.28);
+          const txCol = isHit ? "#34d399" : note.color;
           // Pass blockY (top edge) so connector line ends at block top
           drawBendBadge(bLabel, bIcon, bgCol, txCol, labelX, bendBadgeY, blockY);
         }
@@ -2170,10 +2422,37 @@ function paintFrame() {
         // ── Update slide tracking (right edge of block) ───────────────────
         stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + headW / 2, y: note.noteY, slideOut: note.slideOut ?? 0 });
       }
+    }
+  }
 
-      if (palmMuteX !== null && showTechniqueLabels) {
-        drawPalmMuteLabel(palmMuteX, beatW, isActive);
-      }
+  // ── Counting — "1 e & a" under each beat ─────────────────────────────────
+  // Below the palm-mute row, where nothing else is drawn: over the staff it
+  // would run into pick marks, chord names and slur letters. Left out when wide
+  // string spacing leaves no room for it on the board.
+  const countY = STAFF_TOP + 5 * STRING_SPACING + BLOCK_H / 2 + PM_ROW_GAP + COUNT_ROW_GAP;
+  if (showCounting && !hideNotes && countY <= BASE_H - 6) {
+    ctx.font = COUNT_FONT;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    for (let i = startIdx; i < renderBeats.length; i++) {
+      const x = xMap.xs[i] + BLOCK_PAD + BLOCK_H / 2;
+      if (x > visR) break;
+      const count = beatCounts[i];
+      if (!count) continue;
+      ctx.fillStyle = withAlpha(inkColor, count.onBeat ? 0.7 : 0.4);
+      drawText(count.label, x, countY);
+    }
+  }
+
+  // ── Palm-mute spans ──────────────────────────────────────────────────────
+  if (showTechniqueLabels && !hideNotes) {
+    for (const run of pmRuns) {
+      const runL = xMap.xs[run.start];
+      const runR = xMap.xs[run.end + 1];
+      if (runR < visL) continue;
+      if (runL > visR) break;
+      const live = isPlaying && startWallMs !== null && cursorPos >= runL && cursorPos < runR;
+      drawPalmMuteSpan(runL + BLOCK_PAD, xMap.xs[run.end] + BLOCK_PAD + BLOCK_H, runR - runL, live);
     }
   }
 
@@ -2183,9 +2462,13 @@ function paintFrame() {
     // Half the digit stack (two 14px digits ±10 px from the middle) plus half a pill.
     const sigClearance = 17 + BLOCK_H / 2;
     ctx.fillStyle = withAlpha(inkColor, 0.45);
-    ctx.font = "bold 14px Inter, sans-serif";
+    // Engraved numerals, like the rhythm lane above them; plain digits until
+    // (or unless) the music font is in. A SMuFL numeral is two staff spaces tall
+    // and centred on its baseline, so the pair stacks one space either side.
+    const sigSp = TIME_SIG_PX / 4;
+    ctx.font = bravuraReady ? TIME_SIG_FONT : "bold 14px Inter, sans-serif";
     ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+    ctx.textBaseline = bravuraReady ? "alphabetic" : "middle";
     // Markers run left to right: find the first in view, stop past the last.
     let lo = 0, hi = timeSigMarkers.length;
     while (lo < hi) {
@@ -2201,8 +2484,13 @@ function paintFrame() {
       // the signature steps aside wherever that first beat has a note under it.
       const opening = hideNotes ? undefined : renderBeats[marker.beatIdx];
       if (opening?.notes.some((n) => Math.abs(n.noteY - sigMidY) < sigClearance)) continue;
-      drawText(marker.sig[0].toString(), mx, sigMidY - 10);
-      drawText(marker.sig[1].toString(), mx, sigMidY + 10);
+      if (bravuraReady) {
+        drawText(timeSigGlyph(marker.sig[0]), mx, sigMidY - sigSp);
+        drawText(timeSigGlyph(marker.sig[1]), mx, sigMidY + sigSp);
+      } else {
+        drawText(marker.sig[0].toString(), mx, sigMidY - 10);
+        drawText(marker.sig[1].toString(), mx, sigMidY + 10);
+      }
     }
   }
 
@@ -2390,13 +2678,30 @@ function paintFrame() {
 
   // ── Cursor line + beat pulse ─────────────────────────────────────────────
   if (dispCursor > 0 || isPlaying) {
-    // Learn mode keeps no time, so the stopped-red of a paused cursor would say
-    // something it isn't: it rests on the target instead.
-    ctx.strokeStyle = isPlaying ? "#06b6d4" : isLearning ? withAlpha(LEARN_COLOR, 0.6) : "#ef4444";
-    ctx.lineWidth = isLearning ? 2 : 3;
+    // While it plays: a soft wake behind the line, so the eye finds it without
+    // the line itself having to be heavy.
+    if (isPlaying) {
+      const wake = ctx.createLinearGradient(dispCursor - CURSOR_WAKE_W, 0, dispCursor, 0);
+      wake.addColorStop(0, withAlpha(CURSOR_COLOR, 0));
+      wake.addColorStop(1, withAlpha(CURSOR_COLOR, 0.16));
+      ctx.fillStyle = wake;
+      ctx.fillRect(dispCursor - CURSOR_WAKE_W, 0, CURSOR_WAKE_W, viewH);
+    }
+    // Paused it is simply the board's ink — red read as an error. Learn mode
+    // keeps no time, so there it rests on the target in the learn colour.
+    ctx.strokeStyle = isPlaying ? CURSOR_COLOR : isLearning ? withAlpha(LEARN_COLOR, 0.6) : withAlpha(inkColor, 0.7);
+    ctx.lineWidth = isLearning ? 2 : 1.5;
     ctx.beginPath();
     ctx.moveTo(dispCursor, 0); ctx.lineTo(dispCursor, viewH);
     ctx.stroke();
+    // A marker on top of the line, pointing down it.
+    if (!isLearning) {
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.beginPath();
+      ctx.moveTo(dispCursor - 5, 0); ctx.lineTo(dispCursor + 5, 0); ctx.lineTo(dispCursor, 7);
+      ctx.closePath();
+      ctx.fill();
+    }
 
     if (isPlaying && beatsElapsed > 0) {
       const bp = beatsElapsed % 1;
@@ -2469,6 +2774,7 @@ self.onmessage = (e: MessageEvent) => {
       canvas.height = H * dpr;
       vscale = H > 0 ? H / BASE_H : 1;
       ctx = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
+      tailFades.clear();
       ctx.setTransform(dpr * vscale, 0, 0, dpr * vscale, 0, 0);
       // The GPU dropped the context and gave it back blank: repaint even while
       // paused, and rebuild the cached bitmaps, which may have been lost with it.
@@ -2498,11 +2804,14 @@ self.onmessage = (e: MessageEvent) => {
     }
     case 'DATA': {
       renderBeats = msg.renderBeats;
+      pmRuns = palmMuteRuns(renderBeats);
       measureEndXs = msg.measureEndXs;
       totalBeats = msg.totalBeats;
       hasAccentedNotes = msg.hasAccentedNotes;
       hasDynamics = msg.hasDynamics;
       timeSigMarkers = msg.timeSigMarkers ?? [];
+      beatCounts = beatCountLabels(renderBeats, measureEndXs, timeSigMarkers);
+      beatTickBeats = beatTickPositions(measureEndXs, timeSigMarkers);
       tupletGroups = msg.tupletGroups ?? [];
       tempoMap = msg.tempoMap ?? [];
       pausedCursorPos = 0;
@@ -2648,7 +2957,6 @@ self.onmessage = (e: MessageEvent) => {
       if (msg.flipStrings !== undefined) flipStrings = msg.flipStrings;
       if (msg.stringCount !== undefined && msg.stringCount !== stringCount) {
         stringCount = msg.stringCount;
-        STAFF_LINE_GROUPS = staffLineGroups(stringCount);
       }
       if (msg.rightToLeft !== undefined) rightToLeft = msg.rightToLeft;
       if (msg.fretText !== undefined) fretTextColor = msg.fretText;
@@ -2662,6 +2970,7 @@ self.onmessage = (e: MessageEvent) => {
       if (msg.showRhythmLane !== undefined) showRhythmLane = msg.showRhythmLane;
       if (msg.showChordNames !== undefined) showChordNames = msg.showChordNames;
       if (msg.showMeasureLines !== undefined) showMeasureLines = msg.showMeasureLines;
+      if (msg.showCounting !== undefined) showCounting = msg.showCounting;
       if (msg.showTechniqueLabels !== undefined) showTechniqueLabels = msg.showTechniqueLabels;
       if (msg.hitAnimations !== undefined) hitAnimations = msg.hitAnimations;
       if (msg.timingHints !== undefined) {

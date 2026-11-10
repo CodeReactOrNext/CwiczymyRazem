@@ -51,6 +51,8 @@
     "tuning_gutter_desc": "Fixierte Saitennamen links",
     "measure_lines": "Taktstriche",
     "measure_lines_desc": "Senkrechte Taktteiler",
+    "counting": "Zählzeiten",
+    "counting_desc": "„1 e & a“ unter der Notenzeile — so zählst du den Takt",
     "technique": "Technik-Markierungen",
     "technique_desc": "H/P, Bendings, PM, Vibrato, Flageoletts, Anschlag ⊓/⋁"
   },

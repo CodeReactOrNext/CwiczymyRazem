@@ -289,6 +289,8 @@ describe("TablatureViewer.worker — looking things up along the song", () => {
 
   it("draws the time signature and tuplet in view, nothing from far away, and no dynamics bars", async () => {
     const { send, run, log } = await startWorker(longPiece);
+    // The counting under the staff is digits too — off, so a "4" is the signature's.
+    send({ type: "STYLE", showCounting: false });
     run(FRAME_MS);
     expect(log.texts).toContain("4");
     expect(log.texts).not.toContain("7");
@@ -311,9 +313,26 @@ describe("TablatureViewer.worker — looking things up along the song", () => {
       timeSignature: [4, 4],
       beats: [[3, 6], [2, 7], [2, 9], [1, 10]].map(([string, fret]) => ({ duration: 1, notes: [{ string, fret }] })),
     }];
-    const { run, log } = await startWorker(riddle);
+    const { send, run, log } = await startWorker(riddle);
+    send({ type: "STYLE", showCounting: false });
     run(FRAME_MS);
     expect(log.texts).toEqual(expect.arrayContaining(["6", "7", "9", "10"]));
     expect(log.texts).not.toContain("4");
+  });
+
+  it("counts the beats under the staff, and stops when counting is switched off", async () => {
+    const eighths: TablatureMeasure[] = [{
+      timeSignature: [2, 4],
+      beats: [7, 7, 7, 7].map((fret) => ({ duration: 0.5, notes: [{ string: 3, fret }] })),
+    }];
+    const { send, run, log } = await startWorker(eighths);
+    run(FRAME_MS);
+    expect(log.texts.filter((text) => text === "&")).toHaveLength(2);
+    expect(log.texts).toEqual(expect.arrayContaining(["1", "2"]));
+
+    log.texts.length = 0;
+    send({ type: "STYLE", showCounting: false });
+    run(FRAME_MS);
+    expect(log.texts).not.toContain("&");
   });
 });

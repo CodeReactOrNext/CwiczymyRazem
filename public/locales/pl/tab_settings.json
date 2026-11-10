@@ -51,6 +51,8 @@
     "tuning_gutter_desc": "Przypięte nazwy strun po lewej",
     "measure_lines": "Kreski taktowe",
     "measure_lines_desc": "Pionowe podziały taktów",
+    "counting": "Liczenie",
+    "counting_desc": "„1 e & a” pod pięciolinią — jak liczyć takt",
     "technique": "Oznaczenia technik",
     "technique_desc": "H/P, podciągnięcia, PM, wibrato, flażolety, kostkowanie ⊓/⋁"
   },

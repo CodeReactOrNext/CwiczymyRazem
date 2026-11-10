@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { staffLineSpacing, stringRow } from "./tablatureStringRows";
+import { staffLineSpacing, staffLineWidth, stringRow } from "./tablatureStringRows";
 
 describe("stringRow", () => {
   it("puts the high e on the top line by default", () => {
@@ -32,5 +32,24 @@ describe("a four-string staff", () => {
   it("spreads its lines over the height six strings take", () => {
     expect(staffLineSpacing(32, 4) * 3).toBe(32 * 5);
     expect(staffLineSpacing(32)).toBe(32);
+  });
+});
+
+describe("staffLineWidth", () => {
+  it("draws a guitar's three plain strings thin and its wound ones heavier towards the low E", () => {
+    const widths = [0, 1, 2, 3, 4, 5].map((row) => staffLineWidth(row));
+    expect(widths.slice(0, 3)).toEqual([1, 1, 1]);
+    expect(widths[3]).toBeGreaterThan(1);
+    expect(widths[4]).toBeGreaterThan(widths[3]);
+    expect(widths[5]).toBeGreaterThan(widths[4]);
+  });
+
+  it("follows the strings when the staff is flipped", () => {
+    expect(staffLineWidth(0, true)).toBe(staffLineWidth(5));
+    expect(staffLineWidth(5, true)).toBe(1);
+  });
+
+  it("treats every string of a bass as wound", () => {
+    expect([0, 1, 2, 3].every((row) => staffLineWidth(row, false, 4) > 1)).toBe(true);
   });
 });

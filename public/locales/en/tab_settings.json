@@ -51,6 +51,8 @@
     "tuning_gutter_desc": "Pinned string names on the left",
     "measure_lines": "Measure lines",
     "measure_lines_desc": "Vertical bar dividers",
+    "counting": "Counting",
+    "counting_desc": "“1 e & a” under the staff — how to count the bar",
     "technique": "Technique markers",
     "technique_desc": "H/P, bends, PM, vibrato, harmonics, picking ⊓/⋁"
   },

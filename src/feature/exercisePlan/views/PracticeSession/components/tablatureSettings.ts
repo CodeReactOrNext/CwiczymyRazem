@@ -299,6 +299,8 @@ export interface TablatureSettings {
   showChordNames: boolean;
   showTuningGutter: boolean;
   showMeasureLines: boolean;
+  /** "1 e & a" under the staff — how each beat is counted out loud. */
+  showCounting: boolean;
   showTechniqueLabels: boolean;
   // ── Feedback ──
   hitAnimations: boolean;
@@ -333,6 +335,7 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   showChordNames: true,
   showTuningGutter: true,
   showMeasureLines: true,
+  showCounting: true,
   showTechniqueLabels: true,
   hitAnimations: true,
   timingHints: true,
@@ -423,6 +426,7 @@ type TablatureLookSettings = Pick<
   | "showRhythmLane"
   | "showChordNames"
   | "showMeasureLines"
+  | "showCounting"
   | "showTechniqueLabels"
   | "hitAnimations"
   | "timingHints"
@@ -464,6 +468,7 @@ export function tablatureStylePatch(
     showRhythmLane: settings.showRhythmLane,
     showChordNames: settings.showChordNames,
     showMeasureLines: settings.showMeasureLines,
+    showCounting: settings.showCounting,
     showTechniqueLabels: settings.showTechniqueLabels,
     hitAnimations: settings.hitAnimations,
     timingHints: settings.timingHints,
@@ -508,6 +513,7 @@ export function useTablatureStyle(): {
     showRhythmLane,
     showChordNames,
     showMeasureLines,
+    showCounting,
     showTechniqueLabels,
     hitAnimations,
     timingHints,
@@ -527,6 +533,7 @@ export function useTablatureStyle(): {
           showRhythmLane,
           showChordNames,
           showMeasureLines,
+          showCounting,
           showTechniqueLabels,
           hitAnimations,
           timingHints,
@@ -548,6 +555,7 @@ export function useTablatureStyle(): {
       showRhythmLane,
       showChordNames,
       showMeasureLines,
+      showCounting,
       showTechniqueLabels,
       hitAnimations,
       timingHints,

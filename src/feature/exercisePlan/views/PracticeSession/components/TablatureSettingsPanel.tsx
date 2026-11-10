@@ -283,6 +283,11 @@ export function TablatureSettingsPanel() {
       desc: t("toggles.measure_lines_desc"),
     },
     {
+      key: "showCounting",
+      label: t("toggles.counting"),
+      desc: t("toggles.counting_desc"),
+    },
+    {
       key: "showTechniqueLabels",
       label: t("toggles.technique"),
       desc: t("toggles.technique_desc"),
