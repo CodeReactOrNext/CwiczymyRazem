@@ -46,11 +46,11 @@ export const StartGate = memo(function StartGate({
       )}>
       <div className='flex flex-wrap items-center justify-center gap-3'>
         <Button size='lg' onClick={onStart} className='h-12 gap-2 px-8 text-base font-bold'>
-          <Play className='!size-5' />
+          <Play className='mr-2 !size-5' />
           {t("start_gate.start")}
         </Button>
         <Button size='lg' variant='ghost' onClick={onPreview} className='h-12 gap-2 px-6 text-base font-semibold'>
-          <Eye className='!size-5' />
+          <Eye className='mr-2 !size-5' />
           {t("start_gate.preview")}
         </Button>
       </div>

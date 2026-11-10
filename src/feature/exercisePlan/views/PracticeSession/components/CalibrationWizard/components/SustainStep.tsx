@@ -218,11 +218,13 @@ export const SustainStep = React.memo(function SustainStep({
           )}
         </div>
 
-        {/* No way past without the check: the note has to ring to the end. */}
-        <div className="mt-auto flex justify-end shortwide:[grid-area:next]">
+        {/* No way past without the check: the note has to ring to the end.
+            Pinned to the bottom of the screen: a warning or the auto-gain
+            result grows the step, and Next must not drop below the fold. */}
+        <div className="sticky bottom-0 z-10 -mx-5 mt-auto flex justify-end bg-zinc-950 px-5 py-3 sm:-mx-12 sm:px-12 shortwide:mx-0 shortwide:self-end shortwide:px-0 shortwide:py-2 shortwide:[grid-area:next]">
           <Button onClick={onNext} disabled={!passedOnce} className="h-12 w-full gap-2 px-6 text-base font-semibold sm:h-11 sm:w-auto">
             {t("sustain.next")}
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="ml-1.5 h-4 w-4" />
           </Button>
         </div>
       </div>

@@ -73,7 +73,7 @@ const MobileMicSource = ({ onSelect, onCancel }: SourceStepProps) => {
       <div className="mt-auto flex justify-end pt-8 shortwide:pt-4">
         <Button onClick={() => onSelect("microphone")} className="h-12 w-full gap-2 px-6 text-base font-semibold sm:h-11 sm:w-auto">
           {t("source.continue")}
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="ml-1.5 h-4 w-4" />
         </Button>
       </div>
     </div>
