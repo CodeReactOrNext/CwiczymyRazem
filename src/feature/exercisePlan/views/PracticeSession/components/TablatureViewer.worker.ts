@@ -4,11 +4,12 @@ import type { FillStep } from "../utils/fillFeed";
 import type { NoteTiming } from "../utils/timingGrade";
 import type { BeatCount } from "./beatCounting";
 import { beatCountLabels, beatTickPositions } from "./beatCounting";
-import { addFillSteps, clearLiveFills, createLiveFills, currentTiming, isLiveTiming, liveFillBeat, liveFillOn } from "./liveNoteFills";
+import { addFillSteps, clearLiveFills, createLiveFills, currentTiming, isLiveTiming, liveFillDrawnBeat, liveFillOn } from "./liveNoteFills";
 import { applyHitNotes, applyMissedNotes, createNoteHitVisualState, resetFrozenNoteState, resetNoteHitVisualState } from "./noteHitVisualState";
 import type { PalmMuteRun } from "./palmMuteRuns";
 import { palmMuteRuns } from "./palmMuteRuns";
 import { staffLineWidth, stringRow } from "./tablatureStringRows";
+import { pagedScrollX, pageStarts } from "./tabPaging";
 import type { BeatXMap } from "./tabSpacing";
 import { baseBeatWidth, beatToX, buildBeatXMap, xToBeat } from "./tabSpacing";
 import { audioClockNow, createAudioClock, observeAudioClock, resetAudioClock } from "./workerAudioClock";
@@ -33,6 +34,9 @@ let stringCount = 6;
 // transform on the canvas element — the worker only needs to know about it so
 // the text it draws does not come out backwards (see drawText).
 let rightToLeft = false;
+// The standing board: the tab holds still a page at a time and the cursor
+// crosses it (see tabPaging.ts), instead of sliding under a fixed cursor.
+let pagedScroll = false;
 // Width (world px) of the pinned left "tuning gutter" that shows each string's
 // tuned note. Content is inset by this much when tuning data is present so the
 // first notes don't hide behind the labels. Keep in sync with TAB_GUTTER_W in
@@ -459,10 +463,73 @@ let reducedMotion = false;
 /** A glide in progress (SCROLL with `smooth`): the paused view easing to its next resting place. */
 let glide: { fromCursor: number; fromScroll: number; toCursor: number; toScroll: number; start: number } | null = null;
 const GLIDE_MS = 320;
+
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+// ── Standing board ────────────────────────────────────────────────────────────
+// A page turns in step with the music: two thirds of a beat, so a slow piece
+// turns unhurried and a fast one is standing again before its next notes are
+// due — 333 ms at 120 bpm, kept between the two ends below. Eased at both ends
+// (see `easeInOutCubic`): a turn that set off at full speed read as a jolt.
+const PAGE_TURN_BEATS = 2 / 3;
+const PAGE_TURN_MIN_MS = 180;
+const PAGE_TURN_MAX_MS = 480;
+const PAGE_TURN_DEFAULT_MS = 330;
+
+/** The tempo at `beat` of the pass, in bpm. */
+function tempoAt(beat: number): number {
+  let ratio = 1;
+  for (const segment of tempoMap) {
+    if (segment.beatPos > beat) break;
+    ratio = segment.ratio;
+  }
+  return bpm * ratio;
+}
+
+/** How long a page turn starting at `beat` of the pass takes, at the tempo there. */
+function pageTurnMs(beat: number): number {
+  const tempo = tempoAt(beat);
+  if (!(tempo > 0)) return PAGE_TURN_DEFAULT_MS;
+  return Math.min(PAGE_TURN_MAX_MS, Math.max(PAGE_TURN_MIN_MS, (60_000 / tempo) * PAGE_TURN_BEATS));
+}
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+/** How far the played part of a standing page is dimmed into the board. */
+const PAGE_PLAYED_DIM = 0.5;
+/** The page being turned to, and the turn under way towards it. */
+let pageTarget: number | null = null;
+let pageTurn: { from: number; start: number; ms: number } | null = null;
+let pageShown = 0;
+let pageCache: { ends: number[]; totalW: number; visibleW: number; starts: number[] } | null = null;
+
+/** Where the pages of the current layout start, worked out once per layout. */
+function currentPageStarts(totalW: number, visibleW: number): number[] {
+  if (!pageCache || pageCache.ends !== measureEndPx || pageCache.totalW !== totalW || pageCache.visibleW !== visibleW) {
+    pageCache = { ends: measureEndPx, totalW, visibleW, starts: pageStarts(measureEndPx, totalW, visibleW) };
+  }
+  return pageCache.starts;
+}
+
+/** The standing board's scroll this frame: the cursor's page, or part-way
+ *  through the turn to it. */
+function standingScroll(target: number, clockMs: number, beat: number): number {
+  if (pageTarget === null || reducedMotion) {
+    pageTurn = null;
+  } else if (target !== pageTarget) {
+    pageTurn = { from: pageShown, start: clockMs, ms: pageTurnMs(beat) };
+  }
+  pageTarget = target;
+  if (pageTurn) {
+    const t = Math.min(1, (clockMs - pageTurn.start) / pageTurn.ms);
+    pageShown = pageTurn.from + (target - pageTurn.from) * easeInOutCubic(t);
+    if (t >= 1) pageTurn = null;
+  } else {
+    pageShown = target;
+  }
+  return pageShown;
+}
 const LEARN_SETTLE_MS = 320;
 const LEARN_PING_MS = 1100;
 const LEARN_COLOR = "#22d3ee";
-const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 /** Motion is off when the tab's animations are, or the system asks for less. */
 const learnIsCalm = () => !hitAnimations || reducedMotion;
 
@@ -601,8 +668,6 @@ const COUNT_ROW_GAP = 14;
 const COUNT_FONT = "bold 9px Inter, sans-serif";
 /** The playback cursor while it runs. */
 const CURSOR_COLOR = "#06b6d4";
-/** Width of the wake trailing the cursor. */
-const CURSOR_WAKE_W = 26;
 /** Bar number at a bar line. */
 const BAR_NUMBER_FONT = "bold 11px Inter, sans-serif";
 /** Free space two heads need between them for the slur's letter to sit there. */
@@ -1020,6 +1085,79 @@ function drawPill(x: number, y: number, w: number, h: number, r: number) {
   pillPath(x, y, w, h, r);
 }
 
+// ── Sustain: the fill running along a held note's tail ────────────────────────
+// The front of the fill is a comet: a bright head in a halo of the hit colour,
+// drawing a long light trail down the part just filled. It burns while the fill
+// moves and dies down when the note is let go. A note held to its end sends the
+// comet to the end of the tail, where it flares once and goes out.
+/** How long the comet takes to flare and go out at the end of a held note. */
+const SUSTAIN_DONE_MS = 560;
+/** How far behind the comet its trail reaches while the note is held (world px)… */
+const SUSTAIN_TRAIL_W = 90;
+/** …and behind the flare at the note's end. */
+const SUSTAIN_DONE_TRAIL_W = 120;
+/** How bright the trail is where it meets the comet. */
+const SUSTAIN_TRAIL_ALPHA = 0.75;
+/** How quickly the comet lights up and dies down, per frame. */
+const SUSTAIN_SPARK_EASE = 0.22;
+
+/** A soft glow of the hit colour, `r` around (x, y). Drawn at the current globalAlpha. */
+function drawSustainHalo(x: number, y: number, r: number) {
+  const halo = ctx?.createRadialGradient?.(x, y, 0, x, y, r);
+  if (!ctx || !halo) return;
+  halo.addColorStop(0, withAlpha(hitGlow, 0.75));
+  halo.addColorStop(0.45, withAlpha(hitGlow, 0.25));
+  halo.addColorStop(1, withAlpha(hitGlow, 0));
+  ctx.fillStyle = halo;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/** The light a comet at `x` leaves on the tail back to `fromX`, at most `reach` long. */
+function drawSustainTrail(fromX: number, x: number, y: number, tailH: number, reach: number) {
+  const start = Math.max(fromX, x - reach);
+  if (!ctx || x <= start) return;
+  const trail = ctx.createLinearGradient(start, 0, x, 0);
+  trail.addColorStop(0, "rgba(255,255,255,0)");
+  trail.addColorStop(1, `rgba(255,255,255,${SUSTAIN_TRAIL_ALPHA})`);
+  ctx.fillStyle = trail;
+  ctx.fillRect(start, y - tailH / 2, x - start, tailH);
+}
+
+/** The comet at the front of a growing fill, centred on (x, y), its trail
+ *  reaching back no further than `fromX`. `strength` 0–1. */
+function drawSustainComet(x: number, y: number, tailH: number, fromX: number, strength: number) {
+  if (!ctx || strength <= 0.02) return;
+  const before = ctx.globalAlpha;
+  ctx.globalAlpha = before * strength;
+  drawSustainTrail(fromX, x, y, tailH, SUSTAIN_TRAIL_W);
+  drawSustainHalo(x, y, BLOCK_H * 0.7);
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(x, y, tailH * 0.55, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = before;
+}
+
+/** A note held to its end, `age` (0–1) into its animation: the comet, arrived
+ *  at the end of the tail (which starts at `tailX` and ends at `endX`), flares
+ *  and goes out. */
+function drawSustainDone(tailX: number, endX: number, y: number, tailH: number, age: number) {
+  if (!ctx || endX <= tailX) return;
+  const out = easeOutCubic(age);
+  const fade = 1 - age;
+  ctx.globalAlpha = fade;
+  drawSustainTrail(tailX, endX, y, tailH, SUSTAIN_DONE_TRAIL_W);
+  drawSustainHalo(endX, y, BLOCK_H * (0.7 + 0.9 * out));
+  ctx.globalAlpha = fade * fade;
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(endX, y, tailH * (0.55 + 0.5 * out), 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
 // ── Chord box ─────────────────────────────────────────────────────────────────
 /** Notes a beat needs to be drawn as a chord box rather than note by note. */
 const CHORD_BOX_MIN_NOTES = 3;
@@ -1409,7 +1547,10 @@ function drawRestSymbol(x: number, dur: number) {
 }
 
 // ── Main render frame ─────────────────────────────────────────────────────────
-function paintFrame() {
+/** The longest a frame's own timestamp may trail the clock and still be used. */
+const FRAME_STAMP_MAX_LAG_MS = 100;
+
+function paintFrame(frameStamp?: number) {
   if (!ctx || W === 0) return;
 
   // Covered: skip the paint but keep `needsRedraw` intact, so uncovering repaints
@@ -1463,13 +1604,21 @@ function paintFrame() {
 
   // The audio clock now, and the moment the streamed fills are drawn at: a
   // little behind it, so the steps around that moment are already in.
-  const audioNow = audioClockNow(audioClock, performance.now());
+  // The board moves by the frame's own timestamp, which ticks with the screen,
+  // not by the moment this code happens to run: that moment drifts a few ms
+  // from frame to frame, the scroll steps came out uneven, and edges doubled
+  // under an eye following the notes. A stamp that is missing or far behind
+  // (a stalled frame) falls back to the clock.
+  const clockMs = performance.now();
+  const frameLagMs = frameStamp !== undefined && Number.isFinite(frameStamp) ? clockMs - frameStamp : 0;
+  const stampLagMs = frameLagMs >= 0 && frameLagMs <= FRAME_STAMP_MAX_LAG_MS ? frameLagMs : 0;
+  const audioNow = audioClockNow(audioClock, clockMs - stampLagMs);
   const fillRenderSec = audioNow !== null ? audioNow - liveFills.delaySec : null;
 
   if (isPlaying && countInRemaining === 0) {
     const elapsed = (audioStartSec !== null && audioNow !== null && clockFromTicks)
       ? (audioNow - audioStartSec)
-      : startWallMs !== null ? (Date.now() - startWallMs) / 1000 : 0;
+      : startWallMs !== null ? (Date.now() - stampLagMs - startWallMs) / 1000 : 0;
     beatsElapsed = computeBeatsElapsed(elapsed);
 
     if (loopStartBeat !== null && loopEndBeat !== null && loopEndBeat > loopStartBeat
@@ -1488,13 +1637,21 @@ function paintFrame() {
       wrappedCursor = totalBeats > 0 ? beatToX(xMap, beatsElapsed - pass * totalBeats) : 0;
       dispCursor = pass * totalW + wrappedCursor;
     }
-    scrollX = Math.max(0, dispCursor - viewW / 4);
     lastDispCursor = dispCursor;
     lastSeamless = seamless;
     // Pause/seek anchor stays within a single repetition (tile-0 space)
     pausedCursorPos = wrappedCursor;
-    pausedScrollX = Math.max(0, wrappedCursor - viewW / 4);
+    if (pagedScroll) {
+      const starts = currentPageStarts(totalW, viewW - contentLeft);
+      scrollX = standingScroll(pagedScrollX(starts, dispCursor - wrappedCursor, wrappedCursor), clockMs - stampLagMs, xToBeat(xMap, wrappedCursor));
+      // Pausing leaves the page where it stands.
+      pausedScrollX = pagedScrollX(starts, 0, wrappedCursor);
+    } else {
+      scrollX = Math.max(0, dispCursor - viewW / 4);
+      pausedScrollX = Math.max(0, wrappedCursor - viewW / 4);
+    }
   }
+  if (!isPlaying || countInRemaining !== 0 || !pagedScroll) { pageTarget = null; pageTurn = null; }
 
   // The board scrolls in whole device pixels. At a fractional offset every edge
   // and every glyph is antialiased differently from one frame to the next, and
@@ -1855,6 +2012,8 @@ function paintFrame() {
       // (see drawChordBox) — its notes get heads and no tails, whatever the
       // tail setting.
       const isChordBox = beat.notes.length >= CHORD_BOX_MIN_NOTES;
+      // The pace a held note's fill runs at here (liveFillDrawnBeat).
+      const beatsPerSec = tempoAt(beat.offsetX) / 60;
       if (isChordBox) {
         let top = Infinity;
         let bottom = -Infinity;
@@ -1868,7 +2027,7 @@ function paintFrame() {
           // A streamed fill is known for this frame; any other is last frame's,
           // which the heads below update.
           const fill = isOutgoing ? blockW
-            : liveFill ? heldFillWidth(liveFillBeat(liveFill, fillRenderSec), beatPx, beat.offsetX, pxPerBeat, blockX, blockW)
+            : liveFill ? heldFillWidth(liveFillDrawnBeat(liveFill, fillRenderSec, beatsPerSec), beatPx, beat.offsetX, pxPerBeat, blockX, blockW)
               : (noteVisualFill.get(note.noteKey) ?? 0);
           if (hit) held = Math.max(held, fill);
           if (hit || !(reached && tileMissed[note.noteKey])) allMissed = false;
@@ -2042,7 +2201,7 @@ function paintFrame() {
           // Streamed: drawn between the matching loop's own steps, a little
           // behind the clock (liveNoteFills.ts) — it grows at the cursor's pace
           // and stops exactly where the note stopped ringing.
-          fillW = heldFillWidth(liveFillBeat(liveFill, fillRenderSec), beatPx, beat.offsetX, pxPerBeat, blockX, blockW);
+          fillW = heldFillWidth(liveFillDrawnBeat(liveFill, fillRenderSec, beatsPerSec), beatPx, beat.offsetX, pxPerBeat, blockX, blockW);
         } else if (isHit) {
           // Green fills up to how far the note was actually SUSTAINED. `hitVal` is
           // the beat matching last confirmed the correct pitch still ringing — it
@@ -2167,6 +2326,32 @@ function paintFrame() {
             notePath();
             ctx.fillStyle = finalHitColor;
             ctx.fill();
+          } else if (fillW > 0 && hasTail) {
+            // A note with a tail: the head fills as the fill crosses it, then
+            // the fill runs down the tail as a bar of its own with a round
+            // front — no clipping, and no flat cut for a leading edge.
+            ctx.fillStyle = finalHitColor;
+            if (fillStartW === 0 && fillW >= headW) {
+              drawPill(blockX, blockY, headW, BLOCK_H, BLOCK_CORNER);
+              ctx.fill();
+            } else if (fillStartW < headW) {
+              ctx.save();
+              drawPill(blockX, blockY, headW, BLOCK_H, BLOCK_CORNER);
+              ctx.clip();
+              ctx.fillRect(blockX + fillStartW, blockY, Math.max(0, Math.min(fillW, headW) - fillStartW), BLOCK_H);
+              ctx.restore();
+            }
+            const edge = blockX + fillW;
+            const from = Math.max(tailX, blockX + fillStartW);
+            const capR = tailH / 2;
+            if (fillW > headW && edge - capR > from) {
+              ctx.fillStyle = finalHitColor;
+              ctx.fillRect(from, tailY, edge - capR - from, tailH);
+              ctx.beginPath();
+              ctx.arc(edge - capR, note.noteY, capR, -Math.PI / 2, Math.PI / 2);
+              ctx.fill();
+              drawSustainComet(edge - capR, note.noteY, tailH, from, liveFill ? liveFill.spark : 0);
+            }
           } else if (fillW > 0) {
             ctx.save();
             notePath();
@@ -2191,6 +2376,22 @@ function paintFrame() {
           }
 
           ctx.globalAlpha = 1;
+
+          // The spark burns while the fill moves and dies down when it stops;
+          // a fill that reaches the note's end sets off its closing animation.
+          if (liveFill && !isOutgoing) {
+            const moving = isPlaying && fillW > liveFill.drawnW + 0.01 && fillW < blockW - 0.5;
+            liveFill.spark += ((moving ? 1 : 0) - liveFill.spark) * SUSTAIN_SPARK_EASE;
+            liveFill.drawnW = fillW;
+            if (hasTail && filledWhole && liveFill.doneAt === null) liveFill.doneAt = frameNow;
+            if (hasTail && liveFill.doneAt !== null && hitAnimations && !reducedMotion) {
+              const age = (frameNow - liveFill.doneAt) / SUSTAIN_DONE_MS;
+              if (age < 1) {
+                drawSustainDone(tailX, blockX + blockW - tailH / 2, note.noteY, tailH, age);
+                needsRedraw = true;
+              }
+            }
+          }
 
           // Dead note X over the pill
           if (isDead) {
@@ -2626,7 +2827,12 @@ function paintFrame() {
   // perfectly readable and only the older notes disappear. Fill only the visible
   // span (viewL..dispCursor) so the rect can't grow unbounded as the monotonic
   // cursor advances across repetitions.
-  if (dispCursor > 0) {
+  // On a standing page the same gradient would deepen as the cursor crossed
+  // it, so there the played part is simply dimmed evenly.
+  if (dispCursor > 0 && pagedScroll && isPlaying) {
+    ctx.fillStyle = withAlpha(bgColor, PAGE_PLAYED_DIM);
+    ctx.fillRect(viewL, 0, dispCursor - viewL, viewH);
+  } else if (dispCursor > 0) {
     const fade = ctx.createLinearGradient(viewL, 0, dispCursor, 0);
     fade.addColorStop(0,    withAlpha(bgColor, 0.98));
     fade.addColorStop(0.3,  withAlpha(bgColor, 0.82));
@@ -2741,15 +2947,6 @@ function paintFrame() {
   if (dispCursor > 0 || isPlaying) {
     // On a whole device pixel too, so the line stays one crisp stroke.
     const cursorX = Math.round(dispCursor * devicePx) / devicePx;
-    // While it plays: a soft wake behind the line, so the eye finds it without
-    // the line itself having to be heavy.
-    if (isPlaying) {
-      const wake = ctx.createLinearGradient(cursorX - CURSOR_WAKE_W, 0, cursorX, 0);
-      wake.addColorStop(0, withAlpha(CURSOR_COLOR, 0));
-      wake.addColorStop(1, withAlpha(CURSOR_COLOR, 0.16));
-      ctx.fillStyle = wake;
-      ctx.fillRect(cursorX - CURSOR_WAKE_W, 0, CURSOR_WAKE_W, viewH);
-    }
     // Paused it is simply the board's ink — red read as an error. Learn mode
     // keeps no time, so there it rests on the target in the learn colour.
     ctx.strokeStyle = isPlaying ? CURSOR_COLOR : isLearning ? withAlpha(LEARN_COLOR, 0.6) : withAlpha(inkColor, 0.7);
@@ -2808,10 +3005,10 @@ function paintFrame() {
   }
 }
 
-function render() {
+function render(frameStamp?: number) {
   rafId = requestAnimationFrame(render);
   try {
-    paintFrame();
+    paintFrame(frameStamp);
   } catch (err) {
     // A frame that threw between save and restore leaves its clip, transform and
     // state stack behind, and every later frame would draw under them. Drop them
@@ -3022,6 +3219,7 @@ self.onmessage = (e: MessageEvent) => {
         stringCount = msg.stringCount;
       }
       if (msg.rightToLeft !== undefined) rightToLeft = msg.rightToLeft;
+      if (msg.pagedScroll !== undefined) pagedScroll = msg.pagedScroll;
       if (msg.fretText !== undefined) fretTextColor = msg.fretText;
       if (msg.ink !== undefined) {
         inkColor = msg.ink;

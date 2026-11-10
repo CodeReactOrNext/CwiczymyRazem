@@ -322,6 +322,14 @@ export function TablatureSettingsPanel() {
             onChange={(v) => set("stringSpacing", Math.round(v))}
           />
         </div>
+        <div className='mt-4'>
+          <ToggleRow
+            label={t("paged_scroll")}
+            desc={t("paged_scroll_desc")}
+            checked={settings.pagedScroll}
+            onChange={(next) => set("pagedScroll", next)}
+          />
+        </div>
       </Section>
 
       <Section title={t("fret_numbers")}>

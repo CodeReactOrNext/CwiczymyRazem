@@ -41,7 +41,7 @@ async function startWorker() {
       }
       if (prop === "fillText") return (text: string) => { log.texts.push(text); };
       if (prop === "measureText") return (text: string) => ({ width: text.length * 7 });
-      if (prop === "createLinearGradient") return () => ({ addColorStop: () => undefined });
+      if (prop === "createLinearGradient" || prop === "createRadialGradient") return () => ({ addColorStop: () => undefined });
       if (prop === "getTransform") return () => ({ a: 2, b: 0, c: 0, d: 2, e: 0, f: 0 });
       if (prop in target) return target[prop];
       return () => undefined;
@@ -97,9 +97,10 @@ async function startWorker() {
 const matchedBeat = (audioSec: number) => (audioSec - LATENCY_SEC) * (BPM / 60);
 const HIT_AT_SEC = 0.1;
 
-/** Per-frame growth over a stretch of the hold well under way (12–200 px). */
+/** Per-frame growth over a stretch of the hold well under way (60–200 px):
+ *  past the head, where the fill is the bar running down the note's tail. */
 function growthWhileHolding(widths: number[]): number[] {
-  const from = widths.findIndex((w) => w >= 12);
+  const from = widths.findIndex((w) => w >= 60);
   const to = widths.findIndex((w) => w >= 200);
   return widths.slice(from + 1, to).map((w, i) => w - widths[from + i]);
 }
@@ -139,6 +140,27 @@ describe("TablatureViewer.worker — streamed fill", () => {
     expect(growth.length).toBeGreaterThan(40);
     // 200 px a second over 16 ms frames, every frame.
     for (const g of growth) expect(g).toBeCloseTo(3.2, 0);
+  });
+
+  it("keeps growing through a short gap in detection instead of stalling and jumping on", async () => {
+    const { send, play } = await startWorker();
+    let lastSec = -1;
+    const widths = play(1500, (_, audioSec) => {
+      if (audioSec < HIT_AT_SEC || audioSec === lastSec) return;
+      // The detector loses the ringing note for a tenth of a second.
+      if (audioSec >= 0.6 && audioSec < 0.7) return;
+      const step: FillStep = lastSec < 0
+        ? { noteKey: "0-0-0", audioSec, beat: matchedBeat(audioSec), hit: true, timing: { grade: 3, hint: null, offsetBeats: 0 } }
+        : { noteKey: "0-0-0", audioSec, beat: matchedBeat(audioSec) };
+      lastSec = audioSec;
+      send({ type: "FILL_STEPS", steps: [step] });
+    });
+
+    const growth = growthWhileHolding(widths);
+    expect(growth.length).toBeGreaterThan(30);
+    // Never standing still, never leaping: at most the catch-up pace.
+    expect(Math.min(...growth)).toBeGreaterThan(0.5);
+    expect(Math.max(...growth)).toBeLessThanOrEqual(3.2 * 2.5 + 0.5);
   });
 
   it("(before) grew in spurts and stalls when eased toward React's copy at 20 Hz", async () => {

@@ -3,6 +3,8 @@
   "spacing_hint": "Wie weit Noten im Takt und zwischen den Saiten auseinanderstehen.",
   "note_spacing": "Notenabstand",
   "string_spacing": "Saitenabstand",
+  "paged_scroll": "Stehendes Board",
+  "paged_scroll_desc": "Der Tab steht still, während der Cursor darüber läuft, und blättert dann zur nächsten Seite. Noten, die sich nicht bewegen, bleiben scharf.",
   "fret_numbers": "Bundzahlen",
   "size": "Größe",
   "default_view": "Standardansicht",

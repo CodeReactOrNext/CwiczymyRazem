@@ -290,6 +290,12 @@ export interface TablatureSettings {
    * players who want the tab to face the same way as their neck.
    */
   rightToLeft: boolean;
+  /**
+   * The standing board: the tab holds still a page at a time and the cursor
+   * travels across it, instead of the tab sliding under a fixed cursor. Notes
+   * that stand still stay sharp on any screen.
+   */
+  pagedScroll: boolean;
   // ── Colour ──
   palette: PaletteKey;
   hitColor: HitColorKey;
@@ -328,6 +334,7 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   stringSpacing: STRING_SPACING_DEFAULT,
   flipStrings: false,
   rightToLeft: false,
+  pagedScroll: false,
   palette: "rainbow",
   hitColor: "emerald",
   background: "midnight",
@@ -423,6 +430,7 @@ type TablatureLookSettings = Pick<
   | "stringSpacing"
   | "flipStrings"
   | "rightToLeft"
+  | "pagedScroll"
   | "showRhythmLane"
   | "showChordNames"
   | "showMeasureLines"
@@ -463,6 +471,7 @@ export function tablatureStylePatch(
     stringSpacing: settings.stringSpacing,
     flipStrings: settings.flipStrings,
     rightToLeft: settings.rightToLeft,
+    pagedScroll: settings.pagedScroll,
     // "auto" is resolved per pill inside the worker, which knows each note's colour.
     fretText: fretText.color ?? "auto",
     showRhythmLane: settings.showRhythmLane,
@@ -510,6 +519,7 @@ export function useTablatureStyle(): {
     stringSpacing,
     flipStrings,
     rightToLeft,
+    pagedScroll,
     showRhythmLane,
     showChordNames,
     showMeasureLines,
@@ -530,6 +540,7 @@ export function useTablatureStyle(): {
           stringSpacing,
           flipStrings,
           rightToLeft,
+          pagedScroll,
           showRhythmLane,
           showChordNames,
           showMeasureLines,
@@ -552,6 +563,7 @@ export function useTablatureStyle(): {
       stringSpacing,
       flipStrings,
       rightToLeft,
+      pagedScroll,
       showRhythmLane,
       showChordNames,
       showMeasureLines,

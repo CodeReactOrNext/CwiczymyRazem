@@ -3,6 +3,8 @@
   "spacing_hint": "Cuánto se separan las notas en el compás y entre cuerdas.",
   "note_spacing": "Espaciado de notas",
   "string_spacing": "Espaciado de cuerdas",
+  "paged_scroll": "Tablatura fija",
+  "paged_scroll_desc": "La tablatura se queda quieta mientras el cursor la recorre y luego pasa a la página siguiente. Las notas que no se mueven se ven nítidas.",
   "fret_numbers": "Números de traste",
   "size": "Tamaño",
   "default_view": "Vista predeterminada",

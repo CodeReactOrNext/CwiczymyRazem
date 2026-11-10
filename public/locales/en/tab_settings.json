@@ -3,6 +3,8 @@
   "spacing_hint": "How far apart notes sit across the bar and between strings.",
   "note_spacing": "Note spacing",
   "string_spacing": "String spacing",
+  "paged_scroll": "Standing board",
+  "paged_scroll_desc": "The tab stays put while the cursor travels across it, then turns to the next page. Notes that do not move stay sharp.",
   "fret_numbers": "Fret numbers",
   "size": "Size",
   "default_view": "Default view",

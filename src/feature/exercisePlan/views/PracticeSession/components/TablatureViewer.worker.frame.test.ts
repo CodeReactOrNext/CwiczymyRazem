@@ -97,6 +97,7 @@ function recordingContext() {
     fills: [] as string[],
     patterns: [] as unknown[],
     dashes: [] as number[][],
+    translates: [] as number[],
   };
   const ctx = new Proxy(state, {
     get(target, prop: string) {
@@ -108,6 +109,7 @@ function recordingContext() {
       if (prop === "measureText") return (text: string) => ({ width: text.length * 7 });
       if (prop === "createLinearGradient") return () => ({ addColorStop: () => undefined });
       if (prop === "createPattern") return (image: unknown) => { log.patterns.push(image); return WINDING_FILL; };
+      if (prop === "translate") return (x: number) => { log.translates.push(x); };
       if (prop === "setLineDash") return (dash: number[]) => { log.dashes.push(dash); };
       // A board scrolled to a fractional device pixel.
       if (prop === "getTransform") return () => ({ a: 2, b: 0, c: 0, d: 2, e: 10.3, f: 0.6 });
@@ -151,7 +153,10 @@ type WorkerMessage = { type: string; [key: string]: unknown };
 async function startWorker(measures: TablatureMeasure[], zoom = 1) {
   const { ctx, log } = recordingContext();
   let now = 1_000_000;
-  vi.spyOn(Date, "now").mockImplementation(() => now);
+  // How long after its frame's timestamp the paint gets to run.
+  let paintLag = 0;
+  vi.spyOn(Date, "now").mockImplementation(() => now + paintLag);
+  vi.spyOn(performance, "now").mockImplementation(() => now + paintLag);
   let frame: FrameRequestCallback | null = null;
   vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => { frame = cb; return 1; });
   vi.stubGlobal("cancelAnimationFrame", () => { frame = null; });
@@ -176,7 +181,17 @@ async function startWorker(measures: TablatureMeasure[], zoom = 1) {
       frame?.(now);
     }
   };
-  return { send, run, log, posted, now: () => now };
+  /** One frame stamped a frame after the last, painted `lagMs` after its stamp;
+   *  returns where the board was scrolled to for it. */
+  const frameAt = (lagMs: number) => {
+    now += FRAME_MS;
+    paintLag = lagMs;
+    log.translates = [];
+    frame?.(now);
+    paintLag = 0;
+    return log.translates[0];
+  };
+  return { send, run, frameAt, log, posted, now: () => now };
 }
 
 afterEach(() => {
@@ -216,6 +231,76 @@ describe("TablatureViewer.worker — hit glow", () => {
 
     expect(log.drawn).toHaveLength(0);
     expect(log.blurs.some((blur) => blur > 0)).toBe(true);
+  });
+});
+
+describe("TablatureViewer.worker — scrolling", () => {
+  it("moves the board by the frame's timestamp, not by when the paint got to run", async () => {
+    stubOffscreenCanvas();
+    const { send, run, frameAt, now } = await startWorker(longPiece);
+    send({ type: "PLAYBACK", isPlaying: true, startWallMs: now(), bpm: 120, countInRemaining: 0 });
+    run(2000);
+
+    // Evenly stamped frames whose paint runs now on time, now 8 ms late.
+    const offsets = Array.from({ length: 12 }, (_, i) => frameAt(i % 2 === 0 ? 0 : 8));
+    const steps = offsets.slice(1).map((x, i) => offsets[i] - x);
+    expect(Math.min(...steps)).toBeGreaterThan(0);
+    // Whole device pixels may round a step up or down, never more.
+    expect(Math.max(...steps) - Math.min(...steps)).toBeLessThanOrEqual(1.01);
+  });
+});
+
+describe("TablatureViewer.worker — standing board", () => {
+  it("holds the board still while the cursor crosses a page, then turns to the next", async () => {
+    stubOffscreenCanvas();
+    const { send, frameAt, now } = await startWorker(longPiece);
+    send({ type: "STYLE", pagedScroll: true });
+    send({ type: "PLAYBACK", isPlaying: true, startWallMs: now(), bpm: 120, countInRemaining: 0 });
+
+    // Ten seconds at 400 px/s: the cursor covers 4000 px of board.
+    const offsets = Array.from({ length: 625 }, () => frameAt(0));
+    const still = offsets.filter((x, i) => i > 0 && x === offsets[i - 1]).length;
+    const stands = new Set(offsets.filter((x, i) => i > 0 && x === offsets[i - 1]));
+    // Several pages were stood on, and the board stood for most of the time.
+    expect(stands.size).toBeGreaterThan(2);
+    expect(still / offsets.length).toBeGreaterThan(0.6);
+    // The board only ever moves on.
+    expect(offsets.every((x, i) => i === 0 || x <= offsets[i - 1])).toBe(true);
+  });
+});
+
+describe("TablatureViewer.worker — page turn", () => {
+  /** How many frames the first page turn takes at `bpm`. */
+  const turnFrames = async (bpm: number) => {
+    stubOffscreenCanvas();
+    const { send, frameAt, now } = await startWorker(longPiece);
+    send({ type: "STYLE", pagedScroll: true });
+    send({ type: "PLAYBACK", isPlaying: true, startWallMs: now(), bpm, countInRemaining: 0 });
+    const offsets = Array.from({ length: 1500 }, () => frameAt(0));
+    const first = offsets.findIndex((x) => x !== offsets[0]);
+    let last = first;
+    while (offsets[last + 1] !== offsets[last]) last++;
+    return last - first + 1;
+  };
+
+  it("takes two thirds of a beat, so a faster tempo turns the page sooner", async () => {
+    // 120 bpm: 333 ms, about 21 frames of 16 ms.
+    const moderate = await turnFrames(120);
+    expect(moderate).toBeGreaterThanOrEqual(19);
+    expect(moderate).toBeLessThanOrEqual(22);
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    expect(await turnFrames(180)).toBeLessThan(moderate);
+  });
+
+  it("never drags on a slow piece nor snaps on a fast one", async () => {
+    // 40 bpm would be a full second; it is held to 480 ms, 30 frames.
+    expect(await turnFrames(40)).toBeLessThanOrEqual(31);
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    // 300 bpm would be 133 ms; it is held to 180 ms, 11 frames — of which the
+    // eased first and last move the board by less than a device pixel.
+    expect(await turnFrames(300)).toBeGreaterThanOrEqual(7);
   });
 });
 

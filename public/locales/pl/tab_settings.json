@@ -3,6 +3,8 @@
   "spacing_hint": "Jak daleko od siebie stoją nuty w takcie i między strunami.",
   "note_spacing": "Odstęp nut",
   "string_spacing": "Odstęp strun",
+  "paged_scroll": "Stojąca plansza",
+  "paged_scroll_desc": "Tabulatura stoi w miejscu, a kursor po niej jedzie; na końcu strony plansza przeskakuje do następnej. Nuty się nie przesuwają, więc nie rozmywają się w ruchu.",
   "fret_numbers": "Numery progów",
   "size": "Rozmiar",
   "default_view": "Widok domyślny",

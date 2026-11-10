@@ -21,6 +21,19 @@ export interface LiveFill {
   hitAt: number | null;
   /** The hit's timing, ahead of React's copy of it. */
   timing: NoteTiming | null;
+  /** A step after the hit has come in: the note is being held, not just struck. */
+  held: boolean;
+  /** The note earned its whole length and the fill is closing to its end. */
+  closing: boolean;
+  /** The beat the fill is drawn to (see liveFillDrawnBeat) and the audio time it was drawn at. */
+  drawnBeat: number;
+  drawnSec: number | null;
+  // Kept here for the board, which draws the fill: how wide it last drew it,
+  // how brightly its leading spark burns (0–1), and the wall ms the fill
+  // reached the note's end (null until then).
+  drawnW: number;
+  spark: number;
+  doneAt: number | null;
 }
 
 export interface LiveFills {
@@ -36,6 +49,16 @@ const MAX_DELAY_SEC = 0.12;
 /** How fast the delay comes back down once steps arrive on time again. */
 const DELAY_RELAX_SEC = 0.0002;
 const MAX_SAMPLES = 64;
+/**
+ * How long a hold is carried on at the music's pace after its last step. Pitch
+ * detection drops a frame now and then on a note that is ringing fine; the fill
+ * used to stop dead for each one and then jump on. A note really let go of
+ * ends this much further on, less than the eye can place.
+ */
+export const HOLD_CARRY_SEC = 0.08;
+/** How many times the music's pace a fill that fell behind catches up at —
+ *  it runs to where it should be instead of appearing there. */
+const CATCH_UP_PACE = 2.5;
 /** How long a completed note's fill takes to close to its end, eased out. */
 export const COMPLETE_SEC = 0.18;
 /** Share of the way it has closed a third of the way through. */
@@ -65,12 +88,17 @@ export function addFillSteps(
     let fill = fills.byKey.get(step.noteKey);
     // A hit starts the note over — the same key comes back every pass.
     if (!fill || step.hit || fill.tile !== tile) {
-      fill = { tile, samples: [], shownBeat: step.beat, hitAt: step.hit ? wallNow : null, timing: step.timing ?? null };
+      fill = {
+        tile, samples: [], shownBeat: step.beat, hitAt: step.hit ? wallNow : null, timing: step.timing ?? null,
+        held: false, closing: false, drawnBeat: step.beat, drawnSec: null, drawnW: 0, spark: 0, doneAt: null,
+      };
       fills.byKey.set(step.noteKey, fill);
       if (step.hit) hits.push(step);
     }
     const last = fill.samples[fill.samples.length - 1];
+    if (!step.hit) fill.held = true;
     if (step.complete && !step.hit) {
+      fill.closing = true;
       // The note earned its whole length: close the fill from where it is to
       // the end over COMPLETE_SEC, easing out — a jump, but one the eye follows.
       const from = last ? last.beat : fill.shownBeat;
@@ -125,6 +153,33 @@ export function liveFillBeat(fill: LiveFill, renderSec: number | null): number {
   }
   if (beat > fill.shownBeat) fill.shownBeat = beat;
   return fill.shownBeat;
+}
+
+/**
+ * The beat a fill is drawn to at audio time `renderSec`, on a board whose music
+ * moves `beatsPerSec` there: where the steps put it (liveFillBeat), carried on
+ * across a short gap in them, and never by a jump — a fill that fell behind
+ * runs to catch up. Closing to the note's end keeps its own eased pace.
+ */
+export function liveFillDrawnBeat(fill: LiveFill, renderSec: number | null, beatsPerSec: number): number {
+  let target = liveFillBeat(fill, renderSec);
+  if (renderSec === null || !(beatsPerSec > 0)) {
+    fill.drawnBeat = Math.max(fill.drawnBeat, target);
+    fill.drawnSec = renderSec;
+    return fill.drawnBeat;
+  }
+  const last = fill.samples[fill.samples.length - 1];
+  if (fill.held && !fill.closing && last && renderSec > last.audioSec) {
+    target = Math.max(target, last.beat + Math.min(renderSec - last.audioSec, HOLD_CARRY_SEC) * beatsPerSec);
+  }
+  if (fill.closing || fill.drawnSec === null) {
+    fill.drawnBeat = Math.max(fill.drawnBeat, target);
+  } else {
+    const reach = fill.drawnBeat + Math.max(0, renderSec - fill.drawnSec) * beatsPerSec * CATCH_UP_PACE;
+    fill.drawnBeat = Math.max(fill.drawnBeat, Math.min(target, reach));
+  }
+  fill.drawnSec = renderSec;
+  return fill.drawnBeat;
 }
 
 const sameTiming = (a: NoteTiming, b: NoteTiming) =>

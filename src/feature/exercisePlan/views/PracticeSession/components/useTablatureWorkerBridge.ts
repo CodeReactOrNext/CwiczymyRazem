@@ -9,6 +9,7 @@ import type { MutableRefObject } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { boardOffsetX, boardSpan, scrollAfterDrag } from "./tablatureDirection";
+import { pagedScrollX, pageStarts } from "./tabPaging";
 import { baseBeatWidth, beatToX, buildBeatXMap, DEFAULT_PILL_METRICS, xToBeat } from "./tabSpacing";
 import type { TablatureRenderData } from "./useTablatureRenderData";
 
@@ -134,6 +135,8 @@ export interface TablatureStylePatch {
   stringCount?: number;
   /** Mirror the board so the music runs right to left. */
   rightToLeft?: boolean;
+  /** Hold the board still a page at a time while the cursor crosses it. */
+  pagedScroll?: boolean;
   /** Fret-number colour, or "auto" to pick per pill from its brightness. */
   fretText?: string;
   showRhythmLane?: boolean;
@@ -531,7 +534,13 @@ export function useTablatureWorkerBridge({
       const cursor = pass * xMap.totalX + beatToX(xMap, wrapped);
       // Judged late enough that the tab came round: the note is the last pass's.
       shift = pass * xMap.totalX - (beat.offsetX > wrapped ? xMap.totalX : 0);
-      scrollX = Math.max(0, cursor - viewW / 4);
+      scrollX = style?.pagedScroll
+        ? pagedScrollX(
+            pageStarts(renderData.measureEndXs.map((end) => beatToX(xMap, end)), xMap.totalX, viewW - gutterW),
+            pass * xMap.totalX,
+            cursor - pass * xMap.totalX,
+          )
+        : Math.max(0, cursor - viewW / 4);
     }
     // From the note's head to the end of its tail, in world px.
     const head = xMap.xs[index] + 4 + pillHeight / 2 + shift;

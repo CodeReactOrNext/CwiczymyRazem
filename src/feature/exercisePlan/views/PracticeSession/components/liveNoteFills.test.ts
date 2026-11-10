@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import type { FillStep } from "../utils/fillFeed";
 import type { NoteTiming } from "../utils/timingGrade";
-import { addFillSteps, clearLiveFills, COMPLETE_SEC, createLiveFills, currentTiming, isLiveTiming, liveFillBeat, liveFillOn } from "./liveNoteFills";
+import type { LiveFill } from "./liveNoteFills";
+import { addFillSteps, clearLiveFills, COMPLETE_SEC, createLiveFills, currentTiming, isLiveTiming, liveFillBeat, liveFillDrawnBeat, liveFillOn } from "./liveNoteFills";
 
 const LATE: NoteTiming = { grade: 2, hint: "late", offsetBeats: 0.1 };
 const onTile = (tile: number) => () => tile;
@@ -135,5 +136,65 @@ describe("liveNoteFills", () => {
     expect(currentTiming(lastPass, undefined)).toBe(lastPass);
     expect(isLiveTiming(fill, { ...LATE })).toBe(true);
     expect(isLiveTiming(fill, lastPass)).toBe(false);
+  });
+});
+
+/** A set of fills holding `fill` under "k", to feed it more steps. */
+function createLiveFillsWith(fill: LiveFill) {
+  const fills = createLiveFills();
+  fills.byKey.set("k", fill);
+  return fills;
+}
+
+describe("liveFillDrawnBeat", () => {
+  /** A note hit at 1 s on beat 0.5 and held, a step every 20 ms, one beat a second. */
+  const heldFor = (sec: number) => {
+    const fills = createLiveFills();
+    const steps = [hit("k", 1, 0.5)];
+    for (let t = 0.02; t <= sec + 1e-9; t += 0.02) steps.push(hold("k", 1 + t, 0.5 + t));
+    addFillSteps(fills, steps, onTile(0), 0, null);
+    return liveFillOn(fills, "k", 0)!;
+  };
+
+  it("follows the steps exactly while they keep coming", () => {
+    const fill = heldFor(0.4);
+    expect(liveFillDrawnBeat(fill, 1.1, 1)).toBeCloseTo(0.6, 9);
+    expect(liveFillDrawnBeat(fill, 1.116, 1)).toBeCloseTo(0.616, 9);
+    expect(liveFillDrawnBeat(fill, 1.3, 1)).toBeCloseTo(0.8, 9);
+  });
+
+  it("carries a hold on at the music's pace past its last step, then stops", () => {
+    const fill = heldFor(0.2);
+    liveFillDrawnBeat(fill, 1.2, 1);
+    expect(liveFillDrawnBeat(fill, 1.24, 1)).toBeCloseTo(0.74, 9);
+    // Let go of: it ends HOLD_CARRY_SEC further on and stays there.
+    expect(liveFillDrawnBeat(fill, 1.4, 1)).toBeCloseTo(0.78, 9);
+    expect(liveFillDrawnBeat(fill, 3, 1)).toBeCloseTo(0.78, 9);
+  });
+
+  it("does not carry a note that was only struck", () => {
+    const fills = createLiveFills();
+    addFillSteps(fills, [hit("k", 1, 0.5)], onTile(0), 0, null);
+    const fill = liveFillOn(fills, "k", 0)!;
+    expect(liveFillDrawnBeat(fill, 1.5, 1)).toBeCloseTo(0.5, 9);
+  });
+
+  it("runs to catch up after a long gap instead of jumping there", () => {
+    const fill = heldFor(0.1);
+    liveFillDrawnBeat(fill, 1.1, 1);
+    liveFillDrawnBeat(fill, 1.4, 1); // carried to 0.68, then stood
+    addFillSteps(createLiveFillsWith(fill), [hold("k", 1.5, 1)], onTile(0), 0, null);
+    const next = liveFillDrawnBeat(fill, 1.516, 1);
+    expect(next).toBeGreaterThan(0.68);
+    expect(next).toBeLessThanOrEqual(0.68 + 0.116 * 2.5 + 1e-9);
+    expect(next).toBeLessThan(1);
+    expect(liveFillDrawnBeat(fill, 2, 1)).toBeGreaterThanOrEqual(1);
+  });
+
+  it("closes a completed note to its end at the closing's own pace", () => {
+    const fill = heldFor(0.1);
+    liveFillDrawnBeat(fill, 1.1, 1);
+    addFillSteps(createLiveFillsWith(fill), [{ ...hold("k", 1.12, 2), complete: true }], onTile(0), 0, null);
+    expect(liveFillDrawnBeat(fill, 1.12 + COMPLETE_SEC, 1)).toBeCloseTo(2, 9);
   });
 });
