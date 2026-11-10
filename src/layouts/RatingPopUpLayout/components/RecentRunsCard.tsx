@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { cn } from "assets/lib/utils";
 import { GoalRunsChart } from "feature/exerciseGoals/components/GoalRunsChart";
 import { exerciseRunsKey } from "feature/exerciseGoals/hooks/useExerciseGoals";
 import { getExerciseRuns } from "feature/exerciseGoals/services/exerciseGoals.service";
@@ -26,7 +27,7 @@ export const soleExerciseWithTempo = (runs: ScoredRun[]): ScoredRun | null => {
  * How the session's exercise went over its last scored runs — tempo and
  * accuracy, run by run — once it has enough runs to show a trend.
  */
-export const RecentRunsCard = ({ runs }: { runs: ScoredRun[] }) => {
+export const RecentRunsCard = ({ runs, className }: { runs: ScoredRun[]; className?: string }) => {
   const { t } = useTranslation("session_summary");
   const uid = useAppSelector(selectUserAuth);
   const run = soleExerciseWithTempo(runs);
@@ -46,7 +47,7 @@ export const RecentRunsCard = ({ runs }: { runs: ScoredRun[] }) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className='rounded-lg bg-zinc-900/40 p-7 md:p-8'>
+      className={cn("rounded-lg bg-zinc-900/40 p-7 md:p-8", className)}>
       <div className='mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
         <div className='flex items-center gap-2'>
           <TrendingUp className='h-4 w-4 text-zinc-400' aria-hidden />
@@ -62,7 +63,9 @@ export const RecentRunsCard = ({ runs }: { runs: ScoredRun[] }) => {
           })}
         </span>
       </div>
-      <GoalRunsChart runs={history} showTempo showAccuracy />
+      {/* Beside the standings on a wide screen, where the card is as tall as
+          they are: the plot grows into it rather than leaving the room empty. */}
+      <GoalRunsChart runs={history} showTempo showAccuracy chartClassName='lg:h-[22rem]' />
     </motion.div>
   );
 };

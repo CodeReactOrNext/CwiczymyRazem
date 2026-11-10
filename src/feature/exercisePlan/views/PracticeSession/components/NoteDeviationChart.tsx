@@ -12,7 +12,7 @@ const IN_BAND = "#10b981";
 const CLOSE = "#f59e0b";
 const OFF = "#f97316";
 
-interface Scale {
+export interface Scale {
   /** The top grade's band, either side of zero. */
   band: number;
   /** The middle grade's band. */
@@ -45,6 +45,17 @@ export const chartValues = (notes: readonly RunNote[], variant: NoteDeviationCha
     const value = variant === "intonation" ? note.cents : note.timingMs;
     return value === null ? [] : [value];
   });
+
+/**
+ * How far the chart reaches for these values: as far as the furthest note plus
+ * a margin, never past the scale's own range and never so tight that the top
+ * band fills the chart. A fixed range drew a clean run as a thin stripe across
+ * the middle of an empty box.
+ */
+export const chartRange = (values: readonly number[], scale: Scale): number => {
+  const furthest = values.reduce((max, value) => Math.max(max, Math.abs(value)), 0);
+  return Math.min(scale.range, Math.max(scale.band * 1.6, furthest * 1.2));
+};
 
 /** A dot in the colour of the grade it got. */
 const GradeDot = (props: { cx?: number; cy?: number; payload?: Point }) => (
@@ -85,9 +96,11 @@ export const NoteDeviationChart = ({ variant, notes }: NoteDeviationChartProps) 
   const { t } = useTranslation("session");
   const scale = SCALES[variant];
 
-  const points = useMemo<Point[]>(
-    () =>
-      chartValues(notes, variant).map((value, i) => {
+  const { points, range } = useMemo(() => {
+    const values = chartValues(notes, variant);
+    return {
+      range: chartRange(values, scale),
+      points: values.map<Point>((value, i) => {
         const off = Math.abs(value);
         return {
           n: i + 1,
@@ -96,8 +109,8 @@ export const NoteDeviationChart = ({ variant, notes }: NoteDeviationChartProps) 
           color: off <= scale.band ? IN_BAND : off <= scale.close ? CLOSE : OFF,
         };
       }),
-    [notes, variant, scale],
-  );
+    };
+  }, [notes, variant, scale]);
 
   const format = (value: number) => {
     const rounded = Math.round(Math.abs(value));
@@ -127,10 +140,10 @@ export const NoteDeviationChart = ({ variant, notes }: NoteDeviationChartProps) 
       <div className='relative'>
         <span className='pointer-events-none absolute right-0 top-0 text-[11px] text-zinc-500'>{above}</span>
         <span className='pointer-events-none absolute bottom-0 right-0 text-[11px] text-zinc-500'>{below}</span>
-        <ChartContainer config={{ value: { label: title, color: IN_BAND } }} className='h-[120px] w-full'>
+        <ChartContainer config={{ value: { label: title, color: IN_BAND } }} className='h-[120px] w-full shortwide:h-[84px]'>
           <ScatterChart margin={{ top: 8, right: 40, left: 4, bottom: 8 }}>
             <XAxis type='number' dataKey='n' hide domain={[1, Math.max(2, points.length)]} />
-            <YAxis type='number' dataKey='y' hide domain={[-scale.range, scale.range]} />
+            <YAxis type='number' dataKey='y' hide domain={[-range, range]} />
             <ReferenceArea y1={-scale.band} y2={scale.band} fill={IN_BAND} fillOpacity={0.08} stroke='none' />
             <ReferenceLine y={0} stroke='rgba(255,255,255,0.14)' strokeDasharray='4 3' />
             <ChartTooltip

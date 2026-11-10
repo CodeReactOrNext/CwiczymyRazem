@@ -15,6 +15,7 @@ import { useInstrumentPreferenceStore } from "feature/tuner/store/instrumentPref
 import { useSessionTunerStore } from "feature/tuner/store/sessionTunerStore";
 import { selectUserAuth,selectUserInfo} from "feature/user/store/userSlice";
 import { useGuitarAudioInput } from "hooks/useGuitarAudioInput";
+import { useMediaQuery } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import { useSuppressUiSounds } from "lib/uiSounds/uiSounds";
@@ -46,6 +47,7 @@ import { gpLoadingSteps, isStillLoading } from "./components/SessionLoadingSteps
 import { SongSectionMapPanel } from "./components/SongSectionMapPanel";
 import { TimingCalibrationDialog } from "./components/TimingCalibrationDialog";
 import { TuningSettingsModal } from "./components/TuningSettingsModal";
+import { TurnedScreen } from "./components/TurnedScreen";
 import { BossFightControlsProvider } from "./contexts/BossFightControlsContext";
 import { BpmProgressProvider } from "./contexts/BpmProgressContext";
 import { GuitarTuningProvider } from "./contexts/GuitarTuningContext";
@@ -238,6 +240,10 @@ const PracticeSessionInner = ({
     jumpToExercise,  canFinishSession, hasLoggedPractice,
     completedExercises, restartFullSession,
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount });
+  // The upright phone, where PhoneSessionModal lays the practice screen on its
+  // side: the run summary and the session summary that follow it lie the same way.
+  const isUprightScreen = useMediaQuery("(orientation: portrait)");
+  const isUprightPhone = isMobileView && isUprightScreen;
   // UI chimes stay silent for as long as the session can be listening to the
   // guitar; the summary (reportResult) is the first moment they may play.
   useSuppressUiSounds(!reportResult);
@@ -1371,12 +1377,12 @@ const PracticeSessionInner = ({
       />
 
       {isMobileView && reportResult && currentUserStats && previousUserStats && (
-        <div className="fixed inset-0 z-[999999999] overflow-y-auto bg-zinc-950">
+        <TurnedScreen turned={isUprightPhone} className="z-[999999999] bg-zinc-950">
           <RatingPopUp ratingData={reportResult} currentUserStats={currentUserStats} previousUserStats={previousUserStats}
             onClick={onClose} activityData={activityDataToUse} onRestart={handleRestartFullSession}
             scoredRuns={scoredRuns}
           />
-        </div>
+        </TurnedScreen>
       )}
 
       {gpLoading && <GpLoadingOverlay steps={gpSteps} />}
@@ -1401,6 +1407,7 @@ const PracticeSessionInner = ({
           eyebrow={goalRun?.summaryEyebrow}
           extraContent={goalVerdict}
           offerRestart={isGoalMode}
+          turned={isUprightPhone}
           onFinish={async () => {
             metronome.stopMetronome(); await saveCurrentScores();
             autoSubmitReport(exerciseRecordsRef.current,

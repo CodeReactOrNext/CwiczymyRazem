@@ -292,7 +292,7 @@ const RatingPopUpLayout = ({
       transition={{ duration: 0.4 }}
       className={cn(
         "mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 md:p-8",
-        !hideWrapper && "pb-32 pt-16 sm:pb-10 sm:pt-6"
+        !hideWrapper && "pb-32 pt-16 sm:pb-10 sm:pt-6 shortwide:pb-10 shortwide:pt-4"
       )}
     >
       <div ref={topRef} />
@@ -340,12 +340,12 @@ const RatingPopUpLayout = ({
               {t("streak_safe", { days: streak })}
             </p>
 
-            <div className="mt-2 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
+            <div className="mt-2 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row shortwide:w-auto shortwide:flex-row">
               {onRestart && (
                 <Button
                   variant="ghost"
                   onClick={onRestart}
-                  className="w-full gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto"
+                  className="w-full gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto shortwide:w-auto"
                 >
                   <RotateCcw className="mr-2 h-4 w-4" aria-hidden />
                   {restartLabel ?? t("practise_more")}
@@ -353,7 +353,7 @@ const RatingPopUpLayout = ({
               )}
               <Button
                 onClick={handleContinue}
-                className="w-full gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto"
+                className="w-full gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto shortwide:w-auto"
               >
                 {t("back_to_dashboard")}
                 <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
@@ -368,41 +368,48 @@ const RatingPopUpLayout = ({
       {!isRest && (
         <>
           {/* ── Hero ── */}
-          <div className="relative overflow-hidden rounded-lg bg-zinc-900/60 px-7 py-12 text-center md:px-10 md:py-16">
+          <div className="relative overflow-hidden rounded-lg bg-zinc-900/60 px-7 py-12 text-center md:px-10 md:py-14 shortwide:py-8">
             <HeroPattern className="opacity-[0.035]" maskImage="radial-gradient(ellipse at top, black 10%, transparent 70%)" />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute left-1/2 top-24 h-64 w-64 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl"
-            />
 
             <div className="relative">
               <p className="text-sm font-medium text-zinc-400">{t("great_progress")}</p>
 
-              <div className="mt-4 flex items-center justify-center gap-4">
-                <span className="font-teko text-8xl font-bold leading-none tabular-nums text-cyan-400">
-                  +{displayedPoints}
-                </span>
-                <img src="/images/tokens/pick.png" alt="points" className="h-12 w-12 object-contain" />
-              </div>
-
-              <RewardBreakdown rows={pointRows} delay={0.5} className="mt-7" />
-
-              {fame > 0 && (
-                <div className="mt-10">
-                  <div className="flex items-center justify-center gap-2.5">
-                    <img src="/images/tokens/coin.png" alt="" className="h-7 w-7 object-contain" />
-                    <span className="font-teko text-5xl font-bold leading-none tabular-nums text-amber-400">
-                      +{fame}
+              {/* The two rewards stand side by side once there is room: stacked,
+                  the Fame receipt pushed Continue below the fold of a laptop. Each
+                  headline keeps its own height, so the two receipts start level. */}
+              <div
+                className={cn(
+                  "mx-auto mt-4 grid grid-cols-1 gap-x-16 gap-y-10",
+                  fame > 0 && "max-w-3xl md:grid-cols-2 shortwide:grid-cols-2",
+                )}>
+                <div>
+                  <div className="flex h-24 items-end justify-center gap-4">
+                    <span className="font-teko text-8xl font-bold leading-none tabular-nums text-cyan-400">
+                      +{displayedPoints}
                     </span>
-                    <span className="text-base font-semibold text-amber-400">{t("fame")}</span>
+                    <img src="/images/tokens/pick.png" alt="points" className="mb-2 h-12 w-12 object-contain" />
                   </div>
 
-                  <RewardBreakdown rows={fameRows} delay={0.8} className="mt-7" />
+                  <RewardBreakdown rows={pointRows} delay={0.5} className="mt-7" />
                 </div>
-              )}
+
+                {fame > 0 && (
+                  <div>
+                    <div className="flex items-end justify-center gap-2.5 md:h-24 md:pb-2 shortwide:h-24 shortwide:pb-2">
+                      <img src="/images/tokens/coin.png" alt="" className="mb-1 h-7 w-7 object-contain md:mb-2 md:h-9 md:w-9 shortwide:mb-2 shortwide:h-9 shortwide:w-9" />
+                      <span className="font-teko text-5xl font-bold leading-none tabular-nums text-amber-400 md:text-7xl shortwide:text-7xl">
+                        +{fame}
+                      </span>
+                      <span className="mb-1 text-base font-semibold text-amber-400 md:mb-2.5 shortwide:mb-2.5">{t("fame")}</span>
+                    </div>
+
+                    <RewardBreakdown rows={fameRows} delay={0.8} className="mt-7" />
+                  </div>
+                )}
+              </div>
 
               {skillGains.length > 0 && (
-                <div className="mx-auto mt-8 flex max-w-md flex-wrap justify-center gap-2.5">
+                <div className="mx-auto mt-10 flex max-w-md flex-wrap justify-center gap-2.5">
                   {skillGains.map(([key, points], i) => {
                     const cat = CAT_BY_KEY[key];
                     const Icon = cat?.Icon;
@@ -455,12 +462,12 @@ const RatingPopUpLayout = ({
               </div>
 
               {/* CTA */}
-              <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row shortwide:flex-row">
                 {onRestart && (
                   <Button
                     variant="ghost"
                     onClick={onRestart}
-                    className="w-full gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto"
+                    className="w-full gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto shortwide:w-auto"
                   >
                     <RotateCcw className="mr-2 h-4 w-4" aria-hidden />
                     {restartLabel ?? t("repeat_session")}
@@ -468,7 +475,7 @@ const RatingPopUpLayout = ({
                 )}
                 <Button
                   onClick={handleContinue}
-                  className="w-full gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto"
+                  className="w-full gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto shortwide:w-auto"
                 >
                   {t("continue")}
                   <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
@@ -477,28 +484,34 @@ const RatingPopUpLayout = ({
             </div>
           </div>
 
-          {noteCard}
+          {/* ── Note + new achievements ──
+              A flex row, not a grid: whichever is missing leaves the other the
+              whole width instead of an empty column. */}
+          <div className="flex flex-col items-stretch gap-6 empty:hidden md:flex-row shortwide:flex-row">
+            {noteCard && <div className="min-w-0 md:flex-[2] shortwide:flex-[2] [&>*]:h-full">{noteCard}</div>}
+            <AnimatePresence>
+              {newAchievements.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="min-w-0 md:flex-1 shortwide:flex-1 [&>*]:h-full">
+                  <Achievements achievements={newAchievements} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-          {/* ── New achievements ── */}
-          <AnimatePresence>
-            {newAchievements.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <Achievements achievements={newAchievements} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* ── Exercise leaderboards ── */}
-          {scoredRuns.length > 0 && <SessionLeaderboardCard runs={scoredRuns} />}
-
-          {/* ── The climb ahead, and anything already owed ── */}
-          <NextUpCard />
-
-          {/* ── How this session's exercises went over their last runs ── */}
-          <RecentRunsCard runs={scoredRuns} />
+          {/* ── The exercise: where the run stands, and how the last ones went ──
+              Both are about the same exercise, so they share a row; either can
+              render nothing, and the other then takes the row. */}
+          <div className="flex flex-col items-stretch gap-6 empty:hidden lg:flex-row shortwide:flex-row">
+            {scoredRuns.length > 0 && <SessionLeaderboardCard runs={scoredRuns} className="min-w-0 lg:flex-1 shortwide:flex-1" />}
+            <RecentRunsCard runs={scoredRuns} className="min-w-0 lg:flex-1 shortwide:flex-1" />
+          </div>
 
           {/* ── Session time + Streak ── */}
-          <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 shortwide:grid-cols-2">
             {/* Session time */}
             <Card className="h-full">
               <CardHeading>{t("session_time")}</CardHeading>
@@ -568,24 +581,33 @@ const RatingPopUpLayout = ({
             </Card>
           </div>
 
+          {/* ── The climb ahead, and anything already owed ── */}
+          <NextUpCard />
+
           {/* ── Weekly insight + Skill balance ── */}
-          <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2">
-            {/* Weekly */}
-            <Card className="h-full">
-              <div className="mb-6 flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-zinc-300">{t("this_week")}</h3>
-                <span className="font-teko text-3xl font-bold leading-none tabular-nums text-zinc-100">{fmtMin(weekTotalMin)}</span>
-              </div>
-              <div className="h-[180px] w-full">
+          <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 shortwide:grid-cols-2">
+            {/* Weekly — the chart takes whatever height the taller neighbour
+                gives the card, so there is no empty half under it. */}
+            <Card className="flex h-full flex-col">
+              <CardHeading>{t("this_week")}</CardHeading>
+              <p className="font-teko text-6xl font-bold leading-none tabular-nums text-zinc-100">{fmtMin(weekTotalMin)}</p>
+              <div className="mt-8 min-h-[180px] w-full flex-1">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={weekData} margin={{ top: 8, right: 8, left: 4, bottom: 0 }}>
+                  <AreaChart data={weekData} margin={{ top: 8, right: 28, left: 4, bottom: 0 }}>
                     <defs>
                       <linearGradient id="weekGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.3} />
                         <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#71717a" }} axisLine={false} tickLine={false} />
+                    <XAxis
+                      dataKey="label"
+                      interval={0}
+                      padding={{ left: 14, right: 14 }}
+                      tick={{ fontSize: 11, fill: "#a1a1aa" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
                     <ReferenceLine
                       y={DAILY_GOAL_MIN}
                       stroke="#3f3f46"

@@ -169,7 +169,7 @@ const Stop = ({
   const reward = rollLevelReward(milestone);
 
   return (
-    <div className='relative flex w-[168px] shrink-0 flex-col items-center px-2 text-center sm:w-auto sm:min-w-0 sm:flex-1'>
+    <div className='relative flex w-[168px] shrink-0 flex-col items-center px-2 text-center sm:w-auto sm:min-w-0 sm:flex-1 shortwide:w-auto shortwide:min-w-0 shortwide:flex-1'>
       {/* Each stop draws its own segment back to the one before it, rather than
           one line laid across the row: the row is a scroller on a phone and a
           stretched flex on a desktop, and a single absolute line cannot be

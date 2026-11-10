@@ -158,13 +158,14 @@ function StandingSkeleton() {
 
 interface SessionLeaderboardCardProps {
   runs: ScoredRun[];
+  className?: string;
 }
 
 /**
  * Where the session's scored exercises left the player on each exercise
  * leaderboard, with the players standing directly above and below.
  */
-export const SessionLeaderboardCard = ({ runs }: SessionLeaderboardCardProps) => {
+export const SessionLeaderboardCard = ({ runs, className }: SessionLeaderboardCardProps) => {
   const { t } = useTranslation("session_summary");
   const userAuth = useAppSelector(selectUserAuth);
   const playerName = useAppSelector(selectUserName) || t('you');
@@ -194,7 +195,7 @@ export const SessionLeaderboardCard = ({ runs }: SessionLeaderboardCardProps) =>
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className='rounded-lg bg-zinc-900/40 p-7 md:p-8'>
+      className={cn('rounded-lg bg-zinc-900/40 p-7 md:p-8', className)}>
       <div className='mb-6 flex items-center gap-2'>
         <Trophy className='h-4 w-4 text-amber-500' aria-hidden />
         <h3 className='text-sm font-semibold text-zinc-300'>{t('where_you_stand')}</h3>

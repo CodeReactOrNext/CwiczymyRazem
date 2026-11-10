@@ -1,3 +1,4 @@
+import { cn } from "assets/lib/utils";
 import { format } from "date-fns";
 import { PERFECT_TIMING_MS } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import { useTranslation } from "hooks/useTranslation";
@@ -145,6 +146,8 @@ interface GoalRunsChartProps {
   showAccuracy?: boolean;
   /** Off leaves the tempo line out — only with the accuracy line on. */
   showTempo?: boolean;
+  /** Sizes the plot itself — a card that has the room can give it more height. */
+  chartClassName?: string;
 }
 
 /** Round tick steps, so the axis reads 90 · 100 · 110 rather than 94 · 103 · 112. */
@@ -225,6 +228,7 @@ export const GoalRunsChart = ({
   metric = "tempo",
   showAccuracy = false,
   showTempo = true,
+  chartClassName,
 }: GoalRunsChartProps) => {
   const { t } = useTranslation("goals");
   const isTiming = metric === "timing";
@@ -271,7 +275,11 @@ export const GoalRunsChart = ({
   return (
     <div className='space-y-3'>
       {/* recharts makes the chart focusable and rings it on click — no line wanted */}
-      <div className='relative h-56 w-full [&_.recharts-surface]:outline-none [&_.recharts-wrapper]:outline-none'>
+      <div
+        className={cn(
+          "relative h-56 w-full [&_.recharts-surface]:outline-none [&_.recharts-wrapper]:outline-none",
+          chartClassName,
+        )}>
         <ResponsiveContainer width='100%' height='100%'>
           <LineChart
             data={chartData}
