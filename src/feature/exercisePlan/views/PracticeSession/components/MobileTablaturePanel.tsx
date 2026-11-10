@@ -1,6 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Settings2, ZoomIn, ZoomOut } from "lucide-react";
+import { Maximize2, Settings2, ZoomIn, ZoomOut } from "lucide-react";
 import React, {
   memo,
   useCallback,
@@ -76,6 +76,13 @@ interface MobileTablaturePanelProps {
    * move the height along the screen's other axis.
    */
   quarterTurned?: boolean;
+  /**
+   * The session shows nothing but this board ("like a film"): no Look / zoom row, no height cap,
+   * square to the screen's edges. The session owns the state — it hides its own chrome too.
+   */
+  fullscreen?: boolean;
+  /** Given, the board offers a full screen button; also told `false` when the board goes away. */
+  onFullscreenChange?: (fullscreen: boolean) => void;
 }
 
 /**
@@ -98,6 +105,8 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   isListening,
   resetKey,
   quarterTurned = false,
+  fullscreen = false,
+  onFullscreenChange,
 }: MobileTablaturePanelProps) {
   const { t } = useTranslation("session");
   const { hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef } = useNoteMatchingContext();
@@ -120,8 +129,19 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  // An exercise without a tab has nothing to fill the screen with: the board leaving takes the
+  // full screen with it.
+  const fullscreenChangeRef = useRef(onFullscreenChange);
+  useEffect(() => {
+    fullscreenChangeRef.current = onFullscreenChange;
+  });
+  useEffect(() => () => fullscreenChangeRef.current?.(false), []);
+
   // Turned, there's no handle to drag a height of one's own with, so the board always fills.
-  const fills = quarterTurned || !isCustom;
+  const fills = quarterTurned || fullscreen || !isCustom;
+  // Full screen is the whole point there, even on a screen taller than the usual cap.
+  const heightMax = fullscreen ? Infinity : MOBILE_HEIGHT_MAX;
+  const controlsBarH = fullscreen ? 0 : CONTROLS_BAR_H;
 
   const boardRef = useRef<HTMLDivElement>(null);
   const [fitHeight, setFitHeight] = useState<number | null>(null);
@@ -138,7 +158,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
 
   const viewerHeight =
     fills && fitHeight
-      ? Math.min(MOBILE_HEIGHT_MAX, Math.max(MOBILE_HEIGHT_MIN, fitHeight))
+      ? Math.min(heightMax, Math.max(MOBILE_HEIGHT_MIN, fitHeight))
       : height;
 
   const zoom = settings.noteSpacing;
@@ -170,14 +190,15 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   return (
     <div
       className={cn(
-        "flex w-full flex-col overflow-hidden rounded-2xl shadow-lg",
+        "flex w-full flex-col overflow-hidden",
+        !fullscreen && "rounded-2xl shadow-lg",
         fills && "flex-1",
       )}
       style={{
         backgroundColor: background,
         ...(fills && {
-          minHeight: MOBILE_HEIGHT_MIN + CONTROLS_BAR_H,
-          maxHeight: MOBILE_HEIGHT_MAX + CONTROLS_BAR_H,
+          minHeight: MOBILE_HEIGHT_MIN + controlsBarH,
+          ...(!fullscreen && { maxHeight: MOBILE_HEIGHT_MAX + controlsBarH }),
         }),
       }}>
       {/* The viewer sits out of flow, so the board's height is the one the layout gives it —
@@ -218,7 +239,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
           />
         </div>
         {/* Turned, the board's height is the screen's width — nothing to drag. */}
-        {!quarterTurned && (
+        {!quarterTurned && !fullscreen && (
           <TablatureResizeHandle
             height={viewerHeight}
             onChange={setHeight}
@@ -229,6 +250,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
 
       {/* Controls sit under the board rather than floating over it — on a phone
           there is no spare canvas to cover without hiding notes. */}
+      {!fullscreen && (
       <div className='flex shrink-0 items-center justify-between gap-2 bg-black/40 px-2 py-1.5'>
         <button
           type='button'
@@ -263,8 +285,18 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
             className={zoomBtn}>
             <ZoomIn className='h-4 w-4' />
           </button>
+          {onFullscreenChange && (
+            <button
+              type='button'
+              onClick={() => onFullscreenChange(true)}
+              aria-label={t("tab.fullscreen")}
+              className={cn(zoomBtn, "ml-2")}>
+              <Maximize2 className='h-4 w-4' />
+            </button>
+          )}
         </div>
       </div>
+      )}
 
       <TablatureSettingsDialog
         open={isSettingsOpen}

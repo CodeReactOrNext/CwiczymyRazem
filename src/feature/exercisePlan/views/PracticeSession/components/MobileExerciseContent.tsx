@@ -54,6 +54,9 @@ interface MobileExerciseContentProps {
   songSectionMapSlot?: React.ReactNode;
   /** The session screen is laid on its side around the tab — see MobileTablaturePanel. */
   turnTab?: boolean;
+  /** The tab alone on the whole screen — see MobileTablaturePanel. */
+  tabFullscreen?: boolean;
+  onTabFullscreenChange?: (fullscreen: boolean) => void;
 }
 
 export function MobileExerciseContent({
@@ -85,6 +88,8 @@ export function MobileExerciseContent({
   strumVolume = 1,
   songSectionMapSlot,
   turnTab = false,
+  tabFullscreen = false,
+  onTabFullscreenChange,
 }: MobileExerciseContentProps) {
   const { t } = useTranslation("session");
   const { openLeaderboard, backingVideoId, setBackingVideoId } = useSessionUI();
@@ -185,6 +190,8 @@ export function MobileExerciseContent({
           isListening={isListening}
           resetKey={tabResetKey}
           quarterTurned={turnTab}
+          fullscreen={tabFullscreen}
+          onFullscreenChange={onTabFullscreenChange}
         />
       ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (
         <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">

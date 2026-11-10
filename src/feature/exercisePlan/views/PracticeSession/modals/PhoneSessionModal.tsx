@@ -7,9 +7,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMediaQuery } from "hooks/useMediaQuery";
 import { QuarterTurnContext } from "hooks/useQuarterTurn";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Info, Pause, PlayIcon, RotateCcw,SkipBack, SkipForward, X } from "lucide-react";
+import { Check, Info, Minimize2, Pause, PlayIcon, RotateCcw, SkipBack, SkipForward, X } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
@@ -23,6 +23,7 @@ import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useTimerContext } from "../contexts/TimerContext";
 import { strumSynthVolume } from "../helpers/strumSynthVolume";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
+import { useLingeringControls, useTabFullscreen } from "../hooks/useTabFullscreen";
 
 export type PhoneOrientation = "portrait" | "landscape";
 
@@ -173,6 +174,16 @@ export function PhoneSessionModal({
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
   const { formattedTimeLeft } = useTimerContext();
   const strumVolume = strumSynthVolume(isAudioMuted, audioTracks?.find(track => track.id === "main"));
+
+  // "Like a film": the tab alone on the screen. Everything else here — title, timer, drawer,
+  // strip — steps aside, and a small set of controls comes up on a touch, as in a video player.
+  const { isFullscreen, showInstallHint, enter: enterFullscreen, exit: exitFullscreen } = useTabFullscreen();
+  const handleTabFullscreenChange = useCallback(
+    (on: boolean) => (on ? enterFullscreen() : exitFullscreen()),
+    [enterFullscreen, exitFullscreen],
+  );
+  const { visible: fullscreenControlsVisible, wake: wakeFullscreenControls } =
+    useLingeringControls(isFullscreen, isPlaying);
 
   // The turned screen is sized off the real one: its width is the screen's height. Measured
   // inside the safe-area padding, so the strip — on the screen's lower edge once turned —
@@ -339,11 +350,21 @@ export function PhoneSessionModal({
                 } : undefined}
               >
                 {/* The exercise, the timer underneath it, and the drawer over both */}
-                <div className={cn(
-                  "relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
-                  isSideways ? "p-2" : "px-4 pb-2 pt-4",
-                )}>
+                <div
+                  onPointerDownCapture={isFullscreen ? wakeFullscreenControls : undefined}
+                  className={cn(
+                    "relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
+                    !isFullscreen && (isSideways ? "p-2" : "px-4 pb-2 pt-4"),
+                  )}
+                  // Full screen runs edge to edge, so the notch is the board's to avoid — it sits
+                  // at the board's start: the screen's left held sideways, its top when turned.
+                  style={isFullscreen ? {
+                    paddingLeft: isTurned ? "env(safe-area-inset-top, 0px)" : "env(safe-area-inset-left, 0px)",
+                    paddingRight: isTurned ? undefined : "env(safe-area-inset-right, 0px)",
+                  } : undefined}
+                >
                   {/* Title — the screen has no room for the instructions, so they open from here */}
+                  {!isFullscreen && (
                   <button
                     type="button"
                     onClick={() => setInfoExerciseId(currentExercise.id)}
@@ -356,6 +377,7 @@ export function PhoneSessionModal({
                     <span className="truncate text-[11px] font-semibold">{currentExercise.title}</span>
                     <Info className="h-3.5 w-3.5 shrink-0 text-cyan-400/80" />
                   </button>
+                  )}
 
                   {/* Scroll container + min-h-full column: the exercise owns the free height — a
                       tab grows into it, anything shorter is centred in it — while tall exercises
@@ -393,6 +415,8 @@ export function PhoneSessionModal({
                           strumVolume={strumVolume}
                           songSectionMapSlot={songSectionMapSlot}
                           turnTab={isTurned}
+                          tabFullscreen={isFullscreen}
+                          onTabFullscreenChange={handleTabFullscreenChange}
                         />
                       </div>
 
@@ -411,6 +435,7 @@ export function PhoneSessionModal({
                   </div>
 
                   {/* Timer — always visible, even with the details drawer collapsed */}
+                  {!isFullscreen && (
                   <div className="flex shrink-0 items-center justify-center pt-1.5">
                     <div className={cn(
                       "font-mono text-2xl font-black leading-none tracking-tighter transition-colors",
@@ -419,8 +444,45 @@ export function PhoneSessionModal({
                       {formattedTimeLeft}
                     </div>
                   </div>
+                  )}
 
-                  {drawer}
+                  {!isFullscreen && drawer}
+
+                  {/* Full screen's own controls — over the board's corner, gone a moment after
+                      the last touch while the tab plays. Hidden, they let touches through. */}
+                  {isFullscreen && (
+                    <div className={cn(
+                      "absolute right-3 top-3 z-20 flex max-w-[min(22rem,70%)] flex-col items-end gap-2 transition-opacity duration-200",
+                      !fullscreenControlsVisible && "pointer-events-none opacity-0",
+                    )}
+                    style={isTurned ? undefined : { right: "calc(0.75rem + env(safe-area-inset-right, 0px))" }}>
+                      <div className="flex items-center gap-1.5 rounded-lg bg-zinc-950/80 p-1.5 backdrop-blur-xl">
+                        <span className={cn(
+                          "px-2 font-mono text-sm font-black tabular-nums leading-none",
+                          isPlaying ? "text-white" : "text-zinc-500",
+                        )}>
+                          {formattedTimeLeft}
+                        </span>
+                        <Button onClick={handleRestart} variant="subtle" size="icon"
+                          className="h-11 w-11 shrink-0 text-amber-400 hover:text-amber-300">
+                          <RotateCcw size='1em' className="h-4 w-4" />
+                        </Button>
+                        <Button onClick={handleToggleTimer} size="icon" className="h-11 w-11 shrink-0">
+                          {isPlaying ? <Pause size='1em' className='h-4 w-4' /> : <PlayIcon size='1em' className='h-4 w-4' />}
+                        </Button>
+                        <Button onClick={exitFullscreen} variant="subtle" size="icon"
+                          aria-label={t("tab.exit_fullscreen")}
+                          className="h-11 w-11 shrink-0 text-zinc-400 hover:text-white">
+                          <Minimize2 size='1em' className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      {showInstallHint && (
+                        <p className="rounded-lg bg-zinc-950/80 px-3 py-2 text-xs leading-relaxed text-zinc-300 backdrop-blur-xl">
+                          {t("tab.fullscreen_install_hint")}
+                        </p>
+                      )}
+                    </div>
+                  )}
 
                   <AnimatePresence>
                     {isInfoOpen && (
@@ -458,6 +520,7 @@ export function PhoneSessionModal({
                 <div className={cn(
                   "relative z-20 shrink-0 bg-zinc-950/80 backdrop-blur-xl",
                   isSideways ? "w-16" : "pb-safe",
+                  isFullscreen && "hidden",
                 )}>
                   <div className={cn(
                     "flex items-center gap-1.5 overscroll-contain scrollbar-hide",
