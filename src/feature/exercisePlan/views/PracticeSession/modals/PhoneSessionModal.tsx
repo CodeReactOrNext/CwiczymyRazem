@@ -18,6 +18,7 @@ import { MediaControlsToolbar } from "../components/MediaControlsToolbar";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
 import { MobileInstructionsCard } from "../components/MobileInstructionsCard";
 import { MobileMicGameHud } from "../components/MobileMicGameHud";
+import { StartGate, useStartGate } from "../components/StartGate";
 import { QUARTER_TURN_STYLE } from "../components/tablatureDirection";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useTimerContext } from "../contexts/TimerContext";
@@ -213,6 +214,12 @@ export function PhoneSessionModal({
   );
   const { visible: fullscreenControlsVisible, wake: wakeFullscreenControls } =
     useLingeringControls(isFullscreen, isPlaying);
+
+  // Start sits in the strip at the screen's far edge, away from the tab the
+  // player is reading — until the first start the tab itself offers it.
+  const startGate = useStartGate(isPlaying);
+  const showStartGate = startGate.open && !heroSlot && !!activeTablature?.length
+    && currentExercise.riddleConfig?.mode !== "sequenceRepeat";
 
   // The turned screen is sized off the real one: its width is the screen's height. Measured
   // inside the safe-area padding, so the strip — on the screen's lower edge once turned —
@@ -463,6 +470,14 @@ export function PhoneSessionModal({
                   )}
 
                   {!isFullscreen && drawer}
+
+                  {showStartGate && (
+                    <StartGate
+                      onStart={handleToggleTimer}
+                      onPreview={startGate.dismiss}
+                      countsIn={!!currentExercise.metronomeSpeed}
+                    />
+                  )}
 
                   {/* Full screen's own controls — over the board's corner, gone a moment after
                       the last touch while the tab plays. Hidden, they let touches through. */}

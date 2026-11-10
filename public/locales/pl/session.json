@@ -738,5 +738,11 @@
     "passes_other": "{{count}} przejścia ukończone",
     "skip": "Pomiń nutę",
     "restart": "Zacznij od nowa"
+  },
+  "start_gate": {
+    "start": "Start",
+    "preview": "Podgląd",
+    "hint_count_in": "Metronom odliczy wejście, potem grasz. Podgląd pokaże tabulaturę bez liczenia czasu.",
+    "hint": "Czas liczy się od naciśnięcia Start. Podgląd pozwala najpierw się rozejrzeć."
   }
 }

@@ -734,5 +734,11 @@
     "passes_other": "{{count}} passes completed",
     "skip": "Skip note",
     "restart": "Start over"
+  },
+  "start_gate": {
+    "start": "Start",
+    "preview": "Preview",
+    "hint_count_in": "The metronome counts you in, then you play. Preview lets you look at the tab without the clock.",
+    "hint": "The clock starts when you press Start. Preview lets you look first."
   }
 }

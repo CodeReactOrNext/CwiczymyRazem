@@ -645,5 +645,11 @@
     "title": "Tu micrófono oye la guitarra que suena",
     "body": "Esta ronda no entrará en las clasificaciones. Ponte auriculares o apaga el sonido de la guitarra y vuelve a empezar la ronda.",
     "mute": "Apagar guitarra"
+  },
+  "start_gate": {
+    "start": "Empezar",
+    "preview": "Vista previa",
+    "hint_count_in": "El metrónomo marca la entrada y luego tocas. Vista previa te deja ver la tablatura sin que corra el tiempo.",
+    "hint": "El tiempo empieza al pulsar Empezar. Vista previa te deja mirar antes."
   }
 }

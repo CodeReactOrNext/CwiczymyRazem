@@ -645,5 +645,11 @@
     "title": "Dein Mikrofon hört die Gitarrenwiedergabe",
     "body": "Dieser Durchgang kommt nicht in die Ranglisten. Setz Kopfhörer auf oder schalte den Gitarrenklang aus und starte den Durchgang neu.",
     "mute": "Gitarre aus"
+  },
+  "start_gate": {
+    "start": "Start",
+    "preview": "Vorschau",
+    "hint_count_in": "Das Metronom zählt ein, dann spielst du. Mit Vorschau siehst du die Tabulatur, ohne dass die Zeit läuft.",
+    "hint": "Die Zeit läuft ab Start. Mit Vorschau kannst du dich erst umsehen."
   }
 }

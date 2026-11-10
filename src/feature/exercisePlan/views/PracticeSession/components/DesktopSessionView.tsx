@@ -10,6 +10,7 @@ import React from "react";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import type { BackingTrack, TablatureMeasure } from "../../../types/exercise.types";
+import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { BackgroundAmbiance } from "./BackgroundAmbiance";
@@ -22,6 +23,7 @@ import { LearnModeButton } from "./LearnModeButton";
 import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { SessionBottomBar } from "./SessionBottomBar";
 import { SpeedsMasteredButton } from "./SpeedsMasteredButton";
+import { StartGate, useStartGate } from "./StartGate";
 import { TablatureViewMenu } from "./TablatureViewMenu";
 
 interface DesktopSessionViewProps {
@@ -142,6 +144,13 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
   // hero header rendered underneath. Add the extra 40px only when running
   // inside Electron; the web build has no titlebar and needs none of this.
   const { isElectron } = useElectronWindowControls();
+
+  // Learn mode starts the clock on the first note, and a boss fight has its
+  // own arena — neither asks for Start, so neither gets the gate.
+  const { learn } = useNoteMatchingContext();
+  const startGate = useStartGate(p.isPlaying);
+  const showStartGate = startGate.open && !isMobile && !learn?.enabled && !p.heroSlot
+    && !p.backingCinema && !p.backingAligning && !p.setupOpen && !p.reportResult;
 
   const handleTablatureSeek = React.useCallback((beatPosition: number) => {
     if (!p.metronome.isPlaying) {
@@ -347,6 +356,13 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     songSectionMapSlot={p.songSectionMapSlot}
                     cinema={p.backingCinema}
                     obscured={p.backingAligning || p.setupOpen}
+                    startGate={showStartGate ? (
+                      <StartGate
+                        onStart={p.handleToggleTimer}
+                        onPreview={startGate.dismiss}
+                        countsIn={!!p.currentExercise.metronomeSpeed}
+                      />
+                    ) : undefined}
                   />
                 </div>
 

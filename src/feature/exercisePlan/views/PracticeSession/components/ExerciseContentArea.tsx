@@ -116,6 +116,8 @@ interface ExerciseContentAreaProps {
   /** The alignment screen is open over the session. Playback continues — that
    *  is the point of it — but the notation underneath stops drawing. */
   obscured?: boolean;
+  /** Laid over the tab until the session's first start — see StartGate. */
+  startGate?: React.ReactNode;
 }
 
 export const ExerciseContentArea = memo(function ExerciseContentArea({
@@ -175,6 +177,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   songSectionMapSlot,
   cinema = false,
   obscured = false,
+  startGate,
 }: ExerciseContentAreaProps) {
   const { backingVideoId, setBackingVideoId } = useSessionUI();
   const { gameMode } = useTabOverlay();
@@ -291,6 +294,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
       ) : hasTablature ? (
         <>
         {backingTrackSlot}
+        <div className='relative'>
+        {startGate}
         <TablatureSection
           exerciseId={currentExercise.id}
           cinema={cinema}
@@ -325,6 +330,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           onLoopRestart={onLoopRestart}
           obscured={obscured}
         />
+        </div>
         </>
       ) : currentExercise.isPlayalong || currentExercise.videoUrl ? (
         suppressVideo ? null : <VideoSection
