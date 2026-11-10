@@ -32,6 +32,7 @@ function recordingContext() {
       if (prop === "stroke") return () => { log.strokes.push(String(target.strokeStyle)); };
       if (prop === "clearRect") return () => { log.paints++; };
       if (prop === "measureText") return () => ({ width: 10 });
+      if (prop === "getTransform") return () => ({ a: 2, b: 0, c: 0, d: 2, e: 0, f: 0 });
       if (prop === "createLinearGradient") return () => ({ addColorStop: () => undefined });
       if (prop in target) return target[prop];
       return () => undefined;

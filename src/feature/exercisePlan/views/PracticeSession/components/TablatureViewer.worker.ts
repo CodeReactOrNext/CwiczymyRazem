@@ -165,8 +165,8 @@ const NECK_ALPHA = 0.04;
 /** Every other bar's stretch of neck is this much stronger, so bars can be counted at a glance. */
 const BAR_WASH_ALPHA = 0.035;
 /** The winding on the wound strings: fine gaps in the board's colour along the line. */
-const WINDING_DASH = [1, 1.5];
-const WINDING_PERIOD = 2.5;
+const WINDING_ON = 1;
+const WINDING_OFF = 1.5;
 const WINDING_ALPHA = 0.3;
 /** How far the neck reaches past the outer strings — clear of the pills, short of the row below. */
 const neckPad = () => BLOCK_H / 2 + 5;
@@ -229,6 +229,9 @@ let ctx: OffscreenCanvasRenderingContext2D | null = null;
 // Sustain tails fade out along their length. A gradient is built once per
 // colour and (whole-pixel) width, starting at x = 0: the tail is drawn under a
 // translate, which carries the gradient along with it.
+/** How much of a tail's colour is left at its end. It keeps a clear edge there:
+ *  a tail that faded to nothing looked like motion blur once the board moved. */
+const TAIL_FADE_END = 0.5;
 const tailFades = new Map<string, Map<number, CanvasGradient>>();
 /** What a `w`-wide tail of `color` is filled with: the colour dying away to the right. */
 function tailFade(color: string, w: number): CanvasGradient | string {
@@ -246,10 +249,28 @@ function tailFade(color: string, w: number): CanvasGradient | string {
   if (!fade) {
     fade = ctx.createLinearGradient(0, 0, key, 0);
     fade.addColorStop(0, color);
-    fade.addColorStop(1, withAlpha(color, 0.12));
+    fade.addColorStop(1, withAlpha(color, TAIL_FADE_END));
     byWidth.set(key, fade);
   }
   return fade;
+}
+
+// The winding on a wound string: one period of it, in device pixels, kept as a
+// repeating pattern and rebuilt only when the board's colour or scale changes.
+let windingTile: { key: string; pattern: CanvasPattern | null } | null = null;
+function windingPattern(onPx: number, offPx: number): CanvasPattern | null {
+  if (!ctx || typeof OffscreenCanvas === "undefined") return null;
+  const key = `${bgColor}|${onPx}|${offPx}`;
+  if (windingTile?.key === key) return windingTile.pattern;
+  const tile = new OffscreenCanvas(onPx + offPx, 1);
+  const g = tile.getContext("2d");
+  if (g) {
+    g.fillStyle = withAlpha(bgColor, WINDING_ALPHA);
+    g.fillRect(0, 0, onPx, 1);
+  }
+  // A failure is kept too, so the dashed fallback doesn't retry every frame.
+  windingTile = { key, pattern: g ? ctx.createPattern(tile, "repeat") ?? null : null };
+  return windingTile.pattern;
 }
 
 /**
@@ -1475,6 +1496,11 @@ function paintFrame() {
     pausedScrollX = Math.max(0, wrappedCursor - viewW / 4);
   }
 
+  // The board scrolls in whole device pixels. At a fractional offset every edge
+  // and every glyph is antialiased differently from one frame to the next, and
+  // a tab that is sharp when it stands still smears as soon as it moves.
+  const devicePx = dpr * vscale;
+  scrollX = Math.round(scrollX * devicePx) / devicePx;
   const viewL = scrollX - 50;
   const viewR = scrollX + viewW + 50;
   const tileStart = seamless && totalW > 0 ? Math.max(0, Math.floor(viewL / totalW)) : 0;
@@ -1522,6 +1548,7 @@ function paintFrame() {
     ctx.fillStyle = withAlpha(inkColor, NECK_ALPHA);
     ctx.fillRect(lineL, STAFF_TOP - neckPad(), lineR - lineL, 5 * STRING_SPACING + neckPad() * 2);
     ctx.lineCap = "butt";
+    let boardMatrix: DOMMatrix | null = null;
     for (let row = 0; row < stringCount; row++) {
       const y = STAFF_TOP + row * STRING_SPACING;
       const width = staffLineWidth(row, flipStrings, stringCount);
@@ -1533,15 +1560,37 @@ function paintFrame() {
       ctx.stroke();
       if (width > 1) {
         // The winding. Its phase is tied to the board, not to the line's left
-        // end, so it stays put on the string while the tab scrolls.
-        ctx.strokeStyle = withAlpha(bgColor, WINDING_ALPHA);
-        ctx.setLineDash(WINDING_DASH);
-        ctx.lineDashOffset = lineL % WINDING_PERIOD;
-        ctx.beginPath();
-        ctx.moveTo(lineL, y); ctx.lineTo(lineR, y);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.lineDashOffset = 0;
+        // end, so it stays put on the string while the tab scrolls. Both the
+        // pattern and its phase are whole device pixels: a 2.5px period at a
+        // fractional scroll position aliased into ragged, uneven dashes.
+        boardMatrix ??= ctx.getTransform();
+        const m = boardMatrix;
+        const scale = Math.abs(m.a) || 1;
+        const onPx = Math.max(1, Math.round(WINDING_ON * scale));
+        const offPx = Math.max(1, Math.round(WINDING_OFF * scale));
+        const winding = windingPattern(onPx, offPx);
+        if (winding) {
+          // Filled in device pixels from a one-period tile: a dashed stroke
+          // this fine is hundreds of dashes per string, every frame.
+          const anchor = Math.round(m.e);
+          ctx.setTransform(1, 0, 0, 1, anchor, 0);
+          ctx.fillStyle = winding;
+          ctx.fillRect(Math.min(m.a * lineL, m.a * lineR) + m.e - anchor, m.d * (y - width / 2) + m.f, scale * (lineR - lineL), m.d * width);
+          ctx.setTransform(m);
+        } else {
+          const on = onPx / scale;
+          const off = offPx / scale;
+          const period = on + off;
+          const origin = (Math.round(m.e) - m.e) / m.a;
+          ctx.strokeStyle = withAlpha(bgColor, WINDING_ALPHA);
+          ctx.setLineDash([on, off]);
+          ctx.lineDashOffset = (((lineL - origin) % period) + period) % period;
+          ctx.beginPath();
+          ctx.moveTo(lineL, y); ctx.lineTo(lineR, y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.lineDashOffset = 0;
+        }
       }
     }
   }
@@ -2014,6 +2063,10 @@ function paintFrame() {
           noteVisualFill.delete(note.noteKey);
         }
 
+        // A note filled to its end is the note's own shape in the hit colour:
+        // no need to clip a rectangle to it, frame after frame, once it is full.
+        const filledWhole = fillStartW === 0 && fillW >= blockW - 0.5;
+
         if (isHarm) {
           // Harmonic: outlined pill
           const col = note.harmonicType === 1 ? note.color : "#e879f9";
@@ -2032,7 +2085,11 @@ function paintFrame() {
           ctx.globalAlpha = 1;
 
           // Progressive fill for harmonic
-          if (fillW > 0) {
+          if (filledWhole) {
+            notePath();
+            ctx.fillStyle = withAlpha(hitFill, 0.4);
+            ctx.fill();
+          } else if (fillW > 0) {
             ctx.save();
             notePath();
             ctx.clip();
@@ -2106,7 +2163,11 @@ function paintFrame() {
           }
 
           // Progressive filling with green tied to the playback cursor
-          if (fillW > 0) {
+          if (filledWhole) {
+            notePath();
+            ctx.fillStyle = finalHitColor;
+            ctx.fill();
+          } else if (fillW > 0) {
             ctx.save();
             notePath();
             ctx.clip();
@@ -2678,27 +2739,29 @@ function paintFrame() {
 
   // ── Cursor line + beat pulse ─────────────────────────────────────────────
   if (dispCursor > 0 || isPlaying) {
+    // On a whole device pixel too, so the line stays one crisp stroke.
+    const cursorX = Math.round(dispCursor * devicePx) / devicePx;
     // While it plays: a soft wake behind the line, so the eye finds it without
     // the line itself having to be heavy.
     if (isPlaying) {
-      const wake = ctx.createLinearGradient(dispCursor - CURSOR_WAKE_W, 0, dispCursor, 0);
+      const wake = ctx.createLinearGradient(cursorX - CURSOR_WAKE_W, 0, cursorX, 0);
       wake.addColorStop(0, withAlpha(CURSOR_COLOR, 0));
       wake.addColorStop(1, withAlpha(CURSOR_COLOR, 0.16));
       ctx.fillStyle = wake;
-      ctx.fillRect(dispCursor - CURSOR_WAKE_W, 0, CURSOR_WAKE_W, viewH);
+      ctx.fillRect(cursorX - CURSOR_WAKE_W, 0, CURSOR_WAKE_W, viewH);
     }
     // Paused it is simply the board's ink — red read as an error. Learn mode
     // keeps no time, so there it rests on the target in the learn colour.
     ctx.strokeStyle = isPlaying ? CURSOR_COLOR : isLearning ? withAlpha(LEARN_COLOR, 0.6) : withAlpha(inkColor, 0.7);
     ctx.lineWidth = isLearning ? 2 : 1.5;
     ctx.beginPath();
-    ctx.moveTo(dispCursor, 0); ctx.lineTo(dispCursor, viewH);
+    ctx.moveTo(cursorX, 0); ctx.lineTo(cursorX, viewH);
     ctx.stroke();
     // A marker on top of the line, pointing down it.
     if (!isLearning) {
       ctx.fillStyle = ctx.strokeStyle;
       ctx.beginPath();
-      ctx.moveTo(dispCursor - 5, 0); ctx.lineTo(dispCursor + 5, 0); ctx.lineTo(dispCursor, 7);
+      ctx.moveTo(cursorX - 5, 0); ctx.lineTo(cursorX + 5, 0); ctx.lineTo(cursorX, 7);
       ctx.closePath();
       ctx.fill();
     }
@@ -2711,7 +2774,7 @@ function paintFrame() {
         ctx.strokeStyle = `rgba(6,182,212,${opacity})`;
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(dispCursor, viewH / 2, ripple, 0, Math.PI * 2);
+        ctx.arc(cursorX, viewH / 2, ripple, 0, Math.PI * 2);
         ctx.stroke();
       }
     }

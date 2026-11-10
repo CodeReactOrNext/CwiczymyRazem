@@ -81,6 +81,11 @@ const fastRun: TablatureMeasure[] = [
 ];
 const isDynamicsBar = (fill: string) => fill.startsWith("rgba(6,182,212,");
 
+/** What the fake context hands back for the winding's pattern. */
+const WINDING_FILL = "winding-pattern";
+/** The winding's one-period tile is a bitmap too, one device pixel tall. */
+const isSprite = (bitmap: { height: number }) => bitmap.height > 1;
+
 function recordingContext() {
   const state: Record<string, unknown> = {};
   const log = {
@@ -90,6 +95,8 @@ function recordingContext() {
     texts: [] as string[],
     textXs: [] as { text: string; x: number }[],
     fills: [] as string[],
+    patterns: [] as unknown[],
+    dashes: [] as number[][],
   };
   const ctx = new Proxy(state, {
     get(target, prop: string) {
@@ -100,6 +107,8 @@ function recordingContext() {
       // Roughly a 13px font's advance, so long names come out long.
       if (prop === "measureText") return (text: string) => ({ width: text.length * 7 });
       if (prop === "createLinearGradient") return () => ({ addColorStop: () => undefined });
+      if (prop === "createPattern") return (image: unknown) => { log.patterns.push(image); return WINDING_FILL; };
+      if (prop === "setLineDash") return (dash: number[]) => { log.dashes.push(dash); };
       // A board scrolled to a fractional device pixel.
       if (prop === "getTransform") return () => ({ a: 2, b: 0, c: 0, d: 2, e: 10.3, f: 0.6 });
       if (prop in target) return target[prop];
@@ -182,9 +191,10 @@ describe("TablatureViewer.worker — hit glow", () => {
     send({ type: "HIT_NOTES", hitNotes: { "0-0-0": true } });
     run(120);
 
-    expect(made).toHaveLength(1);
+    const sprites = made.filter(isSprite);
+    expect(sprites).toHaveLength(1);
     expect(log.drawn.length).toBeGreaterThan(3);
-    expect(log.drawn.every(({ image }) => image === made[0])).toBe(true);
+    expect(log.drawn.every(({ image }) => image === sprites[0])).toBe(true);
     expect(log.blurs.every((blur) => blur === 0)).toBe(true);
   });
 
@@ -209,6 +219,28 @@ describe("TablatureViewer.worker — hit glow", () => {
   });
 });
 
+describe("TablatureViewer.worker — string winding", () => {
+  it("fills the winding from one cached tile instead of dashing it every frame", async () => {
+    const made = stubOffscreenCanvas();
+    const { run, log } = await startWorker(plain);
+    run(120);
+
+    expect(made.filter((bitmap) => !isSprite(bitmap))).toHaveLength(1);
+    expect(log.patterns).toHaveLength(1);
+    expect(log.fills).toContain(WINDING_FILL);
+    expect(log.dashes.some((dash) => dash.length > 0 && dash[0] < 2)).toBe(false);
+  });
+
+  it("dashes the winding where the worker can't make bitmaps", async () => {
+    vi.stubGlobal("OffscreenCanvas", undefined);
+    const { run, log } = await startWorker(plain);
+    run(60);
+
+    expect(log.patterns).toHaveLength(0);
+    expect(log.dashes.some((dash) => dash.length > 0 && dash[0] < 2)).toBe(true);
+  });
+});
+
 describe("TablatureViewer.worker — chord names", () => {
   it("paints each name once, then only blits it — no blur, no typesetting per frame", async () => {
     const made = stubOffscreenCanvas();
@@ -217,10 +249,11 @@ describe("TablatureViewer.worker — chord names", () => {
     send({ type: "SCROLL", scrollX: 0, cursorPos: 0 });
     run(FRAME_MS);
 
-    expect(made.map((sprite) => sprite.texts)).toEqual([["Am"], ["C"]]);
+    const sprites = made.filter(isSprite);
+    expect(sprites.map((sprite) => sprite.texts)).toEqual([["Am"], ["C"]]);
     // Two frames × three named beats, every one a blit of a cached tag.
     expect(log.drawn).toHaveLength(6);
-    expect(log.drawn.every(({ image }) => image === made[0] || image === made[1])).toBe(true);
+    expect(log.drawn.every(({ image }) => image === sprites[0] || image === sprites[1])).toBe(true);
     expect(log.texts).not.toContain("Am");
     expect(log.blurs.every((blur) => blur === 0)).toBe(true);
   });
