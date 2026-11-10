@@ -1086,76 +1086,149 @@ function drawPill(x: number, y: number, w: number, h: number, r: number) {
 }
 
 // ── Sustain: the fill running along a held note's tail ────────────────────────
-// The front of the fill is a comet: a bright head in a halo of the hit colour,
-// drawing a long light trail down the part just filled. It burns while the fill
-// moves and dies down when the note is let go. A note held to its end sends the
-// comet to the end of the tail, where it flares once and goes out.
-/** How long the comet takes to flare and go out at the end of a held note. */
-const SUSTAIN_DONE_MS = 560;
-/** How far behind the comet its trail reaches while the note is held (world px)… */
-const SUSTAIN_TRAIL_W = 90;
-/** …and behind the flare at the note's end. */
-const SUSTAIN_DONE_TRAIL_W = 120;
-/** How bright the trail is where it meets the comet. */
-const SUSTAIN_TRAIL_ALPHA = 0.75;
-/** How quickly the comet lights up and dies down, per frame. */
+// While a note is held, the filled part of its tail is a beam of blue-white
+// light. At its front rides a small charged spark — a bright point with short
+// arcs jumping round it — shedding little stars behind it. A note held to its
+// end only lets the beam fade: nothing bursts and nothing leaves the note.
+//
+// The light is its own blue-white whatever hit colour is chosen — it is the
+// reward, and reads apart from the fill it rides on.
+/** How long the beam of a note held to its end takes to fade. */
+const SUSTAIN_DONE_MS = 420;
+/** How quickly the star lights up and dies down, per frame. */
 const SUSTAIN_SPARK_EASE = 0.22;
+const STAR_WHITE = "#ffffff";
+const STAR_BLUE = "#7dd3fc";
+/** The beam, widest and faintest first: [width, colour, share of its strength]. */
+const STAR_BEAM: readonly (readonly [number, string, number])[] = [
+  [14, "rgba(56,189,248,0.5)", 0.6],
+  [6, STAR_BLUE, 1],
+  [2.2, STAR_WHITE, 1],
+];
+/** How far the beam sways off the string, in world px. */
+const STAR_BEAM_SWAY = 1.2;
+/** The same "random" number for the same particle every frame, so each keeps its path. */
+const starRandom = (i: number, k: number) => {
+  const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453;
+  return x - Math.floor(x);
+};
+/** Motion is off when the tab's animations are, or the system asks for less. */
+const sustainIsCalm = () => !hitAnimations || reducedMotion;
 
-/** A soft glow of the hit colour, `r` around (x, y). Drawn at the current globalAlpha. */
-function drawSustainHalo(x: number, y: number, r: number) {
-  const halo = ctx?.createRadialGradient?.(x, y, 0, x, y, r);
-  if (!ctx || !halo) return;
-  halo.addColorStop(0, withAlpha(hitGlow, 0.75));
-  halo.addColorStop(0.45, withAlpha(hitGlow, 0.25));
-  halo.addColorStop(1, withAlpha(hitGlow, 0));
-  ctx.fillStyle = halo;
+/** A four-pointed star, `r` to its tips, turned by `spin`. Drawn at the current globalAlpha. */
+function drawStar(x: number, y: number, r: number, spin: number, color: string) {
+  if (!ctx) return;
+  ctx.fillStyle = color;
   ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
+  for (let i = 0; i < 8; i++) {
+    const angle = spin + (i * Math.PI) / 4;
+    const reach = i % 2 === 0 ? r : r * 0.28;
+    ctx.lineTo(x + Math.cos(angle) * reach, y + Math.sin(angle) * reach);
+  }
+  ctx.closePath();
   ctx.fill();
 }
 
-/** The light a comet at `x` leaves on the tail back to `fromX`, at most `reach` long. */
-function drawSustainTrail(fromX: number, x: number, y: number, tailH: number, reach: number) {
-  const start = Math.max(fromX, x - reach);
-  if (!ctx || x <= start) return;
-  const trail = ctx.createLinearGradient(start, 0, x, 0);
-  trail.addColorStop(0, "rgba(255,255,255,0)");
-  trail.addColorStop(1, `rgba(255,255,255,${SUSTAIN_TRAIL_ALPHA})`);
-  ctx.fillStyle = trail;
-  ctx.fillRect(start, y - tailH / 2, x - start, tailH);
-}
-
-/** The comet at the front of a growing fill, centred on (x, y), its trail
- *  reaching back no further than `fromX`. `strength` 0–1. */
-function drawSustainComet(x: number, y: number, tailH: number, fromX: number, strength: number) {
-  if (!ctx || strength <= 0.02) return;
-  const before = ctx.globalAlpha;
-  ctx.globalAlpha = before * strength;
-  drawSustainTrail(fromX, x, y, tailH, SUSTAIN_TRAIL_W);
-  drawSustainHalo(x, y, BLOCK_H * 0.7);
-  ctx.fillStyle = "#ffffff";
-  ctx.beginPath();
-  ctx.arc(x, y, tailH * 0.55, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.globalAlpha = before;
-}
-
-/** A note held to its end, `age` (0–1) into its animation: the comet, arrived
- *  at the end of the tail (which starts at `tailX` and ends at `endX`), flares
- *  and goes out. */
-function drawSustainDone(tailX: number, endX: number, y: number, tailH: number, age: number) {
-  if (!ctx || endX <= tailX) return;
-  const out = easeOutCubic(age);
-  const fade = 1 - age;
-  ctx.globalAlpha = fade;
-  drawSustainTrail(tailX, endX, y, tailH, SUSTAIN_DONE_TRAIL_W);
-  drawSustainHalo(endX, y, BLOCK_H * (0.7 + 0.9 * out));
-  ctx.globalAlpha = fade * fade;
-  ctx.fillStyle = "#ffffff";
-  ctx.beginPath();
-  ctx.arc(endX, y, tailH * (0.55 + 0.5 * out), 0, Math.PI * 2);
-  ctx.fill();
+/** The filled part of a tail as a beam of light from x0 to x1, swaying a little. */
+function drawStarBeam(x0: number, x1: number, y: number, strength: number, time: number) {
+  if (!ctx || x1 - x0 < 4 || strength <= 0.02) return;
+  ctx.globalCompositeOperation = "lighter";
+  ctx.lineCap = "round";
+  for (const [width, color, share] of STAR_BEAM) {
+    ctx.globalAlpha = strength * share;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    for (let x = x0; x <= x1; x += 3) {
+      const grow = Math.min(1, (x - x0) / 30);
+      const sway = Math.sin(x / 11 - time / 55) + Math.sin(x / 4.5 + time / 31) * 0.3;
+      if (x === x0) ctx.moveTo(x, y + sway * STAR_BEAM_SWAY * grow);
+      else ctx.lineTo(x, y + sway * STAR_BEAM_SWAY * grow);
+    }
+    ctx.stroke();
+  }
+  ctx.lineCap = "butt";
   ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = "source-over";
+}
+
+/** How often the arcs round the spark jump to new places. */
+const SPARK_ARC_MS = 55;
+const SPARK_ARCS = 4;
+
+/** A short jagged arc from (x, y) out along `angle`, `length` long. */
+function sparkArcPath(x: number, y: number, angle: number, length: number, seed: number) {
+  if (!ctx) return;
+  const dx = Math.cos(angle);
+  const dy = Math.sin(angle);
+  ctx.moveTo(x, y);
+  for (let step = 1; step <= 3; step++) {
+    const along = (length * step) / 3;
+    const off = step === 3 ? 0 : (starRandom(step, seed) - 0.5) * 7;
+    ctx.lineTo(x + dx * along - dy * off, y + dy * along + dx * off);
+  }
+}
+
+/** The front of a growing fill, centred on (x, y): the beam back to `fromX`,
+ *  a small charged spark with arcs jumping round it, and the small stars it
+ *  sheds. `strength` 0–1. */
+function drawSustainFront(x: number, y: number, tailH: number, fromX: number, strength: number, frameNow: number) {
+  if (!ctx || strength <= 0.02) return;
+  const calm = sustainIsCalm();
+  const time = calm ? 0 : frameNow;
+  drawStarBeam(fromX, x, y, strength, time);
+  const r = BLOCK_H * 0.55;
+  const halo = ctx.createRadialGradient?.(x, y, 0, x, y, r);
+  if (halo) {
+    halo.addColorStop(0, "rgba(125,211,252,0.8)");
+    halo.addColorStop(1, "rgba(125,211,252,0)");
+    ctx.globalAlpha = strength;
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  if (!calm) {
+    // Arcs: the same few until the next jump, blue under a white core.
+    const tick = Math.floor(time / SPARK_ARC_MS);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    for (const [width, color] of [[2.4, STAR_BLUE], [1, STAR_WHITE]] as const) {
+      ctx.globalAlpha = strength * 0.9;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      for (let i = 0; i < SPARK_ARCS; i++) {
+        const seed = tick * 13 + i * 7;
+        sparkArcPath(x, y, starRandom(i, seed) * Math.PI * 2, 8 + 8 * starRandom(i, seed + 1), seed + 2);
+      }
+      ctx.stroke();
+    }
+    ctx.lineCap = "butt";
+    ctx.lineJoin = "miter";
+  }
+  ctx.globalAlpha = strength;
+  ctx.fillStyle = STAR_WHITE;
+  ctx.beginPath();
+  ctx.arc(x, y, tailH * 0.45, 0, Math.PI * 2);
+  ctx.fill();
+  if (!calm) {
+    for (let i = 0; i < 5; i++) {
+      const life = (time / 600 + starRandom(i, 3)) % 1;
+      const px = x - life * (40 + 60 * starRandom(i, 1));
+      if (px <= fromX) continue;
+      ctx.globalAlpha = strength * (1 - life);
+      drawStar(px, y + (starRandom(i, 2) - 0.5) * 34 * life, 4.5 * (1 - life) + 1, time / 200 + i, i % 2 ? STAR_BLUE : STAR_WHITE);
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+/** A note held to its end, `age` (0–1) on: the beam along its tail, from
+ *  `tailX` to `endX`, fades out and leaves the plain fill. */
+function drawSustainDone(tailX: number, endX: number, y: number, age: number, frameNow: number) {
+  if (!ctx || endX <= tailX) return;
+  drawStarBeam(tailX, endX, y, 1 - age, frameNow);
 }
 
 // ── Chord box ─────────────────────────────────────────────────────────────────
@@ -2350,7 +2423,8 @@ function paintFrame(frameStamp?: number) {
               ctx.beginPath();
               ctx.arc(edge - capR, note.noteY, capR, -Math.PI / 2, Math.PI / 2);
               ctx.fill();
-              drawSustainComet(edge - capR, note.noteY, tailH, from, liveFill ? liveFill.spark : 0);
+              drawSustainFront(edge - capR, note.noteY, tailH, from, liveFill ? liveFill.spark : 0, frameNow);
+              ctx.globalAlpha = alpha;
             }
           } else if (fillW > 0) {
             ctx.save();
@@ -2384,10 +2458,10 @@ function paintFrame(frameStamp?: number) {
             liveFill.spark += ((moving ? 1 : 0) - liveFill.spark) * SUSTAIN_SPARK_EASE;
             liveFill.drawnW = fillW;
             if (hasTail && filledWhole && liveFill.doneAt === null) liveFill.doneAt = frameNow;
-            if (hasTail && liveFill.doneAt !== null && hitAnimations && !reducedMotion) {
-              const age = (frameNow - liveFill.doneAt) / SUSTAIN_DONE_MS;
-              if (age < 1) {
-                drawSustainDone(tailX, blockX + blockW - tailH / 2, note.noteY, tailH, age);
+            if (hasTail && !sustainIsCalm()) {
+              const doneAge = liveFill.doneAt !== null ? (frameNow - liveFill.doneAt) / SUSTAIN_DONE_MS : 1;
+              if (doneAge < 1) {
+                drawSustainDone(tailX, blockX + blockW - tailH / 2, note.noteY, doneAge, frameNow);
                 needsRedraw = true;
               }
             }
