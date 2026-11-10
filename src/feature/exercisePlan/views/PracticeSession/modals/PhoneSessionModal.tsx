@@ -27,6 +27,37 @@ import { useLingeringControls, useTabFullscreen } from "../hooks/useTabFullscree
 
 export type PhoneOrientation = "portrait" | "landscape";
 
+/**
+ * The clock and the score are the two things on this screen that change while the player
+ * plays — the clock many times a second, the score on every note. Each reads its own context
+ * here, so a tick or a hit repaints a few characters instead of the whole session screen.
+ */
+function TimeLeft() {
+  const { formattedTimeLeft } = useTimerContext();
+  return <>{formattedTimeLeft}</>;
+}
+
+function DrawerMicStats() {
+  const { t } = useTranslation("session");
+  const { gameState, sessionAccuracy } = useNoteMatchingContext();
+  return (
+    <div className="flex items-center justify-between gap-2 px-3 py-1 text-[9px]">
+      <div className="min-w-0">
+        <div className="tracking-widest text-zinc-600">{t("success.score")}</div>
+        <div className="font-black tabular-nums text-white">{gameState.score.toLocaleString()}</div>
+      </div>
+      <div className="min-w-0">
+        <div className="tracking-widest text-zinc-600">{t("hud.acc_short")}</div>
+        <div className="font-black tabular-nums text-emerald-400">{sessionAccuracy}%</div>
+      </div>
+      <div className="min-w-0 text-right">
+        <div className="tracking-widest text-zinc-600">{t("hud.streak")}</div>
+        <div className="font-black tabular-nums text-cyan-400">{gameState.combo}×{gameState.multiplier}</div>
+      </div>
+    </div>
+  );
+}
+
 interface PhoneSessionModalProps {
   orientation: PhoneOrientation;
   isOpen: boolean;
@@ -171,8 +202,6 @@ export function PhoneSessionModal({
   // so moving on to the next one closes it.
   const [infoExerciseId, setInfoExerciseId] = useState<string | null>(null);
   const isInfoOpen = infoExerciseId === currentExercise.id;
-  const { gameState, sessionAccuracy } = useNoteMatchingContext();
-  const { formattedTimeLeft } = useTimerContext();
   const strumVolume = strumSynthVolume(isAudioMuted, audioTracks?.find(track => track.id === "main"));
 
   // "Like a film": the tab alone on the screen. Everything else here — title, timer, drawer,
@@ -244,20 +273,7 @@ export function PhoneSessionModal({
           {/* Mic stats — ear training keeps its own score inside EarTrainingView,
               the generic tab accuracy meter doesn't apply to it. */}
           {isMicEnabled && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && (
-            <div className="flex items-center justify-between gap-2 px-3 py-1 text-[9px]">
-              <div className="min-w-0">
-                <div className="tracking-widest text-zinc-600">{t("success.score")}</div>
-                <div className="font-black tabular-nums text-white">{gameState.score.toLocaleString()}</div>
-              </div>
-              <div className="min-w-0">
-                <div className="tracking-widest text-zinc-600">{t("hud.acc_short")}</div>
-                <div className="font-black tabular-nums text-emerald-400">{sessionAccuracy}%</div>
-              </div>
-              <div className="min-w-0 text-right">
-                <div className="tracking-widest text-zinc-600">{t("hud.streak")}</div>
-                <div className="font-black tabular-nums text-cyan-400">{gameState.combo}×{gameState.multiplier}</div>
-              </div>
-            </div>
+            <DrawerMicStats />
           )}
 
           {/* Controls */}
@@ -441,7 +457,7 @@ export function PhoneSessionModal({
                       "font-mono text-2xl font-black leading-none tracking-tighter transition-colors",
                       isPlaying ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" : "text-zinc-500"
                     )}>
-                      {formattedTimeLeft}
+                      <TimeLeft />
                     </div>
                   </div>
                   )}
@@ -461,7 +477,7 @@ export function PhoneSessionModal({
                           "px-2 font-mono text-sm font-black tabular-nums leading-none",
                           isPlaying ? "text-white" : "text-zinc-500",
                         )}>
-                          {formattedTimeLeft}
+                          <TimeLeft />
                         </span>
                         <Button onClick={handleRestart} variant="subtle" size="icon"
                           className="h-11 w-11 shrink-0 text-amber-400 hover:text-amber-300">
