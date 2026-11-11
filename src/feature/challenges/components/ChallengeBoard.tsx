@@ -108,7 +108,7 @@ const ChallengeRow = ({
       {/* Station */}
       <div
         className={cn(
-          "relative my-1 flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-3 rounded-lg bg-white/[0.02] px-2 py-3 transition-colors group-hover:bg-white/[0.06] sm:flex-nowrap sm:px-3",
+          "relative my-1 flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-white/[0.02] px-2 py-3 transition-colors group-hover:bg-white/[0.06] sm:flex-nowrap sm:px-3",
           isCleared && "opacity-80 group-hover:opacity-100",
         )}>
         {/* The station itself opens the song — everything already interactive
@@ -155,6 +155,11 @@ const ChallengeRow = ({
           </p>
         </div>
 
+        {/* Phones: the song keeps the first line to itself — sharing it with
+            the runs and Submit left room for one letter of the title — and
+            the actions drop to a second line. */}
+        <span className='basis-full sm:hidden' aria-hidden />
+
         {/* Who already played it — the social proof for this slot */}
         <button
           type='button'
@@ -185,7 +190,7 @@ const ChallengeRow = ({
         {/* Both states share one width so the tier badges line up in a column
             instead of zig-zagging with the label length. */}
         {isCleared ? (
-          <span className='flex h-8 w-[92px] shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green-500/10 text-xs font-bold text-green-400'>
+          <span className='ml-auto flex h-8 w-[92px] shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green-500/10 sm:ml-0 text-xs font-bold text-green-400'>
             <Check className='h-3.5 w-3.5' strokeWidth={3} />
             {t("board.done")}
           </span>
@@ -196,7 +201,7 @@ const ChallengeRow = ({
             disabled={isLocked}
             onClick={onSubmit}
             className={cn(
-              "relative z-10 h-8 w-[92px] shrink-0 px-0 text-xs font-bold",
+              "relative z-10 ml-auto h-8 w-[92px] shrink-0 px-0 text-xs font-bold sm:ml-0",
               isLocked
                 ? "text-zinc-600"
                 : "bg-white/5 text-zinc-200 hover:bg-white/10 hover:text-white",

@@ -133,10 +133,9 @@ const FavoritesPage: NextPageWithLayout = () => {
       <HeroBanner
         title={t("library:favorites.title")}
         subtitle={t("library:favorites.subtitle")}
-        eyebrow={t("library:favorites.title")}
-        eyebrowClassName="text-rose-400/80"
+        compact
         backgroundContent={<HeroPattern withHeart />}
-        className="mb-6 min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]"
+        className="mb-2 w-full !rounded-none !shadow-none md:mb-6 md:min-h-[90px] lg:min-h-[100px]"
       />
 
       <div className="px-3 md:px-6 lg:px-8">
@@ -149,7 +148,7 @@ const FavoritesPage: NextPageWithLayout = () => {
 
       <div className="space-y-12 px-3 py-6 md:px-6 md:py-8 lg:px-8">
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center rounded-lg bg-zinc-900/30 px-6 py-20 text-center">
+          <div className="flex flex-col items-center justify-center rounded-lg bg-zinc-900/30 px-6 py-12 text-center md:py-20">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-rose-500/10">
               <Heart className="h-5 w-5 text-rose-400" />
             </div>

@@ -16,10 +16,9 @@ const GoalsPage: NextPageWithLayout = () => {
       <HeroBanner
         title={t("page.title")}
         subtitle={t("page.subtitle")}
-        eyebrow={t("page.eyebrow")}
-        eyebrowClassName='text-emerald-400/80'
+        compact
         backgroundContent={<HeroPattern />}
-        className='mb-6 min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]'
+        className='mb-2 w-full !rounded-none !shadow-none md:mb-6 md:min-h-[90px] lg:min-h-[100px]'
       />
       <div className='px-3 md:px-6 lg:px-8'>
         <PageTabs tabs={LIBRARY_TABS} activeHref='/goals' ariaLabel='My stuff sections' />

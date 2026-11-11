@@ -14,6 +14,7 @@ import {
   type MoreSheetGroup,
   type MoreSheetItem,
 } from "components/RockSidebar/MobileMoreSheet";
+import { ThemeToggle } from "components/ThemeToggle/ThemeToggle";
 import Avatar from "components/UI/Avatar";
 import { DISCORD_INVITE_URL } from "constants/community";
 import { DESKTOP_APP_RELEASES_URL } from "constants/desktopApp";
@@ -753,6 +754,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       ) : (
         <div className='flex-1' />
       )}
+      <ThemeToggle />
       <CommunityIconButton onOpen={handleLinkClick} />
       <NotificationsBell />
     </div>

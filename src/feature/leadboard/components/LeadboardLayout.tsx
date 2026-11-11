@@ -134,7 +134,7 @@ export const LeadboardLayout = ({
         )}
       </div>
       {nextRival && (
-        <p className='mt-3 text-sm text-zinc-300'>
+        <p className='mt-3 hidden text-sm text-zinc-300 md:block'>
           <span className='font-semibold tabular-nums text-cyan-300'>
             {nextRival.gap.toLocaleString(intlLocale)}
           </span>{" "}
@@ -180,9 +180,10 @@ export const LeadboardLayout = ({
         className='w-full !rounded-none !shadow-none'
         backgroundContent={<HeroPattern />}
         // The rewards belong to the season, so they sit under its name rather
-        // than queue up under the player's rank.
+        // than queue up under the player's rank. Phones skip them: the list
+        // is what the screen is for.
         leftContent={isSeasonalView ? <SeasonRewards /> : undefined}
-        leftContentClassName=''
+        leftContentClassName='hidden md:block'
         rightContent={rankContent}
       />
 
@@ -230,11 +231,11 @@ export const LeadboardLayout = ({
         <div ref={listRef} className='scroll-mt-24 pb-20'>
           {activeScope === "around" ? (
             isNeighborsLoading ? (
-              <ul className='flex flex-col gap-6'>
+              <ul className='flex flex-col gap-2 sm:gap-6'>
                 <TableSkeleton rows={5} />
               </ul>
             ) : neighbors ? (
-              <ul className='flex flex-col gap-6'>
+              <ul className='flex flex-col gap-2 sm:gap-6'>
                 {neighbors.rows.map(({ user, place }) =>
                   renderRow(user, place),
                 )}
@@ -246,7 +247,7 @@ export const LeadboardLayout = ({
             )
           ) : isLoading ? (
             <>
-              <ul className='flex flex-col gap-6'>
+              <ul className='flex flex-col gap-2 sm:gap-6'>
                 <TableSkeleton rows={itemsPerPage} />
               </ul>
               <div className='mt-8 flex justify-center'>
@@ -273,7 +274,7 @@ export const LeadboardLayout = ({
             </div>
           ) : (
             <>
-              <ul className='flex flex-col gap-6'>
+              <ul className='flex flex-col gap-2 sm:gap-6'>
                 {usersData.map((user, index) =>
                   renderRow(user, (currentPage - 1) * itemsPerPage + index + 1),
                 )}

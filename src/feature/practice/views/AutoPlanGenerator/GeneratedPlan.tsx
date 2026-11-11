@@ -1,4 +1,4 @@
-import type { DragEndEvent } from "@dnd-kit/core";
+import type { DragEndEvent, Modifier } from "@dnd-kit/core";
 import {
   closestCenter,
   DndContext,
@@ -25,6 +25,16 @@ import { useState } from "react";
 import { formatMinutesDuration } from "utils/converter";
 
 import { ExerciseCard } from "./ExerciseCard";
+
+/**
+ * The list only reorders up and down. Left free, a card dragged sideways hung
+ * off the phone screen, the page grew wider than the viewport and auto-scroll
+ * dragged the whole screen along with the card.
+ */
+const verticalOnly: Modifier = ({ transform }) => ({ ...transform, x: 0 });
+
+/** No sideways auto-scroll; up/down only near the very edge of the screen. */
+const AUTO_SCROLL = { threshold: { x: 0, y: 0.12 } };
 
 interface GeneratedPlanProps {
   plan: ExercisePlan;
@@ -137,6 +147,8 @@ export const GeneratedPlan = ({
           id='generated-plan-exercises'
           sensors={sensors}
           collisionDetection={closestCenter}
+          modifiers={[verticalOnly]}
+          autoScroll={AUTO_SCROLL}
           onDragEnd={handleDragEnd}>
           <SortableContext
             items={exerciseIds}

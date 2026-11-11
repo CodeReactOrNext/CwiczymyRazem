@@ -9,6 +9,7 @@ import {
   RoadStripSkeleton,
   WhatNextRoadStrip,
 } from "feature/whatNext/components/WhatNextWidget";
+import { useFeatureGoals } from "feature/whatNext/hooks/useFeatureGoals";
 import { useNextMessage } from "feature/whatNext/hooks/useNextMessage";
 import {
   ROAD_SESSION_MINUTES,
@@ -24,7 +25,10 @@ import { useEffect, useRef, useState } from "react";
 export const WhatNextView = () => {
   const { t } = useNextMessage();
   const router = useRouter();
-  const { result, isLoading } = useWhatNext("page");
+  const { result, isLoading: roadLoading } = useWhatNext("page");
+  // The "use it once" goals add stops to the road too — wait for them as well.
+  const { isLoading: goalsLoading } = useFeatureGoals();
+  const isLoading = roadLoading || goalsLoading;
   const track = useTrackAction("page");
   const roadSession = useRoadSession(result?.ranked);
   const [session, setSession] = useState<ExercisePlan | null>(null);

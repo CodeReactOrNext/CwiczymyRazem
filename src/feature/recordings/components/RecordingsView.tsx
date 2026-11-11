@@ -87,7 +87,7 @@ const RecordingsView = () => {
           </div>
 
           {!isLoading && total > 0 && (
-            <span className='ml-auto shrink-0 text-sm text-zinc-400'>
+            <span className='ml-auto hidden shrink-0 text-sm text-zinc-400 sm:inline'>
               {total} {total === 1 ? "recording" : "recordings"}
             </span>
           )}

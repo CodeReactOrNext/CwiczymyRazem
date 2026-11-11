@@ -1,6 +1,4 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
-import { Chip } from "assets/components/ui/chip";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +10,8 @@ import type {
   ExercisePlan,
 } from "feature/exercisePlan/types/exercise.types";
 import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
-import { ChevronRight, Clock, ListChecks, Play } from "lucide-react";
+import { useTranslation } from "hooks/useTranslation";
+import { ChevronRight, Play } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { formatMinutesDuration } from "utils/converter";
@@ -82,6 +81,11 @@ export const ActivityStartModal = ({
     : listedExercises
       ? sumDuration(listedExercises)
       : null;
+  const meta = [
+    totalDuration !== null && formatDuration(totalDuration),
+    difficulty,
+    category,
+  ].filter((item): item is string => !!item);
   // A routine has no route of its own — only its exercises, one at a time.
   const canStart = kind === "lesson" ? !!onStartLesson : kind !== "routine";
 
@@ -108,27 +112,31 @@ export const ActivityStartModal = ({
       onOpenChange={(o) => {
         if (!o) onClose();
       }}>
-      {/* One padded card: header, meta and actions are separated by spacing
-          rather than the rules the modal used to draw across itself. */}
-      {/* No `relative` here — DialogContent is `fixed` (which already anchors the
-          absolute decorations below), and tailwind-merge would drop the `fixed`. */}
+      {/* A plain panel: what it is, how long, and one way in. Sections are set
+          apart by spacing — no washes, chips or rules. */}
       <DialogContent
         overlayClassName='z-[120]'
-        className='z-[120] flex flex-col gap-6 overflow-hidden rounded-lg bg-zinc-950/95 p-6 backdrop-blur-3xl sm:max-w-[480px]'>
-        {/* Cyan wash over the top of the card — same treatment the header block
-            used to carry, now spanning the whole (borderless) panel. */}
-        <div className='pointer-events-none absolute inset-x-0 top-0 h-48 light-tint bg-gradient-to-b from-cyan-500/10 to-transparent' />
-        <div className='pointer-events-none absolute inset-0 light-hide bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.15),transparent_70%)]' />
-
-        <DialogHeader className='relative space-y-2 text-left'>
-          <span className='text-xs font-semibold text-cyan-400'>
+        className='z-[120] flex flex-col gap-5 rounded-lg p-6 sm:max-w-[480px]'>
+        <DialogHeader className='space-y-1.5 text-left'>
+          <span className='text-xs font-medium text-zinc-500'>
             {t(`activity_kind.${kind}`)}
           </span>
-          <DialogTitle className='pr-10 text-xl font-bold leading-tight text-zinc-100'>
+          <DialogTitle className='pr-10 text-lg font-bold leading-snug text-zinc-100'>
             {title}
           </DialogTitle>
+          {/* Length, level and kind read as one quiet line under the title. */}
+          {meta.length > 0 && (
+            <p className='flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-zinc-400'>
+              {meta.map((item, i) => (
+                <span key={i} className='flex items-center gap-2 capitalize'>
+                  {i > 0 && <span className='text-zinc-600'>·</span>}
+                  {item}
+                </span>
+              ))}
+            </p>
+          )}
           {description && (
-            <p className='text-sm leading-relaxed text-zinc-400'>
+            <p className='pt-1.5 text-sm leading-relaxed text-zinc-400'>
               {description}
             </p>
           )}
@@ -146,27 +154,8 @@ export const ActivityStartModal = ({
           </div>
         )}
 
-        {/* Uppercase kept on request — it is the look the owner signed off on,
-            styleguide rule #11 notwithstanding. */}
-        {totalDuration !== null && (
-          <div className='relative flex flex-wrap items-center gap-2 uppercase tracking-wider'>
-            <Chip color='cyan'>
-              <Clock className='h-3.5 w-3.5' />
-              {formatDuration(totalDuration)}
-            </Chip>
-            {difficulty && <Chip color='emerald'>{difficulty}</Chip>}
-            {category && <Chip>{category}</Chip>}
-            {listedExercises && (
-              <Chip>
-                <ListChecks className='h-3.5 w-3.5 text-zinc-400' />
-                {listedExercises.length}
-              </Chip>
-            )}
-          </div>
-        )}
-
         {listedExercises && listedExercises.length > 0 && (
-          <div className='scrollbar-premium relative -mx-2 max-h-[40vh] overflow-y-auto'>
+          <div className='scrollbar-premium -mx-2 max-h-[40vh] overflow-y-auto'>
             <h4 className='mb-2 px-2 text-xs font-semibold text-zinc-500'>
               {t("exercises")}
             </h4>
@@ -192,26 +181,29 @@ export const ActivityStartModal = ({
           </div>
         )}
 
-        {/* Kept as they were on request — the uppercase pair is the look the
-            owner signed off on, styleguide rule #11 notwithstanding. */}
-        <div className='relative flex items-center justify-end gap-3'>
-          <Button
-            variant='ghost'
-            onClick={pickedExercise ? () => setPickedExercise(null) : onClose}
-            className='rounded-[8px] text-[11px] font-bold uppercase tracking-widest text-zinc-500 hover:bg-white/5 hover:text-white'>
-            {pickedExercise ? t("back") : t("close")}
-          </Button>
-          {/* Button wraps its children in its own flex span, so the variant's
-              `gap-2` never reaches the icon — the margin has to live here. */}
-          {canStart && (
-            <Button
-              onClick={handleStart}
-              className='rounded-[8px] text-[11px] font-bold uppercase tracking-widest'>
-              {t("start")}
-              <Play className='ml-2 h-3 w-3' />
-            </Button>
-          )}
-        </div>
+        {/* Closing is the X in the corner; the only second action is the way
+            back from an exercise opened out of a list. Phones get a full-width
+            Start, easy to hit with a thumb. */}
+        {(canStart || pickedExercise) && (
+          <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3'>
+            {pickedExercise && (
+              <Button
+                variant='ghost'
+                onClick={() => setPickedExercise(null)}
+                className='h-11 sm:h-10'>
+                {t("back")}
+              </Button>
+            )}
+            {/* Button wraps its children in its own flex span, so the variant's
+                `gap-2` never reaches the icon — the margin has to live here. */}
+            {canStart && (
+              <Button onClick={handleStart} className='h-11 w-full sm:h-10 sm:w-auto sm:px-6'>
+                <Play className='mr-2 h-4 w-4' />
+                {t("start")}
+              </Button>
+            )}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -809,7 +809,7 @@ export const ExerciseBrowseTab = ({
         // The row is the unit you act on, so it marks itself under the pointer.
         // Its hover step stays below the icon buttons' own, which sit on top of
         // it — otherwise hovering an icon would look like hovering the row.
-        className="flex items-center gap-2.5 rounded px-2 py-3 transition-colors duration-fast hover:bg-zinc-800/60 active:bg-zinc-800/40 sm:gap-3 sm:bg-zinc-800/30 sm:px-3"
+        className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 rounded px-2 py-3 transition-colors duration-fast hover:bg-zinc-800/60 active:bg-zinc-800/40 sm:flex-nowrap sm:gap-3 sm:bg-zinc-800/30 sm:px-3"
       >
         {/* Only a finished or started exercise gets a mark. An empty circle on
             every untouched row said nothing and was most of what the eye saw.
@@ -831,10 +831,10 @@ export const ExerciseBrowseTab = ({
           // The colour sits here, not on the span: an explicit `text-zinc-300`
           // on the child ignored the button's `hover:text-white`, so the name
           // never actually reacted to the pointer.
-          className="flex min-w-0 flex-1 items-baseline gap-2.5 truncate text-left text-zinc-300 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
+          className="flex min-w-0 flex-1 items-baseline gap-2.5 text-left text-zinc-300 sm:truncate transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
           title={titleOf(exercise)}
         >
-          <span className="truncate text-[14px]">
+          <span className="break-words text-[14px] sm:truncate">
             {showVariantLabel ? variantOf(exercise) : titleOf(exercise)}
           </span>
           <span
@@ -863,7 +863,7 @@ export const ExerciseBrowseTab = ({
             hasBpmProgress ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="w-[72px] text-right text-[12px] font-bold tabular-nums text-zinc-300">
+                  <span className="text-right text-[12px] font-bold tabular-nums text-zinc-300 sm:w-[72px]">
                     {resultText}
                   </span>
                 </TooltipTrigger>
@@ -882,7 +882,7 @@ export const ExerciseBrowseTab = ({
                 </TooltipContent>
               </Tooltip>
             ) : (
-              <span className="w-[72px] text-right text-[12px] font-bold tabular-nums text-zinc-300">
+              <span className="text-right text-[12px] font-bold tabular-nums text-zinc-300 sm:w-[72px]">
                 {resultText}
               </span>
             )
@@ -891,7 +891,12 @@ export const ExerciseBrowseTab = ({
           )}
         </div>
 
-        <div className="flex shrink-0 items-center gap-0.5">
+        {/* Phones: the name keeps the first line to itself (it used to be
+            squeezed to a few letters by the icons and Start), the actions
+            drop to a second line indented under it. */}
+        <span className="basis-full sm:hidden" aria-hidden />
+
+        <div className="ml-[18px] flex shrink-0 items-center gap-0.5 sm:ml-0">
           {userAuth && (
             <button
               onClick={() => handleToggleFavorite(exercise.id)}
@@ -931,7 +936,7 @@ export const ExerciseBrowseTab = ({
         {isLocked ? (
           <button
             onClick={onShowUpgrade}
-            className={cn(PRESSABLE, "flex shrink-0 items-center gap-1 rounded bg-amber-500/10 px-3 py-2 text-[13px] font-bold text-amber-500 transition-colors hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50 border-b-black/30")}
+            className={cn(PRESSABLE, "ml-auto flex shrink-0 items-center gap-1 rounded bg-amber-500/10 px-3 py-2 sm:ml-0 text-[13px] font-bold text-amber-500 transition-colors hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50 border-b-black/30")}
           >
             <Lock size={12} />
             Pro
@@ -939,7 +944,7 @@ export const ExerciseBrowseTab = ({
         ) : (
           <button
             onClick={() => handleStart(exercise)}
-            className={cn(PRESSABLE, "flex shrink-0 items-center gap-1 rounded bg-zinc-100 py-2 pl-3 pr-3.5 text-[13px] font-bold text-zinc-950 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border-b-black/25")}
+            className={cn(PRESSABLE, "ml-auto flex shrink-0 items-center gap-1 rounded bg-zinc-100 py-2 pl-3 pr-3.5 sm:ml-0 text-[13px] font-bold text-zinc-950 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border-b-black/25")}
           >
             <ChevronRight size={14} strokeWidth={2.5} />
             Start

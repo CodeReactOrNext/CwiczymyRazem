@@ -154,7 +154,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
   return (
     <div className='relative flex-1 overflow-y-auto bg-zinc-950'>
       {/* ── Hero banner ── */}
-      <div className='relative overflow-hidden px-6 py-10 md:px-10'>
+      <div className='relative overflow-hidden px-4 pb-2 pt-5 md:px-10 md:py-10'>
         <GuitarPatternBackground className='pointer-events-none absolute inset-0 h-full w-full' />
         <div
           className='light-hide pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full opacity-30'
@@ -170,7 +170,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
             onClick={onBack}
             className={cn(
               buttonVariants({ variant: "subtle", size: "sm" }),
-              "group mb-6 gap-1.5 text-zinc-400",
+              "group mb-3 gap-1.5 text-zinc-400 md:mb-6",
             )}>
             <ChevronLeft
               size={12}
@@ -181,7 +181,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
           </button>
 
           <div>
-            <h1 className='font-display text-3xl font-black tracking-tight text-zinc-100 md:text-4xl'>
+            <h1 className='font-display text-2xl font-black tracking-tight text-zinc-100 md:text-4xl'>
               {module.title}
             </h1>
             <p className='mt-1 max-w-xs text-sm text-zinc-400'>
@@ -189,7 +189,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
             </p>
           </div>
 
-          <div className='mt-6 flex items-center gap-3'>
+          <div className='mt-3 flex items-center gap-3 md:mt-6'>
             <div className='h-1.5 w-40 overflow-hidden rounded-full bg-zinc-800'>
               <div
                 className='h-full rounded-full bg-cyan-500'
@@ -212,7 +212,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
       </div>
 
       {/* ── Path ── */}
-      <div className='relative px-3 py-4 md:px-10'>
+      <div className='relative px-3 py-0 md:px-10 md:py-4'>
         {/* Ambient texture — same tiled watermark used on /login, not a graphic */}
         <GuitarPatternBackground className='pointer-events-none absolute inset-0 h-full w-full' />
 
@@ -220,7 +220,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
             the guitar waiting at the end is the reason to keep walking it. */}
         <RoadPath
           stops={stops}
-          className='pb-14 pt-10'
+          className='pb-14 pt-4 md:pt-10'
           footer={
             <JourneyFinishCard
               moduleId={module.id}

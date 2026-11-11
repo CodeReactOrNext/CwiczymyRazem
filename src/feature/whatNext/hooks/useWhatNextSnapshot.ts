@@ -91,6 +91,8 @@ export const DAILY_QUEST_REWARD = { fame: 40, points: 10 };
 
 const STALE_TIME = 5 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
+/** The longest the road waits for its sources before drawing anyway. */
+const SETTLE_CAP_MS = 2500;
 const CATEGORIES: PracticeCategory[] = [
   "technique",
   "theory",
@@ -157,12 +159,12 @@ export const useWhatNextSnapshot = (
   });
 
   // ── Sources shared with the rest of the app ───────────────────────────────
-  const { data: ledger } = useRewardLedger();
+  const { data: ledger, isLoading: ledgerLoading } = useRewardLedger();
   const daily = useDailyExercise(uid);
   const { goals, isLoading: goalsLoading } = useExerciseGoals(uid);
   const planner = usePlannerSources(uid);
   const calendar = useCalendar(uid);
-  const { songs: songLists } = useUserSongs(uid);
+  const { songs: songLists, isLoading: songListsLoading } = useUserSongs(uid);
   const songProgressQuery = useQuery({
     queryKey: ["user-song-progress", uid],
     queryFn: () => getAllUserSongProgress(uid!),
@@ -607,5 +609,40 @@ export const useWhatNextSnapshot = (
     bossQuery.data,
   ]);
 
-  return { snapshot, isLoading: !snapshot || logsQuery.isLoading };
+  // Every source that can move a stop on the road. Showing the road after the
+  // logs alone redrew it once per late source — the page "loaded twice".
+  // `isLoading` is false for a disabled query, so the gated ones don't block.
+  const sourcesLoading =
+    logsQuery.isLoading ||
+    levelsQuery.isLoading ||
+    ledgerLoading ||
+    daily.leaderboard.isLoading ||
+    goalsLoading ||
+    planner.isLoading ||
+    calendar.isLoading ||
+    songListsLoading ||
+    songProgressQuery.isLoading ||
+    rotationQuery.isLoading ||
+    journeyQuery.isLoading ||
+    bpmQuery.isLoading ||
+    challengeQuery.isLoading ||
+    submissionsQuery.isLoading ||
+    duelsQuery.isLoading ||
+    guildsQuery.isLoading ||
+    bossQuery.isLoading ||
+    neighborsQuery.isLoading;
+
+  // A slow source must not hold the skeleton forever: past the cap the road
+  // draws with what is in and re-ranks when the rest answers.
+  const [waitedOut, setWaitedOut] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setWaitedOut(true), SETTLE_CAP_MS);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return {
+    snapshot,
+    isLoading:
+      !snapshot || logsQuery.isLoading || (sourcesLoading && !waitedOut),
+  };
 };
