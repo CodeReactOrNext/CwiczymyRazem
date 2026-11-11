@@ -1,7 +1,8 @@
 import { Button } from "assets/components/ui/button";
+import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
 import { RewardSummary } from "components/Rewards/RewardSummary";
 import { useTranslation } from "hooks/useTranslation";
-import { Gift, PackageOpen, Ticket } from "lucide-react";
+import { Gift, PackageOpen } from "lucide-react";
 
 import type { AchievementReward } from "../../data/achievementRewards";
 
@@ -43,11 +44,7 @@ export const ClaimRewardsBanner = ({
   if (waiting === 0) {
     return (
       <div className='flex items-center gap-3 rounded-lg bg-zinc-800/50 px-5 py-4'>
-        <Ticket
-          size={18}
-          className='shrink-0 text-amber-300'
-          strokeWidth={2.5}
-        />
+        <FreeCaseIcon size={22} />
         <p className='text-sm text-zinc-300'>
           {t(tokensKey, { count: caseTokens })}
         </p>

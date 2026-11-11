@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { TierPlate } from "feature/arsenal/components/TierPlate";
@@ -13,7 +14,6 @@ import { FEATURE_UNLOCKS } from "feature/levelGate/data/featureUnlocks";
 import { pointsToReachLvl } from "feature/levelGate/utils/levelGate.utils";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { useAutoClaimLevels } from "hooks/useRewardLedger";
-import { Ticket } from "lucide-react";
 import { useAppSelector } from "store/hooks";
 
 import type { LevelMilestone, MilestoneUnlock } from "../data/levelMilestones";
@@ -90,11 +90,7 @@ const RewardIcons = ({
           size={size}
           muted={muted}
           count={reward.caseTokens > 1 ? reward.caseTokens : undefined}>
-          <Ticket
-            size={Math.round(size * 0.46)}
-            strokeWidth={2.25}
-            style={{ color: CASE_COLOR }}
-          />
+          <FreeCaseIcon size={Math.round(size * 0.6)} />
         </TierPlate>
       </span>
     )}

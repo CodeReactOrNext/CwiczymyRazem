@@ -4,11 +4,12 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
 import { RewardSummary } from "components/Rewards/RewardSummary";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
 import { useClaimScaleReward, useRewardLedger } from "hooks/useRewardLedger";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Gift, Lock, Ticket } from "lucide-react";
+import { Check, Gift, Lock } from "lucide-react";
 
 import { boxRewardId, getBoxReward } from "../data/scaleTreeRewards";
 
@@ -96,13 +97,11 @@ export const BoxRewardBlock = ({
           at the top of the ladder, and a ladder is climbed towards something
           visible. */}
       {holdsFreeCase && !isClaimed && (
-        <Ticket
-          size={12}
-          strokeWidth={2.5}
-          aria-hidden
+        <FreeCaseIcon
+          size={14}
           className={cn(
             "absolute right-1.5 top-1.5",
-            canClaim ? "text-cyan-300" : "text-cyan-300/40",
+            !canClaim && "opacity-40",
           )}
         />
       )}

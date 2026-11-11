@@ -1,7 +1,7 @@
 import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
 import { useTranslation } from "hooks/useTranslation";
-import { Ticket } from "lucide-react";
 
 interface FreeCaseButtonProps {
   isOpening: boolean;
@@ -38,7 +38,7 @@ export const FreeCaseButton = ({
       className,
     )}>
     <span className='flex items-center gap-2'>
-      <Ticket size={14} strokeWidth={2.5} />
+      <FreeCaseIcon size={18} />
       {t("cases.open_free")}
     </span>
     <span className='text-sm tabular-nums text-cyan-200'>{tokens}</span>

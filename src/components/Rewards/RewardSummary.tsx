@@ -1,12 +1,13 @@
-import { useTranslation } from "hooks/useTranslation";
 import { cn } from "assets/lib/utils";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
 import {
   getPartLabel,
   PART_TIER_COLORS,
 } from "feature/arsenal/data/partDefinitions";
+import { useTranslation } from "hooks/useTranslation";
 import type { RewardPayout } from "lib/rewards/rewardPayout";
-import { Ticket } from "lucide-react";
+
+import { FreeCaseIcon } from "./FreeCaseIcon";
 
 interface RewardSummaryProps {
   reward: RewardPayout;
@@ -62,7 +63,7 @@ export const RewardSummary = ({
       )}>
       {reward.caseTokens > 0 && (
         <span className={cn(row, "text-cyan-300")}>
-          <Ticket size={iconSize} strokeWidth={2.5} className='shrink-0' />
+          <FreeCaseIcon size={iconSize} />
           {reward.caseTokens > 1
             ? t("free_cases", { count: reward.caseTokens })
             : t("free_case")}

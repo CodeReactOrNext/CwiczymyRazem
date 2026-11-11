@@ -5,6 +5,7 @@ import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import { tabNavFadeClass } from "components/PageTabs/tabNav";
 import { useRailEdges } from "components/PageTabs/useRailEdges";
+import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LevelGate } from "feature/levelGate/components/LevelGate";
 import { PlayerLvlProvider } from "feature/progression/hooks/usePlayerLvl";
@@ -19,7 +20,6 @@ import {
   PackageOpen,
   Store,
   Swords,
-  Ticket,
   Users,
   Wrench,
 } from "lucide-react";
@@ -209,14 +209,9 @@ const ArsenalTabs = () => {
                     "flex items-center gap-1.5 rounded-lg px-3 py-1.5",
                     freeCases > 0 ? "bg-arsenal-accent/10" : "bg-arsenal-card",
                   )}>
-                  <Ticket
-                    size={14}
-                    strokeWidth={2.5}
-                    className={
-                      freeCases > 0
-                        ? "text-arsenal-accent"
-                        : "text-arsenal-text-tertiary"
-                    }
+                  <FreeCaseIcon
+                    size={18}
+                    className={cn(freeCases === 0 && "opacity-40 grayscale")}
                   />
                   <span
                     className={cn(

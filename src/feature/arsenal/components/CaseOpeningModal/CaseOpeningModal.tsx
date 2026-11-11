@@ -3,6 +3,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
 import { getDailyPool } from "feature/arsenal/data/dailyCase";
 import { EFFECTS_BY_ID, EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
 import { getEffectValue } from "feature/arsenal/data/effectStats";
@@ -598,7 +599,10 @@ export const CaseOpeningModal = ({
                               {openAgainPayment.cost}
                             </span>
                           ) : openAgainPayment?.kind === "token" ? (
-                            <span className="text-emerald-400">{t("view.free_cases", { count: 1 })}</span>
+                            <span className="flex items-center gap-1.5 text-emerald-400">
+                              <FreeCaseIcon size={20} />
+                              {t("view.free_cases", { count: 1 })}
+                            </span>
                           ) : (
                             <span className="flex items-center gap-1.5 text-zinc-500">
                               <img src="/images/tokens/coin.png" alt="" className="h-5 w-5 object-contain opacity-50" />
