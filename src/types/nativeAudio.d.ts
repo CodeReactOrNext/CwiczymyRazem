@@ -26,6 +26,9 @@ export interface NativeAudioStreamInfo {
   streamLatencyFrames: number;
   /** Measured capture latency (stream latency + one block) in ms. */
   latencyMs: number;
+  /** The shell runs the note detection itself (asked for with `dsp` in the
+   *  start options): readings come through onDsp, no blocks through onFrame. */
+  dsp?: boolean;
 }
 
 export interface NativeAudioStartOpts {
@@ -33,6 +36,9 @@ export interface NativeAudioStartOpts {
   channel?: number;
   sampleRate?: number;
   frameSize?: number;
+  /** Ask the shell to run the note detection itself. It does only when it
+   *  ships the detectors with this hash (GUITAR_DSP_ENGINE_HASH). */
+  dsp?: { hash: string; gain: number; bass: boolean; strum: boolean };
 }
 
 /** Fired when the shared native stream is lost (device disconnected, driver reset
@@ -60,6 +66,15 @@ export interface NativeAudioApi {
    *  busy the renderer's event loop is right now), which isn't otherwise
    *  visible to the renderer-side latency estimate. */
   onFrame: (cb: (buf: Uint8Array, sentAt: number) => void) => () => void;
+  /** The shell's own note detection, a message per analysis window, or
+   *  { type: "lost" } when it stopped and the blocks come through onFrame
+   *  again. `sentAt` as for onFrame. Absent in older shells. */
+  onDsp?: (cb: (message: import("hooks/guitarDspEngine").EngineDspEvent, sentAt: number) => void) => () => void;
+  /** Hands the detection back to the window: the blocks come through onFrame
+   *  again. Absent in older shells. */
+  stopDsp?: () => Promise<boolean>;
+  /** Live settings of the shell's detection. Absent in older shells. */
+  configureDsp?: (patch: { gain?: number; bass?: boolean; strum?: boolean }) => Promise<boolean>;
   /** Subscribe to stream-loss/recovery events. Returns an unsubscribe fn. */
   onConnectionIssue: (cb: (info: ConnectionIssueInfo) => void) => () => void;
   /** Subscribe to native device-list changes (hot-plug). Returns an unsubscribe fn. */

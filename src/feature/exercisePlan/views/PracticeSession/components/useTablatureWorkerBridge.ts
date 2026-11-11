@@ -8,6 +8,8 @@ import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/util
 import type { MutableRefObject } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import type { MarkUpdate } from "./noteMarkPatch";
+import { diffMarks } from "./noteMarkPatch";
 import { boardOffsetX, boardSpan, scrollAfterDrag } from "./tablatureDirection";
 import { pagedScrollX, pageStarts } from "./tabPaging";
 import { baseBeatWidth, beatToX, buildBeatXMap, DEFAULT_PILL_METRICS, xToBeat } from "./tabSpacing";
@@ -148,6 +150,26 @@ export interface TablatureStylePatch {
   timingHints?: boolean;
 }
 
+/** The marks the worker holds, as last sent to it; null where that isn't known. */
+interface SentMarks {
+  hits: Record<string, boolean | number> | null;
+  missed: Record<string, boolean> | null;
+  timings: Record<string, NoteTiming> | null;
+}
+const NOTHING_SENT: SentMarks = { hits: null, missed: null, timings: null };
+
+/** RESET wipes the worker's marks, so what was sent no longer says what it holds. */
+function postReset(worker: Worker | null, sent: { current: SentMarks }) {
+  worker?.postMessage({ type: 'RESET' });
+  sent.current = { ...NOTHING_SENT };
+}
+
+/** A whole map under `type`, or only what changed under its _PATCH form. */
+function postMarks<T>(worker: Worker | null, type: 'HIT_NOTES' | 'MISSED_NOTES' | 'NOTE_TIMINGS', field: string, update: MarkUpdate<T> | null) {
+  if (!update) return;
+  worker?.postMessage({ type: update.kind === "full" ? type : `${type}_PATCH`, [field]: update.marks });
+}
+
 export function useTablatureWorkerBridge({
   canvasRef, containerRef, containerSize, renderData,
   isPlaying, startTime, audioStartTime, bpm, countInRemaining,
@@ -188,11 +210,17 @@ export function useTablatureWorkerBridge({
   );
   const prevXMapRef = useRef(xMap);
 
+  // The marks the worker holds, as last sent — only what differs from them is
+  // sent next (noteMarkPatch.ts). Null: nothing known, the next send is whole.
+  const sentMarksRef = useRef<SentMarks>({ ...NOTHING_SENT });
+
   // Worker lifecycle
   useEffect(() => {
     const worker = new Worker(new URL('./TablatureViewer.worker.ts', import.meta.url));
     workerRef.current      = worker;
     transferredRef.current = false;
+    // A new worker holds no marks: the effects below send it everything.
+    sentMarksRef.current   = { ...NOTHING_SENT };
     worker.onmessage = (e: MessageEvent) => {
       if (e.data?.type === 'REST_ACTIVE') setIsRestActive(e.data.isRest);
     };
@@ -230,7 +258,7 @@ export function useTablatureWorkerBridge({
       hasAccentedNotes: hideDynamicsLane ? false : hasAccentedNotes,
       hasDynamics:      hideDynamicsLane ? false : hasDynamics,
     });
-    workerRef.current?.postMessage({ type: 'RESET' });
+    postReset(workerRef.current, sentMarksRef);
   }, [renderData, hideDynamicsLane]);
 
   // Playback state
@@ -300,9 +328,18 @@ export function useTablatureWorkerBridge({
   }, [isRestActive, isPlaying, volumeRef]);
 
   useEffect(() => { workerRef.current?.postMessage({ type: 'SHOW_REST_WARNING', show: showRestWarning }); }, [showRestWarning]);
-  useEffect(() => { workerRef.current?.postMessage({ type: 'HIT_NOTES',    hitNotes });   }, [hitNotes]);
-  useEffect(() => { workerRef.current?.postMessage({ type: 'MISSED_NOTES', missedNotes }); }, [missedNotes]);
-  useEffect(() => { workerRef.current?.postMessage({ type: 'NOTE_TIMINGS', noteTimings }); }, [noteTimings]);
+  useEffect(() => {
+    postMarks(workerRef.current, 'HIT_NOTES', 'hitNotes', diffMarks(sentMarksRef.current.hits, hitNotes));
+    sentMarksRef.current.hits = hitNotes;
+  }, [hitNotes]);
+  useEffect(() => {
+    postMarks(workerRef.current, 'MISSED_NOTES', 'missedNotes', diffMarks(sentMarksRef.current.missed, missedNotes));
+    sentMarksRef.current.missed = missedNotes;
+  }, [missedNotes]);
+  useEffect(() => {
+    postMarks(workerRef.current, 'NOTE_TIMINGS', 'noteTimings', diffMarks(sentMarksRef.current.timings, noteTimings));
+    sentMarksRef.current.timings = noteTimings;
+  }, [noteTimings]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'HIDE_NOTES',   hideNotes });  }, [hideNotes]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'TUNING', strings: tuningStrings ?? [] }); }, [tuningStrings]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'SELECTION', selection: selection ?? null }); }, [selection]);
@@ -343,7 +380,7 @@ export function useTablatureWorkerBridge({
 
   // Reset cursor when measures or resetKey changes
   useEffect(() => {
-    workerRef.current?.postMessage({ type: 'RESET' });
+    postReset(workerRef.current, sentMarksRef);
     pausedScrollRef.current = { scrollX: 0, cursorPos: 0 };
   }, [measures, resetKey]);
 
@@ -352,7 +389,7 @@ export function useTablatureWorkerBridge({
     const prev = prevStartTimeRef.current;
     prevStartTimeRef.current = startTime;
     if (prev !== null && startTime === null && isPlaying) {
-      workerRef.current?.postMessage({ type: 'RESET' });
+      postReset(workerRef.current, sentMarksRef);
       pausedScrollRef.current = { scrollX: 0, cursorPos: 0 };
     }
   }, [startTime, isPlaying]);

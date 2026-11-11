@@ -1,5 +1,5 @@
 // The main thread's handle on the guitar DSP worker (guitarDsp.worker.ts).
-import type { DspRequest, DspResponse, DspSettings, DspTargets } from "./guitarDspSession";
+import type { DspRequest, DspResponse, DspSettings, DspStart, DspTargets } from "./guitarDspSession";
 import { applyDspReadings } from "./guitarDspSession";
 
 /** A worker that hasn't built its detectors by now is given up on. */
@@ -12,7 +12,7 @@ export interface GuitarDspHandle {
   close(): void;
 }
 
-interface StartGuitarDspOptions extends DspSettings {
+interface StartGuitarDspOptions extends DspStart {
   sampleRate: number;
   /** The refs the readings are written to, after every window. */
   targets: DspTargets;
@@ -27,7 +27,7 @@ interface StartGuitarDspOptions extends DspSettings {
  * can't run — no Worker here, it failed to load, or it never answered — and
  * the caller then runs the processor on its own thread, as it always did.
  */
-export function startGuitarDsp({ sampleRate, gain, bass, strum, targets, onActive, onLost }: StartGuitarDspOptions): Promise<GuitarDspHandle | null> {
+export function startGuitarDsp({ sampleRate, gain, bass, strum, spectrum, targets, onActive, onLost }: StartGuitarDspOptions): Promise<GuitarDspHandle | null> {
   if (typeof Worker === "undefined") return Promise.resolve(null);
   let worker: Worker;
   try {
@@ -74,6 +74,6 @@ export function startGuitarDsp({ sampleRate, gain, bass, strum, targets, onActiv
         close,
       });
     };
-    send({ type: "init", sampleRate, gain, bass, strum });
+    send({ type: "init", sampleRate, gain, bass, strum, spectrum });
   });
 }

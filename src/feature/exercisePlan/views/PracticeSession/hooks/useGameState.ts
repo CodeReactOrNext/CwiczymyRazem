@@ -1,5 +1,6 @@
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 
+import { sameMarks } from "../components/noteMarkPatch";
 import type { NoteTiming, RunNote, TimingCounts } from "../utils/timingGrade";
 import { emptyTimingCounts } from "../utils/timingGrade";
 import type { GameState } from "./noteMatchingFeedback";
@@ -41,6 +42,13 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
   const intonationOffsetsRef = useRef<number[]>([]);
   /** Every graded note of the run, in order — see RunNote. */
   const runLogRef            = useRef<RunNote[]>([]);
+  /** The maps React holds, as last flushed — a flush hands over only the ones
+   *  that differ, so a hit doesn't re-send the misses nor a miss the hits. */
+  const flushedRef           = useRef<{
+    hits: Record<string, boolean | number>;
+    missed: Record<string, boolean>;
+    timings: Record<string, NoteTiming>;
+  }>({ hits: {}, missed: {}, timings: {} });
 
   const reset = useCallback(() => {
     setHitNotes({});    hitNotesRef.current          = {};
@@ -59,6 +67,7 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
     intonationCountsRef.current  = emptyTimingCounts();
     intonationOffsetsRef.current = [];
     runLogRef.current            = [];
+    flushedRef.current           = { hits: {}, missed: {}, timings: {} };
   }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,13 +83,25 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
     const gs    = gameStateRef.current;
     const s     = statsRef.current;
     const total = s.hits + s.misses;
+    // Each map goes to React (and from there to the tab's worker) only when it
+    // changed: every copy is a new identity, and a new identity re-renders and
+    // re-sends whatever reads it.
+    const flushed = flushedRef.current;
+    const hits    = sameMarks(flushed.hits, hitNotesRef.current) ? null : { ...hitNotesRef.current };
+    const timings = sameMarks(flushed.timings, noteTimingsRef.current) ? null : { ...noteTimingsRef.current };
+    const missed  = sameMarks(flushed.missed, missedNotesRef.current) ? null : { ...missedNotesRef.current };
+    if (hits) flushed.hits = hits;
+    if (timings) flushed.timings = timings;
+    if (missed) flushed.missed = missed;
+    const score = gs.score, combo = gs.combo, multiplier = gs.multiplier;
+    const hitCount = s.hits, missCount = s.misses;
     startTransition(() => {
-      setHitNotes({ ...hitNotesRef.current });
-      setNoteTimings({ ...noteTimingsRef.current });
-      setMissedNotes({ ...missedNotesRef.current });
-      setSessionStats({ hits: s.hits, misses: s.misses });
-      setSessionAccuracy(total > 0 ? Math.round((s.hits / total) * 100) : 100);
-      setGameState({ ...gs });
+      if (hits) setHitNotes(hits);
+      if (timings) setNoteTimings(timings);
+      if (missed) setMissedNotes(missed);
+      setSessionStats(prev => (prev.hits === hitCount && prev.misses === missCount ? prev : { hits: hitCount, misses: missCount }));
+      setSessionAccuracy(total > 0 ? Math.round((hitCount / total) * 100) : 100);
+      setGameState(prev => (prev.score === score && prev.combo === combo && prev.multiplier === multiplier ? prev : { score, combo, multiplier }));
       setMaxCombo(maxComboRef.current);
     });
   }, []);

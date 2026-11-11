@@ -5,7 +5,7 @@ import type { NoteTiming } from "../utils/timingGrade";
 import type { BeatCount } from "./beatCounting";
 import { beatCountLabels, beatTickPositions } from "./beatCounting";
 import { addFillSteps, clearLiveFills, createLiveFills, currentTiming, isLiveTiming, liveFillDrawnBeat, liveFillOn } from "./liveNoteFills";
-import { applyHitNotes, applyMissedNotes, createNoteHitVisualState, resetFrozenNoteState, resetNoteHitVisualState } from "./noteHitVisualState";
+import { applyHitNotes, applyHitPatch, applyMissedNotes, applyMissedPatch, createNoteHitVisualState, resetFrozenNoteState, resetNoteHitVisualState } from "./noteHitVisualState";
 import type { PalmMuteRun } from "./palmMuteRuns";
 import { palmMuteRuns } from "./palmMuteRuns";
 import { staffLineWidth, stringRow } from "./tablatureStringRows";
@@ -533,6 +533,46 @@ const LEARN_COLOR = "#22d3ee";
 /** Motion is off when the tab's animations are, or the system asks for less. */
 const learnIsCalm = () => !hitAnimations || reducedMotion;
 
+// ── Frame reuse: its state, and how far left the layout's beats reach ─────────
+// (What it is for: "Reusing the frame before", ahead of paintFrame.)
+/** The canvas still holds the last frame, drawn for the board as it is now. */
+let reuseValid = false;
+/** That frame's right bound of what it drew (world x). */
+let reuseViewRight = 0;
+/** That frame's scroll, in device px. */
+let reuseScrollPx = 0;
+/** Its first column (device px) with nothing but notes not yet reached. */
+let reuseAheadPx = 0;
+
+/** A layout whose notes reach further left than this is drawn whole every frame. */
+const REUSE_MAX_REACH = 600;
+/** Reach to the left that needs no thought: a beat is first drawn while it is
+ *  still this far (world px) beyond the board's right edge. */
+const REUSE_FREE_REACH = 30;
+/** How far left of its own start each beat draws (world px): a slur comes over
+ *  from the note before it on the string, a slide's line from where that note
+ *  ended. Everything else a beat draws stays within REUSE_FREE_REACH. */
+let beatLeftReach = new Float32Array(0);
+/** The longest of them. */
+let layoutLeftReach = 0;
+
+function measureLeftReach() {
+  beatLeftReach = new Float32Array(renderBeats.length);
+  layoutLeftReach = 0;
+  const lastOnString = new Map<number, { x: number; slideOut: number }>();
+  for (let i = 0; i < renderBeats.length; i++) {
+    const x = xMap.xs[i];
+    let reach = 0;
+    for (const note of renderBeats[i].notes) {
+      const before = lastOnString.get(note.noteY);
+      if (before && (before.slideOut > 0 || note.isHammerOn || note.isPullOff)) reach = Math.max(reach, x - before.x + 12);
+    }
+    for (const note of renderBeats[i].notes) lastOnString.set(note.noteY, { x, slideOut: note.slideOut ?? 0 });
+    beatLeftReach[i] = reach;
+    if (reach > layoutLeftReach) layoutLeftReach = reach;
+  }
+}
+
 /**
  * Rebuilds where the beats sit after one of the inputs moved them — the notes,
  * the board's width, the zoom, the pill size. The paused view is kept in pixels,
@@ -544,6 +584,7 @@ function relayout() {
   xMap = buildBeatXMap(renderBeats, totalBeats, baseBeatWidth(W) * zoom, { pillHeight: BLOCK_H, fretFontScale });
   measureEndPx = measureEndXs.map((beat) => beatToX(xMap, beat));
   beatTickPx = beatTickBeats.map((beat) => beatToX(xMap, beat));
+  measureLeftReach();
   const carry = (x: number) => beatToX(xMap, xToBeat(prev, x));
   pausedCursorPos = carry(pausedCursorPos);
   pausedScrollX = carry(pausedScrollX);
@@ -612,7 +653,7 @@ const GLYPH_REST = {
     const g = self as unknown as { fonts?: { add: (f: FontFace) => void }; bravuraUrl?: string };
     if (!g.fonts || typeof FontFace === "undefined") return;
     const face = new FontFace("Bravura", `url(${g.bravuraUrl ?? "/alphatab/font/Bravura.woff2"})`);
-    face.load().then(f => { g.fonts!.add(f); bravuraReady = true; needsRedraw = true; })
+    face.load().then(f => { g.fonts!.add(f); bravuraReady = true; needsRedraw = true; reuseValid = false; })
       .catch(() => { /* keep the hand-drawn fallback */ });
   } catch { /* FontFace / worker fonts unsupported — keep the fallback */ }
 })();
@@ -656,6 +697,9 @@ function fretFont(px: number): string {
   return font;
 }
 const TECHNIQUE_FONT = "bold 9px Inter, sans-serif";
+/** The "T" tab on a tapped note's head. */
+const TAP_TAB_W = 13;
+const TAP_TAB_H = 12;
 /** Height of a beat tick on the neck's edge. */
 const BEAT_TICK_H = 5;
 /** How far short of the neck's edges a bar line stops. */
@@ -1129,27 +1173,70 @@ function drawStar(x: number, y: number, r: number, spin: number, color: string) 
   ctx.fill();
 }
 
+/** The beam's line from x0 to x1, swaying a little, added to `path`. */
+function starBeamLine(path: { moveTo(x: number, y: number): void; lineTo(x: number, y: number): void }, x0: number, x1: number, y: number, time: number) {
+  for (let x = x0; x <= x1; x += 3) {
+    const grow = Math.min(1, (x - x0) / 30);
+    const sway = Math.sin(x / 11 - time / 55) + Math.sin(x / 4.5 + time / 31) * 0.3;
+    if (x === x0) path.moveTo(x, y + sway * STAR_BEAM_SWAY * grow);
+    else path.lineTo(x, y + sway * STAR_BEAM_SWAY * grow);
+  }
+}
+
 /** The filled part of a tail as a beam of light from x0 to x1, swaying a little. */
 function drawStarBeam(x0: number, x1: number, y: number, strength: number, time: number) {
   if (!ctx || x1 - x0 < 4 || strength <= 0.02) return;
   ctx.globalCompositeOperation = "lighter";
   ctx.lineCap = "round";
+  // The same line under all three widths: worked out once a frame, not three
+  // times — every held string of a chord has a beam of its own.
+  let line: Path2D | null = null;
+  if (typeof Path2D !== "undefined") {
+    line = new Path2D();
+    starBeamLine(line, x0, x1, y, time);
+  }
   for (const [width, color, share] of STAR_BEAM) {
     ctx.globalAlpha = strength * share;
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
-    ctx.beginPath();
-    for (let x = x0; x <= x1; x += 3) {
-      const grow = Math.min(1, (x - x0) / 30);
-      const sway = Math.sin(x / 11 - time / 55) + Math.sin(x / 4.5 + time / 31) * 0.3;
-      if (x === x0) ctx.moveTo(x, y + sway * STAR_BEAM_SWAY * grow);
-      else ctx.lineTo(x, y + sway * STAR_BEAM_SWAY * grow);
+    if (line) {
+      ctx.stroke(line);
+    } else {
+      ctx.beginPath();
+      starBeamLine(ctx, x0, x1, y, time);
+      ctx.stroke();
     }
-    ctx.stroke();
   }
   ctx.lineCap = "butt";
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = "source-over";
+}
+
+/** The spark's halo, painted once per size into a bitmap: a gradient made
+ *  anew for every held note in every frame was the costliest part of it. */
+const SPARK_HALO = "125,211,252";
+const sparkHalos = new Map<number, OffscreenCanvas>();
+
+/** The halo for a spark `r` world px in radius, at device resolution, or null
+ *  where the worker can't make canvases of its own. */
+function sparkHaloSprite(r: number): OffscreenCanvas | null {
+  if (typeof OffscreenCanvas === "undefined") return null;
+  const rPx = Math.max(1, Math.ceil(r * dpr * vscale));
+  const cached = sparkHalos.get(rPx);
+  if (cached) return cached;
+  const sprite = new OffscreenCanvas(rPx * 2, rPx * 2);
+  const g = sprite.getContext("2d");
+  if (!g) return null;
+  const halo = g.createRadialGradient(rPx, rPx, 0, rPx, rPx, rPx);
+  halo.addColorStop(0, `rgba(${SPARK_HALO},0.8)`);
+  halo.addColorStop(1, `rgba(${SPARK_HALO},0)`);
+  g.fillStyle = halo;
+  g.beginPath();
+  g.arc(rPx, rPx, rPx, 0, Math.PI * 2);
+  g.fill();
+  if (sparkHalos.size >= 8) sparkHalos.clear();
+  sparkHalos.set(rPx, sprite);
+  return sprite;
 }
 
 /** How often the arcs round the spark jump to new places. */
@@ -1178,15 +1265,21 @@ function drawSustainFront(x: number, y: number, tailH: number, fromX: number, st
   const time = calm ? 0 : frameNow;
   drawStarBeam(fromX, x, y, strength, time);
   const r = BLOCK_H * 0.55;
-  const halo = ctx.createRadialGradient?.(x, y, 0, x, y, r);
-  if (halo) {
-    halo.addColorStop(0, "rgba(125,211,252,0.8)");
-    halo.addColorStop(1, "rgba(125,211,252,0)");
+  const haloSprite = sparkHaloSprite(r);
+  if (haloSprite) {
     ctx.globalAlpha = strength;
-    ctx.fillStyle = halo;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.drawImage(haloSprite, x - r, y - r, r * 2, r * 2);
+  } else {
+    const halo = ctx.createRadialGradient?.(x, y, 0, x, y, r);
+    if (halo) {
+      halo.addColorStop(0, `rgba(${SPARK_HALO},0.8)`);
+      halo.addColorStop(1, `rgba(${SPARK_HALO},0)`);
+      ctx.globalAlpha = strength;
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
   if (!calm) {
     // Arcs: the same few until the next jump, blue under a white core.
@@ -1619,6 +1712,81 @@ function drawRestSymbol(x: number, dur: number) {
   }
 }
 
+// ── Reusing the frame before ─────────────────────────────────────────────────
+// A note the cursor hasn't reached looks the same in every frame — only where
+// it is on the screen changes, and it changes by a whole number of device
+// pixels (the board scrolls on the pixel grid). So while the board plays, the
+// part of the last frame that lies ahead of the cursor is moved, not drawn
+// again: one copy instead of every string, pill, digit and rhythm glyph in
+// three quarters of the board, 165 times a second. What is drawn afresh is
+// everything up to and around the cursor — the notes being played and judged,
+// their fills, pops and labels, the fade over what was played, the gutter —
+// and the strip that scrolled in on the right.
+//
+// The two must tile the board exactly: a column drawn twice would blend its
+// translucent parts twice. Hence the clip on whole device pixels.
+/** How far outside a strip its beats are still looked for (world px): a chord
+ *  name, a slur or a let-ring trail reaches past the beat that owns it. */
+const REUSE_OVERHANG = 160;
+/** Narrower than this (device px), what is left to reuse isn't worth a copy —
+ *  and wide enough that the two strips never look at the same played beat. */
+const REUSE_MIN_STATIC_PX = 400;
+/** How far right of the cursor something still in motion may reach (world
+ *  px): a hit's glow, a timing label, a bend gauge beside a short note. */
+const REUSE_CURSOR_REACH = 140;
+/** …and past the end of the beat under the cursor: its lit pill and gauge. */
+const REUSE_BEAT_REACH = 80;
+/** Messages that only touch notes the cursor has reached — never what lies
+ *  ahead of it. After any other message the next frame is drawn whole. */
+const REUSE_SAFE_MESSAGES = new Set([
+  "TICK", "FILL_STEPS", "FILL_RESET",
+  "HIT_NOTES", "HIT_NOTES_PATCH", "MISSED_NOTES", "MISSED_NOTES_PATCH", "NOTE_TIMINGS", "NOTE_TIMINGS_PATCH",
+]);
+/** The longest reach to the left among the beats that came into the drawn
+ *  range (their head at or before the right bound) since the last frame. */
+function enteredLeftReach(lastRight: number, right: number, seamless: boolean): number {
+  const totalW = xMap.totalX;
+  const head = BLOCK_PAD + BLOCK_H / 2;
+  const tiled = seamless && totalW > 0;
+  const firstTile = tiled ? Math.max(0, Math.floor(lastRight / totalW)) : 0;
+  const lastTile = tiled ? Math.floor(right / totalW) : 0;
+  let reach = 0;
+  for (let tile = firstTile; tile <= lastTile; tile++) {
+    const from = lastRight - tile * totalW - head;
+    const to = right - tile * totalW - head;
+    let lo = 0, hi = renderBeats.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (xMap.xs[mid] <= from) lo = mid + 1; else hi = mid;
+    }
+    for (let i = lo; i < renderBeats.length && xMap.xs[i] <= to; i++) {
+      if (beatLeftReach[i] > reach) reach = beatLeftReach[i];
+    }
+  }
+  return reach;
+}
+
+/** World x up to which this frame's look depends on the cursor: the beat (and
+ *  palm-mute run) it is in, and the reach of what moves around it. */
+function reachedRight(dispCursor: number, wrappedCursor: number): number {
+  const tileOff = dispCursor - wrappedCursor;
+  let right = dispCursor + REUSE_CURSOR_REACH;
+  // The last beat that starts at or before the cursor.
+  let lo = 0, hi = renderBeats.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (xMap.xs[mid] <= wrappedCursor) lo = mid + 1; else hi = mid;
+  }
+  if (lo > 0) right = Math.max(right, tileOff + xMap.xs[lo] + REUSE_BEAT_REACH);
+  for (const run of pmRuns) {
+    const runL = xMap.xs[run.start];
+    if (runL > wrappedCursor) break;
+    const runR = xMap.xs[run.end + 1];
+    if (wrappedCursor < runR) right = Math.max(right, tileOff + runR + REUSE_BEAT_REACH);
+  }
+  return right;
+}
+
 // ── Main render frame ─────────────────────────────────────────────────────────
 /** The longest a frame's own timestamp may trail the clock and still be used. */
 const FRAME_STAMP_MAX_LAG_MS = 100;
@@ -1635,6 +1803,15 @@ function paintFrame(frameStamp?: number) {
   const frameNow = Date.now();
   for (const [key, label] of timingLabels) {
     if (frameNow - label.at >= TIMING_LABEL_MS) timingLabels.delete(key);
+  }
+  // So do the hits' pop stamps, for the same reason.
+  if (visual.hitTimestampsCount > 0) {
+    for (const key of Object.keys(visual.hitTimestamps)) {
+      if (frameNow - visual.hitTimestamps[key] >= HIT_ANIM_MS) {
+        delete visual.hitTimestamps[key];
+        visual.hitTimestampsCount--;
+      }
+    }
   }
 
   // Skip paint when paused and nothing animating
@@ -1746,6 +1923,11 @@ function paintFrame(frameStamp?: number) {
     ? activeTile - 1
     : activeTile;
 
+  // Everything the board shows, for the beats between cullL and cullR (world
+  // x). Called once for the whole board, or once per strip when the rest of
+  // the last frame is reused — the caller has then clipped to the strip.
+  const drawBoard = (cullL: number, cullR: number, withGutter: boolean) => {
+  if (!ctx) return;
   // ── Clear & translate ────────────────────────────────────────────────────
   // Set every frame, not only on INIT/RESIZE: a context restored after a GPU
   // reset (or a frame that threw between save and restore) is left on the
@@ -1831,8 +2013,8 @@ function paintFrame(frameStamp?: number) {
   for (let tile = tileStart; tile <= tileEnd; tile++) {
     const tileOff = tile * totalW;
     // Local (tile-space) viewport + cursor — shadow the outer world-space values
-    const visL = viewL - tileOff;
-    const visR = viewR - tileOff;
+    const visL = cullL - tileOff;
+    const visR = cullR - tileOff;
     const cursorPos = dispCursor - tileOff;
     // Outgoing tail (the repetition just behind the cursor) renders the frozen
     // previous-pass state so it stays painted instead of resetting to raw.
@@ -2218,7 +2400,13 @@ function paintFrame(frameStamp?: number) {
         // The earlier of the two hit times: React's copy lands a flush later.
         const reactHitAt = visual.hitTimestamps[note.noteKey];
         const hitAt = liveFill && liveFill.hitAt !== null && (reactHitAt === undefined || liveFill.hitAt < reactHitAt) ? liveFill.hitAt : reactHitAt;
-        const isAnimatingHit = isHit && hitAt !== undefined;
+        // Only while the pop lasts. A streamed hit keeps its time for good, and
+        // without the age check every note ever hit went on drawing the pop's
+        // rings — faded to nothing — in every frame, for as long as it was on
+        // the board: the further into a pass, the more the board had to draw.
+        const isAnimatingHit = isHit && hitAt !== undefined && frameNow - hitAt < HIT_ANIM_MS;
+        // A paused board repaints only when asked: once more after the pop, to clear it.
+        if (isAnimatingHit) needsRedraw = true;
 
         // Palm-muted notes keep their string colour — the P.M. lane under the
         // staff marks them, and a grey pill read as a disabled note.
@@ -2583,8 +2771,6 @@ function paintFrame(frameStamp?: number) {
             drawPill(blockX - exp2, blockY - exp2, headW + exp2 * 2, BLOCK_H + exp2 * 2, BLOCK_CORNER + exp2);
             ctx.stroke();
           }
-
-          if (hitAge >= 1) { delete visual.hitTimestamps[note.noteKey]; visual.hitTimestampsCount--; }
         }
 
         // ── Fret label ────────────────────────────────────────────────────
@@ -2622,12 +2808,8 @@ function paintFrame(frameStamp?: number) {
         }
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        // Set by the first label that needs the small font (or by H/P, whose
-        // larger font the tap "T" has always inherited).
-        let labelFontSet = false;
         if (note.isAccented) {
           ctx.font = TECHNIQUE_FONT;
-          labelFontSet = true;
           ctx.fillStyle = withAlpha(inkColor, 0.75);
           drawText(">", labelX, blockY - 6);
         }
@@ -2673,12 +2855,33 @@ function paintFrame(frameStamp?: number) {
             ctx.textBaseline = "bottom";
             drawText(label, labelX, blockY - 3);
           }
-          labelFontSet = true;
         }
         if (note.isTap) {
-          if (!labelFontSet) ctx.font = TECHNIQUE_FONT;
-          ctx.fillStyle = isHit ? "#064e3b" : "#34d399";
-          drawText("T", blockRX - 7, blockY - 6);
+          // A tapped note is the one the other hand plays, so it has to be
+          // picked out before it reaches the cursor: a ring in the board's ink
+          // round the head, and a small "T" tab on its top-left corner — on
+          // the head itself, where the fret is read, and clear of the slur
+          // that leaves from the head's middle. Never green: that is a hit.
+          // (It used to be a 9 px green "T" at the far end of the note's tail,
+          // which in a fast run sat on the next note instead.)
+          ctx.globalAlpha = baseAlpha * 0.92;
+          ctx.strokeStyle = inkColor;
+          ctx.lineWidth = 1.5;
+          drawPill(blockX - 3, blockY - 3, headW + 6, BLOCK_H + 6, BLOCK_CORNER + 3);
+          ctx.stroke();
+          ctx.globalAlpha = baseAlpha;
+          ctx.fillStyle = inkColor;
+          ctx.strokeStyle = bgColor;
+          drawPill(blockX - 3, blockY - 7, TAP_TAB_W, TAP_TAB_H, 3);
+          ctx.fill();
+          ctx.stroke();
+          const baseline = ctx.textBaseline;
+          ctx.font = TECHNIQUE_FONT;
+          ctx.fillStyle = bgColor;
+          ctx.textBaseline = "middle";
+          drawText("T", blockX - 3 + TAP_TAB_W / 2, blockY - 7 + TAP_TAB_H / 2 + 0.5);
+          ctx.textBaseline = baseline;
+          ctx.globalAlpha = 1;
         }
 
         // Harmonic badge
@@ -3056,7 +3259,69 @@ function paintFrame(frameStamp?: number) {
   // ── Pinned tuning gutter (drawn on top of the scrolled content) ──────────
   // Light the strings at / just ahead of the cursor. wrappedCursor is tile-0
   // pixel space, so the map turns it back into the cursor beat.
-  drawTuningGutter(activeTuningStrings(xToBeat(xMap, wrappedCursor)));
+  if (withGutter) drawTuningGutter(activeTuningStrings(xToBeat(xMap, wrappedCursor)));
+  };
+
+  // ── Whole, or only what changed ──────────────────────────────────────────
+  const target = canvas;
+  const canReuse = target !== null && typeof OffscreenCanvas !== "undefined" && target instanceof OffscreenCanvas;
+  const scrollPx = Math.round(scrollX * devicePx);
+  let reused = false;
+  if (target && canReuse && layoutLeftReach <= REUSE_MAX_REACH && isPlaying && countInRemaining === 0 && learnTarget === null && glide === null && pageTurn === null) {
+    const widthPx = target.width;
+    const heightPx = target.height;
+    // First column with nothing but notes the cursor hasn't reached.
+    const aheadPx = Math.max(0, Math.ceil((contentLeft + reachedRight(dispCursor, wrappedCursor) - scrollX) * devicePx) + 1);
+    const movedPx = scrollPx - reuseScrollPx;
+    // What the last frame drew ahead of the cursor is now movedPx further left.
+    const fromPx = Math.max(aheadPx, reuseAheadPx - movedPx);
+    // A strip looks this far past its own edges for beats that draw into it;
+    // a beat that came into range this frame draws back over columns that
+    // scrolled in before it did, and those are drawn again with the new strip.
+    const reach = Math.max(REUSE_OVERHANG, layoutLeftReach + 40);
+    const backPx = movedPx > 0
+      ? Math.ceil(Math.max(0, enteredLeftReach(reuseViewRight, viewR, seamless) - REUSE_FREE_REACH) * devicePx)
+      : 0;
+    const stripPx = Math.max(fromPx, widthPx - movedPx - backPx);
+    const keptPx = stripPx - fromPx;
+    // A standing page only ever turns, and a turn redraws it.
+    if (reuseValid && movedPx >= 0 && (!pagedScroll || movedPx === 0) && keptPx >= Math.max(REUSE_MIN_STATIC_PX, Math.ceil(reach * devicePx))) {
+      const toWorld = (px: number) => px / devicePx - contentLeft + scrollX;
+      if (movedPx > 0) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.beginPath();
+        ctx.rect(fromPx, 0, keptPx, heightPx);
+        ctx.clip();
+        ctx.globalCompositeOperation = "copy";
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(target, fromPx + movedPx, 0, keptPx, heightPx, fromPx, 0, keptPx, heightPx);
+        ctx.restore();
+      }
+      const strips: [number, number][] = movedPx > 0 ? [[0, fromPx], [stripPx, widthPx]] : [[0, fromPx]];
+      for (const [x0, x1] of strips) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.beginPath();
+        ctx.rect(x0, 0, x1 - x0, heightPx);
+        ctx.clip();
+        drawBoard(
+          x0 === 0 ? viewL : Math.max(viewL, toWorld(x0) - reach),
+          x1 === widthPx ? viewR : Math.min(viewR, toWorld(x1) + reach),
+          x0 === 0,
+        );
+        ctx.restore();
+      }
+      reused = true;
+    }
+    reuseAheadPx = aheadPx;
+    reuseValid = true;
+  } else {
+    reuseValid = false;
+  }
+  reuseScrollPx = scrollPx;
+  reuseViewRight = viewR;
+  if (!reused) drawBoard(viewL, viewR, true);
 
   // ── Notify main thread when cursor enters/leaves a rest beat ────────────
   if (isPlaying && countInRemaining === 0) {
@@ -3089,7 +3354,26 @@ function render(frameStamp?: number) {
     // and repaint next frame; the error still surfaces.
     ctx?.reset?.();
     needsRedraw = true;
+    reuseValid = false;
     throw err;
+  }
+}
+
+/** Puts up the Early/Late label of every timing in `next` the board hasn't
+ *  shown yet — `next` being all the timings, or only the ones that changed. */
+function labelNewTimings(next: Record<string, NoteTiming>) {
+  if (!timingHints) return;
+  const now = Date.now();
+  // Compared by value: every message arrives as freshly cloned objects.
+  // A note hit again in a later pass with a new timing gets a new label.
+  for (const key of Object.keys(next)) {
+    const t = next[key];
+    const prev = noteTimings[key];
+    if (!t.hint) continue;
+    if (prev && prev.hint === t.hint && prev.offsetBeats === t.offsetBeats) continue;
+    // Already put up when the hit streamed in.
+    if (isLiveTiming(liveFills.byKey.get(key), t)) continue;
+    timingLabels.set(key, { kind: t.hint, at: now });
   }
 }
 
@@ -3097,6 +3381,7 @@ function render(frameStamp?: number) {
 self.onmessage = (e: MessageEvent) => {
   const msg = e.data as { type: string;[k: string]: any };
   needsRedraw = true; // any incoming message requires at least one repaint
+  if (!REUSE_SAFE_MESSAGES.has(msg.type)) reuseValid = false;
 
   switch (msg.type) {
     case 'INIT': {
@@ -3115,7 +3400,9 @@ self.onmessage = (e: MessageEvent) => {
       canvas.addEventListener?.('contextrestored', () => {
         hitGlowSprites.clear();
         chordTagSprites.clear();
+        sparkHalos.clear();
         needsRedraw = true;
+        reuseValid = false;
       });
       relayout();
       if (rafId !== null) cancelAnimationFrame(rafId);
@@ -3217,26 +3504,29 @@ self.onmessage = (e: MessageEvent) => {
       applyHitNotes(visual, msg.hitNotes as Record<string, boolean>, Date.now(), lastFinishedTile);
       break;
     }
+    case 'HIT_NOTES_PATCH': {
+      applyHitPatch(visual, msg.hitNotes as Record<string, boolean | number>, Date.now());
+      break;
+    }
     case 'NOTE_TIMINGS': {
       const next = msg.noteTimings as typeof noteTimings;
-      const now = Date.now();
-      // Compared by value: every message arrives as freshly cloned objects.
-      // A note hit again in a later pass with a new timing gets a new label.
-      for (const key of Object.keys(next)) {
-        if (!timingHints) break;
-        const t = next[key];
-        const prev = noteTimings[key];
-        if (!t.hint) continue;
-        if (prev && prev.hint === t.hint && prev.offsetBeats === t.offsetBeats) continue;
-        // Already put up when the hit streamed in.
-        if (isLiveTiming(liveFills.byKey.get(key), t)) continue;
-        timingLabels.set(key, { kind: t.hint, at: now });
-      }
+      labelNewTimings(next);
       noteTimings = next;
+      break;
+    }
+    case 'NOTE_TIMINGS_PATCH': {
+      const patch = msg.noteTimings as typeof noteTimings;
+      labelNewTimings(patch);
+      for (const key of Object.keys(patch)) noteTimings[key] = patch[key];
       break;
     }
     case 'MISSED_NOTES': {
       applyMissedNotes(visual, msg.missedNotes as Record<string, boolean>, lastFinishedTile);
+      needsRedraw = true;
+      break;
+    }
+    case 'MISSED_NOTES_PATCH': {
+      applyMissedPatch(visual, msg.missedNotes as Record<string, boolean>);
       needsRedraw = true;
       break;
     }

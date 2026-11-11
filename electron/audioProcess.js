@@ -12,6 +12,7 @@
 const os = require("os");
 
 const { createRpcServer } = require("./workerRpc");
+const { createFrameBatcher } = require("./frameBatcher");
 const toneStore = require("./toneStore");
 const vstStore = require("./vst/vstStore");
 const vstRack = require("./vst/vstRack");
@@ -38,6 +39,7 @@ function raisePriority() {
 }
 
 let rpc;
+const captureBatcher = createFrameBatcher((buf) => rpc.emit("frame", buf));
 const handlers = {
   init({ userDataDir }) {
     if (!userDataDir) throw new Error("init: userDataDir is required");
@@ -65,13 +67,14 @@ const handlers = {
   },
 
   attachCapture(opts) {
-    return requireEngine().attachCapture(opts, (buf) => {
-      // Structured-cloned across the process boundary (a copy — a few hundred
-      // bytes per block). The engine's own DSP has already read this buffer.
-      rpc.emit("frame", buf);
-    });
+    // Structured-cloned across the process boundary (a copy — a few hundred
+    // bytes per block). The engine's own DSP has already read this buffer.
+    // Short blocks leave several to a message (frameBatcher.js).
+    captureBatcher.reset();
+    return requireEngine().attachCapture(opts, (buf) => captureBatcher.push(buf));
   },
   detachCapture() {
+    captureBatcher.reset();
     return requireEngine().detachCapture();
   },
   getCaptureStatus() {

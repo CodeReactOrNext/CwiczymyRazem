@@ -1,13 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { ConnectionIssueInfo, NativeAudioDevice, NativeAudioStreamInfo } from "types/nativeAudio";
+import type { Spectrum } from "utils/audio/chordTones";
 import type { PcmSpectrum } from "utils/audio/pcmSpectrum";
 import { createPcmSpectrum } from "utils/audio/pcmSpectrum";
 import type { RecentAudio } from "utils/audio/recentAudio";
 import { createRecentAudio, RECENT_AUDIO_SECONDS } from "utils/audio/recentAudio";
 
+import { GUITAR_DSP_ENGINE_HASH } from "./generated/guitarDspEngineHash";
 import type { DetectedNoteEvent, InputTap } from "./guitarBufferProcessor";
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
+import type { GuitarDspHandle } from "./guitarDspClient";
+import { startGuitarDsp } from "./guitarDspClient";
+import { applyDspReadings } from "./guitarDspSession";
+import type { CaptureWindower } from "./nativeCaptureWindows";
+import { batchWaitMs, createCaptureWindower } from "./nativeCaptureWindows";
+import { createStampShifter } from "./nativeEngineStamps";
 import type { AudioRefs, GuitarAudioInputOptions } from "./useAudioAnalyzer";
 import { readPersistedChannel } from "./useNativeAudioDevices";
 
@@ -19,6 +27,9 @@ const GAIN_STORAGE_KEY = "audio_input_gain"; // shared with the web path
 const DEVICE_STORAGE_KEY = "native_audio_device_id";
 const DEFAULT_GAIN = 3.0;
 const WINDOW_SIZE = 2048; // aubio analysis window — must match createGuitarDetectors
+/** The shell's detection sends a message every ~43 ms, silence included; none
+ *  at all for this long and the window runs the detectors itself. */
+const ENGINE_DSP_SILENT_MS = 2000;
 
 function loadPersistedGain(): number {
   try {
@@ -72,6 +83,7 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
   const selectedDeviceIdRef = useRef<number | null>(loadPersistedDeviceId());
   const selectedChannelRef = useRef<number>(readPersistedChannel());
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const dspUnsubscribeRef = useRef<(() => void) | null>(null);
   const connectionUnsubscribeRef = useRef<(() => void) | null>(null);
 
   // Realtime refs (same shape the rest of the app consumes)
@@ -87,29 +99,45 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
   const lastLowAttackMsRef = useRef<number>(0);
   const lastSoftAttackMsRef = useRef<number>(0);
   // No Web Audio graph here, so no AnalyserNode: chords are graded on a
-  // spectrum computed from the PCM itself (see pcmSpectrum.ts). Built per
-  // stream, for its negotiated sample rate.
+  // spectrum computed from the PCM itself (see pcmSpectrum.ts). Whatever runs
+  // the detectors works it out with them and leaves the latest one here…
+  const remoteSpectrumRef = useRef<Spectrum | null>(null);
+  // …except when that is this thread (the last fallback): then it is computed
+  // here, when read. Built per stream, for its negotiated sample rate.
   const spectrumRef = useRef<PcmSpectrum | null>(null);
   const recentAudioRef = useRef<RecentAudio | null>(null);
   const inputTapRef = useRef<InputTap | null>(null);
   const inputPeakRef = useRef<number>(0);
   const bassRef = useRef(bass);
   const strumRef = useRef(strum);
-  useEffect(() => { bassRef.current = bass; strumRef.current = strum; }, [bass, strum]);
+  /** The DSP worker, while it is the one running the detectors (see guitarDspClient). */
+  const dspRef = useRef<GuitarDspHandle | null>(null);
+  /** The desktop shell runs the detectors itself (see guitarDspEngine.ts). */
+  const engineDspRef = useRef(false);
+  /** Tells whichever of the two runs the detectors. */
+  const configureDsp = useCallback((patch: { gain?: number; bass?: boolean; strum?: boolean }) => {
+    dspRef.current?.configure(patch);
+    if (engineDspRef.current) window.nativeAudio?.configureDsp?.(patch).catch(() => { /* ignore */ });
+  }, []);
+  useEffect(() => {
+    bassRef.current = bass;
+    strumRef.current = strum;
+    configureDsp({ bass, strum });
+  }, [bass, strum, configureDsp]);
 
-  // Accumulator: native blocks (e.g. 256 frames) → 2048-sample analysis windows
-  const windowBufRef = useRef<Float32Array>(new Float32Array(WINDOW_SIZE));
-  const windowPosRef = useRef<number>(0);
   const streamInfoRef = useRef<NativeAudioStreamInfo | null>(null);
   // EMA of the main→renderer IPC hand-off delay (see native.onFrame below) —
   // folded into getLatencyMs() so note-matching's compensation reflects this
-  // hop instead of silently assuming it's zero (it isn't: this is where the
-  // actual aubio DSP work happens, on the same thread as React rendering).
+  // hop instead of silently assuming it's zero.
   const ipcDelayEmaRef = useRef<number>(0);
-  // Set once the stream is open and aubio detectors are built for its *actual*
+  // Frames in the latest capture message — more than one driver block where
+  // the desktop shell sends them several at a time (see getLatencyMs).
+  const messageFramesRef = useRef<number>(0);
+  // Set once the stream is open and something is ready to take its windows —
+  // the DSP worker, or the detectors on this thread — built for its *actual*
   // negotiated sample rate (see init() — the driver doesn't always grant the
   // rate we ask for). Frames that arrive before that are safely dropped.
-  const processRef = useRef<((win: Float32Array) => void) | null>(null);
+  const processRef = useRef<((win: Float32Array, timeMs: number) => boolean) | null>(null);
   // Bumped by every init()/close() call; each init() snapshots it into
   // myGeneration and rechecks after every await. React StrictMode (dev) double-
   // invokes mount effects (and PracticeSession.tsx's own mic-enable effect adds
@@ -119,7 +147,7 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
   // prevent it, because close() runs (and no-ops) before the superseded call
   // has reached anything to unsubscribe. Without this, BOTH calls ended up
   // registering their own live native.onFrame listener against the SAME shared
-  // windowBufRef/windowPosRef, doubling every captured block into the analysis
+  // window accumulator, doubling every captured block into the analysis
   // window and corrupting pitch detection for the whole session.
   const generationRef = useRef(0);
 
@@ -154,14 +182,72 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
       // applies, same as the device id above.
       selectedChannelRef.current = readPersistedChannel();
 
-      // Reset accumulator
-      windowBufRef.current = new Float32Array(WINDOW_SIZE);
-      windowPosRef.current = 0;
+      // Accumulator: native blocks (e.g. 256 frames, or several to a message)
+      // → 2048-sample analysis windows. One per stream, so a superseded
+      // init()'s frames can never land in this one's window.
+      const windower: CaptureWindower = createCaptureWindower(WINDOW_SIZE, (win, timeMs) => processRef.current?.(win, timeMs) ?? false);
+      messageFramesRef.current = 0;
       processRef.current = null;
       spectrumRef.current = null;
+      remoteSpectrumRef.current = null;
+      engineDspRef.current = false;
+
+      const targets = {
+        frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
+        lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, lastSoftAttackMsRef, inputPeakRef,
+        spectrumRef: remoteSpectrumRef,
+      };
+      const onActive = () => {
+        setState(prev =>
+          prev.isListening === true && prev.error === null
+            ? prev
+            : { ...prev, isListening: true, error: null }
+        );
+      };
+      // Measure a message's actual main→renderer delivery delay (clocks are
+      // shared, no skew to correct for) and fold it into a smoothed running
+      // estimate. A single sample is noisy (structured-clone jitter, a GC
+      // tick) — the EMA is what getLatencyMs() below actually reads.
+      const noteIpcDelay = (sentAt: number) => {
+        const ipcDelayMs = Date.now() - sentAt;
+        ipcDelayEmaRef.current = ipcDelayEmaRef.current === 0
+          ? ipcDelayMs
+          : ipcDelayEmaRef.current * 0.9 + ipcDelayMs * 0.1;
+      };
+
+      // A shell that can run the detectors itself is asked to (start() below
+      // says whether it does): the readings then arrive here, one message per
+      // analysis window, and no block ever reaches this thread. Registered
+      // before native.start(), like the blocks' listener.
+      const engineWanted = typeof native.onDsp === "function" && typeof native.configureDsp === "function" && typeof native.stopDsp === "function";
+      let engineHeard = false;
+      /** Set once the stream is open: runs the detectors in this window instead. */
+      let takeOver: (() => Promise<void>) | null = null;
+      const shiftStamps = createStampShifter();
+      dspUnsubscribeRef.current = !engineWanted || !native.onDsp ? null : native.onDsp((message, sentAt) => {
+        if (myGeneration !== generationRef.current) return;
+        if (message.type === "lost") {
+          // The shell's detectors died; it sends the blocks here again.
+          if (!engineDspRef.current) return;
+          engineDspRef.current = false;
+          takeOver?.().catch((err) => console.error("Guitar DSP takeover failed:", err));
+          return;
+        }
+        engineHeard = true;
+        noteIpcDelay(sentAt);
+        // Onto the clock this window's own detection stamps with (nativeEngineStamps.ts).
+        const readings = shiftStamps(message, ipcDelayEmaRef.current);
+        messageFramesRef.current = readings.messageFrames ?? 0;
+        applyDspReadings(targets, readings);
+        // What the session keeps of the raw input: the model's look back and the tap.
+        recentAudioRef.current?.push(readings.samples, readings.timeMs);
+        const sampleRate = streamInfoRef.current?.sampleRate;
+        if (sampleRate) inputTapRef.current?.(readings.samples, sampleRate);
+        if (readings.readings.active) onActive();
+      });
 
       // Subscribe to PCM blocks: reinterpret raw bytes as FLOAT32, fill 2048
-      // windows, then run the shared DSP on each full window. Registered before
+      // windows, then hand each full window to the shared DSP. Registered before
       // native.start() so no frame is missed once the stream opens; processRef
       // is still null at that point (detectors aren't built until we know the
       // stream's actual sample rate below), so early frames are just dropped.
@@ -170,14 +256,7 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
         // stale unsubscribe somehow didn't run (see generationRef above), still
         // never let a superseded generation's frames touch the shared buffer.
         if (myGeneration !== generationRef.current) return;
-        // Measure this block's actual main→renderer delivery delay (clocks are
-        // shared, no skew to correct for) and fold it into a smoothed running
-        // estimate. A single sample is noisy (structured-clone jitter, a GC
-        // tick) — the EMA is what getLatencyMs() below actually reads.
-        const ipcDelayMs = Date.now() - sentAt;
-        ipcDelayEmaRef.current = ipcDelayEmaRef.current === 0
-          ? ipcDelayMs
-          : ipcDelayEmaRef.current * 0.9 + ipcDelayMs * 0.1;
+        noteIpcDelay(sentAt);
 
         // Reinterpret raw bytes as FLOAT32. Float32Array requires a 4-byte
         // aligned offset; IPC buffers usually are, but copy if not.
@@ -189,16 +268,13 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
           copy.set(bytes);
           samples = new Float32Array(copy.buffer, 0, Math.floor(copy.byteLength / 4));
         }
-        const win = windowBufRef.current;
-        let pos = windowPosRef.current;
-        for (let i = 0; i < samples.length; i++) {
-          win[pos++] = samples[i];
-          if (pos === WINDOW_SIZE) {
-            processRef.current?.(win);
-            pos = 0;
-          }
-        }
-        windowPosRef.current = pos;
+        messageFramesRef.current = samples.length;
+        // Each window is stamped with when the driver block holding its last
+        // sample would have arrived on its own: a shell that sends several
+        // blocks to a message delivers the earlier ones late, and the attack
+        // times read from the window must not carry that wait.
+        const info = streamInfoRef.current;
+        windower.push(samples, Date.now(), info?.sampleRate ?? 0, info?.frameSize ?? 0);
       });
 
       // Surfaces stream-loss/recovery from nativeAudioEngine.js's scheduleRecovery
@@ -221,7 +297,7 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
           // The gap mid-window (samples stopped arriving, then resumed) would
           // otherwise splice pre-loss and post-recovery audio into one 2048-sample
           // analysis window — cheap to avoid by just starting the next window fresh.
-          windowPosRef.current = 0;
+          windower.reset();
           native.getStatus().then((status) => {
             if (myGeneration !== generationRef.current) return;
             if (status.info) streamInfoRef.current = status.info;
@@ -251,6 +327,9 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
         deviceId: chosen.id,
         channel: selectedChannelRef.current,
         frameSize: 256,
+        ...(engineWanted && {
+          dsp: { hash: GUITAR_DSP_ENGINE_HASH, gain: inputGainRef.current, bass: bassRef.current, strum: strumRef.current },
+        }),
       });
       if (myGeneration !== generationRef.current) {
         // Superseded while the stream was opening — a newer generation already
@@ -260,38 +339,89 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
       }
       streamInfoRef.current = info;
 
-      // aubio detectors at the stream's actual (negotiated) sample rate.
-      // @ts-ignore — aubiojs has no types
-      const AubioModule = await import("aubiojs");
-      const Aubio = AubioModule.default || AubioModule;
-      const aubio = await Aubio();
-      if (myGeneration !== generationRef.current) return; // superseded while aubio (wasm) loaded
-      const detectors = createGuitarDetectors(aubio, info.sampleRate);
-      const spectrum = createPcmSpectrum(info.sampleRate);
-      spectrumRef.current = spectrum;
       const recentAudio = createRecentAudio(info.sampleRate, RECENT_AUDIO_SECONDS);
       recentAudioRef.current = recentAudio;
 
-      processRef.current = createGuitarBufferProcessor({
-        detectors,
-        getGain: () => inputGainRef.current,
-        sampleRate: info.sampleRate,
-        spectrum,
-        recentAudio,
-        isBass: () => bassRef.current,
-        isStrumWanted: () => strumRef.current,
-        targets: {
-          frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
-          lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, lastSoftAttackMsRef, inputTapRef, inputPeakRef,
-        },
-        onActive: () => {
-          setState(prev =>
-            prev.isListening === true && prev.error === null
-              ? prev
-              : { ...prev, isListening: true, error: null }
-          );
-        },
-      });
+      // The detectors on this thread — only where the worker below can't run,
+      // or once it has died. They cost a few ms of every ~43 ms window, in one
+      // piece, on the thread that draws the session: frames were dropped.
+      const runDspHere = async () => {
+        const spectrum = createPcmSpectrum(info.sampleRate);
+        spectrumRef.current = spectrum;
+        // aubio detectors at the stream's actual (negotiated) sample rate.
+        // @ts-ignore — aubiojs has no types
+        const AubioModule = await import("aubiojs");
+        const Aubio = AubioModule.default || AubioModule;
+        const aubio = await Aubio();
+        if (myGeneration !== generationRef.current) return; // superseded while aubio (wasm) loaded
+        const process = createGuitarBufferProcessor({
+          detectors: createGuitarDetectors(aubio, info.sampleRate),
+          getGain: () => inputGainRef.current,
+          sampleRate: info.sampleRate,
+          spectrum,
+          recentAudio,
+          isBass: () => bassRef.current,
+          isStrumWanted: () => strumRef.current,
+          targets: { ...targets, inputTapRef },
+          onActive,
+        });
+        processRef.current = (win, timeMs) => { process(win, timeMs); return false; };
+      };
+
+      // The detectors in this window's worker — where the shell doesn't run
+      // them itself.
+      const runDspInWorker = async () => {
+        const dsp = await startGuitarDsp({
+          sampleRate: info.sampleRate,
+          gain: inputGainRef.current,
+          bass: bassRef.current,
+          strum: strumRef.current,
+          // The chord spectrum too: its FFT stays off this thread.
+          spectrum: true,
+          targets,
+          onActive,
+          onLost: () => {
+            if (myGeneration !== generationRef.current) return;
+            dspRef.current = null;
+            processRef.current = null;
+            runDspHere().catch((err) => console.error("Guitar DSP fallback failed:", err));
+          },
+        });
+        if (myGeneration !== generationRef.current) { dsp?.close(); return; } // superseded while the worker started
+        if (dsp) {
+          dspRef.current = dsp;
+          // Whatever changed while the worker was starting up.
+          dsp.configure({ gain: inputGainRef.current, bass: bassRef.current, strum: strumRef.current });
+          processRef.current = (win, timeMs) => {
+            // What stays on this thread, both of them copies: the model's look
+            // back and the raw tap — before the buffer leaves with the window.
+            recentAudio.push(win, timeMs);
+            inputTapRef.current?.(win, info.sampleRate);
+            dsp.push(win, timeMs);
+            return true;
+          };
+        } else {
+          await runDspHere();
+        }
+      };
+
+      if (info.dsp && engineWanted) {
+        engineDspRef.current = true;
+        takeOver = runDspInWorker;
+        // Whatever changed while the stream was opening.
+        configureDsp({ gain: inputGainRef.current, bass: bassRef.current, strum: strumRef.current });
+        // Readings that never make it here would leave the session deaf with
+        // everything looking fine: take the detection back instead.
+        setTimeout(() => {
+          if (engineHeard || !engineDspRef.current || myGeneration !== generationRef.current) return;
+          engineDspRef.current = false;
+          native.stopDsp?.().catch(() => { /* ignore */ });
+          runDspInWorker().catch((err) => console.error("Guitar DSP takeover failed:", err));
+        }, ENGINE_DSP_SILENT_MS);
+      } else {
+        await runDspInWorker();
+      }
+      if (myGeneration !== generationRef.current) return;
 
       setState(prev => ({
         ...prev,
@@ -313,7 +443,7 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
       // exactly like a working one, just with nothing ever being detected.
       toast.error(`Couldn't start pitch detection: ${message}`);
     }
-  }, []);
+  }, [configureDsp]);
 
   // init() calls are serialized: a new init() never sends its native.start()
   // while a superseded init()'s start() is still in flight. Without this, the
@@ -342,16 +472,24 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
       unsubscribeRef.current();
       unsubscribeRef.current = null;
     }
+    if (dspUnsubscribeRef.current) {
+      dspUnsubscribeRef.current();
+      dspUnsubscribeRef.current = null;
+    }
     if (connectionUnsubscribeRef.current) {
       connectionUnsubscribeRef.current();
       connectionUnsubscribeRef.current = null;
     }
     window.nativeAudio?.stop().catch(() => { /* ignore */ });
 
+    dspRef.current?.close();
+    dspRef.current = null;
+    engineDspRef.current = false;
     processRef.current = null;
     spectrumRef.current = null;
+    remoteSpectrumRef.current = null;
     recentAudioRef.current = null;
-    windowPosRef.current = 0;
+    messageFramesRef.current = 0;
     streamInfoRef.current = null;
     frequencyRef.current = 0;
     volumeRef.current = 0;
@@ -391,11 +529,12 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
   const setInputGain = useCallback((value: number) => {
     const clamped = Math.max(0.5, Math.min(10.0, value));
     inputGainRef.current = clamped;
+    configureDsp({ gain: clamped });
     try {
       localStorage.setItem(GAIN_STORAGE_KEY, String(clamped));
     } catch { /* ignore */ }
     setState(prev => ({ ...prev, inputGain: clamped }));
-  }, []);
+  }, [configureDsp]);
 
   /** Switch the active input device (e.g. user picks their interface).
    *  Restarts the stream if currently listening. */
@@ -425,17 +564,19 @@ export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAu
     const captureMs = info?.latencyMs ?? 0;     // hardware → app (ASIO ≈ few ms)
     const windowMs = (WINDOW_SIZE / sr) * 1000; // DSP analysis window
     const ipcMs = ipcDelayEmaRef.current;       // measured main→renderer hand-off (see native.onFrame)
-    return captureMs + windowMs + ipcMs;
+    // Blocks sent several to a message: a reading waits for the rest of its message.
+    const batchMs = batchWaitMs(messageFramesRef.current, info?.frameSize ?? 0, sr);
+    return captureMs + windowMs + ipcMs + batchMs;
   }, []);
 
   /** getLatencyMs() for an attack time — without the window, which the
-   *  processor already takes off every onset (see useAudioAnalyzer). */
+   *  processor already takes off every onset (see useAudioAnalyzer), and
+   *  without the wait inside a message, which the window's stamp leaves out. */
   const getAttackLatencyMs = useCallback(() => {
-    const sr = streamInfoRef.current?.sampleRate || 48000;
-    return getLatencyMs() - (WINDOW_SIZE / sr) * 1000;
-  }, [getLatencyMs]);
+    return (streamInfoRef.current?.latencyMs ?? 0) + ipcDelayEmaRef.current;
+  }, []);
 
-  const readSpectrum = useCallback(() => spectrumRef.current?.read() ?? null, []);
+  const readSpectrum = useCallback(() => (spectrumRef.current ? spectrumRef.current.read() : remoteSpectrumRef.current), []);
   const readRecentAudio = useCallback(() => recentAudioRef.current?.read() ?? null, []);
 
   const audioRefs: AudioRefs = {

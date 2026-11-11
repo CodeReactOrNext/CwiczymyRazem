@@ -12,6 +12,8 @@
 // Both halves live here, away from the Worker plumbing (guitarDsp.worker.ts,
 // guitarDspClient.ts), so they can be run against each other in a test.
 import type { AttackReading } from "utils/audio/attackTones";
+import type { Spectrum } from "utils/audio/chordTones";
+import { createPcmSpectrum } from "utils/audio/pcmSpectrum";
 
 import type { DetectedNoteEvent, ProcessorTargets } from "./guitarBufferProcessor";
 import { createGuitarBufferProcessor, createGuitarDetectors } from "./guitarBufferProcessor";
@@ -24,8 +26,18 @@ export interface DspSettings {
   strum: boolean;
 }
 
+/** What a session is started with. */
+export interface DspStart extends DspSettings {
+  /**
+   * Work out the chord spectrum of every window too (pcmSpectrum.ts) — for an
+   * input with no AnalyserNode to read it from, so its FFT doesn't run on the
+   * thread that draws.
+   */
+  spectrum?: boolean;
+}
+
 export type DspRequest =
-  | ({ type: "init"; sampleRate: number } & DspSettings)
+  | ({ type: "init"; sampleRate: number } & DspStart)
   | ({ type: "config" } & Partial<DspSettings>)
   | { type: "samples"; samples: Float32Array; timeMs: number };
 
@@ -53,6 +65,9 @@ export interface DspReadingsMessage {
   events: DetectedNoteEvent[];
   /** Attack spectra that came in for events sent earlier, by the event's onsetMs. */
   attacks: { onsetMs: number; attack: AttackReading }[];
+  /** The chord spectrum after this window (null over silence) — only from a
+   *  session started with `spectrum`. */
+  spectrum?: Spectrum | null;
 }
 
 export type DspResponse =
@@ -61,7 +76,10 @@ export type DspResponse =
   | DspReadingsMessage;
 
 /** The refs the worker's readings land in. */
-export type DspTargets = Omit<ProcessorTargets, "inputTapRef"> & Required<Pick<ProcessorTargets, "noteEventsRef">>;
+export type DspTargets = Omit<ProcessorTargets, "inputTapRef"> & Required<Pick<ProcessorTargets, "noteEventsRef">> & {
+  /** Where a session started with `spectrum` leaves its latest one. */
+  spectrumRef?: { current: Spectrum | null };
+};
 
 /** Same bound as the processor's own ring (EVENT_BUFFER_MAX). */
 const EVENT_BUFFER_MAX = 64;
@@ -72,8 +90,9 @@ const box = <T,>(value: T) => ({ current: value });
  * The worker's side: a processor of its own, and after every window the
  * readings to post. `aubio` is the loaded aubiojs module.
  */
-export function createDspSession(aubio: unknown, sampleRate: number, initial: DspSettings) {
-  const settings: DspSettings = { ...initial };
+export function createDspSession(aubio: unknown, sampleRate: number, initial: DspStart) {
+  const settings: DspSettings = { gain: initial.gain, bass: initial.bass, strum: initial.strum };
+  const spectrum = initial.spectrum ? createPcmSpectrum(sampleRate) : null;
   const targets = {
     frequencyRef: box(0),
     volumeRef: box(0),
@@ -93,6 +112,7 @@ export function createDspSession(aubio: unknown, sampleRate: number, initial: Ds
     detectors: createGuitarDetectors(aubio, sampleRate),
     targets,
     sampleRate,
+    spectrum,
     getGain: () => settings.gain,
     isBass: () => settings.bass,
     isStrumWanted: () => settings.strum,
@@ -139,13 +159,15 @@ export function createDspSession(aubio: unknown, sampleRate: number, initial: Ds
         },
         events,
         attacks,
+        ...(spectrum && { spectrum: spectrum.read() }),
       };
     },
   };
 }
 
 /** The main thread's side: copies a worker message into the refs the app reads. */
-export function applyDspReadings(targets: DspTargets, { readings, events, attacks }: DspReadingsMessage) {
+export function applyDspReadings(targets: DspTargets, { readings, events, attacks, spectrum }: DspReadingsMessage) {
+  if (targets.spectrumRef && spectrum !== undefined) targets.spectrumRef.current = spectrum;
   targets.frequencyRef.current = readings.frequency;
   targets.volumeRef.current = readings.volume;
   targets.rawVolumeRef.current = readings.rawVolume;

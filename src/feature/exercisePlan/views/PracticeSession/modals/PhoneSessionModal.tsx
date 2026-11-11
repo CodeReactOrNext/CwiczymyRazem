@@ -20,7 +20,7 @@ import { MobileInstructionsCard } from "../components/MobileInstructionsCard";
 import { MobileMicGameHud } from "../components/MobileMicGameHud";
 import { StartGate, useStartGate } from "../components/StartGate";
 import { QUARTER_TURN_STYLE } from "../components/tablatureDirection";
-import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { useNoteScore } from "../contexts/NoteMatchingContext";
 import { useTimerContext } from "../contexts/TimerContext";
 import { strumSynthVolume } from "../helpers/strumSynthVolume";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
@@ -40,7 +40,7 @@ function TimeLeft() {
 
 function DrawerMicStats() {
   const { t } = useTranslation("session");
-  const { gameState, sessionAccuracy } = useNoteMatchingContext();
+  const { gameState, sessionAccuracy } = useNoteScore();
   return (
     <div className="grid grid-cols-3 gap-2 rounded-lg bg-zinc-900/60 px-4 py-3">
       <div className="min-w-0">

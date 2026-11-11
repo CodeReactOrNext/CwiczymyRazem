@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import type { NativeAudioApi, NativeAudioStreamInfo } from "types/nativeAudio";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { GUITAR_DSP_ENGINE_HASH } from "./generated/guitarDspEngineHash";
+import type { EngineDspEvent, EngineDspMessage } from "./guitarDspEngine";
 import { useNativeAudioAnalyzer } from "./useNativeAudioAnalyzer";
 
 // aubio's WASM is irrelevant here — only the detector constructors get called.
@@ -165,5 +167,79 @@ describe("useNativeAudioAnalyzer init/close ordering", () => {
     expect(toast.error).not.toHaveBeenCalled();
     expect(result.current.error).toBeNull();
     expect(result.current.isListening).toBe(false);
+  });
+});
+
+describe("useNativeAudioAnalyzer with a shell that runs the detectors", () => {
+  /** A newer shell: the readings' channel next to the blocks'. */
+  function installEngineBridge() {
+    const installed = installBridge();
+    let onDsp: ((message: EngineDspEvent, sentAt: number) => void) | null = null;
+    const configureDsp = vi.fn(async () => true);
+    Object.assign(installed.bridge, {
+      onDsp: vi.fn((cb: (message: EngineDspEvent, sentAt: number) => void) => { onDsp = cb; return () => { onDsp = null; }; }),
+      configureDsp,
+      stopDsp: vi.fn(async () => true),
+    });
+    return { ...installed, configureDsp, emit: (message: EngineDspEvent, sentAt: number) => onDsp?.(message, sentAt) };
+  }
+
+  const readings = (timeMs: number): EngineDspMessage => ({
+    type: "readings",
+    readings: {
+      frequency: 196, volume: 0.4, rawVolume: 0.2, noiseFloor: 0.01, confidence: 0.9,
+      lastOnsetTime: timeMs, lastTickTime: 0, lastAttackMs: timeMs - 20, lastLowAttackMs: 0, lastSoftAttackMs: 0,
+      inputPeak: 0.3, active: true,
+    },
+    events: [{ onsetMs: timeMs - 20, pitchHz: 196, peakVolume: 0.2, attack: null }],
+    attacks: [],
+    spectrum: { magnitudes: new Float32Array([0, 1, 0]), binHz: 5.86 },
+    timeMs,
+    samples: new Float32Array(2048).fill(0.1),
+    messageFrames: 256,
+  });
+
+  it("asks for it with the detectors' hash and reads what the shell sends", async () => {
+    const { bridge, startResolvers, emit } = installEngineBridge();
+    const { result } = renderHook(() => useNativeAudioAnalyzer());
+
+    let init!: Promise<void>;
+    act(() => { init = result.current.init(); });
+    await flush();
+    expect(bridge.start).toHaveBeenCalledWith(expect.objectContaining({
+      dsp: expect.objectContaining({ hash: GUITAR_DSP_ENGINE_HASH }),
+    }));
+    await act(async () => { startResolvers[0]({ ...STREAM_INFO, dsp: true }); await init; });
+    expect(result.current.isListening).toBe(true);
+
+    const now = Date.now();
+    act(() => { emit(readings(now - 5), now); });
+
+    const refs = result.current.audioRefs;
+    expect(refs.frequencyRef.current).toBe(196);
+    expect(refs.noteEventsRef?.current).toHaveLength(1);
+    // The same attack, wherever it is read from, on the same clock.
+    expect(refs.noteEventsRef?.current[0].onsetMs).toBe(refs.lastAttackMsRef?.current);
+    expect(refs.lastOnsetTimeRef.current).toBeGreaterThanOrEqual(now - 5);
+    // The chord spectrum and the look back come with the readings.
+    expect(refs.readSpectrum?.()?.binHz).toBe(5.86);
+    expect(refs.readRecentAudio?.()?.samples).toHaveLength(2048);
+  });
+
+  it("runs the detectors itself for a shell that says it doesn't", async () => {
+    const { configureDsp, startResolvers, emit } = installEngineBridge();
+    const { result } = renderHook(() => useNativeAudioAnalyzer());
+
+    let init!: Promise<void>;
+    act(() => { init = result.current.init(); });
+    await flush();
+    // Other detectors than the shell ships: no `dsp` in what start() resolves with.
+    await act(async () => { startResolvers[0](STREAM_INFO); await init; });
+    expect(result.current.isListening).toBe(true);
+    expect(configureDsp).not.toHaveBeenCalled();
+
+    // Nothing the shell might still send is taken for a reading of this stream's.
+    act(() => { emit({ type: "lost" }, Date.now()); });
+    expect(result.current.isListening).toBe(true);
   });
 });

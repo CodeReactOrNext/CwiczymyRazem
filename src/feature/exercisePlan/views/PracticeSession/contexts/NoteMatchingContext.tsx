@@ -32,11 +32,32 @@ import { summarizeTimingOffsets } from "../utils/timingPrecision";
 
 // ── Context value (what subscribing components read) ─────────────────────────
 
-interface NoteMatchingContextValue {
+// Three contexts, by how often their values change. A tab run judges several
+// notes a second, and every one of them changes the marks and the score — as
+// one context that re-rendered every reader, the whole session view among
+// them, several times a second for a value it never looked at. So the marks
+// and the score each have a context of their own, and this one holds what
+// stays put while the notes go by.
+
+/** What the tab draws on its notes — a new value with every note judged. */
+interface NoteMarksContextValue {
   hitNotes: Record<string, boolean | number>;
   missedNotes: Record<string, boolean>;
   /** noteKey -> how the hit was timed: grade and where the attack landed. */
   noteTimings: Record<string, NoteTiming>;
+}
+
+/** What the HUD counts up — a new value with every note judged. */
+interface NoteScoreContextValue {
+  gameState: GameState;
+  maxPossibleScore: number;
+  sessionAccuracy: number;
+  /** Hits/misses judged so far (tab + strumming), null for hunts — lets the HUD
+   *  tell "nothing played yet" and "mic hears nothing" apart from a real 100% / 0%. */
+  sessionStats: { hits: number; misses: number } | null;
+}
+
+interface NoteMatchingContextValue {
   /** The bend or release under the cursor, refreshed every matching tick —
    *  read it from a frame loop, it never re-renders anything. */
   livePitchRef: MutableRefObject<LivePitch | null>;
@@ -47,12 +68,6 @@ interface NoteMatchingContextValue {
   scoringFocus: ScoringFocus;
   currentBeatsElapsedRef: MutableRefObject<number>;
   strumSlotFeedback: Map<number, SlotResult> | undefined;
-  gameState: GameState;
-  maxPossibleScore: number;
-  sessionAccuracy: number;
-  /** Hits/misses judged so far (tab + strumming), null for hunts — lets the HUD
-   *  tell "nothing played yet" and "mic hears nothing" apart from a real 100% / 0%. */
-  sessionStats: { hits: number; misses: number } | null;
   /** Live note-hunt state — populated for octave/region/interval modes. */
   noteHunt: NoteHuntState | null;
   /** Live chord-hunt state — populated only for chord-mode exercises. */
@@ -166,19 +181,25 @@ const _noPitchRef = { current: null } as MutableRefObject<LivePitch | null>;
 const EMPTY_TIMINGS: Record<string, NoteTiming> = {};
 const EMPTY_MISSED: Record<string, boolean> = {};
 
-const NoteMatchingContext = createContext<NoteMatchingContextValue>({
+const NoteMarksContext = createContext<NoteMarksContextValue>({
   hitNotes: {},
   missedNotes: {},
   noteTimings: {},
+});
+
+const NoteScoreContext = createContext<NoteScoreContextValue>({
+  gameState: defaultGameState,
+  maxPossibleScore: 0,
+  sessionAccuracy: 100,
+  sessionStats: null,
+});
+
+const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   livePitchRef: _noPitchRef,
   fillFeedRef: null,
   scoringFocus: "timing",
   currentBeatsElapsedRef: _fallbackRef,
   strumSlotFeedback: undefined,
-  gameState: defaultGameState,
-  maxPossibleScore: 0,
-  sessionAccuracy: 100,
-  sessionStats: null,
   noteHunt: null,
   chordHunt: null,
   clickHunt: null,
@@ -653,17 +674,37 @@ export function NoteMatchingProvider({
   // from before it was switched on) is not the lesson's to show.
   const isLearning = !!learn?.enabled && !isHunt && !isStrummingExercise;
 
+  const learnHitNotes = learn?.hitNotes;
+  const marks = useMemo<NoteMarksContextValue>(
+    () => ({
+      hitNotes: isLearning && learnHitNotes ? learnHitNotes : hitNotes,
+      missedNotes: isLearning ? EMPTY_MISSED : missedNotes,
+      noteTimings: isHunt || isStrummingExercise || isLearning ? EMPTY_TIMINGS : noteTimings,
+    }),
+    [hitNotes, missedNotes, noteTimings, learnHitNotes, isLearning, isHunt, isStrummingExercise],
+  );
+
+  // Stats arrive as a fresh object from the hunts' and the strum matcher's own
+  // state; keyed by their numbers, the score only changes when one of them does.
+  const statHits = sessionStats?.hits ?? null;
+  const statMisses = sessionStats?.misses ?? null;
+  const score = useMemo<NoteScoreContextValue>(
+    () => ({
+      gameState,
+      maxPossibleScore: effectiveMaxPossibleScore,
+      sessionAccuracy,
+      sessionStats: statHits === null || statMisses === null ? null : { hits: statHits, misses: statMisses },
+    }),
+    [gameState, effectiveMaxPossibleScore, sessionAccuracy, statHits, statMisses],
+  );
+
   const value = useMemo<NoteMatchingContextValue>(
     () => ({
-      hitNotes: isLearning ? learn!.hitNotes : hitNotes,
-      missedNotes: isLearning ? EMPTY_MISSED : missedNotes,
       learn,
-      currentBeatsElapsedRef, strumSlotFeedback, gameState,
-      noteTimings: isHunt || isStrummingExercise || isLearning ? EMPTY_TIMINGS : noteTimings,
+      currentBeatsElapsedRef, strumSlotFeedback,
       livePitchRef,
       fillFeedRef: streamFills ? fillFeedRef : null,
       scoringFocus,
-      maxPossibleScore: effectiveMaxPossibleScore, sessionAccuracy, sessionStats,
       noteHunt: isNoteHunt ? noteHunt : null,
       chordHunt: isChordHunt ? chordHunt : null,
       clickHunt: isClickHunt ? clickHunt : null,
@@ -689,18 +730,33 @@ export function NoteMatchingProvider({
       estimateLatencyMs: getLatencyMs,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, noteTimings, learn, isLearning, livePitchRef, fillFeedRef, streamFills, scoringFocus, isStrummingExercise, strumSlotFeedback, gameState, effectiveMaxPossibleScore, sessionAccuracy, sessionStats, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick, markAlphaTabPassStart, calibratedLatencyMs, getLatencyMs],
+    [learn, livePitchRef, fillFeedRef, streamFills, scoringFocus, strumSlotFeedback, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick, markAlphaTabPassStart, calibratedLatencyMs, getLatencyMs],
   );
 
   return (
     <NoteMatchingContext.Provider value={value}>
-      {children}
+      <NoteScoreContext.Provider value={score}>
+        <NoteMarksContext.Provider value={marks}>
+          {children}
+        </NoteMarksContext.Provider>
+      </NoteScoreContext.Provider>
     </NoteMatchingContext.Provider>
   );
 }
 
 // ── Consumer hook ─────────────────────────────────────────────────────────────
 
+/** Everything about the run that stays put while its notes are judged. */
 export function useNoteMatchingContext() {
   return useContext(NoteMatchingContext);
+}
+
+/** The notes' hit, miss and timing marks. Re-renders its reader with every note judged. */
+export function useNoteMarks() {
+  return useContext(NoteMarksContext);
+}
+
+/** Score, combo and accuracy. Re-renders its reader with every note judged. */
+export function useNoteScore() {
+  return useContext(NoteScoreContext);
 }

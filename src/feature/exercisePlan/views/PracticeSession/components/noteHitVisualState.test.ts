@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   applyHitNotes,
+  applyHitPatch,
   applyMissedNotes,
+  applyMissedPatch,
   createNoteHitVisualState,
   resetFrozenNoteState,
   resetNoteHitVisualState,
@@ -139,5 +141,41 @@ describe("noteHitVisualState", () => {
     // not wipe in-progress scoring.
     expect(state.hitNotes).toEqual({});
     expect(state.missedNotes).toEqual({ "0-1-0": true });
+  });
+
+  it("a hit patch adds and advances notes, stamps only the new ones and keeps the rest", () => {
+    const state = createNoteHitVisualState();
+    applyHitNotes(state, { "0-0-0": 1 }, 1000, 0);
+
+    applyHitPatch(state, { "0-0-0": 1.5, "0-1-0": 2 }, 1200);
+
+    expect(state.hitNotes).toEqual({ "0-0-0": 1.5, "0-1-0": 2 });
+    // The held note keeps the stamp of its hit; only the new note pops.
+    expect(state.hitTimestamps).toEqual({ "0-0-0": 1000, "0-1-0": 1200 });
+    expect(state.hitTimestampsCount).toBe(2);
+  });
+
+  it("a missed patch adds to the misses already there", () => {
+    const state = createNoteHitVisualState();
+    applyMissedNotes(state, { "0-0-0": true }, 0);
+    applyMissedPatch(state, { "0-1-0": true });
+    expect(state.missedNotes).toEqual({ "0-0-0": true, "0-1-0": true });
+  });
+
+  it("a patch never writes into the frozen tail of the pass before", () => {
+    // A pass sat out: no hits, so only its misses shrink at the wrap, and the
+    // freeze takes the live (empty) hit map as the finished pass's.
+    const state = createNoteHitVisualState();
+    applyMissedNotes(state, { "0-0-0": true, "0-1-0": true }, 0);
+    applyMissedNotes(state, {}, 0);
+    expect(state.hasFrozen).toBe(true);
+
+    applyHitPatch(state, { "0-0-0": true }, 2000);
+    applyMissedPatch(state, { "0-1-0": true });
+
+    expect(state.hitNotes).toEqual({ "0-0-0": true });
+    expect(state.frozenHitNotes).toEqual({});
+    expect(state.missedNotes).toEqual({ "0-1-0": true });
+    expect(state.frozenMissedNotes).toEqual({ "0-0-0": true, "0-1-0": true });
   });
 });

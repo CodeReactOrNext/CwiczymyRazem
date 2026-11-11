@@ -15,7 +15,7 @@ import React, {
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
-import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { useNoteMarks, useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import { useTabOverlay } from "../contexts/TabOverlayContext";
 import { useTabPlayUntilStore } from "../hooks/tabPlayUntilStore";
@@ -218,7 +218,8 @@ export const TablatureSection = memo(function TablatureSection({
 }: TablatureSectionProps) {
   const { t } = useTranslation("session");
   const { overlay: tabOverlay, gameMode } = useTabOverlay();
-  const { hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef, learn, markAlphaTabPassStart, calibratedLatencyMs, estimateLatencyMs } = useNoteMatchingContext();
+  const { livePitchRef, fillFeedRef, learn, markAlphaTabPassStart, calibratedLatencyMs, estimateLatencyMs } = useNoteMatchingContext();
+  const { hitNotes, missedNotes, noteTimings } = useNoteMarks();
   // The latency tab timing is judged with: the measured one, else the formula
   // estimate (only meaningful once the input is open).
   const timingLatencyLabel = calibratedLatencyMs !== null

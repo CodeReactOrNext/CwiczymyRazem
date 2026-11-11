@@ -2,12 +2,12 @@ import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 
-import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { useNoteScore } from "../contexts/NoteMatchingContext";
 import { getAccuracyDisplay } from "../hooks/noteMatchingFeedback";
 
 export function MobileMicGameHud() {
   const { t } = useTranslation("session");
-  const { gameState, maxPossibleScore, sessionAccuracy, sessionStats } = useNoteMatchingContext();
+  const { gameState, maxPossibleScore, sessionAccuracy, sessionStats } = useNoteScore();
   const accuracy = getAccuracyDisplay(sessionAccuracy, sessionStats);
 
   return (

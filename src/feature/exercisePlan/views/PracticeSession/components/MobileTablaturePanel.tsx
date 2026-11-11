@@ -13,7 +13,7 @@ import { createPortal } from "react-dom";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
-import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { useNoteMarks, useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useTabOverlay } from "../contexts/TabOverlayContext";
 import { useTabPlayUntilStore } from "../hooks/tabPlayUntilStore";
 import {
@@ -119,7 +119,8 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   onFullscreenChange,
 }: MobileTablaturePanelProps) {
   const { t } = useTranslation("session");
-  const { hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef } = useNoteMatchingContext();
+  const { livePitchRef, fillFeedRef } = useNoteMatchingContext();
+  const { hitNotes, missedNotes, noteTimings } = useNoteMarks();
   // The exercise's time ends the tab at the last bar it fits (tabPlayUntil.ts).
   const playUntilBeat = useTabPlayUntilStore(s => s.until?.beat ?? null);
   const { overlay: tabOverlay } = useTabOverlay();

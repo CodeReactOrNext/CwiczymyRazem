@@ -20,6 +20,13 @@ const nextConfig = {
     ],
   },
   turbopack: {},
+  experimental: {
+    // Turbopack's on-disk dev cache grew without bound (36 GB) and spent most of
+    // a dev session writing and compacting it — a minute or two at a time — which
+    // stalled everything else on the machine, the running app included. Off:
+    // a cold `next dev` start compiles from scratch, and nothing is written.
+    turbopackFileSystemCacheForDev: false,
+  },
   bundlePagesRouterDependencies: true,
   serverExternalPackages: ["@openai/agents"],
   // search_wiki in the MCP server reads the articles from disk at request time.

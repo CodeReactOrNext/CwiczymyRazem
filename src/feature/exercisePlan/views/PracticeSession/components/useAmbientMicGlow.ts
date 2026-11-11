@@ -23,6 +23,12 @@ export function useAmbientMicGlow(
     let smoothedVolume = 0;
     let currentHue = 150;
     let targetHue  = 150;
+    // What the element was last given. The glow is a large blended layer:
+    // every write to it is work for the compositor, so a value that would
+    // look the same as the one already there is not written again.
+    let shownOpacity = "";
+    let shownScale = "";
+    let shownHue = Number.NaN;
 
     const updateGlow = () => {
       smoothedVolume += ((volumeRef.current || 0) - smoothedVolume) * 0.15;
@@ -44,11 +50,16 @@ export function useAmbientMicGlow(
         currentHue = interpolateHue(currentHue, targetHue, 0.05);
         if (currentHue < 0) currentHue += 360;
 
-        if (intensity > 0.01 || ambientGlowRef.current.style.opacity !== "0") {
-          ambientGlowRef.current.style.opacity   = (intensity * 0.7).toFixed(3);
-          const scale = 1 + intensity * 0.1;
-          ambientGlowRef.current.style.transform = `scaleY(${scale.toFixed(3)}) translateZ(0)`;
-          ambientGlowRef.current.style.filter    = `hue-rotate(${currentHue - 120}deg)`;
+        // Steps too small to see: 1/100 of the opacity, 1/1000 of the height, 1°.
+        const opacity = intensity > 0.01 ? (intensity * 0.7).toFixed(2) : "0";
+        const scale = (1 + intensity * 0.1).toFixed(3);
+        const hue = Math.round(currentHue - 120);
+        const style = ambientGlowRef.current.style;
+        if (opacity !== shownOpacity) { style.opacity = opacity; shownOpacity = opacity; }
+        // Nothing to see while it is dark: its shape and colour can wait.
+        if (opacity !== "0") {
+          if (scale !== shownScale) { style.transform = `scaleY(${scale}) translateZ(0)`; shownScale = scale; }
+          if (hue !== shownHue) { style.filter = `hue-rotate(${hue}deg)`; shownHue = hue; }
         }
       }
       rafId = requestAnimationFrame(updateGlow);

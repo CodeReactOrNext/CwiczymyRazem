@@ -19,6 +19,7 @@ const {
 } = require("electron");
 const path = require("path");
 const audioBridge = require("./audioBridge");
+const captureDsp = require("./captureDspHost");
 const ampSim = require("./ampSim");
 const audioEngine = require("./audioEngineHost");
 const buildMenu = require("./menu");
@@ -300,6 +301,7 @@ function createWindow() {
     }
     offlineShown = false;
     stopKeepAwake();
+    captureDsp.stop();
     audioBridge.stop();
     ampSim.stop();
     mainWindow = null;
@@ -309,15 +311,29 @@ function createWindow() {
 // ── Native audio IPC ─────────────────────────────────────────────────────────
 ipcMain.handle("native-audio:list-devices", () => audioBridge.listDevices());
 
+/** Frames in the capture message that last arrived from the audio process. */
+let captureMessageFrames = 0;
+
+function sendToWindow(channel, ...args) {
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send(channel, ...args);
+}
+
 ipcMain.handle("native-audio:start", async (_e, opts) => {
   // macOS gates this; on Windows/Linux it resolves immediately. Must come
   // before the stream is opened — an unauthorized stream on macOS opens
   // "successfully" and delivers silence (see macPermissions.js).
   await requireMicrophoneAccess(mainWindow);
-  return audioBridge.start(opts || {}, (buf) => {
-    // Forward each captured block to the renderer, where useNativeAudioAnalyzer.ts
-    // does the actual windowing + aubio DSP (this main-process side is just a
-    // capture→IPC relay). Buffer is structured-cloned into a Uint8Array on the
+  const { dsp, ...streamOpts } = opts || {};
+  captureDsp.stop();
+  const info = await audioBridge.start(streamOpts, (buf) => {
+    captureMessageFrames = buf.length >> 2;
+    // The detectors run here when the renderer asked for it and this shell
+    // ships the ones it was built with (captureDspHost.js): the block stops in
+    // this process and the renderer gets the readings instead.
+    if (captureDsp.push(buf)) return;
+    // Otherwise forward each captured block to the renderer, where
+    // useNativeAudioAnalyzer.ts does the windowing + aubio DSP itself. Buffer
+    // is structured-cloned into a Uint8Array on the
     // other side. sentAt lets the renderer measure how long that hand-off
     // (IPC delivery + however busy the renderer's own event loop is right now)
     // actually took — main and renderer share the same OS clock, so Date.now()
@@ -326,13 +342,36 @@ ipcMain.handle("native-audio:start", async (_e, opts) => {
     // for hardware capture + the analysis window and silently under-counted
     // this hop, making detected notes read as later than the compensation
     // assumed — worse whenever the renderer is busy (3D note highway, React).
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send("native-audio:frame", buf, Date.now());
-    }
+    sendToWindow("native-audio:frame", buf, Date.now());
   });
+  if (!dsp || !info) return info;
+  const engaged = await captureDsp.start({
+    hash: dsp.hash,
+    sampleRate: info.sampleRate,
+    blockFrames: info.frameSize,
+    settings: dsp,
+    // sentAt, as for the blocks: the renderer measures the same hand-off from it.
+    onMessage: (readings) => sendToWindow("native-audio:dsp", { ...readings, messageFrames: captureMessageFrames }, Date.now()),
+    // The blocks go to the renderer again from here on; it is told to take over.
+    onLost: () => sendToWindow("native-audio:dsp", { type: "lost" }, Date.now()),
+  });
+  return engaged ? { ...info, dsp: true } : info;
+});
+
+// The renderer takes the detection back (its readings never arrived): the
+// blocks go to it again from the next one on.
+ipcMain.handle("native-audio:stop-dsp", () => {
+  captureDsp.stop();
+  return true;
+});
+
+ipcMain.handle("native-audio:configure-dsp", (_e, patch) => {
+  captureDsp.configure(patch);
+  return true;
 });
 
 ipcMain.handle("native-audio:stop", async () => {
+  captureDsp.stop();
   await audioBridge.stop();
   return true;
 });

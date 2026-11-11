@@ -2,7 +2,7 @@ import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 
-import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { useNoteScore } from "../contexts/NoteMatchingContext";
 import { getAccuracyDisplay } from "../hooks/noteMatchingFeedback";
 
 /** Mirrors the multiplier curve in useNoteMatching: min(8, floor(combo / 5) + 1). */
@@ -35,7 +35,7 @@ export const MicHud = ({
   variant?: "docked" | "full";
 }) => {
   const { t } = useTranslation("session");
-  const { gameState, sessionAccuracy, sessionStats } = useNoteMatchingContext();
+  const { gameState, sessionAccuracy, sessionStats } = useNoteScore();
   const { score, combo, multiplier } = gameState;
 
   const full = variant === "full";

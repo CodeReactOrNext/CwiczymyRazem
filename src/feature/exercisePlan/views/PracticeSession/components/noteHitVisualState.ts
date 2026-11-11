@@ -1,7 +1,8 @@
 // Bookkeeping for the tablature worker's per-note hit/miss overlay — pulled out
 // of TablatureViewer.worker.ts so it can be unit tested without a real Worker/
 // OffscreenCanvas. The worker owns one of these and mutates it as HIT_NOTES /
-// MISSED_NOTES / RESET messages arrive from the main thread.
+// MISSED_NOTES (whole maps), their _PATCH forms (only what changed — see
+// noteMarkPatch.ts) and RESET messages arrive from the main thread.
 export interface NoteHitVisualState {
   /** Live, growing-only within a pass — noteKey -> true (hit) or the beat the
    *  hold last confirmed (progressive green fill). */
@@ -76,6 +77,32 @@ export function applyHitNotes(
     }
   }
   state.hitNotes = newHits;
+}
+
+/** HIT_NOTES_PATCH message — the notes hit (or held further) since the last
+ *  message; every other note keeps what it has. A patch never takes a hit
+ *  away, so it never ends a pass: that always arrives as a whole HIT_NOTES. */
+export function applyHitPatch(
+  state: NoteHitVisualState,
+  patch: Record<string, boolean | number>,
+  now: number,
+): void {
+  // The frozen tail may be this very object (a pass frozen by its misses
+  // alone); it describes a pass that is over and must not pick up new hits.
+  if (state.hitNotes === state.frozenHitNotes) state.hitNotes = { ...state.hitNotes };
+  for (const key of Object.keys(patch)) {
+    if (patch[key] && !state.hitNotes[key]) {
+      if (!state.hitTimestamps[key]) state.hitTimestampsCount++;
+      state.hitTimestamps[key] = now;
+    }
+    state.hitNotes[key] = patch[key];
+  }
+}
+
+/** MISSED_NOTES_PATCH message — the notes missed since the last message. */
+export function applyMissedPatch(state: NoteHitVisualState, patch: Record<string, boolean>): void {
+  if (state.missedNotes === state.frozenMissedNotes) state.missedNotes = { ...state.missedNotes };
+  for (const key of Object.keys(patch)) state.missedNotes[key] = patch[key];
 }
 
 /** MISSED_NOTES message — same shrink-detect as hits, freezing the finishing

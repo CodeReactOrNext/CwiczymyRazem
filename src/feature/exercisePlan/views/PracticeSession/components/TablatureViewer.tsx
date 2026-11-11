@@ -269,7 +269,8 @@ const TablatureViewerInner = ({
             background: 'radial-gradient(circle at 50% 100%, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 50%, transparent 80%)',
             transformOrigin: 'bottom',
             zIndex: 1,
-            transition: 'opacity 50ms linear, transform 50ms linear',
+            // No CSS transition: the loop already eases the level frame by
+            // frame, and a transition restarted on every frame only added work.
           }}
         />
       )}

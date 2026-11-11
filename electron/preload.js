@@ -9,8 +9,10 @@ contextBridge.exposeInMainWorld("nativeAudio", {
   /** List input devices and the active audio API (ASIO / WASAPI / ...). */
   listDevices: () => ipcRenderer.invoke("native-audio:list-devices"),
 
-  /** Open a low-latency input stream. opts: { deviceId, channel?, sampleRate?, frameSize? }
-   *  Resolves with the negotiated stream info (incl. measured latencyMs). */
+  /** Open a low-latency input stream. opts: { deviceId, channel?, sampleRate?, frameSize?, dsp? }
+   *  Resolves with the negotiated stream info (incl. measured latencyMs).
+   *  dsp: { hash, gain, bass, strum } asks the shell to run the note detection
+   *  itself (see onDsp); the info then says `dsp: true` if it does. */
   start: (opts) => ipcRenderer.invoke("native-audio:start", opts),
 
   /** Stop and close the active stream. */
@@ -28,6 +30,24 @@ contextBridge.exposeInMainWorld("nativeAudio", {
     ipcRenderer.on("native-audio:frame", listener);
     return () => ipcRenderer.removeListener("native-audio:frame", listener);
   },
+
+  /** Subscribe to the note detection the shell runs itself — asked for with
+   *  start({ dsp }) and on when start() resolves with `dsp: true`. The callback
+   *  gets one message per analysis window (readings, the window's samples) or
+   *  { type: "lost" } when the shell's detectors stopped and the blocks come
+   *  through onFrame again; and the main process's Date.now() when it was sent.
+   *  Returns an unsubscribe fn. */
+  onDsp: (cb) => {
+    const listener = (_event, message, sentAt) => cb(message, sentAt);
+    ipcRenderer.on("native-audio:dsp", listener);
+    return () => ipcRenderer.removeListener("native-audio:dsp", listener);
+  },
+
+  /** Hands the detection back to the renderer: blocks come through onFrame again. */
+  stopDsp: () => ipcRenderer.invoke("native-audio:stop-dsp"),
+
+  /** Live settings of the shell's detection: { gain?, bass?, strum? }. */
+  configureDsp: (patch) => ipcRenderer.invoke("native-audio:configure-dsp", patch),
 
   /** Fires when the shared stream is lost (device disconnected, driver reset from
    *  its own control panel, system resume) and again as the engine retries/recovers

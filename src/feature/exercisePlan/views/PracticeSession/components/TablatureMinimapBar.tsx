@@ -97,6 +97,8 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
   const playheadLineRef = useRef<HTMLDivElement>(null);
   /** Last bar the playhead was in, so the strip only re-centres on a change. */
   const lastIdxRef = useRef(-1);
+  /** Where the playhead was last put, in CSS px — NaN before the first write. */
+  const lastPlayheadXRef = useRef(Number.NaN);
 
   const [draft, setDraft] = useState<MeasureRange | null>(null);
 
@@ -222,6 +224,7 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
     }
     if (!show) {
       lastIdxRef.current = -1;
+      lastPlayheadXRef.current = Number.NaN;
       return;
     }
 
@@ -231,12 +234,19 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
     const frac = m
       ? Math.max(0, Math.min(1, (beat - m.startBeat) / (m.endBeat - m.startBeat)))
       : 0;
-    const playheadX = PAD + idx * UNIT + frac * CELL;
+    // On the screen's pixel grid: the playhead crosses a cell over a whole bar,
+    // far less than a pixel a frame, and a write that moves it nowhere still
+    // costs the page a style pass and a repaint — 165 of them a second.
+    const pixel = 1 / (window.devicePixelRatio || 1);
+    const playheadX = Math.round((PAD + idx * UNIT + frac * CELL) / pixel) * pixel;
 
-    // A transform rather than `left`: the playhead then moves without dirtying
-    // the strip's layout on every frame of every bar.
-    tip.style.transform  = `translate3d(${playheadX}px, 0, 0) translateX(-50%)`;
-    line.style.transform = `translate3d(${playheadX}px, 0, 0) translateX(-50%)`;
+    if (playheadX !== lastPlayheadXRef.current) {
+      lastPlayheadXRef.current = playheadX;
+      // A transform rather than `left`: the playhead then moves without dirtying
+      // the strip's layout.
+      tip.style.transform  = `translate3d(${playheadX}px, 0, 0) translateX(-50%)`;
+      line.style.transform = `translate3d(${playheadX}px, 0, 0) translateX(-50%)`;
+    }
 
     if (idx === lastIdxRef.current) return;
     lastIdxRef.current = idx;
@@ -267,6 +277,7 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
   // Seeks, resets and pauses move the playhead with no loop running.
   useEffect(() => {
     lastIdxRef.current = -1;
+    lastPlayheadXRef.current = Number.NaN;
     paint();
   }, [beatVersion, paint]);
 
