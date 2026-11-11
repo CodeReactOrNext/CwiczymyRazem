@@ -3,9 +3,9 @@
   "close": "Schließen",
   "back": "Zurück",
   "setup": {
-    "title_native": "Audio-Einrichtung",
-    "title_interface": "Audio-Interface einrichten",
-    "title_mic": "Mikrofon einrichten",
+    "title_native": "Eingang einrichten",
+    "title_interface": "Eingang einrichten",
+    "title_mic": "Eingang einrichten",
     "connecting": "Verbinde…",
     "start_listening": "Zuhören starten",
     "grant": "Mikrofonzugriff erlauben",
@@ -20,10 +20,10 @@
     "refresh": "Aktualisieren",
     "no_inputs": "Keine Eingabegeräte gefunden",
     "channel": "Eingang {{n}}",
-    "output": "Ausgang",
+    "output": "Ausgang für App-Sound",
     "no_outputs": "Keine Ausgabegeräte gefunden",
     "output_hint_asio4all": "ASIO4ALL belegt dein ganzes Interface, inklusive Ausgänge, deshalb kann das Metronom darüber nicht spielen. Wähle hier einen anderen Ausgang (z. B. die Lautsprecher deines Computers) oder schalte im ASIO4ALL-Panel den Ausgang des Interfaces ab und lass nur den Eingang aktiv.",
-    "before_start_body": "Wähl dein Interface als Mikrofon des Browsers (Mikrofon-Symbol in der Adressleiste).",
+    "before_start_body": "Wähl den Eingang, an dem deine Gitarre hängt, und spiel etwas.",
     "level": {
       "silent": "Kein Signal. Spiel etwas",
       "good": "Deine Gitarre ist zu hören",
@@ -39,7 +39,21 @@
     "guitar_input": "Gitarren-Eingang",
     "next": "Weiter",
     "waiting_signal": "Spiel etwas, um weiterzugehen",
-    "ready": "Deine Gitarre ist zu hören. Du kannst weiter."
+    "ready": "Deine Gitarre ist zu hören. Du kannst weiter.",
+    "input_device": "Eingabegerät",
+    "channel_auto": "Auto (Eingang {{n}})",
+    "help": {
+      "title": "Immer noch kein Signal? Prüf das",
+      "device": "Der Eingang oben sollte dein Interface sein, nicht eine Webcam oder das Laptop-Mikrofon.",
+      "device_mic": "Der Eingang oben sollte das Mikrofon sein, das du benutzen willst.",
+      "jack": "Der Gitarren-Eingang muss zu der Buchse passen, in der deine Gitarre steckt.",
+      "gain": "Dreh den Gain-Regler dieses Eingangs am Interface auf.",
+      "inst": "Hat das Interface einen INST- oder Hi-Z-Schalter, schalte ihn ein.",
+      "guitar": "Dreh den Lautstärkeregler der Gitarre auf und prüf das Kabel.",
+      "other_app": "Schließ andere Programme, die das Interface benutzen, zum Beispiel eine DAW.",
+      "closer": "Rück mit der Gitarre näher ans Mikrofon.",
+      "muted": "Prüf, ob das Mikrofon in den Soundeinstellungen deines Systems stummgeschaltet ist."
+    }
   },
   "output_stall": {
     "title": "Das Metronom kann nicht spielen",
@@ -95,7 +109,7 @@
   },
   "summary": {
     "title": "Fertig",
-    "ready": "Dein Mikrofon ist an",
+    "ready": "Tonerkennung ist an",
     "body": "Die App hört deine Gitarre und bewertet dein Spiel.",
     "tuning": "Stimmen",
     "tuning_count": "{{tuned}} von {{total}} Saiten",
@@ -115,8 +129,28 @@
     "skip": "Vorerst überspringen"
   },
   "error": {
-    "title": "Mikrofon blockiert",
-    "body": "Erlaube den Mikrofonzugriff in deinen Browser-Einstellungen und versuch es dann noch einmal.",
+    "reasons": {
+      "denied": {
+        "title": "Mikrofon blockiert",
+        "body": "Erlaube dieser Website den Mikrofonzugriff (Symbol am linken Ende der Adressleiste) und versuch es noch einmal."
+      },
+      "no_device": {
+        "title": "Kein Audioeingang gefunden",
+        "body": "Schließ dein Interface oder Mikrofon an und versuch es noch einmal."
+      },
+      "busy": {
+        "title": "Der Eingang ist belegt",
+        "body": "Ein anderes Programm hält deinen Audioeingang. Schließ deine DAW und andere Audio-Apps und versuch es noch einmal."
+      },
+      "unsupported": {
+        "title": "Dieser Browser kann kein Mikrofon nutzen",
+        "body": "Öffne riff.quest in einer aktuellen Version von Chrome, Edge, Firefox oder Safari."
+      },
+      "unknown": {
+        "title": "Der Audioeingang ließ sich nicht öffnen",
+        "body": "Schließ dein Interface oder Mikrofon neu an und versuch es noch einmal."
+      }
+    },
     "retry": "Erneut versuchen",
     "cancel": "Abbrechen"
   },
@@ -128,11 +162,11 @@
     "recalibrate": "Neu kalibrieren"
   },
   "mic_mode": {
-    "required": "Mikrofon erforderlich",
-    "tracking": "Mikrofon-Tracking",
-    "exam_body": "Dieses Modul erfordert ein eingerichtetes Mikrofon. Aktiviere dein Mikrofon, damit das System dein Spiel in der Prüfung bewerten kann.",
-    "body": "Dieser Plan enthält Tab-Übungen. Aktiviere dein Mikrofon, damit das System deiner Gitarre zuhört und dein Spiel in Echtzeit bewertet.",
-    "enable": "Mikrofon aktivieren",
+    "required": "Tonerkennung erforderlich",
+    "tracking": "Tonerkennung",
+    "exam_body": "Diese Prüfung wird nach Gehör bewertet. Richte deinen Eingang ein, damit die App dich spielen hört.",
+    "body": "Dieser Plan enthält Tab-Übungen. Richte deinen Eingang ein, damit die App deine Gitarre hört und dein Spiel in Echtzeit bewertet.",
+    "enable": "Eingang einrichten",
     "skip": "Überspringen"
   },
   "timing_step": {

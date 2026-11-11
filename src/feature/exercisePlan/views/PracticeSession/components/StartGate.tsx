@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { BackingLeakNotice, useBackingLeakNotice } from "feature/autoBacking/components/BackingLeakNotice";
 import { useTranslation } from "hooks/useTranslation";
 import { Eye, Play } from "lucide-react";
 import { memo, useCallback, useState } from "react";
@@ -22,6 +23,8 @@ interface StartGateProps {
   onPreview: () => void;
   /** The exercise runs to a metronome, which counts the player in first. */
   countsIn: boolean;
+  /** The mic is on for this exercise — what the backing-into-the-mic note depends on. */
+  micOn?: boolean;
   className?: string;
 }
 
@@ -34,14 +37,16 @@ export const StartGate = memo(function StartGate({
   onStart,
   onPreview,
   countsIn,
+  micOn = false,
   className,
 }: StartGateProps) {
   const { t } = useTranslation("session");
+  const showLeakNotice = useBackingLeakNotice(micOn);
 
   return (
     <div
       className={cn(
-        "absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-zinc-950/85 p-4 text-center",
+        "absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 overflow-y-auto bg-zinc-950/85 p-4 text-center",
         className,
       )}>
       <div className='flex flex-wrap items-center justify-center gap-3'>
@@ -57,6 +62,8 @@ export const StartGate = memo(function StartGate({
       <p className='max-w-xs text-sm leading-relaxed text-zinc-400'>
         {countsIn ? t("start_gate.hint_count_in") : t("start_gate.hint")}
       </p>
+      {/* Said here, before the clock runs, rather than over the tab mid-play. */}
+      {showLeakNotice && <BackingLeakNotice />}
     </div>
   );
 });

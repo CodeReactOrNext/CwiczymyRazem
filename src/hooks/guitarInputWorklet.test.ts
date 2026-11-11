@@ -2,19 +2,34 @@ import { getCentsDistance } from "utils/audio/noteUtils";
 import { describe, expect, it } from "vitest";
 
 import { createGuitarDetectors } from "./guitarBufferProcessor";
-import { ANALYSIS_SAMPLE_RATE, getDecimationFactor, GUITAR_INPUT_WORKLET_CODE } from "./guitarInputWorklet";
+import {
+  ANALYSIS_SAMPLE_RATE,
+  getDecimationFactor,
+  GUITAR_INPUT_WORKLET_CODE,
+  type GuitarInputChannelsMessage,
+  type GuitarInputSamplesMessage,
+} from "./guitarInputWorklet";
 
 interface WorkletProcessor {
+  port: { onmessage: ((event: { data: unknown }) => void) | null };
   process(inputs: Float32Array[][]): boolean;
 }
 type WorkletProcessorClass = new (options?: { processorOptions?: { decimation?: number } }) => WorkletProcessor;
 
 /** Evaluates the worklet source the way AudioWorkletGlobalScope would, with a
- *  stub base class whose port collects every posted window. */
+ *  stub base class whose port collects every posted window — and, apart from
+ *  them, the reports of which channel is being read. */
 function loadWorklet() {
   const posted: Float32Array[] = [];
+  const channelReports: GuitarInputChannelsMessage[] = [];
   class AudioWorkletProcessorStub {
-    port = { postMessage: (buf: Float32Array) => posted.push(buf) };
+    port = {
+      onmessage: null,
+      postMessage: (data: GuitarInputSamplesMessage | GuitarInputChannelsMessage) => {
+        if (data.type === "samples") posted.push(data.samples);
+        else channelReports.push(data);
+      },
+    };
   }
   let Processor: WorkletProcessorClass | null = null;
   new Function("AudioWorkletProcessor", "registerProcessor", GUITAR_INPUT_WORKLET_CODE)(
@@ -22,7 +37,23 @@ function loadWorklet() {
     (_name: string, cls: WorkletProcessorClass) => { Processor = cls; },
   );
   if (!Processor) throw new Error("worklet did not register a processor");
-  return { Processor: Processor as WorkletProcessorClass, posted };
+  return { Processor: Processor as WorkletProcessorClass, posted, channelReports };
+}
+
+const WINDOW_QUANTA = 2048 / 128;
+
+/** A processor fed constant levels, one per input channel (jack). */
+function loadChannelWorklet() {
+  const { Processor, posted, channelReports } = loadWorklet();
+  const node = new Processor({ processorOptions: { decimation: 1 } });
+  const feed = (levels: number[], quanta: number) => {
+    for (let i = 0; i < quanta; i++) node.process([levels.map((level) => new Float32Array(128).fill(level))]);
+  };
+  const pin = (channel: number) => node.port.onmessage?.({ data: { channel } });
+  /** The level of the newest posted window's last sample. */
+  const heard = () => posted[posted.length - 1]?.[2047];
+  const report = () => channelReports[channelReports.length - 1];
+  return { feed, pin, heard, report };
 }
 
 /** Feeds `signal` to the worklet in 128-sample render quanta, like the browser. */
@@ -114,5 +145,61 @@ describe("guitar input worklet", () => {
 
     expect(Math.abs(getCentsDistance(correct, LOW_E))).toBeLessThan(25);
     expect(getCentsDistance(mislabelled, LOW_E)).toBeGreaterThan(120);
+  });
+});
+
+// One channel per jack: a guitar in input 2 (a Scarlett Solo's instrument jack)
+// used to be read as silence, because only channel 0 was.
+describe("guitar input worklet channel choice", () => {
+  it("follows the guitar when it is plugged into the second input", () => {
+    const { feed, heard, report } = loadChannelWorklet();
+    feed([0, 0.2], WINDOW_QUANTA * 4);
+    expect(heard()).toBeCloseTo(0.2);
+    expect(report()).toEqual({ type: "channels", count: 2, active: 1 });
+  });
+
+  it("stays on the first input while the other one only carries noise", () => {
+    const { feed, heard, report } = loadChannelWorklet();
+    feed([0.2, 0.0001], WINDOW_QUANTA * 4);
+    expect(heard()).toBeCloseTo(0.2);
+    expect(report()).toEqual({ type: "channels", count: 2, active: 0 });
+  });
+
+  it("does not leave a silent first input for the other one's noise floor", () => {
+    const { feed, report } = loadChannelWorklet();
+    feed([0, 0.0001], WINDOW_QUANTA * 4);
+    expect(report().active).toBe(0);
+  });
+
+  it("does not trade places between two inputs of similar level", () => {
+    const { feed, report } = loadChannelWorklet();
+    feed([0.2, 0.25], WINDOW_QUANTA * 4);
+    expect(report().active).toBe(0);
+  });
+
+  it("reads a pinned channel whatever the levels are, until it is released", () => {
+    const { feed, pin, heard, report } = loadChannelWorklet();
+    pin(0);
+    feed([0.01, 0.5], WINDOW_QUANTA * 2);
+    expect(heard()).toBeCloseTo(0.01);
+    expect(report().active).toBe(0);
+
+    pin(-1);
+    feed([0.01, 0.5], WINDOW_QUANTA * 2);
+    expect(heard()).toBeCloseTo(0.5);
+    expect(report().active).toBe(1);
+  });
+
+  it("falls back to the last channel when the pinned one is past the end", () => {
+    const { feed, pin, report } = loadChannelWorklet();
+    pin(3);
+    feed([0.1, 0.1], 4);
+    expect(report()).toEqual({ type: "channels", count: 2, active: 1 });
+  });
+
+  it("reports a mono input as one channel", () => {
+    const { feed, report } = loadChannelWorklet();
+    feed([0.1], 4);
+    expect(report()).toEqual({ type: "channels", count: 1, active: 0 });
   });
 });

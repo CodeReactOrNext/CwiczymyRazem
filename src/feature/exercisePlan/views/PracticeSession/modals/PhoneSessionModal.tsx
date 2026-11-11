@@ -264,7 +264,7 @@ export function PhoneSessionModal({
           // Sized off the exercise area, not the viewport: on a turned screen the viewport is
           // the upright phone, and 60vw of its narrow width left the drawer a sliver.
           className={cn(
-            "absolute z-10 flex flex-col overflow-y-auto overscroll-contain scrollbar-hide bg-zinc-950/90 shadow-2xl shadow-black/50 backdrop-blur-xl",
+            "absolute z-10 flex flex-col overflow-y-auto overscroll-contain scrollbar-hide bg-zinc-950 shadow-2xl shadow-black/50",
             isSideways
               ? "bottom-0 right-0 top-0 w-[min(320px,60%)]"
               : "inset-x-0 bottom-0 max-h-[75%] rounded-t-2xl",
@@ -476,6 +476,7 @@ export function PhoneSessionModal({
                       onStart={handleToggleTimer}
                       onPreview={startGate.dismiss}
                       countsIn={!!currentExercise.metronomeSpeed}
+                      micOn={isMicEnabled}
                     />
                   )}
 
@@ -487,7 +488,7 @@ export function PhoneSessionModal({
                       !fullscreenControlsVisible && "pointer-events-none opacity-0",
                     )}
                     style={isTurned ? undefined : { right: "calc(0.75rem + env(safe-area-inset-right, 0px))" }}>
-                      <div className="flex items-center gap-1.5 rounded-lg bg-zinc-950/80 p-1.5 backdrop-blur-xl">
+                      <div className="flex items-center gap-1.5 rounded-lg bg-zinc-950/90 p-1.5">
                         <span className={cn(
                           "px-2 font-mono text-sm font-black tabular-nums leading-none",
                           isPlaying ? "text-white" : "text-zinc-500",
@@ -508,7 +509,7 @@ export function PhoneSessionModal({
                         </Button>
                       </div>
                       {showInstallHint && (
-                        <p className="rounded-lg bg-zinc-950/80 px-3 py-2 text-xs leading-relaxed text-zinc-300 backdrop-blur-xl">
+                        <p className="rounded-lg bg-zinc-950/90 px-3 py-2 text-xs leading-relaxed text-zinc-300">
                           {t("tab.fullscreen_install_hint")}
                         </p>
                       )}
@@ -523,7 +524,7 @@ export function PhoneSessionModal({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute inset-0 z-30 overflow-y-auto overscroll-contain bg-zinc-950/95 backdrop-blur-xl"
+                        className="absolute inset-0 z-30 overflow-y-auto overscroll-contain bg-zinc-950"
                       >
                         <div className="mx-auto max-w-xl space-y-6 p-5">
                           <div className="flex items-start gap-3">
@@ -549,7 +550,7 @@ export function PhoneSessionModal({
                 {/* Always-visible controls strip — down the right edge sideways, along the bottom
                     upright */}
                 <div className={cn(
-                  "relative z-20 shrink-0 bg-zinc-950/80 backdrop-blur-xl",
+                  "relative z-20 shrink-0 bg-zinc-950",
                   isSideways ? "w-16" : "pb-safe",
                   isFullscreen && "hidden",
                 )}>

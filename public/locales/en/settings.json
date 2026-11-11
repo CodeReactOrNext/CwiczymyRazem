@@ -194,5 +194,15 @@
     "error": "Something went wrong. Try again.",
     "unverified_name": "The app chose this name itself; riff.quest can't confirm it. Check the address it sends you back to.",
     "back_to": "Back to {{host}}"
+  },
+  "audio_input": {
+    "title": "Guitar input",
+    "subtitle": "What the app listens to when it scores your playing. Saved on this device.",
+    "check_label": "Check your input",
+    "check_description": "Pick your interface or microphone and see if the app hears the guitar.",
+    "start": "Check input",
+    "starting": "Connecting…",
+    "stop": "Stop",
+    "heard": "The app hears your guitar."
   }
 }

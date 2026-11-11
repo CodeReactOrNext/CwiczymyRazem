@@ -57,7 +57,7 @@ interface NativeAnalyzerState {
   connectionStatus: ConnectionIssueInfo["status"] | "ok";
 }
 
-export const useNativeAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions = {}) => {
+export const useNativeAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInputOptions = {}) => {
   const [state, setState] = useState<NativeAnalyzerState>({
     isListening: false,
     error: null,
@@ -94,7 +94,8 @@ export const useNativeAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions
   const inputTapRef = useRef<InputTap | null>(null);
   const inputPeakRef = useRef<number>(0);
   const bassRef = useRef(bass);
-  useEffect(() => { bassRef.current = bass; }, [bass]);
+  const strumRef = useRef(strum);
+  useEffect(() => { bassRef.current = bass; strumRef.current = strum; }, [bass, strum]);
 
   // Accumulator: native blocks (e.g. 256 frames) → 2048-sample analysis windows
   const windowBufRef = useRef<Float32Array>(new Float32Array(WINDOW_SIZE));
@@ -278,6 +279,7 @@ export const useNativeAudioAnalyzer = ({ bass = false }: GuitarAudioInputOptions
         spectrum,
         recentAudio,
         isBass: () => bassRef.current,
+        isStrumWanted: () => strumRef.current,
         targets: {
           frequencyRef, volumeRef, rawVolumeRef, noiseFloorRef, confidenceRef,
           lastOnsetTimeRef, lastTickTimeRef, noteEventsRef, lastAttackMsRef, lastLowAttackMsRef, lastSoftAttackMsRef, inputTapRef, inputPeakRef,

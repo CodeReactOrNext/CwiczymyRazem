@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
-import type { AudioRefs } from "hooks/useAudioAnalyzer";
-import { useCallback, useMemo, useState } from "react";
+import type { AudioInitFailure, AudioInitResult, AudioRefs, WebAudioInput } from "hooks/useAudioAnalyzer";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useGuitarTuningContext } from "../../contexts/GuitarTuningContext";
@@ -14,13 +14,16 @@ import { type SetupSummary, SummaryStep } from "./components/SummaryStep";
 import { SustainStep, type SustainTarget } from "./components/SustainStep";
 import { TimingStep } from "./components/TimingStep";
 import { TuningStep } from "./components/TuningStep";
+import { loadInputSource, saveInputSource } from "./inputSource";
+import { trackSetup } from "./setupAnalytics";
 
 interface CalibrationWizardProps {
   isOpen:            boolean;
   /** Setup finished — the mic goes on. */
   onComplete:        () => void;
   onCancel:          () => void;
-  audioInit:         () => Promise<void>;
+  /** Opens the input. The browser path says why when it can't; the desktop one reports on its own. */
+  audioInit:         () => Promise<AudioInitResult | void>;
   audioRefs:         AudioRefs;
   isListening:       boolean;
   inputGain:         number;
@@ -28,6 +31,8 @@ interface CalibrationWizardProps {
   isNative:          boolean;
   onSelectDevice?:   (deviceId: number) => Promise<void>;
   onSelectChannel?:  (channel: number) => Promise<void>;
+  /** The browser path's device and jack picker; undefined in the desktop app. */
+  webInput?:         WebAudioInput;
   /** The session metronome's context, so the timing clicks take the session's output path. */
   timingAudioContext: AudioContext | null;
   /** Formula latency, used until the player measures theirs. */
@@ -47,15 +52,18 @@ const SLIDE = {
 
 const WizardBody = ({
   onComplete, onCancel, audioInit, audioRefs, isListening, inputGain, onInputGainChange,
-  isNative, onSelectDevice, onSelectChannel, timingAudioContext, estimateLatencyMs, onBeforeTimingRun,
+  isNative, onSelectDevice, onSelectChannel, webInput, timingAudioContext, estimateLatencyMs, onBeforeTimingRun,
 }: CalibrationWizardProps) => {
   // Native (Electron) capture has no "interface vs. microphone" distinction
   // (it's one device list) and no browser permission prompt — it starts at
   // device selection instead of the web-only source/permission steps.
-  const [step,        setStep]        = useState<Step>(isNative ? "setup" : "source");
-  const [inputSource, setInputSource] = useState<InputSource>("interface");
+  // With the input already open the setup is being reopened to change
+  // something — the device, most often — so it starts on the device list
+  // rather than asking "interface or microphone?" again. Back still leads there.
+  const [step,        setStep]        = useState<Step>(isNative || isListening ? "setup" : "source");
+  const [inputSource, setInputSource] = useState<InputSource>(loadInputSource);
   const [isGranting,  setIsGranting]  = useState(false);
-  const [micError,    setMicError]    = useState(false);
+  const [micError,    setMicError]    = useState<AudioInitFailure | null>(null);
   const [summary,     setSummary]     = useState<SetupSummary | null>(null);
   const [tunedCount,  setTunedCount]  = useState<number | null>(null);
 
@@ -64,15 +72,48 @@ const WizardBody = ({
   const sustainTarget = useMemo<SustainTarget>(() => sustainTestTarget(strings), [strings]);
   const savedLatencyMs = useCalibratedLatencyMs(isNative);
 
+  const sourceKind = isNative ? "native" : inputSource;
+  useEffect(() => {
+    trackSetup("mic_setup_step_viewed", { step, input_source: sourceKind, is_native: isNative });
+    // The source is picked on the first step — its change alone is not a new step.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  // An input that would not open. In the desktop app the device picker stays
+  // up instead: it is where another interface gets chosen, and the failure is
+  // already reported by the native path.
+  const reportInputError = useCallback((reason: AudioInitFailure) => {
+    trackSetup("mic_setup_error", { reason, step, input_source: sourceKind, is_native: isNative });
+    if (!isNative) setMicError(reason);
+  }, [step, sourceKind, isNative]);
+
   const handleGrant = useCallback(async () => {
     setIsGranting(true);
     try {
-      await audioInit();
-      setStep("setup");
+      // init() resolves with the reason instead of throwing, so the old catch
+      // here never ran and a refused mic led straight back to "Grant access".
+      const result = await audioInit();
+      if (result && !result.ok) reportInputError(result.reason);
+      else setStep("setup");
     }
-    catch { setMicError(true); }
+    catch { reportInputError("unknown"); }
     finally { setIsGranting(false); }
-  }, [audioInit]);
+  }, [audioInit, reportInputError]);
+
+  const handleCancel = useCallback(() => {
+    trackSetup("mic_setup_cancelled", { step, input_source: sourceKind, is_native: isNative, error: micError });
+    onCancel();
+  }, [step, sourceKind, isNative, micError, onCancel]);
+
+  const handleComplete = useCallback(() => {
+    trackSetup("mic_setup_completed", {
+      input_source: sourceKind,
+      is_native: isNative,
+      tuned_count: summary?.tunedCount ?? null,
+      latency_measured: summary?.latencyMeasured ?? false,
+    });
+    onComplete();
+  }, [sourceKind, isNative, summary, onComplete]);
 
   const showSummary = useCallback((count: number | null, measuredMs: number | null) => {
     const latencyMs = measuredMs ?? savedLatencyMs;
@@ -108,7 +149,7 @@ const WizardBody = ({
           paddingRight: "env(safe-area-inset-right, 0px)",
         }}>
         {micError ? (
-          <MicErrorScreen onRetry={() => { setMicError(false); void handleGrant(); }} onCancel={onCancel} />
+          <MicErrorScreen reason={micError} onRetry={() => { setMicError(null); void handleGrant(); }} onCancel={handleCancel} />
         ) : (
           <AnimatePresence mode="wait">
             {step === "source" && (
@@ -116,9 +157,10 @@ const WizardBody = ({
                 <SourceStep
                   onSelect={(source) => {
                     setInputSource(source);
+                    saveInputSource(source);
                     setStep(isListening ? "setup" : "permission");
                   }}
-                  onCancel={onCancel}
+                  onCancel={handleCancel}
                 />
               </motion.div>
             )}
@@ -128,7 +170,7 @@ const WizardBody = ({
                   isLoading={isGranting}
                   onGrant={handleGrant}
                   onBack={() => setStep("source")}
-                  onCancel={onCancel}
+                  onCancel={handleCancel}
                 />
               </motion.div>
             )}
@@ -139,10 +181,11 @@ const WizardBody = ({
                   inputSource={inputSource}
                   audioRefs={audioRefs} inputGain={inputGain}
                   isNative={isNative} onSelectDevice={onSelectDevice} onSelectChannel={onSelectChannel}
+                  webInput={webInput} onInputError={reportInputError}
                   onGrant={handleGrant}
                   onNext={() => setStep("sustain")}
-                  onBack={() => (isNative ? onCancel() : setStep(isListening ? "source" : "permission"))}
-                  onCancel={onCancel}
+                  onBack={() => (isNative ? handleCancel() : setStep(isListening ? "source" : "permission"))}
+                  onCancel={handleCancel}
                 />
               </motion.div>
             )}
@@ -157,7 +200,7 @@ const WizardBody = ({
                   onInputGainChange={onInputGainChange}
                   onNext={() => setStep("tuning")}
                   onBack={() => setStep("setup")}
-                  onCancel={onCancel}
+                  onCancel={handleCancel}
                 />
               </motion.div>
             )}
@@ -169,7 +212,7 @@ const WizardBody = ({
                   strings={strings}
                   onFinish={afterTuning}
                   onAlreadyTuned={() => afterTuning(null)}
-                  onCancel={onCancel}
+                  onCancel={handleCancel}
                 />
               </motion.div>
             )}
@@ -185,13 +228,13 @@ const WizardBody = ({
                   onEnableMic={() => void handleGrant()}
                   onDone={(ms) => showSummary(tunedCount, ms)}
                   onSkip={() => showSummary(tunedCount, null)}
-                  onCancel={onCancel}
+                  onCancel={handleCancel}
                 />
               </motion.div>
             )}
             {step === "summary" && summary && (
               <motion.div key="summary" {...SLIDE} className="flex flex-1 flex-col" exit={{ opacity: 0 }}>
-                <SummaryStep summary={summary} onConfirm={onComplete} />
+                <SummaryStep summary={summary} onConfirm={handleComplete} />
               </motion.div>
             )}
           </AnimatePresence>

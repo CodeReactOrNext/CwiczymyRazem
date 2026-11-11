@@ -27,6 +27,9 @@ export const useGuitarAudioInput = (options: GuitarAudioInputOptions = {}) => {
 
   const isNative = typeof window !== "undefined" && !!window.nativeAudio;
   return isNative
-    ? { ...native, isNative }
+    // webInput is the browser path's own device/jack picker (device ids there
+    // are strings, and the jack can follow the signal) — the native one stays
+    // on selectDevice/selectChannel.
+    ? { ...native, isNative, webInput: undefined }
     : { ...web, isNative, selectDevice: undefined, selectChannel: undefined, connectionStatus: "ok" as const };
 };

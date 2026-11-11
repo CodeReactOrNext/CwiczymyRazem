@@ -12,6 +12,7 @@ import {
 } from "components/PageTabs/tabNav";
 import { useRailEdges } from "components/PageTabs/useRailEdges";
 import { AppearanceSettings } from "feature/settings/components/AppearanceSettings";
+import { AudioInputSettings } from "feature/settings/components/AudioInputSettings";
 import EmailChange from "feature/settings/components/EmailChange";
 import EmailNotificationSettings from "feature/settings/components/EmailNotificationSettings";
 import { GuitarStartDate } from "feature/settings/components/GuitarStartDate";
@@ -101,6 +102,7 @@ const SettingsView = () => {
               <AppearanceSettings />
               <StreakSettings />
               <SoundSettings />
+              <AudioInputSettings />
             </TabsContent>
 
             <TabsContent value="socials" className="mt-0">

@@ -10,7 +10,7 @@ import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import { TunerDialog } from "feature/tuner/components/TunerDialog";
 import { TuningForkIcon } from "feature/tuner/components/TuningForkIcon";
 import { useTranslation } from "hooks/useTranslation";
-import { Bug, ChevronDown, Lock, Mic, RefreshCw } from "lucide-react";
+import { Bug, ChevronDown, Lock, Mic, SlidersHorizontal } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -299,7 +299,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 onClick={onRecalibrate}
                 title={t("media.recalibrate")}
                 className={cn(PRESSABLE_KEY, gridBtn, "bg-zinc-800 text-zinc-400")}>
-                <RefreshCw size='1em' className='h-3.5 w-3.5 shrink-0' />
+                <SlidersHorizontal size='1em' className='h-3.5 w-3.5 shrink-0' />
                 <span className='truncate text-[10px] font-semibold tracking-wide'>
                   {t("media.recalibrate")}
                 </span>
@@ -446,7 +446,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   onClick={onRecalibrate}
                   title={t("media.recalibrate")}
                   className={cn(PRESSABLE_KEY, "flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 transition-colors hover:text-white")}>
-                  <RefreshCw size='1em' className='h-3 w-3' />
+                  <SlidersHorizontal size='1em' className='h-3 w-3' />
                 </button>
               )}
 
@@ -639,11 +639,12 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               // Clear the session's full-screen layer (z-[999999] desktop / z-[9999999] mobile) —
               // otherwise the default z-50 paints underneath it.
               className='z-[99999999] w-56 rounded-lg border-white/10 bg-zinc-900/95 p-1.5 text-white backdrop-blur-md'>
+              {/* Open with the mic off too: this is where a wrong device gets
+                  fixed, which is often why the mic is off in the first place. */}
               <DropdownMenuItem
-                disabled={!isMicEnabled}
                 onSelect={onRecalibrate}
                 className='flex cursor-pointer items-center gap-3 rounded px-2 py-2 text-xs font-semibold text-zinc-200 focus:bg-zinc-800 focus:text-white'>
-                <RefreshCw size='1em' className='h-3.5 w-3.5 shrink-0 text-zinc-400' />
+                <SlidersHorizontal size='1em' className='h-3.5 w-3.5 shrink-0 text-zinc-400' />
                 {t("media.recalibrate")}
               </DropdownMenuItem>
               {hasTuner && (

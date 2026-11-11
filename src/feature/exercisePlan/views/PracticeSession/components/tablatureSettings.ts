@@ -314,6 +314,10 @@ export interface TablatureSettings {
    *  played. Visual only — timing still scores either way. */
   timingHints: boolean;
   ambientGlow: boolean;
+  /** The same glow on the phone layout, off unless asked for: a screen-wide
+   *  blended layer restyled every frame costs a phone's GPU far more than it
+   *  costs a desktop's. */
+  ambientGlowPhone: boolean;
   // ── Notation ──
   /** Renders the standard-notation (sheet music) viewer on a black board instead of white paper. */
   notationDarkMode: boolean;
@@ -347,6 +351,7 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   hitAnimations: true,
   timingHints: true,
   ambientGlow: true,
+  ambientGlowPhone: false,
   notationDarkMode: false,
   notationZoom: 1,
   notationSpacing: 1,

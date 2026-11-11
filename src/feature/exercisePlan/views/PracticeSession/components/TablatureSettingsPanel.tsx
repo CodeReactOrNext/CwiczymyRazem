@@ -6,6 +6,7 @@ import {
 } from "feature/exercisePlan/components/Metronome/utils/clickTones";
 import { previewMetronomeSound } from "feature/exercisePlan/components/Metronome/utils/previewMetronomeSound";
 import { useHandednessStore, useIsLeftHanded } from "hooks/useHandedness";
+import { useMediaQuery } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -252,6 +253,10 @@ export function TablatureSettingsPanel() {
   const { t } = useTranslation(["tab_settings", "metronome"]);
   const settings = useTablatureSettings();
   const { set, reset } = settings;
+  // The phone layout keeps its own glow switch, off by default (see
+  // ambientGlowPhone) — the same line the session picks that layout on.
+  const isPhoneLayout = useMediaQuery("(max-width: 767px), (max-height: 500px)");
+  const glowKey = isPhoneLayout ? "ambientGlowPhone" : "ambientGlow";
   // Handedness lives in its own store: it is a property of the player rather
   // than of the tab, and it drives the neck diagrams in the drills too.
   const leftHanded = useIsLeftHanded();
@@ -595,8 +600,8 @@ export function TablatureSettingsPanel() {
           <ToggleRow
             label={t("ambient_glow")}
             desc={t("ambient_glow_desc")}
-            checked={settings.ambientGlow}
-            onChange={(next) => set("ambientGlow", next)}
+            checked={settings[glowKey]}
+            onChange={(next) => set(glowKey, next)}
           />
         </div>
       </Section>

@@ -15,22 +15,22 @@
     "pitch_off": "Pitch Detect off",
     "pitch_detect": "Pitch Detect",
     "tuner": "Tuner",
-    "recalibrate": "Recalibrate",
+    "recalibrate": "Input setup",
     "playback_off": "Guitar playback off — click to hear the tab",
     "playback_on": "Guitar playback on — click to mute the tab",
     "playback": "Guitar playback",
     "mic_active": "Microphone active — app is listening to your guitar",
     "mic_enable": "Enable microphone to detect what you're playing",
-    "mic_tools_hint": "Mic tools: recalibrate, tuner, troubleshooting",
-    "mic_tools": "Mic tools",
-    "mic_not_working": "Mic not working?",
+    "mic_tools_hint": "Input tools: setup, tuner, troubleshooting",
+    "mic_tools": "Input tools",
+    "mic_not_working": "Guitar not detected?",
     "boost_hint": "Boost the Guitar Pro playback above 100% if it sounds too quiet.",
     "bass_tuning": "Bass tuning",
     "bass_tuning_named": "Bass tuning: {{name}}",
     "bass_tuning_change": "Bass tuning — click to change"
   },
   "mic_help": {
-    "title": "Microphone troubleshooting",
+    "title": "Input troubleshooting",
     "intro": "If the app can't hear your guitar or detects the wrong notes, work through these steps. Most issues come from browser permissions or another app using the mic.",
     "resetting": "Resetting…",
     "reset": "Reset mic settings & reload",
@@ -42,15 +42,15 @@
       },
       "1": {
         "title": "Pick the right input device",
-        "description": "If you have several mics or an audio interface, set the correct one as the default input in your system sound settings (and in the browser's site permissions), then reload."
+        "description": "If you have several mics or an audio interface, open Input setup and pick the right one there. The app remembers it for next time."
       },
       "2": {
         "title": "Free up the microphone",
         "description": "Close other apps that might be holding the mic — Zoom, Discord, OBS, Teams, or another browser tab. Only one app can capture a low-latency input at a time."
       },
       "3": {
-        "title": "Recalibrate",
-        "description": "Use the Recalibrate button to re-run the tuning calibration. This fixes most \"notes not detected\" or \"wrong note\" problems after changing gear or rooms."
+        "title": "Go through Input setup again",
+        "description": "Open Input setup above the tab to check the signal and set the sensitivity again. Do it after changing gear or rooms."
       },
       "4": {
         "title": "Check levels & tuning",
@@ -426,7 +426,7 @@
     "description": "Drums, bass and a soft pad written for this exercise, in its key and following its chords.",
     "drums_only": "Drums only: the notes cover every fret, so any chord would clash with them.",
     "drone": "Bass and power chords on the root, because the notes never say major or minor.",
-    "headphones": "With the mic on, wear headphones. Otherwise the mic hears the band as your playing.",
+    "headphones": "With the mic on, wear headphones. Otherwise the mic hears the band as your playing. If notes you didn't play get counted, this is the first thing to check.",
     "groove": {
       "rock": "Rock",
       "pop": "Pop",
@@ -473,10 +473,11 @@
       "keys_house": "Stabs",
       "keys_dark": "Strings"
     },
-    "headphones_toast": {
-      "title": "The backing track is on",
-      "body": "With the mic on, wear headphones — otherwise the mic hears the band as your playing. You can change it any time in the Volume menu.",
-      "off": "Turn it off"
+    "leak_notice": {
+      "title": "Playing through speakers?",
+      "body": "The backing track is on and your mic can hear it. Headphones keep it out. If the app counts notes you didn't play, or misses the ones you did, check this first.",
+      "ok": "Got it",
+      "off": "Turn the backing off"
     }
   },
   "interval_click": {
@@ -740,5 +741,14 @@
     "preview": "Preview",
     "hint_count_in": "The metronome counts you in, then you play. Preview lets you look at the tab without the clock.",
     "hint": "The clock starts when you press Start. Preview lets you look first."
+  },
+  "mic_open_failed": {
+    "title": "The microphone didn't turn on",
+    "action": "Input setup",
+    "denied": "This site is no longer allowed to use the microphone.",
+    "no_device": "No audio input was found. Plug in your interface or microphone.",
+    "busy": "Another program is holding your audio input.",
+    "unsupported": "This browser can't use a microphone.",
+    "unknown": "Open Input setup to fix it."
   }
 }

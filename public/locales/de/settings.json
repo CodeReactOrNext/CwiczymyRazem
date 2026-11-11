@@ -194,5 +194,15 @@
     "error": "Etwas ist schiefgelaufen. Versuch es noch einmal.",
     "unverified_name": "Die App hat sich diesen Namen selbst gegeben; riff.quest kann ihn nicht bestätigen. Prüf die Adresse, zu der du zurückkommst.",
     "back_to": "Zurück zu {{host}}"
+  },
+  "audio_input": {
+    "title": "Gitarren-Eingang",
+    "subtitle": "Darauf hört die App, wenn sie dein Spiel bewertet. Auf diesem Gerät gespeichert.",
+    "check_label": "Eingang prüfen",
+    "check_description": "Wähl dein Interface oder Mikrofon und sieh nach, ob die App die Gitarre hört.",
+    "start": "Eingang prüfen",
+    "starting": "Verbinde…",
+    "stop": "Stopp",
+    "heard": "Die App hört deine Gitarre."
   }
 }

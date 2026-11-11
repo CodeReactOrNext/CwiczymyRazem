@@ -89,7 +89,7 @@ const liveWorklets = () => worklets.filter(w => w.onmessage !== null);
 describe("useAudioAnalyzer init/close races", () => {
   it("close() while getUserMedia is pending leaves nothing open", async () => {
     const { result } = renderHook(() => useAudioAnalyzer());
-    let initDone: Promise<void> = Promise.resolve();
+    let initDone: Promise<unknown> = Promise.resolve();
     act(() => { initDone = result.current.init(); });
     act(() => { result.current.close(); });
     await act(async () => { pendingGum[0](makeStream()); await initDone; });
@@ -143,5 +143,123 @@ describe("useAudioAnalyzer init/close races", () => {
     expect(live()).toHaveLength(0);
     expect(liveWorklets()).toHaveLength(0);
     expect(contexts.every(c => c.state === "closed")).toBe(true);
+  });
+});
+
+const domError = (name: string) => Object.assign(new Error(name), { name });
+
+/** getUserMedia that answers at once: a stream, or the error the given constraints earn. */
+function stubGetUserMedia(answer: (audio: MediaTrackConstraints) => FakeStream | Error) {
+  const getUserMedia = vi.fn(async ({ audio }: { audio: MediaTrackConstraints }) => {
+    const result = answer(audio);
+    if (result instanceof Error) throw result;
+    return result;
+  });
+  Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: { getUserMedia } });
+  return getUserMedia;
+}
+
+describe("useAudioAnalyzer opening the input", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  it.each([
+    ["NotAllowedError", "denied"],
+    ["NotFoundError", "no_device"],
+    ["NotReadableError", "busy"],
+    ["SomethingElse", "unknown"],
+  ])("reports %s as %s instead of swallowing it", async (name, reason) => {
+    stubGetUserMedia(() => domError(name));
+    const { result } = renderHook(() => useAudioAnalyzer());
+    let outcome: unknown;
+    await act(async () => { outcome = await result.current.init(); });
+
+    expect(outcome).toEqual({ ok: false, reason });
+    expect(result.current.isListening).toBe(false);
+    expect(result.current.errorReason).toBe(reason);
+  });
+
+  it("reports a browser without getUserMedia as unsupported", async () => {
+    Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: undefined });
+    const { result } = renderHook(() => useAudioAnalyzer());
+    let outcome: unknown;
+    await act(async () => { outcome = await result.current.init(); });
+    expect(outcome).toEqual({ ok: false, reason: "unsupported" });
+  });
+
+  it("resolves ok once the input is open", async () => {
+    stubGetUserMedia(() => makeStream());
+    const { result } = renderHook(() => useAudioAnalyzer());
+    let outcome: unknown;
+    await act(async () => { outcome = await result.current.init(); });
+    expect(outcome).toEqual({ ok: true });
+    expect(result.current.isListening).toBe(true);
+    expect(result.current.errorReason).toBeNull();
+  });
+
+  it("opens the device picked last time", async () => {
+    localStorage.setItem("web_audio_input_device_id", "scarlett");
+    const getUserMedia = stubGetUserMedia(() => makeStream());
+    const { result } = renderHook(() => useAudioAnalyzer());
+    await act(async () => { await result.current.init(); });
+
+    expect(getUserMedia).toHaveBeenCalledTimes(1);
+    expect(getUserMedia.mock.calls[0][0].audio.deviceId).toEqual({ exact: "scarlett" });
+  });
+
+  it("falls back to the default input when the picked device is gone", async () => {
+    localStorage.setItem("web_audio_input_device_id", "unplugged");
+    const getUserMedia = stubGetUserMedia((audio) => (audio.deviceId ? domError("OverconstrainedError") : makeStream()));
+    const { result } = renderHook(() => useAudioAnalyzer());
+    let outcome: unknown;
+    await act(async () => { outcome = await result.current.init(); });
+
+    expect(outcome).toEqual({ ok: true });
+    expect(getUserMedia).toHaveBeenCalledTimes(2);
+    expect(live()).toHaveLength(1);
+  });
+
+  it("does not ask twice when access is refused", async () => {
+    localStorage.setItem("web_audio_input_device_id", "scarlett");
+    const getUserMedia = stubGetUserMedia(() => domError("NotAllowedError"));
+    const { result } = renderHook(() => useAudioAnalyzer());
+    await act(async () => { await result.current.init(); });
+    expect(getUserMedia).toHaveBeenCalledTimes(1);
+  });
+
+  it("picking a device remembers it and reopens the input on it", async () => {
+    const getUserMedia = stubGetUserMedia(() => makeStream());
+    const { result } = renderHook(() => useAudioAnalyzer());
+    await act(async () => { await result.current.init(); });
+    await act(async () => { await result.current.webInput.selectDevice("scarlett"); });
+
+    expect(localStorage.getItem("web_audio_input_device_id")).toBe("scarlett");
+    expect(getUserMedia.mock.calls[1][0].audio.deviceId).toEqual({ exact: "scarlett" });
+    expect(streams[0].stopped).toBe(true);
+    expect(live()).toHaveLength(1);
+  });
+
+  it("shows which jack the worklet is reading", async () => {
+    stubGetUserMedia(() => makeStream());
+    const { result } = renderHook(() => useAudioAnalyzer());
+    await act(async () => { await result.current.init(); });
+    const port = liveWorklets()[0] as unknown as { onmessage: (event: { data: unknown }) => void };
+    act(() => { port.onmessage({ data: { type: "channels", count: 2, active: 1 } }); });
+
+    expect(result.current.webInput.channelCount).toBe(2);
+    expect(result.current.webInput.activeChannel).toBe(1);
+  });
+
+  it("remembers a pinned jack and forgets it on auto", () => {
+    const { result } = renderHook(() => useAudioAnalyzer());
+    act(() => { result.current.webInput.selectChannel(1); });
+    expect(localStorage.getItem("web_audio_input_channel")).toBe("1");
+    expect(result.current.webInput.channel).toBe(1);
+
+    act(() => { result.current.webInput.selectChannel(null); });
+    expect(localStorage.getItem("web_audio_input_channel")).toBeNull();
+    expect(result.current.webInput.channel).toBeNull();
   });
 });

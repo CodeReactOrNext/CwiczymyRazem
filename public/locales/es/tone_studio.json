@@ -106,7 +106,7 @@
     "default": "predeterminado",
     "channel": "Canal",
     "input_channel_hint": "De qué canal de entrada capturar — p. ej. la toma de guitarra en una interfaz multicanal",
-    "output": "Salida",
+    "output": "Salida del ampli",
     "asio_same_device": "ASIO usa el mismo dispositivo para entrada y salida",
     "output_hint": "Dispositivo de salida para la monitorización del ampli",
     "same_as_input": "Igual que la entrada (ASIO)",

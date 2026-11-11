@@ -52,21 +52,21 @@ Jeśli każda nuta przechyla się w tę samą stronę o mniej więcej tyle samo,
 
 ## Konfiguracja
 
-Przy pierwszym razie, gdy ćwiczenie tego potrzebuje, dostajesz monit **Śledzenie mikrofonem** z **Włącz mikrofon** i **Pomiń**. Wybranie włączenia uruchamia **Kalibrację gitary**, krótki kreator, który trzeba zrobić tylko raz na konfigurację.
+Przy pierwszym razie, gdy ćwiczenie tego potrzebuje, dostajesz monit **Wykrywanie** z **Ustaw wejście** i **Pomiń**. Wybranie ustawienia uruchamia **Ustawienia wejścia**, krótki kreator, który trzeba przejść tylko raz na konfigurację. Wejście możesz też wybrać wcześniej w Ustawieniach, w sekcji **Wejście gitary**.
 
-<StepList steps="Jak jest podłączona gitara?::Interfejs audio, jeśli jest wpięta w skrzynkę USB lub Thunderbolt, Mikrofon, jeśli grasz akustycznie do laptopa lub mikrofonu USB|Przyznaj dostęp::Przeglądarka pyta raz. Powiedz tak, bo inaczej nic dalej nie działa|Ustaw poziom::Miernik Poziom sygnału robi się zielony, gdy jesteś wystarczająco głośno. Przeciągnij wzmocnienie albo pozwól ustawieniu automatycznemu posłuchać twojego grania i wybrać|Zagraj każdą strunę::Jesteś proszony o wszystkie sześć, po jednej, żeby aplikacja nauczyła się, jak daleko twoja gitara jest od stroju koncertowego, i przestała nazywać lekko niskie G fisem|Potwierdź::Podsumowanie pokazuje zmierzone przesunięcie na strunę. To wszystko, zapisane" />
+<StepList steps="Jak jest podłączona gitara?::Interfejs audio, jeśli jest wpięta w skrzynkę USB lub Thunderbolt, Mikrofon, jeśli grasz akustycznie do laptopa lub mikrofonu USB|Przyznaj dostęp::Przeglądarka pyta raz. Powiedz tak, bo inaczej nic dalej nie zadziała|Wybierz wejście::Wybierz z listy swój interfejs albo mikrofon i zagraj coś. Miernik „Sygnał” robi się zielony, gdy aplikacja słyszy gitarę. Przy interfejsie z więcej niż jednym gniazdem pole „Wejście z gitarą” samo wybiera to, do którego jesteś wpięty, albo możesz je ustawić ręcznie|Pozwól nucie wybrzmieć::Grasz jedną nutę i trzymasz ją. Jeśli urywa się za wcześnie, podnieś „Czułość wejścia” albo pozwól dobrać ją automatycznie|Nastrój gitarę::Stroik prowadzi cię po strunach. Pomiń, jeśli gitara jest już nastrojona|Zmierz opóźnienie::Zagraj do kilku kliknięć, żeby timing był oceniany względem tego, co naprawdę słyszysz" />
 
 <BlogAlert type="tip">
-Kalibruj w pokoju i na sprzęcie, na którym naprawdę ćwiczysz. Kalibracja zrobiona na słuchawkach w cichym mieszkaniu to nie ta kalibracja, której chcesz przy głośnym wzmacniaczu.
+Przejdź ustawienia w pokoju i na sprzęcie, na którym naprawdę ćwiczysz. Czułość dobrana na słuchawkach w cichym mieszkaniu to nie ta, której chcesz przy głośnym wzmacniaczu.
 </BlogAlert>
 
-## Narzędzia mikrofonu
+## Narzędzia wejścia
 
 Obok przycisku Wykrywanie jest mała strzałka z rzeczami, których potrzebujesz od czasu do czasu, a nie codziennie.
 
 <Screenshot src="/images/wiki/pitch-detect-tools.webp" alt="Pasek narzędzi sesji: przycisk strojenia z napisem Half Step Down, zielony przycisk Wykrywanie i otwarte menu z pozycjami Skalibruj ponownie, Stroik i „Mikrofon nie działa?”" caption="Wykrywanie robi się zielone, gdy aplikacja słucha. Przycisk strojenia leży po jego lewej, pokazując strój, w którym jesteś." maxWidth="520px" />
 
-<Checklist items="Skalibruj ponownie::Ponownie uruchamia kreatora. To naprawa niemal każdej skargi „słyszy złą nutę” po zmianie gitary, pokoju lub interfejsu|Stroik::Prawdziwy stroik, bez opuszczania ćwiczenia|Mikrofon nie działa?::Lista rozwiązywania problemów plus przycisk, który czyści zapisaną konfigurację mikrofonu, żebyś mógł zacząć od zera" />
+<Checklist items="Ustawienia wejścia::Otwiera ustawienia ponownie, od razu na liście wejść. Tu zmieniasz interfejs albo mikrofon i tu naprawiasz większość skarg „nie słyszy mnie” po zmianie gitary, pokoju lub sprzętu|Stroik::Prawdziwy stroik, bez opuszczania ćwiczenia|Gitara nie jest wykrywana?::Lista rozwiązywania problemów plus przycisk, który czyści zapisane ustawienia, żebyś mógł zacząć od zera" />
 
 ## Strojenie ma większe znaczenie, niż myślisz
 
@@ -82,7 +82,7 @@ Egzaminy Ścieżki nauki, które oceniają twoje granie, wymagają wykrywania i 
 
 ## Gdy nic nie słyszy
 
-<Checklist items="Ktoś inny ma mikrofon::Zoom, Discord, OBS, druga karta przeglądarki. Tylko jedna aplikacja naraz dostaje wejście o niskim opóźnieniu, więc zamknij inne|Wybrane jest złe wejście::Ustaw właściwe urządzenie jako domyślne w systemie, potem odśwież|System to blokuje::Windows i macOS mają ekran prywatności dla dostępu do mikrofonu, a twoja przeglądarka musi tam mieć zgodę, tak samo jak na stronie|Za cicho lub za mocno::Szept i ściana dystorsji są równie trudne do odczytania. Celuj w zielone pasmo na mierniku poziomu|Rozstrojona::Wykrywanie to porównanie wysokości. Najpierw uruchom Stroik, potem Skalibruj ponownie" />
+<Checklist items="Ktoś inny ma mikrofon::Zoom, Discord, OBS, druga karta przeglądarki. Tylko jedna aplikacja naraz dostaje wejście o niskim opóźnieniu, więc zamknij inne|Wybrane jest złe wejście::Otwórz „Ustawienia wejścia” i wybierz z listy swój interfejs albo mikrofon. Kamerka albo mikrofon laptopa to częsty zły wybór|Gitara jest w drugim gnieździe::Przy interfejsie z dwoma wejściami sprawdź, czy „Wejście z gitarą” pokazuje gniazdo, do którego jesteś wpięty|System to blokuje::Windows i macOS mają ekran prywatności dla dostępu do mikrofonu, a twoja przeglądarka musi tam mieć zgodę, tak samo jak na stronie|Za cicho lub za mocno::Szept i ściana dystorsji są równie trudne do odczytania. Celuj w zielone pasmo na mierniku poziomu|Rozstrojona::Wykrywanie to porównanie wysokości. Najpierw uruchom Stroik, potem przejdź „Ustawienia wejścia” jeszcze raz" />
 
 <BlogAlert type="takeaway">
 Jeśli wykrywanie walczy z tobą dłużej niż kilka minut, wyłącz je i graj dalej. Zapisana sesja z wyłączonym mikrofonem jest warta dokładnie tyle samo, co z włączonym.
@@ -90,6 +90,6 @@ Jeśli wykrywanie walczy z tobą dłużej niż kilka minut, wyłącz je i graj d
 
 ## Pytania, które ludzie zadają
 
-<FaqList items="Czy potrzebuję interfejsu audio?::Nie. Mikrofon laptopa działa przy większości ćwiczeń. Interfejs jest czystszy, cichszy i szybszy, a aplikacja na komputer czyni go jeszcze szybszym|Czy wykrywanie zmienia moje punkty?::Nie. Punkty pochodzą z czasu, który zapisujesz, i twoich zdrowych nawyków. Dokładność wpływa na własny wynik ćwiczenia i jego gwiazdki, nie na twój poziom|Dlaczego pomija nuty, które na pewno zagrałem?::Zwykle to kalibracja lub strój. Nastrój, potem Skalibruj ponownie. Szybkie przebiegi na przesterowanym brzmieniu przez mikrofon pokojowy też są naprawdę trudne do odczytania|Czy mogę używać go na telefonie?::Tak, ścieżka mikrofonu w przeglądarce działa na urządzeniach mobilnych, choć telefon w głośnym pokoju to najtrudniejszy przypadek|Słyszy też mój wzmacniacz lub podkład::Będzie. Graj przez słuchawki, gdzie możesz, i utrzymuj ciszę w pokoju podczas polowań|Czy mogę ćwiczyć ćwiczenie z mikrofonem bez mikrofonu?::Tak. Polowania pozwalają odhaczyć ręcznie to, co znalazłeś, i iść dalej, a ćwiczenia z tabulaturą po prostu przechodzą bez oceny" />
+<FaqList items="Czy potrzebuję interfejsu audio?::Nie. Mikrofon laptopa działa przy większości ćwiczeń. Interfejs jest czystszy, cichszy i szybszy, a aplikacja na komputer czyni go jeszcze szybszym|Czy wykrywanie zmienia moje punkty?::Nie. Punkty pochodzą z czasu, który zapisujesz, i twoich zdrowych nawyków. Dokładność wpływa na własny wynik ćwiczenia i jego gwiazdki, nie na twój poziom|Dlaczego pomija nuty, które na pewno zagrałem?::Zwykle to czułość lub strój. Nastrój, potem przejdź „Ustawienia wejścia” jeszcze raz. Szybkie przebiegi na przesterowanym brzmieniu przez mikrofon pokojowy też są naprawdę trudne do odczytania|Czy mogę używać go na telefonie?::Tak, ścieżka mikrofonu w przeglądarce działa na urządzeniach mobilnych, choć telefon w głośnym pokoju to najtrudniejszy przypadek|Słyszy też mój wzmacniacz lub podkład::Będzie. Graj przez słuchawki, gdzie możesz, i utrzymuj ciszę w pokoju podczas polowań|Czy mogę ćwiczyć ćwiczenie z mikrofonem bez mikrofonu?::Tak. Polowania pozwalają odhaczyć ręcznie to, co znalazłeś, i iść dalej, a ćwiczenia z tabulaturą po prostu przechodzą bez oceny" />
 
 <ReadNext links="Sposoby ćwiczenia::/wiki/practice-modes-overview|Aplikacja na komputer::/wiki/desktop-app|Rutyny ćwiczeń i plan automatyczny::/wiki/exercise-plans-and-auto-plan|Ścieżka nauki i Mapa skal::/wiki/journey-and-scale-tree" />

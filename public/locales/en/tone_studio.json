@@ -106,7 +106,7 @@
     "default": "default",
     "channel": "Channel",
     "input_channel_hint": "Which input channel to capture from — e.g. the guitar jack on a multi-channel interface",
-    "output": "Output",
+    "output": "Amp output",
     "asio_same_device": "ASIO uses the same device for input and output",
     "output_hint": "Output device for amp monitoring",
     "same_as_input": "Same as input (ASIO)",

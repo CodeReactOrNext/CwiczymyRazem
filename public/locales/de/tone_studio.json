@@ -106,7 +106,7 @@
     "default": "Standard",
     "channel": "Kanal",
     "input_channel_hint": "Von welchem Eingangskanal aufgenommen wird — z. B. die Gitarrenbuchse an einem Mehrkanal-Interface",
-    "output": "Ausgang",
+    "output": "Amp-Ausgang",
     "asio_same_device": "ASIO nutzt dasselbe Gerät für Ein- und Ausgang",
     "output_hint": "Ausgabegerät für das Amp-Monitoring",
     "same_as_input": "Wie Eingang (ASIO)",

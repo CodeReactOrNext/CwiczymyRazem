@@ -5,9 +5,10 @@ import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useResponsiveStore } from "store/useResponsiveStore";
 
+import type { InputSource } from "../inputSource";
 import { CloseButton } from "./CloseButton";
 
-export type InputSource = "interface" | "microphone";
+export type { InputSource } from "../inputSource";
 
 interface SourceStepProps {
   onSelect: (source: InputSource) => void;

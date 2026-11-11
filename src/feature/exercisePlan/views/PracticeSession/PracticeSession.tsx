@@ -2,7 +2,6 @@ import "react-circular-progressbar/dist/styles.css";
 
 import type { BossScore } from "feature/autoBacking/bossBacking";
 import { useAutoBacking } from "feature/autoBacking/hooks/useAutoBacking";
-import { useHeadphonesHint } from "feature/autoBacking/hooks/useHeadphonesHint";
 import { useAutoBackingStore } from "feature/autoBacking/store/autoBackingStore";
 import { BackingTrackBar } from "feature/backingTrack/components/BackingTrackBar";
 import { useBackingTrackSession } from "feature/backingTrack/hooks/useBackingTrackSession";
@@ -770,7 +769,7 @@ const PracticeSessionInner = ({
 
   // ── Calibration + mic ─────────────────────────────────────────────────────
 
-  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, getAttackLatencyMs, inputGain, setInputGain, isNative, selectDevice, selectChannel } = useGuitarAudioInput({ bass: isBass });
+  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, getAttackLatencyMs, inputGain, setInputGain, isNative, selectDevice, selectChannel, webInput } = useGuitarAudioInput({ bass: isBass, strum: !!currentExercise.strummingPatterns?.length });
   // The player's measured latency for the input path in use — the browser and the
   // desktop app keep separate measurements (different capture chains).
   const calibratedLatencyMs = timingByPath[timingInputPath(isNative)].latencyMs;
@@ -891,7 +890,17 @@ const PracticeSessionInner = ({
   // analyzer hooks' own cleanup.
   useEffect(() => {
     if (!isMicEnabled) return undefined;
-    if (!isListening) initAudio();
+    // A mic that was set up earlier can still fail to open today (access taken
+    // back, the interface unplugged or held by a DAW). The button lights up
+    // from the preference, so without a word it looked on and scored nothing.
+    // The desktop path reports its own failures (see useNativeAudioAnalyzer).
+    if (!isListening) void Promise.resolve(initAudio()).then((result) => {
+      if (!result || result.ok) return;
+      toast.error(t("mic_open_failed.title", "The microphone didn't turn on"), {
+        description: t(`mic_open_failed.${result.reason}`, "Open Input setup to fix it."),
+        action: { label: t("mic_open_failed.action", "Input setup"), onClick: handleRecalibrate },
+      });
+    });
     return () => { closeAudio(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMicEnabled]);
@@ -1077,9 +1086,6 @@ const PracticeSessionInner = ({
     inputTapRef: audioRefs.inputTapRef,
     onLeak: handlePlaybackLeak,
   });
-  // The backing is on by default — the first time it plays into a listening
-  // mic, the player hears once that it wants headphones.
-  useHeadphonesHint(isMicEnabled && isListening && isAudioPlaying && autoBackingLevel > 0);
 
   const { verdict: goalVerdict, rearm: rearmGoalVerdict } = useGoalRunVerdict({
     goalRun, showSuccessView, isMicEnabled, noteMatchingHandle,
@@ -1560,14 +1566,14 @@ const PracticeSessionInner = ({
         showCompleteDialog={showCompleteDialog} setShowCompleteDialog={setShowCompleteDialog}
         exerciseTitle={currentExercise.title} exerciseDuration={currentExercise.timeInMinutes}
         onFinish={onFinish} handleRestart={handleRestart}
-        sessionPhase={sessionPhase} examMode={isExamMode}
+        sessionPhase={sessionPhase} examMode={isExamMode} turned={isUprightPhone}
         handleEnableMic={handleEnableMic} handleSkipMic={handleSkipMic} onLeave={onClose}
         existingCalibrationTimestamp={existingCalibrationTimestamp}
         handleReuseCalibration={handleReuseCalibration} handleRecalibrate={handleRecalibrate}
         handleCalibrationCancel={handleCalibrationCancelAndClose} handleCalibrationComplete={handleCalibrationComplete}
         audioInit={initAudio} audioRefs={audioRefs}
         isListening={isListening} inputGain={inputGain} setInputGain={setInputGain}
-        isNative={isNative} onSelectDevice={selectDevice} onSelectChannel={selectChannel}
+        isNative={isNative} onSelectDevice={selectDevice} onSelectChannel={selectChannel} webInput={webInput}
         timingAudioContext={metronome.audioContext} estimateLatencyMs={getLatencyMs}
         onBeforeTimingRun={stopSessionPlayback}
         exerciseId={activeExercise.id} isMounted={isMounted}

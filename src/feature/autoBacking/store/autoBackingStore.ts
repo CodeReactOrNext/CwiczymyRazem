@@ -14,9 +14,9 @@ interface AutoBackingState {
    *  picks its own. Remembered on this device. */
   style: BandStylePreference;
   setStyle: (style: BandStylePreference) => void;
-  /** The one-time "wear headphones with the mic on" note has been shown. */
-  headphonesHintShown: boolean;
-  markHeadphonesHintShown: () => void;
+  /** The player has read the start gate's "your mic can hear the backing" note. */
+  leakNoticeDismissed: boolean;
+  dismissLeakNotice: () => void;
   /** What the running session can offer: whether the exercise on screen can
    *  get a backing at all, and what it would play. Owned by PracticeSession,
    *  read by the volume menus in both the desktop and phone layouts. */
@@ -35,8 +35,8 @@ export const useAutoBackingStore = create<AutoBackingState>()(
       setEnabled: (enabled) => set({ enabled }),
       style: "auto",
       setStyle: (style) => set({ style }),
-      headphonesHintShown: false,
-      markHeadphonesHintShown: () => set({ headphonesHintShown: true }),
+      leakNoticeDismissed: false,
+      dismissLeakNotice: () => set({ leakNoticeDismissed: true }),
       available: false,
       summary: null,
       setSession: (session) => set(session),
@@ -49,13 +49,13 @@ export const useAutoBackingStore = create<AutoBackingState>()(
         const stored = (persisted ?? {}) as Partial<AutoBackingState>;
         return {
           enabled: version < 1 ? true : (stored.enabled ?? true),
-          headphonesHintShown: stored.headphonesHintShown ?? false,
+          leakNoticeDismissed: false,
           style: isBandStyle(stored.style) ? stored.style : "auto",
         };
       },
       partialize: (state) => ({
         enabled: state.enabled,
-        headphonesHintShown: state.headphonesHintShown,
+        leakNoticeDismissed: state.leakNoticeDismissed,
         style: state.style,
       }),
       // A style this build no longer has falls back to letting the exercise choose.

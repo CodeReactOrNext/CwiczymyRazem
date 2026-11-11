@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import type { AudioRefs } from "hooks/useAudioAnalyzer";
+import type { AudioInitResult, AudioRefs, WebAudioInput } from "hooks/useAudioAnalyzer";
 import { useTranslation } from "hooks/useTranslation";
 import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -26,6 +26,8 @@ interface SessionDialogsProps {
   // Mic / Calibration
   sessionPhase: string;
   examMode?: boolean;
+  /** The phone screen laid on its side on an upright phone — the mic prompt lies with it. */
+  turned?: boolean;
   handleEnableMic: () => void;
   handleSkipMic: () => void;
   /** Leaves the session from the exam mic prompt, which has no skip. */
@@ -35,7 +37,7 @@ interface SessionDialogsProps {
   handleRecalibrate: () => void;
   handleCalibrationCancel: () => void;
   handleCalibrationComplete: () => void;
-  audioInit: () => Promise<void>;
+  audioInit: () => Promise<AudioInitResult | void>;
   audioRefs: AudioRefs;
   isListening: boolean;
   inputGain: number;
@@ -43,6 +45,8 @@ interface SessionDialogsProps {
   isNative: boolean;
   onSelectDevice?: (deviceId: number) => Promise<void>;
   onSelectChannel?: (channel: number) => Promise<void>;
+  /** The browser path's device and jack picker; undefined in the desktop app. */
+  webInput?: WebAudioInput;
   /** The session metronome's context — the wizard's timing step clicks on it. */
   timingAudioContext: AudioContext | null;
   estimateLatencyMs: () => number;
@@ -67,6 +71,7 @@ export const SessionDialogs = ({
   handleRestart,
   sessionPhase,
   examMode,
+  turned,
   handleEnableMic,
   handleSkipMic,
   onLeave,
@@ -83,6 +88,7 @@ export const SessionDialogs = ({
   isNative,
   onSelectDevice,
   onSelectChannel,
+  webInput,
   timingAudioContext,
   estimateLatencyMs,
   onBeforeTimingRun,
@@ -134,6 +140,7 @@ export const SessionDialogs = ({
       <MicModeDialog
         isOpen={sessionPhase === "mic_prompt"}
         examMode={examMode}
+        turned={turned}
         onEnableMic={handleEnableMic}
         onSkipMic={handleSkipMic}
         onLeave={onLeave}
@@ -159,6 +166,7 @@ export const SessionDialogs = ({
         isNative={isNative}
         onSelectDevice={onSelectDevice}
         onSelectChannel={onSelectChannel}
+        webInput={webInput}
         timingAudioContext={timingAudioContext}
         estimateLatencyMs={estimateLatencyMs}
         onBeforeTimingRun={onBeforeTimingRun}

@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AudioSelect } from "feature/toneStudio/components/AudioSelect";
-import type { AudioRefs } from "hooks/useAudioAnalyzer";
+import type { AudioInitFailure, AudioRefs, WebAudioInput } from "hooks/useAudioAnalyzer";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
 import { isExclusiveAsioWrapper, useNativeOutputDevice } from "hooks/useNativeOutputDevice";
 import { useTranslation } from "hooks/useTranslation";
@@ -10,6 +10,7 @@ import React, { type ReactNode, useCallback, useEffect, useRef, useState } from 
 
 import { useInputLevel } from "../hooks/useInputLevel";
 import type { LevelStatus } from "../inputLevel";
+import { trackSetup } from "../setupAnalytics";
 import { CloseButton } from "./CloseButton";
 import { ReadyCheck } from "./ReadyCheck";
 import type { InputSource } from "./SourceStep";
@@ -24,6 +25,9 @@ const LEVEL_TEXT: Record<Presence, string> = {
   good:     "text-emerald-400",
   clipping: "text-red-400",
 };
+
+/** Silence this long on the input step brings up the checklist. */
+const NO_SIGNAL_HELP_MS = 6000;
 
 const LEVEL_FILL: Record<Presence, string> = {
   silent:   "bg-zinc-600",
@@ -41,13 +45,15 @@ const FieldLabel = ({ children }: { children: ReactNode }) => (
  * device pickers around it don't. The bar is clipped rather than resized — no
  * layout work per frame.
  */
-const SignalMeter = React.memo(function SignalMeter({
-  audioRefs, isListening, gain, onHeard,
+export const SignalMeter = React.memo(function SignalMeter({
+  audioRefs, isListening, gain, onHeard, readyText,
 }: {
   audioRefs: AudioRefs;
   isListening: boolean;
   gain: number;
   onHeard: () => void;
+  /** What the "heard it" mark says; the setup's "you can continue" by default. */
+  readyText?: string;
 }) {
   const { t } = useTranslation("calibration");
   const level = useInputLevel(audioRefs, isListening, gain);
@@ -76,7 +82,7 @@ const SignalMeter = React.memo(function SignalMeter({
           )}
         </div>
       </div>
-      {heard && <ReadyCheck>{t("setup.ready")}</ReadyCheck>}
+      {heard && <ReadyCheck>{readyText ?? t("setup.ready")}</ReadyCheck>}
     </>
   );
 });
@@ -88,7 +94,7 @@ const SignalMeter = React.memo(function SignalMeter({
  * (useNativeAudioDevices), so a choice made here or in the amp panel applies
  * everywhere.
  */
-function NativeDeviceFields({
+export function NativeDeviceFields({
   isListening, onSelectDevice, onSelectChannel,
 }: {
   isListening: boolean;
@@ -161,6 +167,92 @@ function NativeDeviceFields({
   );
 }
 
+/**
+ * Browser-only: which input the browser opened and which of its jacks is read.
+ * The browser opens the system's default input, which is often a webcam or the
+ * laptop's mic rather than the interface — and it never said which one.
+ */
+export function WebDeviceFields({
+  input, inputSource, onInputError,
+}: {
+  input: WebAudioInput;
+  inputSource: InputSource;
+  onInputError: (reason: AudioInitFailure) => void;
+}) {
+  const { t } = useTranslation("calibration");
+  const options = input.devices.map((d) => ({ value: d.deviceId, label: d.label }));
+  const isListed = input.deviceId !== null && options.some((o) => o.value === input.deviceId);
+  const label = <FieldLabel>{t(inputSource === "interface" ? "setup.interface" : "setup.input_device")}</FieldLabel>;
+
+  const handleSelectDevice = async (deviceId: string) => {
+    trackSetup("mic_setup_device_changed", { input_source: inputSource, device_count: options.length });
+    const result = await input.selectDevice(deviceId);
+    if (!result.ok) onInputError(result.reason);
+  };
+
+  const handleSelectChannel = (value: string) => {
+    const channel = value === "auto" ? null : Number(value);
+    trackSetup("mic_setup_channel_changed", { input_source: inputSource, channel: channel ?? "auto", channel_count: input.channelCount });
+    input.selectChannel(channel);
+  };
+
+  return (
+    <div className="space-y-5">
+      {options.length > 0 ? (
+        <AudioSelect
+          label={label}
+          value={isListed ? (input.deviceId ?? "") : ""}
+          onValueChange={(v) => void handleSelectDevice(v)}
+          options={options}
+          placeholder={input.deviceLabel ?? t("setup.no_inputs")}
+          className="gap-2.5"
+        />
+      ) : input.deviceLabel ? (
+        // Some browsers keep the list to themselves; the open device's name is still known.
+        <div className="flex flex-col gap-2.5">
+          {label}
+          <p className="text-sm text-zinc-300">{input.deviceLabel}</p>
+        </div>
+      ) : null}
+
+      {input.channelCount > 1 && (
+        <AudioSelect
+          label={<FieldLabel>{t("setup.guitar_input")}</FieldLabel>}
+          value={input.channel === null ? "auto" : String(Math.min(input.channel, input.channelCount - 1))}
+          onValueChange={handleSelectChannel}
+          options={[
+            { value: "auto", label: t("setup.channel_auto", { n: input.activeChannel + 1 }) },
+            ...Array.from({ length: input.channelCount }, (_, i) => ({ value: String(i), label: t("setup.channel", { n: i + 1 }) })),
+          ]}
+          className="gap-2.5"
+        />
+      )}
+    </div>
+  );
+}
+
+type HelpItem = "device" | "device_mic" | "jack" | "gain" | "inst" | "guitar" | "other_app" | "closer" | "muted";
+
+/** What to check when the meter stays flat, in the order it usually goes wrong. */
+export function helpItems(isNative: boolean, inputSource: InputSource, channelCount: number): HelpItem[] {
+  if (isNative) return ["jack", "gain", "inst", "guitar", "other_app"];
+  if (inputSource === "microphone") return ["device_mic", "closer", "muted"];
+  return ["device", ...(channelCount > 1 ? ["jack" as const] : []), "gain", "inst", "guitar", "other_app"];
+}
+
+/** The way out of "No signal": the input step used to just wait, with Next greyed out. */
+export const NoSignalHelp = React.memo(function NoSignalHelp({ items }: { items: HelpItem[] }) {
+  const { t } = useTranslation("calibration");
+  return (
+    <div role="status" className="space-y-3 rounded-lg bg-zinc-900/40 px-5 py-5">
+      <p className="text-sm font-medium text-zinc-200">{t("setup.help.title")}</p>
+      <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-zinc-300">
+        {items.map((item) => <li key={item}>{t(`setup.help.${item}`)}</li>)}
+      </ul>
+    </div>
+  );
+});
+
 interface SetupStepProps {
   isListening:       boolean;
   isLoading:         boolean;
@@ -170,6 +262,10 @@ interface SetupStepProps {
   isNative:          boolean;
   onSelectDevice?:   (deviceId: number) => Promise<void>;
   onSelectChannel?:  (channel: number) => Promise<void>;
+  /** The browser path's device and jack picker; undefined in the desktop app. */
+  webInput?:         WebAudioInput;
+  /** Switching to a device that would not open. */
+  onInputError:      (reason: AudioInitFailure) => void;
   onGrant:           () => void;
   onNext:            () => void;
   onBack:            () => void;
@@ -183,13 +279,52 @@ interface SetupStepProps {
  */
 export const SetupStep = React.memo(function SetupStep({
   isListening, isLoading, inputSource, audioRefs, inputGain,
-  isNative, onSelectDevice, onSelectChannel, onGrant, onNext, onBack, onCancel,
+  isNative, onSelectDevice, onSelectChannel, webInput, onInputError, onGrant, onNext, onBack, onCancel,
 }: SetupStepProps) {
   const { t } = useTranslation("calibration");
   // Latched by the meter the first time it hears the guitar.
   const [heardOnce, setHeardOnce] = useState(false);
-  const markHeard = useCallback(() => setHeardOnce(true), []);
   const heard = isListening && heardOnce;
+
+  const channelCount = webInput?.channelCount ?? 0;
+  const activeChannel = webInput?.activeChannel ?? 0;
+  // What the analytics events say about the input, read when they fire.
+  const inputInfoRef = useRef({ channelCount, activeChannel });
+  useEffect(() => { inputInfoRef.current = { channelCount, activeChannel }; }, [channelCount, activeChannel]);
+  const source = isNative ? "native" : inputSource;
+  const listeningSinceRef = useRef(0);
+  useEffect(() => { if (isListening) listeningSinceRef.current = performance.now(); }, [isListening]);
+
+  const heardTrackedRef = useRef(false);
+  const markHeard = useCallback(() => {
+    setHeardOnce(true);
+    if (heardTrackedRef.current) return;
+    heardTrackedRef.current = true;
+    trackSetup("mic_setup_signal_heard", {
+      input_source: source,
+      is_native: isNative,
+      channel_count: inputInfoRef.current.channelCount,
+      active_channel: inputInfoRef.current.activeChannel,
+      seconds_to_signal: Math.round((performance.now() - listeningSinceRef.current) / 100) / 10,
+    });
+  }, [source, isNative]);
+
+  // Listening and nothing heard for a while: say what to check instead of
+  // leaving the player in front of a flat meter and a greyed-out Next.
+  const [showHelp, setShowHelp] = useState(false);
+  useEffect(() => {
+    if (!isListening || heardOnce) return undefined;
+    const timer = setTimeout(() => {
+      setShowHelp(true);
+      trackSetup("mic_setup_no_signal_help", {
+        input_source: source,
+        is_native: isNative,
+        channel_count: inputInfoRef.current.channelCount,
+        active_channel: inputInfoRef.current.activeChannel,
+      });
+    }, NO_SIGNAL_HELP_MS);
+    return () => clearTimeout(timer);
+  }, [isListening, heardOnce, source, isNative]);
 
   // The desktop app needs no permission to open the interface, so it starts
   // listening as soon as this screen shows — the meter answers "is my guitar
@@ -225,17 +360,28 @@ export const SetupStep = React.memo(function SetupStep({
       <div className="flex w-full flex-1 flex-col gap-6 overflow-y-auto">
         {isNative ? (
           <NativeDeviceFields isListening={isListening} onSelectDevice={onSelectDevice} onSelectChannel={onSelectChannel} />
-        ) : inputSource === "microphone" ? (
-          <ul className="space-y-2 text-sm text-zinc-300">
-            <li>{t("setup.headphones")}</li>
-            <li>{t("setup.quiet")}</li>
-          </ul>
         ) : (
-          <p className="text-sm leading-relaxed text-zinc-300">{t("setup.before_start_body")}</p>
+          <>
+            {inputSource === "microphone" ? (
+              <ul className="space-y-2 text-sm text-zinc-300">
+                <li>{t("setup.headphones")}</li>
+                <li>{t("setup.quiet")}</li>
+              </ul>
+            ) : (
+              <p className="text-sm leading-relaxed text-zinc-300">{t("setup.before_start_body")}</p>
+            )}
+            {webInput && isListening && (
+              <WebDeviceFields input={webInput} inputSource={inputSource} onInputError={onInputError} />
+            )}
+          </>
         )}
 
         {(isListening || isLoading) && (
           <SignalMeter audioRefs={audioRefs} isListening={isListening} gain={inputGain} onHeard={markHeard} />
+        )}
+
+        {showHelp && isListening && !heard && (
+          <NoSignalHelp items={helpItems(isNative, inputSource, channelCount)} />
         )}
 
         <div className="mt-auto flex justify-end pt-2">

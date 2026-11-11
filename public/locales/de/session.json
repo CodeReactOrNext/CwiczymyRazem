@@ -15,22 +15,22 @@
     "pitch_off": "Tonerkennung aus",
     "pitch_detect": "Tonerkennung",
     "tuner": "Stimmgerät",
-    "recalibrate": "Neu kalibrieren",
+    "recalibrate": "Eingang einrichten",
     "playback_off": "Gitarrenwiedergabe aus – klicken, um den Tab zu hören",
     "playback_on": "Gitarrenwiedergabe an – klicken, um den Tab stummzuschalten",
     "playback": "Gitarrenwiedergabe",
     "mic_active": "Mikrofon aktiv – die App hört deiner Gitarre zu",
     "mic_enable": "Mikrofon aktivieren, um zu erkennen, was du spielst",
-    "mic_tools_hint": "Mikrofon-Tools: Neu kalibrieren, Stimmgerät, Fehlerbehebung",
-    "mic_tools": "Mikrofon-Tools",
-    "mic_not_working": "Mikrofon funktioniert nicht?",
+    "mic_tools_hint": "Eingangs-Tools: Einrichtung, Stimmgerät, Fehlerbehebung",
+    "mic_tools": "Eingangs-Tools",
+    "mic_not_working": "Gitarre wird nicht erkannt?",
     "boost_hint": "Hebe die Guitar-Pro-Wiedergabe über 100 % an, wenn sie zu leise ist.",
     "bass_tuning": "Bassstimmung",
     "bass_tuning_named": "Bassstimmung: {{name}}",
     "bass_tuning_change": "Bassstimmung – zum Ändern klicken"
   },
   "mic_help": {
-    "title": "Mikrofon-Fehlerbehebung",
+    "title": "Fehlerbehebung für den Eingang",
     "intro": "Wenn die App deine Gitarre nicht hört oder falsche Töne erkennt, geh diese Schritte durch. Die meisten Probleme kommen von Browser-Berechtigungen oder einer anderen App, die das Mikrofon nutzt.",
     "resetting": "Wird zurückgesetzt…",
     "reset": "Mikrofon-Einstellungen zurücksetzen & neu laden",
@@ -42,15 +42,15 @@
       },
       "1": {
         "title": "Das richtige Eingabegerät wählen",
-        "description": "Wenn du mehrere Mikrofone oder ein Audio-Interface hast, stell das richtige als Standardeingang in den Soundeinstellungen deines Systems (und in den Website-Berechtigungen des Browsers) ein und lade dann neu."
+        "description": "Wenn du mehrere Mikrofone oder ein Audio-Interface hast, öffne „Eingang einrichten“ und wähl dort das richtige aus. Die App merkt es sich fürs nächste Mal."
       },
       "2": {
         "title": "Mikrofon freigeben",
         "description": "Schließ andere Apps, die das Mikrofon belegen könnten – Zoom, Discord, OBS, Teams oder einen anderen Browser-Tab. Nur eine App kann gleichzeitig einen Eingang mit geringer Latenz aufnehmen."
       },
       "3": {
-        "title": "Neu kalibrieren",
-        "description": "Nutze den Button „Neu kalibrieren“, um die Stimm-Kalibrierung zu wiederholen. Das behebt die meisten Probleme wie „Töne werden nicht erkannt“ oder „falscher Ton“ nach einem Geräte- oder Raumwechsel."
+        "title": "„Eingang einrichten“ noch einmal durchgehen",
+        "description": "Öffne „Eingang einrichten“ über dem Tab, um das Signal zu prüfen und die Empfindlichkeit neu einzustellen. Mach das nach einem Geräte- oder Raumwechsel."
       },
       "4": {
         "title": "Pegel & Stimmung prüfen",
@@ -350,7 +350,7 @@
     "description": "Schlagzeug, Bass und ein weiches Pad für genau diese Übung, in ihrer Tonart und nach ihren Akkorden.",
     "drums_only": "Nur Schlagzeug: Die Töne laufen über alle Bünde, jeder Akkord würde mit ihnen reiben.",
     "drone": "Bass und Powerchords auf dem Grundton, weil die Töne weder Dur noch Moll festlegen.",
-    "headphones": "Mit aktivem Mikrofon Kopfhörer aufsetzen. Sonst hört das Mikrofon die Band als dein Spiel.",
+    "headphones": "Mit aktivem Mikrofon Kopfhörer aufsetzen. Sonst hört das Mikrofon die Band als dein Spiel. Wenn Töne gezählt werden, die du nicht gespielt hast, prüf das zuerst.",
     "groove": {
       "rock": "Rock",
       "pop": "Pop",
@@ -397,10 +397,11 @@
       "keys_house": "Stabs",
       "keys_dark": "Streicher"
     },
-    "headphones_toast": {
-      "title": "Der Backing Track ist an",
-      "body": "Mit aktivem Mikrofon Kopfhörer aufsetzen — sonst hört das Mikrofon die Band als dein Spiel. Ändern kannst du das jederzeit im Lautstärke-Menü.",
-      "off": "Ausschalten"
+    "leak_notice": {
+      "title": "Spielst du über Lautsprecher?",
+      "body": "Der Backing Track ist an und dein Mikrofon kann ihn hören. Kopfhörer halten ihn draußen. Wenn die App Töne zählt, die du nicht gespielt hast, oder gespielte verpasst, prüf das zuerst.",
+      "ok": "Verstanden",
+      "off": "Backing Track ausschalten"
     }
   },
   "interval_click": {
@@ -651,5 +652,14 @@
     "preview": "Vorschau",
     "hint_count_in": "Das Metronom zählt ein, dann spielst du. Mit Vorschau siehst du die Tabulatur, ohne dass die Zeit läuft.",
     "hint": "Die Zeit läuft ab Start. Mit Vorschau kannst du dich erst umsehen."
+  },
+  "mic_open_failed": {
+    "title": "Das Mikrofon ging nicht an",
+    "action": "Eingang einrichten",
+    "denied": "Diese Website darf das Mikrofon nicht mehr benutzen.",
+    "no_device": "Kein Audioeingang gefunden. Schließ dein Interface oder Mikrofon an.",
+    "busy": "Ein anderes Programm hält deinen Audioeingang.",
+    "unsupported": "Dieser Browser kann kein Mikrofon nutzen.",
+    "unknown": "Öffne „Eingang einrichten“, um das zu beheben."
   }
 }

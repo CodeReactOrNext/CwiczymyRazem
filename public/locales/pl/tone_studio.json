@@ -106,7 +106,7 @@
     "default": "domyślne",
     "channel": "Kanał",
     "input_channel_hint": "Z którego kanału wejściowego nagrywać — np. gniazdo gitarowe w interfejsie wielokanałowym",
-    "output": "Wyjście",
+    "output": "Wyjście wzmacniacza",
     "asio_same_device": "ASIO używa tego samego urządzenia na wejściu i wyjściu",
     "output_hint": "Urządzenie wyjściowe do odsłuchu wzmacniacza",
     "same_as_input": "Takie jak wejście (ASIO)",

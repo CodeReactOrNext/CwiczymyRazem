@@ -3,9 +3,9 @@
   "close": "Zamknij",
   "back": "Wstecz",
   "setup": {
-    "title_native": "Konfiguracja audio",
-    "title_interface": "Konfiguracja interfejsu audio",
-    "title_mic": "Konfiguracja mikrofonu",
+    "title_native": "Ustawienia wejścia",
+    "title_interface": "Ustawienia wejścia",
+    "title_mic": "Ustawienia wejścia",
     "connecting": "Łączenie…",
     "start_listening": "Zacznij nasłuchiwać",
     "grant": "Zezwól na mikrofon",
@@ -20,10 +20,10 @@
     "refresh": "Odśwież",
     "no_inputs": "Nie znaleziono urządzeń wejściowych",
     "channel": "Wejście {{n}}",
-    "output": "Wyjście",
+    "output": "Wyjście dźwięku aplikacji",
     "no_outputs": "Nie znaleziono urządzeń wyjściowych",
     "output_hint_asio4all": "ASIO4ALL blokuje cały interfejs, razem z wyjściami, więc metronom nie zagra przez niego. Wybierz tu inne wyjście (np. głośniki komputera) albo w panelu ASIO4ALL wyłącz wyjście interfejsu i zostaw samo wejście.",
-    "before_start_body": "Wybierz interfejs jako mikrofon przeglądarki (ikona mikrofonu przy pasku adresu).",
+    "before_start_body": "Wybierz wejście, do którego wpięta jest gitara, i zagraj coś.",
     "level": {
       "silent": "Brak sygnału. Zagraj coś",
       "good": "Słyszę gitarę",
@@ -39,7 +39,21 @@
     "guitar_input": "Wejście z gitarą",
     "next": "Dalej",
     "waiting_signal": "Zagraj coś, żeby przejść dalej",
-    "ready": "Słyszę gitarę. Możesz iść dalej."
+    "ready": "Słyszę gitarę. Możesz iść dalej.",
+    "input_device": "Urządzenie wejściowe",
+    "channel_auto": "Auto (Wejście {{n}})",
+    "help": {
+      "title": "Dalej brak sygnału? Sprawdź to",
+      "device": "Wejście wybrane wyżej to ma być Twój interfejs, a nie kamerka czy mikrofon laptopa.",
+      "device_mic": "Wejście wybrane wyżej to ma być mikrofon, którego chcesz używać.",
+      "jack": "Wejście z gitarą ma odpowiadać gniazdu, do którego wpięta jest gitara.",
+      "gain": "Podkręć gałkę gain tego wejścia na interfejsie.",
+      "inst": "Jeśli interfejs ma przełącznik INST albo Hi-Z, włącz go.",
+      "guitar": "Podkręć gałkę głośności w gitarze i sprawdź kabel.",
+      "other_app": "Zamknij inne programy, które używają interfejsu, np. DAW.",
+      "closer": "Przysuń gitarę bliżej mikrofonu.",
+      "muted": "Sprawdź, czy mikrofon nie jest wyciszony w ustawieniach dźwięku systemu."
+    }
   },
   "output_stall": {
     "title": "Metronom nie może zagrać",
@@ -95,7 +109,7 @@
   },
   "summary": {
     "title": "Gotowe",
-    "ready": "Mikrofon jest włączony",
+    "ready": "Wykrywanie jest włączone",
     "body": "Aplikacja słyszy gitarę i będzie oceniać Twoją grę.",
     "tuning": "Strojenie",
     "tuning_count": "{{tuned}} z {{total}} strun",
@@ -115,8 +129,28 @@
     "skip": "Na razie pomiń"
   },
   "error": {
-    "title": "Mikrofon zablokowany",
-    "body": "Zezwól na dostęp do mikrofonu w ustawieniach przeglądarki i spróbuj ponownie.",
+    "reasons": {
+      "denied": {
+        "title": "Mikrofon zablokowany",
+        "body": "Zezwól tej stronie na dostęp do mikrofonu (ikona na lewym końcu paska adresu) i spróbuj ponownie."
+      },
+      "no_device": {
+        "title": "Nie znaleziono wejścia audio",
+        "body": "Podłącz interfejs albo mikrofon i spróbuj ponownie."
+      },
+      "busy": {
+        "title": "Wejście jest zajęte",
+        "body": "Inny program trzyma Twoje wejście audio. Zamknij DAW i inne aplikacje audio, a potem spróbuj ponownie."
+      },
+      "unsupported": {
+        "title": "Ta przeglądarka nie obsługuje mikrofonu",
+        "body": "Otwórz riff.quest w aktualnej wersji Chrome, Edge, Firefoksa albo Safari."
+      },
+      "unknown": {
+        "title": "Nie udało się otworzyć wejścia audio",
+        "body": "Podłącz ponownie interfejs albo mikrofon i spróbuj jeszcze raz."
+      }
+    },
     "retry": "Spróbuj ponownie",
     "cancel": "Anuluj"
   },
@@ -128,11 +162,11 @@
     "recalibrate": "Skalibruj ponownie"
   },
   "mic_mode": {
-    "required": "Wymagany mikrofon",
-    "tracking": "Śledzenie mikrofonem",
-    "exam_body": "Ten moduł wymaga konfiguracji mikrofonu. Włącz mikrofon, żeby system mógł ocenić Twoją grę podczas egzaminu.",
-    "body": "Ten plan zawiera ćwiczenia z tabulaturą. Włącz mikrofon, żeby system mógł słuchać gitary i oceniać Twoją grę na bieżąco.",
-    "enable": "Włącz mikrofon",
+    "required": "Wykrywanie jest wymagane",
+    "tracking": "Wykrywanie",
+    "exam_body": "Ten egzamin jest oceniany ze słuchu. Ustaw wejście, żeby aplikacja słyszała Twoją grę.",
+    "body": "Ten plan zawiera ćwiczenia z tabulaturą. Ustaw wejście, żeby aplikacja słyszała gitarę i oceniała Twoją grę na bieżąco.",
+    "enable": "Ustaw wejście",
     "skip": "Pomiń"
   },
   "timing_step": {

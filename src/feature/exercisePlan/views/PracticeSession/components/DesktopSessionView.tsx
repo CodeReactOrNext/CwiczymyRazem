@@ -361,6 +361,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                         onStart={p.handleToggleTimer}
                         onPreview={startGate.dismiss}
                         countsIn={!!p.currentExercise.metronomeSpeed}
+                        micOn={p.isMicEnabled}
                       />
                     ) : undefined}
                   />

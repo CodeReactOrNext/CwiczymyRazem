@@ -194,5 +194,15 @@
     "error": "Algo salió mal. Inténtalo de nuevo.",
     "unverified_name": "La app eligió este nombre ella misma; riff.quest no puede confirmarlo. Revisa la dirección a la que vuelves.",
     "back_to": "Volver a {{host}}"
+  },
+  "audio_input": {
+    "title": "Entrada de la guitarra",
+    "subtitle": "Lo que escucha la app cuando puntúa cómo tocas. Se guarda en este dispositivo.",
+    "check_label": "Comprueba tu entrada",
+    "check_description": "Elige tu interfaz o micrófono y mira si la app oye la guitarra.",
+    "start": "Comprobar entrada",
+    "starting": "Conectando…",
+    "stop": "Detener",
+    "heard": "La app oye tu guitarra."
   }
 }

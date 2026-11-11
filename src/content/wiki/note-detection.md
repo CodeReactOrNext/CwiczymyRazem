@@ -52,21 +52,21 @@ If every note leans the same way by about the same amount, that's usually audio 
 
 ## Setting it up
 
-The first time an exercise needs it, you get a **Mic Tracking** prompt with **Enable Mic** and **Skip**. Choosing to enable runs **Guitar Calibration**, a short wizard that only has to be done once per setup.
+The first time an exercise needs it, you get a **Pitch Detect** prompt with **Set up input** and **Skip**. Choosing to set up runs **Input setup**, a short wizard that only has to be done once per setup. You can also pick your input ahead of time in Settings, under **Guitar input**.
 
-<StepList steps="How is the guitar connected?::Audio Interface if it's plugged into a USB or Thunderbolt box, Microphone if you're playing acoustically into a laptop or USB mic|Grant access::The browser asks once. Say yes, or nothing downstream works|Set the level::A Signal Level meter turns green when you're loud enough. Drag the gain, or let the automatic setting listen to you play and pick it|Play each string::You're asked for all six, one at a time, so the app learns how far your guitar sits from concert pitch and stops calling a slightly flat G an F#|Confirm::The summary shows the offset it measured per string. That's it, saved" />
+<StepList steps="How is the guitar connected?::Audio Interface if it's plugged into a USB or Thunderbolt box, Microphone if you're playing acoustically into a laptop or USB mic|Grant access::The browser asks once. Say yes, or nothing downstream works|Pick the input::Choose your interface or microphone from the list and play something. The Signal meter turns green once the app hears the guitar. With an interface that has more than one jack, Guitar input follows the one you're plugged into, or you can pin it yourself|Let a note ring::You play one note and hold it. If it cuts off early, raise the Input Sensitivity or let the automatic setting pick it|Tune up::A tuner walks you through the strings. Skip it if you're already in tune|Measure the delay::Play along to a few clicks so timing is graded against what you actually hear" />
 
 <BlogAlert type="tip">
-Calibrate in the room and on the gear you actually practise on. A calibration done on headphones in a quiet flat is not the calibration you want on a loud amp.
+Run the setup in the room and on the gear you actually practise on. A sensitivity picked on headphones in a quiet flat is not the one you want next to a loud amp.
 </BlogAlert>
 
-## The mic tools
+## The input tools
 
 Next to the Pitch Detect button is a small chevron with the things you need occasionally rather than daily.
 
 <Screenshot src="/images/wiki/pitch-detect-tools.webp" alt="The session toolbar: a tuning button reading Half Step Down, a green Pitch Detect button, and an open menu listing Recalibrate, Tuner and 'Mic not working?'" caption="Pitch Detect goes green while the app is listening. The tuning button sits to its left, showing whatever tuning you're currently in." maxWidth="520px" />
 
-<Checklist items="Recalibrate::Re-runs the wizard. This is the fix for almost every 'it hears the wrong note' complaint after changing guitar, room or interface|Tuner::A proper tuner, without leaving the exercise|Mic not working?::A troubleshooting list plus a button that wipes the saved mic setup so you can start clean" />
+<Checklist items="Input setup::Opens the setup again, straight on the list of inputs. This is where you switch interface or microphone, and the fix for most 'it doesn't hear me' complaints after changing guitar, room or gear|Tuner::A proper tuner, without leaving the exercise|Guitar not detected?::A troubleshooting list plus a button that wipes the saved setup so you can start clean" />
 
 ## Tuning matters more than you'd think
 
@@ -82,7 +82,7 @@ Learning Path exams that grade your playing require detection and won't let you 
 
 ## When it hears nothing
 
-<Checklist items="Something else has the mic::Zoom, Discord, OBS, a second browser tab. Only one app gets a low-latency input at a time, so close the others|The wrong input is selected::Set the right device as your system default, then reload|The system is blocking it::Windows and macOS both have a privacy screen for microphone access, and your browser has to be allowed there as well as on the site|Too quiet, or too hot::A whisper and a wall of distortion are equally hard to read. Aim for the green band on the level meter|Out of tune::Detection is a pitch comparison. Run the Tuner first, then Recalibrate" />
+<Checklist items="Something else has the mic::Zoom, Discord, OBS, a second browser tab. Only one app gets a low-latency input at a time, so close the others|The wrong input is selected::Open Input setup and pick your interface or microphone from the list. A webcam or the laptop's own mic is a common wrong guess|The guitar is in the other jack::With a two-input interface, check that Guitar input shows the jack you're plugged into|The system is blocking it::Windows and macOS both have a privacy screen for microphone access, and your browser has to be allowed there as well as on the site|Too quiet, or too hot::A whisper and a wall of distortion are equally hard to read. Aim for the green band on the level meter|Out of tune::Detection is a pitch comparison. Run the Tuner first, then go through Input setup again" />
 
 <BlogAlert type="takeaway">
 If detection is fighting you for more than a couple of minutes, turn it off and keep playing. A logged session with the mic off is worth exactly as much as one with it on.
@@ -90,6 +90,6 @@ If detection is fighting you for more than a couple of minutes, turn it off and 
 
 ## Questions people ask
 
-<FaqList items="Do I need an audio interface?::No. A laptop microphone works for most drills. An interface is cleaner, quieter and faster, and the desktop app makes it faster still|Does detection change my points?::No. Points come from the time you log and your healthy habits. Accuracy affects the exercise's own score and its stars, not your level|Why does it miss notes I definitely played?::Usually calibration or tuning. Retune, then Recalibrate. Fast passages on a distorted tone through a room mic are also genuinely hard to read|Can I use it on my phone?::Yes, the browser mic path works on mobile, though a phone in a loud room is the hardest case there is|It hears my amp or backing track too::It will. Play through headphones where you can, and keep the room quiet during hunts|Can I practise a mic exercise without a mic?::Yes. Hunts let you tick what you've found by hand and skip on, and tablature exercises simply play through unscored" />
+<FaqList items="Do I need an audio interface?::No. A laptop microphone works for most drills. An interface is cleaner, quieter and faster, and the desktop app makes it faster still|Does detection change my points?::No. Points come from the time you log and your healthy habits. Accuracy affects the exercise's own score and its stars, not your level|Why does it miss notes I definitely played?::Usually sensitivity or tuning. Retune, then go through Input setup again. Fast passages on a distorted tone through a room mic are also genuinely hard to read|Can I use it on my phone?::Yes, the browser mic path works on mobile, though a phone in a loud room is the hardest case there is|It hears my amp or backing track too::It will. Play through headphones where you can, and keep the room quiet during hunts|Can I practise a mic exercise without a mic?::Yes. Hunts let you tick what you've found by hand and skip on, and tablature exercises simply play through unscored" />
 
 <ReadNext links="Ways to practise::/wiki/practice-modes-overview|The desktop app::/wiki/desktop-app|Practice routines & Auto Plan::/wiki/exercise-plans-and-auto-plan|Learning Path & Scale Map::/wiki/journey-and-scale-tree" />

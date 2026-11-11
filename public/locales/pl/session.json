@@ -15,22 +15,22 @@
     "pitch_off": "Wykrywanie dźwięków wyłączone",
     "pitch_detect": "Wykrywanie",
     "tuner": "Stroik",
-    "recalibrate": "Kalibruj ponownie",
+    "recalibrate": "Ustawienia wejścia",
     "playback_off": "Odtwarzanie gitary wyłączone — kliknij, aby usłyszeć tabulaturę",
     "playback_on": "Odtwarzanie gitary włączone — kliknij, aby wyciszyć tabulaturę",
     "playback": "Odtwarzanie gitary",
     "mic_active": "Mikrofon aktywny — aplikacja słucha Twojej gitary",
     "mic_enable": "Włącz mikrofon, aby wykrywać, co grasz",
-    "mic_tools_hint": "Narzędzia mikrofonu: kalibracja, stroik, rozwiązywanie problemów",
-    "mic_tools": "Narzędzia mikrofonu",
-    "mic_not_working": "Mikrofon nie działa?",
+    "mic_tools_hint": "Narzędzia wejścia: ustawienia, stroik, rozwiązywanie problemów",
+    "mic_tools": "Narzędzia wejścia",
+    "mic_not_working": "Gitara nie jest wykrywana?",
     "boost_hint": "Podgłośnij odtwarzanie Guitar Pro powyżej 100%, jeśli jest za ciche.",
     "bass_tuning": "Strój basu",
     "bass_tuning_named": "Strój basu: {{name}}",
     "bass_tuning_change": "Strój basu — kliknij, aby zmienić"
   },
   "mic_help": {
-    "title": "Problemy z mikrofonem",
+    "title": "Problemy z wejściem",
     "intro": "Jeśli aplikacja nie słyszy gitary albo wykrywa złe dźwięki, przejdź przez te kroki. Większość problemów wynika z uprawnień przeglądarki albo z innej aplikacji używającej mikrofonu.",
     "resetting": "Resetowanie…",
     "reset": "Zresetuj ustawienia mikrofonu i przeładuj",
@@ -42,15 +42,15 @@
       },
       "1": {
         "title": "Wybierz właściwe urządzenie wejściowe",
-        "description": "Jeśli masz kilka mikrofonów albo interfejs audio, ustaw właściwy jako domyślne wejście w ustawieniach dźwięku systemu (i w uprawnieniach strony w przeglądarce), a potem przeładuj."
+        "description": "Jeśli masz kilka mikrofonów albo interfejs audio, otwórz „Ustawienia wejścia” i wybierz tam właściwe urządzenie. Aplikacja zapamięta je na następny raz."
       },
       "2": {
         "title": "Zwolnij mikrofon",
         "description": "Zamknij inne aplikacje, które mogą trzymać mikrofon — Zoom, Discord, OBS, Teams albo inną kartę przeglądarki. Tylko jedna aplikacja naraz może przechwytywać wejście z niskim opóźnieniem."
       },
       "3": {
-        "title": "Kalibruj ponownie",
-        "description": "Użyj przycisku „Kalibruj ponownie”, aby powtórzyć kalibrację stroju. To rozwiązuje większość problemów typu „dźwięki nie są wykrywane” albo „zły dźwięk” po zmianie sprzętu lub pomieszczenia."
+        "title": "Przejdź „Ustawienia wejścia” jeszcze raz",
+        "description": "Otwórz „Ustawienia wejścia” nad tabulaturą, żeby sprawdzić sygnał i ustawić czułość od nowa. Zrób to po zmianie sprzętu albo pomieszczenia."
       },
       "4": {
         "title": "Sprawdź poziomy i strój",
@@ -428,7 +428,7 @@
     "description": "Perkusja, bas i miękki pad napisane pod to ćwiczenie: w jego tonacji i zgodnie z jego akordami.",
     "drums_only": "Tylko perkusja: nuty przechodzą przez wszystkie progi, więc każdy akord by z nimi zgrzytał.",
     "drone": "Bas i power chordy na podstawie, bo nuty nie rozstrzygają, czy to dur, czy moll.",
-    "headphones": "Przy włączonym mikrofonie załóż słuchawki. Inaczej mikrofon usłyszy zespół jako twoje granie.",
+    "headphones": "Przy włączonym mikrofonie załóż słuchawki. Inaczej mikrofon usłyszy zespół jako twoje granie. Jeśli aplikacja zalicza nuty, których nie grasz, sprawdź najpierw to.",
     "groove": {
       "rock": "Rock",
       "pop": "Pop",
@@ -475,10 +475,11 @@
       "keys_house": "Akordy",
       "keys_dark": "Smyczki"
     },
-    "headphones_toast": {
-      "title": "Podkład jest włączony",
-      "body": "Przy włączonym mikrofonie załóż słuchawki — inaczej mikrofon usłyszy zespół jako twoje granie. Zmienisz to w każdej chwili w menu Głośność.",
-      "off": "Wyłącz"
+    "leak_notice": {
+      "title": "Grasz przez głośniki?",
+      "body": "Podkład jest włączony i mikrofon może go słyszeć. Słuchawki to rozwiązują. Jeśli aplikacja zalicza nuty, których nie grasz, albo gubi te zagrane, sprawdź najpierw to.",
+      "ok": "Rozumiem",
+      "off": "Wyłącz podkład"
     }
   },
   "interval_click": {
@@ -744,5 +745,14 @@
     "preview": "Podgląd",
     "hint_count_in": "Metronom odliczy wejście, potem grasz. Podgląd pokaże tabulaturę bez liczenia czasu.",
     "hint": "Czas liczy się od naciśnięcia Start. Podgląd pozwala najpierw się rozejrzeć."
+  },
+  "mic_open_failed": {
+    "title": "Mikrofon się nie włączył",
+    "action": "Ustawienia wejścia",
+    "denied": "Ta strona nie ma już zgody na użycie mikrofonu.",
+    "no_device": "Nie znaleziono wejścia audio. Podłącz interfejs albo mikrofon.",
+    "busy": "Inny program trzyma Twoje wejście audio.",
+    "unsupported": "Ta przeglądarka nie obsługuje mikrofonu.",
+    "unknown": "Otwórz „Ustawienia wejścia”, żeby to naprawić."
   }
 }

@@ -3,7 +3,7 @@ import { cn } from "assets/lib/utils";
 import { BackingTrackButton } from "feature/backingTrack/components/BackingTrackButton";
 import type { BackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
 import { useTranslation } from "hooks/useTranslation";
-import { RefreshCw, Settings2, Timer, X, ZoomIn, ZoomOut } from "lucide-react";
+import { Settings2, SlidersHorizontal, Timer, X, ZoomIn, ZoomOut } from "lucide-react";
 import React, {
   memo,
   useCallback,
@@ -500,13 +500,13 @@ export const TablatureSection = memo(function TablatureSection({
             </button>
           )}
           {isMicEnabled && (
-            // The same wizard as the mic menu's "Recalibrate", where it was
-            // hard to find: input, level, tuning, timing.
+            // The same setup as the input menu's "Input setup", where it was
+            // hard to find: device, level, tuning, timing.
             <button
               type='button'
               onClick={openMicSetup}
               className={cn(TOOL_CHIP, "shrink-0")}>
-              <RefreshCw className='h-3.5 w-3.5' />
+              <SlidersHorizontal className='h-3.5 w-3.5' />
               <span>{t("media.recalibrate")}</span>
             </button>
           )}

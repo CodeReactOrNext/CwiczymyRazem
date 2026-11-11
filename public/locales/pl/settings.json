@@ -194,5 +194,15 @@
     "error": "Coś poszło nie tak. Spróbuj ponownie.",
     "unverified_name": "Aplikacja sama nadała sobie tę nazwę, riff.quest nie może jej potwierdzić. Sprawdź adres, na który wrócisz.",
     "back_to": "Wróć do {{host}}"
+  },
+  "audio_input": {
+    "title": "Wejście gitary",
+    "subtitle": "Tego aplikacja słucha, gdy ocenia Twoją grę. Zapisane na tym urządzeniu.",
+    "check_label": "Sprawdź wejście",
+    "check_description": "Wybierz interfejs albo mikrofon i zobacz, czy aplikacja słyszy gitarę.",
+    "start": "Sprawdź wejście",
+    "starting": "Łączenie…",
+    "stop": "Zatrzymaj",
+    "heard": "Aplikacja słyszy gitarę."
   }
 }

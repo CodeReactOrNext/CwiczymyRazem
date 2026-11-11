@@ -3,9 +3,9 @@
   "close": "Close",
   "back": "Back",
   "setup": {
-    "title_native": "Audio Setup",
-    "title_interface": "Audio Interface Setup",
-    "title_mic": "Microphone Setup",
+    "title_native": "Input setup",
+    "title_interface": "Input setup",
+    "title_mic": "Input setup",
     "connecting": "Connecting…",
     "start_listening": "Start Listening",
     "grant": "Grant Microphone Access",
@@ -20,10 +20,10 @@
     "refresh": "Refresh",
     "no_inputs": "No input devices found",
     "channel": "Input {{n}}",
-    "output": "Output",
+    "output": "App sound output",
     "no_outputs": "No output devices found",
     "output_hint_asio4all": "ASIO4ALL locks your whole interface, outputs included, so the metronome can't play through it. Pick a different output here (e.g. your computer's speakers), or turn off the interface's output in the ASIO4ALL panel and keep only its input.",
-    "before_start_body": "Pick your interface as the browser's microphone (mic icon in the address bar).",
+    "before_start_body": "Pick the input your guitar is plugged into and play something.",
     "level": {
       "silent": "No signal. Play something",
       "good": "Hearing your guitar",
@@ -39,7 +39,21 @@
     "guitar_input": "Guitar input",
     "next": "Next",
     "waiting_signal": "Play something to continue",
-    "ready": "You can continue. The app hears your guitar."
+    "ready": "You can continue. The app hears your guitar.",
+    "input_device": "Input device",
+    "channel_auto": "Auto (Input {{n}})",
+    "help": {
+      "title": "Still no signal? Check these",
+      "device": "The input above should be your interface, not a webcam or the laptop's mic.",
+      "device_mic": "The input above should be the microphone you want to use.",
+      "jack": "Guitar input should match the jack your guitar is plugged into.",
+      "gain": "Turn up the gain knob for that input on the interface.",
+      "inst": "If the interface has an INST or Hi-Z switch, turn it on.",
+      "guitar": "Turn up the volume knob on the guitar and check the cable.",
+      "other_app": "Close other programs that use the interface, such as a DAW.",
+      "closer": "Move the guitar closer to the microphone.",
+      "muted": "Make sure the microphone isn't muted in your system's sound settings."
+    }
   },
   "output_stall": {
     "title": "The metronome can't play",
@@ -95,7 +109,7 @@
   },
   "summary": {
     "title": "All set",
-    "ready": "Your mic is on",
+    "ready": "Pitch Detect is on",
     "body": "The app hears your guitar and will score your playing.",
     "tuning": "Tuning",
     "tuning_count": "{{tuned}} of {{total}} strings",
@@ -115,8 +129,28 @@
     "skip": "Skip for now"
   },
   "error": {
-    "title": "Microphone blocked",
-    "body": "Please allow microphone access in your browser settings, then try again.",
+    "reasons": {
+      "denied": {
+        "title": "Microphone blocked",
+        "body": "Allow microphone access for this site (the icon at the left end of the address bar), then try again."
+      },
+      "no_device": {
+        "title": "No audio input found",
+        "body": "Plug in your interface or microphone, then try again."
+      },
+      "busy": {
+        "title": "The input is in use",
+        "body": "Another program is holding your audio input. Close your DAW and other audio apps, then try again."
+      },
+      "unsupported": {
+        "title": "This browser can't use a microphone",
+        "body": "Open riff.quest in a current version of Chrome, Edge, Firefox or Safari."
+      },
+      "unknown": {
+        "title": "Couldn't open the audio input",
+        "body": "Reconnect your interface or microphone, then try again."
+      }
+    },
     "retry": "Try Again",
     "cancel": "Cancel"
   },
@@ -128,11 +162,11 @@
     "recalibrate": "Recalibrate"
   },
   "mic_mode": {
-    "required": "Microphone Required",
-    "tracking": "Mic Tracking",
-    "exam_body": "This module requires microphone setup. Enable your microphone so the system can evaluate your playing during the exam.",
-    "body": "This plan contains tablature exercises. Enable your microphone so the system can listen to your guitar and score your playing in real time.",
-    "enable": "Enable Mic",
+    "required": "Pitch Detect required",
+    "tracking": "Pitch Detect",
+    "exam_body": "This exam is scored by listening to your guitar. Set up your input so the app can hear you play.",
+    "body": "This plan has tablature exercises. Set up your input so the app can hear your guitar and score your playing in real time.",
+    "enable": "Set up input",
     "skip": "Skip"
   },
   "timing_step": {

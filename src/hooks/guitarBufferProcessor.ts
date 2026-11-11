@@ -132,6 +132,10 @@ export interface BufferProcessorOptions {
   /** Whether the player is on bass right now (read fresh each call) — turns on
    *  the deep bass YIN, so switching instruments needs no new detectors. */
   isBass?: () => boolean;
+  /** Whether anyone is reading lastSoftAttackMsRef right now (read fresh each
+   *  call) — the strum detector is a full spectral pass per hop, and only a
+   *  strumming exercise looks at it. Omit it and it runs whenever the ref is there. */
+  isStrumWanted?: () => boolean;
 }
 
 /**
@@ -140,10 +144,10 @@ export interface BufferProcessorOptions {
  * state persists across calls.
  */
 export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
-  const { detectors, targets, getGain, spectrum, recentAudio, onActive, isBass, sampleRate = 48000 } = opts;
+  const { detectors, targets, getGain, spectrum, recentAudio, onActive, isBass, isStrumWanted, sampleRate = 48000 } = opts;
   const { pitch: pitchDetector, onset: onsetDetector, tick: tickDetector, pitchHigh: pitchHighDetector, pitchLow: pitchLowDetector, pitchBass: pitchBassDetector } = detectors;
-  // Only run when someone reads it.
-  const strumDetector = targets.lastSoftAttackMsRef ? detectors.strum : null;
+  // Only run when someone reads it (see isStrumWanted for the live switch).
+  const strumDetectorIfRead = targets.lastSoftAttackMsRef ? detectors.strum : null;
 
   let lastFrequencies: number[] = [];
   // Per-hop pitch estimates of the current window, reused across calls.
@@ -382,8 +386,12 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     pending = null;
   };
 
-  return function process(inputBuffer: Float32Array) {
+  /** `nowMs` is when the window's last sample was captured (Date.now() domain) —
+   *  pass it when the window was stamped where it was captured and is only being
+   *  processed later, on another thread. */
+  return function process(inputBuffer: Float32Array, nowMs: number = Date.now()) {
     const len = inputBuffer.length;
+    const strumDetector = strumDetectorIfRead && (!isStrumWanted || isStrumWanted()) ? strumDetectorIfRead : null;
     const gain = getGain();
     bassActive = !!pitchBassDetector && !!isBass?.();
     if (!normalizedBuf || normalizedBuf.length !== len) normalizedBuf = new Float32Array(len);
@@ -414,7 +422,6 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     targets.rawVolumeRef.current = rawVolume;
     if (targets.inputPeakRef) targets.inputPeakRef.current = gain > 0 ? peak / gain : peak;
 
-    const nowMs = Date.now();
     // Before the silence gate: an attack out of silence is the one it must not miss.
     const isLowAttack = detectLowAttack(inputBuffer, nowMs);
     recentAudio?.push(inputBuffer, nowMs);

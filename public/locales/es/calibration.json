@@ -3,9 +3,9 @@
   "close": "Cerrar",
   "back": "Atrás",
   "setup": {
-    "title_native": "Configuración de audio",
-    "title_interface": "Configurar interfaz de audio",
-    "title_mic": "Configurar micrófono",
+    "title_native": "Configurar entrada",
+    "title_interface": "Configurar entrada",
+    "title_mic": "Configurar entrada",
     "connecting": "Conectando…",
     "start_listening": "Empezar a escuchar",
     "grant": "Permitir el micrófono",
@@ -20,10 +20,10 @@
     "refresh": "Actualizar",
     "no_inputs": "No se encontraron dispositivos de entrada",
     "channel": "Entrada {{n}}",
-    "output": "Salida",
+    "output": "Salida del sonido de la app",
     "no_outputs": "No se encontraron dispositivos de salida",
     "output_hint_asio4all": "ASIO4ALL bloquea toda tu interfaz, salidas incluidas, así que el metrónomo no puede sonar por ella. Elige aquí otra salida (p. ej. los altavoces del ordenador) o, en el panel de ASIO4ALL, desactiva la salida de la interfaz y deja solo la entrada.",
-    "before_start_body": "Elige tu interfaz como micrófono del navegador (icono del micrófono en la barra de direcciones).",
+    "before_start_body": "Elige la entrada donde está conectada tu guitarra y toca algo.",
     "level": {
       "silent": "Sin señal. Toca algo",
       "good": "Se oye tu guitarra",
@@ -39,7 +39,21 @@
     "guitar_input": "Entrada de la guitarra",
     "next": "Siguiente",
     "waiting_signal": "Toca algo para continuar",
-    "ready": "Se oye tu guitarra. Puedes continuar."
+    "ready": "Se oye tu guitarra. Puedes continuar.",
+    "input_device": "Dispositivo de entrada",
+    "channel_auto": "Auto (Entrada {{n}})",
+    "help": {
+      "title": "¿Sigue sin señal? Revisa esto",
+      "device": "La entrada de arriba debe ser tu interfaz, no una webcam ni el micrófono del portátil.",
+      "device_mic": "La entrada de arriba debe ser el micrófono que quieres usar.",
+      "jack": "La entrada de la guitarra debe coincidir con la toma donde está conectada.",
+      "gain": "Sube el control de ganancia de esa entrada en la interfaz.",
+      "inst": "Si la interfaz tiene un interruptor INST o Hi-Z, actívalo.",
+      "guitar": "Sube el volumen de la guitarra y revisa el cable.",
+      "other_app": "Cierra otros programas que usen la interfaz, como un DAW.",
+      "closer": "Acerca la guitarra al micrófono.",
+      "muted": "Comprueba que el micrófono no esté silenciado en los ajustes de sonido del sistema."
+    }
   },
   "output_stall": {
     "title": "El metrónomo no puede sonar",
@@ -95,7 +109,7 @@
   },
   "summary": {
     "title": "Listo",
-    "ready": "Tu micrófono está activado",
+    "ready": "La detección está activada",
     "body": "La app oye tu guitarra y puntuará cómo tocas.",
     "tuning": "Afinación",
     "tuning_count": "{{tuned}} de {{total}} cuerdas",
@@ -115,8 +129,28 @@
     "skip": "Saltar por ahora"
   },
   "error": {
-    "title": "Micrófono bloqueado",
-    "body": "Permite el acceso al micrófono en los ajustes del navegador y vuelve a intentarlo.",
+    "reasons": {
+      "denied": {
+        "title": "Micrófono bloqueado",
+        "body": "Permite el acceso al micrófono para este sitio (el icono al principio de la barra de direcciones) y vuelve a intentarlo."
+      },
+      "no_device": {
+        "title": "No se encontró ninguna entrada de audio",
+        "body": "Conecta tu interfaz o micrófono y vuelve a intentarlo."
+      },
+      "busy": {
+        "title": "La entrada está en uso",
+        "body": "Otro programa está usando tu entrada de audio. Cierra tu DAW y otras apps de audio y vuelve a intentarlo."
+      },
+      "unsupported": {
+        "title": "Este navegador no puede usar el micrófono",
+        "body": "Abre riff.quest en una versión actual de Chrome, Edge, Firefox o Safari."
+      },
+      "unknown": {
+        "title": "No se pudo abrir la entrada de audio",
+        "body": "Vuelve a conectar tu interfaz o micrófono e inténtalo de nuevo."
+      }
+    },
     "retry": "Reintentar",
     "cancel": "Cancelar"
   },
@@ -128,11 +162,11 @@
     "recalibrate": "Recalibrar"
   },
   "mic_mode": {
-    "required": "Micrófono necesario",
-    "tracking": "Seguimiento por micrófono",
-    "exam_body": "Este módulo requiere configurar el micrófono. Actívalo para que el sistema pueda evaluar cómo tocas durante el examen.",
-    "body": "Este plan incluye ejercicios con tablatura. Activa el micrófono para que el sistema escuche tu guitarra y puntúe cómo tocas en tiempo real.",
-    "enable": "Activar micrófono",
+    "required": "Detección necesaria",
+    "tracking": "Detección",
+    "exam_body": "Este examen se puntúa escuchando tu guitarra. Configura tu entrada para que la app te oiga tocar.",
+    "body": "Este plan incluye ejercicios con tablatura. Configura tu entrada para que la app oiga tu guitarra y puntúe cómo tocas en tiempo real.",
+    "enable": "Configurar entrada",
     "skip": "Saltar"
   },
   "timing_step": {

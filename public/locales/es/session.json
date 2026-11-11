@@ -15,22 +15,22 @@
     "pitch_off": "Detección de notas desactivada",
     "pitch_detect": "Detección",
     "tuner": "Afinador",
-    "recalibrate": "Recalibrar",
+    "recalibrate": "Configurar entrada",
     "playback_off": "Reproducción de guitarra apagada: haz clic para oír la tablatura",
     "playback_on": "Reproducción de guitarra encendida: haz clic para silenciar la tablatura",
     "playback": "Reproducción de guitarra",
     "mic_active": "Micrófono activo: la app está escuchando tu guitarra",
     "mic_enable": "Activa el micrófono para detectar lo que tocas",
-    "mic_tools_hint": "Herramientas del micrófono: recalibrar, afinador, solución de problemas",
-    "mic_tools": "Herramientas del micrófono",
-    "mic_not_working": "¿No funciona el micrófono?",
+    "mic_tools_hint": "Herramientas de entrada: configuración, afinador, solución de problemas",
+    "mic_tools": "Herramientas de entrada",
+    "mic_not_working": "¿No detecta la guitarra?",
     "boost_hint": "Sube la reproducción de Guitar Pro por encima del 100 % si suena demasiado baja.",
     "bass_tuning": "Afinación del bajo",
     "bass_tuning_named": "Afinación del bajo: {{name}}",
     "bass_tuning_change": "Afinación del bajo: haz clic para cambiarla"
   },
   "mic_help": {
-    "title": "Problemas con el micrófono",
+    "title": "Problemas con la entrada",
     "intro": "Si la app no oye tu guitarra o detecta notas equivocadas, sigue estos pasos. La mayoría de los problemas vienen de los permisos del navegador o de otra app que usa el micrófono.",
     "resetting": "Restableciendo…",
     "reset": "Restablecer ajustes del micrófono y recargar",
@@ -42,15 +42,15 @@
       },
       "1": {
         "title": "Elige el dispositivo de entrada correcto",
-        "description": "Si tienes varios micrófonos o una interfaz de audio, pon el correcto como entrada predeterminada en los ajustes de sonido del sistema (y en los permisos del sitio en el navegador) y recarga."
+        "description": "Si tienes varios micrófonos o una interfaz de audio, abre «Configurar entrada» y elige ahí el correcto. La app lo recuerda para la próxima vez."
       },
       "2": {
         "title": "Libera el micrófono",
         "description": "Cierra otras apps que puedan estar usando el micrófono: Zoom, Discord, OBS, Teams u otra pestaña del navegador. Solo una app a la vez puede capturar una entrada de baja latencia."
       },
       "3": {
-        "title": "Recalibra",
-        "description": "Usa el botón Recalibrar para repetir la calibración de afinación. Así se arreglan la mayoría de los problemas de «no detecta notas» o «nota equivocada» tras cambiar de equipo o de sala."
+        "title": "Repite «Configurar entrada»",
+        "description": "Abre «Configurar entrada» encima de la tablatura para revisar la señal y ajustar otra vez la sensibilidad. Hazlo tras cambiar de equipo o de sala."
       },
       "4": {
         "title": "Revisa niveles y afinación",
@@ -350,7 +350,7 @@
     "description": "Batería, bajo y un pad suave escritos para este ejercicio, en su tonalidad y siguiendo sus acordes.",
     "drums_only": "Solo batería: las notas recorren todos los trastes, así que cualquier acorde chocaría con ellas.",
     "drone": "Bajo y power chords sobre la raíz, porque las notas no dicen si es mayor o menor.",
-    "headphones": "Con el micrófono activo, usa auriculares. Si no, el micrófono oirá la banda como si tocaras tú.",
+    "headphones": "Con el micrófono activo, usa auriculares. Si no, el micrófono oirá la banda como si tocaras tú. Si se cuentan notas que no tocaste, revisa esto primero.",
     "groove": {
       "rock": "Rock",
       "pop": "Pop",
@@ -397,10 +397,11 @@
       "keys_house": "Stabs",
       "keys_dark": "Cuerdas"
     },
-    "headphones_toast": {
-      "title": "La pista de acompañamiento está activada",
-      "body": "Con el micrófono activo, usa auriculares: si no, el micrófono oirá la banda como si tocaras tú. Puedes cambiarlo cuando quieras en el menú de volumen.",
-      "off": "Desactivar"
+    "leak_notice": {
+      "title": "¿Tocas con altavoces?",
+      "body": "La pista de acompañamiento está activada y tu micrófono puede oírla. Con auriculares no entra. Si la app cuenta notas que no tocaste, o se pierde las que sí, revisa esto primero.",
+      "ok": "Entendido",
+      "off": "Apagar el acompañamiento"
     }
   },
   "interval_click": {
@@ -651,5 +652,14 @@
     "preview": "Vista previa",
     "hint_count_in": "El metrónomo marca la entrada y luego tocas. Vista previa te deja ver la tablatura sin que corra el tiempo.",
     "hint": "El tiempo empieza al pulsar Empezar. Vista previa te deja mirar antes."
+  },
+  "mic_open_failed": {
+    "title": "El micrófono no se activó",
+    "action": "Configurar entrada",
+    "denied": "Este sitio ya no tiene permiso para usar el micrófono.",
+    "no_device": "No se encontró ninguna entrada de audio. Conecta tu interfaz o micrófono.",
+    "busy": "Otro programa está usando tu entrada de audio.",
+    "unsupported": "Este navegador no puede usar el micrófono.",
+    "unknown": "Abre «Configurar entrada» para arreglarlo."
   }
 }

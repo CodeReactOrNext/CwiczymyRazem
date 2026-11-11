@@ -28,6 +28,11 @@ const MIC_STORAGE_KEYS = [
   "guitar_calibration_data",
   "mic_tracking_enabled",
   "guitar_playback_enabled",
+  // The browser path's picked input device and jack (see useAudioAnalyzer).
+  "web_audio_input_device_id",
+  "web_audio_input_channel",
+  // "Interface or microphone?" from the setup's first step (see inputSource.ts).
+  "mic_setup_input_source",
 ];
 
 interface TroubleshootingTip {
@@ -47,7 +52,7 @@ const TIPS: TroubleshootingTip[] = [
     icon: Mic,
     title: "Pick the right input device",
     description:
-      "If you have several mics or an audio interface, set the correct one as the default input in your system sound settings (and in the browser's site permissions), then reload.",
+      "If you have several mics or an audio interface, open Input setup and pick the right one there. The app remembers it for next time.",
   },
   {
     icon: Headphones,
@@ -57,9 +62,9 @@ const TIPS: TroubleshootingTip[] = [
   },
   {
     icon: RotateCcw,
-    title: "Recalibrate",
+    title: "Go through Input setup again",
     description:
-      'Use the Recalibrate button to re-run the tuning calibration. This fixes most "notes not detected" or "wrong note" problems after changing gear or rooms.',
+      "Open Input setup above the tab to check the signal and set the sensitivity again. Do it after changing gear or rooms.",
   },
   {
     icon: Volume2,
