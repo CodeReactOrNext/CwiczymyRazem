@@ -26,9 +26,9 @@ export const useSessionActivity = ({ plan, currentExercise }: UseSessionActivity
           timestamp: Date.now(),
         })
       );
-    } else if (userAuth && plan.boss) {
-      // A boss level is generated: Live now names the fight, with no ids to
-      // open an exercise that exists nowhere else.
+    } else if (userAuth && (plan.boss || plan.recording)) {
+      // A boss level is generated, and so is a part of a recording session:
+      // Live now names it, with no ids to open an exercise that exists nowhere else.
       dispatch(
         setActivity({
           planTitle: plan.title,

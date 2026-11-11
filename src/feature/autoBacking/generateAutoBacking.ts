@@ -22,8 +22,8 @@ import type { HarmonyKind, KeyHint } from "./keyDetection";
 import { detectKey, keyFromText } from "./keyDetection";
 import type { BarInfo, TabContent } from "./noteEvents";
 import { extractTabContent } from "./noteEvents";
-import type { BandStyleId, BandStylePreference } from "./styles";
-import { chooseStyle } from "./styles";
+import type { BandStyleId } from "./styles";
+import { chooseStyle, isStudioStyle } from "./styles";
 import type { Chord, ScaleId } from "./theory";
 import { chordSymbol, hasThird, pcName, usesFlats } from "./theory";
 
@@ -45,8 +45,11 @@ export interface AutoBackingOptions {
   keyHint?: KeyHint;
   /** Same seed, same backing — drum variations are picked from it. */
   seed?: string;
-  /** The band to play it: the player's pick, or "auto" to let the exercise choose. */
-  style?: BandStylePreference;
+  /**
+   * The band to play it: the player's pick, "auto" to let the exercise
+   * choose, or the session band an exercise names for itself.
+   */
+  style?: BandStyleId | "auto";
 }
 
 export interface AutoBackingSummary {
@@ -232,7 +235,7 @@ export function generateAutoBacking(
   const plan = harmonize({ content, analysis, barMap, random: rng });
   // The pad plays the chords in colour (maj7, add9, m9…); the bass keeps to
   // the plain triads, whose roots and thirds it walks.
-  const padSpans = analysis.key
+  const colouredSpans = analysis.key
     ? colourSpans(
         plan.spans,
         melodyOnBacking(content, barMap),
@@ -257,9 +260,17 @@ export function generateAutoBacking(
   );
 
   const withChords = plan.kind !== "rhythm" && plan.spans.length > 0;
-  // The dark band's strings sit high and quiet enough to go over a riff.
-  const withKeys = withChords && (!NO_KEYS.has(groove) || style === "dark");
-  const withArp = withKeys && onsetDensity(content) <= SPARSE_DENSITY;
+  // The dark band's strings sit high and quiet enough to go over a riff; a
+  // session band's own instrument is the band, whatever the part over it is.
+  const studio = isStudioStyle(style);
+  // A session band plays the chords the part names, as it names them: the
+  // tab says "Em", so nobody in the room plays Em9.
+  const padSpans = studio ? plan.spans : colouredSpans;
+  const withKeys =
+    withChords && (!NO_KEYS.has(groove) || style === "dark" || studio);
+  // A session band is a full band already: no arpeggio on top of it.
+  const withArp =
+    withKeys && !studio && onsetDensity(content) <= SPARSE_DENSITY;
 
   // Where each bar of the harmony loop starts, in loop beats.
   const loopStarts: number[] = [];
@@ -270,8 +281,9 @@ export function generateAutoBacking(
 
   const song = songForm(barMap.length, {
     evolving: !hasIntroOutro && (options.repeatCount ?? 0) === 0,
-    // Without a pad there is nothing to open with.
-    withIntro: withKeys,
+    // Without a pad there is nothing to open with; a session's take is a
+    // minute long, too short to spend its first bars waiting for the band.
+    withIntro: withKeys && !studio,
   });
 
   const drums: TablatureMeasure[] = [];

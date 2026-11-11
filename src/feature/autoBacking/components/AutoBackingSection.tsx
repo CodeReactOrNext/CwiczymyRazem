@@ -1,6 +1,7 @@
 import { Switch } from "assets/components/ui/switch";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
+import { Lock } from "lucide-react";
 import { GiDrumKit } from "react-icons/gi";
 
 import type { AutoBackingSummary } from "../generateAutoBacking";
@@ -47,6 +48,28 @@ function StylePicker({ playing }: { playing: AutoBackingSummary["style"] }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/**
+ * A session that brings its own band (a guild recording): the band is named,
+ * and there is nothing to pick.
+ */
+function LockedStyle({ playing }: { playing: AutoBackingSummary["style"] }) {
+  const { t } = useTranslation("session");
+  return (
+    <div className='mt-3'>
+      <p className='text-[10px] text-zinc-500'>
+        {t("auto_backing.style.label")}
+      </p>
+      <p className='mt-1.5 flex items-center gap-1.5 text-[11px] font-medium text-zinc-200'>
+        <Lock className='h-3 w-3 text-zinc-500' aria-hidden />
+        {t(`auto_backing.style.${playing}`)}
+      </p>
+      <p className='mt-1 text-[10px] leading-relaxed text-zinc-500'>
+        {t("auto_backing.style.locked")}
+      </p>
     </div>
   );
 }
@@ -110,6 +133,7 @@ export const AutoBackingSection = ({
   const summary = useAutoBackingStore((state) => state.summary);
   const enabled = useAutoBackingStore((state) => state.enabled);
   const setEnabled = useAutoBackingStore((state) => state.setEnabled);
+  const styleLocked = useAutoBackingStore((state) => state.styleLocked);
 
   if (!available || !summary) return null;
 
@@ -128,9 +152,13 @@ export const AutoBackingSection = ({
       </div>
       <Summary summary={summary} />
       {/* A boss fight plays its own score, whatever band was picked. */}
-      {enabled && summary.groove !== "boss" && (
-        <StylePicker playing={summary.style} />
-      )}
+      {enabled &&
+        summary.groove !== "boss" &&
+        (styleLocked ? (
+          <LockedStyle playing={summary.style} />
+        ) : (
+          <StylePicker playing={summary.style} />
+        ))}
       <p className='mt-2 text-[10px] leading-relaxed text-zinc-500'>
         {enabled ? t("auto_backing.headphones") : t("auto_backing.description")}
       </p>

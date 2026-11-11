@@ -22,9 +22,12 @@ interface AutoBackingState {
    *  read by the volume menus in both the desktop and phone layouts. */
   available: boolean;
   summary: AutoBackingSummary | null;
+  /** The exercise brings its own band (a guild recording): nothing to pick. */
+  styleLocked: boolean;
   setSession: (session: {
     available: boolean;
     summary: AutoBackingSummary | null;
+    styleLocked: boolean;
   }) => void;
 }
 
@@ -39,6 +42,7 @@ export const useAutoBackingStore = create<AutoBackingState>()(
       dismissLeakNotice: () => set({ leakNoticeDismissed: true }),
       available: false,
       summary: null,
+      styleLocked: false,
       setSession: (session) => set(session),
     }),
     {

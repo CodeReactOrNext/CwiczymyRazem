@@ -19,6 +19,7 @@ import { GuildCosmeticsTab } from "feature/guilds/components/GuildCosmeticsTab";
 import { GuildCover } from "feature/guilds/components/GuildCover";
 import { GuildMembersTab } from "feature/guilds/components/GuildMembersTab";
 import { GuildQuestsTab } from "feature/guilds/components/GuildQuestsTab";
+import { GuildRecordingPanel } from "feature/guilds/components/GuildRecordingPanel";
 import { GuildStashTab } from "feature/guilds/components/GuildStashTab";
 import { GuildStudioPanel } from "feature/guilds/components/GuildStudioPanel";
 import { GuildUpgradesTab } from "feature/guilds/components/GuildUpgradesTab";
@@ -33,6 +34,7 @@ import {
   Coins,
   Lock,
   MessageSquare,
+  Mic,
   Music,
   Palette,
   Shield,
@@ -62,6 +64,7 @@ const TABS: {
   { id: "stash", label: "tabs.stash", icon: Boxes, needsGuild: true },
   { id: "quests", label: "tabs.quests", icon: Target, needsGuild: true },
   { id: "studio", label: "tabs.studio", icon: Music, needsGuild: true },
+  { id: "recording", label: "tabs.recording", icon: Mic, needsGuild: true },
   { id: "upgrades", label: "tabs.upgrades", icon: Coins, needsGuild: true },
   {
     id: "kit",
@@ -292,6 +295,17 @@ export const GuildsView = () => {
           ) : (
             <NeedsAGuild
               what={t("needs_guild.studio")}
+              onBrowse={() => setTab("browse")}
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent value='recording' className='mt-0'>
+          {myGuild ? (
+            <GuildRecordingPanel onOpenStudio={() => setTab("studio")} />
+          ) : (
+            <NeedsAGuild
+              what={t("needs_guild.recording")}
               onBrowse={() => setTab("browse")}
             />
           )}

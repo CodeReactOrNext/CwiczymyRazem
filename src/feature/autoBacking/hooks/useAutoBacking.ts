@@ -13,6 +13,7 @@ import type { AutoBackingSummary } from "../generateAutoBacking";
 import { AUTO_TRACK_IDS, generateAutoBacking } from "../generateAutoBacking";
 import type { KeyHint } from "../keyDetection";
 import { useAutoBackingStore } from "../store/autoBackingStore";
+import { isStudioStyle } from "../styles";
 
 interface UseAutoBackingOptions {
   exercise: Exercise;
@@ -63,6 +64,16 @@ export function useAutoBacking({
   const generatorConfig = exercise._generatorConfig as KeyHint | undefined;
   const hintRoot = generatorConfig?.rootNote;
   const hintScale = generatorConfig?.scaleType;
+  // An exercise generated per session (a guild recording part) brings its own
+  // seed, so the band changes with the session instead of with the exercise id.
+  // And its own band, which is then not the player's to change.
+  const namedStyle = (
+    exercise._generatorConfig as { bandStyle?: unknown } | undefined
+  )?.bandStyle;
+  const lockedStyle = isStudioStyle(namedStyle) ? namedStyle : undefined;
+  const backingSeed =
+    (exercise._generatorConfig as { backingSeed?: string } | undefined)
+      ?.backingSeed ?? exercise.id;
   const keyHint = useMemo<KeyHint | undefined>(
     () =>
       hintRoot && hintScale
@@ -93,8 +104,8 @@ export function useAutoBacking({
       tuningOffsets: tuning,
       repeatCount,
       keyHint,
-      seed: exercise.id,
-      style,
+      seed: backingSeed,
+      style: lockedStyle ?? style,
     });
   }, [
     eligible,
@@ -104,11 +115,12 @@ export function useAutoBacking({
     exercise.metronomeSpeed?.recommended,
     exercise.title,
     exercise.description,
-    exercise.id,
+    backingSeed,
     tuningKey,
     repeatCount,
     keyHint,
     style,
+    lockedStyle,
   ]);
 
   const names = useMemo<Record<string, string>>(
@@ -137,10 +149,11 @@ export function useAutoBacking({
 
   const summary = result?.summary ?? null;
   useEffect(() => {
-    setSession({ available: !!result, summary });
-  }, [result, summary, setSession]);
+    setSession({ available: !!result, summary, styleLocked: !!lockedStyle });
+  }, [result, summary, lockedStyle, setSession]);
   useEffect(
-    () => () => setSession({ available: false, summary: null }),
+    () => () =>
+      setSession({ available: false, summary: null, styleLocked: false }),
     [setSession],
   );
 

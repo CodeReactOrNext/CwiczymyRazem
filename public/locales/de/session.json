@@ -384,7 +384,17 @@
       "lofi": "Lo-fi",
       "synthwave": "Synthwave",
       "house": "House",
-      "dark": "Düster"
+      "dark": "Düster",
+      "garage": "Garagenband",
+      "juke": "Kneipentrio",
+      "neon": "Neonmaschinen",
+      "porch": "Verandaband",
+      "forge": "Die Schmiede",
+      "loft": "Loft-Quartett",
+      "strut": "Die Funk-Sektion",
+      "yard": "Hinterhof-Sound",
+      "tide": "Wellenreiter",
+      "locked": "Die Session bringt ihre eigene Band mit. Sie lässt sich nicht ändern."
     },
     "track": {
       "drums": "Schlagzeug",
@@ -395,7 +405,16 @@
       "keys_lofi": "E-Piano",
       "keys_synthwave": "Synth",
       "keys_house": "Stabs",
-      "keys_dark": "Streicher"
+      "keys_dark": "Streicher",
+      "keys_garage": "Crunch-Gitarre",
+      "keys_juke": "Orgel",
+      "keys_neon": "Poly-Synth",
+      "keys_porch": "Geschlagene Saiten",
+      "keys_forge": "Chug-Gitarre",
+      "keys_strut": "Clavinet",
+      "keys_yard": "Orgel-Chops",
+      "keys_tide": "Tremolo-Gitarre",
+      "keys_loft": "FM-Piano"
     },
     "leak_notice": {
       "title": "Spielst du über Lautsprecher?",

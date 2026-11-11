@@ -460,7 +460,17 @@
       "lofi": "Lo-fi",
       "synthwave": "Synthwave",
       "house": "House",
-      "dark": "Dark"
+      "dark": "Dark",
+      "garage": "Garage band",
+      "juke": "Juke joint trio",
+      "neon": "Neon machines",
+      "porch": "Porch band",
+      "forge": "The forge",
+      "loft": "Loft quartet",
+      "strut": "The strut",
+      "yard": "Yard sound",
+      "tide": "Tide riders",
+      "locked": "The session brings its own band. It cannot be changed."
     },
     "track": {
       "drums": "Drums",
@@ -471,7 +481,16 @@
       "keys_lofi": "Electric piano",
       "keys_synthwave": "Synth",
       "keys_house": "Stabs",
-      "keys_dark": "Strings"
+      "keys_dark": "Strings",
+      "keys_garage": "Crunch guitar",
+      "keys_juke": "Organ",
+      "keys_neon": "Poly synth",
+      "keys_porch": "Strummed strings",
+      "keys_forge": "Chug guitar",
+      "keys_strut": "Clavinet",
+      "keys_yard": "Organ chop",
+      "keys_tide": "Tremolo guitar",
+      "keys_loft": "FM piano"
     },
     "leak_notice": {
       "title": "Playing through speakers?",

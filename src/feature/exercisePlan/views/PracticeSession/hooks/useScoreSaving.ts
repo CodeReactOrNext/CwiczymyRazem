@@ -4,6 +4,7 @@ import { duelScoreKind } from "feature/duels/data/duelPool";
 import { submitDuelRun } from "feature/duels/services/duels.service";
 import { recordPracticeRun } from "feature/exerciseGoals/services/exerciseGoals.service";
 import { judgedRunNotice } from "feature/exerciseGoals/utils/judgedRunNotice";
+import { submitRecordingTake } from "feature/guilds/services/guildRecording.service";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
@@ -42,6 +43,12 @@ interface UseScoreSavingOptions {
    */
   duelId?: string | null;
   /**
+   * The part of the guild's recording session this session plays, if any. It
+   * is generated for that session, so nothing of it is saved as the player's
+   * own record: a take goes to the guild's tape, a rehearsal nowhere.
+   */
+  recording?: { partId: string; rehearsal: boolean } | null;
+  /**
    * True while the session is in learn mode — the tab waited for every note, so
    * nothing was played at tempo and the exercise is not done yet. Read at save
    * time, so a lesson never stamps the exercise as completed in the skill tree.
@@ -73,7 +80,7 @@ export interface ScoreRecords {
 export function useScoreSaving({
   activeExercise, currentExercise, isMicEnabled,
   earTrainingScore, noteMatchingHandle, sessionBpm, recordGoalChartRuns = true,
-  videoDurationSeconds = null, duelId = null, learnModeRef,
+  videoDurationSeconds = null, duelId = null, recording = null, learnModeRef,
 }: UseScoreSavingOptions) {
   const userAuth   = useAppSelector(selectUserAuth);
   const userName   = useAppSelector(selectUserName);
@@ -137,6 +144,17 @@ export function useScoreSaving({
     // scored the playback rather than the player. It is kept off the boards the
     // same way, and counts as practice the same way.
     const isPlaybackAssisted = !!snap?.playbackLeak;
+    if (recording) {
+      // Only a whole take counts: one cut short is a false start, not a take.
+      const isWholeTake = snap?.runMs === undefined || isRunFullLength(activeExercise, snap.runMs, videoDurationSeconds);
+      const isScoredTake = !!userAuth && isMicEnabled && !!snap && snap.score > 0 && !learnModeRef?.current;
+      if (!recording.rehearsal && isScoredTake && isWholeTake && !isPlaybackAssisted) {
+        // Awaited, so the guild page has the verdict by the time the player is back on it.
+        await submitRecordingTake({ partId: recording.partId, accuracy: snap.accuracy, bpm: runBpm ?? sessionBpmRef.current, notes: snap.noteTimeline.length })
+          .catch((error) => console.error("Recording take was not saved", error));
+      }
+      return;
+    }
     const isRanked = !duelId && hasLeaderboard(activeExercise) && isWithinTime && !isPlaybackAssisted;
     // A duel judges the same way the boards do: a run past the exercise time, or
     // one the speakers played along to, is no attempt at it. Awaited, so the duel

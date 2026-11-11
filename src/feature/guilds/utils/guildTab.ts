@@ -5,6 +5,7 @@ export const GUILD_TABS = [
   "stash",
   "quests",
   "studio",
+  "recording",
   "upgrades",
   "kit",
 ] as const;

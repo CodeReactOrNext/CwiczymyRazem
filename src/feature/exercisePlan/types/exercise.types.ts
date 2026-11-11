@@ -391,6 +391,14 @@ export interface ExercisePlan {
   duel?: {
     id: string;
   };
+  /** Set when the session plays a part of the guild's open recording session
+   *  (see feature/guilds/data/guildRecording). The part is generated, so
+   *  nothing public links to it by id. A take's score goes onto the guild's
+   *  tape; a rehearsal's goes nowhere. */
+  recording?: {
+    partId: string;
+    rehearsal: boolean;
+  };
   /** Set when the session is a boss fight (see feature/bosses). Its exercise
    *  is generated, so nothing public links to it by id. */
   boss?: {

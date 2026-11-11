@@ -1,5 +1,6 @@
 {
   "tabs": {
+    "recording": "Nagrania",
     "browse": "Gildie",
     "members": "Członkowie",
     "chat": "Czat",
@@ -14,6 +15,7 @@
   "lvl": "poz.",
   "level_ring": "Poziom gildii {{level}} · zadania na tym okrążeniu: {{done}} z {{lap}}",
   "needs_guild": {
+    "recording": "Sesje nagraniowe zamawia gildia, a ty jeszcze w żadnej nie jesteś.",
     "title": "Najpierw dołącz do gildii",
     "browse": "Zobacz gildie",
     "members": "Skład to ludzie, z którymi jesteś w gildii — a Ty jeszcze w żadnej nie jesteś.",
@@ -837,6 +839,195 @@
       "compass": "Kompas",
       "anchor": "Kotwica"
     }
+  },
+  "recording": {
+    "intro": "Zamów sesję, a do studia wejdzie klient. Gildia nagrywa jego utwór partia po partii: każde zachowane podejście trafia na taśmę swojej partii. Zapełnijcie wszystkie taśmy, a utwór wyjdzie; nagrywajcie dalej, a zrobi się z niego złoto.",
+    "clients_hint": "Jedna sesja naraz, otwarta przez tydzień. Opłata idzie ze skarbca gildii, a zamówić może każdy członek.",
+    "loading": "Otwieramy drzwi studia…",
+    "load_failed": "Nie udało się wczytać sesji. Spróbuj za chwilę.",
+    "failed": "Nie udało się. Spróbuj ponownie.",
+    "booked": "{{client}} jest już w studiu.",
+    "short": "Brakuje {{count}} Fame",
+    "now": "Trwa nagranie",
+    "parts_title": "Partie",
+    "takes_today": "Twoje podejścia dziś: {{left}} z {{total}}",
+    "takes_none": "Na dziś koniec podejść. Poćwicz na próbie i wróć jutro.",
+    "rehearse": "Próba",
+    "record": "Nagraj podejście",
+    "part_done": "Na taśmie",
+    "tape": "{{tape}} / {{target}} na taśmie",
+    "how_1": "Na próbie ćwiczysz partię, ile chcesz: zwolnij ją, zapętl, nic się nie liczy.",
+    "how_2": "Podejście to minuta z włączonym mikrofonem. Na taśmę partii trafia jego dokładność, przeliczona przez to, jak blisko tempa sesji grałeś. Zapełnienie taśmy wymaga wielu podejść.",
+    "how_3": "Wszystkie taśmy pełne oznaczają wydany utwór. Dalsze dogrywki robią z niego złotą, a potem platynową płytę. Im czystsze podejścia, tym bardziej zadowolony klient, a zadowolony klient daje napiwek.",
+    "how_4": "Zagraj w sesji co najmniej tyle podejść: {{count}}, żeby dostać wypłatę, a tyle lub więcej: {{full}}, żeby dostać ją w całości.",
+    "crew": "Kto już grał",
+    "crew_empty": "Nikt jeszcze nie nagrał podejścia.",
+    "crew_row": "podejść: {{takes}} · {{points}} na taśmie",
+    "deliver": "Oddaj utwór teraz",
+    "deliver_confirm": "To kończy sesję z wynikiem: {{rating}}.",
+    "deliver_yes": "Oddaj",
+    "deliver_no": "Nagrywamy dalej",
+    "delivered": "Utwór jest u klienta.",
+    "pay_waiting": "Zakończona sesja jest ci winna {{fame}} Fame.",
+    "collect": "Odbierz",
+    "collected": "+{{fame}} Fame",
+    "last_title": "Ostatnia sesja",
+    "last_bank": "Klient wpłacił do skarbca {{fame}} Fame.",
+    "last_none": "Nic z tego nie wyszło. Klient zabrał taśmę i wyszedł.",
+    "room_title": "Co dokłada wasze studio",
+    "room_hint": "Nic z tego nie jest potrzebne do nagrywania. Każdy sprzęt po prostu ułatwia sesję.",
+    "room_link": "Otwórz studio",
+    "take": {
+      "kept": "Podejście zachowane ({{part}}): {{accuracy}}% przy {{bpm}} BPM, {{points}} na taśmie.",
+      "scrapped": "Podejście do kosza: {{accuracy}}% to mniej niż {{min}}%. Nie zużyło żadnego z twoich podejść.",
+      "no_takes": "To podejście było już ponad dzisiejszy limit, więc nie zostało zachowane.",
+      "over": "Sesja zdążyła się skończyć, więc to podejście nie zostało zachowane."
+    },
+    "session": {
+      "take_title": "Sesja nagraniowa",
+      "rehearsal_title": "Próba"
+    },
+    "perks": {
+      "takes": "Podejścia dziennie",
+      "sound": "Punkty za podejście",
+      "tape": "Taśma do zapełnienia",
+      "desk": "Czek od klienta",
+      "walls": "Fame dla grających",
+      "bench": "Opłata za sesję"
+    },
+    "ratings": {
+      "shelved": "Na półce",
+      "demo": "Demo",
+      "record": "Wydany",
+      "gold": "Złota płyta",
+      "platinum": "Platynowa płyta"
+    },
+    "genres": {
+      "punk": "Punk",
+      "blues": "Blues",
+      "synth": "Synth-pop",
+      "folk": "Indie folk",
+      "metal": "Metal",
+      "fusion": "Fusion",
+      "funk": "Funk",
+      "reggae": "Reggae",
+      "surf": "Surf rock"
+    },
+    "parts": {
+      "riff": "Gitara rytmiczna",
+      "bass": "Linia basu",
+      "arp": "Arpeggio",
+      "hook": "Melodia prowadząca",
+      "run": "Przebieg solowy"
+    },
+    "part_hints": {
+      "riff": "Pedałowana pryma z akcentami na górze.",
+      "bass": "Prymy i kwinty, które wchodzą w następny akord.",
+      "arp": "Akord wybierany po strunach.",
+      "hook": "Krótka melodia, która sama sobie odpowiada.",
+      "run": "Sekwencja po skali w górę pozycji i z powrotem."
+    },
+    "contracts": {
+      "rust-buckets": {
+        "pitch": "Trzy akordy, dwa podejścia, jedno popołudnie. My tego czysto nie zagramy, więc zagracie wy."
+      },
+      "late-shift": {
+        "pitch": "Zespół poszedł do domu o drugiej. Piosenkę wciąż trzeba dokończyć, a kawa jest za darmo."
+      },
+      "neon-motel": {
+        "pitch": "Wszystko robimy na maszynach. Wytwórnia chce, żeby brzmiało, jakby ktoś dotknął struny."
+      },
+      "paper-lanterns": {
+        "pitch": "To powstało na ganku. Zostawcie w tym ganek i błagam, żadnych solówek dłuższych niż zwrotka."
+      },
+      "iron-harvest": {
+        "pitch": "Ciasno, głośno i równo z siatką. Jak będzie bujać, nie płacimy."
+      },
+      "long-take": {
+        "pitch": "Zwalniałem lepsze zespoły niż wasz. Zagrajcie to za jednym podejściem, a może zapamiętam, jak się nazywacie."
+      },
+      "loose-change": {
+        "pitch": "Nikt nie gra nuty na raz, dopóki na niego nie wskażę. Cała reszta jest wasza."
+      },
+      "night-ferry": {
+        "pitch": "Grajcie mniej. A potem jeszcze mniej. Piosenką jest przestrzeń, reszta to echo."
+      },
+      "riptides": {
+        "pitch": "Szybko, mokro i w moll. Jak sprężyna w pogłosie nie brzęczy, to jeszcze raz."
+      }
+    },
+    "tiers": {
+      "t1": "Garażowa wytwórnia",
+      "t2": "Lokalna wytwórnia",
+      "t3": "Niezależna wytwórnia",
+      "t4": "Duża wytwórnia",
+      "t5": "Światowa premiera",
+      "t6": "Galeria sław"
+    },
+    "tier_locked": "Najpierw wydajcie płytę na poziomie „{{tier}}”",
+    "session_meta": "Poziom {{tier}} · {{name}} · {{bpm}} BPM",
+    "pool_title": "Kto może wejść",
+    "pool_hint": "Wybierasz poziom, nie klienta. Kto to będzie, co gra i każda nuta losują się przy zamówieniu, więc żadne dwie sesje nie są takie same.",
+    "tier_of": "Poziom {{tier}} z {{max}}",
+    "tiers_label": "Poziomy",
+    "tier_open": "Otwarty",
+    "tier_closed": "Zamknięty",
+    "stat_tempo": "Tempo",
+    "stat_parts": "Partie",
+    "stat_rhythm": "Najgęstszy rytm",
+    "stat_fame": "Fame dla każdego grającego",
+    "stat_bank": "Do skarbca",
+    "rhythm_short": {
+      "d2": "Ósemki",
+      "d3": "Triole",
+      "d4": "Szesnastki"
+    },
+    "book_session": "Zamów sesję",
+    "treasury_has": "W skarbcu gildii jest {{fame}} Fame.",
+    "tier_pitch": {
+      "t1": "Czterośladowy magnetofon na skrzynce i goła żarówka. Wolno, prosto, trzy partie. Każdy zaczyna tutaj.",
+      "t2": "Zaplecze sklepu z płytami. Trochę szybciej, ale wciąż nic, czego nie policzysz na głos.",
+      "t3": "Prawdziwa sala i prawdziwa konsoleta. Utwór we własnym tempie i czwarta partia do zapełnienia.",
+      "t4": "Sala z fortepianem. Już szybciej, niż chciał klient, a on słyszy wszystko.",
+      "t5": "Ostatnie piętro, całe miasto pod oknem. Pięć partii, szesnastki, nie ma gdzie się schować.",
+      "t6": "Sala, w której wiszą płyty. Tak szybko i tak gęsto, jak się da. Ta zostaje na ścianie."
+    },
+    "time_days": "{{days}}d {{hours}}h",
+    "time_hours": "{{hours}}h {{minutes}}m",
+    "goal": {
+      "record": "podejść do wydania",
+      "gold": "podejść do złotej płyty",
+      "platinum": "podejść do platynowej płyty"
+    },
+    "goal_done": "Nie ma już czego udowadniać",
+    "stat_on_tape": "Na taśmie",
+    "stat_time": "Zostało",
+    "release_rule": "Utwór wyjdzie, gdy taśma każdej partii dojdzie do 100%.",
+    "client_title": "Klient · {{client}}",
+    "mood_level": "Nastrój {{level}} z {{max}}",
+    "moods": {
+      "waiting": "Czeka, aż coś usłyszy",
+      "cold": "Niewzruszony",
+      "listening": "Słucha",
+      "nodding": "Kiwa głową",
+      "grinning": "Szczerzy się",
+      "speechless": "Zaniemówił"
+    },
+    "mood_lines": {
+      "cold": "Równiej grają zespoły na szkolnej akademii. Jeszcze raz.",
+      "listening": "Grajcie dalej. Jeszcze mnie nie przekonaliście.",
+      "nodding": "O to chodzi. To jest ten utwór.",
+      "grinning": "Niczego nie zmieniajcie. Puszczaj taśmę jeszcze raz.",
+      "speechless": "…Kim wy w ogóle jesteście?"
+    },
+    "stat_accuracy": "Średnia dokładność podejść",
+    "stat_takes": "Podejść na taśmie",
+    "stat_tip": "Napiwek do czeku",
+    "part_to_go": "jeszcze około {{count}} podejść",
+    "part_stats": "podejść: {{takes}}, średnio {{accuracy}}%",
+    "part_no_takes": "jeszcze bez podejść",
+    "recent_title": "Ostatnie podejścia",
+    "recent_empty": "Na taśmie nie ma jeszcze żadnego podejścia."
   },
   "studio": {
     "intro": "Sala prób Waszej gildii. Każdy członek może wydawać na nią Fame gildii, a tablica tygodnia pokazuje, kto gra najwięcej.",

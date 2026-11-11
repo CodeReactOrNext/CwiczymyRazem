@@ -138,7 +138,15 @@ interface KitPreset {
     click: number;
   };
   /** What the snare note plays. */
-  snare: "soft" | "dusty" | "gated" | "clap" | "heavy";
+  snare:
+    | "soft"
+    | "dusty"
+    | "gated"
+    | "clap"
+    | "heavy"
+    | "crack"
+    | "brush"
+    | "snap";
   /** The hi-hat's band, level and closed decay; the open hat's decay. */
   hat: { band: number; level: number; decay: number; open: number };
   /** Tom pitches, relative to the soft kit's. */
@@ -149,8 +157,33 @@ interface KitPreset {
 interface BandPreset {
   /** What a keys note plays: the wide pad, an electric piano, a brassy poly
    *  synth, a short house stab or slow strings. */
-  pad: "pad" | "ep" | "brass" | "stab" | "strings";
-  bass: "sub" | "round" | "pluck" | "reese";
+  pad:
+    | "pad"
+    | "ep"
+    | "brass"
+    | "stab"
+    | "strings"
+    // The session bands' — see STUDIO_STYLES.
+    | "crunch"
+    | "chug"
+    | "organ"
+    | "juno"
+    | "strum"
+    | "fm"
+    | "clav"
+    | "skank"
+    | "twang";
+  bass:
+    | "sub"
+    | "round"
+    | "pluck"
+    | "reese"
+    | "pick"
+    | "thump"
+    | "pulse"
+    | "glide"
+    | "slap"
+    | "dub";
   arp: "pluck" | "bell" | "square";
   kit: KitPreset;
   /** The hall's and the echo's return levels, and how long the echo keeps repeating. */
@@ -239,7 +272,163 @@ const PRESETS: Record<BandStyleId, BandPreset> = {
     feedback: 0.4,
     tone: 14000,
   },
+  // ── The session bands (STUDIO_STYLES): drier rooms, harder kits, and an
+  // instrument of their own each. ──
+  garage: {
+    pad: "crunch",
+    bass: "pick",
+    arp: "pluck",
+    kit: {
+      kick: { from: 210, to: 55, sweep: 0.035, decay: 0.22, level: 0.46, click: 0.4 },
+      snare: "crack",
+      hat: { band: 9500, level: 0.2, decay: 0.06, open: 0.35 },
+      toms: 1.1,
+    },
+    hall: 0.35,
+    echo: 0.1,
+    feedback: 0.2,
+    tone: 16000,
+  },
+  juke: {
+    pad: "organ",
+    bass: "thump",
+    arp: "bell",
+    kit: {
+      kick: { from: 150, to: 50, sweep: 0.05, decay: 0.2, level: 0.36, click: 0.1 },
+      snare: "brush",
+      hat: { band: 8500, level: 0.13, decay: 0.05, open: 0.3 },
+      toms: 0.9,
+    },
+    hall: 0.55,
+    echo: 0.2,
+    feedback: 0.25,
+    tone: 11000,
+  },
+  neon: {
+    pad: "juno",
+    bass: "pulse",
+    arp: "square",
+    kit: {
+      kick: { from: 220, to: 52, sweep: 0.04, decay: 0.26, level: 0.42, click: 0.3 },
+      snare: "snap",
+      hat: { band: 11000, level: 0.14, decay: 0.03, open: 0.2 },
+      toms: 1,
+    },
+    hall: 0.7,
+    echo: 0.65,
+    feedback: 0.4,
+    tone: 20000,
+  },
+  porch: {
+    pad: "strum",
+    bass: "thump",
+    arp: "pluck",
+    kit: {
+      kick: { from: 140, to: 55, sweep: 0.05, decay: 0.18, level: 0.3, click: 0.05 },
+      snare: "brush",
+      hat: { band: 9000, level: 0.1, decay: 0.03, open: 0.15 },
+      toms: 1,
+    },
+    hall: 0.6,
+    echo: 0.25,
+    feedback: 0.25,
+    tone: 13000,
+  },
+  forge: {
+    pad: "chug",
+    bass: "pick",
+    arp: "bell",
+    kit: {
+      // Fourteen to the bar: each one quieter and shorter than a kick that
+      // only lands twice, or the kit drowns the band.
+      kick: { from: 240, to: 48, sweep: 0.03, decay: 0.16, level: 0.3, click: 0.5 },
+      snare: "crack",
+      hat: { band: 9000, level: 0.16, decay: 0.05, open: 0.3 },
+      toms: 0.75,
+    },
+    hall: 0.4,
+    echo: 0.1,
+    feedback: 0.2,
+    tone: 15000,
+  },
+  loft: {
+    pad: "fm",
+    bass: "glide",
+    arp: "bell",
+    kit: {
+      kick: { from: 170, to: 50, sweep: 0.045, decay: 0.2, level: 0.38, click: 0.2 },
+      snare: "snap",
+      hat: { band: 10500, level: 0.13, decay: 0.035, open: 0.22 },
+      toms: 1,
+    },
+    hall: 0.6,
+    echo: 0.4,
+    feedback: 0.3,
+    tone: 18000,
+  },
+  strut: {
+    pad: "clav",
+    bass: "slap",
+    arp: "pluck",
+    kit: {
+      kick: { from: 200, to: 54, sweep: 0.035, decay: 0.18, level: 0.42, click: 0.3 },
+      snare: "snap",
+      hat: { band: 10500, level: 0.15, decay: 0.03, open: 0.2 },
+      toms: 1.05,
+    },
+    hall: 0.35,
+    echo: 0.15,
+    feedback: 0.2,
+    tone: 17000,
+  },
+  yard: {
+    pad: "skank",
+    bass: "dub",
+    arp: "bell",
+    kit: {
+      kick: { from: 150, to: 45, sweep: 0.06, decay: 0.3, level: 0.44, click: 0.05 },
+      snare: "brush",
+      hat: { band: 9000, level: 0.12, decay: 0.04, open: 0.25 },
+      toms: 0.9,
+    },
+    hall: 0.7,
+    // The echo is half the sound: a chop, and its ghosts walking away.
+    echo: 0.95,
+    feedback: 0.5,
+    tone: 12000,
+  },
+  tide: {
+    pad: "twang",
+    bass: "pick",
+    arp: "pluck",
+    kit: {
+      kick: { from: 190, to: 55, sweep: 0.04, decay: 0.2, level: 0.4, click: 0.25 },
+      snare: "crack",
+      hat: { band: 9500, level: 0.15, decay: 0.05, open: 0.3 },
+      toms: 1.2,
+    },
+    // A spring tank, turned all the way up.
+    hall: 1,
+    echo: 0.55,
+    feedback: 0.3,
+    tone: 15000,
+  },
 };
+
+/** How fast a surf guitar's tremolo shakes, Hz, and how deep. */
+const TWANG_TREMOLO = { rate: 7.4, depth: 0.42 };
+
+/** Seconds between the strings of a strummed chord. */
+const STRUM_SPREAD = 0.014;
+/** A drawbar organ's stops: each harmonic's ratio and how far it is pulled out. */
+const DRAWBARS: readonly (readonly [number, number])[] = [
+  [0.5, 0.5],
+  [1, 0.6],
+  [1.5, 0.34],
+  [2, 0.3],
+  [3, 0.12],
+  [4, 0.08],
+];
 
 /** The kick pushes the pad and bass down this far, then lets them back up. */
 const DUCK_DEPTH = 0.55;
@@ -288,6 +477,8 @@ export class AmbientBand {
   private readonly ducks = new Map<AudioNode, Envelope>();
   private readonly lfoDepth: GainNode;
   private readonly kickCurve = saturationCurve(1.6);
+  /** The rhythm guitars' fuzz: hard enough that a fifth turns into a chord. */
+  private readonly crunchCurve = saturationCurve(5);
   private readonly bassCurve = saturationCurve(1.2);
   /** A boss in a rage: the band plays harder on the fly from this time on (see setRage); null when calm. */
   private rageFrom: number | null = null;
@@ -822,6 +1013,29 @@ export class AmbientBand {
       case "strings":
         this.playHeld(slot, voiceIndex, key, velocity, time, duration, destination);
         return;
+      case "crunch":
+      case "chug":
+        this.playCrunch(slot, voiceIndex, key, velocity, time, duration, destination);
+        return;
+      case "organ":
+        this.playOrgan(slot, voiceIndex, key, velocity, time, duration, destination);
+        return;
+      case "juno":
+        this.playJuno(slot, voiceIndex, key, velocity, time, duration, destination);
+        return;
+      case "strum":
+        this.playStrum(voiceIndex, key, velocity, time, destination);
+        return;
+      case "fm":
+        this.playFm(slot, voiceIndex, key, velocity, time, duration, destination);
+        return;
+      case "clav":
+      case "skank":
+        this.playChop(voiceIndex, key, velocity, time, destination);
+        return;
+      case "twang":
+        this.playTwang(slot, voiceIndex, key, velocity, time, duration, destination);
+        return;
       default:
         break;
     }
@@ -1092,6 +1306,429 @@ export class AmbientBand {
     this.pads.set(slot, voice);
   }
 
+  // ── The session bands' instruments ───────────────────────────────────────
+
+  /** Everything a struck voice hangs on once its oscillators have stopped. */
+  private release(oscillators: OscillatorNode[], nodes: AudioNode[]) {
+    oscillators[0].addEventListener("ended", () => {
+      for (const node of nodes) node.disconnect();
+    });
+  }
+
+  /**
+   * A rhythm guitar through fuzz: two saws and a sub square driven hard into
+   * the shaper, each string on its own so a fifth stays a fifth. `crunch`
+   * (garage) is open and bright; `chug` (forge) is driven further, darker,
+   * and choked off the moment the note ends — a palm on the strings.
+   */
+  private playCrunch(
+    slot: string,
+    voiceIndex: number,
+    key: number,
+    velocity: number,
+    time: number,
+    duration: number,
+    destination: AudioNode,
+  ) {
+    const chug = this.preset.pad === "chug";
+    const previous = this.pads.get(slot);
+    if (previous) this.fade(previous, time, 0.03);
+
+    const ctx = this.ctx;
+    const peak = (chug ? 0.05 : 0.055) * (0.65 + 0.35 * velocity);
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    envelope.set(0, time);
+    envelope.rampTo(peak, time + 0.004);
+    envelope.approach(peak * (chug ? 0.6 : 0.8), time + 0.004, chug ? 0.09 : 0.25);
+
+    const drive = ctx.createGain();
+    drive.gain.value = chug ? 5 : 2.6;
+    const shaper = ctx.createWaveShaper();
+    shaper.curve = this.crunchCurve;
+    shaper.oversample = "2x";
+    // What a guitar cabinet leaves: no rumble under the bass, no fizz on top.
+    const low = ctx.createBiquadFilter();
+    low.type = "highpass";
+    low.frequency.value = chug ? 110 : 140;
+    const cabinet = ctx.createBiquadFilter();
+    cabinet.type = "lowpass";
+    cabinet.Q.value = 0.9;
+    cabinet.frequency.value = (chug ? 2300 : 3300) + 500 * velocity;
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = PAD_PANS[voiceIndex % PAD_PANS.length] * 1.5;
+
+    const frequency = midiToHz(key);
+    const oscillators = [
+      this.oscillator("sawtooth", frequency, -6, 0.5, drive),
+      this.oscillator("sawtooth", frequency, 6, 0.5, drive),
+      this.oscillator("square", frequency / 2, 0, chug ? 0.4 : 0.22, drive),
+    ];
+    drive.connect(shaper);
+    shaper.connect(low);
+    low.connect(cabinet);
+    cabinet.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    for (const osc of oscillators) osc.start(time);
+    this.release(oscillators, [drive, shaper, low, cabinet, gain, panner]);
+
+    const voice: PadVoice = { key, peak, envelope, oscillators, end: time };
+    this.fade(voice, time + duration, chug ? 0.04 : 0.12);
+    this.pads.set(slot, voice);
+  }
+
+  /**
+   * A drawbar organ: six sines stacked on the note like pulled stops, a
+   * rotary speaker turning behind them (a tremolo each voice starts at its
+   * own point of the turn). Held like the pad, tied over a restrike.
+   */
+  private playOrgan(
+    slot: string,
+    voiceIndex: number,
+    key: number,
+    velocity: number,
+    time: number,
+    duration: number,
+    destination: AudioNode,
+  ) {
+    const previous = this.pads.get(slot);
+    if (previous && previous.key === key && time <= previous.end + TIE_GAP) {
+      previous.envelope.glideTo(previous.peak, Math.max(time, this.ctx.currentTime), 0.03);
+      this.fade(previous, time + duration, 0.1);
+      return;
+    }
+    if (previous) this.fade(previous, time, 0.05);
+
+    const ctx = this.ctx;
+    const peak = 0.062 * (0.7 + 0.3 * velocity);
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    envelope.set(0, time);
+    envelope.rampTo(peak, time + 0.008);
+
+    // The rotary: a gain riding around 1, so the tremolo never mutes the note.
+    const rotary = ctx.createGain();
+    rotary.gain.value = 1;
+    const turn = ctx.createOscillator();
+    turn.type = "sine";
+    turn.frequency.value = 6.1 + 0.25 * (voiceIndex % 3);
+    const depth = ctx.createGain();
+    depth.gain.value = 0.22;
+    turn.connect(depth);
+    depth.connect(rotary.gain);
+
+    const warm = ctx.createBiquadFilter();
+    warm.type = "lowpass";
+    warm.frequency.value = 3600;
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = PAD_PANS[voiceIndex % PAD_PANS.length];
+
+    const frequency = midiToHz(key);
+    const oscillators = [
+      ...DRAWBARS.map(([ratio, level]) =>
+        this.oscillator("sine", frequency * ratio, 0, level, rotary),
+      ),
+      turn,
+    ];
+    rotary.connect(warm);
+    warm.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    for (const osc of oscillators) osc.start(time);
+    this.release(oscillators, [depth, rotary, warm, gain, panner]);
+
+    const voice: PadVoice = { key, peak, envelope, oscillators, end: time };
+    this.fade(voice, time + duration, 0.1);
+    this.pads.set(slot, voice);
+  }
+
+  /**
+   * A pulse-wave poly synth: two squares beating slowly against each other
+   * and a saw an octave down, the filter snapping from open to half-shut —
+   * the chord that sits between the beats of a drum machine.
+   */
+  private playJuno(
+    slot: string,
+    voiceIndex: number,
+    key: number,
+    velocity: number,
+    time: number,
+    duration: number,
+    destination: AudioNode,
+  ) {
+    const previous = this.pads.get(slot);
+    if (previous) this.fade(previous, time, 0.04);
+
+    const ctx = this.ctx;
+    // Short and off the beat: it needs more level than a held chord to be
+    // heard as much (rendered: within 2 dB of the pad, bar for bar).
+    const peak = 0.115 * (0.6 + 0.4 * velocity);
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    envelope.set(0, time);
+    envelope.rampTo(peak, time + 0.005);
+    envelope.approach(peak * 0.6, time + 0.005, 0.3);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.Q.value = 1.6;
+    filter.frequency.setValueAtTime(3600 + 1600 * velocity + this.brightness(time), time);
+    filter.frequency.setTargetAtTime(1200 + 400 * velocity, time, 0.22);
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = PAD_PANS[voiceIndex % PAD_PANS.length] * 1.3;
+
+    const frequency = midiToHz(key);
+    const oscillators = [
+      this.oscillator("square", frequency, -7, 0.3, filter),
+      this.oscillator("square", frequency, 7, 0.3, filter),
+      this.oscillator("sawtooth", frequency / 2, 0, 0.18, filter),
+    ];
+    filter.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    for (const osc of oscillators) osc.start(time);
+    this.release(oscillators, [filter, gain, panner]);
+
+    const voice: PadVoice = { key, peak, envelope, oscillators, end: time };
+    this.fade(voice, time + duration, 0.25);
+    this.pads.set(slot, voice);
+  }
+
+  /**
+   * One string of a strummed chord: plucked and left to ring out, the next
+   * string a moment after it — the hand crossing the strings — with a quiet
+   * octave on top, the second course of a twelve-string.
+   */
+  private playStrum(
+    voiceIndex: number,
+    key: number,
+    velocity: number,
+    time: number,
+    destination: AudioNode,
+  ) {
+    const ctx = this.ctx;
+    const at = time + voiceIndex * STRUM_SPREAD;
+    const peak = 0.1 * (0.55 + 0.45 * velocity);
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    envelope.set(0, at);
+    envelope.rampTo(peak, at + 0.003);
+    envelope.approach(0, at + 0.003, 0.42);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.Q.value = 1;
+    filter.frequency.setValueAtTime(4200 + 1800 * velocity, at);
+    filter.frequency.setTargetAtTime(950, at, 0.14);
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = PAD_PANS[voiceIndex % PAD_PANS.length];
+
+    const frequency = midiToHz(key);
+    const oscillators = [
+      this.oscillator("triangle", frequency, 0, 0.6, filter),
+      this.oscillator("sawtooth", frequency, 3, 0.24, filter),
+      this.oscillator("sine", frequency * 2, 0, 0.16, filter),
+    ];
+    filter.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    for (const osc of oscillators) osc.start(at);
+    stopAt(oscillators, at + 2.4);
+    this.release(oscillators, [filter, gain, panner]);
+  }
+
+  /**
+   * An FM piano: a sine bent by its octave — hollow where the electric piano
+   * is round — with a glassy tine struck on top. Struck afresh every time.
+   */
+  private playFm(
+    slot: string,
+    voiceIndex: number,
+    key: number,
+    velocity: number,
+    time: number,
+    duration: number,
+    destination: AudioNode,
+  ) {
+    const previous = this.pads.get(slot);
+    if (previous) this.fade(previous, time, 0.05);
+
+    const ctx = this.ctx;
+    const frequency = midiToHz(key);
+    const peak = 0.1 * (0.55 + 0.45 * velocity);
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    envelope.set(0, time);
+    envelope.rampTo(peak, time + 0.003);
+    envelope.approach(peak * 0.35, time + 0.003, 0.5);
+
+    const carrier = ctx.createOscillator();
+    carrier.type = "sine";
+    carrier.frequency.value = frequency;
+    const modulator = ctx.createOscillator();
+    modulator.type = "sine";
+    modulator.frequency.value = frequency * 2;
+    const index = ctx.createGain();
+    index.gain.setValueAtTime(frequency * (1.1 + 1.6 * velocity), time);
+    index.gain.setTargetAtTime(frequency * 0.22, time, 0.12);
+    modulator.connect(index);
+    index.connect(carrier.frequency);
+
+    const tine = ctx.createOscillator();
+    tine.type = "sine";
+    tine.frequency.value = frequency * 7;
+    const tineGain = ctx.createGain();
+    tineGain.gain.setValueAtTime(0.22 * velocity, time);
+    tineGain.gain.setTargetAtTime(0, time, 0.035);
+    tine.connect(tineGain);
+
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = PAD_PANS[voiceIndex % PAD_PANS.length] * 1.2;
+    carrier.connect(gain);
+    tineGain.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    const oscillators = [carrier, modulator, tine];
+    for (const osc of oscillators) osc.start(time);
+    this.release(oscillators, [index, tineGain, gain, panner]);
+
+    const voice: PadVoice = { key, peak, envelope, oscillators, end: time };
+    this.fade(voice, time + duration, 0.3);
+    this.pads.set(slot, voice);
+  }
+
+  /**
+   * A chord that is over as soon as it is struck:
+   * - `clav` (strut): a square and a saw through a filter that quacks shut —
+   *   a clavinet, all attack.
+   * - `skank` (yard): a hollow organ chop, three stops and no top, softer and
+   *   a touch longer — it is the echo that carries it on.
+   */
+  private playChop(
+    voiceIndex: number,
+    key: number,
+    velocity: number,
+    time: number,
+    destination: AudioNode,
+  ) {
+    const clav = this.preset.pad === "clav";
+    const ctx = this.ctx;
+    const peak = (clav ? 0.14 : 0.18) * (0.6 + 0.4 * velocity);
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    envelope.set(0, time);
+    envelope.rampTo(peak, time + (clav ? 0.002 : 0.004));
+    envelope.approach(0, time + 0.004, clav ? 0.08 : 0.06);
+
+    const low = ctx.createBiquadFilter();
+    low.type = "highpass";
+    low.frequency.value = clav ? 300 : 220;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = PAD_PANS[voiceIndex % PAD_PANS.length];
+
+    const frequency = midiToHz(key);
+    let oscillators: OscillatorNode[];
+    if (clav) {
+      filter.Q.value = 6;
+      filter.frequency.setValueAtTime(3600 + 1800 * velocity, time);
+      filter.frequency.setTargetAtTime(900, time, 0.04);
+      oscillators = [
+        this.oscillator("square", frequency, 0, 0.5, low),
+        this.oscillator("sawtooth", frequency, 5, 0.26, low),
+      ];
+    } else {
+      filter.Q.value = 0.8;
+      filter.frequency.value = 1700;
+      oscillators = [
+        this.oscillator("sine", frequency, 0, 0.6, low),
+        this.oscillator("sine", frequency * 2, 0, 0.34, low),
+        this.oscillator("sine", frequency * 3, 0, 0.16, low),
+        this.oscillator("triangle", frequency, 0, 0.2, low),
+      ];
+    }
+    low.connect(filter);
+    filter.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    for (const osc of oscillators) osc.start(time);
+    stopAt(oscillators, time + 0.9);
+    this.release(oscillators, [low, filter, gain, panner]);
+  }
+
+  /**
+   * A surf guitar: a bright, nasal string through an amp's tremolo, held for
+   * as long as the chord lasts — the spring reverb behind it is the room
+   * (see the tide preset). Tied over a restrike like the pad.
+   */
+  private playTwang(
+    slot: string,
+    voiceIndex: number,
+    key: number,
+    velocity: number,
+    time: number,
+    duration: number,
+    destination: AudioNode,
+  ) {
+    const previous = this.pads.get(slot);
+    if (previous && previous.key === key && time <= previous.end + TIE_GAP) {
+      previous.envelope.glideTo(previous.peak, Math.max(time, this.ctx.currentTime), 0.03);
+      this.fade(previous, time + duration, 0.5);
+      return;
+    }
+    if (previous) this.fade(previous, time, 0.08);
+
+    const ctx = this.ctx;
+    const peak = 0.08 * (0.6 + 0.4 * velocity);
+    const gain = ctx.createGain();
+    const envelope = new Envelope(gain.gain);
+    envelope.set(0, time);
+    envelope.rampTo(peak, time + 0.004);
+    envelope.approach(peak * 0.7, time + 0.004, 0.6);
+
+    // The amp's tremolo: a gain riding around 1, every string in step.
+    const tremolo = ctx.createGain();
+    tremolo.gain.value = 1;
+    const shake = ctx.createOscillator();
+    shake.type = "sine";
+    shake.frequency.value = TWANG_TREMOLO.rate;
+    const depth = ctx.createGain();
+    depth.gain.value = TWANG_TREMOLO.depth;
+    shake.connect(depth);
+    depth.connect(tremolo.gain);
+
+    const low = ctx.createBiquadFilter();
+    low.type = "highpass";
+    low.frequency.value = 250;
+    // The bridge pickup: a peak in the upper mids, nothing above it.
+    const nose = ctx.createBiquadFilter();
+    nose.type = "lowpass";
+    nose.Q.value = 2.6;
+    nose.frequency.value = 2500 + 500 * velocity;
+    const panner = ctx.createStereoPanner();
+    panner.pan.value = PAD_PANS[voiceIndex % PAD_PANS.length] * 1.2;
+
+    const frequency = midiToHz(key);
+    const oscillators = [
+      this.oscillator("sawtooth", frequency, 0, 0.4, low),
+      this.oscillator("triangle", frequency, 4, 0.4, low),
+      shake,
+    ];
+    low.connect(nose);
+    nose.connect(tremolo);
+    tremolo.connect(gain);
+    gain.connect(panner);
+    panner.connect(destination);
+    for (const osc of oscillators) osc.start(time);
+    this.release(oscillators, [depth, low, nose, tremolo, gain, panner]);
+
+    const voice: PadVoice = { key, peak, envelope, oscillators, end: time };
+    this.fade(voice, time + duration, 0.5);
+    this.pads.set(slot, voice);
+  }
+
   // ── Arpeggio ─────────────────────────────────────────────────────────────
 
   /**
@@ -1300,6 +1937,19 @@ export class AmbientBand {
    * - `pluck` (synthwave, house): saw and square through a resonant filter
    *   that opens on the note and closes behind it.
    * - `reese` (dark): two saws beating against each other over a sine sub.
+   *
+   * And the session bands':
+   * - `pick` (garage, forge): a saw-heavy bass through a filter that barks
+   *   open — a plectrum on a roundwound string.
+   * - `thump` (juke, porch): a sine that drops onto its pitch and dies away
+   *   fast, the way a plucked upright does.
+   * - `pulse` (neon): two squares and a sub through a tight resonant filter —
+   *   a sequencer's bass.
+   * - `glide` (loft): a sine sliding up into the note, held and singing.
+   * - `slap` (strut): square and saw through a filter that snaps wide open
+   *   and shut — a thumb on the string, then nothing.
+   * - `dub` (yard): a slow, round sine with next to no top, held: felt more
+   *   than heard.
    */
   private playStyledBass(
     slot: string,
@@ -1346,6 +1996,95 @@ export class AmbientBand {
         this.oscillator("sawtooth", frequency, 0, 0.35, filter),
         this.oscillator("square", frequency, -7, 0.2, filter),
       ];
+    } else if (kind === "pick") {
+      peak = 0.17 * (0.6 + 0.4 * velocity);
+      envelope.set(0, time);
+      envelope.rampTo(peak, time + 0.003);
+      envelope.approach(peak * 0.6, time + 0.003, 0.15);
+      filter.Q.value = 2;
+      filter.frequency.setValueAtTime(1700 + 1300 * velocity, time);
+      filter.frequency.setTargetAtTime(720, time, 0.06);
+      oscillators = [
+        this.oscillator("sine", frequency, 0, 0.5, filter),
+        this.oscillator("sawtooth", frequency, 0, 0.5, filter),
+        this.oscillator("square", frequency * 2, 0, 0.08, filter),
+      ];
+    } else if (kind === "thump") {
+      peak = 0.27 * (0.6 + 0.4 * velocity);
+      envelope.set(0, time);
+      envelope.rampTo(peak, time + 0.006);
+      envelope.approach(peak * 0.22, time + 0.006, 0.28);
+      filter.Q.value = 0.7;
+      filter.frequency.value = 620 + 240 * velocity;
+      const body = this.oscillator("sine", frequency, 0, 0.85, filter);
+      // The finger leaving the string: the pitch falls onto the note.
+      body.frequency.setValueAtTime(frequency * 1.5, time);
+      body.frequency.exponentialRampToValueAtTime(frequency, time + 0.03);
+      oscillators = [
+        body,
+        this.oscillator("triangle", frequency * 2, 0, 0.2, filter),
+        this.oscillator("sawtooth", frequency, 0, 0.1, filter),
+      ];
+    } else if (kind === "pulse") {
+      peak = 0.17 * (0.6 + 0.4 * velocity);
+      envelope.set(0, time);
+      envelope.rampTo(peak, time + 0.003);
+      envelope.approach(peak * 0.75, time + 0.003, 0.1);
+      filter.Q.value = 5;
+      filter.frequency.setValueAtTime(2000 + 1400 * velocity, time);
+      filter.frequency.setTargetAtTime(480, time, 0.05);
+      oscillators = [
+        this.oscillator("sine", frequency, 0, 0.5, filter),
+        this.oscillator("square", frequency, -9, 0.28, filter),
+        this.oscillator("square", frequency, 9, 0.28, filter),
+      ];
+    } else if (kind === "slap") {
+      // Short notes with rests between them: more level than a line that
+      // never stops, to carry as much weight (rendered against the others).
+      peak = 0.27 * (0.6 + 0.4 * velocity);
+      envelope.set(0, time);
+      envelope.rampTo(peak, time + 0.002);
+      envelope.approach(peak * 0.45, time + 0.002, 0.12);
+      filter.Q.value = 6;
+      filter.frequency.setValueAtTime(3200 + 2200 * velocity, time);
+      filter.frequency.setTargetAtTime(520, time, 0.03);
+      oscillators = [
+        this.oscillator("sine", frequency, 0, 0.5, filter),
+        this.oscillator("square", frequency, 0, 0.3, filter),
+        this.oscillator("sawtooth", frequency, 0, 0.3, filter),
+      ];
+    } else if (kind === "dub") {
+      peak = 0.3 * (0.6 + 0.4 * velocity);
+      envelope.set(0, time);
+      envelope.rampTo(peak, time + 0.03);
+      envelope.approach(peak * 0.9, time + 0.03, 0.5);
+      filter.Q.value = 0.7;
+      filter.frequency.value = 330 + 120 * velocity;
+      oscillators = [
+        this.oscillator("sine", frequency, 0, 0.9, filter),
+        this.oscillator("triangle", frequency, 0, 0.22, filter),
+        // What a phone speaker can still find of it.
+        this.oscillator("sawtooth", frequency, 0, 0.08, filter),
+      ];
+    } else if (kind === "glide") {
+      peak = 0.22 * (0.6 + 0.4 * velocity);
+      envelope.set(0, time);
+      envelope.rampTo(peak, time + 0.02);
+      envelope.approach(peak * 0.8, time + 0.02, 0.4);
+      filter.Q.value = 1.2;
+      filter.frequency.value = 900 + 400 * velocity;
+      const voices = [
+        this.oscillator("sine", frequency, 0, 0.75, filter),
+        this.oscillator("triangle", frequency * 2, 0, 0.22, filter),
+        this.oscillator("sawtooth", frequency, 0, 0.14, filter),
+      ];
+      // Up into the note from just under it, like a finger on a fretless neck.
+      voices.forEach((osc, i) => {
+        const pitch = frequency * (i === 1 ? 2 : 1);
+        osc.frequency.setValueAtTime(pitch * 0.94, time);
+        osc.frequency.exponentialRampToValueAtTime(pitch, time + 0.06);
+      });
+      oscillators = voices;
     } else {
       peak = 0.19 * (0.6 + 0.4 * velocity);
       envelope.set(0, time);
@@ -1557,6 +2296,13 @@ export class AmbientBand {
    *   dead: the gated-reverb snare of the 80s.
    * - `clap`: the house clap alone.
    * - `heavy`: a lower, fatter body and a longer crack.
+   *
+   * And the session bands':
+   * - `crack` (garage, forge): a bright, short crack over a high tight body —
+   *   a snare tuned up and hit hard.
+   * - `brush` (juke, porch): a long soft hiss with barely a body under it.
+   * - `snap` (neon, loft): a drum machine's snare — a click of noise, a ping
+   *   and a clap.
    */
   private styledSnare(time: number, v: number, destination: AudioNode) {
     switch (this.preset.kit.snare) {
@@ -1587,6 +2333,19 @@ export class AmbientBand {
       }
       case "clap":
         this.clap(time, v * 0.95, destination);
+        return;
+      case "crack":
+        this.crack(time, 0.34 * (0.4 + 0.6 * v), 0.13, 3200, 11000, destination);
+        this.body(time, v, destination, 240, 190, 0.34, 0.07);
+        return;
+      case "brush":
+        this.crack(time, 0.27 * (0.4 + 0.6 * v), 0.22, 4500, 8000, destination);
+        this.body(time, v, destination, 200, 180, 0.1, 0.05);
+        return;
+      case "snap":
+        this.crack(time, 0.3 * (0.4 + 0.6 * v), 0.07, 2600, 12000, destination);
+        this.body(time, v, destination, 330, 300, 0.2, 0.05);
+        this.clap(time, v * 0.5, destination);
         return;
       case "heavy":
         this.clap(time, v * 0.75, destination);

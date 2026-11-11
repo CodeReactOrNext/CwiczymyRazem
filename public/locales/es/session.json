@@ -384,7 +384,17 @@
       "lofi": "Lo-fi",
       "synthwave": "Synthwave",
       "house": "House",
-      "dark": "Oscuro"
+      "dark": "Oscuro",
+      "garage": "Banda de garaje",
+      "juke": "Trío de bar",
+      "neon": "Máquinas de neón",
+      "porch": "Banda del porche",
+      "forge": "La fragua",
+      "loft": "Cuarteto del ático",
+      "strut": "La sección funk",
+      "yard": "Sonido del patio",
+      "tide": "Jinetes de la marea",
+      "locked": "La sesión trae su propia banda. No se puede cambiar."
     },
     "track": {
       "drums": "Batería",
@@ -395,7 +405,16 @@
       "keys_lofi": "Piano eléctrico",
       "keys_synthwave": "Sintetizador",
       "keys_house": "Stabs",
-      "keys_dark": "Cuerdas"
+      "keys_dark": "Cuerdas",
+      "keys_garage": "Guitarra crunch",
+      "keys_juke": "Órgano",
+      "keys_neon": "Sintetizador",
+      "keys_porch": "Cuerdas rasgueadas",
+      "keys_forge": "Guitarra chug",
+      "keys_strut": "Clavinet",
+      "keys_yard": "Cortes de órgano",
+      "keys_tide": "Guitarra con trémolo",
+      "keys_loft": "Piano FM"
     },
     "leak_notice": {
       "title": "¿Tocas con altavoces?",

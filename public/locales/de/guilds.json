@@ -1,5 +1,6 @@
 {
   "tabs": {
+    "recording": "Aufnahmen",
     "browse": "Gilden",
     "members": "Mitglieder",
     "chat": "Chat",
@@ -14,6 +15,7 @@
   "lvl": "Lvl",
   "level_ring": "Gildenlevel {{level}} · {{done}} von {{lap}} Quests in dieser Runde",
   "needs_guild": {
+    "recording": "Sessions bucht eine Gilde, und du bist noch in keiner.",
     "title": "Tritt zuerst einer Gilde bei",
     "browse": "Gilden ansehen",
     "members": "Die Mitgliederliste sind die Leute, mit denen du in einer Gilde bist — und du bist noch in keiner.",
@@ -813,6 +815,195 @@
       "compass": "Kompass",
       "anchor": "Anker"
     }
+  },
+  "recording": {
+    "intro": "Bucht eine Session, und ein Kunde kommt in euer Studio. Die Gilde nimmt seinen Track auf, Part für Part: Jeder behaltene Take kommt auf das Band seines Parts. Füllt alle Bänder und der Track erscheint; nehmt weiter auf und er wird Gold.",
+    "clients_hint": "Eine Session zur Zeit, eine Woche lang offen. Die Gebühr kommt aus der Gildenkasse, buchen kann jedes Mitglied.",
+    "loading": "Die Studiotür geht auf…",
+    "load_failed": "Die Sessions konnten nicht geladen werden. Versuch es gleich noch einmal.",
+    "failed": "Das hat nicht geklappt. Versuch es noch einmal.",
+    "booked": "{{client}} ist im Studio.",
+    "short": "Es fehlen {{count}} Fame",
+    "now": "Aufnahme läuft",
+    "parts_title": "Parts",
+    "takes_today": "Deine Takes heute: {{left}} von {{total}}",
+    "takes_none": "Für heute keine Takes mehr. Probe weiter und komm morgen wieder.",
+    "rehearse": "Proben",
+    "record": "Take aufnehmen",
+    "part_done": "Auf Band",
+    "tape": "{{tape}} / {{target}} auf Band",
+    "how_1": "In der Probe übst du einen Part, so lange du willst: langsamer, im Loop, nichts wird gezählt.",
+    "how_2": "Ein Take ist eine Minute mit eingeschaltetem Mikro. Seine Genauigkeit, gewichtet danach, wie nah am Tempo der Session du gespielt hast, kommt auf das Band des Parts. Ein Band braucht viele Takes, bis es voll ist.",
+    "how_3": "Sind alle Bänder voll, ist der Track veröffentlicht. Weitere Overdubs machen ihn zu Gold und dann zu Platin. Je sauberer die Takes, desto zufriedener der Kunde, und ein zufriedener Kunde gibt Trinkgeld.",
+    "how_4": "Spiel in einer Session mindestens so viele Takes: {{count}}, um bezahlt zu werden, und so viele oder mehr: {{full}}, für deinen vollen Anteil.",
+    "crew": "Wer schon gespielt hat",
+    "crew_empty": "Noch hat niemand einen Take aufgenommen.",
+    "crew_row": "Takes: {{takes}} · {{points}} auf Band",
+    "deliver": "Track jetzt abgeben",
+    "deliver_confirm": "Das beendet die Session als: {{rating}}.",
+    "deliver_yes": "Abgeben",
+    "deliver_no": "Weiter aufnehmen",
+    "delivered": "Der Track ist beim Kunden.",
+    "pay_waiting": "Eine beendete Session schuldet dir {{fame}} Fame.",
+    "collect": "Abholen",
+    "collected": "+{{fame}} Fame",
+    "last_title": "Letzte Session",
+    "last_bank": "Der Kunde hat {{fame}} Fame in die Kasse gezahlt.",
+    "last_none": "Daraus wurde nichts. Der Kunde nahm das Band und ging.",
+    "room_title": "Was euer Studio beisteuert",
+    "room_hint": "Nichts davon braucht man zum Aufnehmen. Jedes Teil macht eine Session nur leichter.",
+    "room_link": "Studio öffnen",
+    "take": {
+      "kept": "Take behalten ({{part}}): {{accuracy}} % bei {{bpm}} BPM, {{points}} auf dem Band.",
+      "scrapped": "Take verworfen: {{accuracy}} % liegen unter {{min}} %. Er hat keinen deiner Takes verbraucht.",
+      "no_takes": "Dieser Take kam nach deinem letzten für heute und wurde nicht behalten.",
+      "over": "Die Session war schon zu Ende, der Take wurde nicht behalten."
+    },
+    "session": {
+      "take_title": "Aufnahmesession",
+      "rehearsal_title": "Probe"
+    },
+    "perks": {
+      "takes": "Takes pro Tag",
+      "sound": "Punkte pro Take",
+      "tape": "Band zu füllen",
+      "desk": "Scheck des Kunden",
+      "walls": "Fame für Spieler",
+      "bench": "Sessiongebühr"
+    },
+    "ratings": {
+      "shelved": "Im Regal",
+      "demo": "Demo",
+      "record": "Veröffentlicht",
+      "gold": "Goldene Schallplatte",
+      "platinum": "Platin-Schallplatte"
+    },
+    "genres": {
+      "punk": "Punk",
+      "blues": "Blues",
+      "synth": "Synth-Pop",
+      "folk": "Indie-Folk",
+      "metal": "Metal",
+      "fusion": "Fusion",
+      "funk": "Funk",
+      "reggae": "Reggae",
+      "surf": "Surf-Rock"
+    },
+    "parts": {
+      "riff": "Rhythmusgitarre",
+      "bass": "Basslinie",
+      "arp": "Arpeggio",
+      "hook": "Leadmelodie",
+      "run": "Sololauf"
+    },
+    "part_hints": {
+      "riff": "Ein Grundton als Pedal mit Akzenten darüber.",
+      "bass": "Grundtöne und Quinten, die in den nächsten Akkord laufen.",
+      "arp": "Der Akkord, über die Saiten gezupft.",
+      "hook": "Eine kurze Melodie, die sich selbst antwortet.",
+      "run": "Eine Skalensequenz die Lage hinauf und zurück."
+    },
+    "contracts": {
+      "rust-buckets": {
+        "pitch": "Drei Akkorde, zwei Takes, ein Nachmittag. Wir kriegen es nicht sauber hin, also macht ihr das."
+      },
+      "late-shift": {
+        "pitch": "Die Band ist um zwei nach Hause gegangen. Der Song muss noch fertig werden, und der Kaffee ist umsonst."
+      },
+      "neon-motel": {
+        "pitch": "Wir machen alles mit Maschinen. Das Label will, dass es klingt, als hätte jemand eine Saite berührt."
+      },
+      "paper-lanterns": {
+        "pitch": "Es wurde auf einer Veranda geschrieben. Lasst die Veranda drin, und bitte keine Soli, die länger sind als die Strophe."
+      },
+      "iron-harvest": {
+        "pitch": "Tight, laut und genau auf dem Raster. Wenn es swingt, zahlen wir nicht."
+      },
+      "long-take": {
+        "pitch": "Ich habe bessere Bands gefeuert als eure. Spielt es in einem Take, dann merke ich mir vielleicht euren Namen."
+      },
+      "loose-change": {
+        "pitch": "Niemand spielt einen Ton auf der Eins, bevor ich auf ihn zeige. Alles andere gehört euch."
+      },
+      "night-ferry": {
+        "pitch": "Spielt weniger. Und dann noch weniger. Der Raum ist der Song, der Rest ist das Echo."
+      },
+      "riptides": {
+        "pitch": "Schnell, nass und in Moll. Wenn die Hallspirale nicht scheppert, dann noch einmal."
+      }
+    },
+    "tiers": {
+      "t1": "Garagenlabel",
+      "t2": "Lokales Label",
+      "t3": "Indie-Label",
+      "t4": "Major-Label",
+      "t5": "Weltveröffentlichung",
+      "t6": "Ruhmeshalle"
+    },
+    "tier_locked": "Erst eine Platte auf „{{tier}}“ veröffentlichen",
+    "session_meta": "Stufe {{tier}} · {{name}} · {{bpm}} BPM",
+    "pool_title": "Wer hereinkommen könnte",
+    "pool_hint": "Ihr wählt die Stufe, nicht den Kunden. Wer es ist, was er spielt und jede Note werden beim Buchen ausgelost, also gleicht keine Session der anderen.",
+    "tier_of": "Stufe {{tier}} von {{max}}",
+    "tiers_label": "Stufen",
+    "tier_open": "Offen",
+    "tier_closed": "Gesperrt",
+    "stat_tempo": "Tempo",
+    "stat_parts": "Parts",
+    "stat_rhythm": "Dichtester Rhythmus",
+    "stat_fame": "Fame für jeden Spieler",
+    "stat_bank": "In die Kasse",
+    "rhythm_short": {
+      "d2": "Achtel",
+      "d3": "Triolen",
+      "d4": "Sechzehntel"
+    },
+    "book_session": "Session buchen",
+    "treasury_has": "In der Gildenkasse liegen {{fame}} Fame.",
+    "tier_pitch": {
+      "t1": "Ein Vierspurgerät auf einer Kiste und eine nackte Glühbirne. Langsam, einfach, drei Parts. Hier fängt jeder an.",
+      "t2": "Das Hinterzimmer eines Plattenladens. Etwas schneller, aber nichts, was man nicht laut mitzählen könnte.",
+      "t3": "Ein echter Raum und ein echtes Pult. Der Track im eigenen Tempo, und ein vierter Part.",
+      "t4": "Ein Aufnahmeraum mit Flügel. Schneller, als der Kunde wollte, und er hört alles.",
+      "t5": "Oberstes Stockwerk, die ganze Stadt unter dem Fenster. Fünf Parts, Sechzehntel, kein Versteck.",
+      "t6": "Die Halle, in der die Platten hängen. So schnell und so dicht, wie es geht. Diese bleibt an der Wand."
+    },
+    "time_days": "{{days}}T {{hours}}h",
+    "time_hours": "{{hours}}h {{minutes}}m",
+    "goal": {
+      "record": "Takes bis zur Veröffentlichung",
+      "gold": "Takes bis zur Goldenen Schallplatte",
+      "platinum": "Takes bis zur Platin-Schallplatte"
+    },
+    "goal_done": "Nichts mehr zu beweisen",
+    "stat_on_tape": "Auf Band",
+    "stat_time": "Noch",
+    "release_rule": "Der Track erscheint, sobald das Band jedes Parts 100 % erreicht.",
+    "client_title": "Der Kunde · {{client}}",
+    "mood_level": "Stimmung {{level}} von {{max}}",
+    "moods": {
+      "waiting": "Wartet darauf, etwas zu hören",
+      "cold": "Unbeeindruckt",
+      "listening": "Hört zu",
+      "nodding": "Nickt mit",
+      "grinning": "Grinst",
+      "speechless": "Sprachlos"
+    },
+    "mood_lines": {
+      "cold": "In Schulaulas habe ich schon tightere Bands gehört. Noch mal.",
+      "listening": "Weiter. Überzeugt bin ich noch nicht.",
+      "nodding": "Genau so. Das ist der Track.",
+      "grinning": "Nichts ändern. Band noch mal ab.",
+      "speechless": "… Wer seid ihr eigentlich?"
+    },
+    "stat_accuracy": "Durchschnittliche Take-Genauigkeit",
+    "stat_takes": "Takes auf Band",
+    "stat_tip": "Trinkgeld auf den Scheck",
+    "part_to_go": "noch etwa {{count}} Takes",
+    "part_stats": "Takes: {{takes}}, im Schnitt {{accuracy}} %",
+    "part_no_takes": "noch keine Takes",
+    "recent_title": "Letzte Takes",
+    "recent_empty": "Noch kein Take auf Band."
   },
   "studio": {
     "intro": "Der Proberaum eurer Gilde. Jedes Mitglied kann Fame der Gilde dafür ausgeben, und das Wochenbrett zeigt, wer am meisten spielt.",

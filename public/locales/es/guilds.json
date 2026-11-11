@@ -1,5 +1,6 @@
 {
   "tabs": {
+    "recording": "Grabaciones",
     "browse": "Gremios",
     "members": "Miembros",
     "chat": "Chat",
@@ -14,6 +15,7 @@
   "lvl": "nv.",
   "level_ring": "Nivel de gremio {{level}} · {{done}} de {{lap}} misiones en esta vuelta",
   "needs_guild": {
+    "recording": "Las sesiones las reserva un gremio, y todavía no estás en ninguno.",
     "title": "Únete primero a un gremio",
     "browse": "Ver los gremios",
     "members": "La plantilla son las personas con las que compartes gremio, y todavía no estás en ninguno.",
@@ -813,6 +815,195 @@
       "compass": "Brújula",
       "anchor": "Ancla"
     }
+  },
+  "recording": {
+    "intro": "Reservad una sesión y un cliente entrará en vuestro estudio. El gremio graba su tema parte por parte: cada toma que se guarda va a la cinta de su parte. Llenad todas las cintas y el tema sale; seguid grabando y será disco de oro.",
+    "clients_hint": "Una sesión cada vez, abierta durante una semana. La tarifa sale del tesoro del gremio y cualquier miembro puede reservar.",
+    "loading": "Abriendo la puerta del estudio…",
+    "load_failed": "No se pudieron cargar las sesiones. Inténtalo en un momento.",
+    "failed": "No ha salido. Inténtalo otra vez.",
+    "booked": "{{client}} ya está en el estudio.",
+    "short": "Faltan {{count}} Fame",
+    "now": "Grabando",
+    "parts_title": "Partes",
+    "takes_today": "Tus tomas de hoy: {{left}} de {{total}}",
+    "takes_none": "No te quedan tomas hoy. Ensaya y vuelve mañana.",
+    "rehearse": "Ensayar",
+    "record": "Grabar una toma",
+    "part_done": "En cinta",
+    "tape": "{{tape}} / {{target}} en cinta",
+    "how_1": "En el ensayo practicas una parte todo lo que quieras: más lenta, en bucle, sin que cuente nada.",
+    "how_2": "Una toma es un minuto con el micro encendido. A la cinta de la parte va su precisión, ajustada según lo cerca del tempo de la sesión que tocaste. Llenar una cinta lleva muchas tomas.",
+    "how_3": "Con todas las cintas llenas, el tema está lanzado. A partir de ahí, las regrabaciones lo hacen disco de oro y luego de platino. Cuanto más limpias las tomas, más contento el cliente, y un cliente contento da propina.",
+    "how_4": "Graba en una sesión al menos estas tomas: {{count}}, para cobrar cuando termine, y estas o más: {{full}}, para cobrar tu parte completa.",
+    "crew": "Quién ha tocado",
+    "crew_empty": "Nadie ha grabado una toma todavía.",
+    "crew_row": "tomas: {{takes}} · {{points}} en cinta",
+    "deliver": "Entregar el tema ahora",
+    "deliver_confirm": "Esto cierra la sesión como: {{rating}}.",
+    "deliver_yes": "Entregar",
+    "deliver_no": "Seguir grabando",
+    "delivered": "El tema está con el cliente.",
+    "pay_waiting": "Una sesión terminada te debe {{fame}} Fame.",
+    "collect": "Cobrar",
+    "collected": "+{{fame}} Fame",
+    "last_title": "Última sesión",
+    "last_bank": "El cliente pagó {{fame}} Fame al tesoro.",
+    "last_none": "No salió nada. El cliente cogió la cinta y se fue.",
+    "room_title": "Lo que aporta vuestro estudio",
+    "room_hint": "Nada de esto hace falta para grabar. Cada pieza solo hace la sesión más fácil.",
+    "room_link": "Abrir el estudio",
+    "take": {
+      "kept": "Toma guardada ({{part}}): {{accuracy}} % a {{bpm}} BPM, {{points}} en la cinta.",
+      "scrapped": "Toma descartada: {{accuracy}} % está por debajo de {{min}} %. No gastó ninguna de tus tomas.",
+      "no_takes": "Esa toma llegó después de tu última de hoy, así que no se guardó.",
+      "over": "La sesión ya había terminado, así que esa toma no se guardó."
+    },
+    "session": {
+      "take_title": "Sesión de grabación",
+      "rehearsal_title": "Ensayo"
+    },
+    "perks": {
+      "takes": "Tomas al día",
+      "sound": "Puntos por toma",
+      "tape": "Cinta por llenar",
+      "desk": "Cheque del cliente",
+      "walls": "Fame para los músicos",
+      "bench": "Tarifa de la sesión"
+    },
+    "ratings": {
+      "shelved": "Archivado",
+      "demo": "Maqueta",
+      "record": "Lanzado",
+      "gold": "Disco de oro",
+      "platinum": "Disco de platino"
+    },
+    "genres": {
+      "punk": "Punk",
+      "blues": "Blues",
+      "synth": "Synth-pop",
+      "folk": "Indie folk",
+      "metal": "Metal",
+      "fusion": "Fusión",
+      "funk": "Funk",
+      "reggae": "Reggae",
+      "surf": "Surf rock"
+    },
+    "parts": {
+      "riff": "Guitarra rítmica",
+      "bass": "Línea de bajo",
+      "arp": "Arpegio",
+      "hook": "Melodía principal",
+      "run": "Pasaje solista"
+    },
+    "part_hints": {
+      "riff": "Una fundamental en pedal con acentos encima.",
+      "bass": "Fundamentales y quintas que caminan hacia el acorde siguiente.",
+      "arp": "El acorde, punteado cuerda a cuerda.",
+      "hook": "Una melodía corta que se responde a sí misma.",
+      "run": "Una secuencia de escala que sube por la posición y vuelve."
+    },
+    "contracts": {
+      "rust-buckets": {
+        "pitch": "Tres acordes, dos tomas, una tarde. Nosotros no sabemos tocarlo limpio, así que lo haréis vosotros."
+      },
+      "late-shift": {
+        "pitch": "La banda se fue a casa a las dos. La canción sigue sin terminar, y el café es gratis."
+      },
+      "neon-motel": {
+        "pitch": "Lo hacemos todo con máquinas. El sello quiere que suene como si alguien hubiera tocado una cuerda."
+      },
+      "paper-lanterns": {
+        "pitch": "Se escribió en un porche. Dejad el porche dentro y, por favor, ningún solo más largo que la estrofa."
+      },
+      "iron-harvest": {
+        "pitch": "Compacto, fuerte y exactamente a tiempo. Si tiene swing, no pagamos."
+      },
+      "long-take": {
+        "pitch": "He despedido a bandas mejores que la vuestra. Tocadlo en una sola toma y quizá recuerde vuestro nombre."
+      },
+      "loose-change": {
+        "pitch": "Nadie toca una nota en el uno hasta que yo le señale. Todo lo demás es vuestro."
+      },
+      "night-ferry": {
+        "pitch": "Tocad menos. Y luego menos todavía. El espacio es la canción, lo demás es el eco."
+      },
+      "riptides": {
+        "pitch": "Rápido, mojado y en menor. Si el muelle de la reverb no traquetea, otra vez."
+      }
+    },
+    "tiers": {
+      "t1": "Sello de garaje",
+      "t2": "Sello local",
+      "t3": "Sello independiente",
+      "t4": "Gran sello",
+      "t5": "Lanzamiento mundial",
+      "t6": "Salón de la fama"
+    },
+    "tier_locked": "Primero lanzad un disco en «{{tier}}»",
+    "session_meta": "Nivel {{tier}} · {{name}} · {{bpm}} BPM",
+    "pool_title": "Quién puede entrar",
+    "pool_hint": "Elegís el nivel, no el cliente. Quién es, qué toca y cada nota se sortean al reservar, así que no hay dos sesiones iguales.",
+    "tier_of": "Nivel {{tier}} de {{max}}",
+    "tiers_label": "Niveles",
+    "tier_open": "Abierto",
+    "tier_closed": "Cerrado",
+    "stat_tempo": "Tempo",
+    "stat_parts": "Partes",
+    "stat_rhythm": "Ritmo más denso",
+    "stat_fame": "Fame para cada músico",
+    "stat_bank": "Al tesoro",
+    "rhythm_short": {
+      "d2": "Corcheas",
+      "d3": "Tresillos",
+      "d4": "Semicorcheas"
+    },
+    "book_session": "Reservar sesión",
+    "treasury_has": "El tesoro del gremio tiene {{fame}} Fame.",
+    "tier_pitch": {
+      "t1": "Un cuatro pistas sobre una caja y una bombilla desnuda. Lento, sencillo, tres partes. Todos empiezan aquí.",
+      "t2": "La trastienda de una tienda de discos. Algo más rápido, pero nada que no puedas contar en voz alta.",
+      "t3": "Una sala de verdad y una mesa de verdad. El tema a su propio tempo, y una cuarta parte por llenar.",
+      "t4": "Una sala con piano de cola. Ya más rápido de lo que quería el cliente, y lo oye todo.",
+      "t5": "Último piso, toda la ciudad bajo la ventana. Cinco partes, semicorcheas, sin dónde esconderse.",
+      "t6": "La sala donde cuelgan los discos. Tan rápido y tan lleno como se puede. Este se queda en la pared."
+    },
+    "time_days": "{{days}}d {{hours}}h",
+    "time_hours": "{{hours}}h {{minutes}}m",
+    "goal": {
+      "record": "tomas para el lanzamiento",
+      "gold": "tomas para el disco de oro",
+      "platinum": "tomas para el disco de platino"
+    },
+    "goal_done": "Nada más que demostrar",
+    "stat_on_tape": "En cinta",
+    "stat_time": "Quedan",
+    "release_rule": "El tema sale cuando la cinta de cada parte llega al 100 %.",
+    "client_title": "El cliente · {{client}}",
+    "mood_level": "Ánimo {{level}} de {{max}}",
+    "moods": {
+      "waiting": "Esperando oír algo",
+      "cold": "Indiferente",
+      "listening": "Escuchando",
+      "nodding": "Asintiendo",
+      "grinning": "Sonriendo",
+      "speechless": "Sin palabras"
+    },
+    "mood_lines": {
+      "cold": "He oído bandas más ajustadas en un salón de actos. Otra vez.",
+      "listening": "Seguid. Todavía no me habéis convencido.",
+      "nodding": "Eso es. Ese es el tema.",
+      "grinning": "No cambiéis nada. Pon la cinta otra vez.",
+      "speechless": "… ¿Quiénes sois vosotros?"
+    },
+    "stat_accuracy": "Precisión media de las tomas",
+    "stat_takes": "Tomas en cinta",
+    "stat_tip": "Propina en el cheque",
+    "part_to_go": "faltan unas {{count}} tomas",
+    "part_stats": "tomas: {{takes}}, media del {{accuracy}} %",
+    "part_no_takes": "aún sin tomas",
+    "recent_title": "Últimas tomas",
+    "recent_empty": "Todavía no hay ninguna toma en cinta."
   },
   "studio": {
     "intro": "La sala de ensayo de vuestro gremio. Cualquier miembro puede gastar en ella la Fame del gremio, y el tablón semanal muestra quién toca más.",

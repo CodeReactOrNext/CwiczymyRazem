@@ -1,5 +1,6 @@
 {
   "tabs": {
+    "recording": "Recording",
     "browse": "Guilds",
     "members": "Members",
     "chat": "Chat",
@@ -14,6 +15,7 @@
   "lvl": "lvl",
   "level_ring": "Guild level {{level}} · {{done}} of {{lap}} quests on this lap",
   "needs_guild": {
+    "recording": "Sessions are booked by a guild, and you are not in one yet.",
     "title": "Join a guild first",
     "browse": "See the guilds",
     "members": "A roster is the people you are in it with, and you are not in one yet.",
@@ -813,6 +815,195 @@
       "compass": "Compass",
       "anchor": "Anchor"
     }
+  },
+  "recording": {
+    "intro": "Book a session and a client walks into your studio. The guild records their track, part by part: every kept take goes onto that part's tape. Fill every tape and the track is out; keep recording and it goes gold.",
+    "clients_hint": "One session at a time, open for a week. The fee comes out of the guild treasury, and any member can book.",
+    "loading": "Opening the studio door…",
+    "load_failed": "The sessions could not be loaded. Try again in a moment.",
+    "failed": "That did not go through. Try again.",
+    "booked": "{{client}} is in the studio.",
+    "short": "{{count}} Fame short",
+    "now": "Recording now",
+    "parts_title": "Parts",
+    "takes_today": "Your takes today: {{left}} of {{total}}",
+    "takes_none": "No takes left today. Rehearse, and come back tomorrow.",
+    "rehearse": "Rehearse",
+    "record": "Record a take",
+    "part_done": "On tape",
+    "tape": "{{tape}} / {{target}} on tape",
+    "how_1": "Rehearse a part for as long as you like: slow it down, loop it, nothing is counted.",
+    "how_2": "A take is one minute with the mic on. Its accuracy, scaled by how close to the session's tempo you played, goes onto the part's tape. A tape takes many takes to fill.",
+    "how_3": "Every tape full means the track is released. Past that, overdubs make it gold, then platinum. The cleaner the takes, the happier the client, and a happy client tips.",
+    "how_4": "Lay down at least {{count}} takes in a session to be paid when it ends, and {{full}} or more for your full share.",
+    "crew": "Who has played",
+    "crew_empty": "Nobody has laid a take down yet.",
+    "crew_row": "{{takes}} takes · {{points}} on tape",
+    "deliver": "Hand the track over now",
+    "deliver_confirm": "This ends the session as: {{rating}}.",
+    "deliver_yes": "Hand it over",
+    "deliver_no": "Keep recording",
+    "delivered": "The track is with the client.",
+    "pay_waiting": "A finished session owes you {{fame}} Fame.",
+    "collect": "Collect",
+    "collected": "+{{fame}} Fame",
+    "last_title": "Last session",
+    "last_bank": "The client paid {{fame}} Fame into the treasury.",
+    "last_none": "Nothing came of it. The client took the tape and left.",
+    "room_title": "What your studio adds",
+    "room_hint": "None of it is needed to record. Every piece just makes a session easier.",
+    "room_link": "Open the studio",
+    "take": {
+      "kept": "Take kept on {{part}}: {{accuracy}}% at {{bpm}} BPM, {{points}} on the tape.",
+      "scrapped": "Take scrapped: {{accuracy}}% is under {{min}}%. It did not use up one of your takes.",
+      "no_takes": "That take came after your last one for today, so it was not kept.",
+      "over": "The session had already ended, so that take was not kept."
+    },
+    "session": {
+      "take_title": "Recording session",
+      "rehearsal_title": "Rehearsal"
+    },
+    "perks": {
+      "takes": "Takes a day",
+      "sound": "Points per take",
+      "tape": "Tape to fill",
+      "desk": "Client's cheque",
+      "walls": "Players' Fame",
+      "bench": "Session fee"
+    },
+    "ratings": {
+      "shelved": "Shelved",
+      "demo": "Demo",
+      "record": "Released",
+      "gold": "Gold record",
+      "platinum": "Platinum record"
+    },
+    "genres": {
+      "punk": "Punk",
+      "blues": "Blues",
+      "synth": "Synth-pop",
+      "folk": "Indie folk",
+      "metal": "Metal",
+      "fusion": "Fusion",
+      "funk": "Funk",
+      "reggae": "Reggae",
+      "surf": "Surf rock"
+    },
+    "parts": {
+      "riff": "Rhythm guitar",
+      "bass": "Bass line",
+      "arp": "Arpeggio",
+      "hook": "Lead melody",
+      "run": "Solo run"
+    },
+    "part_hints": {
+      "riff": "A pedalled root with accents on top.",
+      "bass": "Roots and fifths, walking into the next chord.",
+      "arp": "The chord, picked across the strings.",
+      "hook": "A short melody that answers itself.",
+      "run": "A scale sequence up the neck position and back."
+    },
+    "contracts": {
+      "rust-buckets": {
+        "pitch": "Three chords, two takes, one afternoon. We can't play it clean, so you will."
+      },
+      "late-shift": {
+        "pitch": "The band went home at two. The song still needs finishing, and the coffee is free."
+      },
+      "neon-motel": {
+        "pitch": "We do everything on machines. The label wants it to sound like somebody touched a string."
+      },
+      "paper-lanterns": {
+        "pitch": "It was written on a porch. Keep the porch in it, and please, no solos longer than the verse."
+      },
+      "iron-harvest": {
+        "pitch": "Tight, loud and exactly on the grid. If it swings, we are not paying."
+      },
+      "long-take": {
+        "pitch": "I have fired better bands than yours. Play it in one take and I may remember your name."
+      },
+      "loose-change": {
+        "pitch": "Nobody plays a note on the one unless I point at them. Everything else is yours."
+      },
+      "night-ferry": {
+        "pitch": "Play less. Then play less than that. The space is the song, the rest is the echo."
+      },
+      "riptides": {
+        "pitch": "Fast, wet and in a minor key. If the reverb tank isn't rattling, do it again."
+      }
+    },
+    "tiers": {
+      "t1": "Garage label",
+      "t2": "Local label",
+      "t3": "Indie label",
+      "t4": "Major label",
+      "t5": "World release",
+      "t6": "Hall of fame"
+    },
+    "tier_locked": "Release a record on “{{tier}}” first",
+    "session_meta": "Tier {{tier}} · {{name}} · {{bpm}} BPM",
+    "pool_title": "Who might walk in",
+    "pool_hint": "You pick the tier, not the client. Who it is, what they play and every note of it is drawn when you book, so no two sessions are alike.",
+    "tier_of": "Tier {{tier}} of {{max}}",
+    "tiers_label": "Tiers",
+    "tier_open": "Open",
+    "tier_closed": "Locked",
+    "stat_tempo": "Tempo",
+    "stat_parts": "Parts",
+    "stat_rhythm": "Busiest rhythm",
+    "stat_fame": "Fame for each player",
+    "stat_bank": "Into the treasury",
+    "rhythm_short": {
+      "d2": "Eighths",
+      "d3": "Triplets",
+      "d4": "Sixteenths"
+    },
+    "book_session": "Book a session",
+    "treasury_has": "The guild treasury holds {{fame}} Fame.",
+    "tier_pitch": {
+      "t1": "A four-track on a crate and a bare bulb. Slow, simple, three parts. Everybody starts here.",
+      "t2": "The back room of a record shop. A little faster, still nothing you cannot count out loud.",
+      "t3": "A real room and a real desk. The track at its own tempo, and a fourth part to fill.",
+      "t4": "A live room with a piano in it. Past the client's tempo now, and they notice everything.",
+      "t5": "Top floor, the whole city under the window. Five parts, sixteenths, no place to hide.",
+      "t6": "The hall where the records hang. As fast and as full as it gets. This one stays on the wall."
+    },
+    "time_days": "{{days}}d {{hours}}h",
+    "time_hours": "{{hours}}h {{minutes}}m",
+    "goal": {
+      "record": "takes to a release",
+      "gold": "takes to a gold record",
+      "platinum": "takes to a platinum record"
+    },
+    "goal_done": "Nothing left to prove",
+    "stat_on_tape": "On tape",
+    "stat_time": "Left",
+    "release_rule": "The track is released once every part's tape reaches 100%.",
+    "client_title": "The client · {{client}}",
+    "mood_level": "Mood {{level}} of {{max}}",
+    "moods": {
+      "waiting": "Waiting to hear something",
+      "cold": "Unimpressed",
+      "listening": "Listening",
+      "nodding": "Nodding along",
+      "grinning": "Grinning",
+      "speechless": "Speechless"
+    },
+    "mood_lines": {
+      "cold": "I have heard tighter bands in a school hall. Again.",
+      "listening": "Keep going. I am not sold yet.",
+      "nodding": "That's it. That is the track.",
+      "grinning": "Don't change a thing. Roll the tape again.",
+      "speechless": "…Who are you people?"
+    },
+    "stat_accuracy": "Average take accuracy",
+    "stat_takes": "Takes on tape",
+    "stat_tip": "Tip on the cheque",
+    "part_to_go": "about {{count}} takes to go",
+    "part_stats": "{{takes}} takes, {{accuracy}}% average",
+    "part_no_takes": "no takes yet",
+    "recent_title": "Last takes",
+    "recent_empty": "No takes on tape yet."
   },
   "studio": {
     "intro": "Your guild's rehearsal room. Anyone in the guild can spend the guild's Fame on it, and the weekly board pins up who is putting in the hours.",

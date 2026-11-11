@@ -462,7 +462,17 @@
       "lofi": "Lo-fi",
       "synthwave": "Synthwave",
       "house": "House",
-      "dark": "Mroczny"
+      "dark": "Mroczny",
+      "garage": "Zespół z garażu",
+      "juke": "Trio z knajpy",
+      "neon": "Neonowe maszyny",
+      "porch": "Zespół z ganku",
+      "forge": "Kuźnia",
+      "loft": "Kwartet z poddasza",
+      "strut": "Funkowa sekcja",
+      "yard": "Brzmienie z podwórka",
+      "tide": "Zespół z fali",
+      "locked": "Sesja ma własny zespół. Nie da się go zmienić."
     },
     "track": {
       "drums": "Perkusja",
@@ -473,7 +483,16 @@
       "keys_lofi": "Pianino elektryczne",
       "keys_synthwave": "Syntezator",
       "keys_house": "Akordy",
-      "keys_dark": "Smyczki"
+      "keys_dark": "Smyczki",
+      "keys_garage": "Przesterowana gitara",
+      "keys_juke": "Organy",
+      "keys_neon": "Syntezator",
+      "keys_porch": "Bite struny",
+      "keys_forge": "Tłumiona gitara",
+      "keys_strut": "Klawinet",
+      "keys_yard": "Organowe cięcia",
+      "keys_tide": "Gitara z tremolo",
+      "keys_loft": "Pianino FM"
     },
     "leak_notice": {
       "title": "Grasz przez głośniki?",

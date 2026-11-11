@@ -250,6 +250,8 @@ const PracticeSessionInner = ({
   const isPlaying = timer.timerEnabled;
   const isExamMode = typeof examMode === 'boolean' ? examMode : !!examMode;
   const isGoalMode = !!goalRun;
+  // A take of the guild's recording session, as opposed to a rehearsal of it.
+  const isRecordingTake = !!plan.recording && !plan.recording.rehearsal;
   const examModeObject = typeof examMode === 'object' ? examMode : undefined;
   // In exam mode the metronome tempo is fixed: lock min === max === bpm so it
   // can't be changed (slider/±/edit all clamp to this single value).
@@ -778,7 +780,7 @@ const PracticeSessionInner = ({
     sessionPhase, isMicEnabled: _isMicEnabled, handleEnableMic, handleSkipMic,
     handleReuseCalibration, handleRecalibrate, handleCalibrationComplete, handleCalibrationCancel,
     getAdjustedTargetFreq, existingCalibrationTimestamp, setIsMicEnabled: updateMicPersistence, setSessionPhase,
-  } = useCalibration(planHasTablature, (isExamMode || isGoalMode || !!plan.duel) && !currentExercise.disableMic, micStart);
+  } = useCalibration(planHasTablature, (isExamMode || isGoalMode || !!plan.duel || isRecordingTake) && !currentExercise.disableMic, micStart);
   // The wizard opens the input itself and enables the mic only when it
   // finishes — closing it early has to close that stream too, or the tuner keeps
   // reading the guitar and the mic looks on while nothing is being scored.
@@ -808,7 +810,7 @@ const PracticeSessionInner = ({
     [isEarTrainingRiddle, activeTablature],
   );
   const learnAvailable = learnSteps.length > 0 && !isMobileView && !isExamMode && !isGoalMode
-    && !plan.duel && !currentExercise.isPlayalong && !currentExercise.disableMic;
+    && !plan.duel && !isRecordingTake && !currentExercise.isPlayalong && !currentExercise.disableMic;
   const learnEnabled = learnWanted && learnAvailable && isMicEnabled;
   const learnModeRef = useRef(false);
   useEffect(() => { learnModeRef.current = learnEnabled; }, [learnEnabled]);
@@ -859,9 +861,9 @@ const PracticeSessionInner = ({
   // has a snapshot worth submitting when the mic was actually listening — and a
   // lesson is not a run: learn mode has no score, so there is nothing to report.
   const hasTrackedPerformance = (isMicEnabled && !learnEnabled) || isClickAnsweredMode(currentExercise.noteHuntConfig?.mode);
-  // Exams, goals and duels only count mic-scored runs, so they open on the mic prompt.
+  // Exams, goals, duels and recording takes only count mic-scored runs, so they open on the mic prompt.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { if ((isExamMode || isGoalMode || !!plan.duel) && !_isMicEnabled && !currentExercise.disableMic) setSessionPhase("mic_prompt"); }, []);
+  useEffect(() => { if ((isExamMode || isGoalMode || !!plan.duel || isRecordingTake) && !_isMicEnabled && !currentExercise.disableMic) setSessionPhase("mic_prompt"); }, []);
   // No cleanup here used to mean React StrictMode's dev-only double-invoke
   // (mount → cleanup → mount, meant to catch exactly this class of bug) had
   // nothing to undo between its two invocations — both ran initAudio() with
@@ -1043,6 +1045,7 @@ const PracticeSessionInner = ({
     // A song played through its whole tab is a whole run, however long the song.
     videoDurationSeconds: videoDuration ?? songTabSeconds,
     duelId: plan.duel?.id ?? null,
+    recording: plan.recording ?? null,
     learnModeRef,
   });
 

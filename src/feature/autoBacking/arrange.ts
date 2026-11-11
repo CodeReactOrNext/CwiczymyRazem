@@ -9,7 +9,8 @@ import { groupHits, groupStarts, isSimpleMeter } from "./grooves";
 import type { ChordSpan } from "./harmonize";
 import type { BarInfo } from "./noteEvents";
 import { pulseOf } from "./noteEvents";
-import type { BandStyleId } from "./styles";
+import type { BandStyleId, StudioStyleId } from "./styles";
+import { isStudioStyle } from "./styles";
 import type { Chord } from "./theory";
 import { bassOf, QUALITY_INTERVALS } from "./theory";
 
@@ -31,11 +32,22 @@ const styledBar = (
   bar: BarInfo,
   groove: GrooveId,
   style: BandStyleId | undefined,
-): style is Exclude<BandStyleId, "ambient" | "dark"> =>
-  style !== undefined &&
-  style !== "ambient" &&
-  style !== "dark" &&
+): style is "lofi" | "synthwave" | "house" =>
+  (style === "lofi" || style === "synthwave" || style === "house") &&
   RESTYLED_GROOVES.has(groove) &&
+  isSimpleMeter(bar.timeSignature) &&
+  Math.abs(bar.length - 4) < EPS;
+
+/**
+ * A whole 4/4 bar a session band plays. Unlike the styles above it does not
+ * wait for a plain groove: a session band is the feel — the juke band
+ * shuffles and the forge gallops whatever the part over them does.
+ */
+const studioBar = (
+  bar: BarInfo,
+  style: BandStyleId | undefined,
+): style is StudioStyleId =>
+  isStudioStyle(style) &&
   isSimpleMeter(bar.timeSignature) &&
   Math.abs(bar.length - 4) < EPS;
 
@@ -273,7 +285,7 @@ function cymbalGrid(
  *   "and"; the lift fills the sixteenths in between.
  */
 function styledDrums(
-  style: Exclude<BandStyleId, "ambient" | "dark">,
+  style: "lofi" | "synthwave" | "house",
   ctx: DrumBarContext,
   fillFrom: number,
   hit: (pos: number, note: TablatureNote) => void,
@@ -329,6 +341,149 @@ function styledDrums(
       play(beat + 0.25, HAT, 0.24);
       play(beat + 0.75, HAT, 0.3);
     }
+}
+
+/**
+ * A session band's beat over a 4/4 bar, up to where a fill takes over.
+ * - garage: loud eighth hats, the kick pushing into three, a hard backbeat;
+ *   the lift opens the hat on every beat.
+ * - juke: a shuffle on the ride, brushes on two and four, a kick that now and
+ *   then skips ahead of the beat.
+ * - neon: a drum machine — sixteenth hats, kick on one and three, the snap on
+ *   two and four; the lift opens the hat between the beats.
+ * - porch: a shaker in eighths, a rim click where the backbeat is; the lift
+ *   brings the brushes in.
+ * - forge: double kick in sixteenths (eighths when that would blur), the ride
+ *   on every beat, the snare alone on two and four.
+ * - loft: a ride pattern with sixteenth skips, a kick that lands off the beat
+ *   as often as on it, ghost notes around the backbeat.
+ * - strut: sixteenth hats, a kick pushed ahead of the beat, ghost notes
+ *   either side of the backbeat; the lift opens the hat before the bar turns.
+ * - yard: the one-drop — nothing on one, kick and rim together on three,
+ *   hats leaning on the off-beats; the lift puts a kick back on one.
+ * - tide: the surf beat — the ride in eighths, the snare on two, two-and and
+ *   four.
+ */
+function studioDrums(
+  style: StudioStyleId,
+  ctx: DrumBarContext,
+  fillFrom: number,
+  hit: (pos: number, note: TablatureNote) => void,
+) {
+  const { bpm, rng, section = "groove" } = ctx;
+  const lift = section === "lift";
+  const pushing = section === "build" && !!ctx.late;
+  const play = (pos: number, note: number, dynamics: number) => {
+    if (pos >= fillFrom - EPS) return;
+    if (pos < EPS && ctx.isCrash && (note === HAT || note === RIDE)) return;
+    hit(pos, drum(note, dynamics));
+  };
+  const onBeat = (pos: number) => Math.abs(pos - Math.round(pos)) < EPS;
+
+  switch (style) {
+    case "garage":
+      for (const pos of every(0.5, 0, 4))
+        play(pos, lift && onBeat(pos) ? OPEN_HAT : HAT, onBeat(pos) ? 0.78 : 0.6);
+      play(0, KICK, 0.95);
+      play(1.5, KICK, 0.8);
+      play(2, KICK, 0.9);
+      if (pushing || rng() < 0.4) play(2.5, KICK, 0.75);
+      play(1, SNARE, 0.92);
+      play(3, SNARE, 0.95);
+      return;
+    case "juke":
+      for (const beat of [0, 1, 2, 3]) {
+        play(beat, RIDE, 0.65);
+        play(beat + 2 / 3, RIDE, 0.4);
+      }
+      play(0, KICK, 0.85);
+      play(2, KICK, 0.8);
+      if (rng() < 0.3) play(1 + 2 / 3, KICK, 0.5);
+      play(1, SNARE, lift ? 0.75 : 0.6);
+      play(3, SNARE, lift ? 0.8 : 0.65);
+      if (pushing) play(3 + 2 / 3, SNARE, 0.45);
+      return;
+    case "neon": {
+      const step = bpm <= 115 || pushing ? 0.25 : 0.5;
+      for (const pos of every(step, 0, 4)) {
+        const eighth = Math.abs(pos * 2 - Math.round(pos * 2)) < EPS;
+        if (lift && eighth && !onBeat(pos)) play(pos, OPEN_HAT, 0.42);
+        else play(pos, HAT, onBeat(pos) ? 0.5 : eighth ? 0.36 : 0.24);
+      }
+      play(0, KICK, 0.95);
+      play(2, KICK, 0.9);
+      if (rng() < 0.5) play(3.5, KICK, 0.65);
+      play(1, SNARE, 0.85);
+      play(3, SNARE, 0.9);
+      return;
+    }
+    case "porch":
+      for (const pos of every(0.5, 0, 4))
+        play(pos, HAT, (onBeat(pos) ? 0.4 : 0.28) + rng() * 0.06);
+      play(0, KICK, 0.8);
+      play(2, KICK, 0.72);
+      for (const beat of [1, 3])
+        play(beat, lift || pushing ? SNARE : SIDE_STICK, lift ? 0.55 : 0.5);
+      return;
+    case "forge": {
+      const step = bpm <= 150 ? 0.25 : 0.5;
+      for (const pos of every(step, 0, 4)) {
+        if (Math.abs(pos - 1) < EPS || Math.abs(pos - 3) < EPS) continue;
+        play(pos, KICK, onBeat(pos) ? 0.9 : 0.7);
+      }
+      for (const beat of [0, 1, 2, 3]) play(beat, RIDE, 0.7);
+      if (lift) for (const beat of [0, 1, 2, 3]) play(beat + 0.5, RIDE, 0.5);
+      play(1, SNARE, 0.95);
+      play(3, SNARE, 0.95);
+      return;
+    }
+    case "strut":
+      for (const pos of every(0.25, 0, 4)) {
+        const eighth = Math.abs(pos * 2 - Math.round(pos * 2)) < EPS;
+        if (lift && Math.abs(pos - 3.5) < EPS) play(pos, OPEN_HAT, 0.45);
+        else play(pos, HAT, onBeat(pos) ? 0.55 : eighth ? 0.4 : 0.28);
+      }
+      play(0, KICK, 0.95);
+      if (rng() < 0.6) play(0.75, KICK, 0.6);
+      play(2.5, KICK, 0.85);
+      if (pushing || rng() < 0.3) play(3.25, KICK, 0.55);
+      play(1, SNARE, 0.9);
+      play(3, SNARE, 0.92);
+      play(1.75, SNARE, 0.22);
+      if (rng() < 0.6) play(2.25, SNARE, 0.2);
+      return;
+    case "yard":
+      for (const pos of every(0.5, 0, 4))
+        play(pos, HAT, onBeat(pos) ? 0.35 : 0.55);
+      if (lift || pushing) play(0, KICK, 0.8);
+      play(2, KICK, 0.95);
+      play(2, lift ? SNARE : SIDE_STICK, 0.6);
+      if (rng() < 0.3) play(3.5, SIDE_STICK, 0.35);
+      return;
+    case "tide":
+      for (const pos of every(0.5, 0, 4))
+        play(pos, RIDE, onBeat(pos) ? 0.6 : 0.42);
+      play(0, KICK, 0.9);
+      play(2, KICK, 0.85);
+      if (rng() < 0.3) play(2.5, KICK, 0.6);
+      play(1, SNARE, 0.85);
+      play(1.5, SNARE, 0.6);
+      play(3, SNARE, 0.9);
+      if (pushing) play(3.5, SNARE, 0.7);
+      return;
+    default:
+      // Loft.
+      for (const pos of [0, 0.5, 0.75, 1, 1.5, 2, 2.5, 2.75, 3, 3.5])
+        play(pos, RIDE, onBeat(pos) ? 0.6 : Math.abs((pos % 1) - 0.5) < EPS ? 0.42 : 0.3);
+      play(0, KICK, 0.9);
+      play(1.5, KICK, 0.7);
+      if (rng() < 0.6) play(2.75, KICK, 0.6);
+      if (lift || rng() < 0.4) play(3.5, KICK, 0.65);
+      play(1, SNARE, 0.8);
+      play(3, SNARE, 0.85);
+      play(1.75, SNARE, 0.22);
+      if (rng() < 0.5) play(2.25, SNARE, 0.2);
+  }
 }
 
 /** A run of snare into the toms over the last `fillLength` beats, from `fillFrom`. */
@@ -397,6 +552,22 @@ export function drumBar(bar: BarInfo, ctx: DrumBarContext): TrackEvent[] {
   const fillLength = longFill ? 2 : bar.length >= 2 ? Math.min(pulse, 1.5) : 0;
   const fillFrom =
     ctx.isFill && fillLength > 0 ? bar.length - fillLength : Infinity;
+
+  if (studioBar(bar, ctx.style)) {
+    if (ctx.isCrash) hit(0, drum(CRASH, 0.8));
+    studioDrums(ctx.style, ctx, fillFrom, hit);
+    if (fillFrom < Infinity)
+      drumFill(
+        ctx.style === "juke" ? "shuffle" : groove,
+        simple,
+        longFill,
+        bpm,
+        fillFrom,
+        fillLength,
+        hit,
+      );
+    return events;
+  }
 
   if (styledBar(bar, groove, ctx.style)) {
     if (ctx.isCrash) hit(0, drum(CRASH, 0.8));
@@ -532,6 +703,7 @@ export function bassBar(
   const simple = isSimpleMeter(bar.timeSignature);
   const starts = groupStarts(bar);
   const styled = styledBar(bar, groove, style) ? style : null;
+  const studio = studioBar(bar, style) ? style : null;
 
   for (const seg of segments) {
     const root = bassRoot(bassOf(seg.chord));
@@ -541,6 +713,128 @@ export function bassBar(
     const changes = bassOf(seg.next) !== bassOf(seg.chord);
     const span = seg.to - seg.from;
 
+    if (studio) {
+      /** The last note before a new chord steps into it. */
+      const lead = (isLast: boolean, pitch: number) =>
+        isLast && changes && span >= 2 ? approach(seg.next) : pitch;
+      const third = root + thirdOf(seg.chord);
+
+      if (studio === "garage") {
+        // Eighths on the root, straight through: the bass is the engine.
+        const positions = every(0.5, seg.from, seg.to);
+        positions.forEach((pos, i) =>
+          add(
+            pos,
+            lead(i === positions.length - 1, root),
+            0.42,
+            Math.abs(pos % 1) < EPS ? 0.9 : 0.75,
+          ),
+        );
+      } else if (studio === "juke") {
+        // A walking line in quarters, carried on across the bars of a chord.
+        const walk =
+          thirdOf(seg.chord) === 3
+            ? [0, 3, 7, 10, 12, 10, 7, 3]
+            : [0, 4, 7, 9, 10, 9, 7, 4];
+        const positions = every(1, seg.from, seg.to);
+        positions.forEach((pos, i) => {
+          const step = Math.round(seg.sinceChordStart + pos - seg.from);
+          add(
+            pos,
+            lead(i === positions.length - 1, root + walk[step % walk.length]),
+            0.9,
+            0.8,
+          );
+        });
+      } else if (studio === "neon") {
+        // The sequencer: two roots and the octave snapping in before the beat.
+        for (const beat of every(1, seg.from, seg.to)) {
+          add(beat, root, 0.22, 0.85);
+          if (beat + 0.5 < seg.to - EPS) add(beat + 0.5, root, 0.22, 0.6);
+          if (beat + 0.75 < seg.to - EPS)
+            add(
+              beat + 0.75,
+              lead(beat + 1 >= seg.to - EPS, root + 12),
+              0.2,
+              0.7,
+            );
+        }
+      } else if (studio === "porch") {
+        // Boom-chick: the root, then the fifth, two to the bar.
+        every(2, seg.from, seg.to).forEach((pos, i) => {
+          const room = seg.to - pos;
+          add(pos, i % 2 === 1 ? fifth : root, Math.min(1.6, room), 0.85);
+          if (changes && room > 1.5 + EPS && pos + 2 >= seg.to - EPS)
+            add(pos + 1.5, approach(seg.next), 0.45, 0.6);
+        });
+      } else if (studio === "forge") {
+        // The gallop, locked to the guitar: an eighth and two sixteenths.
+        const beats = every(1, seg.from, seg.to);
+        beats.forEach((beat, i) => {
+          const last = i === beats.length - 1;
+          add(beat, root, 0.4, 0.92);
+          if (beat + 0.5 < seg.to - EPS) add(beat + 0.5, root, 0.2, 0.7);
+          if (beat + 0.75 < seg.to - EPS)
+            add(beat + 0.75, lead(last, root), 0.2, 0.74);
+        });
+      } else if (studio === "strut" || studio === "yard") {
+        // Strut: short, syncopated, the octave popped; the seventh on the way
+        // round. Yard: long and low, most of the bar spent on two notes.
+        const seventh = root + (thirdOf(seg.chord) === 3 ? 10 : 9);
+        for (let pos = seg.from; pos < seg.to - EPS; pos += 4) {
+          const room = seg.to - pos;
+          const turn = changes && room <= 4 + EPS ? approach(seg.next) : null;
+          const figure: [number, number, number, number][] =
+            studio === "strut"
+              ? [
+                  [0, root, 0.4, 0.92],
+                  [0.75, root + 12, 0.2, 0.7],
+                  [1.5, fifth, 0.3, 0.7],
+                  [2, root, 0.4, 0.85],
+                  [2.75, seventh, 0.2, 0.6],
+                  [3.5, turn ?? root + 12, 0.3, 0.7],
+                ]
+              : [
+                  [0, root, 0.9, 0.92],
+                  [1.5, root, 0.4, 0.6],
+                  [2, fifth, 0.9, 0.82],
+                  [3, third, 0.45, 0.7],
+                  [3.5, turn ?? root, 0.45, 0.65],
+                ];
+          for (const [offset, pitch, length, dynamics] of figure)
+            if (offset < room - EPS)
+              add(pos + offset, pitch, Math.min(length, room - offset), dynamics);
+        }
+      } else if (studio === "tide") {
+        // Root, fifth, root, fifth: eighths that rock the whole way.
+        const positions = every(0.5, seg.from, seg.to);
+        positions.forEach((pos, i) =>
+          add(
+            pos,
+            lead(i === positions.length - 1, i % 2 === 1 ? fifth : root),
+            0.42,
+            i % 2 === 0 ? 0.88 : 0.72,
+          ),
+        );
+      } else {
+        // Loft: off the beat as often as on it, through the chord and out.
+        for (let pos = seg.from; pos < seg.to - EPS; pos += 4) {
+          const room = seg.to - pos;
+          const figure: [number, number, number, number][] = [
+            [0, root, 1.2, 0.9],
+            [1.5, fifth, 0.45, 0.7],
+            [2, root + 12, 0.45, 0.75],
+            [2.75, fifth, 0.2, 0.55],
+            [3, third, 0.45, 0.7],
+            [3.5, changes && room <= 4 + EPS ? approach(seg.next) : fifth, 0.45, 0.65],
+          ];
+          for (const [offset, pitch, length, dynamics] of figure)
+            if (offset < room - EPS)
+              add(pos + offset, pitch, Math.min(length, room - offset), dynamics);
+        }
+      }
+      continue;
+    }
     if (styled === "synthwave") {
       // The octave pulse: root and the octave above it in eighths.
       const positions = every(0.5, seg.from, seg.to);
@@ -710,6 +1004,15 @@ export function voiceLead(chord: Chord, previous: number[] | null): number[] {
   );
 }
 
+/** Where a rhythm guitar's power chord sits: E2 up to D#3. */
+const POWER_LOW = 40;
+
+/** Root, fifth, octave — what a fuzzed guitar can play without turning to mud. */
+const powerVoices = (chord: Chord): number[] => {
+  const root = POWER_LOW + ((((chord.root - POWER_LOW) % 12) + 12) % 12);
+  return [root, root + (chord.quality === "dim" ? 6 : 7), root + 12];
+};
+
 /** A chord's notes, levelled so four voices sound no louder than three. */
 const keysChord = (voices: number[], dynamics: number): TablatureNote[] => {
   const level = dynamics * Math.sqrt(3 / Math.max(3, voices.length));
@@ -736,10 +1039,15 @@ export function keysBar(
   const simple = isSimpleMeter(bar.timeSignature);
   const starts = groupStarts(bar);
   const styled = styledBar(bar, groove, style) ? style : null;
+  const studio = studioBar(bar, style) ? style : null;
+  const fuzzed = studio === "garage" || studio === "forge";
 
   for (const seg of segments) {
-    const voices = voiceLead(seg.chord, state.voices);
-    state.voices = voices;
+    // The rhythm guitars play power chords down where a guitar plays them.
+    const voices = fuzzed
+      ? powerVoices(seg.chord)
+      : voiceLead(seg.chord, state.voices);
+    if (!fuzzed) state.voices = voices;
     if (voices.length === 0) continue;
     const add = (pos: number, length: number, dynamics: number) =>
       events.push({ pos, length, notes: keysChord(voices, dynamics) });
@@ -762,7 +1070,46 @@ export function keysBar(
       }
     };
 
-    if (styled === "lofi") {
+    if (studio === "garage") {
+      // Downstrokes in eighths, the beat leaned on.
+      comp(every(0.5, 0, 4), (gap) => gap * 0.8, [0.42, 0.3]);
+    } else if (studio === "juke") {
+      // The organ holds the chord and jabs it again on the shuffle's off-beats.
+      comp([0, 1 + 2 / 3, 3], (gap) => gap * 0.9, [0.4, 0.3, 0.34]);
+    } else if (studio === "neon") {
+      // Between the beats, short: the chord answers the kick.
+      comp([0.5, 1.5, 2.5, 3.5], (gap) => Math.min(0.4, gap), [0.4, 0.34]);
+    } else if (studio === "porch") {
+      // Down, down-up, up-down-up: the strum every campfire knows.
+      comp(
+        [0, 1, 1.5, 2.5, 3, 3.5],
+        () => 0.4,
+        [0.46, 0.34, 0.28, 0.3, 0.36, 0.28],
+      );
+    } else if (studio === "forge") {
+      // The gallop: an eighth and two sixteenths, every beat.
+      comp(
+        [0, 1, 2, 3].flatMap((beat) => [beat, beat + 0.5, beat + 0.75]),
+        (gap) => Math.min(0.2, gap),
+        [0.44, 0.3, 0.32],
+      );
+    } else if (studio === "strut") {
+      // The scratch: sixteenths that dodge the beat.
+      comp(
+        [0.5, 0.75, 1.5, 2.25, 2.5, 3.5, 3.75],
+        (gap) => Math.min(0.15, gap),
+        [0.42, 0.3, 0.36],
+      );
+    } else if (studio === "yard") {
+      // The skank on two and four, and its shadow a half beat behind.
+      comp([1, 1.5, 3, 3.5], () => 0.18, [0.46, 0.26]);
+    } else if (studio === "tide") {
+      // One chord shaken by the tremolo, struck again at the half bar.
+      comp([0, 2], (gap) => gap * 0.95, [0.4, 0.36]);
+    } else if (studio === "loft") {
+      // The Charleston, and one more jab before the bar turns over.
+      comp([0, 1.5, 3.5], (gap) => Math.min(0.7, gap * 0.8), [0.42, 0.36, 0.3]);
+    } else if (styled === "lofi") {
       // The electric piano comps: on the one, then pushed onto the "and" of two.
       comp([0, 1.5], (gap) => gap * 0.92, [0.42, 0.34]);
     } else if (styled === "house") {
