@@ -93,9 +93,10 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
       <div
         className={cn(
           "flex w-full items-center rounded-xl bg-zinc-800",
-          // Compact fits a ~180px side panel: no icon, no slider, tighter gaps.
+          // Compact is the phone's tools drawer: no icon, no slider, tighter gaps —
+          // as wide and as tall as the keys it sits under.
           compact
-            ? "h-10 max-w-[320px] justify-between gap-2 px-2.5"
+            ? "h-12 justify-between gap-2 rounded-lg px-2.5"
             : "h-12 gap-3 px-4",
           // The speed picker ("Speed 75% = 46 BPM") needs the extra width or
           // the slider shrinks to nothing.

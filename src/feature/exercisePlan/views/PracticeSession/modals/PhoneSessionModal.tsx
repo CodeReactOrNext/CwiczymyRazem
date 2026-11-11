@@ -1,4 +1,3 @@
-import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
@@ -7,7 +6,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMediaQuery } from "hooks/useMediaQuery";
 import { QuarterTurnContext } from "hooks/useQuarterTurn";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Info, Minimize2, Pause, PlayIcon, RotateCcw, SkipBack, SkipForward, X } from "lucide-react";
+import { transitions } from "lib/motion/motion";
+import { Check, Info, Minimize2, Pause, PlayIcon, RotateCcw, SkipBack, SkipForward, SlidersHorizontal, X } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -42,18 +42,18 @@ function DrawerMicStats() {
   const { t } = useTranslation("session");
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
   return (
-    <div className="flex items-center justify-between gap-2 px-3 py-1 text-[9px]">
+    <div className="grid grid-cols-3 gap-2 rounded-lg bg-zinc-900/60 px-4 py-3">
       <div className="min-w-0">
-        <div className="tracking-widest text-zinc-600">{t("success.score")}</div>
-        <div className="font-black tabular-nums text-white">{gameState.score.toLocaleString()}</div>
+        <div className="truncate text-[11px] font-medium text-zinc-400">{t("success.score")}</div>
+        <div className="text-base font-bold tabular-nums text-white">{gameState.score.toLocaleString()}</div>
       </div>
-      <div className="min-w-0">
-        <div className="tracking-widest text-zinc-600">{t("hud.acc_short")}</div>
-        <div className="font-black tabular-nums text-emerald-400">{sessionAccuracy}%</div>
+      <div className="min-w-0 text-center">
+        <div className="truncate text-[11px] font-medium text-zinc-400">{t("hud.acc_short")}</div>
+        <div className="text-base font-bold tabular-nums text-emerald-400">{sessionAccuracy}%</div>
       </div>
       <div className="min-w-0 text-right">
-        <div className="tracking-widest text-zinc-600">{t("hud.streak")}</div>
-        <div className="font-black tabular-nums text-cyan-400">{gameState.combo}×{gameState.multiplier}</div>
+        <div className="truncate text-[11px] font-medium text-zinc-400">{t("hud.streak")}</div>
+        <div className="text-base font-bold tabular-nums text-cyan-400">{gameState.combo}×{gameState.multiplier}</div>
       </div>
     </div>
   );
@@ -196,9 +196,8 @@ export function PhoneSessionModal({
   const isTurned = isPortrait && isUprightScreen;
   /** The sideways arrangement — the phone really turned, or the screen turned for it. */
   const isSideways = !isPortrait || isTurned;
-  // Sideways the drawer opens beside most of the tab. Upright it would cover the exercise, so
-  // there it starts shut.
-  const [isPanelExpanded, setIsPanelExpanded] = useState(!isPortrait);
+  // The tools drawer starts shut: the tab owns the screen, the tools come up when asked for.
+  const [isPanelExpanded, setIsPanelExpanded] = useState(false);
   // What the exercise is about — over the exercise, opened from its title. Held per exercise,
   // so moving on to the next one closes it.
   const [infoExerciseId, setInfoExerciseId] = useState<string | null>(null);
@@ -220,6 +219,12 @@ export function PhoneSessionModal({
   const startGate = useStartGate(isPlaying);
   const showStartGate = startGate.open && !heroSlot && !!activeTablature?.length
     && currentExercise.riddleConfig?.mode !== "sequenceRepeat";
+  // The tab's own controls (look, zoom, full screen) live in the top bar — a row under the
+  // tab cost it height on a screen that has none to spare.
+  const [tabControlsSlot, setTabControlsSlot] = useState<HTMLElement | null>(null);
+  // A tab runs to the screen's edges, like a video would; anything else keeps its margins.
+  const isTabFlush = hasTablature && currentExercise.id !== "metronome_gap_test"
+    && (currentExercise.riddleConfig?.mode !== "sequenceRepeat" || !!isRiddleRevealed);
 
   // The turned screen is sized off the real one: its width is the screen's height. Measured
   // inside the safe-area padding, so the strip — on the screen's lower edge once turned —
@@ -239,15 +244,17 @@ export function PhoneSessionModal({
     observer.observe(el);
     return () => observer.disconnect();
   }, [isOpen]);
+  // Menus opened from this screen are portalled to the page, out of reach of its own classes.
+  // The mark on <html> is what turns them into bottom sheets (globals.css, `phone-session`).
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    document.documentElement.classList.add("phone-session");
+    return () => document.documentElement.classList.remove("phone-session");
+  }, [isOpen]);
+
   const turnedSize = screenSize ?? (typeof window === "undefined"
     ? { width: 0, height: 0 }
     : { width: window.innerWidth, height: window.innerHeight });
-
-  // The toggle's arrow points the way the drawer will move: out of the strip to open it,
-  // back into the strip to close it.
-  const toggleRotation = isSideways
-    ? (isPanelExpanded ? 0 : 180)
-    : (isPanelExpanded ? 90 : -90);
 
   // The drawer turns with the screen: what sits in it is buttons and steppers, which take a tap
   // through the turn. Its sliders (volume) and lists (speed) open in menus portalled to the
@@ -255,28 +262,35 @@ export function PhoneSessionModal({
   const drawer = (
     <AnimatePresence>
       {isPanelExpanded && (
+        // Tapping the exercise beside the drawer shuts it, as any sheet on a phone would.
+        <motion.button
+          key="scrim"
+          type="button"
+          aria-label={t("tools.close_panel")}
+          onClick={() => setIsPanelExpanded(false)}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-x-0 bottom-0 top-10 z-10 cursor-default bg-black/50"
+        />
+      )}
+      {isPanelExpanded && (
         <motion.div
           key="details"
           initial={isSideways ? { x: "100%" } : { y: "100%" }}
           animate={isSideways ? { x: 0 } : { y: 0 }}
           exit={isSideways ? { x: "100%" } : { y: "100%" }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          transition={transitions.spring}
           // Sized off the exercise area, not the viewport: on a turned screen the viewport is
-          // the upright phone, and 60vw of its narrow width left the drawer a sliver.
+          // the upright phone, and 60vw of its narrow width left the drawer a sliver. It opens
+          // under the top bar, so the title and the clock stay in sight.
           className={cn(
-            "absolute z-10 flex flex-col overflow-y-auto overscroll-contain scrollbar-hide bg-zinc-950 shadow-2xl shadow-black/50",
+            "absolute z-10 flex flex-col gap-3 overflow-y-auto overscroll-contain scrollbar-hide bg-zinc-950 p-3",
             isSideways
-              ? "bottom-0 right-0 top-0 w-[min(320px,60%)]"
-              : "inset-x-0 bottom-0 max-h-[75%] rounded-t-2xl",
+              ? "bottom-0 right-0 top-10 w-[min(360px,66%)]"
+              : "inset-x-0 bottom-0 max-h-[75%] rounded-t-lg",
           )}
         >
-          {/* Title + counter */}
-          <div className="flex items-center gap-1.5 px-3 pb-1 pt-3">
-            <span className='flex-1 truncate text-[11px] font-bold text-foreground'>{currentExercise.title}</span>
-            {currentExercise.id && <FavoriteExerciseButton exerciseId={currentExercise.id} compact />}
-            <Badge variant='outline' className='shrink-0 text-[8px]'>{currentExerciseIndex + 1}/{totalExercises}</Badge>
-          </div>
-
           {/* Mic stats — ear training keeps its own score inside EarTrainingView,
               the generic tab accuracy meter doesn't apply to it. */}
           {isMicEnabled && currentExercise.riddleConfig?.mode !== "sequenceRepeat" && (
@@ -284,7 +298,7 @@ export function PhoneSessionModal({
           )}
 
           {/* Controls */}
-          <div className="space-y-2 px-3 py-2">
+          <div className="space-y-3">
             <MediaControlsToolbar
               hasMetronome={!!currentExercise.metronomeSpeed}
               hasAudioTrack={!!(activeTablature?.length > 0 || currentExercise.gpFileUrl || currentExercise.strummingPatterns?.length > 0) && !currentExercise.disableBackingTrack}
@@ -377,7 +391,6 @@ export function PhoneSessionModal({
                   onPointerDownCapture={isFullscreen ? wakeFullscreenControls : undefined}
                   className={cn(
                     "relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
-                    !isFullscreen && (isSideways ? "p-2" : "px-4 pb-2 pt-4"),
                   )}
                   // Full screen runs edge to edge, so the notch is the board's to avoid — it sits
                   // at the board's start: the screen's left held sideways, its top when turned.
@@ -386,26 +399,43 @@ export function PhoneSessionModal({
                     paddingRight: isTurned ? undefined : "env(safe-area-inset-right, 0px)",
                   } : undefined}
                 >
-                  {/* Title — the screen has no room for the instructions, so they open from here */}
+                  {/* Top bar — what is being played and how long is left, one slim row over
+                      the exercise. The title opens the instructions the screen has no room for. */}
                   {!isFullscreen && (
-                  <button
-                    type="button"
-                    onClick={() => setInfoExerciseId(currentExercise.id)}
-                    aria-label={t("header.exercise_info")}
-                    className={cn(
-                      "flex max-w-full shrink-0 items-center gap-1.5 self-start text-left text-zinc-400 transition-colors hover:text-white",
-                      isSideways ? "px-1 pb-1.5" : "pb-3",
+                  <div className="flex h-10 shrink-0 items-center gap-2 pl-3 pr-2">
+                    <button
+                      type="button"
+                      onClick={() => setInfoExerciseId(currentExercise.id)}
+                      aria-label={t("header.exercise_info")}
+                      className="flex h-10 min-w-0 items-center gap-1.5 text-left text-zinc-200 transition-colors hover:text-white"
+                    >
+                      <span className="truncate text-[13px] font-semibold">{currentExercise.title}</span>
+                      <Info className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
+                    </button>
+                    {totalExercises > 1 && (
+                      <span className="shrink-0 text-xs font-medium tabular-nums text-zinc-500">
+                        {currentExerciseIndex + 1}/{totalExercises}
+                      </span>
                     )}
-                  >
-                    <span className="truncate text-[11px] font-semibold">{currentExercise.title}</span>
-                    <Info className="h-3.5 w-3.5 shrink-0 text-cyan-400/80" />
-                  </button>
+                    <div className="flex-1" />
+                    <div ref={setTabControlsSlot} className="flex shrink-0 items-center" />
+                    {currentExercise.id && <FavoriteExerciseButton exerciseId={currentExercise.id} compact />}
+                    <span className={cn(
+                      "shrink-0 font-mono text-base font-bold tabular-nums leading-none transition-colors",
+                      isPlaying ? "text-white" : "text-zinc-400",
+                    )}>
+                      <TimeLeft />
+                    </span>
+                  </div>
                   )}
 
                   {/* Scroll container + min-h-full column: the exercise owns the free height — a
                       tab grows into it, anything shorter is centred in it — while tall exercises
                       (chord hunt, ear training) scroll instead of being clipped under the timer. */}
-                  <div className="min-h-0 w-full flex-1 overflow-y-auto overscroll-contain">
+                  <div className={cn(
+                    "min-h-0 w-full flex-1 overflow-y-auto overscroll-contain",
+                    !isFullscreen && !isTabFlush && (isSideways ? "px-2 pb-2" : "px-4 pb-2"),
+                  )}>
                     <div className="flex min-h-full w-full flex-col gap-4">
                       <div className="flex flex-1 flex-col justify-center gap-4">
                         {!isSideways && heroSlot}
@@ -439,6 +469,8 @@ export function PhoneSessionModal({
                           songSectionMapSlot={songSectionMapSlot}
                           turnTab={isTurned}
                           tabFullscreen={isFullscreen}
+                          tabFlush={isTabFlush}
+                          tabControlsSlot={tabControlsSlot}
                           onTabFullscreenChange={handleTabFullscreenChange}
                         />
                       </div>
@@ -457,28 +489,20 @@ export function PhoneSessionModal({
                     </div>
                   </div>
 
-                  {/* Timer — always visible, even with the details drawer collapsed */}
-                  {!isFullscreen && (
-                  <div className="flex shrink-0 items-center justify-center pt-1.5">
-                    <div className={cn(
-                      "font-mono text-2xl font-black leading-none tracking-tighter transition-colors",
-                      isPlaying ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" : "text-zinc-500"
-                    )}>
-                      <TimeLeft />
-                    </div>
-                  </div>
-                  )}
-
-                  {!isFullscreen && drawer}
-
-                  {showStartGate && (
+                  {/* Stood down while the drawer is open — the drawer's own menus sit over
+                      the tab, and the veil would bury them. Back when the drawer closes. */}
+                  {showStartGate && !isPanelExpanded && (
                     <StartGate
                       onStart={handleToggleTimer}
                       onPreview={startGate.dismiss}
                       countsIn={!!currentExercise.metronomeSpeed}
                       micOn={isMicEnabled}
+                      // Under the top bar — the title and the clock stay readable.
+                      className='top-10'
                     />
                   )}
+
+                  {!isFullscreen && drawer}
 
                   {/* Full screen's own controls — over the board's corner, gone a moment after
                       the last touch while the tab plays. Hidden, they let touches through. */}
@@ -570,15 +594,12 @@ export function PhoneSessionModal({
                       onClick={() => setIsPanelExpanded(prev => !prev)}
                       aria-label={isPanelExpanded ? t("tools.close_panel") : t("tools.open_panel")}
                       aria-expanded={isPanelExpanded}
-                      className='h-10 w-10 shrink-0 text-zinc-400 hover:text-white'
+                      className={cn(
+                        "h-10 w-10 shrink-0 hover:text-white",
+                        isPanelExpanded ? "bg-white/15 text-white" : "text-zinc-400",
+                      )}
                     >
-                      <motion.span
-                        animate={{ rotate: toggleRotation }}
-                        transition={{ duration: 0.2 }}
-                        className="flex items-center justify-center"
-                      >
-                        <SkipForward size='1em' className='h-4 w-4' />
-                      </motion.span>
+                      <SlidersHorizontal className='h-4 w-4' />
                     </Button>
 
                     <div className="flex-1" />

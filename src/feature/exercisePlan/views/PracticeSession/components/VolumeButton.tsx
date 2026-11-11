@@ -80,10 +80,10 @@ export const VolumeButton = ({
       title={t("volume.title")}
       className={cn(
         PRESSABLE_KEY,
-        "flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-lg bg-zinc-800 text-zinc-400 transition-colors",
+        "flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-lg bg-zinc-800 text-zinc-400 transition-colors",
       )}>
       <VolumeIcon className='h-4 w-4 shrink-0' strokeWidth={2.5} />
-      <span className='truncate text-[10px] font-semibold tracking-wide'>{t("volume.title")}</span>
+      <span className='truncate text-xs font-semibold'>{t("volume.title")}</span>
     </button>
   ) : (
     <button

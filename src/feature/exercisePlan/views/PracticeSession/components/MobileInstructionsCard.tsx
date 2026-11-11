@@ -78,13 +78,13 @@ export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstru
   if (plain) return <div className="space-y-6">{content}</div>;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/50">
+    <div className="overflow-hidden rounded-lg bg-zinc-900/60">
       <button
         onClick={() => setIsExpanded((prev) => !prev)}
-        className="flex w-full items-center gap-2.5 px-4 py-3 text-left"
+        className="flex min-h-12 w-full items-center gap-2.5 px-4 py-3 text-left"
       >
         <InfoIcon size={14} className="shrink-0 text-cyan-400/80" />
-        <span className="flex-1 text-[11px] font-semibold capitalize tracking-wider text-zinc-200">
+        <span className="flex-1 text-[13px] font-semibold text-zinc-200">
           {t("instructions.instructions")}
         </span>
         <ChevronDown
@@ -96,13 +96,13 @@ export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstru
       </button>
 
       {!isExpanded && (
-        <p className="-mt-1 px-4 pb-3 text-xs leading-relaxed text-zinc-500 line-clamp-2">
+        <p className="-mt-1 px-4 pb-4 text-xs leading-relaxed text-zinc-400 line-clamp-2">
           {preview}
         </p>
       )}
 
       {isExpanded && (
-        <div className="space-y-5 border-t border-white/5 px-4 py-4">{content}</div>
+        <div className="space-y-5 px-4 pb-4 pt-1">{content}</div>
       )}
     </div>
   );

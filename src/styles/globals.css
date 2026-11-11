@@ -896,3 +896,89 @@ html.theme-light:has([data-app-shell]) .text-achievements-veryRare:not(.force-da
 html.theme-light:has([data-app-shell]) .text-achievements-epic:not(.force-dark *) {
   color: #6d28d9 !important;
 }
+
+/* Phone practice screen (PhoneSessionModal sets `phone-session` on <html> while
+   it is open): every dropdown menu opened from it — volume, speed, subdivision,
+   beats, mic tools — comes up as a bottom sheet instead of a popover hanging off
+   its key. Radix places the popper wrapper with inline styles, hence !important.
+   On a turned screen the menus are portalled to the page, so the sheet sits on
+   the phone's real lower edge, upright. */
+html.phone-session [data-radix-popper-content-wrapper]:has(> [role="menu"]) {
+  position: fixed !important;
+  inset: auto 0 0 0 !important;
+  transform: none !important;
+  display: flex !important;
+  justify-content: center;
+  width: 100% !important;
+  min-width: 0 !important;
+  z-index: 99999999 !important;
+}
+html.phone-session [data-radix-popper-content-wrapper] > [role="menu"] {
+  width: 100% !important;
+  max-width: 30rem !important;
+  max-height: 85dvh !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  border: 0 !important;
+  border-radius: 22px 22px 0 0 !important;
+  padding: 0.75rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom, 0px)) !important;
+  background-color: rgb(var(--c-zinc-900)) !important;
+  backdrop-filter: none !important;
+  /* The scrim: the menu has no overlay element of its own to dim the screen with. */
+  box-shadow: 0 0 0 100vmax rgb(0 0 0 / 0.55) !important;
+}
+html.phone-session [data-radix-popper-content-wrapper] > [role="menu"]::before {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 0.375rem;
+  margin: 0 auto 1rem;
+  border-radius: 9999px;
+  background-color: rgb(var(--c-zinc-600) / 0.7);
+}
+html.phone-session [data-radix-popper-content-wrapper] > [role="menu"][data-state="open"] {
+  animation: phone-sheet-up 220ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+html.phone-session [data-radix-popper-content-wrapper] > [role="menu"][data-state="closed"] {
+  animation: phone-sheet-down 150ms cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+}
+html.phone-session [data-radix-popper-content-wrapper] > [role="menu"] [role^="menuitem"] {
+  min-height: 2.75rem;
+  font-size: 0.875rem;
+}
+@keyframes phone-sheet-up {
+  from { transform: translateY(100%); }
+}
+@keyframes phone-sheet-down {
+  to { transform: translateY(100%); }
+}
+
+/* Same screen, the dialogs (tuning, tab look, mic help…): a phone held sideways
+   is wider than `sm`, where a dialog is a centred, bordered window — and its
+   overlay sits under the session layer, so nothing dims. There they are the same
+   bottom sheet as on an upright phone and as the menus above. The centring is
+   undone through Tailwind's translate variables, so the slide-up can still
+   animate `transform`. */
+html.phone-session [role="dialog"][data-state]:not([data-vaul-drawer]) {
+  top: auto !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin-inline: auto !important;
+  --tw-translate-x: 0 !important;
+  --tw-translate-y: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: 92dvh !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  border: 0 !important;
+  border-radius: 22px 22px 0 0 !important;
+  box-shadow: 0 0 0 100vmax rgb(0 0 0 / 0.55) !important;
+}
+html.phone-session [role="dialog"][data-state="open"]:not([data-vaul-drawer]) {
+  animation: phone-sheet-up 220ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+html.phone-session [role="dialog"][data-state="closed"]:not([data-vaul-drawer]) {
+  animation: phone-sheet-down 150ms cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+}

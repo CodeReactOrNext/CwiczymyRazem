@@ -12,6 +12,14 @@ const DialogPortal = DialogPrimitive.Portal;
 
 const DialogClose = DialogPrimitive.Close;
 
+/**
+ * The base z-index splits by breakpoint (`z-[120]` phones, `sm:z-50` up), and
+ * tailwind-merge only swaps a caller's `z-[…]` for the unprefixed one — the
+ * `sm:z-50` would stay and drop the dialog under full-screen views (the
+ * practice session) from 640px up. A caller that sets its own z gets only that.
+ */
+const hasOwnZ = (className?: string) => /(^|\s)!?z-/.test(className ?? "");
+
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
@@ -19,7 +27,8 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "font-openSans app-scrim fixed inset-0 z-[115] bg-black/80 sm:z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "font-openSans app-scrim fixed inset-0 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      !hasOwnZ(className) && "z-[115] sm:z-50",
       className,
     )}
     {...props}
@@ -49,7 +58,8 @@ const DialogContent = React.forwardRef<
           // its content (up to 92% of the screen), rounded on top, sliding up,
           // above the bottom tab bar (z-[120] over its z-[100]) and clear of the
           // home indicator. From `sm` up: the centred dialog it always was.
-          "font-openSans fixed inset-x-0 bottom-0 z-[120] grid max-h-[92dvh] w-full gap-4 overflow-y-auto rounded-t-[22px] border-0 bg-background px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] pt-9 shadow-lg duration-base data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-full data-[state=closed]:slide-out-to-bottom-full sm:inset-x-auto sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:z-50 sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:overflow-visible sm:rounded-lg sm:border sm:p-6 sm:data-[state=open]:slide-in-from-bottom-0 sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 short:p-4 sm:short:max-h-[calc(100dvh-1.5rem)] sm:short:overflow-y-auto",
+          "font-openSans fixed inset-x-0 bottom-0 grid max-h-[92dvh] w-full gap-4 overflow-y-auto rounded-t-[22px] border-0 bg-background px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] pt-9 shadow-lg duration-base data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-full data-[state=closed]:slide-out-to-bottom-full sm:inset-x-auto sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:overflow-visible sm:rounded-lg sm:border sm:p-6 sm:data-[state=open]:slide-in-from-bottom-0 sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 short:p-4 sm:short:max-h-[calc(100dvh-1.5rem)] sm:short:overflow-y-auto",
+          !hasOwnZ(className) && "z-[120] sm:z-50",
           className,
         )}
         {...props}>

@@ -56,6 +56,10 @@ interface MobileExerciseContentProps {
   turnTab?: boolean;
   /** The tab alone on the whole screen — see MobileTablaturePanel. */
   tabFullscreen?: boolean;
+  /** The tab runs edge to edge — the phone screen gives it no margins. */
+  tabFlush?: boolean;
+  /** Where the tab's Look / zoom controls go instead of a row under it — see MobileTablaturePanel. */
+  tabControlsSlot?: HTMLElement | null;
   onTabFullscreenChange?: (fullscreen: boolean) => void;
 }
 
@@ -89,6 +93,8 @@ export function MobileExerciseContent({
   songSectionMapSlot,
   turnTab = false,
   tabFullscreen = false,
+  tabFlush = false,
+  tabControlsSlot,
   onTabFullscreenChange,
 }: MobileExerciseContentProps) {
   const { t } = useTranslation("session");
@@ -191,6 +197,8 @@ export function MobileExerciseContent({
           resetKey={tabResetKey}
           quarterTurned={turnTab}
           fullscreen={tabFullscreen}
+          flush={tabFlush}
+          controlsSlot={tabControlsSlot}
           onFullscreenChange={onTabFullscreenChange}
         />
       ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (

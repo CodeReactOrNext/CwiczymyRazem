@@ -9,6 +9,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
@@ -81,6 +82,13 @@ interface MobileTablaturePanelProps {
    * square to the screen's edges. The session owns the state — it hides its own chrome too.
    */
   fullscreen?: boolean;
+  /** Edge to edge in the screen around it: square corners, no card of its own. */
+  flush?: boolean;
+  /**
+   * Somewhere else to put the Look / zoom / full screen controls — the phone screen's top bar.
+   * Given (even while still `null`), the board keeps no row of its own under the tab.
+   */
+  controlsSlot?: HTMLElement | null;
   /** Given, the board offers a full screen button; also told `false` when the board goes away. */
   onFullscreenChange?: (fullscreen: boolean) => void;
 }
@@ -106,6 +114,8 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   resetKey,
   quarterTurned = false,
   fullscreen = false,
+  flush = false,
+  controlsSlot,
   onFullscreenChange,
 }: MobileTablaturePanelProps) {
   const { t } = useTranslation("session");
@@ -141,7 +151,8 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   const fills = quarterTurned || fullscreen || !isCustom;
   // Full screen is the whole point there, even on a screen taller than the usual cap.
   const heightMax = fullscreen ? Infinity : MOBILE_HEIGHT_MAX;
-  const controlsBarH = fullscreen ? 0 : CONTROLS_BAR_H;
+  const controlsElsewhere = controlsSlot !== undefined;
+  const controlsBarH = fullscreen || controlsElsewhere ? 0 : CONTROLS_BAR_H;
 
   const boardRef = useRef<HTMLDivElement>(null);
   const [fitHeight, setFitHeight] = useState<number | null>(null);
@@ -187,11 +198,65 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   const zoomBtn =
     "flex h-9 w-9 items-center justify-center rounded-lg text-zinc-300 transition-colors active:bg-white/10 disabled:opacity-30";
 
+  const lookButton = (
+    <button
+      type='button'
+      onClick={() => setIsSettingsOpen(true)}
+      aria-label={t("tab.settings")}
+      className={cn(
+        "flex h-9 items-center gap-1.5 rounded-lg text-zinc-300 transition-colors active:bg-white/10",
+        controlsElsewhere ? "w-9 justify-center" : "px-2.5",
+      )}>
+      <Settings2 className='h-4 w-4 shrink-0' />
+      {/* In the top bar the icon stands alone — the label has no room there. */}
+      {!controlsElsewhere && <span className='text-xs font-semibold'>{t("tab.look")}</span>}
+    </button>
+  );
+  const zoomControls = (
+    <div className='flex items-center gap-0.5'>
+      <button
+        type='button'
+        onClick={() => handleZoomChange(zoom - ZOOM_STEP)}
+        disabled={atMin}
+        aria-label={t("tab.zoom_out")}
+        className={zoomBtn}>
+        <ZoomOut className='h-4 w-4' />
+      </button>
+      <button
+        type='button'
+        onClick={() => handleZoomChange(fitZoom)}
+        aria-label={t("tab.reset_zoom")}
+        className={cn(
+          "font-mono rounded-lg py-2 text-center text-xs font-semibold tabular-nums text-zinc-300 transition-colors active:bg-white/10",
+          controlsElsewhere ? "min-w-[2.75rem] px-1" : "min-w-[3.25rem] px-1.5",
+        )}>
+        {Math.round(zoom * 100)}%
+      </button>
+      <button
+        type='button'
+        onClick={() => handleZoomChange(zoom + ZOOM_STEP)}
+        disabled={atMax}
+        aria-label={t("tab.zoom_in")}
+        className={zoomBtn}>
+        <ZoomIn className='h-4 w-4' />
+      </button>
+      {onFullscreenChange && (
+        <button
+          type='button'
+          onClick={() => onFullscreenChange(true)}
+          aria-label={t("tab.fullscreen")}
+          className={cn(zoomBtn, !controlsElsewhere && "ml-2")}>
+          <Maximize2 className='h-4 w-4' />
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <div
       className={cn(
         "flex w-full flex-col overflow-hidden",
-        !fullscreen && "rounded-2xl shadow-lg",
+        !fullscreen && !flush && "rounded-lg",
         fills && "flex-1",
       )}
       style={{
@@ -250,52 +315,18 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
 
       {/* Controls sit under the board rather than floating over it — on a phone
           there is no spare canvas to cover without hiding notes. */}
-      {!fullscreen && (
-      <div className='flex shrink-0 items-center justify-between gap-2 bg-black/40 px-2 py-1.5'>
-        <button
-          type='button'
-          onClick={() => setIsSettingsOpen(true)}
-          aria-label={t("tab.settings")}
-          className='flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-zinc-300 transition-colors active:bg-white/10'>
-          <Settings2 className='h-4 w-4 shrink-0' />
-          <span className='text-xs font-semibold'>{t("tab.look")}</span>
-        </button>
-
-        <div className='flex items-center gap-0.5'>
-          <button
-            type='button'
-            onClick={() => handleZoomChange(zoom - ZOOM_STEP)}
-            disabled={atMin}
-            aria-label={t("tab.zoom_out")}
-            className={zoomBtn}>
-            <ZoomOut className='h-4 w-4' />
-          </button>
-          <button
-            type='button'
-            onClick={() => handleZoomChange(fitZoom)}
-            aria-label={t("tab.reset_zoom")}
-            className='font-mono min-w-[3.25rem] rounded-lg px-1.5 py-2 text-center text-xs font-semibold tabular-nums text-zinc-300 transition-colors active:bg-white/10'>
-            {Math.round(zoom * 100)}%
-          </button>
-          <button
-            type='button'
-            onClick={() => handleZoomChange(zoom + ZOOM_STEP)}
-            disabled={atMax}
-            aria-label={t("tab.zoom_in")}
-            className={zoomBtn}>
-            <ZoomIn className='h-4 w-4' />
-          </button>
-          {onFullscreenChange && (
-            <button
-              type='button'
-              onClick={() => onFullscreenChange(true)}
-              aria-label={t("tab.fullscreen")}
-              className={cn(zoomBtn, "ml-2")}>
-              <Maximize2 className='h-4 w-4' />
-            </button>
-          )}
+      {!fullscreen && !controlsElsewhere && (
+        <div className='flex shrink-0 items-center justify-between gap-2 bg-black/40 px-2 py-1.5'>
+          {lookButton}
+          {zoomControls}
         </div>
-      </div>
+      )}
+      {!fullscreen && controlsSlot && createPortal(
+        <>
+          {lookButton}
+          {zoomControls}
+        </>,
+        controlsSlot,
       )}
 
       <TablatureSettingsDialog

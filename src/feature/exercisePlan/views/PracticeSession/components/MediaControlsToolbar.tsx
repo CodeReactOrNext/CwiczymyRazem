@@ -145,7 +145,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
     // portrait and inside the narrow (264px) landscape drawer, so no row may
     // ever depend on label width for its layout.
     const gridBtn =
-      "flex h-11 w-full min-w-0 items-center justify-center gap-2 rounded-lg transition-colors";
+      "flex h-12 w-full min-w-0 items-center justify-center gap-2 rounded-lg transition-colors";
     const showSpeedBtn = showSpeedControl && hasMetronome;
     const showBackingBtn = showBacking && hasAudioTrack;
     const showTuningBtn = hasAudioTrack || hasMicControls;
@@ -159,9 +159,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 speedMultiplier={speedMultiplier}
                 onSpeedMultiplierChange={onSpeedMultiplierChange}
                 baseBpm={baseBpm}
-                h='h-11'
+                h='h-12'
                 className={cn(
-                  "w-full min-w-0 justify-center",
+                  // The label matches the other keys of this grid (12px), not the desktop bar.
+                  "w-full min-w-0 justify-center [&>span:first-of-type]:text-xs [&>span:first-of-type]:tracking-normal",
                   !showBackingBtn && "col-span-2",
                 )}
               />
@@ -183,7 +184,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   isRiddleMode && "cursor-not-allowed opacity-50",
                 )}>
                 <GiGuitar className='shrink-0 text-lg' />
-                <span className='truncate text-[10px] font-semibold tracking-wide'>
+                <span className='truncate text-xs font-semibold'>
                   {t("media.guitar")}
                 </span>
               </button>
@@ -221,7 +222,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               ) : (
                 <GiGuitarHead className='h-4 w-4 shrink-0' />
               )}
-              <span className='truncate text-[10px] font-semibold tracking-wide'>
+              <span className='truncate text-xs font-semibold'>
                 {preferredTuning.name}
               </span>
             </button>
@@ -269,7 +270,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   "cursor-not-allowed",
               )}>
               <Mic size='1em' className='h-3.5 w-3.5 shrink-0' />
-              <span className='truncate text-[10px] font-semibold tracking-wide'>
+              <span className='truncate text-xs font-semibold'>
                 {t("media.pitch_detect")}
               </span>
             </button>
@@ -287,7 +288,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                     : "bg-zinc-800 text-zinc-400",
                 )}>
                 <TuningForkIcon className='h-4 w-4 shrink-0' />
-                <span className='truncate text-[10px] font-semibold tracking-wide'>
+                <span className='truncate text-xs font-semibold'>
                   {t("media.tuner")}
                 </span>
               </button>
@@ -300,14 +301,14 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 title={t("media.recalibrate")}
                 className={cn(PRESSABLE_KEY, gridBtn, "bg-zinc-800 text-zinc-400")}>
                 <SlidersHorizontal size='1em' className='h-3.5 w-3.5 shrink-0' />
-                <span className='truncate text-[10px] font-semibold tracking-wide'>
+                <span className='truncate text-xs font-semibold'>
                   {t("media.recalibrate")}
                 </span>
               </button>
             )}
 
             {/* Electron-only amp simulator (renders nothing on web) */}
-            <AmpSimButton h='h-11' />
+            <AmpSimButton h='h-12' />
           </div>
         )}
 
