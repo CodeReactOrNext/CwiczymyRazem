@@ -11,7 +11,10 @@ import type {
   WorkshopKind,
 } from "feature/arsenal/types/arsenal.types";
 import { FEATURE_UNLOCKS } from "feature/levelGate/data/featureUnlocks";
-import { pointsToReachLvl } from "feature/levelGate/utils/levelGate.utils";
+import {
+  pointsToReachLvl,
+  progressToLvl,
+} from "feature/levelGate/utils/levelGate.utils";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { useAutoClaimLevels } from "hooks/useRewardLedger";
 import { useAppSelector } from "store/hooks";
@@ -72,12 +75,19 @@ const RewardIcons = ({
   reward,
   size = 46,
   muted,
+  align = "center",
 }: {
   reward: RewardLike;
   size?: number;
   muted?: boolean;
+  /** The receipt centres its haul; a stop on the path hangs it off its left edge. */
+  align?: "start" | "center";
 }) => (
-  <div className='flex flex-wrap items-center justify-center gap-2'>
+  <div
+    className={cn(
+      "flex flex-wrap items-center gap-2",
+      align === "center" ? "justify-center" : "justify-start",
+    )}>
     {reward.caseTokens > 0 && (
       <span
         title={
@@ -122,93 +132,77 @@ const RewardIcons = ({
   </div>
 );
 
+/** The least a started stretch shows, so two points in still reads as begun. */
+const MIN_FILL_PCT = 3;
+
 /**
- * A stop on the trail — a node, not a badge.
+ * One stop on the path ahead: the stretch of road to it, the level, what it
+ * opens, what it pays.
  *
- * It used to be the level number inside a 48px disc, which was wrong twice
- * over: the number was already printed underneath, and at `font-black` the app
- * has no such weight to load, so the browser smeared a synthetic one and "12"
- * came out looking double-struck. A path is made of points; the writing goes
- * beside it.
+ * The road is the stop's own bar rather than a line threaded through dots. The
+ * dots sat in a huddle mid-card with a hairline between them, and said nothing
+ * about how far along the player was; a bar per stop fills the card's width and
+ * the first one doubles as the progress to the next level. Everything hangs off
+ * the bar's left edge, so each stop reads top to bottom from where it starts.
  *
- * Never the rank badge either. Those badges are guitars, and a guitar on this
- * card is a guitar the player has every reason to think they are being given.
+ * Never the rank badge for a stop. Those badges are guitars, and a guitar on
+ * this card is a guitar the player has every reason to think they are being
+ * given.
  */
-const TrailNode = ({ isNext }: { isNext: boolean }) => (
-  <span
-    className={cn(
-      "block h-3.5 w-3.5 shrink-0 rounded-full",
-      isNext ? "bg-cyan-400" : "bg-zinc-700",
-    )}
-    style={
-      isNext ? { boxShadow: "0 0 0 5px rgba(34,211,238,0.16)" } : undefined
-    }
-  />
-);
-
-/** Half the node, less half the trail — where the trail meets the nodes. */
-const TRAIL_TOP = 7 - 1.5;
-
-/** One stop on the path ahead: the level, what it opens, what it pays. */
 const Stop = ({
   milestone,
   points,
   isNext,
-  showTrail,
+  progress,
 }: {
   milestone: LevelMilestone;
   points: number;
   isNext: boolean;
-  /** Draws the segment back to the previous stop. Every stop but the first. */
-  showTrail: boolean;
+  /** 0–1 along the stretch to this stop. Only the next one has any. */
+  progress: number;
 }) => {
   const reward = rollLevelReward(milestone);
+  const fillPct =
+    progress > 0 ? Math.max(MIN_FILL_PCT, Math.round(progress * 100)) : 0;
 
   return (
-    <div className='relative flex w-[168px] shrink-0 flex-col items-center px-2 text-center sm:w-auto sm:min-w-0 sm:flex-1 shortwide:w-auto shortwide:min-w-0 shortwide:flex-1'>
-      {/* Each stop draws its own segment back to the one before it, rather than
-          one line laid across the row: the row is a scroller on a phone and a
-          stretched flex on a desktop, and a single absolute line cannot be
-          right in both. Half a stop back to half a stop is exactly centre to
-          centre. */}
-      {showTrail && (
+    <div className='flex w-[168px] shrink-0 flex-col sm:w-auto sm:min-w-0 sm:flex-1 shortwide:w-auto shortwide:min-w-0 shortwide:flex-1'>
+      <div className='h-1.5 overflow-hidden rounded-full bg-zinc-800'>
+        {fillPct > 0 && (
+          <div
+            className='h-full rounded-full bg-cyan-400'
+            style={{ width: `${fillPct}%` }}
+          />
+        )}
+      </div>
+
+      <p className='mt-5 flex items-baseline gap-2'>
+        <span className='text-xs font-medium text-zinc-500'>Level</span>
         <span
-          aria-hidden
-          className='absolute left-[-50%] right-1/2 h-[2px] rounded-full bg-zinc-800'
-          style={{ top: TRAIL_TOP }}
-        />
-      )}
-
-      <TrailNode isNext={isNext} />
-
-      {/* Every row below the trail is given its height whether it has anything
-          in it or not. Left to pack, three stops with different amounts to say
-          put their artwork at three different heights, and the row stopped
-          reading as one row. */}
-      <p
-        className={cn(
-          "mt-4 text-sm font-bold",
-          isNext ? "text-zinc-100" : "text-zinc-400",
-        )}>
-        Level {milestone.lvl}
+          className={cn(
+            "font-teko text-5xl font-bold leading-[0.8] tabular-nums",
+            isNext ? "text-zinc-100" : "text-zinc-400",
+          )}>
+          {milestone.lvl}
+        </span>
       </p>
 
-      <p className='h-4 text-xs tabular-nums text-cyan-400/90'>
+      {/* Every row below the bar is given its height whether it has anything in
+          it or not. Left to pack, three stops with different amounts to say put
+          their artwork at three different heights, and the row stopped reading
+          as one row. */}
+      <p className='mt-1 h-4 text-xs font-semibold tabular-nums text-cyan-400'>
         {isNext &&
           `${pointsToReachLvl(points, milestone.lvl).toLocaleString()} pts to go`}
       </p>
 
-      <div className='mt-2.5 flex min-h-[1.25rem] flex-col items-center gap-0.5'>
+      <div className='mt-3 flex min-h-[2.25rem] flex-col items-start gap-0.5'>
         {milestone.unlocks.map((unlock) => {
           const { text, color } = unlockLabel(unlock);
           return (
             <span
               key={text}
-              className={cn(
-                "text-xs font-semibold",
-                !color && "text-zinc-300",
-                !isNext && "opacity-70",
-              )}
+              className={cn("text-sm font-semibold", !color && "text-zinc-200")}
               style={color ? { color } : undefined}>
               {text}
             </span>
@@ -217,8 +211,8 @@ const Stop = ({
       </div>
 
       {reward && (
-        <div className='mt-3'>
-          <RewardIcons reward={reward} muted={!isNext} />
+        <div className='mt-4'>
+          <RewardIcons reward={reward} align='start' />
         </div>
       )}
     </div>
@@ -296,18 +290,17 @@ export const NextUpCard = ({ className }: { className?: string }) => {
             <span className='text-xs text-zinc-500'>you&apos;re level {lvl}</span>
           </div>
 
-          {/* Held to a width instead of spanning the card. Stretched across a
-              desktop the three stops sat so far apart that the connecting line
-              became the biggest thing on the screen, and a trail should be the
-              quietest part of a path. */}
-          <div className='mx-auto flex max-w-2xl items-start overflow-x-auto pb-1 sm:overflow-x-visible'>
+          {/* The whole width of the card: the bars are the layout, so there is
+              no empty margin either side of them. A scroller on a phone, where
+              three stops do not fit side by side. */}
+          <div className='flex items-start gap-3 overflow-x-auto pb-1 sm:gap-4 sm:overflow-x-visible'>
             {ahead.map((milestone, idx) => (
               <Stop
                 key={milestone.lvl}
                 milestone={milestone}
                 points={points}
                 isNext={idx === 0}
-                showTrail={idx > 0}
+                progress={idx === 0 ? progressToLvl(points, lvl, milestone.lvl) : 0}
               />
             ))}
           </div>

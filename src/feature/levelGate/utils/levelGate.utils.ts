@@ -10,6 +10,22 @@ import { getPointsToLvlUp } from "utils/gameLogic";
 export const pointsToReachLvl = (points: number, targetLvl: number) =>
   Math.max(0, getPointsToLvlUp(targetLvl - 1) - points);
 
+/**
+ * How far along the climb from the start of `lvl` to `targetLvl` the account
+ * is, 0–1. Measured from where the current level began, so a bar drawn from it
+ * starts empty on the day of a level-up instead of already half full.
+ */
+export const progressToLvl = (
+  points: number,
+  lvl: number,
+  targetLvl: number,
+) => {
+  const from = getPointsToLvlUp(lvl - 1);
+  const to = getPointsToLvlUp(targetLvl - 1);
+  if (to <= from) return 1;
+  return Math.min(1, Math.max(0, (points - from) / (to - from)));
+};
+
 export type LevelStep =
   | { kind: "level"; lvl: number; state: "current" | "todo" | "target" }
   | { kind: "gap" };

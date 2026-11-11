@@ -5,7 +5,11 @@ import {
   getLockedAtLvl,
   isFeatureUnlocked,
 } from "../data/featureUnlocks";
-import { buildLevelTrack, pointsToReachLvl } from "./levelGate.utils";
+import {
+  buildLevelTrack,
+  pointsToReachLvl,
+  progressToLvl,
+} from "./levelGate.utils";
 
 describe("isFeatureUnlocked", () => {
   it("opens the feature on the required level, not after it", () => {
@@ -31,6 +35,25 @@ describe("pointsToReachLvl", () => {
 
   it("never goes negative once the level is already reached", () => {
     expect(pointsToReachLvl(500, 3)).toBe(0);
+  });
+});
+
+describe("progressToLvl", () => {
+  it("starts empty where the current level began", () => {
+    // Level 2 begins at 36 points, level 3 at 74.
+    expect(progressToLvl(36, 2, 3)).toBe(0);
+    expect(progressToLvl(55, 2, 3)).toBe(0.5);
+  });
+
+  it("spans every level between here and a milestone further off", () => {
+    // Level 5 begins at 156: the climb from level 2 is 120 points long.
+    expect(progressToLvl(66, 2, 5)).toBe(0.25);
+  });
+
+  it("stays inside 0–1 whatever the points say", () => {
+    expect(progressToLvl(0, 2, 3)).toBe(0);
+    expect(progressToLvl(900, 2, 3)).toBe(1);
+    expect(progressToLvl(40, 3, 3)).toBe(1);
   });
 });
 
