@@ -3,7 +3,7 @@ import { ChartContainer, ChartTooltip } from "assets/components/ui/chart";
 import { cn } from "assets/lib/utils";
 import confetti from "canvas-confetti";
 import { accuracyToStars, EXAM_STAR_ACCURACY } from "feature/journey/services/journey.service";
-import { animate, motion } from "framer-motion";
+import { animate, AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
 import { Check, Flame, Star, Target } from "lucide-react";
@@ -26,7 +26,7 @@ interface ExerciseStats {
 
 interface ExerciseSuccessViewProps {
   planTitle: string;
-  onFinish: () => void;
+  onFinish: () => void | Promise<void>;
   onRestart?: () => void;
   isLoading?: boolean;
   examMode?: boolean;
@@ -113,6 +113,36 @@ function StatItem({ icon, value, label, accent }: { icon: ReactNode; value: stri
   );
 }
 
+const FINISHING_STEPS = ["counting", "crunching", "judging", "asking", "polishing"] as const;
+const FINISHING_STEP_MS = 1400;
+
+// What the Finish button says while the run is being saved: a line that keeps
+// changing, so a slow connection reads as work being done rather than a dead tap.
+function FinishingLabel() {
+  const { t } = useTranslation("session");
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setStep(current => (current + 1) % FINISHING_STEPS.length), FINISHING_STEP_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <span className="inline-flex h-5 items-center overflow-hidden" aria-live="polite">
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={step}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}>
+          {t(`finishing.${FINISHING_STEPS[step]}`)}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
+
 export const ExerciseSuccessView = ({
   planTitle,
   onFinish,
@@ -138,6 +168,20 @@ export const ExerciseSuccessView = ({
   const { t } = useTranslation(["common", "session"]);
   const [isVisible, setIsVisible] = useState(false);
   const [displayScore, setDisplayScore] = useState(0);
+  // The tap itself: `isLoading` only turns on once the scores are saved and the
+  // report goes out, which on a phone connection left the button looking dead.
+  const [isPending, setIsPending] = useState(false);
+  const isBusy = isLoading || isPending;
+
+  const handleFinish = async () => {
+    if (isBusy) return;
+    setIsPending(true);
+    try {
+      await onFinish();
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   const isExam = examMode && typeof score !== 'undefined' && typeof maxScore !== 'undefined';
   const hasStats = !!stats;
@@ -365,24 +409,30 @@ export const ExerciseSuccessView = ({
             {((isExam && !isPassed) || offerRestart) && onRestart && (
               <Button
                 onClick={onRestart}
-                disabled={isLoading}
+                disabled={isBusy}
                 className="h-11 flex-1 rounded-lg bg-zinc-800 text-sm font-medium text-zinc-100 hover:bg-zinc-700">
                 {t("session:timing.try_again")}
               </Button>
             )}
+            {/* Not `disabled` while busy: that would dim the one thing on screen
+                that says the tap landed. `handleFinish` ignores repeat taps. */}
             <Button
-              onClick={onFinish}
-              disabled={isLoading}
+              onClick={handleFinish}
+              aria-busy={isBusy}
               className={cn(
                 'flex h-11 flex-1 items-center justify-center rounded-lg text-sm font-medium',
                 isExam && !isPassed
                   ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-100'
-                  : 'bg-white hover:bg-zinc-200 text-zinc-950 font-semibold'
+                  : 'bg-white hover:bg-zinc-200 text-zinc-950 font-semibold',
+                isBusy && 'pointer-events-none'
               )}>
-              {isLoading ? (
+              {isBusy ? (
                 <>
-                  <span className="mr-2 h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-400 border-t-zinc-950" />
-                  <span>{t("session:saving")}</span>
+                  <span className={cn(
+                    "mr-2 h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2",
+                    isExam && !isPassed ? "border-zinc-600 border-t-zinc-100" : "border-zinc-400 border-t-zinc-950"
+                  )} />
+                  <FinishingLabel />
                 </>
               ) : (
                 <>

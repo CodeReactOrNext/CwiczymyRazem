@@ -106,6 +106,13 @@
   },
   "add_to_plan": "Dodaj do planu",
   "saving": "Zapisywanie…",
+  "finishing": {
+    "counting": "Liczymy nuty…",
+    "crunching": "Przeliczamy punkty…",
+    "judging": "Oceniamy feeling…",
+    "asking": "Pytamy metronom o zdanie…",
+    "polishing": "Polerujemy wynik…"
+  },
   "scale_dialog": {
     "title": "Wybierz skalę do ćwiczenia",
     "description": "Ustaw parametry ćwiczenia skali. System sam wygeneruje tabulaturę.",

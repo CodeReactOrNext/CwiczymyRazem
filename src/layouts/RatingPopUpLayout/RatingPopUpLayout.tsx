@@ -461,8 +461,12 @@ const RatingPopUpLayout = ({
                 </div>
               </div>
 
-              {/* CTA */}
-              <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row shortwide:flex-row">
+              {/* CTA — on a phone it lives in the bar pinned to the bottom of
+                  the screen instead (see below), where it needs no scrolling. */}
+              <div className={cn(
+                "mt-10 flex-col items-center justify-center gap-3 sm:flex-row shortwide:flex-row",
+                hideWrapper ? "flex" : "hidden lg:flex",
+              )}>
                 {onRestart && (
                   <Button
                     variant="ghost"
@@ -663,6 +667,32 @@ const RatingPopUpLayout = ({
               </div>
             </Card>
           </div>
+
+          {/* ── Way out, always in reach ──
+              The summary is several screens long on a phone and Continue sat
+              under the rewards, a scroll away. Pinned to the bottom edge it is
+              where the thumb already is, whatever the player is reading. */}
+          {!hideWrapper && (
+            <div className="sticky bottom-0 z-20 -mx-4 flex items-center gap-3 bg-zinc-950/95 px-4 py-3 backdrop-blur-sm md:-mx-8 md:px-8 lg:hidden">
+              {onRestart && (
+                <Button
+                  variant="ghost"
+                  onClick={onRestart}
+                  className="h-11 flex-1 gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4 shrink-0" aria-hidden />
+                  <span className="truncate">{restartLabel ?? t("repeat_session")}</span>
+                </Button>
+              )}
+              <Button
+                onClick={handleContinue}
+                className="h-11 flex-1 gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200"
+              >
+                {t("continue")}
+                <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+              </Button>
+            </div>
+          )}
         </>
       )}
     </motion.div>

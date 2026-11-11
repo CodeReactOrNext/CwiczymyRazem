@@ -106,6 +106,13 @@
   },
   "add_to_plan": "Zum Plan hinzufügen",
   "saving": "Wird gespeichert…",
+  "finishing": {
+    "counting": "Noten werden gezählt…",
+    "crunching": "Punkte werden berechnet…",
+    "judging": "Groove wird bewertet…",
+    "asking": "Metronom wird befragt…",
+    "polishing": "Ergebnis wird poliert…"
+  },
   "scale_dialog": {
     "title": "Tonleiter zum Üben wählen",
     "description": "Stell die Parameter der Tonleiterübung ein. Das System erstellt die Tabulatur automatisch.",

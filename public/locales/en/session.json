@@ -106,6 +106,13 @@
   },
   "add_to_plan": "Add to Plan",
   "saving": "Saving…",
+  "finishing": {
+    "counting": "Counting the notes…",
+    "crunching": "Crunching the numbers…",
+    "judging": "Judging your groove…",
+    "asking": "Asking the metronome…",
+    "polishing": "Polishing the score…"
+  },
   "scale_dialog": {
     "title": "Choose Scale to Practice",
     "description": "Configure scale practice parameters. The system will generate tablature automatically.",

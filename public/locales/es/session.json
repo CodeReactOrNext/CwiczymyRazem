@@ -106,6 +106,13 @@
   },
   "add_to_plan": "Añadir al plan",
   "saving": "Guardando…",
+  "finishing": {
+    "counting": "Contando las notas…",
+    "crunching": "Calculando los puntos…",
+    "judging": "Evaluando tu groove…",
+    "asking": "Preguntando al metrónomo…",
+    "polishing": "Puliendo el resultado…"
+  },
   "scale_dialog": {
     "title": "Elige la escala a practicar",
     "description": "Configura los parámetros de la práctica de escala. El sistema generará la tablatura automáticamente.",
