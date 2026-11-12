@@ -21,8 +21,43 @@ describe("tabPlayUntil", () => {
   it("stops at the last bar that ends a second before the time is up", () => {
     // 21 s → bars must end by 20 s → 5 bars (two and a half passes).
     expect(until(twoBars, 60, 21)).toEqual({ beat: 20, warped: 20 });
-    // 20.5 s → limit 19.5 s → the bar ending at 20 s no longer fits.
-    expect(until(twoBars, 60, 20.5)).toEqual({ beat: 16, warped: 16 });
+    // 18.5 s → limit 17.5 s → the bar ending at 20 s no longer fits; the one
+    // ending at 16 s leaves 2.5 s of silence, which is short enough.
+    expect(until(twoBars, 60, 18.5)).toEqual({ beat: 16, warped: 16 });
+  });
+
+  it("stops inside a bar when the last bar line leaves over three seconds of silence", () => {
+    // 20.5 s → the bar line at 16 s would leave 4.5 s → the beat ending at 19 s.
+    expect(until(twoBars, 60, 20.5)).toEqual({ beat: 19, warped: 19 });
+    // 40 BPM: a beat is 1.5 s, a bar 6 s. 11.5 s → bar line at 6 s leaves 5.5 s
+    // → the last beat ending by 10.5 s is the 7th (10.5 s).
+    expect(until(twoBars, 40, 11.5)).toEqual({ beat: 7, warped: 7 });
+  });
+
+  it("falls back to note ends when a whole beat is still too early", () => {
+    // 20 BPM: a beat is 3 s. Sixteenths: 0.75 s each, sixteen to the bar.
+    const sixteenths: TablatureMeasure[] = [{
+      timeSignature: [4, 4],
+      beats: Array.from({ length: 16 }, () => ({ duration: 0.25, notes: [] })),
+    }];
+    // 15.9 s → limit 14.9 s. Bar line 12 s (3.9 s left), beat line 12 s too
+    // → the last sixteenth ending by 14.9 s ends at 14.25 s = 4.75 beats.
+    expect(until(sixteenths, 20, 15.9)).toEqual({ beat: 4.75, warped: 4.75 });
+  });
+
+  it("never leaves more than three seconds while notes are shorter than two", () => {
+    const sixteenths: TablatureMeasure[] = [0, 1, 2].map(() => ({
+      timeSignature: [4, 4] as [number, number],
+      beats: Array.from({ length: 16 }, () => ({ duration: 0.25, notes: [] })),
+    }));
+    for (const bpm of [40, 60, 100]) {
+      for (let endSec = 5; endSec < 125; endSec += 0.37) {
+        const cut = until(sixteenths, bpm, endSec)!;
+        const silence = endSec - cut.warped / (bpm / 60);
+        expect(silence).toBeLessThanOrEqual(3 + 1e-6);
+        expect(silence).toBeGreaterThanOrEqual(0);
+      }
+    }
   });
 
   it("lets a whole pass that ends right on time through without the margin", () => {

@@ -61,6 +61,24 @@ describe("metronomeSound", () => {
   });
 });
 
+describe("pagedScroll", () => {
+  it("defaults to the standing (paged) board", () => {
+    expect(DEFAULT_SETTINGS.pagedScroll).toBe(true);
+  });
+
+  it("moves installs from before v6 onto the paged board", () => {
+    expect(
+      migrateTablatureSettings({ ...DEFAULT_SETTINGS, pagedScroll: false }, 5),
+    ).toMatchObject({ pagedScroll: true });
+  });
+
+  it("keeps a choice made on v6 or later", () => {
+    expect(
+      migrateTablatureSettings({ ...DEFAULT_SETTINGS, pagedScroll: false }, 6),
+    ).toMatchObject({ pagedScroll: false });
+  });
+});
+
 describe("noteStyle", () => {
   it("defaults to head + tail", () => {
     expect(DEFAULT_SETTINGS.noteStyle).toBe("headTail");

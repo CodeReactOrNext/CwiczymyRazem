@@ -44,6 +44,7 @@ import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
 import { SessionDialogs } from "./components/SessionDialogs";
 import { gpLoadingSteps, isStillLoading } from "./components/SessionLoadingSteps";
 import { SongSectionMapPanel } from "./components/SongSectionMapPanel";
+import { useTablatureSettings } from "./components/tablatureSettings";
 import { TimingCalibrationDialog } from "./components/TimingCalibrationDialog";
 import { TuningSettingsModal } from "./components/TuningSettingsModal";
 import { TurnedScreen } from "./components/TurnedScreen";
@@ -727,7 +728,9 @@ const PracticeSessionInner = ({
   // the board were ones nobody could finish. Each time playback starts, the
   // remaining time is laid over the tab: the last bar that ends a second before
   // the timer does is where the board stops drawing, the synth and the band
-  // stop playing, and the matcher stops expecting notes. Left out where the
+  // stop playing, and the matcher stops expecting notes. A slow bar would leave
+  // a long silence there, so the stop moves inside the next bar to keep it to
+  // three seconds at most (tabPlayUntil.ts). Left out where the
   // tab is not ours to cut — AlphaTab plays a GP file itself, an exam runs on
   // its backing, a riddle plays once.
   const setTabPlayUntil = useTabPlayUntilStore(s => s.setUntil);
@@ -861,7 +864,13 @@ const PracticeSessionInner = ({
   const handleToggleAlphaTabScore = useCallback(() => {
     if (learnWanted) setLearnWanted(false);
     toggleAlphaTabScore();
-  }, [learnWanted, toggleAlphaTabScore]);
+    // The view menu is the player's choice, so the next session opens on it
+    // too — otherwise a "Default view: Notation" picked
+    // once to try it keeps flipping every session back to sheet music.
+    useTablatureSettings
+      .getState()
+      .set("defaultViewMode", showAlphaTabScore ? "tab" : "notation");
+  }, [learnWanted, toggleAlphaTabScore, showAlphaTabScore]);
 
   const learn = useMemo<LearnModeState | null>(
     () => (learnAvailable

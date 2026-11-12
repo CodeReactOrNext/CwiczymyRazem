@@ -338,7 +338,7 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   stringSpacing: STRING_SPACING_DEFAULT,
   flipStrings: false,
   rightToLeft: false,
-  pagedScroll: false,
+  pagedScroll: true,
   palette: "rainbow",
   hitColor: "emerald",
   background: "midnight",
@@ -365,11 +365,16 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
  */
 export function migrateTablatureSettings(
   persisted: unknown,
+  version?: number,
 ): TablatureSettings {
   const s = {
     ...DEFAULT_SETTINGS,
     ...(persisted as Partial<TablatureSettings>),
   };
+  // v6 made the standing board the default. Every older install stored the
+  // whole settings object, so its `false` is the old default, not a choice —
+  // move it over too.
+  if (version !== undefined && version < 6) s.pagedScroll = true;
   s.defaultViewMode = normalizeDefaultViewMode(s.defaultViewMode);
   s.metronomeSound = normalizeMetronomeSound(s.metronomeSound);
   if (!(s.pillPreset in PILL_PRESETS))
@@ -412,7 +417,8 @@ export const useTablatureSettings = create<TablatureSettingsStore>()(
       // migrated back to the flat tab below. v4 added the flipped-string staff,
       // which the defaults spread in the migration fills in as "off". v5 added
       // the metronome sound picker, filled in as the classic beep the same way.
-      version: 5,
+      // v6 switched everyone onto the standing (paged) board.
+      version: 6,
       /**
        * Drops stored choices that no longer exist (an option removed between
        * builds) back to their default, so the pickers show a real selection
