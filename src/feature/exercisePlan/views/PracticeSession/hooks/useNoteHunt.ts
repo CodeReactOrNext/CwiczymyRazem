@@ -188,7 +188,11 @@ export function useNoteHunt(
    *  the new question opened with the old one's answer already revealed, already
    *  solved, and never counted as a round of its own. */
   roundKey?: string,
+  /** Identity of the run. A new value (restart, next exercise) starts the score
+   *  and rounds over from zero instead of banking onto the last run. */
+  runKey: string | number = 0,
 ): NoteHuntControls {
+  const runKeyRef = useRef(runKey);
   const shiftedTargetNote = shiftNote(targetNote, tuningShift);
   const [state, setState] = useState<NoteHuntState>(() =>
     buildState(
@@ -223,8 +227,15 @@ export function useNoteHunt(
   // Retarget in place when the goal note or region changes (no remount). Refs
   // only — the RAF loop pushes the cleared state on its next tick.
   useEffect(() => {
-    // Bank the finishing target's score before clearing (skip the initial mount).
-    if (!firstTargetRef.current) {
+    // Bank the finishing target's score before clearing (skip the initial mount)
+    // — unless a new run started, which starts the total over.
+    const isNewRun = runKeyRef.current !== runKey;
+    runKeyRef.current = runKey;
+    if (isNewRun) {
+      sessionScoreRef.current = 0;
+      roundsSolvedRef.current = 0;
+      roundsPresentedRef.current = 1;
+    } else if (!firstTargetRef.current) {
       sessionScoreRef.current += scoreForCount(prevFoundRef.current);
       if (prevFoundRef.current > 0) roundsSolvedRef.current += 1;
       roundsPresentedRef.current += 1;
@@ -244,7 +255,7 @@ export function useNoteHunt(
       roundGraded ? { solved: roundsSolvedRef.current, presented: roundsPresentedRef.current } : null,
     ));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetKey]);
+  }, [targetKey, runKey]);
 
   useEffect(() => {
     if (!active) return () => { /* nothing to clean up */ };

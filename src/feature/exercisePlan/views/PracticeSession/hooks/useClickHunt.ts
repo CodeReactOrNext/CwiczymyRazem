@@ -84,8 +84,12 @@ export function useClickHunt(
   startFret: number,
   endFret: number,
   strings: number[] | undefined,
+  /** Identity of the run. A new value (restart, next exercise) starts the score,
+   *  accuracy and mistakes over from zero instead of banking onto the last run. */
+  runKey: string | number = 0,
 ): ClickHuntControls {
   const targetKey = `${note}|${startFret}-${endFret}|${strings ? strings.join(",") : "all"}`;
+  const runKeyRef = useRef(runKey);
 
   const foundRef = useRef<Set<string>>(new Set());
   const hitIdRef = useRef(0);
@@ -114,7 +118,14 @@ export function useClickHunt(
   // Retarget in place when the note/window/strings change — bank the finishing
   // target's score first (skip the initial mount), same pattern as useNoteHunt.
   useEffect(() => {
-    if (!firstTargetRef.current) {
+    const isNewRun = runKeyRef.current !== runKey;
+    runKeyRef.current = runKey;
+    if (isNewRun) {
+      sessionScoreRef.current = 0;
+      bankedFoundRef.current = 0;
+      bankedTotalRef.current = 0;
+      mistakeCountRef.current = 0;
+    } else if (!firstTargetRef.current) {
       sessionScoreRef.current += scoreForCount(prevFoundCountRef.current);
       bankedFoundRef.current += prevFoundCountRef.current;
       bankedTotalRef.current += targetsRef.current.length;
@@ -130,7 +141,7 @@ export function useClickHunt(
       sessionScoreRef.current, bankedFoundRef.current, bankedTotalRef.current, mistakeCountRef.current,
     ));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetKey]);
+  }, [targetKey, runKey]);
 
   const registerClick = useCallback(
     (string: number, fret: number) => {

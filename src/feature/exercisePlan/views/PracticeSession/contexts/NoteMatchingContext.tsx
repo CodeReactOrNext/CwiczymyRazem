@@ -454,6 +454,10 @@ export function NoteMatchingProvider({
     () => (stringsKey ? stringsKey.split(",").map(Number) : undefined),
     [stringsKey],
   );
+  // Every hunt banks its score across rotations; a restart or the next exercise
+  // is a new run, so the hunts start their totals over when this key changes.
+  const [huntRestarts, setHuntRestarts] = useState(0);
+  const huntRunKey = `${currentExerciseIndex}:${huntRestarts}`;
   const { state: noteHunt, markOctave: markNoteHuntOctave } = useNoteHunt(
     customGoal ?? "",
     audioRefs.frequencyRef,
@@ -466,6 +470,7 @@ export function NoteMatchingProvider({
     // The question itself, so a fresh round that happens to land on the note
     // still up counts (and clears) as its own round rather than starting solved.
     customGoalPrompt ? `${customGoalPrompt.title}|${customGoalPrompt.subtitle ?? ""}` : undefined,
+    huntRunKey,
   );
 
   // Chord-mode: derive the chord's member pitch classes from its name.
@@ -477,6 +482,7 @@ export function NoteMatchingProvider({
     audioRefs.volumeRef,
     isMicEnabled && isChordHunt,
     huntTuningShift,
+    huntRunKey,
   );
 
   // Click-mode: no mic, no play/pause gating — clicks always register.
@@ -485,6 +491,7 @@ export function NoteMatchingProvider({
     regionStart ?? 0,
     regionEnd ?? 12,
     huntStrings,
+    huntRunKey,
   );
 
   // Interval-click mode: the prompt's root lives in customGoalPrompt.title and the
@@ -496,6 +503,7 @@ export function NoteMatchingProvider({
     regionStart ?? 0,
     regionEnd ?? 12,
     huntStrings,
+    huntRunKey,
   );
 
   // Exam mode, click-answered hunts only: too many wrong clicks fails the exam
@@ -627,6 +635,8 @@ export function NoteMatchingProvider({
   const resetGameAndProgress = useCallback(() => {
     resetGame();
     setAccumulatedNotes(new Set());
+    setHuntRestarts(n => n + 1);
+    examFailFiredRef.current = false;
     markRunStart();
   }, [resetGame, markRunStart]);
 

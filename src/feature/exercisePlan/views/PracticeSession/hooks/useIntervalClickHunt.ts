@@ -124,7 +124,11 @@ export function useIntervalClickHunt(
   startFret: number,
   endFret: number,
   strings: number[] | undefined,
+  /** Identity of the run. A new value (restart, next exercise) starts the score,
+   *  accuracy and mistakes over from zero instead of banking onto the last run. */
+  runKey: string | number = 0,
 ): IntervalClickControls {
+  const runKeyRef = useRef(runKey);
   const stringsKey = strings ? strings.join(",") : "all";
   const promptKey = `${rootNote}>${intervalNote}|${startFret}-${endFret}|${stringsKey}`;
 
@@ -169,7 +173,13 @@ export function useIntervalClickHunt(
   // Fresh prompt: bank the finishing round's asked-for clicks first (skipping the
   // initial mount), then start over on the new root/interval pair.
   useEffect(() => {
-    if (!firstPromptRef.current) {
+    const isNewRun = runKeyRef.current !== runKey;
+    runKeyRef.current = runKey;
+    if (isNewRun) {
+      correctClicksRef.current = 0;
+      bankedTotalRef.current = 0;
+      mistakeCountRef.current = 0;
+    } else if (!firstPromptRef.current) {
       bankedTotalRef.current += (rootsRef.current.length > 0 ? 1 : 0) + 1;
     }
     firstPromptRef.current = false;
@@ -193,7 +203,7 @@ export function useIntervalClickHunt(
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [promptKey]);
+  }, [promptKey, runKey]);
 
   const registerClick = useCallback((string: number, fret: number) => {
     // Round already solved — the panel is on its way to the next prompt, and

@@ -104,7 +104,11 @@ export function useChordHunt(
   /** Semitone shift applied to every tone before matching the mic's detected
    *  pitch class — see getUniformTuningShift. 0 (default) matches literal absolute pitch. */
   tuningShift = 0,
+  /** Identity of the run. A new value (restart, next exercise) starts the score
+   *  over from zero instead of banking onto the last run. */
+  runKey: string | number = 0,
 ): ChordHuntControls {
+  const runKeyRef = useRef(runKey);
   const shiftedTones = tuningShift === 0 ? tones : tones.map(pc => (pc + tuningShift + 12 * 10) % 12);
   const [state, setState] = useState<ChordHuntState>(() =>
     buildState(shiftedTones, labels, new Set(), null, null, 0, false, 0),
@@ -127,7 +131,10 @@ export function useChordHunt(
   const firstTargetRef  = useRef(true);
 
   useEffect(() => {
-    if (!firstTargetRef.current) sessionScoreRef.current += scoreForCount(prevFoundRef.current);
+    const isNewRun = runKeyRef.current !== runKey;
+    runKeyRef.current = runKey;
+    if (isNewRun) sessionScoreRef.current = 0;
+    else if (!firstTargetRef.current) sessionScoreRef.current += scoreForCount(prevFoundRef.current);
     firstTargetRef.current = false;
     tonesRef.current      = shiftedTones;
     labelsRef.current     = labels;
@@ -140,7 +147,7 @@ export function useChordHunt(
     // without this the previous chord's found tones would linger after a rotate.
     setState(buildState(tonesRef.current, labelsRef.current, foundRef.current, null, null, 0, false, 0, sessionScoreRef.current));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetKey]);
+  }, [targetKey, runKey]);
 
   useEffect(() => {
     if (!active) return () => { /* nothing to clean up */ };
