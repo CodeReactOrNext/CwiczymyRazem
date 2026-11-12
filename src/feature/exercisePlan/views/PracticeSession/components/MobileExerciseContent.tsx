@@ -166,7 +166,7 @@ export function MobileExerciseContent({
           difficulty={currentExercise.riddleConfig.difficulty}
           isRevealed={isRiddleRevealed || false}
           isGuessed={isRiddleGuessed || false}
-          isPlaying={isPlaying}
+          isPlaying={metronome.isPlaying}
           onPlayRiddle={onPlayRiddle}
           onReveal={handleRevealRiddle || (() => {})}
           onNextRiddle={handleNextRiddle || (() => {})}

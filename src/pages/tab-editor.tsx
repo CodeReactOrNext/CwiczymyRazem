@@ -74,6 +74,7 @@ import { ImportTablature } from "feature/songs/components/ImportTablature/Import
 import { InstrumentPicker } from "feature/tuner/components/InstrumentPicker";
 import { useInstrumentPreferenceStore } from "feature/tuner/store/instrumentPreferenceStore";
 import { AnimatePresence, motion } from "framer-motion";
+import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { useTranslation } from "hooks/useTranslation";
 import type { Translate } from "lib/i18n/translate";
 import {
@@ -559,6 +560,7 @@ const EMPTY_HISTORY: HistoryState = {
 export default function TabEditor() {
   const router = useRouter();
   const { t } = useTranslation("library");
+  const { isElectron } = useElectronWindowControls();
   const [measures, setMeasures] = useState<TablatureMeasure[]>([
     createMeasure(),
   ]);
@@ -2096,7 +2098,9 @@ export default function TabEditor() {
         </Head>
 
         {/* Fixed Header/Toolbar */}
-        <div className='fixed left-0 right-0 top-0 z-[60] border-b border-zinc-800 bg-zinc-950/85 p-4 backdrop-blur-2xl md:px-8'>
+        {/* Under the desktop shell's own titlebar (h-10, see ElectronTitleBar),
+            which is drawn over everything at the top of the window. */}
+        <div className={cn("fixed left-0 right-0 z-[60] border-b border-zinc-800 bg-zinc-950/85 p-4 backdrop-blur-2xl md:px-8", isElectron ? "top-10" : "top-0")}>
           <div className='mx-auto flex max-w-[1700px] flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
             <div className='flex items-center gap-4'>
               <BackLink label={t("tab_editor.back")} onClick={() => router.back()} />

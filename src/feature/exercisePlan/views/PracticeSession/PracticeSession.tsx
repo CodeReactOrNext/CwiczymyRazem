@@ -1273,12 +1273,14 @@ const PracticeSessionInner = ({
   // resumes the metronome at the offset the last stop left behind: a player who
   // stopped the moment they had heard enough would get the tail of the phrase back,
   // not the phrase. Here Play always means "play it again from the first note".
+  // Stop silences the phrase only — the session clock keeps counting while the
+  // player works the answer out (the session's own pause still stops it).
   const handlePlayRiddle = useCallback(() => {
     cancelRiddleAutoAdvance();
-    if (isPlaying || metronome.isPlaying) { stopTimer(); metronome.stopMetronome(); return; }
-    startTimer();
+    if (metronome.isPlaying) { metronome.stopMetronome(); return; }
+    if (!isPlaying) startTimer();
     handleReplayRiddle();
-  }, [cancelRiddleAutoAdvance, isPlaying, metronome, stopTimer, startTimer, handleReplayRiddle]);
+  }, [cancelRiddleAutoAdvance, isPlaying, metronome, startTimer, handleReplayRiddle]);
 
   // The mic heard the whole answer, so nothing is left for the player to click:
   // bank the point, hold the green state long enough to read, then deal and play
@@ -1293,11 +1295,12 @@ const PracticeSessionInner = ({
     }, RIDDLE_AUTO_ADVANCE_MS);
   }, [handleEarTrainingGuessed, cancelRiddleAutoAdvance, handleNextRiddleClick]);
 
-  // Armed only while playback is fully stopped — otherwise the mic would hear
-  // the riddle itself coming from the speakers and solve it on its own.
+  // Armed only while the phrase is silent — otherwise the mic would hear the
+  // riddle itself coming from the speakers and solve it on its own. The session
+  // clock may keep running meanwhile: answering is practice time too.
   const riddleProgress = useRiddleSequenceMatcher({
     measures: riddleMeasures,
-    active: isMicEnabled && isListening && hasPlayedRiddleOnce && !isRiddleRevealed && !isPlaying && !metronome.isPlaying,
+    active: isMicEnabled && isListening && hasPlayedRiddleOnce && !isRiddleRevealed && !metronome.isPlaying,
     frequencyRef: audioRefs.frequencyRef,
     volumeRef: audioRefs.volumeRef,
     tuningOffsets: guitarTuning.tuning.offsets,

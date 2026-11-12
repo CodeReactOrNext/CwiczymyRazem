@@ -208,10 +208,10 @@ export function useSessionAudio({
       // then goes quiet. Looping forever meant the player had to stop playback by
       // hand before the mic would judge their answer at all (the matcher only
       // arms in silence — see useRiddleSequenceMatcher), which is the click-heavy
-      // flow the exercise was reported for.
+      // flow the exercise was reported for. Only the sound stops: the player is
+      // still practising while working the answer out, so the clock keeps going.
       if (autoStopAfterFirstLoop) {
         stopMetronome();
-        stopTimer();
         return;
       }
       if (tabRepeatCount > 0) {
