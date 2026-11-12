@@ -107,7 +107,6 @@ const FirstRiffPage: NextPage = () => {
           <FirstRiffIntro
             level={level}
             bpm={plan.exercises[0].metronomeSpeed?.recommended ?? 60}
-            tablature={plan.exercises[0].tablature ?? []}
             isMobile={isMobile}
             source={source}
             onStart={setWithMic}

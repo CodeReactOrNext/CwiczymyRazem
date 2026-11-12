@@ -1,9 +1,12 @@
 // @vitest-environment jsdom
 
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getIntroSlides } from "../data/firstRiffIntro";
+import { getIntroScreen, getIntroSlides } from "../data/firstRiffIntro";
 import { FirstRiffIntro } from "./FirstRiffIntro";
 
 vi.mock("hooks/useTranslation", () => ({
@@ -11,6 +14,9 @@ vi.mock("hooks/useTranslation", () => ({
 }));
 
 vi.mock("posthog-js", () => ({ default: { capture: vi.fn() } }));
+
+// jsdom has no viewport: the phone reads as held sideways.
+vi.mock("hooks/useMediaQuery", () => ({ useMediaQuery: () => false }));
 
 const renderIntro = (
   props: Partial<Parameters<typeof FirstRiffIntro>[0]> = {},
@@ -20,7 +26,6 @@ const renderIntro = (
     <FirstRiffIntro
       level='new'
       bpm={60}
-      tablature={[]}
       isMobile={false}
       source='signup'
       onStart={onStart}
@@ -76,6 +81,31 @@ describe("FirstRiffIntro", () => {
 
     fireEvent.click(screen.getByText("first_riff_intro.mic_question.yes"));
     expect(screen.getByText("first_riff_intro.phone_panel")).toBeTruthy();
+  });
+});
+
+describe("getIntroScreen", () => {
+  it("has a screenshot for every level, device and slide", () => {
+    const levels = ["new", "some", "experienced"] as const;
+    const devices = ["desktop", "landscape", "portrait"] as const;
+    const slides = ["question", "tempo", "mic", "no_mic", "tab"] as const;
+    for (const level of levels) {
+      for (const device of devices) {
+        for (const slide of slides) {
+          const { src } = getIntroScreen(level, device, slide);
+          expect(existsSync(join(process.cwd(), "public", src)), src).toBe(
+            true,
+          );
+        }
+      }
+    }
+  });
+
+  it("shows each device its own screenshot", () => {
+    const sources = (["desktop", "landscape", "portrait"] as const).map(
+      (device) => getIntroScreen("new", device, "tempo").src,
+    );
+    expect(new Set(sources).size).toBe(3);
   });
 });
 

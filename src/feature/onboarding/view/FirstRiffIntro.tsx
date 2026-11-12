@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { useMediaQuery } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Image from "next/image";
@@ -11,45 +11,43 @@ import {
   trackOnboardingFirstRiffIntroDone,
   trackOnboardingFirstRiffMicChosen,
 } from "../analytics/onboardingAnalytics";
-import type { IntroSlideId } from "../data/firstRiffIntro";
-import { getIntroSlides, getIntroVoice } from "../data/firstRiffIntro";
+import type { IntroDevice } from "../data/firstRiffIntro";
+import {
+  getIntroScreen,
+  getIntroSlides,
+  getIntroVoice,
+} from "../data/firstRiffIntro";
 import type { OnboardingLevel } from "../types";
-import type { PreviewFocus } from "./SessionPreview";
-import { SessionPreview } from "./SessionPreview";
 
 const FOCUS_RING =
   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60";
 
-const FOCUS_BY_SLIDE: Record<IntroSlideId, PreviewFocus> = {
-  tempo: "tempo",
-  mic: "mic",
-  // The mic key shown off: this is the button they skipped.
-  no_mic: "mic",
-  tab: "tab",
-};
-
 /**
  * Before the first riff: can the player use a mic, then three short slides on
  * where the tempo is, what the mic does (or that without it they just play
- * along) and that the tab can be set up — each beside a still of the session
- * with that control lit. Ends by handing the mic answer to the session, which
- * then skips its own "use the mic?" prompt.
+ * along) and that the tab can be set up — each beside a screenshot of the
+ * session, enlarged around that control and with it ringed. Ends by handing
+ * the mic answer to the session, which then skips its own "use the mic?"
+ * prompt.
  *
- * Desktop: copy on the left, the session still on the right. Phone: a full
- * screen like a native app — the still fills the top, the copy and buttons sit
- * in a sheet at the bottom, within thumb reach.
+ * The screenshots are of the session as this reader will get it: the desktop
+ * one, the phone held sideways, or the phone held upright (where the session
+ * lies on its side — that screenshot is turned back to read the right way up).
+ *
+ * Desktop: copy on the left, the screenshot on the right. Phone upright: the
+ * screenshot fills the top, the copy and buttons sit in a sheet at the bottom,
+ * within thumb reach. Phone sideways: the screenshot on the left, the sheet
+ * down the right edge.
  */
 export const FirstRiffIntro = ({
   level,
   bpm,
-  tablature,
   isMobile,
   source,
   onStart,
 }: {
   level: OnboardingLevel;
   bpm: number;
-  tablature: TablatureMeasure[];
   isMobile: boolean;
   source: OnboardingSource;
   onStart: (withMic: boolean) => void;
@@ -57,6 +55,13 @@ export const FirstRiffIntro = ({
   const { t } = useTranslation("onboarding");
   const [withMic, setWithMic] = useState<boolean | null>(null);
   const [index, setIndex] = useState(0);
+  const isUpright = useMediaQuery("(orientation: portrait)");
+  const device: IntroDevice = !isMobile
+    ? "desktop"
+    : isUpright
+      ? "portrait"
+      : "landscape";
+  const isSideways = device === "landscape";
 
   const voice = getIntroVoice(level);
   const slides = getIntroSlides(withMic ?? true);
@@ -89,6 +94,11 @@ export const FirstRiffIntro = ({
   const body = onQuestion
     ? t("first_riff_intro.mic_question.description")
     : t(`first_riff_intro.slides.${slide.id}.${voice}.body`);
+  const screen = getIntroScreen(
+    level,
+    device,
+    onQuestion ? "question" : slide.id,
+  );
   const phoneNote =
     !onQuestion && isMobile && slide.inPhonePanel
       ? t("first_riff_intro.phone_panel")
@@ -147,7 +157,11 @@ export const FirstRiffIntro = ({
 
   return (
     <div className='flex h-[100dvh] flex-col overflow-hidden bg-zinc-950 text-zinc-100 lg:h-auto lg:min-h-[100dvh] lg:overflow-visible'>
-      <header className='mx-auto flex w-full max-w-7xl shrink-0 items-center justify-between gap-4 px-4 pb-3 pt-4 sm:px-6 lg:px-10 lg:py-6'>
+      <header
+        className={cn(
+          "mx-auto flex w-full max-w-7xl shrink-0 items-center justify-between gap-4 px-4 sm:px-6 lg:px-10 lg:py-6",
+          isSideways ? "pb-2 pt-2" : "pb-3 pt-4",
+        )}>
         <Image
           src='/images/longlightlogo.svg'
           alt='Riff Quest'
@@ -183,30 +197,44 @@ export const FirstRiffIntro = ({
         ))}
       </div>
 
-      <main className='mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-16 lg:px-10 lg:py-16'>
-        {/* The still: fills the screen above the sheet on a phone, the right column on desktop. */}
+      <main
+        className={cn(
+          "mx-auto flex min-h-0 w-full max-w-7xl flex-1 lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-16 lg:px-10 lg:py-16",
+          isSideways ? "flex-row" : "flex-col",
+        )}>
+        {/* The screenshot: above the sheet on an upright phone, beside it on a sideways one, the right column on desktop. */}
         <div
           className={cn(
-            "min-h-0 flex-1 lg:order-2 lg:flex-none",
-            isMobile ? "" : "flex items-center px-4 py-6 sm:px-6 lg:p-0",
+            "flex min-h-0 min-w-0 flex-1 items-center justify-center lg:order-2 lg:flex-none",
+            isMobile ? "p-3" : "px-4 py-6 sm:px-6 lg:p-0",
           )}>
-          <div className={cn(isMobile ? "h-full" : "w-full")}>
-            <SessionPreview
-              device={isMobile ? "phone" : "desktop"}
-              focus={onQuestion ? "mic" : FOCUS_BY_SLIDE[slide.id]}
-              micOn={!onQuestion && withMic === true}
-              bpm={bpm}
-              tablature={tablature}
-            />
-          </div>
+          {/* Shown whole and never upscaled past its pixels: the file is cut
+              at the capture's device pixels, so it stays sharp enlarged. */}
+          <Image
+            key={screen.src}
+            src={screen.src}
+            alt=''
+            aria-hidden
+            width={screen.width}
+            height={screen.height}
+            priority
+            className={cn(
+              "rounded-xl object-contain duration-base animate-in fade-in",
+              isMobile ? "max-h-full w-auto max-w-full" : "h-auto w-full",
+            )}
+          />
         </div>
 
         <div
           key={onQuestion ? "question" : slide.id}
           className={cn(
             "shrink-0 duration-base animate-in fade-in lg:order-1",
-            // Phone: a bottom sheet, buttons within thumb reach.
-            "rounded-t-2xl bg-zinc-900 px-5 pb-[max(env(safe-area-inset-bottom),1.25rem)] pt-6",
+            // Phone: a sheet with the buttons within thumb reach — at the
+            // bottom upright, down the right edge sideways.
+            "bg-zinc-900 px-5 pb-[max(env(safe-area-inset-bottom),1.25rem)] pt-6",
+            isSideways
+              ? "flex w-[44%] flex-col justify-center overflow-y-auto rounded-l-2xl"
+              : "rounded-t-2xl",
             "lg:rounded-none lg:bg-transparent lg:p-0",
           )}>
           <h1 className='text-2xl font-semibold tracking-tight text-zinc-100 lg:text-4xl'>
