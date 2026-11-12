@@ -55,3 +55,9 @@ export const SONG_PRACTICE_MODE_LABELS: Record<SongPracticeMode, string> = {
   gp: "Tab",
   sections: "Sections",
 };
+
+/**
+ * Tempo range of a song played over its attached tab — the one the song's own
+ * practice page uses. A song item has no tempo until the session finds a tab.
+ */
+export const SONG_TAB_METRONOME_SPEED = { min: 40, max: 240, recommended: 120 };

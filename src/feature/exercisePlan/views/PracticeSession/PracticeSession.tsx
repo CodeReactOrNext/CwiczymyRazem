@@ -35,6 +35,7 @@ import { deriveMetronomeGrid } from "../../components/Metronome/utils/meterGrid"
 import type { ExercisePlan } from "../../types/exercise.types";
 import { hasLeaderboard } from "../../utils/hasLeaderboard";
 import { isClickAnsweredMode } from "../../utils/huntModes";
+import { SONG_TAB_METRONOME_SPEED } from "../../utils/songToExercise";
 import { DesktopSessionView } from "./components/DesktopSessionView";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
 import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
@@ -233,7 +234,7 @@ const PracticeSessionInner = ({
 
   const {
     currentExerciseIndex, exerciseKey, showCompleteDialog, isMobileView,
-    isFullSessionModalOpen, isMounted, currentExercise,
+    isFullSessionModalOpen, isMounted, currentExercise: planExercise,
     isLastExercise, setShowCompleteDialog, handleNextExercise,
     startTimer, stopTimer, resetTimer, showSuccessView, resetSuccessView,
     videoDuration, setVideoDuration, setTabDuration, setTimerTime, autoSubmitReport,
@@ -261,7 +262,7 @@ const PracticeSessionInner = ({
   const lockedExamBpm = examModeObject ? examModeObject.requiredBpm : (isExamMode ? examBpm : undefined);
   // Scale (theory) exams keep the metronome and backing-track controls visible —
   // unlike regular exercise exams, the metronome is the audible guide here.
-  const isScaleExam = isExamMode && currentExercise.category === "theory";
+  const isScaleExam = isExamMode && planExercise.category === "theory";
 
   const userInfo   = useAppSelector(selectUserInfo);
   const userId     = useAppSelector(selectUserAuth);
@@ -316,15 +317,28 @@ const PracticeSessionInner = ({
   // the player attached to it — the same tab its own practice page would open,
   // backing track included — or over its section map (video + sections), which
   // wants neither the tab nor the backing recording behind it.
-  const songItem = currentExercise.songData;
+  const songItem = planExercise.songData;
   const songItemOverSections = songItem?.mode === "sections";
   const songItemTabId = songItem && !songItemOverSections ? songItem.songId : undefined;
   const songGpFile = useSongExerciseGpFile(songItemTabId, userId ?? null);
-  const gpFileUrl = currentExercise.gpFileUrl ?? songGpFile.gpFileUrl;
+  const gpFileUrl = planExercise.gpFileUrl ?? songGpFile.gpFileUrl;
 
   const { effectiveRawGpFile, isFetchingGpFile, isParsingGpFile, parsedGpTracks, gpTempo } = useGpFileLoader({
-    rawGpFile, gpFileUrl, exerciseTitle: currentExercise.title,
+    rawGpFile, gpFileUrl, exerciseTitle: planExercise.title,
   });
+
+  // A song item carries no tempo of its own (see songToExercise), and Play only
+  // runs the transport for exercises that have one — so with a tab attached the
+  // clock ran while the tab stood still. The tab brings the tempo range the
+  // song's own practice page gives it. Held from the lookup on, so the tempo
+  // saved for the song is not reset when the file arrives.
+  const songItemHasTab = !!songItemTabId && (songGpFile.isResolving || !!songGpFile.gpFileUrl);
+  const currentExercise = useMemo(
+    () => (songItemHasTab && !planExercise.metronomeSpeed
+      ? { ...planExercise, metronomeSpeed: SONG_TAB_METRONOME_SPEED }
+      : planExercise),
+    [planExercise, songItemHasTab],
+  );
 
   useEffect(() => {
     posthog.capture("practice_session_started", { plan_title: plan.title, exercise_count: plan.exercises.length });
