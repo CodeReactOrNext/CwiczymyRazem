@@ -22,8 +22,13 @@ const PAGE_MIN_STEP = 40;
  * @param measureEndPx where each bar ends, ascending
  * @param totalW       length of one pass
  * @param visibleW     width of the board the music can use
+ * @param readAhead    turn a bar early: the page moves on as the cursor enters
+ *                     its last bar, and that bar opens the next page. On a
+ *                     narrow board (a phone) the sliver PAGE_FILL leaves is too
+ *                     little to read ahead by — the turn came when the notes
+ *                     after it were already due.
  */
-export function pageStarts(measureEndPx: readonly number[], totalW: number, visibleW: number): number[] {
+export function pageStarts(measureEndPx: readonly number[], totalW: number, visibleW: number, readAhead = false): number[] {
   const starts = [0];
   if (!(totalW > 0) || !(visibleW > 0)) return starts;
   const reach = Math.max(PAGE_MIN_STEP, visibleW * PAGE_FILL - PAGE_LEAD);
@@ -34,7 +39,15 @@ export function pageStarts(measureEndPx: readonly number[], totalW: number, visi
     while (bar < measureEndPx.length && measureEndPx[bar] <= start) bar++;
     // The last barline that still leaves the next page showing…
     let next = -1;
-    for (let i = bar; i < measureEndPx.length && measureEndPx[i] <= start + reach; i++) next = measureEndPx[i];
+    let before = -1;
+    for (let i = bar; i < measureEndPx.length && measureEndPx[i] <= start + reach; i++) {
+      before = next;
+      next = measureEndPx[i];
+    }
+    // …and with read-ahead the barline before it, so the page's last bar is
+    // played as the first bar of the next one. A page of a single bar has no
+    // bar to spare and turns where it ends.
+    if (readAhead && before > start) next = before;
     // …or the one bar there is, if it fits the board at all; a bar wider than
     // the board is cut where the page runs out.
     if (next < 0) next = bar < measureEndPx.length && measureEndPx[bar] <= start + whole ? measureEndPx[bar] : start + reach;

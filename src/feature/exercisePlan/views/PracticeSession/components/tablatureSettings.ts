@@ -256,8 +256,10 @@ export const TAB_PERFORMANCE_MODES: readonly TabPerformanceMode[] = [
  *  pixel: at a phone's pixel density a 3× board costs over twice a 2× one and
  *  can't be told from it. */
 export const PHONE_MAX_DPR = 2;
-/** The lite board's resolution: a little soft, at a quarter of a 3× board's pixels. */
-export const LITE_MAX_DPR = 1.5;
+/** The lite board's resolution. A whole number on purpose: at 1.5× every
+ *  one-pixel line and pill edge landed on half pixels and came out uneven and
+ *  soft — it read as a broken tab, not a lighter one. */
+export const LITE_MAX_DPR = 2;
 
 export const FRET_FONT_MIN = 0.8;
 export const FRET_FONT_MAX = 1.4;
@@ -341,7 +343,7 @@ export interface TablatureSettings {
   performanceMode: TabPerformanceMode;
   /** Set by the board itself the first time a phone can't hold the frame rate
    *  (framePace.ts) — `auto` then runs lite from there on. */
-  liteDetected: boolean;
+  slowBoardSeen: boolean;
   // ── Notation ──
   /** Renders the standard-notation (sheet music) viewer on a black board instead of white paper. */
   notationDarkMode: boolean;
@@ -377,7 +379,7 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   ambientGlow: true,
   ambientGlowPhone: false,
   performanceMode: "auto",
-  liteDetected: false,
+  slowBoardSeen: false,
   notationDarkMode: false,
   notationZoom: 1,
   notationSpacing: 1,
@@ -416,7 +418,7 @@ export function migrateTablatureSettings(
   if (!TAB_PERFORMANCE_MODES.includes(s.performanceMode)) {
     s.performanceMode = DEFAULT_SETTINGS.performanceMode;
   }
-  s.liteDetected = s.liteDetected === true;
+  s.slowBoardSeen = s.slowBoardSeen === true;
   return s;
 }
 
@@ -528,36 +530,28 @@ export function tablatureStylePatch(
 interface DeviceHints {
   /** Chrome's rounded-down RAM in GB (0.25–8); absent in Safari and Firefox. */
   deviceMemory?: number;
-  hardwareConcurrency?: number;
 }
 
 /**
- * A device that is weak on paper: 2–3 GB of RAM or a four-core CPU. Deliberately
- * narrow — most phones that struggle report neither, and are caught by how their
- * frames actually run instead (framePace.ts).
+ * A device that is weak on paper: 2–3 GB of RAM. Deliberately narrow — most
+ * phones that struggle don't say so, and are caught by how their frames
+ * actually run instead (framePace.ts). The core count is no help: Safari
+ * reports a handful of cores for every iPhone, the fastest included.
  */
 export function isWeakDevice(hints: DeviceHints | undefined): boolean {
-  if (!hints) return false;
-  if (typeof hints.deviceMemory === "number" && hints.deviceMemory <= 2) {
-    return true;
-  }
-  return (
-    typeof hints.hardwareConcurrency === "number" &&
-    hints.hardwareConcurrency > 0 &&
-    hints.hardwareConcurrency <= 4
-  );
+  return typeof hints?.deviceMemory === "number" && hints.deviceMemory <= 2;
 }
 
 /** Whether the board runs lite: the player's choice, or `auto` deciding for a phone. */
 export function resolveTabLite(
   mode: TabPerformanceMode,
   isPhone: boolean,
-  liteDetected: boolean,
+  slowBoardSeen: boolean,
   weakDevice: boolean,
 ): boolean {
   if (mode === "lite") return true;
   if (mode === "full") return false;
-  return isPhone && (liteDetected || weakDevice);
+  return isPhone && (slowBoardSeen || weakDevice);
 }
 
 /**

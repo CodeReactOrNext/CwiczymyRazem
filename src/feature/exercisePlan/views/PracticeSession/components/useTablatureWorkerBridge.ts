@@ -171,6 +171,8 @@ export interface TablatureStylePatch {
   rightToLeft?: boolean;
   /** Hold the board still a page at a time while the cursor crosses it. */
   pagedScroll?: boolean;
+  /** Turn the standing board a bar early — see `readAhead` in tabPaging.ts. */
+  pageReadAhead?: boolean;
   /** Fret-number colour, or "auto" to pick per pill from its brightness. */
   fretText?: string;
   showRhythmLane?: boolean;
@@ -618,7 +620,7 @@ export function useTablatureWorkerBridge({
       shift = pass * xMap.totalX - (beat.offsetX > wrapped ? xMap.totalX : 0);
       scrollX = style?.pagedScroll
         ? pagedScrollX(
-            pageStarts(renderData.measureEndXs.map((end) => beatToX(xMap, end)), xMap.totalX, viewW - gutterW),
+            pageStarts(renderData.measureEndXs.map((end) => beatToX(xMap, end)), xMap.totalX, viewW - gutterW, !!style?.pageReadAhead),
             pass * xMap.totalX,
             cursor - pass * xMap.totalX,
           )

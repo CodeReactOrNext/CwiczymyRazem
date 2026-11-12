@@ -105,7 +105,7 @@ describe("noteStyle", () => {
 describe("lite board", () => {
   it("defaults to auto, with nothing detected yet", () => {
     expect(DEFAULT_SETTINGS.performanceMode).toBe("auto");
-    expect(DEFAULT_SETTINGS.liteDetected).toBe(false);
+    expect(DEFAULT_SETTINGS.slowBoardSeen).toBe(false);
   });
 
   it("heals an unknown stored mode and keeps a valid one", () => {
@@ -113,11 +113,11 @@ describe("lite board", () => {
       migrateTablatureSettings({ ...DEFAULT_SETTINGS, performanceMode: "turbo" }),
     ).toMatchObject({ performanceMode: "auto" });
     expect(
-      migrateTablatureSettings({ ...DEFAULT_SETTINGS, performanceMode: "lite", liteDetected: true }),
-    ).toMatchObject({ performanceMode: "lite", liteDetected: true });
+      migrateTablatureSettings({ ...DEFAULT_SETTINGS, performanceMode: "lite", slowBoardSeen: true }),
+    ).toMatchObject({ performanceMode: "lite", slowBoardSeen: true });
     expect(
-      migrateTablatureSettings({ ...DEFAULT_SETTINGS, liteDetected: "yes" }),
-    ).toMatchObject({ liteDetected: false });
+      migrateTablatureSettings({ ...DEFAULT_SETTINGS, slowBoardSeen: "yes" }),
+    ).toMatchObject({ slowBoardSeen: false });
   });
 
   it("follows the player's own choice on any device", () => {
@@ -133,14 +133,13 @@ describe("lite board", () => {
     expect(resolveTabLite("auto", false, true, true)).toBe(false);
   });
 
-  it("calls a device weak only on little memory or four cores", () => {
+  it("calls a device weak only on little memory", () => {
     expect(isWeakDevice(undefined)).toBe(false);
+    expect(isWeakDevice({ deviceMemory: 2 })).toBe(true);
+    expect(isWeakDevice({ deviceMemory: 4 })).toBe(false);
+    // An iPhone reports no memory at all — and few cores, whatever it has.
     expect(isWeakDevice({})).toBe(false);
-    expect(isWeakDevice({ deviceMemory: 2, hardwareConcurrency: 8 })).toBe(true);
-    expect(isWeakDevice({ deviceMemory: 4, hardwareConcurrency: 8 })).toBe(false);
-    expect(isWeakDevice({ hardwareConcurrency: 4 })).toBe(true);
-    // An iPhone reports no memory at all.
-    expect(isWeakDevice({ hardwareConcurrency: 6 })).toBe(false);
+    expect(isWeakDevice({ hardwareConcurrency: 2 } as Parameters<typeof isWeakDevice>[0])).toBe(false);
   });
 
   it("stands the board still and drops the hit animations", () => {

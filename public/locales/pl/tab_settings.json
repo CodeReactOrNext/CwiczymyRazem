@@ -37,7 +37,7 @@
   "ambient_glow": "Poświata mikrofonu",
   "ambient_glow_desc": "Poświata pod tabulaturą reagująca na głośność gry",
   "performance": "Wydajność",
-  "performance_hint": "Gdy tabulatura się zacina. Lekka tabulatura rysuje się w niższej rozdzielczości i z połową klatek, stoi w miejscu strona po stronie i nie ma efektów. Nuty, wypełnienia i punktacja zostają bez zmian.",
+  "performance_hint": "Gdy tabulatura się zacina. Lekka tabulatura rysuje się z połową klatek, stoi w miejscu strona po stronie i nie ma efektów. Nuty, wypełnienia i punktacja zostają bez zmian.",
   "performance_modes": {
     "auto": { "label": "Automatycznie", "desc": "Lekka na telefonach, które nie nadążają" },
     "lite": { "label": "Lekka", "desc": "Zawsze prostsza tabulatura" },

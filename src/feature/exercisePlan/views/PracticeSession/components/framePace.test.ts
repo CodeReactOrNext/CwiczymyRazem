@@ -18,11 +18,16 @@ describe("framePace", () => {
     expect(run(pace, 0, 30, 1000 / 60)[0]).toBe(false);
   });
 
-  it("reports a board stuck around 25 fps, once", () => {
+  it("reports a board stuck around 16 fps, once", () => {
     const pace = createFramePace();
-    const [reported, end] = run(pace, 0, 10, 40);
+    const [reported, end] = run(pace, 0, 10, 60);
     expect(reported).toBe(true);
-    expect(run(pace, end, 10, 40)[0]).toBe(false);
+    expect(run(pace, end, 10, 60)[0]).toBe(false);
+  });
+
+  it("leaves a steady 30 fps alone — a phone in low power mode", () => {
+    const pace = createFramePace();
+    expect(run(pace, 0, 30, 1000 / 30)[0]).toBe(false);
   });
 
   it("reports a board that averages fine but keeps missing frames", () => {
@@ -48,7 +53,7 @@ describe("framePace", () => {
     const pace = createFramePace();
     let [, t] = run(pace, 0, 6, 1000 / 60);
     let reported: boolean;
-    [reported, t] = run(pace, t, 2.2, 45);
+    [reported, t] = run(pace, t, 2.2, 60);
     expect(reported).toBe(false);
     expect(run(pace, t, 10, 1000 / 60)[0]).toBe(false);
   });
@@ -68,10 +73,10 @@ describe("framePace", () => {
 
   it("starts counting again after a reset", () => {
     const pace = createFramePace();
-    const [first, end] = run(pace, 0, 5, 40);
+    const [first, end] = run(pace, 0, 5, 60);
     expect(first).toBe(false);
     resetFramePace(pace);
     // Warm-up and both slow windows are needed again.
-    expect(run(pace, end, 5, 40)[0]).toBe(false);
+    expect(run(pace, end, 5, 60)[0]).toBe(false);
   });
 });

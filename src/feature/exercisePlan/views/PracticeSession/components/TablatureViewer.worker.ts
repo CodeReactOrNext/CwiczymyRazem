@@ -38,6 +38,8 @@ let rightToLeft = false;
 // The standing board: the tab holds still a page at a time and the cursor
 // crosses it (see tabPaging.ts), instead of sliding under a fixed cursor.
 let pagedScroll = false;
+// The standing board turns a bar early (STYLE.pageReadAhead — see pageStarts).
+let pageReadAhead = false;
 // Width (world px) of the pinned left "tuning gutter" that shows each string's
 // tuned note. Content is inset by this much when tuning data is present so the
 // first notes don't hide behind the labels. Keep in sync with TAB_GUTTER_W in
@@ -149,7 +151,7 @@ let noteTails = true;
  * The lite board (STYLE.lite), for devices that can't keep up with the full
  * one: half the frames, and none of the drawing that is only there to look
  * good — tail gradients, string winding, the beat's ripple, the spark and beam
- * on a held note, the page turn's slide. The notes, the fills and every mark a
+ * on a held note. The notes, the fills and every mark a
  * hit leaves stay exactly where they are. The caller also sends the canvas at
  * a lower resolution and switches hit animations off (see liteTablatureStyle).
  */
@@ -551,12 +553,12 @@ const PAGE_PLAYED_DIM = 0.5;
 let pageTarget: number | null = null;
 let pageTurn: { from: number; start: number; ms: number } | null = null;
 let pageShown = 0;
-let pageCache: { ends: number[]; totalW: number; visibleW: number; starts: number[] } | null = null;
+let pageCache: { ends: number[]; totalW: number; visibleW: number; readAhead: boolean; starts: number[] } | null = null;
 
 /** Where the pages of the current layout start, worked out once per layout. */
 function currentPageStarts(totalW: number, visibleW: number): number[] {
-  if (!pageCache || pageCache.ends !== measureEndPx || pageCache.totalW !== totalW || pageCache.visibleW !== visibleW) {
-    pageCache = { ends: measureEndPx, totalW, visibleW, starts: pageStarts(measureEndPx, totalW, visibleW) };
+  if (!pageCache || pageCache.ends !== measureEndPx || pageCache.totalW !== totalW || pageCache.visibleW !== visibleW || pageCache.readAhead !== pageReadAhead) {
+    pageCache = { ends: measureEndPx, totalW, visibleW, readAhead: pageReadAhead, starts: pageStarts(measureEndPx, totalW, visibleW, pageReadAhead) };
   }
   return pageCache.starts;
 }
@@ -564,8 +566,7 @@ function currentPageStarts(totalW: number, visibleW: number): number[] {
 /** The standing board's scroll this frame: the cursor's page, or part-way
  *  through the turn to it. */
 function standingScroll(target: number, clockMs: number, beat: number): number {
-  // The lite board turns its page in one frame: a slide redraws the whole board all the way.
-  if (pageTarget === null || reducedMotion || lite) {
+  if (pageTarget === null || reducedMotion) {
     pageTurn = null;
   } else if (target !== pageTarget) {
     pageTurn = { from: pageShown, start: clockMs, ms: pageTurnMs(beat) };
@@ -3665,6 +3666,7 @@ self.onmessage = (e: MessageEvent) => {
       }
       if (msg.rightToLeft !== undefined) rightToLeft = msg.rightToLeft;
       if (msg.pagedScroll !== undefined) pagedScroll = msg.pagedScroll;
+      if (msg.pageReadAhead !== undefined) pageReadAhead = msg.pageReadAhead;
       if (msg.fretText !== undefined) fretTextColor = msg.fretText;
       if (msg.ink !== undefined) {
         inkColor = msg.ink;

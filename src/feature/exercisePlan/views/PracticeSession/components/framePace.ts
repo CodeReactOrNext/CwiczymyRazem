@@ -5,10 +5,14 @@
 
 /** Frames are judged a window at a time. */
 const WINDOW_MS = 2000;
-/** A window slower than this many frames a second counts against the device. */
-const SLOW_FPS = 42;
-/** A frame this long was at least one missed frame on any phone screen (60 Hz and up). */
-const HITCH_MS = 28;
+/**
+ * A window slower than this many frames a second counts against the device.
+ * Under 30 on purpose: a phone in low power mode is held at a steady 30 by the
+ * system, and a steady 30 is not a board that can't keep up.
+ */
+const SLOW_FPS = 24;
+/** A frame this long is a stall you can see — longer than a frame at 30 a second. */
+const HITCH_MS = 45;
 /** A window with this share of such frames stutters, whatever its average says. */
 const HITCH_SHARE = 0.1;
 /** This many slow windows in a row, and the device is slow — not a passing hiccup. */

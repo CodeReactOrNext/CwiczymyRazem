@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useMediaQuery } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
 import { Maximize2, Settings2, ZoomIn, ZoomOut } from "lucide-react";
 import React, {
@@ -152,8 +153,13 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   // what the device says about itself, or — the usual way — because the board
   // itself reported its frames falling behind (onSlowFrames).
   const lite = useTabLiteMode(true);
-  const boardStyle = useMemo(() => (lite ? liteTablatureStyle(style) : style), [lite, style]);
-  const handleSlowFrames = useCallback(() => setSetting("liteDetected", true), [setSetting]);
+  // A phone's board is a couple of bars wide, so its page turns a bar early:
+  // the bar being played moves to the left and the ones after it are in view.
+  const boardStyle = useMemo(
+    () => ({ ...(lite ? liteTablatureStyle(style) : style), pageReadAhead: true }),
+    [lite, style],
+  );
+  const handleSlowFrames = useCallback(() => setSetting("slowBoardSeen", true), [setSetting]);
   const { height, setHeight, isCustom, clearHeight } = useTablatureHeight({
     storageKey: PHONE_HEIGHT_KEY,
     min: MOBILE_HEIGHT_MIN,
@@ -169,8 +175,11 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   });
   useEffect(() => () => fullscreenChangeRef.current?.(false), []);
 
+  // A phone held sideways has no height to spare: a height dragged earlier (upright, or by a
+  // stray touch on the handle) left the board a strip in the middle of a black screen.
+  const isShortScreen = useMediaQuery("(max-height: 500px)");
   // Turned, there's no handle to drag a height of one's own with, so the board always fills.
-  const fills = quarterTurned || fullscreen || !isCustom;
+  const fills = quarterTurned || fullscreen || isShortScreen || !isCustom;
   // Full screen is the whole point there, even on a screen taller than the usual cap.
   const heightMax = fullscreen ? Infinity : MOBILE_HEIGHT_MAX;
   const controlsElsewhere = controlsSlot !== undefined;
@@ -330,7 +339,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
           />
         </div>
         {/* Turned, the board's height is the screen's width — nothing to drag. */}
-        {!quarterTurned && !fullscreen && (
+        {!quarterTurned && !fullscreen && !isShortScreen && (
           <TablatureResizeHandle
             height={viewerHeight}
             onChange={setHeight}

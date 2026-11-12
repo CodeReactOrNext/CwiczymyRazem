@@ -24,6 +24,23 @@ describe("pageStarts", () => {
     });
   });
 
+  it("turns a bar early with read-ahead, the page's last bar opening the next", () => {
+    // Without it: [0, 800, 1600]. Each page now gives up its last bar.
+    expect(pageStarts(bars(10), 2000, 1000, true)).toEqual([0, 600, 1200, 1800]);
+    // Two bars to a page: the board moves on a bar at a time, the next always in view.
+    expect(pageStarts(bars(6), 1200, 520, true)).toEqual([0, 200, 400, 600, 800, 1000]);
+  });
+
+  it("has no bar to spare on a one-bar page, read-ahead or not", () => {
+    expect(pageStarts(bars(4), 800, 230, true)).toEqual(pageStarts(bars(4), 800, 230));
+  });
+
+  it("shows the start of the next pass during the last bar with read-ahead", () => {
+    // Three bars fit: without read-ahead the whole tab is one page.
+    expect(pageStarts(bars(3), 600, 800)).toEqual([0]);
+    expect(pageStarts(bars(3), 600, 800, true)).toEqual([0, 400]);
+  });
+
   it("is a single page for a tab that fits, an empty tab, or a board with no width", () => {
     expect(pageStarts(bars(2), 400, 1000)).toEqual([0]);
     expect(pageStarts([], 0, 1000)).toEqual([0]);
