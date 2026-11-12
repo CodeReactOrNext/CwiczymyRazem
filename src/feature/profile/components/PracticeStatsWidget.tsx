@@ -1,5 +1,6 @@
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
+import { getDailyGoalMinutes } from "constants/dailyGoal";
 import { addDays, format, isSameDay, startOfWeek } from "date-fns";
 import { useTranslation } from "hooks/useTranslation";
 import { useColorTheme } from "lib/colorTheme/colorTheme";
@@ -15,9 +16,6 @@ import {
 } from "recharts";
 import type { StatisticsDataInterface } from "types/api.types";
 import { getReconciledStreak, hasRestDays } from "utils/gameLogic";
-
-const DAILY_GOAL_MIN = 15;
-const DAILY_GOAL_MS = DAILY_GOAL_MIN * 60 * 1000;
 
 interface ActivityDetail {
   title: string;
@@ -61,7 +59,7 @@ const formatBarLabel = (ms: number) => {
   return rem > 0 ? `${h}h ${rem} min` : `${h}h`;
 };
 
-const CustomTooltip = ({ active, payload }: any) => {
+const CustomTooltip = ({ active, payload, goalMin }: any) => {
   const { t } = useTranslation("profile");
   if (!active || !payload?.length) return null;
   const data = payload[0]?.payload;
@@ -86,7 +84,7 @@ const CustomTooltip = ({ active, payload }: any) => {
             <span className="text-[11px] text-zinc-400">{t("week_widget.total")}</span>
             <span className={cn(
               "text-[11px] font-bold tabular-nums",
-              data.minutes >= DAILY_GOAL_MIN ? "text-green-400" : "text-zinc-300"
+              data.minutes >= goalMin ? "text-green-400" : "text-zinc-300"
             )}>
               {formatMin(data.totalMs)}
             </span>
@@ -142,6 +140,8 @@ export const PracticeStatsWidget = ({
 }: PracticeStatsWidgetProps) => {
   const { t } = useTranslation("profile");
   const ink = CHART_INK[useColorTheme()];
+  const goalMin = getDailyGoalMinutes(userStats);
+  const goalMs = goalMin * 60 * 1000;
   const today = new Date();
   const dateFnsLocale = useDateFnsLocale();
   const intlLocale = useIntlLocale();
@@ -170,7 +170,7 @@ export const PracticeStatsWidget = ({
       : 0;
     const isToday = isSameDay(dayDate, today);
     const isFuture = dayDate > today;
-    const isGoalMet = timeMs >= DAILY_GOAL_MS;
+    const isGoalMet = timeMs >= goalMs;
     return {
       label,
       dayDate,
@@ -186,7 +186,7 @@ export const PracticeStatsWidget = ({
   });
 
   const practicedDaysThisWeek = weekDays.filter((d) => d.timeMs > 0 && !d.isFuture).length;
-  const maxMinutes = Math.max(DAILY_GOAL_MIN * 2, ...weekDays.map((d) => d.timeMs / 60000));
+  const maxMinutes = Math.max(goalMin * 2, ...weekDays.map((d) => d.timeMs / 60000));
 
   const chartData = weekDays.map(({ label, dayDate, timeMs, isFuture, isToday, isGoalMet, activities, dateLabel }) => ({
     day: format(dayDate, "EEE", { locale: dateFnsLocale }) || label,
@@ -219,7 +219,7 @@ export const PracticeStatsWidget = ({
         <div className="flex-1 min-h-[130px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 18, right: 44, bottom: 0, left: 0 }} barCategoryGap="20%">
-              {/* Hidden Y axis fixes the scale so the 15-min goal line stays visible
+              {/* Hidden Y axis fixes the scale so the daily goal line stays visible
                   even on low-practice days (otherwise the domain collapses to dataMax
                   and the reference line gets discarded for overflowing). */}
               <YAxis hide domain={[0, maxMinutes]} />
@@ -285,11 +285,11 @@ export const PracticeStatsWidget = ({
               />
 
               <ReferenceLine
-                y={DAILY_GOAL_MIN}
+                y={goalMin}
                 stroke={ink.goalLine}
                 strokeDasharray="4 3"
                 label={{
-                  value: "15 min",
+                  value: `${goalMin} min`,
                   position: "right",
                   fill: "#71717a",
                   fontSize: 11,
@@ -298,7 +298,7 @@ export const PracticeStatsWidget = ({
               />
 
               <Tooltip
-                content={<CustomTooltip />}
+                content={<CustomTooltip goalMin={goalMin} />}
                 cursor={{ fill: ink.cursor }}
                 allowEscapeViewBox={{ x: false, y: true }}
                 wrapperStyle={{ zIndex: 20 }}

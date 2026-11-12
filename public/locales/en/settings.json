@@ -124,6 +124,12 @@
     "description": "One missed day a week (Monday to Sunday) won't break your streak, though it won't add a day either. Two missed days in a row always end it.",
     "error": "Couldn't save. Try again."
   },
+  "daily_goal": {
+    "title": "Daily goal",
+    "subtitle": "How long a day of practice should be. The dashed line on Home's \"This week\" chart and the green bars follow it.",
+    "minutes": "{{minutes}} min",
+    "error": "Couldn't save. Try again."
+  },
   "mcp": {
     "title": "AI assistants (MCP)",
     "subtitle": "Connect Claude, Cursor or another AI app to your riff.quest account. It can read your practice, plan sessions and write exercises with tabs.",

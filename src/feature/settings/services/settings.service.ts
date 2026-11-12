@@ -95,6 +95,11 @@ export const firebaseUpdateStreakRestDays = async (enabled: boolean) => {
   await updateDoc(userDocRef, { "statistics.streakRestDays": enabled });
 };
 
+export const firebaseUpdateDailyGoalMinutes = async (minutes: number) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, { "statistics.dailyGoalMinutes": minutes });
+};
+
 /**
  * Saving the toggles in Settings is also an answer to "may we email you?" —
  * any one left on is a yes — so the consent record is written with them.

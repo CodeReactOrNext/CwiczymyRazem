@@ -124,6 +124,12 @@
     "description": "Ein verpasster Tag pro Woche (Montag bis Sonntag) beendet deine Serie nicht, verlängert sie aber auch nicht. Zwei verpasste Tage hintereinander beenden sie immer.",
     "error": "Speichern fehlgeschlagen. Versuch es noch einmal."
   },
+  "daily_goal": {
+    "title": "Tagesziel",
+    "subtitle": "Wie lange du pro Tag üben willst. Die gestrichelte Linie und die grünen Balken im Wochendiagramm auf der Startseite richten sich danach.",
+    "minutes": "{{minutes}} Min.",
+    "error": "Speichern fehlgeschlagen. Versuch es nochmal."
+  },
   "mcp": {
     "title": "KI-Assistenten (MCP)",
     "subtitle": "Verbinde Claude, Cursor oder eine andere KI-App mit deinem riff.quest-Konto. Sie kann dein Üben lesen, Sessions planen und Übungen mit Tabs schreiben.",

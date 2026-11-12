@@ -124,6 +124,12 @@
     "description": "Jeden opuszczony dzień w tygodniu (od poniedziałku do niedzieli) nie przerywa serii, ale też jej nie wydłuża. Dwa dni przerwy pod rząd zawsze ją kończą.",
     "error": "Nie udało się zapisać. Spróbuj ponownie."
   },
+  "daily_goal": {
+    "title": "Dzienny cel",
+    "subtitle": "Ile minut dziennie chcesz ćwiczyć. Według tego rysuje się przerywana linia i zielone słupki na wykresie „This week” na stronie głównej.",
+    "minutes": "{{minutes}} min",
+    "error": "Nie udało się zapisać. Spróbuj ponownie."
+  },
   "mcp": {
     "title": "Asystenci AI (MCP)",
     "subtitle": "Podłącz Claude, Cursora albo inną aplikację AI do swojego konta riff.quest. Będzie widzieć Twoje ćwiczenie, planować sesje i pisać ćwiczenia z tabami.",

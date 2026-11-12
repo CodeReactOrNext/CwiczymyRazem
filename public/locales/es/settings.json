@@ -124,6 +124,12 @@
     "description": "Saltarte un día a la semana (de lunes a domingo) no rompe tu racha, aunque tampoco la alarga. Dos días seguidos sin tocar siempre la rompen.",
     "error": "No se pudo guardar. Inténtalo de nuevo."
   },
+  "daily_goal": {
+    "title": "Meta diaria",
+    "subtitle": "Cuánto quieres practicar al día. La línea discontinua y las barras verdes del gráfico semanal de Inicio se basan en ella.",
+    "minutes": "{{minutes}} min",
+    "error": "No se pudo guardar. Inténtalo de nuevo."
+  },
   "mcp": {
     "title": "Asistentes de IA (MCP)",
     "subtitle": "Conecta Claude, Cursor u otra app de IA a tu cuenta de riff.quest. Podrá leer tu práctica, planificar sesiones y escribir ejercicios con tablaturas.",

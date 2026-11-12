@@ -158,6 +158,8 @@ export interface StatisticsDataInterface {
    * player setting; absent means on, so only an explicit `false` turns it off.
    */
   streakRestDays?: boolean;
+  /** Daily practice goal in minutes (Home's "This week" line); absent means 15. */
+  dailyGoalMinutes?: number;
   guitarStartDate: Timestamp | null;
   songLists?: {
     wantToLearn: string[];

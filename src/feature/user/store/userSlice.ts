@@ -185,6 +185,11 @@ const userSlice = createSlice({
         state.currentUserStats.streakRestDays = payload;
       }
     },
+    setDailyGoalMinutes: (state, { payload }: PayloadAction<number>) => {
+      if (state.currentUserStats) {
+        state.currentUserStats.dailyGoalMinutes = payload;
+      }
+    },
     // Challenges removed
     generateDailyQuest: (state, action: PayloadAction<{ randomExercise?: { id: string; title: string } } | undefined>) => {
       if (!state.currentUserStats) return;
@@ -643,6 +648,7 @@ export const {
   setFame,
   setSelectedGuitar,
   setStreakRestDays,
+  setDailyGoalMinutes,
   setFavoritePlan,
   setFavoriteExercise,
   setFavoriteSong,

@@ -13,6 +13,7 @@ import {
 import { useRailEdges } from "components/PageTabs/useRailEdges";
 import { AppearanceSettings } from "feature/settings/components/AppearanceSettings";
 import { AudioInputSettings } from "feature/settings/components/AudioInputSettings";
+import { DailyGoalSettings } from "feature/settings/components/DailyGoalSettings";
 import EmailChange from "feature/settings/components/EmailChange";
 import EmailNotificationSettings from "feature/settings/components/EmailNotificationSettings";
 import { GuitarStartDate } from "feature/settings/components/GuitarStartDate";
@@ -101,6 +102,7 @@ const SettingsView = () => {
               <LanguageSettings />
               <AppearanceSettings />
               <StreakSettings />
+              <DailyGoalSettings />
               <SoundSettings />
               <AudioInputSettings />
             </TabsContent>
