@@ -24,6 +24,8 @@ interface MobileExerciseContentProps {
   currentExercise: any;
   activeTablature?: any;
   effectiveBpm?: number;
+  /** AudioContext time the tab started at — see MobileTablaturePanel. */
+  audioStartTime?: number | null;
   metronome: any;
   isRiddleRevealed?: boolean;
   isRiddleGuessed?: boolean;
@@ -67,6 +69,7 @@ export function MobileExerciseContent({
   currentExercise,
   activeTablature,
   effectiveBpm,
+  audioStartTime,
   metronome,
   isRiddleRevealed,
   isRiddleGuessed,
@@ -193,6 +196,8 @@ export function MobileExerciseContent({
           bpm={effectiveBpm || metronome.bpm}
           isPlaying={metronome.isPlaying}
           startTime={metronome.startTime || null}
+          audioContext={metronome.audioContext}
+          audioStartTime={audioStartTime}
           countInRemaining={(metronome as any).countInRemaining}
           frequencyRef={frequencyRef}
           isListening={isListening}

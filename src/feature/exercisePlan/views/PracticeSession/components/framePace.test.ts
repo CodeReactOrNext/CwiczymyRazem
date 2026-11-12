@@ -25,6 +25,18 @@ describe("framePace", () => {
     expect(run(pace, end, 10, 40)[0]).toBe(false);
   });
 
+  it("reports a board that averages fine but keeps missing frames", () => {
+    const pace = createFramePace();
+    let t = 0;
+    let reported = false;
+    // 60 fps with every sixth frame taking three: about 45 fps, in jerks.
+    for (let i = 0; t < 10_000; i++) {
+      t += i % 6 === 0 ? 50 : 1000 / 60;
+      if (observeFrame(pace, t)) reported = true;
+    }
+    expect(reported).toBe(true);
+  });
+
   it("forgives a slow start", () => {
     const pace = createFramePace();
     const [slowStart, end] = run(pace, 0, 2.5, 50);

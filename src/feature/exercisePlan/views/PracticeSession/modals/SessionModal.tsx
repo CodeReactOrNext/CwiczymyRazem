@@ -34,6 +34,8 @@ interface SessionModalProps {
   isSubmittingReport?: boolean;
   metronome: any;
   effectiveBpm?: number;
+  /** AudioContext time the tab started at — the phone board's cursor runs on it. */
+  audioStartTime?: number | null;
   isMicEnabled: boolean;
   toggleMic: () => Promise<void>;
   frequencyRef?: React.RefObject<number>;
@@ -77,7 +79,7 @@ const SessionModal = ({
   handleNextExercise, handleBackExercise,
   setVideoDuration, setTimerTime, startTimer, stopTimer, resetScore,
   isFinishing, isSubmittingReport,
-  metronome, effectiveBpm,
+  metronome, effectiveBpm, audioStartTime,
   isMicEnabled, toggleMic,
   frequencyRef, volumeRef, onRecalibrate,
   isListening,
@@ -168,6 +170,7 @@ const SessionModal = ({
         isLastExercise={isLastExercise} isPlaying={isPlaying}
         isFinishing={isFinishing} isSubmittingReport={isSubmittingReport}
         metronome={metronome} effectiveBpm={effectiveBpm}
+        audioStartTime={audioStartTime}
         isMicEnabled={isMicEnabled} toggleMic={toggleMic}
         isAudioMuted={isAudioMuted} setIsAudioMuted={setIsAudioMuted}
         isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}

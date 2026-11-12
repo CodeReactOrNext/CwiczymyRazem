@@ -73,6 +73,8 @@ interface PhoneSessionModalProps {
   isSubmittingReport?: boolean;
   metronome: any;
   effectiveBpm?: number;
+  /** AudioContext time the tab started at — see MobileTablaturePanel. */
+  audioStartTime?: number | null;
   isMicEnabled: boolean;
   toggleMic: () => Promise<void>;
   isAudioMuted: boolean;
@@ -144,6 +146,7 @@ export function PhoneSessionModal({
   isSubmittingReport,
   metronome,
   effectiveBpm,
+  audioStartTime,
   isMicEnabled,
   toggleMic,
   isAudioMuted,
@@ -443,6 +446,7 @@ export function PhoneSessionModal({
                           currentExercise={currentExercise}
                           activeTablature={activeTablature}
                           effectiveBpm={effectiveBpm}
+                          audioStartTime={audioStartTime}
                           metronome={metronome}
                           isRiddleRevealed={isRiddleRevealed}
                           isRiddleGuessed={isRiddleGuessed}

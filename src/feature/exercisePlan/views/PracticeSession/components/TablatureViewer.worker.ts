@@ -161,6 +161,14 @@ const LITE_FRAME_SLACK_MS = 4;
 let lastLitePaintStamp = Number.NEGATIVE_INFINITY;
 /** How the frames are keeping up while the tab plays — see framePace.ts. */
 const framePace = createFramePace();
+/**
+ * The readout behind ?tabperf=1 (PERF message; TabPerfOverlay shows it): how
+ * many frames the screen offered, how many were painted and what painting
+ * cost this thread. Low frames with a cheap paint means the time goes where
+ * this thread can't see it — the GPU.
+ */
+let perfOn = false;
+const perf = { since: 0, frames: 0, painted: 0, paintMs: 0, paintMax: 0 };
 
 const withAlphaCache = new Map<string, Map<number, string>>();
 
@@ -312,6 +320,32 @@ function drawText(text: string, x: number, y: number) {
 }
 let dpr = 1;
 let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
+
+/** Posts the last second of the frame readout, once it is over. */
+function reportPerf(now: number) {
+  const span = now - perf.since;
+  if (span < 1000) return;
+  if (perf.since > 0) {
+    self.postMessage({
+      type: 'PERF_STATS',
+      stats: {
+        screenFps: (perf.frames * 1000) / span,
+        paintFps: (perf.painted * 1000) / span,
+        paintAvgMs: perf.painted > 0 ? perf.paintMs / perf.painted : 0,
+        paintMaxMs: perf.paintMax,
+        width: canvas?.width ?? 0,
+        height: canvas?.height ?? 0,
+        dpr,
+        lite,
+      },
+    });
+  }
+  perf.since = now;
+  perf.frames = 0;
+  perf.painted = 0;
+  perf.paintMs = 0;
+  perf.paintMax = 0;
+}
 
 // Render data
 let renderBeats: BeatRD[] = [];
@@ -1759,7 +1793,7 @@ const REUSE_BEAT_REACH = 80;
 /** Messages that only touch notes the cursor has reached — never what lies
  *  ahead of it. After any other message the next frame is drawn whole. */
 const REUSE_SAFE_MESSAGES = new Set([
-  "TICK", "FILL_STEPS", "FILL_RESET",
+  "TICK", "FILL_STEPS", "FILL_RESET", "PERF",
   "HIT_NOTES", "HIT_NOTES_PATCH", "MISSED_NOTES", "MISSED_NOTES_PATCH", "NOTE_TIMINGS", "NOTE_TIMINGS_PATCH",
 ]);
 /** The longest reach to the left among the beats that came into the drawn
@@ -3368,6 +3402,11 @@ function render(frameStamp?: number) {
   rafId = requestAnimationFrame(render);
   const stamped = frameStamp !== undefined && Number.isFinite(frameStamp);
   const running = isPlaying && isVisible && countInRemaining === 0;
+  const perfStart = perfOn ? performance.now() : 0;
+  if (perfOn) {
+    perf.frames++;
+    reportPerf(perfStart);
+  }
   if (stamped && running) {
     if (lite) {
       // Every other frame of a 60 Hz screen, every fourth of a 120 Hz one.
@@ -3384,6 +3423,12 @@ function render(frameStamp?: number) {
   }
   try {
     paintFrame(frameStamp);
+    if (perfOn) {
+      const cost = performance.now() - perfStart;
+      perf.painted++;
+      perf.paintMs += cost;
+      if (cost > perf.paintMax) perf.paintMax = cost;
+    }
   } catch (err) {
     // A frame that threw between save and restore leaves its clip, transform and
     // state stack behind, and every later frame would draw under them. Drop them
@@ -3668,6 +3713,11 @@ self.onmessage = (e: MessageEvent) => {
       noteTuners.clear();
       livePitch = null;
       // loop range is intentionally NOT cleared here so it survives loop restarts
+      break;
+    }
+    case 'PERF': {
+      perfOn = !!msg.on;
+      perf.since = 0;
       break;
     }
     case 'VISIBLE': {

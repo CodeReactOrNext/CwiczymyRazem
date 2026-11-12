@@ -24,7 +24,6 @@ import {
   PHONE_MAX_DPR,
   useTablatureSettings,
   useTablatureStyle,
-  useTabLiteMode,
 } from "./tablatureSettings";
 import { TablatureSettingsDialog } from "./TablatureSettingsDialog";
 import { tuningGutterStrings } from "./tablatureStringRows";
@@ -35,6 +34,7 @@ import {
   useTablatureHeight,
 } from "./useTablatureHeight";
 import type { TuningGutterString } from "./useTablatureWorkerBridge";
+import { useTabLiteMode } from "./useTabLiteMode";
 
 /**
  * Phones hit the 120px/beat floor of the beat-width formula, which shows barely
@@ -71,6 +71,15 @@ interface MobileTablaturePanelProps {
   bpm: number;
   isPlaying: boolean;
   startTime: number | null;
+  /**
+   * The session's audio clock and the moment on it the tab started. The notes
+   * are judged on this clock (useNoteMatching) and the sound runs on it, so
+   * the cursor has to as well: on the wall clock it ran ahead of both whenever
+   * the phone's audio stalled, and the note under the cursor was no longer the
+   * note being judged.
+   */
+  audioContext?: AudioContext | null;
+  audioStartTime?: number | null;
   countInRemaining?: number;
   frequencyRef?: React.MutableRefObject<number>;
   isListening?: boolean;
@@ -112,6 +121,8 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   bpm,
   isPlaying,
   startTime,
+  audioContext,
+  audioStartTime,
   countInRemaining,
   frequencyRef,
   isListening,
@@ -291,6 +302,8 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
             bpm={bpm}
             isPlaying={isPlaying}
             startTime={startTime}
+            audioContext={audioContext}
+            audioStartTime={audioStartTime}
             countInRemaining={countInRemaining}
             className='w-full'
             frequencyRef={frequencyRef}

@@ -12,6 +12,7 @@ import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import { CountInOverlay } from "./CountInOverlay";
 import { mirrorBoardStyle, pointerAlongBoard } from "./tablatureDirection";
 import { staffLineSpacing } from "./tablatureStringRows";
+import { TabPerfOverlay, useTabPerfFlag } from "./TabPerfOverlay";
 import { useAmbientMicGlow } from "./useAmbientMicGlow";
 import { STRING_SPACING, useTablatureRenderData } from "./useTablatureRenderData";
 import type { TablatureSelection, TablatureStylePatch, TuningGutterString } from "./useTablatureWorkerBridge";
@@ -172,13 +173,14 @@ const TablatureViewerInner = ({
   // was built with (both come from `style`).
   const renderData = useTablatureRenderData(measures, palette, style?.stringSpacing, style?.flipStrings, style?.stringCount);
 
-  const { showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat, locateNote } = useTablatureWorkerBridge({
+  const perf = useTabPerfFlag();
+  const { perfStats, showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat, locateNote } = useTablatureWorkerBridge({
     canvasRef, containerRef, containerSize, renderData,
     isPlaying, startTime, audioStartTime, bpm, countInRemaining,
     hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek,
     loopStartBeat, loopEndBeat, playUntilBeat, zoom, tuningStrings, style, selection, obscured,
-    quarterTurned, learnFocus, maxDpr, onSlowFrames,
+    quarterTurned, learnFocus, maxDpr, onSlowFrames, perf,
   });
   const along = (pointer: { clientX: number; clientY: number }) =>
     pointerAlongBoard(pointer, quarterTurned);
@@ -282,6 +284,7 @@ const TablatureViewerInner = ({
       )}
 
       <CountInOverlay count={countInRemaining} bpm={bpm} />
+      {perf && <TabPerfOverlay stats={perfStats} />}
 
       {showRestWarning && countInRemaining === 0 && (
         <div className="absolute top-2 right-3 pointer-events-none z-10">

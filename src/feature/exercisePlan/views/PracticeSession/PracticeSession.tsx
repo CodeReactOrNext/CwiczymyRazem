@@ -1498,6 +1498,7 @@ const PracticeSessionInner = ({
           resetScore={() => { noteMatchingHandle.current?.resetGame(); setEarTrainingScore(0); }}
           isFinishing={isFinishing} isSubmittingReport={isSubmittingReport}
           metronome={metronome} effectiveBpm={effectiveBpm}
+          audioStartTime={effectiveAudioStartTime}
           isMicEnabled={isMicEnabled} toggleMic={handleMicToggle}
           frequencyRef={audioRefs.frequencyRef} volumeRef={audioRefs.volumeRef} isListening={isListening}
           onRecalibrate={handleRecalibrate}

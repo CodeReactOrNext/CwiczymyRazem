@@ -3,7 +3,7 @@ import {
   type MetronomeSoundKey,
   normalizeMetronomeSound,
 } from "feature/exercisePlan/components/Metronome/utils/clickTones";
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -558,27 +558,6 @@ export function resolveTabLite(
   if (mode === "lite") return true;
   if (mode === "full") return false;
   return isPhone && (liteDetected || weakDevice);
-}
-
-const noopSubscribe = () => () => undefined;
-const readWeakDevice = () =>
-  typeof navigator !== "undefined" && isWeakDevice(navigator as DeviceHints);
-
-/**
- * Whether this board should run lite. `isPhone` is true for the phone session's
- * board only: `auto` never touches a desktop board, where nothing changes how
- * the tab looks unless the player asks for it.
- */
-export function useTabLiteMode(isPhone: boolean): boolean {
-  const mode = useTablatureSettings((s) => s.performanceMode);
-  const liteDetected = useTablatureSettings((s) => s.liteDetected);
-  // The server has no device to ask; the client's answer never changes.
-  const weakDevice = useSyncExternalStore(
-    noopSubscribe,
-    readWeakDevice,
-    () => false,
-  );
-  return resolveTabLite(mode, isPhone, liteDetected, weakDevice);
 }
 
 /**

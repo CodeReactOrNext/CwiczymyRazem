@@ -110,6 +110,24 @@ interface WorkerBridgeOptions {
   maxDpr?:         number;
   /** Called once if the board can't hold the screen's frame rate while playing. */
   onSlowFrames?:   () => void;
+  /** Ask the worker for its frame readout once a second (the ?tabperf=1 overlay). */
+  perf?:           boolean;
+}
+
+/** What the worker reports about its last second of frames — see TabPerfOverlay. */
+export interface TabPerfStats {
+  /** Animation frames the screen offered the worker. */
+  screenFps: number;
+  /** Frames it painted (the lite board skips some on purpose). */
+  paintFps: number;
+  /** What a paint cost the worker's own thread, on average and at worst. */
+  paintAvgMs: number;
+  paintMaxMs: number;
+  /** The canvas in its own pixels, and the pixel ratio it is drawn at. */
+  width: number;
+  height: number;
+  dpr: number;
+  lite: boolean;
 }
 
 /** The canvas's pixel ratio: the screen's, up to `maxDpr`. */
@@ -192,7 +210,7 @@ export function useTablatureWorkerBridge({
   hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef = null, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
   loopStartBeat, loopEndBeat, playUntilBeat = null, zoom = 1, tuningStrings, style, selection,
-  obscured = false, quarterTurned = false, learnFocus = null, maxDpr, onSlowFrames,
+  obscured = false, quarterTurned = false, learnFocus = null, maxDpr, onSlowFrames, perf = false,
 }: WorkerBridgeOptions) {
   const workerRef           = useRef<Worker | null>(null);
   const transferredRef      = useRef(false);
@@ -207,6 +225,7 @@ export function useTablatureWorkerBridge({
 
   const [isRestActive,    setIsRestActive]    = useState(false);
   const [showRestWarning, setShowRestWarning] = useState(false);
+  const [perfStats,       setPerfStats]       = useState<TabPerfStats | null>(null);
 
   // Display scale mirroring the worker's vscale — converts CSS px ↔ world px.
   const vscale = containerSize.height > 0 ? containerSize.height / TAB_BASE_HEIGHT : 1;
@@ -245,6 +264,7 @@ export function useTablatureWorkerBridge({
     worker.onmessage = (e: MessageEvent) => {
       if (e.data?.type === 'REST_ACTIVE') setIsRestActive(e.data.isRest);
       else if (e.data?.type === 'SLOW_FRAMES') onSlowFramesRef.current?.();
+      else if (e.data?.type === 'PERF_STATS') setPerfStats(e.data.stats as TabPerfStats);
     };
     return () => { worker.postMessage({ type: 'STOP' }); worker.terminate(); };
   }, []);
@@ -292,6 +312,8 @@ export function useTablatureWorkerBridge({
       audioStartSec: isPlaying ? (audioStartTime ?? null) : null,
     });
   }, [isPlaying, startTime, audioStartTime, bpm, countInRemaining]);
+
+  useEffect(() => { workerRef.current?.postMessage({ type: 'PERF', on: perf }); }, [perf]);
 
   // Tell the worker whether anyone can see it. A covered board keeps its state
   // and its clock; it just stops painting frames into a canvas nobody is looking at.
@@ -619,5 +641,5 @@ export function useTablatureWorkerBridge({
     };
   };
 
-  return { showRestWarning, isRestActive, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat, locateNote };
+  return { perfStats: perf ? perfStats : null, showRestWarning, isRestActive, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat, locateNote };
 }

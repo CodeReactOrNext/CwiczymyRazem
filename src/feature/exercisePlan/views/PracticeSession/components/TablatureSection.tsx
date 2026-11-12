@@ -33,7 +33,6 @@ import {
   NOTE_SPACING_MIN,
   useTablatureSettings,
   useTablatureStyle,
-  useTabLiteMode,
 } from "./tablatureSettings";
 import { TablatureSettingsDialog } from "./TablatureSettingsDialog";
 import { tuningGutterStrings } from "./tablatureStringRows";
@@ -43,6 +42,7 @@ import {
   TablatureResizeHandle,
   useTablatureHeight,
 } from "./useTablatureHeight";
+import { useTabLiteMode } from "./useTabLiteMode";
 import { useTablatureRenderData } from "./useTablatureRenderData";
 import type { TuningGutterString } from "./useTablatureWorkerBridge";
 
