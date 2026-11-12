@@ -94,6 +94,7 @@ import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
 import type { FreePlayFrame } from "./utils/freePlay";
 import { buildLearnSteps } from "./utils/learnSteps";
+import { shiftTabPitch } from "./utils/shiftTabPitch";
 import { tabPlayUntil } from "./utils/tabPlayUntil";
 import type { TimingPrecision } from "./utils/timingPrecision";
 
@@ -575,11 +576,23 @@ const PracticeSessionInner = ({
   // Locked to Standard for Guitar Pro imports (the file already encodes its own tuning)
   // and during exams (prepared only for standard tuning).
   const isGpFile = !!effectiveRawGpFile || !!gpFileUrl;
-  const guitarTuning = useGuitarTuning({ isGpFile, isExamMode, contentInstrument, contentStringCount: gpTrack?.stringCount });
+  const guitarTuning = useGuitarTuning({
+    isGpFile, isExamMode, contentInstrument, contentStringCount: gpTrack?.stringCount,
+    fileOpenStringMidi: gpTrack?.openStringMidi, fileTuningKey: currentExercise.id,
+  });
   const isBass = guitarTuning.instrument === "bass";
 
+  // A player tuned a half step under the file plays the file's frets and sounds
+  // a half step under its notes — so that is what the matcher is given to hear.
+  const gpTrackMeasures = gpTrack?.measures;
+  const gpPitchShift = guitarTuning.pitchShift;
+  const playedGpMeasures = useMemo(
+    () => shiftTabPitch(gpTrackMeasures, gpPitchShift),
+    [gpTrackMeasures, gpPitchShift],
+  );
+
   const rawTablature = riddleMeasures
-    || (parsedGpTracks ? parsedGpTracks[gpTrackIdx]?.measures : undefined)
+    || (parsedGpTracks ? playedGpMeasures : undefined)
     || activeExercise.tablature;
 
   /**
@@ -704,6 +717,7 @@ const PracticeSessionInner = ({
     tabRestartKey,
     pendingSeekBeatRef: metronome.pendingSeekBeatRef,
     tuningOffsets: guitarTuning.tuning.offsets,
+    gpTransposeSemitones: gpPitchShift,
     isBass,
     bandRage: !!bossFight?.enraged,
   });

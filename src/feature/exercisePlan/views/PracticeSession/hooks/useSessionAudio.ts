@@ -50,6 +50,9 @@ interface UseSessionAudioOptions {
   /** Per-string semitone offset from standard tuning, applied to the custom (non-GP) synth so the
    *  background guitar matches the player's chosen tuning. */
   tuningOffsets?:          readonly number[];
+  /** Semitones the Guitar Pro file's own playback is moved by, so the band stays in
+   *  the key of a player tuned higher or lower than the file (see useGuitarTuning). */
+  gpTransposeSemitones?:   number;
   /** The player is on bass: the main track sounds as one, and only it takes their tuning. */
   isBass?:                 boolean;
   /** A boss fight's boss is enraged: the generated backing's band plays harder. */
@@ -63,7 +66,7 @@ export function useSessionAudio({
   isMetronomeMuted, metronomeVolume, showAlphaTabScore, examMode, examBacking,
   metronomeAudioContext, metronomeStartTime, metronomeAudioStartTime,
   stopMetronome, stopTimer, setTimerTime, setHasPlayedRiddleOnce, autoStopAfterFirstLoop,
-  onAlphaTabAudioContextReady, onAlphaTabLoopRestart, tabRestartKey, pendingSeekBeatRef, tuningOffsets, isBass = false, bandRage = false,
+  onAlphaTabAudioContextReady, onAlphaTabLoopRestart, tabRestartKey, pendingSeekBeatRef, tuningOffsets, gpTransposeSemitones = 0, isBass = false, bandRage = false,
 }: UseSessionAudioOptions) {
   // ── Track configs ──────────────────────────────────────────────────────────
 
@@ -168,6 +171,7 @@ export function useSessionAudio({
     backingTrackIds: alphaTabBackingTrackIds,
     resetKey:        tabRestartKey,
     pendingSeekBeatRef,
+    transposeSemitones: gpTransposeSemitones,
   });
 
   // ── Exam backing track ─────────────────────────────────────────────────────

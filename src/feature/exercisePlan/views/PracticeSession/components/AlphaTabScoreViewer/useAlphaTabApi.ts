@@ -1,4 +1,5 @@
 import * as alphaTabLib from "@coderline/alphatab";
+import { applyAlphaTabTranspose } from "feature/exercisePlan/hooks/useAlphaTabPlayer";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { onOutputDeviceChange, readPersistedOutputDeviceId } from "hooks/useNativeOutputDevice";
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +17,9 @@ interface UseAlphaTabApiOptions {
   baseTempo?: number;
   /** Staff metadata for the generated alphaTex — a bass's strings and clef (alphaTexStaffHeader). */
   staffHeader?: string;
+  /** Semitones a Guitar Pro file's playback is moved by (ignored for generated alphaTex,
+   *  whose staff header already carries the player's tuning). */
+  transposeSemitones?: number;
   mode: "score" | "tab";
   /** Black board with white ink instead of the default white paper. */
   notationDarkMode?: boolean;
@@ -65,6 +69,7 @@ export function useAlphaTabApi({
   measures,
   baseTempo = 120,
   staffHeader = "",
+  transposeSemitones = 0,
   mode,
   notationDarkMode = false,
   notationZoom = 1,
@@ -258,6 +263,14 @@ export function useAlphaTabApi({
       }
     });
   }, [trackConfigs, backingTrackIds, uiReady]);
+
+  // Transposition of a Guitar Pro file, for a player tuned off it as a whole.
+  // uiReady in deps: a fresh instance (and its freshly loaded song) starts at 0.
+  useEffect(() => {
+    const api = apiRef.current;
+    if (!api || !uiReady || !rawGpFile) return;
+    applyAlphaTabTranspose(api, scoreRef.current, transposeSemitones);
+  }, [transposeSemitones, uiReady, rawGpFile]);
 
   const handleTrackSelect = (idx: number) => {
     const score = scoreRef.current;

@@ -67,7 +67,20 @@ interface UseAlphaTabPlayerProps {
    * Consumed (reset to null) once applied. Null → start/resume normally.
    */
   pendingSeekBeatRef?: MutableRefObject<number | null>;
+  /** Semitones every pitched track is played higher (or, negative, lower) than written. */
+  transposeSemitones?: number;
 }
+
+/**
+ * Moves the pitch of every track but the drums — a drum's "pitch" is which drum
+ * it is. AlphaTab forgets live transposition whenever a song is loaded, so this
+ * has to be called again after each load.
+ */
+export const applyAlphaTabTranspose = (api: any, score: any, semitones: number): void => {
+  const pitched = (score?.tracks ?? []).filter((track: any) => !track.isPercussion);
+  if (pitched.length === 0) return;
+  try { api.changeTrackTranspositionPitch(pitched, semitones); } catch { /* ignore */ }
+};
 
 /**
  * Drives AlphaTab's built-in AlphaSynth synthesizer (sonivox.sf2) for GP file playback.
@@ -93,6 +106,7 @@ export const useAlphaTabPlayer = ({
   backingTrackIds = [],
   resetKey,
   pendingSeekBeatRef,
+  transposeSemitones = 0,
 }: UseAlphaTabPlayerProps) => {
   const apiRef             = useRef<any>(null);
   const playRef            = useRef<AlphaTabPlayerHandle['play'] | null>(null);
@@ -407,6 +421,14 @@ export const useAlphaTabPlayer = ({
       }
     });
   }, [trackConfigs, backingTrackIds]);
+
+  // Transposition — for a player tuned higher or lower than the file is written.
+  // loadedFile in deps: loading a song resets it inside the synthesizer.
+  useEffect(() => {
+    const api = apiRef.current;
+    if (!api || !isPlayerReady || !loadedFile) return;
+    applyAlphaTabTranspose(api, scoreRef.current, transposeSemitones);
+  }, [transposeSemitones, isPlayerReady, loadedFile]);
 
   /** The current file can be played: its sounds and its song are loaded. */
   const isAudioReady = !rawGpFile || (isPlayerReady && loadedFile === rawGpFile);

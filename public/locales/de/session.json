@@ -606,7 +606,11 @@
     "tunings": "Stimmung",
     "bass_description": "Wähle, wie dein Bass gestimmt ist — Tonerkennung und Begleitaudio werden an diese Stimmung angepasst.",
     "instrument_lock_bass": "Diese Übung ist für Bass geschrieben.",
-    "instrument_lock_guitar": "Diese Übung ist für Gitarre geschrieben."
+    "instrument_lock_guitar": "Diese Übung ist für Gitarre geschrieben.",
+    "file_tuning": "Stimmung der Datei",
+    "from_file": "aus der Datei",
+    "file_description": "Dieser Tab stammt aus einer Guitar-Pro-Datei in der Stimmung {{name}}. Wenn deine ganze Gitarre höher oder tiefer gestimmt ist, wähle das hier — die Bünde bleiben gleich, Erkennung und Wiedergabe folgen deiner Stimmung.",
+    "file_description_bass": "Dieser Tab stammt aus einer Guitar-Pro-Datei in der Stimmung {{name}}. Wenn dein ganzer Bass höher oder tiefer gestimmt ist, wähle das hier — die Bünde bleiben gleich, Erkennung und Wiedergabe folgen deiner Stimmung."
   },
   "header": {
     "close_session": "Session schließen",

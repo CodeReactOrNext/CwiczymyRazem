@@ -15,6 +15,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { memo, useState } from "react";
 import { createPortal } from "react-dom";
 import { GiGuitar, GiGuitarHead } from "react-icons/gi";
+import { isStandardTuning } from "utils/audio/tunings";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
@@ -106,9 +107,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   const [isTunerOpen, setIsTunerOpen] = useState(false);
   const [isTroubleshootOpen, setIsTroubleshootOpen] = useState(false);
   const {
-    tuningId,
     tuning,
-    preferredTuning,
     isLocked: isTuningLocked,
     openModal: openTuningSettings,
     instrument,
@@ -134,7 +133,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
   if (!hasMetronome && !hasAudioTrack && !hasMicControls) return null;
 
-  const isNonStandardTuning = tuningId !== "standard";
+  const isNonStandardTuning = !isStandardTuning(tuning.id);
 
   const hasTuner =
     hasMicControls && !!frequencyRef && !!volumeRef && !disableTuner;
@@ -223,7 +222,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 <GiGuitarHead className='h-4 w-4 shrink-0' />
               )}
               <span className='truncate text-xs font-semibold'>
-                {preferredTuning.name}
+                {t("tuning_modal.tunings")}
               </span>
             </button>
           )}
@@ -391,7 +390,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               title={
                 isTuningLocked
                   ? t("media.tuning_locked")
-                  : t(`media.${tuningKey}_named`, { name: preferredTuning.name })
+                  : t(`media.${tuningKey}_named`, { name: tuning.name })
               }
               className={cn(
                 PRESSABLE_KEY,
@@ -575,7 +574,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   <GiGuitarHead className='h-4 w-4 shrink-0' />
                 )}
                 <span className='text-[10px] font-semibold tracking-wide'>
-                  {preferredTuning.name}
+                  {t("tuning_modal.tunings")}
                 </span>
               </button>
             </SessionTooltip>

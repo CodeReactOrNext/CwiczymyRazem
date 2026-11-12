@@ -684,7 +684,11 @@
     "tunings": "Strój",
     "bass_description": "Wybierz strój basu — wykrywanie wysokości i podkład zostaną do niego dopasowane.",
     "instrument_lock_bass": "To ćwiczenie jest napisane na bas.",
-    "instrument_lock_guitar": "To ćwiczenie jest napisane na gitarę."
+    "instrument_lock_guitar": "To ćwiczenie jest napisane na gitarę.",
+    "file_tuning": "Strój z pliku",
+    "from_file": "z pliku",
+    "file_description": "Ta tabulatura pochodzi z pliku Guitar Pro zapisanego w stroju {{name}}. Jeśli cała Twoja gitara jest nastrojona wyżej lub niżej, wybierz to tutaj — progi zostają te same, a detekcja i odtwarzanie dopasują się do Twojego stroju.",
+    "file_description_bass": "Ta tabulatura pochodzi z pliku Guitar Pro zapisanego w stroju {{name}}. Jeśli cały Twój bas jest nastrojony wyżej lub niżej, wybierz to tutaj — progi zostają te same, a detekcja i odtwarzanie dopasują się do Twojego stroju."
   },
   "header": {
     "close_session": "Zamknij sesję",

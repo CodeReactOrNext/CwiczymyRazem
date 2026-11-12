@@ -226,7 +226,7 @@ export const TablatureSection = memo(function TablatureSection({
     ? `${calibratedLatencyMs} ms`
     : isListening ? `~${Math.round(estimateLatencyMs())} ms` : null;
   const { openTimingCalibration, openMicSetup } = useSessionUI();
-  const { tuning, stringCount } = useGuitarTuningContext();
+  const { tuning, stringCount, pitchShift } = useGuitarTuningContext();
   const {
     settings,
     palette,
@@ -548,6 +548,7 @@ export const TablatureSection = memo(function TablatureSection({
             measures={activeTablature}
             baseTempo={baseTempo}
             staffHeader={alphaTexStaffHeader(tuning)}
+            transposeSemitones={pitchShift}
             mode='score'
             isPlaying={isAudioPlaying && showAlphaTabScore}
             countInRemaining={countInRemaining}

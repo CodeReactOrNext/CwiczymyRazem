@@ -8,6 +8,9 @@ interface GpTrack {
   pan: number; // -1.0 to 1.0
   /** Strings on the track's instrument — 4 for most basses, 7 for a seven-string. */
   stringCount: number;
+  /** MIDI note of each open string as the file tunes it, string 1 (the highest) first.
+   *  Absent on drums and vocals, and when the file doesn't say. */
+  openStringMidi?: number[];
 }
 
 export interface ParsedGp {
@@ -107,6 +110,15 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
       pan = guitarTrackCount % 2 === 0 ? -0.3 : 0.3;
       guitarTrackCount++;
     }
+
+    // The tuning the track is written in. AlphaTab lists the staff's open strings
+    // top line first, which is our string 1 — the same order the notes are mapped in.
+    const staffTuning: unknown = staff.tuning;
+    const openStringMidi = (trackType === 'guitar' || trackType === 'bass')
+      && Array.isArray(staffTuning) && staffTuning.length > 0
+      && staffTuning.every((midi): midi is number => typeof midi === 'number')
+      ? [...staffTuning]
+      : undefined;
 
     const measures: TablatureMeasure[] = [];
     let prevMasterBarIndex = -1;
@@ -356,6 +368,7 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
       trackType,
       pan,
       stringCount: staff.stringCount || 6,
+      ...(openStringMidi && { openStringMidi }),
     });
   });
 

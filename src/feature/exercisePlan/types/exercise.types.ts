@@ -170,6 +170,8 @@ export interface BackingTrack {
   trackType?: TabTrackType;
   /** Strings on the instrument, when the track says (a Guitar Pro import does) — 4 for most basses. */
   stringCount?: number;
+  /** MIDI note of each open string as a Guitar Pro file tunes it, string 1 (the highest) first. */
+  openStringMidi?: number[];
   pan?: number; // -1.0 (left) to 1.0 (right)
   /** Written by the auto-backing generator rather than imported or authored —
    *  played on the synthesised backing band (feature/autoBacking/synth). */

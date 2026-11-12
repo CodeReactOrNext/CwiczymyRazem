@@ -17,6 +17,9 @@ export interface AlphaTabScoreViewerProps {
   baseTempo?: number;
   /** Staff metadata for the generated alphaTex — a bass's strings and clef (alphaTexStaffHeader). */
   staffHeader?: string;
+  /** Semitones a Guitar Pro file is played higher (negative: lower) than written —
+   *  for a player whose whole instrument is tuned off the file. Sound only. */
+  transposeSemitones?: number;
   /** "score" = standard notation, "tab" = guitar tablature */
   mode?: "score" | "tab";
   /** True only after count-in — mirrors session's isAudioPlaying */

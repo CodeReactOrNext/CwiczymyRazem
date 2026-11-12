@@ -135,3 +135,61 @@ export function findNearestTuningString(
   });
   return { index, cents };
 }
+
+/** Id of a tuning read from a Guitar Pro file that matches none of the presets. */
+export const FILE_TUNING_ID = "file";
+
+/** Most strings a tuning can describe — the offsets carry one slot per standard guitar string. */
+const MAX_TUNED_STRINGS = 6;
+
+const FLAT_NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
+
+/**
+ * The tuning a Guitar Pro track is written in, from its open strings' MIDI notes
+ * (string 1 — the highest — first). The matching preset when there is one, else a
+ * one-off preset under FILE_TUNING_ID. Null when the track doesn't say, or has more
+ * strings than the offsets can hold (a seven-string).
+ */
+export function getFileTuning(
+  openStringMidi: readonly number[] | undefined,
+  instrument: Instrument,
+): GuitarTuningPreset | null {
+  const stringCount = openStringMidi?.length ?? 0;
+  if (!openStringMidi || stringCount === 0 || stringCount > MAX_TUNED_STRINGS) return null;
+  if (openStringMidi.some(midi => !Number.isFinite(midi))) return null;
+
+  const offsets = [1, 2, 3, 4, 5, 6].map(string =>
+    string <= stringCount ? openStringMidi[string - 1] - STANDARD_OPEN_STRING_MIDI[string] : 0);
+  const preset = getTuningsFor(instrument).find(candidate =>
+    candidate.stringCount === stringCount
+    && candidate.offsets.every((offset, i) => i >= stringCount || offset === offsets[i]));
+  if (preset) return preset;
+
+  const notation = [...openStringMidi].reverse()
+    .map(midi => FLAT_NOTE_NAMES[((midi % 12) + 12) % 12])
+    .join(" ");
+  return {
+    id: FILE_TUNING_ID,
+    name: "Custom",
+    notation,
+    offsets: offsets as unknown as TuningOffsets,
+    instrument,
+    stringCount,
+  };
+}
+
+/**
+ * How many semitones every string of `tuning` sits from the same string of
+ * `reference` — null when the strings don't all move together, or the two aren't
+ * the same instrument and string count. A whole-instrument shift is the only
+ * retune that leaves a tab's frets where they are: the same shapes, the same
+ * melody, just higher or lower.
+ */
+export function getTuningShiftFrom(reference: GuitarTuningPreset, tuning: GuitarTuningPreset): number | null {
+  if (reference.instrument !== tuning.instrument || reference.stringCount !== tuning.stringCount) return null;
+  const shift = tuning.offsets[0] - reference.offsets[0];
+  for (let i = 1; i < reference.stringCount; i++) {
+    if (tuning.offsets[i] - reference.offsets[i] !== shift) return null;
+  }
+  return shift;
+}

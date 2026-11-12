@@ -606,7 +606,11 @@
     "tunings": "Afinación",
     "bass_description": "Elige cómo está afinado tu bajo — la detección de tono y el audio de acompañamiento se ajustarán a esta afinación.",
     "instrument_lock_bass": "Este ejercicio está escrito para bajo.",
-    "instrument_lock_guitar": "Este ejercicio está escrito para guitarra."
+    "instrument_lock_guitar": "Este ejercicio está escrito para guitarra.",
+    "file_tuning": "Afinación del archivo",
+    "from_file": "del archivo",
+    "file_description": "Esta tablatura viene de un archivo de Guitar Pro escrito en afinación {{name}}. Si toda tu guitarra está afinada más aguda o más grave, elígelo aquí: los trastes no cambian, y la detección y la reproducción siguen tu afinación.",
+    "file_description_bass": "Esta tablatura viene de un archivo de Guitar Pro escrito en afinación {{name}}. Si todo tu bajo está afinado más agudo o más grave, elígelo aquí: los trastes no cambian, y la detección y la reproducción siguen tu afinación."
   },
   "header": {
     "close_session": "Cerrar sesión de práctica",
