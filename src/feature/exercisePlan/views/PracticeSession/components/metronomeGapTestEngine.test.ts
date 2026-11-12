@@ -2,42 +2,7 @@
 import type { Mock } from "vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { gapTestEngine, makeCueOffsets } from "./metronomeGapTestEngine";
-
-/** How far an offset sits from the nearest beat line, in beats. */
-const offBeat = (offset: number) => Math.abs(offset - Math.round(offset));
-
-describe("makeCueOffsets", () => {
-  it("times one cue per silent bar and reveals the first one without delay", () => {
-    const offsets = makeCueOffsets(4);
-    expect(offsets).toHaveLength(4);
-    expect(offsets[0]).toBe(0);
-  });
-
-  it("keeps every cue clear of a beat line and inside its own bar", () => {
-    for (let round = 0; round < 200; round++) {
-      makeCueOffsets(6)
-        .slice(1)
-        .forEach((offset) => {
-          // 0.29 rather than 0.3: the offsets are floating-point sums.
-          expect(offBeat(offset)).toBeGreaterThan(0.29);
-          expect(offset).toBeLessThan(4);
-        });
-    }
-  });
-
-  it("draws each bar on its own, so the cues aren't the grid with one shift", () => {
-    const queue = [0.9, 0, 0.1, 0.5, 0.9, 1];
-    const rand = () => queue.shift() ?? 0;
-    const offsets = makeCueOffsets(4, rand);
-    expect(offsets[0]).toBe(0);
-    expect(offsets[1]).toBeCloseTo(1.3, 5);
-    expect(offsets[2]).toBeCloseTo(0.5, 5);
-    expect(offsets[3]).toBeCloseTo(1.7, 5);
-    // Bar-to-bar spacing varies, so the cues can't be counted as a pulse.
-    expect(offsets[2] - offsets[1]).not.toBeCloseTo(offsets[3] - offsets[2], 5);
-  });
-});
+import { gapTestEngine } from "./metronomeGapTestEngine";
 
 class FakeAudioParam {
   value = 0;
@@ -119,6 +84,14 @@ describe("the spacebar while a gap test panel is mounted", () => {
     expect(gapTestEngine.getSnapshot().running).toBe(false);
     expect(sessionShortcut).toHaveBeenCalledTimes(1);
     input.remove();
+  });
+
+  it("reports nothing about the silence — counting it is the player's job", () => {
+    pressSpaceOn(document.body);
+    const state = gapTestEngine.getSnapshot();
+    expect(state.leadBar).toBe(0);
+    expect(state).not.toHaveProperty("silentBar");
+    expect(state).not.toHaveProperty("getReady");
   });
 
   it("drops a live round when the session clock stops", () => {

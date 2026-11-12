@@ -26,26 +26,50 @@ vi.mock("store/hooks", () => ({
 
 import { HeroAuthButtons } from "./HeroAuthButtons";
 
+// Both labels stay in the DOM (the idle one is aria-hidden and rolled out of
+// the key), so the state is read from the accessible names, not from the text.
 describe("HeroAuthButtons", () => {
   beforeEach(() => {
     sessionStatus = "loading";
   });
   afterEach(cleanup);
 
-  it("links to the dashboard as soon as the session is there, before the profile syncs", () => {
+  it("links to the dashboard as soon as the session is there, before the profile syncs", async () => {
     sessionStatus = "authenticated";
     render(<HeroAuthButtons />);
 
-    const link = screen.getByRole("link", { name: /go to dashboard/i });
+    // The first frame is the visitor's keys; the labels roll over on the next.
+    const link = await screen.findByRole("link", { name: /go to dashboard/i });
     expect(link.getAttribute("href")).toBe("/dashboard");
-    expect(screen.queryByText("Start tracking")).toBeNull();
+    expect(screen.queryByRole("link", { name: /start tracking/i })).toBeNull();
+    expect(
+      screen
+        .getByRole("link", { name: /start practicing/i })
+        .getAttribute("href"),
+    ).toBe("/timer");
   });
 
   it("offers sign-up to a visitor without a session", () => {
     sessionStatus = "unauthenticated";
     render(<HeroAuthButtons />);
 
-    expect(screen.getByText("Start tracking")).toBeTruthy();
-    expect(screen.queryByText("Go to Dashboard")).toBeNull();
+    const link = screen.getByRole("link", { name: /start tracking/i });
+    expect(link.getAttribute("href")).toBe("/signup");
+    expect(
+      screen.getByRole("link", { name: /continue with google/i }),
+    ).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /go to dashboard/i })).toBeNull();
+  });
+
+  it("keeps the same keys in every state, so the hero below never moves", async () => {
+    sessionStatus = "unauthenticated";
+    const { container, rerender } = render(<HeroAuthButtons />);
+    const before = container.querySelectorAll("a").length;
+
+    sessionStatus = "authenticated";
+    rerender(<HeroAuthButtons />);
+    await screen.findByRole("link", { name: /go to dashboard/i });
+
+    expect(container.querySelectorAll("a").length).toBe(before);
   });
 });

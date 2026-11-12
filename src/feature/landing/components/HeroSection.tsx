@@ -1,37 +1,21 @@
-import { Button } from "assets/components/ui/button";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { Logo } from "components/Logo/Logo";
+import { HeroCtaButtons } from "feature/landing/components/HeroCtaButtons";
 import { HERO_STATS } from "feature/landing/data/heroStats";
 import type { Transition, Variants } from "framer-motion";
 import { motion, useReducedMotion } from "framer-motion";
-import { trackSignupCtaClicked } from "lib/signupFunnel";
-import { ArrowRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 
-const StaticCTA = () => (
-  <div className='flex flex-col items-center gap-2'>
-    <Link href='/signup' onClick={() => trackSignupCtaClicked("landing_hero")}>
-      <Button className='group/btn h-14 rounded-lg border-none bg-white px-8 text-base font-bold text-black transition-colors duration-base hover:bg-zinc-50 active:scale-[0.98]'>
-        <span className='flex items-center gap-3 whitespace-nowrap'>
-          Start tracking
-          <ArrowRight className='h-5 w-5 text-cyan-500 transition-transform duration-base group-hover/btn:translate-x-1.5' />
-        </span>
-      </Button>
-    </Link>
-    <span className='mt-1 max-w-xs text-center text-xs font-medium leading-relaxed text-zinc-400'>
-      No credit card. Funded by player donations, not subscriptions.
-    </span>
-  </div>
-);
-
+// The static page and the auth chunk render the same box, so the hero does not
+// move when one replaces the other.
 const HeroAuthButtons = dynamic(
   () =>
     import("feature/landing/components/HeroAuthButtons").then(
       (m) => m.HeroAuthButtons,
     ),
-  { ssr: false, loading: () => <StaticCTA /> },
+  { ssr: false, loading: () => <HeroCtaButtons isLoggedIn={false} /> },
 );
 
 const easeOutExpo: Transition["ease"] = [0.16, 1, 0.3, 1];

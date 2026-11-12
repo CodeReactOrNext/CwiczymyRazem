@@ -36,18 +36,16 @@ export interface GapTestState {
   /** Currently lit metronome LED during the audible bars (0..3), or -1. */
   ledIndex: number;
   ledAccent: boolean;
-  /** During the gap: 0-based index of the current silent bar, or -1. */
-  silentBar: number;
-  /** True in the final silent bar — the target downbeat is approaching. */
-  getReady: boolean;
+  /** During the audible bars: 0-based index of the bar being played, or -1. */
+  leadBar: number;
   result: { verdict: GapVerdict; dev: number | null } | null;
   history: GapAttempt[];
 }
 
 const BEATS_PER_BAR = 4;
-const LEAD_BARS = 2; // audible bars before the silence
-const T_SUPER = 35; // |dev| <= this ms → "super" (levels up)
-const T_GOOD = 80; // |dev| <= this ms → "good"
+export const LEAD_BARS = 2; // audible bars before the silence
+export const T_SUPER = 35; // |dev| <= this ms → "super" (levels up)
+export const T_GOOD = 80; // |dev| <= this ms → "good"
 /**
  * Fixed input-latency compensation (ms). Keyboard/mouse presses register a bit
  * late (hardware debounce + USB polling), so taps read systematically "late".
@@ -59,31 +57,12 @@ export const RULER_RANGE = 200;
 export const TEMPO_MIN = 40;
 export const TEMPO_MAX = 160;
 
-/**
- * Cues shown while the click is silent (the bar counter, the "get ready"
- * arming) are pushed off the grid on purpose. A counter that ticked exactly on
- * the downbeat was a silent metronome — it handed back the very pulse the test
- * asks the player to hold. Every cue now sits at least CUE_MIN_OFF_BEAT beats
- * away from any beat line.
+/*
+ * Nothing is reported while the click is silent — no bar counter, no "get
+ * ready" in the last bar. Both used to exist (pushed off the grid so they
+ * couldn't be read as a pulse), but they still did the counting for the
+ * player. The state says "gap" and stays that way until the tap.
  */
-const CUE_MIN_OFF_BEAT = 0.3;
-/** A cue may also slip a whole beat late, so the gaps between cues vary. */
-const CUE_MAX_BEAT_SLIP = 1;
-
-/**
- * How late (in beats past its own downbeat) the UI may admit it has reached
- * each silent bar. Bar 0 is free: the click has only just stopped, so that
- * downbeat is already common knowledge. The rest are drawn independently, so
- * the cues never line up into a merely phase-shifted grid either.
- */
-export function makeCueOffsets(gapBars: number, rand: () => number = Math.random): number[] {
-  const offsets = [0];
-  for (let bar = 1; bar < gapBars; bar++) {
-    const slip = Math.min(CUE_MAX_BEAT_SLIP, Math.floor(rand() * (CUE_MAX_BEAT_SLIP + 1)));
-    offsets.push(slip + CUE_MIN_OFF_BEAT + rand() * (1 - 2 * CUE_MIN_OFF_BEAT));
-  }
-  return offsets;
-}
 
 const INITIAL_STATE: GapTestState = {
   phase: "idle",
@@ -92,8 +71,7 @@ const INITIAL_STATE: GapTestState = {
   gapBars: 2,
   ledIndex: -1,
   ledAccent: false,
-  silentBar: -1,
-  getReady: false,
+  leadBar: -1,
   result: null,
   history: [],
 };
@@ -116,8 +94,6 @@ class GapTestEngine {
     startPerf: number;
     gapPerf: number;
     targetPerf: number;
-    /** Per silent bar: how many beats past its downbeat the UI may reveal it. */
-    cueOffsets: number[];
   } | null = null;
 
   // --- external store API (useSyncExternalStore) ---
@@ -147,7 +123,7 @@ class GapTestEngine {
       window.removeEventListener("keydown", this.keyHandler, true);
       this.abort();
       // Keep the earned level, calibration and history; just stop any live round.
-      this.emit({ phase: "idle", running: false, ledIndex: -1, ledAccent: false });
+      this.emit({ phase: "idle", running: false, ledIndex: -1, ledAccent: false, leadBar: -1 });
     }
   }
 
@@ -188,7 +164,7 @@ class GapTestEngine {
   stop() {
     if (!this.state.running) return;
     this.abort();
-    this.emit({ running: false, phase: "idle", ledIndex: -1, ledAccent: false, silentBar: -1, getReady: false });
+    this.emit({ running: false, phase: "idle", ledIndex: -1, ledAccent: false, leadBar: -1 });
   }
 
   /** Begin a round at the current tempo using the current level + calibration. */
@@ -219,11 +195,10 @@ class GapTestEngine {
       startPerf: ctxToPerf(startCtx),
       gapPerf: ctxToPerf(startCtx + leadBeats * beatS),
       targetPerf: ctxToPerf(startCtx + targetBeat * beatS),
-      cueOffsets: makeCueOffsets(this.state.gapBars),
     };
 
     this.awaiting = true;
-    this.emit({ running: true, phase: "lead", result: null, ledIndex: -1, ledAccent: false, silentBar: -1, getReady: false });
+    this.emit({ running: true, phase: "lead", result: null, ledIndex: -1, ledAccent: false, leadBar: 0 });
 
     if (this.missTimer) clearTimeout(this.missTimer);
     this.missTimer = setTimeout(
@@ -250,38 +225,30 @@ class GapTestEngine {
     let phase: Phase;
     let ledIndex = -1;
     let ledAccent = false;
-    let silentBar = -1;
-    let getReady = false;
+    let leadBar = -1;
     if (now < r.gapPerf) {
       phase = "lead";
       const bf = (now - r.startPerf) / r.beatMs;
-      const inBar = Math.max(0, Math.floor(bf)) % BEATS_PER_BAR;
+      const beat = Math.max(0, Math.floor(bf));
+      const inBar = beat % BEATS_PER_BAR;
+      leadBar = Math.min(LEAD_BARS - 1, Math.floor(beat / BEATS_PER_BAR));
       const frac = bf - Math.floor(bf);
       if (frac < 0.26) {
         ledIndex = inBar;
         ledAccent = inBar === 0;
       }
     } else {
-      // Silence — no per-beat cue, that's the test. The bar counter still runs,
-      // but each step is held back to its own off-grid cue time so neither it nor
-      // the "get ready" arming that rides on it can be read as a beat.
+      // Silence — nothing to report until the tap. That's the test.
       phase = "gap";
-      const beatsIntoGap = (now - r.gapPerf) / r.beatMs;
-      const bars = r.cueOffsets.length;
-      let bar = 0;
-      while (bar + 1 < bars && beatsIntoGap >= (bar + 1) * BEATS_PER_BAR + r.cueOffsets[bar + 1]) bar++;
-      silentBar = bar;
-      getReady = bar >= bars - 1;
     }
 
     if (
       phase !== this.state.phase ||
       ledIndex !== this.state.ledIndex ||
       ledAccent !== this.state.ledAccent ||
-      silentBar !== this.state.silentBar ||
-      getReady !== this.state.getReady
+      leadBar !== this.state.leadBar
     ) {
-      this.emit({ phase, ledIndex, ledAccent, silentBar, getReady });
+      this.emit({ phase, ledIndex, ledAccent, leadBar });
     }
     if (this.state.running) this.raf = requestAnimationFrame(this.loop);
   };
@@ -314,8 +281,7 @@ class GapTestEngine {
       phase: "result",
       ledIndex: -1,
       ledAccent: false,
-      silentBar: -1,
-      getReady: false,
+      leadBar: -1,
       result: { verdict, dev: rounded },
       history: [attempt, ...this.state.history].slice(0, 24),
       gapBars: verdict === "super" ? this.state.gapBars + 1 : this.state.gapBars,
