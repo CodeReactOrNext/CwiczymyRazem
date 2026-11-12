@@ -400,6 +400,11 @@ describe("riff.quest MCP server", () => {
           artist: "Band",
           status: "learned",
           practiceMinutes: 0,
+          sessions: 0,
+          bestAccuracy: null,
+          lastAccuracy: null,
+          lastPracticed: null,
+          playableParts: [],
         },
         expect.objectContaining({
           id: "a",

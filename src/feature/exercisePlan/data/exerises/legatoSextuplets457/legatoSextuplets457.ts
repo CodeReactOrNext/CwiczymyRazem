@@ -30,6 +30,7 @@ export const legatoSextuplets457Exercise: Exercise = {
       "beats": [
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -40,6 +41,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -50,6 +52,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -60,6 +63,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 3,
@@ -69,6 +73,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -79,6 +84,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -89,6 +95,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -99,6 +106,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -109,6 +117,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -119,6 +128,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 3,
@@ -128,6 +138,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -138,6 +149,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -148,6 +160,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -158,6 +171,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -168,6 +182,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -178,6 +193,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 3,
@@ -187,6 +203,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -197,6 +214,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -207,6 +225,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -217,6 +236,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -227,6 +247,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -237,6 +258,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 3,
@@ -246,6 +268,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,
@@ -256,6 +279,7 @@ export const legatoSextuplets457Exercise: Exercise = {
         },
         {
           "duration": 0.16666666666666666,
+          "tuplet": 6,
           "notes": [
             {
               "string": 4,

@@ -10,7 +10,7 @@ export interface SpotifyTrackSuggestion {
   popularity?: number;
 }
 
-async function getSpotifyAccessToken(): Promise<string> {
+export async function getSpotifyAccessToken(): Promise<string> {
   const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 

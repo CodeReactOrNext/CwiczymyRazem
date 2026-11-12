@@ -34,7 +34,7 @@ Liczy się wszystko, co zagrasz, gdziekolwiek to zagrasz: sesja z Rotacji, rutyn
 
 <ClickPath steps="Moje rzeczy|Rotacja|Zagraj 3 najdawniej grane" caption="Rozpoczyna jedną krótką sesję z trzema rzeczami, których nie grałeś najdłużej." />
 
-Góra strony pokazuje kilka następnych pozycji jako rękę kart i to, ile czeka na odświeżenie. **Zagraj 3 najdawniej grane** wrzuca je do jednej sesji. Utwory dostają tam po pięć minut, a ćwiczenia zachowują swoją zwykłą długość. Przycisk odtwarzania w dowolnym wierszu rozpoczyna sesję tylko z tą jedną pozycją.
+Góra strony pokazuje kilka następnych pozycji jako rękę kart i to, ile czeka na odświeżenie. **Zagraj 3 najdawniej grane** wrzuca je do jednej sesji. Każdy utwór dostaje tyle, ile sam trwa, plus minutę na rozkręcenie się, więc zmieści się nawet długi kawałek. Jeśli aplikacja nie zna długości utworu, dostaje on dziesięć minut, a utwór z tabulaturą nigdy mniej niż jedno jej przegranie. Ćwiczenia zachowują swoją zwykłą długość. Przycisk odtwarzania w dowolnym wierszu rozpoczyna sesję tylko z tą jedną pozycją.
 
 **Wylosuj kartę** jest na dni, gdy chcesz pograć, ale nie chcesz wybierać. Dostajesz jedną losową kartę, częściej coś, czego dawno nie grałeś, nigdy tę samą kartę dwa razy z rzędu. Zagraj ją albo wylosuj inną.
 

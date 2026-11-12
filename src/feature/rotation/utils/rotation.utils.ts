@@ -18,8 +18,24 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
 export const COOLING_AFTER_DAYS = 7;
 /** Not played for this many days: rusty. */
 export const RUSTY_AFTER_DAYS = 21;
-/** A song gets a short slot — rotation refreshes what you know, it doesn't teach it. */
-export const ROTATION_SONG_MINUTES = 5;
+/**
+ * A song's slot when its length is unknown: long enough to play most songs
+ * through once, since a refresh stopped halfway is no refresh. A song with a
+ * tab stretches further in the session itself, to one pass of the tab at the
+ * tempo it is played.
+ */
+export const ROTATION_SONG_MINUTES = 10;
+/** Room on top of a song's length to tune, count in and find the first note. */
+export const SONG_SLOT_LEAD_IN_MINUTES = 1;
+
+/**
+ * A song's slot: one play-through plus a minute to get going, or the default
+ * slot when the song's length is unknown.
+ */
+export const songSlotMinutes = (durationMs: number | null | undefined) =>
+  durationMs && durationMs > 0
+    ? Math.ceil(durationMs / 60_000) + SONG_SLOT_LEAD_IN_MINUTES
+    : ROTATION_SONG_MINUTES;
 /** A timed custom item's slot when it shares a session with others (alone it runs on the free timer). */
 export const CUSTOM_SLOT_MINUTES = 10;
 /** How many items "Play the stalest" puts in one session. */
@@ -233,6 +249,8 @@ export const buildRotationPlan = (
   lastPracticed: LastPracticedMap,
   now: number,
   random: () => number = Math.random,
+  /** Song id → recording length, for the songs whose length is known. */
+  songDurationsMs: Readonly<Record<string, number>> = {},
 ): ExercisePlan | null => {
   const used = new Set<string>();
   const exercises: Exercise[] = [];
@@ -259,7 +277,7 @@ export const buildRotationPlan = (
           artist: item.artist ?? "",
           ...(item.coverUrl ? { coverUrl: item.coverUrl } : {}),
         },
-        ROTATION_SONG_MINUTES,
+        songSlotMinutes(songDurationsMs[item.id]),
       );
     }
 

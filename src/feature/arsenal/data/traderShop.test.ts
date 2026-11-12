@@ -24,6 +24,7 @@ import { getScrapYield } from "./scrapYield";
 import {
   getComponentOfferPrice,
   getModBillValue,
+  getPartStockWeight,
   getTraderOffers,
   getTraderRestockAt,
   getTraderShop,
@@ -210,6 +211,24 @@ describe("trader stock", () => {
     ).length;
     expect(withLegendary / days.length).toBeGreaterThan(0.25);
     expect(withLegendary / days.length).toBeLessThan(0.45);
+  });
+
+  it("never stocks a part at a tier no recipe asks for", () => {
+    for (const offers of windows(365)) {
+      for (const p of partOffers(offers)) {
+        if (p.partId === "screws" || p.partId === "pot") continue;
+        expect(getPartStockWeight(p.partId, p.tier)).toBeGreaterThan(0);
+      }
+    }
+    // Legendary tuners head no build ladder — they used to take the slot most.
+    expect(getPartStockWeight("tuners", "Legendary")).toBe(0);
+  });
+
+  it("stocks op-amps — the head of most pedal ladders — at or above the median", () => {
+    const tiers: PartTier[] = ["Standard", "Epic", "Legendary"];
+    for (const tier of tiers) {
+      expect(getPartStockWeight("opamp", tier)).toBeGreaterThanOrEqual(1);
+    }
   });
 
   it("keeps top-rarity featured items rare", () => {

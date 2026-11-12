@@ -15,6 +15,7 @@ import {
   pickSkillExercise,
   ROTATION_SONG_MINUTES,
   rotationKey,
+  songSlotMinutes,
   toRotationEntries,
 } from "./rotation.utils";
 
@@ -211,6 +212,19 @@ describe("pickSkillExercise", () => {
   });
 });
 
+describe("songSlotMinutes", () => {
+  it("gives one play-through rounded up plus a lead-in minute", () => {
+    expect(songSlotMinutes(2 * 60_000 + 35_000)).toBe(4);
+    expect(songSlotMinutes(5 * 60_000)).toBe(6);
+  });
+
+  it("falls back to the default slot when the length is unknown", () => {
+    expect(songSlotMinutes(undefined)).toBe(ROTATION_SONG_MINUTES);
+    expect(songSlotMinutes(null)).toBe(ROTATION_SONG_MINUTES);
+    expect(songSlotMinutes(0)).toBe(ROTATION_SONG_MINUTES);
+  });
+});
+
 describe("buildRotationPlan", () => {
   it("turns songs, exercises and skills into one session", () => {
     const plan = buildRotationPlan(
@@ -240,6 +254,22 @@ describe("buildRotationPlan", () => {
       artist: "Metallica",
     });
     expect(plan?.exercises[0].timeInMinutes).toBe(ROTATION_SONG_MINUTES);
+  });
+
+  it("fits a song's slot to its length when the length is known", () => {
+    const plan = buildRotationPlan(
+      [item("song", "s1"), item("song", "s2")],
+      CATALOG,
+      emptyLastPracticed(),
+      NOW,
+      () => 0,
+      { s1: 7 * 60_000 + 15_000 },
+    );
+
+    expect(plan?.exercises.map((entry) => entry.timeInMinutes)).toEqual([
+      9,
+      ROTATION_SONG_MINUTES,
+    ]);
   });
 
   it("lets a skill pick another drill than an exercise already in the session", () => {

@@ -196,6 +196,9 @@ const BUILD_LADDER: BuildStep[] = [
   },
 ];
 
+/** Levels the authored ladder covers — everything past it is the last step scaled up. */
+export const BUILD_LADDER_LENGTH = BUILD_LADDER.length;
+
 /** Past the ladder the last recipe simply scales up. No further promotions. */
 const BEYOND_LADDER_GROWTH = 1.4;
 

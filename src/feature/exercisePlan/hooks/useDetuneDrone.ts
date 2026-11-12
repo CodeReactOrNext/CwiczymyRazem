@@ -67,8 +67,14 @@ function retune(ctx: AudioContext, voice: Voice, frequency: number): void {
  * on the live oscillators rather than by restarting them, which is what lets the
  * slider be dragged while listening.
  */
-export function useDetuneDrone(referenceMidi: number, offsetCents: number) {
-  const [isPlaying, setIsPlaying] = useState(false);
+export function useDetuneDrone(
+  referenceMidi: number,
+  offsetCents: number,
+  /** Start sounding on mount — for a round reached by pressing Next, so the
+   *  player does not have to click play again every question. */
+  autoStart = false,
+) {
+  const [isPlaying, setIsPlaying] = useState(autoStart);
 
   const ctxRef = useRef<AudioContext | null>(null);
   const referenceVoiceRef = useRef<Voice | null>(null);
@@ -86,7 +92,8 @@ export function useDetuneDrone(referenceMidi: number, offsetCents: number) {
     setIsPlaying(false);
   }, []);
 
-  const start = useCallback(() => {
+  /** Brings the voices up. Kept free of React state so the mount effect can call it. */
+  const sound = useCallback((): boolean => {
     try {
       if (!ctxRef.current || ctxRef.current.state === "closed") {
         ctxRef.current = createAudioContext();
@@ -94,7 +101,7 @@ export function useDetuneDrone(referenceMidi: number, offsetCents: number) {
         tunedVoiceRef.current = null;
       }
       const ctx = ctxRef.current;
-      if (!ctx) return;
+      if (!ctx) return false;
       wakeAudioContext(ctx);
 
       const referenceFrequency = midiToFrequency(referenceMidi);
@@ -127,11 +134,25 @@ export function useDetuneDrone(referenceMidi: number, offsetCents: number) {
         );
       });
 
-      setIsPlaying(true);
+      return true;
     } catch {
       /* Web Audio unavailable — the panel stays usable, just silent */
+      return false;
     }
   }, [referenceMidi, offsetCents]);
+
+  const start = useCallback(() => {
+    if (sound()) setIsPlaying(true);
+  }, [sound]);
+
+  // Only the first render decides; later questions remount the quiz anyway.
+  const autoStartRef = useRef(autoStart);
+  const soundRef = useRef(sound);
+  useEffect(() => {
+    // isPlaying already started true; if Web Audio refuses, the toggle just
+    // reads "stop" once and the next click starts it properly.
+    if (autoStartRef.current) soundRef.current();
+  }, []);
 
   const toggle = useCallback(() => {
     if (isPlaying) stop();

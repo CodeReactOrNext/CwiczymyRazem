@@ -17,6 +17,8 @@ const note = (duration: number): TablatureBeat => ({
   notes: [{ string: 6, fret: 0 }],
 });
 const rest = (duration: number): TablatureBeat => ({ duration, notes: [] });
+/** A triplet eighth — a third of a beat, written as an eighth under a "3". */
+const triplet = (): TablatureBeat => ({ ...note(0.333), tuplet: 3 });
 
 /** A rhythmic building block that fills exactly `beats` quarter-note beats. */
 interface Cell {
@@ -49,7 +51,7 @@ const CELL_POOLS: Record<Difficulty, Cell[]> = {
     { beats: 1, make: () => [note(0.5), note(0.25), note(0.25)] },              // gallop
     { beats: 1, make: () => [note(0.25), note(0.25), note(0.5)] },              // reverse gallop
     { beats: 1, make: () => [rest(0.25), note(0.25), rest(0.25), note(0.25)] }, // 16th syncopation
-    { beats: 1, make: () => [note(0.333), note(0.333), note(0.333)] },          // triplet
+    { beats: 1, make: () => [triplet(), triplet(), triplet()] },                // triplet
     { beats: 1, make: () => [note(0.5), note(0.5)] },                           // two eighths
   ],
 };

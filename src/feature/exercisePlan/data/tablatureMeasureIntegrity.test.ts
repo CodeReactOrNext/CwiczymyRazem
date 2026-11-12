@@ -1,4 +1,5 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { inferTuplet } from "feature/exercisePlan/utils/notatedDuration";
 import { describe, expect, it } from "vitest";
 
 // A measure's notated length (sum of `beat.duration`, in quarter-note units) must equal
@@ -44,6 +45,21 @@ describe("exercise tablature measure integrity", () => {
       }
 
       expect(violations).toEqual([]);
+    },
+  );
+
+  // A triplet stored as a bare `duration: 0.333` renders without its "3" — the
+  // score falls back on inference, but the data should say what it means.
+  it.each(exercisesWithTablature.map((exercise) => [exercise.id, exercise] as const))(
+    "%s — triplet-length beats declare their tuplet",
+    (_id, exercise) => {
+      const bare = exercise.tablature!.flatMap((measure, mIdx) =>
+        measure.beats
+          .map((beat, bIdx) => ({ beat, at: `measure #${mIdx + 1} beat #${bIdx + 1}` }))
+          .filter(({ beat }) => beat.tuplet === undefined && inferTuplet(beat.duration) !== undefined)
+          .map(({ beat, at }) => `${at}: duration ${beat.duration}`),
+      );
+      expect(bare).toEqual([]);
     },
   );
 });

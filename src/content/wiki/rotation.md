@@ -34,7 +34,7 @@ Anything you play counts, wherever you play it: a session from Rotation, a routi
 
 <ClickPath steps="My Stuff|Rotation|Play the 3 stalest" caption="Starts one short session with the three things you haven't played for the longest." />
 
-The top of the page shows the next few items as a hand of cards and how many are waiting for a refresh. **Play the 3 stalest** puts them into one session. Songs get five minutes each there, and exercises keep their usual length. The play button on any row starts a session with just that one item.
+The top of the page shows the next few items as a hand of cards and how many are waiting for a refresh. **Play the 3 stalest** puts them into one session. Each song gets as long as the song itself plus a minute to get going, so even a long one fits. If the app can't find how long a song is, it gets ten minutes, and a song with a tab never gets less than one play-through of the tab. Exercises keep their usual length. The play button on any row starts a session with just that one item.
 
 **Draw a card** is for days when you want to play but don't want to pick. You get one random card, more often something you haven't played for a while, never the same card twice in a row. Play it or draw another.
 

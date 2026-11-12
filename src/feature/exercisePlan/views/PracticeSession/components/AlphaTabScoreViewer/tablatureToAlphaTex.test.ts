@@ -206,6 +206,23 @@ describe("tablatureToAlphaTex", () => {
     );
   });
 
+  it("infers the triplet of a bare, rounded 0.333 beat instead of writing a sixteenth", () => {
+    const measures: TablatureMeasure[] = [
+      {
+        timeSignature: [4, 4],
+        beats: [
+          { duration: 0.333, notes: [{ string: 5, fret: 0 }] },
+          { duration: 0.333, notes: [{ string: 5, fret: 0 }] },
+          { duration: 0.333, notes: [{ string: 5, fret: 0 }] },
+        ],
+      },
+    ];
+
+    expect(tablatureToAlphaTex(measures, 120)).toBe(
+      "\\tempo 120 \\ts 4 4 0.5.8 {tu 3} 0.5.8 {tu 3} 0.5.8 {tu 3} |",
+    );
+  });
+
   it("widens a measure's emitted time signature when its beats exceed the declared capacity (#741)", () => {
     // Some shipped exercise data crammed a whole phrase (e.g. 16 eighth notes = 8 quarter
     // notes) into a single TablatureMeasure still declared as 4/4 (capacity 4). Emitting

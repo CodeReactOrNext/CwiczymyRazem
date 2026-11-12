@@ -7,6 +7,7 @@ import { LIBRARY_TABS } from "constants/navTabs";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { useSongDurations } from "feature/songs/hooks/useSongDurations";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence } from "framer-motion";
 import { Dumbbell, Music, Plus, Target } from "lucide-react";
@@ -89,6 +90,13 @@ export const RotationView = () => {
     [entries],
   );
   const nextUp = playable.slice(0, STALEST_SESSION_SIZE);
+  // Each song's slot fits its length; until the lengths arrive (or for a song
+  // Spotify doesn't know) it gets the default slot.
+  const songIds = useMemo(
+    () => items.filter((item) => item.type === "song").map((item) => item.id),
+    [items],
+  );
+  const songDurations = useSongDurations(songIds);
   const stalestPlan = useMemo(
     () =>
       buildRotationPlan(
@@ -96,8 +104,10 @@ export const RotationView = () => {
         exercisesAgregat,
         lastPracticed,
         now,
+        Math.random,
+        songDurations,
       ),
-    [playable, lastPracticed, now],
+    [playable, lastPracticed, now, songDurations],
   );
 
   const startSession = (plan: ExercisePlan | null, source: SessionSource) => {
@@ -115,7 +125,14 @@ export const RotationView = () => {
 
   const playItems = (picked: RotationItem[], source: SessionSource) =>
     startSession(
-      buildRotationPlan(picked, exercisesAgregat, lastPracticed, now),
+      buildRotationPlan(
+        picked,
+        exercisesAgregat,
+        lastPracticed,
+        now,
+        Math.random,
+        songDurations,
+      ),
       source,
     );
 

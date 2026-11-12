@@ -34,7 +34,7 @@ Alles, was du spielst, zählt, wo immer du es spielst: eine Session aus der Rota
 
 <ClickPath steps="Meine Sachen|Rotation|Die 3 ältesten spielen" caption="Startet eine kurze Session mit den drei Dingen, die du am längsten nicht gespielt hast." />
 
-Oben auf der Seite werden die nächsten paar Posten als Kartenhand gezeigt, dazu wie viele auf eine Auffrischung warten. **Die 3 ältesten spielen** packt sie in eine Session. Songs bekommen dort je fünf Minuten, und Übungen behalten ihre übliche Länge. Die Abspiel-Schaltfläche in einer beliebigen Zeile startet eine Session nur mit diesem einen Posten.
+Oben auf der Seite werden die nächsten paar Posten als Kartenhand gezeigt, dazu wie viele auf eine Auffrischung warten. **Die 3 ältesten spielen** packt sie in eine Session. Jeder Song bekommt so lange, wie er selbst dauert, plus eine Minute zum Reinkommen, also passt auch ein langer Song hinein. Kennt die App die Länge eines Songs nicht, bekommt er zehn Minuten, und ein Song mit Tab nie weniger als ein Durchspielen des Tabs. Übungen behalten ihre übliche Länge. Die Abspiel-Schaltfläche in einer beliebigen Zeile startet eine Session nur mit diesem einen Posten.
 
 **Karte ziehen** ist für Tage, an denen du spielen, aber nicht wählen willst. Du bekommst eine zufällige Karte, öfter etwas, das du länger nicht gespielt hast, nie dieselbe Karte zweimal hintereinander. Spiel sie oder zieh eine andere.
 

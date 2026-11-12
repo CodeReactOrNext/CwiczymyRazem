@@ -127,6 +127,24 @@ const songSummary = (id: string, data: FirebaseFirestore.DocumentData) => ({
   url: appLink(`/songs?songId=${encodeURIComponent(id)}`),
 });
 
+/** The player's figures for one song, from `songProgress/<songId>`. */
+export const songStats = (progress: FirebaseFirestore.DocumentData = {}) => ({
+  practiceMinutes: msToMinutes(progress.totalPracticeMs),
+  sessions: progress.sessionCount ?? 0,
+  // Percent of notes hit in a scored tab run; null until one is scored.
+  bestAccuracy:
+    typeof progress.bestAccuracy === "number"
+      ? Math.round(progress.bestAccuracy)
+      : null,
+  lastAccuracy:
+    typeof progress.lastAccuracy === "number"
+      ? Math.round(progress.lastAccuracy)
+      : null,
+  lastPracticed:
+    progress.lastPracticedAt?.toDate?.().toISOString().slice(0, 10) ?? null,
+  playableParts: (progress.parts ?? []) as string[],
+});
+
 const SONG_LIST_STATUSES = ["learned", "learning", "wantToLearn"] as const;
 
 /** The deepest a song search pages — each page reads every song it skips. */
@@ -410,7 +428,7 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
     {
       title: "Song details",
       description:
-        "One song, with the player's status for it and their practice time on it.",
+        "One song, with the player's list status and their stats on it (minutes, sessions, best/last accuracy %, last practiced day, parts marked playable).",
       inputSchema: strictInput({ id: docId() }),
       annotations: READ_TOOL_ANNOTATIONS,
     },
@@ -429,7 +447,7 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
         return jsonResult({
           ...songSummary(song.id, song.data()!),
           yourStatus: status.data()?.status ?? null,
-          yourPracticeMinutes: msToMinutes(progress.data()?.totalPracticeMs),
+          yourStats: songStats(progress.data()),
         });
       }),
   );
@@ -439,7 +457,7 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
     {
       title: "My song lists",
       description:
-        "The songs on the player's own lists (learned, learning, wantToLearn) in their order, with practice minutes. Paged.",
+        "Every song title on the player's own lists (learned, learning, wantToLearn) in their order, each with its stats: minutes, sessions, best/last accuracy %, last practiced day, parts marked playable. Use this — not the totals — to name or review the player's songs. Paged.",
       inputSchema: strictInput({
         status: z
           .enum(SONG_LIST_STATUSES)
@@ -486,9 +504,7 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
                     artist: data.artist ?? null,
                   }),
               status: data.status,
-              practiceMinutes: msToMinutes(
-                progress[index].data()?.totalPracticeMs,
-              ),
+              ...songStats(progress[index].data()),
             };
           }),
         });

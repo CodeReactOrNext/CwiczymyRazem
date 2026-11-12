@@ -658,7 +658,7 @@ const PracticeSessionInner = ({
   }, [sessionTempoRuler]);
 
   // A song item's slot stretches to one pass of its tab at the speed it is
-  // played — a rotation song gets 5 minutes, and an 8-minute song stopped at 5
+  // played — a rotation song gets 10 minutes, and a 12-minute song stopped at 10
   // never gets played through.
   const songTabSeconds = songItemTabId && parsedGpTracks && effectiveBpm > 0
     ? (sessionTempoRuler.totalWarped * 60) / effectiveBpm

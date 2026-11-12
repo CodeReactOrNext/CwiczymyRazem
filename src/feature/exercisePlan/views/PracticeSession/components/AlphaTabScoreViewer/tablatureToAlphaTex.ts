@@ -1,61 +1,12 @@
 import type { TablatureBeat, TablatureMeasure, TablatureNote } from "feature/exercisePlan/types/exercise.types";
+import { resolveNotatedDuration } from "feature/exercisePlan/utils/notatedDuration";
 import { midiToNoteName, STANDARD_OPEN_STRING_MIDI } from "utils/audio/noteUtils";
 import type { GuitarTuningPreset } from "utils/audio/tunings";
-
-// alphaTex duration codes are the denominator of the note value (4 = quarter, 8 = eighth, …).
-// Our own model stores duration as a fraction of a quarter note, so the code is 4 / duration.
-const DURATION_CODES = [1, 2, 4, 8, 16, 32, 64];
-
-// alphaTex's default tuplet denominator per numerator (matches AlphaTab's own
-// AlphaTex1LanguageHandler._getTupletDenominator: 3→2, 5/6/7→4, 9/10/11/12→8).
-// A tuplet packs `numerator` notes into the time of `denominator` — e.g. a triplet
-// (3) packs 3 notes into the time of 2, so each one sounds for 2/3 of its notated length.
-const TUPLET_DENOMINATORS: Record<number, number> = { 3: 2, 5: 4, 6: 4, 7: 4, 9: 8, 10: 8, 11: 8, 12: 8 };
 
 const HARMONIC_TAGS: Record<number, string> = { 1: "nh", 2: "ah", 3: "th", 4: "ph", 5: "sh" };
 const SLIDE_IN_TAGS: Record<number, string> = { 1: "sib", 2: "sia" };
 // slideOut 3 ("SlideTo") has no dedicated alphaTex counterpart — closest is a legato slide.
 const SLIDE_OUT_TAGS: Record<number, string> = { 1: "ss", 2: "sl", 3: "sl" };
-
-interface ResolvedDuration {
-  code: number;
-  dots: number;
-}
-
-// Our model stores `beat.duration` as the note's actual *sounding* length (a fraction
-// of a quarter note) — for tuplets this is already time-compressed (a triplet eighth
-// sounds for 1/3 of a quarter, not 1/2). alphaTex instead wants the *notated* base
-// duration (its own `{tu N}` effect re-compresses it at render time), and has no
-// fractional duration for dotted notes — those are a separate `{d}`/`{dd}` beat effect
-// layered on top of the nearest power-of-two base.
-//
-// Getting either wrong (as the previous version did — it ignored `beat.tuplet` entirely
-// and had no dotted-note handling) makes a measure's total notated length silently
-// mismatch its declared `\ts`, which visibly desyncs the notation from the actual bars
-// as the piece progresses.
-function resolveDuration(duration: number, tuplet?: number): ResolvedDuration {
-  if (!duration || duration <= 0) return { code: 4, dots: 0 };
-
-  const tupletDenominator = tuplet ? TUPLET_DENOMINATORS[tuplet] : undefined;
-  // Undo the tuplet's time compression to recover the notated base duration.
-  const notated = tupletDenominator ? duration * (tuplet! / tupletDenominator) : duration;
-
-  const EPS = 1e-3;
-  for (const code of DURATION_CODES) {
-    const base = 4 / code;
-    if (Math.abs(notated - base) < EPS) return { code, dots: 0 };
-    if (Math.abs(notated - base * 1.5) < EPS) return { code, dots: 1 };
-    if (Math.abs(notated - base * 1.75) < EPS) return { code, dots: 2 };
-  }
-
-  // Fallback: nearest base duration, no dot (previous, imprecise behaviour) — used
-  // only for values that don't cleanly resolve to a plain/dotted/tupleted note.
-  const raw = 4 / notated;
-  const code = DURATION_CODES.reduce((closest, candidate) =>
-    Math.abs(candidate - raw) < Math.abs(closest - raw) ? candidate : closest,
-  );
-  return { code, dots: 0 };
-}
 
 // AlphaTab bend points: offset is 0..60 across the note. `value` is in half-semitone
 // (50 cents) units — confirmed against MidiFileGenerator.getPitchWheel, which derives the
@@ -146,7 +97,11 @@ function noteTex(note: TablatureNote, origins: WeakSet<TablatureNote>): string {
 }
 
 function beatTex(beat: TablatureBeat, origins: WeakSet<TablatureNote>): string {
-  const { code: duration, dots } = resolveDuration(beat.duration, beat.tuplet);
+  // alphaTex wants the *written* value — its own `{tu N}` re-compresses a tuplet and
+  // `{d}`/`{dd}` add the dots. Writing the sounding length instead makes a bar's
+  // notated length mismatch its `\ts` and plays the wrong rhythm. A beat stored as
+  // a bare `0.333` gets its triplet inferred rather than becoming a sixteenth.
+  const { code: duration, dots, tuplet } = resolveNotatedDuration(beat.duration, beat.tuplet);
   const content =
     beat.notes.length === 0
       ? "r"
@@ -154,7 +109,7 @@ function beatTex(beat: TablatureBeat, origins: WeakSet<TablatureNote>): string {
         ? noteTex(beat.notes[0], origins)
         : `(${beat.notes.map((note) => noteTex(note, origins)).join(" ")})`;
   const beatEffectTokens: string[] = [];
-  if (beat.tuplet) beatEffectTokens.push(`tu ${beat.tuplet}`);
+  if (tuplet) beatEffectTokens.push(`tu ${tuplet}`);
   // Picking direction is a beat effect in alphaTex too (`sd` = down, `su` = up),
   // which AlphaTab draws as the usual ⊓ / ⋁ markers above the staff.
   if (beat.pickStroke) beatEffectTokens.push(beat.pickStroke === "down" ? "sd" : "su");

@@ -246,6 +246,9 @@ interface BeatRD {
   notes: NoteRD[];
   isRest: boolean;
   tuplet?: number;
+  /** Written note value in quarters (a triplet eighth is 0.5); falls back to `duration`. */
+  writtenDuration?: number;
+  dots?: number;
   pickStroke?: "down" | "up";
 }
 
@@ -2209,7 +2212,9 @@ function paintFrame(frameStamp?: number) {
 
     // Rhythm notation
     if (inView && showRhythmLane) {
-      const dur = beat.duration;
+      // The written value, not the sounding length — a triplet eighth sounds for
+      // 1/3 of a beat but is drawn as an eighth (the "3" bracket says the rest).
+      const dur = beat.writtenDuration ?? beat.duration;
       ctx.strokeStyle = RHYTHM_COLOR;
       ctx.fillStyle = RHYTHM_COLOR;
 
@@ -2296,6 +2301,16 @@ function paintFrame(frameStamp?: number) {
               }
             }
           }
+        }
+      }
+
+      // Augmentation dots, to the right of the notehead (or rest).
+      if (beat.dots) {
+        const dotY = beat.isRest ? (STEM_TOP_Y + RHY_HEAD_Y) / 2 : RHY_HEAD_Y - 1;
+        for (let d = 0; d < beat.dots; d++) {
+          ctx.beginPath();
+          ctx.arc(beatL + RHY_HEAD_R + 5 + d * 5, dotY, 1.6, 0, Math.PI * 2);
+          ctx.fill();
         }
       }
     }

@@ -44,6 +44,10 @@ export interface Song {
   artist_lowercase?: string;
   tier?: string;
   spotifyId?: string;
+  /** Recording length from Spotify, written by the backend (`/api/songs/durations`). */
+  durationMs?: number;
+  /** Set once Spotify was asked for the length, found or not. */
+  durationLookedUp?: boolean;
   masteryProgress?: number;
   totalSections?: number;
 }

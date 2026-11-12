@@ -65,7 +65,8 @@ export function EarQuizPanel({
           <ProgressionQuiz key={round} question={question} {...shared} />
         )}
         {question.kind === "detune" && (
-          <DetuneQuiz key={round} question={question} {...shared} />
+          // Past the first round Next was the click, so the notes start on their own.
+          <DetuneQuiz key={round} question={question} autoPlay={round > 0} {...shared} />
         )}
         {question.kind === "scaleMode" && (
           <ScaleModeQuiz key={round} question={question} {...shared} />

@@ -1,4 +1,5 @@
 import type { PickStroke, TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { flagCountForCode, resolveNotatedDuration, TUPLET_DENOMINATORS } from "feature/exercisePlan/utils/notatedDuration";
 
 import { STRING_COUNT, stringRow } from "./tablatureStringRows";
 
@@ -47,7 +48,11 @@ export interface BeatRD {
   prevBeamRight2: boolean;
   notes: NoteRD[];
   isRest: boolean;
+  /** The beat's tuplet — its own, or inferred from a bare triplet length. */
   tuplet?: number;
+  /** Written note value in quarters, before dots and tuplet (a triplet eighth is 0.5). */
+  writtenDuration: number;
+  dots: number;
   pickStroke?: PickStroke;
 }
 
@@ -101,18 +106,26 @@ export function buildTablatureRenderData(
   const tupletGroups: TupletGroup[]  = [];
   let hasAccents = false, hasDyn = false;
   let prevSig: [number, number] | null = null;
-  let activeTuplet: { num: number; x1: number; x2: number } | null = null;
+  let activeTuplet: { num: number; x1: number; x2: number; span: number } | null = null;
+
+  const closeTuplet = () => {
+    if (activeTuplet) tupletGroups.push({ num: activeTuplet.num, x1: activeTuplet.x1, x2: activeTuplet.x2 });
+    activeTuplet = null;
+  };
 
   measures.forEach((measure, mIdx) => {
     const sig = measure.timeSignature;
+    const written = measure.beats.map(beat => resolveNotatedDuration(beat.duration, beat.tuplet));
     if (!prevSig || prevSig[0] !== sig[0] || prevSig[1] !== sig[1]) {
       timeSigMarkers.push({ x: currentX, sig, beatIdx: renderBeats.length });
       prevSig = sig;
     }
 
     measure.beats.forEach((beat, bIdx) => {
-      const next        = measure.beats[bIdx + 1];
       const beatStartX  = currentX;
+      const { code, dots, tuplet } = written[bIdx];
+      const flags      = flagCountForCode(code);
+      const nextFlags  = bIdx + 1 < written.length ? flagCountForCode(written[bIdx + 1].code) : 0;
 
       const notes: NoteRD[] = beat.notes.map((note, nIdx) => {
         if (note.isAccented)             hasAccents = true;
@@ -153,32 +166,38 @@ export function buildTablatureRenderData(
         duration:       beat.duration,
         topNoteY:       STAFF_TOP + topRow * stringSpacing,
         chordName:      beat.chordName,
-        beamRight:      beat.duration <= 0.5  && !!next && next.duration <= 0.5,
-        beamRight2:     beat.duration <= 0.25 && !!next && next.duration <= 0.25,
+        // Beamed by the *written* value: a triplet eighth (sounding 1/3) carries one
+        // beam like any eighth, and a dotted eighth beams to the sixteenth after it.
+        beamRight:      flags >= 1 && nextFlags >= 1,
+        beamRight2:     flags >= 2 && nextFlags >= 2,
         prevBeamRight:  false,
         prevBeamRight2: false,
         notes,
         isRest: beat.notes.length === 0,
-        tuplet: beat.tuplet,
+        tuplet,
+        writtenDuration: 4 / code,
+        dots,
         pickStroke: beat.pickStroke,
       });
       currentX += beat.duration;
 
-      const tupNum = beat.tuplet ?? null;
-      if (tupNum !== null) {
-        if (!activeTuplet || activeTuplet.num !== tupNum) {
-          if (activeTuplet) tupletGroups.push({ ...activeTuplet });
-          activeTuplet = { num: tupNum, x1: beatStartX, x2: currentX };
+      if (tuplet !== undefined) {
+        if (!activeTuplet || activeTuplet.num !== tuplet) {
+          closeTuplet();
+          // `num` notes of the written value fill the time of `denominator` of them —
+          // one bracket per such group, not one across a whole bar of triplets.
+          const span = (TUPLET_DENOMINATORS[tuplet] ?? tuplet) * (4 / code);
+          activeTuplet = { num: tuplet, x1: beatStartX, x2: currentX, span };
         } else {
           activeTuplet.x2 = currentX;
         }
-      } else if (activeTuplet) {
-        tupletGroups.push({ ...activeTuplet });
-        activeTuplet = null;
+        if (activeTuplet.x2 - activeTuplet.x1 >= activeTuplet.span - 1e-2) closeTuplet();
+      } else {
+        closeTuplet();
       }
     });
 
-    if (activeTuplet) { tupletGroups.push({ ...activeTuplet }); activeTuplet = null; }
+    closeTuplet();
     measureEndXs.push(currentX);
   });
 

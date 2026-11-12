@@ -30,6 +30,8 @@ interface DetuneQuizProps {
   isCorrect: boolean;
   onAnswer: (correct: boolean) => void;
   onNext: () => void;
+  /** Start the two notes straight away — set for every round reached via Next. */
+  autoPlay?: boolean;
 }
 
 /** Slider travel each way. Wider than the largest error a question can start
@@ -44,6 +46,7 @@ export function DetuneQuiz({
   isCorrect,
   onAnswer,
   onNext,
+  autoPlay = false,
 }: DetuneQuizProps) {
   const { t } = useTranslation("session");
   const [sliderCents, setSliderCents] = useState(0);
@@ -53,6 +56,7 @@ export function DetuneQuiz({
   const drone = useDetuneDrone(
     question.referenceMidi,
     remainingDetuneCents(question, sliderCents),
+    autoPlay,
   );
 
   const judgedCents = submittedCents ?? sliderCents;

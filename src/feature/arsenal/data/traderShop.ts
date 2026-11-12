@@ -47,6 +47,7 @@ import {
   rollVintageYear,
 } from "./itemStats";
 import { PART_DEFINITIONS, PART_TIERS } from "./partDefinitions";
+import { getPartDemand } from "./partDemand";
 import { getPartSupply } from "./partSupply";
 import { rollItemTraits } from "./traits";
 import type { ModFeatureDef } from "./workshop";
@@ -313,10 +314,8 @@ const MEDIAN_SUPPLY = new Map<PartTier, number>(
  * How much dearer than average a part is, by how little of it the drop tables
  * actually pay out (`partSupply.ts`).
  *
- * One number does two jobs: it prices the part *and* weights how often the
- * counter stocks it. So the parts the game starves — `tuners` at Legendary being
- * the documented worst case — show up more often and cost more, which is exactly
- * the shape of a shortage.
+ * Prices only. It used to weight the shelf too, which stocked the parts recipes
+ * lean on hardest the least — see `getPartStockWeight`.
  */
 export const getPartScarcityMultiplier = (
   partId: PartId,
@@ -330,6 +329,48 @@ export const getPartScarcityMultiplier = (
 
 const roundTo = (value: number, step: number): number =>
   Math.max(step, Math.round(value / step) * step);
+
+/** Cap on how much likelier than the median a part can be to land on the shelf. */
+const STOCK_WEIGHT_MAX = 2;
+
+/** Demand per piece of supply, by part and tier. */
+const getPartPressure = (partId: PartId, tier: PartTier): number => {
+  const demand = getPartDemand(partId, tier);
+  if (demand <= 0) return 0;
+  return demand / Math.max(1, getPartSupply(partId, tier));
+};
+
+/** Median pressure per tier among parts something actually asks for. */
+const MEDIAN_PRESSURE = new Map<PartTier, number>(
+  PART_TIERS.map((tier) => [
+    tier,
+    medianOf(
+      STOCKABLE_PARTS.map((p) => getPartPressure(p.id, tier)).filter(
+        (v) => v > 0,
+      ),
+    ),
+  ]),
+);
+
+/**
+ * How often the counter stocks a part, relative to the median one at its tier.
+ *
+ * Weighted by demand over supply (`partDemand.ts` / `partSupply.ts`), not by
+ * supply alone. Supply alone sent the shelf the wrong way twice over: `opamp`
+ * is the best-supplied pedal part, so recipes ask for it first on nearly every
+ * pedal — and the same number made the counter stock it least, while Legendary
+ * tuners that no build asks for took the slot most. A part nothing asks for at a
+ * tier is never stocked at that tier.
+ *
+ * Price stays on `getPartScarcityMultiplier` — this moves what is on the shelf,
+ * not what it costs.
+ */
+export const getPartStockWeight = (partId: PartId, tier: PartTier): number => {
+  const pressure = getPartPressure(partId, tier);
+  if (pressure <= 0) return 0;
+  const median = MEDIAN_PRESSURE.get(tier) ?? pressure;
+  return Math.min(STOCK_WEIGHT_MAX, pressure / median);
+};
 
 /** Fame for one piece of a part, scarcity included. */
 export const getPartUnitPrice = (partId: PartId, tier: PartTier): number => {
@@ -369,8 +410,12 @@ const canStockAt = (maxTier: PartTier, tier: PartTier): boolean =>
 
 const drawParts = (tier: PartTier, count: number, random: () => number) =>
   weightedSample(
-    STOCKABLE_PARTS.filter((p) => canStockAt(p.maxTier, tier)),
-    (p) => getPartScarcityMultiplier(p.id, tier),
+    // Zero-weight parts are filtered out, not just weighted out: once the
+    // weighted ones run dry `weightedPick` falls back to a uniform pick.
+    STOCKABLE_PARTS.filter(
+      (p) => canStockAt(p.maxTier, tier) && getPartStockWeight(p.id, tier) > 0,
+    ),
+    (p) => getPartStockWeight(p.id, tier),
     count,
     random,
   );

@@ -34,7 +34,7 @@ Cuenta todo lo que toques, dondequiera que lo toques: una sesión de Rotación, 
 
 <ClickPath steps="Mis cosas|Rotación|Tocar los 3 más olvidados" caption="Empieza una sesión corta con las tres cosas que llevas más tiempo sin tocar." />
 
-La parte superior de la página muestra los siguientes elementos como una mano de cartas y cuántos esperan un repaso. **Tocar los 3 más olvidados** los mete en una sesión. Las canciones reciben allí cinco minutos cada una, y los ejercicios conservan su duración habitual. El botón de reproducir de cualquier fila empieza una sesión solo con ese elemento.
+La parte superior de la página muestra los siguientes elementos como una mano de cartas y cuántos esperan un repaso. **Tocar los 3 más olvidados** los mete en una sesión. Cada canción recibe lo que dura, más un minuto para arrancar, así que cabe incluso una canción larga. Si la app no sabe cuánto dura una canción, recibe diez minutos, y una canción con tablatura nunca menos que tocar la tablatura entera una vez. Los ejercicios conservan su duración habitual. El botón de reproducir de cualquier fila empieza una sesión solo con ese elemento.
 
 **Sacar una carta** es para los días en que quieres tocar pero no quieres elegir. Recibes una carta al azar, más a menudo algo que llevas un tiempo sin tocar, nunca la misma carta dos veces seguidas. Tócala o saca otra.
 
