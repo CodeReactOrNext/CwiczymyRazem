@@ -20,7 +20,9 @@ export function useStartGate(isPlaying: boolean) {
 
 interface StartGateProps {
   onStart: () => void;
-  onPreview: () => void;
+  /** Lifts the veil without the clock. Left out where the board IS the answer
+   *  sheet (the click drills): there's nothing to read first, only to score. */
+  onPreview?: () => void;
   /** The exercise runs to a metronome, which counts the player in first. */
   countsIn: boolean;
   /** The mic is on for this exercise — what the backing-into-the-mic note depends on. */
@@ -50,17 +52,21 @@ export const StartGate = memo(function StartGate({
         className,
       )}>
       <div className='flex flex-wrap items-center justify-center gap-3'>
-        <Button size='lg' onClick={onStart} className='h-12 gap-2 px-8 text-base font-bold'>
+        {/* Called bare: onStart can be the timer's startTimer(delayMs), and the
+            click event landing in delayMs started the clock at NaN. */}
+        <Button size='lg' onClick={() => onStart()} className='h-12 gap-2 px-8 text-base font-bold'>
           <Play className='mr-2 !size-5' />
           {t("start_gate.start")}
         </Button>
-        <Button size='lg' variant='ghost' onClick={onPreview} className='h-12 gap-2 px-6 text-base font-semibold'>
-          <Eye className='mr-2 !size-5' />
-          {t("start_gate.preview")}
-        </Button>
+        {onPreview && (
+          <Button size='lg' variant='ghost' onClick={onPreview} className='h-12 gap-2 px-6 text-base font-semibold'>
+            <Eye className='mr-2 !size-5' />
+            {t("start_gate.preview")}
+          </Button>
+        )}
       </div>
       <p className='max-w-xs text-sm leading-relaxed text-zinc-400'>
-        {countsIn ? t("start_gate.hint_count_in") : t("start_gate.hint")}
+        {!onPreview ? t("start_gate.hint_no_preview") : countsIn ? t("start_gate.hint_count_in") : t("start_gate.hint")}
       </p>
       {/* Said here, before the clock runs, rather than over the tab mid-play. */}
       {showLeakNotice && <BackingLeakNotice />}

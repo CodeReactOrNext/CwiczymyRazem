@@ -1,14 +1,14 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { IntervalClickPanel } from "./IntervalClickPanel";
 
 // Rendered without a NoteMatchingProvider: the context defaults stand in for a
 // session that hasn't started tracking yet, which is exactly the state the panel
 // mounts in. Anything that crashes here crashes on the way into the exercise.
-const renderPanel = () =>
+const renderPanel = (isPlaying = false, onStart: () => void = () => {}) =>
   render(
     <IntervalClickPanel
       rootNote="A"
@@ -16,7 +16,8 @@ const renderPanel = () =>
       targetNote="E"
       startFret={0}
       endFret={4}
-      isPlaying={false}
+      isPlaying={isPlaying}
+      onStart={onStart}
     />,
   );
 
@@ -49,5 +50,18 @@ describe("IntervalClickPanel", () => {
   it("reuses the shared neck diagram", () => {
     renderPanel();
     expect(screen.getByLabelText("Clickable fretboard")).toBeDefined();
+  });
+
+  it("puts the board under the Start gate until the clock runs, without a Preview", () => {
+    const onStart = vi.fn();
+    renderPanel(false, onStart);
+    expect(screen.queryByRole("button", { name: /preview/i })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /start/i }));
+    expect(onStart).toHaveBeenCalledOnce();
+  });
+
+  it("drops the gate once the clock runs", () => {
+    renderPanel(true);
+    expect(screen.queryByRole("button", { name: /^start$/i })).toBeNull();
   });
 });

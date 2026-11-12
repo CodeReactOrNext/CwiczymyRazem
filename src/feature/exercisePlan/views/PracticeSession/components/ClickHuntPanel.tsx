@@ -23,9 +23,11 @@ interface ClickHuntPanelProps {
   startFret: number;
   endFret: number;
   strings?: number[];
-  /** Whether the session timer is running — the note-rotation countdown is
-   *  frozen until it is, even though clicking itself always works. */
+  /** Whether the session timer is running. While it isn't, the board sits under
+   *  the Start gate and clicks don't score — same as every other exercise. */
   isPlaying: boolean;
+  /** Starts the session clock, from the Start gate over the board. */
+  onStart: () => void;
   /** Shows the mistake counter and puts it under the exam's 3-strike limit. */
   isExamMode?: boolean;
   /** Dev-only (non-production): fast-tracks the WHOLE EXAM finish flow instantly.
@@ -44,7 +46,7 @@ const stripFretRange = (description?: string) =>
  * Click-to-answer counterpart to NoteHuntDetector: shows the target note name
  * and a clickable fretboard diagram instead of mic-driven pitch detection.
  */
-export function ClickHuntPanel({ targetNote: targetNoteProp, description, startFret, endFret, strings, isPlaying, isExamMode, onDevPassExam }: ClickHuntPanelProps) {
+export function ClickHuntPanel({ targetNote: targetNoteProp, description, startFret, endFret, strings, isPlaying, onStart, isExamMode, onDevPassExam }: ClickHuntPanelProps) {
   const { t } = useTranslation("session");
   const { clickHunt, huntTarget, noteHuntSecondsLeft, advanceHunt, registerFretClick } = useNoteMatchingContext();
   const mistakeCount = clickHunt?.mistakeCount ?? 0;
@@ -111,13 +113,16 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
   // the red flash already says enough.
   const handleCellClick = useCallback(
     (string: number, fret: number) => {
+      // The gate covers the board while stopped; this keeps a stray click from
+      // scoring in the frame it fades in or out.
+      if (!isPlaying) return;
       if (noteSound && targetPositions.some((p) => p.string === string && p.fret === fret)) {
         const midi = midiForPosition(string, fret);
         if (midi >= 0) playGuitarNotePreview(midi);
       }
       registerFretClick(string, fret);
     },
-    [noteSound, targetPositions, registerFretClick],
+    [isPlaying, noteSound, targetPositions, registerFretClick],
   );
 
   const instruction = stripFretRange(description);
@@ -125,6 +130,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
   return (
     <HuntStage
       awaitingStart={!isPlaying}
+      onStart={onStart}
       stats={
         <HuntStats
           score={score}

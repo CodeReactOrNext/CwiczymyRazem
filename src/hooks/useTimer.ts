@@ -39,7 +39,10 @@ const useTimer = () => {
   const startTimer = useCallback((delayMs = 0) => {
     if (timerEnabledRef.current) return;
     timerEnabledRef.current = true;
-    startTimeRef.current = Date.now() + Math.max(0, delayMs);
+    // Anything but a real number (e.g. a click event from `onClick={startTimer}`)
+    // would start the clock at NaN — treat it as no delay.
+    const delay = typeof delayMs === "number" && Number.isFinite(delayMs) ? Math.max(0, delayMs) : 0;
+    startTimeRef.current = Date.now() + delay;
     setTimerEnabled(true);
     notify();
   }, [notify]);

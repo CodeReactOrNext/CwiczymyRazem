@@ -145,10 +145,6 @@
     "hide_tabs": "Hide Fret Tabs",
     "by_ear": "Play by ear/memory"
   },
-  "hunt": {
-    "press_play": "Press Play below to start the timer",
-    "click_now": "you can click right away"
-  },
   "quick": {
     "tempo_reset": "Metronome tempo — reset to recommended",
     "slower_hint": "Slower (Shift: −5 BPM)",
@@ -766,7 +762,8 @@
     "start": "Start",
     "preview": "Preview",
     "hint_count_in": "The metronome counts you in, then you play. Preview lets you look at the tab without the clock.",
-    "hint": "The clock starts when you press Start. Preview lets you look first."
+    "hint": "The clock starts when you press Start. Preview lets you look first.",
+    "hint_no_preview": "The clock and the score start when you press Start."
   },
   "mic_open_failed": {
     "title": "The microphone didn't turn on",

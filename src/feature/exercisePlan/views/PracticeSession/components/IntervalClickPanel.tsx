@@ -30,9 +30,11 @@ interface IntervalClickPanelProps {
   startFret: number;
   endFret: number;
   strings?: number[];
-  /** Whether the session timer is running — the prompt countdown is frozen until
-   *  it is, even though clicking always works. */
+  /** Whether the session timer is running. While it isn't, the board sits under
+   *  the Start gate and clicks don't score — same as every other exercise. */
   isPlaying: boolean;
+  /** Starts the session clock, from the Start gate over the board. */
+  onStart: () => void;
   /** Shows the mistake counter and puts it under the exam's 3-strike limit. */
   isExamMode?: boolean;
   /** Dev-only (non-production): fast-tracks the WHOLE EXAM finish flow instantly. */
@@ -120,6 +122,7 @@ export function IntervalClickPanel({
   endFret,
   strings,
   isPlaying,
+  onStart,
   isExamMode,
   onDevPassExam,
 }: IntervalClickPanelProps) {
@@ -255,13 +258,16 @@ export function IntervalClickPanel({
   // a row with no shape to them.
   const handleCellClick = useCallback(
     (string: number, fret: number) => {
+      // The gate covers the board while stopped; this keeps a stray click from
+      // scoring in the frame it fades in or out.
+      if (!isPlaying) return;
       if (noteSound && !onInterval && rootPositions.some((p) => p.string === string && p.fret === fret)) {
         const midi = midiForPosition(string, fret);
         if (midi >= 0) playGuitarNotePreview(midi);
       }
       registerIntervalClick(string, fret);
     },
-    [noteSound, onInterval, rootPositions, registerIntervalClick],
+    [isPlaying, noteSound, onInterval, rootPositions, registerIntervalClick],
   );
 
   const [showSemitones, setShowSemitones] = useState(false);
@@ -280,6 +286,7 @@ export function IntervalClickPanel({
   return (
     <HuntStage
       awaitingStart={!isPlaying}
+      onStart={onStart}
       railClassName="xl:w-64"
       stats={
         <HuntStats

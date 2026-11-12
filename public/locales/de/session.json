@@ -145,10 +145,6 @@
     "hide_tabs": "Tabs ausblenden",
     "by_ear": "Nach Gehör/aus dem Gedächtnis spielen"
   },
-  "hunt": {
-    "press_play": "Drück unten auf Play, um den Timer zu starten",
-    "click_now": "du kannst sofort klicken"
-  },
   "quick": {
     "tempo_reset": "Metronom-Tempo – auf empfohlen zurücksetzen",
     "slower_hint": "Langsamer (Shift: −5 BPM)",
@@ -677,7 +673,8 @@
     "start": "Start",
     "preview": "Vorschau",
     "hint_count_in": "Das Metronom zählt ein, dann spielst du. Mit Vorschau siehst du die Tabulatur, ohne dass die Zeit läuft.",
-    "hint": "Die Zeit läuft ab Start. Mit Vorschau kannst du dich erst umsehen."
+    "hint": "Die Zeit läuft ab Start. Mit Vorschau kannst du dich erst umsehen.",
+    "hint_no_preview": "Zeit und Punkte zählen ab Start."
   },
   "mic_open_failed": {
     "title": "Das Mikrofon ging nicht an",

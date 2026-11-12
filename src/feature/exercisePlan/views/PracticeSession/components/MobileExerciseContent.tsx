@@ -134,6 +134,7 @@ export function MobileExerciseContent({
               endFret={currentExercise.customGoalRegion?.endFret ?? 12}
               strings={currentExercise.customGoalStrings}
               isPlaying={isPlaying}
+              onStart={startTimer}
               isExamMode={isExamMode}
             />
           ) : currentExercise.noteHuntConfig?.mode === "click" ? (
@@ -146,6 +147,7 @@ export function MobileExerciseContent({
               endFret={currentExercise.customGoalRegion?.endFret ?? 12}
               strings={currentExercise.customGoalStrings}
               isPlaying={isPlaying}
+              onStart={startTimer}
               isExamMode={isExamMode}
             />
           ) : (

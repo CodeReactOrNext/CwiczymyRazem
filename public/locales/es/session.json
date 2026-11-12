@@ -145,10 +145,6 @@
     "hide_tabs": "Ocultar tablatura",
     "by_ear": "Tocar de oído/de memoria"
   },
-  "hunt": {
-    "press_play": "Pulsa Play abajo para iniciar el temporizador",
-    "click_now": "ya puedes hacer clic"
-  },
   "quick": {
     "tempo_reset": "Tempo del metrónomo: volver al recomendado",
     "slower_hint": "Más lento (Mayús: −5 BPM)",
@@ -677,7 +673,8 @@
     "start": "Empezar",
     "preview": "Vista previa",
     "hint_count_in": "El metrónomo marca la entrada y luego tocas. Vista previa te deja ver la tablatura sin que corra el tiempo.",
-    "hint": "El tiempo empieza al pulsar Empezar. Vista previa te deja mirar antes."
+    "hint": "El tiempo empieza al pulsar Empezar. Vista previa te deja mirar antes.",
+    "hint_no_preview": "El tiempo y los puntos cuentan desde que pulsas Empezar."
   },
   "mic_open_failed": {
     "title": "El micrófono no se activó",

@@ -23,6 +23,15 @@ describe("useTimer — count-in delay", () => {
     expect(result.current.getTime()).toBe(1000);
   });
 
+  it("treats a non-number delay (a click event from onClick={startTimer}) as no delay", () => {
+    const { result } = renderHook(() => useTimer());
+
+    act(() => (result.current.startTimer as (d: unknown) => void)({ type: "click" }));
+    act(() => { vi.advanceTimersByTime(1000); });
+    // NaN here read as "time's up" downstream and stopped the clock at once.
+    expect(result.current.getTime()).toBe(1000);
+  });
+
   it("banks nothing when stopped mid-delay", () => {
     const { result } = renderHook(() => useTimer());
 

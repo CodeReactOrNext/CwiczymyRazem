@@ -1,13 +1,16 @@
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { useTranslation } from "hooks/useTranslation";
 import type { ReactNode } from "react";
 
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
+import { StartGate } from "./StartGate";
 
 interface HuntStageProps {
-  /** Dims the whole stage until the session timer is started. */
+  /** The session clock is stopped: the stage sits under the same Start gate as
+   *  the tab exercises, and nothing on the board can be clicked or scored. */
   awaitingStart?: boolean;
+  /** Starts the session clock — the gate's Start button. */
+  onStart?: () => void;
   /** Score / strikes / countdown pills. */
   stats?: ReactNode;
   /** Target card(s) plus the one-line instruction — the "what am I doing" block. */
@@ -40,6 +43,7 @@ interface HuntStageProps {
  */
 export function HuntStage({
   awaitingStart,
+  onStart,
   stats,
   prompt,
   controls,
@@ -48,7 +52,6 @@ export function HuntStage({
   className,
   railClassName,
 }: HuntStageProps) {
-  const { t } = useTranslation("session");
   return (
     <div
       className={cn(
@@ -57,22 +60,7 @@ export function HuntStage({
         "shortwide:gap-2",
         className,
       )}>
-      <AnimatePresence>
-        {awaitingStart && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-zinc-950/40 backdrop-blur-[1px]">
-            <span className="rounded-lg bg-zinc-900/90 px-5 py-3 text-center text-sm font-bold tracking-wide text-amber-200">
-              ▶ {t("hunt.press_play")}
-              <br />
-              <span className="text-xs font-semibold text-zinc-400">{t("hunt.click_now")}</span>
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {awaitingStart && onStart && <StartGate onStart={onStart} countsIn={false} className="rounded-lg" />}
 
       <div
         className={cn(

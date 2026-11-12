@@ -266,6 +266,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
               endFret={currentExercise.customGoalRegion?.endFret ?? 12}
               strings={currentExercise.customGoalStrings}
               isPlaying={isPlaying}
+              onStart={startTimer}
               isExamMode={isExamMode}
               onDevPassExam={onDevPassExam}
             />
@@ -277,6 +278,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
               endFret={currentExercise.customGoalRegion?.endFret ?? 12}
               strings={currentExercise.customGoalStrings}
               isPlaying={isPlaying}
+              onStart={startTimer}
               isExamMode={isExamMode}
               onDevPassExam={onDevPassExam}
             />

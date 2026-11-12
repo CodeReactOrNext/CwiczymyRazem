@@ -145,10 +145,6 @@
     "hide_tabs": "Ukryj tabulaturę",
     "by_ear": "Graj ze słuchu/z pamięci"
   },
-  "hunt": {
-    "press_play": "Naciśnij Play poniżej, aby uruchomić stoper",
-    "click_now": "możesz klikać od razu"
-  },
   "quick": {
     "tempo_reset": "Tempo metronomu — przywróć zalecane",
     "slower_hint": "Wolniej (Shift: −5 BPM)",
@@ -770,7 +766,8 @@
     "start": "Start",
     "preview": "Podgląd",
     "hint_count_in": "Metronom odliczy wejście, potem grasz. Podgląd pokaże tabulaturę bez liczenia czasu.",
-    "hint": "Czas liczy się od naciśnięcia Start. Podgląd pozwala najpierw się rozejrzeć."
+    "hint": "Czas liczy się od naciśnięcia Start. Podgląd pozwala najpierw się rozejrzeć.",
+    "hint_no_preview": "Czas i punkty liczą się od naciśnięcia Start."
   },
   "mic_open_failed": {
     "title": "Mikrofon się nie włączył",
