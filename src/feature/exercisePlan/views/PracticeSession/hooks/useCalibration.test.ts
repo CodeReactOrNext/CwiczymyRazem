@@ -55,22 +55,31 @@ describe("useCalibration", () => {
     expect(result.current.isMicEnabled).toBe(true);
   });
 
-  it("opens on the wizard when the mic was already said yes to, unless it is set up", () => {
+  it("opens on the wizard when the mic was already said yes to, set up before or not", () => {
     const fresh = renderHook(() => useCalibration(true, false, "setup"));
     expect(fresh.result.current.sessionPhase).toBe("calibrating");
+    expect(fresh.result.current.isMicEnabled).toBe(false);
 
     localStorage.setItem(MIC_PREFERENCE_KEY, "true");
     const setUp = renderHook(() => useCalibration(true, false, "setup"));
+    expect(setUp.result.current.sessionPhase).toBe("calibrating");
+    expect(setUp.result.current.isMicEnabled).toBe(true);
+
+    act(() => setUp.result.current.handleCalibrationCancel());
     expect(setUp.result.current.sessionPhase).toBe("ready");
     expect(setUp.result.current.isMicEnabled).toBe(true);
   });
 
-  it("starts with the mic off, without remembering it, when the player said no", () => {
-    localStorage.setItem(MIC_PREFERENCE_KEY, "true");
+  it("starts with the mic off and remembers it when the player said no", () => {
     const { result } = renderHook(() => useCalibration(true, false, "off"));
 
     expect(result.current.sessionPhase).toBe("ready");
     expect(result.current.isMicEnabled).toBe(false);
-    expect(localStorage.getItem(MIC_PREFERENCE_KEY)).toBe("true");
+    expect(localStorage.getItem(MIC_PREFERENCE_KEY)).toBe("false");
+
+    // The next session doesn't ask again.
+    const next = renderHook(() => useCalibration(true));
+    expect(next.result.current.sessionPhase).toBe("ready");
+    expect(next.result.current.isMicEnabled).toBe(false);
   });
 });

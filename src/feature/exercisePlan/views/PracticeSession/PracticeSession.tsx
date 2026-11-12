@@ -202,7 +202,8 @@ interface PracticeSessionProps {
   bossFight?:          BossFightConfig;
   /**
    * The mic question was answered before the session: "setup" opens on the
-   * setup wizard, "off" starts without the mic. Either way the "use the mic?"
+   * setup wizard (always, also with the mic set up before), "off" starts
+   * without the mic. Either way the "use the mic?"
    * prompt is skipped.
    */
   micStart?:           "setup" | "off";

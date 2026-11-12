@@ -1,4 +1,4 @@
-import { useCallback,useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type SessionPhase = "mic_prompt" | "calibration_choice" | "calibrating" | "ready";
 
@@ -26,9 +26,11 @@ function saveMicPreference(enabled: boolean): void {
  *   the mic off, so it goes back to the mic prompt instead.
  * @param micStart the player already answered the mic question before the
  *   session (the onboarding's first riff), so it is not asked again:
- *   "setup" opens straight on the setup wizard (unless the mic is already set
- *   up), "off" starts with the mic off — without saving that as the player's
- *   preference, so the next session still offers it.
+ *   "setup" opens straight on the setup wizard — also when the mic was set up
+ *   before, where it runs as a recalibration over the already-on mic and
+ *   closing it just leaves the mic on. "off" starts with the mic off and
+ *   saves that as the player's preference, so later sessions don't ask again
+ *   (the mic button in the session still turns it on).
  */
 export function useCalibration(
   planHasTablature: boolean,
@@ -38,7 +40,7 @@ export function useCalibration(
   const [sessionPhase, setSessionPhase] = useState<SessionPhase>(() => {
     const pref = loadMicPreference();
     if (!planHasTablature || micStart === "off") return "ready";
-    if (micStart === "setup") return pref === true ? "ready" : "calibrating";
+    if (micStart === "setup") return "calibrating";
     if (pref !== null) return "ready";
     return "mic_prompt";
   });
@@ -47,6 +49,11 @@ export function useCalibration(
     const pref = loadMicPreference();
     return pref ?? false;
   });
+  // "No mic" given before the session is the player's answer like any other:
+  // remembered, so the sessions that follow don't ask again.
+  useEffect(() => {
+    if (micStart === "off") saveMicPreference(false);
+  }, [micStart]);
   // Nothing from the setup wizard is stored any more (its tuning step is a
   // plain tuner), so there is never an earlier setup to offer reusing.
   const existingCalibrationTimestamp = 0;
