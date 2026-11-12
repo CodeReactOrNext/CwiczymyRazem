@@ -36,6 +36,13 @@
   "timing_hints_desc": "„Za wcześnie”, „Za późno” albo zielony plus nad nutą przy trafieniu, a spóźniona nuta wypełnia się od miejsca, w którym ją zagrałeś. Timing i tak liczy się do wyniku.",
   "ambient_glow": "Poświata mikrofonu",
   "ambient_glow_desc": "Poświata pod tabulaturą reagująca na głośność gry",
+  "performance": "Wydajność",
+  "performance_hint": "Gdy tabulatura się zacina. Lekka tabulatura rysuje się w niższej rozdzielczości i z połową klatek, stoi w miejscu strona po stronie i nie ma efektów. Nuty, wypełnienia i punktacja zostają bez zmian.",
+  "performance_modes": {
+    "auto": { "label": "Automatycznie", "desc": "Lekka na telefonach, które nie nadążają" },
+    "lite": { "label": "Lekka", "desc": "Zawsze prostsza tabulatura" },
+    "full": { "label": "Pełna", "desc": "Zawsze pełna tabulatura" }
+  },
   "reset": "Resetuj ustawienia tabulatury",
   "sizing": "Rozmiar",
   "sizing_hint": "Własny zoom i odstępy nut AlphaTab — niezależne od suwaków płaskiej tabulatury powyżej.",

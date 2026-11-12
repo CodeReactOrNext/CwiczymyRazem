@@ -17,10 +17,14 @@ import { useNoteMarks, useNoteMatchingContext } from "../contexts/NoteMatchingCo
 import { useTabOverlay } from "../contexts/TabOverlayContext";
 import { useTabPlayUntilStore } from "../hooks/tabPlayUntilStore";
 import {
+  LITE_MAX_DPR,
+  liteTablatureStyle,
   NOTE_SPACING_MAX,
   NOTE_SPACING_MIN,
+  PHONE_MAX_DPR,
   useTablatureSettings,
   useTablatureStyle,
+  useTabLiteMode,
 } from "./tablatureSettings";
 import { TablatureSettingsDialog } from "./TablatureSettingsDialog";
 import { tuningGutterStrings } from "./tablatureStringRows";
@@ -133,6 +137,12 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
     style,
   } = useTablatureStyle();
   const setSetting = useTablatureSettings((s) => s.set);
+  // A phone that can't keep up gets the lite board: by the player's choice, by
+  // what the device says about itself, or — the usual way — because the board
+  // itself reported its frames falling behind (onSlowFrames).
+  const lite = useTabLiteMode(true);
+  const boardStyle = useMemo(() => (lite ? liteTablatureStyle(style) : style), [lite, style]);
+  const handleSlowFrames = useCallback(() => setSetting("liteDetected", true), [setSetting]);
   const { height, setHeight, isCustom, clearHeight } = useTablatureHeight({
     storageKey: PHONE_HEIGHT_KEY,
     min: MOBILE_HEIGHT_MIN,
@@ -297,8 +307,10 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
             heightPx={viewerHeight}
             tuningStrings={tuningStrings}
             stringCount={stringCount}
-            style={style}
-            ambientGlow={settings.ambientGlowPhone}
+            style={boardStyle}
+            maxDpr={lite ? LITE_MAX_DPR : PHONE_MAX_DPR}
+            onSlowFrames={handleSlowFrames}
+            ambientGlow={settings.ambientGlowPhone && !lite}
             palette={palette}
             isLightBoard={isLightBoard}
             quarterTurned={quarterTurned}

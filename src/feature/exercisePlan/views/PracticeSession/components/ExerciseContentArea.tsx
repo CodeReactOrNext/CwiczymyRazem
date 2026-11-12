@@ -56,6 +56,11 @@ interface ExerciseContentAreaProps {
    *  second, hidden video a moment later (and on iOS steal the audio from the
    *  visible one, which pauses it and stops the session). */
   suppressVideo?: boolean;
+  /** Leave the flat tab out — set while the mobile session modal owns the screen
+   *  and shows its own board. A copy here is a second render worker, a second
+   *  pass over the song on every hit and three more frame loops, all drawing
+   *  into a box nobody can see, on the device with the least to spare. */
+  suppressTablature?: boolean;
 
   // Tablature
   isMetronomePlaying: boolean;
@@ -138,6 +143,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   backingTrackIds,
   silenceStrumSynth,
   suppressVideo,
+  suppressTablature,
   isMetronomePlaying,
   countInRemaining,
   frequencyRef,
@@ -298,7 +304,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         {backingTrackSlot}
         <div className='relative'>
         {startGate}
-        <TablatureSection
+        {!suppressTablature && <TablatureSection
           exerciseId={currentExercise.id}
           cinema={cinema}
           backingTrackStatus={backingTrackStatus}
@@ -331,7 +337,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           isMicEnabled={isMicEnabled}
           onLoopRestart={onLoopRestart}
           obscured={obscured}
-        />
+        />}
         </div>
         </>
       ) : currentExercise.isPlayalong || currentExercise.videoUrl ? (

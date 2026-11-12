@@ -328,6 +328,9 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     // modal's — one pattern, two synths, a frame apart.
                     silenceStrumSynth={isMobile}
                     suppressVideo={isMobile}
+                    // Not while notation is the view: on a phone opened with it as
+                    // the default, this copy's AlphaTab is what makes the sound.
+                    suppressTablature={isMobile && !p.showAlphaTabScore}
                     isMetronomePlaying={p.metronome.isPlaying}
                     countInRemaining={p.countInRemaining} frequencyRef={p.frequencyRef}
                     isListening={p.isListening} audioContext={p.metronomeAudioContext}

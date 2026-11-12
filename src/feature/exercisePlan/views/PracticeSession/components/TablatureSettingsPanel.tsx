@@ -49,6 +49,7 @@ import {
   STRING_PALETTES,
   STRING_SPACING_MAX,
   STRING_SPACING_MIN,
+  TAB_PERFORMANCE_MODES,
   useTablatureSettings,
 } from "./tablatureSettings";
 
@@ -603,6 +604,24 @@ export function TablatureSettingsPanel() {
             checked={settings[glowKey]}
             onChange={(next) => set(glowKey, next)}
           />
+        </div>
+      </Section>
+
+      <Section title={t("performance")} hint={t("performance_hint")}>
+        <div className='grid grid-cols-3 gap-2'>
+          {TAB_PERFORMANCE_MODES.map((mode) => (
+            <OptionCard
+              key={mode}
+              active={settings.performanceMode === mode}
+              onClick={() => set("performanceMode", mode)}>
+              <span className='text-xs font-semibold text-zinc-100'>
+                {t(`performance_modes.${mode}.label`)}
+              </span>
+              <span className='text-[10px] leading-tight text-zinc-500'>
+                {t(`performance_modes.${mode}.desc`)}
+              </span>
+            </OptionCard>
+          ))}
         </div>
       </Section>
 

@@ -36,6 +36,13 @@
   "timing_hints_desc": "„Früh“, „Spät“ oder ein grünes + über der Note beim Treffer, und eine späte Note füllt sich ab der Stelle, wo du sie gespielt hast. Das Timing zählt so oder so für deinen Score.",
   "ambient_glow": "Mikrofon-Leuchten",
   "ambient_glow_desc": "Leuchten unter dem Tab, das auf deine Spiellautstärke reagiert",
+  "performance": "Leistung",
+  "performance_hint": "Wenn der Tab ruckelt. Der leichte Tab wird in geringerer Auflösung und mit halber Bildrate gezeichnet, steht seitenweise still und verzichtet auf Effekte. Noten, Füllungen und Wertung bleiben gleich.",
+  "performance_modes": {
+    "auto": { "label": "Automatisch", "desc": "Leicht auf Handys, die nicht mithalten" },
+    "lite": { "label": "Leicht", "desc": "Immer der einfachere Tab" },
+    "full": { "label": "Voll", "desc": "Immer der volle Tab" }
+  },
   "reset": "Tab-Einstellungen zurücksetzen",
   "sizing": "Größe",
   "sizing_hint": "Eigener Zoom und Notenabstand von AlphaTab – unabhängig von den Reglern des flachen Tabs oben.",

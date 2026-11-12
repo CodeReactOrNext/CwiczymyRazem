@@ -4,6 +4,7 @@ import type { FillStep } from "../utils/fillFeed";
 import type { NoteTiming } from "../utils/timingGrade";
 import type { BeatCount } from "./beatCounting";
 import { beatCountLabels, beatTickPositions } from "./beatCounting";
+import { createFramePace, observeFrame, resetFramePace } from "./framePace";
 import { addFillSteps, clearLiveFills, createLiveFills, currentTiming, isLiveTiming, liveFillDrawnBeat, liveFillOn } from "./liveNoteFills";
 import { applyHitNotes, applyHitPatch, applyMissedNotes, applyMissedPatch, createNoteHitVisualState, resetFrozenNoteState, resetNoteHitVisualState } from "./noteHitVisualState";
 import type { PalmMuteRun } from "./palmMuteRuns";
@@ -144,6 +145,22 @@ let hitAnimations = true;
 let timingHints = true;
 /** Head + thin sustain tail (true) or the classic one-block bar (false). */
 let noteTails = true;
+/**
+ * The lite board (STYLE.lite), for devices that can't keep up with the full
+ * one: half the frames, and none of the drawing that is only there to look
+ * good — tail gradients, string winding, the beat's ripple, the spark and beam
+ * on a held note, the page turn's slide. The notes, the fills and every mark a
+ * hit leaves stay exactly where they are. The caller also sends the canvas at
+ * a lower resolution and switches hit animations off (see liteTablatureStyle).
+ */
+let lite = false;
+/** The lite board paints no more often than this — 30 frames a second. */
+const LITE_FRAME_MS = 1000 / 30;
+/** Rounding room, so a 60 Hz screen's every other frame (33.3 ms) gets through. */
+const LITE_FRAME_SLACK_MS = 4;
+let lastLitePaintStamp = Number.NEGATIVE_INFINITY;
+/** How the frames are keeping up while the tab plays — see framePace.ts. */
+const framePace = createFramePace();
 
 const withAlphaCache = new Map<string, Map<number, string>>();
 
@@ -239,7 +256,8 @@ const TAIL_FADE_END = 0.5;
 const tailFades = new Map<string, Map<number, CanvasGradient>>();
 /** What a `w`-wide tail of `color` is filled with: the colour dying away to the right. */
 function tailFade(color: string, w: number): CanvasGradient | string {
-  if (!ctx || color.length !== 7 || color[0] !== "#") return color;
+  // One flat colour on the lite board: a gradient per tail is fill-rate a slow GPU feels.
+  if (lite || !ctx || color.length !== 7 || color[0] !== "#") return color;
   let byWidth = tailFades.get(color);
   if (!byWidth) {
     if (tailFades.size >= COLOR_CACHE_MAX) tailFades.clear();
@@ -512,7 +530,8 @@ function currentPageStarts(totalW: number, visibleW: number): number[] {
 /** The standing board's scroll this frame: the cursor's page, or part-way
  *  through the turn to it. */
 function standingScroll(target: number, clockMs: number, beat: number): number {
-  if (pageTarget === null || reducedMotion) {
+  // The lite board turns its page in one frame: a slide redraws the whole board all the way.
+  if (pageTarget === null || reducedMotion || lite) {
     pageTurn = null;
   } else if (target !== pageTarget) {
     pageTurn = { from: pageShown, start: clockMs, ms: pageTurnMs(beat) };
@@ -1260,7 +1279,8 @@ function sparkArcPath(x: number, y: number, angle: number, length: number, seed:
  *  a small charged spark with arcs jumping round it, and the small stars it
  *  sheds. `strength` 0–1. */
 function drawSustainFront(x: number, y: number, tailH: number, fromX: number, strength: number, frameNow: number) {
-  if (!ctx || strength <= 0.02) return;
+  // The lite board keeps the fill's round front and nothing that glows on top of it.
+  if (!ctx || lite || strength <= 0.02) return;
   const calm = sustainIsCalm();
   const time = calm ? 0 : frameNow;
   drawStarBeam(fromX, x, y, strength, time);
@@ -1970,7 +1990,7 @@ function paintFrame(frameStamp?: number) {
       ctx.beginPath();
       ctx.moveTo(lineL, y); ctx.lineTo(lineR, y);
       ctx.stroke();
-      if (width > 1) {
+      if (width > 1 && !lite) {
         // The winding. Its phase is tied to the board, not to the line's left
         // end, so it stays put on the string while the tab scrolls. Both the
         // pattern and its phase are whole device pixels: a 2.5px period at a
@@ -3240,7 +3260,7 @@ function paintFrame(frameStamp?: number) {
       ctx.fill();
     }
 
-    if (isPlaying && beatsElapsed > 0) {
+    if (isPlaying && beatsElapsed > 0 && !lite) {
       const bp = beatsElapsed % 1;
       if (bp < 0.3) {
         const ripple = bp * 100;
@@ -3346,6 +3366,22 @@ function paintFrame(frameStamp?: number) {
 
 function render(frameStamp?: number) {
   rafId = requestAnimationFrame(render);
+  const stamped = frameStamp !== undefined && Number.isFinite(frameStamp);
+  const running = isPlaying && isVisible && countInRemaining === 0;
+  if (stamped && running) {
+    if (lite) {
+      // Every other frame of a 60 Hz screen, every fourth of a 120 Hz one.
+      if (frameStamp - lastLitePaintStamp < LITE_FRAME_MS - LITE_FRAME_SLACK_MS) return;
+      lastLitePaintStamp = frameStamp;
+    } else if (observeFrame(framePace, frameStamp)) {
+      // The frames aren't keeping up: let whoever owns the board decide (a
+      // phone goes lite; a desktop leaves it alone).
+      self.postMessage({ type: 'SLOW_FRAMES' });
+    }
+  } else if (!running) {
+    resetFramePace(framePace);
+    lastLitePaintStamp = Number.NEGATIVE_INFINITY;
+  }
   try {
     paintFrame(frameStamp);
   } catch (err) {
@@ -3598,6 +3634,11 @@ self.onmessage = (e: MessageEvent) => {
       if (msg.showCounting !== undefined) showCounting = msg.showCounting;
       if (msg.showTechniqueLabels !== undefined) showTechniqueLabels = msg.showTechniqueLabels;
       if (msg.hitAnimations !== undefined) hitAnimations = msg.hitAnimations;
+      if (msg.lite !== undefined && msg.lite !== lite) {
+        lite = msg.lite;
+        tailFades.clear();
+        resetFramePace(framePace);
+      }
       if (msg.timingHints !== undefined) {
         timingHints = msg.timingHints;
         if (!timingHints) timingLabels.clear();

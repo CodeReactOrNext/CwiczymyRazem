@@ -102,6 +102,20 @@ interface WorkerBridgeOptions {
    * Pass a stable object — every new identity posts a message.
    */
   learnFocus?:     LearnFocus | null;
+  /**
+   * The most canvas pixels per CSS pixel the board is drawn at. Omit for the
+   * screen's own ratio; a phone caps it (PHONE_MAX_DPR, LITE_MAX_DPR), since
+   * the board's cost grows with the square of it.
+   */
+  maxDpr?:         number;
+  /** Called once if the board can't hold the screen's frame rate while playing. */
+  onSlowFrames?:   () => void;
+}
+
+/** The canvas's pixel ratio: the screen's, up to `maxDpr`. */
+export function boardPixelRatio(screenDpr: number | undefined, maxDpr?: number): number {
+  const dpr = screenDpr && screenDpr > 0 ? screenDpr : 1;
+  return maxDpr !== undefined && maxDpr > 0 ? Math.min(dpr, maxDpr) : dpr;
 }
 
 /**
@@ -148,6 +162,8 @@ export interface TablatureStylePatch {
   showTechniqueLabels?: boolean;
   hitAnimations?: boolean;
   timingHints?: boolean;
+  /** The lite board — see `lite` in TablatureViewer.worker.ts. Leave it to liteTablatureStyle. */
+  lite?: boolean;
 }
 
 /** The marks the worker holds, as last sent to it; null where that isn't known. */
@@ -176,7 +192,7 @@ export function useTablatureWorkerBridge({
   hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef = null, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
   loopStartBeat, loopEndBeat, playUntilBeat = null, zoom = 1, tuningStrings, style, selection,
-  obscured = false, quarterTurned = false, learnFocus = null,
+  obscured = false, quarterTurned = false, learnFocus = null, maxDpr, onSlowFrames,
 }: WorkerBridgeOptions) {
   const workerRef           = useRef<Worker | null>(null);
   const transferredRef      = useRef(false);
@@ -213,6 +229,11 @@ export function useTablatureWorkerBridge({
   // The marks the worker holds, as last sent — only what differs from them is
   // sent next (noteMarkPatch.ts). Null: nothing known, the next send is whole.
   const sentMarksRef = useRef<SentMarks>({ ...NOTHING_SENT });
+  // The latest callback, for a worker that outlives any one render.
+  const onSlowFramesRef = useRef(onSlowFrames);
+  useEffect(() => {
+    onSlowFramesRef.current = onSlowFrames;
+  });
 
   // Worker lifecycle
   useEffect(() => {
@@ -223,6 +244,7 @@ export function useTablatureWorkerBridge({
     sentMarksRef.current   = { ...NOTHING_SENT };
     worker.onmessage = (e: MessageEvent) => {
       if (e.data?.type === 'REST_ACTIVE') setIsRestActive(e.data.isRest);
+      else if (e.data?.type === 'SLOW_FRAMES') onSlowFramesRef.current?.();
     };
     return () => { worker.postMessage({ type: 'STOP' }); worker.terminate(); };
   }, []);
@@ -231,7 +253,7 @@ export function useTablatureWorkerBridge({
   useEffect(() => {
     if (!canvasRef.current || !workerRef.current || transferredRef.current || containerSize.width === 0) return;
     const htmlCanvas = canvasRef.current;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = boardPixelRatio(window.devicePixelRatio, maxDpr);
     htmlCanvas.width  = containerSize.width  * dpr;
     htmlCanvas.height = containerSize.height * dpr;
     const offscreen = htmlCanvas.transferControlToOffscreen();
@@ -240,15 +262,16 @@ export function useTablatureWorkerBridge({
       [offscreen],
     );
     transferredRef.current = true;
-  // canvasRef is a stable ref object — omitted intentionally
+  // canvasRef is a stable ref object — omitted intentionally; a changed maxDpr
+  // reaches a board already handed over through the resize below.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [containerSize]);
 
-  // Resize
+  // Resize — also how a board picks up a new pixel ratio (going lite mid-session).
   useEffect(() => {
     if (!transferredRef.current || containerSize.width === 0) return;
-    workerRef.current?.postMessage({ type: 'RESIZE', width: containerSize.width, height: containerSize.height, dpr: window.devicePixelRatio || 1 });
-  }, [containerSize]);
+    workerRef.current?.postMessage({ type: 'RESIZE', width: containerSize.width, height: containerSize.height, dpr: boardPixelRatio(window.devicePixelRatio, maxDpr) });
+  }, [containerSize, maxDpr]);
 
   // Render data + reset cursor
   useEffect(() => {

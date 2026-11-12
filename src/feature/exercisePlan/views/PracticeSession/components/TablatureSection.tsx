@@ -27,10 +27,13 @@ import { LearnModeBar } from "./LearnModeBar";
 import { MicHud } from "./MicHud";
 import { TablatureMinimapBar } from "./TablatureMinimapBar";
 import {
+  LITE_MAX_DPR,
+  liteTablatureStyle,
   NOTE_SPACING_MAX,
   NOTE_SPACING_MIN,
   useTablatureSettings,
   useTablatureStyle,
+  useTabLiteMode,
 } from "./tablatureSettings";
 import { TablatureSettingsDialog } from "./TablatureSettingsDialog";
 import { tuningGutterStrings } from "./tablatureStringRows";
@@ -231,8 +234,11 @@ export const TablatureSection = memo(function TablatureSection({
     settings,
     palette,
     isLightBoard,
-    style: tabStyle,
+    style: playerStyle,
   } = useTablatureStyle();
+  // Here only when the player picked it: "auto" leaves a desktop board alone.
+  const lite = useTabLiteMode(false);
+  const tabStyle = useMemo(() => (lite ? liteTablatureStyle(playerStyle) : playerStyle), [lite, playerStyle]);
   const renderData = useTablatureRenderData(
     activeTablature,
     palette,
@@ -623,7 +629,8 @@ export const TablatureSection = memo(function TablatureSection({
               stringCount={stringCount}
               style={tabStyle}
               cinema={cinema}
-              ambientGlow={settings.ambientGlow}
+              maxDpr={lite ? LITE_MAX_DPR : undefined}
+              ambientGlow={settings.ambientGlow && !lite}
               palette={palette}
               isLightBoard={isLightBoard}
             />

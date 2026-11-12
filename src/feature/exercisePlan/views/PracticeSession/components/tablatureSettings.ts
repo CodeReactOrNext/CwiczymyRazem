@@ -3,7 +3,7 @@ import {
   type MetronomeSoundKey,
   normalizeMetronomeSound,
 } from "feature/exercisePlan/components/Metronome/utils/clickTones";
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -240,6 +240,25 @@ export const NOTE_STYLES: Record<NoteStyleKey, { label: string; desc: string }> 
     bar: { label: "Solid bar", desc: "One block for the whole length" },
   };
 
+/**
+ * How much the board is allowed to cost. `auto` goes lite on a phone that is
+ * weak on paper or was caught dropping frames; `lite` and `full` are the
+ * player's own call, on any device.
+ */
+export type TabPerformanceMode = "auto" | "lite" | "full";
+export const TAB_PERFORMANCE_MODES: readonly TabPerformanceMode[] = [
+  "auto",
+  "lite",
+  "full",
+];
+
+/** A phone's board is drawn at no more than this many canvas pixels per CSS
+ *  pixel: at a phone's pixel density a 3× board costs over twice a 2× one and
+ *  can't be told from it. */
+export const PHONE_MAX_DPR = 2;
+/** The lite board's resolution: a little soft, at a quarter of a 3× board's pixels. */
+export const LITE_MAX_DPR = 1.5;
+
 export const FRET_FONT_MIN = 0.8;
 export const FRET_FONT_MAX = 1.4;
 
@@ -318,6 +337,11 @@ export interface TablatureSettings {
    *  blended layer restyled every frame costs a phone's GPU far more than it
    *  costs a desktop's. */
   ambientGlowPhone: boolean;
+  // ── Performance ──
+  performanceMode: TabPerformanceMode;
+  /** Set by the board itself the first time a phone can't hold the frame rate
+   *  (framePace.ts) — `auto` then runs lite from there on. */
+  liteDetected: boolean;
   // ── Notation ──
   /** Renders the standard-notation (sheet music) viewer on a black board instead of white paper. */
   notationDarkMode: boolean;
@@ -352,6 +376,8 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   timingHints: true,
   ambientGlow: true,
   ambientGlowPhone: false,
+  performanceMode: "auto",
+  liteDetected: false,
   notationDarkMode: false,
   notationZoom: 1,
   notationSpacing: 1,
@@ -387,6 +413,10 @@ export function migrateTablatureSettings(
   if (!(s.fretTextColor in FRET_TEXT_COLORS)) {
     s.fretTextColor = DEFAULT_SETTINGS.fretTextColor;
   }
+  if (!TAB_PERFORMANCE_MODES.includes(s.performanceMode)) {
+    s.performanceMode = DEFAULT_SETTINGS.performanceMode;
+  }
+  s.liteDetected = s.liteDetected === true;
   return s;
 }
 
@@ -493,6 +523,73 @@ export function tablatureStylePatch(
     hitAnimations: settings.hitAnimations,
     timingHints: settings.timingHints,
   };
+}
+
+interface DeviceHints {
+  /** Chrome's rounded-down RAM in GB (0.25–8); absent in Safari and Firefox. */
+  deviceMemory?: number;
+  hardwareConcurrency?: number;
+}
+
+/**
+ * A device that is weak on paper: 2–3 GB of RAM or a four-core CPU. Deliberately
+ * narrow — most phones that struggle report neither, and are caught by how their
+ * frames actually run instead (framePace.ts).
+ */
+export function isWeakDevice(hints: DeviceHints | undefined): boolean {
+  if (!hints) return false;
+  if (typeof hints.deviceMemory === "number" && hints.deviceMemory <= 2) {
+    return true;
+  }
+  return (
+    typeof hints.hardwareConcurrency === "number" &&
+    hints.hardwareConcurrency > 0 &&
+    hints.hardwareConcurrency <= 4
+  );
+}
+
+/** Whether the board runs lite: the player's choice, or `auto` deciding for a phone. */
+export function resolveTabLite(
+  mode: TabPerformanceMode,
+  isPhone: boolean,
+  liteDetected: boolean,
+  weakDevice: boolean,
+): boolean {
+  if (mode === "lite") return true;
+  if (mode === "full") return false;
+  return isPhone && (liteDetected || weakDevice);
+}
+
+const noopSubscribe = () => () => undefined;
+const readWeakDevice = () =>
+  typeof navigator !== "undefined" && isWeakDevice(navigator as DeviceHints);
+
+/**
+ * Whether this board should run lite. `isPhone` is true for the phone session's
+ * board only: `auto` never touches a desktop board, where nothing changes how
+ * the tab looks unless the player asks for it.
+ */
+export function useTabLiteMode(isPhone: boolean): boolean {
+  const mode = useTablatureSettings((s) => s.performanceMode);
+  const liteDetected = useTablatureSettings((s) => s.liteDetected);
+  // The server has no device to ask; the client's answer never changes.
+  const weakDevice = useSyncExternalStore(
+    noopSubscribe,
+    readWeakDevice,
+    () => false,
+  );
+  return resolveTabLite(mode, isPhone, liteDetected, weakDevice);
+}
+
+/**
+ * The look the lite board is sent instead of the player's: no hit animations
+ * and the standing page (nothing scrolls, so nearly every frame is the cursor
+ * and the notes under it), plus the worker's own `lite` switch.
+ */
+export function liteTablatureStyle(
+  style: TablatureStylePatch,
+): TablatureStylePatch {
+  return { ...style, lite: true, hitAnimations: false, pagedScroll: true };
 }
 
 /**

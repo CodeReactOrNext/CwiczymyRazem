@@ -36,6 +36,13 @@
   "timing_hints_desc": "\"Early\", \"Late\" or a green + over a note as you hit it, and a late note filling from where you played it. Timing still counts toward your score either way.",
   "ambient_glow": "Ambient mic glow",
   "ambient_glow_desc": "Glow under the tab reacting to your playing volume",
+  "performance": "Performance",
+  "performance_hint": "For when the tab stutters. The lite tab is drawn at a lower resolution and half the frame rate, stands still a page at a time and drops the effects. Notes, fills and scoring stay the same.",
+  "performance_modes": {
+    "auto": { "label": "Auto", "desc": "Lite on phones that can't keep up" },
+    "lite": { "label": "Lite", "desc": "Always the simpler tab" },
+    "full": { "label": "Full", "desc": "Always the full tab" }
+  },
   "reset": "Reset tablature settings",
   "sizing": "Sizing",
   "sizing_hint": "AlphaTab’s own zoom and note spacing — independent of the flat-tab sliders above.",

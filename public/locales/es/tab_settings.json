@@ -36,6 +36,13 @@
   "timing_hints_desc": "«Pronto», «Tarde» o un + verde sobre la nota al acertarla, y una nota tardía se rellena desde donde la tocaste. El tempo cuenta para tu puntuación igualmente.",
   "ambient_glow": "Brillo del micrófono",
   "ambient_glow_desc": "Brillo bajo la tablatura que reacciona al volumen con que tocas",
+  "performance": "Rendimiento",
+  "performance_hint": "Para cuando la tablatura va a tirones. La tablatura ligera se dibuja a menor resolución y a la mitad de fotogramas, se queda quieta página a página y prescinde de los efectos. Las notas, los rellenos y la puntuación no cambian.",
+  "performance_modes": {
+    "auto": { "label": "Automático", "desc": "Ligera en móviles que no dan abasto" },
+    "lite": { "label": "Ligera", "desc": "Siempre la tablatura sencilla" },
+    "full": { "label": "Completa", "desc": "Siempre la tablatura completa" }
+  },
   "reset": "Restablecer ajustes de tablatura",
   "sizing": "Tamaño",
   "sizing_hint": "Zoom y espaciado propios de AlphaTab, independientes de los controles de la tablatura plana de arriba.",

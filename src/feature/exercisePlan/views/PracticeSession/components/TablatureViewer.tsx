@@ -102,6 +102,10 @@ interface TablatureViewerProps {
   /** Learn mode: the beat the player has to play next. Memoize it — a new
    *  object identity means a new message to the worker. */
   learnFocus?: LearnFocus | null;
+  /** Cap on the canvas's pixel ratio — see the bridge's `maxDpr`. */
+  maxDpr?: number;
+  /** Called once if the board can't hold the frame rate while playing. Keep it stable. */
+  onSlowFrames?: () => void;
 }
 
 const TablatureViewerInner = ({
@@ -144,6 +148,8 @@ const TablatureViewerInner = ({
   isLightBoard = false,
   quarterTurned = false,
   learnFocus = null,
+  maxDpr,
+  onSlowFrames,
 }: TablatureViewerProps) => {
   const { t } = useTranslation("session");
   const canvasRef      = useRef<HTMLCanvasElement>(null);
@@ -172,7 +178,7 @@ const TablatureViewerInner = ({
     hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek,
     loopStartBeat, loopEndBeat, playUntilBeat, zoom, tuningStrings, style, selection, obscured,
-    quarterTurned, learnFocus,
+    quarterTurned, learnFocus, maxDpr, onSlowFrames,
   });
   const along = (pointer: { clientX: number; clientY: number }) =>
     pointerAlongBoard(pointer, quarterTurned);
@@ -338,5 +344,7 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.palette          === next.palette            &&
   prev.isLightBoard     === next.isLightBoard        &&
   prev.quarterTurned    === next.quarterTurned      &&
-  prev.learnFocus       === next.learnFocus
+  prev.learnFocus       === next.learnFocus         &&
+  prev.maxDpr           === next.maxDpr             &&
+  prev.onSlowFrames     === next.onSlowFrames
 );
