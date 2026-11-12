@@ -41,6 +41,22 @@ interface UseMobileMetronomeProps {
   externalAudioContext?: AudioContext | null;
 }
 
+/**
+ * How far ahead of the audio clock clicks are queued. This scheduler runs on
+ * the page's own thread, and on a phone that thread stalls — a render, a
+ * throttled timer. A click whose time has passed by the time the scheduler
+ * gets to run sounds late, and the tab's notes and backing (queued further
+ * ahead) don't: the click then wanders against the music. This is how long a
+ * stall the click now rides out; it matches the tab synth's own lookahead on
+ * a phone (MOBILE_LOOKAHEAD_SEC in useTablatureAudio).
+ */
+export const MOBILE_CLICK_LOOKAHEAD_SEC = 0.4;
+/** How long before the first beat the playback anchor is published — as it was
+ *  when the whole lookahead was 100 ms, so the count-in's last number stays up. */
+const ANCHOR_LEAD_SEC = 0.12;
+/** A wait shorter than this isn't worth a timer. */
+const UI_NOW_MS = 20;
+
 export const useMobileMetronome = ({
   initialBpm = 60,
   minBpm = 40,
@@ -89,6 +105,8 @@ export const useMobileMetronome = ({
   const gainNodeRef = useRef<GainNode | null>(null);
   const oscillatorRef = useRef<OscillatorNode | null>(null);
   const timeoutRef = useRef<number | null>(null);
+  // What the screen is to show when a queued click sounds, not when it was queued.
+  const uiTimeoutsRef = useRef<Set<number>>(new Set());
   const nextNoteTimeRef = useRef<number>(0);
   const startTimeRef = useRef<number | null>(null);
   const audioStartTimeRef = useRef<number | null>(null);
@@ -216,6 +234,40 @@ export const useMobileMetronome = ({
     );
   }, []);
 
+  const clearUiTimeouts = useCallback(() => {
+    uiTimeoutsRef.current.forEach(id => window.clearTimeout(id));
+    uiTimeoutsRef.current.clear();
+  }, []);
+
+  /** Runs `update` when the audio clock reaches `audioTime` — the clicks are
+   *  queued well ahead of it, and the screen must not run ahead with them. */
+  const atAudioTime = useCallback((audioTime: number, update: () => void) => {
+    const context = audioContextRef.current;
+    const waitMs = context ? (audioTime - context.currentTime) * 1000 : 0;
+    if (waitMs < UI_NOW_MS) { update(); return; }
+    const id = window.setTimeout(() => {
+      uiTimeoutsRef.current.delete(id);
+      update();
+    }, waitMs);
+    uiTimeoutsRef.current.add(id);
+  }, []);
+
+  /**
+   * Silences every click already queued: they hang off the old bus, which is
+   * dropped. With clicks queued this far ahead a pause would otherwise be
+   * followed by a click or two of the bar that was never played.
+   */
+  const dropQueuedClicks = useCallback(() => {
+    const context = audioContextRef.current;
+    const bus = gainNodeRef.current;
+    if (!context || !bus) return;
+    try { bus.disconnect(); } catch { /* already gone with its context */ }
+    const next = context.createGain();
+    next.gain.value = isMutedRef.current ? 0 : 1;
+    next.connect(context.destination);
+    gainNodeRef.current = next;
+  }, []);
+
   // Advanced timing mechanism using AudioContext's currentTime
   const scheduler = useCallback(() => {
     if (!audioContextRef.current) return;
@@ -234,18 +286,20 @@ export const useMobileMetronome = ({
     const ruler = tempoRulerRef?.current ?? null;
     const hasTempoMap = !!ruler && !ruler.isConstant;
     const warped = (beat: number) => (hasTempoMap ? ruler!.toWarped(beat) : beat);
+    const unwarped = (w: number) => (hasTempoMap ? ruler!.fromWarped(w) : w);
     const stepSeconds = (fromBeat: number, beats: number): number =>
       (warped(fromBeat + beats) - warped(fromBeat)) * secondsPerBeat;
 
     // Schedule notes ahead of time for precise timing
-    while (nextNoteTimeRef.current < currentTime + 0.1) {
+    while (nextNoteTimeRef.current < currentTime + MOBILE_CLICK_LOOKAHEAD_SEC) {
       if (countInTargetRef.current > 0) {
         // Always a plain 4/4 bar of quarter notes, whatever grid the exercise plays
         // in — see COUNT_IN_BEATS. Subdivision only kicks in once real playback starts.
         const countInBeatIndex = countInStartRef.current - countInTargetRef.current;
         const countInLevel     = getAccentLevel(DEFAULT_ACCENT_PATTERN, countInBeatIndex);
         scheduleNote(nextNoteTimeRef.current, countInLevel === 2 ? 'accent' : 'beat');
-        setCountInRemaining(countInTargetRef.current);
+        const shownCount = countInTargetRef.current;
+        atAudioTime(nextNoteTimeRef.current, () => setCountInRemaining(shownCount));
         countInTargetRef.current -= 1;
         // The count-in leads into bar 1, so it ticks at bar 1's tempo — one whole
         // quarter note at a time, independent of what a grid entry is worth.
@@ -259,15 +313,27 @@ export const useMobileMetronome = ({
           // Account for lookahead: startTime should reflect when the beat will actually play,
           // not when it is scheduled. This prevents the cursor from being ~100ms ahead.
           const msUntilBeat = Math.max(0, (nextNoteTimeRef.current - context.currentTime) * 1000);
-          startTimeRef.current = Date.now() + msUntilBeat - pausedElapsedTimeRef.current;
+          // Resuming from a pause, snap the resume offset to a WHOLE number of beats
+          // — as useMetronome does. The click sounds now, so the tab has to resume
+          // on a beat: resumed mid-beat (at 5.3, say) the clicks landed at 5.3 /
+          // 6.3 / … for the rest of the run, off the notes and off the backing.
+          // A fresh start has nothing paused, so this is a no-op there.
+          const pausedWarped     = secondsPerBeat > 0 ? (pausedAudioElapsedRef.current / 1000) / secondsPerBeat : 0;
+          const beatsPaused      = Math.round(unwarped(pausedWarped));
+          const snappedElapsedMs = warped(beatsPaused) * secondsPerBeat * 1000;
+          startTimeRef.current = Date.now() + msUntilBeat - snappedElapsedMs;
           if (audioContextRef.current) {
-            audioStartTimeRef.current = nextNoteTimeRef.current - (pausedAudioElapsedRef.current / 1000);
+            audioStartTimeRef.current = nextNoteTimeRef.current - (snappedElapsedMs / 1000);
           }
-          beatCounterRef.current = 0;
-          stepCounterRef.current = 0;
+          // The accent grid — and under a tempo map, the tempo — carry on from the resumed beat.
+          beatCounterRef.current = beatsPaused;
+          stepCounterRef.current = beatsPaused * stepsPerBeat;
           onPlayStartRef.current?.();
-          setCountInRemaining(0);
-          setPlaybackAnchor({ wall: startTimeRef.current, audio: audioStartTimeRef.current });
+          const anchor = { wall: startTimeRef.current, audio: audioStartTimeRef.current };
+          atAudioTime(nextNoteTimeRef.current - ANCHOR_LEAD_SEC, () => {
+            setCountInRemaining(0);
+            setPlaybackAnchor(anchor);
+          });
         }
 
         // Where this tick sits in the score, which under a tempo map decides the gap
@@ -284,7 +350,8 @@ export const useMobileMetronome = ({
           const level     = getAccentLevel(accentPattern, stepIndex);
           if (level !== 0) scheduleNote(nextNoteTimeRef.current, level === 2 ? 'accent' : 'beat');
           stepCounterRef.current += 1;
-          setCurrentBeat(accentPattern.length > 0 ? stepIndex % accentPattern.length : 0);
+          const shownBeat = accentPattern.length > 0 ? stepIndex % accentPattern.length : 0;
+          atAudioTime(nextNoteTimeRef.current, () => setCurrentBeat(shownBeat));
         } else {
           scheduleNote(nextNoteTimeRef.current, 'sub');
         }
@@ -297,7 +364,7 @@ export const useMobileMetronome = ({
 
     // Use lookahead scheduling for better timing accuracy on mobile
     timeoutRef.current = window.setTimeout(scheduler, 25);
-  }, [bpm, speedMultiplier, subdivision, gridUnit, accentPattern, scheduleNote]);
+  }, [bpm, speedMultiplier, subdivision, gridUnit, accentPattern, scheduleNote, atAudioTime]);
 
   // Resume audio context if suspended (common on mobile)
   const resumeAudioContext = useCallback(async () => {
@@ -318,6 +385,8 @@ export const useMobileMetronome = ({
     if (timeoutRef.current) {
       window.clearTimeout(timeoutRef.current);
     }
+    clearUiTimeouts();
+    dropQueuedClicks();
 
     if (audioContextRef.current) {
       const useCountIn   = !options?.skipCountIn;
@@ -336,13 +405,15 @@ export const useMobileMetronome = ({
     }
 
     setIsPlaying(true);
-  }, [initializeAudio, resumeAudioContext, scheduler, bpm, speedMultiplier]);
+  }, [initializeAudio, resumeAudioContext, scheduler, bpm, speedMultiplier, clearUiTimeouts, dropQueuedClicks]);
 
   const stopMetronome = useCallback(() => {
     if (timeoutRef.current) {
       window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+    clearUiTimeouts();
+    dropQueuedClicks();
 
     if (startTimeRef.current !== null) {
       pausedElapsedTimeRef.current = Date.now() - startTimeRef.current;
@@ -357,7 +428,7 @@ export const useMobileMetronome = ({
     setCountInRemaining(0);
     setPlaybackAnchor({ wall: null, audio: null });
     setIsPlaying(false);
-  }, []);
+  }, [clearUiTimeouts, dropQueuedClicks]);
 
   const restartMetronome = useCallback(() => {
     stopMetronome();

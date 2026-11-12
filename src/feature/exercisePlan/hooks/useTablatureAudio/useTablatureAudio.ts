@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Soundfont from "soundfont-player";
 import { applySinkId } from "utils/applyAudioSinkId";
 
+import { isMobileDevice } from "../../components/Metronome/utils/deviceDetection";
 import type { TablatureBeat, TablatureNote, TabTrackType } from "../../types/exercise.types";
 import { createTempoRulerFromMeasures } from "../../views/PracticeSession/hooks/tempoBeatClock";
 import { BASS_STRING_MIDI, MAIN_TRACK_BOOST } from "./audio.constants";
@@ -13,6 +14,18 @@ import { playDrumNote } from "./synth.drums";
 import type { StringPlayers } from "./synth.strings";
 import { playStringNote } from "./synth.strings";
 import type { AudioTrackConfig, UseTablatureAudioProps } from "./types";
+
+/** How far ahead of the audio clock notes are queued. */
+const LOOKAHEAD_SEC = 0.25;
+/**
+ * …and on a phone, where the page's thread — the one this scheduler runs on —
+ * stalls for longer than that: a note whose time has passed when the scheduler
+ * next runs is played late, out of step with everything queued in time. The
+ * phone metronome queues its clicks the same distance ahead
+ * (MOBILE_CLICK_LOOKAHEAD_SEC), so the two ride out the same stalls.
+ */
+const MOBILE_LOOKAHEAD_SEC = 0.4;
+const lookaheadSec = () => (isMobileDevice() ? MOBILE_LOOKAHEAD_SEC : LOOKAHEAD_SEC);
 
 export const useTablatureAudio = ({
   tracks: inputTracks,
@@ -387,7 +400,7 @@ export const useTablatureAudio = ({
       activeNodesRef.current.clear();
     }
 
-    const lookaheadTime  = ctx.currentTime + 0.25;
+    const lookaheadTime  = ctx.currentTime + lookaheadSec();
     const secondsPerBeat = 60 / (bpmRef.current || 120);
     const tracks         = activeTracksRef.current;
     const refTrackId     = tracks.length > 0 ? tracks[0].id : null;
