@@ -1,10 +1,10 @@
 import type { ExercisePlan } from "../../../types/exercise.types";
+import { chromaticAccentsExercise } from "../../exerises/chromaticAccents/chromaticAccents";
 import { spiderBasicExercise } from "../../exerises/spiderBasic/spiderBasic";
 import { spiderPermutation1234Exercise } from "../../exerises/spiderPermutation1234/spiderPermutation1234";
 import { spiderStairsHardExercise } from "../../exerises/spiderStairsHard/spiderStairsHard";
 import { SpiderStringSkippingExercise } from "../../exerises/spiderStringSkipping/spiderStringSkipping";
 import { spiderXExercise } from "../../exerises/spiderX/spiderX";
-import { spiderXExtendedExercise } from "../../exerises/spiderXExtended/spiderXExtended";
 import spiderImage from "../spiderPermutationPlan/image.webp";
 
 export const spiderMasterPlan: ExercisePlan = {
@@ -21,7 +21,7 @@ export const spiderMasterPlan: ExercisePlan = {
     spiderStairsHardExercise,
     SpiderStringSkippingExercise,
     spiderXExercise,
-    spiderXExtendedExercise,
+    chromaticAccentsExercise,
   ],
   userId: "system",
   image: spiderImage,

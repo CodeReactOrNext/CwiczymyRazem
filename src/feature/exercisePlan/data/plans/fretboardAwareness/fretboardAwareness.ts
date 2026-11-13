@@ -1,7 +1,7 @@
-import { chromaticNoteHuntExercise } from "feature/exercisePlan/data/exerises/chromaticNoteHunt/chromaticNoteHunt";
-import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
 import { fretboardRegionHuntExercise } from "feature/exercisePlan/data/exerises/fretboardRegionHunt/fretboardRegionHunt";
+import { intervalHuntExercise } from "feature/exercisePlan/data/exerises/intervalHunt/intervalHunt";
 import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
+import { wholeNeckHuntExercise } from "feature/exercisePlan/data/exerises/wholeNeckHunt/wholeNeckHunt";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -15,9 +15,9 @@ export const fretboardAwarenessPlan: ExercisePlan = {
   category: "theory",
   exercises: [
     randomNoteHuntExercise,
-    chromaticNoteHuntExercise,
+    intervalHuntExercise,
     fretboardRegionHuntExercise,
-    fretboardMasteryExercise
+    wholeNeckHuntExercise,
   ],
   userId: "system",
   image: null,

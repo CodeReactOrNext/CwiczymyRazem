@@ -1,10 +1,8 @@
+import { funkSixteenthScratchExercise } from "feature/exercisePlan/data/exerises/funkSixteenthScratch/funkSixteenthScratch";
+import { meterSwitch68To34Exercise } from "feature/exercisePlan/data/exerises/meterSwitching/meterSwitch68To34";
 import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
 import { rhythmicPocketMasteryExercise } from "feature/exercisePlan/data/exerises/rhythmicPocketMastery/rhythmicPocketMastery";
-import {
-  rhythmTrainingEasy,
-  rhythmTrainingHard,
-  rhythmTrainingMedium,
-} from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
+import { rhythmTrainingEasy } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -12,15 +10,15 @@ export const rhythmTimingPlan: ExercisePlan = {
   id: "rhythm_timing_foundations",
   title: "Rhythm & Timing",
   description:
-    "Develop a rock-solid internal clock — start with quarter-note pulses, progress through eighth- and sixteenth-note subdivisions, master subdivision switching, and test your timing through silence.",
+    "Develop a rock-solid internal clock — start with a steady pulse, lock in a sixteenth-note funk scratch, master subdivision switching, test your timing through silence, and finish with a 6/8 ↔ 3/4 hemiola.",
   difficulty: "medium",
   category: "technique",
   exercises: [
     rhythmTrainingEasy,
-    rhythmTrainingMedium,
+    funkSixteenthScratchExercise,
     rhythmicPocketMasteryExercise,
     metronomeGapTestExercise,
-    rhythmTrainingHard,
+    meterSwitch68To34Exercise,
   ],
   userId: "system",
   image: null,

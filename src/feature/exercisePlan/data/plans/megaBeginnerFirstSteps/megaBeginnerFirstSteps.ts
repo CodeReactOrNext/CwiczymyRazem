@@ -1,4 +1,5 @@
 import { chordPracticeExercise } from "feature/exercisePlan/data/exerises/chordPractice/chordPractice";
+import { firstMelodyExercise } from "feature/exercisePlan/data/exerises/firstMelody/firstMelody";
 import { nakedToneMelodyExercise } from "feature/exercisePlan/data/exerises/nakedToneMelody/nakedToneMelody";
 import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
 import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
@@ -18,7 +19,7 @@ export const beginnerDailyExercisesPlan: ExercisePlan = {
   category: "technique",
   exercises: [
     openGRepetitionExercise,
-    stringRepetitionExercise,
+    firstMelodyExercise,
     randomNoteHuntExercise,
     spiderQuarterNotesExercise,
   ],

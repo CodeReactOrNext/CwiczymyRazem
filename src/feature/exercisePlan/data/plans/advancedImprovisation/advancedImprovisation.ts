@@ -1,5 +1,5 @@
+import { chordDegreeHuntChangesExercise } from "feature/exercisePlan/data/exerises/chordDegreeHunt/chordDegreeHuntChanges";
 import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
-import { improvPromptHard } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
@@ -13,9 +13,9 @@ export const advancedImprovisationPlan: ExercisePlan = {
   difficulty: "hard",
   category: "theory",
   exercises: [
+    chordDegreeHuntChangesExercise,
     chordToneImprovisationExercise,
     triadImprovisationExercise,
-    improvPromptHard
   ],
   userId: "system",
   image: null,

@@ -437,7 +437,10 @@
         "name": "Octave",
         "character": "The same note again, higher — it blends completely."
       }
-    }
+    },
+    "tune_interval": "Tune the second note a {{interval}} above the first",
+    "interval_reference": "Lower note: {{root}} — slide the upper one until the {{interval}} stops wobbling",
+    "detune_interval_footnote": "This is how one string is tuned to the next: an octave, 5th or 4th is right when the slow wobble between the two notes stops."
   },
   "backing": {
     "required": "This exercise requires a backing track",

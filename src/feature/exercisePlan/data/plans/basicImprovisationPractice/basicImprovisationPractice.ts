@@ -1,9 +1,9 @@
 
 
+import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
 import { improvPromptMedium } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
 import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneChordImprov/oneChordImprov";
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
-import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 import basicImprovisationPracticeImage from "./image.webp";
@@ -19,8 +19,9 @@ export const basicImprovisationPractice: ExercisePlan = {
   exercises: [
     oneChordImprovExercise,
     oneStringBackingExercise,
-    triadImprovisationExercise,
-    improvPromptMedium],
+    callAndResponsePhrasingExercise,
+    improvPromptMedium,
+  ],
   userId: "system",
   image: basicImprovisationPracticeImage,
 }; 

@@ -1,4 +1,4 @@
-import { chromaticSpiderWalkExercise } from "feature/exercisePlan/data/exerises/chromaticSpiderWalk/chromaticSpiderWalk";
+import { fingerIndependence1aExercise } from "feature/exercisePlan/data/exerises/fingerIndependence1a/fingerIndependence1a";
 import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fretStretchDrill/fretStretchDrill";
 import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
 import { pinkyPowerDrillExercise } from "feature/exercisePlan/data/exerises/pinkyPowerDrill/pinkyPowerDrill";
@@ -13,9 +13,9 @@ export const handHealthStrengthPlan: ExercisePlan = {
   category: "technique",
   exercises: [
     jpStretching,
-    chromaticSpiderWalkExercise,
+    fingerIndependence1aExercise,
     pinkyPowerDrillExercise,
-    fretStretchDrillExercise
+    fretStretchDrillExercise,
   ],
   userId: "system",
   image: null,

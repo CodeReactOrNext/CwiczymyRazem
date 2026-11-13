@@ -1,6 +1,6 @@
 import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
-import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
-import { spiderChromaticsExercise } from "feature/exercisePlan/data/exerises/spiderChromatics/spiderChromatics";
+import { fingerPairDyadsExercise } from "feature/exercisePlan/data/exerises/fingerPairDyads/fingerPairDyads";
+import { pentatonicStringCrossing3Exercise } from "feature/exercisePlan/data/exerises/pentatonicStringCrossing3/pentatonicStringCrossing3";
 import { spiderOneStringExercise } from "feature/exercisePlan/data/exerises/spiderOneString/spiderOneString";
 import { stringRepetitionExercise } from "feature/exercisePlan/data/exerises/stringRepetition/stringRepetition";
 
@@ -18,8 +18,8 @@ export const dailyDexterityStarterPlan: ExercisePlan = {
     spiderOneStringExercise,
     stringRepetitionExercise,
     chromaticAccentsExercise,
-    spiderBasicExercise,
-    spiderChromaticsExercise
+    fingerPairDyadsExercise,
+    pentatonicStringCrossing3Exercise,
   ],
   userId: "system",
   image: null,

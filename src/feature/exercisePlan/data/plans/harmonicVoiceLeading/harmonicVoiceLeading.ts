@@ -1,6 +1,6 @@
+import { chordDegreeHuntSeventhsExercise } from "feature/exercisePlan/data/exerises/chordDegreeHunt/chordDegreeHuntSevenths";
 import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
 import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
-import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -13,9 +13,9 @@ export const harmonicVoiceLeadingPlan: ExercisePlan = {
   difficulty: "hard",
   category: "theory",
   exercises: [
+    chordDegreeHuntSeventhsExercise,
     guideToneVoiceLeadingExercise,
-    smoothChordTransitionsExercise,
-    minimalMotionVoiceLeadingExercise
+    minimalMotionVoiceLeadingExercise,
   ],
   userId: "system",
   image: null,

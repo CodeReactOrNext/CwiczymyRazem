@@ -12,7 +12,12 @@ import type {
   ProgressionQuizConfig,
   ScaleModeQuizConfig,
 } from "./earQuiz.types";
-import { buildIntervalMidi, INTERVALS, sortIntervals } from "./intervals";
+import {
+  buildIntervalMidi,
+  INTERVALS,
+  pureIntervalCents,
+  sortIntervals,
+} from "./intervals";
 import {
   buildProgressionChords,
   DEGREES,
@@ -267,6 +272,8 @@ describe("detune scoring", () => {
     referenceName: "A",
     offsetCents: 24,
     toleranceCents: 8,
+    targetCents: 0,
+    beatPartial: 1,
   };
 
   it("subtracts the slider from the error", () => {
@@ -338,5 +345,42 @@ describe("intervals", () => {
     expect(generateEarQuizQuestion(config, null, seeded([0])).kind).toBe(
       "interval",
     );
+  });
+});
+
+describe("tuning an interval by ear", () => {
+  const config: DetuneQuizConfig = {
+    mode: "detune",
+    toleranceCents: 12,
+    minOffsetCents: 28,
+    maxOffsetCents: 50,
+    intervals: ["P5"],
+  };
+
+  it("places pure intervals within two cents of the fretted ones", () => {
+    expect(pureIntervalCents("P8")).toBeCloseTo(1200, 5);
+    expect(Math.abs(pureIntervalCents("P5") - 700)).toBeLessThan(2.1);
+    expect(Math.abs(pureIntervalCents("P4") - 500)).toBeLessThan(2.1);
+  });
+
+  it("asks for the interval and says where its beating is heard", () => {
+    const question = generateDetuneQuestion(config, null, seeded([0.5]));
+    expect(question.interval).toBe("P5");
+    expect(question.targetCents).toBeCloseTo(701.955, 2);
+    expect(question.beatPartial).toBe(3);
+  });
+
+  it("leaves a plain unison round as it was", () => {
+    const { intervals: _intervals, ...unison } = config;
+    const question = generateDetuneQuestion(unison, null, seeded([0.5]));
+    expect(question.interval).toBeUndefined();
+    expect(question.targetCents).toBe(0);
+    expect(question.beatPartial).toBe(1);
+  });
+
+  it("scores the error the same way, whatever the interval", () => {
+    const question = generateDetuneQuestion(config, null, seeded([0.5]));
+    expect(isDetuneSolved(question, -question.offsetCents)).toBe(true);
+    expect(isDetuneSolved(question, 0)).toBe(false);
   });
 });

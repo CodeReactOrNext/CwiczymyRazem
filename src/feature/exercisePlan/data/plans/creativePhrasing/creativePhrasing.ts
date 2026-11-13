@@ -1,5 +1,5 @@
 import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
-import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneChordImprov/oneChordImprov";
+import { expressiveBendPhrasingExercise } from "feature/exercisePlan/data/exerises/expressiveBendPhrasing/expressiveBendPhrasing";
 import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
@@ -15,7 +15,7 @@ export const creativePhrasingPlan: ExercisePlan = {
   exercises: [
     twoNotesPerBarPhrasingExercise,
     callAndResponsePhrasingExercise,
-    oneChordImprovExercise
+    expressiveBendPhrasingExercise,
   ],
   userId: "system",
   image: null,

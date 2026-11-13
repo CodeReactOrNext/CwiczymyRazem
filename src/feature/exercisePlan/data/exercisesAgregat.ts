@@ -299,6 +299,7 @@ const FREE_EXERCISE_IDS = new Set([
   "ear_mode_major_or_minor",
   "ear_interval_three_sizes",
   "ear_tuning_wide_misses",
+  "ear_tuning_intervals",
   // Riff Vault — free
   "master_of_puppets_riff_preview",
   "seven_nation_army_riff_preview",

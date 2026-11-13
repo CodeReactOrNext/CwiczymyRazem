@@ -1,8 +1,8 @@
 import { alternatePickingCrossStringExercise } from "feature/exercisePlan/data/exerises/alternatePickingCrossString/alternatePickingCrossString";
-import { chromaticSpiderWalkExercise } from "feature/exercisePlan/data/exerises/chromaticSpiderWalk/chromaticSpiderWalk";
+import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePlan/data/exerises/alternatePickingPentatonicAPositions/alternatePickingPentatonicAPositions";
 import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
+import { metalTremoloPickingExercise } from "feature/exercisePlan/data/exerises/metalTremoloPicking/metalTremoloPicking";
 import { speedBurstChromaticBlitzExercise } from "feature/exercisePlan/data/exerises/speedBurstChromaticBlitz/speedBurstChromaticBlitz";
-import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -15,9 +15,9 @@ export const speedBuildingProgressivePlan: ExercisePlan = {
   difficulty: "hard",
   category: "technique",
   exercises: [
-    spiderBasicExercise,
-    chromaticSpiderWalkExercise,
+    alternatePickingPentatonicAPositionsExercise,
     alternatePickingCrossStringExercise,
+    metalTremoloPickingExercise,
     speedBurstChromaticBlitzExercise,
     economyPickingAngularExercise,
   ],

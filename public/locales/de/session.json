@@ -361,7 +361,10 @@
         "name": "Oktave",
         "character": "Derselbe Ton noch einmal, nur höher — verschmilzt vollständig."
       }
-    }
+    },
+    "tune_interval": "Stimme den zweiten Ton: {{interval}} über dem ersten",
+    "interval_reference": "Unterer Ton: {{root}} — verschiebe den oberen, bis die Schwebung verschwindet ({{interval}})",
+    "detune_interval_footnote": "So stimmt man eine Saite nach der anderen: Oktave, Quinte oder Quarte stimmt, wenn die langsame Schwebung zwischen den Tönen aufhört."
   },
   "backing": {
     "required": "Diese Übung braucht einen Backing Track",

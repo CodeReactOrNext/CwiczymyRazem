@@ -361,7 +361,10 @@
         "name": "Octava",
         "character": "La misma nota otra vez, más aguda — se funde por completo."
       }
-    }
+    },
+    "tune_interval": "Afina la segunda nota: {{interval}} sobre la primera",
+    "interval_reference": "Nota grave: {{root}} — mueve la aguda hasta que el batido desaparezca ({{interval}})",
+    "detune_interval_footnote": "Así se afina una cuerda con la siguiente: una octava, quinta o cuarta está afinada cuando el batido lento entre las dos notas se detiene."
   },
   "backing": {
     "required": "Este ejercicio necesita una pista de acompañamiento",

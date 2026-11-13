@@ -1,7 +1,7 @@
 import { earTrainingEasy } from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
-import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
 import { rhythmTrainingEasy } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
-import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
+import { transcriptionMelodyExercise } from "feature/exercisePlan/data/exerises/transcription/transcription";
+import { tripletsDrillExercise } from "feature/exercisePlan/data/exerises/tripletsDrill/tripletsDrill";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -14,8 +14,8 @@ export const earRhythmFundamentalsPlan: ExercisePlan = {
   exercises: [
     earTrainingEasy,
     rhythmTrainingEasy,
-    metronomeGapTestExercise,
-    singWhatYouPlayExercise
+    tripletsDrillExercise,
+    transcriptionMelodyExercise,
   ],
   userId: "system",
   image: null,

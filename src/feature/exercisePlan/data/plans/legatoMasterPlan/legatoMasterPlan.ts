@@ -1,8 +1,9 @@
+import { hammerOnPentatonicRunExercise } from "feature/exercisePlan/data/exerises/hammerOnPentatonicRun/hammerOnPentatonicRun";
 import { legatoContinuousFlowExercise } from "feature/exercisePlan/data/exerises/legatoContinuousFlow/legatoContinuousFlow";
 import { legatoHammerPullRunExercise } from "feature/exercisePlan/data/exerises/legatoHammerPullRun/legatoHammerPullRun";
 import { legatoSextuplets457Exercise } from "feature/exercisePlan/data/exerises/legatoSextuplets457/legatoSextuplets457";
 import { legatoTrillSprintExercise } from "feature/exercisePlan/data/exerises/legatoTrillSprint/legatoTrillSprint";
-import { spiderLegatoBasicExercise } from "feature/exercisePlan/data/exerises/spiderLegatoBasic/spiderLegatoBasic";
+import { pullOffPentatonicRunExercise } from "feature/exercisePlan/data/exerises/pullOffPentatonicRun/pullOffPentatonicRun";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -15,7 +16,8 @@ export const legatoMasterPlan: ExercisePlan = {
   difficulty: "hard",
   category: "technique",
   exercises: [
-    spiderLegatoBasicExercise,
+    hammerOnPentatonicRunExercise,
+    pullOffPentatonicRunExercise,
     legatoHammerPullRunExercise,
     legatoContinuousFlowExercise,
     legatoTrillSprintExercise,

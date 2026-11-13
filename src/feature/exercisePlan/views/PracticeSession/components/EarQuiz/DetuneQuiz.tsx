@@ -1,6 +1,7 @@
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "assets/lib/utils";
 import { useDetuneDrone } from "feature/exercisePlan/hooks/useDetuneDrone";
+import { INTERVALS } from "feature/exercisePlan/logic/earQuiz/intervals";
 import type { DetuneQuestion } from "feature/exercisePlan/logic/earQuiz/questions";
 import {
   beatsPerSecond,
@@ -55,7 +56,9 @@ export function DetuneQuiz({
   const [submittedCents, setSubmittedCents] = useState<number | null>(null);
   const drone = useDetuneDrone(
     question.referenceMidi,
-    remainingDetuneCents(question, sliderCents),
+    // The drone's second voice is placed from the first: the interval, if the
+    // round has one, plus whatever error is left.
+    question.targetCents + remainingDetuneCents(question, sliderCents),
     autoPlay,
   );
 
@@ -63,7 +66,12 @@ export function DetuneQuiz({
   const remaining = remainingDetuneCents(question, judgedCents);
   const solved = isDetuneSolved(question, judgedCents);
   const referenceFrequency = midiToFrequency(question.referenceMidi);
-  const beats = beatsPerSecond(referenceFrequency, remaining);
+  // Two notes an interval apart beat where their overtones meet, not at the
+  // lower note's own pitch — faster, for the same error in cents.
+  const beats = beatsPerSecond(referenceFrequency * question.beatPartial, remaining);
+  const intervalName = question.interval
+    ? t(`quiz.intervals.${question.interval}.name`, INTERVALS[question.interval].name)
+    : null;
 
   const submit = () => {
     if (isAnswered) return;
@@ -118,14 +126,17 @@ export function DetuneQuiz({
           beats < 0.15
             ? t("quiz.no_beating")
             : t("quiz.beating", { beats: beats.toFixed(1) }),
-        footnote: t("quiz.detune_footnote"),
+        footnote: t(intervalName ? "quiz.detune_interval_footnote" : "quiz.detune_footnote"),
       }
     : null;
 
   return (
     <>
       <div className='flex flex-col items-center gap-3'>
-        <QuizQuestion question={t("quiz.tune_second")} verdict={verdict} />
+        <QuizQuestion
+          question={intervalName ? t("quiz.tune_interval", { interval: intervalName }) : t("quiz.tune_second")}
+          verdict={verdict}
+        />
         <QuizPrimarySlot isAnswered={isAnswered} onNext={onNext}>
           <ListenButton
             onClick={drone.toggle}
@@ -134,7 +145,11 @@ export function DetuneQuiz({
           />
         </QuizPrimarySlot>
         <QuizNote
-          hint={<>Reference: {question.referenceName} — listen for the wobble and slide it away</>}
+          hint={
+            intervalName
+              ? t("quiz.interval_reference", { root: question.referenceName, interval: intervalName })
+              : <>Reference: {question.referenceName} — listen for the wobble and slide it away</>
+          }
           verdict={verdict}
         />
       </div>

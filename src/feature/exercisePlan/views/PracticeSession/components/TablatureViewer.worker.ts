@@ -500,6 +500,8 @@ function heldFillWidth(heldBeat: number, beatPx: number, beatOffset: number, pxP
 const SLIDE_BEND_MAX = 46;
 /** A tail with less room than this past its head stays straight. */
 const SLIDE_BEND_MIN = 14;
+/** Length of the run-up drawn before a note that is slid into from nowhere (px). */
+const SLIDE_IN_RUN = 30;
 /** How many beats ahead the note a slide arrives on is looked for. */
 const SLIDE_LOOKAHEAD = 8;
 
@@ -831,6 +833,8 @@ const TECHNIQUE_FONT = "bold 9px Inter, sans-serif";
 /** The "T" tab on a tapped note's head. */
 const TAP_TAB_W = 13;
 const TAP_TAB_H = 12;
+/** The harmonic's tab is the same height and wide enough for two letters. */
+const HARMONIC_TAB_W = 18;
 /** Height of a beat tick on the neck's edge. */
 const BEAT_TICK_H = 5;
 /** How far short of the neck's edges a bar line stops. */
@@ -2500,6 +2504,35 @@ function paintFrame(frameStamp?: number) {
         // are drawn from it.
         const prev = stringLastPos.get(note.noteY);
 
+        // A slide in from nowhere has no note before it to bend a tail from, so
+        // the note brings its own: a short run-up that fades in on the string
+        // and bends into the head the same way — up into it from below, down
+        // into it from above. The head, drawn next, covers where it lands.
+        if (note.slideIn && note.slideIn > 0 && !(prev && prev.slideOut > 0)) {
+          const reach = (BLOCK_H - tailH) / 2;
+          const xs = blockX - SLIDE_IN_RUN;
+          const runUp: SlideBend = {
+            x0: xs,
+            xs,
+            xe: blockX + BLOCK_CORNER,
+            lift: note.slideIn === 1 ? -reach : reach,
+          };
+          const runColor = isHit ? hitFill : note.color;
+          let runFill: CanvasGradient | string = runColor;
+          // One flat colour on the lite board, as for the tails.
+          if (!lite && runColor.length === 7 && runColor[0] === "#") {
+            runFill = ctx.createLinearGradient(xs, 0, blockX, 0);
+            runFill.addColorStop(0, withAlpha(runColor, 0));
+            runFill.addColorStop(0.7, runColor);
+          }
+          ctx.globalAlpha = baseAlpha * (lite ? 0.6 : 0.85);
+          ctx.fillStyle = runFill;
+          ctx.beginPath();
+          slideTailPath(runUp, note.noteY, tailH);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
         // ── Choose fill color ────────────────────────────────────────────
         let fillColor = note.color;
 
@@ -2919,8 +2952,9 @@ function paintFrame(frameStamp?: number) {
         // ── Fret label ────────────────────────────────────────────────────
         if (!isDead) {
           // "auto" reads the pill's own colour, so a dark palette gets light digits.
-          // A hollow pill shows the board through, so its digit is in the board's ink.
-          ctx.fillStyle = isHollow ? inkColor : fretTextColor === "auto" ? readableInk(note.color) : fretTextColor;
+          // A hollow pill shows the board through, so its digit is in the board's ink —
+          // and so is a harmonic's, whose pill is only an outline.
+          ctx.fillStyle = isHollow || isHarm ? inkColor : fretTextColor === "auto" ? readableInk(note.color) : fretTextColor;
           ctx.font = fretFont(fs);
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
@@ -3058,13 +3092,27 @@ function paintFrame(frameStamp?: number) {
           ctx.globalAlpha = 1;
         }
 
-        // Harmonic badge
+        // Harmonic: which kind, on a small tab over the head's top-right corner
+        // — the tap and slide tabs take the left one. (The letters used to be
+        // drawn on the head itself, straight over the fret number.)
         if (isHarm) {
-          ctx.font = "bold 8px Inter, sans-serif";
-          ctx.fillStyle = note.harmonicType === 1 ? "#a3e635" : "#f0abfc";
-          const hLabel = note.harmonicType === 1 ? "N.H." : note.harmonicType === 2 ? "A.H."
-            : note.harmonicType === 3 ? "T.H." : note.harmonicType === 4 ? "P.H." : "S.H.";
-          drawText(hLabel, labelX, note.noteY);
+          const hLabel = note.harmonicType === 1 ? "NH" : note.harmonicType === 2 ? "AH"
+            : note.harmonicType === 3 ? "TH" : note.harmonicType === 4 ? "PH" : "SH";
+          const tabX = blockX + headW - HARMONIC_TAB_W + 3;
+          const tabY = blockY - 7;
+          ctx.globalAlpha = baseAlpha;
+          ctx.fillStyle = inkColor;
+          ctx.strokeStyle = bgColor;
+          ctx.lineWidth = 1.5;
+          drawPill(tabX, tabY, HARMONIC_TAB_W, TAP_TAB_H, 3);
+          ctx.fill();
+          ctx.stroke();
+          ctx.font = "700 8px Inter, sans-serif";
+          ctx.fillStyle = bgColor;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          drawText(hLabel, tabX + HARMONIC_TAB_W / 2, tabY + TAP_TAB_H / 2 + 0.5);
+          ctx.globalAlpha = 1;
         }
 
         // Staccato: dot above block

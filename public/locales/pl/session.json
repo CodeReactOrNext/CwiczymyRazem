@@ -441,7 +441,10 @@
         "name": "Oktawa",
         "character": "Ten sam dźwięk, tylko wyżej — zlewa się całkowicie."
       }
-    }
+    },
+    "tune_interval": "Nastrój drugi dźwięk: {{interval}} nad pierwszym",
+    "interval_reference": "Dolny dźwięk: {{root}} — przesuwaj górny, aż {{interval}} przestanie falować",
+    "detune_interval_footnote": "Tak stroi się jedną strunę do drugiej: oktawa, kwinta albo kwarta jest czysta, gdy powolne falowanie między dźwiękami ustaje."
   },
   "backing": {
     "required": "To ćwiczenie wymaga podkładu",

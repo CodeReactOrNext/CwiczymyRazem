@@ -1,12 +1,12 @@
 import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePlan/data/exerises/alternatePickingPentatonicAPositions/alternatePickingPentatonicAPositions";
 import { bendAndReleaseExercise } from "feature/exercisePlan/data/exerises/bendAndRelease/bendAndRelease";
+import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
 import { earTrainingMedium } from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
 import { improvPromptMedium } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
 import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
 import { miniArpeggioExercise } from "feature/exercisePlan/data/exerises/miniArpeggio/miniArpeggio";
 import { rhythmicPocketMasteryExercise } from "feature/exercisePlan/data/exerises/rhythmicPocketMastery/rhythmicPocketMastery";
-import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
-import { vibratoSustainDrillExercise } from "feature/exercisePlan/data/exerises/vibratoSustainDrill/vibratoSustainDrill";
+import { vibratoControlDrillExercise } from "feature/exercisePlan/data/exerises/vibratoControlDrill/vibratoControlDrill";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -20,12 +20,12 @@ export const completeDailyPracticePlan: ExercisePlan = {
   category: "mixed",
   exercises: [
     jpStretching,
-    spiderBasicExercise,
+    chromaticAccentsExercise,
     alternatePickingPentatonicAPositionsExercise,
     miniArpeggioExercise,
     rhythmicPocketMasteryExercise,
     earTrainingMedium,
-    vibratoSustainDrillExercise,
+    vibratoControlDrillExercise,
     bendAndReleaseExercise,
     improvPromptMedium,
   ],

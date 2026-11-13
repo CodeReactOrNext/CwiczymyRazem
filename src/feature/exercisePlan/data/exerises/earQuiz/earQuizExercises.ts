@@ -488,6 +488,36 @@ export const earTuningWideMissesExercise: Exercise = {
   },
 };
 
+export const earTuningIntervalsExercise: Exercise = {
+  ...INTERVAL_QUIZ_DEFAULTS,
+  id: "ear_tuning_intervals",
+  title: "Tune By Ear — Octaves, Fifths and Fourths",
+  description:
+    "Two notes that should be an octave, a 5th or a 4th apart, with the upper one clearly out. Slide it until the wobble between them disappears.",
+  whyItMatters:
+    "This is how a guitar is actually tuned by ear: one string against the next, a 4th or a 5th apart, or against its octave. Two different notes still beat when the interval is off, and learning to hear that wobble is what lets you tune without a tuner and notice when a chord is sour.",
+  difficulty: "easy",
+  timeInMinutes: 1,
+  instructions: [
+    "Press Play — two different notes sound together. The lower one is the reference; the question says which interval the upper one should make with it.",
+    "Move the slider. The wobble slows down as the upper note gets closer to its place and speeds up as it moves away.",
+    "Stop when the two notes lock into one steady, hollow sound, then press 'That's in tune'.",
+  ],
+  tips: [
+    "The wobble sits higher up than either note — listen above them, not at their pitch.",
+    "An octave locks in most obviously; the 4th is the subtlest of the three.",
+    "If you lose it, move the slider far to one side and come back slowly, listening to the wobble slow down.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear"],
+  earQuizConfig: {
+    mode: "detune",
+    toleranceCents: 12,
+    minOffsetCents: 28,
+    maxOffsetCents: 50,
+    intervals: ["P8", "P5", "P4"],
+  },
+};
+
 export const earQuizExercises: Exercise[] = [
   earChordQualityBasicsExercise,
   earChordQualityAdvancedExercise,
@@ -505,4 +535,5 @@ export const earQuizExercises: Exercise[] = [
   earModeMajorOrMinorExercise,
   earIntervalThreeSizesExercise,
   earTuningWideMissesExercise,
+  earTuningIntervalsExercise,
 ];

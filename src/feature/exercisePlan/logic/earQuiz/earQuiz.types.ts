@@ -44,6 +44,9 @@ export type IntervalId =
   | "M7"
   | "P8";
 
+/** The intervals that can be tuned by ear until the beating stops. */
+export type PureIntervalId = "P4" | "P5" | "P8";
+
 /** How the two notes of an interval are sounded. */
 export type IntervalDirection = "ascending" | "descending" | "harmonic";
 
@@ -71,6 +74,12 @@ export interface DetuneQuizConfig {
   /** The random starting error is drawn from this window, either direction. */
   minOffsetCents: number;
   maxOffsetCents: number;
+  /**
+   * Tune the second note to one of these intervals above the first instead of
+   * to the same pitch; one is drawn per round. Only the intervals that have a
+   * pure, beat-free tuning to listen for can be used — see PURE_INTERVALS.
+   */
+  intervals?: PureIntervalId[];
 }
 
 export interface ScaleModeQuizConfig {

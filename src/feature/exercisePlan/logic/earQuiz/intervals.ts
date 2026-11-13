@@ -1,4 +1,8 @@
-import type { IntervalDirection, IntervalId } from "./earQuiz.types";
+import type {
+  IntervalDirection,
+  IntervalId,
+  PureIntervalId,
+} from "./earQuiz.types";
 
 export interface Interval {
   id: IntervalId;
@@ -115,4 +119,24 @@ export const buildIntervalMidi = (
   return direction === "descending"
     ? [rootMidi, rootMidi - semitones]
     : [rootMidi, rootMidi + semitones];
+};
+
+/**
+ * The intervals two sustained notes can be tuned to by ear: at a whole-number
+ * frequency ratio their overtones line up and the beating between them stops.
+ * `ratio` is upper note : lower note. The octave, 5th and 4th are the ones a
+ * guitar is tuned with, and the only ones whose pure tuning sits within a
+ * couple of cents of the fretted one — a pure major 3rd is 14 cents flat of it,
+ * so "no beating" and "in tune with the frets" would be different answers.
+ */
+export const PURE_INTERVALS: Record<PureIntervalId, [number, number]> = {
+  P8: [2, 1],
+  P5: [3, 2],
+  P4: [4, 3],
+};
+
+/** How far above the lower note a pure interval's upper note sits, in cents. */
+export const pureIntervalCents = (interval: PureIntervalId): number => {
+  const [upper, lower] = PURE_INTERVALS[interval];
+  return 1200 * Math.log2(upper / lower);
 };

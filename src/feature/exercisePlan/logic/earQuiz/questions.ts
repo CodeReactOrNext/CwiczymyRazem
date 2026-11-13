@@ -9,10 +9,16 @@ import type {
   IntervalId,
   IntervalQuizConfig,
   ProgressionQuizConfig,
+  PureIntervalId,
   ScaleModeId,
   ScaleModeQuizConfig,
 } from "./earQuiz.types";
-import { buildIntervalMidi, sortIntervals } from "./intervals";
+import {
+  buildIntervalMidi,
+  PURE_INTERVALS,
+  pureIntervalCents,
+  sortIntervals,
+} from "./intervals";
 import type { ProgressionChord } from "./progressions";
 import {
   buildProgressionChords,
@@ -80,6 +86,15 @@ export interface DetuneQuestion {
   /** How far out of tune the second note starts, in cents (can be negative). */
   offsetCents: number;
   toleranceCents: number;
+  /** Set when the second note is tuned to an interval above the first, not to it. */
+  interval?: PureIntervalId;
+  /** Cents from the first note to where the second is in tune — 0 for a unison. */
+  targetCents: number;
+  /**
+   * Which overtone of the first note the beating is heard at: its own pitch for
+   * a unison, the 2nd for an octave, the 3rd for a 5th, the 4th for a 4th.
+   */
+  beatPartial: number;
 }
 
 export interface ScaleModeQuestion {
@@ -181,12 +196,19 @@ export const generateDetuneQuestion = (
     rng,
   );
   const sign = rng() < 0.5 ? -1 : 1;
+  const interval =
+    config.intervals && config.intervals.length > 0
+      ? pickFresh(config.intervals, previous?.interval, rng)
+      : undefined;
   return {
     kind: "detune",
     referenceMidi,
     referenceName: midiToNoteName(referenceMidi),
     offsetCents: magnitude * sign,
     toleranceCents: config.toleranceCents,
+    interval,
+    targetCents: interval ? pureIntervalCents(interval) : 0,
+    beatPartial: interval ? PURE_INTERVALS[interval][0] : 1,
   };
 };
 
