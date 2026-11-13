@@ -126,6 +126,7 @@ const ROADMAP_STEPS: RoadmapStep[] = [
   },
   {
     id: "ex-ear-training",
+    done: true,
     cost: 30,
     icon: Ear,
     label: "+3 New Exercises",
