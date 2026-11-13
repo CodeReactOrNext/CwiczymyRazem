@@ -374,10 +374,74 @@
       "chordType": "Rodzaj akordu",
       "progression": "Progresje akordów",
       "detune": "Strojenie ze słuchu",
-      "scaleMode": "Skale i tryby"
+      "scaleMode": "Skale i tryby",
+      "interval": "Interwały"
     },
     "key_of_build": "Tonacja {{key}} — ułóż stopnie, które słyszysz, po kolei",
-    "listen_for": "Wsłuchaj się w: {{tell}} — {{formula}}"
+    "listen_for": "Wsłuchaj się w: {{tell}} — {{formula}}",
+    "which_interval": "Jaki to interwał?",
+    "play_interval": "Zagraj interwał",
+    "play_together": "Zagraj oba naraz",
+    "interval_hint": "Pierwszy dźwięk zmienia się co rundę — słuchaj odległości, nie wysokości",
+    "interval_direction": {
+      "ascending": "w górę",
+      "descending": "w dół",
+      "harmonic": "zagrane razem"
+    },
+    "interval_frets_one": "{{count}} próg od {{root}} na jednej strunie",
+    "interval_frets_few": "{{count}} progi od {{root}} na jednej strunie",
+    "interval_frets_many": "{{count}} progów od {{root}} na jednej strunie",
+    "interval_frets_other": "{{count}} progu od {{root}} na jednej strunie",
+    "intervals": {
+      "m2": {
+        "name": "Sekunda mała",
+        "character": "Jeden próg różnicy — najciaśniejszy, najbardziej napięty krok."
+      },
+      "M2": {
+        "name": "Sekunda wielka",
+        "character": "Dwa progi — zwykły krok między sąsiednimi dźwiękami skali."
+      },
+      "m3": {
+        "name": "Tercja mała",
+        "character": "Smutna tercja — podstawa każdego akordu molowego."
+      },
+      "M3": {
+        "name": "Tercja wielka",
+        "character": "Jasna tercja — podstawa każdego akordu durowego."
+      },
+      "P4": {
+        "name": "Kwarta czysta",
+        "character": "Otwarta i stabilna — odległość między większością sąsiednich strun."
+      },
+      "TT": {
+        "name": "Tryton",
+        "character": "Dokładnie pół oktawy — niespokojny, domaga się rozwiązania."
+      },
+      "P5": {
+        "name": "Kwinta czysta",
+        "character": "Power chord — pusta, mocna i całkowicie stabilna."
+      },
+      "m6": {
+        "name": "Seksta mała",
+        "character": "Szeroki, tęskny skok — odwrócona tercja wielka."
+      },
+      "M6": {
+        "name": "Seksta wielka",
+        "character": "Szeroki, słodki skok — bardziej ciepły niż napięty."
+      },
+      "m7": {
+        "name": "Septyma mała",
+        "character": "Bluesowa septyma — dwa progi poniżej oktawy."
+      },
+      "M7": {
+        "name": "Septyma wielka",
+        "character": "Jeden próg poniżej oktawy — ostra i pełna tęsknoty."
+      },
+      "P8": {
+        "name": "Oktawa",
+        "character": "Ten sam dźwięk, tylko wyżej — zlewa się całkowicie."
+      }
+    }
   },
   "backing": {
     "required": "To ćwiczenie wymaga podkładu",
@@ -650,10 +714,14 @@
     "play_note": "Odtwórz szukany dźwięk"
   },
   "strum": {
-    "down": "W dół",
-    "up": "W górę",
+    "strum": "Uderz w struny",
+    "swing": "Machnij obok, nie uderzaj",
     "muted": "Wytłumione",
-    "accent": "Akcent"
+    "accent": "Akcent: zagraj głośniej",
+    "fb_hit": "Trafione",
+    "fb_wrong": "Uderzenie w pauzie",
+    "fb_miss": "Pominięte",
+    "chords_per_loop": "{{count}} akordów / pętla"
   },
   "open_exercise": {
     "title": "Ćwiczenie otwarte",

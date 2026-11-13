@@ -296,10 +296,72 @@
       "chordType": "Akkordtyp",
       "progression": "Akkordfolgen",
       "detune": "Stimmen nach Gehör",
-      "scaleMode": "Tonleitern & Modi"
+      "scaleMode": "Tonleitern & Modi",
+      "interval": "Intervalle"
     },
     "key_of_build": "Tonart {{key}} — setze die gehörten Stufen der Reihe nach zusammen",
-    "listen_for": "Achte auf: {{tell}} — {{formula}}"
+    "listen_for": "Achte auf: {{tell}} — {{formula}}",
+    "which_interval": "Welches Intervall ist das?",
+    "play_interval": "Intervall abspielen",
+    "play_together": "Beide zusammen spielen",
+    "interval_hint": "Der erste Ton wechselt jede Runde — hör auf den Abstand, nicht auf die Tonhöhe",
+    "interval_direction": {
+      "ascending": "aufwärts",
+      "descending": "abwärts",
+      "harmonic": "zusammen gespielt"
+    },
+    "interval_frets_one": "{{count}} Bund von {{root}} auf einer Saite",
+    "interval_frets_other": "{{count}} Bünde von {{root}} auf einer Saite",
+    "intervals": {
+      "m2": {
+        "name": "Kleine Sekunde",
+        "character": "Ein Bund Abstand — der engste, spannungsreichste Schritt überhaupt."
+      },
+      "M2": {
+        "name": "Große Sekunde",
+        "character": "Zwei Bünde — der normale Schritt zwischen benachbarten Tonleitertönen."
+      },
+      "m3": {
+        "name": "Kleine Terz",
+        "character": "Die traurige Terz — das Fundament jedes Mollakkords."
+      },
+      "M3": {
+        "name": "Große Terz",
+        "character": "Die helle Terz — das Fundament jedes Durakkords."
+      },
+      "P4": {
+        "name": "Reine Quarte",
+        "character": "Offen und stabil — der Abstand zwischen den meisten Nachbarsaiten."
+      },
+      "TT": {
+        "name": "Tritonus",
+        "character": "Genau eine halbe Oktave — unruhig, will sich auflösen."
+      },
+      "P5": {
+        "name": "Reine Quinte",
+        "character": "Der Powerchord — hohl, kräftig und völlig stabil."
+      },
+      "m6": {
+        "name": "Kleine Sexte",
+        "character": "Ein weiter, sehnsüchtiger Sprung — eine umgekehrte große Terz."
+      },
+      "M6": {
+        "name": "Große Sexte",
+        "character": "Ein weiter, süßer Sprung — eher warm als gespannt."
+      },
+      "m7": {
+        "name": "Kleine Septime",
+        "character": "Die bluesige Septime — zwei Bünde unter der Oktave."
+      },
+      "M7": {
+        "name": "Große Septime",
+        "character": "Ein Bund unter der Oktave — scharf und sehnsuchtsvoll."
+      },
+      "P8": {
+        "name": "Oktave",
+        "character": "Derselbe Ton noch einmal, nur höher — verschmilzt vollständig."
+      }
+    }
   },
   "backing": {
     "required": "Diese Übung braucht einen Backing Track",
@@ -572,10 +634,14 @@
     "play_note": "Gesuchten Ton abspielen"
   },
   "strum": {
-    "down": "Ab",
-    "up": "Auf",
+    "strum": "Anschlagen",
+    "swing": "Vorbeischwingen, nicht anschlagen",
     "muted": "Gedämpft",
-    "accent": "Akzent"
+    "accent": "Akzent: lauter spielen",
+    "fb_hit": "Getroffen",
+    "fb_wrong": "In der Pause angeschlagen",
+    "fb_miss": "Verpasst",
+    "chords_per_loop": "{{count}} Akkorde / Durchlauf"
   },
   "open_exercise": {
     "title": "Offene Übung",

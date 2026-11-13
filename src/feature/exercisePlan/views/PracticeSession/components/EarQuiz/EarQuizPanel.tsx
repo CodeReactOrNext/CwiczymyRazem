@@ -8,6 +8,7 @@ import { useEarQuizGame } from "../../hooks/useEarQuizGame";
 import { ChordTypeQuiz } from "./ChordTypeQuiz";
 import { DetuneQuiz } from "./DetuneQuiz";
 import { EarQuizCard, EarQuizHeader, StartTimerHint } from "./EarQuizChrome";
+import { IntervalQuiz } from "./IntervalQuiz";
 import { ProgressionQuiz } from "./ProgressionQuiz";
 import { ScaleModeQuiz } from "./ScaleModeQuiz";
 
@@ -25,10 +26,11 @@ const MODE_LABEL: Record<EarQuizMode, string> = {
   progression: "Chord progressions",
   detune: "Tuning by ear",
   scaleMode: "Scales & modes",
+  interval: "Intervals",
 };
 
 /**
- * The four click-to-answer listening drills. Each one owns its answer UI; this
+ * The five click-to-answer listening drills. Each one owns its answer UI; this
  * panel holds the round loop and the scoreboard they all share, so a session can
  * drop in any of them by setting `earQuizConfig` on the exercise.
  */
@@ -70,6 +72,9 @@ export function EarQuizPanel({
         )}
         {question.kind === "scaleMode" && (
           <ScaleModeQuiz key={round} question={question} {...shared} />
+        )}
+        {question.kind === "interval" && (
+          <IntervalQuiz key={round} question={question} {...shared} />
         )}
       </div>
     </EarQuizCard>

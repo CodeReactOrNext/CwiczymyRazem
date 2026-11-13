@@ -1,9 +1,14 @@
-/** Shared ids for the four listening quizzes (chord quality, progression,
- *  detune, scale/mode). Kept in their own module so `exercise.types` can type an
+/** Shared ids for the five listening quizzes (chord quality, progression,
+ *  detune, scale/mode, interval). Kept in their own module so `exercise.types` can type an
  *  exercise's `earQuizConfig` without importing the quiz logic — and the logic
  *  can stay free of any dependency on the exercise model. */
 
-export type EarQuizMode = "chordType" | "progression" | "detune" | "scaleMode";
+export type EarQuizMode =
+  | "chordType"
+  | "progression"
+  | "detune"
+  | "scaleMode"
+  | "interval";
 
 export type ChordQualityId =
   | "major"
@@ -24,6 +29,23 @@ export type ScaleModeId =
   | "aeolian"
   | "locrian"
   | "harmonicMinor";
+
+export type IntervalId =
+  | "m2"
+  | "M2"
+  | "m3"
+  | "M3"
+  | "P4"
+  | "TT"
+  | "P5"
+  | "m6"
+  | "M6"
+  | "m7"
+  | "M7"
+  | "P8";
+
+/** How the two notes of an interval are sounded. */
+export type IntervalDirection = "ascending" | "descending" | "harmonic";
 
 /** Roman-numeral degrees of a major key — the tiles the player builds with. */
 export type DegreeId = "I" | "ii" | "iii" | "IV" | "V" | "vi" | "vii°";
@@ -57,8 +79,17 @@ export interface ScaleModeQuizConfig {
   scales: ScaleModeId[];
 }
 
+export interface IntervalQuizConfig {
+  mode: "interval";
+  /** Which intervals are in play — also the answer buttons the player gets. */
+  intervals: IntervalId[];
+  /** Ways a round may sound its two notes; one is drawn per round. */
+  directions: IntervalDirection[];
+}
+
 export type EarQuizConfig =
   | ChordTypeQuizConfig
   | ProgressionQuizConfig
   | DetuneQuizConfig
-  | ScaleModeQuizConfig;
+  | ScaleModeQuizConfig
+  | IntervalQuizConfig;

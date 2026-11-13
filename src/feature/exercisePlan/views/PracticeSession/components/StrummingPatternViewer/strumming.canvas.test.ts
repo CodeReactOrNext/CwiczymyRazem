@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { canvasContentWidth, fitSlotWidth, slotScale } from "./strumming.canvas";
-import { MIN_SLOT_W, PAD } from "./strumming.constants";
+import { canvasContentWidth, drawRepBar, fitSlotWidth, slotScale, swingDirection } from "./strumming.canvas";
+import { HEAD_HALF_W, MIN_SLOT_W, PAD, REP_CURRENT, REP_DONE } from "./strumming.constants";
 
 /** 4/4 in 16ths — the funk patterns, the widest bar the app ships. */
 const FUNK_SLOTS = 16;
@@ -61,8 +61,40 @@ describe("slotScale", () => {
 
   it("keeps an arrow head inside its own slot", () => {
     for (const slotW of [MIN_SLOT_W, 20, 24, 34, 64]) {
-      const headWidth = 2 * 11 * slotScale(slotW); // widest (active) arrow
+      const headWidth = 2 * HEAD_HALF_W * slotScale(slotW);
       expect(headWidth).toBeLessThanOrEqual(slotW);
     }
+  });
+});
+
+describe("swingDirection", () => {
+  it("alternates down and up through 8ths and 16ths alike", () => {
+    expect([0, 1, 2, 3].map(swingDirection)).toEqual(["down", "up", "down", "up"]);
+  });
+});
+
+describe("drawRepBar", () => {
+  const rects = (maxReps: number, currentRep: number, progress: number) => {
+    const out: { x: number; w: number; color: string }[] = [];
+    let fillStyle = "";
+    const ctx = {
+      beginPath: () => {}, fill: () => {},
+      roundRect: (x: number, _y: number, w: number) => out.push({ x, w, color: fillStyle }),
+      set fillStyle(v: string) { fillStyle = v; },
+    } as unknown as CanvasRenderingContext2D;
+    drawRepBar(ctx, currentRep, progress, maxReps, 360, 0);
+    return out;
+  };
+
+  it("draws a segment per rep and fills the current one", () => {
+    const out = rects(10, 2, 0.5);
+    expect(out).toHaveLength(11); // ten segments + the current rep's fill
+    expect(out.filter((r) => r.color === REP_DONE)).toHaveLength(2);
+    expect(out.filter((r) => r.color === REP_CURRENT)).toHaveLength(1);
+    expect(Math.max(...out.map((r) => r.x + r.w))).toBeLessThanOrEqual(360 - PAD + 0.001);
+  });
+
+  it("falls back to one continuous bar for a very long set", () => {
+    expect(rects(200, 100, 0)).toHaveLength(2);
   });
 });

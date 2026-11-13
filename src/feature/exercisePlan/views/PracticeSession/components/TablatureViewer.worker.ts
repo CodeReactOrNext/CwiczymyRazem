@@ -496,9 +496,83 @@ function heldFillWidth(heldBeat: number, beatPx: number, beatOffset: number, pxP
   return Math.max(0, Math.min(blockW, beatPx + (heldBeat - beatOffset) * pxPerBeat - blockX));
 }
 
+/** The longest stretch of a sliding note's tail that bends into the next note (px). */
+const SLIDE_BEND_MAX = 46;
+/** A tail with less room than this past its head stays straight. */
+const SLIDE_BEND_MIN = 14;
+/** How many beats ahead the note a slide arrives on is looked for. */
+const SLIDE_LOOKAHEAD = 8;
+
+/**
+ * Where the tail of a note that slides into the next one leaves the string:
+ * straight from `x0` to `xs`, then an S-bend to `xe` — just inside the head
+ * it arrives on — ending `lift` px off the string (negative = up the board,
+ * for a slide to a higher fret).
+ */
+interface SlideBend {
+  x0: number;
+  xs: number;
+  xe: number;
+  lift: number;
+}
+
+const smoothstep = (u: number) => (u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u));
+
+/** How far off the string a bent tail's middle is at `x`. */
+const slideBendOffset = (bend: SlideBend, x: number) =>
+  bend.lift * smoothstep((x - bend.xs) / (bend.xe - bend.xs));
+
+/**
+ * The outline of a bent tail `t` thick around the string at `y`. Added to the
+ * current path, like pillPath; `dx` shifts it for a caller drawing under a
+ * translate. Its ends are square: one sits under the note's own head, the
+ * other under the head it slides into.
+ */
+function slideTailPath(bend: SlideBend, y: number, t: number, dx = 0) {
+  if (!ctx) return;
+  const { x0, xs, xe, lift } = bend;
+  const half = t / 2;
+  const steps = Math.max(4, Math.ceil((xe - xs) / 3));
+  ctx.moveTo(x0 - dx, y - half);
+  for (let k = 0; k <= steps; k++) {
+    const u = k / steps;
+    ctx.lineTo(xs + (xe - xs) * u - dx, y + lift * smoothstep(u) - half);
+  }
+  for (let k = steps; k >= 0; k--) {
+    const u = k / steps;
+    ctx.lineTo(xs + (xe - xs) * u - dx, y + lift * smoothstep(u) + half);
+  }
+  ctx.lineTo(x0 - dx, y + half);
+  ctx.closePath();
+}
+
+/**
+ * The bend for the tail of `note` (in beat `beatIndex`), or null when it has
+ * nowhere to slide to or no room to show it. The tail lifts towards a higher
+ * fret and drops towards a lower one, by as much as keeps its outer edge level
+ * with the top (or bottom) of the head it runs into.
+ */
+function slideBendFor(beatIndex: number, note: NoteRD, tailX: number, headRight: number, tailH: number): SlideBend | null {
+  const last = Math.min(renderBeats.length - 1, beatIndex + SLIDE_LOOKAHEAD);
+  for (let j = beatIndex + 1; j <= last; j++) {
+    const target = renderBeats[j].notes.find((n) => n.noteY === note.noteY);
+    if (!target) continue;
+    const xe = xMap.xs[j] + BLOCK_PAD + BLOCK_CORNER;
+    if (xe - headRight < SLIDE_BEND_MIN) return null;
+    const reach = (BLOCK_H - tailH) / 2;
+    return {
+      x0: tailX,
+      xs: Math.max(headRight + 2, xe - SLIDE_BEND_MAX),
+      xe,
+      lift: target.fret >= note.fret ? -reach : reach,
+    };
+  }
+  return null;
+}
+
 // ── Performance: module-level reuse ──────────────────────────────────────────
 // Reused each frame instead of allocating a new Map on every rAF tick
-const stringLastPos = new Map<number, { x: number; cx: number; y: number; slideOut: number }>();
+const stringLastPos = new Map<number, { x: number; cx: number; y: number; fret: number; slideOut: number }>();
 // Dirty flag — skip rAF paint when nothing changed (paused, no animations)
 let needsRedraw = true;
 // False while something opaque covers the board (the alignment screen). Playback
@@ -2408,39 +2482,23 @@ function paintFrame(frameStamp?: number) {
         const tailX = blockX + headW / 2;
         const tailW = blockX + blockW - tailX;
         const hasTail = noteTails && !isChordBox && blockW - headW > 4;
+        // A note that slides on bends the end of its tail into the next head.
+        const slideBend = hasTail && note.slideOut ? slideBendFor(i, note, tailX, blockX + headW, tailH) : null;
+        const tailPath = (dx = 0) => {
+          if (slideBend) slideTailPath(slideBend, note.noteY, tailH, dx);
+          else pillPath(tailX - dx, tailY, tailW, tailH, tailH / 2);
+        };
         const notePath = () => {
           ctx!.beginPath();
           pillPath(blockX, blockY, headW, BLOCK_H, BLOCK_CORNER);
-          if (hasTail) pillPath(tailX, tailY, tailW, tailH, tailH / 2);
+          if (hasTail) tailPath();
         };
         // Bar mode keeps the label in the left "head" of the long block.
         const labelX = headsOnly ? blockX + headW / 2 : blockX + Math.min(blockW / 2, BLOCK_H * 0.65);
 
-        // ── Slide-in line ────────────────────────────────────────────────
-        if (note.slideIn && note.slideIn > 0) {
-          const fromY = note.slideIn === 1 ? note.noteY + 20 : note.noteY - 20;
-          ctx.strokeStyle = note.color;
-          ctx.globalAlpha = ghostAlpha * 0.7;
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(blockX - 16, fromY);
-          ctx.lineTo(blockX - 2, note.noteY);
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-        }
-
-        // ── Slide line from previous block on same string ─────────────────
+        // The note before this one on the string — slurs and the slide marker
+        // are drawn from it.
         const prev = stringLastPos.get(note.noteY);
-        if (prev && prev.slideOut > 0) {
-          ctx.strokeStyle = stringColors[note.string - 1] ?? "#fff";
-          ctx.globalAlpha = 0.7;
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(prev.x + 2, prev.y);
-          ctx.lineTo(blockX - 2, note.noteY);
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-        }
 
         // ── Choose fill color ────────────────────────────────────────────
         let fillColor = note.color;
@@ -2563,7 +2621,8 @@ function paintFrame(frameStamp?: number) {
           ctx.globalAlpha = ghostAlpha;
           if (hasTail) {
             ctx.fillStyle = (isHit ? hitFill : col) + "33";
-            drawPill(tailX, tailY, tailW, tailH, tailH / 2);
+            ctx.beginPath();
+            tailPath();
             ctx.fill();
           }
           ctx.strokeStyle = isHit ? hitFill : col;
@@ -2595,9 +2654,10 @@ function paintFrame(frameStamp?: number) {
           // the head stays the thing your eye lands on. Dead notes keep their grey.
           if (hasTail) {
             ctx.globalAlpha = alpha * (isActive ? 0.8 : 0.6);
-            ctx.fillStyle = tailFade(isDead ? DEAD_NOTE_FILL : note.color, tailW);
+            ctx.fillStyle = tailFade(isDead ? DEAD_NOTE_FILL : note.color, slideBend ? slideBend.xe - tailX : tailW);
             ctx.translate(tailX, 0);
-            drawPill(0, tailY, tailW, tailH, tailH / 2);
+            ctx.beginPath();
+            tailPath(tailX);
             ctx.fill();
             ctx.translate(-tailX, 0);
           }
@@ -2675,7 +2735,20 @@ function paintFrame(frameStamp?: number) {
             const edge = blockX + fillW;
             const from = Math.max(tailX, blockX + fillStartW);
             const capR = tailH / 2;
-            if (fillW > headW && edge - capR > from) {
+            if (slideBend) {
+              // A bent tail fills inside its own outline, so the fill takes the
+              // bend with it; the spark rides the tail's middle line.
+              if (fillW > headW && edge > from) {
+                ctx.save();
+                ctx.beginPath();
+                tailPath();
+                ctx.clip();
+                ctx.fillRect(from, blockY, edge - from, BLOCK_H);
+                ctx.restore();
+                drawSustainFront(edge, note.noteY + slideBendOffset(slideBend, edge), tailH, Math.max(from, Math.min(edge, slideBend.xs)), liveFill ? liveFill.spark : 0, frameNow);
+                ctx.globalAlpha = alpha;
+              }
+            } else if (fillW > headW && edge - capR > from) {
               ctx.fillStyle = finalHitColor;
               ctx.fillRect(from, tailY, edge - capR - from, tailH);
               ctx.beginPath();
@@ -2873,7 +2946,7 @@ function paintFrame(frameStamp?: number) {
         // Turned off as a group: skip every marker but still record this block
         // for the next note's slide line, which is note geometry, not a label.
         if (!showTechniqueLabels) {
-          stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + headW / 2, y: note.noteY, slideOut: note.slideOut ?? 0 });
+          stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + headW / 2, y: note.noteY, fret: note.fret, slideOut: note.slideOut ?? 0 });
           continue;
         }
         ctx.textAlign = "center";
@@ -2954,6 +3027,37 @@ function paintFrame(frameStamp?: number) {
           ctx.globalAlpha = 1;
         }
 
+        // A slid-into note carries a small tab on its top-left corner, like
+        // the tap's: a slash leaning the way the pitch moved — "/" up from a
+        // lower fret, the other way down from a higher one. The bent tail
+        // before it shows the glide; this names it, and is all a slide in
+        // from nowhere (or on a board without tails) has.
+        const slidFrom = prev && prev.slideOut > 0 ? prev : null;
+        if ((slidFrom || (note.slideIn && note.slideIn > 0)) && !note.isTap) {
+          const rising = slidFrom ? note.fret >= slidFrom.fret : note.slideIn === 1;
+          const tabX = blockX - 3;
+          const tabY = blockY - 7;
+          ctx.globalAlpha = baseAlpha;
+          ctx.fillStyle = inkColor;
+          ctx.strokeStyle = bgColor;
+          ctx.lineWidth = 1.5;
+          drawPill(tabX, tabY, TAP_TAB_W, TAP_TAB_H, 3);
+          ctx.fill();
+          ctx.stroke();
+          // The board is mirrored for left-handed players; the slash is not.
+          const lean = (rising ? 1 : -1) * (rightToLeft ? -1 : 1);
+          const cx = tabX + TAP_TAB_W / 2;
+          const cy = tabY + TAP_TAB_H / 2;
+          ctx.lineWidth = 1.75;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(cx - 2.5, cy + 3 * lean);
+          ctx.lineTo(cx + 2.5, cy - 3 * lean);
+          ctx.stroke();
+          ctx.lineCap = "butt";
+          ctx.globalAlpha = 1;
+        }
+
         // Harmonic badge
         if (isHarm) {
           ctx.font = "bold 8px Inter, sans-serif";
@@ -3029,7 +3133,7 @@ function paintFrame(frameStamp?: number) {
         }
 
         // ── Update slide tracking (right edge of block) ───────────────────
-        stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + headW / 2, y: note.noteY, slideOut: note.slideOut ?? 0 });
+        stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + headW / 2, y: note.noteY, fret: note.fret, slideOut: note.slideOut ?? 0 });
       }
     }
   }

@@ -1,134 +1,76 @@
-import { motion } from "framer-motion";
-import { useTranslation } from "hooks/useTranslation";
-import { useColorTheme } from "lib/colorTheme/colorTheme";
-import { memo, useLayoutEffect, useRef } from "react";
+import { cn } from "assets/lib/utils";
+import { RoadPathNode, type RoadTone } from "components/RoadPath/RoadPathNode";
+import { memo, type ReactNode, useMemo } from "react";
 
-import type { RoadmapTier } from "./skillRoadmap.data";
-import type { LayoutBranch, RoadmapLayout } from "./skillRoadmapLayout";
+import type { RoadmapBranch, RoadmapTier } from "./skillRoadmap.data";
+import type {
+  LayoutBranch,
+  LayoutNode,
+  RoadmapLayout,
+} from "./skillRoadmapLayout";
 import { ROADMAP_GEOMETRY as G } from "./skillRoadmapLayout";
+import { roadmapLines } from "./skillRoadmapLines";
 import type { RoadmapNodeState, RoadmapProgress } from "./skillRoadmapStates";
 import { useSkillRoadmapLabels } from "./useSkillRoadmapLabels";
 
 export interface RoadmapNodeHover {
   id: string;
-  /** Map coordinates, for panning to the dot. */
-  x: number;
-  y: number;
-  /** Viewport coordinates of the dot's centre, for placing the hover card. */
+  /** Viewport coordinates of the key's centre, for placing the hover card. */
   screenX: number;
   screenY: number;
+}
+
+/** What the bubble under the picked exercise is told about it. */
+export interface RoadmapBubbleInfo {
+  exerciseId: string;
+  /** Position in its skill, from 1. */
+  position: number;
+  count: number;
+  branchLabel: string;
 }
 
 interface SkillRoadmapTreeProps {
   tiers: RoadmapTier[];
   layout: RoadmapLayout;
   progress: RoadmapProgress;
-  hoveredId: string | null;
+  selectedId: string | null;
   onNodeHover: (hover: RoadmapNodeHover | null) => void;
-  onNodeClick: (exerciseId: string) => void;
+  onNodeSelect: (exerciseId: string) => void;
   onBranchClick: (branch: { id: string; skillId: string }) => void;
+  onTierToggle: (tierId: string) => void;
   /** Level per skill id, counted the way the rest of the app counts it. */
   skillLevels: Record<string, number>;
-  /** The view's zoom; below 1:1 the small text grows to stay readable. */
-  scale?: number;
-  /** Fades the map in on mount; off for static renders. */
-  animate?: boolean;
+  /** Read out for a key, which only shows its number. */
+  exerciseTitle: (exerciseId: string) => string;
+  /** What goes in the bubble under the picked exercise. */
+  renderBubble: (info: RoadmapBubbleInfo) => ReactNode;
 }
 
+/** The ring a key's wrapper adds around its face, per RoadPathNode size. */
+const KEY_PAD = { xs: 3, lg: 8 };
+
 /**
- * One ink, three meanings. Everything structural is drawn in neutrals and the
- * three accents are reserved for the states a player acts on: what is done,
- * what is next, and what needs Pro.
+ * Finished and up-next speak for themselves. Of the rest, the first unfinished
+ * key of a skill is the way in and stays bright; what comes after it is dimmed,
+ * so the map shows where to step next instead of a wall of equal keys.
  */
-const INK_DARK = {
-  page: "#09090b", // zinc-950, the surface the map is drawn on
-  line: "#27272a", // zinc-800, structure
-  lineLit: "#3f3f46", // zinc-700, structure on a path already walked
-  slot: "#27272a", // zinc-800, an untouched dot — a quiet place waiting to be filled
-  mark: "#3f3f46", // zinc-700, difficulty pips — there when looked for, quiet otherwise
-  ring: "#52525b", // zinc-600, the root of a branch not yet started
-  title: "#f4f4f5", // zinc-100
-  label: "#d4d4d8", // zinc-300
-  muted: "#a1a1aa", // zinc-400
-  faint: "#71717a", // zinc-500
-  done: "#10b981", // emerald-500, completed
-  next: "#22d3ee", // cyan-400, up next
-  locked: "#a16207", // yellow-700, Pro
+const toneFor = (state: RoadmapNodeState, isWayIn: boolean): RoadTone => {
+  if (state === "completed") return "done";
+  if (state === "current") return "current";
+  if (state === "locked") return "locked";
+  return isWayIn ? "open" : "later";
 };
 
-/**
- * The same roles on the light app theme: the map sits on a pale page, so the
- * structure goes to light greys and the text to ink. SVG attributes cannot read
- * CSS variables, hence a second palette picked per render.
- */
-const INK_LIGHT: typeof INK_DARK = {
-  page: "#ebebee",
-  line: "#d4d4d8",
-  lineLit: "#a1a1aa",
-  slot: "#cfcfd4",
-  mark: "#c4c4c9",
-  ring: "#a1a1aa",
-  title: "#18181b",
-  label: "#27272a",
-  muted: "#52525b",
-  faint: "#71717a",
-  done: "#059669",
-  next: "#d97706",
-  locked: "#a16207",
-};
-
-const useInk = () => (useColorTheme() === "light" ? INK_LIGHT : INK_DARK);
-
-/** Inter, the app's body face — set explicitly because SVG ignores the cascade. */
-const FONT = "Inter, ui-sans-serif, system-ui, sans-serif";
-
-/** Largest a text may grow to stay readable on a zoomed-out map. */
-const MAX_TEXT_BOOST = 1.3;
-
-/**
- * Font sizes in map units for the current zoom. Each text has the size it is
- * designed at and a smallest size in screen pixels; below 1:1 the units grow
- * to hold that minimum, up to MAX_TEXT_BOOST, so a laptop-width map keeps its
- * levels and counts legible while a wide screen draws them as designed.
- */
-const typeScaleFor = (scale: number) => {
-  const size = (units: number, minPx: number) =>
-    units * Math.min(MAX_TEXT_BOOST, Math.max(1, minPx / (units * scale)));
+const hoverFor = (id: string, element: HTMLElement): RoadmapNodeHover => {
+  const rect = element.getBoundingClientRect();
   return {
-    title: size(20, 15),
-    count: size(11, 11),
-    number: size(14, 12),
-    label: size(12.5, 12),
-    level: size(10.5, 11),
+    id,
+    screenX: rect.left + rect.width / 2,
+    screenY: rect.top + rect.height / 2,
   };
 };
 
-type TypeScale = ReturnType<typeof typeScaleFor>;
-
-/**
- * Average advance of Inter, as a share of the font size. Only places a level
- * until the real text can be measured, and in static renders.
- */
-const INTER_ADVANCE = 0.56;
-const textWidth = (text: string, fontSize: number) =>
-  text.length * fontSize * INTER_ADVANCE;
-
-/** The least room between a branch's name and its level. */
-const LEVEL_GAP = 10;
-
-/** Where a milestone's name and count sit below its circle's bottom edge. */
-const CAPTION_TITLE_DY = 28;
-const CAPTION_COUNT_DY = 47;
-
-/** Height a milestone's name and count occupy under its circle. */
-const CAPTION_BLOCK = 54;
-
-/** Difficulty pips: tiny, tight, just under the dot that starts a group. */
-const PIP_RADIUS = 1;
-const PIP_SPACING = 3.4;
-const PIP_DY = G.dotRadius + 4.5;
-
-/** One to four pips under the first dot of a difficulty group. */
+/** One to four pips under the first key of a difficulty group. */
 const DifficultyPips = ({
   x,
   y,
@@ -137,564 +79,420 @@ const DifficultyPips = ({
   x: number;
   y: number;
   level: number;
-}) => {
-  const INK = useInk();
-  return (
-  <g aria-hidden='true'>
+}) => (
+  <g aria-hidden='true' className='fill-zinc-700'>
     {Array.from({ length: level }, (_, i) => (
       <circle
         key={i}
-        cx={x + (i - (level - 1) / 2) * PIP_SPACING}
-        cy={y + PIP_DY}
-        r={PIP_RADIUS}
-        fill={INK.mark}
+        cx={x + (i - (level - 1) / 2) * 4}
+        cy={y + G.keySize / 2 + G.keyLip + 6}
+        r={1}
       />
     ))}
   </g>
+);
+
+/** Progress round a tier's key, drawn outside the ring that cuts the trunk. */
+const ProgressArc = ({
+  x,
+  y,
+  share,
+}: {
+  x: number;
+  y: number;
+  share: number;
+}) => {
+  const r = G.tierKeySize / 2 + 11;
+  const cy = y + G.tierKeyLip / 2;
+  const circumference = 2 * Math.PI * r;
+  return (
+    <g fill='none'>
+      <circle
+        cx={x}
+        cy={cy}
+        r={r}
+        strokeWidth={2}
+        className='stroke-zinc-800'
+      />
+      <circle
+        cx={x}
+        cy={cy}
+        r={r}
+        strokeWidth={3}
+        strokeLinecap='round'
+        strokeDasharray={`${circumference * share} ${circumference}`}
+        transform={`rotate(-90 ${x} ${cy})`}
+        className='stroke-emerald-500'
+      />
+    </g>
   );
 };
 
-/** Dot identity plus where it currently sits on screen. */
-const hoverFor = (
-  node: { id: string; x: number; y: number },
-  element: SVGGElement,
-): RoadmapNodeHover => {
-  const rect = element.getBoundingClientRect();
-  return {
-    id: node.id,
-    x: node.x,
-    y: node.y,
-    screenX: rect.left + rect.width / 2,
-    screenY: rect.top + rect.height / 2,
-  };
-};
-
-/**
- * Solid for what is done, a ring for what is next, a dim solid for the rest.
- * Done and untouched differ in colour and brightness, so no tick is needed.
- */
-const Dot = ({
-  state,
-  x,
-  y,
+/** A stop's name and count, sitting on the trunk above its key. */
+const StopLabel = ({
+  top,
+  title,
+  completed,
+  total,
 }: {
-  state: RoadmapNodeState;
-  x: number;
-  y: number;
-}) => {
-  const INK = useInk();
-  const r = G.dotRadius;
-  if (state === "completed") {
-    return <circle cx={x} cy={y} r={r} fill={INK.done} />;
-  }
-  if (state === "current") {
-    return (
-      <>
-        <circle
-          cx={x}
-          cy={y}
-          r={r}
-          fill={INK.page}
-          stroke={INK.next}
-          strokeWidth={2}
-        />
-        <circle cx={x} cy={y} r={2.4} fill={INK.next} />
-      </>
-    );
-  }
-  if (state === "locked") {
-    return (
-      <>
-        <circle
-          cx={x}
-          cy={y}
-          r={r}
-          fill={INK.page}
-          stroke={INK.line}
-          strokeWidth={1.25}
-        />
-        <rect
-          x={x - 2.6}
-          y={y - 0.6}
-          width={5.2}
-          height={4}
-          rx={1}
-          fill={INK.locked}
-        />
-        <path
-          d={`M ${x - 1.5} ${y - 0.6} v -1.4 a 1.5 1.5 0 0 1 3 0 v 1.4`}
-          fill='none'
-          stroke={INK.locked}
-          strokeWidth={1}
-        />
-      </>
-    );
-  }
-  return <circle cx={x} cy={y} r={r} fill={INK.slot} />;
-};
+  top: number;
+  title: string;
+  completed: number;
+  total: number;
+}) => (
+  <div
+    className='absolute left-1/2 z-10 flex -translate-x-1/2 flex-col items-center whitespace-nowrap bg-zinc-950 px-4 py-1.5'
+    style={{ top }}>
+    <span className='text-xl font-bold tracking-tight text-zinc-100'>
+      {title}
+    </span>
+    <span className='text-[13px] tabular-nums text-zinc-500'>
+      {completed} / {total}
+    </span>
+  </div>
+);
 
-/**
- * A branch's name and level. The level closes the header over the end of the
- * first row, so levels line up with their chains; a row shorter than the name
- * lets it follow the name instead. The name is measured once it is laid out —
- * and again when the web font arrives — so the gap is the same for every
- * branch; the estimate only covers the first paint and static renders.
- */
-const BranchHeader = ({
-  x,
-  y,
+/** A stop's number, on its key. */
+const StopNumber = ({ number }: { number: number }) => (
+  <span className='text-xl font-bold tabular-nums'>
+    {String(number).padStart(2, "0")}
+  </span>
+);
+
+const stopKeyStyle = (x: number, y: number) => ({
+  left: x - G.tierKeySize / 2 - KEY_PAD.lg,
+  top: y - G.tierKeySize / 2 - KEY_PAD.lg,
+});
+
+const Branch = ({
+  layoutBranch,
+  branch,
   label,
   level,
-  firstRowRight,
-  started,
-  type,
+  mapWidth,
+  progress,
+  selectedId,
+  startLabel,
+  levelLabel,
+  onNodeHover,
+  onNodeSelect,
+  onBranchClick,
+  exerciseTitle,
+  renderBubble,
 }: {
-  x: number;
-  y: number;
+  layoutBranch: LayoutBranch;
+  branch: RoadmapBranch;
   label: string;
+  /** Absent for the play-along branches, which no single skill owns. */
   level?: number;
-  firstRowRight: number;
-  started: boolean;
-  type: TypeScale;
+  mapWidth: number;
+  progress: RoadmapProgress;
+  selectedId: string | null;
+  startLabel: string;
+  levelLabel: string | null;
+  onNodeHover: SkillRoadmapTreeProps["onNodeHover"];
+  onNodeSelect: SkillRoadmapTreeProps["onNodeSelect"];
+  onBranchClick: SkillRoadmapTreeProps["onBranchClick"];
+  exerciseTitle: SkillRoadmapTreeProps["exerciseTitle"];
+  renderBubble: SkillRoadmapTreeProps["renderBubble"];
 }) => {
-  const INK = useInk();
-  const nameRef = useRef<SVGTextElement>(null);
-  const levelRef = useRef<SVGTextElement>(null);
-  const { t } = useTranslation("skills");
-  const levelText = level ? t("roadmap.lvl", { level }) : null;
-  const estimatedLevelX = levelText
-    ? Math.max(
-        firstRowRight,
-        x +
-          textWidth(label, type.label) +
-          LEVEL_GAP +
-          textWidth(levelText, type.level),
-      )
-    : 0;
-
-  useLayoutEffect(() => {
-    const name = nameRef.current;
-    const levelEl = levelRef.current;
-    if (!name || !levelEl || typeof name.getComputedTextLength !== "function")
-      return undefined;
-    let active = true;
-    const place = () => {
-      if (!active) return;
-      const levelX = Math.max(
-        firstRowRight,
-        x +
-          name.getComputedTextLength() +
-          LEVEL_GAP +
-          levelEl.getComputedTextLength(),
-      );
-      levelEl.setAttribute("x", String(levelX));
-    };
-    place();
-    void document.fonts?.ready.then(place);
-    return () => {
-      active = false;
-    };
-  }, [x, firstRowRight, label, levelText, type.label, type.level]);
+  const stateOf = (node: LayoutNode): RoadmapNodeState =>
+    progress.states.get(node.id) ?? "available";
+  const { nodes, side, bubble } = layoutBranch;
+  const doneCount = nodes.filter((n) => stateOf(n) === "completed").length;
+  const wayIn = nodes.findIndex((n) => stateOf(n) !== "completed");
+  const touched = doneCount > 0 || nodes.some((n) => stateOf(n) === "current");
+  // A branch fed by a skill opens that skill's sheet; the play-along branches
+  // belong to no skill, so their names are plain text, not a button.
+  const opensSkill = branch.skillId !== "general";
+  const nameClass = cn(
+    "text-sm font-semibold",
+    touched ? "text-zinc-100" : "text-zinc-400",
+  );
+  const bubbleNode = bubble && nodes.find((n) => n.id === bubble.nodeId);
 
   return (
     <>
-      <text
-        ref={nameRef}
-        x={x}
-        y={y}
-        fontFamily={FONT}
-        fontSize={type.label}
-        fontWeight={600}
-        fill={started ? INK.label : INK.faint}>
-        {label}
-      </text>
-      {levelText && (
-        <text
-          ref={levelRef}
-          x={estimatedLevelX}
-          y={y}
-          textAnchor='end'
-          fontFamily={FONT}
-          fontSize={type.level}
-          fontWeight={500}
-          // Inline, so hovering the name brightens the name and not the level.
-          style={{ fill: INK.faint, fontVariantNumeric: "tabular-nums" }}>
-          {levelText}
-        </text>
+      <div
+        className='absolute z-10 flex h-[22px] items-baseline gap-2.5 whitespace-nowrap'
+        style={
+          side > 0
+            ? { top: layoutBranch.top, left: layoutBranch.headerX }
+            : { top: layoutBranch.top, right: mapWidth - layoutBranch.headerX }
+        }>
+        {opensSkill ? (
+          <button
+            type='button'
+            onClick={() =>
+              onBranchClick({ id: branch.id, skillId: branch.skillId })
+            }
+            className={cn(
+              nameClass,
+              "rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:text-white",
+            )}>
+            {label}
+          </button>
+        ) : (
+          <span className={nameClass}>{label}</span>
+        )}
+        {levelLabel && level ? (
+          <span className='text-xs tabular-nums text-zinc-500'>
+            {levelLabel}
+          </span>
+        ) : null}
+        <span className='text-xs tabular-nums text-zinc-500'>
+          {doneCount} / {nodes.length}
+        </span>
+      </div>
+
+      {nodes.map((node) => {
+        const state = stateOf(node);
+        return (
+          <div
+            key={node.id}
+            data-exercise-id={node.id}
+            className='absolute z-10'
+            style={{
+              left: node.x - G.keySize / 2 - KEY_PAD.xs,
+              top: node.y - G.keySize / 2 - KEY_PAD.xs,
+            }}
+            onMouseEnter={(e) =>
+              onNodeHover(hoverFor(node.id, e.currentTarget))
+            }
+            onMouseLeave={() => onNodeHover(null)}
+            onFocus={(e) => onNodeHover(hoverFor(node.id, e.currentTarget))}
+            onBlur={() => onNodeHover(null)}>
+            <RoadPathNode
+              size='xs'
+              tone={toneFor(state, node.index === wayIn)}
+              icon={
+                <span className='text-[11px] font-semibold tabular-nums'>
+                  {node.index + 1}
+                </span>
+              }
+              title={exerciseTitle(node.id)}
+              selected={node.id === selectedId}
+              startLabel={state === "current" ? startLabel : undefined}
+              onClick={() => onNodeSelect(node.id)}
+            />
+          </div>
+        );
+      })}
+
+      {bubble && bubbleNode && (
+        <div
+          className='absolute z-10'
+          style={{
+            top: bubble.top,
+            left: bubble.left,
+            width: bubble.width,
+            height: G.bubbleHeight,
+          }}>
+          <span
+            aria-hidden='true'
+            className='absolute -top-1.5 h-3 w-3 -translate-x-1/2 rotate-45 bg-zinc-900'
+            style={{ left: bubble.pointerX }}
+          />
+          <div className='relative h-full'>
+            {renderBubble({
+              exerciseId: bubble.nodeId,
+              position: bubbleNode.index + 1,
+              count: nodes.length,
+              branchLabel: label,
+            })}
+          </div>
+        </div>
       )}
     </>
   );
 };
 
-const Branch = ({
-  branch,
-  label,
-  skillId,
-  level,
-  progress,
-  type,
-  hoveredId,
-  onNodeHover,
-  onNodeClick,
-  onBranchClick,
-}: {
-  branch: LayoutBranch;
-  label: string;
-  skillId: string;
-  /** Absent for the play-along branches, which no single skill owns. */
-  level?: number;
-  progress: RoadmapProgress;
-  type: TypeScale;
-  hoveredId: string | null;
-  onNodeHover: SkillRoadmapTreeProps["onNodeHover"];
-  onNodeClick: SkillRoadmapTreeProps["onNodeClick"];
-  onBranchClick: SkillRoadmapTreeProps["onBranchClick"];
-}) => {
-  const INK = useInk();
-  const started = branch.nodes.some(
-    (n) => progress.states.get(n.id) === "completed",
-  );
-  // A branch fed by a skill opens that skill's sheet; the play-along branches
-  // belong to no skill, so their names are plain text, not a button.
-  const opensSkill = skillId !== "general";
-
-  const activate = () => onBranchClick({ id: branch.id, skillId });
-
-  const header = (
-    <BranchHeader
-      x={branch.root.x + 11}
-      y={branch.labelY}
-      label={label}
-      level={level}
-      firstRowRight={branch.firstRowRight}
-      started={started}
-      type={type}
-    />
-  );
-
-  return (
-    <g>
-      <path
-        d={branch.connectorPath}
-        fill='none'
-        stroke={started ? INK.lineLit : INK.line}
-        strokeWidth={1}
-      />
-      <path
-        d={branch.chainPath}
-        fill='none'
-        stroke={INK.line}
-        strokeWidth={1.5}
-        strokeLinecap='round'
-      />
-      {branch.difficultyMarks.map((mark) => (
-        <DifficultyPips key={`${mark.x},${mark.y}`} {...mark} />
-      ))}
-      <circle
-        cx={branch.root.x}
-        cy={branch.root.y}
-        r={2.5}
-        fill={started ? INK.done : INK.ring}
-      />
-      {opensSkill ? (
-        <g
-          role='button'
-          tabIndex={0}
-          className='cursor-pointer outline-none [&:focus-visible_text]:fill-zinc-50 [&:hover_text]:fill-zinc-50'
-          onClick={activate}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              activate();
-            }
-          }}>
-          {header}
-        </g>
-      ) : (
-        header
-      )}
-      {branch.nodes.map((node) => {
-        const state = progress.states.get(node.id) ?? "available";
-        return (
-          <g
-            key={node.id}
-            data-exercise-id={node.id}
-            role='button'
-            tabIndex={0}
-            className='cursor-pointer outline-none'
-            onMouseEnter={(e) => onNodeHover(hoverFor(node, e.currentTarget))}
-            onMouseLeave={() => onNodeHover(null)}
-            onFocus={(e) => onNodeHover(hoverFor(node, e.currentTarget))}
-            onBlur={() => onNodeHover(null)}
-            onClick={() => onNodeClick(node.id)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onNodeClick(node.id);
-              }
-            }}>
-            {/* Generous hit area — the dots themselves are small. */}
-            <circle
-              cx={node.x}
-              cy={node.y}
-              r={G.dotSpacing / 2}
-              fill='transparent'
-            />
-            {hoveredId === node.id && (
-              <circle
-                cx={node.x}
-                cy={node.y}
-                r={G.dotRadius + 4}
-                fill='none'
-                stroke={INK.label}
-                strokeWidth={1}
-              />
-            )}
-            <Dot state={state} x={node.x} y={node.y} />
-          </g>
-        );
-      })}
-    </g>
-  );
-};
-
 /**
- * A numbered stop on the trunk, its name and count under it — a tier, or
- * Mastery at the end of the line. Progress runs round the circle and a
- * finished stop is filled in. The trunk breaks for the caption, so the eye
- * reads number → name → count.
+ * The skill tree: a straight trunk, a big key per tier, and every exercise a
+ * small numbered key on a row that leaves the trunk on its own curve — the same
+ * keys and lines as the Journey road. Lines are an SVG underneath; everything
+ * that can be pressed is a real button on top of it.
  */
-const Stop = ({
-  x,
-  y,
-  number,
-  title,
-  completed,
-  total,
-  type,
-}: {
-  x: number;
-  y: number;
-  number: number;
-  title: string;
-  completed: number;
-  total: number;
-  type: TypeScale;
-}) => {
-  const INK = useInk();
-  const r = G.milestoneRadius;
-  const share = total > 0 ? completed / total : 0;
-  const done = total > 0 && completed === total;
-  const circumference = 2 * Math.PI * r;
-
-  return (
-    <g>
-      {done ? (
-        <circle cx={x} cy={y} r={r} fill={INK.done} />
-      ) : (
-        <>
-          <circle
-            cx={x}
-            cy={y}
-            r={r}
-            fill={INK.page}
-            stroke={INK.line}
-            strokeWidth={1.5}
-          />
-          {share > 0 && (
-            <circle
-              cx={x}
-              cy={y}
-              r={r}
-              fill='none'
-              stroke={INK.done}
-              strokeWidth={2.5}
-              strokeLinecap='round'
-              strokeDasharray={circumference}
-              strokeDashoffset={circumference * (1 - share)}
-              transform={`rotate(-90 ${x} ${y})`}
-            />
-          )}
-        </>
-      )}
-      <text
-        x={x}
-        y={y + 1}
-        textAnchor='middle'
-        dominantBaseline='central'
-        fontFamily={FONT}
-        fontSize={type.number}
-        fontWeight={600}
-        fill={done ? INK.page : completed > 0 ? INK.title : INK.muted}
-        style={{ fontVariantNumeric: "tabular-nums" }}>
-        {String(number).padStart(2, "0")}
-      </text>
-      <text
-        x={x}
-        y={y + r + CAPTION_TITLE_DY}
-        textAnchor='middle'
-        fontFamily={FONT}
-        fontSize={type.title}
-        fontWeight={600}
-        fill={INK.title}>
-        {title}
-      </text>
-      <text
-        x={x}
-        y={y + r + CAPTION_COUNT_DY}
-        textAnchor='middle'
-        fontFamily={FONT}
-        fontSize={type.count}
-        fill={INK.faint}
-        style={{ fontVariantNumeric: "tabular-nums" }}>
-        {completed} / {total}
-      </text>
-    </g>
-  );
-};
-
-/**
- * The stretches of trunk that are actually drawn: from the first milestone
- * down to mastery, everything but the captions.
- */
-const trunkSegments = (layout: RoadmapLayout): [number, number][] => {
-  const segments: [number, number][] = [];
-  let cursor = layout.tiers.length
-    ? layout.tiers[0].y + G.milestoneRadius
-    : layout.masteryY;
-  layout.tiers.forEach((lt) => {
-    const from = lt.y + G.milestoneRadius;
-    if (from > cursor) segments.push([cursor, from]);
-    cursor = from + CAPTION_BLOCK;
-  });
-  const end = layout.masteryY - G.milestoneRadius;
-  if (end > cursor) segments.push([cursor, end]);
-  return segments;
-};
-
 export const SkillRoadmapTree = memo(function SkillRoadmapTree({
   tiers,
   layout,
   progress,
-  hoveredId,
+  selectedId,
   onNodeHover,
-  onNodeClick,
+  onNodeSelect,
   onBranchClick,
+  onTierToggle,
   skillLevels,
-  scale = 1,
-  animate = true,
+  exerciseTitle,
+  renderBubble,
 }: SkillRoadmapTreeProps) {
-  const INK = useInk();
-
   const labels = useSkillRoadmapLabels();
+  const { t } = labels;
   const tierById = new Map(tiers.map((tier) => [tier.id, tier]));
-  const type = typeScaleFor(scale);
-  // The spine is lit down to the last tier the player has actually touched.
-  const lastStartedIndex = layout.tiers.reduce(
-    (last, lt, i) =>
-      (progress.byTier.get(lt.id)?.completed ?? 0) > 0 ? i : last,
-    -1,
+  const lines = useMemo(
+    () => roadmapLines(layout, progress),
+    [layout, progress],
   );
-  const litUntil =
-    lastStartedIndex >= 0 ? layout.tiers[lastStartedIndex].bottom : 0;
+  const trunkTop = layout.tiers[0]?.y ?? layout.masteryY;
+  const { trunkX } = layout;
+  const allDone = progress.total > 0 && progress.completed === progress.total;
 
   return (
-    <svg
-      viewBox={`0 0 ${layout.width} ${layout.height}`}
-      width='100%'
-      height='100%'
-      className='block select-none'
-      aria-label={labels.t("roadmap.aria")}>
-      <motion.g
-        initial={animate ? { opacity: 0 } : false}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.45, ease: "easeOut" }}>
-        {/* The spine, drawn in segments so it never strikes through a caption,
-            and brighter over the stretch already walked. */}
-        {trunkSegments(layout).map(([from, to]) => (
-          <g key={from}>
-            <line
-              x1={layout.trunkX}
-              y1={from}
-              x2={layout.trunkX}
-              y2={to}
-              stroke={INK.line}
-              strokeWidth={1.5}
-            />
-            {litUntil > from && (
-              <line
-                x1={layout.trunkX}
-                y1={from}
-                x2={layout.trunkX}
-                y2={Math.min(to, litUntil)}
-                stroke={INK.lineLit}
-                strokeWidth={1.5}
-              />
-            )}
-          </g>
+    <div
+      role='group'
+      aria-label={t("roadmap.aria")}
+      className='relative mx-auto select-none'
+      style={{ width: layout.width, height: layout.height }}>
+      <svg
+        aria-hidden='true'
+        width={layout.width}
+        height={layout.height}
+        className='absolute left-0 top-0'
+        fill='none'
+        strokeWidth={4}
+        strokeLinecap='round'
+        strokeLinejoin='round'>
+        <path
+          d={`M ${trunkX} ${trunkTop} L ${trunkX} ${layout.masteryY}`}
+          className='stroke-zinc-800'
+        />
+        {lines.base.map((d) => (
+          <path key={d} d={d} className='stroke-zinc-800' />
         ))}
-
-        {layout.tiers.map((lt, index) => {
-          const tier = tierById.get(lt.id);
-          if (!tier) return null;
-          const stats = progress.byTier.get(tier.id) ?? {
-            completed: 0,
-            total: 0,
-          };
-          return (
-            <g key={lt.id}>
-              <Stop
-                x={lt.x}
-                y={lt.y}
-                number={index + 1}
-                title={labels.tierTitle(tier)}
-                completed={stats.completed}
-                total={stats.total}
-                type={type}
-              />
-              {lt.rails.map((rail) => (
-                <path
-                  key={rail}
-                  d={rail}
-                  fill='none'
-                  stroke={INK.line}
-                  strokeWidth={1}
+        {lines.sapTo !== null && lines.sapTo > trunkTop && (
+          <path
+            d={`M ${trunkX} ${trunkTop} L ${trunkX} ${lines.sapTo}`}
+            className='stroke-emerald-500'
+          />
+        )}
+        {lines.done.map((d) => (
+          <path key={d} d={d} className='stroke-emerald-500' />
+        ))}
+        {lines.next.map((d) => (
+          <path key={d} d={d} className='stroke-cyan-500' />
+        ))}
+        <g stroke='none'>
+          {layout.tiers.flatMap((lt) =>
+            lt.branches.flatMap((lb) =>
+              lb.difficultyMarks.map((mark) => (
+                <DifficultyPips
+                  key={`${lb.id}:${mark.x}:${mark.y}`}
+                  {...mark}
                 />
-              ))}
-              {lt.branches.map((lb) => {
-                const branch = tier.branches.find((b) => b.id === lb.id);
-                if (!branch) return null;
-                return (
-                  <Branch
-                    key={lb.id}
-                    branch={lb}
-                    label={labels.branchLabel(branch)}
-                    skillId={branch.skillId}
-                    level={skillLevels[branch.skillId]}
-                    progress={progress}
-                    type={type}
-                    hoveredId={hoveredId}
-                    onNodeHover={onNodeHover}
-                    onNodeClick={onNodeClick}
-                    onBranchClick={onBranchClick}
-                  />
-                );
-              })}
-            </g>
+              )),
+            ),
+          )}
+        </g>
+        {layout.tiers.map((lt) => {
+          const stats = progress.byTier.get(lt.id);
+          if (
+            !stats ||
+            stats.completed === 0 ||
+            stats.completed === stats.total
+          )
+            return null;
+          return (
+            <ProgressArc
+              key={lt.id}
+              x={trunkX}
+              y={lt.y}
+              share={stats.completed / stats.total}
+            />
           );
         })}
+      </svg>
 
-        {/* The end of the line */}
-        <Stop
-          x={layout.trunkX}
-          y={layout.masteryY}
-          number={layout.tiers.length + 1}
-          title={labels.t("roadmap.mastery")}
-          completed={progress.completed}
-          total={progress.total}
-          type={type}
+      {layout.tiers.map((lt, index) => {
+        const tier = tierById.get(lt.id);
+        if (!tier) return null;
+        const stats = progress.byTier.get(tier.id) ?? {
+          completed: 0,
+          total: 0,
+        };
+        const title = labels.tierTitle(tier);
+        const holdsCurrent = tier.branches.some((branch) =>
+          branch.exercises.some((e) => progress.states.get(e.id) === "current"),
+        );
+        const tone: RoadTone = holdsCurrent
+          ? "current"
+          : stats.total > 0 && stats.completed === stats.total
+            ? "done"
+            : "open";
+        return (
+          <div key={lt.id}>
+            <StopLabel
+              top={lt.labelTop}
+              title={title}
+              completed={stats.completed}
+              total={stats.total}
+            />
+            <div
+              className='absolute z-10'
+              style={stopKeyStyle(trunkX, lt.y)}
+              title={t(
+                lt.folded ? "roadmap.show_skills" : "roadmap.hide_skills",
+              )}>
+              <RoadPathNode
+                tone={tone}
+                icon={<StopNumber number={index + 1} />}
+                title={title}
+                selected={lt.folded}
+                onClick={() => onTierToggle(tier.id)}
+              />
+            </div>
+            {lt.folded && (
+              <p
+                className='absolute left-1/2 z-10 -translate-x-1/2 whitespace-nowrap bg-zinc-950 px-3 py-1 text-xs text-zinc-500'
+                style={{ top: lt.foldedNoteTop }}>
+                {t("roadmap.skills_hidden", { count: tier.branches.length })}
+              </p>
+            )}
+            {lt.branches.map((lb) => {
+              const branch = tier.branches.find((b) => b.id === lb.id);
+              if (!branch) return null;
+              const level = skillLevels[branch.skillId];
+              return (
+                <Branch
+                  key={lb.id}
+                  layoutBranch={lb}
+                  branch={branch}
+                  label={labels.branchLabel(branch)}
+                  level={level}
+                  mapWidth={layout.width}
+                  progress={progress}
+                  selectedId={selectedId}
+                  startLabel={t("roadmap.start")}
+                  levelLabel={level ? t("roadmap.lvl", { level }) : null}
+                  onNodeHover={onNodeHover}
+                  onNodeSelect={onNodeSelect}
+                  onBranchClick={onBranchClick}
+                  exerciseTitle={exerciseTitle}
+                  renderBubble={renderBubble}
+                />
+              );
+            })}
+          </div>
+        );
+      })}
+
+      {/* The end of the line: nothing to press, it fills in when all is done. */}
+      <StopLabel
+        top={layout.masteryLabelTop}
+        title={t("roadmap.mastery")}
+        completed={progress.completed}
+        total={progress.total}
+      />
+      <div
+        className='absolute z-10'
+        style={stopKeyStyle(trunkX, layout.masteryY)}>
+        <RoadPathNode
+          tone={allDone ? "done" : "locked"}
+          icon={<StopNumber number={layout.tiers.length + 1} />}
+          title={t("roadmap.mastery")}
+          disabled
+          onClick={() => undefined}
         />
-      </motion.g>
-    </svg>
+      </div>
+    </div>
   );
 });

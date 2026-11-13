@@ -67,6 +67,8 @@ export function useStrummingMatcher({
   const judgedSlotsRef          = useRef<Set<number>>(new Set());
   /** The next absolute slot whose deadline for a miss hasn't been checked. */
   const missCursorRef           = useRef<number>(0);
+  /** The clock and tempo the slots above are numbered on (see the detection loop). */
+  const slotGridRef             = useRef<string | null>(null);
   const lastProcessedOnsetRef   = useRef<number>(0);
   const lastProcessedSoftRef    = useRef<number>(0);
   const rhythmStatsRef          = useRef({ hits: 0, misses: 0, wrongHits: 0 });
@@ -87,6 +89,7 @@ export function useStrummingMatcher({
     slotFeedbackRefInternal.current.clear();
     judgedSlotsRef.current.clear();
     missCursorRef.current = 0;
+    slotGridRef.current = null;
     lastProcessedOnsetRef.current = 0;
     lastProcessedSoftRef.current = 0;
     rhythmStatsRef.current  = { hits: 0, misses: 0, wrongHits: 0 };
@@ -109,6 +112,20 @@ export function useStrummingMatcher({
 
     const totalSlots = pattern.timeSignature[0] * pattern.subdivisions;
     const bpw        = barPixelWidth(pattern);
+
+    // A slot's number is its place on this run's clock at this tempo. Started
+    // over, resumed or played at another tempo, the same numbers come round
+    // again for other moments — and a slot already given its verdict takes no
+    // second one, so every strum on them went by unheard, without a miss either.
+    // The numbering starts afresh with the grid: nothing judged yet, and what
+    // has already gone by on the new grid is not called missed.
+    const slotGrid = `${startTime}:${bpm}:${pattern.subdivisions}`;
+    if (slotGridRef.current !== slotGrid) {
+      slotGridRef.current = slotGrid;
+      judgedSlotsRef.current.clear();
+      const gridSlotMs = (60000 / bpm) / pattern.subdivisions;
+      missCursorRef.current = Math.max(0, Math.ceil((Date.now() - startTime) / gridSlotMs));
+    }
 
     /**
      * Gives the slot an attack lands on its verdict, if it has none yet. A soft
@@ -197,7 +214,13 @@ export function useStrummingMatcher({
       const reportLagMs = Math.max(getLatencyMs(), attackLatency + ATTACK_WINDOW_MS) + REPORT_MARGIN_MS;
       const settledSlots = Math.floor((elapsedMs - toleranceMs - reportLagMs) / slotDurationMs) + 1;
       while (missCursorRef.current < settledSlots) {
-        const absSlot = missCursorRef.current++;
+        // Read, then written — not `missCursorRef.current++`. In the built app
+        // (React Compiler on) that expression gave the value *after* the step:
+        // every slot was closed one slot early, before its strum could be heard,
+        // so every strum read as missed. Vitest runs without the compiler and
+        // never saw it.
+        const absSlot = missCursorRef.current;
+        missCursorRef.current = absSlot + 1;
         if (judgedSlotsRef.current.has(absSlot)) continue;
         judgedSlotsRef.current.add(absSlot);
         const slotInBar = ((absSlot % totalSlots) + totalSlots) % totalSlots;

@@ -1,26 +1,35 @@
 import { alternatePickingCrossStringExercise } from "feature/exercisePlan/data/exerises/alternatePickingCrossString/alternatePickingCrossString";
 import { aMajorTriadsExercise } from "feature/exercisePlan/data/exerises/aMajorTriads/aMajorTriads";
 import { aMinorTriadsExercise } from "feature/exercisePlan/data/exerises/aMinorTriads/aMinorTriads";
+import { barreBuildingExercise, barreOpenToBarreExercise } from "feature/exercisePlan/data/exerises/barreChords/barreChords";
+import { bassBluesWalkExercise, bassEighthNoteDriveExercise, bassMajorScaleExercise, bassOctaveGrooveExercise, bassRootAndFifthExercise, bassWalkingLineExercise } from "feature/exercisePlan/data/exerises/bassFoundations/bassFoundations";
+import { alternatePickingFirstDownUpExercise, articulationShortAndLongExercise, hammerOnFirstHammerExercise, minorPentatonicOpenPositionExercise, pickingOpenStringCrossingExercise, pullOffFirstPullExercise, stringSkippingOpenStringsExercise, tappingFirstTapExercise, vibratoFirstWobbleExercise } from "feature/exercisePlan/data/exerises/beginnerTechnique/beginnerTechnique";
+import { compositionFirstRiffExercise, harmonyMajorVsMinorExercise, harmonyRootThirdFifthExercise, improvThreeNotesExercise, notesOnAStringExercise, notesOnLowEStringExercise, phrasingPlayThenRestExercise, tonePickPositionExercise } from "feature/exercisePlan/data/exerises/beginnerTheory/beginnerTheory";
 import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
 import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
 import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
 import { crazyTrainRiffPreviewExercise } from "feature/exercisePlan/data/exerises/crazyTrainRiffPreview/crazyTrainRiffPreview";
 import { dMajorTriadsExercise } from "feature/exercisePlan/data/exerises/dMajorTriads/dMajorTriads";
 import { dMinorTriadsExercise } from "feature/exercisePlan/data/exerises/dMinorTriads/dMinorTriads";
+import { doubleStopsRockFourthsExercise, doubleStopsSixthsExercise, doubleStopsThirdsExercise, octaveShapesExercise } from "feature/exercisePlan/data/exerises/doubleStops/doubleStops";
 import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
 import { eMajorTriadsExercise } from "feature/exercisePlan/data/exerises/eMajorTriads/eMajorTriads";
 import { eMinorTriadsExercise } from "feature/exercisePlan/data/exerises/eMinorTriads/eMinorTriads";
+import { fingerstyleAlternatingThumbExercise, fingerstyleTravisPinchExercise } from "feature/exercisePlan/data/exerises/fingerstyleThumb/fingerstyleThumb";
 import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
+import { funkSixteenthScratchExercise } from "feature/exercisePlan/data/exerises/funkSixteenthScratch/funkSixteenthScratch";
 import { gMajorInversionsExercise } from "feature/exercisePlan/data/exerises/gMajorInversions/gMajorInversions";
 import { gMinorInversionsExercise } from "feature/exercisePlan/data/exerises/gMinorInversions/gMinorInversions";
 import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
 import { guitarPlayalongsExercises } from "feature/exercisePlan/data/exerises/guitarPlayalongs/guitarPlayalongs";
 import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
+import { harmonicsChimeMelodyExercise, naturalHarmonicsExercise, pinchHarmonicsExercise } from "feature/exercisePlan/data/exerises/harmonics/harmonics";
 import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
 import { legatoContinuousFlowExercise } from "feature/exercisePlan/data/exerises/legatoContinuousFlow/legatoContinuousFlow";
 import { legatoHammerPullRunExercise } from "feature/exercisePlan/data/exerises/legatoHammerPullRun/legatoHammerPullRun";
 import { legatoSextuplets457Exercise } from "feature/exercisePlan/data/exerises/legatoSextuplets457/legatoSextuplets457";
 import { legatoTrillSprintExercise } from "feature/exercisePlan/data/exerises/legatoTrillSprint/legatoTrillSprint";
+import { majorScaleGroupsOfFourExercise, majorScaleThirdsExercise, majorScaleThreePerStringExercise } from "feature/exercisePlan/data/exerises/majorScale/majorScale";
 import { masterOfPuppetsRiffPreviewExercise } from "feature/exercisePlan/data/exerises/masterOfPuppetsRiffPreview/masterOfPuppetsRiffPreview";
 import {
   metalPlayalongExercise,
@@ -46,10 +55,17 @@ import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exe
 import { mutingDisciplineDrillExercise } from "feature/exercisePlan/data/exerises/mutingDisciplineDrill/mutingDisciplineDrill";
 import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneChordImprov/oneChordImprov";
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
+import { openChordsBluesSeventhsExercise, openChordsFirstChangesExercise, pickedOpenChordArpeggiosExercise } from "feature/exercisePlan/data/exerises/openChords/openChords";
 import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
+import { palmMuteChugAndStabExercise, palmMuteOpenChugExercise } from "feature/exercisePlan/data/exerises/palmMuting/palmMuting";
 import { pentatonicPlayalongExercise } from "feature/exercisePlan/data/exerises/pentatonicPlayalong/pentatonicPlayalong";
+import { powerChordFirstShapesExercise, powerChordShiftsExercise } from "feature/exercisePlan/data/exerises/powerChords/powerChords";
+import { offBeatChopsExercise, palmMuteSixteenthChugExercise, powerChordStopsExercise } from "feature/exercisePlan/data/exerises/rhythmGuitar/rhythmGuitar";
+import { bluesScaleBoxExercise, majorPentatonicBoxExercise, majorScaleOpenPositionExercise, naturalMinorPositionExercise, seventhChordArpeggiosExercise } from "feature/exercisePlan/data/exerises/scalePositions/scalePositions";
 import { sevenNationArmyRiffPreviewExercise } from "feature/exercisePlan/data/exerises/sevenNationArmyRiffPreview/sevenNationArmyRiffPreview";
+import { bluesTwelveBarShuffleExercise, shuffleBoogieRiffExercise } from "feature/exercisePlan/data/exerises/shuffleBlues/shuffleBlues";
 import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
+import { slidesIntoNotesExercise, slidesLinkingBoxesExercise, slidesOneStringExercise } from "feature/exercisePlan/data/exerises/slides/slides";
 import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
 import { speedBurstChromaticBlitzExercise } from "feature/exercisePlan/data/exerises/speedBurstChromaticBlitz/speedBurstChromaticBlitz";
 import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
@@ -114,6 +130,7 @@ import {
 import { strummingRockExercise } from "feature/exercisePlan/data/exerises/strummingRock/strummingRock";
 import { sweetChildOMineRiffPreviewExercise } from "feature/exercisePlan/data/exerises/sweetChildOMineRiffPreview/sweetChildOMineRiffPreview";
 import { thunderstruckRiffPreviewExercise } from "feature/exercisePlan/data/exerises/thunderstruckRiffPreview/thunderstruckRiffPreview";
+import { transcriptionChordsByEarExercise, transcriptionFindTheKeyExercise, transcriptionLickExercise, transcriptionMelodyExercise } from "feature/exercisePlan/data/exerises/transcription/transcription";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
 import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
 import { writeYourOwnPartExercise } from "feature/exercisePlan/data/exerises/writeYourOwnPart/writeYourOwnPart";
@@ -175,6 +192,10 @@ const FREE_EXERCISE_IDS = new Set([
   "ear_progression_basics",
   "ear_tuning_trainer",
   "ear_mode_basics",
+  "ear_interval_basics",
+  "ear_interval_seconds_thirds",
+  "ear_interval_all_twelve",
+  "ear_interval_harmonic",
   // Chord degree hunts — the entry level is free
   "chord_degree_hunt_triads",
   // Playalong exercises — free
@@ -211,6 +232,73 @@ const FREE_EXERCISE_IDS = new Set([
   "gp_music_theory_essential",
   "gp_drop2_chords_arpeggios",
   "gp_pentatonic_tutorial",
+  // Rhythm guitar, articulation, scales, fingerstyle, feel, bass, transcription
+  "power_chord_first_shapes",
+  "power_chord_shifts",
+  "palm_mute_open_chug",
+  "palm_mute_chug_and_stab",
+  "barre_building_the_barre",
+  "barre_open_to_barre",
+  "slides_one_string",
+  "slides_linking_pentatonic_boxes",
+  "natural_harmonics_12_7_5",
+  "pinch_harmonics_squeals",
+  "double_stops_thirds_g_major",
+  "octave_shapes_muted_lines",
+  "major_scale_three_notes_per_string",
+  "major_scale_in_thirds",
+  "major_scale_groups_of_four",
+  "fingerstyle_alternating_thumb",
+  "fingerstyle_travis_pinch",
+  "shuffle_boogie_riff",
+  "blues_twelve_bar_shuffle_a",
+  "funk_sixteenth_scratch",
+  "bass_root_and_fifth",
+  "bass_eighth_note_drive",
+  "bass_walking_line_g",
+  "transcription_melody_by_ear",
+  "transcription_lift_a_lick",
+  "open_chords_first_changes",
+  "open_chords_blues_sevenths",
+  "arpeggios_picked_open_chords",
+  "power_chord_stops_and_rests",
+  "palm_mute_sixteenth_chug",
+  "rhythm_off_beat_chops",
+  "slides_into_the_note",
+  "harmonics_chime_melody",
+  "double_stops_sixths_g_major",
+  "double_stops_rock_fourths",
+  "major_scale_open_position_c",
+  "minor_scale_a_natural_minor",
+  "blues_scale_box_1",
+  "major_pentatonic_g_box",
+  "arpeggios_seventh_chords_c",
+  "bass_octave_groove",
+  "bass_major_scale_one_octave",
+  "bass_blues_walk_12_bar",
+  "transcription_find_the_key",
+  "transcription_chords_by_ear",
+  "picking_open_string_crossing",
+  "alternate_picking_first_down_up",
+  "string_skipping_open_strings",
+  "hammer_on_first_hammer",
+  "pull_off_first_pull",
+  "tapping_first_tap",
+  "vibrato_first_wobble",
+  "articulation_short_and_long",
+  "minor_pentatonic_open_position_e",
+  "harmony_root_third_fifth",
+  "harmony_major_vs_minor",
+  "notes_natural_low_e_string",
+  "notes_natural_a_string",
+  "improv_three_notes_only",
+  "phrasing_play_then_rest",
+  "composition_first_riff",
+  "tone_where_and_how_you_pick",
+  "ear_chord_major_or_minor",
+  "ear_mode_major_or_minor",
+  "ear_interval_three_sizes",
+  "ear_tuning_wide_misses",
   // Riff Vault — free
   "master_of_puppets_riff_preview",
   "seven_nation_army_riff_preview",
@@ -467,6 +555,70 @@ const rawExercises: Exercise[] = [
   pentatonicPlayalongExercise,
   ...guitarPlayalongsExercises,
   jpStretching,
+  // Rhythm guitar, articulation, scales, fingerstyle, feel, bass, transcription — 2026-11
+  powerChordFirstShapesExercise,
+  powerChordShiftsExercise,
+  palmMuteOpenChugExercise,
+  palmMuteChugAndStabExercise,
+  barreBuildingExercise,
+  barreOpenToBarreExercise,
+  slidesOneStringExercise,
+  slidesLinkingBoxesExercise,
+  naturalHarmonicsExercise,
+  pinchHarmonicsExercise,
+  doubleStopsThirdsExercise,
+  octaveShapesExercise,
+  majorScaleThreePerStringExercise,
+  majorScaleThirdsExercise,
+  majorScaleGroupsOfFourExercise,
+  fingerstyleAlternatingThumbExercise,
+  fingerstyleTravisPinchExercise,
+  shuffleBoogieRiffExercise,
+  bluesTwelveBarShuffleExercise,
+  funkSixteenthScratchExercise,
+  bassRootAndFifthExercise,
+  bassEighthNoteDriveExercise,
+  bassWalkingLineExercise,
+  transcriptionMelodyExercise,
+  transcriptionLickExercise,
+  openChordsFirstChangesExercise,
+  openChordsBluesSeventhsExercise,
+  pickedOpenChordArpeggiosExercise,
+  powerChordStopsExercise,
+  palmMuteSixteenthChugExercise,
+  offBeatChopsExercise,
+  slidesIntoNotesExercise,
+  harmonicsChimeMelodyExercise,
+  doubleStopsSixthsExercise,
+  doubleStopsRockFourthsExercise,
+  majorScaleOpenPositionExercise,
+  naturalMinorPositionExercise,
+  bluesScaleBoxExercise,
+  majorPentatonicBoxExercise,
+  seventhChordArpeggiosExercise,
+  bassOctaveGrooveExercise,
+  bassMajorScaleExercise,
+  bassBluesWalkExercise,
+  transcriptionFindTheKeyExercise,
+  transcriptionChordsByEarExercise,
+  // First steps — beginner entries for branches that had none
+  pickingOpenStringCrossingExercise,
+  alternatePickingFirstDownUpExercise,
+  stringSkippingOpenStringsExercise,
+  hammerOnFirstHammerExercise,
+  pullOffFirstPullExercise,
+  tappingFirstTapExercise,
+  vibratoFirstWobbleExercise,
+  articulationShortAndLongExercise,
+  minorPentatonicOpenPositionExercise,
+  harmonyRootThirdFifthExercise,
+  harmonyMajorVsMinorExercise,
+  notesOnLowEStringExercise,
+  notesOnAStringExercise,
+  improvThreeNotesExercise,
+  phrasingPlayThenRestExercise,
+  compositionFirstRiffExercise,
+  tonePickPositionExercise,
 
   alternatePickingCrossStringExercise,
   alternatePickingPentatonicAPositionsExercise,

@@ -1,14 +1,19 @@
-import { SEASON_REWARD_PLACES } from "constants/seasonRewards";
-
 import { EMAIL_FROM, getResend } from "./client";
-import SeasonEndingSoonEmail from "./templates/SeasonEndingSoonEmail";
-import SeasonResultsEmail from "./templates/SeasonResultsEmail";
-import SeasonStartEmail from "./templates/SeasonStartEmail";
+import { formatSeasonName } from "./seasonName";
+import SeasonEndingSoonEmail, {
+  seasonEndingSubject,
+} from "./templates/SeasonEndingSoonEmail";
+import SeasonResultsEmail, {
+  seasonResultsSubject,
+} from "./templates/SeasonResultsEmail";
+import SeasonStartEmail, {
+  seasonStartSubject,
+} from "./templates/SeasonStartEmail";
 import StreakReminderEmail, {
-  formatHoursLeft,
   type StreakEmailVariant,
+  streakSubject,
 } from "./templates/StreakReminderEmail";
-import WelcomeEmail from "./templates/WelcomeEmail";
+import WelcomeEmail, { WELCOME_SUBJECT } from "./templates/WelcomeEmail";
 import { unsubscribeHeaders } from "./unsubscribe";
 
 // Every email links here from its footer: the Settings tab with the toggles.
@@ -29,7 +34,7 @@ export async function sendWelcomeEmail({ to, userName }: SendWelcomeArgs) {
   const { data, error } = await getResend().emails.send({
     from: EMAIL_FROM,
     to,
-    subject: "Welcome to Riff Quest, your journey starts now",
+    subject: WELCOME_SUBJECT,
     react: WelcomeEmail({
       userName: userName ?? "",
       dashboardUrl: `${baseUrl}/dashboard`,
@@ -73,16 +78,10 @@ export async function sendStreakReminderEmail({
   const logoUrl =
     process.env.EMAIL_LOGO_URL ?? "https://riff.quest/images/longlightlogo.png";
 
-  const deadline = formatHoursLeft(hoursLeft);
-  const subjects: Record<StreakEmailVariant, string> = {
-    d1: `Your day ends ${deadline} — keep your ${streakDays}-day streak going`,
-    d3: "It's been 3 days. Time to pick up the guitar again",
-  };
-
   const { data, error } = await getResend().emails.send({
     from: EMAIL_FROM,
     to,
-    subject: subjects[variant],
+    subject: streakSubject(variant, streakDays, userName),
     headers: unsubscribeHeaders(uid, "streakReminders", baseUrl),
     react: StreakReminderEmail({
       userName: userName ?? "",
@@ -134,14 +133,16 @@ export async function sendSeasonStartEmail({
   const logoUrl =
     process.env.EMAIL_LOGO_URL ?? "https://riff.quest/images/longlightlogo.png";
 
+  const season = formatSeasonName(seasonName);
+
   const { data, error } = await getResend().emails.send({
     from: EMAIL_FROM,
     to,
-    subject: `${seasonName} has started — compete for the top ${SEASON_REWARD_PLACES}`,
+    subject: seasonStartSubject(season),
     headers: unsubscribeHeaders(uid, "seasonUpdates", baseUrl),
     react: SeasonStartEmail({
       userName: userName ?? "",
-      seasonName,
+      seasonName: season,
       daysInSeason,
       leaderboardUrl: `${baseUrl}/leaderboard`,
       logoUrl,
@@ -166,12 +167,6 @@ interface SendSeasonEndingSoonArgs {
   daysLeft: number;
 }
 
-function endingSoonSubject(seasonName: string, daysLeft: number): string {
-  if (daysLeft <= 0) return `Final hours of ${seasonName} — last chance`;
-  if (daysLeft === 1) return `${seasonName} ends tomorrow — final push`;
-  return `${daysLeft} days left in ${seasonName} — make your final push`;
-}
-
 export async function sendSeasonEndingSoonEmail({
   to,
   uid,
@@ -183,14 +178,16 @@ export async function sendSeasonEndingSoonEmail({
   const logoUrl =
     process.env.EMAIL_LOGO_URL ?? "https://riff.quest/images/longlightlogo.png";
 
+  const season = formatSeasonName(seasonName);
+
   const { data, error } = await getResend().emails.send({
     from: EMAIL_FROM,
     to,
-    subject: endingSoonSubject(seasonName, daysLeft),
+    subject: seasonEndingSubject(season, daysLeft),
     headers: unsubscribeHeaders(uid, "seasonUpdates", baseUrl),
     react: SeasonEndingSoonEmail({
       userName: userName ?? "",
-      seasonName,
+      seasonName: season,
       daysLeft,
       leaderboardUrl: `${baseUrl}/leaderboard`,
       logoUrl,
@@ -216,6 +213,8 @@ interface SendSeasonResultsArgs {
   userPoints: number;
   fameEarned: number | null;
   top3: TopPlayer[];
+  /** Points of the last rewarded place, quoted to readers below it. */
+  lastRewardedPoints?: number | null;
 }
 
 export async function sendSeasonResultsEmail({
@@ -227,29 +226,29 @@ export async function sendSeasonResultsEmail({
   userPoints,
   fameEarned,
   top3,
+  lastRewardedPoints = null,
 }: SendSeasonResultsArgs) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://riff.quest";
   const logoUrl =
     process.env.EMAIL_LOGO_URL ?? "https://riff.quest/images/longlightlogo.png";
 
-  const subject =
-    userPlace !== null && userPlace <= SEASON_REWARD_PLACES
-      ? `You finished top ${SEASON_REWARD_PLACES} in ${seasonName}`
-      : `${seasonName} is over — see your results`;
+  const season = formatSeasonName(seasonName);
 
   const { data, error } = await getResend().emails.send({
     from: EMAIL_FROM,
     to,
-    subject,
+    subject: seasonResultsSubject(season, userPlace),
     headers: unsubscribeHeaders(uid, "seasonUpdates", baseUrl),
     react: SeasonResultsEmail({
       userName: userName ?? "",
-      seasonName,
+      seasonName: season,
       userPlace,
       userPoints,
       fameEarned,
       top3,
+      lastRewardedPoints,
       leaderboardUrl: `${baseUrl}/leaderboard`,
+      practiceUrl: `${baseUrl}/dashboard`,
       logoUrl,
       preferencesUrl: preferencesUrlFor(baseUrl),
     }),

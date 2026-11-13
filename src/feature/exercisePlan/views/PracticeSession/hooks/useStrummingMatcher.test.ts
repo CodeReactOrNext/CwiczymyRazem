@@ -33,7 +33,8 @@ const WINDOW_MS = 43;
 const ATTACK_LATENCY_MS = 20;
 
 let now = START;
-let frames: FrameRequestCallback[] = [];
+let frames = new Map<number, FrameRequestCallback>();
+let nextFrameId = 1;
 
 function refs(): AudioRefs {
   const r = <T,>(current: T) => ({ current });
@@ -48,17 +49,17 @@ function refs(): AudioRefs {
 /** Runs the RAF loop at `at` ms after the start. */
 function frame(at: number) {
   now = START + at;
-  const pending = frames;
-  frames = [];
+  const pending = [...frames.values()];
+  frames = new Map();
   act(() => { pending.forEach(cb => cb(now)); });
 }
 
 beforeEach(() => {
   now = START;
-  frames = [];
+  frames = new Map();
   vi.spyOn(Date, "now").mockImplementation(() => now);
-  vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => { frames.push(cb); return frames.length; });
-  vi.stubGlobal("cancelAnimationFrame", () => {});
+  vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => { frames.set(nextFrameId, cb); return nextFrameId++; });
+  vi.stubGlobal("cancelAnimationFrame", (id: number) => { frames.delete(id); });
 });
 
 afterEach(() => {
@@ -186,5 +187,65 @@ describe("useStrummingMatcher verdicts", () => {
     frame(2200);
     frame(2300);
     expect(result.current.sessionStats.hits).toBe(1);
+  });
+});
+
+describe("useStrummingMatcher over a restart", () => {
+  /** The hook on a clock the test can move: a restart or a tempo change gives a new one. */
+  function renderOn(audioRefs: AudioRefs, startTime: number, bpm = 60) {
+    return renderHook(
+      (props: { startTime: number; bpm: number }) => useStrummingMatcher({
+        isPlaying: true, startTime: props.startTime, bpm: props.bpm, pattern: PATTERN, isMicEnabled: true, audioRefs,
+        getLatencyMs: () => ATTACK_LATENCY_MS + WINDOW_MS + 30,
+        getAttackLatencyMs: () => ATTACK_LATENCY_MS + 30,
+        calibratedLatencyMs: null, currentExerciseIndex: 0,
+      }),
+      { initialProps: { startTime, bpm } },
+    );
+  }
+  const heardAt = (ms: number) => ms + ATTACK_LATENCY_MS + 30;
+
+  it("credits the same slots again after the pattern is started over", () => {
+    const audio = refs();
+    const { result, rerender } = renderOn(audio, START);
+    frame(1500);
+    audio.lastAttackMsRef!.current = heardAt(START + 2000);
+    frame(2100);
+    frame(2200);
+    expect(result.current.sessionStats.hits).toBe(1);
+
+    // Started over 10 s in: the slots count from 0 again.
+    const restart = START + 10_000;
+    rerender({ startTime: restart, bpm: 60 });
+    frame(10_500);
+    audio.lastAttackMsRef!.current = heardAt(restart + 1000);
+    frame(11_100);
+    audio.lastAttackMsRef!.current = heardAt(restart + 2000);
+    frame(12_100);
+    frame(12_200);
+    expect(result.current.sessionStats.hits).toBe(3);
+  });
+
+  it("keeps crediting strums after the tempo is turned down", () => {
+    const audio = refs();
+    const { result, rerender } = renderOn(audio, START, 120);
+    // Eight slots played through at 120 BPM (one every 500 ms).
+    for (let slot = 1; slot <= 8; slot++) {
+      audio.lastAttackMsRef!.current = heardAt(START + slot * 500);
+      frame(slot * 500 + 100);
+    }
+    frame(4300);
+    expect(result.current.sessionStats.hits).toBe(8);
+    const missesBefore = result.current.sessionStats.misses;
+
+    // Down to 60 BPM on the same clock: 5 s in is now slot 5, a number already used.
+    rerender({ startTime: START, bpm: 60 });
+    frame(4400);
+    audio.lastAttackMsRef!.current = heardAt(START + 5000);
+    frame(5100);
+    frame(5200);
+    expect(result.current.sessionStats.hits).toBe(9);
+    // What went by before the change is not called missed after it.
+    expect(result.current.sessionStats.misses).toBe(missesBefore);
   });
 });

@@ -5,10 +5,14 @@ import type {
   DegreeId,
   DetuneQuizConfig,
   EarQuizConfig,
+  IntervalDirection,
+  IntervalId,
+  IntervalQuizConfig,
   ProgressionQuizConfig,
   ScaleModeId,
   ScaleModeQuizConfig,
 } from "./earQuiz.types";
+import { buildIntervalMidi, sortIntervals } from "./intervals";
 import type { ProgressionChord } from "./progressions";
 import {
   buildProgressionChords,
@@ -42,6 +46,8 @@ const randomInt = (min: number, max: number, rng: Rng): number =>
 const CHORD_ROOT_RANGE = { min: 48, max: 59 } as const; // C3 – B3
 const KEY_ROOT_RANGE = { min: 50, max: 59 } as const; // D3 – B3 (the bass note sits an octave under)
 const SCALE_ROOT_RANGE = { min: 55, max: 64 } as const; // G3 – E4
+// An octave fits above and below without leaving the range the sampled guitar covers.
+const INTERVAL_ROOT_RANGE = { min: 55, max: 64 } as const; // G3 – E4
 
 export interface ChordTypeQuestion {
   kind: "chordType";
@@ -88,11 +94,24 @@ export interface ScaleModeQuestion {
   options: ScaleModeId[];
 }
 
+export interface IntervalQuestion {
+  kind: "interval";
+  /** The note the interval is measured from — the first one sounded. */
+  rootMidi: number;
+  rootName: string;
+  interval: IntervalId;
+  direction: IntervalDirection;
+  /** The two notes in the order they sound. */
+  midis: [number, number];
+  options: IntervalId[];
+}
+
 export type EarQuizQuestion =
   | ChordTypeQuestion
   | ProgressionQuestion
   | DetuneQuestion
-  | ScaleModeQuestion;
+  | ScaleModeQuestion
+  | IntervalQuestion;
 
 export const generateChordTypeQuestion = (
   config: ChordTypeQuizConfig,
@@ -189,6 +208,29 @@ export const generateScaleModeQuestion = (
   };
 };
 
+export const generateIntervalQuestion = (
+  config: IntervalQuizConfig,
+  previous?: IntervalQuestion | null,
+  rng: Rng = Math.random,
+): IntervalQuestion => {
+  const interval = pickFresh(config.intervals, previous?.interval, rng);
+  const direction = pick(config.directions, rng);
+  const rootMidi = randomInt(
+    INTERVAL_ROOT_RANGE.min,
+    INTERVAL_ROOT_RANGE.max,
+    rng,
+  );
+  return {
+    kind: "interval",
+    rootMidi,
+    rootName: midiToNoteName(rootMidi),
+    interval,
+    direction,
+    midis: buildIntervalMidi(rootMidi, interval, direction),
+    options: sortIntervals(config.intervals),
+  };
+};
+
 /** Rolls the next round for whichever quiz the exercise is configured as. */
 export const generateEarQuizQuestion = (
   config: EarQuizConfig,
@@ -212,6 +254,12 @@ export const generateEarQuizQuestion = (
     return generateDetuneQuestion(
       config,
       sameKind as DetuneQuestion | null,
+      rng,
+    );
+  if (config.mode === "interval")
+    return generateIntervalQuestion(
+      config,
+      sameKind as IntervalQuestion | null,
       rng,
     );
   return generateScaleModeQuestion(

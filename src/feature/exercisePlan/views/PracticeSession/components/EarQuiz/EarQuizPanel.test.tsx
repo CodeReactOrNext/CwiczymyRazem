@@ -156,3 +156,26 @@ describe("EarQuizPanel — scales and modes", () => {
     expect(screen.getByText("/1")).toBeDefined();
   });
 });
+
+describe("EarQuizPanel — intervals", () => {
+  afterEach(cleanup);
+
+  const config: EarQuizConfig = {
+    mode: "interval",
+    intervals: ["m3", "M3", "P5"],
+    directions: ["ascending"],
+  };
+
+  it("offers each interval, grades the pick and lets every one be heard after", () => {
+    render(<EarQuizPanel config={config} exerciseId='test_interval_quiz' />);
+
+    fireEvent.click(button(/Play interval/));
+    fireEvent.click(button(/Perfect 5th/));
+
+    expect(button(/Next/)).toBeDefined();
+    expect(screen.getByText(/frets? from .+ on one string/)).toBeDefined();
+
+    fireEvent.click(button(/Hear Minor 3rd from/));
+    expect(screen.getByText("/1")).toBeDefined();
+  });
+});

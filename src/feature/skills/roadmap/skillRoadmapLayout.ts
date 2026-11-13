@@ -7,132 +7,173 @@ import {
 } from "./skillRoadmap.data";
 
 /**
- * Geometry of the roadmap in map units (the SVG viewBox); the view scales it.
+ * Geometry of the roadmap, in CSS pixels.
  *
- * One trunk down the middle, milestones on it, and up to four branch lanes per
- * band — two either side of the trunk, the way a tree fans out. A branch is a
- * serpentine chain: `dotsPerRow` dots left-to-right, a half-circle turn, the
- * next row back right-to-left, so a long chain grows down instead of across.
- * Branches of a tier fill a band of four lanes at a time; a tier with more
- * branches gets more bands stacked below the first.
+ * One straight trunk down the middle with a big key per tier on it. A tier's
+ * skills hang off the trunk in pairs, one either side at the same height. A
+ * skill is one or more rows of exercise keys, and every row leaves the trunk on
+ * its own curve — a twig — and reads from the trunk outwards, so nothing snakes
+ * back and the middle of the map is a single line.
+ *
+ * The map follows the width it is given: a narrower panel gets shorter rows,
+ * not a scaled-down drawing, so the keys keep their size.
  */
 export const ROADMAP_GEOMETRY = {
-  width: 1200,
-  trunkX: 600,
-  /** Left edge of each lane, outermost-left to outermost-right. */
-  laneStarts: [40, 290, 690, 940],
-  dotSpacing: 27,
-  rowSpacing: 32,
-  /**
-   * Extra room where a chain steps up a difficulty, on top of `dotSpacing`.
-   * A branch has at most four difficulties, so at most three of these.
-   */
-  groupGap: 10,
-  /** Upper bound on a row; a branch that wraps spreads its dots evenly instead. */
-  dotsPerRow: 8,
-  /** Dot radius; the chain starts this far into the lane. */
-  dotRadius: 7,
-  /** The branch's name plus breathing room above its first row of dots. */
-  branchHeaderHeight: 26,
-  /** Vertical room between two bands of the same tier. */
-  bandGap: 30,
-  /** How far above a band its rail runs — clear of the branch names. */
-  railOffset: 16,
-  milestoneRadius: 24,
-  /** From the milestone's bottom edge to the first band: the tier's name and count sit here, then the connectors swoop out below them. */
-  milestoneLabelHeight: 80,
-  tierGap: 16,
-  /** Above the first milestone, clear of the view's top fade. */
-  topPadding: 56,
-  /** Mastery marker below the last tier, as far down as a milestone would be. */
-  masteryOffset: 40,
-  bottomPadding: 120,
+  maxWidth: 1100,
+  minWidth: 640,
+  /** Clear space kept at the map's left and right edges. */
+  sideMargin: 20,
+
+  /** An exercise key: its face, and the lip under it. */
+  keySize: 30,
+  keyLip: 4,
+  /** Centre to centre along a row. */
+  keyStep: 42,
+  /** Extra room where a row steps up a difficulty, on top of `keyStep`. */
+  groupGap: 12,
+  /** Row to row inside one skill. */
+  rowPitch: 52,
+  /** Trunk to the centre of a row's first key. */
+  rowStart: 112,
+  /** Trunk to where a skill's name starts. */
+  headerX: 96,
+  /** How far above its row a twig leaves the trunk. */
+  forkRise: 44,
+  maxKeysPerRow: 8,
+  minKeysPerRow: 3,
+
+  /** A skill's name, plus the room above its first row. */
+  headerHeight: 36,
+  /** Extra room above the row that carries the "Start" tag. */
+  startTagRoom: 34,
+  /** Under a row's keys: the difficulty pips and a little air. */
+  rowFoot: 12,
+  /** Between two pairs of skills in a tier. */
+  branchGap: 30,
+
+  /** A tier's key on the trunk. */
+  tierKeySize: 80,
+  tierKeyLip: 7,
+  /** The tier's name and count, stacked above its key. */
+  tierLabelHeight: 70,
+  /** From under a tier's key to its first pair of skills. */
+  tierToBranches: 26,
+  /** After a tier's last pair, before the next tier's name. */
+  tierGap: 10,
+  /** What a folded tier takes under its key: one line saying what is hidden. */
+  foldedHeight: 64,
+
+  /** The bubble that opens under the picked exercise. */
+  bubbleHeight: 92,
+  bubbleGap: 20,
+
+  topPadding: 24,
+  bottomPadding: 48,
 } as const;
+
+const G = ROADMAP_GEOMETRY;
 
 export interface LayoutNode {
   id: string;
   x: number;
   y: number;
-  /** Position in its branch, easiest first. */
+  /** Position in its skill, easiest first. */
   index: number;
+}
+
+export interface LayoutRow {
+  y: number;
+  /** Indexes into the branch's nodes; a row is never empty. */
+  first: number;
+  last: number;
+}
+
+export interface LayoutBubble {
+  nodeId: string;
+  top: number;
+  left: number;
+  width: number;
+  /** Where the picked key sits, measured from the bubble's left edge. */
+  pointerX: number;
 }
 
 export interface LayoutBranch {
   id: string;
-  /** Lane index (0–3): 0–1 hang left of the trunk, 2–3 right. */
-  lane: number;
-  /** Left edge of the lane; labels start here. */
-  x: number;
-  /** Baseline of the branch label. */
-  labelY: number;
-  /** Where the connector lands: a small root marker left of the label. */
-  root: { x: number; y: number };
+  /** -1 hangs left of the trunk, 1 right. Rows run away from the trunk. */
+  side: -1 | 1;
+  /** Top of the skill's name. */
+  top: number;
+  /** The edge the name is anchored to, on the trunk's side. */
+  headerX: number;
   nodes: LayoutNode[];
-  /** Right edge of the first row's last dot; the branch's level closes the header here. */
-  firstRowRight: number;
-  /** SVG path through the dots, with the serpentine turns, broken where the difficulty steps up. */
-  chainPath: string;
+  rows: LayoutRow[];
   /**
-   * The first dot of each difficulty group and how hard the group is, from
-   * 1 (beginner) to 4 (hard) — that many pips sit under the dot.
+   * The first key of each difficulty group and how hard the group is, from
+   * 1 (beginner) to 4 (hard) — that many pips sit under the key.
    */
   difficultyMarks: { x: number; y: number; level: number }[];
-  /** Short vertical drop from the band's rail down to the root marker. */
-  connectorPath: string;
+  /** Set on the one branch that holds the picked exercise. */
+  bubble?: LayoutBubble;
 }
 
 export interface LayoutTier {
   id: string;
-  /** Milestone centre. */
-  x: number;
+  /** Top of the tier's name, above its key. */
+  labelTop: number;
+  /** Centre of the tier's key. */
   y: number;
-  /** Where the tier's last band ends. */
-  bottom: number;
-  /** One horizontal rail per band, hung off the trunk, feeding its branches. */
-  rails: string[];
+  folded: boolean;
+  /** Top of the "skills hidden" line; only meaningful when folded. */
+  foldedNoteTop: number;
   branches: LayoutBranch[];
+  bottom: number;
 }
 
 export interface RoadmapLayout {
   width: number;
   height: number;
   trunkX: number;
+  keysPerRow: number;
+  masteryLabelTop: number;
   masteryY: number;
   tiers: LayoutTier[];
 }
 
-const G = ROADMAP_GEOMETRY;
+export interface RoadmapLayoutOptions {
+  /** Width of the panel the map is drawn in; clamped to the geometry's range. */
+  width?: number;
+  /** The picked exercise — its row makes room for the bubble under it. */
+  selectedId?: string | null;
+  /** The "up next" exercise — its row makes room for the Start tag over it. */
+  currentId?: string | null;
+  foldedTierIds?: ReadonlySet<string>;
+}
+
+export const clampRoadmapWidth = (width: number): number =>
+  Math.min(G.maxWidth, Math.max(G.minWidth, Math.round(width)));
 
 /**
- * Which lanes a band of branches occupies, so a short band sits balanced around
- * the trunk instead of bunching against the left edge and leaving a hole on the
- * right. Lanes read outer-left, inner-left, inner-right, outer-right.
+ * How many keys fit on a row for a given map width, with room left for the
+ * three difficulty gaps a row can carry.
  */
-const LANES_BY_BAND_SIZE: Record<number, number[]> = {
-  1: [1],
-  2: [1, 2],
-  3: [0, 1, 2],
-  4: [0, 1, 2, 3],
+export const keysPerRowForWidth = (width: number): number => {
+  const room =
+    width / 2 - G.sideMargin - G.keySize / 2 - G.rowStart - 3 * G.groupGap;
+  const fits = Math.floor(room / G.keyStep) + 1;
+  return Math.min(G.maxKeysPerRow, Math.max(G.minKeysPerRow, fits));
 };
 
-export const lanesForBand = (size: number): number[] =>
-  LANES_BY_BAND_SIZE[size] ?? LANES_BY_BAND_SIZE[4];
-
-export const branchRowCount = (exerciseCount: number): number =>
-  Math.max(1, Math.ceil(exerciseCount / G.dotsPerRow));
-
 /**
- * Dots per row for a given chain. A branch of nine is laid out 5 + 4 rather
- * than 8 + 1: rows of near-equal length read as a considered block, a single
- * orphan below a full row reads as an accident.
+ * Keys per row for one skill. Rows come out near-equal — thirteen is 7 + 6,
+ * never 8 + 5 — so a skill reads as a block rather than a row and a leftover.
  */
-export const dotsPerRowFor = (exerciseCount: number): number =>
-  Math.ceil(exerciseCount / branchRowCount(exerciseCount));
-
-const branchHeight = (exerciseCount: number): number =>
-  G.branchHeaderHeight + branchRowCount(exerciseCount) * G.rowSpacing;
-
-const NO_BREAKS: ReadonlySet<number> = new Set();
+export const rowSizeFor = (
+  exerciseCount: number,
+  maxPerRow: number,
+): number => {
+  const rows = Math.max(1, Math.ceil(exerciseCount / maxPerRow));
+  return Math.max(1, Math.ceil(exerciseCount / rows));
+};
 
 /**
  * Where a branch steps up a difficulty: the index of the first exercise of
@@ -147,204 +188,172 @@ export const difficultyBreaks = (exercises: Exercise[]): Set<number> =>
   );
 
 /**
- * Serpentine dot positions for a chain that starts at (x0, y0), with a wider
- * step before every index in `breaksBefore`.
+ * A twig: leaves the trunk heading down, bends out to the side and runs level
+ * to `toX`. Every row hangs off the trunk on one of these.
  */
-export const chainPositions = (
-  count: number,
-  x0: number,
-  y0: number,
-  breaksBefore: ReadonlySet<number> = NO_BREAKS,
-): { x: number; y: number }[] => {
-  const perRow = dotsPerRowFor(count);
-  const points: { x: number; y: number }[] = [];
-  let x = 0;
-  let direction = 1;
-  for (let i = 0; i < count; i += 1) {
-    if (i > 0 && i % perRow === 0) {
-      // A new row starts right under the last dot and runs back the other
-      // way, so the chain reads as one continuous line rather than as rows.
-      direction = -direction;
-    } else if (i > 0) {
-      x +=
-        direction * (G.dotSpacing + (breaksBefore.has(i) ? G.groupGap : 0));
+export const twigPath = (
+  trunkX: number,
+  side: -1 | 1,
+  y: number,
+  toX: number,
+): string =>
+  `M ${trunkX} ${y - G.forkRise} C ${trunkX} ${y - 12}, ${trunkX + side * 12} ${y}, ${trunkX + side * G.forkRise} ${y} L ${toX} ${y}`;
+
+interface BranchContext {
+  width: number;
+  trunkX: number;
+  keysPerRow: number;
+  selectedId?: string | null;
+  currentId?: string | null;
+}
+
+/** One skill on one side of the trunk, and how tall it came out. */
+const layoutBranch = (
+  branch: RoadmapBranch,
+  side: -1 | 1,
+  top: number,
+  ctx: BranchContext,
+): { branch: LayoutBranch; height: number } => {
+  const { exercises } = branch;
+  const breaks = difficultyBreaks(exercises);
+  const perRow = rowSizeFor(exercises.length, ctx.keysPerRow);
+  const selectedIndex = exercises.findIndex((e) => e.id === ctx.selectedId);
+  const selectedRow =
+    selectedIndex < 0 ? -1 : Math.floor(selectedIndex / perRow);
+  const hasCurrent = exercises.some((e) => e.id === ctx.currentId);
+  const firstRowY =
+    top + G.headerHeight + (hasCurrent ? G.startTagRoom : 0) + G.keySize / 2;
+  const underKey = G.keySize / 2 + G.keyLip;
+  // What an open bubble pushes the rows below it down by.
+  const bubbleRoom = G.bubbleGap + G.bubbleHeight + 6;
+
+  const nodes: LayoutNode[] = [];
+  const rows: LayoutRow[] = [];
+  const difficultyMarks: LayoutBranch["difficultyMarks"] = [];
+  let bubble: LayoutBubble | undefined;
+  let bottom = firstRowY;
+
+  for (let first = 0; first < exercises.length; first += perRow) {
+    const row = rows.length;
+    const last = Math.min(exercises.length, first + perRow) - 1;
+    const y =
+      firstRowY +
+      row * G.rowPitch +
+      (selectedRow >= 0 && row > selectedRow ? bubbleRoom : 0);
+    let distance = G.rowStart;
+    for (let index = first; index <= last; index += 1) {
+      if (index > first)
+        distance += G.keyStep + (breaks.has(index) ? G.groupGap : 0);
+      const x = ctx.trunkX + side * distance;
+      nodes.push({ id: exercises[index].id, x, y, index });
+      if (index === 0 || breaks.has(index))
+        difficultyMarks.push({
+          x,
+          y,
+          level: DIFFICULTY_RANK[exercises[index].difficulty] + 1,
+        });
     }
-    points.push({ x, y: y0 + Math.floor(i / perRow) * G.rowSpacing });
-  }
-  // A gap on a row that runs back can carry it past the lane's left edge; the
-  // whole chain then moves right so its leftmost dot still starts the lane.
-  const minX = Math.min(0, ...points.map((p) => p.x));
-  return points.map((p) => ({ x: x0 + p.x - minX, y: p.y }));
-};
+    rows.push({ y, first, last });
+    bottom = y + underKey + G.rowFoot;
 
-/**
- * One stretch of a chain, from dot `from` to dot `to`. Straight runs along a
- * row, half-circle turns between rows; the whole chain is passed in so a turn
- * drawn on its own still bends the same way as the line it belongs to.
- */
-export const chainPathBetween = (
-  points: { x: number; y: number }[],
-  from: number,
-  to: number,
-): string => {
-  if (to <= from || from < 0 || to >= points.length) return "";
-  const r = G.rowSpacing / 2;
-  let d = `M ${points[from].x} ${points[from].y}`;
-  for (let i = from + 1; i <= to; i += 1) {
-    const prev = points[i - 1];
-    const p = points[i];
-    if (prev.y === p.y) {
-      d += ` L ${p.x} ${p.y}`;
-      continue;
-    }
-    // Row change: the turn sits on the right when the previous row ran
-    // left-to-right (clockwise arc), on the left otherwise.
-    const sweep = prev.x >= (points[i - 2]?.x ?? -Infinity) ? 1 : 0;
-    d += ` A ${r} ${r} 0 0 ${sweep} ${p.x} ${p.y}`;
-  }
-  return d;
-};
-
-/**
- * The whole chain, dot to dot, left open before every index in `breaksBefore`
- * so each difficulty group is its own stretch of line.
- */
-export const chainPathFor = (
-  points: { x: number; y: number }[],
-  breaksBefore: ReadonlySet<number> = NO_BREAKS,
-): string => {
-  const stretches: string[] = [];
-  let start = 0;
-  for (let i = 1; i <= points.length; i += 1) {
-    if (i === points.length || breaksBefore.has(i)) {
-      const stretch = chainPathBetween(points, start, i - 1);
-      if (stretch) stretches.push(stretch);
-      start = i;
+    if (row === selectedRow) {
+      const left = side > 0 ? ctx.trunkX + G.headerX - 16 : G.sideMargin;
+      bubble = {
+        nodeId: exercises[selectedIndex].id,
+        top: y + underKey + G.bubbleGap,
+        left,
+        width: ctx.width / 2 - G.headerX - G.sideMargin + 16,
+        pointerX: nodes[selectedIndex].x - left,
+      };
+      bottom = y + underKey + bubbleRoom;
     }
   }
-  return stretches.join(" ");
+
+  return {
+    branch: {
+      id: branch.id,
+      side,
+      top,
+      headerX: ctx.trunkX + side * G.headerX,
+      nodes,
+      rows,
+      difficultyMarks,
+      bubble,
+    },
+    height: bottom - top,
+  };
 };
 
-/**
- * One mark per difficulty group, under the leftmost dot of the row the group
- * starts on — on a row that runs back, that is the group's last dot there,
- * not its first, so the marks always sit at the left edge the eye starts from.
- */
-export const difficultyMarksFor = (
-  points: { x: number; y: number }[],
-  exercises: Exercise[],
-  breaks: ReadonlySet<number>,
-): LayoutBranch["difficultyMarks"] => {
-  const perRow = dotsPerRowFor(points.length);
-  const starts = [0, ...breaks].filter((i) => i < points.length);
-  return starts.map((start, k) => {
-    const groupEnd = (starts[k + 1] ?? points.length) - 1;
-    const rowEnd = (Math.floor(start / perRow) + 1) * perRow - 1;
-    const onRow = points.slice(start, Math.min(groupEnd, rowEnd) + 1);
-    return {
-      x: Math.min(...onRow.map((p) => p.x)),
-      y: points[start].y,
-      level: DIFFICULTY_RANK[exercises[start].difficulty] + 1,
-    };
-  });
-};
-
-/** The horizontal rail a band hangs from, always reaching the trunk. */
-export const railPathFor = (rootXs: number[], railY: number): string => {
-  const left = Math.min(G.trunkX, ...rootXs);
-  const right = Math.max(G.trunkX, ...rootXs);
-  return `M ${left} ${railY} L ${right} ${railY}`;
-};
-
-/** The drop from that rail into one branch's root marker. */
-export const dropPathFor = (
-  root: { x: number; y: number },
-  railY: number,
-): string => `M ${root.x} ${railY} L ${root.x} ${root.y}`;
-
-const chunk = <T>(items: T[], size: number): T[][] => {
-  const out: T[][] = [];
-  for (let i = 0; i < items.length; i += size)
-    out.push(items.slice(i, i + size));
-  return out;
-};
-
-export const layoutSkillRoadmap = (tiers: RoadmapTier[]): RoadmapLayout => {
-  const laneCount = G.laneStarts.length;
+export const layoutSkillRoadmap = (
+  tiers: RoadmapTier[],
+  options: RoadmapLayoutOptions = {},
+): RoadmapLayout => {
+  const width = clampRoadmapWidth(options.width ?? G.maxWidth);
+  const ctx: BranchContext = {
+    width,
+    trunkX: width / 2,
+    keysPerRow: keysPerRowForWidth(width),
+    selectedId: options.selectedId,
+    currentId: options.currentId,
+  };
+  const keyRadius = G.tierKeySize / 2;
   let cursor = G.topPadding;
 
   const laidOut: LayoutTier[] = tiers.map((tier) => {
-    const milestoneY = cursor + G.milestoneRadius;
-    let bandTop = milestoneY + G.milestoneRadius + G.milestoneLabelHeight;
+    const labelTop = cursor;
+    const y = labelTop + G.tierLabelHeight + keyRadius;
+    const underKey = y + keyRadius + G.tierKeyLip;
+    const folded = !!options.foldedTierIds?.has(tier.id);
     const branches: LayoutBranch[] = [];
-    const rails: string[] = [];
 
-    chunk<RoadmapBranch>(tier.branches, laneCount).forEach((band) => {
-      // A band hangs off the trunk on one horizontal rail, with a short drop
-      // into each branch — the same right angles the chains themselves use.
-      const railY = bandTop - G.railOffset;
-      const lanes = lanesForBand(band.length);
-      const rootXs: number[] = [];
+    if (folded) {
+      cursor = underKey + G.foldedHeight;
+      return {
+        id: tier.id,
+        labelTop,
+        y,
+        folded,
+        foldedNoteTop: underKey + 16,
+        branches,
+        bottom: cursor,
+      };
+    }
 
-      band.forEach((branch, indexInBand) => {
-        const lane = lanes[indexInBand];
-        const x = G.laneStarts[lane];
-        const labelY = bandTop + 14;
-        const root = { x: x + G.dotRadius, y: bandTop + 8 };
-        rootXs.push(root.x);
-        const breaks = difficultyBreaks(branch.exercises);
-        const points = chainPositions(
-          branch.exercises.length,
-          x + G.dotRadius,
-          bandTop + G.branchHeaderHeight + G.dotRadius,
-          breaks,
-        );
-        const nodes = points.map((p, index) => ({
-          id: branch.exercises[index].id,
-          x: p.x,
-          y: p.y,
-          index,
-        }));
-        branches.push({
-          id: branch.id,
-          lane,
-          x,
-          labelY,
-          root,
-          nodes,
-          firstRowRight:
-            Math.max(
-              ...points.filter((p) => p.y === points[0].y).map((p) => p.x),
-            ) + G.dotRadius,
-          chainPath: chainPathFor(points, breaks),
-          difficultyMarks: difficultyMarksFor(points, branch.exercises, breaks),
-          connectorPath: dropPathFor(root, railY),
-        });
-      });
+    let top = underKey + G.tierToBranches;
+    for (let i = 0; i < tier.branches.length; i += 2) {
+      const left = layoutBranch(tier.branches[i], -1, top, ctx);
+      branches.push(left.branch);
+      let height = left.height;
+      if (tier.branches[i + 1]) {
+        const right = layoutBranch(tier.branches[i + 1], 1, top, ctx);
+        branches.push(right.branch);
+        height = Math.max(height, right.height);
+      }
+      top += height + G.branchGap;
+    }
 
-      rails.push(railPathFor(rootXs, railY));
-
-      const bandHeight = Math.max(
-        ...band.map((branch) => branchHeight(branch.exercises.length)),
-      );
-      bandTop += bandHeight + G.bandGap;
-    });
-
-    const bottom = bandTop - G.bandGap;
-    cursor = bottom + G.tierGap;
-
-    return { id: tier.id, x: G.trunkX, y: milestoneY, bottom, rails, branches };
+    const bottom = top - G.branchGap;
+    cursor = top + G.tierGap;
+    return {
+      id: tier.id,
+      labelTop,
+      y,
+      folded,
+      foldedNoteTop: underKey + 16,
+      branches,
+      bottom,
+    };
   });
 
-  const lastBottom = laidOut.length
-    ? laidOut[laidOut.length - 1].bottom
-    : G.topPadding;
-  const masteryY = lastBottom + G.masteryOffset;
+  const masteryLabelTop = cursor;
+  const masteryY = masteryLabelTop + G.tierLabelHeight + keyRadius;
 
   return {
-    width: G.width,
-    height: masteryY + G.bottomPadding,
-    trunkX: G.trunkX,
+    width,
+    height: masteryY + keyRadius + G.tierKeyLip + G.bottomPadding,
+    trunkX: ctx.trunkX,
+    keysPerRow: ctx.keysPerRow,
+    masteryLabelTop,
     masteryY,
     tiers: laidOut,
   };

@@ -296,10 +296,72 @@
       "chordType": "Tipo de acorde",
       "progression": "Progresiones de acordes",
       "detune": "Afinar de oído",
-      "scaleMode": "Escalas y modos"
+      "scaleMode": "Escalas y modos",
+      "interval": "Intervalos"
     },
     "key_of_build": "Tonalidad de {{key}} — arma los grados que oyes, en orden",
-    "listen_for": "Fíjate en: {{tell}} — {{formula}}"
+    "listen_for": "Fíjate en: {{tell}} — {{formula}}",
+    "which_interval": "¿Qué intervalo es?",
+    "play_interval": "Tocar intervalo",
+    "play_together": "Tocar las dos a la vez",
+    "interval_hint": "La primera nota cambia en cada ronda — escucha la distancia, no la altura",
+    "interval_direction": {
+      "ascending": "ascendente",
+      "descending": "descendente",
+      "harmonic": "tocadas a la vez"
+    },
+    "interval_frets_one": "A {{count}} traste de {{root}} en una cuerda",
+    "interval_frets_other": "A {{count}} trastes de {{root}} en una cuerda",
+    "intervals": {
+      "m2": {
+        "name": "Segunda menor",
+        "character": "Un traste de distancia — el paso más estrecho y tenso que existe."
+      },
+      "M2": {
+        "name": "Segunda mayor",
+        "character": "Dos trastes — el paso normal entre notas vecinas de la escala."
+      },
+      "m3": {
+        "name": "Tercera menor",
+        "character": "La tercera triste — la base de todo acorde menor."
+      },
+      "M3": {
+        "name": "Tercera mayor",
+        "character": "La tercera brillante — la base de todo acorde mayor."
+      },
+      "P4": {
+        "name": "Cuarta justa",
+        "character": "Abierta y sólida — la distancia entre la mayoría de las cuerdas vecinas."
+      },
+      "TT": {
+        "name": "Tritono",
+        "character": "Exactamente media octava — inquieto, pide resolverse."
+      },
+      "P5": {
+        "name": "Quinta justa",
+        "character": "El power chord — hueca, fuerte y totalmente estable."
+      },
+      "m6": {
+        "name": "Sexta menor",
+        "character": "Un salto amplio y melancólico — una tercera mayor invertida."
+      },
+      "M6": {
+        "name": "Sexta mayor",
+        "character": "Un salto amplio y dulce — más cálido que tenso."
+      },
+      "m7": {
+        "name": "Séptima menor",
+        "character": "La séptima del blues — dos trastes por debajo de la octava."
+      },
+      "M7": {
+        "name": "Séptima mayor",
+        "character": "Un traste por debajo de la octava — afilada y anhelante."
+      },
+      "P8": {
+        "name": "Octava",
+        "character": "La misma nota otra vez, más aguda — se funde por completo."
+      }
+    }
   },
   "backing": {
     "required": "Este ejercicio necesita una pista de acompañamiento",
@@ -572,10 +634,14 @@
     "play_note": "Reproduce la nota que buscas"
   },
   "strum": {
-    "down": "Abajo",
-    "up": "Arriba",
+    "strum": "Rasguea",
+    "swing": "Pasa de largo, sin tocar",
     "muted": "Apagado",
-    "accent": "Acento"
+    "accent": "Acento: toca más fuerte",
+    "fb_hit": "Acertado",
+    "fb_wrong": "Rasgueo en un silencio",
+    "fb_miss": "Fallado",
+    "chords_per_loop": "{{count}} acordes / vuelta"
   },
   "open_exercise": {
     "title": "Ejercicio abierto",

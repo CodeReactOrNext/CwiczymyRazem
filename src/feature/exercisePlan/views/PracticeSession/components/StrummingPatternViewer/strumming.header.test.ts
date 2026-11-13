@@ -1,7 +1,7 @@
 import type { StrumPattern } from "feature/exercisePlan/types/exercise.types";
 import { describe, expect, it } from "vitest";
 
-import { drawChordHeader, drawCursor } from "./strumming.canvas";
+import { drawChordHeader } from "./strumming.canvas";
 import { HEADER_H, PAD } from "./strumming.constants";
 
 /** A 2D context that draws nothing and remembers where the boxes and the text went. */
@@ -38,24 +38,28 @@ const pattern = (overrides: Partial<StrumPattern>) =>
 const fontPx = (font: string) => Number(/(\d+)px/.exec(font)?.[1] ?? 0);
 
 describe("strumming header", () => {
-  const arrowTop = PAD + HEADER_H;
+  const tileTop = PAD + HEADER_H;
 
   for (const [label, p] of [
     ["a single chord", pattern({ chord: "Em" })],
     ["a progression", pattern({ chords: ["Em", "C", "G", "D"] })],
   ] as const) {
-    it(`keeps ${label} clear of the cursor and its PLAY label`, () => {
-      const { ctx, boxes, texts } = recordingContext();
-      drawChordHeader(ctx, 360, p, 0);
-      drawCursor(ctx, PAD, arrowTop, true);
+    for (const width of [360, 900]) {
+      it(`keeps ${label} clear of the tiles at ${width}px`, () => {
+        const { ctx, boxes, texts } = recordingContext();
+        drawChordHeader(ctx, width, p, 0);
 
-      const chordBottom = Math.max(...boxes.map((b) => b.y + b.h));
-      const play = texts.find((t) => t.text.includes("PLAY"));
-      expect(play).toBeDefined();
-      // fillText draws on the baseline, so the label's glyphs start a font-size above it.
-      expect(chordBottom).toBeLessThanOrEqual(play!.y - fontPx(play!.font));
-      // The cursor line starts 2px above the arrows.
-      expect(chordBottom).toBeLessThan(arrowTop - 2);
-    });
+        expect(boxes.length).toBeGreaterThan(0);
+        expect(Math.max(...boxes.map((b) => b.y + b.h))).toBeLessThan(tileTop);
+        expect(texts.some((t) => t.text === "Em")).toBe(true);
+        for (const t of texts) expect(t.y + fontPx(t.font) / 2).toBeLessThan(tileTop);
+      });
+    }
   }
+
+  it("names the pattern next to the chord", () => {
+    const { ctx, texts } = recordingContext();
+    drawChordHeader(ctx, 900, pattern({ chord: "Em" }), 0);
+    expect(texts.some((t) => t.text === "All Downs")).toBe(true);
+  });
 });

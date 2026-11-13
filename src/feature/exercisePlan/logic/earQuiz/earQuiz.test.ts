@@ -8,9 +8,11 @@ import {
 import type {
   ChordTypeQuizConfig,
   DetuneQuizConfig,
+  IntervalQuizConfig,
   ProgressionQuizConfig,
   ScaleModeQuizConfig,
 } from "./earQuiz.types";
+import { buildIntervalMidi, INTERVALS, sortIntervals } from "./intervals";
 import {
   buildProgressionChords,
   DEGREES,
@@ -25,6 +27,7 @@ import {
   generateChordTypeQuestion,
   generateDetuneQuestion,
   generateEarQuizQuestion,
+  generateIntervalQuestion,
   generateProgressionQuestion,
   generateScaleModeQuestion,
   isDetuneSolved,
@@ -284,5 +287,56 @@ describe("detune scoring", () => {
     expect(beatsPerSecond(440, 10)).toBeCloseTo(2.55, 1);
     // Direction doesn't change how fast it wobbles.
     expect(beatsPerSecond(440, -10)).toBeCloseTo(beatsPerSecond(440, 10), 0);
+  });
+});
+
+describe("intervals", () => {
+  const config: IntervalQuizConfig = {
+    mode: "interval",
+    intervals: ["P5", "m3", "P8"],
+    directions: ["ascending"],
+  };
+
+  it("covers every distance inside an octave exactly once", () => {
+    const semitones = Object.values(INTERVALS).map((i) => i.semitones);
+    expect([...semitones].sort((a, b) => a - b)).toEqual([
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+    ]);
+  });
+
+  it("measures up from the root, or down when descending", () => {
+    expect(buildIntervalMidi(60, "P5", "ascending")).toEqual([60, 67]);
+    expect(buildIntervalMidi(60, "P5", "harmonic")).toEqual([60, 67]);
+    expect(buildIntervalMidi(60, "m3", "descending")).toEqual([60, 57]);
+  });
+
+  it("orders the answers narrow to wide whatever the config lists", () => {
+    expect(sortIntervals(["P8", "m3", "P5"])).toEqual(["m3", "P5", "P8"]);
+  });
+
+  it("never repeats the previous interval", () => {
+    const first = generateIntervalQuestion(config, null, seeded([0]));
+    const second = generateIntervalQuestion(config, first, seeded([0]));
+    expect(second.interval).not.toBe(first.interval);
+  });
+
+  it("sounds the interval it asks about, the way the round says", () => {
+    const question = generateIntervalQuestion(
+      { ...config, directions: ["descending"] },
+      null,
+      seeded([0.5]),
+    );
+    expect(question.direction).toBe("descending");
+    expect(question.midis[0]).toBe(question.rootMidi);
+    expect(question.midis[0] - question.midis[1]).toBe(
+      INTERVALS[question.interval].semitones,
+    );
+    expect(question.options).toEqual(["m3", "P5", "P8"]);
+  });
+
+  it("is reached through the shared dispatcher", () => {
+    expect(generateEarQuizQuestion(config, null, seeded([0])).kind).toBe(
+      "interval",
+    );
   });
 });

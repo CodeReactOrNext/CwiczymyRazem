@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode, Ref } from "react";
  * - `current` — where the player is now.
  * - `open` — reachable, not started.
  * - `locked` — not reachable yet.
+ * - `later` — reachable, but further down a chain than the one to play next.
  * - `streak` — a streak to keep alive today.
  */
 export type RoadTone =
@@ -15,6 +16,7 @@ export type RoadTone =
   | "current"
   | "open"
   | "locked"
+  | "later"
   | "streak";
 
 const FACE: Record<RoadTone, string> = {
@@ -22,6 +24,7 @@ const FACE: Record<RoadTone, string> = {
   current: "bg-cyan-500 text-zinc-950 hover:bg-cyan-400",
   open: "bg-zinc-700 text-zinc-100 hover:bg-zinc-600",
   locked: "bg-zinc-700 text-zinc-500",
+  later: "bg-zinc-800 text-zinc-400 hover:bg-zinc-700",
   streak: "bg-orange-500 text-zinc-950 hover:bg-orange-400",
 };
 
@@ -33,6 +36,7 @@ const LIP: Record<RoadTone, string> = {
   // Light theme lifts these (globals.css → --road-lip-*): pale grey faces.
   open: "var(--road-lip-open, rgb(39,39,42))",
   locked: "var(--road-lip-locked, rgb(24,24,27))",
+  later: "var(--road-lip-locked, rgb(24,24,27))",
   streak: "rgb(194,65,12)",
 };
 
@@ -42,13 +46,16 @@ const SELECTED_HALO: Record<RoadTone, string> = {
   current: "bg-cyan-950",
   open: "bg-zinc-800",
   locked: "bg-zinc-900",
+  later: "bg-zinc-600",
   streak: "bg-orange-950",
 };
 
+/** `pad` is the ring around the key that cuts the road's line; `xs` keeps it thin so a tight chain still shows its line. */
 const SIZES = {
-  lg: { key: "h-20 w-20", lip: 7 },
-  md: { key: "h-16 w-16", lip: 6 },
-  sm: { key: "h-12 w-12", lip: 5 },
+  lg: { key: "h-20 w-20", lip: 7, pad: "p-2 pb-3" },
+  md: { key: "h-16 w-16", lip: 6, pad: "p-2 pb-3" },
+  sm: { key: "h-12 w-12", lip: 5, pad: "p-2 pb-3" },
+  xs: { key: "h-[30px] w-[30px]", lip: 4, pad: "p-[3px] pb-[7px]" },
 };
 
 export interface RoadPathNodeProps {
@@ -91,6 +98,8 @@ export const RoadPathNode = ({
   buttonRef,
 }: RoadPathNodeProps) => {
   const locked = tone === "locked";
+  // A dim key stays flat: the light across the top is for stops worth pressing now.
+  const lit = !locked && tone !== "later";
   const style = {
     "--lip": LIP[tone],
     "--lip-h": `${SIZES[size].lip}px`,
@@ -110,7 +119,8 @@ export const RoadPathNode = ({
       )}
       <div
         className={cn(
-          "rounded-full p-2 pb-3 transition-colors",
+          "rounded-full transition-colors",
+          SIZES[size].pad,
           selected
             ? SELECTED_HALO[tone]
             : halo === "cut"
@@ -132,7 +142,7 @@ export const RoadPathNode = ({
             SIZES[size].key,
             FACE[tone],
           )}>
-          {!locked && (
+          {lit && (
             <span
               aria-hidden
               className='light-hide pointer-events-none absolute inset-0 rounded-full bg-gradient-to-b from-white/30 via-white/0 to-black/10'

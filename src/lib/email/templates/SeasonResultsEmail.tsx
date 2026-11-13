@@ -1,18 +1,17 @@
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Text,
-} from "@react-email/components";
-import { SEASON_REWARD_PLACES } from "constants/seasonRewards";
+import { Column, Row, Section, Text } from "@react-email/components";
+import { placeSuffix, SEASON_REWARD_PLACES } from "constants/seasonRewards";
+import type { CSSProperties } from "react";
 
-import EmailFooter from "./EmailFooter";
+import EmailLayout, {
+  EmailButton,
+  EmailCard,
+  emailColors,
+  EmailIntro,
+  EmailNote,
+  formatNumber,
+  monoFont,
+  withName,
+} from "./EmailLayout";
 
 interface TopPlayer {
   displayName: string;
@@ -21,189 +20,86 @@ interface TopPlayer {
 
 interface SeasonResultsEmailProps {
   userName: string;
+  /** Already formatted for readers, e.g. "November season". */
   seasonName: string;
   userPlace: number | null;
   userPoints: number;
   fameEarned: number | null;
   top3: TopPlayer[];
+  /** Points the last rewarded place finished with; shown to everyone below it. */
+  lastRewardedPoints?: number | null;
   leaderboardUrl: string;
+  /** Where "Start the next season" goes for readers outside the rewards. */
+  practiceUrl: string;
   logoUrl: string;
   /** The email tab of Settings, linked from the footer. */
   preferencesUrl: string;
 }
 
-const colors = {
-  bg: "#09090b",
-  card: "#18181b",
-  cardElevated: "#27272a",
-  text: "#f4f4f5",
-  textMuted: "#a1a1aa",
-  textDim: "#71717a",
-  cyan: "#22d3ee",
-  gold: "#f59e0b",
-  goldBg: "#2a1d08",
-  goldMuted: "#fde68a",
-};
+const ordinal = (n: number) => `${n}${placeSuffix(n)}`;
 
-const main = {
-  background: `radial-gradient(ellipse 80% 60% at 50% 0%, rgba(34, 211, 238, 0.10) 0%, rgba(34, 211, 238, 0) 60%), ${colors.bg}`,
-  backgroundColor: colors.bg,
-  fontFamily:
-    'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+const isRankedPlace = (place: number | null): place is number =>
+  place !== null && place <= SEASON_REWARD_PLACES;
+
+export function seasonResultsSubject(
+  seasonName: string,
+  userPlace: number | null,
+): string {
+  return isRankedPlace(userPlace)
+    ? `You finished ${ordinal(userPlace)} in the ${seasonName}`
+    : `The ${seasonName} is over. See how you did`;
+}
+
+const cell = (bold: boolean): CSSProperties => ({
   margin: 0,
-  padding: 0,
-  color: colors.text,
-};
-
-const container = {
-  maxWidth: "580px",
-  margin: "0 auto",
-  padding: "48px 24px",
-};
-
-const logoSection = {
-  textAlign: "center" as const,
-  marginBottom: "32px",
-};
-
-const card = {
-  backgroundColor: colors.card,
-  borderRadius: "8px",
-  padding: "40px 36px",
-};
-
-const eyebrow = (color: string) => ({
-  fontSize: "13px",
-  fontWeight: 600,
-  color,
-  margin: "0 0 16px",
-});
-
-const heading = {
-  fontSize: "26px",
-  fontWeight: 800,
-  margin: "0 0 12px",
-  color: colors.text,
-  lineHeight: "1.25",
-  letterSpacing: "-0.02em",
-};
-
-const paragraph = {
   fontSize: "15px",
-  lineHeight: "26px",
-  color: colors.textMuted,
-  margin: "0 0 28px",
-};
-
-const resultHero = (bgColor: string) => ({
-  backgroundColor: bgColor,
-  borderRadius: "8px",
-  padding: "24px",
-  textAlign: "center" as const,
-  margin: "0 0 24px",
+  lineHeight: "24px",
+  fontWeight: bold ? 700 : 400,
 });
 
-const resultPlace = (color: string) => ({
-  fontSize: "64px",
-  fontWeight: 900,
-  color,
-  margin: 0,
-  lineHeight: 1,
-  letterSpacing: "-0.04em",
-});
-
-const resultLabel = (color: string) => ({
-  fontSize: "14px",
-  fontWeight: 500,
-  color,
-  margin: "6px 0 0",
-  opacity: 0.8,
-});
-
-const fameBox = {
-  backgroundColor: colors.goldBg,
-  borderRadius: "8px",
-  padding: "16px 20px",
-  margin: "0 0 24px",
-  textAlign: "center" as const,
-};
-
-const fameLabel = {
-  fontSize: "12px",
-  color: colors.gold,
-  fontWeight: 600,
-  margin: "0 0 4px",
-};
-
-const fameValue = {
-  fontSize: "28px",
-  fontWeight: 800,
-  color: colors.goldMuted,
-  margin: 0,
-  lineHeight: 1,
-};
-
-const standingsBox = {
-  backgroundColor: colors.cardElevated,
-  borderRadius: "8px",
-  padding: "20px",
-  margin: "0 0 28px",
-};
-
-const standingsTitle = {
-  fontSize: "13px",
-  fontWeight: 600,
-  color: colors.textMuted,
-  margin: "0 0 14px",
-};
-
-const playerRow = {
-  margin: "0 0 10px",
-};
-
-const playerPlaceText = {
-  fontSize: "12px",
-  fontWeight: 700,
-  color: colors.textDim,
-  margin: "0 0 2px",
-};
-
-const playerName = {
-  fontSize: "14px",
-  fontWeight: 600,
-  color: colors.text,
-  margin: 0,
-};
-
-const playerPoints = {
-  fontSize: "12px",
-  color: colors.textMuted,
-  margin: "2px 0 0",
-};
-
-const buttonWrap = {
-  textAlign: "center" as const,
-};
-
-const ctaButton = {
-  backgroundColor: colors.cyan,
-  color: "#09090b",
-  padding: "14px 36px",
-  borderRadius: "8px",
-  fontWeight: 700,
-  fontSize: "15px",
-  textDecoration: "none",
-  display: "inline-block",
-};
-
-const ordinal = (n: number) => {
-  if (n === 1) return "1st";
-  if (n === 2) return "2nd";
-  if (n === 3) return "3rd";
-  return `${n}th`;
-};
-
-const placesList = ["1st", "2nd", "3rd"];
+function StandingRow({
+  place,
+  name,
+  points,
+  isYou,
+}: {
+  place: string;
+  name: string;
+  points: number;
+  isYou: boolean;
+}) {
+  return (
+    <Row
+      style={{
+        backgroundColor: isYou ? emailColors.cardRaised : undefined,
+        borderRadius: "8px",
+      }}>
+      <Column style={{ width: "44px", padding: "12px 0 12px 16px" }}>
+        <Text
+          style={{
+            ...cell(isYou),
+            fontFamily: monoFont,
+            color: isYou ? emailColors.amber : emailColors.textDim,
+          }}>
+          {place}
+        </Text>
+      </Column>
+      <Column style={{ padding: "12px 0" }}>
+        <Text style={{ ...cell(isYou), color: emailColors.text }}>{name}</Text>
+      </Column>
+      <Column align='right' style={{ padding: "12px 16px 12px 0" }}>
+        <Text
+          style={{
+            ...cell(isYou),
+            fontFamily: monoFont,
+            color: isYou ? emailColors.text : emailColors.textMuted,
+          }}>
+          {formatNumber(points)}
+        </Text>
+      </Column>
+    </Row>
+  );
+}
 
 export default function SeasonResultsEmail({
   userName,
@@ -212,109 +108,116 @@ export default function SeasonResultsEmail({
   userPoints,
   fameEarned,
   top3,
+  lastRewardedPoints = null,
   leaderboardUrl,
+  practiceUrl,
   logoUrl,
   preferencesUrl,
 }: SeasonResultsEmailProps) {
-  const displayName = userName?.trim() || "Guitarist";
-  const isRanked = userPlace !== null && userPlace <= SEASON_REWARD_PLACES;
-  const accentColor = isRanked ? colors.gold : colors.cyan;
-  const heroBg = isRanked ? colors.goldBg : "#0c1920";
-  const heroTextColor = isRanked ? colors.goldMuted : colors.cyan;
+  const isRanked = isRankedPlace(userPlace);
+  const points = formatNumber(userPoints);
+  const youInTop3 = userPlace !== null && userPlace <= top3.length;
 
-  const previewText = isRanked
-    ? `You finished ${ordinal(userPlace!)} in ${seasonName} — well done`
-    : `${seasonName} is over — see how you did`;
+  const preview = isRanked
+    ? fameEarned !== null
+      ? `${points} points, and ${formatNumber(fameEarned)} Fame is already on your account.`
+      : `You closed the season with ${points} points.`
+    : userPlace !== null
+      ? `You finished ${ordinal(userPlace)} with ${points} points.`
+      : `You finished with ${points} points.`;
+
+  const title =
+    userPlace !== null
+      ? withName(`${ordinal(userPlace)} place`, userName)
+      : withName("The season is over", userName);
 
   return (
-    <Html lang='en'>
-      <Head />
-      <Preview>{previewText}</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Section style={logoSection}>
-            <Img src={logoUrl} alt='Riff Quest' width='160' />
-          </Section>
-
-          <Section style={card}>
-            <Text style={eyebrow(accentColor)}>Season over</Text>
-
-            {isRanked ? (
+    <EmailLayout
+      preview={preview}
+      logoUrl={logoUrl}
+      art={isRanked ? "results-ranked" : "results-unranked"}
+      preferencesUrl={preferencesUrl}
+      reason={`You got this because you played in the ${seasonName}.`}>
+      <EmailIntro eyebrow={`${seasonName} · final standings`} title={title} big>
+        {isRanked ? (
+          <>
+            You closed the season with {points} points. That&apos;s inside the
+            reward places
+            {fameEarned !== null ? (
               <>
-                <Heading style={heading}>
-                  You finished in the top {SEASON_REWARD_PLACES}, {displayName}
-                </Heading>
-                <Text style={paragraph}>
-                  {seasonName} is done. You placed {ordinal(userPlace!)} with{" "}
-                  {userPoints.toLocaleString()} points — that puts you in the top{" "}
-                  {SEASON_REWARD_PLACES} and earns you fame rewards.
-                </Text>
-
-                <Section style={resultHero(heroBg)}>
-                  <Text style={resultPlace(heroTextColor)}>
-                    {ordinal(userPlace!)}
-                  </Text>
-                  <Text style={resultLabel(heroTextColor)}>
-                    final placement
-                  </Text>
-                </Section>
-
-                {fameEarned !== null && (
-                  <Section style={fameBox}>
-                    <Text style={fameLabel}>Fame earned</Text>
-                    <Text style={fameValue}>+{fameEarned}</Text>
-                  </Section>
-                )}
+                , so{" "}
+                <span style={{ color: emailColors.amber, fontWeight: 600 }}>
+                  +{formatNumber(fameEarned)} Fame
+                </span>{" "}
+                is already on your account.
               </>
             ) : (
-              <>
-                <Heading style={heading}>
-                  {seasonName} is over, {displayName}
-                </Heading>
-                <Text style={paragraph}>
-                  You finished with {userPoints.toLocaleString()} points
-                  {userPlace !== null ? `, placing ${ordinal(userPlace)}` : ""}.
-                  A new season starts tomorrow — come back and go further.
-                </Text>
+              "."
+            )}
+          </>
+        ) : (
+          <>
+            You closed the season with {points} points. The next one starts
+            today, and everyone starts from zero again.
+          </>
+        )}
+      </EmailIntro>
 
-                <Section style={resultHero(heroBg)}>
-                  <Text style={resultPlace(heroTextColor)}>
-                    {userPoints.toLocaleString()}
-                  </Text>
-                  <Text style={resultLabel(heroTextColor)}>
-                    points this season
+      {top3.length > 0 && (
+        <EmailCard padding='8px'>
+          {top3.map((player, i) => (
+            <StandingRow
+              key={i}
+              place={String(i + 1)}
+              name={userPlace === i + 1 ? "You" : player.displayName}
+              points={player.points}
+              isYou={userPlace === i + 1}
+            />
+          ))}
+          {!youInTop3 && (
+            <>
+              {userPlace !== null && userPlace > top3.length + 1 && (
+                <Section style={{ padding: "0 16px" }}>
+                  <Text
+                    style={{
+                      margin: 0,
+                      fontFamily: monoFont,
+                      fontSize: "15px",
+                      lineHeight: "20px",
+                      color: emailColors.textFaint,
+                    }}>
+                    ···
                   </Text>
                 </Section>
-              </>
-            )}
+              )}
+              <StandingRow
+                place={userPlace !== null ? String(userPlace) : "–"}
+                name='You'
+                points={userPoints}
+                isYou
+              />
+            </>
+          )}
+        </EmailCard>
+      )}
 
-            {top3.length > 0 && (
-              <Section style={standingsBox}>
-                <Text style={standingsTitle}>Final top 3</Text>
-                {top3.map((player, idx) => (
-                  <Section key={idx} style={playerRow}>
-                    <Text style={playerPlaceText}>{placesList[idx]}</Text>
-                    <Text style={playerName}>{player.displayName}</Text>
-                    <Text style={playerPoints}>
-                      {player.points.toLocaleString()} pts
-                    </Text>
-                  </Section>
-                ))}
-              </Section>
-            )}
-
-            <Section style={buttonWrap}>
-              <Button href={leaderboardUrl} style={ctaButton}>
-                {isRanked ? "See final results" : "Start next season"}
-              </Button>
-            </Section>
-          </Section>
-
-          <EmailFooter preferencesUrl={preferencesUrl}>
-            You received this because you participated in {seasonName}.
-          </EmailFooter>
-        </Container>
-      </Body>
-    </Html>
+      {isRanked ? (
+        <>
+          <EmailButton href={leaderboardUrl}>See final standings</EmailButton>
+          <EmailNote>
+            The next season starts today, and everyone starts from zero.
+          </EmailNote>
+        </>
+      ) : (
+        <>
+          <EmailButton href={practiceUrl}>Start the next season</EmailButton>
+          <EmailNote>
+            The top {SEASON_REWARD_PLACES} take home Fame.
+            {lastRewardedPoints !== null &&
+              ` ${ordinal(SEASON_REWARD_PLACES)} place this season needed ${formatNumber(lastRewardedPoints)} points.`}
+          </EmailNote>
+        </>
+      )}
+    </EmailLayout>
   );
 }

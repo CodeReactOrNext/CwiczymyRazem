@@ -320,6 +320,8 @@ export default async function handler(
         displayName: p.displayName,
         points: p.points,
       }));
+      const lastRewardedPoints =
+        prevParticipants[SEASON_REWARD_PLACES - 1]?.points ?? null;
 
       const jobs: { uid: string; run: () => Promise<unknown> }[] = [];
       prevParticipants.forEach((p) => {
@@ -341,6 +343,7 @@ export default async function handler(
               userPoints: p.points,
               fameEarned,
               top3,
+              lastRewardedPoints,
             }),
         });
       });

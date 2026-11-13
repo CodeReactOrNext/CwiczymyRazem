@@ -6,7 +6,7 @@ import { memo } from "react";
 import type { SlotResult } from "../../hooks/useStrummingMatcher";
 import { CountInOverlay } from "../CountInOverlay";
 import { useStrummingAnimation } from "./hooks/useStrummingAnimation";
-import { ACCENT_DOT, ARROW_AREA_H, DOTS_H, DOWN_COLOR, HEADER_H, LABEL_H, MUTED_COLOR, PAD, UP_COLOR } from "./strumming.constants";
+import { DOTS_H, HEADER_H, HIT_COLOR, INK_COLOR, MISS_COLOR, PAD, TILE_H, WRONG_COLOR } from "./strumming.constants";
 
 interface StrummingPatternViewerProps {
   patterns:             StrumPattern[];
@@ -28,6 +28,22 @@ interface StrummingPatternViewerProps {
   volume?:              number;
 }
 
+/** The legend's arrow: the same glyph the canvas draws, at text size. */
+function LegendArrow({ color, weight = 2, dotted = false, up = false }: {
+  color: string; weight?: number; dotted?: boolean; up?: boolean;
+}) {
+  return (
+    <svg width={10} height={16} viewBox='0 0 10 16' fill='none' aria-hidden='true' className={cn(up && "rotate-180")}>
+      <path d='M5 1.5V14' stroke={color} strokeWidth={weight} strokeLinecap='round' strokeDasharray={dotted ? "0.1 3.6" : undefined} />
+      <path d='M1.5 10.5L5 14.5L8.5 10.5' stroke={color} strokeWidth={weight} strokeLinecap='round' strokeLinejoin='round' />
+    </svg>
+  );
+}
+
+function LegendDot({ color }: { color: string }) {
+  return <span className='inline-block h-2 w-2 rounded-full' style={{ background: color }} />;
+}
+
 function StrummingPatternViewerInner({
   patterns, bpm, isPlaying, startTime, countInRemaining = 0,
   className, slotFeedback, isMicEnabled, maxReps = 10,
@@ -35,7 +51,7 @@ function StrummingPatternViewerInner({
 }: StrummingPatternViewerProps) {
   const { t } = useTranslation("session");
   const pattern = patterns[0];
-  const canvasH = PAD + HEADER_H + ARROW_AREA_H + LABEL_H + DOTS_H + PAD;
+  const canvasH = PAD + HEADER_H + TILE_H + DOTS_H + PAD;
 
   const { canvasRef, containerRef } = useStrummingAnimation({
     pattern, bpm, isPlaying, startTime, countInRemaining,
@@ -45,9 +61,14 @@ function StrummingPatternViewerInner({
   if (!pattern) return null;
 
   const hasChords = pattern.chords && pattern.chords.length > 1;
+  // The legend only explains marks this pattern actually uses.
+  const hasSwing  = pattern.strums.some((b) => b.direction === "miss");
+  const hasMuted  = pattern.strums.some((b) => b.direction !== "miss" && b.muted);
+  const hasAccent = pattern.strums.some((b) => b.direction !== "miss" && b.accented);
 
   return (
-    <div className={cn("relative w-full bg-[#0a0a0a] rounded-lg overflow-hidden", className)}>
+    // The canvas paints its own dark surface, so the whole viewer stays dark in the light theme.
+    <div className={cn("force-dark relative w-full overflow-hidden rounded-lg bg-[#0a0a0a]", className)}>
       {/* The canvas sizes itself: it fits the bar to this box when it can, and
           only scrolls when the slots would get unreadably narrow. */}
       <div
@@ -59,34 +80,43 @@ function StrummingPatternViewerInner({
 
       <CountInOverlay count={countInRemaining} bpm={bpm} />
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 text-xs text-zinc-400">
-        <span className="flex items-center gap-1">
-          <svg width={9} height={14} viewBox="0 0 9 14">
-            <line x1={4.5} y1={1} x2={4.5} y2={9} stroke={DOWN_COLOR} strokeWidth={2} strokeLinecap="round"/>
-            <polyline points="1,6 4.5,12 8,6" fill="none" stroke={DOWN_COLOR} strokeWidth={2} strokeLinejoin="round"/>
-          </svg>
-          {t("strum.down")}
+      <div className='flex flex-wrap items-center gap-x-5 gap-y-2 px-4 pb-3 pt-1 text-xs text-zinc-400'>
+        <span className='flex items-center gap-1.5'>
+          <LegendArrow color={INK_COLOR} />
+          {t("strum.strum")}
         </span>
-        <span className="flex items-center gap-1">
-          <svg width={9} height={14} viewBox="0 0 9 14">
-            <line x1={4.5} y1={13} x2={4.5} y2={5} stroke={UP_COLOR} strokeWidth={2} strokeLinecap="round"/>
-            <polyline points="1,8 4.5,2 8,8" fill="none" stroke={UP_COLOR} strokeWidth={2} strokeLinejoin="round"/>
-          </svg>
-          {t("strum.up")}
-        </span>
-        <span className="flex items-center gap-1">
-          <span style={{ color: MUTED_COLOR, fontWeight: 700, fontSize: 11 }}>✕</span>
-          {t("strum.muted")}
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block rounded-lg" style={{ width: 6, height: 6, background: ACCENT_DOT }}/>
-          {t("strum.accent")}
-        </span>
-        <span className="flex-1" />
-        {hasChords && (
-          <span className="text-zinc-500">
-            {pattern.chords!.length} chords / loop
+        {hasSwing && (
+          <span className='flex items-center gap-1.5'>
+            <LegendArrow color='#71717a' dotted up />
+            {t("strum.swing")}
           </span>
+        )}
+        {hasMuted && (
+          <span className='flex items-center gap-1.5'>
+            <svg width={10} height={10} viewBox='0 0 10 10' fill='none' aria-hidden='true'>
+              <path d='M1.5 1.5L8.5 8.5M8.5 1.5L1.5 8.5' stroke={INK_COLOR} strokeWidth={2} strokeLinecap='round' />
+            </svg>
+            {t("strum.muted")}
+          </span>
+        )}
+        {hasAccent && (
+          <span className='flex items-center gap-1.5'>
+            <LegendArrow color={INK_COLOR} weight={3.2} />
+            {t("strum.accent")}
+          </span>
+        )}
+        <span className='flex-1' />
+        {isMicEnabled && (
+          <>
+            <span className='flex items-center gap-1.5'><LegendDot color={HIT_COLOR} />{t("strum.fb_hit")}</span>
+            <span className='flex items-center gap-1.5'><LegendDot color={MISS_COLOR} />{t("strum.fb_miss")}</span>
+            {hasSwing && (
+              <span className='flex items-center gap-1.5'><LegendDot color={WRONG_COLOR} />{t("strum.fb_wrong")}</span>
+            )}
+          </>
+        )}
+        {hasChords && (
+          <span>{t("strum.chords_per_loop", { count: pattern.chords!.length })}</span>
         )}
       </div>
     </div>

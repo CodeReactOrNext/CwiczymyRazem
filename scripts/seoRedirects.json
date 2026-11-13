@@ -610,6 +610,316 @@
     "permanent": true
   },
   {
+    "source": "/exercises/power-chord-first-shapes",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/power-chord-shifts",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/palm-mute-open-chug",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/palm-mute-chug-and-stab",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/barre-building-the-barre",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/barre-open-to-barre",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/slides-one-string",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/slides-linking-pentatonic-boxes",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/natural-harmonics-12-7-5",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/pinch-harmonics-squeals",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/double-stops-thirds-g-major",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/octave-shapes-muted-lines",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/major-scale-three-notes-per-string",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/major-scale-in-thirds",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/major-scale-groups-of-four",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fingerstyle-alternating-thumb",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/fingerstyle-travis-pinch",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/shuffle-boogie-riff",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/blues-twelve-bar-shuffle-a",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/funk-sixteenth-scratch",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/bass-root-and-fifth",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/bass-eighth-note-drive",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/bass-walking-line-g",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/transcription-melody-by-ear",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/transcription-lift-a-lick",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/open-chords-first-changes",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/open-chords-blues-sevenths",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/arpeggios-picked-open-chords",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/power-chord-stops-and-rests",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/palm-mute-sixteenth-chug",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/rhythm-off-beat-chops",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/slides-into-the-note",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/harmonics-chime-melody",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/double-stops-sixths-g-major",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/double-stops-rock-fourths",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/major-scale-open-position-c",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/minor-scale-a-natural-minor",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/blues-scale-box-1",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/major-pentatonic-g-box",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/arpeggios-seventh-chords-c",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/bass-octave-groove",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/bass-major-scale-one-octave",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/bass-blues-walk-12-bar",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/transcription-find-the-key",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/transcription-chords-by-ear",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/picking-open-string-crossing",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/alternate-picking-first-down-up",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/string-skipping-open-strings",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/hammer-on-first-hammer",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/pull-off-first-pull",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/tapping-first-tap",
+    "destination": "/guitar-speed-hand-synchronization-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/vibrato-first-wobble",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/articulation-short-and-long",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/minor-pentatonic-open-position-e",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/harmony-root-third-fifth",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/harmony-major-vs-minor",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/notes-natural-low-e-string",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/notes-natural-a-string",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/improv-three-notes-only",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/phrasing-play-then-rest",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/composition-first-riff",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/tone-where-and-how-you-pick",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
     "source": "/exercises/alternate-picking-cross-string",
     "destination": "/guitar-speed-hand-synchronization-exercises#alternate-picking-cross-string",
     "permanent": true
@@ -727,6 +1037,46 @@
   {
     "source": "/exercises/ear-mode-advanced",
     "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-interval-basics",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-interval-seconds-thirds",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-interval-all-twelve",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-interval-harmonic",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-chord-major-or-minor",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-mode-major-or-minor",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-interval-three-sizes",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-tuning-wide-misses",
+    "destination": "/beginner-guitar-exercises",
     "permanent": true
   },
   {

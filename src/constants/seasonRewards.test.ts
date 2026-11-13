@@ -65,5 +65,23 @@ describe("season fame ladder", () => {
       expect(named.slice(0, 5)).toEqual(["1st", "2nd", "3rd", "4th", "5th"]);
       expect(named.at(-1)).toBe(`${SEASON_REWARD_PLACES}th`);
     });
+
+    it("names places past the ladder the English way", () => {
+      const named = [11, 12, 13, 21, 22, 23, 24, 101, 111, 112].map(
+        (n) => `${n}${placeSuffix(n)}`,
+      );
+      expect(named).toEqual([
+        "11th",
+        "12th",
+        "13th",
+        "21st",
+        "22nd",
+        "23rd",
+        "24th",
+        "101st",
+        "111th",
+        "112th",
+      ]);
+    });
   });
 });

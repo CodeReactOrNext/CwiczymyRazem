@@ -1,106 +1,90 @@
 import type { StrumBeat, StrumPattern } from "feature/exercisePlan/types/exercise.types";
 
 import type { SlotResult } from "../../hooks/useStrummingMatcher";
-import { drawChordHeader, drawCursor, drawDownArrow, drawRepDots, drawUpArrow, makeLabels, slotScale } from "./strumming.canvas";
+import { drawArrow, drawChordHeader, drawRepBar, makeLabels, swingDirection } from "./strumming.canvas";
 import {
-  ACCENT_DOT, ARROW_AREA_H, BAR_LINE, BEAT_LINE, BG_COLOR,
-  DOWN_COLOR, HEADER_H, HEADER_ROW_H, LABEL_BEAT, LABEL_H, LABEL_SUB,
-  MISS_COLOR, MUTED_COLOR, PAD, UP_COLOR,
+  ACTIVE_COLOR, ARROW_AREA_H, BG_COLOR, GHOST_COLOR, HEADER_H, HEADER_ROW_H,
+  HIT_COLOR, INK_COLOR, MISS_COLOR, MUTED_COLOR, PAD, REP_BAR_GAP, TEXT_DIM,
+  TILE_ACTIVE, TILE_BEAT, TILE_H, TILE_SUB, WRONG_COLOR,
 } from "./strumming.constants";
+
+const FONT = "ui-sans-serif, system-ui, sans-serif";
+
+/** The wash a judged slot leaves on its tile. */
+const FEEDBACK_TINT: Record<SlotResult, string> = {
+  hit:   "rgba(52,211,153,0.10)",
+  wrong: "rgba(251,191,36,0.12)",
+  miss:  "rgba(248,113,113,0.12)",
+};
 
 function drawSlots(
   ctx: CanvasRenderingContext2D, pattern: StrumPattern,
-  totalSlots: number, labels: string[], arrowTop: number,
+  totalSlots: number, labels: string[], tileTop: number,
   drawSlotW: number, cursorScreenX: number, isActive: boolean,
   micEnabled: boolean, slotFeedback: Map<number, SlotResult>,
   prevSlotFeedback: Map<number, SlotResult>, transitionAlpha: number,
 ) {
-  const patternLeft = PAD;
-  const s           = slotScale(drawSlotW);
-  const narrow      = drawSlotW < 24;
+  const roomy  = drawSlotW >= 34;
+  const narrow = drawSlotW < 24;
+  const inset  = roomy ? 3 : 1;
+  const tile = (x: number, w: number, color: string) => {
+    ctx.fillStyle = color;
+    ctx.beginPath(); (ctx as any).roundRect(x, tileTop, w, TILE_H, Math.min(8, w / 3)); ctx.fill();
+  };
+
   for (let si = 0; si < totalSlots; si++) {
-    const slotLeft = patternLeft + si * drawSlotW;
-    const slotCX   = slotLeft + drawSlotW / 2;
-
-    if (si > 0) {
-      ctx.strokeStyle = si % pattern.subdivisions === 0 ? BAR_LINE : BEAT_LINE;
-      ctx.lineWidth   = 1;
-      ctx.beginPath(); ctx.moveTo(slotLeft, arrowTop + 4); ctx.lineTo(slotLeft, arrowTop + ARROW_AREA_H - 4); ctx.stroke();
-    }
-
     const beat: StrumBeat = pattern.strums[si]!;
     if (!beat) continue;
 
-    if (micEnabled && transitionAlpha > 0) {
+    const slotLeft = PAD + si * drawSlotW;
+    const isBeat   = si % pattern.subdivisions === 0;
+    // Each beat's slots sit together: a wider gap before every counted beat
+    // groups "1 &" apart from "2 &" without drawing a line between them.
+    const lead     = isBeat && si > 0 && roomy ? 4 : 0;
+    const tileX    = slotLeft + inset + lead;
+    const tileW    = drawSlotW - 2 * inset - lead;
+    const tileCX   = tileX + tileW / 2;
+    const isStrum  = beat.direction !== "miss";
+    const isSlotActive = isActive && cursorScreenX >= slotLeft && cursorScreenX < slotLeft + drawSlotW;
+
+    const tileColor = isSlotActive ? TILE_ACTIVE : isBeat ? TILE_BEAT : TILE_SUB;
+    tile(tileX, tileW, tileColor);
+
+    const feedback = micEnabled ? slotFeedback.get(si) : undefined;
+    if (feedback) {
+      tile(tileX, tileW, FEEDBACK_TINT[feedback]);
+    } else if (micEnabled && transitionAlpha > 0) {
+      // Last loop's verdict fades out instead of blinking off on the bar line.
       const prevFb = prevSlotFeedback.get(si);
       if (prevFb) {
         ctx.save(); ctx.globalAlpha = transitionAlpha;
-        ctx.fillStyle =
-          prevFb === "hit"   ? "rgba(74,222,128,0.22)" :
-          prevFb === "wrong" ? "rgba(234,88,12,0.26)"  : "rgba(239,68,68,0.14)";
-        ctx.beginPath(); (ctx as any).roundRect(slotLeft + 2, arrowTop + 2, drawSlotW - 4, ARROW_AREA_H - 4, 6); ctx.fill();
+        tile(tileX, tileW, FEEDBACK_TINT[prevFb]);
         ctx.restore();
       }
     }
 
-    const feedback = micEnabled ? slotFeedback.get(si) : undefined;
-    if (feedback === "hit") {
-      ctx.save(); ctx.fillStyle = "rgba(74,222,128,0.18)";
-      ctx.beginPath(); (ctx as any).roundRect(slotLeft + 2, arrowTop + 2, drawSlotW - 4, ARROW_AREA_H - 4, 6); ctx.fill(); ctx.restore();
-    } else if (feedback === "wrong") {
-      ctx.save(); ctx.fillStyle = "rgba(234,88,12,0.22)";
-      ctx.beginPath(); (ctx as any).roundRect(slotLeft + 2, arrowTop + 2, drawSlotW - 4, ARROW_AREA_H - 4, 6); ctx.fill(); ctx.restore();
-    } else if (feedback === "miss") {
-      ctx.save(); ctx.fillStyle = "rgba(239,68,68,0.12)";
-      ctx.beginPath(); (ctx as any).roundRect(slotLeft + 2, arrowTop + 2, drawSlotW - 4, ARROW_AREA_H - 4, 6); ctx.fill(); ctx.restore();
-    }
+    const color =
+      feedback === "hit"   ? HIT_COLOR   :
+      feedback === "wrong" ? WRONG_COLOR :
+      feedback === "miss"  ? MISS_COLOR  :
+      !isStrum             ? GHOST_COLOR :
+      isSlotActive         ? ACTIVE_COLOR :
+      beat.muted           ? MUTED_COLOR : INK_COLOR;
 
-    const isSlotActive = isActive && slotCX >= cursorScreenX - drawSlotW / 2 && slotCX < cursorScreenX + drawSlotW / 2;
-    const dimmed       = feedback === "miss";
+    drawArrow(ctx, tileCX, tileTop + 12, ARROW_AREA_H - 16, {
+      direction: isStrum ? (beat.direction as "down" | "up") : swingDirection(si),
+      color,
+      weight:    !isStrum ? "ghost" : beat.accented ? "accent" : "normal",
+      muted:     isStrum && !!beat.muted,
+      tileColor,
+      slotW:     drawSlotW,
+    });
 
-    const baseColor =
-      dimmed                    ? "rgba(255,255,255,0.12)" :
-      beat.muted                ? MUTED_COLOR :
-      beat.direction === "down" ? DOWN_COLOR  :
-      beat.direction === "up"   ? UP_COLOR    : MISS_COLOR;
-
-    const activeColor =
-      beat.muted                ? "#fde68a" :
-      beat.direction === "down" ? "#bfdbfe" :
-      beat.direction === "up"   ? "#e9d5ff" : MISS_COLOR;
-
-    const color     = (isSlotActive && beat.direction !== "miss") ? activeColor : baseColor;
-    const thick     = isSlotActive && beat.direction !== "miss";
-    const glowColor = feedback === "hit" ? "rgba(74,222,128,0.9)" : undefined;
-
-    if (isSlotActive && beat.direction !== "miss") {
-      ctx.save();
-      ctx.fillStyle = beat.direction === "down" ? "rgba(96,165,250,0.13)" : "rgba(192,132,252,0.13)";
-      ctx.beginPath(); (ctx as any).roundRect(slotLeft + 2, arrowTop + 2, drawSlotW - 4, ARROW_AREA_H - 4, 6); ctx.fill();
-      ctx.restore();
-    }
-
-    if (beat.direction === "down") {
-      drawDownArrow(ctx, slotCX, arrowTop, ARROW_AREA_H, color, thick, !!beat.muted, glowColor, drawSlotW);
-    } else if (beat.direction === "up") {
-      drawUpArrow(ctx, slotCX, arrowTop, ARROW_AREA_H, color, thick, !!beat.muted, glowColor, drawSlotW);
-    } else {
-      ctx.fillStyle = MISS_COLOR; ctx.beginPath(); ctx.arc(slotCX, arrowTop + ARROW_AREA_H / 2, 3.5 * s, 0, Math.PI * 2); ctx.fill();
-    }
-
-    if (beat.accented && beat.direction !== "miss") {
-      const dotR  = Math.max(2.5, 4 * s);
-      const dotCX = slotLeft + drawSlotW - Math.max(dotR + 1.5, 10 * s);
-      ctx.fillStyle = ACCENT_DOT; ctx.beginPath(); ctx.arc(dotCX, arrowTop + 10, dotR, 0, Math.PI * 2); ctx.fill();
-    }
-
-    const label  = labels[si] ?? "";
-    const isBeat = si % pattern.subdivisions === 0;
-    ctx.fillStyle = isBeat ? LABEL_BEAT : LABEL_SUB;
+    ctx.fillStyle = isSlotActive ? ACTIVE_COLOR : isBeat ? INK_COLOR : TEXT_DIM;
     ctx.font      = isBeat
-      ? `bold ${narrow ? 10 : 12}px ui-sans-serif, system-ui, sans-serif`
-      : `${narrow ? 9 : 11}px ui-sans-serif, system-ui, sans-serif`;
-    ctx.textAlign = "center"; ctx.fillText(label, slotCX, arrowTop + ARROW_AREA_H + LABEL_H - 6); ctx.textAlign = "left";
+      ? `bold ${narrow ? 11 : 16}px ${FONT}`
+      : `${narrow ? 9 : 12}px ${FONT}`;
+    ctx.textAlign = "center"; ctx.fillText(labels[si] ?? "", tileCX, tileTop + TILE_H - 11); ctx.textAlign = "left";
   }
 }
 
@@ -121,30 +105,25 @@ export function drawFrame(
 
   const totalSlots   = pattern.timeSignature[0] * pattern.subdivisions;
   const labels       = makeLabels(pattern.timeSignature[0], pattern.subdivisions);
-  const arrowTop     = PAD + HEADER_H;
+  const tileTop      = PAD + HEADER_H;
   const patternWidth = totalSlots * drawSlotW;
 
   const repLabel = `Rep ${currentRep + 1} / ${maxReps}`;
-  ctx.font = `bold 12px ui-sans-serif, system-ui, sans-serif`;
+  ctx.font = `bold 12px ${FONT}`;
   const repWidth = ctx.measureText(repLabel).width + 8;
 
   drawChordHeader(ctx, W, pattern, chordIdx, repWidth);
 
   ctx.save();
-  ctx.font = `bold 12px ui-sans-serif, system-ui, sans-serif`; ctx.fillStyle = "rgba(255,255,255,0.38)";
+  ctx.font = `bold 12px ${FONT}`; ctx.fillStyle = TEXT_DIM;
   ctx.textAlign = "right"; ctx.textBaseline = "middle";
   ctx.fillText(repLabel, W - PAD, PAD + HEADER_ROW_H / 2);
-  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
   ctx.restore();
 
-  ctx.strokeStyle = BAR_LINE; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(PAD, arrowTop); ctx.lineTo(PAD, arrowTop + ARROW_AREA_H); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(PAD + patternWidth, arrowTop); ctx.lineTo(PAD + patternWidth, arrowTop + ARROW_AREA_H); ctx.stroke();
-
-  const isActive = cursorScreenX >= 0 && !idleCursor;
-  drawSlots(ctx, pattern, totalSlots, labels, arrowTop, drawSlotW, cursorScreenX, isActive, micEnabled, slotFeedback, prevSlotFeedback, transitionAlpha);
-  drawRepDots(ctx, currentRep, maxReps, W, arrowTop);
-  drawCursor(ctx, cursorScreenX, arrowTop, idleCursor);
+  const isActive    = cursorScreenX >= 0 && !idleCursor;
+  const repProgress = isActive && patternWidth > 0 ? (cursorScreenX - PAD) / patternWidth : 0;
+  drawSlots(ctx, pattern, totalSlots, labels, tileTop, drawSlotW, cursorScreenX, isActive, micEnabled, slotFeedback, prevSlotFeedback, transitionAlpha);
+  drawRepBar(ctx, currentRep, repProgress, maxReps, W, tileTop + TILE_H + REP_BAR_GAP);
 
   ctx.restore();
 }

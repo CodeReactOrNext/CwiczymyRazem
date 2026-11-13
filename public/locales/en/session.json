@@ -372,10 +372,72 @@
       "chordType": "Chord quality",
       "progression": "Chord progressions",
       "detune": "Tuning by ear",
-      "scaleMode": "Scales & modes"
+      "scaleMode": "Scales & modes",
+      "interval": "Intervals"
     },
     "key_of_build": "Key of {{key}} — build the degrees you hear, in order",
-    "listen_for": "Listen for the {{tell}} — {{formula}}"
+    "listen_for": "Listen for the {{tell}} — {{formula}}",
+    "which_interval": "Which interval is this?",
+    "play_interval": "Play interval",
+    "play_together": "Play them together",
+    "interval_hint": "The first note moves every round — listen to the distance, not the pitch",
+    "interval_direction": {
+      "ascending": "going up",
+      "descending": "going down",
+      "harmonic": "played together"
+    },
+    "interval_frets_one": "{{count}} fret from {{root}} on one string",
+    "interval_frets_other": "{{count}} frets from {{root}} on one string",
+    "intervals": {
+      "m2": {
+        "name": "Minor 2nd",
+        "character": "One fret apart — the tightest, most tense step there is."
+      },
+      "M2": {
+        "name": "Major 2nd",
+        "character": "Two frets — the plain step between neighbouring scale notes."
+      },
+      "m3": {
+        "name": "Minor 3rd",
+        "character": "The sad third — the bottom of every minor chord."
+      },
+      "M3": {
+        "name": "Major 3rd",
+        "character": "The bright third — the bottom of every major chord."
+      },
+      "P4": {
+        "name": "Perfect 4th",
+        "character": "Open and solid — the gap between most neighbouring strings."
+      },
+      "TT": {
+        "name": "Tritone",
+        "character": "Exactly half an octave — restless, it wants to resolve."
+      },
+      "P5": {
+        "name": "Perfect 5th",
+        "character": "The power chord — hollow, strong and completely stable."
+      },
+      "m6": {
+        "name": "Minor 6th",
+        "character": "A wide, aching leap — a major 3rd turned upside down."
+      },
+      "M6": {
+        "name": "Major 6th",
+        "character": "A wide, sweet leap — warm rather than tense."
+      },
+      "m7": {
+        "name": "Minor 7th",
+        "character": "The bluesy seventh — two frets short of the octave."
+      },
+      "M7": {
+        "name": "Major 7th",
+        "character": "One fret short of the octave — sharp and yearning."
+      },
+      "P8": {
+        "name": "Octave",
+        "character": "The same note again, higher — it blends completely."
+      }
+    }
   },
   "backing": {
     "required": "This exercise requires a backing track",
@@ -648,10 +710,14 @@
     "play_note": "Play the note you are looking for"
   },
   "strum": {
-    "down": "Down",
-    "up": "Up",
+    "strum": "Strum",
+    "swing": "Swing past, don't hit",
     "muted": "Muted",
-    "accent": "Accent"
+    "accent": "Accent: play it louder",
+    "fb_hit": "Hit",
+    "fb_wrong": "Strummed on a rest",
+    "fb_miss": "Missed",
+    "chords_per_loop": "{{count}} chords / loop"
   },
   "open_exercise": {
     "title": "Open Exercise",

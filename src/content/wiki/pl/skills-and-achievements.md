@@ -10,19 +10,19 @@ order: 2
 
 Aplikacja śledzi 23 pojedyncze umiejętności gitarowe (naprzemienne kostkowanie, legato, podciąganie, wibrato, akordy, skale, rytm, trening słuchu, improwizacja, transkrypcja i tak dalej), pogrupowane w te same cztery kategorie, których używa się wszędzie indziej: technika, teoria, słuch i kreatywność.
 
-<ClickPath steps="Ćwicz|Umiejętności" caption="Ekran Umiejętności to jedna wielka mapa: pień pośrodku, siedem kamieni milowych na nim i każde ćwiczenie z biblioteki jako pojedyncza kropka na gałęzi." />
+<ClickPath steps="Ćwicz|Umiejętności" caption="Ekran Umiejętności to jedno wielkie drzewo: pień pośrodku, siedem etapów na nim i każde ćwiczenie z biblioteki jako pojedynczy numerowany klawisz na gałęzi." />
 
-Mapa biegnie z góry na dół, od Podstaw przez Technikę, Teorię i gryf, Rytm i groove, Ekspresję i styl oraz Kształcenie słuchu do Kreatywności, i kończy się na Mistrzostwie. Każdy kamień milowy rozgałęzia się w gałęzie nazwane od umiejętności (Kostkowanie naprzemienne, Legato, Polowania kliknięciem, Wzory bicia…), a każda gałąź to łańcuch kropek uporządkowanych od najłatwiejszych. Małe przerwy dzielą łańcuch na stopnie trudności, a słabe kreski pod każdym stopniem mówią, jak jest trudny: jedna dla początkujących, do czterech dla trudnych. Zielona kropka to ćwiczenie, które zagrałeś, ciemna kropka wciąż czeka, a kłódka oznacza ćwiczenie Pro. Dokładnie jedna kropka na całej mapie nosi pierścień: ćwiczenie, na którym jesteś. Okrąg kamienia milowego wypełnia się, gdy grasz jego ćwiczenia, i staje się w pełni zielony, gdy zrobisz każde z nich.
+Mapa biegnie z góry na dół, od Podstaw przez Technikę, Teorię i gryf, Rytm i groove, Ekspresję i styl oraz Kształcenie słuchu do Kreatywności, i kończy się na Mistrzostwie. Każdy etap to duży klawisz na pniu, a jego umiejętności wiszą parami po obu stronach (Kostkowanie naprzemienne, Legato, Polowania kliknięciem, Wzory bicia…). Umiejętność to jeden lub kilka rzędów numerowanych klawiszy, od najłatwiejszych, a każdy rząd czyta się od pnia na zewnątrz. Małe przerwy dzielą rząd na stopnie trudności, a słabe znaczki pod każdym stopniem mówią, jak jest trudny: jeden dla początkujących, do czterech dla trudnych. Zielony klawisz to ćwiczenie, które zagrałeś, i prowadzi do niego zielona linia od samej góry drzewa. Jeden klawisz na całym drzewie jest turkusowy i ma znacznik Start: to ćwiczenie, na którym jesteś. W każdej innej umiejętności pierwszy niezagrany klawisz jest jaśniejszy od kolejnych, więc widać, gdzie można wejść. Klawisz etapu dostaje pierścień, który wypełnia się, gdy grasz jego ćwiczenia, i staje się w pełni zielony, gdy zrobisz każde z nich.
 
 Każda gałąź niesie w nagłówku poziom swojej umiejętności. Dwie gałęzie trenujące tę samą umiejętność pokazują ten sam poziom, bo to ta sama umiejętność rozbita na dwa odcinki mapy. Gałęzie, których jeszcze nie dotykałeś, mają przyciemnioną nazwę, więc te, nad którymi pracujesz, się wyróżniają.
 
-Najedź na kropkę, żeby zobaczyć, czym jest, kliknij ją, by podejrzeć i rozpocząć; kliknij nazwę umiejętności, by otworzyć pełną listę dla tej umiejętności.
+Najedź na klawisz, żeby zobaczyć, czym jest. Kliknij go, a pod jego rzędem otworzy się dymek z nazwą ćwiczenia, trudnością i stanem oraz przyciskiem, który je rozpoczyna, i drugim, który pozwala najpierw je podejrzeć. Kliknij nazwę umiejętności, by otworzyć pełną listę dla tej umiejętności.
 
-Przeciągaj gdziekolwiek, by przesuwać, albo użyj klawiszy strzałek. Przyciski plus i minus przybliżają, tak samo Ctrl i kółko myszy, a przycisk dopasowania przywraca całą szerokość. Otwórz mapę po sesji, a wyląduje na twoim następnym ćwiczeniu, a nie na górze.
+Kliknij duży klawisz etapu, żeby zwinąć jego umiejętności, i jeszcze raz, żeby je przywrócić. Długie drzewo da się tak skrócić do tego, nad czym pracujesz. Otwórz drzewo po sesji, a wyląduje na twoim następnym ćwiczeniu, a nie na górze, z otwartym już dymkiem.
 
 Każde ćwiczenie, które ukończysz w ramach zapisanej sesji, zasila umiejętności, którymi jest oznaczone. Nie ma limitu: umiejętność to bieżąca suma, która tylko rośnie, więc liczba jest zapisem poświęconej uwagi, a nie oceną.
 
-Luki są sednem. Gałąź z jedną wypełnioną kropką i ośmioma pustymi nie jest niedostateczną oceną, to krótka lista: te puste kropki to ćwiczenia, które mógłbyś zrobić dziś wieczorem.
+Luki są sednem. Umiejętność z jednym zielonym klawiszem i ośmioma ciemnymi nie jest niedostateczną oceną, to krótka lista: te ciemne klawisze to ćwiczenia, które mógłbyś zrobić dziś wieczorem.
 
 <ClickPath steps="Postępy|Umiejętności" caption="Każda rozpoczęta umiejętność z poziomem, czasem ćwiczenia i dystansem do następnego poziomu." />
 

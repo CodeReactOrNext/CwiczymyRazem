@@ -251,6 +251,243 @@ export const earModeAdvancedExercise: Exercise = {
   },
 };
 
+// ── 5. Intervals ─────────────────────────────────────────────────────────────
+
+const INTERVAL_QUIZ_DEFAULTS = {
+  ...EAR_QUIZ_DEFAULTS,
+  addedAt: "2026-11-13",
+} satisfies Partial<Exercise>;
+
+export const earIntervalBasicsExercise: Exercise = {
+  ...INTERVAL_QUIZ_DEFAULTS,
+  id: "ear_interval_basics",
+  title: "Intervals by Ear — First Five",
+  description:
+    "Two notes, one after the other, going up. Name the distance: major 2nd, major 3rd, 4th, 5th or octave.",
+  whyItMatters:
+    "Every melody is a chain of intervals. Once you can name the jump between two notes, you can find a tune on the guitar without hunting fret by fret — and these five are the ones melodies use most.",
+  difficulty: "easy",
+  timeInMinutes: 1,
+  instructions: [
+    "Press Play — two notes sound, the second higher than the first.",
+    "Pick the interval you hear. The starting note changes every round, so only the distance matters.",
+    "Stuck? 'Play them together' stacks the two notes so you can hear how well they blend.",
+  ],
+  tips: [
+    "Sing both notes back before you answer. If you can sing it, you can name it.",
+    "A 5th sounds hollow and strong, like a power chord. An octave sounds like the same note twice.",
+    "Count up the major scale from the first note in your head: the second note is step 2, 3, 4, 5 or 8.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "music_theory"],
+  earQuizConfig: {
+    mode: "interval",
+    intervals: ["M2", "M3", "P4", "P5", "P8"],
+    directions: ["ascending"],
+  },
+};
+
+export const earIntervalSecondsThirdsExercise: Exercise = {
+  ...INTERVAL_QUIZ_DEFAULTS,
+  id: "ear_interval_seconds_thirds",
+  title: "Intervals by Ear — Seconds and Thirds",
+  description:
+    "The four smallest steps, a single fret apart from each other: minor and major 2nd, minor and major 3rd.",
+  whyItMatters:
+    "Major or minor is decided by one fret. Telling a minor 3rd from a major 3rd by ear is the same skill as hearing whether a chord, a scale or a whole song is major or minor.",
+  difficulty: "medium",
+  timeInMinutes: 1,
+  instructions: [
+    "Press Play — two notes sound, going up or coming down.",
+    "First decide: is it a step (a 2nd) or a small skip (a 3rd)? Then decide whether it is the minor or the major one.",
+    "After you answer, tap the other tiles to hear each interval from the same starting note.",
+  ],
+  tips: [
+    "A minor 2nd is the tensest sound here — two notes almost on top of each other.",
+    "A minor 3rd sounds sad, a major 3rd sounds bright. Think of the first two notes of a minor or a major chord.",
+    "Coming down is harder than going up. Sing the lower note first, then the upper, to turn it around.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "music_theory"],
+  earQuizConfig: {
+    mode: "interval",
+    intervals: ["m2", "M2", "m3", "M3"],
+    directions: ["ascending", "descending"],
+  },
+};
+
+const ALL_INTERVALS = [
+  "m2", "M2", "m3", "M3", "P4", "TT", "P5", "m6", "M6", "m7", "M7", "P8",
+] as const;
+
+export const earIntervalAllExercise: Exercise = {
+  ...INTERVAL_QUIZ_DEFAULTS,
+  id: "ear_interval_all_twelve",
+  title: "Intervals by Ear — All Twelve",
+  description:
+    "Every interval inside an octave, going up or coming down. Twelve answers, one fret apart from each other.",
+  whyItMatters:
+    "With all twelve intervals in your ear, transcribing stops being trial and error: you hear a leap, name it, and your hand already knows the shape. It is the single most transferable ear skill a guitarist can build.",
+  difficulty: "hard",
+  timeInMinutes: 1.5,
+  instructions: [
+    "Press Play — two notes sound, going up or coming down.",
+    "Sort it roughly first: small (2nds, 3rds), medium (4th, tritone, 5th) or wide (6ths, 7ths, octave).",
+    "Then choose between the two or three candidates in that group.",
+  ],
+  tips: [
+    "The tritone is the restless one that fits neither the 4th nor the 5th.",
+    "A minor 7th is two frets below the octave, a major 7th only one — sing up to the octave to check which.",
+    "Wrong answers teach the most: tap the tile you picked and the correct one, back to back.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "transcription"],
+  earQuizConfig: {
+    mode: "interval",
+    intervals: [...ALL_INTERVALS],
+    directions: ["ascending", "descending"],
+  },
+};
+
+export const earIntervalHarmonicExercise: Exercise = {
+  ...INTERVAL_QUIZ_DEFAULTS,
+  id: "ear_interval_harmonic",
+  title: "Intervals by Ear — Two Notes Together",
+  description:
+    "Both notes struck at once. Name the interval from its colour alone — smooth, hollow, sweet or clashing.",
+  whyItMatters:
+    "Double stops, power chords and the outer notes of every chord are intervals heard together. Recognising them this way is what lets you work out chords and harmonised lines from a recording.",
+  difficulty: "hard",
+  timeInMinutes: 1.5,
+  instructions: [
+    "Press Play — two notes ring together.",
+    "Listen to how they blend: do they melt into each other, sit comfortably, or grind?",
+    "'One note at a time' plays them apart if you need to hear the distance.",
+  ],
+  tips: [
+    "5ths, 4ths and octaves are hollow and stable. 3rds and 6ths are sweet. 2nds, 7ths and the tritone clash.",
+    "Hum the lower note, then the upper one — pulling the two apart with your voice is half the answer.",
+    "A minor 2nd and a major 7th are the two harshest sounds; the 7th is the wide one.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "harmony"],
+  earQuizConfig: {
+    mode: "interval",
+    intervals: [...ALL_INTERVALS],
+    directions: ["harmonic"],
+  },
+};
+
+// ── 6. First listening drills ────────────────────────────────────────────────
+// Two or three answers each: the entry step below the "basics" of every quiz.
+
+export const earChordMajorOrMinorExercise: Exercise = {
+  ...INTERVAL_QUIZ_DEFAULTS,
+  id: "ear_chord_major_or_minor",
+  title: "Chord Quality — Major or Minor",
+  description:
+    "Hear a chord and decide one thing only: is it major or minor?",
+  whyItMatters:
+    "Major or minor is the first question to ask about any chord, and the answer sets the mood of a whole song. Getting this one distinction into your ear is where ear training starts.",
+  difficulty: "beginner",
+  timeInMinutes: 1,
+  instructions: [
+    "Press Play — a chord rings out.",
+    "Pick Major or Minor. The chord starts on a different note every round, so listen to the mood, not the pitch.",
+    "After you answer, tap both tiles to hear the two versions side by side.",
+  ],
+  tips: [
+    "Major tends to sound bright and settled, minor darker and sadder.",
+    "'One note at a time' spreads the chord out — the middle note is the one that changes.",
+    "Do not rush. Let the chord ring and notice how it makes you feel before you answer.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "chords"],
+  earQuizConfig: {
+    mode: "chordType",
+    qualities: ["major", "minor"],
+  },
+};
+
+export const earModeMajorOrMinorExercise: Exercise = {
+  ...INTERVAL_QUIZ_DEFAULTS,
+  id: "ear_mode_major_or_minor",
+  title: "Name That Mode — Major or Minor",
+  description:
+    "A scale runs up over a held root. Is it the major scale or the natural minor scale?",
+  whyItMatters:
+    "The major and natural minor scales are the two that most music is written in. Telling them apart by ear lets you guess the right scale for a song before you have found a single note.",
+  difficulty: "beginner",
+  timeInMinutes: 1,
+  instructions: [
+    "Press Play — a scale climbs one octave while its root is held underneath.",
+    "Pick the scale you hear: major or natural minor.",
+    "'Play it slowly' gives you more time on each note.",
+  ],
+  tips: [
+    "Listen to the third note of the run. In minor it sits lower and sounds darker.",
+    "Sing along with the scale — your voice will notice the difference before your head does.",
+    "After answering, tap the other tile to hear what the wrong answer would have sounded like.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "scales"],
+  earQuizConfig: {
+    mode: "scaleMode",
+    scales: ["ionian", "aeolian"],
+  },
+};
+
+export const earIntervalThreeSizesExercise: Exercise = {
+  ...INTERVAL_QUIZ_DEFAULTS,
+  id: "ear_interval_three_sizes",
+  title: "Intervals by Ear — Small, Medium, Wide",
+  description:
+    "Two notes going up. Is the jump a small step, a medium leap or a full octave?",
+  whyItMatters:
+    "Before naming every interval, the ear has to learn to judge size. A step, a fifth and an octave are far enough apart to tell at once — and they are the landmarks every other interval is measured against.",
+  difficulty: "beginner",
+  timeInMinutes: 1,
+  instructions: [
+    "Press Play — two notes sound, the second higher than the first.",
+    "Pick the size of the jump: a major 2nd (small), a perfect 5th (medium) or an octave (wide).",
+    "After you answer, tap the tiles to hear all three from the same starting note.",
+  ],
+  tips: [
+    "A major 2nd is the next note of a scale — a small step up.",
+    "A perfect 5th is the sound of a power chord played one note at a time.",
+    "An octave sounds like the same note again, only higher.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "music_theory"],
+  earQuizConfig: {
+    mode: "interval",
+    intervals: ["M2", "P5", "P8"],
+    directions: ["ascending"],
+  },
+};
+
+export const earTuningWideMissesExercise: Exercise = {
+  ...INTERVAL_QUIZ_DEFAULTS,
+  id: "ear_tuning_wide_misses",
+  title: "Tune By Ear — Wide Misses",
+  description:
+    "Two notes, one clearly out of tune. Slide it until the wobble between them disappears — with a generous margin.",
+  whyItMatters:
+    "Hearing that something is out of tune, and which way to fix it, is a skill every guitarist needs from the first day. Starting with large, obvious errors trains the ear to notice the wobble that smaller errors hide.",
+  difficulty: "beginner",
+  timeInMinutes: 1,
+  instructions: [
+    "Press Play — two notes sound together and wobble against each other.",
+    "Move the slider. The wobble slows down as you get closer and speeds up as you move away.",
+    "Stop when the two notes melt into one steady sound, then check your answer.",
+  ],
+  tips: [
+    "If you cannot tell which way to go, move the slider a long way and listen to whether the wobble gets faster or slower.",
+    "Listen to the wobble itself, not to the two notes.",
+    "This is exactly what happens when you tune one string against another.",
+  ],
+  relatedSkills: ["ear_training"],
+  earQuizConfig: {
+    mode: "detune",
+    toleranceCents: 12,
+    minOffsetCents: 28,
+    maxOffsetCents: 50,
+  },
+};
+
 export const earQuizExercises: Exercise[] = [
   earChordQualityBasicsExercise,
   earChordQualityAdvancedExercise,
@@ -260,4 +497,12 @@ export const earQuizExercises: Exercise[] = [
   earTuningPrecisionExercise,
   earModeBasicsExercise,
   earModeAdvancedExercise,
+  earIntervalBasicsExercise,
+  earIntervalSecondsThirdsExercise,
+  earIntervalAllExercise,
+  earIntervalHarmonicExercise,
+  earChordMajorOrMinorExercise,
+  earModeMajorOrMinorExercise,
+  earIntervalThreeSizesExercise,
+  earTuningWideMissesExercise,
 ];

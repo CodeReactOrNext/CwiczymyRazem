@@ -1,4 +1,7 @@
-import { getSeasonFameReward } from "constants/seasonRewards";
+import {
+  getSeasonFameReward,
+  SEASON_REWARD_PLACES,
+} from "constants/seasonRewards";
 import { canSendEmail } from "lib/email/consent";
 import { isOnEmailCooldown, todayKey } from "lib/email/cooldown";
 import {
@@ -52,6 +55,8 @@ export interface AdminEmailContext {
   daysInSeason?: number;
   daysLeft?: number;
   top3?: TopPlayer[];
+  /** Points of the last rewarded place in the finished season. */
+  lastRewardedPoints?: number | null;
 }
 
 interface RecipientsResponse {
@@ -286,6 +291,8 @@ async function buildRecipientsResponse(type: AdminEmailType): Promise<Recipients
       context: {
         seasonName: `Season ${prevSeasonId}`,
         top3,
+        lastRewardedPoints:
+          participants[SEASON_REWARD_PLACES - 1]?.points ?? null,
       },
       description: `Final results for previous season (${prevSeasonId}). Only players who agreed to these emails.`,
     };
@@ -396,6 +403,7 @@ async function sendOne(
       userPoints: points,
       fameEarned,
       top3: context.top3,
+      lastRewardedPoints: context.lastRewardedPoints ?? null,
     });
     return;
   }

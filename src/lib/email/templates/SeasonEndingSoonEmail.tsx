@@ -1,21 +1,21 @@
+import { Column, Row, Text } from "@react-email/components";
 import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Text,
-} from "@react-email/components";
-import { SEASON_REWARD_PLACES } from "constants/seasonRewards";
+  SEASON_FAME_REWARDS,
+  SEASON_REWARD_PLACES,
+} from "constants/seasonRewards";
 
-import EmailFooter from "./EmailFooter";
+import EmailLayout, {
+  EmailButton,
+  EmailCard,
+  emailColors,
+  EmailIntro,
+  formatNumber,
+  withName,
+} from "./EmailLayout";
 
 interface SeasonEndingSoonEmailProps {
   userName: string;
+  /** Already formatted for readers, e.g. "November season". */
   seasonName: string;
   daysLeft: number;
   leaderboardUrl: string;
@@ -24,162 +24,71 @@ interface SeasonEndingSoonEmailProps {
   preferencesUrl: string;
 }
 
-const colors = {
-  bg: "#09090b",
-  card: "#18181b",
-  text: "#f4f4f5",
-  textMuted: "#a1a1aa",
-  textDim: "#71717a",
-  cyan: "#22d3ee",
-  red: "#ef4444",
-  redBg: "#2a0a0a",
-  redMuted: "#fca5a5",
-};
+const NUMBER_WORDS = [
+  "Zero",
+  "One",
+  "Two",
+  "Three",
+  "Four",
+  "Five",
+  "Six",
+  "Seven",
+  "Eight",
+  "Nine",
+  "Ten",
+];
 
-const main = {
-  background: `radial-gradient(ellipse 80% 60% at 50% 0%, rgba(34, 211, 238, 0.10) 0%, rgba(34, 211, 238, 0) 60%), ${colors.bg}`,
-  backgroundColor: colors.bg,
-  fontFamily:
-    'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  margin: 0,
-  padding: 0,
-  color: colors.text,
-};
-
-const container = {
-  maxWidth: "580px",
-  margin: "0 auto",
-  padding: "48px 24px",
-};
-
-const logoSection = {
-  textAlign: "center" as const,
-  marginBottom: "32px",
-};
-
-const card = {
-  backgroundColor: colors.card,
-  borderRadius: "8px",
-  padding: "40px 36px",
-};
-
-const eyebrow = {
-  fontSize: "13px",
-  fontWeight: 600,
-  color: colors.red,
-  margin: "0 0 16px",
-};
-
-const heading = {
-  fontSize: "26px",
-  fontWeight: 800,
-  margin: "0 0 12px",
-  color: colors.text,
-  lineHeight: "1.25",
-  letterSpacing: "-0.02em",
-};
-
-const paragraph = {
-  fontSize: "15px",
-  lineHeight: "26px",
-  color: colors.textMuted,
-  margin: "0 0 28px",
-};
-
-const daysHero = {
-  backgroundColor: colors.redBg,
-  borderRadius: "8px",
-  padding: "24px",
-  textAlign: "center" as const,
-  margin: "0 0 28px",
-};
-
-const daysNumberBig = {
-  fontSize: "72px",
-  fontWeight: 900,
-  color: colors.redMuted,
-  margin: 0,
-  lineHeight: 1,
-  letterSpacing: "-0.04em",
-};
-
-const daysNumberWord = {
-  fontSize: "44px",
-  fontWeight: 900,
-  color: colors.redMuted,
-  margin: 0,
-  lineHeight: 1.05,
-  letterSpacing: "-0.03em",
-};
-
-const daysLabel = {
-  fontSize: "15px",
-  fontWeight: 500,
-  color: colors.redMuted,
-  margin: "6px 0 0",
-  opacity: 0.8,
-};
-
-const buttonWrap = {
-  textAlign: "center" as const,
-};
-
-const ctaButton = {
-  backgroundColor: colors.cyan,
-  color: "#09090b",
-  padding: "14px 36px",
-  borderRadius: "8px",
-  fontWeight: 700,
-  fontSize: "15px",
-  textDecoration: "none",
-  display: "inline-block",
-};
+export function seasonEndingSubject(
+  seasonName: string,
+  daysLeft: number,
+): string {
+  if (daysLeft <= 0) return `Last day of the ${seasonName}`;
+  if (daysLeft === 1) return `The ${seasonName} ends tomorrow`;
+  return `${daysLeft} days left in the ${seasonName}`;
+}
 
 interface Copy {
   preview: string;
-  eyebrow: string;
-  heading: string;
+  title: string;
   paragraph: string;
-  heroNumber: string;
-  heroLabel: string;
-  heroNumberAsWord: boolean;
+  big: string;
+  /** "Today" is a word, so it gets a smaller size than a digit. */
+  bigIsWord: boolean;
+  label: string;
 }
 
-function buildCopy(
-  daysLeft: number,
-  displayName: string,
-  seasonName: string,
-): Copy {
+function buildCopy(daysLeft: number, userName: string): Copy {
   if (daysLeft <= 0) {
     return {
-      preview: `${seasonName} ends today — last chance`,
-      eyebrow: "Final hours",
-      heading: `${displayName}, the season ends today`,
-      paragraph: `${seasonName} closes today. Last chance to push your spot on the leaderboard — every minute counts.`,
-      heroNumber: "TODAY",
-      heroLabel: "season ends",
-      heroNumberAsWord: true,
+      preview: "The standings lock tonight.",
+      title: withName("Last day of the season", userName),
+      paragraph:
+        "The standings lock tonight. One more session today could still move you up a place.",
+      big: "Today",
+      bigIsWord: true,
+      label: "final hours",
     };
   }
   if (daysLeft === 1) {
     return {
-      preview: `${seasonName} ends tomorrow`,
-      eyebrow: "1 day left",
-      heading: `${displayName}, the season ends tomorrow`,
-      paragraph: `${seasonName} closes tomorrow. This is the last day to climb — the top ${SEASON_REWARD_PLACES} take home fame rewards.`,
-      heroNumber: "1",
-      heroLabel: "day remaining",
-      heroNumberAsWord: false,
+      preview: "Today and tomorrow are your last two chances to climb.",
+      title: withName("The season ends tomorrow", userName),
+      paragraph:
+        "Today and tomorrow are your last chances to move up the leaderboard before the standings lock.",
+      big: "1",
+      bigIsWord: false,
+      label: "day left",
     };
   }
+  const word = NUMBER_WORDS[daysLeft] ?? String(daysLeft);
   return {
-    preview: `${daysLeft} days left in ${seasonName}`,
-    eyebrow: `${daysLeft} days left`,
-    heading: `${displayName}, the season ends in ${daysLeft} days`,
-    paragraph: `${seasonName} closes in ${daysLeft} days. This is your final push — every session counts toward the leaderboard. The top ${SEASON_REWARD_PLACES} take home fame rewards at the end.`,
-    heroNumber: String(daysLeft),
-    heroLabel: "days remaining",
-    heroNumberAsWord: false,
+    preview: "Every session from now on counts toward your final place.",
+    title: withName(`${word} days left`, userName),
+    paragraph:
+      "The season closes at the end of the month. Every session until then counts toward your place on the leaderboard.",
+    big: String(daysLeft),
+    bigIsWord: false,
+    label: "days left",
   };
 }
 
@@ -191,44 +100,60 @@ export default function SeasonEndingSoonEmail({
   logoUrl,
   preferencesUrl,
 }: SeasonEndingSoonEmailProps) {
-  const displayName = userName?.trim() || "Guitarist";
-  const copy = buildCopy(daysLeft, displayName, seasonName);
+  const copy = buildCopy(daysLeft, userName);
 
   return (
-    <Html lang='en'>
-      <Head />
-      <Preview>{copy.preview}</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Section style={logoSection}>
-            <Img src={logoUrl} alt='Riff Quest' width='160' />
-          </Section>
+    <EmailLayout
+      preview={copy.preview}
+      logoUrl={logoUrl}
+      art='season-ending'
+      preferencesUrl={preferencesUrl}
+      reason={`You got this because you're playing in the ${seasonName}.`}>
+      <EmailIntro eyebrow={seasonName} title={copy.title}>
+        {copy.paragraph}
+      </EmailIntro>
 
-          <Section style={card}>
-            <Text style={eyebrow}>{copy.eyebrow}</Text>
-            <Heading style={heading}>{copy.heading}</Heading>
-            <Text style={paragraph}>{copy.paragraph}</Text>
+      <EmailCard>
+        <Row>
+          <Column style={{ width: "136px", verticalAlign: "middle" }}>
+            <Text
+              style={{
+                margin: 0,
+                fontSize: copy.bigIsWord ? "44px" : "64px",
+                lineHeight: "64px",
+                fontWeight: 800,
+                letterSpacing: copy.bigIsWord ? "-0.03em" : "-0.04em",
+                color: emailColors.amber,
+              }}>
+              {copy.big}
+            </Text>
+            <Text
+              style={{
+                margin: "4px 0 0",
+                fontSize: "14px",
+                lineHeight: "20px",
+                fontWeight: 600,
+                color: emailColors.text,
+              }}>
+              {copy.label}
+            </Text>
+          </Column>
+          <Column style={{ verticalAlign: "middle", paddingLeft: "24px" }}>
+            <Text
+              style={{
+                margin: 0,
+                fontSize: "15px",
+                lineHeight: "24px",
+                color: emailColors.textMuted,
+              }}>
+              The top {SEASON_REWARD_PLACES} take home Fame when the season
+              closes. 1st place pays {formatNumber(SEASON_FAME_REWARDS[0])}.
+            </Text>
+          </Column>
+        </Row>
+      </EmailCard>
 
-            <Section style={daysHero}>
-              <Text
-                style={copy.heroNumberAsWord ? daysNumberWord : daysNumberBig}>
-                {copy.heroNumber}
-              </Text>
-              <Text style={daysLabel}>{copy.heroLabel}</Text>
-            </Section>
-
-            <Section style={buttonWrap}>
-              <Button href={leaderboardUrl} style={ctaButton}>
-                See leaderboard
-              </Button>
-            </Section>
-          </Section>
-
-          <EmailFooter preferencesUrl={preferencesUrl}>
-            You received this because you are participating in {seasonName}.
-          </EmailFooter>
-        </Container>
-      </Body>
-    </Html>
+      <EmailButton href={leaderboardUrl}>See the leaderboard</EmailButton>
+    </EmailLayout>
   );
 }

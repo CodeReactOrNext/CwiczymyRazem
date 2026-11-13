@@ -1,17 +1,14 @@
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Text,
-} from "@react-email/components";
+import { Column, Row, Section, Text } from "@react-email/components";
 
-import EmailFooter from "./EmailFooter";
+import EmailLayout, {
+  EmailButton,
+  EmailCard,
+  emailColors,
+  EmailIntro,
+  EmailNote,
+  monoFont,
+  withName,
+} from "./EmailLayout";
 
 export type StreakEmailVariant = "d1" | "d3";
 
@@ -43,152 +40,93 @@ export function formatHoursLeft(hoursLeft?: number | null): string {
   return hoursLeft === 1 ? "in 1 hour" : `in ${hoursLeft} hours`;
 }
 
-const colors = {
-  bg: "#09090b",
-  card: "#18181b",
-  cardElevated: "#27272a",
-  text: "#f4f4f5",
-  textMuted: "#a1a1aa",
-  textDim: "#71717a",
-  cyan: "#22d3ee",
-  red: "#ef4444",
-  redBg: "#2a0a0a",
-  redMuted: "#fca5a5",
-  gold: "#f59e0b",
-  goldBg: "#2a1d08",
-  goldMuted: "#fde68a",
-};
+const streakLine = (days: number) =>
+  days === 1 ? "You played yesterday" : `${days} days in a row`;
 
-const main = {
-  background: `radial-gradient(ellipse 80% 60% at 50% 0%, rgba(34, 211, 238, 0.10) 0%, rgba(34, 211, 238, 0) 60%), ${colors.bg}`,
-  backgroundColor: colors.bg,
-  fontFamily:
-    'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  margin: 0,
-  padding: 0,
-  color: colors.text,
-};
-
-const container = {
-  maxWidth: "580px",
-  margin: "0 auto",
-  padding: "48px 24px",
-};
-
-const logoSection = {
-  textAlign: "center" as const,
-  marginBottom: "32px",
-};
-
-const card = {
-  backgroundColor: colors.card,
-  borderRadius: "8px",
-  padding: "40px 36px",
-};
-
-const eyebrow = (color: string) => ({
-  fontSize: "13px",
-  fontWeight: 600,
-  color,
-  margin: "0 0 16px",
-});
-
-const heading = {
-  fontSize: "26px",
-  fontWeight: 800,
-  margin: "0 0 12px",
-  color: colors.text,
-  lineHeight: "1.25",
-  letterSpacing: "-0.02em",
-};
-
-const paragraph = {
-  fontSize: "15px",
-  lineHeight: "26px",
-  color: colors.textMuted,
-  margin: "0 0 28px",
-};
-
-// Hero streak block
-const streakHero = (bgColor: string) => ({
-  backgroundColor: bgColor,
-  borderRadius: "8px",
-  padding: "28px 24px",
-  textAlign: "center" as const,
-  margin: "0 0 24px",
-});
-
-const streakNumber = (color: string) => ({
-  fontSize: "72px",
-  fontWeight: 900,
-  color,
-  margin: 0,
-  lineHeight: 1,
-  letterSpacing: "-0.04em",
-});
-
-const streakUnit = (color: string) => ({
-  fontSize: "16px",
-  fontWeight: 600,
-  color,
-  margin: "6px 0 0",
-  opacity: 0.8,
-});
-
-// Tip / motivational box
-const tipBox = {
-  backgroundColor: colors.cardElevated,
-  borderRadius: "8px",
-  padding: "16px 18px",
-  margin: "0 0 28px",
-  borderLeft: `3px solid ${colors.cyan}`,
-};
-
-const tipLabel = {
-  fontSize: "12px",
-  fontWeight: 700,
-  color: colors.cyan,
-  margin: "0 0 4px",
-};
-
-const tipText = {
-  fontSize: "13px",
-  lineHeight: "20px",
-  color: colors.textMuted,
-  margin: 0,
-};
-
-const buttonWrap = {
-  textAlign: "center" as const,
-  margin: "4px 0 0",
-};
-
-const ctaButton = (bgColor: string) => ({
-  backgroundColor: bgColor,
-  color: "#09090b",
-  padding: "14px 36px",
-  borderRadius: "8px",
-  fontWeight: 700,
-  fontSize: "15px",
-  textDecoration: "none",
-  display: "inline-block",
-});
+export function streakSubject(
+  variant: StreakEmailVariant,
+  streakDays: number,
+  userName?: string | null,
+): string {
+  if (variant === "d3") {
+    const name = userName?.trim();
+    return name
+      ? `Three days without the guitar, ${name}`
+      : "Three days without the guitar";
+  }
+  return `${streakLine(streakDays)}. Today isn't logged yet.`;
+}
 
 const d1Tips = [
-  "Warm up with 5 minutes of chromatic exercises — your fingers will remember.",
-  "Even one slow run through a chord progression counts as a session.",
-  "Put the guitar in sight, not in the case. You'll pick it up.",
+  "Short on time? One slow run through a chord progression counts as a session.",
+  "Short on time? Five minutes of chromatic warm-up still counts, and your fingers will remember.",
+  "Put the guitar where you can see it, not in the case. You'll pick it up.",
 ];
 
 const d3Tips = [
-  "Start with something you already know. Familiarity gets you back in the groove fast.",
-  "A 10-minute session today is worth more than an hour next week.",
-  "The hardest part is always picking up the guitar. After that, it plays itself.",
+  "Start with something you already know. Familiar material gets your hands back in the groove fast, and ten minutes still counts.",
+  "A ten-minute session today is worth more than an hour next week.",
+  "The hardest part is picking up the guitar. After that, it mostly plays itself.",
 ];
 
-function pickTip(tips: string[], streakDays: number) {
-  return tips[streakDays % tips.length];
+const pickTip = (tips: string[], streakDays: number) =>
+  tips[Math.abs(streakDays) % tips.length];
+
+/** Cells in the "last 14 days" strip, today included. */
+const STRIP_DAYS = 14;
+
+/**
+ * The last two weeks as the streak implies them: the days the streak covers
+ * are filled, older ones are empty, and today is an outline still waiting.
+ * We only know the streak length here, not the full history, so a day before
+ * the streak is shown empty even if the reader played it.
+ */
+function StreakStrip({ streakDays }: { streakDays: number }) {
+  const cells = Array.from({ length: STRIP_DAYS }, (_, i) => {
+    const daysAgo = STRIP_DAYS - 1 - i;
+    if (daysAgo === 0) return "today" as const;
+    return daysAgo <= streakDays ? ("played" as const) : ("empty" as const);
+  });
+
+  return (
+    <Row>
+      {cells.map((cell, i) => (
+        <Column
+          key={i}
+          style={{
+            paddingLeft: i === 0 ? 0 : "3px",
+            paddingRight: i === STRIP_DAYS - 1 ? 0 : "3px",
+          }}>
+          <div
+            style={{
+              height: "32px",
+              borderRadius: "4px",
+              boxSizing: "border-box",
+              backgroundColor:
+                cell === "played"
+                  ? emailColors.amber
+                  : cell === "empty"
+                    ? emailColors.cardRaised
+                    : "transparent",
+              border:
+                cell === "today"
+                  ? `2px dashed ${emailColors.amber}`
+                  : undefined,
+            }}
+          />
+        </Column>
+      ))}
+    </Row>
+  );
 }
+
+const stripLabel = {
+  margin: "12px 0 0",
+  fontFamily: monoFont,
+  fontSize: "12px",
+  lineHeight: "18px",
+  color: emailColors.textDim,
+};
 
 export default function StreakReminderEmail({
   userName,
@@ -199,95 +137,104 @@ export default function StreakReminderEmail({
   variant,
   hoursLeft = null,
 }: StreakReminderEmailProps) {
-  const displayName = userName?.trim() || "Guitarist";
   const days = streakDays ?? 0;
-  const isD1 = variant === "d1";
   const deadline = formatHoursLeft(hoursLeft);
+  const reason = "You got this because streak reminders are on.";
 
-  const accentColor = isD1 ? colors.red : colors.gold;
-  const accentBg = isD1 ? colors.redBg : colors.goldBg;
-  const accentMuted = isD1 ? colors.redMuted : colors.goldMuted;
+  if (variant === "d3") {
+    return (
+      <EmailLayout
+        preview="The streak is gone. The muscle memory isn't."
+        logoUrl={logoUrl}
+        art='streak-d3'
+        preferencesUrl={preferencesUrl}
+        reason={reason}>
+        <EmailIntro title='Your guitar has been in its case for three days.'>
+          The streak is gone, but the muscle memory isn&apos;t. One session
+          today starts a new one. Every guitarist has weeks like this.
+        </EmailIntro>
 
-  const previewText = isD1
-    ? `🔥 Your day ends ${deadline} — one session keeps your ${days}-day streak going`
-    : `Hey ${displayName}, it's been 3 days. Time to play something.`;
+        <EmailCard>
+          <Text
+            style={{
+              margin: "0 0 8px",
+              fontSize: "13px",
+              lineHeight: "20px",
+              fontWeight: 600,
+              color: emailColors.amber,
+            }}>
+            The easy way back
+          </Text>
+          <Text
+            style={{
+              margin: 0,
+              fontSize: "16px",
+              lineHeight: "26px",
+              color: emailColors.text,
+            }}>
+            {pickTip(d3Tips, days)}
+          </Text>
+        </EmailCard>
+
+        <EmailButton href={timerUrl}>Jump back in</EmailButton>
+      </EmailLayout>
+    );
+  }
 
   return (
-    <Html lang='en'>
-      <Head />
-      <Preview>{previewText}</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Section style={logoSection}>
-            <Img src={logoUrl} alt='Riff Quest' width='160' />
-          </Section>
+    <EmailLayout
+      preview={`Your day ends ${deadline}. One session keeps it going.`}
+      logoUrl={logoUrl}
+      art='streak-d1'
+      preferencesUrl={preferencesUrl}
+      reason={reason}>
+      <EmailIntro
+        title={`${withName(streakLine(days), userName)} Today is still empty.`}>
+        Your day ends {deadline}. One session before then keeps the streak
+        going.
+      </EmailIntro>
 
-          <Section style={card}>
-            {isD1 ? (
-              <>
-                <Text style={eyebrow(accentColor)}>Keep it going</Text>
-                <Heading style={heading}>
-                  {displayName}, today ends {deadline}
-                </Heading>
-                <Text style={paragraph}>
-                  You&apos;ve built something real. A single session today
-                  keeps it growing.
-                </Text>
+      <EmailCard>
+        <Section style={{ marginBottom: "20px" }}>
+          <Text style={{ margin: 0 }}>
+            <span
+              style={{
+                fontSize: "64px",
+                lineHeight: "64px",
+                fontWeight: 800,
+                letterSpacing: "-0.04em",
+                color: emailColors.amber,
+              }}>
+              {days}
+            </span>
+            <span
+              style={{
+                fontSize: "16px",
+                lineHeight: "24px",
+                fontWeight: 600,
+                color: emailColors.text,
+                paddingLeft: "12px",
+              }}>
+              day streak
+            </span>
+          </Text>
+        </Section>
+        <StreakStrip streakDays={days} />
+        <Row>
+          <Column>
+            <Text style={stripLabel}>last {STRIP_DAYS} days</Text>
+          </Column>
+          <Column align='right'>
+            <Text style={{ ...stripLabel, color: emailColors.amber }}>
+              today
+            </Text>
+          </Column>
+        </Row>
+      </EmailCard>
 
-                <Section style={streakHero(accentBg)}>
-                  <Text style={streakNumber(accentMuted)}>{days}</Text>
-                  <Text style={streakUnit(accentMuted)}>
-                    day{days !== 1 ? "s" : ""} strong
-                  </Text>
-                </Section>
+      <EmailButton href={timerUrl}>Practice now</EmailButton>
 
-                <Section style={tipBox}>
-                  <Text style={tipLabel}>Quick start</Text>
-                  <Text style={tipText}>{pickTip(d1Tips, days)}</Text>
-                </Section>
-
-                <Section style={buttonWrap}>
-                  <Button href={timerUrl} style={ctaButton(colors.cyan)}>
-                    Practice now
-                  </Button>
-                </Section>
-              </>
-            ) : (
-              <>
-                <Text style={eyebrow(accentColor)}>We miss you</Text>
-                <Heading style={heading}>
-                  Hey {displayName}, time to pick up the guitar again
-                </Heading>
-                <Text style={paragraph}>
-                  It&apos;s been 3 days. Your streak is gone — but the muscle
-                  memory isn&apos;t. Come back with one session and start fresh.
-                  Every guitarist has off days.
-                </Text>
-
-                <Section style={streakHero(accentBg)}>
-                  <Text style={streakNumber(accentMuted)}>3</Text>
-                  <Text style={streakUnit(accentMuted)}>days away</Text>
-                </Section>
-
-                <Section style={tipBox}>
-                  <Text style={tipLabel}>Get back in</Text>
-                  <Text style={tipText}>{pickTip(d3Tips, days)}</Text>
-                </Section>
-
-                <Section style={buttonWrap}>
-                  <Button href={timerUrl} style={ctaButton(accentColor)}>
-                    Jump back in
-                  </Button>
-                </Section>
-              </>
-            )}
-          </Section>
-
-          <EmailFooter preferencesUrl={preferencesUrl}>
-            You received this because you turned on streak reminders.
-          </EmailFooter>
-        </Container>
-      </Body>
-    </Html>
+      <EmailNote>{pickTip(d1Tips, days)}</EmailNote>
+    </EmailLayout>
   );
 }

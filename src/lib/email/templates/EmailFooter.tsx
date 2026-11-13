@@ -10,10 +10,9 @@ interface EmailFooterProps {
 
 const footer = {
   fontSize: "12px",
-  color: "#71717a",
-  textAlign: "center" as const,
-  marginTop: "28px",
-  lineHeight: "18px",
+  lineHeight: "20px",
+  color: "#8b8b94",
+  margin: 0,
 };
 
 const link = {
@@ -32,8 +31,6 @@ export default function EmailFooter({
       <Link href={preferencesUrl} style={link}>
         Manage email preferences
       </Link>
-      <br />
-      Riff Quest. Practice. Progress. Play.
     </Text>
   );
 }

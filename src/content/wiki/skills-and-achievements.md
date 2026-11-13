@@ -10,19 +10,19 @@ order: 2
 
 The app tracks 23 individual guitar skills (alternate picking, legato, bending, vibrato, chords, scales, rhythm, ear training, improvisation, transcription and so on), grouped under the same four categories used everywhere else: technique, theory, hearing and creativity.
 
-<ClickPath steps="Practice|Skills" caption="The Skills screen is one big map: a trunk down the middle, seven milestones on it, and every exercise in the library as a single dot on a branch." />
+<ClickPath steps="Practice|Skills" caption="The Skills screen is one big tree: a trunk down the middle, seven stages on it, and every exercise in the library as a single numbered key on a branch." />
 
-The map runs top to bottom, from Foundations through Technique, Theory & Fretboard, Rhythm & Groove, Expression & Style and Ear Training to Creativity, and ends at Mastery. Each milestone fans out into branches named after a skill (Alternate Picking, Legato, Click Hunts, Strumming Patterns…), and each branch is a chain of dots ordered easiest first. Small gaps split a chain into difficulty steps, and the faint marks under each step tell you how hard it is: one for beginner, up to four for hard. A green dot is an exercise you've played, a dark dot is still waiting, and a padlock marks a Pro exercise. Exactly one dot on the whole map wears a ring: the exercise you're up to. A milestone's circle fills up as you play its exercises and turns solid green once every one of them is done.
+The map runs top to bottom, from Foundations through Technique, Theory & Fretboard, Rhythm & Groove, Expression & Style and Ear Training to Creativity, and ends at Mastery. Each stage is a big key on the trunk, and its skills hang either side of it in pairs (Alternate Picking, Legato, Click Hunts, Strumming Patterns…). A skill is one or more rows of numbered keys, easiest first, and every row reads from the trunk outwards. Small gaps split a row into difficulty steps, and the faint marks under each step tell you how hard it is: one for beginner, up to four for hard. A green key is an exercise you've played, and a green line leads to it all the way from the top of the tree. One key on the whole tree is cyan and wears a Start tag: the exercise you're up to. In every other skill the first key you haven't played is brighter than the ones after it, so you can see where to step in. A stage's key gets a ring that fills up as you play its exercises, and turns solid green once every one of them is done.
 
 Each branch carries its skill's level in its header. Two branches that train the same skill show the same level, because it is the same skill split into two stretches of the map. Branches you haven't touched yet have a dimmer name, so the ones you're working on stand out.
 
-Hover a dot to see what it is, click it to preview and start it; click a skill's name to open the full list for that skill.
+Hover a key to see what it is. Click it and a bubble opens under its row with the exercise's name, its difficulty and how it stands, plus a button to start it and one to preview it first. Click a skill's name to open the full list for that skill.
 
-Drag anywhere to pan, or use the arrow keys. The plus and minus buttons zoom, as does Ctrl and the scroll wheel, and the fit button brings the whole width back. Open the map after a session and it lands on your next exercise rather than at the top.
+Click a stage's big key to fold its skills away, and again to bring them back, so a long tree can be cut down to what you're working on. Open the tree after a session and it lands on your next exercise rather than at the top, with its bubble already open.
 
 Every exercise you complete as part of a logged session feeds the skills it's tagged with. There's no cap: a skill is a running total that only ever goes up, so the number is a record of attention paid, not a grade.
 
-The gaps are the point. A branch with one filled dot and eight hollow ones isn't a failing grade, it's a shortlist: those hollow dots are exercises you could do tonight.
+The gaps are the point. A skill with one green key and eight dark ones isn't a failing grade, it's a shortlist: those dark keys are exercises you could do tonight.
 
 <ClickPath steps="Progress|Skills" caption="Every skill you've touched, with its level, its practice time and how far it is to the next level." />
 

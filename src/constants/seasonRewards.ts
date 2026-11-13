@@ -26,8 +26,11 @@ export const getSeasonFameReward = (place: number): number | null =>
   SEASON_FAME_REWARDS[place - 1] ?? null;
 
 export const placeSuffix = (place: number): string => {
-  if (place === 1) return "st";
-  if (place === 2) return "nd";
-  if (place === 3) return "rd";
+  const lastTwo = place % 100;
+  if (lastTwo >= 11 && lastTwo <= 13) return "th";
+  const last = place % 10;
+  if (last === 1) return "st";
+  if (last === 2) return "nd";
+  if (last === 3) return "rd";
   return "th";
 };
