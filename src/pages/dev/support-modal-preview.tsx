@@ -21,6 +21,7 @@ import { useState } from "react";
 const VARIANTS: { variant: SupportModalVariant; label: string }[] = [
   { variant: "ask", label: "Ask (not a supporter)" },
   { variant: "thanks", label: "Thanks (supporter)" },
+  { variant: "again", label: "Again (supporter, every 4th)" },
 ];
 
 const FIXTURE_BOARD: RoadmapBoard = {
@@ -60,6 +61,8 @@ export default function SupportModalPreviewPage() {
       <SupportModal
         isOpen={open !== null}
         variant={open ?? "ask"}
+        name='Alex'
+        practiceHours={31}
         onClose={() => setOpen(null)}
         onDonate={() => setOpen(null)}
       />

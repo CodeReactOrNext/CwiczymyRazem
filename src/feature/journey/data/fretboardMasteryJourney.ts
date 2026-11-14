@@ -126,7 +126,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click the correct fret on the low E string for at least 90% of the notes that come up.",
+          examGoal: "Click the correct fret on the low E string for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_low_e_open",
           stepIcon: "Guitar",
           contentBlocks: [
@@ -152,7 +152,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click the correct fret on the low E string for at least 90% of the notes that come up.",
+          examGoal: "Click the correct fret on the low E string for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_low_e_high",
           stepIcon: "Guitar",
           contentBlocks: [
@@ -178,7 +178,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click the correct fret on the A string for at least 90% of the notes that come up.",
+          examGoal: "Click the correct fret on the A string for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_a_open",
           stepIcon: "Guitar",
           contentBlocks: [
@@ -204,7 +204,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click the correct fret on the A string for at least 90% of the notes that come up.",
+          examGoal: "Click the correct fret on the A string for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_a_high",
           stepIcon: "Guitar",
           contentBlocks: [
@@ -224,7 +224,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct string at fret 5 for at least 90% of the notes that come up.",
+          examGoal: "Click every correct string at fret 5 for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_fret5_all",
           stepIcon: "Target",
           contentBlocks: [
@@ -256,7 +256,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct string at fret 7 for at least 90% of the notes that come up.",
+          examGoal: "Click every correct string at fret 7 for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_fret7_all",
           stepIcon: "Target",
           contentBlocks: [
@@ -282,7 +282,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct string at fret 9 for at least 90% of the notes that come up.",
+          examGoal: "Click every correct string at fret 9 for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_fret9_all",
           stepIcon: "Target",
           contentBlocks: [
@@ -315,7 +315,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct spot on the D & G strings (frets 0-6) for at least 90% of the notes that come up.",
+          examGoal: "Click every correct spot on the D & G strings (frets 0-6) for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_octaves_dg_open",
           stepIcon: "Copy",
           contentBlocks: [
@@ -358,7 +358,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct spot on the D & G strings (frets 6-12) for at least 90% of the notes that come up.",
+          examGoal: "Click every correct spot on the D & G strings (frets 6-12) for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_octaves_dg_high",
           stepIcon: "Copy",
           contentBlocks: [
@@ -384,7 +384,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct spot on the B & high e strings (frets 0-6) for at least 90% of the notes that come up.",
+          examGoal: "Click every correct spot on the B & high e strings (frets 0-6) for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_octaves_be_open",
           stepIcon: "Copy",
           contentBlocks: [
@@ -421,7 +421,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct spot on the B & high e strings (frets 6-12) for at least 90% of the notes that come up.",
+          examGoal: "Click every correct spot on the B & high e strings (frets 6-12) for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_octaves_be_high",
           stepIcon: "Copy",
           contentBlocks: [
@@ -454,7 +454,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct spot in this box (frets 0-4, all strings) for at least 90% of the notes that come up.",
+          examGoal: "Click every correct spot in this box (frets 0-4, all strings) for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_box_0_4",
           stepIcon: "LayoutGrid",
           contentBlocks: [
@@ -474,7 +474,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct spot in this box (frets 4-8, all strings) for at least 90% of the notes that come up.",
+          examGoal: "Click every correct spot in this box (frets 4-8, all strings) for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_box_4_8",
           stepIcon: "LayoutGrid",
           contentBlocks: [
@@ -494,7 +494,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct spot in this box (frets 8-12, all strings) for at least 90% of the notes that come up.",
+          examGoal: "Click every correct spot in this box (frets 8-12, all strings) for at least 93% of the notes that come up.",
           suggestedExerciseId: "fret_click_box_8_12",
           stepIcon: "LayoutGrid",
           contentBlocks: [
@@ -521,7 +521,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct spot on the whole neck (frets 0-12) for at least 90% of the natural notes that come up.",
+          examGoal: "Click every correct spot on the whole neck (frets 0-12) for at least 93% of the natural notes that come up.",
           suggestedExerciseId: "fret_click_whole_natural",
           stepIcon: "Globe",
           contentBlocks: [
@@ -553,7 +553,7 @@ export const fretboardMasteryModule: JourneyModule = {
           fullDescription: "",
           tips: [],
           commonMistakes: [],
-          examGoal: "Click every correct spot on the whole neck (frets 0-12) for at least 90% of the notes that come up, sharps and flats included.",
+          examGoal: "Click every correct spot on the whole neck (frets 0-12) for at least 93% of the notes that come up, sharps and flats included.",
           suggestedExerciseId: "fret_click_whole_chromatic",
           stepIcon: "Sparkles",
           contentBlocks: [

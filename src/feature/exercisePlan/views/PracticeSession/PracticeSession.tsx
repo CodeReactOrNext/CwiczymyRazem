@@ -199,7 +199,9 @@ interface PracticeSessionProps {
   skillRewardAmount?:  number;
   examMode?:           boolean | { requiredBpm: number; nodeId?: string };
   examBpm?:            number;
-  onExamComplete?:     (accuracy: number) => void;
+  /** `onTimePct`: share of the run's timed notes that were on time, null where
+   *  timing isn't judged — see accuracyToStars. */
+  onExamComplete?:     (accuracy: number, onTimePct?: number | null) => void;
   skipExitDialog?:     boolean;
   goalRun?:            GoalRunConfig;
   bossFight?:          BossFightConfig;
@@ -1170,7 +1172,7 @@ const PracticeSessionInner = ({
         hasTrackedPerformance && snap ? { score: snap.score, accuracy: snap.accuracy, ...micStandingRef.current } : null,
         null,
       );
-      onExamComplete?.(snap?.accuracy ?? 0);
+      onExamComplete?.(snap?.accuracy ?? 0, snap?.onTimePct ?? null);
     })();
     // Intentionally narrow deps — this should fire exactly once per showSuccessView
     // transition, not re-run when metronome/save/report identities change each render.
@@ -1442,6 +1444,7 @@ const PracticeSessionInner = ({
           planTitle={planTitleString} examMode={isExamMode}
           score={examMistakeFailed ? 0 : successSnapshot.score} maxScore={successSnapshot.maxPossibleScore}
           examAccuracy={examMistakeFailed ? 0 : successSnapshot.accuracy}
+          examOnTimePct={examMistakeFailed ? null : successSnapshot.onTimePct ?? null}
           stats={
             hasTrackedPerformance && !isEarTrainingRiddle
               ? { accuracy: examMistakeFailed ? 0 : successSnapshot.accuracy, maxStreak: successSnapshot.maxCombo }
@@ -1467,7 +1470,7 @@ const PracticeSessionInner = ({
                   ? { score: 0, accuracy: 0 }
                   : { score: successSnapshot.score, accuracy: successSnapshot.accuracy, ...micStandingRef.current },
               isEarTrainingRiddle ? { score: earTrainingScore, ...earTrainingStandingRef.current } : null);
-            if (isExamMode) onExamComplete?.(examMistakeFailed ? 0 : successSnapshot.accuracy);
+            if (isExamMode) onExamComplete?.(examMistakeFailed ? 0 : successSnapshot.accuracy, successSnapshot.onTimePct ?? null);
           }}
           onRestart={examMistakeFailed ? undefined : () => {
             examAutoFinishedRef.current = false;
@@ -1500,7 +1503,7 @@ const PracticeSessionInner = ({
               hasTrackedPerformance && !isEarTrainingRiddle && snap ? { score: snap.score, accuracy: snap.accuracy, ...micStandingRef.current } : null,
               !earlyFinish && isEarTrainingRiddle ? { score: earTrainingScore, ...earTrainingStandingRef.current } : null,
               { skipSkillPoints: earlyFinish });
-            if (isExamMode && snap) onExamComplete?.(snap.accuracy);
+            if (isExamMode && snap) onExamComplete?.(snap.accuracy, snap.onTimePct ?? null);
           } : onFinish}
           isMounted={isMounted} currentExercise={currentExercise}
           currentExerciseIndex={currentExerciseIndex} totalExercises={plan.exercises.length}

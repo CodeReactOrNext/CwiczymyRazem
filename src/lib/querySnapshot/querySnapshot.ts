@@ -28,6 +28,9 @@ const PERSISTED_KEY_PREFIXES: readonly QueryKey[] = [
   ["support-team"],
   ["arsenal", "inventory"],
   ["song-tiers"],
+  ["practice-levels"],
+  ["userRank"],
+  ["seasonalUserPoints"],
 ];
 
 interface PersistedQuery {

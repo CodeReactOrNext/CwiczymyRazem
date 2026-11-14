@@ -1,16 +1,18 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
 import type { DateWithReport, ReportListInterfaceWithTimeSumary } from "../activityLog.types";
 import { formatDateKey, getEmptySlots } from "../activityLog.utils";
+
+const EMPTY: DateWithReport[] = [];
 
 export const useActivityLogData = (
   reportList: ReportListInterfaceWithTimeSumary[] | null,
   year: number
 ) => {
-  const [activityData, setActivityData] = useState<DateWithReport[]>([]);
-
-  useEffect(() => {
-    if (!reportList) return;
+  // Derived during render, not in an effect: with the reports already cached
+  // the calendar is filled on its first frame instead of drawing empty once.
+  const activityData = useMemo(() => {
+    if (!reportList) return EMPTY;
 
     const reportMap = new Map<string, ReportListInterfaceWithTimeSumary[]>();
     reportList.forEach((report) => {
@@ -48,8 +50,8 @@ export const useActivityLogData = (
       }
     }
 
-    setActivityData(newActivityData);
+    return newActivityData;
   }, [reportList, year]);
 
   return { activityData };
-}; 
+};

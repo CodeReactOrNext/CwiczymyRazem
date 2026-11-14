@@ -203,15 +203,36 @@
     "cta": "Say thanks with a coffee"
   },
   "modal": {
-    "why": "Why support Riff Quest?",
-    "body": "Riff Quest is a one person project, free and built in the open. Your support covers the domain, hosting, and database first. Everything raised on top of that funds the roadmap: new exercises, gear, and features, unlocked tier by tier as the community funds them.",
-    "later": "Maybe later",
+    "ask": {
+      "title": "{{count}} hours of practice behind you, {{name}}.",
+      "title_no_name": "{{count}} hours of practice behind you.",
+      "title_plain": "Good to have you here, {{name}}.",
+      "title_plain_no_name": "Good to have you here.",
+      "body": "Riff Quest is free and it stays free. It is still in beta, and new features get built thanks to players chipping in.",
+      "invite": "If you feel like chipping in, every coffee brings the next one closer.",
+      "next": "Next:",
+      "perk_before": "Supporters get",
+      "perk_after": "and a say in the roadmap.",
+      "sign": "Thanks for playing.",
+      "cta": "Buy me a coffee"
+    },
     "thanks": {
-      "title": "Thank you, {{name}}",
-      "title_no_name": "Thank you for backing Riff Quest",
-      "body": "You are one of the people keeping Riff Quest free for everyone. Your support pays the hosting bill and turns roadmap ideas into features every player gets to use. It genuinely means a lot to me, thank you.",
-      "tokens_hint": "Spend them on roadmap ideas, gear and the next supporter case.",
-      "close": "Back to practice"
+      "title": "Thank you, {{name}}.",
+      "title_no_name": "Thank you.",
+      "body": "Riff Quest is still in beta, and it keeps growing thanks to you and {{count}} other players. Your support has already built:",
+      "body_solo": "Riff Quest is still in beta, and it keeps growing thanks to you. Your support has already built:",
+      "tokens": "You have {{count}} tokens.",
+      "tokens_one": "You have 1 token.",
+      "tokens_hint": "You can use them to pick what gets built next.",
+      "sign": "Thanks for being here.",
+      "cta": "See what's next"
+    },
+    "close": "Back to practice",
+    "again": {
+      "title": "You helped build this, {{name}}.",
+      "title_no_name": "You helped build this.",
+      "body": "Your support is part of everything shipped so far:",
+      "invite": "Riff Quest is still in beta and keeps growing the same way. If you ever feel like chipping in again, every coffee brings the next one closer."
     }
   },
   "panel": {

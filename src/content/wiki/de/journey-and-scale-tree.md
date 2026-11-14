@@ -18,7 +18,9 @@ Aktuell sind zwei Module live, **Fundamentals** und **Fretboard Mastery**, währ
 
 **Fretboard Mastery** funktioniert durch Klicken, nicht durch Hören: Dir wird ein Notenname gezeigt, und du klickst, wo er auf dem Griffbrett liegt, die ersten vier Stufen funktionieren also bestens ohne Mikrofon. Die letzte Stufe, **Play!**, lässt dich die Noten auf deiner Gitarre finden, und diese Prüfungen hören zu. Prüfungen werden nach Genauigkeit bewertet:
 
-<ProgressLadder items="Unter 80 %::Keine Sterne, einen weiteren Versuch wert|80 %::Ein Stern|90 %::Zwei Sterne|95 % und mehr::Drei Sterne" highlight="95 % und mehr" />
+<ProgressLadder items="Unter 93 %::Keine Sterne, einen weiteren Versuch wert|93 %::Ein Stern|97 %::Zwei Sterne|99 % und mehr::Drei Sterne" highlight="99 % und mehr" />
+
+Bei Prüfungen, die deiner Gitarre zuhören, zählt für den zweiten und dritten Stern auch dein Timing: Für zwei Sterne müssen 90 % deiner Noten im Takt sitzen, für drei 95 %. Das Bestehen hängt nie vom Timing ab.
 
 ## Scale Map
 

@@ -29,9 +29,10 @@ interface TechniqueFlags {
 /**
  * Whether a note is sounded by its own pick attack. Hammer-ons and pull-offs
  * are fretted out of a ringing string, and a release is the bent string let
- * back down — nobody picks it. Such notes are credited on pitch alone and
- * never timed: there is no attack of theirs to time, and any attack the
- * detector reports during one belongs to something else.
+ * back down — nobody picks it. Such notes are credited on pitch alone: any
+ * attack the detector reports during one belongs to something else. A
+ * hammer-on or pull-off has to hold its pitch for a moment and is timed by
+ * when that pitch came up (legatoHold.ts); a release is never timed.
  */
 export const hasOwnAttack = (note: TechniqueFlags): boolean =>
   !note.isHammerOn && !note.isPullOff && !note.isRelease;

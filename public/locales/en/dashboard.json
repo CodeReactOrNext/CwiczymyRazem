@@ -29,6 +29,7 @@
     }
   },
   "customize": {
+    "refreshing": "Updating…",
     "hint": "Drag cards to reorder, hide what you don't need, add what you do.",
     "add_widget": "Add widget",
     "reset": "Reset",

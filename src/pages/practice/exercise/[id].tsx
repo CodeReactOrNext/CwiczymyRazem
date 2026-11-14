@@ -48,8 +48,8 @@ export default function PracticeExercisePage() {
     }
   }, [id, userAuth, router]);
 
-  const handleExamComplete = async (accuracy: number) => {
-    const stars = accuracyToStars(accuracy);
+  const handleExamComplete = async (accuracy: number, onTimePct: number | null = null) => {
+    const stars = accuracyToStars(accuracy, onTimePct);
     if (stars && userAuth && stepId && moduleId) {
       await firebaseCompleteJourneyStepWithStars(
         userAuth,

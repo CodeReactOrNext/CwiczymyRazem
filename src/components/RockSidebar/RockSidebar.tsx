@@ -327,6 +327,8 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const {
     show: showSupportPrompt,
     variant: supportPromptVariant,
+    name: supportPromptName,
+    practiceHours: supportPracticeHours,
     markAsDismissed: markSupportAsDismissed,
     markAsDonate: markSupportAsDonate,
   } = useSupportPrompt();
@@ -842,8 +844,15 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       />
 
       <SupportModal
-        isOpen={showSupportPrompt && !emailConsentPrompt.blocksOtherPrompts}
+        // One prompt per visit: the consent and the feedback ask go first.
+        isOpen={
+          showSupportPrompt &&
+          !showFeedbackPrompt &&
+          !emailConsentPrompt.blocksOtherPrompts
+        }
         variant={supportPromptVariant}
+        name={supportPromptName}
+        practiceHours={supportPracticeHours}
         onClose={markSupportAsDismissed}
         onDonate={markSupportAsDonate}
       />

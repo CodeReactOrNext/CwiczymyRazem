@@ -1,4 +1,5 @@
 import type { SupportModalVariant } from "feature/support/components/SupportModal";
+import { getSupportPrompt } from "feature/support/utils/supportPromptRules";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import {
   selectCurrentUserStats,
@@ -6,27 +7,15 @@ import {
   selectUserInfo,
 } from "feature/user/store/userSlice";
 import { doc, increment, serverTimestamp, updateDoc } from "firebase/firestore";
+import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { db } from "utils/firebase/client/firebase.utils";
 
-// Give the user real value before asking (reciprocity).
-const MIN_DAYS_SINCE_REGISTRATION = 7;
-const MIN_SESSIONS = 5;
+// Long enough for the page the player landed on after the session to settle.
+const SHOW_DELAY_MS = 1500;
 
-// Re-eligible only once BOTH have passed since the last time it was shown —
-// prevents re-asking a binge-session user the same day, and a low-activity
-// user just because a month went by.
-const MIN_DAYS_SINCE_SHOWN = 1;
-const MIN_SESSIONS_SINCE_SHOWN = 1;
-
-// Supporters get a thank-you instead of the ask. Saying thanks every day is
-// noise, so it comes back at most once a month.
-const MIN_DAYS_SINCE_SHOWN_SUPPORTER = 30;
-
-// Extra cooldown in days after each explicit dismissal (index = dismissCount - 1).
-// Never fully suppressed — repeat-dismissers land on the last value (40) forever.
-const DISMISS_COOLDOWNS_DAYS = [7, 12, 30, 40];
+const HOUR_MS = 3_600_000;
 
 const LS_KEY = "supportAskState";
 
@@ -35,6 +24,12 @@ interface LsState {
   lastShownSessionCount: number;
   dismissCount: number;
   lastDismissedAt: number;
+  /** Session count the last time this browser checked — see the rules. */
+  seenSessionCount: number;
+  /** Last click on the ask's donate button. */
+  lastDonateClickAt: number;
+  /** Supporter notes shown so far — every fourth is the "again" one. */
+  supporterNoteCount: number;
 }
 
 const getLsState = (): Partial<LsState> | null => {
@@ -60,14 +55,22 @@ const toMs = (value: any): number => {
   return s * 1000;
 };
 
+const getLocalDay = () => {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${now.getFullYear()}-${month}-${day}`;
+};
+
+export type SupportPromptCloseVia = "button" | "x" | "backdrop";
+
 export const useSupportPrompt = () => {
-  const [show, setShow] = useState(false);
+  const [shown, setShown] = useState<SupportModalVariant | null>(null);
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
   const userStats = useAppSelector(selectCurrentUserStats);
   const { isSupport, isLoading: isRosterLoading } = useSupportTeam();
   const isSupporter = isSupport(userAuth);
-  const variant: SupportModalVariant = isSupporter ? "thanks" : "ask";
 
   useEffect(() => {
     if (!userAuth || !userInfo || !userStats) return;
@@ -76,76 +79,67 @@ export const useSupportPrompt = () => {
     if (isRosterLoading) return;
 
     const ls = getLsState();
+    const sessionCount = userStats.sessionCount;
 
-    // Basic eligibility.
-    const meetsSessions = userStats.sessionCount >= MIN_SESSIONS;
-    const accountAgeDays = (Date.now() - toMs(userInfo.createdAt)) / 86_400_000;
-    const meetsAge = accountAgeDays >= MIN_DAYS_SINCE_REGISTRATION;
-    if (!meetsSessions || !meetsAge) return;
+    const variant = getSupportPrompt({
+      now: Date.now(),
+      accountCreatedMs: toMs(userInfo.createdAt),
+      sessionCount,
+      isSupporter,
+      seenSessionCount: ls?.seenSessionCount ?? null,
+      // Absent on old accounts: without it the session count alone decides.
+      practicedToday:
+        !userStats.lastPracticeLocalDay ||
+        userStats.lastPracticeLocalDay === getLocalDay(),
+      lastShownMs: Math.max(
+        toMs(userInfo.supportAskLastShownAt),
+        ls?.lastShownAt ?? 0,
+      ),
+      lastDonateClickMs: ls?.lastDonateClickAt ?? 0,
+      supporterNoteCount: ls?.supporterNoteCount ?? 0,
+    });
 
-    // Cooldown since it was last shown (days AND sessions must both clear).
-    const lastShownMs = Math.max(
-      toMs(userInfo.supportAskLastShownAt),
-      ls?.lastShownAt ?? 0
-    );
-    if (lastShownMs) {
-      const lastShownSessionCount = Math.max(
-        userInfo.supportAskLastShownSessionCount ?? 0,
-        ls?.lastShownSessionCount ?? 0
-      );
-      const daysSinceShown = (Date.now() - lastShownMs) / 86_400_000;
-      const sessionsSinceShown = userStats.sessionCount - lastShownSessionCount;
-      const minDaysSinceShown = isSupporter
-        ? MIN_DAYS_SINCE_SHOWN_SUPPORTER
-        : MIN_DAYS_SINCE_SHOWN;
-      if (
-        daysSinceShown < minDaysSinceShown ||
-        sessionsSinceShown < MIN_SESSIONS_SINCE_SHOWN
-      ) {
-        return;
-      }
+    if (!variant) {
+      // This session has been looked at; it will not trigger a prompt later.
+      setLsState({ seenSessionCount: sessionCount });
+      return;
     }
 
-    // Extra cooldown after an explicit dismissal.
-    const dismissCount = Math.max(
-      userInfo.supportAskDismissCount ?? 0,
-      ls?.dismissCount ?? 0
-    );
-    if (dismissCount > 0) {
-      const cooldownDays =
-        DISMISS_COOLDOWNS_DAYS[dismissCount - 1] ??
-        DISMISS_COOLDOWNS_DAYS[DISMISS_COOLDOWNS_DAYS.length - 1];
-      const lastDismissedMs = Math.max(
-        toMs(userInfo.supportAskLastDismissedAt),
-        ls?.lastDismissedAt ?? 0
-      );
-      const daysSinceLastDismiss = lastDismissedMs
-        ? (Date.now() - lastDismissedMs) / 86_400_000
-        : Infinity;
-      if (daysSinceLastDismiss < cooldownDays) return;
-    }
-
+    // The session stays "unseen" until the timer fires, so a re-run of this
+    // effect inside the delay reaches the same decision instead of losing it.
     const timer = setTimeout(() => {
-      setShow(true);
+      setShown(variant);
       setLsState({
+        seenSessionCount: sessionCount,
         lastShownAt: Date.now(),
-        lastShownSessionCount: userStats.sessionCount,
+        lastShownSessionCount: sessionCount,
+        ...(variant === "ask"
+          ? {}
+          : { supporterNoteCount: (ls?.supporterNoteCount ?? 0) + 1 }),
       });
+      posthog.capture("support_prompt_shown", { variant });
       updateDoc(doc(db, "users", userAuth), {
         supportAskLastShownAt: serverTimestamp(),
-        supportAskLastShownSessionCount: userStats.sessionCount,
+        supportAskLastShownSessionCount: sessionCount,
       }).catch(() => {
         // localStorage fallback already saved above
       });
-    }, 3000);
+    }, SHOW_DELAY_MS);
     return () => clearTimeout(timer);
   }, [userAuth, userInfo, userStats, isRosterLoading, isSupporter]);
 
-  const markAsDismissed = async () => {
-    if (!userAuth) return;
-    setShow(false);
+  const markAsDismissed = async (via: SupportPromptCloseVia = "button") => {
+    const variant = shown;
+    setShown(null);
+    if (!userAuth || !variant) return;
+    posthog.capture("support_prompt_dismissed", { variant, via });
+
+    // Closing a note to a supporter is not turning down an ask.
+    if (variant !== "ask") return;
+
     const ls = getLsState();
-    const newCount = Math.max(userInfo?.supportAskDismissCount ?? 0, ls?.dismissCount ?? 0) + 1;
+    const newCount =
+      Math.max(userInfo?.supportAskDismissCount ?? 0, ls?.dismissCount ?? 0) + 1;
     setLsState({ dismissCount: newCount, lastDismissedAt: Date.now() });
     try {
       await updateDoc(doc(db, "users", userAuth), {
@@ -157,9 +151,27 @@ export const useSupportPrompt = () => {
     }
   };
 
+  /** The modal's main button: the donate link, or the panel for a supporter. */
   const markAsDonate = () => {
-    setShow(false);
+    if (shown) posthog.capture("support_prompt_cta_clicked", { variant: shown });
+    if (shown === "ask") setLsState({ lastDonateClickAt: Date.now() });
+    setShown(null);
   };
 
-  return { show, variant, markAsDismissed, markAsDonate };
+  const time = userStats?.time;
+  const practiceHours = time
+    ? Math.floor(
+        (time.technique + time.theory + time.hearing + time.creativity) /
+          HOUR_MS,
+      )
+    : 0;
+
+  return {
+    show: shown !== null,
+    variant: shown ?? (isSupporter ? "thanks" : "ask"),
+    name: userInfo?.displayName ?? undefined,
+    practiceHours,
+    markAsDismissed,
+    markAsDonate,
+  };
 };

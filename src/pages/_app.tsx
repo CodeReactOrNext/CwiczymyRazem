@@ -88,7 +88,10 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
     defaultOptions: {
       queries: {
         staleTime: 60 * 1000,
-        gcTime: 5 * 60 * 1000,
+        // How long an answer nobody is looking at stays in memory. Long enough
+        // to outlast a practice session: coming back to Home then draws what
+        // it had and refetches behind it, instead of starting from skeletons.
+        gcTime: 60 * 60 * 1000,
         retry: 1,
         refetchOnWindowFocus: false,
       },

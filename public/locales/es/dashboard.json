@@ -29,6 +29,7 @@
     }
   },
   "customize": {
+    "refreshing": "Actualizando…",
     "hint": "Arrastra las tarjetas para reordenarlas, oculta lo que no necesites y añade lo que sí.",
     "add_widget": "Añadir widget",
     "reset": "Restablecer",

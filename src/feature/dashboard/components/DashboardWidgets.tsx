@@ -12,6 +12,7 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
+import { useIsFetching } from "@tanstack/react-query";
 import { Button } from "assets/components/ui/button";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { SupportBanner } from "feature/dashboard/components/SupportBanner";
@@ -39,7 +40,7 @@ import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 import { LogsBoxSkeleton } from "feature/logsBox/view/LogsBoxView/LogsBoxView";
 import { MountOnVisible } from "feature/seoLanding/components/MountOnVisible";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Plus, RotateCcw, Settings2 } from "lucide-react";
+import { Check, Loader2, Plus, RotateCcw, Settings2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useResponsiveStore } from "store/useResponsiveStore";
 
@@ -62,6 +63,9 @@ export const DashboardWidgets = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const isMobile = useResponsiveStore((state) => state.isMobile);
+  // Cards keep showing what they had while fresher answers are on the way;
+  // this is the only sign of that, so nothing on the page has to move.
+  const isRefreshing = useIsFetching() > 0;
 
   const sensors = useSensors(
     // A few pixels of travel before a drag starts, so a tap on the handle
@@ -107,6 +111,14 @@ export const DashboardWidgets = () => {
               <span />
             )}
             <div className='ml-auto flex flex-wrap items-center gap-2'>
+              {isRefreshing && !isLoading && !isEditing && (
+                <span
+                  role='status'
+                  className='mr-1 flex items-center gap-1.5 text-xs text-zinc-500'>
+                  <Loader2 aria-hidden className='h-3.5 w-3.5 animate-spin' />
+                  {t("customize.refreshing", "Updating…")}
+                </span>
+              )}
               {isEditing ? (
                 <>
                   <Button

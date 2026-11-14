@@ -29,6 +29,7 @@
     }
   },
   "customize": {
+    "refreshing": "Wird aktualisiert…",
     "hint": "Zieh Karten, um sie neu anzuordnen, blende Unnötiges aus und füge hinzu, was du brauchst.",
     "add_widget": "Widget hinzufügen",
     "reset": "Zurücksetzen",

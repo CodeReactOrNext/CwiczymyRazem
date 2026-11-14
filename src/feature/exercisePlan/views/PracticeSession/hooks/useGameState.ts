@@ -3,6 +3,8 @@ import { startTransition, useCallback, useEffect, useRef, useState } from "react
 import { sameMarks } from "../components/noteMarkPatch";
 import type { NoteTiming, RunNote, TimingCounts } from "../utils/timingGrade";
 import { emptyTimingCounts } from "../utils/timingGrade";
+import type { TimedHits } from "../utils/timingPrecision";
+import { emptyTimedHits } from "../utils/timingPrecision";
 import type { GameState } from "./noteMatchingFeedback";
 
 const INITIAL_GS: GameState = { score: 0, combo: 0, multiplier: 1 };
@@ -36,6 +38,8 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
   /** Signed attack offsets (ms, + = late) of every timed hit this run, loops
    *  included — what the run's timing precision is read from. */
   const timingOffsetsRef     = useRef<number[]>([]);
+  /** Of the hits whose attack was timed, how many were on time — see onTimePercent. */
+  const timedHitsRef         = useRef<TimedHits>(emptyTimedHits());
   /** Pitch-graded notes per intonation grade over the run (pitch-focused exercises). */
   const intonationCountsRef  = useRef<TimingCounts>(emptyTimingCounts());
   /** Signed cents (+ = sharp) of every pitch-graded note that came near its pitch. */
@@ -64,6 +68,7 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
     setNoteTimings({}); noteTimingsRef.current = {};
     timingCountsRef.current      = emptyTimingCounts();
     timingOffsetsRef.current     = [];
+    timedHitsRef.current         = emptyTimedHits();
     intonationCountsRef.current  = emptyTimingCounts();
     intonationOffsetsRef.current = [];
     runLogRef.current            = [];
@@ -110,7 +115,7 @@ export function useGameState(currentExerciseIndex: number, onReset?: () => void)
     hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState, noteTimings,
     hitNotesRef, missedNotesRef, gameStateRef, statsRef,
     maxComboRef, needsFlushRef, minScoredBpmRef,
-    noteTimingsRef, timingCountsRef, timingOffsetsRef, intonationCountsRef, intonationOffsetsRef, runLogRef,
+    noteTimingsRef, timingCountsRef, timingOffsetsRef, timedHitsRef, intonationCountsRef, intonationOffsetsRef, runLogRef,
     flushToReact, reset,
   };
 }

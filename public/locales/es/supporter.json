@@ -203,15 +203,36 @@
     "cta": "Da las gracias con un café"
   },
   "modal": {
-    "why": "¿Por qué apoyar Riff Quest?",
-    "body": "Riff Quest es un proyecto de una sola persona, gratis y construido en abierto. Tu apoyo cubre primero el dominio, el alojamiento y la base de datos. Todo lo que se recauda por encima financia la hoja de ruta: nuevos ejercicios, equipo y funciones, desbloqueados nivel a nivel a medida que la comunidad los financia.",
-    "later": "Quizá más tarde",
+    "ask": {
+      "title": "{{count}} horas de práctica a tus espaldas, {{name}}.",
+      "title_no_name": "{{count}} horas de práctica a tus espaldas.",
+      "title_plain": "Qué bien tenerte aquí, {{name}}.",
+      "title_plain_no_name": "Qué bien tenerte aquí.",
+      "body": "Riff Quest es gratis y lo seguirá siendo. Todavía está en beta, y las funciones nuevas salen gracias a los aportes de los jugadores.",
+      "invite": "Si te apetece aportar, cada café acerca la siguiente.",
+      "next": "Siguiente:",
+      "perk_before": "Quienes apoyan reciben",
+      "perk_after": "y voz en la hoja de ruta.",
+      "sign": "Gracias por tocar.",
+      "cta": "Invítame a un café"
+    },
     "thanks": {
-      "title": "Gracias, {{name}}",
-      "title_no_name": "Gracias por apoyar Riff Quest",
-      "body": "Eres una de las personas que mantienen Riff Quest gratis para todos. Tu apoyo paga los servidores y convierte las ideas de la hoja de ruta en funciones que puede usar cualquier jugador. De verdad significa mucho para mí, gracias.",
-      "tokens_hint": "Gástalos en ideas para la hoja de ruta, equipo y la próxima caja de supporters.",
-      "close": "Volver a practicar"
+      "title": "Gracias, {{name}}.",
+      "title_no_name": "Gracias.",
+      "body": "Riff Quest todavía está en beta y crece gracias a ti y a {{count}} personas más. Con vuestro apoyo ya se ha construido:",
+      "body_solo": "Riff Quest todavía está en beta y crece gracias a ti. Con tu apoyo ya se ha construido:",
+      "tokens": "Tienes {{count}} tokens.",
+      "tokens_one": "Tienes 1 token.",
+      "tokens_hint": "Puedes usarlos para elegir qué se construye después.",
+      "sign": "Gracias por estar aquí.",
+      "cta": "Mira lo que viene"
+    },
+    "close": "Volver a practicar",
+    "again": {
+      "title": "Esto también es mérito tuyo, {{name}}.",
+      "title_no_name": "Esto también es mérito tuyo.",
+      "body": "Tu apoyo está en todo lo que ya ha salido:",
+      "invite": "Riff Quest todavía está en beta y sigue creciendo igual. Si algún día te apetece aportar otra vez, cada café acerca la siguiente función."
     }
   },
   "badge": {

@@ -7,6 +7,7 @@ import { correctOctaveForLowStrings, getAdaptiveVolumeGate, getBaseToleranceCent
 import type { TablatureMeasure } from "../../../types/exercise.types";
 import type { FillFeed, FillStep } from "../utils/fillFeed";
 import { clearFillFeed, createFillFeed, pushFillStep } from "../utils/fillFeed";
+import { createLegatoHold, isLegatoNote } from "../utils/legatoHold";
 import type { IntonationKind, LivePitch, ScoringFocus } from "../utils/pitchScoring";
 import { closerIntonation, continuationAttackFloorMs, gradeIntonation, hasOwnAttack, hasPlainAttack, INTONATION_SETTLE_MS, intonationKindOf, isNearPitch, isSamePitchContinuation, liveBendAmount, medianCents, noteSettleMs } from "../utils/pitchScoring";
 import { heldFillTarget } from "../utils/sustainCredit";
@@ -122,7 +123,7 @@ export function useNoteMatching({
     hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState, noteTimings,
     hitNotesRef, missedNotesRef, gameStateRef, statsRef,
     maxComboRef, needsFlushRef, minScoredBpmRef,
-    noteTimingsRef, timingCountsRef, timingOffsetsRef, intonationCountsRef, intonationOffsetsRef, runLogRef,
+    noteTimingsRef, timingCountsRef, timingOffsetsRef, timedHitsRef, intonationCountsRef, intonationOffsetsRef, runLogRef,
     flushToReact, reset: resetGameState,
   } = useGameState(currentExerciseIndex, onReset);
 
@@ -133,6 +134,8 @@ export function useNoteMatching({
   const livePitchRef = useRef<LivePitch | null>(null);
   /** When each chord tone was first heard after its attack (chordTones.ts). */
   const chordEvidenceRef = useRef(createChordToneEvidence());
+  /** Since when each hammer-on / pull-off has been sounding (legatoHold.ts). */
+  const legatoHoldRef = useRef(createLegatoHold());
   /** Every hit and every step of a hold, the moment the loop judges it, for the
    *  tab to draw the fill from (see fillFeed.ts). Read from a frame loop. */
   const fillFeedRef = useRef<FillFeed>(createFillFeed());
@@ -140,6 +143,7 @@ export function useNoteMatching({
   const resetGame = useCallback(() => {
     pendingIntonationRef.current.clear();
     chordEvidenceRef.current.clear();
+    legatoHoldRef.current.clear();
     clearFillFeed(fillFeedRef.current);
     livePitchRef.current = null;
     resetGameState();
@@ -149,6 +153,7 @@ export function useNoteMatching({
   useEffect(() => {
     pendingIntonationRef.current.clear();
     chordEvidenceRef.current.clear();
+    legatoHoldRef.current.clear();
     clearFillFeed(fillFeedRef.current);
   }, [currentExerciseIndex]);
 
@@ -430,6 +435,7 @@ export function useNoteMatching({
         processedNotesRef.current.clear();
         consumedAttacksRef.current.clear();
         chordEvidenceRef.current.clear();
+        legatoHoldRef.current.clear();
         needsFlushRef.current = true;
       }
       lastLoopedBeatsRef.current = loopedBeatsElapsed;
@@ -636,6 +642,24 @@ export function useNoteMatching({
             return;
           }
 
+          // ── Legato: a hammer-on or pull-off has no attack, so the moment its
+          // pitch comes up and stays up stands in for one (legatoHold.ts). It
+          // is followed from before the window opens — an early one has to
+          // read as early — but no earlier than halfway through the note
+          // before, where an attack would still be that note's too.
+          const isLegato = beat.notes.length === 1 && !note.isDead && isLegatoNote(note);
+          let legatoSinceMs: number | null = null;
+          if (isLegato && !isPassed) {
+            let beatsAhead = beatStart - loopedBeatsElapsed;
+            if (beatsAhead > totalExBeats / 2) beatsAhead -= totalExBeats;
+            const before = flatBeats[i > 0 ? i - 1 : flatBeats.length - 1];
+            if (beatsAhead <= (before.beatEnd - before.beatStart) / 2) {
+              legatoSinceMs = legatoHoldRef.current.observe(
+                noteKey, now, currentVolume > gates.volumeGate && pitchIsSounding(false),
+              );
+            }
+          }
+
           if (isWithinWindow) {
             let beatsUntilDue = beatStart - loopedBeatsElapsed;
             // The last note, graded late just after the loop wrapped.
@@ -663,22 +687,28 @@ export function useNoteMatching({
             // the attack — the strum's last string lands tens of ms after its
             // first — and counts once it has held for a moment, so a pick's
             // transient can't pass for it.
-            const liveHit = mayHit && (beat.notes.length > 1
-              ? chordEvidenceRef.current.observe(noteKey, lastOnsetTime, now, pitchIsSounding(false))
-              : pitchIsSounding(false));
+            // A legato note counts once its pitch has held, not on one reading.
+            const liveHit = isLegato
+              ? legatoSinceMs !== null
+              : mayHit && (beat.notes.length > 1
+                ? chordEvidenceRef.current.observe(noteKey, lastOnsetTime, now, pitchIsSounding(false))
+                : pitchIsSounding(false));
 
             if (liveHit || eventHits.has(noteKey)) {
               // First (and only) grade of this note — the guards above guarantee
               // it was neither processed nor hit before.
               processedNotesRef.current.add(noteKey);
+              legatoHoldRef.current.forget(noteKey);
 
               // ── Timing: how far the attack landed from the note's due time ──
               // The attack route carries its own Δt. A live hit is timed by the
               // latest attack — the pitch that proved the hit arrives tens of ms
               // after it, so the moment of the hit itself would read as late.
               const liveAttackDeltaMs = (): number | null => {
-                // Legato notes have no attack of their own, and a tick alone
-                // (muted note) leaves no precise time — neither can be timed.
+                // A legato note is timed by when its pitch came up.
+                if (legatoSinceMs !== null) return legatoSinceMs - dueMs;
+                // A release has no attack of its own, and a tick alone (muted
+                // note) leaves no precise time — neither can be timed.
                 const attackMs = audioRefs.lastAttackMsRef?.current ?? 0;
                 if (!requiresOnset || !hasRecentOnset || attackMs <= 0) return null;
                 const deltaMs = attackMs - (dueMs - attackEarlierMs);
@@ -732,8 +762,10 @@ export function useNoteMatching({
               };
               onNoteJudgedRef.current?.({ noteKey, hit: true, grade: timingGrade, perfect, combo: newCombo });
               timingCountsRef.current[timingGrade]++;
-              if (attackDeltaMs !== null && timingOffsetsRef.current.length < MAX_TIMED_NOTES) {
-                timingOffsetsRef.current.push(attackDeltaMs);
+              if (attackDeltaMs !== null) {
+                timedHitsRef.current.measured++;
+                if (timingGrade === 3) timedHitsRef.current.onTime++;
+                if (timingOffsetsRef.current.length < MAX_TIMED_NOTES) timingOffsetsRef.current.push(attackDeltaMs);
               }
 
               hitNotesRef.current[noteKey] = loopedBeatsElapsed;
@@ -743,6 +775,7 @@ export function useNoteMatching({
           } else if (isPassed) {
 
             processedNotesRef.current.add(noteKey);
+            legatoHoldRef.current.forget(noteKey);
             missedNotesRef.current[noteKey] = true;
             needsFlushRef.current = true;
             s.misses++;
@@ -801,5 +834,5 @@ export function useNoteMatching({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, startTime, audioContext, audioStartTime, alphaTabSource, beatClock, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, getAttackLatencyMs, audioRefs, getAdjustedTargetFreq, tuningOffsets, speedMultiplier, rawBpm, calibratedLatencyMs, scoringFocus, settleIntonation, streamFills]);
 
-  return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, minScoredBpmRef, noteTimings, timingCountsRef, timingOffsetsRef, intonationCountsRef, intonationOffsetsRef, runLogRef, livePitchRef, fillFeedRef, settlePendingIntonation, resetGame, markAlphaTabPassStart };
+  return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, minScoredBpmRef, noteTimings, timingCountsRef, timingOffsetsRef, timedHitsRef, intonationCountsRef, intonationOffsetsRef, runLogRef, livePitchRef, fillFeedRef, settlePendingIntonation, resetGame, markAlphaTabPassStart };
 }

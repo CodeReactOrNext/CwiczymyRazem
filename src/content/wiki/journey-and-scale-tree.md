@@ -18,7 +18,9 @@ Two modules are live today, **Fundamentals** and **Fretboard Mastery**, with rhy
 
 **Fretboard Mastery** works by clicking, not listening: you're shown a note name and you click where it lives on the fretboard, so its first four stages work fine without a microphone. The last stage, **Play!**, has you find the notes on your guitar, and those exams listen. Exams are graded on accuracy:
 
-<ProgressLadder items="Below 80%::No stars, worth another go|80%::One star|90%::Two stars|95% and up::Three stars" highlight="95% and up" />
+<ProgressLadder items="Below 93%::No stars, worth another go|93%::One star|97%::Two stars|99% and up::Three stars" highlight="99% and up" />
+
+On exams that listen to your guitar, the second and third star also look at your timing: 90% of your notes have to land on the beat for two stars, 95% for three. Passing never depends on timing.
 
 ## Scale Map
 

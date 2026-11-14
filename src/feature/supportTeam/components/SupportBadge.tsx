@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { SUPPORT_RIM_GRADIENT } from "feature/supportTeam/components/SupportAvatarRing";
 import type { SupportTeamMember } from "feature/supportTeam/types/supportTeam.types";
 import { useTranslation } from "hooks/useTranslation";
 import { Heart } from "lucide-react";
@@ -20,10 +21,17 @@ interface SupportBadgeProps {
   className?: string;
 }
 
+/** The pin's face under the gold rim, per surface it sits on. */
+const PIN_FACE = { dark: "#141210", light: "#fffbeb" } as const;
+
 /**
- * Text pill shown next to a supporter's name wherever there is room. Gold + a
- * filled heart, the same language the donation surfaces use — a shield would
- * read as a moderator instead of someone funding the project.
+ * Text pill shown next to a supporter's name wherever there is room. A filled
+ * heart, the same language the donation surfaces use — a shield would read as
+ * a moderator instead of someone funding the project.
+ *
+ * It is a pin in the same polished-gold rim as the supporter's avatar, so the
+ * two read as one mark. The rim is the gradient showing through a transparent
+ * border, with the face painted over the padding box only.
  */
 export const SupportBadge = ({
   member,
@@ -31,17 +39,24 @@ export const SupportBadge = ({
   className,
 }: SupportBadgeProps) => {
   const { label, tooltip } = useSupportWords(member);
+  const face = PIN_FACE[tone];
   return (
     <span
       title={tooltip}
+      style={{
+        background: `linear-gradient(${face}, ${face}) padding-box, ${SUPPORT_RIM_GRADIENT} border-box`,
+      }}
       className={cn(
-        "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold leading-none",
-        tone === "light"
-          ? "bg-amber-100 text-amber-700"
-          : "bg-amber-500/15 text-amber-300",
+        "inline-flex shrink-0 items-center gap-1 rounded-full border-[1.5px] border-transparent px-2 py-0.5 text-xs font-semibold leading-none",
+        tone === "light" ? "text-amber-900" : "text-amber-100",
         className,
       )}>
-      <Heart size={12} strokeWidth={2.5} fill='currentColor' />
+      <Heart
+        size={12}
+        strokeWidth={2.5}
+        fill='currentColor'
+        className={tone === "light" ? "text-amber-600" : "text-amber-400"}
+      />
       {label}
     </span>
   );

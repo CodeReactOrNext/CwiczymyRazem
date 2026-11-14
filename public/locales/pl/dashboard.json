@@ -29,6 +29,7 @@
     }
   },
   "customize": {
+    "refreshing": "Odświeżanie…",
     "hint": "Przeciągaj karty, by zmienić kolejność, ukrywaj niepotrzebne, dodawaj potrzebne.",
     "add_widget": "Dodaj widżet",
     "reset": "Resetuj",

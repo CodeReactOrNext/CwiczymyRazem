@@ -18,7 +18,9 @@ Hoy hay dos módulos activos, **Fundamentals** y **Fretboard Mastery**, con ritm
 
 **Fretboard Mastery** funciona haciendo clic, no escuchando: se te muestra el nombre de una nota y haces clic donde está en el mástil, así que sus cuatro primeras etapas funcionan perfectamente sin micrófono. La última etapa, **Play!**, te hace encontrar las notas en tu guitarra, y esos exámenes escuchan. Los exámenes se puntúan por precisión:
 
-<ProgressLadder items="Por debajo del 80 %::Sin estrellas, merece otro intento|80 %::Una estrella|90 %::Dos estrellas|95 % o más::Tres estrellas" highlight="95 % o más" />
+<ProgressLadder items="Por debajo del 93 %::Sin estrellas, merece otro intento|93 %::Una estrella|97 %::Dos estrellas|99 % o más::Tres estrellas" highlight="99 % o más" />
+
+En los exámenes que escuchan tu guitarra, la segunda y la tercera estrella también miran tu timing: para dos estrellas, el 90 % de tus notas tiene que caer a tiempo; para tres, el 95 %. Aprobar nunca depende del timing.
 
 ## Mapa de escalas
 

@@ -18,7 +18,9 @@ Obecnie aktywne są dwa moduły, **Fundamentals** i **Fretboard Mastery**, a ryt
 
 **Fretboard Mastery** działa przez klikanie, a nie słuchanie: widzisz nazwę nuty i klikasz, gdzie leży na gryfie, więc jego pierwsze cztery etapy świetnie działają bez mikrofonu. Ostatni etap, **Play!**, każe ci znajdować nuty na własnej gitarze, a te egzaminy nasłuchują. Egzaminy są oceniane według celności:
 
-<ProgressLadder items="Poniżej 80%::Bez gwiazdek, warto spróbować jeszcze raz|80%::Jedna gwiazdka|90%::Dwie gwiazdki|95% i więcej::Trzy gwiazdki" highlight="95% i więcej" />
+<ProgressLadder items="Poniżej 93%::Bez gwiazdek, warto spróbować jeszcze raz|93%::Jedna gwiazdka|97%::Dwie gwiazdki|99% i więcej::Trzy gwiazdki" highlight="99% i więcej" />
+
+W egzaminach, które słuchają gitary, druga i trzecia gwiazdka patrzą też na timing: na dwie gwiazdki 90% nut musi trafić w rytm, na trzy 95%. Samo zaliczenie nigdy nie zależy od timingu.
 
 ## Mapa skal
 

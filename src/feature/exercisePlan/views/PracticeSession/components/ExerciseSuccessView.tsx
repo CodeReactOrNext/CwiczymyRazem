@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { ChartContainer, ChartTooltip } from "assets/components/ui/chart";
 import { cn } from "assets/lib/utils";
 import confetti from "canvas-confetti";
-import { accuracyToStars, EXAM_STAR_ACCURACY } from "feature/journey/services/journey.service";
+import { accuracyToStars, EXAM_STAR_ACCURACY, EXAM_STAR_ON_TIME } from "feature/journey/utils/examStars";
 import { animate, AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
@@ -36,6 +36,9 @@ interface ExerciseSuccessViewProps {
    *  onExamComplete, so the verdict here matches the stars that get saved.
    *  Falls back to stats.accuracy. */
   examAccuracy?: number;
+  /** Share of the run's timed notes that were on time (0–100) — the second
+   *  and third star ask for it too. null where timing isn't judged. */
+  examOnTimePct?: number | null;
   stats?: ExerciseStats;
   timeline?: ('hit' | 'miss' | 'perfect' | 'early' | 'late')[];
   /** Hits per timing grade — shown under the stats when the run was timed. */
@@ -81,13 +84,37 @@ const TIERS: Record<TierKey, { color: string; bg: string }> = {
   D: { color: 'text-zinc-300',    bg: 'bg-zinc-800'       },
 };
 
+// The top three letters sit on the star thresholds, so a run never reads "S"
+// next to one star, nor "A" next to a failed exam.
 const getTierFromAccuracy = (accuracy: number): TierKey => {
-  if (accuracy >= 95) return 'S';
-  if (accuracy >= 90) return 'A';
-  if (accuracy >= 80) return 'B';
-  if (accuracy >= 70) return 'C';
+  if (accuracy >= EXAM_STAR_ACCURACY[2]) return 'S';
+  if (accuracy >= EXAM_STAR_ACCURACY[1]) return 'A';
+  if (accuracy >= EXAM_STAR_ACCURACY[0]) return 'B';
+  if (accuracy >= 80) return 'C';
   return 'D';
 };
+
+// One requirement of the next star: how far the run got against what it asks.
+function StarRequirement({ label, value, target, progress }: { label: string; value: number; target: number; progress: number }) {
+  return (
+    <div>
+      <div className="flex items-baseline justify-between gap-4 text-[11px]">
+        <span className="font-semibold tracking-wide text-zinc-500">{label}</span>
+        <span className="tabular-nums text-zinc-400">
+          <span className={cn("font-semibold", value >= target ? "text-emerald-400" : "text-zinc-200")}>{value}%</span> / {target}%
+        </span>
+      </div>
+      <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-zinc-800">
+        <motion.div
+          className={cn("h-full rounded-full", value >= target ? "bg-emerald-500" : "bg-amber-500")}
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ delay: 1.2, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        />
+      </div>
+    </div>
+  );
+}
 
 const SEGMENTS = 12;
 
@@ -152,6 +179,7 @@ export const ExerciseSuccessView = ({
   score,
   maxScore,
   examAccuracy,
+  examOnTimePct = null,
   stats,
   timeline,
   timing,
@@ -191,18 +219,33 @@ export const ExerciseSuccessView = ({
   const tier = TIERS[tierKey];
 
   // An exam is passed on accuracy alone, by the same rule that saves its stars
-  // (accuracyToStars). The score still weighs timing and combo, but a clean run
-  // that was early on the beat shouldn't read "failed" next to 98% accuracy.
+  // (accuracyToStars): a clean run that was early on the beat shouldn't read
+  // "failed" next to 98% accuracy. The second and third star ask for timing too.
   const passAccuracy = examAccuracy ?? accuracy;
-  const stars = isExam ? accuracyToStars(passAccuracy) ?? 0 : 0;
+  const stars = isExam ? accuracyToStars(passAccuracy, examOnTimePct) ?? 0 : 0;
   const isPassed = isExam ? stars > 0 : true;
   const accuracyToPass = isExam ? Math.max(0, Math.ceil(EXAM_STAR_ACCURACY[0] - passAccuracy)) : 0;
 
-  let starProgress = 100;
+  // What the next star asks for, each against how far this run got.
+  const nextStar: { label: string; value: number; target: number; progress: number }[] = [];
   if (isExam && stars < 3) {
     const from = stars === 0 ? 0 : EXAM_STAR_ACCURACY[stars - 1];
     const to = EXAM_STAR_ACCURACY[stars as 0 | 1 | 2];
-    starProgress = Math.min(100, Math.max(0, ((passAccuracy - from) / (to - from)) * 100));
+    nextStar.push({
+      label: t("session:success.accuracy"),
+      value: Math.round(passAccuracy),
+      target: to,
+      progress: Math.min(100, Math.max(0, ((passAccuracy - from) / (to - from)) * 100)),
+    });
+    const onTimeTarget = EXAM_STAR_ON_TIME[stars as 0 | 1 | 2];
+    if (onTimeTarget !== null && examOnTimePct !== null) {
+      nextStar.push({
+        label: t("session:timing_breakdown.title", "Timing"),
+        value: examOnTimePct,
+        target: onTimeTarget,
+        progress: Math.min(100, (examOnTimePct / onTimeTarget) * 100),
+      });
+    }
   }
 
   const hasTimeline = !!timeline && timeline.length > 0;
@@ -302,14 +345,11 @@ export const ExerciseSuccessView = ({
                 </div>
 
                 {/* Progress to next star */}
-                {stars < 3 && (
-                  <div className="w-36 h-1 bg-zinc-800 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-amber-500 rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${starProgress}%` }}
-                      transition={{ delay: 1.2, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                    />
+                {nextStar.length > 0 && (
+                  <div className="w-full max-w-[15rem] space-y-3 text-left">
+                    {nextStar.map(requirement => (
+                      <StarRequirement key={requirement.label} {...requirement} />
+                    ))}
                   </div>
                 )}
 

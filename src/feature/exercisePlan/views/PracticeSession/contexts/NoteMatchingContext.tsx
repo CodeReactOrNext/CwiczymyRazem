@@ -28,7 +28,7 @@ import type { LivePitch, ScoringFocus } from "../utils/pitchScoring";
 import { summarizeIntonation } from "../utils/pitchScoring";
 import type { NoteTiming, RunNote, TimingCounts } from "../utils/timingGrade";
 import type { TimingPrecision } from "../utils/timingPrecision";
-import { summarizeTimingOffsets } from "../utils/timingPrecision";
+import { onTimePercent, summarizeTimingOffsets } from "../utils/timingPrecision";
 
 // ── Context value (what subscribing components read) ─────────────────────────
 
@@ -142,6 +142,10 @@ export interface NoteMatchingSnapshot {
   /** How tightly the run's timed notes sat on the beat; null where timing
    *  isn't graded, or too few notes could be timed. */
   timingPrecision?: TimingPrecision | null;
+  /** Share of the run's timed notes that were on time, 0–100 — what an exam's
+   *  stars ask of the timing (see accuracyToStars). null where timing isn't
+   *  judged: hunts, strumming, pitch-scored exercises, too few timed notes. */
+  onTimePct?: number | null;
   /** Pitch-graded notes per intonation grade; null unless the exercise
    *  scores intonation (scoringFocus "pitch"). */
   intonation?: TimingCounts | null;
@@ -359,6 +363,7 @@ export function NoteMatchingProvider({
     noteTimings,
     timingCountsRef,
     timingOffsetsRef,
+    timedHitsRef,
     intonationCountsRef,
     intonationOffsetsRef,
     runLogRef,
@@ -666,6 +671,7 @@ export function NoteMatchingProvider({
         minScoredBpm: isHunt || isStrummingExercise ? null : minScoredBpmRef.current,
         timing: isHunt || isStrummingExercise ? null : { ...timingCountsRef.current },
         timingPrecision: isHunt || isStrummingExercise ? null : summarizeTimingOffsets(timingOffsetsRef.current),
+        onTimePct: isHunt || isStrummingExercise || scoringFocus === "pitch" ? null : onTimePercent(timedHitsRef.current),
         intonation: isHunt || isStrummingExercise || scoringFocus !== "pitch" || !hasIntonation ? null : intonationCounts,
         intonationBiasCents: isHunt || isStrummingExercise || scoringFocus !== "pitch"
           ? null

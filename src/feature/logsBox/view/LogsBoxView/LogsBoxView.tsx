@@ -64,26 +64,49 @@ interface LogsBoxViewProps {
   contained?: boolean;
 }
 
+// What the feed last showed, kept for the lifetime of the tab. The feed is
+// unmounted with every page change, and the stream needs a round trip before
+// its first answer — without this, each return to Home redrew the skeleton
+// over a list the player was reading a moment ago.
+const lastFeed: {
+  uid: string | null;
+  logs: AnyFirebaseLog[] | null;
+  pinned: AnyFirebaseLog[];
+} = { uid: null, logs: null, pinned: [] };
+
 const LogsBoxView = ({ className, contained = false }: LogsBoxViewProps) => {
-  const [logs, setLogs] = useState<AnyFirebaseLog[] | null>(null);
-  const [pinnedDonations, setPinnedDonations] = useState<AnyFirebaseLog[]>([]);
+  const currentUserId = useAppSelector(selectUserAuth);
+  const hasLastFeed = !!currentUserId && lastFeed.uid === currentUserId;
+
+  const [logs, setLogs] = useState<AnyFirebaseLog[] | null>(() =>
+    hasLastFeed ? lastFeed.logs : null,
+  );
+  const [pinnedDonations, setPinnedDonations] = useState<AnyFirebaseLog[]>(
+    () => (hasLastFeed ? lastFeed.pinned : []),
+  );
   const [logsLimit, setLogsLimit] = useState(LOGS_PAGE_SIZE);
   const [hasLoadedMore, setHasLoadedMore] = useState(false);
 
-  const currentUserId = useAppSelector(selectUserAuth);
-
   useEffect(() => {
     const unsubscribe = firebaseGetLogsStream((logsData) => {
+      // Only the first page is kept: a return visit opens on the first page too.
+      if (logsLimit === LOGS_PAGE_SIZE) {
+        lastFeed.uid = currentUserId;
+        lastFeed.logs = logsData;
+      }
       return setLogs(logsData);
     }, logsLimit);
 
     return () => unsubscribe();
-  }, [logsLimit]);
+  }, [logsLimit, currentUserId]);
 
   // Streamed apart from the page above: a donation is meant to hold the top of the feed for 24
   // hours, which it can't do once the newest-20 window has scrolled past it.
   useEffect(() => {
-    const unsubscribe = firebaseGetPinnedDonationsStream(setPinnedDonations);
+    const unsubscribe = firebaseGetPinnedDonationsStream((donations) => {
+      lastFeed.pinned = donations;
+      setPinnedDonations(donations);
+    });
 
     return () => unsubscribe();
   }, []);

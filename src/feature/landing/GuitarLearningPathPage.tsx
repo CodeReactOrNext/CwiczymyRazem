@@ -52,9 +52,9 @@ const IMAGES = "/images/learning-path";
 
 /** Pass mark and star thresholds, as `accuracyToStars` grades an exam. */
 export const LEARNING_PATH_STAR_LADDER = [
-  { accuracy: 80, label: "Pass, one star" },
-  { accuracy: 90, label: "Two stars" },
-  { accuracy: 95, label: "Three stars" },
+  { accuracy: 93, label: "Pass, one star" },
+  { accuracy: 97, label: "Two stars" },
+  { accuracy: 99, label: "Three stars" },
 ] as const;
 
 const primaryButton =
@@ -446,7 +446,7 @@ export const GuitarLearningPathPage = ({
                   ))}
                 </ol>
                 <p className='mt-4 text-sm leading-relaxed text-zinc-500'>
-                  Below 80% the step stays open. A passed exam can be retaken
+                  Below {LEARNING_PATH_STAR_LADDER[0].accuracy}% the step stays open. A passed exam can be retaken
                   whenever you like.
                 </p>
               </div>

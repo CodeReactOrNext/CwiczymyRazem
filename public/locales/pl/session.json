@@ -225,7 +225,7 @@
     "failed": "Egzamin niezdany",
     "flawless": "Bezbłędne wykonanie.",
     "nice_work": "Dobra robota — jeszcze kilka podejść i zagrasz każdy dźwięk.",
-    "missed_by": "Do zaliczenia (80% trafień) zabrakło {{points}}. Spróbuj jeszcze raz!",
+    "missed_by": "Do zaliczenia (93% trafień) zabrakło {{points}}. Spróbuj jeszcze raz!",
     "total_score": "Łączny wynik",
     "grade": "Ocena",
     "accuracy": "Dokładność",

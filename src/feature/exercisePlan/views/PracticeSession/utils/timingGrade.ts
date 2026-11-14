@@ -119,7 +119,7 @@ export const timingHintFor = (deltaMs: number | null): TimingHint | null => {
 /**
  * Grades a hit by how far its attack landed from the note's due time (signed,
  * positive = late; early and late cost the same). `null` means the attack
- * couldn't be told apart — a legato note has none of its own, a muted one may
+ * couldn't be told apart — a release has none of its own, a muted note may
  * only have ticked — and gets full marks: nobody is graded down for what we
  * cannot measure.
  */

@@ -1,14 +1,28 @@
 import {
   firebaseGetUserRaprotsLogs,
   invalidateActivityLogsCache,
+  peekUserRaprotsLogs,
 } from "feature/logs/services/getUserRaprotsLogs.service";
+import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
 import { useCallback, useEffect, useState } from "react";
 
 import type { PracticeLogSession } from "../types/practiceLog.types";
 import { mapLogToSession } from "../utils/practiceLog.utils";
 
+const toSessions = (logs: FirebaseUserExceriseLog[]) =>
+  logs
+    .map(mapLogToSession)
+    .filter((session): session is PracticeLogSession => session !== null)
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
+
 export const usePracticeLogSessions = (userAuth: string) => {
-  const [sessions, setSessions] = useState<PracticeLogSession[] | null>(null);
+  // Seeded from the service's memory cache: coming back to a page that lists
+  // sessions draws them on the first frame instead of flashing a skeleton
+  // while the (instant) cached promise resolves.
+  const [sessions, setSessions] = useState<PracticeLogSession[] | null>(() => {
+    const cached = userAuth ? peekUserRaprotsLogs(userAuth, "all") : null;
+    return cached ? toSessions(cached) : null;
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [refreshNonce, setRefreshNonce] = useState(0);
 
@@ -30,15 +44,7 @@ export const usePracticeLogSessions = (userAuth: string) => {
           firebaseGetUserRaprotsLogs(userAuth, "all"),
           timeout,
         ]);
-        if (!cancelled) {
-          const mapped = response
-            .map(mapLogToSession)
-            .filter(
-              (session): session is PracticeLogSession => session !== null
-            )
-            .sort((a, b) => b.date.getTime() - a.date.getTime());
-          setSessions(mapped);
-        }
+        if (!cancelled) setSessions(toSessions(response));
       } catch (error) {
         console.error("Failed to load practice log:", error);
       } finally {
@@ -60,5 +66,7 @@ export const usePracticeLogSessions = (userAuth: string) => {
     setRefreshNonce((nonce) => nonce + 1);
   }, [userAuth]);
 
-  return { sessions, isLoading, refresh };
+  // "Loading" only while there is nothing to show — a refresh after an edit
+  // swaps the list in place rather than blanking what is already on screen.
+  return { sessions, isLoading: isLoading && sessions === null, refresh };
 };
