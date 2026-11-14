@@ -1162,9 +1162,9 @@ export const GUITARS_BY_RARITY = GUITAR_DEFINITIONS.reduce(
  * The guitars a random draw may produce: everything except the roadmap
  * trophies, which are won by finishing the roadmap and by no other route.
  *
- * Every case pool filters through this — the open cases, the Featured
- * rotation and the Supporter slate — as does the reel the opening animation
- * spins, so the strip never teases a pull that cannot happen.
+ * Every case pool filters through this — the open cases and the Featured
+ * rotation — as does the reel the opening animation spins, so the strip never
+ * teases a pull that cannot happen.
  */
 export const DROPPABLE_GUITARS: GuitarDefinition[] = GUITAR_DEFINITIONS.filter(
   (g) => !isTrophyGuitar(g.id),

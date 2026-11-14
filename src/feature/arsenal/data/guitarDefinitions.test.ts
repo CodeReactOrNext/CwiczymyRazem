@@ -1,5 +1,3 @@
-import type { SlateRarity } from "feature/supporterCase/types/supporterCase.types";
-import { eligibleItems } from "feature/supporterCase/utils/slate";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -25,7 +23,7 @@ describe("roadmap trophy guitars", () => {
   // Reversed deliberately: finishing the roadmap used to be how you were
   // *given* one of these, with the cases as a slower second route. It is now
   // the only route, so they are absent from every pool a draw reads.
-  // `trophyGuitars.test.ts` owns the full guard; these two keep the story
+  // `trophyGuitars.test.ts` owns the full guard; this one keeps the story
   // straight in the file that builds the pools.
   it("are absent from the pool the cases draw from", () => {
     const pool = DROPPABLE_GUITARS_BY_RARITY.Mythic ?? [];
@@ -34,15 +32,6 @@ describe("roadmap trophy guitars", () => {
         pool.some((entry) => entry.id === guitar.id),
         String(guitar.id),
       ).toBe(false);
-    }
-  });
-
-  it("are kept off the supporter ballot too", () => {
-    for (const guitar of trophies) {
-      const onBallot = eligibleItems(guitar.rarity as SlateRarity).some(
-        (item) => item.kind === "guitar" && item.id === guitar.id,
-      );
-      expect(onBallot, String(guitar.id)).toBe(false);
     }
   });
 

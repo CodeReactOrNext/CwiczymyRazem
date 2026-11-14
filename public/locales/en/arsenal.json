@@ -154,7 +154,6 @@
       "standard": "Standard",
       "premium": "Premium",
       "elite": "Elite",
-      "supporter": "Supporter",
       "vault": "Vault",
       "parts": "Parts"
     },
@@ -177,11 +176,6 @@
       "daily": {
         "name": "Featured Case",
         "description": "A rotating pool of 10 items."
-      },
-      "supporter": {
-        "name": "Supporter Case",
-        "title": "{{tier}} Case",
-        "description": "Six items, chosen by the supporters. New slate every fortnight."
       },
       "elite-guitar": {
         "name": "Elite Guitar Case",

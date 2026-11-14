@@ -24,6 +24,11 @@ import { toast } from "sonner";
 
 import { readBoardLevel } from "../../data/boardDuplicates";
 import {
+  readBoardSkins,
+  wornBoardLook,
+  wornCable,
+} from "../../data/boardSkins";
+import {
   autoPatch,
   pickOutput,
   readPowerState,
@@ -170,6 +175,7 @@ export const PedalboardView = ({
   // A screen with no cursor: every control that hides behind a hover has to
   // stand on its own here, and a card is read by tapping rather than pointing.
   const isTouch = Boolean(onShowCard);
+  const skins = readBoardSkins(data.boardSkins);
   const { t } = useArsenalLabels();
   const boardRef = useRef<HTMLDivElement>(null);
   const [showPicker, setShowPicker] = useState(false);
@@ -1617,6 +1623,7 @@ export const PedalboardView = ({
         <PedalboardCase
           geo={geo}
           flawless={verdict.flawless}
+          look={wornBoardLook(skins)}
           deckRef={boardRef}
           deckCursor={dragging?.active ? "grabbing" : "default"}
           rail={
@@ -1680,6 +1687,7 @@ export const PedalboardView = ({
             widthOf={widthOf}
             jacksOf={jacksOf}
             isOnBoard={isOnBoard}
+            skin={wornCable(skins)}
           />
 
           {/* Pedals */}

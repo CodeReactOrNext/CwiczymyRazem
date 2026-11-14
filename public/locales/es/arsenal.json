@@ -154,7 +154,6 @@
       "standard": "Estándar",
       "premium": "Premium",
       "elite": "Élite",
-      "supporter": "supporters",
       "vault": "Vault",
       "parts": "piezas"
     },
@@ -177,11 +176,6 @@
       "daily": {
         "name": "Caja destacada",
         "description": "Un pool rotativo de 10 objetos."
-      },
-      "supporter": {
-        "name": "Caja de supporters",
-        "title": "Caja de {{tier}}",
-        "description": "Seis objetos elegidos por los supporters. Nueva selección cada quince días."
       },
       "elite-guitar": {
         "name": "Caja de guitarras Élite",

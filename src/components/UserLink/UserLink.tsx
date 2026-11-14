@@ -1,6 +1,8 @@
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { AvatarDecoration } from "feature/cosmetics/components/AvatarDecoration";
+import { findAvatarEffect } from "feature/cosmetics/data/cosmeticsCatalog";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import type { GuildBadge } from "feature/guilds/types/guild.types";
 import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
@@ -18,6 +20,12 @@ interface UserLinkProps {
    * of twenty names is not worth twenty extra reads for a tag.
    */
   guildBadge?: GuildBadge | null;
+  /**
+   * Id of the avatar decoration this player bought and wears. Passed only by
+   * surfaces with room around the avatar (the activity feed) — the art
+   * overflows it.
+   */
+  avatarEffect?: string | null;
   /** "xs" (32px) is for dense rows like cards; "sm" (40px) for the activity log. */
   size?: "xs" | "sm";
   /** Avatar-only, for rows that print the name elsewhere (e.g. a comment bubble). */
@@ -43,6 +51,7 @@ export const UserLink = ({
   userName,
   avatarUrl,
   guildBadge,
+  avatarEffect,
   size = "sm",
   showName = true,
   className,
@@ -55,6 +64,7 @@ export const UserLink = ({
   if (!uid) return <span className={nameClassName}>{userName}</span>;
 
   const supportMember = getSupportMember(uid);
+  const decoration = findAvatarEffect(avatarEffect);
 
   const avatar = (
     <Avatar
@@ -66,7 +76,7 @@ export const UserLink = ({
   );
 
   return (
-    <UserTooltip userId={uid}>
+    <UserTooltip userId={uid} avatarEffect={avatarEffect}>
       <Link
         className={cn(
           "flex min-h-11 min-w-0 items-center gap-2 text-white hover:underline",
@@ -75,12 +85,14 @@ export const UserLink = ({
         href={`/user/${uid}`}>
         {/* flex, not block: the avatar is inline-block, and a line box would add a
             descender's worth of height under it (an oval supporter ring). */}
-        <div className='flex shrink-0'>
-          {supportMember ? (
-            <SupportAvatarRing>{avatar}</SupportAvatarRing>
-          ) : (
-            avatar
-          )}
+        <div className={cn("flex shrink-0", decoration && "mx-1.5")}>
+          <AvatarDecoration item={decoration}>
+            {supportMember ? (
+              <SupportAvatarRing>{avatar}</SupportAvatarRing>
+            ) : (
+              avatar
+            )}
+          </AvatarDecoration>
         </div>
         {showName && (
           <span className={cn("truncate", nameClassName)}>{userName}</span>

@@ -122,31 +122,32 @@
   },
   "perks": {
     "title": "What you get",
-    "tokens": "Supporting turns into tokens: {{welcome}} land with the badge and {{perDollar}} more for every dollar after that. They never expire, and they buy a say over what gets built.",
+    "intro": "Any donation makes you a supporter.",
     "open_panel": "Open the supporter panel",
-    "spend_title": "What tokens buy",
-    "badge_title": "Comes with the badge",
+    "badge_title": "The supporter badge",
+    "badge_note": "Yours from the first donation, whatever the amount.",
+    "spend_title": "What you can do",
     "discord_body": "A supporter role on {{discord}} and a channel where I show what I am building before it ships.",
     "items": {
+      "badge": {
+        "title": "Your name on the wall",
+        "body": "An amber ring around your avatar and a place among the players funding Riff Quest."
+      },
       "roadmap": {
-        "title": "The roadmap board",
-        "body": "Post what you want built and back the ideas other supporters posted.",
-        "price": "{{post}} to post an idea, {{back}} to back one"
+        "title": "Decide what gets built",
+        "body": "Post what you want built and back the ideas other supporters posted."
       },
-      "gear": {
-        "title": "Gear you picked",
-        "body": "Propose a guitar or a pedal for the Arsenal, or back somebody else's spec.",
-        "price": "{{post}} to propose, {{back}} to back one"
-      },
-      "case": {
-        "title": "The supporter case",
-        "body": "Vote on which items get a seat in the next supporter case.",
-        "price": "{{vote}} per vote"
+      "coach": {
+        "title": "Get a roadmap for your goal",
+        "body": "Describe what you want to play and the coach lays out the phases, exercises, lessons and songs to get you there."
       },
       "guild": {
-        "title": "A guild of your own",
-        "body": "Found one with its own name and tag, a shared stash and a harder practice week.",
-        "price": "{{found}} to found one"
+        "title": "Found or grow a guild",
+        "body": "Found one with its own name and tag, or chip in with your guildmates for more seats and a bigger shared stash."
+      },
+      "shop": {
+        "title": "Dress up your profile and rig",
+        "body": "Banners and avatar effects that show on your posts in Activity, plus skins for your pedalboard and cables."
       },
       "discord": {
         "title": "The supporter channel"
@@ -237,76 +238,39 @@
   },
   "panel": {
     "title": "Supporter panel",
-    "subtitle": "See what is being built, pick what comes next, and set the week the whole app plays.",
+    "subtitle": "Pick what gets built next, and set the week the whole app plays.",
     "eyebrow": "Supporters",
     "tabs": {
       "roadmap": "Roadmap",
       "gear": "Gear",
-      "case": "Supporter Case",
+      "shop": "Skin shop",
       "guild": "Found a Guild",
-      "work": "In the works",
       "wall": "Supporters",
       "players": "Player Roadmaps",
-      "info": "Info"
+      "info": "Info",
+      "support": "Become a supporter"
     },
     "wallet": "tokens to spend",
     "wallet_one": "token to spend",
     "show_less": "Show less",
     "show_more": "Show more",
     "info": {
-      "what_you_do": "What you do here",
       "surfaces": {
         "roadmap": {
           "title": "Roadmap",
           "body": "Put up what the app is missing and push the ideas you want built. What the board carries most is what gets picked up next."
         },
-        "work": {
-          "title": "In the works",
-          "body": "The actual build order — what is in progress, what is queued, what shipped. You stop guessing what happened to your idea."
-        },
         "gear": {
           "title": "Gear",
           "body": "Put a guitar, an amp or a pedal up for the Arsenal and push the ones you want drawn. What rises here is what gets made."
         },
-        "case": {
-          "title": "Supporter case",
-          "body": "Six seats in the next case, and you pick what sits in each one before it ever opens. Only the winner's tokens are spent. Everything backing the rest stays on the board for the next case."
-        },
-        "wall": {
-          "title": "Supporters",
-          "body": "Everyone funding the app, listed with the level they play at. The badge puts you on that wall the day it lands."
+        "shop": {
+          "title": "Skin shop",
+          "body": "Banners and avatar effects for your posts in Activity, and skins for your pedalboard and cables. Purely cosmetic, yours to keep."
         },
         "guild": {
           "title": "Guild",
           "body": "Claim a name and a tag nobody else can take, then widen the room and the shelf as members turn up."
-        }
-      },
-      "how_tokens": "How you get tokens",
-      "badge_once": "Supporter badge, once",
-      "per_dollar": "Every $1 donated",
-      "in_total": "${{usd}} in total",
-      "membership": "A membership pays again on every renewal. Tokens never expire and never refill on their own — spent ones are gone.",
-      "what_cost": "What they cost",
-      "costs": {
-        "roadmap": {
-          "title": "Roadmap",
-          "post_idea": "Post an idea",
-          "back_idea": "Back an idea (max {{max}})"
-        },
-        "gear": {
-          "title": "Gear",
-          "propose_gear": "Propose gear",
-          "back_proposal": "Back a proposal"
-        },
-        "votes": {
-          "title": "Votes",
-          "case_item": "Supporter case item"
-        },
-        "guild": {
-          "title": "Guild",
-          "found_guild": "Found a guild",
-          "seats": "+{{seats}} seats",
-          "stash_row": "+1 stash row"
         }
       },
       "donate_email": "Donate with your account email",
@@ -318,8 +282,8 @@
       "title": "A donation opens the supporter panel",
       "intro": "Behind the badge is the room where riff.quest is decided out loud:",
       "perks": {
-        "0": "Watch what is being built now and vote on what comes next",
-        "1": "Pick the gear that goes into the Arsenal and the cases",
+        "0": "Post ideas and vote on what gets built next",
+        "1": "Pick the gear that goes into the Arsenal",
         "2": "Found a guild with its own name, tag and shared stash",
         "3": "Connect Claude or another AI assistant to your account"
       },
@@ -327,7 +291,8 @@
       "email_known": "Use the email this account is on to unlock Supporter: {{email}}.",
       "other_email": "Using a different email? {{discord}} and I'll attach it by hand.",
       "write_discord": "Write to me on Discord",
-      "support": "Support the project"
+      "support": "Support the project",
+      "shop_body": "Banners and avatar effects for your posts in Activity, skins for your pedalboard and cables. Purely cosmetic and yours to keep."
     },
     "backers": {
       "count": "Backed by {{count}} supporters",
@@ -756,52 +721,6 @@
         "engraving_hint": "If this gets built, your line ships on the item — {{count}} characters left.",
         "scrap_hint": "What the bench gets when somebody scraps it, in salvage order and at what grade. Up to {{max}} parts — leave it empty and the bench decides."
       }
-    },
-    "case": {
-      "mine_on_seat": "{{count}} of your tokens are on this seat",
-      "mine_on_seat_one": "1 of your tokens is on this seat",
-      "empty": "empty",
-      "up_next": "Up next",
-      "winning": "{{name}} is winning this seat",
-      "no_votes": "No votes yet",
-      "back_another": "Back another {{rarity}} item ({{count}})",
-      "search": "Search {{rarity}} items…",
-      "no_match": "Nothing matches “{{search}}”",
-      "back_item": "Back {{name}}",
-      "seat": "{{rarity}} seat",
-      "replaces": "Vote for what replaces {{item}} when the case changes.",
-      "fills": "Vote for what fills it when the case changes.",
-      "title": "In the case right now",
-      "intro": "One item per rarity. Pick a seat, then vote for what goes in next.",
-      "changes_tomorrow": "changes tomorrow",
-      "changes_in": "changes in {{count}} days",
-      "chosen_by": "Chosen by supporters",
-      "slate_tomorrow": "new slate tomorrow",
-      "slate_in": "new slate in {{count}} days",
-      "open_for": "Open for {{cost}} Fame",
-      "needs": "Needs {{cost}} Fame",
-      "supporters_pick": "Supporters pick what goes in here →"
-    },
-    "work": {
-      "columns": {
-        "queue": {
-          "title": "Queue",
-          "blurb": "Up next, in order"
-        },
-        "in_progress": {
-          "title": "In progress",
-          "blurb": "Being built now"
-        },
-        "done": {
-          "title": "Done",
-          "blurb": "Shipped, newest first"
-        }
-      },
-      "from_idea": "Came from a supporter idea",
-      "idea": "Supporter idea",
-      "nothing_here": "Nothing here",
-      "show_all": "Show all {{count}}",
-      "empty_body": "This is where the queue shows up once there is something in it."
     }
   },
   "badge": {
@@ -818,5 +737,78 @@
     "body_one": "1 player keeps this app being built. Every guitar, exercise and week the app plays for was paid for here.",
     "body_empty": "Everyone who supports the project is listed here, with the level they play at.",
     "empty": "Nobody on the wall yet — the first name here is still free."
+  },
+  "shop": {
+    "boards_title": "Pedalboards",
+    "boards_body": "A different board under your pedals. The layout, the cables and the bonuses stay exactly as they are.",
+    "cables_title": "Signal cables",
+    "cables_body": "What the cable between your pedals is made of. A cable plugged in the wrong way round still turns red.",
+    "buy": "Buy",
+    "confirm": "Confirm",
+    "not_enough": "Not enough tokens",
+    "owned": "Owned",
+    "in_use": "On your board",
+    "put_on": "Use",
+    "take_off": "Take off",
+    "load_failed": "The shop did not load. Refresh the page to try again.",
+    "toast_bought": "{{name}} is on your board",
+    "toast_buy_failed": "Could not buy that skin",
+    "toast_wear_failed": "Could not change the skin",
+    "cosmetics": {
+      "intro": "Looks for your Activity entries. Bought once with tokens, yours for good. Everyone sees them on your posts.",
+      "banners": "Activity banners",
+      "banners_hint": "The picture behind everything you post in Activity.",
+      "avatars": "Avatar effects",
+      "avatars_hint": "Art around your avatar in Activity.",
+      "preview_time": "just now",
+      "preview_line": "practiced for 25 min",
+      "bought": "{{name}} is yours and on",
+      "err_equip": "Could not change your look",
+      "names": {
+        "banner_storm": "Storm",
+        "banner_neon": "Neon",
+        "banner_astronaut": "Astronaut",
+        "banner_mech": "Mech",
+        "banner_rider": "Rider",
+        "banner_wolf": "White Wolf",
+        "banner_dragon": "Dragon",
+        "banner_viking": "Viking",
+        "banner_kraken": "Kraken",
+        "banner_angel": "Fallen Angel",
+        "banner_reaper": "Reaper",
+        "banner_samurai": "Samurai",
+        "banner_phoenix": "Phoenix",
+        "avatar_fire": "Ring of Fire",
+        "avatar_frost": "Frost",
+        "avatar_smoke": "Smoke",
+        "avatar_chain": "Chain",
+        "avatar_uroboros": "Ouroboros",
+        "avatar_vinyl": "Vinyl",
+        "avatar_horns": "Devil Horns",
+        "avatar_dragon": "Dragon Wings",
+        "avatar_crown": "Crown",
+        "banner_holo": "Holo",
+        "banner_bokeh": "Bokeh",
+        "banner_vinyl": "Vinyl",
+        "banner_led": "Spectrum",
+        "banner_halftone": "Halftone",
+        "banner_dust": "Gold Dust",
+        "banner_pattern": "Pattern"
+      },
+      "owned": "Owned",
+      "wearing": "Wearing",
+      "take_off": "Take off",
+      "wear": "Wear",
+      "confirm": "Confirm",
+      "not_enough": "Not enough tokens",
+      "toast_buy_failed": "Could not buy that",
+      "preview_name": "You"
+    },
+    "tabs": {
+      "banners": "Banners",
+      "avatars": "Avatar effects",
+      "boards": "Pedalboards",
+      "cables": "Cables"
+    }
   }
 }

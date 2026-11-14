@@ -1,3 +1,9 @@
+import type { CablePaint, CableSkin } from "feature/arsenal/data/boardSkins";
+import {
+  CABLE_JACKET_W,
+  PLUG_METAL_STOPS,
+  PLUG_METALS,
+} from "feature/arsenal/data/boardSkins";
 import type { ChainVerdict } from "feature/arsenal/data/signalChain";
 import { motion, useReducedMotion } from "framer-motion";
 import { useId } from "react";
@@ -83,7 +89,7 @@ const TOP_LANE = 2.4;
  * 1.65 and 2.35 units across, and a plug half again as fat as its hole looks
  * pushed against the pedal rather than into it.
  */
-const JACKET_W = 1.9;
+const JACKET_W = CABLE_JACKET_W;
 const BOOT_H = 2.15;
 const HANDLE_H = 2.75;
 
@@ -351,7 +357,7 @@ const linkRun = (
     : looseRun(geo, a.at, b.at);
 };
 
-const TONES = {
+const TONES: Record<"ok" | "bad" | "plain", CablePaint> = {
   ok: { jacket: "#0b3b2e", core: "#34d399", pulse: "#a7f3d0" },
   bad: { jacket: "#4c1111", core: "#f87171", pulse: "#fecaca" },
   /**
@@ -361,9 +367,70 @@ const TONES = {
    * enough grey down its spine to keep it from reading as a hole in the deck.
    */
   plain: { jacket: "#0c0c0e", core: "#3b3b3f", pulse: "#3b3b3f" },
-} as const;
+};
 
-type Tone = (typeof TONES)[keyof typeof TONES];
+type Tone = CablePaint;
+
+/** The halo colours of the two verdicts: their own bright cores. */
+const OK_GLOW = "#34d399";
+const BAD_GLOW = "#f87171";
+
+/** The boot behind a stock plug: lifted off black so it reads on the deck. */
+const STOCK_BOOT = "#1b1c21";
+
+interface CableStrandProps {
+  d: string;
+  paint: CablePaint;
+}
+
+/**
+ * One run's jacket, bottom layer to top: the rubber, whatever is woven over
+ * it, the shade and sheen that make it round, and the line down its spine.
+ *
+ * Exported for the skin shop, which shows a length of each cable on its own.
+ */
+export const CableStrand = ({ d, paint }: CableStrandProps) => (
+  <>
+    <path d={d} stroke={paint.jacket} strokeWidth={JACKET_W} />
+    {paint.weave?.map((layer, index) => (
+      <path
+        key={index}
+        d={d}
+        stroke={layer.color}
+        strokeWidth={layer.width}
+        strokeDasharray={layer.dash}
+        strokeDashoffset={layer.offset}
+        strokeLinecap='butt'
+        opacity={layer.opacity}
+      />
+    ))}
+    {paint.shade ? (
+      <path
+        d={d}
+        stroke='#000000'
+        strokeWidth={0.5}
+        opacity={paint.shade}
+        transform='translate(0 0.62)'
+      />
+    ) : null}
+    {/* The sheen off the jacket, which is what makes it round. */}
+    <path
+      d={d}
+      stroke='#ffffff'
+      strokeWidth={0.42}
+      opacity={paint.sheen ?? 0.12}
+      transform='translate(0 -0.5)'
+    />
+    {paint.core && (
+      <path
+        d={d}
+        stroke={paint.core}
+        strokeWidth={paint.coreWidth ?? 0.62}
+        opacity={0.95}
+      />
+    )}
+  </>
+);
 
 interface CableRun {
   d: string;
@@ -380,6 +447,10 @@ interface PlugProps {
   metal: string;
   /** How far it stands out of the socket — cut back to fit a tight gap. */
   reach?: number;
+  /** The strain-relief boot's colour, when a skin changes it. */
+  boot?: string;
+  /** A pale boot wants fainter ribs than a black one. */
+  lightBoot?: boolean;
 }
 
 /**
@@ -409,7 +480,14 @@ interface PlugProps {
  * underneath. One facing down has to be turned, so it is handed a gradient
  * already laid the other way to come out top-lit anyway.
  */
-const Plug = ({ at: point, spin, metal, reach = PLUG_REACH }: PlugProps) => {
+export const Plug = ({
+  at: point,
+  spin,
+  metal,
+  reach = PLUG_REACH,
+  boot: bootFill = STOCK_BOOT,
+  lightBoot = false,
+}: PlugProps) => {
   const turn = spin === 180 ? " scale(-1 1)" : spin === 90 ? " rotate(90)" : "";
   /** The back face of the boot, and the shoulder tapering onto it. */
   const back = -reach;
@@ -428,9 +506,9 @@ const Plug = ({ at: point, spin, metal, reach = PLUG_REACH }: PlugProps) => {
           a hole with a handle floating over it. */}
       <path
         d={`M -0.95 ${-handle} L ${shoulder} ${-taper} Q ${back} ${-boot} ${back} 0 Q ${back} ${boot} ${shoulder} ${taper} L -0.95 ${handle} Z`}
-        fill='#1b1c21'
+        fill={bootFill}
       />
-      <g stroke='#000000' strokeWidth={0.18} opacity={0.55}>
+      <g stroke='#000000' strokeWidth={0.18} opacity={lightBoot ? 0.3 : 0.55}>
         <line x1={rib(0.35)} y1={-taper} x2={rib(0.35)} y2={taper} />
         <line x1={rib(0.65)} y1={-boot} x2={rib(0.65)} y2={boot} />
       </g>
@@ -586,6 +664,12 @@ interface SignalCableProps {
    */
   plain?: boolean;
   /**
+   * A cable skin bought in the supporter panel. It replaces the emerald loom
+   * on the owner's board and the black one a visitor sees; a run wired
+   * backwards stays red on the owner's board whatever the cable is made of.
+   */
+  skin?: CableSkin;
+  /**
    * Whether a pedal is actually on the surface. Parked pedals still count in the
    * chain, but there is nothing on the board to run a cable to, so their runs
    * are folded into the neighbouring one.
@@ -600,6 +684,7 @@ export const SignalCable = ({
   jacksOf,
   isOnBoard,
   plain = false,
+  skin,
 }: SignalCableProps) => {
   const reduceMotion = useReducedMotion();
   const uid = useId();
@@ -753,8 +838,36 @@ export const SignalCable = ({
 
   const couplers = between.filter((link) => link.coupled);
   const pulsing = verdict.flawless && !reduceMotion && !plain;
-  const toneFor = (ok: boolean) =>
-    plain ? TONES.plain : ok ? TONES.ok : TONES.bad;
+  const toneFor = (ok: boolean): Tone => {
+    if (plain) return skin?.paint ?? TONES.plain;
+    return ok ? (skin?.paint ?? TONES.ok) : TONES.bad;
+  };
+  /** The halo under a run: the verdict's on a stock loom, the cable's own on a
+   *  skinned one — and the alarm under a backwards run on either. */
+  const glowFor = (ok: boolean): { color: string; opacity: number } | null => {
+    if (!plain && !ok) return { color: BAD_GLOW, opacity: 0.18 };
+    if (skin) {
+      return skin.paint.glow
+        ? { color: skin.paint.glow, opacity: skin.paint.glowOpacity ?? 0.1 }
+        : null;
+    }
+    if (plain) return null;
+    return { color: OK_GLOW, opacity: verdict.flawless ? 0.14 : 0.08 };
+  };
+  // A black loom casts nothing: under a dark cable the cast only thickens it
+  // into a smear. A skinned one is lit like the owner's, so it gets its shadow
+  // on a profile too.
+  const castsShadow = !plain || Boolean(skin);
+  const metalStops = PLUG_METALS[skin?.metal ?? "nickel"].map(
+    (color, index) => (
+      <stop
+        key={index}
+        offset={`${PLUG_METAL_STOPS[index]}%`}
+        stopColor={color}
+      />
+    ),
+  );
+  const plugSkin = { boot: skin?.boot, lightBoot: skin?.lightBoot };
 
   return (
     <>
@@ -770,18 +883,10 @@ export const SignalCable = ({
             other way across the shape, for the plugs that get turned on their
             side and would otherwise come out lit from the left. */}
           <linearGradient id={metalDown} x1='0' y1='0' x2='0' y2='1'>
-            <stop offset='0%' stopColor='#c9d1d8' />
-            <stop offset='22%' stopColor='#8e969d' />
-            <stop offset='48%' stopColor='#454b51' />
-            <stop offset='72%' stopColor='#2a2e33' />
-            <stop offset='100%' stopColor='#767d84' />
+            {metalStops}
           </linearGradient>
           <linearGradient id={metalAcross} x1='0' y1='0' x2='1' y2='0'>
-            <stop offset='0%' stopColor='#c9d1d8' />
-            <stop offset='22%' stopColor='#8e969d' />
-            <stop offset='48%' stopColor='#454b51' />
-            <stop offset='72%' stopColor='#2a2e33' />
-            <stop offset='100%' stopColor='#767d84' />
+            {metalStops}
           </linearGradient>
 
           {/* The two ends fade out towards the edge they leave by. A luminance
@@ -837,7 +942,7 @@ export const SignalCable = ({
           core. A black loom skips them altogether: the cast under a dark cable
           only thickens it into a smear, where under a lit one it was what
           lifted the cable off the deck. */}
-        {!plain && (
+        {castsShadow && (
           <g fill='none' strokeLinecap='round' strokeLinejoin='round'>
             {runs.map((run, index) => (
               <path
@@ -855,6 +960,7 @@ export const SignalCable = ({
 
         {runs.map((run, index) => {
           const tone = toneFor(run.ok);
+          const glow = glowFor(run.ok);
 
           return (
             <g
@@ -864,29 +970,15 @@ export const SignalCable = ({
               strokeLinejoin='round'
               mask={run.mask}>
               {/* The glow a good run carries, and the alarm a bad one does. */}
-              {!plain && (
+              {glow && (
                 <path
                   d={run.d}
-                  stroke={tone.core}
+                  stroke={glow.color}
                   strokeWidth={4.1}
-                  opacity={run.ok ? (verdict.flawless ? 0.14 : 0.08) : 0.18}
+                  opacity={glow.opacity}
                 />
               )}
-              <path d={run.d} stroke={tone.jacket} strokeWidth={JACKET_W} />
-              {/* The sheen off a rubber jacket, which is what makes it round. */}
-              <path
-                d={run.d}
-                stroke='#ffffff'
-                strokeWidth={0.42}
-                opacity={0.12}
-                transform='translate(0 -0.5)'
-              />
-              <path
-                d={run.d}
-                stroke={tone.core}
-                strokeWidth={0.62}
-                opacity={0.95}
-              />
+              <CableStrand d={run.d} paint={tone} />
               {pulsing && (
                 <motion.path
                   d={run.d}
@@ -927,6 +1019,7 @@ export const SignalCable = ({
                 spin={plug.spin}
                 reach={plug.reach}
                 metal={`url(#${plug.spin === 90 ? metalAcross : metalDown})`}
+                {...plugSkin}
               />
             ),
         )}
@@ -962,6 +1055,7 @@ export const SignalCable = ({
                   spin={plug.spin}
                   reach={plug.reach}
                   metal={`url(#${metalDown})`}
+                  {...plugSkin}
                 />
               ),
           )}

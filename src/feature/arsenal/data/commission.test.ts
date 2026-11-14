@@ -61,7 +61,7 @@ const poolFor = (kind: WorkshopKind, rarity: GuitarRarity) =>
 /** Cases locked to one kind — the shelf a player buys for a specific pool. */
 const casesFor = (kind: WorkshopKind) =>
   Object.values(CASE_DEFINITIONS).filter(
-    (c) => c.dropKind === kind && c.id !== "daily" && c.id !== "supporter",
+    (c) => c.dropKind === kind && c.id !== "daily",
   );
 
 /**
@@ -121,7 +121,6 @@ const caseLastLowTier = (
       .filter(
         (c) =>
           c.id !== "daily" &&
-          c.id !== "supporter" &&
           (!c.dropKind || c.dropKind === kind) &&
           (c.probabilities[rarity] ?? 0) > 0,
       )

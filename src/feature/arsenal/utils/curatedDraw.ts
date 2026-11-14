@@ -2,8 +2,8 @@ import { POOL_RARITY_ORDER } from "../data/dailyCase";
 import type { GuitarRarity } from "../types/arsenal.types";
 
 /**
- * Which item comes out of a curated pool — the Featured case's rotating ten,
- * the Supporter case's voted six — once the case has rolled its rarity.
+ * Which item comes out of a curated pool — the Featured case's rotating ten —
+ * once the case has rolled its rarity.
  *
  * ─── Why the open cases' bias is not enough here ────────────────────────────
  *
@@ -11,9 +11,9 @@ import type { GuitarRarity } from "../types/arsenal.types";
  * already rolled*, which works on the Standard/Premium/Elite cases because they
  * draw from the whole collection: 27 Epics to choose between, so "the Epic you
  * don't have" is nearly always available. A curated pool has no room for that.
- * The Featured pool holds two Epics; the Supporter slate holds exactly one, so
- * every Epic roll for a fortnight returns the same pedal no matter what the
- * player owns, and the bias is a no-op on a pool of one.
+ * The Featured pool holds two Epics, so every Epic roll until the pool rotates
+ * returns one of the same two items no matter what the player owns, and the
+ * bias has next to nothing to choose between.
  *
  * ─── The rule ───────────────────────────────────────────────────────────────
  *
@@ -27,10 +27,10 @@ import type { GuitarRarity } from "../types/arsenal.types";
  * Step 2 only ever goes down. That is the whole safety property: the rarity
  * roll's printed odds become a ceiling rather than a promise, so no amount of
  * collecting can turn a case into a better case. Letting it search upward would
- * be far more generous and completely farmable — a supporter holding five of
- * the six slate seats would be buying a near-guaranteed Mythic at 300 Fame for
- * the rest of the fortnight, since the Mythic seat would be the only item left
- * for the substitution to find.
+ * be far more generous and completely farmable — a player holding everything
+ * in the pool but its Mythic would be buying a near-guaranteed Mythic at the
+ * Featured price until the pool rotates, since the Mythic would be the only
+ * item left for the substitution to find.
  *
  * Duplicates are not eliminated, only deferred: a player who has collected the
  * whole pool is back to pulling repeats, which is what keeps curated cases

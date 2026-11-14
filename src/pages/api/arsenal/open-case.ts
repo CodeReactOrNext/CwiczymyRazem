@@ -40,7 +40,6 @@ import {
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
 import { readRewardLedger } from "lib/rewards/rewardLedger";
-import { getSlatePool } from "lib/supporterCase/supporterCase";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -91,15 +90,10 @@ async function openCases(
   const userRef = firestore
     .collection("users")
     .doc(userId) as DocumentReference;
-  const isCurated = caseType === "daily" || caseType === "supporter";
-
-  // The slate is a read of its own and does not depend on the account, so it
-  // is fetched once, out here, instead of on every retry of the transaction.
-  const curatedPool: DailyPoolEntry[] | null = isCurated
-    ? caseType === "supporter"
-      ? ((await getSlatePool()) as DailyPoolEntry[])
-      : getDailyPool()
-    : null;
+  // The pool does not depend on the account, so it is read once, out here,
+  // instead of on every retry of the transaction.
+  const curatedPool: DailyPoolEntry[] | null =
+    caseType === "daily" ? getDailyPool() : null;
 
   let capturedUserData: Record<string, any> = {};
 
@@ -162,7 +156,7 @@ async function openCases(
         discoveredGuitars,
         discoveredEffects,
         counters:
-          hasPity(caseDef) && !isCurated
+          hasPity(caseDef) && !curatedPool
             ? readPity(data.casePity, caseDef)
             : undefined,
         curatedPool,

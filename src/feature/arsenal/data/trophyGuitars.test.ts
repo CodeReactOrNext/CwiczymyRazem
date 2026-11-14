@@ -14,8 +14,6 @@ import {
   ROADMAP_TROPHY_GUITARS,
   TROPHY_GUITAR_IDS,
 } from "feature/arsenal/data/trophyGuitars";
-import { SLATE_RARITIES } from "feature/supporterCase/types/supporterCase.types";
-import { eligibleItems } from "feature/supporterCase/utils/slate";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -86,14 +84,5 @@ describe("roadmap trophy guitars", () => {
         ).toBe(false);
       });
     }
-  });
-
-  it("never offers a trophy on a Supporter slate ballot", () => {
-    SLATE_RARITIES.forEach((rarity) => {
-      eligibleItems(rarity).forEach((item) => {
-        if (item.kind !== "guitar") return;
-        expect(isTrophyGuitar(item.id), `${rarity}: ${item.name}`).toBe(false);
-      });
-    });
   });
 });

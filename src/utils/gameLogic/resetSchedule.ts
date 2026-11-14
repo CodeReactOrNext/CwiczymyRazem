@@ -1,6 +1,5 @@
 import { getNextDailyReset } from "feature/arsenal/data/dailyCase";
 import { getTraderRestockAt } from "feature/arsenal/data/traderShop";
-import { cycleEnd } from "feature/supporterCase/utils/caseCycle";
 import { weekEnd } from "utils/gameLogic/utcWeek";
 
 /**
@@ -89,13 +88,6 @@ export const getResetSchedule = (now: Date = new Date()): ResetEntry[] => {
       nextResetAt: weekEnd(now).getTime(),
     },
     {
-      id: "supporter-slate",
-      label: "Supporter slate",
-      detail: "A new pair of supporter cases goes up for voting.",
-      scope: "server",
-      nextResetAt: cycleEnd(now).getTime(),
-    },
-    {
       id: "monthly",
       label: "Season & Monthly Challenge",
       detail: "The leaderboard resets and a new challenge board opens.",
@@ -112,8 +104,8 @@ export const getResetSchedule = (now: Date = new Date()): ResetEntry[] => {
     },
   ];
 
-  // Rows landing on the same instant (the weekly and the supporter slate share
-  // every other Monday) collapse into the earlier-listed one.
+  // Rows landing on the same instant (the daily reset and the trader restock,
+  // or a week that ends with the month) collapse into the earlier-listed one.
   const merged: ResetEntry[] = [];
   for (const entry of entries) {
     const twin = merged.find((seen) => seen.nextResetAt === entry.nextResetAt);

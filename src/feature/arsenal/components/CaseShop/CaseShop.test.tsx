@@ -58,7 +58,6 @@ describe("CaseShop", () => {
       "Premium Guitar Case",
       "Elite Guitar Case",
       "Vault Guitar Case",
-      "Supporter Case",
       "Parts Crate",
     ]);
 
@@ -72,7 +71,6 @@ describe("CaseShop", () => {
       "/images/case-guitar-premium.webp",
       "/images/case-guitar-elite.webp",
       "/images/case-guitar-vault.webp",
-      "/images/case-supporter.webp",
       "/images/case-parts.webp",
     ]);
   });

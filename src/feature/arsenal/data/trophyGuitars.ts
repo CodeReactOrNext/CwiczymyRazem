@@ -5,8 +5,8 @@
  * A roadmap is 37 to 38 steps and roughly 250 logged practice sessions — by a
  * wide margin the longest thing the app asks anyone to do. Its trophy is the
  * only guitar in the game that cannot be rolled: not from a case, not from the
- * Featured rotation, not off a Supporter slate. Finishing the roadmap is the
- * only way the model enters a collection.
+ * Featured rotation. Finishing the roadmap is the only way the model enters a
+ * collection.
  *
  * That is a deliberate reversal. These models used to sit in the case pools as
  * well, which made the trophy a *guaranteed* copy of something a long enough

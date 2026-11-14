@@ -1,0 +1,158 @@
+/*
+ * The banners drawn in code rather than painted. Every colour arrives as an
+ * inline custom property, picked per theme in DrawnBanner.tsx, so the rules
+ * here are only shape and motion. Transform/opacity/mask only.
+ */
+
+.layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* Holo: a foil that drifts, a finer dotted foil the other way, and a sheen. */
+.foil {
+  position: absolute;
+  inset: 0;
+  background: var(--foil);
+  background-size: 200% 100%;
+  animation: foil 18s linear infinite;
+}
+
+.foilDots {
+  position: absolute;
+  inset: 0;
+  background: var(--foil2);
+  background-size: 200% 100%;
+  animation: foil 13s linear infinite reverse;
+  -webkit-mask-image:
+    repeating-linear-gradient(45deg, #000 0 1.1px, transparent 1.1px 4px),
+    repeating-linear-gradient(-45deg, #000 0 1.1px, transparent 1.1px 4px);
+  mask-image:
+    repeating-linear-gradient(45deg, #000 0 1.1px, transparent 1.1px 4px),
+    repeating-linear-gradient(-45deg, #000 0 1.1px, transparent 1.1px 4px);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+@keyframes foil {
+  to {
+    background-position: 100% 0;
+  }
+}
+
+.sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(112deg, transparent 40%, rgb(255 255 255 / var(--sh)) 50%, transparent 60%);
+  background-size: 260% 100%;
+  background-position: 100% 0;
+  animation: sheen 7s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+@keyframes sheen {
+  0% {
+    background-position: 100% 0;
+  }
+  70%,
+  100% {
+    background-position: 0 0;
+  }
+}
+
+/* Bokeh: soft discs that drift and dim. */
+.disc {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side, rgb(var(--c) / 0.7) 0, rgb(var(--c) / 0.8) 84%, rgb(var(--c) / 0) 100%);
+  filter: blur(var(--bl));
+  opacity: var(--o);
+  mix-blend-mode: var(--blend);
+  animation: bokeh var(--d) ease-in-out infinite alternate;
+  animation-delay: var(--dl);
+}
+
+@keyframes bokeh {
+  from {
+    transform: translate(0, 0) scale(0.94);
+    opacity: calc(var(--o) * 0.45);
+  }
+  to {
+    transform: translate(var(--dx), var(--dy)) scale(1.06);
+    opacity: var(--o);
+  }
+}
+
+/* Vinyl: the record half out of the sleeve, label turning. */
+.record {
+  position: absolute;
+  right: -118px;
+  top: 50%;
+  width: 300px;
+  height: 300px;
+  margin-top: -150px;
+  border-radius: 50%;
+  background: var(--vinyl);
+}
+
+.recordShine {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--vshine);
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 36%, #000 38%, #000 97%, transparent 98%);
+  mask-image: radial-gradient(circle closest-side, transparent 36%, #000 38%, #000 97%, transparent 98%);
+  animation: wobble 7s ease-in-out infinite alternate;
+}
+
+@keyframes wobble {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(7deg);
+  }
+}
+
+.label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100px;
+  height: 100px;
+  margin: -50px;
+  border-radius: 50%;
+  background: var(--vlabel);
+  animation: spin 7s linear infinite;
+}
+
+.labelPrint {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--vtext);
+  opacity: 0.55;
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 58%, #000 59% 66%, transparent 67% 74%, #000 75% 80%, transparent 81%);
+  mask-image: radial-gradient(circle closest-side, transparent 0 58%, #000 59% 66%, transparent 67% 74%, #000 75% 80%, transparent 81%);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foil,
+  .foilDots,
+  .sheen,
+  .disc,
+  .recordShine,
+  .label {
+    animation: none;
+  }
+}

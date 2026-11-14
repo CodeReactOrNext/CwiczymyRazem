@@ -1,5 +1,11 @@
+import type { BoardLookId } from "feature/arsenal/data/boardSkins";
+import {
+  BOARD_LOOK_MARGINS,
+  boardLookArt,
+} from "feature/arsenal/utils/boardSkinArt";
 import type { BoardGeometry } from "feature/arsenal/utils/pedalboardLayout";
-import { railPaddingPct } from "feature/arsenal/utils/powerLayout";
+import { RAIL_H, railPaddingPct } from "feature/arsenal/utils/powerLayout";
+import { useId, useMemo } from "react";
 
 /** One steel latch on the case's top edge. */
 const Latch = () => (
@@ -41,7 +47,84 @@ interface PedalboardCaseProps {
   deckRef?: React.Ref<HTMLDivElement>;
   /** The editor's hand while a pedal is being carried. */
   deckCursor?: React.CSSProperties["cursor"];
+  /**
+   * A board skin bought in the supporter panel. Left out, the board stands in
+   * the stock flight case below.
+   */
+  look?: BoardLookId;
 }
+
+/** The inside of a deck wired by the book, whatever it is built from. */
+const FLAWLESS_WASH =
+  "inset 0 0 0 1px rgba(52,211,153,0.10), inset 0 0 44px rgba(16,185,129,0.11)";
+
+/**
+ * A skinned board: the same rail and deck, standing in a drawing of something
+ * else. The drawing is one SVG stretched behind both, with its margins turned
+ * into padding so the bay it leaves open is exactly where the rail and the
+ * deck land — see `utils/boardSkinArt`.
+ */
+const SkinnedCase = ({
+  geo,
+  flawless,
+  rail,
+  children,
+  deckRef,
+  deckCursor,
+  look,
+}: PedalboardCaseProps & { look: BoardLookId }) => {
+  const uid = useId();
+  const art = useMemo(
+    () =>
+      boardLookArt(
+        look,
+        uid,
+        geo.viewW,
+        RAIL_H + geo.viewH,
+        // Where the top row ends: half way down the channel under it.
+        geo.rows > 1
+          ? RAIL_H +
+              ((geo.rowYPct[0] + geo.pedalHPct + geo.rowYPct[1]) / 200) *
+                geo.viewH
+          : null,
+      ),
+    [look, uid, geo],
+  );
+  const m = BOARD_LOOK_MARGINS[look];
+  const pct = (units: number) => `${(units / art.width) * 100}%`;
+
+  return (
+    <div
+      className='relative w-full select-none'
+      style={{ padding: `${pct(m.t)} ${pct(m.r)} ${pct(m.b)} ${pct(m.l)}` }}>
+      <svg
+        viewBox={`0 0 ${art.width} ${art.height}`}
+        preserveAspectRatio='none'
+        className='pointer-events-none absolute inset-0 h-full w-full overflow-visible'
+        aria-hidden
+        dangerouslySetInnerHTML={{ __html: art.markup }}
+      />
+
+      <div
+        className='relative w-full'
+        style={{ paddingTop: `${railPaddingPct(geo)}%` }}>
+        {rail}
+      </div>
+
+      <div
+        ref={deckRef}
+        className='relative w-full overflow-hidden'
+        style={{
+          aspectRatio: `${geo.w} / ${geo.h}`,
+          boxShadow: flawless ? FLAWLESS_WASH : undefined,
+          transition: "box-shadow 0.4s ease",
+          cursor: deckCursor,
+        }}>
+        {children}
+      </div>
+    </div>
+  );
+};
 
 /**
  * The flight case a board is built in: shell, latches, the supply racked along
@@ -51,7 +134,7 @@ interface PedalboardCaseProps {
  * profile, so a board looks the same from both sides — the profile used to draw
  * its own, and kept everything the Arsenal's had since dropped.
  */
-export const PedalboardCase = ({
+const FlightCase = ({
   geo,
   flawless,
   rail,
@@ -133,3 +216,10 @@ export const PedalboardCase = ({
     </div>
   </div>
 );
+
+export const PedalboardCase = (props: PedalboardCaseProps) =>
+  props.look ? (
+    <SkinnedCase {...props} look={props.look} />
+  ) : (
+    <FlightCase {...props} />
+  );

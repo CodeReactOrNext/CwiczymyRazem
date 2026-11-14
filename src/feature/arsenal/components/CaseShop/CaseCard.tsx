@@ -38,13 +38,6 @@ const CASE_TIER: Record<
     image: "/images/case-guitar-elite.webp",
     wash: "rgba(251,191,36,0.10)",
   },
-  // Aged brass rather than Elite's bright amber: supporters read amber right
-  // across the app, and one step deeper keeps the two apart on the same shelf.
-  supporter: {
-    color: "#f59e0b",
-    image: "/images/case-supporter.webp",
-    wash: "rgba(245,158,11,0.07)",
-  },
   // The top of the ladder takes the one colour the shelf has not used: violet is
   // the app's "rare / special", and nothing above Elite should look like Elite.
   // Elite's render with its gold turned to the same violet, so the case on the

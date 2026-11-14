@@ -87,8 +87,8 @@ describe("getResetSchedule", () => {
   });
 
   it("merges rollovers that share an instant into one row", () => {
-    // A Monday that starts both a new week and a new supporter cycle.
-    const schedule = getResetSchedule(new Date("2026-09-14T12:00:00Z"));
+    // The week and the month end on the same midnight: Monday, 1 June 2026.
+    const schedule = getResetSchedule(new Date("2026-05-31T12:00:00Z"));
     const instants = schedule.map((entry) => entry.nextResetAt);
 
     expect(new Set(instants).size).toBe(instants.length);

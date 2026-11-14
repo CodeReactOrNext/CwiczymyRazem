@@ -2,8 +2,9 @@ import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { GearBoardTab } from "feature/gearProposals/components/GearBoardTab";
 import { GuildFoundingPanel } from "feature/guilds/components/GuildFoundingPanel";
-import { SupporterCaseTab } from "feature/supporterCase/components/SupporterCaseTab";
+import { RoadmapPerks } from "feature/roadmap/components/RoadmapPerks";
 import { RoadmapBoardTab } from "feature/supporterPanel/components/RoadmapBoardTab";
+import { SkinShopTab } from "feature/supporterPanel/components/SkinShopTab";
 import { SupporterInfo } from "feature/supporterPanel/components/SupporterInfo";
 import { SupporterPitch } from "feature/supporterPanel/components/SupporterPitch";
 import { TokenWalletBar } from "feature/supporterPanel/components/TokenWalletBar";
@@ -11,39 +12,28 @@ import { useSupporterRoadmap } from "feature/supporterPanel/hooks/useSupporterRo
 import { SupporterWall } from "feature/supportTeam/components/SupporterWall";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { WorkBoardTab } from "feature/workBoard/components/WorkBoardTab";
 import { useTranslation } from "hooks/useTranslation";
-import {
-  Guitar,
-  Hammer,
-  Heart,
-  Info,
-  Map,
-  Package,
-  Shield,
-} from "lucide-react";
+import { Guitar, Heart, Info, Map, Shield, Store } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
-type SupporterTab =
-  | "roadmap"
-  | "gear"
-  | "case"
-  | "guild"
-  | "work"
-  | "wall"
-  | "info";
+type SupporterTab = "roadmap" | "gear" | "shop" | "guild" | "wall" | "info";
 
 /** Labels are keys in `supporter:panel.tabs`. */
 const TABS: { id: SupporterTab; icon: typeof Map }[] = [
   { id: "roadmap", icon: Map },
   { id: "gear", icon: Guitar },
-  { id: "case", icon: Package },
+  { id: "shop", icon: Store },
   { id: "guild", icon: Shield },
-  { id: "work", icon: Hammer },
   { id: "wall", icon: Heart },
   { id: "info", icon: Info },
+];
+
+/** What somebody without the badge can open: the ask, and the shop window. */
+const VISITOR_TABS: { id: "support" | "shop"; icon: typeof Map }[] = [
+  { id: "support", icon: Heart },
+  { id: "shop", icon: Store },
 ];
 
 /** A tab somebody linked to — the gear board sends people back to its own. */
@@ -51,13 +41,11 @@ const isSupporterTab = (value: unknown): value is SupporterTab =>
   TABS.some((candidate) => candidate.id === value);
 
 /**
- * The supporter panel: one shell, six surfaces and their prices, one wallet.
+ * The supporter panel: one shell, its surfaces and their prices, one wallet.
  *
  * The page wears the same full-bleed banner as Milestones and Arsenal, and the
- * wallet rides in it rather than in a card of its own. Every tab here spends
- * the same wallet, and the tabs that used to draw their own copy of it left
- * the case and the work board asking for tokens without ever saying how many
- * were left.
+ * wallet rides in it rather than in a card of its own: every tab here spends
+ * the same wallet, so it is drawn once, above all of them.
  */
 export const SupporterPanelView = () => {
   const { t } = useTranslation("supporter");
@@ -78,8 +66,12 @@ export const SupporterPanelView = () => {
     if (movedToRoadmaps) void router.replace("/my-roadmaps");
   }, [movedToRoadmaps, router]);
 
-  const openTab = (next: SupporterTab) => {
-    setTab(next);
+  // A visitor sees two tabs; a link to the shop lands on the window, anything else on the ask.
+  const visitorTab = tab === "shop" ? "shop" : "support";
+
+  /** "support" is a visitor's tab; in state it falls back to the roadmap, a supporter's first tab. */
+  const openTab = (next: SupporterTab | "support") => {
+    setTab(next === "support" ? "roadmap" : next);
     void router.replace(
       { pathname: router.pathname, query: { ...router.query, tab: next } },
       undefined,
@@ -123,11 +115,42 @@ export const SupporterPanelView = () => {
         ) : !isSupporter ? (
           // The faces that used to sit under the pitch on their own wall are in
           // the pitch itself now, where they read as part of the ask.
-          <SupporterPitch />
+          <>
+            <div className={tabNavListClass}>
+              {VISITOR_TABS.map(({ id, icon: Icon }) => (
+                <button
+                  key={id}
+                  type='button'
+                  onClick={() => openTab(id)}
+                  aria-pressed={visitorTab === id}
+                  className={tabNavItemClass(visitorTab === id)}>
+                  <Icon size={16} className='shrink-0' />
+                  {t(`panel.tabs.${id}`)}
+                </button>
+              ))}
+            </div>
+
+            {visitorTab === "support" ? (
+              <div className='flex flex-col gap-16'>
+                <SupporterPitch />
+                {/* What the badge and the tokens bring, drawn rather than
+                    listed — the same section the roadmap page shows. */}
+                <RoadmapPerks showPanelLink={false} />
+              </div>
+            ) : (
+              // The shop in the window: real shelves and prices, nothing to press.
+              <section className='flex flex-col gap-6'>
+                <p className='max-w-2xl text-base leading-relaxed text-zinc-300'>
+                  {t("panel.pitch.shop_body")}
+                </p>
+                <SkinShopTab enabled={false} />
+              </section>
+            )}
+          </>
         ) : (
           <>
-            {/* Seven tabs, so the rail scrolls sideways on a phone rather than
-                wrapping into three rows of its own. */}
+            {/* The rail scrolls sideways on a phone rather than wrapping into
+                rows of its own. */}
             <div className={tabNavListClass}>
               {TABS.map(({ id, icon: Icon }) => (
                 <button
@@ -148,9 +171,7 @@ export const SupporterPanelView = () => {
 
             {tab === "gear" && <GearBoardTab enabled={isSupporter} />}
 
-            {tab === "case" && (
-              <SupporterCaseTab wallet={board?.wallet} enabled={isSupporter} />
-            )}
+            {tab === "shop" && <SkinShopTab enabled={isSupporter} />}
 
             {tab === "guild" && (
               <GuildFoundingPanel
@@ -158,8 +179,6 @@ export const SupporterPanelView = () => {
                 enabled={isSupporter}
               />
             )}
-
-            {tab === "work" && <WorkBoardTab enabled={isSupporter} />}
 
             {tab === "wall" && <SupporterWall />}
 

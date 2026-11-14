@@ -15,7 +15,6 @@ import type { CaseDefinition } from "../types/arsenal.types";
  *   Featured       260   a rotating pool of 10
  *   Parts Crate    300   Guitar Builder parts, nothing else
  *   Premium        350   guitars *or* pedals, Rare and better is the main course
- *   Supporter      420   six items the supporters voted onto the slate
  *   Elite          500   Rare or better, guaranteed
  *   Vault         1200   Epic or better, guaranteed — the case you save for
  *
@@ -62,9 +61,9 @@ import type { CaseDefinition } from "../types/arsenal.types";
  * were rounded so that the new-model wait still shortens on every rung of the
  * ladder: 7 became 4, and 5 became 2 rather than a 3 that would have tied Premium.
  *
- * The curated cases (Featured, Supporter) already never repeat while their pool
- * holds something new, and the Parts Crate has no collection to complete, so
- * none of the three carries one.
+ * The curated Featured case already never repeats while its pool holds
+ * something new, and the Parts Crate has no collection to complete, so neither
+ * carries one.
  */
 /**
  * How many cases one pack opens, besides the single open. Paid in Fame one open
@@ -172,51 +171,6 @@ export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
       Epic: 0.2,
       Legendary: 0.06,
       Mythic: 0.02,
-    },
-  },
-  /**
-   * The supporters' own case: six items, one per rarity, voted onto the slate
-   * for a fortnight at a time.
-   *
-   * Balanced as a *targeting* tool, not a better case. Curation is worth far
-   * more than it looks: rolling Mythic out of Elite spreads across the Mythics in
-   * the game, so a 4% Mythic roll there is well under 1% on the one you wanted,
-   * while a slate has exactly one — at equal odds the supporter case would be
-   * several times the case Elite is. The odds are therefore set strictly below
-   * Elite at every rarity it shares, and strictly above the Featured case, which
-   * is the other curated one:
-   *
-   *   rarity      Featured (260)   Supporter (420)   Elite (500)
-   *   Rare            0.25              0.40            0.48
-   *   Epic            0.20              0.28            0.38
-   *   Legendary       0.06              0.07            0.10
-   *   Mythic          0.02             0.025            0.04
-   *
-   * So the ladder still reads top to bottom on raw value, and what the extra
-   * Fame buys over the Featured case is knowing exactly which six items are in it.
-   *
-   * The Common seat is deliberately thin at 8% — a quarter of what the Standard
-   * rolls. Commons are the one tier the game hands out freely, so a fat Common
-   * slice on the most expensive curated case would just be a tax; 8% is enough
-   * that voting a Common in is a real way to finish that corner of the Dex, and
-   * small enough that nobody pays 420 Fame expecting one.
-   */
-  supporter: {
-    id: "supporter",
-    name: "Supporter Case",
-    description:
-      "Six items, chosen by the supporters. New slate every fortnight.",
-    fameCost: 420,
-    yearFrom: 2018,
-    yearTo: 2024,
-    country: "USA",
-    probabilities: {
-      Common: 0.08,
-      Uncommon: 0.145,
-      Rare: 0.4,
-      Epic: 0.28,
-      Legendary: 0.07,
-      Mythic: 0.025,
     },
   },
   "elite-guitar": {

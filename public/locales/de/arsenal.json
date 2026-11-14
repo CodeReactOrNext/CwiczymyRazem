@@ -154,7 +154,6 @@
       "standard": "Standard",
       "premium": "Premium",
       "elite": "Elite",
-      "supporter": "Supporter",
       "vault": "Vault",
       "parts": "Teile"
     },
@@ -177,11 +176,6 @@
       "daily": {
         "name": "Featured-Kiste",
         "description": "Ein wechselnder Pool aus 10 Gegenständen."
-      },
-      "supporter": {
-        "name": "Supporter-Kiste",
-        "title": "{{tier}}-Kiste",
-        "description": "Sechs Gegenstände, ausgewählt von den Supportern. Alle zwei Wochen eine neue Auswahl."
       },
       "elite-guitar": {
         "name": "Elite-Gitarrenkiste",

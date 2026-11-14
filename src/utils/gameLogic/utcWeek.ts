@@ -1,7 +1,7 @@
 /**
  * Weeks run Monday to Monday in UTC, matching how the rest of the app talks
- * about a practice week. Pure, so the reset schedule and the supporter case
- * cycle agree on the same boundaries without passing dates around.
+ * about a practice week. Pure, so the reset schedule and the weekly goals
+ * agree on the same boundaries without passing dates around.
  */
 
 const DAY_MS = 24 * 60 * 60 * 1000;

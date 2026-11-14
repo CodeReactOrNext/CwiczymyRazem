@@ -156,7 +156,6 @@
       "standard": "Standard",
       "premium": "Premium",
       "elite": "Elite",
-      "supporter": "wspierających",
       "vault": "Vault",
       "parts": "z częściami"
     },
@@ -179,11 +178,6 @@
       "daily": {
         "name": "Wyróżniona skrzynka",
         "description": "Rotująca pula 10 przedmiotów."
-      },
-      "supporter": {
-        "name": "Skrzynka wspierających",
-        "title": "Skrzynka {{tier}}",
-        "description": "Sześć przedmiotów wybranych przez wspierających. Nowy zestaw co dwa tygodnie."
       },
       "elite-guitar": {
         "name": "Gitarowa skrzynka Elite",

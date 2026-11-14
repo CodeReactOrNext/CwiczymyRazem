@@ -42,6 +42,17 @@ import { BOSS_PLAN_PREFIX } from "feature/bosses/data/bosses";
 import { AVATAR_SHRINK } from "feature/chat/chatLayout";
 import { welcomeGoalPhrase } from "feature/chat/utils/systemMessages";
 import { communityDocId } from "feature/communityExercises/utils/communityToExercise";
+import {
+  bannerNeedsDarkCard,
+  CosmeticBanner,
+} from "feature/cosmetics/components/CosmeticBanner";
+import cosmeticStyles from "feature/cosmetics/components/cosmetics.module.css";
+import { findBanner } from "feature/cosmetics/data/cosmeticsCatalog";
+import { useEquippedCosmetics } from "feature/cosmetics/hooks/useCosmetics";
+import {
+  randomLook,
+  useCosmeticsPreview,
+} from "feature/cosmetics/hooks/useCosmeticsPreview";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { SearchingDots } from "feature/duels/components/DuelQueueCard";
 import { useNow } from "feature/duels/hooks/useDuels";
@@ -534,18 +545,41 @@ const TimeStamp = ({ date }: { date: Date }) => (
 
 const LogItem = ({
   isNew,
+  bannerId,
   children,
 }: {
   isNew: boolean;
+  /** The banner the row's player bought and wears, if any. */
+  bannerId?: string | null;
   children: React.ReactNode;
-}) => (
-  <div
-    className={`my-3 flex flex-col flex-nowrap items-start rounded-xl px-4 py-4 transition-all duration-base sm:px-5 lg:flex-row lg:items-center ${
-      isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
-    }`}>
-    {children}
-  </div>
-);
+}) => {
+  const banner = findBanner(bannerId);
+
+  return (
+    <div
+      className={cn(
+        "my-3 flex flex-col flex-nowrap items-start rounded-xl px-4 py-4 transition-all duration-base sm:px-5 lg:flex-row lg:items-center",
+        banner && "relative overflow-hidden",
+        // A painted banner keeps its card dark in both themes — the pictures
+        // are night scenes — and opaque, so the page never shows through. A
+        // drawn one sits on the player's normal card.
+        bannerNeedsDarkCard(banner)
+          ? "force-dark bg-zinc-900"
+          : isNew
+            ? "bg-zinc-800/70"
+            : "bg-zinc-900/60",
+      )}>
+      {banner && <CosmeticBanner item={banner} />}
+      {banner ? (
+        <div className={cn("relative z-10 w-full", cosmeticStyles.onBanner)}>
+          {children}
+        </div>
+      ) : (
+        children
+      )}
+    </div>
+  );
+};
 
 const getSongStatusMessage = (status: string, t: any): string => {
   return t(`song_status.${status}`);
@@ -2049,15 +2083,21 @@ const GroupedLogItem = ({
   const fameAmount = calculateGroupFame(group);
   const { uid, userName, avatarUrl, guildBadge } =
     representative;
+  const equipped = useEquippedCosmetics()(uid);
+  const isCosmeticsPreview = useCosmeticsPreview();
 
   // The reaction lives on the oldest log in the group, not the newest one shown at the top: the
   // head keeps changing as the user logs more of the same activity, the tail does not.
   const reactionLogId = getGroupReactionAnchor(group)?.id;
+  // Test mode (`?cosmetics=random`) dresses every row in a stable random look, locally.
+  const worn = isCosmeticsPreview
+    ? randomLook(reactionLogId ?? `${uid}-${getLogTimestampMs(group.logs[0])}`)
+    : equipped;
   const reactors = getGroupReactors(group);
   const awardedFame = getGroupAwardedFame(group, fameAmount);
 
   return (
-    <LogItem isNew={isNew}>
+    <LogItem isNew={isNew} bannerId={worn.banner}>
       {/* Motivate gets a column of its own, so a long name never has to share a row with it. On a
           phone that column would squeeze every line below into a sliver, so there it only sits
           beside the name and the lines take the card's full width. */}
@@ -2070,6 +2110,7 @@ const GroupedLogItem = ({
                 userName={userName}
                 avatarUrl={avatarUrl ?? undefined}
                 guildBadge={guildBadge}
+                avatarEffect={worn.avatar}
                 avatarClassName={AVATAR_SHRINK}
                 nameClassName='text-[15px] text-zinc-100 sm:ml-2'
                 guildBadgeClassName='hidden sm:inline-flex'

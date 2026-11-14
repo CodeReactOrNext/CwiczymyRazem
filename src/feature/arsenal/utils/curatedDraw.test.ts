@@ -10,8 +10,8 @@ interface Entry {
 
 const entry = (id: string, rarity: GuitarRarity): Entry => ({ id, rarity });
 
-/** The Supporter slate's shape: exactly one item per rarity. */
-const SLATE: Entry[] = [
+/** The tightest pool a curated case can have: exactly one item per rarity. */
+const ONE_EACH: Entry[] = [
   entry("mythic", "Mythic"),
   entry("legendary", "Legendary"),
   entry("epic", "Epic"),
@@ -50,17 +50,17 @@ const draw = (
 
 describe("pickCuratedDrop", () => {
   it("hands over the rolled rarity's item when the player does not have it", () => {
-    expect(draw(SLATE, "Epic", [])?.id).toBe("epic");
+    expect(draw(ONE_EACH, "Epic", [])?.id).toBe("epic");
   });
 
-  it("substitutes downward rather than repeating a slate seat", () => {
-    // Cookie's case: the slate's only Epic is already in the Dex, so a fourth
+  it("substitutes downward rather than repeating the pool's only item", () => {
+    // Cookie's case: the pool's only Epic is already in the Dex, so a fourth
     // copy of it is exactly what this rule exists to stop.
-    expect(draw(SLATE, "Epic", ["epic"])?.id).toBe("rare");
+    expect(draw(ONE_EACH, "Epic", ["epic"])?.id).toBe("rare");
   });
 
   it("skips past lower rarities that are collected too", () => {
-    expect(draw(SLATE, "Epic", ["epic", "rare", "uncommon"])?.id).toBe("common");
+    expect(draw(ONE_EACH, "Epic", ["epic", "rare", "uncommon"])?.id).toBe("common");
   });
 
   it("never substitutes upward, however much is missing above the roll", () => {
@@ -69,7 +69,7 @@ describe("pickCuratedDrop", () => {
     // into a Mythic printer — the roll's odds are a ceiling, so it repeats.
     const owned = ["epic", "rare", "uncommon", "common"];
     for (const random of [() => 0, () => 0.5, () => 0.99]) {
-      expect(draw(SLATE, "Epic", owned, random)?.id).toBe("epic");
+      expect(draw(ONE_EACH, "Epic", owned, random)?.id).toBe("epic");
     }
   });
 

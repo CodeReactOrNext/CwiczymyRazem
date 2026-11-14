@@ -4,7 +4,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Crown,
-  Hammer,
   ListMusic,
   LogOut,
   Mail,
@@ -36,7 +35,6 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
     { name: "Discovery", href: "/admin/discovery",icon: SearchCheck  },
     { name: "YT Scraper", href: "/admin/youtube-scraper", icon: FaYoutube },
     { name: "Roadmaps",  href: "/admin/roadmaps", icon: Map          },
-    { name: "Work",      href: "/admin/work",     icon: Hammer       },
     { name: "Section Maps", href: "/admin/section-maps", icon: ListMusic },
     { name: "Emails",    href: "/admin/emails",   icon: Mail         },
   ];

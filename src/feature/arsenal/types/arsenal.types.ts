@@ -1,3 +1,4 @@
+import type { BoardSkinState } from "feature/arsenal/data/boardSkins";
 import type {
   ComponentDef,
   CustomGuitarRecord,
@@ -206,8 +207,7 @@ export type CaseType =
   | "vault-guitar"
   | "vault-effect"
   | "parts"
-  | "daily"
-  | "supporter";
+  | "daily";
 
 type ProductionCountry =
   | "USA"
@@ -514,6 +514,12 @@ export interface ArsenalUserData {
   dexEffects?: (number | string)[];
   /** Guitar Builder parts: bodies, necks, pickups, finishes… from cases. */
   components?: OwnedComponent[];
+  /**
+   * Pedalboard skins bought in the supporter panel, and which the board wears.
+   * Written only by `/api/supporter/skins`; read through `readBoardSkins`,
+   * which is what makes a stale or hand-edited record harmless.
+   */
+  boardSkins?: BoardSkinState;
 }
 
 export interface ScrapResult {

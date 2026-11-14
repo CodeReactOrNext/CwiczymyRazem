@@ -1,0 +1,196 @@
+/*
+ * Motion for cosmetics. Transform/opacity/filter only, nothing per frame in JS:
+ * a feed can show a dozen of these at once.
+ */
+
+/* Grows from the top right, so the push-in never slides the top edge out of view. */
+/*
+ * A painted banner, laid out.
+ *
+ * Desktop: the frame fades the art in from the left so the name sits on the
+ * plain card; the art box is as tall as the row (never under 9rem, so a
+ * one-line row still shows a subject — extra comes off the bottom, the head
+ * stays) and its own left edge fades, so it never meets the card in a seam.
+ */
+.paintedFrame {
+  -webkit-mask-image: linear-gradient(to right, transparent 12%, #000 56%);
+  mask-image: linear-gradient(to right, transparent 12%, #000 56%);
+}
+
+.paintedArt {
+  height: max(100%, 9rem);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 35%);
+  mask-image: linear-gradient(to right, transparent, #000 35%);
+}
+
+/* A light veil, heavier at the bottom, so a bright picture never outshines the text. */
+.paintedShade {
+  background: linear-gradient(to top, rgb(0 0 0 / 0.42), rgb(0 0 0 / 0.14) 70%);
+}
+
+/*
+ * Phone: the card is narrower than the picture, so the art's own left fade
+ * falls off-screen and the picture would start right under the name; and a
+ * row's lines stack, so a tall row would put every line on the picture.
+ * There the art keeps to a band across the top — no taller than it is on a
+ * one-line row — fades out downwards, and fades in later from the left. The
+ * lines further down sit on the plain card.
+ */
+@media (max-width: 639px) {
+  .paintedFrame {
+    -webkit-mask-image: linear-gradient(to right, transparent 18%, #000 78%);
+    mask-image: linear-gradient(to right, transparent 18%, #000 78%);
+  }
+
+  .paintedArt {
+    height: 8.5rem;
+    -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+  }
+
+  .paintedShade {
+    background: linear-gradient(to top, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.22) 70%);
+  }
+
+  /* The same band for what is drawn in code and for the drifting particles. */
+  .phoneBand {
+    -webkit-mask-image: linear-gradient(to bottom, #000 4.5rem, transparent 8.5rem);
+    mask-image: linear-gradient(to bottom, #000 4.5rem, transparent 8.5rem);
+  }
+}
+
+.bannerArt {
+  transform-origin: 78% 0%;
+  animation: pushIn 22s ease-in-out infinite alternate;
+}
+
+@keyframes pushIn {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.08) translateX(-1.2%);
+  }
+}
+
+/*
+ * The content of a bannered row. Its buttons and badges are tinted with
+ * see-through fills (`bg-amber-500/15`, `bg-emerald-500/10`…), which on a plain
+ * card read as a tint and on a picture let the picture through. Each gets an
+ * opaque underlay in the card's own colour, under its own tint, so it looks
+ * exactly as it does on a plain card. Absolutely placed bits (hint dots,
+ * floating coins) are left alone: `position: relative` would move them.
+ */
+.onBanner [class*="bg-"]:not([class*="absolute"]):not([class*="fixed"]):not(img) {
+  position: relative;
+  isolation: isolate;
+}
+
+.onBanner [class*="bg-"]:not([class*="absolute"]):not([class*="fixed"]):not(img)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: rgb(var(--c-zinc-900));
+  pointer-events: none;
+}
+
+/* Lightning: dark for most of the cycle, then a double strike. */
+.flash {
+  background: radial-gradient(ellipse at 78% 30%, rgb(196 181 253 / 0.55), transparent 60%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: flash 7s linear infinite;
+}
+
+@keyframes flash {
+  0%,
+  86% {
+    opacity: 0;
+  }
+  87% {
+    opacity: 1;
+  }
+  88.5% {
+    opacity: 0.15;
+  }
+  90% {
+    opacity: 0.85;
+  }
+  94%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.spin {
+  animation: spin var(--cosmetic-duration, 24s) linear infinite;
+}
+
+.spinReverse {
+  animation: spin var(--cosmetic-duration, 24s) linear infinite reverse;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pulse {
+  animation: pulse var(--cosmetic-duration, 1.1s) ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1) rotate(-1.5deg);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.03, 1.05) rotate(0.8deg);
+    filter: brightness(1.18);
+  }
+  100% {
+    transform: scale(1.015, 1.02) rotate(1.6deg);
+    filter: brightness(1.05);
+  }
+}
+
+.float {
+  animation: float var(--cosmetic-duration, 3.4s) ease-in-out infinite alternate;
+}
+
+@keyframes float {
+  from {
+    transform: translateY(1.2%) rotate(-0.8deg);
+  }
+  to {
+    transform: translateY(-1.2%) rotate(0.8deg);
+  }
+}
+
+.shine {
+  animation: shine var(--cosmetic-duration, 3s) ease-in-out infinite alternate;
+}
+
+@keyframes shine {
+  from {
+    filter: brightness(0.95);
+  }
+  to {
+    filter: brightness(1.3) saturate(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bannerArt,
+  .flash,
+  .spin,
+  .spinReverse,
+  .pulse,
+  .float,
+  .shine {
+    animation: none;
+  }
+}

@@ -9,13 +9,11 @@ import { Interpolate } from "lib/i18n/Interpolate";
 import { Heart } from "lucide-react";
 
 /**
- * What somebody who hasn't donated yet sees at /supporter: the door, and
- * nothing behind it.
+ * What somebody who hasn't donated yet sees first at /supporter: the door.
  *
- * The panel is the pitch — a donation opens the room where riff.quest is
- * decided out loud — but what is inside the room stays inside it. The surfaces
- * and the prices live in `SupporterInfo` on the Info tab, which only a
- * supporter ever reaches.
+ * Under it the panel view lays out what is behind it — the perks, drawn as on
+ * the roadmap page, and the skin shop as a window with prices and no buttons.
+ * The full price list lives in `SupporterInfo` on the Info tab.
  *
  * The one thing that has to be said out here is which address to pay from: a
  * donation carrying an email the account isn't on leaves the money parked and

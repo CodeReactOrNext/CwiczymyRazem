@@ -11,6 +11,11 @@ import {
 } from "feature/arsenal/components/Rig/PowerLoom";
 import { RigHeadline } from "feature/arsenal/components/Rig/RigStatsPanel";
 import { SignalCable } from "feature/arsenal/components/Rig/SignalCable";
+import {
+  readBoardSkins,
+  wornBoardLook,
+  wornCable,
+} from "feature/arsenal/data/boardSkins";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { readPowerState } from "feature/arsenal/data/powerSupply";
 import { boardTierOf, supplyTierOf } from "feature/arsenal/data/rigHardware";
@@ -167,6 +172,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
   // Shared with the profile's hero — one read of this player's document feeds
   // the rig here and the guitar card hanging off their avatar.
   const { data: arsenal } = useUserArsenal(userAuth);
+  const skins = readBoardSkins(arsenal?.boardSkins);
 
   if (!arsenal) return null;
 
@@ -328,6 +334,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
           <PedalboardCase
             geo={geo}
             flawless={verdict.flawless}
+            look={wornBoardLook(skins)}
             rail={
               <PowerRail
                 rail={rail}
@@ -351,6 +358,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
               verdict={verdict}
               widthOf={widthOf}
               jacksOf={jacksOf}
+              skin={wornCable(skins)}
               plain
             />
 

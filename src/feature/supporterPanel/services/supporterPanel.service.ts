@@ -1,8 +1,13 @@
 import axios from "axios";
 import type {
+  BoardSkinState,
+  SkinKind,
+} from "feature/arsenal/data/boardSkins";
+import type {
   RoadmapBoard,
   RoadmapIdeaIcon,
   RoadmapIdeaStatus,
+  SupporterWallet,
 } from "feature/supporterPanel/types/supporterPanel.types";
 import { auth } from "utils/firebase/client/firebase.utils";
 
@@ -65,3 +70,33 @@ export const setRoadmapIdeaStatus = async (
   });
   return data;
 };
+
+/** The skin shop as the server holds it: what is left to spend, what is owned. */
+export interface SkinShopState {
+  wallet: SupporterWallet;
+  boardSkins: BoardSkinState;
+}
+
+const postSkinShop = async (
+  body: Record<string, unknown>,
+): Promise<SkinShopState> => {
+  const idToken = await getIdToken();
+  const { data } = await axios.post<SkinShopState>("/api/supporter/skins", {
+    idToken,
+    ...body,
+  });
+  return data;
+};
+
+export const fetchSkinShop = (): Promise<SkinShopState> =>
+  postSkinShop({ action: "read" });
+
+/** Only the id travels: the price is the server's to look up. */
+export const buyBoardSkin = (skinId: string): Promise<SkinShopState> =>
+  postSkinShop({ action: "buy", skinId });
+
+/** `null` goes back to the stock cable or the stock case. */
+export const wearBoardSkin = (
+  kind: SkinKind,
+  skinId: string | null,
+): Promise<SkinShopState> => postSkinShop({ action: "wear", kind, skinId });

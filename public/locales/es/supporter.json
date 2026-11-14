@@ -122,31 +122,32 @@
   },
   "perks": {
     "title": "Qué obtienes",
-    "tokens": "Apoyar se convierte en tokens: {{welcome}} llegan con la insignia y {{perDollar}} más por cada dólar después. Nunca caducan y te dan voz sobre lo que se construye.",
+    "intro": "Cualquier donación te convierte en supporter.",
     "open_panel": "Abrir el panel de supporter",
-    "spend_title": "Qué compran los tokens",
-    "badge_title": "Viene con la insignia",
+    "badge_title": "La insignia de supporter",
+    "badge_note": "Tuya desde la primera donación, sea cual sea la cantidad.",
+    "spend_title": "Qué puedes hacer",
     "discord_body": "Un rol de supporter en {{discord}} y un canal donde enseño lo que estoy construyendo antes de lanzarlo.",
     "items": {
+      "badge": {
+        "title": "Tu nombre en el muro",
+        "body": "Un anillo ámbar alrededor de tu avatar y un lugar entre los jugadores que financian Riff Quest."
+      },
       "roadmap": {
-        "title": "El tablero de la hoja de ruta",
-        "body": "Publica lo que quieres que se construya y apoya las ideas de otros supporters.",
-        "price": "{{post}} por idea, {{back}} por apoyar una"
+        "title": "Decide qué se construye",
+        "body": "Publica lo que quieres que se construya y apoya las ideas de otros supporters."
       },
-      "gear": {
-        "title": "Equipo elegido por ti",
-        "body": "Propón una guitarra o un pedal para el Arsenal, o apoya la propuesta de otro.",
-        "price": "{{post}} por propuesta, {{back}} por apoyar una"
-      },
-      "case": {
-        "title": "La caja de supporters",
-        "body": "Vota qué objetos entran en la próxima caja de supporters.",
-        "price": "{{vote}} por voto"
+      "coach": {
+        "title": "Una hoja de ruta para tu meta",
+        "body": "Describe lo que quieres tocar y el coach traza las fases, ejercicios, lecciones y canciones para llegar."
       },
       "guild": {
-        "title": "Un gremio propio",
-        "body": "Funda uno con su propio nombre y etiqueta, un almacén compartido y una semana de práctica más dura.",
-        "price": "{{found}} por fundarlo"
+        "title": "Funda o amplía un gremio",
+        "body": "Funda uno con su propio nombre y etiqueta, o ponte de acuerdo con tu gremio para pagar más plazas y un almacén compartido más grande."
+      },
+      "shop": {
+        "title": "Viste tu perfil y tu equipo",
+        "body": "Banners y efectos de avatar que se ven en tus publicaciones de Actividad, además de skins para tu pedalboard y tus cables."
       },
       "discord": {
         "title": "El canal de supporters"
@@ -252,17 +253,17 @@
   },
   "panel": {
     "title": "Panel de supporters",
-    "subtitle": "Mira lo que se está construyendo, elige lo que viene después y decide la semana que juega toda la app.",
+    "subtitle": "Elige lo que se construye después y decide la semana que juega toda la app.",
     "eyebrow": "Supporters",
     "tabs": {
       "roadmap": "Hoja de ruta",
       "gear": "Equipo",
-      "case": "Caja de supporters",
+      "shop": "Tienda de skins",
       "guild": "Fundar un gremio",
-      "work": "En marcha",
       "wall": "Supporters",
       "players": "Rutas de jugadores",
-      "info": "Info"
+      "info": "Info",
+      "support": "Hazte supporter"
     },
     "wallet": "tokens para gastar",
     "wallet_one": "token para gastar",
@@ -277,59 +278,22 @@
     "close": "Cerrar",
     "try_again": "Reintentar",
     "info": {
-      "what_you_do": "Qué haces aquí",
       "surfaces": {
         "roadmap": {
           "title": "Hoja de ruta",
           "body": "Propón lo que le falta a la app e impulsa las ideas que quieres ver construidas. Lo que más apoya el tablero es lo siguiente que se hace."
         },
-        "work": {
-          "title": "En marcha",
-          "body": "El orden real de trabajo — qué está en curso, qué está en cola, qué ya salió. Dejas de adivinar qué pasó con tu idea."
-        },
         "gear": {
           "title": "Equipo",
           "body": "Propón una guitarra, un ampli o un pedal para el Arsenal e impulsa los que quieres ver dibujados. Lo que sube aquí es lo que se hace."
         },
-        "case": {
-          "title": "Caja de supporters",
-          "body": "Seis huecos en la próxima caja, y tú eliges qué va en cada uno antes de que se abra. Solo se gastan los tokens del ganador. Todo lo que apoya al resto se queda en el tablero para la próxima caja."
-        },
-        "wall": {
-          "title": "Supporters",
-          "body": "Todos los que financian la app, con el nivel al que tocan. La insignia te pone en ese muro el día que llega."
+        "shop": {
+          "title": "Tienda de skins",
+          "body": "Banners y efectos de avatar para tus publicaciones de Actividad, y skins para tu pedalboard y tus cables. Solo estéticos y tuyos para siempre."
         },
         "guild": {
           "title": "Gremio",
           "body": "Reserva un nombre y una etiqueta que nadie más puede usar, y amplía la sala y el estante a medida que llegan miembros."
-        }
-      },
-      "how_tokens": "Cómo consigues tokens",
-      "badge_once": "Insignia de supporter, una vez",
-      "per_dollar": "Por cada $1 donado",
-      "in_total": "${{usd}} en total",
-      "membership": "Una membresía vuelve a pagar en cada renovación. Los tokens nunca caducan ni se recargan solos — los gastados ya no vuelven.",
-      "what_cost": "Lo que cuestan",
-      "costs": {
-        "roadmap": {
-          "title": "Hoja de ruta",
-          "post_idea": "Publicar una idea",
-          "back_idea": "Apoyar una idea (máx. {{max}})"
-        },
-        "gear": {
-          "title": "Equipo",
-          "propose_gear": "Proponer equipo",
-          "back_proposal": "Apoyar una propuesta"
-        },
-        "votes": {
-          "title": "Votos",
-          "case_item": "Objeto de la caja de supporters"
-        },
-        "guild": {
-          "title": "Gremio",
-          "found_guild": "Fundar un gremio",
-          "seats": "+{{seats}} plazas",
-          "stash_row": "+1 fila de almacén"
         }
       },
       "donate_email": "Dona con el correo de tu cuenta",
@@ -341,8 +305,8 @@
       "title": "Una donación abre el panel de supporters",
       "intro": "Detrás de la insignia está la sala donde riff.quest se decide en voz alta:",
       "perks": {
-        "0": "Mira lo que se construye ahora y vota lo que viene después",
-        "1": "Elige el equipo que entra en el Arsenal y en las cajas",
+        "0": "Propón ideas y vota lo que se construye después",
+        "1": "Elige el equipo que entra en el Arsenal",
         "2": "Funda un gremio con su propio nombre, etiqueta y almacén compartido",
         "3": "Conecta Claude u otro asistente de IA a tu cuenta"
       },
@@ -350,7 +314,8 @@
       "email_known": "Usa el correo de esta cuenta para desbloquear Supporter: {{email}}.",
       "other_email": "¿Usas otro correo? {{discord}} y lo vincularé a mano.",
       "write_discord": "Escríbeme por Discord",
-      "support": "Apoya el proyecto"
+      "support": "Apoya el proyecto",
+      "shop_body": "Banners y efectos de avatar para tus publicaciones de Actividad, skins para tu pedalboard y tus cables. Solo estéticos y tuyos para siempre."
     },
     "backers": {
       "count": "Apoyado por {{count}} supporters",
@@ -771,52 +736,79 @@
         "engraving_hint": "Si se construye, tu frase va en el objeto — quedan {{count}} caracteres.",
         "scrap_hint": "Lo que recibe el taller cuando alguien lo desmonta, en orden de recuperación y con qué grado. Hasta {{max}} piezas — déjalo vacío y decide el taller."
       }
-    },
-    "case": {
-      "mine_on_seat": "{{count}} de tus tokens están en este hueco",
-      "mine_on_seat_one": "1 de tus tokens está en este hueco",
-      "empty": "vacío",
-      "up_next": "A continuación",
-      "winning": "{{name}} va ganando este hueco",
-      "no_votes": "Sin votos todavía",
-      "back_another": "Apoyar otro objeto: {{rarity}} ({{count}})",
-      "search": "Buscar objetos: {{rarity}}…",
-      "no_match": "Nada coincide con «{{search}}»",
-      "back_item": "Apoyar {{name}}",
-      "seat": "Hueco: {{rarity}}",
-      "replaces": "Vota qué sustituye a {{item}} cuando cambie la caja.",
-      "fills": "Vota qué lo ocupa cuando cambie la caja.",
-      "title": "En la caja ahora mismo",
-      "intro": "Un objeto por rareza. Elige un hueco y vota qué entra a continuación.",
-      "changes_tomorrow": "cambia mañana",
-      "changes_in": "cambia en {{count}} días",
-      "chosen_by": "Elegido por los supporters",
-      "slate_tomorrow": "nueva selección mañana",
-      "slate_in": "nueva selección en {{count}} días",
-      "open_for": "Abrir por {{cost}} Fame",
-      "needs": "Necesita {{cost}} Fame",
-      "supporters_pick": "Los supporters eligen lo que entra aquí →"
-    },
-    "work": {
-      "columns": {
-        "queue": {
-          "title": "Cola",
-          "blurb": "Lo siguiente, en orden"
-        },
-        "in_progress": {
-          "title": "En curso",
-          "blurb": "En construcción ahora"
-        },
-        "done": {
-          "title": "Hecho",
-          "blurb": "Lanzado, lo más nuevo primero"
-        }
+    }
+  },
+  "shop": {
+    "boards_title": "Pedaleras",
+    "boards_body": "Otra pedalera bajo tus pedales. La disposición, los cables y las bonificaciones se quedan exactamente como están.",
+    "cables_title": "Cables de señal",
+    "cables_body": "De qué está hecho el cable entre tus pedales. Un cable conectado al revés se sigue poniendo rojo.",
+    "buy": "Comprar",
+    "confirm": "Confirmar",
+    "not_enough": "No tienes suficientes tokens",
+    "owned": "Comprado",
+    "in_use": "En tu pedalera",
+    "put_on": "Usar",
+    "take_off": "Quitar",
+    "load_failed": "La tienda no se ha cargado. Recarga la página para volver a intentarlo.",
+    "toast_bought": "{{name}} ya está en tu pedalera",
+    "toast_buy_failed": "No se ha podido comprar ese skin",
+    "toast_wear_failed": "No se ha podido cambiar el skin",
+    "cosmetics": {
+      "intro": "Aspectos para tus entradas de Activity. Se compran una vez con tokens y son tuyos para siempre. Todos los ven en tus publicaciones.",
+      "banners": "Banners de actividad",
+      "banners_hint": "La imagen detrás de todo lo que publicas en Activity.",
+      "avatars": "Efectos de avatar",
+      "avatars_hint": "Adorno alrededor de tu avatar en Activity.",
+      "preview_time": "ahora mismo",
+      "preview_line": "practicó 25 min",
+      "bought": "{{name}} es tuyo y lo llevas puesto",
+      "err_equip": "No se pudo cambiar tu aspecto",
+      "names": {
+        "banner_storm": "Tormenta",
+        "banner_neon": "Neón",
+        "banner_astronaut": "Astronauta",
+        "banner_mech": "Mech",
+        "banner_rider": "Jinete",
+        "banner_wolf": "Lobo blanco",
+        "banner_dragon": "Dragón",
+        "banner_viking": "Vikingo",
+        "banner_kraken": "Kraken",
+        "banner_angel": "Ángel caído",
+        "banner_reaper": "Segador",
+        "banner_samurai": "Samurái",
+        "banner_phoenix": "Fénix",
+        "avatar_fire": "Anillo de fuego",
+        "avatar_frost": "Escarcha",
+        "avatar_smoke": "Humo",
+        "avatar_chain": "Cadena",
+        "avatar_uroboros": "Uróboros",
+        "avatar_vinyl": "Vinilo",
+        "avatar_horns": "Cuernos de diablo",
+        "avatar_dragon": "Alas de dragón",
+        "avatar_crown": "Corona",
+        "banner_holo": "Holo",
+        "banner_bokeh": "Bokeh",
+        "banner_vinyl": "Vinilo",
+        "banner_led": "Espectro",
+        "banner_halftone": "Trama",
+        "banner_dust": "Polvo dorado",
+        "banner_pattern": "Patrón"
       },
-      "from_idea": "Viene de una idea de un supporter",
-      "idea": "Idea de supporter",
-      "nothing_here": "Aquí no hay nada",
-      "show_all": "Mostrar las {{count}}",
-      "empty_body": "Aquí aparecerá la cola cuando haya algo en ella."
+      "owned": "En propiedad",
+      "wearing": "Puesto",
+      "take_off": "Quitar",
+      "wear": "Poner",
+      "confirm": "Confirmar",
+      "not_enough": "No hay suficientes tokens",
+      "toast_buy_failed": "No se pudo comprar",
+      "preview_name": "Tú"
+    },
+    "tabs": {
+      "banners": "Banners",
+      "avatars": "Efectos de avatar",
+      "boards": "Pedaleras",
+      "cables": "Cables"
     }
   }
 }

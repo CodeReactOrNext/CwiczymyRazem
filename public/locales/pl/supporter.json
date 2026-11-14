@@ -122,31 +122,32 @@
   },
   "perks": {
     "title": "Co dostajesz",
-    "tokens": "Wsparcie zamienia się w tokeny: {{welcome}} przychodzi razem z odznaką, a potem {{perDollar}} za każdego kolejnego dolara. Nie wygasają i dają głos w tym, co powstanie.",
+    "intro": "Każda wpłata robi z Ciebie supportera.",
     "open_panel": "Otwórz panel supportera",
-    "spend_title": "Na co idą tokeny",
-    "badge_title": "W pakiecie z odznaką",
+    "badge_title": "Odznaka supportera",
+    "badge_note": "Twoja od pierwszej wpłaty, niezależnie od kwoty.",
+    "spend_title": "Co możesz zrobić",
     "discord_body": "Rola supportera na {{discord}} i kanał, na którym pokazuję, co buduję, zanim to wyjdzie.",
     "items": {
+      "badge": {
+        "title": "Twoje imię na ścianie",
+        "body": "Bursztynowa obwódka wokół avatara i miejsce wśród graczy, którzy finansują Riff Quest."
+      },
       "roadmap": {
-        "title": "Tablica roadmapy",
-        "body": "Zgłaszaj, co chcesz, żeby powstało, i popieraj pomysły innych supporterów.",
-        "price": "{{post}} za pomysł, {{back}} za poparcie"
+        "title": "Decyduj, co powstanie",
+        "body": "Zgłaszaj, co chcesz, żeby powstało, i popieraj pomysły innych supporterów."
       },
-      "gear": {
-        "title": "Sprzęt, który wybrałeś",
-        "body": "Zaproponuj gitarę albo efekt do Arsenału lub poprzyj czyjąś propozycję.",
-        "price": "{{post}} za propozycję, {{back}} za poparcie"
-      },
-      "case": {
-        "title": "Skrzynka supporterów",
-        "body": "Głosuj, które przedmioty trafią do następnej skrzynki supporterów.",
-        "price": "{{vote}} za głos"
+      "coach": {
+        "title": "Roadmapa pod twój cel",
+        "body": "Opisz, co chcesz grać, a coach rozpisze etapy, ćwiczenia, lekcje i utwory, które cię tam doprowadzą."
       },
       "guild": {
-        "title": "Własna gildia",
-        "body": "Załóż gildię z własną nazwą i tagiem, wspólnym schowkiem i trudniejszym tygodniem ćwiczeń.",
-        "price": "{{found}} za założenie"
+        "title": "Załóż albo rozbuduj gildię",
+        "body": "Załóż własną z nazwą i tagiem albo zrzuć się z resztą gildii na nowe miejsca i większy wspólny schowek."
+      },
+      "shop": {
+        "title": "Ubierz profil i sprzęt",
+        "body": "Banery i efekty awatara widoczne przy Twoich wpisach w Aktywności, a do tego skórki pedalboardu i kabli."
       },
       "discord": {
         "title": "Kanał supporterów"
@@ -260,17 +261,17 @@
   },
   "panel": {
     "title": "Panel wspierających",
-    "subtitle": "Zobacz, co powstaje, wybierz, co będzie dalej, i ustal tydzień, w który gra cała aplikacja.",
+    "subtitle": "Wybierz, co powstanie jako następne, i ustal tydzień, w który gra cała aplikacja.",
     "eyebrow": "Wspierający",
     "tabs": {
       "roadmap": "Plan rozwoju",
       "gear": "Sprzęt",
-      "case": "Skrzynka wspierających",
+      "shop": "Sklep ze skinami",
       "guild": "Załóż gildię",
-      "work": "W budowie",
       "wall": "Wspierający",
       "players": "Ścieżki graczy",
-      "info": "Info"
+      "info": "Info",
+      "support": "Zostań supporterem"
     },
     "wallet": "tokenów do wydania",
     "wallet_one": "token do wydania",
@@ -287,59 +288,22 @@
     "close": "Zamknij",
     "try_again": "Spróbuj ponownie",
     "info": {
-      "what_you_do": "Co tu robisz",
       "surfaces": {
         "roadmap": {
           "title": "Plan rozwoju",
           "body": "Zgłoś, czego brakuje w aplikacji, i popchnij pomysły, które chcesz zobaczyć. To, co tablica wspiera najmocniej, trafia do budowy jako następne."
         },
-        "work": {
-          "title": "W budowie",
-          "body": "Prawdziwa kolejność prac — co jest w trakcie, co w kolejce, co już wyszło. Nie musisz zgadywać, co się stało z twoim pomysłem."
-        },
         "gear": {
           "title": "Sprzęt",
           "body": "Zgłoś gitarę, wzmacniacz albo efekt do Arsenału i popchnij te, które chcesz zobaczyć narysowane. To, co tu urośnie, powstaje."
         },
-        "case": {
-          "title": "Skrzynka wspierających",
-          "body": "Sześć miejsc w następnej skrzynce i ty wybierasz, co trafi do każdego, zanim ktokolwiek ją otworzy. Wydawane są tylko tokeny zwycięzcy. Wszystko, co wspiera resztę, zostaje na tablicy do następnej skrzynki."
-        },
-        "wall": {
-          "title": "Wspierający",
-          "body": "Każdy, kto finansuje aplikację, razem z poziomem, na którym gra. Odznaka umieszcza cię na tej ścianie w dniu, w którym ją dostaniesz."
+        "shop": {
+          "title": "Sklep ze skórkami",
+          "body": "Banery i efekty awatara do Twoich wpisów w Aktywności oraz skórki pedalboardu i kabli. Czysto kosmetyczne, zostają na zawsze."
         },
         "guild": {
           "title": "Gildia",
           "body": "Zajmij nazwę i tag, których nikt inny nie weźmie, a potem poszerzaj salę i półkę, gdy przybywa członków."
-        }
-      },
-      "how_tokens": "Skąd biorą się tokeny",
-      "badge_once": "Odznaka wspierającego, jednorazowo",
-      "per_dollar": "Za każdego wpłaconego $1",
-      "in_total": "Łącznie ${{usd}}",
-      "membership": "Członkostwo płaci ponownie przy każdym odnowieniu. Tokeny nigdy nie wygasają i same się nie odnawiają — wydane znikają.",
-      "what_cost": "Ile kosztują",
-      "costs": {
-        "roadmap": {
-          "title": "Plan rozwoju",
-          "post_idea": "Zgłoszenie pomysłu",
-          "back_idea": "Wsparcie pomysłu (maks. {{max}})"
-        },
-        "gear": {
-          "title": "Sprzęt",
-          "propose_gear": "Propozycja sprzętu",
-          "back_proposal": "Wsparcie propozycji"
-        },
-        "votes": {
-          "title": "Głosy",
-          "case_item": "Przedmiot w skrzynce wspierających"
-        },
-        "guild": {
-          "title": "Gildia",
-          "found_guild": "Założenie gildii",
-          "seats": "+{{seats}} miejsca",
-          "stash_row": "+1 rząd schowka"
         }
       },
       "donate_email": "Wpłacaj z adresu e-mail konta",
@@ -351,8 +315,8 @@
       "title": "Darowizna otwiera panel wspierających",
       "intro": "Za odznaką jest pokój, w którym riff.quest decyduje się na głos:",
       "perks": {
-        "0": "Obserwuj, co powstaje teraz, i głosuj, co będzie dalej",
-        "1": "Wybieraj sprzęt, który trafi do Arsenału i do skrzynek",
+        "0": "Zgłaszaj pomysły i głosuj, co powstanie jako następne",
+        "1": "Wybieraj sprzęt, który trafi do Arsenału",
         "2": "Załóż gildię z własną nazwą, tagiem i wspólnym schowkiem",
         "3": "Podłącz Claude'a albo innego asystenta AI do konta"
       },
@@ -360,7 +324,8 @@
       "email_known": "Użyj adresu e-mail tego konta, żeby odblokować Wspierającego: {{email}}.",
       "other_email": "Używasz innego adresu? {{discord}}, a podepnę to ręcznie.",
       "write_discord": "Napisz do mnie na Discordzie",
-      "support": "Wesprzyj projekt"
+      "support": "Wesprzyj projekt",
+      "shop_body": "Banery i efekty awatara do Twoich wpisów w Aktywności, skórki pedalboardu i kabli. Czysto kosmetyczne i zostają u Ciebie na zawsze."
     },
     "backers": {
       "count": "Wspierający: {{count}}",
@@ -787,52 +752,79 @@
         "engraving_hint": "Jeśli powstanie, twoja linijka trafi na przedmiot — zostało znaków: {{count}}.",
         "scrap_hint": "Co dostaje warsztat, gdy ktoś go rozbierze, w kolejności odzysku i jakiej klasy. Do {{max}} części — zostaw puste, a zdecyduje warsztat."
       }
-    },
-    "case": {
-      "mine_on_seat": "Twoje tokeny na tym miejscu: {{count}}",
-      "mine_on_seat_one": "1 twój token jest na tym miejscu",
-      "empty": "puste",
-      "up_next": "Następny",
-      "winning": "{{name}} wygrywa to miejsce",
-      "no_votes": "Brak głosów",
-      "back_another": "Wesprzyj inny przedmiot: {{rarity}} ({{count}})",
-      "search": "Szukaj przedmiotów: {{rarity}}…",
-      "no_match": "Nic nie pasuje do „{{search}}”",
-      "back_item": "Wesprzyj {{name}}",
-      "seat": "Miejsce: {{rarity}}",
-      "replaces": "Głosuj, co zastąpi {{item}} przy zmianie skrzynki.",
-      "fills": "Głosuj, co je zajmie przy zmianie skrzynki.",
-      "title": "Teraz w skrzynce",
-      "intro": "Jeden przedmiot na rzadkość. Wybierz miejsce, a potem głosuj, co trafi tam następne.",
-      "changes_tomorrow": "zmiana jutro",
-      "changes_in": "zmiana za {{count}} dni",
-      "chosen_by": "Wybrane przez wspierających",
-      "slate_tomorrow": "nowy zestaw jutro",
-      "slate_in": "nowy zestaw za {{count}} dni",
-      "open_for": "Otwórz za {{cost}} Fame",
-      "needs": "Potrzeba {{cost}} Fame",
-      "supporters_pick": "Wspierający wybierają, co tu trafia →"
-    },
-    "work": {
-      "columns": {
-        "queue": {
-          "title": "Kolejka",
-          "blurb": "Następne, po kolei"
-        },
-        "in_progress": {
-          "title": "W trakcie",
-          "blurb": "Budowane teraz"
-        },
-        "done": {
-          "title": "Zrobione",
-          "blurb": "Wydane, od najnowszych"
-        }
+    }
+  },
+  "shop": {
+    "boards_title": "Pedalboardy",
+    "boards_body": "Inny board pod Twoimi efektami. Układ, kable i bonusy zostają dokładnie takie, jakie są.",
+    "cables_title": "Kable sygnałowe",
+    "cables_body": "Z czego zrobiony jest kabel między efektami. Kabel wpięty odwrotnie dalej robi się czerwony.",
+    "buy": "Kup",
+    "confirm": "Potwierdź",
+    "not_enough": "Za mało tokenów",
+    "owned": "Kupiony",
+    "in_use": "Na Twoim boardzie",
+    "put_on": "Załóż",
+    "take_off": "Zdejmij",
+    "load_failed": "Sklep się nie wczytał. Odśwież stronę, żeby spróbować ponownie.",
+    "toast_bought": "{{name}} jest już na Twoim boardzie",
+    "toast_buy_failed": "Nie udało się kupić tego skina",
+    "toast_wear_failed": "Nie udało się zmienić skina",
+    "cosmetics": {
+      "intro": "Wygląd Twoich wpisów w Activity. Kupujesz raz za tokeny i masz na zawsze. Widzą je wszyscy przy Twoich wpisach.",
+      "banners": "Bannery aktywności",
+      "banners_hint": "Obraz za wszystkim, co publikujesz w Activity.",
+      "avatars": "Efekty awatara",
+      "avatars_hint": "Ozdoba wokół Twojego awatara w Activity.",
+      "preview_time": "przed chwilą",
+      "preview_line": "ćwiczył(a) 25 min",
+      "bought": "{{name}} jest Twoje i założone",
+      "err_equip": "Nie udało się zmienić wyglądu",
+      "names": {
+        "banner_storm": "Burza",
+        "banner_neon": "Neon",
+        "banner_astronaut": "Astronauta",
+        "banner_mech": "Mech",
+        "banner_rider": "Jeździec",
+        "banner_wolf": "Biały wilk",
+        "banner_dragon": "Smok",
+        "banner_viking": "Wiking",
+        "banner_kraken": "Kraken",
+        "banner_angel": "Upadły anioł",
+        "banner_reaper": "Żniwiarz",
+        "banner_samurai": "Samuraj",
+        "banner_phoenix": "Feniks",
+        "avatar_fire": "Pierścień ognia",
+        "avatar_frost": "Szron",
+        "avatar_smoke": "Dym",
+        "avatar_chain": "Łańcuch",
+        "avatar_uroboros": "Uroboros",
+        "avatar_vinyl": "Winyl",
+        "avatar_horns": "Diabelskie rogi",
+        "avatar_dragon": "Smocze skrzydła",
+        "avatar_crown": "Korona",
+        "banner_holo": "Holo",
+        "banner_bokeh": "Bokeh",
+        "banner_vinyl": "Winyl",
+        "banner_led": "Spektrum",
+        "banner_halftone": "Raster",
+        "banner_dust": "Złoty pył",
+        "banner_pattern": "Wzór"
       },
-      "from_idea": "Pochodzi z pomysłu wspierającego",
-      "idea": "Pomysł wspierającego",
-      "nothing_here": "Nic tu nie ma",
-      "show_all": "Pokaż wszystkie ({{count}})",
-      "empty_body": "Tu pojawi się kolejka, gdy coś w niej będzie."
+      "owned": "Posiadane",
+      "wearing": "Założone",
+      "take_off": "Zdejmij",
+      "wear": "Załóż",
+      "confirm": "Potwierdź",
+      "not_enough": "Za mało tokenów",
+      "toast_buy_failed": "Nie udało się kupić",
+      "preview_name": "Ty"
+    },
+    "tabs": {
+      "banners": "Bannery",
+      "avatars": "Efekty awatara",
+      "boards": "Pedalboardy",
+      "cables": "Kable"
     }
   }
 }

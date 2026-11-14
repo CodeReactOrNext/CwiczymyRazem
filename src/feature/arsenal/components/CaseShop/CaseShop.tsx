@@ -32,8 +32,7 @@ interface CaseShopProps {
 
 /**
  * The shelf, read as a ladder: Standard → Premium → Elite → Vault across the top,
- * with the two cases that are not rungs of it — the supporters' slate and the
- * Parts Crate — underneath.
+ * with the one case that is not a rung of it — the Parts Crate — underneath.
  *
  * Premium, Elite and Vault each come in a guitar and a pedal version. They share
  * one card with a switch instead of taking two, so the shelf keeps one card per
@@ -46,7 +45,7 @@ const LADDER: CaseType[][] = [
   ["vault-guitar", "vault-effect"],
 ];
 
-const SIDE: CaseType[][] = [["supporter"], ["parts"]];
+const SIDE: CaseType[][] = [["parts"]];
 
 interface GroupProps {
   ids: CaseType[];

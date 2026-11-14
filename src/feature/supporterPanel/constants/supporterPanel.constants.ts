@@ -47,9 +47,6 @@ export const GEAR_PROPOSAL_COST = 8;
 export const GEAR_BACK_COST = 1;
 export const MAX_BACKING_PER_GEAR = 3;
 
-/** Backing one item for one seat of the next supporter-case slate. */
-export const SLATE_VOTE_COST = 1;
-
 /**
  * Founding a guild, and by a distance the dearest thing a supporter buys.
  *

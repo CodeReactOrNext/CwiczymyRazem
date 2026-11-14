@@ -90,7 +90,6 @@ describe("the shelf's price ladder", () => {
       "daily",
       "parts",
       "premium-guitar",
-      "supporter",
       "elite-guitar",
       "vault-guitar",
     ];
@@ -165,9 +164,9 @@ describe("pity rules", () => {
   const WITH_PITY = CASES.filter(([, def]) => def.pity);
 
   it("sits on every gear case that completes a collection, and only there", () => {
-    // Curated cases already never repeat while their pool holds something new,
-    // and the Parts Crate has no Dex.
-    for (const id of ["daily", "supporter", "parts"]) {
+    // The curated case already never repeats while its pool holds something
+    // new, and the Parts Crate has no Dex.
+    for (const id of ["daily", "parts"]) {
       expect(CASE_DEFINITIONS[id].pity, id).toBeUndefined();
     }
     for (const id of [

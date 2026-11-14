@@ -9,6 +9,8 @@ import { cn } from "assets/lib/utils";
 import { IconBox } from "components/IconBox/IconBox";
 import { resolveLiveActivity } from "components/OnlineUsers/liveActivity";
 import Avatar from "components/UI/Avatar";
+import { AvatarDecoration } from "feature/cosmetics/components/AvatarDecoration";
+import { findAvatarEffect } from "feature/cosmetics/data/cosmeticsCatalog";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
@@ -54,6 +56,11 @@ interface UserTooltipProps {
   currentActivity?: CurrentActivityInterface | null;
   /** Opens what the player is practicing right now. Without it the card only names it. */
   onOpenActivity?: (preview: ActivityPreview) => void;
+  /**
+   * Id of the avatar decoration the player wears, where the opening row already
+   * knows it (the activity feed). The card draws it round its own avatar.
+   */
+  avatarEffect?: string | null;
 }
 
 export const UserTooltip = ({
@@ -61,7 +68,9 @@ export const UserTooltip = ({
   children,
   currentActivity,
   onOpenActivity,
+  avatarEffect,
 }: UserTooltipProps) => {
+  const decoration = findAvatarEffect(avatarEffect);
   const [userData, setUserData] = useState<UserTooltipData | null>(null);
   const [reconciledStreak, setReconciledStreak] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -190,17 +199,22 @@ export const UserTooltip = ({
               )}
 
               <div className='relative z-10 flex items-center gap-8'>
-                {userData.avatar ? (
-                  <Avatar
-                    name={userData.displayName}
-                    avatarURL={userData.avatar}
-                    size='sm'
-                  />
-                ) : (
-                  <div className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-900'>
-                    {userData.displayName?.[0] ?? "?"}
-                  </div>
-                )}
+                {/* The decoration overflows the avatar, so it gets a margin to grow into. */}
+                <div className={cn("flex shrink-0", decoration && "m-3")}>
+                  <AvatarDecoration item={decoration}>
+                    {userData.avatar ? (
+                      <Avatar
+                        name={userData.displayName}
+                        avatarURL={userData.avatar}
+                        size='sm'
+                      />
+                    ) : (
+                      <div className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-900'>
+                        {userData.displayName?.[0] ?? "?"}
+                      </div>
+                    )}
+                  </AvatarDecoration>
+                </div>
                 <div className='flex flex-col items-start gap-1.5'>
                   <h3 className='flex items-center gap-2 text-base font-bold text-gray-900'>
                     {userData.displayName}

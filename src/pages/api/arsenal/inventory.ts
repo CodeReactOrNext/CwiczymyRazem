@@ -1,3 +1,4 @@
+import { readBoardSkins } from "feature/arsenal/data/boardSkins";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
 import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
@@ -128,6 +129,9 @@ export default async function handler(
       components: Array.isArray(data.arsenal.components)
         ? data.arsenal.components
         : [],
+      // Skins bought in the supporter panel. Read through the sanitiser, so
+      // the board never wears one the account does not own.
+      boardSkins: readBoardSkins(data.arsenal.boardSkins),
     };
 
     // Reconcile the denormalized rig level (backfills old accounts, self-heals

@@ -49,7 +49,7 @@ interface PlanInput<Part> {
   discoveredEffects: Set<number | string>;
   /** The case's running pity counters, or undefined for a case with none. */
   counters?: CasePityCounters;
-  /** The Featured pool or the Supporter slate. Absent for every other case. */
+  /** The Featured pool. Absent for every other case. */
   curatedPool?: readonly DailyPoolEntry[] | null;
   /** Rolls one Guitar Builder part; called only by the Parts Crate. */
   rollPart: () => Part;
