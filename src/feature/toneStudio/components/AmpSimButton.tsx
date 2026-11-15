@@ -62,21 +62,21 @@ const CHIP_ON: Record<ToneAccent, string> = {
   orange: "bg-orange-500/15 text-orange-300",
 };
 
-const POPOVER_WIDTH = 320;
+export const POPOVER_WIDTH = 320;
 const POPOVER_GAP = 8;
 const VIEWPORT_MARGIN = 12;
 /** With less room than this under the trigger, the popover opens upwards. */
 const MIN_ROOM_BELOW = 360;
 
 /** Fixed-position box for the popover, measured off its trigger. */
-interface PopoverPlacement {
+export interface PopoverPlacement {
   right: number;
   top?: number;
   bottom?: number;
   maxHeight: number;
 }
 
-function placePopover(trigger: HTMLElement): PopoverPlacement {
+export function placePopover(trigger: HTMLElement): PopoverPlacement {
   const rect = trigger.getBoundingClientRect();
   const right = Math.max(
     VIEWPORT_MARGIN,

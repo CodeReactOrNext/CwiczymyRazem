@@ -213,6 +213,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
         baseBpm={p.metronome?.bpm}
         examMode={p.isExamMode}
         showBackingInExam={p.isScaleExam}
+        takeTitle={p.currentExercise.title}
         trailing={
           <>
             {/* Waits on each note instead of keeping time; absent where the exercise has no tab. */}

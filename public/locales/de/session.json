@@ -780,5 +780,42 @@
     "busy": "Ein anderes Programm hält deinen Audioeingang.",
     "unsupported": "Dieser Browser kann kein Mikrofon nutzen.",
     "unknown": "Öffne „Eingang einrichten“, um das zu beheben."
+  },
+  "takes": {
+    "title": "Aufnahme",
+    "short": "Rec",
+    "stop": "Aufnahme stoppen",
+    "starting": "Startet…",
+    "saving": "Speichert…",
+    "mode_label": "Was aufnehmen",
+    "mode": {
+      "audio": "Audio",
+      "video": "Video"
+    },
+    "about": {
+      "audio": "Deine Gitarre, wie der Amp sie spielt, zusammen mit allem, was die App dazu spielt.",
+      "video": "Die Tabulatur mit deinen Punkten und der Ton von Gitarre und Begleitung."
+    },
+    "split": "Gitarre und Begleitung als getrennte Dateien",
+    "split_hint": {
+      "audio": "Zwei WAV-Dateien, die im selben Moment beginnen.",
+      "video": "Im Video bleibt nur deine Gitarre. Das Backing wird daneben als WAV gespeichert, das im selben Moment beginnt."
+    },
+    "start": "Aufnahme starten",
+    "failure": {
+      "no_board": "Ein Video braucht eine Tabulatur auf dem Bildschirm. Öffne eine Übung mit Tab oder nimm Audio auf.",
+      "failed": "Die Aufnahme konnte nicht gespeichert werden."
+    },
+    "no_guitar": "Die Gitarre wurde nicht aufgenommen. Schalte vor dem Start den Amp oder Pitch Detect ein.",
+    "trim": "Timing der Gitarre",
+    "trim_hint": "Wenn die Gitarre in deinen Aufnahmen zu früh oder zu spät zur Begleitung kommt, verschiebe sie hier.",
+    "recent": "Aufnahmen",
+    "empty": "Noch nichts aufgenommen.",
+    "open_folder": "Ordner öffnen",
+    "change_folder": "Ändern",
+    "play": "Abspielen",
+    "show_in_folder": "Im Ordner zeigen",
+    "delete": "In den Papierkorb",
+    "untitled": "Aufnahme"
   }
 }

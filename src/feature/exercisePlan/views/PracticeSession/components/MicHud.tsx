@@ -55,6 +55,8 @@ export const MicHud = ({
 
   return (
     <div
+      // Filmed above the board by a video take (feature/takes).
+      data-take-region='score'
       className={cn(
         "flex shrink-0 items-center duration-slow animate-in fade-in slide-in-from-right-4",
         full

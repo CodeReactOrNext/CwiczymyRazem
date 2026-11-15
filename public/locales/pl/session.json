@@ -875,5 +875,42 @@
     "busy": "Inny program trzyma Twoje wejście audio.",
     "unsupported": "Ta przeglądarka nie obsługuje mikrofonu.",
     "unknown": "Otwórz „Ustawienia wejścia”, żeby to naprawić."
+  },
+  "takes": {
+    "title": "Nagrywanie",
+    "short": "Rec",
+    "stop": "Zatrzymaj nagrywanie",
+    "starting": "Uruchamianie…",
+    "saving": "Zapisywanie…",
+    "mode_label": "Co nagrać",
+    "mode": {
+      "audio": "Audio",
+      "video": "Wideo"
+    },
+    "about": {
+      "audio": "Twoja gitara tak, jak gra ją wzmacniacz, razem ze wszystkim, co gra aplikacja.",
+      "video": "Tabulatura z punktami oraz dźwięk Twojej gitary i podkładu."
+    },
+    "split": "Gitara i podkład w osobnych plikach",
+    "split_hint": {
+      "audio": "Dwa pliki WAV, które zaczynają się w tym samym momencie.",
+      "video": "W wideo zostaje sama gitara. Podkład zapisuje się obok jako WAV, który zaczyna się w tym samym momencie."
+    },
+    "start": "Zacznij nagrywać",
+    "failure": {
+      "no_board": "Wideo wymaga tabulatury na ekranie. Otwórz ćwiczenie z tabulaturą albo nagraj audio.",
+      "failed": "Nie udało się zapisać nagrania."
+    },
+    "no_guitar": "Gitara się nie nagrała. Przed startem włącz wzmacniacz albo Pitch Detect.",
+    "trim": "Synchronizacja gitary",
+    "trim_hint": "Jeśli w nagraniach gitara wchodzi za wcześnie albo za późno względem podkładu, przesuń ją tutaj.",
+    "recent": "Nagrania",
+    "empty": "Nie ma jeszcze żadnych nagrań.",
+    "open_folder": "Otwórz folder",
+    "change_folder": "Zmień",
+    "play": "Odtwórz",
+    "show_in_folder": "Pokaż w folderze",
+    "delete": "Przenieś do kosza",
+    "untitled": "Nagranie"
   }
 }

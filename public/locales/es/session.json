@@ -780,5 +780,42 @@
     "busy": "Otro programa está usando tu entrada de audio.",
     "unsupported": "Este navegador no puede usar el micrófono.",
     "unknown": "Abre «Configurar entrada» para arreglarlo."
+  },
+  "takes": {
+    "title": "Grabar",
+    "short": "Rec",
+    "stop": "Detener la grabación",
+    "starting": "Iniciando…",
+    "saving": "Guardando…",
+    "mode_label": "Qué grabar",
+    "mode": {
+      "audio": "Audio",
+      "video": "Vídeo"
+    },
+    "about": {
+      "audio": "Tu guitarra tal como la toca el ampli, junto con todo lo que suena en la app.",
+      "video": "La tablatura con tu puntuación y el sonido de tu guitarra y la base."
+    },
+    "split": "Guitarra y base en archivos separados",
+    "split_hint": {
+      "audio": "Dos archivos WAV que empiezan en el mismo momento.",
+      "video": "En el vídeo queda solo tu guitarra. El acompañamiento se guarda al lado como un WAV que empieza en el mismo momento."
+    },
+    "start": "Empezar a grabar",
+    "failure": {
+      "no_board": "Un vídeo necesita una tablatura en pantalla. Abre un ejercicio con tablatura o graba audio.",
+      "failed": "No se pudo guardar la grabación."
+    },
+    "no_guitar": "La guitarra no se grabó. Enciende el ampli o Pitch Detect antes de empezar.",
+    "trim": "Sincronía de la guitarra",
+    "trim_hint": "Si en tus grabaciones la guitarra entra antes o después que la base, muévela aquí.",
+    "recent": "Grabaciones",
+    "empty": "Aún no hay grabaciones.",
+    "open_folder": "Abrir carpeta",
+    "change_folder": "Cambiar",
+    "play": "Reproducir",
+    "show_in_folder": "Mostrar en la carpeta",
+    "delete": "Mover a la papelera",
+    "untitled": "Grabación"
   }
 }

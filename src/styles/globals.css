@@ -58,6 +58,13 @@ body:has([data-desktop-session]) [data-mobile-bottom-nav] {
   display: none;
 }
 
+/* A video take (feature/takes, desktop app) films the tablature straight off
+   the window, so the controls that sit on the board step out of the picture
+   while it runs. `visibility` keeps the layout exactly where it was. */
+html[data-take-recording="video"] [data-take-hide] {
+  visibility: hidden;
+}
+
 /* The song session on a phone has its own bottom bar (session time + Finish);
    the tab bar under it only invited leaving mid-practice. */
 body:has([data-song-session]) [data-mobile-bottom-nav] {

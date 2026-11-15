@@ -36,6 +36,7 @@ let meterListener = null;
 let connectionListener = null;
 let devicesChangedListener = null;
 let vstListener = null;
+let takeListener = null;
 // Whether a consumer is (as far as the host knows) attached — used to decide
 // if an unexpected process exit should surface to the user as a lost stream.
 let captureAttached = false;
@@ -58,6 +59,7 @@ function handleEvent(name, payload) {
     case "connection-issue": safeCall(connectionListener, payload); break;
     case "devices-changed": safeCall(devicesChangedListener); break;
     case "vst": safeCall(vstListener, payload); break;
+    case "take": safeCall(takeListener, payload); break;
     case "error": console.error("[audio] engine process error:", payload && payload.message); break;
     default: break;
   }
@@ -188,6 +190,27 @@ function recoverAfterResume() {
   return call("recoverAfterResume").catch(() => {});
 }
 
+/** Take recording: `onChunk` gets the guitar in stereo batches (see
+ *  takeBatcher.js) until takeStop. Resolves what is being recorded — { sampleRate,
+ *  wet, inputLatencyMs } — or null while no stream is open. */
+async function takeStart(onChunk) {
+  takeListener = onChunk;
+  try {
+    return await call("takeStart");
+  } catch (err) {
+    takeListener = null;
+    throw err;
+  }
+}
+
+/** Resolves once the last batch has been handed over. */
+async function takeStop() {
+  if (child) {
+    try { await call("takeStop"); } catch { /* process gone — nothing more is coming */ }
+  }
+  takeListener = null;
+}
+
 /** VST rack (electron/vst/vstRack.js) — lives in the engine process, so these
  *  spawn it if needed: building a rack works before the amp is ever turned on.
  *  Each resolves with the rack's new status. */
@@ -231,4 +254,5 @@ module.exports = {
   attachAmp, updateAmpParams, detachAmp, getAmpStatus, getDiagnostics,
   onOverload, onMeter, onConnectionIssue, onDevicesChanged, recoverAfterResume,
   rackCall, onVstEvent,
+  takeStart, takeStop,
 };

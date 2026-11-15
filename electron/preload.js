@@ -223,6 +223,51 @@ contextBridge.exposeInMainWorld("backingTracks", {
   clearAssignment: (songId) => ipcRenderer.invoke("backing:clear-assignment", songId),
 });
 
+// Takes: recordings of the player's own playing, saved as files in a folder on
+// this computer (see electron/takeRecorder.js; feature/takes on the renderer
+// side). The guitar is recorded by the shell straight from the audio engine;
+// the window supplies what the page plays and, for a video, the picture.
+contextBridge.exposeInMainWorld("takes", {
+  isAvailable: true,
+
+  /** Starts a take. opts: { mode: "audio" | "video", title?, split?, container? }.
+   *  Resolves { mode, baseName, folder, guitar } — guitar is { sampleRate, wet,
+   *  inputLatencyMs } or null while no audio stream is open. */
+  start: (opts) => ipcRenderer.invoke("takes:start", opts),
+  /** Audio take: the next piece of the page's own playback — interleaved stereo
+   *  FLOAT32 as a Uint8Array. */
+  pushBacking: (bytes) => ipcRenderer.send("takes:backing", bytes),
+  /** Video take: the next piece of the encoded file, in order. */
+  pushVideo: (bytes) => ipcRenderer.send("takes:video", bytes),
+  /** Video take: the guitar, for the window to mix in. The callback gets
+   *  interleaved stereo FLOAT32 as a Uint8Array, its sample rate, and the
+   *  wall-clock moment (Date.now()) its last sample reached the engine.
+   *  Returns an unsubscribe fn. */
+  onGuitar: (cb) => {
+    const listener = (_event, pcm, sampleRate, endWallMs) => cb(pcm, sampleRate, endWallMs);
+    ipcRenderer.on("takes:guitar", listener);
+    return () => ipcRenderer.removeListener("takes:guitar", listener);
+  },
+  /** Ends the take. opts: { discard?, backingStartMs?, backingSampleRate?,
+   *  guitarTrimMs? }. Resolves the saved take, or null when it was discarded or
+   *  recorded nothing. */
+  finish: (opts) => ipcRenderer.invoke("takes:finish", opts),
+
+  /** [{ id, title, createdAt, kind, durationSec, files: [{ name, role, bytes }] }], newest first. */
+  list: () => ipcRenderer.invoke("takes:list"),
+  getFolder: () => ipcRenderer.invoke("takes:get-folder"),
+  /** Native folder picker; resolves the new folder, or null if cancelled. */
+  chooseFolder: () => ipcRenderer.invoke("takes:choose-folder"),
+  /** Opens the takes folder in the file manager. */
+  openFolder: () => ipcRenderer.invoke("takes:open-folder"),
+  /** Shows one file in the file manager. */
+  reveal: (fileName) => ipcRenderer.invoke("takes:reveal", fileName),
+  /** Opens one file in the system's player. */
+  open: (fileName) => ipcRenderer.invoke("takes:open", fileName),
+  /** Moves a take's files to the recycle bin; resolves the new list. */
+  remove: (takeId) => ipcRenderer.invoke("takes:delete", takeId),
+});
+
 // Guitar Pro library kept on this computer instead of Firebase Storage, so the
 // web build's 1.5 MB / 50 file caps don't apply (see feature/songs/services/
 // userGpFiles.service on the renderer side). Files saved here never sync.

@@ -13,6 +13,7 @@ const os = require("os");
 
 const { createRpcServer } = require("./workerRpc");
 const { createFrameBatcher } = require("./frameBatcher");
+const { createTakeBatcher } = require("./takeBatcher");
 const toneStore = require("./toneStore");
 const vstStore = require("./vst/vstStore");
 const vstRack = require("./vst/vstRack");
@@ -40,6 +41,7 @@ function raisePriority() {
 
 let rpc;
 const captureBatcher = createFrameBatcher((buf) => rpc.emit("frame", buf));
+const takeBatcher = createTakeBatcher((chunk) => rpc.emit("take", chunk));
 const handlers = {
   init({ userDataDir }) {
     if (!userDataDir) throw new Error("init: userDataDir is required");
@@ -99,6 +101,22 @@ const handlers = {
 
   recoverAfterResume() {
     requireEngine().recoverAfterResume();
+  },
+
+  // Take recording (electron/takeRecorder.js): from here on the guitar — after
+  // the amp when it is on — leaves as "take" events, until takeStop. Resolves
+  // what is being recorded right now, or null while no stream is open (a take
+  // can start first; the guitar joins when the stream does).
+  takeStart() {
+    const e = requireEngine();
+    takeBatcher.reset();
+    e.setTakeTap(takeBatcher.push);
+    return e.getTakeSource();
+  },
+  takeStop() {
+    if (engine) engine.setTakeTap(null);
+    takeBatcher.flush();
+    return true;
   },
 
   // VST rack (electron/vst/vstRack.js). Every edit resolves with the new rack status.

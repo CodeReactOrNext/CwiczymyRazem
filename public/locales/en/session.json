@@ -869,5 +869,42 @@
     "busy": "Another program is holding your audio input.",
     "unsupported": "This browser can't use a microphone.",
     "unknown": "Open Input setup to fix it."
+  },
+  "takes": {
+    "title": "Record",
+    "short": "Rec",
+    "stop": "Stop recording",
+    "starting": "Starting…",
+    "saving": "Saving…",
+    "mode_label": "What to record",
+    "mode": {
+      "audio": "Audio",
+      "video": "Video"
+    },
+    "about": {
+      "audio": "Your guitar as the amp plays it, together with everything the app plays along.",
+      "video": "The tablature with your score, and the sound of your guitar and the backing."
+    },
+    "split": "Guitar and backing as separate files",
+    "split_hint": {
+      "audio": "Two WAV files that start at the same moment.",
+      "video": "The video keeps your guitar. The backing is saved beside it as a WAV that starts at the same moment."
+    },
+    "start": "Start recording",
+    "failure": {
+      "no_board": "A video needs a tablature on screen. Open an exercise with a tab, or record audio instead.",
+      "failed": "The recording could not be saved."
+    },
+    "no_guitar": "The guitar was not recorded. Turn on the amp or Pitch Detect before you start.",
+    "trim": "Guitar timing",
+    "trim_hint": "If the guitar lands early or late against the backing in your recordings, move it here.",
+    "recent": "Recordings",
+    "empty": "Nothing recorded yet.",
+    "open_folder": "Open folder",
+    "change_folder": "Change",
+    "play": "Play",
+    "show_in_folder": "Show in folder",
+    "delete": "Move to the recycle bin",
+    "untitled": "Recording"
   }
 }

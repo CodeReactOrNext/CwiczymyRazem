@@ -127,6 +127,7 @@ export function TablatureResizeHandle({ height, onChange, onReset, className }: 
   return (
     <div
       role="separator"
+      data-take-hide
       aria-orientation="horizontal"
       aria-label={t("tab.resize_height")}
       title={t("tab.drag_resize")}

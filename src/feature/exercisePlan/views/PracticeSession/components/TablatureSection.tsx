@@ -613,7 +613,8 @@ export const TablatureSection = memo(function TablatureSection({
               boardHeight={height}
             />
           )}
-          <div ref={boardRef} className='relative min-w-0 flex-1'>
+          {/* What a video take films (feature/takes): the board, without the controls on it. */}
+          <div ref={boardRef} data-take-region='board' className='relative min-w-0 flex-1'>
             {tabOverlay}
             <TablatureViewer
               measures={activeTablature}
@@ -656,7 +657,7 @@ export const TablatureSection = memo(function TablatureSection({
               palette={palette}
               isLightBoard={isLightBoard}
             />
-            <div className='absolute bottom-3 right-3 z-20 flex items-center gap-2'>
+            <div data-take-hide className='absolute bottom-3 right-3 z-20 flex items-center gap-2'>
               <TablatureSettingsButton onOpen={() => setIsSettingsOpen(true)} />
               <TablatureZoomControl
                 zoom={zoom}

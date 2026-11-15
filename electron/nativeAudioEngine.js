@@ -639,6 +639,39 @@ function onFrameOutput() {
   if (DEBUG_TIMING) debugOnFrameOutput();
 }
 
+// ── Take recording tap (electron/takeRecorder.js) ───────────────────────────
+// What the player's guitar sounds like, handed out block by block while a take
+// is being recorded: the amp's output (after the VST rack / built-in chain,
+// Master and the limiter — exactly what goes to the interface) when the amp is
+// on, the raw input otherwise. Null when nothing records, which is the only
+// cost a session that isn't recording pays: one comparison a block.
+//
+// tap(left, right|null, frames, sampleRate, wet, arrivedAtMs) — the buffers are
+// the engine's own and are reused on the next block, so the tap must copy.
+let takeTap = null;
+
+function setTakeTap(fn) {
+  takeTap = typeof fn === "function" ? fn : null;
+}
+
+/** What a take would record right now, or null when no stream is open. */
+function getTakeSource() {
+  if (!openShape) return null;
+  return {
+    sampleRate: openShape.sampleRate,
+    wet: !!(openShape.duplex && ampConsumer && ampChain),
+    // The driver's own latency, split evenly when the figure covers both
+    // directions of a duplex stream — how long before a block arrives the
+    // string was actually played.
+    inputLatencyMs:
+      ((openShape.streamLatencyFrames || 0) / (openShape.duplex ? 2 : 1) / openShape.sampleRate) * 1000,
+  };
+}
+
+function runTakeTap(left, right, n, wet) {
+  try { takeTap(left, right, n, openShape.sampleRate, wet, Date.now()); } catch { /* a recorder bug must not reach the audio */ }
+}
+
 /** Shared input callback for the one open stream — forwards to capture, runs the amp
  *  DSP chain and writes output (or silence, if amp isn't attached but the stream is
  *  duplex anyway) when duplex. Reads live module state on every call so attach/detach
@@ -669,9 +702,9 @@ function onInputBlock(inputBuffer) {
   }
   const tCapture = process.hrtime.bigint();
 
-  if (!openShape || !openShape.duplex) return;
+  if (!openShape) return;
+  if (!openShape.duplex && !takeTap) return;
 
-  const rt = shared.getRt();
   const n = Math.floor(inputBuffer.byteLength / 4);
   let inF;
   if (inputBuffer.byteOffset % 4 === 0) {
@@ -679,6 +712,14 @@ function onInputBlock(inputBuffer) {
   } else {
     const c = Buffer.from(inputBuffer); inF = new Float32Array(c.buffer, c.byteOffset, n);
   }
+
+  if (!openShape.duplex) {
+    // Capture on its own: no amp, so the take gets the guitar as it came in.
+    runTakeTap(inF, null, n, false);
+    return;
+  }
+
+  const rt = shared.getRt();
 
   const outChannels = openShape.outChannels;
   const { out, outBytes } = getOutBuffer(n, outChannels); // .out zero-filled = silence by default
@@ -690,6 +731,7 @@ function onInputBlock(inputBuffer) {
       activeChain.processBlock(inF, mono, n);
       if (meterListener) accumulateMeter(inF, mono, n);
       out.set(mono.subarray(0, n));
+      if (takeTap) runTakeTap(mono, null, n, true);
     } else {
       // Left on even outputs, right on odd ones: identical for every mono
       // path, apart only when a hosted plugin produces real stereo.
@@ -701,7 +743,11 @@ function onInputBlock(inputBuffer) {
         const r = right[i];
         for (let ch = 0; ch < outChannels; ch++) out[i * outChannels + ch] = ch % 2 === 0 ? l : r;
       }
+      if (takeTap) runTakeTap(mono, right, n, true);
     }
+  } else if (takeTap) {
+    // Duplex stream with the amp off (it is closing, or only capture is left).
+    runTakeTap(inF, null, n, false);
   }
   const tDsp = process.hrtime.bigint();
 
@@ -973,4 +1019,5 @@ module.exports = {
   attachAmp, updateAmpParams, detachAmp, getAmpStatus, getDiagnostics, warmUp,
   onOverload, onMeter,
   onConnectionIssue, onDevicesChanged, recoverAfterResume,
+  setTakeTap, getTakeSource,
 };

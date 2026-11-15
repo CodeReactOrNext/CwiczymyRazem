@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
+import { TakeRecorderButton } from "feature/takes/components/TakeRecorderButton";
 import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import { TunerDialog } from "feature/tuner/components/TunerDialog";
 import { TuningForkIcon } from "feature/tuner/components/TuningForkIcon";
@@ -70,6 +71,8 @@ interface MediaControlsToolbarProps {
   examMode?: boolean;
   /** Keep the backing-track (guitar) toggle available even in exam mode (e.g. scale exams). */
   showBackingInExam?: boolean;
+  /** What is being played — names the files a recorded take is saved as (desktop). */
+  takeTitle?: string;
 }
 
 export const MediaControlsToolbar = memo(function MediaControlsToolbar({
@@ -102,6 +105,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   trailing,
   examMode = false,
   showBackingInExam = false,
+  takeTitle,
 }: MediaControlsToolbarProps) {
   const { t } = useTranslation("session");
   const [isTunerOpen, setIsTunerOpen] = useState(false);
@@ -666,6 +670,9 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
           {/* Electron-only amp simulator (renders nothing on web) */}
           <AmpSimButton h={h} />
+
+          {/* Electron-only take recorder (renders nothing on web) */}
+          <TakeRecorderButton h={h} compact={compact} title={takeTitle} />
         </div>
       )}
 

@@ -29,6 +29,7 @@ const toneStore = require("./toneStore");
 const vstScanner = require("./vst/vstScanner");
 const backingTrackStore = require("./backingTrackStore");
 const gpFileStore = require("./gpFileStore");
+const { createTakeRecorder } = require("./takeRecorder");
 const { requireMicrophoneAccess } = require("./macPermissions");
 const desktopAuth = require("./desktopAuth");
 
@@ -301,6 +302,11 @@ function createWindow() {
     }
     offlineShown = false;
     stopKeepAwake();
+    // A take the window was recording keeps what it has (its sources are no
+    // longer coming) rather than being lost with the window.
+    if (takeRecorder && takeRecorder.isActive()) {
+      finishTake({}).catch((err) => console.warn("[takes] could not save the take:", err && err.message));
+    }
     captureDsp.stop();
     audioBridge.stop();
     ampSim.stop();
@@ -649,6 +655,86 @@ ipcMain.handle("backing:save-assignment", (_e, songId, patch) =>
   backingTrackStore.saveAssignment(songId, patch),
 );
 ipcMain.handle("backing:clear-assignment", (_e, songId) => backingTrackStore.clearAssignment(songId));
+
+// ── Takes: recording the player's own playing (takeRecorder.js) ─────────────
+// The guitar comes from the audio engine, the backing and the video from the
+// window. An audio take's sources are written down here and put together when
+// it ends; a video take's guitar is passed on to the window, which mixes it
+// into the file its encoder writes.
+let takeRecorder = null;
+function takes() {
+  if (!takeRecorder) {
+    takeRecorder = createTakeRecorder({
+      settingsPath: path.join(app.getPath("userData"), "takes.json"),
+      tempDir: path.join(app.getPath("userData"), "takes-tmp"),
+      defaultFolder: path.join(app.getPath("music"), "riff.quest"),
+    });
+  }
+  return takeRecorder;
+}
+
+/** Ends whatever take is running and keeps what it recorded. */
+async function finishTake(opts) {
+  await audioEngine.takeStop();
+  return takes().finish(opts);
+}
+
+ipcMain.handle("takes:start", async (_e, opts) => {
+  const recorder = takes();
+  if (recorder.isActive()) await finishTake({ discard: true });
+  const started = recorder.begin(opts);
+  let guitar = null;
+  try {
+    guitar = await audioEngine.takeStart((chunk) => {
+      if (started.mode === "video") sendToWindow("takes:guitar", chunk.pcm, chunk.sampleRate, chunk.endWallMs);
+      else recorder.pushGuitar(chunk);
+    });
+  } catch (err) {
+    // No engine, no guitar — the take still records what the page plays.
+    console.warn("[takes] guitar is not being recorded:", err && err.message);
+  }
+  recorder.setGuitarSource(guitar);
+  return { ...started, guitar };
+});
+ipcMain.on("takes:backing", (_e, bytes) => {
+  if (takeRecorder) takeRecorder.pushBacking(bytes);
+});
+ipcMain.on("takes:video", (_e, bytes) => {
+  if (takeRecorder) takeRecorder.pushVideo(bytes);
+});
+ipcMain.handle("takes:finish", (_e, opts) => finishTake(opts || {}));
+ipcMain.handle("takes:list", () => takes().list());
+ipcMain.handle("takes:get-folder", () => takes().getFolder());
+ipcMain.handle("takes:choose-folder", async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: "Choose where recordings are saved",
+    defaultPath: takes().ensureFolder(),
+    properties: ["openDirectory", "createDirectory"],
+  });
+  if (result.canceled || result.filePaths.length === 0) return null;
+  return takes().setFolder(result.filePaths[0]);
+});
+ipcMain.handle("takes:open-folder", async () => {
+  await shell.openPath(takes().ensureFolder());
+  return true;
+});
+ipcMain.handle("takes:reveal", (_e, fileName) => {
+  const filePath = takes().resolveFile(fileName);
+  if (filePath) shell.showItemInFolder(filePath);
+  return !!filePath;
+});
+ipcMain.handle("takes:open", async (_e, fileName) => {
+  const filePath = takes().resolveFile(fileName);
+  if (filePath) await shell.openPath(filePath);
+  return !!filePath;
+});
+// To the recycle bin rather than gone: a take cannot be played again.
+ipcMain.handle("takes:delete", async (_e, takeId) => {
+  for (const filePath of takes().filesOf(takeId)) {
+    try { await shell.trashItem(filePath); } catch { /* in use or already gone */ }
+  }
+  return takes().list();
+});
 
 // ── Guitar Pro library (local, no size/count cap — see gpFileStore.js) ───────
 ipcMain.handle("gp:list-files", () => gpFileStore.listFiles());

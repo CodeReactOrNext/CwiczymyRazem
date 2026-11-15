@@ -78,7 +78,9 @@ function SectionLabel({ section }: { section: TabSection }) {
   return (
     <>
       {isSolo(section.name) && <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-amber-400" />}
-      {section.name && <span className="max-w-[180px] truncate" title={section.name}>{section.name}</span>}
+      {/* Full name: the strip scrolls sideways, so a long marker costs nothing but
+          width. The cap only guards against a whole lyric line pasted as one. */}
+      {section.name && <span className="max-w-[360px] truncate" title={section.name}>{section.name}</span>}
       <span className="font-medium tabular-nums text-zinc-400">{sectionBarRange(section)}</span>
     </>
   );
