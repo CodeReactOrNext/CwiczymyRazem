@@ -18,9 +18,13 @@
   "category": "Kategoria",
   "all": "Wszystkie",
   "difficulty": "Trudność",
+  "instrument": "Instrument",
+  "instrument_guitar": "6 strun",
+  "instrument_seven": "7 strun",
+  "instrument_bass": "Bas",
   "count_one": "{{count}} ćwiczenie",
   "count": "Ćwiczenia: {{count}}",
-  "sorted_by_rating": "według oceny",
+  "sorted_by_plays": "najczęściej ćwiczone",
   "page_of": "strona {{page}} / {{total}}",
   "empty": "Nie ma jeszcze ćwiczeń społeczności. Opublikuj pierwsze!",
   "no_match": "Żadne ćwiczenie nie pasuje do filtrów.",
@@ -28,5 +32,7 @@
   "col_min": "Min",
   "col_rating": "Ocena",
   "previous": "Poprzednia",
-  "next": "Następna"
+  "next": "Następna",
+  "show_details": "Pokaż szczegóły: {{title}}",
+  "close": "Zamknij"
 }

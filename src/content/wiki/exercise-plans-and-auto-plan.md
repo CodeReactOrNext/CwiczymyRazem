@@ -40,7 +40,7 @@ A routine can hold songs from your library next to its exercises, so a whole ses
 
 Every exercise you create sits in one pool; a single public/private switch decides who sees it.
 
-<Checklist items="My Exercises::Everything you've written, public or private, under My Stuff|Community::Only the public ones, browsable by everyone and sorted by rating, under Practice → Exercises" />
+<Checklist items="My Exercises::Everything you've written, public or private, under My Stuff|Community::Only the public ones, browsable by everyone with the most practised first, under Practice → Exercises" />
 
 Community exercises can be rated one to five stars. Sharing pays a little too: a "thanks" from another player pays you **+5 Fame**, and the first time somebody other than you completes your exercise pays **+1 Fame**. Playing your own exercise doesn't count towards its play count.
 

@@ -18,9 +18,13 @@
   "category": "Category",
   "all": "All",
   "difficulty": "Difficulty",
+  "instrument": "Instrument",
+  "instrument_guitar": "6-string",
+  "instrument_seven": "7-string",
+  "instrument_bass": "Bass",
   "count_one": "{{count}} exercise",
   "count": "{{count}} exercises",
-  "sorted_by_rating": "sorted by rating",
+  "sorted_by_plays": "most practised first",
   "page_of": "page {{page}} / {{total}}",
   "empty": "No community exercises yet. Be the first to publish one!",
   "no_match": "No exercises match the current filters.",
@@ -28,5 +32,7 @@
   "col_min": "Min",
   "col_rating": "Rating",
   "previous": "Previous",
-  "next": "Next"
+  "next": "Next",
+  "show_details": "Show details: {{title}}",
+  "close": "Close"
 }

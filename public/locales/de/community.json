@@ -18,9 +18,13 @@
   "category": "Kategorie",
   "all": "Alle",
   "difficulty": "Schwierigkeit",
+  "instrument": "Instrument",
+  "instrument_guitar": "6-saitig",
+  "instrument_seven": "7-saitig",
+  "instrument_bass": "Bass",
   "count_one": "{{count}} Übung",
   "count": "{{count}} Übungen",
-  "sorted_by_rating": "nach Bewertung sortiert",
+  "sorted_by_plays": "am häufigsten geübt zuerst",
   "page_of": "Seite {{page}} / {{total}}",
   "empty": "Noch keine Community-Übungen. Veröffentliche als Erster eine!",
   "no_match": "Keine Übung passt zu den aktuellen Filtern.",
@@ -28,5 +32,7 @@
   "col_min": "Min",
   "col_rating": "Bewertung",
   "previous": "Zurück",
-  "next": "Weiter"
+  "next": "Weiter",
+  "show_details": "Details anzeigen: {{title}}",
+  "close": "Schließen"
 }

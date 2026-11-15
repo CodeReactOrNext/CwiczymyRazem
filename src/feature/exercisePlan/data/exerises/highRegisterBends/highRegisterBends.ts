@@ -14,7 +14,7 @@ export const highRegisterBendsExercise: Exercise = {
   category: "technique",
   // A bending drill: scored on how close each bend gets to its pitch.
   scoringFocus: "pitch",
-  timeInMinutes: 5,
+  timeInMinutes: 1.5,
   instructions: [
     "Brace your bending finger with your middle and index fingers for maximum leverage.",
     "Push the string upward, keeping your knuckles curved to prevent the string from slipping."

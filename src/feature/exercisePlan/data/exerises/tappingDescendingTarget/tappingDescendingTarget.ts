@@ -26,7 +26,7 @@ export const tappingDescendingTargetExercise: Exercise = {
   whyItMatters: "Descending tapping sequences can easily become muddy if the tapped finger doesn't pull off cleanly. This drill trains your tapping finger to pull slightly downward, ensuring a crisp, high-volume note trigger.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 2,
   instructions: [
     "Tap the target note with high velocity, hitting exactly in the middle of the fret.",
     "Pull the tapped finger slightly downward to execute a clean, loud pull-off."
