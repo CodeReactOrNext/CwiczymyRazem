@@ -172,6 +172,8 @@
     "fullscreen_install_hint": "Dodaj riff.quest do ekranu początkowego — tam tabulatura zajmie cały ekran, bez paska przeglądarki.",
     "remove_loop": "Usuń pętlę",
     "clear_loop": "Wyczyść pętlę",
+    "loop_section": "Zapętl sekcję",
+    "loop_section_hint": "Zapętl sekcję, w której jesteś",
     "calibrate_hint": "Zmierz opóźnienie dźwięku, żeby oceny timingu zgadzały się z tym, co słyszysz",
     "minimap_hint": "Kliknij takt, by przeskoczyć · przeciągnij po taktach, by zapętlić",
     "settings_description": "Dostosuj wygląd tabulatury. Zmiany działają od razu i są zapamiętywane na tym urządzeniu.",

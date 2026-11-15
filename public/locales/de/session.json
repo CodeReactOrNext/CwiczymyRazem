@@ -172,6 +172,8 @@
     "fullscreen_install_hint": "Füge riff.quest zum Home-Bildschirm hinzu — dort füllt die Tabulatur den ganzen Bildschirm, ohne Browserleiste.",
     "remove_loop": "Loop entfernen",
     "clear_loop": "Loop löschen",
+    "loop_section": "Abschnitt loopen",
+    "loop_section_hint": "Den aktuellen Abschnitt loopen",
     "calibrate_hint": "Miss deine Audio-Verzögerung, damit die Timing-Bewertung zu dem passt, was du hörst",
     "minimap_hint": "Takt anklicken zum Springen · über Takte ziehen zum Loopen",
     "settings_description": "Passe das Aussehen der Tabulatur an. Änderungen greifen sofort und werden auf diesem Gerät gespeichert.",

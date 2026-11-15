@@ -3,7 +3,7 @@ import { cn } from "assets/lib/utils";
 import { BackingTrackButton } from "feature/backingTrack/components/BackingTrackButton";
 import type { BackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
 import { useTranslation } from "hooks/useTranslation";
-import { Settings2, SlidersHorizontal, Timer, X, ZoomIn, ZoomOut } from "lucide-react";
+import { Repeat, Settings2, SlidersHorizontal, Timer, X, ZoomIn, ZoomOut } from "lucide-react";
 import React, {
   memo,
   useCallback,
@@ -20,6 +20,7 @@ import { useSessionUI } from "../contexts/SessionUIContext";
 import { useTabOverlay } from "../contexts/TabOverlayContext";
 import { useTabPlayUntilStore } from "../hooks/tabPlayUntilStore";
 import { accuracyPerMeasure } from "../utils/measureAccuracy";
+import { buildTabSections } from "../utils/tabSections";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
 import { alphaTexStaffHeader } from "./AlphaTabScoreViewer/tablatureToAlphaTex";
 import { FingeringHand } from "./FingeringHand/FingeringHand";
@@ -437,6 +438,12 @@ export const TablatureSection = memo(function TablatureSection({
     [activeTablature, hitNotes, missedNotes, isMicEnabled],
   );
 
+  // The song's named parts (a Guitar Pro file's markers): the navigator folds
+  // every one but the section being played into a single block.
+  const sections = useMemo(() => buildTabSections(activeTablature), [activeTablature]);
+  // The section the navigator has open, so it can be looped in one press.
+  const [openSection, setOpenSection] = useState<{ startBeat: number; endBeat: number } | null>(null);
+
   // Cinema keeps the picture clear of the backing track's own chrome.
   const showBackingButton = !!backingTrackStatus && !!onOpenBackingTrack && !cinema;
 
@@ -463,6 +470,8 @@ export const TablatureSection = memo(function TablatureSection({
             isPlaying={isMetronomePlaying && countInRemaining === 0}
             paused={obscured}
             measureAccuracy={measureAccuracy}
+            sections={sections}
+            onOpenSectionChange={setOpenSection}
             onSeek={handleSeek}
             onLoopRangeChange={(s, e) => {
               setLoopStart(s);
@@ -472,7 +481,20 @@ export const TablatureSection = memo(function TablatureSection({
         )}
       </div>
       {/* Fixed slot: showing/hiding the button must not resize the strip. */}
-      <div className='flex w-[116px] shrink-0 justify-end'>
+      <div className='flex w-[132px] shrink-0 justify-end'>
+        {showMinimap && openSection && (loopStart === null || loopEnd === null) && (
+          <button
+            type='button'
+            onClick={() => {
+              setLoopStart(openSection.startBeat);
+              setLoopEnd(openSection.endBeat);
+            }}
+            title={t("tab.loop_section_hint")}
+            className={TOOL_CHIP}>
+            <Repeat className='h-3.5 w-3.5' />
+            <span>{t("tab.loop_section")}</span>
+          </button>
+        )}
         {loopStart !== null && loopEnd !== null && (
           <button
             onClick={() => {

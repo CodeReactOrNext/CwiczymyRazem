@@ -1,6 +1,10 @@
 import { PRESSABLE } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import type { TabSection } from "../utils/tabSections";
+import { sectionBarRange, sectionIndexOfBar } from "../utils/tabSections";
 
 interface TablatureMinimapBarProps {
   measureEndXs: number[];
@@ -29,6 +33,14 @@ interface TablatureMinimapBarProps {
   /** Pitch-detect accuracy per measure (0..1), same index as measureEndXs.
    *  null/undefined = not attempted yet this pass — cell stays unfilled. */
   measureAccuracy?: (number | null)[];
+  /**
+   * The song's named sections (a Guitar Pro file's markers). With them the strip
+   * shows bars only for the section the playhead is in; every other section is
+   * folded into one block that jumps to it. Absent or a single one: every bar.
+   */
+  sections?: TabSection[];
+  /** The beats of the section now opened into bars, null when there are none. */
+  onOpenSectionChange?: (range: { startBeat: number; endBeat: number } | null) => void;
   onSeek: (beat: number) => void;
   onLoopRangeChange: (start: number | null, end: number | null) => void;
 }
@@ -58,6 +70,20 @@ const accuracyFillColor = (acc: number): string => {
   return "rgba(248,113,113,0.55)"; // red-400 — D
 };
 
+/** A section whose name says it is a solo gets a dot: it is what players jump to most. */
+const isSolo = (name: string | undefined): boolean => !!name && /solo/i.test(name);
+
+/** Name and bar range of a section, the same on a folded block and over the open one. */
+function SectionLabel({ section }: { section: TabSection }) {
+  return (
+    <>
+      {isSolo(section.name) && <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-amber-400" />}
+      {section.name && <span className="max-w-[180px] truncate" title={section.name}>{section.name}</span>}
+      <span className="font-medium tabular-nums text-zinc-400">{sectionBarRange(section)}</span>
+    </>
+  );
+}
+
 type DragMode = "none" | "pending" | "creating";
 
 interface Measure { startBeat: number; endBeat: number; }
@@ -68,6 +94,11 @@ interface MeasureRange { lo: number; hi: number; }
  * scrollable strip. Click a bar to jump there; drag across bars (mouse) to set a
  * loop. Loop state is owned by the parent and drives playback restart, so the
  * loop selected here actually loops during practice.
+ *
+ * A song with named sections folds: only the section the playhead is in is laid
+ * out as bars, the others are one block each. Everything about the bars below
+ * (pointer maths, playhead, loop outline) then works on that section's bars —
+ * the "window" — and a song without sections is simply one window of all of them.
  *
  * The playhead is the one thing here that moves continuously, so it is the one
  * thing that is not React state: it is positioned by writing a transform inside
@@ -84,6 +115,8 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
   isPlaying,
   paused = false,
   measureAccuracy,
+  sections,
+  onOpenSectionChange,
   onSeek,
   onLoopRangeChange,
 }: TablatureMinimapBarProps) {
@@ -121,7 +154,6 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
   }, [measureEndXs, totalBeats]);
 
   const count = measures.length;
-  const contentWidth = PAD * 2 + count * CELL + Math.max(0, count - 1) * GAP;
 
   const getMeasureIdx = useCallback((beat: number): number => {
     for (let i = 0; i < measures.length; i++) {
@@ -130,14 +162,45 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
     return measures.length - 1;
   }, [measures]);
 
+  // Folding only helps when there is something to fold away.
+  const sectionList = sections && sections.length > 1 && count > 0 ? sections : null;
+
+  /**
+   * The section the moving playhead is in. Set from the animation loop, and only
+   * when it crosses into another section — a handful of times a song. It is
+   * stamped with the resting beat it was seen under: any seek, pause or reset
+   * moves that beat, and the stale section is ignored from then on.
+   */
+  const [liveSection, setLiveSection] = useState<{ idx: number; version: number } | null>(null);
+  const restingSection = sectionList ? sectionIndexOfBar(sectionList, getMeasureIdx(beatVersion)) : -1;
+  const openIdx = !sectionList
+    ? -1
+    : isPlaying && liveSection && liveSection.version === beatVersion && liveSection.idx < sectionList.length
+      ? liveSection.idx
+      : restingSection;
+
+  // The bars laid out as cells: the open section's, or all of them.
+  const winLo = sectionList ? Math.min(sectionList[openIdx].lo, count - 1) : 0;
+  const winHi = sectionList ? Math.min(sectionList[openIdx].hi, count - 1) : count - 1;
+  const winCount = Math.max(0, winHi - winLo + 1);
+  const contentWidth = PAD * 2 + winCount * CELL + Math.max(0, winCount - 1) * GAP;
+
+  const openStartBeat = sectionList ? measures[winLo]?.startBeat ?? null : null;
+  const openEndBeat = sectionList ? measures[winHi]?.endBeat ?? null : null;
+  useEffect(() => {
+    onOpenSectionChange?.(
+      openStartBeat !== null && openEndBeat !== null ? { startBeat: openStartBeat, endBeat: openEndBeat } : null,
+    );
+  }, [onOpenSectionChange, openStartBeat, openEndBeat]);
+
   // Screen X → measure index. The content element scrolls, so its rect already
   // accounts for the current scroll offset — no manual scrollLeft math needed.
   const clientXToIdx = useCallback((clientX: number): number => {
     const rect = contentRef.current?.getBoundingClientRect();
     if (!rect) return 0;
     const x = clientX - rect.left - PAD;
-    return Math.max(0, Math.min(count - 1, Math.floor(x / UNIT)));
-  }, [count]);
+    return winLo + Math.max(0, Math.min(winCount - 1, Math.floor(x / UNIT)));
+  }, [winLo, winCount]);
 
   // ── Pointer: click = seek, drag = loop ──────────────────────────────
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
@@ -229,6 +292,16 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
     }
 
     const idx = getMeasureIdx(beat);
+    // The playhead has just left the open section: the strip is about to be laid
+    // out again around the new one, and there is no cell here to put it on.
+    const visibility = idx < winLo || idx > winHi ? "hidden" : "visible";
+    if (cell.style.visibility !== visibility) {
+      tip.style.visibility  = visibility;
+      line.style.visibility = visibility;
+      cell.style.visibility = visibility;
+    }
+    if (visibility === "hidden") return;
+    const local = idx - winLo;
     const m = measures[idx];
     // Playhead sweeps across the active cell as the beat advances through the measure.
     const frac = m
@@ -238,7 +311,7 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
     // far less than a pixel a frame, and a write that moves it nowhere still
     // costs the page a style pass and a repaint — 165 of them a second.
     const pixel = 1 / (window.devicePixelRatio || 1);
-    const playheadX = Math.round((PAD + idx * UNIT + frac * CELL) / pixel) * pixel;
+    const playheadX = Math.round((PAD + local * UNIT + frac * CELL) / pixel) * pixel;
 
     if (playheadX !== lastPlayheadXRef.current) {
       lastPlayheadXRef.current = playheadX;
@@ -250,29 +323,34 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
 
     if (idx === lastIdxRef.current) return;
     lastIdxRef.current = idx;
-    cell.style.transform = `translate3d(${idx * UNIT}px, 0, 0)`;
+    cell.style.transform = `translate3d(${local * UNIT}px, 0, 0)`;
 
     // Follow the playhead: re-centre only once the active cell drifts near the
     // edge, so the strip stays put while the user scrolls ahead to look around.
     const el = scrollRef.current;
     if (!el || isDraggingRef.current) return;
-    const cellLeft = PAD + idx * UNIT;
+    // The bars sit after the folded blocks that precede them in the row.
+    const cellLeft = (contentRef.current?.offsetLeft ?? 0) + PAD + local * UNIT;
     const margin = CELL * 2;
     if (cellLeft < el.scrollLeft + margin || cellLeft + CELL > el.scrollLeft + el.clientWidth - margin) {
       el.scrollTo({ left: Math.max(0, cellLeft + CELL / 2 - el.clientWidth / 2), behavior: "smooth" });
     }
-  }, [count, currentBeatRef, getMeasureIdx, isPlaying, measures]);
+  }, [count, currentBeatRef, getMeasureIdx, isPlaying, measures, winLo, winHi]);
 
   // While the beat is moving, follow it. Parked — paused, or covered by the
   // alignment screen — there is nothing to follow and no loop runs at all.
   useEffect(() => {
     if (!isPlaying || paused || count === 0) return undefined;
     let rafId = requestAnimationFrame(function tick() {
+      if (sectionList) {
+        const idx = sectionIndexOfBar(sectionList, getMeasureIdx(currentBeatRef.current));
+        if (idx !== openIdx) setLiveSection({ idx, version: beatVersion });
+      }
       paint();
       rafId = requestAnimationFrame(tick);
     });
     return () => cancelAnimationFrame(rafId);
-  }, [isPlaying, paused, count, paint]);
+  }, [isPlaying, paused, count, paint, sectionList, openIdx, beatVersion, getMeasureIdx, currentBeatRef]);
 
   // Seeks, resets and pauses move the playhead with no loop running.
   useEffect(() => {
@@ -295,11 +373,13 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
   // accuracy fill is positioned inside the border, so it rises above the lip.
   const cells = useMemo(() => {
     shownRef.current = [];
-    return measures.map((_, i) => (
+    return measures.slice(winLo, winHi + 1).map((_, local) => {
+      const i = winLo + local;
+      return (
       <div
         key={i}
         className={`${PRESSABLE} absolute overflow-hidden rounded border-b-black/30 bg-zinc-800 transition-colors hover:bg-zinc-700`}
-        style={{ left: PAD + i * UNIT, top: TOP, width: CELL, height: CELL_H }}
+        style={{ left: PAD + local * UNIT, top: TOP, width: CELL, height: CELL_H }}
       >
         <div
           ref={(el) => { fillRefs.current[i] = el; }}
@@ -310,12 +390,13 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
           {i + 1}
         </div>
       </div>
-    ));
-  }, [measures]);
+      );
+    });
+  }, [measures, winLo, winHi]);
 
   useEffect(() => {
     const shown = shownRef.current;
-    for (let i = 0; i < measures.length; i++) {
+    for (let i = winLo; i <= winHi; i++) {
       const acc = measureAccuracy?.[i] ?? null;
       const fill = fillRefs.current[i];
       if (!fill || shown[i] === acc) continue;
@@ -323,20 +404,21 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
       fill.style.height = acc == null ? "0" : `${Math.round(acc * 100)}%`;
       fill.style.background = acc == null ? "" : accuracyFillColor(acc);
     }
-  }, [cells, measures, measureAccuracy]);
+  }, [cells, winLo, winHi, measureAccuracy]);
 
   if (count === 0) return null;
 
   const hasLoop = loopStart !== null && loopEnd !== null;
-  const displayRange: MeasureRange | null =
+  const fullRange: MeasureRange | null =
     draft ??
     (hasLoop ? { lo: getMeasureIdx(loopStart!), hi: getMeasureIdx(loopEnd! - 0.001) } : null);
+  // Only the part of the loop that falls on the bars laid out here can be drawn.
+  const displayRange: MeasureRange | null =
+    fullRange && fullRange.hi >= winLo && fullRange.lo <= winHi
+      ? { lo: Math.max(fullRange.lo, winLo) - winLo, hi: Math.min(fullRange.hi, winHi) - winLo }
+      : null;
 
-  return (
-    <div className="mb-6 w-full select-none">
-
-      {/* ── Scrollable strip of numbered measure cells ─────────────────── */}
-      <div ref={scrollRef} onWheel={handleWheel} className="no-scrollbar overflow-x-auto">
+  const strip = (
         <div
           ref={contentRef}
           className="relative cursor-pointer"
@@ -413,6 +495,42 @@ export const TablatureMinimapBar = memo(function TablatureMinimapBar({
               boxShadow: "0 0 8px 1px rgba(34,211,238,0.6)",
             }}
           />
+        </div>
+  );
+
+  return (
+    <div className="mb-6 w-full select-none">
+
+      {/* ── Scrollable strip: numbered measure cells, folded sections around them ── */}
+      <div ref={scrollRef} onWheel={handleWheel} className="no-scrollbar overflow-x-auto">
+        {/* Positioned, so the bars' offset inside the row can be read for scrolling. */}
+        <div className="relative flex w-max items-end gap-2">
+          {!sectionList
+            ? strip
+            : sectionList.map((section, i) =>
+                i === openIdx ? (
+                  <div key={i} className="flex flex-col gap-1 rounded-lg bg-zinc-800/40 pt-2">
+                    <div
+                      className="flex items-center gap-2 whitespace-nowrap text-xs font-semibold text-zinc-200"
+                      style={{ paddingInline: PAD }}>
+                      <SectionLabel section={section} />
+                    </div>
+                    {strip}
+                  </div>
+                ) : (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => onSeek(measures[Math.min(section.lo, count - 1)]?.startBeat ?? 0)}
+                    className={cn(
+                      PRESSABLE,
+                      "flex shrink-0 items-center gap-2 whitespace-nowrap rounded border-b-black/30 bg-zinc-800 px-3 text-xs text-zinc-200 transition-colors hover:bg-zinc-700",
+                    )}
+                    style={{ height: CELL_H, marginBottom: BOT }}>
+                    <SectionLabel section={section} />
+                  </button>
+                ),
+              )}
         </div>
       </div>
     </div>

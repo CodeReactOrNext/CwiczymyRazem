@@ -106,6 +106,23 @@ describe("parseGpFile", () => {
     expect(measures[2].tempoChange).toBe(1.5);
   });
 
+  it("marks the bar each section starts on, once per pass through it", async () => {
+    const score = scoreWithBars(4) as ReturnType<typeof scoreWithBars> & {
+      masterBars: { section?: { text: string; marker?: string } }[];
+    };
+    score.masterBars[0].section = { text: "[Intro]" };
+    score.masterBars[2].section = { text: " Solo " };
+    score.masterBars[3].section = { text: "  " };
+    loadScoreFromBytes.mockReturnValue(score);
+    // Bars 0–1 twice, 2–3, then back to the top for one more bar.
+    playedBars.current = [0, 1, 0, 1, 2, 3, 0].map((index, i) => ({ index, start: i * 3840, tempo: [[i * 3840, 100]] }));
+    const { measures } = (await parseGpFile(file())).tracks[0];
+
+    expect(measures.map((m) => m.section)).toEqual([
+      "Intro", undefined, undefined, undefined, "Solo", undefined, "Intro",
+    ]);
+  });
+
   it("fills a bar the track has no entry for with a whole rest", async () => {
     const score = scoreWithBars(3);
     score.tracks[0].staves[0].bars.splice(1, 1);

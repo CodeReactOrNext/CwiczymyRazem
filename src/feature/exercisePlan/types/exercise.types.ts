@@ -113,6 +113,9 @@ export interface TablatureMeasure {
    *  on Guitar Pro imports whose repeats were unfolded, where the bars are stored
    *  in the order they are played and so no longer line up with the page. */
   scoreBeat?: number;
+  /** A named part of the song starts on this bar ("Chorus", "Solo") — the marker
+   *  a Guitar Pro file carries. It runs until the next bar that has one. */
+  section?: string;
 }
 
 export interface ImprovPrompt {

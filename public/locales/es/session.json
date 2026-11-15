@@ -172,6 +172,8 @@
     "fullscreen_install_hint": "Añade riff.quest a la pantalla de inicio: allí la tablatura ocupa toda la pantalla, sin la barra del navegador.",
     "remove_loop": "Quitar el bucle",
     "clear_loop": "Borrar bucle",
+    "loop_section": "Repetir sección",
+    "loop_section_hint": "Repetir en bucle la sección actual",
     "calibrate_hint": "Mide el retardo de audio para que la valoración del tempo coincida con lo que oyes",
     "minimap_hint": "Haz clic en un compás para saltar · arrastra sobre compases para hacer bucle",
     "settings_description": "Personaliza cómo se ve la tablatura. Los cambios se aplican al instante y se recuerdan en este dispositivo.",

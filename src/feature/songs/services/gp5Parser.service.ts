@@ -158,6 +158,26 @@ function tempoFields(played: PlayedBar[], baseTempo: number): Pick<TablatureMeas
   });
 }
 
+/**
+ * The section that starts on each played bar, if one does. A Guitar Pro file
+ * marks them on the written bar ("Intro", "[Chorus]", "Solo"), so a repeat that
+ * goes back to a marked bar would announce the same section again: a marker is
+ * only taken when it is not the one the song is already in.
+ */
+function sectionStarts(played: PlayedBar[], masterBars: any[]): (string | undefined)[] {
+  let current = -1;
+  return played.map(bar => {
+    const marker = masterBars[bar.index]?.section;
+    const raw: unknown = marker?.text || marker?.marker;
+    if (typeof raw !== 'string') return undefined;
+    // Tabbers often write the name in brackets; the brackets add nothing here.
+    const name = raw.trim().replace(/^\[(.*)\]$/, '$1').trim();
+    if (!name || bar.index === current) return undefined;
+    current = bar.index;
+    return name;
+  });
+}
+
 /** Parse any Guitar Pro file (GP3 / GP4 / GP5 / GPX / GP7).
  *  AlphaTab auto-detects the format from the file's binary signature.
  */
@@ -185,6 +205,7 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
   const played = playbackOrder(score);
   const playedTempo = tempoFields(played, tempo);
   const masterBars: any[] = score.masterBars ?? [];
+  const playedSections = sectionStarts(played, masterBars);
   // A score with repeats or jumps is stored as it is played, so each bar also
   // says where it is written (the notation view still shows the page as written).
   const isUnfolded = played.length !== masterBars.length || played.some((bar, i) => bar.index !== i);
@@ -461,6 +482,7 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
         beats,
         timeSignature: source.timeSignature,
         ...playedTempo[i],
+        ...(playedSections[i] ? { section: playedSections[i] } : {}),
         ...(isUnfolded && typeof masterBar?.start === 'number'
           ? { scoreBeat: masterBar.start / TICKS_PER_QUARTER }
           : {}),

@@ -172,6 +172,8 @@
     "fullscreen_install_hint": "Add riff.quest to your home screen — there the tab takes the whole screen, with no browser bar.",
     "remove_loop": "Remove the loop",
     "clear_loop": "Clear loop",
+    "loop_section": "Loop section",
+    "loop_section_hint": "Loop the section you are in",
     "calibrate_hint": "Measure your audio delay, so timing grades match what you hear",
     "minimap_hint": "Click a bar to jump · drag across bars to loop",
     "settings_description": "Personalise how the tab looks. Changes apply straight away and are remembered on this device.",
