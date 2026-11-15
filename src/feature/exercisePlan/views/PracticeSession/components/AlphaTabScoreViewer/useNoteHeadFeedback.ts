@@ -42,6 +42,10 @@ export function useNoteHeadFeedback({
     if (!measures) return map;
     let cumQuarter = 0;
     measures.forEach((m, mi) => {
+      // AlphaTab's bounds are laid out as the score is written. A file whose
+      // repeats were unfolded stores its bars as they are played, and says where
+      // each one sits on the page.
+      if (m.scoreBeat !== undefined) cumQuarter = m.scoreBeat;
       m.beats.forEach((b, bi) => {
         const start = Math.round(cumQuarter * TICKS_PER_QUARTER);
         b.notes.forEach((n, ni) => map.set(`${mi}-${bi}-${ni}`, { start, fret: n.fret, string: n.string }));

@@ -1,9 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { loadScoreFromBytes } = vi.hoisted(() => ({ loadScoreFromBytes: vi.fn() }));
+const { loadScoreFromBytes, playedBars } = vi.hoisted(() => ({
+  loadScoreFromBytes: vi.fn(),
+  /** What AlphaTab's generator reports as played; null = it isn't available. */
+  playedBars: { current: null as null | { index: number; start: number; tempo?: [number, number][] }[] },
+}));
 
 vi.mock("@coderline/alphatab", () => ({
   importer: { ScoreLoader: { loadScoreFromBytes } },
+  midi: {
+    MidiFileGenerator: class {
+      tickLookup = { masterBars: [] as unknown[] };
+      generate() {
+        if (!playedBars.current) throw new Error("no generator");
+        this.tickLookup.masterBars = playedBars.current.map((bar) => ({
+          masterBar: { index: bar.index },
+          start: bar.start,
+          tempoChanges: (bar.tempo ?? []).map(([tick, tempo]) => ({ tick, tempo })),
+        }));
+      }
+    },
+  },
   Settings: class {
     importer = { encoding: "utf-8" };
   },
@@ -19,8 +36,85 @@ const scoreWithTracks = (...names: string[]) => ({
 
 const file = () => new File([new Uint8Array([1, 2, 3])], "song.gp5");
 
+/** A one-track 4/4 score at 100 BPM whose bar N holds a single whole note on fret N. */
+const scoreWithBars = (count: number, automations: Record<number, { value: number; ratioPosition: number }[]> = {}) => {
+  const masterBars = Array.from({ length: count }, (_, index) => ({
+    index,
+    start: index * 3840,
+    timeSignatureNumerator: 4,
+    timeSignatureDenominator: 4,
+    calculateDuration: () => 3840,
+    tempoAutomations: (automations[index] ?? []).map((a) => ({ type: 0, ...a })),
+  }));
+  const bars = masterBars.map((masterBar) => ({
+    masterBar,
+    voices: [{ beats: [{ displayDuration: 3840, notes: [{ fret: masterBar.index, string: 1 }] }] }],
+  }));
+  return { tempo: 100, masterBars, tracks: [{ name: "Lead", staves: [{ stringCount: 6, bars }] }] };
+};
+
+const fretsOf = (parsed: Awaited<ReturnType<typeof parseGpFile>>) =>
+  parsed.tracks[0].measures.map((m) => m.beats[0].notes[0].fret);
+
 describe("parseGpFile", () => {
-  beforeEach(() => loadScoreFromBytes.mockReset());
+  beforeEach(() => {
+    loadScoreFromBytes.mockReset();
+    playedBars.current = null;
+  });
+
+  it("lays the bars out in the order AlphaTab plays them, repeats included", async () => {
+    loadScoreFromBytes.mockReturnValue(scoreWithBars(3));
+    // Bars 0–1 repeated, then bar 2.
+    playedBars.current = [0, 1, 0, 1, 2].map((index, i) => ({ index, start: i * 3840, tempo: [[i * 3840, 100]] }));
+    const parsed = await parseGpFile(file());
+    const { measures } = parsed.tracks[0];
+
+    expect(fretsOf(parsed)).toEqual([0, 1, 0, 1, 2]);
+    // Where each one is written, for the notation view.
+    expect(measures.map((m) => m.scoreBeat)).toEqual([0, 4, 0, 4, 8]);
+    // The second pass is its own bar, not the first one again.
+    expect(measures[2].beats).not.toBe(measures[0].beats);
+    expect(measures.map((m) => m.tempoChange)).toEqual([1, undefined, undefined, undefined, undefined]);
+  });
+
+  it("carries tempo changes from inside a bar and restates the tempo after it", async () => {
+    loadScoreFromBytes.mockReturnValue(scoreWithBars(3));
+    playedBars.current = [
+      { index: 0, start: 0, tempo: [[0, 100]] },
+      { index: 1, start: 3840, tempo: [[3840, 100], [3840 + 2880, 50], [3840 + 3360, 200]] },
+      { index: 2, start: 7680, tempo: [[7680, 200]] },
+    ];
+    const { measures } = (await parseGpFile(file())).tracks[0];
+
+    expect(measures[1].tempoChange).toBeUndefined();
+    expect(measures[1].tempoShifts).toEqual([{ at: 3, ratio: 0.5 }, { at: 3.5, ratio: 2 }]);
+    expect(measures[2].tempoChange).toBe(2);
+    // Nothing was unfolded, so no bar needs to say where it is written.
+    expect(measures.every((m) => m.scoreBeat === undefined)).toBe(true);
+  });
+
+  it("reads the bars as written, with their tempo, when AlphaTab can't say how they play", async () => {
+    loadScoreFromBytes.mockReturnValue(
+      scoreWithBars(3, { 1: [{ value: 50, ratioPosition: 0.5 }, { value: 150, ratioPosition: 0.75 }] }),
+    );
+    const parsed = await parseGpFile(file());
+    const { measures } = parsed.tracks[0];
+
+    expect(fretsOf(parsed)).toEqual([0, 1, 2]);
+    expect(measures[0].tempoChange).toBe(1);
+    expect(measures[1].tempoShifts).toEqual([{ at: 2, ratio: 0.5 }, { at: 3, ratio: 1.5 }]);
+    expect(measures[2].tempoChange).toBe(1.5);
+  });
+
+  it("fills a bar the track has no entry for with a whole rest", async () => {
+    const score = scoreWithBars(3);
+    score.tracks[0].staves[0].bars.splice(1, 1);
+    loadScoreFromBytes.mockReturnValue(score);
+    const { measures } = (await parseGpFile(file())).tracks[0];
+
+    expect(measures).toHaveLength(3);
+    expect(measures[1].beats).toEqual([{ notes: [], duration: 4 }]);
+  });
 
   it("reads the file once when its names decode as UTF-8", async () => {
     loadScoreFromBytes.mockReturnValue(scoreWithTracks("Lead", "Rhythm"));

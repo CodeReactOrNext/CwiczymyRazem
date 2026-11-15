@@ -104,6 +104,15 @@ export interface TablatureMeasure {
    *  tempo changes at this measure. The cursor uses it to compute effective BPM so that
    *  playback speed-scaling (bpm / originalBpm) stays in sync with AlphaTabPlayer. */
   tempoChange?: number;
+  /** Tempo changes that land inside the measure rather than on its first beat — a
+   *  ritardando written out over one bar. `at` is in quarter notes from the bar's
+   *  start, `ratio` is relative to score.tempo like `tempoChange`. The bar after
+   *  one of these always carries its own `tempoChange`. */
+  tempoShifts?: { at: number; ratio: number }[];
+  /** Where the bar is written in the score, in quarter notes from its start. Only
+   *  on Guitar Pro imports whose repeats were unfolded, where the bars are stored
+   *  in the order they are played and so no longer line up with the page. */
+  scoreBeat?: number;
 }
 
 export interface ImprovPrompt {

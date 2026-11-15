@@ -33,6 +33,7 @@ export interface BarInfo {
   firstLoopOnly?: boolean;
   lastLoopOnly?: boolean;
   tempoChange?: number;
+  tempoShifts?: { at: number; ratio: number }[];
 }
 
 export interface TabContent {
@@ -165,6 +166,7 @@ export function extractTabContent(
       ...(measure.tempoChange !== undefined
         ? { tempoChange: measure.tempoChange }
         : {}),
+      ...(measure.tempoShifts ? { tempoShifts: measure.tempoShifts } : {}),
     });
     barStart += pos;
   });

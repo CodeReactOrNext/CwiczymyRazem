@@ -1,6 +1,7 @@
 import type { PickStroke, TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { flagCountForCode, resolveNotatedDuration, TUPLET_DENOMINATORS } from "feature/exercisePlan/utils/notatedDuration";
 
+import { buildTempoMap } from "../hooks/tempoBeatClock";
 import { STRING_COUNT, stringRow } from "./tablatureStringRows";
 
 export const STRING_SPACING = 32;
@@ -206,12 +207,8 @@ export function buildTablatureRenderData(
     renderBeats[i].prevBeamRight2 = renderBeats[i - 1].beamRight2;
   }
 
-  const tempoMap: TempoPoint[] = [];
-  let posX = 0;
-  measures.forEach(m => {
-    if (m.tempoChange !== undefined) tempoMap.push({ beatPos: posX, ratio: m.tempoChange });
-    posX += m.beats.reduce((s, b) => s + b.duration, 0);
-  });
+  // The same map the note matcher judges on, so the cursor and the scoring agree.
+  const tempoMap: TempoPoint[] = buildTempoMap(measures);
 
   return { totalBeats: currentX, renderBeats, measureEndXs, timeSigMarkers, tupletGroups, tempoMap, hasAccentedNotes: hasAccents, hasDynamics: hasDyn };
 }

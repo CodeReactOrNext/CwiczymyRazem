@@ -126,6 +126,7 @@ export function buildMeasure(
     beats,
     timeSignature: bar.timeSignature,
     ...(bar.tempoChange !== undefined ? { tempoChange: bar.tempoChange } : {}),
+    ...(bar.tempoShifts ? { tempoShifts: bar.tempoShifts } : {}),
     ...(bar.firstLoopOnly ? { firstLoopOnly: true } : {}),
     ...(bar.lastLoopOnly ? { lastLoopOnly: true } : {}),
   };

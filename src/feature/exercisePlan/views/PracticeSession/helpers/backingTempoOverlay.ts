@@ -38,14 +38,17 @@ export function withBackingTempo(
     const isNew = Math.abs(ratio - previousRatio) > RATIO_EPSILON;
 
     if (isNew) {
-      next.push({ ...measure, tempoChange: ratio });
+      const copy = { ...measure, tempoChange: ratio };
+      delete copy.tempoShifts;
+      next.push(copy);
       previousRatio = ratio;
       changed = true;
-    } else if (measure.tempoChange !== undefined) {
+    } else if (measure.tempoChange !== undefined || measure.tempoShifts !== undefined) {
       // The recording is the truth for playing along, so a tempo the file came
       // with (a GP import's own automation) is dropped rather than fighting it.
       const copy = { ...measure };
       delete copy.tempoChange;
+      delete copy.tempoShifts;
       next.push(copy);
       changed = true;
     } else {

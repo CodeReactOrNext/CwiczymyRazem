@@ -16,8 +16,17 @@ export function buildTempoMap(measures: TablatureMeasure[]): TempoPoint[] {
   const map: TempoPoint[] = [];
   let pos = 0;
   for (const m of measures) {
+    const length = m.beats.reduce((s, b) => s + b.duration, 0);
     if (m.tempoChange !== undefined) map.push({ beatPos: pos, ratio: m.tempoChange });
-    pos += m.beats.reduce((s, b) => s + b.duration, 0);
+    // Changes inside the bar. One at or past the bar's end would land after the
+    // next bar's own point and leave the map out of order, so it is left out.
+    let last = 0;
+    for (const shift of m.tempoShifts ?? []) {
+      if (shift.at <= last || shift.at >= length) continue;
+      map.push({ beatPos: pos + shift.at, ratio: shift.ratio });
+      last = shift.at;
+    }
+    pos += length;
   }
   return map;
 }

@@ -30,6 +30,25 @@ describe("buildTempoMap", () => {
       { beatPos: 8, ratio: 0.5 },
     ]);
   });
+
+  it("places tempo changes written inside a bar at their own beat", () => {
+    const slowing: TablatureMeasure = {
+      ...measure([1, 1, 1, 1]),
+      tempoShifts: [{ at: 1, ratio: 0.8 }, { at: 3.5, ratio: 0.25 }],
+    };
+    const map = buildTempoMap([measure([1, 1, 1, 1], 1), slowing, measure([1, 1, 1, 1], 1)]);
+    expect(map).toEqual([
+      { beatPos: 0, ratio: 1 },
+      { beatPos: 5, ratio: 0.8 },
+      { beatPos: 7.5, ratio: 0.25 },
+      { beatPos: 8, ratio: 1 },
+    ]);
+  });
+
+  it("leaves out a change that would fall outside its bar", () => {
+    const bar: TablatureMeasure = { ...measure([1, 1]), tempoShifts: [{ at: 0, ratio: 2 }, { at: 2, ratio: 3 }] };
+    expect(buildTempoMap([bar])).toEqual([]);
+  });
 });
 
 describe("createBeatClock", () => {

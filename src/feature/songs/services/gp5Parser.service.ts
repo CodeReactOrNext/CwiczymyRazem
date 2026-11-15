@@ -72,6 +72,92 @@ function loadScore(bytes: Uint8Array): any {
   return loader.loadScoreFromBytes(bytes, settings);
 }
 
+const TICKS_PER_QUARTER = 960;
+
+/** One bar as it comes up in playback: which written bar, and the tempo over it. */
+interface PlayedBar {
+  /** Index of the written bar (the score's master bar). */
+  index: number;
+  /** Tempo in force over the bar: `at` in quarter notes from its start, in BPM. */
+  tempo: { at: number; bpm: number }[];
+}
+
+const quartersIn = (masterBar: any): number => {
+  const ticks = typeof masterBar?.calculateDuration === 'function' ? masterBar.calculateDuration() : 0;
+  if (ticks > 0) return ticks / TICKS_PER_QUARTER;
+  return (masterBar?.timeSignatureNumerator ?? 4) * (4 / (masterBar?.timeSignatureDenominator ?? 4));
+};
+
+/** The bars as written, start to end — what is left when AlphaTab can't say how it plays them. */
+function writtenOrder(score: any): PlayedBar[] {
+  let bpm: number = score.tempo > 0 ? score.tempo : 120;
+  return (score.masterBars ?? []).map((masterBar: any, i: number): PlayedBar => {
+    const length = quartersIn(masterBar);
+    const automations: any[] = (masterBar.tempoAutomations ?? []).filter((a: any) => a.type === 0 && a.value > 0);
+    const tempo = automations.map(a => ({ at: (a.ratioPosition ?? 0) * length, bpm: a.value as number }));
+    if (tempo.length === 0 || tempo[0].at > 0) tempo.unshift({ at: 0, bpm });
+    bpm = tempo[tempo.length - 1].bpm;
+    return { index: typeof masterBar.index === 'number' ? masterBar.index : i, tempo };
+  });
+}
+
+const ignore = () => {};
+/** A MIDI handler that keeps nothing: only the generator's bar lookup is wanted. */
+const SILENT_MIDI_HANDLER = {
+  addTimeSignature: ignore, addRest: ignore, addNote: ignore, addControlChange: ignore,
+  addProgramChange: ignore, addTempo: ignore, addBend: ignore, addNoteBend: ignore,
+  finishTrack: ignore, addTickShift: ignore,
+};
+
+/**
+ * The bars in the order they sound. The audio of a Guitar Pro file is AlphaTab's
+ * own synthesizer, which plays repeats, alternate endings and D.S./coda jumps and
+ * follows every tempo change, including the ones in the middle of a bar. The tab
+ * has to be laid out the same way or it runs ahead of the music from the first
+ * repeat on — so the order is taken from the very generator the player uses.
+ */
+function playbackOrder(score: any): PlayedBar[] {
+  try {
+    const Generator = (alphaTab as any).midi?.MidiFileGenerator;
+    if (Generator) {
+      const generator = new Generator(score, null, SILENT_MIDI_HANDLER);
+      generator.generate();
+      const played: PlayedBar[] = (generator.tickLookup?.masterBars ?? []).map((lookup: any) => ({
+        index: lookup.masterBar.index,
+        tempo: (lookup.tempoChanges ?? []).map((change: any) => ({
+          at: (change.tick - lookup.start) / TICKS_PER_QUARTER,
+          bpm: change.tempo,
+        })),
+      }));
+      if (played.length > 0) return played;
+    }
+  } catch { /* fall through to the written order */ }
+  return writtenOrder(score);
+}
+
+/** The tempo fields each played bar carries, as ratios of the score's tempo. */
+function tempoFields(played: PlayedBar[], baseTempo: number): Pick<TablatureMeasure, 'tempoChange' | 'tempoShifts'>[] {
+  let running = baseTempo;
+  // The first bar always states its tempo, and so does the bar after one whose
+  // tempo moved inside it: readers that only know `tempoChange` then go wrong
+  // for that one bar at most.
+  let restate = true;
+  return played.map(bar => {
+    const points = bar.tempo.filter(p => p.bpm > 0).sort((a, b) => a.at - b.at);
+    const opening = points.filter(p => p.at <= 0).pop();
+    const inside = points.filter(p => p.at > 0);
+    const startBpm = opening ? opening.bpm : running;
+
+    const fields: Pick<TablatureMeasure, 'tempoChange' | 'tempoShifts'> = {};
+    if (restate || startBpm !== running) fields.tempoChange = startBpm / baseTempo;
+    if (inside.length > 0) fields.tempoShifts = inside.map(p => ({ at: p.at, ratio: p.bpm / baseTempo }));
+
+    restate = inside.length > 0;
+    running = inside.length > 0 ? inside[inside.length - 1].bpm : startBpm;
+    return fields;
+  });
+}
+
 /** Parse any Guitar Pro file (GP3 / GP4 / GP5 / GPX / GP7).
  *  AlphaTab auto-detects the format from the file's binary signature.
  */
@@ -94,6 +180,14 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
   }
 
   const tracks: Gp5Track[] = [];
+
+  // Worked out once for the whole score: every track plays the same bars.
+  const played = playbackOrder(score);
+  const playedTempo = tempoFields(played, tempo);
+  const masterBars: any[] = score.masterBars ?? [];
+  // A score with repeats or jumps is stored as it is played, so each bar also
+  // says where it is written (the notation view still shows the page as written).
+  const isUnfolded = played.length !== masterBars.length || played.some((bar, i) => bar.index !== i);
 
   // Count guitar tracks for auto-panning
   let guitarTrackCount = 0;
@@ -120,7 +214,11 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
       ? [...staffTuning]
       : undefined;
 
-    const measures: TablatureMeasure[] = [];
+    // The track's bars as written, by master bar index. Some GP formats (GPX/GP7)
+    // compress N consecutive whole-rest bars into a single Bar entry in staff.bars
+    // while creating N individual MasterBars, so an index can be missing here —
+    // those come out as whole rests when the bars are laid out below.
+    const written = new Map<number, Pick<TablatureMeasure, 'beats' | 'timeSignature'>>();
     let prevMasterBarIndex = -1;
 
     staff.bars.forEach((bar: any) => {
@@ -130,28 +228,16 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
         masterBar.timeSignatureDenominator
       ];
 
-      // ── Multi-measure rest gap fill ────────────────────────────────────────
-      // Some GP formats (GPX/GP7) compress N consecutive whole-rest bars into a
-      // single Bar entry in staff.bars, while creating N individual MasterBars.
-      // If masterBar.index jumps by more than 1, fill the gap with whole rests.
       const currentMasterBarIndex = typeof masterBar.index === 'number' ? masterBar.index : prevMasterBarIndex + 1;
-      const skippedBars = currentMasterBarIndex - (prevMasterBarIndex + 1);
-      if (skippedBars > 0) {
-        const gapDuration = timeSignature[0] * (4 / timeSignature[1]);
-        for (let g = 0; g < skippedBars; g++) {
-          measures.push({ beats: [{ notes: [], duration: gapDuration }], timeSignature });
-        }
-      }
       prevMasterBarIndex = currentMasterBarIndex;
 
       const beats: TablatureBeat[] = [];
 
-      // Expected measure duration in quarter notes from the time signature.
-      // Used as a fallback when the voice is missing or has no beats (e.g. completely
+      // How long AlphaTab plays the bar for, in quarter notes: the time signature
+      // (4/4 = 4, 3/4 = 3, 6/8 = 3), or what a pickup bar actually holds.
+      // Used when the voice is missing or has no beats (e.g. completely
       // empty/rest bars that AlphaTab returns with an empty beats array).
-      // Formula: numerator × (4 / denominator)  →  e.g. 4/4 = 4, 3/4 = 3, 6/8 = 3
-      const expectedMeasureDuration =
-        timeSignature[0] * (4 / timeSignature[1]);
+      const expectedMeasureDuration = quartersIn(masterBar);
 
       // Only parse the first voice (Voice 0) to avoid overlapping beats being added sequentially
       const mainVoice = bar.voices[0];
@@ -169,7 +255,6 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
           // It already includes dots, tuplets and all edge cases (DoubleWhole etc.),
           // so using it directly guarantees our cursor grid matches AlphaTab's playback grid.
           // Fallback: reconstruct from Duration enum + dots + tuplets (legacy path).
-          const TICKS_PER_QUARTER = 960;
           let durationInQuarterNotes: number;
 
           if (typeof altBeat.displayDuration === 'number' && altBeat.displayDuration > 0) {
@@ -347,19 +432,39 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
         }
       }
 
-      // ── Tempo automation ratio ────────────────────────────────────────────
-      // Store fileTempo / score.tempo so the TablatureViewer cursor can compute
-      // effectiveBpm = ratio * userBpm — matching AlphaTabPlayer's playbackSpeed.
-      const tempoAuto = (masterBar.tempoAutomations ?? []).find((a: any) => a.type === 0);
-      const tempoRatio = tempoAuto && tempo > 0
-        ? (tempoAuto.value as number) / tempo
-        : measures.length === 0 ? 1.0 : undefined; // bar 0 always seeds ratio=1.0
+      written.set(currentMasterBarIndex, { beats, timeSignature });
+    });
 
-      measures.push({
+    // ── Lay the bars out as they are played ─────────────────────────────────
+    // Tempo is stored as fileTempo / score.tempo so the TablatureViewer cursor can
+    // compute effectiveBpm = ratio * userBpm — matching AlphaTabPlayer's playbackSpeed.
+    const timesPlayed = new Map<number, number>();
+    const measures: TablatureMeasure[] = played.map((playedBar, i) => {
+      const masterBar = masterBars[playedBar.index];
+      const source = written.get(playedBar.index) ?? {
+        beats: [{ notes: [], duration: quartersIn(masterBar) }],
+        timeSignature: [
+          masterBar?.timeSignatureNumerator ?? 4,
+          masterBar?.timeSignatureDenominator ?? 4,
+        ] as [number, number],
+      };
+
+      // A bar that comes round again gets its own copy: each pass is scored and
+      // drawn as a bar of its own.
+      const occurrence = timesPlayed.get(playedBar.index) ?? 0;
+      timesPlayed.set(playedBar.index, occurrence + 1);
+      const beats = occurrence === 0
+        ? source.beats
+        : source.beats.map(beat => ({ ...beat, notes: beat.notes.map(note => ({ ...note })) }));
+
+      return {
         beats,
-        timeSignature,
-        ...(tempoRatio !== undefined ? { tempoChange: tempoRatio } : {}),
-      });
+        timeSignature: source.timeSignature,
+        ...playedTempo[i],
+        ...(isUnfolded && typeof masterBar?.start === 'number'
+          ? { scoreBeat: masterBar.start / TICKS_PER_QUARTER }
+          : {}),
+      };
     });
 
     tracks.push({
