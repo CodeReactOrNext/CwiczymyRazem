@@ -186,21 +186,25 @@ export const rateExercise = async (
 };
 
 /**
- * Increments the "played" counter on a community exercise. No-ops (and
- * doesn't count) when the author starts their own exercise, so the number
- * reflects real usage by other people rather than the author testing it.
+ * Increments the "played" counter on a community exercise when a session opens
+ * it — from the Community tab, a plan, a goal or the calendar alike, so only
+ * the doc id is known here and the author is looked up. No-ops (and doesn't
+ * count) when the author starts their own exercise, so the number reflects
+ * real usage by other people rather than the author testing it.
  */
-export const incrementExercisePlayCount = async (
+export const recordCommunityExercisePlay = async (
   exerciseId: string,
-  authorId: string,
   userId: string | null
 ): Promise<boolean> => {
-  if (!userId || userId === authorId) return true;
+  if (!userId) return false;
   try {
-    await updateDoc(doc(db, COLLECTION, exerciseId), { playCount: increment(1) });
+    const ref = doc(db, COLLECTION, exerciseId);
+    const snap = await getDoc(ref);
+    if (!snap.exists() || snap.data().authorId === userId) return false;
+    await updateDoc(ref, { playCount: increment(1) });
     return true;
   } catch (error) {
-    logger.error(error, { context: "incrementExercisePlayCount" });
+    logger.error(error, { context: "recordCommunityExercisePlay" });
     return false;
   }
 };

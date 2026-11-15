@@ -8,7 +8,6 @@ import { communityExercisesQuery } from "feature/communityExercises/hooks/commun
 import {
   getUserRatingForExercise,
   getUserThanksForExercise,
-  incrementExercisePlayCount,
   rateExercise,
   thankExercise,
 } from "feature/communityExercises/services/communityExerciseService";
@@ -827,8 +826,9 @@ export const CommunityExercisesTab = ({
   };
 
   const handleStart = (exercise: CommunityExercise) => {
+    // The session itself records the play (useCommunityPlayCount); this only
+    // keeps the number on the card in step without a refetch.
     if (userAuth && userAuth !== exercise.authorId) {
-      incrementExercisePlayCount(exercise.id, exercise.authorId, userAuth);
       setExercises((prev) =>
         prev.map((ex) =>
           ex.id === exercise.id

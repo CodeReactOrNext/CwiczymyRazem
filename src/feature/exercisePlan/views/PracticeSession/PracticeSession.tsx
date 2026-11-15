@@ -7,6 +7,7 @@ import { BackingTrackBar } from "feature/backingTrack/components/BackingTrackBar
 import { useBackingTrackSession } from "feature/backingTrack/hooks/useBackingTrackSession";
 import { barBeatsOf } from "feature/backingTrack/utils/alignment";
 import { getBackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
+import { useCommunityPlayCount } from "feature/communityExercises/hooks/useCommunityPlayCount";
 import { useLocalizedPlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { saveLastSession } from "feature/practice/utils/lastSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
@@ -270,6 +271,13 @@ const PracticeSessionInner = ({
   const userId     = useAppSelector(selectUserAuth);
   const isPremium  = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
   const planHasGpFile = !!rawGpFile || plan.exercises.some(ex => !!ex.gpFileUrl);
+  // "Practiced N times" on a community exercise counts on open, from any entry
+  // point. The Community tab hands in a DashboardExercise naming the bare doc id.
+  useCommunityPlayCount(
+    planExercise?.id,
+    userId,
+    (plan as { communityExerciseId?: string }).communityExerciseId,
+  );
 
   // Desktop-only: a downloaded update sat unapplied too long (see
   // useUpdateRequiredGate). Checked once at session start, never mid-session.
