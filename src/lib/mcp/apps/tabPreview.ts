@@ -19,41 +19,35 @@ import {
   staffLineSpacing,
   tuningGutterStrings,
 } from "feature/exercisePlan/views/PracticeSession/components/tablatureStringRows";
-import type { Instrument } from "utils/audio/tunings";
-import {
-  BASS_STANDARD_TUNING_ID,
-  BASS_TUNINGS,
-  GUITAR_TUNINGS,
-  STANDARD_TUNING_ID,
-} from "utils/audio/tunings";
 import { z } from "zod";
 
 import { READ_TOOL_ANNOTATIONS, runTool, strictInput } from "../results";
 import { checkTab, renderAsciiTab, tabSchema } from "../tablature/tabJson";
-import { formatTabIssues } from "../tablature/validateTablature";
-import { instrumentSchema } from "../tools/exercises";
+import {
+  formatTabIssues,
+  type TabInstrument,
+  tabTuning,
+} from "../tablature/validateTablature";
+import {
+  instrumentSchema,
+  resolveTabTuning,
+  tuningSchema,
+} from "../tools/exercises";
 import { ASSET_ORIGIN, TAB_PREVIEW_HTML } from "./tabPreviewHtml";
 
 const RESOURCE_URI = "ui://riff-quest/tab-preview.html";
 
-const BASS_STANDARD = BASS_TUNINGS.find(
-  (tuning) => tuning.id === BASS_STANDARD_TUNING_ID,
-)!;
-const GUITAR_STANDARD = GUITAR_TUNINGS.find(
-  (tuning) => tuning.id === STANDARD_TUNING_ID,
-)!;
-
 /**
  * The practice session's tab board as a player sees it before changing any
- * setting: the default palette, board and pills, standard tuning in the gutter.
+ * setting: the default palette, board and pills, the tab's tuning in the gutter.
  */
 export function defaultBoard(
   measures: TablatureMeasure[],
   bpm: number,
-  instrument: Instrument,
+  instrument: TabInstrument,
 ) {
   const palette = STRING_PALETTES[DEFAULT_SETTINGS.palette].colors;
-  const tuning = instrument === "bass" ? BASS_STANDARD : GUITAR_STANDARD;
+  const tuning = tabTuning(instrument);
   const style = tablatureStylePatch(
     DEFAULT_SETTINGS,
     palette,
@@ -63,7 +57,7 @@ export function defaultBoard(
     measures,
     bpm,
     palette,
-    // A bass staff spreads its four lines over the six-string height, as in the session.
+    // A bass or seven-string staff spreads its lines over the six-string height, as in the session.
     style:
       tuning.stringCount === 6
         ? style
@@ -125,23 +119,27 @@ export function registerTabPreviewApp(server: McpServer) {
       inputSchema: strictInput({
         tab: tabSchema,
         instrument: instrumentSchema,
+        tuning: tuningSchema,
         title: z.string().max(80).optional(),
         bpm: z.number().int().min(20).max(400).optional(),
       }),
       annotations: READ_TOOL_ANNOTATIONS,
       _meta: { ui: { resourceUri: RESOURCE_URI } },
     },
-    ({ tab, instrument, title, bpm }) =>
+    ({ tab, instrument, tuning: tuningId, title, bpm }) =>
       runTool("riffquest_preview_tab", async () => {
-        const kind = instrument ?? "guitar";
-        const { measures, validation: result } = checkTab(tab, kind);
+        const { instrument: kind, tuning } = resolveTabTuning(
+          instrument,
+          tuningId,
+        );
+        const { measures, validation: result } = checkTab(tab, tuning);
         const tempo = bpm ?? 90;
         let tex: string | null = null;
         try {
           tex = tablatureToAlphaTex(
             measures,
             tempo,
-            kind === "bass" ? alphaTexStaffHeader(BASS_STANDARD) : "",
+            alphaTexStaffHeader(tuning),
           );
         } catch {
           tex = null;
@@ -149,12 +147,13 @@ export function registerTabPreviewApp(server: McpServer) {
         const summary = {
           title: title ?? "Tab preview",
           instrument: kind,
+          tuning: tuning.id,
           tempo,
           measures: result.stats.measures,
           ok: result.ok,
           errors: formatTabIssues(result.errors),
           warnings: formatTabIssues(result.warnings),
-          asciiTab: renderAsciiTab(measures, kind),
+          asciiTab: renderAsciiTab(measures, tuning),
         };
         // The model reads the summary; what only the view draws from (the
         // board and the alphaTex) rides in structuredContent alone.
@@ -164,7 +163,7 @@ export function registerTabPreviewApp(server: McpServer) {
             ...summary,
             tex,
             board:
-              measures.length > 0 ? defaultBoard(measures, tempo, kind) : null,
+              measures.length > 0 ? defaultBoard(measures, tempo, tuning) : null,
           },
         };
       }),

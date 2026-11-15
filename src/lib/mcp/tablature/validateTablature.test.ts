@@ -1,5 +1,6 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { getTuningPreset, SEVEN_STRING_STANDARD_TUNING_ID } from "utils/audio/tunings";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -83,6 +84,15 @@ describe("validateTablature", () => {
       bar([quarter(0, 5), quarter(7, 5), quarter(1, 25), quarter(1, -1)]),
     ]);
     expect(result.errors).toHaveLength(4);
+  });
+
+  it("takes string 7 only in a seven-string tuning", () => {
+    const tab = [bar([quarter(7, 0), quarter(6, 0), quarter(1, 0), quarter(7, 2)])];
+    const six = validateTablature(tab);
+    expect(formatTabIssues(six.errors).join(" ")).toContain("1–6 (1 = high e, 6 = low E)");
+    expect(validateTablature(tab, getTuningPreset("seven-drop-a")).ok).toBe(true);
+    const eight = validateTablature([bar([quarter(8, 0), quarter(1, 0), quarter(1, 0), quarter(1, 0)])], getTuningPreset(SEVEN_STRING_STANDARD_TUNING_ID));
+    expect(formatTabIssues(eight.errors).join(" ")).toContain("1–7 (1 = high e, 7 = low B)");
   });
 
   it("rejects two notes on one string in a chord", () => {

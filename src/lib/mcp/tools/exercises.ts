@@ -4,7 +4,13 @@ import { communityExerciseId } from "feature/communityExercises/utils/communityT
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { FieldValue } from "firebase-admin/firestore";
-import type { Instrument } from "utils/audio/tunings";
+import type { GuitarTuningPreset, Instrument } from "utils/audio/tunings";
+import {
+  findTuningPreset,
+  getStandardTuningId,
+  getTuningPreset,
+  getTuningsFor,
+} from "utils/audio/tunings";
 import { z } from "zod";
 
 import { consumeWriteQuota, type McpContext } from "../auth";
@@ -51,7 +57,64 @@ import {
 export const instrumentSchema = z
   .enum(["guitar", "bass"])
   .optional()
-  .describe("Default guitar; bass = 4-string, standard tuning");
+  .describe("Default guitar; bass = 4-string");
+
+// A plain string, not an enum of every preset: the enum would repeat ~20 ids in
+// every tool that takes a tab, and the tool list has a size budget. The ids are
+// in the tab format guide, and an unknown one is answered with the full list.
+export const tuningSchema = z
+  .string()
+  .optional()
+  .describe(
+    "Tuning id, default standard; 7-string: seven-*. See riffquest_get_tab_format",
+  );
+
+const tuningIdsFor = (instrument: Instrument) =>
+  getTuningsFor(instrument)
+    .map((tuning) => tuning.id)
+    .join(", ");
+
+/**
+ * The instrument and tuning a tab is written for, from what the client sent:
+ * the tuning alone names its instrument; neither means standard guitar.
+ */
+export function resolveTabTuning(
+  instrument: Instrument | undefined,
+  tuningId: string | undefined,
+): { instrument: Instrument; tuning: GuitarTuningPreset } {
+  const tuning = tuningId ? findTuningPreset(tuningId) : null;
+  if (tuningId && !tuning) {
+    throw new McpToolError(
+      `Unknown tuning "${tuningId}". Guitar: ${tuningIdsFor("guitar")}. Bass: ${tuningIdsFor("bass")}.`,
+    );
+  }
+  const kind = instrument ?? tuning?.instrument ?? "guitar";
+  if (tuning && tuning.instrument !== kind) {
+    throw new McpToolError(
+      `Tuning "${tuning.id}" is for ${tuning.instrument}, not ${kind}. ${kind === "bass" ? "Bass" : "Guitar"} tunings: ${tuningIdsFor(kind)}.`,
+    );
+  }
+  return {
+    instrument: kind,
+    tuning: tuning ?? getTuningPreset(getStandardTuningId(kind)),
+  };
+}
+
+/** How a tuning is reported back: its id, name and strings, low to high. */
+const tuningOut = (tuning: GuitarTuningPreset) => ({
+  id: tuning.id,
+  name: tuning.stringCount === 7 ? `${tuning.name} (7-string)` : tuning.name,
+  strings: tuning.notation,
+});
+
+/** A saved exercise's tuning — standard when absent, unknown or for the other instrument. */
+const storedTuning = (instrument: Instrument, tuningId: unknown) => {
+  const tuning =
+    typeof tuningId === "string" ? findTuningPreset(tuningId) : null;
+  return tuning && tuning.instrument === instrument
+    ? tuning
+    : getTuningPreset(getStandardTuningId(instrument));
+};
 
 const exerciseFields = {
   title: z.string().min(3).max(80),
@@ -72,6 +135,7 @@ const exerciseFields = {
   tips: z.array(z.string().min(3).max(300)).max(6).optional(),
   tab: tabSchema,
   instrument: instrumentSchema,
+  tuning: tuningSchema,
 };
 
 type ExerciseFields = {
@@ -89,7 +153,7 @@ const editorUrl = (id: string) =>
  */
 function checkExercise(
   fields: Partial<ExerciseFields>,
-  instrument: Instrument,
+  instrument: GuitarTuningPreset,
   storedTab?: TablatureMeasure[],
 ) {
   const problems: string[] = [];
@@ -129,6 +193,7 @@ function checkExercise(
 const toStored = (
   fields: Partial<ExerciseFields>,
   measures: TablatureMeasure[] | undefined,
+  tuning: GuitarTuningPreset,
 ): Partial<CreateCommunityExerciseInput> => {
   const stored: Partial<CreateCommunityExerciseInput> = {};
   if (fields.title !== undefined) stored.title = fields.title.trim();
@@ -146,7 +211,10 @@ const toStored = (
     stored.instructions = fields.instructions.map((line) => line.trim());
   if (fields.tips !== undefined)
     stored.tips = fields.tips.map((line) => line.trim());
-  if (fields.instrument !== undefined) stored.instrument = fields.instrument;
+  if (fields.instrument !== undefined || fields.tuning !== undefined) {
+    stored.instrument = tuning.instrument;
+    stored.tuningId = tuning.id;
+  }
   if (measures !== undefined) {
     // Through JSON once: drops undefined optionals, which Firestore refuses.
     stored.tablature = JSON.parse(
@@ -157,9 +225,9 @@ const toStored = (
 };
 
 /** A tab as a client gets it back: the JSON to work with, the text tab to show. */
-const tabOut = (measures: TablatureMeasure[], instrument: Instrument) => ({
+const tabOut = (measures: TablatureMeasure[], tuning: GuitarTuningPreset) => ({
   tab: measuresToTab(measures) satisfies TabJson,
-  asciiTab: renderAsciiTab(measures, instrument),
+  asciiTab: renderAsciiTab(measures, tuning),
 });
 
 export function registerExerciseTools(server: McpServer, context: McpContext) {
@@ -211,6 +279,7 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
       inputSchema: strictInput({
         tab: tabSchema,
         instrument: instrumentSchema,
+        tuning: tuningSchema,
       }),
       outputSchema: {
         ok: z.boolean(),
@@ -225,16 +294,16 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
       },
       annotations: READ_TOOL_ANNOTATIONS,
     },
-    ({ tab, instrument }) =>
+    ({ tab, instrument, tuning: tuningId }) =>
       runTool("riffquest_validate_tablature", async () => {
-        const kind = instrument ?? "guitar";
-        const { measures, validation } = checkTab(tab, kind);
+        const { tuning } = resolveTabTuning(instrument, tuningId);
+        const { measures, validation } = checkTab(tab, tuning);
         return jsonResult({
           ok: validation.ok,
           errors: formatTabIssues(validation.errors),
           warnings: formatTabIssues(validation.warnings),
           stats: validation.stats,
-          asciiTab: renderAsciiTab(measures, kind),
+          asciiTab: renderAsciiTab(measures, tuning),
         });
       }),
   );
@@ -270,6 +339,7 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
               id,
               title: library.title,
               instrument: library.instrument ?? "guitar",
+              tuningId: library.tuningId,
               bpm: library.metronomeSpeed,
               tablature: library.tablature ?? [],
             }
@@ -277,6 +347,7 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
               id: communityExerciseId(own.id),
               title: own.data.title,
               instrument: own.data.instrument ?? "guitar",
+              tuningId: own.data.tuningId,
               bpm: own.data.metronomeSpeed,
               tablature: own.data.tablature ?? [],
             }));
@@ -291,14 +362,16 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
             `"${source.title}" has ${total} measures — fromMeasure has to be between 1 and ${total}, and not after toMeasure.`,
           );
         }
-        const { tablature, ...about } = source;
+        const { tablature, tuningId, ...about } = source;
+        const tuning = storedTuning(about.instrument, tuningId);
         return fittedResult(
           (shown) => ({
             ...about,
+            tuning: tuningOut(tuning),
             totalMeasures: total,
             fromMeasure: first,
             toMeasure: first + shown.length - 1,
-            ...tabOut(shown, about.instrument),
+            ...tabOut(shown, tuning),
           }),
           tablature.slice(first - 1, last),
           "Ask for the rest with fromMeasure set to the measure after toMeasure.",
@@ -329,6 +402,8 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
               bpm: data.metronomeSpeed ?? null,
               minutes: data.timeInMinutes,
               instrument: data.instrument ?? "guitar",
+              tuning: storedTuning(data.instrument ?? "guitar", data.tuningId)
+                .id,
               tabMeasures: data.tablature?.length ?? 0,
               isPublic: data.isPublic === true,
               createdAt: data.createdAt?.toDate?.().toISOString() ?? null,
@@ -352,12 +427,12 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
     },
     (fields) =>
       runTool("riffquest_create_exercise", async () => {
-        const instrument = fields.instrument ?? "guitar";
-        const { warnings, measures } = checkExercise(fields, instrument);
+        const { tuning } = resolveTabTuning(fields.instrument, fields.tuning);
+        const { warnings, measures } = checkExercise(fields, tuning);
         const left = await consumeWriteQuota(context, "exercise");
         const user = (await userRef(uid).get()).data();
         const ref = await exercises().add({
-          ...toStored(fields, measures),
+          ...toStored(fields, measures, tuning),
           tips: fields.tips?.map((line) => line.trim()) ?? [],
           videoUrl: null,
           imageUrl: null,
@@ -377,7 +452,8 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
           title: fields.title,
           saved: true,
           warnings,
-          asciiTab: renderAsciiTab(measures ?? [], instrument),
+          tuning: tuningOut(tuning),
+          asciiTab: renderAsciiTab(measures ?? [], tuning),
           playUrl: myExercisesUrl,
           editUrl: editorUrl(ref.id),
           usage: `Use id "${communityExerciseId(ref.id)}" in riffquest_create_practice_plan or riffquest_set_exercise_goal.`,
@@ -403,15 +479,24 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
         const own = await readOwn(id);
         if (Object.keys(fields).length === 0)
           return errorResult("Nothing to change — pass at least one field.");
-        // A switch of instrument re-checks the stored tab against the new string count.
-        const instrument: Instrument =
-          fields.instrument ?? own.data.instrument ?? "guitar";
+        // A new instrument or tuning re-checks the stored tab against its
+        // strings. A tuning alone names its instrument; a new instrument
+        // without one starts at that instrument's standard.
+        const ownInstrument: Instrument = own.data.instrument ?? "guitar";
+        const retuned =
+          fields.instrument !== undefined || fields.tuning !== undefined;
+        const tuning = retuned
+          ? resolveTabTuning(
+              fields.instrument ?? (fields.tuning ? undefined : ownInstrument),
+              fields.tuning,
+            ).tuning
+          : storedTuning(ownInstrument, own.data.tuningId);
         const { warnings, measures } = checkExercise(
           fields,
-          instrument,
-          !fields.tab && fields.instrument ? own.data.tablature : undefined,
+          tuning,
+          !fields.tab && retuned ? own.data.tablature : undefined,
         );
-        const changes = toStored(fields, measures);
+        const changes = toStored(fields, measures, tuning);
         const left = await consumeWriteQuota(context, "write");
         await own.ref.update({
           ...changes,
@@ -423,8 +508,9 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
           // The names the client sent, not the stored ones (bpm, not metronomeSpeed).
           updated: Object.keys(fields),
           warnings,
+          ...(retuned ? { tuning: tuningOut(tuning) } : {}),
           ...(measures
-            ? { asciiTab: renderAsciiTab(measures, instrument) }
+            ? { asciiTab: renderAsciiTab(measures, tuning) }
             : {}),
           playUrl: myExercisesUrl,
           editUrl: editorUrl(own.id),

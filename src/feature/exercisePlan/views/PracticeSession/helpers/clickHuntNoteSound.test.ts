@@ -36,8 +36,13 @@ describe("midiForPosition", () => {
     expect(midiForPosition(5, 12)).toBe(57); // A2 → A3
   });
 
-  it("returns -1 for a string outside 1-6", () => {
-    expect(midiForPosition(7, 3)).toBe(-1);
+  it("returns -1 for a string no guitar has", () => {
+    expect(midiForPosition(0, 3)).toBe(-1);
+    expect(midiForPosition(8, 3)).toBe(-1);
+  });
+
+  it("knows a seven-string's low B", () => {
+    expect(midiForPosition(7, 0)).toBe(35);
   });
 });
 

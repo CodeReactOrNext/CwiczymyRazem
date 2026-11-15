@@ -3,12 +3,14 @@ import type {
   TablatureMeasure,
   TablatureNote,
 } from "feature/exercisePlan/types/exercise.types";
-import type { Instrument } from "utils/audio/tunings";
+import { tabStringNames } from "utils/audio/tunings";
 import { z } from "zod";
 
 import {
   TAB_LIMITS,
+  type TabInstrument,
   type TabIssue,
+  tabTuning,
   type TabValidation,
   TUPLET_DENOMINATORS,
   validateTablature,
@@ -66,7 +68,7 @@ const timeSignature = z
 
 const noteSchema = z
   .object({
-    string: z.number().describe("1 = high e … 6 = low E; bass: 1 = G … 4 = E"),
+    string: z.number().describe("1 = high e … 6 = low E, 7 = low B on a 7-string tuning; bass: 1 = G … 4 = E"),
     fret: z.number().describe("0 = open"),
     techniques: z.array(z.enum(TECHNIQUES)).max(6).optional(),
     bend: z
@@ -208,7 +210,7 @@ export function tabToMeasures(tab: TabJson): {
 /** Maps the tab and runs every check, issues of the format first. */
 export function checkTab(
   tab: TabJson,
-  instrument: Instrument = "guitar",
+  instrument: TabInstrument = "guitar",
 ): { measures: TablatureMeasure[]; validation: TabValidation } {
   const { measures, issues } = tabToMeasures(tab);
   const validation = validateTablature(measures, instrument);
@@ -383,11 +385,6 @@ function noteText(note: TablatureNote, used: Set<Symbol>) {
   return text;
 }
 
-const STRING_NAMES: Record<Instrument, string[]> = {
-  guitar: ["e", "B", "G", "D", "A", "E"],
-  bass: ["G", "D", "A", "E"],
-};
-
 const MEASURES_PER_LINE = 4;
 
 /**
@@ -397,9 +394,12 @@ const MEASURES_PER_LINE = 4;
  */
 export function renderAsciiTab(
   measures: TablatureMeasure[],
-  instrument: Instrument = "guitar",
+  instrument: TabInstrument = "guitar",
 ): string {
-  const names = STRING_NAMES[instrument];
+  // Padded to one width, so "Eb" and "D" rows still line up.
+  const tuningNames = tabStringNames(tabTuning(instrument));
+  const nameWidth = Math.max(...tuningNames.map((name) => name.length));
+  const names = tuningNames.map((name) => name.padEnd(nameWidth));
   const used = new Set<Symbol>();
   const systems: string[] = [];
   for (let start = 0; start < measures.length; start += MEASURES_PER_LINE) {

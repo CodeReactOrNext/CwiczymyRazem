@@ -672,6 +672,8 @@
     "instrument": "Instrumento",
     "guitar": "Guitarra",
     "bass": "Bajo",
+    "strings": "Cuerdas",
+    "string_count": "{{count}} cuerdas",
     "tunings": "Afinación",
     "bass_description": "Elige cómo está afinado tu bajo — la detección de tono y el audio de acompañamiento se ajustarán a esta afinación.",
     "instrument_lock_bass": "Este ejercicio está escrito para bajo.",
@@ -679,7 +681,10 @@
     "file_tuning": "Afinación del archivo",
     "from_file": "del archivo",
     "file_description": "Esta tablatura viene de un archivo de Guitar Pro escrito en afinación {{name}}. Si toda tu guitarra está afinada más aguda o más grave, elígelo aquí: los trastes no cambian, y la detección y la reproducción siguen tu afinación.",
-    "file_description_bass": "Esta tablatura viene de un archivo de Guitar Pro escrito en afinación {{name}}. Si todo tu bajo está afinado más agudo o más grave, elígelo aquí: los trastes no cambian, y la detección y la reproducción siguen tu afinación."
+    "file_description_bass": "Esta tablatura viene de un archivo de Guitar Pro escrito en afinación {{name}}. Si todo tu bajo está afinado más agudo o más grave, elígelo aquí: los trastes no cambian, y la detección y la reproducción siguen tu afinación.",
+    "written_in": "afinación del tab",
+    "written_description": "Este tab está escrito en {{name}} ({{notation}}). Afina así para tocar los trastes tal cual — o, si toda tu guitarra está más alta o más baja, elígelo aquí y la detección y la reproducción te seguirán.",
+    "written_description_bass": "Este tab está escrito en {{name}} ({{notation}}). Afina así para tocar los trastes tal cual — o, si todo tu bajo está más alto o más bajo, elígelo aquí y la detección y la reproducción te seguirán."
   },
   "header": {
     "close_session": "Cerrar sesión de práctica",

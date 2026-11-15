@@ -220,6 +220,9 @@ export interface Exercise {
   tablature?: TablatureMeasure[];
   /** What the tablature is written for — a bass tab numbers its strings 1 (G) … 4 (E). Absent = guitar. */
   instrument?: Instrument;
+  /** The tuning preset the tablature is written in (utils/audio/tunings) — e.g. a
+   *  seven-string Drop A tab. Absent = the instrument's standard tuning. */
+  tuningId?: string;
   backingTracks?: BackingTrack[];
   gpFileUrl?: string;
   hideTablatureNotes?: boolean;

@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import type { GuitarTuningPreset, Instrument } from "utils/audio/tunings";
 import {
   FILE_TUNING_ID,
+  findTuningPreset,
   getFileTuning,
   getStandardTuningId,
   getTuningPreset,
@@ -28,6 +29,10 @@ export interface UseGuitarTuningOptions {
   fileOpenStringMidi?: readonly number[];
   /** What the player's choice for this file is remembered under — the exercise's id. */
   fileTuningKey?: string;
+  /** The tuning preset a plain tab exercise is written in (Exercise.tuningId) —
+   *  a seven-string Drop A tab, say. Treated like a Guitar Pro file's own tuning:
+   *  the frets are only true in it, or with the whole instrument shifted. */
+  contentTuningId?: string;
 }
 
 export interface GuitarTuningState {
@@ -49,8 +54,10 @@ export interface GuitarTuningState {
   tuning: GuitarTuningPreset;
   /** The user's preferred preset — shown as "selected" in the picker even while locked. */
   preferredTuning: GuitarTuningPreset;
-  /** The tuning the Guitar Pro file is written in, when it is known. */
+  /** The tuning the Guitar Pro file (or the exercise) is written in, when it is known. */
   fileTuning: GuitarTuningPreset | null;
+  /** Where fileTuning comes from — a Guitar Pro file, or the exercise saying so. */
+  fileTuningSource: "file" | "exercise" | null;
   /** Tunings the picker offers, the file's own first when no preset covers it. */
   tuningOptions: GuitarTuningPreset[];
   /** The option shown as picked. */
@@ -70,6 +77,7 @@ export interface GuitarTuningState {
 
 export function useGuitarTuning({
   isGpFile, isExamMode, contentInstrument, contentStringCount, fileOpenStringMidi, fileTuningKey,
+  contentTuningId,
 }: UseGuitarTuningOptions): GuitarTuningState {
   const { t } = useTranslation("session");
   const preferredInstrument = useInstrumentPreferenceStore((s) => s.instrument);
@@ -88,16 +96,23 @@ export function useGuitarTuning({
   const presets = useMemo(() => getTuningsFor(instrument), [instrument]);
 
   // The file's own tuning — known once the file is parsed and the track is a
-  // guitar or a bass. Exams stay on Standard whatever they are played from.
-  const fileTuning = useMemo(() => {
+  // guitar or a bass — or the one a tab exercise says it is written in.
+  // Exams stay on Standard whatever they are played from.
+  const writtenTuning = useMemo(() => {
+    const preset = !isGpFile && !isExamMode ? findTuningPreset(contentTuningId) : null;
+    return preset && preset.instrument === instrument ? preset : null;
+  }, [isGpFile, isExamMode, contentTuningId, instrument]);
+  const gpFileTuning = useMemo(() => {
     if (!isGpFile || isExamMode || !contentInstrument) return null;
     const tuning = getFileTuning(fileOpenStringMidi, contentInstrument);
     return tuning?.id === FILE_TUNING_ID ? { ...tuning, name: t("tuning_modal.file_tuning") } : tuning;
   }, [isGpFile, isExamMode, contentInstrument, fileOpenStringMidi, t]);
+  const fileTuning = gpFileTuning ?? writtenTuning;
+  const fileTuningSource = gpFileTuning ? "file" : writtenTuning ? "exercise" : null;
 
   // Per-file key: the same exercise re-uploaded in another tuning starts over.
   const shiftKey = fileTuning && fileTuningKey
-    ? `${fileTuningKey}:${fileOpenStringMidi?.join(",") ?? ""}`
+    ? `${fileTuningKey}:${fileOpenStringMidi?.join(",") ?? fileTuning.id}`
     : null;
   const savedShift = shiftKey ? fileTuningShifts[shiftKey] ?? 0 : 0;
 
@@ -152,6 +167,7 @@ export function useGuitarTuning({
     tuning,
     preferredTuning,
     fileTuning,
+    fileTuningSource,
     tuningOptions: fileChoice?.options ?? presets,
     selectedTuningId: fileChoice ? fileChoice.active.id : preferredTuning.id,
     isTuningAvailable,

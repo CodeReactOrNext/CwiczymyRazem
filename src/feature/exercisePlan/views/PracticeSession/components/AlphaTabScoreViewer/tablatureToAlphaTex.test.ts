@@ -302,6 +302,10 @@ describe("tablatureToAlphaTex on bass", () => {
     expect(tablatureToAlphaTex(bar, 120, header).startsWith(`${header} \\tempo 120`)).toBe(true);
   });
 
+  it("gives a seven-string its seven open strings", () => {
+    expect(alphaTexStaffHeader(getTuningPreset("seven-drop-a"))).toBe("\\tuning (E4 B3 G3 D3 A2 E2 A1)");
+  });
+
   it("leaves a guitar's tab as it was", () => {
     expect(alphaTexStaffHeader(getTuningPreset(STANDARD_TUNING_ID))).toBe("");
     expect(tablatureToAlphaTex(bar, 120, "")).toBe(tablatureToAlphaTex(bar, 120));

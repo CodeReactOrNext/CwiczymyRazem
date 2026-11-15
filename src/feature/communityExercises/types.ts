@@ -17,6 +17,8 @@ export interface CommunityExercise {
   tablature: TablatureMeasure[];
   /** What the tablature is written for; absent = guitar. */
   instrument?: Instrument;
+  /** The tuning preset the tablature is written in; absent = standard. */
+  tuningId?: string;
   /** Set on exercises saved from the plan creator, which supports a bit more
    *  than the Tab Editor does (a YouTube/image reference, an uploaded GP file). */
   videoUrl?: string | null;
@@ -66,6 +68,7 @@ export interface CreateCommunityExerciseInput {
   tips: string[];
   tablature: TablatureMeasure[];
   instrument?: Instrument;
+  tuningId?: string;
   videoUrl?: string | null;
   imageUrl?: string | null;
   gpFileUrl?: string;

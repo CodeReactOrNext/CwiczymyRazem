@@ -672,6 +672,8 @@
     "instrument": "Instrument",
     "guitar": "Gitarre",
     "bass": "Bass",
+    "strings": "Saiten",
+    "string_count": "{{count}} Saiten",
     "tunings": "Stimmung",
     "bass_description": "Wähle, wie dein Bass gestimmt ist — Tonerkennung und Begleitaudio werden an diese Stimmung angepasst.",
     "instrument_lock_bass": "Diese Übung ist für Bass geschrieben.",
@@ -679,7 +681,10 @@
     "file_tuning": "Stimmung der Datei",
     "from_file": "aus der Datei",
     "file_description": "Dieser Tab stammt aus einer Guitar-Pro-Datei in der Stimmung {{name}}. Wenn deine ganze Gitarre höher oder tiefer gestimmt ist, wähle das hier — die Bünde bleiben gleich, Erkennung und Wiedergabe folgen deiner Stimmung.",
-    "file_description_bass": "Dieser Tab stammt aus einer Guitar-Pro-Datei in der Stimmung {{name}}. Wenn dein ganzer Bass höher oder tiefer gestimmt ist, wähle das hier — die Bünde bleiben gleich, Erkennung und Wiedergabe folgen deiner Stimmung."
+    "file_description_bass": "Dieser Tab stammt aus einer Guitar-Pro-Datei in der Stimmung {{name}}. Wenn dein ganzer Bass höher oder tiefer gestimmt ist, wähle das hier — die Bünde bleiben gleich, Erkennung und Wiedergabe folgen deiner Stimmung.",
+    "written_in": "Stimmung des Tabs",
+    "written_description": "Dieser Tab ist für {{name}} ({{notation}}) geschrieben. Stimme so, um die Bünde wie notiert zu spielen — oder wähle hier, wenn deine ganze Gitarre höher oder tiefer gestimmt ist; Erkennung und Wiedergabe folgen dir.",
+    "written_description_bass": "Dieser Tab ist für {{name}} ({{notation}}) geschrieben. Stimme so, um die Bünde wie notiert zu spielen — oder wähle hier, wenn dein ganzer Bass höher oder tiefer gestimmt ist; Erkennung und Wiedergabe folgen dir."
   },
   "header": {
     "close_session": "Session schließen",

@@ -16,7 +16,7 @@ import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
 import { Clock, Play } from "lucide-react";
 import { useMemo } from "react";
-import { getStandardTuningId, getTuningPreset } from "utils/audio/tunings";
+import { findTuningPreset, getStandardTuningId, getTuningPreset } from "utils/audio/tunings";
 import { convertMsToHMS } from "utils/converter";
 
 import { ExercisePreviewActions } from "./ExercisePreviewActions";
@@ -48,8 +48,13 @@ export function ExercisePreviewDialog({
   // preview reads exactly like the tab they get in the session.
   const { settings, palette, isLightBoard, style } = useTablatureStyle();
 
-  // Exercises are written for standard tuning — a bass's when they're for bass.
-  const tuning = getTuningPreset(getStandardTuningId(exercise?.instrument ?? "guitar"));
+  // The tuning the tab is written in: its own (a seven-string Drop A tab, say),
+  // else standard — a bass's when it's for bass.
+  const instrument = exercise?.instrument ?? "guitar";
+  const written = findTuningPreset(exercise?.tuningId);
+  const tuning = written?.instrument === instrument
+    ? written
+    : getTuningPreset(getStandardTuningId(instrument));
   const tuningStrings = useMemo<TuningGutterString[]>(() => {
     if (!settings.showTuningGutter) return [];
     return tuningGutterStrings(tuning.notation, tuning.stringCount, palette);

@@ -748,6 +748,8 @@
     "instrument": "Instrument",
     "guitar": "Guitar",
     "bass": "Bass",
+    "strings": "Strings",
+    "string_count": "{{count}} strings",
     "tunings": "Tuning",
     "bass_description": "Choose how your bass is tuned — pitch detection and backing audio will be matched to this tuning.",
     "instrument_lock_bass": "This exercise is written for bass.",
@@ -755,7 +757,10 @@
     "file_tuning": "File tuning",
     "from_file": "from the file",
     "file_description": "This tab comes from a Guitar Pro file written in {{name}}. If your whole guitar is tuned higher or lower, pick it here — the frets stay the same, and detection and playback follow your tuning.",
-    "file_description_bass": "This tab comes from a Guitar Pro file written in {{name}}. If your whole bass is tuned higher or lower, pick it here — the frets stay the same, and detection and playback follow your tuning."
+    "file_description_bass": "This tab comes from a Guitar Pro file written in {{name}}. If your whole bass is tuned higher or lower, pick it here — the frets stay the same, and detection and playback follow your tuning.",
+    "written_in": "written in",
+    "written_description": "This tab is written for {{name}} ({{notation}}). Tune to it to play the frets as written — or, if your whole guitar sits higher or lower, pick that here and detection and playback follow you.",
+    "written_description_bass": "This tab is written for {{name}} ({{notation}}). Tune to it to play the frets as written — or, if your whole bass sits higher or lower, pick that here and detection and playback follow you."
   },
   "header": {
     "close_session": "Close session",

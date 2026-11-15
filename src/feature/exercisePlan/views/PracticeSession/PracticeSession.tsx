@@ -596,6 +596,7 @@ const PracticeSessionInner = ({
   const guitarTuning = useGuitarTuning({
     isGpFile, isExamMode, contentInstrument, contentStringCount: gpTrack?.stringCount,
     fileOpenStringMidi: gpTrack?.openStringMidi, fileTuningKey: currentExercise.id,
+    contentTuningId: activeExercise.tablature?.length ? activeExercise.tuningId : undefined,
   });
   const isBass = guitarTuning.instrument === "bass";
 

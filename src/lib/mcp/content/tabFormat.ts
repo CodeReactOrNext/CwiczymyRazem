@@ -1,3 +1,13 @@
+import type { Instrument } from "utils/audio/tunings";
+import { getTuningsFor } from "utils/audio/tunings";
+
+/** One line per tuning preset: its id, name and strings low to high. */
+const tuningLines = (instrument: Instrument, stringCount: number) =>
+  getTuningsFor(instrument)
+    .filter((tuning) => tuning.stringCount === stringCount)
+    .map((tuning) => `- \`${tuning.id}\` — ${tuning.name}: ${tuning.notation}`)
+    .join("\n");
+
 /**
  * How an AI client writes a riff.quest tab. Served by the `riffquest_get_tab_format`
  * tool and the `riffquest://docs/tab-format` resource, so a client without
@@ -27,8 +37,8 @@ note    = { string, fret, techniques?, bend?, slideIn?, slideOut?, harmonic? }
 
 ## The rules that matter
 
-1. **Strings count from the thin one: string 1 = high e, string 6 = low E.**
-   The top line of a tab is string 1.
+1. **Strings count from the thin one: string 1 = high e, string 6 = low E**
+   (string 7 = the low B of a 7-string, see Tunings). The top line of a tab is string 1.
 2. **duration is the written note value:** \`whole\`, \`half\`, \`quarter\`, \`eighth\`,
    \`sixteenth\`, \`thirty-second\`, \`sixty-fourth\`. \`dots: 1\` makes it dotted.
 3. **Every measure adds up exactly to its time signature.** 4/4 holds four
@@ -42,11 +52,29 @@ Write the note value as it's notated and add \`tuplet\`. Three triplet eighths f
 one quarter: three beats of \`{ "duration": "eighth", "tuplet": 3 }\`. Triplet
 sixteenths: \`"sixteenth"\` with \`tuplet: 3\`. Also 5, 6, 7 and 9–12.
 
-## Bass
+## Tunings, 7-string guitar and bass
 
-Set \`instrument: "bass"\` on the exercise (and on \`riffquest_validate_tablature\`) for a 4-string
-bass in standard tuning. Strings are then **1–4: 1 = G, 2 = D, 3 = A, 4 = low E**.
-Everything else works the same. Without \`instrument\` the tab is a guitar tab.
+Frets are written for the tuning the tab is in. Pass \`tuning\` (an id below) to
+\`riffquest_create_exercise\`, \`riffquest_update_exercise\`, \`riffquest_validate_tablature\`
+and \`riffquest_preview_tab\`. The exercise keeps it: the app draws the tab in that
+tuning and asks the player to tune to it. Without \`tuning\` the tab is in standard.
+
+A **7-string** tuning adds **string 7, the low B** (A in Drop A) under string 6, so
+strings are 1–7. Use string 7 only with a 7-string tuning.
+
+Guitar, 6 strings:
+${tuningLines("guitar", 6)}
+
+Guitar, 7 strings:
+${tuningLines("guitar", 7)}
+
+Set \`instrument: "bass"\` for a bass. Strings are then **1–4: 1 = G, 2 = D, 3 = A,
+4 = low E** (5 = low B on the 5-string tuning). Everything else works the same.
+Without \`instrument\` or \`tuning\` the tab is a guitar tab.
+
+Bass:
+${tuningLines("bass", 4)}
+${tuningLines("bass", 5)}
 
 ## Techniques
 

@@ -29,6 +29,7 @@ export const communityToExercise = (ce: CommunityExercise): Exercise => ({
   relatedSkills: ce.relatedSkills,
   tablature: ce.tablature,
   ...(ce.instrument === "bass" && { instrument: ce.instrument }),
+  ...(ce.tuningId && { tuningId: ce.tuningId }),
   videoUrl: ce.videoUrl,
   imageUrl: ce.imageUrl,
   gpFileUrl: ce.gpFileUrl,

@@ -140,10 +140,11 @@ describe("riff.quest MCP server", () => {
   // characters before the trim; a new tool should fit without growing it back.
   // Raised from 35k for the practice log and goal edit (~2.8k together),
   // then from 37k for the calendar read and write (~2.9k together), then
-  // from 40k for the player's own song lists (~0.7k).
+  // from 40k for the player's own song lists (~0.7k), then from 41k for the
+  // `tuning` argument on the four tab tools (~0.4k; the ids live in the guide).
   it("keeps the tool list within its size budget", async () => {
     const { tools } = await client.listTools();
-    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(41_000);
+    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(41_500);
   });
 
   it("refuses arguments a tool doesn't take", async () => {
@@ -319,6 +320,44 @@ describe("riff.quest MCP server", () => {
       /^measure 1: beats add up to 1 quarter notes but 4\/4 holds 4/,
     );
     expect(data.asciiTab.split("\n")[0]).toBe("e|-5-|");
+  });
+
+  it("checks a seven-string tab in its tuning, and lists the tunings for an unknown one", async () => {
+    const tab = {
+      measures: [
+        { beats: [{ duration: "whole", notes: [{ string: 7, fret: 0 }] }] },
+      ],
+    };
+    const sevenString = await client.callTool({
+      name: "riffquest_validate_tablature",
+      arguments: { tab, tuning: "seven-drop-a" },
+    });
+    const data = JSON.parse(textOf(sevenString));
+    expect(data.ok).toBe(true);
+    expect(data.asciiTab.split("\n")).toHaveLength(7);
+
+    const sixString = JSON.parse(
+      textOf(
+        await client.callTool({
+          name: "riffquest_validate_tablature",
+          arguments: { tab },
+        }),
+      ),
+    );
+    expect(sixString.ok).toBe(false);
+
+    const unknown = await client.callTool({
+      name: "riffquest_validate_tablature",
+      arguments: { tab, tuning: "drop-z" },
+    });
+    expect(unknown.isError).toBe(true);
+    expect(textOf(unknown)).toMatch(/seven-drop-a/);
+
+    const wrongInstrument = await client.callTool({
+      name: "riffquest_validate_tablature",
+      arguments: { tab, tuning: "seven-drop-a", instrument: "bass" },
+    });
+    expect(wrongInstrument.isError).toBe(true);
   });
 
   it("refuses a write from a read-only token before touching the database", async () => {

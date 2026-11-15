@@ -1,9 +1,10 @@
 import { correctOctaveForLowStrings, getCentsDistance, midiToFrequency, midiToNoteName, STANDARD_OPEN_STRING_MIDI } from "./noteUtils";
 
-/** Semitone offset from standard GUITAR tuning, per string. Index 0 = string 1 (high E) … index 5 = string 6 (low E).
+/** Semitone offset from standard GUITAR tuning, per string. Index 0 = string 1 (high E) … index 5 = string 6 (low E),
+ *  and on a seven-string index 6 = string 7 (low B, see STANDARD_OPEN_STRING_MIDI). Six slots on every other preset.
  *  A bass is expressed the same way — its G string as string 1 sitting 21 semitones under the guitar's high E —
  *  so every consumer that turns a string + fret into a pitch (getFrequencyFromTab) needs no idea of the instrument. */
-export type TuningOffsets = readonly [number, number, number, number, number, number];
+export type TuningOffsets = readonly number[];
 
 export type Instrument = "guitar" | "bass";
 
@@ -25,6 +26,7 @@ export interface GuitarTuningPreset {
 
 export const STANDARD_TUNING_ID = "standard";
 export const BASS_STANDARD_TUNING_ID = "bass-standard";
+export const SEVEN_STRING_STANDARD_TUNING_ID = "seven-standard";
 
 const guitar = (id: string, name: string, notation: string, offsets: TuningOffsets): GuitarTuningPreset =>
   ({ id, name, notation, offsets, instrument: "guitar", stringCount: 6 });
@@ -41,11 +43,27 @@ export const GUITAR_TUNINGS: GuitarTuningPreset[] = [
   guitar("dadgad",           "DADGAD",          "D A D G A D",       [-2, -2, 0, 0, 0, -2]),
 ];
 
+const sevenString = (id: string, name: string, notation: string, offsets: TuningOffsets): GuitarTuningPreset =>
+  ({ id, name, notation, offsets, instrument: "guitar", stringCount: 7 });
+
+/** Seven-string presets — still the guitar, one low string more (B1 in standard). */
+export const SEVEN_STRING_TUNINGS: GuitarTuningPreset[] = [
+  sevenString(SEVEN_STRING_STANDARD_TUNING_ID, "Standard",        "B E A D G B E",        [0, 0, 0, 0, 0, 0, 0]),
+  sevenString("seven-drop-a",                  "Drop A",          "A E A D G B E",        [0, 0, 0, 0, 0, 0, -2]),
+  sevenString("seven-half-step-down",          "Half Step Down",  "Bb Eb Ab Db Gb Bb Eb", [-1, -1, -1, -1, -1, -1, -1]),
+  sevenString("seven-drop-g-sharp",            "Drop G#/Ab",      "Ab Eb Ab Db Gb Bb Eb", [-1, -1, -1, -1, -1, -1, -3]),
+  sevenString("seven-whole-step-down",         "Whole Step Down", "A D G C F A D",        [-2, -2, -2, -2, -2, -2, -2]),
+  sevenString("seven-drop-g",                  "Drop G",          "G D G C F A D",        [-2, -2, -2, -2, -2, -2, -4]),
+];
+
+/** String counts a guitar tuning comes in — the tabs of the tuning picker. */
+export const GUITAR_STRING_COUNTS = [6, 7] as const;
+
 /** A bass preset from its open strings' MIDI notes, string 1 (highest) first. */
 const bass = (id: string, name: string, notation: string, openMidi: readonly number[]): GuitarTuningPreset => {
   const offsets = [1, 2, 3, 4, 5, 6].map(string =>
     string <= openMidi.length ? openMidi[string - 1] - STANDARD_OPEN_STRING_MIDI[string] : 0);
-  return { id, name, notation, offsets: offsets as unknown as TuningOffsets, instrument: "bass", stringCount: openMidi.length };
+  return { id, name, notation, offsets, instrument: "bass", stringCount: openMidi.length };
 };
 
 export const BASS_TUNINGS: GuitarTuningPreset[] = [
@@ -57,13 +75,37 @@ export const BASS_TUNINGS: GuitarTuningPreset[] = [
   bass("bass-5-standard",      "5-String",        "B E A D G",   [43, 38, 33, 28, 23]),
 ];
 
-const ALL_TUNINGS = [...GUITAR_TUNINGS, ...BASS_TUNINGS];
+const GUITAR_TUNINGS_ALL = [...GUITAR_TUNINGS, ...SEVEN_STRING_TUNINGS];
+const ALL_TUNINGS = [...GUITAR_TUNINGS_ALL, ...BASS_TUNINGS];
 
+/** Every preset for the instrument — on guitar six- and seven-string alike. */
 export const getTuningsFor = (instrument: Instrument): GuitarTuningPreset[] =>
-  instrument === "bass" ? BASS_TUNINGS : GUITAR_TUNINGS;
+  instrument === "bass" ? BASS_TUNINGS : GUITAR_TUNINGS_ALL;
 
 export const getStandardTuningId = (instrument: Instrument): string =>
   instrument === "bass" ? BASS_STANDARD_TUNING_ID : STANDARD_TUNING_ID;
+
+/** Every preset — guitar (six- and seven-string) and bass. */
+export const ALL_TUNING_PRESETS: readonly GuitarTuningPreset[] = ALL_TUNINGS;
+
+/** The preset with exactly this id, or null — unlike getTuningPreset, no fallback. */
+export function findTuningPreset(id: string | null | undefined): GuitarTuningPreset | null {
+  return ALL_TUNINGS.find(t => t.id === id) ?? null;
+}
+
+/**
+ * String names for a tab's left edge, string 1 (the thinnest) first — "e B G D A E"
+ * in standard. The top name is lower-cased when it repeats lower down, the way
+ * tabs tell the high e from the low E.
+ */
+export function tabStringNames(tuning: Pick<GuitarTuningPreset, "notation" | "stringCount">): string[] {
+  const lowToHigh = tuning.notation.split(/\s+/);
+  const names = Array.from({ length: tuning.stringCount }, (_, i) => lowToHigh[lowToHigh.length - 1 - i] ?? "?");
+  if (names.length > 1 && names.slice(1).some(name => name.toLowerCase() === names[0].toLowerCase())) {
+    names[0] = names[0].toLowerCase();
+  }
+  return names;
+}
 
 /** The preset with this id — guitar or bass — falling back to standard guitar tuning. */
 export function getTuningPreset(id: string | null | undefined): GuitarTuningPreset {
@@ -71,7 +113,7 @@ export function getTuningPreset(id: string | null | undefined): GuitarTuningPres
 }
 
 export function isStandardTuning(id: string | null | undefined): boolean {
-  return !id || id === STANDARD_TUNING_ID || id === BASS_STANDARD_TUNING_ID;
+  return !id || id === STANDARD_TUNING_ID || id === BASS_STANDARD_TUNING_ID || id === SEVEN_STRING_STANDARD_TUNING_ID;
 }
 
 /**
@@ -139,8 +181,8 @@ export function findNearestTuningString(
 /** Id of a tuning read from a Guitar Pro file that matches none of the presets. */
 export const FILE_TUNING_ID = "file";
 
-/** Most strings a tuning can describe — the offsets carry one slot per standard guitar string. */
-const MAX_TUNED_STRINGS = 6;
+/** Most strings a tuning can describe — a seven-string (see STANDARD_OPEN_STRING_MIDI). */
+const MAX_TUNED_STRINGS = 7;
 
 const FLAT_NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
 
@@ -148,7 +190,7 @@ const FLAT_NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "
  * The tuning a Guitar Pro track is written in, from its open strings' MIDI notes
  * (string 1 — the highest — first). The matching preset when there is one, else a
  * one-off preset under FILE_TUNING_ID. Null when the track doesn't say, or has more
- * strings than the offsets can hold (a seven-string).
+ * strings than the offsets can hold (an eight-string).
  */
 export function getFileTuning(
   openStringMidi: readonly number[] | undefined,
@@ -158,7 +200,8 @@ export function getFileTuning(
   if (!openStringMidi || stringCount === 0 || stringCount > MAX_TUNED_STRINGS) return null;
   if (openStringMidi.some(midi => !Number.isFinite(midi))) return null;
 
-  const offsets = [1, 2, 3, 4, 5, 6].map(string =>
+  const slots = Math.max(6, stringCount);
+  const offsets = Array.from({ length: slots }, (_, i) => i + 1).map(string =>
     string <= stringCount ? openStringMidi[string - 1] - STANDARD_OPEN_STRING_MIDI[string] : 0);
   const preset = getTuningsFor(instrument).find(candidate =>
     candidate.stringCount === stringCount
@@ -172,7 +215,7 @@ export function getFileTuning(
     id: FILE_TUNING_ID,
     name: "Custom",
     notation,
-    offsets: offsets as unknown as TuningOffsets,
+    offsets,
     instrument,
     stringCount,
   };

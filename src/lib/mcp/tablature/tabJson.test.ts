@@ -1,5 +1,6 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { getTuningPreset } from "utils/audio/tunings";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -260,5 +261,39 @@ describe("renderAsciiTab", () => {
       "A|---|",
       "E|-0-|",
     ]);
+  });
+
+  it("names a seven-string tuning's strings, the low string 7 last", () => {
+    const { measures } = tabToMeasures({
+      measures: [
+        { beats: [{ duration: "whole", notes: [{ string: 7, fret: 0 }] }] },
+      ],
+    });
+    expect(
+      renderAsciiTab(measures, getTuningPreset("seven-drop-a")).split("\n"),
+    ).toEqual([
+      "e|---|",
+      "B|---|",
+      "G|---|",
+      "D|---|",
+      "A|---|",
+      "E|---|",
+      "A|-0-|",
+    ]);
+  });
+
+  it("pads two-letter string names so the rows line up", () => {
+    const { measures } = tabToMeasures({
+      measures: [
+        { beats: [{ duration: "whole", notes: [{ string: 1, fret: 3 }] }] },
+      ],
+    });
+    const rows = renderAsciiTab(
+      measures,
+      getTuningPreset("half-step-down"),
+    ).split("\n");
+    expect(rows[0]).toBe("eb|-3-|");
+    expect(rows[1]).toBe("Bb|---|");
+    expect(new Set(rows.map((row) => row.indexOf("|"))).size).toBe(1);
   });
 });

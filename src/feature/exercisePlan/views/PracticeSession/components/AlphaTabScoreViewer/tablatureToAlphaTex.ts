@@ -153,15 +153,17 @@ function effectiveTimeSignature(beats: TablatureBeat[], timeSignature: [number, 
  */
 /**
  * Staff metadata for a tab that isn't on a six-string guitar — a bass gets its
- * own open strings, the bass clef and a bass sound for the score's playback.
- * Empty for a guitar, which is what AlphaTab assumes anyway.
+ * own open strings, the bass clef and a bass sound for the score's playback; a
+ * seven-string gets its seven open strings, or string 7 would have no line.
+ * Empty for a six-string guitar, which is what AlphaTab assumes anyway.
  */
 export function alphaTexStaffHeader(
   tuning: Pick<GuitarTuningPreset, "instrument" | "offsets" | "stringCount">,
 ): string {
-  if (tuning.instrument !== "bass") return "";
+  if (tuning.instrument !== "bass" && tuning.stringCount === 6) return "";
   const openStrings = Array.from({ length: tuning.stringCount }, (_, i) =>
     midiToNoteName(STANDARD_OPEN_STRING_MIDI[i + 1] + tuning.offsets[i]));
+  if (tuning.instrument !== "bass") return `\\tuning (${openStrings.join(" ")})`;
   // GM program 33 = Electric Bass (finger).
   return `\\instrument 33 \\tuning (${openStrings.join(" ")}) \\clef F4`;
 }

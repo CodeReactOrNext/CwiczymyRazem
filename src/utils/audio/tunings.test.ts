@@ -14,6 +14,8 @@ import {
   getTuningStrings,
   GUITAR_TUNINGS,
   isStandardTuning,
+  SEVEN_STRING_STANDARD_TUNING_ID,
+  SEVEN_STRING_TUNINGS,
   STANDARD_TUNING_ID,
 } from "./tunings";
 
@@ -33,6 +35,38 @@ describe("tunings", () => {
     GUITAR_TUNINGS.forEach(tuning => {
       expect(tuning.offsets).toHaveLength(6);
     });
+  });
+
+  it("seven-string presets offset 7 strings and reach down to the low B", () => {
+    SEVEN_STRING_TUNINGS.forEach(tuning => {
+      expect(tuning.offsets).toHaveLength(7);
+      expect(tuning.stringCount).toBe(7);
+      expect(tuning.instrument).toBe("guitar");
+    });
+    const standard7 = getTuningPreset(SEVEN_STRING_STANDARD_TUNING_ID);
+    expect(getTuningStrings(standard7).map(s => s.name)).toEqual(["B1", "E2", "A2", "D3", "G3", "B3", "E4"]);
+    expect(getTuningStrings(getTuningPreset("seven-drop-a"))[0].name).toBe("A1");
+    expect(getFrequencyFromTab(7, 0, standard7.offsets)).toBeCloseTo(61.735, 2);
+  });
+
+  it("seven-string notation names every string, low to high", () => {
+    SEVEN_STRING_TUNINGS.forEach(tuning => {
+      const names = getTuningStrings(tuning).map(s => s.name.replace(/\d+$/, ""));
+      const enharmonic: Record<string, string> = { "C#": "Db", "D#": "Eb", "F#": "Gb", "G#": "Ab", "A#": "Bb" };
+      expect(names.map(n => enharmonic[n] ?? n)).toEqual(tuning.notation.split(" "));
+    });
+  });
+
+  it("matches a seven-string Guitar Pro track to its preset", () => {
+    expect(getFileTuning([64, 59, 55, 50, 45, 40, 35], "guitar")?.id).toBe(SEVEN_STRING_STANDARD_TUNING_ID);
+    expect(getFileTuning([64, 59, 55, 50, 45, 40, 33], "guitar")?.id).toBe("seven-drop-a");
+    expect(getFileTuning([64, 59, 55, 50, 45, 40, 34], "guitar")?.stringCount).toBe(7);
+  });
+
+  it("only shifts a seven-string tuning against another seven-string", () => {
+    const standard7 = getTuningPreset(SEVEN_STRING_STANDARD_TUNING_ID);
+    expect(getTuningShiftFrom(standard7, getTuningPreset("seven-half-step-down"))).toBe(-1);
+    expect(getTuningShiftFrom(standard7, getTuningPreset(STANDARD_TUNING_ID))).toBeNull();
   });
 
   it("drop-d only lowers the 6th string by a whole step", () => {
@@ -95,7 +129,7 @@ describe("bass tunings", () => {
   });
 
   it("lists and defaults per instrument", () => {
-    expect(getTuningsFor("guitar")).toBe(GUITAR_TUNINGS);
+    expect(getTuningsFor("guitar")).toEqual([...GUITAR_TUNINGS, ...SEVEN_STRING_TUNINGS]);
     expect(getTuningsFor("bass")).toBe(BASS_TUNINGS);
     expect(getStandardTuningId("bass")).toBe(BASS_STANDARD_TUNING_ID);
     expect(isStandardTuning(BASS_STANDARD_TUNING_ID)).toBe(true);
@@ -169,7 +203,7 @@ describe("file tunings", () => {
   it("gives up on a track with no tuning or too many strings", () => {
     expect(getFileTuning(undefined, "guitar")).toBeNull();
     expect(getFileTuning([], "guitar")).toBeNull();
-    expect(getFileTuning([64, 59, 55, 50, 45, 40, 35], "guitar")).toBeNull();
+    expect(getFileTuning([64, 59, 55, 50, 45, 40, 35, 30], "guitar")).toBeNull();
   });
 
   it("measures a whole-instrument shift between two tunings", () => {

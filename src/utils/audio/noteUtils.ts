@@ -89,6 +89,7 @@ export const STANDARD_OPEN_STRING_MIDI: Record<number, number> = {
   4: 50, // D3
   5: 45, // A2
   6: 40, // E2
+  7: 35, // B1 — a seven-string's extra low string
 };
 
 /**

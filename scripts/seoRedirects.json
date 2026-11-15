@@ -1080,6 +1080,11 @@
     "permanent": true
   },
   {
+    "source": "/exercises/ear-tuning-intervals",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
     "source": "/exercises/first-bend",
     "destination": "/beginner-guitar-exercises#first-bend",
     "permanent": true

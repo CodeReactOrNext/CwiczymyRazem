@@ -4,7 +4,8 @@ import type {
   TablatureNote,
 } from "feature/exercisePlan/types/exercise.types";
 import { tablatureToAlphaTex } from "feature/exercisePlan/views/PracticeSession/components/AlphaTabScoreViewer/tablatureToAlphaTex";
-import type { Instrument } from "utils/audio/tunings";
+import type { GuitarTuningPreset, Instrument } from "utils/audio/tunings";
+import { getStandardTuningId, getTuningPreset, tabStringNames } from "utils/audio/tunings";
 
 /**
  * Checks a tab written by an AI client before it is saved as an exercise.
@@ -87,21 +88,34 @@ const isInt = (value: unknown): value is number =>
 
 const round = (value: number) => Math.round(value * 1000) / 1000;
 
-/** Strings per instrument, and how the error names the outer ones. */
-const STRINGS: Record<Instrument, { count: number; range: string }> = {
-  guitar: { count: 6, range: "1–6 (1 = high e, 6 = low E)" },
-  bass: { count: 4, range: "1–4 on bass (1 = G, 4 = low E)" },
-};
+/** What a tab is written for: an instrument in its standard tuning, or one tuning preset. */
+export type TabInstrument = Instrument | GuitarTuningPreset;
+
+/** The tuning a tab is checked and drawn against — standard for a bare instrument. */
+export const tabTuning = (target: TabInstrument): GuitarTuningPreset =>
+  typeof target === "string" ? getTuningPreset(getStandardTuningId(target)) : target;
+
+/** Strings in the tuning, and how the error names the outer ones. */
+function tabStrings(target: TabInstrument): { count: number; range: string } {
+  const tuning = tabTuning(target);
+  const names = tabStringNames(tuning);
+  const count = tuning.stringCount;
+  const bass = tuning.instrument === "bass";
+  return {
+    count,
+    range: `1–${count}${bass ? " on bass" : ""} (1 = ${bass ? "" : "high "}${names[0]}, ${count} = low ${names[count - 1]})`,
+  };
+}
 
 function checkNote(
   note: TablatureNote,
   at: { measure: number; beat: number },
   errors: TabIssue[],
   warnings: TabIssue[],
-  instrument: Instrument,
+  instrument: TabInstrument,
 ) {
   const where = `string ${note.string}, fret ${note.fret}`;
-  const strings = STRINGS[instrument];
+  const strings = tabStrings(instrument);
   if (
     !isInt(note.string) ||
     note.string < TAB_LIMITS.minString ||
@@ -183,9 +197,9 @@ function checkNote(
 
 export function validateTablature(
   measures: TablatureMeasure[],
-  instrument: Instrument = "guitar",
+  instrument: TabInstrument = "guitar",
 ): TabValidation {
-  const stringCount = STRINGS[instrument].count;
+  const stringCount = tabStrings(instrument).count;
   const errors: TabIssue[] = [];
   const warnings: TabIssue[] = [];
   const stats = { measures: measures.length, beats: 0, notes: 0 };

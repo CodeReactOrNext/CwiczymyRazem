@@ -752,6 +752,8 @@
     "instrument": "Instrument",
     "guitar": "Gitara",
     "bass": "Bas",
+    "strings": "Liczba strun",
+    "string_count": "{{count}} strun",
     "tunings": "Strój",
     "bass_description": "Wybierz strój basu — wykrywanie wysokości i podkład zostaną do niego dopasowane.",
     "instrument_lock_bass": "To ćwiczenie jest napisane na bas.",
@@ -759,7 +761,10 @@
     "file_tuning": "Strój z pliku",
     "from_file": "z pliku",
     "file_description": "Ta tabulatura pochodzi z pliku Guitar Pro zapisanego w stroju {{name}}. Jeśli cała Twoja gitara jest nastrojona wyżej lub niżej, wybierz to tutaj — progi zostają te same, a detekcja i odtwarzanie dopasują się do Twojego stroju.",
-    "file_description_bass": "Ta tabulatura pochodzi z pliku Guitar Pro zapisanego w stroju {{name}}. Jeśli cały Twój bas jest nastrojony wyżej lub niżej, wybierz to tutaj — progi zostają te same, a detekcja i odtwarzanie dopasują się do Twojego stroju."
+    "file_description_bass": "Ta tabulatura pochodzi z pliku Guitar Pro zapisanego w stroju {{name}}. Jeśli cały Twój bas jest nastrojony wyżej lub niżej, wybierz to tutaj — progi zostają te same, a detekcja i odtwarzanie dopasują się do Twojego stroju.",
+    "written_in": "strój tabu",
+    "written_description": "Ten tab jest napisany w stroju {{name}} ({{notation}}). Nastrój gitarę tak samo, żeby grać progi jak w tabie — a jeśli cała gitara jest niżej lub wyżej, wybierz to tutaj, a wykrywanie i odtwarzanie się dopasują.",
+    "written_description_bass": "Ten tab jest napisany w stroju {{name}} ({{notation}}). Nastrój bas tak samo, żeby grać progi jak w tabie — a jeśli cały bas jest niżej lub wyżej, wybierz to tutaj, a wykrywanie i odtwarzanie się dopasują."
   },
   "header": {
     "close_session": "Zamknij sesję",

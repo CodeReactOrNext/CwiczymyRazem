@@ -5,19 +5,101 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
 import { InstrumentPicker } from "feature/tuner/components/InstrumentPicker";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, Lock } from "lucide-react";
+import { useState } from "react";
+import { GUITAR_STRING_COUNTS } from "utils/audio/tunings";
 
 import { useGuitarTuningContext } from "../contexts/GuitarTuningContext";
+
+/**
+ * The tuning grid. Its own component so the 6/7-string tab it keeps resets to
+ * the active tuning's string count every time the dialog opens (Radix unmounts
+ * the dialog's content while it's closed).
+ */
+const TuningOptions = () => {
+  const { t } = useTranslation("session");
+  const {
+    setTuningId, isLocked, instrument,
+    fileTuning, fileTuningSource, tuningOptions, selectedTuningId, isTuningAvailable,
+  } = useGuitarTuningContext();
+  const selectedCount = tuningOptions.find((option) => option.id === selectedTuningId)?.stringCount ?? 6;
+  const [stringTab, setStringTab] = useState(String(selectedCount));
+
+  // A Guitar Pro file fixes the string count; a bass keeps its one list.
+  const countsOnOffer = GUITAR_STRING_COUNTS.filter((count) =>
+    tuningOptions.some((option) => option.stringCount === count));
+  const showStringTabs = instrument === "guitar" && !fileTuning && countsOnOffer.length > 1;
+  const visibleCount = showStringTabs ? Number(stringTab) : fileTuning?.stringCount;
+  const visibleOptions = visibleCount
+    ? tuningOptions.filter((option) => option.stringCount === visibleCount)
+    : tuningOptions;
+
+  return (
+    <div className='space-y-3'>
+      {showStringTabs && (
+        <Tabs value={stringTab} onValueChange={setStringTab}>
+          <TabsList
+            aria-label={t("tuning_modal.strings")}
+            className={cn("flex h-auto w-full gap-1 bg-zinc-900/60", isLocked && "pointer-events-none opacity-40")}>
+            {countsOnOffer.map((count) => (
+              <TabsTrigger
+                key={count}
+                value={String(count)}
+                disabled={isLocked}
+                className='flex-1 py-1.5 font-semibold text-zinc-300 hover:text-white data-[state=active]:bg-zinc-700/80 data-[state=active]:text-white data-[state=active]:shadow-none'>
+                {t("tuning_modal.string_count", { count })}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      )}
+
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-2 xsm:grid-cols-2",
+          isLocked && "pointer-events-none opacity-40"
+        )}
+      >
+        {visibleOptions.map((option) => {
+          const isSelected = option.id === selectedTuningId;
+          const isAvailable = isTuningAvailable(option.id);
+          return (
+            <button
+              key={option.id}
+              type="button"
+              disabled={isLocked || !isAvailable}
+              onClick={() => setTuningId(option.id)}
+              className={cn(
+                "flex items-center justify-between gap-2 rounded-lg p-3 text-left transition-colors",
+                isSelected ? "bg-cyan-500/10 text-cyan-400" : "bg-zinc-900/40 text-zinc-300 hover:bg-zinc-800/60",
+                !isAvailable && !isLocked && "pointer-events-none opacity-40"
+              )}
+            >
+              <span>
+                <span className="block text-sm font-semibold">{option.name}</span>
+                <span className="block text-xs text-zinc-500">
+                  {option.notation}
+                  {option.id === fileTuning?.id && ` · ${t(fileTuningSource === "exercise" ? "tuning_modal.written_in" : "tuning_modal.from_file")}`}
+                </span>
+              </span>
+              {isSelected && <Check className="h-4 w-4 shrink-0 text-cyan-400" />}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export const TuningSettingsModal = () => {
   const { t } = useTranslation("session");
   const {
-    isModalOpen, closeModal, setTuningId, isLocked, lockReason, tuning,
-    instrument, setInstrument, instrumentLockReason,
-    fileTuning, tuningOptions, selectedTuningId, isTuningAvailable,
+    isModalOpen, closeModal, isLocked, lockReason, tuning,
+    instrument, setInstrument, instrumentLockReason, fileTuning, fileTuningSource,
   } = useGuitarTuningContext();
   const isBass = instrument === "bass";
 
@@ -58,47 +140,17 @@ export const TuningSettingsModal = () => {
           </div>
         )}
 
-        {/* A Guitar Pro file is written in its own tuning: the frets only stay
-            true when the whole instrument moves, so nothing else is offered. */}
+        {/* A Guitar Pro file (or a tab saying so) is written in its own tuning: the
+            frets only stay true when the whole instrument moves, so nothing else is offered. */}
         {fileTuning && !isLocked && (
           <p className="text-xs leading-relaxed text-zinc-500">
-            {t(isBass ? "tuning_modal.file_description_bass" : "tuning_modal.file_description", { name: fileTuning.name })}
+            {fileTuningSource === "exercise"
+              ? t(isBass ? "tuning_modal.written_description_bass" : "tuning_modal.written_description", { name: fileTuning.name, notation: fileTuning.notation })
+              : t(isBass ? "tuning_modal.file_description_bass" : "tuning_modal.file_description", { name: fileTuning.name })}
           </p>
         )}
 
-        <div
-          className={cn(
-            "grid grid-cols-1 gap-2 xsm:grid-cols-2",
-            isLocked && "pointer-events-none opacity-40"
-          )}
-        >
-          {tuningOptions.map((option) => {
-            const isSelected = option.id === selectedTuningId;
-            const isAvailable = isTuningAvailable(option.id);
-            return (
-              <button
-                key={option.id}
-                type="button"
-                disabled={isLocked || !isAvailable}
-                onClick={() => setTuningId(option.id)}
-                className={cn(
-                  "flex items-center justify-between gap-2 rounded-lg p-3 text-left transition-colors",
-                  isSelected ? "bg-cyan-500/10 text-cyan-400" : "bg-zinc-900/40 text-zinc-300 hover:bg-zinc-800/60",
-                  !isAvailable && !isLocked && "pointer-events-none opacity-40"
-                )}
-              >
-                <span>
-                  <span className="block text-sm font-semibold">{option.name}</span>
-                  <span className="block text-xs text-zinc-500">
-                    {option.notation}
-                    {option.id === fileTuning?.id && ` · ${t("tuning_modal.from_file")}`}
-                  </span>
-                </span>
-                {isSelected && <Check className="h-4 w-4 shrink-0 text-cyan-400" />}
-              </button>
-            );
-          })}
-        </div>
+        <TuningOptions />
       </DialogContent>
     </Dialog>
   );

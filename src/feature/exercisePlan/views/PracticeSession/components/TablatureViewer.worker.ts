@@ -28,8 +28,9 @@ let STRING_SPACING = 32;
 // apart; everything derived from a string NUMBER here goes through stringRow().
 let flipStrings = false;
 // Lines on the staff — 4 for a bass tab. Driven by STYLE together with a
-// STRING_SPACING spread so the staff keeps its height (staffLineSpacing), which
-// is why everything sized by 5 * STRING_SPACING below needs no count.
+// STRING_SPACING spread so the staff keeps its height (staffLineSpacing).
+// Everything sized by the staff goes through staffSpan(), never five fixed gaps:
+// that only spans six strings, and left a seven-string's last line off the neck.
 let stringCount = 6;
 // Mirrored board (music running right to left). The flip itself is a CSS
 // transform on the canvas element — the worker only needs to know about it so
@@ -191,6 +192,11 @@ function withAlpha(hex: string, a: number): string {
 const STAFF_LINE_INK = 0.42;
 /** How far a string line leans towards its string's colour. */
 const STAFF_LINE_TINT = 0.45;
+/** On a light board: the line's ink share, how far the string colour is darkened
+ *  towards the ink first, and how much of that colour the line then takes. */
+const STAFF_LINE_INK_LIGHT = 0.5;
+const STAFF_LINE_DARKEN_LIGHT = 0.4;
+const STAFF_LINE_TINT_LIGHT = 0.6;
 /** The neck: a faint surface under the strings, setting them apart from the rhythm lane. */
 const NECK_ALPHA = 0.04;
 /** Every other bar's stretch of neck is this much stronger, so bars can be counted at a glance. */
@@ -201,6 +207,8 @@ const WINDING_OFF = 1.5;
 const WINDING_ALPHA = 0.3;
 /** How far the neck reaches past the outer strings — clear of the pills, short of the row below. */
 const neckPad = () => BLOCK_H / 2 + 5;
+/** Top line to bottom line — the same height for any string count (see staffLineSpacing). */
+const staffSpan = () => (stringCount - 1) * STRING_SPACING;
 
 
 // ── Shared types (mirrored from TablatureViewer.tsx) ──────────────────────────
@@ -868,6 +876,54 @@ function mixHex(from: string, to: string, amt: number): string {
   return `rgb(${mix(1)}, ${mix(3)}, ${mix(5)})`;
 }
 
+/** mixHex, but "#rrggbb" out — for a blend that is mixed again. Non-hex input comes back as `to`. */
+function mixHexToHex(from: string, to: string, amt: number): string {
+  if (from.length !== 7 || from[0] !== "#" || to.length !== 7 || to[0] !== "#") return to;
+  const mix = (i: number) => {
+    const a = parseInt(from.slice(i, i + 2), 16);
+    const b = parseInt(to.slice(i, i + 2), 16);
+    return Math.round(a + (b - a) * amt).toString(16).padStart(2, "0");
+  };
+  return `#${mix(1)}${mix(3)}${mix(5)}`;
+}
+
+// ── Neck edge ───────────────────────────────────────────────────────────────
+// The neck is drawn as a board seen slightly from above, like the Note Hunt
+// fretboard: its face goes from lighter at the top to darker at the bottom, and
+// under the last string its side shows as a dark band where the bar lines (the
+// tab's frets) carry on at one shared lean instead of straight down.
+/** Height of the neck's visible side under the bottom string (world px). */
+const NECK_EDGE_H = 10;
+/** How far a bar line leans across that side, left over its height (world px). */
+const NECK_EDGE_LEAN = 4;
+let neckGradientCache: { key: string; face: CanvasGradient; edge: CanvasGradient } | null = null;
+/** A light board (Paper, White, Sepia): the ink is dark, so light and shade swap roles. */
+function isLightBoard(): boolean {
+  if (bgColor.length !== 7 || bgColor[0] !== "#") return false;
+  const channel = (i: number) => parseInt(bgColor.slice(i, i + 2), 16);
+  return 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5) > 140;
+}
+/** Bar lines across the neck's side — a touch stronger on paper, where the side is mid-tone. */
+const neckEdgeLineAlpha = () => (isLightBoard() ? 0.3 : 0.22);
+function neckGradients(c: OffscreenCanvasRenderingContext2D, top: number, bottom: number) {
+  const key = `${top}|${bottom}|${inkColor}|${bgColor}`;
+  if (neckGradientCache?.key === key) return neckGradientCache;
+  const light = isLightBoard();
+  // Lit from above either way. On a dark board the ink is the light, so the
+  // face carries more of it at the top; on paper the ink is the shade, so it
+  // gathers towards the bottom edge instead.
+  const face = c.createLinearGradient(0, top, 0, bottom);
+  face.addColorStop(0, withAlpha(inkColor, NECK_ALPHA * (light ? 0.5 : 1.8)));
+  face.addColorStop(1, withAlpha(inkColor, NECK_ALPHA * (light ? 1.9 : 0.4)));
+  // The side: near-black under a dark board; on paper a soft tone of the ink
+  // over the paper (warm brown on Sepia), never a black slab.
+  const edge = c.createLinearGradient(0, bottom, 0, bottom + NECK_EDGE_H);
+  edge.addColorStop(0, light ? mixHex(bgColor, inkColor, 0.13) : "rgba(0,0,0,0.45)");
+  edge.addColorStop(1, light ? mixHex(bgColor, inkColor, 0.22) : "rgba(0,0,0,0.75)");
+  neckGradientCache = { key, face, edge };
+  return neckGradientCache;
+}
+
 const pillEdges = new Map<string, string>();
 /** The hairline round a filled pill: its own colour, a good step darker. */
 function pillEdge(hex: string): string {
@@ -897,9 +953,22 @@ function boardTint(role: BoardTintRole, stringColor: string | undefined): string
   const key = role + (stringColor ?? "");
   let color = boardTints.get(key);
   if (color === undefined) {
-    const neutral = mixHex(bgColor, inkColor, STAFF_LINE_INK);
+    const light = isLightBoard();
+    const neutral = mixHex(bgColor, inkColor, light ? STAFF_LINE_INK_LIGHT : STAFF_LINE_INK);
     if (!stringColor) color = neutral;
-    else if (role === "line") color = mixHex(neutral, stringColor, STAFF_LINE_TINT);
+    else if (role === "line") {
+      // On a dark board the line is the string colour at STAFF_LINE_TINT opacity.
+      // On paper that washes out — Mono, Pastel or a yellow string end up paper
+      // white — so there the colour is first pulled towards the ink, then laid
+      // opaque over the ink-grey line.
+      color = light
+        ? mixHex(
+          mixHexToHex(bgColor, inkColor, STAFF_LINE_INK_LIGHT),
+          mixHexToHex(stringColor, inkColor, STAFF_LINE_DARKEN_LIGHT),
+          STAFF_LINE_TINT_LIGHT,
+        )
+        : withAlpha(stringColor, STAFF_LINE_TINT);
+    }
     else if (role === "tile") color = mixHex(bgColor, stringColor, 0.3);
     else color = mixHex(stringColor, inkColor, 0.35);
     if (boardTints.size >= COLOR_CACHE_MAX) boardTints.clear();
@@ -967,7 +1036,7 @@ let palmMuteLabelW = 0;
  */
 function drawPalmMuteSpan(x0: number, x1: number, room: number, live: boolean) {
   if (!ctx) return;
-  const staffBottom = STAFF_TOP + 5 * STRING_SPACING;
+  const staffBottom = STAFF_TOP + staffSpan();
   // Held inside the board when wide string spacing leaves little room under the staff.
   const y = Math.min(BASE_H - 7, staffBottom + BLOCK_H / 2 + PM_ROW_GAP);
   ctx.font = "bold 11px Inter, sans-serif";
@@ -1708,7 +1777,7 @@ function drawTuningGutter(active: Set<number>) {
   // The nut: the bar the strings run from. An object on the board, not a
   // divider — it is what makes the staff read as a neck.
   ctx.fillStyle = withAlpha(inkColor, 0.8);
-  drawPill(GUTTER_W - NUT_W + 1, STAFF_TOP - 6, NUT_W, 5 * STRING_SPACING + 12, NUT_W / 2);
+  drawPill(GUTTER_W - NUT_W + 1, STAFF_TOP - 6, NUT_W, staffSpan() + 12, NUT_W / 2);
   ctx.fill();
 
   const pillX = 4, pillW = 26, pillH = BLOCK_H, r = BLOCK_CORNER;
@@ -2093,8 +2162,18 @@ function paintFrame(frameStamp?: number) {
   if (!hideNotes) {
     const lineL = Math.max(0, scrollX);
     const lineR = seamless ? scrollX + viewW + 10 : Math.min(totalW, scrollX + viewW + 10);
-    ctx.fillStyle = withAlpha(inkColor, NECK_ALPHA);
-    ctx.fillRect(lineL, STAFF_TOP - neckPad(), lineR - lineL, 5 * STRING_SPACING + neckPad() * 2);
+    const neckT = STAFF_TOP - neckPad();
+    const neckB = STAFF_TOP + staffSpan() + neckPad();
+    if (lite) {
+      ctx.fillStyle = withAlpha(inkColor, NECK_ALPHA);
+      ctx.fillRect(lineL, neckT, lineR - lineL, neckB - neckT);
+    } else {
+      const { face, edge } = neckGradients(ctx, neckT, neckB);
+      ctx.fillStyle = face;
+      ctx.fillRect(lineL, neckT, lineR - lineL, neckB - neckT);
+      ctx.fillStyle = edge;
+      ctx.fillRect(lineL, neckB, lineR - lineL, NECK_EDGE_H);
+    }
     ctx.lineCap = "butt";
     let boardMatrix: DOMMatrix | null = null;
     for (let row = 0; row < stringCount; row++) {
@@ -2170,7 +2249,7 @@ function paintFrame(frameStamp?: number) {
   // print). Parity runs on across repetitions so two unwashed bars never meet
   // at the loop seam.
   const neckTop = STAFF_TOP - neckPad();
-  const neckBottom = STAFF_TOP + 5 * STRING_SPACING + neckPad();
+  const neckBottom = STAFF_TOP + staffSpan() + neckPad();
   if (showMeasureLines && !hideNotes && measureEndPx.length > 0) {
     ctx.font = BAR_NUMBER_FONT;
     ctx.textAlign = "right";
@@ -2228,6 +2307,24 @@ function paintFrame(frameStamp?: number) {
       }
     }
     ctx.stroke();
+
+    if (!lite && !hideNotes) {
+      // …and carry on across the neck's side at one shared lean (see NECK_EDGE_H).
+      const edgeTop = neckBottom;
+      const edgeBottom = neckBottom + NECK_EDGE_H;
+      ctx.strokeStyle = withAlpha(inkColor, neckEdgeLineAlpha());
+      ctx.lineWidth = 2;
+      ctx.lineCap = "butt";
+      ctx.beginPath();
+      ctx.moveTo(0, edgeTop); ctx.lineTo(-NECK_EDGE_LEAN, edgeBottom);
+      for (const x of measureEndPx) {
+        if (x < visL) continue;
+        if (x > visR + NECK_EDGE_LEAN) break;
+        ctx.moveTo(x, edgeTop); ctx.lineTo(x - NECK_EDGE_LEAN, edgeBottom);
+      }
+      ctx.stroke();
+      ctx.lineCap = "round";
+    }
 
     // The last bar closes with a final bar line: thin, then thick.
     const endX = measureEndPx[measureEndPx.length - 1];
@@ -3190,7 +3287,7 @@ function paintFrame(frameStamp?: number) {
   // Below the palm-mute row, where nothing else is drawn: over the staff it
   // would run into pick marks, chord names and slur letters. Left out when wide
   // string spacing leaves no room for it on the board.
-  const countY = STAFF_TOP + 5 * STRING_SPACING + BLOCK_H / 2 + PM_ROW_GAP + COUNT_ROW_GAP;
+  const countY = STAFF_TOP + staffSpan() + BLOCK_H / 2 + PM_ROW_GAP + COUNT_ROW_GAP;
   if (showCounting && !hideNotes && countY <= BASE_H - 6) {
     ctx.font = COUNT_FONT;
     ctx.textAlign = "center";
@@ -3219,7 +3316,7 @@ function paintFrame(frameStamp?: number) {
 
   // ── Time signature markers ───────────────────────────────────────────────
   if (timeSigMarkers.length > 0) {
-    const sigMidY = STAFF_TOP + STRING_SPACING * 2.5;
+    const sigMidY = STAFF_TOP + staffSpan() / 2;
     // Half the digit stack (two 14px digits ±10 px from the middle) plus half a pill.
     const sigClearance = 17 + BLOCK_H / 2;
     ctx.fillStyle = withAlpha(inkColor, 0.45);
@@ -3310,7 +3407,7 @@ function paintFrame(frameStamp?: number) {
     // A closing double bar where the music stops.
     if (!hideNotes && playUntilX >= viewL && playUntilX <= viewR) {
       const top = STAFF_TOP;
-      const bottom = STAFF_TOP + 5 * STRING_SPACING;
+      const bottom = STAFF_TOP + staffSpan();
       ctx.strokeStyle = withAlpha(inkColor, 0.55);
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(playUntilX - 6, top); ctx.lineTo(playUntilX - 6, bottom); ctx.stroke();
@@ -3379,7 +3476,7 @@ function paintFrame(frameStamp?: number) {
     // Wash over the whole staff at that beat: an empty cell has no note to ring,
     // and this is what makes the spot findable at a glance.
     ctx.fillStyle = "rgba(6,182,212,0.10)";
-    ctx.fillRect(selX, STAFF_TOP - 16, selW, 5 * STRING_SPACING + 32);
+    ctx.fillRect(selX, STAFF_TOP - 16, selW, staffSpan() + 32);
 
     // Ring around the selected string(s) — the note-level "you are here".
     ctx.strokeStyle = "rgba(34,211,238,0.85)";
