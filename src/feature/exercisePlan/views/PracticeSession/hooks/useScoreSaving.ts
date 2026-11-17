@@ -13,9 +13,9 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
-import { markExerciseCompleted, saveLeaderboardEntry, updateClickHighScore, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
+import { getLeaderboardEntryScore, markExerciseCompleted, saveLeaderboardEntry, updateClickHighScore, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
 import type { Exercise, ScoredRun } from "../../../types/exercise.types";
-import { isRunFullLength, isRunWithinExerciseTime } from "../../../utils/exerciseTimeLimit";
+import { getExerciseTimeLimitMs, isRunFullLength, isRunWithinExerciseTime } from "../../../utils/exerciseTimeLimit";
 import { hasLeaderboard } from "../../../utils/hasLeaderboard";
 import { isClickAnsweredMode } from "../../../utils/huntModes";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
@@ -26,6 +26,13 @@ interface UseScoreSavingOptions {
   currentExercise:      Exercise;
   isMicEnabled:         boolean;
   earTrainingScore:     number;
+  /**
+   * The Play by Ear run as a leaderboard may take it: mic-heard melodies only,
+   * solved within one attempt `limitMs` long (see earTrainingBoardScore). The
+   * plain `earTrainingScore` also holds the "I had it" points and is the
+   * player's own record only.
+   */
+  getEarTrainingBoardScore?: (limitMs: number | null) => number;
   noteMatchingHandle:   RefObject<NoteMatchingHandle | null>;
   /** Tempo the run is actually being played at — metronome BPM × speed multiplier. */
   sessionBpm:           number;
@@ -79,7 +86,7 @@ export interface ScoreRecords {
 
 export function useScoreSaving({
   activeExercise, currentExercise, isMicEnabled,
-  earTrainingScore, noteMatchingHandle, sessionBpm, recordGoalChartRuns = true,
+  earTrainingScore, getEarTrainingBoardScore, noteMatchingHandle, sessionBpm, recordGoalChartRuns = true,
   videoDurationSeconds = null, duelId = null, recording = null, learnModeRef,
 }: UseScoreSavingOptions) {
   const userAuth   = useAppSelector(selectUserAuth);
@@ -212,11 +219,20 @@ export function useScoreSaving({
     }
 
     if (userAuth && currentExercise.riddleConfig?.mode === "sequenceRepeat" && earTrainingScore > 0) {
+      // The player's own record takes every point, "I had it" ones included.
       const result = await updateEarTrainingHighScore(userAuth, exId, earTrainingScore, exTitle, exCategory);
-      recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: earTrainingScore, scoreType: "earTraining", previousBest: result.previousScore, bpm: runBpm }, isRanked);
-      earTrainingStandingRef.current = await placeOnLeaderboard(userAuth, earTrainingScore, result.previousScore);
-      // Play by Ear has no accuracy of its own — 0 tells the duel page not to show one.
-      if (duelScoreKind(activeExercise) === "earTraining") await sendDuelRun(earTrainingScore, 0);
+      // Boards and duels take only what the mic heard within one attempt — a
+      // self-marked point, or one from the tenth minute of a 3-minute drill,
+      // says nothing anyone else can be ranked against.
+      const boardScore = getEarTrainingBoardScore?.(getExerciseTimeLimitMs(activeExercise)) ?? 0;
+      if (boardScore > 0) {
+        // The board's own best, not the record above: the two count different points.
+        const boardBest = isRanked ? await getLeaderboardEntryScore(userAuth, exId) : 0;
+        recordScoredRun({ exerciseId: exId, exerciseTitle: exTitle, score: boardScore, scoreType: "earTraining", previousBest: boardBest, bpm: runBpm }, isRanked);
+        earTrainingStandingRef.current = await placeOnLeaderboard(userAuth, boardScore, boardBest);
+        // Play by Ear has no accuracy of its own — 0 tells the duel page not to show one.
+        if (duelScoreKind(activeExercise) === "earTraining") await sendDuelRun(boardScore, 0);
+      }
       if (result.isNewRecord) {
         exerciseRecordsRef.current = {
           ...exerciseRecordsRef.current,

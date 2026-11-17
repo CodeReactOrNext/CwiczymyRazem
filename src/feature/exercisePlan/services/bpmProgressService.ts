@@ -440,6 +440,20 @@ export const saveLeaderboardEntry = async (
   }
 };
 
+/** The score the player already holds on an exercise's leaderboard; 0 when none or unreadable. */
+export const getLeaderboardEntryScore = async (
+  userId: string,
+  exerciseId: string
+): Promise<number> => {
+  try {
+    const snapshot = await trackedGetDoc(doc(db, "exerciseLeaderboards", exerciseId, "entries", userId));
+    return snapshot.exists() ? (snapshot.data() as LeaderboardEntry).score ?? 0 : 0;
+  } catch (error) {
+    logger.error(error, { context: "getLeaderboardEntryScore" });
+    return 0;
+  }
+};
+
 export const getExerciseLeaderboard = async (
   exerciseId: string,
   limitCount = 20

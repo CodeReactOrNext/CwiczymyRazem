@@ -26,7 +26,7 @@ import { useAppSelector } from "store/hooks";
 import { useCalendar } from "../hooks/useCalendar";
 import { useCalendarDisplay } from "../hooks/useCalendarDisplay";
 import { usePlannerSources } from "../hooks/usePlannerSources";
-import type { PracticeArea } from "../types/calendar.types";
+import type { CalendarItem, PracticeArea } from "../types/calendar.types";
 import {
   addDays,
   startOfWeek,
@@ -147,20 +147,36 @@ export const CalendarView = () => {
 
   const fail = () => toast.error(t("toast.error"));
 
+  const startSession = (date: string, items: CalendarItem[]) => {
+    const plan = buildDayPlan(date, items, EXERCISES_BY_ID, sources.gpSongIds);
+    if (!plan) {
+      toast.error(t("toast.nothing_to_play"));
+      return false;
+    }
+    setSession({ date, plan, itemIds: items.map((item) => item.id) });
+    return true;
+  };
+
   const playDay = (date: string) => {
     const open = week.byDate[date]
       .filter((entry) => !entry.done)
       .map((entry) => entry.item);
-    const plan = buildDayPlan(date, open, EXERCISES_BY_ID, sources.gpSongIds);
-    if (!plan) {
-      toast.error(t("toast.nothing_to_play"));
-      return;
-    }
+    if (!startSession(date, open)) return;
     posthog.capture("calendar_day_started", {
       items: open.length,
       is_today: date === today,
     });
-    setSession({ date, plan, itemIds: open.map((item) => item.id) });
+  };
+
+  /** Just one slot — played again even when it is already ticked off. */
+  const playItem = (date: string, itemId: string) => {
+    const entry = week.byDate[date].find((e) => e.item.id === itemId);
+    if (!entry || !startSession(date, [entry.item])) return;
+    posthog.capture("calendar_item_started", {
+      kind: entry.item.kind,
+      was_done: entry.done,
+      is_today: date === today,
+    });
   };
 
   const clearWeek = async () => {
@@ -275,6 +291,7 @@ export const CalendarView = () => {
       onAdd={() => setDialog({ date })}
       onRepeat={() => setRepeating(date)}
       onPlay={() => playDay(date)}
+      onPlayItem={(itemId) => playItem(date, itemId)}
       onToggleDone={(itemId) =>
         void calendar.toggleDone(date, itemId).catch(fail)
       }

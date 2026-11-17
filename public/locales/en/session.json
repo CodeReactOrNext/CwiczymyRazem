@@ -135,8 +135,10 @@
     "title": "Chord Practice Setup",
     "description": "Build your exercise. Sequence up to 8 chords.",
     "click_to_add": "Click chords below to add...",
+    "sequence": "Sequence ({{count}}/8)",
+    "remove_chord": "Remove {{chord}}",
     "beginner": "Beginner",
-    "intermediate": "Inter",
+    "intermediate": "Intermediate",
     "advanced": "Advanced",
     "frequency": "Changes Frequency",
     "every_bar": "Every Bar",
@@ -475,7 +477,8 @@
     "stuck_reveal": "Stuck? Reveal",
     "show_answer": "Show answer",
     "replay_melody": "Replay melody",
-    "had_it": "I had it"
+    "had_it": "I had it",
+    "self_marked_note": "Only melodies the mic hears count on the leaderboard — \"I had it\" adds to your own record."
   },
   "volume": {
     "instruments": "Instruments",

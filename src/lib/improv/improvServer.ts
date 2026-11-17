@@ -30,9 +30,8 @@ import type {
   Transaction,
 } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
-import { firestore } from "utils/firebase/api/firebase.config";
-
 import { lastDiscordError } from "lib/discord/discordBot";
+import { firestore } from "utils/firebase/api/firebase.config";
 
 import {
   deleteImprovTakeMessage,
@@ -225,6 +224,10 @@ const ensureCurrentRound = async (
  * request (the next visit, or the next take) tries again — which is also how a
  * round drawn before the bot was configured gets its thread later.
  */
+/** Discord's "Unknown Channel" — the thread no longer exists. */
+const isUnknownChannelError = (error: string | null): boolean =>
+  !!error && /"code":\s*10003\b/.test(error);
+
 const NOT_CONFIGURED =
   "DISCORD_BOT_TOKEN or DISCORD_IMPROV_CHANNEL_ID is not set on the server";
 
@@ -414,16 +417,30 @@ export const submitImprovTake = async (
     },
   );
 
-  const thread =
+  let thread =
     threadOf(current.data) ??
     (await ensureRoundThread(current.ref, now)).thread;
   let discordMessageId: string | null = null;
-  if (thread) {
-    discordMessageId = await postImprovTake(
-      thread,
+  const post = (target: ImprovThread) =>
+    postImprovTake(
+      target,
       toRound(current.ref.id, current.data),
       toTake(takeRef.id, takeData, null),
     );
+
+  if (thread) {
+    discordMessageId = await post(thread);
+    // The thread was deleted on Discord: unlink it, open a fresh one and try
+    // once more, so a moderator removing a thread can't silence the round.
+    if (!discordMessageId && isUnknownChannelError(lastDiscordError())) {
+      await current.ref.update({
+        discordThreadId: FieldValue.delete(),
+        discordGuildId: FieldValue.delete(),
+        discordClaimedAt: 0,
+      });
+      thread = (await ensureRoundThread(current.ref, now)).thread;
+      if (thread) discordMessageId = await post(thread);
+    }
     if (discordMessageId) await takeRef.update({ discordMessageId });
   }
 

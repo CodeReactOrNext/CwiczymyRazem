@@ -4,7 +4,7 @@ import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/e
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import { useInstrumentPreferenceStore } from "feature/tuner/store/instrumentPreferenceStore";
 import { useTranslation } from "hooks/useTranslation";
-import { AlertCircle, Drum,FileMusic, Music as MusicIcon, Upload, Zap } from "lucide-react";
+import { Drum,FileMusic, Music as MusicIcon, Upload, Zap } from "lucide-react";
 import { useCallback, useMemo,useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
@@ -205,9 +205,9 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
       <div
         {...getRootProps()}
         className={cn(
-          "relative group cursor-pointer rounded-2xl border-2 border-dashed transition-all duration-base overflow-hidden",
-          isDragActive ? "border-cyan-500 bg-cyan-500/10" : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10",
-          file ? "border-green-500/50 bg-green-500/5" : "",
+          "relative cursor-pointer overflow-hidden rounded-lg transition-colors duration-base",
+          isDragActive ? "bg-zinc-800" : "bg-zinc-900/60 hover:bg-zinc-900",
+          file ? "bg-emerald-500/10" : "",
           isParsing ? "opacity-50 cursor-wait" : "",
           parsedData ? "h-24" : ""
         )}
@@ -216,24 +216,24 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
 
         <div className={cn(
           "flex flex-col items-center text-center transition-all duration-base",
-          parsedData ? "p-4 space-y-2" : "p-8 space-y-4"
+          parsedData ? "p-4 space-y-2" : "p-6 space-y-3"
         )}>
           {file ? (
             <>
               {!parsedData && (
-                <div className="h-16 w-16 rounded-2xl bg-green-500/20 flex items-center justify-center text-green-400">
-                  <FileMusic className="h-8 w-8" />
+                <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                  <FileMusic className="h-5 w-5" />
                 </div>
               )}
               <div className="space-y-1">
-                <div className="font-bold text-white flex items-center gap-2 justify-center">
-                  <FileMusic className="h-4 w-4 text-green-400" />
+                <div className="text-sm font-medium text-zinc-100 flex items-center gap-2 justify-center">
+                  <FileMusic className="h-4 w-4 text-emerald-400" />
                   {file.name}
                 </div>
-                {!parsedData && <div className="text-xs text-zinc-500">{t("import_tab.processing")}</div>}
+                {!parsedData && <div className="text-xs text-zinc-400">{t("import_tab.processing")}</div>}
                 {parsedData && (
-                  <div className="flex items-center gap-2 text-xs text-zinc-500 justify-center font-bold">
-                    <Zap className="h-3 w-3 text-yellow-500" /> {parsedData.tracks.length} tracks detected
+                  <div className="flex items-center gap-2 text-xs text-zinc-400 justify-center">
+                    <Zap className="h-3 w-3 text-zinc-400" /> {parsedData.tracks.length} tracks detected
                   </div>
                 )}
               </div>
@@ -241,36 +241,32 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
           ) : (
             <>
               <div className={cn(
-                "h-16 w-16 rounded-2xl flex items-center justify-center transition-all duration-base",
-                isDragActive ? "bg-cyan-500 text-white" : "bg-zinc-900 text-zinc-500 group-hover:bg-zinc-800"
+                "h-10 w-10 rounded-lg flex items-center justify-center bg-zinc-800 text-zinc-400 transition-colors duration-base",
+                isDragActive && "text-zinc-100"
               )}>
                 {isParsing ? (
-                  <div className="h-8 w-8 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+                  <div className="h-5 w-5 border-2 border-zinc-600 border-t-zinc-300 rounded-full animate-spin" />
                 ) : (
-                  <Upload className="h-8 w-8" />
+                  <Upload className="h-5 w-5" />
                 )}
               </div>
 
               <div className="space-y-1">
-                <div className="font-bold text-white text-xs">
+                <div className="text-sm font-medium text-zinc-100">
                   {isDragActive ? t("import_tab.drop") : t("import_tab.import")}
                 </div>
-                <div className="text-sm text-zinc-500">
+                <div className="text-xs text-zinc-400">
                   {isParsing ? t("import_tab.analyzing") : t("import_tab.upload")}
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 text-xs font-bold text-cyan-500/50 bg-cyan-500/5 px-3 py-1 rounded-full border border-cyan-500/10">
-                <AlertCircle className="h-3 w-3" />
-                Guitar Pro (Multi-Track) support
+              <div className="text-xs text-zinc-500">
+                Guitar Pro (Multi-Track)
               </div>
             </>
           )}
         </div>
 
-        {/* Decorative corner glow */}
-        <div className="absolute -top-12 -right-12 h-24 w-24 bg-cyan-500/10 blur-[40px] rounded-full pointer-events-none" />
-        <div className="absolute -bottom-12 -left-12 h-24 w-24 bg-purple-500/10 blur-[40px] rounded-full pointer-events-none" />
       </div>
     </div>
   );

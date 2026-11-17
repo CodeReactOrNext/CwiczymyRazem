@@ -16,6 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'assets/components/ui/select';
+import { cn } from 'assets/lib/utils';
+import {
+  SETUP_DIALOG_BODY,
+  SETUP_DIALOG_CONTENT,
+  SETUP_DIALOG_FOOTER,
+  SETUP_FIELD,
+} from 'feature/exercisePlan/components/setupDialogStyles';
 import { type FretPosition,getScaleShape, getShapeStartFrets } from 'feature/exercisePlan/scales/fretboardMapper';
 import { getNotesPerString,rootNotes as chromaticRootNotes,scaleDefinitions } from 'feature/exercisePlan/scales/scaleDefinitions';
 import {
@@ -28,7 +35,7 @@ import {
 } from 'feature/exercisePlan/scales/scaleExerciseGenerator';
 import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
 import { useTranslation } from "hooks/useTranslation";
-import { useEffect,useState } from 'react';
+import { useState } from 'react';
 
 import { FretboardPreview } from './FretboardPreview';
 
@@ -53,7 +60,17 @@ export function ScaleSelectionDialog({
     position: 1,
   });
 
-  useEffect(() => {
+  // Reset the form whenever the dialog opens (or is reopened for another
+  // exercise) — adjusted during render instead of in an effect.
+  const [syncedFor, setSyncedFor] = useState<{
+    isOpen: boolean;
+    initialExercise?: Exercise;
+  }>({ isOpen: false });
+  if (
+    syncedFor.isOpen !== isOpen ||
+    syncedFor.initialExercise !== initialExercise
+  ) {
+    setSyncedFor({ isOpen, initialExercise });
     if (isOpen) {
       if (initialExercise && initialExercise._generatorConfig) {
         setConfig(initialExercise._generatorConfig);
@@ -66,7 +83,7 @@ export function ScaleSelectionDialog({
         });
       }
     }
-  }, [isOpen, initialExercise]);
+  }
 
   const rootNotes = getAvailableRootNotes();
   const scales = getAvailableScales();
@@ -128,7 +145,7 @@ export function ScaleSelectionDialog({
           it renders behind it (SelectContent defaults to z-50). */}
       <DialogContent
         overlayClassName="z-[99999998]"
-        className="z-[99999999] !flex flex-col max-h-[100dvh] sm:max-h-[92dvh] sm:max-w-[500px]"
+        className={cn("z-[99999999]", SETUP_DIALOG_CONTENT)}
       >
         <DialogHeader className="shrink-0">
           <DialogTitle>{t("scale_dialog.title")}</DialogTitle>
@@ -137,8 +154,8 @@ export function ScaleSelectionDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-        <div className="space-y-6 py-4">
+        <div className={SETUP_DIALOG_BODY}>
+        <div className="space-y-8">
           {/* Root Note Selection */}
           <div className="space-y-2">
             <Label htmlFor="root-note">{t("scale_dialog.root")}</Label>
@@ -148,7 +165,7 @@ export function ScaleSelectionDialog({
                 setConfig((prev) => ({ ...prev, rootNote: value }))
               }
             >
-              <SelectTrigger id="root-note">
+              <SelectTrigger id="root-note" className={SETUP_FIELD}>
                 <SelectValue placeholder={t("scale_dialog.select_note")} />
               </SelectTrigger>
               <SelectContent className="z-[100000000]">
@@ -170,7 +187,7 @@ export function ScaleSelectionDialog({
                 setConfig((prev) => ({ ...prev, scaleType: value }))
               }
             >
-              <SelectTrigger id="scale-type">
+              <SelectTrigger id="scale-type" className={SETUP_FIELD}>
                 <SelectValue placeholder={t("scale_dialog.select_scale")} />
               </SelectTrigger>
               <SelectContent className="z-[100000000]">
@@ -182,7 +199,7 @@ export function ScaleSelectionDialog({
               </SelectContent>
             </Select>
             {selectedScale && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-zinc-400">
                 {selectedScale.description}
               </p>
             )}
@@ -197,7 +214,7 @@ export function ScaleSelectionDialog({
                 setConfig((prev) => ({ ...prev, patternType: value }))
               }
             >
-              <SelectTrigger id="pattern-type">
+              <SelectTrigger id="pattern-type" className={SETUP_FIELD}>
                 <SelectValue placeholder={t("scale_dialog.select_pattern")} />
               </SelectTrigger>
               <SelectContent className="z-[100000000]">
@@ -219,7 +236,7 @@ export function ScaleSelectionDialog({
                 setConfig((prev) => ({ ...prev, position: value === 'all' ? 'all' : parseInt(value) }))
               }
             >
-              <SelectTrigger id="position">
+              <SelectTrigger id="position" className={SETUP_FIELD}>
                 <SelectValue placeholder={t("scale_dialog.select_position")} />
               </SelectTrigger>
               <SelectContent className="z-[100000000]">
@@ -230,7 +247,7 @@ export function ScaleSelectionDialog({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-zinc-400">
               {config.position === 'all' 
                 ? t("scale_dialog.all_hint")
                 : t("scale_dialog.position_hint")}
@@ -253,7 +270,7 @@ export function ScaleSelectionDialog({
         )}
         </div>
 
-        <div className="flex shrink-0 justify-end gap-3">
+        <div className={SETUP_DIALOG_FOOTER}>
           <Button variant="outline" onClick={onClose}>
             {t("cancel")}
           </Button>

@@ -108,6 +108,7 @@ export function MobileExerciseContent({
   if (currentExercise.earQuizConfig) {
     return (
       <EarQuizPanel
+        key={currentExercise.id}
         config={currentExercise.earQuizConfig}
         exerciseId={currentExercise.id}
         isSessionRunning={isPlaying}

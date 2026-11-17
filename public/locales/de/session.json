@@ -135,6 +135,8 @@
     "title": "Akkordübung einrichten",
     "description": "Bau deine Übung. Reihe bis zu 8 Akkorde aneinander.",
     "click_to_add": "Klick unten auf Akkorde, um sie hinzuzufügen...",
+    "sequence": "Reihenfolge ({{count}}/8)",
+    "remove_chord": "{{chord}} entfernen",
     "beginner": "Anfänger",
     "intermediate": "Mittel",
     "advanced": "Fortgeschritten",
@@ -399,7 +401,8 @@
     "stuck_reveal": "Hängst du? Aufdecken",
     "show_answer": "Antwort zeigen",
     "replay_melody": "Melodie nochmal abspielen",
-    "had_it": "Hatte ich"
+    "had_it": "Hatte ich",
+    "self_marked_note": "In der Rangliste zählen nur Melodien, die das Mikrofon hört — „Hatte ich“ zählt für deinen eigenen Rekord."
   },
   "volume": {
     "instruments": "Instrumente",

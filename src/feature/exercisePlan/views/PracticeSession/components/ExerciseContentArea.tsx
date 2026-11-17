@@ -245,6 +245,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
       {currentExercise.earQuizConfig ? (
         <div className='p-4 sm:p-6'>
           <EarQuizPanel
+            key={currentExercise.id}
             config={currentExercise.earQuizConfig}
             exerciseId={currentExercise.id}
             isSessionRunning={isPlaying}

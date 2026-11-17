@@ -1,10 +1,12 @@
 import { generateRiddle } from "feature/exercisePlan/logic/riddleGenerator";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useEffect, useState } from "react";
+import type { SetStateAction } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 import { getExerciseBpmProgress } from "../../../services/bpmProgressService";
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
+import { earTrainingBoardScore } from "../../../utils/earTrainingBoardScore";
 
 interface UseEarTrainingOptions {
   currentExercise: Exercise;
@@ -29,10 +31,42 @@ export function useEarTraining({
   const [riddleMeasures,       setRiddleMeasures]       = useState<TablatureMeasure[] | null>(null);
   const [isRiddleRevealed,     setIsRiddleRevealed]     = useState(false);
   const [isRiddleGuessed,      setIsRiddleGuessed]      = useState(false);
-  const [earTrainingScore,     setEarTrainingScore]     = useState(0);
+  const [earTrainingScore,     setEarTrainingScoreState] = useState(0);
   const [earTrainingHighScore, setEarTrainingHighScore] = useState<number | null>(null);
   const [hasPlayedRiddleOnce,  setHasPlayedRiddleOnce]  = useState(false);
   const [tabResetKey,          setTabResetKey]          = useState(0);
+
+  // What the leaderboard may see of the run (see earTrainingBoardScore): when
+  // its first melody sounded, and when each melody the mic heard was solved.
+  // Wall-clock, so a paused session keeps counting.
+  const runStartMsRef = useRef<number | null>(null);
+  const verifiedAtMsRef = useRef<number[]>([]);
+
+  const clearBoardRun = () => {
+    runStartMsRef.current = null;
+    verifiedAtMsRef.current = [];
+  };
+
+  // Every reset of the score goes through here, so a reset also starts the
+  // board's run over — the score and its proof never drift apart.
+  const setEarTrainingScore = useCallback((next: SetStateAction<number>) => {
+    if (next === 0) {
+      runStartMsRef.current = null;
+      verifiedAtMsRef.current = [];
+    }
+    setEarTrainingScoreState(next);
+  }, []);
+
+  /** A melody the mic heard the player repeat — the only kind a board ranks. */
+  const recordVerifiedEarPoint = useCallback(() => {
+    verifiedAtMsRef.current.push(performance.now());
+  }, []);
+
+  /** The run's score as the leaderboard may take it, for an attempt `limitMs` long. */
+  const getEarTrainingBoardScore = useCallback(
+    (limitMs: number | null) => earTrainingBoardScore(verifiedAtMsRef.current, runStartMsRef.current, limitMs),
+    []
+  );
 
   // Fetch high score from Firebase
   useEffect(() => {
@@ -50,6 +84,7 @@ export function useEarTraining({
     setIsRiddleRevealed(false);
     setIsRiddleGuessed(false);
     setHasPlayedRiddleOnce(false);
+    clearBoardRun();
     if (currentExercise.riddleConfig?.mode === "sequenceRepeat") {
       setRiddleMeasures(generateRiddle(currentExercise.riddleConfig));
       if (currentBpm !== 108) setBpm(108);
@@ -67,6 +102,8 @@ export function useEarTraining({
   // which is what "it stopped listening to my notes" looked like from the couch.
   useEffect(() => {
     if (!isRiddleSounding || currentExercise.riddleConfig?.mode !== "sequenceRepeat") return;
+    // The board's clock starts with the run's first melody.
+    if (runStartMsRef.current === null) runStartMsRef.current = performance.now();
     // A latch over time, not a value derivable from the current props: the phrase
     // stays heard long after it has stopped sounding.
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -105,6 +142,8 @@ export function useEarTraining({
     setIsRiddleGuessed,
     earTrainingScore,
     setEarTrainingScore,
+    recordVerifiedEarPoint,
+    getEarTrainingBoardScore,
     earTrainingHighScore,
     hasPlayedRiddleOnce,
     setHasPlayedRiddleOnce,

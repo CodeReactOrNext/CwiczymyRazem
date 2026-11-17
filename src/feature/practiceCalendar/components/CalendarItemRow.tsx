@@ -5,7 +5,14 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
-import { Check, ExternalLink, RotateCcw, Timer, Trash2 } from "lucide-react";
+import {
+  Check,
+  ExternalLink,
+  Play,
+  RotateCcw,
+  Timer,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 
 import { useCalendarDisplay } from "../hooks/useCalendarDisplay";
@@ -20,6 +27,8 @@ interface CalendarItemRowProps {
   date: string;
   /** The days of the shown week, Monday first — where a slot can be moved. */
   weekDates: string[];
+  /** Runs just this slot as a session of its own. */
+  onPlay: () => void;
   onToggleDone: () => void;
   onChangeLength: () => void;
   onMove: (date: string) => void;
@@ -28,14 +37,15 @@ interface CalendarItemRowProps {
 
 /**
  * One slot of a day: the area's dot, what it plays and for how long. A tap
- * opens its menu — tick it off, change its length, move it, open its goal or
- * roadmap step.
+ * opens its menu — play just this slot, tick it off, change its length, move
+ * it, open its goal or roadmap step.
  */
 export const CalendarItemRow = ({
   item,
   done,
   date,
   weekDates,
+  onPlay,
   onToggleDone,
   onChangeLength,
   onMove,
@@ -88,6 +98,12 @@ export const CalendarItemRow = ({
         <DropdownMenuContent
           align='start'
           className='w-64 border-0 bg-zinc-900 p-1.5 text-zinc-200'>
+          <DropdownMenuItem
+            onSelect={onPlay}
+            className='gap-2.5 rounded-lg py-2 font-medium text-zinc-100 focus:bg-zinc-800'>
+            <Play className='h-4 w-4 text-zinc-300' />
+            {t("item.play")}
+          </DropdownMenuItem>
           {/* Played elsewhere in the app counts as done by itself — there is nothing to undo. */}
           {(!done || item.done) && (
             <DropdownMenuItem

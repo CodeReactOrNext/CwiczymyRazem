@@ -1,10 +1,11 @@
 'use client';
 
+import { Button } from 'assets/components/ui/button';
 import { Input } from 'assets/components/ui/input';
 import { Label } from 'assets/components/ui/label';
 import { cn } from 'assets/lib/utils';
+import { SETUP_FIELD } from 'feature/exercisePlan/components/setupDialogStyles';
 import { useTranslation } from "hooks/useTranslation";
-import { Clock } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 const QUICK_TIMES = [3, 5, 10, 15, 20];
@@ -47,49 +48,42 @@ export function ExerciseTimeField({
   }, [selectOnMount]);
 
   return (
-    <div className='space-y-5'>
-      <div className='space-y-2.5'>
-        <Label
-          htmlFor='exercise-time'
-          className='flex items-center gap-1.5 text-[12px] font-bold tracking-wider text-zinc-500'>
-          <Clock className='h-3.5 w-3.5 text-cyan-500/70' />
-          {t("practice_duration")}
-        </Label>
-        <div className='relative'>
-          <Input
-            ref={inputRef}
-            id='exercise-time'
-            type='number'
-            min={1}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') onSubmit();
-              if (e.key === 'Escape') onCancel();
-            }}
-            className='h-14 rounded-[8px] border-none bg-white/[0.05] text-center text-xl font-black text-cyan-300 transition-all placeholder:text-zinc-700 [appearance:textfield] focus-visible:bg-white/[0.08] focus-visible:ring-1 focus-visible:ring-cyan-500/40 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
-            placeholder='0'
-          />
-          <span className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold tracking-widest text-zinc-500'>
-            min
-          </span>
-        </div>
+    <div className='space-y-3'>
+      <Label htmlFor='exercise-time'>{t("practice_duration")}</Label>
+      <div className='relative'>
+        <Input
+          ref={inputRef}
+          id='exercise-time'
+          type='number'
+          min={1}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') onSubmit();
+            if (e.key === 'Escape') onCancel();
+          }}
+          className={cn(
+            SETUP_FIELD,
+            'text-center text-lg font-semibold [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
+          )}
+          placeholder='0'
+        />
+        <span className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-zinc-400'>
+          min
+        </span>
       </div>
 
       <div className='flex flex-wrap gap-2'>
-        {QUICK_TIMES.map((t) => (
-          <button
-            key={t}
+        {QUICK_TIMES.map((minutes) => (
+          <Button
+            key={minutes}
             type='button'
-            onClick={() => onChange(String(t))}
-            className={cn(
-              'min-w-[50px] flex-1 rounded-[8px] py-2 text-[12px] font-bold transition-colors duration-base',
-              value === String(t)
-                ? 'bg-cyan-500/15 text-cyan-300'
-                : 'bg-white/[0.05] text-zinc-300 hover:bg-white/10 hover:text-white'
-            )}>
-            {t}
-          </button>
+            variant={value === String(minutes) ? 'default' : 'secondary'}
+            aria-pressed={value === String(minutes)}
+            onClick={() => onChange(String(minutes))}
+            className='min-w-[50px] flex-1'>
+            {minutes}
+          </Button>
         ))}
       </div>
     </div>

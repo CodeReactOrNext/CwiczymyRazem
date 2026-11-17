@@ -40,6 +40,7 @@
   "item": {
     "menu": "Opcje: {{title}}",
     "warmup": "Rozgrzewka",
+    "play": "Zagraj teraz",
     "mark_done": "Oznacz jako zagrane",
     "undo_done": "Oznacz jako niezagrane",
     "open_goal": "Otwórz cel",

@@ -38,6 +38,7 @@
   "item": {
     "menu": "Options for {{title}}",
     "warmup": "Warm-up",
+    "play": "Play this now",
     "mark_done": "Mark as played",
     "undo_done": "Mark as not played",
     "open_goal": "Open goal",

@@ -497,7 +497,7 @@ const PracticeSessionInner = ({
 
   const {
     riddleMeasures, isRiddleRevealed, isRiddleGuessed, setIsRiddleGuessed,
-    earTrainingScore, setEarTrainingScore, earTrainingHighScore,
+    earTrainingScore, setEarTrainingScore, recordVerifiedEarPoint, getEarTrainingBoardScore, earTrainingHighScore,
     hasPlayedRiddleOnce, setHasPlayedRiddleOnce, tabResetKey,
     handleNextRiddle, handleReplayRiddle, handleRevealRiddle,
   } = useEarTraining({ currentExercise, isRiddleSounding: isAudioPlaying, restartMetronome: metronome.restartMetronome, startMetronome: metronome.startMetronome, currentBpm: metronome.bpm, setBpm: metronome.setBpm });
@@ -1088,7 +1088,7 @@ const PracticeSessionInner = ({
   // place of the run that was just saved — every finish path below awaits
   // saveCurrentScores() first, so they are filled by the time the report goes out.
   const { saveCurrentScores, exerciseRecordsRef, scoredRuns, micStandingRef, earTrainingStandingRef } = useScoreSaving({
-    activeExercise, currentExercise, isMicEnabled, earTrainingScore, noteMatchingHandle,
+    activeExercise, currentExercise, isMicEnabled, earTrainingScore, getEarTrainingBoardScore, noteMatchingHandle,
     sessionBpm: effectiveBpm,
     recordGoalChartRuns: !isGoalMode,
     // A song played through its whole tab is a whole run, however long the song.
@@ -1321,13 +1321,15 @@ const PracticeSessionInner = ({
   // the next phrase. Only this path auto-advances — a player who pressed "Stuck?
   // Reveal" wants to study the tab, not watch it disappear.
   const handleRiddleMatched = useCallback(() => {
+    // The mic heard it — the one kind of point the leaderboard takes.
+    recordVerifiedEarPoint();
     handleEarTrainingGuessed();
     cancelRiddleAutoAdvance();
     riddleAutoAdvanceRef.current = window.setTimeout(() => {
       riddleAutoAdvanceRef.current = null;
       handleNextRiddleClick();
     }, RIDDLE_AUTO_ADVANCE_MS);
-  }, [handleEarTrainingGuessed, cancelRiddleAutoAdvance, handleNextRiddleClick]);
+  }, [recordVerifiedEarPoint, handleEarTrainingGuessed, cancelRiddleAutoAdvance, handleNextRiddleClick]);
 
   // Armed only while the phrase is silent — otherwise the mic would hear the
   // riddle itself coming from the speakers and solve it on its own. The session

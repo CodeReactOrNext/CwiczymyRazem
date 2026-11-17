@@ -180,6 +180,7 @@ export const EarTrainingView = ({
             </Button>
           </div>
         ) : !isGuessed ? (
+          <div className="space-y-2.5">
           <div className="flex items-center gap-2">
             <Button
               size="sm"
@@ -205,6 +206,8 @@ export const EarTrainingView = ({
             >
               <X className="mr-1.5 h-3.5 w-3.5" /> Missed it
             </Button>
+          </div>
+          <p className="text-[11px] text-zinc-500">{t("ear.self_marked_note")}</p>
           </div>
         ) : (
           <div className="flex items-center gap-2">

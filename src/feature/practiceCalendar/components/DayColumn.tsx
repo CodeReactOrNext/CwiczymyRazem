@@ -22,6 +22,7 @@ interface DayColumnProps {
   onAdd: () => void;
   onRepeat: () => void;
   onPlay: () => void;
+  onPlayItem: (itemId: string) => void;
   onToggleDone: (itemId: string) => void;
   onChangeLength: (itemId: string) => void;
   onMove: (itemId: string, to: string) => void;
@@ -43,6 +44,7 @@ export const DayColumn = ({
   onAdd,
   onRepeat,
   onPlay,
+  onPlayItem,
   onToggleDone,
   onChangeLength,
   onMove,
@@ -149,6 +151,7 @@ export const DayColumn = ({
               done={done}
               date={date}
               weekDates={weekDates}
+              onPlay={() => onPlayItem(item.id)}
               onToggleDone={() => onToggleDone(item.id)}
               onChangeLength={() => onChangeLength(item.id)}
               onMove={(to) => onMove(item.id, to)}

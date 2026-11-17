@@ -1,13 +1,14 @@
 'use client';
 
 import { Button } from 'assets/components/ui/button';
-import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from 'assets/components/ui/dialog';
+import { SETUP_DIALOG_FOOTER } from 'feature/exercisePlan/components/setupDialogStyles';
+import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
 import { useTranslation } from "hooks/useTranslation";
 import { useState } from 'react';
@@ -39,15 +40,14 @@ function AddExerciseTimeForm({
   };
 
   return (
-    <DialogContent className="sm:max-w-[360px] border-white/10 bg-zinc-950/80 backdrop-blur-xl shadow-2xl [&>button]:!rounded-[8px]" style={{ borderRadius: '8px' }}>
+    <DialogContent className="sm:max-w-[380px]">
       <DialogHeader>
-        <DialogTitle className="text-[16px] font-bold leading-tight pr-6 text-zinc-100 flex items-start gap-2">
-          <span className="w-1.5 h-1.5 rounded-[8px] bg-cyan-500 mt-1.5 shrink-0" />
+        <DialogTitle className="pr-6">
           {localizeExercise(exercise).title}
         </DialogTitle>
       </DialogHeader>
 
-      <div className="space-y-5 pt-2">
+      <div className="space-y-8 pt-2">
         <ExerciseTimeField
           value={time}
           onChange={setTime}
@@ -55,12 +55,11 @@ function AddExerciseTimeForm({
           onCancel={onCancel}
         />
 
-        <div className="flex justify-end gap-2 pt-2">
-          <Button variant="ghost" className="rounded-[8px] text-zinc-400 hover:text-white hover:bg-white/5 transition-colors font-semibold" onClick={onCancel}>
+        <div className={SETUP_DIALOG_FOOTER}>
+          <Button variant="outline" onClick={onCancel}>
             {t("cancel")}
           </Button>
           <Button
-            className="rounded-[8px] bg-white hover:bg-zinc-200 text-black transition-colors font-bold px-6"
             onClick={handleConfirm}
             disabled={minutes === null}
           >

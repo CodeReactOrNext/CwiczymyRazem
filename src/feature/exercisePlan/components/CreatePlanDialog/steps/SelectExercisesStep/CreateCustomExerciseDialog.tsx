@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
@@ -19,8 +18,16 @@ import {
   SelectValue,
 } from "assets/components/ui/select";
 import { Textarea } from "assets/components/ui/textarea";
+import { cn } from "assets/lib/utils";
 import { createCommunityExercise } from "feature/communityExercises/services/communityExerciseService";
 import type { CreateCommunityExerciseInput } from "feature/communityExercises/types";
+import {
+  SETUP_DIALOG_BODY,
+  SETUP_DIALOG_CONTENT,
+  SETUP_DIALOG_FOOTER,
+  SETUP_FIELD,
+  SETUP_SURFACE,
+} from "feature/exercisePlan/components/setupDialogStyles";
 import type {
     BackingTrack,
     DifficultyLevel,
@@ -32,9 +39,8 @@ import { ImportTablature } from "feature/songs/components/ImportTablature/Import
 import { uploadUserGpFile } from "feature/songs/services/userGpFiles.service";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { AlignLeft, BookMarked, Clock, Dumbbell, FileMusic, HelpCircle, Image as ImageIcon, List, Loader2, Plus, Tag, Trash2, X } from "lucide-react";
+import { FileMusic, Loader2, Plus, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import type { Instrument } from "utils/audio/tunings";
@@ -344,360 +350,439 @@ export const CreateCustomExerciseDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-xl bg-zinc-950 border border-white/10 text-zinc-100 flex flex-col max-h-[90vh] overflow-hidden p-0 gap-0">
-        <div className="px-6 pt-6 pb-4 border-b border-white/10 shrink-0">
-            <DialogHeader>
-                <DialogTitle className="text-xl">
-                    {mode === "edit" ? t("exercises:custom_exercise.edit_button") : t("exercises:custom_exercise.title")}
-                </DialogTitle>
-                <DialogDescription>
-                    {t("exercises:custom_exercise.description")}
-                </DialogDescription>
-            </DialogHeader>
-        </div>
+      <DialogContent className={SETUP_DIALOG_CONTENT}>
+        <DialogHeader className='shrink-0'>
+          <DialogTitle>
+            {mode === "edit"
+              ? t("exercises:custom_exercise.edit_button")
+              : t("exercises:custom_exercise.title")}
+          </DialogTitle>
+          <DialogDescription>
+            {t("exercises:custom_exercise.description")}
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar min-h-0">
-            <form id="create-exercise-form" onSubmit={handleSubmit} className="flex flex-col gap-8">
-
+        <div className={SETUP_DIALOG_BODY}>
+          <form
+            id='create-exercise-form'
+            onSubmit={handleSubmit}
+            className='flex flex-col gap-8'>
             {/* GP File Upload */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-zinc-300 font-medium">
-                <FileMusic className="h-4 w-4 text-cyan-500" />
-                <span>{t("plans:custom.gp_file")} <span className="text-zinc-600 font-normal text-xs">{t("plans:optional")}</span></span>
-              </div>
+            <div className='space-y-2'>
+              <Label>
+                {t("plans:custom.gp_file")}{" "}
+                <span className='font-normal text-zinc-400'>
+                  {t("plans:optional")}
+                </span>
+              </Label>
 
               {gpFileName ? (
-                <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-cyan-500/30 bg-cyan-500/5">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <FileMusic className="h-4 w-4 text-cyan-400 shrink-0" />
-                    <span className="text-sm text-cyan-300 font-medium truncate">{gpFileName}</span>
+                <div className={cn(
+                    "flex items-center justify-between gap-3 py-2 pl-4 pr-2",
+                    SETUP_SURFACE
+                  )}>
+                  <div className='flex min-w-0 items-center gap-2.5'>
+                    <FileMusic className='h-4 w-4 shrink-0 text-zinc-400' />
+                    <span className='truncate text-sm font-medium text-zinc-100'>
+                      {gpFileName}
+                    </span>
                   </div>
-                  <button
-                    type="button"
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='icon'
                     onClick={clearGpFile}
-                    className="text-zinc-500 hover:text-red-400 transition-colors shrink-0"
-                    title={t("plans:custom.remove_gp")}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                    aria-label={t("plans:custom.remove_gp")}
+                    title={t("plans:custom.remove_gp")}>
+                    <X className='h-4 w-4' />
+                  </Button>
                 </div>
               ) : (
-                <ImportTablature
-                  onImported={handleGpImported}
-                />
+                <ImportTablature onImported={handleGpImported} />
               )}
             </div>
 
             {/* Title and Description Group */}
-            <div className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="title" className="text-zinc-300 font-medium">{t("exercises:custom_exercise.exercise_title")}</Label>
-                    <Input
-                        id="title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder={t("plans:custom.title_placeholder")}
-                        className="bg-zinc-900 border-zinc-800 focus:ring-cyan-500/50 h-10"
-                    />
+            <div className='space-y-6'>
+              <div className='space-y-2'>
+                <Label htmlFor='title'>
+                  {t("exercises:custom_exercise.exercise_title")}
+                </Label>
+                <Input
+                  className={SETUP_FIELD}
+                  id='title'
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder={t("plans:custom.title_placeholder")}
+                />
+              </div>
+
+              <div className='space-y-2'>
+                <Label htmlFor='description'>
+                  {t("exercises:custom_exercise.exercise_desc")}
+                </Label>
+                <Textarea
+                  id='description'
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder='...'
+                  className={cn(SETUP_FIELD, "h-auto min-h-[100px] resize-none py-3")}
+                />
+              </div>
+
+              {/* Video URL — hidden when GP file loaded */}
+              {!gpTablature && (
+                <div className='space-y-2'>
+                  <Label htmlFor='videoUrl'>
+                    {t("exercises:custom_exercise.video_url", {
+                      defaultValue: "YouTube Link",
+                    })}
+                  </Label>
+                  <Input
+                    className={SETUP_FIELD}
+                    id='videoUrl'
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    placeholder='https://www.youtube.com/watch?v=...'
+                  />
                 </div>
+              )}
 
-                <div className="space-y-2">
-                    <Label htmlFor="description" className="flex items-center gap-2 text-zinc-300 font-medium">
-                        <AlignLeft className="h-4 w-4 text-cyan-500" />
-                        {t("exercises:custom_exercise.exercise_desc")}
-                    </Label>
-                    <Textarea
-                        id="description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="..."
-                        className="bg-zinc-900 border-zinc-800 focus:ring-cyan-500/50 min-h-[100px] resize-none"
-                    />
-                </div>
-
-                {/* Video URL — hidden when GP file loaded */}
-                {!gpTablature && (
-                  <div className="space-y-2">
-                      <Label htmlFor="videoUrl" className="flex items-center gap-2 text-zinc-300 font-medium">
-                          <FaYoutube className="h-4 w-4 text-red-500" />
-                          {t("exercises:custom_exercise.video_url", { defaultValue: "YouTube Link" })}
-                      </Label>
-                      <Input
-                          id="videoUrl"
-                          value={videoUrl}
-                          onChange={(e) => setVideoUrl(e.target.value)}
-                          placeholder="https://www.youtube.com/watch?v=..."
-                          className="bg-zinc-900 border-zinc-800 focus:ring-red-500/50 h-10"
+              {/* Image URL — hidden when GP file loaded */}
+              {!gpTablature && (
+                <div className='space-y-2'>
+                  <Label htmlFor='imageUrl'>
+                    {t("exercises:custom_exercise.image_url", {
+                      defaultValue: "Image URL (Tab/Score)",
+                    })}
+                  </Label>
+                  <Input
+                    className={SETUP_FIELD}
+                    id='imageUrl'
+                    value={imageUrl}
+                    onChange={(e) => {
+                      setImageUrl(e.target.value);
+                      setIsImageValid(true);
+                    }}
+                    placeholder='https://example.com/image.png'
+                  />
+                  {imageUrl && (
+                    <div className={cn(
+                        "relative mt-2 aspect-[3.5/1] w-full overflow-hidden",
+                        SETUP_SURFACE
+                      )}>
+                      <img
+                        src={imageUrl}
+                        alt={t("plans:details.preview")}
+                        className='h-full w-full object-contain'
+                        onError={() => setIsImageValid(false)}
+                        onLoad={() => setIsImageValid(true)}
                       />
-                  </div>
-                )}
-
-                {/* Image URL — hidden when GP file loaded */}
-                {!gpTablature && (
-                  <div className="space-y-2">
-                      <Label htmlFor="imageUrl" className="flex items-center gap-2 text-zinc-300 font-medium">
-                          <ImageIcon className="h-4 w-4 text-emerald-500" />
-                          {t("exercises:custom_exercise.image_url", { defaultValue: "Image URL (Tab/Score)" })}
-                      </Label>
-                      <Input
-                          id="imageUrl"
-                          value={imageUrl}
-                          onChange={(e) => {
-                              setImageUrl(e.target.value);
-                              setIsImageValid(true);
-                          }}
-                          placeholder="https://example.com/image.png"
-                          className="bg-zinc-900 border-zinc-800 focus:ring-emerald-500/50 h-10"
-                      />
-                      {imageUrl && (
-                          <div className="mt-2 relative aspect-[3.5/1] w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50">
-                              <img
-                                  src={imageUrl}
-                                  alt={t("plans:details.preview")}
-                                  className="h-full w-full object-contain"
-                                  onError={() => setIsImageValid(false)}
-                                  onLoad={() => setIsImageValid(true)}
-                              />
-                              {!isImageValid && (
-                                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/80 text-rose-500 text-xs font-medium">
-                                      {t("exercises:custom_exercise.invalid_image", { defaultValue: "Invalid image URL" })}
-                                  </div>
-                              )}
-                          </div>
+                      {!isImageValid && (
+                        <div className='absolute inset-0 flex items-center justify-center bg-zinc-950/80 text-xs font-medium text-rose-400'>
+                          {t("exercises:custom_exercise.invalid_image", {
+                            defaultValue: "Invalid image URL",
+                          })}
+                        </div>
                       )}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Properties Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-5 bg-zinc-900/30 rounded-xl border border-white/5">
-                <div className="space-y-2">
-                    <Label htmlFor="duration" className="flex items-center gap-2 text-zinc-400 text-sm">
-                        <Clock className="h-4 w-4 text-amber-500" />
-                        {t("exercises:custom_exercise.duration")}
-                    </Label>
-                    <div className="relative">
-                        <Input
-                            id="duration"
-                            type="number"
-                            min="1"
-                            value={duration}
-                            onChange={(e) => setDuration(e.target.value)}
-                            className="bg-zinc-900 border-zinc-800 focus:ring-amber-500/50 pl-3"
-                        />
-                    </div>
-                </div>
+            <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
+              <div className='space-y-2'>
+                <Label htmlFor='duration'>
+                  {t("exercises:custom_exercise.duration")}
+                </Label>
+                <Input
+                  className={SETUP_FIELD}
+                  id='duration'
+                  type='number'
+                  min='1'
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                />
+              </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="difficulty" className="flex items-center gap-2 text-zinc-400 text-sm">
-                        <Dumbbell className="h-4 w-4 text-rose-500" />
-                        {t("exercises:custom_exercise.difficulty")}
-                    </Label>
-                    <Select value={difficulty} onValueChange={(v) => setDifficulty(v as DifficultyLevel)}>
-                        <SelectTrigger className="bg-zinc-900 border-zinc-800 focus:ring-rose-500/50 w-full">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-zinc-900 border-zinc-800">
-                            <SelectItem value="beginner">{t("exercises:difficulty.beginner")}</SelectItem>
-                            <SelectItem value="easy">{t("exercises:difficulty.easy")}</SelectItem>
-                            <SelectItem value="medium">{t("exercises:difficulty.medium")}</SelectItem>
-                            <SelectItem value="hard">{t("exercises:difficulty.hard")}</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+              <div className='space-y-2'>
+                <Label htmlFor='difficulty'>
+                  {t("exercises:custom_exercise.difficulty")}
+                </Label>
+                <Select
+                  value={difficulty}
+                  onValueChange={(v) => setDifficulty(v as DifficultyLevel)}>
+                  <SelectTrigger id='difficulty' className={SETUP_FIELD}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='beginner'>
+                      {t("exercises:difficulty.beginner")}
+                    </SelectItem>
+                    <SelectItem value='easy'>
+                      {t("exercises:difficulty.easy")}
+                    </SelectItem>
+                    <SelectItem value='medium'>
+                      {t("exercises:difficulty.medium")}
+                    </SelectItem>
+                    <SelectItem value='hard'>
+                      {t("exercises:difficulty.hard")}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                <div className="space-y-2 sm:col-span-2">
-                     <Label htmlFor="category" className="flex items-center gap-2 text-zinc-400 text-sm">
-                        <Tag className="h-4 w-4 text-emerald-500" />
-                        {t("exercises:custom_exercise.category")}
-                    </Label>
-                    <Select value={category} onValueChange={(v) => setCategory(v as ExerciseCategory)}>
-                        <SelectTrigger className="bg-zinc-900 border-zinc-800 focus:ring-emerald-500/50 w-full">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-zinc-900 border-zinc-800">
-                            <SelectItem value="technique">{t("exercises:categories.technique")}</SelectItem>
-                            <SelectItem value="theory">{t("exercises:categories.theory")}</SelectItem>
-                            <SelectItem value="creativity">{t("exercises:categories.creativity")}</SelectItem>
-                            <SelectItem value="hearing">{t("exercises:categories.hearing")}</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+              <div className='space-y-2 sm:col-span-2'>
+                <Label htmlFor='category'>
+                  {t("exercises:custom_exercise.category")}
+                </Label>
+                <Select
+                  value={category}
+                  onValueChange={(v) => setCategory(v as ExerciseCategory)}>
+                  <SelectTrigger id='category' className={SETUP_FIELD}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='technique'>
+                      {t("exercises:categories.technique")}
+                    </SelectItem>
+                    <SelectItem value='theory'>
+                      {t("exercises:categories.theory")}
+                    </SelectItem>
+                    <SelectItem value='creativity'>
+                      {t("exercises:categories.creativity")}
+                    </SelectItem>
+                    <SelectItem value='hearing'>
+                      {t("exercises:categories.hearing")}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Metronome Settings */}
-            <div className="space-y-4 p-5 bg-zinc-900/30 rounded-xl border border-white/5">
-                <div className="flex items-center justify-between">
-                    <Label htmlFor="metronome" className="flex items-center gap-2 text-zinc-300 font-medium">
-                        <Clock className="h-4 w-4 text-cyan-500" />
-                        {t("exercises:custom_exercise.use_metronome", { defaultValue: "Use Metronome" })}
-                    </Label>
-                    <Checkbox
-                        id="metronome"
-                        checked={useMetronome}
-                        onCheckedChange={(checked) => setUseMetronome(!!checked)}
-                        className="border-zinc-700 data-[state=checked]:bg-cyan-500 data-[state=checked]:border-cyan-500"
-                    />
-                </div>
+            <div className='space-y-4'>
+              <div className='flex items-center gap-3'>
+                <Checkbox
+                  id='metronome'
+                  checked={useMetronome}
+                  onCheckedChange={(checked) => setUseMetronome(!!checked)}
+                />
+                <Label htmlFor='metronome' className='cursor-pointer'>
+                  {t("exercises:custom_exercise.use_metronome", {
+                    defaultValue: "Use Metronome",
+                  })}
+                </Label>
+              </div>
 
-                {useMetronome && (
-                    <div className="grid grid-cols-3 gap-4 animate-in fade-in slide-in-from-top-2 duration-base">
-                        <div className="space-y-2">
-                            <Label htmlFor="minBpm" className="text-zinc-400 text-xs font-bold">{t("plans:custom.min_bpm")}</Label>
-                            <Input
-                                id="minBpm"
-                                type="number"
-                                value={minBpm}
-                                onChange={(e) => setMinBpm(e.target.value)}
-                                className="bg-zinc-900 border-zinc-800 focus:ring-cyan-500/50 h-9 text-sm"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="maxBpm" className="text-zinc-400 text-xs font-bold">{t("plans:custom.max_bpm")}</Label>
-                            <Input
-                                id="maxBpm"
-                                type="number"
-                                value={maxBpm}
-                                onChange={(e) => setMaxBpm(e.target.value)}
-                                className="bg-zinc-900 border-zinc-800 focus:ring-cyan-500/50 h-9 text-sm"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="recBpm" className="text-zinc-400 text-xs font-bold">{t("plans:custom.rec_bpm")}</Label>
-                            <Input
-                                id="recBpm"
-                                type="number"
-                                value={recommendedBpm}
-                                onChange={(e) => setRecommendedBpm(e.target.value)}
-                                className="bg-zinc-900 border-zinc-800 focus:ring-cyan-500/50 h-9 text-sm"
-                            />
-                        </div>
-                    </div>
-                )}
+              {useMetronome && (
+                <div className='grid grid-cols-3 gap-4'>
+                  <div className='space-y-2'>
+                    <Label htmlFor='minBpm'>{t("plans:custom.min_bpm")}</Label>
+                    <Input
+                      className={SETUP_FIELD}
+                      id='minBpm'
+                      type='number'
+                      value={minBpm}
+                      onChange={(e) => setMinBpm(e.target.value)}
+                    />
+                  </div>
+                  <div className='space-y-2'>
+                    <Label htmlFor='maxBpm'>{t("plans:custom.max_bpm")}</Label>
+                    <Input
+                      className={SETUP_FIELD}
+                      id='maxBpm'
+                      type='number'
+                      value={maxBpm}
+                      onChange={(e) => setMaxBpm(e.target.value)}
+                    />
+                  </div>
+                  <div className='space-y-2'>
+                    <Label htmlFor='recBpm'>{t("plans:custom.rec_bpm")}</Label>
+                    <Input
+                      className={SETUP_FIELD}
+                      id='recBpm'
+                      type='number'
+                      value={recommendedBpm}
+                      onChange={(e) => setRecommendedBpm(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Instructions */}
-            <div className="space-y-3">
-                <Label className="flex items-center gap-2 text-zinc-300 font-medium">
-                    <List className="h-4 w-4 text-purple-500" />
-                    {t("exercises:custom_exercise.instructions")}
-                </Label>
-                <div className="flex gap-2">
-                    <Input
-                        value={currentInstruction}
-                        onChange={(e) => setCurrentInstruction(e.target.value)}
-                        placeholder={t("exercises:custom_exercise.add_instruction_placeholder")}
-                        className="bg-zinc-900 border-zinc-800 focus:ring-purple-500/50"
-                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddInstruction())}
-                    />
-                    <Button type="button" onClick={handleAddInstruction} size="icon" className="bg-zinc-800 hover:bg-zinc-700 shrink-0">
-                        <Plus className="h-4 w-4" />
-                    </Button>
-                </div>
-                {instructions.length > 0 ? (
-                    <ul className="space-y-2 mt-2">
-                        {instructions.map((inst, index) => (
-                            <li key={index} className="flex items-start justify-between gap-3 p-3 rounded-lg bg-zinc-900/40 border border-white/5 text-sm group">
-                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-white/5 text-xs text-zinc-400 shrink-0 mt-0.5">
-                                    {index + 1}
-                                </span>
-                                <span className="text-zinc-300 break-words flex-1 leading-relaxed">{inst}</span>
-                                <button
-                                    type="button"
-                                    onClick={() => handleRemoveInstruction(index)}
-                                    className="text-zinc-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="text-xs text-zinc-500 italic pl-1">
-                        {t("exercises:custom_exercise.no_instructions_hint", { defaultValue: "No instructions added yet." })}
-                    </p>
-                )}
+            <div className='space-y-2'>
+              <Label htmlFor='instruction-input'>
+                {t("exercises:custom_exercise.instructions")}
+              </Label>
+              <div className='flex gap-2'>
+                <Input
+                  className={SETUP_FIELD}
+                  id='instruction-input'
+                  value={currentInstruction}
+                  onChange={(e) => setCurrentInstruction(e.target.value)}
+                  placeholder={t(
+                    "exercises:custom_exercise.add_instruction_placeholder"
+                  )}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" &&
+                    (e.preventDefault(), handleAddInstruction())
+                  }
+                />
+                <Button
+                  type='button'
+                  variant='secondary'
+                  size='icon'
+                  onClick={handleAddInstruction}
+                  aria-label={t("exercises:custom_exercise.instructions")}
+                  className='h-11 w-11 shrink-0'>
+                  <Plus className='h-4 w-4' />
+                </Button>
+              </div>
+              {instructions.length > 0 ? (
+                <ul className='space-y-2 pt-2'>
+                  {instructions.map((inst, index) => (
+                    <li
+                      key={index}
+                      className={cn(
+                        "flex items-start gap-3 py-2 pl-3 pr-2 text-sm",
+                        SETUP_SURFACE
+                      )}>
+                      <span className='mt-1.5 shrink-0 text-xs tabular-nums text-zinc-400'>
+                        {index + 1}.
+                      </span>
+                      <span className='flex-1 break-words pt-1 leading-relaxed text-zinc-200'>
+                        {inst}
+                      </span>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        onClick={() => handleRemoveInstruction(index)}
+                        aria-label={t("common:button.remove" as any)}
+                        className='shrink-0'>
+                        <Trash2 className='h-4 w-4' />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className='text-xs text-zinc-400'>
+                  {t("exercises:custom_exercise.no_instructions_hint", {
+                    defaultValue: "No instructions added yet.",
+                  })}
+                </p>
+              )}
             </div>
 
             {/* Tips */}
-            <div className="space-y-3">
-                <Label className="flex items-center gap-2 text-zinc-300 font-medium">
-                    <HelpCircle className="h-4 w-4 text-blue-500" />
-                    {t("exercises:custom_exercise.tips")}
-                </Label>
-                <div className="flex gap-2">
-                    <Input
-                        value={currentTip}
-                        onChange={(e) => setCurrentTip(e.target.value)}
-                        placeholder={t("exercises:custom_exercise.add_tip_placeholder")}
-                        className="bg-zinc-900 border-zinc-800 focus:ring-blue-500/50"
-                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTip())}
-                    />
-                    <Button type="button" onClick={handleAddTip} size="icon" className="bg-zinc-800 hover:bg-zinc-700 shrink-0">
-                        <Plus className="h-4 w-4" />
-                    </Button>
-                </div>
-                 {tips.length > 0 ? (
-                    <ul className="space-y-2 mt-2">
-                        {tips.map((tip, index) => (
-                            <li key={index} className="flex items-start justify-between gap-3 p-3 rounded-lg bg-blue-500/5 border border-blue-500/10 text-sm group">
-                                <div className="mt-0.5 shrink-0">
-                                     <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                                </div>
-                                <span className="text-zinc-300 break-words flex-1 leading-relaxed">{tip}</span>
-                                <button
-                                    type="button"
-                                    onClick={() => handleRemoveTip(index)}
-                                    className="text-zinc-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                     <p className="text-xs text-zinc-500 italic pl-1">
-                        {t("exercises:custom_exercise.no_tips_hint", { defaultValue: "No tips added yet." })}
-                    </p>
-                )}
+            <div className='space-y-2'>
+              <Label htmlFor='tip-input'>
+                {t("exercises:custom_exercise.tips")}
+              </Label>
+              <div className='flex gap-2'>
+                <Input
+                  className={SETUP_FIELD}
+                  id='tip-input'
+                  value={currentTip}
+                  onChange={(e) => setCurrentTip(e.target.value)}
+                  placeholder={t("exercises:custom_exercise.add_tip_placeholder")}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" && (e.preventDefault(), handleAddTip())
+                  }
+                />
+                <Button
+                  type='button'
+                  variant='secondary'
+                  size='icon'
+                  onClick={handleAddTip}
+                  aria-label={t("exercises:custom_exercise.tips")}
+                  className='h-11 w-11 shrink-0'>
+                  <Plus className='h-4 w-4' />
+                </Button>
+              </div>
+              {tips.length > 0 ? (
+                <ul className='space-y-2 pt-2'>
+                  {tips.map((tip, index) => (
+                    <li
+                      key={index}
+                      className={cn(
+                        "flex items-start gap-3 py-2 pl-3 pr-2 text-sm",
+                        SETUP_SURFACE
+                      )}>
+                      <span className='flex-1 break-words pt-1 leading-relaxed text-zinc-200'>
+                        {tip}
+                      </span>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        onClick={() => handleRemoveTip(index)}
+                        aria-label={t("common:button.remove" as any)}
+                        className='shrink-0'>
+                        <Trash2 className='h-4 w-4' />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className='text-xs text-zinc-400'>
+                  {t("exercises:custom_exercise.no_tips_hint", {
+                    defaultValue: "No tips added yet.",
+                  })}
+                </p>
+              )}
             </div>
 
             {/* Keep a copy outside this plan */}
             {userId && (
-              <div className="flex items-start justify-between gap-5 p-5 bg-zinc-900/30 rounded-xl border border-white/5">
-                <div className="space-y-1.5">
-                  <Label htmlFor="saveToLibrary" className="flex items-center gap-2 text-zinc-300 font-medium">
-                    <BookMarked className="h-4 w-4 text-cyan-500" />
+              <div className='flex items-start gap-3'>
+                <Checkbox
+                  id='saveToLibrary'
+                  checked={saveToLibrary}
+                  onCheckedChange={(checked) => setSaveToLibrary(!!checked)}
+                  className='mt-0.5 shrink-0'
+                />
+                <div className='space-y-1'>
+                  <Label htmlFor='saveToLibrary' className='cursor-pointer'>
                     {t("plans:custom.save_to_mine")}
                   </Label>
-                  <p className="text-xs text-zinc-500 leading-relaxed">
+                  <p className='text-xs leading-relaxed text-zinc-400'>
                     {t("plans:custom.save_to_mine_hint")}
                   </p>
                 </div>
-                <Checkbox
-                  id="saveToLibrary"
-                  checked={saveToLibrary}
-                  onCheckedChange={(checked) => setSaveToLibrary(!!checked)}
-                  className="mt-1 shrink-0 border-zinc-700 data-[state=checked]:bg-cyan-500 data-[state=checked]:border-cyan-500"
-                />
               </div>
             )}
-            </form>
+          </form>
         </div>
 
-        <div className="p-6 border-t border-white/10 bg-zinc-950 shrink-0">
-            <DialogFooter>
-                <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto mt-2 sm:mt-0 border-zinc-700 hover:bg-zinc-800">
-                    {t("common:cancel" as any)}
-                </Button>
-                <Button type="submit" form="create-exercise-form" disabled={isUploading || isSavingToLibrary} className="w-full sm:w-auto bg-white text-black hover:bg-zinc-200">
-                    {isUploading ? (
-                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{t("plans:custom.uploading")}</>
-                    ) : isSavingToLibrary ? (
-                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />{t("plans:saving")}</>
-                    ) : mode === "edit" ? t("exercises:custom_exercise.save_button") : t("common:create" as any)}
-                </Button>
-            </DialogFooter>
+        <div className={SETUP_DIALOG_FOOTER}>
+          <Button variant='outline' onClick={() => onOpenChange(false)}>
+            {t("common:cancel" as any)}
+          </Button>
+          <Button
+            type='submit'
+            form='create-exercise-form'
+            disabled={isUploading || isSavingToLibrary}>
+            {isUploading ? (
+              <>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                {t("plans:custom.uploading")}
+              </>
+            ) : isSavingToLibrary ? (
+              <>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                {t("plans:saving")}
+              </>
+            ) : mode === "edit" ? (
+              t("exercises:custom_exercise.save_button")
+            ) : (
+              t("common:create" as any)
+            )}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

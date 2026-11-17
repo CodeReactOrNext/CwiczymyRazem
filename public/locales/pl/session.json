@@ -135,6 +135,8 @@
     "title": "Ćwiczenie akordów",
     "description": "Zbuduj ćwiczenie. Ułóż sekwencję do 8 akordów.",
     "click_to_add": "Kliknij akordy poniżej, aby dodać...",
+    "sequence": "Sekwencja ({{count}}/8)",
+    "remove_chord": "Usuń {{chord}}",
     "beginner": "Początkujący",
     "intermediate": "Średni",
     "advanced": "Zaawansowany",
@@ -479,7 +481,8 @@
     "stuck_reveal": "Utknąłeś? Pokaż",
     "show_answer": "Pokaż odpowiedź",
     "replay_melody": "Odtwórz melodię ponownie",
-    "had_it": "Miałem to"
+    "had_it": "Miałem to",
+    "self_marked_note": "Do rankingu liczą się tylko melodie usłyszane przez mikrofon — „Miałem to” liczy się do Twojego rekordu."
   },
   "volume": {
     "instruments": "Instrumenty",

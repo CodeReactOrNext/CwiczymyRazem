@@ -39,6 +39,8 @@
     "grant-all-tokens": "vitest run --mode grant-all-tokens scripts/grantAllSupportersTokens.test.ts",
     "cleanup-exercise-scores": "vitest run --mode cleanup-scores-dry scripts/cleanupImpossibleExerciseScores.test.ts",
     "cleanup-exercise-scores:apply": "vitest run --mode cleanup-scores-apply scripts/cleanupImpossibleExerciseScores.test.ts",
+    "cleanup-ear-boards": "vitest run --mode cleanup-ear-dry scripts/cleanupEarTrainingBoards.test.ts",
+    "cleanup-ear-boards:apply": "vitest run --mode cleanup-ear-apply scripts/cleanupEarTrainingBoards.test.ts",
     "clear-boards": "vitest run --mode clear-boards scripts/clearSupporterBoards.test.ts",
     "delete-guilds": "vitest run --mode delete-guilds scripts/deleteAllGuilds.test.ts",
     "delete-recording": "vitest run --mode delete-recording scripts/deleteRecording.test.ts",

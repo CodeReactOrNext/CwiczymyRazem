@@ -1,33 +1,45 @@
-'use client';
+"use client";
 
-import { Badge } from 'assets/components/ui/badge';
-import { Button } from 'assets/components/ui/button';
-import { Checkbox } from 'assets/components/ui/checkbox';
+import { Button } from "assets/components/ui/button";
+import { Checkbox } from "assets/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from 'assets/components/ui/dialog';
-import { Label } from 'assets/components/ui/label';
+} from "assets/components/ui/dialog";
+import { Label } from "assets/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from 'assets/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from 'assets/components/ui/tabs';
+} from "assets/components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "assets/components/ui/tabs";
+import { cn } from "assets/lib/utils";
 import {
   type ChordExerciseConfig,
   generateChordExercise,
   getCategorizedChords,
-} from 'feature/exercisePlan/chords/chordExerciseGenerator';
-import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
+} from "feature/exercisePlan/chords/chordExerciseGenerator";
+import {
+  SETUP_DIALOG_BODY,
+  SETUP_DIALOG_CONTENT,
+  SETUP_DIALOG_FOOTER,
+  SETUP_FIELD,
+  SETUP_SURFACE,
+} from "feature/exercisePlan/components/setupDialogStyles";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
-import { X } from 'lucide-react';
-import { useEffect,useState } from 'react';
+import { X } from "lucide-react";
+import { useState } from "react";
 
 interface ChordSelectionDialogProps {
   isOpen: boolean;
@@ -43,12 +55,22 @@ export function ChordSelectionDialog({
   initialExercise,
 }: ChordSelectionDialogProps) {
   const { t } = useTranslation("session");
-  const [selectedChords, setSelectedChords] = useState<string[]>(['G', 'C']);
+  const [selectedChords, setSelectedChords] = useState<string[]>(["G", "C"]);
   const [hideNotes, setHideNotes] = useState(false);
   const [changesPerMeasure, setChangesPerMeasure] = useState(1);
   const categorizedChords = getCategorizedChords();
 
-  useEffect(() => {
+  // Reset the form whenever the dialog opens (or is reopened for another
+  // exercise) — adjusted during render instead of in an effect.
+  const [syncedFor, setSyncedFor] = useState<{
+    isOpen: boolean;
+    initialExercise?: Exercise;
+  }>({ isOpen: false });
+  if (
+    syncedFor.isOpen !== isOpen ||
+    syncedFor.initialExercise !== initialExercise
+  ) {
+    setSyncedFor({ isOpen, initialExercise });
     if (isOpen) {
       if (initialExercise && initialExercise._generatorConfig) {
         const conf = initialExercise._generatorConfig as ChordExerciseConfig;
@@ -56,12 +78,12 @@ export function ChordSelectionDialog({
         setHideNotes(initialExercise.hideTablatureNotes ?? false);
         setChangesPerMeasure(conf.changesPerMeasure || 1);
       } else {
-        setSelectedChords(['G', 'C']);
+        setSelectedChords(["G", "C"]);
         setHideNotes(false);
         setChangesPerMeasure(1);
       }
     }
-  }, [isOpen, initialExercise]);
+  }
 
   const handleAddChord = (chord: string) => {
     if (selectedChords.length < 8) {
@@ -86,8 +108,8 @@ export function ChordSelectionDialog({
         tempo: {
           min: 40,
           max: 180,
-          recommended: 80
-        }
+          recommended: 80,
+        },
       });
       exercise.hideTablatureNotes = hideNotes;
       onExerciseGenerated(exercise);
@@ -99,113 +121,136 @@ export function ChordSelectionDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       {/* z-index must beat the mobile session modal (z-[9999999]) or the setup
           dialog is invisible on phones. Flex column + capped height keeps the
-          header/footer on screen (middle scrolls) even on short landscape phones. */}
+          header/footer on screen (middle scrolls) even on short landscape phones.
+          The Select dropdown needs a z-index above this dialog's, otherwise it
+          renders behind it (SelectContent defaults to z-50). */}
       <DialogContent
-        overlayClassName="z-[99999998]"
-        className="z-[99999999] !flex flex-col max-h-[100dvh] sm:max-h-[92dvh] sm:max-w-[550px] bg-zinc-950 border-white/10 shadow-2xl"
-      >
-        <DialogHeader className="shrink-0">
-          <DialogTitle className="text-2xl font-black italic tracking-tighter text-white capitalize">
-            {t("chord_dialog.title")}
-          </DialogTitle>
-          <DialogDescription className="text-zinc-400">
-            {t("chord_dialog.description")}
-          </DialogDescription>
+        overlayClassName='z-[99999998]'
+        className={cn("z-[99999999]", SETUP_DIALOG_CONTENT)}>
+        <DialogHeader className='shrink-0'>
+          <DialogTitle>{t("chord_dialog.title")}</DialogTitle>
+          <DialogDescription>{t("chord_dialog.description")}</DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto py-4 pr-1">
-          <div className="space-y-3">
-            <Label className="text-zinc-500 font-bold capitalize text-[10px] tracking-widest pl-1">
-                Active Sequence ({selectedChords.length}/8)
+        <div className={SETUP_DIALOG_BODY}>
+          <div className='space-y-2'>
+            <Label>
+              {t("chord_dialog.sequence", { count: selectedChords.length })}
             </Label>
-            <div className="flex flex-wrap gap-2 p-4 bg-white/[0.03] rounded-xl border border-white/5 min-h-[72px] items-center">
+            <div className={cn(
+                "flex min-h-[64px] flex-wrap items-center gap-2 p-3",
+                SETUP_SURFACE
+              )}>
               {selectedChords.map((chord, idx) => (
-                <div key={idx} className="flex items-center animate-in fade-in zoom-in duration-base">
-                    <Badge variant="secondary" className="px-3 py-1.5 text-base font-black bg-cyan-500/10 text-cyan-400 border-cyan-500/20 gap-2">
+                <div key={idx} className='flex items-center gap-2'>
+                  <span className='flex items-center gap-1 rounded bg-zinc-800 py-1 pl-3 pr-1 text-sm font-semibold text-zinc-100'>
                     {chord}
-                    <button onClick={() => handleRemoveChord(idx)} className="hover:text-white transition-colors">
-                        <X size={14} />
+                    <button
+                      type='button'
+                      onClick={() => handleRemoveChord(idx)}
+                      aria-label={t("chord_dialog.remove_chord", { chord })}
+                      className='rounded p-1 text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 hover:bg-zinc-700 hover:text-zinc-100'>
+                      <X size={14} />
                     </button>
-                    </Badge>
-                    {idx < selectedChords.length - 1 && <span className="mx-1 text-zinc-700 font-bold">→</span>}
+                  </span>
+                  {idx < selectedChords.length - 1 && (
+                    <span className='text-zinc-500'>→</span>
+                  )}
                 </div>
               ))}
-              {selectedChords.length === 0 && <span className="text-zinc-600 text-sm font-medium pl-1">{t("chord_dialog.click_to_add")}</span>}
+              {selectedChords.length === 0 && (
+                <span className='pl-1 text-sm text-zinc-400'>
+                  {t("chord_dialog.click_to_add")}
+                </span>
+              )}
             </div>
           </div>
 
-          <div className="space-y-3">
-            <Tabs defaultValue="beginner" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 bg-zinc-900/50 border border-white/5 p-1 h-11">
-                <TabsTrigger value="beginner" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">{t("chord_dialog.beginner")}</TabsTrigger>
-                <TabsTrigger value="intermediate" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">{t("chord_dialog.intermediate")}</TabsTrigger>
-                <TabsTrigger value="advanced" className="data-[state=active]:bg-zinc-800 capitalize text-[10px] font-bold tracking-wider">{t("chord_dialog.advanced")}</TabsTrigger>
-              </TabsList>
-              
-              {(Object.keys(categorizedChords) as Array<keyof typeof categorizedChords>).map((level) => (
-                <TabsContent key={level} value={level} className="mt-4 outline-none">
-                  <div className="grid grid-cols-5 gap-2 max-h-[160px] overflow-y-auto pr-2 scrollbar-premium">
-                    {categorizedChords[level].map(chord => (
-                      <Button 
-                        key={chord} 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleAddChord(chord)}
-                        className="font-black text-sm border border-white/5 hover:border-cyan-500/50 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all h-10 capitalize tracking-tight"
-                      >
-                        {chord}
-                      </Button>
-                    ))}
-                  </div>
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
+          <Tabs defaultValue='beginner' className='w-full'>
+            <TabsList className='grid w-full grid-cols-3'>
+              <TabsTrigger value='beginner'>
+                {t("chord_dialog.beginner")}
+              </TabsTrigger>
+              <TabsTrigger value='intermediate'>
+                {t("chord_dialog.intermediate")}
+              </TabsTrigger>
+              <TabsTrigger value='advanced'>
+                {t("chord_dialog.advanced")}
+              </TabsTrigger>
+            </TabsList>
 
-          <div className="grid grid-cols-2 gap-6 pt-2">
-            <div className="space-y-2">
-              <Label className="text-zinc-500 font-bold capitalize text-[10px] tracking-widest pl-1">{t("chord_dialog.frequency")}</Label>
+            {(
+              Object.keys(categorizedChords) as Array<
+                keyof typeof categorizedChords
+              >
+            ).map((level) => (
+              <TabsContent key={level} value={level} className='mt-4'>
+                <div className='grid max-h-[180px] grid-cols-4 gap-2 overflow-y-auto pr-1 sm:grid-cols-5'>
+                  {categorizedChords[level].map((chord) => (
+                    <Button
+                      key={chord}
+                      variant='secondary'
+                      onClick={() => handleAddChord(chord)}
+                      disabled={selectedChords.length >= 8}>
+                      {chord}
+                    </Button>
+                  ))}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+
+          <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
+            <div className='space-y-2'>
+              <Label htmlFor='chord-frequency'>
+                {t("chord_dialog.frequency")}
+              </Label>
               <Select
                 value={changesPerMeasure.toString()}
-                onValueChange={(v) => setChangesPerMeasure(parseInt(v))}
-              >
-                <SelectTrigger className="bg-white/[0.02] border-white/5 h-11 font-medium">
+                onValueChange={(v) => setChangesPerMeasure(parseInt(v))}>
+                <SelectTrigger id='chord-frequency' className={SETUP_FIELD}>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-900 border-white/10 text-white">
-                  <SelectItem value="1">{t("chord_dialog.every_bar")}</SelectItem>
-                  <SelectItem value="2">{t("chord_dialog.every_2_beats")}</SelectItem>
-                  <SelectItem value="4">{t("chord_dialog.every_beat")}</SelectItem>
+                <SelectContent className='z-[100000000]'>
+                  <SelectItem value='1'>
+                    {t("chord_dialog.every_bar")}
+                  </SelectItem>
+                  <SelectItem value='2'>
+                    {t("chord_dialog.every_2_beats")}
+                  </SelectItem>
+                  <SelectItem value='4'>
+                    {t("chord_dialog.every_beat")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="flex flex-col justify-end">
-              <div className="flex items-center space-x-3 pb-2 px-1">
-                <Checkbox 
-                  id="hide-notes-dlg" 
-                  checked={hideNotes} 
-                  onCheckedChange={(checked) => setHideNotes(!!checked)}
-                  className="border-white/20 data-[state=checked]:bg-cyan-500 data-[state=checked]:border-cyan-500 w-5 h-5"
-                />
-                <div className="grid gap-1 leading-none">
-                    <Label htmlFor="hide-notes-dlg" className="text-sm font-bold text-zinc-200 cursor-pointer">
-                        {t("chord_dialog.hide_tabs")}
-                    </Label>
-                    <p className="text-[10px] text-zinc-500 font-medium leading-relaxed italic">
-                        {t("chord_dialog.by_ear")}
-                    </p>
-                </div>
+            <div className='flex items-start gap-3 sm:pt-9'>
+              <Checkbox
+                id='hide-notes-dlg'
+                checked={hideNotes}
+                onCheckedChange={(checked) => setHideNotes(!!checked)}
+                className='mt-0.5'
+              />
+              <div className='grid gap-1'>
+                <Label htmlFor='hide-notes-dlg' className='cursor-pointer'>
+                  {t("chord_dialog.hide_tabs")}
+                </Label>
+                <p className='text-xs text-zinc-400'>
+                  {t("chord_dialog.by_ear")}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex shrink-0 justify-end gap-3 pt-4 border-t border-white/5">
-          <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white hover:bg-white/5 font-bold capitalize tracking-widest text-[11px]">
+        <div className={SETUP_DIALOG_FOOTER}>
+          <Button variant='outline' onClick={onClose}>
             {t("cancel")}
           </Button>
-          <Button onClick={handleGenerate} disabled={selectedChords.length === 0} className="bg-white text-black hover:bg-zinc-200 px-8 font-black capitalize tracking-widest text-[11px] shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+          <Button
+            onClick={handleGenerate}
+            disabled={selectedChords.length === 0}>
             {t("add_to_plan")}
           </Button>
         </div>

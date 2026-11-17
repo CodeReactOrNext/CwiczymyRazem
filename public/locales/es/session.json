@@ -135,6 +135,8 @@
     "title": "Configurar práctica de acordes",
     "description": "Crea tu ejercicio. Encadena hasta 8 acordes.",
     "click_to_add": "Haz clic en los acordes de abajo para añadirlos...",
+    "sequence": "Secuencia ({{count}}/8)",
+    "remove_chord": "Quitar {{chord}}",
     "beginner": "Principiante",
     "intermediate": "Intermedio",
     "advanced": "Avanzado",
@@ -399,7 +401,8 @@
     "stuck_reveal": "¿Atascado? Revelar",
     "show_answer": "Mostrar respuesta",
     "replay_melody": "Repetir melodía",
-    "had_it": "Lo tenía"
+    "had_it": "Lo tenía",
+    "self_marked_note": "En la clasificación solo cuentan las melodías que oye el micrófono — «Lo tenía» suma a tu propio récord."
   },
   "volume": {
     "instruments": "Instrumentos",

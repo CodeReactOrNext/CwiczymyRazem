@@ -7,7 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from 'assets/components/ui/dialog';
+import { Label } from 'assets/components/ui/label';
 import { cn } from 'assets/lib/utils';
+import { SETUP_DIALOG_FOOTER } from 'feature/exercisePlan/components/setupDialogStyles';
 import type { SongPracticeMode } from 'feature/exercisePlan/types/exercise.types';
 import { DEFAULT_SONG_EXERCISE_MINUTES } from 'feature/exercisePlan/utils/songToExercise';
 import { useTranslation } from "hooks/useTranslation";
@@ -84,10 +86,9 @@ function AddSongToPlanForm({
 
   return (
     <DialogContent
-      className='border-white/10 bg-zinc-950/80 shadow-2xl backdrop-blur-xl sm:max-w-[420px] [&>button]:!rounded-[8px]'
-      style={{ borderRadius: '8px' }}>
+      className='sm:max-w-[420px]'>
       <DialogHeader>
-        <DialogTitle className='flex items-center gap-3 pr-6 text-[16px] font-bold leading-tight text-zinc-100'>
+        <DialogTitle className='flex items-center gap-3 pr-6'>
           <span className='h-10 w-10 shrink-0 overflow-hidden rounded bg-zinc-800'>
             {song.coverUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -107,9 +108,9 @@ function AddSongToPlanForm({
         </DialogTitle>
       </DialogHeader>
 
-      <div className='space-y-6 pt-2'>
+      <div className='space-y-8 pt-2'>
         <div className='space-y-2.5'>
-          <p className='text-[12px] font-bold tracking-wider text-zinc-500'>{t("add_song.practise_with")}</p>
+          <Label>{t("add_song.practise_with")}</Label>
           <div className='grid gap-2' role='radiogroup' aria-label={t("add_song.how_aria")}>
             {MODE_OPTIONS.map(({ id, label, description, Icon }) => {
               const available = isModeAvailable(id);
@@ -169,15 +170,13 @@ function AddSongToPlanForm({
           onCancel={onCancel}
         />
 
-        <div className='flex justify-end gap-2 pt-2'>
+        <div className={SETUP_DIALOG_FOOTER}>
           <Button
-            variant='ghost'
-            className='rounded-[8px] font-semibold text-zinc-400 transition-colors hover:bg-white/5 hover:text-white'
+            variant='outline'
             onClick={onCancel}>
             {t("cancel")}
           </Button>
           <Button
-            className='rounded-[8px] bg-cyan-600 px-6 font-bold text-white shadow-[0_0_15px_-3px_rgba(6,182,212,0.4)] transition-all hover:bg-cyan-500'
             onClick={handleConfirm}
             disabled={!canConfirm}>
             {song.current ? t('save') : t('add_to_plan')}

@@ -37,8 +37,8 @@ export function FretboardPreview({ positions, startFret, endFret, rootMidi, labe
   const vh = TOP_PAD + 6 * CELL_H + BOT_PAD;
 
   return (
-    <div className="rounded-lg border border-border/50 bg-muted/10 px-2 pt-2 pb-1.5">
-      <p className="text-xs text-muted-foreground text-center mb-1.5 font-medium">{label}</p>
+    <div className="rounded-lg bg-zinc-900/60 px-3 pb-3 pt-3">
+      <p className="mb-2 text-center text-xs font-medium text-zinc-400">{label}</p>
       {/* Fixed-height container so the SVG never overflows */}
       <div style={{ height: '150px', width: '100%' }}>
         <svg
@@ -144,7 +144,7 @@ export function FretboardPreview({ positions, startFret, endFret, rootMidi, labe
         </svg>
       </div>
 
-      <div className="flex gap-4 text-xs text-muted-foreground/70 justify-center mt-0.5">
+      <div className="mt-1 flex justify-center gap-4 text-xs text-zinc-400">
         <span className="flex items-center gap-1">
           <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
           {t("interval_click.root")}

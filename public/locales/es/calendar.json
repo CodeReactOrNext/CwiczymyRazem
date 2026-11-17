@@ -38,6 +38,7 @@
   "item": {
     "menu": "Opciones de {{title}}",
     "warmup": "Calentamiento",
+    "play": "Tocar ahora",
     "mark_done": "Marcar como tocado",
     "undo_done": "Marcar como no tocado",
     "open_goal": "Abrir meta",
