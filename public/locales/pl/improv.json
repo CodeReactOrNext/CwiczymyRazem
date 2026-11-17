@@ -1,0 +1,149 @@
+{
+  "player": {
+    "play": "Odtwórz: {{title}}",
+    "open": "Otwórz na YouTube",
+    "open_title": "Otwórz na YouTube: {{title}}"
+  },
+  "hero": {
+    "track_label": "Podkład #{{number}}",
+    "eyebrow": "Runda improwizacji #{{number}}",
+    "over": "Runda zakończona",
+    "left_days_one": "został {{count}} dzień",
+    "left_days_few": "zostały {{count}} dni",
+    "left_days_many": "zostało {{count}} dni",
+    "left_days_other": "zostało {{count}} dnia",
+    "left_hours_one": "została {{count}} godzina",
+    "left_hours_few": "zostały {{count}} godziny",
+    "left_hours_many": "zostało {{count}} godzin",
+    "left_hours_other": "zostało {{count}} godziny",
+    "left_minutes_one": "została {{count}} minuta",
+    "left_minutes_few": "zostały {{count}} minuty",
+    "left_minutes_many": "zostało {{count}} minut",
+    "left_minutes_other": "zostało {{count}} minuty",
+    "takes_so_far": "Take'ów do tej pory",
+    "players_one": "{{count}} gracz",
+    "players_few": "{{count}} graczy",
+    "players_many": "{{count}} graczy",
+    "players_other": "{{count}} gracza",
+    "points_per_take": "punktów za take",
+    "fame_for_joining": "Fame za dołączenie",
+    "cta": "Podlinkuj swój take",
+    "discord_thread": "Wątek na Discordzie",
+    "discord_join": "Dołącz do Discorda",
+    "track_by": "Podkład od: {{name}}"
+  },
+  "empty": {
+    "eyebrow": "Nowy podkład co {{days}} dni",
+    "title": "W tej rundzie nie ma jeszcze podkładu",
+    "body": "Runda rusza w chwili, gdy jest do czego grać. Dodaj link do podkładu na YouTube, a od razu wejdzie na żywo — każdy może wtedy do niego pojamować, nagrać take i podlinkować go tutaj."
+  },
+  "how": {
+    "title": "Jak działają rundy improwizacji",
+    "intro": "Jeden podkład, {{days}} dni, wszyscy grają do tego samego. Bez ocen i bez zwycięzców — to jam, a rozmowa o nim toczy się na Discordzie.",
+    "steps": {
+      "listen": {
+        "title": "Pograj do podkładu",
+        "body": "Włącz podkład tutaj albo otwórz go na YouTube. Rozgrzewaj się przy nim tak długo, jak chcesz."
+      },
+      "record": {
+        "title": "Nagraj take",
+        "body": "Nagraj telefonem, jak improwizujesz. Jedno podejście, bez montażu — pomyłki mile widziane."
+      },
+      "link": {
+        "title": "Podlinkuj go tutaj",
+        "body": "Wrzuć film na YouTube, Instagram albo Dysk Google i wklej link. To jest twój take."
+      },
+      "discord": {
+        "title": "Zbierz feedback na Discordzie",
+        "body": "Nasz bot wrzuca twój take do wątku rundy. Tam ludzie reagują i o nim rozmawiają."
+      }
+    },
+    "discord_title": "Zbudowane wokół Discorda.",
+    "discord_body": "Każda runda ma własny wątek na naszym serwerze. Bot ogłasza tam podkład, wrzuca każdy take w chwili, gdy go podlinkujesz, a cały feedback zostaje w tym wątku — tutaj grasz i wysyłasz, na Discordzie rozmawiasz."
+  },
+  "rules": {
+    "0": "Baw się dobrze. Bez ocen, bez zwycięzców.",
+    "1": "Improwizuj. Luźny pomysł jest OK, rozpisane solo już nie.",
+    "2": "Rozgrzewaj się, ile chcesz. Gdy włączysz nagrywanie — to jest twój take.",
+    "3": "Bez montażu. Pomyłki mile widziane.",
+    "4": "Feedback tylko pozytywny.",
+    "title": "Zasady domu"
+  },
+  "tabs": {
+    "takes": "Take'i",
+    "next": "Następny podkład",
+    "past": "Poprzednie rundy",
+    "how": "Jak to działa"
+  },
+  "submit": {
+    "placeholder": "Wklej link z YouTube, Instagrama albo Dysku Google…",
+    "note_placeholder": "Jedno zdanie o twoim take'u (opcjonalnie)",
+    "button": "Wyślij",
+    "hint": "Każdy take trafia automatycznie do wątku rundy na Discordzie.",
+    "limit": "Wykorzystałeś wszystkie {{max}} take'i w tej rundzie.",
+    "takes_left_one": "został {{count}} z {{max}} take'ów",
+    "takes_left_few": "zostały {{count}} z {{max}} take'ów",
+    "takes_left_many": "zostało {{count}} z {{max}} take'ów",
+    "takes_left_other": "zostało {{count}} z {{max}} take'ów",
+    "error_BAD_LINK": "To nie wygląda na link do filmu z YouTube, Instagrama ani Dysku Google.",
+    "error_LIMIT": "Masz już {{max}} take'i w tej rundzie.",
+    "error_DUPLICATE": "Ten link już wysłałeś.",
+    "error_NO_ROUND": "W tej chwili nie trwa żadna runda.",
+    "error": "Coś poszło nie tak. Spróbuj ponownie za chwilę.",
+    "success": "Take wysłany — +{{points}} punktów",
+    "success_first": "Jesteś w grze! +{{points}} punktów, +{{fame}} Fame"
+  },
+  "take": {
+    "watch": "Obejrzyj take gracza {{name}} w serwisie {{provider}}",
+    "number": "Take {{number}}",
+    "remove": "Usuń take",
+    "removed": "Take usunięty",
+    "feedback": "Feedback na Discordzie",
+    "none_title": "Jeszcze nie ma take'ów",
+    "none_body": "Ktoś musi być pierwszy. Zagraj do podkładu, nagraj to i wklej link powyżej.",
+    "no_round": "Take'i ruszą, gdy tylko pojawi się podkład."
+  },
+  "side": {
+    "discord_title": "Wątek na Discordzie",
+    "discord_body": "Własny wątek tej rundy. Tam ląduje każdy take i cały feedback.",
+    "discord_body_no_thread": "Feedback toczy się na naszym serwerze Discord. Wpadnij i się przywitaj.",
+    "open_thread": "Otwórz wątek",
+    "players_title": "Gracze",
+    "takes_one": "{{count}} take",
+    "takes_few": "{{count}} take'i",
+    "takes_many": "{{count}} take'ów",
+    "takes_other": "{{count}} take'a"
+  },
+  "next": {
+    "title": "Następna runda rusza: {{date}}",
+    "body": "Co {{days}} dni podkład z największą liczbą głosów staje się nową rundą. Dodaj podkład z YouTube albo zagłosuj na cudzy — przy remisie wygrywa ten dodany wcześniej.",
+    "upload": "Dodaj podkład",
+    "leading": "Następny w kolejce",
+    "by": "od: {{name}}",
+    "remove": "Usuń podkład",
+    "vote": "Zagłosuj na ten podkład",
+    "voted": "Cofnij głos",
+    "empty_title": "Pula jest pusta",
+    "empty_body": "Żaden podkład nie czeka. Dodaj swój, a poprowadzi w głosowaniu na następną rundę."
+  },
+  "upload": {
+    "title": "Dodaj podkład",
+    "description": "Wklej link do podkładu na YouTube. Trafia do puli, ludzie głosują, a podkład z największym poparciem staje się następną rundą.",
+    "link": "Link do YouTube",
+    "link_hint": "Może być dowolny podkład z YouTube — nazwę bierzemy z filmu. Najlepiej sprawdza się 2–5 minut.",
+    "rights": "Linkuj podkład, a nie czyjś cały utwór.",
+    "submit": "Dodaj do puli",
+    "success": "Podkład dodany do puli",
+    "error": "Nie udało się. Spróbuj ponownie za chwilę.",
+    "error_LIMIT": "Masz już {{max}} podkłady czekające w puli.",
+    "error_DUPLICATE": "Ten podkład jest już w puli.",
+    "error_link": "Ten link nie działa. To musi być publiczny film na YouTube."
+  },
+  "past": {
+    "empty_title": "Nie ma jeszcze poprzednich rund",
+    "empty_body": "Zamknięte rundy zostają tutaj — razem z podkładami i wszystkimi take'ami.",
+    "view_takes": "Zobacz take'i",
+    "no_takes": "W tej rundzie nikt nie wrzucił take'a."
+  },
+  "error": "Nie udało się wczytać rundy improwizacji. Spróbuj ponownie za chwilę."
+}

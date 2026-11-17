@@ -1,0 +1,137 @@
+{
+  "player": {
+    "play": "{{title}} abspielen",
+    "open": "Auf YouTube öffnen",
+    "open_title": "{{title}} auf YouTube öffnen"
+  },
+  "hero": {
+    "track_label": "Backing-Track #{{number}}",
+    "eyebrow": "Improv-Runde #{{number}}",
+    "over": "Runde beendet",
+    "left_days_one": "noch {{count}} Tag",
+    "left_days_other": "noch {{count}} Tage",
+    "left_hours_one": "noch {{count}} Stunde",
+    "left_hours_other": "noch {{count}} Stunden",
+    "left_minutes_one": "noch {{count}} Minute",
+    "left_minutes_other": "noch {{count}} Minuten",
+    "takes_so_far": "Takes bisher",
+    "players_one": "{{count}} Spieler",
+    "players_other": "{{count}} Spieler",
+    "points_per_take": "Punkte pro Take",
+    "fame_for_joining": "Fame fürs Mitmachen",
+    "cta": "Take verlinken",
+    "discord_thread": "Discord-Thread",
+    "discord_join": "Zum Discord",
+    "track_by": "Backing-Track von {{name}}"
+  },
+  "empty": {
+    "eyebrow": "Alle {{days}} Tage ein neuer Backing-Track",
+    "title": "Für diese Runde gibt es noch keinen Backing-Track",
+    "body": "Eine Runde startet, sobald es einen Track zum Mitspielen gibt. Füge einen YouTube-Link hinzu und er geht sofort live — dann können alle dazu jammen, einen Take filmen und ihn hier verlinken."
+  },
+  "how": {
+    "title": "So funktionieren die Improv-Runden",
+    "intro": "Ein Backing-Track, {{days}} Tage, alle spielen dazu. Keine Wertung, keine Gewinner — es ist ein Jam, und gesprochen wird darüber auf Discord.",
+    "steps": {
+      "listen": {
+        "title": "Spiel mit",
+        "body": "Drück hier auf Play oder öffne den Track auf YouTube. Wärm dich dazu auf, solange du willst."
+      },
+      "record": {
+        "title": "Film einen Take",
+        "body": "Nimm dich beim Improvisieren mit dem Handy auf. Ein Durchgang, kein Schnitt — Fehler sind willkommen."
+      },
+      "link": {
+        "title": "Verlinke ihn hier",
+        "body": "Lade das Video bei YouTube, Instagram oder Google Drive hoch und füge den Link ein. Das ist dein Take."
+      },
+      "discord": {
+        "title": "Feedback auf Discord",
+        "body": "Unser Bot postet deinen Take in den Thread der Runde. Dort wird reagiert und darüber gesprochen."
+      }
+    },
+    "discord_title": "Rund um Discord gebaut.",
+    "discord_body": "Jede Runde bekommt ihren eigenen Thread auf unserem Server. Der Bot kündigt dort den Track an, postet jeden Take, sobald du ihn verlinkst, und das Feedback bleibt in diesem Thread — hier spielst du und reichst ein, auf Discord wird geredet."
+  },
+  "rules": {
+    "0": "Hab Spaß. Keine Wertung, keine Gewinner.",
+    "1": "Improvisiere. Eine grobe Idee ist okay, ein ausgeschriebenes Solo nicht.",
+    "2": "Wärm dich auf, solange du willst. Sobald die Aufnahme läuft, ist das dein Take.",
+    "3": "Kein Schnitt. Fehler sind willkommen.",
+    "4": "Nur positives Feedback.",
+    "title": "Hausregeln"
+  },
+  "tabs": {
+    "takes": "Takes",
+    "next": "Nächster Track",
+    "past": "Frühere Runden",
+    "how": "So funktioniert's"
+  },
+  "submit": {
+    "placeholder": "Link von YouTube, Instagram oder Google Drive einfügen…",
+    "note_placeholder": "Ein Satz zu deinem Take (optional)",
+    "button": "Einreichen",
+    "hint": "Jeder Take wird automatisch in den Discord-Thread der Runde gepostet.",
+    "limit": "Du hast alle {{max}} Takes dieser Runde verbraucht.",
+    "takes_left_one": "noch {{count}} von {{max}} Takes",
+    "takes_left_other": "noch {{count}} von {{max}} Takes",
+    "error_BAD_LINK": "Das sieht nicht nach einem Videolink von YouTube, Instagram oder Google Drive aus.",
+    "error_LIMIT": "Du hast in dieser Runde schon {{max}} Takes gepostet.",
+    "error_DUPLICATE": "Diesen Link hast du schon gepostet.",
+    "error_NO_ROUND": "Im Moment läuft keine Runde.",
+    "error": "Etwas ist schiefgelaufen. Versuch es gleich noch einmal.",
+    "success": "Take gepostet — +{{points}} Punkte",
+    "success_first": "Du bist dabei! +{{points}} Punkte, +{{fame}} Fame"
+  },
+  "take": {
+    "watch": "Take von {{name}} auf {{provider}} ansehen",
+    "number": "Take {{number}}",
+    "remove": "Take entfernen",
+    "removed": "Take entfernt",
+    "feedback": "Feedback auf Discord",
+    "none_title": "Noch keine Takes",
+    "none_body": "Irgendwer muss anfangen. Spiel zum Track, film es und füge den Link oben ein.",
+    "no_round": "Takes sind möglich, sobald ein Backing-Track live ist."
+  },
+  "side": {
+    "discord_title": "Discord-Thread",
+    "discord_body": "Der eigene Thread dieser Runde. Dort landet jeder Take — und das Feedback dazu.",
+    "discord_body_no_thread": "Feedback gibt es auf unserem Discord-Server. Komm vorbei und sag hallo.",
+    "open_thread": "Thread öffnen",
+    "players_title": "Spieler",
+    "takes_one": "{{count}} Take",
+    "takes_other": "{{count}} Takes"
+  },
+  "next": {
+    "title": "Die nächste Runde startet am {{date}}",
+    "body": "Alle {{days}} Tage wird der Track mit den meisten Stimmen zur neuen Runde. Füge einen Backing-Track von YouTube hinzu oder stimm für einen anderen — bei Gleichstand gewinnt der früher hinzugefügte.",
+    "upload": "Backing-Track hinzufügen",
+    "leading": "Als Nächstes",
+    "by": "von {{name}}",
+    "remove": "Track entfernen",
+    "vote": "Für diesen Track stimmen",
+    "voted": "Stimme zurücknehmen",
+    "empty_title": "Der Pool ist leer",
+    "empty_body": "Kein Track wartet. Füge einen hinzu und er führt die Abstimmung für die nächste Runde an."
+  },
+  "upload": {
+    "title": "Backing-Track hinzufügen",
+    "description": "Füge einen Link zu einem Backing-Track auf YouTube ein. Er kommt in den Pool, es wird abgestimmt, und der Track mit den meisten Stimmen wird zur nächsten Runde.",
+    "link": "YouTube-Link",
+    "link_hint": "Jeder Backing-Track auf YouTube funktioniert — der Name kommt vom Video. Zwei bis fünf Minuten passen am besten.",
+    "rights": "Verlinke einen Backing-Track, nicht den kompletten Song von jemandem.",
+    "submit": "In den Pool",
+    "success": "Track zum Pool hinzugefügt",
+    "error": "Das hat nicht geklappt. Versuch es gleich noch einmal.",
+    "error_LIMIT": "Du hast schon {{max}} Tracks im Pool.",
+    "error_DUPLICATE": "Dieser Track ist schon im Pool.",
+    "error_link": "Dieser Link funktioniert nicht. Es muss ein öffentliches YouTube-Video sein."
+  },
+  "past": {
+    "empty_title": "Noch keine früheren Runden",
+    "empty_body": "Abgeschlossene Runden bleiben hier — mit ihren Backing-Tracks und allen Takes.",
+    "view_takes": "Takes ansehen",
+    "no_takes": "In dieser Runde hat niemand einen Take gepostet."
+  },
+  "error": "Die Improv-Runde konnte nicht geladen werden. Versuch es gleich noch einmal."
+}

@@ -25,6 +25,7 @@ import feed from "../../../public/locales/en/feed.json";
 import feedback from "../../../public/locales/en/feedback.json";
 import goals from "../../../public/locales/en/goals.json";
 import guilds from "../../../public/locales/en/guilds.json";
+import improv from "../../../public/locales/en/improv.json";
 import journey from "../../../public/locales/en/journey.json";
 import leadboard from "../../../public/locales/en/leadboard.json";
 import level_gate from "../../../public/locales/en/level_gate.json";
@@ -75,6 +76,7 @@ export const EN_APP_CATALOG: LocaleCatalog = {
   feedback,
   goals,
   guilds,
+  improv,
   journey,
   leadboard,
   level_gate,

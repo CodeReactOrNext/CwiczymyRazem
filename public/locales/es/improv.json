@@ -1,0 +1,137 @@
+{
+  "player": {
+    "play": "Reproducir {{title}}",
+    "open": "Abrir en YouTube",
+    "open_title": "Abrir {{title}} en YouTube"
+  },
+  "hero": {
+    "track_label": "Base #{{number}}",
+    "eyebrow": "Ronda de improvisación #{{number}}",
+    "over": "Ronda terminada",
+    "left_days_one": "queda {{count}} día",
+    "left_days_other": "quedan {{count}} días",
+    "left_hours_one": "queda {{count}} hora",
+    "left_hours_other": "quedan {{count}} horas",
+    "left_minutes_one": "queda {{count}} minuto",
+    "left_minutes_other": "quedan {{count}} minutos",
+    "takes_so_far": "Tomas hasta ahora",
+    "players_one": "{{count}} jugador",
+    "players_other": "{{count}} jugadores",
+    "points_per_take": "puntos por toma",
+    "fame_for_joining": "Fame por participar",
+    "cta": "Enlaza tu toma",
+    "discord_thread": "Hilo de Discord",
+    "discord_join": "Únete al Discord",
+    "track_by": "Base de {{name}}"
+  },
+  "empty": {
+    "eyebrow": "Una base nueva cada {{days}} días",
+    "title": "Esta ronda aún no tiene base",
+    "body": "Una ronda empieza en cuanto hay una base sobre la que tocar. Añade un enlace de YouTube y sale en directo al momento: todos pueden improvisar encima, grabar una toma y enlazarla aquí."
+  },
+  "how": {
+    "title": "Cómo funcionan las rondas de improvisación",
+    "intro": "Una base, {{days}} días, todos tocan sobre lo mismo. Sin puntuaciones ni ganadores: es una jam, y la conversación sobre ella ocurre en Discord.",
+    "steps": {
+      "listen": {
+        "title": "Toca encima",
+        "body": "Dale a reproducir aquí o abre la base en YouTube. Calienta sobre ella todo el tiempo que quieras."
+      },
+      "record": {
+        "title": "Graba una toma",
+        "body": "Grábate improvisando con el móvil. Un solo intento, sin edición: los errores son bienvenidos."
+      },
+      "link": {
+        "title": "Enlázala aquí",
+        "body": "Sube el vídeo a YouTube, Instagram o Google Drive y pega el enlace. Esa es tu toma."
+      },
+      "discord": {
+        "title": "Recibe feedback en Discord",
+        "body": "Nuestro bot publica tu toma en el hilo de la ronda. Ahí es donde la gente reacciona y la comenta."
+      }
+    },
+    "discord_title": "Construido en torno a Discord.",
+    "discord_body": "Cada ronda tiene su propio hilo en nuestro servidor. El bot anuncia allí la base, publica cada toma en cuanto la enlazas, y el feedback se queda en ese hilo: aquí tocas y envías, en Discord se habla."
+  },
+  "rules": {
+    "0": "Diviértete. Sin puntuaciones, sin ganadores.",
+    "1": "Improvisa. Una idea aproximada vale, un solo escrito no.",
+    "2": "Calienta todo lo que quieras. En cuanto le das a grabar, esa es tu toma.",
+    "3": "Sin edición. Los errores son bienvenidos.",
+    "4": "Solo feedback positivo.",
+    "title": "Reglas de la casa"
+  },
+  "tabs": {
+    "takes": "Tomas",
+    "next": "Próxima base",
+    "past": "Rondas anteriores",
+    "how": "Cómo funciona"
+  },
+  "submit": {
+    "placeholder": "Pega un enlace de YouTube, Instagram o Google Drive…",
+    "note_placeholder": "Una línea sobre tu toma (opcional)",
+    "button": "Enviar",
+    "hint": "Cada toma se publica automáticamente en el hilo de Discord de la ronda.",
+    "limit": "Has usado las {{max}} tomas de esta ronda.",
+    "takes_left_one": "queda {{count}} de {{max}} tomas",
+    "takes_left_other": "quedan {{count}} de {{max}} tomas",
+    "error_BAD_LINK": "Eso no parece un enlace a un vídeo de YouTube, Instagram o Google Drive.",
+    "error_LIMIT": "Ya has publicado {{max}} tomas en esta ronda.",
+    "error_DUPLICATE": "Ya has publicado este enlace.",
+    "error_NO_ROUND": "Ahora mismo no hay ninguna ronda en marcha.",
+    "error": "Algo ha fallado. Inténtalo de nuevo en un momento.",
+    "success": "Toma publicada: +{{points}} puntos",
+    "success_first": "¡Estás dentro! +{{points}} puntos, +{{fame}} Fame"
+  },
+  "take": {
+    "watch": "Ver la toma de {{name}} en {{provider}}",
+    "number": "Toma {{number}}",
+    "remove": "Eliminar toma",
+    "removed": "Toma eliminada",
+    "feedback": "Feedback en Discord",
+    "none_title": "Aún no hay tomas",
+    "none_body": "Alguien tiene que ser el primero. Toca sobre la base, grábalo y pega el enlace arriba.",
+    "no_round": "Las tomas se abren en cuanto haya una base en directo."
+  },
+  "side": {
+    "discord_title": "Hilo de Discord",
+    "discord_body": "El hilo propio de esta ronda. Ahí llega cada toma, y también el feedback.",
+    "discord_body_no_thread": "El feedback ocurre en nuestro servidor de Discord. Pásate y saluda.",
+    "open_thread": "Abrir hilo",
+    "players_title": "Jugadores",
+    "takes_one": "{{count}} toma",
+    "takes_other": "{{count}} tomas"
+  },
+  "next": {
+    "title": "La próxima ronda empieza el {{date}}",
+    "body": "Cada {{days}} días, la base con más votos se convierte en la nueva ronda. Añade una base de YouTube o apoya la de otro; en caso de empate gana la que se añadió antes.",
+    "upload": "Añadir una base",
+    "leading": "La siguiente",
+    "by": "de {{name}}",
+    "remove": "Eliminar base",
+    "vote": "Votar por esta base",
+    "voted": "Retirar tu voto",
+    "empty_title": "No hay bases en espera",
+    "empty_body": "No hay ninguna base esperando. Añade una y encabezará la votación de la próxima ronda."
+  },
+  "upload": {
+    "title": "Añadir una base",
+    "description": "Pega un enlace a una base en YouTube. Entra en la lista, la gente vota y la base más apoyada se convierte en la próxima ronda.",
+    "link": "Enlace de YouTube",
+    "link_hint": "Vale cualquier base de YouTube: el nombre se toma del vídeo. Lo ideal son de dos a cinco minutos.",
+    "rights": "Enlaza una base, no la canción completa de alguien.",
+    "submit": "Añadir a la lista",
+    "success": "Base añadida a la lista",
+    "error": "No se ha podido completar. Inténtalo de nuevo en un momento.",
+    "error_LIMIT": "Ya tienes {{max}} bases esperando en la lista.",
+    "error_DUPLICATE": "Esa base ya está en la lista.",
+    "error_link": "Ese enlace no funciona. Tiene que ser un vídeo público de YouTube."
+  },
+  "past": {
+    "empty_title": "Aún no hay rondas anteriores",
+    "empty_body": "Las rondas cerradas se quedan aquí, con sus bases y todas las tomas.",
+    "view_takes": "Ver tomas",
+    "no_takes": "Nadie publicó una toma en esta ronda."
+  },
+  "error": "No se ha podido cargar la ronda de improvisación. Inténtalo de nuevo en un momento."
+}

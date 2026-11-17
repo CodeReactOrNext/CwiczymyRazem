@@ -2,6 +2,10 @@ import crypto from "crypto";
 import { logger } from "feature/logger/Logger";
 import * as admin from "firebase-admin";
 import {
+  RECURRING_PAYMENTS_COLLECTION,
+  recurringPaymentKey,
+} from "lib/support/recurringPayment";
+import {
   findDonorAccountByEmail,
   grantSupporterByEmail,
 } from "lib/support/supporterGrant";
@@ -131,6 +135,25 @@ async function grantSupporterBadge(
   }
 }
 
+/** Claims one membership payment in the ledger. True only the first time —
+ * a retried or repeated webhook for a period already paid claims nothing. */
+async function claimRecurringPayment(
+  subscriptionId: string,
+  periodStartSec: number,
+  amount: number,
+  type: string
+): Promise<boolean> {
+  const ref: admin.firestore.DocumentReference = firestore
+    .collection(RECURRING_PAYMENTS_COLLECTION)
+    .doc(recurringPaymentKey(subscriptionId, periodStartSec));
+
+  return firestore.runTransaction(async (tx: admin.firestore.Transaction) => {
+    if ((await tx.get(ref)).exists) return false;
+    tx.set(ref, { subscriptionId, amount, type, periodStart: periodStartSec, at: TS() });
+    return true;
+  });
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -190,12 +213,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       type === "recurring_donation.started" ||
       type === "recurring_donation.created"
     ) {
-      // Record the subscription once. The lifetime read accrues
-      // `amount × months elapsed` from startedAt — no per-month event needed.
+      // Record the subscription once. The funding bar accrues
+      // `amount × months elapsed` from startedAt; the donor's own total is
+      // credited per payment through the ledger, starting with this one.
+      const subscriptionId = String(data.id ?? crypto.randomUUID());
       const ref: admin.firestore.DocumentReference = firestore
         .collection("bmcRecurring")
-        .doc(String(data.id ?? crypto.randomUUID()));
-      const isNewSubscription = !(await ref.get()).exists;
+        .doc(subscriptionId);
       await ref.set(
         {
           amount: extractAmount(data),
@@ -210,7 +234,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         { merge: true }
       );
 
-      if (isNewSubscription) {
+      const isFirstPayment = await claimRecurringPayment(
+        subscriptionId,
+        num(data.current_period_start ?? data.started_at ?? created),
+        extractAmount(data),
+        type
+      );
+      if (isFirstPayment) {
         await postDonationActivity(data, extractAmount(data), "recurring");
         await grantSupporterBadge(data, type);
       }
@@ -240,6 +270,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         { merge: true }
       );
+
+      // BMC announces a membership renewal as `updated` on an active
+      // subscription. Every payment is money given, so it tops up the donor's
+      // `supportTotal` — and with it their supporter tokens — like a coffee.
+      // The ledger keys on the billing month, so an edit to a period that was
+      // already paid credits nothing.
+      if (!inactive && data.id != null) {
+        logger.info("BMC recurring update", {
+          context: "bmcWebhook",
+          extra: { type, fields: Object.keys(data) },
+        });
+        const isNewPayment = await claimRecurringPayment(
+          String(data.id),
+          num(data.current_period_start ?? created),
+          extractAmount(data),
+          type
+        );
+        if (isNewPayment) {
+          await postDonationActivity(data, extractAmount(data), "recurring");
+          await grantSupporterBadge(data, type);
+        }
+      }
     }
   } catch (error) {
     logger.error(error, { context: "bmcWebhook", extra: { type } });

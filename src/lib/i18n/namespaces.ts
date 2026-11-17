@@ -36,6 +36,7 @@ export const TRANSLATION_NAMESPACES = [
   "footer",
   "goals",
   "guilds",
+  "improv",
   "journey",
   "leadboard",
   "level_gate",

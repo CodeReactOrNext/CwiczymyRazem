@@ -37,6 +37,7 @@ export type NavPagesTypes =
   | "recordings"
   | "challenges"
   | "duels"
+  | "improv"
   | "bosses"
   | "supporter"
   | "guilds"

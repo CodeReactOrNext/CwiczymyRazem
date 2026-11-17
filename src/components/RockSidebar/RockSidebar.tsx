@@ -53,6 +53,7 @@ import {
   Library,
   LogOut,
   Mic2,
+  Music2,
   Route,
   Settings,
   Shield,
@@ -194,6 +195,13 @@ const COMMUNITY_SUB_NAV: SidebarSubLink[] = [
     href: "/duels",
     icon: <Swords size={16} />,
     tooltip: "duels_tooltip",
+  },
+  {
+    id: "community-improv",
+    name: "improv",
+    href: "/improv",
+    icon: <Music2 size={16} />,
+    tooltip: "improv_tooltip",
   },
   {
     id: "community-recordings",
@@ -385,6 +393,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (pathname === "/summary") return "progress";
     if (pathname.startsWith("/challenges")) return "community";
     if (pathname.startsWith("/duels")) return "community";
+    if (pathname.startsWith("/improv")) return "community";
     if (pathname.startsWith("/leaderboard")) return "community";
     if (pathname.startsWith("/seasons")) return "community";
     if (pathname.startsWith("/guilds")) return "community";

@@ -1,0 +1,137 @@
+{
+  "player": {
+    "play": "Play {{title}}",
+    "open": "Open on YouTube",
+    "open_title": "Open {{title}} on YouTube"
+  },
+  "hero": {
+    "track_label": "Backing track #{{number}}",
+    "eyebrow": "Improv round #{{number}}",
+    "over": "Round over",
+    "left_days_one": "{{count}} day left",
+    "left_days_other": "{{count}} days left",
+    "left_hours_one": "{{count}} hour left",
+    "left_hours_other": "{{count}} hours left",
+    "left_minutes_one": "{{count}} minute left",
+    "left_minutes_other": "{{count}} minutes left",
+    "takes_so_far": "Takes so far",
+    "players_one": "{{count}} player",
+    "players_other": "{{count}} players",
+    "points_per_take": "points per take",
+    "fame_for_joining": "Fame for joining",
+    "cta": "Link your take",
+    "discord_thread": "Discord thread",
+    "discord_join": "Join the Discord",
+    "track_by": "Backing track by {{name}}"
+  },
+  "empty": {
+    "eyebrow": "A new backing track every {{days}} days",
+    "title": "No backing track this round yet",
+    "body": "A round starts the moment there is a track to play over. Add a YouTube link to one and it goes live straight away — everybody can then jam to it, film a take and link it here."
+  },
+  "how": {
+    "title": "How improv rounds work",
+    "intro": "One backing track, {{days}} days, everybody plays over it. No scores and no winners — it's a jam, and the conversation about it happens on Discord.",
+    "steps": {
+      "listen": {
+        "title": "Play along",
+        "body": "Hit play here or open the track on YouTube. Warm up over it for as long as you like."
+      },
+      "record": {
+        "title": "Film a take",
+        "body": "Record yourself improvising with your phone. One go, no editing — mistakes are welcome."
+      },
+      "link": {
+        "title": "Link it here",
+        "body": "Put the video on YouTube, Instagram or Google Drive and paste the link. That's your take."
+      },
+      "discord": {
+        "title": "Get feedback on Discord",
+        "body": "Our bot posts your take to the round's thread. That's where people react and talk it through."
+      }
+    },
+    "discord_title": "Built around Discord.",
+    "discord_body": "Every round gets its own thread on our server. The bot announces the track there, posts each take the moment you link it, and the feedback lives in that thread — this page is where you play and submit, Discord is where you talk."
+  },
+  "rules": {
+    "0": "Have fun. No scores, no winners.",
+    "1": "Improvise. A rough idea is fine, a written-out solo isn't.",
+    "2": "Warm up as long as you like. Once you hit record, that's your take.",
+    "3": "No editing. Mistakes are welcome.",
+    "4": "Feedback is positive only.",
+    "title": "House rules"
+  },
+  "tabs": {
+    "takes": "Takes",
+    "next": "Next track",
+    "past": "Past rounds",
+    "how": "How it works"
+  },
+  "submit": {
+    "placeholder": "Paste a YouTube, Instagram or Google Drive link…",
+    "note_placeholder": "One line about your take (optional)",
+    "button": "Submit",
+    "hint": "Every take is posted to the round's Discord thread automatically.",
+    "limit": "You've used all {{max}} takes this round.",
+    "takes_left_one": "{{count}} of {{max}} takes left",
+    "takes_left_other": "{{count}} of {{max}} takes left",
+    "error_BAD_LINK": "That doesn't look like a YouTube, Instagram or Google Drive video link.",
+    "error_LIMIT": "You've already posted {{max}} takes on this round.",
+    "error_DUPLICATE": "You've already posted this link.",
+    "error_NO_ROUND": "There is no round running right now.",
+    "error": "Something went wrong. Try again in a moment.",
+    "success": "Take posted — +{{points}} points",
+    "success_first": "You're in! +{{points}} points, +{{fame}} Fame"
+  },
+  "take": {
+    "watch": "Watch {{name}}'s take on {{provider}}",
+    "number": "Take {{number}}",
+    "remove": "Remove take",
+    "removed": "Take removed",
+    "feedback": "Feedback on Discord",
+    "none_title": "No takes yet",
+    "none_body": "Somebody has to go first. Play over the track, film it and paste the link above.",
+    "no_round": "Takes open as soon as a backing track is live."
+  },
+  "side": {
+    "discord_title": "Discord thread",
+    "discord_body": "This round's own thread. Every take lands there, and so does the feedback.",
+    "discord_body_no_thread": "Feedback happens on our Discord server. Join in and say hi.",
+    "open_thread": "Open thread",
+    "players_title": "Players",
+    "takes_one": "{{count}} take",
+    "takes_other": "{{count}} takes"
+  },
+  "next": {
+    "title": "The next round starts on {{date}}",
+    "body": "Every {{days}} days the track with the most votes becomes the new round. Add a backing track from YouTube or back somebody else's — on a tie, the one added first wins.",
+    "upload": "Add a backing track",
+    "leading": "Next up",
+    "by": "by {{name}}",
+    "remove": "Remove track",
+    "vote": "Vote for this track",
+    "voted": "Take your vote back",
+    "empty_title": "The pool is empty",
+    "empty_body": "No tracks are waiting. Add one and it leads the vote for the next round."
+  },
+  "upload": {
+    "title": "Add a backing track",
+    "description": "Paste a link to a backing track on YouTube. It joins the pool, people vote, and the most-backed track becomes the next round.",
+    "link": "YouTube link",
+    "link_hint": "Any backing track on YouTube works — the name is taken from the video. Two to five minutes is best.",
+    "rights": "Link to a backing track, not to somebody's full song.",
+    "submit": "Add to the pool",
+    "success": "Track added to the pool",
+    "error": "That didn't go through. Try again in a moment.",
+    "error_LIMIT": "You already have {{max}} tracks waiting in the pool.",
+    "error_DUPLICATE": "That track is already in the pool.",
+    "error_link": "That link doesn't work. It has to be a public YouTube video."
+  },
+  "past": {
+    "empty_title": "No past rounds yet",
+    "empty_body": "Closed rounds are kept here, with their backing tracks and every take.",
+    "view_takes": "View takes",
+    "no_takes": "Nobody posted a take on this round."
+  },
+  "error": "Couldn't load the improv round. Try again in a moment."
+}
