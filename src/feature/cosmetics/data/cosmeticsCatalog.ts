@@ -80,6 +80,10 @@ export const BANNERS: BannerCosmetic[] = [
   banner("reaper", 160, "embers"),
   banner("samurai", 160, "petals"),
   banner("phoenix", 160, "embers"),
+  banner("mariachi", 160, "marigold"),
+  { ...banner("lineage", 160, "dust"), lights: "spotlights" },
+  { ...banner("crossroads", 160, "dust"), lights: "moon" },
+  { ...banner("anubis", 160, "dust"), lights: "sun" },
 ];
 
 export const AVATAR_EFFECTS: AvatarCosmetic[] = [
@@ -89,7 +93,11 @@ export const AVATAR_EFFECTS: AvatarCosmetic[] = [
   avatar("chain", 40, { inner: RING, motion: "spin", duration: 40 }),
   avatar("uroboros", 60, { inner: RING, motion: "spin", duration: 18 }),
   avatar("vinyl", 60, { inner: RING, motion: "spin", duration: 6 }),
+  // A wreath, not a clean ring: the hole is cut a little small so the flowers
+  // and skulls lap over the avatar's edge.
+  avatar("marigold", 60, { inner: 0.54, motion: "spin", duration: 90 }),
   avatar("horns", 60, { inner: STICKER, motion: "float", duration: 3.4 }),
+  avatar("sombrero", 60, { inner: STICKER, motion: "float", duration: 3.4 }),
   avatar("dragon", 100, { inner: STICKER, motion: "float", duration: 3.4 }),
   avatar("crown", 100, { inner: STICKER, motion: "shine", duration: 3 }),
 ];

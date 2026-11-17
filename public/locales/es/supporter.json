@@ -793,7 +793,13 @@
         "banner_led": "Espectro",
         "banner_halftone": "Trama",
         "banner_dust": "Polvo dorado",
-        "banner_pattern": "Patrón"
+        "banner_pattern": "Patrón",
+        "banner_mariachi": "Mariachi",
+        "avatar_sombrero": "Sombrero",
+        "avatar_marigold": "Corona de cempasúchil",
+        "banner_lineage": "Linaje",
+        "banner_crossroads": "Encrucijada",
+        "banner_anubis": "Anubis"
       },
       "owned": "En propiedad",
       "wearing": "Puesto",

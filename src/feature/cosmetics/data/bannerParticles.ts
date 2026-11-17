@@ -12,6 +12,7 @@ export type BannerParticleKind =
   | "green"
   | "snow"
   | "petals"
+  | "marigold"
   | "stars"
   | "rain"
   | "dust";
@@ -58,6 +59,14 @@ export const PARTICLES: Record<BannerParticleKind, ParticleConfig> = {
     vx: [-30, -10],
     vy: [5, 18],
     size: [1, 2.3],
+    alpha: [0.5, 0.95],
+  },
+  marigold: {
+    colors: ["#fb923c", "#f97316", "#fbbf24", "#fdba74"],
+    count: 34,
+    vx: [-32, -10],
+    vy: [4, 16],
+    size: [0.9, 2.2],
     alpha: [0.5, 0.95],
   },
   stars: {

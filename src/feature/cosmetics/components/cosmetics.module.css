@@ -124,6 +124,144 @@
   }
 }
 
+/*
+ * Stage lamps: a cone of light over each guitar, lit in turn from the oldest
+ * to the newest, then dark for the rest of the cycle. Each lamp lags the one
+ * before it by `--lamp-index` steps.
+ */
+.spotlight {
+  width: 11%;
+  margin-left: -5.5%;
+  background: radial-gradient(
+    ellipse 50% 96% at 50% 0%,
+    rgb(var(--lamp) / 0.85),
+    rgb(var(--lamp) / 0.4) 60%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: spotlight 11s ease-in-out infinite;
+  animation-delay: calc(var(--lamp-index) * 0.42s);
+}
+
+@keyframes spotlight {
+  0% {
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  11% {
+    opacity: 0.45;
+  }
+  24%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/*
+ * Crossroads: the moon breathes, and a bank of fog slides along the road.
+ * Both are placed on that one picture, in shares of the art box.
+ */
+.moonGlow {
+  left: 64.3%;
+  top: 19.8%;
+  width: 22%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: radial-gradient(
+    circle,
+    rgb(191 219 254 / 0.55),
+    rgb(147 197 253 / 0.22) 40%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation: breathe 7s ease-in-out infinite alternate;
+}
+
+.fog {
+  left: 42%;
+  bottom: 0;
+  width: 58%;
+  height: 46%;
+  background: radial-gradient(ellipse at 50% 100%, rgb(203 213 225 / 0.26), transparent 70%);
+  mix-blend-mode: screen;
+  opacity: 0.8;
+  animation: fog 17s ease-in-out infinite alternate;
+}
+
+/* Anubis: the sun disc breathes, and the spark at the headstock flickers. */
+.sunGlow {
+  left: 64.6%;
+  top: 31%;
+  width: 34%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: radial-gradient(
+    circle,
+    rgb(253 224 71 / 0.42),
+    rgb(251 191 36 / 0.18) 45%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation: breathe 6s ease-in-out infinite alternate;
+}
+
+.spark {
+  left: 73.7%;
+  top: 23%;
+  width: 8%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: radial-gradient(circle, rgb(94 234 212 / 0.9), transparent 65%);
+  mix-blend-mode: screen;
+  opacity: 0.2;
+  animation: spark 5s linear infinite;
+}
+
+@keyframes breathe {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fog {
+  from {
+    transform: translateX(-6%);
+    opacity: 0.55;
+  }
+  to {
+    transform: translateX(6%);
+    opacity: 1;
+  }
+}
+
+@keyframes spark {
+  0%,
+  70% {
+    opacity: 0.15;
+  }
+  72% {
+    opacity: 1;
+  }
+  74% {
+    opacity: 0.3;
+  }
+  77% {
+    opacity: 0.9;
+  }
+  86%,
+  100% {
+    opacity: 0.15;
+  }
+}
+
 .spin {
   animation: spin var(--cosmetic-duration, 24s) linear infinite;
 }
@@ -186,6 +324,11 @@
 @media (prefers-reduced-motion: reduce) {
   .bannerArt,
   .flash,
+  .spotlight,
+  .moonGlow,
+  .fog,
+  .sunGlow,
+  .spark,
   .spin,
   .spinReverse,
   .pulse,

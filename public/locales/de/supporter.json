@@ -793,7 +793,13 @@
         "banner_led": "Spektrum",
         "banner_halftone": "Raster",
         "banner_dust": "Goldstaub",
-        "banner_pattern": "Muster"
+        "banner_pattern": "Muster",
+        "banner_mariachi": "Mariachi",
+        "avatar_sombrero": "Sombrero",
+        "avatar_marigold": "Tagetes-Kranz",
+        "banner_lineage": "Ahnenreihe",
+        "banner_crossroads": "Kreuzweg",
+        "banner_anubis": "Anubis"
       },
       "owned": "In Besitz",
       "wearing": "Angelegt",

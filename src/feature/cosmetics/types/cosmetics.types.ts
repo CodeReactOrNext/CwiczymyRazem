@@ -31,6 +31,9 @@ export type DrawnLook =
   | "dust"
   | "pattern";
 
+/** The paintings with a light of their own moving in them. */
+export type BannerLights = "spotlights" | "moon" | "sun";
+
 export interface BannerCosmetic extends CosmeticBase {
   kind: "banner";
   /**
@@ -42,6 +45,8 @@ export interface BannerCosmetic extends CosmeticBase {
   particles?: BannerParticleKind;
   /** A lightning flash every few seconds — the storm pictures. */
   flash?: boolean;
+  /** Light placed by hand on one particular painting; see BannerLights.tsx. */
+  lights?: BannerLights;
 }
 
 export interface AvatarCosmetic extends CosmeticBase {

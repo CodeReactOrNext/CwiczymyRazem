@@ -809,7 +809,13 @@
         "banner_led": "Spektrum",
         "banner_halftone": "Raster",
         "banner_dust": "Złoty pył",
-        "banner_pattern": "Wzór"
+        "banner_pattern": "Wzór",
+        "banner_mariachi": "Mariachi",
+        "avatar_sombrero": "Sombrero",
+        "avatar_marigold": "Wieniec z aksamitek",
+        "banner_lineage": "Rodowód",
+        "banner_crossroads": "Rozstaje",
+        "banner_anubis": "Anubis"
       },
       "owned": "Posiadane",
       "wearing": "Założone",

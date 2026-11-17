@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { BannerLights } from "feature/cosmetics/components/BannerLights";
 import { BannerParticles } from "feature/cosmetics/components/BannerParticles";
 import styles from "feature/cosmetics/components/cosmetics.module.css";
 import { DrawnBanner } from "feature/cosmetics/components/DrawnBanner";
@@ -57,8 +58,9 @@ export const CosmeticBanner = ({ item, className }: CosmeticBannerProps) => {
             "absolute inset-0 bg-cover bg-right-top",
             styles.bannerArt,
           )}
-          style={{ backgroundImage: `url(${cosmeticImage(item)})` }}
-        />
+          style={{ backgroundImage: `url(${cosmeticImage(item)})` }}>
+          {item.lights && <BannerLights kind={item.lights} />}
+        </div>
       </div>
       <div className={cn("absolute inset-0", styles.paintedShade)} />
       {item.flash && <div className={cn("absolute inset-0", styles.flash)} />}

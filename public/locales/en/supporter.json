@@ -793,7 +793,13 @@
         "banner_led": "Spectrum",
         "banner_halftone": "Halftone",
         "banner_dust": "Gold Dust",
-        "banner_pattern": "Pattern"
+        "banner_pattern": "Pattern",
+        "banner_mariachi": "Mariachi",
+        "avatar_sombrero": "Sombrero",
+        "avatar_marigold": "Marigold Wreath",
+        "banner_lineage": "Lineage",
+        "banner_crossroads": "Crossroads",
+        "banner_anubis": "Anubis"
       },
       "owned": "Owned",
       "wearing": "Wearing",
