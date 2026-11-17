@@ -18,6 +18,14 @@ const CHANNEL_TYPE_FORUM = 15;
 const CHANNEL_TYPE_MEDIA = 16;
 const LINK_BUTTON = 5;
 
+let lastError: string | null = null;
+
+/**
+ * Why the most recent call failed — "403 Missing Access", "no response"… — so
+ * a feature can store it where an admin will see it, instead of only in logs.
+ */
+export const lastDiscordError = (): string | null => lastError;
+
 export const isDiscordBotConfigured = (): boolean =>
   !!process.env.DISCORD_BOT_TOKEN;
 
@@ -40,15 +48,18 @@ export const discordCall = async <T>(
       body: body === undefined ? undefined : JSON.stringify(body),
     });
     if (!response.ok) {
+      const detail = await response.text().catch(() => "");
+      lastError = `${method} ${path}: ${response.status} ${detail.slice(0, 200)}`;
       console.error(
         `discord ${method} ${path} failed`,
         response.status,
-        await response.text().catch(() => ""),
+        detail,
       );
       return null;
     }
     return response.status === 204 ? null : ((await response.json()) as T);
   } catch (error) {
+    lastError = `${method} ${path}: no response`;
     console.error(`discord ${method} ${path} failed`, error);
     return null;
   }

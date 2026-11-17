@@ -78,6 +78,8 @@ export interface ImprovOverview {
   past: ImprovRound[];
   nextRoundStartsAt: number;
   isAdmin: boolean;
+  /** Admins only: why the round has no Discord thread, when it hasn't. */
+  discordIssue: string | null;
 }
 
 export interface ImprovTakeResult {

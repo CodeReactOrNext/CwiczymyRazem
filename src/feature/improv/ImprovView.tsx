@@ -188,6 +188,7 @@ export const ImprovView = () => {
             <ImprovDiscordCard
               discordUrl={discordUrl}
               hasThread={!!round?.discordThreadUrl}
+              adminIssue={round ? (overview?.discordIssue ?? null) : null}
             />
             <ImprovPlayersCard players={players} />
             <ImprovRules />

@@ -13,9 +13,12 @@ import { FaDiscord } from "react-icons/fa6";
 export const ImprovDiscordCard = ({
   discordUrl,
   hasThread,
+  adminIssue = null,
 }: {
   discordUrl: string;
   hasThread: boolean;
+  /** Shown to admins only — why the bot hasn't opened the thread. */
+  adminIssue?: string | null;
 }) => {
   const { t } = useTranslation("improv");
   return (
@@ -35,6 +38,11 @@ export const ImprovDiscordCard = ({
           </p>
         </div>
       </div>
+      {adminIssue && (
+        <p className='font-mono break-words rounded-lg bg-red-500/10 px-3 py-2 text-xs leading-relaxed text-red-300'>
+          Admin · bot: {adminIssue}
+        </p>
+      )}
       <Button asChild variant='ghost' className='h-10'>
         <a href={discordUrl} target='_blank' rel='noreferrer'>
           {hasThread ? t("side.open_thread") : t("hero.discord_join")}

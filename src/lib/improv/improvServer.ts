@@ -32,6 +32,8 @@ import type {
 import { FieldValue } from "firebase-admin/firestore";
 import { firestore } from "utils/firebase/api/firebase.config";
 
+import { lastDiscordError } from "lib/discord/discordBot";
+
 import {
   deleteImprovTakeMessage,
   type ImprovThread,
@@ -223,35 +225,55 @@ const ensureCurrentRound = async (
  * request (the next visit, or the next take) tries again — which is also how a
  * round drawn before the bot was configured gets its thread later.
  */
+const NOT_CONFIGURED =
+  "DISCORD_BOT_TOKEN or DISCORD_IMPROV_CHANNEL_ID is not set on the server";
+
+interface RoundThreadState {
+  thread: ImprovThread | null;
+  /** Why there is no thread, for admins. Null when there is one, or one is being opened. */
+  issue: string | null;
+}
+
 const ensureRoundThread = async (
   ref: DocumentReference,
   now: number,
-): Promise<ImprovThread | null> => {
-  if (!isImprovDiscordConfigured()) return null;
+): Promise<RoundThreadState> => {
+  if (!isImprovDiscordConfigured()) {
+    return { thread: null, issue: NOT_CONFIGURED };
+  }
 
   const claimed = await firestore.runTransaction(
-    async (tx: Transaction): Promise<DocumentData | ImprovThread | null> => {
+    async (
+      tx: Transaction,
+    ): Promise<DocumentData | RoundThreadState | null> => {
       const snap = await tx.get(ref);
       const data = snap.data();
       if (!data) return null;
       const thread = threadOf(data);
-      if (thread) return thread;
-      if (now - (data.discordClaimedAt ?? 0) < THREAD_CLAIM_MS) return null;
+      if (thread) return { thread, issue: null };
+      if (now - (data.discordClaimedAt ?? 0) < THREAD_CLAIM_MS) {
+        return { thread: null, issue: data.discordError ?? null };
+      }
       tx.update(ref, { discordClaimedAt: now });
       return data;
     },
   );
 
-  if (!claimed) return null;
-  if ("threadId" in claimed) return claimed as ImprovThread;
+  if (!claimed) return { thread: null, issue: null };
+  if ("issue" in claimed) return claimed as RoundThreadState;
 
   const thread = await openImprovThread(toRound(ref.id, claimed));
-  await ref.update(
-    thread
-      ? { discordThreadId: thread.threadId, discordGuildId: thread.guildId }
-      : { discordClaimedAt: 0 },
-  );
-  return thread;
+  if (thread) {
+    await ref.update({
+      discordThreadId: thread.threadId,
+      discordGuildId: thread.guildId,
+      discordError: FieldValue.delete(),
+    });
+    return { thread, issue: null };
+  }
+  const issue = lastDiscordError() ?? "Discord did not answer";
+  await ref.update({ discordClaimedAt: 0, discordError: issue });
+  return { thread: null, issue };
 };
 
 const readTakes = async (
@@ -272,9 +294,13 @@ export const getImprovOverview = async (
 ): Promise<ImprovOverview> => {
   const now = Date.now();
   const current = await ensureCurrentRound(now);
-  const thread = current
-    ? (threadOf(current.data) ?? (await ensureRoundThread(current.ref, now)))
-    : null;
+  const existingThread = current ? threadOf(current.data) : null;
+  const threadState: RoundThreadState = !current
+    ? { thread: null, issue: null }
+    : existingThread
+      ? { thread: existingThread, issue: null }
+      : await ensureRoundThread(current.ref, now);
+  const thread = threadState.thread;
 
   const [roundTakes, pool, pastSnap, identity] = await Promise.all([
     current ? readTakes(current.ref.id, thread) : Promise.resolve([]),
@@ -306,6 +332,7 @@ export const getImprovOverview = async (
       .map((doc) => toRound(doc.id, doc.data())),
     nextRoundStartsAt: improvRoundWindow(improvRoundIndex(now)).endsAt,
     isAdmin: identity.isAdmin,
+    discordIssue: identity.isAdmin ? threadState.issue : null,
   };
 };
 
@@ -388,7 +415,8 @@ export const submitImprovTake = async (
   );
 
   const thread =
-    threadOf(current.data) ?? (await ensureRoundThread(current.ref, now));
+    threadOf(current.data) ??
+    (await ensureRoundThread(current.ref, now)).thread;
   let discordMessageId: string | null = null;
   if (thread) {
     discordMessageId = await postImprovTake(
