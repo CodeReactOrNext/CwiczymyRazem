@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { announceChallengeRun } from "feature/challenges/services/announceChallenge.service";
 import {
   ensureCurrentChallenge,
   getChallenge,
@@ -120,6 +121,8 @@ export const useChallengeMutations = () => {
       submitChallengeRecording(params),
     onSuccess: (reward, params) => {
       refreshBoard(params.challenge.id);
+      // Fire and forget — the bot's post must never hold up or fail the run.
+      void announceChallengeRun(params.challenge.id, params.songId);
       // The reward lands on the user document as an increment, which the store
       // holding the header and profile numbers never hears about — without this
       // the toast promises points the app goes on showing the old total for
@@ -140,13 +143,19 @@ export const useChallengeMutations = () => {
       // earned rather than flashing a "+0 points" that reads like a bug.
       if (reward.points === 0) {
         toast.success(
-          t("toast.accepted_fame_only", { fame: reward.fame, count: CHALLENGE_SONG_COUNT }),
+          t("toast.accepted_fame_only", {
+            fame: reward.fame,
+            count: CHALLENGE_SONG_COUNT,
+          }),
         );
         return;
       }
       toast.success(
         reward.isClear
-          ? t("toast.board_cleared", { points: reward.points, fame: reward.fame })
+          ? t("toast.board_cleared", {
+              points: reward.points,
+              fame: reward.fame,
+            })
           : t("toast.accepted", { points: reward.points, fame: reward.fame }),
       );
     },
@@ -178,7 +187,8 @@ export const useChallengeMutations = () => {
       nomination: ChallengeNomination;
       userId: string;
       userName: string;
-    }) => toggleNominationVote(params.nomination, params.userId, params.userName),
+    }) =>
+      toggleNominationVote(params.nomination, params.userId, params.userName),
     onSuccess: () => refreshBallot(),
     onError: (error) => {
       console.error(error);
