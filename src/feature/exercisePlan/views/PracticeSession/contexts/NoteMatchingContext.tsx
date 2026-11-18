@@ -476,6 +476,8 @@ export function NoteMatchingProvider({
     // still up counts (and clears) as its own round rather than starting solved.
     customGoalPrompt ? `${customGoalPrompt.title}|${customGoalPrompt.subtitle ?? ""}` : undefined,
     huntRunKey,
+    // Nothing counts until Start is pressed, and nothing while paused.
+    isPlaying,
   );
 
   // Chord-mode: derive the chord's member pitch classes from its name.
@@ -488,6 +490,7 @@ export function NoteMatchingProvider({
     isMicEnabled && isChordHunt,
     huntTuningShift,
     huntRunKey,
+    isPlaying,
   );
 
   // Click-mode: no mic, no play/pause gating — clicks always register.

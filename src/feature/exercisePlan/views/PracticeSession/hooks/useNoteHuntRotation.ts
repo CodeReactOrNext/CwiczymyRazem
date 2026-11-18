@@ -49,6 +49,11 @@ const SOLVED_POLL_MS = 250;
 const SOLVED_HOLD_MS = 1500;
 const SOLVED_SETTLE_MS = 600;
 
+// A countdown hunt the mic has heard in full moves on almost at once: polled
+// often, held just long enough for the last found mark to be seen.
+const HEARD_POLL_MS = 100;
+const HEARD_HOLD_MS = 350;
+
 // How often the bar-locked pacing checks the clock. Fine enough that a change
 // lands within a fraction of a beat of the bar line at any playable tempo.
 const BAR_POLL_MS = 60;
@@ -62,7 +67,9 @@ const BAR_POLL_MS = 60;
  * re-renders consumers when it changes.
  *
  * Only ticks while the session is playing (pausing freezes the timer). When
- * `solvedRef.current` is true the remaining countdown is clamped to ~3s.
+ * `solvedRef.current` goes true on a hunt answered on the guitar, the next
+ * target comes up within half a second; the ~3s clamp on the countdown is the
+ * fallback for the click-answered ones.
  *
  * `noteHuntConfig.advanceOn: "solved"` swaps the countdown for the opposite
  * pacing: the target holds until it is answered and only then moves on, with no
@@ -186,6 +193,24 @@ export function useNoteHuntRotation(
     }, SOLVED_POLL_MS);
     return () => { clearInterval(id); if (hold) clearTimeout(hold); };
   }, [enabled, waitsForAnswer, isPlaying, solvedRef]);
+
+  // Countdown hunts answered on the guitar: once the mic has heard the whole
+  // goal there is nothing left to wait for, so the next target comes up at once
+  // instead of sitting out what is left of the clock. Click-answered hunts are
+  // left alone — their panel already moves on by itself.
+  const advancesWhenHeard = countsDown && !isClickAnsweredMode(exercise.noteHuntConfig?.mode);
+  useEffect(() => {
+    if (!advancesWhenHeard || !isPlaying) return;
+    let hold: ReturnType<typeof setTimeout> | undefined;
+    const id = setInterval(() => {
+      if (hold || !solvedRef?.current) return;
+      hold = setTimeout(() => {
+        advanceRef.current();
+        setTimeout(() => { hold = undefined; }, SOLVED_SETTLE_MS);
+      }, HEARD_HOLD_MS);
+    }, HEARD_POLL_MS);
+    return () => { clearInterval(id); if (hold) clearTimeout(hold); };
+  }, [advancesWhenHeard, isPlaying, solvedRef]);
 
   return {
     target: enabled ? target : null,

@@ -8,9 +8,14 @@ import { isClickAnsweredMode } from "feature/exercisePlan/utils/huntModes";
  * accident. Every one produces a score both players can be compared on:
  *
  * - technique: tab drills graded by the mic, note by note against the part —
- *   the spider family, every finger permutation, and the Riff Vault riffs;
- * - theory: the mic note hunts, plus the whole-neck click hunt;
+ *   the spider family, every finger permutation, legato, picking, string
+ *   skipping and scale runs, and the Riff Vault riffs;
+ * - theory: the whole-neck click hunts and the whole-neck interval clicks;
  * - hearing: the listening quizzes, scored per answer (see earQuizRunStore).
+ *
+ * The mic note hunts (All Notes, Intervals, In a Region) left the pool on
+ * 2026-11-18, on the owner's call. Duels already drawn with one stay playable:
+ * see `getDuelExercise`.
  *
  * Ids only: they are keys in Firestore and never change (renames touch the
  * title), so a duel stored months ago still resolves its exercise.
@@ -25,6 +30,16 @@ export const DUEL_EXERCISE_IDS = [
   "economy_picking_angular",
   "string_skipping_basic",
   "high_register_bends",
+  // Technique — legato, picking, string skipping and scale runs (added 2026-11-18)
+  "legato_hammer_pull_run",
+  "legato_continuous_flow",
+  "metal_tremolo_picking",
+  "alternate_picking_cross_string",
+  "chromatic_accents",
+  "string_skipping_melodic",
+  "string_skipping_arpeggios",
+  "major_scale_groups_of_four",
+  "major_scale_three_notes_per_string",
   // Technique — every finger permutation
   "spider_permutation_1234",
   "spider_permutation_1243",
@@ -57,9 +72,8 @@ export const DUEL_EXERCISE_IDS = [
   "thunderstruck_riff_preview",
   // Theory — find it on the neck
   "fret_click_whole_chromatic",
-  "chromatic_note_hunt",
-  "interval_hunt",
-  "fretboard_region_hunt",
+  "fret_click_whole_natural",
+  "interval_click_whole_fretboard",
   // Hearing — listening quizzes
   "ear_chord_quality_advanced",
   "ear_progression_basics",

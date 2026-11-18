@@ -107,8 +107,12 @@ export function useChordHunt(
   /** Identity of the run. A new value (restart, next exercise) starts the score
    *  over from zero instead of banking onto the last run. */
   runKey: string | number = 0,
+  /** Whether hits count. False before Start and while paused — see useNoteHunt. */
+  counting = true,
 ): ChordHuntControls {
   const runKeyRef = useRef(runKey);
+  const countingRef = useRef(counting);
+  useEffect(() => { countingRef.current = counting; });
   const shiftedTones = tuningShift === 0 ? tones : tones.map(pc => (pc + tuningShift + 12 * 10) % 12);
   const [state, setState] = useState<ChordHuntState>(() =>
     buildState(shiftedTones, labels, new Set(), null, null, 0, false, 0),
@@ -177,7 +181,7 @@ export function useChordHunt(
               stableRef.current = entry;
             }
             const confirmed = entry.count >= CONFIRM_SAMPLES;
-            const isMatch = matchesTone && confirmed;
+            const isMatch = matchesTone && confirmed && countingRef.current;
 
             if (isMatch) {
               if (!wasMatchingRef.current) hitIdRef.current++;
@@ -215,6 +219,7 @@ export function useChordHunt(
 
   // Self-check for players without a mic: tap to toggle a chord tone as found.
   const markTone = useCallback((pitchClass: number) => {
+    if (!countingRef.current) return;
     const found = foundRef.current;
     if (found.has(pitchClass)) {
       found.delete(pitchClass);

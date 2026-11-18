@@ -191,8 +191,14 @@ export function useNoteHunt(
   /** Identity of the run. A new value (restart, next exercise) starts the score
    *  and rounds over from zero instead of banking onto the last run. */
   runKey: string | number = 0,
+  /** Whether hits count. False before Start (and while paused): the mic still
+   *  shows what it hears, so the player can check it works, but nothing is
+   *  found or scored — a hunt can't be answered ahead of its own clock. */
+  counting = true,
 ): NoteHuntControls {
   const runKeyRef = useRef(runKey);
+  const countingRef = useRef(counting);
+  useEffect(() => { countingRef.current = counting; });
   const shiftedTargetNote = shiftNote(targetNote, tuningShift);
   const [state, setState] = useState<NoteHuntState>(() =>
     buildState(
@@ -286,7 +292,7 @@ export function useNoteHunt(
               stableRef.current = entry;
             }
             const confirmed = entry.count >= CONFIRM_SAMPLES;
-            const isMatch = matchesTarget && confirmed;
+            const isMatch = matchesTarget && confirmed && countingRef.current;
 
             if (isMatch) {
               if (!wasMatchingRef.current) hitIdRef.current++; // new attack → flash
@@ -327,6 +333,7 @@ export function useNoteHunt(
   // Self-check for players without a mic: tap to toggle an octave as found. Feeds
   // the same found-set/scoring path as live detection.
   const markOctave = useCallback((octave: number) => {
+    if (!countingRef.current) return;
     const found = foundRef.current;
     if (found.has(octave)) {
       found.delete(octave);

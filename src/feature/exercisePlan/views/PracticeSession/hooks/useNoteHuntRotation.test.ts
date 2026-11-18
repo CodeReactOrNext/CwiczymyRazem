@@ -52,6 +52,43 @@ describe("useNoteHuntRotation — timer pacing", () => {
     act(() => void vi.advanceTimersByTime(3000));
     expect(result.current.rotation.target!.goal).not.toBe(first);
   });
+
+  it("moves on at once when the mic has heard the whole goal", () => {
+    const { result } = renderRotation(makeExercise({ rotateSeconds: 20 }));
+    const first = result.current.rotation.target!.goal;
+
+    act(() => {
+      result.current.solvedRef.current = true;
+      vi.advanceTimersByTime(500);
+    });
+    expect(result.current.rotation.target!.goal).not.toBe(first);
+    // A fresh target gets the full clock again.
+    expect(result.current.rotation.secondsLeft).toBe(20);
+  });
+
+  it("does not skip the fresh target while solvedRef is still stale", () => {
+    const { result } = renderRotation(makeExercise({ rotateSeconds: 20 }));
+
+    act(() => {
+      result.current.solvedRef.current = true;
+      vi.advanceTimersByTime(500);
+    });
+    const second = result.current.rotation.target!.goal;
+
+    act(() => void vi.advanceTimersByTime(400));
+    expect(result.current.rotation.target!.goal).toBe(second);
+  });
+
+  it("leaves click-answered hunts to their own panel", () => {
+    const { result } = renderRotation(makeExercise({ rotateSeconds: 20, mode: "click" }));
+    const first = result.current.rotation.target!.goal;
+
+    act(() => {
+      result.current.solvedRef.current = true;
+      vi.advanceTimersByTime(900);
+    });
+    expect(result.current.rotation.target!.goal).toBe(first);
+  });
 });
 
 describe("useNoteHuntRotation — wait-for-answer pacing", () => {

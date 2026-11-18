@@ -21,9 +21,9 @@ describe("DUEL_POOL", () => {
     expect(new Set(DUEL_EXERCISE_IDS).size).toBe(DUEL_EXERCISE_IDS.length);
   });
 
-  it("is about a fifth of the catalogue", () => {
+  it("is a sizeable slice of the catalogue, not most of it", () => {
     const share = DUEL_POOL.length / exercisesAgregat.length;
-    expect(share).toBeGreaterThan(0.15);
+    expect(share).toBeGreaterThan(0.12);
     expect(share).toBeLessThan(0.25);
   });
 
@@ -75,6 +75,13 @@ describe("duelScoreKind", () => {
 });
 
 describe("getDuelExercise", () => {
+  it("keeps the mic note hunts out of the draw but playable in old duels", () => {
+    for (const id of ["chromatic_note_hunt", "interval_hunt", "fretboard_region_hunt"]) {
+      expect(isDuelExercise(id), id).toBe(false);
+      expect(getDuelExercise(id), id).not.toBeNull();
+    }
+  });
+
   it("still resolves an exercise that has left the pool", () => {
     expect(isDuelExercise("chord_degree_hunt_changes")).toBe(false);
     expect(getDuelExercise("chord_degree_hunt_changes")?.title).toBe("Chords — Degree Hunt (Changes)");
