@@ -55,7 +55,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -64,7 +64,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -91,7 +91,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -100,7 +100,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -127,7 +127,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -136,7 +136,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -163,7 +163,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -172,7 +172,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 4
+              "fret": 2
             }
           ]
         }
@@ -207,7 +207,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -216,7 +216,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -243,7 +243,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -252,7 +252,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -279,7 +279,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -288,7 +288,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -315,7 +315,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -324,7 +324,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 4
+              "fret": 2
             }
           ]
         }
@@ -359,7 +359,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -368,7 +368,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -395,7 +395,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -404,7 +404,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -431,24 +431,6 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 2
-            }
-          ]
-        },
-        {
-          "duration": 0.25,
-          "notes": [
-            {
-              "string": 6,
-              "fret": 4
-            }
-          ]
-        },
-        {
-          "duration": 0.25,
-          "notes": [
-            {
-              "string": 6,
               "fret": 4
             }
           ]
@@ -467,7 +449,16 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 3
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 6,
+              "fret": 2
             }
           ]
         },
@@ -477,6 +468,15 @@ export const spiderPermutation3142Exercise: Exercise = {
             {
               "string": 6,
               "fret": 5
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 6,
+              "fret": 3
             }
           ]
         }
@@ -511,7 +511,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -520,7 +520,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -547,7 +547,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -556,7 +556,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -583,7 +583,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -592,7 +592,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -619,7 +619,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -628,7 +628,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 5
+              "fret": 3
             }
           ]
         }
@@ -663,7 +663,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -672,7 +672,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -699,7 +699,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -708,7 +708,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -735,7 +735,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -744,7 +744,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -771,7 +771,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -780,7 +780,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 5
+              "fret": 3
             }
           ]
         }
@@ -815,7 +815,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -824,7 +824,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -851,24 +851,6 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 3
-            }
-          ]
-        },
-        {
-          "duration": 0.25,
-          "notes": [
-            {
-              "string": 6,
-              "fret": 5
-            }
-          ]
-        },
-        {
-          "duration": 0.25,
-          "notes": [
-            {
-              "string": 6,
               "fret": 5
             }
           ]
@@ -887,7 +869,16 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 4
+              "fret": 5
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 6,
+              "fret": 3
             }
           ]
         },
@@ -904,6 +895,15 @@ export const spiderPermutation3142Exercise: Exercise = {
           "duration": 0.25,
           "notes": [
             {
+              "string": 6,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
               "string": 5,
               "fret": 5
             }
@@ -923,7 +923,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -932,7 +932,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 6
+              "fret": 4
             }
           ]
         }
@@ -967,7 +967,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -976,7 +976,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -1003,7 +1003,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -1012,7 +1012,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -1039,7 +1039,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -1048,7 +1048,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -1075,7 +1075,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -1084,7 +1084,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 6
+              "fret": 4
             }
           ]
         }
@@ -1119,7 +1119,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -1128,7 +1128,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -1155,7 +1155,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -1164,7 +1164,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -1191,7 +1191,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -1200,7 +1200,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -1227,7 +1227,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -1236,7 +1236,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 6
+              "fret": 4
             }
           ]
         }
@@ -1271,24 +1271,6 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 4
-            }
-          ]
-        },
-        {
-          "duration": 0.25,
-          "notes": [
-            {
-              "string": 6,
-              "fret": 6
-            }
-          ]
-        },
-        {
-          "duration": 0.25,
-          "notes": [
-            {
-              "string": 6,
               "fret": 6
             }
           ]
@@ -1307,7 +1289,16 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 5
+              "fret": 6
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 6,
+              "fret": 4
             }
           ]
         },
@@ -1324,6 +1315,15 @@ export const spiderPermutation3142Exercise: Exercise = {
           "duration": 0.25,
           "notes": [
             {
+              "string": 6,
+              "fret": 5
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
               "string": 5,
               "fret": 6
             }
@@ -1343,7 +1343,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -1352,7 +1352,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -1379,7 +1379,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -1388,7 +1388,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 7
+              "fret": 5
             }
           ]
         }
@@ -1423,7 +1423,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -1432,7 +1432,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -1459,7 +1459,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -1468,7 +1468,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -1495,7 +1495,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -1504,7 +1504,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -1531,7 +1531,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -1540,7 +1540,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 7
+              "fret": 5
             }
           ]
         }
@@ -1575,7 +1575,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -1584,7 +1584,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -1611,7 +1611,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -1620,7 +1620,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -1647,7 +1647,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -1656,7 +1656,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -1683,7 +1683,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -1692,7 +1692,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 7
+              "fret": 5
             }
           ]
         }
@@ -1719,15 +1719,6 @@ export const spiderPermutation3142Exercise: Exercise = {
             {
               "string": 6,
               "fret": 5
-            }
-          ]
-        },
-        {
-          "duration": 0.25,
-          "notes": [
-            {
-              "string": 6,
-              "fret": 6
             }
           ]
         },
@@ -1744,6 +1735,15 @@ export const spiderPermutation3142Exercise: Exercise = {
           "duration": 0.25,
           "notes": [
             {
+              "string": 6,
+              "fret": 6
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
               "string": 5,
               "fret": 7
             }
@@ -1763,7 +1763,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 6
+              "fret": 8
             }
           ]
         },
@@ -1772,7 +1772,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 8
+              "fret": 6
             }
           ]
         },
@@ -1799,7 +1799,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 6
+              "fret": 8
             }
           ]
         },
@@ -1808,7 +1808,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 8
+              "fret": 6
             }
           ]
         },
@@ -1835,7 +1835,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 6
+              "fret": 8
             }
           ]
         },
@@ -1844,7 +1844,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 8
+              "fret": 6
             }
           ]
         }
@@ -1879,7 +1879,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 6
+              "fret": 8
             }
           ]
         },
@@ -1888,7 +1888,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 8
+              "fret": 6
             }
           ]
         },
@@ -1915,7 +1915,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 6
+              "fret": 8
             }
           ]
         },
@@ -1924,7 +1924,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 8
+              "fret": 6
             }
           ]
         },
@@ -1951,7 +1951,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 6
+              "fret": 8
             }
           ]
         },
@@ -1960,7 +1960,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 8
+              "fret": 6
             }
           ]
         },
@@ -1987,7 +1987,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 6
+              "fret": 8
             }
           ]
         },
@@ -1996,7 +1996,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 8
+              "fret": 6
             }
           ]
         }
@@ -2031,7 +2031,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 6
+              "fret": 8
             }
           ]
         },
@@ -2040,7 +2040,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 8
+              "fret": 6
             }
           ]
         },
@@ -2067,7 +2067,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 6
+              "fret": 8
             }
           ]
         },
@@ -2076,7 +2076,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 8
+              "fret": 6
             }
           ]
         },
@@ -2095,15 +2095,6 @@ export const spiderPermutation3142Exercise: Exercise = {
             {
               "string": 6,
               "fret": 5
-            }
-          ]
-        },
-        {
-          "duration": 0.25,
-          "notes": [
-            {
-              "string": 6,
-              "fret": 6
             }
           ]
         },
@@ -2130,6 +2121,15 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
+              "fret": 6
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 6,
               "fret": 4
             }
           ]
@@ -2139,7 +2139,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -2148,7 +2148,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 7
+              "fret": 5
             }
           ]
         }
@@ -2183,7 +2183,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -2192,7 +2192,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -2219,7 +2219,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -2228,7 +2228,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -2255,7 +2255,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -2264,7 +2264,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -2291,7 +2291,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -2300,7 +2300,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 7
+              "fret": 5
             }
           ]
         }
@@ -2335,7 +2335,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -2344,7 +2344,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -2371,7 +2371,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -2380,7 +2380,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -2407,7 +2407,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -2416,7 +2416,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -2443,7 +2443,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -2452,7 +2452,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 7
+              "fret": 5
             }
           ]
         }
@@ -2487,7 +2487,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 5
+              "fret": 7
             }
           ]
         },
@@ -2496,7 +2496,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 7
+              "fret": 5
             }
           ]
         },
@@ -2515,15 +2515,6 @@ export const spiderPermutation3142Exercise: Exercise = {
             {
               "string": 6,
               "fret": 4
-            }
-          ]
-        },
-        {
-          "duration": 0.25,
-          "notes": [
-            {
-              "string": 6,
-              "fret": 5
             }
           ]
         },
@@ -2550,6 +2541,15 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
+              "fret": 5
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 6,
               "fret": 3
             }
           ]
@@ -2559,7 +2559,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -2568,7 +2568,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -2595,7 +2595,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -2604,7 +2604,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 6
+              "fret": 4
             }
           ]
         }
@@ -2639,7 +2639,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -2648,7 +2648,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -2675,7 +2675,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -2684,7 +2684,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -2711,7 +2711,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -2720,7 +2720,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -2747,7 +2747,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -2756,7 +2756,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 6
+              "fret": 4
             }
           ]
         }
@@ -2791,7 +2791,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -2800,7 +2800,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -2827,7 +2827,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -2836,7 +2836,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -2863,7 +2863,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -2872,7 +2872,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 6
+              "fret": 4
             }
           ]
         },
@@ -2899,7 +2899,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 4
+              "fret": 6
             }
           ]
         },
@@ -2908,7 +2908,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 6
+              "fret": 4
             }
           ]
         }
@@ -2943,15 +2943,6 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 4
-            }
-          ]
-        },
-        {
-          "duration": 0.25,
-          "notes": [
-            {
-              "string": 6,
               "fret": 6
             }
           ]
@@ -2970,6 +2961,15 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 6,
               "fret": 2
             }
           ]
@@ -2979,7 +2979,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -2988,7 +2988,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -3015,7 +3015,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -3024,7 +3024,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -3051,7 +3051,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -3060,7 +3060,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 5
+              "fret": 3
             }
           ]
         }
@@ -3095,7 +3095,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -3104,7 +3104,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -3131,7 +3131,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -3140,7 +3140,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -3167,7 +3167,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -3176,7 +3176,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -3203,7 +3203,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -3212,7 +3212,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 5
+              "fret": 3
             }
           ]
         }
@@ -3247,7 +3247,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -3256,7 +3256,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -3283,7 +3283,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -3292,7 +3292,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -3319,7 +3319,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -3328,7 +3328,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 5
+              "fret": 3
             }
           ]
         },
@@ -3355,7 +3355,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 3
+              "fret": 5
             }
           ]
         },
@@ -3364,7 +3364,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 5
+              "fret": 3
             }
           ]
         }
@@ -3399,7 +3399,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -3408,7 +3408,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -3435,7 +3435,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -3444,7 +3444,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -3471,7 +3471,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -3480,7 +3480,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -3507,7 +3507,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -3516,7 +3516,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 4
+              "fret": 2
             }
           ]
         }
@@ -3551,7 +3551,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -3560,7 +3560,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -3587,7 +3587,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -3596,7 +3596,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -3623,7 +3623,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -3632,7 +3632,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 2,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -3659,7 +3659,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -3668,14 +3668,17 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 4
+              "fret": 2
             }
           ]
         }
       ]
     },
     {
-      "timeSignature": [3, 4],
+      "timeSignature": [
+        3,
+        4
+      ],
       "beats": [
         {
           "duration": 0.25,
@@ -3700,7 +3703,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -3709,7 +3712,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 4,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -3736,7 +3739,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -3745,7 +3748,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 5,
-              "fret": 4
+              "fret": 2
             }
           ]
         },
@@ -3772,7 +3775,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 2
+              "fret": 4
             }
           ]
         },
@@ -3781,7 +3784,7 @@ export const spiderPermutation3142Exercise: Exercise = {
           "notes": [
             {
               "string": 6,
-              "fret": 4
+              "fret": 2
             }
           ]
         }

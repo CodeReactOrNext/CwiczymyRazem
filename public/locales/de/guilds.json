@@ -472,7 +472,8 @@
     "members_need_one": "1 weiteres Mitglied braucht {{ask}}",
     "to_go": "noch {{amount}}",
     "you": "du: {{amount}}",
-    "cleared_on": "Geschafft am {{date}}"
+    "cleared_on": "Geschafft am {{date}}",
+    "former_members": "ehemalige Mitglieder"
   },
   "spend": {
     "token_amount": "{{amount}} Tokens",

@@ -116,6 +116,21 @@
       "body": "It keeps Riff Quest free and funds the roadmap. Tap to see where it goes."
     }
   },
+  "highlights": {
+    "improv_label": "Improv round",
+    "improv_title": "{{name}} posted a take",
+    "challenge_label": "Monthly challenge",
+    "challenge_title_one": "1 recording on the board",
+    "challenge_title_other": "{{count}} recordings on the board",
+    "days_left_one": "1 day left",
+    "days_left_other": "{{count}} days left",
+    "duel_won": "{{winner}} beat {{loser}}",
+    "duel_draw": "{{winner}} and {{loser}} drew",
+    "record_label": "New record",
+    "record_title": "{{name}} took #1 on {{exercise}}",
+    "boss_label": "Boss fight",
+    "boss_title": "{{name}} cleared phase {{phase}} of {{boss}}"
+  },
   "community": {
     "label": "Activity and chat",
     "new_in_feed": "{{count}} new in the feed",

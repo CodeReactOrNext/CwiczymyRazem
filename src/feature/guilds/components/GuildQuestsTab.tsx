@@ -10,7 +10,10 @@ import {
 } from "feature/guilds/data/guildQuests";
 import { useGuildMutations } from "feature/guilds/hooks/useGuilds";
 import { useGuildText } from "feature/guilds/hooks/useGuildText";
-import type { GuildQuestBoard } from "feature/guilds/types/guild.types";
+import type {
+  GuildMember,
+  GuildQuestBoard,
+} from "feature/guilds/types/guild.types";
 import { Interpolate } from "lib/i18n/Interpolate";
 import { Check, Lock } from "lucide-react";
 
@@ -309,7 +312,14 @@ const Chapters = ({ board }: { board: GuildQuestBoard }) => {
   );
 };
 
-export const GuildQuestsTab = ({ board }: { board: GuildQuestBoard }) => {
+export const GuildQuestsTab = ({
+  board,
+  members,
+}: {
+  board: GuildQuestBoard;
+  /** The roster, to put names to each quest's shares. */
+  members: GuildMember[];
+}) => {
   const { t, chapterName, chapterBlurb } = useGuildText();
   const { claimQuests } = useGuildMutations();
   const busy = claimQuests.isPending;
@@ -368,7 +378,7 @@ export const GuildQuestsTab = ({ board }: { board: GuildQuestBoard }) => {
         {open.length > 0 && (
           <div className='space-y-3'>
             {open.map((quest) => (
-              <GuildQuestCard key={quest.id} quest={quest} />
+              <GuildQuestCard key={quest.id} quest={quest} members={members} />
             ))}
           </div>
         )}
@@ -379,7 +389,7 @@ export const GuildQuestsTab = ({ board }: { board: GuildQuestBoard }) => {
               {t("quests.cleared_in_chapter")}
             </p>
             {cleared.map((quest) => (
-              <GuildQuestCard key={quest.id} quest={quest} />
+              <GuildQuestCard key={quest.id} quest={quest} members={members} />
             ))}
           </div>
         )}

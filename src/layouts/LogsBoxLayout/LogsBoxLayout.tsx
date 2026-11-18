@@ -207,6 +207,7 @@ const LogsBoxLayout = ({
                   hasOlderLogs={hasOlderLogs}
                   hasMoreLogs={hasMoreLogs}
                   onLoadMoreLogs={onLoadMoreLogs}
+                  showHighlights={!contained}
                 />
               </div>
             )}

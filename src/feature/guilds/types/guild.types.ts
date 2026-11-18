@@ -170,6 +170,12 @@ export interface GuildQuestProgress {
   mine: number | null;
   /** The per-member ask, in words, and the caller's own number against it. */
   each: { ask: string; mine: number; target: number; done: boolean } | null;
+  /**
+   * Every current member's own number per uid, in `unit` — their part of a guild
+   * total, or where they stand against `each.target`. Members who have left are
+   * not in it, so on a total it can add up to less than `progress`.
+   */
+  shares: Record<string, number>;
   /** When the guild cleared it, or null while it is still open. */
   doneAt: string | null;
 }

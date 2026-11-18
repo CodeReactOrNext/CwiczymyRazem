@@ -472,7 +472,8 @@
     "members_need_one": "1 more member needs {{ask}}",
     "to_go": "{{amount}} to go",
     "you": "you: {{amount}}",
-    "cleared_on": "Cleared {{date}}"
+    "cleared_on": "Cleared {{date}}",
+    "former_members": "former members"
   },
   "spend": {
     "token_amount": "{{amount}} tokens",

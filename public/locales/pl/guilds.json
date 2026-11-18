@@ -494,7 +494,8 @@
     "members_need_many": "Jeszcze {{count}} członków potrzebuje: {{ask}}",
     "to_go": "Zostało: {{amount}}",
     "you": "Ty: {{amount}}",
-    "cleared_on": "Zaliczone {{date}}"
+    "cleared_on": "Zaliczone {{date}}",
+    "former_members": "byli członkowie"
   },
   "spend": {
     "token_amount": "{{amount}} tokena",

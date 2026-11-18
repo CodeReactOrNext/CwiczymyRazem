@@ -116,6 +116,21 @@
       "body": "Dzięki temu Riff Quest zostaje darmowy, a roadmapa jest finansowana. Stuknij, żeby zobaczyć, na co idą pieniądze."
     }
   },
+  "highlights": {
+    "improv_label": "Runda improwizacji",
+    "improv_title": "{{name}} wrzuca nagranie",
+    "challenge_label": "Wyzwanie miesiąca",
+    "challenge_title_one": "1 nagranie na tablicy",
+    "challenge_title_other": "Nagrania na tablicy: {{count}}",
+    "days_left_one": "został 1 dzień",
+    "days_left_other": "zostało dni: {{count}}",
+    "duel_won": "{{winner}} wygrywa z {{loser}}",
+    "duel_draw": "{{winner}} i {{loser}} remisują",
+    "record_label": "Nowy rekord",
+    "record_title": "{{name}} bierze 1. miejsce w {{exercise}}",
+    "boss_label": "Walka z bossem",
+    "boss_title": "{{name}} przechodzi fazę {{phase}}: {{boss}}"
+  },
   "community": {
     "label": "Aktywność i czat",
     "new_in_feed": "nowe w aktywności: {{count}}",

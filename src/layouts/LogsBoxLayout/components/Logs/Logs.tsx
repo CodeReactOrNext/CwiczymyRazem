@@ -123,6 +123,7 @@ import {
   EXERCISES_BY_ID,
   findExerciseByTitle,
 } from "feature/logs/utils/practiceCatalog";
+import { CommunityHighlights } from "feature/logsBox/components/CommunityHighlights";
 import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
@@ -531,6 +532,8 @@ interface LogsBoxLayoutProps {
   hasOlderLogs?: boolean;
   hasMoreLogs?: boolean;
   onLoadMoreLogs?: () => void;
+  /** The "what's going on" cells beside Live Now — the dashboard's wide panel only. */
+  showHighlights?: boolean;
 }
 
 const TimeStamp = ({ date }: { date: Date }) => (
@@ -2178,9 +2181,11 @@ const Logs = ({
   hasOlderLogs,
   hasMoreLogs,
   onLoadMoreLogs,
+  showHighlights = false,
 }: LogsBoxLayoutProps) => {
   const { t } = useTranslation("feed");
   const { isNewMessage } = useUnreadMessages();
+  const isMobile = useResponsiveStore((state) => state.isMobile);
   const [activeRecordingId, setActiveRecordingId] = useState<string | null>(
     null,
   );
@@ -2278,8 +2283,15 @@ const Logs = ({
 
   return (
     <>
-      <div className='mb-2 mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 px-3 empty:hidden'>
+      <div className='mb-2 mt-4 flex flex-wrap items-center gap-x-8 gap-y-2 px-3 empty:hidden lg:flex-nowrap lg:items-stretch'>
         <OnlineUsers onOpenActivity={setPreview} />
+        {showHighlights && !isMobile && (
+          <CommunityHighlights
+            logs={logs}
+            currentUserId={currentUserId}
+            className='hidden lg:grid'
+          />
+        )}
       </div>
       <div ref={spanRef} className='h-1' />
       {groups.map((group, groupIndex) => {

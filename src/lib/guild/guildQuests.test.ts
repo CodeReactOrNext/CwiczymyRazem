@@ -265,6 +265,8 @@ describe("readQuestBoard", () => {
       target: 100,
       isComplete: true,
       mine: 60,
+      // Who put in what — the names behind the total.
+      shares: { ann: 60, bob: 50, cid: 5 },
     });
     expect(byId["hours-50"]).toMatchObject({ progress: 87.5, mine: 60 });
     expect(byId["technique-10"]).toMatchObject({ progress: 60, mine: 60 });

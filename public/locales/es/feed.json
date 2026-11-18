@@ -116,6 +116,21 @@
       "body": "Mantiene Riff Quest gratis y financia la roadmap. Toca para ver a dónde va."
     }
   },
+  "highlights": {
+    "improv_label": "Ronda de improvisación",
+    "improv_title": "{{name}} ha subido una toma",
+    "challenge_label": "Reto del mes",
+    "challenge_title_one": "1 grabación en el tablero",
+    "challenge_title_other": "{{count}} grabaciones en el tablero",
+    "days_left_one": "queda 1 día",
+    "days_left_other": "quedan {{count}} días",
+    "duel_won": "{{winner}} gana a {{loser}}",
+    "duel_draw": "{{winner}} y {{loser}} empatan",
+    "record_label": "Nuevo récord",
+    "record_title": "{{name}} se lleva el n.º 1 en {{exercise}}",
+    "boss_label": "Combate contra jefe",
+    "boss_title": "{{name}} supera la fase {{phase}}: {{boss}}"
+  },
   "community": {
     "label": "Actividad y chat",
     "new_in_feed": "{{count}} nuevas en el feed",

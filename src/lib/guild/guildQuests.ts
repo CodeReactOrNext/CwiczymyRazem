@@ -298,11 +298,29 @@ async function measureQuest(
   let progress = 0;
   let mine: number | null = null;
   let each: GuildQuestProgress["each"] = null;
+  let shares: Record<string, number> = {};
+
+  /**
+   * Every current member's own number, in the quest's unit. Only the roster:
+   * a total may still hold what somebody who has since left put in, and that
+   * part is the guild's, not a name's.
+   */
+  const sharesOf = (
+    values: Record<string, number>,
+    measureOf: (value: number) => number = (value) => value,
+  ): Record<string, number> =>
+    Object.fromEntries(
+      members.map((member) => [
+        member.uid,
+        measureOf(values[member.uid] ?? 0),
+      ]),
+    );
 
   /** A guild total out of per-member numbers, with the caller's own share. */
   const total = (values: Record<string, number>) => {
     progress = sum(values);
     mine = values[uid] ?? 0;
+    shares = sharesOf(values);
   };
 
   /**
@@ -321,6 +339,7 @@ async function measureQuest(
     const own = measureOf(values[uid] ?? 0);
     progress = cleared;
     each = { ask, mine: own, target: bar, done: own >= bar };
+    shares = sharesOf(values, measureOf);
   };
 
   switch (measure.kind) {
@@ -338,6 +357,7 @@ async function measureQuest(
         // away before it has been added to anybody else's.
         progress = inUnit(field, sum(raw));
         mine = inUnit(field, raw[uid] ?? 0);
+        shares = sharesOf(raw, (value) => inUnit(field, value));
       } else {
         everyone(raw, measure.each, (value) => inUnit(field, value));
       }
@@ -402,6 +422,7 @@ async function measureQuest(
     reward: quest.reward,
     mine,
     each,
+    shares,
   };
 }
 

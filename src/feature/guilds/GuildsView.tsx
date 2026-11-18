@@ -280,7 +280,7 @@ export const GuildsView = () => {
 
         <TabsContent value='quests' className='mt-0'>
           {myGuild && data?.quests ? (
-            <GuildQuestsTab board={data.quests} />
+            <GuildQuestsTab board={data.quests} members={myGuild.members} />
           ) : (
             <NeedsAGuild
               what={t("needs_guild.quests")}
