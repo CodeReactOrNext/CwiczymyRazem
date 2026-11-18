@@ -19,7 +19,7 @@ import Avatar from "components/UI/Avatar";
 import { DISCORD_INVITE_URL } from "constants/community";
 import { DESKTOP_APP_RELEASES_URL } from "constants/desktopApp";
 import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaimedMilestone";
-import { isFeatureUnlocked } from "feature/levelGate/data/featureUnlocks";
+import { getLockedAtLvl } from "feature/levelGate/data/featureUnlocks";
 import { CommunityIconButton } from "feature/logsBox/components/CommunityIconButton";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 import { userProfileQuery } from "feature/profile/hooks/userProfileQuery";
@@ -51,6 +51,7 @@ import {
   Heart,
   Home,
   Library,
+  Lock,
   LogOut,
   Mic2,
   Music2,
@@ -169,6 +170,8 @@ interface SidebarSubLink {
   href: string;
   icon: React.ReactNode;
   tooltip?: string;
+  /** Values for the tooltip's translation, e.g. the level a locked page opens at. */
+  tooltipValues?: Record<string, number>;
 }
 
 // Community is the one section without a tab bar of its own, so it is the only
@@ -314,7 +317,10 @@ const SidebarExpandableNavLink = ({
                   icon={subLink.icon}
                   isActive={isSubLinkActive(subLink.href)}
                   onClick={onLinkClick}
-                  tooltip={subLink.tooltip && t(subLink.tooltip)}
+                  tooltip={
+                    subLink.tooltip &&
+                    t(subLink.tooltip, subLink.tooltipValues)
+                  }
                 />
               ))}
             </div>
@@ -363,10 +369,13 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
     if (userAuth) void queryClient.prefetchQuery(userProfileQuery(userAuth));
   };
 
-  // A page that is still level-locked stays out of the nav instead of showing
-  // up with a padlock — a new account sees what it can open today. False until
-  // the stats land, so the entry never flashes in for a low-level account.
-  const showGuilds = !!userStats && isFeatureUnlocked("guilds", userStats.lvl);
+  // A page that is still level-locked stays in the nav, behind a padlock and
+  // the level it opens at — the nav is where a player learns it exists (owner's
+  // call, 2026-11-18; the Milestones tab works the same way). Only once the
+  // stats land, so the padlock never flashes for an account past the level.
+  const guildsLockedAtLvl = userStats
+    ? getLockedAtLvl("guilds", userStats.lvl)
+    : undefined;
 
   // The panel is a perk, so the entry only exists for people who funded it.
   const { isSupport } = useSupportTeam();
@@ -501,9 +510,18 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       name: t("community"),
       href: "/seasons",
       icon: <Users size={18} />,
-      children: showGuilds
-        ? COMMUNITY_SUB_NAV
-        : COMMUNITY_SUB_NAV.filter((link) => link.href !== "/guilds"),
+      children: guildsLockedAtLvl
+        ? COMMUNITY_SUB_NAV.map((link) =>
+            link.href === "/guilds"
+              ? {
+                  ...link,
+                  icon: <Lock size={16} />,
+                  tooltip: "unlocks_at_level",
+                  tooltipValues: { lvl: guildsLockedAtLvl },
+                }
+              : link,
+          )
+        : COMMUNITY_SUB_NAV,
     },
     {
       id: "arsenal",

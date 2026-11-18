@@ -17,6 +17,7 @@
   "recordings_tooltip": "Comparte tus covers y escucha lo que graban los demás",
   "guilds": "Gremios",
   "guilds_tooltip": "Practica junto a otras personas: chat y un reto semanal",
+  "unlocks_at_level": "Se desbloquea en el nivel {{lvl}}",
   "arsenal": "Arsenal",
   "tone_studio": "Tone Studio",
   "supporter": "Mecenas",
