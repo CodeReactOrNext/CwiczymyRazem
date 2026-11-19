@@ -1,6 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
-import { RiffFace } from "components/Mascot/Riff";
+import { EchoFace } from "components/Mascot/Echo";
 import { addDays, isSameDay, startOfWeek } from "date-fns";
 import { ScoreBreakdownTooltip } from "feature/profile/components/ScoreBreakdownTooltip";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
@@ -48,10 +48,10 @@ export const StreakBox = () => {
       onClick={() => router.push("/practice-log")}
       className='flex h-11 cursor-pointer items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-zinc-800/70'>
       <div className="flex items-center gap-1.5 shrink-0 px-1">
-        {/* Riff's face: the lamp is the streak — lit while it lives, off and
+        {/* Echo's face is the streak: bright while it lives, faded and
             asleep once it breaks. */}
-        <RiffFace
-          lampOn={dayWithoutBreak > 0}
+        <EchoFace
+          active={dayWithoutBreak > 0}
           asleep={dayWithoutBreak === 0}
           className={cn("h-6 w-6 transition-opacity duration-slow", dayWithoutBreak === 0 && "opacity-60")}
         />

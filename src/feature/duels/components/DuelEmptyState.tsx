@@ -1,5 +1,5 @@
 import { Card } from "assets/components/ui/card";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import Avatar from "components/UI/Avatar";
 import { useTranslation } from "hooks/useTranslation";
 
@@ -39,9 +39,9 @@ export const DuelEmptyState = ({
           vs
         </span>
         <div className='flex flex-col items-center gap-2'>
-          {/* Riff keeps the empty seat: looking around while a ticket is out,
+          {/* Echo keeps the empty seat: looking around while a ticket is out,
               asleep while nobody is looking for anyone. */}
-          <Riff mood={isSearching ? "lookAround" : "asleep"} className='h-14' />
+          <Echo mood={isSearching ? "lookAround" : "asleep"} className='h-14' />
           <span className='text-xs font-semibold text-zinc-500'>?</span>
         </div>
       </div>

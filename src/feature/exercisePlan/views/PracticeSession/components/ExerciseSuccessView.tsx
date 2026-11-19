@@ -3,7 +3,7 @@ import { ChartContainer, ChartTooltip } from "assets/components/ui/chart";
 import { cn } from "assets/lib/utils";
 import confetti from "canvas-confetti";
 import { AnimeChip, AnimeMoment } from "components/AnimeMoment/AnimeMoment";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { accuracyToStars, EXAM_STAR_ACCURACY, EXAM_STAR_ON_TIME } from "feature/journey/utils/examStars";
 import { animate, AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
@@ -330,13 +330,13 @@ export const ExerciseSuccessView = ({
           <div className="contents shortwide:flex shortwide:min-w-0 shortwide:flex-1 shortwide:flex-col shortwide:justify-center">
           {/* Header */}
           <div className="relative order-1 px-7 pb-2 pt-9 shortwide:pt-5">
-            {/* Riff hops for a run that went through: a small one for a cleared
+            {/* Echo hops for a run that went through: a small one for a cleared
                 exercise or a passed exam, the short celebration for 3 stars. A
                 failed exam gets no mascot — the screen already says what to fix. */}
             {(!isExam || isPassed) && (
               <div className="mb-3 flex h-20 justify-center shortwide:hidden">
-                {/* Mounted once the moment is over, so his hop is seen. */}
-                {!moment && <Riff mood={isExam && stars === 3 ? "celebrate" : "hop"} short delay={0.15} className="h-20" />}
+                {/* Mounted once the moment is over, so its hop is seen. */}
+                {!moment && <Echo mood={isExam && stars === 3 ? "celebrate" : "hop"} short delay={0.15} className="h-20" />}
               </div>
             )}
             {isExam ? (

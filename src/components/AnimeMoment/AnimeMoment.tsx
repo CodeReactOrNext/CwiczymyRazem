@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { Riff, type RiffMood } from "components/Mascot/Riff";
+import { Echo, type EchoMood } from "components/Mascot/Echo";
 import { motion, useReducedMotion } from "framer-motion";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -12,7 +12,7 @@ import { createPortal } from "react-dom";
  * Beats:
  *   0.00  eyecatch wipe — three slanted bands and a halftone trail sweep across
  *   0.40  flash, then focus lines that flicker "on twos" like hand-drawn cels
- *   0.45  the hero springs in (Riff, or whatever `hero` is)
+ *   0.45  the hero springs in (Echo, or whatever `hero` is)
  *   land  impact frame (the screen inverts for two frames), screen shake,
  *         shockwaves, speed streaks and a burst of picks / notes / stars
  *   +     the title slams in letter by letter with a chromatic split, the
@@ -35,9 +35,9 @@ const DEFAULT_COLORS: AnimeMomentColors = { a: "#22d3ee", b: "#f4b63e" };
 interface AnimeMomentProps {
   title: string;
   subtitle?: ReactNode;
-  /** What springs into the middle. Defaults to Riff in `mood`. */
+  /** What springs into the middle. Defaults to Echo in `mood`. */
   hero?: ReactNode;
-  mood?: RiffMood;
+  mood?: EchoMood;
   /** Chips under the title (see AnimeChip). */
   children?: ReactNode;
   /** When the hero lands, in seconds — the impact beat is timed to it. */
@@ -328,7 +328,7 @@ export const AnimeMoment = ({
   hero,
   mood = "celebrate",
   children,
-  land = 1.8,
+  land = 1.6,
   durationMs,
   brief = false,
   layoutId,
@@ -364,7 +364,7 @@ export const AnimeMoment = ({
   if (typeof document === "undefined") return null;
   const d = (s: number) => (reduceMotion ? 0 : s);
 
-  const heroNode = hero ?? <Riff mood={mood} delay={d(0.55)} className='h-56 md:h-72' />;
+  const heroNode = hero ?? <Echo mood={mood} delay={d(0.55)} className='h-48 md:h-60' />;
 
   return createPortal(
     <motion.div

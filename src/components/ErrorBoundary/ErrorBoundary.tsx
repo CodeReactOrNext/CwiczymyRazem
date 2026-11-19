@@ -1,5 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { captureException } from "lib/sentry/sentryClient";
 import { Home, RefreshCcw } from "lucide-react";
 import Link from "next/link";
@@ -52,8 +52,8 @@ class ErrorBoundary extends Component<Props, State> {
         <div className="min-h-screen w-full bg-zinc-950 flex items-center justify-center p-6 text-zinc-100 font-sans">
           <div className="max-w-md w-full space-y-8 animate-in fade-in duration-base">
             <div className="space-y-4">
-              {/* Riff blew a fuse: the lamp sputters, smoke, eyes off in two directions. */}
-              <Riff mood="error" className="h-28" />
+              {/* Echo short-circuits: spiral eyes, fizzing sparks, a nervous shake. */}
+              <Echo mood="error" className="h-28" />
               <h1 className="text-2xl font-bold tracking-tight">This screen crashed</h1>
               <p className="text-zinc-400">
                 The error was reported to us automatically. Reloading brings the

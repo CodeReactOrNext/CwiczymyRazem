@@ -3,9 +3,9 @@
 import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { Riff, RiffFace, type RiffMood, RiffSays } from "./Riff";
+import { Echo, EchoFace, type EchoMood, EchoSays } from "./Echo";
 
-const MOODS: RiffMood[] = [
+const MOODS: EchoMood[] = [
   "idle",
   "celebrate",
   "hop",
@@ -22,36 +22,38 @@ const MOODS: RiffMood[] = [
   "plugIn",
   "error",
   "listen",
+  "sad",
+  "surprised",
+  "think",
 ];
 
-describe("Riff", () => {
+describe("Echo", () => {
   afterEach(cleanup);
 
   it.each(MOODS)("draws the %s mood", (mood) => {
-    const { container } = render(<Riff mood={mood} />);
+    const { container } = render(<Echo mood={mood} />);
     expect(container.querySelector("svg")).toBeTruthy();
   });
 
   it("switches moods and unmounts mid-reaction without throwing", () => {
-    const { rerender, unmount } = render(<Riff mood='asleep' />);
-    rerender(<Riff mood='celebrate' />);
-    rerender(<Riff mood='idle' talking lively />);
-    // Unmounting while talking used to start an animation on a gone component.
+    const { rerender, unmount } = render(<Echo mood='asleep' />);
+    rerender(<Echo mood='celebrate' />);
+    rerender(<Echo mood='idle' talking lively arrive />);
     expect(() => unmount()).not.toThrow();
   });
 
   it("keeps the whole line of a speech bubble readable from the start", () => {
-    render(<RiffSays text='Someone pulled the cable.' />);
+    render(<EchoSays text='Someone pulled the cable.' />);
     expect(screen.getAllByText("Someone pulled the cable.").length).toBeGreaterThan(0);
   });
 
   it("titles the small face when asked to", () => {
-    render(<RiffFace title='Streak' />);
+    render(<EchoFace title='Streak' active={false} asleep />);
     expect(screen.getByRole("img", { name: "Streak" })).toBeTruthy();
   });
 
   it("does not crash when rendered and torn down quickly", async () => {
-    const { unmount } = render(<Riff mood='plugIn' />);
+    const { unmount } = render(<Echo mood='levelUp' />);
     await act(async () => {
       await new Promise((r) => setTimeout(r, 50));
     });

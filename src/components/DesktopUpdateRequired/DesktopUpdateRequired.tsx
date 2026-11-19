@@ -1,5 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { DESKTOP_APP_RELEASES_URL, MIN_DESKTOP_APP_VERSION } from "constants/desktopApp";
 import { useDesktopAppVersion } from "hooks/useDesktopAppVersion";
 import { useTranslation } from "hooks/useTranslation";
@@ -24,8 +24,8 @@ export const DesktopUpdateRequired = () => {
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-zinc-950 p-6">
       <div className="w-full max-w-md space-y-6 text-center">
-        {/* Riff nudges towards the download: one glance up at the button. */}
-        <Riff mood="nudge" lookAt="down" className="mx-auto h-24" />
+        {/* Echo nudges towards the download: one glance down at the button. */}
+        <Echo mood="nudge" lookAt="down" className="mx-auto h-24" />
         <h1 className="text-xl font-semibold text-zinc-100">{t("update_required.title")}</h1>
         <p className="text-sm text-zinc-400">
           {t("update_required.body", { version: appVersion })}

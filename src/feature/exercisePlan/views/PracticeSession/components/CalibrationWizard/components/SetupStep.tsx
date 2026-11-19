@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { AudioSelect } from "feature/toneStudio/components/AudioSelect";
 import type { AudioInitFailure, AudioRefs, WebAudioInput } from "hooks/useAudioAnalyzer";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
@@ -359,11 +359,11 @@ export const SetupStep = React.memo(function SetupStep({
       </div>
 
       <div className="flex w-full flex-1 flex-col gap-6 overflow-y-auto">
-        {/* Riff tells the state of the input at a glance: cable out before
+        {/* Echo tells the state of the input at a glance: puzzled before
             listening (or when nothing comes in for a while), ears up while
-            listening, and the plug flying into the jack once the guitar is heard. */}
+            listening, and a burst of rings once the guitar is heard. */}
         <div className="flex justify-center shortwide:hidden">
-          <Riff
+          <Echo
             mood={heard ? "plugIn" : isListening && !showHelp ? "listen" : "unplugged"}
             lookAt="down"
             className="h-20 sm:h-24"

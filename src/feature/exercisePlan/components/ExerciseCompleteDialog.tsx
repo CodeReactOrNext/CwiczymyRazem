@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import confetti from "canvas-confetti";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { RotateCw } from "lucide-react";
@@ -49,7 +49,7 @@ export const ExerciseCompleteDialog = ({
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", duration: 0.5 }}
                 onAnimationComplete={handleConfetti}>
-                <Riff mood='celebrate' short delay={0.2} className='h-24' />
+                <Echo mood='celebrate' short delay={0.2} className='h-24' />
               </motion.div>
               <span>{t("exercise_complete.title")}</span>
             </div>

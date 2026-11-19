@@ -1,7 +1,7 @@
 import { AnimeChip, AnimeMoment } from "components/AnimeMoment/AnimeMoment";
 import { DesktopUpdateRequired } from "components/DesktopUpdateRequired/DesktopUpdateRequired";
 import ErrorBoundary from "components/ErrorBoundary/ErrorBoundary";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { CollectionEmptyState } from "feature/arsenal/components/Collection/CollectionEmptyState";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
@@ -26,7 +26,7 @@ import { useRouter } from "next/router";
 import { type ReactNode, useEffect, useState } from "react";
 
 /**
- * Dev-only: every place Riff (or the anime moment) appears that can be shown
+ * Dev-only: every place Echo (or the anime moment) appears that can be shown
  * without an account, rendered from the real components on sample data.
  * Pick a scene with ?scene=<id>. Renders nothing in production.
  */
@@ -136,7 +136,7 @@ const SCENES: Record<string, { label: string; node: () => ReactNode }> = {
               hero={
                 <div className='relative'>
                   <img src={getRankBadgeSrc(guitar.imageId, "medium")} alt='' className='h-44 w-80 object-contain md:h-52 md:w-[26rem]' />
-                  <Riff mood='celebrate' short delay={0.9} className='absolute -bottom-10 -right-4 h-24 md:h-28' />
+                  <Echo mood='celebrate' short delay={0.9} className='absolute -bottom-10 -right-4 h-24 md:h-28' />
                 </div>
               }
               onDone={again}>
@@ -172,7 +172,7 @@ const SCENES: Record<string, { label: string; node: () => ReactNode }> = {
   "duel-searching": { label: "Pojedynki: szukanie", node: () => <DuelEmptyState myName='Ty' myAvatar='' isSearching /> },
 };
 
-function RiffShowcase() {
+function MascotShowcase() {
   const router = useRouter();
   if (process.env.NODE_ENV === "production") return null;
   const scene = typeof router.query.scene === "string" ? router.query.scene : null;
@@ -182,7 +182,7 @@ function RiffShowcase() {
 
   return (
     <div className='min-h-screen bg-zinc-950 p-8'>
-      <h1 className='mb-6 text-xl font-bold text-zinc-100'>Riff — miejsca w aplikacji</h1>
+      <h1 className='mb-6 text-xl font-bold text-zinc-100'>Echo — miejsca w aplikacji</h1>
       <ul className='grid gap-2 sm:grid-cols-2'>
         {Object.entries(SCENES).map(([id, s]) => (
           <li key={id}>
@@ -196,4 +196,4 @@ function RiffShowcase() {
   );
 }
 
-export default dynamic(() => Promise.resolve(RiffShowcase), { ssr: false });
+export default dynamic(() => Promise.resolve(MascotShowcase), { ssr: false });

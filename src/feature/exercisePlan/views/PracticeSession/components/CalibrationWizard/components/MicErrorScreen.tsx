@@ -1,5 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import type { AudioInitFailure } from "hooks/useAudioAnalyzer";
 import { useTranslation } from "hooks/useTranslation";
 import React from "react";
@@ -19,8 +19,8 @@ export function MicErrorScreen({ reason, onRetry, onCancel }: MicErrorScreenProp
     <ModalWrapper zIndex="z-[99999999]">
       <div className="flex h-full items-center justify-center px-6 text-white">
         <div className="max-w-sm w-full text-center space-y-6">
-          {/* The input would not open: Riff stands with his cable pulled out. */}
-          <Riff mood="unplugged" className="mx-auto h-24" />
+          {/* The input would not open: Echo hears nothing, rings silent, puzzled. */}
+          <Echo mood="unplugged" className="mx-auto h-24" />
           <div className="space-y-2">
             <p className="text-lg font-semibold">{t(`error.reasons.${reason}.title`)}</p>
             <p className="text-sm leading-relaxed text-zinc-300">

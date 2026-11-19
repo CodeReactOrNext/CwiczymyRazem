@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import axios from "axios";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import type { DesktopLoginRequest } from "feature/user/services/desktopLogin";
 import {
   parseDesktopLoginRequest,
@@ -129,11 +129,11 @@ export const DesktopLoginView = () => {
           priority
         />
 
-        {/* Riff mirrors the hand-off to the desktop app: warming up while it
-            loads, the cable going in once it is connected, pulled out when the
-            link is no good. */}
+        {/* Echo mirrors the hand-off to the desktop app: warming up while it
+            loads, lighting up once it is connected, puzzled when the link is no
+            good. */}
         <div className='flex justify-center'>
-          <Riff
+          <Echo
             mood={
               isLoading
                 ? "warmup"

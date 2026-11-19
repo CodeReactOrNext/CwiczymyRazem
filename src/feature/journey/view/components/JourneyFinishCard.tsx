@@ -1,6 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { AnimeChip, AnimeMoment } from "components/AnimeMoment/AnimeMoment";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { RewardSummary } from "components/Rewards/RewardSummary";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
@@ -71,7 +71,7 @@ export const JourneyFinishCard = ({
                 className='h-44 w-80 object-contain md:h-52 md:w-[26rem]'
                 draggable={false}
               />
-              <Riff mood='celebrate' short delay={0.9} className='absolute -bottom-10 -right-4 h-24 md:h-28' />
+              <Echo mood='celebrate' short delay={0.9} className='absolute -bottom-10 -right-4 h-24 md:h-28' />
             </div>
           }
           onDone={() => setCelebrating(false)}>
@@ -105,10 +105,10 @@ export const JourneyFinishCard = ({
         />
       )}
 
-      {/* The finish is reached and the guitar waits: Riff throws a short party
+      {/* The finish is reached and the guitar waits: Echo throws a short party
           in the corner — small, the guitar stays the prize. */}
       {canClaim && (
-        <Riff mood='celebrate' short delay={0.3} className='absolute right-3 top-3 z-10 h-16' />
+        <Echo mood='celebrate' short delay={0.3} className='absolute right-3 top-3 z-10 h-16' />
       )}
 
       <div className='relative flex flex-col items-center gap-3'>

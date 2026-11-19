@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { DesktopGoogleSignInHint } from "feature/user/components/DesktopGoogleSignInHint/DesktopGoogleSignInHint";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
@@ -27,7 +27,7 @@ const LoginView = () => {
   const { t } = useTranslation(["common", "login"]);
   const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
-  // Riff covers his eyes while a hidden password is being typed.
+  // Echo shuts its eyes while a hidden password is being typed.
   const [typingPassword, setTypingPassword] = useState(false);
 
   const googleLogInHandler = () => {
@@ -60,7 +60,7 @@ const LoginView = () => {
           {/* Header Section */}
           <div className='text-center'>
             <div className='mb-2 flex justify-center sm:mb-6'>
-              <Riff lively arrive eyesClosed={typingPassword && !showPassword} className='h-16 sm:h-24' />
+              <Echo lively arrive eyesClosed={typingPassword && !showPassword} className='h-16 sm:h-24' />
             </div>
             <h1 className='mb-1 text-2xl font-bold tracking-tight text-white sm:mb-2 sm:text-3xl'>
               {t("login:title")}

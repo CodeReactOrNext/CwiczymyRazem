@@ -1,5 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { useTranslation } from "hooks/useTranslation";
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -115,7 +115,7 @@ export const GoalsPanel = ({
       {goals.length === 0 ? (
         <div className='flex flex-col items-center justify-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
           {/* No goals: squared up, ready to aim at one. */}
-          <Riff mood='focus' className='mb-4 h-24' />
+          <Echo mood='focus' className='mb-4 h-24' />
           <p className='text-base font-semibold text-zinc-100'>
             {t("empty.title")}
           </p>

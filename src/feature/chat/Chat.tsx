@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { format } from "date-fns";
@@ -99,8 +99,8 @@ const EmptyRoom = ({
   const { t } = useTranslation("chat");
   return (
   <div className='flex h-full flex-col items-center justify-center gap-4 px-6 py-16 text-center'>
-    {/* A quiet room: he points down at the say-hi button. */}
-    <Riff mood='nudge' lookAt='down' className='h-20' />
+    {/* A quiet room: Echo points down at the say-hi button. */}
+    <Echo mood='nudge' lookAt='down' className='h-20' />
     <div className='space-y-1'>
       <p className='text-sm font-semibold text-zinc-200'>
         {t("empty_room.title")}

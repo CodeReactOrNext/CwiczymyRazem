@@ -3,7 +3,7 @@ import { Checkbox } from "assets/components/ui/checkbox";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { cn } from "assets/lib/utils";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { onboardingHref } from "feature/onboarding/analytics/onboardingAnalytics";
 import { DesktopGoogleSignInHint } from "feature/user/components/DesktopGoogleSignInHint/DesktopGoogleSignInHint";
 import { selectIsFetching } from "feature/user/store/userSlice";
@@ -52,7 +52,7 @@ const SingupView = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  // Riff covers his eyes while a hidden password is being typed.
+  // Echo shuts its eyes while a hidden password is being typed.
   const [typingPassword, setTypingPassword] = useState(false);
 
   const isFetching = useAppSelector(selectIsFetching) === "createAccount";
@@ -140,7 +140,7 @@ const SingupView = () => {
           {/* Header Section */}
           <div className="text-center">
              <div className="flex justify-center mb-2 sm:mb-6">
-                <Riff lively arrive eyesClosed={typingPassword && !showPassword} className='h-16 sm:h-24' />
+                <Echo lively arrive eyesClosed={typingPassword && !showPassword} className='h-16 sm:h-24' />
              </div>
              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-1 sm:mb-2">
                {t("signup:title")}

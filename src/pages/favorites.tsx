@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LIBRARY_TABS } from "constants/navTabs";
@@ -150,8 +150,8 @@ const FavoritesPage: NextPageWithLayout = () => {
       <div className="space-y-12 px-3 py-6 md:px-6 md:py-8 lg:px-8">
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center rounded-lg bg-zinc-900/30 px-6 py-12 text-center md:py-20">
-            {/* Nothing saved: he looks around for something to keep. */}
-            <Riff mood="lookAround" className="mb-4 h-24" />
+            {/* Nothing saved: Echo looks around for something to keep. */}
+            <Echo mood="lookAround" className="mb-4 h-24" />
             <p className="text-base font-semibold text-zinc-100">
               {t("library:favorites.empty_title")}
             </p>

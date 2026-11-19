@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { AnimeChip, AnimeMoment } from "components/AnimeMoment/AnimeMoment";
-import { Riff } from "components/Mascot/Riff";
+import { Echo } from "components/Mascot/Echo";
 import { useBossFightControls } from "feature/exercisePlan/views/PracticeSession/contexts/BossFightControlsContext";
 import { AnimatePresence, m } from "framer-motion";
 import { fade, popIn } from "lib/motion/motion";
@@ -108,9 +108,9 @@ export const BossResultOverlay = ({ boss }: { boss: BossDefinition }) => {
             variants={popIn}
             className='w-full max-w-lg space-y-6 rounded-lg bg-zinc-900 px-6 py-8 text-center sm:px-8'>
             <div className='flex items-end justify-center gap-2'>
-              {/* Riff across from the boss: a new record is worth a party,
-                  anything else leaves him seeing stars. */}
-              <Riff mood={newRecord ? "celebrate" : "dizzy"} short delay={0.2} className='h-32 shrink-0 sm:h-36' />
+              {/* Echo across from the boss: a new record is worth a party,
+                  anything else leaves it dizzy. */}
+              <Echo mood={newRecord ? "celebrate" : "dizzy"} short delay={0.2} className='h-32 shrink-0 sm:h-36' />
               <BossArt
                 boss={boss}
                 className='h-36 w-44 sm:h-40 sm:w-48'

@@ -69,12 +69,12 @@ bez ścieżek URL, nazw pól i wzorów, za to z komponentami z `src/components/W
 (`ClickPath`, `AppScreen`, `QuestPreview`, `PlanComparison`…). Zasady i lista
 komponentów: **[docs/WIKI.md](docs/WIKI.md)**.
 
-## Maskotka (Riff)
+## Maskotka (Echo)
 
-Mały wzmacniacz combo z twarzą i rękami (`components/Mascot/Riff.tsx`), plus pełnoekranowy
-moment anime dla dużych wygranych (`components/AnimeMoment`). Wygląd, stany, ruch i miejsca,
-gdzie wolno go pokazać: **[docs/MASCOT.md](docs/MASCOT.md)**. Nie dorysowuj mu części, kolorów
-ani stanów spoza tego pliku — nowy stan najpierw trafia do specu.
+Ciemny kamyk ze świecącymi oczami, styl „Noir” (`components/Mascot/Echo.tsx`), plus pełnoekranowy moment anime
+dla dużych wygranych (`components/AnimeMoment`). Wygląd, nastroje, ruch i miejsca, gdzie wolno ją
+pokazać: **[docs/MASCOT.md](docs/MASCOT.md)**. Nie dorysowuj jej części, kolorów ani stanów spoza
+tego pliku — nowy stan najpierw trafia do specu.
 
 ## Firebase
 

@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 
 /**
  * Full-screen "session complete" transition shown before the summary — the
- * shared anime moment with the session's headline numbers. Riff shares a
- * layoutId with the summary card, so on the way out he flies (and shrinks)
- * straight into his place there.
+ * shared anime moment with the session's headline numbers. Echo shares a
+ * layoutId with the summary card, so on the way out it flies (and shrinks)
+ * straight into its place there.
  */
 
 interface SessionCelebrationProps {
@@ -21,7 +21,7 @@ interface SessionCelebrationProps {
   onDone: () => void;
 }
 
-export const RIFF_LAYOUT_ID = "session-summary-riff";
+export const MASCOT_LAYOUT_ID = "session-summary-mascot";
 
 // The full moment plays once a day; later sessions that day get the short cut,
 // so the third session in a row does not sit through the whole show again.
@@ -55,7 +55,7 @@ export const SessionCelebration = ({ points, fame, streak, levelUp = false, stre
     <AnimeMoment
       title={levelUp ? t("level_up") : streakMilestone ? t("celebrate.streak_milestone", { days: streak }) : t("celebrate.title")}
       mood={levelUp ? "levelUp" : "celebrate"}
-      layoutId={RIFF_LAYOUT_ID}
+      layoutId={MASCOT_LAYOUT_ID}
       brief={brief}
       onDone={onDone}>
       <AnimeChip index={0} className='text-cyan-400'>
