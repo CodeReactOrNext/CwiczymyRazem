@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import axios from "axios";
-import { Echo } from "components/Mascot/Echo";
+import { Kostek } from "components/Mascot/Kostek";
 import type { DesktopLoginRequest } from "feature/user/services/desktopLogin";
 import {
   parseDesktopLoginRequest,
@@ -129,11 +129,11 @@ export const DesktopLoginView = () => {
           priority
         />
 
-        {/* Echo mirrors the hand-off to the desktop app: warming up while it
+        {/* Kostek mirrors the hand-off to the desktop app: warming up while it
             loads, lighting up once it is connected, puzzled when the link is no
             good. */}
         <div className='flex justify-center'>
-          <Echo
+          <Kostek
             mood={
               isLoading
                 ? "warmup"

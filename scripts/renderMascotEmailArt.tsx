@@ -1,6 +1,6 @@
 /**
  * Renders the email header art (public/images/email/*.jpg, 1200×600) from the
- * real Echo component, so the mascot in the inbox is the one in the app.
+ * real Kostek component, so the mascot in the inbox is the one in the app.
  *
  *   npx esbuild scripts/renderMascotEmailArt.tsx --bundle --platform=node \
  *     --format=esm --jsx=automatic --outfile=tmp/renderMascotEmailArt.mjs \
@@ -11,7 +11,7 @@
  * and looping effects do not exist in a still, so the extras a pose needs to
  * read (sound rings, the podium) are drawn here.
  */
-import { type EchoMood, EchoStill } from "components/Mascot/Echo";
+import { type KostekMood, KostekStill } from "components/Mascot/Kostek";
 import { renderToStaticMarkup } from "react-dom/server";
 import sharp from "sharp";
 
@@ -22,11 +22,11 @@ const CYAN = "#22D3EE";
 
 interface Art {
   file: string;
-  mood: EchoMood;
-  /** Extra SVG drawn behind / in front of Echo, in the 1200×600 frame. */
+  mood: KostekMood;
+  /** Extra SVG drawn behind / in front of Kostek, in the 1200×600 frame. */
   back?: string;
   front?: string;
-  /** Echo's box in the frame (centre and height). */
+  /** Kostek's box in the frame (centre and height). */
   box?: { x: number; y: number; h: number };
 }
 
@@ -47,9 +47,9 @@ const ARTS: Art[] = [
 ];
 
 const render = async ({ file, mood, back = "", front = "", box = { x: 600, y: 315, h: 420 } }: Art) => {
-  // The figure's viewBox is 112 × 98; scale it to the requested height.
-  const w = (box.h * 112) / 98;
-  const echo = renderToStaticMarkup(<EchoStill mood={mood} lookAt='left' />)
+  // The figure's viewBox is 112 × 110; scale it to the requested height.
+  const w = (box.h * 112) / 110;
+  const echo = renderToStaticMarkup(<KostekStill mood={mood} lookAt='left' />)
     .replace(' xmlns="http://www.w3.org/2000/svg"', "")
     .replace("<svg", `<svg x="${box.x - w / 2}" y="${box.y - box.h / 2}" height="${box.h}" width="${w}"`);
 

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 /**
  * Full-screen "session complete" transition shown before the summary — the
- * shared anime moment with the session's headline numbers. Echo shares a
+ * shared anime moment with the session's headline numbers. Kostek shares a
  * layoutId with the summary card, so on the way out it flies (and shrinks)
  * straight into its place there.
  */

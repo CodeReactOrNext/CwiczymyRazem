@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
-import { Echo } from "components/Mascot/Echo";
+import { Kostek } from "components/Mascot/Kostek";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { TIME_POINTS_VALUE } from "constants/ratingValue";
 import type { AchievementList } from "feature/achievements";
@@ -311,8 +311,8 @@ const RatingPopUpLayout = ({
         <div className="relative overflow-hidden rounded-lg bg-zinc-900/60 px-7 py-16 text-center md:px-10">
           <HeroPattern className="opacity-[0.03]" maskImage="radial-gradient(ellipse at top, black 10%, transparent 70%)" />
           <div className="relative flex flex-col items-center gap-5">
-            {/* Nothing counted: Echo glances aside and shrugs — no blame, just "not yet". */}
-            <Echo mood="shrug" lookAt="left" delay={0.3} className="h-28" />
+            {/* Nothing counted: Kostek glances aside and shrugs — no blame, just "not yet". */}
+            <Kostek mood="shrug" lookAt="left" delay={0.3} className="h-28" />
 
             <div className="flex flex-col items-center gap-3">
               <p className="text-xl font-semibold text-zinc-100">{t("no_points_title")}</p>
@@ -379,11 +379,11 @@ const RatingPopUpLayout = ({
 
             <div className="relative">
               {/* The slot keeps its height while the celebration is up, so the
-                  card does not jump when Echo flies in from it. */}
+                  card does not jump when Kostek flies in from it. */}
               <div className="mx-auto mb-4 flex h-28 justify-center md:h-32">
                 {!celebrating && (
                   <motion.div layoutId={MASCOT_LAYOUT_ID} transition={{ type: "spring", stiffness: 140, damping: 20 }}>
-                    <Echo lively arrive className="h-28 md:h-32" />
+                    <Kostek lively arrive className="h-28 md:h-32" />
                   </motion.div>
                 )}
               </div>

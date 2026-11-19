@@ -1,5 +1,5 @@
 import { ActivityChart } from "components/Charts/ActivityChart";
-import { Echo } from "components/Mascot/Echo";
+import { Kostek } from "components/Mascot/Kostek";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { NotebookPen } from "lucide-react";
@@ -126,8 +126,8 @@ export const PracticeLogView = () => {
         </div>
       ) : !hasAnySessions ? (
         <div className='flex flex-col items-center gap-4 py-24 text-center'>
-          {/* No sessions yet: Echo drums its fingers, waiting for the first one. */}
-          <Echo mood='wait' className='h-24 md:h-36' />
+          {/* No sessions yet: Kostek drums its fingers, waiting for the first one. */}
+          <Kostek mood='wait' className='h-24 md:h-36' />
           <div className='space-y-1'>
             <p className='text-sm font-medium text-zinc-200'>
               {t("page.empty")}

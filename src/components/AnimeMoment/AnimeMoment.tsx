@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { Echo, type EchoMood } from "components/Mascot/Echo";
+import { Kostek, type KostekMood } from "components/Mascot/Kostek";
 import { motion, useReducedMotion } from "framer-motion";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -10,11 +10,11 @@ import { createPortal } from "react-dom";
  * own and hands over — no button; a click or Enter / Esc only skips ahead.
  *
  * Beats:
- *   0.00  eyecatch wipe — three slanted bands and a halftone trail sweep across
- *   0.40  flash, then focus lines that flicker "on twos" like hand-drawn cels
- *   0.45  the hero springs in (Echo, or whatever `hero` is)
- *   land  impact frame (the screen inverts for two frames), screen shake,
- *         shockwaves, speed streaks and a burst of picks / notes / stars
+ *   0.00  three hairline slashes cut across the dark, focus lines fade in and
+ *         flicker "on twos" like hand-drawn cels — nothing fills the screen
+ *   0.45  the hero springs in (Kostek, or whatever `hero` is)
+ *   land  a small shake, shockwaves, speed streaks and a burst of picks /
+ *         notes / stars
  *   +     the title slams in letter by letter with a chromatic split, the
  *         underline swooshes, the chips pop — then it washes out.
  *
@@ -35,9 +35,9 @@ const DEFAULT_COLORS: AnimeMomentColors = { a: "#22d3ee", b: "#f4b63e" };
 interface AnimeMomentProps {
   title: string;
   subtitle?: ReactNode;
-  /** What springs into the middle. Defaults to Echo in `mood`. */
+  /** What springs into the middle. Defaults to Kostek in `mood`. */
   hero?: ReactNode;
-  mood?: EchoMood;
+  mood?: KostekMood;
   /** Chips under the title (see AnimeChip). */
   children?: ReactNode;
   /** When the hero lands, in seconds — the impact beat is timed to it. */
@@ -100,50 +100,34 @@ const FocusLines = ({ land, colors }: { land: number; colors: AnimeMomentColors 
   );
 };
 
-// ─── Wipe ─────────────────────────────────────────────────────────────────────
-const HALFTONE = "radial-gradient(circle, rgba(250,250,250,0.9) 1.6px, transparent 1.9px)";
+// ─── Entry ────────────────────────────────────────────────────────────────────
+// Thin slashes, not walls of colour: three hairline streaks cut across the
+// dark at an angle and are gone, like a fast pan. Nothing ever covers the
+// whole screen.
+const SLASHES = [
+  { top: "34%", width: "46%", height: 3, delay: 0, color: "a" },
+  { top: "58%", width: "30%", height: 2, delay: 0.06, color: "white" },
+  { top: "46%", width: "62%", height: 1.5, delay: 0.12, color: "b" },
+] as const;
 
-const Wipe = ({ colors }: { colors: AnimeMomentColors }) => (
+const Slashes = ({ colors }: { colors: AnimeMomentColors }) => (
   <>
-    <motion.div
-      aria-hidden
-      className='absolute inset-y-[-10%] left-0 w-[75%] -skew-x-12'
-      style={{ background: colors.a }}
-      initial={{ x: "-130%" }}
-      animate={{ x: "230%" }}
-      transition={{ duration: 0.55, ease: WIPE_EASE }}
-    />
-    {/* Halftone trail riding behind the first band. */}
-    <motion.div
-      aria-hidden
-      className='absolute inset-y-[-10%] left-0 w-[30%] -skew-x-12 opacity-40'
-      style={{ backgroundImage: HALFTONE, backgroundSize: "10px 10px" }}
-      initial={{ x: "-330%" }}
-      animate={{ x: "560%" }}
-      transition={{ duration: 0.62, ease: WIPE_EASE, delay: 0.02 }}
-    />
-    <motion.div
-      aria-hidden
-      className='absolute inset-y-[-10%] left-0 w-[40%] -skew-x-12'
-      style={{ background: colors.b }}
-      initial={{ x: "-180%" }}
-      animate={{ x: "380%" }}
-      transition={{ duration: 0.6, ease: WIPE_EASE, delay: 0.07 }}
-    />
-    <motion.div
-      aria-hidden
-      className='absolute inset-y-[-10%] left-0 w-[18%] -skew-x-12 bg-zinc-50'
-      initial={{ x: "-300%" }}
-      animate={{ x: "800%" }}
-      transition={{ duration: 0.6, ease: WIPE_EASE, delay: 0.12 }}
-    />
-    <motion.div
-      aria-hidden
-      className='absolute inset-0 bg-zinc-50'
-      initial={{ opacity: 0 }}
-      animate={{ opacity: [0, 0.55, 0] }}
-      transition={{ duration: 0.35, delay: 0.42 }}
-    />
+    {SLASHES.map((sl, i) => (
+      <motion.div
+        key={i}
+        aria-hidden
+        className='absolute left-0 origin-left -rotate-12 rounded-full'
+        style={{
+          top: sl.top,
+          width: sl.width,
+          height: sl.height,
+          background: sl.color === "a" ? colors.a : sl.color === "b" ? colors.b : "#fafafa",
+        }}
+        initial={{ x: "-110%", opacity: 0 }}
+        animate={{ x: "260%", opacity: [0, 0.9, 0.9, 0] }}
+        transition={{ duration: 0.6, delay: sl.delay, ease: WIPE_EASE, opacity: { duration: 0.6, delay: sl.delay, times: [0, 0.15, 0.7, 1] } }}
+      />
+    ))}
   </>
 );
 
@@ -164,19 +148,6 @@ const ScreenTone = () => (
 );
 
 // ─── Impact ───────────────────────────────────────────────────────────────────
-/** Two frames of an inverted screen — the classic anime impact frame. */
-const ImpactFrame = ({ at }: { at: number }) => (
-  <motion.div
-    aria-hidden
-    className='pointer-events-none absolute inset-0 bg-white mix-blend-difference'
-    initial={{ opacity: 0 }}
-    // Not a full inversion: strong enough to read as the hit, soft enough
-    // not to flash hard on the eyes.
-    animate={{ opacity: [0, 0.7, 0.7, 0] }}
-    transition={{ duration: 0.13, delay: at, times: [0, 0.02, 0.98, 1], ease: "linear" }}
-  />
-);
-
 const Shockwaves = ({ at, colors }: { at: number; colors: AnimeMomentColors }) => (
   <div className='pointer-events-none absolute left-1/2 top-1/2' aria-hidden>
     {[colors.b, colors.a, "#fafafa"].map((color, i) => (
@@ -364,7 +335,7 @@ export const AnimeMoment = ({
   if (typeof document === "undefined") return null;
   const d = (s: number) => (reduceMotion ? 0 : s);
 
-  const heroNode = hero ?? <Echo mood={mood} delay={d(0.55)} className='h-48 md:h-60' />;
+  const heroNode = hero ?? <Kostek mood={mood} delay={d(0.55)} className='h-48 md:h-60' />;
 
   return createPortal(
     <motion.div
@@ -380,7 +351,7 @@ export const AnimeMoment = ({
       {/* Screen shake on landing moves everything, background included. */}
       <motion.div
         className='absolute inset-0 flex items-center justify-center'
-        animate={reduceMotion ? undefined : { x: [0, -12, 10, -7, 5, -2, 0], y: [0, 8, -6, 5, -3, 1, 0] }}
+        animate={reduceMotion ? undefined : { x: [0, -5, 4, -2, 1, 0], y: [0, 3, -2, 1, 0, 0] }}
         transition={{ duration: 0.42, delay: land, ease: "easeOut" }}>
         {!reduceMotion && (
           <>
@@ -392,7 +363,7 @@ export const AnimeMoment = ({
               className='absolute inset-0'
               style={{ background: "radial-gradient(circle at center, #09090b 22%, rgba(9,9,11,0) 48%)" }}
             />
-            {!brief && <Wipe colors={colors} />}
+            {!brief && <Slashes colors={colors} />}
             <Shockwaves at={land} colors={colors} />
             <Streaks at={land} />
             <Burst at={land} colors={colors} />
@@ -424,7 +395,6 @@ export const AnimeMoment = ({
           {children && <div className='mt-7 flex flex-wrap justify-center gap-3'>{children}</div>}
         </div>
 
-        {!reduceMotion && <ImpactFrame at={land} />}
       </motion.div>
     </motion.div>,
     document.body,

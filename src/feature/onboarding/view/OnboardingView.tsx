@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { Echo, type EchoMood } from "components/Mascot/Echo";
+import { Kostek, type KostekMood } from "components/Mascot/Kostek";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { addPlayerJoinedLog } from "feature/logs/services/addPlayerJoinedLog.service";
@@ -116,15 +116,15 @@ const StepHeading = ({
   /** Only where the title can't carry the message alone — the questions don't need one. */
   description?: string;
   onBack?: () => void;
-  /** Echo's reaction for this step; by default it drops in and stays lively. */
-  mascotMood?: EchoMood;
+  /** Kostek's reaction for this step; by default it drops in and stays lively. */
+  mascotMood?: KostekMood;
 }) => {
   const { t } = useTranslation("onboarding");
   return (
   <div className='mx-auto mb-8 max-w-xl space-y-3 text-center sm:mb-10'>
-    {/* Echo walks the new player through the questions: it lands on each
+    {/* Kostek walks the new player through the questions: it lands on each
         step, then keeps fidgeting while they decide. */}
-    <Echo
+    <Kostek
       mood={mascotMood ?? "idle"}
       short
       lively

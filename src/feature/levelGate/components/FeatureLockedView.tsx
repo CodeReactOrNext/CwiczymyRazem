@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { Echo } from "components/Mascot/Echo";
+import { Kostek } from "components/Mascot/Kostek";
 import type { FeatureUnlock } from "feature/levelGate/data/featureUnlocks";
 import { FEATURE_UNLOCK_LIST } from "feature/levelGate/data/featureUnlocks";
 import {
@@ -88,8 +88,8 @@ export const FeatureLockedView = ({
     <div className='mx-auto w-full max-w-3xl px-4 py-10 md:py-16'>
       <div className='flex flex-col items-center gap-8 rounded-lg bg-zinc-900/40 px-6 py-12 text-center md:gap-10 md:px-14 md:py-16'>
         <div className='flex items-end gap-4 md:gap-6'>
-          {/* Echo nudges: a glance at the level the page is waiting for. */}
-          <Echo mood='nudge' lookAt='right' delay={0.3} className='hidden h-24 sm:block lg:h-32' />
+          {/* Kostek nudges: a glance at the level the page is waiting for. */}
+          <Kostek mood='nudge' lookAt='right' delay={0.3} className='hidden h-24 sm:block lg:h-32' />
           <div className='relative'>
             <LevelProgressCircle
               lvl={lvl}

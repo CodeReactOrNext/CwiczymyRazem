@@ -14,21 +14,21 @@ import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from "rea
 import { smoothControls, splineValue } from "./smoothMotion";
 
 /**
- * Echo — the Riff Quest mascot (see docs/MASCOT.md), "Noir" style: a dark
- * pebble the colour of the app with two glowing eyes, one cyan rim of light
- * and two small floating hands. No mouth, no cheeks, no stickers: what it
- * feels is the shape of the eyes, how the light glows or dims, a restrained
- * squash of the body and what the hands do. Sound rings show what it hears.
+ * Kostek — the Riff Quest mascot (see docs/MASCOT.md), drawn in the logo's
+ * style: a flat guitar pick in the logo's off-white, details cut out of it so
+ * the background shows through, cyan #22d3ee as the only accent (the sound
+ * rings), and a face that is nothing but two eyes. Two round floating mitts do
+ * the gesturing. On the light theme the body turns dark (`--mascot-fg`).
  *
  * Layers: pose (held tilt / squash) → breath + sway (idle loop) → action
  * (one-off reactions) → face (eyes, gaze) and hands. The hands are springs
  * that chase their pose a beat behind the body, so every move overlaps and
  * settles instead of stopping dead; gestures run along splines (smoothMotion).
- * Loops only run while Echo is on screen and the tab is in front. Reduced
+ * Loops only run while Kostek is on screen and the tab is in front. Reduced
  * motion: the held pose only.
  */
 
-export type EchoMood =
+export type KostekMood =
   | "idle"
   | "celebrate"
   | "hop"
@@ -56,41 +56,42 @@ export type EchoMood =
 
 type LookAt = "left" | "right" | "up" | "down";
 
+/**
+ * Logo style: one flat colour for the body and hands, the face cut out of it
+ * (it shows whatever is behind), cyan as the only accent. The body colour is a
+ * CSS variable so the light theme turns it dark (see globals.css).
+ */
+const FG = "var(--mascot-fg, #FBFBFA)";
 const C = {
-  body: "#272C34",
-  shade: "#1C2026",
-  hand: "#3A414C",
-  handEdge: "#525A67",
-  eye: "#67E8F9",
-  eyeDim: "#2E6F7B",
-  rim: "#22D3EE",
-  rimOff: "#2A3036",
   ring: "#22D3EE",
-  warn: "#F4B63E",
 };
 
 const EASE: [number, number, number, number] = [0.45, 0, 0.25, 1];
 const SPRING: Transition = { type: "spring", stiffness: 220, damping: 20 };
 /** Hands chase their pose a little late and overshoot a touch: follow-through. */
 const HAND_SPRING: Transition = { type: "spring", stiffness: 150, damping: 13, mass: 0.9 };
-const BODY = "M22 70 C22 44 38 30 60 30 C82 30 98 44 98 70 C98 92 82 104 60 104 C38 104 22 92 22 70 Z";
-const SHADE = "M98 70 C98 92 82 104 60 104 C76 98 88 86 90 66 C92 56 90 48 86 42 C94 50 98 58 98 70 Z";
-const RIM = "M30 56 C34 42 46 34 60 33";
+/** The pick: wide and round on top, narrowing to a soft point. */
+const BODY = "M60 115.1 C50.8 115.1 22 77 22 52.9 C22 34.4 37.8 26 60 26 C82.3 26 98.1 34.4 98.1 52.9 C98.1 77 69.3 115.1 60 115.1 Z";
 
 // ─── Eyes ─────────────────────────────────────────────────────────────────────
-// Two glowing pills. Every expression is a change of their size, tilt or a
-// swap to a stroke (arcs for joy, flat arcs for contentment, lines for closed,
-// spirals for dizzy).
+// Two narrow upright slots cut out of the body (they are drawn into a mask,
+// so the page shows through). Every expression is their size, tilt or a swap
+// to a stroke: arcs for joy, flat arcs for contentment, a line for closed,
+// spirals for dizzy. The eyes are the only place Kostek has a face.
 type EyeShape = "open" | "happy" | "content" | "closed" | "sad" | "wide" | "focus" | "sleepy" | "spiral";
-const EYE_Y = 64;
+const EYE_Y = 57.5;
+const EYE_L = 50;
+const EYE_R = 70;
 type PillShape = { w: number; h: number; tilt: number; y: number };
 const PILL: Partial<Record<EyeShape, PillShape>> = {
-  open: { w: 6.4, h: 15, tilt: 0, y: 0 },
-  wide: { w: 8, h: 18, tilt: 0, y: -1 },
-  sad: { w: 6.4, h: 12, tilt: 18, y: 1 },
-  focus: { w: 6.4, h: 7.5, tilt: -14, y: 1 },
-  sleepy: { w: 6.4, h: 5, tilt: 0, y: 3 },
+  open: { w: 5, h: 12, tilt: 0, y: 0 },
+  wide: { w: 6.2, h: 14.5, tilt: 0, y: -1 },
+  sad: { w: 5, h: 9.5, tilt: 18, y: 1 },
+  focus: { w: 5, h: 6, tilt: -14, y: 1 },
+  sleepy: { w: 5, h: 4, tilt: 0, y: 2.5 },
 };
+/** Colour of a cut in the mask: black removes the body there. */
+const CUT = "#000";
 
 const Eye = ({ cx, shape, side, spin, talk }: { cx: number; shape: EyeShape; side: -1 | 1; spin: boolean; talk: number }) => {
   const cy = EYE_Y;
@@ -100,46 +101,46 @@ const Eye = ({ cx, shape, side, spin, talk }: { cx: number; shape: EyeShape; sid
   return (
     <>
       <motion.rect
-        x={cx - 3.2}
-        y={cy - 7.5}
-        width={6.4}
-        height={15}
-        rx={3.2}
-        fill={shape === "sleepy" ? C.eyeDim : C.eye}
+        x={cx - 2.5}
+        y={cy - 6}
+        width={5}
+        height={12}
+        rx={2.5}
+        fill={CUT}
         style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
         initial={false}
         animate={
           pill
-            ? { opacity: 1, scaleX: pill.w / 6.4, scaleY: (pill.h / 15) * (talk ? 0.82 : 1), rotate: pill.tilt * -side, y: pill.y }
+            ? { opacity: 1, scaleX: pill.w / 5, scaleY: (pill.h / 12) * (talk ? 0.8 : 1), rotate: pill.tilt * -side, y: pill.y }
             : { opacity: 0, scaleX: 1, scaleY: 0.6, rotate: 0, y: 0 }
         }
         transition={t}
       />
       <motion.path
-        d={`M${cx - 6},${cy + 3} Q${cx},${cy - 6} ${cx + 6},${cy + 3}`}
+        d={`M${cx - 4.6},${cy + 2.6} Q${cx},${cy - 5.4} ${cx + 4.6},${cy + 2.6}`}
         fill='none'
-        stroke={C.eye}
-        strokeWidth={5}
+        stroke={CUT}
+        strokeWidth={3.4}
         strokeLinecap='round'
         initial={false}
         animate={show("happy")}
         transition={t}
       />
       <motion.path
-        d={`M${cx - 5.5},${cy + 3} Q${cx},${cy - 1.5} ${cx + 5.5},${cy + 3}`}
+        d={`M${cx - 4.4},${cy + 2.4} Q${cx},${cy - 1.6} ${cx + 4.4},${cy + 2.4}`}
         fill='none'
-        stroke={C.eye}
-        strokeWidth={4.5}
+        stroke={CUT}
+        strokeWidth={3.2}
         strokeLinecap='round'
         initial={false}
         animate={show("content")}
         transition={t}
       />
       <motion.path
-        d={`M${cx - 5},${cy + 2} L${cx + 5},${cy + 2}`}
+        d={`M${cx - 4},${cy + 1.5} L${cx + 4},${cy + 1.5}`}
         fill='none'
-        stroke={C.eyeDim}
-        strokeWidth={5}
+        stroke={CUT}
+        strokeWidth={3.2}
         strokeLinecap='round'
         initial={false}
         animate={show("closed")}
@@ -147,10 +148,10 @@ const Eye = ({ cx, shape, side, spin, talk }: { cx: number; shape: EyeShape; sid
       />
       <motion.g initial={false} animate={show("spiral")} transition={t}>
         <motion.path
-          d={`M${cx},${cy} m-1.5,0 a1.5,1.5 0 1,1 3,0 a3,3 0 1,1 -6,0 a4.5,4.5 0 1,1 9,0`}
+          d={`M${cx},${cy} m-1.2,0 a1.2,1.2 0 1,1 2.4,0 a2.4,2.4 0 1,1 -4.8,0 a3.6,3.6 0 1,1 7.2,0`}
           fill='none'
-          stroke={C.eye}
-          strokeWidth={2.6}
+          stroke={CUT}
+          strokeWidth={2.1}
           strokeLinecap='round'
           style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
           animate={spin ? { rotate: side * 360 } : { rotate: 0 }}
@@ -162,32 +163,33 @@ const Eye = ({ cx, shape, side, spin, talk }: { cx: number; shape: EyeShape; sid
 };
 
 // ─── Hands ────────────────────────────────────────────────────────────────────
-// Two floating mitts, no arms. Shapes are drawn around (0, 0); `point`
-// extends a finger along +x and `thumb` raises one along −y, so rotating the
-// hand aims them.
-type HandShape = "mitt" | "fist" | "point" | "thumb";
+// Two floating round mitts, no arms. Shapes are drawn around (0, 0); `point`
+// extends a finger along +x, `thumb` raises one along −y and `horns` is the
+// rock-on fist, so rotating the hand aims them.
+type HandShape = "mitt" | "fist" | "point" | "thumb" | "horns";
 type HandPose = { x: number; y: number; r: number; shape?: HandShape; behind?: boolean };
 type HandMV = { x: MotionValue<number>; y: MotionValue<number>; r: MotionValue<number> };
 
-const Hand = ({ mv, shape, dim }: { mv: HandMV; shape: HandShape; dim: boolean }) => (
-  <motion.g style={{ x: mv.x, y: mv.y, rotate: mv.r }}>
-    {shape === "point" && <rect x={3.5} y={-2.2} width={10.5} height={4.4} rx={2.2} fill={C.hand} />}
-    {shape === "thumb" && (
-      // A thumbs-up, not a lone raised finger: a short thumb leaning out from
-      // the top-left of a fist (the curled fingers are marked over the fist).
+const HAND_R = 6.4;
+const HandShapes = ({ shape }: { shape: HandShape }) => (
+  <>
+    {shape === "point" && <rect x={3} y={-2} width={9.5} height={4} rx={2} fill={FG} />}
+    {shape === "thumb" && <rect x={-6.6} y={-12} width={4.4} height={8.5} rx={2.2} fill={FG} transform='rotate(-24 -4.4 -4)' />}
+    {shape === "horns" ? (
+      // Rock on: a rounded fist with two fingers up.
       <>
-        <rect x={-7.2} y={-12.5} width={5} height={9} rx={2.5} fill={C.hand} transform='rotate(-24 -4.7 -4)' />
+        <rect x={-7} y={-5} width={14} height={11.5} rx={4.6} fill={FG} />
+        <rect x={-7} y={-15.5} width={4} height={13} rx={2} fill={FG} />
+        <rect x={3} y={-15.5} width={4} height={13} rx={2} fill={FG} />
       </>
+    ) : (
+      <circle cx={0} cy={0} r={shape === "fist" ? HAND_R - 0.4 : HAND_R} fill={FG} />
     )}
-    <ellipse cx={0} cy={0} rx={shape === "fist" ? 6.8 : 7.6} ry={shape === "fist" ? 6.4 : 7} fill={C.hand} />
-    {shape === "thumb" && (
-      <g stroke='#272C34' strokeWidth={1.3} strokeLinecap='round'>
-        <path d='M0.5,-1.6 L5.2,-1.6' />
-        <path d='M0.5,1.4 L5.2,1.4' />
-        <path d='M0.8,4.2 L4.6,4.2' />
-      </g>
-    )}
-    <path d={shape === "fist" ? "M-4.2,-3.8 Q0,-6.6 4.2,-3.8" : "M-4.6,-4.2 Q0,-7.2 4.6,-4.2"} fill='none' stroke={dim ? C.hand : C.handEdge} strokeWidth={1.8} strokeLinecap='round' />
+  </>
+);
+const Hand = ({ mv, shape }: { mv: HandMV; shape: HandShape }) => (
+  <motion.g style={{ x: mv.x, y: mv.y, rotate: mv.r }}>
+    <HandShapes shape={shape} />
   </motion.g>
 );
 
@@ -228,17 +230,18 @@ const pointing = (lookAt: LookAt | undefined): { l: HandPose; r: HandPose } => {
   }
 };
 
-const poseFor = (mood: EchoMood, lookAt?: LookAt): Pose => {
+const poseFor = (mood: KostekMood, lookAt?: LookAt): Pose => {
   const look = lookAt ? LOOK[lookAt] : null;
   const s = lookAt === "left" ? -1 : 1;
   const base = { look: look ?? ZERO, body: REST, lit: true, l: H.restL, r: H.restR };
   switch (mood) {
     case "celebrate":
+      return { ...base, eyes: "happy", look: ZERO, l: H.upL, r: { ...H.upR, x: 110, y: 42, r: 10, shape: "horns" } };
     case "hop":
     case "plugIn":
       return { ...base, eyes: "happy", look: ZERO, l: H.upL, r: H.upR };
     case "levelUp":
-      return { ...base, eyes: "happy", look: ZERO, l: { ...H.upL, y: 34, shape: "fist" }, r: { ...H.upR, y: 34, shape: "fist" } };
+      return { ...base, eyes: "happy", look: ZERO, l: { ...H.upL, y: 34, shape: "fist" }, r: { ...H.upR, x: 110, y: 38, r: 10, shape: "horns" } };
     case "asleep":
       return { ...base, eyes: "closed", look: ZERO, body: { scaleX: 1.04, scaleY: 0.95, rotate: 6, y: 0 }, lit: false, l: H.lowL, r: H.lowR };
     case "standby":
@@ -312,12 +315,12 @@ const poseFor = (mood: EchoMood, lookAt?: LookAt): Pose => {
   }
 };
 
-// ─── Echo ─────────────────────────────────────────────────────────────────────
+// ─── Kostek ─────────────────────────────────────────────────────────────────────
 type Action = "glance" | "bounce" | "tilt" | "ping" | "lookUp" | "wave" | "stretch";
 const ACTIONS: Action[] = ["glance", "ping", "tilt", "wave", "glance", "lookUp", "bounce", "stretch"];
 
-export interface EchoProps {
-  mood?: EchoMood;
+export interface KostekProps {
+  mood?: KostekMood;
   className?: string;
   /** Extra wait (s) before the entry reaction, e.g. while a parent enters. */
   delay?: number;
@@ -337,7 +340,7 @@ export interface EchoProps {
   talking?: boolean;
 }
 
-export const Echo = ({
+export const Kostek = ({
   mood = "idle",
   className,
   delay = 0,
@@ -348,7 +351,7 @@ export const Echo = ({
   eyesClosed = false,
   signal = 0,
   talking = false,
-}: EchoProps) => {
+}: KostekProps) => {
   const reduceMotion = !!useReducedMotion();
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const actionCtl = useAnimationControls();
@@ -393,8 +396,8 @@ export const Echo = ({
     pose = {
       ...pose,
       eyes: "closed",
-      l: { x: 47, y: 64, r: -15 },
-      r: { x: 73, y: 64, r: 15 },
+      l: { x: 50, y: 58, r: -15 },
+      r: { x: 70, y: 58, r: 15 },
     };
   if (joy) pose = { ...pose, eyes: "happy" };
 
@@ -741,39 +744,40 @@ export const Echo = ({
     <>
       {!!pose.l.behind === behind && (
         <motion.g initial={false} animate={float(0)}>
-          <Hand mv={hand.l} shape={shapeL} dim={!pose.lit} />
+          <Hand mv={hand.l} shape={shapeL} />
         </motion.g>
       )}
       {!!pose.r.behind === behind && (
         <motion.g initial={false} animate={float(1.3)}>
-          <Hand mv={hand.r} shape={shapeR} dim={!pose.lit} />
+          <Hand mv={hand.r} shape={shapeR} />
         </motion.g>
       )}
     </>
   );
 
+  const maskId = `kostek-${uid}`;
   return (
-    <motion.svg ref={svgRef} viewBox='4 18 112 98' overflow='visible' className={cn("h-32 w-auto", className)} aria-hidden onHoverStart={onHover}>
-      <defs>
-        <clipPath id={`echo-${uid}`}>
-          <path d={BODY} />
-        </clipPath>
-      </defs>
-
+    <motion.svg
+      ref={svgRef}
+      viewBox='4 16 112 110'
+      overflow='visible'
+      className={cn("h-32 w-auto", className)}
+      aria-hidden
+      onHoverStart={onHover}>
       <motion.ellipse
         cx='60'
-        cy='111'
-        rx='30'
-        ry='3.6'
-        fill='#000'
-        opacity={0.35}
+        cy='121'
+        rx='14'
+        ry='2.2'
+        fill={FG}
+        opacity={0.18}
         style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
         initial={false}
         animate={{ scaleX: pose.body.scaleX }}
       />
 
-      {/* Sound rings: a steady pulse while listening (the input sets how
-          bright it is), single bursts on reactions, none when it is dark. */}
+      {/* Sound rings, the one accent colour: a steady pulse while listening
+          (the input sets how bright it is), single bursts on reactions. */}
       <motion.g
         initial={false}
         animate={{ opacity: listening && loops ? 0.25 + level * 0.75 : 1 }}
@@ -783,22 +787,22 @@ export const Echo = ({
             <motion.circle
               key={`l${i}`}
               cx='60'
-              cy='67'
-              r='40'
+              cy='68'
+              r='46'
               fill='none'
               stroke={C.ring}
               strokeWidth={2.4 - i * 0.8}
               style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ scale: [0.9, 1.4], opacity: [0.7, 0] }}
+              animate={{ scale: [0.9, 1.35], opacity: [0.7, 0] }}
               transition={{ duration: 1.3, repeat: Infinity, delay: i * 0.65, ease: "easeOut" }}
             />
           ) : (
             <motion.circle
               key={`r${i}`}
               cx='60'
-              cy='67'
-              r='40'
+              cy='68'
+              r='46'
               fill='none'
               stroke={C.ring}
               strokeWidth={2.4 - i * 0.8}
@@ -818,55 +822,31 @@ export const Echo = ({
               style={origin}
               animate={listening && loops ? { scale: 1 + level * 0.04 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 500, damping: 22 }}>
-              <path d={BODY} fill={C.body} />
-              <g clipPath={`url(#echo-${uid})`}>
-                <path d={SHADE} fill={C.shade} />
-              </g>
-              {/* The rim of light: Echo's one bit of colour, dark when it is. */}
-              <motion.path
-                d={RIM}
-                fill='none'
-                strokeWidth={2.6}
-                strokeLinecap='round'
-                initial={false}
-                animate={{ stroke: pose.lit ? C.rim : C.rimOff, opacity: pose.lit ? 0.95 : 0.8 }}
-                transition={{ duration: 0.4 }}
-              />
-
-              {/* Face: shifts with the gaze so it reads as turning. */}
-              <motion.g initial={false} animate={{ x: pose.look.x, y: pose.look.y }} transition={reduceMotion ? { duration: 0 } : SPRING}>
-                <motion.g animate={gazeCtl}>
-                  <motion.g animate={eyesCtl}>
-                    <motion.g
-                      key={blink}
-                      style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
-                      animate={blink ? { scaleY: [1, 0.12, 1] } : { scaleY: 1 }}
-                      transition={{ duration: 0.18, ease: EASE }}>
-                      <Eye cx={48} shape={pose.eyes} side={-1} spin={loops} talk={talk} />
-                      <Eye cx={72} shape={pose.eyes} side={1} spin={loops} talk={talk} />
+              {/* The face is cut out of the body: the mask is white where the
+                  body shows and black where the eyes are. */}
+              <mask id={maskId} maskUnits='userSpaceOnUse' x='0' y='0' width='120' height='130'>
+                <rect x='0' y='0' width='120' height='130' fill='#fff' />
+                <motion.g initial={false} animate={{ x: pose.look.x, y: pose.look.y }} transition={reduceMotion ? { duration: 0 } : SPRING}>
+                  <motion.g animate={gazeCtl}>
+                    <motion.g animate={eyesCtl}>
+                      <motion.g
+                        key={blink}
+                        style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
+                        animate={blink ? { scaleY: [1, 0.12, 1] } : { scaleY: 1 }}
+                        transition={{ duration: 0.18, ease: EASE }}>
+                        <Eye cx={EYE_L} shape={pose.eyes} side={-1} spin={loops} talk={talk} />
+                        <Eye cx={EYE_R} shape={pose.eyes} side={1} spin={loops} talk={talk} />
+                      </motion.g>
                     </motion.g>
                   </motion.g>
                 </motion.g>
-              </motion.g>
+              </mask>
+              <path d={BODY} fill={FG} mask={`url(#${maskId})`} />
             </motion.g>
             {hands(false)}
           </motion.g>
         </motion.g>
       </motion.g>
-
-      {/* A short-circuit is the one place a second colour shows. */}
-      {loops && mood === "error" && (
-        <motion.path
-          d={RIM}
-          fill='none'
-          stroke={C.warn}
-          strokeWidth={2.6}
-          strokeLinecap='round'
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 1, 0, 0] }}
-          transition={{ duration: 0.5, times: [0, 0.2, 0.5, 1], repeat: Infinity, repeatDelay: 2 }}
-        />
-      )}
     </motion.svg>
   );
 };
@@ -874,15 +854,28 @@ export const Echo = ({
 // ─── Still ────────────────────────────────────────────────────────────────────
 
 /**
- * Echo as a plain, motionless SVG for raster export (the email art). The
+ * Kostek as a plain, motionless SVG for raster export (the email art). The
  * animated figure relies on CSS transform origins, which rasterisers ignore,
- * so here every pose transform is written out as an SVG `transform`.
+ * so every pose transform is written out as an SVG `transform` here, and the
+ * colours are literal (`fg`, `bg` — the face is cut to `bg`).
  */
-export const EchoStill = ({ mood = "idle", lookAt, eyesClosed = false }: { mood?: EchoMood; lookAt?: LookAt; eyesClosed?: boolean }) => {
+export const KostekStill = ({
+  mood = "idle",
+  lookAt,
+  eyesClosed = false,
+  fg = "#FBFBFA",
+  bg = "#0B0D10",
+}: {
+  mood?: KostekMood;
+  lookAt?: LookAt;
+  eyesClosed?: boolean;
+  fg?: string;
+  bg?: string;
+}) => {
   let pose = poseFor(mood, lookAt);
-  if (eyesClosed) pose = { ...pose, eyes: "closed", l: { x: 47, y: 64, r: -15 }, r: { x: 73, y: 64, r: 15 } };
+  if (eyesClosed) pose = { ...pose, eyes: "closed", l: { x: 50, y: 58, r: -15 }, r: { x: 70, y: 58, r: 15 } };
   const b = pose.body;
-  const bodyT = `translate(60 104) rotate(${b.rotate}) scale(${b.scaleX} ${b.scaleY}) translate(-60 -104)`;
+  const bodyT = `translate(60 115) rotate(${b.rotate}) scale(${b.scaleX} ${b.scaleY}) translate(-60 -115)`;
   const eye = (cx: number, side: -1 | 1) => {
     const cy = EYE_Y;
     const pill = PILL[pose.eyes];
@@ -894,68 +887,40 @@ export const EchoStill = ({ mood = "idle", lookAt, eyesClosed = false }: { mood?
           width={pill.w}
           height={pill.h}
           rx={Math.min(pill.w, pill.h) / 2}
-          fill={pose.eyes === "sleepy" ? C.eyeDim : C.eye}
+          fill={bg}
           transform={`rotate(${pill.tilt * -side} ${cx} ${cy + pill.y})`}
         />
       );
     if (pose.eyes === "happy")
-      return <path d={`M${cx - 6},${cy + 3} Q${cx},${cy - 6} ${cx + 6},${cy + 3}`} fill='none' stroke={C.eye} strokeWidth={5} strokeLinecap='round' />;
+      return <path d={`M${cx - 4.6},${cy + 2.6} Q${cx},${cy - 5.4} ${cx + 4.6},${cy + 2.6}`} fill='none' stroke={bg} strokeWidth={3.4} strokeLinecap='round' />;
     if (pose.eyes === "content")
-      return <path d={`M${cx - 5.5},${cy + 3} Q${cx},${cy - 1.5} ${cx + 5.5},${cy + 3}`} fill='none' stroke={C.eye} strokeWidth={4.5} strokeLinecap='round' />;
-    if (pose.eyes === "closed") return <path d={`M${cx - 5},${cy + 2} L${cx + 5},${cy + 2}`} fill='none' stroke={C.eyeDim} strokeWidth={5} strokeLinecap='round' />;
+      return <path d={`M${cx - 4.4},${cy + 2.4} Q${cx},${cy - 1.6} ${cx + 4.4},${cy + 2.4}`} fill='none' stroke={bg} strokeWidth={3.2} strokeLinecap='round' />;
+    if (pose.eyes === "closed") return <path d={`M${cx - 4},${cy + 1.5} L${cx + 4},${cy + 1.5}`} fill='none' stroke={bg} strokeWidth={3.2} strokeLinecap='round' />;
     return (
       <path
-        d={`M${cx},${cy} m-1.5,0 a1.5,1.5 0 1,1 3,0 a3,3 0 1,1 -6,0 a4.5,4.5 0 1,1 9,0`}
+        d={`M${cx},${cy} m-1.2,0 a1.2,1.2 0 1,1 2.4,0 a2.4,2.4 0 1,1 -4.8,0 a3.6,3.6 0 1,1 7.2,0`}
         fill='none'
-        stroke={C.eye}
-        strokeWidth={2.6}
+        stroke={bg}
+        strokeWidth={2.1}
         strokeLinecap='round'
       />
     );
   };
-  const hand = (h: HandPose) => {
-    const shape = h.shape ?? "mitt";
-    return (
-      <g transform={`translate(${h.x} ${h.y}) rotate(${h.r})`}>
-        {shape === "point" && <rect x={3.5} y={-2.2} width={10.5} height={4.4} rx={2.2} fill={C.hand} />}
-        {shape === "thumb" && (
-      // A thumbs-up, not a lone raised finger: a short thumb leaning out from
-      // the top-left of a fist (the curled fingers are marked over the fist).
-      <>
-        <rect x={-7.2} y={-12.5} width={5} height={9} rx={2.5} fill={C.hand} transform='rotate(-24 -4.7 -4)' />
-      </>
-    )}
-        <ellipse cx={0} cy={0} rx={shape === "fist" ? 6.8 : 7.6} ry={shape === "fist" ? 6.4 : 7} fill={C.hand} />
-    {shape === "thumb" && (
-      <g stroke='#272C34' strokeWidth={1.3} strokeLinecap='round'>
-        <path d='M0.5,-1.6 L5.2,-1.6' />
-        <path d='M0.5,1.4 L5.2,1.4' />
-        <path d='M0.8,4.2 L4.6,4.2' />
-      </g>
-    )}
-        <path d={shape === "fist" ? "M-4.2,-3.8 Q0,-6.6 4.2,-3.8" : "M-4.6,-4.2 Q0,-7.2 4.6,-4.2"} fill='none' stroke={pose.lit ? C.handEdge : C.hand} strokeWidth={1.8} strokeLinecap='round' />
-      </g>
-    );
-  };
+  const hand = (h: HandPose) => (
+    <g transform={`translate(${h.x} ${h.y}) rotate(${h.r})`} style={{ ["--mascot-fg" as string]: fg }}>
+      <HandShapes shape={h.shape ?? "mitt"} />
+    </g>
+  );
   return (
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='4 18 112 98' overflow='visible'>
-      <defs>
-        <clipPath id='echo-still'>
-          <path d={BODY} />
-        </clipPath>
-      </defs>
-      <ellipse cx='60' cy='111' rx={30 * b.scaleX} ry='3.6' fill='#000' opacity={0.35} />
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='4 16 112 110' overflow='visible' style={{ ["--mascot-fg" as string]: fg }}>
+      <ellipse cx='60' cy='121' rx={14 * b.scaleX} ry='2.2' fill={fg} opacity={0.18} />
       <g transform={bodyT}>
         {pose.l.behind && hand(pose.l)}
         {pose.r.behind && hand(pose.r)}
-        <path d={BODY} fill={C.body} />
-        <g clipPath='url(#echo-still)'>
-          <path d={SHADE} fill={C.shade} />
-        </g>
-        <path d={RIM} fill='none' stroke={pose.lit ? C.rim : C.rimOff} strokeWidth={2.6} strokeLinecap='round' opacity={pose.lit ? 0.95 : 0.8} />
+        <path d={BODY} fill={fg} />
         <g transform={`translate(${pose.look.x} ${pose.look.y})`}>
-          {eye(48, -1)}
-          {eye(72, 1)}
+          {eye(EYE_L, -1)}
+          {eye(EYE_R, 1)}
         </g>
         {!pose.l.behind && hand(pose.l)}
         {!pose.r.behind && hand(pose.r)}
@@ -967,24 +932,24 @@ export const EchoStill = ({ mood = "idle", lookAt, eyesClosed = false }: { mood?
 // ─── Speech ───────────────────────────────────────────────────────────────────
 
 /**
- * Echo with a speech bubble: the line types itself out while the eyes keep
+ * Kostek with a speech bubble: the line types itself out while the eyes keep
  * time and a hand explains, then it goes quiet. Reduced motion shows the line at once.
  */
-export const EchoSays = ({
+export const KostekSays = ({
   text,
   mood = "idle",
   layout = "row",
   className,
-  echoClassName,
+  kostekClassName,
   bubbleClassName,
   delay = 0.3,
   children,
   ...echoProps
-}: Omit<EchoProps, "talking" | "className"> & {
+}: Omit<KostekProps, "talking" | "className"> & {
   text: string;
   layout?: "row" | "column";
   className?: string;
-  echoClassName?: string;
+  kostekClassName?: string;
   bubbleClassName?: string;
   children?: ReactNode;
 }) => {
@@ -1014,7 +979,7 @@ export const EchoSays = ({
 
   return (
     <div className={cn("flex items-center gap-4", column && "flex-col", className)}>
-      <Echo {...echoProps} mood={mood} talking={talking} className={cn("h-24 shrink-0", echoClassName)} />
+      <Kostek {...echoProps} mood={mood} talking={talking} className={cn("h-24 shrink-0", kostekClassName)} />
       <motion.div
         initial={reduceMotion ? false : { opacity: 0, scale: 0.9, x: column ? 0 : -8, y: column ? -6 : 0 }}
         animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
@@ -1036,10 +1001,11 @@ export const EchoSays = ({
 };
 
 /**
- * Echo's face alone for 16–32 px (header streak chip, small markers). `active`
- * is the streak: eyes and rim lit while it lives, dark and asleep once it breaks.
+ * Kostek's face alone for 16–32 px (header streak chip, small markers): the
+ * pick with its eyes cut out. `active` is the streak — solid while it lives,
+ * faded and asleep once it breaks.
  */
-export const EchoFace = ({
+export const KostekFace = ({
   className,
   active = true,
   asleep = false,
@@ -1049,21 +1015,26 @@ export const EchoFace = ({
   active?: boolean;
   asleep?: boolean;
   title?: string;
-}) => (
-  <svg viewBox='18 26 84 82' className={cn("h-6 w-6", className)} role={title ? "img" : undefined} aria-hidden={title ? undefined : true}>
-    {title && <title>{title}</title>}
-    <path d={BODY} fill='#2A2F37' />
-    <path d={RIM} fill='none' stroke={active ? C.rim : "#3A414A"} strokeWidth={4} strokeLinecap='round' />
-    {asleep ? (
-      <g fill='none' stroke={C.eyeDim} strokeWidth={6} strokeLinecap='round'>
-        <path d='M42 66 L54 66' />
-        <path d='M66 66 L78 66' />
-      </g>
-    ) : (
-      <>
-        <rect x='43.5' y='55' width='9' height='19' rx='4.5' fill={active ? C.eye : C.eyeDim} />
-        <rect x='67.5' y='55' width='9' height='19' rx='4.5' fill={active ? C.eye : C.eyeDim} />
-      </>
-    )}
-  </svg>
-);
+}) => {
+  const id = `kostek-face-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  return (
+    <svg viewBox='18 22 84 96' className={cn("h-6 w-6", className)} role={title ? "img" : undefined} aria-hidden={title ? undefined : true}>
+      {title && <title>{title}</title>}
+      <mask id={id} maskUnits='userSpaceOnUse' x='0' y='0' width='120' height='130'>
+        <rect x='0' y='0' width='120' height='130' fill='#fff' />
+        {asleep ? (
+          <g fill='none' stroke='#000' strokeWidth={6} strokeLinecap='round'>
+            <path d='M43 60 L55 60' />
+            <path d='M65 60 L77 60' />
+          </g>
+        ) : (
+          <>
+            <rect x='45' y='47' width='10' height='22' rx='5' fill='#000' />
+            <rect x='65' y='47' width='10' height='22' rx='5' fill='#000' />
+          </>
+        )}
+      </mask>
+      <path d={BODY} fill={FG} mask={`url(#${id})`} opacity={active ? 1 : 0.45} />
+    </svg>
+  );
+};

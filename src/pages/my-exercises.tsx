@@ -5,7 +5,7 @@ import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
 import { LibrarySortSelect } from "components/LibrarySortSelect/LibrarySortSelect";
 import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
-import { Echo } from "components/Mascot/Echo";
+import { Kostek } from "components/Mascot/Kostek";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LIBRARY_TABS } from "constants/navTabs";
@@ -216,8 +216,8 @@ const MyExercisesPage: NextPageWithLayout = () => {
           }>
           {exercises.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 gap-6 text-center">
-              {/* No exercises of your own: Echo rubs its hands, ready for the first. */}
-              <Echo mood="ready" className="h-24 md:h-36" />
+              {/* No exercises of your own: Kostek rubs its hands, ready for the first. */}
+              <Kostek mood="ready" className="h-24 md:h-36" />
               <div className="space-y-2">
                 <p className="text-zinc-100 font-semibold">{t("my_exercises.empty_title")}</p>
                 <p className="text-zinc-400 text-sm max-w-sm">

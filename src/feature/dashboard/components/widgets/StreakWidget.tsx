@@ -1,5 +1,5 @@
 import { Card } from "assets/components/ui/card";
-import { Echo } from "components/Mascot/Echo";
+import { Kostek } from "components/Mascot/Kostek";
 import { isSameWeek, isYesterday } from "date-fns";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { useTranslation } from "hooks/useTranslation";
@@ -57,9 +57,9 @@ export const StreakWidget = () => {
             {dayWithoutBreak === 1 ? t("streak.day") : t("streak.days")}
           </span>
         </div>
-        {/* The streak keeps Echo awake: a broken one leaves it asleep;
+        {/* The streak keeps Kostek awake: a broken one leaves it asleep;
             the first session after it wakes it up. */}
-        <Echo mood={dayWithoutBreak > 0 ? "idle" : "asleep"} className='-mb-1 h-16 shrink-0' />
+        <Kostek mood={dayWithoutBreak > 0 ? "idle" : "asleep"} className='-mb-1 h-16 shrink-0' />
       </div>
 
       {multiplier > 0 && (

@@ -1,11 +1,11 @@
 import { Button } from "assets/components/ui/button";
-import { EchoSays } from "components/Mascot/Echo";
+import { KostekSays } from "components/Mascot/Kostek";
 import OldEffect from "components/OldEffect";
 import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
 
 /**
- * 404: Echo is the page. It sits puzzled with its rings gone silent, says what happened,
+ * 404: Kostek is the page. It sits puzzled with its rings gone silent, says what happened,
  * and the way back sits right under it; the code itself is only a label.
  */
 const NotFoundLayout = () => {
@@ -19,12 +19,12 @@ const NotFoundLayout = () => {
           <p className='font-teko text-7xl font-bold leading-none text-zinc-100 md:text-8xl'>404</p>
           <p className='text-xs font-semibold tracking-wide text-zinc-400'>{t("page_not_found")}</p>
         </div>
-        <EchoSays
+        <KostekSays
           mood='unplugged'
           text={t("mascot_line")}
           layout='column'
           delay={0.6}
-          echoClassName='h-48 md:h-60'
+          kostekClassName='h-48 md:h-60'
           bubbleClassName='text-base'
         />
         <Button asChild className='h-11 rounded-lg bg-white px-6 font-semibold text-zinc-950 hover:bg-zinc-200'>

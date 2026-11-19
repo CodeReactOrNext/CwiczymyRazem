@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { Echo } from "components/Mascot/Echo";
+import { Kostek } from "components/Mascot/Kostek";
 import { AudioSelect } from "feature/toneStudio/components/AudioSelect";
 import type { AudioInitFailure, AudioRefs, WebAudioInput } from "hooks/useAudioAnalyzer";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
@@ -359,11 +359,11 @@ export const SetupStep = React.memo(function SetupStep({
       </div>
 
       <div className="flex w-full flex-1 flex-col gap-6 overflow-y-auto">
-        {/* Echo tells the state of the input at a glance: puzzled before
+        {/* Kostek tells the state of the input at a glance: puzzled before
             listening (or when nothing comes in for a while), ears up while
             listening, and a burst of rings once the guitar is heard. */}
         <div className="flex justify-center shortwide:hidden">
-          <Echo
+          <Kostek
             mood={heard ? "plugIn" : isListening && !showHelp ? "listen" : "unplugged"}
             lookAt="down"
             className="h-20 sm:h-24"

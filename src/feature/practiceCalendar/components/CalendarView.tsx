@@ -1,7 +1,7 @@
 import { Button, buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
-import { Echo } from "components/Mascot/Echo";
+import { Kostek } from "components/Mascot/Kostek";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LIBRARY_TABS } from "constants/navTabs";
@@ -393,8 +393,8 @@ export const CalendarView = () => {
           />
         ) : weekIsEmpty ? (
           <section className='flex flex-col items-start gap-6 rounded-lg bg-zinc-900/40 p-6 sm:flex-row sm:items-center sm:p-8'>
-            {/* An empty week: Echo points at the plan beside it. */}
-            <Echo mood='nudge' lookAt='right' className='h-20 shrink-0 md:h-28' />
+            {/* An empty week: Kostek points at the plan beside it. */}
+            <Kostek mood='nudge' lookAt='right' className='h-20 shrink-0 md:h-28' />
             <div className='min-w-0 flex-1'>
               <p className='text-base font-semibold text-zinc-100'>
                 {t("empty.title")}

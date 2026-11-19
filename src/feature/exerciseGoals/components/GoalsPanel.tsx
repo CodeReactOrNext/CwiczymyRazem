@@ -1,5 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import { Echo } from "components/Mascot/Echo";
+import { Kostek } from "components/Mascot/Kostek";
 import { useTranslation } from "hooks/useTranslation";
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -114,8 +114,8 @@ export const GoalsPanel = ({
     <div className='space-y-12 px-3 py-6 md:px-6 md:py-8 lg:px-8'>
       {goals.length === 0 ? (
         <div className='flex flex-col items-center justify-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-          {/* No goals: Echo rubs its hands, ready to aim at one. */}
-          <Echo mood='ready' className='mb-4 h-24 md:h-36' />
+          {/* No goals: Kostek rubs its hands, ready to aim at one. */}
+          <Kostek mood='ready' className='mb-4 h-24 md:h-36' />
           <p className='text-base font-semibold text-zinc-100'>
             {t("empty.title")}
           </p>

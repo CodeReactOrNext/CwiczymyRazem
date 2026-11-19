@@ -7,7 +7,7 @@ import {
 import { cn } from "assets/lib/utils";
 import type { GlobalSearchResult } from "components/GlobalSearch/useGlobalSearch";
 import { useGlobalSearch } from "components/GlobalSearch/useGlobalSearch";
-import { Echo } from "components/Mascot/Echo";
+import { Kostek } from "components/Mascot/Kostek";
 import { useTranslation } from "hooks/useTranslation";
 import {
   ClipboardList,
@@ -172,8 +172,8 @@ export const GlobalSearch = () => {
             )}
             {hasQuery && results.length === 0 && !isLoading && (
               <div className='flex flex-col items-center gap-3 px-3 py-8 text-center'>
-                {/* Nothing turned up: Echo looks left and right for it. */}
-                <Echo mood='lookAround' className='h-16 md:h-24' />
+                {/* Nothing turned up: Kostek looks left and right for it. */}
+                <Kostek mood='lookAround' className='h-16 md:h-24' />
                 <p className='text-sm text-zinc-500'>
                   {t("search.no_results", { query: query.trim() })}
                 </p>

@@ -432,6 +432,8 @@ button,
    that palette: shadcn tokens, the themer tokens, the scrollbar and raw CSS.
    Same selector as the palette — the class alone does nothing on public pages. */
 html.theme-light:has([data-app-shell]) {
+  /* Kostek, the mascot: off-white on dark, ink on light (its eyes are cut-outs). */
+  --mascot-fg: #18181b;
   color-scheme: light;
   color: #18181b;
   background-color: #eaeaed;
