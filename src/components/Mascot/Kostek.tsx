@@ -62,6 +62,14 @@ type LookAt = "left" | "right" | "up" | "down";
  * CSS variable so the light theme turns it dark (see globals.css).
  */
 const FG = "var(--mascot-fg, #FBFBFA)";
+/**
+ * One shade step of the same colour, for volume: a crescent along the pick's
+ * right and lower edge and the underside of the mitts. Still flat — no
+ * gradients — just the way a printed sticker gets a second ink.
+ */
+const SHADE = "var(--mascot-shade, #DCDCD6)";
+/** The crescent of shade, clipped to the body. */
+const SHADE_PATH = "M84 31 C95 37 98.1 45 98.1 52.9 C98.1 77 69.3 115.1 60 115.1 C67 108 85 85 89 62 C91 50 90 39 84 31 Z";
 const C = {
   ring: "#22D3EE",
 };
@@ -178,12 +186,16 @@ const HandShapes = ({ shape }: { shape: HandShape }) => (
     {shape === "horns" ? (
       // Rock on: a rounded fist with two fingers up.
       <>
-        <rect x={-7} y={-5} width={14} height={11.5} rx={4.6} fill={FG} />
+        <rect x={-7} y={-5} width={14} height={11.5} rx={4.6} fill={SHADE} />
+        <rect x={-7} y={-5} width={13} height={10.5} rx={4.4} fill={FG} />
         <rect x={-7} y={-15.5} width={4} height={13} rx={2} fill={FG} />
         <rect x={3} y={-15.5} width={4} height={13} rx={2} fill={FG} />
       </>
     ) : (
-      <circle cx={0} cy={0} r={shape === "fist" ? HAND_R - 0.4 : HAND_R} fill={FG} />
+      <>
+        <circle cx={0} cy={0} r={shape === "fist" ? HAND_R - 0.4 : HAND_R} fill={SHADE} />
+        <circle cx={-0.9} cy={-0.9} r={(shape === "fist" ? HAND_R - 0.4 : HAND_R) - 0.9} fill={FG} />
+      </>
     )}
   </>
 );
@@ -764,17 +776,10 @@ export const Kostek = ({
       className={cn("h-32 w-auto", className)}
       aria-hidden
       onHoverStart={onHover}>
-      <motion.ellipse
-        cx='60'
-        cy='121'
-        rx='14'
-        ry='2.2'
-        fill={FG}
-        opacity={0.18}
-        style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
-        initial={false}
-        animate={{ scaleX: pose.body.scaleX }}
-      />
+      <motion.g style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }} initial={false} animate={{ scaleX: pose.body.scaleX }}>
+        <ellipse cx='60' cy='121' rx='18' ry='2.8' fill={FG} opacity={0.1} />
+        <ellipse cx='60' cy='120.6' rx='9' ry='1.6' fill='#000' opacity={0.35} />
+      </motion.g>
 
       {/* Sound rings, the one accent colour: a steady pulse while listening
           (the input sets how bright it is), single bursts on reactions. */}
@@ -841,7 +846,13 @@ export const Kostek = ({
                   </motion.g>
                 </motion.g>
               </mask>
-              <path d={BODY} fill={FG} mask={`url(#${maskId})`} />
+              <clipPath id={`${maskId}-body`}>
+                <path d={BODY} />
+              </clipPath>
+              <g mask={`url(#${maskId})`}>
+                <path d={BODY} fill={FG} />
+                <path d={SHADE_PATH} fill={SHADE} clipPath={`url(#${maskId}-body)`} />
+              </g>
             </motion.g>
             {hands(false)}
           </motion.g>
@@ -864,12 +875,14 @@ export const KostekStill = ({
   lookAt,
   eyesClosed = false,
   fg = "#FBFBFA",
+  shade = "#DCDCD6",
   bg = "#0B0D10",
 }: {
   mood?: KostekMood;
   lookAt?: LookAt;
   eyesClosed?: boolean;
   fg?: string;
+  shade?: string;
   bg?: string;
 }) => {
   let pose = poseFor(mood, lookAt);
@@ -907,17 +920,22 @@ export const KostekStill = ({
     );
   };
   const hand = (h: HandPose) => (
-    <g transform={`translate(${h.x} ${h.y}) rotate(${h.r})`} style={{ ["--mascot-fg" as string]: fg }}>
+    <g transform={`translate(${h.x} ${h.y}) rotate(${h.r})`} style={{ ["--mascot-fg" as string]: fg, ["--mascot-shade" as string]: shade }}>
       <HandShapes shape={h.shape ?? "mitt"} />
     </g>
   );
   return (
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='4 16 112 110' overflow='visible' style={{ ["--mascot-fg" as string]: fg }}>
-      <ellipse cx='60' cy='121' rx={14 * b.scaleX} ry='2.2' fill={fg} opacity={0.18} />
+      <clipPath id='kostek-still-body'>
+        <path d={BODY} />
+      </clipPath>
+      <ellipse cx='60' cy='121' rx={18 * b.scaleX} ry='2.8' fill={fg} opacity={0.1} />
+      <ellipse cx='60' cy='120.6' rx={9 * b.scaleX} ry='1.6' fill='#000' opacity={0.35} />
       <g transform={bodyT}>
         {pose.l.behind && hand(pose.l)}
         {pose.r.behind && hand(pose.r)}
         <path d={BODY} fill={fg} />
+        <path d={SHADE_PATH} fill={shade} clipPath='url(#kostek-still-body)' />
         <g transform={`translate(${pose.look.x} ${pose.look.y})`}>
           {eye(EYE_L, -1)}
           {eye(EYE_R, 1)}
@@ -1034,7 +1052,13 @@ export const KostekFace = ({
           </>
         )}
       </mask>
-      <path d={BODY} fill={FG} mask={`url(#${id})`} opacity={active ? 1 : 0.45} />
+      <clipPath id={`${id}-body`}>
+        <path d={BODY} />
+      </clipPath>
+      <g mask={`url(#${id})`} opacity={active ? 1 : 0.45}>
+        <path d={BODY} fill={FG} />
+        <path d={SHADE_PATH} fill={SHADE} clipPath={`url(#${id}-body)`} />
+      </g>
     </svg>
   );
 };

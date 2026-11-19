@@ -434,6 +434,7 @@ button,
 html.theme-light:has([data-app-shell]) {
   /* Kostek, the mascot: off-white on dark, ink on light (its eyes are cut-outs). */
   --mascot-fg: #18181b;
+  --mascot-shade: #0b0b0d;
   color-scheme: light;
   color: #18181b;
   background-color: #eaeaed;
