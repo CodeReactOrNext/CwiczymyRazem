@@ -25,6 +25,11 @@ const MOODS: EchoMood[] = [
   "sad",
   "surprised",
   "think",
+  "wave",
+  "approve",
+  "chill",
+  "wait",
+  "ready",
 ];
 
 describe("Echo", () => {
@@ -39,6 +44,7 @@ describe("Echo", () => {
     const { rerender, unmount } = render(<Echo mood='asleep' />);
     rerender(<Echo mood='celebrate' />);
     rerender(<Echo mood='idle' talking lively arrive />);
+    rerender(<Echo mood='wave' eyesClosed />);
     expect(() => unmount()).not.toThrow();
   });
 

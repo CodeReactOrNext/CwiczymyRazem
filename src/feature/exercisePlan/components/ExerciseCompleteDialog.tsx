@@ -49,7 +49,7 @@ export const ExerciseCompleteDialog = ({
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", duration: 0.5 }}
                 onAnimationComplete={handleConfetti}>
-                <Echo mood='celebrate' short delay={0.2} className='h-24' />
+                <Echo mood='approve' delay={0.2} className='h-24' />
               </motion.div>
               <span>{t("exercise_complete.title")}</span>
             </div>

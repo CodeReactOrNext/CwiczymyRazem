@@ -151,7 +151,7 @@ const FavoritesPage: NextPageWithLayout = () => {
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center rounded-lg bg-zinc-900/30 px-6 py-12 text-center md:py-20">
             {/* Nothing saved: Echo looks around for something to keep. */}
-            <Echo mood="lookAround" className="mb-4 h-24" />
+            <Echo mood="lookAround" className="mb-4 h-24 md:h-36" />
             <p className="text-base font-semibold text-zinc-100">
               {t("library:favorites.empty_title")}
             </p>

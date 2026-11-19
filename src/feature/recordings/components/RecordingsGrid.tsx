@@ -59,7 +59,7 @@ export const RecordingsGrid = ({
     return (
       <div className='flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
         {/* Nothing recorded: Echo is all ears for the first take. */}
-        <Echo mood='listen' className='h-24' />
+        <Echo mood='listen' className='h-24 md:h-36' />
         <h3 className='text-lg font-bold text-zinc-100'>{t("grid.empty_title")}</h3>
         <p className='text-sm text-zinc-400'>
           {t("grid.empty_body")}

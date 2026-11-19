@@ -53,7 +53,7 @@ class ErrorBoundary extends Component<Props, State> {
           <div className="max-w-md w-full space-y-8 animate-in fade-in duration-base">
             <div className="space-y-4">
               {/* Echo short-circuits: spiral eyes, fizzing sparks, a nervous shake. */}
-              <Echo mood="error" className="h-28" />
+              <Echo mood="error" className="h-28 md:h-40" />
               <h1 className="text-2xl font-bold tracking-tight">This screen crashed</h1>
               <p className="text-zinc-400">
                 The error was reported to us automatically. Reloading brings the

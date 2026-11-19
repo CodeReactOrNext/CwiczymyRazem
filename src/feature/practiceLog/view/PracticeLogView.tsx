@@ -126,8 +126,8 @@ export const PracticeLogView = () => {
         </div>
       ) : !hasAnySessions ? (
         <div className='flex flex-col items-center gap-4 py-24 text-center'>
-          {/* No sessions yet: lamps on standby, waiting for the first one. */}
-          <Echo mood='standby' className='h-24' />
+          {/* No sessions yet: Echo drums its fingers, waiting for the first one. */}
+          <Echo mood='wait' className='h-24 md:h-36' />
           <div className='space-y-1'>
             <p className='text-sm font-medium text-zinc-200'>
               {t("page.empty")}

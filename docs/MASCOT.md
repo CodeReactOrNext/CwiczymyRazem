@@ -6,7 +6,7 @@
 > Echo zastąpiła wcześniejszą maskotkę-wzmacniacz „Riff” — pliki w [docs/mascot/](mascot/) to
 > szkice tamtej postaci, zostają jako historia.
 
-Echo to ciemny kamyk w kolorze aplikacji z dwojgiem świecących oczu i jednym cyjanowym refleksem (styl „Noir”). Celowo bez buzi, rumieńców i naklejek — ma być spokojna i dorosła, nie dziecinna. Ten plik mówi, jak wygląda, jak się rusza, gdzie ją
+Echo to ciemny kamyk w kolorze aplikacji z dwojgiem świecących oczu, jednym cyjanowym refleksem i dwiema małymi „pływającymi” dłońmi (styl „Noir”). Celowo bez buzi, rumieńców i naklejek — ma być spokojna i dorosła, nie dziecinna. Ten plik mówi, jak wygląda, jak się rusza, gdzie ją
 pokazujemy i czego jej nie dorabiamy.
 
 ## 1. Kim jest
@@ -17,16 +17,17 @@ pokazujemy i czego jej nie dorabiamy.
 
 ## 2. Budowa
 
-Rysowana w układzie 100 × 98 (viewBox `10 18 100 98`). Dokładnie te części, żadnych nowych:
+Rysowana w układzie 112 × 98 (viewBox `4 18 112 98`, z miejscem na dłonie). Dokładnie te części, żadnych nowych:
 
 | Część | Rola |
 |---|---|
 | Ciało | jeden zaokrąglony kształt w grafitowym kolorze aplikacji, jeden ciemniejszy cień (prawy dół) |
 | Refleks | cyjanowy łuk na lewej górnej krawędzi; gaśnie, gdy Echo jest „bez energii” (sen, dzień wolny, cisza) |
 | Oczy | dwie świecące cyjanowe kreski; emocję niesie ich wysokość, pochylenie albo zamiana na łuki / linie / spiralki |
+| Dłonie | dwie małe rękawice bez ramion, w kolorze ciała; kształty: dłoń, pięść, palec wskazujący, kciuk w górę |
 | Fale dźwięku | cienkie cyjanowe okręgi: słuchanie, reakcje, mówienie |
 
-Echo nie ma buzi, rąk, nóg, policzków ani ubrań. Nie dokładamy iskierek, „z”, znaków zapytania itp.
+Echo nie ma buzi, ramion, nóg, policzków ani ubrań. Nie dokładamy iskierek, „z”, znaków zapytania itp.
 Jedyny drugi kolor to złoty błysk refleksu przy awarii.
 
 ## 3. Reguły rysunku
@@ -34,7 +35,8 @@ Jedyny drugi kolor to złoty błysk refleksu przy awarii.
 1. **Płaskie kolory:** grafit ciała, ciemniejszy cień, cyjan oczu i refleksu, przygaszony cyjan
    oczu przy zmęczeniu. Bez gradientów, obrysów, tekstur i połysków.
 2. **Światło = energia.** Oczy i refleks świecą, gdy Echo jest aktywna; przygasają, gdy nie.
-3. **Jeden kształt ciała.** Stany zmieniają przechylenie, ściśnięcie i oczy — nigdy obrys ciała.
+3. **Jeden kształt ciała.** Stany zmieniają przechylenie, ściśnięcie, oczy i dłonie — nigdy obrys ciała.
+   Dłonie są sprężynami: dochodzą do pozy z lekkim opóźnieniem i dobiciem, więc każdy ruch się nakłada.
 4. **Ikona 16–32 px** to osobny, uproszczony rysunek: `EchoFace` (ciało, refleks, oczy).
 5. **Żadnych kostiumów** (czapki, okulary, wersje świąteczne) bez decyzji właściciela.
 
@@ -47,26 +49,31 @@ przerwana. Widżet serii na dashboardzie: Echo nie śpi, dopóki seria trwa.
 
 | Stan | Twarz i ciało | Efekt | Gdzie |
 |---|---|---|---|
-| `idle` | oczy-kreski, ledwie oddycha, mruga; z `lively` rzadko zerka, przechyla się, puszcza falę | — | domyślnie, logowanie, podsumowanie |
-| `celebrate` | oczy-łuki, dwa sprężyste podskoki | fale | po sesji, rekord, 3 gwiazdki |
-| `hop` | jeden podskok, oczy-łuki | fala | zaliczone ćwiczenie |
-| `levelUp` | przysiad, obrót w powietrzu | fale | nowy poziom |
-| `asleep` | zamknięte oczy (przygaszone linie), refleks zgaszony, przechylona | — | przerwana seria, puste powiadomienia, puste krzesło |
-| `standby` | oczy w pół, przygaszona | — | dzień wolny, pusty dziennik |
-| `focus` | zmrużone oczy, przysiad, sprężyste kiwanie | — | boss, puste cele |
-| `nudge` | przechylona w stronę `lookAt`, co chwilę zaczepia | — | zachęta do akcji obok |
-| `shrug` | wzrok w bok, kołysze się | — | „za krótko”, pusta kolekcja |
-| `dizzy` | spiralki zamiast oczu, chwieje się | — | przegrana z bossem |
-| `lookAround` | wzrok i ciało na boki | — | brak wyników, szukanie, ulubione |
-| `warmup` | światło powoli narasta i opada | wolne fale | ładowanie sesji |
-| `unplugged` | smutne, pochylone oczy, refleks zgaszony, patrzy w dół | — | 404, brak mikrofonu |
-| `plugIn` | światło zapala się z mignięciem, podskok | fale | sygnał złapany, moje ćwiczenia |
-| `error` | spiralki, światło migocze, nerwowe drżenie | złoty błysk refleksu | ekran awarii |
-| `listen` | wzrok w górę, pulsuje z sygnałem (`signal`) | fale wg sygnału | kalibracja, puste nagrania |
-| `sad` / `surprised` / `think` | smutek / zaskoczenie / namysł | — | rezerwowe |
+| `idle` | oczy-kreski, oddycha i lekko się kołysze, dłonie unoszą się; z `lively` zerka, macha, przeciąga się; `arrive` — wskakuje i macha | — | domyślnie, logowanie, podsumowanie |
+| `celebrate` | oczy-łuki, dwa podskoki, dłonie w górze pompują na zmianę | fale | po sesji, rekord, 3 gwiazdki |
+| `hop` | jeden podskok, dłonie podrywają się | fala | rezerwowe |
+| `levelUp` | przysiad, obrót w powietrzu, pięści w górę | fale | nowy poziom |
+| `approve` | oczy-łuki, kciuk w górę z kiwnięciem | — | zaliczone ćwiczenie, koniec ćwiczenia |
+| `wave` | macha dłonią | — | pusty czat (powitanie) |
+| `asleep` | zamknięte oczy, refleks zgaszony, dłonie opadłe | — | przerwana seria, puste krzesło |
+| `chill` | zadowolone oczy, odchylona, dłonie za głową | — | dzień wolny, puste powiadomienia |
+| `standby` | oczy w pół, przygaszona | — | rezerwowe |
+| `wait` | stuka palcami, zerka w bok, wzdycha | — | pusty dziennik, szukanie przeciwnika |
+| `ready` | zaciera dłonie, podryguje | — | puste cele, moje ćwiczenia |
+| `focus` | zmrużone oczy, przysiad, pięści w gardzie | — | boss |
+| `nudge` | wskazuje palcem w stronę `lookAt`, stuka nim | — | aktualizacja, blokada funkcji, kalendarz |
+| `shrug` | dłonie do góry, wzrusza się | — | „za krótko”, pusta kolekcja |
+| `dizzy` | spiralki, chwieje się, dłonie latają | — | przegrana z bossem |
+| `lookAround` | dłoń nad oczami, wzrok i ciało na boki | — | brak wyników, ulubione |
+| `warmup` | światło narasta i opada, rozciera dłonie | wolne fale | ładowanie sesji |
+| `unplugged` | smutne oczy, refleks zgaszony, drapie się po głowie | — | 404, brak mikrofonu |
+| `plugIn` | światło zapala się, podskok z dłońmi w górze | fale | sygnał złapany |
+| `error` | spiralki, łapie się za głowę, światło migocze | złoty błysk refleksu | ekran awarii |
+| `listen` | dłoń przy „uchu”, pulsuje z sygnałem (`signal`) | fale wg sygnału | kalibracja, puste nagrania |
+| `sad` / `surprised` / `think` | smutek / zaskoczenie (dłonie przy twarzy) / namysł (dłoń pod brodą) | — | rezerwowe |
 
-Dodatkowo: `eyesClosed` (zamknięte oczy przy wpisywaniu hasła), `talking` (oczy pulsują w sylabach,
-słaba fala trzyma rytm), `lookAt` (kierunek wzroku i przechylenia), `short` (jeden podskok zamiast całej
+Dodatkowo: `eyesClosed` (zasłania oczy dłońmi przy wpisywaniu hasła), `talking` (oczy pulsują w sylabach,
+dłoń gestykuluje, słaba fala trzyma rytm), `lookAt` (kierunek wzroku i przechylenia), `short` (jeden podskok zamiast całej
 radości), `arrive` (wskoczenie przy pojawieniu się).
 
 Nowy stan najpierw trafia do tej tabeli, potem do kodu.

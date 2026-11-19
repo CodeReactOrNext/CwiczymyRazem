@@ -173,7 +173,7 @@ export const GlobalSearch = () => {
             {hasQuery && results.length === 0 && !isLoading && (
               <div className='flex flex-col items-center gap-3 px-3 py-8 text-center'>
                 {/* Nothing turned up: Echo looks left and right for it. */}
-                <Echo mood='lookAround' className='h-16' />
+                <Echo mood='lookAround' className='h-16 md:h-24' />
                 <p className='text-sm text-zinc-500'>
                   {t("search.no_results", { query: query.trim() })}
                 </p>

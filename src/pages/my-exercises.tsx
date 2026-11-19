@@ -216,8 +216,8 @@ const MyExercisesPage: NextPageWithLayout = () => {
           }>
           {exercises.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 gap-6 text-center">
-              {/* No exercises of your own: Echo lights up, ready for the first. */}
-              <Echo mood="plugIn" className="h-24" />
+              {/* No exercises of your own: Echo rubs its hands, ready for the first. */}
+              <Echo mood="ready" className="h-24 md:h-36" />
               <div className="space-y-2">
                 <p className="text-zinc-100 font-semibold">{t("my_exercises.empty_title")}</p>
                 <p className="text-zinc-400 text-sm max-w-sm">

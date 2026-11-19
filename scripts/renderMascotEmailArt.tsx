@@ -11,7 +11,7 @@
  * and looping effects do not exist in a still, so the extras a pose needs to
  * read (sound rings, the podium) are drawn here.
  */
-import { Echo, type EchoMood } from "components/Mascot/Echo";
+import { type EchoMood, EchoStill } from "components/Mascot/Echo";
 import { renderToStaticMarkup } from "react-dom/server";
 import sharp from "sharp";
 
@@ -47,10 +47,10 @@ const ARTS: Art[] = [
 ];
 
 const render = async ({ file, mood, back = "", front = "", box = { x: 600, y: 315, h: 420 } }: Art) => {
-  // The figure's viewBox is 100 × 98; scale it to the requested height.
-  const w = (box.h * 100) / 98;
-  const echo = renderToStaticMarkup(<Echo mood={mood} lookAt='left' className='' />)
-    .replace(/class="[^"]*"/, "")
+  // The figure's viewBox is 112 × 98; scale it to the requested height.
+  const w = (box.h * 112) / 98;
+  const echo = renderToStaticMarkup(<EchoStill mood={mood} lookAt='left' />)
+    .replace(' xmlns="http://www.w3.org/2000/svg"', "")
     .replace("<svg", `<svg x="${box.x - w / 2}" y="${box.y - box.h / 2}" height="${box.h}" width="${w}"`);
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">

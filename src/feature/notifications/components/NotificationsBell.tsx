@@ -418,7 +418,7 @@ export const NotificationsBell = () => {
             </div>
           ) : notifications.length === 0 ? (
             <div className='flex flex-col items-center gap-4 px-6 pb-14 pt-10 text-center'>
-              <Echo mood='asleep' className='h-16' />
+              <Echo mood='chill' className='h-16 md:h-20' />
               <div>
                 <p className='text-sm font-medium text-zinc-200'>
                   {t("bell.empty_title")}

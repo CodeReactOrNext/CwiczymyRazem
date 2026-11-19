@@ -20,7 +20,7 @@ export function MicErrorScreen({ reason, onRetry, onCancel }: MicErrorScreenProp
       <div className="flex h-full items-center justify-center px-6 text-white">
         <div className="max-w-sm w-full text-center space-y-6">
           {/* The input would not open: Echo hears nothing, rings silent, puzzled. */}
-          <Echo mood="unplugged" className="mx-auto h-24" />
+          <Echo mood="unplugged" className="mx-auto h-24 md:h-32" />
           <div className="space-y-2">
             <p className="text-lg font-semibold">{t(`error.reasons.${reason}.title`)}</p>
             <p className="text-sm leading-relaxed text-zinc-300">

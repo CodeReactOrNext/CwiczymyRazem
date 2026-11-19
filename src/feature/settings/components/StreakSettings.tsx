@@ -48,9 +48,9 @@ export const StreakSettings = () => {
       </CardHeader>
       <CardContent>
         <div className='flex items-center justify-between gap-6 rounded-lg bg-zinc-900/40 px-4 py-3'>
-          {/* With the rest day on, Echo shows what it means: on standby — dimmed,
-              eyes half shut, but not asleep. */}
-          <Echo mood={enabled ? "standby" : "idle"} className='hidden h-14 shrink-0 sm:block' />
+          {/* With the rest day on, Echo shows what it means: kicking back, hands
+              behind its head, content — resting, not gone. */}
+          <Echo mood={enabled ? "chill" : "idle"} className='hidden h-14 shrink-0 sm:block' />
           <div className='min-w-0 flex-1'>
             <p className='text-sm font-semibold text-zinc-200'>
               {t("streak.label")}
