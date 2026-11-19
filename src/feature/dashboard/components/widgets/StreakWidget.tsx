@@ -1,4 +1,5 @@
 import { Card } from "assets/components/ui/card";
+import { Riff } from "components/Mascot/Riff";
 import { isSameWeek, isYesterday } from "date-fns";
 import { useDashboardData } from "feature/dashboard/context/DashboardContext";
 import { useTranslation } from "hooks/useTranslation";
@@ -47,13 +48,18 @@ export const StreakWidget = () => {
         title={t("streak.title")}
       />
 
-      <div className='flex items-baseline gap-2'>
-        <span className='text-4xl font-bold tabular-nums text-white'>
-          {dayWithoutBreak}
-        </span>
-        <span className='text-sm text-zinc-400'>
-          {dayWithoutBreak === 1 ? t("streak.day") : t("streak.days")}
-        </span>
+      <div className='flex items-end justify-between gap-4'>
+        <div className='flex items-baseline gap-2'>
+          <span className='text-4xl font-bold tabular-nums text-white'>
+            {dayWithoutBreak}
+          </span>
+          <span className='text-sm text-zinc-400'>
+            {dayWithoutBreak === 1 ? t("streak.day") : t("streak.days")}
+          </span>
+        </div>
+        {/* The lamp is the streak: a broken one leaves Riff cold and asleep;
+            the first session after it wakes him up. */}
+        <Riff mood={dayWithoutBreak > 0 ? "idle" : "asleep"} className='-mb-1 h-16 shrink-0' />
       </div>
 
       {multiplier > 0 && (

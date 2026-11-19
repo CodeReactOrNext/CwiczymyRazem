@@ -34,6 +34,7 @@
     "collecting": "Recogiendo...",
     "collect": "Recoger la guitarra",
     "collected": "Recogida",
+    "moment": "¡La guitarra es tuya!",
     "steps": "{{done}}/{{total}} pasos"
   },
   "path": {

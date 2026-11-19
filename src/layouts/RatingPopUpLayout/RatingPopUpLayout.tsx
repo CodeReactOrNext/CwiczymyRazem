@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
+import { Riff } from "components/Mascot/Riff";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { TIME_POINTS_VALUE } from "constants/ratingValue";
 import type { AchievementList } from "feature/achievements";
@@ -12,9 +13,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import { playUiSound } from "lib/uiSounds/uiSounds";
-import { ArrowRight, Brain, Ear, Flame, Hand, Music, NotebookPen, RotateCcw, Sparkles, Timer, Trophy } from "lucide-react";
+import { ArrowRight, Brain, Ear, Flame, Hand, Music, NotebookPen, RotateCcw, Sparkles, Trophy } from "lucide-react";
 import Router from "next/router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Area, AreaChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ReferenceLine, ResponsiveContainer, XAxis,
 } from "recharts";
@@ -27,6 +29,7 @@ import {
 
 import { RecentRunsCard } from "./components/RecentRunsCard";
 import { RewardBreakdown } from "./components/RewardBreakdown";
+import { RIFF_LAYOUT_ID, SessionCelebration } from "./components/SessionCelebration";
 import { SessionLeaderboardCard } from "./components/SessionLeaderboardCard";
 import { SessionNoteForm } from "./components/SessionNoteForm";
 import { useRatingPopUp } from "./hooks/useRatingPopUp";
@@ -39,6 +42,8 @@ import { buildFameBreakdown, buildPointsBreakdown } from "./utils/rewardBreakdow
 // ─────────────────────────────────────────────────────────────────────────────
 
 const MIN = 60 * 1000;
+// Streak lengths worth a headline of their own on the celebration screen.
+const STREAK_MILESTONES = [7, 30, 100, 365];
 const DAILY_GOAL_MIN = 30; // goal line on the weekly chart
 // Time points are floor(ms × TIME_POINTS_VALUE), so this is the practice time the
 // *first* point actually costs (~3min). Derived from the rate in
@@ -143,6 +148,8 @@ const RatingPopUpLayout = ({
   // the whole reason the breakdown exists. See `utils/rewardBreakdown`.
   const fame = ratingData.fameEarned ?? 0;
   const isRest = ratingData.totalPoints <= 0;
+  // A session that earned something opens on the full-screen celebration first.
+  const [celebrating, setCelebrating] = useState(!isRest);
 
   const handleContinue = () => (onClick ? onClick(false) : Router.push("/dashboard"));
 
@@ -304,9 +311,8 @@ const RatingPopUpLayout = ({
         <div className="relative overflow-hidden rounded-lg bg-zinc-900/60 px-7 py-16 text-center md:px-10">
           <HeroPattern className="opacity-[0.03]" maskImage="radial-gradient(ellipse at top, black 10%, transparent 70%)" />
           <div className="relative flex flex-col items-center gap-5">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800 text-zinc-400">
-              <Timer className="h-7 w-7" />
-            </div>
+            {/* Nothing counted: Riff glances aside and shrugs — no blame, just "not yet". */}
+            <Riff mood="shrug" lookAt="left" delay={0.3} className="h-28" />
 
             <div className="flex flex-col items-center gap-3">
               <p className="text-xl font-semibold text-zinc-100">{t("no_points_title")}</p>
@@ -372,6 +378,15 @@ const RatingPopUpLayout = ({
             <HeroPattern className="opacity-[0.035]" maskImage="radial-gradient(ellipse at top, black 10%, transparent 70%)" />
 
             <div className="relative">
+              {/* The slot keeps its height while the celebration is up, so the
+                  card does not jump when Riff flies in from it. */}
+              <div className="mx-auto mb-4 flex h-28 justify-center md:h-32">
+                {!celebrating && (
+                  <motion.div layoutId={RIFF_LAYOUT_ID} transition={{ type: "spring", stiffness: 140, damping: 20 }}>
+                    <Riff lively arrive className="h-28 md:h-32" />
+                  </motion.div>
+                )}
+              </div>
               <p className="text-sm font-medium text-zinc-400">{t("great_progress")}</p>
 
               {/* The two rewards stand side by side once there is room: stacked,
@@ -698,9 +713,40 @@ const RatingPopUpLayout = ({
     </motion.div>
   );
 
-  if (hideWrapper) return content;
+  // Portalled to <body> so no transformed ancestor can trap the fixed overlay.
+  const celebration =
+    typeof document !== "undefined" &&
+    createPortal(
+      <AnimatePresence>
+        {celebrating && (
+          <SessionCelebration
+            points={ratingData.totalPoints}
+            fame={fame}
+            streak={streak}
+            levelUp={isGetNewLevel}
+            streakMilestone={STREAK_MILESTONES.includes(streak) && streak > (previousUserStats.actualDayWithoutBreak ?? 0)}
+            onDone={() => setCelebrating(false)}
+          />
+        )}
+      </AnimatePresence>,
+      document.body,
+    );
 
-  return <MainContainer noBorder>{content}</MainContainer>;
+  if (hideWrapper) {
+    return (
+      <>
+        {celebration}
+        {content}
+      </>
+    );
+  }
+
+  return (
+    <>
+      {celebration}
+      <MainContainer noBorder>{content}</MainContainer>
+    </>
+  );
 };
 
 // ─── Achievements (reuses the real AchievementCard) ───────────────────────────

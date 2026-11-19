@@ -1,3 +1,4 @@
+import { Riff } from "components/Mascot/Riff";
 import { motion } from "framer-motion";
 import { Guitar, Headphones, Music } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -129,18 +130,20 @@ export const PracticeLoadingScreen = ({ isReady, steps = [], onDone }: PracticeL
         transition={{ duration: 0.35, ease: "easeIn" }}
       />
 
-      {/* What is still loading, above the seam; fades as the doors part */}
-      {steps.length > 0 && (
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center"
-          animate={{ opacity: revealing ? 0 : 1 }}
-          transition={{ duration: 0.2 }}
-        >
+      {/* Riff warming his valves up on the seam, and what is still loading
+          under him; both go as the doors part. */}
+      <motion.div
+        className="absolute inset-0 flex flex-col items-center justify-center gap-6"
+        animate={{ opacity: revealing ? 0 : 1, scale: revealing ? 0.9 : 1 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Riff mood="warmup" className="h-44 md:h-56" />
+        {steps.length > 0 && (
           <div className="rounded-lg bg-zinc-900/80 px-6 py-5">
             <SessionLoadingSteps steps={steps} />
           </div>
-        </motion.div>
-      )}
+        )}
+      </motion.div>
 
     </div>,
     document.body,

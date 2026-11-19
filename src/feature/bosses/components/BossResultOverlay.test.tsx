@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import type { BossFightSessionControls } from "feature/exercisePlan/views/PracticeSession/contexts/BossFightControlsContext";
 import { BossFightControlsProvider } from "feature/exercisePlan/views/PracticeSession/contexts/BossFightControlsContext";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -68,7 +68,12 @@ describe("BossResultOverlay", () => {
   it("calls out a new record", async () => {
     renderOverlay(controls());
     loseIn(9, true);
-    expect(await screen.findByText("New record", {}, { timeout: 2000 })).toBeTruthy();
+    // First the full-screen moment, which a click skips…
+    const moment = await screen.findByRole("status", { name: "New record" }, { timeout: 2000 });
+    fireEvent.click(moment);
+    // …then the result card says it too.
+    const dialog = await screen.findByRole("dialog", {}, { timeout: 2000 });
+    expect(within(dialog).getByText("New record")).toBeTruthy();
   });
 
   it("starts a new fight or finishes the session", async () => {

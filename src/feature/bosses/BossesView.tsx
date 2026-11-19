@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { Riff } from "components/Mascot/Riff";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { m } from "framer-motion";
 import type { Translate } from "lib/i18n/translate";
@@ -291,6 +292,9 @@ const BossLair = ({ boss }: { boss: BossDefinition }) => {
             aria-hidden
             className='pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-zinc-950/60 to-transparent'
           />
+          {/* Riff squares up to the boss on the same floor: crouched, lids
+              narrowed, ready. */}
+          <Riff mood='focus' delay={0.4} className='absolute bottom-3 left-4 z-10 h-20 lg:bottom-5 lg:left-8 lg:h-28' />
         </div>
 
         <m.div

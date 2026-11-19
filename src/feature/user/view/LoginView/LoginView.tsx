@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { Riff } from "components/Mascot/Riff";
 import { DesktopGoogleSignInHint } from "feature/user/components/DesktopGoogleSignInHint/DesktopGoogleSignInHint";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
@@ -12,7 +13,6 @@ import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { Form, Formik } from "formik";
 import { useTranslation } from "hooks/useTranslation";
 import { ChevronRight, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
@@ -27,6 +27,8 @@ const LoginView = () => {
   const { t } = useTranslation(["common", "login"]);
   const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = useState(false);
+  // Riff covers his eyes while a hidden password is being typed.
+  const [typingPassword, setTypingPassword] = useState(false);
 
   const googleLogInHandler = () => {
     dispatch(logInViaGoogle());
@@ -58,14 +60,7 @@ const LoginView = () => {
           {/* Header Section */}
           <div className='text-center'>
             <div className='mb-2 flex justify-center sm:mb-6'>
-              <Image
-                src='/images/logolight.svg'
-                alt='Logo'
-                width={56}
-                height={56}
-                className='h-10 w-10 sm:h-14 sm:w-14'
-                priority
-              />
+              <Riff lively arrive eyesClosed={typingPassword && !showPassword} className='h-16 sm:h-24' />
             </div>
             <h1 className='mb-1 text-2xl font-bold tracking-tight text-white sm:mb-2 sm:text-3xl'>
               {t("login:title")}
@@ -149,7 +144,11 @@ const LoginView = () => {
                             type={showPassword ? "text" : "password"}
                             value={values.password}
                             onChange={handleChange}
-                            onBlur={handleBlur}
+                            onFocus={() => setTypingPassword(true)}
+                            onBlur={(e) => {
+                              handleBlur(e);
+                              setTypingPassword(false);
+                            }}
                             placeholder='••••••••'
                             className='h-11 rounded-lg border-white/10 bg-black/40 pl-10 pr-10 text-white transition-all duration-base placeholder:text-zinc-500 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10'
                           />

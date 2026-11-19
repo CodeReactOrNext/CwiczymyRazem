@@ -1,8 +1,8 @@
 import { Card } from "assets/components/ui/card";
-import { cn } from "assets/lib/utils";
+import { Riff } from "components/Mascot/Riff";
 import Avatar from "components/UI/Avatar";
 import { useTranslation } from "hooks/useTranslation";
-import { UserRound } from "lucide-react";
+
 
 const STEP_COUNT = 3;
 
@@ -39,14 +39,9 @@ export const DuelEmptyState = ({
           vs
         </span>
         <div className='flex flex-col items-center gap-2'>
-          <span
-            className={cn(
-              "flex size-12 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500",
-              isSearching && "animate-pulse",
-            )}
-            aria-hidden='true'>
-            <UserRound size={22} />
-          </span>
+          {/* Riff keeps the empty seat: looking around while a ticket is out,
+              asleep while nobody is looking for anyone. */}
+          <Riff mood={isSearching ? "lookAround" : "asleep"} className='h-14' />
           <span className='text-xs font-semibold text-zinc-500'>?</span>
         </div>
       </div>

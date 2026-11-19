@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
+import { Riff } from "components/Mascot/Riff";
 import type { AudioInitFailure } from "hooks/useAudioAnalyzer";
 import { useTranslation } from "hooks/useTranslation";
-import { Mic } from "lucide-react";
 import React from "react";
 
 import { ModalWrapper } from "../../ModalWrapper";
@@ -19,9 +19,8 @@ export function MicErrorScreen({ reason, onRetry, onCancel }: MicErrorScreenProp
     <ModalWrapper zIndex="z-[99999999]">
       <div className="flex h-full items-center justify-center px-6 text-white">
         <div className="max-w-sm w-full text-center space-y-6">
-          <div className="mx-auto h-16 w-16 rounded-lg bg-red-500/10 flex items-center justify-center">
-            <Mic size='1em' className="h-7 w-7 text-red-400" />
-          </div>
+          {/* The input would not open: Riff stands with his cable pulled out. */}
+          <Riff mood="unplugged" className="mx-auto h-24" />
           <div className="space-y-2">
             <p className="text-lg font-semibold">{t(`error.reasons.${reason}.title`)}</p>
             <p className="text-sm leading-relaxed text-zinc-300">

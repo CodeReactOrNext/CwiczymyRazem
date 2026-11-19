@@ -5,6 +5,7 @@ import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
 import { LibrarySortSelect } from "components/LibrarySortSelect/LibrarySortSelect";
 import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
+import { Riff } from "components/Mascot/Riff";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LIBRARY_TABS } from "constants/navTabs";
@@ -215,9 +216,8 @@ const MyExercisesPage: NextPageWithLayout = () => {
           }>
           {exercises.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 gap-6 text-center">
-              <div className="w-16 h-16 rounded-lg bg-zinc-900/60 flex items-center justify-center">
-                <Music2 className="text-zinc-500" size={28} />
-              </div>
+              {/* No exercises of your own: he plugs in, ready for the first. */}
+              <Riff mood="plugIn" className="h-24" />
               <div className="space-y-2">
                 <p className="text-zinc-100 font-semibold">{t("my_exercises.empty_title")}</p>
                 <p className="text-zinc-400 text-sm max-w-sm">

@@ -5,6 +5,7 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
+import { Riff } from "components/Mascot/Riff";
 import Avatar from "components/UI/Avatar";
 import { formatDistanceToNow } from "date-fns";
 import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
@@ -417,9 +418,7 @@ export const NotificationsBell = () => {
             </div>
           ) : notifications.length === 0 ? (
             <div className='flex flex-col items-center gap-4 px-6 pb-14 pt-10 text-center'>
-              <div className='rounded-full bg-zinc-800/60 p-4 text-zinc-500'>
-                <Bell className='h-6 w-6' />
-              </div>
+              <Riff mood='asleep' className='h-16' />
               <div>
                 <p className='text-sm font-medium text-zinc-200'>
                   {t("bell.empty_title")}

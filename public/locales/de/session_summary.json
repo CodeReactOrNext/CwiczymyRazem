@@ -61,5 +61,10 @@
   "recent_runs": {
     "title": "So lief diese Übung zuletzt",
     "runs": "letzte {{count}} Durchgänge · {{from}} → {{to}} BPM"
+  },
+  "celebrate": {
+    "title": "Session abgeschlossen!",
+    "days": "{{days}} Tage",
+    "streak_milestone": "{{days}} Tage am Stück!"
   }
 }

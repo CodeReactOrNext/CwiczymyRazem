@@ -8,9 +8,10 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import confetti from "canvas-confetti";
+import { Riff } from "components/Mascot/Riff";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { RotateCw, Trophy } from "lucide-react";
+import { RotateCw } from "lucide-react";
 
 interface ExerciseCompleteDialogProps {
   isOpen: boolean;
@@ -48,9 +49,7 @@ export const ExerciseCompleteDialog = ({
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", duration: 0.5 }}
                 onAnimationComplete={handleConfetti}>
-                <div className='rounded-full bg-primary/10 p-3'>
-                  <Trophy size='1em' className='h-6 w-6 text-primary' />
-                </div>
+                <Riff mood='celebrate' short delay={0.2} className='h-24' />
               </motion.div>
               <span>{t("exercise_complete.title")}</span>
             </div>

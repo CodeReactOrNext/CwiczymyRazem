@@ -1,11 +1,12 @@
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
+import { RiffFace } from "components/Mascot/Riff";
 import { addDays, isSameDay, startOfWeek } from "date-fns";
 import { ScoreBreakdownTooltip } from "feature/profile/components/ScoreBreakdownTooltip";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { useRemoteSessionRefresh } from "hooks/useRemoteSessionRefresh";
 import { useTranslation } from "hooks/useTranslation";
-import { Coffee, Flame } from "lucide-react";
+import { Coffee } from "lucide-react";
 import { useRouter } from "next/router";
 import { useAppSelector } from "store/hooks";
 import { getReconciledStreak, hasRestDays } from "utils/gameLogic";
@@ -47,12 +48,13 @@ export const StreakBox = () => {
       onClick={() => router.push("/practice-log")}
       className='flex h-11 cursor-pointer items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-zinc-800/70'>
       <div className="flex items-center gap-1.5 shrink-0 px-1">
-        <Flame size='1em' className={cn(
-          "text-xl transition-all duration-slow",
-          dayWithoutBreak > 0
-            ? "text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]"
-            : "text-zinc-700 opacity-50"
-        )} />
+        {/* Riff's face: the lamp is the streak — lit while it lives, off and
+            asleep once it breaks. */}
+        <RiffFace
+          lampOn={dayWithoutBreak > 0}
+          asleep={dayWithoutBreak === 0}
+          className={cn("h-6 w-6 transition-opacity duration-slow", dayWithoutBreak === 0 && "opacity-60")}
+        />
         {dayWithoutBreak > 0 && (
           <span className="text-sm font-black text-white">
             {dayWithoutBreak}

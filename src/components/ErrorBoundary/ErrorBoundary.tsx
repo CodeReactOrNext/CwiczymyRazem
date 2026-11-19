@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
+import { Riff } from "components/Mascot/Riff";
 import { captureException } from "lib/sentry/sentryClient";
-import { AlertTriangle, Home,RefreshCcw } from "lucide-react";
+import { Home, RefreshCcw } from "lucide-react";
 import Link from "next/link";
 import type { ErrorInfo, ReactNode } from 'react';
 import React, { Component } from 'react';
@@ -51,9 +52,8 @@ class ErrorBoundary extends Component<Props, State> {
         <div className="min-h-screen w-full bg-zinc-950 flex items-center justify-center p-6 text-zinc-100 font-sans">
           <div className="max-w-md w-full space-y-8 animate-in fade-in duration-base">
             <div className="space-y-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-500/10">
-                <AlertTriangle className="h-6 w-6 text-red-400" />
-              </div>
+              {/* Riff blew a fuse: the lamp sputters, smoke, eyes off in two directions. */}
+              <Riff mood="error" className="h-28" />
               <h1 className="text-2xl font-bold tracking-tight">This screen crashed</h1>
               <p className="text-zinc-400">
                 The error was reported to us automatically. Reloading brings the

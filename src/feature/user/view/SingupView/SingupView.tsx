@@ -3,6 +3,7 @@ import { Checkbox } from "assets/components/ui/checkbox";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { cn } from "assets/lib/utils";
+import { Riff } from "components/Mascot/Riff";
 import { onboardingHref } from "feature/onboarding/analytics/onboardingAnalytics";
 import { DesktopGoogleSignInHint } from "feature/user/components/DesktopGoogleSignInHint/DesktopGoogleSignInHint";
 import { selectIsFetching } from "feature/user/store/userSlice";
@@ -30,7 +31,6 @@ import {
   Music,
   User,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect,useState } from "react";
@@ -52,6 +52,8 @@ const SingupView = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  // Riff covers his eyes while a hidden password is being typed.
+  const [typingPassword, setTypingPassword] = useState(false);
 
   const isFetching = useAppSelector(selectIsFetching) === "createAccount";
   const isGoogleFetching = useAppSelector(selectIsFetching) === "google";
@@ -138,13 +140,7 @@ const SingupView = () => {
           {/* Header Section */}
           <div className="text-center">
              <div className="flex justify-center mb-2 sm:mb-6">
-                <Image
-                  src='/images/logolight.svg'
-                  alt='Logo'
-                  width={56}
-                  height={56}
-                  className='h-10 w-10 sm:h-14 sm:w-14' priority
-                />
+                <Riff lively arrive eyesClosed={typingPassword && !showPassword} className='h-16 sm:h-24' />
              </div>
              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-1 sm:mb-2">
                {t("signup:title")}
@@ -283,7 +279,11 @@ const SingupView = () => {
                         type={showPassword ? "text" : "password"}
                         value={values.password}
                         onChange={handleChange}
-                        onBlur={handleBlur}
+                        onFocus={() => setTypingPassword(true)}
+                        onBlur={(e) => {
+                          handleBlur(e);
+                          setTypingPassword(false);
+                        }}
                         placeholder='••••••••'
                         className='pl-10 pr-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-base text-white placeholder:text-zinc-500'
                       />

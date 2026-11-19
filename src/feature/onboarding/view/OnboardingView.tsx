@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { Riff, type RiffMood } from "components/Mascot/Riff";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { addPlayerJoinedLog } from "feature/logs/services/addPlayerJoinedLog.service";
@@ -109,15 +110,27 @@ const StepHeading = ({
   title,
   description,
   onBack,
+  riffMood,
 }: {
   title: string;
   /** Only where the title can't carry the message alone — the questions don't need one. */
   description?: string;
   onBack?: () => void;
+  /** Riff's reaction for this step; by default he lands and stays lively. */
+  riffMood?: RiffMood;
 }) => {
   const { t } = useTranslation("onboarding");
   return (
   <div className='mx-auto mb-8 max-w-xl space-y-3 text-center sm:mb-10'>
+    {/* Riff walks the new player through the questions: he lands on each
+        step, then keeps fidgeting while they decide. */}
+    <Riff
+      mood={riffMood ?? "idle"}
+      short
+      lively
+      arrive={!riffMood}
+      className='mx-auto !mb-4 h-20 sm:h-24'
+    />
     <h1 className='text-3xl font-semibold tracking-tight text-zinc-100 sm:text-4xl'>
       {title}
     </h1>
@@ -753,6 +766,8 @@ const OnboardingView = () => {
                   : undefined
               }
               onBack={pending ? undefined : () => goTo("play")}
+              // Back from the first riff they ever played here: that is a party.
+              riffMood={start.returnedFromRiff ? "celebrate" : undefined}
             />
             <div className='grid gap-4 sm:grid-cols-2'>
               {goals.map((option, index) => (

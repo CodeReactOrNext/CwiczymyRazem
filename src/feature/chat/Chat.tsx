@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { Riff } from "components/Mascot/Riff";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { format } from "date-fns";
@@ -48,7 +49,7 @@ import {
   ActivityStartModal,
 } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { useDateFnsLocale } from "lib/i18n/dateLocale";
-import { ArrowDown, Ellipsis, MessageCircle } from "lucide-react";
+import { ArrowDown, Ellipsis } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TOUCH_TARGET } from "utils/touchTarget";
 
@@ -98,9 +99,8 @@ const EmptyRoom = ({
   const { t } = useTranslation("chat");
   return (
   <div className='flex h-full flex-col items-center justify-center gap-4 px-6 py-16 text-center'>
-    <span className='flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900'>
-      <MessageCircle className='h-6 w-6 text-zinc-500' />
-    </span>
+    {/* A quiet room: he points down at the say-hi button. */}
+    <Riff mood='nudge' lookAt='down' className='h-20' />
     <div className='space-y-1'>
       <p className='text-sm font-semibold text-zinc-200'>
         {t("empty_room.title")}

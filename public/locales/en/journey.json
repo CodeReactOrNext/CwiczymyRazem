@@ -34,6 +34,7 @@
     "collecting": "Collecting...",
     "collect": "Collect the guitar",
     "collected": "Collected",
+    "moment": "The guitar is yours!",
     "steps": "{{done}}/{{total}} steps"
   },
   "path": {

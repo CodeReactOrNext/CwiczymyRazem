@@ -2,6 +2,8 @@ import { Button } from "assets/components/ui/button";
 import { ChartContainer, ChartTooltip } from "assets/components/ui/chart";
 import { cn } from "assets/lib/utils";
 import confetti from "canvas-confetti";
+import { AnimeChip, AnimeMoment } from "components/AnimeMoment/AnimeMoment";
+import { Riff } from "components/Mascot/Riff";
 import { accuracyToStars, EXAM_STAR_ACCURACY, EXAM_STAR_ON_TIME } from "feature/journey/utils/examStars";
 import { animate, AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
@@ -225,6 +227,9 @@ export const ExerciseSuccessView = ({
   const stars = isExam ? accuracyToStars(passAccuracy, examOnTimePct) ?? 0 : 0;
   const isPassed = isExam ? stars > 0 : true;
   const accuracyToPass = isExam ? Math.max(0, Math.ceil(EXAM_STAR_ACCURACY[0] - passAccuracy)) : 0;
+  // A flawless exam earns the full-screen anime moment before the card. Not
+  // when the screen is laid on its side: the moment would come in the wrong way up.
+  const [moment, setMoment] = useState(isExam && stars === 3 && !turned);
 
   // What the next star asks for, each against how far this run got.
   const nextStar: { label: string; value: number; target: number; progress: number }[] = [];
@@ -325,6 +330,15 @@ export const ExerciseSuccessView = ({
           <div className="contents shortwide:flex shortwide:min-w-0 shortwide:flex-1 shortwide:flex-col shortwide:justify-center">
           {/* Header */}
           <div className="relative order-1 px-7 pb-2 pt-9 shortwide:pt-5">
+            {/* Riff hops for a run that went through: a small one for a cleared
+                exercise or a passed exam, the short celebration for 3 stars. A
+                failed exam gets no mascot — the screen already says what to fix. */}
+            {(!isExam || isPassed) && (
+              <div className="mb-3 flex h-20 justify-center shortwide:hidden">
+                {/* Mounted once the moment is over, so his hop is seen. */}
+                {!moment && <Riff mood={isExam && stars === 3 ? "celebrate" : "hop"} short delay={0.15} className="h-20" />}
+              </div>
+            )}
             {isExam ? (
               <div className="flex flex-col items-center gap-3 text-center">
                 {/* Stars */}
@@ -576,7 +590,34 @@ export const ExerciseSuccessView = ({
   // On an upright phone the practice screen is laid on its side, so the player
   // is holding the phone sideways when this opens: it turns the same way rather
   // than making them turn the phone back to read it.
-  if (!turned) return overlay;
+  const momentNode = (
+    <AnimatePresence>
+      {moment && (
+        <AnimeMoment
+          title={t("session:success.mastered")}
+          subtitle={planTitle}
+          colors={{ a: "#f4b63e", b: "#a78bfa" }}
+          zIndex={100000000}
+          onDone={() => setMoment(false)}>
+          <AnimeChip className="gap-1.5 text-amber-400">
+            {[0, 1, 2].map((i) => (
+              <Star key={i} className="h-7 w-7" fill="currentColor" aria-hidden />
+            ))}
+          </AnimeChip>
+          <AnimeChip index={1} className="text-zinc-100">
+            <span className="font-teko text-4xl font-bold leading-none tabular-nums">{Math.round(passAccuracy)}%</span>
+          </AnimeChip>
+        </AnimeMoment>
+      )}
+    </AnimatePresence>
+  );
+
+  if (!turned) return (
+    <>
+      {overlay}
+      {momentNode}
+    </>
+  );
   return (
     <div
       className="sideways-screen fixed left-0 top-0 z-[99999999]"

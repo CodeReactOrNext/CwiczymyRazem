@@ -1,8 +1,8 @@
 import { Button } from "assets/components/ui/button";
 import { Skeleton } from "assets/components/ui/skeleton";
+import { Riff } from "components/Mascot/Riff";
 import type { Recording } from "feature/recordings/types/types";
 import { useTranslation } from "hooks/useTranslation";
-import { Video } from "lucide-react";
 
 import { RecordingCard } from "./RecordingCard";
 
@@ -58,7 +58,8 @@ export const RecordingsGrid = ({
   if (recordings.length === 0) {
     return (
       <div className='flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-        <Video className='h-8 w-8 text-zinc-500' />
+        {/* Nothing recorded: he is all ears for the first take. */}
+        <Riff mood='listen' className='h-24' />
         <h3 className='text-lg font-bold text-zinc-100'>{t("grid.empty_title")}</h3>
         <p className='text-sm text-zinc-400'>
           {t("grid.empty_body")}

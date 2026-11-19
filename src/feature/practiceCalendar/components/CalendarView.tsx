@@ -1,6 +1,7 @@
 import { Button, buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
+import { Riff } from "components/Mascot/Riff";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LIBRARY_TABS } from "constants/navTabs";
@@ -9,7 +10,6 @@ import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import {
-  CalendarDays as CalendarIcon,
   ChevronLeft,
   ChevronRight,
   Eraser,
@@ -393,9 +393,8 @@ export const CalendarView = () => {
           />
         ) : weekIsEmpty ? (
           <section className='flex flex-col items-start gap-6 rounded-lg bg-zinc-900/40 p-6 sm:flex-row sm:items-center sm:p-8'>
-            <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400'>
-              <CalendarIcon className='h-5 w-5' aria-hidden />
-            </div>
+            {/* An empty week: he points at the plan beside him. */}
+            <Riff mood='nudge' lookAt='right' className='h-20 shrink-0' />
             <div className='min-w-0 flex-1'>
               <p className='text-base font-semibold text-zinc-100'>
                 {t("empty.title")}

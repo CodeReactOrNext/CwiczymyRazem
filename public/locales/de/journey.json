@@ -34,6 +34,7 @@
     "collecting": "Wird abgeholt...",
     "collect": "Gitarre abholen",
     "collected": "Abgeholt",
+    "moment": "Die Gitarre gehört dir!",
     "steps": "{{done}}/{{total}} Schritte"
   },
   "path": {

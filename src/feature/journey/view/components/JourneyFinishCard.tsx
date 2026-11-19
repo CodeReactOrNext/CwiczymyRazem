@@ -1,10 +1,14 @@
 import { cn } from "assets/lib/utils";
+import { AnimeChip, AnimeMoment } from "components/AnimeMoment/AnimeMoment";
+import { Riff } from "components/Mascot/Riff";
 import { RewardSummary } from "components/Rewards/RewardSummary";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { AnimatePresence } from "framer-motion";
 import { useClaimJourneyReward, useRewardLedger } from "hooks/useRewardLedger";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, Lock } from "lucide-react";
+import { useState } from "react";
 
 import { getJourneyReward, journeyRewardId } from "../../data/journeyRewards";
 
@@ -36,6 +40,9 @@ export const JourneyFinishCard = ({
   const reward = getJourneyReward(moduleId);
   const { data: ledger } = useRewardLedger();
   const { mutate: claim, isPending } = useClaimJourneyReward();
+  // Collecting the roadmap's guitar is one of the few big wins: it gets the
+  // full-screen moment, with the guitar itself as the hero.
+  const [celebrating, setCelebrating] = useState(false);
 
   if (!reward?.guitar || total === 0) return null;
 
@@ -47,6 +54,33 @@ export const JourneyFinishCard = ({
   const rarityColor = getRarityColor(guitar.rarity);
 
   return (
+    <>
+    <AnimatePresence>
+      {celebrating && (
+        <AnimeMoment
+          title={t("finish.moment")}
+          subtitle={`${guitar.brand} ${guitar.name}`}
+          colors={{ a: rarityColor, b: "#f4b63e" }}
+          land={0.9}
+          durationMs={3800}
+          hero={
+            <div className='relative'>
+              <img
+                src={getRankBadgeSrc(guitar.imageId, "medium")}
+                alt=''
+                className='h-44 w-80 object-contain md:h-52 md:w-[26rem]'
+                draggable={false}
+              />
+              <Riff mood='celebrate' short delay={0.9} className='absolute -bottom-10 -right-4 h-24 md:h-28' />
+            </div>
+          }
+          onDone={() => setCelebrating(false)}>
+          <AnimeChip className='font-bold' >
+            <span style={{ color: rarityColor }}>{guitar.rarity}</span>
+          </AnimeChip>
+        </AnimeMoment>
+      )}
+    </AnimatePresence>
     <div
       className={cn(
         "relative z-10 flex w-full max-w-sm flex-col items-center gap-6 overflow-hidden rounded-lg px-8 py-8 text-center",
@@ -69,6 +103,12 @@ export const JourneyFinishCard = ({
             background: `radial-gradient(ellipse at 50% 0%, ${rarityColor}40, transparent 70%)`,
           }}
         />
+      )}
+
+      {/* The finish is reached and the guitar waits: Riff throws a short party
+          in the corner — small, the guitar stays the prize. */}
+      {canClaim && (
+        <Riff mood='celebrate' short delay={0.3} className='absolute right-3 top-3 z-10 h-16' />
       )}
 
       <div className='relative flex flex-col items-center gap-3'>
@@ -111,7 +151,7 @@ export const JourneyFinishCard = ({
 
       {canClaim ? (
         <button
-          onClick={() => claim(moduleId)}
+          onClick={() => claim(moduleId, { onSuccess: () => setCelebrating(true) })}
           disabled={isPending}
           className={cn(
             "relative rounded-lg bg-zinc-100 px-6 py-2.5 text-xs font-bold capitalize tracking-wide text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white",
@@ -139,5 +179,6 @@ export const JourneyFinishCard = ({
         </span>
       )}
     </div>
+    </>
   );
 };

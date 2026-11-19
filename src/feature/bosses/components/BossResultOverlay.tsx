@@ -1,4 +1,6 @@
 import { Button } from "assets/components/ui/button";
+import { AnimeChip, AnimeMoment } from "components/AnimeMoment/AnimeMoment";
+import { Riff } from "components/Mascot/Riff";
 import { useBossFightControls } from "feature/exercisePlan/views/PracticeSession/contexts/BossFightControlsContext";
 import { AnimatePresence, m } from "framer-motion";
 import { fade, popIn } from "lib/motion/motion";
@@ -37,6 +39,7 @@ export const BossResultOverlay = ({ boss }: { boss: BossDefinition }) => {
   const newRecord = useBossFightStore((s) => s.newRecord);
   const recordBefore = useBossFightStore((s) => s.recordBefore);
   const [revealed, setRevealed] = useState(false);
+  const [momentDone, setMomentDone] = useState(false);
 
   useEffect(() => {
     if (!fight.outcome) return undefined;
@@ -44,6 +47,7 @@ export const BossResultOverlay = ({ boss }: { boss: BossDefinition }) => {
     return () => {
       window.clearTimeout(timer);
       setRevealed(false);
+      setMomentDone(false);
     };
   }, [fight.outcome]);
 
@@ -63,9 +67,31 @@ export const BossResultOverlay = ({ boss }: { boss: BossDefinition }) => {
           ? t("result.behind", { count: -gap })
           : t("result.level_with");
 
+  // A new record gets the full-screen anime moment first, then the numbers.
+  const showMoment = !!fight.outcome && revealed && newRecord && !momentDone;
+
   return createPortal(
+    <>
     <AnimatePresence>
-      {fight.outcome && revealed && (
+      {showMoment && (
+        <AnimeMoment
+          title={t("result.new_record")}
+          colors={{ a: "#f97316", b: "#22d3ee" }}
+          zIndex={1000000000}
+          onDone={() => setMomentDone(true)}>
+          <AnimeChip className='flex-col gap-0 text-amber-400'>
+            <span className='font-teko text-4xl font-bold leading-none tabular-nums'>{score.total.toLocaleString()}</span>
+            <span className='text-xs text-zinc-400'>{t("result.score")}</span>
+          </AnimeChip>
+          <AnimeChip index={1} className='flex-col gap-0 text-zinc-100'>
+            <span className='font-teko text-4xl font-bold leading-none tabular-nums'>{phase}</span>
+            <span className='text-xs text-zinc-400'>{t("result.phase")}</span>
+          </AnimeChip>
+        </AnimeMoment>
+      )}
+    </AnimatePresence>
+    <AnimatePresence>
+      {fight.outcome && revealed && !showMoment && (
         <m.div
           key='boss-result'
           variants={fade}
@@ -81,14 +107,19 @@ export const BossResultOverlay = ({ boss }: { boss: BossDefinition }) => {
           <m.div
             variants={popIn}
             className='w-full max-w-lg space-y-6 rounded-lg bg-zinc-900 px-6 py-8 text-center sm:px-8'>
-            <BossArt
-              boss={boss}
-              className='mx-auto h-40 w-52'
-              mood={moodFor(fight)}
-              form={artPhaseFor(fight)}
-              pattern={legPatternFor(fight.plan)}
-              webTorn={1 - fight.bossHp / fight.bossMaxHp}
-            />
+            <div className='flex items-end justify-center gap-2'>
+              {/* Riff across from the boss: a new record is worth a party,
+                  anything else leaves him seeing stars. */}
+              <Riff mood={newRecord ? "celebrate" : "dizzy"} short delay={0.2} className='h-32 shrink-0 sm:h-36' />
+              <BossArt
+                boss={boss}
+                className='h-36 w-44 sm:h-40 sm:w-48'
+                mood={moodFor(fight)}
+                form={artPhaseFor(fight)}
+                pattern={legPatternFor(fight.plan)}
+                webTorn={1 - fight.bossHp / fight.bossMaxHp}
+              />
+            </div>
 
             <div className='space-y-2'>
               <h2
@@ -178,7 +209,8 @@ export const BossResultOverlay = ({ boss }: { boss: BossDefinition }) => {
           </div>
         </m.div>
       )}
-    </AnimatePresence>,
+    </AnimatePresence>
+    </>,
     document.body,
   );
 };

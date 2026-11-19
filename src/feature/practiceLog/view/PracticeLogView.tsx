@@ -1,4 +1,5 @@
 import { ActivityChart } from "components/Charts/ActivityChart";
+import { Riff } from "components/Mascot/Riff";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { NotebookPen } from "lucide-react";
@@ -125,7 +126,8 @@ export const PracticeLogView = () => {
         </div>
       ) : !hasAnySessions ? (
         <div className='flex flex-col items-center gap-4 py-24 text-center'>
-          <NotebookPen size={24} className='text-zinc-600' />
+          {/* No sessions yet: lamps on standby, waiting for the first one. */}
+          <Riff mood='standby' className='h-24' />
           <div className='space-y-1'>
             <p className='text-sm font-medium text-zinc-200'>
               {t("page.empty")}

@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "assets/components/ui/card";
 import { Switch } from "assets/components/ui/switch";
+import { Riff } from "components/Mascot/Riff";
 import { firebaseUpdateStreakRestDays } from "feature/settings/services/settings.service";
 import {
   selectCurrentUserStats,
@@ -47,7 +48,10 @@ export const StreakSettings = () => {
       </CardHeader>
       <CardContent>
         <div className='flex items-center justify-between gap-6 rounded-lg bg-zinc-900/40 px-4 py-3'>
-          <div className='min-w-0'>
+          {/* With the rest day on, Riff shows what it means: on standby — lamp
+              dimmed, eyes half shut, but not cold. */}
+          <Riff mood={enabled ? "standby" : "idle"} className='hidden h-14 shrink-0 sm:block' />
+          <div className='min-w-0 flex-1'>
             <p className='text-sm font-semibold text-zinc-200'>
               {t("streak.label")}
             </p>
