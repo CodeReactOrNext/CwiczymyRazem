@@ -30,6 +30,9 @@ const MOODS: KostekMood[] = [
   "chill",
   "wait",
   "ready",
+  "micOff",
+  "duel",
+  "emptyCase",
 ];
 
 describe("Kostek", () => {

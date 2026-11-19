@@ -1,7 +1,6 @@
 import { AnimeChip, AnimeMoment } from "components/AnimeMoment/AnimeMoment";
 import { useTranslation } from "hooks/useTranslation";
 import { Flame } from "lucide-react";
-import { useEffect, useState } from "react";
 
 /**
  * Full-screen "session complete" transition shown before the summary — the
@@ -23,40 +22,18 @@ interface SessionCelebrationProps {
 
 export const MASCOT_LAYOUT_ID = "session-summary-mascot";
 
-// The full moment plays once a day; later sessions that day get the short cut,
-// so the third session in a row does not sit through the whole show again.
-const FULL_SHOWN_KEY = "riff-moment-full-day";
-const today = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-};
-const fullShownToday = () => {
-  try {
-    return window.localStorage.getItem(FULL_SHOWN_KEY) === today();
-  } catch {
-    return false;
-  }
-};
-
 export const SessionCelebration = ({ points, fame, streak, levelUp = false, streakMilestone = false, onDone }: SessionCelebrationProps) => {
   const { t } = useTranslation("session_summary");
-  // A new level or a streak milestone always gets the full show.
-  const [brief] = useState(() => !levelUp && !streakMilestone && fullShownToday());
-  useEffect(() => {
-    if (brief) return;
-    try {
-      window.localStorage.setItem(FULL_SHOWN_KEY, today());
-    } catch {
-      // Storage blocked: every session gets the full moment, which is fine.
-    }
-  }, [brief]);
+  // An ordinary session ends calmly; the full show is kept for what is rare —
+  // a new level or a streak milestone — so it still means something then.
+  const calm = !levelUp && !streakMilestone;
 
   return (
     <AnimeMoment
       title={levelUp ? t("level_up") : streakMilestone ? t("celebrate.streak_milestone", { days: streak }) : t("celebrate.title")}
       mood={levelUp ? "levelUp" : "celebrate"}
       layoutId={MASCOT_LAYOUT_ID}
-      brief={brief}
+      calm={calm}
       onDone={onDone}>
       <AnimeChip index={0} className='text-cyan-400'>
         <img src='/images/tokens/pick.png' alt='' className='h-6 w-6 object-contain' />

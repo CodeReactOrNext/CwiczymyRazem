@@ -41,7 +41,7 @@ export const DuelEmptyState = ({
         <div className='flex flex-col items-center gap-2'>
           {/* Kostek keeps the empty seat: drumming its fingers while a ticket is out,
               asleep while nobody is looking for anyone. */}
-          <Kostek mood={isSearching ? "wait" : "asleep"} className='h-14' />
+          <Kostek mood={isSearching ? "wait" : "duel"} className='h-14' />
           <span className='text-xs font-semibold text-zinc-500'>?</span>
         </div>
       </div>

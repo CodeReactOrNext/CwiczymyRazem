@@ -61,7 +61,7 @@ describe("OnboardingView", () => {
 
     fireEvent.click(screen.getByText("levels.some.label"));
 
-    expect(await screen.findByText("play_step.title")).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "play_step.title" })).toBeTruthy();
     expect(screen.getByText("play_step.start")).toBeTruthy();
     expect(screen.getByText("play_step.options.no_guitar")).toBeTruthy();
   });
@@ -86,7 +86,7 @@ describe("OnboardingView", () => {
     router.query = { step: "goal", level: "some", played: "1", from: "signup" };
     render(<OnboardingView />);
 
-    expect(screen.getByText("goal_step.title_after_play")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "goal_step.title_after_play" })).toBeTruthy();
 
     fireEvent.click(screen.getByText("goals.songs.label"));
     fireEvent.click(await screen.findByText("songs_step.continue"));
@@ -99,7 +99,7 @@ describe("OnboardingView", () => {
       goal: "songs",
       playChoice: "play",
     });
-    expect(screen.queryByText("desktop_hint.title")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "desktop_hint.title" })).toBeNull();
   });
 
   it("shows a player looking around the plan library, not a plan session", async () => {
@@ -112,7 +112,7 @@ describe("OnboardingView", () => {
     await vi.waitFor(() =>
       expect(router.push).toHaveBeenCalledWith("/timer/plans"),
     );
-    expect(screen.queryByText("plan_step.title")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "plan_step.title" })).toBeNull();
     expect(saveOnboarding).toHaveBeenCalledWith({
       level: "new",
       goal: "plans",
@@ -127,7 +127,7 @@ describe("OnboardingView", () => {
     await lookAroundAsBeginner();
     fireEvent.click(await screen.findByText("goals.journey.label"));
 
-    expect(await screen.findByText("desktop_hint.title")).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "desktop_hint.title" })).toBeTruthy();
     expect(router.push).not.toHaveBeenCalled();
     // Nothing is left to skip once the answers are saved.
     expect(screen.queryByText("skip")).toBeNull();
@@ -145,7 +145,7 @@ describe("OnboardingView", () => {
       await screen.findByText("play_step.options.no_guitar"),
     );
 
-    expect(await screen.findByText("goal_step.title_no_guitar")).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "goal_step.title_no_guitar" })).toBeTruthy();
     expect(screen.getByText("goal_step.no_guitar_hint")).toBeTruthy();
   });
 
@@ -177,6 +177,6 @@ describe("OnboardingView", () => {
     fireEvent.click(await screen.findByText("goals.journey.label"));
 
     await vi.waitFor(() => expect(router.push).toHaveBeenCalledWith("/journey"));
-    expect(screen.queryByText("desktop_hint.title")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "desktop_hint.title" })).toBeNull();
   });
 });

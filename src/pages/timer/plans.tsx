@@ -5,6 +5,7 @@ import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { usePublicExercisePlans, useUserExercisePlans } from "feature/exercisePlan/hooks/useExercisePlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PlanSelector } from "feature/practice/views/PlanSelector/PlanSelector";
+import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
 import dynamic from "next/dynamic";
@@ -105,10 +106,12 @@ const TimerPlans: NextPageWithLayout = () => {
     router.push("/report");
   };
 
+  const sessionOpen = useSessionEntryGate(!!(router.query.planId && selectedPlan));
+
   // Require both the query param and the loaded plan so that losing
   // ?planId= (browser back/forward, or handleBack stripping it) hides the
   // session immediately, without needing an effect to reset `selectedPlan`.
-  return router.query.planId && selectedPlan ? (
+  return router.query.planId && selectedPlan && sessionOpen ? (
     <MainContainer>
       <PracticeSession plan={selectedPlan} onClose={handleBack} onFinish={handlePlanFinish} isFinishing={isFinishing} autoReport={true} />
     </MainContainer>

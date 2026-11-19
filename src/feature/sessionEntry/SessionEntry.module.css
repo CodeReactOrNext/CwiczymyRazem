@@ -1,0 +1,641 @@
+/* The cut into a practice session. Everything that moves here is a CSS
+   animation of transform or opacity, so it runs on the compositor: the page
+   underneath is busy loading a score and decoding sound, and none of that may
+   show as a stutter. No filters, masks, shadows or blurs — only flat layers. */
+
+.root {
+  /* One string gap; the whole scene is measured in it. */
+  --g: clamp(14px, 3.4vh, 30px);
+  /* Kostek's height. */
+  --k: clamp(110px, 22vh, 210px);
+  /* One strum. */
+  --p: 1.5s;
+  /* When the scene starts: the bands are most of the way in by then. */
+  --t0: 0.2s;
+  /* The strum loop starts as Kostek arrives. */
+  --loop: calc(var(--t0) + 0.1s);
+  /* The first strike: the tip is in the middle of the six strings. */
+  --hit0: calc(var(--loop) + var(--p) * 0.27);
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  overflow: hidden;
+  contain: strict;
+}
+.instant {
+  --t0: 0s;
+}
+.out {
+  pointer-events: none;
+}
+
+/* ── Bands ───────────────────────────────────────────────────────────────────
+   Six slanted slats slam in from the right one after another and leave to the
+   left the same way. Each is one flat layer: a bright edge, a lighter lead,
+   then the dark that covers the page. */
+.band {
+  position: absolute;
+  left: -30vw;
+  width: 160vw;
+  top: calc(var(--i) * 100% / 6 - 1px);
+  height: calc(100% / 6 + 2px);
+  background: linear-gradient(
+    90deg,
+    var(--edge) 0,
+    var(--edge) 3px,
+    #27272a 3px,
+    #27272a 6%,
+    #09090b 6%,
+    #09090b 94%,
+    #27272a 94%,
+    #27272a calc(100% - 3px),
+    var(--edge) calc(100% - 3px)
+  );
+  transform: skewX(-14deg);
+  will-change: transform;
+  /* sessionEntryStore's COVER_MS is when the last of these has landed. */
+  animation: band-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i) * 0.03s);
+}
+.instant .band {
+  animation: none;
+}
+.out .band {
+  animation: band-out 0.5s cubic-bezier(0.7, 0, 0.84, 0) both;
+  animation-delay: calc(var(--i) * 0.04s);
+}
+
+/* Hairlines that shoot across ahead of the bands, on the way in and out. */
+.streak {
+  position: absolute;
+  right: 0;
+  top: var(--y);
+  width: var(--len);
+  height: var(--h);
+  border-radius: 9999px;
+  background: var(--c);
+  opacity: 0;
+  animation: streak-in 0.42s cubic-bezier(0.7, 0, 0.3, 1) both;
+  animation-delay: var(--d);
+}
+.instant .streak {
+  animation: none;
+}
+.out .streak {
+  animation: streak-out 0.42s cubic-bezier(0.7, 0, 0.3, 1) both;
+  animation-delay: var(--d);
+}
+
+/* ── Scene ─────────────────────────────────────────────────────────────────── */
+.scene {
+  position: absolute;
+  inset: 0;
+}
+/* Everything rushes off to the left just ahead of the bands. */
+.out .scene {
+  animation: scene-out 0.36s cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+/* The first strike kicks the whole picture once. */
+.shake {
+  position: absolute;
+  inset: 0;
+  animation: shake 0.3s linear both;
+  animation-delay: var(--hit0);
+}
+
+/* ── Impact ──────────────────────────────────────────────────────────────────
+   The first strike lands like the end-of-session moment: focus lines snap in
+   around it, rings and ink streaks shoot out, picks, notes and stars fly.
+   The focus lines stay and flicker for as long as the session loads; the rest
+   plays once. */
+.focus {
+  position: absolute;
+  inset: -10%;
+  opacity: 0;
+  animation: focus-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--hit0);
+  will-change: transform, opacity;
+}
+/* Three pre-drawn cels; only their opacity is switched, on twos. */
+.focusFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: flicker 0.25s step-end infinite;
+}
+.focusFrame1 {
+  animation-delay: -0.0833s;
+}
+.focusFrame2 {
+  animation-delay: -0.1667s;
+}
+/* Keeps the middle dark, so Kostek and the strings read on the lines. */
+.focusClear {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, #09090b 16%, rgb(9 9 11 / 0) 44%);
+}
+/* Drawn at its final size and grown from small, so the line stays crisp. */
+.shock {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--g) * 26);
+  height: calc(var(--g) * 26);
+  margin: calc(var(--g) * -13) 0 0 calc(var(--g) * -13);
+  border: var(--b) solid var(--c);
+  border-radius: 9999px;
+  opacity: 0;
+  animation: shock 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--hit0) + var(--d));
+}
+.spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(var(--a));
+}
+.sparkLine {
+  position: absolute;
+  left: 0;
+  top: -2.5px;
+  width: var(--len);
+  height: 5px;
+  border-radius: 9999px;
+  background: #fafafa;
+  transform-origin: 0 50%;
+  opacity: 0;
+  animation: spark 0.45s ease-out both;
+  animation-delay: calc(var(--hit0) + var(--d));
+}
+.bit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  opacity: 0;
+  animation: bit 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--hit0) + var(--d));
+}
+
+/* Six strings across the whole screen; they arrive as lines from the right. */
+.string {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + (var(--i) - 2.5) * var(--g));
+  height: 0;
+  animation: string-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i) * 0.03s);
+}
+.instant .string {
+  animation: none;
+}
+.core,
+.lit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--w) / -2);
+  height: var(--w);
+}
+/* At rest; fades while the string swings, so the swing isn't pinned by a
+   straight line through its middle. */
+.core {
+  background: #71717a;
+  animation: core var(--p) linear infinite;
+  animation-delay: calc(var(--loop) + var(--hit));
+}
+.lit {
+  background: #22d3ee;
+  opacity: 0;
+  animation: lit var(--p) ease-out infinite;
+  animation-delay: calc(var(--loop) + var(--hit));
+}
+/* A struck string, drawn the way animation draws one: two cels, bowed up and
+   bowed down, swapped every other frame, dying down together. */
+.ring {
+  --amp: calc(var(--g) * 0.62);
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--amp) * -1);
+  height: calc(var(--amp) * 2);
+  opacity: 0;
+  animation: ring var(--p) linear infinite;
+  animation-delay: calc(var(--loop) + var(--hit));
+  will-change: transform, opacity;
+}
+.wave {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: cel 0.084s step-end infinite;
+}
+.wave path {
+  vector-effect: non-scaling-stroke;
+}
+.waveLine {
+  fill: none;
+  stroke: #67e8f9;
+  stroke-width: var(--w);
+}
+.waveLens {
+  fill: #22d3ee;
+  opacity: 0.12;
+}
+.waveB {
+  animation-delay: -0.042s;
+}
+/* The hit travelling along the string: two bright dashes leave the pick for
+   the edges of the screen. One layer, stretched from its middle. */
+.pulse {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1.5px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #a5f3fc 3%, transparent 14%, transparent 86%, #a5f3fc 97%, transparent 100%);
+  opacity: 0;
+  animation: pulse var(--p) linear infinite;
+  animation-delay: calc(var(--loop) + var(--hit));
+}
+
+/* Kostek: flies in from the right, and strums. The box is his own size and
+   turns about his tip, so the tip follows the keyframes exactly. */
+.fly {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--k) * 1.018);
+  height: var(--k);
+  margin-left: calc(var(--k) * -0.509);
+  margin-top: calc(var(--k) * -0.901);
+  animation: fly-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--t0);
+}
+.striker {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 90.1%;
+  transform: translate3d(calc(var(--g) * -0.3), calc(var(--g) * -4), 0) rotate(-6deg);
+  will-change: transform;
+  animation: strum var(--p) infinite;
+  animation-delay: var(--loop);
+}
+
+/* Two coloured afterimages trail the stroke: the same swing a few frames
+   late, shown only while the pick is moving fast. */
+.ghost {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 90.1%;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation:
+    strum var(--p) infinite,
+    ghost var(--p) linear infinite;
+  animation-delay: calc(var(--loop) + var(--lag));
+}
+
+.steps {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + var(--g) * 4 + 2vh);
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: steps-in 0.3s ease-out forwards;
+  animation-delay: calc(var(--t0) + 1s);
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────────────────── */
+@keyframes band-in {
+  from {
+    transform: translate3d(135vw, 0, 0) skewX(-14deg);
+  }
+  to {
+    transform: translate3d(0, 0, 0) skewX(-14deg);
+  }
+}
+@keyframes band-out {
+  from {
+    transform: translate3d(0, 0, 0) skewX(-14deg);
+  }
+  to {
+    transform: translate3d(-135vw, 0, 0) skewX(-14deg);
+  }
+}
+@keyframes streak-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
+  }
+  15%,
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-110vw, 0, 0);
+  }
+}
+/* Same flight; a second name so switching to it starts it again. */
+@keyframes streak-out {
+  0% {
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
+  }
+  15%,
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-110vw, 0, 0);
+  }
+}
+@keyframes scene-out {
+  to {
+    transform: translate3d(-115vw, 0, 0);
+  }
+}
+@keyframes shake {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  15% {
+    transform: translate3d(0, 7px, 0);
+  }
+  35% {
+    transform: translate3d(-3px, -4px, 0);
+  }
+  55% {
+    transform: translate3d(2px, 3px, 0);
+  }
+  75% {
+    transform: translate3d(-1px, -1px, 0);
+  }
+}
+@keyframes string-in {
+  from {
+    transform: translate3d(105%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes fly-in {
+  from {
+    transform: translate3d(70vw, -12vh, 0) rotate(28deg);
+  }
+  to {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+/* Hover, wind up (lift and lean back), a fast stroke down through the six
+   strings, follow-through, then round the front and back up. The stroke is
+   linear from 22% to 32%: SessionEntryScene times each string's hit on it. */
+@keyframes strum {
+  0%,
+  100% {
+    transform: translate3d(calc(var(--g) * -0.3), calc(var(--g) * -4), 0) rotate(-6deg) scale(1, 1);
+    animation-timing-function: ease-in-out;
+  }
+  22% {
+    transform: translate3d(calc(var(--g) * -0.9), calc(var(--g) * -5.6), 0) rotate(-20deg) scale(0.96, 1.06);
+    animation-timing-function: linear;
+  }
+  32% {
+    transform: translate3d(calc(var(--g) * 0.5), calc(var(--g) * 3.6), 0) rotate(12deg) scale(1.05, 0.95);
+    animation-timing-function: ease-out;
+  }
+  42% {
+    transform: translate3d(calc(var(--g) * 0.7), calc(var(--g) * 4.2), 0) rotate(16deg) scale(1, 1);
+    animation-timing-function: ease-in-out;
+  }
+  58% {
+    transform: translate3d(calc(var(--g) * 1.6), 0, 0) rotate(6deg) scale(1.07, 1.07);
+    animation-timing-function: ease-in-out;
+  }
+  72% {
+    transform: translate3d(calc(var(--g) * -0.3), calc(var(--g) * -4), 0) rotate(-6deg) scale(1, 1);
+    animation-timing-function: ease-in-out;
+  }
+  86% {
+    transform: translate3d(calc(var(--g) * -0.3), calc(var(--g) * -4.3), 0) rotate(-5deg) scale(1, 1);
+    animation-timing-function: ease-in-out;
+  }
+}
+/* These four start on the string's own hit (their delay), and last one strum. */
+@keyframes ring {
+  0% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  8% {
+    transform: scaleY(0.74);
+  }
+  18% {
+    transform: scaleY(0.5);
+  }
+  30% {
+    transform: scaleY(0.3);
+  }
+  44% {
+    opacity: 1;
+    transform: scaleY(0.15);
+  }
+  58% {
+    opacity: 0;
+    transform: scaleY(0.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0.05);
+  }
+}
+@keyframes core {
+  0%,
+  40% {
+    opacity: 0.15;
+  }
+  58%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes lit {
+  0% {
+    opacity: 1;
+  }
+  45%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scaleX(0.04);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  30% {
+    opacity: 0;
+    transform: scaleX(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(1.12);
+  }
+}
+@keyframes ghost {
+  0%,
+  19% {
+    opacity: 0;
+  }
+  23%,
+  30% {
+    opacity: 0.6;
+  }
+  38%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes focus-in {
+  from {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* One cel of three is shown at a time: drawn frames on twos (12 fps). */
+@keyframes flicker {
+  0% {
+    opacity: 1;
+  }
+  33.333% {
+    opacity: 0;
+  }
+}
+@keyframes shock {
+  0% {
+    opacity: 0;
+    transform: scale(0.05);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+@keyframes spark {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--from), 0, 0) scaleX(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translate3d(calc(var(--from) + 56px), 0, 0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(var(--from) + 140px), 0, 0) scaleX(0);
+  }
+}
+/* Flies out fast, then floats down a little as it fades. */
+@keyframes bit {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.3);
+  }
+  10% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(var(--x), var(--y), 0) rotate(var(--r)) scale(var(--s));
+    animation-timing-function: ease-in;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--x), calc(var(--y) + 36px), 0) rotate(var(--r)) scale(var(--s));
+  }
+}
+/* One cel of two is shown at a time. */
+@keyframes cel {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes steps-in {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes still-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes still-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion: the screen fades to the still picture and fades back. */
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    animation: still-in 0.2s ease-out both;
+  }
+  .root.instant {
+    animation: none;
+  }
+  .root.out {
+    animation: still-out 0.3s ease-in both;
+  }
+  .band,
+  .out .band,
+  .streak,
+  .out .streak,
+  .scene,
+  .out .scene,
+  .shake,
+  .string,
+  .core,
+  .lit,
+  .ring,
+  .wave,
+  .pulse,
+  .fly,
+  .striker,
+  .ghost,
+  .focus,
+  .focusFrame,
+  .shock,
+  .sparkLine,
+  .bit {
+    animation: none;
+  }
+  .steps {
+    animation-delay: 0.3s;
+  }
+}

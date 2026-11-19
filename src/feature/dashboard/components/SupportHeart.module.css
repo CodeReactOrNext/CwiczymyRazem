@@ -1,0 +1,66 @@
+/* Transform and opacity only, so it costs nothing next to the dashboard. */
+
+.beat {
+  transform-box: fill-box;
+  transform-origin: 50% 55%;
+  animation: beat 1.6s ease-in-out infinite;
+}
+
+/* The small hearts start behind Kostek's shoulders and drift up and out. */
+.float {
+  opacity: 0;
+  animation: float 3.2s ease-out infinite;
+}
+.floatA {
+  --x: 96px;
+  --dx: 12px;
+  animation-delay: 0.3s;
+}
+.floatB {
+  --x: 22px;
+  --dx: -10px;
+  animation-delay: 1.9s;
+}
+
+/* A heartbeat: two quick pulses, then a rest. */
+@keyframes beat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  10% {
+    transform: scale(1.13);
+  }
+  20% {
+    transform: scale(0.98);
+  }
+  30% {
+    transform: scale(1.09);
+  }
+  44% {
+    transform: scale(1);
+  }
+}
+@keyframes float {
+  0% {
+    opacity: 0;
+    transform: translate(var(--x), 44px) scale(0.2);
+  }
+  15% {
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--x) + var(--dx)), 2px) scale(0.42);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beat,
+  .float {
+    animation: none;
+  }
+}

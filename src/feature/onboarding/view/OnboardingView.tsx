@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { Kostek, type KostekMood } from "components/Mascot/Kostek";
+import { type KostekMood, KostekSays } from "components/Mascot/Kostek";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { addPlayerJoinedLog } from "feature/logs/services/addPlayerJoinedLog.service";
@@ -106,51 +106,49 @@ const readStart = (
   return { step: "level", level: "new", returnedFromRiff: false };
 };
 
+/**
+ * What sits under Kostek's question on a step: the one line the question
+ * can't carry alone, and the way back.
+ */
 const StepHeading = ({
-  title,
   description,
   onBack,
-  mascotMood,
 }: {
-  title: string;
-  /** Only where the title can't carry the message alone — the questions don't need one. */
+  /** Only where the question can't carry the message alone. */
   description?: string;
   onBack?: () => void;
-  /** Kostek's reaction for this step; by default it drops in and stays lively. */
-  mascotMood?: KostekMood;
 }) => {
   const { t } = useTranslation("onboarding");
+  if (!description && !onBack) return <div className='mb-8 sm:mb-10' />;
   return (
-  <div className='mx-auto mb-8 max-w-xl space-y-3 text-center sm:mb-10'>
-    {/* Kostek walks the new player through the questions: it lands on each
-        step, then keeps fidgeting while they decide. */}
-    <Kostek
-      mood={mascotMood ?? "idle"}
-      short
-      lively
-      arrive={!mascotMood}
-      className='mx-auto !mb-4 h-20 sm:h-24'
-    />
-    <h1 className='text-3xl font-semibold tracking-tight text-zinc-100 sm:text-4xl'>
-      {title}
-    </h1>
-    {description && (
-      <p className='text-base leading-relaxed text-zinc-300'>{description}</p>
-    )}
-    {onBack && (
-      <button
-        type='button'
-        onClick={onBack}
-        className={cn(
-          "mx-auto !mt-5 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-200",
-          FOCUS_RING,
-        )}>
-        <ArrowLeft className='h-4 w-4' />
-        {t("back")}
-      </button>
-    )}
-  </div>
+    <div className='mx-auto mb-8 max-w-xl space-y-3 text-center sm:mb-10'>
+      {description && (
+        <p className='text-base leading-relaxed text-zinc-300'>{description}</p>
+      )}
+      {onBack && (
+        <button
+          type='button'
+          onClick={onBack}
+          className={cn(
+            "mx-auto flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-200",
+            FOCUS_RING,
+          )}>
+          <ArrowLeft className='h-4 w-4' />
+          {t("back")}
+        </button>
+      )}
+    </div>
   );
+};
+
+/** Kostek's face for each step; it changes as the player moves on. */
+const STEP_MOOD: Record<Step, KostekMood> = {
+  level: "idle",
+  play: "ready",
+  goal: "think",
+  plan: "approve",
+  songs: "shrug",
+  desktop: "nudge",
 };
 
 /** A few bars of tab, shown so the strike through them reads at a glance. */
@@ -637,6 +635,23 @@ const OnboardingView = () => {
   };
 
   const stepIndex = PROGRESS[step];
+  const question: Record<Step, string> = {
+    level: t("level_step.title"),
+    play: t("play_step.title"),
+    goal: t(
+      start.returnedFromRiff
+        ? "goal_step.title_after_play"
+        : playChoice === "no_guitar"
+          ? "goal_step.title_no_guitar"
+          : "goal_step.title",
+    ),
+    plan: t("plan_step.title"),
+    songs: t("songs_step.title"),
+    desktop: t("desktop_hint.title"),
+  };
+  // Back from the first riff they ever played here: that is a party.
+  const mood: KostekMood =
+    step === "goal" && start.returnedFromRiff ? "celebrate" : STEP_MOOD[step];
 
   return (
     <div className='flex min-h-[100dvh] flex-col bg-zinc-950 text-zinc-100'>
@@ -681,10 +696,29 @@ const OnboardingView = () => {
         ))}
       </div>
 
-      <main className='mx-auto w-full max-w-4xl flex-1 px-4 pb-16 pt-8 sm:px-6 sm:pt-16'>
+      <main className='mx-auto w-full max-w-4xl flex-1 px-4 pb-16 pt-8 sm:px-6 sm:pt-12'>
+        {/* Kostek stays on screen for the whole onboarding and asks each
+            question in its bubble; moving on makes it bounce and change face
+            while the new question types itself out. */}
+        <KostekSays
+          heading
+          text={question[step]}
+          mood={mood}
+          cue={step}
+          short
+          lively
+          arrive
+          delay={0.25}
+          // A fixed-width row: the bubble grows to the right, Kostek never
+          // shifts when a longer or shorter question comes in.
+          className='mx-auto mb-6 w-full max-w-2xl justify-center gap-3 sm:mb-8 sm:gap-5'
+          kostekClassName='h-24 sm:h-36'
+          bubbleClassName='w-fit max-w-full px-4 py-3 text-lg font-semibold leading-snug tracking-tight sm:px-6 sm:py-4 sm:text-3xl'
+          bubbleSlotClassName='w-[13rem] sm:w-[28rem]'
+        />
         {step === "level" && (
           <StepBody key='level'>
-            <StepHeading title={t("level_step.title")} />
+            <StepHeading />
             <div className='grid gap-4 sm:grid-cols-3'>
               {LEVEL_OPTIONS.map((option, index) => (
                 <button
@@ -718,7 +752,6 @@ const OnboardingView = () => {
         {step === "play" && (
           <StepBody key='play'>
             <StepHeading
-              title={t("play_step.title")}
               onBack={pending ? undefined : () => goTo("level")}
             />
             <div className='mx-auto max-w-lg'>
@@ -752,13 +785,6 @@ const OnboardingView = () => {
         {step === "goal" && (
           <StepBody key='goal'>
             <StepHeading
-              title={t(
-                start.returnedFromRiff
-                  ? "goal_step.title_after_play"
-                  : playChoice === "no_guitar"
-                    ? "goal_step.title_no_guitar"
-                    : "goal_step.title",
-              )}
               // One line so the tiles read as what's worth a look without a guitar.
               description={
                 playChoice === "no_guitar"
@@ -766,8 +792,6 @@ const OnboardingView = () => {
                   : undefined
               }
               onBack={pending ? undefined : () => goTo("play")}
-              // Back from the first riff they ever played here: that is a party.
-              mascotMood={start.returnedFromRiff ? "celebrate" : undefined}
             />
             <div className='grid gap-4 sm:grid-cols-2'>
               {goals.map((option, index) => (
@@ -789,7 +813,6 @@ const OnboardingView = () => {
         {step === "plan" && (
           <StepBody key='plan'>
             <StepHeading
-              title={t("plan_step.title")}
               onBack={pending ? undefined : () => goTo("goal")}
             />
             <div className='grid gap-4 sm:grid-cols-2'>
@@ -825,7 +848,6 @@ const OnboardingView = () => {
         {step === "songs" && (
           <StepBody key='songs'>
             <StepHeading
-              title={t("songs_step.title")}
               description={t("songs_step.description")}
             />
             {/* Sized to fit a phone screen without scrolling, buttons included. */}
@@ -865,7 +887,6 @@ const OnboardingView = () => {
         {step === "desktop" && (
           <StepBody key='desktop'>
             <StepHeading
-              title={t("desktop_hint.title")}
               description={t("desktop_hint.description")}
             />
             <div className='mx-auto max-w-md space-y-8'>

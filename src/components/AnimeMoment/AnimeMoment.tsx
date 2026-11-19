@@ -50,6 +50,11 @@ interface AnimeMomentProps {
   /** A shorter cut for wins that repeat (the second session of a day): no
    *  eyecatch wipe or screen tone, and it hands over sooner. */
   brief?: boolean;
+  /** The everyday version, for a win that comes after every session: the
+   *  hero, the title and the chips over faint focus lines — no shake, rings,
+   *  streaks or burst, and the title simply rises in. The full show stays for
+   *  the wins that are rare. */
+  calm?: boolean;
   onDone: () => void;
 }
 
@@ -61,7 +66,7 @@ const rand = (k: number, i: number) => {
   const x = Math.sin(k * 97.3 + i * 13.17) * 43758.5453;
   return x - Math.floor(x);
 };
-const LINE_SETS = [0, 1, 2].map((k) =>
+export const LINE_SETS = [0, 1, 2].map((k) =>
   Array.from({ length: 60 }, (_, i) => {
     const a = (i / 60) * Math.PI * 2 + (rand(k, i) - 0.5) * 0.09;
     const w = 0.004 + rand(k + 7, i) * 0.012;
@@ -186,9 +191,9 @@ const Streaks = ({ at }: { at: number }) => (
 );
 
 // Burst pieces: guitar picks, eighth notes and four-point stars.
-const PICK = "M0,-9 C6,-9 8,-6.5 7.6,-3.5 C7.2,0 3.2,5 0,8 C-3.2,5 -7.2,0 -7.6,-3.5 C-8,-6.5 -6,-9 0,-9 Z";
-const NOTE = "M-2,6 C-2,9 -7,10 -7.5,7.5 C-8,5 -4,3.5 -2,4.5 L-2,-9 L6,-11 L6,-7 L0,-5.5 L0,6 Z";
-const STAR = "M0,-9 L2.2,-2.2 L9,0 L2.2,2.2 L0,9 L-2.2,2.2 L-9,0 L-2.2,-2.2 Z";
+export const PICK = "M0,-9 C6,-9 8,-6.5 7.6,-3.5 C7.2,0 3.2,5 0,8 C-3.2,5 -7.2,0 -7.6,-3.5 C-8,-6.5 -6,-9 0,-9 Z";
+export const NOTE = "M-2,6 C-2,9 -7,10 -7.5,7.5 C-8,5 -4,3.5 -2,4.5 L-2,-9 L6,-11 L6,-7 L0,-5.5 L0,6 Z";
+export const STAR = "M0,-9 L2.2,-2.2 L9,0 L2.2,2.2 L0,9 L-2.2,2.2 L-9,0 L-2.2,-2.2 Z";
 const PARTICLES = Array.from({ length: 24 }, (_, i) => {
   const angle = (i / 24) * Math.PI * 2 + (i % 2 ? 0.12 : -0.08);
   const dist = 230 + ((i * 53) % 190);
@@ -228,13 +233,26 @@ const Burst = ({ at, colors }: { at: number; colors: AnimeMomentColors }) => (
 );
 
 // ─── Title ────────────────────────────────────────────────────────────────────
-const Title = ({ text, delay, colors, reduceMotion }: { text: string; delay: number; colors: AnimeMomentColors; reduceMotion: boolean }) => {
+const Title = ({
+  text,
+  delay,
+  colors,
+  reduceMotion,
+  calm,
+}: {
+  text: string;
+  delay: number;
+  colors: AnimeMomentColors;
+  reduceMotion: boolean;
+  calm: boolean;
+}) => {
   const letters = Array.from(text);
   const settled = delay + letters.length * 0.035 + 0.15;
   return (
     <div className='relative mt-6'>
       {/* Chromatic split: two coloured ghosts snap onto the title and vanish. */}
       {!reduceMotion &&
+        !calm &&
         [
           { color: colors.a, from: -10 },
           { color: colors.b, from: 10 },
@@ -257,9 +275,14 @@ const Title = ({ text, delay, colors, reduceMotion }: { text: string; delay: num
             aria-hidden
             className='inline-block whitespace-pre'
             // Each letter slams down from big and blurred-fast, like a stamp.
-            initial={reduceMotion ? false : { opacity: 0, y: -24, scale: 2.4, rotate: i % 2 ? 10 : -10 }}
+            // (Calm: it just rises into place.)
+            initial={reduceMotion ? false : calm ? { opacity: 0, y: 12 } : { opacity: 0, y: -24, scale: 2.4, rotate: i % 2 ? 10 : -10 }}
             animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
-            transition={{ delay: delay + i * 0.035, type: "spring", stiffness: 520, damping: 18 }}>
+            transition={
+              calm
+                ? { delay: delay + i * 0.02, duration: 0.3, ease: EASE_OUT }
+                : { delay: delay + i * 0.035, type: "spring", stiffness: 520, damping: 18 }
+            }>
             {ch}
           </motion.span>
         ))}
@@ -302,6 +325,7 @@ export const AnimeMoment = ({
   land = 1.6,
   durationMs,
   brief = false,
+  calm = false,
   layoutId,
   colors = DEFAULT_COLORS,
   zIndex = 60,
@@ -321,7 +345,7 @@ export const AnimeMoment = ({
       finished = true;
       doneRef.current();
     };
-    const timer = setTimeout(finish, reduceMotion ? 1800 : (durationMs ?? (brief ? 2700 : 3600)));
+    const timer = setTimeout(finish, reduceMotion ? 1800 : (durationMs ?? (calm ? 2500 : brief ? 2700 : 3600)));
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === "Escape") finish();
     };
@@ -330,12 +354,12 @@ export const AnimeMoment = ({
       clearTimeout(timer);
       window.removeEventListener("keydown", onKey);
     };
-  }, [reduceMotion, durationMs, brief]);
+  }, [reduceMotion, durationMs, brief, calm]);
 
   if (typeof document === "undefined") return null;
   const d = (s: number) => (reduceMotion ? 0 : s);
 
-  const heroNode = hero ?? <Kostek mood={mood} delay={d(0.55)} className='h-48 md:h-60' />;
+  const heroNode = hero ?? <Kostek mood={mood} short={calm} delay={d(0.55)} className={calm ? "h-40 md:h-48" : "h-48 md:h-60"} />;
 
   return createPortal(
     <motion.div
@@ -343,7 +367,10 @@ export const AnimeMoment = ({
       aria-label={title}
       onClick={() => doneRef.current()}
       style={{ zIndex }}
-      className='fixed inset-0 flex cursor-pointer items-center justify-center overflow-hidden bg-zinc-950'
+      // force-dark: the moment is a dark scene in the light theme too. Its
+      // lines, streaks and the vignette are drawn for a dark page; on a light
+      // one the vignette was a black blot behind an ink Kostek.
+      className='force-dark fixed inset-0 flex cursor-pointer items-center justify-center overflow-hidden bg-zinc-950'
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: 0.45, ease: "easeInOut" } }}
@@ -351,9 +378,21 @@ export const AnimeMoment = ({
       {/* Screen shake on landing moves everything, background included. */}
       <motion.div
         className='absolute inset-0 flex items-center justify-center'
-        animate={reduceMotion ? undefined : { x: [0, -5, 4, -2, 1, 0], y: [0, 3, -2, 1, 0, 0] }}
+        animate={reduceMotion || calm ? undefined : { x: [0, -5, 4, -2, 1, 0], y: [0, 3, -2, 1, 0, 0] }}
         transition={{ duration: 0.42, delay: land, ease: "easeOut" }}>
-        {!reduceMotion && (
+        {!reduceMotion && calm && (
+          <>
+            <div className='absolute inset-0 opacity-40'>
+              <FocusLines land={land} colors={colors} />
+            </div>
+            <div
+              aria-hidden
+              className='absolute inset-0'
+              style={{ background: "radial-gradient(circle at center, #09090b 26%, rgba(9,9,11,0) 54%)" }}
+            />
+          </>
+        )}
+        {!reduceMotion && !calm && (
           <>
             <FocusLines land={land} colors={colors} />
             {!brief && <ScreenTone />}
@@ -373,14 +412,18 @@ export const AnimeMoment = ({
         <div className='relative flex flex-col items-center px-6 text-center'>
           <motion.div layoutId={layoutId} transition={{ type: "spring", stiffness: 140, damping: 20 }}>
             <motion.div
-              initial={reduceMotion ? false : { scale: 0.2, opacity: 0, rotate: -14, y: 60 }}
+              initial={reduceMotion ? false : calm ? { scale: 0.85, opacity: 0, y: 24 } : { scale: 0.2, opacity: 0, rotate: -14, y: 60 }}
               animate={{ scale: 1, opacity: 1, rotate: 0, y: 0 }}
-              transition={{ delay: d(0.45), type: "spring", stiffness: 230, damping: 13 }}>
+              transition={
+                calm
+                  ? { delay: d(0.25), type: "spring", stiffness: 200, damping: 22 }
+                  : { delay: d(0.45), type: "spring", stiffness: 230, damping: 13 }
+              }>
               {heroNode}
             </motion.div>
           </motion.div>
 
-          <Title text={title} delay={d(TITLE_DELAY)} colors={colors} reduceMotion={reduceMotion} />
+          <Title text={title} delay={d(calm ? TITLE_DELAY - 0.3 : TITLE_DELAY)} colors={colors} reduceMotion={reduceMotion} calm={calm} />
 
           {subtitle && (
             <motion.p

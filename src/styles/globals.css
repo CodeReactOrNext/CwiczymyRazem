@@ -435,6 +435,12 @@ html.theme-light:has([data-app-shell]) {
   /* Kostek, the mascot: off-white on dark, ink on light (its eyes are cut-outs). */
   --mascot-fg: #18181b;
   --mascot-shade: #0b0b0d;
+  /* What shows through its eyes where they are painted, not cut (PerkArt). */
+  --mascot-cut: #ffffff;
+  /* Its accent: the cyan of the dark theme washes out on a white card. */
+  --mascot-accent: #06b6d4;
+  /* The second tone on what it holds: the shade above is too close to the ink. */
+  --mascot-prop: #71717a;
   color-scheme: light;
   color: #18181b;
   background-color: #eaeaed;
@@ -539,6 +545,13 @@ html.theme-light:has([data-app-shell]) .app-scrim {
 html.theme-light:has([data-app-shell]) .force-dark {
   color-scheme: dark;
   color: #f5f5f5;
+  /* Kostek on a dark surface is the dark theme's Kostek: left in ink it
+     vanished into the card. */
+  --mascot-fg: #fbfbfa;
+  --mascot-shade: #dcdcd6;
+  --mascot-cut: #18181b;
+  --mascot-accent: #22d3ee;
+  --mascot-prop: #dcdcd6;
   --background: 0 0% 3.9%;
   --foreground: 0 0% 98%;
   --card: 0 0% 10%;

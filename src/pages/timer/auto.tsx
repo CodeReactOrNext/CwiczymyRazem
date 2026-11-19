@@ -5,6 +5,7 @@ import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { AutoPlanGenerator } from "feature/practice/views/AutoPlanGenerator/AutoPlanGenerator";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
+import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
 import AppLayout from "layouts/AppLayout";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
@@ -45,9 +46,11 @@ const TimerAuto: NextPageWithLayout = () => {
     router.push("/report");
   };
 
+  const sessionOpen = useSessionEntryGate(!!selectedPlan);
+
   return (
     <PremiumGate feature="timer-auto" requiredPlan="master">
-      {selectedPlan ? (
+      {selectedPlan && sessionOpen ? (
         <MainContainer>
           <PracticeSession onClose={handleBack} plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
         </MainContainer>

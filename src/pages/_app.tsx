@@ -33,6 +33,7 @@ import { ElectronIntegrations } from "components/ElectronIntegrations";
 import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
 import { RouteProgress } from "components/RouteProgress/RouteProgress";
 import { DesktopNotifications } from "feature/notifications/components/DesktopNotifications";
+import { SessionEntryTransition } from "feature/sessionEntry/SessionEntryTransition";
 import useAuthSync from "hooks/useAuthSync";
 import useDailyQuestSync from "hooks/useDailyQuestSync";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
@@ -131,6 +132,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                           "reduce motion" in the OS turns transforms off everywhere. */}
                       <MotionConfig transition={transitions.base} reducedMotion='user'>
                         <RouteProgress />
+                        <SessionEntryTransition />
                         {page}
                       </MotionConfig>
                     </LazyMotion>

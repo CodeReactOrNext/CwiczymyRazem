@@ -2,6 +2,7 @@ import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { DISCORD_INVITE_URL } from "constants/community";
+import { PerkArt, type PerkArtKind } from "feature/roadmap/components/PerkArt";
 import { TokenExchange } from "feature/supporterPanel/components/TokenExchange";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
@@ -9,8 +10,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface SpendPerk {
-  id: string;
-  image: string;
+  id: PerkArtKind;
 }
 
 /**
@@ -25,13 +25,14 @@ interface SpendPerk {
  *
  * Nobody read the first version: six rows of small grey type, each behind its
  * own icon. So there are no row icons here at all, nothing is set smaller than
- * `text-sm`, and each thing on offer is a picture first.
+ * `text-sm`, and each thing on offer is a picture first — a scene with Kostek
+ * in it (PerkArt), drawn in the mascot's own flat style.
  */
 const SPEND_PERKS: SpendPerk[] = [
-  { id: "roadmap", image: "/images/supporter-perks/board.webp" },
-  { id: "coach", image: "/images/supporter-perks/map.webp" },
-  { id: "shop", image: "/images/supporter-perks/skins.webp" },
-  { id: "guild", image: "/images/supporter-perks/shield.webp" },
+  { id: "roadmap" },
+  { id: "coach" },
+  { id: "shop" },
+  { id: "guild" },
 ];
 
 const BADGE_PERKS = ["badge", "discord", "ai"];
@@ -78,16 +79,10 @@ const BadgePerk = ({ id }: { id: string }) => {
 
 const SpendCard = ({ perk }: { perk: SpendPerk }) => {
   const { t } = useTranslation("supporter");
-  const { id, image } = perk;
+  const { id } = perk;
   return (
     <li className='flex min-w-0 items-start gap-5 sm:flex-col sm:gap-0'>
-      <img
-        src={image}
-        alt=''
-        aria-hidden
-        loading='lazy'
-        className='aspect-[4/3] w-24 shrink-0 object-contain sm:w-full sm:max-w-[240px]'
-      />
+      <PerkArt kind={id} className='aspect-[4/3] w-24 shrink-0 sm:w-full sm:max-w-[240px]' />
       <div className='min-w-0 sm:mt-4'>
         <p className='text-base font-semibold text-zinc-100'>
           {t(`perks.items.${id}.title`)}
@@ -151,13 +146,7 @@ export const RoadmapPerks = ({ showPanelLink = true }: RoadmapPerksProps) => {
           phone. The two halves are told apart by their headings and the gap
           between them. */}
       <div className='relative mt-12 flex flex-col gap-x-10 gap-y-6 sm:flex-row sm:items-start'>
-        <img
-          src='/images/supporter-perks/badge.webp'
-          alt=''
-          aria-hidden
-          loading='lazy'
-          className='aspect-[4/3] w-28 shrink-0 object-contain sm:w-40'
-        />
+        <PerkArt kind='badge' className='aspect-[4/3] w-28 shrink-0 sm:w-40' />
         <div className='min-w-0 flex-1'>
           <GroupHeading
             title={t("perks.badge_title")}

@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
+import { Kostek } from "components/Mascot/Kostek";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { getEquippedRarity } from "feature/arsenal/data/equippedGuitar";
@@ -191,12 +192,17 @@ const ProfileLandingLayout = ({
         leftContent={
           <div className='flex flex-col gap-3'>
             <div className='flex flex-row flex-wrap items-center justify-between gap-3'>
-              <Button
-                onClick={() => router.push("/timer")}
-                className='group/btn h-14 px-8 text-base font-semibold'>
-                Practice
-                <ArrowRight className='ml-2 h-5 w-5 transition-transform duration-base group-hover/btn:translate-x-1' />
-              </Button>
+              <div className='flex items-center gap-5'>
+                <Button
+                  onClick={() => router.push("/timer")}
+                  className='group/btn h-14 px-8 text-base font-semibold'>
+                  Practice
+                  <ArrowRight className='ml-2 h-5 w-5 transition-transform duration-base group-hover/btn:translate-x-1' />
+                </Button>
+                {/* With no special guitar to fill the banner, Kostek stands
+                    by the button and keeps pointing at it. */}
+                {!isSpecialGuitar && <Kostek mood='nudge' lookAt='left' className='-my-4 hidden h-24 shrink-0 md:block' />}
+              </div>
               <div className='select-none rounded-xl bg-zinc-900/50 p-2 md:hidden'>
                 {renderProgress(64)}
               </div>

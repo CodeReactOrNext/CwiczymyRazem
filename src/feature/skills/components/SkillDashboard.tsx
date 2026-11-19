@@ -16,6 +16,7 @@ import { hasLeaderboard as hasExerciseLeaderboard } from "feature/exercisePlan/u
 import { isClickAnsweredMode } from "feature/exercisePlan/utils/huntModes";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
+import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { SkillRoadmapMobile } from "feature/skills/roadmap/SkillRoadmapMobile";
 import { SkillRoadmapView } from "feature/skills/roadmap/SkillRoadmapView";
@@ -257,7 +258,9 @@ export const SkillDashboard = ({
     }
   };
 
-  if (selectedChallenge) {
+  const sessionOpen = useSessionEntryGate(!!selectedChallenge);
+
+  if (selectedChallenge && sessionOpen) {
     return (
       <div
         className={cn(

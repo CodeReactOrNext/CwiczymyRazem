@@ -2,6 +2,7 @@ import { buttonVariants } from "assets/components/ui/button";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { HeroPattern } from "components/UI/HeroBanner";
+import { SupportHeart } from "feature/dashboard/components/SupportHeart";
 import { FundingStatusBlock } from "feature/roadmap/components/FundingStatusBlock";
 import { ROADMAP_RAISED_OFFSET } from "feature/roadmap/data/roadmap.data";
 import { useBuyMeACoffeeFunding } from "feature/roadmap/hooks/useBuyMeACoffeeFunding";
@@ -42,12 +43,7 @@ export const SupportBanner = () => {
         {/* Full width until lg, same as RoadmapPitch — the shrink-0 CTA plus the
             gap would otherwise leave the copy a couple of characters per line. */}
         <div className='flex w-full min-w-0 items-center gap-4 lg:w-auto lg:flex-1'>
-          <img
-            src='/images/tokens/heart.png'
-            alt=''
-            aria-hidden
-            className='size-12 shrink-0 object-contain'
-          />
+          <SupportHeart className='size-16 shrink-0 sm:size-20' />
           <div className='min-w-0'>
             <p className='text-sm font-semibold text-zinc-100 sm:text-base'>
               {t("support.title")}

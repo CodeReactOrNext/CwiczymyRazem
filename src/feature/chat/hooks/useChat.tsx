@@ -23,6 +23,7 @@ import {
   selectUserName,
 } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
+import { devSim } from "lib/devSim";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
@@ -41,7 +42,9 @@ const quoteOf = (message: ChatMessageType): string => {
 export const useChat = (chatPath: string = GLOBAL_CHAT_PATH) => {
   const { t } = useTranslation("chat");
   // `null` until the first snapshot lands, so an empty room can be told apart from a loading one.
-  const [messages, setMessages] = useState<ChatMessageType[] | null>(null);
+  const [messages, setMessages] = useState<ChatMessageType[] | null>(
+    () => devSim()?.chatMessages ?? null,
+  );
   const [newMessage, setNewMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<ChatReplyTo | null>(null);
@@ -58,6 +61,8 @@ export const useChat = (chatPath: string = GLOBAL_CHAT_PATH) => {
   const guildBadge = useAppSelector(selectUserGuildBadge);
 
   useEffect(() => {
+    // The dev simulator hands the room in; nothing to subscribe to.
+    if (devSim()?.chatMessages) return undefined;
     const unsubscribe = fetchChatMessages(setMessages, chatPath);
     return unsubscribe;
   }, [chatPath]);

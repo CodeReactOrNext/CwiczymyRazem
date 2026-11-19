@@ -17,6 +17,7 @@ import {
 import { arrayMove,sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { Button, PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { Kostek } from "components/Mascot/Kostek";
 import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { Ripple } from "components/Ripple/Ripple";
 import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
@@ -641,9 +642,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
 
                   {totalSongsCount === 0 && (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
-                        <Music size={32} className="text-zinc-500" />
-                      </div>
+                      <Kostek mood="lookAround" className="mb-6 h-24 md:h-36" />
                       <h3 className="mb-2 text-xl font-bold text-white">{t("view.board_empty")}</h3>
                       <p className="max-w-xs text-sm text-zinc-400">
                         {t("view.board_empty_hint")}

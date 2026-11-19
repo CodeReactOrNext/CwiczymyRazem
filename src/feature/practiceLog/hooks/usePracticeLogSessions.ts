@@ -4,6 +4,7 @@ import {
   peekUserRaprotsLogs,
 } from "feature/logs/services/getUserRaprotsLogs.service";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
+import { devSim } from "lib/devSim";
 import { useCallback, useEffect, useState } from "react";
 
 import type { PracticeLogSession } from "../types/practiceLog.types";
@@ -20,6 +21,9 @@ export const usePracticeLogSessions = (userAuth: string) => {
   // sessions draws them on the first frame instead of flashing a skeleton
   // while the (instant) cached promise resolves.
   const [sessions, setSessions] = useState<PracticeLogSession[] | null>(() => {
+    // The dev simulator hands the sessions in.
+    const simulated = devSim()?.practiceLogSessions;
+    if (simulated) return simulated;
     const cached = userAuth ? peekUserRaprotsLogs(userAuth, "all") : null;
     return cached ? toSessions(cached) : null;
   });
@@ -30,7 +34,7 @@ export const usePracticeLogSessions = (userAuth: string) => {
     let cancelled = false;
 
     const fetchSessions = async () => {
-      if (!userAuth) return;
+      if (!userAuth || devSim()?.practiceLogSessions) return;
 
       setIsLoading(true);
       try {

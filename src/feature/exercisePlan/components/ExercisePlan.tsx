@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
@@ -80,12 +81,14 @@ export const ExercisePlan = ({ hideLayout, onSessionChange, controlledTab, onTab
     onSessionChange?.(false);
   };
 
+  const sessionOpen = useSessionEntryGate(activeTab === "practice" && !!selectedPlan);
+
   return (
-    <div className={cn('container mx-auto font-openSans', !selectedPlan && 'md:py-8')}>
+    <div className={cn('container mx-auto font-openSans', !sessionOpen && 'md:py-8')}>
 
 
       <div className='mt-4 sm:mt-6'>
-        {activeTab === "practice" && selectedPlan ? (
+        {sessionOpen && selectedPlan ? (
           <PracticeSession
             plan={selectedPlan}
             onFinish={handleFinish}

@@ -8,6 +8,7 @@ import { LIBRARY_TABS } from "constants/navTabs";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import {
   ChevronLeft,
@@ -260,7 +261,9 @@ export const CalendarView = () => {
       )
     : undefined;
 
-  if (session) {
+  const sessionOpen = useSessionEntryGate(!!session);
+
+  if (session && sessionOpen) {
     return (
       <MainContainer>
         <PracticeSession

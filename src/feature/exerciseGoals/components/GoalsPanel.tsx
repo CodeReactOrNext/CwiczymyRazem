@@ -115,7 +115,7 @@ export const GoalsPanel = ({
       {goals.length === 0 ? (
         <div className='flex flex-col items-center justify-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
           {/* No goals: Kostek rubs its hands, ready to aim at one. */}
-          <Kostek mood='ready' className='mb-4 h-24 md:h-36' />
+          <Kostek mood='lookAround' className='mb-4 h-24 md:h-36' />
           <p className='text-base font-semibold text-zinc-100'>
             {t("empty.title")}
           </p>

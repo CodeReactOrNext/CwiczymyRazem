@@ -7,6 +7,7 @@ import { LIBRARY_TABS } from "constants/navTabs";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
 import { useSongDurations } from "feature/songs/hooks/useSongDurations";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence } from "framer-motion";
@@ -182,7 +183,9 @@ export const RotationView = () => {
     }
   };
 
-  if (activePlan) {
+  const sessionOpen = useSessionEntryGate(!!activePlan);
+
+  if (activePlan && sessionOpen) {
     return (
       <MainContainer>
         <PracticeSession

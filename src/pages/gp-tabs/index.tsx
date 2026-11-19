@@ -22,6 +22,7 @@ import type {
 } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
+import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
 import {
   GP_EXTENSIONS,
   isGpFile,
@@ -565,7 +566,9 @@ const GpTabsPage: NextPageWithLayout = () => {
   };
 
   // ── Practice session fullscreen ──────────────────────────────────────────────
-  if (sessionPlan) {
+  const sessionOpen = useSessionEntryGate(!!sessionPlan);
+
+  if (sessionPlan && sessionOpen) {
     return (
       <PracticeSession
         plan={sessionPlan}

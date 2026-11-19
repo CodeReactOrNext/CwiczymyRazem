@@ -15,6 +15,7 @@ import type { CommunityExercise } from "feature/communityExercises/types";
 import { isReadyToPublish } from "feature/communityExercises/utils/isReadyToPublish";
 import { clearTabEditorDraft, saveTabEditorDraft } from "feature/exercisePlan/utils/tabEditorDraft";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useLibrarySort } from "hooks/useLibrarySort";
@@ -166,7 +167,9 @@ const MyExercisesPage: NextPageWithLayout = () => {
     setDeletingId(null);
   };
 
-  if (activeExercise) {
+  const sessionOpen = useSessionEntryGate(!!activeExercise);
+
+  if (activeExercise && sessionOpen) {
     return (
       <div className="bg-second-600 rounded-lg overflow-visible flex flex-col min-h-screen ">
         <div className="px-4 pt-6 pb-2">
@@ -217,7 +220,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
           {exercises.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 gap-6 text-center">
               {/* No exercises of your own: Kostek rubs its hands, ready for the first. */}
-              <Kostek mood="ready" className="h-24 md:h-36" />
+              <Kostek mood="lookAround" className="h-24 md:h-36" />
               <div className="space-y-2">
                 <p className="text-zinc-100 font-semibold">{t("my_exercises.empty_title")}</p>
                 <p className="text-zinc-400 text-sm max-w-sm">

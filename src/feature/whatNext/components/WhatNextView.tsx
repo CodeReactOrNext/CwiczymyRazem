@@ -5,6 +5,7 @@ import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
 import MainContainer from "components/MainContainer";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
 import {
   RoadStripSkeleton,
   WhatNextRoadStrip,
@@ -45,7 +46,9 @@ export const WhatNextView = () => {
     });
   }, [result, isLoading]);
 
-  if (session) {
+  const sessionOpen = useSessionEntryGate(!!session);
+
+  if (session && sessionOpen) {
     return (
       <MainContainer>
         <PracticeSession
