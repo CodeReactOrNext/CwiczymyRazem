@@ -172,8 +172,21 @@ type HandMV = { x: MotionValue<number>; y: MotionValue<number>; r: MotionValue<n
 const Hand = ({ mv, shape, dim }: { mv: HandMV; shape: HandShape; dim: boolean }) => (
   <motion.g style={{ x: mv.x, y: mv.y, rotate: mv.r }}>
     {shape === "point" && <rect x={3.5} y={-2.2} width={10.5} height={4.4} rx={2.2} fill={C.hand} />}
-    {shape === "thumb" && <rect x={-2.3} y={-13} width={4.6} height={9.5} rx={2.3} fill={C.hand} />}
+    {shape === "thumb" && (
+      // A thumbs-up, not a lone raised finger: a short thumb leaning out from
+      // the top-left of a fist (the curled fingers are marked over the fist).
+      <>
+        <rect x={-7.2} y={-12.5} width={5} height={9} rx={2.5} fill={C.hand} transform='rotate(-24 -4.7 -4)' />
+      </>
+    )}
     <ellipse cx={0} cy={0} rx={shape === "fist" ? 6.8 : 7.6} ry={shape === "fist" ? 6.4 : 7} fill={C.hand} />
+    {shape === "thumb" && (
+      <g stroke='#272C34' strokeWidth={1.3} strokeLinecap='round'>
+        <path d='M0.5,-1.6 L5.2,-1.6' />
+        <path d='M0.5,1.4 L5.2,1.4' />
+        <path d='M0.8,4.2 L4.6,4.2' />
+      </g>
+    )}
     <path d={shape === "fist" ? "M-4.2,-3.8 Q0,-6.6 4.2,-3.8" : "M-4.6,-4.2 Q0,-7.2 4.6,-4.2"} fill='none' stroke={dim ? C.hand : C.handEdge} strokeWidth={1.8} strokeLinecap='round' />
   </motion.g>
 );
@@ -905,8 +918,21 @@ export const EchoStill = ({ mood = "idle", lookAt, eyesClosed = false }: { mood?
     return (
       <g transform={`translate(${h.x} ${h.y}) rotate(${h.r})`}>
         {shape === "point" && <rect x={3.5} y={-2.2} width={10.5} height={4.4} rx={2.2} fill={C.hand} />}
-        {shape === "thumb" && <rect x={-2.3} y={-13} width={4.6} height={9.5} rx={2.3} fill={C.hand} />}
+        {shape === "thumb" && (
+      // A thumbs-up, not a lone raised finger: a short thumb leaning out from
+      // the top-left of a fist (the curled fingers are marked over the fist).
+      <>
+        <rect x={-7.2} y={-12.5} width={5} height={9} rx={2.5} fill={C.hand} transform='rotate(-24 -4.7 -4)' />
+      </>
+    )}
         <ellipse cx={0} cy={0} rx={shape === "fist" ? 6.8 : 7.6} ry={shape === "fist" ? 6.4 : 7} fill={C.hand} />
+    {shape === "thumb" && (
+      <g stroke='#272C34' strokeWidth={1.3} strokeLinecap='round'>
+        <path d='M0.5,-1.6 L5.2,-1.6' />
+        <path d='M0.5,1.4 L5.2,1.4' />
+        <path d='M0.8,4.2 L4.6,4.2' />
+      </g>
+    )}
         <path d={shape === "fist" ? "M-4.2,-3.8 Q0,-6.6 4.2,-3.8" : "M-4.6,-4.2 Q0,-7.2 4.6,-4.2"} fill='none' stroke={pose.lit ? C.handEdge : C.hand} strokeWidth={1.8} strokeLinecap='round' />
       </g>
     );
