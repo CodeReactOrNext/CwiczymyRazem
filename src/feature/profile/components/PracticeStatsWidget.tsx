@@ -2,6 +2,10 @@ import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { getDailyGoalMinutes } from "constants/dailyGoal";
 import { addDays, format, isSameDay, startOfWeek } from "date-fns";
+import {
+  getFirstPracticeDay,
+  isBeforeFirstPractice,
+} from "feature/profile/utils/firstPracticeDay";
 import { useTranslation } from "hooks/useTranslation";
 import { useColorTheme } from "lib/colorTheme/colorTheme";
 import { useDateFnsLocale, useIntlLocale } from "lib/i18n/dateLocale";
@@ -160,6 +164,9 @@ export const PracticeStatsWidget = ({
   });
 
   const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+  // Days before the player's first practice ever are drawn like days still to
+  // come: no red line, no cross. A new account is not told it missed Monday.
+  const firstPracticeDay = getFirstPracticeDay(reportList);
 
   const weekDays = DAYS_OF_WEEK.map((label, index) => {
     const dayDate = addDays(weekStart, index);
@@ -171,12 +178,15 @@ export const PracticeStatsWidget = ({
     const isToday = isSameDay(dayDate, today);
     const isFuture = dayDate > today;
     const isGoalMet = timeMs >= goalMs;
+    const isBeforeStart =
+      !isToday && !isFuture && isBeforeFirstPractice(dayDate, firstPracticeDay);
     return {
       label,
       dayDate,
       timeMs,
       isToday,
       isFuture,
+      isBeforeStart,
       isGoalMet,
       activities: dayReport?.activities,
       dateLabel: isToday
@@ -188,13 +198,14 @@ export const PracticeStatsWidget = ({
   const practicedDaysThisWeek = weekDays.filter((d) => d.timeMs > 0 && !d.isFuture).length;
   const maxMinutes = Math.max(goalMin * 2, ...weekDays.map((d) => d.timeMs / 60000));
 
-  const chartData = weekDays.map(({ label, dayDate, timeMs, isFuture, isToday, isGoalMet, activities, dateLabel }) => ({
+  const chartData = weekDays.map(({ label, dayDate, timeMs, isFuture, isToday, isBeforeStart, isGoalMet, activities, dateLabel }) => ({
     day: format(dayDate, "EEE", { locale: dateFnsLocale }) || label,
     minutes: isFuture && !isToday ? 0 : Math.round(timeMs / 60000),
     totalMs: timeMs,
     isGoalMet,
     isToday,
     isFuture,
+    isBeforeStart,
     activities,
     dateLabel,
   }));
@@ -235,13 +246,14 @@ export const PracticeStatsWidget = ({
                   const day = weekDays[index];
                   if (!day) return <g />;
 
-                  const isPast = !day.isToday && !day.isFuture;
+                  const isPast =
+                    !day.isToday && !day.isFuture && !day.isBeforeStart;
                   const showCheck = day.isGoalMet;
                   const showX = isPast && !day.isGoalMet;
 
                   const labelColor = day.isToday
                     ? ink.today
-                    : day.isFuture
+                    : day.isFuture || day.isBeforeStart
                     ? ink.future
                     : day.isGoalMet
                     ? ink.met
@@ -311,7 +323,7 @@ export const PracticeStatsWidget = ({
                 background={{ fill: ink.track, radius: 3 }}
                 shape={(props: any) => {
                   const { x, y, width, height, payload } = props;
-                  const isUnfulfilled = !payload.isGoalMet && !payload.isFuture && !payload.isToday;
+                  const isUnfulfilled = !payload.isGoalMet && !payload.isFuture && !payload.isToday && !payload.isBeforeStart;
                   
                   if (!width || !height) {
                     if (isUnfulfilled) {

@@ -32,6 +32,8 @@ export interface AttackSpectra {
   before: Float32Array;
   after: Float32Array;
   binHz: number;
+  /** Read with the bass window (BASS_WINDOW_MS) — rivals are then looked for down to a bass's lowest notes. */
+  bass?: boolean;
 }
 
 /** An attack's spectra as they stand: still being captured, read, or not readable. */
@@ -44,6 +46,15 @@ export const spectraOf = (reading: AttackReading | undefined): AttackSpectra | n
 /** Each look spans ~85 ms — enough bins to tell a semitone apart at a note's
  *  2nd–5th harmonic, short enough to end before the next eighth at 160 BPM. */
 const WINDOW_MS = 85;
+/** On bass each look is twice as long. A fret is 2.5 Hz at the low E and 85 ms
+ *  resolves ~27 Hz, so the short look can't tell a bass note from the frets
+ *  around it before its 11th harmonic, where a plucked bass has little left:
+ *  held against a tab a fret or two off, it credited 31% of the notes of real
+ *  bass lines, and with the rivals down there checked honestly it lost the
+ *  notes played over ringing strings instead. At 170 ms it does both — 2% and
+ *  98% (guitarBufferProcessor.realbass.test.ts). The verdict comes ~265 ms
+ *  after the attack, still inside the hit window of an eighth at 160 BPM. */
+const BASS_WINDOW_MS = 170;
 /** "Before" stops short of the attack: the onset is timed to ±10 ms. */
 const PRE_GAP_MS = 10;
 /** "After" starts once the pick's own noise is over. The verdict comes ~170 ms
@@ -58,9 +69,11 @@ const TOP_HZ = 2000;
 const LOWEST_HZ = 60;
 /** Rivals are looked for from a semitone under the low E up to here. */
 const RIVAL_RANGE_HZ: [number, number] = [75, 1400];
+/** On bass, from under a five-string's low B. */
+const BASS_RIVAL_RANGE_HZ: [number, number] = [28, 1400];
 
-export const attackFftSize = (sampleRate: number): number =>
-  2 ** Math.min(15, Math.max(11, Math.round(Math.log2((sampleRate * WINDOW_MS) / 1000))));
+export const attackFftSize = (sampleRate: number, bass = false): number =>
+  2 ** Math.min(15, Math.max(11, Math.round(Math.log2((sampleRate * (bass ? BASS_WINDOW_MS : WINDOW_MS)) / 1000))));
 
 /** The Blackman window, as the chord spectrum uses (pcmSpectrum.ts). */
 const blackman = (size: number): Float64Array =>
@@ -68,6 +81,10 @@ const blackman = (size: number): Float64Array =>
     const phase = (2 * Math.PI * n) / size;
     return 0.42 - 0.5 * Math.cos(phase) + 0.08 * Math.cos(2 * phase);
   });
+
+/** An attack this soon (ms) after another cuts that one's "after" look short, and it reads null. */
+export const attackLookCutoffMs = (sampleRate: number, bass = false): number =>
+  POST_GAP_MS + (0.75 * attackFftSize(sampleRate, bass) * 1000) / sampleRate;
 
 export interface AttackSpectraTap {
   /** Appends captured samples (raw, any block size). Settles every attack whose verdict is now due. */
@@ -84,8 +101,9 @@ export interface AttackSpectraTap {
   readonly written: number;
 }
 
-export function createAttackSpectraTap(sampleRate: number): AttackSpectraTap {
-  const size = attackFftSize(sampleRate);
+/** `bass` reads with the longer bass window and marks the spectra as a bass's (see BASS_WINDOW_MS). */
+export function createAttackSpectraTap(sampleRate: number, bass = false): AttackSpectraTap {
+  const size = attackFftSize(sampleRate, bass);
   const binHz = sampleRate / size;
   const bins = Math.min(size / 2, Math.ceil(TOP_HZ / binHz) + 2);
   const preGap = Math.round((PRE_GAP_MS / 1000) * sampleRate);
@@ -119,7 +137,7 @@ export function createAttackSpectraTap(sampleRate: number): AttackSpectraTap {
   const settle = () => {
     pending = pending.filter(({ onset, before, receive }) => {
       if (written < onset + settledAfter) return true;
-      receive({ before, after: spectrumFrom(onset + postGap), binHz });
+      receive({ before, after: spectrumFrom(onset + postGap), binHz, ...(bass && { bass }) });
       return false;
     });
   };
@@ -213,6 +231,7 @@ interface Rise {
   mean: (freqs: number[]) => number;
   top: number;
   binHz: number;
+  rivalRangeHz: [number, number];
 }
 
 const riseCache = new WeakMap<AttackSpectra, Rise>();
@@ -230,7 +249,7 @@ const riseOf = (attack: AttackSpectra): Rise => {
   let top = 0;
   for (let k = Math.floor(LOWEST_HZ / binHz); k < rise.length; k++) top = Math.max(top, rise[k]);
   const at = (freq: number) => levelNear(rise, binHz, freq);
-  const result: Rise = { at, top, binHz, mean: (freqs) => (freqs.length ? freqs.reduce((sum, f) => sum + at(f), 0) / freqs.length : 0) };
+  const result: Rise = { at, top, binHz, rivalRangeHz: attack.bass ? BASS_RIVAL_RANGE_HZ : RIVAL_RANGE_HZ, mean: (freqs) => (freqs.length ? freqs.reduce((sum, f) => sum + at(f), 0) / freqs.length : 0) };
   riseCache.set(attack, result);
   return result;
 };
@@ -241,7 +260,7 @@ function struckOn(rise: Rise, freq: number): boolean {
   // Identity: it beats every note it could be mistaken for.
   for (const ratio of RIVALS) {
     const rival = freq * ratio;
-    if (rival < RIVAL_RANGE_HZ[0] || rival > RIVAL_RANGE_HZ[1]) continue;
+    if (rival < rise.rivalRangeHz[0] || rival > rise.rivalRangeHz[1]) continue;
     const mine = ownHarmonics(freq, rival, rise.binHz);
     const theirs = ownHarmonics(rival, freq, rise.binHz);
     if (mine.length > 0 && theirs.length > 0) {

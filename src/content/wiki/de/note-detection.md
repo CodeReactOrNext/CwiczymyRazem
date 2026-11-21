@@ -44,6 +44,8 @@ Jede Note, die die App hört, ist ein Treffer. Was ein Treffer wert ist, hängt 
 
 **Bei Bending-Übungen die Tonhöhe.** Jede Note wird danach beurteilt, wie sauber sie gestimmt ist. Ein Bending oder Zurücklassen zählt danach, wie nah es an die Note kommt, auf die es zielt, und eine gehaltene Note danach, wo sie sitzt, während sie klingt, zu festes Drücken und Hochgehen fällt also auf. Genau auf der Tonhöhe behält alles, ein wenig daneben zwei Drittel, und weiter daneben ein Drittel. Das Timing kostet dort nichts. Die Pfeile unter den Noten zeigen es weiterhin, aber die Zusammenfassung nach dem Durchlauf handelt von der Tonhöhe und sagt dir, ob deine Noten eher zu tief oder zu hoch landen.
 
+**Gedämpfte Noten haben keine Tonhöhe,** also braucht ein x im Tab nur den Anschlag im Takt. Ein Kratzen über mehrere gedämpfte Saiten ist ein Anschlag und zählt als eine Note, ein verpasstes kostet dich also eine Note, nicht sechs.
+
 Solange eine Note klingt, zeigt ein kleines Stimmgerät darüber, wo die Saite steht: Der Punkt sitzt im grünen Band, wenn du sauber gestimmt bist, und die Note selbst füllt sich entsprechend grün, bernsteinfarben oder orange. Eine Note, die daneben endete, behält ihre Anzeige, zum Beispiel +28¢ mit einem Pfeil nach oben für zu hoch. Während du biegst, füllt sich neben der Note eine Kurve, während die Saite steigt, und wird grün, wenn du die Tonhöhe erreichst.
 
 Das Diagramm unter der Zusammenfassung zeigt jede Note des Durchlaufs der Reihe nach: wie weit jede vom Schlag landete, bei Bending-Übungen von ihrer Tonhöhe, mit dem grünen Band, das die Bestnote markiert. Ein Durchlauf, der straff beginnt und driftet, während deine Hand ermüdet, zeigt sich dort sofort.

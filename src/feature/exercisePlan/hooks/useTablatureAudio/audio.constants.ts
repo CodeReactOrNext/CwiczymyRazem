@@ -2,11 +2,11 @@
 // string 1 → E4 (64), 2 → B3 (59), 3 → G3 (55), 4 → D3 (50), 5 → A2 (45), 6 → E2 (40),
 // 7 → B1 (35), a seven-string's extra low string (see STANDARD_OPEN_STRING_MIDI)
 export const GUITAR_STRING_MIDI = [64, 59, 55, 50, 45, 40, 35];
-// string 1 → G2 (43), 2 → D2 (38), 3 → A1 (33), 4 → E1 (28)
-export const BASS_STRING_MIDI   = [43, 38, 33, 28];
+// string 1 → G2 (43), 2 → D2 (38), 3 → A1 (33), 4 → E1 (28), 5 → B0 (23), a five-string's low string
+export const BASS_STRING_MIDI   = [43, 38, 33, 28, 23];
 
 export const GUITAR_STRING_FREQS = [329.63, 246.94, 196.00, 146.83, 110.00,  82.41,  61.74];
-export const BASS_STRING_FREQS   = [ 98.00,  73.42,  55.00,  41.20];
+export const BASS_STRING_FREQS   = [ 98.00,  73.42,  55.00,  41.20,  30.87];
 
 // ── Noise buffer ──────────────────────────────────────────────────────────────
 

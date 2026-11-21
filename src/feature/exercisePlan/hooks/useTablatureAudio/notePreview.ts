@@ -2,6 +2,7 @@ import Soundfont from "soundfont-player";
 import { createAudioContext, wakeAudioContext } from "utils/audio/audioContext";
 import { midiToFrequency } from "utils/audio/noteUtils";
 
+import { renderRoomImpulse } from "./guitarTone";
 import { playSoundfontNote } from "./soundfontVoice";
 
 // Own AudioContext, lazily created and kept for the page's lifetime — previews
@@ -24,23 +25,6 @@ interface PreviewBus {
 
 let _bus: PreviewBus | null = null;
 let _busCtx: AudioContext | null = null;
-
-/**
- * A synthetic impulse response: noise decaying exponentially, decorrelated per
- * channel. Not a real room, but enough of one that a single plucked note stops
- * sounding like it was recorded inside a cardboard box.
- */
-function renderRoomImpulse(ctx: AudioContext, seconds: number, decay: number): AudioBuffer {
-  const length = Math.max(1, Math.ceil(ctx.sampleRate * seconds));
-  const impulse = ctx.createBuffer(2, length, ctx.sampleRate);
-  for (let channel = 0; channel < 2; channel++) {
-    const data = impulse.getChannelData(channel);
-    for (let i = 0; i < length; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
-    }
-  }
-  return impulse;
-}
 
 function getPreviewBus(ctx: AudioContext): PreviewBus {
   if (_bus && _busCtx === ctx) return _bus;

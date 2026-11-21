@@ -9,7 +9,7 @@ import {
   getSustainVolumeGate,
 } from "utils/audio/noteUtils";
 
-import { advanceSustain, initialSustain, type SustainState } from "../sustainCheck";
+import { advanceSustain, initialSustain, SUSTAIN_TEST_MS, type SustainState } from "../sustainCheck";
 
 /** The tab's fixed gate before the room's noise floor has been measured (useNoteMatching VOLUME_GATE). */
 const FALLBACK_GATE = 0.005;
@@ -26,11 +26,13 @@ export const AUTO_RETRY_MS = 5000;
  * remembered (`passedOnce`) through any later runs.
  */
 export function useSustainCheck({
-  audioRefs, targetHz, active,
+  audioRefs, targetHz, active, testMs = SUSTAIN_TEST_MS,
 }: {
   audioRefs: AudioRefs;
   targetHz: number;
   active: boolean;
+  /** How long the note is followed (sustainCheck.ts sustainTestMs). */
+  testMs?: number;
 }) {
   const [state, setState] = useState<SustainState>(initialSustain);
   const [run, setRun] = useState(0);
@@ -60,7 +62,7 @@ export function useSustainCheck({
         sustainGate: getDetectionGates(targetHz, getSustainVolumeGate(noise, FALLBACK_GATE)).volumeGate,
         toleranceCents,
         dtMs,
-      });
+      }, testMs);
       // A new note is under way — the previous run's hint has done its job.
       if (!started && s.phase !== "waiting") {
         started = true;
@@ -75,7 +77,7 @@ export function useSustainCheck({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [active, targetHz, audioRefs, run]);
+  }, [active, targetHz, audioRefs, run, testMs]);
 
   const failed = state.phase === "done" && state.outcome !== "pass";
 

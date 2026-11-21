@@ -1,4 +1,5 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
+import { isAudioDebugOn, logAudioDebug } from "utils/audio/audioDebugLog";
 
 import type { TabPerfStats } from "./useTablatureWorkerBridge";
 
@@ -25,6 +26,55 @@ const noopSubscribe = () => () => undefined;
 
 export function useTabPerfFlag(): boolean {
   return useSyncExternalStore(noopSubscribe, readTabPerfFlag, () => false);
+}
+
+/** A page frame this late is one a player sees. */
+const PAGE_HITCH_MS = 100;
+
+/**
+ * For the dev recorder (utils/audio/audioDebugLog.ts): a line a second about
+ * the page's own thread while the tab plays — its frames, its longest gap, and
+ * where the audio clock stands, so a clock that fell behind the wall clock
+ * shows up as the two drifting apart from one line to the next.
+ */
+export function usePageFrameLog(isPlaying: boolean, audioContext: AudioContext | null | undefined): void {
+  useEffect(() => {
+    if (!isPlaying || !isAudioDebugOn()) return undefined;
+    let rafId: number;
+    let last = 0;
+    let since = 0;
+    let frames = 0;
+    let worst = 0;
+    let hitches = 0;
+    const tick = (stamp: number) => {
+      if (last > 0) {
+        const gap = stamp - last;
+        frames++;
+        if (gap > worst) worst = gap;
+        if (gap > PAGE_HITCH_MS) hitches++;
+      }
+      last = stamp;
+      if (since === 0) since = stamp;
+      if (stamp - since >= 1000) {
+        logAudioDebug({
+          k: "page",
+          fps: Math.round((frames * 1000) / (stamp - since)),
+          worstMs: Math.round(worst),
+          hitches,
+          wallMs: Math.round(performance.now()),
+          audioSec: audioContext ? audioContext.currentTime : null,
+          audioState: audioContext ? audioContext.state : null,
+        });
+        since = stamp;
+        frames = 0;
+        worst = 0;
+        hitches = 0;
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [isPlaying, audioContext]);
 }
 
 /**
@@ -73,6 +123,9 @@ export function TabPerfOverlay({ stats }: { stats: TabPerfStats | null }) {
           ? `board ${Math.round(stats.paintFps)}/${Math.round(stats.screenFps)} fps · paint ${stats.paintAvgMs.toFixed(1)}/${stats.paintMaxMs.toFixed(1)} ms · ${stats.width}×${stats.height} @${stats.dpr}${stats.lite ? " lite" : ""}`
           : "board …"}
       </div>
+      {stats && (
+        <div>{`gaps ${stats.gaps} · hitches ${stats.hitches} · slips ${stats.slips} (${Math.round(stats.slipMaxMs)} ms) · tick ${Math.round(stats.tickGapMaxMs)} ms`}</div>
+      )}
       <div ref={pageRef}>page …</div>
     </div>
   );

@@ -43,6 +43,30 @@ export const DEFAULT_LAYOUT: DashboardLayout = {
   customShortcuts: [],
 };
 
+/** Practice days after which a never-customised Home shows every default card. */
+export const FULL_HOME_PRACTICE_DAYS = 3;
+
+/**
+ * What an account sees until it has practised on a few days: what to do today
+ * and the week it is filling in. The ranked exercise and the year heatmap say
+ * little before then; they join on their own (see defaultLayoutFor) and can be
+ * added by hand from day one.
+ */
+export const STARTER_LAYOUT: DashboardLayout = {
+  ...DEFAULT_LAYOUT,
+  widgets: [
+    { id: "daily-quests", size: "half" },
+    { id: "practice-stats", size: "half" },
+  ],
+};
+
+/** Distinct local calendar days among the given practice dates. */
+export const countPracticeDays = (dates: readonly Date[]): number =>
+  new Set(dates.map((date) => new Date(date).toDateString())).size;
+
+export const isNewPlayerByDays = (practiceDays: number): boolean =>
+  practiceDays < FULL_HOME_PRACTICE_DAYS;
+
 const isWidgetSize = (value: unknown): value is WidgetSize =>
   value === "half" || value === "full";
 
@@ -126,6 +150,14 @@ export const normalizeLayout = (raw: unknown): DashboardLayout => {
     ),
   };
 };
+
+/**
+ * The layout of an account that has never saved one — a fresh copy each call.
+ * A saved layout is never touched by this: once the player arranges Home, it
+ * stays as arranged.
+ */
+export const defaultLayoutFor = (isNewPlayer: boolean): DashboardLayout =>
+  normalizeLayout(isNewPlayer ? STARTER_LAYOUT : DEFAULT_LAYOUT);
 
 export const hasWidget = (layout: DashboardLayout, id: WidgetId): boolean =>
   layout.widgets.some((w) => w.id === id);

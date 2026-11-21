@@ -16,15 +16,20 @@ import { describe, expect, it } from "vitest";
 import {
   addCustomShortcut,
   addWidget,
+  countPracticeDays,
   DEFAULT_LAYOUT,
+  defaultLayoutFor,
+  FULL_HOME_PRACTICE_DAYS,
   hiddenWidgets,
   isDefaultLayout,
+  isNewPlayerByDays,
   MAX_SHORTCUTS,
   moveWidget,
   normalizeLayout,
   removeCustomShortcut,
   removeWidget,
   setWidgetSize,
+  STARTER_LAYOUT,
   toggleShortcut,
 } from "./dashboardLayout";
 
@@ -80,6 +85,48 @@ describe("widget catalog", () => {
   it("ships a default layout made only of known cards and shortcuts", () => {
     expect(normalizeLayout(DEFAULT_LAYOUT)).toEqual(DEFAULT_LAYOUT);
     expect(isDefaultLayout(DEFAULT_LAYOUT)).toBe(true);
+  });
+});
+
+describe("starter layout", () => {
+  const day = (iso: string) => new Date(iso);
+
+  it("counts distinct calendar days, not sessions", () => {
+    expect(countPracticeDays([])).toBe(0);
+    expect(
+      countPracticeDays([
+        day("2026-11-19T08:00:00"),
+        day("2026-11-19T21:30:00"),
+        day("2026-11-20T10:00:00"),
+      ]),
+    ).toBe(2);
+  });
+
+  it("treats the player as new until the third practice day", () => {
+    expect(isNewPlayerByDays(0)).toBe(true);
+    expect(isNewPlayerByDays(FULL_HOME_PRACTICE_DAYS - 1)).toBe(true);
+    expect(isNewPlayerByDays(FULL_HOME_PRACTICE_DAYS)).toBe(false);
+  });
+
+  it("gives a new player the quests and the week, and everyone else the full default", () => {
+    expect(defaultLayoutFor(true).widgets.map((w) => w.id)).toEqual([
+      "daily-quests",
+      "practice-stats",
+    ]);
+    expect(defaultLayoutFor(false)).toEqual(DEFAULT_LAYOUT);
+  });
+
+  it("keeps the starter cards a subset of the default, with the same shortcuts", () => {
+    STARTER_LAYOUT.widgets.forEach((widget) => {
+      expect(DEFAULT_LAYOUT.widgets).toContainEqual(widget);
+    });
+    expect(STARTER_LAYOUT.shortcuts).toEqual(DEFAULT_LAYOUT.shortcuts);
+  });
+
+  it("hands out a fresh copy, so editing it cannot change the next account's Home", () => {
+    const layout = defaultLayoutFor(true);
+    expect(layout).not.toBe(STARTER_LAYOUT);
+    expect(layout.widgets).not.toBe(STARTER_LAYOUT.widgets);
   });
 });
 

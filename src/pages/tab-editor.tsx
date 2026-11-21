@@ -25,6 +25,7 @@ import {
   startsCountedBeat,
 } from "feature/exercisePlan/utils/beatDuration";
 import { hasTablatureNotes } from "feature/exercisePlan/utils/hasTablatureNotes";
+import { importedTabNote } from "feature/exercisePlan/utils/importedTabNote";
 import {
   beatsDurationInQuarters,
   isMeasureComplete,
@@ -135,8 +136,8 @@ const ARTICULATIONS: {
   },
   {
     type: "isDead",
-    letter: "D",
-    label: "Dead note",
+    letter: "X",
+    label: "Muted note",
     activeClass: "bg-zinc-500/20 text-zinc-200 ring-1 ring-zinc-500/40",
   },
   {
@@ -859,16 +860,7 @@ export default function TabEditor() {
           beats: (m.beats || []).map((b: any) => ({
             duration: b.duration || 0.25,
             ...importedPickStroke(b.pickStroke),
-            notes: (b.notes || []).map((n: any) => ({
-              string: n.string,
-              fret: n.fret,
-              isAccented: !!n.isAccented,
-              isHammerOn: !!n.isHammerOn,
-              isPullOff: !!n.isPullOff,
-              isBend: !!n.isBend,
-              bendSemitones: n.bendSemitones,
-              bendCurve: n.bendCurve,
-            })),
+            notes: (b.notes || []).map(importedTabNote),
           })),
         }));
       } else {
@@ -879,16 +871,7 @@ export default function TabEditor() {
             .map((b: any) => ({
               duration: b.duration || 0.25,
               ...importedPickStroke(b.pickStroke),
-              notes: (b.notes || []).map((n: any) => ({
-                string: n.string,
-                fret: n.fret,
-                isAccented: !!n.isAccented,
-                isHammerOn: !!n.isHammerOn,
-                isPullOff: !!n.isPullOff,
-                isBend: !!n.isBend,
-                bendSemitones: n.bendSemitones,
-                bendCurve: n.bendCurve,
-              })),
+              notes: (b.notes || []).map(importedTabNote),
             }));
 
           while (beatsInMeasure.length < BEATS_PER_MEASURE) {
@@ -1228,7 +1211,34 @@ export default function TabEditor() {
             note.string - 1 >= firstString && note.string - 1 <= lastString,
         ),
       );
-      if (notes.length === 0) return;
+      if (notes.length === 0) {
+        // A muted note has no fret to type first, so on an empty cell the
+        // press writes the x itself.
+        if (type === "isDead" && selectedCell && isSingleCell(selection)) {
+          const { measureIdx, beatIdx, stringIdx } = selectedCell;
+          commit(
+            current.map((measure, mIdx) =>
+              mIdx !== measureIdx
+                ? measure
+                : {
+                    ...measure,
+                    beats: measure.beats.map((b, bIdx) =>
+                      bIdx !== beatIdx
+                        ? b
+                        : {
+                            ...b,
+                            notes: [
+                              ...b.notes,
+                              { string: stringIdx + 1, fret: 0, isDead: true },
+                            ],
+                          },
+                    ),
+                  },
+            ),
+          );
+        }
+        return;
+      }
 
       const enable = !notes.every((note) => note[type]);
       commit(
@@ -1237,7 +1247,7 @@ export default function TabEditor() {
         ),
       );
     },
-    [commit, selection],
+    [commit, selection, selectedCell],
   );
 
   // Fret nudging with the wheel. React registers `wheel` as a passive listener
@@ -1728,6 +1738,20 @@ export default function TabEditor() {
         clearSelectedNotesInGrid();
       } else if (e.key.toLowerCase() === "r") {
         restSelection();
+      } else if (e.key.toLowerCase() === "x") {
+        // Written as in any tab: x on an empty cell is a muted note, and the
+        // cursor moves on like it does after a fret.
+        const beat = measures[measureIdx].beats[beatIdx];
+        const wasEmpty = !beat.notes.some((n) => n.string === stringIdx + 1);
+        toggleArticulationOnSelection("isDead");
+        if (wasEmpty && autoAdvance) {
+          const nextBeat = beatIdx + 1;
+          if (nextBeat < measures[measureIdx].beats.length) {
+            setSelectedCell({ ...selectedCell, beatIdx: nextBeat });
+          } else if (measureIdx + 1 < measures.length) {
+            setSelectedCell({ measureIdx: measureIdx + 1, beatIdx: 0, stringIdx });
+          }
+        }
       } else if (
         ["h", "p", "a", "d", "v", "t", "m", "b"].includes(e.key.toLowerCase())
       ) {
@@ -3032,7 +3056,10 @@ export default function TabEditor() {
                     <button
                       key={a.type}
                       onClick={() => toggleArticulationOnSelection(a.type)}
-                      disabled={selectedNotes.length === 0}
+                      disabled={
+                        selectedNotes.length === 0 &&
+                        !(a.type === "isDead" && !isBlockSelection && selectedCell)
+                      }
                       title={
                         t(`tab_editor.articulations.${a.type}`, a.label) +
                         (isBlockSelection ? ` — ${t("tab_editor.on_every_note")}` : "")
@@ -3258,7 +3285,7 @@ export default function TabEditor() {
                 </div>
                 <div className='flex items-center justify-between'>
                   <span>{t("tab_editor.keys.articulations")}</span>
-                  <span className='text-zinc-300'>H P A D V T M</span>
+                  <span className='text-zinc-300'>H P A X V T M</span>
                 </div>
                 <div className='flex items-center justify-between'>
                   <span>{t("tab_editor.keys.rest")}</span>

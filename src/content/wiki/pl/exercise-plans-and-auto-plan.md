@@ -46,6 +46,8 @@ Każde ćwiczenie, które tworzysz, trafia do jednej puli; jeden przełącznik p
 
 Tworzenie lub edycja ćwiczenia otwiera edytor tabulatur, w którym możesz wypisać zapis nutowy. Gdy je publikujesz, wybierasz, czy ma być publiczne (domyślnie), czy pozostać prywatne.
 
+Wyciszone dźwięki, czyli perkusyjny szmer, gdy lewa ręka tylko leży na strunach, zapisujesz tak jak w każdej tabulaturze: kliknij pole i naciśnij **X** albo użyj przycisku **Dźwięk wyciszony** obok innych technik. Wyciszone dźwięki z pliku Guitar Pro przechodzą bez zmian.
+
 ## Pytania, które ludzie zadają
 
 <FaqList items="Czy muszę ukończyć rutynę, żeby się liczyła?::Nie, zapisuje się to, co faktycznie zagrałeś. Ukończenie oznacza po prostu, że wszystko jest odhaczone|Czy mogę edytować gotowy plan?::Nie w miejscu, ale możesz zbudować własną wersję z ćwiczeniami, które lubisz|Czy rutyna jest warta więcej punktów niż swobodne ćwiczenie?::Nie. Czas to czas. Podążanie za planem pozwala zaznaczyć nawyk Plan ćwiczeń, wart punkt|Co się stanie z udostępnionym ćwiczeniem, jeśli znów ustawię je jako prywatne?::Znika z listy społeczności. Oceny i Fame, które już zdobyłeś, zostają" />

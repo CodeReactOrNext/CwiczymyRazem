@@ -22,14 +22,23 @@ vi.mock("feature/autoBacking/synth/ambientBand", () => ({
   velocityOf: () => 1,
 }));
 
-const node = () => ({ connect: vi.fn(), disconnect: vi.fn(), gain: { value: 1, setTargetAtTime: vi.fn() }, pan: { value: 0 } });
+const node = () => ({
+  connect: vi.fn(), disconnect: vi.fn(),
+  gain: { value: 1, setTargetAtTime: vi.fn() }, pan: { value: 0 },
+  frequency: { value: 0 }, Q: { value: 0 }, curve: null, oversample: "none",
+});
 
 const fakeContext = () => ({
   currentTime: 0,
   state: "running",
   destination: {},
+  sampleRate: 100,
   createGain: node,
   createStereoPanner: node,
+  createBiquadFilter: node,
+  createConvolver: node,
+  createWaveShaper: node,
+  createBuffer: (_channels: number, length: number) => ({ getChannelData: () => new Float32Array(length) }),
 }) as unknown as AudioContext & { currentTime: number };
 
 /** A full 4/4 bar of quarter notes — no rest for the loop to breathe on. */

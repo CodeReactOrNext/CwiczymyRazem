@@ -2,12 +2,24 @@ import type Soundfont from "soundfont-player";
 
 import type { TablatureNote } from "../../types/exercise.types";
 import { BASS_STRING_FREQS, BASS_STRING_MIDI, getCachedNoiseBuffer, GUITAR_STRING_FREQS, GUITAR_STRING_MIDI } from "./audio.constants";
+import type { StringNote } from "./guitarTone";
+import { articulationFor, brightnessCutoffHz, SYNTH_GUITAR_TRIM, voiceVariation } from "./guitarTone";
 import { attackLeadFor, playSoundfontNote } from "./soundfontVoice";
 import { synthBass, synthGuitar } from "./synth.guitar";
 import type { StringSynthOptions } from "./types";
 
+/** The last note played on each string, kept beside the scheduler's own map of
+ *  sounding voices (and dropped with it) — a slide needs to know where it comes from. */
+const stringNotes = new WeakMap<object, Map<string, StringNote>>();
+
+function stringsPlayedOn(activeNodes: object): Map<string, StringNote> {
+  let strings = stringNotes.get(activeNodes);
+  if (!strings) { strings = new Map(); stringNotes.set(activeNodes, strings); }
+  return strings;
+}
+
 export interface StringPlayers {
-  guitar:      Soundfont.Player | null;
+  guitar:     Soundfont.Player | null;
   mutedGuitar: Soundfont.Player | null;
   bass:        Soundfont.Player | null;
   vocals:      Soundfont.Player | null;
@@ -151,6 +163,12 @@ export function playStringNote(
     player = players.guitar;
   }
 
+  // ── How the note is reached: picked, hammered, slid into (see guitarTone) ──
+  const fretted = trackType === "guitar" || trackType === "bass";
+  const strings = fretted ? stringsPlayedOn(activeNodes) : null;
+  const articulation = fretted ? articulationFor(note, midiNote, t, strings?.get(noteKey)) : null;
+  strings?.set(noteKey, { midi: midiNote, time: t, slideOut: note.slideOut });
+
   if (player) {
     const sfDuration = trackType === "vocals"
       ? Math.max(effectiveDuration * 1.3, 0.3)
@@ -160,15 +178,47 @@ export function playStringNote(
     const startAt = trackType === "bass"
       ? Math.max(ctx.currentTime + 0.001, t - attackLeadFor(player, midiNote))
       : t;
+    // A guitar's notes are told apart and shaded by how hard they're picked
+    // (see guitarTone) — the samples alone have one level and one colour.
+    const variation = trackType === "guitar" ? voiceVariation() : null;
+    // A note that isn't picked has none of the pick's brightness either.
+    const loudness  = gainScale * (articulation?.gain ?? 1);
+    const cutoff    = trackType === "guitar" ? brightnessCutoffHz(loudness) : null;
+    let tone: BiquadFilterNode | null = null;
+    if (cutoff !== null) {
+      tone = ctx.createBiquadFilter();
+      tone.type = "lowpass"; tone.frequency.value = cutoff; tone.Q.value = 0.5;
+      tone.connect(trackGain);
+    }
     const sfNode = playSoundfontNote(player, String(midiNote), startAt, {
-      duration: sfDuration, gain: baseGain * gainScale, destination: trackGain,
+      duration: sfDuration, gain: baseGain * loudness * (variation?.gain ?? 1), destination: tone ?? trackGain,
+      attack: articulation?.attackSec,
     });
+    if (tone && !sfNode) tone.disconnect();
 
     if (sfNode) {
       activeNodes.set(noteKey, sfNode);
       const sourceNode = ((sfNode as any).source ?? (sfNode as any).bufferSource) as AudioBufferSourceNode | undefined;
       const detuneParam: AudioParam | undefined = sourceNode?.detune;
       const rateParam:   AudioParam | undefined = sourceNode?.playbackRate;
+
+      if (tone) {
+        const filter = tone;
+        if (sourceNode) sourceNode.addEventListener("ended", () => filter.disconnect());
+        // No source to listen to: the note's own length, plus its release.
+        else window.setTimeout(() => filter.disconnect(), (startAt - ctx.currentTime + sfDuration + 1) * 1000);
+      }
+      // A bend writes the pitch itself; vibrato only adds to it.
+      if (detuneParam && !note.isBend) {
+        const rest = variation?.detuneCents ?? 0;
+        if (articulation?.glideFromCents) {
+          // A slide: the pitch travels up the neck to the note instead of jumping.
+          detuneParam.setValueAtTime(articulation.glideFromCents, startAt);
+          detuneParam.linearRampToValueAtTime(rest, startAt + Math.min(articulation.glideSec, sfDuration * 0.6));
+        } else if (rest) {
+          detuneParam.value = rest;
+        }
+      }
 
       if (note.isVibrato && detuneParam) {
         const lfo  = ctx.createOscillator(); lfo.type = "sine"; lfo.frequency.value = 5.5;
@@ -214,6 +264,7 @@ export function playStringNote(
       bendSemitones: note.bendSemitones, gainScale,
     };
     if (trackType === "bass") synthBass(ctx, freq, t, trackGain, effectiveDuration, opts);
-    else                       synthGuitar(ctx, freq, t, trackGain, effectiveDuration, opts);
+    // A guitar track runs through the amp stage, which is set for the far quieter samples.
+    else                       synthGuitar(ctx, freq, t, trackGain, effectiveDuration, trackType === "guitar" ? { ...opts, gainScale: gainScale * SYNTH_GUITAR_TRIM } : opts);
   }
 }

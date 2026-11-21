@@ -7,6 +7,7 @@ import type { TabNotePoint } from "feature/exercisePlan/views/PracticeSession/ut
 import type { NoteTiming } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import type { MutableRefObject } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { isAudioDebugOn, logAudioDebug } from "utils/audio/audioDebugLog";
 
 import type { MarkUpdate } from "./noteMarkPatch";
 import { diffMarks } from "./noteMarkPatch";
@@ -128,6 +129,24 @@ export interface TabPerfStats {
   height: number;
   dpr: number;
   lite: boolean;
+  /** The tab was playing (past the count-in, uncovered) when the second ended. */
+  running: boolean;
+  /** The standing board, as opposed to the scrolling one. */
+  paged: boolean;
+  /** Between two frames while the tab ran: the longest wait, how many were long
+   *  enough to see (over 45 ms), and how many over 250 ms — a board that stood still. */
+  frameGapMaxMs: number;
+  hitches: number;
+  gaps: number;
+  /** Times the audio clock fell back under the cursor, by how much in all and at worst. */
+  slips: number;
+  slipMs: number;
+  slipMaxMs: number;
+  /** The longest wait for the page's reading of the audio clock (due every ~33 ms). */
+  tickGapMaxMs: number;
+  /** Paints made while a page turned, and the dearest of them. */
+  turnFrames: number;
+  turnPaintMaxMs: number;
 }
 
 /** The canvas's pixel ratio: the screen's, up to `maxDpr`. */
@@ -266,7 +285,11 @@ export function useTablatureWorkerBridge({
     worker.onmessage = (e: MessageEvent) => {
       if (e.data?.type === 'REST_ACTIVE') setIsRestActive(e.data.isRest);
       else if (e.data?.type === 'SLOW_FRAMES') onSlowFramesRef.current?.();
-      else if (e.data?.type === 'PERF_STATS') setPerfStats(e.data.stats as TabPerfStats);
+      else if (e.data?.type === 'PERF_STATS') {
+        setPerfStats(e.data.stats as TabPerfStats);
+        // The dev recorder keeps every second of it (utils/audio/audioDebugLog.ts).
+        logAudioDebug({ k: "board", ...(e.data.stats as TabPerfStats) });
+      }
     };
     return () => { worker.postMessage({ type: 'STOP' }); worker.terminate(); };
   }, []);
@@ -315,7 +338,8 @@ export function useTablatureWorkerBridge({
     });
   }, [isPlaying, startTime, audioStartTime, bpm, countInRemaining]);
 
-  useEffect(() => { workerRef.current?.postMessage({ type: 'PERF', on: perf }); }, [perf]);
+  // The dev recorder asks for the readout too, overlay or not.
+  useEffect(() => { workerRef.current?.postMessage({ type: 'PERF', on: perf || isAudioDebugOn() }); }, [perf]);
 
   // Tell the worker whether anyone can see it. A covered board keeps its state
   // and its clock; it just stops painting frames into a canvas nobody is looking at.

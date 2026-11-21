@@ -1,4 +1,3 @@
-import { DEFAULT_LAYOUT } from "feature/dashboard/utils/dashboardLayout";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -44,13 +43,10 @@ describe("dashboardLayout.service", () => {
     );
   });
 
-  it("hands back the default layout when nothing has been saved yet", async () => {
+  it("hands back null when nothing has been saved yet", async () => {
     vi.mocked(getDoc).mockResolvedValue(snapshot(null) as never);
 
-    const layout = await firebaseGetDashboardLayout("uid-1");
-
-    expect(layout).toEqual(DEFAULT_LAYOUT);
-    expect(layout).not.toBe(DEFAULT_LAYOUT);
+    expect(await firebaseGetDashboardLayout("uid-1")).toBeNull();
   });
 
   it("normalises whatever is stored instead of trusting it", async () => {

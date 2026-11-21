@@ -46,6 +46,8 @@ Community-Übungen können mit ein bis fünf Sternen bewertet werden. Teilen zah
 
 Eine Übung zu erstellen oder zu bearbeiten öffnet den Tab-Editor, in dem du die Notation ausschreiben kannst. Beim Veröffentlichen wählst du, ob sie öffentlich wird (die Vorgabe) oder privat bleibt.
 
+Gedämpfte Noten, das perkussive Kratzen, wenn die Greifhand nur auf den Saiten liegt, schreibst du wie in jedem Tab: Klick ein Feld an und drück **X**, oder nimm den Knopf **Gedämpfte Note** neben den anderen Techniken. Gedämpfte Noten aus einer Guitar-Pro-Datei kommen so an, wie sie sind.
+
 ## Fragen, die Leute stellen
 
 <FaqList items="Muss ich eine Routine beenden, damit sie zählt?::Nein, was du tatsächlich gespielt hast, wird eingetragen. Beenden heißt nur, dass alles abgehakt ist|Kann ich einen fertigen Plan bearbeiten?::Nicht direkt, aber du kannst deine eigene Version mit den Übungen bauen, die dir gefallen|Ist eine Routine mehr Punkte wert als freies Üben?::Nein. Zeit ist Zeit. Einem Plan zu folgen lässt dich die Gewohnheit Übungsplan abhaken, die einen Punkt wert ist|Was passiert mit einer geteilten Übung, wenn ich sie wieder privat mache?::Sie verlässt die Community-Liste. Bewertungen und Fame, die du schon verdient hast, bleiben" />

@@ -11,7 +11,7 @@ import type { GuitarString } from "../calibration.constants";
 import { useAutoGain } from "../hooks/useAutoGain";
 import { useSustainCheck } from "../hooks/useSustainCheck";
 import { MAX_GAIN, MIN_GAIN } from "../inputLevel";
-import { isWrongNote, SUSTAIN_PASS_SHARE, type SustainOutcome, sustainProgress } from "../sustainCheck";
+import { isWrongNote, SUSTAIN_PASS_SHARE, type SustainOutcome, sustainProgress, sustainTestMs } from "../sustainCheck";
 import { CloseButton } from "./CloseButton";
 import { LevelWave } from "./LevelWave";
 import { IssueNote, ReadyCheck } from "./ReadyCheck";
@@ -79,6 +79,8 @@ interface SustainStepProps {
   /** The guitar's open strings, for the neck. */
   strings:           GuitarString[];
   target:            SustainTarget;
+  /** The guitar is heard by a microphone — a shorter note is asked for. */
+  throughAir:        boolean;
   inputGain:         number;
   onInputGainChange: (v: number) => void;
   onNext:            () => void;
@@ -92,14 +94,15 @@ interface SustainStepProps {
  * either — and the step says which gain to turn up.
  */
 export const SustainStep = React.memo(function SustainStep({
-  audioRefs, isListening, strings, target, inputGain, onInputGainChange, onNext, onBack, onCancel,
+  audioRefs, isListening, strings, target, throughAir, inputGain, onInputGainChange, onNext, onBack, onCancel,
 }: SustainStepProps) {
   const { t } = useTranslation("calibration");
-  const { state, retry, passedOnce, lastFail } = useSustainCheck({ audioRefs, targetHz: target.hz, active: isListening });
+  const testMs = sustainTestMs(throughAir);
+  const { state, retry, passedOnce, lastFail } = useSustainCheck({ audioRefs, targetHz: target.hz, active: isListening, testMs });
   const autoGain = useAutoGain(audioRefs, inputGain, onInputGainChange);
   const isMobile = useResponsiveStore((s) => s.isMobile);
 
-  const progress = sustainProgress(state);
+  const progress = sustainProgress(state, testMs);
   const done = state.phase === "done";
   const passed = state.outcome === "pass";
   const seconds = (state.heardMs / 1000).toFixed(1);

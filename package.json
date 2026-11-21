@@ -9,6 +9,7 @@
   "desktopName": "riff-quest.desktop",
   "scripts": {
     "dev": "next dev",
+    "dev:phone": "next dev --experimental-https -H 0.0.0.0",
     "electron": "electron .",
     "electron:dev": "concurrently -k -n NEXT,ELECTRON -c blue,green \"npm:dev\" \"wait-on tcp:127.0.0.1:3000 && electron .\"",
     "electron:build": "electron-builder --win",

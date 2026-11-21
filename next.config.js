@@ -10,6 +10,8 @@ const nextConfig = {
     NEXT_PUBLIC_APP_VERSION: require("./package.json").version,
   },
   reactCompiler: true,
+  // `npm run dev:phone`: the dev server opened from a phone on the same network.
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*"],
   images: {
     unoptimized: true,
     remotePatterns: [

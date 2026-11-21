@@ -5,12 +5,14 @@ import {
   END_SILENCE_MS,
   initialSustain,
   isWrongNote,
+  MIC_SUSTAIN_TEST_MS,
   PROCESSOR_GATE_VOLUME,
   SUSTAIN_PASS_SHARE,
   SUSTAIN_TEST_MS,
   type SustainFrame,
   sustainProgress,
   type SustainState,
+  sustainTestMs,
   WRONG_NOTE_MS,
 } from "./sustainCheck";
 
@@ -30,6 +32,28 @@ const run = (state: SustainState, frame: SustainFrame, ms: number) => {
 };
 
 describe("advanceSustain", () => {
+  it("asks a microphone for a shorter note", () => {
+    const testMs = sustainTestMs(true);
+    expect(testMs).toBe(MIC_SUSTAIN_TEST_MS);
+    expect(sustainTestMs(false)).toBe(SUSTAIN_TEST_MS);
+
+    // 1.3 s of ringing: most of the microphone's test, about half of the cabled one.
+    const step = (s: SustainState, f: SustainFrame, ms: number, length?: number) => {
+      let next = s;
+      for (let t = 0; t < ms; t += FRAME) next = advanceSustain(next, f, length);
+      return next;
+    };
+    const heldMs = 1300;
+    const viaMic = step(step(initialSustain(), ringing, heldMs, testMs), decayed, END_SILENCE_MS + 50, testMs);
+    expect(viaMic.outcome).toBe("pass");
+    const viaCable = step(step(initialSustain(), ringing, heldMs), decayed, END_SILENCE_MS + 50);
+    expect(viaCable.outcome).toBe("quiet");
+
+    const full = step(initialSustain(), ringing, testMs + 100, testMs);
+    expect(full.outcome).toBe("pass");
+    expect(sustainProgress(full, testMs)).toBe(1);
+  });
+
   it("passes a note followed for the whole test", () => {
     const s = run(initialSustain(), ringing, SUSTAIN_TEST_MS + 100);
     expect(s.outcome).toBe("pass");

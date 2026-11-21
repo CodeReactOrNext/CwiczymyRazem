@@ -57,6 +57,8 @@ interface UseAutoTabZoomArgs {
   zoomScale?: number;
   /** False while the flat tab isn't on screen (notation view). */
   enabled?: boolean;
+  /** Whether the board draws the tuning gutter. Omit to follow the player's setting. */
+  hasGutter?: boolean;
 }
 
 /**
@@ -74,11 +76,13 @@ export function useAutoTabZoom({
   viewerHeight,
   zoomScale = 1,
   enabled = true,
+  hasGutter,
 }: UseAutoTabZoomArgs): number {
   const setSetting = useTablatureSettings((s) => s.set);
   const pillPreset = useTablatureSettings((s) => s.pillPreset);
   const fretFontScale = useTablatureSettings((s) => s.fretFontScale);
-  const showTuningGutter = useTablatureSettings((s) => s.showTuningGutter);
+  const gutterSetting = useTablatureSettings((s) => s.showTuningGutter);
+  const showTuningGutter = hasGutter ?? gutterSetting;
 
   const [width, setWidth] = useState(0);
   useEffect(() => {

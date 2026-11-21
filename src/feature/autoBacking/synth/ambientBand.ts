@@ -67,6 +67,8 @@ function saturationCurve(drive: number): Float32Array<ArrayBuffer> {
 const CEILING_KNEE = 0.75;
 /** What the ceiling lets out at the most — anything louder is rounded off under it. */
 const CEILING_MAX = 0.97;
+/** What the finished band is turned down by on its way out — see the bus in the constructor. */
+const BAND_OUTPUT_LEVEL = 0.6;
 
 /**
  * A soft ceiling after the limiter: straight through below CEILING_KNEE
@@ -542,7 +544,14 @@ export class AmbientBand {
     this.toneFilter.connect(this.dipFilter);
     this.dipFilter.connect(limiter);
     limiter.connect(ceiling);
-    ceiling.connect(output);
+    // The band's place in the mix, set after the limiter so its sound doesn't
+    // change with it: about 4.5 dB under the figures above. The sampled guitar
+    // it backs is a plucked sound some 13 dB quieter in RMS than a single pulse
+    // of the band at full level — it was being buried.
+    const level = ctx.createGain();
+    level.gain.value = BAND_OUTPUT_LEVEL;
+    ceiling.connect(level);
+    level.connect(output);
     this.bus = trim;
     // Trimmed like the bus, for the same make-up gain.
     this.accents = ctx.createGain();

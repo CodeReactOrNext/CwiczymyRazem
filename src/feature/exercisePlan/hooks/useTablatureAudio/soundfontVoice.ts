@@ -11,6 +11,8 @@ interface PlayIntoOptions {
   duration:    number;
   gain:        number;
   destination: AudioNode;
+  /** Fade-in (seconds) in place of the library's 10 ms — long enough to take the pick out of the note. */
+  attack?: number;
 }
 
 /**
@@ -31,9 +33,10 @@ export function playSoundfontNote(
   player: Soundfont.Player,
   name: string,
   when: number,
-  { duration, gain, destination }: PlayIntoOptions,
+  { duration, gain, destination, attack }: PlayIntoOptions,
 ): SoundfontVoice | null {
-  const voice = player.play(name, when, { duration, gain }) as unknown as SoundfontVoice | null;
+  const options = attack === undefined ? { duration, gain } : { duration, gain, attack };
+  const voice = player.play(name, when, options) as unknown as SoundfontVoice | null;
   if (!voice) return null;
 
   // The voice is created and started synchronously here, so the swap lands in

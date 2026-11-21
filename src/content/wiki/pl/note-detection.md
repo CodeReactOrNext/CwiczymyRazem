@@ -44,6 +44,8 @@ Każda nuta, którą aplikacja usłyszy, jest trafieniem. Ile warte jest trafien
 
 **W ćwiczeniach z podciąganiem wysokość.** Każda nuta jest oceniana według tego, jak jest w stroju. Podciągnięcie lub puszczenie liczy się według tego, jak blisko dochodzi do nuty, w którą celuje, a nuta trzymana według tego, gdzie leży, gdy dzwoni, więc zbyt mocny nacisk i pójście w górę jest widoczne. Dokładnie w wysokość zachowuje wszystko, trochę obok dwie trzecie, a dalej jedną trzecią. Timing tam nic nie kosztuje. Strzałki pod nutami nadal go pokazują, ale podsumowanie po przebiegu dotyczy wysokości i mówi, czy twoje nuty zwykle lądują za nisko, czy za wysoko.
 
+**Wyciszone dźwięki nie mają wysokości,** więc x w tabulaturze wymaga tylko trafienia kostką w rytm. Szmer przez kilka wyciszonych strun to jedno uderzenie i liczy się jako jedna nuta, więc chybienie kosztuje jedną nutę, a nie sześć.
+
 Gdy nuta dzwoni, mały stroik nad nią pokazuje, gdzie jest struna: kropka leży w zielonym paśmie, gdy jesteś w stroju, a sama nuta wypełnia się zielenią, bursztynem lub pomarańczem odpowiednio. Nuta, która wylądowała obok, zachowuje swój odczyt, na przykład +28¢ ze strzałką w górę dla za wysoko. Gdy podciągasz, krzywa obok nuty wypełnia się, gdy struna rośnie, i robi się zielona, gdy dojdziesz do wysokości.
 
 Wykres pod podsumowaniem pokazuje każdą nutę przebiegu po kolei: jak daleko od uderzenia wylądowała każda, a w ćwiczeniach z podciąganiem od swojej wysokości, z zielonym pasmem zaznaczającym najwyższą ocenę. Przebieg, który zaczyna się ciasno, a dryfuje w miarę męczenia się ręki, widać tam od razu.

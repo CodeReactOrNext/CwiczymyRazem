@@ -4,9 +4,9 @@ import {
   firebaseSaveDashboardLayout,
 } from "feature/dashboard/services/dashboardLayout.service";
 import type { DashboardLayout } from "feature/dashboard/types/dashboard.types";
-import { normalizeLayout } from "feature/dashboard/utils/dashboardLayout";
+import { defaultLayoutFor } from "feature/dashboard/utils/dashboardLayout";
 import { useTranslation } from "hooks/useTranslation";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 
 export const dashboardLayoutQueryKey = (uid: string | null) =>
@@ -20,8 +20,15 @@ const STALE_TIME = 10 * 60 * 1000;
  * Every change lands in the query cache first and is written behind it, so
  * dragging a card feels immediate; a failed write rolls the cache back to what
  * it was before that change and says so once.
+ *
+ * `isNewPlayer` only matters until the first save: an account that has never
+ * arranged Home gets the short starter layout in its first practice days and
+ * the full default after them.
  */
-export const useDashboardLayout = (userAuth: string | null) => {
+export const useDashboardLayout = (
+  userAuth: string | null,
+  isNewPlayer = false,
+) => {
   const queryClient = useQueryClient();
   const { t } = useTranslation("dashboard");
   const queryKey = dashboardLayoutQueryKey(userAuth);
@@ -38,12 +45,15 @@ export const useDashboardLayout = (userAuth: string | null) => {
       firebaseSaveDashboardLayout(userAuth as string, layout),
     onMutate: async (layout) => {
       await queryClient.cancelQueries({ queryKey });
-      const previous = queryClient.getQueryData<DashboardLayout>(queryKey);
+      const previous = queryClient.getQueryData<DashboardLayout | null>(
+        queryKey,
+      );
       queryClient.setQueryData(queryKey, layout);
       return { previous };
     },
     onError: (error, _layout, context) => {
-      if (context?.previous)
+      // Null is a real state to go back to: nothing was saved before.
+      if (context && context.previous !== undefined)
         queryClient.setQueryData(queryKey, context.previous);
       console.error("[dashboard layout]", error);
       toast.error(t("errors.layout_save"));
@@ -59,8 +69,14 @@ export const useDashboardLayout = (userAuth: string | null) => {
     [mutate, userAuth],
   );
 
+  const saved = query.data;
+  const layout = useMemo(
+    () => saved ?? defaultLayoutFor(isNewPlayer),
+    [saved, isNewPlayer],
+  );
+
   return {
-    layout: query.data ?? normalizeLayout(undefined),
+    layout,
     isLoading: !!userAuth && query.isPending,
     updateLayout,
   };

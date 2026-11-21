@@ -27,14 +27,12 @@ import {
   useTablatureStyle,
 } from "./tablatureSettings";
 import { TablatureSettingsDialog } from "./TablatureSettingsDialog";
-import { tuningGutterStrings } from "./tablatureStringRows";
 import { TablatureViewer } from "./TablatureViewer";
 import { useAutoTabZoom } from "./useAutoTabZoom";
 import {
   TablatureResizeHandle,
   useTablatureHeight,
 } from "./useTablatureHeight";
-import type { TuningGutterString } from "./useTablatureWorkerBridge";
 import { useTabLiteMode } from "./useTabLiteMode";
 
 /**
@@ -140,7 +138,7 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
   // The exercise's time ends the tab at the last bar it fits (tabPlayUntil.ts).
   const playUntilBeat = useTabPlayUntilStore(s => s.until?.beat ?? null);
   const { overlay: tabOverlay } = useTabOverlay();
-  const { tuning, stringCount } = useGuitarTuningContext();
+  const { stringCount } = useGuitarTuningContext();
   const {
     settings,
     palette,
@@ -216,13 +214,10 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
     boardRef,
     viewerHeight,
     zoomScale: MOBILE_FIT,
+    // No tuning gutter on a phone: the board is a couple of bars wide, and the
+    // column of string names took a twentieth of it.
+    hasGutter: false,
   });
-
-  // Left-gutter tuning legend, same mapping as the desktop section.
-  const tuningStrings = useMemo<TuningGutterString[]>(() => {
-    if (!settings.showTuningGutter) return [];
-    return tuningGutterStrings(tuning.notation, stringCount, palette);
-  }, [tuning.notation, stringCount, palette, settings.showTuningGutter]);
 
   const atMin = zoom <= NOTE_SPACING_MIN + 1e-6;
   const atMax = zoom >= NOTE_SPACING_MAX - 1e-6;
@@ -314,7 +309,9 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
             audioContext={audioContext}
             audioStartTime={audioStartTime}
             countInRemaining={countInRemaining}
-            className='w-full'
+            // No inner margin on a phone: the viewer's own (px-4 pb-4) kept the neck
+            // 16px short of the screen at both ends and under it.
+            className='w-full px-0 pb-0'
             frequencyRef={frequencyRef}
             isListening={isListening}
             hitNotes={hitNotes}
@@ -327,7 +324,6 @@ export const MobileTablaturePanel = memo(function MobileTablaturePanel({
             playUntilBeat={playUntilBeat}
             zoom={zoom * MOBILE_FIT}
             heightPx={viewerHeight}
-            tuningStrings={tuningStrings}
             stringCount={stringCount}
             style={boardStyle}
             maxDpr={lite ? LITE_MAX_DPR : PHONE_MAX_DPR}

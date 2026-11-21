@@ -1,8 +1,10 @@
 
 import { useCallback,useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { audioDebugSession, isAudioDebugOn, logAudioDebug, pushAudioDebugSamples } from "utils/audio/audioDebugLog";
 import type { Spectrum } from "utils/audio/chordTones";
 import { spectrumFromAnalyser } from "utils/audio/chordTones";
+import { createGatedInputWatch, isCallModeRate, pickOtherInput } from "utils/audio/narrowbandInput";
 import type { RecentAudio, RecentAudioSnapshot } from "utils/audio/recentAudio";
 import { createRecentAudio, RECENT_AUDIO_SECONDS } from "utils/audio/recentAudio";
 
@@ -189,7 +191,13 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
   const tickDetectorRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const resumeHandlerRef = useRef<(() => void) | null>(null);
+  /** The dev recorder's reading loop (utils/audio/audioDebugLog.ts). */
+  const debugTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const manualChannelRef = useRef<number | null>(loadPersistedChannel());
+  /** The input opened in place of a headset in call mode (narrowbandInput.ts) — for this page load, never saved. */
+  const forcedDeviceIdRef = useRef<string | null>(null);
+  /** Inputs found muting themselves this page load. */
+  const gatedDeviceIdsRef = useRef<Set<string>>(new Set());
   /** Something asked for the input and has not closed it — what a replugged interface reopens for. */
   const wantsInputRef = useRef(false);
   const initRef = useRef<(() => Promise<AudioInitResult>) | null>(null);
@@ -222,6 +230,10 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
 
   /** Disconnects and closes whatever input is open; leaves the readings alone. */
   const releaseResources = useCallback(() => {
+    if (debugTimerRef.current !== null) {
+      clearInterval(debugTimerRef.current);
+      debugTimerRef.current = null;
+    }
     if (resumeHandlerRef.current) {
       document.removeEventListener("pointerdown", resumeHandlerRef.current);
       document.removeEventListener("keydown", resumeHandlerRef.current);
@@ -297,7 +309,7 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
     try {
       // The device the player picked last time, else whatever the system calls
       // its default — which is often a webcam, hence the picker.
-      const wantedDeviceId = loadPersistedDeviceId();
+      const wantedDeviceId = forcedDeviceIdRef.current ?? loadPersistedDeviceId();
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           audio: wantedDeviceId ? { ...INPUT_CONSTRAINTS, deviceId: { exact: wantedDeviceId } } : INPUT_CONSTRAINTS,
@@ -310,6 +322,7 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
         stream = await navigator.mediaDevices.getUserMedia({ audio: INPUT_CONSTRAINTS });
       }
       if (isStale()) return { ok: true };
+
       streamRef.current = stream;
 
       const track = stream.getTracks()[0] as MediaStreamTrack | undefined;
@@ -429,6 +442,8 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
         onLost: () => {
           if (myGeneration !== generationRef.current) return;
           dspRef.current = null;
+          // From here on the detectors run on the page's own thread.
+          logAudioDebug({ k: "dspLost" });
           runDspHere().catch((err) => console.error("Guitar DSP fallback failed:", err));
         },
       });
@@ -442,9 +457,68 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
         if (isStale()) return { ok: true };
       }
 
+      // A Bluetooth headset in call mode mutes held notes (narrowbandInput.ts).
+      // The browser made it the default input by itself, so another one is
+      // opened — unless the player picked the headset, which is only told about.
+      const gatedWatch = isCallModeRate(audioContext.sampleRate) || isCallModeRate(settings.sampleRate)
+        ? createGatedInputWatch(analysisRate)
+        : null;
+      const onGatedInput = async () => {
+        const openId = settings.deviceId;
+        if (openId) gatedDeviceIdsRef.current.add(openId);
+        const pickedByPlayer = !!openId && openId === loadPersistedDeviceId();
+        let otherId: string | null = null;
+        if (!pickedByPlayer) {
+          try {
+            const all = await navigator.mediaDevices.enumerateDevices();
+            otherId = pickOtherInput(all, { deviceId: openId, groupId: settings.groupId }, gatedDeviceIdsRef.current);
+          } catch { /* no list — nothing else to try */ }
+        }
+        if (myGeneration !== generationRef.current) return;
+        if (isAudioDebugOn()) logAudioDebug({ k: "gated", label: track?.label ?? null, openId, pickedByPlayer, otherId });
+        if (otherId) {
+          forcedDeviceIdRef.current = otherId;
+          toast.info("Bluetooth headphones cut held notes off, so the app is switching to another microphone.");
+          void initRef.current?.();
+        } else {
+          toast.warning("Bluetooth headphones cut held notes off. Disconnect them or pick another microphone.");
+        }
+      };
+
+      const debugOn = isAudioDebugOn();
+      if (debugOn) {
+        logAudioDebug({
+          k: "input",
+          userAgent: navigator.userAgent,
+          label: track?.label ?? null,
+          // What the browser actually granted — a phone may ignore the request
+          // to switch its voice processing off.
+          settings,
+          contextRate: audioContext.sampleRate,
+          analysisRate,
+          dspInWorker: !!dsp,
+          gain: inputGainRef.current,
+        });
+        debugTimerRef.current = setInterval(() => {
+          logAudioDebug({
+            k: "f",
+            raw: rawVolumeRef.current,
+            vol: volumeRef.current,
+            floor: noiseFloorRef.current,
+            hz: frequencyRef.current,
+            conf: confidenceRef.current,
+            peak: inputPeakRef.current,
+            gain: inputGainRef.current,
+          });
+        }, 50);
+        toast.info(`Audio debug log on: ${audioDebugSession()}`);
+      }
+
       workletNode.port.onmessage = (event: MessageEvent<GuitarInputSamplesMessage | GuitarInputChannelsMessage>) => {
         const data = event.data;
         if (data?.type === "samples") {
+          if (debugOn) pushAudioDebugSamples(data.samples, analysisRate);
+          if (gatedWatch?.feed(data.samples) === "gated") void onGatedInput();
           const worker = dspRef.current;
           if (!worker) { processHere?.(data.samples, data.timeMs); return; }
           // What stays on this thread: the model's look back and the raw tap —
@@ -539,6 +613,9 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
   /** Opens another input device and remembers it; reopens the stream if one is live or was wanted. */
   const selectDevice = useCallback(async (deviceId: string): Promise<AudioInitResult> => {
     try { localStorage.setItem(DEVICE_STORAGE_KEY, deviceId); } catch { /* ignore */ }
+    // The player chose: nothing is opened over that, and every input gets a fresh look.
+    forcedDeviceIdRef.current = null;
+    gatedDeviceIdsRef.current.clear();
     setState(prev => ({ ...prev, deviceId }));
     if (!wantsInputRef.current) return { ok: true };
     return init();

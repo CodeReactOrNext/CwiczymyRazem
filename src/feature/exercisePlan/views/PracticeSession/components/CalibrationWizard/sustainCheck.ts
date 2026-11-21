@@ -9,6 +9,15 @@ import { CLIP_PEAK } from "./inputLevel";
 
 /** How long the note is followed. */
 export const SUSTAIN_TEST_MS = 2500;
+/**
+ * The same through a microphone. An unplugged guitar a phone hears stands some
+ * 20–25 dB over the microphone's own noise at the attack and is down in it
+ * within 1–2 s (measured on an iPhone, 2026-11-21) — the cabled length asked for
+ * more than the string has to give, however well the input was set up.
+ */
+export const MIC_SUSTAIN_TEST_MS = 1500;
+
+export const sustainTestMs = (throughAir: boolean) => (throughAir ? MIC_SUSTAIN_TEST_MS : SUSTAIN_TEST_MS);
 /** Passing share — the same one that fills a tab note whole. */
 export const SUSTAIN_PASS_SHARE = SUSTAIN_COMPLETE_SHARE;
 /** Not followed for this long, the test is over. */
@@ -99,7 +108,7 @@ function finish(state: SustainState, passed: boolean, cause: DropCause | null): 
 export const isWrongNote = (state: SustainState) => state.phase === "waiting" && state.wrongMs >= WRONG_NOTE_MS;
 
 /** Share of the test the note has been followed for, 0–1. */
-export const sustainProgress = (state: SustainState) => Math.min(1, state.heardMs / SUSTAIN_TEST_MS);
+export const sustainProgress = (state: SustainState, testMs = SUSTAIN_TEST_MS) => Math.min(1, state.heardMs / testMs);
 
 const onPitch = (f: SustainFrame) => f.cents !== null && Math.abs(f.cents) <= f.toleranceCents;
 
@@ -109,7 +118,7 @@ function causeOf(f: SustainFrame): DropCause {
   return "pitch";
 }
 
-export function advanceSustain(state: SustainState, f: SustainFrame): SustainState {
+export function advanceSustain(state: SustainState, f: SustainFrame, testMs = SUSTAIN_TEST_MS): SustainState {
   if (state.phase === "done") return state;
 
   if (state.phase === "waiting") {
@@ -126,10 +135,10 @@ export function advanceSustain(state: SustainState, f: SustainFrame): SustainSta
   const elapsedMs = state.elapsedMs + f.dtMs;
   const clipped = state.clipped || f.rawPeak >= CLIP_PEAK;
   if (onPitch(f) && f.rawVolume > f.sustainGate) {
-    const heardMs = Math.min(SUSTAIN_TEST_MS, elapsedMs);
+    const heardMs = Math.min(testMs, elapsedMs);
     const hotMs = state.hotMs + (f.gainedVolume >= HOT_VOLUME ? f.dtMs : 0);
     const next = { ...state, elapsedMs, heardMs, silentMs: 0, lastCause: null, clipped, hotMs };
-    if (heardMs >= SUSTAIN_TEST_MS) return { ...next, phase: "done", outcome: finish(next, true, null) };
+    if (heardMs >= testMs) return { ...next, phase: "done", outcome: finish(next, true, null) };
     return next;
   }
 
@@ -138,6 +147,6 @@ export function advanceSustain(state: SustainState, f: SustainFrame): SustainSta
   const next = { ...state, elapsedMs, silentMs, lastCause, clipped };
   if (silentMs < END_SILENCE_MS) return next;
 
-  const passed = state.heardMs >= SUSTAIN_PASS_SHARE * SUSTAIN_TEST_MS;
+  const passed = state.heardMs >= SUSTAIN_PASS_SHARE * testMs;
   return { ...next, phase: "done", outcome: finish(next, passed, lastCause) };
 }

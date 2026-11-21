@@ -1,5 +1,6 @@
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { isAudioDebugOn, logAudioDebug } from "utils/audio/audioDebugLog";
 import type { Spectrum } from "utils/audio/chordTones";
 import { CHORD_TONE_HIT, CHORD_TONE_SUSTAIN, createChordToneEvidence, isChordToneSounding, spectrumPeak } from "utils/audio/chordTones";
 import { correctOctaveForLowStrings, getAdaptiveVolumeGate, getBaseToleranceCents, getCentsDistance, getDetectionGates, getExpectationBiasedTolerance, getFrequencyFromTab, getSustainVolumeGate, midiToFrequency } from "utils/audio/noteUtils";
@@ -8,6 +9,7 @@ import type { TablatureMeasure } from "../../../types/exercise.types";
 import type { FillFeed, FillStep } from "../utils/fillFeed";
 import { clearFillFeed, createFillFeed, pushFillStep } from "../utils/fillFeed";
 import { createLegatoHold, isLegatoNote } from "../utils/legatoHold";
+import { gradedNoteCount, isMuteStrum } from "../utils/muteStrum";
 import type { IntonationKind, LivePitch, ScoringFocus } from "../utils/pitchScoring";
 import { closerIntonation, continuationAttackFloorMs, gradeIntonation, hasOwnAttack, hasPlainAttack, INTONATION_SETTLE_MS, intonationKindOf, isNearPitch, isSamePitchContinuation, liveBendAmount, medianCents, noteSettleMs } from "../utils/pitchScoring";
 import { heldFillTarget } from "../utils/sustainCredit";
@@ -220,7 +222,7 @@ export function useNoteMatching({
 
   const totalNotes = useMemo(() => {
     if (!activeTablature) return 0;
-    return activeTablature.reduce((acc, m) => acc + m.beats.reduce((a, b) => a + b.notes.length, 0), 0);
+    return activeTablature.reduce((acc, m) => acc + m.beats.reduce((a, b) => a + gradedNoteCount(b.notes), 0), 0);
   }, [activeTablature]);
 
   const maxPossibleScore = useMemo(() => {
@@ -271,19 +273,22 @@ export function useNoteMatching({
     if (!isPlaying || !startTime || !activeTablature || !isMicEnabled) return;
 
     // Pre-flatten beats once per effect mount for O(log n) window search
+    // A mute strum (every string dead) is graded once, as its first note; the
+    // other strings take the same verdict through `alsoKeys` (muteStrum.ts).
     const flatBeats: {
       beat: any; beatStart: number; beatEnd: number;
-      notes: { note: any; noteKey: string }[];
+      notes: { note: any; noteKey: string; alsoKeys: string[] }[];
     }[] = [];
     let pos = 0;
     for (let mIdx = 0; mIdx < activeTablature.length; mIdx++) {
       for (let bIdx = 0; bIdx < activeTablature[mIdx].beats.length; bIdx++) {
         const beat = activeTablature[mIdx].beats[bIdx];
+        const keys = beat.notes.map((_: unknown, nIdx: number) => `${mIdx}-${bIdx}-${nIdx}`);
         flatBeats.push({
           beat, beatStart: pos, beatEnd: pos + beat.duration,
-          notes: beat.notes.map((note: any, nIdx: number) => ({
-            note, noteKey: `${mIdx}-${bIdx}-${nIdx}`,
-          })),
+          notes: isMuteStrum(beat.notes)
+            ? [{ note: beat.notes[0], noteKey: keys[0], alsoKeys: keys.slice(1) }]
+            : beat.notes.map((note: any, nIdx: number) => ({ note, noteKey: keys[nIdx], alsoKeys: [] })),
         });
         pos += beat.duration;
       }
@@ -330,6 +335,7 @@ export function useNoteMatching({
     });
 
     const pitchFocused = scoringFocus === "pitch";
+    const audioDebug = isAudioDebugOn();
     // Not cleared here: this effect restarts on every identity change of its
     // inputs, and the notes waiting for a verdict belong to the run, not to it.
     const pendingIntonation = pendingIntonationRef.current;
@@ -544,7 +550,7 @@ export function useNoteMatching({
           (!passClock && loopedBeatsElapsed < earlyWindowBeats && beatEnd + windowBeats >= totalExBeats);
         const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
 
-        notes.forEach(({ note, noteKey }) => {
+        notes.forEach(({ note, noteKey, alsoKeys }) => {
           const existingHit = hitNotesRef.current[noteKey];
           if (processedNotesRef.current.has(noteKey) && !existingHit) return;
 
@@ -622,6 +628,17 @@ export function useNoteMatching({
           // exactly there. Never rewind. Score/combo were counted once, at the
           // attack below — this pass only moves the visual fill. ──
           if (existingHit) {
+            if (audioDebug && typeof existingHit === "number" && loopedBeatsElapsed >= beatStart && loopedBeatsElapsed <= beatEnd) {
+              const heard = correctOctaveForLowStrings(currentFreq, targetFreq);
+              const sustainGate = getDetectionGates(targetFreq, sustainGateBase).volumeGate;
+              logAudioDebug({
+                k: "hold", note: noteKey, target: targetFreq, chord: beat.notes.length > 1,
+                beat: loopedBeatsElapsed, from: beatStart, to: beatEnd, filled: existingHit,
+                raw: currentVolume, gate: sustainGate, levelOk: currentVolume > sustainGate,
+                hz: currentFreq, cents: heard > 20 ? getCentsDistance(heard, targetFreq) : null,
+                pitchOk: pitchIsSounding(true),
+              });
+            }
             if (typeof existingHit === "number"
                 && loopedBeatsElapsed > existingHit
                 && loopedBeatsElapsed <= beatEnd
@@ -690,7 +707,7 @@ export function useNoteMatching({
             // A legato note counts once its pitch has held, not on one reading.
             const liveHit = isLegato
               ? legatoSinceMs !== null
-              : mayHit && (beat.notes.length > 1
+              : mayHit && (notes.length > 1
                 ? chordEvidenceRef.current.observe(noteKey, lastOnsetTime, now, pitchIsSounding(false))
                 : pitchIsSounding(false));
 
@@ -699,6 +716,14 @@ export function useNoteMatching({
               // it was neither processed nor hit before.
               processedNotesRef.current.add(noteKey);
               legatoHoldRef.current.forget(noteKey);
+              if (audioDebug) {
+                logAudioDebug({
+                  k: "hit", note: noteKey, target: targetFreq, via: eventHits.has(noteKey) ? "attack" : "live",
+                  beat: loopedBeatsElapsed, from: beatStart, to: beatEnd, beatMs: beatDurationMs,
+                  raw: currentVolume, gate: gates.volumeGate, hz: currentFreq,
+                  chord: beat.notes.length > 1, dead: !!note.isDead,
+                });
+              }
 
               // ── Timing: how far the attack landed from the note's due time ──
               // The attack route carries its own Δt. A live hit is timed by the
@@ -771,12 +796,29 @@ export function useNoteMatching({
               hitNotesRef.current[noteKey] = loopedBeatsElapsed;
               needsFlushRef.current = true;
               streamFill?.({ noteKey, beat: loopedBeatsElapsed, hit: true, timing: noteTimingsRef.current[noteKey] });
+              for (const key of alsoKeys) {
+                processedNotesRef.current.add(key);
+                noteTimingsRef.current[key] = noteTimingsRef.current[noteKey];
+                hitNotesRef.current[key] = loopedBeatsElapsed;
+                streamFill?.({ noteKey: key, beat: loopedBeatsElapsed, hit: true, timing: noteTimingsRef.current[key] });
+              }
             }
           } else if (isPassed) {
 
             processedNotesRef.current.add(noteKey);
             legatoHoldRef.current.forget(noteKey);
             missedNotesRef.current[noteKey] = true;
+            if (audioDebug) {
+              logAudioDebug({
+                k: "miss", note: noteKey, target: targetFreq, chord: beat.notes.length > 1, dead: !!note.isDead,
+                beat: loopedBeatsElapsed, from: beatStart, to: beatEnd, beatMs: beatDurationMs,
+                raw: currentVolume, gate: gates.volumeGate, hz: currentFreq,
+              });
+            }
+            for (const key of alsoKeys) {
+              processedNotesRef.current.add(key);
+              missedNotesRef.current[key] = true;
+            }
             needsFlushRef.current = true;
             s.misses++;
             logRunNote({ hit: false, timingMs: null, cents: null });

@@ -46,6 +46,8 @@ Community exercises can be rated one to five stars. Sharing pays a little too: a
 
 Creating or editing an exercise opens the tab editor, where you can write out the notation. When you publish it, you choose whether it goes public (the default) or stays private to you.
 
+Muted notes, the percussive scratch you get from resting the fretting hand on the strings, are written the way any tab writes them: click a cell and press **X**, or use the **Muted note** button next to the other techniques. Muted notes in a Guitar Pro file come across as they are.
+
 ## Questions people ask
 
 <FaqList items="Do I have to finish a routine for it to count?::No, whatever you actually played gets logged. Finishing simply means everything is ticked off|Can I edit a ready-made plan?::Not in place, but you can build your own version with the exercises you like|Is a routine worth more points than free practice?::No. Time is time. Following a plan does let you tick the Exercise plan habit, which is worth a point|What happens to a shared exercise if I make it private again?::It leaves the community list. Ratings and Fame you already earned stay" />

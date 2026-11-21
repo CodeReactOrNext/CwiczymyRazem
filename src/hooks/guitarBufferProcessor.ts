@@ -8,7 +8,7 @@
 // The only difference between paths is *where the buffer comes from*; the math
 // below is the single source of truth.
 import type { AttackReading } from "utils/audio/attackTones";
-import { createAttackSpectraTap } from "utils/audio/attackTones";
+import { attackLookCutoffMs, createAttackSpectraTap } from "utils/audio/attackTones";
 import { getAdaptiveVolumeGate, HIGH_STRING_MIN_FREQ } from "utils/audio/noteUtils";
 import type { PcmSpectrum } from "utils/audio/pcmSpectrum";
 import type { RecentAudio } from "utils/audio/recentAudio";
@@ -64,6 +64,11 @@ export interface DetectedNoteEvent {
    * couldn't be read cleanly (the next attack came first) or isn't read at all.
    */
   attack?: AttackReading;
+  /** Opened by the spectral-flux detector, not by hfc (bass only — see
+   *  SOFT_ATTACK_* in the processor). Something changed there, which need not
+   *  have been a note: good for crediting a note the tab expects, not for
+   *  saying the player struck one. */
+  soft?: boolean;
 }
 
 /**
@@ -329,6 +334,12 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   /** Every attack is also looked at as a before/after spectrum (attackTones.ts) —
    *  only where events are wanted at all. Fed the raw input, like the chord spectrum. */
   const attackTap = targets.noteEventsRef ? createAttackSpectraTap(sampleRate) : null;
+  /** The same for a bass, whose notes need a longer look to be told apart
+   *  (attackTones.ts, BASS_WINDOW_MS) — made the first time the player is on
+   *  bass, and marked instead of attackTap from then on while they are. */
+  let bassAttackTap: ReturnType<typeof createAttackSpectraTap> | null = null;
+  /** Samples received before bassAttackTap existed: its clock starts there. */
+  let bassAttackTapFrom = 0;
   /** Samples received before the current window — attackTap's clock. */
   let samplesIn = 0;
 
@@ -358,6 +369,21 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
   let pending: PendingEvent | null = null;
   /** Set per window from isBass — see BASS_* above. */
   let bassActive = false;
+
+  // ── Soft attacks on bass ────────────────────────────────────────────────────
+  // hfc hears a bright attack, and a bass string plucked with a finger has
+  // little brightness — least of all one played over another left ringing.
+  // With no attack reported there is no event, so nothing looks at what the
+  // attack changed (attackTones.ts), and the pitch read under a ringing string
+  // is that string's: the note goes unheard. On real bass notes laid along the
+  // bass exercises, hfc missed a quarter of the attacks of a fast line played
+  // with the strings ringing (guitarBufferProcessor.realbass.test.ts).
+  // The spectral-flux detector hears those, so on bass it opens an event too —
+  // marked `soft`, as it also fires on strings fading or beating, and never
+  // within an attack's own "after" look, which a second mark would cut short
+  // (its firing a hop or two after hfc is the same attack anyway).
+  const SOFT_ATTACK_MIN_GAP_MS = attackLookCutoffMs(sampleRate, true) + 10;
+  let lastEventOnsetMs = -Infinity;
 
   const median = (xs: number[]): number => {
     if (xs.length === 0) return 0;
@@ -401,7 +427,12 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
     spectrum?.push(inputBuffer);
     const blockStart = samplesIn;
     samplesIn += len;
+    if (bassActive && attackTap && !bassAttackTap) {
+      bassAttackTap = createAttackSpectraTap(sampleRate, true);
+      bassAttackTapFrom = blockStart;
+    }
     attackTap?.push(inputBuffer);
+    bassAttackTap?.push(inputBuffer);
     targets.inputTapRef?.current?.(inputBuffer, sampleRate);
 
     // 1. Apply gain and calculate RMS volume + peak from gained signal
@@ -491,24 +522,36 @@ export function createGuitarBufferProcessor(opts: BufferProcessorOptions) {
       // that jump (a quiet tail and the attack after it both read full scale).
       const onsetChunk = onsetBuf.subarray(offset, offset + HOP);
 
-      if (onsetDetector.do(onsetChunk)) {
+      // nowMs stamps the END of the block; walk back to this hop, then
+      // back again by the detector's own one-window reporting lag.
+      const hopOnsetMs = nowMs - (totalHops - 1 - hopIndex) * hopMs - ONSET_REPORT_LAG_MS;
+      const isHopOnset = !!onsetDetector.do(onsetChunk);
+      const isHopTick = !!tickDetector.do(onsetChunk);
+      if (isHopOnset) {
         isOnset = true;
-        // nowMs stamps the END of the block; walk back to this hop, then
-        // back again by the detector's own one-window reporting lag.
-        const onsetMs = nowMs - (totalHops - 1 - hopIndex) * hopMs - ONSET_REPORT_LAG_MS;
-        if (targets.lastAttackMsRef) targets.lastAttackMsRef.current = onsetMs;
-        if (targets.noteEventsRef) {
-          commitPending(); // a new attack ends the previous one, resolved or not
-          const event: DetectedNoteEvent = { onsetMs, pitchHz: 0, peakVolume: rawVolume, attack: attackTap ? "reading" : null };
-          // The same instant in samples: this hop's end, back by the detector's window.
-          attackTap?.mark(blockStart + (hopIndex + 1) * HOP - ONSET_WINDOW, (spectra) => { event.attack = spectra; });
-          pending = {
-            event,
-            long: [], high: [], peakVolume: rawVolume, longHops: 0, highHops: 0,
-          };
-        }
+        if (targets.lastAttackMsRef) targets.lastAttackMsRef.current = hopOnsetMs;
       }
-      if (tickDetector.do(onsetChunk)) isTick = true;
+      if (isHopTick) isTick = true;
+      // See SOFT_ATTACK_* above: on bass the spectral flux opens an event too.
+      const isSoftAttack = bassActive && isHopTick && !isHopOnset
+        && hopOnsetMs - lastEventOnsetMs >= SOFT_ATTACK_MIN_GAP_MS;
+      if ((isHopOnset || isSoftAttack) && targets.noteEventsRef) {
+        // The spectral flux was a hop or two ahead of hfc on this attack: one
+        // attack, so one event — this one, whose "after" look is whole. (Only
+        // while the soft one is still open: once committed it has been handed out.)
+        if (isHopOnset && pending?.event.soft) pending = null;
+        commitPending(); // a new attack ends the previous one, resolved or not
+        lastEventOnsetMs = hopOnsetMs;
+        const tap = bassActive ? bassAttackTap : attackTap;
+        const event: DetectedNoteEvent = { onsetMs: hopOnsetMs, pitchHz: 0, peakVolume: rawVolume, attack: tap ? "reading" : null, ...(isSoftAttack && { soft: true }) };
+        // The same instant in samples: this hop's end, back by the detector's window.
+        const onsetSample = blockStart + (hopIndex + 1) * HOP - ONSET_WINDOW - (bassActive ? bassAttackTapFrom : 0);
+        tap?.mark(onsetSample, (spectra) => { event.attack = spectra; });
+        pending = {
+          event,
+          long: [], high: [], peakVolume: rawVolume, longHops: 0, highHops: 0,
+        };
+      }
       if (strumDetector?.do(onsetChunk)) {
         targets.lastSoftAttackMsRef!.current = nowMs - (totalHops - 1 - hopIndex) * hopMs - ONSET_REPORT_LAG_MS;
       }

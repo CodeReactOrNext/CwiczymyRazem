@@ -171,7 +171,20 @@ const framePace = createFramePace();
  * this thread can't see it — the GPU.
  */
 let perfOn = false;
-const perf = { since: 0, frames: 0, painted: 0, paintMs: 0, paintMax: 0 };
+const perf = {
+  since: 0, frames: 0, painted: 0, paintMs: 0, paintMax: 0,
+  // Frame intervals while the tab runs: the longest, those long enough to see
+  // (> PERF_HITCH_MS), and those framePace throws away as "not a frame" (> PERF_GAP_MS).
+  lastStamp: 0, wasRunning: false, frameGapMax: 0, hitches: 0, gaps: 0,
+  // The audio clock stepping back (a stalled audio thread), and the longest wait for a TICK.
+  slips: 0, slipMs: 0, slipMax: 0, lastTickAt: 0, tickGapMax: 0,
+  // Paints made while a page turns — the whole board, every frame.
+  turnFrames: 0, turnPaintMax: 0,
+};
+const PERF_HITCH_MS = 45;
+const PERF_GAP_MS = 250;
+/** The audio clock falling back by less than this is a late reading, not a slip. */
+const PERF_SLIP_SEC = 0.002;
 
 const withAlphaCache = new Map<string, Map<number, string>>();
 
@@ -350,6 +363,17 @@ function reportPerf(now: number) {
         height: canvas?.height ?? 0,
         dpr,
         lite,
+        running: perf.wasRunning,
+        paged: pagedScroll,
+        frameGapMaxMs: perf.frameGapMax,
+        hitches: perf.hitches,
+        gaps: perf.gaps,
+        slips: perf.slips,
+        slipMs: perf.slipMs,
+        slipMaxMs: perf.slipMax,
+        tickGapMaxMs: perf.tickGapMax,
+        turnFrames: perf.turnFrames,
+        turnPaintMaxMs: perf.turnPaintMax,
       },
     });
   }
@@ -358,6 +382,15 @@ function reportPerf(now: number) {
   perf.painted = 0;
   perf.paintMs = 0;
   perf.paintMax = 0;
+  perf.frameGapMax = 0;
+  perf.hitches = 0;
+  perf.gaps = 0;
+  perf.slips = 0;
+  perf.slipMs = 0;
+  perf.slipMax = 0;
+  perf.tickGapMax = 0;
+  perf.turnFrames = 0;
+  perf.turnPaintMax = 0;
 }
 
 // Render data
@@ -650,12 +683,17 @@ function currentPageStarts(totalW: number, visibleW: number): number[] {
   return pageCache.starts;
 }
 
+/** Targets closer than this (world px) are the same page. A turn restarted on
+ *  every rounding step of its target never got anywhere: the board stood on
+ *  the last page while the cursor played on. */
+const PAGE_SAME_PX = 0.5;
+
 /** The standing board's scroll this frame: the cursor's page, or part-way
  *  through the turn to it. */
 function standingScroll(target: number, clockMs: number, beat: number): number {
   if (pageTarget === null || reducedMotion) {
     pageTurn = null;
-  } else if (target !== pageTarget) {
+  } else if (Math.abs(target - pageTarget) > PAGE_SAME_PX) {
     pageTurn = { from: pageShown, start: clockMs, ms: pageTurnMs(beat) };
   }
   pageTarget = target;
@@ -2056,6 +2094,7 @@ function paintFrame(frameStamp?: number) {
   let beatsElapsed = 0;
   let wrappedCursor = pausedCursorPos;  // cursor within a single repetition (tile-0 space)
   let seamless = false;                 // full-exercise seamless wrap active this frame
+  let passStartX = 0;                   // world x the cursor's repetition starts at
 
   // The audio clock now, and the moment the streamed fills are drawn at: a
   // little behind it, so the steps around that moment are already in.
@@ -2090,7 +2129,8 @@ function paintFrame(frameStamp?: number) {
       seamless = totalBeats > 0;
       const pass = totalBeats > 0 ? Math.floor(beatsElapsed / totalBeats) : 0;
       wrappedCursor = totalBeats > 0 ? beatToX(xMap, beatsElapsed - pass * totalBeats) : 0;
-      dispCursor = pass * totalW + wrappedCursor;
+      passStartX = pass * totalW;
+      dispCursor = passStartX + wrappedCursor;
     }
     lastDispCursor = dispCursor;
     lastSeamless = seamless;
@@ -2098,7 +2138,10 @@ function paintFrame(frameStamp?: number) {
     pausedCursorPos = wrappedCursor;
     if (pagedScroll) {
       const starts = currentPageStarts(totalW, viewW - contentLeft);
-      scrollX = standingScroll(pagedScrollX(starts, dispCursor - wrappedCursor, wrappedCursor), clockMs - stampLagMs, xToBeat(xMap, wrappedCursor));
+      // The pass's start as it was multiplied out, not dispCursor - wrappedCursor:
+      // that difference comes back a rounding step off, a different one from
+      // frame to frame, and each looked like a new page to turn to.
+      scrollX = standingScroll(pagedScrollX(starts, passStartX, wrappedCursor), clockMs - stampLagMs, xToBeat(xMap, wrappedCursor));
       // Pausing leaves the page where it stands.
       pausedScrollX = pagedScrollX(starts, 0, wrappedCursor);
     } else {
@@ -3670,6 +3713,16 @@ function render(frameStamp?: number) {
   const perfStart = perfOn ? performance.now() : 0;
   if (perfOn) {
     perf.frames++;
+    if (stamped) {
+      if (running && perf.wasRunning && perf.lastStamp > 0) {
+        const gap = frameStamp - perf.lastStamp;
+        if (gap > perf.frameGapMax) perf.frameGapMax = gap;
+        if (gap > PERF_GAP_MS) perf.gaps++;
+        else if (gap > PERF_HITCH_MS) perf.hitches++;
+      }
+      perf.lastStamp = frameStamp;
+      perf.wasRunning = running;
+    }
     reportPerf(perfStart);
   }
   if (stamped && running) {
@@ -3693,6 +3746,10 @@ function render(frameStamp?: number) {
       perf.painted++;
       perf.paintMs += cost;
       if (cost > perf.paintMax) perf.paintMax = cost;
+      if (pageTurn !== null) {
+        perf.turnFrames++;
+        if (cost > perf.turnPaintMax) perf.turnPaintMax = cost;
+      }
     }
   } catch (err) {
     // A frame that threw between save and restore leaves its clip, transform and
@@ -3797,7 +3854,7 @@ self.onmessage = (e: MessageEvent) => {
       bpm = msg.bpm;
       countInRemaining = msg.countInRemaining;
       audioStartSec = msg.audioStartSec ?? null;
-      if (!isPlaying) { resetAudioClock(audioClock); clockFromTicks = false; livePitch = null; }
+      if (!isPlaying) { resetAudioClock(audioClock); clockFromTicks = false; livePitch = null; perf.lastTickAt = 0; }
       if (isPlaying) { hoverStartX = null; glide = null; } // clear hover when playback starts
       recomputeLoopSeconds();
       break;
@@ -3822,7 +3879,20 @@ self.onmessage = (e: MessageEvent) => {
     }
     case 'TICK': {
       if (!clockFromTicks) { resetAudioClock(audioClock); clockFromTicks = true; }
-      observeAudioClock(audioClock, msg.audioCurrentSec, performance.now());
+      const tickAt = performance.now();
+      const offsetBefore = audioClock.offset;
+      observeAudioClock(audioClock, msg.audioCurrentSec, tickAt);
+      if (perfOn) {
+        if (perf.lastTickAt > 0 && tickAt - perf.lastTickAt > perf.tickGapMax) perf.tickGapMax = tickAt - perf.lastTickAt;
+        perf.lastTickAt = tickAt;
+        const offsetAfter = audioClock.offset;
+        if (offsetBefore !== null && offsetAfter !== null && offsetAfter < offsetBefore - PERF_SLIP_SEC) {
+          const slipMs = (offsetBefore - offsetAfter) * 1000;
+          perf.slips++;
+          perf.slipMs += slipMs;
+          if (slipMs > perf.slipMax) perf.slipMax = slipMs;
+        }
+      }
       livePitch = msg.pitch ?? null;
       break;
     }
@@ -3984,6 +4054,8 @@ self.onmessage = (e: MessageEvent) => {
     case 'PERF': {
       perfOn = !!msg.on;
       perf.since = 0;
+      perf.lastStamp = 0;
+      perf.lastTickAt = 0;
       break;
     }
     case 'VISIBLE': {

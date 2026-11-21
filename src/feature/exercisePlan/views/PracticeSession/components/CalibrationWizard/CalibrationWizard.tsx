@@ -196,6 +196,7 @@ const WizardBody = ({
                   isListening={isListening}
                   strings={strings}
                   target={sustainTarget}
+                  throughAir={!isNative && inputSource === "microphone"}
                   inputGain={inputGain}
                   onInputGainChange={onInputGainChange}
                   onNext={() => setStep("tuning")}

@@ -1,8 +1,5 @@
 import type { DashboardLayout } from "feature/dashboard/types/dashboard.types";
-import {
-  DEFAULT_LAYOUT,
-  normalizeLayout,
-} from "feature/dashboard/utils/dashboardLayout";
+import { normalizeLayout } from "feature/dashboard/utils/dashboardLayout";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -13,11 +10,16 @@ import { db } from "utils/firebase/client/firebase.utils";
  */
 const docRef = (uid: string) => doc(db, "users", uid, "settings", "dashboard");
 
+/**
+ * Null means the player has never saved a layout, which is not the same as
+ * having saved the default one: Home picks the unsaved layout by how long the
+ * account has been practising (see defaultLayoutFor).
+ */
 export const firebaseGetDashboardLayout = async (
   uid: string,
-): Promise<DashboardLayout> => {
+): Promise<DashboardLayout | null> => {
   const snap = await getDoc(docRef(uid));
-  if (!snap.exists()) return normalizeLayout(DEFAULT_LAYOUT);
+  if (!snap.exists()) return null;
   return normalizeLayout(snap.data());
 };
 

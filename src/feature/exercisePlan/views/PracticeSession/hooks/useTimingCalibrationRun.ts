@@ -118,7 +118,7 @@ export function useTimingCalibrationRun({
     const collectEventOnsets = () => {
       const from = clickWallMs[0];
       for (const event of audioRefs.noteEventsRef.current) {
-        if (event.onsetMs < from || event.onsetMs > lastAnswerMs) continue;
+        if (event.soft || event.onsetMs < from || event.onsetMs > lastAnswerMs) continue;
         if (attacks.some((a) => Math.abs(a - event.onsetMs) < 5)) continue;
         attacks.push(event.onsetMs);
       }

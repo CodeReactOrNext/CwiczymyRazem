@@ -42,6 +42,10 @@ import { transitions } from "lib/motion/motion";
 import { useQuerySnapshot } from "lib/querySnapshot/useQuerySnapshot";
 import dynamic from "next/dynamic";
 import type { AppPropsWithLayout } from "types/page";
+import { isAudioDebugOn } from "utils/audio/audioDebugLog";
+
+// Reads `?audiolog=1` off the landing URL, before a redirect drops it (dev only).
+isAudioDebugOn();
 
 const PostHogProvider = dynamic(
   () => import("../providers/PostHogProvider").then((m) => m.PostHogProvider),

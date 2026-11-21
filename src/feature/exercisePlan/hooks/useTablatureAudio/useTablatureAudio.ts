@@ -10,6 +10,7 @@ import { isMobileDevice } from "../../components/Metronome/utils/deviceDetection
 import type { TablatureBeat, TablatureNote, TabTrackType } from "../../types/exercise.types";
 import { createTempoRulerFromMeasures } from "../../views/PracticeSession/hooks/tempoBeatClock";
 import { BASS_STRING_MIDI, MAIN_TRACK_BOOST } from "./audio.constants";
+import { createGuitarRoom, createGuitarToneInput, GUITAR_ROOM_SEND, strumDelays } from "./guitarTone";
 import { playDrumNote } from "./synth.drums";
 import type { StringPlayers } from "./synth.strings";
 import { playStringNote } from "./synth.strings";
@@ -54,7 +55,9 @@ export const useTablatureAudio = ({
   const trackInputsRef       = useRef<Record<string, AudioNode>>({});
   /** A generated track's reverb/echo sends, taken after its fader. */
   const trackSendsRef        = useRef<Record<string, AudioNode[]>>({});
-  const timeoutRef           = useRef<number | null>(null);
+  /** The room the sampled guitars share, made when the first one needs it. */
+  const roomRef              = useRef<ConvolverNode | null>(null);
+  const timeoutRef          = useRef<number | null>(null);
 
   // ── Absolute-clock playback state ─────────────────────────────────────────
   // beatIdx grows monotonically — audio time = startAudioTime
@@ -213,6 +216,9 @@ export const useTablatureAudio = ({
       // this same dependency) supplies fresh players for the new context.
       guitarPlayerRef.current = mutedGuitarPlayerRef.current = bassPlayerRef.current = vocalsPlayerRef.current = null;
       bandRef.current = null;
+      // An adopted context outlives this hook — don't leave the room ringing on it.
+      roomRef.current?.disconnect();
+      roomRef.current = null;
     };
   }, [externalAudioContext]);
 
@@ -283,7 +289,10 @@ export const useTablatureAudio = ({
     activeTracks.forEach(track => {
       const existing = trackGainsRef.current[track.id];
       if (!existing || existing.context !== ctx) {
-        if (existing) { trackGainsRef.current[track.id]?.disconnect(); trackPannersRef.current[track.id]?.disconnect(); }
+        if (existing) {
+          trackGainsRef.current[track.id]?.disconnect(); trackPannersRef.current[track.id]?.disconnect();
+          trackSendsRef.current[track.id]?.forEach(send => send.disconnect());
+        }
         const gain   = ctx.createGain();
         const panner = ctx.createStereoPanner();
         panner.pan.value = track.pan ?? 0;
@@ -294,8 +303,21 @@ export const useTablatureAudio = ({
         gain.connect(panner); panner.connect(band ? band.bus : masterGainRef.current!);
         trackGainsRef.current[track.id]  = gain;
         trackPannersRef.current[track.id] = panner;
-        trackInputsRef.current[track.id] = band ? band.insert(track.trackType, gain) : gain;
+        // A sampled guitar plays through a small amp and a little of the shared room.
+        const sampledGuitar = !band && (track.trackType ?? "guitar") === "guitar";
+        trackInputsRef.current[track.id] = band
+          ? band.insert(track.trackType, gain)
+          : sampledGuitar ? createGuitarToneInput(ctx, gain) : gain;
         if (band) trackSendsRef.current[track.id] = band.attachSends(track.trackType, gain);
+        // Not on a phone: its speaker sits next to the microphone listening for
+        // the player's notes, and a convolver is the dearest node on the graph.
+        else if (sampledGuitar && !isMobileDevice()) {
+          if (!roomRef.current) roomRef.current = createGuitarRoom(ctx, masterGainRef.current!);
+          const send = ctx.createGain();
+          send.gain.value = GUITAR_ROOM_SEND;
+          panner.connect(send); send.connect(roomRef.current);
+          trackSendsRef.current[track.id] = [send];
+        }
       } else {
         const panner = trackPannersRef.current[track.id];
         if (panner) panner.pan.value = track.pan ?? 0;
@@ -478,8 +500,11 @@ export const useTablatureAudio = ({
         const isLate = beatAudioTime < ctx.currentTime - 0.1;
 
         if (!track.isMuted && !isLate) {
-          beat.notes.forEach((n: TablatureNote) => {
-            playNote(n, t, track.id, beatDuration, track.trackType ?? "guitar", track.generated, track.tuningOffsets);
+          const trackType = track.trackType ?? "guitar";
+          // A sampled guitar's chord is strummed across its strings, not struck at once.
+          const delays = trackType === "guitar" && !track.generated ? strumDelays(beat.notes, beat.pickStroke) : null;
+          beat.notes.forEach((n: TablatureNote, i: number) => {
+            playNote(n, t + (delays?.[i] ?? 0), track.id, beatDuration, trackType, track.generated, track.tuningOffsets);
           });
         }
 

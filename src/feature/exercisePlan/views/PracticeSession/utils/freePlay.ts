@@ -48,7 +48,8 @@ export const freshAttacks = (
 ): FreePlayAttack[] => {
   const fresh: FreePlayAttack[] = [];
   for (const event of events) {
-    if (event.pitchHz <= 0 || seen.has(event.onsetMs)) continue;
+    // A soft event (bass) marks a change in the sound, not surely a struck note.
+    if (event.soft || event.pitchHz <= 0 || seen.has(event.onsetMs)) continue;
     seen.add(event.onsetMs);
     if (event.pitchHz > MAX_ATTACK_HZ) continue;
     fresh.push({ beat: beatNow + (event.onsetMs - nowMs) / msPerBeat, pitchHz: event.pitchHz });

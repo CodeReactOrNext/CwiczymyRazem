@@ -226,7 +226,7 @@
       "isHammerOn": "Hammer-on",
       "isPullOff": "Pull-off",
       "isAccented": "Accent",
-      "isDead": "Dead note",
+      "isDead": "Muted note",
       "isVibrato": "Vibrato",
       "isTap": "Tap",
       "isPalmMute": "Palm mute",

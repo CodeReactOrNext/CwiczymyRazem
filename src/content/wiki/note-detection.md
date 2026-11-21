@@ -44,6 +44,8 @@ Every note the app hears is a hit. What a hit is worth depends on what the exerc
 
 **On bend drills, pitch.** Every note is judged by how in tune it is. A bend or release counts by how close it gets to the note it's aimed at, and a held note counts by where it sits while it rings, so pressing too hard and going sharp shows. Right on the pitch keeps everything, a little off keeps two thirds, and further off keeps a third. Timing costs nothing there. The arrows under the notes still show it, but the summary after the run is about pitch, and it tells you whether your notes tend to land flat or sharp.
 
+**Muted notes have no pitch,** so an x in the tab only needs the click of the pick on time. A scratch across several muted strings is one stroke and counts as one note, so missing it costs you one note, not six.
+
 While a note rings, a small tuner over it shows where the string is: the dot sits in the green band when you're in tune, and the note itself fills green, amber or orange to match. A note that ended up off keeps its reading, for example +28¢ with an arrow up for sharp. While you bend, a curve next to the note fills as the string rises and turns green when you reach the pitch.
 
 The chart under the summary shows every note of the run in order: how far each one landed from the beat, or from its pitch on bend drills, with the green band marking the top grade. A run that starts tight and drifts as your hand tires shows up there straight away.

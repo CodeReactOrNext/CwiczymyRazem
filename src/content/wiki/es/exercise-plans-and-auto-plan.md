@@ -46,6 +46,8 @@ Los ejercicios de la comunidad se pueden valorar de una a cinco estrellas. Compa
 
 Crear o editar un ejercicio abre el editor de tablaturas, donde puedes escribir la notación. Al publicarlo, eliges si pasa a ser público (la opción por defecto) o se queda privado.
 
+Las notas apagadas, ese rasgueo percusivo que sale al apoyar la mano del mástil sobre las cuerdas, se escriben como en cualquier tablatura: haz clic en una casilla y pulsa **X**, o usa el botón **Nota apagada** junto a las demás técnicas. Las notas apagadas de un archivo de Guitar Pro llegan tal cual.
+
 ## Preguntas que la gente hace
 
 <FaqList items="¿Tengo que terminar una rutina para que cuente?::No, lo que realmente tocaste queda registrado. Terminar simplemente significa que todo está marcado|¿Puedo editar un plan ya hecho?::No directamente, pero puedes montar tu propia versión con los ejercicios que te gusten|¿Una rutina vale más puntos que la práctica libre?::No. El tiempo es tiempo. Seguir un plan sí te deja marcar el hábito Plan de ejercicios, que vale un punto|¿Qué pasa con un ejercicio compartido si lo vuelvo a poner privado?::Sale de la lista de la comunidad. Las valoraciones y la Fame que ya ganaste se quedan" />

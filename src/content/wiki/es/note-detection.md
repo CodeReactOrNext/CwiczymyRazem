@@ -44,6 +44,8 @@ Cada nota que oye la app es un acierto. Lo que vale un acierto depende de lo que
 
 **En los ejercicios de bending, la altura.** Cada nota se juzga por lo afinada que está. Un bending o un soltado cuenta según lo cerca que llega de la nota a la que apunta, y una nota sostenida según dónde se sitúa mientras suena, así que apretar demasiado y subirte se nota. Justo en la altura conserva todo, un poco fuera conserva dos tercios y más lejos conserva un tercio. El timing no cuesta nada ahí. Las flechas bajo las notas aún lo muestran, pero el resumen tras la pasada trata de la altura y te dice si tus notas tienden a quedar bajas o altas.
 
+**Las notas apagadas no tienen altura,** así que una x en la tablatura solo pide el golpe de púa a tiempo. Un rasgueo sobre varias cuerdas apagadas es un solo golpe y cuenta como una nota, así que fallarlo te cuesta una nota, no seis.
+
 Mientras suena una nota, un pequeño afinador encima muestra dónde está la cuerda: el punto queda en la banda verde cuando estás afinado y la propia nota se rellena de verde, ámbar o naranja en consecuencia. Una nota que acabó fuera conserva su lectura, por ejemplo +28¢ con una flecha hacia arriba para alta. Mientras haces el bending, una curva junto a la nota se va llenando a medida que sube la cuerda y se pone verde cuando alcanzas la altura.
 
 El gráfico bajo el resumen muestra cada nota de la pasada en orden: a qué distancia del pulso cayó cada una, o de su altura en los ejercicios de bending, con la banda verde marcando la nota máxima. Una pasada que empieza ajustada y se desvía a medida que se cansa tu mano se ve ahí de inmediato.

@@ -12,7 +12,7 @@ import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import { CountInOverlay } from "./CountInOverlay";
 import { mirrorBoardStyle, pointerAlongBoard } from "./tablatureDirection";
 import { staffLineSpacing } from "./tablatureStringRows";
-import { TabPerfOverlay, useTabPerfFlag } from "./TabPerfOverlay";
+import { TabPerfOverlay, usePageFrameLog, useTabPerfFlag } from "./TabPerfOverlay";
 import { useAmbientMicGlow } from "./useAmbientMicGlow";
 import { STRING_SPACING, useTablatureRenderData } from "./useTablatureRenderData";
 import type { TablatureSelection, TablatureStylePatch, TuningGutterString } from "./useTablatureWorkerBridge";
@@ -174,6 +174,7 @@ const TablatureViewerInner = ({
   const renderData = useTablatureRenderData(measures, palette, style?.stringSpacing, style?.flipStrings, style?.stringCount);
 
   const perf = useTabPerfFlag();
+  usePageFrameLog(isPlaying && !obscured, audioContext);
   const { perfStats, showRestWarning, handleDragStart, handleDragMove, handleDragEnd, handleHover, handleHoverEnd, resetSeek, seekWorker, scrollToBeat, locateNote } = useTablatureWorkerBridge({
     canvasRef, containerRef, containerSize, renderData,
     isPlaying, startTime, audioStartTime, bpm, countInRemaining,

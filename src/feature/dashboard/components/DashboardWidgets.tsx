@@ -26,6 +26,7 @@ import {
   WIDGET_GROUP_ORDER,
 } from "feature/dashboard/data/widgetCatalog";
 import { useDashboardLayout } from "feature/dashboard/hooks/useDashboardLayout";
+import { useIsNewPlayer } from "feature/dashboard/hooks/useIsNewPlayer";
 import { useLocalizeWidget } from "feature/dashboard/hooks/useLocalizeWidget";
 import {
   addWidget,
@@ -51,7 +52,8 @@ import { WidgetContent } from "./widgets/WidgetContent";
 const GRID = "grid grid-cols-1 gap-6 lg:grid-cols-2";
 
 /**
- * Everything under the hero. The support banner and community feed at the bottom are fixed; between
+ * Everything under the hero. The support banner (from the player's third
+ * practice day on) and community feed at the bottom are fixed; between
  * them sit the player's cards in the player's order, plus the Customize mode
  * that changes both. Every change is saved as it is made, so Done only closes
  * the toolbars.
@@ -59,7 +61,11 @@ const GRID = "grid grid-cols-1 gap-6 lg:grid-cols-2";
 export const DashboardWidgets = () => {
   const { t } = useTranslation("dashboard");
   const { userAuth, feedSlot } = useDashboardData();
-  const { layout, isLoading, updateLayout } = useDashboardLayout(userAuth);
+  const isNewPlayer = useIsNewPlayer();
+  const { layout, isLoading, updateLayout } = useDashboardLayout(
+    userAuth,
+    isNewPlayer,
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const isMobile = useResponsiveStore((state) => state.isMobile);
@@ -230,7 +236,10 @@ export const DashboardWidgets = () => {
           )}
         </div>
 
-        <SupportBanner />
+        {/* Not before the player has practised on a few days: with the short
+            starter Home it would land on the first screen, asking for support
+            ahead of the first session. */}
+        {!isNewPlayer && <SupportBanner />}
 
         {/* Below the widgets and the banner, so usually off screen at load. The
             feed brings a pile of listeners (logs, pinned donations, unread

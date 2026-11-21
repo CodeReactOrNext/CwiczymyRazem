@@ -50,3 +50,7 @@ scripts/roadmapPreflightProbe.report.txt
 # VST host build inputs/outputs (electron/vst/build.bat fetches the SDK)
 /electron/vst/third_party/
 /electron/vst/build/
+
+# npm run dev:phone (self-signed cert) and the dev audio recorder
+/certificates
+/.audio-debug
