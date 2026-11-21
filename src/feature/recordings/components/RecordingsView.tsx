@@ -58,7 +58,7 @@ const RecordingsView = () => {
           <Button
             onClick={() => setIsAddModalOpen(true)}
             className='h-11 bg-cyan-600 px-6 font-bold text-white hover:bg-cyan-500'>
-            <Plus className='mr-2 h-5 w-5' />
+            <Plus className='h-5 w-5' />
             {t("view.add")}
           </Button>
         }

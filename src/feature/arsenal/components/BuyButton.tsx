@@ -12,8 +12,13 @@ interface BuyButtonProps {
   /**
    * `soft` for a grid of cards, where a solid bar on every one would have them
    * all shouting at once; `solid` for the one loud CTA on a screen.
+   *
+   * The trader's counter has a Buy on every line, so it uses the two plain
+   * keys instead: `key` is a grey key whose only colour is the Fame on it,
+   * `primary` the one white key the counter leads with. Neither carries the
+   * cart — sixteen of them down a price list said nothing the word did not.
    */
-  variant?: "solid" | "soft";
+  variant?: "solid" | "soft" | "key" | "primary";
   /** `sm` for the narrow footer of a trading card. */
   size?: "default" | "sm";
   /**
@@ -44,7 +49,19 @@ export const BuyButton = ({
   className,
 }: BuyButtonProps) => {
   const { t } = useTranslation("arsenal");
-  const solid = variant === "solid";
+  const plain = variant === "key" || variant === "primary";
+  const face = {
+    solid: "bg-arsenal-accent text-arsenal-bg hover:bg-arsenal-accent/90",
+    soft: "bg-arsenal-accent/15 text-arsenal-accent hover:bg-arsenal-accent/25",
+    key: "bg-zinc-800 text-zinc-100 hover:bg-zinc-700",
+    primary: "bg-zinc-100 text-zinc-900 hover:bg-white",
+  }[variant];
+  const priceInk = {
+    solid: "text-arsenal-bg",
+    soft: "text-amber-400",
+    key: "text-amber-400",
+    primary: "text-zinc-900",
+  }[variant];
 
   return (
     <button
@@ -56,15 +73,15 @@ export const BuyButton = ({
         "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
         size === "sm" ? "h-9 px-3 text-xs" : "h-10 px-4 text-sm",
         canAfford
-          ? solid
-            ? "bg-arsenal-accent text-arsenal-bg hover:bg-arsenal-accent/90"
-            : "bg-arsenal-accent/15 text-arsenal-accent hover:bg-arsenal-accent/25"
+          ? face
           : "cursor-not-allowed bg-arsenal-card text-arsenal-text-tertiary",
         isBuying && "cursor-wait opacity-70",
         className,
       )}>
       <span className='flex items-center gap-2'>
-        <ShoppingCart size={size === "sm" ? 13 : 15} strokeWidth={2.5} />
+        {!plain && (
+          <ShoppingCart size={size === "sm" ? 13 : 15} strokeWidth={2.5} />
+        )}
         {isBuying
           ? t("buy.buying")
           : canAfford
@@ -77,11 +94,7 @@ export const BuyButton = ({
       <span
         className={cn(
           "flex items-center gap-1.5 tabular-nums",
-          canAfford
-            ? solid
-              ? "text-arsenal-bg"
-              : "text-amber-400"
-            : "text-arsenal-text-tertiary",
+          canAfford ? priceInk : "text-arsenal-text-tertiary",
         )}>
         <img
           src='/images/tokens/coin.png'

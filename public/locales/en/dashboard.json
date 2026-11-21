@@ -1,9 +1,11 @@
 {
   "daily_quests": {
     "title": "Daily Quests",
-    "claim": "Claim {{points}}",
-    "claimed": "Reward Claimed",
-    "reward_hint": "Finish all {{count}} to earn",
+    "reward_hint": "Finish all {{total}} to earn",
+    "time_left": "{{time}} left",
+    "new_in": "New quests in {{time}}",
+    "claim_reward": "Claim reward",
+    "all_done": "All done for today",
     "tasks": {
       "rate_song": "Rate a Song",
       "add_want_to_learn": "Add song to \"Want to Learn\"",
@@ -213,13 +215,17 @@
     "open_spot": "Open spot",
     "open_spot_hint": "Play to take it",
     "title": "Exercise of the day",
-    "new_in": "New in {{time}}",
     "none_today": "No exercise today.",
     "beat_score": "Beat your score",
     "play": "Play",
     "board_error": "The board could not be loaded.",
     "prize": "Prize for #1",
     "wins": "#1 wins",
-    "mod": "{{label}} mod"
+    "mod": "{{label}} mod",
+    "time_left": "{{time}} left",
+    "your_best": "Your best {{score}}",
+    "gap_to_first": "{{gap}} to #1",
+    "leading": "You're in the lead",
+    "ahead_of_second": "{{gap}} ahead of #2"
   }
 }

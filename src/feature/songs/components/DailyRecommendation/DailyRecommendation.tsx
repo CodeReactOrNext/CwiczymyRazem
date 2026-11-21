@@ -103,7 +103,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
                 className="flex-1 sm:flex-none"
               >
                 Practice
-                <ChevronRight size={14} strokeWidth={3} className="ml-1" />
+                <ChevronRight size={14} strokeWidth={3} className="" />
               </Button>
             )}
 
@@ -114,7 +114,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
                 onClick={() => handleAdd("wantToLearn")}
                 className="flex-1 sm:flex-none whitespace-nowrap"
               >
-                <Plus className="mr-1 h-3.5 w-3.5" />
+                <Plus className="h-3.5 w-3.5" />
                 {isAdding ? t("recommendation.adding") : t("want_to_learn")}
               </Button>
             )}
@@ -126,7 +126,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
                 className="flex-1 sm:flex-none whitespace-nowrap"
               >
                 {isAdding ? t("recommendation.adding") : t("recommendation.start_learning")}
-                <ChevronRight size={14} strokeWidth={3} className="ml-1" />
+                <ChevronRight size={14} strokeWidth={3} className="" />
               </Button>
             )}
             

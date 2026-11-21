@@ -53,6 +53,37 @@ export const DexMarks = ({
 };
 
 /**
+ * The same fact as one plain word, for a footer that already has enough going
+ * on: a card for sale says "Owned", "In Dex" or that it would be a first, at a
+ * size that can be read, and leaves the glyphs to the surfaces with room.
+ */
+export const DexWord = ({
+  status,
+  className,
+}: {
+  status: DexStatus;
+  className?: string;
+}) => {
+  const { t } = useTranslation("arsenal");
+  const isNew = !status.isOwned && !status.inDex;
+
+  return (
+    <span
+      className={cn(
+        "truncate text-xs",
+        isNew ? "font-medium text-zinc-200" : "text-zinc-400",
+        className,
+      )}>
+      {status.isOwned
+        ? t("dex_marks.owned")
+        : status.inDex
+          ? t("dex_marks.in_dex")
+          : t("dex_marks.new")}
+    </span>
+  );
+};
+
+/**
  * The same fact as one glyph, for a corner that has no room for words. Owned
  * wins over Dex — a tile carries one icon, and "you have it" is the one that
  * changes what the player does next. A model they have never had wears the

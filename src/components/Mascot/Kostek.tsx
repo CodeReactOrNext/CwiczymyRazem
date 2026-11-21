@@ -1937,11 +1937,15 @@ export const KostekStill = ({
   bg = "#0B0D10",
   hands = true,
   shadow = true,
+  part = "all",
+  face,
   className,
 }: {
   mood?: KostekMood;
   lookAt?: LookAt;
   eyesClosed?: boolean;
+  /** The mood's pose with other eyes, e.g. a strike's shut eyes on `focus`. */
+  face?: EyeShape;
   fg?: string;
   shade?: string;
   bg?: string;
@@ -1949,6 +1953,11 @@ export const KostekStill = ({
   hands?: boolean;
   /** Leave the ground shadow out, e.g. when the figure moves through the air. */
   shadow?: boolean;
+  /**
+   * Draw only the body (no eyes) or only the eyes, in the same frame, so the
+   * eyes can be stacked on their own layer and animated (squeezed) apart.
+   */
+  part?: "all" | "body" | "eyes";
   className?: string;
 }) => {
   let pose = poseFor(mood, lookAt);
@@ -1959,6 +1968,7 @@ export const KostekStill = ({
       l: { x: 50, y: 58, r: -15 },
       r: { x: 70, y: 58, r: 15 },
     };
+  if (face) pose = { ...pose, eyes: face };
   const b = pose.body;
   const bodyT = `translate(60 115) rotate(${b.rotate}) scale(${b.scaleX} ${b.scaleY}) translate(-60 -115)`;
   const eye = (cx: number, side: -1 | 1) => {
@@ -1977,6 +1987,23 @@ export const KostekStill = ({
       <path d={eyePath(cx, { ...form, tilt: form.tilt * -side })} fill={bg} />
     );
   };
+  const eyes = (
+    <g transform={`translate(${pose.look.x} ${pose.look.y})`}>
+      {eye(EYE_L, -1)}
+      {eye(EYE_R, 1)}
+    </g>
+  );
+  if (part === "eyes")
+    return (
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        viewBox='4 16 112 110'
+        overflow='visible'
+        className={className}
+        aria-hidden>
+        <g transform={bodyT}>{eyes}</g>
+      </svg>
+    );
   const hand = (h: HandPose) => (
     <g
       transform={`translate(${h.x} ${h.y}) rotate(${h.r})`}
@@ -2023,15 +2050,22 @@ export const KostekStill = ({
         {hands && pose.r.behind && hand(pose.r)}
         <path d={BODY} fill={fg} />
         <path d={SHADE_PATH} fill={shade} clipPath='url(#kostek-still-body)' />
-        <g transform={`translate(${pose.look.x} ${pose.look.y})`}>
-          {eye(EYE_L, -1)}
-          {eye(EYE_R, 1)}
-        </g>
+        {part === "all" && eyes}
         {hands && !pose.l.behind && hand(pose.l)}
         {hands && !pose.r.behind && hand(pose.r)}
       </g>
     </svg>
   );
+};
+
+/**
+ * Where the eyes' centre line sits in a `KostekStill` of this mood, as a share
+ * of the figure's height (top = 0) — the origin to squeeze the eyes about.
+ */
+export const kostekEyeLine = (mood: KostekMood = "idle") => {
+  const { eyes, look, body } = poseFor(mood);
+  const y = 115 + (EYE_Y + EYE_FORM[eyes].y + look.y - 115) * body.scaleY;
+  return (y - 16) / 110;
 };
 
 // ─── Speech ───────────────────────────────────────────────────────────────────

@@ -276,7 +276,7 @@ export const SkillDashboard = ({
             onClick={handleClose}
             className="text-zinc-500 hover:text-white hover:bg-white/10"
            >
-              <ArrowLeft size={16} className="mr-2" />
+              <ArrowLeft size={16} className="" />
               {returnTo ? "Back to Roadmap" : "Back to Skills"}
            </Button>
         </div>

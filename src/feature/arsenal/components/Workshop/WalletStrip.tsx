@@ -3,8 +3,7 @@ import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import { getWalletTierTotals } from "feature/arsenal/utils/scrap";
-import { readableText } from "lib/colorTheme/colorTheme";
-import { ChevronDown, Wrench } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { PartsWallet } from "../Parts/PartsWallet";
@@ -32,7 +31,7 @@ export const WalletStrip = ({ parts }: WalletStripProps) => {
   const tierTotals = useMemo(() => getWalletTierTotals(parts), [parts]);
 
   return (
-    <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-4'>
+    <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 px-5 py-4'>
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
@@ -40,9 +39,8 @@ export const WalletStrip = ({ parts }: WalletStripProps) => {
           "flex flex-wrap items-center gap-x-6 gap-y-2 text-left",
           "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
         )}>
-        <span className='flex items-center gap-2.5'>
-          <Wrench size={16} className='text-zinc-500' />
-          <span className='text-sm font-bold text-zinc-200'>{labels.t("workshop.parts")}</span>
+        <span className='text-sm font-bold text-zinc-200'>
+          {labels.t("workshop.parts")}
         </span>
 
         <span className='flex min-w-0 flex-1 flex-wrap items-baseline gap-x-5 gap-y-1'>
@@ -56,9 +54,14 @@ export const WalletStrip = ({ parts }: WalletStripProps) => {
                 <span className='text-base font-black tabular-nums text-white'>
                   {qty}
                 </span>
-                <span
-                  className='text-[11px] font-semibold'
-                  style={{ color: readableText(PART_TIER_COLORS[tier]) }}>
+                {/* The tier's colour is one dot; the word stays grey, so four
+                    tiers in a row are not four colours of text. */}
+                <span className='flex items-center gap-1.5 text-xs text-zinc-400'>
+                  <span
+                    aria-hidden
+                    className='h-1.5 w-1.5 rounded-full'
+                    style={{ backgroundColor: PART_TIER_COLORS[tier] }}
+                  />
                   {labels.partTier(tier)}
                 </span>
               </span>

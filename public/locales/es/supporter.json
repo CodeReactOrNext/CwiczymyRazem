@@ -212,8 +212,6 @@
       "body": "Riff Quest es gratis y lo seguirá siendo. Todavía está en beta, y las funciones nuevas salen gracias a los aportes de los jugadores.",
       "invite": "Si te apetece aportar, cada café acerca la siguiente.",
       "next": "Siguiente:",
-      "perk_before": "Quienes apoyan reciben",
-      "perk_after": "y voz en la hoja de ruta.",
       "sign": "Gracias por tocar.",
       "cta": "Invítame a un café"
     },
@@ -302,20 +300,19 @@
       "message_discord": "Escríbeme por Discord"
     },
     "pitch": {
-      "title": "Una donación abre el panel de supporters",
-      "intro": "Detrás de la insignia está la sala donde riff.quest se decide en voz alta:",
-      "perks": {
-        "0": "Propón ideas y vota lo que se construye después",
-        "1": "Elige el equipo que entra en el Arsenal",
-        "2": "Funda un gremio con su propio nombre, etiqueta y almacén compartido",
-        "3": "Conecta Claude u otro asistente de IA a tu cuenta"
-      },
-      "email": "Usa el correo de esta cuenta para desbloquear Supporter.",
-      "email_known": "Usa el correo de esta cuenta para desbloquear Supporter: {{email}}.",
-      "other_email": "¿Usas otro correo? {{discord}} y lo vincularé a mano.",
+      "hello": "Hola, soy Michał. Yo construyo Riff Quest.",
+      "story": "Lo empecé como una herramienta para mí, para ayudarme a practicar. Ahora quiero que la tenga todo el mundo y que siga siendo gratis, para que cualquiera pueda usarla.",
+      "where": "Tu apoyo paga primero los servidores. Todo lo que pase de ahí va a la siguiente función de la hoja de ruta, y se desbloquea para todos.",
+      "sign": "Michał Jabłoński, guitarrista y creador de Riff Quest",
+      "photo_alt": "Michał Jabłoński tocando la guitarra en un escenario",
+      "email": "Dona con el correo de esta cuenta para que la insignia de supporter la encuentre.",
+      "email_known": "Dona con {{email}} para que la insignia de supporter encuentre esta cuenta.",
+      "other_email": "¿Otro correo? {{discord}}.",
       "write_discord": "Escríbeme por Discord",
       "support": "Apoya el proyecto",
-      "shop_body": "Banners y efectos de avatar para tus publicaciones de Actividad, skins para tu pedalboard y tus cables. Solo estéticos y tuyos para siempre."
+      "shop_title": "Todo aquí se compra con tokens",
+      "shop_body": "Los tokens son un agradecimiento por apoyar el proyecto: cada $1 donado son {{rate}} tokens, más {{welcome}} con tu primera donación. Solo estéticos y tuyos para siempre.",
+      "shop_wallet": "tus tokens"
     },
     "backers": {
       "count": "Apoyado por {{count}} supporters",

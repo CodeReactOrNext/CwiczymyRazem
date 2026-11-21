@@ -67,6 +67,10 @@ const recording = (takesLeft: number): RecordingView => {
   };
 };
 
+/** Opens one of the panes under the stage, the way a member would. */
+const openPane = (name: string) =>
+  fireEvent.click(screen.getByRole("tab", { name }));
+
 const show = (props: Partial<GuildRecordingTabProps> = {}) => {
   const handlers = {
     onBook: vi.fn(),
@@ -156,8 +160,27 @@ describe("GuildRecordingTab", () => {
     expect(T6.fame).toBeGreaterThan(T1.fame);
   });
 
+  it("opens on the three steps, with the one the guild is on marked", () => {
+    const current = () =>
+      screen
+        .getAllByRole("listitem")
+        .filter((item) => item.getAttribute("aria-current") === "step");
+    show();
+    expect(current()).toHaveLength(1);
+    expect(current()[0].textContent).toContain("Book a session");
+    cleanup();
+
+    // With a session open the parts stand under the stage; the steps are a tap away.
+    show({ view: recording(1) });
+    expect(current()).toHaveLength(0);
+    openPane("How it works");
+    expect(current()).toHaveLength(1);
+    expect(current()[0].textContent).toContain("Record takes");
+  });
+
   it("shows who might walk in, without letting anybody be picked", () => {
     show();
+    openPane("Clients");
     for (const contract of RECORDING_CONTRACTS)
       expect(screen.getByText(contract.client)).toBeTruthy();
     // The only way in is a tier.
@@ -175,9 +198,11 @@ describe("GuildRecordingTab", () => {
     expect(screen.getAllByRole("button", { name: /rehearse/i })).toHaveLength(
       3,
     );
+    // The tape is said as how full it is, not as raw points.
     expect(
-      screen.getByText(`160 / ${T1.tape} on tape`, { exact: false }),
-    ).toBeTruthy();
+      screen.getAllByText(`${Math.round((160 / T1.tape) * 100)}%`).length,
+    ).toBeGreaterThan(0);
+    expect(screen.queryByText(`160 / ${T1.tape}`, { exact: false })).toBeNull();
 
     fireEvent.click(
       screen.getAllByRole("button", { name: /record a take/i })[1],
@@ -208,10 +233,12 @@ describe("GuildRecordingTab", () => {
 
   it("shows how good the takes were and how the client takes them", () => {
     show({ view: recording(1) });
+    expect(screen.getByText(/1 takes, 92% average/)).toBeTruthy();
+    openPane("The client");
     expect(screen.getByRole("heading", { name: "Grinning" })).toBeTruthy();
     expect(screen.getByText("+10%")).toBeTruthy();
-    expect(screen.getByText(/1 takes, 92% average/)).toBeTruthy();
     // The take on the list of the last ones, with who played it.
+    openPane("The crew");
     expect(screen.getAllByText("92%").length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText("+160")).toBeTruthy();
   });

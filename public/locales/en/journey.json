@@ -16,16 +16,26 @@
     },
     "close": "Close",
     "step": "Step {{n}}",
-    "goal": "Goal",
-    "complete_tasks": "Please complete all mandatory tasks below by ticking the checkboxes to proceed to the next stage.",
-    "your_tasks": "Your Tasks",
     "choose_target": "Choose a target",
     "saving": "Saving...",
     "done_complete": "Done & Complete",
-    "unlock_hint": "Read through the content and check all the boxes above to unlock this",
     "practice": "Practice",
     "retake": "Retake",
     "exam": "Exam"
+  },
+  "lesson": {
+    "next": "Next",
+    "back": "Back",
+    "how_to_pass": "How you pass",
+    "before_you_start": "Before you start",
+    "tick_all": "Tick everything that's true for you to finish this step.",
+    "tick_more_one": "Tick 1 more to finish",
+    "tick_more_other": "Tick {{count}} more to finish",
+    "pick_song": "Pick a song to finish",
+    "open_one": "Start the lesson · 1 page",
+    "open_other": "Start the lesson · {{count}} pages",
+    "read_again_one": "Read the lesson · 1 page",
+    "read_again_other": "Read the lesson · {{count}} pages"
   },
   "finish": {
     "in_arsenal": "In your Arsenal, with a serial nobody else has.",
@@ -39,7 +49,8 @@
   },
   "path": {
     "modules": "Modules",
-    "start": "Start"
+    "start": "Start",
+    "stage": "Section {{n}}"
   },
   "modules": {
     "title": "Learning path",

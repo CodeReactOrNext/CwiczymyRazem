@@ -461,6 +461,10 @@
     "last_session": "Letzte Session",
     "continue": "Weiter",
     "your_progress": "Dein Fortschritt",
-    "start_today": "Starte das heutige Üben"
+    "start_today": "Starte das heutige Üben",
+    "practice": "Üben",
+    "practice_more": "Weiter üben",
+    "level": "Level",
+    "xp": "{{current}} / {{total}} XP"
   }
 }

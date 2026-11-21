@@ -118,5 +118,133 @@
     "5": "Si ganas a alguien más fuerte, ganas más ELO. ¿No tocaste? Cuenta como derrota.",
     "title": "Cómo funciona"
   },
-  "error": "No se pudieron cargar tus duelos. Recarga la página."
+  "error": "No se pudieron cargar tus duelos. Recarga la página.",
+  "tabs": {
+    "duels": "Duelos",
+    "ranking": "Ranking",
+    "history": "Historial"
+  },
+  "strip": {
+    "unrated": "Sin ranking",
+    "elo_aria": "ELO {{rating}}. ¿Qué es el ELO?"
+  },
+  "slots": {
+    "title": "Tus duelos",
+    "used": "{{used}} de {{max}} plazas",
+    "free": "Plaza libre",
+    "searching": "Buscando rival",
+    "searching_expires": "Te avisaremos. El ticket caduca en {{time}}",
+    "cancel": "Cancelar",
+    "you": "Tú",
+    "opponent": "Rival",
+    "opp_attempts_one": "Rival · {{count}} intento",
+    "opp_attempts_other": "Rival · {{count}} intentos",
+    "opp_ready": "listo",
+    "locked": "Resultado fijado",
+    "new": "Nuevo",
+    "left": "restante",
+    "open_aria": "Abrir duelo: {{title}}"
+  },
+  "join": {
+    "title": "Nuevo duelo",
+    "waiting_one": "{{count}} jugador está esperando, así que empiezas ya.",
+    "waiting_other": "{{count}} jugadores están esperando, así que empiezas ya.",
+    "nobody": "Ahora no espera nadie. Tu ticket espera hasta 24 horas.",
+    "confirm": "Buscar rival"
+  },
+  "pending": {
+    "title": "Resultado listo",
+    "vs": "vs {{name}} · {{exercise}}",
+    "open": "Ver"
+  },
+  "duel": {
+    "back": "Volver a duelos",
+    "left": "hasta que termine el duelo",
+    "run_details": "{{accuracy}}% · {{bpm}} BPM"
+  },
+  "result": {
+    "won": "¡Has ganado!",
+    "lost": "Has perdido",
+    "draw": "Empate",
+    "void": "Nadie jugó",
+    "vs": "vs {{name}}",
+    "elo": "ELO",
+    "was": "antes {{rating}}",
+    "place": "Puesto",
+    "place_of": "de {{total}}",
+    "unranked": "Sin ranking",
+    "continue": "Continuar"
+  },
+  "onboarding": {
+    "0": {
+      "title": "Tú contra un desconocido",
+      "body": "Los dos recibís el mismo ejercicio al azar. Tu rival es anónimo hasta que termina el duelo."
+    },
+    "1": {
+      "title": "48 horas, todos los intentos que quieras",
+      "body": "Solo cuenta tu mejor intento. Los ejercicios tocados los puntúa el micrófono."
+    },
+    "2": {
+      "title": "Ganas y tu ELO sube",
+      "body": "El ELO es un número que dice lo fuerte que tocas. Todos empiezan en 1000. Gana a alguien más fuerte y sumarás más."
+    },
+    "next": "Siguiente",
+    "start": "Vamos",
+    "skip": "Saltar"
+  },
+  "rules_short": {
+    "open": "Cómo funciona",
+    "first_time": "¿Primera vez?",
+    "first_time_body": "Reglas y ELO en un minuto",
+    "steps": {
+      "0": {
+        "title": "El mismo ejercicio",
+        "body": "Tú y un rival anónimo recibís el mismo ejercicio al azar."
+      },
+      "1": {
+        "title": "48 horas, cuenta el mejor intento",
+        "body": "Toca las veces que quieras. Tu mejor intento es tu resultado."
+      },
+      "2": {
+        "title": "El mejor gana ELO",
+        "body": "Ganar a alguien más fuerte vale más."
+      }
+    },
+    "more": "Más detalles",
+    "more_list": {
+      "0": "Hasta 3 duelos a la vez, contando los tickets en cola.",
+      "1": "Los ejercicios tocados solo cuentan con el micrófono. Quizzes: +100 por respuesta correcta y −100 por incorrecta.",
+      "2": "¿Has terminado antes? Fija tu resultado. Cuando los dos lo hagáis, el duelo termina al momento.",
+      "3": "Ves cuántos intentos hizo tu rival, nunca su nombre ni su resultado hasta que termina.",
+      "4": "¿No jugaste nada? Es una derrota. ¿No jugó nadie? El ELO no cambia."
+    }
+  },
+  "elo": {
+    "title": "¿Qué es el ELO?",
+    "your": "Tu ELO: {{rating}}",
+    "body_0": "Un número que dice lo fuerte que eres en los duelos. Todos empiezan en {{start}}. Ganar lo sube, perder lo baja. El ranking son los jugadores ordenados por ELO.",
+    "body_1": "Lo que ganas depende del rival. Si ganas a alguien más fuerte, sumas mucho. Si ganas a alguien más débil, sumas poco, y perder contra él cuesta más.",
+    "example": "Ejemplo: tienes {{rating}} de ELO",
+    "col_opponent": "Rival",
+    "col_win": "Victoria",
+    "col_draw": "Empate",
+    "col_loss": "Derrota",
+    "strength": {
+      "stronger": "más fuerte",
+      "equal": "igual",
+      "weaker": "más débil"
+    },
+    "provisional": "Tus primeros {{count}} duelos cuentan el doble, para que encuentres tu nivel rápido.",
+    "floor": "Nunca bajas de {{min}}.",
+    "ladder": "Entras en el ranking tras tu primer duelo resuelto.",
+    "all_rules": "Todas las reglas"
+  },
+  "rank": {
+    "gap": "{{points}} ELO para el puesto #{{place}}",
+    "peek_title": "Tu puesto",
+    "full": "Ranking completo"
+  },
+  "history": {
+    "title": "Duelos resueltos"
+  }
 }

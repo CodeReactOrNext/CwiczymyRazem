@@ -98,7 +98,7 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
                    onClick={onLogout}
                    className="w-full justify-start px-4 text-red-500/70 hover:bg-red-500/10 hover:text-red-500"
                 >
-                  <LogOut className="h-5 w-5 mr-3" />
+                  <LogOut className="h-5 w-5" />
                   <span className="font-bold">Log Out</span>
                 </Button>
               </div>
@@ -173,7 +173,7 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
                className="w-full justify-start px-3 text-red-500/70 hover:bg-red-500/10 hover:text-red-500"
             >
               <LogOut className="h-5 w-5" />
-              {!isCollapsed && <span className="ml-3 text-sm font-bold">Log Out</span>}
+              {!isCollapsed && <span className="text-sm font-bold">Log Out</span>}
             </Button>
           </div>
         </div>

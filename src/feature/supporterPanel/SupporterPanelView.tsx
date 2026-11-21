@@ -4,6 +4,7 @@ import { GearBoardTab } from "feature/gearProposals/components/GearBoardTab";
 import { GuildFoundingPanel } from "feature/guilds/components/GuildFoundingPanel";
 import { RoadmapPerks } from "feature/roadmap/components/RoadmapPerks";
 import { RoadmapBoardTab } from "feature/supporterPanel/components/RoadmapBoardTab";
+import { ShopWindowBank } from "feature/supporterPanel/components/ShopWindowBank";
 import { SkinShopTab } from "feature/supporterPanel/components/SkinShopTab";
 import { SupporterInfo } from "feature/supporterPanel/components/SupporterInfo";
 import { SupporterPitch } from "feature/supporterPanel/components/SupporterPitch";
@@ -139,10 +140,8 @@ export const SupporterPanelView = () => {
               </div>
             ) : (
               // The shop in the window: real shelves and prices, nothing to press.
-              <section className='flex flex-col gap-6'>
-                <p className='max-w-2xl text-base leading-relaxed text-zinc-300'>
-                  {t("panel.pitch.shop_body")}
-                </p>
+              <section className='flex flex-col gap-7'>
+                <ShopWindowBank />
                 <SkinShopTab enabled={false} />
               </section>
             )}

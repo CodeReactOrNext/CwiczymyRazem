@@ -9,7 +9,7 @@ import { RewardSummary } from "components/Rewards/RewardSummary";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
 import { useClaimScaleReward, useRewardLedger } from "hooks/useRewardLedger";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Gift, Lock } from "lucide-react";
+import { Check, Gift } from "lucide-react";
 
 import { boxRewardId, getBoxReward } from "../data/scaleTreeRewards";
 
@@ -137,8 +137,8 @@ export const BoxRewardBlock = ({
         </>
       ) : (
         <>
-          <Lock size={16} className='relative text-zinc-600' strokeWidth={2} />
-          <span className='relative text-[10px] font-bold tabular-nums leading-none text-zinc-600'>
+          <Gift size={16} className='relative text-zinc-600' strokeWidth={2} />
+          <span className='relative text-[11px] font-semibold tabular-nums leading-none text-zinc-500'>
             {done}/{total}
           </span>
         </>

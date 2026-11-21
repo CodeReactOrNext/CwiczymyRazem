@@ -216,8 +216,6 @@
       "body": "Riff Quest jest darmowy i taki zostanie. To wciąż beta, a nowe funkcje powstają dzięki wpłatom graczy.",
       "invite": "Jeśli masz ochotę się dorzucić, każda kawa przybliża kolejną.",
       "next": "Dalej:",
-      "perk_before": "Wspierający dostają",
-      "perk_after": "i głos w roadmapie.",
       "sign": "Dzięki, że grasz.",
       "cta": "Postaw kawę"
     },
@@ -312,20 +310,19 @@
       "message_discord": "Napisz do mnie na Discordzie"
     },
     "pitch": {
-      "title": "Darowizna otwiera panel wspierających",
-      "intro": "Za odznaką jest pokój, w którym riff.quest decyduje się na głos:",
-      "perks": {
-        "0": "Zgłaszaj pomysły i głosuj, co powstanie jako następne",
-        "1": "Wybieraj sprzęt, który trafi do Arsenału",
-        "2": "Załóż gildię z własną nazwą, tagiem i wspólnym schowkiem",
-        "3": "Podłącz Claude'a albo innego asystenta AI do konta"
-      },
-      "email": "Użyj adresu e-mail tego konta, żeby odblokować Wspierającego.",
-      "email_known": "Użyj adresu e-mail tego konta, żeby odblokować Wspierającego: {{email}}.",
-      "other_email": "Używasz innego adresu? {{discord}}, a podepnę to ręcznie.",
+      "hello": "Cześć, jestem Michał. Buduję Riff Quest.",
+      "story": "Zacząłem to robić jako narzędzie dla siebie, żeby pomagało mi ćwiczyć. Teraz chcę dać je wszystkim i chcę, żeby zostało darmowe, tak żeby każdy mógł z niego korzystać.",
+      "where": "Twoje wsparcie najpierw opłaca serwery. Wszystko ponad to idzie na kolejną funkcję z roadmapy, a ta odblokowuje się dla wszystkich.",
+      "sign": "Michał Jabłoński, gitarzysta i twórca Riff Quest",
+      "photo_alt": "Michał Jabłoński gra na gitarze na scenie",
+      "email": "Wpłać z adresu e-mail tego konta, żeby odznaka supportera je znalazła.",
+      "email_known": "Wpłać z adresu {{email}}, żeby odznaka supportera znalazła to konto.",
+      "other_email": "Inny adres? {{discord}}.",
       "write_discord": "Napisz do mnie na Discordzie",
       "support": "Wesprzyj projekt",
-      "shop_body": "Banery i efekty awatara do Twoich wpisów w Aktywności, skórki pedalboardu i kabli. Czysto kosmetyczne i zostają u Ciebie na zawsze."
+      "shop_title": "Wszystko tutaj kupuje się za tokeny",
+      "shop_body": "Tokeny to podziękowanie za wsparcie projektu: każdy wpłacony $1 to {{rate}} tokenów, plus {{welcome}} przy pierwszej wpłacie. Czysto kosmetyczne i zostają u Ciebie na zawsze.",
+      "shop_wallet": "Twoje tokeny"
     },
     "backers": {
       "count": "Wspierający: {{count}}",

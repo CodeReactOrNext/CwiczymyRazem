@@ -1,7 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
-import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { TierPlate } from "feature/arsenal/components/TierPlate";
 import { ModArt } from "feature/arsenal/components/Workshop/ModArt";
 import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
@@ -29,13 +28,15 @@ const AHEAD = 3;
 /** Cases are cyan wherever they appear — the shelf, the banner, this plate. */
 const CASE_COLOR = "#22d3ee";
 
-/** What one unlock reads as, and the colour it carries. */
-const unlockLabel = (
-  unlock: MilestoneUnlock,
-): { text: string; color?: string } =>
+/**
+ * What one unlock reads as. Plain words: the rewards under it already carry
+ * the tiers' colours, and a rarity's name in its own colour on top of them made
+ * the card four colours wide.
+ */
+const unlockLabel = (unlock: MilestoneUnlock): string =>
   unlock.kind === "rarity"
-    ? { text: `${unlock.rarity} gear`, color: getRarityColor(unlock.rarity) }
-    : { text: FEATURE_UNLOCKS[unlock.feature].name };
+    ? `${unlock.rarity} gear`
+    : FEATURE_UNLOCKS[unlock.feature].name;
 
 /** Whatever a rung pays, in the loosest shape that covers both callers. */
 interface RewardLike {
@@ -80,13 +81,13 @@ const RewardIcons = ({
   reward: RewardLike;
   size?: number;
   muted?: boolean;
-  /** The receipt centres its haul; a stop on the path hangs it off its left edge. */
-  align?: "start" | "center";
+  /** The receipt centres its haul; a stop on the path hangs it under its node. */
+  align?: "end" | "center";
 }) => (
   <div
     className={cn(
       "flex flex-wrap items-center gap-2",
-      align === "center" ? "justify-center" : "justify-start",
+      align === "center" ? "justify-center" : "justify-end",
     )}>
     {reward.caseTokens > 0 && (
       <span
@@ -133,17 +134,14 @@ const RewardIcons = ({
 );
 
 /** The least a started stretch shows, so two points in still reads as begun. */
-const MIN_FILL_PCT = 3;
+const MIN_FILL_PCT = 2;
 
 /**
- * One stop on the path ahead: the stretch of road to it, the level, what it
- * opens, what it pays.
+ * One stop on the path ahead: the level, what it opens, what it pays.
  *
- * The road is the stop's own bar rather than a line threaded through dots. The
- * dots sat in a huddle mid-card with a hairline between them, and said nothing
- * about how far along the player was; a bar per stop fills the card's width and
- * the first one doubles as the progress to the next level. Everything hangs off
- * the bar's left edge, so each stop reads top to bottom from where it starts.
+ * It hangs off the right end of its stretch of the track, under its node — the
+ * road to a stop is the part of the bar on its left. Only the next stop is at
+ * full strength; the two after it are the same thing, quieter.
  *
  * Never the rank badge for a stop. Those badges are guitars, and a guitar on
  * this card is a guitar the player has every reason to think they are being
@@ -151,68 +149,41 @@ const MIN_FILL_PCT = 3;
  */
 const Stop = ({
   milestone,
-  points,
   isNext,
-  progress,
 }: {
   milestone: LevelMilestone;
-  points: number;
   isNext: boolean;
-  /** 0–1 along the stretch to this stop. Only the next one has any. */
-  progress: number;
 }) => {
   const reward = rollLevelReward(milestone);
-  const fillPct =
-    progress > 0 ? Math.max(MIN_FILL_PCT, Math.round(progress * 100)) : 0;
 
   return (
-    <div className='flex w-[168px] shrink-0 flex-col sm:w-auto sm:min-w-0 sm:flex-1 shortwide:w-auto shortwide:min-w-0 shortwide:flex-1'>
-      <div className='h-1.5 overflow-hidden rounded-full bg-zinc-800'>
-        {fillPct > 0 && (
-          <div
-            className='h-full rounded-full bg-cyan-400'
-            style={{ width: `${fillPct}%` }}
-          />
-        )}
-      </div>
+    <div className='flex min-w-0 flex-col items-end gap-3 pl-3 text-right'>
+      <span
+        className={cn(
+          "font-teko text-4xl font-bold leading-[0.8] tabular-nums sm:text-5xl",
+          isNext ? "text-zinc-100" : "text-zinc-400",
+        )}>
+        {milestone.lvl}
+      </span>
 
-      <p className='mt-5 flex items-baseline gap-2'>
-        <span className='text-xs font-medium text-zinc-500'>Level</span>
-        <span
-          className={cn(
-            "font-teko text-5xl font-bold leading-[0.8] tabular-nums",
-            isNext ? "text-zinc-100" : "text-zinc-400",
-          )}>
-          {milestone.lvl}
-        </span>
-      </p>
-
-      {/* Every row below the bar is given its height whether it has anything in
-          it or not. Left to pack, three stops with different amounts to say put
-          their artwork at three different heights, and the row stopped reading
-          as one row. */}
-      <p className='mt-1 h-4 text-xs font-semibold tabular-nums text-cyan-400'>
-        {isNext &&
-          `${pointsToReachLvl(points, milestone.lvl).toLocaleString()} pts to go`}
-      </p>
-
-      <div className='mt-3 flex min-h-[2.25rem] flex-col items-start gap-0.5'>
-        {milestone.unlocks.map((unlock) => {
-          const { text, color } = unlockLabel(unlock);
-          return (
-            <span
-              key={text}
-              className={cn("text-sm font-semibold", !color && "text-zinc-200")}
-              style={color ? { color } : undefined}>
-              {text}
-            </span>
-          );
-        })}
+      {/* Given its height whether it has anything in it or not, so three stops
+          with different amounts to say keep their rewards on one line. */}
+      <div className='flex min-h-[1.25rem] flex-col items-end'>
+        {milestone.unlocks.map((unlock) => (
+          <span
+            key={unlockLabel(unlock)}
+            className={cn(
+              "text-xs sm:text-sm",
+              isNext ? "font-semibold text-zinc-100" : "text-zinc-400",
+            )}>
+            {unlockLabel(unlock)}
+          </span>
+        ))}
       </div>
 
       {reward && (
-        <div className='mt-4'>
-          <RewardIcons reward={reward} align='start' />
+        <div className={cn(!isNext && "opacity-60")}>
+          <RewardIcons reward={reward} size={40} align='end' />
         </div>
       )}
     </div>
@@ -246,6 +217,9 @@ export const NextUpCard = ({ className }: { className?: string }) => {
   ).slice(0, AHEAD);
 
   const paid = collected && collected.levels.length > 0 ? collected : null;
+  // 0–1 along the stretch to the next stop.
+  const progress =
+    ahead.length > 0 ? progressToLvl(points, lvl, ahead[0].lvl) : 0;
 
   // Nothing paid and nothing left to climb: the card would be an empty box on a
   // screen that is meant to be a reward.
@@ -284,26 +258,58 @@ export const NextUpCard = ({ className }: { className?: string }) => {
       )}
 
       {ahead.length > 0 && (
-        <div className='space-y-6'>
-          <div className='flex items-baseline justify-between gap-4'>
-            <h3 className='text-sm font-semibold text-zinc-300'>Coming up</h3>
-            <span className='text-xs text-zinc-500'>you&apos;re level {lvl}</span>
+        <div className='flex flex-col gap-6'>
+          {/* One track for the whole climb, cut into as many stretches as
+              there are stops, each ending in its stop's node. Only the first
+              stretch can be part-filled — it is the progress to the next
+              level, so the card needs no second bar and no heading. */}
+          <div
+            className='relative h-3 rounded-full bg-zinc-800'
+            role='progressbar'
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(progress * 100)}
+            aria-label={`Level ${ahead[0].lvl}`}>
+            {progress > 0 && (
+              <div
+                className='h-full rounded-full bg-cyan-400'
+                style={{
+                  width: `${Math.max(MIN_FILL_PCT, (progress * 100) / ahead.length)}%`,
+                }}
+              />
+            )}
+            {ahead.map((milestone, idx) => (
+              <span
+                key={milestone.lvl}
+                aria-hidden
+                className='absolute top-1/2 h-5 w-5 -translate-x-full -translate-y-1/2 rounded-full bg-zinc-700'
+                style={{ left: `${((idx + 1) * 100) / ahead.length}%` }}
+              />
+            ))}
           </div>
 
-          {/* The whole width of the card: the bars are the layout, so there is
-              no empty margin either side of them. A scroller on a phone, where
-              three stops do not fit side by side. */}
-          <div className='flex items-start gap-3 overflow-x-auto pb-1 sm:gap-4 sm:overflow-x-visible'>
+          <div
+            // No gap: each column ends exactly where its node sits on the
+            // track, and keeps its distance with padding instead.
+            className='grid'
+            style={{
+              gridTemplateColumns: `repeat(${ahead.length}, minmax(0, 1fr))`,
+            }}>
             {ahead.map((milestone, idx) => (
               <Stop
                 key={milestone.lvl}
                 milestone={milestone}
-                points={points}
                 isNext={idx === 0}
-                progress={idx === 0 ? progressToLvl(points, lvl, milestone.lvl) : 0}
               />
             ))}
           </div>
+
+          <p className='text-sm tabular-nums text-zinc-400'>
+            <span className='font-bold text-zinc-100'>
+              {pointsToReachLvl(points, ahead[0].lvl).toLocaleString()}
+            </span>{" "}
+            pts to level {ahead[0].lvl}
+          </p>
         </div>
       )}
     </div>

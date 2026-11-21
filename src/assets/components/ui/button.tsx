@@ -123,9 +123,18 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, loading, children, disabled, ...props }, ref) => {
+    // ICON ↔ TEXT SPACING — read before touching this span or a button's icon.
+    // The label sits in this span, so the span (not the button) lays out the
+    // icon and the text. `gap-[inherit]` hands it the button's own gap: gap-2
+    // from buttonVariants, or whatever gap-* the caller passes. Without it the
+    // icon touched the text in every <Button>, and callers kept patching that
+    // with mr-2 on each icon (swept out 2026-11-21).
+    // So: never put mr-*/ml-* on an icon inside a Button. Change the gap with
+    // gap-* on the Button instead. Text that must stay glued to an inline
+    // element ("Had it +1") goes in one <span>, because each child is spaced.
     const content = (
-      <span className="flex items-center justify-center">
-        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      <span className="flex items-center justify-center gap-[inherit]">
+        {loading && <Loader2 className="h-4 w-4 animate-spin" />}
         {children}
       </span>
     );

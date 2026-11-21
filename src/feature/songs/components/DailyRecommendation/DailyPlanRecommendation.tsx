@@ -57,7 +57,7 @@ export const DailyPlanRecommendation = ({ plan }: DailyPlanRecommendationProps) 
             <Link href={`/timer/plans?planId=${plan.id}`} className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto">
                 Practice
-                <ChevronRight size={14} strokeWidth={3} className="ml-1" />
+                <ChevronRight size={14} strokeWidth={3} className="" />
               </Button>
             </Link>
           </div>

@@ -117,9 +117,9 @@ export const DuplicateSongsModal = ({ isOpen, onClose, duplicates, onDelete, onM
                             className="h-9 hover:bg-cyan-500/10 hover:text-cyan-400 text-zinc-500 font-black uppercase tracking-wider text-[10px]"
                           >
                             {mergingGroupId === song.id ? (
-                               <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" />
+                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
                             ) : (
-                               <GitMerge className="h-3.5 w-3.5 mr-2" />
+                               <GitMerge className="h-3.5 w-3.5" />
                             )}
                             Merge Others Here
                           </Button>
@@ -131,9 +131,9 @@ export const DuplicateSongsModal = ({ isOpen, onClose, duplicates, onDelete, onM
                             className="h-9 hover:bg-red-500/10 hover:text-red-500 text-zinc-600 font-bold uppercase tracking-wider text-[10px]"
                           >
                             {deletingId === song.id ? (
-                               <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" />
+                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
                             ) : (
-                               <Trash2 className="h-3.5 w-3.5 mr-2" />
+                               <Trash2 className="h-3.5 w-3.5" />
                             )}
                             Delete
                           </Button>

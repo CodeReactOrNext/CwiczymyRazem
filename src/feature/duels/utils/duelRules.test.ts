@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 import {
   canOpenDuel,
   canPlayerRun,
+  decidedFeed,
   DUEL_DURATION_MS,
   DUEL_MAX_OPEN,
   DUEL_MIN_RATING,
@@ -15,7 +16,6 @@ import {
   DUEL_START_RATING,
   DUEL_SUBMIT_GRACE_MS,
   expectedScore,
-  feedForViewer,
   isDuelOpenForRuns,
   isEveryoneReady,
   kFactor,
@@ -347,7 +347,7 @@ describe("toDuelView", () => {
   });
 });
 
-describe("feedForViewer", () => {
+describe("decidedFeed", () => {
   const settled = (kind: "win" | "void", [x, y]: [string, string]) =>
     toDuelFeedEntry(
       duel(
@@ -367,13 +367,11 @@ describe("feedForViewer", () => {
       ),
     )!;
 
-  it("leaves out the viewer's own duels and the ones nobody played", () => {
-    const mine = settled("win", ["a", "b"]);
-    const theirs = settled("win", ["c", "d"]);
+  it("leaves out only the duels nobody played", () => {
+    const first = settled("win", ["a", "b"]);
+    const second = settled("win", ["c", "d"]);
     const empty = settled("void", ["c", "e"]);
-    expect(feedForViewer([mine, theirs, empty], "a")).toEqual([theirs]);
-    expect(feedForViewer([mine, theirs, empty], "b")).toEqual([theirs]);
-    expect(feedForViewer([mine, theirs, empty], "z")).toEqual([mine, theirs]);
+    expect(decidedFeed([first, empty, second])).toEqual([first, second]);
   });
 });
 

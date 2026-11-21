@@ -7,6 +7,7 @@ import {
   Check,
   ChevronRight,
   Compass,
+  Ear,
   Grid3x3,
   Guitar,
   Lightbulb,
@@ -15,6 +16,7 @@ import {
   Music2,
   PlayCircle,
   RotateCcw,
+  Ruler,
   Sparkles,
   Target,
 } from "lucide-react";
@@ -56,6 +58,16 @@ const MODULE_CFG: Record<string, {
     wash: "bg-purple-500/[0.06] hover:bg-purple-500/10",
     bar: "bg-purple-500",
     label: "text-purple-400",
+  },
+  intervals: {
+    Icon: Ruler,
+    icons: [Ruler, Ear, Music2, Target],
+    hex: "#fbbf24",
+    tileBg: "bg-amber-500/10",
+    tileFg: "text-amber-400",
+    wash: "bg-amber-500/[0.06] hover:bg-amber-500/10",
+    bar: "bg-amber-500",
+    label: "text-amber-400",
   },
 };
 

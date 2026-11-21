@@ -9,7 +9,7 @@ import type {
   InventoryItem,
 } from "feature/arsenal/types/arsenal.types";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
-import { PackageOpen, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -55,8 +55,8 @@ const BuildTile = ({
       aria-pressed={active}
       onClick={onSelect}
       className={cn(
-        "flex w-44 shrink-0 flex-col gap-2 rounded-lg p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400",
-        active ? "bg-cyan-500/10" : "bg-zinc-900/60 hover:bg-zinc-800",
+        "flex w-44 shrink-0 flex-col gap-3 rounded-lg p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400",
+        active ? "bg-zinc-100/15" : "bg-zinc-900/60 hover:bg-zinc-800",
       )}>
       <img
         src={getRankBadgeSrc(def.imageId, "small")}
@@ -65,19 +65,24 @@ const BuildTile = ({
         draggable={false}
         loading='lazy'
       />
-      <span className='space-y-0.5'>
+      <span className='space-y-1'>
         <span
           className={cn(
-            "block truncate text-xs",
-            active ? "text-cyan-400" : "text-zinc-200",
+            "block truncate text-sm",
+            active ? "font-semibold text-zinc-50" : "text-zinc-200",
           )}>
           {def.name}
         </span>
-        <span className='flex justify-between text-xs'>
-          <span style={{ color: getRarityColor(def.rarity) }}>
-            {labels.rarity(def.rarity)}
+        <span className='flex justify-between gap-2 text-xs text-zinc-400'>
+          <span className='flex min-w-0 items-center gap-1.5'>
+            <span
+              aria-hidden
+              className='h-1.5 w-1.5 shrink-0 rounded-full'
+              style={{ backgroundColor: getRarityColor(def.rarity) }}
+            />
+            <span className='truncate'>{labels.rarity(def.rarity)}</span>
           </span>
-          <span className='tabular-nums text-zinc-400'>
+          <span className='shrink-0 tabular-nums text-zinc-300'>
             {labels.t("common.lvl", { level: item.custom.level })}
           </span>
         </span>
@@ -143,7 +148,7 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
         ? t("buy.not_enough_fame")
         : null;
     return (
-      <div className='space-y-2'>
+      <div className='space-y-3'>
         <div className='flex gap-2'>
           <Input
             value={name}
@@ -166,6 +171,10 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
             </Button>
           )}
         </div>
+        {/* Why the key is off is on its tooltip, not in a line under it: an
+            unfinished build shows what is open on the slot tabs. The span
+            carries the title because a disabled button swallows the hover. */}
+        <span className='block' title={reason ?? undefined}>
         <Button
           className='h-11 w-full bg-white text-zinc-900 hover:bg-zinc-200'
           disabled={Boolean(reason) || isPending}
@@ -199,16 +208,13 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
             </span>
           </span>
         </Button>
-        {reason && (
-          <p className='text-center text-xs text-zinc-400'>{reason}</p>
-        )}
+        </span>
       </div>
     );
   };
 
   const emptySlot = (
-    <div className='flex flex-col items-center gap-4 rounded-lg bg-zinc-900/40 px-6 py-12 text-center'>
-      <PackageOpen className='size-8 text-zinc-400' aria-hidden />
+    <div className='flex flex-col items-center gap-5 rounded-lg bg-zinc-900/40 px-6 py-12 text-center'>
       <p className='max-w-sm text-sm text-zinc-400'>
         {t("builder.no_slot_yet", { slot: labels.slot(slot).toLowerCase() })}
       </p>
@@ -232,7 +238,7 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
   return (
     <div className='space-y-6'>
       {builds.length > 0 && (
-        <div className='no-scrollbar flex gap-2 overflow-x-auto'>
+        <div className='no-scrollbar flex gap-3 overflow-x-auto'>
           <button
             type='button'
             aria-pressed={!editing}
@@ -240,7 +246,7 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
             className={cn(
               "flex w-32 shrink-0 flex-col items-center justify-center gap-2 rounded-lg p-3 text-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400",
               !editing
-                ? "bg-cyan-500/10 text-cyan-400"
+                ? "bg-zinc-100/15 text-zinc-50"
                 : "bg-zinc-900/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
             )}>
             <Plus className='size-6' aria-hidden />

@@ -1,6 +1,5 @@
-import { Button } from "assets/components/ui/button";
+import { Button, PRESSABLE_KEY } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
-import { Checkbox } from "assets/components/ui/checkbox";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
@@ -20,8 +19,10 @@ import {
   toggleDifficultyEverywhere,
 } from "feature/practice/utils/autoPlan";
 import { useTranslation } from "hooks/useTranslation";
-import { Minus } from "lucide-react";
+import { Check, Minus, Plus } from "lucide-react";
 import { Fragment, useMemo } from "react";
+
+import { CATEGORY_DOT, FALLBACK_DOT } from "./categoryStyles";
 
 interface PlanSetupProps {
   time: number;
@@ -51,46 +52,50 @@ export const PlanSetup = ({
   return (
     <MainContainer noBorder>
       <div className='font-openSans mx-auto max-w-3xl space-y-8 px-4 py-6 sm:p-8'>
-        <Card className='space-y-10 bg-transparent p-0 sm:bg-zinc-800/40 sm:p-6'>
+        <Card className='space-y-10 rounded-2xl bg-transparent p-0 sm:bg-zinc-800/40 sm:p-7'>
           {/* Duration Section */}
           <div className='space-y-4'>
-            <h2 className='text-xl font-semibold'>
+            <h2 className='text-xl font-extrabold'>
               {t("exercises:auto_plan.duration")}
             </h2>
 
-            <div className='flex flex-col gap-4 sm:flex-row sm:items-center'>
-              <div className='flex w-full flex-1 items-center gap-2'>
-                <Button
-                  variant='outline'
-                  size='icon'
-                  className='h-9 w-9 flex-shrink-0'
-                  onClick={() => setTime(Math.max(15, time - 15))}
-                  disabled={time <= 15}>
-                  <span className='text-lg'>-</span>
-                </Button>
-
-                <div className='relative flex-1 py-4'>
-                  <Slider
-                    value={[time]}
-                    min={15}
-                    max={120}
-                    step={15}
-                    onValueChange={(value) => setTime(value[0])}
-                    className='h-2'
-                  />
-                </div>
-
-                <Button
-                  variant='outline'
-                  size='icon'
-                  className='h-9 w-9 flex-shrink-0'
-                  onClick={() => setTime(Math.min(120, time + 15))}
-                  disabled={time >= 120}>
-                  <span className='text-lg'>+</span>
-                </Button>
-
-                <div className='w-20 text-center font-medium'>{time} min</div>
+            {/* On a phone the number sits above the slider, so the slider
+                keeps the whole row. */}
+            <div className='flex flex-wrap items-center gap-x-3 gap-y-2'>
+              <div className='order-first w-full text-3xl font-extrabold tabular-nums leading-none sm:order-last sm:w-auto sm:min-w-[6.5rem] sm:text-right'>
+                {time}{" "}
+                <span className='text-base font-bold text-zinc-400'>min</span>
               </div>
+
+              <Button
+                variant='secondary'
+                size='icon'
+                className='flex-shrink-0'
+                aria-label='-15 min'
+                onClick={() => setTime(Math.max(15, time - 15))}
+                disabled={time <= 15}>
+                <Minus />
+              </Button>
+
+              <Slider
+                value={[time]}
+                min={15}
+                max={120}
+                step={15}
+                onValueChange={(value) => setTime(value[0])}
+                aria-label={t("exercises:auto_plan.duration")}
+                className='w-auto min-w-0 flex-1 py-4 [&_[data-slot=slider-track]]:h-3.5 [&_[data-slot=slider-track]]:bg-zinc-800 [&_[role=slider]]:h-7 [&_[role=slider]]:w-7 [&_[role=slider]]:border-0 [&_[role=slider]]:bg-primary [&_[role=slider]]:shadow-none'
+              />
+
+              <Button
+                variant='secondary'
+                size='icon'
+                className='flex-shrink-0'
+                aria-label='+15 min'
+                onClick={() => setTime(Math.min(120, time + 15))}
+                disabled={time >= 120}>
+                <Plus />
+              </Button>
             </div>
           </div>
 
@@ -98,7 +103,7 @@ export const PlanSetup = ({
           <div className='space-y-5'>
             <div className='flex flex-wrap items-start justify-between gap-3'>
               <div className='space-y-1'>
-                <h2 className='text-xl font-semibold'>
+                <h2 className='text-xl font-extrabold'>
                   {t("exercises:auto_plan.focus")}
                 </h2>
                 <p className='text-sm text-zinc-400'>
@@ -130,7 +135,7 @@ export const PlanSetup = ({
               <div
                 role='group'
                 aria-label={t("exercises:auto_plan.focus")}
-                className='grid min-w-[20rem] grid-cols-[minmax(5.5rem,1.4fr)_repeat(4,minmax(3.25rem,1fr))] items-center gap-x-1 gap-y-1'>
+                className='grid min-w-[20rem] grid-cols-[minmax(5.5rem,1.4fr)_repeat(4,minmax(3.25rem,1fr))] items-center gap-2 pb-1'>
                 <span />
                 {PLAN_DIFFICULTIES.map((difficulty) => (
                   <button
@@ -142,7 +147,7 @@ export const PlanSetup = ({
                     title={t("practice_hub:auto.toggle_difficulty", {
                       difficulty: t(`exercises:difficulty.${difficulty}`),
                     })}
-                    className='rounded px-1 py-2 text-center text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800/50 hover:text-zinc-200'>
+                    className='rounded-lg px-1 py-2 text-center text-[13px] font-bold text-zinc-300 transition-colors hover:bg-zinc-800/50 hover:text-zinc-100'>
                     {t(`exercises:difficulty.${difficulty}`)}
                   </button>
                 ))}
@@ -157,7 +162,13 @@ export const PlanSetup = ({
                       title={t("practice_hub:auto.toggle_category", {
                         category: t(`exercises:categories.${category}`),
                       })}
-                      className='rounded px-2 py-2 text-left text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800/50 hover:text-zinc-100'>
+                      className='flex items-center gap-2.5 rounded-lg px-2 py-2 text-left text-[15px] font-bold text-zinc-100 transition-colors hover:bg-zinc-800/50'>
+                      <span
+                        className={cn(
+                          "h-2.5 w-2.5 shrink-0 rounded-full",
+                          CATEGORY_DOT[category] ?? FALLBACK_DOT,
+                        )}
+                      />
                       {t(`exercises:categories.${category}`)}
                     </button>
 
@@ -185,22 +196,34 @@ export const PlanSetup = ({
                             )
                           }
                           className={cn(
-                            "flex items-center justify-center gap-1.5 rounded py-2.5 transition-colors",
+                            "flex h-12 items-center justify-center gap-1.5 rounded-xl text-sm tabular-nums",
                             available === 0
                               ? "cursor-not-allowed"
-                              : "hover:bg-zinc-800/50",
-                            selected && "bg-cyan-500/10 hover:bg-cyan-500/20",
+                              : [
+                                  PRESSABLE_KEY,
+                                  "font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                                  selected
+                                    ? "border-b-black/25 bg-primary bg-clip-border text-primary-foreground"
+                                    : "bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700/80 hover:text-zinc-100",
+                                ],
                           )}>
+                          {/* A picked tile turns light and gets a tick; a free
+                              one shows a faint plus, an empty one a dash. */}
                           {available === 0 ? (
                             <Minus
                               aria-hidden
                               className='h-4 w-4 text-zinc-600'
                             />
+                          ) : selected ? (
+                            <Check
+                              aria-hidden
+                              strokeWidth={3.5}
+                              className='h-4 w-4'
+                            />
                           ) : (
-                            <Checkbox
-                              checked={selected}
-                              tabIndex={-1}
-                              className='pointer-events-none border-zinc-600 data-[state=checked]:border-cyan-500 data-[state=checked]:bg-cyan-500 data-[state=checked]:text-zinc-950'
+                            <Plus
+                              aria-hidden
+                              className='h-4 w-4 text-zinc-500'
                             />
                           )}
                         </button>
@@ -215,19 +238,27 @@ export const PlanSetup = ({
           <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
             <p
               className={cn(
-                "text-sm",
+                "text-[15px]",
                 matchingCount === 0 ? "text-amber-400" : "text-zinc-400",
               )}>
-              {matchingCount === 0
-                ? t("exercises:auto_plan.no_exercises")
-                : `${
-                    matchingCount === 1
-                      ? "1 exercise matches"
-                      : `${matchingCount} exercises match`
-                  } your picks`}
+              {matchingCount === 0 ? (
+                t("exercises:auto_plan.no_exercises")
+              ) : (
+                <>
+                  <span className='font-extrabold tabular-nums text-zinc-100'>
+                    {matchingCount}
+                  </span>{" "}
+                  {matchingCount === 1 ? "exercise matches" : "exercises match"}{" "}
+                  your picks
+                </>
+              )}
             </p>
 
-            <Button onClick={onGenerate} disabled={matchingCount === 0}>
+            <Button
+              size='lg'
+              onClick={onGenerate}
+              disabled={matchingCount === 0}
+              className='w-full sm:w-auto'>
               {t("exercises:auto_plan.generate")}
             </Button>
           </div>

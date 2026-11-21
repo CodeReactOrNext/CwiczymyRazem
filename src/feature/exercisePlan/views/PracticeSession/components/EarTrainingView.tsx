@@ -176,7 +176,7 @@ export const EarTrainingView = ({
               className="h-9 px-4 text-zinc-400 hover:text-zinc-100"
               onClick={onReveal}
             >
-              <Eye className="mr-1.5 h-3.5 w-3.5" /> {isMicEnabled ? t("ear.stuck_reveal") : t("ear.show_answer")}
+              <Eye className="h-3.5 w-3.5" /> {isMicEnabled ? t("ear.stuck_reveal") : t("ear.show_answer")}
             </Button>
           </div>
         ) : !isGuessed ? (
@@ -196,7 +196,7 @@ export const EarTrainingView = ({
               className="h-9 flex-1 bg-emerald-500/90 font-semibold text-emerald-950 hover:bg-emerald-400"
               onClick={() => { onGuessed(); onNextRiddle(); }}
             >
-              <Check className="mr-1.5 h-3.5 w-3.5" /> {t("ear.had_it")}&nbsp;<span className="opacity-70">+1</span>
+              <Check className="h-3.5 w-3.5" /> <span>{t("ear.had_it")}&nbsp;<span className="opacity-70">+1</span></span>
             </Button>
             <Button
               size="sm"
@@ -204,7 +204,7 @@ export const EarTrainingView = ({
               className="h-9 flex-1 bg-white/5 text-zinc-300 hover:bg-white/10"
               onClick={onNextRiddle}
             >
-              <X className="mr-1.5 h-3.5 w-3.5" /> Missed it
+              <X className="h-3.5 w-3.5" /> Missed it
             </Button>
           </div>
           <p className="text-[11px] text-zinc-500">{t("ear.self_marked_note")}</p>
@@ -225,7 +225,7 @@ export const EarTrainingView = ({
               className="h-9 flex-1 bg-emerald-500/90 font-semibold text-emerald-950 hover:bg-emerald-400"
               onClick={onNextRiddle}
             >
-              Next melody <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+              Next melody <ArrowRight className="h-3.5 w-3.5" />
             </Button>
           </div>
         )}

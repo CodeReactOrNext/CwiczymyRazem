@@ -270,22 +270,24 @@ export const PlanCard = ({
             )}
             {(onEdit || onDelete || onTogglePublic) && (
                 <TooltipProvider delayDuration={200}>
-                    <div className="mr-1 flex items-center gap-0.5 rounded-[4px] border border-white/10 bg-zinc-950/50 p-1 shadow-lg backdrop-blur-sm">
+                    {/* Three separate keys, like every other button — not flat
+                        icons inside a bordered tray. */}
+                    <div className="flex items-center gap-1.5">
                         {onTogglePublic && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <button
                                         type="button"
                                         aria-label={plan.isPublic ? t("plans:card.unpublish") : t("plans:card.publish")}
+                                        aria-pressed={!!plan.isPublic}
                                         className={cn(
-                                            "flex h-9 w-9 items-center justify-center rounded-[4px] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
-                                            plan.isPublic
-                                                ? "bg-cyan-500/15 text-cyan-400 hover:bg-cyan-500/25 hover:text-cyan-300"
-                                                : "text-zinc-400 hover:bg-white/10 hover:text-zinc-100"
+                                            buttonVariants({ variant: "ghost", size: "icon" }),
+                                            // Published = the globe lights up; the face stays the same key.
+                                            plan.isPublic && "text-cyan-400 hover:text-cyan-300"
                                         )}
                                         onClick={(e) => { e.stopPropagation(); onTogglePublic(); }}
                                     >
-                                        <Globe className="h-4 w-4" />
+                                        <Globe />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -299,10 +301,10 @@ export const PlanCard = ({
                                     <button
                                         type="button"
                                         aria-label={t("plans:card.edit_plan")}
-                                        className="flex h-9 w-9 items-center justify-center rounded-[4px] text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+                                        className={buttonVariants({ variant: "ghost", size: "icon" })}
                                         onClick={(e) => { e.stopPropagation(); onEdit(); }}
                                     >
-                                        <Pencil size='1em' className="h-3.5 w-3.5" />
+                                        <Pencil />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>{t("plans:edit")}</TooltipContent>
@@ -314,10 +316,13 @@ export const PlanCard = ({
                                     <button
                                         type="button"
                                         aria-label={t("plans:card.delete_plan")}
-                                        className="flex h-9 w-9 items-center justify-center rounded-[4px] text-zinc-400 transition-colors hover:bg-red-500/15 hover:text-red-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500/50"
+                                        className={cn(
+                                            buttonVariants({ variant: "ghost", size: "icon" }),
+                                            "hover:text-red-400"
+                                        )}
                                         onClick={(e) => { e.stopPropagation(); onDelete(); }}
                                     >
-                                        <Trash2 size='1em' className="h-3.5 w-3.5" />
+                                        <Trash2 />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>{t("plans:delete")}</TooltipContent>

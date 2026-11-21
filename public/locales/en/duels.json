@@ -118,5 +118,133 @@
     "5": "Beat a stronger player and you gain more ELO. Didn't play at all? That's a loss.",
     "title": "How it works"
   },
-  "error": "Couldn't load your duels. Refresh to try again."
+  "error": "Couldn't load your duels. Refresh to try again.",
+  "tabs": {
+    "duels": "Duels",
+    "ranking": "Ranking",
+    "history": "History"
+  },
+  "strip": {
+    "unrated": "Unranked",
+    "elo_aria": "ELO {{rating}}. What is ELO?"
+  },
+  "slots": {
+    "title": "Your duels",
+    "used": "{{used}} of {{max}} slots",
+    "free": "Free slot",
+    "searching": "Looking for an opponent",
+    "searching_expires": "You'll get a notification. Ticket expires in {{time}}",
+    "cancel": "Cancel",
+    "you": "You",
+    "opponent": "Opponent",
+    "opp_attempts_one": "Opponent · {{count}} attempt",
+    "opp_attempts_other": "Opponent · {{count}} attempts",
+    "opp_ready": "ready",
+    "locked": "Result locked in",
+    "new": "New",
+    "left": "left",
+    "open_aria": "Open duel: {{title}}"
+  },
+  "join": {
+    "title": "New duel",
+    "waiting_one": "{{count}} player is waiting, so you start right away.",
+    "waiting_other": "{{count}} players are waiting, so you start right away.",
+    "nobody": "Nobody is waiting right now. Your ticket waits up to 24 hours.",
+    "confirm": "Find an opponent"
+  },
+  "pending": {
+    "title": "Result ready",
+    "vs": "vs {{name}} · {{exercise}}",
+    "open": "See it"
+  },
+  "duel": {
+    "back": "Back to duels",
+    "left": "until the duel ends",
+    "run_details": "{{accuracy}}% · {{bpm}} BPM"
+  },
+  "result": {
+    "won": "You won!",
+    "lost": "You lost",
+    "draw": "Draw",
+    "void": "Nobody played",
+    "vs": "vs {{name}}",
+    "elo": "ELO",
+    "was": "was {{rating}}",
+    "place": "Place",
+    "place_of": "of {{total}}",
+    "unranked": "Unranked",
+    "continue": "Continue"
+  },
+  "onboarding": {
+    "0": {
+      "title": "You against a stranger",
+      "body": "You both get the same random exercise. Your opponent stays anonymous until the duel ends."
+    },
+    "1": {
+      "title": "48 hours, as many runs as you like",
+      "body": "Only your best run counts. Playing drills are scored by your microphone."
+    },
+    "2": {
+      "title": "Win and your ELO goes up",
+      "body": "ELO is a number that says how strong you are. Everyone starts at 1000. Beat a stronger player and you gain more."
+    },
+    "next": "Next",
+    "start": "Let's go",
+    "skip": "Skip"
+  },
+  "rules_short": {
+    "open": "How it works",
+    "first_time": "First time?",
+    "first_time_body": "Rules and ELO in a minute",
+    "steps": {
+      "0": {
+        "title": "The same exercise",
+        "body": "You and an anonymous opponent get the same random exercise."
+      },
+      "1": {
+        "title": "48 hours, best run counts",
+        "body": "Play as often as you like. Your best run is your score."
+      },
+      "2": {
+        "title": "The better run wins ELO",
+        "body": "A win over a stronger player is worth more."
+      }
+    },
+    "more": "More details",
+    "more_list": {
+      "0": "Up to 3 duels at once, tickets in the queue included.",
+      "1": "Playing drills only count with the mic on. Quizzes give +100 for a right answer and −100 for a wrong one.",
+      "2": "Done early? Lock in your result. When both of you have, the duel ends right away.",
+      "3": "You see how many attempts your opponent made, never their name or score until it ends.",
+      "4": "Didn't play at all? That's a loss. Nobody played? ELO stays the same."
+    }
+  },
+  "elo": {
+    "title": "What is ELO?",
+    "your": "Your ELO: {{rating}}",
+    "body_0": "A number that says how strong you are in duels. Everyone starts at {{start}}. A win raises it, a loss lowers it. The ranking is simply players sorted by ELO.",
+    "body_1": "How much you gain depends on your opponent. Beat a stronger player and you gain a lot. Beat a weaker one and you gain little, and losing to them costs more.",
+    "example": "Example: you have {{rating}} ELO",
+    "col_opponent": "Opponent",
+    "col_win": "Win",
+    "col_draw": "Draw",
+    "col_loss": "Loss",
+    "strength": {
+      "stronger": "stronger",
+      "equal": "equal",
+      "weaker": "weaker"
+    },
+    "provisional": "Your first {{count}} duels count double, so you find your level fast.",
+    "floor": "You can't drop below {{min}}.",
+    "ladder": "You join the ranking after your first settled duel.",
+    "all_rules": "All rules"
+  },
+  "rank": {
+    "gap": "{{points}} ELO to place #{{place}}",
+    "peek_title": "Your place",
+    "full": "Full ranking"
+  },
+  "history": {
+    "title": "Settled duels"
+  }
 }

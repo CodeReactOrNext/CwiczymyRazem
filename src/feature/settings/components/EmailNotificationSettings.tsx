@@ -140,9 +140,9 @@ const EmailNotificationSettings = () => {
             className="h-11 font-bold sm:self-start sm:px-8"
           >
             {isFetching ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Check className="mr-2 h-4 w-4" />
+              <Check className="h-4 w-4" />
             )}
             {isFetching ? t("email_notifications.saving") : t("email_notifications.save")}
           </Button>

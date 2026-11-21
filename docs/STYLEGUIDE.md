@@ -325,6 +325,7 @@ Aliasy importów (z `components.json`): `components` → `assets/components`, `u
 8. Wyróżnienie/akcent (bez borderu) → `bg-{kolor}-500/10 + text-{kolor}-400` (ew. dla istniejących wzorców `border-{kolor}-500/20`).
 9. **Hover minimalistyczny:** tylko tło/kolor/opacity (`transition-background`), **bez `scale`/transformacji rozmiaru**. Klik → `click-behavior`.
 10. **Buttony:** widoczny micro-interaction na `hover` i `focus-visible` (ring) — żadnego "martwego" przycisku.
+    **Ikona ↔ tekst w przycisku: odstęp daje `gap`, nigdy margines.** `<Button>` ma `gap-2` i przekazuje go do etykiety, więc ikona i tekst stoją w odstępie same z siebie. **Nie** dawaj ikonie w przycisku `mr-*` ani `ml-*`, bo wyjdzie podwójny odstęp. Inny odstęp ustawiasz przez `gap-*` na samym `<Button>`. Tekst, który ma się trzymać elementu inline (np. „Had it +1”), zamknij w jednym `<span>`. Każde dziecko przycisku dostaje odstęp, a tak zachowa się jak jedno.
 11. Warianty komponentu → CVA + `forwardRef` + `displayName`.
 12. Fonty → `font-sans`/`font-display`/`font-teko`. **Nie** dodawaj `font-openSans` (nie istnieje w configu).
 13. Złożone animacje → framer-motion; proste → klasy `animate-*` z configu. **Czasy i krzywe tylko z tokenów ruchu** (`duration-fast/base/slow`, `transitions.*` — sekcja 9 „Ruch”).

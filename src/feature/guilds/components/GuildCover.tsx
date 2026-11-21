@@ -4,6 +4,7 @@ import { GuildCrest } from "feature/guilds/components/GuildCrest";
 import { GuildLevelRing } from "feature/guilds/components/GuildLevelRing";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { HonorMark } from "feature/guilds/components/HonorMark";
+import { GUILD_LAP_SIZE } from "feature/guilds/data/guildQuests";
 import type { Guild } from "feature/guilds/types/guild.types";
 import {
   accentHex,
@@ -25,6 +26,28 @@ interface GuildCoverProps {
   /** Goes on the block under the strip — for padding, mostly. */
   className?: string;
 }
+
+/** One figure under the page header's banner: the number, then what it counts. */
+const CoverStat = ({
+  label,
+  title,
+  footer,
+  children,
+}: {
+  label: string;
+  title?: string;
+  /** Under the label — the level's lap bar. */
+  footer?: ReactNode;
+  children: ReactNode;
+}) => (
+  <div title={title} className='flex flex-col gap-0.5'>
+    <span className='flex items-center gap-1.5 text-xl font-bold tabular-nums leading-tight text-zinc-100'>
+      {children}
+    </span>
+    <span className='text-xs text-zinc-400'>{label}</span>
+    {footer}
+  </div>
+);
 
 /**
  * The top of a guild card: the banner across it, and the crest hanging off the
@@ -68,41 +91,38 @@ export const GuildCover = ({
     ? (guild.honor[myUid!] ?? { earned: 0, spent: 0, balance: 0 })
     : null;
 
+  const level = Math.max(0, Math.floor(Number(guild.level) || 0));
+  const onLap = level % GUILD_LAP_SIZE;
+
   return (
     <>
-      {/* The level rides the banner's right-hand side, halfway down, the way a
-          level sits on a card in any game — so it is read as one before it is
-          read at all, and it stays out of the crest's way on the left. My own
-          honor sits right beside it, for the same reason: the one figure on
-          this card that is mine rather than the guild's. */}
+      {/* On a card the level rides the banner's right-hand side, with my own
+          honor beside it. At the top of the page the banner is left to be a
+          banner: the same figures are set under it on the plain card, each
+          with its name, where nothing has to be read off a pattern. */}
       <div className='relative'>
         <GuildBanner
           bannerId={banner.id}
           hex={hex}
           icons={motifIcons(guild.cosmetics)}
-          className={large ? "h-28 sm:h-40" : "h-24 sm:h-28"}
+          className={large ? "h-24 sm:h-32" : "h-24 sm:h-28"}
         />
-        <div
-          className={cn(
-            "absolute top-1/2 flex -translate-y-1/2 items-center gap-2",
-            large ? "right-6 sm:right-8" : "right-4",
-          )}>
-          {myHonor && (
-            <span
-              title={t("cover.your_honor", {
-                earned: myHonor.earned.toLocaleString(),
-                balance: myHonor.balance.toLocaleString(),
-              })}
-              className={cn(
-                "flex shrink-0 items-center gap-1.5 rounded-lg bg-zinc-950/75 font-bold tabular-nums text-purple-200",
-                large ? "px-3 py-2 text-base" : "px-2 py-1.5 text-sm",
-              )}>
-              <HonorMark size={large ? 22 : 16} />
-              {myHonor.earned.toLocaleString()}
-            </span>
-          )}
-          <GuildLevelRing level={guild.level} size={large ? 72 : 48} />
-        </div>
+        {!large && (
+          <div className='absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-2'>
+            {myHonor && (
+              <span
+                title={t("cover.your_honor", {
+                  earned: myHonor.earned.toLocaleString(),
+                  balance: myHonor.balance.toLocaleString(),
+                })}
+                className='flex shrink-0 items-center gap-1.5 rounded-lg bg-zinc-950/75 px-2 py-1.5 text-sm font-bold tabular-nums text-purple-200'>
+                <HonorMark size={16} />
+                {myHonor.earned.toLocaleString()}
+              </span>
+            )}
+            <GuildLevelRing level={guild.level} size={48} />
+          </div>
+        )}
       </div>
 
       {/* The crest is the guild's face and is drawn at a size that says so:
@@ -170,6 +190,50 @@ export const GuildCover = ({
                 large ? "sm:pt-16" : "sm:pt-14",
               )}>
               {actions}
+            </div>
+          )}
+
+          {large && (
+            <div className='flex shrink-0 items-start gap-8 sm:pt-16'>
+              <CoverStat
+                label={t("level")}
+                title={t("level_ring", {
+                  level,
+                  done: onLap,
+                  lap: GUILD_LAP_SIZE,
+                })}
+                footer={
+                  <span className='mt-1.5 block h-1.5 w-16 overflow-hidden rounded-full bg-zinc-800'>
+                    <span
+                      className='block h-full rounded-full bg-cyan-400'
+                      style={{ width: `${(onLap / GUILD_LAP_SIZE) * 100}%` }}
+                    />
+                  </span>
+                }>
+                {level}
+              </CoverStat>
+              {myHonor && (
+                <CoverStat
+                  label={t("honor.yours")}
+                  title={t("cover.your_honor", {
+                    earned: myHonor.earned.toLocaleString(),
+                    balance: myHonor.balance.toLocaleString(),
+                  })}>
+                  <HonorMark size={18} />
+                  {myHonor.earned.toLocaleString()}
+                </CoverStat>
+              )}
+              <CoverStat
+                label={t("tabs.members")}
+                title={t("seats_taken", {
+                  count: guild.memberCount,
+                  limit: guild.memberLimit,
+                })}>
+                {guild.memberCount}
+                <span className='text-base font-semibold text-zinc-500'>
+                  / {guild.memberLimit}
+                </span>
+              </CoverStat>
             </div>
           )}
         </div>

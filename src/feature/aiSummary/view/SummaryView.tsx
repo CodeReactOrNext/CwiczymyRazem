@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { buttonVariants } from "assets/components/ui/button";
+import { buttonVariants, PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
@@ -14,6 +14,7 @@ import {
   LEVEL_COLORS, LEVELS, localDateStr, milestoneLockedAtLvl, MS_15,
   PRACTICE_CATEGORIES,
 } from "feature/aiSummary/utils/milestoneLogic";
+import { MilestoneNode } from "feature/dashboard/components/widgets/MilestoneNode";
 import { practiceLevelsQueryKey } from "feature/dashboard/hooks/useMilestoneProgress";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
@@ -24,6 +25,7 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
+import { m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import { Interpolate } from "lib/i18n/Interpolate";
@@ -40,10 +42,10 @@ import { useAppSelector } from "store/hooks";
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
 // Compact hours format ("98 min" → "1h 38 min") matching the activity widget.
-function fmtMin(m: number) {
-  if (m < 60) return `${m} min`;
-  const h = Math.floor(m / 60);
-  const rem = m % 60;
+function fmtMin(min: number) {
+  if (min < 60) return `${min} min`;
+  const h = Math.floor(min / 60);
+  const rem = min % 60;
   return rem > 0 ? `${h}h ${rem} min` : `${h}h`;
 }
 
@@ -91,7 +93,14 @@ function PracticeProgressTracker({
   const realNextIdx = levelStatuses.findIndex(s => !s.met);
   const activeIdx   = previewIdx ?? (realNextIdx === -1 ? LEVELS.length - 1 : realNextIdx);
   const metCount    = levelStatuses.filter(s => s.met).length;
-  const activeColor = LEVEL_COLORS[levelStatuses[activeIdx].id - 1];
+  // The bubble sits over the goal the week is heading for — the first one not
+  // met yet, and only while it is the player's to work on (owned, not shut).
+  const bubbleIdx = realNextIdx !== -1 && ownedSet.has(levelStatuses[realNextIdx].id)
+    ? realNextIdx
+    : -1;
+  const bubbleLeft = bubbleIdx === -1
+    ? 0
+    : levelStatuses[bubbleIdx].progress.max - levelStatuses[bubbleIdx].progress.value;
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLButtonElement>(null);
@@ -110,14 +119,14 @@ function PracticeProgressTracker({
   const CENTER = NODE / 2;     // vertical centre → trail height
 
   return (
-    <div className="flex w-full flex-col gap-6 rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm px-4 py-6 sm:px-6 sm:py-7">
+    <div className="flex w-full flex-col gap-7 rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm px-4 pb-6 pt-2 sm:px-6 sm:pb-7 sm:pt-3">
       {/* arrows flank the strip like a carousel, aligned to the node centres */}
       <div className="flex items-start gap-1 sm:gap-2">
         <button
           onClick={() => onPreviewChange(Math.max(0, activeIdx - 1))}
           disabled={activeIdx === 0}
           aria-label={t("page.prev_level")}
-          className="mt-3.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
+          className="mt-[50px] flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
         >
           <ChevronLeft size={20} strokeWidth={2.5} />
         </button>
@@ -125,12 +134,11 @@ function PracticeProgressTracker({
         {/* milestone nodes */}
         <div
           ref={scrollRef}
-          className="flex flex-1 items-start overflow-x-auto no-scrollbar snap-x snap-mandatory pt-1 sm:snap-none sm:overflow-x-visible"
+          className="flex flex-1 items-start overflow-x-auto no-scrollbar snap-x snap-mandatory pt-10 pb-1 sm:snap-none sm:overflow-x-visible"
         >
         {levelStatuses.map((level, idx) => {
           const isOwned     = ownedSet.has(level.id);
           const isClaimed   = claimedSet.has(level.id);
-          const isClaimable = level.met && isOwned && !isClaimed;   // reward waiting to collect
           const isCurrent   = idx === activeIdx;
           // Two reasons a tier can be shut: it has not been bought, or the
           // account is not high enough to buy it. The strip has room for one
@@ -138,14 +146,7 @@ function PracticeProgressTracker({
           const lockedLvl   = milestoneLockedAtLvl(level, playerLvl, isOwned);
           const showLock    = !isOwned && (level.cost > 0 || lockedLvl != null);
           const baseColor   = LEVEL_COLORS[level.id - 1];
-          const ringColor   = level.met ? GREEN : baseColor;   // reached rings turn green
           const prevMet     = idx > 0 && levelStatuses[idx - 1].met;
-
-          const R      = 23;   // ring radius inside the 56px node
-          const CIRC   = 2 * Math.PI * R;
-          const pct    = level.progress.max > 0 ? level.progress.value / level.progress.max : 0;
-          const offset = CIRC - (level.met ? 1 : pct) * CIRC;
-          const stroke = isCurrent ? 4 : 3;
 
           return (
             <button
@@ -160,83 +161,47 @@ function PracticeProgressTracker({
               {idx > 0 && (
                 <span
                   aria-hidden
-                  className="absolute left-[-50%] right-1/2 h-[3px] rounded-full transition-colors"
-                  style={{ top: CENTER - 1.5, backgroundColor: prevMet ? GREEN : "#3f3f46" }}
+                  className="absolute left-[-50%] right-1/2 h-1.5 rounded-full transition-colors"
+                  style={{ top: CENTER - 3, backgroundColor: prevMet ? GREEN : "#3f3f46" }}
                 />
               )}
 
-              {/* node — solid disc, never transparent */}
-              <div
-                className="relative z-10 flex items-center justify-center rounded-full transition-transform duration-base group-active:scale-95"
-                style={{ width: NODE, height: NODE }}
-              >
-                {isCurrent && (
-                  <span
-                    aria-hidden
-                    className="absolute inset-[-4px] rounded-full"
-                    style={{ boxShadow: `0 0 0 2px ${ringColor}, 0 0 16px ${ringColor}55` }}
-                  />
-                )}
-                <span
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    backgroundColor: level.met ? GREEN : showLock ? "#1e1e22" : "#2e2e34",
-                    boxShadow: level.met ? `0 2px 10px ${GREEN}40` : undefined,
-                  }}
-                />
-                {!level.met && (
-                  <svg viewBox={`0 0 ${NODE} ${NODE}`} className="absolute inset-0 h-full w-full -rotate-90">
-                    <circle
-                      cx={CENTER} cy={CENTER} r={R}
-                      fill="none"
-                      stroke={showLock ? "#45454d" : "#52525b"}
-                      strokeWidth={stroke}
-                      strokeDasharray={showLock ? "3 4" : undefined}
-                    />
-                    {!showLock && pct > 0 && (
-                      <circle
-                        cx={CENTER} cy={CENTER} r={R}
-                        fill="none"
-                        stroke={baseColor}
-                        strokeWidth={stroke}
-                        strokeLinecap="round"
-                        strokeDasharray={CIRC}
-                        strokeDashoffset={offset}
-                        className="transition-[stroke-dashoffset] duration-slow ease-out"
-                      />
-                    )}
-                  </svg>
-                )}
-                <span className="relative">
-                  {showLock ? (
-                    <Lock className="h-5 w-5 text-zinc-500" />
-                  ) : level.met ? (
-                    <Check className="h-6 w-6 text-emerald-950" strokeWidth={3} />
-                  ) : (
-                    <level.Icon className="h-5 w-5" style={{ color: isCurrent ? baseColor : "#8e8e98" }} />
-                  )}
-                </span>
+              {/* "1 more day" over the goal the week is heading for — the
+                  strip's one moving part, so the eye lands where to practise */}
+              {idx === bubbleIdx && (
+                <m.span
+                  aria-hidden
+                  className="pointer-events-none absolute -top-9 z-20 whitespace-nowrap rounded-lg bg-zinc-100 px-2.5 py-1 text-xs font-bold text-zinc-950"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  {t("page.days_left", { count: bubbleLeft })}
+                  <span className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-zinc-100" />
+                </m.span>
+              )}
 
-                {/* reward status: amber pulse = uncollected reward, emerald = claimed */}
-                {isClaimable && (
-                  <span
-                    aria-label={t("page.reward_ready")}
-                    className="absolute -right-0.5 -top-0.5 z-20 h-3.5 w-3.5 rounded-full bg-amber-500 animate-pulse ring-2 ring-zinc-900"
-                  />
-                )}
-                {isClaimed && (
-                  <span
-                    aria-label={t("page.reward_claimed")}
-                    className="absolute -right-0.5 -top-0.5 z-20 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-zinc-900"
-                  >
-                    <Check size={9} strokeWidth={3.5} className="text-zinc-950" />
-                  </span>
-                )}
+              {/* node — a round key: amber gift = Fame waiting, green tick = collected */}
+              <div className="relative z-10">
+                <MilestoneNode
+                  status={{
+                    met: level.met,
+                    owned: isOwned,
+                    claimed: isClaimed,
+                    cost: level.cost,
+                    lockedAtLvl: lockedLvl ?? null,
+                    color: baseColor,
+                    Icon: level.Icon,
+                    progress: level.progress,
+                  }}
+                  isCurrent={isCurrent}
+                  selected={isCurrent}
+                  pressable
+                />
               </div>
 
               {/* label */}
               <span
-                className="w-full max-w-[72px] truncate px-0.5 text-center text-[11px] font-semibold leading-none"
+                className="w-full max-w-[76px] truncate px-0.5 text-center text-xs font-semibold leading-none"
                 style={{ color: isCurrent ? "#fafafa" : level.met ? "#d4d4d8" : "#8e8e98" }}
                 title={levelName(t, level)}
               >
@@ -251,27 +216,31 @@ function PracticeProgressTracker({
           onClick={() => onPreviewChange(Math.min(LEVELS.length - 1, activeIdx + 1))}
           disabled={activeIdx === LEVELS.length - 1}
           aria-label={t("page.next_level")}
-          className="mt-3.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
+          className="mt-[50px] flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
         >
           <ChevronRight size={20} strokeWidth={2.5} />
         </button>
       </div>
 
       {/* legend */}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-zinc-800 pt-4">
-        <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <span className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
           <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: GREEN }} />
           {t("page.reached")}
         </span>
-        <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
-          <span className="h-2.5 w-2.5 rounded-full border-2 bg-transparent" style={{ borderColor: activeColor }} />
+        <span className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
+          <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+          {t("page.reward_ready")}
+        </span>
+        <span className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
+          <span className="h-2.5 w-2.5 rounded-full border-2 bg-transparent" style={{ borderColor: GREEN }} />
           {t("page.current_goal")}
         </span>
-        <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400">
+        <span className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
           <Lock size={11} className="text-zinc-500" />
           {t("page.locked")}
         </span>
-        <span className="ml-auto text-[11px] font-semibold tabular-nums text-zinc-500">
+        <span className="ml-auto text-xs font-semibold tabular-nums text-zinc-400">
           {t("page.reached_of", { done: metCount, total: LEVELS.length })}
         </span>
       </div>
@@ -403,8 +372,7 @@ function LevelGoalCard({
   const canAfford     = fame >= nextLevel.cost;
   const canClaim      = isOwned && isMet && !isClaimedThisWeek;
 
-  const REWARD_GREEN = "#22c55e";
-  const btnBase = "flex w-full items-center justify-center gap-2.5 rounded-[8px] px-6 py-3.5 text-base font-bold transition-all sm:w-auto";
+  const btnBase = "flex w-full items-center justify-center gap-2.5 rounded-lg px-6 py-3.5 text-base font-bold sm:w-auto";
 
   let actionButton: React.ReactNode = null;
   if (lockedLvl != null) {
@@ -415,7 +383,7 @@ function LevelGoalCard({
       <div className="flex flex-col items-center gap-2">
         <div
           className={`${btnBase} cursor-default`}
-          style={{ backgroundColor: "#27272a", color: "#a1a1aa", border: "2px solid #3f3f46" }}
+          style={{ backgroundColor: "#27272a", color: "#a1a1aa" }}
         >
           <Lock size={18} />
           <span>{t("page.unlocks_at", { lvl: lockedLvl })}</span>
@@ -432,13 +400,15 @@ function LevelGoalCard({
       <button
         onClick={() => onPurchase(nextLevel.id)}
         disabled={busy || !canAfford}
-        className={`${btnBase} active:scale-95 disabled:cursor-not-allowed disabled:opacity-50`}
-        style={{
-          backgroundColor: canAfford ? `${color}22` : "#27272a",
-          color: canAfford ? color : "#71717a",
-          border: `2px solid ${canAfford ? color + "70" : "#3f3f46"}`,
-          boxShadow: canAfford ? `0 0 12px ${color}40` : undefined,
-        }}
+        className={cn(
+          PRESSABLE,
+          btnBase,
+          "transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300",
+          canAfford
+            ? "border-b-zinc-800 bg-zinc-700 text-zinc-50 hover:bg-zinc-600"
+            : "cursor-not-allowed border-b-zinc-900 bg-zinc-800 text-zinc-500",
+          "disabled:opacity-60",
+        )}
       >
         <Lock size={18} />
         <span>{t("page.unlock_once")}</span>
@@ -457,12 +427,13 @@ function LevelGoalCard({
       <button
         onClick={() => onClaim(nextLevel.id)}
         disabled={busy}
-        className={`${btnBase} animate-pulse hover:animate-none active:scale-95 disabled:opacity-50`}
-        style={{
-          backgroundColor: REWARD_GREEN,
-          color: "#052e16",
-          boxShadow: `0 0 18px ${REWARD_GREEN}99`,
-        }}
+        className={cn(
+          PRESSABLE,
+          btnBase,
+          "border-b-green-700 bg-green-500 text-green-950 transition-colors duration-fast hover:bg-green-400",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900",
+          "disabled:opacity-50",
+        )}
       >
         <Sparkles size={18} />
         <span>{t("page.claim_reward")}</span>
@@ -556,12 +527,12 @@ function LevelGoalCard({
               {levelName(t, nextLevel)}
             </p>
             {isOwned && isClaimedThisWeek && (
-              <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400">
+              <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-bold text-emerald-400">
                 {t("card.claimed")}
               </span>
             )}
             {isOwned && !isClaimedThisWeek && isMet && (
-              <span className="animate-pulse rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
+              <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-bold text-amber-400">
                 {t("page.claim")}
               </span>
             )}
@@ -587,10 +558,7 @@ function LevelGoalCard({
             <>
               <p className="tabular-nums leading-none font-black" style={{ color }}>
                 <span className="text-3xl">{value}</span>
-                <span className="text-lg text-zinc-600">/{max}</span>
-              </p>
-              <p className="text-[10px] text-zinc-600 mt-1">
-                {t("page.percent_done", { percent: Math.round((value / max) * 100) })}
+                <span className="text-lg text-zinc-500">/{max}</span>
               </p>
             </>
           )}
@@ -602,6 +570,26 @@ function LevelGoalCard({
       {!isLocked && (
         <div className="space-y-4">
           {goalBox}
+          {/* the week as one thick bar — the number in the corner, made visible */}
+          <div
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={max}
+            aria-valuenow={value}
+            className="relative ml-10 h-3 overflow-hidden rounded-full bg-zinc-800"
+          >
+            <div
+              className="absolute inset-y-0 left-0 rounded-full bg-green-500 transition-[width] duration-slow ease-out"
+              style={{ width: `${Math.min(1, max > 0 ? value / max : 0) * 100}%` }}
+            />
+            {value > 0 && (
+              <div
+                aria-hidden
+                className="light-hide absolute left-1.5 top-[3px] h-[3px] rounded-full bg-white/30"
+                style={{ width: `calc(${Math.min(1, max > 0 ? value / max : 0) * 100}% - 12px)` }}
+              />
+            )}
+          </div>
           {actionButton && (
             <div className="[&>button]:w-full [&>p]:pl-10">
               {actionButton}
@@ -620,7 +608,7 @@ function LevelGoalCard({
         const GREEN      = "#4ade80";
         const CYAN       = "rgb(6,182,212)";
         return (
-          <div className="border-t border-zinc-800/70 pt-6">
+          <div className="pt-2">
             <div className="relative">
             {/* 15-min goal line */}
             <div
@@ -674,7 +662,7 @@ function LevelGoalCard({
                     </span>
                     {/* bar + track */}
                     <div
-                      className="flex w-full max-w-[56px] items-end justify-center rounded-md"
+                      className="flex w-full max-w-[56px] items-end justify-center rounded-lg"
                       style={{
                         height: CHART_H,
                         backgroundColor: "rgba(255,255,255,0.03)",
@@ -683,11 +671,10 @@ function LevelGoalCard({
                       }}
                     >
                       <div
-                        className="w-full rounded-md transition-all group-hover:brightness-125"
+                        className="w-full rounded-b rounded-t-lg transition-[height,filter] duration-slow ease-out group-hover:brightness-125"
                         style={{
                           height: heightPx,
                           backgroundColor: barColor,
-                          boxShadow: entry.ok ? `0 0 8px ${GREEN}55` : undefined,
                         }}
                       />
                     </div>
@@ -710,7 +697,7 @@ function LevelGoalCard({
               })}
             </div>
             </div>
-            <p className="mt-5 flex items-center gap-1.5 text-[11px] leading-snug text-zinc-500">
+            <p className="mt-5 flex items-center gap-1.5 text-xs leading-snug text-zinc-400">
               <CheckCircle2 size={12} style={{ color: GREEN }} className="shrink-0" />
               <span>
                 <Interpolate
@@ -731,7 +718,7 @@ function LevelGoalCard({
 
       {/* ── streak-simple (levels 3,5) ── */}
       {!isLocked && levelType === "streak-simple" && (
-        <div className="space-y-5 border-t border-zinc-800/70 pt-6">
+        <div className="space-y-5 pt-2">
           <div className="flex gap-1.5 sm:gap-2">
             {weekDays.map((day, i) => {
               const key      = localDateStr(day);
@@ -752,13 +739,22 @@ function LevelGoalCard({
                   className="group flex flex-1 flex-col items-center gap-2 cursor-pointer select-none touch-manipulation outline-none"
                 >
                   <div
-                    className="flex w-full h-28 flex-col items-center justify-center gap-1 rounded-lg transition-all group-hover:brightness-125"
+                    className="relative flex w-full h-28 flex-col items-center justify-center gap-1 rounded-lg transition-[filter] group-hover:brightness-125"
                     style={{
                       backgroundColor: inStreak ? `${color}30` : "#18181b",
-                      border: `2px solid ${isShown ? color : inStreak ? color + "80" : isToday ? "#52525b" : "#27272a"}`,
-                      boxShadow: inStreak || isShown ? `0 0 8px ${color}55` : undefined,
+                      boxShadow: isToday && !inStreak ? "inset 0 0 0 2px #3f3f46" : undefined,
+                      outline: isShown ? `2px solid ${color}` : undefined,
+                      outlineOffset: 2,
                     }}
                   >
+                    {/* the run carries on tomorrow — bridge the gap so it reads as one streak */}
+                    {inStreak && i < 6 && streakKeys.has(localDateStr(weekDays[i + 1])) && (
+                      <span
+                        aria-hidden
+                        className="absolute left-full top-1/2 h-5 w-1.5 -translate-y-1/2 sm:w-2"
+                        style={{ backgroundColor: `${color}30` }}
+                      />
+                    )}
                     {met ? (
                       <>
                         <CheckCircle2 size={28} style={{ color: inStreak ? color : "#71717a" }} />
@@ -781,7 +777,7 @@ function LevelGoalCard({
               );
             })}
           </div>
-          <p className="flex items-center gap-1.5 text-[10px] leading-snug text-zinc-500">
+          <p className="flex items-center gap-1.5 text-xs leading-snug text-zinc-400">
             <CheckCircle2 size={11} style={{ color }} className="shrink-0" />
             <span>
               <Interpolate
@@ -801,7 +797,7 @@ function LevelGoalCard({
 
       {/* ── week-cats (level 6) ── */}
       {!isLocked && levelType === "week-cats" && (
-        <div className="space-y-5 border-t border-zinc-800/70 pt-6">
+        <div className="space-y-5 pt-2">
           <div className="flex gap-1.5 sm:gap-2">
             {weekDays.map((day, i) => {
               const key      = localDateStr(day);
@@ -817,12 +813,12 @@ function LevelGoalCard({
                   onMouseEnter={() => onPeekDay(day)}
                   onMouseLeave={() => onPeekDay(null)}
                   onClick={() => onSelectDay(day)}
-                  className="group flex-1 min-w-0 flex flex-col items-center justify-center gap-2 sm:gap-2.5 rounded-lg py-3 px-0.5 sm:py-4 sm:px-1 cursor-pointer select-none touch-manipulation outline-none transition-all hover:brightness-125"
+                  className="group flex-1 min-w-0 flex flex-col items-center justify-center gap-2 sm:gap-2.5 rounded-lg py-3 px-0.5 sm:py-4 sm:px-1 cursor-pointer select-none touch-manipulation transition-[filter] hover:brightness-125 focus-visible:ring-2 focus-visible:ring-zinc-300"
                   style={{
                     minHeight: 112,
-                    backgroundColor: allMet ? `${color}18` : "#18181b",
-                    border: `2px solid ${isShown ? color : allMet ? color + "40" : "#27272a"}`,
-                    boxShadow: allMet || isShown ? `0 0 8px ${color}30` : undefined,
+                    backgroundColor: allMet ? `${color}24` : "#18181b",
+                    outline: isShown ? `2px solid ${color}` : undefined,
+                    outlineOffset: 2,
                   }}
                 >
                   {/* one dot per category — lit when that category hit 15+ min */}
@@ -833,9 +829,7 @@ function LevelGoalCard({
                         title={`${catLabel(cat)}${met[ci] ? " ✓" : ""}`}
                         className="h-3 w-3 sm:h-4 sm:w-4 rounded-full transition-all"
                         style={{
-                          backgroundColor: met[ci] ? cat.color : "#27272a",
-                          boxShadow: met[ci] ? `0 0 8px ${cat.color}` : undefined,
-                          border: met[ci] ? `1px solid ${cat.color}` : "1.5px solid #52525b",
+                          backgroundColor: met[ci] ? cat.color : "#3f3f46",
                         }}
                       />
                     ))}
@@ -853,7 +847,7 @@ function LevelGoalCard({
               );
             })}
           </div>
-          <p className="flex items-center gap-1.5 text-[10px] leading-snug text-zinc-500">
+          <p className="flex items-center gap-1.5 text-xs leading-snug text-zinc-400">
             <CheckCircle2 size={11} style={{ color }} className="shrink-0" />
             <span>
               <Interpolate
@@ -881,7 +875,7 @@ function LevelGoalCard({
 
       {/* ── streak-cats (levels 7,8,9) ── */}
       {!isLocked && levelType === "streak-cats" && (
-        <div className="space-y-5 border-t border-zinc-800/70 pt-6">
+        <div className="space-y-5 pt-2">
           <div className="flex gap-1.5 sm:gap-2">
             {weekDays.map((day, i) => {
               const key      = localDateStr(day);
@@ -901,14 +895,22 @@ function LevelGoalCard({
                   className="group flex flex-1 min-w-0 flex-col items-center gap-2 cursor-pointer select-none touch-manipulation outline-none"
                 >
                   <div
-                    className="flex w-full flex-col rounded-xl p-1.5 sm:p-2.5 transition-all group-hover:brightness-125"
+                    className="relative flex w-full flex-col rounded-lg p-1.5 sm:p-2.5 transition-[filter] group-hover:brightness-125"
                     style={{
                       minHeight: 128,
                       backgroundColor: allMet ? `${color}26` : inStreak ? `${color}18` : "#18181b",
-                      border: `2px solid ${isShown ? color : inStreak ? color + "70" : isToday ? "#52525b" : "#27272a"}`,
-                      boxShadow: inStreak || isShown ? `0 0 10px ${color}50` : undefined,
+                      boxShadow: isToday && !inStreak ? "inset 0 0 0 2px #3f3f46" : undefined,
+                      outline: isShown ? `2px solid ${color}` : undefined,
+                      outlineOffset: 2,
                     }}
                   >
+                    {inStreak && i < 6 && streakKeys.has(localDateStr(weekDays[i + 1])) && (
+                      <span
+                        aria-hidden
+                        className="absolute left-full top-1/2 h-5 w-1.5 -translate-y-1/2 sm:w-2"
+                        style={{ backgroundColor: `${color}18` }}
+                      />
+                    )}
                     {/* status: full check or how many of 4 categories done */}
                     <div className="flex h-6 items-center justify-center mb-2">
                       {allMet ? (
@@ -921,7 +923,6 @@ function LevelGoalCard({
                       {CATS.map(cat => {
                         const time = stats?.[cat.k] ?? 0;
                         const pct  = Math.min(time / MS_15, 1) * 100;
-                        const met  = time >= MS_15;
                         return (
                           <div key={cat.k} className="h-3 rounded-full bg-zinc-800 overflow-hidden">
                             <div
@@ -929,7 +930,6 @@ function LevelGoalCard({
                               style={{
                                 width: `${pct}%`,
                                 backgroundColor: cat.color,
-                                boxShadow: met ? `0 0 6px ${cat.color}` : undefined,
                               }}
                             />
                           </div>
@@ -948,7 +948,7 @@ function LevelGoalCard({
               );
             })}
           </div>
-          <p className="flex items-center gap-1.5 text-[10px] leading-snug text-zinc-500">
+          <p className="flex items-center gap-1.5 text-xs leading-snug text-zinc-400">
             <CheckCircle2 size={11} style={{ color }} className="shrink-0" />
             <span>
               <Interpolate

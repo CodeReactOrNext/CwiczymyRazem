@@ -1,4 +1,4 @@
-import { PRESSABLE_KEY } from "assets/components/ui/button";
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Mic } from "lucide-react";
@@ -6,9 +6,9 @@ import { useMemo } from "react";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { huntPositions } from "../hooks/useNoteHunt";
-import { ClickableFretboard, FullNeckToggle, LeftyToggle, useShowFullNeck } from "./ClickableFretboard";
+import { ClickableFretboard, useShowFullNeck } from "./ClickableFretboard";
 import { DetectionWave } from "./DetectionWave";
-import { HuntPromptCard, HuntStage, HuntStats, HuntSteps, HuntTargetCard } from "./HuntStage";
+import { HuntPromptCard, HuntStage, HuntStats, HuntSteps, HuntTargetCard, HuntViewMenu } from "./HuntStage";
 
 interface NoteHuntDetectorProps {
   targetNote: string;
@@ -41,7 +41,7 @@ export function NoteHuntDetector({
   onDevPassExam,
 }: NoteHuntDetectorProps) {
   const { t } = useTranslation("session");
-  const { noteHunt, noteHuntSecondsLeft, noteHuntRegion, noteHuntStrings, customGoalPrompt, huntTarget, chromaticProgress, volumeRef, advanceHunt, canAdvanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
+  const { noteHunt, noteHuntSecondsLeft, noteHuntSecondsTotal, noteHuntRegion, noteHuntStrings, customGoalPrompt, huntTarget, chromaticProgress, volumeRef, advanceHunt, canAdvanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
 
   // Read the live target from context (not the prop) so it updates through the
   // memoized desktop content wrapper when the target rotates. Falls back to the
@@ -95,7 +95,7 @@ export function NoteHuntDetector({
     && octaves.length > 0 && !octaves.includes(detectedOctave);
 
   const stats = (
-    <HuntStats score={isMicEnabled ? score : undefined} secondsLeft={isRotating ? noteHuntSecondsLeft : null} complete={complete}>
+    <HuntStats score={isMicEnabled ? score : undefined} secondsLeft={isRotating ? noteHuntSecondsLeft : null} secondsTotal={noteHuntSecondsTotal} complete={complete}>
       {chromaticProgress && (
         <span
           className={cn(
@@ -284,23 +284,15 @@ export function NoteHuntDetector({
         )
       )}
 
-      {noteHuntRegion && (
-        <>
-          <FullNeckToggle value={showFullNeck} onChange={setShowFullNeck} />
-          <LeftyToggle />
-        </>
-      )}
+      {noteHuntRegion && <HuntViewMenu showFullNeck={showFullNeck} onShowFullNeckChange={setShowFullNeck} />}
 
       {/* Manual advance — works with or without the mic, and on the drills that
           wait for an answer rather than counting down (which have no timer to
           skip, but still need a way past a chord you can't crack). */}
       {canAdvanceHunt && (
-        <button
-          type="button"
-          onClick={advanceHunt}
-          className={cn(PRESSABLE_KEY, "inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring")}>
-          Next <ArrowRight size='1em' className="h-3.5 w-3.5 text-zinc-400" />
-        </button>
+        <Button type="button" variant="ghost" onClick={advanceHunt}>
+          {t("hunt.next")} <ArrowRight aria-hidden />
+        </Button>
       )}
       {onDevPassExam && (
         <button

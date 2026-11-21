@@ -2,7 +2,6 @@ import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
 import { getWorkshopEntries } from "feature/arsenal/utils/workshopEntries";
 import { useTranslation } from "hooks/useTranslation";
-import { Guitar, Hammer } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { InServiceTags } from "../InServiceTags";
@@ -34,16 +33,8 @@ export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
 
   if (entries.length === 0) {
     return (
-      <div className='flex flex-col items-center gap-6 rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-        <Hammer size={40} className='text-zinc-700' />
-        <div className='flex flex-col items-center gap-2'>
-          <h2 className='text-xl font-black tracking-wide text-white'>
-            Workshop
-          </h2>
-          <p className='max-w-sm text-sm text-zinc-400'>
-            {t("workshop.empty")}
-          </p>
-        </div>
+      <div className='flex justify-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
+        <p className='max-w-sm text-sm text-zinc-400'>{t("workshop.empty")}</p>
       </div>
     );
   }
@@ -64,7 +55,6 @@ export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
         <button
           onClick={() => setRackOpen(true)}
           className='flex items-center gap-3 rounded-lg bg-zinc-900/40 p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60 hover:bg-zinc-900/70 lg:hidden'>
-          <Guitar size={18} className='shrink-0 text-zinc-500' />
           <span className='flex min-w-0 flex-1 flex-col gap-1'>
             <span className='truncate text-sm font-bold text-zinc-100'>
               {selected?.name}

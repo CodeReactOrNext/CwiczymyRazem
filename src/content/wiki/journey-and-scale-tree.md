@@ -12,11 +12,13 @@ Most of riff.quest lets you practise whatever you feel like. These two don't: th
 
 <ClickPath steps="Learning Path" caption="Modules made of stages, stages made of steps, and an exam at the end of each stage." />
 
-Two modules are live today, **Fundamentals** and **Fretboard Mastery**, with rhythm, scales and improvisation marked as coming soon. Each step comes with instructions, a checklist and tips.
+Three modules are live today, **Fundamentals**, **Fretboard Mastery** and **Interval Mastery**, with rhythm, scales and improvisation marked as coming soon. Each step comes with instructions, a checklist and tips.
 
-<StepList steps="The first step is always open::No prerequisites, on either module|Steps unlock in order::The next step opens once you've marked the one before it complete|Modules aren't locked::Both live modules are open from day one, and only the steps inside them unlock in sequence" />
+<StepList steps="The first step is always open::No prerequisites, on any module|Steps unlock in order::The next step opens once you've marked the one before it complete|Modules aren't locked::All three live modules are open from day one, and only the steps inside them unlock in sequence" />
 
-**Fretboard Mastery** works by clicking, not listening: you're shown a note name and you click where it lives on the fretboard, so its first four stages work fine without a microphone. The last stage, **Play!**, has you find the notes on your guitar, and those exams listen. Exams are graded on accuracy:
+**Fretboard Mastery** works by clicking, not listening: you're shown a note name and you click where it lives on the fretboard, so its first four stages work fine without a microphone. The last stage, **Play!**, has you find the notes on your guitar, and those exams listen.
+
+**Interval Mastery** teaches each interval three ways: you click its shape on the fretboard, you name it by ear, and you play it on your guitar. Only those Play steps listen. Exams are graded on accuracy:
 
 <ProgressLadder items="Below 93%::No stars, worth another go|93%::One star|97%::Two stars|99% and up::Three stars" highlight="99% and up" />
 
@@ -42,6 +44,6 @@ Each node shows where you stand (locked, available, in progress or done) based o
 
 ## Questions people ask
 
-<FaqList items="Do I need a microphone?::For the exams that grade your playing, yes: every Fundamentals exam and the Play! stage of Fretboard Mastery. Those won't let you skip the prompt, see note detection. The click-based Fretboard Mastery stages, Practice and the checklists work without one. The Scale Map tracks the tempo you record on each pattern|Can I skip a step?::No, that's rather the point. Steps open in order|What if I fail an exam?::Nothing happens except that it stays unfinished. Retake it whenever|Does this count as practice?::Yes, time spent here logs like any other session" />
+<FaqList items="Do I need a microphone?::For the exams that grade your playing, yes: every Fundamentals exam, the Play! stage of Fretboard Mastery and the Play steps of Interval Mastery. Those won't let you skip the prompt, see note detection. The click-based Fretboard Mastery stages, the clicking and listening steps of Interval Mastery, Practice and the checklists work without one. The Scale Map tracks the tempo you record on each pattern|Can I skip a step?::No, that's rather the point. Steps open in order|What if I fail an exam?::Nothing happens except that it stays unfinished. Retake it whenever|Does this count as practice?::Yes, time spent here logs like any other session" />
 
 <ReadNext links="Skills & achievements::/wiki/skills-and-achievements|Note detection & mic setup::/wiki/note-detection|AI Coach & weekly Milestones::/wiki/ai-coach-and-weekly-milestones|Points, levels & streaks::/wiki/how-scoring-works" />

@@ -592,7 +592,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                             variant="subtle"
                             onClick={() => handleSwitchView("explore")}
                             className="ml-auto hidden h-10 px-4 text-zinc-200 sm:inline-flex">
-                            <Plus className="mr-1.5" />
+                            <Plus className="" />
                             {t("view.add_songs")}
                           </Button>
                         </div>
@@ -737,7 +737,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                           hasFilters && "bg-cyan-500/5 text-cyan-400"
                         )}
                       >
-                        <SlidersHorizontal className="mr-2.5 h-4 w-4" />
+                        <SlidersHorizontal className="h-4 w-4" />
                         {t("filter_sheet.title")}
                       </Button>
                     </div>

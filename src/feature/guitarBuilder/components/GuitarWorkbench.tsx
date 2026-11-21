@@ -230,19 +230,17 @@ export const GuitarWorkbench = ({
       ),
     );
 
-  const slotHint = (target: ComponentSlot) => {
-    if (target === "sticker") {
-      return stickers.length ? `${stickers.length}` : "–";
-    }
-    const fitted = resolveOwned(stash, loadout[target], target);
-    return fitted ? labels.t("common.lvl", { level: fitted.level }) : "–";
-  };
+  const slotFilled = (target: ComponentSlot) =>
+    target === "sticker"
+      ? stickers.length > 0
+      : Boolean(resolveOwned(stash, loadout[target], target));
 
   return (
     <div className='grid items-start gap-8 md:grid-cols-[22rem_1fr] lg:grid-cols-[26rem_1fr]'>
       {/* the build hangs in the same lit bay as the rig and profile wall,
           with its plate and level breakdown under it, and stays in view
-          while parts are swapped */}
+          while parts are swapped. The bay wears no level emblem here: the
+          plate right under it counts the same number up. */}
       <div className='md:sticky md:top-4'>
         <div
           className='rounded-lg bg-arsenal-card p-1.5'
@@ -253,7 +251,6 @@ export const GuitarWorkbench = ({
               color={
                 summary.complete ? getRarityColor(summary.rarity) : undefined
               }
-              level={summary.complete ? summary.total : undefined}
               rarity={summary.rarity}>
               {/* nothing hangs until a body is picked — stock art in its
                   place read as a guitar the player already had */}
@@ -295,7 +292,7 @@ export const GuitarWorkbench = ({
           slots={SLOTS}
           active={slot}
           onSelect={onSlotChange}
-          hint={slotHint}
+          filled={slotFilled}
         />
 
         {slot === "sticker" && (
@@ -317,7 +314,7 @@ export const GuitarWorkbench = ({
         {items.length === 0 && emptySlot ? (
           emptySlot
         ) : (
-          <div className='grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4'>
+          <div className='grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4'>
             {items.map((item) => (
               <ComponentCard
                 key={item.uid}

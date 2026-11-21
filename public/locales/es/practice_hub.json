@@ -1,12 +1,7 @@
 {
   "title": "Práctica",
-  "continue": "Continuar",
   "loading": "Cargando...",
   "any_part": "Cualquier parte",
-  "lock": {
-    "master": "Master",
-    "premium": "Premium"
-  },
   "sections": {
     "all": "Todas las formas de practicar",
     "log_time": "Registrar tiempo",
@@ -14,10 +9,16 @@
     "create_plan": "Crear plan",
     "create_exercise": "Crear ejercicio"
   },
+  "groups": {
+    "planned": "Con plan",
+    "songs": "Canciones",
+    "exercises": "Ejercicios",
+    "challenges": "Desafíos"
+  },
   "modes": {
     "routine": {
       "title": "Rutinas de práctica",
-      "description": "Rutinas listas, playalongs, tus planes y los de la comunidad"
+      "description": "Planes de sesión hechos y propios"
     },
     "manual_log": {
       "title": "Registro manual",
@@ -29,43 +30,43 @@
     },
     "songs": {
       "title": "Canciones",
-      "description": "Practica tu repertorio: el tiempo cuenta para cada canción"
+      "description": "Tu repertorio"
     },
     "auto": {
       "title": "Plan automático",
-      "description": "Una sesión generada para el tiempo que tienes"
+      "description": "Una sesión a la medida de tu tiempo"
     },
     "gp": {
       "title": "Archivos Guitar Pro",
-      "description": "Practica con tablaturas importadas, con reproducción"
+      "description": "Tus tablaturas con reproducción"
     },
     "learning_path": {
       "title": "Ruta de aprendizaje",
-      "description": "Empieza por lo básico, una lección cada vez"
+      "description": "Desde lo básico, lección a lección"
     },
     "roadmaps": {
       "title": "Mastery Roadmaps",
-      "description": "Un plan personal para una habilidad o estilo de juego"
+      "description": "Un plan para una habilidad"
     },
     "scales": {
       "title": "Mapa de escalas",
-      "description": "Formas de escalas, caja a caja al tempo objetivo"
+      "description": "Formas de escala, caja a caja"
     },
     "bosses": {
       "title": "Jefes",
-      "description": "Derrota a un jefe nivel a nivel tocando la guitarra"
+      "description": "Vence a un jefe tocando"
     },
     "duels": {
       "title": "Duelos",
-      "description": "1 contra 1 con un desconocido en el mismo ejercicio"
+      "description": "1 contra 1 en el mismo ejercicio"
     },
     "skills": {
       "title": "Habilidades",
-      "description": "Mira tu progreso por técnica"
+      "description": "Progreso por técnica"
     },
     "exercises": {
       "title": "Catálogo de ejercicios",
-      "description": "Encuentra un ejercicio por habilidad, duración o modo"
+      "description": "Todos los ejercicios"
     },
     "favorites": {
       "title": "Favoritos"
@@ -88,10 +89,6 @@
     "goals": {
       "title": "Objetivos"
     }
-  },
-  "tags": {
-    "most_used": "Lo más usado",
-    "new": "Nuevo"
   },
   "progress": {
     "all_modules": "Todos los módulos completados",

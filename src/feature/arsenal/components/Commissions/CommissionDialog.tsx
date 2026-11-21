@@ -20,15 +20,11 @@ import type {
   InventoryItem,
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
-import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
-import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
-import { Hammer, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useMemo } from "react";
 
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
-import { RARITY_STYLES } from "../RarityBadge";
-import { sectionLabelClass } from "../SectionLabel";
 import { CostTable } from "../Workshop/CostTable";
 
 interface CommissionDialogProps {
@@ -50,6 +46,9 @@ const PREVIEW_ID = "commission-preview";
  * mints from, so what the player reads here is what lands in the stash — only
  * the serial is assigned on delivery. Once the order goes through, the same
  * dialog shows the delivered card instead of stacking a second one on top.
+ *
+ * The heading is the title alone. It used to carry a thumbnail, the maker and
+ * the rarity as well — all three are on the card directly underneath it.
  */
 export const CommissionDialog = ({
   target,
@@ -79,11 +78,6 @@ export const CommissionDialog = ({
   if (!target || !quote) return null;
 
   const { def } = target;
-  const imageSrc =
-    target.kind === "guitar"
-      ? getRankBadgeSrc(target.def.imageId, "medium")
-      : getEffectImageSrc(target.def.imageId, "medium");
-
   const preview =
     target.kind === "guitar" ? (
       <GuitarCard
@@ -129,28 +123,15 @@ export const CommissionDialog = ({
           "pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-7",
         )}>
         <div className='flex items-start justify-between gap-4'>
-          <div className='flex min-w-0 items-center gap-4'>
-            <span className='flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-zinc-950/60'>
-              <img
-                src={imageSrc}
-                alt=''
-                draggable={false}
-                className='h-14 w-14 object-contain'
-              />
-            </span>
-            <div className='flex min-w-0 flex-col gap-1'>
-              <DialogTitle className='text-2xl font-black text-white'>
-                {delivered
-                  ? t("commissions.delivered")
-                  : t("commissions.commission_name", { name: def.name })}
-              </DialogTitle>
-              <DialogDescription className={sectionLabelClass}>
-                {def.brand} ·{" "}
-                <span style={{ color: RARITY_STYLES[def.rarity].baseColor }}>
-                  {labels.rarity(def.rarity)}
-                </span>
-              </DialogDescription>
-            </div>
+          <div className='flex min-w-0 flex-col'>
+            <DialogTitle className='text-2xl font-black text-white'>
+              {delivered
+                ? t("commissions.delivered")
+                : t("commissions.commission_name", { name: def.name })}
+            </DialogTitle>
+            <DialogDescription className='sr-only'>
+              {def.brand} · {labels.rarity(def.rarity)}
+            </DialogDescription>
           </div>
 
           <button
@@ -214,14 +195,14 @@ export const CommissionDialog = ({
               }
               disabled={!quote.canAfford || commission.isPending}
               className={cn(
-                "flex flex-1 items-center justify-center gap-2.5 rounded-lg px-5 py-3.5 text-sm font-bold transition-colors",
+                PRESSABLE,
+                "flex-1 rounded-lg border-b-black/25 px-5 py-3.5 text-sm font-bold transition-colors",
                 "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400",
                 "disabled:pointer-events-none disabled:opacity-40",
                 quote.canAfford
-                  ? "bg-cyan-400 text-zinc-950 hover:bg-cyan-300"
+                  ? "bg-zinc-100 text-zinc-900 hover:bg-white"
                   : "bg-zinc-800/60 text-zinc-500",
               )}>
-              <Hammer size={16} />
               {commission.isPending ? t("workshop.building") : t("commissions.commission")}
             </button>
           </div>

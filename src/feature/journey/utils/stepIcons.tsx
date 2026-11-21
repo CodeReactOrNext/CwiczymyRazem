@@ -3,7 +3,7 @@ import {
   BookIcon,
   ChevronDown, ClipboardCheck, Compass, Copy,   CrownIcon,
 Dot, Drum,
-  Ear, Eye, Footprints, GitMerge,   GlobeIcon,
+  Ear, Eye, Flame, Footprints, GitMerge,   GlobeIcon,
 GraduationCap, Grid3x3, Guitar,
   Hammer, Hand, Hash, Info, Layers, Lightbulb,
   ListMusic,   MapPin,
@@ -40,6 +40,11 @@ const STEP_ICON_COMPONENTS: Record<string, React.ComponentType<{ size?: number }
   Trophy:     Trophy,
   Guitar:     TbGuitarPick, // matches the guitar-pick motif used elsewhere in the app
   Crown:      CrownIcon,      // reserved for the whole-neck capstone exam
+  // Interval Mastery
+  Ear,                        // every listening step
+  Flame,                      // the tritone
+  Repeat,                     // inversions
+  SlidersHorizontal,          // tuning by ear
 };
 
 export function getStepIcon(name: string, size = 22): React.ReactNode {

@@ -50,7 +50,7 @@ okrągłe rękawice nad głową czytają się jak uszy.
 
 ## 4. Seria
 
-Ikona w nagłówku (`KostekFace`) to seria: **pełna** — seria żyje, **przygaszona, z zamkniętymi oczami** —
+Seria w nagłówku to **płomień** (ikona `Flame`), nie Kostek: pomarańczowy, gdy seria żyje, szary, gdy
 przerwana. Widżet serii na dashboardzie: Kostek nie śpi, dopóki seria trwa.
 
 ## 5. Nastroje (`mood`)
@@ -81,7 +81,8 @@ przerwana. Widżet serii na dashboardzie: Kostek nie śpi, dopóki seria trwa.
 | `plugIn` | mignięcie oczu, podskok z dłońmi w górze | fale | sygnał złapany |
 | `error` | wstrząs, przewraca się na bok i osiada; spiralki, dłonie opadłe na ziemię, chwieje się oszołomiona | — | ekran awarii |
 | `listen` | jedno wielkie ucho z boku głowy (dłoń zamienia się w ucho, cyjanowy zawijas w środku), pochylony w jego stronę; ucho strzyże, ciało pulsuje z sygnałem (`signal`) | fale wg sygnału | kalibracja, puste nagrania |
-| `sad` / `surprised` / `think` | smutek / zaskoczenie (dłonie przy twarzy) / namysł (dłoń pod brodą) | — | rezerwowe |
+| `sad` | smutek | — | niezdany egzamin: ekran wyniku i podsumowanie sesji (bez celebracji i fanfar) |
+| `surprised` / `think` | zaskoczenie (dłonie przy twarzy) / namysł (dłoń pod brodą) | — | rezerwowe |
 
 Dodatkowo: `eyesClosed` (zasłania oczy dłońmi przy wpisywaniu hasła), `talking` (oczy pulsują w sylabach,
 dłoń gestykuluje, słaba fala trzyma rytm), `lookAt` (kierunek wzroku i przechylenia), `short` (jeden podskok zamiast całej
@@ -107,7 +108,10 @@ Nowy stan najpierw trafia do tej tabeli, potem do kodu.
   wchodzi — zmiana trasy albo podmiana ekranu na sesję (`useSessionEntryGate`) czeka, aż ją zakryją.
   Pierwsze uderzenie jest zainscenizowane jak moment anime (§9): linie skupienia, pierścienie, smugi,
   rozrzut kostek i nut oraz dwa kolorowe powidoki Kostka (cyjan i bursztyn — to efekt sceny, nie kolor
-  postaci). Przy długim ładowaniu gra dalej, a pod strunami
+  postaci). Kostek czuje każde uderzenie: przy zamachu mruży oczy, na uderzeniu zaciska je w kreski,
+  podczas wybrzmienia przechodzą w łuki radości, a potem otwiera je (na chwilę szerzej) i wraca do
+  skupienia. Twarze przełączają się twardym cięciem jak klatki anime — warstwy oczu nad ciałem
+  (`KostekStill` z `part`/`face`), bez przenikania. Przy długim ładowaniu gra dalej, a pod strunami
   pojawia się lista kroków. Całość to animacje CSS samego transform/opacity (bez filtrów, masek i cieni),
   więc działa na kompozytorze i nie przycina, gdy strona parsuje nuty albo dekoduje dźwięk. Animowanego
   `Kostek` nie dawaj tam, gdzie główny wątek jest zajęty.

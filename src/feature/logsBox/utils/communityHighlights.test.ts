@@ -72,8 +72,8 @@ describe("buildCommunityHighlights", () => {
     expect(result.map((item) => item.kind)).toEqual([
       "duelResult",
       "improv",
-      "record",
       "boss",
+      "challenge",
     ]);
   });
 
@@ -113,28 +113,15 @@ describe("buildCommunityHighlights", () => {
     expect(result).toEqual([]);
   });
 
-  it("only counts a first place as a record", () => {
+  it("does not show leaderboard records", () => {
     const result = buildCommunityHighlights({
       logs: [
-        session(HOUR, { micPerformance: { score: 1, accuracy: 1, rank: 2 } }),
-        session(2 * HOUR, {
-          userName: "Ryan",
-          exerciseIds: ["ear-1"],
-          earTrainingPerformance: { score: 9, rank: 1 },
-        }),
+        session(HOUR, { micPerformance: { score: 1, accuracy: 1, rank: 1 } }),
+        session(2 * HOUR, { earTrainingPerformance: { score: 9, rank: 1 } }),
       ],
       now: NOW,
     });
 
-    expect(result).toEqual([
-      {
-        kind: "record",
-        at: NOW - 2 * HOUR,
-        userName: "Ryan",
-        avatarUrl: null,
-        exerciseTitle: "Open G Repeats",
-        exerciseId: "ear-1",
-      },
-    ]);
+    expect(result).toEqual([]);
   });
 });

@@ -36,6 +36,8 @@
   "practise_more": "Practise a bit more",
   "back_to_dashboard": "Back to dashboard",
   "great_progress": "Great progress!",
+  "exam_failed": "Exam not passed",
+  "exam_failed_body": "Your practice time still counts toward points and your streak.",
   "fame": "Fame",
   "cat": {
     "technique": "Technique",
@@ -50,13 +52,9 @@
   "session_time": "Session time",
   "streak": "Streak",
   "days_in_a_row": "days in a row",
+  "days_in_a_row_one": "day in a row",
   "streak_bonus_points": "+{{pct}}% points",
   "today": "today",
-  "this_week": "This week",
-  "goal": "goal",
-  "last_7_days": "last 7 days",
-  "skill_balance": "Skill balance",
-  "previous": "Previous",
   "new_achievements": "New achievements",
   "recent_runs": {
     "title": "How this exercise has gone lately",

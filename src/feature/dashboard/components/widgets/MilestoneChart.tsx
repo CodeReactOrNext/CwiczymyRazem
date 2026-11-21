@@ -32,6 +32,7 @@ const Tile = ({
   rule,
   met,
   lit,
+  joinNext = false,
   color,
   children,
 }: {
@@ -40,16 +41,25 @@ const Tile = ({
   met: boolean;
   /** Part of the streak that is running, or a day that covered everything. */
   lit: boolean;
+  /** The run carries on into tomorrow — a band bridges the gap so the streak reads as one piece. */
+  joinNext?: boolean;
   color: string;
   children?: ReactNode;
 }) => (
   <div
     title={milestoneDayTitle(day, rule, met)}
-    className='flex flex-1 flex-col items-center justify-center gap-[3px] rounded-sm px-1'
+    className='relative flex flex-1 flex-col items-center justify-center gap-[3px] rounded-sm px-1'
     style={{
       height: CHART_H,
       backgroundColor: lit ? `${color}26` : "rgba(255,255,255,0.03)",
     }}>
+    {joinNext && (
+      <span
+        aria-hidden
+        className='absolute -right-1 top-1/2 h-3 w-1 -translate-y-1/2'
+        style={{ backgroundColor: `${color}26` }}
+      />
+    )}
     {children}
   </div>
 );
@@ -76,6 +86,7 @@ const StreakWeek = ({ days, rule, color }: ChartProps) => {
               rule={rule}
               met={met}
               lit={streak[index]}
+              joinNext={streak[index] && !!streak[index + 1]}
               color={color}>
               {met ? (
                 <Check
@@ -189,6 +200,7 @@ const CategoryStreakWeek = ({ days, rule, color }: ChartProps) => {
               rule={rule}
               met={met}
               lit={streak[index]}
+              joinNext={streak[index] && !!streak[index + 1]}
               color={color}>
               {PRACTICE_CATEGORIES.map((cat) => {
                 const filled = Math.min(

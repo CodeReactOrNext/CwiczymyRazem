@@ -2,7 +2,7 @@
 
 import { cleanup, render, screen } from "@testing-library/react";
 import { useHandednessStore } from "hooks/useHandedness";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ClickableFretboard } from "./ClickableFretboard";
 
@@ -59,5 +59,42 @@ describe("ClickableFretboard handedness", () => {
 
     const highE = labels().find((text) => text.textContent === "e")!;
     expect(highE.getAttribute("text-anchor")).toBe("start");
+  });
+});
+
+describe("ClickableFretboard moving window", () => {
+  const board = (startFret: number, endFret: number) => (
+    <ClickableFretboard startFret={startFret} endFret={endFret} strings={undefined} foundKeys={[]} totalTargets={1} lastClick={null} />
+  );
+  const viewBox = () => screen.getByLabelText("Clickable fretboard").getAttribute("viewBox");
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  // Frets 5–8 plus three context frets each side: 2–11 on camera.
+  const AT_FRETS_5_8 = "285 0 1965 558";
+  // The same frame moved up to frets 8–11: 5–14 on camera, same width.
+  const AT_FRETS_8_11 = "855 0 1965 558";
+
+  it("frames the window plus context frets", () => {
+    render(board(5, 8));
+    expect(viewBox()).toBe(AT_FRETS_5_8);
+  });
+
+  it("travels along the neck to a moved window instead of cutting to it", () => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame", "performance"] });
+    const { rerender } = render(board(5, 8));
+    rerender(board(8, 11));
+
+    // Still showing where the last round was: the move starts from there…
+    expect(viewBox()).toBe(AT_FRETS_5_8);
+    vi.advanceTimersByTime(300);
+    const [midX] = viewBox()!.split(" ").map(Number);
+    expect(midX).toBeGreaterThan(285);
+    expect(midX).toBeLessThan(855);
+    // …and lands on the new window.
+    vi.advanceTimersByTime(600);
+    expect(viewBox()).toBe(AT_FRETS_8_11);
   });
 });

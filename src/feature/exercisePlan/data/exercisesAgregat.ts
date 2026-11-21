@@ -300,6 +300,11 @@ const FREE_EXERCISE_IDS = new Set([
   "ear_interval_three_sizes",
   "ear_tuning_wide_misses",
   "ear_tuning_intervals",
+  "ear_interval_seconds",
+  "ear_interval_thirds",
+  "ear_interval_pillars",
+  "ear_interval_sixths_sevenths",
+  "ear_interval_blend",
   // Riff Vault — free
   "master_of_puppets_riff_preview",
   "seven_nation_army_riff_preview",
@@ -368,8 +373,11 @@ import {
 import { intervalClickBox04Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox04";
 import { intervalClickBox59Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox59";
 import { intervalClickBox812Exercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickBox812";
+import { intervalClickLessonExercises } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickLessons";
 import { intervalClickWholeFretboardExercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickWholeFretboard";
 import { intervalHuntExercise } from "feature/exercisePlan/data/exerises/intervalHunt/intervalHunt";
+import { intervalHuntSetExercises } from "feature/exercisePlan/data/exerises/intervalHunt/intervalHuntSets";
+import { intervalTuneExercises } from "feature/exercisePlan/data/exerises/intervalTunes/intervalTunes";
 import { jazzChordMelodyExercise } from "feature/exercisePlan/data/exerises/jazzChordMelody/jazzChordMelody";
 import { metalGallopExercise } from "feature/exercisePlan/data/exerises/metalGallop/metalGallop";
 import { metalTremoloPickingExercise } from "feature/exercisePlan/data/exerises/metalTremoloPicking/metalTremoloPicking";
@@ -502,6 +510,7 @@ const rawExercises: Exercise[] = [
   intervalClickBox59Exercise,
   intervalClickBox812Exercise,
   intervalClickWholeFretboardExercise,
+  ...intervalClickLessonExercises,
   stringHuntLowEExercise,
   stringHuntAExercise,
   stringHuntDExercise,
@@ -509,6 +518,8 @@ const rawExercises: Exercise[] = [
   stringHuntBExercise,
   wholeNeckHuntExercise,
   intervalHuntExercise,
+  ...intervalHuntSetExercises,
+  ...intervalTuneExercises,
   buildTheChordExercise,
   chordDegreeHuntTriadsExercise,
   chordDegreeHuntSeventhsExercise,

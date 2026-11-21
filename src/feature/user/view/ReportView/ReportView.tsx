@@ -1,15 +1,25 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "assets/components/ui/button";
-import { Input } from "assets/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
 import Backdrop from "components/UI/Backdrop";
+import { MAX_DAYS_BACK } from "constants/gameSettings";
 import { isAutoPlanId, isRecognizedPracticePlanId } from "feature/exercisePlan/utils/isRecognizedPracticePlan";
+import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { ArrangementPicker } from "feature/songs/components/Arrangements/ArrangementPicker";
 import { ensureSongIsLearning } from "feature/songs/services/udateSongStatus";
 import { recordPracticeSession } from "feature/songs/services/userSongProgress.service";
 import type { SongArrangement } from "feature/songs/types/songs.type";
-import { parseArrangement } from "feature/songs/utils/arrangements.utils";
+import { ARRANGEMENT_META, parseArrangement } from "feature/songs/utils/arrangements.utils";
 import {
   selectCurrentUserStats,
   selectIsFetching,
@@ -30,19 +40,24 @@ import {
   ErrorBox,
   HealthHabbitsBox,
   LongPracticeConfirmPopUp,
-  TimeInputBox,
 } from "layouts/ReportFormLayout/components";
 import type { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
-import type { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
 import { useIntlLocale } from "lib/i18n/dateLocale";
-import { ArrowDown, Check, Flame, Music, Tags } from "lucide-react";
+import {
+  CalendarDays,
+  ListChecks,
+  Music,
+  Plus,
+  Tags,
+  Target,
+  Timer,
+} from "lucide-react";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import {
-  convertMsToHM,
   convertMsToHMObject,
   getDateFromPast,
   inputTimeConverter,
@@ -60,7 +75,6 @@ import {
   isLastReportTimeExceeded,
 } from "./helpers/isLastReportTimeExceeded";
 import { RaportSchema } from "./helpers/RaportShcema";
-import { buildSaveSummary } from "./helpers/saveSummary";
 import {
   MAX_SKILL_MINUTES,
   type SkillMinutes,
@@ -70,28 +84,41 @@ import {
 import {
   buildSongsSessionTitle,
   createPickedSong,
+  formatPracticed,
   MAX_SESSION_SONGS,
   MAX_SONG_CATEGORY_MINUTES,
+  MINUTE_MS,
   type PickedSong,
   pickPrimarySong,
   type SessionSong,
+  songTotalMinutes,
   sumSongMinutes,
   toReportSongEntries,
 } from "./helpers/sessionSongs";
+import {
+  CATEGORY_KEYS,
+  type CategoryKey,
+  getCategoryMinutes,
+  MAX_CATEGORY_MINUTES,
+  withSongHearingMinutes,
+  withSongTotalMinutes,
+} from "./helpers/timeSteps";
+import { CategoryBadge, ChoiceTile, DetailRow, StepHeader } from "./ReportFlowParts";
 import type { ReportFormikInterface } from "./ReportView.types";
-import SavedTimeBanner from "./SavedTimeBanner";
 import SessionSkillPicker from "./SessionSkillPicker";
-import SessionSongPicker, { type SongCategory } from "./SessionSongPicker";
-
-type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
+import SessionSongPicker, { SongCover } from "./SessionSongPicker";
+import SessionSummary, { type SessionSummaryLine } from "./SessionSummary";
+import SessionTagPicker, { tagKey } from "./SessionTagPicker";
+import { MinutesStepper, TimeBlock } from "./TimeBlock";
 
 type SessionMode = "free" | "songs";
 
 /** How a free session's time is entered: per category, or per guitar skill. */
 type FreeInput = "categories" | "skills";
 
-/** Tag labels double as ids; this is the key their translation lives under. */
-const tagKey = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+type FlowStep = "what" | "pick" | "time";
+
+type DetailKey = "song" | "tags" | "habits" | "day";
 
 const ReportView = () => {
   const router = useRouter();
@@ -127,6 +154,7 @@ const ReportView = () => {
   const [skillMinutes, setSkillMinutes] = useState<SkillMinutes>({});
   const autoApplyTimer = applyTimer === "true";
   const { t } = useTranslation("report");
+  const { t: tSkills } = useTranslation("skills");
   const intlLocale = useIntlLocale();
 
   const dispatch = useAppDispatch();
@@ -149,6 +177,31 @@ const ReportView = () => {
     timerData.technique;
 
   const hasSavedTime = savedTimerSum > 0 && !savedTimeApplied && !autoApplyTimer;
+
+  // The log is three questions — what, which, how long — one on screen at a
+  // time. Arriving with the answers already known (a song from its page, time
+  // handed over by the timer) starts on the last one.
+  const [pickedCategories, setPickedCategories] = useState<CategoryKey[]>(() =>
+    autoApplyTimer ? CATEGORY_KEYS.filter((key) => timerData[key] > 0) : []
+  );
+  const [step, setStep] = useState<FlowStep>(() =>
+    pickedSongs.length > 0 || autoApplyTimer ? "time" : "what"
+  );
+  // Which detail the sheet shows stays put while it closes, so the content
+  // does not vanish mid-animation.
+  const [detail, setDetail] = useState<DetailKey>("habits");
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const flowTopRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const flowTop = flowTopRef.current;
+    if (flowTop && flowTop.getBoundingClientRect().top < 0) {
+      flowTop.scrollIntoView({ block: "start" });
+    }
+  }, [step]);
+  const openDetail = (key: DetailKey) => {
+    setDetail(key);
+    setIsDetailOpen(true);
+  };
 
   // Streak multiplier (kicks in at a 2-day streak). It is applied to the combined
   // time + habit points in makeRatingData, so each ticked habit is worth
@@ -181,48 +234,12 @@ const ReportView = () => {
     planId: (planId as string) || undefined,
   };
 
-  const timeInputList: TimeInputProps[] = [
-    {
-      title: i18n?.t("report:technique"),
-      questionMarkProps: {
-        description: i18n?.t("report:description.technique"),
-      },
-      Icon: SKILL_CATEGORY_ICONS.technique,
-      hoursName: "techniqueHours",
-      minutesName: "techniqueMinutes",
-      skillId: "technique",
-    },
-    {
-      title: i18n?.t("report:theory"),
-      questionMarkProps: {
-        description: i18n?.t("report:description.theory"),
-      },
-      Icon: SKILL_CATEGORY_ICONS.theory,
-      hoursName: "theoryHours",
-      minutesName: "theoryMinutes",
-      skillId: "theory",
-    },
-    {
-      title: i18n?.t("report:hearing"),
-      questionMarkProps: {
-        description: i18n?.t("report:description.hearing"),
-      },
-      Icon: SKILL_CATEGORY_ICONS.hearing,
-      hoursName: "hearingHours",
-      minutesName: "hearingMinutes",
-      skillId: "hearing",
-    },
-    {
-      title: i18n?.t("report:creativity"),
-      questionMarkProps: {
-        description: i18n?.t("report:description.creative"),
-      },
-      Icon: SKILL_CATEGORY_ICONS.creativity,
-      hoursName: "creativityHours",
-      minutesName: "creativityMinutes",
-      skillId: "creativity",
-    },
-  ];
+  const categories = CATEGORY_KEYS.map((key) => ({
+    key,
+    label: t(key),
+    hint: t(`flow.category_hints.${key}`),
+    Icon: SKILL_CATEGORY_ICONS[key],
+  }));
 
   const healthHabbitsList: HealthHabbitsBoxProps[] = [
     {
@@ -304,25 +321,17 @@ const ReportView = () => {
       : [...pickedSongs, createPickedSong(song)];
 
     setPickedSongs(nextSongs);
+    if (nextSongs.length === 0) setStep("pick");
     applySongTimes(nextSongs, setFieldValue);
   };
 
-  const setSongMinutes = (
+  const updateSong = (
     pickedId: string,
-    category: SongCategory,
-    minutes: number,
+    update: (song: PickedSong) => PickedSong,
     setFieldValue: SetFieldValue
   ) => {
-    const safeMinutes = Math.max(0, Math.min(minutes, MAX_SONG_CATEGORY_MINUTES));
     const nextSongs = pickedSongs.map((song) =>
-      song.id === pickedId
-        ? {
-            ...song,
-            techniqueMinutes:
-              category === "technique" ? safeMinutes : song.techniqueMinutes,
-            hearingMinutes: category === "hearing" ? safeMinutes : song.hearingMinutes,
-          }
-        : song
+      song.id === pickedId ? update(song) : song
     );
 
     setPickedSongs(nextSongs);
@@ -354,6 +363,7 @@ const ReportView = () => {
     if (skillId in next) delete next[skillId];
     else next[skillId] = 0;
     setSkillMinutes(next);
+    if (Object.keys(next).length === 0) setStep("pick");
     applySkillTimes(next, setFieldValue);
   };
 
@@ -366,13 +376,42 @@ const ReportView = () => {
     applySkillTimes(next, setFieldValue);
   };
 
+  /** Question 2 for exercises can be answered by category or by skill. */
   const switchFreeInput = (input: FreeInput, setFieldValue: SetFieldValue) => {
     if (input === freeInput) return;
     setFreeInput(input);
-    // Either side owns the boxes; switching starts that side from empty rather
-    // than leaving time on the boxes the skills no longer explain.
+    // Either side owns the time boxes; switching starts both from empty rather
+    // than leaving time on the boxes the other side no longer explains.
     setSkillMinutes({});
+    setPickedCategories([]);
     applySkillTimes({}, setFieldValue);
+  };
+
+  const toggleTag = (label: string, setFieldValue: SetFieldValue) => {
+    const nextTags = selectedTags.includes(label)
+      ? selectedTags.filter((tag) => tag !== label)
+      : [...selectedTags, label];
+    setSelectedTags(nextTags);
+    setFieldValue(
+      "reportTitle",
+      nextTags.map((tag) => t(`tags.${tagKey(tag)}`, tag)).join(" + ")
+    );
+  };
+
+  const toggleCategory = (
+    key: CategoryKey,
+    isActive: boolean,
+    setFieldValue: SetFieldValue
+  ) => {
+    if (!isActive) {
+      // Catalogue order, so the time blocks do not depend on the tap order.
+      setPickedCategories(
+        CATEGORY_KEYS.filter((k) => k === key || pickedCategories.includes(k))
+      );
+      return;
+    }
+    setPickedCategories(pickedCategories.filter((k) => k !== key));
+    setMinutesField(`${key}Hours`, `${key}Minutes`, 0, setFieldValue);
   };
 
   const switchSessionMode = (mode: SessionMode, setFieldValue: SetFieldValue) => {
@@ -608,6 +647,17 @@ const ReportView = () => {
     setAcceptLongTime(false);
     setSubmittedValues(null);
     setLogNonce((nonce) => nonce + 1);
+    setIsDetailOpen(false);
+    setSelectedTags([]);
+    setStep(
+      (sessionMode === "songs"
+        ? pickedSongs.length
+        : freeInput === "skills"
+          ? Object.keys(skillMinutes).length
+          : pickedCategories.length) > 0
+        ? "time"
+        : "what"
+    );
     setView('form');
     window.scrollTo({ top: 0 });
   };
@@ -622,6 +672,28 @@ const ReportView = () => {
     setFieldValue("creativityHours", creativityTime.hours);
     setFieldValue("creativityMinutes", creativityTime.minutes);
     setSavedTimeApplied(true);
+  };
+
+  /** Question 1. Changing the kind of session starts its answers over. */
+  const chooseMode = (mode: SessionMode, setFieldValue: SetFieldValue) => {
+    if (mode !== sessionMode) {
+      switchSessionMode(mode, setFieldValue);
+      setPickedCategories([]);
+    }
+    setStep("pick");
+  };
+
+  /**
+   * The timer already knows what was practised and for how long, so its time
+   * answers all three questions at once and lands on the last one.
+   */
+  const applyTimerShortcut = (setFieldValue: SetFieldValue) => {
+    if (sessionMode !== "free") switchSessionMode("free", setFieldValue);
+    setFreeInput("categories");
+    setSkillMinutes({});
+    applySavedTime(setFieldValue);
+    setPickedCategories(CATEGORY_KEYS.filter((key) => timerData[key] > 0));
+    setStep("time");
   };
 
   const getUpdatedActivityData = () => {
@@ -695,429 +767,565 @@ const ReportView = () => {
           enableReinitialize={true}
           onSubmit={reportOnSubmit}>
           {({ errors, values, setFieldValue }) => {
-            const isStep1Done = getSumTime(values) > 0;
+            const totalMs = getSumTime(values);
+            const hasTime = totalMs > 0;
             const isSongMode = sessionMode === "songs";
-            // Song mode fills the title from the songs, so only ticked habits
-            // can mark this step as done there.
-            const isStep2Completed = isSongMode
-              ? (values.habbits?.length ?? 0) > 0
-              : values.reportTitle.trim().length > 0 || (values.habbits && values.habbits.length > 0);
+            const isBySkill = !isSongMode && freeInput === "skills";
+            const hasErrors = Object.keys(errors).length !== 0;
+            const stepNumber = step === "what" ? 1 : step === "pick" ? 2 : 3;
+            const habitCount = values.habbits?.length ?? 0;
+            // Catalogue order, so a block does not jump around as minutes change.
+            const pickedSkills = guitarSkills.filter((skill) => skill.id in skillMinutes);
+            // A category is in the session when it was ticked or already holds
+            // time. The second half matters: time can reach the form without a
+            // tick (the timer's hand-over), and time that is counted in the
+            // total must never sit in a block the player cannot see.
+            const activeCategories =
+              isSongMode || isBySkill
+                ? []
+                : CATEGORY_KEYS.filter(
+                    (key) =>
+                      pickedCategories.includes(key) || getCategoryMinutes(values, key) > 0
+                  );
+            const canContinue = isSongMode
+              ? pickedSongs.length > 0
+              : isBySkill
+                ? pickedSkills.length > 0
+                : activeCategories.length > 0;
+            const minutesLabel = (minutes: number) => formatPracticed(minutes * MINUTE_MS);
+            const dayLabel = (days: number) =>
+              days === 0
+                ? t("form.today")
+                : days === 1
+                  ? t("form.yesterday")
+                  : t("form.days_ago", { count: days });
+            const streakText = hasStreakBonus
+              ? t("form.streak_bonus", { count: streak, multiplier: streakMultiplier.toFixed(1) })
+              : t("form.no_streak_bonus", { multiplier: streakMultiplier.toFixed(1) });
+
+            const songDetailValue = pickedSongs
+              .flatMap((song) => [
+                song.arrangement ? ARRANGEMENT_META[song.arrangement].label : null,
+                song.hearingMinutes > 0
+                  ? t("flow.by_ear_value", { time: minutesLabel(song.hearingMinutes) })
+                  : null,
+              ])
+              .filter(Boolean)
+              .join(" · ");
+
+            // What the session holds so far, one line per song or category.
+            const summaryLines: SessionSummaryLine[] = isSongMode
+              ? pickedSongs.map((song) => ({
+                  key: song.id,
+                  label: song.title,
+                  minutes: songTotalMinutes(song),
+                  isName: true,
+                  leading: <SongCover size='sm' coverUrl={song.coverUrl} />,
+                }))
+              : isBySkill
+                ? pickedSkills.map((skill) => ({
+                    key: skill.id,
+                    label: tSkills(`skills.${skill.id}.name` as never),
+                    minutes: skillMinutes[skill.id] ?? 0,
+                    isName: false,
+                    leading: <CategoryBadge size='sm' category={skill.category} />,
+                  }))
+                : categories
+                    .filter(({ key }) => activeCategories.includes(key))
+                    .map(({ key, label }) => ({
+                      key,
+                      label,
+                      minutes: getCategoryMinutes(values, key),
+                      isName: false,
+                      leading: <CategoryBadge size='sm' category={key} />,
+                    }));
+
+            const detailMeta = {
+              song: { title: t("flow.detail_song"), description: t("flow.detail_song_hint") },
+              tags: { title: t("flow.detail_tags"), description: t("description.sesion_title") },
+              habits: { title: t("flow.detail_habits"), description: streakText },
+              day: {
+                title: t("form.when"),
+                description: t("description.max_days", { days: MAX_DAYS_BACK }),
+              },
+            }[detail];
+
+            const saveButton = (
+              <Button
+                type='submit'
+                size='lg'
+                loading={isFetching}
+                disabled={!hasTime || hasErrors}
+                className='h-12 w-full text-base'>
+                {isFetching ? t("form.saving") : t("flow.save")}
+              </Button>
+            );
 
             return (
               <>
                 <ReportFormLayout>
-                  {/* STEP 1: TIME TRACKING */}
-                  <div className='mb-12'>
-                    <div className='mb-8 flex flex-col gap-2'>
-                        <div className='flex items-center gap-3'>
-                          <div className={cn(
-                            'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-slow',
-                            isStep1Done ? "bg-emerald-500 text-black" : "bg-cyan-500/10 text-cyan-400"
-                          )}>
-                            {isStep1Done ? <Check className="h-5 w-5 stroke-[3]" /> : "1"}
-                          </div>
-                          <div className="flex-1">
-                            <h3 className='font-display text-xl font-bold text-zinc-100'>
-                              {t("exercise_type_title")}
-                            </h3>
-                          </div>
-                        </div>
-                        <p className={cn(
-                          "ml-12 text-sm font-medium transition-colors duration-slow",
-                          isStep1Done ? "text-emerald-400" : "text-zinc-400"
-                        )}>
-                          {isStep1Done
-                            ? t("form.time_entered")
-                            : isSongMode
-                              ? pickedSongs.length > 0
-                                ? t("form.song_selected")
-                                : t("form.pick_songs")
-                              : t("form.what_practiced")}
-                        </p>
-                    </div>
-
-                    <div className='mb-6 flex gap-1 rounded-lg bg-zinc-900/60 p-1'>
-                      {([
-                        { mode: "free" as const, label: t("form.mode_free"), Icon: Tags },
-                        { mode: "songs" as const, label: t("form.mode_songs"), Icon: Music },
-                      ]).map(({ mode, label, Icon }) => (
-                        <button
-                          key={mode}
-                          type='button'
-                          onClick={() => switchSessionMode(mode, setFieldValue)}
-                          className={cn(
-                            "flex flex-1 items-center justify-center gap-2 rounded py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
-                            sessionMode === mode
-                              ? "bg-cyan-500/10 text-cyan-400"
-                              : "text-zinc-500 hover:text-zinc-300"
-                          )}>
-                          <Icon className='h-4 w-4' />
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-
-                    {isSongMode ? (
-                      <SessionSongPicker
-                        userId={userAuth as string | null}
-                        selected={pickedSongs}
-                        onToggle={(song) => toggleSong(song, setFieldValue)}
-                        onSetMinutes={(pickedId, category, minutes) =>
-                          setSongMinutes(pickedId, category, minutes, setFieldValue)
+                  <div className='grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,42rem)_20rem] lg:justify-between lg:gap-12'>
+                    <div
+                      ref={flowTopRef}
+                      className='mx-auto flex w-full max-w-xl scroll-mt-24 flex-col gap-8 lg:mx-0 lg:max-w-none'>
+                      <StepHeader
+                        step={stepNumber}
+                        total={3}
+                        backLabel={t("flow.back")}
+                        onBack={
+                          step === "what"
+                            ? undefined
+                            : () => setStep(step === "time" ? "pick" : "what")
                         }
-                        onSetArrangement={setSongArrangement}
                       />
-                    ) : (
-                      <>
-                        <div className='mb-6 flex gap-1'>
-                          {([
-                            { input: "categories" as const, label: "By category" },
-                            { input: "skills" as const, label: "By skill" },
-                          ]).map(({ input, label }) => (
-                            <button
-                              key={input}
-                              type='button'
-                              aria-pressed={freeInput === input}
-                              onClick={() => switchFreeInput(input, setFieldValue)}
-                              className={cn(
-                                "rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
-                                freeInput === input
-                                  ? "bg-zinc-800 text-zinc-100"
-                                  : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
-                              )}>
-                              {label}
-                            </button>
-                          ))}
-                        </div>
 
-                        {freeInput === "skills" ? (
-                          <SessionSkillPicker
-                            value={skillMinutes}
-                            onToggle={(skillId) => toggleSkill(skillId, setFieldValue)}
-                            onSetMinutes={(skillId, minutes) =>
-                              setSkillMinutesFor(skillId, minutes, setFieldValue)
-                            }
-                          />
-                        ) : (
-                        <>
-                        {hasSavedTime && (
-                          <SavedTimeBanner
-                            timerData={timerData}
-                            onApply={() => applySavedTime(setFieldValue)}
-                            onDismiss={() => setSavedTimeApplied(true)}
-                          />
-                        )}
-
-                        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-                          {timeInputList.map(
-                            (
-                              { title, questionMarkProps, Icon, hoursName, minutesName, skillId },
-                              index
-                            ) => (
-                              <div key={index}>
-                                <TimeInputBox
-                                  errors={errors}
-                                  title={title}
-                                  questionMarkProps={questionMarkProps}
-                                  Icon={Icon}
-                                  hoursName={hoursName}
-                                  minutesName={minutesName}
-                                  skillId={skillId}
-                                />
-                              </div>
-                            )
-                          )}
-                        </div>
-                        </>
-                        )}
-                      </>
-                    )}
-                    <div className='mt-10'>
-                      <div className="flex flex-col items-center gap-4 md:items-end">
-                        <div className='flex items-center rounded-lg bg-zinc-900/60 px-6 py-4 backdrop-blur-md'>
-                          <div className="mr-6 flex flex-col items-start">
-                            <span className='mb-1.5 text-xs font-medium text-zinc-400'>
-                              {t("total_time")}
-                            </span>
-                            <span className='text-3xl font-bold leading-none text-zinc-100 tabular-nums'>
-                               {convertMsToHM(getSumTime(values))}
-                            </span>
-                          </div>
-
-                          {/* Always on screen, disabled until there's time to
-                              save — a missing button said nothing about why. */}
-                          <Button
-                            type='submit'
-                            loading={isFetching}
-                            disabled={!isStep1Done}
-                            className="bg-emerald-600 text-white hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-400 disabled:opacity-100"
-                          >
-                            <Check className="mr-2 h-4 w-4" />
-                            {t("form.save_now")}
-                          </Button>
-                        </div>
-
-                        {isStep1Done && (
-                          <p className="pr-4 text-xs font-medium text-zinc-300">
-                            {buildSaveSummary(values, t)}
-                          </p>
-                        )}
-                        {isStep1Done ? (
-                          <div className="mt-2 flex items-center gap-3 pr-4 duration-slow animate-in fade-in slide-in-from-top-2">
-                             <p className="text-sm font-semibold text-emerald-400">
-                                {t("form.more_details")}
-                             </p>
-                             <ArrowDown className="h-5 w-5 animate-bounce text-emerald-500" />
-                          </div>
-                        ) : (
-                          <p className="mt-1 text-sm text-zinc-500">{t("form.add_time_hint")}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* STEP 2: FOCUS & DETAILS (OPTIONAL) */}
-                  <div className={cn('mb-12 transition-all duration-slow', !isStep1Done ? "opacity-30 grayscale pointer-events-none" : "opacity-100")}>
-                    <div className='mb-6 flex items-center gap-3 pt-8'>
-                      <div className={cn(
-                        'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-slow',
-                        isStep2Completed
-                          ? "bg-emerald-500 text-black"
-                          : isStep1Done
-                            ? "bg-cyan-500/10 text-cyan-400"
-                            : "bg-zinc-800 text-zinc-500"
-                      )}>
-                         {isStep2Completed ? <Check className="h-5 w-5 stroke-[3]" /> : "2"}
-                      </div>
-                      <div className="flex items-baseline gap-3">
-                        <h3 className='font-display text-xl font-bold tracking-tight text-zinc-100'>
-                           {isSongMode ? t("form.healthy_habits") : t("form.focus_habits")}
-                        </h3>
-                        <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-xs font-medium text-zinc-400">{t("form.optional")}</span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                       {!isSongMode && (
-                       <div className="lg:col-span-12 xl:col-span-7 space-y-6">
-                        <div className='space-y-4'>
-                          <div className="flex items-center justify-between">
-                            <label className='font-sans text-sm font-bold text-zinc-400'>
-                              {t("form.session_title")}
-                            </label>
-                          </div>
-                          <div className='relative'>
-                            <Input
-                              name='reportTitle'
-                              placeholder={t("form.session_title_placeholder")}
-                              className={cn(
-                                "h-11 bg-zinc-900/40 text-sm focus-visible:ring-cyan-500/40",
-                                errors.reportTitle && "ring-1 ring-red-500/40"
-                              )}
-                              value={values.reportTitle}
-                              onChange={(e) => { setSelectedTags([]); setFieldValue("reportTitle", e.target.value); }}
+                      {/* QUESTION 1: WHAT */}
+                      {step === "what" && (
+                        <section className='flex flex-col gap-8 duration-base animate-in fade-in slide-in-from-bottom-1'>
+                          <h2 className='text-2xl font-bold tracking-tight text-zinc-100 sm:text-3xl'>
+                            {t("flow.q_what")}
+                          </h2>
+                          <div className='flex flex-col gap-4'>
+                            <ChoiceTile
+                              size='lg'
+                              icon={<Target size='1em' />}
+                              title={t("flow.kind_free")}
+                              hint={t("flow.kind_free_hint")}
+                              onClick={() => chooseMode("free", setFieldValue)}
                             />
-                            {errors.reportTitle && (
-                              <p className="mt-1.5 text-xs font-medium text-red-400">
-                                {errors.reportTitle}
+                            <ChoiceTile
+                              size='lg'
+                              icon={<Music size='1em' />}
+                              title={t("flow.kind_songs")}
+                              hint={t("flow.kind_songs_hint")}
+                              onClick={() => chooseMode("songs", setFieldValue)}
+                            />
+                          </div>
+
+                          {hasSavedTime && (
+                            <div className='flex flex-col gap-3'>
+                              <p className='text-sm font-semibold text-zinc-400'>
+                                {t("flow.shortcuts")}
                               </p>
-                            )}
-                          </div>
-                          
-                          <div className='space-y-5 pt-2'>
-                            {[
-                              { label: "Goal", icon: "🎯", tags: [
-                                { label: "Warmup", icon: "🎸" },
-                                { label: "Technique", icon: "⚡" },
-                                { label: "Speed Building", icon: "🏎️" },
-                                { label: "Ear Training", icon: "👂" },
-                              ]},
-                              { label: "Playing Style", icon: "🎸", tags: [
-                                { label: "Fingerpicking", icon: "🖐️" },
-                                { label: "Rhythm Training", icon: "🥁" },
-                                { label: "Vibrato", icon: "〰️" },
-                                { label: "Bends", icon: "🎯" },
-                              ]},
-                              { label: "Techniques", icon: "🧩", tags: [
-                                { label: "Legato", icon: "🌊" },
-                                { label: "Alt Picking", icon: "🔄" },
-                                { label: "Hybrid Picking", icon: "🤟" },
-                                { label: "Sweep Picking", icon: "🌪️" },
-                                { label: "Tapping", icon: "👆" },
-                                { label: "Picking Control", icon: "🤏" },
-                                { label: "String Skipping", icon: "⏩" },
-                                { label: "Down Picking", icon: "⬇️" },
-                              ]},
-                              { label: "Theory & Knowledge", icon: "🎼", tags: [
-                                { label: "Scales", icon: "🎹" },
-                                { label: "Arpeggios", icon: "🎼" },
-                                { label: "Chords", icon: "🔗" },
-                                { label: "Theory", icon: "📚" },
-                                { label: "Sight Reading", icon: "👁️" },
-                                { label: "Transcribing", icon: "🎧" },
-                              ]},
-                              { label: "Creative", icon: "🎵", tags: [
-                                { label: "Improvisation", icon: "✨" },
-                                { label: "New Song", icon: "🎵" },
-                                { label: "Song Writing", icon: "✍️" },
-                                { label: "Composition", icon: "🖊️" },
-                                { label: "Jamming", icon: "🔊" },
-                              ]},
-                              { label: "Performance", icon: "🎤", tags: [
-                                { label: "Performance Prep", icon: "🎭" },
-                                { label: "Performing", icon: "🎤" },
-                                { label: "Cover Song", icon: "🎵" },
-                                { label: "Soloing", icon: "🌟" },
-                                { label: "Recording", icon: "⏺️" },
-                              ]},
-                            ].map((group) => (
-                              <div key={group.label} className="space-y-2">
-                                <p className="text-xs font-semibold text-zinc-400">
-                                  {group.icon} {t(`tag_groups.${tagKey(group.label)}`, group.label)}
-                                </p>
-                                <div className='flex flex-wrap gap-2'>
-                                  {group.tags.map((tag) => {
-                                    const isActive = selectedTags.includes(tag.label);
-                                    return (
-                                      <button
-                                        key={tag.label}
-                                        type="button"
-                                        onClick={() => {
-                                          setSelectedTags(prev => {
-                                            const newTags = prev.includes(tag.label)
-                                              ? prev.filter((label) => label !== tag.label)
-                                              : [...prev, tag.label];
-                                            setFieldValue("reportTitle", newTags.map((label) => t(`tags.${tagKey(label)}`, label)).join(" + "));
-                                            return newTags;
-                                          });
-                                        }}
-                                        className={cn(
-                                          "group flex items-center gap-1.5 rounded border border-transparent px-3 py-1.5 text-xs font-semibold transition-[background-color,color,transform] duration-fast active:click-behavior-second focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
-                                          isActive
-                                            ? "border-cyan-500/30 bg-cyan-500/10 text-zinc-100"
-                                            : "bg-zinc-800/60 text-zinc-400 hover:bg-cyan-500/10 hover:text-cyan-400"
-                                        )}
-                                      >
-                                        <span className={cn("transition-opacity", isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100")}>{tag.icon}</span>
-                                        {t(`tags.${tagKey(tag.label)}`, tag.label)}
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                          </div>
-                       </div>
-                       )}
-
-                       <div className={cn(
-                         "lg:col-span-12 space-y-4",
-                         isSongMode ? "xl:col-span-12" : "xl:col-span-5"
-                       )}>
-                          <div className="flex items-center justify-between gap-2 px-1">
-                            <p className="text-lg font-bold text-zinc-200">{t("form.habits_checklist")}</p>
-                            <span
-                              className={cn(
-                                "flex shrink-0 items-center gap-1 rounded px-2 py-0.5 text-xs font-bold",
-                                hasStreakBonus
-                                  ? "bg-orange-500/10 text-orange-400"
-                                  : "bg-zinc-800 text-zinc-400"
-                              )}
-                              title={
-                                hasStreakBonus
-                                  ? t("form.streak_bonus", { count: streak, multiplier: streakMultiplier.toFixed(1) })
-                                  : t("form.no_streak_bonus", { multiplier: streakMultiplier.toFixed(1) })
-                              }>
-                              <Flame
-                                className={cn("h-3.5 w-3.5", !hasStreakBonus && "text-zinc-500")}
-                                aria-hidden
+                              <ChoiceTile
+                                quiet
+                                icon={<Timer size='1em' />}
+                                title={t("flow.timer_title")}
+                                hint={t("flow.timer_hint", {
+                                  time: formatPracticed(savedTimerSum),
+                                })}
+                                onClick={() => applyTimerShortcut(setFieldValue)}
                               />
-                              ×{streakMultiplier.toFixed(1)}
-                            </span>
+                            </div>
+                          )}
+                        </section>
+                      )}
+
+                      {/* QUESTION 2: WHICH */}
+                      {step === "pick" && (
+                        <section className='flex flex-col gap-8 duration-base animate-in fade-in slide-in-from-bottom-1'>
+                          <div className='flex flex-col gap-2'>
+                            <h2 className='text-2xl font-bold tracking-tight text-zinc-100 sm:text-3xl'>
+                              {isSongMode ? t("flow.q_songs") : t("flow.q_focus")}
+                            </h2>
+                            <p className='text-base text-zinc-400'>{t("flow.pick_hint")}</p>
                           </div>
-                          <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1'>
-                            {healthHabbitsList.map(
-                              ({ name, questionMarkProps, title }, index) => (
-                                <HealthHabbitsBox
-                                  key={name + index}
-                                  name={name}
-                                  title={title}
-                                  questionMarkProps={questionMarkProps}
-                                />
-                              )
-                            )}
-                          </div>
-                       </div>
-                    </div>
-                  </div>
 
-                  {/* STEP 3: LOGGING (OPTIONAL DETAILS) */}
-                  <div className={cn('scroll-mt-24 transition-all duration-slow', !isStep1Done ? "opacity-30 grayscale pointer-events-none" : "opacity-100")}>
-                    <div className="mb-8 pt-8">
-                      <div className='mb-6 flex items-center gap-3'>
-                        <div className={cn(
-                          'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors duration-slow',
-                          isStep1Done
-                            ? "bg-cyan-500/10 text-cyan-400"
-                            : "bg-zinc-800 text-zinc-500"
-                        )}>3</div>
-                        <div className="flex items-baseline gap-3">
-                          <h3 className='font-display text-lg font-bold text-zinc-100'>
-                             {t("form.finalize")}
-                          </h3>
-                          <span className="whitespace-nowrap rounded bg-zinc-800 px-2 py-0.5 text-xs font-medium text-zinc-400">{t("form.optional_details")}</span>
-                        </div>
-                      </div>
-
-                      <div className='flex flex-col items-center gap-8 py-4'>
-                          <div className='flex flex-col items-center gap-4'>
-                            <p className='text-xs font-semibold tracking-wide text-zinc-400'>{t("form.when")}</p>
-                            <div className='flex flex-wrap items-center justify-center gap-3'>
-                              {[0, 1, 2, 3, 4].map((days) => {
-                                const isSelected = values.countBackDays === days;
-                                const label = days === 0 ? t("form.today") : days === 1 ? t("form.yesterday") : t("form.days_ago", { count: days });
-
-                                return (
-                                  <Button
-                                    key={days}
+                          {isSongMode ? (
+                            <SessionSongPicker
+                              userId={userAuth as string | null}
+                              selected={pickedSongs}
+                              onToggle={(song) => toggleSong(song, setFieldValue)}
+                            />
+                          ) : (
+                            <div className='flex flex-col gap-4'>
+                              <div
+                                role='tablist'
+                                className='flex gap-1 self-start rounded-lg bg-zinc-900/60 p-1'>
+                                {(
+                                  [
+                                    { input: "categories", label: t("flow.by_category") },
+                                    { input: "skills", label: t("flow.by_skill") },
+                                  ] as const
+                                ).map(({ input, label }) => (
+                                  <button
+                                    key={input}
                                     type='button'
-                                    variant={isSelected ? "default" : "outline"}
-                                    onClick={() => setFieldValue("countBackDays", days)}
+                                    role='tab'
+                                    aria-selected={freeInput === input}
+                                    onClick={() => switchFreeInput(input, setFieldValue)}
                                     className={cn(
-                                      "border-transparent",
-                                      isSelected
-                                        ? "bg-cyan-500 font-bold text-black"
-                                        : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
+                                      "min-h-10 rounded px-4 py-2 text-sm font-semibold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                      freeInput === input
+                                        ? "bg-zinc-700/80 text-white"
+                                        : "text-zinc-400 hover:bg-zinc-800/70 hover:text-white"
                                     )}>
                                     {label}
-                                  </Button>
-                                );
-                              })}
-                            </div>
-                            <p className='text-xs font-medium text-zinc-400'>
-                              {t("form.selected")} <span className="text-zinc-200">{getDateFromPast(values.countBackDays).toLocaleDateString(intlLocale)}</span>
-                            </p>
-                          </div>
-
-                          <div className='mt-2 flex flex-col items-center gap-4'>
-                            {Object.keys(errors).length !== 0 && <ErrorBox errors={errors} />}
-                            <Button
-                              size='lg'
-                              type='submit'
-                              loading={isFetching}
-                              disabled={Object.keys(errors).length !== 0 || !isStep1Done}
-                             >
-                              <div className="flex items-center gap-2">
-                                <Check className='h-6 w-6 text-emerald-600' />
-                                <span>{isFetching ? t("form.saving") : t("form.finish_save")}</span>
+                                  </button>
+                                ))}
                               </div>
+
+                              {isBySkill ? (
+                                <SessionSkillPicker
+                                  value={skillMinutes}
+                                  onToggle={(skillId) => toggleSkill(skillId, setFieldValue)}
+                                />
+                              ) : (
+                                <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+                                  {categories.map(({ key, label, hint }) => (
+                                    <ChoiceTile
+                                      key={key}
+                                      leading={<CategoryBadge category={key} />}
+                                      title={label}
+                                      hint={hint}
+                                      selected={activeCategories.includes(key)}
+                                      onClick={() =>
+                                        toggleCategory(
+                                          key,
+                                          activeCategories.includes(key),
+                                          setFieldValue
+                                        )
+                                      }
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          <Button
+                            type='button'
+                            size='lg'
+                            className='h-12 text-base sm:min-w-56 sm:self-end'
+                            disabled={!canContinue}
+                            onClick={() => setStep("time")}>
+                            {t("flow.next")}
+                          </Button>
+                        </section>
+                      )}
+
+                      {/* QUESTION 3: HOW LONG — and the save */}
+                      {step === "time" && (
+                        <section className='flex flex-col gap-8 duration-base animate-in fade-in slide-in-from-bottom-1'>
+                          <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-3'>
+                            <h2 className='text-2xl font-bold tracking-tight text-zinc-100 sm:text-3xl'>
+                              {t("flow.q_time")}
+                            </h2>
+                            <Button
+                              type='button'
+                              variant='ghost'
+                              onClick={() => setStep("pick")}>
+                              <Plus />
+                              {isSongMode
+                                ? t("flow.change_songs")
+                                : isBySkill
+                                  ? t("flow.change_skills")
+                                  : t("flow.change_focus")}
                             </Button>
                           </div>
-                      </div>
+
+                          <div className='flex flex-col gap-3'>
+                            {isSongMode &&
+                              pickedSongs.map((song) => (
+                                <TimeBlock
+                                  key={song.id}
+                                  isName
+                                  leading={<SongCover coverUrl={song.coverUrl} />}
+                                  title={song.title}
+                                  subtitle={song.artist}
+                                  minutes={songTotalMinutes(song)}
+                                  max={MAX_SONG_CATEGORY_MINUTES}
+                                  onChange={(minutes) =>
+                                    updateSong(
+                                      song.id,
+                                      (picked) => withSongTotalMinutes(picked, minutes),
+                                      setFieldValue
+                                    )
+                                  }
+                                  onRemove={
+                                    pickedSongs.length > 1
+                                      ? () => toggleSong(song, setFieldValue)
+                                      : undefined
+                                  }
+                                />
+                              ))}
+
+                            {!isSongMode &&
+                              !isBySkill &&
+                              categories
+                                .filter(({ key }) => activeCategories.includes(key))
+                                .map(({ key, label }) => (
+                                  <TimeBlock
+                                    key={key}
+                                    leading={<CategoryBadge category={key} />}
+                                    title={label}
+                                    minutes={getCategoryMinutes(values, key)}
+                                    max={MAX_CATEGORY_MINUTES}
+                                    onChange={(minutes) =>
+                                      setMinutesField(
+                                        `${key}Hours`,
+                                        `${key}Minutes`,
+                                        Math.max(0, Math.min(minutes, MAX_CATEGORY_MINUTES)),
+                                        setFieldValue
+                                      )
+                                    }
+                                    onRemove={
+                                      activeCategories.length > 1
+                                        ? () => toggleCategory(key, true, setFieldValue)
+                                        : undefined
+                                    }
+                                  />
+                                ))}
+
+                            {isBySkill &&
+                              pickedSkills.map((skill) => (
+                                <TimeBlock
+                                  key={skill.id}
+                                  leading={<CategoryBadge category={skill.category} />}
+                                  title={tSkills(`skills.${skill.id}.name` as never)}
+                                  minutes={skillMinutes[skill.id] ?? 0}
+                                  max={MAX_SKILL_MINUTES}
+                                  onChange={(minutes) =>
+                                    setSkillMinutesFor(skill.id, minutes, setFieldValue)
+                                  }
+                                  onRemove={
+                                    pickedSkills.length > 1
+                                      ? () => toggleSkill(skill.id, setFieldValue)
+                                      : undefined
+                                  }
+                                />
+                              ))}
+                          </div>
+
+                          {/* Always in view: tucked behind a toggle, the habits
+                              (which earn points) went unticked. */}
+                          <div className='flex flex-col gap-3'>
+                            <p className='text-sm font-semibold text-zinc-300'>
+                              {t("flow.details")}{" "}
+                              <span className='font-normal text-zinc-400'>· {t("optional")}</span>
+                            </p>
+                            <div className='flex flex-col gap-2'>
+                              {isSongMode ? (
+                                <DetailRow
+                                  icon={<Music />}
+                                  label={t("flow.detail_song")}
+                                  value={songDetailValue || t("flow.whole_song")}
+                                  isSet={songDetailValue.length > 0}
+                                  onClick={() => openDetail("song")}
+                                />
+                              ) : (
+                                <DetailRow
+                                  icon={<Tags />}
+                                  label={t("flow.detail_tags")}
+                                  value={values.reportTitle.trim() || t("flow.none")}
+                                  isSet={values.reportTitle.trim().length > 0}
+                                  onClick={() => openDetail("tags")}
+                                />
+                              )}
+                              <DetailRow
+                                icon={<ListChecks />}
+                                label={t("flow.detail_habits")}
+                                value={
+                                  habitCount > 0
+                                    ? t("flow.habits_count", {
+                                        count: habitCount,
+                                        total: healthHabbitsList.length,
+                                      })
+                                    : t("flow.none")
+                                }
+                                isSet={habitCount > 0}
+                                onClick={() => openDetail("habits")}
+                              />
+                              <DetailRow
+                                icon={<CalendarDays />}
+                                label={t("flow.detail_when")}
+                                value={dayLabel(values.countBackDays)}
+                                isSet={values.countBackDays > 0}
+                                onClick={() => openDetail("day")}
+                              />
+                            </div>
+                          </div>
+
+                          {hasErrors && <ErrorBox errors={errors} />}
+
+                          {/* Wide screens save from the summary beside the questions. */}
+                          <div className='flex flex-col gap-3 rounded-lg bg-zinc-900/40 p-4 lg:hidden'>
+                            <div className='flex items-center gap-4'>
+                              <div className='flex w-32 shrink-0 flex-col'>
+                                <span className='text-xs font-medium text-zinc-400'>
+                                  {t("total_time")}
+                                </span>
+                                <span className='whitespace-nowrap text-2xl font-bold leading-tight tabular-nums text-zinc-100'>
+                                  {formatPracticed(totalMs)}
+                                </span>
+                              </div>
+                              <div className='min-w-0 flex-1'>{saveButton}</div>
+                            </div>
+                            {!hasTime && (
+                              <p className='text-sm text-zinc-400'>{t("flow.add_time_hint")}</p>
+                            )}
+                          </div>
+                        </section>
+                      )}
                     </div>
+
+                    {/* The session so far — always in view on wide screens. */}
+                    <aside className='hidden lg:block'>
+                      <SessionSummary
+                        lines={summaryLines}
+                        totalMs={totalMs}
+                        meta={
+                          step === "time"
+                            ? {
+                                dayLabel: dayLabel(values.countBackDays),
+                                habitsLabel: `${t("flow.detail_habits")} · ${t("flow.habits_count", {
+                                  count: habitCount,
+                                  total: healthHabbitsList.length,
+                                })}`,
+                                hasHabits: habitCount > 0,
+                                onOpenDay: () => openDetail("day"),
+                                onOpenHabits: () => openDetail("habits"),
+                              }
+                            : undefined
+                        }
+                        footer={
+                          step === "time" ? (
+                            <>
+                              {saveButton}
+                              {!hasTime && (
+                                <p className='text-sm text-zinc-400'>
+                                  {t("flow.add_time_hint")}
+                                </p>
+                              )}
+                            </>
+                          ) : undefined
+                        }
+                      />
+                    </aside>
                   </div>
                 </ReportFormLayout>
+
+                <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+                  <DialogContent className='dark-theme gap-6 sm:max-w-xl sm:overflow-y-auto'>
+                    <DialogHeader className='pr-10 text-left'>
+                      <DialogTitle>{detailMeta.title}</DialogTitle>
+                      <DialogDescription>{detailMeta.description}</DialogDescription>
+                    </DialogHeader>
+
+                    {detail === "song" && (
+                      <div className='flex flex-col gap-3'>
+                        {pickedSongs.map((song) => (
+                          <div
+                            key={song.id}
+                            className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-4'>
+                            <p
+                              translate='no'
+                              className='truncate text-base font-semibold text-zinc-100'>
+                              {song.title}
+                            </p>
+                            <ArrangementPicker
+                              value={song.arrangement ?? null}
+                              onChange={(arrangement) =>
+                                setSongArrangement(song.id, arrangement)
+                              }
+                              noneLabel={t("songs.any_part")}
+                              size='sm'
+                              className='bg-zinc-950/50'
+                            />
+                            <div className='flex flex-wrap items-center justify-between gap-3'>
+                              <span className='text-sm text-zinc-400'>{t("flow.by_ear")}</span>
+                              <MinutesStepper
+                                label={`${song.title} — ${t("hearing")}`}
+                                minutes={song.hearingMinutes}
+                                max={songTotalMinutes(song)}
+                                onChange={(minutes) =>
+                                  updateSong(
+                                    song.id,
+                                    (picked) => withSongHearingMinutes(picked, minutes),
+                                    setFieldValue
+                                  )
+                                }
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {detail === "tags" && (
+                      <SessionTagPicker
+                        title={values.reportTitle}
+                        titleError={errors.reportTitle}
+                        selectedTags={selectedTags}
+                        onTitleChange={(title) => {
+                          setSelectedTags([]);
+                          setFieldValue("reportTitle", title);
+                        }}
+                        onToggleTag={(label) => toggleTag(label, setFieldValue)}
+                      />
+                    )}
+
+                    {detail === "habits" && (
+                      <div className='flex flex-col gap-3'>
+                        {healthHabbitsList.map(({ name, questionMarkProps, title }) => (
+                          <HealthHabbitsBox
+                            key={name}
+                            name={name}
+                            title={title}
+                            questionMarkProps={questionMarkProps}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {detail === "day" && (
+                      <div role='radiogroup' className='flex flex-col gap-2'>
+                        {Array.from({ length: MAX_DAYS_BACK + 1 }, (_, days) => days).map(
+                          (days) => {
+                            const isSelected = values.countBackDays === days;
+                            return (
+                              <button
+                                key={days}
+                                type='button'
+                                role='radio'
+                                aria-checked={isSelected}
+                                onClick={() => {
+                                  setFieldValue("countBackDays", days);
+                                  setIsDetailOpen(false);
+                                }}
+                                className={cn(
+                                  "flex min-h-12 w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                  isSelected
+                                    ? "bg-zinc-100 text-zinc-950"
+                                    : "bg-zinc-900/40 text-zinc-200 hover:bg-zinc-800/60"
+                                )}>
+                                <span className='font-semibold'>{dayLabel(days)}</span>
+                                <span
+                                  className={cn(
+                                    "ml-auto tabular-nums",
+                                    isSelected ? "text-zinc-700" : "text-zinc-400"
+                                  )}>
+                                  {getDateFromPast(days).toLocaleDateString(intlLocale)}
+                                </span>
+                              </button>
+                            );
+                          }
+                        )}
+                      </div>
+                    )}
+
+                    {detail !== "day" && (
+                      <DialogFooter>
+                        <Button
+                          type='button'
+                          className='h-11 sm:h-9 sm:min-w-28'
+                          onClick={() => setIsDetailOpen(false)}>
+                          {t("flow.done")}
+                        </Button>
+                      </DialogFooter>
+                    )}
+                  </DialogContent>
+                </Dialog>
 
                 {acceptPopUpVisible && exceedingTime && (
                   <Backdrop selector='overlays'>

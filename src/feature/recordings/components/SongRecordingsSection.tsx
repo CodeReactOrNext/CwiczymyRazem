@@ -20,20 +20,20 @@ export const SongRecordingsSection = ({ songId, songTitle, songArtist }: SongRec
   const { recordings, isLoading, total } = useRecordings(undefined, songId);
 
   return (
-    <div className="bg-zinc-800/40 rounded-lg p-6 space-y-4 shadow-sm backdrop-blur-sm mt-8">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-4 rounded-lg bg-zinc-800/40 p-6">
+      <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Mic2 size={18} className="transition-all duration-slow text-zinc-700" />
-          <span className="text-sm font-semibold text-zinc-300">
+          <Mic2 className="h-4 w-4 text-zinc-500" />
+          <span className="text-sm font-semibold text-zinc-200">
             Recordings{total > 0 ? ` (${total})` : ""}
           </span>
         </div>
         <Button
           size="sm"
+          variant="ghost"
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-cyan-600 hover:bg-cyan-500 text-white"
         >
-          <Plus className="mr-1.5 h-4 w-4" />
+          <Plus className="h-4 w-4" />
           {t("view.add")}
         </Button>
       </div>

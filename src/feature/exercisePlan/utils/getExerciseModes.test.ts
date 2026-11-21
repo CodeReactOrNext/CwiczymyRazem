@@ -60,11 +60,11 @@ describe("the real library", () => {
 
   it("matches the counts the browse filter advertises", () => {
     const count = (mode: string) => visible.filter(e => getExerciseModes(e).includes(mode as never)).length;
-    expect(count("bpm")).toBe(230);
-    expect(count("tab")).toBe(178);
+    expect(count("bpm")).toBe(242);
+    expect(count("tab")).toBe(190);
     expect(count("strum")).toBe(34);
-    expect(count("fretboard")).toBe(36);
-    expect(count("ear")).toBe(17);
-    expect(count("noGuitar")).toBe(39);
+    expect(count("fretboard")).toBe(53);
+    expect(count("ear")).toBe(22);
+    expect(count("noGuitar")).toBe(57);
   });
 });

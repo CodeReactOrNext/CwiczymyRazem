@@ -3,6 +3,59 @@ import { useNow } from "feature/duels/hooks/useDuels";
 import { formatClock } from "feature/duels/utils/duelFormat";
 import { useTranslation } from "hooks/useTranslation";
 
+/** Three dots taking turns — "still looking", without a spinner's urgency. */
+export const SearchingDots = () => (
+  <span className='flex items-center gap-1' aria-hidden='true'>
+    {[0, 1, 2].map((i) => (
+      <span
+        key={i}
+        className='size-1.5 animate-pulse rounded-full bg-zinc-300'
+        style={{ animationDelay: `${i * 200}ms` }}
+      />
+    ))}
+  </span>
+);
+
+/**
+ * What is left of a duel as a bar burning down — white, orange once the
+ * reminder is due. Measured against the duel's own length, so one paired under
+ * an older limit reads right.
+ */
+export const DuelFuse = ({
+  createdAt,
+  endsAt,
+  now,
+  isEnding,
+  className,
+}: {
+  createdAt: number;
+  endsAt: number;
+  now: number;
+  isEnding: boolean;
+  className?: string;
+}) => {
+  const share = Math.max(
+    0,
+    Math.min(1, (endsAt - now) / Math.max(1, endsAt - createdAt)),
+  );
+  return (
+    <div
+      className={cn(
+        "h-1.5 overflow-hidden rounded-full bg-zinc-800",
+        className,
+      )}
+      aria-hidden='true'>
+      <div
+        className={cn(
+          "h-full rounded-full transition-[width] duration-1000",
+          isEnding ? "bg-orange-400" : "bg-zinc-100",
+        )}
+        style={{ width: `${share * 100}%` }}
+      />
+    </div>
+  );
+};
+
 /**
  * The duel clock, ticking every second. Its own component so only these
  * digits re-render each second, not the card around them.
@@ -104,58 +157,5 @@ export const FormGuide = ({
         </li>
       ))}
     </ol>
-  );
-};
-
-const SPARK_W = 112;
-const SPARK_H = 28;
-const SPARK_PAD = 3;
-
-/**
- * The rating across the recent duels as a thin line, the last point marked —
- * emerald when the last duel gained, zinc when it did not.
- */
-export const RatingSparkline = ({ trail }: { trail: number[] }) => {
-  const { t } = useTranslation("duels");
-  if (trail.length < 2) return null;
-  const min = Math.min(...trail);
-  const max = Math.max(...trail);
-  const span = max - min || 1;
-  const points = trail.map((value, i) => {
-    const x = SPARK_PAD + (i / (trail.length - 1)) * (SPARK_W - SPARK_PAD * 2);
-    // A flat trail sits in the middle instead of on the floor.
-    const y =
-      max === min
-        ? SPARK_H / 2
-        : SPARK_PAD + (1 - (value - min) / span) * (SPARK_H - SPARK_PAD * 2);
-    return [x, y] as const;
-  });
-  const [lastX, lastY] = points[points.length - 1];
-  const gained = trail[trail.length - 1] > trail[trail.length - 2];
-
-  return (
-    <svg
-      viewBox={`0 0 ${SPARK_W} ${SPARK_H}`}
-      width={SPARK_W}
-      height={SPARK_H}
-      role='img'
-      aria-label={t("form.trend_aria")}
-      className='overflow-visible'>
-      <polyline
-        points={points.map(([x, y]) => `${x},${y}`).join(" ")}
-        fill='none'
-        stroke='currentColor'
-        strokeWidth={1.5}
-        strokeLinejoin='round'
-        strokeLinecap='round'
-        className='text-zinc-500'
-      />
-      <circle
-        cx={lastX}
-        cy={lastY}
-        r={3}
-        className={gained ? "fill-emerald-400" : "fill-zinc-300"}
-      />
-    </svg>
   );
 };

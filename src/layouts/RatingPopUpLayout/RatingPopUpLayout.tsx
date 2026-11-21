@@ -13,13 +13,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import { playUiSound } from "lib/uiSounds/uiSounds";
-import { ArrowRight, Brain, Ear, Flame, Hand, Music, NotebookPen, RotateCcw, Sparkles, Trophy } from "lucide-react";
+import { ArrowRight, Brain, Check, Ear, Flame, Hand, Music, NotebookPen, RotateCcw, Sparkles, Trophy } from "lucide-react";
 import Router from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import {
-  Area, AreaChart, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ReferenceLine, ResponsiveContainer, XAxis,
-} from "recharts";
 import type { StatisticsDataInterface } from "types/api.types";
 import {
   getDailyStreakMultiplier,
@@ -44,7 +41,6 @@ import { buildFameBreakdown, buildPointsBreakdown } from "./utils/rewardBreakdow
 const MIN = 60 * 1000;
 // Streak lengths worth a headline of their own on the celebration screen.
 const STREAK_MILESTONES = [7, 30, 100, 365];
-const DAILY_GOAL_MIN = 30; // goal line on the weekly chart
 // Time points are floor(ms × TIME_POINTS_VALUE), so this is the practice time the
 // *first* point actually costs (~3min). Derived from the rate in
 // constants/ratingValue so the "no points" screen can never quote a stale number.
@@ -94,6 +90,8 @@ interface RatingPopUpProps {
   restartLabel?: string;
   /** Scored exercises of this session — each gets its leaderboard placing. */
   scoredRuns?: ScoredRun[];
+  /** Set only after an exam: false turns the celebration into a plain "not passed". */
+  examPassed?: boolean;
 }
 
 // ─── Card shell ───────────────────────────────────────────────────────────────
@@ -112,6 +110,24 @@ function CardHeading({ icon, children, suffix }: { icon?: React.ReactNode; child
   );
 }
 
+/** A duration as big digits with small units, so the number leads and "min" follows. */
+function BigTime({ minutes }: { minutes: number }) {
+  const hours = Math.floor(minutes / 60);
+  const unit = "text-3xl font-semibold text-zinc-400";
+  return (
+    <p className="flex items-baseline gap-1.5 font-teko text-6xl font-bold leading-none tabular-nums text-zinc-100">
+      {hours > 0 && (
+        <>
+          <span>{hours}</span>
+          <span className={cn(unit, "mr-1.5")}>h</span>
+        </>
+      )}
+      <span>{minutes % 60}</span>
+      <span className={unit}>min</span>
+    </p>
+  );
+}
+
 const RatingPopUpLayout = ({
   ratingData,
   currentUserStats,
@@ -122,6 +138,7 @@ const RatingPopUpLayout = ({
   onRestart,
   restartLabel,
   scoredRuns = [],
+  examPassed,
 }: RatingPopUpProps) => {
   const { t } = useTranslation("session_summary");
   const intlLocale = useIntlLocale();
@@ -136,10 +153,14 @@ const RatingPopUpLayout = ({
     sessionBreakdown,
   } = useRatingPopUp({ ratingData, currentUserStats, previousUserStats, activityData });
 
+  // A failed exam still logs its practice, but nothing about it is a win:
+  // no fanfare, no full-screen celebration, and Kostek says so.
+  const examFailed = examPassed === false;
+
   // One cue as the summary lands — the biggest thing that happened wins.
-  const summaryCue = isGetNewLevel ? "levelUp" : newAchievements.length > 0 ? "reward" : "sessionComplete";
+  const summaryCue = isGetNewLevel ? "levelUp" : newAchievements.length > 0 ? "reward" : examFailed ? null : "sessionComplete";
   useEffect(() => {
-    playUiSound(summaryCue);
+    if (summaryCue) playUiSound(summaryCue);
     // Once per summary, not again when the cue would read differently later.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -149,7 +170,7 @@ const RatingPopUpLayout = ({
   const fame = ratingData.fameEarned ?? 0;
   const isRest = ratingData.totalPoints <= 0;
   // A session that earned something opens on the full-screen celebration first.
-  const [celebrating, setCelebrating] = useState(!isRest);
+  const [celebrating, setCelebrating] = useState(!isRest && !examFailed);
 
   const handleContinue = () => (onClick ? onClick(false) : Router.push("/dashboard"));
 
@@ -210,7 +231,7 @@ const RatingPopUpLayout = ({
   // so "0" reads as "not yet", not as a bug.
   const firstPointPct = Math.min(100, Math.round((sessionTimeMs / FIRST_POINT_MS) * 100));
 
-  // weekly chart — last 7 calendar days.
+  // streak row — last 7 calendar days.
   // Timezone-safe: every report instant is bucketed by its *local* calendar day
   // (dayStr → getFullYear/Month/Date), the exact basis used by the activity
   // heatmap and getReconciledStreak — so a session never drifts to a neighbour
@@ -235,62 +256,6 @@ const RatingPopUpLayout = ({
       };
     });
   }, [activityData, intlLocale]);
-  const weekTotalMin = weekData.reduce((acc, d) => acc + d.minutes, 0);
-
-  // skill balance — last 7 days vs previous 7 days
-  const { radarData, radarRows } = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const start = (back: number) => {
-      const d = new Date(today);
-      d.setDate(d.getDate() - back);
-      return dayStr(d);
-    };
-    const lastStart = start(6); // last 7 incl. today
-    const prevStart = start(13);
-    const prevEnd = start(7);
-
-    const sum = (s: string, e: string) => {
-      const acc: Record<CatKey, number> = { technique: 0, theory: 0, hearing: 0, creativity: 0 };
-      for (const d of activityData) {
-        const key = dayStr(new Date(d.date));
-        if (key >= s && key <= e) {
-          acc.technique += d.techniqueTime;
-          acc.theory += d.theoryTime;
-          acc.hearing += d.hearingTime;
-          acc.creativity += d.creativityTime;
-        }
-      }
-      return acc;
-    };
-
-    const cur = sum(lastStart, dayStr(today));
-    const prv = sum(prevStart, prevEnd);
-
-    // one shared scale for every axis and both periods — normalising per
-    // category would pin each vertex to 100 and draw a full diamond
-    const scaleMax = Math.max(1, ...CATS.flatMap((c) => [cur[c.key], prv[c.key]]));
-
-    const radarData = CATS.map((c) => ({
-      cat: c.key,
-      prev: Math.round((prv[c.key] / scaleMax) * 100),
-      current: Math.round((cur[c.key] / scaleMax) * 100),
-    }));
-    const radarRows = CATS.map((c) => ({
-      ...c,
-      curMin: Math.round(cur[c.key] / MIN),
-      deltaMin: Math.round((cur[c.key] - prv[c.key]) / MIN),
-    }));
-    return { radarData, radarRows };
-  }, [activityData]);
-
-  // ── render helpers ──
-
-  const renderWeeklyDot = (props: { cx?: number; cy?: number; index?: number }) => {
-    const { cx, cy, index } = props;
-    if (cx == null || cy == null || index !== weekData.length - 1) return <g key={`dot-${index}`} />;
-    return <circle key={`dot-${index}`} cx={cx} cy={cy} r={5} fill="#22d3ee" stroke="#09090b" strokeWidth={2} />;
-  };
 
   const content = (
     <motion.div
@@ -312,7 +277,7 @@ const RatingPopUpLayout = ({
           <HeroPattern className="opacity-[0.03]" maskImage="radial-gradient(ellipse at top, black 10%, transparent 70%)" />
           <div className="relative flex flex-col items-center gap-5">
             {/* Nothing counted: Kostek glances aside and shrugs — no blame, just "not yet". */}
-            <Kostek mood="shrug" lookAt="left" delay={0.3} className="h-28" />
+            <Kostek mood={examFailed ? "sad" : "shrug"} lookAt="left" delay={0.3} className="h-28" />
 
             <div className="flex flex-col items-center gap-3">
               <p className="text-xl font-semibold text-zinc-100">{t("no_points_title")}</p>
@@ -351,18 +316,18 @@ const RatingPopUpLayout = ({
                 <Button
                   variant="ghost"
                   onClick={onRestart}
-                  className="w-full gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto shortwide:w-auto"
+                  className="w-full text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto shortwide:w-auto"
                 >
-                  <RotateCcw className="mr-2 h-4 w-4" aria-hidden />
+                  <RotateCcw className="h-4 w-4" aria-hidden />
                   {restartLabel ?? t("practise_more")}
                 </Button>
               )}
               <Button
                 onClick={handleContinue}
-                className="w-full gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto shortwide:w-auto"
+                className="w-full bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto shortwide:w-auto"
               >
                 {t("back_to_dashboard")}
-                <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                <ArrowRight className="h-4 w-4" aria-hidden />
               </Button>
             </div>
           </div>
@@ -381,13 +346,24 @@ const RatingPopUpLayout = ({
               {/* The slot keeps its height while the celebration is up, so the
                   card does not jump when Kostek flies in from it. */}
               <div className="mx-auto mb-4 flex h-28 justify-center md:h-32">
-                {!celebrating && (
-                  <motion.div layoutId={MASCOT_LAYOUT_ID} transition={{ type: "spring", stiffness: 140, damping: 20 }}>
-                    <Kostek lively arrive className="h-28 md:h-32" />
-                  </motion.div>
+                {examFailed ? (
+                  <Kostek mood="sad" delay={0.3} className="h-28 md:h-32" />
+                ) : (
+                  !celebrating && (
+                    <motion.div layoutId={MASCOT_LAYOUT_ID} transition={{ type: "spring", stiffness: 140, damping: 20 }}>
+                      <Kostek lively arrive className="h-28 md:h-32" />
+                    </motion.div>
+                  )
                 )}
               </div>
-              <p className="text-sm font-medium text-zinc-400">{t("great_progress")}</p>
+              {examFailed ? (
+                <div className="space-y-1">
+                  <p className="text-xl font-semibold text-red-400">{t("exam_failed")}</p>
+                  <p className="text-sm text-zinc-400">{t("exam_failed_body")}</p>
+                </div>
+              ) : (
+                <p className="text-sm font-medium text-zinc-400">{t("great_progress")}</p>
+              )}
 
               {/* The two rewards stand side by side once there is room: stacked,
                   the Fame receipt pushed Continue below the fold of a laptop. Each
@@ -486,18 +462,18 @@ const RatingPopUpLayout = ({
                   <Button
                     variant="ghost"
                     onClick={onRestart}
-                    className="w-full gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto shortwide:w-auto"
+                    className="w-full text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto shortwide:w-auto"
                   >
-                    <RotateCcw className="mr-2 h-4 w-4" aria-hidden />
+                    <RotateCcw className="h-4 w-4" aria-hidden />
                     {restartLabel ?? t("repeat_session")}
                   </Button>
                 )}
                 <Button
                   onClick={handleContinue}
-                  className="w-full gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto shortwide:w-auto"
+                  className="w-full bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto shortwide:w-auto"
                 >
                   {t("continue")}
-                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                  <ArrowRight className="h-4 w-4" aria-hidden />
                 </Button>
               </div>
             </div>
@@ -534,7 +510,7 @@ const RatingPopUpLayout = ({
             {/* Session time */}
             <Card className="h-full">
               <CardHeading>{t("session_time")}</CardHeading>
-              <p className="font-teko text-6xl font-bold leading-none tabular-nums text-zinc-100">{fmtMin(Math.round(sessionTimeMs / MIN))}</p>
+              <BigTime minutes={Math.round(sessionTimeMs / MIN)} />
 
               <div className="mt-8 space-y-5">
                 {CATS.map((c) => ({ ...c, ms: sessionBreakdown[c.key] || 0 }))
@@ -546,12 +522,14 @@ const RatingPopUpLayout = ({
                       <div key={c.key} className="flex items-center gap-3">
                         <c.Icon size={15} className="shrink-0 text-zinc-400" />
                         <div className="flex-1">
-                          <div className="mb-1.5 flex items-center justify-between text-xs">
+                          <div className="mb-2 flex items-center justify-between text-sm">
                             <span className="font-medium text-zinc-300">{t(`cat.${c.key}`)}</span>
-                            <span className="font-semibold tabular-nums text-zinc-400">{fmtMin(Math.round(c.ms / MIN))}</span>
+                            <span className="font-semibold tabular-nums text-zinc-100">{fmtMin(Math.round(c.ms / MIN))}</span>
                           </div>
-                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-                            <div className="h-full rounded-full bg-cyan-500/50" style={{ width: `${pct}%` }} />
+                          <div className="h-3 w-full overflow-hidden rounded-full bg-zinc-800">
+                            <div className="relative h-full rounded-full bg-cyan-600" style={{ width: `${pct}%` }}>
+                              <span aria-hidden className="absolute inset-x-1.5 top-[3px] h-[3px] rounded-full bg-white/20" />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -562,11 +540,12 @@ const RatingPopUpLayout = ({
 
             {/* Streak */}
             <Card className="h-full">
-              <CardHeading icon={<Flame className="h-4 w-4 text-orange-500" />}>{t("streak")}</CardHeading>
+              <CardHeading>{t("streak")}</CardHeading>
 
               <div className="flex items-baseline gap-2">
-                <span className="font-teko text-6xl font-bold leading-none tabular-nums text-zinc-100">{streak}</span>
-                <span className="text-sm font-medium text-zinc-400">{t("days_in_a_row")}</span>
+                <Flame className="h-10 w-10 shrink-0 self-center fill-orange-400 text-orange-400" aria-hidden />
+                <span className="font-teko text-6xl font-bold leading-none tabular-nums text-orange-400">{streak}</span>
+                <span className="text-sm font-medium text-zinc-400">{t("days_in_a_row", { count: streak })}</span>
               </div>
 
               {streakBonusPct > 0 && (
@@ -580,17 +559,16 @@ const RatingPopUpLayout = ({
                 {weekData.map((d, i) => {
                   const active = d.minutes > 0 || (d.isToday && didPracticeToday);
                   return (
-                    <div key={i} className="flex flex-1 flex-col items-center gap-2">
+                    <div key={i} className="flex flex-1 flex-col items-center gap-2.5">
                       <div
                         className={cn(
-                          "flex h-11 w-full items-center justify-center rounded",
-                          active ? "bg-orange-500/15" : "bg-zinc-800",
-                          d.isToday && "ring-1 ring-orange-400/70"
+                          "flex aspect-square w-full max-w-[2.5rem] items-center justify-center rounded-full",
+                          active ? "bg-orange-500" : "bg-zinc-800/60"
                         )}
                       >
-                        {active && <Flame className="h-4 w-4 text-orange-400/80" aria-hidden />}
+                        {active && <Check className="h-5 w-5 text-zinc-950" strokeWidth={3} aria-hidden />}
                       </div>
-                      <span className={cn("text-[10px] font-medium", d.isToday ? "text-zinc-300" : "text-zinc-500")}>
+                      <span className={cn("text-xs", d.isToday ? "font-bold text-zinc-100" : "font-medium text-zinc-500")}>
                         {d.isToday ? t("today") : d.label.slice(0, 1)}
                       </span>
                     </div>
@@ -603,86 +581,6 @@ const RatingPopUpLayout = ({
           {/* ── The climb ahead, and anything already owed ── */}
           <NextUpCard />
 
-          {/* ── Weekly insight + Skill balance ── */}
-          <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 shortwide:grid-cols-2">
-            {/* Weekly — the chart takes whatever height the taller neighbour
-                gives the card, so there is no empty half under it. */}
-            <Card className="flex h-full flex-col">
-              <CardHeading>{t("this_week")}</CardHeading>
-              <p className="font-teko text-6xl font-bold leading-none tabular-nums text-zinc-100">{fmtMin(weekTotalMin)}</p>
-              <div className="mt-8 min-h-[180px] w-full flex-1">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={weekData} margin={{ top: 8, right: 28, left: 4, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="weekGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis
-                      dataKey="label"
-                      interval={0}
-                      padding={{ left: 14, right: 14 }}
-                      tick={{ fontSize: 11, fill: "#a1a1aa" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <ReferenceLine
-                      y={DAILY_GOAL_MIN}
-                      stroke="#3f3f46"
-                      strokeDasharray="4 4"
-                      label={{ value: t("goal"), position: "right", fontSize: 9, fill: "#52525b" }}
-                    />
-                    <Area dataKey="minutes" type="monotone" stroke="#22d3ee" strokeWidth={2} fill="url(#weekGrad)" dot={renderWeeklyDot} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </Card>
-
-            {/* Skill balance */}
-            <Card className="h-full">
-              <CardHeading suffix={<span className="text-xs text-zinc-500">· {t("last_7_days")}</span>}>{t("skill_balance")}</CardHeading>
-
-              <div className="h-[260px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  {/* 70% leaves margin so edge labels (Creativity/Theory) aren't
-                      clipped on narrow mobile cards */}
-                  <RadarChart data={radarData} outerRadius="70%">
-                    <PolarGrid stroke="#3f3f46" />
-                    <PolarAngleAxis dataKey="cat" tick={{ fontSize: 11, fill: "#a1a1aa" }} tickFormatter={(key: string) => t(`cat.${key}`)} />
-                    <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
-                    <Radar dataKey="prev" stroke="#52525b" fill="#52525b" fillOpacity={0.12} />
-                    <Radar dataKey="current" stroke="#22d3ee" fill="#22d3ee" fillOpacity={0.25} />
-                  </RadarChart>
-                </ResponsiveContainer>
-              </div>
-
-              <div className="mt-2 flex justify-center gap-5">
-                <span className="flex items-center gap-1.5 text-xs text-zinc-400">
-                  <span className="h-2 w-2 rounded-full bg-cyan-400" /> {t("this_week")}
-                </span>
-                <span className="flex items-center gap-1.5 text-xs text-zinc-500">
-                  <span className="h-2 w-2 rounded-full bg-zinc-600" /> {t("previous")}
-                </span>
-              </div>
-
-              <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
-                {radarRows.map((c) => (
-                  <div key={c.key} className="flex min-w-0 items-center gap-2.5">
-                    <c.Icon size={14} className="shrink-0 text-zinc-400" />
-                    <span className="min-w-0 flex-1 truncate text-xs text-zinc-300">{t(`cat.${c.key}`)}</span>
-                    <span className="whitespace-nowrap text-xs font-semibold tabular-nums text-zinc-200">{fmtMin(c.curMin)}</span>
-                    {c.deltaMin !== 0 && (
-                      <span className={cn("whitespace-nowrap text-[10px] font-bold tabular-nums", c.deltaMin > 0 ? "text-emerald-400" : "text-zinc-500")}>
-                        {c.deltaMin > 0 ? "+" : ""}{c.deltaMin}min
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-
           {/* ── Way out, always in reach ──
               The summary is several screens long on a phone and Continue sat
               under the rewards, a scroll away. Pinned to the bottom edge it is
@@ -693,18 +591,18 @@ const RatingPopUpLayout = ({
                 <Button
                   variant="ghost"
                   onClick={onRestart}
-                  className="h-11 flex-1 gap-0 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+                  className="h-11 flex-1 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
                 >
-                  <RotateCcw className="mr-2 h-4 w-4 shrink-0" aria-hidden />
+                  <RotateCcw className="h-4 w-4 shrink-0" aria-hidden />
                   <span className="truncate">{restartLabel ?? t("repeat_session")}</span>
                 </Button>
               )}
               <Button
                 onClick={handleContinue}
-                className="h-11 flex-1 gap-0 bg-white font-semibold text-zinc-950 hover:bg-zinc-200"
+                className="h-11 flex-1 bg-white font-semibold text-zinc-950 hover:bg-zinc-200"
               >
                 {t("continue")}
-                <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                <ArrowRight className="h-4 w-4" aria-hidden />
               </Button>
             </div>
           )}

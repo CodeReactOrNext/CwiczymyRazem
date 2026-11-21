@@ -25,23 +25,27 @@ const formatTimeLeft = (ms: number): string => {
 const formatScore = (score: number) => score.toLocaleString();
 
 /**
- * Places sit side by side while they fit (full or half width) and stack on
- * phones. The tiles only get a background from `sm` up: on a phone the card is
- * the one level of panel, and the places read as a plain list inside it — the
- * negative margin puts place numbers back on the card's text edge, while the
- * rows keep their padding for the "you" highlight.
+ * The board is a short list beside the exercise, one place per row. The rows
+ * get no background of their own — the card is the one level of panel — except
+ * the player's own, which is tinted. On a phone the negative margin puts place
+ * numbers back on the card's text edge while the rows keep their padding for
+ * that tint.
  */
-const PODIUM_GRID =
-  "-mx-3 grid grid-cols-1 gap-1 sm:mx-0 sm:grid-cols-[repeat(auto-fit,minmax(11rem,1fr))] sm:gap-3";
-const TILE = "flex min-w-0 items-center gap-3 rounded-lg px-3 py-2 sm:px-4 sm:py-3";
+const BOARD = "-mx-3 flex flex-col gap-1 sm:mx-0";
+const ROW =
+  "grid grid-cols-[1.25rem_2rem_minmax(0,1fr)_auto] items-center gap-x-3 rounded-lg px-3 py-2.5";
 
-const PlaceNumber = ({ place }: { place: number }) => (
-  <span className='w-5 shrink-0 text-center text-sm font-bold tabular-nums text-zinc-400'>
-    {place}.
+const PlaceNumber = ({ place, isMe }: { place: number; isMe?: boolean }) => (
+  <span
+    className={cn(
+      "text-center text-sm font-bold tabular-nums",
+      isMe ? "text-cyan-300" : "text-zinc-400",
+    )}>
+    {place}
   </span>
 );
 
-const PodiumTile = ({
+const BoardRow = ({
   entry,
   place,
   isMe,
@@ -50,8 +54,8 @@ const PodiumTile = ({
   place: number;
   isMe: boolean;
 }) => (
-  <li className={cn(TILE, isMe && "bg-cyan-500/10")}>
-    <PlaceNumber place={place} />
+  <li className={cn(ROW, isMe && "bg-cyan-500/10")}>
+    <PlaceNumber place={place} isMe={isMe} />
     <Avatar
       avatarURL={entry.avatar || undefined}
       name={entry.displayName}
@@ -66,19 +70,25 @@ const PodiumTile = ({
         {entry.displayName}
       </span>
       <span className='block text-xs tabular-nums text-zinc-400'>
-        {formatScore(entry.score)} · {entry.accuracy}%
-        {entry.bpm ? ` · ${entry.bpm} BPM` : null}
+        {entry.accuracy}%{entry.bpm ? ` · ${entry.bpm} BPM` : null}
       </span>
+    </span>
+    <span
+      className={cn(
+        "text-[15px] font-bold tabular-nums",
+        isMe ? "text-cyan-300" : "text-zinc-100",
+      )}>
+      {formatScore(entry.score)}
     </span>
   </li>
 );
 
-const OpenTile = ({ place }: { place: number }) => {
+const OpenRow = ({ place }: { place: number }) => {
   const { t } = useTranslation("dashboard");
   return (
-    <li className={TILE}>
+    <li className={ROW}>
       <PlaceNumber place={place} />
-      <span className='size-8 shrink-0 rounded-full bg-zinc-800/80' />
+      <span className='size-8 rounded-full border-2 border-dashed border-zinc-600' />
       <span className='min-w-0 truncate text-sm font-semibold text-zinc-400'>
         {t("daily_exercise.open_spot")}
       </span>
@@ -87,9 +97,64 @@ const OpenTile = ({ place }: { place: number }) => {
 };
 
 /**
+ * How far the player's best run is from the prize: a bar that fills toward the
+ * leader's score, or stands full once the player is the leader.
+ */
+const ChaseBar = ({
+  me,
+  top,
+}: {
+  me: DailyExerciseEntry & { rank: number };
+  top: readonly DailyExerciseEntry[];
+}) => {
+  const { t } = useTranslation("dashboard");
+  const isLeading = me.rank === 1;
+  const leader = top[0];
+  const runnerUp = top[1];
+  if (!isLeading && !leader) return null;
+
+  const percent = isLeading
+    ? 100
+    : Math.min(100, (me.score / Math.max(1, leader.score)) * 100);
+
+  return (
+    <div className='flex flex-col gap-2'>
+      <div className='flex items-baseline justify-between gap-3 text-[13px] font-semibold tabular-nums'>
+        {isLeading ? (
+          <span className='text-amber-400'>{t("daily_exercise.leading")}</span>
+        ) : (
+          <span className='text-zinc-100'>
+            {t("daily_exercise.your_best", { score: formatScore(me.score) })}
+          </span>
+        )}
+        <span className='text-zinc-400'>
+          {isLeading
+            ? runnerUp &&
+              t("daily_exercise.ahead_of_second", {
+                gap: formatScore(me.score - runnerUp.score),
+              })
+            : t("daily_exercise.gap_to_first", {
+                gap: formatScore(leader.score - me.score),
+              })}
+        </span>
+      </div>
+      <div className='h-3.5 overflow-hidden rounded-full bg-zinc-700/50'>
+        <div
+          className={cn(
+            "h-full rounded-full transition-[width] duration-slow",
+            isLeading ? "bg-amber-400" : "bar-shine bg-cyan-400",
+          )}
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+    </div>
+  );
+};
+
+/**
  * One exercise, the same for everyone, for one UTC day — scored by pitch
- * detection. The card names the exercise and what #1 wins, with the button
- * and the time left beside it, and the podium underneath. A run counts whenever the
+ * detection. On the left the exercise, what #1 wins, how far the player is
+ * from it and the button; on the right the board. A run counts whenever the
  * exercise is played through with the mic on, wherever it was started from.
  */
 export const DailyExerciseWidget = () => {
@@ -111,64 +176,80 @@ export const DailyExerciseWidget = () => {
 
   return (
     <Card className='flex h-full flex-col p-5 sm:p-6'>
-      <WidgetHeader title={t("daily_exercise.title")} />
+      <WidgetHeader
+        title={t("daily_exercise.title")}
+        className='mb-6'
+        action={
+          <span className='flex shrink-0 items-center gap-1.5 text-[13px] font-semibold tabular-nums text-orange-400'>
+            <Clock size={14} strokeWidth={2.5} aria-hidden />
+            {t("daily_exercise.time_left", { time: formatTimeLeft(msLeft) })}
+          </span>
+        }
+      />
 
-      <div className='flex flex-wrap items-center gap-4'>
-        {board?.prize ? (
-          <DailyPrizeArt prize={board.prize} />
-        ) : (
-          <div className='size-14 shrink-0 rounded bg-zinc-800' />
-        )}
+      <div className='flex flex-wrap items-center gap-x-14 gap-y-6'>
+        <div className='flex min-w-0 flex-[1_1_20rem] flex-col gap-6'>
+          <div className='flex items-center gap-4'>
+            {board?.prize ? (
+              <DailyPrizeArt
+                prize={board.prize}
+                className='size-[72px] rounded-lg'
+              />
+            ) : (
+              <div className='size-[72px] shrink-0 rounded-lg bg-zinc-800' />
+            )}
+            <div className='min-w-0'>
+              <h4 className='text-xl font-bold text-zinc-100'>
+                {localizeExercise(exercise).title}
+              </h4>
+              {board?.prize && (
+                <p className='mt-1.5 text-sm text-zinc-400'>
+                  {t("daily_exercise.wins")}{" "}
+                  <DailyPrizeName prize={board.prize} />
+                </p>
+              )}
+            </div>
+          </div>
 
-        <div className='min-w-0 flex-[1_1_14rem]'>
-          <h4 className='text-lg font-semibold text-zinc-100'>
-            {localizeExercise(exercise).title}
-          </h4>
-          {board?.prize && (
-            <p className='mt-1 text-sm text-zinc-400'>
-              {t("daily_exercise.wins")} <DailyPrizeName prize={board.prize} />
-            </p>
-          )}
-        </div>
+          {me && <ChaseBar me={me} top={board?.top ?? []} />}
 
-        <div className='flex shrink-0 flex-col items-center gap-2'>
           <Link
             href={`/practice/exercise/${exercise.id}`}
-            className={cn(buttonVariants(), "h-11 px-5")}>
+            className={cn(buttonVariants(), "h-12 self-start px-8 text-[15px]")}>
             <Play size={16} className='fill-current' />
             {me ? t("daily_exercise.beat_score") : t("daily_exercise.play")}
           </Link>
-          <span className='flex items-center gap-1.5 text-xs tabular-nums text-zinc-400'>
-            <Clock size={12} className='text-zinc-500' />
-            {t("daily_exercise.new_in", { time: formatTimeLeft(msLeft) })}
-          </span>
         </div>
-      </div>
 
-      {leaderboard.isLoading ? (
-        <div className={cn(PODIUM_GRID, "mt-6")}>
-          {Array.from({ length: DAILY_PODIUM_SIZE }, (_, i) => (
-            <Skeleton key={i} className='h-14 w-full rounded-lg' />
-          ))}
-        </div>
-      ) : leaderboard.isError ? (
-        <p className='mt-6 text-sm text-zinc-400'>{t("daily_exercise.board_error")}</p>
-      ) : (board?.top?.length ?? 0) === 0 ? null : (
-        <ol className={cn(PODIUM_GRID, "mt-6")}>
-          {dailyPodium(board?.top ?? [], me).map((slot, i) =>
-            slot ? (
-              <PodiumTile
-                key={slot.entry.userId}
-                entry={slot.entry}
-                place={slot.place}
-                isMe={slot.entry.userId === uid}
-              />
-            ) : (
-              <OpenTile key={`open-${i}`} place={i + 1} />
-            ),
-          )}
-        </ol>
-      )}
+        {leaderboard.isLoading ? (
+          <div className='flex max-w-md flex-[1_1_18rem] flex-col gap-1'>
+            {Array.from({ length: DAILY_PODIUM_SIZE }, (_, i) => (
+              <Skeleton key={i} className='h-14 w-full rounded-lg' />
+            ))}
+          </div>
+        ) : leaderboard.isError ? (
+          <p className='flex-[1_1_18rem] text-sm text-zinc-400'>
+            {t("daily_exercise.board_error")}
+          </p>
+        ) : (board?.top?.length ?? 0) === 0 ? null : (
+          <div className='min-w-0 max-w-md flex-[1_1_18rem]'>
+            <ol className={BOARD}>
+              {dailyPodium(board?.top ?? [], me).map((slot, i) =>
+                slot ? (
+                  <BoardRow
+                    key={slot.entry.userId}
+                    entry={slot.entry}
+                    place={slot.place}
+                    isMe={slot.entry.userId === uid}
+                  />
+                ) : (
+                  <OpenRow key={`open-${i}`} place={i + 1} />
+                ),
+              )}
+            </ol>
+          </div>
+        )}
+      </div>
     </Card>
   );
 };

@@ -315,6 +315,71 @@
     "permanent": true
   },
   {
+    "source": "/exercises/interval-click-minor-2nd",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-major-2nd",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-minor-3rd",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-major-3rd",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-perfect-4th",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-tritone",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-perfect-5th",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-minor-6th",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-major-6th",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-minor-7th",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-major-7th",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-inversion-pairs",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-click-g-b-crossing",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
     "source": "/exercises/string-sweep-low-e",
     "destination": "/guitar-scale-practice-routine",
     "permanent": true
@@ -347,6 +412,86 @@
   {
     "source": "/exercises/interval-hunt",
     "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-hunt-seconds-thirds",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-hunt-pillars",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-hunt-sixths-sevenths",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-hunt-all-eleven",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-minor-2nd",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-major-2nd",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-minor-3rd",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-major-3rd",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-perfect-4th",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-tritone",
+    "destination": "/intermediate-guitar-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-perfect-5th",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-minor-6th",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-major-6th",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-minor-7th",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-major-7th",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/interval-tunes-octave",
+    "destination": "/daily-guitar-practice-plan",
     "permanent": true
   },
   {
@@ -1082,6 +1227,31 @@
   {
     "source": "/exercises/ear-tuning-intervals",
     "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-interval-seconds",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-interval-thirds",
+    "destination": "/beginner-guitar-exercises",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-interval-pillars",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-interval-sixths-sevenths",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/ear-interval-blend",
+    "destination": "/daily-guitar-practice-plan",
     "permanent": true
   },
   {

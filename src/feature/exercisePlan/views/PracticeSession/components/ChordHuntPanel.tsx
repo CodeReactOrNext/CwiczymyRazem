@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
@@ -23,7 +24,7 @@ interface ChordHuntPanelProps {
  */
 export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEnabled, isListening }: ChordHuntPanelProps) {
   const { t } = useTranslation("session");
-  const { chordHunt, noteHuntSecondsLeft, huntTarget, volumeRef, advanceHunt, markChordTone } = useNoteMatchingContext();
+  const { chordHunt, noteHuntSecondsLeft, noteHuntSecondsTotal, huntTarget, volumeRef, advanceHunt, markChordTone } = useNoteMatchingContext();
 
   // Read the live chord from context (not the prop) so it updates through the
   // memoized desktop content wrapper when the chord rotates.
@@ -46,6 +47,7 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
       <HuntStats
         score={isMicEnabled ? score : undefined}
         secondsLeft={isRotating ? noteHuntSecondsLeft : null}
+        secondsTotal={noteHuntSecondsTotal}
         complete={allFound}
       />
 
@@ -136,13 +138,9 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
 
       {/* Manual advance — works with or without the mic */}
       {isRotating && (
-        <button
-          type="button"
-          onClick={advanceHunt}
-          className="mt-1 inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        >
-          Next <ArrowRight size='1em' className="h-3.5 w-3.5 text-zinc-400" />
-        </button>
+        <Button type="button" variant="ghost" onClick={advanceHunt} className="mt-1">
+          {t("hunt.next")} <ArrowRight aria-hidden />
+        </Button>
       )}
     </div>
   );

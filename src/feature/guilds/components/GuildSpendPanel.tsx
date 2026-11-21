@@ -35,8 +35,6 @@ const LOOK: Record<
     surface: string;
     text: string;
     bar: string;
-    button: string;
-    buttonStrong: string;
   }
 > = {
   tokens: {
@@ -44,16 +42,12 @@ const LOOK: Record<
     surface: "bg-cyan-950/25",
     text: "text-cyan-300",
     bar: "bg-cyan-400",
-    button: "bg-cyan-500/15 text-cyan-200 hover:bg-cyan-500/25",
-    buttonStrong: "bg-cyan-500/30 text-cyan-100 hover:bg-cyan-500/40",
   },
   fame: {
     hex: "#fbbf24",
     surface: "bg-amber-950/25",
     text: "text-amber-400",
     bar: "bg-amber-400",
-    button: "bg-amber-500/15 text-amber-200 hover:bg-amber-500/25",
-    buttonStrong: "bg-amber-500/30 text-amber-100 hover:bg-amber-500/40",
   },
 };
 
@@ -196,7 +190,7 @@ export const GuildSpendPanel = ({
               have,
               need: amountOf(t, currency, need),
             })}
-            className='h-2.5 overflow-hidden rounded-full bg-zinc-950/60'>
+            className='h-3 overflow-hidden rounded-full bg-zinc-950/60'>
             <div
               className={cn(
                 "h-full rounded-full transition-[width] duration-slow",
@@ -214,10 +208,10 @@ export const GuildSpendPanel = ({
 };
 
 /**
- * One amount a member can put in, as an actual button rather than a ghost
- * link — solid tinted fill in the currency's own colour, the coin and the
- * number at a size worth tapping. The amount that finishes the pot gets the
- * stronger fill and says so, so it reads as the one worth pressing.
+ * One amount a member can put in, as a key. The panel and the coin already say
+ * which currency this is, so the key itself stays neutral — a dark face for an
+ * ordinary amount, and the app's white primary for the one that finishes the
+ * pot, which also says so. One white key per panel is the one worth pressing.
  */
 export const PledgeButton = ({
   currency,
@@ -234,7 +228,6 @@ export const PledgeButton = ({
   onClick: () => void;
 }) => {
   const { t } = useTranslation("guilds");
-  const look = LOOK[currency];
 
   return (
     <button
@@ -245,7 +238,9 @@ export const PledgeButton = ({
         PRESSABLE,
         "border-b-black/30",
         "flex items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-sm font-bold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40",
-        finishes ? look.buttonStrong : look.button,
+        finishes
+          ? "bg-white text-zinc-950 hover:bg-zinc-200"
+          : "bg-zinc-950/50 text-zinc-100 hover:bg-zinc-950/70",
       )}>
       +
       <CurrencyIcon currency={currency} size={18} />

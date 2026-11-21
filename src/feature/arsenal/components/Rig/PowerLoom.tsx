@@ -282,9 +282,8 @@ interface PowerRailProps {
  * brick's own edges, so the proportions can change without the silkscreen
  * sliding out from under them.
  *
- * The name and the rating are silkscreened here rather than left to the panel
- * above the board, because that is where they are on the real thing — and
- * because a player looking at a full brick is already looking here.
+ * The face is bare metal, vents and lamps: no name, no rating. See the note on
+ * the vents below.
  */
 export const PowerRail = ({
   rail,
@@ -305,9 +304,6 @@ export const PowerRail = ({
   const grain = `${uid}-grain`;
 
   const { brick, supply } = rail;
-  /** What is silkscreened on it: whose it is, and how many pedals it feeds. */
-  const name = supply.name;
-  const legend = `${supply.outputs} OUTPUTS`;
 
   const lit = (index: number) => live && used.has(index);
   const stubs = rail.sockets.filter(
@@ -347,32 +343,20 @@ export const PowerRail = ({
   } ${brick.x - leadRun * 0.66} ${RAIL_H - 0.75} ${-3} ${RAIL_H - 0.2}`;
 
   /**
-   * The name, split where a brand splits: the make in ink, the model number in
-   * the same copper as the outputs. A trailing number is how these things are
-   * named — it is the count of holes — so it is set apart rather than trailing
-   * off the end of the word.
-   */
-  const named = /^(.*?)(?:\s+(\d+))?$/.exec(name);
-  const brand = named?.[1] || name;
-  const model = named?.[2] ?? "";
-
-  /** The rating plate at the far end of the face. */
-  const plateW = legend.length * 0.78 + 2;
-  const plateX = inner.x + inner.w - 0.4 - plateW + 0.4;
-
-  /**
-   * Cooling slots, in banks, on whatever face is left between the badge and the
-   * rating plate. A supply is the one box on a board that has to shed heat, and
-   * the slots are most of what tells it apart from a patch bay at a glance. The
+   * Cooling slots, in banks, along the face between the left cap and the mains
+   * lamp. A supply is the one box on a board that has to shed heat, and the
+   * slots are most of what tells it apart from a patch bay at a glance. The
    * smallest brick has no face to spare and goes without, which is also true of
    * the small ones on a shelf.
+   *
+   * The face carries no lettering. It used to be silkscreened with the model's
+   * name and "N OUTPUTS", but the outputs are right there to be counted, each
+   * with its number, and the name is on the brick's tooltip.
    */
-  const badgeEnd =
-    inner.x +
-    0.9 +
-    brand.length * 1.43 +
-    (model ? 0.72 + model.length * 1.06 : 0);
-  const ventRoom = plateX - VENT_MARGIN - (badgeEnd + VENT_MARGIN);
+  const badgeEnd = inner.x;
+  const lampRoom = 2.4;
+  const ventRoom =
+    inner.x + inner.w - lampRoom - VENT_MARGIN - (badgeEnd + VENT_MARGIN);
   const bankW = VENT_SLOTS * VENT_PITCH - (VENT_PITCH - VENT_W);
   const banks = Math.min(
     VENT_MAX_BANKS,
@@ -781,70 +765,8 @@ export const PowerRail = ({
         </g>
       ))}
 
-      {/* Silkscreen: whose it is on the left, what it gives on the right.
-          Printed twice — a dark copy a hair low, a light one over it — because
-          that is the bite ink has on a brushed face, and one flat grey string
-          is the difference between a badge and a label. */}
-      {[
-        { dy: 0.11, ink: "#000000", mark: "#000000", opacity: 0.55 },
-        { dy: 0, ink: "#e4e7ec", mark: DC_CORE_LIVE, opacity: 0.86 },
-      ].map((pass) => (
-        <text
-          key={pass.ink}
-          x={inner.x + 0.9}
-          y={nameY + pass.dy}
-          fill={pass.ink}
-          opacity={pass.opacity}
-          fontSize={1.5}
-          letterSpacing={0.44}
-          fontFamily='ui-sans-serif, system-ui, sans-serif'
-          fontWeight={800}>
-          {brand.toUpperCase()}
-          {model && (
-            <tspan
-              dx={0.72}
-              fill={pass.mark}
-              fontWeight={700}
-              letterSpacing={0.16}>
-              {model}
-            </tspan>
-          )}
-        </text>
-      ))}
-      {/* The rating, on its own etched plate at the other end — where a spec is
-          stamped, and far enough from the name that neither is reading as part
-          of the other. */}
-      <rect
-        x={plateX}
-        y={nameY - 1.18}
-        width={plateW}
-        height={1.66}
-        rx={0.28}
-        fill='#08090b'
-        opacity={0.72}
-      />
-      <rect
-        x={plateX}
-        y={nameY + 0.41}
-        width={plateW}
-        height={0.07}
-        rx={0.03}
-        fill='#ffffff'
-        opacity={0.16}
-      />
-      <text
-        x={inner.x + inner.w - 2.1}
-        y={nameY}
-        textAnchor='end'
-        fill='#d7dce4'
-        opacity={live ? 0.85 : 0.45}
-        fontSize={1.16}
-        letterSpacing={0.16}
-        fontFamily='ui-sans-serif, system-ui, sans-serif'
-        fontWeight={700}>
-        {legend}
-      </text>
-      {/* The mains lamp beside the rating: green while the brick is fed. */}
+      {/* The mains lamp at the far end of the face: green while the brick is
+          fed. */}
       <circle
         cx={inner.x + inner.w - 1.25}
         cy={nameY - 0.4}

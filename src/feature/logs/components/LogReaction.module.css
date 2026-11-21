@@ -3,11 +3,63 @@
  *   0 ms    the coin squashes and flips up; the "+N" lifts off the button
  *   120 ms  the new total pops into the freed slot
  *   460 ms  the coin lands — a soft pulse and a handful of coins spill out
+ *   640 ms  the settled coin turns edge-on and is gone
+ *   780 ms  the check turns in from the other side, pops, and its tick draws
  * Plain keyframes on transform/opacity only, so nothing runs in JS per frame.
  */
 
+/* The second animation takes the transform over once the toss has finished. */
 .toss {
-  animation: toss 640ms both;
+  animation:
+    toss 640ms both,
+    coin-out 160ms 640ms ease-in forwards;
+}
+
+@keyframes coin-out {
+  from {
+    transform: rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: rotateY(90deg) scale(0.7);
+    opacity: 0;
+  }
+}
+
+/*
+ * The paid-out check. It sits in the slot from the click on, hidden under the
+ * tossed coin, and is the very element the button keeps afterwards — nothing
+ * is swapped when the celebration ends.
+ */
+.checkIn {
+  animation: check-in 260ms 780ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+/* Turns in and settles, with no overshoot: a pop here read as the mark
+   hopping. It ends on no transform at all, so dropping the class afterwards
+   changes nothing on screen. */
+@keyframes check-in {
+  from {
+    transform: rotateY(-90deg) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* The tick is one stroke (~23 units long): drawn in once the disc faces front. */
+.checkIn svg path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: tick-draw 220ms 960ms ease-out forwards;
+}
+
+@keyframes tick-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes toss {
@@ -185,7 +237,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toss,
   .pop,
   .hint,
   .receipt[data-state] {
@@ -194,8 +245,16 @@
 
   .lift,
   .pulse,
-  .drift {
+  .drift,
+  .toss {
     display: none;
+  }
+
+  /* No toss to wait for: the check is simply there. */
+  .checkIn,
+  .checkIn svg path {
+    animation: none;
+    stroke-dashoffset: 0;
   }
 
   .hint {

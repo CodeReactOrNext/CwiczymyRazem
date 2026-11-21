@@ -3,11 +3,43 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { HuntPromptCard, HuntTargetCard } from "./HuntStage";
+import { HuntPromptCard, HuntStats, HuntTargetCard } from "./HuntStage";
 
 // No global setup file in this project, so cleanup is explicit — otherwise the
 // second render finds the first one's tile still in the document.
 afterEach(cleanup);
+
+describe("HuntStats countdown", () => {
+  const fill = () => screen.getByRole("progressbar").firstElementChild as HTMLElement;
+
+  it("shows the time left as a draining bar and in words", () => {
+    render(<HuntStats score={2} secondsLeft={8} secondsTotal={16} />);
+    expect(screen.getByText("8 s left")).toBeDefined();
+    expect(fill().style.transform).toBe("scaleX(0.5)");
+    expect(fill().className).toContain("bg-cyan-400");
+  });
+
+  it("turns amber from 5 seconds and red from 3", () => {
+    render(<HuntStats secondsLeft={5} secondsTotal={15} />);
+    expect(fill().className).toContain("bg-amber-400");
+    cleanup();
+    render(<HuntStats secondsLeft={3} secondsTotal={15} />);
+    expect(fill().className).toContain("bg-red-400");
+  });
+
+  it("fills green and says so once the round is solved", () => {
+    render(<HuntStats secondsLeft={4} secondsTotal={15} complete />);
+    expect(screen.getByText("Solved")).toBeDefined();
+    expect(fill().style.transform).toBe("scaleX(1)");
+    expect(fill().className).toContain("bg-emerald-400");
+  });
+
+  it("draws no bar for drills without a countdown", () => {
+    render(<HuntStats score={1} secondsLeft={null} />);
+    expect(screen.queryByRole("progressbar")).toBeNull();
+    expect(screen.getByText("★ 1")).toBeDefined();
+  });
+});
 
 describe("HuntTargetCard", () => {
   const renderValue = (value: string) => {

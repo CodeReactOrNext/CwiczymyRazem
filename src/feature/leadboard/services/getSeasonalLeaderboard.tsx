@@ -12,6 +12,7 @@ import { memoryCache } from "utils/cache/memoryCache";
 import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
 
+import { attachGuildBadges } from "./attachGuildBadges";
 import { mapSeasonalUser } from "./getLeaderboardNeighbors";
 
 export const getSeasonalLeaderboard = async (
@@ -52,8 +53,9 @@ export const getSeasonalLeaderboard = async (
 
     const querySnapshot = await trackedGetDocs(q);
 
-    const users = querySnapshot.docs.map((doc) =>
-      mapSeasonalUser(doc.id, doc.data())
+    // Season documents carry no guild tag; it is read off the user documents.
+    const users = await attachGuildBadges(
+      querySnapshot.docs.map((doc) => mapSeasonalUser(doc.id, doc.data())),
     );
 
     const result = {

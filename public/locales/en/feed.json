@@ -63,6 +63,24 @@
   "ranking_hint": "Click to view the ranking for this exercise",
   "new_since_last_visit": "New since your last visit",
   "show_more": "Show more",
+  "show_more_count": "Show {{count}} more",
+  "practiced_item": "practiced {{item}}",
+  "fought_boss": "fought {{item}}",
+  "phase_cleared": "phase {{phase}} cleared",
+  "logged_session": "logged a practice session",
+  "reached_level": "reached level {{level}}",
+  "stat": {
+    "points": "Points",
+    "time": "Time",
+    "score": "Score",
+    "accuracy": "Accuracy",
+    "tempo": "Tempo",
+    "place": "Place",
+    "price": "Price",
+    "rarity": "Rarity",
+    "level": "Level",
+    "rating": "Rating"
+  },
   "just_now": "just now",
   "activity_kind": {
     "plan": "Plan",
@@ -126,8 +144,6 @@
     "days_left_other": "{{count}} days left",
     "duel_won": "{{winner}} beat {{loser}}",
     "duel_draw": "{{winner}} and {{loser}} drew",
-    "record_label": "New record",
-    "record_title": "{{name}} took #1 on {{exercise}}",
     "boss_label": "Boss fight",
     "boss_title": "{{name}} cleared phase {{phase}} of {{boss}}"
   },

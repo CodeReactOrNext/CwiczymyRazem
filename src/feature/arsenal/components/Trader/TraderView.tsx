@@ -33,10 +33,10 @@ import { RestockTimer } from "./RestockTimer";
  * request of its own — the only thing it needs from the server is what the player
  * has already taken today, which rides along with the arsenal data.
  *
- * One heading for the counter with the restock clock beside it, then two
- * shelves built the same way: a heading, a line on what the shelf is for, and
- * a grid of cards on one shared surface. The day's mod leads the first shelf
- * on a double card; the parts follow it in the same grid.
+ * Two shelves on the same surface, each under a heading and nothing else. The
+ * tab already says "Trader", so the view has no title of its own; the restock
+ * clock sits beside the first shelf's heading. The day's mod leads that shelf
+ * with the counter's one white key, and the parts follow it as a price list.
  */
 export const TraderView = () => {
   const shop = useTraderShop();
@@ -103,35 +103,16 @@ export const TraderView = () => {
     arsenal?.components?.filter((c) => c.defId === offer.roll.defId).length ??
     0;
 
-  const listed = [...parts, ...components];
-  const partsTaken = listed.filter((o) => remainingOf(o.id) === 0).length;
   const modTaken = mod ? remainingOf(mod.id) === 0 : false;
 
   return (
     <div className='flex flex-col gap-8'>
-      <div className='flex flex-wrap items-end justify-between gap-x-8 gap-y-4'>
-        <div>
-          <h2 className='font-display text-2xl font-black text-zinc-100'>
-            {t("view.tabs.trader")}
-          </h2>
-          <p className='mt-1 text-sm text-zinc-500'>
-            {t("trader.subtitle")}
-          </p>
-        </div>
-        <RestockTimer restockAt={shop.restockAt} />
-      </div>
-
       <section className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
         <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1'>
-          <h3 className='text-lg font-bold text-zinc-100'>{t("trader.parts_mods")}</h3>
-          <p className='text-xs text-zinc-500'>
-            {partsTaken + (modTaken ? 1 : 0) === 0
-              ? t("trader.nothing_taken")
-              : t("trader.slots_cleared", {
-                  taken: partsTaken + (modTaken ? 1 : 0),
-                  total: listed.length + (mod ? 1 : 0),
-                })}
-          </p>
+          <h2 className='text-lg font-bold text-zinc-100'>
+            {t("trader.parts_mods")}
+          </h2>
+          <RestockTimer restockAt={shop.restockAt} />
         </div>
 
         {/* The day's mod is a loose component sold like the parts, so it sits
@@ -153,11 +134,10 @@ export const TraderView = () => {
               "hidden gap-x-6 px-4 pb-1 text-xs text-zinc-500 xl:grid",
               PART_ROW_COLS,
             )}>
-            <span>{t("trader.col_part")}</span>
+            <span />
             <span>{t("trader.col_in_stash")}</span>
-            <span>{t("trader.col_left_today")}</span>
-            <span>{t("trader.col_price_each")}</span>
-            <span className='w-[20.5rem]' />
+            <span>{t("trader.col_left")}</span>
+            <span />
           </div>
           {parts.map((offer) => (
             <PartOfferRow
@@ -186,14 +166,12 @@ export const TraderView = () => {
 
       {items.length > 0 && (
         <section className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
-          <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1'>
-            <h3 className='text-lg font-bold text-zinc-100'>{t("trader.featured_gear")}</h3>
-            <p className='text-xs text-zinc-500'>
-              {t("trader.featured_hint")}
-            </p>
-          </div>
+          <h2 className='text-lg font-bold text-zinc-100'>
+            {t("trader.featured_gear")}
+          </h2>
 
-          <div className='grid grid-cols-1 gap-4 xsm:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
+          {/* Four a day, so four across: a fifth column left the row a gap. */}
+          <div className='grid grid-cols-1 gap-4 xsm:grid-cols-2 lg:grid-cols-4'>
             {items.map((offer) => (
               <ItemOfferCard
                 key={offer.id}

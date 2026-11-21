@@ -1,10 +1,8 @@
-import { PRESSABLE_KEY } from "assets/components/ui/button";
-import { Checkbox } from "assets/components/ui/checkbox";
-import { Label } from "assets/components/ui/label";
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { playGuitarNotePreview, preloadGuitarNotePreview } from "feature/exercisePlan/hooks/useTablatureAudio/notePreview";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, Volume2 } from "lucide-react";
+import { Volume2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { CLICK_EXAM_MISTAKE_LIMIT, useNoteMatchingContext } from "../contexts/NoteMatchingContext";
@@ -14,8 +12,8 @@ import {
   pickReferenceMidi,
   saveClickHuntNoteSoundPreference,
 } from "../helpers/clickHuntNoteSound";
-import { ClickableFretboard, FullNeckToggle, LeftyToggle, useShowFullNeck } from "./ClickableFretboard";
-import { HuntStage, HuntStats, HuntTargetCard } from "./HuntStage";
+import { ClickableFretboard, useShowFullNeck } from "./ClickableFretboard";
+import { HuntFooter, HuntStage, HuntStats, HuntTargetCard, HuntViewMenu } from "./HuntStage";
 
 interface ClickHuntPanelProps {
   targetNote: string;
@@ -48,7 +46,7 @@ const stripFretRange = (description?: string) =>
  */
 export function ClickHuntPanel({ targetNote: targetNoteProp, description, startFret, endFret, strings, isPlaying, onStart, isExamMode, onDevPassExam }: ClickHuntPanelProps) {
   const { t } = useTranslation("session");
-  const { clickHunt, huntTarget, noteHuntSecondsLeft, advanceHunt, registerFretClick } = useNoteMatchingContext();
+  const { clickHunt, huntTarget, noteHuntSecondsLeft, noteHuntSecondsTotal, advanceHunt, registerFretClick } = useNoteMatchingContext();
   const mistakeCount = clickHunt?.mistakeCount ?? 0;
 
   const targetNote = huntTarget ?? targetNoteProp;
@@ -136,6 +134,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
           score={score}
           mistakes={isExamMode ? { count: mistakeCount, limit: CLICK_EXAM_MISTAKE_LIMIT } : undefined}
           secondsLeft={isRotating ? noteHuntSecondsLeft : null}
+          secondsTotal={noteHuntSecondsTotal}
           complete={complete}
         />
       }
@@ -162,45 +161,27 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
         />
       }
       footer={
-        <div className="flex flex-row flex-wrap items-center justify-center gap-x-3 gap-y-2">
+        <HuntFooter onNext={isRotating ? advanceHunt : undefined}>
           {totalTargets > 1 && (
-            <p className={cn("text-sm font-extrabold tabular-nums transition-colors", complete ? "text-emerald-400" : "text-zinc-300")}>
+            <p className={cn("px-1 text-sm font-extrabold tabular-nums transition-colors", complete ? "text-emerald-400" : "text-zinc-300")}>
               {complete ? "★ all positions found" : `${foundCount} / ${totalTargets} found`}
             </p>
           )}
-          {isRotating && (
-            <button
-              type="button"
-              onClick={advanceHunt}
-              className={cn(PRESSABLE_KEY, "inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring")}>
-              Next <ArrowRight size='1em' className="h-3.5 w-3.5 text-zinc-400" />
-            </button>
-          )}
-
-          {/* Settings — quieter than Next and parked next to it, so they stay
-              reachable without sitting in the reading path above the neck. */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:ml-2">
-            <button
-              type="button"
-              onClick={playReference}
-              disabled={referenceMidi === null}
-              className={cn(PRESSABLE_KEY, "inline-flex items-center gap-2 rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50")}
-              title={t("click_hunt.play_note")}>
-              <Volume2 size='1em' className="h-3 w-3 text-zinc-400" /> Hear it
-            </button>
-            <FullNeckToggle value={showFullNeck} onChange={setShowFullNeck} />
-            <LeftyToggle />
-            <div className="flex items-center gap-2 px-1">
-              <Checkbox
-                id="click-hunt-note-sound"
-                checked={noteSound}
-                onCheckedChange={(checked) => toggleNoteSound(checked === true)}
-              />
-              <Label htmlFor="click-hunt-note-sound" className="cursor-pointer text-xs font-semibold text-zinc-400">
-                {t("interval_click.autoplay")}
-              </Label>
-            </div>
-          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={playReference}
+            disabled={referenceMidi === null}
+            title={t("click_hunt.play_note")}>
+            <Volume2 aria-hidden className="text-zinc-400" /> {t("click_hunt.hear_it")}
+          </Button>
+          <HuntViewMenu
+            showFullNeck={showFullNeck}
+            onShowFullNeckChange={setShowFullNeck}
+            noteSound={noteSound}
+            onNoteSoundChange={toggleNoteSound}
+          />
 
           {process.env.NODE_ENV !== "production" && !complete && totalTargets > 0 && (
             <button
@@ -220,7 +201,7 @@ export function ClickHuntPanel({ targetNote: targetNoteProp, description, startF
               🏁 Pass whole exam (dev)
             </button>
           )}
-        </div>
+        </HuntFooter>
       }
     />
   );

@@ -39,38 +39,27 @@ const RigGuitarTile = ({
   const level = getItemLevel(item, guitar);
 
   const tile = (
-    <div
-      className='group/tile relative flex h-16 w-16 cursor-pointer items-center justify-center overflow-hidden rounded-xl transition-transform duration-base'
-      style={{
-        background: `linear-gradient(175deg, ${rs.baseColor}22 0%, #0c0c10 45%, #0c0c10 100%)`,
-        boxShadow: `inset 0 0 0 1px ${rs.baseColor}55, 0 2px 8px rgba(0,0,0,0.5)`,
-      }}>
-      {/* Rarity glow backdrop */}
-      <div
-        className='pointer-events-none absolute h-12 w-12 translate-y-2 rounded-full blur-[16px]'
-        style={{
-          background: `radial-gradient(circle at center, ${rs.baseColor}70 0%, ${rs.baseColor}20 50%, transparent 75%)`,
-        }}
+    // Flat tile: the rarity is a faint tint of the face, not a glow or a ring —
+    // the guitar is what the eye should land on.
+    // Flat tile: the rarity is a faint tint of the face, not a glow or a ring —
+    // the guitar is what the eye should land on.
+    <div className='relative flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-zinc-800/40 transition-colors duration-base hover:bg-zinc-800/70'>
+      <span
+        aria-hidden
+        className='pointer-events-none absolute inset-0'
+        style={{ backgroundColor: `${rs.baseColor}1a` }}
       />
       <img
         src={getRankBadgeSrc(guitar.imageId, "small")}
         alt={`${guitar.brand} ${guitar.name}`}
-        className='relative z-10 h-[52px] w-[52px] -rotate-45 object-contain drop-shadow-[0_3px_4px_rgba(0,0,0,0.7)]'
+        className='relative h-8 w-8 -rotate-45 object-contain'
         draggable={false}
       />
-      {/* Guitar level badge */}
-      <div
-        className='absolute bottom-1 right-1 z-20 flex items-center justify-center rounded text-xs font-black leading-none text-white'
-        style={{
-          minWidth: 22,
-          height: 18,
-          padding: "0 4px",
-          background: "#0d0d10",
-          border: `1px solid ${rs.baseColor}`,
-        }}
+      <span
+        className='absolute bottom-0.5 right-0.5 rounded bg-zinc-950/80 px-1 py-0.5 text-[10px] font-semibold tabular-nums leading-none text-zinc-200'
         title={t("rig.guitar_level")}>
         {level}
-      </div>
+      </span>
     </div>
   );
 
@@ -120,7 +109,7 @@ export const RigGuitarsPreview = ({ arsenal }: RigGuitarsPreviewProps) => {
   });
 
   return (
-    <div className='flex items-center gap-2'>
+    <div className='flex items-center gap-1.5'>
       {slotItems.map((item, i) => {
         const guitar = item ? GUITARS_BY_ID.get(item.guitarId) : null;
 
@@ -128,7 +117,7 @@ export const RigGuitarsPreview = ({ arsenal }: RigGuitarsPreviewProps) => {
           return (
             <div
               key={i}
-              className='flex h-16 w-16 items-center justify-center rounded-xl border border-dashed border-white/10 bg-zinc-900/30'
+              className='flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-900/40'
               title={t("rig.empty_slot", { n: i + 1 })}>
               <Guitar className='h-4 w-4 text-zinc-700' />
             </div>

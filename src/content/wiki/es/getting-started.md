@@ -10,7 +10,7 @@ riff.quest es un registro de práctica que se comporta como un juego. Practicas,
 
 <YouTube id="x2wERUdqtL0" title="Primeros pasos con Riff Quest" caption="El recorrido: registrar una sesión, leer lo que valió y dónde está cada cosa. El resto de esta página es el mismo terreno por escrito." />
 
-Y hay mucho que practicar. La biblioteca tiene más de 200 ejercicios y más de 50 rutinas ya hechas, la Ruta de aprendizaje tiene 36 pasos repartidos en dos módulos y el Mapa de escalas cubre 9 familias de escalas. Además, se te escribe una Mastery Roadmap cuando la pides, normalmente de entre 35 y 55 pasos.
+Y hay mucho que practicar. La biblioteca tiene más de 200 ejercicios y más de 50 rutinas ya hechas, la Ruta de aprendizaje tiene 74 pasos repartidos en tres módulos y el Mapa de escalas cubre 9 familias de escalas. Además, se te escribe una Mastery Roadmap cuando la pides, normalmente de entre 35 y 55 pasos.
 
 <StatRow stats="200+:ejercicios en la biblioteca|50+:rutinas ya hechas|36:pasos en la Ruta de aprendizaje|9:familias de escalas en el Mapa de escalas" caption="Los dos primeros están redondeados a la baja y las cifras reales siguen subiendo, así que tómalos como un mínimo y no como el recuento." />
 

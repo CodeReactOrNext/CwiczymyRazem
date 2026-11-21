@@ -3,7 +3,6 @@ import type { CommissionTarget } from "feature/arsenal/data/commission";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
-import { readableText } from "lib/colorTheme/colorTheme";
 
 import { RARITY_STYLES } from "../RarityBadge";
 import { FameCoin } from "../Workshop/FameCoin";
@@ -23,6 +22,9 @@ interface CommissionCardProps {
  * The parts bill is left to the dialog — on a card it would be a second row of
  * numbers nobody compares across a grid. The price simply dims while the order
  * cannot be paid for, so the cards that can be ordered today read first.
+ *
+ * Two lines under the picture: the name with its price, then the maker with the
+ * rarity. The rarity's colour is one dot; the words stay grey.
  */
 export const CommissionCard = ({
   target,
@@ -45,7 +47,7 @@ export const CommissionCard = ({
       aria-label={labels.t("commissions.commission_name", {
         name: `${def.brand} ${def.name}`,
       })}
-      className='flex flex-col gap-3 rounded-lg bg-arsenal-section p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-zinc-800/60'>
+      className='flex flex-col gap-4 rounded-lg bg-arsenal-section p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-zinc-800/60'>
       <span className='flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md bg-arsenal-bg'>
         <img
           src={imageSrc}
@@ -56,30 +58,30 @@ export const CommissionCard = ({
         />
       </span>
 
-      <span className='flex min-w-0 flex-col gap-0.5 px-1'>
-        <span className='truncate text-sm font-semibold text-zinc-100'>
-          {def.name}
-        </span>
-        <span className='truncate text-xs text-zinc-500'>{def.brand}</span>
-      </span>
-
-      <span className='flex items-center justify-between gap-2 px-1'>
-        <span
-          className='flex items-center gap-1.5 text-[11px] font-medium'
-          style={{ color: readableText(rarityColor) }}>
+      <span className='flex min-w-0 flex-col gap-1'>
+        <span className='flex items-baseline justify-between gap-3'>
+          <span className='min-w-0 truncate text-sm font-semibold text-zinc-100'>
+            {def.name}
+          </span>
           <span
-            className='h-1.5 w-1.5 rounded-full'
-            style={{ backgroundColor: rarityColor }}
-          />
-          {labels.rarity(def.rarity)}
+            className={cn(
+              "flex shrink-0 items-center gap-1 self-center text-sm font-bold tabular-nums",
+              affordable ? "text-amber-400" : "text-zinc-500",
+            )}>
+            <FameCoin size={14} />
+            {price.toLocaleString()}
+          </span>
         </span>
-        <span
-          className={cn(
-            "flex items-center gap-1 text-sm font-bold tabular-nums",
-            affordable ? "text-zinc-100" : "text-zinc-500",
-          )}>
-          <FameCoin size={14} />
-          {price.toLocaleString()}
+        <span className='flex items-center justify-between gap-3 text-xs text-zinc-400'>
+          <span className='min-w-0 truncate'>{def.brand}</span>
+          <span className='flex shrink-0 items-center gap-1.5'>
+            <span
+              aria-hidden
+              className='h-1.5 w-1.5 rounded-full'
+              style={{ backgroundColor: rarityColor }}
+            />
+            {labels.rarity(def.rarity)}
+          </span>
         </span>
       </span>
     </button>

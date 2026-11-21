@@ -1,81 +1,31 @@
-import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { getDuelExercise } from "feature/duels/data/duelPool";
 import type {
+  DuelFeedEntry,
+  DuelFeedPlayer,
   DuelOpponentRevealed,
   DuelView,
 } from "feature/duels/types/duel.types";
-import { formatRatingDelta, scoreShare } from "feature/duels/utils/duelFormat";
+import { formatRatingDelta } from "feature/duels/utils/duelFormat";
 import { useTranslation } from "hooks/useTranslation";
-import { useIntlLocale } from "lib/i18n/dateLocale";
-import { History } from "lucide-react";
+import Link from "next/link";
 
-interface RecentDuelsProps {
-  duels: DuelView[];
-  highlightedId?: string | null;
-}
-
-const RESULT_STYLE: Record<NonNullable<DuelView["result"]>, string> = {
-  won: "bg-emerald-500/10 text-emerald-400",
-  lost: "bg-zinc-800/60 text-zinc-300",
-  draw: "bg-zinc-800/60 text-zinc-300",
-  void: "bg-zinc-800/40 text-zinc-500",
+const RESULT_TEXT: Record<NonNullable<DuelView["result"]>, string> = {
+  won: "text-emerald-400",
+  lost: "text-zinc-400",
+  draw: "text-zinc-300",
+  void: "text-zinc-500",
 };
 
-/** Your segment of the split, coloured by how the duel went. */
-const MY_SEGMENT: Record<"won" | "lost" | "draw", string> = {
-  won: "bg-emerald-400",
-  lost: "bg-zinc-400",
-  draw: "bg-zinc-300",
-};
-
-/**
- * The two best runs as one split bar — yours from the left, theirs from the
- * right — so a landslide and a photo finish look different at a glance.
- */
-const ScoreSplit = ({
-  mine,
-  theirs,
-  result,
-}: {
-  mine: number;
-  theirs: number;
-  result: "won" | "lost" | "draw";
-}) => {
-  const share = scoreShare(mine, theirs);
-  if (share === null) return null;
-  return (
-    <span
-      className='flex h-1.5 w-full gap-0.5 overflow-hidden rounded-full'
-      aria-hidden='true'>
-      {share > 0 && (
-        <span
-          className={cn("h-full", MY_SEGMENT[result])}
-          style={{ width: `${share * 100}%` }}
-        />
-      )}
-      {share < 1 && <span className='h-full flex-1 bg-zinc-700' />}
-    </span>
-  );
-};
-
-const RecentDuelRow = ({
-  duel,
-  isHighlighted,
-}: {
-  duel: DuelView;
-  isHighlighted: boolean;
-}) => {
+const RecentDuelRow = ({ duel }: { duel: DuelView }) => {
   const { t } = useTranslation("duels");
-  const intlLocale = useIntlLocale();
   const result = duel.result ?? "void";
   const opponent = duel.opponent.revealed
     ? (duel.opponent as DuelOpponentRevealed)
     : null;
   const exercise = getDuelExercise(duel.exerciseId);
   const delta = duel.ratingDelta ?? 0;
-  const score = (value: number) => value.toLocaleString(intlLocale);
 
   // Who never sent a run — the reason a walkover went the way it did.
   const note =
@@ -88,21 +38,21 @@ const RecentDuelRow = ({
           : null;
 
   return (
-    <li
-      id={`duel-${duel.id}`}
-      className={cn(
-        "-mx-3 flex scroll-mt-24 flex-wrap items-center gap-x-5 gap-y-3 rounded-lg px-3 py-3.5 transition-colors hover:bg-zinc-800/30",
-        isHighlighted && "bg-zinc-800/60 hover:bg-zinc-800/60",
-      )}>
-      <span
-        className={cn(
-          "w-[4.5rem] shrink-0 rounded px-2 py-1 text-center text-xs font-semibold",
-          RESULT_STYLE[result],
-        )}>
-        {t(`recent.${result}`)}
-      </span>
-
-      <div className='flex min-w-0 flex-[1_1_11rem] items-center gap-3'>
+    <li>
+      <Link
+        href={{
+          pathname: "/duels",
+          query: { tab: "history", result: duel.id },
+        }}
+        shallow
+        className='flex items-center gap-4 rounded-xl px-3 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 hover:bg-zinc-900/60'>
+        <span
+          className={cn(
+            "w-[4.5rem] shrink-0 text-sm font-semibold",
+            RESULT_TEXT[result],
+          )}>
+          {t(`recent.${result}`)}
+        </span>
         {opponent ? (
           <Avatar
             avatarURL={opponent.avatar || undefined}
@@ -116,80 +66,163 @@ const RecentDuelRow = ({
             aria-hidden='true'
           />
         )}
-        <div className='min-w-0'>
-          <p className='truncate text-sm text-zinc-200'>
-            <span className='text-zinc-500'>{t("recent.vs")} </span>
-            <span className='font-semibold'>
-              {opponent?.displayName ?? t("active.anonymous")}
-            </span>
-          </p>
-          <p className='truncate text-xs text-zinc-400'>
+        <span className='min-w-0 flex-1'>
+          <span className='block truncate text-sm font-semibold text-zinc-100'>
+            {opponent?.displayName ?? t("active.anonymous")}
+          </span>
+          <span className='block truncate text-xs text-zinc-500'>
             {note ?? exercise?.title ?? duel.exerciseId}
-          </p>
-        </div>
-      </div>
-
-      {result !== "void" && (
-        <div className='w-full shrink-0 sm:w-44'>
-          <p className='flex items-baseline justify-between gap-2 text-sm tabular-nums'>
-            <span
-              className={cn(
-                "font-semibold",
-                result === "lost" ? "text-zinc-300" : "text-zinc-50",
-              )}>
-              {score(duel.me.bestScore)}
-            </span>
-            <span
-              className={cn(
-                "font-semibold",
-                result === "lost" ? "text-zinc-50" : "text-zinc-500",
-              )}>
-              {score(opponent?.bestScore ?? 0)}
-            </span>
-          </p>
-          <div className='mt-1.5'>
-            <ScoreSplit
-              mine={duel.me.bestScore}
-              theirs={opponent?.bestScore ?? 0}
-              result={result}
-            />
-          </div>
-        </div>
-      )}
-
-      <span
-        className={cn(
-          "ml-auto w-14 shrink-0 text-right font-teko text-2xl font-semibold tabular-nums leading-none",
-          delta > 0 ? "text-emerald-400" : "text-zinc-500",
-        )}>
-        {result === "void" ? "—" : formatRatingDelta(delta)}
-      </span>
+          </span>
+        </span>
+        <span
+          className={cn(
+            "w-12 shrink-0 text-right font-teko text-2xl font-semibold tabular-nums leading-none",
+            delta > 0 ? "text-emerald-400" : "text-zinc-500",
+          )}>
+          {result === "void" ? "—" : formatRatingDelta(delta)}
+        </span>
+      </Link>
     </li>
   );
 };
 
-/** Settled duels, newest first — the opponent finally has a name. The form guide lives in the hero. */
-export const RecentDuels = ({ duels, highlightedId }: RecentDuelsProps) => {
+/** How many of the app's latest duels the Duels tab shows. */
+const LATEST_COUNT = 3;
+
+const FeedAvatar = ({
+  player,
+  className,
+}: {
+  player: DuelFeedPlayer;
+  className?: string;
+}) => (
+  <Avatar
+    avatarURL={player.avatar || undefined}
+    name={player.displayName}
+    size='xs'
+    className={cn("shrink-0", className)}
+  />
+);
+
+const LatestDuelRow = ({
+  entry,
+  isOpenable,
+}: {
+  entry: DuelFeedEntry;
+  /** The viewer played it and its result screen is still within reach. */
+  isOpenable: boolean;
+}) => {
   const { t } = useTranslation("duels");
+  const [winner, loser] = entry.players;
+  const isDraw = entry.kind === "draw";
+  const exercise = getDuelExercise(entry.exerciseId);
+  const rowClass = "flex items-center gap-4 rounded-xl px-3 py-3";
+
+  const content = (
+    <>
+      <span className='flex shrink-0 items-center'>
+        <FeedAvatar player={winner} />
+        <FeedAvatar player={loser} className='-ml-2' />
+      </span>
+      <span className='min-w-0 flex-1'>
+        <span className='block truncate text-sm font-semibold text-zinc-100'>
+          {t(`feed.${entry.kind}`, {
+            winner: winner.displayName,
+            loser: loser.displayName,
+          })}
+        </span>
+        <span className='block truncate text-xs text-zinc-500'>
+          {exercise?.title ?? entry.exerciseId}
+        </span>
+      </span>
+      <span className='shrink-0 font-teko text-2xl font-semibold tabular-nums leading-none text-zinc-500'>
+        <span className={isDraw ? "text-zinc-300" : "text-zinc-50"}>
+          {winner.bestScore}
+        </span>
+        {" : "}
+        <span className={isDraw ? "text-zinc-300" : undefined}>
+          {loser.bestScore}
+        </span>
+      </span>
+    </>
+  );
+
   return (
-    <Card className='p-5 sm:p-7'>
-      <h2 className='flex items-center gap-2 text-base font-semibold text-zinc-100'>
-        <History size={16} className='text-zinc-400' />
+    <li>
+      {isOpenable ? (
+        <Link
+          href={{ pathname: "/duels", query: { result: entry.id } }}
+          shallow
+          className={cn(
+            rowClass,
+            "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 hover:bg-zinc-900/60",
+          )}>
+          {content}
+        </Link>
+      ) : (
+        <div className={rowClass}>{content}</div>
+      )}
+    </li>
+  );
+};
+
+/**
+ * The newest few decided duels across the app, under the slots: who beat whom,
+ * on what, and by how much. A duel the viewer played opens its result screen.
+ * Renders nothing until there is a duel to show.
+ */
+export const LatestDuels = ({
+  feed,
+  ownDuels,
+}: {
+  feed: DuelFeedEntry[];
+  /** The viewer's settled duels — the ones with a result screen to open. */
+  ownDuels: DuelView[];
+}) => {
+  const { t } = useTranslation("duels");
+  if (feed.length === 0) return null;
+  return (
+    <section className='mt-6 flex flex-col gap-2'>
+      <h2 className='px-1 text-base font-semibold text-zinc-100'>
         {t("recent.title")}
       </h2>
+      <ul className='-mx-2 flex flex-col gap-0.5'>
+        {feed.slice(0, LATEST_COUNT).map((entry) => (
+          <LatestDuelRow
+            key={entry.id}
+            entry={entry}
+            isOpenable={ownDuels.some((duel) => duel.id === entry.id)}
+          />
+        ))}
+      </ul>
+    </section>
+  );
+};
+
+/** The History tab: settled duels, newest first, each one opening its result screen again. */
+export const RecentDuels = ({ duels }: { duels: DuelView[] }) => {
+  const { t } = useTranslation("duels");
+  return (
+    <section className='flex max-w-2xl flex-col gap-4'>
+      <div className='flex items-baseline justify-between gap-3 px-1'>
+        <h2 className='text-base font-semibold text-zinc-100'>
+          {t("history.title")}
+        </h2>
+        {duels.length > 0 && (
+          <span className='text-sm tabular-nums text-zinc-500'>
+            {duels.length}
+          </span>
+        )}
+      </div>
       {duels.length === 0 ? (
-        <p className='mt-4 text-sm text-zinc-400'>{t("recent.empty")}</p>
+        <p className='px-1 text-sm text-zinc-400'>{t("recent.empty")}</p>
       ) : (
-        <ul className='mt-5 space-y-1'>
+        <ul className='flex flex-col gap-0.5'>
           {duels.map((duel) => (
-            <RecentDuelRow
-              key={duel.id}
-              duel={duel}
-              isHighlighted={duel.id === highlightedId}
-            />
+            <RecentDuelRow key={duel.id} duel={duel} />
           ))}
         </ul>
       )}
-    </Card>
+    </section>
   );
 };

@@ -36,6 +36,14 @@ const JOURNEY_REWARDS: Record<string, JourneySpec> = {
       { tier: "Legendary", qty: 1 },
     ],
   },
+  intervals: {
+    fame: 350,
+    caseTokens: 1,
+    parts: [
+      { tier: "Epic", qty: 3 },
+      { tier: "Legendary", qty: 1 },
+    ],
+  },
 };
 
 /** What a module with no entry of its own is worth — the shorter course's rate. */
@@ -61,6 +69,7 @@ export const journeyRewardId = (moduleId: string): string =>
 const TROPHY_GUITAR_IDS: Record<string, number | string> = {
   fundamentals: 62, // RPS Osprey Custom
   fretboard: 49, // Fairmont Stratocaster Heavy Relic
+  intervals: 65, // Voyager Celestial
 };
 
 /**

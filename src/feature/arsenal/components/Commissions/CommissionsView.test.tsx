@@ -59,11 +59,10 @@ describe("CommissionsView", () => {
     render(<CommissionsView data={account()} fame={0} />);
 
     expect(cards()).toHaveLength(NON_TROPHY_GUITARS.length);
+    // How much is left is said once, on the kind it is left in.
     expect(
-      screen.getByText(
-        String(NON_TROPHY_GUITARS.length + EFFECT_DEFINITIONS.length),
-      ),
-    ).toBeTruthy();
+      screen.getByRole("button", { name: /Guitars/ }).textContent,
+    ).toContain(String(NON_TROPHY_GUITARS.length));
 
     fireEvent.click(screen.getByRole("button", { name: /Pedals/ }));
     expect(cards()).toHaveLength(EFFECT_DEFINITIONS.length);

@@ -52,7 +52,7 @@ export const LibraryHeroSection = ({ totalSongs }: LibraryHeroSectionProps) => {
             <Link href="/signup">
               <Button className="h-12 px-8 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-lg transition-colors">
                 Track Your Songs Free
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link

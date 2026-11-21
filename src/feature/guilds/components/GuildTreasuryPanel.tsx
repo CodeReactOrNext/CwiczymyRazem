@@ -144,9 +144,6 @@ export const GuildTreasuryPanel = ({
           <div
             title={t("treasury.you_have", { count: fame.toLocaleString() })}
             className='flex flex-wrap items-center gap-2'>
-            <span className='mr-1 text-sm text-zinc-400'>
-              {t("treasury.put_in")}
-            </span>
             {amounts.map((amount) => (
               <PledgeButton
                 key={amount}

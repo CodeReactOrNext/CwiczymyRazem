@@ -1,9 +1,11 @@
 {
   "daily_quests": {
     "title": "Misiones diarias",
-    "claim": "Reclamar {{points}}",
-    "claimed": "Recompensa reclamada",
-    "reward_hint": "Completa las {{count}} para ganar",
+    "reward_hint": "Completa las {{total}} para ganar",
+    "time_left": "Quedan {{time}}",
+    "new_in": "Nuevas misiones en {{time}}",
+    "claim_reward": "Reclamar recompensa",
+    "all_done": "Todo hecho por hoy",
     "tasks": {
       "rate_song": "Valora una canción",
       "add_want_to_learn": "Añade una canción a «Quiero aprender»",
@@ -213,13 +215,17 @@
     "open_spot": "Puesto libre",
     "open_spot_hint": "Toca para ocuparlo",
     "title": "Ejercicio del día",
-    "new_in": "Nuevo en {{time}}",
     "none_today": "Hoy no hay ejercicio.",
     "beat_score": "Supera tu puntuación",
     "play": "Tocar",
     "board_error": "No se pudo cargar el tablero.",
     "prize": "Premio para el #1",
     "wins": "El #1 gana",
-    "mod": "Mod {{label}}"
+    "mod": "Mod {{label}}",
+    "time_left": "Quedan {{time}}",
+    "your_best": "Tu mejor {{score}}",
+    "gap_to_first": "{{gap}} para el #1",
+    "leading": "Vas en cabeza",
+    "ahead_of_second": "{{gap}} por delante del #2"
   }
 }

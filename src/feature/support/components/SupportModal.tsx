@@ -12,11 +12,10 @@ import {
 import { tierLabel } from "feature/roadmap/utils/tierText";
 import { useSupporterRoadmap } from "feature/supporterPanel/hooks/useSupporterRoadmap";
 import type { SupporterWallet } from "feature/supporterPanel/types/supporterPanel.types";
-import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
 import { AnimatePresence, m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { fade } from "lib/motion/motion";
-import { ArrowRight, ArrowUpRight, Coffee, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Coffee, Heart, X } from "lucide-react";
 import Link from "next/link";
 
 export type SupportModalVariant = "ask" | "thanks" | "again";
@@ -161,7 +160,11 @@ const AskBody = ({ funding, name, practiceHours }: AskBodyProps) => {
 
   return (
     <>
-      <h2 className='pr-10 text-2xl font-semibold tracking-tight text-white'>
+      <div className='flex h-11 w-11 items-center justify-center rounded-full bg-amber-500/10'>
+        <Heart size={20} className='text-amber-400' fill='currentColor' />
+      </div>
+
+      <h2 className='text-2xl font-semibold tracking-tight text-white'>
         {title}
       </h2>
 
@@ -171,12 +174,6 @@ const AskBody = ({ funding, name, practiceHours }: AskBodyProps) => {
       </div>
 
       <NextGoal funding={funding} />
-
-      <p className='flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-zinc-400'>
-        {t("modal.ask.perk_before")}
-        <SupportBadge />
-        {t("modal.ask.perk_after")}
-      </p>
 
       <Signature line={t("modal.ask.sign")} />
     </>

@@ -91,7 +91,7 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries, compact = fal
 
   const searchAgain = (
     <Button variant='subtle' size='sm' onClick={search}>
-      <RefreshCw className="mr-1.5" />
+      <RefreshCw className="" />
       {t("backing.search_again")}
     </Button>
   );
@@ -115,7 +115,7 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries, compact = fal
           </div>
           {state === "idle" && (
             <Button variant='secondary' size='sm' onClick={search}>
-              <FaYoutube className="mr-1.5 text-red-500" />
+              <FaYoutube className="text-red-500" />
               {t("backing.find_short")}
             </Button>
           )}
@@ -151,7 +151,7 @@ export function BackingTrackPicker({ exerciseTitle, searchQueries, compact = fal
 
       {state === "idle" && (
         <Button variant='secondary' onClick={search}>
-          <FaYoutube className="mr-1.5 text-red-500" />
+          <FaYoutube className="text-red-500" />
           {t("backing.find")}
         </Button>
       )}
@@ -206,7 +206,7 @@ export function BackingVideoPlayer({ videoId, onChangeClick }: BackingVideoPlaye
         />
       </div>
       <Button variant='subtle' size='sm' onClick={onChangeClick}>
-        <FaYoutube className="mr-1.5" />
+        <FaYoutube className="" />
         {t("backing.change")}
       </Button>
     </div>

@@ -1,12 +1,7 @@
 {
   "title": "Üben",
-  "continue": "Weitermachen",
   "loading": "Wird geladen...",
   "any_part": "Beliebiger Teil",
-  "lock": {
-    "master": "Master",
-    "premium": "Premium"
-  },
   "sections": {
     "all": "Alle Arten zu üben",
     "log_time": "Zeit eintragen",
@@ -14,10 +9,16 @@
     "create_plan": "Plan erstellen",
     "create_exercise": "Übung erstellen"
   },
+  "groups": {
+    "planned": "Mit Plan",
+    "songs": "Songs",
+    "exercises": "Übungen",
+    "challenges": "Herausforderungen"
+  },
   "modes": {
     "routine": {
       "title": "Übungsroutinen",
-      "description": "Fertige Routinen, Playalongs, deine Pläne und die der Community"
+      "description": "Fertige und eigene Session-Pläne"
     },
     "manual_log": {
       "title": "Manueller Eintrag",
@@ -29,43 +30,43 @@
     },
     "songs": {
       "title": "Songs",
-      "description": "Übe dein Repertoire — die Zeit zählt für jeden Song"
+      "description": "Dein Repertoire"
     },
     "auto": {
       "title": "Auto-Plan",
-      "description": "Eine Session, die in deine verfügbare Zeit passt"
+      "description": "Eine Session, die in deine Zeit passt"
     },
     "gp": {
       "title": "Guitar-Pro-Dateien",
-      "description": "Übe mit importierten Tabs, mit Wiedergabe"
+      "description": "Deine Tabs mit Wiedergabe"
     },
     "learning_path": {
       "title": "Lernpfad",
-      "description": "Beginne mit den Grundlagen, eine Lektion nach der anderen"
+      "description": "Von den Grundlagen, Lektion für Lektion"
     },
     "roadmaps": {
       "title": "Mastery Roadmaps",
-      "description": "Ein persönlicher Plan für eine Fähigkeit oder einen Spielstil"
+      "description": "Ein Plan für einen Skill"
     },
     "scales": {
       "title": "Scale Map",
-      "description": "Tonleiterformen, Box für Box im Zieltempo"
+      "description": "Skalenmuster, Box für Box"
     },
     "bosses": {
       "title": "Bosskämpfe",
-      "description": "Besiege einen Boss Level für Level mit deiner Gitarre"
+      "description": "Besiege einen Boss beim Spielen"
     },
     "duels": {
       "title": "Duelle",
-      "description": "1 gegen 1 mit einem Fremden auf derselben Übung"
+      "description": "1 gegen 1 an derselben Übung"
     },
     "skills": {
       "title": "Fähigkeiten",
-      "description": "Sieh deinen Fortschritt nach Technik"
+      "description": "Fortschritt nach Technik"
     },
     "exercises": {
       "title": "Übungskatalog",
-      "description": "Finde eine Übung nach Fähigkeit, Länge oder Modus"
+      "description": "Alle Übungen"
     },
     "favorites": {
       "title": "Favoriten"
@@ -88,10 +89,6 @@
     "goals": {
       "title": "Ziele"
     }
-  },
-  "tags": {
-    "most_used": "Am häufigsten genutzt",
-    "new": "Neu"
   },
   "progress": {
     "all_modules": "Alle Module abgeschlossen",

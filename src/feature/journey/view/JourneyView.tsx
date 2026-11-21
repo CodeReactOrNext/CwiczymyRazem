@@ -1,5 +1,4 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Drawer, DrawerContent } from "assets/components/ui/drawer";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
@@ -22,8 +21,9 @@ import type {
 import { buildModuleWithStatus } from "../utils/journeyStatus";
 import { JourneyPath } from "./components/JourneyPath";
 import { JourneyPathSkeleton, ModuleSelectionSkeleton } from "./components/JourneySkeletons";
+import { JourneyStepBubble } from "./components/JourneyStepBubble";
 import { ModuleSelectionScreen } from "./components/ModuleSelectionScreen";
-import { StepSidebar } from "./components/StepSidebar";
+import { StepLesson } from "./components/StepLesson";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -67,8 +67,9 @@ const JourneyView: React.FC = () => {
   const [selectedModuleId, setSelectedModuleId] = useState(() =>
     typeof router.query.module === "string" ? router.query.module : journeyModules[0].id
   );
-  const [selectedStep, setSelectedStep] = useState<JourneyStepWithStatus | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // The step whose bubble is open on the road, and the one read full screen.
+  const [openStepId, setOpenStepId] = useState<string | null>(null);
+  const [lessonStepId, setLessonStepId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const examResultHandled = useRef(false);
   const queryApplied = useRef(false);
@@ -80,6 +81,11 @@ const JourneyView: React.FC = () => {
   const activeModule = useMemo(
     () => modulesWithStatus.find((m) => m.id === selectedModuleId) ?? modulesWithStatus[0],
     [modulesWithStatus, selectedModuleId]
+  );
+  // Looked up every render, so a step finished in the meantime shows as finished.
+  const lessonStep = useMemo(
+    () => activeModule.stages.flatMap((s) => s.steps).find((s) => s.id === lessonStepId) ?? null,
+    [activeModule, lessonStepId]
   );
 
   useEffect(() => {
@@ -98,16 +104,16 @@ const JourneyView: React.FC = () => {
       // Look up the raw module directly (not the status-decorated `activeModule`,
       // which still reflects the PREVIOUS selectedModuleId in this same render —
       // setSelectedModuleId above hasn't flushed yet).
-      const targetModule = journeyModules.find((m) => m.id === qModule) ?? modulesWithStatus[0];
-      const targetWithStatus = modulesWithStatus.find((m) => m.id === targetModule.id);
-      const allSteps = (targetWithStatus ?? buildModuleWithStatus(targetModule, progressDoc)).stages.flatMap((s) => s.steps);
-      const found = allSteps.find((s) => s.id === qStep);
+      const targetModule = journeyModules.find((m) => m.id === qModule) ?? journeyModules[0];
+      const found = targetModule.stages.flatMap((s) => s.steps).some((s) => s.id === qStep);
       if (found) {
-        setSelectedStep(found);
-        setIsModalOpen(true);
+        setOpenStepId(qStep as string);
+        // Back from an exam the bubble is enough (Retake is in it); the lesson
+        // opens straight away only for a link to the step itself.
+        if (!router.query.examResult) setLessonStepId(qStep as string);
       }
     }
-  }, [loading, router.query, modulesWithStatus, progressDoc]);
+  }, [loading, router.query]);
 
   // Handle returning from exam
   useEffect(() => {
@@ -134,15 +140,19 @@ const JourneyView: React.FC = () => {
     router.replace({ pathname: "/journey", query: qModule ? { module: qModule } : {} }, undefined, { shallow: true });
   }, [router.query, loading, userAuth]);
 
+  // A tap on the road opens the step's bubble; a second tap folds it away.
   const handleStepClick = useCallback((step: JourneyStepWithStatus) => {
-    setSelectedStep(step);
-    setIsModalOpen(true);
+    setOpenStepId((current) => (current === step.id ? null : step.id));
+  }, []);
+
+  const handleOpenLesson = useCallback((step: JourneyStepWithStatus) => {
+    setLessonStepId(step.id);
     router.push({ pathname: "/journey", query: { module: selectedModuleId, step: step.id } }, undefined, { shallow: true });
   }, [selectedModuleId, router]);
 
-  const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-    setTimeout(() => setSelectedStep(null), 300);
+  // Back on the road with the bubble still open, so the exercise is one tap away.
+  const handleCloseLesson = useCallback(() => {
+    setLessonStepId(null);
     router.push({ pathname: "/journey", query: { module: selectedModuleId } }, undefined, { shallow: true });
   }, [selectedModuleId, router]);
 
@@ -171,7 +181,8 @@ const JourneyView: React.FC = () => {
       try {
         await firebaseCompleteJourneyStep(userAuth as string, selectedModuleId, stepId);
         toast.success(t("toast.step_completed"));
-        handleCloseModal();
+        handleCloseLesson();
+        setOpenStepId(null);
       } catch {
         setProgressDoc(prev);
         toast.error(t("toast.save_failed"));
@@ -179,7 +190,7 @@ const JourneyView: React.FC = () => {
         setIsSaving(false);
       }
     },
-    [userAuth, progressDoc, selectedModuleId, handleCloseModal, setProgressDoc]
+    [userAuth, progressDoc, selectedModuleId, handleCloseLesson, setProgressDoc]
   );
 
   const handleStartStep = useCallback(
@@ -213,6 +224,28 @@ const JourneyView: React.FC = () => {
     [userAuth, selectedModuleId, setProgressDoc]
   );
 
+  const handlePractice = useCallback(
+    async (step: JourneyStepWithStatus) => {
+      if (step.status === "available") await handleStartStep(step.id);
+      router.push({
+        pathname: `/practice/exercise/${step.suggestedExerciseId}`,
+        query: { stepId: step.id, moduleId: selectedModuleId },
+      });
+    },
+    [handleStartStep, router, selectedModuleId]
+  );
+
+  const handleExam = useCallback(
+    async (step: JourneyStepWithStatus) => {
+      if (step.status === "available") await handleStartStep(step.id);
+      router.push({
+        pathname: `/practice/exercise/${step.suggestedExerciseId}`,
+        query: { mode: "exam", bpm: step.examBpm ?? 60, stepId: step.id, moduleId: selectedModuleId },
+      });
+    },
+    [handleStartStep, router, selectedModuleId]
+  );
+
   if (loading) {
     // A link straight into a module (back from an exam, a shared step) opens on
     // the path; everything else on the module list.
@@ -237,33 +270,32 @@ const JourneyView: React.FC = () => {
     <div className="relative h-full min-h-screen bg-zinc-950 overflow-x-hidden">
       <JourneyPath
         module={activeModule}
+        openStepId={openStepId}
         onStepClick={handleStepClick}
+        renderBubble={(step, pointerOffset) => (
+          <JourneyStepBubble
+            step={step}
+            pointerOffset={pointerOffset}
+            onOpenLesson={() => handleOpenLesson(step)}
+            onPractice={() => handlePractice(step)}
+            onExam={() => handleExam(step)}
+          />
+        )}
         onBack={() => {
+          setOpenStepId(null);
           setShowModuleSelection(true);
           router.push({ pathname: "/journey" }, undefined, { shallow: true });
         }}
       />
 
-      <Drawer 
-        open={!!selectedStep} 
-        onOpenChange={(open) => {
-          if (!open) handleCloseModal();
-        }}
-        direction="right"
-      >
-        <DrawerContent className="fixed top-0 bottom-[100px] sm:bottom-0 right-0 left-auto mt-0 w-full max-w-xl rounded-none bg-zinc-950">
-          {selectedStep && (
-            <StepSidebar
-              step={selectedStep}
-              moduleId={selectedModuleId}
-              onClose={handleCloseModal}
-              onComplete={handleCompleteStep}
-              onStart={handleStartStep}
-              isSaving={isSaving}
-            />
-          )}
-        </DrawerContent>
-      </Drawer>
+      <StepLesson
+        step={lessonStep}
+        onClose={handleCloseLesson}
+        onComplete={handleCompleteStep}
+        onPractice={handlePractice}
+        onExam={handleExam}
+        isSaving={isSaving}
+      />
     </div>
   );
 };

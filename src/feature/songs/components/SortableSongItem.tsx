@@ -88,7 +88,7 @@ const GpPracticeButton = ({
             size="sm"
             className="h-8 w-full bg-cyan-600 text-[11px] font-bold text-white hover:bg-cyan-500 active:scale-95 transition-all shadow-lg shadow-cyan-500/10"
           >
-            <Play className="mr-1.5 h-3 w-3 fill-current" />
+            <Play className="h-3 w-3 fill-current" />
             {t("card.practice")}
           </Button>
         ) : (
@@ -115,7 +115,7 @@ const GpPracticeButton = ({
           size="sm"
           className="h-8 w-full bg-cyan-600 text-[11px] font-bold text-white hover:bg-cyan-500 active:scale-95 transition-all shadow-lg shadow-cyan-500/10"
         >
-          <Play className="mr-1.5 h-3 w-3 fill-current" />
+          <Play className="h-3 w-3 fill-current" />
           {t("card.practice")}
         </Button>
       ) : (

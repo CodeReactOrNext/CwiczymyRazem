@@ -28,7 +28,7 @@ export const SongsTableEmpty = ({
         onClick={onAddSong}
         className='transition-background mt-8 h-11 rounded-lg bg-zinc-800/60 px-6 font-bold text-white hover:bg-zinc-800'
       >
-        <Plus className='mr-2 h-4 w-4' />
+        <Plus className='h-4 w-4' />
         {t("add_new_song")}
       </Button>
     </div>

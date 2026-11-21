@@ -57,6 +57,8 @@
     "in_progress_lc": "in Arbeit",
     "reward_ready": "Belohnung bereit zum Abholen",
     "reward_claimed": "Belohnung abgeholt",
+    "days_left": "noch {{count}} Tage",
+    "days_left_one": "noch 1 Tag",
     "reached": "Erreicht",
     "current_goal": "Aktuelles Ziel",
     "locked": "Gesperrt",

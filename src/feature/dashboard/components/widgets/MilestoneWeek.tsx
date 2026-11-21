@@ -109,7 +109,7 @@ export const MilestoneWeek = ({
                 title={milestoneDayTitle(day, rule, met)}
                 className='flex h-full flex-1 items-end rounded-sm bg-white/[0.03]'>
                 <div
-                  className='w-full rounded-sm transition-all'
+                  className='w-full rounded-b-sm rounded-t transition-all'
                   style={{ height, backgroundColor: color }}
                 />
               </div>

@@ -1,5 +1,15 @@
+import { Button } from "assets/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { useHandednessStore, useIsLeftHanded } from "hooks/useHandedness";
+import { useTranslation } from "hooks/useTranslation";
+import { ArrowRight, SlidersHorizontal } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
@@ -11,7 +21,9 @@ interface HuntStageProps {
   awaitingStart?: boolean;
   /** Starts the session clock — the gate's Start button. */
   onStart?: () => void;
-  /** Score / strikes / countdown pills. */
+  /** The countdown bar + score row (HuntStats). Spans the whole stage above the
+   *  prompt and the board, so the time left reads as the state of the round
+   *  rather than as one more number beside the score. */
   stats?: ReactNode;
   /** Target card(s) plus the one-line instruction — the "what am I doing" block. */
   prompt: ReactNode;
@@ -30,7 +42,8 @@ interface HuntStageProps {
  * Shared frame for every "target + fretboard" drill (click hunts, interval
  * clicks, mic hunts).
  *
- * The neck is a very wide, short shape; the prompt is a narrow, tall one. Stacked
+ * The countdown and score run across the top of the whole stage. Under them, the
+ * neck is a very wide, short shape and the prompt a narrow, tall one. Stacked
  * they waste a screenful of height and push the board off short viewports, so on
  * wide screens the prompt moves into a side rail and the board keeps the rest of
  * the width. Below `xl` everything falls back into one centered column — the neck
@@ -38,8 +51,8 @@ interface HuntStageProps {
  *
  * A phone held sideways is the other place the stack doesn't fit: about 390px tall,
  * and the column alone runs past that. There the rail turns into a single row
- * above the board instead â pills, a small tile and the instruction side by
- * side â so the neck keeps the full width and every cell stays big enough to tap.
+ * above the board instead (a small tile and the instruction side by side), so the
+ * neck keeps the full width and every cell stays big enough to tap.
  */
 export function HuntStage({
   awaitingStart,
@@ -53,75 +66,237 @@ export function HuntStage({
   railClassName,
 }: HuntStageProps) {
   return (
-    <div
-      className={cn(
-        "relative flex w-full max-w-7xl flex-col items-center gap-4",
-        "xl:flex-row xl:items-center xl:justify-center xl:gap-8",
-        "shortwide:gap-2",
-        className,
-      )}>
+    <div className={cn("relative flex w-full max-w-7xl flex-col gap-6 shortwide:gap-2", className)}>
       {awaitingStart && onStart && <StartGate onStart={onStart} countsIn={false} className="rounded-lg" />}
+
+      {stats}
 
       <div
         className={cn(
-          "flex w-full flex-col items-center gap-3 xl:w-48 xl:shrink-0 xl:gap-4",
-          "shortwide:flex-row shortwide:flex-wrap shortwide:justify-center shortwide:gap-4",
-          railClassName,
+          "flex w-full flex-col items-center gap-5",
+          "xl:flex-row xl:items-center xl:justify-center xl:gap-10",
+          "shortwide:gap-2",
         )}>
-        {stats}
-        {prompt}
-        {controls}
-      </div>
-
-      {(board || footer) && (
-        <div className="flex w-full min-w-0 flex-col items-center gap-3 xl:flex-1 shortwide:gap-2">
-          {board}
-          {footer}
+        <div
+          className={cn(
+            "flex w-full flex-col items-center gap-3 xl:w-48 xl:shrink-0 xl:gap-4",
+            "shortwide:flex-row shortwide:flex-wrap shortwide:justify-center shortwide:gap-4",
+            railClassName,
+          )}>
+          {prompt}
+          {controls}
         </div>
-      )}
+
+        {(board || footer) && (
+          <div className="flex w-full min-w-0 flex-col items-center gap-4 xl:flex-1 shortwide:gap-2">
+            {board}
+            {footer}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
+type TimerTone = "ok" | "warn" | "crit" | "done";
+
+const TIMER_FILL: Record<TimerTone, string> = {
+  ok: "bg-cyan-400",
+  warn: "bg-amber-400",
+  crit: "bg-red-400",
+  done: "bg-emerald-400",
+};
+
+const TIMER_LABEL: Record<TimerTone, string> = {
+  ok: "text-zinc-300",
+  warn: "text-amber-400",
+  crit: "animate-pulse text-red-400 motion-reduce:animate-none",
+  done: "text-emerald-400",
+};
 
 interface HuntStatsProps {
   score?: number;
   mistakes?: { count: number; limit: number };
   /** `null` when the drill isn't on a rotation timer. */
   secondsLeft?: number | null;
+  /** The round length `secondsLeft` counts down from — sets how full the bar is.
+   *  Without it the bar stays full and only the words count down. */
+  secondsTotal?: number | null;
   complete?: boolean;
   /** Drill-specific pills (e.g. the chromatic hunt's note counter). */
   children?: ReactNode;
 }
 
-/** The pill row every hunt panel opens with. */
-export function HuntStats({ score, mistakes, secondsLeft, complete, children }: HuntStatsProps) {
+/**
+ * The row every hunt panel opens with: the round's countdown as a bar that
+ * drains across the stage, then the score.
+ *
+ * The countdown used to be a "5s" pill beside the score and read as one more
+ * stat. A bar emptying says "time is running out" before anything is read, and
+ * the words next to it ("8 s left") say how much. Amber from 5 s, red from 3 s;
+ * a solved round fills it green.
+ */
+export function HuntStats({ score, mistakes, secondsLeft, secondsTotal, complete, children }: HuntStatsProps) {
+  const { t } = useTranslation("session");
+  const counting = secondsLeft !== null && secondsLeft !== undefined;
+  const tone: TimerTone = complete ? "done" : !counting ? "ok" : secondsLeft <= 3 ? "crit" : secondsLeft <= 5 ? "warn" : "ok";
+  // The number only changes on the second, so the fill slides over that second
+  // (duration-1000, linear) and the bar drains smoothly instead of in steps.
+  const fraction = complete || !counting || !secondsTotal ? 1 : Math.max(0, Math.min(1, secondsLeft / secondsTotal));
+
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
+    <div className={cn("flex w-full flex-wrap items-center gap-x-3 gap-y-2", !counting && "justify-center")}>
       {children}
+      {counting && (
+        <>
+          <div
+            role='progressbar'
+            aria-label={t("hunt.time_left")}
+            aria-valuemin={0}
+            aria-valuemax={secondsTotal ?? undefined}
+            aria-valuenow={secondsLeft}
+            className='h-2.5 min-w-[8rem] flex-1 overflow-hidden rounded-full bg-zinc-800/80'>
+            <div
+              className={cn(
+                "h-full w-full origin-left rounded-full transition-[transform,background-color] duration-1000 ease-linear motion-reduce:transition-none",
+                TIMER_FILL[tone],
+              )}
+              style={{ transform: `scaleX(${fraction})` }}
+            />
+          </div>
+          <span className={cn("shrink-0 text-sm font-bold tabular-nums transition-colors", TIMER_LABEL[tone])}>
+            {complete ? t("hunt.solved") : t("hunt.seconds_left", { count: secondsLeft })}
+          </span>
+        </>
+      )}
       {score !== undefined && (
-        <span className="rounded bg-amber-500/10 px-3 py-1 text-sm font-extrabold tabular-nums text-amber-400">
+        <span className="shrink-0 rounded bg-amber-500/10 px-2.5 py-0.5 text-sm font-extrabold tabular-nums text-amber-400">
           ★ {score}
         </span>
       )}
       {mistakes && (
-        <span className="rounded bg-zinc-800/40 px-3 py-1 text-sm font-extrabold tabular-nums text-zinc-400">
+        <span className="shrink-0 rounded bg-zinc-800/40 px-2.5 py-0.5 text-sm font-extrabold tabular-nums text-zinc-400">
           ✕ {mistakes.count}/{mistakes.limit}
         </span>
       )}
-      {secondsLeft !== null && secondsLeft !== undefined && (
-        <span
-          className={cn(
-            "rounded px-3 py-1 text-sm font-extrabold tabular-nums transition-colors",
-            complete
-              ? "bg-emerald-500/10 text-emerald-400"
-              : secondsLeft <= 5
-                ? "animate-pulse bg-red-500/10 text-red-300"
-                : "bg-zinc-800/40 text-zinc-200",
-          )}>
-          {secondsLeft}s
-        </span>
-      )}
     </div>
+  );
+}
+
+interface HuntAskProps {
+  /** Where in the round the player is — "Step 1 of 2", "Solved". */
+  step?: string;
+  /** The instruction itself. The biggest text in the rail: it is what to do. */
+  title: string;
+  /** One short line on where to look. */
+  hint?: string;
+  solved?: boolean;
+}
+
+/**
+ * The "what do I do now" block: step, instruction, where to look.
+ *
+ * The instruction used to sit under the tiles as the smallest text in the rail,
+ * read last. It leads now and the tiles illustrate it.
+ */
+export function HuntAsk({ step, title, hint, solved }: HuntAskProps) {
+  return (
+    <div
+      aria-live='polite'
+      className='flex flex-col items-center gap-1 text-center xl:items-start xl:text-left shortwide:max-w-[14rem] shortwide:items-start shortwide:text-left'>
+      {step && <p className={cn("text-sm font-semibold", solved ? "text-emerald-400" : "text-zinc-500")}>{step}</p>}
+      <p
+        className={cn(
+          "font-display text-2xl font-extrabold leading-tight tracking-tight [text-wrap:balance] shortwide:text-lg",
+          solved ? "text-emerald-400" : "text-zinc-50",
+        )}>
+        {title}
+      </p>
+      {hint && <p className="text-sm text-zinc-400 shortwide:text-xs">{hint}</p>}
+    </div>
+  );
+}
+
+/**
+ * The row under the neck: Next on its own, the drill's helpers beside it. The
+ * view settings live in HuntViewMenu among the helpers, so the row holds what is
+ * used every round and not what is set once.
+ */
+export function HuntFooter({ onNext, children }: { onNext?: () => void; children?: ReactNode }) {
+  const { t } = useTranslation("session");
+  return (
+    <div className='flex w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 sm:justify-between'>
+      {onNext ? (
+        <Button type='button' variant='ghost' onClick={onNext}>
+          {t("hunt.next")} <ArrowRight aria-hidden />
+        </Button>
+      ) : (
+        <span className='hidden sm:block' />
+      )}
+      {children && <div className='flex flex-wrap items-center justify-center gap-2'>{children}</div>}
+    </div>
+  );
+}
+
+interface HuntViewMenuProps {
+  showFullNeck: boolean;
+  onShowFullNeckChange: (next: boolean) => void;
+  /** The "play notes for me" preference, for the drills that have one. */
+  noteSound?: boolean;
+  onNoteSoundChange?: (next: boolean) => void;
+}
+
+/**
+ * Whole neck, left-handed and note sound — set once, not every round, so they
+ * share one menu instead of three chips in the footer.
+ */
+export function HuntViewMenu({ showFullNeck, onShowFullNeckChange, noteSound, onNoteSoundChange }: HuntViewMenuProps) {
+  const { t } = useTranslation("session");
+  const leftHanded = useIsLeftHanded();
+  const setLeftHanded = useHandednessStore((state) => state.setLeftHanded);
+  const itemClass = "cursor-pointer rounded-md py-2 text-sm font-semibold text-zinc-200 focus:bg-zinc-800 focus:text-zinc-50";
+  // Keeps the menu open, so several settings can be flipped in one visit.
+  const keepOpen = (event: Event) => event.preventDefault();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button type='button' variant='ghost' size='sm'>
+          <SlidersHorizontal aria-hidden className='text-zinc-400' /> {t("hunt.view")}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align='end'
+        sideOffset={8}
+        collisionPadding={16}
+        // Clear the session's full-screen layer (z-[999999] desktop / z-[9999999]
+        // mobile); the default z-50 would paint underneath it.
+        className='z-[99999999] w-56 border-0 bg-zinc-900 p-1.5 text-zinc-100 shadow-none'>
+        <DropdownMenuCheckboxItem
+          checked={showFullNeck}
+          onCheckedChange={(checked) => onShowFullNeckChange(checked === true)}
+          onSelect={keepOpen}
+          className={itemClass}>
+          {t("fretboard.whole_neck")}
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={leftHanded}
+          onCheckedChange={(checked) => setLeftHanded(checked === true)}
+          onSelect={keepOpen}
+          className={itemClass}>
+          {t("fretboard.lefty")}
+        </DropdownMenuCheckboxItem>
+        {noteSound !== undefined && onNoteSoundChange && (
+          <DropdownMenuCheckboxItem
+            checked={noteSound}
+            onCheckedChange={(checked) => onNoteSoundChange(checked === true)}
+            onSelect={keepOpen}
+            className={itemClass}>
+            {t("hunt.play_notes")}
+          </DropdownMenuCheckboxItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

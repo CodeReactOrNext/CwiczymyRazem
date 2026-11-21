@@ -550,11 +550,6 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
             {guitar.brand} <span className='text-zinc-600'>·</span>{" "}
             <span className='font-medium' style={{ color: readableText(rs.baseColor) }}>
               {labels.rarity(rarity)}
-            </span>{" "}
-            <span className='text-zinc-600'>·</span>{" "}
-            <span className='text-zinc-500'>
-              {item.year} <span className='text-zinc-700'>·</span>{" "}
-              {item.country}
             </span>
           </p>
         </div>

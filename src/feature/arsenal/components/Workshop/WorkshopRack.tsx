@@ -9,7 +9,6 @@ import { useMemo, useState } from "react";
 
 import { ConditionMeter } from "../ConditionMeter";
 import { InServiceTags } from "../InServiceTags";
-import { SectionLabel } from "../SectionLabel";
 
 type RackFilter = "all" | "guitar" | "effect";
 
@@ -30,7 +29,13 @@ const FILTERS: { id: RackFilter; label: string }[] = [
   { id: "effect", label: "Pedals" },
 ];
 
-/** The rack on the wall: pick what goes on the bench. */
+/**
+ * The rack on the wall: pick what goes on the bench.
+ *
+ * A row is the name, whether the piece is in service, its condition and its
+ * level — the four things that decide what gets picked. The piece on the bench
+ * is told apart by its surface, not by an outline.
+ */
 export const WorkshopRack = ({
   entries,
   selectedId,
@@ -50,23 +55,12 @@ export const WorkshopRack = ({
     });
   }, [entries, filter, search]);
 
-  const counts = useMemo(
-    () => ({
-      all: entries.length,
-      guitar: entries.filter((e) => e.kind === "guitar").length,
-      effect: entries.filter((e) => e.kind === "effect").length,
-    }),
-    [entries],
-  );
-
   return (
     <div
       className={cn(
         "flex flex-col gap-5",
         !bare && "rounded-lg bg-arsenal-section p-5",
       )}>
-      <SectionLabel>{t("workshop.your_gear")}</SectionLabel>
-
       <div className='flex gap-1 rounded-lg bg-arsenal-bg p-1'>
         {FILTERS.map((f) => (
           <button
@@ -80,7 +74,6 @@ export const WorkshopRack = ({
                 : "text-arsenal-text-tertiary hover:bg-white/[0.06] hover:text-arsenal-text-primary",
             )}>
             {t(`workshop.rack_filter.${f.id}`, f.label)}
-            <span className='tabular-nums opacity-60'>{counts[f.id]}</span>
           </button>
         ))}
       </div>
@@ -117,11 +110,11 @@ export const WorkshopRack = ({
                 key={entry.id}
                 onClick={() => onSelect(entry)}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg border p-3 text-left transition-colors duration-fast",
+                  "flex items-center gap-3 rounded-lg px-3 py-3.5 text-left transition-colors duration-fast",
                   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
                   isSelected
-                    ? "border-arsenal-accent/40 bg-arsenal-card"
-                    : "border-transparent bg-arsenal-card/60 hover:border-arsenal-border hover:bg-arsenal-card",
+                    ? "bg-zinc-100/10"
+                    : "bg-arsenal-card/40 hover:bg-arsenal-card",
                 )}>
                 {/* Rarity as a single mark rather than a wash across the whole row —
                     the wash sat under the name and made both hard to read. */}
@@ -158,15 +151,8 @@ export const WorkshopRack = ({
                   />
                 </span>
 
-                <span className='flex shrink-0 flex-col items-end gap-1'>
-                  <span className='text-sm font-semibold tabular-nums leading-none text-arsenal-text-primary'>
-                    {entry.level}
-                  </span>
-                  {entry.buildLevel > 0 && (
-                    <span className='rounded bg-arsenal-accent/15 px-1.5 py-0.5 text-[10px] font-bold tabular-nums leading-none text-arsenal-accent'>
-                      +{entry.buildLevel}
-                    </span>
-                  )}
+                <span className='shrink-0 text-sm font-semibold tabular-nums leading-none text-arsenal-text-primary'>
+                  {entry.level}
                 </span>
               </button>
             );

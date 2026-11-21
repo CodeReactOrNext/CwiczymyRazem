@@ -12,11 +12,13 @@ Das meiste von riff.quest lässt dich üben, wonach dir ist. Diese zwei nicht: S
 
 <ClickPath steps="Lernpfad" caption="Module aus Stufen, Stufen aus Schritten und am Ende jeder Stufe eine Prüfung." />
 
-Aktuell sind zwei Module live, **Fundamentals** und **Fretboard Mastery**, während Rhythmus, Tonleitern und Improvisation als demnächst markiert sind. Jeder Schritt kommt mit Anleitung, Checkliste und Tipps.
+Aktuell sind drei Module live, **Fundamentals**, **Fretboard Mastery** und **Interval Mastery**, während Rhythmus, Tonleitern und Improvisation als demnächst markiert sind. Jeder Schritt kommt mit Anleitung, Checkliste und Tipps.
 
-<StepList steps="Der erste Schritt ist immer offen::Keine Voraussetzungen, in beiden Modulen|Schritte schalten sich der Reihe nach frei::Der nächste Schritt öffnet sich, sobald du den davor als erledigt markiert hast|Module sind nicht gesperrt::Beide Live-Module sind von Tag eins an offen, und nur die Schritte darin schalten sich der Reihe nach frei" />
+<StepList steps="Der erste Schritt ist immer offen::Keine Voraussetzungen, in jedem Modul|Schritte schalten sich der Reihe nach frei::Der nächste Schritt öffnet sich, sobald du den davor als erledigt markiert hast|Module sind nicht gesperrt::Alle drei Live-Module sind von Tag eins an offen, und nur die Schritte darin schalten sich der Reihe nach frei" />
 
-**Fretboard Mastery** funktioniert durch Klicken, nicht durch Hören: Dir wird ein Notenname gezeigt, und du klickst, wo er auf dem Griffbrett liegt, die ersten vier Stufen funktionieren also bestens ohne Mikrofon. Die letzte Stufe, **Play!**, lässt dich die Noten auf deiner Gitarre finden, und diese Prüfungen hören zu. Prüfungen werden nach Genauigkeit bewertet:
+**Fretboard Mastery** funktioniert durch Klicken, nicht durch Hören: Dir wird ein Notenname gezeigt, und du klickst, wo er auf dem Griffbrett liegt, die ersten vier Stufen funktionieren also bestens ohne Mikrofon. Die letzte Stufe, **Play!**, lässt dich die Noten auf deiner Gitarre finden, und diese Prüfungen hören zu.
+
+**Interval Mastery** bringt dir jedes Intervall auf drei Arten bei: Du klickst seine Form auf dem Griffbrett, du erkennst es nach Gehör, und du spielst es auf deiner Gitarre. Nur diese Play-Schritte hören zu. Prüfungen werden nach Genauigkeit bewertet:
 
 <ProgressLadder items="Unter 93 %::Keine Sterne, einen weiteren Versuch wert|93 %::Ein Stern|97 %::Zwei Sterne|99 % und mehr::Drei Sterne" highlight="99 % und mehr" />
 
@@ -42,6 +44,6 @@ Jeder Knoten zeigt, wo du stehst (gesperrt, verfügbar, in Arbeit oder erledigt)
 
 ## Fragen, die Leute stellen
 
-<FaqList items="Brauche ich ein Mikrofon?::Für die Prüfungen, die dein Spiel bewerten, ja: jede Fundamentals-Prüfung und die Play!-Stufe von Fretboard Mastery. Die lassen dich die Aufforderung nicht überspringen, siehe Notenerkennung. Die klickbasierten Stufen von Fretboard Mastery, Üben und die Checklisten funktionieren ohne. Die Scale Map verfolgt das Tempo, das du auf jedem Muster aufzeichnest|Kann ich einen Schritt überspringen?::Nein, das ist ja gerade der Sinn. Schritte öffnen sich der Reihe nach|Was, wenn ich eine Prüfung nicht bestehe?::Nichts passiert, außer dass sie unerledigt bleibt. Wiederhole sie, wann du willst|Zählt das als Üben?::Ja, hier verbrachte Zeit wird wie jede andere Session eingetragen" />
+<FaqList items="Brauche ich ein Mikrofon?::Für die Prüfungen, die dein Spiel bewerten, ja: jede Fundamentals-Prüfung, die Play!-Stufe von Fretboard Mastery und die Play-Schritte von Interval Mastery. Die lassen dich die Aufforderung nicht überspringen, siehe Notenerkennung. Die klickbasierten Stufen von Fretboard Mastery, die Klick- und Hörschritte von Interval Mastery, Üben und die Checklisten funktionieren ohne. Die Scale Map verfolgt das Tempo, das du auf jedem Muster aufzeichnest|Kann ich einen Schritt überspringen?::Nein, das ist ja gerade der Sinn. Schritte öffnen sich der Reihe nach|Was, wenn ich eine Prüfung nicht bestehe?::Nichts passiert, außer dass sie unerledigt bleibt. Wiederhole sie, wann du willst|Zählt das als Üben?::Ja, hier verbrachte Zeit wird wie jede andere Session eingetragen" />
 
 <ReadNext links="Fähigkeiten & Erfolge::/wiki/skills-and-achievements|Notenerkennung & Mikrofon-Einrichtung::/wiki/note-detection|Mastery Roadmaps & wöchentliche Meilensteine::/wiki/ai-coach-and-weekly-milestones|Punkte, Level & Serien::/wiki/how-scoring-works" />

@@ -1,7 +1,6 @@
 import { buttonVariants } from "assets/components/ui/button";
 import {
   Chip,
-  type ChipProps,
   getChipCustomStyle,
 } from "assets/components/ui/chip";
 import {
@@ -49,12 +48,8 @@ import {
 import cosmeticStyles from "feature/cosmetics/components/cosmetics.module.css";
 import { findBanner } from "feature/cosmetics/data/cosmeticsCatalog";
 import { useEquippedCosmetics } from "feature/cosmetics/hooks/useCosmetics";
-import {
-  randomLook,
-  useCosmeticsPreview,
-} from "feature/cosmetics/hooks/useCosmeticsPreview";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
-import { SearchingDots } from "feature/duels/components/DuelQueueCard";
+import { SearchingDots } from "feature/duels/components/DuelBits";
 import { useNow } from "feature/duels/hooks/useDuels";
 import { formatRatingDelta } from "feature/duels/utils/duelFormat";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
@@ -99,6 +94,7 @@ import type {
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
 import { calculateGroupFame } from "feature/logs/utils/activityFame";
+import { getFeedDayHeadings } from "feature/logs/utils/feedDayHeadings";
 import { formatLogTime } from "feature/logs/utils/formatLogTime";
 import {
   type AnyFirebaseLog,
@@ -144,28 +140,11 @@ import { Interpolate } from "lib/i18n/Interpolate";
 import type { Translate } from "lib/i18n/translate";
 import {
   CalendarIcon,
-  Clock,
   Coffee,
-  Dumbbell,
-  Ear,
-  ExternalLink,
-  Gift,
-  GraduationCap,
-  Hand,
   Heart,
-  ListChecks,
-  type LucideIcon,
-  Map as MapIcon,
-  MonitorPlay,
-  Music,
   Shield,
-  ShoppingCart,
-  Skull,
   Star,
-  Tag,
-  Target,
   Trophy,
-  Video,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -480,50 +459,6 @@ export const ItemPill = ({
   return <PillCard pill={pill} card={cardContent} />;
 };
 
-/** A Guitar Builder part dropped from a case: its stash art, slot, rarity and rolled level. */
-const ComponentPill = ({ component }: { component: OwnedComponent }) => {
-  const { t } = useTranslation("feed");
-  const def = getComponent(component.defId);
-  if (!def) return null;
-  const color = getRarityColor(def.rarity);
-
-  const pill = (
-    <span className='inline-flex w-full cursor-pointer items-center gap-2.5 rounded-lg bg-white/5 p-2 sm:w-auto sm:gap-1.5 sm:rounded-none sm:bg-transparent sm:p-0'>
-      {/* stash art squeezed into the pill's slot, whatever size the thumb draws it at */}
-      <ComponentThumb
-        def={def}
-        className='h-10 w-10 shrink-0 opacity-90 sm:order-last sm:h-7 sm:w-7 [&_img]:!h-full [&_img]:!w-full [&_span]:!h-full [&_span]:!w-full'
-      />
-      <span className='flex min-w-0 flex-1 flex-col gap-1 sm:flex-initial sm:flex-row sm:items-center sm:gap-1.5'>
-        <span className='order-1 min-w-0 break-words text-sm font-bold sm:order-2'>
-          <span style={{ color }}>{def.name}</span>{" "}
-          <span className='font-normal text-zinc-400'>
-            {SLOT_LABELS[def.slot]}
-          </span>
-        </span>
-        <span className='order-2 flex shrink-0 items-center gap-1.5 sm:order-1'>
-          <Chip
-            color='custom'
-            className='whitespace-nowrap px-1.5 py-0.5 text-xs tracking-wide'
-            style={getChipCustomStyle(color)}>
-            {def.rarity}
-          </Chip>
-          <Chip
-            color='gray'
-            className='whitespace-nowrap px-1.5 py-0.5 text-xs tabular-nums tracking-wide'
-            title={t("item_level")}>
-            {t("item_level_short", { level: component.level })}
-          </Chip>
-        </span>
-      </span>
-    </span>
-  );
-
-  return (
-    <PillCard pill={pill} card={<ComponentPreviewCard component={component} />} />
-  );
-};
-
 interface LogsBoxLayoutProps {
   logs: AnyFirebaseLog[];
   marksLogsAsRead: () => void;
@@ -621,11 +556,11 @@ const SongReference = ({
     {song.songId ? (
       <Link
         href={`/songs?view=management&songId=${song.songId}`}
-        className={cn(TOUCH_TARGET, "text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
+        className={cn(TOUCH_TARGET, "font-bold text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
         {song.songArtist} - {song.songTitle}
       </Link>
     ) : (
-      <span className='text-white'>
+      <span className='font-bold text-white'>
         {song.songArtist} - {song.songTitle}
       </span>
     )}
@@ -868,6 +803,136 @@ const FirebaseLogsGuildLevelItem = ({
   );
 };
 
+/** A thing a feed sentence names — what was practiced, bought, passed. */
+const FEED_OBJECT = "font-bold text-white";
+const FEED_OBJECT_LINK = cn(
+  TOUCH_TARGET,
+  FEED_OBJECT,
+  "transition-colors hover:text-cyan-400 hover:underline",
+);
+
+/** How many activities a card lists before the rest folds behind "Show more". */
+const MAX_VISIBLE_LOGS = 3;
+
+/** The square a feed row leads with when it has a real thing to show: an item, a new level. */
+const FeedThumb = ({ children }: { children: React.ReactNode }) => (
+  <span
+    // Solid already — a bannered row's underlay has nothing to add here.
+    data-opaque
+    className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800'>
+    {children}
+  </span>
+);
+
+/** A number a feed row reports, under the name of what it measures. */
+type FeedStat =
+  | { label: string; value: React.ReactNode }
+  | false
+  | null
+  | undefined;
+
+/**
+ * One activity in a feed card, always the same shape: a sentence naming the
+ * thing, then its numbers as named columns underneath — what it paid first,
+ * so points never float loose beside a title with nothing saying what they
+ * are. Art, when a row has any, sits under the sentence beside the numbers
+ * that describe it: every row's text starts on the same left edge whether or
+ * not it has a picture. Every kind of log goes
+ * through this, so a card reads top to bottom instead of as a wrapped run of
+ * fragments, icons and chips.
+ */
+const FeedRow = ({
+  thumb,
+  title,
+  facts = [],
+  stats = [],
+}: {
+  thumb?: React.ReactNode;
+  title: React.ReactNode;
+  /** Short qualifiers that trail the sentence. Falsy entries are skipped. */
+  facts?: React.ReactNode[];
+  /** Named numbers under the sentence. Falsy entries are skipped. */
+  stats?: FeedStat[];
+}) => {
+  const shownFacts = facts.filter(
+    (fact) =>
+      fact !== null && fact !== undefined && fact !== false && fact !== "",
+  );
+  const shownStats = stats.filter(
+    (stat): stat is { label: string; value: React.ReactNode } => Boolean(stat),
+  );
+
+  return (
+    <div className='min-w-0'>
+        <p className='break-words text-sm leading-snug text-zinc-400 first-letter:uppercase sm:text-[15px]'>
+          {title}
+          {shownFacts.length > 0 && (
+            // inline-block: on a narrow card the qualifiers drop to the next line together
+            // instead of breaking between "Lv" and the number.
+            <span className='ml-2 inline-block text-[13px] tabular-nums text-zinc-400'>
+              {shownFacts.map((fact, index) => (
+                <Fragment key={index}>
+                  {index > 0 && (
+                    <span aria-hidden className='text-zinc-600'>
+                      {" · "}
+                    </span>
+                  )}
+                  {fact}
+                </Fragment>
+              ))}
+            </span>
+          )}
+        </p>
+      {(thumb || shownStats.length > 0) && (
+        <div className='mt-2 flex items-center gap-4'>
+          {thumb}
+          {shownStats.length > 0 && (
+            <dl className='flex min-w-0 flex-wrap gap-x-7 gap-y-2'>
+              {shownStats.map((stat) => (
+                <div key={stat.label}>
+                  <dt className='text-xs text-zinc-400'>{stat.label}</dt>
+                  <dd className='mt-0.5 flex items-center gap-1 text-sm font-semibold tabular-nums text-zinc-100'>
+                    {stat.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/** Points a row paid — always its first stat. */
+const pointsStat = (points: number, label: string): FeedStat => ({
+  label,
+  value: (
+    <>
+      {points}
+      <img
+        src='/images/tokens/pick.png'
+        alt=''
+        className='h-3.5 w-3.5 object-contain'
+      />
+    </>
+  ),
+});
+
+const priceStat = (price: number, label: string): FeedStat => ({
+  label,
+  value: (
+    <>
+      {price}
+      <img
+        src='/images/tokens/coin.png'
+        alt=''
+        className='h-3.5 w-3.5 object-contain'
+      />
+    </>
+  ),
+});
+
 const DuelName = ({
   player,
   isWinner,
@@ -903,6 +968,7 @@ const FirebaseLogsDuelResultItem = ({
 }) => {
   const { t } = useTranslation(["feed", "duels"]);
   const intlLocale = useIntlLocale();
+  const dateLocale = useDateFnsLocale();
   const date = new Date(log.data);
   const [first, second] = log.players;
   const isDraw = log.kind === "draw";
@@ -911,29 +977,26 @@ const FirebaseLogsDuelResultItem = ({
 
   return (
     <div
-      className={`my-3 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl px-4 py-4 transition-all duration-base sm:px-5 ${
+      className={`my-3 flex flex-col gap-3 rounded-xl px-4 py-4 transition-all duration-base sm:px-5 ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
-      <span className='flex shrink-0 -space-x-2' aria-hidden='true'>
-        <Avatar
-          avatarURL={first.avatar || undefined}
-          name={first.displayName}
-          size='xs'
-          className='relative z-10 rounded-full ring-2 ring-zinc-900'
-        />
-        <Avatar
-          avatarURL={second.avatar || undefined}
-          name={second.displayName}
-          size='xs'
-          className='rounded-full ring-2 ring-zinc-900'
-        />
-      </span>
-
-      <div className='min-w-0 flex-[1_1_14rem]'>
-        <p className='text-xs font-semibold text-zinc-400'>
-          {t("feed:duel_finished")}
-        </p>
-        <h3 className='text-sm text-zinc-400 sm:text-base'>
+      {/* Same shape as a player's card: who on top, one row underneath. */}
+      <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
+        <span className='flex shrink-0 -space-x-2' aria-hidden='true'>
+          <Avatar
+            avatarURL={first.avatar || undefined}
+            name={first.displayName}
+            size='xs'
+            className='relative z-10 rounded-full ring-2 ring-zinc-900'
+          />
+          <Avatar
+            avatarURL={second.avatar || undefined}
+            name={second.displayName}
+            size='xs'
+            className='rounded-full ring-2 ring-zinc-900'
+          />
+        </span>
+        <h3 className='min-w-0 text-[15px] text-zinc-400'>
           <Interpolate
             text={t(`duels:feed.${log.kind}`)}
             values={{
@@ -954,39 +1017,43 @@ const FirebaseLogsDuelResultItem = ({
             }}
           />
         </h3>
-        <p className='mt-1 truncate text-xs text-zinc-400'>
-          {log.exerciseTitle}
-        </p>
+        <span className='shrink-0 text-xs text-zinc-400'>
+          {formatLogTime(date, new Date(), {
+            locale: dateLocale,
+            justNow: t("feed:just_now"),
+          })}
+        </span>
       </div>
 
-      <p className='shrink-0 text-sm tabular-nums'>
-        <span className='font-semibold text-zinc-50'>
-          {score(first.bestScore)}
-        </span>
-        <span className='text-zinc-600'> : </span>
-        <span
-          className={cn(
-            "font-semibold",
-            isDraw ? "text-zinc-50" : "text-zinc-500",
-          )}>
-          {score(second.bestScore)}
-        </span>
-      </p>
-
-      {!isDraw && (
-        <span
-          className={cn(
-            "w-12 shrink-0 text-right font-teko text-2xl font-semibold tabular-nums leading-none",
-            delta > 0 ? "text-emerald-400" : "text-zinc-500",
-          )}>
-          {formatRatingDelta(delta)}
-        </span>
-      )}
-
-      <span className='ml-auto shrink-0 text-[11px] text-zinc-400'>
-        {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
-        {addZeroToTime(date.getMinutes())}
-      </span>
+      <div className='sm:pl-[68px]'>
+        <FeedRow
+          title={<span className={FEED_OBJECT}>{log.exerciseTitle}</span>}
+          facts={[t("feed:duel_finished")]}
+          stats={[
+            {
+              label: t("feed:stat.score"),
+              value: (
+                <>
+                  {score(first.bestScore)}
+                  <span className='text-zinc-600'>:</span>
+                  <span className={isDraw ? undefined : "text-zinc-500"}>
+                    {score(second.bestScore)}
+                  </span>
+                </>
+              ),
+            },
+            !isDraw && {
+              label: t("feed:stat.rating"),
+              value: (
+                <span
+                  className={delta > 0 ? "text-emerald-400" : "text-zinc-500"}>
+                  {formatRatingDelta(delta)}
+                </span>
+              ),
+            },
+          ]}
+        />
+      </div>
     </div>
   );
 };
@@ -1258,15 +1325,6 @@ const FirebaseLogsDonationItem = ({
   );
 };
 
-/** One activity line's content, wrapping in its own column. */
-const GroupedLine = ({ children }: { children: React.ReactNode }) => (
-  <div className='flex items-center gap-2'>
-    <div className='flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-2'>
-      {children}
-    </div>
-  </div>
-);
-
 /**
  * The exercise a goal row names. A library exercise links to where it's
  * played; one the player wrote has nowhere to open it — it may be private — so
@@ -1284,145 +1342,158 @@ const GoalExerciseName = ({ exerciseId, title }: { exerciseId: string; title: st
   );
 
 /**
- * What a scored run is worth: points, accuracy, and the tempo it was played at.
- * Rendered identically whether or not the row links through to the exercise's
- * leaderboard, so the two variants below share this one definition.
+ * A guitar or effect named by a feed row: its art leads the row, the name
+ * opens the item's card (hover on desktop, tap on touch), rarity and level sit
+ * in the facts.
  */
-const LeaderboardPlace = ({ rank }: { rank: number }) => {
-  const { t } = useTranslation("feed");
-  return (
-  <>
-    <span aria-hidden className='text-zinc-600'>·</span>
-    <span
-      title={t("leaderboard_place_hint")}
-      className={cn(
-        "font-semibold tabular-nums",
-        rank <= 3 ? "text-amber-300" : "text-white",
-      )}>
-      #{rank}
-    </span>
-  </>
-  );
-};
-
-const MicPerformanceStats = ({
-  performance,
+const ItemRow = ({
+  lead,
+  trail,
+  itemType,
+  itemName,
+  itemBrand,
+  itemRarity,
+  itemImageId,
+  rolledItem,
+  price,
 }: {
-  performance: NonNullable<FirebaseLogsInterface["micPerformance"]>;
+  /** The sentence up to the item ("opened Vintage Case and got"). */
+  lead: React.ReactNode;
+  /** Whatever follows the item's name ("from Tomek"). */
+  trail?: React.ReactNode;
+  itemType: "guitar" | "effect";
+  itemName: string;
+  itemBrand: string;
+  itemRarity: string;
+  itemImageId: number | string;
+  rolledItem: InventoryItem | EffectInventoryItem | undefined;
+  /** What it was listed or sold for. */
+  price?: number;
 }) => {
   const { t } = useTranslation("feed");
-  return (
-  <>
-    <Target className='h-3.5 w-3.5 shrink-0 text-zinc-500' />
-    <span className='text-zinc-400'>{t("score")}</span>
-    <span className='font-semibold tabular-nums text-white'>
-      {performance.score}
-    </span>
-    <span aria-hidden className='text-zinc-600'>·</span>
-    <span className='font-semibold tabular-nums text-white'>
-      {performance.accuracy}%
-    </span>
-    {/* Older logs and metronome-less exercises carry no tempo — say nothing rather than guess one. */}
-    {performance.bpm != null && (
-      <>
-        <span aria-hidden className='text-zinc-600'>·</span>
-        <span className='font-semibold tabular-nums text-white'>
-          {performance.bpm}
-        </span>
-        <span className='text-zinc-400'>BPM</span>
-      </>
-    )}
-    {performance.rank != null && <LeaderboardPlace rank={performance.rank} />}
-  </>
-  );
-};
+  const { rolledGuitar, rolledEffect, level } = resolveRolledItem(rolledItem);
+  const imgSrc =
+    itemType === "guitar"
+      ? getRankBadgeSrc(itemImageId, "small")
+      : getEffectImageSrc(itemImageId, "small");
 
-/** The ear-training twin of MicPerformanceStats — no accuracy, no tempo. */
-const EarTrainingStats = ({
-  performance,
-}: {
-  performance: NonNullable<FirebaseLogsInterface["earTrainingPerformance"]>;
-}) => {
-  const { t } = useTranslation("feed");
-  return (
-  <>
-    <Ear className='h-3.5 w-3.5 shrink-0 text-zinc-500' />
-    <span className='text-zinc-400'>{t("score")}</span>
-    <span className='font-semibold tabular-nums text-white'>
-      {performance.score}
-    </span>
-    {performance.rank != null && <LeaderboardPlace rank={performance.rank} />}
-  </>
-  );
-};
-
-/** Purple "Song" chip shared by every feed row that references a song, so artist/title are always formatted the same way. */
-const SongBadge = ({
-  songId,
-  songArtist,
-  songTitle,
-}: {
-  songId?: string;
-  songArtist: string;
-  songTitle: string;
-}) => {
-  const { t } = useTranslation("feed");
-  return songId ? (
-    <Link
-      href={`/songs?view=management&songId=${songId}`}
-      title={t("open_song_hint")}>
-      <Chip color='purple' className='cursor-pointer'>
-        <Music className='h-3.5 w-3.5 shrink-0' />
-        <span className='underline-offset-2 hover:underline'>
-          {songArtist} - {songTitle}
-        </span>
-        <ExternalLink className='h-3 w-3 shrink-0 opacity-70' />
-      </Chip>
-    </Link>
+  const card = rolledGuitar ? (
+    <div style={{ width: 250 }}>
+      <GuitarCard item={rolledGuitar} readOnly />
+    </div>
+  ) : rolledEffect ? (
+    <div style={{ width: 250 }}>
+      <EffectCard item={rolledEffect} readOnly />
+    </div>
   ) : (
-    <Chip color='purple'>
-      <Music className='h-3.5 w-3.5 shrink-0' />
-      {songArtist} - {songTitle}
-    </Chip>
+    <ItemTooltipCard
+      itemType={itemType}
+      itemName={itemName}
+      itemBrand={itemBrand}
+      itemRarity={itemRarity}
+      itemImageId={itemImageId}
+    />
+  );
+
+  return (
+    <FeedRow
+      thumb={
+        <FeedThumb>
+          <img
+            src={imgSrc}
+            alt=''
+            className={cn(
+              "h-8 w-8 object-contain",
+              itemType === "guitar" && "-rotate-45",
+            )}
+          />
+        </FeedThumb>
+      }
+      title={
+        <>
+          {lead}{" "}
+          <PillCard
+            pill={
+              <span className={cn(FEED_OBJECT, "cursor-pointer")}>
+                {itemBrand} {itemName}
+              </span>
+            }
+            card={card}
+          />
+          {trail && <> {trail}</>}
+        </>
+      }
+      stats={[
+        {
+          label: t("stat.rarity"),
+          value: (
+            <span style={{ color: getRarityColor(itemRarity) }}>
+              {itemRarity}
+            </span>
+          ),
+        },
+        level !== null && { label: t("stat.level"), value: level },
+        price !== undefined && priceStat(price, t("stat.price")),
+      ]}
+    />
   );
 };
 
-/**
- * The chip naming what a session practiced. It opens that plan, exercise or lesson when the feed
- * knows how to, and stays a plain label when it doesn't — a free-text manual report, an older log.
- */
-const PracticedChip = ({
-  color,
-  icon: Icon,
-  label,
-  hint,
-  onOpen,
+/** The Guitar Builder twin of ItemRow: a part dropped from a case. */
+const ComponentRow = ({
+  lead,
+  component,
 }: {
-  color: ChipProps["color"];
-  icon: LucideIcon;
-  label: string;
-  hint: string;
-  onOpen?: () => void;
-}) =>
-  onOpen ? (
-    <button
-      type='button'
-      onClick={onOpen}
-      title={hint}
-      className={TOUCH_TARGET}>
-      <Chip color={color} className='cursor-pointer text-left'>
-        <Icon className='h-3.5 w-3.5 shrink-0' />
-        <span className='underline-offset-2 hover:underline'>{label}</span>
-      </Chip>
-    </button>
-  ) : (
-    <Chip color={color}>
-      <Icon className='h-3.5 w-3.5 shrink-0' />
-      {label}
-    </Chip>
-  );
+  lead: React.ReactNode;
+  component: OwnedComponent | undefined;
+}) => {
+  const { t } = useTranslation("feed");
+  const def = component ? getComponent(component.defId) : null;
+  if (!component || !def) return <FeedRow title={lead} />;
 
-/** Renders a single activity's description inside a grouped feed row — same detail as the standalone item, minus the avatar and reaction (those live once on the group). */
+  return (
+    <FeedRow
+      thumb={
+        <FeedThumb>
+          {/* stash art squeezed into the row's slot, whatever size the thumb draws it at */}
+          <ComponentThumb
+            def={def}
+            className='h-8 w-8 shrink-0 [&_img]:!h-full [&_img]:!w-full [&_span]:!h-full [&_span]:!w-full'
+          />
+        </FeedThumb>
+      }
+      title={
+        <>
+          {lead}{" "}
+          <PillCard
+            pill={
+              <span className={cn(FEED_OBJECT, "cursor-pointer")}>
+                {def.name}
+              </span>
+            }
+            card={<ComponentPreviewCard component={component} />}
+          />
+        </>
+      }
+      facts={[
+        SLOT_LABELS[def.slot],
+      ]}
+      stats={[
+        {
+          label: t("stat.rarity"),
+          value: (
+            <span style={{ color: getRarityColor(def.rarity) }}>
+              {def.rarity}
+            </span>
+          ),
+        },
+        { label: t("stat.level"), value: component.level },
+      ]}
+    />
+  );
+};
+
+/** Renders one activity as feed rows — the avatar and the reaction live once on the group. */
 const GroupedLogLine = ({
   log,
   type,
@@ -1451,8 +1522,8 @@ const GroupedLogLine = ({
       : null;
 
     return (
-      <GroupedLine>
-        <p className='text-sm text-zinc-300'>
+      <FeedRow
+        title={
           <Interpolate
             text={message}
             values={{
@@ -1464,20 +1535,19 @@ const GroupedLogLine = ({
               ),
             }}
           />
-        </p>
-        {showRating && ratingTier && (
-          <Chip
-            color='custom'
-            style={getChipCustomStyle(ratingTier.color)}
-            title={t("feed:difficulty_rated", {
-              rating: songLog.difficulty_rate,
-              tier: ratingTier.label,
-            })}>
-            <Star className='h-3 w-3 shrink-0 fill-current' />
-            {songLog.difficulty_rate}/10
-          </Chip>
-        )}
-      </GroupedLine>
+        }
+        facts={[
+          showRating && ratingTier && (
+            <span
+              title={t("feed:difficulty_rated", {
+                rating: songLog.difficulty_rate,
+                tier: ratingTier.label,
+              })}>
+              {songLog.difficulty_rate}/10
+            </span>
+          ),
+        ]}
+      />
     );
   }
 
@@ -1485,153 +1555,106 @@ const GroupedLogLine = ({
     const recLog = log as FirebaseLogsRecordingsInterface;
 
     return (
-      <GroupedLine>
-        <p className='text-sm text-zinc-300'>
-          <Video className='mr-1.5 inline-block h-3 w-3 text-cyan-400' />
-          {t("feed:added_recording")}{" "}
-          {recLog.recordingId ? (
-            <button
-              onClick={() => onViewRecording(recLog.recordingId as string)}
-              className={cn(TOUCH_TARGET, "text-left font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
-              {recLog.recordingTitle}
-            </button>
-          ) : (
-            <a
-              href={recLog.videoUrl}
-              target='_blank'
-              rel='noopener noreferrer'
-              className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
-              {recLog.recordingTitle}
-            </a>
-          )}{" "}
-          {recLog.songTitle && (
-            <span className='text-xs opacity-70'>
-              ({recLog.songArtist} - {recLog.songTitle})
-            </span>
-          )}
-        </p>
-      </GroupedLine>
+      <FeedRow
+        title={
+          <>
+            {t("feed:added_recording")}{" "}
+            {recLog.recordingId ? (
+              <button
+                type='button'
+                onClick={() => onViewRecording(recLog.recordingId as string)}
+                className={cn(FEED_OBJECT_LINK, "text-left")}>
+                {recLog.recordingTitle}
+              </button>
+            ) : (
+              <a
+                href={recLog.videoUrl}
+                target='_blank'
+                rel='noopener noreferrer'
+                className={FEED_OBJECT_LINK}>
+                {recLog.recordingTitle}
+              </a>
+            )}
+          </>
+        }
+        facts={[
+          recLog.songTitle && `${recLog.songArtist} - ${recLog.songTitle}`,
+        ]}
+      />
     );
   }
 
   if (type === "caseOpen") {
     const caseLog = log as FirebaseLogsCaseOpenInterface;
-    const { rolledGuitar, rolledEffect, level } = resolveRolledItem(
-      caseLog.rolledItem,
+    const lead = (
+      <Interpolate
+        text={t("feed:opened_case")}
+        values={{
+          case: <span className={FEED_OBJECT}>{caseLog.caseName}</span>,
+        }}
+      />
     );
 
-    return (
-      <GroupedLine>
-        <span className='text-sm text-zinc-300'>
-          <Interpolate
-            text={t("feed:opened_case")}
-            values={{
-              case: (
-                <span className='font-bold text-white'>{caseLog.caseName}</span>
-              ),
-            }}
-          />
-        </span>
-        {caseLog.itemType === "component" ? (
-          caseLog.component && <ComponentPill component={caseLog.component} />
-        ) : (
-          <ItemPill
-            itemType={caseLog.itemType}
-            itemName={caseLog.itemName}
-            itemBrand={caseLog.itemBrand}
-            itemRarity={caseLog.itemRarity}
-            itemImageId={caseLog.itemImageId}
-            level={level}
-            rolledGuitar={rolledGuitar}
-            rolledEffect={rolledEffect}
-          />
-        )}
-      </GroupedLine>
+    return caseLog.itemType === "component" ? (
+      <ComponentRow lead={lead} component={caseLog.component} />
+    ) : (
+      <ItemRow
+        lead={lead}
+        itemType={caseLog.itemType}
+        itemName={caseLog.itemName}
+        itemBrand={caseLog.itemBrand}
+        itemRarity={caseLog.itemRarity}
+        itemImageId={caseLog.itemImageId}
+        rolledItem={caseLog.rolledItem}
+      />
     );
   }
 
   if (type === "marketplace") {
     const marketLog = log as FirebaseLogsMarketplaceInterface;
-    const { rolledGuitar, rolledEffect, level } = resolveRolledItem(
-      marketLog.rolledItem,
-    );
 
     return (
-      <GroupedLine>
-        <span className='text-sm text-zinc-300'>{t("feed:listed")}</span>
-        <ItemPill
-          itemType={marketLog.itemType}
-          itemName={marketLog.itemName}
-          itemBrand={marketLog.itemBrand}
-          itemRarity={marketLog.itemRarity}
-          itemImageId={marketLog.itemImageId}
-          level={level}
-          rolledGuitar={rolledGuitar}
-          rolledEffect={rolledEffect}
-        />
-        <Chip color='amber'>
-          <Tag className='h-3.5 w-3.5 shrink-0' />
-          <span className='inline-flex items-center gap-1 tabular-nums'>
-            {marketLog.price}
-            <img
-              src='/images/tokens/coin.png'
-              alt='coin'
-              className='h-4 w-4 object-contain'
-            />
-          </span>
-        </Chip>
-      </GroupedLine>
+      <ItemRow
+        lead={t("feed:listed")}
+        itemType={marketLog.itemType}
+        itemName={marketLog.itemName}
+        itemBrand={marketLog.itemBrand}
+        itemRarity={marketLog.itemRarity}
+        itemImageId={marketLog.itemImageId}
+        rolledItem={marketLog.rolledItem}
+        price={marketLog.price}
+      />
     );
   }
 
   if (type === "marketplacePurchase") {
     const purchaseLog = log as FirebaseLogsMarketplacePurchaseInterface;
-    const { rolledGuitar, rolledEffect, level } = resolveRolledItem(
-      purchaseLog.rolledItem,
-    );
 
     return (
-      <GroupedLine>
-        <span className='text-sm text-zinc-300'>
-          <ShoppingCart className='mr-1.5 inline-block h-3.5 w-3.5 text-amber-400' />
-          {t("feed:bought")}
-        </span>
-        <ItemPill
-          itemType={purchaseLog.itemType}
-          itemName={purchaseLog.itemName}
-          itemBrand={purchaseLog.itemBrand}
-          itemRarity={purchaseLog.itemRarity}
-          itemImageId={purchaseLog.itemImageId}
-          level={level}
-          rolledGuitar={rolledGuitar}
-          rolledEffect={rolledEffect}
-        />
-        <span className='text-sm text-zinc-300'>
-          {t("feed:from")}{" "}
-          {purchaseLog.sellerId ? (
-            <Link
-              href={`/user/${purchaseLog.sellerId}`}
-              className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
-              {purchaseLog.sellerName}
-            </Link>
-          ) : (
-            <span className='font-bold text-white'>
-              {purchaseLog.sellerName}
-            </span>
-          )}
-        </span>
-        <Chip color='amber'>
-          <Tag className='h-3.5 w-3.5 shrink-0' />
-          <span className='inline-flex items-center gap-1 tabular-nums'>
-            {purchaseLog.price}
-            <img
-              src='/images/tokens/coin.png'
-              alt='coin'
-              className='h-4 w-4 object-contain'
-            />
-          </span>
-        </Chip>
-      </GroupedLine>
+      <ItemRow
+        lead={t("feed:bought")}
+        trail={
+          <>
+            {t("feed:from")}{" "}
+            {purchaseLog.sellerId ? (
+              <Link
+                href={`/user/${purchaseLog.sellerId}`}
+                className={FEED_OBJECT_LINK}>
+                {purchaseLog.sellerName}
+              </Link>
+            ) : (
+              <span className={FEED_OBJECT}>{purchaseLog.sellerName}</span>
+            )}
+          </>
+        }
+        itemType={purchaseLog.itemType}
+        itemName={purchaseLog.itemName}
+        itemBrand={purchaseLog.itemBrand}
+        itemRarity={purchaseLog.itemRarity}
+        itemImageId={purchaseLog.itemImageId}
+        rolledItem={purchaseLog.rolledItem}
+        price={purchaseLog.price}
+      />
     );
   }
 
@@ -1642,27 +1665,24 @@ const GroupedLogLine = ({
     );
 
     return (
-      <GroupedLine>
-        <p className='text-sm text-zinc-300'>
-          {t("feed:created_playlist", { kind: kindLabel })}{" "}
-          <Link
-            href={`/songs?view=playlists&playlistId=${playlistLog.playlistId}`}
-            className={cn(TOUCH_TARGET, "inline-flex items-center gap-1 font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
-            {playlistLog.playlistName}
-            <ExternalLink className='h-3 w-3 opacity-60' />
-          </Link>
-          {playlistLog.songCount > 0 && (
-            <span className='text-xs opacity-70'>
-              {" "}
-              (
-              {playlistLog.songCount === 1
-                ? t("feed:song_count_one")
-                : t("feed:song_count_other", { count: playlistLog.songCount })}
-              )
-            </span>
-          )}
-        </p>
-      </GroupedLine>
+      <FeedRow
+        title={
+          <>
+            {t("feed:created_playlist", { kind: kindLabel })}{" "}
+            <Link
+              href={`/songs?view=playlists&playlistId=${playlistLog.playlistId}`}
+              className={FEED_OBJECT_LINK}>
+              {playlistLog.playlistName}
+            </Link>
+          </>
+        }
+        facts={[
+          playlistLog.songCount > 0 &&
+            (playlistLog.songCount === 1
+              ? t("feed:song_count_one")
+              : t("feed:song_count_other", { count: playlistLog.songCount })),
+        ]}
+      />
     );
   }
 
@@ -1670,23 +1690,28 @@ const GroupedLogLine = ({
     const examLog = log as FirebaseLogsExamPassedInterface;
 
     return (
-      <GroupedLine>
-        <p className='text-sm text-zinc-300'>
-          <GraduationCap className='mr-1.5 inline-block h-3.5 w-3.5 text-emerald-400' />
+      <FeedRow
+        title={
           <Interpolate
             text={t("feed:passed_exam")}
             values={{
-              step: <span className='font-bold text-white'>{examLog.stepTitle}</span>,
+              step: <span className={FEED_OBJECT}>{examLog.stepTitle}</span>,
             }}
           />
-        </p>
-        <Chip color='emerald'>
-          {Array.from({ length: examLog.stars }).map((_, i) => (
-            <Star key={i} className='h-3.5 w-3.5 shrink-0 fill-current' />
-          ))}
-          <span className='tabular-nums'>{examLog.accuracy}%</span>
-        </Chip>
-      </GroupedLine>
+        }
+        facts={[
+          examLog.stars > 0 && (
+            <span className='inline-flex items-center gap-0.5 text-zinc-300'>
+              {Array.from({ length: examLog.stars }).map((_, i) => (
+                <Star key={i} className='h-3 w-3 shrink-0 fill-current' />
+              ))}
+            </span>
+          ),
+        ]}
+        stats={[
+          { label: t("feed:stat.accuracy"), value: `${examLog.accuracy}%` },
+        ]}
+      />
     );
   }
 
@@ -1694,16 +1719,15 @@ const GroupedLogLine = ({
     const stepLog = log as FirebaseLogsRoadmapStepInterface;
 
     return (
-      <GroupedLine>
-        <p className='text-sm text-zinc-300'>
-          <MapIcon className='mr-1.5 inline-block h-3.5 w-3.5 text-cyan-400' />
+      <FeedRow
+        title={
           <Interpolate
             text={t("feed:completed_roadmap_step")}
             values={{
               step: (
                 <Link
                   href={`/ai-coach?roadmapId=${stepLog.roadmapId}&step=${stepLog.stepId}`}
-                  className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
+                  className={FEED_OBJECT_LINK}>
                   {stepLog.stepTitle}
                 </Link>
               ),
@@ -1714,9 +1738,9 @@ const GroupedLogLine = ({
               ),
             }}
           />
-        </p>
-        {stepLog.phaseTitle && <Chip color='cyan'>{stepLog.phaseTitle}</Chip>}
-      </GroupedLine>
+        }
+        facts={[stepLog.phaseTitle]}
+      />
     );
   }
 
@@ -1724,20 +1748,24 @@ const GroupedLogLine = ({
     const goalLog = log as FirebaseLogsGoalCompletedInterface;
 
     return (
-      <GroupedLine>
-        <p className='text-sm text-zinc-300'>
-          <Target className='mr-1.5 inline-block h-3.5 w-3.5 text-emerald-400' />
+      <FeedRow
+        title={
           <Interpolate
             text={t("feed:reached_exercise_goal")}
             values={{
-              exercise: <GoalExerciseName exerciseId={goalLog.exerciseId} title={goalLog.exerciseTitle} />,
+              exercise: (
+                <GoalExerciseName
+                  exerciseId={goalLog.exerciseId}
+                  title={goalLog.exerciseTitle}
+                />
+              ),
             }}
           />
-        </p>
-        <Chip color='emerald'>
-          <span className='tabular-nums'>{goalLog.targetBpm} BPM</span>
-        </Chip>
-      </GroupedLine>
+        }
+        stats={[
+          { label: t("feed:stat.tempo"), value: `${goalLog.targetBpm} BPM` },
+        ]}
+      />
     );
   }
 
@@ -1745,22 +1773,27 @@ const GroupedLogLine = ({
     const goalLog = log as FirebaseLogsGoalCreatedInterface;
 
     return (
-      <GroupedLine>
-        <p className='text-sm text-zinc-300'>
-          <Target className='mr-1.5 inline-block h-3.5 w-3.5 text-cyan-400' />
+      <FeedRow
+        title={
           <Interpolate
             text={t("feed:set_exercise_goal")}
             values={{
-              exercise: <GoalExerciseName exerciseId={goalLog.exerciseId} title={goalLog.exerciseTitle} />,
+              exercise: (
+                <GoalExerciseName
+                  exerciseId={goalLog.exerciseId}
+                  title={goalLog.exerciseTitle}
+                />
+              ),
             }}
           />
-        </p>
-        <Chip color='cyan'>
-          <span className='tabular-nums'>
-            {goalLog.startBpm} → {goalLog.targetBpm} BPM
-          </span>
-        </Chip>
-      </GroupedLine>
+        }
+        stats={[
+          {
+            label: t("feed:stat.tempo"),
+            value: `${goalLog.startBpm} → ${goalLog.targetBpm} BPM`,
+          },
+        ]}
+      />
     );
   }
 
@@ -1769,14 +1802,9 @@ const GroupedLogLine = ({
     const phrase = welcomeGoalPhrase(joinedLog.goal, joinedLog.planTitle, t);
 
     return (
-      <GroupedLine>
-        <p className='text-sm text-zinc-300'>
-          <Hand className='mr-1.5 inline-block h-3.5 w-3.5 text-cyan-400' />
-          {phrase
-            ? t("feed:joined_with", { phrase })
-            : t("feed:joined")}
-        </p>
-      </GroupedLine>
+      <FeedRow
+        title={phrase ? t("feed:joined_with", { phrase }) : t("feed:joined")}
+      />
     );
   }
 
@@ -1784,31 +1812,19 @@ const GroupedLogLine = ({
     const questLog = log as FirebaseLogsDailyQuestInterface;
 
     return (
-      <GroupedLine>
-        <p className='text-sm text-zinc-300'>
+      <FeedRow
+        title={
           <Interpolate
             text={t("feed:completed_daily_quests")}
             values={{
               quests: (
-                <span className='font-semibold text-zinc-200'>
-                  {t("feed:daily_quests")}
-                </span>
+                <span className={FEED_OBJECT}>{t("feed:daily_quests")}</span>
               ),
             }}
           />
-        </p>
-        <Chip color='yellow'>
-          <Gift className='h-3.5 w-3.5 shrink-0' />
-          <span className='inline-flex items-center gap-1 tabular-nums'>
-            +{questLog.points}
-            <img
-              src='/images/tokens/pick.png'
-              alt='points'
-              className='h-4 w-4 object-contain'
-            />
-          </span>
-        </Chip>
-      </GroupedLine>
+        }
+        stats={[pointsStat(questLog.points, t("feed:stat.points"))]}
+      />
     );
   }
 
@@ -1876,104 +1892,85 @@ const GroupedLogLine = ({
   })();
   const sessionTimeMs = genericLog.timeSumary?.sumTime ?? 0;
 
-  return (
-    <GroupedLine>
-      {/* One sentence around the points, so German can close it with
-          "erhalten" right after them instead of after the time and the rest. */}
-      <span className='inline-flex items-center gap-1.5 text-sm text-zinc-300'>
+  /**
+   * The thing a session practiced, inside its sentence. It opens that plan,
+   * exercise or lesson when the feed knows how to, and stays plain text when it
+   * doesn't — a free-text manual report, an older log.
+   */
+  const practiced = (label: string, hint: string, onOpen?: () => void) => (
+    <Interpolate
+      text={t("feed:practiced_item")}
+      values={{
+        item: onOpen ? (
+          <button
+            type='button'
+            onClick={onOpen}
+            title={hint}
+            className={cn(FEED_OBJECT_LINK, "text-left")}>
+            {label}
+          </button>
+        ) : (
+          <span className={FEED_OBJECT}>{label}</span>
+        ),
+      }}
+    />
+  );
+
+  // What the session was about. Usually one thing; a plan logged with a single
+  // song names both, each on its own row.
+  const subjects: { title: React.ReactNode; facts?: React.ReactNode[] }[] = [];
+
+  if (bossTitle) {
+    subjects.push({
+      title: (
         <Interpolate
-          text={t("common:logsBox.got_points")}
+          text={t("feed:fought_boss")}
           values={{
-            points: (
-              <span className='flex items-center gap-1 text-cyan-500'>
-                +{genericLog.points}
-                <img
-                  src='/images/tokens/pick.png'
-                  alt='points'
-                  className='h-5 w-5 object-contain'
-                />
-              </span>
+            item: (
+              <Link
+                href='/bosses'
+                title={t("feed:boss_hint")}
+                className={FEED_OBJECT_LINK}>
+                {bossTitle}
+              </Link>
             ),
           }}
         />
-      </span>
+      ),
+      facts: [
+        genericLog.bossRun &&
+          t("feed:phase_cleared", { phase: genericLog.bossRun.phase }),
+      ],
+    });
+  }
 
-      {sessionTimeMs > 0 && (
-        <span
-          className='inline-flex items-center gap-1.5 text-sm text-zinc-300'
-          title={t("feed:session_time_hint")}>
-          <Clock className='h-3.5 w-3.5 shrink-0 text-zinc-500' />
-          <span className='tabular-nums'>
-            {formatSessionTime(sessionTimeMs)}
-          </span>
-        </span>
-      )}
+  if (planTitle) {
+    subjects.push({
+      title: practiced(
+        planTitle,
+        t("feed:plan_hint"),
+        plan
+          ? () => onPreview({ kind: "plan", plan })
+          : loggedExercises.length > 0
+            ? () =>
+                onPreview({
+                  kind: "routine",
+                  title: planTitle,
+                  exercises: loggedExercises,
+                })
+            : undefined,
+      ),
+      facts: [t("feed:activity_kind.plan")],
+    });
+  }
 
-      {genericLog.newLevel?.isNewLevel && (
-        <span className='text-sm text-zinc-300'>
-          {t("common:logsBox.lvl_up")}
-          <span className='ml-1 text-main'>
-            {t("feed:level_short", { level: genericLog.newLevel.level })}
-          </span>
-        </span>
-      )}
-
-      {genericLog.newAchievements?.length > 0 && (
-        <span className='inline-flex items-center gap-2 text-sm'>
-          {t("common:logsBox.achievements")}{" "}
-          {genericLog.newAchievements.map((achievement, index) => (
-            <span key={index} className='inline-flex items-center gap-2'>
-              <AchievementIcon id={achievement} />
-            </span>
-          ))}
-        </span>
-      )}
-
-      {bossTitle && (
-        <Link href='/bosses' title={t("feed:boss_hint")} className={TOUCH_TARGET}>
-          <Chip color='amber' className='cursor-pointer text-left'>
-            <Skull className='h-3.5 w-3.5 shrink-0' />
-            <span className='underline-offset-2 hover:underline'>
-              {genericLog.bossRun
-                ? t("feed:boss_phase_cleared", { boss: bossTitle, phase: genericLog.bossRun.phase })
-                : bossTitle}
-            </span>
-          </Chip>
-        </Link>
-      )}
-
-      {planTitle && (
-        <PracticedChip
-          color='cyan'
-          icon={ListChecks}
-          label={planTitle}
-          hint={t("feed:plan_hint")}
-          onOpen={
-            plan
-              ? () => onPreview({ kind: "plan", plan })
-              : loggedExercises.length > 0
-                ? () =>
-                    onPreview({
-                      kind: "routine",
-                      title: planTitle,
-                      exercises: loggedExercises,
-                    })
-                : undefined
-          }
-        />
-      )}
-
-      {sessionTitle &&
-        !planTitle &&
-        !bossTitle &&
-        !genericLog.songTitle &&
-        (lessonTitle ? (
-          <PracticedChip
-            color='emerald'
-            icon={MonitorPlay}
-            label={lessonTitle}
-            hint={t("feed:lesson_hint")}
-            onOpen={
+  if (sessionTitle && !planTitle && !bossTitle && !genericLog.songTitle) {
+    subjects.push(
+      lessonTitle
+        ? {
+            title: practiced(
+              lessonTitle,
+              t("feed:lesson_hint"),
               lessonVideoId
                 ? () =>
                     onPreview({
@@ -1981,82 +1978,153 @@ const GroupedLogLine = ({
                       title: lessonTitle,
                       videoId: lessonVideoId,
                     })
-                : undefined
-            }
-          />
-        ) : (
-          <PracticedChip
-            color='emerald'
-            icon={Dumbbell}
-            label={sessionTitle}
-            hint={t("feed:exercise_hint")}
-            onOpen={
+                : undefined,
+            ),
+            facts: [t("feed:activity_kind.lesson")],
+          }
+        : {
+            title: practiced(
+              sessionTitle,
+              t("feed:exercise_hint"),
               matchedExercise
                 ? () =>
                     onPreview({ kind: "exercise", exercise: matchedExercise })
-                : undefined
-            }
-          />
-        ))}
+                : undefined,
+            ),
+          },
+    );
+  }
 
-      {genericLog.micPerformance &&
-        genericLog.micPerformance.score !== 0 &&
-        (rankedExercise ? (
-          <button
-            type='button'
-            onClick={() =>
-              onOpenLeaderboard(rankedExercise.id, rankedExercise.title)
-            }
-            title={t("feed:ranking_hint")}
-            className={cn(TOUCH_TARGET, "inline-flex items-center gap-1.5 text-sm underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
-            <MicPerformanceStats performance={genericLog.micPerformance} />
-          </button>
-        ) : (
-          <span className='inline-flex items-center gap-1.5 text-sm'>
-            <MicPerformanceStats performance={genericLog.micPerformance} />
-          </span>
-        ))}
+  if (practicedSongs.length > 0 && !hidesPrimarySong) {
+    subjects.push({
+      title: (
+        <Interpolate
+          text={t("common:song_status.practiced", {
+            count: practicedSongs.length,
+          })}
+          values={{
+            song: practicedSongs.map((song, index) => (
+              <Fragment
+                key={song.songId || `${song.songArtist}-${song.songTitle}`}>
+                {index > 0 && <span className='text-zinc-500'>, </span>}
+                <SongReference
+                  song={song}
+                  info={song.songId ? songTiers[song.songId] : undefined}
+                />
+              </Fragment>
+            )),
+          }}
+        />
+      ),
+    });
+  }
 
-      {genericLog.earTrainingPerformance &&
-        genericLog.earTrainingPerformance.score !== 0 &&
-        (rankedExercise ? (
-          <button
-            type='button'
-            onClick={() =>
-              onOpenLeaderboard(rankedExercise.id, rankedExercise.title)
-            }
-            title={t("feed:ranking_hint")}
-            className={cn(TOUCH_TARGET, "inline-flex items-center gap-1.5 text-sm underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
-            <EarTrainingStats performance={genericLog.earTrainingPerformance} />
-          </button>
-        ) : (
-          <span className='inline-flex items-center gap-1.5 text-sm'>
-            <EarTrainingStats performance={genericLog.earTrainingPerformance} />
-          </span>
-        ))}
+  if (subjects.length === 0) subjects.push({ title: t("feed:logged_session") });
 
-      {practicedSongs.length > 0 && !hidesPrimarySong && (
-        <p className='text-sm text-zinc-300'>
-          <Interpolate
-            text={t("common:song_status.practiced", {
-              count: practicedSongs.length,
-            })}
-            values={{
-              song: practicedSongs.map((song, index) => (
-                <Fragment
-                  key={song.songId || `${song.songArtist}-${song.songTitle}`}>
-                  {index > 0 && <span className='text-zinc-500'>, </span>}
-                  <SongReference
-                    song={song}
-                    info={song.songId ? songTiers[song.songId] : undefined}
-                  />
-                </Fragment>
-              )),
-            }}
-          />
-        </p>
+  /** A scored number opens the exercise's leaderboard when it has one. */
+  const ranked = (value: React.ReactNode, hint?: string) =>
+    rankedExercise ? (
+      <button
+        type='button'
+        onClick={() =>
+          onOpenLeaderboard(rankedExercise.id, rankedExercise.title)
+        }
+        title={t("feed:ranking_hint")}
+        className={cn(
+          TOUCH_TARGET,
+          "font-semibold underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60",
+        )}>
+        {value}
+      </button>
+    ) : (
+      <span title={hint}>{value}</span>
+    );
+  const scoreStat = (score: number): FeedStat => ({
+    label: t("feed:stat.score"),
+    value: ranked(score),
+  });
+  const placeStat = (rank: number | null | undefined): FeedStat =>
+    rank != null && {
+      label: t("feed:stat.place"),
+      value: ranked(`#${rank}`, t("feed:leaderboard_place_hint")),
+    };
+
+  const mic =
+    genericLog.micPerformance && genericLog.micPerformance.score !== 0
+      ? genericLog.micPerformance
+      : null;
+  const ear =
+    genericLog.earTrainingPerformance &&
+    genericLog.earTrainingPerformance.score !== 0
+      ? genericLog.earTrainingPerformance
+      : null;
+
+  // Always in this order, so the eye finds the same number in the same column on every card.
+  const sessionStats: FeedStat[] = [
+    pointsStat(genericLog.points, t("feed:stat.points")),
+    sessionTimeMs > 0 && {
+      label: t("feed:stat.time"),
+      value: (
+        <span title={t("feed:session_time_hint")}>
+          {formatSessionTime(sessionTimeMs)}
+        </span>
+      ),
+    },
+    mic && scoreStat(mic.score),
+    mic && { label: t("feed:stat.accuracy"), value: `${mic.accuracy}%` },
+    // Older logs and metronome-less exercises carry no tempo — say nothing rather than guess one.
+    mic &&
+      mic.bpm != null && {
+        label: t("feed:stat.tempo"),
+        value: `${mic.bpm} BPM`,
+      },
+    mic && placeStat(mic.rank),
+    ear && scoreStat(ear.score),
+    ear && placeStat(ear.rank),
+  ];
+
+  return (
+    <>
+      {subjects.map((subject, index) => (
+        <FeedRow
+          key={index}
+          title={subject.title}
+          facts={subject.facts}
+          // The session's points, time and score belong to its first row.
+          stats={index === 0 ? sessionStats : undefined}
+        />
+      ))}
+
+      {genericLog.newLevel?.isNewLevel && (
+        <FeedRow
+          title={
+            <Interpolate
+              text={t("feed:reached_level")}
+              values={{
+                level: (
+                  <span className={FEED_OBJECT}>
+                    {genericLog.newLevel.level}
+                  </span>
+                ),
+              }}
+            />
+          }
+        />
       )}
-    </GroupedLine>
+
+      {genericLog.newAchievements?.length > 0 && (
+        <FeedRow
+          title={
+            <span className='inline-flex flex-wrap items-center gap-2'>
+              {t("common:logsBox.achievements")}
+              {genericLog.newAchievements.map((achievement, index) => (
+                <AchievementIcon key={index} id={achievement} />
+              ))}
+            </span>
+          }
+        />
+      )}
+    </>
   );
 };
 
@@ -2081,65 +2149,75 @@ const GroupedLogItem = ({
 }) => {
   const { t } = useTranslation("feed");
   const dateLocale = useDateFnsLocale();
+  const [isExpanded, setIsExpanded] = useState(false);
   const representative = group.logs[0] as FirebaseLogsInterface;
   const date = new Date(getLogTimestampMs(group.logs[0]));
   const fameAmount = calculateGroupFame(group);
   const { uid, userName, avatarUrl, guildBadge } =
     representative;
-  const equipped = useEquippedCosmetics()(uid);
-  const isCosmeticsPreview = useCosmeticsPreview();
+  const worn = useEquippedCosmetics()(uid);
 
   // The reaction lives on the oldest log in the group, not the newest one shown at the top: the
   // head keeps changing as the user logs more of the same activity, the tail does not.
   const reactionLogId = getGroupReactionAnchor(group)?.id;
-  // Test mode (`?cosmetics=random`) dresses every row in a stable random look, locally.
-  const worn = isCosmeticsPreview
-    ? randomLook(reactionLogId ?? `${uid}-${getLogTimestampMs(group.logs[0])}`)
-    : equipped;
   const reactors = getGroupReactors(group);
   const awardedFame = getGroupAwardedFame(group, fameAmount);
 
+  // A long run of the same player's activity folds after the newest few, so one busy evening
+  // doesn't push everyone else out of the feed.
+  const visibleLogs = isExpanded
+    ? group.logs
+    : group.logs.slice(0, MAX_VISIBLE_LOGS);
+  const hiddenCount = group.logs.length - visibleLogs.length;
+
   return (
     <LogItem isNew={isNew} bannerId={worn.banner}>
-      {/* Motivate gets a column of its own, so a long name never has to share a row with it. On a
-          phone that column would squeeze every line below into a sliver, so there it only sits
-          beside the name and the lines take the card's full width. */}
-      <div className='grid w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-4 sm:gap-y-3'>
-        <div className='col-start-1 row-start-1 min-w-0 self-center sm:self-start'>
-          <div className='flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1'>
-            <span className='inline-flex min-w-0 items-center gap-2 font-semibold text-zinc-200'>
-              <UserLink
-                uid={uid}
-                userName={userName}
-                avatarUrl={avatarUrl ?? undefined}
-                guildBadge={guildBadge}
-                avatarEffect={worn.avatar}
-                avatarClassName={AVATAR_SHRINK}
-                nameClassName='text-[15px] text-zinc-100 sm:ml-2'
-                guildBadgeClassName='hidden sm:inline-flex'
+      {/* Name and Motivate share the top row; the activity rows run underneath at the card's full
+          width, so what a row paid always lands on the same right edge. From `sm` up the rows start
+          where the name does, leaving the avatar a column of its own. */}
+      <div className='grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3'>
+        <div className='flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1'>
+          <span className='inline-flex min-w-0 items-center gap-2 font-semibold text-zinc-200'>
+            <UserLink
+              uid={uid}
+              userName={userName}
+              avatarUrl={avatarUrl ?? undefined}
+              guildBadge={guildBadge}
+              avatarEffect={worn.avatar}
+              avatarClassName={AVATAR_SHRINK}
+              nameClassName='text-[15px] text-zinc-100 sm:ml-2'
+              guildBadgeClassName='hidden sm:inline-flex'
+            />
+          </span>
+          <span className='hidden shrink-0 items-center gap-1.5 text-xs text-zinc-400 sm:flex'>
+            {isNew && (
+              <span
+                aria-label={t("new_since_last_visit")}
+                className='h-1.5 w-1.5 rounded-full bg-cyan-400'
               />
-            </span>
-            <span className='hidden shrink-0 items-center gap-1.5 text-xs text-zinc-400 sm:flex'>
-              {isNew && (
-                <span
-                  aria-label={t("new_since_last_visit")}
-                  className='h-1.5 w-1.5 rounded-full bg-cyan-400'
-                />
-              )}
-              {formatLogTime(date, new Date(), {
-                locale: dateLocale,
-                justNow: t("just_now"),
-              })}
-            </span>
-          </div>
+            )}
+            {formatLogTime(date, new Date(), {
+              locale: dateLocale,
+              justNow: t("just_now"),
+            })}
+          </span>
         </div>
 
-        <div
-          className={cn(
-            "col-span-2 row-start-2 flex min-w-0 flex-col gap-4 sm:gap-3",
-            reactionLogId && "sm:col-span-1",
-          )}>
-          {group.logs.map((log, index) => (
+        {reactionLogId && (
+          <LogReaction
+            logId={reactionLogId}
+            reactions={reactors}
+            currentUserId={currentUserId}
+            disabled={uid === currentUserId}
+            fameAmount={fameAmount}
+            awardedFame={awardedFame}
+            recipientName={userName}
+            showHint={showMotivateHint}
+          />
+        )}
+
+        <div className='col-span-2 flex min-w-0 flex-col gap-5 sm:pl-14'>
+          {visibleLogs.map((log, index) => (
             <GroupedLogLine
               key={
                 (log as { id?: string }).id ??
@@ -2153,22 +2231,18 @@ const GroupedLogItem = ({
               onOpenLeaderboard={onOpenLeaderboard}
             />
           ))}
+          {hiddenCount > 0 && (
+            <button
+              type='button'
+              onClick={() => setIsExpanded(true)}
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "sm" }),
+                "self-start",
+              )}>
+              {t("show_more_count", { count: hiddenCount })}
+            </button>
+          )}
         </div>
-
-        {reactionLogId && (
-          <div className='col-start-2 row-start-1 sm:row-span-2'>
-            <LogReaction
-              logId={reactionLogId}
-              reactions={reactors}
-              currentUserId={currentUserId}
-              disabled={uid === currentUserId}
-              fameAmount={fameAmount}
-              awardedFame={awardedFame}
-              recipientName={userName}
-              showHint={showMotivateHint}
-            />
-          </div>
-        )}
       </div>
     </LogItem>
   );
@@ -2230,19 +2304,39 @@ const Logs = ({
   // feed instead of sinking under the evening's practice reports. Everything else keeps the order
   // it streamed in.
   const now = useNow();
-  const groups = useMemo(() => {
+  const { groups, pinnedCount } = useMemo(() => {
     const { pinned, rest } = splitPinnedDonations(
       logs.filter((log) => !isExpiredDuelWaiting(log, now)),
     );
 
-    return [
-      ...groupConsecutiveLogs(pinned),
-      ...dropIncompleteTailGroup(
-        groupConsecutiveLogs(rest),
-        Boolean(hasOlderLogs),
-      ),
-    ];
+    const pinnedGroups = groupConsecutiveLogs(pinned);
+
+    return {
+      groups: [
+        ...pinnedGroups,
+        ...dropIncompleteTailGroup(
+          groupConsecutiveLogs(rest),
+          Boolean(hasOlderLogs),
+        ),
+      ],
+      pinnedCount: pinnedGroups.length,
+    };
   }, [logs, hasOlderLogs, now]);
+
+  // Where each calendar day starts in the feed. Pinned donations sit above the stream out of
+  // order, so they get no heading and don't count as the day before the first real one.
+  const intlLocale = useIntlLocale();
+  const dayHeadings = useMemo(
+    () =>
+      getFeedDayHeadings(
+        groups.map((group, index) =>
+          index < pinnedCount ? null : getLogTimestampMs(group.logs[0]),
+        ),
+        now,
+        intlLocale,
+      ),
+    [groups, pinnedCount, now, intlLocale],
+  );
 
   const songIds = useMemo(
     () =>
@@ -2308,6 +2402,11 @@ const Logs = ({
 
         return (
           <div key={key} className='mr-2'>
+            {dayHeadings[groupIndex] && (
+              <h3 className='mb-1 mt-6 px-1 text-[13px] font-semibold text-zinc-400 first-letter:uppercase'>
+                {dayHeadings[groupIndex]}
+              </h3>
+            )}
             {group.type === "topPlayers" ? (
               <FirebaseLogsTopPlayersItem
                 log={representative as FirebaseLogsTopPlayersInterface}

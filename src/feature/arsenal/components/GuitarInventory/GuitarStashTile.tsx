@@ -54,7 +54,11 @@ export const GuitarStashTile = ({
     <StashTile
       {...placement}
       color={RARITY_STYLES[rarity].baseColor}
-      imageSrc={getRankBadgeSrc(guitar.imageId, "medium")}
+      // The small cut (420px wide at most): stood up in a socket the art is
+      // drawn about 125–220px wide, so the medium one (900px) was four times
+      // the pixels to decode per guitar — and a rig picker draws every copy
+      // the player owns at once, which is what made it stutter.
+      imageSrc={getRankBadgeSrc(guitar.imageId, "small")}
       imageRotated
       tall
       // The cap goes in the label as well as the corner: the padlock is the

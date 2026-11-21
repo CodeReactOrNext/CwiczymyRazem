@@ -80,13 +80,23 @@
  * opaque underlay in the card's own colour, under its own tint, so it looks
  * exactly as it does on a plain card. Absolutely placed bits (hint dots,
  * floating coins) are left alone: `position: relative` would move them.
+ *
+ * The element must NOT become a stacking context (no `isolation`, no z-index):
+ * inside its own context a `z-index: -1` child is painted over the element's
+ * background, so the underlay replaced the fill instead of backing it — every
+ * button on a banner came out the card's flat dark, a solid gold one included.
+ * Left to the row's context (the `relative z-10` wrapper), the underlay drops
+ * behind the element's own background, where it belongs.
+ *
+ * A fill that is already opaque opts out with `data-opaque`: it needs no
+ * underlay, and a pressed key (its `translate` makes a stacking context for
+ * that moment) would otherwise flash dark.
  */
-.onBanner [class*="bg-"]:not([class*="absolute"]):not([class*="fixed"]):not(img) {
+.onBanner [class*="bg-"]:not([class*="absolute"]):not([class*="fixed"]):not(img):not([data-opaque]) {
   position: relative;
-  isolation: isolate;
 }
 
-.onBanner [class*="bg-"]:not([class*="absolute"]):not([class*="fixed"]):not(img)::before {
+.onBanner [class*="bg-"]:not([class*="absolute"]):not([class*="fixed"]):not(img):not([data-opaque])::before {
   content: "";
   position: absolute;
   inset: 0;

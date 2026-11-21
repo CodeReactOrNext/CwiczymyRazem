@@ -45,14 +45,6 @@ export type CommunityHighlight =
       isDraw: boolean;
     }
   | {
-      kind: "record";
-      at: number;
-      userName: string;
-      avatarUrl: string | null;
-      exerciseTitle: string;
-      exerciseId: string | null;
-    }
-  | {
       kind: "boss";
       at: number;
       userName: string;
@@ -90,8 +82,8 @@ const newer = <T extends { at: number }>(current: T | null, next: T): T =>
 
 /**
  * What the feed's logs have to say: an open duel (or the last one settled), the
- * last #1 on an exercise leaderboard, the last boss phase cleared, the last
- * guild level-up. One of each, and only while it is still fresh.
+ * last boss phase cleared, the last guild level-up. One of each, and only
+ * while it is still fresh.
  */
 const highlightsFromLogs = (
   logs: AnyFirebaseLog[],
@@ -101,7 +93,6 @@ const highlightsFromLogs = (
     null;
   let duelResult: Extract<CommunityHighlight, { kind: "duelResult" }> | null =
     null;
-  let record: Extract<CommunityHighlight, { kind: "record" }> | null = null;
   let boss: Extract<CommunityHighlight, { kind: "boss" }> | null = null;
   let guild: Extract<CommunityHighlight, { kind: "guild" }> | null = null;
 
@@ -152,27 +143,13 @@ const highlightsFromLogs = (
           bossTitle: session.exerciseTitle,
           phase: session.bossRun.phase,
         });
-      continue;
     }
-
-    const rank =
-      session.micPerformance?.rank ?? session.earTrainingPerformance?.rank;
-    if (rank === 1)
-      record = newer(record, {
-        kind: "record" as const,
-        at,
-        userName: session.userName,
-        avatarUrl: session.avatarUrl ?? null,
-        exerciseTitle: session.exerciseTitle,
-        exerciseId:
-          session.exerciseIds?.length === 1 ? session.exerciseIds[0] : null,
-      });
   }
 
   // Somebody waiting right now can be acted on; a settled duel is only news.
   const duel = duelWaiting ?? duelResult;
 
-  return [duel, record, boss, guild].filter(
+  return [duel, boss, guild].filter(
     (item): item is NonNullable<typeof item> => item !== null,
   );
 };

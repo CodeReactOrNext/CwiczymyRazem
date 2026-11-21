@@ -183,7 +183,7 @@ export const SongTimerLayout = ({
               {timerEnabled ? (
                 <Pause className='h-4 w-4 fill-current' />
               ) : (
-                <Play className='ml-0.5 h-4 w-4 fill-current' />
+                <Play className='h-4 w-4 fill-current' />
               )}
             </Button>
 

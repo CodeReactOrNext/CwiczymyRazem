@@ -43,7 +43,6 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/router";
 
-
 const TABS: {
   id: GuildTab;
   /** Key in the `guilds` namespace. */
@@ -110,8 +109,8 @@ const NeedsAGuild = ({
 
 /**
  * The top of the page for a member: the guild's own card, at full size — its
- * banner across the top with the level ring in its corner, the crest hanging
- * off it, and the seats taken beside the name.
+ * banner across the top, the crest hanging off it, and level, honor and seats
+ * as figures beside the name.
  */
 const GuildHeader = ({ guild }: { guild: Guild }) => {
   const { t } = useTranslation("guilds");
@@ -125,20 +124,6 @@ const GuildHeader = ({ guild }: { guild: Guild }) => {
           {guild.description ||
             t("header.founded_by", { name: guild.founderName })}
         </p>
-      }
-      actions={
-        <span className='flex items-center gap-4 text-sm'>
-          <span
-            title={t("seats_taken", {
-              count: guild.memberCount,
-              limit: guild.memberLimit,
-            })}
-            className='inline-flex items-center gap-1.5 tabular-nums text-zinc-400'>
-            <Users size={15} className='text-zinc-500' />
-            {guild.memberCount}
-            <span className='text-zinc-500'>/ {guild.memberLimit}</span>
-          </span>
-        </span>
       }
     />
   );
@@ -156,7 +141,7 @@ const NoGuildHeader = ({ isLoading }: { isLoading: boolean }) => {
       <GuildBanner
         bannerId='banner:wash'
         hex='#22d3ee'
-        className='h-28 sm:h-40'
+        className='h-24 sm:h-32'
       />
       <div className='px-5 pb-6 sm:px-6'>
         <div className='-mt-12 flex items-start gap-5 sm:-mt-14'>

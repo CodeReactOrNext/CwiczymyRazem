@@ -1,72 +1,116 @@
+import { cn } from "assets/lib/utils";
 import type { MilestoneStatus } from "feature/dashboard/utils/milestoneSummary";
-import { Check, Lock } from "lucide-react";
+import { Check, Gift, Lock } from "lucide-react";
+import type { CSSProperties } from "react";
 
-/** "Reached" green, the same one the Milestones page fills its discs with. */
-const GREEN = "#22c55e";
+/** "Reached" green, the same one the trail and the goal tick use. */
+export const MILESTONE_GREEN = "#22c55e";
 const NODE = 56;
 const CENTER = NODE / 2;
 const RING_R = 23;
 const CIRC = 2 * Math.PI * RING_R;
 
+/** The key's lip: the face's own hue, a few shades down. */
+const LIP = {
+  reached: "#15803d",
+  reward: "#b45309",
+  open: "#1f1f23",
+  locked: "#141417",
+};
+
+/** What a node needs to know about its tier — the strip and the Home card both have this much. */
+export type MilestoneNodeStatus = Pick<
+  MilestoneStatus,
+  | "met"
+  | "owned"
+  | "claimed"
+  | "cost"
+  | "lockedAtLvl"
+  | "color"
+  | "Icon"
+  | "progress"
+>;
+
 /** A tier is shut either because it was never bought or because the account is too low. */
-export const isLockedNode = (status: MilestoneStatus): boolean =>
+export const isLockedNode = (status: MilestoneNodeStatus): boolean =>
   !status.owned && (status.cost > 0 || status.lockedAtLvl !== null);
 
-export const isClaimableNode = (status: MilestoneStatus): boolean =>
+export const isClaimableNode = (status: MilestoneNodeStatus): boolean =>
   status.met && status.owned && !status.claimed;
 
 /**
- * One milestone drawn as the Milestones page draws it: a solid disc carrying
- * the tier's icon, wrapped in a ring that fills with the week's progress. Green
- * and ticked once the goal is met, padlocked and dashed while the tier is shut,
- * and dotted in the corner when a reward is waiting or has been collected.
+ * One milestone as a round key: a solid face over a darker lip, the tier's
+ * icon on it, and a ring that fills with the week's progress. Green and ticked
+ * once the goal is met, amber with a gift while its Fame waits to be claimed,
+ * padlocked with a dashed ring while the tier is shut.
  *
- * The ring is the progress read-out, which is what lets the card around it stay
- * a single line instead of stacking a separate bar under the text.
+ * `pressable` sinks the face onto its lip when the button around it (which
+ * carries `group`) is hovered or pressed — the strip's nodes are buttons, the
+ * Home card's disc is not.
  */
 export const MilestoneNode = ({
   status,
   isCurrent = false,
+  selected = false,
+  pressable = false,
 }: {
-  status: MilestoneStatus;
-  /** The goal being worked towards right now — drawn with a halo. */
+  status: MilestoneNodeStatus;
+  /** The goal being worked towards — icon in the tier's colour, thicker ring. */
   isCurrent?: boolean;
+  /** Picked in the strip: an outline around the key, not a glow. */
+  selected?: boolean;
+  pressable?: boolean;
 }) => {
   const locked = isLockedNode(status);
   const claimable = isClaimableNode(status);
-  const ringColor = status.met ? GREEN : status.color;
   const percent =
     status.progress.max > 0 ? status.progress.value / status.progress.max : 0;
   const stroke = isCurrent ? 4 : 3;
   const Icon = status.Icon;
 
+  const face = locked
+    ? "#1e1e22"
+    : claimable
+      ? "#f59e0b"
+      : status.met
+        ? MILESTONE_GREEN
+        : "#2e2e34";
+  const lip = locked
+    ? LIP.locked
+    : claimable
+      ? LIP.reward
+      : status.met
+        ? LIP.reached
+        : LIP.open;
+
   return (
     <div
-      className='relative flex shrink-0 items-center justify-center rounded-full'
-      style={{ width: NODE, height: NODE }}>
-      {isCurrent && (
-        <span
-          aria-hidden
-          className='absolute inset-[-4px] rounded-full'
-          style={{
-            boxShadow: `0 0 0 2px ${ringColor}, 0 0 16px ${ringColor}55`,
-          }}
-        />
+      className={cn(
+        "relative flex shrink-0 items-center justify-center rounded-full",
+        selected && "outline outline-2 outline-offset-4 outline-zinc-500",
       )}
-
+      style={{ width: NODE, height: NODE }}>
       <span
         aria-hidden
-        className='absolute inset-0 rounded-full transition-colors'
-        style={{
-          backgroundColor: status.met ? GREEN : locked ? "#1e1e22" : "#2e2e34",
-        }}
+        style={{ backgroundColor: face, "--lip": lip } as CSSProperties}
+        className={cn(
+          "absolute inset-0 rounded-full shadow-[0_4px_0_0_var(--lip)] transition-[transform,box-shadow,background-color] duration-100 ease-out",
+          pressable &&
+            !locked &&
+            "group-hover:translate-y-[2px] group-hover:shadow-[0_2px_0_0_var(--lip)] group-active:translate-y-[4px] group-active:shadow-none",
+        )}
       />
 
       {!status.met && (
         <svg
           aria-hidden
           viewBox={`0 0 ${NODE} ${NODE}`}
-          className='absolute inset-0 h-full w-full -rotate-90'>
+          className={cn(
+            "absolute inset-0 h-full w-full -rotate-90 transition-transform duration-100 ease-out",
+            pressable &&
+              !locked &&
+              "group-hover:translate-y-[2px] group-active:translate-y-[4px]",
+          )}>
           <circle
             cx={CENTER}
             cy={CENTER}
@@ -82,7 +126,7 @@ export const MilestoneNode = ({
               cy={CENTER}
               r={RING_R}
               fill='none'
-              stroke={status.color}
+              stroke={MILESTONE_GREEN}
               strokeWidth={stroke}
               strokeLinecap='round'
               strokeDasharray={CIRC}
@@ -93,9 +137,17 @@ export const MilestoneNode = ({
         </svg>
       )}
 
-      <span className='relative'>
+      <span
+        className={cn(
+          "relative transition-transform duration-100 ease-out",
+          pressable &&
+            !locked &&
+            "group-hover:translate-y-[2px] group-active:translate-y-[4px]",
+        )}>
         {locked ? (
           <Lock className='h-5 w-5 text-zinc-500' />
+        ) : claimable ? (
+          <Gift className='h-6 w-6 text-amber-950' strokeWidth={2.5} />
         ) : status.met ? (
           <Check className='h-6 w-6 text-emerald-950' strokeWidth={3} />
         ) : (
@@ -105,21 +157,6 @@ export const MilestoneNode = ({
           />
         )}
       </span>
-
-      {/* Amber pulse = Fame waiting, emerald tick = already collected. */}
-      {claimable && (
-        <span
-          aria-hidden
-          className='absolute -right-0.5 -top-0.5 z-20 h-3.5 w-3.5 animate-pulse rounded-full bg-amber-500 ring-2 ring-zinc-900'
-        />
-      )}
-      {status.claimed && (
-        <span
-          aria-hidden
-          className='absolute -right-0.5 -top-0.5 z-20 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-zinc-900'>
-          <Check size={9} strokeWidth={3.5} className='text-zinc-950' />
-        </span>
-      )}
     </div>
   );
 };

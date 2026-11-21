@@ -1,12 +1,10 @@
-import { PRESSABLE_KEY } from "assets/components/ui/button";
-import { Checkbox } from "assets/components/ui/checkbox";
-import { Label } from "assets/components/ui/label";
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { playGuitarNotePreview, preloadGuitarNotePreview } from "feature/exercisePlan/hooks/useTablatureAudio/notePreview";
 import { intervalBySemitones, semitonesBetween } from "feature/exercisePlan/intervals/intervalDefinitions";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, Volume2 } from "lucide-react";
+import { Volume2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { CLICK_EXAM_MISTAKE_LIMIT, useNoteMatchingContext } from "../contexts/NoteMatchingContext";
@@ -18,8 +16,8 @@ import {
 } from "../helpers/clickHuntNoteSound";
 import { isWithinReach, reachZoneKeys } from "../helpers/clickTargets";
 import { INTERVAL_PHRASE_HOLD_MS, playIntervalPhrase } from "../helpers/intervalPreview";
-import { ClickableFretboard, FullNeckToggle, LeftyToggle, useShowFullNeck } from "./ClickableFretboard";
-import { HuntStage, HuntStats } from "./HuntStage";
+import { ClickableFretboard, useShowFullNeck } from "./ClickableFretboard";
+import { HuntAsk, HuntFooter, HuntStage, HuntStats, HuntViewMenu } from "./HuntStage";
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
 
 interface IntervalClickPanelProps {
@@ -41,7 +39,13 @@ interface IntervalClickPanelProps {
   onDevPassExam?: () => void;
 }
 
-type StepState = "waiting" | "active" | "done";
+/**
+ * What a tile is doing, in the same colours the board uses for it: cyan is
+ * "look here now" (and the lit frets), amber is the root you placed (and its R on
+ * the neck), emerald is solved. A found root used to turn green as if the round
+ * were over, while the half still to do sat in the same cyan as the search window.
+ */
+type StepState = "waiting" | "active" | "anchor" | "done";
 
 /** How long a solved round stays up when the notes are muted — just the reveal to
  *  read. With sound on it is the interval phrase that sets the pace instead. */
@@ -51,28 +55,28 @@ const SILENT_ADVANCE_MS = 1400;
 const PROMPT_ROOT_DELAY_MS = 280;
 
 const STEP_TILE_STYLES: Record<StepState, string> = {
-  waiting: "bg-zinc-800/40 text-zinc-500",
+  waiting: "bg-zinc-800/60 text-zinc-500",
   active: "bg-cyan-500/15 text-cyan-200",
+  anchor: "bg-amber-500/15 text-amber-200",
   done: "bg-emerald-500/15 text-emerald-200",
 };
 
 interface StepTileProps {
-  step: number;
+  /** One word under the tile — the instruction lives in the heading above. */
   caption: string;
   value: string;
   state: StepState;
-  progress?: string;
   /** Fires the found/complete flourish on the tile the player is working on. */
   burst?: { foundCount: number; complete: boolean };
 }
 
-function StepTile({ step, caption, value, state, progress, burst }: StepTileProps) {
+function StepTile({ caption, value, state, burst }: StepTileProps) {
   return (
-    <div className="flex flex-col items-center gap-2 shortwide:gap-1">
+    <div className="flex flex-col items-center gap-1.5 shortwide:gap-1">
       <div className="relative">
         {burst && <HuntSuccessBurst foundCount={burst.foundCount} complete={burst.complete} />}
         <motion.div
-          animate={state === "done" ? { scale: [1, 1.12, 1] } : { scale: 1 }}
+          animate={state === "done" || state === "anchor" ? { scale: [1, 1.1, 1] } : { scale: 1 }}
           transition={{ duration: 0.4 }}
           className={cn(
             "flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-lg transition-colors duration-slow sm:h-20 sm:w-20 shortwide:h-14 shortwide:w-14",
@@ -91,16 +95,7 @@ function StepTile({ step, caption, value, state, progress, burst }: StepTileProp
           </AnimatePresence>
         </motion.div>
       </div>
-      <div className="flex flex-col items-center gap-0.5">
-        <span className={cn("text-sm font-bold", state === "waiting" ? "text-zinc-500" : "text-zinc-200")}>
-          {step}. {caption}
-        </span>
-        {progress && (
-          <span className={cn("text-xs font-semibold tabular-nums", state === "done" ? "text-emerald-400" : "text-zinc-400")}>
-            {progress}
-          </span>
-        )}
-      </div>
+      <span className="text-xs font-semibold text-zinc-500">{caption}</span>
     </div>
   );
 }
@@ -118,8 +113,8 @@ export function IntervalClickPanel({
   rootNote: rootNoteProp,
   intervalLabel: intervalLabelProp,
   targetNote: targetNoteProp,
-  startFret,
-  endFret,
+  startFret: startFretProp,
+  endFret: endFretProp,
   strings,
   isPlaying,
   onStart,
@@ -127,8 +122,12 @@ export function IntervalClickPanel({
   onDevPassExam,
 }: IntervalClickPanelProps) {
   const { t } = useTranslation("session");
-  const { intervalClickHunt, huntTarget, customGoalPrompt, noteHuntSecondsLeft, advanceHunt, registerIntervalClick } =
+  const { intervalClickHunt, huntTarget, huntRegion, customGoalPrompt, noteHuntSecondsLeft, noteHuntSecondsTotal, advanceHunt, registerIntervalClick } =
     useNoteMatchingContext();
+  // Drills that move the window every round score against the rotated one, so
+  // the board has to follow it rather than the exercise's opening window.
+  const startFret = huntRegion?.startFret ?? startFretProp;
+  const endFret = huntRegion?.endFret ?? endFretProp;
 
   const rootNote = customGoalPrompt?.title ?? rootNoteProp;
   const targetNote = huntTarget ?? targetNoteProp;
@@ -275,68 +274,76 @@ export function IntervalClickPanel({
 
   const intervalName = interval?.name ?? intervalLabel.replace(" ↑", "");
   // Which strings are live is already obvious on the board (the rest sit behind a
-  // scrim), so the prompt only points at it rather than listing string names.
+  // scrim), so the hint only points at it rather than listing string names.
   const scope = strings && strings.length < 6 ? ` ${t("interval_click.on_highlighted")}` : "";
-  const stepPrompt = complete
-    ? `${intervalName} above ${rootNote} = ${targetNote}`
+
+  // Heading first, tiles second: the step, the instruction, and one line on where
+  // to look. The tiles below only illustrate it.
+  const ask = complete
+    ? {
+        step: t("hunt.solved"),
+        title: t("interval_click.solved", { root: rootNote, interval: intervalName, target: targetNote }),
+        hint: undefined,
+      }
     : onInterval
-      ? t("interval_click.now_above", { interval: intervalName })
-      : t("interval_click.click_any", { note: `${rootNote}${scope}` });
+      ? {
+          step: t("interval_click.step", { step: 2 }),
+          title: t("interval_click.now_above", { interval: intervalName, root: rootNote }),
+          hint: t(zoneKeys ? "interval_click.near_zone" : "interval_click.near", { root: rootNote }),
+        }
+      : {
+          step: t("interval_click.step", { step: 1 }),
+          title: t("interval_click.click_any", { note: rootNote }),
+          hint: `${t("interval_click.anywhere", { from: startFret, to: endFret })}${scope}`,
+        };
 
   return (
     <HuntStage
       awaitingStart={!isPlaying}
       onStart={onStart}
-      railClassName="xl:w-64"
+      railClassName="xl:w-80 xl:items-start"
       stats={
         <HuntStats
           score={score}
           mistakes={isExamMode ? { count: mistakeCount, limit: CLICK_EXAM_MISTAKE_LIMIT } : undefined}
           secondsLeft={isRotating ? noteHuntSecondsLeft : null}
+          secondsTotal={noteHuntSecondsTotal}
           complete={complete}
         />
       }
       prompt={
-        <div className="flex flex-col items-center gap-3 shortwide:flex-row shortwide:gap-4">
-          {/* The prompt: root, the interval between them, and the answer slot. */}
-          <div className="flex items-start justify-center gap-3 sm:gap-5">
+        <div className="flex flex-col items-center gap-5 xl:items-start shortwide:flex-row shortwide:gap-4">
+          <HuntAsk step={ask.step} title={ask.title} hint={ask.hint} solved={complete} />
+
+          {/* Root, the interval on the arrow between them, and the answer slot —
+              read left to right like the sentence it is. */}
+          <div className="flex items-start gap-2.5 sm:gap-3">
             <StepTile
-              step={1}
               caption={t("interval_click.root")}
               value={rootNote}
-              state={onInterval ? "done" : "active"}
-              progress={onInterval ? "placed" : "pick one spot"}
+              state={complete ? "done" : onInterval ? "anchor" : "active"}
               burst={onInterval ? undefined : { foundCount: rootFound, complete: false }}
             />
 
-            <div className="flex flex-col items-center gap-1 pt-5 sm:pt-6 shortwide:pt-3">
-              {interval && (
-                <span className="rounded bg-cyan-500/10 px-2 py-0.5 text-xs font-extrabold text-cyan-400">
-                  {interval.degree}
-                </span>
-              )}
-              <ArrowRight size='1em' className="h-4 w-4 text-zinc-500" aria-hidden />
-              <span className="max-w-[6rem] text-center text-xs font-bold leading-tight text-zinc-200">
-                {intervalLabel}
+            <div className="flex w-24 flex-col items-center gap-1.5 pt-6 sm:w-28 sm:pt-7 shortwide:w-20 shortwide:pt-4">
+              <span className="whitespace-nowrap text-sm font-bold text-zinc-200 shortwide:text-xs">{intervalLabel}</span>
+              <span aria-hidden className="relative h-0.5 w-full rounded-full bg-zinc-600">
+                <span className="absolute -right-0.5 top-1/2 h-0 w-0 -translate-y-1/2 border-y-[5px] border-l-[7px] border-y-transparent border-l-zinc-600" />
               </span>
               {showSemitones && semitones >= 0 && (
-                <span className="text-xs font-semibold tabular-nums text-zinc-400">+{semitones} frets</span>
+                <span className="text-xs font-semibold text-cyan-300">
+                  {t("interval_click.frets_up", { count: semitones })}
+                </span>
               )}
             </div>
 
             <StepTile
-              step={2}
               caption={t("interval_click.target")}
               value={complete ? targetNote : "?"}
               state={complete ? "done" : onInterval ? "active" : "waiting"}
-              progress={complete ? "found" : onInterval ? "from that root" : undefined}
               burst={onInterval ? { foundCount: intervalFound, complete } : undefined}
             />
           </div>
-
-          <p className={cn("text-center text-sm font-bold shortwide:max-w-[12rem] shortwide:text-left shortwide:text-xs", complete ? "text-emerald-400" : "text-zinc-200")}>
-            {stepPrompt}
-          </p>
         </div>
       }
       board={
@@ -356,46 +363,31 @@ export function IntervalClickPanel({
         />
       }
       footer={
-        <div className="flex flex-row flex-wrap items-center justify-center gap-x-3 gap-y-2">
-          {isRotating && (
-            <button
-              type="button"
-              onClick={advanceHunt}
-              className={cn(PRESSABLE_KEY, "inline-flex items-center gap-2 rounded-lg bg-zinc-800/60 px-5 py-2.5 text-sm font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring")}>
-              Next <ArrowRight size='1em' className="h-3.5 w-3.5 text-zinc-400" />
-            </button>
-          )}
-
-          {/* Settings — quieter than Next and parked next to it, so they stay
-              reachable without sitting in the reading path above the neck. */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:ml-2">
-            <button
-              type="button"
-              onClick={hearRoot}
-              disabled={heardRootMidi === null}
-              className={cn(PRESSABLE_KEY, "inline-flex items-center gap-2 rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50")}
-              title={t("interval_click.play_root")}>
-              <Volume2 size='1em' className="h-3 w-3 text-zinc-400" /> Hear the root
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowSemitones((v) => !v)}
-              className={cn(PRESSABLE_KEY, "rounded bg-zinc-800/60 px-3 py-1.5 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring")}>
-              {showSemitones ? t("interval_click.hide_distance") : t("interval_click.how_far")}
-            </button>
-            <FullNeckToggle value={showFullNeck} onChange={setShowFullNeck} />
-            <LeftyToggle />
-            <div className="flex items-center gap-2 px-1">
-              <Checkbox
-                id="interval-click-note-sound"
-                checked={noteSound}
-                onCheckedChange={(checked) => toggleNoteSound(checked === true)}
-              />
-              <Label htmlFor="interval-click-note-sound" className="cursor-pointer text-xs font-semibold text-zinc-400">
-                {t("interval_click.autoplay")}
-              </Label>
-            </div>
-          </div>
+        <HuntFooter onNext={isRotating ? advanceHunt : undefined}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={hearRoot}
+            disabled={heardRootMidi === null}
+            title={t("interval_click.play_root")}>
+            <Volume2 aria-hidden className="text-zinc-400" /> {t("interval_click.hear_root")}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            aria-pressed={showSemitones}
+            onClick={() => setShowSemitones((v) => !v)}
+            className={cn(showSemitones && "text-cyan-300 hover:text-cyan-200")}>
+            {showSemitones ? t("interval_click.hide_distance") : t("interval_click.how_far")}
+          </Button>
+          <HuntViewMenu
+            showFullNeck={showFullNeck}
+            onShowFullNeckChange={setShowFullNeck}
+            noteSound={noteSound}
+            onNoteSoundChange={toggleNoteSound}
+          />
 
           {process.env.NODE_ENV !== "production" && !complete && (
             <button
@@ -420,7 +412,7 @@ export function IntervalClickPanel({
               🏁 Pass whole exam (dev)
             </button>
           )}
-        </div>
+        </HuntFooter>
       }
     />
   );

@@ -40,7 +40,10 @@
   "rewards": {
     "title": "Nagrody sezonu",
     "place": "Miejsce {{place}}: {{fame}} Fame",
-    "range": "Miejsca {{from}}–{{to}}: {{max}}–{{min}} Fame"
+    "range": "Miejsca {{from}}–{{to}}: {{max}}–{{min}} Fame",
+    "summary": "Top {{count}} dostaje Fame",
+    "show": "Nagrody",
+    "hide": "Ukryj"
   },
   "hero": {
     "season": "Sezon",
@@ -59,6 +62,9 @@
   },
   "rig": {
     "guitar_level": "Poziom gitary",
-    "empty_slot": "Puste miejsce {{n}}"
-  }
+    "empty_slot": "Puste miejsce {{n}}",
+    "title": "Zestaw"
+  },
+  "player_level": "Poziom gracza",
+  "player": "Gracz"
 }

@@ -5,7 +5,6 @@ import type { TraderModOffer } from "feature/arsenal/types/trader.types";
 import { BuyButton } from "../BuyButton";
 import { MOD_ACCENT, TierPlate } from "../TierPlate";
 import { ModArt } from "../Workshop/ModArt";
-import { RollMeter } from "./offerBits";
 import { PurchaseStamp, PurchaseSweep, useTakenHere } from "./purchaseMotion";
 
 interface ModOfferCardProps {
@@ -23,9 +22,9 @@ interface ModOfferCardProps {
  *
  * There is one a day and it is gone once taken, and it is the only thing on the
  * counter a player cannot make at the bench without owning the parts first —
- * so it gets the bigger plate and its roll drawn on the range it came out of.
- * It still pays through the same button as the parts, on the same right-hand
- * edge: it is a loose component, not a different kind of purchase.
+ * so it gets the bigger plate and the counter's one white key. Its roll is
+ * written against the best it could have been ("+6 / +8"): that one figure says
+ * what a bar and a "top roll" tag used to say three times.
  *
  * It does not show the bench bill the price is derived from. The bill is what
  * prices the mod, not what the buyer is choosing between; the mod, its roll and
@@ -42,72 +41,58 @@ export const ModOfferCard = ({
   const labels = useArsenalLabels();
   const { t } = labels;
   const canAfford = currentFame >= offer.unitPrice;
-  const isTopRoll = offer.points >= offer.maxPoints;
   const takenHere = useTakenHere(available);
 
   return (
     <div
       className={cn(
-        "relative flex flex-col gap-4 overflow-hidden rounded-lg bg-zinc-800/40 p-4 transition-colors sm:flex-row sm:items-center sm:gap-6 sm:p-5",
+        "relative flex flex-col gap-4 overflow-hidden rounded-lg bg-zinc-800/40 p-5 transition-colors sm:flex-row sm:items-center sm:gap-6",
         available ? "hover:bg-zinc-800/60" : "opacity-60",
         className,
       )}>
       <PurchaseSweep trigger={takenHere ? 1 : 0} color={MOD_ACCENT} />
 
-      {/* The mods' own purple, as light off the plate rather than a frame. */}
-      <div
-        className='pointer-events-none absolute inset-0'
-        style={{
-          background: `radial-gradient(40% 120% at 0% 50%, ${MOD_ACCENT}1f 0%, transparent 70%)`,
-        }}
-      />
-
       <div className='relative flex min-w-0 flex-1 items-center gap-4 sm:gap-5'>
         {/* Socketed the way the stash board shows a rescued mod: the blueprint
             tile sitting in a hollow lit by the mods' own purple. */}
-        <TierPlate color={MOD_ACCENT} size={80} className='shrink-0'>
-          <ModArt modId={offer.featureId} size={68} />
+        <TierPlate color={MOD_ACCENT} size={64} className='shrink-0'>
+          <ModArt modId={offer.featureId} size={54} />
         </TierPlate>
 
-        <div className='flex min-w-0 flex-1 flex-col gap-2'>
-          <span className='flex flex-wrap items-center gap-x-2 gap-y-1 text-xs'>
-            <span className='font-semibold text-purple-300'>
-              {t("trader.mod_of_day")}
-            </span>
-            <span className='text-zinc-400'>
-              {offer.modKind === "guitar" ? t("trader.guitar_mod") : t("trader.pedal_mod")}
-            </span>
-            {isTopRoll && (
-              <span className='font-semibold text-amber-400'>{t("trader.top_roll")}</span>
-            )}
+        <div className='flex min-w-0 flex-1 flex-col gap-1'>
+          <span className='truncate text-xs text-zinc-400'>
+            {t("trader.mod_of_day")} ·{" "}
+            {offer.modKind === "guitar"
+              ? t("trader.guitar_mod")
+              : t("trader.pedal_mod")}
           </span>
           <span className='truncate text-lg font-bold leading-tight text-zinc-100'>
             {labels.mod(offer.featureId, offer.label)}
           </span>
-          <RollMeter
-            points={offer.points}
-            minPoints={offer.minPoints}
-            maxPoints={offer.maxPoints}
-            color={MOD_ACCENT}
-            className='max-w-xs'
-          />
+          <span className='text-sm tabular-nums text-zinc-400'>
+            <span className='font-bold text-zinc-100'>+{offer.points}</span> / +
+            {offer.maxPoints}
+          </span>
         </div>
       </div>
 
       <div className='relative flex flex-col sm:items-end'>
         {available ? (
           <BuyButton
+            variant='primary'
             price={offer.unitPrice}
             canAfford={canAfford}
             isBuying={isBuying}
             onClick={onBuy}
             size='sm'
             unaffordableLabel={t("buy.buy")}
-            className='w-full sm:w-40'
+            className='w-full sm:w-36'
           />
         ) : (
-          <PurchaseStamp slam={takenHere} className='text-xs text-zinc-500'>
-            {t("trader.taken_for_today")}
+          <PurchaseStamp
+            slam={takenHere}
+            className='text-xs text-zinc-500 sm:w-36 sm:text-center'>
+            {t("trader.taken")}
           </PurchaseStamp>
         )}
       </div>

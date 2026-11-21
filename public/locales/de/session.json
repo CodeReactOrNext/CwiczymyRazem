@@ -496,8 +496,16 @@
       "off": "Backing Track ausschalten"
     }
   },
+  "hunt": {
+    "seconds_left": "Noch {{count}} s",
+    "solved": "Gelöst",
+    "time_left": "Restzeit dieser Runde",
+    "next": "Weiter",
+    "view": "Ansicht",
+    "play_notes": "Töne abspielen"
+  },
   "interval_click": {
-    "now_above": "Jetzt die {{interval}} über diesem Grundton – in seiner Reichweite",
+    "now_above": "{{interval}} über diesem {{root}}",
     "click_any": "Klick ein beliebiges {{note}}",
     "on_highlighted": "auf den markierten Saiten",
     "root": "Grundton",
@@ -505,7 +513,15 @@
     "play_root": "Den Grundton spielen, von dem das Intervall gemessen wird",
     "hide_distance": "Abstand ausblenden",
     "how_far": "Wie weit ist es?",
-    "autoplay": "Autoplay"
+    "autoplay": "Autoplay",
+    "step": "Schritt {{step}} von 2",
+    "anywhere": "Irgendwo in den Bünden {{from}}–{{to}}",
+    "near_zone": "Nah an deinem {{root}}, im hellen Bereich",
+    "near": "In Reichweite deines {{root}}",
+    "solved": "{{root}} + {{interval}} = {{target}}",
+    "frets_up_one": "{{count}} Bund höher",
+    "frets_up_other": "{{count}} Bünde höher",
+    "hear_root": "Grundton anhören"
   },
   "instructions": {
     "support_author": "Autor unterstützen",
@@ -639,7 +655,8 @@
     "total": "Session gesamt"
   },
   "click_hunt": {
-    "play_note": "Gesuchten Ton abspielen"
+    "play_note": "Gesuchten Ton abspielen",
+    "hear_it": "Anhören"
   },
   "strum": {
     "strum": "Anschlagen",

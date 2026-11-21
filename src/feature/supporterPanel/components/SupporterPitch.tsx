@@ -1,5 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
 import { Button } from "assets/components/ui/button";
-import { HeroPattern } from "components/UI/HeroBanner";
 import { DISCORD_INVITE_URL } from "constants/community";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { useAccountEmail } from "feature/supporterPanel/hooks/useAccountEmail";
@@ -9,62 +9,65 @@ import { Interpolate } from "lib/i18n/Interpolate";
 import { Heart } from "lucide-react";
 
 /**
- * What somebody who hasn't donated yet sees first at /supporter: the door.
+ * What somebody who hasn't donated yet sees first at /supporter: a note from
+ * the person who builds the app, with his photo.
  *
- * Under it the panel view lays out what is behind it — the perks, drawn as on
- * the roadmap page, and the skin shop as a window with prices and no buttons.
- * The full price list lives in `SupporterInfo` on the Info tab.
+ * It asks for support and says where the money goes, and nothing else. No
+ * amounts, no tokens, no list of perks: this is a community-funded project, and
+ * a price list at the door reads like a shop. What a donation brings back is
+ * told right under it, by `RoadmapPerks`.
  *
- * The one thing that has to be said out here is which address to pay from: a
- * donation carrying an email the account isn't on leaves the money parked and
- * the badge off, and the person it happened to is by definition looking at this
- * page rather than at the Info tab.
+ * The one practical thing that has to be said out here is which address to pay
+ * from: a donation carrying an email the account isn't on leaves the badge off,
+ * and the person it happened to is by definition looking at this page rather
+ * than at the Info tab. So it sits right under the button, at body weight.
  */
 export const SupporterPitch = () => {
   const { t } = useTranslation("supporter");
   const email = useAccountEmail();
 
   return (
-    <section className='relative flex flex-col items-start gap-6 overflow-hidden rounded-lg bg-zinc-900/40 p-6 sm:p-8 md:p-10'>
-      {/* Amber, the colour the badge and the avatar ring are already in, so the
-          door is painted like the thing behind it. Pattern and glow fade out to
-          the right, leaving the copy on clean background. */}
-      <HeroPattern
-        variant='heart'
-        className='opacity-[0.09]'
-        maskImage='linear-gradient(to right, black 0%, transparent 55%)'
-        gradient={["#fbbf24", "#f97316"]}
+    <section className='relative flex flex-col gap-5 overflow-hidden rounded-lg bg-zinc-900/40 p-3 pb-7 md:flex-row md:items-center md:gap-9 md:p-7'>
+      {/* Amber, the colour the badge and the avatar ring are already in. */}
+      <div className='light-tint pointer-events-none absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-transparent' />
+
+      {/* The whole frame on desktop, so the guitar is in it from headstock to
+          picking hand; a square cut from the top on a phone. */}
+      <img
+        src='/images/authors/michal-jablonski.webp'
+        alt={t("panel.pitch.photo_alt")}
+        width={635}
+        height={689}
+        className='relative aspect-square w-full shrink-0 rounded-lg object-cover object-[50%_15%] md:aspect-[635/689] md:w-[38%] md:max-w-[300px]'
       />
-      <div className='pointer-events-none absolute inset-0 light-tint bg-gradient-to-r from-amber-500/10 via-transparent to-transparent' />
 
-      <span className='relative flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/10 text-amber-400'>
-        <Heart size={24} fill='currentColor' />
-      </span>
-
-      <div className='relative space-y-3'>
-        <h2 className='text-xl font-bold text-zinc-100'>
-          {t("panel.pitch.title")}
+      <div className='relative min-w-0 px-2 md:px-0 md:py-2'>
+        <h2 className='text-balance text-2xl font-bold leading-tight text-zinc-100 md:text-[28px]'>
+          {t("panel.pitch.hello")}
         </h2>
-        <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
-          {t("panel.pitch.intro")}
+        <p className='mt-3 max-w-[54ch] text-base leading-relaxed text-zinc-300'>
+          {t("panel.pitch.story")}
         </p>
-        <ul className='max-w-2xl space-y-1.5 text-sm text-zinc-300'>
-          {[0, 1, 2, 3]
-            .map((i) => t(`panel.pitch.perks.${i}`))
-            .map((perk) => (
-              <li key={perk} className='flex gap-2'>
-                <span className='text-amber-400'>•</span>
-                {perk}
-              </li>
-            ))}
-        </ul>
-      </div>
+        <p className='mt-3 max-w-[54ch] text-base leading-relaxed text-zinc-300'>
+          {t("panel.pitch.where")}
+        </p>
+        <p className='mt-3 text-sm text-zinc-400'>{t("panel.pitch.sign")}</p>
 
-      {/* The unlock condition sits right above the button, readable at the
-          same weight as the action: pay from the wrong address and the badge
-          stays off, so it can't be small grey print below the fold. */}
-      <div className='relative flex max-w-2xl flex-col gap-4'>
-        <div className='rounded-lg bg-amber-500/10 px-4 py-3 text-sm leading-relaxed text-zinc-200'>
+        <div className='mt-7 flex flex-col gap-2.5 sm:items-start'>
+          <Button asChild size='lg' className='h-12 text-[15px]'>
+            <a href={BMC_URL} target='_blank' rel='noreferrer'>
+              <span className='flex items-center gap-2'>
+                <Heart size={16} fill='currentColor' />
+                {t("panel.pitch.support")}
+              </span>
+            </a>
+          </Button>
+          <p className='text-center text-sm text-zinc-400 sm:text-left'>
+            {t("hero.coffee_hint")}
+          </p>
+        </div>
+
+        <p className='mt-6 max-w-[54ch] text-sm leading-relaxed text-zinc-300'>
           {email ? (
             <Interpolate
               text={t("panel.pitch.email_known")}
@@ -74,8 +77,8 @@ export const SupporterPitch = () => {
             />
           ) : (
             t("panel.pitch.email")
-          )}
-          <span className='mt-1 block text-zinc-400'>
+          )}{" "}
+          <span className='text-zinc-400'>
             <Interpolate
               text={t("panel.pitch.other_email")}
               values={{
@@ -91,25 +94,13 @@ export const SupporterPitch = () => {
               }}
             />
           </span>
-        </div>
+        </p>
 
-        <Button asChild size='lg' className='w-fit'>
-          <a href={BMC_URL} target='_blank' rel='noreferrer'>
-            <span className='flex items-center gap-2'>
-              <Heart size={16} fill='currentColor' />
-              {t("panel.pitch.support")}
-            </span>
-          </a>
-        </Button>
+        {/* Faces under the ask, because this is the one spot on the page where
+            they are an argument rather than a thank-you: whoever is reading
+            sees who already said yes. */}
+        <SupporterStrip className='mt-7 w-full' />
       </div>
-
-      {/* Faces right under the button, because this is the one spot on the page
-          where they are an argument rather than a thank-you: whoever is reading
-          the ask sees who already said yes. No link on the caption — the full
-          wall, with names and levels, is the next thing down the page. */}
-      {/* w-full, not the column's default max-content: the row has to know how
-          wide the box is to wrap inside it instead of running past the edge. */}
-      <SupporterStrip className='relative w-full' />
     </section>
   );
 };

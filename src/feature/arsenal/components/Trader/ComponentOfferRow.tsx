@@ -7,7 +7,6 @@ import {
   getComponent,
   levelRange,
 } from "feature/guitarBuilder/utils/components";
-import { readableText } from "lib/colorTheme/colorTheme";
 
 import { BuyButton } from "../BuyButton";
 import { getRarityColor } from "../RarityBadge";
@@ -15,10 +14,9 @@ import {
   OfferRowActions,
   offerRowClass,
   OfferRowIdentity,
-  OfferRowPrice,
   OfferRowStats,
   PickerSpacer,
-  TakenForToday,
+  Taken,
 } from "./offerRow";
 import { PurchaseSweep, useTakenHere } from "./purchaseMotion";
 
@@ -68,18 +66,10 @@ export const ComponentOfferRow = ({
           </PartPlate>
         }
         name={def.name}
-        detail={
-          <>
-            <span style={{ color: readableText(rarityColor) }}>
-              {labels.rarity(def.rarity)}
-            </span>
-            <span className='text-zinc-400'>
-              {" "}
-              · {t(`builder.slots.${def.slot}`, SLOT_LABELS[def.slot])} ·{" "}
-              {t("common.lvl", { level: `${offer.roll.level}/${maxLevel}` })}
-            </span>
-          </>
-        }
+        detail={`${labels.rarity(def.rarity)} · ${t(
+          `builder.slots.${def.slot}`,
+          SLOT_LABELS[def.slot],
+        )} · ${t("common.lvl", { level: `${offer.roll.level}/${maxLevel}` })}`}
       />
 
       <OfferRowStats
@@ -89,24 +79,23 @@ export const ComponentOfferRow = ({
         stock={offer.stock}
       />
 
-      <OfferRowPrice unitPrice={offer.unitPrice} />
-
       <OfferRowActions>
         {available ? (
           <>
             <PickerSpacer />
             <BuyButton
+              variant='key'
               price={offer.unitPrice}
               canAfford={currentFame >= offer.unitPrice}
               isBuying={isBuying}
               onClick={onBuy}
               size='sm'
               unaffordableLabel={t("buy.buy")}
-              className='min-w-0 flex-1 sm:w-40 sm:flex-none'
+              className='min-w-0 flex-1 sm:w-36 sm:flex-none'
             />
           </>
         ) : (
-          <TakenForToday slam={takenHere} />
+          <Taken slam={takenHere} />
         )}
       </OfferRowActions>
     </div>

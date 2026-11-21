@@ -212,8 +212,6 @@
       "body": "Riff Quest is free and it stays free. It is still in beta, and new features get built thanks to players chipping in.",
       "invite": "If you feel like chipping in, every coffee brings the next one closer.",
       "next": "Next:",
-      "perk_before": "Supporters get",
-      "perk_after": "and a say in the roadmap.",
       "sign": "Thanks for playing.",
       "cta": "Buy me a coffee"
     },
@@ -279,20 +277,19 @@
       "message_discord": "Message me on Discord"
     },
     "pitch": {
-      "title": "A donation opens the supporter panel",
-      "intro": "Behind the badge is the room where riff.quest is decided out loud:",
-      "perks": {
-        "0": "Post ideas and vote on what gets built next",
-        "1": "Pick the gear that goes into the Arsenal",
-        "2": "Found a guild with its own name, tag and shared stash",
-        "3": "Connect Claude or another AI assistant to your account"
-      },
-      "email": "Use the email this account is on to unlock Supporter.",
-      "email_known": "Use the email this account is on to unlock Supporter: {{email}}.",
-      "other_email": "Using a different email? {{discord}} and I'll attach it by hand.",
+      "hello": "Hi, I'm Michał. I build Riff Quest.",
+      "story": "I started it as a tool for myself, to help me practice. Now I want everyone to have it, and I want it to stay free so anyone can use it.",
+      "where": "Your support pays for the servers first. Everything above that goes into the next feature on the roadmap, and it unlocks for everyone.",
+      "sign": "Michał Jabłoński, guitarist and creator of Riff Quest",
+      "photo_alt": "Michał Jabłoński playing guitar on stage",
+      "email": "Donate with the email this account is on, so the supporter badge finds it.",
+      "email_known": "Donate with {{email}} so the supporter badge finds this account.",
+      "other_email": "Different email? {{discord}}.",
       "write_discord": "Write to me on Discord",
       "support": "Support the project",
-      "shop_body": "Banners and avatar effects for your posts in Activity, skins for your pedalboard and cables. Purely cosmetic and yours to keep."
+      "shop_title": "Everything here is bought with tokens",
+      "shop_body": "Tokens are a thank-you for supporting the project: every $1 donated is {{rate}} tokens, plus {{welcome}} with your first donation. Purely cosmetic and yours to keep.",
+      "shop_wallet": "your tokens"
     },
     "backers": {
       "count": "Backed by {{count}} supporters",

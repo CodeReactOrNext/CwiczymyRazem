@@ -92,37 +92,6 @@ const tenth = (value: number): number =>
 
 const amountOf = (value: number): string => tenth(value).toLocaleString();
 
-/**
- * A colour per member, picked by their seat on the roster — so a player keeps
- * the same colour on every quest and the eye can follow one person down the
- * board. Ordered so that neighbours in the list are never two shades of one
- * hue; a roster longer than the list starts it again.
- */
-const SHARE_SHADES = [
-  "bg-cyan-400",
-  "bg-orange-400",
-  "bg-violet-400",
-  "bg-amber-300",
-  "bg-emerald-400",
-  "bg-pink-400",
-  "bg-blue-400",
-  "bg-lime-400",
-];
-/**
- * What nobody on the roster accounts for: members who have left. Light, so it
- * still reads as filled next to the dark, hatched part that is left to do.
- */
-const REST_SHADE = "bg-zinc-300";
-
-/** The part of the bar still to do: dark, with fine diagonal lines. */
-const EMPTY_TRACK_STYLE = {
-  backgroundImage:
-    "repeating-linear-gradient(135deg, rgb(var(--c-zinc-600) / 0.55) 0 2px, transparent 2px 7px)",
-};
-
-const shadeOf = (seat: number): string =>
-  SHARE_SHADES[seat % SHARE_SHADES.length];
-
 /** A sliver thinner than this is rounding, not somebody's work. */
 const MIN_REST_WIDTH = 0.5;
 
@@ -176,15 +145,32 @@ const remainingLine = (
   return t("card.to_go", { amount: formatQuestAmount(quest.unit, left, t) });
 };
 
+/** What a quest pays each member. Grey once it has been cleared. */
+const Reward = ({ amount, done }: { amount: number; done: boolean }) => {
+  const { t } = useGuildText();
+  return (
+    <p
+      className={cn(
+        "flex shrink-0 items-center gap-1.5 text-base font-bold tabular-nums",
+        done ? "text-zinc-500" : "text-amber-400",
+      )}>
+      <FameCoin size={16} />
+      {t("quests.plus_fame", { amount })}
+    </p>
+  );
+};
+
 /**
- * One quest, said the way a member reads it: what it is, how far the guild has
- * got as a bar and a percentage, what it pays, and what is still missing.
+ * One quest, said the way a member reads it: what it is, what it pays, one bar
+ * for how far the guild has got, and one line under it — where we are on the
+ * left, what is still missing on the right.
  *
- * The four things are laid out in that order because that is the order the
- * questions come in — "what is this", "how close are we", "what do I get",
- * "what is left to do" — and every one of them has its own line rather than
- * being folded into a tooltip. A cleared quest keeps the same shape in green,
- * so the eye can tell done from open without reading anything.
+ * The bar is one colour. Who put in how much is on its tooltip rather than
+ * drawn as a segment and a legend entry per member, which made every card a
+ * chart to be decoded. A quest that counts members still lists them under the
+ * bar, because there the names are the answer to "who is it waiting on".
+ *
+ * A cleared quest folds down to a single line: a tick, its name and the day.
  */
 export const GuildQuestCard = ({
   quest,
@@ -198,222 +184,136 @@ export const GuildQuestCard = ({
   const spec = questById(quest.questId);
   const name = questName(quest.questId, quest.name, quest.lap);
   const done = quest.doneAt !== null;
-  const percent = done ? 100 : percentOf(quest.progress, quest.target);
 
-  // An open quest shows who is carrying it: a guild total as one segment per
-  // member, a per-member ask as the roster against the bar. A cleared one keeps
-  // its plain green bar — it is done, and who did how much no longer matters.
-  const sharesSplit =
-    !done && !quest.each ? splitQuestShares(quest, members) : null;
-  const split = sharesSplit && sharesSplit.shares.length > 0 ? sharesSplit : null;
+  if (done) {
+    return (
+      <article className='flex items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4'>
+        <span className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400'>
+          <Check size={20} />
+        </span>
+        <div className='min-w-0 flex-1'>
+          <h3 className='truncate text-base font-bold text-zinc-300'>{name}</h3>
+          {quest.doneAt && (
+            <p className='mt-0.5 text-sm text-zinc-500'>
+              {t("card.cleared_on", { date: dayOf(quest.doneAt) })}
+            </p>
+          )}
+        </div>
+        <Reward amount={quest.reward} done />
+      </article>
+    );
+  }
+
+  const percent = percentOf(quest.progress, quest.target);
+  const split = quest.each ? null : splitQuestShares(quest, members);
+  const carriedBy =
+    split && split.shares.length > 0
+      ? [
+          ...split.shares.map(
+            (share) => `${share.name}: ${amountOf(share.value)}`,
+          ),
+          ...(split.restWidth > MIN_REST_WIDTH
+            ? [t("card.former_members")]
+            : []),
+        ].join(" · ")
+      : undefined;
   const eachTarget = quest.each?.target ?? null;
   const standings =
-    !done && eachTarget !== null && quest.shares
+    eachTarget !== null && quest.shares
       ? questStandings(quest, eachTarget, members)
+      : null;
+  const mine = quest.each
+    ? eachLine(spec, quest.each, t)
+    : quest.mine !== null
+      ? t("card.you", { amount: formatQuestAmount(quest.unit, quest.mine, t) })
       : null;
 
   return (
-    <article
-      className={cn(
-        "rounded-lg p-5 transition-background",
-        done ? "bg-emerald-500/[0.06]" : "bg-zinc-900/40",
-      )}>
+    <article className='rounded-lg bg-zinc-900/40 p-5'>
       <div className='flex items-start gap-4'>
-        <span
-          className={cn(
-            "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg",
-            done
-              ? "bg-emerald-500/10 text-emerald-400"
-              : "bg-zinc-800/60 text-zinc-300",
-          )}>
-          {done ? <Check size={20} /> : <QuestIcon quest={spec} size={20} />}
+        <span className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300'>
+          <QuestIcon quest={spec} size={20} />
         </span>
 
-        <div className='min-w-0 flex-1 space-y-4'>
-          <div className='flex flex-wrap items-start justify-between gap-x-6 gap-y-2'>
+        <div className='min-w-0 flex-1 space-y-3'>
+          <div className='flex items-start justify-between gap-4'>
             <div className='min-w-0'>
               <h3 className='text-base font-bold text-zinc-100'>{name}</h3>
               <p className='mt-0.5 text-sm text-zinc-400'>
                 {questBlurb(quest)}
               </p>
             </div>
-
-            <div className='shrink-0 text-right'>
-              <p
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded px-2 py-1 text-sm font-bold tabular-nums",
-                  done
-                    ? "bg-emerald-500/10 text-emerald-400"
-                    : "bg-amber-500/10 text-amber-400",
-                )}>
-                <FameCoin size={14} />
-                {t("quests.plus_fame", { amount: quest.reward })}
-              </p>
-            </div>
+            <Reward amount={quest.reward} done={false} />
           </div>
 
-          <div className='space-y-2'>
-            <div className='flex items-end justify-between gap-4'>
-              <p className='text-sm tabular-nums text-zinc-400'>
-                <span className='text-xl font-bold text-zinc-100'>
-                  {tenth(quest.progress).toLocaleString()}
-                </span>{" "}
-                / {formatQuestAmount(quest.unit, quest.target, t)}
-              </p>
-              <p
-                className={cn(
-                  "text-xl font-bold tabular-nums",
-                  done ? "text-emerald-400" : "text-cyan-300",
-                )}>
-                {percent}%
-              </p>
-            </div>
-
+          <div
+            role='progressbar'
+            aria-valuenow={Math.min(quest.progress, quest.target)}
+            aria-valuemin={0}
+            aria-valuemax={quest.target}
+            aria-label={`${name}: ${percent}%`}
+            title={carriedBy}
+            className='h-3 overflow-hidden rounded-full bg-zinc-800'>
             <div
-              role='progressbar'
-              aria-valuenow={Math.min(quest.progress, quest.target)}
-              aria-valuemin={0}
-              aria-valuemax={quest.target}
-              aria-label={`${name}: ${percent}%`}
-              // With a colour per member on it, a plain grey track reads as one
-              // more member. Hatching it says "nothing here yet" at a glance.
-              style={split ? EMPTY_TRACK_STYLE : undefined}
-              className={cn(
-                "flex h-2.5 overflow-hidden rounded-full",
-                split ? "bg-zinc-950/60" : "bg-zinc-800/60",
-              )}>
-              {split ? (
-                <>
-                  {split.shares.map((share, index) => (
-                    <div
-                      key={share.uid}
-                      title={`${share.name}: ${amountOf(share.value)}`}
-                      className={cn(
-                        "h-full transition-[width] duration-slow",
-                        shadeOf(share.seat),
-                        index > 0 && "border-l-2 border-zinc-950/70",
-                      )}
-                      style={{ width: `${share.width}%` }}
-                    />
-                  ))}
-                  {split.restWidth > MIN_REST_WIDTH && (
-                    <div
-                      title={t("card.former_members")}
-                      className={cn(
-                        "h-full border-l-2 border-zinc-950/70",
-                        REST_SHADE,
-                      )}
-                      style={{ width: `${split.restWidth}%` }}
-                    />
-                  )}
-                </>
-              ) : (
-                <div
-                  className={cn(
-                    "bar-shine h-full rounded-full transition-[width] duration-slow",
-                    done ? "bg-emerald-400" : "bg-cyan-400",
-                  )}
-                  style={{ width: `${percent}%` }}
-                />
+              className='bar-shine h-full rounded-full bg-cyan-400 transition-[width] duration-slow'
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+
+          <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 text-sm tabular-nums text-zinc-400'>
+            <p>
+              <span className='font-bold text-zinc-100'>
+                {amountOf(quest.progress)}
+              </span>{" "}
+              / {formatQuestAmount(quest.unit, quest.target, t)}
+              {mine && (
+                <span
+                  className={
+                    quest.each?.done ? "text-emerald-400" : "text-zinc-500"
+                  }>
+                  {" · "}
+                  {mine}
+                </span>
               )}
-            </div>
-
-            {split && (
-              <ul className='flex flex-wrap gap-x-5 gap-y-1.5 pt-1 text-xs'>
-                {split.shares.map((share) => (
-                  <li key={share.uid} className='flex items-center gap-1.5'>
-                    <span
-                      aria-hidden
-                      className={cn(
-                        "h-2 w-2 shrink-0 rounded-full",
-                        shadeOf(share.seat),
-                      )}
-                    />
-                    <span className='font-medium text-zinc-200'>
-                      {share.name}
-                    </span>
-                    <span className='tabular-nums text-zinc-400'>
-                      {amountOf(share.value)}
-                    </span>
-                  </li>
-                ))}
-                {split.restWidth > MIN_REST_WIDTH && (
-                  <li className='flex items-center gap-1.5 text-zinc-400'>
-                    <span
-                      aria-hidden
-                      className={cn("h-2 w-2 shrink-0 rounded-full", REST_SHADE)}
-                    />
-                    {t("card.former_members")}
-                  </li>
-                )}              </ul>
-            )}
-
-            {standings && eachTarget !== null && (
-              <ul className='flex flex-wrap gap-x-5 gap-y-1.5 pt-1 text-xs'>
-                {standings.map((standing) => (
-                  <li key={standing.uid} className='flex items-center gap-1.5'>
-                    {standing.done ? (
-                      <Check
-                        aria-hidden
-                        size={12}
-                        className='shrink-0 text-emerald-400'
-                      />
-                    ) : (
-                      <span
-                        aria-hidden
-                        className='mx-0.5 h-2 w-2 shrink-0 rounded-full bg-zinc-600'
-                      />
-                    )}
-                    <span
-                      className={cn(
-                        "font-medium",
-                        standing.done ? "text-zinc-200" : "text-zinc-400",
-                      )}>
-                      {standing.name}
-                    </span>
-                    <span className='tabular-nums text-zinc-400'>
-                      {amountOf(standing.value)} / {amountOf(eachTarget)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
+            </p>
+            <p>
+              {remainingLine(
+                quest,
+                quest.each ? questAsk(quest, quest.each.ask) : "",
+                t,
+              )}
+            </p>
           </div>
 
-          <div className='flex flex-wrap items-center justify-between gap-x-6 gap-y-1 text-xs'>
-            {quest.each ? (
-              <span
-                className={cn(
-                  "flex items-center gap-1.5 tabular-nums",
-                  quest.each.done ? "text-emerald-400" : "text-zinc-400",
-                )}>
-                {quest.each.done && <Check size={12} />}
-                {eachLine(spec, quest.each, t)}
-              </span>
-            ) : quest.mine !== null ? (
-              <span className='tabular-nums text-zinc-400'>
-                {t("card.you", {
-                  amount: formatQuestAmount(quest.unit, quest.mine, t),
-                })}
-              </span>
-            ) : (
-              <span />
-            )}
-
-            <span
-              className={cn(
-                "font-semibold tabular-nums",
-                done ? "text-emerald-400" : "text-zinc-300",
-              )}>
-              {done && quest.doneAt
-                ? t("card.cleared_on", { date: dayOf(quest.doneAt) })
-                : remainingLine(
-                    quest,
-                    quest.each ? questAsk(quest, quest.each.ask) : "",
-                    t,
+          {standings && eachTarget !== null && (
+            <ul className='flex flex-wrap gap-x-5 gap-y-1.5 text-sm'>
+              {standings.map((standing) => (
+                <li key={standing.uid} className='flex items-center gap-1.5'>
+                  {standing.done ? (
+                    <Check
+                      aria-hidden
+                      size={14}
+                      className='shrink-0 text-emerald-400'
+                    />
+                  ) : (
+                    <span
+                      aria-hidden
+                      className='mx-0.5 h-2 w-2 shrink-0 rounded-full bg-zinc-600'
+                    />
                   )}
-            </span>
-          </div>
+                  <span
+                    className={
+                      standing.done ? "text-zinc-200" : "text-zinc-400"
+                    }>
+                    {standing.name}
+                  </span>
+                  <span className='tabular-nums text-zinc-500'>
+                    {amountOf(standing.value)} / {amountOf(eachTarget)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </article>

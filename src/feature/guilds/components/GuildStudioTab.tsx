@@ -31,15 +31,13 @@ import {
   itemCap,
   itemLevel,
   podiumFor,
-  studioProgress,
 } from "feature/guilds/utils/guildStudio.utils";
 import { Check } from "lucide-react";
 import { useState } from "react";
 
 /**
- * The guild studio tab: the room as a scene with the gear standing in it, the
- * room's own level and the guild's Fame on top, and the list of pieces under
- * it. Picking a piece, in the room or on the list, opens its ladder and its
+ * The guild studio tab: one line with the room and the guild's Fame, the room
+ * as a scene with the gear standing in it, and a tile per piece under it. Picking a piece, in the room or on the list, opens its ladder and its
  * upgrade in a dialog. It only draws and calls back — whoever hosts it owns the
  * studio, the Fame and the writes.
  *
@@ -102,62 +100,51 @@ interface RoomHeaderProps {
   onUpgrade: () => void;
 }
 
+/**
+ * One line over the scene: which room this is, what the guild has to spend, and
+ * the move to the next room. Why the move is off is on the button's tooltip —
+ * its price sits right beside the bank, which says the usual reason already.
+ */
 const RoomHeader = ({ studio, bank, busy, onUpgrade }: RoomHeaderProps) => {
   const text = useStudioText();
   const { t } = text;
   const check = checkRoomUpgrade(studio, bank);
-  const progress = studioProgress(studio);
   const hasNextRoom = studio.roomLevel < STUDIO_MAX_ROOM_LEVEL;
   const reason = blockedReason(check, text);
 
   return (
-    <section className='space-y-6 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
-      <div className='flex flex-wrap items-start justify-between gap-4'>
-        <div className='max-w-2xl space-y-1'>
-          <p className='text-sm text-zinc-400'>
-            {t("studio.room_level", {
-              level: studio.roomLevel,
-              max: STUDIO_MAX_ROOM_LEVEL,
-            })}
-          </p>
-          <h2 className='font-display text-2xl font-bold text-zinc-100'>
-            {text.roomName(studio.roomLevel)}
-          </h2>
-          <p className='text-sm text-zinc-400'>
-            {t("studio.gear_cap", {
-              cap: itemCap(studio.roomLevel),
-              built: progress.built,
-              total: progress.total,
-            })}
-          </p>
-          <p className='pt-2 text-sm leading-relaxed text-zinc-400'>
-            {t("studio.intro")}
-          </p>
-        </div>
-        <div className='text-right'>
-          <p className='flex items-center justify-end gap-2 text-2xl font-bold tabular-nums text-amber-400'>
-            <FameCoin size={22} />
-            {bank.toLocaleString()}
-          </p>
-          <p className='mt-1 text-xs text-zinc-500'>{t("studio.treasury")}</p>
-          <p className='mt-1 text-xs text-zinc-500'>
-            {t("studio.treasury_hint")}
-          </p>
-        </div>
-      </div>
+    <section className='flex flex-wrap items-center justify-between gap-x-6 gap-y-4'>
+      <h2 className='flex flex-wrap items-center gap-2.5 text-lg font-bold text-white'>
+        {text.roomName(studio.roomLevel)}
+        <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-semibold tabular-nums text-zinc-400'>
+          {t("studio.room_level", {
+            level: studio.roomLevel,
+            max: STUDIO_MAX_ROOM_LEVEL,
+          })}
+        </span>
+      </h2>
 
-      {hasNextRoom && (
-        <div className='flex flex-wrap items-center justify-end gap-x-4 gap-y-2'>
-          {reason && <span className='text-sm text-zinc-400'>{reason}</span>}
-          <Button
-            variant='secondary'
-            disabled={!check.ok || busy}
-            onClick={onUpgrade}>
-            {t("studio.move_to", { room: text.roomName(studio.roomLevel + 1) })}{" "}
-            · <Cost amount={costOf(check)} />
-          </Button>
-        </div>
-      )}
+      <div className='flex flex-wrap items-center gap-x-5 gap-y-3'>
+        <p
+          title={t("studio.treasury")}
+          className='flex items-center gap-2 text-xl font-bold tabular-nums text-amber-400'>
+          <FameCoin size={20} />
+          {bank.toLocaleString()}
+        </p>
+        {hasNextRoom && (
+          <span title={reason ?? undefined}>
+            <Button
+              variant='secondary'
+              disabled={!check.ok || busy}
+              onClick={onUpgrade}>
+              {t("studio.move_to", {
+                room: text.roomName(studio.roomLevel + 1),
+              })}{" "}
+              · <Cost amount={costOf(check)} />
+            </Button>
+          </span>
+        )}
+      </div>
     </section>
   );
 };
@@ -208,10 +195,9 @@ const WeekRanking = ({
   const { t } = text;
   return (
     <div className='space-y-4'>
-      <div className='space-y-0.5'>
-        <p className='text-sm text-zinc-300'>{t("studio.week_so_far")}</p>
-        <p className='text-xs text-zinc-500'>{t("studio.week_note")}</p>
-      </div>
+      <p className='text-sm font-bold text-zinc-100'>
+        {t("studio.week_so_far")}
+      </p>
       {STUDIO_BOARD_AWARDS.map((award, i) => {
         const title = text.awardTitle(award.stat);
         if (i >= level)
@@ -350,7 +336,7 @@ const GearList = ({
   const text = useStudioText();
   const cap = itemCap(studio.roomLevel);
   return (
-    <div className='grid grid-cols-2 gap-2 sm:grid-cols-5'>
+    <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
       {STUDIO_ITEMS.map((item) => {
         const level = itemLevel(studio, item.id);
         const selected = item.id === selectedId;
@@ -361,18 +347,20 @@ const GearList = ({
             onClick={() => onSelect(item.id)}
             aria-pressed={selected}
             className={cn(
-              "flex flex-col gap-2 rounded-lg px-3 py-2.5 text-left transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-              selected ? "bg-zinc-800/70" : "hover:bg-zinc-800/40",
+              "flex flex-col gap-3 rounded-lg p-4 text-left transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+              selected
+                ? "bg-zinc-800/60"
+                : "bg-zinc-900/40 hover:bg-zinc-800/60",
             )}>
-            <span className='flex min-w-0 items-center gap-2'>
+            <span className='flex min-w-0 items-center gap-2.5'>
               <item.icon
-                size={15}
+                size={18}
                 aria-hidden
                 className='shrink-0 text-zinc-400'
               />
               <span
                 className={cn(
-                  "truncate text-sm font-medium",
+                  "truncate text-sm font-bold",
                   level > 0 ? "text-zinc-100" : "text-zinc-400",
                 )}>
                 {text.itemName(item.id)}
@@ -439,13 +427,11 @@ export const GuildStudioTab = ({
           onSelect={pick}
         />
 
-        <section className='rounded-lg bg-zinc-900/40 p-3 sm:p-5'>
-          <GearList
-            studio={studio}
-            selectedId={open ? selected.id : ""}
-            onSelect={pick}
-          />
-        </section>
+        <GearList
+          studio={studio}
+          selectedId={open ? selected.id : ""}
+          onSelect={pick}
+        />
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>

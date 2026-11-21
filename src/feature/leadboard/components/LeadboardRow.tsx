@@ -1,25 +1,54 @@
 import { cn } from "assets/lib/utils";
-import { DaySinceMessage } from "components/DaySince/DaySince";
 import Avatar from "components/UI/Avatar";
 import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import type { GuildBadge } from "feature/guilds/types/guild.types";
-import { AchievementsCarousel } from "feature/leadboard/components/AchievementsCarousel";
 import { RigGuitarsPreview } from "feature/leadboard/components/RigGuitarsPreview";
 import { useTranslation } from "hooks/useTranslation";
-import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToWholeHours } from "utils/converter/timeConverter";
 
+export type LeadboardRowVariant = "default" | "gear";
+
+/**
+ * Column tracks of the desktop row, shared with the header above the list so
+ * each label sits over its numbers: place, avatar, player, then the stats.
+ * The rig preview only has room from `xl` up.
+ */
+export const LEADBOARD_ROW_GRID: Record<LeadboardRowVariant, string> = {
+  default:
+    "sm:grid-cols-[2.5rem_3.5rem_minmax(0,1fr)_7.5rem_5rem] lg:grid-cols-[2.5rem_3.5rem_minmax(0,1fr)_9rem_6.5rem]",
+  gear: "sm:grid-cols-[2.5rem_3.5rem_minmax(0,1fr)_7rem_3.5rem_3.5rem] xl:grid-cols-[2.5rem_3.5rem_minmax(0,1fr)_7.5rem_3.75rem_3.75rem_8.25rem]",
+};
+
+/** Medal keys for the podium: face, lip and ink. Everyone else gets zinc. */
+const PODIUM_KEY: Record<number, string> = {
+  1: "border-b-amber-700 bg-amber-400 text-zinc-950",
+  2: "border-b-zinc-500 bg-zinc-300 text-zinc-950",
+  3: "border-b-orange-700 bg-orange-400 text-zinc-950",
+};
+
+/** The same medal as light falling on the card from the left. */
+const PODIUM_LIGHT: Record<number, string> = {
+  1: "from-amber-400/15",
+  2: "from-zinc-300/10",
+  3: "from-orange-400/10",
+};
+
+/** Rows slide in one after another; this is the step between two of them. */
+const ENTER_STAGGER_MS = 28;
+
 interface LeadboardColumnProps {
+  /** Position in the visible list, for the staggered entrance. */
+  order?: number;
   place: number;
   nick: string;
   statistics: StatisticsDataInterface;
   userAvatar?: string;
   profileId?: string;
   currentUserId: string | null;
-  variant?: "default" | "gear";
+  variant?: LeadboardRowVariant;
   rigLevel?: number;
   guitarsOwned?: number;
   effectsOwned?: number;
@@ -29,6 +58,7 @@ interface LeadboardColumnProps {
 }
 
 export const LeadboardRow = ({
+  order = 0,
   place,
   nick,
   statistics,
@@ -50,45 +80,55 @@ export const LeadboardRow = ({
 
   const isCurrentUser = profileId === currentUserId;
 
-  const shortenNick = (nick: string) => {
-    const MAX_SHOW_NICK_LENGTH = 16;
-    if (!nick) {
-      return null;
-    }
-    if (nick.length > MAX_SHOW_NICK_LENGTH) {
-      return (
-        <span data-tip={nick}>
-          {nick.substring(0, MAX_SHOW_NICK_LENGTH) + "..."}
-        </span>
-      );
-    }
-    return nick;
-  };
+  const isPodium = place <= 3;
+  const accentText = isCurrentUser
+    ? "text-cyan-300"
+    : place === 1
+      ? "text-amber-400"
+      : "text-zinc-100";
+
+  // The place is a key, like every control in the app: a face and a lip. It
+  // labels the row and is not a button, so it never moves.
+  const placeKeyClass = cn(
+    "flex flex-shrink-0 items-center justify-center rounded-[0.625rem] border-b-[3px] pt-0.5 font-teko font-semibold tabular-nums leading-none",
+    PODIUM_KEY[place] ??
+      cn(
+        "border-b-black/40 bg-zinc-800 bg-clip-padding",
+        isCurrentUser ? "text-cyan-300" : "text-zinc-300",
+      ),
+  );
+  // The number the board is sorted by, set like a scoreboard.
+  const leadNumberClass = cn(
+    "pt-1 text-right font-teko font-semibold tabular-nums leading-none",
+    isPodium ? "text-4xl" : "text-3xl",
+    accentText,
+  );
+  const sideNumberClass =
+    "text-right text-sm font-semibold tabular-nums text-zinc-400";
 
   return (
-    <li className='w-full'>
+    <li
+      className='w-full duration-slow animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards motion-reduce:animate-none'
+      style={{ animationDelay: `${order * ENTER_STAGGER_MS}ms` }}>
       <div
         className={cn(
-          "relative overflow-hidden rounded-xl transition-background glass-card sm:rounded-2xl",
-          profileId === currentUserId
-            ? "light-tint bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20"
-            : "hover:glass-card-hover",
+          "relative overflow-hidden rounded-xl transition-background glass-card hover:glass-card-hover",
+          isCurrentUser
+            ? "light-tint bg-gradient-to-r from-cyan-400/15 to-cyan-400/5"
+            : isPodium &&
+                cn(
+                  "light-tint bg-gradient-to-r via-transparent to-transparent",
+                  PODIUM_LIGHT[place],
+                ),
         )}>
         {/* --- Mobile Layout (<640px) ---
             One line per player, read like a table row: place, who, score.
             Achievements and the rig preview stay on wider screens. */}
-        <div className='relative z-10 flex items-center gap-3 px-3 py-2.5 sm:hidden'>
+        <div className='relative z-10 flex items-center gap-3 px-3 py-3 sm:hidden'>
           <span
             translate='no'
-            className={cn(
-              "min-w-[2rem] flex-shrink-0 text-center text-sm font-black italic tabular-nums tracking-tighter",
-              isCurrentUser
-                ? "text-cyan-400"
-                : place <= 3
-                  ? "text-zinc-100"
-                  : "text-zinc-500",
-            )}>
-            #{place}
+            className={cn("h-7 w-8 text-xl", placeKeyClass)}>
+            {place}
           </span>
 
           <Link href={`/user/${profileId}`} className='flex-shrink-0'>
@@ -105,7 +145,7 @@ export const LeadboardRow = ({
               translate='no'
               className={cn(
                 "truncate text-sm font-bold tracking-tight",
-                isCurrentUser ? "text-cyan-400" : "text-white",
+                isCurrentUser ? "text-cyan-300" : "text-white",
               )}>
               {nick}
             </Link>
@@ -128,8 +168,8 @@ export const LeadboardRow = ({
           <div className='flex flex-shrink-0 flex-col items-end gap-0.5'>
             <span
               className={cn(
-                "text-base font-black tabular-nums leading-tight tracking-tight",
-                isCurrentUser ? "text-cyan-400" : "text-zinc-100",
+                "pt-0.5 font-teko text-2xl font-semibold tabular-nums leading-none",
+                accentText,
               )}>
               {variant === "gear"
                 ? rigLevel.toLocaleString()
@@ -141,154 +181,74 @@ export const LeadboardRow = ({
           </div>
         </div>
 
-        <div className='relative z-10 hidden items-center gap-3 p-4 sm:flex sm:gap-5 sm:p-5 lg:gap-8 lg:p-6'>
-          <div
+        {/* --- Desktop Layout (>=640px) ---
+            A low card on fixed column tracks: the labels live once in the
+            header above the list, and the numbers line up down the page. */}
+        <div
+          className={cn(
+            "relative z-10 hidden items-center gap-x-5 px-5 sm:grid",
+            isPodium ? "h-24" : "h-[5.25rem]",
+            LEADBOARD_ROW_GRID[variant],
+          )}>
+          <span
             translate='no'
-            className={`flex h-10 w-10 flex-shrink-0 items-center justify-center text-lg font-black italic tracking-tighter sm:h-12 sm:w-12 sm:text-xl lg:h-14 lg:w-14 lg:text-2xl ${
-              profileId === currentUserId
-                ? "text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]"
-                : place <= 3
-                  ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                  : "text-zinc-500 group-hover:text-zinc-400"
-            }`}>
-            #{place}
-          </div>
+            className={cn("h-9 w-10 text-2xl", placeKeyClass)}>
+            {place}
+          </span>
 
-          {/* Avatar */}
-          <Link href={`/user/${profileId}`} className='flex-shrink-0'>
-            <div className='relative transition-transform duration-base'>
-              <Avatar
-                avatarURL={userAvatar}
-                name={nick}
-              />
-            </div>
+          {/* The level rides on the corner of the portrait, as on a player
+              card, instead of taking a slot beside the name. */}
+          <Link href={`/user/${profileId}`} className='relative flex'>
+            <Avatar
+              avatarURL={userAvatar}
+              name={nick}
+              size='lg'
+            />
+            <span
+              translate='no'
+              title={t("player_level")}
+              className={cn(
+                "absolute -bottom-1.5 -right-2.5 z-20 min-w-[1.75rem] rounded-lg bg-zinc-950 px-1.5 pb-px pt-1 text-center font-teko text-xl font-semibold tabular-nums leading-none",
+                isCurrentUser ? "text-cyan-300" : "text-zinc-200",
+              )}>
+              {lvl}
+            </span>
           </Link>
 
-          {/* User Info */}
-          <div className='min-w-0 flex-1'>
-            <div className='mb-1.5 flex flex-wrap items-center gap-x-4 gap-y-1'>
-              <Link
-                href={`/user/${profileId}`}
-                className='group/link flex min-w-0 items-center gap-2'>
-                <h3
-                  translate='no'
-                  className={`truncate text-lg font-bold tracking-tight transition-colors group-hover/link:underline lg:text-xl ${
-                    profileId === currentUserId
-                      ? "text-cyan-300"
-                      : "text-zinc-200 group-hover:text-white"
-                  }`}>
-                  {shortenNick(nick)}
-                </h3>
-                <ExternalLink size='1em' className='flex-shrink-0 text-xs opacity-30 transition-all duration-base group-hover/link:opacity-100 sm:text-sm' />
-              </Link>
+          <div className='flex min-w-0 items-center gap-2.5 pl-2'>
+            <Link
+              href={`/user/${profileId}`}
+              translate='no'
+              title={nick}
+              className={cn(
+                "min-w-0 truncate font-bold tracking-tight hover:underline",
+                isPodium ? "text-lg" : "text-base",
+                isCurrentUser ? "text-cyan-300" : "text-zinc-100",
+              )}>
+              {nick}
+            </Link>
 
-              <div
-                translate='no'
-                className={`flex w-fit flex-shrink-0 items-center gap-1.5 rounded-sm px-3 py-1 ${
-                  profileId === currentUserId
-                    ? "bg-cyan-500/10 text-cyan-300 ring-1 ring-cyan-500/30"
-                    : "bg-zinc-800 text-zinc-400 ring-1 ring-white/5"
-                }`}>
-                <span className='text-xs font-bold opacity-70'>
-                  LVL
-                </span>
-                <span className='text-base font-bold'>{statistics.lvl}</span>
-              </div>
-
-              <GuildTagBadge badge={guildBadge} size='md' />
-            </div>
-
-            <div translate='no' className='font-medium'>
-              <DaySinceMessage date={new Date(statistics.lastReportDate)} />
-            </div>
+            <GuildTagBadge badge={guildBadge} />
           </div>
 
-          {/* Stats */}
           {variant === "gear" ? (
-            <div className='flex items-center gap-8 lg:gap-12'>
-              <div className='text-center'>
-                <div
-                  className={`text-xl font-black tracking-tight lg:text-2xl ${
-                    profileId === currentUserId
-                      ? "text-cyan-300"
-                      : "text-white transition-transform duration-base"
-                  }`}>
-                  {rigLevel.toLocaleString()}
-                </div>
-                <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
-                  {t("rig_level")}
-                </div>
+            <>
+              <span className={leadNumberClass}>
+                {rigLevel.toLocaleString()}
+              </span>
+              <span className={sideNumberClass}>{guitarsOwned}</span>
+              <span className={sideNumberClass}>{effectsOwned}</span>
+              <div className='hidden xl:block'>
+                <RigGuitarsPreview arsenal={arsenal} />
               </div>
-
-              <div className='text-center'>
-                <div
-                  className={`text-xl font-bold lg:text-2xl ${
-                    profileId === currentUserId
-                      ? "text-cyan-300"
-                      : "text-zinc-300 group-hover:text-white"
-                  }`}>
-                  {guitarsOwned}
-                </div>
-                <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
-                  {t("guitars")}
-                </div>
-              </div>
-
-              <div className='text-center'>
-                <div
-                  className={`text-xl font-bold lg:text-2xl ${
-                    profileId === currentUserId
-                      ? "text-cyan-300"
-                      : "text-zinc-300 group-hover:text-white"
-                  }`}>
-                  {effectsOwned}
-                </div>
-                <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
-                  {t("effects")}
-                </div>
-              </div>
-            </div>
+            </>
           ) : (
-            <div className='flex items-center gap-8 lg:gap-12'>
-              <div className='text-center'>
-                <div
-                  className={`text-xl font-black tracking-tight lg:text-2xl ${
-                    profileId === currentUserId
-                      ? "text-cyan-300"
-                      : "text-white transition-transform duration-base"
-                  }`}>
-                  {statistics.points.toLocaleString()}
-                </div>
-                <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
-                  {t("points")}
-                </div>
-              </div>
-
-              <div className='text-center'>
-                <div
-                  className={`text-xl font-bold lg:text-2xl ${
-                    profileId === currentUserId
-                      ? "text-cyan-300"
-                      : "text-zinc-300 group-hover:text-white"
-                  }`}>
-                  {practiceHours}
-                </div>
-                <div className='text-[10px] font-bold tracking-wider text-zinc-500 group-hover:text-zinc-400'>
-                  {t("exercise_time")}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Rig Guitars / Achievements - Desktop */}
-          {variant === "gear" ? (
-            <div className='hidden flex-shrink-0 opacity-90 transition-opacity duration-base group-hover:opacity-100 xl:block'>
-              <RigGuitarsPreview arsenal={arsenal} />
-            </div>
-          ) : (
-            <div className='hidden flex-shrink-0 opacity-80 transition-opacity duration-base group-hover:opacity-100 xl:block'>
-              <AchievementsCarousel achievements={statistics.achievements} />
-            </div>
+            <>
+              <span className={leadNumberClass}>
+                {statistics.points.toLocaleString()}
+              </span>
+              <span className={sideNumberClass}>{practiceHours}</span>
+            </>
           )}
         </div>
       </div>

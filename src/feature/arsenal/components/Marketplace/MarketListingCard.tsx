@@ -17,7 +17,7 @@ import {
   getGuitarScrapYield,
 } from "feature/arsenal/utils/scrap";
 import { ComponentPreviewCard } from "feature/guitarBuilder/components/ComponentPreviewCard";
-import { Unplug, X } from "lucide-react";
+import { X } from "lucide-react";
 import Link from "next/link";
 
 import type {
@@ -32,7 +32,7 @@ import type {
 } from "../../types/marketplace.types";
 import { BuyButton } from "../BuyButton";
 import { SalvagedModCard } from "../Collection/SalvagedModCard";
-import { DexMarks } from "../DexMarks";
+import { DexWord } from "../DexMarks";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { ScrapYieldStrip } from "../Parts/ScrapYieldStrip";
@@ -101,9 +101,14 @@ export const MarketListingCard = ({
 
   // Seller + price + action, rendered inside the card's own frame so the whole
   // thing reads as one trading card instead of a floating, detached badge.
+  //
+  // Three things, top to bottom: who sells it and where the model stands with
+  // the buyer, what a teardown pays out, and the key. The payout is a small
+  // table — picture on the left, figure on the right edge — in text that can be
+  // read; it used to be three lines of 10px grey behind three tiny icons.
   const footer = (
-    <div className='flex flex-col gap-2 p-2.5'>
-      <div className='flex items-center justify-between gap-2'>
+    <div className='flex flex-col gap-3 p-3'>
+      <div className='flex items-center justify-between gap-3'>
         <Link
           href={`/user/${listing.sellerId}`}
           className='flex min-w-0 items-center gap-1.5 text-zinc-300 transition-colors hover:text-white'>
@@ -130,6 +135,12 @@ export const MarketListingCard = ({
             {listing.price.toLocaleString()}
           </span>
         )}
+        {/* The same answer the case preview and the shelf give. A seller's own
+            listing skips it: it is theirs, which is the whole point of the
+            cancel button underneath. */}
+        {dexStatus && !isOwn && (
+          <DexWord status={dexStatus} className='max-w-[55%] shrink-0' />
+        )}
       </div>
 
       <ScrapYieldStrip parts={scrapParts} />
@@ -142,13 +153,12 @@ export const MarketListingCard = ({
         <TooltipProvider>
           <Tooltip delayDuration={150}>
             <TooltipTrigger asChild>
-              <div className='flex cursor-help items-center gap-2 text-purple-300/70 transition-colors hover:text-purple-300'>
-                <Unplug size={13} strokeWidth={2.5} className='shrink-0' />
+              <div className='flex cursor-help items-center gap-2'>
                 <ModArt modId={salvaged.featureId} size={24} />
-                <span className='min-w-0 truncate text-[11px] font-semibold'>
+                <span className='min-w-0 flex-1 truncate text-xs text-zinc-300'>
                   {labels.mod(salvaged.featureId, salvaged.label)}
                 </span>
-                <span className='shrink-0 text-[11px] font-bold tabular-nums'>
+                <span className='shrink-0 text-xs font-bold tabular-nums text-purple-300'>
                   +{salvaged.points}
                 </span>
               </div>
@@ -156,7 +166,7 @@ export const MarketListingCard = ({
             <TooltipContent
               side='top'
               className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-white'>
-              <span className='text-[11px] text-zinc-300'>
+              <span className='text-xs text-zinc-300'>
                 {t(
                   listing.itemType === "guitar"
                     ? "market.salvage_hint_guitar"
@@ -172,11 +182,6 @@ export const MarketListingCard = ({
           </Tooltip>
         </TooltipProvider>
       )}
-
-      {/* The same marks the case preview and the shelf show. A seller's own
-          listing skips them: it is theirs, which is the whole point of the
-          cancel button underneath. */}
-      {dexStatus && !isOwn && <DexMarks status={dexStatus} />}
 
       {isOwn ? (
         <button

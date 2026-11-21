@@ -198,7 +198,7 @@ export const ActivityStartModal = ({
                 `gap-2` never reaches the icon — the margin has to live here. */}
             {canStart && (
               <Button onClick={handleStart} className='h-11 w-full sm:h-10 sm:w-auto sm:px-6'>
-                <Play className='mr-2 h-4 w-4' />
+                <Play className='h-4 w-4' />
                 {t("start")}
               </Button>
             )}

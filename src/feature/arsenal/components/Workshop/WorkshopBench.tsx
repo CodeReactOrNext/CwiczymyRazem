@@ -17,7 +17,6 @@ import type {
   SalvagedMod,
   ScrapPart,
 } from "feature/arsenal/types/arsenal.types";
-import { describeBlocker } from "feature/arsenal/utils/workshopBlockers";
 import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
 import { readableText } from "lib/colorTheme/colorTheme";
 import { Hammer, Wrench } from "lucide-react";
@@ -186,20 +185,21 @@ export const WorkshopBench = ({
               className='max-w-[220px]'
             />
           </div>
-          <div className='flex shrink-0 items-center gap-2'>
-            <span className='text-[10px] font-semibold tracking-widest text-zinc-500'>
-              {t("workshop.level")}
-            </span>
-            <LevelEmblem level={entry.level} rarity={entry.rarity} size={44} />
-          </div>
+          <LevelEmblem
+            level={entry.level}
+            rarity={entry.rarity}
+            size={44}
+            title={t("workshop.level")}
+          />
         </div>
       </div>
 
-      {/* ─── The three things you can do ─── */}
-      {/* Nothing left to restore collapses to a status line — a big disabled
-          card for a job that will never run again just eats space the other
-          two jobs could use. */}
-      {repairQuote.target ? (
+      {/* ─── The things you can do ─── */}
+      {/* Nothing left to restore means no card at all: the status bar above
+          already says the grade and that it is fully restored, and a second
+          line under it only said so again. What a job is short of is in the
+          dialog it opens — the card just greys its gain. */}
+      {repairQuote.target && (
         <JobCard
           icon={Wrench}
           title={t("workshop.restore_condition")}
@@ -211,19 +211,9 @@ export const WorkshopBench = ({
           }
           gain={repairQuote.gain}
           ready={repairQuote.canRepair}
-          blockedNote={describeBlocker(repairQuote.recipe, [], t)}
           accent='emerald'
           onClick={() => setJob("repair")}
         />
-      ) : (
-        <div className='flex items-center gap-2.5 rounded-lg bg-zinc-900/40 px-4 py-3 text-sm'>
-          <Wrench size={15} className='shrink-0 text-emerald-400/60' />
-          <span className='font-bold text-zinc-300'>
-            {labels.condition(getConditionGrade(entry.condition))}
-          </span>
-          <span className='text-zinc-600'>·</span>
-          <span className='text-zinc-500'>{t("workshop.fully_restored")}</span>
-        </div>
       )}
 
       <JobCard
@@ -245,7 +235,6 @@ export const WorkshopBench = ({
         }
         gain={buildQuote.gain}
         ready={buildQuote.canBuild}
-        blockedNote={describeBlocker(buildQuote.recipe, buildQuote.checks, t)}
         accent='cyan'
         onClick={() => setJob("build")}
       />

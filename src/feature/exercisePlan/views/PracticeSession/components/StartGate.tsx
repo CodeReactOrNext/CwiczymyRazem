@@ -55,12 +55,12 @@ export const StartGate = memo(function StartGate({
         {/* Called bare: onStart can be the timer's startTimer(delayMs), and the
             click event landing in delayMs started the clock at NaN. */}
         <Button size='lg' onClick={() => onStart()} className='h-12 gap-2 px-8 text-base font-bold'>
-          <Play className='mr-2 !size-5' />
+          <Play className='!size-5' />
           {t("start_gate.start")}
         </Button>
         {onPreview && (
           <Button size='lg' variant='ghost' onClick={onPreview} className='h-12 gap-2 px-6 text-base font-semibold'>
-            <Eye className='mr-2 !size-5' />
+            <Eye className='!size-5' />
             {t("start_gate.preview")}
           </Button>
         )}

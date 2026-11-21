@@ -2,7 +2,7 @@ import type Soundfont from "soundfont-player";
 
 import type { TablatureNote } from "../../types/exercise.types";
 import { BASS_STRING_FREQS, BASS_STRING_MIDI, getCachedNoiseBuffer, GUITAR_STRING_FREQS, GUITAR_STRING_MIDI } from "./audio.constants";
-import { playSoundfontNote } from "./soundfontVoice";
+import { attackLeadFor, playSoundfontNote } from "./soundfontVoice";
 import { synthBass, synthGuitar } from "./synth.guitar";
 import type { StringSynthOptions } from "./types";
 
@@ -156,7 +156,11 @@ export function playStringNote(
       ? Math.max(effectiveDuration * 1.3, 0.3)
       : Math.max(effectiveDuration * 0.92, 0.08);
     const baseGain = trackType === "bass" ? 0.8 : trackType === "vocals" ? 0.55 : 0.65;
-    const sfNode = playSoundfontNote(player, String(midiNote), t, {
+    // The bass samples have a lead-in before the attack — see attackLeadFor.
+    const startAt = trackType === "bass"
+      ? Math.max(ctx.currentTime + 0.001, t - attackLeadFor(player, midiNote))
+      : t;
+    const sfNode = playSoundfontNote(player, String(midiNote), startAt, {
       duration: sfDuration, gain: baseGain * gainScale, destination: trackGain,
     });
 

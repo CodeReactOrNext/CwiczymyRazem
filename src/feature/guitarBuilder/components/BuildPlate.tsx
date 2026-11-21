@@ -45,7 +45,9 @@ const CountingLevel = ({ value }: { value: number }) => {
 
 /**
  * The plate under the bay: what the build is, what it adds up to, and which
- * part brings what — so the number in the emblem above is never a mystery.
+ * part brings what. The total is said here and only here — the bay above
+ * carries no emblem of its own — and an unfinished build simply has no rarity
+ * yet, rather than a line saying parts are missing.
  */
 export const BuildPlate = ({ name, summary, pulse }: BuildPlateProps) => {
   const color = getRarityColor(summary.rarity);
@@ -65,12 +67,15 @@ export const BuildPlate = ({ name, summary, pulse }: BuildPlateProps) => {
           <p className='truncate font-display text-xl font-semibold text-zinc-50'>
             {name}
           </p>
-          {summary.complete ? (
-            <p className='mt-0.5 text-sm' style={{ color }}>
+          {summary.complete && (
+            <p className='mt-1 flex items-center gap-1.5 text-sm text-zinc-400'>
+              <span
+                aria-hidden
+                className='h-1.5 w-1.5 rounded-full'
+                style={{ backgroundColor: color }}
+              />
               {labels.rarity(summary.rarity)}
             </p>
-          ) : (
-            <p className='mt-0.5 text-sm text-zinc-400'>{t("builder.missing_parts")}</p>
           )}
         </div>
         <p
@@ -91,7 +96,7 @@ export const BuildPlate = ({ name, summary, pulse }: BuildPlateProps) => {
           )}
         </p>
       </div>
-      <dl className='space-y-1.5 text-sm'>
+      <dl className='space-y-2 text-sm'>
         {summary.lines.map((line) => (
           <div key={line.slot} className='flex items-baseline gap-3'>
             <dt className='w-20 shrink-0 text-zinc-400'>

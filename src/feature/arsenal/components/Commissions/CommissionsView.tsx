@@ -11,10 +11,8 @@ import type {
 import { getCommissionCatalog } from "feature/arsenal/utils/commissionCatalog";
 import type { DexRarityFilter } from "feature/arsenal/utils/dexWall";
 import { DEX_RARITY_CHIPS } from "feature/arsenal/utils/dexWall";
-import { Guitar, Layers } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { RARITY_STYLES } from "../RarityBadge";
 import { Segment, SegmentGroup } from "../SegmentedControl";
 import { CommissionCard } from "./CommissionCard";
 import { CommissionDialog } from "./CommissionDialog";
@@ -32,6 +30,10 @@ interface CommissionsViewProps {
  * to order. The level gate sits around this view in the Arsenal, so by the time
  * it renders the player may order anything on it — see `data/commission.ts` for
  * the prices and the rules.
+ *
+ * The view is the two filters and the grid. The tab already names it, so it has
+ * no title; how much is left is said once, on the kind it is left in; and a
+ * rarity's colour is on the cards, not repeated as a dot on every filter.
  */
 export const CommissionsView = ({ data, fame }: CommissionsViewProps) => {
   const [kind, setKind] = useState<WorkshopKind>("guitar");
@@ -68,38 +70,16 @@ export const CommissionsView = ({ data, fame }: CommissionsViewProps) => {
   );
 
   return (
-    <div className='flex flex-col gap-5'>
-      <div className='flex flex-wrap items-end justify-between gap-4'>
-        <div className='flex flex-col gap-1.5'>
-          <div className='flex items-center gap-3'>
-            <span className='h-6 w-0.5 rounded-full bg-cyan-400' aria-hidden />
-            <h2 className='font-display text-2xl font-black text-zinc-100'>
-              {t("view.tabs.commissions")}
-            </h2>
-          </div>
-          <p className='text-sm text-zinc-500'>
-            {t("commissions.subtitle")}
-          </p>
-        </div>
-        <p className='text-sm text-zinc-400'>
-          <span className='font-bold tabular-nums text-zinc-100'>
-            {catalog.length}
-          </span>{" "}
-          {t("commissions.left_to_build")}
-        </p>
-      </div>
-
-      <div className='flex flex-wrap items-center gap-3'>
+    <div className='flex flex-col gap-6'>
+      <div className='flex flex-wrap items-center justify-between gap-3'>
         <SegmentGroup>
           <Segment active={kind === "guitar"} onClick={() => setKind("guitar")}>
-            <Guitar size={14} />
             {t("collection.scope.guitars")}
-            <span className='text-zinc-500'>{counts.guitar}</span>
+            <span className='tabular-nums text-zinc-500'>{counts.guitar}</span>
           </Segment>
           <Segment active={kind === "effect"} onClick={() => setKind("effect")}>
-            <Layers size={14} />
             {t("collection.scope.pedals")}
-            <span className='text-zinc-500'>{counts.effect}</span>
+            <span className='tabular-nums text-zinc-500'>{counts.effect}</span>
           </Segment>
         </SegmentGroup>
 
@@ -109,17 +89,13 @@ export const CommissionsView = ({ data, fame }: CommissionsViewProps) => {
           </Segment>
           {DEX_RARITY_CHIPS.map((r) => (
             <Segment key={r} active={rarity === r} onClick={() => setRarity(r)}>
-              <span
-                className='h-1.5 w-1.5 rounded-full'
-                style={{ backgroundColor: RARITY_STYLES[r].baseColor }}
-              />
               {labels.rarity(r)}
             </Segment>
           ))}
         </SegmentGroup>
       </div>
 
-      <div className='rounded-lg bg-arsenal-bg p-3 sm:p-4'>
+      <div className='rounded-lg bg-arsenal-bg p-4 sm:p-5'>
         {visible.length === 0 ? (
           <p className='py-16 text-center text-sm text-zinc-500'>
             {catalog.length === 0
@@ -127,7 +103,7 @@ export const CommissionsView = ({ data, fame }: CommissionsViewProps) => {
               : t("commissions.nothing_here")}
           </p>
         ) : (
-          <div className='grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
+          <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
             {visible.map(({ key, target, quote }) => (
               <CommissionCard
                 key={key}

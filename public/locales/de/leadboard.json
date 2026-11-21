@@ -40,7 +40,10 @@
   "rewards": {
     "title": "Saisonbelohnungen",
     "place": "Platz {{place}}: {{fame}} Fame",
-    "range": "Plätze {{from}}–{{to}}: {{max}}–{{min}} Fame"
+    "range": "Plätze {{from}}–{{to}}: {{max}}–{{min}} Fame",
+    "summary": "Die Top {{count}} erhalten Fame",
+    "show": "Belohnungen",
+    "hide": "Ausblenden"
   },
   "hero": {
     "season": "Saison",
@@ -59,6 +62,9 @@
   },
   "rig": {
     "guitar_level": "Gitarrenlevel",
-    "empty_slot": "Leerer Platz {{n}}"
-  }
+    "empty_slot": "Leerer Platz {{n}}",
+    "title": "Rig"
+  },
+  "player_level": "Spielerlevel",
+  "player": "Spieler"
 }

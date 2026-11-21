@@ -85,7 +85,7 @@ export const ClaimRewardsBanner = ({
         onClick={onClaimAll}
         loading={isClaiming}
         className='w-full shrink-0 px-6 sm:w-auto'>
-        {!isClaiming && <PackageOpen className='mr-2' />}
+        {!isClaiming && <PackageOpen className='' />}
         {isClaiming ? t("panel.rewards.claiming") : t("panel.rewards.claimAll")}
       </Button>
     </div>

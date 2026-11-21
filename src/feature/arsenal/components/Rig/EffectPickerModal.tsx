@@ -1,4 +1,9 @@
-import { buttonVariants,PRESSABLE } from "assets/components/ui/button";
+import { buttonVariants } from "assets/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
@@ -10,11 +15,12 @@ import {
   rarityLockLvl,
   usePlayerLvl,
 } from "feature/progression/hooks/usePlayerLvl";
-import { ArrowLeftRight, Lock, X } from "lucide-react";
+import { ArrowLeftRight, Lock } from "lucide-react";
+import { useMemo } from "react";
 
 import type { EffectInventoryItem } from "../../types/arsenal.types";
 import { EffectStashTile } from "../GuitarInventory/EffectStashTile";
-import { RARITY_STYLES } from "../RarityBadge";
+import { useProgressiveCount } from "./useProgressiveCount";
 
 interface EffectPickerModalProps {
   effectInventory: EffectInventoryItem[];
@@ -27,10 +33,17 @@ interface EffectPickerModalProps {
   onClose: () => void;
 }
 
+/**
+ * Picking a pedal for the board.
+ *
+ * The app's own dialog — a sheet on a phone, a centred panel above it — rather
+ * than an overlay built by hand. One title and the grid: under each pedal its
+ * name and its kind, and one quiet line only when picking it works differently
+ * (it trades places with a pedal on a full board, or it is still locked).
+ */
 export const EffectPickerModal = ({
   effectInventory,
   occupiedItemIds,
-  slotIndex,
   currentItemId,
   canFit,
   onSelect,
@@ -40,65 +53,30 @@ export const EffectPickerModal = ({
   // are two different pedals — level, condition and fitted mods all differ — so
   // collapsing them to one hid the better one behind the worse. The order is the
   // stash's own: rarest first, copies of a model side by side, best copy leading.
-  const items = filterAndSortEntries(
-    getEffectEntries(effectInventory),
-    "",
-    "rarity",
+  const items = useMemo(
+    () => filterAndSortEntries(getEffectEntries(effectInventory), "", "rarity"),
+    [effectInventory],
   );
+  const shown = useProgressiveCount(items.length);
   const playerLvl = usePlayerLvl();
   const labels = useArsenalLabels();
   const { t } = labels;
 
-  const boardFull =
-    !!canFit &&
-    items.length > 0 &&
-    !items.some(
-      (item) => !occupiedItemIds.includes(item.id) && canFit(item.id),
-    );
-
   return (
-    <div
-      className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm'
-      onClick={onClose}>
-      <div
-        className='relative max-h-[80vh] w-full max-w-xl overflow-y-auto rounded-lg bg-zinc-900 p-6 shadow-2xl'
-        onClick={(e) => e.stopPropagation()}>
-        <div className='mb-6 flex items-start justify-between gap-4'>
-          <div className='flex flex-col gap-0.5'>
-            <p className='text-[10px] font-bold capitalize tracking-widest text-zinc-500'>
-              {t("picker.pedal_slot", { slot: slotIndex + 1 })}
-            </p>
-            <p className='text-base font-black capitalize tracking-wide text-white'>
-              {t("picker.choose_effect")}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label={t("common.close")}
-            className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
-            <X size={18} />
-          </button>
-        </div>
-
-        {boardFull && (
-          <p className='mb-6 rounded-lg bg-amber-500/10 px-4 py-3 text-xs font-semibold text-amber-400'>
-            {t("picker.board_full")}
-          </p>
-        )}
-
-        {currentItemId && (
-          <button
-            onClick={() => {
-              onSelect(null);
-              onClose();
-            }}
-            className={cn(PRESSABLE, "mb-6 w-full rounded-lg bg-zinc-800/40 py-3 text-xs font-bold capitalize tracking-widest text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white border-b-black/30")}>
-            {t("picker.remove_from_slot")}
-          </button>
-        )}
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        // A tile shows its full card when it takes focus, so the dialog must
+        // not hand focus to the first one the moment it opens.
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        // No zoom on the way in or out: scaling a grid of lit, filtered sockets
+        // re-draws every one of them on every frame of it. It fades instead.
+        className='flex flex-col gap-8 border-0 bg-zinc-900 shadow-none sm:max-w-2xl sm:overflow-y-auto sm:p-8 sm:data-[state=closed]:zoom-out-100 sm:data-[state=open]:zoom-in-100'>
+        <DialogTitle className='pr-12 text-xl font-bold leading-snug text-zinc-100'>
+          {t("picker.choose_effect")}
+        </DialogTitle>
 
         {items.length === 0 && (
-          <p className='py-8 text-center text-sm text-zinc-500'>
+          <p className='py-8 text-center text-sm leading-relaxed text-zinc-400'>
             {t("picker.no_effects")}
             <br />
             {t("picker.no_effects_hint")}
@@ -106,8 +84,8 @@ export const EffectPickerModal = ({
         )}
 
         {/* The stash's own sockets, square the way a pedal sits on the board. */}
-        <div className='grid grid-cols-3 gap-x-3 gap-y-4 xsm:grid-cols-4'>
-          {items.map((item) => {
+        <div className='grid grid-cols-3 gap-x-4 gap-y-6 sm:grid-cols-4'>
+          {items.slice(0, shown).map((item) => {
             const effect = EFFECTS_BY_ID.get(item.effectId);
             if (!effect) return null;
 
@@ -125,7 +103,7 @@ export const EffectPickerModal = ({
             const unavailable = isOccupied;
 
             return (
-              <div key={item.id} className='flex flex-col gap-2'>
+              <div key={item.id} className='flex flex-col gap-2.5'>
                 <div className='aspect-square'>
                   <EffectStashTile
                     item={item}
@@ -141,31 +119,26 @@ export const EffectPickerModal = ({
 
                 <div
                   className={cn(
-                    "flex min-w-0 flex-col",
+                    "flex min-w-0 flex-col gap-0.5",
                     unavailable && "opacity-40",
                   )}>
-                  <span
-                    className='truncate text-[10px] font-bold capitalize'
-                    style={{ color: RARITY_STYLES[rarity].baseColor }}>
-                    {labels.effectType(effect.type)}
-                  </span>
-                  <span className='truncate text-xs font-black capitalize leading-snug text-white'>
+                  <span className='truncate text-sm font-semibold leading-snug text-zinc-100'>
                     {effect.name}
                   </span>
-                  {isOccupied && (
-                    <span className='text-[10px] font-semibold text-zinc-500'>
-                      {t("picker.on_another_slot")}
-                    </span>
-                  )}
+                  <span className='truncate text-xs text-zinc-400'>
+                    {isOccupied
+                      ? t("picker.on_another_slot")
+                      : labels.effectType(effect.type)}
+                  </span>
                   {noRoom && lockedLvl == null && (
-                    <span className='flex items-center gap-1 text-[10px] font-semibold text-amber-500/90'>
-                      <ArrowLeftRight size={9} aria-hidden />
+                    <span className='flex items-center gap-1 text-xs text-zinc-400'>
+                      <ArrowLeftRight size={11} aria-hidden />
                       {t("picker.no_room")}
                     </span>
                   )}
                   {lockedLvl != null && !isOccupied && (
-                    <span className='flex items-center gap-1 text-[10px] font-semibold text-zinc-400'>
-                      <Lock size={9} aria-hidden />
+                    <span className='flex items-center gap-1 text-xs text-zinc-400'>
+                      <Lock size={11} aria-hidden />
                       {rarityLockLabel(lockedLvl, t)}
                     </span>
                   )}
@@ -174,7 +147,18 @@ export const EffectPickerModal = ({
             );
           })}
         </div>
-      </div>
-    </div>
+
+        {currentItemId && (
+          <button
+            onClick={() => {
+              onSelect(null);
+              onClose();
+            }}
+            className={cn(buttonVariants({ variant: "ghost" }), "self-start")}>
+            {t("picker.remove_from_slot")}
+          </button>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 };

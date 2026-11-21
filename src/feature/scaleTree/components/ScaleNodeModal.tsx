@@ -1,5 +1,4 @@
 import { buttonVariants } from "assets/components/ui/button";
-import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
 import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
@@ -8,16 +7,10 @@ import { useTranslation } from "hooks/useTranslation";
 import { Flame, Lock, Minus, Play, Plus, Target, Trophy, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-import { BASE_ROOT_NOTE, transposeFret } from "../data/scaleTreeKeys";
+import { transposeFret } from "../data/scaleTreeKeys";
 import { nextRecordTarget, RECORD_MAX_BPM, RECORD_MIN_BPM, stepRecordBpm } from "../data/scaleTreeRecords";
 import type { NodeStatus, ScaleRecord, ScaleTreeNodeDef } from "../types/scaleTree.types";
 
-
-const FAMILY_COLOR: Record<string, string> = {
-  pentatonic: "text-amber-400",
-  diatonic:   "text-cyan-400",
-  mode:       "text-violet-400",
-};
 
 interface ScaleNodeModalProps {
   node: ScaleTreeNodeDef | null;
@@ -115,7 +108,18 @@ export function ScaleNodeModal({
 
   // The node's name is built from what it is rather than read off the data,
   // so it can be said in any language: the scale, then the shape and pattern.
-  const title = node ? t(`scales.${node.scaleType}`, node.label) : "";
+  // The key rides in the title ("A Minor Pentatonic"), as on the tree's header.
+  const title = node
+    ? t("grid.title", { root: rootNote, scale: t(`scales.${node.scaleType}`, node.label) })
+    : "";
+  // Where it sits and how fast — one quiet line instead of a row of chips that
+  // repeated the pattern and box already named in the subtitle.
+  const meta: string[] = [];
+  if (req) {
+    if (req.stringNum != null) meta.push(t("modal.string", { n: req.stringNum }));
+    else if (fretRange) meta.push(t("modal.frets", { low: fretRange.low, high: fretRange.high }));
+    meta.push(`${req.requiredBpm} BPM`);
+  }
   const subtitle = !req
     ? node?.subtitle
     : req.stringNum != null
@@ -153,14 +157,16 @@ export function ScaleNodeModal({
             {/* Header */}
             <div className='flex items-start gap-4'>
               <div className='min-w-0 flex-1'>
-                <p className={cn("text-xs font-semibold tracking-wide", FAMILY_COLOR[node.scaleFamily] ?? "text-zinc-400")}>
-                  {t(`families.${node.scaleFamily}.label`, node.scaleFamily)}
-                </p>
-                <h2 className='mt-1 font-display text-xl font-bold leading-tight text-zinc-100'>
+                <h2 className='font-display text-xl font-bold leading-tight text-zinc-100'>
                   {title}
                 </h2>
                 {subtitle && (
                   <p className='mt-1 text-sm text-zinc-400'>{subtitle}</p>
+                )}
+                {meta.length > 0 && (
+                  <p className='mt-1 text-xs tabular-nums text-zinc-500'>
+                    {meta.join(" · ")}
+                  </p>
                 )}
               </div>
               <button
@@ -170,31 +176,6 @@ export function ScaleNodeModal({
                 <X className='h-4 w-4' />
               </button>
             </div>
-
-            {/* Exercise tags */}
-            {req && (
-              <div className='flex flex-wrap gap-2'>
-                <Chip>{t(`patterns.${req.patternType}`, req.patternType)}</Chip>
-                {req.stringNum != null ? (
-                  <Chip>{t("modal.string", { n: req.stringNum })}</Chip>
-                ) : (
-                  // Box names exist for pentatonics only — elsewhere the fret
-                  // range chip below already says everything there is to say.
-                  req.boxNumber != null && (
-                    <Chip>{t("shape.box", { n: req.boxNumber })}</Chip>
-                  )
-                )}
-                {req.stringNum == null && fretRange && (
-                  <Chip>
-                    {t("modal.frets", { low: fretRange.low, high: fretRange.high })}
-                  </Chip>
-                )}
-                <Chip color='cyan'>{req.requiredBpm} BPM</Chip>
-                {rootNote !== BASE_ROOT_NOTE && (
-                  <Chip color='purple'>{t("modal.key_of", { root: rootNote })}</Chip>
-                )}
-              </div>
-            )}
 
             {/* Tablature preview — no inner card, the sheet is the only surface */}
             {tablature && tablature.length > 0 && (
@@ -211,14 +192,14 @@ export function ScaleNodeModal({
               <div className='grid grid-cols-2 gap-3'>
                 <button
                   onClick={onStartPractice}
-                  className='flex items-center justify-center gap-2 rounded-lg bg-zinc-800/60 py-3 text-sm font-bold text-zinc-100 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
-                  <Play className='h-4 w-4' fill='currentColor' />
+                  className={cn(buttonVariants({ variant: "ghost" }), "h-11 font-bold")}>
+                  <Play fill='currentColor' />
                   {t("modal.practice")}
                 </button>
                 <button
                   onClick={onStartExam}
-                  className='flex items-center justify-center gap-2 rounded-lg bg-cyan-500 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
-                  <Target className='h-4 w-4' />
+                  className={cn(buttonVariants(), "h-11 font-bold")}>
+                  <Target />
                   {isCompleted ? t("modal.retake") : t("modal.exam")}
                 </button>
               </div>
@@ -226,8 +207,7 @@ export function ScaleNodeModal({
 
             {/* Record run — the same exam above the tree's tempo. Opens up once the
                 node itself is cleared, so the exam stays the way in. */}
-            {!isLocked && (
-              isCompleted ? (
+            {!isLocked && isCompleted && (
                 <div className='flex flex-col gap-4 rounded-lg bg-zinc-800/40 p-4'>
                   <div className='flex items-center gap-3'>
                     <Flame className='h-4 w-4 shrink-0 text-orange-400' />
@@ -250,13 +230,13 @@ export function ScaleNodeModal({
                   </div>
 
                   <div className='flex items-center gap-3'>
-                    <div className='flex flex-1 items-center justify-between gap-2 rounded-lg bg-zinc-900/60 px-2 py-2'>
+                    <div className='flex flex-1 items-center justify-between gap-2'>
                       <button
                         onClick={() => setRecordTarget((bpm) => stepRecordBpm(bpm, -1))}
                         disabled={recordTarget <= RECORD_MIN_BPM}
                         aria-label={t("modal.lower_tempo")}
-                        className='flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-40'>
-                        <Minus className='h-4 w-4' />
+                        className={buttonVariants({ variant: "ghost", size: "icon" })}>
+                        <Minus />
                       </button>
                       <span className='text-sm font-bold tabular-nums text-zinc-100'>
                         {recordTarget} BPM
@@ -265,29 +245,22 @@ export function ScaleNodeModal({
                         onClick={() => setRecordTarget((bpm) => stepRecordBpm(bpm, 1))}
                         disabled={recordTarget >= RECORD_MAX_BPM}
                         aria-label={t("modal.raise_tempo")}
-                        className='flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-background hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-40'>
-                        <Plus className='h-4 w-4' />
+                        className={buttonVariants({ variant: "ghost", size: "icon" })}>
+                        <Plus />
                       </button>
                     </div>
                     <button
                       onClick={() => onStartRecord(recordTarget)}
-                      className='flex shrink-0 items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-3 text-sm font-bold text-zinc-950 transition-background hover:bg-orange-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring active:click-behavior'>
-                      <Flame className='h-4 w-4' />
+                      title={t("modal.clean_run")}
+                      className={cn(
+                        buttonVariants(),
+                        "h-11 shrink-0 bg-orange-500 px-4 font-bold text-zinc-950 hover:bg-orange-400",
+                      )}>
+                      <Flame />
                       {record ? t("modal.beat_it") : t("modal.set_record")}
                     </button>
                   </div>
-
-                  <p className='text-xs leading-relaxed text-zinc-500'>
-                    {t("modal.clean_run")}
-                  </p>
                 </div>
-              ) : (
-                <p className='text-xs leading-relaxed text-zinc-500'>
-                  {t("modal.pass_exam", {
-                    bpm: req?.requiredBpm ?? RECORD_MIN_BPM,
-                  })}
-                </p>
-              )
             )}
           </motion.div>
         </div>

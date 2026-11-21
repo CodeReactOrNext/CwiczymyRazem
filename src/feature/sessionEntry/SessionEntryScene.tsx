@@ -1,6 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { LINE_SETS, NOTE, PICK, STAR } from "components/AnimeMoment/AnimeMoment";
-import { KostekStill } from "components/Mascot/Kostek";
+import { kostekEyeLine, KostekStill } from "components/Mascot/Kostek";
 import { SessionLoadingSteps } from "feature/exercisePlan/views/PracticeSession/components/SessionLoadingSteps";
 import type { CSSProperties } from "react";
 import { memo, useEffect } from "react";
@@ -61,6 +61,32 @@ const GHOSTS = [
   { c: AMBER, lag: 0.07 },
   { c: CYAN, lag: 0.035 },
 ];
+
+/** Squeezed about their own centre line, so both close in place. */
+const EYE_ORIGIN = { "--eye-y": `${(kostekEyeLine("focus") * 100).toFixed(2)}%` } as CSSProperties;
+
+/**
+ * Kostek mid-strum: the body, and his eyes on layers of their own above it.
+ * Focused eyes narrow on the wind-up; on the hit they cut (like a cel) to shut
+ * lines, which turn into happy arcs while the strings ring, and then
+ * the focused eyes pop back open.
+ */
+const Striker = ({ fg, shade }: { fg?: string; shade?: string }) => (
+  <>
+    <KostekStill mood='focus' part='body' hands={false} shadow={false} fg={fg} shade={shade} bg={INK} className='h-full w-full' />
+    <div className={cn(styles.eyes, styles.eyesFocus)} style={EYE_ORIGIN}>
+      <div className={styles.eyesSquint}>
+        <KostekStill mood='focus' part='eyes' bg={INK} className='h-full w-full' />
+      </div>
+    </div>
+    <div className={cn(styles.eyes, styles.eyesShut)} style={EYE_ORIGIN}>
+      <KostekStill mood='focus' face='closed' part='eyes' bg={INK} className='h-full w-full' />
+    </div>
+    <div className={cn(styles.eyes, styles.eyesBliss)} style={EYE_ORIGIN}>
+      <KostekStill mood='focus' face='happy' part='eyes' bg={INK} className='h-full w-full' />
+    </div>
+  </>
+);
 
 /** The anime moment's focus lines as three pre-drawn cels. */
 const FocusLines = () => (
@@ -150,11 +176,11 @@ export const SessionEntryScene = memo(function SessionEntryScene() {
         <div className={styles.fly}>
           {GHOSTS.map((ghost) => (
             <div key={ghost.c} aria-hidden className={styles.ghost} style={{ "--lag": `${ghost.lag}s` } as CSSProperties}>
-              <KostekStill mood='focus' hands={false} shadow={false} fg={ghost.c} shade={ghost.c} bg={INK} className='h-full w-full' />
+              <Striker fg={ghost.c} shade={ghost.c} />
             </div>
           ))}
           <div className={styles.striker}>
-            <KostekStill mood='focus' hands={false} shadow={false} bg={INK} className='h-full w-full' />
+            <Striker />
           </div>
         </div>
         <div aria-hidden>

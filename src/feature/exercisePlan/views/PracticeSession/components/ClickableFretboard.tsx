@@ -1,9 +1,7 @@
-import { PRESSABLE_KEY } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
-import { mirrorStyle, uprightTransform, useHandednessStore, useIsLeftHanded } from "hooks/useHandedness";
+import { mirrorStyle, uprightTransform, useIsLeftHanded } from "hooks/useHandedness";
 import { useTranslation } from "hooks/useTranslation";
-import { type CSSProperties, memo, useCallback, useId, useState } from "react";
+import { type CSSProperties, memo, useCallback, useId, useLayoutEffect, useRef, useState } from "react";
 
 interface ClickableFretboardProps {
   startFret: number;
@@ -74,46 +72,6 @@ export function useShowFullNeck() {
   return [showFullNeck, toggle] as const;
 }
 
-/** Zoom-out switch for the neck — same preference as before, as a compact chip. */
-export function FullNeckToggle({ value, onChange }: { value: boolean; onChange: (next: boolean) => void }) {
-  const { t } = useTranslation("session");
-  return (
-    <button
-      type="button"
-      aria-pressed={value}
-      onClick={() => onChange(!value)}
-      className={cn(
-        PRESSABLE_KEY,
-        "rounded px-3 py-1.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-        value ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20" : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-700/60",
-      )}
-      title={t("fretboard.whole_neck_hint")}>
-      {t("fretboard.whole_neck")}
-    </button>
-  );
-}
-
-/** Mirrors every neck diagram for left-handed players — nut on the right. */
-export function LeftyToggle() {
-  const { t } = useTranslation("session");
-  const leftHanded = useIsLeftHanded();
-  const setLeftHanded = useHandednessStore((state) => state.setLeftHanded);
-  return (
-    <button
-      type="button"
-      aria-pressed={leftHanded}
-      onClick={() => setLeftHanded(!leftHanded)}
-      className={cn(
-        PRESSABLE_KEY,
-        "rounded px-3 py-1.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-        leftHanded ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20" : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-700/60",
-      )}
-      title={t("fretboard.lefty_hint")}>
-      {t("fretboard.lefty")}
-    </button>
-  );
-}
-
 const TIME_PILL_W = 165;
 const TIME_PILL_H = 60;
 // Square the mic's pulsing ring is drawn in — its r=30 circle plus the stroke.
@@ -153,6 +111,59 @@ const FRET_NUMBER_CONTEXT_COLOR = "#52525b";
 // Index 0 = string 1 (high e) .. index 5 = string 6 (low E).
 const STRING_ACTIVE_WIDTHS = [3, 3.6, 4.4, 5.4, 6.6, 8];
 const STRING_INACTIVE_WIDTHS = [1, 1.1, 1.3, 1.5, 1.8, 2.2];
+
+/** How long the camera takes to travel to a new fret window. */
+const CAMERA_MOVE_MS = 650;
+
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+
+/**
+ * Eases the board's geometry from where it was shown to where React just drew
+ * it. React writes the new attributes on commit; this puts the old values back
+ * before the browser paints, then walks them across, writing straight to the DOM
+ * so the memoised board doesn't re-render every frame. React leaves those
+ * attributes alone until the target changes again, so nothing fights the tween.
+ *
+ * It runs only when the window actually moves (once a round at most), so the
+ * neck repainting for those frames is fine; the rule against animating inside
+ * the <svg> is about things that loop.
+ */
+function useTweenedGeometry(target: readonly number[], apply: (values: readonly number[]) => void) {
+  const applyRef = useRef(apply);
+  useLayoutEffect(() => {
+    applyRef.current = apply;
+  });
+  const shownRef = useRef<readonly number[] | null>(null);
+  const key = target.join(",");
+
+  useLayoutEffect(() => {
+    const to = key.split(",").map(Number);
+    const from = shownRef.current;
+    const reduceMotion =
+      typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const moves = !!from && from.length === to.length && from.some((value, i) => value !== to[i]);
+    if (!from || !moves || reduceMotion || typeof requestAnimationFrame !== "function") {
+      // A tween cut short can leave values React has no reason to rewrite.
+      shownRef.current = to;
+      if (from) applyRef.current(to);
+      return undefined;
+    }
+
+    let frame = 0;
+    const start = performance.now();
+    const step = (now: number) => {
+      const progress = Math.min(1, (now - start) / CAMERA_MOVE_MS);
+      const eased = easeInOutCubic(progress);
+      const values = to.map((value, i) => from[i] + (value - from[i]) * eased);
+      shownRef.current = values;
+      applyRef.current(values);
+      if (progress < 1) frame = requestAnimationFrame(step);
+    };
+    applyRef.current(from);
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [key]);
+}
 
 /**
  * The exercise's neck diagram, shared by the click drills and the mic-driven
@@ -194,27 +205,34 @@ export const ClickableFretboard = memo(function ClickableFretboard({
   // narrows it down — with all six in play there's nothing to distinguish.
   const stringScoped = !!strings && strings.length < 6;
 
+  // The neck is always drawn whole, nut to a few frets past the 12th; what
+  // moves is the camera on it (the viewBox). Zoomed in, the camera frames the
+  // search window plus a few context frets. When a drill moves that window
+  // between rounds, the camera travels along the neck to the new spot rather
+  // than the board cutting to a fresh drawing with different fret numbers, so
+  // the player sees where on the neck the round went.
   const displayStart = showFullNeck ? 0 : Math.max(0, startFret - CONTEXT_FRETS);
   const displayEnd = showFullNeck ? Math.max(endFret, FULL_NECK_END_FRET) : endFret + CONTEXT_FRETS;
-  const fretCount = displayEnd - displayStart + 1;
-  const showNut = displayStart === 0;
+  const drawEnd = Math.max(endFret, FULL_NECK_END_FRET) + CONTEXT_FRETS;
+  const fretCount = drawEnd + 1;
   const neckX = LEFT_PAD;
   // Fret 0 (the open string) only needs half a cell — the nut sits at its
   // right edge — so every other fret shifts left by half a cell width.
-  const colWidth = (fret: number) => (showNut && fret === 0 ? CELL_W / 2 : CELL_W);
-  const colX = (fret: number): number => {
-    if (!showNut) return neckX + (fret - displayStart) * CELL_W;
-    if (fret <= 0) return neckX;
-    return neckX + CELL_W / 2 + (fret - 1) * CELL_W;
-  };
+  const colWidth = (fret: number) => (fret === 0 ? CELL_W / 2 : CELL_W);
+  const colX = (fret: number): number => (fret <= 0 ? neckX : neckX + CELL_W / 2 + (fret - 1) * CELL_W);
   // The nut replaces the plain divider between fret 0 and fret 1, instead of
   // taking its own extra slot before fret 0.
   const nutCenterX = colX(1);
 
-  const vw = colX(displayEnd + 1) + 10;
+  // Camera: the neck from camLeft to camRight, with the string names in a
+  // gutter to its left that travels with it.
+  const camLeft = colX(displayStart);
+  const camRight = colX(displayEnd + 1);
+  const viewX = camLeft - LEFT_PAD;
+  const vw = camRight - viewX + 10;
   const neckH = 6 * ROW_H;
   const vh = TOP_PAD + neckH + BOTTOM_BAND_H + BOT_PAD;
-  const neckW = vw - neckX - 6;
+  const neckW = colX(drawEnd + 1) - neckX;
   const nutColor = allFound ? "#34d399" : "#f59e0b";
 
   const rowY = (i: number) => TOP_PAD + i * ROW_H;
@@ -222,6 +240,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
   const gradientId = `ckfb-neck-${reactId}`;
   const sheenId = `ckfb-sheen-${reactId}`;
   const clipId = `ckfb-clip-${reactId}`;
+  const viewClipId = `ckfb-view-${reactId}`;
 
   // Left-handed mode mirrors the neck about its vertical centre — nut on the
   // right, frets running right-to-left, string rows untouched. Only the drawing
@@ -231,9 +250,24 @@ export const ClickableFretboard = memo(function ClickableFretboard({
   const leftHanded = useIsLeftHanded();
   const upright = (anchorX: number) => uprightTransform(anchorX, leftHanded);
 
+  // The camera and the window band glide to a moved window instead of jumping.
+  const svgRef = useRef<SVGSVGElement>(null);
+  const viewClipRef = useRef<SVGRectElement>(null);
+  const labelsRef = useRef<SVGGElement>(null);
+  const bandRef = useRef<SVGRectElement>(null);
+  useTweenedGeometry([camLeft, camRight, colX(startFret), colX(endFret + 1)], ([left, right, bandLeft, bandRight]) => {
+    const x = left - LEFT_PAD;
+    svgRef.current?.setAttribute("viewBox", `${x} 0 ${right - x + 10} ${vh}`);
+    viewClipRef.current?.setAttribute("x", String(left));
+    viewClipRef.current?.setAttribute("width", String(right - left + 4));
+    labelsRef.current?.setAttribute("transform", `translate(${x} 0)`);
+    bandRef.current?.setAttribute("x", String(bandLeft));
+    bandRef.current?.setAttribute("width", String(bandRight - bandLeft));
+  });
+
   // Percent box of the overlay layer for a rect in viewBox units.
   const overlayBox = (x: number, y: number, w: number, h: number): CSSProperties => ({
-    left: `${(x / vw) * 100}%`,
+    left: `${((x - viewX) / vw) * 100}%`,
     top: `${(y / vh) * 100}%`,
     width: `${(w / vw) * 100}%`,
     height: `${(h / vh) * 100}%`,
@@ -255,7 +289,8 @@ export const ClickableFretboard = memo(function ClickableFretboard({
           "--fretboard-min-w": `${Math.round(vw * (MIN_COL_PX / CELL_W))}px`,
         } as CSSProperties}>
         <svg
-          viewBox={`0 0 ${vw} ${vh}`}
+          ref={svgRef}
+          viewBox={`${viewX} 0 ${vw} ${vh}`}
           style={{
             width: "100%",
             height: "auto",
@@ -275,17 +310,24 @@ export const ClickableFretboard = memo(function ClickableFretboard({
               <stop offset="45%" stopColor="#ffffff" stopOpacity="0.05" />
               <stop offset="60%" stopColor="#ffffff" stopOpacity="0" />
             </linearGradient>
+            {/* Everything on the neck is cut to the camera, so the neck to the left
+                of the frame never shows behind the string names. */}
+            <clipPath id={viewClipId}>
+              <rect ref={viewClipRef} x={camLeft} y={0} width={camRight - camLeft + 4} height={vh} />
+            </clipPath>
             <clipPath id={clipId}>
               <rect x={neckX} y={TOP_PAD} width={neckW} height={neckH + BOTTOM_BAND_H} rx={6} />
             </clipPath>
           </defs>
 
+          <g clipPath={`url(#${viewClipId})`}>
           <rect x={neckX} y={TOP_PAD} width={neckW} height={neckH + BOTTOM_BAND_H} rx={6} fill={`url(#${gradientId})`} />
           <rect x={neckX} y={TOP_PAD} width={neckW} height={neckH} fill={`url(#${sheenId})`} clipPath={`url(#${clipId})`} />
 
           {/* Search-zone band — marks exactly which columns are clickable,
               distinguishing them from the surrounding context-only frets. */}
           <rect
+            ref={bandRef}
             x={colX(startFret)}
             y={TOP_PAD}
             width={colX(endFret + 1) - colX(startFret)}
@@ -313,7 +355,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
 
           {/* Inlay markers — sit on the fretboard itself, between strings, like a real neck. */}
           {Array.from({ length: fretCount }, (_, i) => {
-            const fret = displayStart + i;
+            const fret = i;
             if (fret === 0) return null;
             const x = colX(fret) + CELL_W / 2;
             const centerY = TOP_PAD + neckH / 2;
@@ -333,9 +375,9 @@ export const ClickableFretboard = memo(function ClickableFretboard({
 
           {/* Fret dividers — thin and muted, deliberately understated next to the strings. */}
           {Array.from({ length: fretCount + 1 }, (_, i) => {
-            const fret = displayStart + i;
+            const fret = i;
             const x = colX(fret);
-            if (fret === 0 || (fret === 1 && showNut)) return null;
+            if (fret === 0 || fret === 1) return null;
             return (
               <line
                 key={i}
@@ -355,9 +397,9 @@ export const ClickableFretboard = memo(function ClickableFretboard({
               instead of staying parallel, a small perspective flourish under
               the last string. */}
           {Array.from({ length: fretCount + 1 }, (_, i) => {
-            const fret = displayStart + i;
+            const fret = i;
             const x = colX(fret);
-            if (fret === 0 || (fret === 1 && showNut)) return null;
+            if (fret === 0 || fret === 1) return null;
             const spreadX = x - BOTTOM_LEAN;
             return (
               <line
@@ -377,7 +419,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
           {/* Side-dot markers in the bottom band, following the same lean as the
               fret lines there — like the position dots on the edge of a real neck. */}
           {Array.from({ length: fretCount }, (_, i) => {
-            const fret = displayStart + i;
+            const fret = i;
             if (!SINGLE_INLAY_FRETS.has(fret) && !DOUBLE_INLAY_FRETS.has(fret)) return null;
             const xTop = colX(fret) + CELL_W / 2;
             const x = xTop - BOTTOM_LEAN / 2;
@@ -389,7 +431,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
               solid-colored, straddling that boundary. Continues into the
               bottom band with the same lean/skew as the frets there, instead
               of a straight-down bar. */}
-          {showNut && (() => {
+          {(() => {
             const nutLeft = nutCenterX - NUT_WIDTH / 2;
             const nutRight = nutCenterX + NUT_WIDTH / 2;
             return (
@@ -416,7 +458,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                 <line
                   x1={neckX}
                   y1={y}
-                  x2={vw - 6}
+                  x2={neckX + neckW}
                   y2={y}
                   stroke={active ? STRING_ACTIVE_COLOR : STRING_INACTIVE_COLOR}
                   strokeWidth={width}
@@ -427,7 +469,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                   <line
                     x1={neckX}
                     y1={y - width / 4}
-                    x2={vw - 6}
+                    x2={neckX + neckW}
                     y2={y - width / 4}
                     stroke={STRING_ACTIVE_HIGHLIGHT}
                     strokeWidth={Math.max(1, width / 4)}
@@ -459,7 +501,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
 
           {/* Fret numbers — plain text above the neck, dimmer for context-only frets. */}
           {Array.from({ length: fretCount }, (_, i) => {
-            const fret = displayStart + i;
+            const fret = i;
             const inTarget = fret >= startFret && fret <= endFret;
             const x = colX(fret) + colWidth(fret) / 2;
             return (
@@ -475,28 +517,6 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                 opacity={inTarget ? 1 : 0.6}
               >
                 {fret}
-              </text>
-            );
-          })}
-
-          {/* String labels — the string(s) actually in play read as the loudest
-              thing on the diagram; everything else recedes. */}
-          {STRING_LABELS.map((label, i) => {
-            const stringNum = i + 1;
-            const active = isInScope(stringNum);
-            const y = rowY(i) + ROW_H / 2 + (active ? 10 : 6);
-            return (
-              <text
-                key={i}
-                x={LEFT_PAD - 20}
-                y={y}
-                transform={upright(LEFT_PAD - 20)}
-                textAnchor={leftHanded ? "start" : "end"}
-                fontSize={active ? 32 : 20}
-                fontWeight={active ? "800" : "600"}
-                fill={active ? (stringScoped ? "#67e8f9" : STRING_ACTIVE_COLOR) : STRING_INACTIVE_COLOR}
-              >
-                {label}
               </text>
             );
           })}
@@ -570,6 +590,31 @@ export const ClickableFretboard = memo(function ClickableFretboard({
             }
             return cells;
           })}
+          </g>
+
+          {/* String labels — the string(s) actually in play read as the loudest
+              thing on the diagram; everything else recedes. */}
+          <g ref={labelsRef} transform={`translate(${viewX} 0)`}>
+          {STRING_LABELS.map((label, i) => {
+            const stringNum = i + 1;
+            const active = isInScope(stringNum);
+            const y = rowY(i) + ROW_H / 2 + (active ? 10 : 6);
+            return (
+              <text
+                key={i}
+                x={LEFT_PAD - 20}
+                y={y}
+                transform={upright(LEFT_PAD - 20)}
+                textAnchor={leftHanded ? "start" : "end"}
+                fontSize={active ? 32 : 20}
+                fontWeight={active ? "800" : "600"}
+                fill={active ? (stringScoped ? "#67e8f9" : STRING_ACTIVE_COLOR) : STRING_INACTIVE_COLOR}
+              >
+                {label}
+              </text>
+            );
+          })}
+          </g>
 
       </svg>
 

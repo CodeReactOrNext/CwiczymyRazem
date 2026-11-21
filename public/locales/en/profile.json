@@ -463,6 +463,10 @@
     "last_session": "Last session",
     "continue": "Continue",
     "your_progress": "Your progress",
-    "start_today": "Start today's practice"
+    "start_today": "Start today's practice",
+    "practice": "Practice",
+    "practice_more": "Practice more",
+    "level": "Level",
+    "xp": "{{current}} / {{total}} XP"
   }
 }

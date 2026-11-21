@@ -67,7 +67,7 @@ export const BuilderPartsShelf = ({ components }: BuilderPartsShelfProps) => {
         unit={t("builder.parts_collected")}
         action={
           <Button variant='secondary' size='sm' onClick={openBuilder}>
-            <Wrench className='mr-2' />
+            <Wrench className='' />
             {t("builder.open_builder")}
           </Button>
         }

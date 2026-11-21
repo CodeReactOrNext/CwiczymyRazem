@@ -1,3 +1,9 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import type {
@@ -8,17 +14,17 @@ import type {
 import type { TraderItemOffer } from "feature/arsenal/types/trader.types";
 import type { DexStatus } from "feature/arsenal/utils/dex";
 import {
+  countScrapParts,
   getEffectScrapYield,
   getGuitarScrapYield,
 } from "feature/arsenal/utils/scrap";
 import { useTranslation } from "hooks/useTranslation";
-import { Check } from "lucide-react";
 
 import { BuyButton } from "../BuyButton";
-import { DexMarks } from "../DexMarks";
+import { DexWord } from "../DexMarks";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
-import { ScrapYieldStrip } from "../Parts/ScrapYieldStrip";
+import { ScrapYieldList } from "../Parts/ScrapYieldList";
 import { PurchaseStamp, useTakenHere } from "./purchaseMotion";
 
 /**
@@ -58,8 +64,9 @@ interface ItemOfferCardProps {
  * so condition, features and vintage are all on the card before paying.
  *
  * The price rides on the button, the way it does on every other Fame CTA in the
- * arsenal. The footer used to open with a "Trader" caption, which only repeated
- * the tab the player was already standing in.
+ * arsenal. Above it the footer is one line of two facts: where the model stands
+ * with the player, and how many parts this copy breaks down into — the payout
+ * itself is behind a hover, since the count is what decides a purchase.
  */
 export const ItemOfferCard = ({
   offer,
@@ -73,15 +80,42 @@ export const ItemOfferCard = ({
   const canAfford = currentFame >= offer.unitPrice;
   const takenHere = useTakenHere(available);
   const scrapParts = getOfferScrapYield(offer);
+  const scrapTotal = countScrapParts(scrapParts);
 
   const footer = (
-    <div className='flex flex-col gap-2.5 p-2.5'>
-      <ScrapYieldStrip parts={scrapParts} />
-
-      {dexStatus && <DexMarks status={dexStatus} />}
+    <div className='flex flex-col gap-3 p-3'>
+      <div className='flex items-baseline justify-between gap-3 text-xs text-zinc-300'>
+        {dexStatus ? (
+          <DexWord status={dexStatus} className='min-w-0' />
+        ) : (
+          <span />
+        )}
+        {scrapTotal > 0 && (
+          <TooltipProvider>
+            <Tooltip delayDuration={150}>
+              <TooltipTrigger asChild>
+                <span className='shrink-0 cursor-help tabular-nums'>
+                  {t("trader.scrap_parts", { count: scrapTotal })}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent
+                side='top'
+                className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-white'>
+                <div className='flex flex-col gap-1.5'>
+                  <span className='text-xs text-zinc-400'>
+                    {t("card.scraps_into", { count: scrapTotal })}
+                  </span>
+                  <ScrapYieldList parts={scrapParts} compact />
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
 
       {available ? (
         <BuyButton
+          variant='key'
           size='sm'
           price={offer.unitPrice}
           canAfford={canAfford}
@@ -91,9 +125,8 @@ export const ItemOfferCard = ({
       ) : (
         <PurchaseStamp
           slam={takenHere}
-          className='flex h-9 items-center justify-center gap-1.5 rounded-lg bg-zinc-800 text-xs font-semibold text-zinc-400'>
-          <Check size={13} strokeWidth={3} />
-          {t("trader.bought_today")}
+          className='flex h-9 items-center justify-center text-xs text-zinc-500'>
+          {t("trader.taken")}
         </PurchaseStamp>
       )}
     </div>

@@ -6,7 +6,7 @@ import { RIG_BUTTON } from "./RigSection";
 
 /** The one thing to do once there is room: white, like every main CTA. */
 const RIG_BUTTON_CTA =
-  "flex shrink-0 items-center gap-1.5 rounded bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-zinc-950 transition-colors duration-fast hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/60";
+  "flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-zinc-950 transition-colors duration-fast hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/60";
 
 interface MakeRoomBarProps {
   /** The pedal waiting for room, as the player knows it. */
@@ -84,7 +84,7 @@ export const MakeRoomBar = ({
       <div className='flex flex-wrap items-center gap-2'>
         {ready && (
           <button onClick={onPlace} className={RIG_BUTTON_CTA}>
-            <ArrowDownToLine size={12} strokeWidth={2.5} />
+            <ArrowDownToLine size={15} strokeWidth={2.5} />
             {t("board.place_now")}
           </button>
         )}
@@ -93,12 +93,12 @@ export const MakeRoomBar = ({
             onClick={onSqueeze}
             className={swapCount > 0 ? RIG_BUTTON : RIG_BUTTON_CTA}
             title={t("board.squeeze_hint")}>
-            <FoldHorizontal size={12} strokeWidth={2.5} />
+            <FoldHorizontal size={15} strokeWidth={2.5} />
             {t("board.squeeze_in")}
           </button>
         )}
         <button onClick={onCancel} className={RIG_BUTTON}>
-          <X size={12} strokeWidth={2.5} />
+          <X size={15} strokeWidth={2.5} />
           {t("board.make_room_cancel")}
         </button>
       </div>

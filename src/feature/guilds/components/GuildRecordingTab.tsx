@@ -10,7 +10,6 @@ import {
   getRecordingContract,
   getRecordingTier,
   RECORDING_CONTRACTS,
-  RECORDING_FULL_SHARE_TAKES,
   RECORDING_GOLD,
   RECORDING_KEEP_ACCURACY,
   RECORDING_MAX_TIER,
@@ -38,10 +37,15 @@ import { m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { fadeUp } from "lib/motion/motion";
 import { Check, Lock, Mic, Repeat } from "lucide-react";
+import type { ReactNode } from "react";
 import { useState } from "react";
 
 /**
- * The guild's Recording tab. With no session open it is a select screen: a
+ * The guild's Recording tab: a stage on top and, under it, one pane at a time
+ * — so the room, the record and the big numbers stay as loud as they were,
+ * and the rest is read a block at a time instead of six deep. The three steps
+ * (book, record, get paid) are a pane of their own, open by default while
+ * there is nothing booked. With no session open it is a select screen: a
  * strip of the six tiers and the picked one on its stage — where the session
  * would be cut, how hard it is, what it pays and the one key that books it.
  * The guild picks how serious the session is; the client is drawn when it
@@ -60,6 +64,127 @@ const Fame = ({ amount }: { amount: number }) => (
     {amount.toLocaleString()}
   </span>
 );
+
+/**
+ * What a recording session is, as the three things that happen in order. It
+ * stands at the top of the tab in both states, with the step the guild is on
+ * lit and the one behind it ticked — so a member who has never seen the tab
+ * reads what it is for, and where the guild is in it, before anything else.
+ */
+const HowItWorks = ({
+  active,
+  takesPerDay,
+}: {
+  /** 1 while there is a session to book, 2 while one is being recorded. */
+  active: 1 | 2;
+  takesPerDay: number;
+}) => {
+  const { t } = useTranslation("guilds");
+  const steps = [
+    {
+      title: t("recording.steps.s1_title"),
+      body: t("recording.steps.s1_body"),
+    },
+    {
+      title: t("recording.steps.s2_title"),
+      body: t("recording.steps.s2_body", { takes: takesPerDay }),
+    },
+    {
+      title: t("recording.steps.s3_title"),
+      body: t("recording.steps.s3_body", {
+        count: RECORDING_MIN_TAKES_FOR_PAY,
+      }),
+    },
+  ];
+
+  return (
+    <ol className='grid gap-2 sm:grid-cols-3'>
+      {steps.map((step, index) => {
+        const place = index + 1;
+        const done = place < active;
+        const current = place === active;
+        return (
+          <li
+            key={place}
+            aria-current={current ? "step" : undefined}
+            className={cn(
+              "flex gap-4 rounded-lg p-5",
+              current ? "bg-zinc-800/60" : "bg-zinc-900/40",
+            )}>
+            <span
+              className={cn(
+                "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base font-bold tabular-nums",
+                done && "bg-emerald-500/10 text-emerald-400",
+                current && "bg-zinc-100 text-zinc-950",
+                !done && !current && "bg-zinc-800/60 text-zinc-500",
+              )}>
+              {done ? <Check size={18} aria-hidden /> : place}
+            </span>
+            <div className='min-w-0 space-y-1'>
+              <p
+                className={cn(
+                  "text-base font-bold",
+                  done || current ? "text-zinc-100" : "text-zinc-400",
+                )}>
+                {step.title}
+              </p>
+              <p className='text-sm leading-relaxed text-zinc-400'>
+                {step.body}
+              </p>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+};
+
+interface Pane {
+  id: string;
+  label: string;
+  content: ReactNode;
+}
+
+/**
+ * What sits under the stage, one thing at a time. The stage is the picture
+ * and the one big number; everything else the tab knows used to be stacked
+ * under it in full, six blocks deep. Here each block keeps its full size and
+ * its own look, and a member reads one of them at a time.
+ */
+const Panes = ({ panes }: { panes: Pane[] }) => {
+  const [openId, setOpenId] = useState(panes[0]?.id);
+  const open = panes.find((pane) => pane.id === openId) ?? panes[0];
+  if (!open) return null;
+
+  return (
+    <div className='space-y-6'>
+      <div role='tablist' className='flex flex-wrap gap-2'>
+        {panes.map((pane) => {
+          const selected = pane.id === open.id;
+          return (
+            <button
+              key={pane.id}
+              type='button'
+              role='tab'
+              aria-selected={selected}
+              onClick={() => setOpenId(pane.id)}
+              className={cn(
+                "rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                selected
+                  ? "bg-zinc-800/60 text-zinc-100"
+                  : "bg-zinc-900/40 text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200",
+              )}>
+              {pane.label}
+            </button>
+          );
+        })}
+      </div>
+      <div role='tabpanel' key={open.id}>
+        {open.content}
+      </div>
+    </div>
+  );
+};
 
 const RATING_TONE: Record<RecordingRating, string> = {
   shelved: "text-zinc-400",
@@ -422,29 +547,41 @@ const TierStage = ({ state, bank, busy, onBook }: TierStageProps) => {
             </p>
           </div>
 
-          <div className='flex flex-wrap gap-x-10 gap-y-5'>
-            <Stat
-              value={`${Math.round(tier.tempo * 100)}%`}
-              label={t("recording.stat_tempo")}
-            />
-            <Stat value={tier.parts} label={t("recording.stat_parts")} />
-            <Stat
-              value={t(`recording.rhythm_short.d${tier.density}`)}
-              label={t("recording.stat_rhythm")}
-            />
+          {/* Two rows of figures, each named for the question it answers —
+              unnamed, five big numbers in a column read as one riddle. */}
+          <div className='space-y-3'>
+            <p className='text-sm font-semibold text-zinc-300'>
+              {t("recording.stage_difficulty")}
+            </p>
+            <div className='flex flex-wrap gap-x-10 gap-y-5'>
+              <Stat
+                value={`${Math.round(tier.tempo * 100)}%`}
+                label={t("recording.stat_tempo")}
+              />
+              <Stat value={tier.parts} label={t("recording.stat_parts")} />
+              <Stat
+                value={t(`recording.rhythm_short.d${tier.density}`)}
+                label={t("recording.stat_rhythm")}
+              />
+            </div>
           </div>
 
-          <div className='flex flex-wrap gap-x-10 gap-y-5'>
-            <Stat
-              value={state.fame.toLocaleString()}
-              label={t("recording.stat_fame")}
-              className='text-amber-400'
-            />
-            <Stat
-              value={state.bank.toLocaleString()}
-              label={t("recording.stat_bank")}
-              className='text-amber-400'
-            />
+          <div className='space-y-3'>
+            <p className='text-sm font-semibold text-zinc-300'>
+              {t("recording.stage_reward")}
+            </p>
+            <div className='flex flex-wrap gap-x-10 gap-y-5'>
+              <Stat
+                value={state.fame.toLocaleString()}
+                label={t("recording.stat_fame")}
+                className='text-amber-400'
+              />
+              <Stat
+                value={state.bank.toLocaleString()}
+                label={t("recording.stat_bank")}
+                className='text-amber-400'
+              />
+            </div>
           </div>
 
           {state.unlocked ? (
@@ -545,9 +682,6 @@ const ClientPool = () => {
         </h3>
         <p className='text-sm leading-relaxed text-zinc-400'>
           {t("recording.pool_hint")}
-        </p>
-        <p className='text-sm leading-relaxed text-zinc-400'>
-          {t("recording.intro")} {t("recording.clients_hint")}
         </p>
       </div>
       <ul className='grid grid-cols-3 gap-4 sm:grid-cols-5 lg:grid-cols-9'>
@@ -898,27 +1032,22 @@ const PartRow = ({
         </div>
         <div className='flex items-center gap-2'>
           <Button variant='ghost' size='sm' onClick={onRehearse}>
-            <Repeat size={15} className='mr-2' aria-hidden />
+            <Repeat size={15} className='' aria-hidden />
             {t("recording.rehearse")}
           </Button>
-          <Button
-            variant='secondary'
-            size='sm'
-            disabled={!canRecord}
-            onClick={onRecord}>
-            <Mic size={15} className='mr-2' aria-hidden />
+          {/* The one thing to do on this screen, so it is the white key. */}
+          <Button size='sm' disabled={!canRecord} onClick={onRecord}>
+            <Mic size={15} className='' aria-hidden />
             {t("recording.record")}
           </Button>
         </div>
       </div>
       <Tape part={part} />
-      <p className='text-xs tabular-nums text-zinc-500'>
-        {role && `${t(`recording.part_hints.${role}`)} `}
-        {t("recording.tape", {
-          tape: part.tape.toLocaleString(),
-          target: part.target.toLocaleString(),
-        })}
-      </p>
+      {role && (
+        <p className='text-sm text-zinc-500'>
+          {t(`recording.part_hints.${role}`)}
+        </p>
+      )}
     </li>
   );
 };
@@ -934,6 +1063,9 @@ interface SessionProps {
   onRecord: (partId: string) => void;
   onRehearse: (partId: string) => void;
   onDeliver: () => void;
+  /** What the room adds, and the three steps — shared with the select screen. */
+  studio: ReactNode;
+  how: ReactNode;
 }
 
 const Session = ({
@@ -943,6 +1075,8 @@ const Session = ({
   onRecord,
   onRehearse,
   onDeliver,
+  studio,
+  how,
 }: SessionProps) => {
   const { t } = useTranslation("guilds");
   const [confirming, setConfirming] = useState(false);
@@ -950,147 +1084,149 @@ const Session = ({
   if (!contract) return null;
   const canRecord = session.me.takesLeft > 0;
 
+  // The parts are where a member acts, so they are what the tab opens on
+  // under the stage; how it is going is one tap away.
+  const record = (
+    <section className='space-y-8 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+      <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2'>
+        <h3 className='font-display text-lg font-bold text-zinc-100'>
+          {t("recording.parts_title")}
+        </h3>
+        <p className='text-sm text-zinc-400'>
+          {canRecord
+            ? t("recording.takes_today", {
+                left: session.me.takesLeft,
+                total: perks.takesPerDay,
+              })
+            : t("recording.takes_none")}
+        </p>
+      </div>
+      <ul className='space-y-8'>
+        {session.parts.map((part) => (
+          <PartRow
+            key={part.id}
+            contract={contract}
+            part={part}
+            canRecord={canRecord}
+            onRecord={() => onRecord(part.id)}
+            onRehearse={() => onRehearse(part.id)}
+          />
+        ))}
+      </ul>
+    </section>
+  );
+
+  const crew = (
+    <section className='grid gap-10 rounded-lg bg-zinc-900/40 p-5 sm:p-6 lg:grid-cols-2'>
+      <div className='space-y-5'>
+        <h3 className='font-display text-lg font-bold text-zinc-100'>
+          {t("recording.recent_title")}
+        </h3>
+        {session.recent.length === 0 ? (
+          <p className='text-sm text-zinc-400'>{t("recording.recent_empty")}</p>
+        ) : (
+          <ol className='space-y-3'>
+            {session.recent.map((take) => (
+              <li
+                key={`${take.uid}:${take.at}`}
+                className='flex items-baseline gap-4 text-sm'>
+                <span
+                  className={cn(
+                    "w-14 shrink-0 font-teko text-2xl tabular-nums leading-none",
+                    accuracyTone(take.accuracy),
+                  )}>
+                  {Math.round(take.accuracy)}%
+                </span>
+                <span className='min-w-0 flex-1 truncate text-zinc-300'>
+                  <span className='font-medium text-zinc-100'>
+                    {take.displayName}
+                  </span>{" "}
+                  · {partName(t, contract, take.partId)}
+                </span>
+                <span className='shrink-0 tabular-nums text-zinc-400'>
+                  +{take.points}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+
+      <div className='space-y-5'>
+        <h3 className='font-display text-lg font-bold text-zinc-100'>
+          {t("recording.crew")}
+        </h3>
+        {session.crew.length === 0 ? (
+          <p className='text-sm text-zinc-400'>{t("recording.crew_empty")}</p>
+        ) : (
+          <ol className='space-y-3'>
+            {session.crew.map((member) => (
+              <li
+                key={member.uid}
+                className='flex items-baseline gap-4 text-sm'>
+                <span
+                  className={cn(
+                    "w-14 shrink-0 font-teko text-2xl tabular-nums leading-none",
+                    accuracyTone(member.accuracy),
+                  )}>
+                  {Math.round(member.accuracy)}%
+                </span>
+                <span className='min-w-0 flex-1 truncate font-medium text-zinc-100'>
+                  {member.displayName}
+                </span>
+                <span className='shrink-0 tabular-nums text-zinc-400'>
+                  {t("recording.crew_row", {
+                    takes: member.takes,
+                    points: member.points.toLocaleString(),
+                  })}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+        {session.canDeliver && (
+          <div className='flex flex-wrap items-center gap-x-4 gap-y-2 pt-2'>
+            {confirming ? (
+              <>
+                <span className='text-sm text-zinc-300'>
+                  {t("recording.deliver_confirm", {
+                    rating: ratingName(t, session.rating),
+                  })}
+                </span>
+                <Button variant='secondary' disabled={busy} onClick={onDeliver}>
+                  {t("recording.deliver_yes")}
+                </Button>
+                <Button variant='ghost' onClick={() => setConfirming(false)}>
+                  {t("recording.deliver_no")}
+                </Button>
+              </>
+            ) : (
+              <Button variant='ghost' onClick={() => setConfirming(true)}>
+                {t("recording.deliver")}
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+
   return (
     <>
       <SessionStage session={session} contract={contract} />
-      <ClientMood session={session} contract={contract} />
-
-      <section className='space-y-8 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
-        <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2'>
-          <h3 className='font-display text-lg font-bold text-zinc-100'>
-            {t("recording.parts_title")}
-          </h3>
-          <p className='text-sm text-zinc-400'>
-            {canRecord
-              ? t("recording.takes_today", {
-                  left: session.me.takesLeft,
-                  total: perks.takesPerDay,
-                })
-              : t("recording.takes_none")}
-          </p>
-        </div>
-        <ul className='space-y-8'>
-          {session.parts.map((part) => (
-            <PartRow
-              key={part.id}
-              contract={contract}
-              part={part}
-              canRecord={canRecord}
-              onRecord={() => onRecord(part.id)}
-              onRehearse={() => onRehearse(part.id)}
-            />
-          ))}
-        </ul>
-        <ul className='max-w-2xl space-y-2 text-sm leading-relaxed text-zinc-400'>
-          <li>{t("recording.how_1")}</li>
-          <li>{t("recording.how_2")}</li>
-          <li>{t("recording.how_3")}</li>
-          <li>
-            {t("recording.how_4", {
-              count: RECORDING_MIN_TAKES_FOR_PAY,
-              full: RECORDING_FULL_SHARE_TAKES,
-            })}
-          </li>
-        </ul>
-      </section>
-
-      <section className='grid gap-10 rounded-lg bg-zinc-900/40 p-5 sm:p-6 lg:grid-cols-2'>
-        <div className='space-y-5'>
-          <h3 className='font-display text-lg font-bold text-zinc-100'>
-            {t("recording.recent_title")}
-          </h3>
-          {session.recent.length === 0 ? (
-            <p className='text-sm text-zinc-400'>
-              {t("recording.recent_empty")}
-            </p>
-          ) : (
-            <ol className='space-y-3'>
-              {session.recent.map((take) => (
-                <li
-                  key={`${take.uid}:${take.at}`}
-                  className='flex items-baseline gap-4 text-sm'>
-                  <span
-                    className={cn(
-                      "w-14 shrink-0 font-teko text-2xl tabular-nums leading-none",
-                      accuracyTone(take.accuracy),
-                    )}>
-                    {Math.round(take.accuracy)}%
-                  </span>
-                  <span className='min-w-0 flex-1 truncate text-zinc-300'>
-                    <span className='font-medium text-zinc-100'>
-                      {take.displayName}
-                    </span>{" "}
-                    · {partName(t, contract, take.partId)}
-                  </span>
-                  <span className='shrink-0 tabular-nums text-zinc-400'>
-                    +{take.points}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          )}
-        </div>
-
-        <div className='space-y-5'>
-          <h3 className='font-display text-lg font-bold text-zinc-100'>
-            {t("recording.crew")}
-          </h3>
-          {session.crew.length === 0 ? (
-            <p className='text-sm text-zinc-400'>{t("recording.crew_empty")}</p>
-          ) : (
-            <ol className='space-y-3'>
-              {session.crew.map((member) => (
-                <li
-                  key={member.uid}
-                  className='flex items-baseline gap-4 text-sm'>
-                  <span
-                    className={cn(
-                      "w-14 shrink-0 font-teko text-2xl tabular-nums leading-none",
-                      accuracyTone(member.accuracy),
-                    )}>
-                    {Math.round(member.accuracy)}%
-                  </span>
-                  <span className='min-w-0 flex-1 truncate font-medium text-zinc-100'>
-                    {member.displayName}
-                  </span>
-                  <span className='shrink-0 tabular-nums text-zinc-400'>
-                    {t("recording.crew_row", {
-                      takes: member.takes,
-                      points: member.points.toLocaleString(),
-                    })}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          )}
-          {session.canDeliver && (
-            <div className='flex flex-wrap items-center gap-x-4 gap-y-2 pt-2'>
-              {confirming ? (
-                <>
-                  <span className='text-sm text-zinc-300'>
-                    {t("recording.deliver_confirm", {
-                      rating: ratingName(t, session.rating),
-                    })}
-                  </span>
-                  <Button
-                    variant='secondary'
-                    disabled={busy}
-                    onClick={onDeliver}>
-                    {t("recording.deliver_yes")}
-                  </Button>
-                  <Button variant='ghost' onClick={() => setConfirming(false)}>
-                    {t("recording.deliver_no")}
-                  </Button>
-                </>
-              ) : (
-                <Button variant='ghost' onClick={() => setConfirming(true)}>
-                  {t("recording.deliver")}
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
-      </section>
+      <Panes
+        panes={[
+          { id: "record", label: t("recording.panes.record"), content: record },
+          {
+            id: "client",
+            label: t("recording.panes.client"),
+            content: <ClientMood session={session} contract={contract} />,
+          },
+          { id: "crew", label: t("recording.panes.crew"), content: crew },
+          { id: "studio", label: t("recording.panes.studio"), content: studio },
+          { id: "how", label: t("recording.panes.how"), content: how },
+        ]}
+      />
     </>
   );
 };
@@ -1121,7 +1257,12 @@ export const GuildRecordingTab = ({
   onClaim,
   onOpenStudio,
 }: GuildRecordingTabProps) => {
+  const { t } = useTranslation("guilds");
   const { session } = view;
+  const studio = <RoomShare perks={view.perks} onOpenStudio={onOpenStudio} />;
+  const how = (
+    <HowItWorks active={session ? 2 : 1} takesPerDay={view.perks.takesPerDay} />
+  );
 
   return (
     <div className='mx-auto w-full max-w-5xl space-y-6'>
@@ -1145,6 +1286,8 @@ export const GuildRecordingTab = ({
           onRecord={onRecord}
           onRehearse={onRehearse}
           onDeliver={onDeliver}
+          studio={studio}
+          how={how}
         />
       ) : (
         <>
@@ -1156,11 +1299,25 @@ export const GuildRecordingTab = ({
           />
 
           {view.last && <LastSession last={view.last} />}
-          <ClientPool />
+          {/* A guild with nothing booked is the one that needs telling what
+              this is, so the three steps are what stands open under the stage. */}
+          <Panes
+            panes={[
+              { id: "how", label: t("recording.panes.how"), content: how },
+              {
+                id: "clients",
+                label: t("recording.panes.clients"),
+                content: <ClientPool />,
+              },
+              {
+                id: "studio",
+                label: t("recording.panes.studio"),
+                content: studio,
+              },
+            ]}
+          />
         </>
       )}
-
-      <RoomShare perks={view.perks} onOpenStudio={onOpenStudio} />
     </div>
   );
 };

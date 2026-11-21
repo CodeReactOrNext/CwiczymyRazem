@@ -42,8 +42,6 @@ export const GuildUpgradesTab = ({
   const { fund, depositFame } = useGuildMutations();
   const busy = fund.isPending || depositFame.isPending;
 
-  const freeSeats = Math.max(0, guild.memberLimit - guild.memberCount);
-
   const treasuryQuest = board?.active.find(
     (quest) =>
       quest.doneAt === null &&
@@ -51,36 +49,27 @@ export const GuildUpgradesTab = ({
   );
 
   return (
-    <div className='space-y-8'>
-      <div className='space-y-1.5'>
-        <h2 className='text-xl font-bold text-white'>{t("tabs.upgrades")}</h2>
-        <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
-          <Interpolate
-            text={t("upgrades.intro")}
-            values={{
-              honor: (
-                <span className='font-semibold text-purple-300'>
-                  {t("upgrades.honor")}
-                </span>
-              ),
-            }}
-          />
-        </p>
-      </div>
+    <div className='space-y-6'>
+      {/* The tab bar already says "Upgrades"; this is the one line on what
+          putting in does, for the guild and for the member. */}
+      <p className='max-w-2xl text-sm leading-relaxed text-zinc-400'>
+        <Interpolate
+          text={t("upgrades.intro")}
+          values={{
+            honor: (
+              <span className='font-semibold text-zinc-200'>
+                {t("upgrades.honor")}
+              </span>
+            ),
+          }}
+        />
+      </p>
 
       <div className='grid gap-4 lg:grid-cols-2'>
         <GuildFundBar
           icon={Armchair}
           fund={guild.funds.seats}
           title={t("upgrades.seats_title")}
-          standing={
-            freeSeats === 0
-              ? t("upgrades.all_seats", { count: guild.memberLimit })
-              : t("seats_taken", {
-                  count: guild.memberCount,
-                  limit: guild.memberLimit,
-                })
-          }
           buys={t("upgrades.seats_buys", { count: GUILD_SEATS_PER_UPGRADE })}
           maxed={t("upgrades.seats_max", { count: GUILD_MAX_SEATS })}
           members={guild.members}
@@ -93,11 +82,6 @@ export const GuildUpgradesTab = ({
           icon={Rows3}
           fund={guild.funds.stashRows}
           title={t("upgrades.rows_title")}
-          standing={
-            guild.stashRowLimit === 1
-              ? t("upgrades.rows_one")
-              : t("upgrades.rows", { count: guild.stashRowLimit })
-          }
           buys={t("upgrades.rows_buys")}
           maxed={t("upgrades.rows_max", { count: GUILD_MAX_STASH_ROWS })}
           members={guild.members}

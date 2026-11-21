@@ -260,6 +260,8 @@ export function parseChordSymbol(symbol: string): Chord | null {
   let quality: ChordQuality = "maj";
   if (/^(maj7|M7|Δ)/.test(suffix)) quality = "maj7";
   else if (/^(m7|min7|-7)/.test(suffix)) quality = "min7";
+  else if (/^(aug|\+)/.test(suffix)) quality = "aug";
+  else if (/^(dim7|°7)/.test(suffix)) quality = "dim7";
   else if (/^(dim|°)/.test(suffix)) quality = "dim";
   else if (/^(m|min|-)(?!aj)/.test(suffix)) quality = "min";
   else if (/^7/.test(suffix)) quality = "7";

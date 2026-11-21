@@ -1,12 +1,7 @@
 {
   "title": "Practice",
-  "continue": "Continue",
   "loading": "Loading...",
   "any_part": "Any part",
-  "lock": {
-    "master": "Master",
-    "premium": "Premium"
-  },
   "sections": {
     "all": "All ways to practise",
     "log_time": "Log time",
@@ -14,10 +9,16 @@
     "create_plan": "Create Plan",
     "create_exercise": "Create Exercise"
   },
+  "groups": {
+    "planned": "With a plan",
+    "songs": "Songs",
+    "exercises": "Exercises",
+    "challenges": "Challenges"
+  },
   "modes": {
     "routine": {
       "title": "Practice Routines",
-      "description": "Ready-made routines, playalongs, your plans and the community's"
+      "description": "Ready-made and your own session plans"
     },
     "manual_log": {
       "title": "Manual Log",
@@ -29,43 +30,43 @@
     },
     "songs": {
       "title": "Songs",
-      "description": "Practise your repertoire — the time counts towards each song"
+      "description": "Your repertoire"
     },
     "auto": {
       "title": "Auto Plan",
-      "description": "A session generated to fit the time you have"
+      "description": "A session built to fit your time"
     },
     "gp": {
       "title": "Guitar Pro Files",
-      "description": "Practise from tabs you import, with playback"
+      "description": "Your tabs, with playback"
     },
     "learning_path": {
       "title": "Learning Path",
-      "description": "Start with the basics, one lesson at a time"
+      "description": "From the basics, lesson by lesson"
     },
     "roadmaps": {
       "title": "Mastery Roadmaps",
-      "description": "A personal plan for one skill or playing style"
+      "description": "A plan for one skill"
     },
     "scales": {
       "title": "Scale Map",
-      "description": "Scale shapes cleared box by box at a target tempo"
+      "description": "Scale shapes, box by box"
     },
     "bosses": {
       "title": "Boss Fights",
-      "description": "Beat a boss level by level, playing your guitar"
+      "description": "Beat a boss by playing"
     },
     "duels": {
       "title": "Duels",
-      "description": "1 vs 1 with a stranger on the same exercise"
+      "description": "1 vs 1 on the same exercise"
     },
     "skills": {
       "title": "Skills",
-      "description": "See your progress by technique"
+      "description": "Progress by technique"
     },
     "exercises": {
       "title": "Exercise Catalog",
-      "description": "Find an exercise by skill, length or practice mode"
+      "description": "Every exercise"
     },
     "favorites": {
       "title": "Favorites"
@@ -88,10 +89,6 @@
     "goals": {
       "title": "Goals"
     }
-  },
-  "tags": {
-    "most_used": "Most used",
-    "new": "New"
   },
   "progress": {
     "all_modules": "All modules completed",

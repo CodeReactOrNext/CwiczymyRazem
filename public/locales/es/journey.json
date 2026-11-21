@@ -16,16 +16,26 @@
     },
     "close": "Cerrar",
     "step": "Paso {{n}}",
-    "goal": "Objetivo",
-    "complete_tasks": "Completa todas las tareas obligatorias de abajo marcando las casillas para pasar a la siguiente etapa.",
-    "your_tasks": "Tus tareas",
     "choose_target": "Elige un objetivo",
     "saving": "Guardando...",
     "done_complete": "Hecho y completar",
-    "unlock_hint": "Lee el contenido y marca todas las casillas de arriba para desbloquearlo",
     "practice": "Practicar",
     "retake": "Repetir",
     "exam": "Examen"
+  },
+  "lesson": {
+    "next": "Siguiente",
+    "back": "Atrás",
+    "how_to_pass": "Cómo aprobar",
+    "before_you_start": "Antes de empezar",
+    "tick_all": "Marca todo lo que sea cierto para ti para completar este paso.",
+    "tick_more_one": "Marca 1 más para terminar",
+    "tick_more_other": "Marca {{count}} más para terminar",
+    "pick_song": "Elige una canción para terminar",
+    "open_one": "Empezar la lección · 1 página",
+    "open_other": "Empezar la lección · {{count}} páginas",
+    "read_again_one": "Leer la lección · 1 página",
+    "read_again_other": "Leer la lección · {{count}} páginas"
   },
   "finish": {
     "in_arsenal": "En tu Arsenal, con un número de serie que nadie más tiene.",
@@ -39,7 +49,8 @@
   },
   "path": {
     "modules": "Módulos",
-    "start": "Empezar"
+    "start": "Empezar",
+    "stage": "Sección {{n}}"
   },
   "modules": {
     "title": "Ruta de aprendizaje",

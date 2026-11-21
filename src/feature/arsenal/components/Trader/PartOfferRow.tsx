@@ -6,7 +6,6 @@ import {
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { TraderPartOffer } from "feature/arsenal/types/trader.types";
 import { useHoldRepeat } from "hooks/useHoldRepeat";
-import { readableText } from "lib/colorTheme/colorTheme";
 import type { LucideIcon } from "lucide-react";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
@@ -18,10 +17,10 @@ import {
   OfferRowActions,
   offerRowClass,
   OfferRowIdentity,
-  OfferRowPrice,
   OfferRowStats,
   PickerSpacer,
-  TakenForToday,
+  Taken,
+  WasPrice,
 } from "./offerRow";
 import { PurchaseSweep, useTakenHere } from "./purchaseMotion";
 
@@ -67,7 +66,8 @@ const PickerButton = ({
  * "each", "of 40 left", "You own" — and a stock bar that sat full on almost
  * every one of them. As rows under one header, the column says what a number
  * is, so the row itself carries only the numbers: what it is, how many the
- * player has, how many are left, what one costs, and the controls.
+ * player has, how many are left, and the controls. The price is on the Buy key
+ * and nowhere else; the tier's colour is on the plate and nowhere else.
  *
  * Parts sell by the piece, so the controls are a quantity picker: a player
  * with thirty Fame to their name can still walk out with something.
@@ -117,9 +117,7 @@ export const PartOfferRow = ({
           </TierPlate>
         }
         name={labels.part(offer.partId)}
-        detail={
-          <span style={{ color: readableText(tierColor) }}>{labels.partTier(offer.tier)}</span>
-        }
+        detail={labels.partTier(offer.tier)}
       />
 
       <OfferRowStats
@@ -129,15 +127,9 @@ export const PartOfferRow = ({
         stock={offer.stock}
       />
 
-      <OfferRowPrice
-        unitPrice={offer.unitPrice}
-        basePrice={offer.basePrice}
-        discountPct={offer.discountPct}
-      />
-
       <OfferRowActions>
         {soldOut ? (
-          <TakenForToday slam={takenHere} />
+          <Taken slam={takenHere} />
         ) : (
           <>
             {remaining > 1 ? (
@@ -204,14 +196,18 @@ export const PartOfferRow = ({
             ) : (
               <PickerSpacer />
             )}
+            {offer.discountPct > 0 && canAfford && (
+              <WasPrice price={offer.basePrice * qty} />
+            )}
             <BuyButton
+              variant='key'
               price={total}
               canAfford={canAfford}
               isBuying={isBuying}
               onClick={() => onBuy(qty)}
               size='sm'
               unaffordableLabel={t("buy.buy")}
-              className='min-w-0 flex-1 sm:w-40 sm:flex-none'
+              className='min-w-0 flex-1 sm:w-36 sm:flex-none'
             />
           </>
         )}

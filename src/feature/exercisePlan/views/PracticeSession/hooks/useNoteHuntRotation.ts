@@ -26,6 +26,9 @@ export interface NoteHuntRotation {
   target: HuntTarget | null;
   /** Seconds until the target rotates, or null when not a rotating hunt. */
   secondsLeft: number | null;
+  /** Length of one round in seconds — what `secondsLeft` counts down from, so a
+   *  countdown bar knows how full to start. Null when there is no countdown. */
+  secondsTotal: number | null;
   /** Manually advance to the next target now (for players not using pitch detection). */
   advance: () => void;
 }
@@ -212,9 +215,12 @@ export function useNoteHuntRotation(
     return () => { clearInterval(id); if (hold) clearTimeout(hold); };
   }, [advancesWhenHeard, isPlaying, solvedRef]);
 
+  const secondsTotal = countsDown ? rotateSeconds : barLocked ? Math.max(1, Math.ceil(msPerChange / 1000)) : null;
+
   return {
     target: enabled ? target : null,
     secondsLeft: enabled ? secondsLeft : null,
+    secondsTotal: enabled ? secondsTotal : null,
     advance,
   };
 }

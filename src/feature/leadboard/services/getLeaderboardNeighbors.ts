@@ -14,6 +14,8 @@ import { memoryCache } from "utils/cache/memoryCache";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 import { db } from "utils/firebase/client/firebase.utils";
 
+import { attachGuildBadges } from "./attachGuildBadges";
+
 export interface LeaderboardNeighborRow {
   user: FirebaseUserDataInterface;
   place: number;
@@ -160,6 +162,17 @@ export const getLeaderboardNeighbors = async ({
         }
       : null,
   };
+
+  // Season documents carry no guild tag; it is read off the user documents.
+  if (view === "seasonal") {
+    const tagged = await attachGuildBadges(
+      neighbors.rows.map((entry) => entry.user),
+    );
+    neighbors.rows = neighbors.rows.map((entry, index) => ({
+      ...entry,
+      user: tagged[index],
+    }));
+  }
 
   memoryCache.set(cacheKey, neighbors, 5 * 60 * 1000); // 5 minutes cache
   return neighbors;

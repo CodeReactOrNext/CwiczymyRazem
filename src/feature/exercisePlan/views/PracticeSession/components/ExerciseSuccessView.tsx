@@ -330,15 +330,17 @@ export const ExerciseSuccessView = ({
           <div className="contents shortwide:flex shortwide:min-w-0 shortwide:flex-1 shortwide:flex-col shortwide:justify-center">
           {/* Header */}
           <div className="relative order-1 px-7 pb-2 pt-9 shortwide:pt-5">
-            {/* Kostek reacts to a run that went through: a thumbs-up for a cleared
-                exercise or a passed exam, the short celebration for 3 stars. A
-                failed exam gets no mascot — the screen already says what to fix. */}
-            {(!isExam || isPassed) && (
-              <div className="mb-3 flex h-20 justify-center shortwide:hidden">
-                {/* Mounted once the moment is over, so its reaction is seen. */}
-                {!moment && <Kostek mood={isExam && stars === 3 ? "celebrate" : "approve"} short delay={0.15} className="h-20" />}
-              </div>
-            )}
+            {/* Kostek reacts to how the run went: a thumbs-up for a cleared
+                exercise or a passed exam, the short celebration for 3 stars, and
+                a sad face for a failed exam, so a fail never looks like a win. */}
+            <div className="mb-3 flex h-20 justify-center shortwide:hidden">
+              {/* Mounted once the moment is over, so its reaction is seen. */}
+              {!moment && (
+                isPassed
+                  ? <Kostek mood={isExam && stars === 3 ? "celebrate" : "approve"} short delay={0.15} className="h-20" />
+                  : <Kostek mood="sad" delay={0.15} className="h-20" />
+              )}
+            </div>
             {isExam ? (
               <div className="flex flex-col items-center gap-3 text-center">
                 {/* Stars */}

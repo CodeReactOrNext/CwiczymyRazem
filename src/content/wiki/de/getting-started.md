@@ -10,7 +10,7 @@ riff.quest ist ein Übungstracker, der sich wie ein Spiel verhält. Du übst, du
 
 <YouTube id="x2wERUdqtL0" title="Erste Schritte mit Riff Quest" caption="Die Tour: eine Session eintragen, ablesen, was sie wert war, und wo alles liegt. Der Rest dieser Seite ist dasselbe Terrain in Schriftform." />
 
-Und es gibt reichlich zu üben. Die Bibliothek enthält über 200 Übungen und mehr als 50 fertige Routinen, der Lernpfad umfasst 36 Schritte in zwei Modulen, und die Scale Map deckt 9 Tonleiterfamilien ab. Obendrein wird eine Mastery Roadmap für dich geschrieben, wenn du eine anforderst, meist mit 35 bis 55 Schritten.
+Und es gibt reichlich zu üben. Die Bibliothek enthält über 200 Übungen und mehr als 50 fertige Routinen, der Lernpfad umfasst 74 Schritte in drei Modulen, und die Scale Map deckt 9 Tonleiterfamilien ab. Obendrein wird eine Mastery Roadmap für dich geschrieben, wenn du eine anforderst, meist mit 35 bis 55 Schritten.
 
 <StatRow stats="200+:Übungen in der Bibliothek|50+:fertige Routinen|36:Schritte im Lernpfad|9:Tonleiterfamilien auf der Scale Map" caption="Die ersten beiden sind abgerundet und die echten Zahlen steigen weiter, nimm sie also als Untergrenze, nicht als Anzahl." />
 

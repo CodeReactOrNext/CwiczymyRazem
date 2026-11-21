@@ -1,5 +1,5 @@
 type JourneyStepStatus = "locked" | "available" | "in-progress" | "completed";
-type JourneyStageId = "stage_1" | "stage_2" | "stage_3" | "stage_4" | "stage_5";
+type JourneyStageId = `stage_${number}`;
 
 export interface FretDiagramString {
   /** 1-6, 1 = high e. */

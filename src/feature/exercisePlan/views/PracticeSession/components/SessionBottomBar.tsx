@@ -150,7 +150,7 @@ const SessionBottomBarComponent = ({
                     disabled={finishDisabled}
                     onClick={() => setShowFinishEarlyDialog(true)}
                   >
-                    <FlagIcon size='1em' className="mr-2" /> {t("common:practice.finish_plan_early")}
+                    <FlagIcon size='1em' className="" /> {t("common:practice.finish_plan_early")}
                   </Button>
                 </span>
               </TooltipTrigger>
@@ -235,7 +235,7 @@ const SessionBottomBarComponent = ({
                 className='h-10 w-full text-sm font-bold'
                 loading={isFinishing || isSubmittingReport}
                 onClick={async () => { setShowExitDialog(false); await onFinishSession({ earlyFinish: isEarlyFinish }); }}>
-                <Check size='1em' className='mr-2' />
+                <Check size='1em' className='' />
                 {t("session:exit.finish_save")}
               </Button>
               {isEarlyFinish && (
@@ -251,7 +251,7 @@ const SessionBottomBarComponent = ({
               variant='subtle'
               className='flex-1 text-sm text-zinc-400 hover:bg-red-500/15 hover:text-red-400'
               onClick={() => { setShowExitDialog(false); onClose?.(); }}>
-              <LogOut size='1em' className='mr-2' />
+              <LogOut size='1em' className='' />
               {finishDisabled ? t("session:exit.exit") : t("session:exit.exit_no_save")}
             </Button>
             <Button

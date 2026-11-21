@@ -6,6 +6,7 @@ import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import {
   AlertTriangle,
   ArrowLeftRight,
+  ChevronDown,
   Expand,
   LayoutGrid,
   Minimize2,
@@ -96,7 +97,12 @@ import { PedalboardCase } from "./PedalboardCase";
 import type { PoweredPedal } from "./PowerLoom";
 import { PedalDcPlug, PowerLoom, PowerRail } from "./PowerLoom";
 import { RigHardwarePanel } from "./RigHardwarePanel";
-import { RIG_BUTTON, RIG_BUTTON_FIX, RIG_BUTTON_PRIMARY } from "./RigSection";
+import {
+  RIG_BUTTON,
+  RIG_BUTTON_FIX,
+  RIG_BUTTON_PRIMARY,
+  RIG_TILE,
+} from "./RigSection";
 import { SignalCable } from "./SignalCable";
 import { SignalOrderStrip } from "./SignalOrderStrip";
 
@@ -224,6 +230,8 @@ export const PedalboardView = ({
 
   /** The board, taken out of the page and given the whole screen. */
   const [fullscreen, setFullscreen] = useState(false);
+  /** The four gestures a finger has on the deck, folded away until asked for. */
+  const [showGestures, setShowGestures] = useState(false);
   /** How small the board may be drawn here. Only a full screen has room to
    *  spare, and only there is "show me all of it" a thing worth asking for. */
   const zoomFloor = fullscreen ? FIT_ZOOM : MIN_ZOOM;
@@ -1571,14 +1579,14 @@ export const PedalboardView = ({
           onClick={handleTidy}
           className={RIG_BUTTON}
           title={t("board.tidy_hint")}>
-          <LayoutGrid size={12} strokeWidth={2.5} />
+          <LayoutGrid size={15} strokeWidth={2.5} />
           {t("stash.tidy_up")}
         </button>
       )}
       <button
         onClick={() => setShowPicker(true)}
         className={RIG_BUTTON_PRIMARY}>
-        <Plus size={12} strokeWidth={2.5} />
+        <Plus size={15} strokeWidth={2.5} />
         {t("board.add_pedal")}
       </button>
     </>
@@ -1973,7 +1981,7 @@ export const PedalboardView = ({
               onClick={handleWireUp}
               className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
               title={t("signal.wire_it_up_hint")}>
-              <Zap size={12} strokeWidth={2.5} />
+              <Zap size={15} strokeWidth={2.5} />
               {t("signal.wire_it_up")}
             </button>
           )}
@@ -1982,7 +1990,7 @@ export const PedalboardView = ({
               onClick={handlePatch}
               className={cn(RIG_BUTTON, RIG_BUTTON_FIX)}
               title={t("power.patch_hint")}>
-              <Plug size={12} strokeWidth={2.5} />
+              <Plug size={15} strokeWidth={2.5} />
               {t("power.patch")}
             </button>
           )}
@@ -2015,59 +2023,90 @@ export const PedalboardView = ({
 
   return (
     <>
-      {/* The board's own heading carries only what buys it more room. Tidying
-          and adding sit on the case itself, and the fixes in the readouts they
-          answer. */}
+      {/* The board's own heading carries the two actions used every visit —
+          adding and tidying — so the main one sits where the section starts.
+          The fixes are in the readouts they answer, and what buys the board
+          more room is under it. Full screen, these same buttons float over
+          the board instead. */}
       <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-3'>
         <p className='font-display text-2xl font-black text-arsenal-text-primary'>
           {t("board.title")}
         </p>
-        <div className='flex flex-wrap items-center gap-2'>
-          <RigHardwarePanel rig={data.rig} fame={fame} />
-        </div>
+        {!fullscreen && (
+          <div className='flex flex-wrap items-center gap-2'>
+            {boardActions}
+          </div>
+        )}
       </div>
 
       {notice && (
-        <p className='flex items-center gap-1.5 text-[11px] font-semibold text-orange-400'>
-          <AlertTriangle size={13} strokeWidth={2.5} className='shrink-0' />
+        <p className='flex items-center gap-2 text-sm font-semibold text-orange-400'>
+          <AlertTriangle size={15} strokeWidth={2.5} className='shrink-0' />
           {notice}
         </p>
       )}
 
       {/* A phone has no cursor to hint with, so the board says out loud what a
-          finger can do to it — but only while there is something to do it to. */}
+          finger can do to it — but only while there is something to do it to.
+          One sentence and the way into full screen; the gestures themselves
+          are folded away, because a paragraph of them stood here on every
+          visit long after it had been read. */}
       {isTouch && boardItems.length > 0 && (
-        <p className='text-[11px] leading-relaxed text-zinc-500'>
-          {t("board.touch_help")}
-        </p>
+        <div className={cn(RIG_TILE, "flex flex-col gap-4 px-6 py-5")}>
+          <p className='text-sm leading-relaxed text-arsenal-text-secondary'>
+            {t("board.touch_tip")}
+          </p>
+          <div className='flex flex-wrap items-center gap-2'>
+            <button onClick={openFullscreen} className={RIG_BUTTON}>
+              <Expand size={15} strokeWidth={2.5} />
+              {t("board.fullscreen")}
+            </button>
+            <button
+              type='button'
+              onClick={() => setShowGestures((open) => !open)}
+              aria-expanded={showGestures}
+              className={RIG_BUTTON}>
+              {t("board.gestures_toggle")}
+              <ChevronDown
+                size={15}
+                className={cn(
+                  "transition-transform duration-fast",
+                  showGestures && "rotate-180",
+                )}
+              />
+            </button>
+          </div>
+          {showGestures && (
+            <ul className='flex flex-col gap-2 text-sm leading-relaxed text-arsenal-text-secondary'>
+              <li>{t("board.gesture_zoom")}</li>
+              <li>{t("board.gesture_drag")}</li>
+              <li>{t("board.gesture_tap")}</li>
+              <li>{t("board.gesture_cable")}</li>
+            </ul>
+          )}
+        </div>
       )}
 
-      {/* What the wiring is worth and whether the brick has a hole left, then
-          the chain itself as a line of names. */}
+      {/* What the wiring is worth, whether the brick has a hole left and what
+          duplicates cost — three tiles cut to one pattern — then the chain
+          itself as progress towards its prize. One tight group, so it reads
+          as the board's readout and not as three more sections. */}
       {boardItems.length > 0 && (
-        <>
+        <div className='flex flex-col gap-4'>
           <BoardStatusStrip
             verdict={verdict}
             supply={supply}
             power={powerState}
             unpowered={unpoweredNames}
             onWireUp={canWireUp ? handleWireUp : null}
-            onPatch={canPatch ? handlePatch : null}
-          />
-          <DuplicateStrip
-            board={boardLevel}
-            activeModel={hoverDuplicate}
-            onHoverModel={setHoverDuplicate}
-          />
+            onPatch={canPatch ? handlePatch : null}>
+            <DuplicateStrip
+              board={boardLevel}
+              activeModel={hoverDuplicate}
+              onHoverModel={setHoverDuplicate}
+            />
+          </BoardStatusStrip>
           <SignalOrderStrip verdict={verdict} board={boardLevel} />
-        </>
-      )}
-
-      {/* Right on top of the case they act on. Full screen, these same
-          buttons float over the board instead. */}
-      {!fullscreen && (
-        <div className='flex flex-wrap items-center justify-end gap-2'>
-          {boardActions}
         </div>
       )}
 
@@ -2079,12 +2118,12 @@ export const PedalboardView = ({
 
       {/* Parked pedals: still equipped, but the board ran out of room for them. */}
       {overflowItems.length > 0 && (
-        <div className='mt-4 flex flex-col gap-3 rounded bg-zinc-900/40 p-4'>
-          <div className='flex flex-col gap-0.5'>
-            <p className='text-[9px] font-bold capitalize tracking-[0.2em] text-amber-500/90'>
+        <div className={cn(RIG_TILE, "flex flex-col gap-4 px-6 py-5")}>
+          <div className='flex flex-col gap-1'>
+            <p className='text-base font-semibold text-arsenal-text-primary'>
               {t("board.off_the_board")}
             </p>
-            <p className='text-xs text-zinc-400'>
+            <p className='text-sm text-zinc-400'>
               {t("board.overflow_hint", { count: overflowItems.length })}
             </p>
           </div>
@@ -2129,7 +2168,7 @@ export const PedalboardView = ({
                         handlePickerSelect(placement.itemId);
                       }}
                       className={cn(RIG_BUTTON, "mt-2")}>
-                      <ArrowLeftRight size={12} strokeWidth={2.5} />
+                      <ArrowLeftRight size={15} strokeWidth={2.5} />
                       {t("board.find_room")}
                     </button>
                   )}
@@ -2150,6 +2189,10 @@ export const PedalboardView = ({
           </div>
         </div>
       )}
+
+      {/* What buys the board more room, under the board it is about — and
+          right after the pedals that did not fit, which is when it is wanted. */}
+      <RigHardwarePanel rig={data.rig} fame={fame} />
 
       {showPicker && (
         <EffectPickerModal

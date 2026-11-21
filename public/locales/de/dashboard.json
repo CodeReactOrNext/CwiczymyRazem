@@ -1,9 +1,11 @@
 {
   "daily_quests": {
     "title": "Tagesquests",
-    "claim": "{{points}} abholen",
-    "claimed": "Belohnung abgeholt",
-    "reward_hint": "Schließe alle {{count}} ab für",
+    "reward_hint": "Schließe alle {{total}} ab für",
+    "time_left": "Noch {{time}}",
+    "new_in": "Neue Quests in {{time}}",
+    "claim_reward": "Belohnung abholen",
+    "all_done": "Für heute alles erledigt",
     "tasks": {
       "rate_song": "Bewerte einen Song",
       "add_want_to_learn": "Füge einen Song zu „Will ich lernen“ hinzu",
@@ -213,13 +215,17 @@
     "open_spot": "Freier Platz",
     "open_spot_hint": "Spiel, um ihn zu holen",
     "title": "Übung des Tages",
-    "new_in": "Neu in {{time}}",
     "none_today": "Heute keine Übung.",
     "beat_score": "Schlag dein Ergebnis",
     "play": "Spielen",
     "board_error": "Das Board konnte nicht geladen werden.",
     "prize": "Preis für #1",
     "wins": "#1 gewinnt",
-    "mod": "{{label}}-Mod"
+    "mod": "{{label}}-Mod",
+    "time_left": "Noch {{time}}",
+    "your_best": "Dein Bestwert {{score}}",
+    "gap_to_first": "{{gap}} bis #1",
+    "leading": "Du führst",
+    "ahead_of_second": "{{gap}} vor #2"
   }
 }

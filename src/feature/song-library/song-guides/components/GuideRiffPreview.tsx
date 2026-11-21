@@ -33,7 +33,7 @@ export const GuideRiffPreview = ({ riffPreview }: GuideRiffPreviewProps) => {
               href={`/practice/exercise/${idToSlug(riffPreview.practiceExerciseId)}`}>
               <Button className='h-9 rounded-lg bg-cyan-500 px-5 text-sm font-bold text-black transition-colors hover:bg-cyan-400'>
                 Practice it with real-time scoring
-                <ArrowRight className='ml-1.5 h-4 w-4' />
+                <ArrowRight className='h-4 w-4' />
               </Button>
             </Link>
             <span className='text-xs font-medium text-zinc-500'>

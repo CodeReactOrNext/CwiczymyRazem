@@ -36,6 +36,8 @@
   "practise_more": "Poćwicz jeszcze trochę",
   "back_to_dashboard": "Wróć do pulpitu",
   "great_progress": "Świetny postęp!",
+  "exam_failed": "Egzamin niezaliczony",
+  "exam_failed_body": "Czas ćwiczenia i tak liczy się do punktów i serii.",
   "fame": "Fame",
   "cat": {
     "technique": "Technika",
@@ -50,13 +52,9 @@
   "session_time": "Czas sesji",
   "streak": "Seria",
   "days_in_a_row": "dni z rzędu",
+  "days_in_a_row_one": "dzień z rzędu",
   "streak_bonus_points": "+{{pct}}% punktów",
   "today": "dziś",
-  "this_week": "Ten tydzień",
-  "goal": "cel",
-  "last_7_days": "ostatnie 7 dni",
-  "skill_balance": "Równowaga umiejętności",
-  "previous": "Poprzedni",
   "new_achievements": "Nowe osiągnięcia",
   "recent_runs": {
     "title": "Jak ostatnio szło Ci to ćwiczenie",

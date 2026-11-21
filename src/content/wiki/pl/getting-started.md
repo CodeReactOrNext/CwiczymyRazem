@@ -10,7 +10,7 @@ riff.quest to tracker ćwiczeń, który zachowuje się jak gra. Ćwiczysz, mówi
 
 <YouTube id="x2wERUdqtL0" title="Pierwsze kroki z Riff Quest" caption="Wycieczka: zapisanie sesji, odczytanie, ile była warta, i gdzie co się znajduje. Reszta tej strony to ten sam teren na piśmie." />
 
-A jest co ćwiczyć. Biblioteka zawiera ponad 200 ćwiczeń i ponad 50 gotowych rutyn, Ścieżka nauki ma 36 kroków w dwóch modułach, a Mapa skal obejmuje 9 rodzin skal. Do tego Mastery Roadmap jest pisana dla ciebie, gdy o nią poprosisz, zwykle ma od 35 do 55 kroków.
+A jest co ćwiczyć. Biblioteka zawiera ponad 200 ćwiczeń i ponad 50 gotowych rutyn, Ścieżka nauki ma 74 kroki w trzech modułach, a Mapa skal obejmuje 9 rodzin skal. Do tego Mastery Roadmap jest pisana dla ciebie, gdy o nią poprosisz, zwykle ma od 35 do 55 kroków.
 
 <StatRow stats="200+:ćwiczeń w bibliotece|50+:gotowych rutyn|36:kroków w Ścieżce nauki|9:rodzin skal na Mapie skal" caption="Pierwsze dwie liczby są zaokrąglone w dół, a prawdziwe wciąż rosną, więc traktuj je jako dolną granicę, a nie dokładną liczbę." />
 

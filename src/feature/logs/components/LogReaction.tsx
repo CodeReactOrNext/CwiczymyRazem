@@ -9,6 +9,7 @@ import { cn } from "assets/lib/utils";
 import styles from "feature/logs/components/LogReaction.module.css";
 import { markMotivateHintDone } from "feature/logs/hooks/useMotivateHint";
 import { toggleLogReaction } from "feature/logs/services/toggleLogReaction.service";
+import { Check } from "lucide-react";
 import { type CSSProperties, useState } from "react";
 import { toast } from "sonner";
 
@@ -77,6 +78,19 @@ const Coin = ({ className }: { className?: string }) => (
     alt=''
     className={cn("object-contain", className)}
   />
+);
+
+/** What stands in the coin's slot once the Fame is paid out. */
+const PaidCheck = ({ className }: { className?: string }) => (
+  <span
+    // Solid already — a bannered row's underlay has nothing to add here.
+    data-opaque
+    className={cn(
+      "flex h-5 w-5 items-center justify-center rounded-full bg-zinc-950 text-amber-400 sm:h-[22px] sm:w-[22px]",
+      className,
+    )}>
+    <Check size={13} strokeWidth={3.5} aria-hidden />
+  </span>
 );
 
 export const LogReaction = ({
@@ -194,17 +208,24 @@ export const LogReaction = ({
             disabled={isPending}
             aria-pressed={isReacted}
             aria-disabled={isReacted}
+            // Both faces are solid, so a bannered row's underlay skips this button.
+            data-opaque
             aria-label={
               isReacted
                 ? `Motivated. This activity earned ${totalFame} Fame`
                 : `Motivate ${recipient} and give them ${fameAmount} Fame`
             }
-            className={cn(PRESSABLE, "border-b-black/30", 
-              "group relative flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-[color,background-color,transform] duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:gap-2 sm:px-3 sm:text-[13px]",
-              // A motivated row lights up amber; one still waiting for you stays neutral.
+            className={cn(
+              PRESSABLE,
+              "group relative flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs transition-[color,background-color,transform] duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 sm:gap-2 sm:px-3 sm:text-[13px]",
+              // Both faces are opaque: the button also sits on players' banners, where a tinted,
+              // see-through face lost its colour and the two states read as the same dark key.
+              // A motivated row is solid gold; one still waiting for you is a neutral key.
+              // The gold key stays pressed in — no lip underneath, a dark edge above — because
+              // motivating is one-way and there is nothing left to press.
               isReacted
-                ? "cursor-default bg-amber-500/15 text-amber-300"
-                : "cursor-pointer bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-300",
+                ? "cursor-default border-b-0 border-t-[3px] border-t-amber-700 bg-amber-400 font-bold text-zinc-950 active:[clip-path:none] active:[translate:none]"
+                : "cursor-pointer border-b-zinc-950 bg-zinc-800 text-zinc-100 hover:bg-zinc-700",
               showHint && !isReacted && "ring-1 ring-amber-400/40",
             )}>
             {showHint && !isReacted && (
@@ -228,13 +249,27 @@ export const LogReaction = ({
             )}
             <span className='relative flex items-center gap-1.5 sm:gap-2'>
               <span className='relative flex [perspective:240px]'>
-                <Coin
-                  className={cn(
-                    "h-5 w-5 transition-opacity duration-base sm:h-[22px] sm:w-[22px]",
-                    !isReacted && "opacity-50 group-hover:opacity-80",
-                    celebration !== 0 && styles.toss,
-                  )}
-                />
+                {isReacted ? (
+                  // Paid out: the coin has left the button, and a check stands where it was.
+                  // The check is the slot's own element from the click on and only fades in;
+                  // the tossed coin is laid over it. Swapping one element for another when
+                  // the celebration ended made the mark hop.
+                  <>
+                    <PaidCheck
+                      className={celebration !== 0 ? styles.checkIn : undefined}
+                    />
+                    {celebration !== 0 && (
+                      <Coin
+                        className={cn(
+                          "absolute inset-0 h-full w-full",
+                          styles.toss,
+                        )}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <Coin className='h-5 w-5 sm:h-[22px] sm:w-[22px]' />
+                )}
                 {celebration !== 0 &&
                   SPILL.map((coin, index) => (
                     <span
@@ -259,7 +294,7 @@ export const LogReaction = ({
                 <span
                   className={cn(
                     "inline-block font-bold tabular-nums",
-                    isReacted && "text-amber-400",
+                    !isReacted && "text-amber-400",
                     celebration !== 0 && styles.pop,
                   )}>
                   {isReacted ? totalFame : `+${fameAmount}`}
@@ -270,7 +305,7 @@ export const LogReaction = ({
                     key={`lift-${celebration}`}
                     aria-hidden
                     className={cn(
-                      "pointer-events-none absolute inset-0 flex items-center justify-center whitespace-nowrap font-bold tabular-nums text-amber-300",
+                      "pointer-events-none absolute inset-0 flex items-center justify-center whitespace-nowrap font-bold tabular-nums text-zinc-950",
                       styles.lift,
                     )}>
                     +{fameAmount}

@@ -187,7 +187,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
               hasLiked && "text-red-400 hover:text-red-300",
             )}
             onClick={handleLike}>
-            <Heart className={cn("mr-1.5 h-4 w-4", hasLiked && "fill-current")} />
+            <Heart className={cn("h-4 w-4", hasLiked && "fill-current")} />
             <span className='text-xs font-bold'>{recording.likes.length}</span>
           </Button>
         </RecordingLikersTooltip>
@@ -198,7 +198,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
           aria-label={t("card.comments")}
           className='text-zinc-400 hover:bg-zinc-800/60 hover:text-cyan-400'
           onClick={() => onView(recording.id)}>
-          <MessageSquare className='mr-1.5 h-4 w-4' />
+          <MessageSquare className='h-4 w-4' />
           <span className='text-xs font-bold'>{recording.commentCount}</span>
         </Button>
 

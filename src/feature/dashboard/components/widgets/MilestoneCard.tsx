@@ -1,3 +1,4 @@
+import { buttonVariants, PRESSABLE } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
@@ -101,7 +102,10 @@ export const MilestoneCard = ({
         ) : !status.owned ? (
           <Link
             href='/summary'
-            className='shrink-0 rounded-lg bg-zinc-900/60 px-3 py-2 text-xs font-semibold text-zinc-200 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-900'>
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "shrink-0",
+            )}>
             {t("card.unlock", { cost: status.cost })}
           </Link>
         ) : canClaim ? (
@@ -117,8 +121,9 @@ export const MilestoneCard = ({
               })
             }
             className={cn(
-              "shrink-0 rounded-lg bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-400 transition-background",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500 hover:bg-amber-500/20",
+              PRESSABLE,
+              "shrink-0 rounded-lg border-b-amber-700 bg-amber-500 px-3 py-2 text-sm text-amber-950 transition-colors duration-fast hover:bg-amber-400",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900",
               "disabled:pointer-events-none disabled:opacity-50",
             )}>
             {claim.isPending ? t("card.claiming") : t("card.claim", { reward: status.reward })}

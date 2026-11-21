@@ -460,7 +460,7 @@ const TimerLayout = ({
                 className='h-11 px-5'
                 disabled={isFinishing || sumTime === 0}
               >
-                <RotateCcw className='mr-2 h-4 w-4' />
+                <RotateCcw className='h-4 w-4' />
                 {t("reset_button")}
               </Button>
             )}
@@ -470,7 +470,7 @@ const TimerLayout = ({
               className='h-11 min-w-[140px] px-6'
               variant='subtle'
             >
-              <ArrowLeft className='mr-2 h-4 w-4' />
+              <ArrowLeft className='h-4 w-4' />
               {t("back_to_practice")}
             </Button>
             ) : (

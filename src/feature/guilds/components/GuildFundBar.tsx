@@ -30,8 +30,6 @@ interface GuildFundBarProps {
   icon?: LucideIcon;
   /** What the track is, as the panel's title: "More seats", "Another shelf row". */
   title: ReactNode;
-  /** Where the guild stands now, e.g. "Room for 2 more". */
-  standing: ReactNode;
   /** What the next step adds, e.g. "3 more seats". */
   buys: string;
   /** Said in place of the bar once the track has nowhere left to go. */
@@ -87,7 +85,6 @@ export const GuildFundBar = ({
   fund,
   icon,
   title,
-  standing,
   buys,
   maxed,
   members,
@@ -103,12 +100,7 @@ export const GuildFundBar = ({
         currency='tokens'
         icon={icon}
         title={title}
-        blurb={
-          <>
-            <p className='text-zinc-200'>{standing}</p>
-            <p>{t("fund.maxed", { maxed })}</p>
-          </>
-        }
+        blurb={t("fund.maxed", { maxed })}
         have={fund.pot}
         need={null}
         className={className}>
@@ -126,15 +118,10 @@ export const GuildFundBar = ({
       icon={icon}
       title={title}
       blurb={
-        <>
-          <p className='text-zinc-200'>{standing}</p>
-          <p>
-            <Interpolate
-              text={t("fund.next_step")}
-              values={{ buys: <span className='text-zinc-200'>{buys}</span> }}
-            />
-          </p>
-        </>
+        <Interpolate
+          text={t("fund.next_step")}
+          values={{ buys: <span className='text-zinc-200'>{buys}</span> }}
+        />
       }
       have={fund.pot}
       need={fund.cost}
@@ -151,9 +138,6 @@ export const GuildFundBar = ({
           <div
             title={t("fund.you_have", { count: tokensLeft.toLocaleString() })}
             className='flex flex-wrap items-center gap-2'>
-            <span className='mr-1 text-sm text-zinc-400'>
-              {t("fund.chip_in")}
-            </span>
             {amounts.map((amount) => (
               <PledgeButton
                 key={amount}

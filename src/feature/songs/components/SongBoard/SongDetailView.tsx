@@ -46,10 +46,10 @@ import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import { transitions } from "lib/motion/motion";
 import { useSharedElement } from "lib/motion/useSharedElement";
+import type { LucideIcon } from "lucide-react";
 import {
   ArrowLeft,
   Check,
-  Clock,
   FileText,
   ListMusic,
   MessageSquare,
@@ -64,6 +64,7 @@ import {
   TrendingUp,
   Users} from "lucide-react";
 import { useRouter } from "next/router";
+import type { ReactNode } from "react";
 import { useEffect, useMemo,useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -91,7 +92,7 @@ const StarRatingDisplay = ({ rating, color, size = 12, onRate }: { rating: numbe
   const [hoverRating, setHoverRating] = useState<number | null>(null);
 
   return (
-    <div className="flex flex-wrap items-center justify-end gap-0.5 group/stars">
+    <div className="flex flex-wrap items-center justify-end gap-1 group/stars">
       {[...Array(10)].map((_, i) => {
         const starValue = i + 1;
         const isActive = hoverRating !== null ? starValue <= hoverRating : starValue <= Math.round(rating);
@@ -116,13 +117,24 @@ const StarRatingDisplay = ({ rating, color, size = 12, onRate }: { rating: numbe
   );
 };
 
-const InfoRow = ({ label, value, icon: Icon }: any) => (
-  <div className="flex items-center justify-between group py-1">
-    <div className="flex items-center gap-3">
-       <Icon className="h-4 w-4 text-zinc-500" />
-       <span className="text-xs font-bold text-zinc-400 capitalize">{label}</span>
+const InfoRow = ({ label, value, icon: Icon }: { label: string; value: ReactNode; icon: LucideIcon }) => (
+  <div className="flex items-center justify-between gap-4 py-1.5">
+    <div className="flex min-w-0 items-center gap-3">
+       <Icon className="h-4 w-4 shrink-0 text-zinc-500" />
+       <span className="text-sm text-zinc-400">{label}</span>
     </div>
-    <span className="text-xs font-bold text-white text-right max-w-[150px] truncate">{value}</span>
+    <span className="max-w-[160px] truncate text-right text-sm font-semibold tabular-nums text-zinc-100">{value}</span>
+  </div>
+);
+
+/** One header for every card on this page: grey icon, light label, optional right side. */
+const CardHeader = ({ icon: Icon, title, children }: { icon: LucideIcon; title: ReactNode; children?: ReactNode }) => (
+  <div className="flex items-center justify-between gap-3">
+    <div className="flex items-center gap-2">
+      <Icon className="h-4 w-4 text-zinc-500" />
+      <span className="text-sm font-semibold text-zinc-200">{title}</span>
+    </div>
+    {children}
   </div>
 );
 
@@ -326,7 +338,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                 onClick={() => runAfterSnapshot(onBack)}
                 className="text-zinc-400 backdrop-blur-md px-4"
               >
-                <ArrowLeft size={16} className="mr-1.5" />
+                <ArrowLeft size={16} className="" />
                 <span className="text-xs font-bold">{backLabel ?? t("detail.back_to_library")}</span>
               </Button>
            </div>
@@ -340,7 +352,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
               layoutDependency={layoutDependency}
               transition={transitions.move}
               style={SONG_COVER_STYLE}
-              className="h-20 w-20 sm:h-32 sm:w-32 md:h-40 md:w-40 shrink-0 overflow-hidden shadow-2xl bg-zinc-900"
+              className="h-20 w-20 sm:h-32 sm:w-32 md:h-36 md:w-36 shrink-0 overflow-hidden shadow-2xl bg-zinc-900"
             >
               {song.coverUrl ? (
                 <img src={song.coverUrl} className="h-full w-full object-cover" />
@@ -351,23 +363,23 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
               )}
             </motion.div>
 
-            <div className="flex-1 text-left">
-               <div className="flex items-center justify-start gap-3 mb-1 sm:mb-2">
-                   <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-[4px] bg-zinc-800 text-[9px] sm:text-[10px] font-bold capitalize text-zinc-400 backdrop-blur-sm">
-                     {song.genres?.[0] || t("detail.guitar_track")}
-                   </span>
+            <div className="flex min-w-0 flex-1 flex-col items-start gap-2 text-left">
+               <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs font-medium capitalize text-zinc-400">
+                 {song.genres?.[0] || t("detail.guitar_track")}
+               </span>
+               <div className="flex flex-col gap-1">
+                 <h2 className="font-display text-xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">{song.title}</h2>
+                 <p className="text-sm font-semibold text-zinc-400 sm:text-lg">{song.artist}</p>
                </div>
-               <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-md">{song.title}</h2>
-               <p className="text-sm sm:text-lg md:text-xl font-bold text-zinc-400 drop-shadow-sm">{song.artist}</p>
             </div>
 
-            <div className="shrink-0 hidden sm:flex flex-col items-end gap-3">
+            <div className="shrink-0 hidden sm:flex">
                <TierBadge song={song} className="h-16 w-16 md:h-20 md:w-20" />
             </div>
          </div>
 
-         <div className="relative px-6 md:px-8 pb-8 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10">
-            <div className="flex flex-col sm:flex-row items-center gap-6 md:gap-10 w-full lg:w-auto">
+         <div className="relative flex flex-col gap-6 px-6 pb-8 md:px-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex w-full flex-col gap-6 sm:flex-row sm:items-center sm:gap-10 lg:w-auto">
                {/* Primary Action Button */}
                <Button
                  onClick={() => {
@@ -377,41 +389,37 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                      onPractice(song);
                    }
                  }}
-                 className="relative h-14 w-full sm:w-auto overflow-hidden px-8 font-semibold"
+                 className="h-14 w-full px-8 font-semibold sm:w-auto"
                >
-                 <span className="pointer-events-none absolute inset-y-0 -left-1/4 w-1/3 animate-shine bg-gradient-to-r from-transparent via-black/[0.07] to-transparent" />
                  {status
-                   ? <Play className="mr-3 h-5 w-5 fill-current" />
-                   : <Music className="mr-3 h-5 w-5" />}
+                   ? <Play className="h-5 w-5 fill-current" />
+                   : <Music className="h-5 w-5" />}
                  <span className="text-sm">{status ? "Start practice" : "Add to library"}</span>
                </Button>
 
                {/* Steam-style Info Boxes */}
-               <div className="flex items-center gap-6 sm:gap-10 pt-6 sm:pt-0 sm:pl-8 w-full sm:w-auto justify-around sm:justify-start">
-                  <div className="flex flex-col items-center sm:items-start">
-                     <span className="text-xs font-medium tracking-wider text-zinc-400 mb-1">{t("board.sessions")}</span>
-                     <span className="text-sm font-bold text-zinc-200">{progress?.sessionCount || 0}</span>
+               <div className="grid grid-cols-3 gap-8 sm:flex">
+                  <div className="flex flex-col gap-1">
+                     <span className="text-xs text-zinc-400">{t("board.sessions")}</span>
+                     <span className="text-base font-semibold tabular-nums text-zinc-100">{progress?.sessionCount || 0}</span>
                   </div>
 
-                  <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-                     <span className="text-xs font-medium tracking-wider text-zinc-400 mb-1">{t("detail.last_practiced")}</span>
-                     <span className="text-sm font-bold text-zinc-200">
+                  <div className="flex flex-col gap-1">
+                     <span className="text-xs text-zinc-400">{t("detail.last_practiced")}</span>
+                     <span className="text-base font-semibold tabular-nums text-zinc-100">
                         {progress?.lastPracticedAt ? progress.lastPracticedAt.toLocaleDateString(intlLocale) : t("detail.never")}
                      </span>
                   </div>
 
-                  <div className="flex flex-col items-center sm:items-start">
-                     <div className="flex items-center gap-2 mb-1">
-                        <Clock size={12} className="text-zinc-500" />
-                        <span className="text-xs font-medium tracking-wider text-zinc-400">{t("board.play_time")}</span>
-                     </div>
-                     <span className="text-sm font-bold text-zinc-200">{totalHours}h {totalMinutes} min</span>
+                  <div className="flex flex-col gap-1">
+                     <span className="text-xs text-zinc-400">{t("board.play_time")}</span>
+                     <span className="text-base font-semibold tabular-nums text-zinc-100">{totalHours}h {totalMinutes} min</span>
                   </div>
                </div>
             </div>
 
-            <div className="flex items-center gap-4 w-full lg:w-auto justify-center lg:justify-end">
-               <div className="flex items-center gap-2 bg-black/20 p-1.5 rounded-lg">
+            <div className="flex items-center gap-3 lg:justify-end">
+               <div className="flex items-center gap-1 rounded-lg bg-black/20 p-1">
                   {(["wantToLearn", "learning", "learned"] as const).map((s) => {
                     const config = STATUS_CONFIG[s];
                     const Icon = config.icon;
@@ -428,8 +436,8 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                               className={cn(
                                 "h-11 w-11 rounded-lg transition-all",
                                 isActive
-                                  ? "bg-zinc-800 text-white shadow-xl"
-                                  : "text-zinc-600 hover:text-zinc-400 hover:bg-white/5"
+                                  ? cn(config.bgColor, config.color, config.bgHover)
+                                  : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
                               )}
                             >
                               <Icon size={18} />
@@ -444,12 +452,11 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                   })}
                </div>
 
-               <div className="w-px h-8 bg-white/10" />
-
                <Button
                  onClick={() => setShowRemoveConfirm(true)}
                  variant="ghost"
-                 className="h-11 w-11 rounded-lg text-zinc-600 hover:text-red-500 hover:bg-red-500/10 transition-all active:scale-95 p-0"
+                 aria-label={t("detail.remove_title")}
+                 className="h-11 w-11 p-0 text-zinc-400 hover:bg-rose-500/10 hover:text-rose-400"
                >
                  <Trash2 size={16} />
                </Button>
@@ -484,8 +491,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
       </div>
 
       {/* Content Section */}
-      <div className="p-4 md:p-6 lg:p-8">
-         
+      <div className="flex flex-col gap-6 p-4 md:p-6 lg:p-8">
          {status && (
            <ArrangementStrip
              progress={progress}
@@ -497,119 +503,97 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
 
          {/* Spotify Preview */}
          {song.spotifyId && (
-           <div className="animate-in fade-in slide-in-from-top-4 duration-slow mb-6 max-w-md">
-             <div className="bg-zinc-800/40 rounded-lg p-1 backdrop-blur-sm shadow-sm">
+           <div className="max-w-md animate-in fade-in slide-in-from-top-4 duration-slow">
+             <div className="rounded-lg bg-zinc-800/40 p-1">
                 <SpotifyPlayer trackId={song.spotifyId} height={80} />
              </div>
            </div>
          )}
 
-
-
          {/* Second Row: Detailed Info & Progress */}
-         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            
-            {/* Column 1: Your Progress */}
-            <div className="bg-zinc-800/40 rounded-lg p-6 space-y-6 shadow-sm backdrop-blur-sm">
-               <div className="flex items-center gap-2">
-                  <TrendingUp size={18} className="transition-all duration-slow text-zinc-700" />
-                  <span className="text-sm font-semibold text-zinc-300">{t("your_progress")}</span>
-               </div>
-               
-               <div className="space-y-8">
-                  <div className="group/rate px-1">
-                     <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs font-semibold text-zinc-400">{t("detail.my_rating")}</p>
-                        {isRating ? (
-                           <span className="inline-flex items-center gap-1.5 text-[9px] font-bold text-cyan-400">
-                              <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                              {t("detail.saving")}
-                           </span>
-                        ) : userRating !== undefined ? (
-                           <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400">
-                              <Check size={11} strokeWidth={3} />
-                              {t("detail.rated")}
-                           </span>
-                        ) : (
-                           <span className="inline-flex items-center gap-1 rounded-[8px] border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 text-[9px] font-bold text-cyan-400 animate-pulse">
-                              {t("detail.tap_to_rate")}
-                           </span>
-                        )}
-                     </div>
-                     <TooltipProvider>
-                        <Tooltip>
-                           <TooltipTrigger asChild>
-                              <div className="flex flex-wrap items-center justify-between gap-y-2 cursor-pointer rounded-lg -mx-1 px-1 py-1 transition-colors hover:bg-white/5">
-                                 <span className={cn(
-                                    "text-4xl font-black transition-colors leading-none shrink-0",
-                                    userRating !== undefined ? "text-white" : "text-zinc-700"
-                                 )}>
-                                    {userRating !== undefined ? userRating : "--"}
-                                 </span>
-                                 <StarRatingDisplay
-                                    rating={userRating || 0}
-                                    color={userRating !== undefined ? getSongTier(userRating).color : "#52525b"}
-                                    size={20}
-                                    onRate={handleRate}
-                                 />
-                              </div>
-                           </TooltipTrigger>
-                           <TooltipContent className="bg-zinc-950 text-zinc-100 shadow-2xl">
-                              {userRating !== undefined
-                                 ? t("detail.rated_tooltip", { rating: userRating })
-                                 : t("detail.rate_tooltip")}
-                           </TooltipContent>
-                        </Tooltip>
-                     </TooltipProvider>
-                     <p className="text-[9px] text-zinc-500 mt-3 transition-opacity">
-                        {userRating !== undefined ? t("detail.change_rating") : t("detail.set_rating")}
-                     </p>
-                  </div>
+         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
 
-                  <div className="space-y-3">
-                     <InfoRow label={t("detail.mastery_progress")} value={`${song.masteryProgress || 0}%`} icon={Target} />
-                     <InfoRow label={t("detail.last_practiced")} value={progress?.lastPracticedAt ? progress.lastPracticedAt.toLocaleDateString(intlLocale) : t("detail.never")} icon={Clock} />
-                     <InfoRow label={t("detail.attached_file")} value={progress?.gpFileName || t("detail.none")} icon={FileText} />
-                  </div>
+            {/* Column 1: Your Progress */}
+            <div className="flex flex-col gap-6 rounded-lg bg-zinc-800/40 p-6">
+               <CardHeader icon={TrendingUp} title={t("your_progress")} />
+
+               <TooltipProvider>
+                  <Tooltip>
+                     <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between gap-3">
+                           <p className="text-sm text-zinc-400">{t("detail.my_rating")}</p>
+                           {isRating ? (
+                              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400">
+                                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-500" />
+                                 {t("detail.saving")}
+                              </span>
+                           ) : userRating !== undefined ? (
+                              <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-400">
+                                 <Check size={12} strokeWidth={3} />
+                                 {t("detail.rated")}
+                              </span>
+                           ) : (
+                              <span className="text-xs text-zinc-500">{t("detail.set_rating")}</span>
+                           )}
+                        </div>
+                        <TooltipTrigger asChild>
+                           <div className="-mx-1 flex cursor-pointer flex-wrap items-center justify-between gap-3 rounded-lg px-1 py-1 transition-colors hover:bg-white/5">
+                              <span className={cn(
+                                 "shrink-0 text-4xl font-extrabold leading-none transition-colors",
+                                 userRating !== undefined ? "text-white" : "text-zinc-600"
+                              )}>
+                                 {userRating !== undefined ? userRating : "--"}
+                              </span>
+                              <StarRatingDisplay
+                                 rating={userRating || 0}
+                                 color={userRating !== undefined ? getSongTier(userRating).color : "#52525b"}
+                                 size={16}
+                                 onRate={handleRate}
+                              />
+                           </div>
+                        </TooltipTrigger>
+                     </div>
+                     <TooltipContent className="bg-zinc-950 text-zinc-100">
+                        {userRating !== undefined
+                           ? t("detail.rated_tooltip", { rating: userRating })
+                           : t("detail.rate_tooltip")}
+                     </TooltipContent>
+                  </Tooltip>
+               </TooltipProvider>
+
+               <div className="flex flex-col">
+                  <InfoRow label={t("detail.mastery_progress")} value={`${song.masteryProgress || 0}%`} icon={Target} />
+                  <InfoRow label={t("detail.attached_file")} value={progress?.gpFileName || t("detail.none")} icon={FileText} />
                </div>
             </div>
 
             {/* Column 2: Song Info */}
-            <div className="bg-zinc-800/40 rounded-lg p-6 space-y-6 shadow-sm backdrop-blur-sm">
-               <div className="flex items-center gap-2">
-                  <Music size={18} className="transition-all duration-slow text-zinc-700" />
-                  <span className="text-sm font-semibold text-zinc-300">{t("detail.song_data")}</span>
-               </div>
+            <div className="flex flex-col gap-6 rounded-lg bg-zinc-800/40 p-6">
+               <CardHeader icon={Music} title={t("detail.song_data")} />
 
-               <div className="space-y-5">
-                  <div className="space-y-3 mt-4">
-                     <InfoRow label={t("artist")} value={song.artist} icon={Users} />
-                     <InfoRow label={t("detail.total_sections")} value={song.totalSections || 0} icon={FileText} />
-                     <InfoRow label={t("detail.practicing_users")} value={song.practicingUsers?.length || 0} icon={Users} />
-                  </div>
+               <div className="flex flex-col">
+                  <InfoRow label={t("detail.total_sections")} value={song.totalSections || 0} icon={FileText} />
+                  <InfoRow label={t("detail.practicing_users")} value={song.practicingUsers?.length || 0} icon={Users} />
                </div>
             </div>
 
             {/* Column 3: Community & Ratings */}
-            <div className="bg-zinc-800/40 rounded-lg p-6 flex flex-col gap-6 shadow-sm backdrop-blur-sm">
-               <div className="flex items-center gap-2">
-                  <Star size={18} className="transition-all duration-slow text-zinc-700" />
-                  <span className="text-sm font-semibold text-zinc-300">{t("detail.community_ratings")}</span>
-               </div>
+            <div className="flex flex-col gap-6 rounded-lg bg-zinc-800/40 p-6">
+               <CardHeader icon={Star} title={t("detail.community_ratings")} />
 
-               <div className="px-1">
-                  <p className="text-xs font-semibold text-zinc-400 mb-3">{t("detail.avg_difficulty")}</p>
-                  <div className="flex flex-wrap items-center justify-between gap-y-2">
-                     <div className="flex items-center gap-3 shrink-0">
-                        <TierBadge song={song} className="h-8 w-8 rounded-md text-sm" />
-                        <span className="text-4xl font-black text-white leading-none">{avgDifficulty.toFixed(1)}</span>
+               <div className="flex flex-col gap-3">
+                  <p className="text-sm text-zinc-400">{t("detail.avg_difficulty")}</p>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                     <div className="flex shrink-0 items-center gap-3">
+                        <TierBadge song={song} className="h-8 w-8 rounded text-sm" />
+                        <span className="text-4xl font-extrabold leading-none text-white">{avgDifficulty.toFixed(1)}</span>
                      </div>
-                     <StarRatingDisplay rating={avgDifficulty} color={tier.color} size={20} />
+                     <StarRatingDisplay rating={avgDifficulty} color={tier.color} size={16} />
                   </div>
                </div>
 
                <div className="flex-1">
-                  <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-wrap gap-3">
                      {song.difficulties && song.difficulties.length > 0 ? (
                        song.difficulties.slice(0, 15).map((diff, i) => {
                          const profile = raterProfiles[diff.userId];
@@ -648,10 +632,10 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                          );
                        })
                      ) : (
-                       <p className="text-xs text-zinc-600 italic">{t("detail.no_ratings")}</p>
+                       <p className="text-sm text-zinc-500">{t("detail.no_ratings")}</p>
                      )}
                      {song.difficulties && song.difficulties.length > 15 && (
-                       <div className="h-8 w-8 rounded-full bg-zinc-800/40 border border-dashed border-white/10 flex items-center justify-center text-[10px] font-bold text-zinc-500">
+                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800 text-[11px] font-semibold text-zinc-400">
                          +{song.difficulties.length - 15}
                        </div>
                      )}
@@ -666,13 +650,12 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
          <SongRecordingsSection songId={song.id} songTitle={song.title} songArtist={song.artist} />
 
          {/* Full Width Bottom: Integrated Mastery Timeline Box */}
-         <div className="bg-zinc-800/40 rounded-lg p-8 shadow-sm backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-slow mt-6">
-           <div className="flex flex-col items-center gap-8">
+         <div className="rounded-lg bg-zinc-800/40 p-6 animate-in fade-in slide-in-from-bottom-4 duration-slow">
              {/* Mastery Summary (Timeline) */}
-             <div className="w-full space-y-4">
+             <div className="flex w-full flex-col gap-5">
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                   <div className="flex flex-col">
-                      <span className="flex items-center gap-2 text-sm font-semibold text-zinc-300">
+                   <div className="flex flex-col gap-1">
+                      <span className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
                          {selectedArrangement && (
                            <span
                              aria-hidden
@@ -688,13 +671,13 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                              })
                            : t("detail.song_mastery")}
                       </span>
-                      <p className="text-xs font-medium text-zinc-500 mt-1">
+                      <p className="text-xs text-zinc-500">
                          {masteryData ? t("detail.progression") : t("detail.map_to_track")}
                       </p>
                    </div>
                    <div className="flex items-center gap-4">
                       {masteryData && (
-                        <span className="text-xs font-semibold text-zinc-400 tabular-nums">
+                        <span className="text-sm font-semibold tabular-nums text-zinc-300">
                            {t("detail.sections_progress", {
   done: masteryData.masteredCount,
   total: masteryData.totalSections,
@@ -739,7 +722,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                            onClick={() => router.push(`/timer/song/${song.id}`)}
                            className="mt-1 rounded-lg bg-white px-6 text-sm font-bold text-zinc-950 hover:bg-zinc-200"
                         >
-                           <ListMusic className="mr-2 h-4 w-4" />
+                           <ListMusic className="h-4 w-4" />
                            {t("detail.map_song")}
                         </Button>
 
@@ -754,7 +737,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                 )}
 
                 {masteryData && (
-                  <div className="w-full space-y-1.5">
+                  <div className="flex w-full flex-col gap-2">
                      {sections
                        .slice()
                        .sort((a, b) => a.startTime - b.startTime)
@@ -763,7 +746,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                            key={s.id}
                            className={cn(
                              "flex items-center gap-3 rounded-lg px-4 py-3 transition-colors",
-                             getSectionMastery(s, selectedArrangement) === 3 ? "bg-green-500/5" : "bg-black/20"
+                             getSectionMastery(s, selectedArrangement) === 3 ? "bg-green-500/[0.07]" : "bg-zinc-900/60"
                            )}
                          >
                             <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
@@ -778,7 +761,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                      <button
                         type="button"
                         onClick={() => router.push(`/timer/song/${song.id}`)}
-                        className={cn(PRESSABLE_KEY, "flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-800 py-3 text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-700")}
+                        className={cn(PRESSABLE_KEY, "mt-1 flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-800 py-3 text-sm font-semibold text-zinc-300 transition-colors hover:bg-zinc-700")}
                      >
                         <Plus className="h-4 w-4" />
                         {t("detail.add_section")}
@@ -788,40 +771,35 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
              </div>
            </div>
 
-           {/* Column 4: Practice Notes */}
-           <div className="lg:col-span-3 bg-zinc-800/40 rounded-lg p-6 space-y-4 shadow-sm backdrop-blur-sm relative group/notes mt-8">
-              <div className="flex items-center justify-between">
-                 <div className="flex items-center gap-2">
-                    <MessageSquare size={18} className="transition-all duration-slow text-zinc-700" />
-                    <span className="text-sm font-semibold text-zinc-300">{t("detail.practice_notes")}</span>
-                 </div>
-                 <div className="flex items-center gap-3">
-                    {isSaving && (
-                       <div className="flex items-center gap-1.5 animate-pulse">
-                          <Save size={10} className="text-zinc-500" />
-                          <span className="text-[9px] text-zinc-500 font-bold">{t("detail.saving")}</span>
-                       </div>
-                    )}
-                    <span className={cn(
-                      "text-[9px] font-bold",
-                      notes.length > 450 ? "text-amber-500" : "text-zinc-600"
-                    )}>
-                      {t("detail.characters", { count: notes.length })}
-                    </span>
-                 </div>
-              </div>
+         {/* Practice Notes — its own card, not nested inside the mastery box */}
+         <div className="flex flex-col gap-4 rounded-lg bg-zinc-800/40 p-6">
+            <CardHeader icon={MessageSquare} title={t("detail.practice_notes")}>
+               <div className="flex items-center gap-3">
+                  {isSaving && (
+                     <div className="flex animate-pulse items-center gap-1.5">
+                        <Save size={12} className="text-zinc-500" />
+                        <span className="text-xs text-zinc-500">{t("detail.saving")}</span>
+                     </div>
+                  )}
+                  <span className={cn(
+                    "text-xs tabular-nums",
+                    notes.length > 450 ? "text-amber-500" : "text-zinc-500"
+                  )}>
+                    {t("detail.characters", { count: notes.length })}
+                  </span>
+               </div>
+            </CardHeader>
 
-              <textarea
-                 value={notes}
-                 onChange={(e) => {
-                   if (e.target.value.length <= 500) {
-                      setNotes(e.target.value);
-                   }
-                 }}
-                 placeholder={t("detail.notes_placeholder")}
-                 className="w-full min-h-[250px] bg-black/20 rounded-lg p-4 text-sm text-zinc-300 placeholder:text-zinc-700 focus:outline-none focus:ring-1 focus:ring-white/10 transition-all resize-none leading-relaxed shadow-inner"
-              />
-           </div>
+            <textarea
+               value={notes}
+               onChange={(e) => {
+                 if (e.target.value.length <= 500) {
+                    setNotes(e.target.value);
+                 }
+               }}
+               placeholder={t("detail.notes_placeholder")}
+               className="min-h-[160px] w-full resize-none rounded-lg bg-zinc-950/40 p-4 text-sm leading-relaxed text-zinc-300 transition-colors placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-white/10"
+            />
          </div>
       </div>
     </div>

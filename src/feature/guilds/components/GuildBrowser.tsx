@@ -4,7 +4,6 @@ import Avatar from "components/UI/Avatar";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { GuildBanner } from "feature/guilds/components/GuildBanner";
 import { GuildCrest } from "feature/guilds/components/GuildCrest";
-import { GuildLevelRing } from "feature/guilds/components/GuildLevelRing";
 import { GuildTagBadge } from "feature/guilds/components/GuildTagBadge";
 import { NewGuildDialog } from "feature/guilds/components/NewGuildDialog";
 import { useGuildMutations } from "feature/guilds/hooks/useGuilds";
@@ -20,8 +19,8 @@ import { Check, Clock, Plus, Shield, Users, X } from "lucide-react";
 import { useState } from "react";
 
 /** Who is in it, as faces — names on hover, the roster tab reads them. */
-const MemberFaces = ({ guild }: { guild: Guild }) => {
-  const shown = guild.members.slice(0, 6);
+const MemberFaces = ({ guild, max = 6 }: { guild: Guild; max?: number }) => {
+  const shown = guild.members.slice(0, max);
   const more = guild.memberCount - shown.length;
 
   return (
@@ -46,11 +45,12 @@ const MemberFaces = ({ guild }: { guild: Guild }) => {
 
 /**
  * One guild, as one line of a ranking: place, crest, name, who is in it, level,
- * and the way in. The banner still shows — faded in behind the right of the row
- * — so a guild's kit is not lost by folding the card down to a line.
+ * and the way in. The banner still shows — faded in behind the right half of the
+ * row, clear of the name and the faces — so a guild's kit is not lost by folding
+ * the card down to a line. The caller's own guild is the lighter row.
  *
- * On a phone a single line leaves the name no room at all, so the level ring
- * becomes a word in the meta line and the button moves to a row of its own.
+ * On a phone a single line leaves the name no room at all, so the faces and the
+ * button move to a row of their own under it.
  */
 const GuildRankRow = ({
   guild,
@@ -82,13 +82,13 @@ const GuildRankRow = ({
   return (
     <li
       className={cn(
-        "relative flex flex-wrap items-center gap-x-3 gap-y-3 overflow-hidden rounded-lg p-4 transition-background sm:flex-nowrap sm:gap-6 sm:p-6",
-        isMine ? "bg-cyan-500/[0.08]" : "bg-zinc-900/40 hover:bg-zinc-900/60",
+        "relative flex flex-wrap items-center gap-x-3 gap-y-3 overflow-hidden rounded-lg p-4 transition-background sm:flex-nowrap sm:gap-5 sm:px-6 sm:py-5",
+        isMine ? "bg-zinc-800/60" : "bg-zinc-900/40 hover:bg-zinc-900/60",
       )}>
-      {/* The banner, faded in from the right and out under the text. */}
+      {/* The banner, faded in from the right and gone before the text. */}
       <div
         aria-hidden
-        className='pointer-events-none absolute inset-y-0 right-0 w-3/4 opacity-50'
+        className='pointer-events-none absolute inset-y-0 right-0 w-1/2 opacity-50'
         style={{
           maskImage: "linear-gradient(to left, black, transparent)",
           WebkitMaskImage: "linear-gradient(to left, black, transparent)",
@@ -104,8 +104,8 @@ const GuildRankRow = ({
       <span
         aria-label={t("browser.rank", { rank })}
         className={cn(
-          "relative w-6 shrink-0 text-center text-xl font-bold tabular-nums sm:w-8 sm:text-3xl",
-          rank <= 3 ? "text-zinc-200" : "text-zinc-600",
+          "relative w-6 shrink-0 text-center text-xl font-bold tabular-nums",
+          rank <= 3 ? "text-zinc-200" : "text-zinc-500",
         )}>
         {rank}
       </span>
@@ -114,7 +114,7 @@ const GuildRankRow = ({
         logo={guild.logo}
         tag={guild.tag}
         accentHex={hex}
-        className='relative h-12 w-12 shrink-0 text-sm sm:h-20 sm:w-20 sm:text-lg'
+        className='relative h-12 w-12 shrink-0 text-sm sm:h-16 sm:w-16 sm:text-base'
       />
 
       <div className='relative min-w-0 flex-1'>
@@ -135,13 +135,13 @@ const GuildRankRow = ({
               linked={false}
             />
           )}
+        </p>
+        <p className='mt-0.5 flex flex-wrap items-center gap-x-3 text-sm text-zinc-400'>
           {isMine && (
-            <span className='shrink-0 rounded bg-cyan-500/15 px-1.5 py-0.5 text-xs font-semibold text-cyan-300'>
+            <span className='font-semibold text-zinc-200'>
               {t("browser.yours")}
             </span>
           )}
-        </p>
-        <p className='mt-0.5 flex flex-wrap items-center gap-x-3 text-sm text-zinc-400'>
           <span
             className={cn(
               "inline-flex items-center gap-1.5 tabular-nums",
@@ -149,9 +149,6 @@ const GuildRankRow = ({
             )}>
             <Users size={13} />
             {guild.memberCount}/{guild.memberLimit}
-          </span>
-          <span className='tabular-nums sm:hidden'>
-            {t("browser.level", { level: guild.level })}
           </span>
           <span className='truncate text-zinc-500'>
             {t("browser.by", { name: guild.founderName })}
@@ -170,12 +167,20 @@ const GuildRankRow = ({
       </div>
 
       <div
-        className='relative hidden shrink-0 sm:block'
+        className='relative shrink-0 text-right'
         title={t("browser.level", { level: guild.level })}>
-        <GuildLevelRing level={guild.level} size={56} />
+        <p className='text-xl font-bold tabular-nums leading-tight text-zinc-100'>
+          {guild.level}
+        </p>
+        <p className='text-xs text-zinc-400'>{t("level")}</p>
       </div>
 
-      <div className='relative flex w-full shrink-0 justify-end sm:w-24'>
+      <div className='relative flex w-full shrink-0 items-center justify-end gap-3 pl-9 sm:w-24 sm:pl-0'>
+        {guild.members.length > 0 && (
+          <div className='mr-auto sm:hidden'>
+            <MemberFaces guild={guild} max={4} />
+          </div>
+        )}
         {isMine ? (
           <Button
             variant='ghost'
@@ -242,9 +247,11 @@ const ApplicationQueue = ({
   const { t } = useTranslation("guilds");
   return (
     <section className='space-y-3'>
-      <h2 className='text-sm font-bold text-zinc-200'>
-        {t("browser.asking")}{" "}
-        <span className='font-medium text-zinc-500'>{applications.length}</span>
+      <h2 className='flex items-center gap-2.5 text-lg font-bold text-white'>
+        {t("browser.asking")}
+        <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-semibold tabular-nums text-zinc-400'>
+          {applications.length}
+        </span>
       </h2>
 
       {applications.map((application) => (
@@ -322,7 +329,7 @@ export const GuildBrowser = ({
         {Array.from({ length: 3 }, (_, index) => (
           <div
             key={index}
-            className='h-52 animate-pulse rounded-lg bg-zinc-900/40'
+            className='h-28 animate-pulse rounded-lg bg-zinc-900/40'
           />
         ))}
       </div>

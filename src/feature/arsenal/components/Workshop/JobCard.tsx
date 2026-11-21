@@ -40,15 +40,8 @@ interface JobCardProps {
   summary: ReactNode;
   /** Level it is worth, when there is one. */
   gain?: number;
-  /**
-   * Shown in the gain's place for a job whose payoff is rolled, not fixed —
-   * a mod is worth "somewhere in +1…+7", and printing a number would be a lie.
-   */
-  readyNote?: string;
-  /** Ready to run right now — drives the accent and the status line. */
+  /** Ready to run right now — drives the accent. */
   ready: boolean;
-  /** Shown instead of the gain when the job cannot run yet. */
-  blockedNote?: string;
   accent: JobAccent;
   disabled?: boolean;
   onClick: () => void;
@@ -59,28 +52,22 @@ interface JobCardProps {
  *
  * The bench answers "what can I do and is it possible"; every number behind that
  * answer lives in the dialog this opens. Two readable rows beat two dense panels.
+ *
+ * A job that cannot run yet says so by going grey — icon and gain both — and
+ * keeps what it is worth on show. What it is short of is the dialog's to say;
+ * a line of orange on the card read as a telling-off.
  */
 export const JobCard = ({
   icon: Icon,
   title,
   summary,
   gain,
-  readyNote,
   ready,
-  blockedNote,
   accent,
   disabled = false,
   onClick,
 }: JobCardProps) => {
   const { t } = useTranslation("arsenal");
-  const showsGain = ready && gain != null;
-  // The note is the whole answer to "why is this button grey?", so on a phone —
-  // where there is no room for a right-hand column — it moves under the summary
-  // rather than disappearing.
-  const note = ready ? (showsGain ? undefined : readyNote) : blockedNote;
-  // Orange, not amber — amber/gold is reserved for Fame everywhere else in the
-  // system, so a "why can't I do this" note needs its own colour.
-  const noteClass = ready ? ACCENTS[accent].fg : "text-orange-400/80";
 
   return (
     <button
@@ -123,36 +110,23 @@ export const JobCard = ({
         <span className='flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-arsenal-text-secondary'>
           {summary}
         </span>
-        {note && (
-          <span className={cn("text-sm sm:hidden", noteClass)}>{note}</span>
-        )}
       </span>
 
       <span className='relative flex shrink-0 items-center gap-4'>
-        {showsGain ? (
+        {gain != null && (
           <span className='flex flex-col items-end gap-0.5'>
             <CountUp
               value={gain}
               prefix='+'
               className={cn(
                 "text-3xl font-black tabular-nums",
-                ACCENTS[accent].fg,
+                ready ? ACCENTS[accent].fg : "text-arsenal-text-tertiary",
               )}
             />
             <span className='text-sm text-arsenal-text-tertiary'>
               {t("workshop.levels_word", { count: gain })}
             </span>
           </span>
-        ) : (
-          note && (
-            <span
-              className={cn(
-                "hidden max-w-[200px] text-right text-sm sm:block",
-                noteClass,
-              )}>
-              {note}
-            </span>
-          )
         )}
 
         <ChevronRight size={18} className='text-arsenal-text-tertiary' />

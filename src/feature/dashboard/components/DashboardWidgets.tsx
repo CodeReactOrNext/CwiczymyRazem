@@ -127,7 +127,7 @@ export const DashboardWidgets = () => {
                     size='sm'
                     className='h-11 px-4'
                     onClick={() => setIsAddOpen(true)}>
-                    <Plus aria-hidden className='mr-2' />
+                    <Plus aria-hidden className='' />
                     {t("customize.add_widget")}
                   </Button>
                   <Button
@@ -137,7 +137,7 @@ export const DashboardWidgets = () => {
                     className='h-11 px-4'
                     disabled={isDefaultLayout(layout)}
                     onClick={() => updateLayout(normalizeLayout(undefined))}>
-                    <RotateCcw aria-hidden className='mr-2' />
+                    <RotateCcw aria-hidden className='' />
                     {t("customize.reset")}
                   </Button>
                   <Button
@@ -145,7 +145,7 @@ export const DashboardWidgets = () => {
                     size='sm'
                     className='h-11 px-4'
                     onClick={() => setIsEditing(false)}>
-                    <Check aria-hidden className='mr-2' />
+                    <Check aria-hidden className='' />
                     {t("customize.done")}
                   </Button>
                 </>
@@ -157,7 +157,7 @@ export const DashboardWidgets = () => {
                   className='h-9 px-4'
                   disabled={isLoading}
                   onClick={() => setIsEditing(true)}>
-                  <Settings2 aria-hidden className='mr-2' />
+                  <Settings2 aria-hidden className='' />
                   {t("customize.customize")}
                 </Button>
               )}
@@ -189,7 +189,7 @@ export const DashboardWidgets = () => {
                   setIsEditing(true);
                   setIsAddOpen(true);
                 }}>
-                <Plus aria-hidden className='mr-2' />
+                <Plus aria-hidden className='' />
                 {t("customize.add_widget")}
               </Button>
             </div>

@@ -60,7 +60,7 @@ export const ArrangementStrip = ({
   ];
 
   return (
-    <div className='mb-6 space-y-3'>
+    <div className='space-y-3'>
       <div className='flex flex-wrap items-baseline justify-between gap-2 px-1'>
         <span className='text-sm font-semibold text-zinc-300'>{t("arrangements.title")}</span>
         <span className='text-xs text-zinc-500'>

@@ -70,7 +70,11 @@ export function useAutoBacking({
   const namedStyle = (
     exercise._generatorConfig as { bandStyle?: unknown } | undefined
   )?.bandStyle;
-  const lockedStyle = isStudioStyle(namedStyle) ? namedStyle : undefined;
+  const lockedStyle = isStudioStyle(namedStyle)
+    ? namedStyle
+    : isStudioStyle(exercise.bandStyle)
+      ? exercise.bandStyle
+      : undefined;
   const backingSeed =
     (exercise._generatorConfig as { backingSeed?: string } | undefined)
       ?.backingSeed ?? exercise.id;

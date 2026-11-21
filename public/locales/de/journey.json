@@ -16,16 +16,26 @@
     },
     "close": "Schließen",
     "step": "Schritt {{n}}",
-    "goal": "Ziel",
-    "complete_tasks": "Erledige alle Pflichtaufgaben unten und hake sie ab, um zur nächsten Stufe zu gelangen.",
-    "your_tasks": "Deine Aufgaben",
     "choose_target": "Wähle ein Ziel",
     "saving": "Wird gespeichert...",
     "done_complete": "Fertig & abschließen",
-    "unlock_hint": "Lies den Inhalt und hake alle Kästchen oben ab, um das freizuschalten",
     "practice": "Üben",
     "retake": "Wiederholen",
     "exam": "Prüfung"
+  },
+  "lesson": {
+    "next": "Weiter",
+    "back": "Zurück",
+    "how_to_pass": "So bestehst du",
+    "before_you_start": "Bevor du anfängst",
+    "tick_all": "Hake alles ab, was auf dich zutrifft, um diesen Schritt abzuschließen.",
+    "tick_more_one": "Noch 1 abhaken",
+    "tick_more_other": "Noch {{count}} abhaken",
+    "pick_song": "Wähle einen Song zum Abschließen",
+    "open_one": "Lektion starten · 1 Seite",
+    "open_other": "Lektion starten · {{count}} Seiten",
+    "read_again_one": "Lektion lesen · 1 Seite",
+    "read_again_other": "Lektion lesen · {{count}} Seiten"
   },
   "finish": {
     "in_arsenal": "In deinem Arsenal, mit einer Seriennummer, die sonst niemand hat.",
@@ -39,7 +49,8 @@
   },
   "path": {
     "modules": "Module",
-    "start": "Start"
+    "start": "Start",
+    "stage": "Abschnitt {{n}}"
   },
   "modules": {
     "title": "Lernpfad",

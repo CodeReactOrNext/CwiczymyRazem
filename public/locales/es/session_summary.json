@@ -36,6 +36,8 @@
   "practise_more": "Practica un poco más",
   "back_to_dashboard": "Volver al panel",
   "great_progress": "¡Gran progreso!",
+  "exam_failed": "Examen no superado",
+  "exam_failed_body": "Tu tiempo de práctica cuenta igual para los puntos y tu racha.",
   "fame": "Fame",
   "cat": {
     "technique": "Técnica",
@@ -50,13 +52,9 @@
   "session_time": "Tiempo de sesión",
   "streak": "Racha",
   "days_in_a_row": "días seguidos",
+  "days_in_a_row_one": "día seguido",
   "streak_bonus_points": "+{{pct}} % de puntos",
   "today": "hoy",
-  "this_week": "Esta semana",
-  "goal": "objetivo",
-  "last_7_days": "últimos 7 días",
-  "skill_balance": "Equilibrio de habilidades",
-  "previous": "Anterior",
   "new_achievements": "Nuevos logros",
   "recent_runs": {
     "title": "Cómo te ha ido últimamente con este ejercicio",

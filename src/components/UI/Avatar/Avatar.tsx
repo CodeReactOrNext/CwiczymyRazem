@@ -3,17 +3,19 @@
 interface AvatarProps {
   name: string;
   avatarURL?: string;
-  size?: "xs" | "sm" | "md" | "2xl";
+  size?: "xs" | "sm" | "md" | "lg" | "2xl";
   className?: string;
 }
 
 const Avatar = ({ name, avatarURL, size, className }: AvatarProps) => {
-  const isCompact = size === "xs" || size === "sm" || size === "md";
+  const isCompact =
+    size === "xs" || size === "sm" || size === "md" || size === "lg";
 
   let containerSizeClass = "h-20 w-20 rounded-xl";
   if (size === "xs") containerSizeClass = "h-8 w-8 rounded-full";
   if (size === "sm") containerSizeClass = "h-10 w-10 rounded-full";
   if (size === "md") containerSizeClass = "h-12 w-12 rounded-lg";
+  if (size === "lg") containerSizeClass = "h-14 w-14 rounded-xl";
   if (size === "2xl") containerSizeClass = "h-32 w-32 rounded-2xl";
 
   // The light fill is only for the initial: behind a photo it leaks through the

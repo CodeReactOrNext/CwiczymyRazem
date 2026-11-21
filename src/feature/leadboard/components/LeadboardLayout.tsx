@@ -1,10 +1,15 @@
+import { Button } from "assets/components/ui/button";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { TableSkeleton } from "assets/components/ui/table-skeleton";
 import { Tabs, TabsList, TabsTrigger } from "assets/components/ui/tabs";
+import { cn } from "assets/lib/utils";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LEADERBOARD_TABS } from "constants/navTabs";
-import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
+import {
+  LEADBOARD_ROW_GRID,
+  LeadboardRow,
+} from "feature/leadboard/components/LeadboardRow";
 import { Pagination } from "feature/leadboard/components/Pagination";
 import type { LeaderboardViewType } from "feature/leadboard/hooks/useLeaderboard";
 import type { LeaderboardNeighbors } from "feature/leadboard/services/getLeaderboardNeighbors";
@@ -93,9 +98,14 @@ export const LeadboardLayout = ({
     listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const renderRow = (user: FirebaseUserDataInterface, place: number) => (
+  const renderRow = (
+    user: FirebaseUserDataInterface,
+    place: number,
+    order: number,
+  ) => (
     <LeadboardRow
       key={user.profileId}
+      order={order}
       profileId={user.profileId}
       place={place}
       nick={user.displayName}
@@ -111,6 +121,30 @@ export const LeadboardLayout = ({
     />
   );
 
+  // One line of labels for every card below it, on the same column tracks.
+  const listHeader = (
+    <div
+      className={cn(
+        "hidden items-center gap-x-5 px-5 pb-2 text-xs font-medium text-zinc-500 sm:grid",
+        LEADBOARD_ROW_GRID[isGearView ? "gear" : "default"],
+      )}>
+      <span className='col-start-3 truncate pl-2'>{t("player")}</span>
+      {isGearView ? (
+        <>
+          <span className='truncate text-right'>{t("rig_level")}</span>
+          <span className='truncate text-right'>{t("guitars")}</span>
+          <span className='truncate text-right'>{t("effects")}</span>
+          <span className='hidden truncate xl:block'>{t("rig.title")}</span>
+        </>
+      ) : (
+        <>
+          <span className='truncate text-right'>{t("points")}</span>
+          <span className='truncate text-right'>{t("exercise_time")}</span>
+        </>
+      )}
+    </div>
+  );
+
   // Same shape as the duel rating in the duels hero: one big Teko number, the
   // context it needs on the line beside it, what to do next underneath.
   const rankContent = isRankLoading ? (
@@ -124,7 +158,7 @@ export const LeadboardLayout = ({
         {t("rank.your_position")}
       </span>
       <div className='mt-1 flex items-baseline gap-3'>
-        <span className='font-teko text-7xl font-semibold tabular-nums leading-[0.8] text-zinc-50'>
+        <span className='font-teko text-5xl font-semibold tabular-nums leading-[0.8] text-zinc-50 md:text-6xl'>
           #{userRank}
         </span>
         {totalUsers > 0 && (
@@ -142,13 +176,15 @@ export const LeadboardLayout = ({
         </p>
       )}
       {canShowAround && (
-        <button
+        <Button
           type='button'
+          variant='ghost'
+          size='sm'
           onClick={jumpToMyRank}
-          className='mt-4 flex items-center gap-1.5 rounded-lg bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-300 transition-colors hover:bg-cyan-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'>
-          <ArrowDown className='h-3.5 w-3.5' />
+          className='mt-3'>
+          <ArrowDown />
           {t("rank.jump")}
-        </button>
+        </Button>
       )}
     </div>
   ) : null;
@@ -165,12 +201,10 @@ export const LeadboardLayout = ({
     ? {
         eyebrow: t("hero.rig_eyebrow"),
         title: t("gear_title"),
-        subtitle: t("gear_subtitle"),
       }
     : {
         eyebrow: t("hero.all_time_eyebrow"),
         title: t("hero.title"),
-        subtitle: t("hero.subtitle"),
       };
 
   return (
@@ -179,11 +213,11 @@ export const LeadboardLayout = ({
         {...hero}
         className='w-full !rounded-none !shadow-none'
         backgroundContent={<HeroPattern />}
-        // The rewards belong to the season, so they sit under its name rather
-        // than queue up under the player's rank. Phones skip them: the list
-        // is what the screen is for.
+        compact
+        // The rewards belong to the season, so they sit under its name — one
+        // line, the full ladder behind a key, so the banner stays short.
         leftContent={isSeasonalView ? <SeasonRewards /> : undefined}
-        leftContentClassName='hidden md:block'
+        leftContentClassName='mt-3'
         rightContent={rankContent}
       />
 
@@ -231,15 +265,18 @@ export const LeadboardLayout = ({
         <div ref={listRef} className='scroll-mt-24 pb-20'>
           {activeScope === "around" ? (
             isNeighborsLoading ? (
-              <ul className='flex flex-col gap-2 sm:gap-6'>
+              <ul className='flex flex-col gap-1.5 sm:gap-2'>
                 <TableSkeleton rows={5} />
               </ul>
             ) : neighbors ? (
-              <ul className='flex flex-col gap-2 sm:gap-6'>
-                {neighbors.rows.map(({ user, place }) =>
-                  renderRow(user, place),
-                )}
-              </ul>
+              <>
+                {listHeader}
+                <ul className='flex flex-col gap-1.5 sm:gap-2'>
+                  {neighbors.rows.map(({ user, place }, index) =>
+                    renderRow(user, place, index),
+                  )}
+                </ul>
+              </>
             ) : (
               <p className='py-16 text-center text-sm text-zinc-500'>
                 {t("scope.around_error")}
@@ -247,7 +284,7 @@ export const LeadboardLayout = ({
             )
           ) : isLoading ? (
             <>
-              <ul className='flex flex-col gap-2 sm:gap-6'>
+              <ul className='flex flex-col gap-1.5 sm:gap-2'>
                 <TableSkeleton rows={itemsPerPage} />
               </ul>
               <div className='mt-8 flex justify-center'>
@@ -274,9 +311,14 @@ export const LeadboardLayout = ({
             </div>
           ) : (
             <>
-              <ul className='flex flex-col gap-2 sm:gap-6'>
+              {listHeader}
+              <ul className='flex flex-col gap-1.5 sm:gap-2'>
                 {usersData.map((user, index) =>
-                  renderRow(user, (currentPage - 1) * itemsPerPage + index + 1),
+                  renderRow(
+                    user,
+                    (currentPage - 1) * itemsPerPage + index + 1,
+                    index,
+                  ),
                 )}
               </ul>
 

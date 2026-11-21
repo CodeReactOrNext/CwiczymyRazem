@@ -1,5 +1,4 @@
 import { useTranslation } from "hooks/useTranslation";
-import { Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface RestockTimerProps {
@@ -17,7 +16,11 @@ const format = (msLeft: number): string => {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 };
 
-/** Counts down to the next restock. The whole point of coming back tomorrow. */
+/**
+ * Counts down to the next restock, as one quiet line beside the shelf's
+ * heading. It is the reason to come back tomorrow, not something to act on
+ * now, so it has no box, no icon and no weight of its own.
+ */
 export const RestockTimer = ({ restockAt }: RestockTimerProps) => {
   const [left, setLeft] = useState(() => restockAt - Date.now());
   const { t } = useTranslation("arsenal");
@@ -28,16 +31,15 @@ export const RestockTimer = ({ restockAt }: RestockTimerProps) => {
   }, [restockAt]);
 
   return (
-    <div className='flex items-center gap-2.5 rounded-lg bg-zinc-800/40 px-4 py-2.5'>
-      <Timer size={16} className='text-cyan-400' />
-      <span className='text-xs font-semibold text-zinc-400'>{t("trader.restocks_in")}</span>
+    <p className='text-sm text-zinc-500'>
+      {t("trader.restocks_in")}{" "}
       {/* Server and client read their own clocks a moment apart — the first
           paint is allowed to disagree, the interval settles it a second later. */}
       <span
         suppressHydrationWarning
-        className='text-lg font-black tabular-nums text-white'>
+        className='font-semibold tabular-nums text-zinc-300'>
         {format(left)}
       </span>
-    </div>
+    </p>
   );
 };

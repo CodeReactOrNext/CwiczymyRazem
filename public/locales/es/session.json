@@ -496,8 +496,16 @@
       "off": "Apagar el acompañamiento"
     }
   },
+  "hunt": {
+    "seconds_left": "Quedan {{count}} s",
+    "solved": "Resuelto",
+    "time_left": "Tiempo restante de la ronda",
+    "next": "Siguiente",
+    "view": "Vista",
+    "play_notes": "Reproducir notas"
+  },
   "interval_click": {
-    "now_above": "Ahora la {{interval}} por encima de esa raíz, a su alcance",
+    "now_above": "{{interval}} por encima de ese {{root}}",
     "click_any": "Haz clic en cualquier {{note}}",
     "on_highlighted": "en las cuerdas resaltadas",
     "root": "Raíz",
@@ -505,7 +513,15 @@
     "play_root": "Toca la nota raíz desde la que se mide el intervalo",
     "hide_distance": "Ocultar la distancia",
     "how_far": "¿A qué distancia está?",
-    "autoplay": "Reproducción automática"
+    "autoplay": "Reproducción automática",
+    "step": "Paso {{step}} de 2",
+    "anywhere": "En cualquier lugar de los trastes {{from}}–{{to}}",
+    "near_zone": "Cerca de tu {{root}}, dentro de la zona iluminada",
+    "near": "Al alcance de tu {{root}}",
+    "solved": "{{root}} + {{interval}} = {{target}}",
+    "frets_up_one": "{{count}} traste más arriba",
+    "frets_up_other": "{{count}} trastes más arriba",
+    "hear_root": "Escuchar la raíz"
   },
   "instructions": {
     "support_author": "Apoyar al autor",
@@ -639,7 +655,8 @@
     "total": "Total de la sesión"
   },
   "click_hunt": {
-    "play_note": "Reproduce la nota que buscas"
+    "play_note": "Reproduce la nota que buscas",
+    "hear_it": "Escuchar"
   },
   "strum": {
     "strum": "Rasguea",

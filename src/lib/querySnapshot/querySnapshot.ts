@@ -31,6 +31,9 @@ const PERSISTED_KEY_PREFIXES: readonly QueryKey[] = [
   ["practice-levels"],
   ["userRank"],
   ["seasonalUserPoints"],
+  // useLastKnown: small derived values (song tier, duel rating) whose source
+  // queries stay out of the snapshot.
+  ["last-known"],
 ];
 
 interface PersistedQuery {

@@ -8,7 +8,7 @@ order: 1
 
 Abre **Práctica** y te encuentras con un muro de opciones. Todas acaban en el mismo sitio, una sesión registrada que alimenta tus puntos, tu racha y tus habilidades, pero se diferencian en cuánto tienes que pensar antes.
 
-<Screenshot src="/images/wiki/practice-hub.webp" alt="La pantalla de Práctica: una lista de todas las formas de practicar — Rutinas de práctica, Canciones, Ruta de aprendizaje, Catálogo de ejercicios, Habilidades, Duelos, Jefes, Plan automático, Mapa de escalas, Mastery Roadmaps y Archivos Guitar Pro — y al lado Registrar tiempo (Temporizador libre, Registro manual) y Mis cosas" caption="Todo lo de abajo vive en esta única pantalla. Los mosaicos que siguen el progreso muestran cuánto llevas justo en la tarjeta." />
+<Screenshot src="/images/wiki/practice-hub.webp" alt="La pantalla de Práctica: una lista de todas las formas de practicar — Rutinas de práctica, Canciones, Ruta de aprendizaje, Catálogo de ejercicios, Habilidades, Duelos, Jefes, Plan automático, Mapa de escalas, Mastery Roadmaps y Archivos Guitar Pro — y al lado Registrar tiempo (Temporizador libre, Registro manual) y Mis cosas" caption="Todo lo de abajo vive en esta única pantalla." />
 
 ## Elige según cuánta dirección quieras
 

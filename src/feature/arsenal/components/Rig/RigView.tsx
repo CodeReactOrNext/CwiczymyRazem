@@ -97,7 +97,7 @@ export const RigView = ({ data, fame }: RigViewProps) => {
   };
 
   return (
-    <div className='flex flex-col gap-8'>
+    <div className='flex flex-col gap-12'>
       {/* What the rig below is currently worth per hour of practice. */}
       <RigStatsPanel data={data} />
 
@@ -112,7 +112,7 @@ export const RigView = ({ data, fame }: RigViewProps) => {
       />
 
       {/* Pedalboard — its own heading, because the board actions ride on it. */}
-      <div className='flex flex-col gap-5'>
+      <div className='flex flex-col gap-8'>
         <PedalboardView
           data={data}
           fame={fame}

@@ -212,8 +212,6 @@
       "body": "Riff Quest ist kostenlos und bleibt es auch. Es ist noch eine Beta, und neue Funktionen entstehen dank der Beiträge der Spieler.",
       "invite": "Wenn du Lust hast, etwas beizusteuern: Jeder Kaffee bringt die nächste näher.",
       "next": "Als Nächstes:",
-      "perk_before": "Supporter bekommen",
-      "perk_after": "und eine Stimme bei der Roadmap.",
       "sign": "Danke, dass du spielst.",
       "cta": "Einen Kaffee spendieren"
     },
@@ -302,20 +300,19 @@
       "message_discord": "Schreib mir auf Discord"
     },
     "pitch": {
-      "title": "Eine Spende öffnet das Supporter-Panel",
-      "intro": "Hinter dem Abzeichen liegt der Raum, in dem riff.quest offen entschieden wird:",
-      "perks": {
-        "0": "Reich Ideen ein und stimm ab, was als Nächstes gebaut wird",
-        "1": "Wähl das Equipment, das ins Arsenal kommt",
-        "2": "Gründe eine Gilde mit eigenem Namen, Tag und gemeinsamem Lager",
-        "3": "Verbinde Claude oder einen anderen KI-Assistenten mit deinem Konto"
-      },
-      "email": "Nutze die E-Mail-Adresse dieses Kontos, um Supporter freizuschalten.",
-      "email_known": "Nutze die E-Mail-Adresse dieses Kontos, um Supporter freizuschalten: {{email}}.",
-      "other_email": "Eine andere E-Mail-Adresse? {{discord}}, und ich ordne sie von Hand zu.",
+      "hello": "Hi, ich bin Michał. Ich baue Riff Quest.",
+      "story": "Angefangen habe ich es als Werkzeug für mich selbst, um besser zu üben. Jetzt möchte ich, dass alle es haben und dass es kostenlos bleibt, damit jeder es nutzen kann.",
+      "where": "Deine Unterstützung bezahlt zuerst die Server. Alles darüber fließt in das nächste Feature auf der Roadmap, und das wird für alle freigeschaltet.",
+      "sign": "Michał Jabłoński, Gitarrist und Entwickler von Riff Quest",
+      "photo_alt": "Michał Jabłoński spielt Gitarre auf der Bühne",
+      "email": "Spende mit der E-Mail-Adresse dieses Kontos, damit das Supporter-Abzeichen es findet.",
+      "email_known": "Spende mit {{email}}, damit das Supporter-Abzeichen dieses Konto findet.",
+      "other_email": "Andere E-Mail-Adresse? {{discord}}.",
       "write_discord": "Schreib mir auf Discord",
       "support": "Projekt unterstützen",
-      "shop_body": "Banner und Avatar-Effekte für deine Beiträge in der Aktivität, Skins für Pedalboard und Kabel. Rein kosmetisch und für immer deins."
+      "shop_title": "Alles hier wird mit Tokens gekauft",
+      "shop_body": "Tokens sind ein Dankeschön für deine Unterstützung: Jeder gespendete Dollar bringt {{rate}} Tokens, plus {{welcome}} bei deiner ersten Spende. Rein kosmetisch und für immer deins.",
+      "shop_wallet": "deine Tokens"
     },
     "backers": {
       "count": "Unterstützt von {{count}} Supportern",

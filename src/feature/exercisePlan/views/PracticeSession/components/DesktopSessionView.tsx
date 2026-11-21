@@ -29,6 +29,8 @@ import { TablatureViewMenu } from "./TablatureViewMenu";
 interface DesktopSessionViewProps {
   reportResult:             any;
   scoredRuns:               ScoredRun[];
+  /** Set only in exam mode: whether the exam was passed (the summary stops celebrating when not). */
+  examPassed?:              boolean;
   currentUserStats:         any;
   previousUserStats:        any;
   activityDataToUse:        any;
@@ -270,6 +272,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                   previousUserStats={p.previousUserStats} onClick={p.onClose}
                   activityData={p.activityDataToUse} hideWrapper={true}
                   scoredRuns={p.scoredRuns}
+                  examPassed={p.examPassed}
                   onRestart={p.handleRestartFullSession}
                 />
               </div>

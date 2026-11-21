@@ -58,7 +58,9 @@ export type ChordQuality =
   | "sus2"
   | "sus4"
   | "9"
-  | "m7b5";
+  | "m7b5"
+  | "dim7"
+  | "aug";
 
 export const QUALITY_INTERVALS: Record<ChordQuality, readonly number[]> = {
   maj: [0, 4, 7],
@@ -79,6 +81,10 @@ export const QUALITY_INTERVALS: Record<ChordQuality, readonly number[]> = {
   sus4: [0, 5, 7],
   "9": [0, 4, 10, 14],
   m7b5: [0, 3, 6, 10],
+  // Minor 3rds all the way up: named by the tab, never chosen by the harmonizer.
+  dim7: [0, 3, 6, 9],
+  // Major 3rds all the way up: likewise only ever named by the tab.
+  aug: [0, 4, 8],
 };
 
 const QUALITY_SUFFIX: Record<ChordQuality, string> = {
@@ -97,6 +103,8 @@ const QUALITY_SUFFIX: Record<ChordQuality, string> = {
   sus4: "sus4",
   "9": "9",
   m7b5: "m7b5",
+  dim7: "dim7",
+  aug: "aug",
 };
 
 export interface Chord {

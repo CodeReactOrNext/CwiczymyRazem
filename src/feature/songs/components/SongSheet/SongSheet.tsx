@@ -355,7 +355,7 @@ const SongSheet = ({
                 className="relative h-14 w-full overflow-hidden rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold flex items-center justify-center transition-all active:scale-95 shadow-2xl border-none"
             >
               <span className="pointer-events-none absolute inset-y-0 -left-1/4 w-1/3 animate-shine bg-gradient-to-r from-transparent via-black/[0.07] to-transparent" />
-              <Play className="mr-3 h-5 w-5 fill-current" />
+              <Play className="h-5 w-5 fill-current" />
               <span className="text-sm">{t("card.practice")}</span>
             </Button>
           </Link>

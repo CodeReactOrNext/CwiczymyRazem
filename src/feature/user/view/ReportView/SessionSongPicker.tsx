@@ -1,69 +1,52 @@
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
-import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
-import { ArrangementPicker } from "feature/songs/components/Arrangements/ArrangementPicker";
+import { useSongSuggestions } from "feature/songs/hooks/useSongSuggestions";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.service";
-import type { Song, SongArrangement } from "feature/songs/types/songs.type";
+import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
-import {
-  Check,
-  ChevronUp,
-  Library,
-  Loader2,
-  Minus,
-  Music,
-  Plus,
-  Search,
-  X,
-} from "lucide-react";
+import { Check, Loader2, Music, Search } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import type { IconType } from "react-icons/lib";
+import { type ReactNode, useMemo, useState } from "react";
 
 import {
   formatPracticed,
   MAX_SESSION_SONGS,
-  MAX_SONG_CATEGORY_MINUTES,
-  MINUTE_STEP,
   type PickedSong,
   type SessionSong,
-  sumSongMinutes,
 } from "./helpers/sessionSongs";
-import { SKILL_COLORS } from "./helpers/skillColors";
 
 export type { SessionSong } from "./helpers/sessionSongs";
 
-export type SongCategory = "technique" | "hearing";
+/** How many last-played songs lead the list. */
+const RECENT_SONGS = 4;
 
 interface SessionSongPickerProps {
   userId: string | null;
   /** Songs picked for this session, in pick order. */
   selected: PickedSong[];
   onToggle: (song: SessionSong) => void;
-  onSetMinutes: (songId: string, category: SongCategory, minutes: number) => void;
-  /** Which part of the song got the time; omit to hide the picker. */
-  onSetArrangement?: (songId: string, arrangement: SongArrangement | null) => void;
 }
 
-/** Snaps to the next/previous multiple of the step, so 7m → 10m → 5m → 0m. */
-const stepUp = (minutes: number) =>
-  Math.min(
-    MAX_SONG_CATEGORY_MINUTES,
-    Math.floor(minutes / MINUTE_STEP) * MINUTE_STEP + MINUTE_STEP
-  );
-const stepDown = (minutes: number) =>
-  Math.max(0, Math.ceil(minutes / MINUTE_STEP) * MINUTE_STEP - MINUTE_STEP);
-
-const SongCover = ({ coverUrl }: { coverUrl?: string }) => (
-  <div className='h-10 w-10 shrink-0 overflow-hidden rounded bg-zinc-800'>
+export const SongCover = ({
+  coverUrl,
+  size = "md",
+}: {
+  coverUrl?: string;
+  size?: "sm" | "md";
+}) => (
+  <div
+    className={cn(
+      "shrink-0 overflow-hidden rounded bg-zinc-800",
+      size === "sm" ? "h-8 w-8" : "h-11 w-11",
+    )}>
     {coverUrl ? (
       <img src={coverUrl} alt='' className='h-full w-full object-cover' />
     ) : (
-      <div className='flex h-full w-full items-center justify-center text-zinc-600'>
+      <div className='flex h-full w-full items-center justify-center text-zinc-500'>
         <Music className='h-4 w-4' />
       </div>
     )}
@@ -72,177 +55,34 @@ const SongCover = ({ coverUrl }: { coverUrl?: string }) => (
 
 const TierChip = ({ song }: { song: Song }) => {
   const tier = getSongTier(
-    (song.avgDifficulty ?? 0) === 0 ? "?" : song.tier || song.avgDifficulty || "?"
+    (song.avgDifficulty ?? 0) === 0
+      ? "?"
+      : song.tier || song.avgDifficulty || "?",
   );
   return (
     <span
       className='shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold'
-      style={{ backgroundColor: inkWash(tier.color, 12), color: inkAccent(tier.color) }}>
+      style={{
+        backgroundColor: inkWash(tier.color, 12),
+        color: inkAccent(tier.color),
+      }}>
       {tier.tier}
     </span>
   );
 };
 
-/**
- * One category's minutes on one song. It borrows the time boxes' signature —
- * the category's colored icon disc and its value in the same color — at a third
- * of the size, so a stack of songs stays readable without a wheel picker each.
- */
-const CategoryTime = ({
-  skill,
-  label,
-  Icon,
-  minutes,
-  onChange,
-}: {
-  skill: SongCategory;
-  label: string;
-  Icon: IconType;
-  minutes: number;
-  onChange: (minutes: number) => void;
-}) => {
-  const { t } = useTranslation("report");
-  // While the field is focused the raw text wins, so clearing it to type a new
-  // number doesn't snap back to "0" under the cursor.
-  const [draft, setDraft] = useState<string | null>(null);
-  const color = SKILL_COLORS[skill];
-  const hasValue = minutes > 0;
-
-  return (
-    <div className='flex items-center gap-2.5'>
-      <span
-        className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full'
-        style={{
-          background: hasValue
-            ? `linear-gradient(135deg, ${color}33, ${color}1a)`
-            : "linear-gradient(135deg, #52525b80, #3f3f4666)",
-        }}>
-        <Icon
-          className='text-base'
-          style={{ color: hasValue ? color : "#d4d4d8" }}
-          aria-hidden
-        />
-      </span>
-
-      <span className='w-20 shrink-0 font-sans text-sm font-medium text-zinc-100'>{label}</span>
-
-      <div className='flex items-center gap-1'>
-        <button
-          type='button'
-          aria-label={t("songs.less", { label: label.toLowerCase() })}
-          disabled={minutes <= 0}
-          onClick={() => onChange(stepDown(minutes))}
-          className='flex h-9 w-9 items-center justify-center rounded bg-zinc-700/60 text-zinc-100 transition-colors hover:bg-zinc-600/70 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40 disabled:pointer-events-none disabled:opacity-30'>
-          <Minus className='h-3.5 w-3.5' />
-        </button>
-
-        <div className='relative'>
-          <input
-            inputMode='numeric'
-            aria-label={t("songs.minutes_of", { label: label.toLowerCase() })}
-            value={draft ?? String(minutes)}
-            onChange={(event) => {
-              const cleaned = event.target.value.replace(/\D/g, "").slice(0, 3);
-              setDraft(cleaned);
-              onChange(Math.min(Number(cleaned || 0), MAX_SONG_CATEGORY_MINUTES));
-            }}
-            onFocus={(event) => event.target.select()}
-            onBlur={() => setDraft(null)}
-            style={{ color: hasValue ? color : undefined }}
-            className='h-9 w-16 rounded bg-zinc-950/70 pr-5 text-right font-mono text-base font-bold text-zinc-200 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'
-          />
-          <span className='pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-zinc-400'>
-            m
-          </span>
-        </div>
-
-        <button
-          type='button'
-          aria-label={t("songs.more", { label: label.toLowerCase() })}
-          onClick={() => onChange(stepUp(minutes))}
-          className='flex h-9 w-9 items-center justify-center rounded bg-zinc-700/60 text-zinc-100 transition-colors hover:bg-zinc-600/70 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
-          <Plus className='h-3.5 w-3.5' />
-        </button>
-      </div>
-    </div>
-  );
-};
-
-const PickedSongRow = ({
-  song,
-  coverUrl,
-  onSetMinutes,
-  onSetArrangement,
-  onRemove,
-}: {
-  song: PickedSong;
-  coverUrl?: string;
-  onSetMinutes: (category: SongCategory, minutes: number) => void;
-  onSetArrangement?: (arrangement: SongArrangement | null) => void;
-  onRemove: () => void;
-}) => {
-  const { t } = useTranslation("report");
-  return (
-  <div className='rounded-lg bg-zinc-800/60 p-4'>
-    <div className='flex items-center gap-3'>
-      <SongCover coverUrl={coverUrl ?? song.coverUrl} />
-      <div className='min-w-0 flex-1'>
-        <p translate='no' className='truncate text-base font-semibold text-zinc-100'>
-          {song.title}
-        </p>
-        <p translate='no' className='truncate text-sm text-zinc-400'>
-          {song.artist}
-        </p>
-      </div>
-      <button
-        type='button'
-        onClick={onRemove}
-        aria-label={t("songs.remove", { title: song.title })}
-        className='flex h-9 w-9 shrink-0 items-center justify-center rounded text-zinc-300 transition-colors hover:bg-zinc-700/60 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'>
-        <X className='h-4 w-4' />
-      </button>
-    </div>
-
-    {/* The two categories sit side by side once there is room, and stack below. */}
-    <div className='mt-4 flex flex-wrap gap-x-10 gap-y-3'>
-      <CategoryTime
-        skill='technique'
-        label={t("technique")}
-        Icon={SKILL_CATEGORY_ICONS.technique}
-        minutes={song.techniqueMinutes}
-        onChange={(minutes) => onSetMinutes("technique", minutes)}
-      />
-      <CategoryTime
-        skill='hearing'
-        label={t("hearing")}
-        Icon={SKILL_CATEGORY_ICONS.hearing}
-        minutes={song.hearingMinutes}
-        onChange={(minutes) => onSetMinutes("hearing", minutes)}
-      />
-    </div>
-
-    {onSetArrangement && (
-      <ArrangementPicker
-        value={song.arrangement ?? null}
-        onChange={onSetArrangement}
-        noneLabel={t("songs.any_part")}
-        size='sm'
-        className='mt-4 bg-zinc-950/50'
-      />
-    )}
-  </div>
-  );
-};
-
 const SongRow = ({
   song,
-  practicedMs,
+  practicedLabel,
+  chip,
   isSelected,
   isDisabled,
   onPick,
 }: {
-  song: Song;
-  practicedMs: number;
+  song: SessionSong;
+  /** "45 min logged" — only for songs that already have time on them. */
+  practicedLabel?: string;
+  chip?: ReactNode;
   isSelected: boolean;
   isDisabled: boolean;
   onPick: () => void;
@@ -253,51 +93,53 @@ const SongRow = ({
     disabled={isDisabled}
     aria-pressed={isSelected}
     className={cn(
-      "group flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40",
-      isSelected ? "bg-cyan-500/5" : "hover:bg-zinc-800/60",
-      isDisabled && "pointer-events-none opacity-40"
+      "group flex w-full items-center gap-3 rounded-lg p-2.5 text-left transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      isSelected ? "bg-zinc-800" : "hover:bg-zinc-800/60",
+      isDisabled && "pointer-events-none opacity-40",
     )}>
     <SongCover coverUrl={song.coverUrl} />
     <div className='min-w-0 flex-1'>
-      <p translate='no' className='truncate text-sm font-semibold text-zinc-100'>
+      <p
+        translate='no'
+        className='truncate text-sm font-semibold text-zinc-100'>
         {song.title}
       </p>
-      <p translate='no' className='truncate text-xs text-zinc-500'>
+      <p translate='no' className='truncate text-xs text-zinc-400'>
         {song.artist}
-        {practicedMs > 0 && (
-          <span className='text-zinc-600'> · {formatPracticed(practicedMs)} logged</span>
-        )}
+        {practicedLabel && <span> · {practicedLabel}</span>}
       </p>
     </div>
-    <TierChip song={song} />
+    {chip}
     <span
       className={cn(
-        "flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors",
+        "flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors duration-fast",
         isSelected
-          ? "bg-cyan-500/15 text-cyan-400"
-          : "bg-zinc-800/60 text-zinc-500 group-hover:bg-cyan-500/10 group-hover:text-cyan-400"
+          ? "bg-zinc-100 text-zinc-950"
+          : "bg-zinc-800/60 text-transparent group-hover:text-zinc-500",
       )}>
-      <Check className='h-3.5 w-3.5' />
+      <Check className='h-3.5 w-3.5' strokeWidth={3} />
     </span>
   </button>
 );
 
+const GroupLabel = ({ children }: { children: ReactNode }) => (
+  <p className='px-2.5 text-xs font-semibold text-zinc-400'>{children}</p>
+);
+
 /**
- * The whole time input for a song session: pick songs from the library and give
- * each one its own technique/hearing minutes. The report's category totals are
- * the sum over these songs, and each song's slice also lands on its own
- * progress (see `recordPracticeSession`).
+ * "Which songs?" — any number ticked at once. One search field covers the
+ * player's own library and, by title, the whole catalog, so an empty library
+ * is not a dead end: a catalog song is logged like any other and joins the
+ * library as "learning" when the session is saved. The time each song got is
+ * the next question's job (see `TimeBlock`).
  */
 const SessionSongPicker = ({
   userId,
   selected,
   onToggle,
-  onSetMinutes,
-  onSetArrangement,
 }: SessionSongPickerProps) => {
   const { t } = useTranslation(["report", "plans"]);
   const [query, setQuery] = useState("");
-  const [isAdding, setIsAdding] = useState(false);
 
   const { data: userSongs, isLoading } = useQuery({
     // Same key as useSongs so the songs page and this picker share one fetch.
@@ -314,191 +156,247 @@ const SessionSongPicker = ({
     staleTime: 5 * 60 * 1000,
   });
 
+  const { suggestions, isLoading: isSearching } = useSongSuggestions(
+    "title",
+    query,
+    !!userId,
+  );
+
   const practicedMsById = useMemo(() => {
     const map = new Map<string, number>();
-    (progressList ?? []).forEach((p) => map.set(p.songId, p.totalPracticeMs ?? 0));
+    (progressList ?? []).forEach((p) =>
+      map.set(p.songId, p.totalPracticeMs ?? 0),
+    );
     return map;
   }, [progressList]);
 
-  const coverById = useMemo(() => {
-    const map = new Map<string, string | undefined>();
-    [
-      ...(userSongs?.learning ?? []),
-      ...(userSongs?.wantToLearn ?? []),
-      ...(userSongs?.learned ?? []),
-    ].forEach((song) => map.set(song.id, song.coverUrl));
-    return map;
-  }, [userSongs]);
-
   const selectedIds = useMemo(
     () => new Set(selected.map((song) => song.id)),
-    [selected]
+    [selected],
+  );
+
+  const libraryIds = useMemo(
+    () =>
+      new Set(
+        [
+          ...(userSongs?.learning ?? []),
+          ...(userSongs?.wantToLearn ?? []),
+          ...(userSongs?.learned ?? []),
+        ].map((song) => song.id),
+      ),
+    [userSongs],
   );
 
   const groups = useMemo(() => {
     const all = [
-      { label: t("plans:song_picker.learning"), songs: userSongs?.learning ?? [] },
-      { label: t("plans:song_picker.want_to_learn"), songs: userSongs?.wantToLearn ?? [] },
-      { label: t("plans:song_picker.learned"), songs: userSongs?.learned ?? [] },
+      {
+        label: t("plans:song_picker.learning"),
+        songs: userSongs?.learning ?? [],
+      },
+      {
+        label: t("plans:song_picker.want_to_learn"),
+        songs: userSongs?.wantToLearn ?? [],
+      },
+      {
+        label: t("plans:song_picker.learned"),
+        songs: userSongs?.learned ?? [],
+      },
     ];
     const q = query.trim().toLowerCase();
-    if (!q) return all.filter((group) => group.songs.length > 0);
+    if (!q) {
+      // The songs played last come first — most sessions return to the same
+      // few. Read off the progress list this picker loads anyway, so it costs
+      // no extra request. They leave their own group so no song shows twice.
+      const lastPlayedAt = new Map(
+        (progressList ?? []).map((p) => [
+          p.songId,
+          p.lastPracticedAt?.getTime() ?? 0,
+        ]),
+      );
+      const recent = all
+        .flatMap((group) => group.songs)
+        .filter((song) => (lastPlayedAt.get(song.id) ?? 0) > 0)
+        .sort(
+          (a, b) =>
+            (lastPlayedAt.get(b.id) ?? 0) - (lastPlayedAt.get(a.id) ?? 0),
+        )
+        .slice(0, RECENT_SONGS);
+      const recentIds = new Set(recent.map((song) => song.id));
+
+      return [
+        { label: t("flow.recent_group"), songs: recent },
+        ...all.map((group) => ({
+          ...group,
+          songs: group.songs.filter((song) => !recentIds.has(song.id)),
+        })),
+      ].filter((group) => group.songs.length > 0);
+    }
     return all
       .map((group) => ({
         ...group,
         songs: group.songs.filter(
           (song) =>
-            song.title.toLowerCase().includes(q) || song.artist.toLowerCase().includes(q)
+            song.title.toLowerCase().includes(q) ||
+            song.artist.toLowerCase().includes(q),
         ),
       }))
       .filter((group) => group.songs.length > 0);
-  }, [userSongs, query, t]);
+  }, [userSongs, progressList, query, t]);
 
-  const hasAnySong =
-    (userSongs?.learning.length ?? 0) +
-      (userSongs?.wantToLearn.length ?? 0) +
-      (userSongs?.learned.length ?? 0) >
-    0;
+  const hasQuery = query.trim().length > 0;
+  const catalogSongs = hasQuery
+    ? suggestions.filter((song) => !libraryIds.has(song.id))
+    : [];
+  // Picked from the catalog earlier: they are in no library group, and must
+  // not vanish from the list once the search that found them changes.
+  const pickedOutsideLibrary = selected.filter(
+    (song) =>
+      !libraryIds.has(song.id) &&
+      !catalogSongs.some((match) => match.id === song.id),
+  );
 
-  const totals = sumSongMinutes(selected);
   const isAtLimit = selected.length >= MAX_SESSION_SONGS;
-  // With nothing picked yet the library list is the only thing worth showing.
-  const isLibraryOpen = selected.length === 0 || isAdding;
+  const isEmptyLibrary = libraryIds.size === 0;
+  const hasNothingToShow =
+    groups.length === 0 &&
+    catalogSongs.length === 0 &&
+    pickedOutsideLibrary.length === 0 &&
+    !isSearching;
 
   if (!userId || isLoading) {
     return (
-      <div className='flex items-center justify-center py-10 text-zinc-600'>
+      <div className='flex items-center justify-center rounded-lg bg-zinc-900/40 py-12 text-zinc-500'>
         <Loader2 className='h-5 w-5 animate-spin' />
       </div>
     );
   }
 
-  if (!hasAnySong) {
-    return (
-      <div className='flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 py-10 text-center'>
-        <Library className='h-8 w-8 text-zinc-700' />
-        <p className='text-sm font-semibold text-zinc-300'>{t("songs.empty_title")}</p>
-        <p className='max-w-xs text-xs text-zinc-500'>
-          {t("songs.empty_body")}
-        </p>
-        <Link
-          href='/songs'
-          className='mt-1 rounded-lg bg-cyan-500/10 px-4 py-2 text-xs font-bold text-cyan-400 transition-colors hover:bg-cyan-500/20'>
-          {t("songs.browse")}
-        </Link>
-      </div>
-    );
-  }
-
   return (
-    <div className='space-y-4'>
-      {selected.length > 0 && (
-        <>
-          <div className='space-y-2'>
-            {selected.map((song) => (
-              <PickedSongRow
+    <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-3 sm:p-4'>
+      <div className='group relative'>
+        <div className='pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3.5'>
+          {isSearching ? (
+            <Loader2 className='h-4 w-4 animate-spin text-zinc-400' />
+          ) : (
+            <Search className='h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-zinc-200' />
+          )}
+        </div>
+        <Input
+          placeholder={t("flow.song_search")}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={(event) => {
+            // The field lives inside the report form; Enter must not save it.
+            if (event.key === "Enter") event.preventDefault();
+          }}
+          className='h-11 border-none bg-zinc-950/40 pl-10 text-base text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-cyan-500/40 sm:text-sm'
+        />
+      </div>
+
+      {isAtLimit && (
+        <p className='px-2 text-xs font-semibold text-amber-400'>
+          {t("songs.limit", { max: MAX_SESSION_SONGS })}
+        </p>
+      )}
+
+      <div className='flex max-h-[26rem] flex-col gap-5 overflow-y-auto pr-1'>
+        {pickedOutsideLibrary.length > 0 && (
+          <div className='flex flex-col gap-1'>
+            <GroupLabel>{t("flow.picked_group")}</GroupLabel>
+            {pickedOutsideLibrary.map((song) => (
+              <SongRow
                 key={song.id}
                 song={song}
-                coverUrl={coverById.get(song.id)}
-                onSetMinutes={(category, minutes) =>
-                  onSetMinutes(song.id, category, minutes)
-                }
-                onSetArrangement={
-                  onSetArrangement
-                    ? (arrangement) => onSetArrangement(song.id, arrangement)
-                    : undefined
-                }
-                onRemove={() => onToggle(song)}
+                isSelected
+                isDisabled={false}
+                onPick={() => onToggle(song)}
               />
             ))}
           </div>
+        )}
 
-          <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-1'>
-            <p className='text-sm text-zinc-400'>
-              {t("technique")}{" "}
-              <span className='font-semibold text-zinc-100 tabular-nums'>{totals.technique}m</span> ·{" "}
-              {t("hearing")}{" "}
-              <span className='font-semibold text-zinc-100 tabular-nums'>{totals.hearing}m</span>
-            </p>
-
-            <button
-              type='button'
-              onClick={() => setIsAdding((open) => !open)}
-              disabled={isAtLimit && !isAdding}
-              className='flex items-center gap-1.5 rounded bg-zinc-700/60 px-3 py-2 text-xs font-bold text-zinc-100 transition-colors hover:bg-zinc-600/70 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40 disabled:pointer-events-none disabled:opacity-40'>
-              {isAdding ? (
-                <>
-                  <ChevronUp className='h-3.5 w-3.5' />
-                  {t("songs.done_adding")}
-                </>
-              ) : (
-                <>
-                  <Plus className='h-3.5 w-3.5' />
-                  {t("songs.add_song")}
-                </>
-              )}
-            </button>
+        {groups.map((group) => (
+          <div key={group.label} className='flex flex-col gap-1'>
+            <GroupLabel>{group.label}</GroupLabel>
+            {group.songs.map((song) => {
+              const isSelected = selectedIds.has(song.id);
+              return (
+                <SongRow
+                  key={song.id}
+                  song={song}
+                  practicedLabel={
+                    (practicedMsById.get(song.id) ?? 0) > 0
+                      ? t("flow.logged", {
+                          time: formatPracticed(
+                            practicedMsById.get(song.id) ?? 0,
+                          ),
+                        })
+                      : undefined
+                  }
+                  chip={<TierChip song={song} />}
+                  isSelected={isSelected}
+                  isDisabled={isAtLimit && !isSelected}
+                  onPick={() =>
+                    onToggle({
+                      id: song.id,
+                      title: song.title,
+                      artist: song.artist,
+                      coverUrl: song.coverUrl,
+                    })
+                  }
+                />
+              );
+            })}
           </div>
-        </>
-      )}
+        ))}
 
-      {isLibraryOpen && (
-        <div className='space-y-3'>
-          <div className='group relative'>
-            <div className='pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3.5'>
-              <Search className='h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-zinc-200' />
-            </div>
-            <Input
-              placeholder={t("songs.search")}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className='h-11 border-none bg-zinc-900/40 pl-10 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-cyan-500/40'
-            />
-          </div>
-
-          {isAtLimit && (
-            <p className='px-2 text-xs font-semibold text-amber-400'>
-              {t("songs.limit", { max: MAX_SESSION_SONGS })}
+        {catalogSongs.length > 0 && (
+          <div className='flex flex-col gap-1'>
+            <GroupLabel>{t("flow.catalog_group")}</GroupLabel>
+            {catalogSongs.map((song) => {
+              const isSelected = selectedIds.has(song.id);
+              return (
+                <SongRow
+                  key={song.id}
+                  song={song}
+                  isSelected={isSelected}
+                  isDisabled={isAtLimit && !isSelected}
+                  onPick={() =>
+                    onToggle({
+                      id: song.id,
+                      title: song.title,
+                      artist: song.artist,
+                      coverUrl: song.coverUrl,
+                    })
+                  }
+                />
+              );
+            })}
+            <p className='px-2.5 pt-1 text-xs text-zinc-400'>
+              {t("flow.catalog_hint")}
             </p>
-          )}
+          </div>
+        )}
 
-          <div className='max-h-80 space-y-4 overflow-y-auto pr-1'>
-            {groups.length === 0 ? (
-              <p className='py-8 text-center text-xs font-medium text-zinc-500'>
-                {t("songs.no_match")}
-              </p>
-            ) : (
-              groups.map((group) => (
-                <div key={group.label} className='space-y-1'>
-                  <p className='px-2 text-xs font-semibold text-zinc-500'>
-                    {group.label}
-                  </p>
-                  {group.songs.map((song) => {
-                    const isSelected = selectedIds.has(song.id);
-                    return (
-                      <SongRow
-                        key={song.id}
-                        song={song}
-                        practicedMs={practicedMsById.get(song.id) ?? 0}
-                        isSelected={isSelected}
-                        isDisabled={isAtLimit && !isSelected}
-                        onPick={() =>
-                          onToggle({
-                            id: song.id,
-                            title: song.title,
-                            artist: song.artist,
-                            coverUrl: song.coverUrl,
-                          })
-                        }
-                      />
-                    );
-                  })}
-                </div>
-              ))
+        {hasNothingToShow && (
+          <div className='flex flex-col items-center gap-3 px-4 py-8 text-center'>
+            <p className='max-w-sm text-sm text-zinc-400'>
+              {hasQuery
+                ? t("flow.no_song_match")
+                : isEmptyLibrary
+                  ? t("flow.empty_library_hint")
+                  : t("songs.no_match")}
+            </p>
+            {hasQuery && (
+              <Link
+                href='/songs'
+                className='rounded-lg bg-zinc-800/60 px-4 py-2 text-sm font-semibold text-zinc-100 transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800'>
+                {t("songs.browse")}
+              </Link>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

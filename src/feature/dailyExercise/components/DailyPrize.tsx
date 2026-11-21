@@ -14,7 +14,7 @@ export const DailyPrizeArt = ({ prize, className }: { prize: DailyExercisePrize;
       aria-label={t("daily_exercise.prize")}
       title={t("daily_exercise.prize")}
       className={cn("flex size-14 shrink-0 items-center justify-center rounded bg-zinc-800", className)}>
-      <div className='size-12'>
+      <div className='size-[86%]'>
         {prize.kind === "mod" ? <ModArt modId={prize.featureId} /> : <PartIcon partId={prize.partId} />}
       </div>
     </div>

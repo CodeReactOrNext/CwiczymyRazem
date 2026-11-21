@@ -1,7 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { Slider } from "assets/components/ui/slider";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
-import { Trash2 } from "lucide-react";
 
 import { STICKER_SIZE } from "../data/guitarParts";
 import type { PlacedSticker } from "../types/guitarBuilder.types";
@@ -80,7 +79,6 @@ export const StickerPanel = ({
             variant='secondary'
             size='sm'
             onClick={() => onRemove(selected.id)}>
-            <Trash2 className='mr-2' />
             {t("builder.peel_off")}
           </Button>
         )}

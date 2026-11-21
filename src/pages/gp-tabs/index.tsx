@@ -720,7 +720,7 @@ const GpTabsPage: NextPageWithLayout = () => {
                 variant="ghost"
                 className="h-9 px-4 rounded-lg text-xs font-bold bg-zinc-800/60 text-zinc-200 hover:bg-zinc-700/60 hover:text-white"
               >
-                <FolderPlus className="h-4 w-4 mr-2" />
+                <FolderPlus className="h-4 w-4" />
                 {t("gp.new_folder")}
               </Button>
             )}
@@ -796,7 +796,7 @@ const GpTabsPage: NextPageWithLayout = () => {
               disabled={atFileCap}
               className="mt-2 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 h-10 px-6 rounded-lg text-xs font-bold capitalize tracking-widest"
             >
-              <Upload className="h-3.5 w-3.5 mr-2" />
+              <Upload className="h-3.5 w-3.5" />
               {t("gp.upload_gp")}
             </Button>
           </div>
@@ -1155,7 +1155,7 @@ const GpTabsPage: NextPageWithLayout = () => {
               className="w-full h-12 rounded-lg bg-white text-zinc-950 font-bold hover:bg-zinc-100 transition-colors"
             >
               <span>{t("gp.start")}</span>
-              <Zap className={cn("h-4 w-4 ml-2 fill-current", isStarting && "hidden")} />
+              <Zap className={cn("h-4 w-4 fill-current", isStarting && "hidden")} />
             </Button>
           </div>
         </div>

@@ -86,7 +86,7 @@ const AdminActionCenter = ({
           disabled={isLoading}
           className="h-10 border-white/5 bg-zinc-900/60 hover:bg-white/5 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em]"
         >
-          <RefreshCw className={cn("h-3.5 w-3.5 mr-2", isLoading && "animate-spin")} />
+          <RefreshCw className={cn("h-3.5 w-3.5", isLoading && "animate-spin")} />
           Sync Catalog
         </Button>
         <Button 
@@ -94,7 +94,7 @@ const AdminActionCenter = ({
           disabled={isBulkProcessing}
           className="h-10 bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
         >
-          <ShieldCheck className="mr-2 h-3.5 w-3.5" />
+          <ShieldCheck className="h-3.5 w-3.5" />
           Mass Verify
         </Button>
         <Button 
@@ -102,7 +102,7 @@ const AdminActionCenter = ({
           disabled={isBulkProcessing}
           className="h-10 bg-amber-600 hover:bg-amber-500 shadow-lg shadow-amber-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
         >
-          <RefreshCw className={cn("mr-2 h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
+          <RefreshCw className={cn("h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
           Mass Enrich
         </Button>
         <Button
@@ -110,7 +110,7 @@ const AdminActionCenter = ({
           disabled={isLoading}
           className="h-10 bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
         >
-          <Plus className="mr-2 h-3.5 w-3.5" />
+          <Plus className="h-3.5 w-3.5" />
           Bulk Add Songs
         </Button>
         <Button

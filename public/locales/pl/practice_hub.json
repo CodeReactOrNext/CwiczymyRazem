@@ -1,12 +1,7 @@
 {
   "title": "Ćwicz",
-  "continue": "Kontynuuj",
   "loading": "Wczytywanie...",
   "any_part": "Dowolna część",
-  "lock": {
-    "master": "Master",
-    "premium": "Premium"
-  },
   "sections": {
     "all": "Wszystkie sposoby ćwiczenia",
     "log_time": "Zapisz czas",
@@ -14,10 +9,16 @@
     "create_plan": "Utwórz plan",
     "create_exercise": "Utwórz ćwiczenie"
   },
+  "groups": {
+    "planned": "Z planem",
+    "songs": "Utwory",
+    "exercises": "Ćwiczenia",
+    "challenges": "Wyzwania"
+  },
   "modes": {
     "routine": {
       "title": "Rutyny ćwiczeń",
-      "description": "Gotowe rutyny, playalongi, Twoje plany i plany społeczności"
+      "description": "Gotowe i własne plany sesji"
     },
     "manual_log": {
       "title": "Ręczny wpis",
@@ -29,43 +30,43 @@
     },
     "songs": {
       "title": "Utwory",
-      "description": "Ćwicz swój repertuar — czas liczy się do nauki każdego utworu"
+      "description": "Twój repertuar"
     },
     "auto": {
       "title": "Plan automatyczny",
-      "description": "Sesja ułożona tak, by zmieściła się w Twoim czasie"
+      "description": "Sesja ułożona pod Twój czas"
     },
     "gp": {
       "title": "Pliki Guitar Pro",
-      "description": "Ćwicz z zaimportowanych tabulatur, z odtwarzaniem"
+      "description": "Twoje tabulatury z odtwarzaniem"
     },
     "learning_path": {
       "title": "Ścieżka nauki",
-      "description": "Zacznij od podstaw, lekcja po lekcji"
+      "description": "Od podstaw, lekcja po lekcji"
     },
     "roadmaps": {
       "title": "Mastery Roadmaps",
-      "description": "Osobisty plan dla jednej umiejętności lub stylu gry"
+      "description": "Plan na jedną umiejętność"
     },
     "scales": {
       "title": "Mapa skal",
-      "description": "Kształty skal zaliczane pudełko po pudełku w docelowym tempie"
+      "description": "Kształty skal, pudełko po pudełku"
     },
     "bosses": {
       "title": "Walki z bossami",
-      "description": "Pokonaj bossa poziom po poziomie, grając na gitarze"
+      "description": "Pokonaj bossa, grając"
     },
     "duels": {
       "title": "Duele",
-      "description": "1 na 1 z nieznajomym na tym samym ćwiczeniu"
+      "description": "1 na 1 na tym samym ćwiczeniu"
     },
     "skills": {
       "title": "Umiejętności",
-      "description": "Zobacz postępy w poszczególnych technikach"
+      "description": "Postępy w technikach"
     },
     "exercises": {
       "title": "Katalog ćwiczeń",
-      "description": "Znajdź ćwiczenie po umiejętności, długości lub trybie"
+      "description": "Wszystkie ćwiczenia"
     },
     "favorites": {
       "title": "Ulubione"
@@ -88,10 +89,6 @@
     "goals": {
       "title": "Cele"
     }
-  },
-  "tags": {
-    "most_used": "Najczęściej wybierane",
-    "new": "Nowość"
   },
   "progress": {
     "all_modules": "Wszystkie moduły ukończone",

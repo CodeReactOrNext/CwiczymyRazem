@@ -20,7 +20,8 @@ import {
 import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useTranslation } from "hooks/useTranslation";
-import { BookOpen, Flame, Music, Zap, Plus } from "lucide-react";
+import { ArrowLeft, BookOpen, Flame, Music, Zap, Plus } from "lucide-react";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { motion } from "framer-motion";
 
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
@@ -236,9 +237,15 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   };
 
   if (isLoading) {
+    // Card-shaped placeholders in the grid the plans land in, so the page
+    // doesn't jump when they arrive.
     return (
-      <div className='flex h-[400px] items-center justify-center'>
-        <div className='h-12 w-12 animate-spin rounded-full border-b-2 border-primary' />
+      <div
+        aria-busy
+        className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${hideLayout ? "px-3 md:px-6" : ""}`}>
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} variant='block' className='h-[188px]' />
+        ))}
       </div>
     );
   }
@@ -246,10 +253,14 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   if (editingPlan) {
     return (
       <div className='container mx-auto px-4 lg:px-8 py-8 md:py-12'>
-        <div className='mb-4 px-4'>
-          <Button variant='ghost' onClick={() => setEditingPlan(null)}>
+        <div className='mb-6 flex items-center gap-4 px-4'>
+          <Button variant='ghost' className='shrink-0' onClick={() => setEditingPlan(null)}>
+            <ArrowLeft className='' />
             {t("common:back")}
           </Button>
+          <span className='truncate text-sm font-semibold text-zinc-300'>
+            {getLocalizedTitle(editingPlan.title)}
+          </span>
         </div>
         <CreatePlan initialPlan={editingPlan} onSubmit={handleCreatePlan} onUpdate={handleUpdatePlan} />
       </div>
@@ -351,7 +362,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
                   onClick={() => isPremium ? router.push('/plans/create') : setShowUpgradeModal(true)}
                   className="bg-white hover:bg-zinc-100 text-black font-bold text-xs h-9 px-5 rounded-lg transition-all"
                 >
-                  <Plus size='1em' className="mr-2 h-3 w-3" />
+                  <Plus size='1em' className="h-3 w-3" />
                   {t("exercises:my_plans.create_plan")}
                 </Button>
               }

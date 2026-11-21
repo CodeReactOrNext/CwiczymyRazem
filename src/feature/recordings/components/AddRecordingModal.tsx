@@ -361,7 +361,7 @@ export const AddRecordingModal = ({
                 {t("modal.cancel")}
               </Button>
               <Button type="submit" disabled={isSaving} className="bg-cyan-600 hover:bg-cyan-500 text-white">
-                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
                 {isEditing ? t("modal.save") : t("modal.share")}
               </Button>
             </DialogFooter>

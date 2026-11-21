@@ -80,7 +80,7 @@ export const GuitarBuilderView = () => {
             </button>
           )}
           <Button variant='secondary' onClick={rollPart}>
-            <Dices className='mr-2' />
+            <Dices className='' />
             Roll a part
           </Button>
         </div>

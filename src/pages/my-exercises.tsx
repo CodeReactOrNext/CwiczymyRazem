@@ -229,7 +229,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
               </div>
               <div className="flex flex-col sm:flex-row items-center gap-3">
                 <Button onClick={handleCreate} size="lg" className="px-5">
-                  <Music2 className="mr-2" />
+                  <Music2 className="" />
                   {t("my_exercises.with_tab")}
                 </Button>
                 <Button
@@ -238,7 +238,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                   onClick={handleCreateWithoutTab}
                   className="px-5"
                 >
-                  <FileText className="mr-2" />
+                  <FileText className="" />
                   {t("my_exercises.instructions_only")}
                 </Button>
               </div>
@@ -315,7 +315,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                     onClick={() => setActiveExercise(buildChallenge(ex))}
                     className="h-10 flex-1 shrink-0 sm:h-9 sm:flex-none"
                   >
-                    <Play fill="currentColor" className="mr-1.5" />
+                    <Play fill="currentColor" className="" />
                     {t("my_exercises.practice")}
                   </Button>
 
@@ -352,7 +352,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                       disabled={togglingId === ex.id}
                       className="h-10 shrink-0 sm:h-9 hover:text-emerald-400"
                     >
-                      <Globe className="mr-1.5" />
+                      <Globe className="" />
                       {t("my_exercises.make_public")}
                     </Button>
                   )}

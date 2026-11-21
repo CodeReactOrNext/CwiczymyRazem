@@ -12,11 +12,13 @@ Większość riff.quest pozwala ćwiczyć to, na co masz ochotę. Te dwie rzeczy
 
 <ClickPath steps="Ścieżka nauki" caption="Moduły złożone z etapów, etapy złożone z kroków i egzamin na końcu każdego etapu." />
 
-Obecnie aktywne są dwa moduły, **Fundamentals** i **Fretboard Mastery**, a rytm, skale i improwizacja są oznaczone jako wkrótce. Każdy krok ma instrukcje, listę kontrolną i wskazówki.
+Obecnie aktywne są trzy moduły, **Fundamentals**, **Fretboard Mastery** i **Interval Mastery**, a rytm, skale i improwizacja są oznaczone jako wkrótce. Każdy krok ma instrukcje, listę kontrolną i wskazówki.
 
-<StepList steps="Pierwszy krok jest zawsze otwarty::Bez warunków wstępnych, w obu modułach|Kroki odblokowują się po kolei::Następny krok otwiera się, gdy oznaczysz poprzedni jako ukończony|Moduły nie są zablokowane::Oba aktywne moduły są otwarte od pierwszego dnia, a tylko kroki wewnątrz nich odblokowują się po kolei" />
+<StepList steps="Pierwszy krok jest zawsze otwarty::Bez warunków wstępnych, w każdym module|Kroki odblokowują się po kolei::Następny krok otwiera się, gdy oznaczysz poprzedni jako ukończony|Moduły nie są zablokowane::Wszystkie trzy aktywne moduły są otwarte od pierwszego dnia, a tylko kroki wewnątrz nich odblokowują się po kolei" />
 
-**Fretboard Mastery** działa przez klikanie, a nie słuchanie: widzisz nazwę nuty i klikasz, gdzie leży na gryfie, więc jego pierwsze cztery etapy świetnie działają bez mikrofonu. Ostatni etap, **Play!**, każe ci znajdować nuty na własnej gitarze, a te egzaminy nasłuchują. Egzaminy są oceniane według celności:
+**Fretboard Mastery** działa przez klikanie, a nie słuchanie: widzisz nazwę nuty i klikasz, gdzie leży na gryfie, więc jego pierwsze cztery etapy świetnie działają bez mikrofonu. Ostatni etap, **Play!**, każe ci znajdować nuty na własnej gitarze, a te egzaminy nasłuchują.
+
+**Interval Mastery** uczy każdego interwału na trzy sposoby: klikasz jego kształt na gryfie, rozpoznajesz go na słuch i grasz go na własnej gitarze. Nasłuchują tylko te kroki Play. Egzaminy są oceniane według celności:
 
 <ProgressLadder items="Poniżej 93%::Bez gwiazdek, warto spróbować jeszcze raz|93%::Jedna gwiazdka|97%::Dwie gwiazdki|99% i więcej::Trzy gwiazdki" highlight="99% i więcej" />
 
@@ -42,6 +44,6 @@ Każdy węzeł pokazuje, gdzie jesteś (zablokowany, dostępny, w trakcie lub uk
 
 ## Pytania, które ludzie zadają
 
-<FaqList items="Czy potrzebuję mikrofonu?::Do egzaminów, które oceniają twoje granie, tak: każdego egzaminu Fundamentals i etapu Play! w Fretboard Mastery. Nie pozwolą ci pominąć monitu, patrz wykrywanie nut. Etapy Fretboard Mastery oparte na klikaniu, Practice i listy kontrolne działają bez niego. Mapa skal śledzi tempo, które zapisujesz na każdym wzorze|Czy mogę pominąć krok?::Nie, na tym to właśnie polega. Kroki otwierają się po kolei|Co jeśli oblę egzamin?::Nic się nie dzieje poza tym, że pozostaje nieukończony. Zdawaj ponownie, kiedy chcesz|Czy to liczy się jako ćwiczenie?::Tak, czas spędzony tutaj zapisuje się jak każda inna sesja" />
+<FaqList items="Czy potrzebuję mikrofonu?::Do egzaminów, które oceniają twoje granie, tak: każdego egzaminu Fundamentals, etapu Play! w Fretboard Mastery i kroków Play w Interval Mastery. Nie pozwolą ci pominąć monitu, patrz wykrywanie nut. Etapy Fretboard Mastery oparte na klikaniu, kroki Interval Mastery z klikaniem i słuchaniem, Practice i listy kontrolne działają bez niego. Mapa skal śledzi tempo, które zapisujesz na każdym wzorze|Czy mogę pominąć krok?::Nie, na tym to właśnie polega. Kroki otwierają się po kolei|Co jeśli oblę egzamin?::Nic się nie dzieje poza tym, że pozostaje nieukończony. Zdawaj ponownie, kiedy chcesz|Czy to liczy się jako ćwiczenie?::Tak, czas spędzony tutaj zapisuje się jak każda inna sesja" />
 
 <ReadNext links="Umiejętności i osiągnięcia::/wiki/skills-and-achievements|Wykrywanie nut i ustawienie mikrofonu::/wiki/note-detection|Mastery Roadmaps i cotygodniowe kamienie milowe::/wiki/ai-coach-and-weekly-milestones|Punkty, poziomy i serie::/wiki/how-scoring-works" />

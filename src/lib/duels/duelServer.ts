@@ -16,6 +16,7 @@ import type {
 import {
   canOpenDuel,
   canPlayerRun,
+  decidedFeed,
   DUEL_DURATION_MS,
   DUEL_FEED_SIZE,
   DUEL_RANKING_SIZE,
@@ -23,7 +24,6 @@ import {
   DUEL_START_RATING,
   DUEL_SUBMIT_GRACE_MS,
   DUEL_TICKET_TTL_MS,
-  feedForViewer,
   isEveryoneReady,
   liveTickets,
   pickOpponentTicket,
@@ -709,13 +709,12 @@ export async function getDuelOverview(
       toRankingEntry(doc.data() as DuelProfile),
     ),
     rankedPlayers: rankedCount.data().count,
-    feed: feedForViewer(
+    feed: decidedFeed(
       feedSnap.docs
         .map((doc: QueryDocumentSnapshot) =>
           toDuelFeedEntry(doc.data() as DuelDoc),
         )
         .filter((entry): entry is DuelFeedEntry => !!entry),
-      userId,
     ),
     waitingOthers: Math.max(
       0,

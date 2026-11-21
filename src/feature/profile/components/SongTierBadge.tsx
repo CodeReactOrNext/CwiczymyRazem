@@ -86,7 +86,7 @@ export const SongTierBadge = ({
 
   const content = (
     <>
-      <span className='text-xs font-semibold tracking-widest text-zinc-400'>
+      <span className='whitespace-nowrap text-xs font-semibold text-zinc-400'>
         {t("tier_badge.label")}
       </span>
       {isLoading ? (

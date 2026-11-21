@@ -118,5 +118,133 @@
     "5": "Schlägst du einen Stärkeren, bekommst du mehr ELO. Gar nicht gespielt? Das ist eine Niederlage.",
     "title": "So funktioniert's"
   },
-  "error": "Deine Duelle konnten nicht geladen werden. Lade die Seite neu."
+  "error": "Deine Duelle konnten nicht geladen werden. Lade die Seite neu.",
+  "tabs": {
+    "duels": "Duelle",
+    "ranking": "Rangliste",
+    "history": "Verlauf"
+  },
+  "strip": {
+    "unrated": "Ohne Rang",
+    "elo_aria": "ELO {{rating}}. Was ist ELO?"
+  },
+  "slots": {
+    "title": "Deine Duelle",
+    "used": "{{used}} von {{max}} Plätzen",
+    "free": "Freier Platz",
+    "searching": "Suche nach einem Gegner",
+    "searching_expires": "Du bekommst eine Benachrichtigung. Das Ticket läuft in {{time}} ab",
+    "cancel": "Abbrechen",
+    "you": "Du",
+    "opponent": "Gegner",
+    "opp_attempts_one": "Gegner · {{count}} Versuch",
+    "opp_attempts_other": "Gegner · {{count}} Versuche",
+    "opp_ready": "bereit",
+    "locked": "Ergebnis festgelegt",
+    "new": "Neu",
+    "left": "übrig",
+    "open_aria": "Duell öffnen: {{title}}"
+  },
+  "join": {
+    "title": "Neues Duell",
+    "waiting_one": "{{count}} Spieler wartet, du startest sofort.",
+    "waiting_other": "{{count}} Spieler warten, du startest sofort.",
+    "nobody": "Gerade wartet niemand. Dein Ticket wartet bis zu 24 Stunden.",
+    "confirm": "Gegner suchen"
+  },
+  "pending": {
+    "title": "Ergebnis da",
+    "vs": "vs {{name}} · {{exercise}}",
+    "open": "Ansehen"
+  },
+  "duel": {
+    "back": "Zurück zu den Duellen",
+    "left": "bis das Duell endet",
+    "run_details": "{{accuracy}}% · {{bpm}} BPM"
+  },
+  "result": {
+    "won": "Gewonnen!",
+    "lost": "Verloren",
+    "draw": "Unentschieden",
+    "void": "Niemand hat gespielt",
+    "vs": "vs {{name}}",
+    "elo": "ELO",
+    "was": "vorher {{rating}}",
+    "place": "Platz",
+    "place_of": "von {{total}}",
+    "unranked": "Ohne Rang",
+    "continue": "Weiter"
+  },
+  "onboarding": {
+    "0": {
+      "title": "Du gegen einen Unbekannten",
+      "body": "Ihr bekommt beide dieselbe zufällige Übung. Dein Gegner bleibt anonym, bis das Duell endet."
+    },
+    "1": {
+      "title": "48 Stunden, so viele Versuche du willst",
+      "body": "Nur dein bester Durchlauf zählt. Gespielte Übungen bewertet dein Mikrofon."
+    },
+    "2": {
+      "title": "Gewinne und dein ELO steigt",
+      "body": "ELO ist eine Zahl, die zeigt, wie stark du spielst. Alle starten bei 1000. Schlag einen Stärkeren und du bekommst mehr."
+    },
+    "next": "Weiter",
+    "start": "Los geht's",
+    "skip": "Überspringen"
+  },
+  "rules_short": {
+    "open": "So funktioniert's",
+    "first_time": "Zum ersten Mal hier?",
+    "first_time_body": "Regeln und ELO in einer Minute",
+    "steps": {
+      "0": {
+        "title": "Dieselbe Übung",
+        "body": "Du und ein anonymer Gegner bekommt dieselbe zufällige Übung."
+      },
+      "1": {
+        "title": "48 Stunden, der beste Durchlauf zählt",
+        "body": "Spiel so oft du willst. Dein bester Durchlauf ist dein Ergebnis."
+      },
+      "2": {
+        "title": "Der Bessere gewinnt ELO",
+        "body": "Ein Sieg gegen einen Stärkeren bringt mehr."
+      }
+    },
+    "more": "Mehr Details",
+    "more_list": {
+      "0": "Bis zu 3 Duelle gleichzeitig, Tickets in der Warteschlange eingerechnet.",
+      "1": "Gespielte Übungen zählen nur mit Mikrofon. Quiz: +100 für eine richtige Antwort, −100 für eine falsche.",
+      "2": "Früher fertig? Leg dein Ergebnis fest. Wenn ihr beide das tut, endet das Duell sofort.",
+      "3": "Du siehst, wie viele Versuche dein Gegner hatte, aber nie Namen oder Ergebnis, bis es endet.",
+      "4": "Gar nicht gespielt? Das ist eine Niederlage. Keiner hat gespielt? ELO bleibt gleich."
+    }
+  },
+  "elo": {
+    "title": "Was ist ELO?",
+    "your": "Dein ELO: {{rating}}",
+    "body_0": "Eine Zahl, die zeigt, wie stark du in Duellen bist. Alle starten bei {{start}}. Ein Sieg hebt sie, eine Niederlage senkt sie. Die Rangliste ordnet Spieler einfach nach ELO.",
+    "body_1": "Wie viel du bekommst, hängt vom Gegner ab. Schlägst du einen Stärkeren, bekommst du viel. Schlägst du einen Schwächeren, bekommst du wenig, und eine Niederlage gegen ihn kostet mehr.",
+    "example": "Beispiel: du hast {{rating}} ELO",
+    "col_opponent": "Gegner",
+    "col_win": "Sieg",
+    "col_draw": "Remis",
+    "col_loss": "Niederlage",
+    "strength": {
+      "stronger": "stärker",
+      "equal": "gleich",
+      "weaker": "schwächer"
+    },
+    "provisional": "Deine ersten {{count}} Duelle zählen doppelt, damit du schnell dein Niveau findest.",
+    "floor": "Du fällst nie unter {{min}}.",
+    "ladder": "In die Rangliste kommst du nach deinem ersten abgerechneten Duell.",
+    "all_rules": "Alle Regeln"
+  },
+  "rank": {
+    "gap": "{{points}} ELO bis Platz #{{place}}",
+    "peek_title": "Dein Platz",
+    "full": "Ganze Rangliste"
+  },
+  "history": {
+    "title": "Abgerechnete Duelle"
+  }
 }

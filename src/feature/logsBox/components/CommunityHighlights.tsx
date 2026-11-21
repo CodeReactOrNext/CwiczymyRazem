@@ -5,8 +5,7 @@ import { ChallengeCover } from "feature/challenges/components/ChallengeCover";
 import { useCurrentChallenge } from "feature/challenges/hooks/useChallenges";
 import type { ChallengeSong } from "feature/challenges/types/challenge.types";
 import { daysLeftInChallenge } from "feature/challenges/utils/challengeMonth";
-import { communityDocId } from "feature/communityExercises/utils/communityToExercise";
-import { SearchingDots } from "feature/duels/components/DuelQueueCard";
+import { SearchingDots } from "feature/duels/components/DuelBits";
 import { useNow } from "feature/duels/hooks/useDuels";
 import {
   fetchImprovOverview,
@@ -22,7 +21,7 @@ import {
 import { useTranslation } from "hooks/useTranslation";
 import { useDateFnsLocale } from "lib/i18n/dateLocale";
 import type { Translate } from "lib/i18n/translate";
-import { type LucideIcon, Shield, Skull, Trophy } from "lucide-react";
+import { type LucideIcon, Shield, Skull } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 
@@ -65,19 +64,6 @@ const cellText = (item: CommunityHighlight, t: Translate): CellText => {
           loser: item.loser,
         }),
         href: "/duels",
-      };
-    case "record":
-      return {
-        label: t("highlights.record_label"),
-        title: t("highlights.record_title", {
-          name: item.userName,
-          exercise: item.exerciseTitle,
-        }),
-        // An exercise a player wrote may be private — nowhere to send people.
-        href:
-          item.exerciseId && !communityDocId(item.exerciseId)
-            ? `/profile/skills?exerciseId=${item.exerciseId}`
-            : null,
       };
     case "boss":
       return {
@@ -187,15 +173,6 @@ const CellMedia = ({
             className={cn("rounded-full", !item.isDraw && "opacity-60")}
           />
         </span>
-      );
-    case "record":
-      return (
-        <PlayerTile
-          name={item.userName}
-          avatarUrl={item.avatarUrl}
-          mark={Trophy}
-          markClassName='text-amber-400'
-        />
       );
     case "boss":
       return (

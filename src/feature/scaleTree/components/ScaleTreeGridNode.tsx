@@ -17,9 +17,9 @@ interface ScaleTreeGridNodeProps {
 }
 
 const FAMILY_COLORS = {
-  pentatonic: { accent: '#fbbf24', border: 'border-amber-500/30', glow: 'rgba(251, 191, 36, 0.4)' },
-  diatonic: { accent: '#22d3ee', border: 'border-cyan-500/30', glow: 'rgba(34, 211, 238, 0.4)' },
-  mode: { accent: '#a78bfa', border: 'border-violet-500/30', glow: 'rgba(167, 139, 250, 0.4)' },
+  pentatonic: { accent: '#fbbf24', border: 'border-amber-500/30' },
+  diatonic: { accent: '#22d3ee', border: 'border-cyan-500/30' },
+  mode: { accent: '#a78bfa', border: 'border-violet-500/30' },
 };
 
 // Keyed by pentatonic box number (1–5), not by fret — the spine node shows
@@ -68,18 +68,6 @@ function regularPolygon(sides: number, rotationDeg: number, cx = 50, cy = 50, ra
   return pts.join(' ');
 }
 
-const CONSTELLATIONS: Record<string, Array<{ x: number; y: number }>> = {
-  minor_pentatonic: [{ x: -0.25, y: -0.22 }, { x: 0, y: -0.11 }, { x: -0.15, y: 0.11 }, { x: 0.25, y: 0.22 }],
-  major_pentatonic: [{ x: -0.25, y: -0.22 }, { x: -0.08, y: -0.05 }, { x: 0.12, y: 0.11 }, { x: 0.25, y: 0.22 }],
-  minor: [{ x: -0.2, y: -0.22 }, { x: -0.2, y: 0.1 }, { x: 0.2, y: -0.1 }, { x: 0.2, y: 0.22 }],
-  major: [{ x: -0.25, y: 0.22 }, { x: 0, y: -0.25 }, { x: 0.25, y: 0.22 }],
-  dorian: [{ x: 0, y: -0.25 }, { x: -0.25, y: 0 }, { x: 0.25, y: 0 }, { x: 0, y: 0.25 }],
-  phrygian: [{ x: -0.25, y: -0.25 }, { x: 0.25, y: -0.25 }, { x: 0, y: 0.25 }],
-  mixolydian: [{ x: -0.2, y: -0.2 }, { x: 0.2, y: -0.2 }, { x: 0, y: 0 }, { x: -0.2, y: 0.2 }, { x: 0.2, y: 0.2 }],
-  lydian: [{ x: -0.25, y: 0 }, { x: 0, y: -0.22 }, { x: 0.25, y: 0 }, { x: 0, y: 0.22 }],
-  locrian: [{ x: -0.25, y: -0.2 }, { x: -0.1, y: 0.2 }, { x: 0.1, y: -0.2 }, { x: 0.25, y: 0.2 }],
-};
-
 export function ScaleTreeGridNode({
   node,
   rootNote = BASE_ROOT_NOTE,
@@ -101,7 +89,6 @@ export function ScaleTreeGridNode({
   const strokeGradId = `stroke-grad-${node.id}`;
   const glossGradId = `gloss-grad-${node.id}`;
   const bevelGradId = `bevel-grad-${node.id}`;
-  const dotGradId = `dot-grad-${node.id}`;
   const shadowFilterId = `soft-shadow-${node.id}`;
 
   // Thickness of the extruded lip, in viewBox units (~4% of the node).
@@ -168,90 +155,13 @@ export function ScaleTreeGridNode({
   const req = node.data?.requiredExercises?.[0];
   const patternType = req?.patternType;
 
-  const getConstellationSvg = () => {
-    if (isSingleString || isReward || isLocked || !isSubnode) return null;
-    const type = node.data?.scaleType || 'minor_pentatonic';
-    const points = CONSTELLATIONS[type] || [];
-
-    const strokeColor = colors.accent;
-    const opacityVal = 0.25;
-
-    const verticalFretlines = [-1.5, -0.5, 0.5, 1.5].map((i) => {
-      const x = 50 + 50 * 0.25 * i;
-      return (
-        <line
-          key={`v-${i}`}
-          x1={x}
-          y1={35}
-          x2={x}
-          y2={65}
-          stroke={strokeColor}
-          strokeWidth={0.8}
-          opacity={opacityVal}
-        />
-      );
-    });
-
-    const horizontalStrings = [-1.0, 0.0, 1.0].map((i) => {
-      const y = 50 + 50 * 0.2 * i;
-      return (
-        <line
-          key={`h-${i}`}
-          x1={30}
-          y1={y}
-          x2={70}
-          y2={y}
-          stroke={strokeColor}
-          strokeWidth={0.8}
-          opacity={opacityVal}
-        />
-      );
-    });
-
-    let pathD = '';
-    if (points.length > 1) {
-      pathD = `M ${50 + 50 * points[0].x} ${50 + 50 * points[0].y}`;
-      for (let i = 1; i < points.length; i++) {
-        pathD += ` L ${50 + 50 * points[i].x} ${50 + 50 * points[i].y}`;
-      }
-    }
-
-    return (
-      <g className="pointer-events-none">
-        {verticalFretlines}
-        {horizontalStrings}
-        {pathD && (
-          <path
-            d={pathD}
-            stroke={strokeColor}
-            strokeWidth={0.8}
-            fill="none"
-            opacity={0.4}
-          />
-        )}
-        {points.map((p, idx) => (
-          <circle
-            key={`dot-${idx}`}
-            cx={50 + 50 * p.x}
-            cy={50 + 50 * p.y}
-            r={3}
-            fill={strokeColor}
-            opacity={0.7}
-          />
-        ))}
-      </g>
-    );
-  };
-
+  // One glyph per node: the pattern's contour. The faint fretboard sketch that
+  // used to sit behind it doubled every node's detail for nothing.
   const getIconContent = () => {
-    // Every icon carries the same soft cast shadow so it reads as floating a
-    // little above the node face rather than being printed onto it.
-    const iconShadow = 'drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.65)]';
-
     if (isLocked) {
       return (
         <Lock
-          className={`${isSubnode ? 'h-5 w-5' : 'h-6 w-6'} text-zinc-400 ${iconShadow}`}
+          className={`${isSubnode ? 'h-4 w-4' : 'h-5 w-5'} text-zinc-600`}
           strokeWidth={2}
         />
       );
@@ -261,7 +171,7 @@ export function ScaleTreeGridNode({
       const isClaimed = node.data?.claimed;
       return (
         <Trophy
-          className={`h-8 w-8 ${iconShadow} ${isClaimed ? 'text-emerald-400' : 'text-amber-400'}`}
+          className={`h-8 w-8 ${isClaimed ? 'text-emerald-400' : 'text-amber-400'}`}
           strokeWidth={2.2}
         />
       );
@@ -270,7 +180,7 @@ export function ScaleTreeGridNode({
     if (isSingleString) {
       return (
         <Music4
-          className={`h-9 w-9 ${iconShadow}`}
+          className="h-8 w-8"
           style={{ color: colors.accent }}
           strokeWidth={2.2}
         />
@@ -278,30 +188,21 @@ export function ScaleTreeGridNode({
     }
 
     if (isSubnode && patternType) {
-      const dotR = 6;
-      // Dots are lit from the top-left so they read as beads, not flat discs.
       const renderDots = (pts: Array<[number, number]>) =>
         pts.map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r={dotR} fill={`url(#${dotGradId})`} stroke="none" />
+          <circle key={i} cx={cx} cy={cy} r={5.5} fill={colors.accent} stroke="none" />
         ));
 
       return (
         <svg
           viewBox="0 0 100 100"
-          className={`w-11 h-11 z-10 pointer-events-none ${iconShadow}`}
+          className="w-10 h-10 z-10 pointer-events-none"
           stroke={colors.accent}
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
         >
-          <defs>
-            <radialGradient id={dotGradId} cx="34%" cy="28%" r="78%">
-              <stop offset="0%" stopColor={shade(colors.accent, -0.35)} />
-              <stop offset="45%" stopColor={colors.accent} />
-              <stop offset="100%" stopColor={shade(colors.accent, 0.4)} />
-            </radialGradient>
-          </defs>
           {patternType === 'descending' && (
             <>
               <polyline points="20,30 40,47 60,64 80,81" />
@@ -360,28 +261,14 @@ export function ScaleTreeGridNode({
     return (
       <div className="flex flex-col items-center justify-center gap-[2px] z-10 pointer-events-none select-none">
         <span
-          className="text-[22px] font-black tracking-tighter leading-none"
-          style={{
-            color: colors.accent,
-            textShadow: '0 1.5px 2px rgba(0,0,0,0.7)',
-          }}
+          className="text-[22px] font-black tracking-tighter leading-none tabular-nums"
+          style={{ color: colors.accent }}
         >
           {numeral}
         </span>
-        <div
-          className="h-[2px] w-5 rounded-full"
-          style={{
-            background: `linear-gradient(to bottom, ${shade(colors.accent, -0.25)}, ${shade(colors.accent, 0.3)})`,
-            opacity: 0.8,
-          }}
-        />
       </div>
     );
   };
-
-  const selectedGlowFilter = isSelected
-    ? `drop-shadow(0 0 6px ${colors.glow})`
-    : undefined;
 
   // Personal best above the exam tempo, kept per shape (shared across keys).
   const recordBpm = node.data?.record?.bpm as number | undefined;
@@ -408,7 +295,7 @@ export function ScaleTreeGridNode({
         <svg
           viewBox="0 0 100 100"
           className="w-full h-full absolute inset-0"
-          style={{ filter: selectedGlowFilter, overflow: 'visible' }}
+          style={{ overflow: 'visible' }}
         >
           <defs>
             <linearGradient id={fillGradId} x1="0%" y1="0%" x2="100%" y2="100%">
@@ -462,7 +349,6 @@ export function ScaleTreeGridNode({
           </defs>
 
           {getShapeSvg()}
-          {getConstellationSvg()}
         </svg>
 
         <div className="relative z-10 flex items-center justify-center">
@@ -480,17 +366,15 @@ export function ScaleTreeGridNode({
         )}
       </motion.div>
 
-      {node.data?.subtitle && (isReward || isSingleString || isSubnode) && (
+      {/* Pattern names sit once above the columns (ScaleTreeGrid), not under
+          each of the thirty-odd nodes; only the lone gate node names itself. */}
+      {(isReward || isSingleString) && (
         <span
-          className={`mt-2.5 text-[10px] font-medium transition-colors text-center max-w-[84px] truncate ${
+          className={`mt-2.5 text-[11px] font-medium transition-colors text-center ${
             isLocked ? 'text-zinc-600' : 'text-zinc-400 group-hover:text-zinc-200'
           }`}
         >
-          {isReward
-            ? t('node.reward')
-            : isSingleString
-              ? t('node.single_string')
-              : t(`patterns_short.${req.patternType}`, req.patternType)}
+          {isReward ? t('node.reward') : t('node.single_string')}
         </span>
       )}
     </div>

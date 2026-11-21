@@ -1,9 +1,11 @@
 {
   "daily_quests": {
     "title": "Dzienne zadania",
-    "claim": "Odbierz {{points}}",
-    "claimed": "Nagroda odebrana",
-    "reward_hint": "Ukończ wszystkie {{count}}, aby zdobyć",
+    "reward_hint": "Ukończ wszystkie {{total}}, aby zdobyć",
+    "time_left": "Zostało {{time}}",
+    "new_in": "Nowe zadania za {{time}}",
+    "claim_reward": "Odbierz nagrodę",
+    "all_done": "Na dziś wszystko zrobione",
     "tasks": {
       "rate_song": "Oceń utwór",
       "add_want_to_learn": "Dodaj utwór do „Chcę się nauczyć”",
@@ -213,13 +215,17 @@
     "open_spot": "Wolne miejsce",
     "open_spot_hint": "Zagraj, żeby je zająć",
     "title": "Ćwiczenie dnia",
-    "new_in": "Nowe za {{time}}",
     "none_today": "Dziś brak ćwiczenia.",
     "beat_score": "Pobij swój wynik",
     "play": "Graj",
     "board_error": "Nie udało się wczytać tablicy.",
     "prize": "Nagroda za #1",
     "wins": "#1 wygrywa",
-    "mod": "Mod: {{label}}"
+    "mod": "Mod: {{label}}",
+    "time_left": "Zostało {{time}}",
+    "your_best": "Twój najlepszy {{score}}",
+    "gap_to_first": "{{gap}} do #1",
+    "leading": "Prowadzisz",
+    "ahead_of_second": "{{gap}} przewagi nad #2"
   }
 }

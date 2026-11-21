@@ -161,7 +161,7 @@ export const HeroBanner = ({
             {!rightContent && buttonText && (
               <Button onClick={onClick} className="group/btn h-10 shrink-0 px-5">
                 {buttonText}
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-base group-hover/btn:translate-x-1" />
+                <ArrowRight className="h-4 w-4 transition-transform duration-base group-hover/btn:translate-x-1" />
               </Button>
             )}
             {children && <div className="w-full md:w-auto md:mb-1">{children}</div>}

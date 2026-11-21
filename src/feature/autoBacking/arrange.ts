@@ -674,11 +674,14 @@ export function bassNote(pitch: number, dynamics: number): TablatureNote {
   };
 }
 
+const isDiminished = (chord: Chord) =>
+  chord.quality === "dim" || chord.quality === "dim7";
 const thirdOf = (chord: Chord) =>
-  chord.quality === "min" || chord.quality === "min7" || chord.quality === "dim"
+  chord.quality === "min" || chord.quality === "min7" || isDiminished(chord)
     ? 3
     : 4;
-const fifthOf = (chord: Chord) => (chord.quality === "dim" ? 6 : 7);
+const fifthOf = (chord: Chord) =>
+  isDiminished(chord) ? 6 : chord.quality === "aug" ? 8 : 7;
 
 /** A half step into the next root — from below, or from above where the
  *  bass has no lower string. */
@@ -1011,7 +1014,7 @@ const POWER_LOW = 40;
 /** Root, fifth, octave — what a fuzzed guitar can play without turning to mud. */
 const powerVoices = (chord: Chord): number[] => {
   const root = POWER_LOW + ((((chord.root - POWER_LOW) % 12) + 12) % 12);
-  return [root, root + (chord.quality === "dim" ? 6 : 7), root + 12];
+  return [root, root + fifthOf(chord), root + 12];
 };
 
 /** A chord's notes, levelled so four voices sound no louder than three. */

@@ -2,9 +2,10 @@ import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import type { RoadPathStop } from "components/RoadPath/RoadPath";
-import { RoadPath } from "components/RoadPath/RoadPath";
+import { RoadPath, roadWaveX } from "components/RoadPath/RoadPath";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, ChevronLeft, Star } from "lucide-react";
+import type { ReactNode } from "react";
 import React from "react";
 
 import type {
@@ -73,30 +74,42 @@ const DoneBadge = () => (
 
 // ─── StageDivider ─────────────────────────────────────────────────────────────
 
-function StageDivider({ label }: { label: string }) {
+/**
+ * A sign on the road where a section starts. Solid, so the road passes behind
+ * it, and big enough to find a section while scrolling past it.
+ */
+function StageDivider({ order, label }: { order: number; label: string }) {
+  const { t } = useTranslation("journey");
   return (
-    <div className='relative z-10 flex items-center gap-3 text-zinc-600'>
-      <span className='rounded bg-zinc-900/60 px-3 py-1 text-[11px] font-bold tracking-widest text-zinc-500'>
-        {label}
-      </span>
+    <div className='flex justify-center py-3'>
+      <div className='flex flex-col items-center rounded-xl bg-zinc-800 px-6 py-2.5 text-center'>
+        <span className='text-xs font-medium tabular-nums text-zinc-400'>
+          {t("path.stage", { n: order })}
+        </span>
+        <span className='font-display text-base font-bold leading-tight text-zinc-50 md:text-lg'>
+          {label}
+        </span>
+      </div>
     </div>
   );
 }
 
 // ─── Path entries ─────────────────────────────────────────────────────────────
 
+type StageSign = { order: number; label: string };
+
 type PathEntry =
-  | { kind: "divider"; id: string; label: string }
+  | { kind: "divider"; id: string; sign: StageSign }
   | { kind: "step"; id: string; step: JourneyStepWithStatus };
 
 function buildEntries(module: JourneyModuleWithStatus): PathEntry[] {
   const entries: PathEntry[] = [];
-  module.stages.forEach((stage) => {
+  module.stages.forEach((stage, index) => {
     if (stage.label)
       entries.push({
         kind: "divider",
         id: `divider_${stage.id}`,
-        label: stage.label,
+        sign: { order: index + 1, label: stage.label },
       });
     stage.steps.forEach((step) =>
       entries.push({ kind: "step", id: step.id, step }),
@@ -109,23 +122,29 @@ function buildEntries(module: JourneyModuleWithStatus): PathEntry[] {
 
 interface JourneyPathProps {
   module: JourneyModuleWithStatus;
+  /** The step whose bubble is open under it on the road. */
+  openStepId?: string | null;
   onStepClick: (step: JourneyStepWithStatus) => void;
+  /** What opens under the tapped step; `pointerOffset` puts the bubble's pointer under it. */
+  renderBubble?: (step: JourneyStepWithStatus, pointerOffset: number) => ReactNode;
   onBack: () => void;
 }
 
 export const JourneyPath: React.FC<JourneyPathProps> = ({
   module,
+  openStepId,
   onStepClick,
+  renderBubble,
   onBack,
 }) => {
   const { t } = useTranslation("journey");
   // A stage's title rides on its first step, so the road runs through it.
-  let pendingDivider: string | null = null;
+  let pendingDivider: StageSign | null = null;
   let startPlaced = false;
   const stops: RoadPathStop[] = [];
   buildEntries(module).forEach((entry) => {
     if (entry.kind === "divider") {
-      pendingDivider = entry.label;
+      pendingDivider = entry.sign;
       return;
     }
     const { step } = entry;
@@ -133,6 +152,8 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
       step.status === "available" || step.status === "in-progress";
     const isStart = isCurrent && !startPlaced;
     if (isStart) startPlaced = true;
+    const isOpen = step.id === openStepId;
+    const index = stops.length;
     stops.push({
       id: step.id,
       tone:
@@ -140,12 +161,15 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
       icon: getStepIcon(step.stepIcon, 26),
       title: step.title,
       disabled: step.status === "locked",
-      startLabel: isStart ? t("path.start") : undefined,
+      selected: isOpen,
+      // The bubble says it now, so the tag over the start would only repeat it.
+      startLabel: isStart && !isOpen ? t("path.start") : undefined,
       badge: step.status === "completed" ? <DoneBadge /> : undefined,
       label: <StepLabel step={step} />,
       before: pendingDivider ? (
-        <StageDivider label={pendingDivider} />
+        <StageDivider {...pendingDivider} />
       ) : undefined,
+      after: isOpen && renderBubble ? renderBubble(step, roadWaveX(index)) : undefined,
       onClick: () => onStepClick(step),
     });
     pendingDivider = null;

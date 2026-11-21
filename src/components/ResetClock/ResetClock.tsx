@@ -49,7 +49,7 @@ const getServerTickSnapshot = () => null;
  * page load. Withholding it until after hydration costs one frame of placeholder
  * and removes the entire class of mismatch.
  */
-const useClientNow = (): Date | null => {
+export const useClientNow = (): Date | null => {
   const tick = useSyncExternalStore(
     subscribeToTick,
     getTickSnapshot,

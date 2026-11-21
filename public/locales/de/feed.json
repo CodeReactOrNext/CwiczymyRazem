@@ -63,6 +63,24 @@
   "ranking_hint": "Klicken, um die Rangliste dieser Übung zu sehen",
   "new_since_last_visit": "Neu seit deinem letzten Besuch",
   "show_more": "Mehr anzeigen",
+  "show_more_count": "{{count}} weitere anzeigen",
+  "practiced_item": "hat {{item}} geübt",
+  "fought_boss": "hat gegen {{item}} gekämpft",
+  "phase_cleared": "Phase {{phase}} geschafft",
+  "logged_session": "hat eine Übungssession eingetragen",
+  "reached_level": "hat Level {{level}} erreicht",
+  "stat": {
+    "points": "Punkte",
+    "time": "Zeit",
+    "score": "Score",
+    "accuracy": "Genauigkeit",
+    "tempo": "Tempo",
+    "place": "Platz",
+    "price": "Preis",
+    "rarity": "Seltenheit",
+    "level": "Level",
+    "rating": "Rating"
+  },
   "just_now": "gerade eben",
   "activity_kind": {
     "plan": "Plan",
@@ -126,8 +144,6 @@
     "days_left_other": "noch {{count}} Tage",
     "duel_won": "{{winner}} schlägt {{loser}}",
     "duel_draw": "{{winner}} und {{loser}} spielen unentschieden",
-    "record_label": "Neuer Rekord",
-    "record_title": "{{name}} holt Platz 1 bei {{exercise}}",
     "boss_label": "Bosskampf",
     "boss_title": "{{name}} schafft Phase {{phase}}: {{boss}}"
   },

@@ -576,8 +576,16 @@
       "off": "Wyłącz podkład"
     }
   },
+  "hunt": {
+    "seconds_left": "Zostało {{count}} s",
+    "solved": "Rozwiązane",
+    "time_left": "Czas do końca rundy",
+    "next": "Dalej",
+    "view": "Widok",
+    "play_notes": "Odtwarzaj dźwięki"
+  },
   "interval_click": {
-    "now_above": "Teraz {{interval}} nad tym dźwiękiem podstawowym — w jego zasięgu",
+    "now_above": "{{interval}} nad tym {{root}}",
     "click_any": "Kliknij dowolne {{note}}",
     "on_highlighted": "na podświetlonych strunach",
     "root": "Podstawa",
@@ -585,7 +593,17 @@
     "play_root": "Odtwórz dźwięk podstawowy, od którego liczony jest interwał",
     "hide_distance": "Ukryj odległość",
     "how_far": "Jak daleko?",
-    "autoplay": "Autoodtwarzanie"
+    "autoplay": "Autoodtwarzanie",
+    "step": "Krok {{step}} z 2",
+    "anywhere": "Gdziekolwiek na progach {{from}}–{{to}}",
+    "near_zone": "Blisko twojego {{root}}, w podświetlonym polu",
+    "near": "W zasięgu twojego {{root}}",
+    "solved": "{{root}} + {{interval}} = {{target}}",
+    "frets_up_one": "{{count}} próg wyżej",
+    "frets_up_few": "{{count}} progi wyżej",
+    "frets_up_many": "{{count}} progów wyżej",
+    "frets_up_other": "{{count}} progu wyżej",
+    "hear_root": "Posłuchaj podstawy"
   },
   "instructions": {
     "support_author": "Wesprzyj autora",
@@ -719,7 +737,8 @@
     "total": "Łącznie w sesji"
   },
   "click_hunt": {
-    "play_note": "Odtwórz szukany dźwięk"
+    "play_note": "Odtwórz szukany dźwięk",
+    "hear_it": "Posłuchaj"
   },
   "strum": {
     "strum": "Uderz w struny",

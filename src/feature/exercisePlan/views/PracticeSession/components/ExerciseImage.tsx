@@ -53,7 +53,7 @@ export const ExerciseImage = ({
                 variant='secondary'
                 size='sm'
                 className='pointer-events-none opacity-90 shadow-lg'>
-                <span className='mr-2'>{t("image.enlarge")}</span>
+                <span className=''>{t("image.enlarge")}</span>
                 <Maximize2 size='1em' className='h-4 w-4' />
               </Button>
             </div>

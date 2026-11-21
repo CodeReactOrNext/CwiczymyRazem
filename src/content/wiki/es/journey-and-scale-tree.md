@@ -12,11 +12,13 @@ La mayor parte de riff.quest te deja practicar lo que te apetezca. Estas dos no:
 
 <ClickPath steps="Ruta de aprendizaje" caption="Módulos hechos de etapas, etapas hechas de pasos y un examen al final de cada etapa." />
 
-Hoy hay dos módulos activos, **Fundamentals** y **Fretboard Mastery**, con ritmo, escalas e improvisación marcados como próximamente. Cada paso viene con instrucciones, una lista de comprobación y consejos.
+Hoy hay tres módulos activos, **Fundamentals**, **Fretboard Mastery** e **Interval Mastery**, con ritmo, escalas e improvisación marcados como próximamente. Cada paso viene con instrucciones, una lista de comprobación y consejos.
 
-<StepList steps="El primer paso siempre está abierto::Sin requisitos previos, en ambos módulos|Los pasos se desbloquean en orden::El siguiente paso se abre en cuanto marcas como completado el anterior|Los módulos no están bloqueados::Los dos módulos activos están abiertos desde el primer día, y solo los pasos de dentro se desbloquean en secuencia" />
+<StepList steps="El primer paso siempre está abierto::Sin requisitos previos, en cualquier módulo|Los pasos se desbloquean en orden::El siguiente paso se abre en cuanto marcas como completado el anterior|Los módulos no están bloqueados::Los tres módulos activos están abiertos desde el primer día, y solo los pasos de dentro se desbloquean en secuencia" />
 
-**Fretboard Mastery** funciona haciendo clic, no escuchando: se te muestra el nombre de una nota y haces clic donde está en el mástil, así que sus cuatro primeras etapas funcionan perfectamente sin micrófono. La última etapa, **Play!**, te hace encontrar las notas en tu guitarra, y esos exámenes escuchan. Los exámenes se puntúan por precisión:
+**Fretboard Mastery** funciona haciendo clic, no escuchando: se te muestra el nombre de una nota y haces clic donde está en el mástil, así que sus cuatro primeras etapas funcionan perfectamente sin micrófono. La última etapa, **Play!**, te hace encontrar las notas en tu guitarra, y esos exámenes escuchan.
+
+**Interval Mastery** enseña cada intervalo de tres maneras: haces clic en su forma sobre el mástil, lo reconoces de oído y lo tocas en tu guitarra. Solo esos pasos Play escuchan. Los exámenes se puntúan por precisión:
 
 <ProgressLadder items="Por debajo del 93 %::Sin estrellas, merece otro intento|93 %::Una estrella|97 %::Dos estrellas|99 % o más::Tres estrellas" highlight="99 % o más" />
 
@@ -42,6 +44,6 @@ Cada nodo muestra en qué punto estás (bloqueado, disponible, en curso o hecho)
 
 ## Preguntas que la gente hace
 
-<FaqList items="¿Necesito un micrófono?::Para los exámenes que puntúan tu forma de tocar, sí: todos los exámenes de Fundamentals y la etapa Play! de Fretboard Mastery. No te dejan saltarte el aviso, mira la detección de notas. Las etapas de Fretboard Mastery basadas en clics, Practice y las listas de comprobación funcionan sin él. El Mapa de escalas sigue el tempo que registras en cada patrón|¿Puedo saltarme un paso?::No, de eso se trata. Los pasos se abren en orden|¿Y si suspendo un examen?::No pasa nada salvo que queda sin terminar. Repítelo cuando quieras|¿Esto cuenta como práctica?::Sí, el tiempo que pases aquí se registra como cualquier otra sesión" />
+<FaqList items="¿Necesito un micrófono?::Para los exámenes que puntúan tu forma de tocar, sí: todos los exámenes de Fundamentals, la etapa Play! de Fretboard Mastery y los pasos Play de Interval Mastery. No te dejan saltarte el aviso, mira la detección de notas. Las etapas de Fretboard Mastery basadas en clics, los pasos de clic y de escucha de Interval Mastery, Practice y las listas de comprobación funcionan sin él. El Mapa de escalas sigue el tempo que registras en cada patrón|¿Puedo saltarme un paso?::No, de eso se trata. Los pasos se abren en orden|¿Y si suspendo un examen?::No pasa nada salvo que queda sin terminar. Repítelo cuando quieras|¿Esto cuenta como práctica?::Sí, el tiempo que pases aquí se registra como cualquier otra sesión" />
 
 <ReadNext links="Habilidades y logros::/wiki/skills-and-achievements|Detección de notas y configuración del micrófono::/wiki/note-detection|Mastery Roadmaps e hitos semanales::/wiki/ai-coach-and-weekly-milestones|Puntos, niveles y rachas::/wiki/how-scoring-works" />

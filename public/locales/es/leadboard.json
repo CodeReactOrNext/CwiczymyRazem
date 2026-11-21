@@ -40,7 +40,10 @@
   "rewards": {
     "title": "Recompensas de temporada",
     "place": "Puesto {{place}}: {{fame}} Fame",
-    "range": "Puestos {{from}}–{{to}}: {{max}}–{{min}} Fame"
+    "range": "Puestos {{from}}–{{to}}: {{max}}–{{min}} Fame",
+    "summary": "El top {{count}} gana Fame",
+    "show": "Recompensas",
+    "hide": "Ocultar"
   },
   "hero": {
     "season": "Temporada",
@@ -59,6 +62,9 @@
   },
   "rig": {
     "guitar_level": "Nivel de guitarra",
-    "empty_slot": "Hueco vacío {{n}}"
-  }
+    "empty_slot": "Hueco vacío {{n}}",
+    "title": "Rig"
+  },
+  "player_level": "Nivel del jugador",
+  "player": "Jugador"
 }

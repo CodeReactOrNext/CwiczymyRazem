@@ -16,16 +16,32 @@
     },
     "close": "Zamknij",
     "step": "Krok {{n}}",
-    "goal": "Cel",
-    "complete_tasks": "Wykonaj wszystkie obowiązkowe zadania poniżej, zaznaczając pola, żeby przejść do następnego etapu.",
-    "your_tasks": "Twoje zadania",
     "choose_target": "Wybierz cel",
     "saving": "Zapisywanie...",
     "done_complete": "Gotowe — ukończ",
-    "unlock_hint": "Przeczytaj treść i zaznacz wszystkie pola powyżej, żeby to odblokować",
     "practice": "Ćwicz",
     "retake": "Powtórz",
     "exam": "Egzamin"
+  },
+  "lesson": {
+    "next": "Dalej",
+    "back": "Wstecz",
+    "how_to_pass": "Jak zaliczyć",
+    "before_you_start": "Zanim zaczniesz",
+    "tick_all": "Zaznacz wszystko, co się zgadza, żeby ukończyć ten krok.",
+    "tick_more_one": "Zaznacz jeszcze 1",
+    "tick_more_few": "Zaznacz jeszcze {{count}}",
+    "tick_more_many": "Zaznacz jeszcze {{count}}",
+    "tick_more_other": "Zaznacz jeszcze {{count}}",
+    "pick_song": "Wybierz utwór, żeby ukończyć",
+    "open_one": "Zacznij lekcję · 1 strona",
+    "open_few": "Zacznij lekcję · {{count}} strony",
+    "open_many": "Zacznij lekcję · {{count}} stron",
+    "open_other": "Zacznij lekcję · {{count}} strony",
+    "read_again_one": "Przeczytaj lekcję · 1 strona",
+    "read_again_few": "Przeczytaj lekcję · {{count}} strony",
+    "read_again_many": "Przeczytaj lekcję · {{count}} stron",
+    "read_again_other": "Przeczytaj lekcję · {{count}} strony"
   },
   "finish": {
     "in_arsenal": "W twoim Arsenale, z numerem seryjnym, którego nie ma nikt inny.",
@@ -39,7 +55,8 @@
   },
   "path": {
     "modules": "Moduły",
-    "start": "Start"
+    "start": "Start",
+    "stage": "Sekcja {{n}}"
   },
   "modules": {
     "title": "Ścieżka nauki",

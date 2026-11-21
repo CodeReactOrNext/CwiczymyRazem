@@ -322,18 +322,11 @@ export const toDuelFeedEntry = (duel: DuelDoc): DuelFeedEntry | null => {
 };
 
 /**
- * The feed as one player sees it: other people's decided duels. Their own
- * already sit in their recent list, and a duel nobody played says nothing.
+ * The feed everyone sees: decided duels, the viewer's own among them. A duel
+ * nobody played says nothing, so it stays out.
  */
-export const feedForViewer = (
-  entries: DuelFeedEntry[],
-  viewerId: string,
-): DuelFeedEntry[] =>
-  entries.filter(
-    (entry) =>
-      entry.kind !== "void" &&
-      entry.players.every((player) => player.userId !== viewerId),
-  );
+export const decidedFeed = (entries: DuelFeedEntry[]): DuelFeedEntry[] =>
+  entries.filter((entry) => entry.kind !== "void");
 
 /** Whether a run sent at `now` still lands on the duel. */
 export const isDuelOpenForRuns = (

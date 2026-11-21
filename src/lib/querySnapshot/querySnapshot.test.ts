@@ -21,6 +21,7 @@ describe("querySnapshot", () => {
     expect(isPersistedQueryKey(["arsenal", "inventory"])).toBe(true);
     expect(isPersistedQueryKey(["arsenal", "user", "uid-1"])).toBe(false);
     expect(isPersistedQueryKey(["user-songs", "uid-1"])).toBe(false);
+    expect(isPersistedQueryKey(["last-known", "song-tier", "uid-1"])).toBe(true);
   });
 
   it("restores saved data with its original fetch time, so it refetches", () => {

@@ -42,7 +42,7 @@ export const MigrationCenter = ({
             disabled={isMigrating}
             className='h-10 bg-orange-600 hover:bg-orange-500 shadow-lg shadow-orange-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white'
           >
-            <RefreshCw className={cn("mr-2 h-3.5 w-3.5", isMigrating && "animate-spin")} />
+            <RefreshCw className={cn("h-3.5 w-3.5", isMigrating && "animate-spin")} />
             {isMigrating ? "Migrating..." : "Run Migration"}
           </Button>
         </div>

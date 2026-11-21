@@ -1,4 +1,3 @@
-import { Chip } from 'assets/components/ui/chip';
 import { cn } from 'assets/lib/utils';
 import { SCALE_TREE_KEYS, transposeFret } from 'feature/scaleTree/data/scaleTreeKeys';
 import { SCALE_TREE_POSITIONS, usesBoxNames } from 'feature/scaleTree/data/scaleTreeNodes';
@@ -181,10 +180,7 @@ export function ScaleTreeGrid({
       className="relative flex-1 flex flex-col h-full bg-zinc-950 overflow-hidden p-3 sm:p-6 pt-14 sm:pt-6 select-none"
     >
       <div className="mb-4 flex flex-col sm:mb-6">
-        <span className={`text-xs font-semibold tracking-wide ${accentText}`}>
-          {t(`families.${family}.tree`, family)}
-        </span>
-        <div className="mt-1.5 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-baseline gap-3">
           <h1 className="font-display text-xl font-bold text-zinc-100 sm:text-2xl">
             {t('grid.title', {
               root: rootNote,
@@ -192,32 +188,30 @@ export function ScaleTreeGrid({
             })}
           </h1>
           {scaleNodes.length > 0 && (
-            <Chip color='gray' className='py-1 text-[11px]'>
-              <span className={`font-semibold tabular-nums ${accentText}`}>
-                {completedCount}/{scaleNodes.length}
-              </span>
-              {t('grid.done')}
-            </Chip>
+            <span className="text-sm font-semibold tabular-nums text-zinc-500">
+              <span className={accentText}>{completedCount}</span>/{scaleNodes.length}
+            </span>
           )}
         </div>
 
         {/* Key picker — the tree itself never changes, only the fret its shapes
-            sit on and the notes under your fingers. */}
-        <div className="mt-4 flex items-center gap-3">
+            sit on and the notes under your fingers. Only the chosen key has a
+            face; the rest are plain letters. */}
+        <div className="mt-3 flex items-center gap-3">
           <span className="hidden shrink-0 text-xs font-semibold text-zinc-500 sm:block">
             {t('grid.key')}
           </span>
-          <div className="flex gap-1.5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent">
+          <div className="flex gap-0.5 overflow-x-auto [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent">
             {SCALE_TREE_KEYS.map((key) => (
               <button
                 key={key}
                 onClick={() => onSelectRootNote(key)}
                 aria-pressed={key === rootNote}
                 className={cn(
-                  'shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold tabular-nums transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+                  'h-8 min-w-8 shrink-0 rounded-lg px-2 text-xs font-semibold tabular-nums transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
                   key === rootNote
-                    ? 'bg-zinc-800/70 text-zinc-100'
-                    : 'bg-zinc-900/40 text-zinc-500 hover:bg-zinc-800/40 hover:text-zinc-300'
+                    ? 'bg-zinc-800 text-zinc-100'
+                    : 'text-zinc-500 hover:bg-zinc-900/60 hover:text-zinc-300'
                 )}
               >
                 {key}
@@ -247,14 +241,12 @@ export function ScaleTreeGrid({
               x2={line.x2}
               y2={line.y2}
               stroke={line.isActive ? accentColor : '#1f1f24'}
-              strokeWidth={line.isActive ? 2 : 1.2}
+              strokeOpacity={line.isActive ? 0.6 : 1}
+              strokeWidth={line.isActive ? 1.5 : 1.2}
               strokeDasharray={line.isDashed ? '4,4' : undefined}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
-              style={{
-                filter: line.isActive ? `drop-shadow(0 0 4px ${accentColor}dd)` : 'none',
-              }}
             />
           ))}
         </svg>
@@ -277,6 +269,34 @@ export function ScaleTreeGrid({
           )}
 
           <div className="w-full max-w-5xl flex flex-col gap-3 sm:gap-6">
+            {/* Every row runs the same patterns in the same order, so they are
+                named once here instead of under each node. Same widths and
+                padding as the rows below, so each name sits over its column. */}
+            {positions.length > 0 && (
+              <div className="flex items-end w-full gap-2 sm:gap-6">
+                <div className="w-10 sm:w-16 flex-shrink-0" />
+                <div className="flex-1 flex justify-between items-end px-1.5 sm:px-3 gap-1 sm:gap-2">
+                  {getPositionNodes(positions[0]).map((node) => {
+                    const pattern = node.data?.requiredExercises?.[0]?.patternType;
+                    return (
+                      <span
+                        key={node.id}
+                        className={cn(
+                          'flex-shrink-0 text-center text-[11px] font-medium leading-tight text-zinc-500',
+                          node.id.endsWith('_asc')
+                            ? 'w-[62px] sm:w-[82px]'
+                            : 'w-[52px] sm:w-[68px]'
+                        )}
+                      >
+                        {pattern ? t(`patterns_short.${pattern}`, pattern) : null}
+                      </span>
+                    );
+                  })}
+                </div>
+                <div className="w-[64px] sm:w-[92px] flex-shrink-0" />
+              </div>
+            )}
+
             {positions.map((pos, idx) => {
               const posNodes = getPositionNodes(pos);
               // Node IDs stay keyed to the C fret; only the label follows the key.
@@ -303,7 +323,7 @@ export function ScaleTreeGrid({
                     )}
                   </div>
 
-                  <div className="flex-1 flex justify-between items-center bg-black/15 rounded-lg p-1.5 sm:p-3 gap-1 sm:gap-2">
+                  <div className="flex-1 flex justify-between items-center p-1.5 sm:p-3 gap-1 sm:gap-2">
                     {posNodes.map((node) => (
                       <div key={node.id} id={`node-slot-${node.id}`} className="flex-shrink-0">
                         <ScaleTreeGridNode

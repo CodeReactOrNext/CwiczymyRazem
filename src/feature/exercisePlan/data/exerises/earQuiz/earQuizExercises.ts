@@ -518,6 +518,152 @@ export const earTuningIntervalsExercise: Exercise = {
   },
 };
 
+// ── 7. Interval families ─────────────────────────────────────────────────────
+// One small pool each, in the order the Interval Mastery learning path teaches
+// them (feature/journey/data/intervalsJourney). Two minutes rather than one: an
+// exam on a quiz needs ten answers before its hit rate counts.
+
+const INTERVAL_FAMILY_DEFAULTS = {
+  ...EAR_QUIZ_DEFAULTS,
+  addedAt: "2026-11-19",
+  timeInMinutes: 2,
+} satisfies Partial<Exercise>;
+
+export const earIntervalSecondsExercise: Exercise = {
+  ...INTERVAL_FAMILY_DEFAULTS,
+  id: "ear_interval_seconds",
+  title: "Intervals by Ear — Half Step or Whole Step",
+  description:
+    "Two notes going up, one fret or two apart. Decide which: minor 2nd or major 2nd.",
+  whyItMatters:
+    "Half step or whole step is the question behind every scale and every bend. Hearing which one just went past is how you know whether a bend reached its note and which scale a melody is walking through.",
+  difficulty: "easy",
+  instructions: [
+    "Press Play — two notes sound, the second a little higher than the first.",
+    "Pick Minor 2nd (one fret) or Major 2nd (two frets). The starting note changes every round.",
+    "After you answer, tap both tiles to hear the two steps from the same starting note.",
+  ],
+  tips: [
+    "The minor 2nd is cramped and tense, like the two notes of a shark theme.",
+    "The major 2nd is relaxed: the first two notes of a major scale.",
+    "Sing the two notes. If your voice barely has to move, it is the half step.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "music_theory"],
+  earQuizConfig: {
+    mode: "interval",
+    intervals: ["m2", "M2"],
+    directions: ["ascending"],
+  },
+};
+
+export const earIntervalThirdsExercise: Exercise = {
+  ...INTERVAL_FAMILY_DEFAULTS,
+  id: "ear_interval_thirds",
+  title: "Intervals by Ear — Minor or Major 3rd",
+  description:
+    "Two notes going up, three frets or four apart. One fret decides the mood: minor 3rd or major 3rd.",
+  whyItMatters:
+    "A chord is major or minor because of this one interval. Hear it between two bare notes and you'll hear it inside every chord, riff and solo built on top of it.",
+  difficulty: "easy",
+  instructions: [
+    "Press Play — two notes sound, the second higher than the first.",
+    "Pick Minor 3rd or Major 3rd. Listen to the mood of the pair, not to how high it is.",
+    "After you answer, tap both tiles back to back from the same starting note.",
+  ],
+  tips: [
+    "The minor 3rd is the darker one: the first move of a minor pentatonic riff.",
+    "The major 3rd is open and bright: the first two notes of a major chord played one at a time.",
+    "'Play them together' turns the pair into a tiny chord, and the mood gets easier to hear.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "music_theory"],
+  earQuizConfig: {
+    mode: "interval",
+    intervals: ["m3", "M3"],
+    directions: ["ascending"],
+  },
+};
+
+export const earIntervalPillarsExercise: Exercise = {
+  ...INTERVAL_FAMILY_DEFAULTS,
+  id: "ear_interval_pillars",
+  title: "Intervals by Ear — 4th, Tritone, 5th, Octave",
+  description:
+    "The middle of the octave and its top: perfect 4th, tritone, perfect 5th and the octave, going up.",
+  whyItMatters:
+    "The 4th, the 5th and the octave are the stable sounds everything else leans on, and the tritone is the restless one wedged between them. Telling them apart is how you hear bass lines, power chords and where a riff is heading.",
+  difficulty: "medium",
+  instructions: [
+    "Press Play — two notes sound, the second higher than the first.",
+    "Pick the interval: perfect 4th, tritone, perfect 5th or octave.",
+    "Stuck between two? 'Play them together' shows how well the notes blend: the tritone is the only one that doesn't.",
+  ],
+  tips: [
+    "The octave is the same note again, higher. Nothing new is added.",
+    "The 5th is a power chord one note at a time; the 4th is the same sound heard from its top note.",
+    "The tritone refuses to sit still. If the pair makes you want a third note, that is the one.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "music_theory"],
+  earQuizConfig: {
+    mode: "interval",
+    intervals: ["P4", "TT", "P5", "P8"],
+    directions: ["ascending", "descending"],
+  },
+};
+
+export const earIntervalSixthsSeventhsExercise: Exercise = {
+  ...INTERVAL_FAMILY_DEFAULTS,
+  id: "ear_interval_sixths_sevenths",
+  title: "Intervals by Ear — Sixths and Sevenths",
+  description:
+    "The wide leaps just under the octave: minor and major 6th, minor and major 7th, going up.",
+  whyItMatters:
+    "Wide leaps are what make a melody memorable, and the 7ths are what turn a triad into a 7th chord. Hearing them cleanly is the difference between transcribing a line and guessing at it.",
+  difficulty: "hard",
+  instructions: [
+    "Press Play — two notes sound, a wide leap apart.",
+    "First decide 6th or 7th: a 6th is sweet, a 7th strains toward the octave. Then choose minor or major.",
+    "After you answer, tap the neighbouring tiles to hear how one fret changes the leap.",
+  ],
+  tips: [
+    "Sing the top note up to the octave. One fret away is a major 7th, two is a minor 7th.",
+    "The minor 7th is the bluesy one; the major 7th is sharper and almost painful when bare.",
+    "The major 6th sounds like the start of a sing-along; the minor 6th is the sadder version of it.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "music_theory"],
+  earQuizConfig: {
+    mode: "interval",
+    intervals: ["m6", "M6", "m7", "M7"],
+    directions: ["ascending", "descending"],
+  },
+};
+
+export const earIntervalBlendExercise: Exercise = {
+  ...INTERVAL_FAMILY_DEFAULTS,
+  id: "ear_interval_blend",
+  title: "Intervals by Ear — Smooth or Rough",
+  description:
+    "Two notes struck at once, five very different colours: minor 2nd, major 3rd, tritone, perfect 5th and octave.",
+  whyItMatters:
+    "Played together, intervals stop being distances and become textures: hollow, sweet, grinding. That texture is what you hear in a power chord, a double stop or two guitars in harmony, and it is why some shapes survive distortion and others turn to mud.",
+  difficulty: "medium",
+  instructions: [
+    "Press Play — two notes ring together.",
+    "Listen to the texture before the distance: do the notes melt into one, sit side by side, or fight?",
+    "'One note at a time' pulls the pair apart if you need to hear the leap.",
+  ],
+  tips: [
+    "Octave: one sound, just fuller. Perfect 5th: hollow and strong.",
+    "Major 3rd: sweet, with a slow shimmer in it.",
+    "Tritone: restless. Minor 2nd: the two notes grind against each other.",
+  ],
+  relatedSkills: ["ear_training", "harmony-ear", "harmony"],
+  earQuizConfig: {
+    mode: "interval",
+    intervals: ["m2", "M3", "TT", "P5", "P8"],
+    directions: ["harmonic"],
+  },
+};
+
 export const earQuizExercises: Exercise[] = [
   earChordQualityBasicsExercise,
   earChordQualityAdvancedExercise,
@@ -536,4 +682,9 @@ export const earQuizExercises: Exercise[] = [
   earIntervalThreeSizesExercise,
   earTuningWideMissesExercise,
   earTuningIntervalsExercise,
+  earIntervalSecondsExercise,
+  earIntervalThirdsExercise,
+  earIntervalPillarsExercise,
+  earIntervalSixthsSeventhsExercise,
+  earIntervalBlendExercise,
 ];

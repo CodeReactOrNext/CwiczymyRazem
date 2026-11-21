@@ -1,31 +1,32 @@
 import { cn } from "assets/lib/utils";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
-import { AlertTriangle, Plug, Zap } from "lucide-react";
+import { AlertTriangle, Cable, Check, Plug, Zap } from "lucide-react";
 
 import type { PowerState } from "../../data/powerSupply";
 import type { SupplyTier } from "../../data/rigHardware";
-import { type ChainVerdict } from "../../data/signalChain";
+import { CHAIN_TIERS, type ChainVerdict } from "../../data/signalChain";
 import { CountUp, Pop } from "../Workshop/workshopMotion";
-import { RIG_BUTTON, RIG_BUTTON_FIX } from "./RigSection";
+import {
+  RIG_BUTTON,
+  RIG_BUTTON_FIX,
+  StatusTile,
+  type StatusTone,
+} from "./RigSection";
 
 /**
- * The two readouts over the board, side by side on one line each: what the
- * wiring is worth and whether the brick has a hole left.
+ * The readouts over the board, as a row of tiles cut to one pattern: what the
+ * wiring is worth, whether the brick has a hole left, and — passed in as a
+ * child, only while there is one — what duplicates cost.
  *
  * Both read the *live* board rather than the saved one, so the verdict and the
  * numbers move under the player's hand while a pedal is still being dragged.
  * That immediacy is the whole strip: a number climbing as the pedal lands
  * teaches the rule faster than a paragraph would.
  *
- * Each panel is a headline and, on the right, the one detail worth acting on —
- * in colour only when it is a problem — followed by the button that fixes it,
- * when there is something to fix. No lamp beside the headline: it only
- * repeated, as a dot, the colour of the warning on the same line. The Lamp
- * stays exported for the strips that have no warning text to lean on.
- *
- * The complaint and its cure sit side by side, so the
- * something to fix. The complaint and its cure sit side by side, so the
- * heading above the board is left with the actions that are nobody's fault.
+ * Each tile says its verdict in words and carries the button that fixes it
+ * when there is something to fix; what the verdict means is on its tooltip. The complaint and
+ * its cure sit together, so the heading above the board is left with the
+ * actions that are nobody's fault.
  */
 
 /** Lamp colours: the same four the cables and the verdict already use. */
@@ -46,26 +47,13 @@ export const Lamp = ({ tone }: { tone: keyof typeof LAMP }) => (
   />
 );
 
-interface PanelProps {
-  label: string;
-  children: React.ReactNode;
-  /** The right-hand detail. */
-  aside?: React.ReactNode;
-}
-
-const Panel = ({ label, children, aside }: PanelProps) => (
-  <div className='flex min-h-[3.25rem] flex-wrap items-center gap-x-5 gap-y-2 rounded-lg bg-arsenal-section px-5 py-3'>
-    <span className='text-sm font-semibold text-arsenal-text-primary'>
-      {label}
-    </span>
-    <div className='flex items-center gap-2.5'>{children}</div>
-    {aside && (
-      <div className='ml-auto flex flex-wrap items-center gap-3 text-xs'>
-        {aside}
-      </div>
-    )}
-  </div>
-);
+/** A chain tier's tone, as the tile it is drawn on names it. */
+const CHAIN_TILE_TONE: Record<keyof typeof LAMP, StatusTone> = {
+  good: "good",
+  warn: "fix",
+  bad: "fix",
+  idle: "idle",
+};
 
 interface FixButtonProps {
   icon: React.ReactNode;
@@ -95,6 +83,8 @@ interface BoardStatusStripProps {
   onWireUp: (() => void) | null;
   /** Fills the brick's free outputs; `null` when it would do nothing. */
   onPatch: (() => void) | null;
+  /** More tiles for the same row — the duplicates one. */
+  children?: React.ReactNode;
 }
 
 export const BoardStatusStrip = ({
@@ -104,91 +94,116 @@ export const BoardStatusStrip = ({
   unpowered,
   onWireUp,
   onPatch,
+  children,
 }: BoardStatusStripProps) => {
   const cables = verdict.links.length;
   const labels = useArsenalLabels();
   const { t } = labels;
   const tierLabel = labels.chainTierLabel(verdict.tier);
+  const chainTone = CHAIN_TILE_TONE[CHAIN_TIERS[verdict.tier].tone];
+
+  const powerTone: StatusTone =
+    unpowered.length > 0
+      ? "fix"
+      : power.outputsUsed === 0
+        ? "idle"
+        : "good";
 
   return (
-    <div className='grid grid-cols-1 gap-3 lg:grid-cols-2'>
-      <Panel
+    <div className='grid grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fit,minmax(18rem,1fr))]'>
+      <StatusTile
         label={t("signal.path")}
-        aside={
-          <>
-            {cables === 0 ? (
-              <span className='text-arsenal-text-tertiary'>{labels.chainTierNote(verdict.tier)}</span>
-            ) : verdict.wrongLinks > 0 ? (
-              // One sentence, not a tally beside a warning: how many are wrong
-              // is the only half of the count anybody acts on.
-              <span className='flex items-center gap-1.5 font-semibold tabular-nums text-amber-400'>
-                <AlertTriangle size={13} strokeWidth={2.5} />
-                {t("signal.backwards", { wrong: verdict.wrongLinks, cables })}
-              </span>
-            ) : (
-              <span className='tabular-nums text-arsenal-text-tertiary'>
-                {t("signal.all_in_order", { count: cables })}
-              </span>
-            )}
-            {onWireUp && (
-              <FixButton
-                icon={<Zap size={12} strokeWidth={2.5} />}
-                label={t("signal.wire_it_up")}
-                title={t("signal.wire_it_up_hint")}
-                onClick={onWireUp}
-              />
-            )}
-          </>
-        }>
-        <Pop trigger={tierLabel}>
-          <span className='text-sm font-semibold capitalize text-arsenal-text-primary'>
-            {tierLabel}
+        side={
+          <span className='text-amber-300'>
+            <CountUp value={verdict.rate} decimals={1} prefix='+' />
+            <span className='text-xs text-amber-500/70'> /h</span>
           </span>
-        </Pop>
-        <span className='flex items-baseline gap-0.5 text-sm font-bold tabular-nums text-amber-300'>
-          <CountUp value={verdict.rate} decimals={1} prefix='+' />
-          <span className='text-xs font-semibold text-amber-500/70'>/h</span>
-        </span>
-      </Panel>
+        }
+        tone={chainTone}
+        icon={
+          chainTone === "good" ? (
+            <Check size={18} strokeWidth={3} />
+          ) : chainTone === "fix" ? (
+            <AlertTriangle size={18} strokeWidth={2.2} />
+          ) : (
+            <Cable size={18} strokeWidth={2} />
+          )
+        }
+        title={
+          <Pop trigger={tierLabel}>
+            <span
+              className='capitalize'
+              title={
+                verdict.wrongLinks > 0
+                  ? `${t("signal.backwards", { wrong: verdict.wrongLinks, cables })}. ${labels.chainTierNote(verdict.tier)}`
+                  : labels.chainTierNote(verdict.tier)
+              }>
+              {tierLabel}
+            </span>
+          </Pop>
+        }
+        action={
+          onWireUp && (
+            <FixButton
+              icon={<Zap size={15} strokeWidth={2.5} />}
+              label={t("signal.wire_it_up")}
+              title={t("signal.wire_it_up_hint")}
+              onClick={onWireUp}
+            />
+          )
+        }
+      />
 
-      <Panel
+      <StatusTile
         label={t("power.label")}
-        aside={
-          <>
-            {unpowered.length > 0 ? (
-              // A pedal's full name is long enough to push the fix off the
-              // line, so a crowd is counted and the names go on the tooltip.
-              <span
-                title={unpowered.join("\n")}
-                className='flex items-center gap-1.5 font-semibold text-red-400'>
-                <AlertTriangle size={13} strokeWidth={2.5} />
-                {unpowered.length === 1
-                  ? t("power.one_unpowered", { name: unpowered[0] })
-                  : t("power.many_unpowered", { count: unpowered.length })}
-              </span>
-            ) : (
-              <span className='text-arsenal-text-tertiary'>
-                {power.outputsUsed === 0
-                  ? t("power.nothing_plugged")
-                  : t("power.all_running")}
-              </span>
-            )}
-            {onPatch && (
-              <FixButton
-                icon={<Plug size={12} strokeWidth={2.5} />}
-                label={t("power.patch")}
-                title={t("power.patch_hint")}
-                onClick={onPatch}
-              />
-            )}
-          </>
-        }>
-        <span
-          title={supply.name}
-          className='text-sm font-semibold tabular-nums text-arsenal-text-primary'>
-          {t("power.outputs", { used: power.outputsUsed, total: supply.outputs })}
-        </span>
-      </Panel>
+        side={
+          <span title={supply.name}>
+            {t("power.outputs", {
+              used: power.outputsUsed,
+              total: supply.outputs,
+            })}
+          </span>
+        }
+        tone={powerTone}
+        icon={
+          powerTone === "good" ? (
+            <Check size={18} strokeWidth={3} />
+          ) : powerTone === "fix" ? (
+            <AlertTriangle size={18} strokeWidth={2.2} />
+          ) : (
+            <Plug size={18} strokeWidth={2} />
+          )
+        }
+        title={
+          unpowered.length > 0 ? (
+            // A crowd is counted, and the names go on the tooltip: a row of
+            // full pedal names is longer than the tile. So does what a dead
+            // pedal costs — it is off the board as far as the game goes.
+            <span
+              title={`${unpowered.join("\n")}\n\n${t("power.dead_pedal_note")}`}>
+              {unpowered.length === 1
+                ? t("power.one_unpowered", { name: unpowered[0] })
+                : t("power.many_unpowered", { count: unpowered.length })}
+            </span>
+          ) : power.outputsUsed === 0 ? (
+            t("power.nothing_plugged")
+          ) : (
+            t("power.all_running")
+          )
+        }
+        action={
+          onPatch && (
+            <FixButton
+              icon={<Plug size={15} strokeWidth={2.5} />}
+              label={t("power.patch")}
+              title={t("power.patch_hint")}
+              onClick={onPatch}
+            />
+          )
+        }
+      />
+
+      {children}
     </div>
   );
 };

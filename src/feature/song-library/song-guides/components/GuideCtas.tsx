@@ -101,7 +101,7 @@ export const GuideInlineCta = ({ guide, coverUrl }: GuideCtaProps) => {
           <Link href='/signup'>
             <Button className='h-9 rounded-lg bg-cyan-500 px-5 text-sm font-bold text-black transition-colors hover:bg-cyan-400'>
               Start free
-              <ArrowRight className='ml-1.5 h-4 w-4' />
+              <ArrowRight className='h-4 w-4' />
             </Button>
           </Link>
         </div>
@@ -144,7 +144,7 @@ export const GuideFinalCta = ({ guide, coverUrl }: GuideCtaProps) => {
           <Link href='/signup'>
             <Button className='h-12 rounded-lg bg-cyan-500 px-8 text-base font-bold text-black transition-colors hover:bg-cyan-400'>
               Start tracking this song free
-              <ArrowRight className='ml-2 h-5 w-5' />
+              <ArrowRight className='h-5 w-5' />
             </Button>
           </Link>
           <span className='text-xs text-zinc-500'>

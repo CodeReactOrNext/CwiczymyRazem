@@ -1,5 +1,7 @@
 import type { IntervalDefinition } from "feature/exercisePlan/intervals/intervalDefinitions";
 import { intervalsByIds, noteAtInterval } from "feature/exercisePlan/intervals/intervalDefinitions";
+import type { FretWindow } from "feature/exercisePlan/intervals/intervalWindows";
+import { pickIntervalWindow } from "feature/exercisePlan/intervals/intervalWindows";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { NOTES } from "utils/audio/noteUtils";
 
@@ -16,6 +18,12 @@ export interface IntervalClickConfig {
   difficulty: Exercise["difficulty"];
   timeInMinutes: number;
   region: { startFret: number; endFret: number };
+  /**
+   * Confines every round to a fresh window this many frets wide, drawn inside
+   * `region` so it holds both the root and the answer within a hand's reach.
+   * Omitted = the whole of `region` every round.
+   */
+  windowFrets?: number;
   /** Strings in play (1 = high e … 6 = low E). Omitted = all six. */
   strings?: number[];
   /** Interval ids from intervalDefinitions, e.g. ["m3", "M3", "P5"]. */
@@ -32,18 +40,39 @@ interface IntervalPrompt {
   interval: IntervalDefinition;
   /** The note the interval lands on — the answer, never shown until it's found. */
   target: string;
+  /** The frets this round is played in. */
+  region: FretWindow;
 }
 
 const pick = <T,>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
-function rollPrompt(roots: string[], intervals: IntervalDefinition[], exclude?: string): IntervalPrompt {
-  let next: IntervalPrompt;
+/** The whole configured region, or a fresh narrow window inside it that fits the round. */
+function rollRegion(
+  { region, windowFrets, strings }: Pick<IntervalClickConfig, "region" | "windowFrets" | "strings">,
+  root: string,
+  target: string,
+  previous?: FretWindow,
+): FretWindow {
+  if (!windowFrets) return region;
+  const window = pickIntervalWindow(root, target, windowFrets, strings, previous);
+  // Windows are drawn across frets 0–12; keep only ones inside the drill's own region.
+  return window.startFret >= region.startFret && window.endFret <= region.endFret ? window : region;
+}
+
+function rollPrompt(
+  config: Pick<IntervalClickConfig, "region" | "windowFrets" | "strings">,
+  roots: string[],
+  intervals: IntervalDefinition[],
+  previous?: IntervalPrompt,
+): IntervalPrompt {
+  let root: string;
+  let interval: IntervalDefinition;
   do {
-    const root = pick(roots);
-    const interval = pick(intervals);
-    next = { root, interval, target: noteAtInterval(root, interval.semitones) };
-  } while (roots.length * intervals.length > 1 && `${next.root}-${next.interval.id}` === exclude);
-  return next;
+    root = pick(roots);
+    interval = pick(intervals);
+  } while (roots.length * intervals.length > 1 && `${root}-${interval.id}` === `${previous?.root}-${previous?.interval.id}`);
+  const target = noteAtInterval(root, interval.semitones);
+  return { root, interval, target, region: rollRegion(config, root, target, previous?.region) };
 }
 
 /**
@@ -62,7 +91,7 @@ export function createIntervalClickExercise(config: IntervalClickConfig): Exerci
 
   // Module-level per exercise: the prompt has to survive re-renders and stay put
   // between rotations, exactly like the other rotating hunts.
-  let current = rollPrompt(roots, intervals);
+  let current = rollPrompt(config, roots, intervals);
 
   const promptFor = (prompt: IntervalPrompt) => ({
     title: prompt.root,
@@ -88,11 +117,11 @@ export function createIntervalClickExercise(config: IntervalClickConfig): Exerci
     customGoal: current.target,
     customGoalPrompt: promptFor(current),
     customGoalDescription: "Click one root, then the interval measured from that spot",
-    customGoalRegion: config.region,
+    customGoalRegion: current.region,
     customGoalStrings: config.strings,
     rollHuntTarget: () => {
-      current = rollPrompt(roots, intervals, `${current.root}-${current.interval.id}`);
-      return { goal: current.target, prompt: promptFor(current), region: config.region };
+      current = rollPrompt(config, roots, intervals, current);
+      return { goal: current.target, prompt: promptFor(current), region: current.region };
     },
     noteHuntConfig: { rotateSeconds: config.rotateSeconds, mode: "intervalClick" },
   };

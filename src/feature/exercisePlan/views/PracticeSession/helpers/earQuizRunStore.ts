@@ -1,3 +1,4 @@
+import type { EarQuizMode } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
 import { create } from "zustand";
 
 interface EarQuizRunState {
@@ -25,6 +26,28 @@ export const useEarQuizRunStore = create<EarQuizRunState>()((set) => ({
     })),
   reset: () => set({ correct: 0, answered: 0 }),
 }));
+
+/**
+ * How many answers an exam run has to give before its hit rate stands by
+ * itself. Tuning a note by ear takes several times longer than naming one, so
+ * the slider quiz asks for fewer.
+ */
+export const EAR_QUIZ_EXAM_MIN_ANSWERS = 10;
+export const EAR_QUIZ_EXAM_MIN_TUNINGS = 3;
+
+export const earQuizExamMinAnswers = (mode: EarQuizMode): number =>
+  mode === "detune" ? EAR_QUIZ_EXAM_MIN_TUNINGS : EAR_QUIZ_EXAM_MIN_ANSWERS;
+
+/**
+ * A quiz run as an exam accuracy (0–100): right answers over answers given.
+ * A run shorter than `minAnswers` is graded as if the missing answers were
+ * wrong, so one lucky answer and a minute of waiting is not a 100% exam.
+ */
+export const earQuizExamAccuracy = (
+  correct: number,
+  answered: number,
+  minAnswers: number = EAR_QUIZ_EXAM_MIN_ANSWERS,
+): number => Math.round((correct / Math.max(answered, minAnswers, 1)) * 100);
 
 /** Points per right answer, and taken off per wrong one — guessing fast must not pay. */
 export const EAR_QUIZ_POINTS = 100;

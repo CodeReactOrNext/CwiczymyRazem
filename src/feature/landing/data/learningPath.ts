@@ -55,7 +55,8 @@ export const LEARNING_PATH_MODULE_COPY: Record<
   {
     forWho: string;
     outcome: string;
-    image: { src: string; alt: string; width: number; height: number };
+    /** Screenshot of one of the module's lessons; a module without one yet shows only its profile. */
+    image?: { src: string; alt: string; width: number; height: number };
   }
 > = {
   fundamentals: {
@@ -82,6 +83,12 @@ export const LEARNING_PATH_MODULE_COPY: Record<
       height: 900,
     },
   },
+  intervals: {
+    forWho:
+      "Players who can find a note on the neck but learn every chord and lick as a separate shape, with no idea what connects them.",
+    outcome:
+      "All eleven intervals as shapes, as sounds and under your fingers: one lesson each, then the tritone, inversions and the G–B string quirk that bends every shape.",
+  },
 };
 
 /**
@@ -92,7 +99,7 @@ export const LEARNING_PATH_FAQS: faqQuestionInterface[] = [
   {
     title: "Can I skip ahead to a later step?",
     message:
-      "No. Steps open in order, and the next one unlocks when the one before it is complete. Both modules are open from the start, so you can work on them side by side.",
+      "No. Steps open in order, and the next one unlocks when the one before it is complete. All three modules are open from the start, so you can work on them side by side.",
   },
   {
     title: "What happens if I fail an exam?",

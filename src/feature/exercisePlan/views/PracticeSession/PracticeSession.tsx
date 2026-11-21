@@ -9,6 +9,7 @@ import { barBeatsOf } from "feature/backingTrack/utils/alignment";
 import { getBackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
 import { useCommunityPlayCount } from "feature/communityExercises/hooks/useCommunityPlayCount";
 import { useLocalizedPlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
+import { accuracyToStars } from "feature/journey/utils/examStars";
 import { saveLastSession } from "feature/practice/utils/lastSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { useInstrumentPreferenceStore } from "feature/tuner/store/instrumentPreferenceStore";
@@ -59,6 +60,7 @@ import { SessionUIProvider } from "./contexts/SessionUIContext";
 import { TabOverlayProvider } from "./contexts/TabOverlayContext";
 import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
 import { withBackingTempo } from "./helpers/backingTempoOverlay";
+import { earQuizExamAccuracy, earQuizExamMinAnswers, useEarQuizRunStore } from "./helpers/earQuizRunStore";
 import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
 import {
   loadGlobalMasterVolume,
@@ -1074,13 +1076,30 @@ const PracticeSessionInner = ({
     startTime: metronome.startTime,
     msPerBar: (60000 / effectiveBpm) * (huntBarSteps / stepsPerBeat(metronome.gridUnit)),
   };
-  const { target: huntTarget, secondsLeft: noteHuntSecondsLeft, advance: advanceHunt } = useNoteHuntRotation(currentExercise, isPlaying, huntSolvedRef, isExamMode, huntBarClock);
+  const { target: huntTarget, secondsLeft: noteHuntSecondsLeft, secondsTotal: noteHuntSecondsTotal, advance: advanceHunt } = useNoteHuntRotation(currentExercise, isPlaying, huntSolvedRef, isExamMode, huntBarClock);
   const [successSnapshot, setSuccessSnapshot] = useState<NoteMatchingSnapshot | null>(null);
   useEffect(() => { if (showSuccessView) setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null); }, [showSuccessView]);
+  // The listening quizzes are graded by their own panel, outside the
+  // note-matching context, so an exam on one reads its accuracy off the quiz run.
+  const examAccuracyOf = (snap: NoteMatchingSnapshot): number => {
+    const quizMode = currentExercise.earQuizConfig?.mode;
+    if (!quizMode) return snap.accuracy;
+    const { correct, answered } = useEarQuizRunStore.getState();
+    return earQuizExamAccuracy(correct, answered, earQuizExamMinAnswers(quizMode));
+  };
   // Set by the click-hunt mistake-limit fail path below — shows the same
   // success/fail modal as a normal exam finish, forced into its failed state,
   // instead of redirecting away before the player sees why they failed.
   const [examMistakeFailed, setExamMistakeFailed] = useState(false);
+  // How the exam ended, by the same rule that saves its stars, so the session
+  // summary does not celebrate a failed one. Null until an exam is handed in;
+  // an exam left before the end has none and counts as not passed.
+  const [examStars, setExamStars] = useState<number | null>(null);
+  const completeExam = (accuracy: number, onTimePct: number | null = null) => {
+    setExamStars(accuracyToStars(accuracy, onTimePct) ?? 0);
+    onExamComplete?.(accuracy, onTimePct);
+  };
+  const examPassed = isExamMode ? (examStars ?? 0) > 0 : undefined;
 
   // ── Score saving ──────────────────────────────────────────────────────────
 
@@ -1181,7 +1200,7 @@ const PracticeSessionInner = ({
         hasTrackedPerformance && snap ? { score: snap.score, accuracy: snap.accuracy, ...micStandingRef.current } : null,
         null,
       );
-      onExamComplete?.(snap?.accuracy ?? 0, snap?.onTimePct ?? null);
+      completeExam(snap?.accuracy ?? 0, snap?.onTimePct ?? null);
     })();
     // Intentionally narrow deps — this should fire exactly once per showSuccessView
     // transition, not re-run when metronome/save/report identities change each render.
@@ -1206,7 +1225,7 @@ const PracticeSessionInner = ({
       hasTrackedPerformance && snap ? { score: snap.maxPossibleScore, accuracy: 100, ...micStandingRef.current } : null,
       null,
     );
-    onExamComplete?.(100);
+    completeExam(100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1247,6 +1266,11 @@ const PracticeSessionInner = ({
     tabRestartKey, setTabRestartKey,
     learnMode: learnEnabled,
   });
+  // A restarted session plays the exam again, so its old result must not linger.
+  const restartSessionAndExam = () => {
+    setExamStars(null);
+    handleRestartFullSession();
+  };
 
   // ── Boss fight ────────────────────────────────────────────────────────────
 
@@ -1409,6 +1433,7 @@ const PracticeSessionInner = ({
       customGoalStrings={currentExercise.customGoalStrings}
       noteHuntMode={currentExercise.noteHuntConfig?.mode}
       noteHuntSecondsLeft={noteHuntSecondsLeft}
+      noteHuntSecondsTotal={noteHuntSecondsTotal}
       solvedRef={huntSolvedRef}
       onAdvanceHunt={advanceHunt}
       canAdvanceHunt={huntTarget !== null}
@@ -1442,8 +1467,8 @@ const PracticeSessionInner = ({
       {isMobileView && reportResult && currentUserStats && previousUserStats && (
         <TurnedScreen turned={isUprightPhone} className="z-[999999999] bg-zinc-950">
           <RatingPopUp ratingData={reportResult} currentUserStats={currentUserStats} previousUserStats={previousUserStats}
-            onClick={onClose} activityData={activityDataToUse} onRestart={handleRestartFullSession}
-            scoredRuns={scoredRuns}
+            onClick={onClose} activityData={activityDataToUse} onRestart={restartSessionAndExam}
+            scoredRuns={scoredRuns} examPassed={examPassed}
           />
         </TurnedScreen>
       )}
@@ -1454,7 +1479,7 @@ const PracticeSessionInner = ({
         <ExerciseSuccessView
           planTitle={planTitleString} examMode={isExamMode}
           score={examMistakeFailed ? 0 : successSnapshot.score} maxScore={successSnapshot.maxPossibleScore}
-          examAccuracy={examMistakeFailed ? 0 : successSnapshot.accuracy}
+          examAccuracy={examMistakeFailed ? 0 : examAccuracyOf(successSnapshot)}
           examOnTimePct={examMistakeFailed ? null : successSnapshot.onTimePct ?? null}
           stats={
             hasTrackedPerformance && !isEarTrainingRiddle
@@ -1481,7 +1506,7 @@ const PracticeSessionInner = ({
                   ? { score: 0, accuracy: 0 }
                   : { score: successSnapshot.score, accuracy: successSnapshot.accuracy, ...micStandingRef.current },
               isEarTrainingRiddle ? { score: earTrainingScore, ...earTrainingStandingRef.current } : null);
-            if (isExamMode) onExamComplete?.(examMistakeFailed ? 0 : successSnapshot.accuracy, successSnapshot.onTimePct ?? null);
+            if (isExamMode) completeExam(examMistakeFailed ? 0 : examAccuracyOf(successSnapshot), successSnapshot.onTimePct ?? null);
           }}
           onRestart={examMistakeFailed ? undefined : () => {
             examAutoFinishedRef.current = false;
@@ -1514,7 +1539,7 @@ const PracticeSessionInner = ({
               hasTrackedPerformance && !isEarTrainingRiddle && snap ? { score: snap.score, accuracy: snap.accuracy, ...micStandingRef.current } : null,
               !earlyFinish && isEarTrainingRiddle ? { score: earTrainingScore, ...earTrainingStandingRef.current } : null,
               { skipSkillPoints: earlyFinish });
-            if (isExamMode && snap) onExamComplete?.(snap.accuracy, snap.onTimePct ?? null);
+            if (isExamMode && snap) completeExam(examAccuracyOf(snap), snap.onTimePct ?? null);
           } : onFinish}
           isMounted={isMounted} currentExercise={currentExercise}
           currentExerciseIndex={currentExerciseIndex} totalExercises={plan.exercises.length}
@@ -1548,10 +1573,10 @@ const PracticeSessionInner = ({
       )}
 
       <DesktopSessionView
-        reportResult={reportResult} scoredRuns={scoredRuns}
+        reportResult={reportResult} scoredRuns={scoredRuns} examPassed={examPassed}
         currentUserStats={currentUserStats} previousUserStats={previousUserStats}
         activityDataToUse={activityDataToUse} router={router}
-        handleRestartFullSession={handleRestartFullSession}
+        handleRestartFullSession={restartSessionAndExam}
         plan={plan} currentExercise={currentExercise} activeExercise={activeExercise}
         category={currentExercise.category || "mixed"}
         currentExerciseIndex={currentExerciseIndex} completedExercises={completedExercises}

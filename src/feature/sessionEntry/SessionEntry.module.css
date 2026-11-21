@@ -283,6 +283,7 @@
   animation-delay: var(--t0);
 }
 .striker {
+  position: relative;
   width: 100%;
   height: 100%;
   transform-origin: 50% 90.1%;
@@ -304,6 +305,43 @@
     strum var(--p) infinite,
     ghost var(--p) linear infinite;
   animation-delay: calc(var(--loop) + var(--lag));
+}
+
+/* His eyes, on layers of their own over the body: they feel every strike.
+   Three faces cut into each other like cels (no fades): focused, shut on the
+   hit, happy arcs while the strings ring. An afterimage's eyes run its own lag
+   behind, like the rest of it. */
+.eyes {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% var(--eye-y);
+  will-change: transform, opacity;
+  animation-delay: calc(var(--loop) + var(--lag, 0s));
+}
+.eyesFocus {
+  animation-name: face-focus;
+  animation-duration: var(--p);
+  animation-iteration-count: infinite;
+}
+.eyesSquint {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% var(--eye-y);
+  will-change: transform;
+  animation: squint var(--p) infinite;
+  animation-delay: calc(var(--loop) + var(--lag, 0s));
+}
+.eyesShut {
+  opacity: 0;
+  animation-name: face-shut;
+  animation-duration: var(--p);
+  animation-iteration-count: infinite;
+}
+.eyesBliss {
+  opacity: 0;
+  animation-name: face-bliss;
+  animation-duration: var(--p);
+  animation-iteration-count: infinite;
 }
 
 .steps {
@@ -433,6 +471,88 @@
   86% {
     transform: translate3d(calc(var(--g) * -0.3), calc(var(--g) * -4.3), 0) rotate(-5deg) scale(1, 1);
     animation-timing-function: ease-in-out;
+  }
+}
+/* Kostek's face through one strum (the `strum` timeline; the tip meets the
+   first string at ~25%): the focused eyes narrow on the wind-up and cut to
+   shut lines on the hit, those squeeze in, turn into happy arcs while
+   the strings ring, and the focused eyes pop back open a touch wide. */
+@keyframes face-focus {
+  0% {
+    opacity: 1;
+    animation-timing-function: step-end;
+  }
+  24% {
+    opacity: 0;
+    animation-timing-function: step-end;
+  }
+  48%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes squint {
+  0%,
+  14% {
+    transform: scale(1, 1);
+    animation-timing-function: ease-in;
+  }
+  24% {
+    transform: scale(1, 0.4);
+    animation-timing-function: step-end;
+  }
+  48% {
+    transform: scale(1, 0.4);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  53% {
+    transform: scale(1, 1.25);
+    animation-timing-function: ease-in-out;
+  }
+  64%,
+  100% {
+    transform: scale(1, 1);
+  }
+}
+@keyframes face-shut {
+  0% {
+    opacity: 0;
+    transform: scale(0.7, 1);
+    animation-timing-function: step-end;
+  }
+  24% {
+    opacity: 1;
+    transform: scale(0.7, 1);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  27% {
+    opacity: 1;
+    transform: scale(1.08, 1);
+    animation-timing-function: ease-out;
+  }
+  31% {
+    opacity: 1;
+    transform: scale(1, 1);
+    animation-timing-function: step-end;
+  }
+  32%,
+  100% {
+    opacity: 0;
+    transform: scale(1, 1);
+  }
+}
+@keyframes face-bliss {
+  0% {
+    opacity: 0;
+    animation-timing-function: step-end;
+  }
+  32% {
+    opacity: 1;
+    animation-timing-function: step-end;
+  }
+  48%,
+  100% {
+    opacity: 0;
   }
 }
 /* These four start on the string's own hit (their delay), and last one strum. */
@@ -628,6 +748,8 @@
   .fly,
   .striker,
   .ghost,
+  .eyes,
+  .eyesSquint,
   .focus,
   .focusFrame,
   .shock,

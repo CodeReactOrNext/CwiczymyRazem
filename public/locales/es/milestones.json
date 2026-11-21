@@ -57,6 +57,8 @@
     "in_progress_lc": "en curso",
     "reward_ready": "Recompensa lista para reclamar",
     "reward_claimed": "Recompensa reclamada",
+    "days_left": "{{count}} días más",
+    "days_left_one": "1 día más",
     "reached": "Alcanzado",
     "current_goal": "Objetivo actual",
     "locked": "Bloqueado",

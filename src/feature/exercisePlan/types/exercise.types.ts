@@ -324,6 +324,9 @@ export interface Exercise {
   metronomeGrid?: MetronomeGrid;
   strummingPatterns?: StrumPattern[];
   _generatorConfig?: any;
+  /** The session band its generated backing is played by, when the style is
+   *  the point of the exercise. The player's own pick then doesn't apply. */
+  bandStyle?: BandStyleId;
   /** Audio file played as backing in exam mode. sourceBpm must match the file's recorded tempo. */
   examBacking?: { url: string; sourceBpm: number };
   /** Overrides the derived "no guitar needed" answer for exercises the shape of

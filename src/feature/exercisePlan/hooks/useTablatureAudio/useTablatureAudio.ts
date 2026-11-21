@@ -234,7 +234,15 @@ export const useTablatureAudio = ({
     Promise.all([
       Soundfont.instrument(ctx, "electric_guitar_clean" as Soundfont.InstrumentName),
       Soundfont.instrument(ctx, "electric_guitar_muted" as Soundfont.InstrumentName),
-      Soundfont.instrument(ctx, "electric_bass_pick"    as Soundfont.InstrumentName),
+      // FluidR3's finger bass, not MusyngKite's pick bass: two of MusyngKite's
+      // pick zones (B0–F#1, C#2–D#2 — the A string's 4th–6th frets) carry
+      // fret rattle, up to 9 dB more off-harmonic noise above 600 Hz than the zones
+      // around them, its notes sit 10–20 cents sharp, and its low E string is
+      // mostly a 41–55 Hz fundamental that laptop and phone speakers can't play. This one
+      // is in tune within 5 cents, cleaner above 600 Hz in every zone, and
+      // 2–9 dB louder through a small speaker. Its lead-in before each attack
+      // is made up for in playStringNote (attackLeadFor).
+      Soundfont.instrument(ctx, "electric_bass_finger"  as Soundfont.InstrumentName, { soundfont: "FluidR3_GM" }),
       Soundfont.instrument(ctx, "choir_aahs"            as Soundfont.InstrumentName),
     ]).then(([guitar, mutedGuitar, bass, vocals]) => {
       if (cancelled) return;

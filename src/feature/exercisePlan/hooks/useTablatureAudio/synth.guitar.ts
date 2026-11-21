@@ -100,6 +100,10 @@ export function synthGuitar(
 
 // ── Bass synthesis ────────────────────────────────────────────────────────────
 
+/** Lowest the bass synth's filter settles: up to ~8 harmonics of a low E get
+ *  through, where a laptop speaker (rolling off under ~150–200 Hz) can play them. */
+const BASS_SYNTH_FLOOR_HZ = 380;
+
 export function synthBass(
   ctx: AudioContext,
   freq: number,
@@ -117,7 +121,10 @@ export function synthBass(
   const stopTime    = releaseTime + 0.05;
 
   const osc1 = ctx.createOscillator(); osc1.type = "sine";     osc1.frequency.setValueAtTime(freq, t);
-  const osc2 = ctx.createOscillator(); osc2.type = "triangle"; osc2.frequency.setValueAtTime(freq, t);
+  // A sawtooth, not a triangle: a bass's E string is 41–55 Hz, under what laptop
+  // and phone speakers can play, so it is only heard through its harmonics —
+  // and a triangle has next to none.
+  const osc2 = ctx.createOscillator(); osc2.type = "sawtooth"; osc2.frequency.setValueAtTime(freq, t);
   const osc3 = ctx.createOscillator(); osc3.type = "sine";     osc3.frequency.setValueAtTime(freq * 2, t);
 
   if (isBend) {
@@ -151,7 +158,7 @@ export function synthBass(
   }
 
   const g1 = ctx.createGain(); g1.gain.value = 0.50;
-  const g2 = ctx.createGain(); g2.gain.value = 0.38;
+  const g2 = ctx.createGain(); g2.gain.value = 0.26;
   const g3 = ctx.createGain(); g3.gain.value = 0.10;
   osc1.connect(g1); osc2.connect(g2); osc3.connect(g3);
 
@@ -164,8 +171,10 @@ export function synthBass(
     filter.frequency.exponentialRampToValueAtTime(Math.max(freq * 1.2, 100), t + 0.04);
     filter.Q.value = 2.0;
   } else {
-    filter.frequency.setValueAtTime(Math.min(freq * 5, 3000), t);
-    filter.frequency.exponentialRampToValueAtTime(Math.max(freq * 1.8, 150), t + 0.08);
+    // Settles no lower than BASS_SYNTH_FLOOR_HZ, so the low strings keep the
+    // harmonics a small speaker can play (see osc2).
+    filter.frequency.setValueAtTime(Math.min(Math.max(freq * 8, 900), 3000), t);
+    filter.frequency.exponentialRampToValueAtTime(Math.max(freq * 1.8, BASS_SYNTH_FLOOR_HZ), t + 0.08);
     filter.Q.value = 0.7;
   }
 

@@ -99,16 +99,24 @@ export const GeneratedPlan = ({
         </h1>
 
         <div className='flex flex-wrap gap-2'>
-          <Button variant='outline' onClick={onBack} disabled={isStarting}>
+          <Button
+            variant='secondary'
+            onClick={onBack}
+            disabled={isStarting}
+>
             {t("common:back")}
           </Button>
-          <Button variant='secondary' onClick={onRegenerate} disabled={isStarting}>
-            <RefreshCw className='mr-2 h-4 w-4' />
+          <Button
+            variant='secondary'
+            onClick={onRegenerate}
+            disabled={isStarting}
+>
+            <RefreshCw className='h-4 w-4' />
             {t("practice_hub:auto.regenerate")}
           </Button>
           <Button
             onClick={() => onStart(plan)}
-            className='ml-auto bg-primary hover:bg-primary/90'
+            className='ml-auto'
             disabled={isStarting}
           >
             <span className="flex items-center gap-2">
@@ -119,7 +127,7 @@ export const GeneratedPlan = ({
                   </>
               ) : (
                   <>
-                    <Play size='1em' className='mr-2 h-3.5 w-3.5' />
+                    <Play size='1em' className='h-3.5 w-3.5' />
                     <span>{t("common:start")}</span>
                   </>
               )}
@@ -128,11 +136,11 @@ export const GeneratedPlan = ({
         </div>
       </div>
 
-      <Card className='bg-transparent p-0 sm:bg-zinc-800/40 sm:p-6'>
-        <div className='mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 sm:mb-6'>
-          <h2 className='text-lg font-semibold sm:text-xl'>
+      <Card className='rounded-2xl bg-transparent p-0 sm:bg-zinc-800/40 sm:p-7'>
+        <div className='flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
+          <h2 className='text-2xl font-extrabold tabular-nums sm:text-[26px]'>
             {formatMinutesDuration(totalMinutes)}{" "}
-            <span className='font-normal text-zinc-500'>
+            <span className='text-base font-semibold text-zinc-400'>
               {t("practice_hub:auto.of_target", { minutes: targetMinutes })}
             </span>
           </h2>
@@ -141,6 +149,22 @@ export const GeneratedPlan = ({
               ? t("practice_hub:auto.exercise_one")
               : t("practice_hub:auto.exercise_many", { count: exerciseCount })}
           </span>
+        </div>
+
+        {/* How much of the requested time the plan fills right now. */}
+        <div
+          aria-hidden
+          className='mb-5 mt-3 h-3 overflow-hidden rounded-full bg-zinc-800 sm:mb-6'>
+          <div
+            className='h-full rounded-full bg-primary transition-[width] duration-base'
+            style={{
+              width: `${
+                targetMinutes > 0
+                  ? Math.min(100, (totalMinutes / targetMinutes) * 100)
+                  : 0
+              }%`,
+            }}
+          />
         </div>
 
         <DndContext
@@ -153,7 +177,7 @@ export const GeneratedPlan = ({
           <SortableContext
             items={exerciseIds}
             strategy={verticalListSortingStrategy}>
-            <div className='space-y-3 sm:space-y-4'>
+            <div className='space-y-2.5'>
               {plan.exercises.map((exercise, index) => (
                 <ExerciseCard
                   key={exercise.id}
@@ -173,7 +197,7 @@ export const GeneratedPlan = ({
         <div className='mt-6 pt-4 sm:mt-8'>
           <Button
             onClick={() => onStart(plan)}
-            className='w-full shadow-md'
+            className='w-full'
             size='lg'
             variant='default'
             disabled={isStarting}
@@ -186,7 +210,7 @@ export const GeneratedPlan = ({
                   </>
               ) : (
                   <>
-                    <Play size='1em' className='mr-2 h-4 w-4' />
+                    <Play size='1em' className='h-4 w-4' />
                     <span>{t("common:start")}</span>
                   </>
               )}

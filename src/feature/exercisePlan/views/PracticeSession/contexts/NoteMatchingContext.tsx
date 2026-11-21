@@ -81,8 +81,14 @@ interface NoteMatchingContextValue {
   chromaticProgress: { found: number; total: number } | null;
   /** Seconds until the hunt target rotates, or null when not rotating. */
   noteHuntSecondsLeft: number | null;
+  /** The round length the countdown starts from, or null when not rotating. */
+  noteHuntSecondsTotal: number | null;
   /** Fret window for region-mode note hunts, or null when not in region mode. */
   noteHuntRegion: { startFret: number; endFret: number } | null;
+  /** The current round's fret window for any hunt that has one — it can move from
+   *  round to round, so a panel draws its board from here rather than from the
+   *  exercise's opening window. Null when the hunt spans the whole neck. */
+  huntRegion: { startFret: number; endFret: number } | null;
   /** Strings the hunt is restricted to (1 = high e … 6 = low E), or null for the
    *  whole neck. Scopes both detection (which octaves count) and the neck diagram. */
   noteHuntStrings: number[] | null;
@@ -210,7 +216,9 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   intervalClickHunt: null,
   chromaticProgress: null,
   noteHuntSecondsLeft: null,
+  noteHuntSecondsTotal: null,
   noteHuntRegion: null,
+  huntRegion: null,
   noteHuntStrings: null,
   customGoalPrompt: null,
   huntTarget: null,
@@ -275,6 +283,8 @@ interface NoteMatchingProviderProps {
   noteHuntMode: "octaves" | "region" | "interval" | "chord" | "click" | "accumulate" | "intervalClick" | undefined;
   // countdown until the note-hunt target rotates (null when not rotating)
   noteHuntSecondsLeft: number | null;
+  // the round length that countdown starts from (null when not rotating)
+  noteHuntSecondsTotal?: number | null;
   // flipped to true once the current hunt goal is fully solved (drives fast-forward)
   solvedRef?: React.MutableRefObject<boolean>;
   // manually advance the hunt to the next target (for no-mic practice)
@@ -334,6 +344,7 @@ export function NoteMatchingProvider({
   customGoalStrings,
   noteHuntMode,
   noteHuntSecondsLeft,
+  noteHuntSecondsTotal = null,
   solvedRef,
   onAdvanceHunt,
   canAdvanceHunt = false,
@@ -730,7 +741,9 @@ export function NoteMatchingProvider({
       intervalClickHunt: isIntervalClickHunt ? intervalClickHunt : null,
       chromaticProgress: isAccumulatingHunt ? { found: accumulatedNotes.size, total: 12 } : null,
       noteHuntSecondsLeft: isHunt ? noteHuntSecondsLeft : null,
+      noteHuntSecondsTotal: isHunt ? noteHuntSecondsTotal : null,
       noteHuntRegion: isNoteHunt && fretRange ? { startFret: fretRange[0], endFret: fretRange[1] } : null,
+      huntRegion: isHunt && fretRange ? { startFret: fretRange[0], endFret: fretRange[1] } : null,
       noteHuntStrings: isNoteHunt ? (huntStrings ?? null) : null,
       customGoalPrompt: isHunt ? (customGoalPrompt ?? null) : null,
       huntTarget: isHunt ? (customGoal ?? null) : null,
@@ -749,7 +762,7 @@ export function NoteMatchingProvider({
       estimateLatencyMs: getLatencyMs,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [learn, livePitchRef, fillFeedRef, streamFills, scoringFocus, strumSlotFeedback, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick, markAlphaTabPassStart, calibratedLatencyMs, getLatencyMs],
+    [learn, livePitchRef, fillFeedRef, streamFills, scoringFocus, strumSlotFeedback, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, noteHuntSecondsTotal, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick, markAlphaTabPassStart, calibratedLatencyMs, getLatencyMs],
   );
 
   return (

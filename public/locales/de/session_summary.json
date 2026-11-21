@@ -36,6 +36,8 @@
   "practise_more": "Noch etwas üben",
   "back_to_dashboard": "Zurück zum Dashboard",
   "great_progress": "Toller Fortschritt!",
+  "exam_failed": "Prüfung nicht bestanden",
+  "exam_failed_body": "Deine Übungszeit zählt trotzdem für Punkte und deine Serie.",
   "fame": "Fame",
   "cat": {
     "technique": "Technik",
@@ -50,13 +52,9 @@
   "session_time": "Session-Zeit",
   "streak": "Serie",
   "days_in_a_row": "Tage in Folge",
+  "days_in_a_row_one": "Tag in Folge",
   "streak_bonus_points": "+{{pct}} % Punkte",
   "today": "heute",
-  "this_week": "Diese Woche",
-  "goal": "Ziel",
-  "last_7_days": "letzte 7 Tage",
-  "skill_balance": "Fähigkeitsbalance",
-  "previous": "Vorher",
   "new_achievements": "Neue Erfolge",
   "recent_runs": {
     "title": "So lief diese Übung zuletzt",

@@ -572,8 +572,16 @@
       "off": "Turn the backing off"
     }
   },
+  "hunt": {
+    "seconds_left": "{{count}} s left",
+    "solved": "Solved",
+    "time_left": "Time left in this round",
+    "next": "Next",
+    "view": "View",
+    "play_notes": "Play notes"
+  },
   "interval_click": {
-    "now_above": "Now the {{interval}} above that root — within reach of it",
+    "now_above": "{{interval}} above that {{root}}",
     "click_any": "Click any {{note}}",
     "on_highlighted": "on the highlighted strings",
     "root": "Root",
@@ -581,7 +589,15 @@
     "play_root": "Play the root note the interval is measured from",
     "hide_distance": "Hide the distance",
     "how_far": "How far is it?",
-    "autoplay": "Autoplay"
+    "autoplay": "Autoplay",
+    "step": "Step {{step}} of 2",
+    "anywhere": "Anywhere in frets {{from}}–{{to}}",
+    "near_zone": "Close to your {{root}}, inside the lit area",
+    "near": "Within reach of your {{root}}",
+    "solved": "{{root}} + {{interval}} = {{target}}",
+    "frets_up_one": "{{count}} fret up",
+    "frets_up_other": "{{count}} frets up",
+    "hear_root": "Hear the root"
   },
   "instructions": {
     "support_author": "Support Author",
@@ -715,7 +731,8 @@
     "total": "Session Total"
   },
   "click_hunt": {
-    "play_note": "Play the note you are looking for"
+    "play_note": "Play the note you are looking for",
+    "hear_it": "Hear it"
   },
   "strum": {
     "strum": "Strum",

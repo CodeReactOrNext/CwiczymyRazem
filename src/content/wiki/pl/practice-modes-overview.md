@@ -8,7 +8,7 @@ order: 1
 
 Otwórz **Ćwiczenia**, a zobaczysz ścianę opcji. Wszystkie kończą się w tym samym miejscu, zapisaną sesją, która zasila twoje punkty, serię i umiejętności, ale różnią się tym, ile musisz najpierw pomyśleć.
 
-<Screenshot src="/images/wiki/practice-hub.webp" alt="Ekran Ćwicz: jedna lista wszystkich sposobów ćwiczenia — Rutyny ćwiczeń, Utwory, Ścieżka nauki, Katalog ćwiczeń, Umiejętności, Duele, Walki z bossami, Plan automatyczny, Mapa skal, Mastery Roadmaps i Pliki Guitar Pro — a obok Zapisz czas (Wolny stoper, Ręczny wpis) i Moje rzeczy" caption="Wszystko poniżej mieszka na tym jednym ekranie. Kafelki śledzące postępy pokazują, jak daleko jesteś, wprost na karcie." />
+<Screenshot src="/images/wiki/practice-hub.webp" alt="Ekran Ćwicz: jedna lista wszystkich sposobów ćwiczenia — Rutyny ćwiczeń, Utwory, Ścieżka nauki, Katalog ćwiczeń, Umiejętności, Duele, Walki z bossami, Plan automatyczny, Mapa skal, Mastery Roadmaps i Pliki Guitar Pro — a obok Zapisz czas (Wolny stoper, Ręczny wpis) i Moje rzeczy" caption="Wszystko poniżej mieszka na tym jednym ekranie." />
 
 ## Wybierz według tego, ile wskazówek chcesz
 

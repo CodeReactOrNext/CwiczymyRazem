@@ -13,14 +13,14 @@ interface TableSkeletonProps {
  */
 export function TableSkeleton({ rows = 5, className }: TableSkeletonProps) {
   return (
-    <div className={cn("w-full space-y-2 sm:space-y-6", className)}>
+    <div className={cn("w-full space-y-1.5 sm:space-y-2", className)}>
       {Array.from({ length: rows }).map((_, i) => (
         <div
           key={i}
-          className="relative overflow-hidden rounded-xl glass-card sm:rounded-2xl"
+          className="relative overflow-hidden rounded-xl glass-card"
         >
           {/* --- Mobile Layout (<640px): one line per player --- */}
-          <div className="relative z-10 flex items-center gap-3 px-3 py-2.5 sm:hidden">
+          <div className="relative z-10 flex items-center gap-3 px-3 py-3 sm:hidden">
             <Skeleton className="h-4 w-8 flex-shrink-0 bg-white/5" />
             <Skeleton className="h-10 w-10 flex-shrink-0 rounded-full bg-white/5" />
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -33,44 +33,15 @@ export function TableSkeleton({ rows = 5, className }: TableSkeletonProps) {
             </div>
           </div>
 
-          {/* --- Desktop Layout (>=640px) --- */}
-          <div className="relative z-10 hidden items-center gap-3 p-4 sm:flex sm:gap-5 sm:p-5 lg:gap-8 lg:p-6">
-            {/* Rank */}
-            <Skeleton className="h-10 w-10 flex-shrink-0 rounded-lg bg-white/5 sm:h-12 sm:w-12 lg:h-14 lg:w-14" />
-
-            {/* Avatar */}
-            <Skeleton className="h-20 w-20 flex-shrink-0 rounded-xl bg-white/5" />
-
-            {/* User Info */}
-            <div className="min-w-0 flex-1">
-              <div className="mb-1.5 flex items-center gap-4">
-                <Skeleton className="h-7 w-40 bg-white/10" />
-                <Skeleton className="h-8 w-16 rounded-sm bg-white/5" />
-              </div>
-              {/* DaySince: status dot + small text */}
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-1.5 w-1.5 rounded-full bg-white/10" />
-                <Skeleton className="h-3 w-28 bg-white/5" />
-              </div>
+          {/* --- Desktop Layout (>=640px): one low card per player --- */}
+          <div className="relative z-10 hidden h-[5.25rem] items-center gap-5 px-5 sm:flex">
+            <Skeleton className="h-9 w-10 flex-shrink-0 rounded-[0.625rem] bg-white/5" />
+            <Skeleton className="h-14 w-14 flex-shrink-0 rounded-xl bg-white/5" />
+            <div className="flex min-w-0 flex-1 items-center gap-2.5">
+              <Skeleton className="h-5 w-40 bg-white/10" />
             </div>
-
-            {/* Stats */}
-            <div className="flex items-center gap-8 lg:gap-12">
-              <div className="flex flex-col items-center gap-1.5">
-                <Skeleton className="h-7 w-16 bg-white/10" />
-                <Skeleton className="h-2.5 w-12 bg-white/5" />
-              </div>
-              <div className="flex flex-col items-center gap-1.5">
-                <Skeleton className="h-7 w-16 bg-white/10" />
-                <Skeleton className="h-2.5 w-12 bg-white/5" />
-              </div>
-            </div>
-
-            {/* Achievements - Desktop (lg only, carousel: icon pill + label) */}
-            <div className="hidden flex-shrink-0 flex-col items-center gap-1.5 lg:flex">
-              <Skeleton className="h-10 w-36 rounded-lg bg-white/5" />
-              <Skeleton className="h-2.5 w-24 bg-white/5" />
-            </div>
+            <Skeleton className="h-7 w-24 flex-shrink-0 bg-white/10" />
+            <Skeleton className="h-4 w-14 flex-shrink-0 bg-white/5" />
           </div>
         </div>
       ))}

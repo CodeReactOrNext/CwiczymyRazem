@@ -561,7 +561,7 @@ export const GuitarLearningPathPage = ({
               <Reveal delay={0.1} className='mx-auto w-full max-w-lg'>
                 <Screenshot
                   src={`${IMAGES}/first-lesson.webp`}
-                  alt={LEARNING_PATH_MODULE_COPY.fundamentals.image.alt}
+                  alt={LEARNING_PATH_MODULE_COPY.fundamentals.image?.alt ?? ""}
                   width={577}
                   height={760}
                   sizes='(min-width: 1024px) 512px, 100vw'
@@ -575,8 +575,8 @@ export const GuitarLearningPathPage = ({
         <section className='bg-zinc-900/30 py-20'>
           <div className='mx-auto max-w-7xl px-6'>
             <SectionIntro eyebrow='The modules' title='Who each module is for'>
-              Both live modules are open from the start. Take one, or run them
-              side by side.
+              All three live modules are open from the start. Take one, or run
+              them side by side.
             </SectionIntro>
 
             <div className='space-y-20'>
@@ -644,7 +644,7 @@ export const GuitarLearningPathPage = ({
                     </div>
 
                     <div className='mx-auto w-full max-w-md'>
-                      {copy && (
+                      {copy?.image && (
                         <div className='max-h-[620px] overflow-hidden [mask-image:linear-gradient(to_bottom,black_85%,transparent)]'>
                           <Screenshot
                             src={copy.image.src}
@@ -772,7 +772,7 @@ export const GuitarLearningPathPage = ({
           <div className='mx-auto max-w-7xl px-6'>
             <SectionIntro
               eyebrow='What exists today'
-              title='Two modules live, three on the way'>
+              title='Three modules live, three on the way'>
               The live modules are complete, start to finish. The planned ones
               are topics we&apos;re building next, and aren&apos;t playable yet.
             </SectionIntro>

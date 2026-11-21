@@ -63,6 +63,24 @@
   "ranking_hint": "Haz clic para ver la clasificación de este ejercicio",
   "new_since_last_visit": "Nuevo desde tu última visita",
   "show_more": "Mostrar más",
+  "show_more_count": "Mostrar {{count}} más",
+  "practiced_item": "practicó {{item}}",
+  "fought_boss": "luchó contra {{item}}",
+  "phase_cleared": "fase {{phase}} superada",
+  "logged_session": "registró una sesión de práctica",
+  "reached_level": "subió al nivel {{level}}",
+  "stat": {
+    "points": "Puntos",
+    "time": "Tiempo",
+    "score": "Puntuación",
+    "accuracy": "Precisión",
+    "tempo": "Tempo",
+    "place": "Puesto",
+    "price": "Precio",
+    "rarity": "Rareza",
+    "level": "Nivel",
+    "rating": "Rating"
+  },
   "just_now": "ahora mismo",
   "activity_kind": {
     "plan": "Plan",
@@ -126,8 +144,6 @@
     "days_left_other": "quedan {{count}} días",
     "duel_won": "{{winner}} gana a {{loser}}",
     "duel_draw": "{{winner}} y {{loser}} empatan",
-    "record_label": "Nuevo récord",
-    "record_title": "{{name}} se lleva el n.º 1 en {{exercise}}",
     "boss_label": "Combate contra jefe",
     "boss_title": "{{name}} supera la fase {{phase}}: {{boss}}"
   },

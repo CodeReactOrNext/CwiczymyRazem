@@ -164,7 +164,7 @@ export const MicTroubleshootingDialog = ({
             disabled={didReset}
             variant='destructive'
             className='w-full font-bold'>
-            <RotateCcw className='mr-2 h-4 w-4' />
+            <RotateCcw className='h-4 w-4' />
             {didReset ? t("mic_help.resetting") : t("mic_help.reset")}
           </Button>
           <p className='text-center text-[10px] text-zinc-500'>

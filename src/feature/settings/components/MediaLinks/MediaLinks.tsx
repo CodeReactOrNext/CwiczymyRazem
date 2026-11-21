@@ -106,7 +106,7 @@ const MediaLinks = () => {
 
       <div className="flex justify-end pt-4">
         <Button onClick={handleSave} disabled={!hasChanges || isFetching}>
-          {isFetching && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isFetching && <Loader2 className="h-4 w-4 animate-spin" />}
           {t("settings:save")}
         </Button>
       </div>
