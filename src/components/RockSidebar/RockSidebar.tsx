@@ -23,6 +23,7 @@ import { useHasUnclaimedMilestone } from "feature/aiSummary/hooks/useHasUnclaime
 import { getLockedAtLvl } from "feature/levelGate/data/featureUnlocks";
 import { CommunityIconButton } from "feature/logsBox/components/CommunityIconButton";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
+import { useStartTour } from "feature/onboarding/tour/useStartTour";
 import { userProfileQuery } from "feature/profile/hooks/userProfileQuery";
 import { EmailConsentModal } from "feature/settings/components/EmailConsentModal";
 import { SupportModal } from "feature/support/components/SupportModal";
@@ -53,6 +54,7 @@ import {
   Library,
   Lock,
   LogOut,
+  Map as MapIcon,
   Mic2,
   Music2,
   Route,
@@ -100,6 +102,7 @@ const SidebarNavLink = ({
   tooltip,
   muted = false,
   external = false,
+  tourId,
 }: {
   href: string;
   name: string;
@@ -110,12 +113,15 @@ const SidebarNavLink = ({
   tooltip?: string;
   muted?: boolean;
   external?: boolean;
+  /** `data-tour` for the first-day tour, which lights this link up. */
+  tourId?: string;
 }) => {
   const { t } = useTranslation("nav");
   const { createRipple, ripple } = useRipple();
   const link = (
     <Link
       href={href}
+      data-tour={tourId}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
       onClick={(e) => {
@@ -463,6 +469,9 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const handleLinkClick = () => {
     setIsMobileOpen(false);
   };
+  // On a phone the account menu, and its "Take the tour", is hidden with the
+  // header, so the More sheet carries it too.
+  const startTour = useStartTour();
 
   const mainNavigation = [
     { id: "home", name: t("home"), href: "/dashboard", icon: <Home size={18} /> },
@@ -471,6 +480,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       name: t("practice"),
       href: "/timer",
       icon: <Timer size={18} />,
+      tourId: "nav-practice",
     },
     {
       id: "what-next",
@@ -592,6 +602,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
       external?: boolean;
       showBadge?: boolean;
       children?: SidebarSubLink[];
+      tourId?: string;
     }[],
     onClick?: () => void,
   ) =>
@@ -606,6 +617,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         external,
         showBadge,
         children,
+        tourId,
       }) => {
         if (children) {
           return (
@@ -637,6 +649,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             tooltip={tooltip}
             muted={muted}
             external={external}
+            tourId={tourId}
           />
         );
       },
@@ -670,7 +683,9 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const navContent = () => (
     <nav className='flex min-h-0 flex-1 flex-col overflow-y-auto p-4 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5'>
       <div className='space-y-8'>
-        <div className='space-y-1'>{renderNavLinks(mainNavigation)}</div>
+        <div className='space-y-1' data-tour='nav'>
+          {renderNavLinks(mainNavigation)}
+        </div>
 
         <div className='space-y-1'>{renderNavLinks(utilityNavigation)}</div>
       </div>
@@ -797,6 +812,18 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         type='button'
         onClick={() => {
           handleLinkClick();
+          startTour();
+        }}
+        className='flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-400 transition-colors duration-base hover:bg-white/5 hover:text-zinc-200'>
+        <span className={NAV_ICON_SLOT}>
+          <MapIcon size={16} />
+        </span>
+        <span>{t("take_tour")}</span>
+      </button>
+      <button
+        type='button'
+        onClick={() => {
+          handleLinkClick();
           setIsLogoutDialogOpen(true);
         }}
         className='flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-400 transition-colors duration-base hover:bg-red-500/10 hover:text-red-400'>
@@ -838,7 +865,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
                 </span>
               </div>
             </Link>
-            <div className='ml-auto flex items-center gap-1.5'>
+            <div className='ml-auto flex items-center gap-1.5' data-tour='community'>
               <CommunityIconButton />
               <NotificationsBell />
             </div>

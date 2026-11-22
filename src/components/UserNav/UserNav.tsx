@@ -7,13 +7,20 @@ import {
 } from "assets/components/ui/dropdown-menu";
 import { LogoutDialog } from "components/LogoutDialog/LogoutDialog";
 import Avatar from "components/UI/Avatar";
+import { useStartTour } from "feature/onboarding/tour/useStartTour";
 import {
   selectUserAuth,
   selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronDown, LogOut, Settings, User } from "lucide-react";
+import {
+  ChevronDown,
+  LogOut,
+  Map as MapIcon,
+  Settings,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -27,6 +34,7 @@ const UserNav = () => {
   const userId = useAppSelector(selectUserAuth);
   const userName = useAppSelector(selectUserName);
   const avatar = useAppSelector(selectUserAvatar);
+  const handleTakeTour = useStartTour();
 
   // The confirm dialog sits outside the menu: the menu closes on select, and a
   // dialog mounted inside its content would unmount with it.
@@ -77,6 +85,12 @@ const UserNav = () => {
               <Settings size={14} />
               {t("settings")}
             </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={handleTakeTour}
+            className='flex items-center gap-2'>
+            <MapIcon size={14} />
+            {t("take_tour")}
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => setIsLogoutDialogOpen(true)}

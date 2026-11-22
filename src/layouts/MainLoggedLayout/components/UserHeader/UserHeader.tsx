@@ -37,7 +37,7 @@ const UserHeader = (_props: UserHeaderProps) => {
           </div>
 
           <div className='hidden flex-1 justify-center px-6 md:flex'>
-             <div className='flex items-center gap-4'>
+             <div className='flex items-center gap-4' data-tour='stats'>
       <StreakBox />
       <PointsBox />
       <FameBox />

@@ -250,9 +250,11 @@ export const DashboardWidgets = () => {
             feed brings a pile of listeners (logs, pinned donations, unread
             counts), the changelog and the whole RTDB presence node — none of
             it needs to compete with the widgets above it. */}
-        <MountOnVisible placeholder={<LogsBoxSkeleton />}>
-          {feedSlot ?? <LogsBoxView />}
-        </MountOnVisible>
+        <div data-tour='feed'>
+          <MountOnVisible placeholder={<LogsBoxSkeleton />}>
+            {feedSlot ?? <LogsBoxView />}
+          </MountOnVisible>
+        </div>
       </div>
 
       <AddWidgetSheet

@@ -20,9 +20,15 @@ type NavIcon = React.ComponentType<{ size?: number; className?: string }>;
 
 // Icons must stay in sync with the sidebar entries in RockSidebar, otherwise the
 // same destination shows up with two different glyphs.
-const navItems: { label: string; href: string; icon: NavIcon }[] = [
+const navItems: {
+  label: string;
+  href: string;
+  icon: NavIcon;
+  /** `data-tour` for the first-day tour. */
+  tourId?: string;
+}[] = [
   { label: "home", href: "/dashboard", icon: Home },
-  { label: "practice", href: "/timer", icon: Timer },
+  { label: "practice", href: "/timer", icon: Timer, tourId: "nav-practice" },
   { label: "songs", href: "/songs?view=board", icon: CassetteTape },
   { label: "progress", href: "/profile/activity", icon: TrendingUp },
 ];
@@ -53,6 +59,7 @@ const BottomNavItem = ({
   active,
   onNavigate,
   showBadge = false,
+  tourId,
 }: {
   label: string;
   href: string;
@@ -60,12 +67,14 @@ const BottomNavItem = ({
   active: boolean;
   onNavigate?: () => void;
   showBadge?: boolean;
+  tourId?: string;
 }) => {
   const { t } = useTranslation("nav");
   const { createRipple, ripple } = useRipple("bg-cyan-400/30");
   return (
     <Link
       href={href}
+      data-tour={tourId}
       aria-current={active ? "page" : undefined}
       onClick={(e) => {
         createRipple(e);
@@ -120,6 +129,7 @@ export const MobileBottomNav = ({
   return (
     <nav
       {...{ [MOBILE_BOTTOM_NAV_ATTR]: "" }}
+      data-tour='nav'
       // The open sheet is a modal that switches pointer events off on <body>;
       // the bar opts back in so its tabs keep working underneath.
       className={cn(
@@ -143,6 +153,7 @@ export const MobileBottomNav = ({
               }
               onNavigate={onNavigate}
               showBadge={showBadge}
+              tourId={item.tourId}
             />
           );
         })}

@@ -62,6 +62,7 @@ import {
   SONGS_HREF,
 } from "../data/onboardingGoals";
 import { firebaseSaveOnboarding } from "../services/onboarding.service";
+import { getTourHref } from "../tour/tourSteps";
 import type {
   OnboardingGoal,
   OnboardingLevel,
@@ -498,18 +499,26 @@ const OnboardingView = () => {
     }).catch(() => null);
     // After the save: the feed's welcome row reads the goal and plan off the user document.
     void addPlayerJoinedLog();
+    // Not straight to the answer: Home first, where Kostek's tour shows the
+    // app around and ends on the answer. Players dropped on it cold did not
+    // know where they were.
+    const tourHref = getTourHref({
+      goal: result.goal,
+      next: href,
+      noGuitar: playChoice === "no_guitar",
+    });
     // The answers are saved by now, so a phone player who closes the tab on
     // the desktop step loses nothing. Someone who just played their first riff
     // on the phone has seen it work there, so they skip the step.
     if (isMobile && playChoice !== "play") {
       clock.takeStep();
-      void router.prefetch(href);
-      setDestination({ href, goal: result.goal });
+      void router.prefetch(tourHref);
+      setDestination({ href: tourHref, goal: result.goal });
       setPending(null);
       setStep("desktop");
       return;
     }
-    await router.push(href);
+    await router.push(tourHref);
   };
 
   const handleDesktopContinue = async () => {
@@ -659,7 +668,7 @@ const OnboardingView = () => {
         {/* Nothing is left to skip once the answers are in. */}
         {step !== "desktop" && (
           <Link
-            href='/dashboard'
+            href={getTourHref(null)}
             onClick={handleSkip}
             className={cn(
               "rounded-lg px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-200",

@@ -3,6 +3,7 @@ import { CorridorBackdrop } from "components/CorridorBackdrop/CorridorBackdrop";
 import { isTabSwitchTo } from "components/PageTabs/useTabSwitchMotion";
 import { RockSidebar } from "components/RockSidebar";
 import { CommunityDrawer } from "feature/logsBox/components/CommunityDrawer";
+import { AppTour } from "feature/onboarding/tour/AppTour";
 import { m, useReducedMotion } from "framer-motion";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { LocalizedRegion } from "lib/i18n/LocalizedRegion";
@@ -98,6 +99,7 @@ const MainLoggedLayout = ({
         </div>
 
         <CommunityDrawer />
+        <AppTour />
       </main>
     </LocalizedRegion>
   );

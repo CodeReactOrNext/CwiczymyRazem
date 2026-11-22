@@ -151,7 +151,9 @@ export const HomeHero = ({
           </Button>
 
           {/* No backdrop of its own: on a phone the hero is the one level of card. */}
-          <div className='select-none pt-1 md:hidden'>{stackedStats}</div>
+          <div className='select-none pt-1 md:hidden' data-tour='stats'>
+            {stackedStats}
+          </div>
         </div>
       </div>
 

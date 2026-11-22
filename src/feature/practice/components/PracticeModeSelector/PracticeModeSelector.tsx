@@ -35,6 +35,8 @@ import { useState } from "react";
 import { SiGuitarpro } from "react-icons/si";
 
 interface ModeRowProps {
+  /** The mode id, as `data-tour` — the first-day tour points at one of these. */
+  id: string;
   Icon: React.ElementType;
   title: string;
   description: string;
@@ -48,12 +50,13 @@ interface ModeRowProps {
  * badges were tried on its right edge and only made eleven rows harder to
  * read; where the player stands in a mode is that mode's own screen's job.
  */
-const ModeRow = ({ Icon, title, description, loading, onActivate }: ModeRowProps) => {
+const ModeRow = ({ id, Icon, title, description, loading, onActivate }: ModeRowProps) => {
   const { createRipple, ripple } = useRipple("bg-white/15");
 
   return (
     <button
       type='button'
+      data-tour={`mode-${id}`}
       onClick={(e) => {
         createRipple(e);
         if (!loading) onActivate();
@@ -166,6 +169,7 @@ export const PracticeModeSelector = () => {
   const logButton = (id: string, Icon: React.ElementType, href: string) => (
     <button
       type='button'
+      data-tour={`mode-${id}`}
       onClick={() => nav(href, id)}
       className={cn(PRESSABLE_KEY, "relative flex min-h-[52px] w-full items-center gap-3 overflow-hidden rounded-lg bg-zinc-800/50 px-3.5 text-left transition-background hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring")}>
       <Ripple className='bg-white/15' />
@@ -190,7 +194,7 @@ export const PracticeModeSelector = () => {
             <h2 className='text-base font-semibold text-zinc-200'>
               {t("sections.all")}
             </h2>
-            <div className='flex flex-col gap-3'>
+            <div className='flex flex-col gap-3' data-tour='practice-modes'>
               {MODE_GROUPS.map((group) => (
                 <div
                   key={group.id}
@@ -201,6 +205,7 @@ export const PracticeModeSelector = () => {
                   {group.modes.map(({ id, Icon, href }) => (
                     <ModeRow
                       key={id}
+                      id={id}
                       Icon={Icon}
                       title={t(`modes.${id}.title`)}
                       description={t(`modes.${id}.description`)}
@@ -214,7 +219,7 @@ export const PracticeModeSelector = () => {
           </section>
 
           <aside className='w-full shrink-0 space-y-8 lg:w-80'>
-            <section className='space-y-3'>
+            <section className='space-y-3' data-tour='practice-log'>
               <h2 className='text-base font-semibold text-zinc-200'>
                 {t("sections.log_time")}
               </h2>

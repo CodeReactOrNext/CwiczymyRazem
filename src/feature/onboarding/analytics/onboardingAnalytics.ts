@@ -265,6 +265,60 @@ export const trackOnboardingBack = (props: {
   });
 };
 
+// ─── First-day tour ────────────────────────────────────────────────────────────
+// Its own funnel: tour_started → tour_step_viewed (per step) → tour_completed,
+// with tour_skipped saying where players gave up on it.
+
+export const trackTourStarted = (props: {
+  source: "onboarding" | "menu";
+  goal: OnboardingGoal | null;
+  noGuitar: boolean;
+}) => {
+  posthog.capture("tour_started", {
+    source: props.source,
+    goal: props.goal,
+    no_guitar: props.noGuitar,
+  });
+};
+
+export const trackTourStepViewed = (props: {
+  step: string;
+  index: number;
+  total: number;
+}) => {
+  posthog.capture("tour_step_viewed", {
+    step: props.step,
+    index: props.index,
+    total: props.total,
+  });
+};
+
+export const trackTourSkipped = (props: {
+  step: string;
+  index: number;
+  total: number;
+  durationMs: number;
+}) => {
+  posthog.capture("tour_skipped", {
+    step: props.step,
+    index: props.index,
+    total: props.total,
+    duration_ms: props.durationMs,
+  });
+};
+
+export const trackTourCompleted = (props: {
+  durationMs: number;
+  /** Where the goodbye card sent the player; `null` = they just closed it. */
+  destination: string | null;
+}) => {
+  posthog.capture("tour_completed", {
+    duration_ms: props.durationMs,
+    destination: props.destination,
+    $set_once: { tour_completed_at: new Date().toISOString() },
+  });
+};
+
 export const trackOnboardingSkipped = (props: {
   step: OnboardingStep;
   /** Only known once the first question was answered. */

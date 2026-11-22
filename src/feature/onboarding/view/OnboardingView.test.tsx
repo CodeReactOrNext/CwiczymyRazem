@@ -3,7 +3,12 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { getTourHref } from "../tour/tourSteps";
 import OnboardingView from "./OnboardingView";
+
+/** Every answer now goes through Home, where the tour ends on it. */
+const viaTour = (goal: "journey" | "plans" | "songs", next: string, noGuitar = false) =>
+  getTourHref({ goal, next, noGuitar });
 
 const { router, viewport, saveOnboarding } = vi.hoisted(() => ({
   router: {
@@ -92,7 +97,9 @@ describe("OnboardingView", () => {
     fireEvent.click(await screen.findByText("songs_step.continue"));
 
     await vi.waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith("/songs?view=management"),
+      expect(router.push).toHaveBeenCalledWith(
+        viaTour("songs", "/songs?view=management"),
+      ),
     );
     expect(saveOnboarding).toHaveBeenCalledWith({
       level: "some",
@@ -110,7 +117,7 @@ describe("OnboardingView", () => {
     fireEvent.click(await screen.findByText("goals.plans.label"));
 
     await vi.waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith("/timer/plans"),
+      expect(router.push).toHaveBeenCalledWith(viaTour("plans", "/timer/plans")),
     );
     expect(screen.queryByRole("heading", { name: "plan_step.title" })).toBeNull();
     expect(saveOnboarding).toHaveBeenCalledWith({
@@ -133,7 +140,9 @@ describe("OnboardingView", () => {
     expect(screen.queryByText("skip")).toBeNull();
 
     fireEvent.click(screen.getByText("desktop_hint.continue"));
-    await vi.waitFor(() => expect(router.push).toHaveBeenCalledWith("/journey"));
+    await vi.waitFor(() =>
+      expect(router.push).toHaveBeenCalledWith(viaTour("journey", "/journey")),
+    );
   });
 
   it("tells a player without a guitar what they can already look at", async () => {
@@ -147,6 +156,12 @@ describe("OnboardingView", () => {
 
     expect(await screen.findByRole("heading", { name: "goal_step.title_no_guitar" })).toBeTruthy();
     expect(screen.getByText("goal_step.no_guitar_hint")).toBeTruthy();
+
+    // The tour ends on exercises that need no guitar, so it has to know.
+    fireEvent.click(screen.getByText("goals.journey.label"));
+    await vi.waitFor(() =>
+      expect(router.push).toHaveBeenCalledWith(viaTour("journey", "/journey", true)),
+    );
   });
 
   it("explains songs before committing a player to them", async () => {
@@ -165,18 +180,22 @@ describe("OnboardingView", () => {
 
     fireEvent.click(await screen.findByText("songs_step.continue"));
     await vi.waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith("/songs?view=management"),
+      expect(router.push).toHaveBeenCalledWith(
+        viaTour("songs", "/songs?view=management"),
+      ),
     );
   });
 
-  it("sends a desktop player straight to their answer", async () => {
+  it("sends a desktop player to Home with the tour, which ends on their answer", async () => {
     viewport.isMobile = false;
     render(<OnboardingView />);
 
     await lookAroundAsBeginner();
     fireEvent.click(await screen.findByText("goals.journey.label"));
 
-    await vi.waitFor(() => expect(router.push).toHaveBeenCalledWith("/journey"));
+    await vi.waitFor(() =>
+      expect(router.push).toHaveBeenCalledWith(viaTour("journey", "/journey")),
+    );
     expect(screen.queryByRole("heading", { name: "desktop_hint.title" })).toBeNull();
   });
 });

@@ -138,5 +138,72 @@
         }
       }
     }
+  },
+  "tour": {
+    "step": "Schritt {{n}} von {{total}}",
+    "next": "Weiter",
+    "back": "Zurück",
+    "skip": "Tour überspringen",
+    "skipped_toast": "Tour übersprungen. Du findest sie jederzeit im Menü: {{take}}.",
+    "welcome": {
+      "title": "Hi, ich bin Kostek",
+      "text": "Ich zeige dir in einer Minute, wo was ist und wie du anfängst. Du kannst die Tour jederzeit überspringen.",
+      "cta": "Zeig's mir"
+    },
+    "nav": {
+      "title": "Dein Menü",
+      "text": "Das Menü ist immer links. Von hier ist jeder Teil der App einen Klick entfernt.",
+      "text_mobile": "Das Menü ist immer unten. Unter {{more}} findest du den Rest: Benachrichtigungen, Community, Arsenal und Einstellungen."
+    },
+    "community": {
+      "title": "Benachrichtigungen und Community",
+      "text": "Die Glocke sammelt Likes, Antworten und Belohnungen. Das Symbol daneben öffnet die Community: was andere üben, den Chat und deine Gilde."
+    },
+    "stats": {
+      "title": "Serie, Punkte und Fame",
+      "text": "Die Flamme ist deine Serie: Tage am Stück mit Üben. Ab Tag 5 gibt sie 50 % mehr Punkte. Punkte halten deine Arbeit fest und heben dein Level. Fame ist die Währung, die du im Arsenal für Gitarren und Pedale ausgibst.",
+      "text_mobile": "Das ist dein Level. Jede Session bringt Punkte, die es steigen lassen, und eine Serie von Tagen am Stück legt bis zu 50 % drauf. Sessions bringen auch Fame, die Währung für Gitarren und Pedale im Arsenal."
+    },
+    "quests": {
+      "title": "Tägliche Quests",
+      "text": "Hier warten jeden Tag drei kleine Aufgaben, die meisten erledigst du einfach beim Spielen. Schaffst du alle drei, holst du dir Fame und Punkte ab."
+    },
+    "week": {
+      "title": "Deine Woche",
+      "text": "An welchen Tagen du diese Woche gespielt hast und wie lange. Jede Session zählt, auch zehn Minuten."
+    },
+    "feed": {
+      "title": "Was andere spielen",
+      "text": "Weiter unten siehst du, was andere gerade üben. Motiviere jemandes Session, und die Person bekommt Fame von dir. Eine Kleinigkeit, die beim Dranbleiben hilft."
+    },
+    "go_practice": {
+      "title": "Hier fängt alles an",
+      "text": "Alles in deinem Log beginnt mit Spielen. Klick auf {{practice}}, dann zeige ich dir, wie du üben kannst.",
+      "hint": "Klick auf den hervorgehobenen Button {{practice}}."
+    },
+    "hub": {
+      "title": "Fünf Wege in eine Session",
+      "text": "{{today}} ist ein Plan für eine Sitzung. {{courses}} laufen über Wochen. {{music}} sind Songs, {{technique}} einzelne Übungen und {{versus}} Duelle und Bosskämpfe. Jeder Weg bringt Punkte und Fame und hält deine Serie am Leben."
+    },
+    "log": {
+      "title": "Ohne die App gespielt?",
+      "text": "Zeit, die du woanders spielst, zählt auch. Starte die Stoppuhr beim Spielen oder trag sie von Hand ein, bis zu 7 Tage zurück."
+    },
+    "start": {
+      "title": "Dein Start: {{name}}",
+      "journey": "Ein Kurs von den Grundlagen an, Lektion für Lektion. Komm jederzeit hierher zurück, wenn du den nächsten Schritt willst.",
+      "plans": "Eine fertige Session mit Timer, der dir sagt, was du wie lange spielst.",
+      "songs": "Speichere die Songs, die du lernen willst, und verfolge, wie weit du bei jedem bist.",
+      "roadmap": "Wochen voller Schritte zu einem Ziel, etwa im Stil deines Idols zu spielen.",
+      "log": "Starte die Stoppuhr beim Spielen, und die Zeit landet in deinem Log.",
+      "no_guitar": "Für {{name}} brauchst du eine Gitarre, heb es dir also auf, bis du eine zur Hand hast. Heute kannst du mit Übungen ohne Gitarre anfangen: Theorie und Gehörtraining bringen genauso viele Punkte und halten deine Serie am Leben."
+    },
+    "done": {
+      "title": "Das war's",
+      "text": "Du kannst diese Tour jederzeit über das Menü wiederholen: {{take}}. Bis nach deiner ersten Session!",
+      "cta_go": "Bring mich hin",
+      "cta_no_guitar": "Übungen ohne Gitarre",
+      "finish": "Fertig"
+    }
   }
 }

@@ -61,7 +61,11 @@ export const WidgetFrame = ({
     // `empty:hidden` — a card that decided to render nothing (checklist
     // claimed, no level reward waiting) must not leave a blank cell.
     return (
-      <div ref={setNodeRef} className={cn(colSpan, "empty:hidden")}>
+      <div
+        ref={setNodeRef}
+        className={cn(colSpan, "empty:hidden")}
+        // The first-day tour lights cards up by id.
+        data-tour={`widget-${placement.id}`}>
         {children}
       </div>
     );

@@ -138,5 +138,72 @@
         }
       }
     }
+  },
+  "tour": {
+    "step": "Krok {{n}} z {{total}}",
+    "next": "Dalej",
+    "back": "Wstecz",
+    "skip": "Pomiń wycieczkę",
+    "skipped_toast": "Wycieczka pominięta. Znajdziesz ją w menu: {{take}}.",
+    "welcome": {
+      "title": "Cześć, jestem Kostek",
+      "text": "Pokażę ci w minutę, co gdzie jest i od czego zacząć. Wycieczkę możesz pominąć w każdej chwili.",
+      "cta": "Pokaż mi"
+    },
+    "nav": {
+      "title": "Menu",
+      "text": "Menu jest zawsze po lewej. Każde miejsce w aplikacji jest stąd o jedno kliknięcie.",
+      "text_mobile": "Menu jest zawsze na dole. Pod {{more}} jest reszta: powiadomienia, społeczność, Arsenal i ustawienia."
+    },
+    "community": {
+      "title": "Powiadomienia i społeczność",
+      "text": "Dzwonek zbiera polubienia, odpowiedzi i nagrody. Ikona obok otwiera panel społeczności: co ćwiczą inni, czat i twoją gildię."
+    },
+    "stats": {
+      "title": "Seria, punkty i Fame",
+      "text": "Płomień to seria, czyli kolejne dni grania z rzędu. Od 5. dnia dodaje 50% do punktów. Punkty zapisują twoją pracę i podnoszą poziom. Fame to waluta: wydajesz ją w Arsenale na gitary i efekty.",
+      "text_mobile": "To twój poziom. Każda sesja daje punkty, które go podnoszą, a seria dni z rzędu dokłada do nich nawet 50%. Sesje dają też Fame, walutę na gitary i efekty w Arsenale."
+    },
+    "quests": {
+      "title": "Zadania dnia",
+      "text": "Codziennie czekają tu trzy małe zadania, a większość robi się sama przy graniu. Po wszystkich trzech odbierasz Fame i punkty."
+    },
+    "week": {
+      "title": "Twój tydzień",
+      "text": "W które dni tego tygodnia było granie i jak długo. Każda sesja się liczy, nawet dziesięć minut."
+    },
+    "feed": {
+      "title": "Co grają inni",
+      "text": "Niżej widać, co ćwiczą teraz inni gracze. Zmotywuj czyjąś sesję, a ta osoba dostanie od ciebie Fame. To drobiazg, który naprawdę pomaga wytrwać."
+    },
+    "go_practice": {
+      "title": "Od tego wszystko się zaczyna",
+      "text": "Wszystko w dzienniku zaczyna się od grania. Kliknij {{practice}}, a pokażę ci, jak można ćwiczyć.",
+      "hint": "Kliknij podświetlony przycisk {{practice}}."
+    },
+    "hub": {
+      "title": "Pięć sposobów na sesję",
+      "text": "{{today}} to plan na jedno posiedzenie. {{courses}} trwają tygodniami. {{music}} to utwory, {{technique}} pojedyncze ćwiczenia, a {{versus}} pojedynki i bossy. Każda droga daje punkty, Fame i podtrzymuje serię."
+    },
+    "log": {
+      "title": "Grasz bez aplikacji?",
+      "text": "Czas zagrany gdzie indziej też się liczy. Włącz stoper na czas grania albo wpisz go ręcznie, do 7 dni wstecz."
+    },
+    "start": {
+      "title": "Twój start: {{name}}",
+      "journey": "Kurs od samych podstaw, lekcja po lekcji. Wracaj tu zawsze, gdy chcesz zrobić następny krok.",
+      "plans": "Gotowa sesja ze stoperem, który mówi, co grać i jak długo.",
+      "songs": "Zapisuj utwory, których chcesz się nauczyć, i śledź, jak daleko jesteś z każdym.",
+      "roadmap": "Tygodnie kroków do jednego celu, na przykład grania w stylu twojego idola.",
+      "log": "Włącz stoper, kiedy grasz, a czas trafi do twojego dziennika.",
+      "no_guitar": "{{name}} wymaga gitary, więc wróć tu, gdy będzie pod ręką. Dziś zacznij od ćwiczeń bez gitary: teoria i słuch dają tyle samo punktów i też podtrzymują serię."
+    },
+    "done": {
+      "title": "Gotowe",
+      "text": "Wycieczkę włączysz ponownie w każdej chwili z menu: {{take}}. Do zobaczenia po pierwszej sesji!",
+      "cta_go": "Zabierz mnie tam",
+      "cta_no_guitar": "Ćwiczenia bez gitary",
+      "finish": "Zakończ"
+    }
   }
 }

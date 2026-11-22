@@ -138,5 +138,72 @@
         }
       }
     }
+  },
+  "tour": {
+    "step": "Step {{n}} of {{total}}",
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip the tour",
+    "skipped_toast": "Tour skipped. It's in the menu whenever you want it: {{take}}.",
+    "welcome": {
+      "title": "Hi, I'm Kostek",
+      "text": "Let me show you around in about a minute: where things are and how to start. You can skip the tour at any time.",
+      "cta": "Show me"
+    },
+    "nav": {
+      "title": "Your menu",
+      "text": "The menu is always on the left. Every part of the app is one click away from here.",
+      "text_mobile": "The menu is always at the bottom. {{more}} holds the rest: notifications, community, the Arsenal and settings."
+    },
+    "community": {
+      "title": "Notifications and community",
+      "text": "The bell collects likes, replies and rewards. The icon next to it opens the community panel: what other players are practising, the chat and your guild."
+    },
+    "stats": {
+      "title": "Streak, points and Fame",
+      "text": "The flame is your streak: days in a row with practice. From day 5 it adds 50% to your points. Points record your work and raise your level. Fame is the currency you spend in the Arsenal on guitars and pedals.",
+      "text_mobile": "This is your level. Every session pays points that raise it, and a streak of days in a row adds up to 50% on top. Sessions pay Fame too, the currency for guitars and pedals in the Arsenal."
+    },
+    "quests": {
+      "title": "Daily quests",
+      "text": "Three small tasks wait here every day, and most of them get done just by playing. Finish all three and collect Fame and points."
+    },
+    "week": {
+      "title": "Your week",
+      "text": "Which days you played this week and for how long. Every session counts, even ten minutes."
+    },
+    "feed": {
+      "title": "What others are playing",
+      "text": "Further down is what other players are practising right now. Motivate someone's session and they get Fame from you. It's a small thing that keeps people going."
+    },
+    "go_practice": {
+      "title": "Where it all starts",
+      "text": "Everything in your log starts with playing. Press {{practice}} and I'll show you the ways to practise.",
+      "hint": "Press the lit-up {{practice}} button."
+    },
+    "hub": {
+      "title": "Five ways into a session",
+      "text": "{{today}} is a plan you play through in one sitting. {{courses}} run for weeks. {{music}} is songs, {{technique}} is single exercises, and {{versus}} is duels and boss fights. Every one of them pays points and Fame and keeps your streak going."
+    },
+    "log": {
+      "title": "Playing without the app?",
+      "text": "Time you play elsewhere counts too. Run the stopwatch while you play, or log it by hand up to 7 days back."
+    },
+    "start": {
+      "title": "Your start: {{name}}",
+      "journey": "A course from the very basics, one lesson at a time. Come back here whenever you want your next step.",
+      "plans": "A ready-made session with a timer that tells you what to play and for how long.",
+      "songs": "Save the songs you want to learn and track how far you've got with each one.",
+      "roadmap": "Weeks of steps toward one goal, like playing in the style of your hero.",
+      "log": "Run the stopwatch while you play and the time lands in your log.",
+      "no_guitar": "{{name}} is played on a guitar, so keep it for when you have one at hand. Today you can start with exercises that need no guitar: theory and ear training pay the same points and keep your streak too."
+    },
+    "done": {
+      "title": "That's it",
+      "text": "You can take this tour again any time from the menu: {{take}}. See you after your first session!",
+      "cta_go": "Take me there",
+      "cta_no_guitar": "Exercises without a guitar",
+      "finish": "Finish"
+    }
   }
 }

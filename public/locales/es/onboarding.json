@@ -138,5 +138,72 @@
         }
       }
     }
+  },
+  "tour": {
+    "step": "Paso {{n}} de {{total}}",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "skip": "Saltar el recorrido",
+    "skipped_toast": "Recorrido saltado. Lo tienes en el menú cuando quieras: {{take}}.",
+    "welcome": {
+      "title": "Hola, soy Kostek",
+      "text": "Te enseño en un minuto dónde está cada cosa y cómo empezar. Puedes saltarte el recorrido cuando quieras.",
+      "cta": "Enséñame"
+    },
+    "nav": {
+      "title": "Tu menú",
+      "text": "El menú está siempre a la izquierda. Desde aquí llegas a cualquier parte de la app con un clic.",
+      "text_mobile": "El menú está siempre abajo. En {{more}} está el resto: notificaciones, comunidad, el Arsenal y los ajustes."
+    },
+    "community": {
+      "title": "Notificaciones y comunidad",
+      "text": "La campana reúne los me gusta, las respuestas y las recompensas. El icono de al lado abre el panel de la comunidad: lo que practican otros, el chat y tu gremio."
+    },
+    "stats": {
+      "title": "Racha, puntos y Fame",
+      "text": "La llama es tu racha: días seguidos practicando. Desde el día 5 suma un 50 % a tus puntos. Los puntos registran tu trabajo y suben tu nivel. La Fame es la moneda que gastas en el Arsenal en guitarras y pedales.",
+      "text_mobile": "Este es tu nivel. Cada sesión da puntos que lo suben, y una racha de días seguidos añade hasta un 50 % más. Las sesiones también dan Fame, la moneda para guitarras y pedales del Arsenal."
+    },
+    "quests": {
+      "title": "Misiones diarias",
+      "text": "Aquí te esperan tres pequeñas tareas cada día, y la mayoría se completan simplemente tocando. Termina las tres y recoge Fame y puntos."
+    },
+    "week": {
+      "title": "Tu semana",
+      "text": "Qué días tocaste esta semana y durante cuánto tiempo. Cada sesión cuenta, aunque sean diez minutos."
+    },
+    "feed": {
+      "title": "Qué tocan los demás",
+      "text": "Más abajo ves lo que practican ahora otros jugadores. Motiva la sesión de alguien y recibirá Fame de tu parte. Es un detalle pequeño que ayuda a seguir."
+    },
+    "go_practice": {
+      "title": "Aquí empieza todo",
+      "text": "Todo lo que hay en tu registro empieza tocando. Pulsa {{practice}} y te enseño las formas de practicar.",
+      "hint": "Pulsa el botón {{practice}} resaltado."
+    },
+    "hub": {
+      "title": "Cinco formas de empezar una sesión",
+      "text": "{{today}} es un plan para una sola sesión. {{courses}} duran semanas. {{music}} son canciones, {{technique}} ejercicios sueltos y {{versus}} duelos y jefes. Todas dan puntos y Fame y mantienen tu racha."
+    },
+    "log": {
+      "title": "¿Tocas sin la app?",
+      "text": "El tiempo que tocas en otra parte también cuenta. Pon el cronómetro mientras tocas o anótalo a mano, hasta 7 días atrás."
+    },
+    "start": {
+      "title": "Tu inicio: {{name}}",
+      "journey": "Un curso desde lo más básico, lección a lección. Vuelve aquí cuando quieras dar el siguiente paso.",
+      "plans": "Una sesión preparada con un temporizador que te dice qué tocar y durante cuánto tiempo.",
+      "songs": "Guarda las canciones que quieres aprender y sigue cuánto has avanzado con cada una.",
+      "roadmap": "Semanas de pasos hacia un objetivo, como tocar al estilo de tu ídolo.",
+      "log": "Pon el cronómetro mientras tocas y el tiempo irá a tu registro.",
+      "no_guitar": "{{name}} se toca con guitarra, así que guárdalo para cuando tengas una a mano. Hoy puedes empezar con ejercicios sin guitarra: la teoría y el oído dan los mismos puntos y también mantienen tu racha."
+    },
+    "done": {
+      "title": "Listo",
+      "text": "Puedes repetir este recorrido cuando quieras desde el menú: {{take}}. ¡Nos vemos después de tu primera sesión!",
+      "cta_go": "Llévame allí",
+      "cta_no_guitar": "Ejercicios sin guitarra",
+      "finish": "Terminar"
+    }
   }
 }
