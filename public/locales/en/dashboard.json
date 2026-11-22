@@ -27,8 +27,26 @@
       "rate_multiple_songs": "Rate 3 Songs",
       "complete_two_plans": "Complete 2 Practice Plans",
       "improve_skill": "Earn points in any Skill",
-      "practice_three_exercises": "Practice 3 different exercises"
-    }
+      "practice_three_exercises": "Practice 3 different exercises",
+      "goal_run_one": "Do a run on one of your Goals",
+      "goal_run_other": "Do {{count}} runs on your Goals",
+      "calendar_tick": "Tick off a Calendar item or plan one",
+      "rotation_item_one": "Play an item from your Rotation",
+      "rotation_item_other": "Play {{count}} items from your Rotation",
+      "journey_step": "Finish a Journey step",
+      "roadmap_step": "Practice a step from your Roadmap",
+      "tempo_cleared": "Clear a tempo on a Tree",
+      "daily_exercise": "Play today's Daily Exercise",
+      "duel_run": "Play a Duel run",
+      "boss_attempt": "Take on a Boss",
+      "challenge_play": "Practice this month's Challenge song",
+      "guild_contribution": "Contribute to your Guild",
+      "ear_round": "Play a Play by Ear round"
+    },
+    "slot_discover": "New for you",
+    "slot_comeback": "Back after a while",
+    "reroll": "Swap this quest",
+    "reroll_hint": "One swap a day"
   },
   "customize": {
     "refreshing": "Updating…",

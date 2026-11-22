@@ -1,6 +1,7 @@
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useCallback, useEffect, useState } from "react";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 import {
   getExerciseBpmProgress,
@@ -18,6 +19,7 @@ interface UseBpmProgressReturn {
 
 export const useBpmProgress = (exercise: Exercise): UseBpmProgressReturn => {
   const userAuth = useAppSelector(selectUserAuth);
+  const dispatch = useAppDispatch();
   const [completedBpms, setCompletedBpms] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -63,13 +65,14 @@ export const useBpmProgress = (exercise: Exercise): UseBpmProgressReturn => {
           exercise.category
         );
         setCompletedBpms(updatedBpms);
+        if (updatedBpms.includes(bpm)) dispatch(updateQuestProgress({ type: "tempo_cleared" }));
       } catch {
         // Revert on failure
         const data = await getExerciseBpmProgress(userAuth, exercise.id);
         setCompletedBpms(data?.completedBpms || []);
       }
     },
-    [userAuth, exercise.id, exercise.title, exercise.category, exercise.metronomeSpeed]
+    [userAuth, exercise.id, exercise.title, exercise.category, exercise.metronomeSpeed, dispatch]
   );
 
   return {

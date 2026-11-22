@@ -1,12 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { firebaseUpdateUserProgress } from "feature/aiCoach/services/userProgress.service";
 import type { RoadmapPhase } from "feature/aiCoach/types/roadmap.types";
-import { newlyCompletedSteps } from "feature/aiCoach/utils/completedSteps";
+import { hasAdvancedStep, newlyCompletedSteps } from "feature/aiCoach/utils/completedSteps";
 import { extractStepProgress } from "feature/aiCoach/utils/roadmapProgress";
 import { firebaseAddRoadmapStepLog } from "feature/logs/services/addRoadmapStepLog.service";
 import type { UserRoadmapDetail } from "feature/supporterPanel/types/userRoadmaps.types";
 import { displayTitle } from "feature/supporterPanel/utils/roadmapGoal";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useCallback, useRef } from "react";
+import { useAppDispatch } from "store/hooks";
 
 import { userRoadmapDetailKey } from "./useUserRoadmaps";
 
@@ -41,6 +43,7 @@ export const useOwnRoadmapPersist = (
   runnerUid: string = userId,
 ) => {
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
   // Steps already put in the activity log while this roadmap is open.
   const loggedStepsRef = useRef(new Set<string>());
 
@@ -51,6 +54,9 @@ export const useOwnRoadmapPersist = (
       const finished = cached
         ? newlyCompletedSteps(lastSavedPhases(cached), phases)
         : [];
+      // Only the player's own run counts toward their daily quest.
+      const advanced =
+        !!cached && runnerUid === userId && hasAdvancedStep(lastSavedPhases(cached), phases);
 
       const { stepProgress, resourceProgress, phaseChecks } =
         extractStepProgress(phases);
@@ -61,6 +67,7 @@ export const useOwnRoadmapPersist = (
         resourceProgress,
         phaseChecks,
       );
+      if (advanced) dispatch(updateQuestProgress({ type: "roadmap_step" }));
 
       // Once per step per visit: ticking a step off, back on and off again
       // should not fill the feed with the same step.
@@ -81,6 +88,6 @@ export const useOwnRoadmapPersist = (
         prev ? { ...prev, stepProgress, resourceProgress, phaseChecks } : prev,
       );
     },
-    [queryClient, roadmapId, runnerUid, userId],
+    [queryClient, roadmapId, runnerUid, userId, dispatch],
   );
 };

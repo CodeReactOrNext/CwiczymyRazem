@@ -13,11 +13,12 @@ import {
   firebaseUpdateUserProgress,
   type UserRoadmapProgress,
 } from "feature/aiCoach/services/userProgress.service";
-import { newlyCompletedSteps } from "feature/aiCoach/utils/completedSteps";
+import { hasAdvancedStep, newlyCompletedSteps } from "feature/aiCoach/utils/completedSteps";
 import { withPhaseChecks } from "feature/aiCoach/utils/phaseCheck";
 import { extractStepProgress } from "feature/aiCoach/utils/roadmapProgress";
 import { firebaseAddRoadmapStepLog } from "feature/logs/services/addRoadmapStepLog.service";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowRight,
@@ -28,7 +29,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 import type {
   Roadmap,
@@ -84,6 +85,7 @@ function mergeWithProgress(
 
 const AiCoachView = () => {
   const { t } = useTranslation("ai_coach");
+  const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
   const userId = typeof userAuth === "string" ? userAuth : null;
   const router = useRouter();
@@ -152,6 +154,8 @@ const AiCoachView = () => {
       mergedRoadmap && selectedStaticRoadmap
         ? newlyCompletedSteps(mergedRoadmap.phases, phases)
         : [];
+    const advanced =
+      !!mergedRoadmap && hasAdvancedStep(mergedRoadmap.phases, phases);
     const { stepProgress, resourceProgress, phaseChecks } =
       extractStepProgress(phases);
     await firebaseUpdateUserProgress(
@@ -161,6 +165,7 @@ const AiCoachView = () => {
       resourceProgress,
       phaseChecks,
     );
+    if (advanced) dispatch(updateQuestProgress({ type: "roadmap_step" }));
 
     // Once per step per visit: ticking a step off, back on and off again
     // should not fill the feed with the same step.

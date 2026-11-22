@@ -27,8 +27,26 @@
       "rate_multiple_songs": "Valora 3 canciones",
       "complete_two_plans": "Completa 2 planes de práctica",
       "improve_skill": "Gana puntos en cualquier habilidad",
-      "practice_three_exercises": "Practica 3 ejercicios distintos"
-    }
+      "practice_three_exercises": "Practica 3 ejercicios distintos",
+      "goal_run_one": "Haz un intento en uno de tus objetivos",
+      "goal_run_other": "Haz {{count}} intentos en tus objetivos",
+      "calendar_tick": "Marca algo del calendario o planifica algo",
+      "rotation_item_one": "Toca algo de tu rotación",
+      "rotation_item_other": "Toca {{count}} cosas de tu rotación",
+      "journey_step": "Completa un paso del Journey",
+      "roadmap_step": "Practica un paso de tu roadmap",
+      "tempo_cleared": "Supera un tempo en un árbol",
+      "daily_exercise": "Toca el Daily Exercise de hoy",
+      "duel_run": "Juega un intento de duelo",
+      "boss_attempt": "Enfréntate a un jefe",
+      "challenge_play": "Practica la canción del reto del mes",
+      "guild_contribution": "Aporta algo a tu gremio",
+      "ear_round": "Juega una ronda de Play by Ear"
+    },
+    "slot_discover": "Nuevo para ti",
+    "slot_comeback": "De vuelta tras un tiempo",
+    "reroll": "Cambiar esta misión",
+    "reroll_hint": "Un cambio al día"
   },
   "customize": {
     "refreshing": "Actualizando…",

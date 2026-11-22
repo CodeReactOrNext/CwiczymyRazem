@@ -23,6 +23,7 @@ export const isSameQuest = (
   if (!a || !b) return !a && !b;
   if (a.date !== b.date) return false;
   if (a.isRewardClaimed !== b.isRewardClaimed) return false;
+  if (!!a.rerolled !== !!b.rerolled) return false;
   if (a.tasks.length !== b.tasks.length) return false;
 
   return a.tasks.every((task, index) => {
@@ -79,39 +80,50 @@ export const mergeDailyQuests = (
   // Same day: the stored task list is the canonical draw. Two clients that
   // generated a set at the same time must not keep swapping their own draw in,
   // so local-only tasks are dropped and their progress carried over by type.
-  const localByKey = new Map(local.tasks.map((task) => [taskKey(task), task]));
+  //
+  // The one exception is the daily swap: a copy that has used it and a copy
+  // that has not hold different task lists on purpose, and the swapped list is
+  // the newer one. Without this the stored list would win and undo the swap.
+  const canonical = local.rerolled && !remote.rerolled ? local : remote;
+  const other = canonical === local ? remote : local;
+  const otherByKey = new Map(other.tasks.map((task) => [taskKey(task), task]));
 
-  const tasks = remote.tasks.map((remoteTask) => {
-    const localTask = localByKey.get(taskKey(remoteTask));
-    if (!localTask) return remoteTask;
+  const tasks = canonical.tasks.map((canonicalTask) => {
+    const otherTask = otherByKey.get(taskKey(canonicalTask));
+    if (!otherTask) return canonicalTask;
 
     // Two devices that each practiced a different category hold a progress of 1
     // apiece, yet together made 2 — so for the distinct-category tasks the
     // count is rebuilt from the merged minutes rather than picked by max alone.
-    const categoryMinutes = isCategoryQuestType(remoteTask.type)
-      ? mergeCategoryMinutes(remoteTask.categoryMinutes, localTask.categoryMinutes)
+    const categoryMinutes = isCategoryQuestType(canonicalTask.type)
+      ? mergeCategoryMinutes(canonicalTask.categoryMinutes, otherTask.categoryMinutes)
       : undefined;
     const categoriesCounted = categoryMinutes
-      ? countQuestCategories(remoteTask.type, categoryMinutes)
+      ? countQuestCategories(canonicalTask.type, categoryMinutes)
       : 0;
 
     const progress = Math.min(
-      Math.max(remoteTask.progress, localTask.progress, categoriesCounted),
-      remoteTask.target
+      Math.max(canonicalTask.progress, otherTask.progress, categoriesCounted),
+      canonicalTask.target
     );
 
     return {
-      ...remoteTask,
+      ...canonicalTask,
       ...(categoryMinutes && { categoryMinutes }),
       progress,
       isCompleted:
-        remoteTask.isCompleted || localTask.isCompleted || progress >= remoteTask.target,
+        canonicalTask.isCompleted || otherTask.isCompleted || progress >= canonicalTask.target,
     };
   });
+
+  const features = canonical.features ?? other.features;
+  const rerolled = !!(remote.rerolled || local.rerolled);
 
   return {
     date: remote.date,
     tasks,
     isRewardClaimed: remote.isRewardClaimed || local.isRewardClaimed,
+    ...(features && { features }),
+    ...(rerolled && { rerolled }),
   };
 };

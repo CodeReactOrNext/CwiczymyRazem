@@ -15,6 +15,15 @@ const ANY_SESSION: ReadonlySet<DailyQuestTaskType> = new Set([
 const BY_SOURCE: Partial<Record<NextAction["source"], DailyQuestTaskType[]>> = {
   plan: ["practice_plan", "complete_two_plans"],
   songs: ["practice_any_song"],
+  goals: ["goal_run"],
+  calendar: ["calendar_tick"],
+  rotation: ["rotation_item"],
+  journey: ["journey_step"],
+  roadmap: ["roadmap_step"],
+  dailyExercise: ["daily_exercise"],
+  duels: ["duel_run"],
+  bosses: ["boss_attempt"],
+  challenge: ["challenge_play"],
 };
 
 const heroExerciseId = (hero: NextAction): string | undefined => {

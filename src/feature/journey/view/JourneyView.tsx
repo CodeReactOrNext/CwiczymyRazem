@@ -1,10 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 import { journeyModules, placeholderModules } from "../data/journeyModules";
 import {
@@ -30,6 +31,7 @@ import { StepLesson } from "./components/StepLesson";
 const JourneyView: React.FC = () => {
   const { t } = useTranslation("journey");
   const userAuth = useAppSelector(selectUserAuth);
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   const queryClient = useQueryClient();
@@ -180,6 +182,7 @@ const JourneyView: React.FC = () => {
 
       try {
         await firebaseCompleteJourneyStep(userAuth as string, selectedModuleId, stepId);
+        dispatch(updateQuestProgress({ type: "journey_step" }));
         toast.success(t("toast.step_completed"));
         handleCloseLesson();
         setOpenStepId(null);
@@ -190,7 +193,7 @@ const JourneyView: React.FC = () => {
         setIsSaving(false);
       }
     },
-    [userAuth, progressDoc, selectedModuleId, handleCloseLesson, setProgressDoc]
+    [userAuth, progressDoc, selectedModuleId, handleCloseLesson, setProgressDoc, dispatch]
   );
 
   const handleStartStep = useCallback(

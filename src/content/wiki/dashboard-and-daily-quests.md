@@ -32,11 +32,21 @@ Some cards only appear when they have something to say, and step aside on their 
 
 ## Daily quests
 
-Every day you get three small tasks, drawn at random from a big pool, with no two of them being the same job in different clothes. Finish all three and a Claim button appears.
+Every day you get three small tasks. Finish all three and a Claim button appears.
 
-<QuestPreview tasks="Practice for 15 minutes::done|Rate a Song::0 / 1|Practice 3 different categories::2 / 3" reward="+10 points, +40 Fame" caption="Tap any unfinished task and the app takes you straight to the screen where you can do it." />
+<QuestPreview tasks="Practice for 15 minutes::done|Play 2 items from your Rotation::1 / 2|Do a run on one of your Goals::0 / 1" reward="+10 points, +40 Fame" caption="Tap any unfinished task and the app takes you straight to the screen where you can do it." />
 
-The tasks are things you were probably going to do anyway. They tick off automatically as you practise and log, so there's nothing to mark by hand.
+Each of the three has its own job:
+
+- **The first is always plain practice**, like 15 minutes at the guitar or three different exercises. You can do it from anywhere in the app.
+- **The other two come from the tools you actually use.** If you've been working on goals, your calendar or your rotation, that's what your quests are about. A tool you haven't touched for about a month of practice days drops out, and the same tool doesn't come up two days in a row when there's something else to pick.
+- **Every few days one of them is a tool you've left behind.** The card marks it "Back after a while".
+
+In your first week everything is new, so the two tool quests show you around the app instead, marked "New for you". They skip whatever What Next is already pointing you to, so the two never ask for the same thing.
+
+The tasks tick off automatically as you practise and log, so there's nothing to mark by hand.
+
+**One swap a day.** If a quest doesn't fit your day, press the arrows next to it and you get a different one. It works once a day, and only on a quest you haven't finished yet.
 
 <BlogAlert type="warning">
 The reward isn't given automatically. You have to press Claim before the day rolls over. Your quest day ends at midnight where you live, so a late-evening session still counts towards the set you have been looking at all day, and a fresh set of three is waiting the next morning.
@@ -44,52 +54,37 @@ The reward isn't given automatically. You have to press Claim before the day rol
 
 ## Every quest that can come up
 
-Twenty-one tasks sit in the pool. Three are drawn from it each morning.
-
-**Time at the guitar**
+**Plain practice** (one of these every day)
 
 - Practice for 15 minutes
 - Practice for 30 minutes total
-
-**One category at a time**
-
-- Practice Technique for 10 minutes
-- Practice Theory for 10 minutes
-- Train your Ear for 10 minutes
-- Be Creative for 10 minutes
-- Spend 15 minutes on Creativity
-
-**Spreading it around**
-
-- Practice 3 different categories
 - Practice 2 categories for 5 min each
-- Practice Technique & Theory in one session
-
-**Songs**
-
-- Rate a Song
-- Rate 3 Songs
-- Add song to "Want to Learn"
-- Practice any Song
-
-**Routines**
-
-- Complete a Practice Plan
-- Complete 2 Practice Plans
-- Generate & Practice Auto Plan
-
-**Exercises and skills**
-
-- Practice a specific exercise, named on the card
+- Practice 3 different categories
 - Practice 3 different exercises
+- Practice Technique for 10 minutes
+- Practice a specific exercise, named on the card
 - Earn points in any Skill
 
-**Habits**
+**From your tools**
 
-- Use 2 Healthy Habits
+- **Exercise goals:** Do a run on one of your Goals · Do 3 runs on your Goals
+- **Calendar:** Tick off a Calendar item or plan one
+- **Rotation:** Play an item from your Rotation · Play 2 items from your Rotation
+- **Practice plans:** Complete a Practice Plan · Complete 2 Practice Plans · Generate & Practice Auto Plan
+- **Songs:** Practice any Song · Rate 3 Songs · Add song to "Want to Learn"
+- **Journey:** Finish a Journey step
+- **Roadmap:** Practice a step from your Roadmap
+- **Skill and scale trees:** Clear a tempo on a Tree
+- **Daily Exercise:** Play today's Daily Exercise
+- **Duels:** Play a Duel run
+- **Bosses:** Take on a Boss
+- **Monthly challenge:** Practice this month's Challenge song
+- **Guild:** Contribute to your Guild
+- **Ear training:** Play a Play by Ear round · Train your Ear for 10 minutes
+- **Logging with habits:** Use 2 Healthy Habits
 
 ## Questions people ask
 
-<FaqList items="I finished a quest but it still shows as incomplete::Quest progress is counted from logged sessions, so it only moves once you save the session, not while the timer is running|Can I choose my quests?::No, they're drawn for you each day. If a task doesn't suit you, skip it. Nothing is lost except that day's claim|Do quests keep a streak?::No. Only practising keeps the streak alive. Quests are a separate, single-day reward|Can I change what Home shows?::Yes. Press Customize above the cards, then drag, hide, resize or add cards. Reset brings the original Home back|I hid a card by mistake::Press Customize, then Add widget. Every hidden card is in that list|Can I put a single weekly goal on Home?::Yes. Every milestone is its own card under Weekly goals in the Add widget list, and you can claim its reward straight from the card" />
+<FaqList items="I finished a quest but it still shows as incomplete::Quest progress is counted from logged sessions, so it only moves once you save the session, not while the timer is running|Can I choose my quests?::Not directly. They follow the tools you use. If one doesn't suit your day, press the arrows next to it to swap it, once a day. You can also just skip it: nothing is lost except that day's claim|Do quests keep a streak?::No. Only practising keeps the streak alive. Quests are a separate, single-day reward|Can I change what Home shows?::Yes. Press Customize above the cards, then drag, hide, resize or add cards. Reset brings the original Home back|I hid a card by mistake::Press Customize, then Add widget. Every hidden card is in that list|Can I put a single weekly goal on Home?::Yes. Every milestone is its own card under Weekly goals in the Add widget list, and you can claim its reward straight from the card" />
 
 <ReadNext links="How points and streaks work::/wiki/how-scoring-works|Logging a practice session::/wiki/practice-sessions-and-logging|Where Fame comes from::/wiki/fame|Spending your Fame::/wiki/arsenal-and-gear" />

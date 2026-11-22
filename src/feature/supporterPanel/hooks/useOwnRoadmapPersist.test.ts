@@ -11,6 +11,7 @@ vi.mock("feature/aiCoach/services/userProgress.service", () => ({
 }));
 
 const firebaseAddRoadmapStepLog = vi.fn();
+vi.mock("store/hooks", () => ({ useAppDispatch: () => vi.fn() }));
 vi.mock("feature/logs/services/addRoadmapStepLog.service", () => ({
   firebaseAddRoadmapStepLog: (...args: unknown[]) =>
     firebaseAddRoadmapStepLog(...args),

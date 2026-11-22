@@ -45,6 +45,7 @@ vi.mock("feature/user/store/userSlice", () => ({
 
 vi.mock("store/hooks", () => ({
   useAppSelector: (selector: (state: unknown) => unknown) => selector({}),
+  useAppDispatch: () => vi.fn(),
 }));
 
 const exercise = {

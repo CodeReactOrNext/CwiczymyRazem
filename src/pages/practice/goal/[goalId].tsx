@@ -10,11 +10,13 @@ import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSessio
 import type { GoalRunConfig } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { logger } from "feature/logger/Logger";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useRequireUserAuth } from "hooks/useRequireUserAuth";
 import { useTranslation } from "hooks/useTranslation";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
+import { useAppDispatch } from "store/hooks";
 
 /**
  * Goal mode: the goal's exercise, played run after run, each run that reaches
@@ -25,6 +27,7 @@ import { useEffect, useMemo, useState } from "react";
 export default function GoalPracticePage() {
   const { t } = useTranslation("goals");
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const userAuth = useRequireUserAuth();
   const goalId = typeof router.query.goalId === "string" ? router.query.goalId : null;
   const [exercise, setExercise] = useState<Exercise | null>(null);
@@ -86,6 +89,9 @@ export default function GoalPracticePage() {
         try {
           const result = await recordGoalRun(userAuth, goal.id, exercise, scored, run.timing);
           if (result.outcome.justCompleted) setIsReached(true);
+          dispatch(updateQuestProgress({ type: "goal_run" }));
+          // A cleared stage ticks its tempo on the ladder the trees read.
+          if (result.outcome.stageCleared) dispatch(updateQuestProgress({ type: "tempo_cleared" }));
           setGoal(result.goal);
           return <GoalRunVerdict state={{ kind: "judged", goal: result.goal, run: scored, outcome: result.outcome }} />;
         } catch (error) {
@@ -94,7 +100,7 @@ export default function GoalPracticePage() {
         }
       },
     };
-  }, [goal, exercise, userAuth, t]);
+  }, [goal, exercise, userAuth, t, dispatch]);
 
   const backToGoals = () => {
     router.push(isReached && goalId ? `/goals?completed=${goalId}` : "/goals");

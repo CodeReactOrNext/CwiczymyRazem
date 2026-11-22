@@ -8,10 +8,12 @@ import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/Prac
 import { journeyModules } from "feature/journey/data/journeyModules";
 import { accuracyToStars, firebaseCompleteJourneyStepWithStars } from "feature/journey/services/journey.service";
 import { firebaseAddExamPassedLog } from "feature/logs/services/addExamPassedLog.service";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useRequireUserAuth } from "hooks/useRequireUserAuth";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useAppDispatch } from "store/hooks";
 
 export default function PracticeExercisePage() {
   const router = useRouter();
@@ -19,6 +21,7 @@ export default function PracticeExercisePage() {
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useRequireUserAuth();
+  const dispatch = useAppDispatch();
 
   const isExamMode = mode === "exam";
   const examBpm = bpm ? parseInt(bpm as string, 10) : undefined;
@@ -57,6 +60,7 @@ export default function PracticeExercisePage() {
         stepId as string,
         stars
       );
+      dispatch(updateQuestProgress({ type: "journey_step" }));
 
       const journeyModule = journeyModules.find((m) => m.id === moduleId);
       const step = journeyModule?.stages.flatMap((s) => s.steps).find((s) => s.id === stepId);

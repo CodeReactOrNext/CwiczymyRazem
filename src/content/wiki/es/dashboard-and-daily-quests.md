@@ -32,64 +32,59 @@ Algunas tarjetas solo aparecen cuando tienen algo que decir, y luego desaparecen
 
 ## Misiones diarias
 
-Cada día recibes tres tareas pequeñas, sacadas al azar de un gran conjunto, y no hay dos que sean el mismo trabajo con otro disfraz. Completa las tres y aparece un botón Reclamar.
+Cada día recibes tres tareas pequeñas. Termina las tres y aparecerá un botón de Cobrar.
 
-<QuestPreview tasks="Practica 15 minutos::done|Valora una canción::0 / 1|Practica 3 categorías distintas::2 / 3" reward="+10 puntos, +40 Fame" caption="Toca cualquier tarea sin terminar y la app te lleva directo a la pantalla donde puedes hacerla." />
+<QuestPreview tasks="Practica 15 minutos::done|Toca 2 cosas de tu rotación::1 / 2|Haz un intento en uno de tus objetivos::0 / 1" reward="+10 puntos, +40 Fame" caption="Toca cualquier tarea sin terminar y la app te lleva directo a la pantalla donde puedes hacerla." />
 
-Las tareas son cosas que probablemente ibas a hacer de todos modos. Se marcan solas a medida que practicas y registras, así que no hay nada que marcar a mano.
+Cada una de las tres tiene su papel:
+
+- **La primera siempre es práctica sin más**, como 15 minutos con la guitarra o tres ejercicios distintos. Puedes hacerla desde cualquier parte de la app.
+- **Las otras dos salen de las herramientas que de verdad usas.** Si últimamente trabajas con objetivos, el calendario o tu rotación, de eso tratan tus misiones. Una herramienta que no tocas durante más o menos un mes de días de práctica desaparece, y la misma herramienta no sale dos días seguidos si hay otra entre la que elegir.
+- **Cada pocos días una de ellas trata de una herramienta que has dejado.** La tarjeta la marca como «De vuelta tras un tiempo».
+
+En tu primera semana todo es nuevo, así que las dos misiones de herramientas te enseñan la app, marcadas como «Nuevo para ti». Se saltan lo que What Next ya te está señalando, así que los dos nunca piden lo mismo.
+
+Las tareas se marcan solas mientras practicas y registras, así que no hay nada que marcar a mano.
+
+**Un cambio al día.** Si una misión no encaja con tu día, pulsa las flechas a su lado y te dará otra. Funciona una vez al día y solo con una misión que aún no has terminado.
 
 <BlogAlert type="warning">
-La recompensa no se da automáticamente. Tienes que pulsar Reclamar antes de que acabe el día. Tu día de misiones termina a medianoche donde vives, así que una sesión a última hora de la tarde sigue contando para el conjunto que has estado viendo todo el día, y a la mañana siguiente te espera un conjunto nuevo de tres.
+La recompensa no se da automáticamente. Tienes que pulsar Cobrar antes de que cambie el día. Tu día de misiones termina a medianoche donde vives, así que una sesión a última hora de la tarde sigue contando para el conjunto que has tenido delante todo el día, y a la mañana siguiente te espera un conjunto nuevo de tres.
 </BlogAlert>
 
 ## Todas las misiones que pueden salir
 
-Hay veintiuna tareas en el conjunto. Cada mañana se sacan tres.
-
-**Tiempo con la guitarra**
+**Práctica sin más** (una de estas cada día)
 
 - Practica 15 minutos
 - Practica 30 minutos en total
-
-**Una categoría cada vez**
-
-- Practica técnica 10 minutos
-- Practica teoría 10 minutos
-- Entrena el oído 10 minutos
-- Sé creativo 10 minutos
-- Dedica 15 minutos a la creatividad
-
-**Repartirlo**
-
+- Practica 2 categorías durante 5 min cada una
 - Practica 3 categorías distintas
-- Practica 2 categorías 5 min cada una
-- Practica técnica y teoría en una sesión
-
-**Canciones**
-
-- Valora una canción
-- Valora 3 canciones
-- Añade una canción a «Quiero aprender»
-- Practica cualquier canción
-
-**Rutinas**
-
-- Completa un plan de práctica
-- Completa 2 planes de práctica
-- Genera y practica un plan automático
-
-**Ejercicios y habilidades**
-
-- Practica un ejercicio concreto, indicado en la tarjeta
 - Practica 3 ejercicios distintos
+- Practica técnica durante 10 minutos
+- Practica un ejercicio concreto, nombrado en la tarjeta
 - Gana puntos en cualquier habilidad
 
-**Hábitos**
+**De tus herramientas**
 
-- Aplica 2 hábitos saludables
+- **Objetivos de ejercicios:** Haz un intento en uno de tus objetivos · Haz 3 intentos en tus objetivos
+- **Calendario:** Marca algo del calendario o planifica algo
+- **Rotación:** Toca algo de tu rotación · Toca 2 cosas de tu rotación
+- **Planes de práctica:** Completa un plan de práctica · Completa 2 planes de práctica · Genera y practica un Auto Plan
+- **Canciones:** Practica cualquier canción · Valora 3 canciones · Añade una canción a «Quiero aprender»
+- **Journey:** Completa un paso del Journey
+- **Roadmap:** Practica un paso de tu roadmap
+- **Árboles de habilidades y escalas:** Supera un tempo en un árbol
+- **Daily Exercise:** Toca el Daily Exercise de hoy
+- **Duelos:** Juega un intento de duelo
+- **Jefes:** Enfréntate a un jefe
+- **Reto del mes:** Practica la canción del reto del mes
+- **Gremio:** Aporta algo a tu gremio
+- **Oído:** Juega una ronda de Play by Ear · Entrena tu oído durante 10 minutos
+- **Registro con hábitos:** Usa 2 hábitos saludables
 
 ## Preguntas que la gente hace
 
-<FaqList items="He terminado una misión pero sigue como incompleta::El progreso de las misiones se cuenta a partir de las sesiones registradas, así que solo avanza cuando guardas la sesión, no mientras corre el temporizador|¿Puedo elegir mis misiones?::No, se sacan para ti cada día. Si una tarea no te encaja, sáltala. No pierdes nada salvo el cobro de ese día|¿Las misiones mantienen una racha?::No. Solo practicar mantiene viva la racha. Las misiones son una recompensa aparte, de un solo día|¿Puedo cambiar lo que muestra Inicio?::Sí. Pulsa Personalizar encima de las tarjetas y luego arrastra, oculta, redimensiona o añade tarjetas. Restablecer devuelve el Inicio original|He ocultado una tarjeta por error::Pulsa Personalizar y luego Añadir widget. Todas las tarjetas ocultas están en esa lista|¿Puedo poner un único objetivo semanal en Inicio?::Sí. Cada hito es su propia tarjeta bajo Objetivos semanales en la lista Añadir widget, y puedes reclamar su recompensa directamente desde la tarjeta" />
+<FaqList items="He terminado una misión pero sigue como incompleta::El progreso de las misiones se cuenta a partir de las sesiones registradas, así que solo avanza cuando guardas la sesión, no mientras corre el temporizador|¿Puedo elegir mis misiones?::No directamente. Siguen las herramientas que usas. Si una no encaja con tu día, pulsa las flechas a su lado y cámbiala, una vez al día. También puedes saltarla: no pierdes nada salvo el cobro de ese día|¿Las misiones mantienen una racha?::No. Solo practicar mantiene viva la racha. Las misiones son una recompensa aparte, de un solo día|¿Puedo cambiar lo que muestra Inicio?::Sí. Pulsa Personalizar encima de las tarjetas y luego arrastra, oculta, redimensiona o añade tarjetas. Restablecer devuelve el Inicio original|He ocultado una tarjeta por error::Pulsa Personalizar y luego Añadir widget. Todas las tarjetas ocultas están en esa lista|¿Puedo poner un único objetivo semanal en Inicio?::Sí. Cada hito es su propia tarjeta bajo Objetivos semanales en la lista Añadir widget, y puedes reclamar su recompensa directamente desde la tarjeta" />
 
 <ReadNext links="Cómo funcionan los puntos y las rachas::/wiki/how-scoring-works|Registrar una sesión de práctica::/wiki/practice-sessions-and-logging|De dónde viene la Fame::/wiki/fame|Gastar tu Fame::/wiki/arsenal-and-gear" />

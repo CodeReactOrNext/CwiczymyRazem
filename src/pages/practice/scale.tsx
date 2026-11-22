@@ -11,11 +11,12 @@ import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/Prac
 import { BASE_ROOT_NOTE, isScaleTreeKey } from "feature/scaleTree/data/scaleTreeKeys";
 import { isRecordRunClean, RECORD_PASS_ACCURACY } from "feature/scaleTree/data/scaleTreeRecords";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 // Every scale-tree exam runs on the same clock — 90 s to hold the required BPM.
@@ -31,6 +32,7 @@ export default function PracticeScalePage() {
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
+  const dispatch = useAppDispatch();
 
   // Key the tree sent us into. The fret (`pos`) already arrives transposed —
   // this only decides which notes the generator writes into the tab.
@@ -143,6 +145,7 @@ export default function PracticeScalePage() {
           exercise.title,
           'theory'
         );
+        dispatch(updateQuestProgress({ type: 'tempo_cleared' }));
       }
     } catch (e) {
       console.error(e);

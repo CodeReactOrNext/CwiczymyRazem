@@ -139,6 +139,7 @@ vi.mock("next/router", () => ({
 // own summary with a matching userId instead of changing this default.
 vi.mock("store/hooks", () => ({
   useAppSelector: () => "viewer-uid",
+  useAppDispatch: () => vi.fn(),
 }));
 // No QueryClientProvider in these tests — invalidate/read are no-ops here;
 // the "own roadmap" test checks the real cache update through the real hook.

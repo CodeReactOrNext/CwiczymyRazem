@@ -32,11 +32,21 @@ Niektóre karty pojawiają się tylko wtedy, gdy mają coś do powiedzenia, a po
 
 ## Dzienne zadania
 
-Każdego dnia dostajesz trzy małe zadania, losowane z dużej puli, żadne dwa nie są tą samą robotą w innym przebraniu. Ukończ wszystkie trzy, a pojawi się przycisk Odbierz.
+Każdego dnia dostajesz trzy małe zadania. Ukończ wszystkie trzy, a pojawi się przycisk Odbierz.
 
-<QuestPreview tasks="Ćwicz przez 15 minut::done|Oceń utwór::0 / 1|Poćwicz 3 różne kategorie::2 / 3" reward="+10 punktów, +40 Fame" caption="Stuknij dowolne nieukończone zadanie, a aplikacja zabierze cię prosto na ekran, na którym możesz je wykonać." />
+<QuestPreview tasks="Ćwicz przez 15 minut::done|Zagraj 2 rzeczy z rotacji::1 / 2|Zrób podejście do jednego ze swoich celów::0 / 1" reward="+10 punktów, +40 Fame" caption="Stuknij dowolne nieukończone zadanie, a aplikacja zabierze cię prosto na ekran, na którym możesz je wykonać." />
 
-Zadania to rzeczy, które i tak prawdopodobnie miałeś zrobić. Odhaczają się automatycznie, gdy ćwiczysz i zapisujesz, więc nie ma nic do zaznaczania ręcznie.
+Każde z trzech ma swoją rolę:
+
+- **Pierwsze to zawsze samo granie**, na przykład 15 minut z gitarą albo trzy różne ćwiczenia. Zrobisz je z każdego miejsca w aplikacji.
+- **Dwa pozostałe pochodzą z narzędzi, których faktycznie używasz.** Jeśli ostatnio pracujesz z celami, kalendarzem albo rotacją, to o nich będą twoje zadania. Narzędzie nieruszane przez mniej więcej miesiąc dni z graniem wypada, a to samo narzędzie nie wraca dwa dni z rzędu, jeśli jest z czego wybierać.
+- **Co kilka dni jedno z nich dotyczy narzędzia, które odstawiłeś.** Karta oznacza je jako „Powrót po przerwie”.
+
+W pierwszym tygodniu wszystko jest nowe, więc dwa zadania z narzędzi oprowadzają cię po aplikacji, z dopiskiem „Nowe dla ciebie”. Pomijają to, co już podsuwa What Next, więc oba miejsca nigdy nie proszą o to samo.
+
+Zadania odhaczają się automatycznie, gdy ćwiczysz i zapisujesz, więc nie ma nic do zaznaczania ręcznie.
+
+**Jedna wymiana dziennie.** Jeśli zadanie nie pasuje do twojego dnia, naciśnij strzałki obok niego, a dostaniesz inne. Działa to raz dziennie i tylko na zadaniu, którego jeszcze nie ukończyłeś.
 
 <BlogAlert type="warning">
 Nagroda nie jest przyznawana automatycznie. Musisz nacisnąć Odbierz, zanim dzień się skończy. Twój dzień zadań kończy się o północy tam, gdzie mieszkasz, więc późna wieczorna sesja nadal liczy się do zestawu, który oglądałeś przez cały dzień, a świeży zestaw trzech czeka następnego ranka.
@@ -44,52 +54,37 @@ Nagroda nie jest przyznawana automatycznie. Musisz nacisnąć Odbierz, zanim dzi
 
 ## Każde zadanie, które może się pojawić
 
-W puli jest dwadzieścia jeden zadań. Trzy są losowane każdego ranka.
-
-**Czas z gitarą**
+**Samo granie** (jedno z nich codziennie)
 
 - Ćwicz przez 15 minut
-- Ćwicz łącznie 30 minut
-
-**Jedna kategoria naraz**
-
-- Ćwicz technikę przez 10 minut
-- Ćwicz teorię przez 10 minut
-- Ćwicz słuch przez 10 minut
-- Twórz przez 10 minut
-- Poświęć 15 minut na kreatywność
-
-**Rozłożenie na różne obszary**
-
+- Ćwicz łącznie przez 30 minut
+- Poćwicz 2 kategorie po 5 minut
 - Poćwicz 3 różne kategorie
-- Poćwicz 2 kategorie po 5 min
-- Poćwicz technikę i teorię w jednej sesji
-
-**Utwory**
-
-- Oceń utwór
-- Oceń 3 utwory
-- Dodaj utwór do „Chcę się nauczyć”
-- Poćwicz dowolny utwór
-
-**Rutyny**
-
-- Ukończ plan ćwiczeń
-- Ukończ 2 plany ćwiczeń
-- Wygeneruj i przećwicz plan automatyczny
-
-**Ćwiczenia i umiejętności**
-
-- Poćwicz konkretne ćwiczenie, nazwane na karcie
 - Poćwicz 3 różne ćwiczenia
+- Ćwicz technikę przez 10 minut
+- Poćwicz konkretne ćwiczenie, podane na karcie
 - Zdobądź punkty w dowolnej umiejętności
 
-**Nawyki**
+**Z twoich narzędzi**
 
-- Zastosuj 2 zdrowe nawyki
+- **Cele ćwiczeń:** Zrób podejście do jednego ze swoich celów · Zrób 3 podejścia do swoich celów
+- **Kalendarz:** Odhacz coś w kalendarzu albo coś zaplanuj
+- **Rotacja:** Zagraj coś z rotacji · Zagraj 2 rzeczy z rotacji
+- **Plany ćwiczeń:** Ukończ plan ćwiczeń · Ukończ 2 plany ćwiczeń · Wygeneruj i przećwicz Auto Plan
+- **Utwory:** Przećwicz dowolny utwór · Oceń 3 utwory · Dodaj utwór do „Chcę się nauczyć”
+- **Journey:** Ukończ krok w Journey
+- **Roadmapa:** Przećwicz krok ze swojej roadmapy
+- **Drzewka umiejętności i skal:** Zalicz tempo na drzewku
+- **Daily Exercise:** Zagraj dzisiejsze Daily Exercise
+- **Pojedynki:** Zagraj podejście w pojedynku
+- **Bossowie:** Zmierz się z bossem
+- **Wyzwanie miesiąca:** Przećwicz utwór z wyzwania miesiąca
+- **Gildia:** Dołóż się do gildii
+- **Słuch:** Zagraj rundę Play by Ear · Trenuj słuch przez 10 minut
+- **Zapis z nawykami:** Użyj 2 zdrowych nawyków
 
 ## Pytania, które ludzie zadają
 
-<FaqList items="Ukończyłem zadanie, ale wciąż jest nieukończone::Postęp zadań jest liczony z zapisanych sesji, więc rusza dopiero po zapisaniu sesji, a nie podczas działania stopera|Czy mogę wybierać zadania?::Nie, są losowane dla ciebie każdego dnia. Jeśli zadanie ci nie pasuje, pomiń je. Nic nie tracisz poza odbiorem nagrody tego dnia|Czy zadania podtrzymują serię?::Nie. Serię podtrzymuje tylko ćwiczenie. Zadania to osobna, jednodniowa nagroda|Czy mogę zmienić to, co pokazuje Start?::Tak. Naciśnij Dostosuj nad kartami, a potem przeciągaj, ukrywaj, zmieniaj rozmiar lub dodawaj karty. Resetuj przywraca oryginalny Start|Ukryłem kartę przez pomyłkę::Naciśnij Dostosuj, potem Dodaj widżet. Każda ukryta karta jest na tej liście|Czy mogę umieścić na Starcie pojedynczy cel tygodniowy?::Tak. Każdy kamień milowy to osobna karta w sekcji Cele tygodniowe na liście Dodaj widżet, a jego nagrodę możesz odebrać prosto z karty" />
+<FaqList items="Ukończyłem zadanie, ale wciąż jest nieukończone::Postęp zadań jest liczony z zapisanych sesji, więc rusza dopiero po zapisaniu sesji, a nie podczas działania stopera|Czy mogę wybierać zadania?::Nie wprost. Zadania idą za narzędziami, których używasz. Jeśli któreś nie pasuje do twojego dnia, naciśnij strzałki obok i wymień je, raz dziennie. Możesz je też po prostu pominąć: nic nie tracisz poza odbiorem nagrody tego dnia|Czy zadania podtrzymują serię?::Nie. Serię podtrzymuje tylko ćwiczenie. Zadania to osobna, jednodniowa nagroda|Czy mogę zmienić to, co pokazuje Start?::Tak. Naciśnij Dostosuj nad kartami, a potem przeciągaj, ukrywaj, zmieniaj rozmiar lub dodawaj karty. Resetuj przywraca oryginalny Start|Ukryłem kartę przez pomyłkę::Naciśnij Dostosuj, potem Dodaj widżet. Każda ukryta karta jest na tej liście|Czy mogę umieścić na Starcie pojedynczy cel tygodniowy?::Tak. Każdy kamień milowy to osobna karta w sekcji Cele tygodniowe na liście Dodaj widżet, a jego nagrodę możesz odebrać prosto z karty" />
 
 <ReadNext links="Jak działają punkty i serie::/wiki/how-scoring-works|Zapisywanie sesji ćwiczeniowej::/wiki/practice-sessions-and-logging|Skąd bierze się Fame::/wiki/fame|Wydawanie Fame::/wiki/arsenal-and-gear" />

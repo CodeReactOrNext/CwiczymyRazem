@@ -7,8 +7,10 @@ import {
 import type { GuildsState } from "feature/guilds/types/guild.types";
 import type { GuildUpgrade } from "feature/guilds/utils/guildUpgrades.utils";
 import { GUILD_SEATS_PER_UPGRADE } from "feature/supporterPanel/constants/supporterPanel.constants";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
+import { useAppDispatch } from "store/hooks";
 import { auth } from "utils/firebase/client/firebase.utils";
 
 export const GUILDS_KEY = ["guilds"] as const;
@@ -58,7 +60,10 @@ const errorMessage = (error: unknown, fallback: string): string => {
 
 export const useGuildMutations = () => {
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
   const { t } = useTranslation("guilds");
+  const countContribution = () =>
+    dispatch(updateQuestProgress({ type: "guild_contribution" }));
 
   const apply = (state: GuildsState) =>
     queryClient.setQueryData(GUILDS_KEY, state);
@@ -140,6 +145,7 @@ export const useGuildMutations = () => {
       post<Funded>("/api/supporter/guild/fund", input),
     onSuccess: (state, { track }) => {
       apply(state);
+      countContribution();
 
       if (state.unlocked) {
         toast.success(BOUGHT[track]);
@@ -202,6 +208,7 @@ export const useGuildMutations = () => {
       }),
     onSuccess: (state) => {
       apply(state);
+      countContribution();
       toast.success(t("toast.deposited", { fame: state.paid }));
     },
     onError: (error) =>

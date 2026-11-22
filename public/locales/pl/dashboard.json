@@ -27,8 +27,30 @@
       "rate_multiple_songs": "Oceń 3 utwory",
       "complete_two_plans": "Ukończ 2 plany ćwiczeń",
       "improve_skill": "Zdobądź punkty w dowolnej umiejętności",
-      "practice_three_exercises": "Poćwicz 3 różne ćwiczenia"
-    }
+      "practice_three_exercises": "Poćwicz 3 różne ćwiczenia",
+      "goal_run_one": "Zrób podejście do jednego ze swoich celów",
+      "goal_run_few": "Zrób {{count}} podejścia do swoich celów",
+      "goal_run_many": "Zrób {{count}} podejść do swoich celów",
+      "goal_run_other": "Zrób {{count}} podejścia do swoich celów",
+      "calendar_tick": "Odhacz coś w kalendarzu albo coś zaplanuj",
+      "rotation_item_one": "Zagraj coś z rotacji",
+      "rotation_item_few": "Zagraj {{count}} rzeczy z rotacji",
+      "rotation_item_many": "Zagraj {{count}} rzeczy z rotacji",
+      "rotation_item_other": "Zagraj {{count}} rzeczy z rotacji",
+      "journey_step": "Ukończ krok w Journey",
+      "roadmap_step": "Przećwicz krok ze swojej roadmapy",
+      "tempo_cleared": "Zalicz tempo na drzewku",
+      "daily_exercise": "Zagraj dzisiejsze Daily Exercise",
+      "duel_run": "Zagraj podejście w pojedynku",
+      "boss_attempt": "Zmierz się z bossem",
+      "challenge_play": "Przećwicz utwór z wyzwania miesiąca",
+      "guild_contribution": "Dołóż się do gildii",
+      "ear_round": "Zagraj rundę Play by Ear"
+    },
+    "slot_discover": "Nowe dla ciebie",
+    "slot_comeback": "Powrót po przerwie",
+    "reroll": "Wymień to zadanie",
+    "reroll_hint": "Jedna wymiana dziennie"
   },
   "customize": {
     "refreshing": "Odświeżanie…",

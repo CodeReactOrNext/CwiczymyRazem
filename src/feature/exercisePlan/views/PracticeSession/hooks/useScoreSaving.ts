@@ -7,11 +7,12 @@ import { judgedRunNotice } from "feature/exerciseGoals/utils/judgedRunNotice";
 import { submitRecordingTake } from "feature/guilds/services/guildRecording.service";
 import { getExerciseUserRank } from "feature/leadboard/services/getExerciseUserRank";
 import { selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import type { RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 import { getLeaderboardEntryScore, markExerciseCompleted, saveLeaderboardEntry, updateClickHighScore, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
 import type { Exercise, ScoredRun } from "../../../types/exercise.types";
@@ -89,6 +90,7 @@ export function useScoreSaving({
   earTrainingScore, getEarTrainingBoardScore, noteMatchingHandle, sessionBpm, recordGoalChartRuns = true,
   videoDurationSeconds = null, duelId = null, recording = null, learnModeRef,
 }: UseScoreSavingOptions) {
+  const dispatch = useAppDispatch();
   const userAuth   = useAppSelector(selectUserAuth);
   const userName   = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
@@ -204,6 +206,11 @@ export function useScoreSaving({
         const isFullLength = isRunFullLength(activeExercise, snap.runMs ?? 0, videoDurationSeconds);
         void recordPracticeRun(userAuth, activeExercise, { bpm: runBpm, accuracy: Math.round(snap.accuracy) }, snap.timingPrecision ?? null, isFullLength)
           .then((judged) => {
+            // A run an open goal judged is a goal run, wherever it was played.
+            if (judged) {
+              dispatch(updateQuestProgress({ type: "goal_run" }));
+              if (judged.outcome.stageCleared) dispatch(updateQuestProgress({ type: "tempo_cleared" }));
+            }
             const notice = judged && judgedRunNotice(judged, Math.round(snap.accuracy), tGoals);
             if (!notice) return;
             const show = notice.tone === "success" ? toast.success : toast;

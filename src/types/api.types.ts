@@ -32,7 +32,51 @@ export type DailyQuestTaskType =
   | 'rate_multiple_songs'
   | 'complete_two_plans'
   | 'improve_skill'
-  | 'practice_three_exercises';
+  | 'practice_three_exercises'
+  // Tool quests — each belongs to one feature (see dailyQuest.features).
+  | 'goal_run'
+  | 'calendar_tick'
+  | 'rotation_item'
+  | 'journey_step'
+  | 'roadmap_step'
+  | 'tempo_cleared'
+  | 'daily_exercise'
+  | 'duel_run'
+  | 'boss_attempt'
+  | 'challenge_play'
+  | 'guild_contribution'
+  | 'ear_round';
+
+/**
+ * A part of the app a daily quest can be about. The quest generator draws its
+ * tool quests from the ones the player actually uses (`featureUse`).
+ */
+export type QuestFeature =
+  | 'goals'
+  | 'calendar'
+  | 'rotation'
+  | 'plans'
+  | 'songs'
+  | 'journey'
+  | 'roadmap'
+  | 'trees'
+  | 'daily'
+  | 'duels'
+  | 'bosses'
+  | 'challenge'
+  | 'guild'
+  | 'ear'
+  | 'habits';
+
+/**
+ * Per feature, the `sessionCount` at which the player last used it.
+ * `sessionCount` grows once per day with a report, so it is a counter of active
+ * days: "used in the last 30 active days" is `sessionCount - featureUse[f] < 30`.
+ */
+export type FeatureUseMap = Partial<Record<QuestFeature, number>>;
+
+/** Why a task is in today's set — read by the Home card to say so. */
+export type DailyQuestSlot = 'core' | 'tool' | 'discover' | 'comeback';
 
 export type DailyQuestCategory = 'technique' | 'theory' | 'hearing' | 'creativity';
 
@@ -53,12 +97,19 @@ export interface DailyQuestTask {
    * of what each session reported — see `dailyQuest.categories`.
    */
   categoryMinutes?: DailyQuestCategoryMinutes;
+  /** The feature a tool quest was drawn from. Absent on practice quests. */
+  feature?: QuestFeature;
+  slot?: DailyQuestSlot;
 }
 
 export interface DailyQuest {
   date: string;
   tasks: DailyQuestTask[];
   isRewardClaimed: boolean;
+  /** Features today's set was drawn from, so tomorrow's set can skip them. */
+  features?: QuestFeature[];
+  /** The one swap a day has been used. */
+  rerolled?: boolean;
 }
 
 /**
@@ -176,6 +227,8 @@ export interface StatisticsDataInterface {
     };
   };
   dailyQuest?: DailyQuest | null;
+  /** Which features the player used, and when — see `FeatureUseMap`. */
+  featureUse?: FeatureUseMap;
   fame?: number;
   /** Daily fame counter — fame scales on a curve over the day's total practice
    * time, so the payout needs to know how much of today is already paid for. */

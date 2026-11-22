@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
+import { useAppDispatch } from "store/hooks";
 
 import {
   getCalendar,
@@ -57,7 +59,15 @@ const applyLinks = (
  */
 export const useCalendar = (uid: string | null) => {
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
   const key = calendarQueryKey(uid);
+  // Planning a slot or ticking one off is the calendar quest ("tick off an
+  // item or plan one"), counted once the write went through.
+  const countTick = <T,>(write: Promise<T>): Promise<T> =>
+    write.then((result) => {
+      dispatch(updateQuestProgress({ type: "calendar_tick" }));
+      return result;
+    });
 
   const query = useQuery({
     queryKey: key,
@@ -148,19 +158,20 @@ export const useCalendar = (uid: string | null) => {
         (date) =>
           JSON.stringify(patch[date]) !== JSON.stringify(days[date] ?? []),
       );
-      return write(patch, unlinkDates(links, changed));
+      return countTick(write(patch, unlinkDates(links, changed)));
     },
     savePrefs: (prefs: PlannerPrefs) => prefsMutation.mutateAsync(prefs),
     addItem: (date: string, item: CalendarItem) =>
-      setDays({ [date]: [...dayItems(date), item] }),
+      countTick(setDays({ [date]: [...dayItems(date), item] })),
     addItems: (date: string, items: CalendarItem[]) =>
-      setDays({ [date]: [...dayItems(date), ...items] }),
+      countTick(setDays({ [date]: [...dayItems(date), ...items] })),
     removeItem: (date: string, itemId: string) =>
       setDays({ [date]: dayItems(date).filter((item) => item.id !== itemId) }),
     updateItem,
     toggleDone: (date: string, itemId: string) => {
       const item = dayItems(date).find((candidate) => candidate.id === itemId);
-      return updateItem(date, itemId, { done: !item?.done });
+      const toggled = updateItem(date, itemId, { done: !item?.done });
+      return item?.done ? toggled : countTick(toggled);
     },
     /** Moves a slot to another day, at its end. Moved by hand, it stops being the planner's. */
     moveItem: (from: string, to: string, itemId: string) => {
@@ -172,11 +183,13 @@ export const useCalendar = (uid: string | null) => {
       });
     },
     markDone: (date: string, itemIds: string[]) =>
-      setDays({
-        [date]: dayItems(date).map((item) =>
-          itemIds.includes(item.id) ? { ...item, done: true } : item,
-        ),
-      }),
+      countTick(
+        setDays({
+          [date]: dayItems(date).map((item) =>
+            itemIds.includes(item.id) ? { ...item, done: true } : item,
+          ),
+        }),
+      ),
     /**
      * Copies a day onto other days, replacing what was on them. Linked, the
      * group becomes exactly the source and `targets` — a day of it left out

@@ -10,9 +10,10 @@ import {
   DAILY_QUEST_FAME_REWARD,
   DAILY_QUEST_POINTS_REWARD,
   ensureQuestForToday,
+  rerollQuestTaskAction,
 } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, ChevronRight, Clock, Gift } from "lucide-react";
+import { Check, ChevronRight, Clock, Gift, RefreshCw } from "lucide-react";
 import Router from "next/router";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -116,12 +117,28 @@ export const DailyQuestWidget = () => {
     Router.push(getQuestTaskHref(task));
   };
 
-  const taskLabel = (task: DailyQuestTask) =>
-    task.type === "practice_specific_exercise"
-      ? t("daily_quests.tasks.practice_specific_exercise", {
-          exercise: task.title.replace(/^Practice: /, ""),
-        })
-      : t(`daily_quests.tasks.${task.type}`, task.title);
+  const taskLabel = (task: DailyQuestTask) => {
+    if (task.type === "practice_specific_exercise") {
+      return t("daily_quests.tasks.practice_specific_exercise", {
+        exercise: task.title.replace(/^Practice: /, ""),
+      });
+    }
+    // Some tool quests come in more than one size ("Play 2 items from your
+    // Rotation"), so the target picks the plural form.
+    const key = `daily_quests.tasks.${task.type}`;
+    const label = t(key, { count: task.target });
+    return label === key ? task.title : label;
+  };
+
+  // Only the slots worth a word: a tool the player uses needs no explaining.
+  const slotNote = (task: DailyQuestTask) =>
+    task.slot === "discover"
+      ? t("daily_quests.slot_discover")
+      : task.slot === "comeback"
+        ? t("daily_quests.slot_comeback")
+        : null;
+
+  const canReroll = !dailyQuest.rerolled;
 
   const header = (
     <div className='flex items-center justify-between gap-3'>
@@ -215,6 +232,11 @@ export const DailyQuestWidget = () => {
                     task.isCompleted ? "text-zinc-400" : "text-zinc-100",
                   )}>
                   {taskLabel(task)}
+                  {slotNote(task) && (
+                    <span className='mt-0.5 block text-xs font-medium text-zinc-400'>
+                      {slotNote(task)}
+                    </span>
+                  )}
                 </span>
                 <span
                   className={cn(
@@ -251,23 +273,35 @@ export const DailyQuestWidget = () => {
               {body}
             </div>
           ) : (
-            <button
-              key={task.id}
-              type='button'
-              onClick={() => openTask(task)}
-              className={cn(
-                rowClass,
-                "text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-800/40",
-              )}>
-              <span className='h-6 w-6 rounded-full ring-2 ring-inset ring-zinc-600' />
-              {body}
-              <ChevronRight
-                size={16}
-                strokeWidth={2.5}
-                className='text-zinc-400'
-                aria-hidden
-              />
-            </button>
+            <div key={task.id} className='flex items-center gap-2'>
+              <button
+                type='button'
+                onClick={() => openTask(task)}
+                className={cn(
+                  rowClass,
+                  "min-w-0 flex-1 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-800/40",
+                )}>
+                <span className='h-6 w-6 rounded-full ring-2 ring-inset ring-zinc-600' />
+                {body}
+                <ChevronRight
+                  size={16}
+                  strokeWidth={2.5}
+                  className='text-zinc-400'
+                  aria-hidden
+                />
+              </button>
+              {canReroll && (
+                <Button
+                  variant='ghost'
+                  size='icon-sm'
+                  onClick={() => dispatch(rerollQuestTaskAction(task.id))}
+                  aria-label={t("daily_quests.reroll")}
+                  title={t("daily_quests.reroll_hint")}
+                  className='shrink-0'>
+                  <RefreshCw aria-hidden />
+                </Button>
+              )}
+            </div>
           );
         })}
       </div>

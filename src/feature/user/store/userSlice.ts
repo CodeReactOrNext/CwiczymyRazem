@@ -8,6 +8,8 @@ import type {
   DailyQuestCategoryMinutes,
   DailyQuestTask,
   DailyQuestTaskType,
+  FeatureUseMap,
+  QuestFeature,
   StatisticsDataInterface,
   StatisticsTime,
   TimerInterface,
@@ -22,6 +24,8 @@ import {
   countQuestCategories,
   isCategoryQuestType,
 } from "./dailyQuest.categories";
+import { drawDailyQuest, drawReplacementTask } from "./dailyQuest.draw";
+import { mergeFeatureUse } from "./dailyQuest.features";
 import { getQuestDayKey, isPreMigrationQuestDay, isQuestDrawnFor } from "./questDay";
 import { subtractReportedTime } from "./timerReporting";
 import {
@@ -195,33 +199,6 @@ const userSlice = createSlice({
       if (!state.currentUserStats) return;
       const today = getQuestDayKey(state.currentUserStats.timeZone);
 
-      // Templates. `group` marks tasks that overlap in what they ask the
-      // player to do (e.g. rating songs, completing practice plans) so we
-      // never draw two of them into the same quest set (see #622).
-      const taskTemplates: { type: DailyQuestTaskType; title: string; target: number; group: string }[] = [
-        { type: 'rate_song', title: 'Rate a Song', target: 1, group: 'rate_song' },
-        { type: 'add_want_to_learn', title: 'Add song to "Want to Learn"', target: 1, group: 'add_want_to_learn' },
-        { type: 'practice_any_song', title: 'Practice any Song', target: 1, group: 'practice_any_song' },
-        { type: 'healthy_habits', title: 'Use 2 Healthy Habits', target: 2, group: 'healthy_habits' },
-        { type: 'auto_plan', title: 'Generate & Practice Auto Plan', target: 1, group: 'auto_plan' },
-        { type: 'practice_plan', title: 'Complete a Practice Plan', target: 1, group: 'practice_plan' },
-        { type: 'practice_total_time', title: 'Practice for 15 minutes', target: 15, group: 'total_time' },
-        { type: 'practice_technique_time', title: 'Practice Technique for 10 minutes', target: 10, group: 'technique_time' },
-        { type: 'practice_specific_exercise', title: 'Practice specific exercise', target: 1, group: 'specific_exercise' },
-        { type: 'practice_theory_time', title: 'Practice Theory for 10 minutes', target: 10, group: 'theory_time' },
-        { type: 'practice_hearing_time', title: 'Train your Ear for 10 minutes', target: 10, group: 'hearing_time' },
-        { type: 'practice_creativity_time', title: 'Be Creative for 10 minutes', target: 10, group: 'creativity_time' },
-        { type: 'creativity_focus', title: 'Spend 15 minutes on Creativity', target: 15, group: 'creativity_time' },
-        { type: 'long_session', title: 'Practice for 30 minutes total', target: 30, group: 'total_time' },
-        { type: 'well_rounded', title: 'Practice 3 different categories', target: 3, group: 'multi_category' },
-        { type: 'two_categories_min', title: 'Practice 2 categories for 5 min each', target: 2, group: 'multi_category' },
-        { type: 'balanced_session', title: 'Practice Technique & Theory in one session', target: 2, group: 'multi_category' },
-        { type: 'rate_multiple_songs', title: 'Rate 3 Songs', target: 3, group: 'rate_song' },
-        { type: 'complete_two_plans', title: 'Complete 2 Practice Plans', target: 2, group: 'practice_plan' },
-        { type: 'improve_skill', title: 'Earn points in any Skill', target: 1, group: 'improve_skill' },
-        { type: 'practice_three_exercises', title: 'Practice 3 different exercises', target: 3, group: 'specific_exercise' },
-      ];
-
       // If a quest exists for today, do nothing.
       //
       // `>=` rather than `===` because a stored key can read as tomorrow's: the
@@ -244,36 +221,28 @@ const userSlice = createSlice({
 
       if (isQuestDrawnFor(storedQuest, today)) return;
 
-      // Shuffle and pick 3, skipping templates whose group is already
-      // represented in the selection so the quest set never contains two
-      // near-duplicate tasks (e.g. "Rate a Song" + "Rate 3 Songs"). Use
-      // Fisher-Yates for a uniform distribution; sort(() => 0.5 - Math.random())
-      // is biased and over-selects the templates near the start of the array.
-      const shuffled = [...taskTemplates];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      const usedGroups = new Set<string>();
-      const selected: typeof taskTemplates = [];
-      for (const template of shuffled) {
-        if (selected.length >= 3) break;
-        if (usedGroups.has(template.group)) continue;
-        usedGroups.add(template.group);
-        selected.push(template);
-      }
+      // Practice plus two tools the player actually uses (see drawDailyQuest).
+      // Everything the draw reads is on the profile already in the store.
+      const stats = state.currentUserStats;
+      const draw = drawDailyQuest({
+        sessionCount: stats.sessionCount || 0,
+        featureUse: stats.featureUse,
+        previousFeatures: storedQuest?.features,
+      });
 
-      const tasks = selected.map((t, index) => {
+      const tasks = draw.tasks.map(({ template, slot, feature }, index) => {
         const taskObj: DailyQuestTask = {
           id: `quest_${today}_${index}`,
-          type: t.type,
-          title: t.title,
+          type: template.type,
+          title: template.title,
           isCompleted: false,
           progress: 0,
-          target: t.target
+          target: template.target,
+          ...(slot && { slot }),
+          ...(feature && { feature }),
         };
 
-        if (t.type === 'practice_specific_exercise') {
+        if (template.type === 'practice_specific_exercise') {
           if (action.payload?.randomExercise) {
             taskObj.exerciseId = action.payload.randomExercise.id;
             taskObj.title = `Practice: ${action.payload.randomExercise.title}`;
@@ -289,7 +258,8 @@ const userSlice = createSlice({
       const newQuest: DailyQuest = {
         date: today,
         isRewardClaimed: false,
-        tasks
+        tasks,
+        features: draw.features,
       };
 
       state.currentUserStats.dailyQuest = newQuest;
@@ -342,6 +312,48 @@ const userSlice = createSlice({
     setDailyQuest: (state, { payload }: PayloadAction<DailyQuest>) => {
       if (!state.currentUserStats) return;
       state.currentUserStats.dailyQuest = payload;
+    },
+    // The one swap a day: an unfinished task is replaced by another of the
+    // same kind (see drawReplacementTask). Never once the reward is claimed.
+    rerollQuestTask: (state, { payload }: PayloadAction<{ taskId: string }>) => {
+      const stats = state.currentUserStats;
+      const quest = stats?.dailyQuest;
+      if (!stats || !quest || quest.rerolled || quest.isRewardClaimed) return;
+      if (quest.date < getQuestDayKey(stats.timeZone)) return;
+
+      const index = quest.tasks.findIndex((task) => task.id === payload.taskId);
+      const task = quest.tasks[index];
+      if (!task || task.isCompleted) return;
+
+      const replacement = drawReplacementTask(quest.tasks, index, {
+        sessionCount: stats.sessionCount || 0,
+        featureUse: stats.featureUse,
+      });
+      if (!replacement) return;
+
+      quest.tasks[index] = {
+        id: `${task.id}_r`,
+        type: replacement.template.type,
+        title: replacement.template.title,
+        isCompleted: false,
+        progress: 0,
+        target: replacement.template.target,
+        ...(replacement.slot && { slot: replacement.slot }),
+        ...(replacement.feature && { feature: replacement.feature }),
+      };
+      quest.features = quest.tasks.flatMap((t) => (t.feature ? [t.feature] : []));
+      quest.rerolled = true;
+    },
+    // Stamps a feature as used on the current active day (see FeatureUseMap).
+    markFeatureUsedLocal: (state, { payload }: PayloadAction<{ feature: QuestFeature; at: number }>) => {
+      if (!state.currentUserStats) return;
+      state.currentUserStats.featureUse = mergeFeatureUse(state.currentUserStats.featureUse, {
+        [payload.feature]: payload.at,
+      });
+    },
+    setFeatureUse: (state, { payload }: PayloadAction<FeatureUseMap>) => {
+      if (!state.currentUserStats) return;
+      state.currentUserStats.featureUse = mergeFeatureUse(state.currentUserStats.featureUse, payload);
     },
     claimQuestReward: (state) => {
       if (!state.currentUserStats?.dailyQuest) return;
@@ -467,6 +479,9 @@ const userSlice = createSlice({
           state.currentUserStats = {
             ...payload.currentUserStats,
             dailyQuest: (currentDailyQuest && currentDailyQuest.date >= questToday) ? currentDailyQuest : payload.currentUserStats.dailyQuest,
+            // The report read the profile before this tab may have stamped a
+            // feature; keep the later stamp per feature.
+            featureUse: mergeFeatureUse(prevStats?.featureUse, payload.currentUserStats.featureUse),
             skills: payload.currentUserStats.skills?.unlockedSkills ? payload.currentUserStats.skills : currentSkills,
           };
 
@@ -640,6 +655,9 @@ export const {
   generateDailyQuest,
   completeQuestTask,
   setDailyQuest,
+  rerollQuestTask,
+  markFeatureUsedLocal,
+  setFeatureUse,
   claimQuestReward,
   setActivity,
   setUserRole,

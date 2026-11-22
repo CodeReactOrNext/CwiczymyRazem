@@ -7,8 +7,10 @@ import type {
   GuildStash,
   StashDeposit,
 } from "feature/guilds/types/stash.types";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
+import { useAppDispatch } from "store/hooks";
 import { auth } from "utils/firebase/client/firebase.utils";
 
 export const GUILD_STASH_KEY = ["guild-stash"] as const;
@@ -56,6 +58,7 @@ const errorMessage = (error: unknown, fallback: string): string => {
 
 export const useStashMutations = () => {
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
   const { t } = useTranslation("guilds");
 
   const settle = (stash: GuildStash) => {
@@ -70,6 +73,7 @@ export const useStashMutations = () => {
     mutationFn: (input: StashDeposit) => post({ action: "deposit", ...input }),
     onSuccess: (stash) => {
       settle(stash);
+      dispatch(updateQuestProgress({ type: "guild_contribution" }));
       toast.success(t("toast.stash_left"));
     },
     onError: (error) =>

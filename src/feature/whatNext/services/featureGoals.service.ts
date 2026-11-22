@@ -2,6 +2,7 @@ import axios from "axios";
 import type { FeatureGoalCases } from "feature/whatNext/utils/featureGoalCases";
 import type { FeatureGoalStatus } from "feature/whatNext/utils/featureGoalsView";
 import { playUiSound } from "lib/uiSounds/uiSounds";
+import type { FeatureUseMap } from "types/api.types";
 import { auth } from "utils/firebase/client/firebase.utils";
 
 export interface FeatureGoalsState {
@@ -9,6 +10,8 @@ export interface FeatureGoalsState {
   cases: FeatureGoalCases;
   /** Free cases the server put into the stash on this very look. */
   paidNow: number;
+  /** The daily quest's feature profile, when this look seeded it. */
+  featureUseSeed?: FeatureUseMap;
 }
 
 const getIdToken = async (): Promise<string> => {

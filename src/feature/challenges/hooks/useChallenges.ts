@@ -26,6 +26,7 @@ import {
 } from "feature/challenges/utils/challengeMonth";
 import type { Song } from "feature/songs/types/songs.type";
 import { addFame, updatePoints } from "feature/user/store/userSlice";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
@@ -121,6 +122,7 @@ export const useChallengeMutations = () => {
       submitChallengeRecording(params),
     onSuccess: (reward, params) => {
       refreshBoard(params.challenge.id);
+      dispatch(updateQuestProgress({ type: "challenge_play" }));
       // Fire and forget — the bot's post must never hold up or fail the run.
       void announceChallengeRun(params.challenge.id, params.songId);
       // The reward lands on the user document as an increment, which the store

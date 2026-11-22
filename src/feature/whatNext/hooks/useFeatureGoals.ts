@@ -3,13 +3,14 @@ import { ARSENAL_QUERY_KEY } from "feature/arsenal/hooks/useArsenalData";
 import {
   selectCurrentUserStats,
   selectUserAuth,
+  setFeatureUse,
 } from "feature/user/store/userSlice";
 import { useNextMessage } from "feature/whatNext/hooks/useNextMessage";
 import { fetchFeatureGoals } from "feature/whatNext/services/featureGoals.service";
 import { REWARD_LEDGER_QUERY_KEY } from "hooks/useRewardLedger";
 import posthog from "posthog-js";
 import { toast } from "sonner";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 /** Prefix of every feature-goals query of this player, whatever the session count. */
 export const featureGoalsQueryKey = (uid: string | null) =>
@@ -35,12 +36,14 @@ export const useFeatureGoals = () => {
   const uid = useAppSelector(selectUserAuth);
   const sessionCount = useAppSelector(selectCurrentUserStats)?.sessionCount ?? 0;
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
   const { t } = useNextMessage();
 
   return useQuery({
     queryKey: [...featureGoalsQueryKey(uid), sessionCount],
     queryFn: async () => {
       const state = await fetchFeatureGoals();
+      if (state.featureUseSeed) dispatch(setFeatureUse(state.featureUseSeed));
       if (state.paidNow > 0) {
         toast.success(t("discover.case_collected", { count: state.paidNow }));
         posthog.capture("feature_goal_case_paid", { cases: state.paidNow });

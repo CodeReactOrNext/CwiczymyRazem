@@ -1,3 +1,4 @@
+import { seedFeatureUse } from "feature/user/store/dailyQuest.features";
 import { FEATURE_GOAL_IDS } from "feature/whatNext/data/featureGoals";
 import {
   payFeatureGoalCases,
@@ -50,6 +51,39 @@ export default async function handler(
     const paidNow =
       cases.owed > 0 ? await payFeatureGoalCases(firestore, userId, done) : 0;
 
+    // Accounts older than the daily quest's feature profile get one built from
+    // the goals they have done, so their quests are about their own tools from
+    // the next draw on rather than after weeks of collecting. Written once,
+    // key by key, and only if nothing touched the document since it was read —
+    // a stamp the client made meanwhile is newer than any seed.
+    const userData = userDoc.data()!;
+    let featureUseSeed: Record<string, number> | null = null;
+    if (userData.statistics?.featureUse === undefined) {
+      const seed = seedFeatureUse(
+        [...done],
+        Number(userData.statistics?.sessionCount) || 0,
+      );
+      if (Object.keys(seed).length > 0) {
+        try {
+          await firestore
+            .collection("users")
+            .doc(userId)
+            .update(
+              Object.fromEntries(
+                Object.entries(seed).map(([feature, at]) => [
+                  `statistics.featureUse.${feature}`,
+                  at,
+                ]),
+              ),
+              { lastUpdateTime: userDoc.updateTime },
+            );
+          featureUseSeed = seed;
+        } catch {
+          // The document changed since it was read; the next look seeds it.
+        }
+      }
+    }
+
     return res.status(200).json({
       goals: FEATURE_GOAL_IDS.map((id) => ({ id, done: done.has(id) })),
       cases: {
@@ -58,6 +92,7 @@ export default async function handler(
         owed: Math.max(0, cases.owed - paidNow),
       },
       paidNow,
+      ...(featureUseSeed && { featureUseSeed }),
     });
   } catch (error) {
     console.error("[feature-goals/state]", error);

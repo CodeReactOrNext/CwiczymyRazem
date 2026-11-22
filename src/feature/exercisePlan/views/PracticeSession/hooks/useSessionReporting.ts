@@ -1,7 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useActivityLog } from 'components/ActivityLog/hooks/useActivityLog';
+import type { Challenge } from 'feature/challenges/types/challenge.types';
+import { currentChallengeId } from 'feature/challenges/utils/challengeMonth';
+import { findDailyDayKeyFor } from 'feature/dailyExercise/utils/dailyExercise';
 import { isAutoPlanId, isRecognizedPracticePlan } from 'feature/exercisePlan/utils/isRecognizedPracticePlan';
 import { collectPlanSongPractice, pickPrimaryPlanSong } from 'feature/exercisePlan/utils/planSongPractice';
+import { rotationQueryKey } from 'feature/rotation/hooks/useRotation';
+import type { RotationDoc } from 'feature/rotation/types/rotation.types';
 import { collectPracticed } from 'feature/rotation/utils/lastPracticed';
 import { selectCurrentUserStats, selectUserAuth } from 'feature/user/store/userSlice';
 import { updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
@@ -14,6 +19,7 @@ import { getLocalDateKey } from 'utils/converter';
 import { getClientReportContext, hasRestDays } from 'utils/gameLogic';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
+import { sessionToolQuests } from '../utils/sessionToolQuests';
 import { computeSkillPointsGained, roundSkillTime } from '../utils/skillPoints';
 
 interface UseSessionReportingProps {
@@ -206,6 +212,31 @@ export const useSessionReporting = ({ plan, avatar, completedExercises }: UseSes
         if (Object.keys(reportData.skillPointsGained || {}).length > 0) {
           dispatch(updateQuestProgress({ type: 'improve_skill' }));
         }
+
+        // Tool quests (rotation, calendar, daily exercise, duels…). Rotation and
+        // the challenge board are only read from the query cache — a player who
+        // has not opened them this visit is not worth a read for a quest.
+        const playedExercises = completedExercises
+          .map((index) => plan.exercises[index])
+          .filter((exercise): exercise is NonNullable<typeof exercise> => !!exercise);
+        const toolQuests = sessionToolQuests({
+          planId: plan.id,
+          played: playedExercises,
+          practiced: reportData.practiced,
+          songIds: [
+            ...(plan.song ? [plan.song.id] : []),
+            ...planSongs.map((song) => song.songId),
+          ],
+          isDuel: !!plan.duel,
+          isBoss: !!plan.boss,
+          isGuildTake: !!plan.recording && !plan.recording.rehearsal,
+          rotationItems: queryClient.getQueryData<RotationDoc>(rotationQueryKey(userAuth))?.items,
+          challengeSongIds: queryClient
+            .getQueryData<Challenge | null>(['challenge', currentChallengeId()])
+            ?.songs?.map((song) => song.songId),
+          isDailyExercise: (exerciseId) => !!findDailyDayKeyFor(exerciseId),
+        });
+        toolQuests.forEach((event) => dispatch(updateQuestProgress(event)));
 
         // "Practice any Song" is completed via the song timer (/timer/song) and via
         // GP-file/tab song practice (this plan carries `song` metadata in that case).

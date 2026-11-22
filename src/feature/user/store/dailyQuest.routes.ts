@@ -23,6 +23,19 @@ export const DAILY_QUEST_ROUTES: Record<DailyQuestTaskType, string> = {
   complete_two_plans: "/timer/plans",
   improve_skill: "/profile/skills",
   practice_three_exercises: "/profile/skills?tab=browse",
+  goal_run: "/goals",
+  calendar_tick: "/calendar",
+  rotation_item: "/rotation",
+  journey_step: "/journey",
+  roadmap_step: "/ai-coach",
+  tempo_cleared: "/profile/skills",
+  // The Daily Exercise card lives on Home; the route carries no catalog.
+  daily_exercise: "/dashboard",
+  duel_run: "/duels",
+  boss_attempt: "/bosses",
+  challenge_play: "/challenges",
+  guild_contribution: "/guilds",
+  ear_round: "/profile/skills?tab=browse",
 };
 
 /** The page that finishes this task — the exact exercise when the task names one. */

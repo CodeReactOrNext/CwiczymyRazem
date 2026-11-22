@@ -32,64 +32,59 @@ Manche Karten erscheinen nur, wenn sie etwas zu sagen haben, und verschwinden da
 
 ## Tägliche Quests
 
-Jeden Tag bekommst du drei kleine Aufgaben, zufällig aus einem großen Pool gezogen, und keine zwei sind dieselbe Arbeit in anderer Verkleidung. Schließ alle drei ab, und eine Einlösen-Schaltfläche erscheint.
+Jeden Tag bekommst du drei kleine Aufgaben. Schließ alle drei ab, und ein Einlösen-Button erscheint.
 
-<QuestPreview tasks="Übe 15 Minuten::done|Bewerte einen Song::0 / 1|Übe 3 verschiedene Kategorien::2 / 3" reward="+10 Punkte, +40 Fame" caption="Tippe auf eine unerledigte Aufgabe, und die App bringt dich direkt auf den Bildschirm, auf dem du sie erledigen kannst." />
+<QuestPreview tasks="Übe 15 Minuten::done|Spiel 2 Einträge aus deiner Rotation::1 / 2|Mach einen Durchgang bei einem deiner Ziele::0 / 1" reward="+10 Punkte, +40 Fame" caption="Tippe auf eine offene Aufgabe, und die App bringt dich direkt zu dem Bildschirm, auf dem du sie erledigen kannst." />
 
-Die Aufgaben sind Dinge, die du ohnehin vermutlich getan hättest. Sie werden automatisch abgehakt, wenn du übst und einträgst, du musst also nichts von Hand markieren.
+Jede der drei hat ihre eigene Rolle:
+
+- **Die erste ist immer reines Üben**, etwa 15 Minuten an der Gitarre oder drei verschiedene Übungen. Du kannst sie überall in der App erledigen.
+- **Die anderen zwei kommen aus den Werkzeugen, die du wirklich nutzt.** Arbeitest du gerade mit Zielen, dem Kalender oder deiner Rotation, drehen sich deine Quests darum. Ein Werkzeug, das du etwa einen Monat an Übungstagen nicht angefasst hast, fällt heraus, und dasselbe Werkzeug kommt nicht zwei Tage hintereinander, wenn es etwas anderes zur Auswahl gibt.
+- **Alle paar Tage geht es bei einer um ein Werkzeug, das du liegen gelassen hast.** Die Karte markiert sie mit „Zurück nach einer Pause“.
+
+In deiner ersten Woche ist alles neu, deshalb führen dich die zwei Werkzeug-Quests stattdessen durch die App, markiert mit „Neu für dich“. Sie lassen weg, worauf What Next dich schon hinweist, sodass beide nie dasselbe verlangen.
+
+Die Aufgaben haken sich automatisch ab, während du übst und einträgst, du musst also nichts von Hand markieren.
+
+**Ein Tausch pro Tag.** Passt eine Quest nicht zu deinem Tag, tippe auf die Pfeile daneben und du bekommst eine andere. Das geht einmal pro Tag und nur bei einer Quest, die du noch nicht abgeschlossen hast.
 
 <BlogAlert type="warning">
-Die Belohnung wird nicht automatisch vergeben. Du musst Einlösen drücken, bevor der Tag zu Ende ist. Dein Quest-Tag endet um Mitternacht an deinem Wohnort, eine späte Abendsession zählt also noch für das Set, das du den ganzen Tag angesehen hast, und am nächsten Morgen wartet ein frisches Set aus drei.
+Die Belohnung wird nicht automatisch vergeben. Du musst auf Einlösen tippen, bevor der Tag umspringt. Dein Quest-Tag endet um Mitternacht an deinem Wohnort, also zählt eine späte Abendsession noch für das Set, das du den ganzen Tag vor dir hattest, und am nächsten Morgen wartet ein frisches Set aus drei.
 </BlogAlert>
 
 ## Jede Quest, die auftauchen kann
 
-Im Pool liegen einundzwanzig Aufgaben. Drei werden jeden Morgen daraus gezogen.
-
-**Zeit an der Gitarre**
+**Reines Üben** (eine davon jeden Tag)
 
 - Übe 15 Minuten
 - Übe insgesamt 30 Minuten
-
-**Eine Kategorie nach der anderen**
-
-- Übe 10 Minuten Technik
-- Übe 10 Minuten Theorie
-- Trainiere 10 Minuten dein Gehör
-- Sei 10 Minuten kreativ
-- Verbringe 15 Minuten mit Kreativität
-
-**Auf mehrere Bereiche verteilen**
-
+- Übe 2 Kategorien je 5 Minuten
 - Übe 3 verschiedene Kategorien
-- Übe 2 Kategorien je 5 Min.
-- Übe Technik & Theorie in einer Session
-
-**Songs**
-
-- Bewerte einen Song
-- Bewerte 3 Songs
-- Füge einen Song zu „Will ich lernen“ hinzu
-- Übe einen beliebigen Song
-
-**Routinen**
-
-- Schließ einen Übungsplan ab
-- Schließ 2 Übungspläne ab
-- Erstelle und übe einen Auto-Plan
-
-**Übungen und Fähigkeiten**
-
-- Übe eine bestimmte Übung, auf der Karte genannt
 - Übe 3 verschiedene Übungen
+- Übe 10 Minuten Technik
+- Übe eine bestimmte Übung, die auf der Karte steht
 - Sammle Punkte in einer beliebigen Fähigkeit
 
-**Gewohnheiten**
+**Aus deinen Werkzeugen**
 
-- Wende 2 gesunde Gewohnheiten an
+- **Übungsziele:** Mach einen Durchgang bei einem deiner Ziele · Mach 3 Durchgänge bei deinen Zielen
+- **Kalender:** Hak etwas im Kalender ab oder plane etwas
+- **Rotation:** Spiel etwas aus deiner Rotation · Spiel 2 Einträge aus deiner Rotation
+- **Übungspläne:** Schließ einen Übungsplan ab · Schließ 2 Übungspläne ab · Erstelle und übe einen Auto Plan
+- **Songs:** Übe einen beliebigen Song · Bewerte 3 Songs · Füge einen Song zu „Will ich lernen“ hinzu
+- **Journey:** Schließ einen Journey-Schritt ab
+- **Roadmap:** Übe einen Schritt aus deiner Roadmap
+- **Fähigkeits- und Skalenbaum:** Schaff ein Tempo auf einem Baum
+- **Daily Exercise:** Spiel die heutige Daily Exercise
+- **Duelle:** Spiel einen Duell-Durchgang
+- **Bosse:** Tritt gegen einen Boss an
+- **Monats-Challenge:** Übe den Song der Monats-Challenge
+- **Gilde:** Trag etwas zu deiner Gilde bei
+- **Gehörtraining:** Spiel eine Runde Play by Ear · Trainiere 10 Minuten dein Gehör
+- **Eintragen mit Gewohnheiten:** Nutze 2 gesunde Gewohnheiten
 
 ## Fragen, die Leute stellen
 
-<FaqList items="Ich habe eine Quest abgeschlossen, aber sie steht noch als unerledigt::Quest-Fortschritt wird aus eingetragenen Sessions gezählt, bewegt sich also erst, wenn du die Session speicherst, nicht während der Timer läuft|Kann ich meine Quests wählen?::Nein, sie werden jeden Tag für dich gezogen. Passt eine Aufgabe nicht, überspring sie. Du verlierst nichts außer dem Einlösen dieses Tages|Halten Quests eine Serie?::Nein. Nur Üben hält die Serie am Leben. Quests sind eine separate Ein-Tages-Belohnung|Kann ich ändern, was Start zeigt?::Ja. Drück Anpassen über den Karten und verschiebe, blende aus, ändere die Größe oder füge Karten hinzu. Zurücksetzen bringt das ursprüngliche Start zurück|Ich habe versehentlich eine Karte ausgeblendet::Drück Anpassen, dann Widget hinzufügen. Jede ausgeblendete Karte steht in dieser Liste|Kann ich ein einzelnes Wochenziel auf Start legen?::Ja. Jeder Meilenstein ist eine eigene Karte unter Wochenziele in der Liste Widget hinzufügen, und du kannst seine Belohnung direkt von der Karte einlösen" />
+<FaqList items="Ich habe eine Quest abgeschlossen, aber sie steht noch als unerledigt::Quest-Fortschritt wird aus eingetragenen Sessions gezählt, bewegt sich also erst, wenn du die Session speicherst, nicht während der Timer läuft|Kann ich meine Quests wählen?::Nicht direkt. Sie richten sich nach den Werkzeugen, die du nutzt. Passt eine nicht zu deinem Tag, tippe auf die Pfeile daneben und tausche sie, einmal pro Tag. Du kannst sie auch einfach überspringen: Du verlierst nichts außer dem Einlösen dieses Tages|Halten Quests eine Serie?::Nein. Nur Üben hält die Serie am Leben. Quests sind eine separate Ein-Tages-Belohnung|Kann ich ändern, was Start zeigt?::Ja. Drück Anpassen über den Karten und verschiebe, blende aus, ändere die Größe oder füge Karten hinzu. Zurücksetzen bringt das ursprüngliche Start zurück|Ich habe versehentlich eine Karte ausgeblendet::Drück Anpassen, dann Widget hinzufügen. Jede ausgeblendete Karte steht in dieser Liste|Kann ich ein einzelnes Wochenziel auf Start legen?::Ja. Jeder Meilenstein ist eine eigene Karte unter Wochenziele in der Liste Widget hinzufügen, und du kannst seine Belohnung direkt von der Karte einlösen" />
 
 <ReadNext links="Wie Punkte und Serien funktionieren::/wiki/how-scoring-works|Eine Übungssession eintragen::/wiki/practice-sessions-and-logging|Woher Fame kommt::/wiki/fame|Dein Fame ausgeben::/wiki/arsenal-and-gear" />

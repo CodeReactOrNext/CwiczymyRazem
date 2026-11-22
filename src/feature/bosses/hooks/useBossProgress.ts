@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { logger } from "feature/logger/Logger";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
+import { useAppDispatch } from "store/hooks";
 
 import { getBossRecords, saveBossRecord } from "../services/bossProgress.service";
 import type { BossRecord, BossRecordMap } from "../types/boss.types";
@@ -14,6 +16,7 @@ export const bossRecordsQueryKey = (uid: string | null) => ["bossRecords", uid] 
  */
 export const useBossRecord = (uid: string | null, bossId: string) => {
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
   const key = bossRecordsQueryKey(uid);
 
   const query = useQuery({
@@ -29,6 +32,10 @@ export const useBossRecord = (uid: string | null, bossId: string) => {
       const previous = queryClient.getQueryData<BossRecordMap>(key);
       queryClient.setQueryData<BossRecordMap>(key, { ...previous, [bossId]: record });
       return { previous };
+    },
+    // Any banked run — won, lost or left — is a swing at the boss.
+    onSuccess: () => {
+      dispatch(updateQuestProgress({ type: "boss_attempt" }));
     },
     onError: (error, _record, context) => {
       logger.error(error, { context: "useBossRecord" });

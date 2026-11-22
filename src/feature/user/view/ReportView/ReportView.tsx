@@ -510,6 +510,9 @@ const ReportView = () => {
     };
 
     await dispatch(updateUserStats({ inputData: enrichedInputData }));
+    if (typeof rotation === "string" && rotation) {
+      dispatch(updateQuestProgress({ type: "rotation_item" }));
+    }
 
     // A manual log attributed to songs also feeds each song's own progress (its
     // share of the practice time, session count) and pulls it into "learning" —

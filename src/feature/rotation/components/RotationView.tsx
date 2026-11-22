@@ -14,13 +14,14 @@ import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/Prac
 import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
 import { useSongDurations } from "feature/songs/hooks/useSongDurations";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { AnimatePresence } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 import { rotationTimerHref } from "../hooks/useCustomRotationItem";
 import { useRotation } from "../hooks/useRotation";
@@ -62,6 +63,7 @@ type SessionSource = "stalest" | "row" | "draw";
 export const RotationView = () => {
   const router = useRouter();
   const uid = useAppSelector(selectUserAuth);
+  const dispatch = useAppDispatch();
   const { describe, t } = useRotationDisplay();
   const { items, lastPracticed, isLoading, addItem, removeItem, markDone } =
     useRotation(uid);
@@ -152,6 +154,7 @@ export const RotationView = () => {
     setDialog(null);
     try {
       await markDone(item.id);
+      dispatch(updateQuestProgress({ type: "rotation_item" }));
       posthog.capture("rotation_custom_done", { source });
       toast.success(t("toast.done", { title: describe(item).title }));
     } catch {

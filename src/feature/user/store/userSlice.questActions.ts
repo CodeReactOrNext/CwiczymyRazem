@@ -11,14 +11,27 @@ import {
 import { playUiSound } from "lib/uiSounds/uiSounds";
 import posthog from "posthog-js";
 import type { RootState } from "store/store";
-import type { DailyQuest, DailyQuestCategoryMinutes, DailyQuestTaskType } from "types/api.types";
+import type {
+  DailyQuest,
+  DailyQuestCategoryMinutes,
+  DailyQuestTaskType,
+  QuestFeature,
+} from "types/api.types";
 import { auth, db } from "utils/firebase/client/firebase.utils";
 import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
 import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
+import { QUEST_TYPE_FEATURE } from "./dailyQuest.features";
 import { isSameQuest, mergeDailyQuests } from "./dailyQuest.merge";
 import { getQuestDayKey, isQuestDrawnFor } from "./questDay";
-import { claimQuestReward, completeQuestTask, generateDailyQuest, setDailyQuest } from "./userSlice";
+import {
+  claimQuestReward,
+  completeQuestTask,
+  generateDailyQuest,
+  markFeatureUsedLocal,
+  rerollQuestTask,
+  setDailyQuest,
+} from "./userSlice";
 
 /** Fame Points awarded for completing the full daily quest set. */
 export const DAILY_QUEST_FAME_REWARD = 40;
@@ -214,12 +227,21 @@ export const initializeDailyQuestAction = createAsyncThunk(
 
     const randomExercise = availableExercises[Math.floor(Math.random() * availableExercises.length)];
 
+    const questBefore = state.user.currentUserStats?.dailyQuest;
     dispatch(generateDailyQuest({
       randomExercise: {
         id: randomExercise.id,
         title: randomExercise.title
       }
     }));
+    const drawn = (getState() as RootState).user.currentUserStats?.dailyQuest;
+    if (drawn && drawn !== questBefore) {
+      posthog.capture("daily_quest_drawn", {
+        types: drawn.tasks.map((task) => task.type),
+        slots: drawn.tasks.map((task) => task.slot ?? "none"),
+        features: drawn.features ?? [],
+      });
+    }
     // generateDailyQuest is a no-op when today's quest is already in the store,
     // and the sync writes nothing when the merge changes nothing — so mounting
     // the widget costs a read, not an overwrite of whatever is stored.
@@ -264,6 +286,32 @@ export const ensureQuestForToday = createAsyncThunk(
   }
 );
 
+/**
+ * Remembers that the player used a feature today, so the quest generator can
+ * draw from the tools they actually use. Stamped with `sessionCount`, which
+ * grows once per active day — at most one small write per feature per day,
+ * and none when the store already holds today's stamp.
+ */
+export const markFeatureUsed = createAsyncThunk(
+  "user/markFeatureUsed",
+  async (feature: QuestFeature, { dispatch, getState }) => {
+    const stats = (getState() as RootState).user.currentUserStats;
+    const userId = auth.currentUser?.uid;
+    if (!stats || !userId) return;
+
+    const at = stats.sessionCount || 0;
+    if ((stats.featureUse?.[feature] ?? -1) >= at) return;
+
+    dispatch(markFeatureUsedLocal({ feature, at }));
+    try {
+      await updateDoc(doc(db, "users", userId), { [`statistics.featureUse.${feature}`]: at });
+    } catch (error) {
+      // A lost stamp only makes the feature look a day older to the generator.
+      console.error("Failed to stamp feature use:", error);
+    }
+  }
+);
+
 export const updateQuestProgress = createAsyncThunk(
   "user/updateQuestProgress",
   async (payload: { type: DailyQuestTaskType; amount?: number; exerciseId?: string; categoryMinutes?: DailyQuestCategoryMinutes }, { dispatch, getState }) => {
@@ -282,6 +330,31 @@ export const updateQuestProgress = createAsyncThunk(
     if (questBefore !== questAfter) {
       dispatch(syncDailyQuestAction());
     }
+
+    // Doing a feature's quest action is using that feature, quest or not.
+    const feature = QUEST_TYPE_FEATURE[payload.type];
+    if (feature) dispatch(markFeatureUsed(feature));
+  }
+);
+
+/** The daily swap of one unfinished task — see `rerollQuestTask`. */
+export const rerollQuestTaskAction = createAsyncThunk(
+  "user/rerollQuestTask",
+  async (taskId: string, { dispatch, getState }) => {
+    await dispatch(ensureQuestForToday());
+
+    const before = (getState() as RootState).user.currentUserStats?.dailyQuest;
+    const replaced = before?.tasks.find((task) => task.id === taskId);
+    dispatch(rerollQuestTask({ taskId }));
+    const after = (getState() as RootState).user.currentUserStats?.dailyQuest;
+    if (!after || after === before) return;
+
+    const replacement = after.tasks.find((task) => task.id === `${taskId}_r`);
+    posthog.capture("daily_quest_rerolled", {
+      from: replaced?.type,
+      to: replacement?.type,
+    });
+    dispatch(syncDailyQuestAction());
   }
 );
 

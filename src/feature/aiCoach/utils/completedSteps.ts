@@ -29,3 +29,26 @@ export const newlyCompletedSteps = (
       .map((step) => ({ step, phase })),
   );
 };
+
+/**
+ * Whether a save moved any step forward: a session more on it, or it newly
+ * done. That is "practiced a step from your roadmap" for the daily quest.
+ */
+export const hasAdvancedStep = (
+  before: RoadmapPhase[],
+  after: RoadmapPhase[],
+): boolean => {
+  const sessionsBefore = new Map(
+    before.flatMap((phase) =>
+      phase.steps.map((step) => [step.id, step.sessionsCompleted ?? 0] as const),
+    ),
+  );
+  return (
+    newlyCompletedSteps(before, after).length > 0 ||
+    after.some((phase) =>
+      phase.steps.some(
+        (step) => (step.sessionsCompleted ?? 0) > (sessionsBefore.get(step.id) ?? 0),
+      ),
+    )
+  );
+};

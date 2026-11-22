@@ -27,8 +27,26 @@
       "rate_multiple_songs": "Bewerte 3 Songs",
       "complete_two_plans": "Schließ 2 Übungspläne ab",
       "improve_skill": "Sammle Punkte in einer beliebigen Fähigkeit",
-      "practice_three_exercises": "Übe 3 verschiedene Übungen"
-    }
+      "practice_three_exercises": "Übe 3 verschiedene Übungen",
+      "goal_run_one": "Mach einen Durchgang bei einem deiner Ziele",
+      "goal_run_other": "Mach {{count}} Durchgänge bei deinen Zielen",
+      "calendar_tick": "Hak etwas im Kalender ab oder plane etwas",
+      "rotation_item_one": "Spiel etwas aus deiner Rotation",
+      "rotation_item_other": "Spiel {{count}} Einträge aus deiner Rotation",
+      "journey_step": "Schließ einen Journey-Schritt ab",
+      "roadmap_step": "Übe einen Schritt aus deiner Roadmap",
+      "tempo_cleared": "Schaff ein Tempo auf einem Baum",
+      "daily_exercise": "Spiel die heutige Daily Exercise",
+      "duel_run": "Spiel einen Duell-Durchgang",
+      "boss_attempt": "Tritt gegen einen Boss an",
+      "challenge_play": "Übe den Song der Monats-Challenge",
+      "guild_contribution": "Trag etwas zu deiner Gilde bei",
+      "ear_round": "Spiel eine Runde Play by Ear"
+    },
+    "slot_discover": "Neu für dich",
+    "slot_comeback": "Zurück nach einer Pause",
+    "reroll": "Quest tauschen",
+    "reroll_hint": "Ein Tausch pro Tag"
   },
   "customize": {
     "refreshing": "Wird aktualisiert…",
