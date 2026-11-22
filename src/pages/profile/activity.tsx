@@ -6,6 +6,7 @@ import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { ActivityChart } from "components/Charts/ActivityChart";
 import { DashboardSection } from "components/Layout";
 import MainContainer from "components/MainContainer";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
@@ -128,11 +129,11 @@ const ProfileActivityPage = () => {
           </div>
         }
 
-        className="w-full !rounded-none !shadow-none min-h-[140px] md:min-h-[120px] lg:min-h-[160px] !flex-col md:!flex-row"
+        className="!flex-col md:!flex-row"
       />
 
 
-      <div className='p-4'>
+      <div className={PAGE_CONTENT}>
         {/* The rail is the row, not just the tabs: the exports ride on it so
             the underline has one continuous line to sit against. */}
         <div className='mb-6 flex items-center gap-2 border-b border-zinc-800'>
@@ -150,7 +151,7 @@ const ProfileActivityPage = () => {
             <ExportButton label={t("activity.export_summary")} onClick={handleExportSummary} />
           </div>
         </div>
-        <div className='font-openSans flex flex-col gap-6'>
+        <div className='flex flex-col gap-6'>
 
           {/* 1. Overview stats with trends + radar + achievements */}
           {stats && (

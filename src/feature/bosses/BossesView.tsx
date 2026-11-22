@@ -1,6 +1,10 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { Kostek } from "components/Mascot/Kostek";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
+import { pageTitleClass } from "components/PageTitle/PageTitle";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
+import { Segment, SegmentedControl, SegmentGroup } from "components/SegmentedControl/SegmentedControl";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { m } from "framer-motion";
 import type { Translate } from "lib/i18n/translate";
@@ -63,28 +67,7 @@ const RecordStat = ({ value, label }: { value: string | number; label: string })
   </div>
 );
 
-const Option = ({
-  selected,
-  onClick,
-  children,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}) => (
-  <button
-    type='button'
-    aria-pressed={selected}
-    onClick={onClick}
-    className={cn(
-      "rounded-lg px-3.5 py-2 text-sm font-semibold tabular-nums transition-colors duration-fast",
-      selected ? "bg-zinc-100 text-zinc-950" : "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100",
-    )}>
-    {children}
-  </button>
-);
-
-/** A difficulty on the setup: its name over a pip per level, so the four read as a climb at a glance. */
+/** A difficulty on the setup: its name beside a pip per level, so the four read as a climb at a glance. */
 const DifficultyOption = ({
   level,
   selected,
@@ -96,27 +79,20 @@ const DifficultyOption = ({
   onClick: () => void;
   children: ReactNode;
 }) => (
-  <button
-    type='button'
-    aria-pressed={selected}
-    onClick={onClick}
-    className={cn(
-      "flex flex-col items-start gap-2.5 rounded-lg px-4 py-3 text-left text-sm font-semibold transition-colors duration-fast",
-      selected ? "bg-zinc-100 text-zinc-950" : "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100",
-    )}>
+  <Segment active={selected} onClick={onClick} className='gap-2.5'>
     {children}
-    <span className='flex gap-1' aria-hidden>
+    <span className='flex gap-0.5' aria-hidden>
       {DIFFICULTIES.map((d, i) => (
         <span
           key={d}
           className={cn(
-            "h-1 w-4 rounded-full",
-            i <= level ? (selected ? "bg-zinc-950" : "bg-zinc-400") : selected ? "bg-zinc-950/15" : "bg-zinc-700",
+            "h-1 w-2.5 rounded-full",
+            i <= level ? (selected ? "bg-zinc-200" : "bg-zinc-400") : selected ? "bg-zinc-500" : "bg-zinc-700",
           )}
         />
       ))}
     </span>
-  </button>
+  </Segment>
 );
 
 const Effect = ({ label, value }: { label: string; value: string }) => (
@@ -159,13 +135,13 @@ const FightSetup = ({
     <div className='space-y-6'>
       <div className='space-y-3'>
         <p className='text-sm text-zinc-400'>{t("lair.difficulty")}</p>
-        <div className='grid grid-cols-2 gap-2 sm:grid-cols-4' role='group' aria-label={t("lair.difficulty")}>
+        <SegmentGroup aria-label={t("lair.difficulty")}>
           {DIFFICULTIES.map((d, i) => (
             <DifficultyOption key={d} level={i} selected={d === difficulty} onClick={() => onDifficulty(d)}>
               {t(`difficulty.${d}`)}
             </DifficultyOption>
           ))}
-        </div>
+        </SegmentGroup>
         <div className='flex flex-wrap gap-x-8 gap-y-2 pt-1'>
           <Effect label={t("lair.effect_damage")} value={`×${effect.damage}`} />
           <Effect label={t("lair.effect_tempo")} value={signedPercent(effect.tempo)} />
@@ -176,12 +152,16 @@ const FightSetup = ({
       {savepoints.length > 1 && (
         <div className='space-y-3'>
           <p className='text-sm text-zinc-400'>{t("lair.start_at")}</p>
-          <div className='flex flex-wrap items-center gap-2' role='group' aria-label={t("lair.start_at")}>
-            {savepoints.map((phase) => (
-              <Option key={phase} selected={phase === start} onClick={() => onStart(phase)}>
-                {t("lair.phase_option", { phase })}
-              </Option>
-            ))}
+          <div className='flex flex-wrap items-center gap-2'>
+            <SegmentedControl
+              label={t("lair.start_at")}
+              selected={[String(start)]}
+              onSelect={(phase) => onStart(Number(phase))}
+              options={savepoints.map((phase) => ({
+                value: String(phase),
+                label: t("lair.phase_option", { phase }),
+              }))}
+            />
             <span className='px-1 text-xs text-zinc-500'>
               {t("lair.next_savepoint", { phase: nextSavepoint(record, difficulty) })}
             </span>
@@ -277,7 +257,7 @@ const BossLair = ({ boss }: { boss: BossDefinition }) => {
   const [entering, setEntering] = useState(false);
 
   return (
-    <section className='overflow-hidden rounded-lg bg-zinc-900/40' style={stageStyle(boss.id, 0)}>
+    <section className='overflow-hidden rounded-lg bg-zinc-800/40' style={stageStyle(boss.id, 0)}>
       <div className='grid lg:min-h-[32rem] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]'>
         {/* The boss stands on the stage's floor, its feet in the shade at the bottom edge. */}
         <div className='relative flex items-end justify-center px-6 pt-8 lg:px-10 lg:pt-12'>
@@ -304,7 +284,7 @@ const BossLair = ({ boss }: { boss: BossDefinition }) => {
           variants={fadeUp}>
           <div className='space-y-2'>
             <p className='text-sm text-zinc-400'>{bossTitle}</p>
-            <h1 className='font-display text-4xl font-semibold tracking-tight text-zinc-100 lg:text-5xl'>{bossName}</h1>
+            <h1 className={pageTitleClass}>{bossName}</h1>
             <p className='max-w-prose pt-1 text-sm leading-relaxed text-zinc-400'>{t("lair.pitch")}</p>
           </div>
 
@@ -329,7 +309,8 @@ const BossLair = ({ boss }: { boss: BossDefinition }) => {
             <div className='flex flex-wrap items-center gap-3'>
               <Button
                 asChild
-                className='h-14 min-w-56 gap-3 bg-white px-10 text-lg text-zinc-950 shadow-none hover:bg-zinc-200 [&_svg]:size-5'>
+                size='xl'
+                className='min-w-56'>
                 <Link
                   href={fightHref}
                   onClick={(event) => {
@@ -350,7 +331,8 @@ const BossLair = ({ boss }: { boss: BossDefinition }) => {
                 <Button
                   type='button'
                   onClick={() => setGuideOpen(true)}
-                  className='h-14 bg-zinc-800 px-8 text-base text-zinc-100 shadow-none hover:bg-zinc-700'>
+                  variant='ghost'
+                  size='xl'>
                   {t("guide.open")}
                 </Button>
               )}
@@ -380,8 +362,8 @@ const FightRules = ({ boss }: { boss: BossDefinition }) => {
   const { t } = useBossText(boss);
 
   return (
-    <section className='rounded-lg bg-zinc-900/40 p-6'>
-      <h2 className='font-display text-lg font-semibold text-zinc-100'>{t("rules.title")}</h2>
+    <section className='rounded-lg bg-zinc-800/40 p-6'>
+      <SectionHeader size='lg' title={t("rules.title")} className='mb-0' />
       <ol className='mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3'>
         {(boss.drill === "changes" ? CHANGES_RULE_KEYS : RULE_KEYS).map((key, i) => (
           <li key={key} className='flex gap-3'>
@@ -411,7 +393,7 @@ export const BossesView = () => {
   const boss = BOSSES.find((b) => b.id === bossId) ?? BOSSES[0];
 
   return (
-    <div className='space-y-10'>
+    <div className={cn("space-y-10", PAGE_CONTENT)}>
       <div className='space-y-4'>
         <div className='grid grid-cols-3 gap-3'>
           {BOSSES.map((b) => (

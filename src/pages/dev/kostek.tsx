@@ -23,6 +23,7 @@ const MOODS: { mood: KostekMood; note: string; props?: Record<string, unknown> }
   { mood: "warmup", note: "warmup — ładowanie" },
   { mood: "unplugged", note: "unplugged — 404, brak sygnału (kabel)" },
   { mood: "micOff", note: "micOff — mikrofon zablokowany" },
+  { mood: "micReady", note: "micReady — prośba o mikrofon" },
   { mood: "duel", note: "duel — pojedynki, puste krzesło" },
   { mood: "emptyCase", note: "emptyCase — pusta kolekcja (arsenał)" },
   { mood: "plugIn", note: "plugIn — sygnał złapany" },

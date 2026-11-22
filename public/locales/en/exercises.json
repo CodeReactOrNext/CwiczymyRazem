@@ -90,7 +90,9 @@
     "predefined_plans_description": "Practice plans prepared by us",
     "create_plan": "Create Plan",
     "create_first": "Create First Plan",
-    "no_custom_plans": "You don't have any custom practice plans yet"
+    "no_custom_plans": "You don't have any custom practice plans yet",
+    "update_success": "Plan saved",
+    "update_error": "Couldn't save the plan"
   },
   "categories": {
     "technique": "Technique",

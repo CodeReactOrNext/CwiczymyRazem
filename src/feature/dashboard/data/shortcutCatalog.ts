@@ -76,7 +76,7 @@ export const SHORTCUT_GROUP_ORDER: ShortcutGroup[] = [
 export const SHORTCUTS = [
   {
     id: "practice-plans",
-    label: "Practice Routines",
+    label: "Practice Plans",
     href: "/timer/plans",
     icon: ListChecks,
     group: "practice",

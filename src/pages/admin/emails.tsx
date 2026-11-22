@@ -1,3 +1,4 @@
+import { BackLink } from "components/BackLink/BackLink";
 import AdminLogin from "feature/admin/components/AdminLogin";
 import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
 import type { AdminEmailType } from "feature/admin/hooks/useAdminEmails";
@@ -6,7 +7,6 @@ import AdminLayout from "feature/admin/layouts/AdminLayout";
 import { doc, getDoc } from "firebase/firestore";
 import {
   AlertCircle,
-  ArrowLeft,
   CalendarClock,
   Check,
   Clock,
@@ -173,13 +173,7 @@ const AdminEmailsPage = () => {
         {activeType && activeCfg && ActiveIcon && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <button
-                onClick={handleBack}
-                className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-500 transition-colors hover:text-white"
-              >
-                <ArrowLeft size={14} />
-                Back
-              </button>
+              <BackLink label='Back' onClick={handleBack} />
               <button
                 onClick={() => fetchRecipients(activeType)}
                 disabled={isLoading}

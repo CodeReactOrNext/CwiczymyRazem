@@ -69,10 +69,10 @@ const ImageModal = ({
         <div className='absolute left-4 top-4 z-10 flex gap-2'>
           <Button
             variant='secondary'
-            size='sm'
+            size='icon-sm'
             className='rounded-lg bg-background/40 backdrop-blur-sm'
             onClick={onClose}>
-            <Minimize2 size='1em' className='h-4 w-4' />
+            <Minimize2 />
           </Button>
         </div>
 
@@ -110,29 +110,29 @@ const ImageModal = ({
         <div className='absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-row gap-3'>
           <Button
             variant='secondary'
-            size='sm'
+            size='icon-touch'
             onClick={handleZoomOut}
             disabled={imageScale <= 0.5}
-            className='h-12 w-12 rounded-lg bg-background/40 backdrop-blur-sm'>
-            <Minus className='h-5 w-5' />
+            className='bg-background/40 backdrop-blur-sm'>
+            <Minus />
           </Button>
           <Button
             variant='secondary'
-            size='sm'
+            size='icon-touch'
             onClick={handleZoomIn}
             disabled={imageScale >= 8}
-            className='h-12 w-12 rounded-lg bg-background/40 backdrop-blur-sm'>
-            <Plus className='h-5 w-5' />
+            className='bg-background/40 backdrop-blur-sm'>
+            <Plus />
           </Button>
           <Button
             variant='secondary'
-            size='sm'
+            size='icon-touch'
             onClick={() => {
               resetImagePosition();
               setPosition({ x: 0, y: 0 });
             }}
-            className='h-12 w-12 rounded-lg bg-background/40 backdrop-blur-sm'>
-            <Minimize2 size='1em' className='h-5 w-5' />
+            className='bg-background/40 backdrop-blur-sm'>
+            <Minimize2 />
           </Button>
         </div>
       </div>

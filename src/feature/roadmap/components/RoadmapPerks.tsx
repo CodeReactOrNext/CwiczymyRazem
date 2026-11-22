@@ -103,7 +103,7 @@ interface RoadmapPerksProps {
 export const RoadmapPerks = ({ showPanelLink = true }: RoadmapPerksProps) => {
   const { t } = useTranslation("supporter");
   return (
-    <section className='relative overflow-hidden rounded-lg bg-zinc-900/40 p-5 sm:p-8'>
+    <section className='relative overflow-hidden rounded-lg bg-zinc-800/40 p-5 sm:p-8'>
       {/* Amber, the colour the app already spends on supporters (the badge, the
           avatar ring): this section lists what the badge buys, so the surface
           it sits on should read as the same thing. Pattern and glow both fade

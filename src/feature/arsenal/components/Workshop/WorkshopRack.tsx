@@ -1,14 +1,14 @@
 import { PRESSABLE } from "assets/components/ui/button";
-import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
 import { useTranslation } from "hooks/useTranslation";
-import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { ConditionMeter } from "../ConditionMeter";
 import { InServiceTags } from "../InServiceTags";
+import { ReadyMark } from "./ReadyMark";
 
 type RackFilter = "all" | "guitar" | "effect";
 
@@ -21,6 +21,8 @@ interface WorkshopRackProps {
    * where the sheet is already the surface and already scrolls.
    */
   bare?: boolean;
+  /** Gear with a bench job that can run right now — marked with the green hammer mark. */
+  readyIds?: Set<string>;
 }
 
 const FILTERS: { id: RackFilter; label: string }[] = [
@@ -41,6 +43,7 @@ export const WorkshopRack = ({
   selectedId,
   onSelect,
   bare = false,
+  readyIds,
 }: WorkshopRackProps) => {
   const [filter, setFilter] = useState<RackFilter>("all");
   const { t } = useTranslation("arsenal");
@@ -78,18 +81,12 @@ export const WorkshopRack = ({
         ))}
       </div>
 
-      <div className='relative'>
-        <Search
-          size={14}
-          className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-arsenal-text-tertiary'
-        />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={t("workshop.search_rack")}
-          className='h-9 border-0 bg-arsenal-bg pl-9 text-sm text-arsenal-text-primary placeholder:text-arsenal-text-tertiary'
-        />
-      </div>
+      <SearchInput
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder={t("workshop.search_rack")}
+        aria-label={t("workshop.search_rack")}
+      />
 
       <div
         className={cn(
@@ -150,6 +147,8 @@ export const WorkshopRack = ({
                     showLabel={false}
                   />
                 </span>
+
+                {readyIds?.has(entry.id) && <ReadyMark />}
 
                 <span className='shrink-0 text-sm font-semibold tabular-nums leading-none text-arsenal-text-primary'>
                   {entry.level}

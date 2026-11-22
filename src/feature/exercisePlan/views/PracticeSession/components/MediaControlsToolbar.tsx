@@ -272,7 +272,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   isMicEnabled &&
                   "cursor-not-allowed",
               )}>
-              <Mic size='1em' className='h-3.5 w-3.5 shrink-0' />
+              <Mic className='h-3.5 w-3.5 shrink-0' />
               <span className='truncate text-xs font-semibold'>
                 {t("media.pitch_detect")}
               </span>
@@ -303,7 +303,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 onClick={onRecalibrate}
                 title={t("media.recalibrate")}
                 className={cn(PRESSABLE_KEY, gridBtn, "bg-zinc-800 text-zinc-400")}>
-                <SlidersHorizontal size='1em' className='h-3.5 w-3.5 shrink-0' />
+                <SlidersHorizontal className='h-3.5 w-3.5 shrink-0' />
                 <span className='truncate text-xs font-semibold'>
                   {t("media.recalibrate")}
                 </span>
@@ -441,7 +441,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                     isMicEnabled &&
                     "cursor-not-allowed hover:bg-emerald-950",
                 )}>
-                <Mic size='1em' className='h-3 w-3' />
+                <Mic className='h-3 w-3' />
               </button>
 
               {isMicEnabled && (
@@ -450,7 +450,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   onClick={onRecalibrate}
                   title={t("media.recalibrate")}
                   className={cn(PRESSABLE_KEY, "flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 transition-colors hover:text-white")}>
-                  <SlidersHorizontal size='1em' className='h-3 w-3' />
+                  <SlidersHorizontal className='h-3 w-3' />
                 </button>
               )}
 
@@ -577,7 +577,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 ) : (
                   <GiGuitarHead className='h-4 w-4 shrink-0' />
                 )}
-                <span className='text-[10px] font-semibold tracking-wide'>
+                <span className='text-xs font-semibold'>
                   {t("tuning_modal.tunings")}
                 </span>
               </button>
@@ -612,8 +612,8 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                   isMicEnabled &&
                   "cursor-not-allowed hover:bg-emerald-950",
               )}>
-              <Mic size='1em' className='h-4 w-4 shrink-0' />
-              <span className='text-[10px] font-semibold tracking-wide'>
+              <Mic className='h-4 w-4 shrink-0' />
+              <span className='text-xs font-semibold'>
                 {t("media.pitch_detect")}
               </span>
             </button>
@@ -642,13 +642,13 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               sideOffset={8}
               // Clear the session's full-screen layer (z-[999999] desktop / z-[9999999] mobile) —
               // otherwise the default z-50 paints underneath it.
-              className='z-[99999999] w-56 rounded-lg border-white/10 bg-zinc-900/95 p-1.5 text-white backdrop-blur-md'>
+              className='z-[99999999] w-56'>
               {/* Open with the mic off too: this is where a wrong device gets
                   fixed, which is often why the mic is off in the first place. */}
               <DropdownMenuItem
                 onSelect={onRecalibrate}
                 className='flex cursor-pointer items-center gap-3 rounded px-2 py-2 text-xs font-semibold text-zinc-200 focus:bg-zinc-800 focus:text-white'>
-                <SlidersHorizontal size='1em' className='h-3.5 w-3.5 shrink-0 text-zinc-400' />
+                <SlidersHorizontal className='h-3.5 w-3.5 shrink-0 text-zinc-400' />
                 {t("media.recalibrate")}
               </DropdownMenuItem>
               {hasTuner && (

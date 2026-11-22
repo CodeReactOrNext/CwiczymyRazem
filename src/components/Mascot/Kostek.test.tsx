@@ -31,6 +31,7 @@ const MOODS: KostekMood[] = [
   "wait",
   "ready",
   "micOff",
+  "micReady",
   "duel",
   "emptyCase",
 ];

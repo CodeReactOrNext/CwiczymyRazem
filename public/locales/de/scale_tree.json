@@ -97,5 +97,11 @@
   "sidebar": {
     "title": "Tonleiterauswahl",
     "body": "Wähle eine Tonleiter, um ihren Baum und ihre Formen zu sehen."
+  },
+  "toast": {
+    "new_record": "Neuer Rekord: {{bpm}} BPM",
+    "new_record_was": "Neuer Rekord: {{bpm}} BPM (vorher {{previous}})",
+    "record_stands": "Sauberer Durchlauf, aber dein Rekord bleibt bei {{bpm}} BPM",
+    "no_record": "Kein Rekord – ein Durchlauf zählt ab {{accuracy}} % Genauigkeit"
   }
 }

@@ -1,5 +1,5 @@
 ---
-title: "Rutinas de práctica y Plan automático"
+title: "Planes de práctica y Plan automático"
 description: "Cómo se arman las rutinas, cómo el Plan automático construye una sesión en torno al tiempo que tienes y cómo funciona compartir ejercicios con la comunidad."
 slug: "exercise-plans-and-auto-plan"
 section: "Practice"
@@ -8,7 +8,7 @@ order: 3
 
 Una **rutina** (la app también la llama plan de práctica) no es más que una lista ordenada de ejercicios con un nombre, una dificultad y una categoría. La sigues de arriba abajo y, al final, registra la sesión por ti.
 
-<ClickPath steps="Práctica|Rutinas de práctica" caption="Rutinas ya preparadas, playalongs, tus propios planes y planes compartidos por otros jugadores." />
+<ClickPath steps="Práctica|Planes de práctica" caption="Rutinas ya preparadas, playalongs, tus propios planes y planes compartidos por otros jugadores." />
 
 ## Tres formas de conseguir una rutina
 

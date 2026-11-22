@@ -38,7 +38,7 @@ Na początek: „Podsumuj mój ostatni tydzień ćwiczeń”, „Zaplanuj 30-min
 
 ## Limity
 
-<StatRow stats="20:zmian dziennie|10:nowych ćwiczeń dziennie|60:zapytań na minutę" />
+<StatRow stats="35:zmian dziennie|20:nowych ćwiczeń dziennie|60:zapytań na minutę" />
 
 Odczyt nigdy nie liczy się do dziennego limitu. Każda zapisana zmiana mówi asystentowi, ile zostało na dziś, więc może cię uprzedzić, zanim limit się skończy.
 

@@ -1,4 +1,4 @@
-import { useTranslation } from "hooks/useTranslation";
+import { Button } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +10,7 @@ import { AddToPlaylistSub } from "feature/songs/components/Playlists/AddToPlayli
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteSong } from "feature/user/store/userSlice.favoriteActions";
+import { useTranslation } from "hooks/useTranslation";
 import {
   BookOpen,
   CheckCircle2,
@@ -63,17 +64,19 @@ export const SongCardMenu = ({
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <button
+        <Button
+          variant='ghost'
+          size='icon'
           aria-label={t("card.actions")}
           className={triggerClassName}
           onClick={(e) => e.stopPropagation()}
         >
-          <MoreVertical className="h-4 w-4" />
-        </button>
+          <MoreVertical />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-56 space-y-1 rounded-lg bg-zinc-950 p-2 text-zinc-400 shadow-2xl backdrop-blur-xl"
+        className="w-56 space-y-1"
       >
         <DropdownMenuItem
           onClick={() => router.push(`/songs?view=board&songId=${song.id}`)}

@@ -34,6 +34,8 @@
   "anonimity_info": "Czy chcesz ukryć swój nick w rankingu?",
   "resolution_info": "Maksymalna rozdzielczość 250 × 250",
   "logged_in_via_google": "Zmiana hasła i e-maila jest wyłączona, ponieważ logujesz się przez Google.",
+  "reauth_title": "Potwierdź, że to Ty",
+  "reauth_description": "Zaloguj się ponownie, żeby zmienić e-mail lub hasło.",
   "bands": "Twoje zespoły",
   "guitarStartDate": {
     "title": "Kiedy zacząłeś grać na gitarze?",

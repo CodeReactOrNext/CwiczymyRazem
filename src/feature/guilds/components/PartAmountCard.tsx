@@ -84,7 +84,7 @@ export const PartAmountCard = ({
         </TierPlate>
         <div className='flex min-w-0 flex-col gap-1.5'>
           <span
-            className='text-[11px] font-semibold tracking-wide'
+            className='text-[11px] font-semibold'
             style={{ color }}>
             {t("parts.tier_part", {
               tier: labels.partTier(part.tier),

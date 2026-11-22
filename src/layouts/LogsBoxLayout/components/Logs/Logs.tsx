@@ -1,4 +1,4 @@
-import { buttonVariants } from "assets/components/ui/button";
+import { Button, buttonVariants } from "assets/components/ui/button";
 import {
   Chip,
   getChipCustomStyle,
@@ -11,10 +11,10 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { OnlineUsers } from "components/OnlineUsers/OnlineUsers";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import Avatar from "components/UI/Avatar";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { UserLink } from "components/UserLink";
-import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
 import LessonPracticeModal from "feature/aiCoach/view/RoadmapView/components/LessonPracticeModal";
 import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
@@ -48,7 +48,6 @@ import {
 import cosmeticStyles from "feature/cosmetics/components/cosmetics.module.css";
 import { findBanner } from "feature/cosmetics/data/cosmeticsCatalog";
 import { useEquippedCosmetics } from "feature/cosmetics/hooks/useCosmetics";
-import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { SearchingDots } from "feature/duels/components/DuelBits";
 import { useNow } from "feature/duels/hooks/useDuels";
 import { formatRatingDelta } from "feature/duels/utils/duelFormat";
@@ -63,6 +62,7 @@ import { ComponentThumb } from "feature/guitarBuilder/components/ComponentThumb"
 import { SLOT_LABELS } from "feature/guitarBuilder/data/components";
 import type { OwnedComponent } from "feature/guitarBuilder/types/guitarBuilder.types";
 import { getComponent } from "feature/guitarBuilder/utils/components";
+import { RankRow } from "feature/leadboard/components/RankRow";
 import { DiscordPromoCard } from "feature/logs/components/DiscordPromoCard";
 import { LogReaction } from "feature/logs/components/LogReaction";
 import {
@@ -140,6 +140,7 @@ import { Interpolate } from "lib/i18n/Interpolate";
 import type { Translate } from "lib/i18n/translate";
 import {
   CalendarIcon,
+  ChevronRight,
   Coffee,
   Heart,
   Shield,
@@ -222,25 +223,23 @@ const ItemTooltipCard = ({
 
   return (
     <div
-      className='flex w-44 flex-col overflow-hidden rounded-xl'
+      className='flex w-44 flex-col overflow-hidden rounded-lg'
       style={{ border: `1px solid ${color}50`, background: "#111" }}>
       {/* Header */}
       <div className='px-3 pb-1 pt-3'>
         <p
-          className='text-xs font-bold tracking-wide'
+          className='text-xs font-bold'
           style={{ color: `${color}cc` }}>
           {itemBrand}
         </p>
         <p className='text-sm font-bold leading-tight text-white'>{itemName}</p>
-        <span
-          className='mt-1.5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-bold tracking-wide'
-          style={{
-            backgroundColor: `${color}20`,
-            color,
-            border: `1px solid ${color}40`,
-          }}>
+        <Chip
+          color='custom'
+          size='sm'
+          className='mt-1.5'
+          style={getChipCustomStyle(color)}>
           {itemRarity}
-        </span>
+        </Chip>
       </div>
 
       {/* Image */}
@@ -330,7 +329,7 @@ const CardModal = ({
           onClick={onClose}
           aria-label={t("close")}
           className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute -right-2 -top-2 z-10")}>
-          <X size={15} />
+          <X />
         </button>
         {children}
       </div>
@@ -367,7 +366,7 @@ const PillCard = ({
       <Tooltip delayDuration={150}>
         <TooltipTrigger asChild>{pill}</TooltipTrigger>
         <TooltipContent
-          className='border-0 bg-transparent p-0 shadow-2xl'
+          className='bg-transparent p-0'
           side='top'>
           {card}
         </TooltipContent>
@@ -439,14 +438,14 @@ export const ItemPill = ({
         <span className='order-2 flex shrink-0 items-center gap-1.5 sm:order-1'>
           <Chip
             color='custom'
-            className='whitespace-nowrap px-1.5 py-0.5 text-xs tracking-wide'
+            className='whitespace-nowrap px-1.5 py-0.5 text-xs'
             style={getChipCustomStyle(color)}>
             {itemRarity}
           </Chip>
           {level !== null && (
             <Chip
               color='gray'
-              className='whitespace-nowrap px-1.5 py-0.5 text-xs tabular-nums tracking-wide'
+              className='whitespace-nowrap px-1.5 py-0.5 text-xs tabular-nums'
               title={t("item_level")}>
               {t("item_level_short", { level })}
             </Chip>
@@ -472,7 +471,7 @@ interface LogsBoxLayoutProps {
 }
 
 const TimeStamp = ({ date }: { date: Date }) => (
-  <p className='mb-2 w-full whitespace-nowrap py-1 text-[0.6rem] text-zinc-400 sm:mb-0 sm:w-auto sm:text-[0.55rem] lg:mr-4 lg:text-xs'>
+  <p className='mb-2 w-full whitespace-nowrap py-1 text-xs text-zinc-400 sm:mb-0 sm:w-auto lg:mr-4'>
     {date.toLocaleDateString() +
       " " +
       addZeroToTime(date.getHours()) +
@@ -482,11 +481,9 @@ const TimeStamp = ({ date }: { date: Date }) => (
 );
 
 const LogItem = ({
-  isNew,
   bannerId,
   children,
 }: {
-  isNew: boolean;
   /** The banner the row's player bought and wears, if any. */
   bannerId?: string | null;
   children: React.ReactNode;
@@ -496,16 +493,14 @@ const LogItem = ({
   return (
     <div
       className={cn(
-        "my-3 flex flex-col flex-nowrap items-start rounded-xl px-4 py-4 transition-all duration-base sm:px-5 lg:flex-row lg:items-center",
+        "my-3 flex flex-col flex-nowrap items-start rounded-lg px-4 py-4 transition-all duration-base sm:px-6 sm:py-5 lg:flex-row lg:items-center",
         banner && "relative overflow-hidden",
         // A painted banner keeps its card dark in both themes — the pictures
         // are night scenes — and opaque, so the page never shows through. A
-        // drawn one sits on the player's normal card.
-        bannerNeedsDarkCard(banner)
-          ? "force-dark bg-zinc-900"
-          : isNew
-            ? "bg-zinc-800/70"
-            : "bg-zinc-900/60",
+        // drawn one sits on the player's normal card. A new row is not a
+        // lighter slab — that read as a selected row; the dot by the name
+        // says it.
+        bannerNeedsDarkCard(banner) ? "force-dark bg-zinc-900" : "bg-zinc-900/60",
       )}>
       {banner && <CosmeticBanner item={banner} />}
       {banner ? (
@@ -539,6 +534,30 @@ const SongTierChip = ({ info }: { info?: SongTierInfo }) => {
   );
 };
 
+/** A thing a feed sentence names — what was practiced, bought, passed. */
+const FEED_OBJECT = "font-bold text-white";
+const FEED_OBJECT_LINK = cn(
+  TOUCH_TARGET,
+  FEED_OBJECT,
+  "group/link transition-colors hover:text-cyan-400 hover:underline",
+);
+
+/**
+ * Says a name in a feed sentence opens something — bold alone looked the same
+ * whether the name was a link or not. It goes inside the link, after the
+ * label; the word joiner keeps it on the label's last line instead of
+ * wrapping alone onto the next.
+ */
+const LinkMark = () => (
+  <>
+    {"\u2060"}
+    <ChevronRight
+      aria-hidden
+      className='ml-0.5 inline-block h-3.5 w-3.5 align-[-0.15em] text-zinc-400 transition-colors group-hover/link:text-cyan-400'
+    />
+  </>
+);
+
 /**
  * A song named inside a feed sentence — the `{{song}}` slot of a `song_status`
  * line. The sentence places it, since German wants it before the closing verb
@@ -556,8 +575,9 @@ const SongReference = ({
     {song.songId ? (
       <Link
         href={`/songs?view=management&songId=${song.songId}`}
-        className={cn(TOUCH_TARGET, "font-bold text-white underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60")}>
+        className={FEED_OBJECT_LINK}>
         {song.songArtist} - {song.songTitle}
+        <LinkMark />
       </Link>
     ) : (
       <span className='font-bold text-white'>
@@ -568,18 +588,6 @@ const SongReference = ({
 );
 
 // Podkomponenty dla FirebaseLogsTopPlayersItem
-
-const PlayerAvatar = ({ player }: { player: TopPlayerData }) => (
-  <div className='relative flex flex-shrink-0 items-center justify-center'>
-    <div className='-mx-1 origin-center scale-[0.8]'>
-      <Avatar
-        size='sm'
-        name={player.displayName}
-        avatarURL={player.avatar ?? undefined}
-      />
-    </div>
-  </div>
-);
 
 const SeasonHeader = ({
   seasonName,
@@ -592,90 +600,28 @@ const SeasonHeader = ({
   date: Date;
   t: (key: string) => string;
 }) => (
-  <div className='flex flex-wrap items-center gap-3 border-b border-white/5 bg-transparent px-3 py-3 sm:px-5 sm:py-4'>
-    <div className='flex items-center gap-2'>
-      <h3 className='text-sm font-bold tracking-wide text-white sm:text-base'>
-        {t("logsBox.top_players")}
-      </h3>
-    </div>
-
-    <span className='text-xs font-semibold tracking-wide text-zinc-400'>
-      {seasonName}
-    </span>
-
-    {/* Right side with date info - on larger screens */}
-    <div className='ml-auto hidden items-center gap-3 text-xs text-zinc-400 sm:flex'>
-      {daysLeftInSeason !== undefined && (
-        <Chip color='gray'>
-          <CalendarIcon size='1em' className='h-3.5 w-3.5 shrink-0' />
-          <span className='tabular-nums'>{daysLeftInSeason}</span>
-          <span>{t("logsBox.days_left")}</span>
-        </Chip>
-      )}
-      <span className='text-zinc-400'>
-        {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
-        {addZeroToTime(date.getMinutes())}
-      </span>
-    </div>
-
-    {/* Days left - on mobile only */}
-    {daysLeftInSeason !== undefined && (
-      <div className='mt-2 flex w-full items-center justify-end text-xs text-zinc-400 sm:hidden'>
-        <Chip color='gray'>
-          <CalendarIcon size='1em' className='h-3.5 w-3.5 shrink-0' />
-          <span className='tabular-nums'>{daysLeftInSeason}</span>
-          <span>{t("logsBox.days_left")}</span>
-        </Chip>
+  <SectionHeader
+    as='h3'
+    title={t("logsBox.top_players")}
+    description={seasonName}
+    className='mb-0'
+    action={
+      <div className='flex shrink-0 flex-col items-end gap-1.5 text-xs text-zinc-400 sm:flex-row sm:items-center sm:gap-3'>
+        {daysLeftInSeason !== undefined && (
+          <Chip color='gray'>
+            <CalendarIcon className='h-3.5 w-3.5 shrink-0' />
+            <span className='tabular-nums'>{daysLeftInSeason}</span>
+            <span>{t("logsBox.days_left")}</span>
+          </Chip>
+        )}
+        <span className='hidden sm:inline'>
+          {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
+          {addZeroToTime(date.getMinutes())}
+        </span>
       </div>
-    )}
-  </div>
+    }
+  />
 );
-
-const PlayerRow = ({
-  player,
-  index,
-}: {
-  player: TopPlayerData;
-  index: number;
-}) => {
-  const { t } = useTranslation("feed");
-  const isTop3 = index < 3;
-
-  return (
-    <div className='flex items-center gap-2 px-3 py-2 sm:gap-4 sm:px-5 sm:py-3'>
-      <div className='w-6 flex-shrink-0 text-center text-sm font-bold text-white/50'>
-        #{index + 1}
-      </div>
-
-      {/* User info with photo */}
-      <div className='flex items-center gap-1 sm:gap-2'>
-        <PlayerAvatar player={player} />
-
-        <UserTooltip userId={player.uid}>
-          <Link
-            className={`${TOUCH_TARGET} text-sm font-bold tracking-wide transition-colors sm:text-base ${
-              index === 0 ? "text-yellow-500/90" : "text-white/90"
-            } hover:text-white`}
-            href={`/user/${player.uid}`}>
-            {player.displayName}
-          </Link>
-        </UserTooltip>
-      </div>
-
-      <div className='ml-auto'>
-        <div className='flex items-baseline gap-1.5'>
-          <span className='text-xs font-semibold text-zinc-400'>
-            {t("points_short")}
-          </span>
-          <span
-            className={`text-sm font-bold sm:text-base ${isTop3 ? "text-cyan-400" : "text-cyan-600"}`}>
-            {player.points}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const NoTopPlayersData = ({
   date,
@@ -687,7 +633,7 @@ const NoTopPlayersData = ({
   t: (key: string) => string;
 }) => (
   <div
-    className={`my-3 flex flex-col flex-nowrap items-start rounded-xl px-4 py-5 transition-all duration-base sm:px-6 lg:flex-row lg:items-center ${
+    className={`my-3 flex flex-col flex-nowrap items-start rounded-lg px-4 py-5 transition-all duration-base sm:px-6 lg:flex-row lg:items-center ${
       isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
     }`}>
     <TimeStamp date={date} />
@@ -704,9 +650,11 @@ const NoTopPlayersData = ({
 const FirebaseLogsTopPlayersItem = ({
   log,
   isNew,
+  currentUserId,
 }: {
   log: FirebaseLogsTopPlayersInterface;
   isNew: boolean;
+  currentUserId: string;
 }) => {
   const { t } = useTranslation(["common", "feed"]);
   const { data, topPlayers, daysLeftInSeason } = log;
@@ -724,7 +672,7 @@ const FirebaseLogsTopPlayersItem = ({
 
   return (
     <div
-      className={`my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-base ${
+      className={`my-3 flex flex-col gap-4 rounded-lg px-3 py-4 transition-all duration-base sm:px-5 ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       <SeasonHeader
@@ -734,11 +682,22 @@ const FirebaseLogsTopPlayersItem = ({
         t={t}
       />
 
-      <div className='divide-y divide-white/5'>
+      <ol className='flex flex-col gap-1'>
         {topPlayers.map((player, index) => (
-          <PlayerRow key={player.uid} player={player} index={index} />
+          <RankRow
+            key={player.uid}
+            place={index + 1}
+            nick={player.displayName}
+            avatarUrl={player.avatar}
+            profileId={player.uid}
+            isCurrentUser={player.uid === currentUserId}
+            score={player.points}
+            scoreLabel={t("feed:points_short")}
+            density='compact'
+            surface='bare'
+          />
         ))}
-      </div>
+      </ol>
     </div>
   );
 };
@@ -756,7 +715,7 @@ const FirebaseLogsGuildLevelItem = ({
 
   return (
     <div
-      className={`my-3 flex flex-col gap-3 rounded-xl px-3 py-3 transition-all duration-base sm:px-5 sm:py-4 ${
+      className={`my-3 flex flex-col gap-3 rounded-lg px-3 py-3 transition-all duration-base sm:px-5 sm:py-4 ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       <div className='flex flex-wrap items-center gap-3'>
@@ -802,14 +761,6 @@ const FirebaseLogsGuildLevelItem = ({
     </div>
   );
 };
-
-/** A thing a feed sentence names — what was practiced, bought, passed. */
-const FEED_OBJECT = "font-bold text-white";
-const FEED_OBJECT_LINK = cn(
-  TOUCH_TARGET,
-  FEED_OBJECT,
-  "transition-colors hover:text-cyan-400 hover:underline",
-);
 
 /** How many activities a card lists before the rest folds behind "Show more". */
 const MAX_VISIBLE_LOGS = 3;
@@ -887,9 +838,11 @@ const FeedRow = ({
         <div className='mt-2 flex items-center gap-4'>
           {thumb}
           {shownStats.length > 0 && (
-            <dl className='flex min-w-0 flex-wrap gap-x-7 gap-y-2'>
+            // Fixed widths, not content widths: with those, Accuracy and
+            // Tempo stood a few pixels apart from one row to the next.
+            <dl className='grid min-w-0 flex-1 grid-cols-3 gap-y-2.5 sm:flex sm:flex-wrap'>
               {shownStats.map((stat) => (
-                <div key={stat.label}>
+                <div key={stat.label} className='min-w-0 sm:w-[100px]'>
                   <dt className='text-xs text-zinc-400'>{stat.label}</dt>
                   <dd className='mt-0.5 flex items-center gap-1 text-sm font-semibold tabular-nums text-zinc-100'>
                     {stat.value}
@@ -977,7 +930,7 @@ const FirebaseLogsDuelResultItem = ({
 
   return (
     <div
-      className={`my-3 flex flex-col gap-3 rounded-xl px-4 py-4 transition-all duration-base sm:px-5 ${
+      className={`my-3 flex flex-col gap-3 rounded-lg px-4 py-4 transition-all duration-base sm:px-5 ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       {/* Same shape as a player's card: who on top, one row underneath. */}
@@ -1076,7 +1029,7 @@ const FirebaseLogsDuelWaitingItem = ({
 
   return (
     <div
-      className={`my-3 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl px-4 py-4 transition-all duration-base sm:px-5 ${
+      className={`my-3 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-lg px-4 py-4 transition-all duration-base sm:px-5 ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       <span className='flex w-8 shrink-0 justify-center'>
@@ -1096,7 +1049,7 @@ const FirebaseLogsDuelWaitingItem = ({
       <Link
         href='/duels'
         onClick={() => useCommunityDrawer.getState().setOpen(false)}
-        className='inline-flex h-9 shrink-0 items-center justify-center rounded-lg bg-white px-4 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900'>
+        className={cn(buttonVariants(), "shrink-0")}>
         {t("duel_waiting_join")}
       </Link>
 
@@ -1134,7 +1087,7 @@ const FirebaseLogsSupportAskItem = ({
 
   return (
     <div
-      className={`force-dark support-warm relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-base ${
+      className={`force-dark support-warm relative my-3 flex flex-col overflow-hidden rounded-lg transition-all duration-base ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       {/* Same tiled icon pattern and warm glow as the "Help build Riff Quest" banner
@@ -1261,7 +1214,7 @@ const FirebaseLogsDonationItem = ({
 
   return (
     <div
-      className={`force-dark support-warm relative my-3 flex flex-col overflow-hidden rounded-xl transition-all duration-base ${
+      className={`force-dark support-warm relative my-3 flex flex-col overflow-hidden rounded-lg transition-all duration-base ${
         isNew ? "bg-zinc-800/70" : "bg-zinc-900/60"
       }`}>
       <HeroPattern
@@ -1336,8 +1289,9 @@ const GoalExerciseName = ({ exerciseId, title }: { exerciseId: string; title: st
   ) : (
     <Link
       href={`/profile/skills?exerciseId=${exerciseId}`}
-      className={cn(TOUCH_TARGET, "font-bold text-white transition-colors hover:text-cyan-400 hover:underline")}>
+      className={FEED_OBJECT_LINK}>
       {title}
+      <LinkMark />
     </Link>
   );
 
@@ -1565,6 +1519,7 @@ const GroupedLogLine = ({
                 onClick={() => onViewRecording(recLog.recordingId as string)}
                 className={cn(FEED_OBJECT_LINK, "text-left")}>
                 {recLog.recordingTitle}
+                <LinkMark />
               </button>
             ) : (
               <a
@@ -1573,6 +1528,7 @@ const GroupedLogLine = ({
                 rel='noopener noreferrer'
                 className={FEED_OBJECT_LINK}>
                 {recLog.recordingTitle}
+                <LinkMark />
               </a>
             )}
           </>
@@ -1673,6 +1629,7 @@ const GroupedLogLine = ({
               href={`/songs?view=playlists&playlistId=${playlistLog.playlistId}`}
               className={FEED_OBJECT_LINK}>
               {playlistLog.playlistName}
+              <LinkMark />
             </Link>
           </>
         }
@@ -1729,6 +1686,7 @@ const GroupedLogLine = ({
                   href={`/ai-coach?roadmapId=${stepLog.roadmapId}&step=${stepLog.stepId}`}
                   className={FEED_OBJECT_LINK}>
                   {stepLog.stepTitle}
+                  <LinkMark />
                 </Link>
               ),
               roadmap: (
@@ -1908,6 +1866,7 @@ const GroupedLogLine = ({
             title={hint}
             className={cn(FEED_OBJECT_LINK, "text-left")}>
             {label}
+            <LinkMark />
           </button>
         ) : (
           <span className={FEED_OBJECT}>{label}</span>
@@ -1932,6 +1891,7 @@ const GroupedLogLine = ({
                 title={t("feed:boss_hint")}
                 className={FEED_OBJECT_LINK}>
                 {bossTitle}
+                <LinkMark />
               </Link>
             ),
           }}
@@ -2032,16 +1992,23 @@ const GroupedLogLine = ({
         title={t("feed:ranking_hint")}
         className={cn(
           TOUCH_TARGET,
-          "font-semibold underline decoration-white/40 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-400 hover:decoration-cyan-400/60",
+          "group/link inline-flex items-center font-semibold transition-colors hover:text-cyan-400",
         )}>
         {value}
+        <LinkMark />
       </button>
     ) : (
       <span title={hint}>{value}</span>
     );
-  const scoreStat = (score: number): FeedStat => ({
+  // The place is the way into the leaderboard. The score beside it used to be
+  // a second link to the same board; it only is one when there is no place to
+  // carry it.
+  const scoreStat = (
+    score: number,
+    rank: number | null | undefined,
+  ): FeedStat => ({
     label: t("feed:stat.score"),
-    value: ranked(score),
+    value: rank != null ? score : ranked(score),
   });
   const placeStat = (rank: number | null | undefined): FeedStat =>
     rank != null && {
@@ -2070,7 +2037,7 @@ const GroupedLogLine = ({
         </span>
       ),
     },
-    mic && scoreStat(mic.score),
+    mic && scoreStat(mic.score, mic.rank),
     mic && { label: t("feed:stat.accuracy"), value: `${mic.accuracy}%` },
     // Older logs and metronome-less exercises carry no tempo — say nothing rather than guess one.
     mic &&
@@ -2079,7 +2046,7 @@ const GroupedLogLine = ({
         value: `${mic.bpm} BPM`,
       },
     mic && placeStat(mic.rank),
-    ear && scoreStat(ear.score),
+    ear && scoreStat(ear.score, ear.rank),
     ear && placeStat(ear.rank),
   ];
 
@@ -2171,7 +2138,7 @@ const GroupedLogItem = ({
   const hiddenCount = group.logs.length - visibleLogs.length;
 
   return (
-    <LogItem isNew={isNew} bannerId={worn.banner}>
+    <LogItem bannerId={worn.banner}>
       {/* Name and Motivate share the top row; the activity rows run underneath at the card's full
           width, so what a row paid always lands on the same right edge. From `sm` up the rows start
           where the name does, leaving the avatar a column of its own. */}
@@ -2189,17 +2156,19 @@ const GroupedLogItem = ({
               guildBadgeClassName='hidden sm:inline-flex'
             />
           </span>
-          <span className='hidden shrink-0 items-center gap-1.5 text-xs text-zinc-400 sm:flex'>
+          <span className='flex shrink-0 items-center gap-1.5 text-xs text-zinc-400'>
             {isNew && (
               <span
                 aria-label={t("new_since_last_visit")}
                 className='h-1.5 w-1.5 rounded-full bg-cyan-400'
               />
             )}
-            {formatLogTime(date, new Date(), {
-              locale: dateLocale,
-              justNow: t("just_now"),
-            })}
+            <span className='hidden sm:inline'>
+              {formatLogTime(date, new Date(), {
+                locale: dateLocale,
+                justNow: t("just_now"),
+              })}
+            </span>
           </span>
         </div>
 
@@ -2411,6 +2380,7 @@ const Logs = ({
               <FirebaseLogsTopPlayersItem
                 log={representative as FirebaseLogsTopPlayersInterface}
                 isNew={isNew}
+                currentUserId={currentUserId}
               />
             ) : group.type === "guildLevel" ? (
               <FirebaseLogsGuildLevelItem
@@ -2465,12 +2435,13 @@ const Logs = ({
 
       {hasMoreLogs && onLoadMoreLogs && (
         <div className='mt-2 flex justify-center'>
-          <button
+          <Button
             type='button'
-            onClick={onLoadMoreLogs}
-            className='rounded-lg bg-zinc-800/60 px-4 py-2 text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white'>
+            variant='ghost'
+            size='sm'
+            onClick={onLoadMoreLogs}>
             {t("show_more")}
-          </button>
+          </Button>
         </div>
       )}
 

@@ -1,6 +1,7 @@
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
 import { RoadPathNode } from "components/RoadPath/RoadPathNode";
 import {
@@ -23,7 +24,6 @@ import type {
   WhatNextResult,
 } from "feature/whatNext/types/whatNext.types";
 import { ROAD_STOPS } from "feature/whatNext/utils/buildRoad";
-import { CheckCircle2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { Fragment } from "react";
 
@@ -67,20 +67,15 @@ export const WhatNextRoadStrip = ({
   const open = stops.find((stop) => stop.id === selected);
 
   if (stops.length === 0) {
+    // Everything done: Kostek leans back, nothing is waiting.
     return (
-      <div className='flex items-start gap-3'>
-        <CheckCircle2
-          size={20}
-          className='mt-0.5 shrink-0 text-emerald-400'
-          aria-hidden
-        />
-        <div>
-          <p className='text-sm font-semibold text-zinc-100'>
-            {t("empty.title")}
-          </p>
-          <p className='mt-0.5 text-sm text-zinc-400'>{t("empty.body")}</p>
-        </div>
-      </div>
+      <EmptyState
+        mood='chill'
+        size='compact'
+        title={t("empty.title")}
+        description={t("empty.body")}
+        className='bg-transparent px-0'
+      />
     );
   }
 

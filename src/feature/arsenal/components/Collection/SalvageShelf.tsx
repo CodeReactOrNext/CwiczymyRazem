@@ -12,6 +12,8 @@ import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useSellPart } from "feature/arsenal/hooks/useSellPart";
 import { useSellSalvagedMod } from "feature/arsenal/hooks/useSellSalvagedMod";
 import { groupWalletByPart } from "feature/arsenal/utils/scrap";
+import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
+import { getTierProgress } from "feature/arsenal/utils/workshopReadiness";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -27,7 +29,9 @@ import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { PartIcon } from "../Parts/PartIcon";
 import { SectionLabel } from "../SectionLabel";
 import { TierPlate } from "../TierPlate";
+import { useBenchDialogStore } from "../Workshop/benchDialogStore";
 import { ModArt } from "../Workshop/ModArt";
+import { ReadyMark } from "../Workshop/ReadyMark";
 import { SalvagedModCard } from "./SalvagedModCard";
 import { ScrapPartCard } from "./ScrapPartCard";
 import { StashItemDialog } from "./StashItemDialog";
@@ -47,6 +51,8 @@ type Pending =
 interface SalvageShelfProps {
   parts: ScrapPart[];
   mods: SalvagedMod[];
+  /** Where each rescued mod could go right now — see `getModTargets`. */
+  modTargets?: Map<string, WorkshopEntry>;
 }
 
 const rowClass =
@@ -60,7 +66,12 @@ const rowClass =
  * a player holding parts and mods with no way to look at them or cash them out.
  * Same cards, same confirm, one row each instead of a socket.
  */
-export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
+export const SalvageShelf = ({
+  parts,
+  mods,
+  modTargets,
+}: SalvageShelfProps) => {
+  const openBench = useBenchDialogStore((state) => state.openBench);
   const { mutate: sellPart, isPending: isSellingPart } = useSellPart();
   const { mutate: fusePartsStack, isPending: isFusingPart } = useFuseParts();
   const { mutate: sellMod, isPending: isSellingMod } = useSellSalvagedMod();
@@ -97,6 +108,7 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
       <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3'>
         {stacks.map((stack) => {
           const color = PART_TIER_COLORS[stack.tier];
+          const progress = getTierProgress(stack, currentFame);
           return (
             <button
               key={`${stack.partId}-${stack.tier}`}
@@ -113,8 +125,29 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
                   {labels.partTier(stack.tier)}
                 </span>
               </span>
-              <span className='text-lg font-black tabular-nums text-zinc-300'>
-                ×{stack.qty}
+              {/* The stack's way to its next tier: the bar fills in the tier
+                  it climbs to, and turns into the green hammer mark once it can. */}
+              <span className='flex shrink-0 flex-col items-end gap-1.5'>
+                <span className='flex items-center gap-1.5'>
+                  {progress?.ready && <ReadyMark />}
+                  <span className='text-lg font-black tabular-nums text-zinc-300'>
+                    ×{stack.qty}
+                  </span>
+                </span>
+                {progress && !progress.ready && (
+                  <span
+                    aria-hidden
+                    title={`${stack.qty}/${progress.ratio} → ${labels.partTier(progress.outputTier)}`}
+                    className='relative h-1.5 w-16 overflow-hidden rounded-full bg-white/10'>
+                    <span
+                      className='absolute inset-y-0 left-0 rounded-full'
+                      style={{
+                        width: `${Math.round(progress.fill * 100)}%`,
+                        backgroundColor: PART_TIER_COLORS[progress.outputTier],
+                      }}
+                    />
+                  </span>
+                )}
               </span>
             </button>
           );
@@ -134,6 +167,7 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
                 {t("salvage.salvaged_mod")}
               </span>
             </span>
+            {modTargets?.has(mod.id) && <ReadyMark />}
             <span className='text-lg font-black tabular-nums text-purple-300'>
               +{mod.points}
             </span>
@@ -143,6 +177,7 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
 
       <StashItemDialog
         isOpen={detail !== null}
+        wide={detail?.kind === "part"}
         onClose={() => setDetail(null)}
         title={
           detail === null
@@ -187,6 +222,18 @@ export const SalvageShelf = ({ parts, mods }: SalvageShelfProps) => {
               setListMod(mod);
             }}
             isListing={isListing}
+            install={(() => {
+              const target = modTargets?.get(detail.mod.id);
+              if (!target) return undefined;
+              return {
+                targetName: target.name,
+                onClick: () => {
+                  const { mod } = detail;
+                  setDetail(null);
+                  openBench(target.id, mod.featureId);
+                },
+              };
+            })()}
           />
         )}
       </StashItemDialog>

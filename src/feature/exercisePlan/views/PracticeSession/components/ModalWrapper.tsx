@@ -14,7 +14,7 @@ export const ModalWrapper = ({ children, zIndex }: ModalWrapperProps) => {
   return createPortal(
     <div
       className={cn(
-        "fixed inset-0 overflow-hidden font-openSans",
+        "fixed inset-0 overflow-hidden",
         "h-dvh w-screen bg-black",
         "isolate will-change-transform",
         zIndex

@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import Avatar from "components/UI/Avatar";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { HonorMark } from "feature/guilds/components/HonorMark";
 import type {
   Guild,
@@ -8,10 +8,10 @@ import type {
 } from "feature/guilds/types/guild.types";
 import type { RosterRow } from "feature/guilds/utils/guildRoster.utils";
 import { rankRoster } from "feature/guilds/utils/guildRoster.utils";
+import { RankRow } from "feature/leadboard/components/RankRow";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
 import { Crown } from "lucide-react";
-import Link from "next/link";
 import { useMemo } from "react";
 import { auth } from "utils/firebase/client/firebase.utils";
 
@@ -43,12 +43,12 @@ const Effort = ({ row }: { row: RosterRow }) => {
   if (row.sessions === 0) return null;
 
   return (
-    <p className='mt-0.5 truncate text-sm tabular-nums text-zinc-400'>
+    <span className='truncate tabular-nums'>
       {row.sessions === 1
         ? t("members.sessions_one")
         : t("members.sessions", { count: row.sessions })}
       {row.hours > 0 && ` · ${t("members.hours", { hours: tenth(row.hours) })}`}
-    </p>
+    </span>
   );
 };
 
@@ -58,7 +58,7 @@ const Effort = ({ row }: { row: RosterRow }) => {
  * the standing. A member who gave a lot and spent a lot has still given a
  * lot, which the balance alone would not say.
  *
- * The one figure on the right of the row, so it is set at the size of a score.
+ * The one figure on the right of the row, so it is the row's score.
  */
 const Honor = ({ honor }: { honor: GuildHonor | undefined }) => {
   const { t } = useTranslation("guilds");
@@ -66,18 +66,18 @@ const Honor = ({ honor }: { honor: GuildHonor | undefined }) => {
   const balance = honor?.balance ?? 0;
 
   return (
-    <p
+    <span
       title={t("members.honor_title", {
         earned: earned.toLocaleString(),
         balance: balance.toLocaleString(),
       })}
       className={cn(
-        "flex shrink-0 items-center gap-1.5 text-base font-bold tabular-nums",
-        earned > 0 ? "text-zinc-100" : "text-zinc-600",
+        "flex items-center gap-1.5",
+        earned === 0 && "text-zinc-600",
       )}>
-      <HonorMark size={18} className={earned > 0 ? "" : "opacity-40"} />
+      <HonorMark size={16} className={earned > 0 ? "" : "opacity-40"} />
       {earned.toLocaleString()}
-    </p>
+    </span>
   );
 };
 
@@ -97,47 +97,30 @@ const MemberRow = ({
   showEffort: boolean;
 }) => {
   const { t } = useTranslation("guilds");
+  const hasEffort = showEffort && row.sessions > 0;
   return (
-    <li
-      className={cn(
-        "flex items-center gap-4 rounded-lg px-4 py-4 transition-background sm:px-5",
-        isMe ? "bg-zinc-800/60" : "bg-zinc-900/40 hover:bg-zinc-900/60",
-      )}>
-      <span
-        className={cn(
-          "w-5 shrink-0 text-center text-base font-bold tabular-nums",
-          isMe ? "text-zinc-100" : "text-zinc-500",
-        )}>
-        {place}
-      </span>
-
-      <Avatar
-        name={row.member.displayName}
-        avatarURL={row.member.avatar ?? undefined}
-        size='sm'
-        className='shrink-0'
-      />
-
-      <div className='min-w-0 flex-1'>
-        <div className='flex items-center gap-2'>
-          <Link
-            href={`/user/${row.member.uid}`}
-            className='truncate text-base font-bold text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:text-white'>
-            {row.member.displayName}
-          </Link>
-          {row.isFounder && (
-            <Crown
-              size={14}
-              aria-label={t("members.founder")}
-              className='shrink-0 text-amber-400'
-            />
-          )}
-        </div>
-        {showEffort && <Effort row={row} />}
-      </div>
-
-      <Honor honor={honor} />
-    </li>
+    <RankRow
+      place={place}
+      nick={row.member.displayName}
+      avatarUrl={row.member.avatar}
+      profileId={row.member.uid}
+      isCurrentUser={isMe}
+      score={<Honor honor={honor} />}
+      meta={
+        (row.isFounder || hasEffort) && (
+          <>
+            {row.isFounder && (
+              <Crown
+                size={14}
+                aria-label={t("members.founder")}
+                className='shrink-0 text-amber-400'
+              />
+            )}
+            {hasEffort && <Effort row={row} />}
+          </>
+        )
+      }
+    />
   );
 };
 
@@ -168,17 +151,20 @@ export const GuildMembersTab = ({
       {/* The guild's name, crest, level and seats are already at the top of the
           page — the heading adds only what the guild has put in together. */}
       <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1'>
-        <h2 className='flex items-center gap-2.5 text-lg font-bold text-white'>
-          {t("tabs.members")}
-          <span
-            title={t("seats_taken", {
-              count: guild.memberCount,
-              limit: guild.memberLimit,
-            })}
-            className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-semibold tabular-nums text-zinc-400'>
-            {guild.memberCount}/{guild.memberLimit}
-          </span>
-        </h2>
+        <SectionHeader
+          size='lg'
+          title={t("tabs.members")}
+          count={
+            <span
+              title={t("seats_taken", {
+                count: guild.memberCount,
+                limit: guild.memberLimit,
+              })}>
+              {guild.memberCount}/{guild.memberLimit}
+            </span>
+          }
+          className='mb-0'
+        />
 
         {board && rows.length > 0 && (
           <p className='text-sm text-zinc-400'>
@@ -205,7 +191,7 @@ export const GuildMembersTab = ({
         )}
       </div>
 
-      <ol className='space-y-2'>
+      <ol className='flex flex-col gap-1.5 sm:gap-2'>
         {rows.map((row, index) => (
           <MemberRow
             key={row.member.uid}

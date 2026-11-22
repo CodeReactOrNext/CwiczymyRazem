@@ -1,6 +1,8 @@
+import { cn } from "assets/lib/utils";
+import { PAGE_GUTTER, PageShell } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { LIBRARY_TABS } from "constants/navTabs";
+import { LIBRARY_HERO_CLASS, LIBRARY_TABS } from "constants/navTabs";
 import { GoalsView } from "feature/exerciseGoals/components/GoalsView";
 import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
@@ -12,25 +14,25 @@ const GoalsPage: NextPageWithLayout = () => {
   const { t } = useTranslation("goals");
 
   return (
-    <div className='bg-second-600 flex min-h-screen flex-col overflow-visible rounded-lg'>
+    <PageShell>
       <HeroBanner
         title={t("page.title")}
         subtitle={t("page.subtitle")}
-        compact
+        eyebrow={t("page.eyebrow")}
+        className={LIBRARY_HERO_CLASS}
         backgroundContent={<HeroPattern />}
-        className='mb-2 w-full !rounded-none !shadow-none md:mb-6 md:min-h-[90px] lg:min-h-[100px]'
       />
-      <div className='px-3 md:px-6 lg:px-8'>
+      <div className={cn(PAGE_GUTTER, "pt-6")}>
         <PageTabs tabs={LIBRARY_TABS} activeHref='/goals' ariaLabel='My stuff sections' />
       </div>
       <GoalsView />
-    </div>
+    </PageShell>
   );
 };
 
 GoalsPage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <AppLayout pageId='goals' variant='secondary' wide>
+    <AppLayout pageId='goals' variant='secondary'>
       {page}
     </AppLayout>
   );

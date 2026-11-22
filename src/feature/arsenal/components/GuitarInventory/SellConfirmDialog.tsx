@@ -1,8 +1,5 @@
-import { PRESSABLE } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
-import { AnimatePresence, m } from "framer-motion";
+import { ConfirmDialog } from "components/ConfirmDialog/ConfirmDialog";
 import { useTranslation } from "hooks/useTranslation";
-import { fade } from "lib/motion/motion";
 
 interface SellConfirmDialogProps {
   isOpen: boolean;
@@ -27,53 +24,30 @@ export const SellConfirmDialog = ({
   const { t } = useTranslation("arsenal");
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <m.div
-          key='SellConfirmDialog'
-          initial='hidden'
-          animate='visible'
-          exit='hidden'
-          variants={fade}
-          className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
-          <div className='mx-4 w-full max-w-sm rounded-lg border border-zinc-700 bg-zinc-900 p-6'>
-            <h2 className='mb-2 text-lg font-bold text-white'>
-              {t(`sell.title.${itemType}`)}
-            </h2>
-            <p className='mb-4 text-sm text-zinc-400'>{itemName}</p>
-
-            <div className='mb-6 rounded bg-zinc-800/50 p-3 text-center'>
-              <p className='mb-1 text-xs text-zinc-400'>{t("sell.you_receive")}</p>
-              <div className='flex items-center justify-center gap-2'>
-                <img
-                  src='/images/tokens/coin.png'
-                  alt='coin'
-                  className='h-4 w-4 object-contain'
-                />
-                <span className='text-2xl font-bold text-amber-400'>
-                  {fameReward}
-                </span>
-                <span className='text-xs text-zinc-400'>{t("sell.fame_points")}</span>
-              </div>
-            </div>
-
-            <div className='flex gap-2'>
-              <button
-                onClick={onCancel}
-                disabled={isLoading}
-                className={cn(PRESSABLE, "flex-1 rounded bg-zinc-700 px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50 hover:bg-zinc-600 border-b-black/30")}>
-                {t("common.cancel")}
-              </button>
-              <button
-                onClick={onConfirm}
-                disabled={isLoading}
-                className={cn(PRESSABLE, "flex-1 rounded bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50 hover:bg-red-700 border-b-black/30")}>
-                {isLoading ? t("common.selling") : t("common.confirm")}
-              </button>
-            </div>
-          </div>
-        </m.div>
-      )}
-    </AnimatePresence>
+    <ConfirmDialog
+      open={isOpen}
+      onOpenChange={(open) => !open && onCancel()}
+      title={t(`sell.title.${itemType}`)}
+      description={itemName}
+      cancelLabel={t("common.cancel")}
+      confirmLabel={isLoading ? t("common.selling") : t("common.confirm")}
+      onConfirm={onConfirm}
+      destructive
+      loading={isLoading}>
+      <div className='flex flex-col items-center gap-1 text-center'>
+        <p className='text-xs text-zinc-400'>{t("sell.you_receive")}</p>
+        <div className='flex items-center justify-center gap-2'>
+          <img
+            src='/images/tokens/coin.png'
+            alt='coin'
+            className='h-4 w-4 object-contain'
+          />
+          <span className='text-2xl font-bold text-amber-400'>
+            {fameReward}
+          </span>
+          <span className='text-xs text-zinc-400'>{t("sell.fame_points")}</span>
+        </div>
+      </div>
+    </ConfirmDialog>
   );
 };

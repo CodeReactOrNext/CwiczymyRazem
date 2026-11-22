@@ -55,7 +55,7 @@ export const InServiceTags = ({ uses, className }: InServiceTagsProps) => {
               style={{ backgroundColor: color, boxShadow: `0 0 8px ${color}` }}
             />
             <span
-              className='text-[9px] font-semibold tracking-wide'
+              className='text-[11px] font-semibold'
               style={{ color: `${color}c4` }}>
               {label}
             </span>

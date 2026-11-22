@@ -1,6 +1,11 @@
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { Skeleton } from "assets/components/ui/skeleton";
+import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
+import { pageTitleClass } from "components/PageTitle/PageTitle";
 import { DISCORD_INVITE_URL } from "constants/community";
 import {
   ImprovDiscordCard,
@@ -71,7 +76,7 @@ export const ImprovView = () => {
   };
 
   return (
-    <div className='flex min-h-screen flex-col gap-6 px-4 pb-16 pt-6 md:px-8 lg:px-10'>
+    <div className={cn("flex flex-col gap-6", PAGE_CONTENT)}>
       {isLoading || !overview ? (
         isError ? (
           <p className='px-1 text-sm text-zinc-400'>{t("error")}</p>
@@ -99,19 +104,16 @@ export const ImprovView = () => {
               <Music2 className='h-3.5 w-3.5' />
               {t("empty.eyebrow", { days: IMPROV_ROUND_DAYS })}
             </p>
-            <h1 className='text-3xl font-bold leading-tight text-white'>
-              {t("empty.title")}
-            </h1>
+            <h1 className={pageTitleClass}>{t("empty.title")}</h1>
             <p className='text-sm leading-relaxed text-zinc-400'>
               {t("empty.body")}
             </p>
             <Button
               onClick={() => setIsUploadOpen(true)}
-              className='mt-2 h-11 px-5'>
-              <span className='flex items-center gap-2'>
-                <Plus />
-                {t("next.upload")}
-              </span>
+              size='lg'
+              className='mt-2'>
+              <Plus />
+              {t("next.upload")}
             </Button>
           </div>
         </section>
@@ -132,14 +134,14 @@ export const ImprovView = () => {
             <Icon size={16} className='shrink-0' />
             {t(`tabs.${id}`)}
             {id === "takes" && takes.length > 0 && (
-              <span className='rounded bg-zinc-800 px-1.5 py-0.5 text-xs tabular-nums text-zinc-300'>
+              <Chip color='gray' size='sm' className='tabular-nums'>
                 {takes.length}
-              </span>
+              </Chip>
             )}
             {id === "next" && (overview?.pool.length ?? 0) > 0 && (
-              <span className='rounded bg-zinc-800 px-1.5 py-0.5 text-xs tabular-nums text-zinc-300'>
+              <Chip color='gray' size='sm' className='tabular-nums'>
                 {overview?.pool.length}
-              </span>
+              </Chip>
             )}
           </button>
         ))}
@@ -162,24 +164,16 @@ export const ImprovView = () => {
                     canModerate={overview?.isAdmin ?? false}
                   />
                 ) : (
-                  <div className='flex flex-col items-center justify-center py-16 text-center'>
-                    <div className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500'>
-                      <Music2 size={26} />
-                    </div>
-                    <h3 className='mb-1 text-lg font-bold text-zinc-100'>
-                      {t("take.none_title")}
-                    </h3>
-                    <p className='max-w-sm text-sm text-zinc-400'>
-                      {t("take.none_body")}
-                    </p>
-                  </div>
+                  <EmptyState
+                    mood='wait'
+                    title={t("take.none_title")}
+                    description={t("take.none_body")}
+                  />
                 )}
               </>
             ) : (
               overview && (
-                <p className='px-1 text-sm text-zinc-400'>
-                  {t("take.no_round")}
-                </p>
+                <EmptyState icon={<Music2 />} title={t("take.no_round")} />
               )
             )}
           </div>

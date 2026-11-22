@@ -5,6 +5,8 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import Avatar from "components/UI/Avatar";
 import type {
   ChallengeSong,
   ChallengeSubmission,
@@ -41,9 +43,9 @@ export const SubmissionsDialog = ({
   return (
     <>
       <Dialog open={!!song} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className='flex h-full max-w-none flex-col border-white/5 bg-zinc-950 p-6 sm:h-[620px] sm:max-w-2xl sm:rounded-2xl'>
+        <DialogContent className='flex flex-col bg-zinc-950 sm:max-w-2xl'>
           <DialogHeader className='mb-1'>
-            <DialogTitle className='font-openSans text-xl font-bold text-white'>
+            <DialogTitle className='text-xl font-bold text-white'>
               {song?.title}
             </DialogTitle>
             <p className='text-sm font-medium text-zinc-500'>
@@ -56,7 +58,7 @@ export const SubmissionsDialog = ({
             </p>
           </DialogHeader>
 
-          <div className='-mx-2 min-h-0 flex-1 space-y-2 overflow-y-auto px-2 pt-2'>
+          <div className='-mx-2 max-h-[70vh] min-h-0 flex-1 space-y-2 overflow-y-auto px-2 pt-2'>
             {submissions.map((submission) => {
               const thumb = submissionThumb(submission);
               const isMine = submission.userId === currentUserId;
@@ -67,10 +69,10 @@ export const SubmissionsDialog = ({
                   type='button'
                   onClick={() => setOpenRecordingId(submission.recordingId)}
                   className={cn(
-                    "group flex w-full items-center gap-4 rounded-xl p-3 text-left transition-colors",
+                    "group flex w-full items-center gap-4 rounded-lg p-3 text-left transition-colors",
                     isMine
                       ? "bg-cyan-500/10 hover:bg-cyan-500/15"
-                      : "bg-white/[0.03] hover:bg-white/[0.07]",
+                      : "bg-zinc-800/40 hover:bg-zinc-800/60",
                   )}>
                   <span className='relative flex h-14 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-zinc-900'>
                     {thumb ? (
@@ -92,17 +94,11 @@ export const SubmissionsDialog = ({
                       {submission.title}
                     </span>
                     <span className='mt-1 flex items-center gap-2 text-xs font-medium text-zinc-500'>
-                      {submission.userAvatarUrl ? (
-                        <img
-                          src={submission.userAvatarUrl}
-                          alt=''
-                          className='h-5 w-5 rounded-full object-cover'
-                        />
-                      ) : (
-                        <span className='flex h-5 w-5 items-center justify-center rounded-full bg-zinc-700 text-[9px] font-bold text-zinc-300'>
-                          {(submission.userName || "?").charAt(0).toUpperCase()}
-                        </span>
-                      )}
+                      <Avatar
+                        size='2xs'
+                        name={submission.userName || "?"}
+                        avatarURL={submission.userAvatarUrl || undefined}
+                      />
                       {submission.userName}
                       {isMine && (
                         <span className='font-bold text-cyan-300'>{t("runs.you")}</span>
@@ -114,20 +110,17 @@ export const SubmissionsDialog = ({
             })}
 
             {submissions.length > 0 && (
-              <p className='px-1 pt-2 text-[11px] font-medium text-zinc-600'>
+              <p className='px-1 pt-2 text-[11px] font-medium text-zinc-500'>
                 {t("runs.tap_hint")}
               </p>
             )}
 
             {submissions.length === 0 && (
-              <div className='flex flex-col items-center justify-center py-16 text-center'>
-                <div className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500'>
-                  <Music size={26} />
-                </div>
-                <p className='max-w-xs text-sm text-zinc-500'>
-                  {t("runs.empty")}
-                </p>
-              </div>
+              <EmptyState
+                size='compact'
+                icon={<Music />}
+                title={t("runs.empty")}
+              />
             )}
           </div>
 

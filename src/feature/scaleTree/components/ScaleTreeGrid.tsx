@@ -1,4 +1,5 @@
 import { cn } from 'assets/lib/utils';
+import { pageTitleClass } from 'components/PageTitle/PageTitle';
 import { SCALE_TREE_KEYS, transposeFret } from 'feature/scaleTree/data/scaleTreeKeys';
 import { SCALE_TREE_POSITIONS, usesBoxNames } from 'feature/scaleTree/data/scaleTreeNodes';
 import { motion } from 'framer-motion';
@@ -181,7 +182,7 @@ export function ScaleTreeGrid({
     >
       <div className="mb-4 flex flex-col sm:mb-6">
         <div className="flex flex-wrap items-baseline gap-3">
-          <h1 className="font-display text-xl font-bold text-zinc-100 sm:text-2xl">
+          <h1 className={pageTitleClass}>
             {t('grid.title', {
               root: rootNote,
               scale: t(`scales.${scaleType}`, scaleType),
@@ -317,7 +318,7 @@ export function ScaleTreeGrid({
                         : t('shape.fret', { n: fret })}
                     </span>
                     {showBoxNames && (
-                      <span className="mt-0.5 hidden text-[10px] tabular-nums text-zinc-500 sm:block">
+                      <span className="mt-0.5 hidden text-[11px] tabular-nums text-zinc-500 sm:block">
                         {t('shape.fret_lc', { n: fret })}
                       </span>
                     )}

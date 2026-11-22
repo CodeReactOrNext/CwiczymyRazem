@@ -60,7 +60,6 @@ export const BuilderPartsShelf = ({ components }: BuilderPartsShelfProps) => {
   return (
     <section className='flex flex-col gap-5'>
       <CollectionSectionHeader
-        eyebrow={t("builder.title")}
         title={t("workshop.parts")}
         owned={distinct}
         total={COMPONENT_DEFS.length}

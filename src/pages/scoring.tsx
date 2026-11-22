@@ -1,3 +1,4 @@
+import { PageShell } from "components/PageShell/PageShell";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { ScoringGuideView } from "feature/scoring/ScoringGuideView";
 import AppLayout from "layouts/AppLayout";
@@ -7,17 +8,16 @@ import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const ScoringPage: NextPageWithLayout = () => {
   return (
-    <div className='bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen'>
+    <PageShell>
       <HeroBanner
         title='How Points Work'
         subtitle='Every way to earn points, multipliers included'
         eyebrow='Game Rules'
         backgroundContent={<HeroPattern />}
         compact
-        className='w-full !rounded-none !shadow-none'
       />
       <ScoringGuideView />
-    </div>
+    </PageShell>
   );
 };
 

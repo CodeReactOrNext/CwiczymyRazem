@@ -1,3 +1,4 @@
+import { PageShell } from "components/PageShell/PageShell";
 import { LeadboardView } from "feature/leadboard/LeadboardView";
 import AppLayout from "layouts/AppLayout";
 import Head from "next/head";
@@ -12,12 +13,12 @@ const LeaderBoardPage: NextPageWithLayout = () => {
   const siteUrl = "https://riff.quest/leaderboard";
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
+    <PageShell>
       <Head>
         <link rel='canonical' href={siteUrl} />
       </Head>
       <LeadboardView />
-    </div>
+    </PageShell>
   );
 };
 

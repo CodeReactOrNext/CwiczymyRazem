@@ -92,14 +92,14 @@ export function SpeedDropdown({
             )}
           />
           {!compact && (
-            <span className='text-[10px] font-semibold tracking-wide'>
+            <span className='text-xs font-semibold'>
               {t("speed.speed")}
             </span>
           )}
           <span
             className={cn(
               "font-mono font-bold tabular-nums",
-              compact ? "text-[10px]" : "text-sm",
+              compact ? "text-[11px]" : "text-sm",
             )}>
             {current.label}
           </span>
@@ -107,13 +107,13 @@ export function SpeedDropdown({
             <span
               className={cn(
                 "font-mono flex items-baseline gap-1 tabular-nums",
-                compact ? "text-[10px]" : "text-sm",
+                compact ? "text-[11px]" : "text-sm",
               )}>
               <span className='opacity-60'>=</span>
               <span className={cn("font-bold", tempoColor(effective))}>
                 {effective}
               </span>
-              <span className='text-[10px] font-semibold opacity-70'>BPM</span>
+              <span className='text-[11px] font-semibold opacity-70'>BPM</span>
             </span>
           )}
           <ChevronDown
@@ -128,12 +128,12 @@ export function SpeedDropdown({
         align='center'
         // Practice session is a full-screen layer at z-[999999] (desktop) / z-[9999999]
         // (mobile modal) — the dropdown's default z-50 would paint underneath it.
-        className='z-[99999999] min-w-[12rem] border border-white/10 bg-zinc-900 p-1.5 text-white'>
+        className='z-[99999999] min-w-[12rem]'>
         <div className='select-none px-2 pb-2 pt-1'>
-          <p className='text-[10px] font-bold tracking-wide text-zinc-400'>
+          <p className='text-xs font-medium text-zinc-400'>
             {t("speed.title")}
           </p>
-          <p className='mt-0.5 text-[10px] leading-snug text-zinc-500'>
+          <p className='mt-0.5 text-xs leading-snug text-zinc-500'>
             {t("speed.subtitle")}
           </p>
         </div>
@@ -149,7 +149,7 @@ export function SpeedDropdown({
               )}>
               <span className='font-mono w-9 tabular-nums'>{label}</span>
               {baseBpm ? (
-                <span className='font-mono text-[10px] tabular-nums text-zinc-500'>
+                <span className='font-mono text-xs tabular-nums text-zinc-500'>
                   {effectiveBpmLabel(baseBpm, value)} BPM
                 </span>
               ) : null}

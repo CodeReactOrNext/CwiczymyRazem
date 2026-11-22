@@ -39,7 +39,7 @@ export const AppShellSkeleton = () => {
         </div>
 
         <div className='flex items-center gap-3 p-4'>
-          <Skeleton className='h-10 w-10 rounded-full' />
+          <Skeleton className='h-12 w-12 rounded-full' />
           <div className='flex-1 space-y-2'>
             <Skeleton className='h-4 w-28' />
             <Skeleton className='h-3 w-20' />
@@ -57,7 +57,7 @@ export const AppShellSkeleton = () => {
       </aside>
 
       <div className='flex h-full flex-1 flex-col overflow-hidden'>
-        <div className='hidden h-14 w-full items-center gap-3 bg-zinc-950/80 px-8 md:flex'>
+        <div className='hidden h-16 w-full items-center gap-3 bg-zinc-950/80 px-8 md:flex'>
           <Skeleton className='h-8 w-8 rounded-full' />
           <Skeleton className='h-3 w-40' />
           <Skeleton className='ml-auto h-8 w-24 rounded-lg' />

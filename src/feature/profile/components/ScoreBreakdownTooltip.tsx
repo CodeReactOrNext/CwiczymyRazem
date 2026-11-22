@@ -60,36 +60,36 @@ export const ScoreBreakdownTooltip = ({
         <TooltipTrigger asChild>{children}</TooltipTrigger>
         <TooltipContent
           side='bottom'
-          className='w-[300px] border-0 bg-zinc-900 p-0 text-zinc-100 shadow-2xl'
+          className='w-[300px] p-3'
         >
-          <div className='space-y-4 p-4'>
+          <div className='space-y-4'>
             {/* Header: streak + current multiplier */}
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-1.5'>
                 <Flame size='1em'
                   className={cn(
                     streak > 0
-                      ? "text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]"
-                      : "text-zinc-500"
+                      ? "text-orange-600"
+                      : "text-black/50"
                   )}
                 />
-                <span className='text-sm font-bold text-white'>
+                <span className='text-sm font-bold'>
                   {streak > 0 ? t("score_tooltip.streak", { count: streak }) : t("score_tooltip.no_streak")}
                 </span>
               </div>
-              <span className='rounded-md bg-orange-500/20 px-2 py-0.5 text-sm font-black tabular-nums text-orange-300'>
+              <span className='rounded bg-orange-500/15 px-2 py-0.5 text-sm font-black tabular-nums text-orange-700'>
                 ×{totalMultiplier.toFixed(1)}
               </span>
             </div>
 
             {/* What you earn right now */}
-            <div className='space-y-2.5 rounded-lg bg-white/5 p-3'>
-              <p className='text-[10px] font-semibold tracking-wider text-zinc-400'>
+            <div className='space-y-2.5 rounded-lg bg-black/5 p-3'>
+              <p className='text-xs font-semibold text-black/60'>
                 {t("score_tooltip.earn_now")}
               </p>
               <div className='flex items-center justify-between text-xs'>
-                <span className='text-zinc-300'>{t("score_tooltip.per_hour")}</span>
-                <span className='flex items-center gap-1 font-bold tabular-nums text-white'>
+                <span className='text-black/70'>{t("score_tooltip.per_hour")}</span>
+                <span className='flex items-center gap-1 font-bold tabular-nums'>
                   {pointsPerHour}
                   <img
                     src='/images/tokens/pick.png'
@@ -99,8 +99,8 @@ export const ScoreBreakdownTooltip = ({
                 </span>
               </div>
               <div className='flex items-center justify-between text-xs'>
-                <span className='text-zinc-300'>{t("score_tooltip.per_habit")}</span>
-                <span className='flex items-center gap-1 font-bold tabular-nums text-white'>
+                <span className='text-black/70'>{t("score_tooltip.per_habit")}</span>
+                <span className='flex items-center gap-1 font-bold tabular-nums'>
                   {fmtPts(pointsPerHabit)}
                   <img
                     src='/images/tokens/pick.png'
@@ -119,19 +119,19 @@ export const ScoreBreakdownTooltip = ({
                   <div
                     key={tier.label}
                     className={cn(
-                      "flex-1 space-y-0.5 rounded-md px-1 py-1.5 text-center transition-colors",
+                      "flex-1 space-y-0.5 rounded px-1 py-1.5 text-center transition-colors",
                       isActive
-                        ? "bg-orange-500/25 ring-1 ring-orange-400/60"
-                        : "bg-white/5"
+                        ? "bg-orange-500/15"
+                        : "bg-black/5"
                     )}
                   >
-                    <div className='text-[8px] tracking-wide text-zinc-400'>
+                    <div className='text-[8px] text-black/60'>
                       {t(`score_tooltip.ladder.${index}`, tier.label)}
                     </div>
                     <div
                       className={cn(
                         "text-[11px] font-bold tabular-nums",
-                        isActive ? "text-orange-300" : "text-zinc-300"
+                        isActive ? "text-orange-700" : "text-black/70"
                       )}
                     >
                       ×{(1 + tier.mult).toFixed(1)}
@@ -142,7 +142,7 @@ export const ScoreBreakdownTooltip = ({
             </div>
 
             {restDays && (
-              <p className='text-xs text-zinc-400'>
+              <p className='text-xs text-black/60'>
                 {t("score_tooltip.rest_day")}
               </p>
             )}

@@ -89,7 +89,7 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
 
   return (
     <>
-      <Card className='group relative  mb-5 overflow-hidden rounded-xl p-4'>
+      <Card className='group relative mb-5 overflow-hidden'>
         <div className='relative space-y-6'>
           {skills.map((skill) => (
             <div key={skill.name} className='group/item space-y-3'>

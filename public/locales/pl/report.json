@@ -217,6 +217,7 @@
     "habits_count": "{{count}} z {{total}}",
     "your_session": "Twoja sesja",
     "summary_empty": "Podsumowanie buduje się tutaj w miarę odpowiedzi.",
+    "ready_title": "Gotowe do zapisu",
     "save": "Zapisz sesję",
     "back": "Wstecz",
     "done": "Gotowe",

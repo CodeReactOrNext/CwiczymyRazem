@@ -7,7 +7,6 @@ interface UseSessionProgressProps {
   isLastExercise: boolean;
   duration: number;
   freeMode?: boolean;
-  isSkillExercise: boolean;
   onTimeUp?: () => void;
 }
 
@@ -17,7 +16,6 @@ export const useSessionProgress = ({
   isLastExercise,
   duration,
   freeMode,
-  isSkillExercise,
   onTimeUp,
 }: UseSessionProgressProps) => {
   const [completedExercises, setCompletedExercises] = useState<number[]>([]);
@@ -70,11 +68,22 @@ export const useSessionProgress = ({
   // count as practised, so a finish can never write an empty report.
   const hasLoggedPractice = completedExercises.length > 0;
 
+  // One rule for every route (owner, 2026-11-22): a session counts in full only
+  // once it is played out — its last exercise ran its clock down. Anything
+  // sooner is an early finish (time only), whether the exercise came from a
+  // plan, the catalog, the daily widget or a skill. An item with no clock of
+  // its own has nothing to play out, so its 20 s are the bar.
+  const hasClock = !freeMode && duration > 0;
   const canFinishSession = freeMode
     ? hasLoggedPractice
-    : isSkillExercise
-      ? currentTimeLeft <= 0 && timeLeftWasPositiveRef.current
-      : hasLoggedPractice;
+    : isLastExercise && (hasClock ? currentTimeLeft <= 0 : hasLoggedPractice);
+
+  /** Whether the exercise on screen ran its clock down — what its scores,
+   *  records and leaderboard entry are saved for when the player moves on. */
+  const isCurrentExercisePlayedOut = useCallback(() => {
+    if (freeMode || duration <= 0) return true;
+    return Math.floor((duration * 1000 - timer.getTime()) / 1000) <= 0;
+  }, [freeMode, duration, timer]);
 
   const resetProgress = useCallback(() => {
     setCompletedExercises([]);
@@ -88,6 +97,7 @@ export const useSessionProgress = ({
     setShowSuccessView,
     canFinishSession,
     hasLoggedPractice,
+    isCurrentExercisePlayedOut,
     resetProgress,
     setCompletedExercises,
   };

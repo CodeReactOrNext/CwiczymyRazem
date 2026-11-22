@@ -21,7 +21,7 @@ function StylePicker({ playing }: { playing: AutoBackingSummary["style"] }) {
   const setStyle = useAutoBackingStore((state) => state.setStyle);
   return (
     <div className='mt-3'>
-      <p className='text-[10px] text-zinc-500'>
+      <p className='text-xs text-zinc-500'>
         {t("auto_backing.style.label")}
       </p>
       <div className='mt-1.5 flex flex-wrap gap-1'>
@@ -60,14 +60,14 @@ function LockedStyle({ playing }: { playing: AutoBackingSummary["style"] }) {
   const { t } = useTranslation("session");
   return (
     <div className='mt-3'>
-      <p className='text-[10px] text-zinc-500'>
+      <p className='text-xs text-zinc-500'>
         {t("auto_backing.style.label")}
       </p>
       <p className='mt-1.5 flex items-center gap-1.5 text-[11px] font-medium text-zinc-200'>
         <Lock className='h-3 w-3 text-zinc-500' aria-hidden />
         {t(`auto_backing.style.${playing}`)}
       </p>
-      <p className='mt-1 text-[10px] leading-relaxed text-zinc-500'>
+      <p className='mt-1 text-xs leading-relaxed text-zinc-500'>
         {t("auto_backing.style.locked")}
       </p>
     </div>
@@ -105,14 +105,14 @@ function Summary({ summary }: { summary: AutoBackingSummary }) {
     <div className='mt-2.5 space-y-1'>
       <p className='text-[11px] font-semibold text-zinc-300'>{heading}</p>
       {summary.kind === "rhythm" ? (
-        <p className='text-[10px] leading-relaxed text-zinc-500'>
+        <p className='text-xs leading-relaxed text-zinc-500'>
           {t("auto_backing.drums_only")}
         </p>
       ) : (
         <p className='font-mono text-[11px] text-zinc-400'>{chords}</p>
       )}
       {summary.kind === "drone" && (
-        <p className='text-[10px] leading-relaxed text-zinc-500'>
+        <p className='text-xs leading-relaxed text-zinc-500'>
           {t("auto_backing.drone")}
         </p>
       )}
@@ -159,7 +159,7 @@ export const AutoBackingSection = ({
         ) : (
           <StylePicker playing={summary.style} />
         ))}
-      <p className='mt-2 text-[10px] leading-relaxed text-zinc-500'>
+      <p className='mt-2 text-xs leading-relaxed text-zinc-500'>
         {enabled ? t("auto_backing.headphones") : t("auto_backing.description")}
       </p>
     </div>

@@ -34,6 +34,8 @@
   "anonimity_info": "Möchtest du deinen Nickname in der Rangliste verbergen?",
   "resolution_info": "Maximale Auflösung 250 × 250",
   "logged_in_via_google": "E-Mail und Passwort können nicht geändert werden, weil du dich mit Google angemeldet hast.",
+  "reauth_title": "Bestätige, dass du es bist",
+  "reauth_description": "Melde dich erneut an, um E-Mail oder Passwort zu ändern.",
   "bands": "Deine Bands",
   "guitarStartDate": {
     "title": "Wann hast du angefangen, Gitarre zu spielen?",

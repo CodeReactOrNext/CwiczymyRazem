@@ -4,10 +4,11 @@ import { getModResaleValue } from "feature/arsenal/data/resale";
 import { getModDef } from "feature/arsenal/data/workshop";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { SalvagedMod } from "feature/arsenal/types/arsenal.types";
-import { Store } from "lucide-react";
+import { Hammer, Store } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { FameCoin } from "../Workshop/FameCoin";
+import { GO_KEY } from "../Workshop/goKey";
 import { ModArt } from "../Workshop/ModArt";
 
 interface SalvagedModCardProps {
@@ -18,6 +19,11 @@ interface SalvagedModCardProps {
   /** Puts the mod on the player-to-player market instead of in the bin. */
   onListClick?: (modId: string) => void;
   isListing?: boolean;
+  /**
+   * An instrument with a free slot that takes this mod, and the way onto its
+   * bench. Absent when nothing the player owns has room for it.
+   */
+  install?: { targetName: string; onClick: () => void };
   /**
    * Replaces the card's own buttons, the way `GuitarCard` takes one: the
    * marketplace puts seller, price and a Buy button here. Its presence also
@@ -41,6 +47,7 @@ export const SalvagedModCard = ({
   isSelling = false,
   onListClick,
   isListing = false,
+  install,
   footer,
 }: SalvagedModCardProps) => {
   const def = getModDef(mod.kind, mod.featureId);
@@ -53,7 +60,7 @@ export const SalvagedModCard = ({
       <div className='flex items-center gap-4'>
         <ModArt modId={mod.featureId} size={72} />
         <div className='flex min-w-0 flex-col gap-1'>
-          <span className='text-[10px] font-semibold tracking-[0.18em] text-purple-300/70'>
+          <span className='text-xs font-medium text-purple-300/70'>
             {t("salvage.salvaged_mod_caps")}
           </span>
           {/* Wraps rather than truncates: mod labels run from "18V rail" to
@@ -76,6 +83,17 @@ export const SalvagedModCard = ({
 
       {footer ?? (
         <div className='flex flex-col gap-2'>
+          {/* The constructive move first: a mod is a component waiting for an
+              instrument, and here is one with room for it. */}
+          {install && (
+            <button
+              onClick={install.onClick}
+              className={cn(GO_KEY, "flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-bold")}>
+              <Hammer size={16} strokeWidth={2.5} />
+              {t("stash.menu.install_on", { name: install.targetName })}
+            </button>
+          )}
+
           {/* Listed first: a mod nobody can build is worth far more to another
               player than to the bin, and the bin is the fallback rather than
               the obvious move. */}

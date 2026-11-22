@@ -187,9 +187,9 @@ export const GuildQuestCard = ({
 
   if (done) {
     return (
-      <article className='flex items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4'>
+      <article className='flex items-center gap-4 rounded-lg bg-zinc-800/40 px-5 py-4'>
         <span className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400'>
-          <Check size={20} />
+          <Check className='h-5 w-5' />
         </span>
         <div className='min-w-0 flex-1'>
           <h3 className='truncate text-base font-bold text-zinc-300'>{name}</h3>
@@ -229,7 +229,7 @@ export const GuildQuestCard = ({
       : null;
 
   return (
-    <article className='rounded-lg bg-zinc-900/40 p-5'>
+    <article className='rounded-lg bg-zinc-800/40 p-5'>
       <div className='flex items-start gap-4'>
         <span className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300'>
           <QuestIcon quest={spec} size={20} />
@@ -292,8 +292,7 @@ export const GuildQuestCard = ({
                   {standing.done ? (
                     <Check
                       aria-hidden
-                      size={14}
-                      className='shrink-0 text-emerald-400'
+                      className='h-3.5 w-3.5 shrink-0 text-emerald-400'
                     />
                   ) : (
                     <span

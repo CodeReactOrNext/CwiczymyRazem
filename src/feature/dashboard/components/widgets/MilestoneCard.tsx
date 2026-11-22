@@ -1,4 +1,4 @@
-import { buttonVariants, PRESSABLE } from "assets/components/ui/button";
+import { Button, buttonVariants } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
@@ -15,6 +15,7 @@ import Link from "next/link";
 
 import { MilestoneChart } from "./MilestoneChart";
 import { isClaimableNode, isLockedNode, MilestoneNode } from "./MilestoneNode";
+import { WidgetHeader } from "./WidgetHeader";
 
 /**
  * One weekly goal: a header line carrying the tier's disc, what the goal asks
@@ -44,9 +45,9 @@ export const MilestoneCard = ({
 
   if (isError) {
     return (
-      <Card className='flex h-full items-center gap-4 p-4 sm:p-5'>
+      <Card className='flex h-full items-center gap-4'>
         <div className='min-w-0'>
-          <h3 className='text-sm font-semibold text-zinc-100'>{tier.name}</h3>
+          <WidgetHeader title={tier.name} className='mb-0' />
           <p className='mt-0.5 text-xs text-zinc-400'>
             Couldn&apos;t load this week&apos;s progress.
           </p>
@@ -57,7 +58,7 @@ export const MilestoneCard = ({
 
   if (isLoading || !status) {
     return (
-      <Card className='flex h-full items-center gap-4 p-4 sm:p-5'>
+      <Card className='flex h-full items-center gap-4'>
         <Skeleton className='h-14 w-14 shrink-0 rounded-full' />
         <div className='min-w-0 flex-1 space-y-2'>
           <Skeleton className='h-4 w-24 rounded' />
@@ -73,21 +74,20 @@ export const MilestoneCard = ({
   const isCurrent = !status.met && !locked;
 
   return (
-    <Card className='flex h-full flex-col gap-4 p-4 sm:p-5'>
+    <Card className='flex h-full flex-col gap-4'>
       <div className='flex flex-wrap items-center gap-x-4 gap-y-3'>
         <MilestoneNode status={status} isCurrent={isCurrent} />
 
         <div className='min-w-0 flex-1'>
-          <div className='flex items-baseline gap-2'>
-            <h3 className='truncate text-sm font-semibold text-zinc-100'>
-              {t(`levels.${status.id}.name`, status.name)}
-            </h3>
-            {!locked && (
-              <span className='shrink-0 text-xs font-semibold tabular-nums text-zinc-400'>
-                {status.progress.value}/{status.progress.max}
-              </span>
-            )}
-          </div>
+          <WidgetHeader
+            title={t(`levels.${status.id}.name`, status.name)}
+            count={
+              locked
+                ? undefined
+                : `${status.progress.value}/${status.progress.max}`
+            }
+            className='mb-0'
+          />
           <p className='mt-0.5 text-xs leading-relaxed text-zinc-400'>
             {t(`levels.${status.id}.req`, status.req)}
           </p>
@@ -109,8 +109,9 @@ export const MilestoneCard = ({
             {t("card.unlock", { cost: status.cost })}
           </Link>
         ) : canClaim ? (
-          <button
+          <Button
             type='button'
+            size='sm'
             disabled={claim.isPending}
             onClick={() =>
               claim.mutate({
@@ -120,14 +121,9 @@ export const MilestoneCard = ({
                 weekKey,
               })
             }
-            className={cn(
-              PRESSABLE,
-              "shrink-0 rounded-lg border-b-amber-700 bg-amber-500 px-3 py-2 text-sm text-amber-950 transition-colors duration-fast hover:bg-amber-400",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900",
-              "disabled:pointer-events-none disabled:opacity-50",
-            )}>
+            className='shrink-0 border-b-amber-700 bg-amber-500 text-amber-950 hover:bg-amber-400 focus-visible:ring-amber-300'>
             {claim.isPending ? t("card.claiming") : t("card.claim", { reward: status.reward })}
-          </button>
+          </Button>
         ) : status.claimed ? (
           <span className='shrink-0 text-xs text-zinc-400'>{t("card.claimed")}</span>
         ) : (
@@ -146,7 +142,6 @@ export const MilestoneCard = ({
           kind={milestoneChartKind(tier)}
           days={days}
           rule={milestoneDayRule(tier)}
-          color={status.color}
         />
       )}
     </Card>

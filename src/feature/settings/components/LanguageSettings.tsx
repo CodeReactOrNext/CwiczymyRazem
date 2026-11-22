@@ -1,11 +1,6 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "assets/components/ui/card";
+import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { useTranslation } from "hooks/useTranslation";
 import type { AppLocale } from "lib/i18n/locales";
 import { SUPPORTED_LOCALES } from "lib/i18n/locales";
@@ -60,11 +55,8 @@ export const LanguageSettings = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{t("language.title")}</CardTitle>
-        <CardDescription>{t("language.subtitle")}</CardDescription>
-      </CardHeader>
-      <CardContent className='space-y-4'>
+      <SectionHeader title={t("language.title")} description={t("language.subtitle")} />
+      <div className='space-y-4'>
         <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
           {SUPPORTED_LOCALES.map(({ code, label, englishLabel }) => (
             <LocaleOption
@@ -79,7 +71,7 @@ export const LanguageSettings = () => {
         </div>
 
         <p className='text-sm text-zinc-400'>{t("language.work_in_progress")}</p>
-      </CardContent>
+      </div>
     </Card>
   );
 };

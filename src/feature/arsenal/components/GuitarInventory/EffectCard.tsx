@@ -52,6 +52,7 @@ import { ScrapYieldList } from "../Parts/ScrapYieldList";
 import { RARITY_STYLES } from "../RarityBadge";
 import { SpecTags } from "../SpecTags";
 import { ModArt } from "../Workshop/ModArt";
+import { WorkshopCardAction } from "../Workshop/WorkshopCardAction";
 
 interface EffectCardProps {
   item: EffectInventoryItem;
@@ -68,6 +69,10 @@ interface EffectCardProps {
   onStashClick?: (inventoryItemId: string) => void;
   isStashing?: boolean;
   /** Takes the pedal off the pedalboard straight from the collection tab. */
+  /** Puts this copy on the Workshop bench. Absent where there is no bench. */
+  onWorkshopClick?: () => void;
+  /** A bench job runs today — the Workshop key wears the green hammer mark. */
+  workshopReady?: boolean;
   onRemoveFromBoard?: (inventoryItemId: string) => void;
   isRemovingFromBoard?: boolean;
   /** Hide the Sell footer — for tooltips, reveals and read-only previews. */
@@ -98,6 +103,8 @@ export const EffectCard = ({
   isStashing,
   onRemoveFromBoard,
   isRemovingFromBoard,
+  onWorkshopClick,
+  workshopReady = false,
   readOnly = false,
   footer,
   imageHeight,
@@ -114,6 +121,11 @@ export const EffectCard = ({
   // Light theme: a white card with a flat rarity tint — no fade, glow or shadow.
   const isLight = useColorTheme() === "light";
   const { t } = labels;
+  // A pedal has no Equip, so the bench key is the row's main action — above
+  // the keys that send the pedal away, the way Equip sits on a guitar card.
+  const workshopKey = onWorkshopClick ? (
+    <WorkshopCardAction ready={workshopReady} onClick={onWorkshopClick} />
+  ) : undefined;
 
   const effect = EFFECTS_BY_ID.get(item.effectId);
   if (!effect) return null;
@@ -205,7 +217,7 @@ export const EffectCard = ({
             {effect.name}
           </p>
           <p
-            className='mt-0.5 text-[9px] font-medium capitalize tracking-[0.15em]'
+            className='mt-0.5 text-[11px] font-medium'
             style={{ color: readableText(rs.baseColor), opacity: 0.7 }}>
             {labels.rarity(rarity)} · {labels.effectType(effect.type)}
           </p>
@@ -217,7 +229,7 @@ export const EffectCard = ({
         </div>
 
         {item.serial != null && (
-          <span className='font-mono flex-shrink-0 text-[9px] tracking-tight text-zinc-500'>
+          <span className='font-mono flex-shrink-0 text-[11px] text-zinc-500'>
             #{String(item.serial).padStart(4, "0")}
           </span>
         )}
@@ -331,7 +343,7 @@ export const EffectCard = ({
               }}
             />
             <span
-              className='text-[8px] font-medium tracking-wide'
+              className='text-[11px] font-medium'
               style={{ color: `${rs.baseColor}B3` }}>
               {t("card.effect.on_board")}
             </span>
@@ -357,7 +369,7 @@ export const EffectCard = ({
       {/* On the board every other action is blocked, so the whole row becomes
           the one action that is available: taking the pedal off. */}
       {!readOnly && !footer && isOnPedalboard && onRemoveFromBoard && (
-        <CardActionRow>
+        <CardActionRow primary={workshopKey}>
           <CardAction
             icon={Unplug}
             onClick={() => onRemoveFromBoard(item.id)}
@@ -371,7 +383,7 @@ export const EffectCard = ({
       {/* Sell — keys, like the guitar card's lower row: a pedal has no Equip,
           so the actions that send it away are the whole band. */}
       {!readOnly && !footer && !(isOnPedalboard && onRemoveFromBoard) && (
-        <CardActionRow keys>
+        <CardActionRow keys primary={workshopKey}>
           {onListClick && (
             <CardAction
               tone='market'
@@ -432,19 +444,19 @@ export const EffectCard = ({
                 </TooltipTrigger>
                 <TooltipContent
                   side='top'
-                  className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-white'>
+                  className='tooltip-ink max-w-[260px]'>
                   {isOnPedalboard ? (
                     <span className='text-xs'>
                       {t("card.effect.scrap_unboard")}
                     </span>
                   ) : (
                     <div className='flex flex-col gap-1.5'>
-                      <span className='text-[10px] font-bold capitalize tracking-wider text-zinc-400'>
+                      <span className='text-xs font-medium text-black/60'>
                         {t("card.scraps_into", { count: scrapTotal })}
                       </span>
                       <ScrapYieldList parts={scrapParts} compact />
                       {salvagedMod && (
-                        <span className='text-[11px] text-purple-300'>
+                        <span className='text-[11px] text-purple-700'>
                           {t("card.mod_comes_off", {
                             name: labels.mod(salvagedMod.featureId, salvagedMod.label),
                             points: salvagedMod.points,

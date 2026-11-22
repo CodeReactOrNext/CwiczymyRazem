@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/t
 import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { tabNavFadeClass } from "components/PageTabs/tabNav";
 import { useRailEdges } from "components/PageTabs/useRailEdges";
 import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
@@ -87,10 +88,12 @@ import {
   arsenalTabTriggerClass,
 } from "./components/tabTrigger";
 import { TraderView } from "./components/Trader/TraderView";
+import { ReadyMark } from "./components/Workshop/ReadyMark";
 import { WorkshopSkeleton } from "./components/Workshop/WorkshopSkeleton";
 import { WorkshopTab } from "./components/Workshop/WorkshopTab";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
 import { useArsenalData } from "./hooks/useArsenalData";
+import { useBenchReadiness } from "./hooks/useBenchReadiness";
 import { useOpenCase } from "./hooks/useOpenCase";
 import { useOpenCasePack } from "./hooks/useOpenCasePack";
 import type {
@@ -102,6 +105,8 @@ import type {
 const ArsenalTabs = () => {
   const { t } = useTranslation("arsenal");
   const { data, isLoading } = useArsenalData();
+  // Gear with a bench job ready right now — counted on the Workshop tab.
+  const { readyIds: benchReadyIds } = useBenchReadiness(data);
   const { ref: railRef, edges: tabEdges } = useRailEdges<HTMLDivElement>();
   const userStats = useAppSelector(selectCurrentUserStats);
   const fame = userStats?.fame || 0;
@@ -185,8 +190,6 @@ const ArsenalTabs = () => {
         title={t("view.title")}
         subtitle={t("view.subtitle")}
         eyebrow={t("view.eyebrow")}
-        compact
-        className="w-full !rounded-none !shadow-none !p-6 min-h-[120px] md:min-h-[132px] lg:min-h-[144px]"
         backgroundContent={<HeroPattern />}
         rightContent={
           // Fame is the only number that belongs to the whole module — it is
@@ -235,7 +238,7 @@ const ArsenalTabs = () => {
         }
       />
 
-      <div className="p-4">
+      <div className={PAGE_CONTENT}>
         <div className="flex flex-col gap-6">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList
@@ -259,6 +262,9 @@ const ArsenalTabs = () => {
                       )}
                     </span>
                     <span className="whitespace-nowrap">{t(`view.tabs.${tab}`)}</span>
+                    {tab === "workshop" && benchReadyIds.size > 0 && (
+                      <ReadyMark count={benchReadyIds.size} />
+                    )}
                   </TabsTrigger>
                 );
               })}

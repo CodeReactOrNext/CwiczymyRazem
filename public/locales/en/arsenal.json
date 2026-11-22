@@ -289,7 +289,9 @@
     "scope": {
       "all": "All",
       "guitars": "Guitars",
-      "pedals": "Pedals"
+      "pedals": "Pedals",
+      "parts": "Parts",
+      "builder": "Builder"
     },
     "search": "Search your collection",
     "sort_by": "Sort by",
@@ -325,12 +327,14 @@
     "guitars_collected": "guitars collected",
     "pedals_eyebrow": "Effects",
     "pedals_collected": "pedals collected",
-    "clear_dupes": "Clear duplicates ({{count}})"
+    "clear_dupes": "Clear duplicates ({{count}})",
+    "shelf": "Shelf",
+    "view_switch": "View"
   },
   "salvage": {
     "title": "Salvage",
     "salvaged_mod": "Salvaged mod",
-    "salvaged_mod_caps": "SALVAGED MOD",
+    "salvaged_mod_caps": "Salvaged mod",
     "fit_title": "Fit {{name}}?",
     "fit_body": "Onto {{target}}, at the value it was salvaged with. Nothing is re-rolled.",
     "off_source": "off {{source}}",
@@ -393,7 +397,8 @@
     "sell_it": "Sell it",
     "sell_one": "Sell one for {{fame}} Fame",
     "salvaged_parts": "Salvaged parts",
-    "wallet_empty": "Scrap a guitar or pedal from your collection to salvage your first parts."
+    "wallet_empty": "Scrap a guitar or pedal from your collection to salvage your first parts.",
+    "sell_one_short": "Sell 1"
   },
   "stash": {
     "part": "Part",
@@ -413,12 +418,14 @@
       "sell_for": "Sell · {{fame}}",
       "sell_all": "Sell all ×{{qty}}",
       "merge": "Merge · +{{gain}} lvl",
-      "merge_plain": "Merge into best copy"
+      "merge_plain": "Merge into best copy",
+      "workshop": "Workshop…",
+      "install_on": "Install on {{name}}"
     },
     "eyebrow": "Arsenal",
     "title": "Stash",
     "items_collected": "items collected",
-    "tidy_hint": "Lay the whole stash out again in one go — it stays your arrangement afterwards",
+    "tidy_hint": "Lay this shelf out again in one go — it stays your arrangement afterwards",
     "tidy_up": "Tidy up",
     "arrange": {
       "equipped": "What I'm playing first",
@@ -472,7 +479,9 @@
     },
     "merge": "Merge +{{gain}}",
     "merge_plain": "Merge",
-    "merge_hint": "Fold into your best copy for +{{gain}} Item Level"
+    "merge_hint": "Fold into your best copy for +{{gain}} Item Level",
+    "workshop": "Workshop",
+    "workshop_hint": "Restore it, upgrade it and fit mods on the bench"
   },
   "bulk": {
     "title": "Clear duplicates?",
@@ -945,7 +954,16 @@
     "levels_word": "levels",
     "empty": "Open a case first. Once you own a guitar or a pedal you can restore it and keep building it up with salvaged parts.",
     "change_instrument": "Change instrument · {{count}} in the rack",
-    "pick_instrument": "Pick an instrument"
+    "pick_instrument": "Pick an instrument",
+    "ready_now": "You can do this now",
+    "make": "Make",
+    "make_hint_one": "Rework {{count}} up from {{tier}} parts",
+    "make_hint": "Rework {{count}} up from {{tier}} parts",
+    "job_with_gain_one": "{{job}} · +{{count}} level",
+    "job_with_gain": "{{job}} · +{{count}} levels",
+    "previous_instrument": "Previous instrument",
+    "next_instrument": "Next instrument",
+    "n_of_total": "{{n}} of {{total}}"
   },
   "mods": {
     "remove_aria": "Take this mod off for {{fame}} Fame",
@@ -1003,7 +1021,10 @@
     "no_match": "No compatible mod matches that name.",
     "bonus": "+{{points}} bonus",
     "bonus_word": "bonus",
-    "compatible_slot": "Compatible with this slot"
+    "compatible_slot": "Compatible with this slot",
+    "install_named": "Install {{name}}",
+    "reroll_range": "Re-roll · +{{min}} to +{{max}}",
+    "take_off_for": "Take off · {{fame}} Fame"
   },
   "toasts": {
     "mod_added": "Mod added to your stash — fit it from Collection or the bench",

@@ -10,15 +10,16 @@
     "create_exercise": "Create Exercise"
   },
   "groups": {
-    "planned": "With a plan",
-    "songs": "Songs",
-    "exercises": "Exercises",
-    "challenges": "Challenges"
+    "today": "Today's session",
+    "courses": "Longer courses",
+    "music": "Music",
+    "technique": "Technique",
+    "versus": "Versus"
   },
   "modes": {
     "routine": {
-      "title": "Practice Routines",
-      "description": "Ready-made and your own session plans"
+      "title": "Practice Plans",
+      "description": "Ready-made or your own, one session each"
     },
     "manual_log": {
       "title": "Manual Log",
@@ -34,7 +35,7 @@
     },
     "auto": {
       "title": "Auto Plan",
-      "description": "A session built to fit your time"
+      "description": "Built on the spot to fit your time"
     },
     "gp": {
       "title": "Guitar Pro Files",
@@ -46,7 +47,7 @@
     },
     "roadmaps": {
       "title": "Mastery Roadmaps",
-      "description": "A plan for one skill"
+      "description": "Weeks of steps toward one goal"
     },
     "scales": {
       "title": "Scale Map",
@@ -65,8 +66,8 @@
       "description": "Progress by technique"
     },
     "exercises": {
-      "title": "Exercise Catalog",
-      "description": "Every exercise"
+      "title": "Exercises",
+      "description": "The whole catalog"
     },
     "favorites": {
       "title": "Favorites"
@@ -129,7 +130,9 @@
     "options": "Options",
     "swap": "Swap for another",
     "move_up": "Move up",
-    "move_down": "Move down"
+    "move_down": "Move down",
+    "matches_one": "exercise matches your picks",
+    "matches_other": "exercises match your picks"
   },
   "back": "Back",
   "no_community_plans": "No community plans published yet.",

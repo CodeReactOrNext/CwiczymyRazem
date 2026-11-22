@@ -1,5 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { WidgetDefinition } from "feature/dashboard/data/widgetCatalog";
 import type {
@@ -26,8 +27,7 @@ interface WidgetFrameProps {
   children: ReactNode;
 }
 
-const controlButton =
-  "rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-700/60 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500";
+const controlButton = "h-8 w-8 text-zinc-400";
 
 /**
  * One cell of the Home grid. Invisible while the page is just being read;
@@ -80,7 +80,9 @@ export const WidgetFrame = ({
         isDragging && "relative z-20 opacity-80",
       )}>
       <div className='flex items-center gap-2 rounded-lg bg-zinc-800/40 px-2 py-1.5'>
-        <button
+        <Button
+          variant='ghost'
+          size='icon'
           ref={setActivatorNodeRef}
           type='button'
           {...attributes}
@@ -91,14 +93,16 @@ export const WidgetFrame = ({
             controlButton,
             "cursor-grab touch-none active:cursor-grabbing",
           )}>
-          <GripVertical size={16} />
-        </button>
+          <GripVertical />
+        </Button>
         <Icon size={14} className='shrink-0 text-zinc-500' />
         <span className='min-w-0 flex-1 truncate text-sm font-semibold text-zinc-200'>
           {definition.title}
         </span>
         {canResize && (
-          <button
+          <Button
+            variant='ghost'
+            size='icon'
             type='button'
             onClick={() => onResize(isFull ? "half" : "full")}
             aria-label={
@@ -109,20 +113,22 @@ export const WidgetFrame = ({
             title={isFull ? t("frame.half") : t("frame.full")}
             className={controlButton}>
             {isFull ? (
-              <Columns2 size={16} />
+              <Columns2 />
             ) : (
-              <RectangleHorizontal size={16} />
+              <RectangleHorizontal />
             )}
-          </button>
+          </Button>
         )}
-        <button
+        <Button
+          variant='ghost'
+          size='icon'
           type='button'
           onClick={onRemove}
           aria-label={t("frame.hide", { title: definition.title })}
           title={t("frame.hide_from_home")}
           className={controlButton}>
-          <EyeOff size={16} />
-        </button>
+          <EyeOff />
+        </Button>
       </div>
 
       <div

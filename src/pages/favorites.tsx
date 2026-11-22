@@ -1,13 +1,23 @@
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
-import { Kostek } from "components/Mascot/Kostek";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import {
+  PAGE_CONTENT,
+  PAGE_GUTTER,
+  PageShell,
+} from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { LIBRARY_TABS } from "constants/navTabs";
+import { LIBRARY_HERO_CLASS, LIBRARY_TABS } from "constants/navTabs";
+import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
+import { getCategoryChipColor } from "feature/exercisePlan/constants/categoryChip";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { SongBoardRow } from "feature/songs/components/SongBoard/SongBoardRow";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
@@ -31,21 +41,6 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuthInitialProps } from "utils/auth/authInitialProps";
 import { formatMinutesDuration } from "utils/converter";
-
-const DIFFICULTY_COLORS: Record<string, string> = {
-  beginner: "bg-sky-500/[0.12] text-sky-400 border-sky-500/30",
-  easy: "bg-emerald-500/[0.12] text-emerald-400 border-emerald-500/30",
-  medium: "bg-amber-500/[0.12] text-amber-400 border-amber-500/30",
-  hard: "bg-rose-500/[0.12] text-rose-400 border-rose-500/30",
-};
-
-const CATEGORY_COLORS: Record<string, string> = {
-  technique: "bg-blue-500/[0.12] text-blue-400 border-blue-500/30",
-  theory: "bg-violet-500/[0.12] text-violet-400 border-violet-500/30",
-  hearing: "bg-cyan-500/[0.12] text-cyan-400 border-cyan-500/30",
-  creativity: "bg-green-500/[0.12] text-green-400 border-green-500/30",
-  mixed: "bg-zinc-500/[0.12] text-zinc-400 border-zinc-500/30",
-};
 
 const localizedTitle = (value: unknown): string => {
   if (!value) return "";
@@ -120,6 +115,8 @@ const FavoritesPage: NextPageWithLayout = () => {
 
   // Practice/GP picker — same chooser you get when clicking a song on /songs.
   const [practiceTarget, setPracticeTarget] = useState<Song | null>(null);
+  // An exercise opens in the same preview the catalog uses; Start leaves for the session.
+  const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const { progressMap, attachGpFile, detachGpFile, setSongParts } = useUserSongProgress(
     userAuth ?? null
   );
@@ -130,16 +127,16 @@ const FavoritesPage: NextPageWithLayout = () => {
     favoriteSongs.length === 0;
 
   return (
-    <div className="bg-second-600 flex min-h-screen flex-col overflow-visible rounded-xl border-none shadow-sm">
+    <PageShell>
       <HeroBanner
         title={t("library:favorites.title")}
         subtitle={t("library:favorites.subtitle")}
-        compact
+        eyebrow={t("library:favorites.eyebrow")}
+        className={LIBRARY_HERO_CLASS}
         backgroundContent={<HeroPattern withHeart />}
-        className="mb-2 w-full !rounded-none !shadow-none md:mb-6 md:min-h-[90px] lg:min-h-[100px]"
       />
 
-      <div className="px-3 md:px-6 lg:px-8">
+      <div className={cn(PAGE_GUTTER, "pt-6")}>
         <PageTabs
           tabs={LIBRARY_TABS}
           activeHref="/favorites"
@@ -147,44 +144,42 @@ const FavoritesPage: NextPageWithLayout = () => {
         />
       </div>
 
-      <div className="space-y-12 px-3 py-6 md:px-6 md:py-8 lg:px-8">
+      <div className={cn("space-y-12", PAGE_CONTENT)}>
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center rounded-lg bg-zinc-900/30 px-6 py-12 text-center md:py-20">
-            {/* Nothing saved: Kostek looks around for something to keep. */}
-            <Kostek mood="lookAround" className="mb-4 h-24 md:h-36" />
-            <p className="text-base font-semibold text-zinc-100">
-              {t("library:favorites.empty_title")}
-            </p>
-            <p className="mt-2 max-w-sm text-sm text-zinc-400">
-              {t("library:favorites.empty_body")}
-            </p>
-            <Button asChild className="mt-8 h-11 rounded-lg bg-white px-6 font-bold text-black hover:bg-zinc-200">
-              <Link href="/profile/skills?tab=browse">
-                {t("library:favorites.browse_exercises")}
-              </Link>
-            </Button>
-            <div className="mt-4 flex items-center gap-6 text-sm">
-              <Link href="/timer/plans" className="font-medium text-zinc-300 transition-colors hover:text-white">
-                {t("library:favorites.browse_plans")}
-              </Link>
-              <Link href="/songs?view=explore" className="font-medium text-zinc-300 transition-colors hover:text-white">
-                {t("library:favorites.browse_songs")}
-              </Link>
-            </div>
-          </div>
+          // Nothing saved: Kostek looks around for something to keep.
+          <EmptyState
+            mood='lookAround'
+            title={t("library:favorites.empty_title")}
+            description={t("library:favorites.empty_body")}
+            action={
+              <>
+                <Button asChild>
+                  <Link href='/profile/skills?tab=browse'>
+                    {t("library:favorites.browse_exercises")}
+                  </Link>
+                </Button>
+                <Button asChild variant='ghost'>
+                  <Link href='/timer/plans'>
+                    {t("library:favorites.browse_plans")}
+                  </Link>
+                </Button>
+                <Button asChild variant='ghost'>
+                  <Link href='/songs?view=explore'>
+                    {t("library:favorites.browse_songs")}
+                  </Link>
+                </Button>
+              </>
+            }
+          />
         ) : (
           <>
             {favoritePlans.length > 0 && (
               <section className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="h-1.5 w-1.5 rounded-full bg-current text-rose-500" />
-                  <h2 className="text-sm font-medium tracking-wide text-white">
-                    Plans
-                  </h2>
-                  <span className="text-xs text-zinc-600">
-                    {favoritePlans.length}
-                  </span>
-                </div>
+                <SectionHeader
+                  title='Plans'
+                  count={favoritePlans.length}
+                  className="mb-0"
+                />
 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {favoritePlans.map((plan) => {
@@ -220,18 +215,14 @@ const FavoritesPage: NextPageWithLayout = () => {
 
             {favoriteExercises.length > 0 && (
               <section className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="h-1.5 w-1.5 rounded-full bg-current text-rose-500" />
-                  <h2 className="text-sm font-medium tracking-wide text-white">
-                    Exercises
-                  </h2>
-                  <span className="text-xs text-zinc-600">
-                    {favoriteExercises.length}
-                  </span>
-                </div>
+                <SectionHeader
+                  title='Exercises'
+                  count={favoriteExercises.length}
+                  className="mb-0"
+                />
 
-                <div className="overflow-hidden rounded-lg border border-zinc-800">
-                  {favoriteExercises.map((exercise, index) => {
+                <div className="space-y-2">
+                  {favoriteExercises.map((exercise) => {
                     const skillId = exercise.relatedSkills[0];
                     const skillData = skillId
                       ? guitarSkills.find((s) => s.id === skillId)
@@ -241,14 +232,8 @@ const FavoritesPage: NextPageWithLayout = () => {
                     <button
                       key={exercise.id}
                       type="button"
-                      onClick={() =>
-                        router.push(`/profile/skills?exerciseId=${exercise.id}`)
-                      }
-                      className={cn(
-                        "group flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-zinc-900/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyan-500/40",
-                        index % 2 === 0 ? "bg-zinc-900/40" : "bg-zinc-950/40",
-                        index !== 0 && "border-t border-zinc-800/60"
-                      )}
+                      onClick={() => setPreviewExercise(exercise)}
+                      className="group flex w-full items-center gap-3 rounded-lg bg-zinc-800/40 px-4 py-3 text-left transition-colors hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-cyan-500/40"
                     >
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-zinc-800/60 text-zinc-400">
                         {SkillIcon ? (
@@ -271,24 +256,17 @@ const FavoritesPage: NextPageWithLayout = () => {
                         </span>
                       )}
 
-                      <span
-                        className={cn(
-                          "hidden shrink-0 rounded border px-2 py-0.5 text-[10px] font-medium capitalize tracking-wider sm:inline-block",
-                          CATEGORY_COLORS[exercise.category] ?? CATEGORY_COLORS.mixed
-                        )}
+                      <Chip
+                        color={getCategoryChipColor(exercise.category)}
+                        size='sm'
+                        className="hidden shrink-0 sm:inline-flex"
                       >
-                        {exercise.category}
-                      </span>
+                        {t(`common:categories.${exercise.category}`, exercise.category)}
+                      </Chip>
 
-                      <span
-                        className={cn(
-                          "hidden shrink-0 rounded border px-2 py-0.5 text-[10px] font-medium capitalize tracking-wider sm:inline-block",
-                          DIFFICULTY_COLORS[exercise.difficulty] ??
-                            DIFFICULTY_COLORS.easy
-                        )}
-                      >
+                      <Chip color='gray' size='sm' className="hidden shrink-0 sm:inline-flex">
                         {t(`common:difficulty.${exercise.difficulty}`, exercise.difficulty)}
-                      </span>
+                      </Chip>
 
                       <span className="hidden w-16 shrink-0 items-center justify-end gap-1 text-[11px] text-zinc-500 sm:flex">
                         <Clock className="h-3 w-3" />
@@ -335,15 +313,11 @@ const FavoritesPage: NextPageWithLayout = () => {
 
             {favoriteSongs.length > 0 && (
               <section className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="h-1.5 w-1.5 rounded-full bg-current text-rose-500" />
-                  <h2 className="text-sm font-medium tracking-wide text-white">
-                    Songs
-                  </h2>
-                  <span className="text-xs text-zinc-600">
-                    {favoriteSongs.length}
-                  </span>
-                </div>
+                <SectionHeader
+                  title='Songs'
+                  count={favoriteSongs.length}
+                  className="mb-0"
+                />
 
                 <div className="space-y-2">
                   {favoriteSongs.map((song) => (
@@ -369,18 +343,30 @@ const FavoritesPage: NextPageWithLayout = () => {
         )}
       </div>
 
+      <ExercisePreviewDialog
+        exercise={previewExercise ? localizeExercise(previewExercise) : null}
+        onClose={() => setPreviewExercise(null)}
+        onStart={() => {
+          if (!previewExercise) return;
+          const id = previewExercise.id;
+          setPreviewExercise(null);
+          router.push(
+            `/profile/skills?exerciseId=${id}&returnTo=${encodeURIComponent("/favorites")}`
+          );
+        }}
+      />
+
       {practiceTarget && userAuth && (
         <SongPracticePickerModal
           song={practiceTarget}
           userId={userAuth}
-          isPremium={isPremium}
           progress={progressMap[practiceTarget.id] ?? null}
           onAttachGpFile={attachGpFile}
           onDetachGpFile={detachGpFile}
           onClose={() => setPracticeTarget(null)}
         />
       )}
-    </div>
+    </PageShell>
   );
 };
 

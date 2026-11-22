@@ -150,7 +150,7 @@ export const EarTrainingView = ({
                   />
                 ))}
               </div>
-              <span className="h-3 font-mono text-[10px] leading-3 text-zinc-600">
+              <span className="h-3 font-mono text-[11px] leading-3 text-zinc-500">
                 {listening ? riddleProgress.heardNote ?? " " : " "}
               </span>
             </div>
@@ -161,50 +161,46 @@ export const EarTrainingView = ({
         {!isRevealed ? (
           <div className="flex items-center gap-2">
             <Button
-              size="sm"
               variant={isPlaying ? "secondary" : "default"}
-              className="h-9 flex-1 font-semibold sm:max-w-[180px]"
+              className="flex-1 sm:max-w-[180px]"
               onClick={onPlayRiddle}
             >
               {isPlaying
-                ? <><Square className="mr-1.5 h-3.5 w-3.5" /> {t("quiz.stop")}</>
-                : <><Play className="mr-1.5 h-3.5 w-3.5" /> {canGuess ? t("ear.replay") : t("quiz.play")}</>}
+                ? <><Square /> {t("quiz.stop")}</>
+                : <><Play /> {canGuess ? t("ear.replay") : t("quiz.play")}</>}
             </Button>
             <Button
-              size="sm"
               variant="ghost"
-              className="h-9 px-4 text-zinc-400 hover:text-zinc-100"
+              className="text-zinc-400 hover:text-zinc-100"
               onClick={onReveal}
             >
-              <Eye className="h-3.5 w-3.5" /> {isMicEnabled ? t("ear.stuck_reveal") : t("ear.show_answer")}
+              <Eye /> {isMicEnabled ? t("ear.stuck_reveal") : t("ear.show_answer")}
             </Button>
           </div>
         ) : !isGuessed ? (
           <div className="space-y-2.5">
           <div className="flex items-center gap-2">
             <Button
-              size="sm"
+              size="icon"
               variant="ghost"
-              className="h-9 px-3 text-zinc-400 hover:text-zinc-100"
+              className="text-zinc-400 hover:text-zinc-100"
               onClick={onPlayRiddle}
               title={isPlaying ? t("quiz.stop") : t("ear.replay_melody")}
             >
-              {isPlaying ? <Square className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+              {isPlaying ? <Square /> : <Play />}
             </Button>
             <Button
-              size="sm"
-              className="h-9 flex-1 bg-emerald-500/90 font-semibold text-emerald-950 hover:bg-emerald-400"
+              className="flex-1 bg-emerald-500/90 text-emerald-950 hover:bg-emerald-400"
               onClick={() => { onGuessed(); onNextRiddle(); }}
             >
-              <Check className="h-3.5 w-3.5" /> <span>{t("ear.had_it")}&nbsp;<span className="opacity-70">+1</span></span>
+              <Check /> <span>{t("ear.had_it")}&nbsp;<span className="opacity-70">+1</span></span>
             </Button>
             <Button
-              size="sm"
               variant="secondary"
-              className="h-9 flex-1 bg-white/5 text-zinc-300 hover:bg-white/10"
+              className="flex-1 bg-white/5 text-zinc-300 hover:bg-white/10"
               onClick={onNextRiddle}
             >
-              <X className="h-3.5 w-3.5" /> Missed it
+              <X /> Missed it
             </Button>
           </div>
           <p className="text-[11px] text-zinc-500">{t("ear.self_marked_note")}</p>
@@ -212,20 +208,19 @@ export const EarTrainingView = ({
         ) : (
           <div className="flex items-center gap-2">
             <Button
-              size="sm"
+              size="icon"
               variant="ghost"
-              className="h-9 px-3 text-zinc-400 hover:text-zinc-100"
+              className="text-zinc-400 hover:text-zinc-100"
               onClick={onPlayRiddle}
               title={isPlaying ? t("quiz.stop") : t("ear.replay_melody")}
             >
-              {isPlaying ? <Square className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+              {isPlaying ? <Square /> : <Play />}
             </Button>
             <Button
-              size="sm"
-              className="h-9 flex-1 bg-emerald-500/90 font-semibold text-emerald-950 hover:bg-emerald-400"
+              className="flex-1 bg-emerald-500/90 text-emerald-950 hover:bg-emerald-400"
               onClick={onNextRiddle}
             >
-              Next melody <ArrowRight className="h-3.5 w-3.5" />
+              Next melody <ArrowRight />
             </Button>
           </div>
         )}

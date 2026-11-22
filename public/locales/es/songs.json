@@ -185,6 +185,7 @@
     "mastered": "Dominadas",
     "total": "Total",
     "time_spent": "Tiempo dedicado",
+    "chart_title": "Práctica de canciones",
     "master_more": "Domina más canciones para evaluar tu nivel."
   },
   "board": {
@@ -368,5 +369,6 @@
     "board_empty_hint": "Añade canciones de la biblioteca para practicarlas y seguir aquí tu progreso.",
     "explore_library": "Explorar la biblioteca",
     "filter_by_tier": "Filtrar por nivel"
-  }
+  },
+  "points_delta": "({{points}} pts)"
 }

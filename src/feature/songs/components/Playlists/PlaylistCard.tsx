@@ -1,5 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
+import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import type { Playlist } from "feature/songs/types/playlist.types";
 import { getPlaylistPopularity } from "feature/songs/types/playlist.types";
@@ -61,7 +62,7 @@ export const PlaylistCard = ({
               )}
             >
               <KindIcon className={cn("h-3.5 w-3.5", meta.badge.iconClassName)} />
-              <span className="text-[10px] font-bold leading-none">{meta.badge.label}</span>
+              <span className="text-[11px] font-bold leading-none">{meta.badge.label}</span>
             </div>
           </>
         )}
@@ -97,17 +98,12 @@ export const PlaylistCard = ({
                   onClick={(e) => e.stopPropagation()}
                   className="flex min-w-0 items-center gap-1.5 hover:text-zinc-200"
                 >
-                  {playlist.ownerAvatar ? (
-                    <img
-                      src={playlist.ownerAvatar}
-                      alt=""
-                      className="h-4 w-4 shrink-0 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[8px] font-bold text-zinc-300">
-                      {playlist.ownerName.charAt(0).toUpperCase()}
-                    </span>
-                  )}
+                  <Avatar
+                    size="2xs"
+                    name={playlist.ownerName}
+                    avatarURL={playlist.ownerAvatar || undefined}
+                    className="shrink-0"
+                  />
                   <span className="truncate">{playlist.ownerName}</span>
                 </Link>
               </UserTooltip>
@@ -131,17 +127,12 @@ export const PlaylistCard = ({
                   )}
                 >
                   <GitFork className="h-3 w-3 shrink-0" />
-                  {playlist.importedFrom.ownerAvatar ? (
-                    <img
-                      src={playlist.importedFrom.ownerAvatar}
-                      alt=""
-                      className="h-4 w-4 shrink-0 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[8px] font-bold text-zinc-400">
-                      {playlist.importedFrom.ownerName.charAt(0).toUpperCase()}
-                    </span>
-                  )}
+                  <Avatar
+                    size="2xs"
+                    name={playlist.importedFrom.ownerName}
+                    avatarURL={playlist.importedFrom.ownerAvatar || undefined}
+                    className="shrink-0"
+                  />
                   <span className="truncate">from {playlist.importedFrom.ownerName}</span>
                 </Link>
               </UserTooltip>
@@ -157,7 +148,7 @@ export const PlaylistCard = ({
                 style={{ width: `${(learnedCount / songCount) * 100}%` }}
               />
             </div>
-            <span className="shrink-0 text-[10px] font-semibold tabular-nums text-zinc-500">
+            <span className="shrink-0 text-[11px] font-semibold tabular-nums text-zinc-500">
               {learnedCount}/{songCount}
             </span>
           </div>

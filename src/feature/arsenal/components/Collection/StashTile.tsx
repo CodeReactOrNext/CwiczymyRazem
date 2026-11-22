@@ -5,7 +5,9 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import type { DexStatus } from "feature/arsenal/utils/dex";
+import type { TierProgress } from "feature/arsenal/utils/workshopReadiness";
 import { lockedArtFilter } from "feature/progression/components/RarityLock";
 import { useColorTheme } from "lib/colorTheme/colorTheme";
 import { Lock, Star } from "lucide-react";
@@ -24,6 +26,7 @@ import {
   plateHollow,
   plateStyle,
 } from "../TierPlate";
+import { ReadyMark } from "../Workshop/ReadyMark";
 
 /** A tap on a socket; the event says where, for a menu hung off the cursor. */
 export type StashTileClick = (event: ReactMouseEvent<HTMLElement>) => void;
@@ -68,6 +71,11 @@ export interface StashPlacement {
   dragHandlers?: StashDragHandlers;
   /** Right-click on the socket. The board answers it with its own menu. */
   onContextMenu?: (event: ReactMouseEvent<HTMLElement>) => void;
+  /**
+   * Something can be done with this piece right now — a bench job, a free slot
+   * for this mod, a stack ready to climb a tier. The green hammer mark in the corner.
+   */
+  ready?: boolean;
 }
 
 interface StashTileProps {
@@ -127,6 +135,13 @@ interface StashTileProps {
    * owned by definition and says nothing.
    */
   dexStatus?: DexStatus;
+  /**
+   * A part stack's way to its next tier, drawn as a thin bar along the bottom —
+   * the one place a player sees, without opening anything, that parts climb.
+   */
+  tierProgress?: TierProgress | null;
+  /** The green hammer mark in the corner — see `StashPlacement.ready`. */
+  ready?: boolean;
   /** Full card shown on hover. Desktop only; touch opens the sheet instead. */
   preview?: ReactNode;
   /**
@@ -170,6 +185,8 @@ export const StashTile = ({
   locked = false,
   inUse = false,
   dexStatus,
+  ready = false,
+  tierProgress = null,
   preview,
   previewFooter,
   onClick,
@@ -215,6 +232,12 @@ export const StashTile = ({
     // The pointer drives the drag, so the browser must not claim the gesture
     // for scrolling first.
     touchAction: dragHandlers ? "none" : undefined,
+    // A big stash is hundreds of sockets, each a stack of gradients, a blended
+    // grain layer and artwork. On a board the grid sizes the socket, so one
+    // scrolled out of view can skip laying out and painting its insides.
+    ...(column != null
+      ? { contentVisibility: "auto", containIntrinsicSize: "auto 80px" }
+      : {}),
     opacity: dragging ? 0.25 : dimmed ? 0.28 : undefined,
     filter: dimmed && !dragging ? "grayscale(0.7)" : undefined,
     // The hollow itself comes from `TierPlate`, which is also what frames a part
@@ -365,7 +388,7 @@ export const StashTile = ({
         </span>
       )}
 
-      {isLight && !inUse && !dexStatus && (
+      {isLight && !inUse && !dexStatus && !ready && (
         <span
           aria-hidden
           className='absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full'
@@ -373,7 +396,10 @@ export const StashTile = ({
         />
       )}
 
-      {inUse && (
+      {/* The hammer mark takes the corner; an item in use still says so by its ring. */}
+      {ready && <ReadyMark className='absolute right-1 top-1' />}
+
+      {inUse && !ready && (
         <span
           aria-hidden
           className='absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-amber-400'
@@ -417,11 +443,33 @@ export const StashTile = ({
         />
       )}
 
+      {/* The way to the next tier: filled in the tier it climbs to, green
+          once a step can be paid for. */}
+      {tierProgress && (
+        <span
+          aria-hidden
+          className='absolute inset-x-1.5 bottom-1 h-1 overflow-hidden rounded-full bg-white/15'>
+          <span
+            className='absolute inset-y-0 left-0 rounded-full'
+            style={{
+              width: `${Math.round((tierProgress.ready ? 1 : tierProgress.fill) * 100)}%`,
+              backgroundColor: tierProgress.ready
+                ? "#10b981"
+                : PART_TIER_COLORS[tierProgress.outputTier],
+            }}
+          />
+        </span>
+      )}
+
       {/* Stack size, in the opposite corner and told apart from the level by
           its colour rather than its shape — plain zinc digits, and the ×
           that says out loud this is "how many", not "how good". */}
       {count != null && count > 0 && (
-        <span className='absolute bottom-1 right-1 rounded bg-zinc-950/85 px-1.5 py-1 text-xs font-black tabular-nums leading-none text-zinc-100'>
+        <span
+          className={cn(
+            "absolute right-1 rounded bg-zinc-950/85 px-1.5 py-1 text-xs font-black tabular-nums leading-none text-zinc-100",
+            tierProgress ? "bottom-2.5" : "bottom-1",
+          )}>
           ×{count}
         </span>
       )}
@@ -437,7 +485,7 @@ export const StashTile = ({
         <TooltipContent
           side='right'
           sideOffset={8}
-          className='w-[260px] border-0 bg-transparent p-0 shadow-none'>
+          className='w-[260px] bg-transparent p-0'>
           {preview}
           {previewFooter}
         </TooltipContent>

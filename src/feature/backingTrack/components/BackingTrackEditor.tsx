@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
 import { useTranslation } from "hooks/useTranslation";
@@ -33,10 +34,8 @@ const OVERVIEW_HEIGHT_PX = 44;
 const fieldLabel = "text-xs text-zinc-400";
 const button =
   "flex items-center gap-2 rounded-lg bg-zinc-800/60 px-3 py-2 text-xs font-medium text-zinc-200 transition-colors hover:bg-zinc-700 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
-const iconButton =
-  "flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
-const primaryButton =
-  "flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+const iconButton = cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-zinc-300");
+const primaryButton = buttonVariants();
 const keyCap = "rounded bg-zinc-950/70 px-1.5 text-[11px] font-semibold leading-5 text-zinc-300";
 
 /** 4 → "4 s", 0.5 → "0.5 s". Whole numbers stay whole. */
@@ -461,7 +460,7 @@ export function BackingTrackEditor({
                   type='button'
                   onClick={importTracks}
                   disabled={isImporting}
-                  className={cn(primaryButton, "disabled:opacity-50")}>
+                  className={primaryButton}>
                   <FolderOpen className='h-4 w-4' />
                   {isImporting ? t("recordings.importing") : t("recordings.add")}
                 </button>

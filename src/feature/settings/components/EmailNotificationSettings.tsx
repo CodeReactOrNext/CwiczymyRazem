@@ -1,7 +1,8 @@
 import { Button } from "assets/components/ui/button";
-import { Card, CardContent } from "assets/components/ui/card";
+import { Card } from "assets/components/ui/card";
 import { Switch } from "assets/components/ui/switch";
 import { cn } from "assets/lib/utils";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
 import { updateEmailNotifications } from "feature/user/store/userSlice.asyncThunk";
 import { useTranslation } from "hooks/useTranslation";
@@ -9,7 +10,7 @@ import {
   effectiveEmailPreferences,
   EMAIL_CATEGORIES,
 } from "lib/email/consent";
-import { Check, Flame, Loader2, Mail, Sparkles, Trophy } from "lucide-react";
+import { Check, Flame, Sparkles, Trophy } from "lucide-react";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { EmailNotificationPreferences } from "types/api.types";
@@ -77,32 +78,18 @@ const EmailNotificationSettings = () => {
   };
 
   return (
-    <Card className="border-none bg-zinc-900/20">
-      <CardContent className="p-6">
+    <Card>
+      <SectionHeader title={t("email_notifications.title")} description={t("email_notifications.description")} />
+      <div>
         <div className="flex flex-col gap-6">
-          {/* Header */}
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded bg-zinc-900/50 text-cyan-500">
-              <Mail className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-foreground">
-                {t("email_notifications.title")}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {t("email_notifications.description")}
-              </p>
-            </div>
-          </div>
-
           {/* Options */}
-          <div className="space-y-3">
+          <div className="space-y-6">
             {OPTIONS.map((opt) => {
               const Icon = opt.icon;
               return (
                 <div
                   key={opt.key}
-                  className="flex items-start justify-between gap-4 rounded-lg bg-zinc-950/30 p-4"
+                  className="flex items-start justify-between gap-4"
                 >
                   <div className="flex items-start gap-3.5">
                     <div className={cn("p-2 rounded shrink-0", opt.iconClass)}>
@@ -136,18 +123,16 @@ const EmailNotificationSettings = () => {
 
           <Button
             onClick={handleSave}
-            disabled={isFetching || !isChanged}
-            className="h-11 font-bold sm:self-start sm:px-8"
+            size="lg"
+            disabled={!isChanged}
+            loading={isFetching}
+            className="sm:self-start"
           >
-            {isFetching ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Check className="h-4 w-4" />
-            )}
+            {!isFetching && <Check />}
             {isFetching ? t("email_notifications.saving") : t("email_notifications.save")}
           </Button>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 };

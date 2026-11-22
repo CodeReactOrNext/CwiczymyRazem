@@ -57,6 +57,6 @@ describe("AI assistant landing", () => {
 
   it("quotes the daily limits the server enforces", () => {
     expect(html).toContain("Up to 35 changes a day");
-    expect(html).toContain("10 of them new exercises");
+    expect(html).toContain("20 of them new exercises");
   });
 });

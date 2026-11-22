@@ -17,9 +17,9 @@ export const NavigationCards = () => {
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === "Enter" && handleClick()}
-      className="light-card relative cursor-pointer overflow-hidden rounded-xl border border-white/20 bg-white/10 px-6 py-5 shadow-lg backdrop-blur-sm transition-all duration-base hover:bg-white/15 hover:shadow-xl hover:border-white/30 active:scale-[0.99]">
+      className="light-card relative cursor-pointer overflow-hidden rounded-lg bg-zinc-800/40 px-6 py-5 transition-colors duration-base hover:bg-zinc-800/60">
       {/* Subtle glow */}
-      <div className="light-hide absolute inset-0 rounded-xl bg-gradient-to-r from-white/5 via-white/10 to-white/5 pointer-events-none" />
+      <div className="light-hide absolute inset-0 rounded-lg bg-gradient-to-r from-white/5 via-white/10 to-white/5 pointer-events-none" />
 
       <div className="relative z-10 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -27,7 +27,7 @@ export const NavigationCards = () => {
             {loading ? (
               <Loader2 className="h-5 w-5 text-white animate-spin" />
             ) : (
-              <Clock size='1em' className="h-5 w-5 text-white" />
+              <Clock className="h-5 w-5 text-white" />
             )}
           </div>
           <div>

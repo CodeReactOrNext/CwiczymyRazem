@@ -63,17 +63,19 @@ class ErrorBoundary extends Component<Props, State> {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
+                size="lg"
                 onClick={this.handleReset}
-                className="flex-1 h-10 rounded-lg bg-white font-bold text-black hover:bg-zinc-200">
-                <RefreshCcw className="h-4 w-4" />
+                className="flex-1">
+                <RefreshCcw />
                 Reload
               </Button>
               <Button
                 asChild
                 variant="ghost"
-                className="flex-1 h-10 rounded-lg bg-zinc-900/60 font-bold text-zinc-200 hover:bg-zinc-800 hover:text-white">
+                size="lg"
+                className="flex-1">
                 <Link href="/dashboard">
-                  <Home className="mr-2 h-4 w-4" />
+                  <Home />
                   Back to dashboard
                 </Link>
               </Button>

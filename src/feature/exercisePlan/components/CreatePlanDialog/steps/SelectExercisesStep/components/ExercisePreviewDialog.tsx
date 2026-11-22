@@ -1,11 +1,12 @@
-import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
+import { getCategoryChipColor } from "feature/exercisePlan/constants/categoryChip";
 import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { useTablatureStyle } from "feature/exercisePlan/views/PracticeSession/components/tablatureSettings";
@@ -32,9 +33,6 @@ interface ExercisePreviewDialogProps {
 
 // Same size the settings preview draws the tab at.
 const PREVIEW_HEIGHT = 340;
-
-const chipClassName =
-  "flex items-center gap-1.5 rounded border-transparent bg-zinc-800/40 px-2.5 py-1 text-xs font-medium text-zinc-300";
 
 export function ExercisePreviewDialog({
   exercise,
@@ -72,7 +70,7 @@ export function ExercisePreviewDialog({
       onOpenChange={(open) => {
         if (!open) onClose();
       }}>
-      <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden border-0 bg-zinc-950/95 p-0 shadow-none backdrop-blur-3xl sm:max-w-[900px] lg:max-w-[1024px]'>
+      <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden bg-zinc-950 p-0 sm:max-w-4xl lg:max-w-5xl'>
         <div className='scrollbar-premium min-h-0 flex-1 overflow-y-auto'>
           {/* Header */}
           <div className='p-6 pt-8'>
@@ -85,31 +83,28 @@ export function ExercisePreviewDialog({
               </p>
 
               <div className='mt-5 hidden flex-wrap items-center gap-2 sm:flex'>
-                <Badge variant='outline' className={chipClassName}>
+                <Chip color='gray'>
                   <Clock className='h-3 w-3 text-zinc-500' />
                   {/* Same m:ss clock the session timer shows. */}
                   {convertMsToHMS(Math.round(exercise.timeInMinutes * 60) * 1000)}
-                </Badge>
+                </Chip>
 
-                <Badge variant='outline' className={chipClassName}>
+                <Chip color='gray'>
                   {t(`common:difficulty.${exercise.difficulty}` as any)}
-                </Badge>
+                </Chip>
 
-                <Badge variant='outline' className={chipClassName}>
+                <Chip color={getCategoryChipColor(exercise.category)}>
                   {t(`common:categories.${exercise.category}` as any)}
-                </Badge>
+                </Chip>
 
                 {skills.map((skill) => {
                   if (!skill) return null;
                   const Icon = skill.icon;
                   return (
-                    <Badge
-                      key={skill.id}
-                      variant='outline'
-                      className={chipClassName}>
+                    <Chip key={skill.id} color='gray'>
                       {Icon && <Icon className='h-3 w-3 text-zinc-500' />}
                       {t(`common:skills.${skill.id}` as any)}
-                    </Badge>
+                    </Chip>
                   );
                 })}
               </div>
@@ -150,7 +145,7 @@ export function ExercisePreviewDialog({
                     <li
                       key={i}
                       className='flex items-start gap-3 text-sm text-zinc-200'>
-                      <span className='mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800/60 text-[10px] font-semibold text-zinc-400'>
+                      <span className='mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800/60 text-[11px] font-semibold text-zinc-400'>
                         {i + 1}
                       </span>
                       <span className='leading-relaxed'>{inst}</span>
@@ -225,10 +220,8 @@ export function ExercisePreviewDialog({
             {t("plans:close")}
           </Button>
           {onStart && (
-            <Button
-              onClick={onStart}
-              className='gap-1.5 bg-zinc-100 text-zinc-950 hover:bg-white'>
-              <Play className='h-3.5 w-3.5 fill-current' />
+            <Button onClick={onStart} className='gap-1.5'>
+              <Play className='fill-current' />
               {t("plans:start")}
             </Button>
           )}

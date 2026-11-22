@@ -232,7 +232,7 @@ export const SkillRoadmapView = ({
             className='shrink-0'
             aria-label={t("roadmap.preview")}
             onClick={() => setPreviewExercise(exercise)}>
-            <Eye className='h-4 w-4' />
+            <Eye />
           </Button>
           <Button
             type='button'

@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { Segment, SegmentGroup } from "components/SegmentedControl/SegmentedControl";
 import { useTranslation } from "hooks/useTranslation";
 import { CheckCircle2, CircleDashed, Zap } from "lucide-react";
 import React from "react";
@@ -9,25 +10,26 @@ const OPTIONS: {
   status: StepStatus;
   label: string;
   Icon: typeof Zap;
+  /** Icon colour once picked. */
   active: string;
 }[] = [
   {
     status: "not-started",
     label: "status_control.not_yet",
     Icon: CircleDashed,
-    active: "bg-zinc-800 text-zinc-100",
+    active: "text-zinc-100",
   },
   {
     status: "in-progress",
     label: "status_control.practicing",
     Icon: Zap,
-    active: "bg-amber-500/10 text-amber-400",
+    active: "text-amber-400",
   },
   {
     status: "done",
     label: "status_control.got_it",
     Icon: CheckCircle2,
-    active: "bg-emerald-500/10 text-emerald-400",
+    active: "text-emerald-400",
   },
 ];
 
@@ -52,30 +54,21 @@ export const StepStatusControl: React.FC<StepStatusControlProps> = ({
           {t("status_control.body")}
         </p>
       </div>
-      <div
-        role='radiogroup'
-        className='grid grid-cols-3 gap-1.5 rounded-lg bg-zinc-900/40 p-1.5'>
+      <SegmentGroup aria-label={t("status_control.title")}>
         {OPTIONS.map(({ status, label, Icon, active }) => {
           const isActive = value === status;
           return (
-            <button
+            <Segment
               key={status}
-              type='button'
-              role='radio'
-              aria-checked={isActive}
-              onClick={() => onChange(status)}
-              className={cn(
-                "flex flex-col items-center gap-1.5 rounded-lg px-2 py-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                isActive
-                  ? active
-                  : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200",
-              )}>
-              <Icon className='h-4 w-4' />
+              active={isActive}
+              onClick={() => onChange(status)}>
+              {/* The status keeps its colour on the icon once picked. */}
+              <Icon className={cn("h-4 w-4 shrink-0", isActive && active)} />
               {t(label)}
-            </button>
+            </Segment>
           );
         })}
-      </div>
+      </SegmentGroup>
     </section>
   );
 };

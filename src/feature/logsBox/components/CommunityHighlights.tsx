@@ -21,7 +21,7 @@ import {
 import { useTranslation } from "hooks/useTranslation";
 import { useDateFnsLocale } from "lib/i18n/dateLocale";
 import type { Translate } from "lib/i18n/translate";
-import { type LucideIcon, Shield, Skull } from "lucide-react";
+import { ChevronRight, type LucideIcon, Shield, Skull } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 
@@ -278,7 +278,9 @@ export const CommunityHighlights = ({
               <span className='truncate text-xs font-medium text-zinc-400'>
                 {label}
               </span>
-              <span className='truncate text-sm font-semibold text-zinc-100'>
+              {/* Two lines before it is cut: on the narrower desktop row a
+                  one-line title lost its second half ("posted a …"). */}
+              <span className='line-clamp-2 text-sm font-semibold leading-snug text-zinc-100'>
                 {title}
               </span>
               <span
@@ -307,6 +309,10 @@ export const CommunityHighlights = ({
               "transition-colors hover:bg-zinc-800/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             )}>
             {body}
+            <ChevronRight
+              aria-hidden
+              className='h-4 w-4 shrink-0 text-zinc-400'
+            />
           </Link>
         ) : (
           <div key={item.kind} title={title} className={cellClass}>

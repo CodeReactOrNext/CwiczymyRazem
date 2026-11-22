@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { GuildBanner } from "feature/guilds/components/GuildBanner";
 import { MOTIF_ICON_COMPONENTS } from "feature/guilds/components/motifIcons";
@@ -68,7 +69,7 @@ export const GuildMotifPicker = ({
   };
 
   return (
-    <div className='space-y-5 rounded-lg bg-zinc-900/40 p-4 sm:p-5'>
+    <div className='space-y-5 rounded-lg bg-zinc-800/40 p-4 sm:p-5'>
       <div className='overflow-hidden rounded-lg'>
         <GuildBanner
           bannerId={bannerId}
@@ -181,20 +182,22 @@ export const GuildMotifPicker = ({
       <div className='flex flex-wrap items-center gap-3'>
         {dirty ? (
           <>
-            <button
+            <Button
               type='button'
+              variant='subtle'
+              size='sm'
               disabled={busy}
-              onClick={() => onWear(motifId(draft))}
-              className='flex h-9 items-center justify-center rounded-lg bg-white/5 px-4 text-xs font-bold text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-white/10'>
+              onClick={() => onWear(motifId(draft))}>
               {t("kit.wear_four")}
-            </button>
-            <button
+            </Button>
+            <Button
               type='button'
+              variant='ghost'
+              size='sm'
               disabled={busy}
-              onClick={() => setDraft([...worn])}
-              className='h-9 rounded-lg px-3 text-xs font-semibold text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:text-zinc-200'>
+              onClick={() => setDraft([...worn])}>
               {t("kit.back_to_worn")}
-            </button>
+            </Button>
           </>
         ) : (
           <p

@@ -1,3 +1,5 @@
+import { Card } from "assets/components/ui/card";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import type { Song } from "feature/songs/types/songs.type";
 import { formatPlayTime } from "feature/songs/utils/arrangements.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
@@ -33,20 +35,18 @@ export const SongCase = ({
   if (songs.length === 0) return null;
 
   return (
-    <div className='rounded-2xl bg-zinc-900/30 p-6'>
-      <div className='flex flex-wrap items-end justify-between gap-2'>
-        <div>
-          <h2 className='text-2xl font-bold text-white'>{t("layout.sections.signature-songs.title")}</h2>
-          {!isPinned && (
-            <p className='mt-1 text-sm text-zinc-400'>{t("cases.hardest")}</p>
-          )}
-        </div>
-        {isOwner && !isPinned && (
-          <p className='text-xs text-zinc-500'>
-            {t("cases.pin_hint")}
-          </p>
-        )}
-      </div>
+    <Card className='p-5 sm:p-6'>
+      <SectionHeader
+        title={t("layout.sections.signature-songs.title")}
+        description={!isPinned && t("cases.hardest")}
+        action={
+          isOwner &&
+          !isPinned && (
+            <p className='text-xs text-zinc-500'>{t("cases.pin_hint")}</p>
+          )
+        }
+        className='mb-0 flex-wrap'
+      />
 
       <div className='mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5'>
         {songs.map((song) => {
@@ -54,7 +54,7 @@ export const SongCase = ({
           return (
             <div
               key={song.id}
-              className='flex flex-col items-center rounded-xl bg-zinc-800/40 px-4 pb-6 pt-8 text-center'
+              className='flex flex-col items-center rounded-lg px-4 pb-6 pt-8 text-center'
               style={{
                 backgroundImage: `radial-gradient(ellipse 75% 55% at 50% 32%, ${tier.color}2e, transparent 75%)`,
               }}>
@@ -89,6 +89,6 @@ export const SongCase = ({
           );
         })}
       </div>
-    </div>
+    </Card>
   );
 };

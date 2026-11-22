@@ -67,7 +67,7 @@ export const MicHud = ({
       {full ? (
         // Full screen: score stacked over accuracy, right-aligned next to the ring.
         <div className='flex flex-col items-end'>
-          <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
+          <span className='text-xs font-medium text-zinc-400'>
             {t("success.score")}
           </span>
           <motion.span
@@ -91,7 +91,7 @@ export const MicHud = ({
       ) : (
         <>
           <div className='flex flex-col items-start'>
-            <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
+            <span className='text-xs font-medium text-zinc-400'>
               {t("success.score")}
             </span>
 
@@ -106,7 +106,7 @@ export const MicHud = ({
           </div>
 
           <div className='flex flex-col items-start'>
-            <span className='text-[10px] font-semibold tracking-wide text-zinc-400'>
+            <span className='text-xs font-medium text-zinc-400'>
               {t("success.accuracy")}
             </span>
             <span

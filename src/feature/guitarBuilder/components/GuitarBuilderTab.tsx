@@ -158,12 +158,13 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
               editing ? t("builder.name_guitar") : t("builder.name_guitar_optional")
             }
             aria-label={t("builder.guitar_name")}
-            className='h-10 bg-zinc-900/60'
+            className='h-10'
           />
           {editing && renamed && (
             <Button
               variant='secondary'
-              className='h-10 shrink-0'
+              size='lg'
+              className='shrink-0'
               disabled={isRenaming}
               loading={isRenaming}
               onClick={() => rename({ itemId: editing.id, name: cleanName })}>
@@ -176,7 +177,8 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
             carries the title because a disabled button swallows the hover. */}
         <span className='block' title={reason ?? undefined}>
         <Button
-          className='h-11 w-full bg-white text-zinc-900 hover:bg-zinc-200'
+          size='lg'
+          className='w-full'
           disabled={Boolean(reason) || isPending}
           loading={isPending}
           onClick={() =>
@@ -200,12 +202,10 @@ export const GuitarBuilderTab = ({ data, fame }: GuitarBuilderTabProps) => {
               },
             )
           }>
-          <span className='flex items-center gap-2'>
-            {editing ? t("builder.rebuild_guitar") : t("builder.build_guitar")}
-            <span className='flex items-center gap-1 text-amber-600'>
-              <img src='/images/tokens/coin.png' alt='' className='h-4 w-4' />
-              {cost}
-            </span>
+          {editing ? t("builder.rebuild_guitar") : t("builder.build_guitar")}
+          <span className='flex items-center gap-1 text-amber-600'>
+            <img src='/images/tokens/coin.png' alt='' className='h-4 w-4' />
+            {cost}
           </span>
         </Button>
         </span>

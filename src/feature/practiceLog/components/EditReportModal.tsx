@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -46,8 +47,7 @@ const fieldsToMs = (field: { hours: string; minutes: string }) => {
 
 const fieldLabelClass =
   "text-xs font-semibold text-zinc-500";
-const inputClass =
-  "border-none bg-white/5 text-sm text-zinc-100 shadow-none placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0";
+const inputClass = "text-sm";
 
 const TimeUnitInput = ({
   value,
@@ -62,7 +62,7 @@ const TimeUnitInput = ({
   label: string;
   onChange: (value: string) => void;
 }) => (
-  <div className="flex items-center rounded-lg bg-white/5 transition-shadow focus-within:ring-1 focus-within:ring-cyan-500/50">
+  <div className="flex items-center rounded-lg bg-zinc-800/60 transition-colors hover:bg-zinc-800/80 focus-within:bg-zinc-800 focus-within:ring-1 focus-within:ring-zinc-500">
     <input
       type="number"
       min={0}
@@ -255,25 +255,25 @@ const EditReportForm = ({
           )}
         </div>
 
-        <p className="text-[11px] leading-relaxed text-zinc-600">
+        <p className="text-[11px] leading-relaxed text-zinc-500">
           {t("edit_modal.stats_note")}
         </p>
       </div>
 
       <DialogFooter className="gap-2">
-        <button
-          onClick={() => onOpenChange(false)}
-          className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100"
-        >
+        <Button
+          variant='ghost'
+          size='lg'
+          onClick={() => onOpenChange(false)}>
           {t("edit_modal.cancel")}
-        </button>
-        <button
+        </Button>
+        <Button
+          size='lg'
           onClick={handleSave}
-          disabled={!isValid || isSaving}
-          className="rounded-lg bg-cyan-500 px-5 py-2 text-sm font-semibold text-zinc-950 transition-colors hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-40"
-        >
+          disabled={!isValid}
+          loading={isSaving}>
           {isSaving ? t("edit_modal.saving") : t("edit_modal.save")}
-        </button>
+        </Button>
       </DialogFooter>
     </>
   );
@@ -286,7 +286,7 @@ export const EditReportModal = ({
 }: EditReportModalProps) => {
   return (
     <Dialog open={!!session} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto border-none bg-zinc-900 text-zinc-100 sm:max-w-[440px] sm:rounded-xl">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto bg-zinc-900 text-zinc-100 sm:max-w-md">
         {session && (
           <EditReportForm
             key={session.id}

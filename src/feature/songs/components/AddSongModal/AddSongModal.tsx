@@ -1,12 +1,14 @@
+import { Chip } from "assets/components/ui/chip";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
-import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { addSong } from "feature/songs/services/addSong";
@@ -88,9 +90,9 @@ const SongResultRow = ({
           {title}
         </span>
         {badge && (
-          <span className='shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-bold text-zinc-400'>
+          <Chip color='gray' size='sm' className='shrink-0'>
             {badge}
-          </span>
+          </Chip>
         )}
       </div>
       <div className='truncate text-xs text-zinc-500'>{subtitle}</div>
@@ -319,7 +321,7 @@ const AddSongModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-none sm:max-w-lg bg-zinc-950 p-0 overflow-hidden h-full sm:h-auto">
+      <DialogContent className="bg-zinc-950 p-0 overflow-hidden h-full sm:h-auto">
         <div className="p-6 pb-24 sm:pb-6 overflow-y-auto h-full sm:max-h-[85vh]">
           <DialogHeader className="mb-6">
             <DialogTitle className='font-sans text-2xl font-bold text-white flex items-center gap-3'>
@@ -335,24 +337,22 @@ const AddSongModal = ({
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                 <div className='space-y-2'>
                   <Label htmlFor='artist' className="text-zinc-400 font-bold ml-1">{t("artist")}</Label>
-                  <Input
+                  <SearchInput
                     id='artist'
                     value={artist}
                     onChange={(e) => setArtist(e.target.value)}
                     required
                     placeholder={t("add_modal.artist_placeholder")}
-                    className="h-12 border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                   />
                 </div>
                 <div className='space-y-2'>
                   <Label htmlFor='title' className="text-zinc-400 font-bold ml-1">{t("song_title")}</Label>
-                  <Input
+                  <SearchInput
                     id='title'
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
                     placeholder={t("add_modal.title_placeholder")}
-                    className="h-12 border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                   />
                 </div>
               </div>
@@ -361,7 +361,7 @@ const AddSongModal = ({
                   then search results, then the "add as typed" row. Its contents swap
                   in place so the modal never grows or shrinks while typing. */}
               <div className="space-y-3">
-                <span className="ml-1 flex h-4 items-center gap-2 text-xs font-bold tracking-wide text-zinc-500">
+                <span className="ml-1 flex h-4 items-center gap-2 text-xs font-medium text-zinc-400">
                   {isBusySearching ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
                   ) : (
@@ -379,12 +379,12 @@ const AddSongModal = ({
                     Array.from({ length: 4 }).map((_, i) => (
                       <div
                         key={i}
-                        className="flex animate-pulse items-center gap-3 rounded-lg bg-zinc-800/40 p-2.5"
+                        className="flex items-center gap-3 rounded-lg bg-zinc-800/40 p-2.5"
                       >
-                        <div className="h-11 w-11 shrink-0 rounded-lg bg-zinc-800" />
+                        <Skeleton className="h-11 w-11 shrink-0 rounded-lg" />
                         <div className="flex-1 space-y-2">
-                          <div className="h-3.5 w-2/5 rounded bg-zinc-800" />
-                          <div className="h-2.5 w-1/4 rounded bg-zinc-800" />
+                          <Skeleton className="h-3.5 w-2/5" />
+                          <Skeleton className="h-2.5 w-1/4" />
                         </div>
                       </div>
                     ))
@@ -456,7 +456,7 @@ const AddSongModal = ({
                 <div className="text-2xl font-bold text-white">{title}</div>
                 <div className="text-zinc-400 font-bold">{artist}</div>
                 <div className="pt-2">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold tracking-wide">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold">
                     {t("add_modal.added")}
                   </span>
                 </div>

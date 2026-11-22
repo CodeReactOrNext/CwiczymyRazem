@@ -120,7 +120,7 @@ export const BoxRewardBlock = ({
             className='relative'
             style={{ color: accentColor }}
           />
-          <span className='relative flex items-center gap-1 text-[10px] font-bold tabular-nums leading-none text-amber-400'>
+          <span className='relative flex items-center gap-1 text-[11px] font-bold tabular-nums leading-none text-amber-400'>
             <img
               src='/images/tokens/coin.png'
               alt=''
@@ -152,11 +152,11 @@ export const BoxRewardBlock = ({
       <TooltipContent
         side='left'
         sideOffset={8}
-        className='z-[100] flex flex-col gap-3 border-none bg-zinc-900 px-4 py-3.5 text-zinc-100 shadow-xl'>
-        <span className='text-[0.6875rem] font-bold tracking-wide text-zinc-500'>
+        className='tooltip-ink z-[100] flex flex-col gap-3 p-3'>
+        <span className='text-xs font-bold text-black/60'>
           {heading}
         </span>
-        <RewardSummary reward={reward} size='lg' muted={isClaimed} />
+        <RewardSummary reward={reward} size='lg' muted={isClaimed} inTooltip />
       </TooltipContent>
     </Tooltip>
   );

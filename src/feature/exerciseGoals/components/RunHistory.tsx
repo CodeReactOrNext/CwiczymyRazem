@@ -1,7 +1,7 @@
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -90,10 +90,9 @@ export const RunHistory = ({ exerciseId, floorBpm }: RunHistoryProps) => {
         </div>
       </div>
       {isLoading ? (
-        <p className='flex h-56 items-center justify-center gap-2 text-sm text-zinc-400'>
-          <Loader2 className='h-4 w-4 animate-spin' />
-          {t("history.loading")}
-        </p>
+        <Skeleton className='h-56 w-full rounded-lg' aria-busy>
+          <span className='sr-only'>{t("history.loading")}</span>
+        </Skeleton>
       ) : (
         <GoalRunsChart
           runs={runs ?? []}

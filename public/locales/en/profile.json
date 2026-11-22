@@ -101,7 +101,14 @@
   "seasonal_achievements": {
     "title": "Seasonal Achievements",
     "points": "points",
-    "no_achievements": "No seasonal achievements yet"
+    "no_achievements": "No seasonal achievements yet",
+    "heading": "Seasons",
+    "best_place": "Best place: #{{place}}",
+    "top_ten": "In the top 10: {{count}}×",
+    "points_short": "pts",
+    "all_seasons": "All seasons",
+    "show_all": "Show all ({{count}})",
+    "show_less": "Show less"
   },
   "activity": "Activity",
   "detailed_stats": {
@@ -467,6 +474,8 @@
     "practice": "Practice",
     "practice_more": "Practice more",
     "level": "Level",
-    "xp": "{{current}} / {{total}} XP"
+    "xp": "{{current}} / {{total}} XP",
+    "first_session": "Play your first session",
+    "start": "Start"
   }
 }

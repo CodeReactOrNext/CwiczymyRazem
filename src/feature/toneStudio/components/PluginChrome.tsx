@@ -209,8 +209,8 @@ export const PowerRocker = ({
         {on ? t("power.turn_off") : t("power.turn_on")}
       </span>
       <span
-        className='font-mono text-[10px]'
-        style={{ color: on ? "#fbbf24" : "#52525b" }}>
+        className='font-mono text-[11px]'
+        style={{ color: on ? "#fbbf24" : "#71717a" }}>
         {on ? "live" : "silent"}
       </span>
     </span>

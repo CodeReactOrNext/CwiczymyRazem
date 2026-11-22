@@ -41,6 +41,13 @@ interface WorkshopBenchProps {
   /** The whole stash of rescued mods — filtered here to what this item can take. */
   salvagedMods: SalvagedMod[];
   fame: number;
+  /**
+   * Opens on a socket instead of the bench — the Collection hands a rescued mod
+   * straight to a free slot. Read once, at mount; the bench is keyed per item.
+   */
+  initialSlot?: ModSlotTarget | null;
+  /** The mod to have picked in that slot's list. */
+  preferModId?: string | null;
 }
 
 export const WorkshopBench = ({
@@ -48,6 +55,8 @@ export const WorkshopBench = ({
   wallet,
   salvagedMods,
   fame,
+  initialSlot = null,
+  preferModId = null,
 }: WorkshopBenchProps) => {
   const rs = RARITY_STYLES[entry.rarity];
   const grade = getConditionGrade(entry.condition);
@@ -73,7 +82,7 @@ export const WorkshopBench = ({
   const labels = useArsenalLabels();
   const { t } = labels;
   /** The socket on the bench the player has opened, if any. */
-  const [slot, setSlot] = useState<ModSlotTarget | null>(null);
+  const [slot, setSlot] = useState<ModSlotTarget | null>(initialSlot);
 
   const mintRarity = entry.subject.mintRarity;
   const promotionsDone = getPromotions(mintRarity, entry.buildLevel);
@@ -94,6 +103,8 @@ export const WorkshopBench = ({
         modQuote={modQuote}
         salvagedOptions={salvagedOptions}
         fame={fame}
+        wallet={wallet}
+        preferModId={preferModId}
         onClose={() => setSlot(null)}
       />
 
@@ -134,7 +145,7 @@ export const WorkshopBench = ({
         {/* Nameplate */}
         <div className='relative flex flex-col gap-1'>
           <span
-            className='text-[11px] font-semibold tracking-[0.18em]'
+            className='text-xs font-semibold'
             style={{ color: readableText(rs.baseColor) }}>
             {entry.brand} · {labels.rarity(entry.rarity)}
           </span>

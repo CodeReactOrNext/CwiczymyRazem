@@ -1,6 +1,8 @@
 import { Button } from "assets/components/ui/button";
+import { Card } from "assets/components/ui/card";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
 import { uploadUserSocialData } from "feature/user/store/userSlice.asyncThunk";
 import { useTranslation } from "hooks/useTranslation";
@@ -67,50 +69,53 @@ const MediaLinks = () => {
     state.bands !== (userInfo.band || "");
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label className="flex items-center gap-2">
-          <FaYoutube className="h-4 w-4" />
-          YouTube
-        </Label>
-        <Input
-          value={state.youtube}
-          onChange={(e) => handleChange("youtube", e.target.value)}
-          placeholder="https://youtube.com/..."
-        />
-      </div>
+    <Card>
+      <SectionHeader title={t("settings:tabs.socials")} />
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <FaYoutube className="h-4 w-4" />
+            YouTube
+          </Label>
+          <Input
+            value={state.youtube}
+            onChange={(e) => handleChange("youtube", e.target.value)}
+            placeholder="https://youtube.com/..."
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label className="flex items-center gap-2">
-          <FaSoundcloud className="h-4 w-4" />
-          SoundCloud
-        </Label>
-        <Input
-          value={state.soundcloud}
-          onChange={(e) => handleChange("soundcloud", e.target.value)}
-          placeholder="https://soundcloud.com/..."
-        />
-      </div>
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <FaSoundcloud className="h-4 w-4" />
+            SoundCloud
+          </Label>
+          <Input
+            value={state.soundcloud}
+            onChange={(e) => handleChange("soundcloud", e.target.value)}
+            placeholder="https://soundcloud.com/..."
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label className="flex items-center gap-2">
-          <Guitar size='1em' className="h-4 w-4" />
-          {t("settings:bands")}
-        </Label>
-        <Input
-          value={state.bands}
-          onChange={(e) => handleChange("bands", e.target.value)}
-          placeholder={t("settings:bands_placeholder")}
-        />
-      </div>
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Guitar className="h-4 w-4" />
+            {t("settings:bands")}
+          </Label>
+          <Input
+            value={state.bands}
+            onChange={(e) => handleChange("bands", e.target.value)}
+            placeholder={t("settings:bands_placeholder")}
+          />
+        </div>
 
-      <div className="flex justify-end pt-4">
-        <Button onClick={handleSave} disabled={!hasChanges || isFetching}>
-          {isFetching && <Loader2 className="h-4 w-4 animate-spin" />}
-          {t("settings:save")}
-        </Button>
+        <div className="flex justify-end pt-4">
+          <Button onClick={handleSave} disabled={!hasChanges || isFetching}>
+            {isFetching && <Loader2 className="animate-spin" />}
+            {t("settings:save")}
+          </Button>
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

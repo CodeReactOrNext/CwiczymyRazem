@@ -29,7 +29,6 @@ export const RoadmapHero = ({
     subtitle={t("hero.subtitle")}
     eyebrow={t("hero.eyebrow")}
     backgroundContent={<HeroPattern variant='heart' />}
-    className='w-full !rounded-none !shadow-none'
     leftContent={
       isLoading ? (
         <div
@@ -52,7 +51,7 @@ export const RoadmapHero = ({
     }
     rightContent={
       <div className='flex flex-col items-start gap-2.5 md:items-end'>
-        <SupportCta className='px-7' />
+        <SupportCta size='xl' />
         <p className='text-xs text-zinc-500'>
           {t("hero.coffee_hint")}
         </p>

@@ -50,4 +50,4 @@ They come in four rarities, shown by the colour of the badge:
 
 <FaqList items="How do I gain skill XP?::Play the exercises tagged with that skill and log the session. Free-form practice time raises your points, but only exercises feed specific skills|Can a skill go down?::No. Skill totals never decrease|Do achievements give rewards?::No, they're collectible only. Everything you actually spend comes from Fame|Where do I see my badges?::On your profile, alongside your level and stats" />
 
-<ReadNext links="The four categories::/wiki/the-four-categories|Ways to practise::/wiki/practice-modes-overview|Practice routines & Auto Plan::/wiki/exercise-plans-and-auto-plan|Learning Path & Scale Map::/wiki/journey-and-scale-tree" />
+<ReadNext links="The four categories::/wiki/the-four-categories|Ways to practise::/wiki/practice-modes-overview|Practice plans & Auto Plan::/wiki/exercise-plans-and-auto-plan|Learning Path & Scale Map::/wiki/journey-and-scale-tree" />

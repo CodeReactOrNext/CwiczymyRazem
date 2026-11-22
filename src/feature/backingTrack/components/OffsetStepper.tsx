@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -7,8 +8,7 @@ import { useState } from "react";
 export const NUDGE_MS = 20;
 export const NUDGE_COARSE_FACTOR = 5;
 
-const stepButton =
-  "flex h-8 items-center justify-center gap-1.5 rounded-lg bg-zinc-800/60 px-2 text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+const stepButton = cn(buttonVariants({ variant: "ghost", size: "sm" }), "gap-1.5 px-2 text-zinc-300");
 const keyCap = "rounded bg-zinc-950/70 px-1.5 text-xs font-semibold leading-5 text-zinc-300";
 
 interface OffsetStepperProps {

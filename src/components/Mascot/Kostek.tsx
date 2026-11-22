@@ -62,6 +62,7 @@ export type KostekMood =
   | "wait"
   | "ready"
   | "micOff"
+  | "micReady"
   | "duel"
   | "emptyCase";
 
@@ -719,6 +720,15 @@ const poseFor = (mood: KostekMood, lookAt?: LookAt): Pose => {
         l: H.lowL,
         r: { x: 113, y: 84, r: -18, shape: "mic" },
       };
+    case "micReady":
+      // The same mic, offered: upright, eyes on the player, ready to hear.
+      return {
+        ...base,
+        eyes: "open",
+        look: look ?? ZERO,
+        body: { scaleX: 0.99, scaleY: 1.01, rotate: 3, y: 0 },
+        r: { x: 112, y: 80, r: -14, shape: "mic" },
+      };
     case "emptyCase":
       // Holding a case with nothing in it.
       return {
@@ -1323,6 +1333,37 @@ export const Kostek = ({
           },
         );
         break;
+      case "micReady": {
+        // Holds the mic out to the player with a little lift of the body, a
+        // ring as it peaks ("go on"), then lowers it and waits. The cheerful
+        // twin of micOff: the same prop, but it works.
+        const cycle = { duration: 2.2, repeat: Infinity, repeatDelay: 2.4 };
+        g.gesture(
+          "r",
+          {
+            y: [80, 70, 68, 70, 70, 80],
+            x: [112, 108, 108, 108, 108, 112],
+            r: [-14, -30, -24, -30, -30, -14],
+          },
+          { ...cycle, delay: d + 0.3, times: [0, 0.22, 0.32, 0.42, 0.75, 1] },
+          false,
+        );
+        action.start(
+          { y: [0, -3, 0, 0], rotate: [0, -2, 0, 0], scaleY: [1, 1.03, 1, 1] },
+          { ...cycle, delay: d + 0.3, times: [0, 0.22, 0.42, 1] },
+        );
+        ringCtl.start(
+          { scale: [0.9, 1.25], opacity: [0.45, 0] },
+          {
+            duration: 0.9,
+            delay: d + 0.3 + 0.22 * cycle.duration,
+            repeat: Infinity,
+            repeatDelay: cycle.duration + cycle.repeatDelay - 0.9,
+            ease: "easeOut",
+          },
+        );
+        break;
+      }
       case "emptyCase":
         // Turns the case upside down and shakes it: nothing falls out. The free hand
         // shrugs along.
@@ -1499,6 +1540,11 @@ export const Kostek = ({
       );
       gazeCtl.start({ x: 0, y: 0 }, { duration: 0.3 });
       eyesCtl.start({ opacity: 1 }, { duration: 0.2 });
+      // Moods with a looping ring must not leave it pulsing after them.
+      if (mood === "micReady" || mood === "warmup") {
+        ringCtl.stop();
+        ringCtl.start({ opacity: 0 }, { duration: 0.2 });
+      }
       g.settleHands();
     };
     // Only a change of mood replays an entry reaction.

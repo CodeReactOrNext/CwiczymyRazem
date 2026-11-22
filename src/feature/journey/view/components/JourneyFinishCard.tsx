@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AnimeChip, AnimeMoment } from "components/AnimeMoment/AnimeMoment";
 import { Kostek } from "components/Mascot/Kostek";
@@ -85,10 +86,8 @@ export const JourneyFinishCard = ({
       className={cn(
         "relative z-10 flex w-full max-w-sm flex-col items-center gap-6 overflow-hidden rounded-lg px-8 py-8 text-center",
         canClaim
-          ? "bg-emerald-500/10"
-          : isClaimed
-            ? "bg-zinc-800/40"
-            : "bg-zinc-900/50",
+          ? "bg-zinc-900 bg-gradient-to-b from-emerald-500/10 to-emerald-500/10"
+          : "bg-zinc-900",
       )}>
       {/* The rarity's own colour behind the instrument, so a Legendary reads as
           one before a single word is. Only once it is actually won — a locked
@@ -124,7 +123,7 @@ export const JourneyFinishCard = ({
 
         <div>
           <span
-            className='text-[0.6875rem] font-bold tracking-wide'
+            className='text-[11px] font-bold'
             style={{ color: rarityColor }}>
             {guitar.rarity}
           </span>
@@ -150,15 +149,12 @@ export const JourneyFinishCard = ({
       />
 
       {canClaim ? (
-        <button
+        <Button
+          size='lg'
           onClick={() => claim(moduleId, { onSuccess: () => setCelebrating(true) })}
-          disabled={isPending}
-          className={cn(
-            "relative rounded-lg bg-zinc-100 px-6 py-2.5 text-xs font-bold capitalize tracking-wide text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white",
-            isPending && "cursor-wait opacity-70",
-          )}>
+          loading={isPending}>
           {isPending ? t("finish.collecting") : t("finish.collect")}
-        </button>
+        </Button>
       ) : (
         <span
           className={cn(

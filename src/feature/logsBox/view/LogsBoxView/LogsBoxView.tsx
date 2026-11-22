@@ -1,4 +1,5 @@
 import { Card } from "assets/components/ui/card";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { firebaseGetLogsStream } from "feature/logs/services/getLogsStream.service";
 import { firebaseGetPinnedDonationsStream } from "feature/logs/services/getPinnedDonationsStream.service";
 import type { AnyFirebaseLog } from "feature/logs/utils/groupConsecutiveLogs";
@@ -10,24 +11,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 const SkeletonLogRow = () => (
-  <div className='my-4 flex flex-col gap-3 rounded-xl bg-main-opposed-bg p-3 sm:p-4 lg:flex-row lg:items-center'>
-    {/* Timestamp */}
-    <div className='border-main-opposed-400 lg:mr-4 lg:border-r-2 lg:pr-4'>
-      <div className='h-3 w-24 rounded bg-white/10' />
+  <div className='my-4 flex items-center gap-3 rounded-lg bg-zinc-900/40 p-3 sm:p-4'>
+    <Skeleton className='h-10 w-10 shrink-0 rounded-lg' />
+    <div className='flex min-w-0 flex-1 flex-col gap-2'>
+      <Skeleton className='h-3 w-32' />
+      <Skeleton className='h-3 w-48 max-w-full' />
     </div>
-
-    {/* Main content */}
-    <div className='flex w-full min-w-0 flex-1 flex-col justify-between gap-3 lg:flex-row lg:items-center lg:gap-4'>
-      <div className='flex items-center gap-2'>
-        <div className='h-6 w-6 rounded-full bg-white/10' />
-        <div className='h-3 w-20 rounded bg-white/10' />
-        <div className='h-3 w-10 rounded bg-white/10' />
-      </div>
-      <div className='flex items-center gap-3 lg:ml-auto'>
-        <div className='h-5 w-40 rounded-md bg-white/[0.06]' />
-        <div className='h-7 w-14 rounded-full bg-white/[0.06]' />
-      </div>
-    </div>
+    <Skeleton className='hidden h-7 w-14 sm:block' />
   </div>
 );
 
@@ -37,18 +27,18 @@ export const LogsBoxSkeleton = ({ className = "" }: { className?: string }) => (
     className={`relative m-auto flex ${panelHeightClass({
       tab: "logs",
       hasOwnHeight: className.includes("h-"),
-    })} font-openSans flex-col p-1 ${
+    })} flex-col p-1 ${
       className.includes("border-none") ? "pb-24" : "pb-3"
-    } rounded-xl text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm w-full min-w-0 ${className}`}>
+    } rounded-lg text-xs leading-5 xs:p-5 xs:pb-0 md:mt-0 lg:text-sm w-full min-w-0 ${className}`}>
     {/* Tab bar */}
     <div className='left-0 top-0 mb-2 flex flex-row justify-around gap-4'>
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className='h-7 w-28 rounded-lg bg-white/[0.06]' />
+        <Skeleton key={i} className='h-7 w-28' />
       ))}
     </div>
 
     {/* Rows */}
-    <div className='mb-2 min-h-0 flex-1 animate-pulse overflow-hidden'>
+    <div className='mb-2 min-h-0 flex-1 overflow-hidden' aria-busy='true'>
       {Array.from({ length: 7 }).map((_, i) => (
         <SkeletonLogRow key={i} />
       ))}

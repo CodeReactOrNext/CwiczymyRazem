@@ -44,7 +44,7 @@ export const RotationSpotlight = ({
   const hand = nextUp.slice(0, FAN.length);
 
   return (
-    <section className='rounded-lg bg-zinc-900/40 px-5 py-8 sm:px-10 sm:py-10'>
+    <section className='rounded-lg bg-zinc-800/40 px-5 py-8 sm:px-10 sm:py-10'>
       <div className='flex flex-col gap-10 xl:flex-row xl:items-center xl:justify-between'>
         <div className='flex flex-col items-center gap-8 text-center sm:flex-row sm:gap-12 sm:text-left'>
           <div className='relative h-32 w-56 shrink-0 sm:h-36' aria-hidden>
@@ -105,10 +105,10 @@ export const RotationSpotlight = ({
         <div className='flex flex-col gap-3 sm:flex-row xl:shrink-0'>
           <Button
             onClick={onPlayStalest}
-            disabled={isStarting || hand.length === 0}
-            className='h-14 rounded-lg bg-white px-7 font-bold text-black focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
+            size='xl'
+            disabled={isStarting || hand.length === 0}>
             <span className='flex items-center gap-3'>
-              <Play className='h-4 w-4 fill-current' />
+              <Play className='fill-current' />
               {t("spotlight.play_stalest", { count: hand.length })}
               <span className='font-medium text-zinc-500'>
                 {t("spotlight.minutes", { count: minutes })}
@@ -117,10 +117,11 @@ export const RotationSpotlight = ({
           </Button>
           <Button
             onClick={onDraw}
-            disabled={isStarting}
-            className='h-14 rounded-lg bg-zinc-800 px-7 font-semibold text-zinc-100 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700'>
+            size='xl'
+            variant='secondary'
+            disabled={isStarting}>
             <span className='flex items-center gap-3'>
-              <Layers className='h-4 w-4 text-zinc-400' />
+              <Layers className='text-zinc-400' />
               {t("spotlight.draw")}
             </span>
           </Button>

@@ -48,29 +48,16 @@ export const SkillPointsTotal = ({
   const { t } = useTranslation("skills");
   const groups = getSkillPointsByCategory(unlockedSkills, timeSpent);
   const total = groups.reduce((sum, group) => sum + group.total, 0);
-  const skillCount = groups.reduce(
-    (sum, group) => sum + group.skills.length,
-    0,
-  );
-  const started = groups.reduce(
-    (sum, group) => sum + group.skills.filter(isStarted).length,
-    0,
-  );
 
   return (
-    <div className='flex flex-col gap-2 md:items-end'>
-      <p className='flex items-baseline gap-2 leading-none'>
-        <span className='text-6xl font-black tabular-nums tracking-tighter text-white'>
-          {total}
-        </span>
-        <span className='text-sm text-zinc-400'>
-          {t("points_panel.total_label")}
-        </span>
-      </p>
-      <p className='text-sm text-zinc-400'>
-        {t("points_panel.started", { started, total: skillCount })}
-      </p>
-    </div>
+    <p className='flex items-baseline gap-2 leading-none'>
+      <span className='text-6xl font-black tabular-nums tracking-tighter text-white'>
+        {total}
+      </span>
+      <span className='text-sm text-zinc-400'>
+        {t("points_panel.total_label")}
+      </span>
+    </p>
   );
 };
 
@@ -180,7 +167,7 @@ const CategoryCard = ({ group }: { group: SkillCategoryPoints }) => {
   const notStarted = skills.filter((entry) => !isStarted(entry));
 
   return (
-    <section className='flex flex-col gap-6 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+    <section className='flex flex-col gap-6 rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
       <header className='flex items-center gap-3'>
         <h2 className='text-lg font-semibold tracking-tight text-zinc-100'>
           {t(`categories.${category}` as never)}

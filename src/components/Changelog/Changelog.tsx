@@ -1,3 +1,5 @@
+import { Chip } from "assets/components/ui/chip";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import {
   type ChangelogVideo,
@@ -326,7 +328,7 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
   if (isLoading) {
     return (
       <DashboardSection compact>
-        <div className='h-64 animate-pulse rounded-lg bg-zinc-900/40' />
+        <Skeleton variant='block' className='h-64' />
       </DashboardSection>
     );
   }
@@ -357,15 +359,15 @@ const Changelog = ({ month = "2026-05" }: { month?: string }) => {
               <div className='mb-5 flex items-center gap-2.5'>
                 <p
                   className={cn(
-                    "font-display text-sm font-semibold tabular-nums tracking-wide",
+                    "font-display text-sm font-semibold tabular-nums",
                     unread ? "text-cyan-400" : "text-zinc-400",
                   )}>
                   {entry.date}
                 </p>
                 {unread && (
-                  <span className='rounded bg-cyan-500/10 px-1.5 py-0.5 text-[11px] font-medium text-cyan-400'>
+                  <Chip color='cyan' size='sm'>
                     {t("changelog.new")}
-                  </span>
+                  </Chip>
                 )}
               </div>
               {/* Text blocks take a full row; videos with only a title flow

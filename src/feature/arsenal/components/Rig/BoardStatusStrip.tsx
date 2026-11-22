@@ -132,7 +132,6 @@ export const BoardStatusStrip = ({
         title={
           <Pop trigger={tierLabel}>
             <span
-              className='capitalize'
               title={
                 verdict.wrongLinks > 0
                   ? `${t("signal.backwards", { wrong: verdict.wrongLinks, cables })}. ${labels.chainTierNote(verdict.tier)}`

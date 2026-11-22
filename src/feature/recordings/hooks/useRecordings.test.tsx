@@ -2,7 +2,10 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, renderHook, waitFor } from "@testing-library/react";
-import { getRecordings } from "feature/recordings/services/getRecordings";
+import {
+  getPopularRecordingPool,
+  getRecordings,
+} from "feature/recordings/services/getRecordings";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -10,9 +13,12 @@ import { useRecordings } from "./useRecordings";
 
 vi.mock("feature/recordings/services/getRecordings", () => ({
   getRecordings: vi.fn(),
+  getPopularRecordingPool: vi.fn(),
+  hydrateRecordingAuthors: vi.fn(async (recordings: unknown[]) => recordings),
 }));
 
 const mockedGetRecordings = vi.mocked(getRecordings);
+const mockedGetPopularPool = vi.mocked(getPopularRecordingPool);
 
 const recordingsOf = (songId?: string) =>
   ({
@@ -75,5 +81,25 @@ describe("useRecordings", () => {
     rerender({ songId: "song-b" });
 
     await waitFor(() => expect(result.current.page).toBe(1));
+  });
+  it("pages the popular pool on the client from a single read", async () => {
+    const pool = Array.from({ length: 15 }, (_, i) => ({ id: `pop-${i}` })) as any;
+    mockedGetPopularPool.mockReset();
+    mockedGetPopularPool.mockResolvedValue(pool);
+
+    const { result } = renderHook(() => useRecordings(undefined, undefined, "popular"), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(result.current.recordings).toHaveLength(12));
+    expect(result.current.recordings[0].id).toBe("pop-0");
+    expect(result.current.totalPages).toBe(2);
+
+    result.current.setPage(2);
+    await waitFor(() => expect(result.current.recordings).toHaveLength(3));
+    expect(result.current.recordings[0].id).toBe("pop-12");
+
+    expect(mockedGetPopularPool).toHaveBeenCalledTimes(1);
+    expect(mockedGetRecordings).not.toHaveBeenCalled();
   });
 });

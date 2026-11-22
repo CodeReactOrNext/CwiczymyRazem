@@ -1,4 +1,4 @@
-import { PRESSABLE } from "assets/components/ui/button";
+import { buttonVariants, PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 /**
  * The pieces of chrome every block of the Rig tab shares.
@@ -22,8 +22,7 @@ export const RIG_BUTTON =
 /** The one primary action on the board — adding to it. White, as the app's
     other primary actions are, so it reads first in a row of neutral buttons
     without spending cyan on a button face. */
-export const RIG_BUTTON_PRIMARY =
-  `${PRESSABLE} flex shrink-0 items-center ${RIG_KEY_SIZE} bg-white font-semibold text-zinc-950 transition-colors duration-fast hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-300/60 border-b-black/30`;
+export const RIG_BUTTON_PRIMARY = `${buttonVariants({ size: "lg" })} shrink-0`;
 
 /** A corrective action — it fixes something the panel beside it is complaining
     about. Orange, not amber/gold — this system reserves gold for Fame. */
@@ -96,22 +95,5 @@ export const StatusTile = ({
       </div>
       {action}
     </div>
-  </div>
-);
-
-interface SectionHeadingProps {
-  title: string;
-  /** Actions for this section, kept on the title's line so they stay together. */
-  children?: React.ReactNode;
-}
-
-export const SectionHeading = ({ title, children }: SectionHeadingProps) => (
-  <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2'>
-    <p className='text-base font-semibold capitalize tracking-wide text-zinc-100'>
-      {title}
-    </p>
-    {children && (
-      <div className='flex flex-wrap items-center gap-2'>{children}</div>
-    )}
   </div>
 );

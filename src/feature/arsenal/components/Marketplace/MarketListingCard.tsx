@@ -165,8 +165,8 @@ export const MarketListingCard = ({
             </TooltipTrigger>
             <TooltipContent
               side='top'
-              className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-white'>
-              <span className='text-xs text-zinc-300'>
+              className='max-w-[260px]'>
+              <span className='text-xs'>
                 {t(
                   listing.itemType === "guitar"
                     ? "market.salvage_hint_guitar"

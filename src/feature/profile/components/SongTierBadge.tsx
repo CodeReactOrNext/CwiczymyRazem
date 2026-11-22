@@ -1,9 +1,11 @@
+import { Skeleton } from "assets/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { cn } from "assets/lib/utils";
 import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import {
   getGatedSkillPower,
@@ -21,6 +23,8 @@ interface SongTierBadgeProps {
   isError?: boolean;
   /** Second person on your own dashboard, third person on someone's profile. */
   isOwnProfile?: boolean;
+  /** The pick with the label and tier beside it — for a horizontal strip. */
+  inline?: boolean;
   onClick?: () => void;
 }
 
@@ -41,6 +45,7 @@ export const SongTierBadge = ({
   isLoading = false,
   isError = false,
   isOwnProfile = false,
+  inline = false,
   onClick,
 }: SongTierBadgeProps) => {
   const { t } = useTranslation("profile");
@@ -84,27 +89,55 @@ export const SongTierBadge = ({
                 : t("tier_badge.none_rated_other")
             } ${howItWorks}`;
 
-  const content = (
+  const subLabelColor = inkAccent(hasTier ? tier.color : UNRATED_COLOR);
+
+  const content = inline ? (
+    <>
+      {isLoading ? (
+        <div className='h-11 w-11 shrink-0 animate-pulse rounded-lg bg-zinc-800/60' />
+      ) : (
+        <TierPick tier={tier} className='h-11 w-11' />
+      )}
+      <span className='flex flex-col items-start gap-0.5'>
+        <span className='whitespace-nowrap text-xs font-semibold text-zinc-400'>
+          {t("tier_badge.label")}
+        </span>
+        {isLoading ? (
+          <span className='my-1.5 block h-3 w-16 animate-pulse rounded bg-zinc-800/60' />
+        ) : (
+          <span
+            className='whitespace-nowrap text-base font-bold leading-6'
+            style={{ color: subLabelColor }}>
+            {subLabel}
+          </span>
+        )}
+      </span>
+    </>
+  ) : (
     <>
       <span className='whitespace-nowrap text-xs font-semibold text-zinc-400'>
         {t("tier_badge.label")}
       </span>
       {isLoading ? (
-        <div className='h-14 w-14 shrink-0 animate-pulse rounded-xl bg-zinc-800/60' />
+        <Skeleton className='h-14 w-14 shrink-0 rounded-lg' />
       ) : (
         <TierPick tier={tier} className='h-14 w-14' />
       )}
       {isLoading ? (
-        <div className='h-3 w-16 animate-pulse rounded bg-zinc-800/60' />
+        <Skeleton className='h-3 w-16' />
       ) : (
         <span
           className='text-[11px] font-medium'
-          style={{ color: inkAccent(hasTier ? tier.color : UNRATED_COLOR) }}>
+          style={{ color: subLabelColor }}>
           {subLabel}
         </span>
       )}
     </>
   );
+
+  const layout = inline
+    ? "relative flex items-center gap-3 p-1"
+    : "relative flex flex-col items-center gap-1.5 p-1";
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -114,18 +147,19 @@ export const SongTierBadge = ({
             <button
               type='button'
               onClick={onClick}
-              className='relative flex flex-col items-center gap-1.5 rounded-lg p-1 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/5'>
+              className={cn(
+                layout,
+                "rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/5",
+              )}>
               {content}
             </button>
           ) : (
-            <div className='relative flex flex-col items-center gap-1.5 p-1'>
-              {content}
-            </div>
+            <div className={layout}>{content}</div>
           )}
         </TooltipTrigger>
         <TooltipContent
           side='bottom'
-          className='max-w-[240px] text-center leading-relaxed text-zinc-800'>
+          className='max-w-[240px] text-center leading-relaxed'>
           {tooltip}
         </TooltipContent>
       </Tooltip>

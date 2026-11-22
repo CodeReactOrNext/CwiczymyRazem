@@ -1,9 +1,12 @@
+import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
+import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { useTranslation } from "hooks/useTranslation";
@@ -92,11 +95,10 @@ const ActionItem = ({
         <span className='block font-semibold'>{label}</span>
         {hint && <span className='block truncate text-zinc-500'>{hint}</span>}
       </span>
-      <span
-        className={cn(
-          "flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold tabular-nums",
-          cost > 0 ? "bg-amber-500/15 text-amber-300" : "text-zinc-500",
-        )}>
+      <Chip
+        color={cost > 0 ? "amber" : "gray"}
+        size='sm'
+        className={cn("shrink-0 tabular-nums", cost === 0 && "bg-transparent text-zinc-500")}>
         {cost > 0 ? (
           <>
             {cost}
@@ -105,7 +107,7 @@ const ActionItem = ({
         ) : (
           t("refine.free")
         )}
-      </span>
+      </Chip>
     </DropdownMenuItem>
   );
 };
@@ -158,24 +160,26 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
         if (!next) setConfirmRemove(false);
       }}>
       <DropdownMenuTrigger asChild>
-        <button
+        <Button
           type='button'
+          variant='ghost'
+          size='icon-sm'
           aria-label={t("refine.aria", { title: step.title })}
           title={t("refine.title_hint")}
           className={cn(
-            "flex h-7 w-7 shrink-0 items-center justify-center rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-zinc-800",
+            "shrink-0 data-[state=open]:bg-zinc-800",
             hasOptions
-              ? "bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20"
-              : "text-zinc-500 data-[state=open]:text-amber-300 hover:bg-zinc-800 hover:text-amber-300",
+              ? "text-cyan-300 hover:text-cyan-200"
+              : "text-zinc-400 data-[state=open]:text-amber-300 hover:text-amber-300",
           )}>
           {isBusy ? (
-            <Loader2 className='h-3.5 w-3.5 animate-spin text-amber-300' />
+            <Loader2 className='animate-spin text-amber-300' />
           ) : hasOptions ? (
-            <Dumbbell className='h-3.5 w-3.5' />
+            <Dumbbell />
           ) : (
-            <Wand2 className='h-3.5 w-3.5' />
+            <Wand2 />
           )}
-        </button>
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
@@ -183,10 +187,10 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
         align='start'
         sideOffset={8}
         collisionPadding={16}
-        className='w-72 border-white/10 bg-zinc-900 p-2 text-zinc-100 shadow-none'>
+        className='w-72 p-2'>
         <div className='flex items-start justify-between gap-3 px-2.5 pb-2 pt-1.5'>
           <span className='min-w-0'>
-            <span className='block text-[10px] font-bold text-amber-300'>
+            <span className='block text-xs font-medium text-amber-300'>
               {t("refine.heading")}
             </span>
             <span className='block truncate text-sm font-semibold text-zinc-100'>
@@ -194,10 +198,10 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
             </span>
           </span>
           {tokensLeft !== null && (
-            <span className='flex shrink-0 items-center gap-1 rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-zinc-300'>
+            <Chip color='gray' size='sm' className='shrink-0 tabular-nums'>
               <Coins className='h-3 w-3 text-amber-300' />
               {tokensLeft}
-            </span>
+            </Chip>
           )}
         </div>
 
@@ -252,14 +256,14 @@ export const StepRefineMenu: React.FC<StepRefineMenuProps> = ({
         ) : (
           <>
             <div className='px-1 pb-2'>
-              <textarea
+              <Textarea
                 rows={2}
                 maxLength={NOTE_MAX}
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
                 onKeyDown={(event) => event.stopPropagation()}
                 placeholder={t("refine.note_placeholder")}
-                className='w-full resize-none rounded-md bg-zinc-800/60 px-2.5 py-2 text-xs leading-relaxed text-zinc-200 outline-none placeholder:text-zinc-600 focus:bg-zinc-800'
+                className='min-h-0 resize-none px-2.5 py-2 text-xs leading-relaxed md:text-xs'
               />
             </div>
 

@@ -1,12 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { buttonVariants, PRESSABLE } from "assets/components/ui/button";
+import { Button, PRESSABLE } from "assets/components/ui/button";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerTitle,
-} from "assets/components/ui/drawer";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "assets/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -15,7 +14,10 @@ import {
 } from "assets/components/ui/select";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { communityExercisesQuery } from "feature/communityExercises/hooks/communityExerciseQueries";
 import {
@@ -33,18 +35,16 @@ import {
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import type { DashboardExercise } from "feature/skills/components/SkillDashboard";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useMediaQuery } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
 import {
   ChevronLeft,
   ChevronRight,
   HandHeart,
   Play,
-  Search,
   Star,
-  X,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -107,40 +107,10 @@ const CATEGORY_FILTERS = [
 
 const DIFFICULTY_FILTERS = ["all", "easy", "medium", "hard"];
 
-/** From `xl` up the list sits beside a details panel; below it details open in a drawer. */
-const DESKTOP_QUERY = "(min-width: 1280px)";
-
 const FOCUS_RING =
   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
 
 const TITLE_CLASS = "text-xl font-bold leading-snug tracking-normal text-white";
-
-const AvatarFace = ({
-  username,
-  avatar,
-  className,
-}: {
-  username: string;
-  avatar?: string | null;
-  className?: string;
-}) =>
-  avatar ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={avatar}
-      alt=''
-      className={cn("h-11 w-11 shrink-0 rounded-full object-cover", className)}
-    />
-  ) : (
-    <span
-      aria-hidden
-      className={cn(
-        "flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-sm font-bold text-zinc-300",
-        className,
-      )}>
-      {username?.[0]?.toUpperCase() ?? "?"}
-    </span>
-  );
 
 /** One star + average — a five-star strip would cost the row the width its title needs. */
 const AverageRating = ({
@@ -163,10 +133,9 @@ const AverageRating = ({
       className='flex items-center gap-1 whitespace-nowrap text-[13px] font-semibold tabular-nums text-zinc-200'
       title={t("rated_by", { avg: average.toFixed(1), count })}>
       <Star
-        size={13}
         fill='currentColor'
         strokeWidth={1.5}
-        className='text-amber-400'
+        className='h-3.5 w-3.5 text-amber-400'
       />
       {average.toFixed(1)}
       <span className='font-normal text-zinc-400'>({count})</span>
@@ -233,16 +202,17 @@ interface ExerciseActions {
 interface ExercisePaneProps extends ExerciseActions {
   exercise: CommunityExercise;
   authorAvatar?: string | null;
-  /** The heading element — the drawer needs its own title primitive. */
+  /** The heading element — the dialog needs its own title primitive. */
   title: ReactNode;
-  /** Sits right of the heading, e.g. the drawer's close key. */
+  /** Sits right of the heading. */
   aside?: ReactNode;
 }
 
 /**
  * Everything about one exercise: who wrote it, the tab, how to play it, and the
- * rating/thanks/start actions. The same pane fills the desktop side panel and
- * the phone drawer; Start stays pinned under the scrolling part.
+ * rating/thanks/start actions. It fills the same Dialog the catalog opens an
+ * exercise in (a bottom sheet on a phone); Start stays pinned under the
+ * scrolling part.
  */
 const ExercisePane = ({
   exercise,
@@ -287,10 +257,11 @@ const ExercisePane = ({
                 "flex w-fit items-center gap-2.5 rounded text-[13px] font-semibold text-zinc-300 transition-colors hover:text-white",
                 FOCUS_RING,
               )}>
-              <AvatarFace
-                username={exercise.authorUsername}
-                avatar={authorAvatar}
-                className='h-8 w-8 text-xs'
+              <Avatar
+                size='xs'
+                name={exercise.authorUsername}
+                avatarURL={authorAvatar || undefined}
+                className='shrink-0'
               />
               {exercise.authorUsername}
             </Link>
@@ -392,16 +363,13 @@ const ExercisePane = ({
       </div>
 
       <div className='px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 sm:px-8 sm:pb-8'>
-        <button
+        <Button
+          size='lg'
           onClick={() => onStart(exercise)}
-          className={cn(
-            PRESSABLE,
-            "flex h-12 w-full items-center justify-center gap-2 rounded-lg border-b-black/25 bg-zinc-100 text-[15px] font-bold text-zinc-950 transition-colors hover:bg-white",
-            FOCUS_RING,
-          )}>
-          <Play size={13} fill='currentColor' />
+          className='w-full'>
+          <Play fill='currentColor' />
           {t("start")}
-        </button>
+        </Button>
       </div>
     </>
   );
@@ -410,19 +378,17 @@ const ExercisePane = ({
 interface ExerciseRowProps {
   exercise: CommunityExercise;
   authorAvatar?: string | null;
-  isSelected: boolean;
   onSelect: (id: string) => void;
   onStart: (exercise: CommunityExercise) => void;
 }
 
 /**
- * One exercise in the list — a row beside the panel on desktop, a card on a
- * phone. The row itself opens the details; the key on the right starts it.
+ * One exercise in the list — a row on desktop, a card on a phone. The row
+ * itself opens the details dialog; the key on the right starts it.
  */
 const ExerciseRow = ({
   exercise,
   authorAvatar,
-  isSelected,
   onSelect,
   onStart,
 }: ExerciseRowProps) => {
@@ -440,17 +406,21 @@ const ExerciseRow = ({
     <div
       className={cn(
         "flex items-center gap-4 rounded-lg p-5 transition-colors xl:p-0 xl:pr-5",
-        isSelected ? "bg-zinc-800/70" : "bg-zinc-900/40 hover:bg-zinc-800/40",
+        "bg-zinc-900/40 hover:bg-zinc-800/40",
       )}>
       <button
         onClick={() => onSelect(exercise.id)}
         aria-label={t("show_details", { title: exercise.title })}
-        aria-current={isSelected ? "true" : undefined}
         className={cn(
           "flex min-w-0 flex-1 items-center gap-4 rounded-lg text-left xl:py-5 xl:pl-5",
           FOCUS_RING,
         )}>
-        <AvatarFace username={exercise.authorUsername} avatar={authorAvatar} />
+        <Avatar
+          size='sm'
+          name={exercise.authorUsername}
+          avatarURL={authorAvatar || undefined}
+          className='shrink-0'
+        />
         <span className='flex min-w-0 flex-1 flex-col gap-1.5'>
           <span className='line-clamp-2 break-words text-base font-semibold leading-snug text-white xl:line-clamp-1'>
             {exercise.title}
@@ -517,7 +487,7 @@ const FilterSelect = ({
         className={cn(
           "border-0",
           PRESSABLE,
-          "h-11 w-full gap-2 border-b-black/30 bg-zinc-800 px-4 text-sm text-zinc-100 shadow-none transition-colors hover:bg-zinc-700 sm:w-auto",
+          "h-10 w-full gap-2 border-b-black/30 bg-zinc-800 px-4 text-sm text-zinc-100 transition-colors hover:bg-zinc-700 sm:w-auto",
         )}>
         {/* A div, not spans: the trigger clamps its direct spans, which would undo `hidden`. */}
         <div className='flex min-w-0 items-center gap-2'>
@@ -580,9 +550,12 @@ export const CommunityExercisesTab = ({
   const [thanksLoading, setThanksLoading] = useState<Record<string, boolean>>(
     {},
   );
-  const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
+  // ?communityExercise=<id> (e.g. "View" on My exercises) opens that exercise's
+  // details straight away, once the list holds it — until the player closes it.
+  const [linkDismissed, setLinkDismissed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -778,13 +751,31 @@ export const CommunityExercisesTab = ({
     setThanksLoading((prev) => ({ ...prev, [exerciseId]: false }));
   };
 
+  const linkedId =
+    typeof router.query.communityExercise === "string"
+      ? router.query.communityExercise
+      : null;
+  const isLinkOpen =
+    !!linkedId && !linkDismissed && exercises.some((ex) => ex.id === linkedId);
+
   const handleSelect = (id: string) => {
+    setLinkDismissed(true);
     setSelectedId(id);
-    if (!isDesktop) setDrawerOpen(true);
+    setDetailOpen(true);
+  };
+
+  const handleDetailOpenChange = (open: boolean) => {
+    if (!open && isLinkOpen) {
+      // Keep the linked exercise on screen while the dialog animates out.
+      setSelectedId(linkedId);
+      setLinkDismissed(true);
+    }
+    setDetailOpen(open);
   };
 
   const handleStartAndClose = (exercise: CommunityExercise) => {
-    setDrawerOpen(false);
+    setLinkDismissed(true);
+    setDetailOpen(false);
     handleStart(exercise);
   };
 
@@ -801,15 +792,9 @@ export const CommunityExercisesTab = ({
     label: i === "all" ? t("all") : t(`instrument_${i}`),
   }));
 
-  // The desktop panel is never empty: with nothing picked (or the pick on
-  // another page) it shows the first exercise of the page.
-  const panelExercise = isDesktop
-    ? (pageExercises.find((ex) => ex.id === selectedId) ?? pageExercises[0])
-    : undefined;
-  // Stays set while the drawer slides out, so it never empties mid-animation.
-  const drawerExercise = isDesktop
-    ? undefined
-    : exercises.find((ex) => ex.id === selectedId);
+  // Stays set while the dialog closes, so it never empties mid-animation.
+  const detailId = isLinkOpen ? linkedId : selectedId;
+  const detailExercise = exercises.find((ex) => ex.id === detailId);
 
   const paneProps = (ex: CommunityExercise) => ({
     exercise: ex,
@@ -835,17 +820,13 @@ export const CommunityExercisesTab = ({
       {/* Search + filters */}
       <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/60 p-5 xl:bg-transparent xl:p-0'>
         <div className='flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center'>
-          <div className='relative sm:min-w-[260px] sm:flex-1'>
-            <Search className='pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400' />
-            <input
-              type='search'
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder={t("search")}
-              aria-label={t("search")}
-              className='h-11 w-full rounded-lg bg-zinc-800/70 pl-10 pr-4 text-sm text-zinc-200 transition-colors placeholder:text-zinc-400 focus:bg-zinc-800 focus:outline-none focus:ring-1 focus:ring-ring'
-            />
-          </div>
+          <SearchInput
+            containerClassName='sm:min-w-[260px] sm:flex-1'
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            placeholder={t("search")}
+            aria-label={t("search")}
+          />
           <div className='grid grid-cols-3 gap-2 sm:flex sm:gap-3'>
             <FilterSelect
               label={t("category")}
@@ -892,11 +873,11 @@ export const CommunityExercisesTab = ({
           </div>
         }>
         {pageExercises.length === 0 ? (
-          <div className='rounded-lg bg-zinc-900/40 px-4 py-16 text-center text-sm text-zinc-400'>
-            {exercises.length === 0 ? t("empty") : t("no_match")}
-          </div>
+          <EmptyState
+            mood={exercises.length === 0 ? "wait" : "lookAround"}
+            title={exercises.length === 0 ? t("empty") : t("no_match")}
+          />
         ) : (
-          <div className='flex flex-col gap-8 xl:flex-row xl:items-start'>
             <div className='flex min-w-0 flex-1 flex-col gap-6'>
               <div className='flex flex-col gap-3'>
                 {pageExercises.map((ex) => (
@@ -904,7 +885,6 @@ export const CommunityExercisesTab = ({
                     key={ex.id}
                     exercise={ex}
                     authorAvatar={authorAvatars[ex.authorId]}
-                    isSelected={panelExercise?.id === ex.id}
                     onSelect={handleSelect}
                     onStart={handleStart}
                   />
@@ -971,63 +951,29 @@ export const CommunityExercisesTab = ({
                 </div>
               )}
             </div>
-
-            {panelExercise && (
-              <aside className='sticky top-6 flex max-h-[calc(100vh-3rem)] w-[460px] shrink-0 flex-col rounded-lg bg-zinc-900/60'>
-                <ExercisePane
-                  key={panelExercise.id}
-                  {...paneProps(panelExercise)}
-                  title={<h3 className={TITLE_CLASS}>{panelExercise.title}</h3>}
-                />
-              </aside>
-            )}
-          </div>
         )}
       </LoadingSwap>
 
-      {!isDesktop && (
-        <Drawer
-          open={drawerOpen}
-          onOpenChange={setDrawerOpen}
-          shouldScaleBackground={false}>
-          <DrawerContent
-            hideHandle
-            overlayClassName='z-[105] bg-black/60'
-            className='z-[110] max-h-[90dvh] rounded-t-lg border-0 bg-zinc-900 outline-none'>
-            <span
-              aria-hidden
-              className='mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-zinc-600'
+      {/* One container for an exercise's details, app-wide: the Dialog the
+          catalog uses — centred on desktop, a bottom sheet on a phone. */}
+      <Dialog open={detailOpen || isLinkOpen} onOpenChange={handleDetailOpenChange}>
+        <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden bg-zinc-950 p-0 sm:max-w-4xl sm:overflow-hidden lg:max-w-5xl'>
+          {detailExercise && (
+            <ExercisePane
+              key={detailExercise.id}
+              {...paneProps(detailExercise)}
+              title={
+                <DialogTitle className={cn(TITLE_CLASS, "pr-12")}>
+                  {detailExercise.title}
+                </DialogTitle>
+              }
             />
-            {drawerExercise && (
-              <ExercisePane
-                key={drawerExercise.id}
-                {...paneProps(drawerExercise)}
-                title={
-                  <DrawerTitle className={TITLE_CLASS}>
-                    {drawerExercise.title}
-                  </DrawerTitle>
-                }
-                aside={
-                  <DrawerClose asChild>
-                    <button
-                      type='button'
-                      aria-label={t("close")}
-                      className={cn(
-                        buttonVariants({ variant: "ghost", size: "icon" }),
-                        "h-11 w-11 shrink-0",
-                      )}>
-                      <X className='h-4 w-4' />
-                    </button>
-                  </DrawerClose>
-                }
-              />
-            )}
-            <DrawerDescription className='sr-only'>
-              {drawerExercise?.authorUsername}
-            </DrawerDescription>
-          </DrawerContent>
-        </Drawer>
-      )}
+          )}
+          <DialogDescription className='sr-only'>
+            {detailExercise?.authorUsername}
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -205,7 +205,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               align='end'
               // Practice session is a full-screen layer at z-[999999] (desktop) / z-[9999999]
               // (mobile modal) — the dropdown's default z-50 would paint underneath it.
-              className='z-[99999999] min-w-[11rem] border border-white/10 bg-zinc-900 text-white'>
+              className='z-[99999999] min-w-[11rem]'>
               {SUBDIVISIONS.map(({ value, title }) => {
                 const active = metronome.subdivision === value;
                 return (
@@ -256,13 +256,13 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               align='end'
               // Practice session is a full-screen layer at z-[999999] (desktop) / z-[9999999]
               // (mobile modal) — the dropdown's default z-50 would paint underneath it.
-              className='z-[99999999] w-64 border border-white/10 bg-zinc-900 p-3 text-white'>
+                className='z-[99999999] w-64 p-3'>
               <div className='flex items-center justify-between px-0.5'>
                 <span className='select-none text-xs font-bold text-zinc-500'>
                   {accentLocked && gridLabel ? gridLabel : t("quick.beats_per_bar")}
                 </span>
                 {accentLocked ? (
-                  <span className='flex select-none items-center gap-1 text-[10px] font-bold text-amber-400'>
+                  <span className='flex select-none items-center gap-1 text-xs font-bold text-amber-400'>
                     <Lock className='h-3 w-3' />
                     {metronome.accentPattern.length}
                   </span>
@@ -302,7 +302,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
                 />
               </div>
 
-              <p className='mt-2 select-none text-[10px] text-zinc-600'>
+              <p className='mt-2 select-none text-xs text-zinc-500'>
                 {accentLocked
                   ? gridLabel?.includes("↔")
                     ? t("metronome:accent.follows_tab")

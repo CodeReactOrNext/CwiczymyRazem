@@ -49,7 +49,7 @@ export const FitSalvagedDialog = ({
     onOpenChange={(open) => {
       if (!open && !isLoading) onCancel();
     }}>
-    <AlertDialogContent className='max-w-sm gap-6 border-0 bg-zinc-900 p-6'>
+    <AlertDialogContent className='max-w-sm gap-6'>
       <AlertDialogHeader className='space-y-2'>
         <AlertDialogTitle className='text-lg font-bold text-white'>
           {t("salvage.fit_title", { name: modName })}
@@ -78,7 +78,7 @@ export const FitSalvagedDialog = ({
       <AlertDialogFooter className='gap-2 sm:space-x-0'>
         <AlertDialogCancel
           disabled={isLoading}
-          className='mt-0 border-0 bg-zinc-700 text-white hover:bg-zinc-600 hover:text-white sm:flex-1'>
+          className='mt-0 sm:flex-1'>
           {t("common.cancel")}
         </AlertDialogCancel>
         <AlertDialogAction
@@ -89,7 +89,7 @@ export const FitSalvagedDialog = ({
             onConfirm();
           }}
           disabled={isLoading}
-          className='bg-purple-600 text-white hover:bg-purple-700 sm:flex-1'>
+          className='sm:flex-1'>
           {isLoading ? t("salvage.installing") : t("salvage.install")}
         </AlertDialogAction>
       </AlertDialogFooter>

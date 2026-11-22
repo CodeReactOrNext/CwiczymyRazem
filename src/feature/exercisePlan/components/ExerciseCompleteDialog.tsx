@@ -63,7 +63,7 @@ export const ExerciseCompleteDialog = ({
         </DialogHeader>
         <DialogFooter className='flex-row gap-2 sm:justify-center'>
           <Button variant='outline' onClick={onRestart}>
-            <RotateCw size='1em' className='h-4 w-4' />
+            <RotateCw />
             {t("exercise_complete.repeat")}
           </Button>
           <Button onClick={onClose}>{t("exercise_complete.continue")}</Button>

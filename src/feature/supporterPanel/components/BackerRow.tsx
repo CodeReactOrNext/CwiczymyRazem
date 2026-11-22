@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import Avatar from "components/UI/Avatar";
 import type { Backer } from "feature/supporterPanel/types/supporterPanel.types";
 import { useTranslation } from "hooks/useTranslation";
 import { useState } from "react";
@@ -15,22 +16,14 @@ import { useState } from "react";
 /** How many names fit before the row starts eating the card. */
 const VISIBLE = 6;
 
-const Bubble = ({ backer }: { backer: Backer }) =>
-  backer.avatar ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={backer.avatar}
-      alt=''
-      loading='lazy'
-      // Somebody else's host; no need to tell them where it is being viewed.
-      referrerPolicy='no-referrer'
-      className='h-5 w-5 shrink-0 rounded-full bg-zinc-800 object-cover'
-    />
-  ) : (
-    <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[10px] font-bold text-zinc-300'>
-      {backer.name.charAt(0)}
-    </span>
-  );
+const Bubble = ({ backer }: { backer: Backer }) => (
+  <Avatar
+    size='2xs'
+    name={backer.name}
+    avatarURL={backer.avatar || undefined}
+    className='shrink-0'
+  />
+);
 
 const CHIP =
   "inline-flex items-center gap-1.5 rounded-full py-1 pl-1 pr-2.5 text-xs";

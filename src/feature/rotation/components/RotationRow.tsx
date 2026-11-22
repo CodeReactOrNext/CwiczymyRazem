@@ -1,3 +1,4 @@
+import { Button, buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
 import { Check, ExternalLink, Play, X } from "lucide-react";
@@ -16,8 +17,6 @@ interface RotationRowProps {
   disabled?: boolean;
 }
 
-const ICON_BUTTON =
-  "flex shrink-0 items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50";
 
 export const RotationRow = ({
   entry,
@@ -39,7 +38,7 @@ export const RotationRow = ({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -24, transition: { duration: 0.18 } }}
       transition={{ type: "spring", stiffness: 420, damping: 36 }}
-      className='flex items-center gap-4 rounded-lg bg-zinc-900/40 p-3 pr-3 transition-colors hover:bg-zinc-900/70 sm:gap-6 sm:p-4 sm:pr-5'>
+      className='flex items-center gap-4 rounded-lg bg-zinc-800/40 p-3 pr-3 transition-colors hover:bg-zinc-800/60 sm:gap-6 sm:p-4 sm:pr-5'>
       <RotationThumb
         display={display}
         className='h-12 w-12 sm:h-14 sm:w-14'
@@ -75,39 +74,33 @@ export const RotationRow = ({
             rel='noopener noreferrer'
             aria-label={t("row.open_link", { site: linkLabel(item.link) })}
             className={cn(
-              ICON_BUTTON,
-              "hidden h-9 w-9 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 sm:flex",
+              buttonVariants({ variant: "ghost", size: "icon-touch" }),
+              "hidden shrink-0 text-zinc-400 sm:inline-flex",
             )}>
-            <ExternalLink className='h-4 w-4' />
+            <ExternalLink />
           </a>
         )}
-        <button
+        <Button
           type='button'
+          variant='ghost'
+          size='icon-touch'
           onClick={onPlay}
           disabled={disabled}
           aria-label={t(ticksOff ? "row.done" : "row.play", {
             title: display.title,
           })}
-          className={cn(
-            ICON_BUTTON,
-            "h-11 w-11 bg-zinc-800 text-zinc-100 hover:bg-zinc-700",
-          )}>
-          {ticksOff ? (
-            <Check className='h-4 w-4' />
-          ) : (
-            <Play className='h-4 w-4 fill-current' />
-          )}
-        </button>
-        <button
+          className='shrink-0 text-zinc-100'>
+          {ticksOff ? <Check /> : <Play className='fill-current' />}
+        </Button>
+        <Button
           type='button'
+          variant='ghost'
+          size='icon'
           onClick={onRemove}
           aria-label={t("row.remove", { title: display.title })}
-          className={cn(
-            ICON_BUTTON,
-            "h-9 w-9 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200",
-          )}>
-          <X className='h-4 w-4' />
-        </button>
+          className='shrink-0 text-zinc-400'>
+          <X />
+        </Button>
       </div>
     </motion.li>
   );

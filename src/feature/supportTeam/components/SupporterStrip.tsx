@@ -1,3 +1,4 @@
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { UserLink } from "components/UserLink/UserLink";
 import { useSupporterWall } from "feature/supportTeam/hooks/useSupporterWall";
@@ -30,10 +31,7 @@ export const SupporterStrip = ({ className }: SupporterStripProps) => {
     return (
       <div className={cn("flex flex-wrap gap-2", className)} aria-hidden>
         {Array.from({ length: 8 }, (_, index) => (
-          <div
-            key={index}
-            className='h-8 w-8 animate-pulse rounded-full bg-zinc-800/60'
-          />
+          <Skeleton key={index} className='h-8 w-8 rounded-full' />
         ))}
       </div>
     );

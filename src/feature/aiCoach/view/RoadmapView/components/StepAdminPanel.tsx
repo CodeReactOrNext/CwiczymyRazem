@@ -1,3 +1,7 @@
+import { Button } from "assets/components/ui/button";
+import { Input } from "assets/components/ui/input";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { Textarea } from "assets/components/ui/textarea";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import {
   ChevronRight,
@@ -16,10 +20,8 @@ import type { YouTubeLessonResult } from "../../../types/youtubeLesson.types";
 import type { RoadmapStepRef } from "../../../utils/roadmapSteps";
 import YouTubeLessonCard from "./YouTubeLessonCard";
 
-const TEXTAREA_CLS =
-  "w-full resize-y rounded-lg bg-zinc-800/60 px-3 py-2 text-sm leading-relaxed text-zinc-200 outline-none transition-colors focus:ring-1 focus:ring-cyan-500";
-const INPUT_CLS =
-  "flex-1 rounded-lg bg-zinc-800/60 px-2.5 py-1.5 text-xs text-zinc-200 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-red-600";
+const TEXTAREA_CLS = "resize-y leading-relaxed";
+const INPUT_CLS = "h-8 px-2.5 text-xs md:text-xs";
 const LINK_BTN_CLS =
   "text-[11px] text-zinc-400 underline underline-offset-2 transition-colors hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
 const SMALL_BTN_CLS =
@@ -82,7 +84,7 @@ export const StepAdminPanel: React.FC<StepAdminPanelProps> = ({
 
   const customLessonForm = (placeholder: string) => (
     <div className='flex gap-2'>
-      <input
+      <Input
         type='text'
         data-vaul-no-drag
         placeholder={placeholder}
@@ -94,18 +96,19 @@ export const StepAdminPanel: React.FC<StepAdminPanelProps> = ({
         }}
         className={INPUT_CLS}
       />
-      <button
+      <Button
         type='button'
+        variant='subtle'
+        size='sm'
         onClick={() => onAddCustomLesson(step.id, phase.id, customLessonInput)}
-        disabled={addingCustomLesson}
-        className='flex items-center gap-1.5 rounded bg-zinc-800 px-2.5 py-1.5 text-xs text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 hover:bg-zinc-700'>
+        disabled={addingCustomLesson}>
         {addingCustomLesson ? (
-          <Loader2 className='h-3 w-3 animate-spin' />
+          <Loader2 className='animate-spin' />
         ) : (
-          <FaYoutube className='h-3 w-3 text-red-500' />
+          <FaYoutube className='text-red-500' />
         )}
         Add
-      </button>
+      </Button>
     </div>
   );
 
@@ -113,7 +116,7 @@ export const StepAdminPanel: React.FC<StepAdminPanelProps> = ({
     <div className='flex flex-col gap-6'>
       {/* Exercise */}
       <section className='rounded-lg bg-zinc-900/40 p-5'>
-        <h3 className='mb-3 flex items-center gap-2 text-xs font-semibold tracking-wide text-zinc-400'>
+        <h3 className='mb-3 flex items-center gap-2 text-xs font-medium text-zinc-400'>
           <Dumbbell className='h-3.5 w-3.5 text-cyan-400' /> Exercise
         </h3>
         {loadingExercise ? (
@@ -226,7 +229,7 @@ export const StepAdminPanel: React.FC<StepAdminPanelProps> = ({
 
       {/* Song — only a real one from the library, only on a repertoire step */}
       <section className='rounded-lg bg-zinc-900/40 p-5'>
-        <h3 className='mb-3 flex items-center gap-2 text-xs font-semibold tracking-wide text-zinc-400'>
+        <h3 className='mb-3 flex items-center gap-2 text-xs font-medium text-zinc-400'>
           <Music className='h-3.5 w-3.5 text-purple-300' /> Library song
         </h3>
         {loadingSong ? (
@@ -280,10 +283,10 @@ export const StepAdminPanel: React.FC<StepAdminPanelProps> = ({
 
       {/* Description */}
       <section className='rounded-lg bg-zinc-900/40 p-5'>
-        <label className='mb-2 block text-xs font-semibold tracking-wide text-zinc-400'>
+        <label className='mb-2 block text-xs font-medium text-zinc-400'>
           Description
         </label>
-        <textarea
+        <Textarea
           rows={10}
           data-vaul-no-drag
           className={TEXTAREA_CLS}
@@ -296,10 +299,10 @@ export const StepAdminPanel: React.FC<StepAdminPanelProps> = ({
 
       {/* Success criteria */}
       <section className='rounded-lg bg-cyan-500/10 p-5'>
-        <label className='mb-2 block text-xs font-semibold tracking-wide text-cyan-400'>
+        <label className='mb-2 block text-xs font-medium text-cyan-400'>
           Success criteria
         </label>
-        <textarea
+        <Textarea
           rows={3}
           data-vaul-no-drag
           className={TEXTAREA_CLS}
@@ -312,16 +315,13 @@ export const StepAdminPanel: React.FC<StepAdminPanelProps> = ({
 
       {/* Lessons */}
       <section className='rounded-lg bg-zinc-900/40 p-5'>
-        <h3 className='mb-3 flex items-center gap-2 text-xs font-semibold tracking-wide text-zinc-400'>
+        <h3 className='mb-3 flex items-center gap-2 text-xs font-medium text-zinc-400'>
           <FaYoutube className='h-3.5 w-3.5 text-red-500' /> YouTube lessons
         </h3>
         {loadingLessons ? (
           <div className='space-y-2'>
             {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className='h-[92px] animate-pulse rounded-lg bg-zinc-900/60'
-              />
+              <Skeleton key={i} variant='block' className='h-[92px]' />
             ))}
           </div>
         ) : lessons.length ? (
@@ -329,15 +329,17 @@ export const StepAdminPanel: React.FC<StepAdminPanelProps> = ({
             {lessons.map((lesson) => (
               <div key={lesson.videoId} className='group relative'>
                 <YouTubeLessonCard lesson={lesson} />
-                <button
+                <Button
                   type='button'
+                  variant='ghost'
+                  size='icon-sm'
                   aria-label='Remove lesson'
                   onClick={() =>
                     onRemoveLesson(step.id, phase.id, lesson.videoId)
                   }
-                  className='absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded bg-zinc-800/80 text-zinc-400 opacity-0 transition-colors focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring group-hover:opacity-100 hover:bg-red-900/60 hover:text-red-300'>
-                  <X className='h-3 w-3' />
-                </button>
+                  className='absolute right-2 top-2 bg-zinc-800 text-zinc-400 opacity-0 focus-visible:opacity-100 group-hover:opacity-100 hover:text-red-300'>
+                  <X />
+                </Button>
               </div>
             ))}
             <button

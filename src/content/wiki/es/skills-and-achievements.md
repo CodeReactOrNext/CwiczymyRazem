@@ -50,4 +50,4 @@ Vienen en cuatro rarezas, indicadas por el color de la insignia:
 
 <FaqList items="¿Cómo gano XP de habilidad?::Toca los ejercicios etiquetados con esa habilidad y registra la sesión. El tiempo de práctica libre sube tus puntos, pero solo los ejercicios alimentan habilidades concretas|¿Puede bajar una habilidad?::No. Los totales de habilidad nunca disminuyen|¿Los logros dan recompensas?::No, son solo coleccionables. Todo lo que realmente gastas viene de la Fame|¿Dónde veo mis insignias?::En tu perfil, junto a tu nivel y tus estadísticas" />
 
-<ReadNext links="Las cuatro categorías::/wiki/the-four-categories|Formas de practicar::/wiki/practice-modes-overview|Rutinas de práctica y Plan automático::/wiki/exercise-plans-and-auto-plan|Ruta de aprendizaje y Mapa de escalas::/wiki/journey-and-scale-tree" />
+<ReadNext links="Las cuatro categorías::/wiki/the-four-categories|Formas de practicar::/wiki/practice-modes-overview|Planes de práctica y Plan automático::/wiki/exercise-plans-and-auto-plan|Ruta de aprendizaje y Mapa de escalas::/wiki/journey-and-scale-tree" />

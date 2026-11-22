@@ -289,7 +289,9 @@
     "scope": {
       "all": "Alle",
       "guitars": "Gitarren",
-      "pedals": "Pedale"
+      "pedals": "Pedale",
+      "parts": "Teile",
+      "builder": "Builder"
     },
     "search": "Sammlung durchsuchen",
     "sort_by": "Sortieren nach",
@@ -325,12 +327,14 @@
     "guitars_collected": "Gitarren gesammelt",
     "pedals_eyebrow": "Effekte",
     "pedals_collected": "Pedale gesammelt",
-    "clear_dupes": "Duplikate entfernen ({{count}})"
+    "clear_dupes": "Duplikate entfernen ({{count}})",
+    "shelf": "Regal",
+    "view_switch": "Ansicht"
   },
   "salvage": {
     "title": "Bergung",
     "salvaged_mod": "Geborgener Mod",
-    "salvaged_mod_caps": "GEBORGENER MOD",
+    "salvaged_mod_caps": "Geborgener Mod",
     "fit_title": "{{name}} einbauen?",
     "fit_body": "In {{target}}, mit dem Wert, mit dem er geborgen wurde. Nichts wird neu ausgewürfelt.",
     "off_source": "aus {{source}}",
@@ -393,7 +397,8 @@
     "sell_it": "Verkaufen",
     "sell_one": "Eins für {{fame}} Fame verkaufen",
     "salvaged_parts": "Geborgene Teile",
-    "wallet_empty": "Zerlege eine Gitarre oder ein Pedal aus deiner Sammlung, um deine ersten Teile zu bergen."
+    "wallet_empty": "Zerlege eine Gitarre oder ein Pedal aus deiner Sammlung, um deine ersten Teile zu bergen.",
+    "sell_one_short": "1 verkaufen"
   },
   "stash": {
     "part": "Teil",
@@ -413,12 +418,14 @@
       "sell_for": "Verkaufen · {{fame}}",
       "sell_all": "Alle verkaufen ×{{qty}}",
       "merge": "Verschmelzen · +{{gain}} Lvl",
-      "merge_plain": "Mit bester Kopie verschmelzen"
+      "merge_plain": "Mit bester Kopie verschmelzen",
+      "workshop": "Werkstatt…",
+      "install_on": "In {{name}} einbauen"
     },
     "eyebrow": "Arsenal",
     "title": "Lager",
     "items_collected": "Gegenstände gesammelt",
-    "tidy_hint": "Das ganze Lager auf einmal neu anordnen — danach bleibt es deine Anordnung",
+    "tidy_hint": "Dieses Regal in einem Rutsch neu anordnen — danach bleibt es deine Anordnung",
     "tidy_up": "Aufräumen",
     "arrange": {
       "equipped": "Was ich spiele, zuerst",
@@ -473,7 +480,9 @@
     },
     "merge": "Verschmelzen +{{gain}}",
     "merge_plain": "Verschmelzen",
-    "merge_hint": "In deine beste Kopie für +{{gain}} Item-Level aufnehmen"
+    "merge_hint": "In deine beste Kopie für +{{gain}} Item-Level aufnehmen",
+    "workshop": "Werkstatt",
+    "workshop_hint": "In der Werkstatt restaurieren, ausbauen und Mods einbauen"
   },
   "bulk": {
     "title": "Duplikate entfernen?",
@@ -946,7 +955,16 @@
     "levels_word": "Level",
     "empty": "Öffne zuerst eine Kiste. Sobald du eine Gitarre oder ein Pedal besitzt, kannst du es restaurieren und mit geborgenen Teilen weiter ausbauen.",
     "change_instrument": "Instrument wechseln · {{count}} im Rack",
-    "pick_instrument": "Instrument wählen"
+    "pick_instrument": "Instrument wählen",
+    "ready_now": "Das geht jetzt",
+    "make": "Bauen",
+    "make_hint_one": "{{count}} aus {{tier}}-Teilen hochstufen",
+    "make_hint": "{{count}} aus {{tier}}-Teilen hochstufen",
+    "job_with_gain_one": "{{job}} · +{{count}} Level",
+    "job_with_gain": "{{job}} · +{{count}} Level",
+    "previous_instrument": "Vorheriges Instrument",
+    "next_instrument": "Nächstes Instrument",
+    "n_of_total": "{{n}} von {{total}}"
   },
   "mods": {
     "remove_aria": "Diesen Mod für {{fame}} Fame ausbauen",
@@ -1004,7 +1022,10 @@
     "no_match": "Kein passender Mod trägt diesen Namen.",
     "bonus": "+{{points}} Bonus",
     "bonus_word": "Bonus",
-    "compatible_slot": "Passt in diesen Slot"
+    "compatible_slot": "Passt in diesen Slot",
+    "install_named": "{{name}} einbauen",
+    "reroll_range": "Neu würfeln · +{{min}} bis +{{max}}",
+    "take_off_for": "Ausbauen · {{fame}} Fame"
   },
   "toasts": {
     "mod_added": "Mod liegt in deinem Lager — bau ihn über die Sammlung oder an der Werkbank ein",

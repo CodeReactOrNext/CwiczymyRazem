@@ -24,7 +24,16 @@
       "tokensHeldOne": "Tienes 1 caja gratis: úsala en cualquier caja del Arsenal.",
       "readyToCollect": "Recompensa lista para recoger",
       "onCompletion": "Recompensa por conseguir este logro",
-      "collected": "Recompensa ya recogida"
+      "collected": "Recompensa ya recogida",
+      "toCollect": "{{count}} recompensas por recoger",
+      "toCollectOne": "1 recompensa por recoger",
+      "moreAfterSession": "+{{count}} tras tu próxima sesión",
+      "collectedCount": "{{count}} recompensas recogidas",
+      "collectedOne": "1 recompensa recogida",
+      "casesInHand": "{{count}} cajas gratis disponibles",
+      "casesInHandOne": "1 caja gratis disponible",
+      "openCase": "Abrir una caja",
+      "openArsenal": "Abrir en el Arsenal"
     }
   },
   "time_1": {

@@ -1,15 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "assets/components/ui/alert-dialog";
 import { Button, PRESSABLE_KEY } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
+import { Textarea } from "assets/components/ui/textarea";
 import { 
   Tooltip, 
   TooltipContent, 
@@ -17,7 +9,10 @@ import {
   TooltipTrigger 
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
+import { ConfirmDialog } from "components/ConfirmDialog/ConfirmDialog";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { Segment, SegmentGroup } from "components/SegmentedControl/SegmentedControl";
 import Avatar from "components/UI/Avatar/Avatar";
 import { SongRecordingsSection } from "feature/recordings/components/SongRecordingsSection";
 import { ArrangementStrip } from "feature/songs/components/Arrangements/ArrangementStrip";
@@ -43,12 +38,12 @@ import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { collection, documentId, getDocs, query, where } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import { transitions } from "lib/motion/motion";
 import { useSharedElement } from "lib/motion/useSharedElement";
 import type { LucideIcon } from "lucide-react";
 import {
-  ArrowLeft,
   Check,
   FileText,
   ListMusic,
@@ -319,7 +314,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
   const totalMinutes = progress ? Math.floor((progress.totalPracticeMs % 3600000) / 60000) : 0;
 
   return (
-    <div className="relative w-full flex flex-col bg-second-600">
+    <div className="relative w-full flex flex-col">
       {/* Header Section */}
       <div className="relative shrink-0 overflow-hidden bg-zinc-900/50">
          <div className="absolute inset-0 overflow-hidden">
@@ -332,15 +327,10 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
          {/* Back button — mobile always; desktop only when nested (e.g. inside a playlist) */}
          {onBack && (
            <div className={cn("relative z-20 pt-4 px-4", !showBackOnDesktop && "xl:hidden")}>
-              <Button
-                variant="subtle"
-                size="sm"
+              <BackLink
+                label={backLabel ?? t("detail.back_to_library")}
                 onClick={() => runAfterSnapshot(onBack)}
-                className="text-zinc-400 backdrop-blur-md px-4"
-              >
-                <ArrowLeft size={16} className="" />
-                <span className="text-xs font-bold">{backLabel ?? t("detail.back_to_library")}</span>
-              </Button>
+              />
            </div>
          )}
 
@@ -364,9 +354,9 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             </motion.div>
 
             <div className="flex min-w-0 flex-1 flex-col items-start gap-2 text-left">
-               <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs font-medium capitalize text-zinc-400">
+               <Chip color='gray' size='sm' className="capitalize">
                  {song.genres?.[0] || t("detail.guitar_track")}
-               </span>
+               </Chip>
                <div className="flex flex-col gap-1">
                  <h2 className="font-display text-xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">{song.title}</h2>
                  <p className="text-sm font-semibold text-zinc-400 sm:text-lg">{song.artist}</p>
@@ -389,12 +379,13 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                      onPractice(song);
                    }
                  }}
-                 className="h-14 w-full px-8 font-semibold sm:w-auto"
+                 size="xl"
+                 className="w-full sm:w-auto"
                >
                  {status
-                   ? <Play className="h-5 w-5 fill-current" />
-                   : <Music className="h-5 w-5" />}
-                 <span className="text-sm">{status ? "Start practice" : "Add to library"}</span>
+                   ? <Play className="fill-current" />
+                   : <Music />}
+                 <span>{status ? "Start practice" : "Add to library"}</span>
                </Button>
 
                {/* Steam-style Info Boxes */}
@@ -419,73 +410,59 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
             </div>
 
             <div className="flex items-center gap-3 lg:justify-end">
-               <div className="flex items-center gap-1 rounded-lg bg-black/20 p-1">
+               <SegmentGroup aria-label={t("add_modal.title_status")}>
                   {(["wantToLearn", "learning", "learned"] as const).map((s) => {
                     const config = STATUS_CONFIG[s];
                     const Icon = config.icon;
                     const isActive = status === s;
-                    
+
                     return (
                       <TooltipProvider key={s} delayDuration={150}>
                         <Tooltip>
+                          {/* Segment doesn't forward the trigger's handlers, so a span carries them. */}
                           <TooltipTrigger asChild>
-                            <Button
-                              onClick={() => onStatusChange(song.id, s, song.title, song.artist)}
-                              variant="ghost"
-                              size="icon"
-                              className={cn(
-                                "h-11 w-11 rounded-lg transition-all",
-                                isActive
-                                  ? cn(config.bgColor, config.color, config.bgHover)
-                                  : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
-                              )}
-                            >
-                              <Icon size={18} />
-                            </Button>
+                            <span className="inline-flex">
+                              <Segment
+                                active={isActive}
+                                onClick={() => onStatusChange(song.id, s, song.title, song.artist)}
+                                className="w-11 justify-center px-0 sm:w-[34px]">
+                                <Icon size={18} className={isActive ? config.color : undefined} />
+                                <span className="sr-only">{t(`status.${s}` as any)}</span>
+                              </Segment>
+                            </span>
                           </TooltipTrigger>
                           <TooltipContent side="top">
-                            <p className="text-xs font-bold capitalize">{t(`status.${s}` as any)}</p>
+                            <p className="text-xs font-bold">{t(`status.${s}` as any)}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     );
                   })}
-               </div>
+               </SegmentGroup>
 
                <Button
                  onClick={() => setShowRemoveConfirm(true)}
                  variant="ghost"
+                 size="icon"
                  aria-label={t("detail.remove_title")}
-                 className="h-11 w-11 p-0 text-zinc-400 hover:bg-rose-500/10 hover:text-rose-400"
+                 className="text-zinc-400 hover:bg-rose-500/10 hover:text-rose-400"
                >
                  <Trash2 size={16} />
                </Button>
 
-               <AlertDialog open={showRemoveConfirm} onOpenChange={setShowRemoveConfirm}>
-                 <AlertDialogContent className="border-none bg-zinc-900 text-zinc-100 sm:rounded-xl">
-                   <AlertDialogHeader>
-                     <AlertDialogTitle className="font-display text-zinc-50">{t("detail.remove_title")}</AlertDialogTitle>
-                     <AlertDialogDescription className="leading-relaxed text-zinc-400">
-                       {t("detail.remove_body")}
-                     </AlertDialogDescription>
-                   </AlertDialogHeader>
-                   <AlertDialogFooter>
-                     <AlertDialogCancel className="border-none bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-zinc-100">
-                       {t("cancel")}
-                     </AlertDialogCancel>
-                     <AlertDialogAction
-                       onClick={(event) => {
-                         event.preventDefault();
-                         setShowRemoveConfirm(false);
-                         onRemove(song.id);
-                       }}
-                       className="bg-rose-600 text-white hover:bg-rose-500"
-                     >
-                       Remove
-                     </AlertDialogAction>
-                   </AlertDialogFooter>
-                 </AlertDialogContent>
-               </AlertDialog>
+               <ConfirmDialog
+                 open={showRemoveConfirm}
+                 onOpenChange={setShowRemoveConfirm}
+                 title={t("detail.remove_title")}
+                 description={t("detail.remove_body")}
+                 cancelLabel={t("cancel")}
+                 confirmLabel={t("sortable.remove")}
+                 onConfirm={() => {
+                   setShowRemoveConfirm(false);
+                   onRemove(song.id);
+                 }}
+                 destructive
+               />
             </div>
          </div>
       </div>
@@ -553,7 +530,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                            </div>
                         </TooltipTrigger>
                      </div>
-                     <TooltipContent className="bg-zinc-950 text-zinc-100">
+                     <TooltipContent>
                         {userRating !== undefined
                            ? t("detail.rated_tooltip", { rating: userRating })
                            : t("detail.rate_tooltip")}
@@ -609,21 +586,20 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                                          name={profile?.displayName || t("detail.musician")}
                                          avatarURL={profile?.avatar}
                                          size="sm"
-                                         className="transition-transform group-hover/avatar:scale-110 shadow-lg"
                                        />
                                        <div
-                                         className="absolute -bottom-1.5 -right-1.5 z-20 flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[10px] font-black shadow-lg ring-2 ring-zinc-900"
+                                         className="absolute -bottom-1.5 -right-1.5 z-20 flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[11px] font-bold shadow-lg ring-2 ring-zinc-900"
                                          style={{ backgroundColor: raterTier.color, color: "#09090b" }}
                                        >
                                          {diff.rating}
                                        </div>
                                     </div>
                                   </TooltipTrigger>
-                                  <TooltipContent className="bg-zinc-950 p-3 shadow-2xl">
+                                  <TooltipContent className="tooltip-ink p-3">
                                     <div className="space-y-1">
-                                       <p className="text-xs font-black text-white">{profile?.displayName || t("detail.unknown_musician")}</p>
-                                       <p className="text-[10px] text-zinc-400">{t("detail.rating_label")} <span className="font-bold" style={{ color: raterTier.color }}>{diff.rating}/10</span></p>
-                                       <p className="text-[10px] text-zinc-400">{t("detail.tier_label")} <span className="font-bold" style={{ color: raterTier.color }}>{raterTier.label}</span></p>
+                                       <p className="text-xs font-black">{profile?.displayName || t("detail.unknown_musician")}</p>
+                                       <p className="text-xs text-black/60">{t("detail.rating_label")} <span className="font-bold" style={{ color: readableText(raterTier.color) }}>{diff.rating}/10</span></p>
+                                       <p className="text-xs text-black/60">{t("detail.tier_label")} <span className="font-bold" style={{ color: readableText(raterTier.color) }}>{raterTier.label}</span></p>
                                     </div>
                                   </TooltipContent>
                                 </Tooltip>
@@ -720,9 +696,10 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
 
                         <Button
                            onClick={() => router.push(`/timer/song/${song.id}`)}
-                           className="mt-1 rounded-lg bg-white px-6 text-sm font-bold text-zinc-950 hover:bg-zinc-200"
+                           size="lg"
+                           className="mt-1"
                         >
-                           <ListMusic className="h-4 w-4" />
+                           <ListMusic />
                            {t("detail.map_song")}
                         </Button>
 
@@ -790,7 +767,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                </div>
             </CardHeader>
 
-            <textarea
+            <Textarea
                value={notes}
                onChange={(e) => {
                  if (e.target.value.length <= 500) {
@@ -798,7 +775,7 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
                  }
                }}
                placeholder={t("detail.notes_placeholder")}
-               className="min-h-[160px] w-full resize-none rounded-lg bg-zinc-950/40 p-4 text-sm leading-relaxed text-zinc-300 transition-colors placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-white/10"
+               className="min-h-[160px] resize-none p-4 leading-relaxed"
             />
          </div>
       </div>

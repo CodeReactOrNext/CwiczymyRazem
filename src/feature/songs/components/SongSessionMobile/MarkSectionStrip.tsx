@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { SongSection } from "feature/songs/types/songSection.type";
 import {
@@ -30,8 +31,10 @@ interface MarkSectionStripProps {
   onClose: () => void;
 }
 
-const iconButton =
-  "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100 active:bg-zinc-800";
+const iconButton = cn(
+  buttonVariants({ variant: "subtle", size: "icon" }),
+  "h-10 w-10 shrink-0",
+);
 
 /**
  * Follows a tap on Mark, right under the controls so the video keeps playing

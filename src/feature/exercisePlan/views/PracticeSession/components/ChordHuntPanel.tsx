@@ -76,7 +76,7 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
       </div>
 
       {description && (
-        <p className="text-center text-sm font-semibold tracking-wide text-zinc-200">{description}</p>
+        <p className="text-center text-sm font-semibold text-zinc-200">{description}</p>
       )}
 
       {/* Detection status */}
@@ -95,7 +95,7 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
       {tones.length > 0 && (
         <div className="flex flex-col items-center gap-1.5">
           {!isMicEnabled && (
-            <span className="text-xs font-semibold tracking-wide text-zinc-400">{t("chord_hunt.tap_tone")}</span>
+            <span className="text-xs font-semibold text-zinc-400">{t("chord_hunt.tap_tone")}</span>
           )}
           <div className="flex flex-wrap items-center justify-center gap-2">
             {tones.map((pc, i) => {
@@ -114,7 +114,7 @@ export function ChordHuntPanel({ chordName: chordNameProp, description, isMicEna
               const inner = (
                 <>
                   <span className="text-lg">{revealed ? NOTES[pc] : "?"}</span>
-                  <span className="text-[10px] opacity-80">{labels[i] ?? ""}</span>
+                  <span className="text-[11px] opacity-80">{labels[i] ?? ""}</span>
                 </>
               );
               return !isMicEnabled ? (

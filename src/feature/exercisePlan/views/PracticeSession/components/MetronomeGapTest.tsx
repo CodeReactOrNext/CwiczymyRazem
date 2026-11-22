@@ -406,12 +406,12 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
         <div className='flex items-center gap-2'>
           <Button
             variant='ghost'
-            size='icon'
-            className='h-8 w-8 shrink-0'
+            size='icon-sm'
+            className='shrink-0'
             onClick={() => gapTestEngine.setBpm(s.bpm - 1)}
             disabled={s.bpm <= TEMPO_MIN}
             aria-label={tMetronome("decrease")}>
-            <Minus className='h-4 w-4' strokeWidth={2.5} />
+            <Minus strokeWidth={2.5} />
           </Button>
           <span className='w-[70px] text-center'>
             <span translate='no' className='font-mono text-lg font-black tabular-nums text-zinc-100'>
@@ -423,12 +423,12 @@ export function MetronomeGapTest({ compact, isSessionRunning, onStartSession }: 
           </span>
           <Button
             variant='ghost'
-            size='icon'
-            className='h-8 w-8 shrink-0'
+            size='icon-sm'
+            className='shrink-0'
             onClick={() => gapTestEngine.setBpm(s.bpm + 1)}
             disabled={s.bpm >= TEMPO_MAX}
             aria-label={tMetronome("increase")}>
-            <Plus className='h-4 w-4' strokeWidth={2.5} />
+            <Plus strokeWidth={2.5} />
           </Button>
           <Slider
             value={[s.bpm]}

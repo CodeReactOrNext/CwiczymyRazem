@@ -121,38 +121,34 @@ export const FirstRiffIntro = ({
       ) : (
         <>
           {t("first_riff_intro.next")}
-          <ArrowRight className='ml-2 h-4 w-4' />
+          <ArrowRight />
         </>
       )}
     </Button>
   );
 
   const secondary = (
-    <button
+    <Button
       type='button'
+      variant='ghost'
+      size='lg'
+      className='w-full lg:w-auto'
       onClick={() =>
         onQuestion
           ? chooseMic(false)
           : index === 0
             ? setWithMic(null)
             : setIndex(index - 1)
-      }
-      className={cn(
-        "flex w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-4 py-3 text-sm transition-colors hover:bg-zinc-800/60 lg:w-auto",
-        onQuestion
-          ? "text-zinc-300 hover:text-zinc-100"
-          : "text-zinc-400 hover:text-zinc-200",
-        FOCUS_RING,
-      )}>
+      }>
       {onQuestion ? (
         t("first_riff_intro.mic_question.no")
       ) : (
         <>
-          <ArrowLeft className='h-4 w-4' />
+          <ArrowLeft />
           {t("first_riff_intro.back")}
         </>
       )}
-    </button>
+    </Button>
   );
 
   return (

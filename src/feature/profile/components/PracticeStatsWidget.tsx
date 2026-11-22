@@ -70,32 +70,32 @@ const CustomTooltip = ({ active, payload, goalMin }: any) => {
   if (!data || data.minutes == null || data.minutes === 0) return null;
 
   return (
-    <div className="bg-zinc-900 border border-white/10 rounded-[8px] p-3 shadow-xl w-max min-w-[140px] max-w-[calc(100vw-2rem)] sm:max-w-[220px]">
-      <p className="text-[11px] font-semibold text-zinc-400 mb-2">{data.dateLabel}</p>
+    <div className="bg-white text-black text-xs rounded-lg p-3 w-max min-w-[140px] max-w-[calc(100vw-2rem)] sm:max-w-[220px]">
+      <p className="text-xs font-semibold text-black/60 mb-2">{data.dateLabel}</p>
       {data.activities && data.activities.length > 0 ? (
         <div>
           <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
             {data.activities.map((act: ActivityDetail, i: number) => (
               <div key={i} className="flex items-center justify-between gap-3">
-                <span className="text-xs text-zinc-200 truncate min-w-0">{act.title}</span>
-                <span className="text-[11px] text-zinc-400 shrink-0 tabular-nums">
+                <span className="text-xs truncate min-w-0">{act.title}</span>
+                <span className="text-[11px] text-black/60 shrink-0 tabular-nums">
                   {formatMin(act.time)}
                 </span>
               </div>
             ))}
           </div>
-          <div className="border-t border-white/10 pt-1.5 mt-1.5 flex items-center justify-between">
-            <span className="text-[11px] text-zinc-400">{t("week_widget.total")}</span>
+          <div className="mt-3 flex items-center justify-between">
+            <span className="text-xs text-black/60">{t("week_widget.total")}</span>
             <span className={cn(
-              "text-[11px] font-bold tabular-nums",
-              data.minutes >= goalMin ? "text-green-400" : "text-zinc-300"
+              "text-xs font-bold tabular-nums",
+              data.minutes >= goalMin ? "text-emerald-700" : "text-black/70"
             )}>
               {formatMin(data.totalMs)}
             </span>
           </div>
         </div>
       ) : (
-        <p className="text-xs text-zinc-300">{t("week_widget.practiced", { time: formatMin(data.totalMs) })}</p>
+        <p className="text-xs">{t("week_widget.practiced", { time: formatMin(data.totalMs) })}</p>
       )}
     </div>
   );
@@ -211,7 +211,7 @@ export const PracticeStatsWidget = ({
   }));
 
   return (
-    <Card className={cn("relative z-20 flex flex-col border-0 bg-zinc-800/40 shadow-sm backdrop-blur-sm p-5 sm:p-6", className)}>
+    <Card className={cn("relative z-20 flex flex-col", className)}>
       <div className="flex flex-col flex-1 gap-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -219,7 +219,7 @@ export const PracticeStatsWidget = ({
           <div className="flex items-center gap-3">
             {dayWithoutBreak > 0 && (
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold leading-none text-zinc-50 tabular-nums">{dayWithoutBreak}</span>
+                <span className="text-3xl font-bold leading-none text-zinc-50 tabular-nums">{dayWithoutBreak}</span>
                 <span className="text-sm font-medium text-zinc-400">{t("layout.facts.streak")}</span>
               </div>
             )}

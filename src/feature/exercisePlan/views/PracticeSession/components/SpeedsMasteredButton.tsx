@@ -56,11 +56,11 @@ export const SpeedsMasteredButton = memo(function SpeedsMasteredButton({
         title={t("speeds_mastered.hint")}
       >
         <Check size='1em' className={cn("shrink-0", compact ? "h-3 w-3" : "h-3.5 w-3.5")} />
-        {!compact && <span className="text-[10px] font-semibold tracking-wide">{t("speeds_mastered.label")}</span>}
+        {!compact && <span className="text-xs font-semibold">{t("speeds_mastered.label")}</span>}
         <span
           className={cn(
             "rounded bg-zinc-900 font-mono",
-            compact ? "px-1 text-[10px]" : "px-1.5 py-0.5 text-xs",
+            compact ? "px-1 text-[11px]" : "px-1.5 py-0.5 text-xs",
             completedBpms.length > 0 ? "text-emerald-400" : "text-zinc-500"
           )}
         >
@@ -93,7 +93,7 @@ export const SpeedsMasteredButton = memo(function SpeedsMasteredButton({
             <DialogClose
               aria-label={t("close")}
               className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "-mr-2 ml-auto")}>
-              <X className='h-4 w-4' />
+              <X />
             </DialogClose>
           </div>
           <BpmProgressGrid

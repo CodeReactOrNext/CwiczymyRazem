@@ -41,7 +41,7 @@ const CoverStat = ({
   children: ReactNode;
 }) => (
   <div title={title} className='flex flex-col gap-0.5'>
-    <span className='flex items-center gap-1.5 text-xl font-bold tabular-nums leading-tight text-zinc-100'>
+    <span className='flex items-center gap-1.5 text-lg font-bold tabular-nums leading-tight text-zinc-100 sm:text-xl'>
       {children}
     </span>
     <span className='text-xs text-zinc-400'>{label}</span>
@@ -56,6 +56,9 @@ const CoverStat = ({
  * One component for the list, the kit's preview and the page header, so a
  * founder trying a banner on sees exactly the card everyone else will, and so
  * the three cannot drift apart over what a guild looks like.
+ *
+ * On the page header (lg) banner and crest are kept low — 64/80 px — so the
+ * tabs and their content start above the fold instead of under a poster.
  *
  * The crest is pulled up over the strip by half its height and the row is
  * aligned to its top, so the crest always sits half on the banner whatever is
@@ -93,6 +96,9 @@ export const GuildCover = ({
 
   const level = Math.max(0, Math.floor(Number(guild.level) || 0));
   const onLap = level % GUILD_LAP_SIZE;
+  const lapPercent = (onLap / GUILD_LAP_SIZE) * 100;
+  // An older guild document may predate the treasury.
+  const treasuryFame = Math.max(0, Math.floor(Number(guild.treasury?.fame) || 0));
 
   return (
     <>
@@ -105,7 +111,7 @@ export const GuildCover = ({
           bannerId={banner.id}
           hex={hex}
           icons={motifIcons(guild.cosmetics)}
-          className={large ? "h-24 sm:h-32" : "h-24 sm:h-28"}
+          className={large ? "h-16 sm:h-20" : "h-24 sm:h-28"}
         />
         {!large && (
           <div className='absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-2'>
@@ -126,14 +132,14 @@ export const GuildCover = ({
       </div>
 
       {/* The crest is the guild's face and is drawn at a size that says so:
-          96px on a card, 128px at the top of the page, half of it hanging
+          96px on a card, 80px at the top of the page (kept short so the tabs stay in view), half of it hanging
           over the banner. The paddings under it keep the name just below the
           banner's edge at either size. */}
       <div className={cn("relative z-10 px-5", className)}>
         <div
           className={cn(
             "flex flex-col gap-x-5 gap-y-3 sm:flex-row sm:items-start sm:justify-between",
-            large ? "-mt-12 sm:-mt-14" : "-mt-10 sm:-mt-12",
+            large ? "-mt-8 sm:-mt-10" : "-mt-10 sm:-mt-12",
           )}>
           <div className='flex min-w-0 flex-1 items-start gap-5'>
             <GuildCrest
@@ -142,7 +148,7 @@ export const GuildCover = ({
               accentHex={hex}
               className={
                 large
-                  ? "h-24 w-24 text-xl sm:h-32 sm:w-32 sm:text-2xl"
+                  ? "h-16 w-16 text-lg sm:h-20 sm:w-20 sm:text-xl"
                   : "h-20 w-20 text-lg sm:h-24 sm:w-24 sm:text-xl"
               }
             />
@@ -150,12 +156,12 @@ export const GuildCover = ({
             <div
               className={cn(
                 "min-w-0 flex-1",
-                large ? "pt-14 sm:pt-16" : "pt-12 sm:pt-14",
+                large ? "pt-10 sm:pt-12" : "pt-12 sm:pt-14",
               )}>
               <Heading
                 className={cn(
                   "flex flex-wrap items-center gap-2 font-bold text-zinc-100",
-                  large ? "text-2xl" : "text-base",
+                  large ? "text-xl sm:text-2xl" : "text-base",
                 )}>
                 <span className='min-w-0 break-words'>{guild.name}</span>
                 {/* The crest has taken the tag's square, so the tag says itself
@@ -187,14 +193,14 @@ export const GuildCover = ({
             <div
               className={cn(
                 "flex shrink-0 items-center gap-2",
-                large ? "sm:pt-16" : "sm:pt-14",
+                large ? "sm:pt-12" : "sm:pt-14",
               )}>
               {actions}
             </div>
           )}
 
           {large && (
-            <div className='flex shrink-0 items-start gap-8 sm:pt-16'>
+            <div className='flex w-full shrink-0 items-start justify-between gap-3 sm:w-auto sm:justify-start sm:gap-8 sm:pt-12'>
               <CoverStat
                 label={t("level")}
                 title={t("level_ring", {
@@ -203,14 +209,39 @@ export const GuildCover = ({
                   lap: GUILD_LAP_SIZE,
                 })}
                 footer={
-                  <span className='mt-1.5 block h-1.5 w-16 overflow-hidden rounded-full bg-zinc-800'>
-                    <span
-                      className='block h-full rounded-full bg-cyan-400'
-                      style={{ width: `${(onLap / GUILD_LAP_SIZE) * 100}%` }}
-                    />
+                  // The lap drawn as the same thick, glossy bar the Milestones
+                  // goal uses — a hairline read as decoration, not progress.
+                  <span className='mt-2 flex items-center gap-2'>
+                    <span className='relative block h-3 w-14 overflow-hidden rounded-full bg-zinc-800 sm:w-24'>
+                      <span
+                        className='absolute inset-y-0 left-0 rounded-full bg-cyan-400 transition-[width] duration-slow ease-out'
+                        style={{ width: `${lapPercent}%` }}
+                      />
+                      {onLap > 0 && (
+                        <span
+                          aria-hidden
+                          className='light-hide absolute left-1.5 top-[3px] h-[3px] rounded-full bg-white/30'
+                          style={{ width: `calc(${lapPercent}% - 12px)` }}
+                        />
+                      )}
+                    </span>
+                    <span className='hidden text-xs tabular-nums text-zinc-500 sm:inline'>
+                      {onLap}/{GUILD_LAP_SIZE}
+                    </span>
                   </span>
                 }>
                 {level}
+              </CoverStat>
+              {/* The guild's own purse — what its members have put in. */}
+              <CoverStat
+                label={t("cover.treasury", "Guild Fame")}
+                title={t("treasury.title")}>
+                <img
+                  src='/images/tokens/coin.png'
+                  alt=''
+                  className='h-[18px] w-[18px] object-contain'
+                />
+                {treasuryFame.toLocaleString()}
               </CoverStat>
               {myHonor && (
                 <CoverStat

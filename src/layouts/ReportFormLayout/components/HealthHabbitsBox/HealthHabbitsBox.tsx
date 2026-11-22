@@ -1,4 +1,5 @@
 import { Card } from "assets/components/ui/card";
+import { Chip } from "assets/components/ui/chip";
 import type { QuestionMarkProps } from "components/UI/QuestionMark";
 import QuestionMark from "components/UI/QuestionMark";
 import { HABBITS_POINTS_VALUE } from "constants/ratingValue";
@@ -101,16 +102,18 @@ const HealthHabbitsBox = ({
               </div>
 
               {isActive && (
-                <span
+                <Chip
                   key={name + "-points"}
-                  className='flex shrink-0 items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-xs font-bold text-emerald-400 duration-base animate-in fade-in zoom-in-95 slide-in-from-right-1'>
+                  color='emerald'
+                  size='sm'
+                  className='shrink-0 duration-base animate-in fade-in zoom-in-95 slide-in-from-right-1'>
                   +{HABBITS_POINTS_VALUE}
                   <img
                     src='/images/tokens/pick.png'
                     alt='points'
                     className='h-3.5 w-3.5 object-contain'
                   />
-                </span>
+                </Chip>
               )}
             </div>
           </div>

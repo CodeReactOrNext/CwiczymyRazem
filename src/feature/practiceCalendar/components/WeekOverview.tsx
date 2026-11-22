@@ -20,7 +20,7 @@ export const WeekOverview = ({
   const percent = planned > 0 ? Math.round((played / planned) * 100) : 0;
 
   return (
-    <section className='grid gap-8 rounded-lg bg-zinc-900/40 p-5 sm:p-6 md:grid-cols-[auto_1fr] md:gap-12'>
+    <section className='grid gap-8 rounded-lg bg-zinc-800/40 p-5 sm:p-6 md:grid-cols-[auto_1fr] md:gap-12'>
       <dl className='flex gap-10'>
         <div>
           <dt className='text-xs text-zinc-400'>{t("week.planned")}</dt>

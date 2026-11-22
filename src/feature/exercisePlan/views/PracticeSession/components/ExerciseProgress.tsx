@@ -24,7 +24,7 @@ export const ExerciseProgress = memo(function ExerciseProgress({
           <span className="text-xs font-semibold text-zinc-500">
             {t("progress.title")}
           </span>
-          <span className="text-[10px] font-semibold tabular-nums tracking-wide text-zinc-400">
+          <span className="text-xs font-semibold tabular-nums text-zinc-400">
             {currentExerciseIndex + 1} <span className="text-zinc-600">/</span> {plan.exercises.length}
           </span>
       </div>
@@ -60,7 +60,7 @@ export const ExerciseProgress = memo(function ExerciseProgress({
               )} />
 
               {/* Subtle hover tooltip showing exercise/song name */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-zinc-900 text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-zinc-900 text-xs font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
                 {label}
               </div>
             </button>

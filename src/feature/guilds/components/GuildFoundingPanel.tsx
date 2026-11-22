@@ -1,4 +1,6 @@
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { GuildCrest } from "feature/guilds/components/GuildCrest";
 import { NewGuildDialog } from "feature/guilds/components/NewGuildDialog";
@@ -36,7 +38,7 @@ export const GuildFoundingPanel = ({
   if (isLoading || !data) {
     return (
       <div className='space-y-8'>
-        <div className='h-40 animate-pulse rounded-lg bg-zinc-900/40' />
+        <Skeleton variant='block' className='h-40' />
       </div>
     );
   }
@@ -48,7 +50,7 @@ export const GuildFoundingPanel = ({
   return (
     <div className='space-y-8'>
       {myGuild ? (
-        <section className='space-y-4 rounded-lg bg-zinc-900/40 p-6'>
+        <section className='space-y-4 rounded-lg bg-zinc-800/40 p-6'>
           <div className='flex flex-wrap items-start justify-between gap-4'>
             <div className='flex items-start gap-3'>
               <GuildCrest logo={myGuild.logo} tag={myGuild.tag} isMine />
@@ -56,9 +58,9 @@ export const GuildFoundingPanel = ({
                 <h3 className='flex items-center gap-2 text-base font-bold text-zinc-100'>
                   {myGuild.name}
                   {myGuild.logo && (
-                    <span className='rounded bg-white/5 px-1.5 py-0.5 text-[10px] font-black tracking-wider text-zinc-500'>
+                    <Chip color='gray' size='sm'>
                       {myGuild.tag}
-                    </span>
+                    </Chip>
                   )}
                 </h3>
                 <p className='mt-0.5 inline-flex items-center gap-1.5 text-xs text-zinc-500'>
@@ -72,12 +74,10 @@ export const GuildFoundingPanel = ({
               </div>
             </div>
 
-            <Button asChild variant='ghost' className='h-9 text-zinc-300'>
+            <Button asChild variant='ghost' className='text-zinc-300'>
               <Link href='/guilds'>
-                <span className='flex items-center gap-2'>
-                  {t("founding.open")}
-                  <ArrowRight size={14} />
-                </span>
+                {t("founding.open")}
+                <ArrowRight size={14} />
               </Link>
             </Button>
           </div>
@@ -90,7 +90,7 @@ export const GuildFoundingPanel = ({
           </p>
         </section>
       ) : (
-        <section className='space-y-5 rounded-lg bg-zinc-900/40 p-6'>
+        <section className='space-y-5 rounded-lg bg-zinc-800/40 p-6'>
           <div className='flex items-start gap-3'>
             <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
               <Shield size={20} />
@@ -109,18 +109,16 @@ export const GuildFoundingPanel = ({
 
           <div className='flex flex-wrap items-center gap-4'>
             <Button onClick={() => setIsFounding(true)} disabled={!canAfford}>
-              <span className='flex items-center gap-2'>
-                <Plus size={16} />
-                {canAfford ? (
-                  <span className='flex items-center gap-1.5'>
-                    {t("founding.cta")}
-                    <SupportToken size={20} />
-                    {data.foundingCost}
-                  </span>
-                ) : (
-                  t("founding.not_enough")
-                )}
-              </span>
+              <Plus size={16} />
+              {canAfford ? (
+                <span className='flex items-center gap-1.5'>
+                  {t("founding.cta")}
+                  <SupportToken size={20} />
+                  {data.foundingCost}
+                </span>
+              ) : (
+                t("founding.not_enough")
+              )}
             </Button>
 
             <Link

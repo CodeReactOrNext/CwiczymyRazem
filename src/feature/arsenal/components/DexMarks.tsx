@@ -21,29 +21,44 @@ import type { CSSProperties } from "react";
  */
 export const DexMarks = ({
   status,
+  inTooltip,
   className,
 }: {
   status: DexStatus;
+  /** On a white tooltip the 400 accents wash out: step to 700 / black/60. */
+  inTooltip?: boolean;
   className?: string;
 }) => {
   const { t } = useTranslation("arsenal");
 
   return (
-  <div className={cn("flex items-center gap-2 text-[10px]", className)}>
+  <div className={cn("flex items-center gap-2 text-[11px]", className)}>
     {status.isOwned && (
-      <span className='flex items-center gap-1 text-cyan-400'>
+      <span
+        className={cn(
+          "flex items-center gap-1",
+          inTooltip ? "text-cyan-700" : "text-cyan-400",
+        )}>
         <CheckCircle2 size={10} />
         {t("dex_marks.owned")}
       </span>
     )}
     {status.inDex && (
-      <span className='flex items-center gap-1 text-zinc-400'>
+      <span
+        className={cn(
+          "flex items-center gap-1",
+          inTooltip ? "text-black/60" : "text-zinc-400",
+        )}>
         <Archive size={10} />
         {t("view.tabs.dex")}
       </span>
     )}
     {!status.isOwned && !status.inDex && (
-      <span className='flex items-center gap-1 font-semibold text-amber-400'>
+      <span
+        className={cn(
+          "flex items-center gap-1 font-semibold",
+          inTooltip ? "text-amber-700" : "text-amber-400",
+        )}>
         <Tag size={10} strokeWidth={2.5} className='shrink-0' />
         {t("dex_marks.new")}
       </span>

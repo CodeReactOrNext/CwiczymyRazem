@@ -1,6 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { FeedbackModal } from "components/FeedbackBubble/FeedbackBubble";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import roadmaps from "data/roadmaps";
 import {
@@ -15,10 +20,8 @@ import { firebaseAddRoadmapStepLog } from "feature/logs/services/addRoadmapStepL
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import {
-  ArrowLeft,
   ArrowRight,
   Lightbulb,
-  Loader2,
   Map,
   Signpost,
 } from "lucide-react";
@@ -207,8 +210,22 @@ const AiCoachView = () => {
     // reads its initial progress once, so mounting it with progressMap still
     // empty would make already-completed steps look forgotten.
     return (
-      <div className='flex justify-center py-16'>
-        <Loader2 className='h-7 w-7 animate-spin text-cyan-500' />
+      <div className='flex w-full flex-col'>
+        <HeroBanner
+          title={selectedStaticRoadmap.title}
+          subtitle={t("goal", { goal: selectedStaticRoadmap.goal })}
+          eyebrow={t("mastery_roadmap")}
+          backgroundContent={<HeroPattern variant='ai' />}
+          rightContent={<BackLink label={t("back")} onClick={handleBack} />}
+        />
+        <div
+          className={cn("flex w-full flex-col gap-6 md:gap-8", PAGE_CONTENT)}
+          aria-busy='true'>
+          <Skeleton variant='block' className='h-48 md:h-56' />
+          {Array.from({ length: 4 }, (_, i) => (
+            <Skeleton key={i} variant='block' className='h-20' />
+          ))}
+        </div>
       </div>
     );
   }
@@ -221,17 +238,9 @@ const AiCoachView = () => {
           subtitle={t("goal", { goal: mergedRoadmap.goal })}
           eyebrow={t("mastery_roadmap")}
           backgroundContent={<HeroPattern variant='ai' />}
-          className='min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]'
-          rightContent={
-            <button
-              onClick={handleBack}
-              className='flex w-fit items-center gap-2 rounded-lg bg-zinc-900/60 px-4 py-2 text-sm text-zinc-400 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-200'>
-              <ArrowLeft className='h-4 w-4' />
-              {t("back")}
-            </button>
-          }
+          rightContent={<BackLink label={t("back")} onClick={handleBack} />}
         />
-        <div className='mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12'>
+        <div className={cn("flex w-full flex-col gap-6 md:gap-8", PAGE_CONTENT)}>
           <RoadmapView
             key={selectedStaticRoadmap.id}
             roadmap={mergedRoadmap}
@@ -250,32 +259,28 @@ const AiCoachView = () => {
   // ─── List view ───
   return (
     <div className='flex w-full flex-col'>
-      <div className='mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12'>
-        {/* A plain title, not a banner — the room goes to the roadmaps. */}
-        <header className='space-y-3'>
+      <HeroBanner
+        title={t("mastery_roadmaps")}
+        subtitle={t("intro")}
+        eyebrowContent={
           <Breadcrumbs
             items={[
               { label: t("practice"), href: "/timer" },
               { label: t("mastery_roadmaps") },
             ]}
           />
-          <div>
-            <h1 className='text-2xl font-bold leading-tight text-white md:text-3xl'>
-              {t("mastery_roadmaps")}
-            </h1>
-            <p className='mt-1 text-sm text-zinc-400'>{t("intro")}</p>
-          </div>
-        </header>
-
+        }
+        backgroundContent={<HeroPattern variant='ai' />}
+      />
+      <div className={cn("flex w-full flex-col gap-6 md:gap-8", PAGE_CONTENT)}>
         {loadingProgress ? (
-          <div className='flex justify-center py-16'>
-            <Loader2 className='h-7 w-7 animate-spin text-cyan-500' />
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2' aria-busy='true'>
+            {Array.from({ length: 4 }, (_, i) => (
+              <Skeleton key={i} variant='block' className='h-64 sm:h-40' />
+            ))}
           </div>
         ) : roadmaps.length === 0 ? (
-          <div className='flex flex-col items-center justify-center gap-3 py-20 text-zinc-500'>
-            <Map className='h-10 w-10 opacity-30' />
-            <span className='text-sm'>{t("empty")}</span>
-          </div>
+          <EmptyState icon={<Map />} title={t("empty")} />
         ) : (
           <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             {sortedRoadmaps.map((rm) => {
@@ -299,7 +304,7 @@ const AiCoachView = () => {
           {/* ─── A roadmap of one's own ─── */}
           <Link
             href='/my-roadmaps'
-            className='flex w-full items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-900/70'>
+            className='flex w-full items-center gap-4 rounded-lg bg-zinc-800/40 px-5 py-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800/60'>
             <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800'>
               <Signpost className='h-4 w-4 text-zinc-400' />
             </div>
@@ -315,7 +320,7 @@ const AiCoachView = () => {
           {/* ─── Suggest a roadmap ─── */}
           <button
             onClick={() => setSuggestOpen(true)}
-            className='flex w-full items-center gap-4 rounded-lg bg-zinc-900/40 px-5 py-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-900/70'>
+            className='flex w-full items-center gap-4 rounded-lg bg-zinc-800/40 px-5 py-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800/60'>
             <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800'>
               <Lightbulb className='h-4 w-4 text-zinc-400' />
             </div>

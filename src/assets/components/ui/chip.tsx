@@ -4,9 +4,14 @@ import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import * as React from "react";
 
 const chipVariants = cva(
-  "inline-flex max-w-full items-center gap-1.5 whitespace-normal break-words rounded-lg px-3 py-1.5 align-middle text-xs font-semibold transition-colors",
+  "inline-flex max-w-full items-center gap-1.5 whitespace-normal break-words align-middle font-semibold transition-colors",
   {
     variants: {
+      size: {
+        default: "rounded-lg px-3 py-1.5 text-xs",
+        // Dense rows (cards, lists, tables): a smaller tag that still reads as the same chip.
+        sm: "gap-1 rounded px-2 py-0.5 text-[11px]",
+      },
       color: {
         // chip-cyan: an ink badge with gold text in the light theme (globals.css).
         cyan: "chip-cyan bg-cyan-950/30 text-cyan-400 hover:bg-cyan-950/50",
@@ -20,9 +25,11 @@ const chipVariants = cva(
         custom: "",
       },
     },
-    defaultVariants: { color: "gray" },
+    defaultVariants: { color: "gray", size: "default" },
   }
 );
+
+export type ChipColor = NonNullable<VariantProps<typeof chipVariants>["color"]>;
 
 export interface ChipProps
   extends Omit<React.HTMLAttributes<HTMLSpanElement>, "color">,
@@ -30,8 +37,8 @@ export interface ChipProps
 
 /** Pill badge (icon + label): tinted translucent fill + bright colored text, same hue, no border. */
 const Chip = React.forwardRef<HTMLSpanElement, ChipProps>(
-  ({ className, color, ...props }, ref) => (
-    <span ref={ref} className={cn(chipVariants({ color, className }))} {...props} />
+  ({ className, color, size, ...props }, ref) => (
+    <span ref={ref} className={cn(chipVariants({ color, size, className }))} {...props} />
   )
 );
 Chip.displayName = "Chip";

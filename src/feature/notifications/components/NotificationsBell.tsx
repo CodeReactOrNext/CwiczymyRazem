@@ -1,11 +1,14 @@
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
-import { Kostek } from "components/Mascot/Kostek";
+import { CountBadge } from "components/CountBadge/CountBadge";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import Avatar from "components/UI/Avatar";
 import { formatDistanceToNow } from "date-fns";
 import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
@@ -352,20 +355,16 @@ export const NotificationsBell = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant='subtle'
-          size='icon'
+          size='icon-touch'
           aria-label={unreadCount > 0 ? t("bell.aria_unread", { count: unreadCount }) : t("bell.aria")}
-          className='group h-11 w-11 data-[state=open]:bg-white/15'>
+          className='group data-[state=open]:bg-white/15'>
           <Bell
             className={cn(
               "text-zinc-400 transition-colors group-hover:text-white",
               "group-data-[state=open]:text-white",
             )}
           />
-          {unreadCount > 0 && (
-            <span className='absolute right-0.5 top-0.5 flex h-5 min-w-5 select-none items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold leading-none text-white'>
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </span>
-          )}
+          {unreadCount > 0 && <CountBadge count={unreadCount} tone='alert' />}
         </Button>
       </DropdownMenuTrigger>
       {/* Portalled outside the app's theme wrapper, so it brings `dark-theme` along — without it
@@ -373,7 +372,7 @@ export const NotificationsBell = () => {
           The base menu's zoom scales from the centre, which on a panel this tall reads as the
           whole thing swelling; it only fades and drops in from under the bell instead. */}
       <DropdownMenuContent
-        className='dark-theme w-[380px] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-lg border-white/10 bg-zinc-900 p-0 text-zinc-100 shadow-none data-[state=closed]:duration-base data-[state=open]:duration-base data-[state=closed]:zoom-out-100 data-[state=open]:zoom-in-100'
+        className='dark-theme w-[380px] max-w-[calc(100vw-1.5rem)] overflow-hidden p-0 data-[state=closed]:duration-base data-[state=open]:duration-base data-[state=closed]:zoom-out-100 data-[state=open]:zoom-in-100'
         align='start'
         sideOffset={10}
         collisionPadding={12}>
@@ -384,50 +383,49 @@ export const NotificationsBell = () => {
               {t("bell.title")}
             </h3>
             {unreadCount > 0 && (
-              <span className='rounded bg-cyan-500/10 px-1.5 py-0.5 text-xs font-semibold tabular-nums text-cyan-400'>
+              <Chip color='cyan' size='sm' className='tabular-nums'>
                 {unreadCount}
-              </span>
+              </Chip>
             )}
           </div>
           {unreadCount > 0 && (
-            <button
+            <Button
+              type='button'
+              variant='ghost'
+              size='sm'
               onClick={(e) => {
                 e.preventDefault();
                 markAllAsRead();
               }}
-              className='flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
-              <CheckCheck className='h-3.5 w-3.5' />
+              className='shrink-0 gap-1.5 [&_svg]:size-3.5'>
+              <CheckCheck />
               {t("bell.mark_all_read")}
-            </button>
+            </Button>
           )}
         </div>
 
         {/* List */}
         <div className='max-h-[60vh] overflow-y-auto [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5'>
           {isLoading ? (
-            <div className='flex flex-col gap-1 p-2'>
+            <div className='flex flex-col gap-1 p-2' aria-busy='true'>
               {[1, 2, 3].map((i) => (
-                <div key={i} className='flex animate-pulse items-start gap-3 p-3'>
-                  <div className='h-10 w-10 shrink-0 rounded-full bg-zinc-800' />
+                <div key={i} className='flex items-start gap-3 p-3'>
+                  <Skeleton className='h-10 w-10 shrink-0 rounded-full' />
                   <div className='flex-1 space-y-2 pt-1'>
-                    <div className='h-3 w-3/4 rounded bg-zinc-800' />
-                    <div className='h-3 w-1/2 rounded bg-zinc-800' />
+                    <Skeleton className='h-3 w-3/4' />
+                    <Skeleton className='h-3 w-1/2' />
                   </div>
                 </div>
               ))}
             </div>
           ) : notifications.length === 0 ? (
-            <div className='flex flex-col items-center gap-4 px-6 pb-14 pt-10 text-center'>
-              <Kostek mood='chill' className='h-16 md:h-20' />
-              <div>
-                <p className='text-sm font-medium text-zinc-200'>
-                  {t("bell.empty_title")}
-                </p>
-                <p className='mt-1 text-xs text-zinc-400'>
-                  {t("bell.empty_body")}
-                </p>
-              </div>
-            </div>
+            <EmptyState
+              size='compact'
+              mood='chill'
+              className='bg-transparent'
+              title={t("bell.empty_title")}
+              description={t("bell.empty_body")}
+            />
           ) : (
             <div className='flex flex-col gap-1 p-2'>
               {notifications.map((n) => {

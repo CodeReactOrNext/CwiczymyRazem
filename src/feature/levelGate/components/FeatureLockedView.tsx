@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { Kostek } from "components/Mascot/Kostek";
+import { pageTitleClass } from "components/PageTitle/PageTitle";
 import type { FeatureUnlock } from "feature/levelGate/data/featureUnlocks";
 import { FEATURE_UNLOCK_LIST } from "feature/levelGate/data/featureUnlocks";
 import {
@@ -41,7 +42,7 @@ const LevelTrack = ({
           className={cn(
             "flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold tabular-nums",
             step.state === "current" && "bg-cyan-500/10 text-cyan-300",
-            step.state === "todo" && "bg-zinc-800/40 text-zinc-500",
+            step.state === "todo" && "bg-zinc-900/40 text-zinc-500",
             step.state === "target" && "bg-zinc-800/60 text-zinc-200",
           )}
           aria-label={
@@ -86,7 +87,7 @@ export const FeatureLockedView = ({
 
   return (
     <div className='mx-auto w-full max-w-3xl px-4 py-10 md:py-16'>
-      <div className='flex flex-col items-center gap-8 rounded-lg bg-zinc-900/40 px-6 py-12 text-center md:gap-10 md:px-14 md:py-16'>
+      <div className='flex flex-col items-center gap-8 rounded-lg bg-zinc-800/40 px-6 py-12 text-center md:gap-10 md:px-14 md:py-16'>
         <div className='flex items-end gap-4 md:gap-6'>
           {/* Kostek nudges: a glance at the level the page is waiting for. */}
           <Kostek mood='nudge' lookAt='right' delay={0.3} className='hidden h-24 sm:block lg:h-32' />
@@ -104,7 +105,7 @@ export const FeatureLockedView = ({
         </div>
 
         <div className='flex flex-col items-center gap-3'>
-          <h1 className='text-2xl font-black tracking-tight text-zinc-100 md:text-3xl'>
+          <h1 className={pageTitleClass}>
             {t("opens_at", { name, lvl: requiredLvl })}
           </h1>
           <p className='text-sm text-zinc-300'>
@@ -139,13 +140,13 @@ export const FeatureLockedView = ({
         </div>
 
         <div className='flex flex-wrap items-center justify-center gap-3'>
-          <Button asChild className='bg-white text-zinc-950 hover:bg-zinc-200'>
+          <Button asChild size='lg'>
             <Link href='/timer'>{t("practise_now")}</Link>
           </Button>
           <Button
             asChild
             variant='ghost'
-            className='bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-zinc-100'>
+            size='lg'>
             <Link href='/wiki/how-scoring-works'>{t("how_levels")}</Link>
           </Button>
         </div>
@@ -164,7 +165,7 @@ export const FeatureLockedView = ({
                     "flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold",
                     open
                       ? "bg-emerald-950/30 text-emerald-400"
-                      : "bg-zinc-800/40 text-zinc-400",
+                      : "bg-zinc-900/40 text-zinc-400",
                   )}>
                   {open ? (
                     <Check size={12} className='text-emerald-400' />

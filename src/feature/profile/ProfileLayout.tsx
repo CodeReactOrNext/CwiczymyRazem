@@ -1,5 +1,8 @@
+import { Card } from "assets/components/ui/card";
 import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
+import { PAGE_CONTENT, PageShell } from "components/PageShell/PageShell";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { useProfileLayout } from "feature/profile/hooks/useProfileLayout";
@@ -111,7 +114,7 @@ const ProfileLayout = ({
         return <AboutSection text={layout.about} />;
       case "insights":
         return (
-          <div className='font-openSans'>
+          <div>
             <PracticeInsights statistics={statistics} />
           </div>
         );
@@ -126,8 +129,9 @@ const ProfileLayout = ({
         );
       case "statistics":
         return (
-          <div className='rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm'>
-            <h2 className='mb-6 text-2xl font-bold text-white'>Statistics</h2>
+          // The stat tiles are the cards here — no frame around them.
+          <div>
+            <SectionHeader size='lg' title='Statistics' className='mb-6' />
             <StatsSection
               statsField={statsField}
               statistics={statistics}
@@ -159,10 +163,10 @@ const ProfileLayout = ({
       case "skills":
         return userSkills &&
           Object.keys(userSkills.unlockedSkills ?? {}).length > 0 ? (
-          <div className='rounded-lg bg-zinc-900/30 p-4 sm:p-6'>
-            <h2 className='mb-6 text-2xl font-bold text-white'>Skills</h2>
+          <Card className='p-5 sm:p-6'>
+            <SectionHeader title='Skills' className='mb-6' />
             <SkillTreeCards isUserProfile userSkills={userSkills} />
-          </div>
+          </Card>
         ) : null;
       case "rig":
         return <ProfileArsenal userAuth={userAuth} />;
@@ -174,7 +178,7 @@ const ProfileLayout = ({
   };
 
   return (
-    <div className='flex flex-col overflow-hidden rounded-xl border-none bg-second-600 shadow-sm md:overflow-visible'>
+    <PageShell className='overflow-hidden md:overflow-visible'>
       <ProfileHeader
         userData={userData}
         userAuth={userAuth}
@@ -185,7 +189,7 @@ const ProfileLayout = ({
         isSongsError={isSongsError}
       />
 
-      <div className='p-4 md:p-6'>
+      <div className={PAGE_CONTENT}>
         <ProfileSections
           layout={layout}
           updateLayout={updateLayout}
@@ -195,7 +199,7 @@ const ProfileLayout = ({
           learnedSongs={songs?.learned ?? []}
         />
       </div>
-    </div>
+    </PageShell>
   );
 };
 

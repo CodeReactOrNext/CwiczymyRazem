@@ -19,7 +19,7 @@ export const PlanSection = ({
   children,
   className,
 }: PlanSectionProps) => (
-  <section className={cn("rounded-lg bg-zinc-900/40 p-5 sm:p-7", className)}>
+  <section className={cn("rounded-lg bg-zinc-800/40 p-5 sm:p-7", className)}>
     <div className='flex items-start justify-between gap-4'>
       <div className='flex gap-4'>
         <span className='pt-0.5 text-xs font-medium tabular-nums text-zinc-500'>

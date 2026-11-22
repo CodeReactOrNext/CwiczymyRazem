@@ -1,3 +1,6 @@
+import { Skeleton } from "assets/components/ui/skeleton";
+import { cn } from "assets/lib/utils";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { GearBoardTab } from "feature/gearProposals/components/GearBoardTab";
@@ -87,20 +90,19 @@ export const SupporterPanelView = () => {
   const { data: board, isLoading } = useSupporterRoadmap(isSupporter);
 
   return (
-    <div className='font-openSans flex w-full flex-col'>
+    <div className='flex w-full flex-col'>
       <HeroBanner
         title={t("panel.title")}
         subtitle={t("panel.subtitle")}
         eyebrow={t("panel.eyebrow")}
         eyebrowClassName='text-amber-400/80'
         backgroundContent={<HeroPattern variant='heart' />}
-        className='min-h-[150px] w-full !rounded-none !shadow-none md:min-h-[120px] lg:min-h-[140px]'
         rightContent={
           isSupporter ? (
             board ? (
               <TokenWalletBar wallet={board.wallet} />
             ) : (
-              <div className='h-[42px] w-[190px] max-w-full animate-pulse rounded-lg bg-zinc-900/60' />
+              <Skeleton className='h-[42px] w-[190px] max-w-full rounded-lg' />
             )
           ) : undefined
         }
@@ -108,11 +110,11 @@ export const SupporterPanelView = () => {
 
       {/* Horizontal padding matches the banner's, so the rail and every tab's
           content line up with the title above them. */}
-      <div className='flex w-full flex-col gap-6 px-6 pb-16 pt-6 md:px-8 lg:px-10'>
+      <div className={cn("flex w-full flex-col gap-6", PAGE_CONTENT)}>
         {isRosterLoading ? (
           // The roster answers "not a supporter" for everyone until it lands,
           // so waiting is what keeps a supporter off the sales pitch.
-          <div className='h-72 animate-pulse rounded-lg bg-zinc-900/40' />
+          <Skeleton variant='block' className='h-72' aria-busy />
         ) : !isSupporter ? (
           // The faces that used to sit under the pitch on their own wall are in
           // the pitch itself now, where they read as part of the ask.

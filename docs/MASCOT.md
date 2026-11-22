@@ -62,7 +62,7 @@ przerwana. Widżet serii na dashboardzie: Kostek nie śpi, dopóki seria trwa.
 | `hop` | jeden podskok, dłonie podrywają się | fala | rezerwowe |
 | `levelUp` | przysiad, obrót w powietrzu, pięść i „rock” w górze | fale | nowy poziom |
 | `approve` | oczy-łuki, podnosi tabliczkę z ptaszkiem i kiwa głową, co chwilę nią potrząsa | — | zaliczone ćwiczenie, koniec ćwiczenia |
-| `wave` | macha dłonią | — | pusty czat (powitanie) |
+| `wave` | macha dłonią | — | pusty czat (powitanie), Home przed pierwszą sesją |
 | `asleep` | zamknięte oczy, przechylony, dłonie opadłe | — | przerwana seria |
 | `emptyCase` | trzyma skrzynię za rączkę, obraca ją do góry dnem, potrząsa — nic nie wypada — i wzrusza wolną dłonią | — | pusta kolekcja (arsenał) |
 | `duel` | zmrużone oczy, miecz w górze, druga dłoń w pięść; jedno cięcie na wejście, potem garda | — | pojedynki: puste krzesło |
@@ -78,10 +78,11 @@ przerwana. Widżet serii na dashboardzie: Kostek nie śpi, dopóki seria trwa.
 | `warmup` | oczy w pół, rozciera dłonie | wolne fale | rezerwowe |
 | `unplugged` | smutne oczy, bez fal; trzyma wtyk z kablem, dźga nim w bok dwa razy i patrzy na niego | — | 404, konfiguracja wejścia bez sygnału |
 | `micOff` | smutne oczy, bez fal; podnosi mikrofon, potrząsa nim i opuszcza | — | mikrofon zablokowany |
+| `micReady` | otwarte oczy na gracza, wyprostowany; wyciąga mikrofon w jego stronę z lekkim podrygiem, chwilę trzyma i opuszcza | fala przy uniesieniu | prośba o dostęp do mikrofonu (pogodny odpowiednik `micOff`) |
 | `plugIn` | mignięcie oczu, podskok z dłońmi w górze | fale | sygnał złapany |
 | `error` | wstrząs, przewraca się na bok i osiada; spiralki, dłonie opadłe na ziemię, chwieje się oszołomiona | — | ekran awarii |
 | `listen` | jedno wielkie ucho z boku głowy (dłoń zamienia się w ucho, cyjanowy zawijas w środku), pochylony w jego stronę; ucho strzyże, ciało pulsuje z sygnałem (`signal`) | fale wg sygnału | kalibracja, puste nagrania |
-| `sad` | smutek | — | niezdany egzamin: ekran wyniku i podsumowanie sesji (bez celebracji i fanfar) |
+| `sad` | smutek | — | niezdany egzamin: ekran wyniku i podsumowanie sesji (bez celebracji i fanfar); przegrany pojedynek (remis i walkower bez wyniku zostają przy `idle`) |
 | `surprised` / `think` | zaskoczenie (dłonie przy twarzy) / namysł (dłoń pod brodą) | — | rezerwowe |
 
 Dodatkowo: `eyesClosed` (zasłania oczy dłońmi przy wpisywaniu hasła), `talking` (oczy pulsują w sylabach,

@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { CountBadge } from "components/CountBadge/CountBadge";
 import { useUnreadMessages as useUnreadChatMessages } from "feature/chat/hooks/useUnreadMessages";
 import { guildChatPath } from "feature/chat/services/chatService";
 import { useUnreadMessages } from "feature/logs/hooks/useUnreadMessages";
@@ -43,20 +44,16 @@ export const CommunityIconButton = ({ onOpen }: CommunityIconButtonProps) => {
     <Button
       type='button'
       variant='subtle'
-      size='icon'
+      size='icon-touch'
       onClick={() => {
         onOpen?.();
         setOpen(true);
       }}
       title={t("community.title")}
       aria-label={label}
-      className='group h-11 w-11'>
+      className='group'>
       <MessagesSquare className='text-zinc-400 transition-colors group-hover:text-white' />
-      {unreadCount > 0 && (
-        <span className='absolute right-0.5 top-0.5 flex h-5 min-w-5 select-none items-center justify-center rounded-full bg-cyan-500 px-1 text-xs font-bold leading-none text-zinc-950'>
-          {unreadCount > 9 ? "9+" : unreadCount}
-        </span>
-      )}
+      {unreadCount > 0 && <CountBadge count={unreadCount} tone='info' />}
       {hasUnreadMessage && (
         <span className='absolute left-1 top-1 h-2 w-2 rounded-full bg-red-500' />
       )}

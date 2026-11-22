@@ -137,7 +137,7 @@ export const PresetBrowser = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align='center'
-          className='z-[999999999] max-h-80 w-64 overflow-y-auto border-0 bg-zinc-900 text-zinc-200'>
+          className='z-[999999999] max-h-80 w-64 overflow-y-auto'>
           {presets.length === 0 && (
             <div className='px-2 py-3 text-center text-xs text-zinc-500'>
               {t("presets.none_saved")}
@@ -157,7 +157,7 @@ export const PresetBrowser = ({
                 <span className='truncate'>{preset.name}</span>
               </span>
               {preset.builtIn ? (
-                <span className='shrink-0 text-[10px] text-zinc-500'>
+                <span className='shrink-0 text-[11px] text-zinc-500'>
                   Built-in
                 </span>
               ) : (

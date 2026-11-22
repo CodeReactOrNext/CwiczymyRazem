@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { Switch } from "assets/components/ui/switch";
 import axios from "axios";
 import { McpSupporterNotice } from "feature/settings/components/McpSupporterNotice";
@@ -6,7 +7,6 @@ import type { User } from "firebase/auth";
 import { useTranslation } from "hooks/useTranslation";
 import { rememberOAuthReturn } from "lib/mcp/oauth/postLoginRedirect";
 import { MCP_SUPPORTERS_ONLY_ERROR } from "lib/mcp/supporterPerk";
-import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -164,8 +164,13 @@ export const OAuthConsentView = () => {
         />
 
         {!described || user === undefined ? (
-          <div className='flex justify-center py-8'>
-            <Loader2 className='h-6 w-6 animate-spin text-zinc-500' />
+          <div className='space-y-6' aria-busy='true'>
+            <div className='space-y-3'>
+              <Skeleton className='h-7 w-3/4' />
+              <Skeleton className='h-4 w-full' />
+            </div>
+            <Skeleton className='h-20 rounded-lg' />
+            <Skeleton className='h-10 rounded-lg' />
           </div>
         ) : bounce ? (
           <div className='space-y-4'>

@@ -54,13 +54,13 @@ export const BuyButton = ({
     solid: "bg-arsenal-accent text-arsenal-bg hover:bg-arsenal-accent/90",
     soft: "bg-arsenal-accent/15 text-arsenal-accent hover:bg-arsenal-accent/25",
     key: "bg-zinc-800 text-zinc-100 hover:bg-zinc-700",
-    primary: "bg-zinc-100 text-zinc-900 hover:bg-white",
+    primary: "bg-primary text-primary-foreground hover:bg-primary/90",
   }[variant];
   const priceInk = {
     solid: "text-arsenal-bg",
     soft: "text-amber-400",
     key: "text-amber-400",
-    primary: "text-zinc-900",
+    primary: "text-primary-foreground",
   }[variant];
 
   return (

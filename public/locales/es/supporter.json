@@ -813,5 +813,9 @@
       "boards": "Pedaleras",
       "cables": "Cables"
     }
+  },
+  "toast": {
+    "idea_posted": "Idea publicada",
+    "proposal_filed": "Propuesta enviada"
   }
 }

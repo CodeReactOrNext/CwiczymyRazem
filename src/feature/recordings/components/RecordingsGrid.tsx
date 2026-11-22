@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { Skeleton } from "assets/components/ui/skeleton";
-import { Kostek } from "components/Mascot/Kostek";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import type { Recording } from "feature/recordings/types/types";
 import { useTranslation } from "hooks/useTranslation";
 
@@ -21,7 +21,7 @@ const GRID_CLASS = "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3";
 
 /** Mirrors RecordingCard's shape so the grid keeps its geometry while loading. */
 const RecordingCardSkeleton = () => (
-  <div className='flex flex-col overflow-hidden rounded-lg bg-zinc-900/40'>
+  <div className='flex flex-col overflow-hidden rounded-lg bg-zinc-800/40'>
     <Skeleton className='aspect-video w-full rounded-none' />
     <div className='flex flex-col gap-3 p-4'>
       <Skeleton className='h-[2.75rem] w-full rounded' />
@@ -32,7 +32,7 @@ const RecordingCardSkeleton = () => (
         <Skeleton className='h-3 w-28 rounded' />
       </div>
     </div>
-    <div className='h-11 bg-zinc-800/30' />
+    <div className='h-11' />
   </div>
 );
 
@@ -56,15 +56,13 @@ export const RecordingsGrid = ({
   }
 
   if (recordings.length === 0) {
+    // Nothing recorded: Kostek is all ears for the first take.
     return (
-      <div className='flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-        {/* Nothing recorded: Kostek is all ears for the first take. */}
-        <Kostek mood='listen' className='h-24 md:h-36' />
-        <h3 className='text-lg font-bold text-zinc-100'>{t("grid.empty_title")}</h3>
-        <p className='text-sm text-zinc-400'>
-          {t("grid.empty_body")}
-        </p>
-      </div>
+      <EmptyState
+        mood='listen'
+        title={t("grid.empty_title")}
+        description={t("grid.empty_body")}
+      />
     );
   }
 

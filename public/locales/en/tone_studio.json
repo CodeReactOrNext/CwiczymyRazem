@@ -2,7 +2,10 @@
   "common": {
     "loading": "Loading…",
     "cancel": "Cancel",
-    "select": "Select…"
+    "select": "Select…",
+    "web_only_title": "Tone Studio is only available in the desktop app",
+    "web_only_body": "Download and run the riff.quest desktop app to shape your tone and load custom IRs.",
+    "web_only_cta": "Get the desktop app"
   },
   "chain": {
     "gate": "Gate",

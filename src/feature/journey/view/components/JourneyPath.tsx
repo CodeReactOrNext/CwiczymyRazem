@@ -1,10 +1,11 @@
-import { buttonVariants } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
-import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { BackLink } from "components/BackLink/BackLink";
+import { PageTitle } from "components/PageTitle/PageTitle";
 import type { RoadPathStop } from "components/RoadPath/RoadPath";
 import { RoadPath, roadWaveX } from "components/RoadPath/RoadPath";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, ChevronLeft, Star } from "lucide-react";
+import { Check, Star } from "lucide-react";
 import type { ReactNode } from "react";
 import React from "react";
 
@@ -14,10 +15,11 @@ import type {
 } from "../../types/journey.types";
 import { getStepIcon } from "../../utils/stepIcons";
 import { JourneyFinishCard } from "./JourneyFinishCard";
+import { JourneyLandmark } from "./JourneyLandmark";
 
 // ─── Step label ───────────────────────────────────────────────────────────────
 
-/** Beside each step on the road: its number, its name, and how it went. */
+/** Beside each step on the road: its number and its name. */
 function StepLabel({ step }: { step: JourneyStepWithStatus }) {
   const { t } = useTranslation("journey");
   const isLocked = step.status === "locked";
@@ -27,8 +29,8 @@ function StepLabel({ step }: { step: JourneyStepWithStatus }) {
     <>
       <span
         className={cn(
-          "text-[10px] font-bold tabular-nums",
-          isLocked ? "text-zinc-700" : "text-zinc-500",
+          "text-xs font-bold tabular-nums",
+          isLocked ? "text-zinc-600" : "text-zinc-500",
         )}>
         #{step.order}
       </span>
@@ -44,24 +46,36 @@ function StepLabel({ step }: { step: JourneyStepWithStatus }) {
         {step.title}
       </p>
       {step.status === "in-progress" && (
-        <span className='mt-1 rounded bg-cyan-500/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-cyan-400'>
+        <Chip color='cyan' size='sm' className='mt-1'>
           {t("sidebar.status.in-progress")}
-        </span>
-      )}
-      {isCompleted && step.stars && (
-        <div className='mt-1 flex items-center gap-0.5'>
-          {[1, 2, 3].map((i) => (
-            <Star
-              key={i}
-              size={9}
-              className={i <= step.stars! ? "text-amber-400" : "text-zinc-700"}
-            />
-          ))}
-        </div>
+        </Chip>
       )}
     </>
   );
 }
+
+/**
+ * How a finished step went, on a dark pill just under its key: filled stars
+ * with a lip like the keys, empty ones solid zinc. The pill gives them their
+ * own ground, so they read on the road and on any backdrop.
+ */
+const StarPill = ({ stars }: { stars: 1 | 2 | 3 }) => (
+  <span className='flex items-center gap-[3px] rounded-full bg-zinc-950 px-2 pb-[5px] pt-1'>
+    {[1, 2, 3].map((i) => (
+      <Star
+        key={i}
+        size={16}
+        strokeWidth={0}
+        className={
+          i <= stars
+            ? "fill-amber-400 drop-shadow-[0_1.5px_0_rgb(180,83,9)]"
+            : "fill-zinc-700"
+        }
+      />
+    ))}
+    <span className='sr-only'>{stars}/3</span>
+  </span>
+);
 
 /** The tick on a finished step's corner. */
 const DoneBadge = () => (
@@ -76,12 +90,23 @@ const DoneBadge = () => (
 
 /**
  * A sign on the road where a section starts. Solid, so the road passes behind
- * it, and big enough to find a section while scrolling past it.
+ * it, and big enough to find a section while scrolling past it. Beside it, on
+ * alternating sides, the section's landmark.
  */
-function StageDivider({ order, label }: { order: number; label: string }) {
+function StageDivider({
+  order,
+  label,
+  moduleId,
+  stageId,
+}: StageSign & { moduleId: string }) {
   const { t } = useTranslation("journey");
   return (
-    <div className='flex justify-center py-3'>
+    <div className='relative flex w-full justify-center py-3'>
+      <JourneyLandmark
+        moduleId={moduleId}
+        stageId={stageId}
+        side={order % 2 === 1 ? "left" : "right"}
+      />
       <div className='flex flex-col items-center rounded-xl bg-zinc-800 px-6 py-2.5 text-center'>
         <span className='text-xs font-medium tabular-nums text-zinc-400'>
           {t("path.stage", { n: order })}
@@ -96,7 +121,7 @@ function StageDivider({ order, label }: { order: number; label: string }) {
 
 // ─── Path entries ─────────────────────────────────────────────────────────────
 
-type StageSign = { order: number; label: string };
+type StageSign = { order: number; label: string; stageId: string };
 
 type PathEntry =
   | { kind: "divider"; id: string; sign: StageSign }
@@ -109,7 +134,7 @@ function buildEntries(module: JourneyModuleWithStatus): PathEntry[] {
       entries.push({
         kind: "divider",
         id: `divider_${stage.id}`,
-        sign: { order: index + 1, label: stage.label },
+        sign: { order: index + 1, label: stage.label, stageId: stage.id },
       });
     stage.steps.forEach((step) =>
       entries.push({ kind: "step", id: step.id, step }),
@@ -126,7 +151,10 @@ interface JourneyPathProps {
   openStepId?: string | null;
   onStepClick: (step: JourneyStepWithStatus) => void;
   /** What opens under the tapped step; `pointerOffset` puts the bubble's pointer under it. */
-  renderBubble?: (step: JourneyStepWithStatus, pointerOffset: number) => ReactNode;
+  renderBubble?: (
+    step: JourneyStepWithStatus,
+    pointerOffset: number,
+  ) => ReactNode;
   onBack: () => void;
 }
 
@@ -165,53 +193,35 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
       // The bubble says it now, so the tag over the start would only repeat it.
       startLabel: isStart && !isOpen ? t("path.start") : undefined,
       badge: step.status === "completed" ? <DoneBadge /> : undefined,
+      below:
+        step.status === "completed" && step.stars ? (
+          <StarPill stars={step.stars} />
+        ) : undefined,
       label: <StepLabel step={step} />,
       before: pendingDivider ? (
-        <StageDivider {...pendingDivider} />
+        <StageDivider {...pendingDivider} moduleId={module.id} />
       ) : undefined,
-      after: isOpen && renderBubble ? renderBubble(step, roadWaveX(index)) : undefined,
+      after:
+        isOpen && renderBubble
+          ? renderBubble(step, roadWaveX(index))
+          : undefined,
       onClick: () => onStepClick(step),
     });
     pendingDivider = null;
   });
 
   return (
-    <div className='relative flex-1 overflow-y-auto bg-zinc-950'>
+    <div className='relative flex-1 overflow-y-auto'>
       {/* ── Hero banner ── */}
       <div className='relative overflow-hidden px-4 pb-2 pt-5 md:px-10 md:py-10'>
-        <GuitarPatternBackground className='pointer-events-none absolute inset-0 h-full w-full' />
-        <div
-          className='light-hide pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full opacity-30'
-          style={{
-            background:
-              "radial-gradient(ellipse at center, rgba(6,182,212,0.25) 0%, transparent 70%)",
-          }}
-        />
-
         <div className='relative'>
-          <button
-            type='button'
+          <BackLink
+            label={t("path.modules")}
             onClick={onBack}
-            className={cn(
-              buttonVariants({ variant: "subtle", size: "sm" }),
-              "group mb-3 gap-1.5 text-zinc-400 md:mb-6",
-            )}>
-            <ChevronLeft
-              size={12}
-              strokeWidth={3}
-              className='transition-transform group-hover:-translate-x-0.5'
-            />
-            {t("path.modules")}
-          </button>
+            className='mb-3 md:mb-6'
+          />
 
-          <div>
-            <h1 className='font-display text-2xl font-black tracking-tight text-zinc-100 md:text-4xl'>
-              {module.title}
-            </h1>
-            <p className='mt-1 max-w-xs text-sm text-zinc-400'>
-              {module.subtitle}
-            </p>
-          </div>
+          <PageTitle title={module.title} subtitle={module.subtitle} />
 
           <div className='mt-3 flex items-center gap-3 md:mt-6'>
             <div className='h-1.5 w-40 overflow-hidden rounded-full bg-zinc-800'>
@@ -236,15 +246,14 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
       </div>
 
       {/* ── Path ── */}
-      <div className='relative px-3 py-0 md:px-10 md:py-4'>
-        {/* Ambient texture — same tiled watermark used on /login, not a graphic */}
-        <GuitarPatternBackground className='pointer-events-none absolute inset-0 h-full w-full' />
-
+      {/* Clips sideways: the landmarks peek in from past the screen edge. */}
+      <div className='relative overflow-x-clip px-3 py-0 md:px-10 md:py-4'>
         {/* The finish line, on the road whether or not it has been reached:
             the guitar waiting at the end is the reason to keep walking it. */}
         <RoadPath
           stops={stops}
-          className='pb-14 pt-4 md:pt-10'
+          trail='band'
+          className='gap-[72px] pb-14 pt-4 md:pt-10'
           footer={
             <JourneyFinishCard
               moduleId={module.id}

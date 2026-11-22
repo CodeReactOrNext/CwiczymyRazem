@@ -37,7 +37,7 @@ export const SessionTooltip = ({
               {keys.map((key) => (
                 <kbd
                   key={key}
-                  className='font-mono rounded bg-zinc-950/10 px-1.5 py-0.5 text-[10px] font-bold text-zinc-700'>
+                  className='font-mono rounded bg-black/10 px-1.5 py-0.5 text-xs font-bold text-black/70'>
                   {key}
                 </kbd>
               ))}

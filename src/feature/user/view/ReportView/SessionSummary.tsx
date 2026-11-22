@@ -1,6 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { CalendarDays, ListChecks } from "lucide-react";
+import { CalendarDays, Check, ListChecks } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { formatPracticed, MINUTE_MS } from "./helpers/sessionSongs";
@@ -13,6 +13,8 @@ export interface SessionSummaryLine {
   isName: boolean;
   /** The line's cover or category icon. */
   leading: ReactNode;
+  /** The share bar's colour — its category's; emerald when left out. */
+  barClassName?: string;
 }
 
 interface SessionSummaryProps {
@@ -28,6 +30,11 @@ interface SessionSummaryProps {
   };
   /** The save button and whatever belongs under it. */
   footer?: ReactNode;
+  /**
+   * The session can be saved as it is. A tick says so above the save, so
+   * nobody fills in the optional parts thinking they have to.
+   */
+  isReady?: boolean;
 }
 
 const metaChipClass =
@@ -44,6 +51,7 @@ const SessionSummary = ({
   totalMs,
   meta,
   footer,
+  isReady = false,
 }: SessionSummaryProps) => {
   const { t } = useTranslation("report");
   const totalMinutes = totalMs / MINUTE_MS;
@@ -93,7 +101,10 @@ const SessionSummary = ({
                   </div>
                   <div className='h-1.5 overflow-hidden rounded-full bg-zinc-800'>
                     <div
-                      className='h-full rounded-full bg-emerald-500 transition-[width] duration-slow'
+                      className={cn(
+                        "h-full rounded-full transition-[width] duration-slow",
+                        line.barClassName ?? "bg-emerald-500",
+                      )}
                       style={{ width: `${share * 100}%` }}
                     />
                   </div>
@@ -123,6 +134,17 @@ const SessionSummary = ({
             <ListChecks className='h-4 w-4 shrink-0 text-zinc-400' />
             {meta.habitsLabel}
           </button>
+        </div>
+      )}
+
+      {isReady && (
+        <div className='flex items-center gap-3 rounded-lg bg-emerald-500/10 p-4 duration-base animate-in fade-in slide-in-from-bottom-1'>
+          <span className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-zinc-950'>
+            <Check className='h-4 w-4' strokeWidth={3} />
+          </span>
+          <p className='text-sm font-semibold text-emerald-300'>
+            {t("flow.ready_title")}
+          </p>
         </div>
       )}
 

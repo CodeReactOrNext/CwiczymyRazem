@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { PluginLibrary } from "feature/toneStudio/components/vst/PluginLibrary";
 import { RackFlow } from "feature/toneStudio/components/vst/RackFlow";
 import { useVstHost } from "feature/toneStudio/hooks/useVstHost";
@@ -47,13 +48,15 @@ export const VstRackView = () => {
       {vst.actionError && (
         <div className='flex items-start gap-3 rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-400'>
           <span className='min-w-0 flex-1'>{vst.actionError}</span>
-          <button
+          <Button
             type='button'
+            variant='ghost'
+            size='icon-sm'
             onClick={vst.dismissError}
             aria-label={t("rack_vst.dismiss")}
-            className='rounded p-0.5 text-red-400/70 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400 hover:text-red-300'>
-            <X size={14} />
-          </button>
+            className='-my-1 shrink-0 text-red-400 hover:text-red-300'>
+            <X />
+          </Button>
         </div>
       )}
 

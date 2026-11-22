@@ -1,26 +1,23 @@
 // eslint-disable-next-line simple-import-sort/imports
 import React from "react";
 import { Button } from "assets/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "assets/components/ui/alert-dialog";
+import { ConfirmDialog } from "components/ConfirmDialog/ConfirmDialog";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "assets/components/ui/tabs";
+import { BackLink } from "components/BackLink/BackLink";
+import { cn } from "assets/lib/utils";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
+import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft, BookOpen, Flame, Music, Zap, Plus } from "lucide-react";
+import { Flame, Music, Zap, Plus } from "lucide-react";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { motion } from "framer-motion";
 
@@ -53,25 +50,6 @@ const getLocalizedTitle = (value: string | { en?: string; pl?: string } | undefi
   if (typeof value === 'string') return value;
   return value.pl || value.en || '';
 };
-
-interface SectionHeaderProps {
-  title: string;
-  subtitle?: string;
-  action?: React.ReactNode;
-}
-
-const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) => (
-  <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-    <div className="flex items-center gap-3">
-      <div className="h-8 w-[3px] rounded-full bg-gradient-to-b from-cyan-400 to-cyan-400/0" />
-      <div>
-        <h2 className="text-base font-black text-white">{title}</h2>
-        {subtitle && <p className="mt-0.5 text-[11px] text-zinc-500">{subtitle}</p>}
-      </div>
-    </div>
-    {action && <div className="shrink-0">{action}</div>}
-  </div>
-);
 
 interface MyPlansProps {
   onPlanSelect: (plan: ExercisePlan) => void;
@@ -193,10 +171,10 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
         prevPlans.map((p) => (p.id === updatedPlan.id ? updatedPlan : p))
       );
       setEditingPlan(null);
-      toast.success(t("common:success") as string);
+      toast.success(t("exercises:my_plans.update_success") as string);
     } catch (error) {
       logger.error(error, { context: "handleUpdatePlan" });
-      toast.error(t("common:error") as string);
+      toast.error(t("exercises:my_plans.update_error") as string);
     }
   };
 
@@ -242,7 +220,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
     return (
       <div
         aria-busy
-        className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${hideLayout ? "px-3 md:px-6" : ""}`}>
+        className={cn("grid gap-6 sm:grid-cols-2 lg:grid-cols-3", hideLayout && PAGE_CONTENT)}>
         {[0, 1, 2].map((i) => (
           <Skeleton key={i} variant='block' className='h-[188px]' />
         ))}
@@ -254,10 +232,11 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
     return (
       <div className='container mx-auto px-4 lg:px-8 py-8 md:py-12'>
         <div className='mb-6 flex items-center gap-4 px-4'>
-          <Button variant='ghost' className='shrink-0' onClick={() => setEditingPlan(null)}>
-            <ArrowLeft className='' />
-            {t("common:back")}
-          </Button>
+          <BackLink
+            label={t("common:back")}
+            onClick={() => setEditingPlan(null)}
+            className='shrink-0'
+          />
           <span className='truncate text-sm font-semibold text-zinc-300'>
             {getLocalizedTitle(editingPlan.title)}
           </span>
@@ -272,23 +251,15 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
       const difficultyPlans = sourcePlans.filter((p) => p.difficulty === difficulty);
       if (difficultyPlans.length === 0) return null;
 
-      const difficultyLabel = {
-        beginner: { color: "text-sky-500" },
-        easy: { color: "text-emerald-500" },
-        medium: { color: "text-amber-500" },
-        hard: { color: "text-red-500" }
-      }[difficulty];
-
       return (
         <div key={difficulty} className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className={`h-1.5 w-1.5 rounded-full bg-current ${difficultyLabel.color}`} />
-            <h3 className={`text-xs font-black ${difficultyLabel.color}`}>
-              {t(`common:difficulty.${difficulty}`)}
-            </h3>
-            <div className="h-px flex-1 bg-white/5" />
-          </div>
-          
+          <SectionHeader
+            as="h3"
+            title={t(`common:difficulty.${difficulty}`)}
+            count={difficultyPlans.length}
+            className="mb-0"
+          />
+
           <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
             {difficultyPlans.map((plan) => {
               const locked = !!plan.premium && !isPremium;
@@ -312,32 +283,23 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   const content = (
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         {/* Navigation Switcher */}
-        {!controlledTab && (["routines", "playalongs", "my_plans"] as const).filter(t => !hideTabs.includes(t)).length > 1 && <div className="mb-10 md:mb-12 sticky top-4 z-40 md:static">
-          <TabsList className="bg-zinc-900/80 backdrop-blur-md border border-white/5 p-1 rounded-2xl h-auto md:bg-transparent md:border-none md:p-0 md:rounded-none md:justify-start md:space-x-12 md:w-full overflow-hidden shadow-2xl md:shadow-none w-full flex">
+        {!controlledTab && (["routines", "playalongs", "my_plans"] as const).filter(t => !hideTabs.includes(t)).length > 1 && <div className="mb-10 md:mb-12">
+          <TabsList className={tabNavListClass}>
             {!hideTabs.includes("routines") && (
-              <TabsTrigger
-                value="routines"
-                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold text-xs md:text-[13px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
-              >
-                <Music size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
+              <TabsTrigger value="routines" className={tabNavTriggerClass}>
+                <Music size={16} />
                 <span>{t("plans:my.routines")}</span>
               </TabsTrigger>
             )}
             {!hideTabs.includes("playalongs") && (
-              <TabsTrigger
-                value="playalongs"
-                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold text-xs md:text-[12px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
-              >
-                <Zap size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
+              <TabsTrigger value="playalongs" className={tabNavTriggerClass}>
+                <Zap size={16} />
                 <span>{t("plans:my.playalongs")}</span>
               </TabsTrigger>
             )}
             {!hideTabs.includes("my_plans") && (
-              <TabsTrigger
-                value="my_plans"
-                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold text-xs md:text-[12px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
-              >
-                <Flame size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
+              <TabsTrigger value="my_plans" className={tabNavTriggerClass}>
+                <Flame size={16} />
                 <span>{t("plans:my.my_plans")}</span>
               </TabsTrigger>
             )}
@@ -356,13 +318,12 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
           {!hideSectionHeader && (
             <SectionHeader
               title={t("plans:my.custom_title")}
-              subtitle={t("exercises:my_plans.custom_plans_description") as string}
+              description={t("exercises:my_plans.custom_plans_description") as string}
               action={
                 <Button
                   onClick={() => isPremium ? router.push('/plans/create') : setShowUpgradeModal(true)}
-                  className="bg-white hover:bg-zinc-100 text-black font-bold text-xs h-9 px-5 rounded-lg transition-all"
                 >
-                  <Plus size='1em' className="h-3 w-3" />
+                  <Plus />
                   {t("exercises:my_plans.create_plan")}
                 </Button>
               }
@@ -371,39 +332,39 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
           {plans.length === 0 ? (
             // The one place to start a first plan: say what a plan is, show a
             // tiny example, and offer the ready-made plans as a way in.
-            <div className="flex flex-col items-center gap-6 rounded-lg bg-zinc-900/40 px-6 py-12 text-center">
-              <div className="space-y-2">
-                <p className="font-semibold text-zinc-100">{t("exercises:my_plans.no_custom_plans")}</p>
-                <p className="mx-auto max-w-md text-sm text-zinc-400">
-                  {t("plans:my.what_is_plan")}
-                </p>
-              </div>
-              <div className="w-full max-w-xs space-y-1.5 rounded-lg bg-zinc-800/40 p-4 text-left text-sm">
-                <p className="text-xs font-semibold text-zinc-500">{t("plans:my.for_example")}</p>
-                {[
-                  [t("plans:my.example_1"), "5 min"],
-                  [t("plans:my.example_2"), "10 min"],
-                  [t("plans:my.example_3"), "10 min"],
-                ].map(([name, time]) => (
-                  <div key={name} className="flex items-center justify-between text-zinc-300">
-                    <span>{name}</span>
-                    <span className="tabular-nums text-zinc-500">{time}</span>
+            <EmptyState
+              title={t("exercises:my_plans.no_custom_plans")}
+              description={t("plans:my.what_is_plan")}
+              action={
+                <div className="flex w-full flex-col items-center gap-6">
+                  <div className="w-full max-w-xs space-y-1.5 text-left text-sm">
+                    <p className="text-xs font-semibold text-zinc-400">{t("plans:my.for_example")}</p>
+                    {[
+                      [t("plans:my.example_1"), "5 min"],
+                      [t("plans:my.example_2"), "10 min"],
+                      [t("plans:my.example_3"), "10 min"],
+                    ].map(([name, time]) => (
+                      <div key={name} className="flex items-center justify-between text-zinc-300">
+                        <span>{name}</span>
+                        <span className="tabular-nums text-zinc-500">{time}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <div className="flex flex-col items-center gap-3">
-                <Button onClick={() => isPremium ? router.push('/plans/create') : setShowUpgradeModal(true)}>
-                  {t("exercises:my_plans.create_first")}
-                </Button>
-                <button
-                  type="button"
-                  onClick={() => router.push("/timer/plans")}
-                  className="text-xs font-semibold text-zinc-400 transition-colors hover:text-cyan-400"
-                >
-                  {t("plans:my.ready_made")}
-                </button>
-              </div>
-            </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Button size='lg' onClick={() => isPremium ? router.push('/plans/create') : setShowUpgradeModal(true)}>
+                      {t("exercises:my_plans.create_first")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => router.push("/timer/plans")}
+                    >
+                      {t("plans:my.ready_made")}
+                    </Button>
+                  </div>
+                </div>
+              }
+            />
           ) : (
             <>
             {plans.length > 1 && (
@@ -437,35 +398,23 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   const modal = (
     <>
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
-      <AlertDialog open={!!planPendingDelete} onOpenChange={(open) => !open && setPlanPendingDelete(null)}>
-        <AlertDialogContent className="border-none bg-zinc-900 text-zinc-100 sm:rounded-xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-display text-zinc-50">{t("plans:my.delete_title")}</AlertDialogTitle>
-            <AlertDialogDescription className="leading-relaxed text-zinc-400">
-              {t("plans:my.delete_body", { title: getLocalizedTitle(planPendingDelete?.title) })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="border-none bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-zinc-100">
-              {t("plans:cancel")}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(event) => {
-                event.preventDefault();
-                if (planPendingDelete) handleDeletePlan(planPendingDelete.id);
-              }}
-              className="bg-rose-600 text-white hover:bg-rose-500"
-            >
-              {t("plans:delete")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={!!planPendingDelete}
+        onOpenChange={(open) => !open && setPlanPendingDelete(null)}
+        title={t("plans:my.delete_title")}
+        description={t("plans:my.delete_body", { title: getLocalizedTitle(planPendingDelete?.title) })}
+        cancelLabel={t("plans:cancel")}
+        confirmLabel={t("plans:delete")}
+        onConfirm={() => {
+          if (planPendingDelete) handleDeletePlan(planPendingDelete.id);
+        }}
+        destructive
+      />
     </>
   );
 
   if (hideLayout) {
-    return <>{<div className="px-3 md:px-6">{content}</div>}{modal}</>;
+    return <>{<div className={PAGE_CONTENT}>{content}</div>}{modal}</>;
   }
 
   return (
@@ -473,7 +422,6 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
       <ExerciseLayout
         title={t("exercises:tabs.my_plans")}
         subtitle={t("plans:my.subtitle")}
-        icon={<BookOpen size={18} />}
       >
         {content}
       </ExerciseLayout>

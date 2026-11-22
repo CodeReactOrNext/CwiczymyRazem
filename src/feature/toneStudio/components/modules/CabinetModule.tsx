@@ -1,3 +1,4 @@
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { Faceplate } from "feature/toneStudio/components/Faceplate";
 import {
@@ -104,9 +105,9 @@ export const CabinetModule = ({
             }>
             <span className='truncate'>{ir.name}</span>
             {ir.truncated && (
-              <span className='shrink-0 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-400'>
+              <Chip color='amber' size='sm' className='shrink-0'>
                 {t("cab.truncated")}
-              </span>
+              </Chip>
             )}
             {params.irId === ir.id && <Check size={14} className='shrink-0' />}
           </PickerRow>

@@ -5,7 +5,11 @@
     "comment_added": "Kommentar hinzugefügt!",
     "comment_failed": "Kommentar konnte nicht hinzugefügt werden.",
     "logged_out": "Du musst angemeldet sein.",
-    "bad_url": "Bitte gib eine gültige YouTube-URL ein."
+    "bad_url": "Bitte gib eine gültige YouTube-URL ein.",
+    "updated": "Aufnahme aktualisiert.",
+    "update_failed": "Aufnahme konnte nicht aktualisiert werden.",
+    "deleted": "Aufnahme gelöscht.",
+    "delete_failed": "Aufnahme konnte nicht gelöscht werden."
   },
   "modal": {
     "edit_title": "Aufnahme bearbeiten",
@@ -52,7 +56,12 @@
     "subtitle": "Hör dir deine Übungssessions an und teile sie",
     "add": "Aufnahme hinzufügen",
     "all": "Alle Aufnahmen",
-    "mine": "Meine Aufnahmen"
+    "mine": "Meine Aufnahmen",
+    "count_one": "{{count}} Aufnahme",
+    "count_other": "{{count}} Aufnahmen",
+    "sort_newest": "Neueste",
+    "sort_popular": "Am beliebtesten",
+    "sort_label": "Aufnahmen sortieren"
   },
   "viewer": {
     "not_found": "Aufnahme nicht gefunden",

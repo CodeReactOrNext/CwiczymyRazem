@@ -1,256 +1,150 @@
 import { Button } from "assets/components/ui/button";
-import { Card } from "assets/components/ui/card";
-import type { SeasonalAchievement } from "feature/profile/services/seasonalAchievementsService";
-import { getUserSeasonalAchievements } from "feature/profile/services/seasonalAchievementsService";
+import { cn } from "assets/lib/utils";
+import { rankRowLineClass } from "feature/leadboard/components/RankRow";
+import {
+  placeKeyClass,
+  rankCardClass,
+  rankScoreClass,
+} from "feature/leadboard/components/rankRowStyles";
+import { useSeasonalAchievements } from "feature/profile/hooks/useSeasonalAchievements";
 import { useTranslation } from "hooks/useTranslation";
-import { 
-  Award as AwardIcon,
-  Crown,
-  ExternalLink,
-  Medal as MedalIcon,
-  Star,
-  Trophy as TrophyIcon,
-} from "lucide-react";
+import { useIntlLocale } from "lib/i18n/dateLocale";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+import { formatSeasonMonth, summarizeSeasonFinishes } from "./seasonFinishes";
 
 interface SeasonalAchievementProps {
   userId?: string;
-  /** When true, render nothing (instead of a placeholder/loading card) if there are no achievements. */
+  /** When true, render nothing (instead of an empty card) if there are no finishes. */
   hideWhenEmpty?: boolean;
 }
 
+/** The newest finishes on show; the rest wait behind "Show all". */
+const VISIBLE_FINISHES = 3;
+
+/**
+ * Where a player finished each season they ended in the top 10.
+ *
+ * Set as rows of the leaderboard they came from, not as trophies of their own:
+ * the medal key in Teko, the podium light and the points as the score are the
+ * same pieces the leaderboard, duels and the daily board use, so a finish here
+ * reads as that board's row, kept.
+ *
+ * The points are the score rather than the Fame the place paid: the payout
+ * ladder changed twice (nothing before March 2026, then 500 for 1st, now 2000),
+ * and a past season is not stored with what it actually paid.
+ */
 const SeasonalAchievements = ({
   userId,
   hideWhenEmpty = false,
 }: SeasonalAchievementProps) => {
-  const { t, i18n } = useTranslation("profile");
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [achievements, setAchievements] = useState<SeasonalAchievement[]>([]);
-  const [loading, setLoading] = useState(true);
-  const maxVisibleItems = 6;
-  const totalItems = achievements.length;
+  const { t } = useTranslation("profile");
+  const intlLocale = useIntlLocale();
+  const { data: finishes = [], isLoading } = useSeasonalAchievements(userId);
+  const [showAll, setShowAll] = useState(false);
 
-  const formatSeasonId = (seasonId: string): string => {
-    const parts = seasonId.split("-");
-    if (parts.length === 2) {
-      const [year, month] = parts;
-      const monthNumber = parseInt(month);
+  // Nothing while loading either: a placeholder that may turn into nothing
+  // would only shift the page under the player.
+  if (isLoading) return null;
 
-      const monthNamesEn = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ];
+  const allSeasonsLink = (
+    <Button asChild variant='ghost' size='sm' className='shrink-0'>
+      <Link href='/seasons'>
+        {t("seasonal_achievements.all_seasons")}
+        <ArrowRight />
+      </Link>
+    </Button>
+  );
 
-      const monthNames = monthNamesEn;
-      const monthName = monthNames[monthNumber - 1];
-
-      return `${monthName} ${year}`;
-    }
-    return seasonId;
-  };
-
-  useEffect(() => {
-    const fetchAchievements = async () => {
-      if (!userId) return;
-
-      setLoading(true);
-      try {
-        const userAchievements = await getUserSeasonalAchievements(userId);
-        setAchievements(userAchievements);
-      } catch (error) {
-        console.error("Failed to fetch seasonal achievements:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAchievements();
-  }, [userId]);
-
-
-  const getVisibleAchievements = () => {
-    const visibleItems = [];
-    const itemsToShow = Math.min(maxVisibleItems, totalItems);
-
-    for (let i = 0; i < itemsToShow; i++) {
-      const index = (activeIndex + i) % totalItems;
-      visibleItems.push(achievements[index]);
-    }
-    return visibleItems;
-  };
-
-  const getAchievementIcon = (place: number) => {
-    switch (place) {
-      case 1:
-        return <TrophyIcon size={28} strokeWidth={1.2} />;
-      case 2:
-        return <MedalIcon size={26} strokeWidth={1.2} />;
-      case 3:
-        return <MedalIcon size={26} strokeWidth={1.2} />;
-      case 4:
-        return <AwardIcon size={24} strokeWidth={1.2} />;
-      default:
-        return <Star size={18} />;
-    }
-  };
-
-
-  const getAchievementStyles = (place: number) => {
-    switch (place) {
-      case 1:
-        return {
-          iconColor: "text-amber-400",
-          crown: true,
-        };
-      case 2:
-        return {
-          iconColor: "text-zinc-300",
-          crown: false,
-        };
-      case 3:
-        return {
-          iconColor: "text-orange-400",
-          crown: false,
-        };
-      case 4:
-        return {
-          iconColor: "text-blue-400",
-          crown: false,
-        };
-      default:
-        return {
-          iconColor: "text-zinc-500",
-          crown: false,
-        };
-    }
-  };
-
-
-  if (!loading && achievements.length === 0) {
+  if (finishes.length === 0) {
     if (hideWhenEmpty) return null;
     return (
-      <Card className='border-white/5 bg-zinc-800/40 p-6 backdrop-blur-md'>
-        <div className='flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center'>
-          <div className='text-left'>
-            <h4 className='text-lg font-bold text-white'>
-              {String(t("seasonal_achievements.title", "Seasonal Achievements"))}
-            </h4>
-            <p className='text-sm text-zinc-500'>
-              {String(t("seasonal_achievements.no_achievements", "No achievements yet. Compete for a spot on the leaderboard!"))}
-            </p>
-          </div>
-          <Button
-             asChild
-             variant='outline'
-             >
-            <Link href='/seasons' className='flex items-center gap-2'>
-              Check Seasons
-              <ExternalLink size={12} />
-            </Link>
-          </Button>
+      <div className='flex flex-col items-start justify-between gap-4 rounded-lg bg-zinc-900/40 p-5 sm:flex-row sm:items-center'>
+        <div className='flex flex-col gap-0.5'>
+          <h2 className='text-sm font-bold text-zinc-200'>
+            {t("seasonal_achievements.heading")}
+          </h2>
+          <p className='text-xs text-zinc-400'>
+            {t("seasonal_achievements.no_achievements")}
+          </p>
         </div>
-      </Card>
+        {allSeasonsLink}
+      </div>
     );
   }
 
-  if (loading) {
-    if (hideWhenEmpty) return null;
-    return (
-      <Card className='relative overflow-hidden border-white/10 bg-zinc-800/40 p-6 backdrop-blur-xl'>
-        <h4 className='mb-4 text-lg font-bold text-white'>
-          {String(t("seasonal_achievements.title", "Seasonal Achievements"))}
-        </h4>
-        <div className='py-8 text-left text-sm text-white/50'>
-          <span className='font-bold text-xs'>Synchronizing...</span>
-        </div>
-      </Card>
-    );
-  }
+  const { bestPlace, topTenCount } = summarizeSeasonFinishes(finishes);
+  const visible = showAll ? finishes : finishes.slice(0, VISIBLE_FINISHES);
+  const hiddenCount = finishes.length - VISIBLE_FINISHES;
 
   return (
-    <Card className='relative overflow-hidden border-white/10 bg-zinc-800/40 p-6 backdrop-blur-xl'>
-      {/* Background decoration */}
-      <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent)]' />
-
-      <div className='relative mb-6 flex items-center justify-between'>
-        <h4 className='text-lg font-bold text-white'>
-          {String(t("seasonal_achievements.title", "Seasonal Achievements"))}
-        </h4>
+    <section className='flex flex-col gap-3'>
+      <div className='flex items-end justify-between gap-4 px-1'>
+        <div className='flex min-w-0 flex-col gap-0.5'>
+          <h2 className='text-sm font-bold text-zinc-200'>
+            {t("seasonal_achievements.heading")}
+          </h2>
+          <p className='text-xs text-zinc-500'>
+            {t("seasonal_achievements.best_place", { place: bestPlace })}
+            {" · "}
+            {t("seasonal_achievements.top_ten", { count: topTenCount })}
+          </p>
+        </div>
+        {allSeasonsLink}
       </div>
 
-      <div className='relative flex gap-4 overflow-x-auto pb-6 pt-4'>
-        {achievements.map((achievement, idx) => {
-          const styles = getAchievementStyles(achievement.place);
-          const displaySeasonName = formatSeasonId(achievement.seasonId);
+      {/* As many columns as fit: three on the achievements page, fewer in a
+          narrow profile tile, one on a phone. */}
+      <ul className='grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-2'>
+        {visible.map((finish) => (
+          <li key={finish.seasonId}>
+            <div className={rankCardClass(finish.place, false)}>
+              <div className={rankRowLineClass()}>
+                <span
+                  translate='no'
+                  className={cn(
+                    "h-9 w-10 text-2xl",
+                    placeKeyClass(finish.place, false),
+                  )}>
+                  {finish.place}
+                </span>
 
-          return (
-            <div
-              key={`${achievement.seasonId}-${idx}`}
-              className='relative flex min-w-[110px] flex-col items-center'>
-              
-              {/* The Trophy Container */}
-              <div className='relative flex h-[100px] w-full flex-col items-center justify-center transition-transform hover:-translate-y-1 duration-base'>
-                
-                {/* Body with Shape and Background */}
-                <div className='absolute inset-0 rounded-[1.2rem] border border-white/10 bg-zinc-900/60 shadow-lg backdrop-blur-md overflow-hidden'>
-                  {/* Metallic Shine Overlay */}
-                  <div className='absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.04] to-white/[0.08]' />
-                  {/* Top highlight line */}
-                  <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent' />
-                  {/* Inner Bezel */}
-                  <div className='absolute inset-1 rounded-[1.1rem] border border-white/[0.03] bg-gradient-to-b from-white/[0.02] to-transparent' />
-                </div>
+                <p className='min-w-0 flex-1 truncate text-sm font-bold text-zinc-100'>
+                  {formatSeasonMonth(finish.seasonId, intlLocale)}
+                </p>
 
-                {/* Rank Seal - Outside the overflow-hidden body */}
-                <div className='absolute -top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-zinc-800 shadow-md z-20'>
-                  <span className={`text-[12px] font-bold leading-none ${styles.iconColor}`}>
-                    {achievement.place}
+                <div className='flex shrink-0 flex-col items-end gap-0.5'>
+                  <span
+                    className={rankScoreClass(finish.place, false, "compact")}>
+                    {(finish.points ?? 0).toLocaleString(intlLocale)}
+                  </span>
+                  <span className='text-xs font-medium text-zinc-500'>
+                    {t("seasonal_achievements.points_short")}
                   </span>
                 </div>
-
-                {/* Trophy Content */}
-                <div className='relative z-10 flex flex-col items-center justify-center pt-1'>
-                  <div className={`${styles.iconColor} drop-shadow-[0_0_12px_rgba(0,0,0,0.5)]`}>
-                    {getAchievementIcon(achievement.place)}
-                    {styles.crown && (
-                      <Crown
-                        className='absolute -right-2.5 -top-2.5 text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]'
-                        size={12}
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* Vertical accent bars for podium */}
-                {achievement.place <= 3 && (
-                  <div className={`absolute bottom-0 h-[2px] w-1/2 rounded-t-lg blur-[2px] opacity-60 ${
-                    achievement.place === 1 ? 'bg-amber-400' : achievement.place === 2 ? 'bg-zinc-300' : 'bg-orange-400'
-                  }`} />
-                )}
-              </div>
-
-              {/* Plaque / Label */}
-              <div className='mt-3 flex w-full flex-col items-center text-center'>
-                <span className='text-[10px] font-medium tracking-wide text-zinc-400 capitalize'>
-                  {displaySeasonName}
-                </span>
               </div>
             </div>
-          );
-        })}
-      </div>
-    </Card>
+          </li>
+        ))}
+      </ul>
+
+      {hiddenCount > 0 && (
+        <Button
+          type='button'
+          variant='ghost'
+          size='sm'
+          className='self-start'
+          onClick={() => setShowAll((open) => !open)}>
+          {showAll
+            ? t("seasonal_achievements.show_less")
+            : t("seasonal_achievements.show_all", {
+                count: finishes.length,
+              })}
+        </Button>
+      )}
+    </section>
   );
 };
 

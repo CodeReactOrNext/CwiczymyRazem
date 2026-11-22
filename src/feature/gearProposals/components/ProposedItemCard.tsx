@@ -101,7 +101,7 @@ export const ProposedItemCard = ({
       <div className='relative z-10 px-3.5 pb-2 pt-3.5'>
         {proposal.brand && (
           <p
-            className='text-[11px] font-semibold leading-none tracking-wide'
+            className='text-[11px] font-semibold leading-none'
             style={{ color: rs.baseColor }}>
             {proposal.brand}
           </p>

@@ -4,6 +4,7 @@ import { useTranslation } from "hooks/useTranslation";
 import { Minus, Plus, X } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
+import { type BlockTone, TONE_CLASSES } from "./helpers/categoryTone";
 import {
   stepMinutesDown,
   stepMinutesUp,
@@ -16,6 +17,8 @@ interface MinutesStepperProps {
   minutes: number;
   max: number;
   size?: "md" | "lg";
+  /** Tints the number — for a block that lights up once it holds time. */
+  tone?: BlockTone;
   onChange: (minutes: number) => void;
 }
 
@@ -25,6 +28,7 @@ export const MinutesStepper = ({
   minutes,
   max,
   size = "md",
+  tone,
   onChange,
 }: MinutesStepperProps) => {
   const { t } = useTranslation("report");
@@ -37,8 +41,8 @@ export const MinutesStepper = ({
       <Button
         type='button'
         variant='ghost'
-        size='icon'
-        className='h-11 w-11'
+        size='icon-touch'
+        className=''
         aria-label={t("flow.less", { label })}
         disabled={minutes <= 0}
         onClick={() => onChange(stepMinutesDown(minutes))}>
@@ -64,8 +68,9 @@ export const MinutesStepper = ({
             event.currentTarget.blur();
           }}
           className={cn(
-            "rounded-lg bg-zinc-950/60 text-center font-bold tabular-nums text-zinc-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            "rounded-lg bg-zinc-950/60 text-center font-bold tabular-nums transition-colors duration-base focus:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             size === "lg" ? "h-14 w-24 text-4xl" : "h-11 w-16 text-xl",
+            tone ? TONE_CLASSES[tone].number : "text-zinc-100",
           )}
         />
         <span className='text-sm font-medium text-zinc-400'>
@@ -76,8 +81,8 @@ export const MinutesStepper = ({
       <Button
         type='button'
         variant='ghost'
-        size='icon'
-        className='h-11 w-11'
+        size='icon-touch'
+        className=''
         aria-label={t("flow.more", { label })}
         disabled={minutes >= max}
         onClick={() => onChange(stepMinutesUp(minutes, max))}>
@@ -98,6 +103,15 @@ interface TimeBlockProps {
   onChange: (minutes: number) => void;
   /** Shown only when there is more than one block to choose between. */
   onRemove?: () => void;
+  /**
+   * `row` puts the name and the minutes on one line, for the desktop form
+   * where every block is on screen at once and typing beats the presets.
+   */
+  variant?: "card" | "row";
+  /** Extra settings under a `row` block, e.g. a song's part and ear time. */
+  children?: ReactNode;
+  /** The colour a `row` block lights up in — its category's; songs stay emerald. */
+  tone?: BlockTone;
 }
 
 /**
@@ -113,8 +127,67 @@ export const TimeBlock = ({
   max,
   onChange,
   onRemove,
+  variant = "card",
+  children,
+  tone = "emerald",
 }: TimeBlockProps) => {
   const { t } = useTranslation("report");
+
+  if (variant === "row") {
+    const isActive = minutes > 0;
+    return (
+      // Lights up once it holds time: a wash in its category's colour running
+      // out across the row, so the filled blocks read at a glance.
+      <div
+        className={cn(
+          "flex flex-col gap-5 rounded-lg p-5 ring-1 ring-inset transition-[background-color,box-shadow] duration-base xl:px-6",
+          isActive
+            ? cn("bg-gradient-to-r", TONE_CLASSES[tone].row)
+            : "bg-zinc-950/30 ring-transparent",
+        )}>
+        <div className='flex flex-wrap items-center gap-x-8 gap-y-4'>
+          <div className='flex min-w-[12rem] flex-1 items-center gap-4'>
+            {leading}
+            <div className='min-w-0 flex-1'>
+              <p
+                translate={isName ? "no" : undefined}
+                className={cn(
+                  "truncate text-base font-semibold transition-colors duration-base",
+                  "text-zinc-100",
+                )}>
+                {title}
+              </p>
+              {subtitle && (
+                <p
+                  translate={isName ? "no" : undefined}
+                  className='truncate text-sm text-zinc-400'>
+                  {subtitle}
+                </p>
+              )}
+            </div>
+          </div>
+          <MinutesStepper
+            label={title}
+            minutes={minutes}
+            max={max}
+            tone={isActive ? tone : undefined}
+            onChange={onChange}
+          />
+          {onRemove && (
+            <Button
+              type='button'
+              variant='ghost'
+              size='icon'
+              aria-label={t("flow.remove", { label: title })}
+              onClick={onRemove}>
+              <X />
+            </Button>
+          )}
+        </div>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5'>

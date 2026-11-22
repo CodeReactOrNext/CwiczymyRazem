@@ -394,7 +394,7 @@ export const CreateCustomExerciseDialog = ({
                     onClick={clearGpFile}
                     aria-label={t("plans:custom.remove_gp")}
                     title={t("plans:custom.remove_gp")}>
-                    <X className='h-4 w-4' />
+                    <X />
                   </Button>
                 </div>
               ) : (
@@ -635,11 +635,11 @@ export const CreateCustomExerciseDialog = ({
                 <Button
                   type='button'
                   variant='secondary'
-                  size='icon'
+                  size='icon-touch'
                   onClick={handleAddInstruction}
                   aria-label={t("exercises:custom_exercise.instructions")}
-                  className='h-11 w-11 shrink-0'>
-                  <Plus className='h-4 w-4' />
+                  className='shrink-0'>
+                  <Plus />
                 </Button>
               </div>
               {instructions.length > 0 ? (
@@ -664,7 +664,7 @@ export const CreateCustomExerciseDialog = ({
                         onClick={() => handleRemoveInstruction(index)}
                         aria-label={t("common:button.remove" as any)}
                         className='shrink-0'>
-                        <Trash2 className='h-4 w-4' />
+                        <Trash2 />
                       </Button>
                     </li>
                   ))}
@@ -697,11 +697,11 @@ export const CreateCustomExerciseDialog = ({
                 <Button
                   type='button'
                   variant='secondary'
-                  size='icon'
+                  size='icon-touch'
                   onClick={handleAddTip}
                   aria-label={t("exercises:custom_exercise.tips")}
-                  className='h-11 w-11 shrink-0'>
-                  <Plus className='h-4 w-4' />
+                  className='shrink-0'>
+                  <Plus />
                 </Button>
               </div>
               {tips.length > 0 ? (
@@ -723,7 +723,7 @@ export const CreateCustomExerciseDialog = ({
                         onClick={() => handleRemoveTip(index)}
                         aria-label={t("common:button.remove" as any)}
                         className='shrink-0'>
-                        <Trash2 className='h-4 w-4' />
+                        <Trash2 />
                       </Button>
                     </li>
                   ))}
@@ -769,12 +769,12 @@ export const CreateCustomExerciseDialog = ({
             disabled={isUploading || isSavingToLibrary}>
             {isUploading ? (
               <>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                <Loader2 className='animate-spin' />
                 {t("plans:custom.uploading")}
               </>
             ) : isSavingToLibrary ? (
               <>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                <Loader2 className='animate-spin' />
                 {t("plans:saving")}
               </>
             ) : mode === "edit" ? (

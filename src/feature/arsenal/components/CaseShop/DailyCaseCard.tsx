@@ -237,7 +237,7 @@ export const DailyCaseCard = ({
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side='top' className={oddsTooltipClass}>
-                    <p className='truncate text-xs font-bold text-zinc-100'>
+                    <p className='truncate text-xs font-bold'>
                       {entry.def.brand} {entry.def.name}
                     </p>
                     <div className='mt-2.5 flex items-baseline justify-between gap-4'>
@@ -254,8 +254,8 @@ export const DailyCaseCard = ({
                           : "—"}
                       </span>
                     </div>
-                    <DexMarks status={dexStatus} className='mt-2' />
-                    <p className='mt-0.5 text-[10px] text-zinc-500'>
+                    <DexMarks status={dexStatus} className='mt-2' inTooltip />
+                    <p className='mt-0.5 text-xs text-black/60'>
                       {t("cases.chance_from_case")}
                     </p>
                   </TooltipContent>

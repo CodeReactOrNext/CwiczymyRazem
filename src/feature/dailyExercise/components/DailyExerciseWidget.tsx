@@ -2,12 +2,16 @@ import { buttonVariants } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
-import Avatar from "components/UI/Avatar";
 import { useDailyExercise } from "feature/dailyExercise/hooks/useDailyExercise";
 import type { DailyExerciseEntry } from "feature/dailyExercise/types/dailyExercise.types";
 import { DAILY_PODIUM_SIZE, dailyPodium } from "feature/dailyExercise/utils/dailyExercise";
 import { WidgetHeader } from "feature/dashboard/components/widgets/WidgetHeader";
 import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
+import { RankRow, rankRowLineClass } from "feature/leadboard/components/RankRow";
+import {
+  placeKeyClass,
+  rankCardClass,
+} from "feature/leadboard/components/rankRowStyles";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { Clock, Play } from "lucide-react";
@@ -25,25 +29,12 @@ const formatTimeLeft = (ms: number): string => {
 const formatScore = (score: number) => score.toLocaleString();
 
 /**
- * The board is a short list beside the exercise, one place per row. The rows
- * get no background of their own — the card is the one level of panel — except
- * the player's own, which is tinted. On a phone the negative margin puts place
- * numbers back on the card's text edge while the rows keep their padding for
- * that tint.
+ * The board is a short list beside the exercise, one place per row, in the
+ * app's shared ranking row. This card keeps no medal colours (dropped on
+ * 2026-10-02), so every place is a plain zinc key and only the player's own
+ * row is lit.
  */
-const BOARD = "-mx-3 flex flex-col gap-1 sm:mx-0";
-const ROW =
-  "grid grid-cols-[1.25rem_2rem_minmax(0,1fr)_auto] items-center gap-x-3 rounded-lg px-3 py-2.5";
-
-const PlaceNumber = ({ place, isMe }: { place: number; isMe?: boolean }) => (
-  <span
-    className={cn(
-      "text-center text-sm font-bold tabular-nums",
-      isMe ? "text-cyan-300" : "text-zinc-400",
-    )}>
-    {place}
-  </span>
-);
+const BOARD = "flex flex-col gap-1.5";
 
 const BoardRow = ({
   entry,
@@ -54,44 +45,41 @@ const BoardRow = ({
   place: number;
   isMe: boolean;
 }) => (
-  <li className={cn(ROW, isMe && "bg-cyan-500/10")}>
-    <PlaceNumber place={place} isMe={isMe} />
-    <Avatar
-      avatarURL={entry.avatar || undefined}
-      name={entry.displayName}
-      size='xs'
-    />
-    <span className='min-w-0'>
-      <span
-        className={cn(
-          "block truncate text-sm font-semibold",
-          isMe ? "text-cyan-300" : "text-zinc-100",
-        )}>
-        {entry.displayName}
-      </span>
-      <span className='block text-xs tabular-nums text-zinc-400'>
+  <RankRow
+    place={place}
+    nick={entry.displayName}
+    avatarUrl={entry.avatar}
+    profileId={entry.userId}
+    isCurrentUser={isMe}
+    podium={false}
+    surface='bare'
+    density='compact'
+    score={formatScore(entry.score)}
+    meta={
+      <span className='tabular-nums'>
         {entry.accuracy}%{entry.bpm ? ` · ${entry.bpm} BPM` : null}
       </span>
-    </span>
-    <span
-      className={cn(
-        "text-[15px] font-bold tabular-nums",
-        isMe ? "text-cyan-300" : "text-zinc-100",
-      )}>
-      {formatScore(entry.score)}
-    </span>
-  </li>
+    }
+  />
 );
 
 const OpenRow = ({ place }: { place: number }) => {
   const { t } = useTranslation("dashboard");
   return (
-    <li className={ROW}>
-      <PlaceNumber place={place} />
-      <span className='size-8 rounded-full border-2 border-dashed border-zinc-600' />
-      <span className='min-w-0 truncate text-sm font-semibold text-zinc-400'>
-        {t("daily_exercise.open_spot")}
-      </span>
+    <li className='w-full'>
+      <div className={rankCardClass(place, false, false, "bare")}>
+        <div className={rankRowLineClass("compact")}>
+          <span
+            translate='no'
+            className={cn("h-7 w-8 text-xl", placeKeyClass(place, false, false))}>
+            {place}
+          </span>
+          <span className='size-10 shrink-0 rounded-full border-2 border-dashed border-zinc-600' />
+          <span className='min-w-0 truncate text-sm font-semibold text-zinc-400'>
+            {t("daily_exercise.open_spot")}
+          </span>
+        </div>
+      </div>
     </li>
   );
 };
@@ -215,7 +203,7 @@ export const DailyExerciseWidget = () => {
 
           <Link
             href={`/practice/exercise/${exercise.id}`}
-            className={cn(buttonVariants(), "h-12 self-start px-8 text-[15px]")}>
+            className={cn(buttonVariants({ size: "xl" }), "self-start")}>
             <Play size={16} className='fill-current' />
             {me ? t("daily_exercise.beat_score") : t("daily_exercise.play")}
           </Link>

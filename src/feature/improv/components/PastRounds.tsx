@@ -1,12 +1,13 @@
 import { Button } from "assets/components/ui/button";
 import { Skeleton } from "assets/components/ui/skeleton";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { TakeGrid } from "feature/improv/components/TakeCard";
 import { TrackPlayer } from "feature/improv/components/TrackPlayer";
 import { useImprovRoundTakes } from "feature/improv/hooks/useImprov";
 import type { ImprovRound } from "feature/improv/types/improv.types";
 import { improvDateRange } from "feature/improv/utils/improvRound";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronDown, ChevronUp, History } from "lucide-react";
+import { ChevronDown, ChevronUp, History, Music2 } from "lucide-react";
 import { useState } from "react";
 import { FaDiscord } from "react-icons/fa6";
 
@@ -37,7 +38,14 @@ const PastRoundTakes = ({
     );
   }
   if (takes.length === 0) {
-    return <p className='text-sm text-zinc-400'>{t("past.no_takes")}</p>;
+    return (
+      <EmptyState
+        size='compact'
+        className='bg-transparent px-0'
+        icon={<Music2 />}
+        title={t("past.no_takes")}
+      />
+    );
   }
   return <TakeGrid takes={takes} uid={uid} canModerate={isAdmin} />;
 };
@@ -49,15 +57,11 @@ export const PastRounds = ({ rounds, uid, isAdmin }: PastRoundsProps) => {
 
   if (rounds.length === 0) {
     return (
-      <div className='flex flex-col items-center justify-center py-16 text-center'>
-        <div className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500'>
-          <History size={26} />
-        </div>
-        <h3 className='mb-1 text-lg font-bold text-zinc-100'>
-          {t("past.empty_title")}
-        </h3>
-        <p className='max-w-sm text-sm text-zinc-400'>{t("past.empty_body")}</p>
-      </div>
+      <EmptyState
+        icon={<History />}
+        title={t("past.empty_title")}
+        description={t("past.empty_body")}
+      />
     );
   }
 
@@ -103,12 +107,9 @@ export const PastRounds = ({ rounds, uid, isAdmin }: PastRoundsProps) => {
                   type='button'
                   variant='ghost'
                   aria-expanded={isOpen}
-                  onClick={() => setOpenId(isOpen ? null : round.id)}
-                  className='h-10 px-4'>
-                  <span className='flex items-center gap-2'>
-                    {t("past.view_takes")}
-                    {isOpen ? <ChevronUp /> : <ChevronDown />}
-                  </span>
+                  onClick={() => setOpenId(isOpen ? null : round.id)}>
+                  {t("past.view_takes")}
+                  {isOpen ? <ChevronUp /> : <ChevronDown />}
                 </Button>
               </div>
             </div>

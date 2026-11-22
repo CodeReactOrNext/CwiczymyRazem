@@ -24,7 +24,16 @@
       "tokensHeldOne": "1 free case in hand - spend it on any case in the Arsenal.",
       "readyToCollect": "Reward ready to collect",
       "onCompletion": "Reward for earning this",
-      "collected": "Reward already collected"
+      "collected": "Reward already collected",
+      "toCollect": "{{count}} rewards to collect",
+      "toCollectOne": "1 reward to collect",
+      "moreAfterSession": "+{{count}} more after your next session",
+      "collectedCount": "Collected {{count}} rewards",
+      "collectedOne": "Collected 1 reward",
+      "casesInHand": "{{count}} free cases in hand",
+      "casesInHandOne": "1 free case in hand",
+      "openCase": "Open a case",
+      "openArsenal": "Open in Arsenal"
     }
   },
   "time_1": {

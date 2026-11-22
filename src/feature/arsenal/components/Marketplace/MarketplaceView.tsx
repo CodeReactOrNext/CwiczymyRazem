@@ -1,4 +1,5 @@
 import { Skeleton } from "assets/components/ui/skeleton";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import {
   selectCurrentUserStats,
   selectUserAuth,
@@ -48,12 +49,7 @@ export const MarketplaceView = () => {
 
   if (!listings || listings.length === 0) {
     return (
-      <div className='flex flex-col items-center justify-center gap-4 py-20 text-zinc-500'>
-        <Store size={48} className='opacity-30' />
-        <p className='text-sm font-medium'>
-          {t("market.empty")}
-        </p>
-      </div>
+      <EmptyState icon={<Store />} title={t("market.empty")} />
     );
   }
 

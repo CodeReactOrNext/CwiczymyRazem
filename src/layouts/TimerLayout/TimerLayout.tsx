@@ -1,24 +1,17 @@
 import "react-circular-progressbar/dist/styles.css";
 
 import { Accordion } from "assets/components/ui/accordion";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "assets/components/ui/alert-dialog";
 import { Button, PRESSABLE } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
+import { ConfirmDialog } from "components/ConfirmDialog/ConfirmDialog";
 import MainContainer from "components/MainContainer";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft, ArrowRight, Loader2, Play, RotateCcw } from "lucide-react";
+import { ArrowRight, Play, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
@@ -358,8 +351,8 @@ const TimerLayout = ({
 
   return (
     <MainContainer noBorder>
-      <div className='font-openSans mx-auto h-full w-full max-w-6xl space-y-6 px-3 pb-8 pt-4 sm:space-y-8 sm:px-4 sm:pb-12 md:p-8'>
-        <Card>
+      <div className={cn(" mx-auto h-full w-full max-w-6xl space-y-6 sm:space-y-8", PAGE_CONTENT)}>
+        <Card size='sm'>
           <div className='flex flex-col gap-8 p-2 sm:p-4 lg:flex-row lg:items-center lg:gap-10'>
             <div className='flex shrink-0 justify-center'>
               <AnimatedTimerDisplay
@@ -457,34 +450,24 @@ const TimerLayout = ({
               <Button
                 onClick={() => setResetDialogOpen(true)}
                 variant='subtle'
-                className='h-11 px-5'
+                size='lg'
                 disabled={isFinishing || sumTime === 0}
               >
-                <RotateCcw className='h-4 w-4' />
+                <RotateCcw />
                 {t("reset_button")}
               </Button>
             )}
             {!hasTrackedTime ? (
-            <Button
-              onClick={onBack}
-              className='h-11 min-w-[140px] px-6'
-              variant='subtle'
-            >
-              <ArrowLeft className='h-4 w-4' />
-              {t("back_to_practice")}
-            </Button>
+            <BackLink label={t("back_to_practice")} onClick={onBack} />
             ) : (
             <Button
               onClick={timerSubmitHandler}
-              className='h-11 min-w-[140px] px-6'
-              variant='default'
-              disabled={isFinishing}
+              size='lg'
+              className='min-w-[140px]'
+              loading={isFinishing}
             >
               {isFinishing ? (
-                  <div translate="no" className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>{t("saving")}</span>
-                  </div>
+                  <span translate="no">{t("saving")}</span>
               ) : (
                   <span translate="no" className="flex items-center gap-2">
                     {t("end_button")}
@@ -496,28 +479,19 @@ const TimerLayout = ({
           </div>
 
           {onResetTimer && (
-            <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>{t("reset_dialog.title")}</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {t("reset_dialog.description")}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>{t("reset_dialog.cancel")}</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => {
-                      onResetTimer();
-                      setResetDialogOpen(false);
-                    }}
-                    className="bg-red-600 hover:bg-red-500"
-                  >
-                    {t("reset_dialog.confirm")}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <ConfirmDialog
+              open={resetDialogOpen}
+              onOpenChange={setResetDialogOpen}
+              title={t("reset_dialog.title")}
+              description={t("reset_dialog.description")}
+              cancelLabel={t("reset_dialog.cancel")}
+              confirmLabel={t("reset_dialog.confirm")}
+              onConfirm={() => {
+                onResetTimer();
+                setResetDialogOpen(false);
+              }}
+              destructive
+            />
           )}
 
           <p className='text-center text-xs text-muted-foreground sm:text-sm'>

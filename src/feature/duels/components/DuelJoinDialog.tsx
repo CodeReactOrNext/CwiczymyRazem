@@ -33,7 +33,7 @@ export const DuelJoinDialog = ({
   const { t } = useTranslation("duels");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='flex max-w-md flex-col gap-5 bg-zinc-900 sm:border-0 sm:p-7'>
+      <DialogContent className='flex flex-col gap-5 bg-zinc-900 sm:max-w-md sm:p-7'>
         <DialogTitle className='pr-12 text-xl text-zinc-50'>
           {t("join.title")}
         </DialogTitle>
@@ -42,7 +42,7 @@ export const DuelJoinDialog = ({
             ? t("join.waiting", { count: waitingOthers })
             : t("join.nobody")}
         </DialogDescription>
-        <p className='flex items-start gap-3 rounded-xl bg-zinc-800/60 px-4 py-3 text-sm leading-relaxed text-zinc-300'>
+        <p className='flex items-start gap-3 rounded-lg bg-zinc-800/60 px-4 py-3 text-sm leading-relaxed text-zinc-300'>
           <Mic size={16} className='mt-0.5 shrink-0 text-cyan-400' />
           {t("queue.mic")}
         </p>
@@ -55,8 +55,7 @@ export const DuelJoinDialog = ({
           size='lg'
           onClick={onConfirm}
           loading={isJoining}
-          disabled={isJoining}
-          className='h-12 w-full border-b-zinc-400 bg-white text-base text-zinc-950 hover:bg-zinc-200'>
+          className='w-full'>
           {!isJoining && <Swords className='' />}
           {isJoining ? t("queue.joining") : t("join.confirm")}
         </Button>

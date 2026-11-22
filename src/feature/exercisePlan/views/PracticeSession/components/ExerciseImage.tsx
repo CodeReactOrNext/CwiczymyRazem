@@ -54,7 +54,7 @@ export const ExerciseImage = ({
                 size='sm'
                 className='pointer-events-none opacity-90 shadow-lg'>
                 <span className=''>{t("image.enlarge")}</span>
-                <Maximize2 size='1em' className='h-4 w-4' />
+                <Maximize2 />
               </Button>
             </div>
           </div>
@@ -118,7 +118,7 @@ export const ExerciseImage = ({
           onClick={handleZoomOut}
           disabled={imageScale <= 0.5}
           className='bg-background/80 shadow-md backdrop-blur-sm transition-all duration-base hover:bg-background/90 hover:shadow-lg'>
-          <Minus className='h-4 w-4' />
+          <Minus />
         </Button>
         <Button
           variant='secondary'
@@ -126,14 +126,14 @@ export const ExerciseImage = ({
           onClick={handleZoomIn}
           disabled={imageScale >= 5}
           className='bg-background/80 shadow-md backdrop-blur-sm transition-all duration-base hover:bg-background/90 hover:shadow-lg'>
-          <Plus className='h-4 w-4' />
+          <Plus />
         </Button>
         <Button
           variant='secondary'
           size='icon'
           onClick={resetImagePosition}
           className='bg-background/80 shadow-md backdrop-blur-sm transition-all duration-base hover:bg-background/90 hover:shadow-lg'>
-          <Minimize2 size='1em' className='h-4 w-4' />
+          <Minimize2 />
         </Button>
       </div>
     </div>

@@ -1,12 +1,7 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "assets/components/ui/card";
+import { Card } from "assets/components/ui/card";
 import { Switch } from "assets/components/ui/switch";
 import { Kostek } from "components/Mascot/Kostek";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { firebaseUpdateStreakRestDays } from "feature/settings/services/settings.service";
 import {
   selectCurrentUserStats,
@@ -42,11 +37,8 @@ export const StreakSettings = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{t("streak.title")}</CardTitle>
-        <CardDescription>{t("streak.subtitle")}</CardDescription>
-      </CardHeader>
-      <CardContent>
+      <SectionHeader title={t("streak.title")} description={t("streak.subtitle")} />
+      <div>
         <div className='flex items-center justify-between gap-6 rounded-lg bg-zinc-900/40 px-4 py-3'>
           {/* With the rest day on, Kostek shows what it means: kicking back, hands
               behind its head, content — resting, not gone. */}
@@ -65,7 +57,7 @@ export const StreakSettings = () => {
             aria-label={t("streak.label")}
           />
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 };

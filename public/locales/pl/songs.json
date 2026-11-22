@@ -185,6 +185,7 @@
     "mastered": "Opanowane",
     "total": "Razem",
     "time_spent": "Spędzony czas",
+    "chart_title": "Ćwiczenie utworów",
     "master_more": "Opanuj więcej utworów, aby ocenić swój poziom."
   },
   "board": {
@@ -368,5 +369,6 @@
     "board_empty_hint": "Dodaj utwory z biblioteki, aby je ćwiczyć i śledzić tu swoje postępy.",
     "explore_library": "Przeglądaj bibliotekę",
     "filter_by_tier": "Filtruj po poziomie"
-  }
+  },
+  "points_delta": "({{points}} pkt)"
 }

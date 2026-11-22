@@ -206,7 +206,7 @@ export const SongRating = ({ song,  tierColor }: SongRatingInterface) => {
         </div>
       </div>
 
-      {isRated && <span className="text-[10px] text-green-500 font-medium">Song Rated: {userRating?.rating}/10</span>}
+      {isRated && <span className="text-xs text-green-500 font-medium">Song Rated: {userRating?.rating}/10</span>}
     </div>
   );
 };

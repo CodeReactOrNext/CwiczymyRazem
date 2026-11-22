@@ -124,12 +124,12 @@ export const SkillPowerHero = ({
     return (
       <div
         className={cn(
-          "flex flex-col gap-4 rounded-lg bg-zinc-900/40 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6",
+          "flex flex-col gap-4 rounded-lg bg-zinc-800/40 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6",
           className,
         )}>
         <div className='flex items-center gap-3'>
           <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-[4px] bg-white/5 text-zinc-400'>
-            <TrendingUp size={18} />
+            <TrendingUp className='h-5 w-5' />
           </div>
           <div>
             <h2 className='text-sm font-bold text-zinc-200'>
@@ -170,7 +170,7 @@ export const SkillPowerHero = ({
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 rounded-xl bg-zinc-900/40 p-3 sm:gap-5 sm:rounded-lg sm:p-6 lg:flex-row lg:items-center lg:gap-10",
+        "flex flex-col gap-4 rounded-lg bg-zinc-800/40 p-5 sm:gap-5 sm:p-6 lg:flex-row lg:items-center lg:gap-10",
         className,
       )}>
       <button
@@ -192,8 +192,7 @@ export const SkillPowerHero = ({
         </div>
         <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-zinc-400 sm:hidden'>
           <ChevronDown
-            size={18}
-            className={cn("transition-transform duration-fast", isOpen && "rotate-180")}
+            className={cn("h-5 w-5 transition-transform duration-fast", isOpen && "rotate-180")}
           />
         </span>
       </button>
@@ -201,7 +200,7 @@ export const SkillPowerHero = ({
       {/* Same rhythm as the score: label on top, value under it. */}
       <dl
         className={cn(
-          "grid-cols-3 gap-4 rounded-lg bg-white/5 p-3 sm:grid sm:gap-10 lg:ml-auto lg:bg-transparent lg:p-0",
+          "grid-cols-3 gap-4 sm:grid sm:gap-10 lg:ml-auto",
           isOpen ? "grid" : "hidden",
         )}>
         {stats.map(({ label, value }) => (

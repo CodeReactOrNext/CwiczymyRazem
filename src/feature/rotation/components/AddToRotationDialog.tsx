@@ -6,12 +6,12 @@ import {
   DialogDescription,
   DialogTitle,
 } from "assets/components/ui/dialog";
-import { Input } from "assets/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
-import { Check, Plus, Search } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -134,7 +134,7 @@ export const AddToRotationDialog = ({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className='flex max-h-[90vh] flex-col gap-6 border-0 bg-zinc-900 shadow-none sm:max-w-lg sm:p-8'>
+      <DialogContent className='flex max-h-[90vh] flex-col gap-6 bg-zinc-900 sm:p-8'>
         <div className='space-y-2 pr-10'>
           <DialogTitle className='text-xl font-bold text-zinc-100'>
             {t("picker.title")}
@@ -145,34 +145,23 @@ export const AddToRotationDialog = ({
         </div>
 
         <div className='space-y-3'>
-          <Tabs
-            value={tab}
-            onValueChange={(value) => setTab(value as RotationItemType)}>
-            <TabsList className='grid h-auto w-full grid-cols-4 bg-zinc-800/50'>
-              {ROTATION_ITEM_TYPES.map((type) => (
-                <TabsTrigger
-                  key={type}
-                  value={type}
-                  className='gap-2 py-2 text-zinc-400 data-[state=active]:bg-zinc-700 data-[state=active]:text-zinc-100 data-[state=active]:shadow-none hover:text-zinc-200'>
-                  {t(`picker.tabs.${type}`)}
-                  {countOf(type) > 0 && (
-                    <span className='text-xs tabular-nums text-emerald-400'>
-                      {countOf(type)}
-                    </span>
-                  )}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+          <SegmentedControl<RotationItemType>
+            label={t("picker.title")}
+            selected={[tab]}
+            onSelect={setTab}
+            options={ROTATION_ITEM_TYPES.map((type) => ({
+              value: type,
+              label: t(`picker.tabs.${type}`),
+              count: countOf(type) > 0 ? countOf(type) : undefined,
+            }))}
+          />
 
           {tab !== "custom" && (
-            <Input
+            <SearchInput
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder={t("picker.search")}
               aria-label={t("picker.search")}
-              startIcon={<Search className='h-4 w-4 text-zinc-500' />}
-              className='h-11 border-0 bg-zinc-800/60 text-zinc-100'
             />
           )}
         </div>
@@ -255,8 +244,8 @@ export const AddToRotationDialog = ({
         </div>
 
         <Button
-          onClick={onClose}
-          className='h-11 rounded-lg bg-white font-bold text-black focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
+          size='lg'
+          onClick={onClose}>
           {t("picker.done")}
         </Button>
       </DialogContent>

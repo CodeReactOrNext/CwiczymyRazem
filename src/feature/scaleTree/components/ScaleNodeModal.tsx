@@ -173,7 +173,7 @@ export function ScaleNodeModal({
                 onClick={onClose}
                 aria-label={t("modal.close")}
                 className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "-mr-1 -mt-1 shrink-0")}>
-                <X className='h-4 w-4' />
+                <X />
               </button>
             </div>
 
@@ -192,13 +192,13 @@ export function ScaleNodeModal({
               <div className='grid grid-cols-2 gap-3'>
                 <button
                   onClick={onStartPractice}
-                  className={cn(buttonVariants({ variant: "ghost" }), "h-11 font-bold")}>
+                  className={buttonVariants({ variant: "ghost", size: "lg" })}>
                   <Play fill='currentColor' />
                   {t("modal.practice")}
                 </button>
                 <button
                   onClick={onStartExam}
-                  className={cn(buttonVariants(), "h-11 font-bold")}>
+                  className={buttonVariants({ size: "lg" })}>
                   <Target />
                   {isCompleted ? t("modal.retake") : t("modal.exam")}
                 </button>
@@ -254,7 +254,7 @@ export function ScaleNodeModal({
                       title={t("modal.clean_run")}
                       className={cn(
                         buttonVariants(),
-                        "h-11 shrink-0 bg-orange-500 px-4 font-bold text-zinc-950 hover:bg-orange-400",
+                        "shrink-0 bg-orange-500 text-zinc-950 hover:bg-orange-400",
                       )}>
                       <Flame />
                       {record ? t("modal.beat_it") : t("modal.set_record")}

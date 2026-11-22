@@ -1,5 +1,6 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { Kostek } from "components/Mascot/Kostek";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { format } from "date-fns";
@@ -97,25 +98,20 @@ const EmptyRoom = ({
   onSayHi: () => void;
 }) => {
   const { t } = useTranslation("chat");
+  // A quiet room: Kostek waves — someone has to say hi first. The room is
+  // already a panel, so no card of its own.
   return (
-  <div className='flex h-full flex-col items-center justify-center gap-4 px-6 py-16 text-center'>
-    {/* A quiet room: Kostek waves — someone has to say hi first. */}
-    <Kostek mood='wave' className='h-20 md:h-28' />
-    <div className='space-y-1'>
-      <p className='text-sm font-semibold text-zinc-200'>
-        {t("empty_room.title")}
-      </p>
-      <p className='text-sm text-zinc-400'>
-        {isGuild ? t("empty_room.guild") : t("empty_room.everyone")}
-      </p>
-    </div>
-    <button
-      type='button'
-      onClick={onSayHi}
-      className='min-h-11 rounded-lg bg-cyan-500/15 px-4 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/25 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60 active:click-behavior'>
-      {t("empty_room.say_hi")}
-    </button>
-  </div>
+    <EmptyState
+      mood='wave'
+      className='h-full justify-center bg-transparent'
+      title={t("empty_room.title")}
+      description={isGuild ? t("empty_room.guild") : t("empty_room.everyone")}
+      action={
+        <Button type='button' onClick={onSayHi}>
+          {t("empty_room.say_hi")}
+        </Button>
+      }
+    />
   );
 };
 
@@ -652,13 +648,14 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
         </div>
 
         {unseenCount > 0 && (
-          <button
+          <Button
             type='button'
+            size='lg'
             onClick={jumpToLatest}
-            className='absolute bottom-3 left-1/2 flex min-h-11 -translate-x-1/2 items-center gap-1.5 rounded-full bg-cyan-500 px-4 text-xs font-semibold text-black transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-200 active:click-behavior'>
-            <ArrowDown className='h-3.5 w-3.5' />
-            {unseenCount} new
-          </button>
+            className='absolute bottom-3 left-1/2 -translate-x-1/2'>
+            <ArrowDown />
+            <span>{unseenCount} new</span>
+          </Button>
         )}
       </div>
 

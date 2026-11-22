@@ -1,10 +1,12 @@
 import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { AddRecordingModal } from "feature/recordings/components/AddRecordingModal";
 import { RecordingCard } from "feature/recordings/components/RecordingCard";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { useRecordings } from "feature/recordings/hooks/useRecordings";
 import { useTranslation } from "hooks/useTranslation";
-import { Loader2, Mic2, Plus } from "lucide-react";
+import { Mic2, Plus } from "lucide-react";
 import { useState } from "react";
 
 interface SongRecordingsSectionProps {
@@ -33,19 +35,24 @@ export const SongRecordingsSection = ({ songId, songTitle, songArtist }: SongRec
           variant="ghost"
           onClick={() => setIsAddModalOpen(true)}
         >
-          <Plus className="h-4 w-4" />
+          <Plus />
           {t("view.add")}
         </Button>
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-cyan-500" />
+        <div className="flex gap-4 overflow-hidden pb-1" aria-busy="true">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} variant="block" className="h-80 w-72 shrink-0" />
+          ))}
         </div>
       ) : recordings.length === 0 ? (
-        <p className="text-sm text-zinc-500 py-4 text-center">
-          {t("song_section.empty")}
-        </p>
+        <EmptyState
+          size='compact'
+          className='bg-transparent px-0'
+          icon={<Mic2 />}
+          title={t("song_section.empty")}
+        />
       ) : (
         <div className="flex gap-4 overflow-x-auto pb-1 custom-scrollbar">
           {recordings.map((recording) => (

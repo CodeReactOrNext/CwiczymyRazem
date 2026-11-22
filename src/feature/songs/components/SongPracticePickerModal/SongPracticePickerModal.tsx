@@ -1,6 +1,8 @@
-import { buttonVariants, PRESSABLE } from "assets/components/ui/button";
+import { Button, buttonVariants, PRESSABLE } from "assets/components/ui/button";
 import { Dialog, DialogContent } from "assets/components/ui/dialog";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { ArrangementPicker } from "feature/songs/components/Arrangements/ArrangementPicker";
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
@@ -18,7 +20,6 @@ import {
   ArrowLeft,
   CassetteTape,
   ChevronRight,
-  Crown,
   FileMusic,
   FolderOpen,
   Link2Off,
@@ -27,7 +28,6 @@ import {
   NotebookPen,
   Upload,
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { SiGuitarpro } from "react-icons/si";
@@ -46,7 +46,6 @@ type AttachTab = "library" | "import";
 interface SongPracticePickerModalProps {
   song: Song;
   userId: string;
-  isPremium: boolean;
   progress: UserSongProgress | null;
   onAttachGpFile: (songId: string, gpFileId: string, gpFileName: string, trackIndex?: number) => Promise<void>;
   onDetachGpFile: (songId: string) => Promise<void>;
@@ -56,7 +55,6 @@ interface SongPracticePickerModalProps {
 export function SongPracticePickerModal({
   song,
   userId,
-  isPremium,
   progress,
   onAttachGpFile,
   onDetachGpFile,
@@ -85,7 +83,6 @@ export function SongPracticePickerModal({
   };
 
   const handleGp5Practice = () => {
-    if (!isPremium) return;
     if (hasGpFile) {
       onClose();
       router.push(`/songs/practice/${song.id}${arrangementQuery}`);
@@ -131,16 +128,18 @@ export function SongPracticePickerModal({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl border-white/5 bg-zinc-950 p-0 shadow-2xl overflow-hidden">
+      <DialogContent className="sm:max-w-md bg-zinc-950 p-0 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center gap-3 border-b border-white/5 px-5 py-4">
+        <div className="flex items-center gap-3 px-5 pt-5">
           {phase === "attach" && (
-            <button
-              onClick={() => setPhase("pick")}
-              className="mr-1 text-zinc-500 hover:text-zinc-200 transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </button>
+            <Button
+              type='button'
+              variant='ghost'
+              size='icon'
+              aria-label={t("common:back")}
+              onClick={() => setPhase("pick")}>
+              <ArrowLeft />
+            </Button>
           )}
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-zinc-500">
@@ -170,8 +169,8 @@ export function SongPracticePickerModal({
               onClick={handleFreePractice}
               className={MODE_KEY}
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-indigo-500/15">
-                <CassetteTape size='1em' className="h-5 w-5 text-indigo-400" />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-purple-500/15">
+                <CassetteTape size='1em' className="h-5 w-5 text-purple-400" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-white">{t("picker.free_practice")}</p>
@@ -181,67 +180,38 @@ export function SongPracticePickerModal({
             </button>
 
             {/* GP5 practice */}
-            {isPremium ? (
-              <button
-                onClick={handleGp5Practice}
-                className={MODE_KEY}
-              >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15">
-                  <SiGuitarpro className="h-5 w-5 text-cyan-400" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-white">{t("picker.gp_practice")}</p>
-                  {hasGpFile && isGpFileElsewhere ? (
-                    <div className="mt-0.5 flex items-center gap-1.5">
-                      <Monitor className="h-3 w-3 shrink-0 text-amber-300/90" />
-                      <span className="text-[11px] text-amber-300/90">{t("picker.desktop_only_missing")}</span>
-                    </div>
-                  ) : hasGpFile ? (
-                    <div className="mt-0.5 flex items-center gap-1.5">
-                      {isDesktopOnlyGpFile ? (
-                        <Monitor className="h-3 w-3 shrink-0 text-amber-300/90" />
-                      ) : (
-                        <FileMusic className="h-3 w-3 shrink-0 text-cyan-400/70" />
-                      )}
-                      <span className="truncate text-[11px] text-cyan-400/70">{progress?.gpFileName}</span>
-                    </div>
-                  ) : (
-                    <p className="text-[11px] text-zinc-400">{t("picker.gp_practice_hint")}</p>
-                  )}
-                </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-300" />
-              </button>
-            ) : (
-              <div className="relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.02] p-4 opacity-70">
-                {/* Locked overlay */}
-                <div className="flex items-center gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg light-tint bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 border border-white/5 border-t-cyan-500/20 border-l-cyan-500/10 shadow-lg">
-                    <SiGuitarpro className="h-5 w-5 text-zinc-600" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold text-zinc-400">{t("picker.gp_practice")}</p>
-                      <span className="flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-400">
-                        <Crown className="h-2.5 w-2.5" />
-                        {t("picker.premium")}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-zinc-600">{t("picker.gp_premium_hint")}</p>
-                  </div>
-                </div>
-                <Link
-                  href="/supporter"
-                  onClick={onClose}
-                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-500/5 py-2 text-xs font-bold text-amber-400 transition-colors hover:border-amber-500/30 hover:bg-amber-500/10"
-                >
-                  <Crown className="h-3 w-3" />
-                  {t("picker.upgrade")}
-                </Link>
+            <button
+              onClick={handleGp5Practice}
+              className={MODE_KEY}
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15">
+                <SiGuitarpro className="h-5 w-5 text-cyan-400" />
               </div>
-            )}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-white">{t("picker.gp_practice")}</p>
+                {hasGpFile && isGpFileElsewhere ? (
+                  <div className="mt-0.5 flex items-center gap-1.5">
+                    <Monitor className="h-3 w-3 shrink-0 text-amber-300/90" />
+                    <span className="text-[11px] text-amber-300/90">{t("picker.desktop_only_missing")}</span>
+                  </div>
+                ) : hasGpFile ? (
+                  <div className="mt-0.5 flex items-center gap-1.5">
+                    {isDesktopOnlyGpFile ? (
+                      <Monitor className="h-3 w-3 shrink-0 text-amber-300/90" />
+                    ) : (
+                      <FileMusic className="h-3 w-3 shrink-0 text-cyan-400/70" />
+                    )}
+                    <span className="truncate text-[11px] text-cyan-400/70">{progress?.gpFileName}</span>
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-zinc-400">{t("picker.gp_practice_hint")}</p>
+                )}
+              </div>
+              <ChevronRight className="h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-300" />
+            </button>
 
             {/* Change / detach GP file */}
-            {isPremium && hasGpFile && (
+            {hasGpFile && (
               <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={() => setPhase("attach")}
@@ -249,18 +219,16 @@ export function SongPracticePickerModal({
                 >
                   {t("picker.change_gp")}
                 </button>
-                <button
+                <Button
+                  variant="destructive"
+                  size="sm"
                   onClick={handleDetach}
-                  disabled={isDetaching}
-                  className={cn(buttonVariants({ variant: "subtle", size: "sm" }), "gap-1.5 font-bold text-red-400/80 hover:bg-red-500/15 hover:text-red-400 [&_svg]:size-3")}
+                  loading={isDetaching}
+                  className="gap-1.5"
                 >
-                  {isDetaching ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <Link2Off className="h-3 w-3" />
-                  )}
+                  {!isDetaching && <Link2Off />}
                   Detach
-                </button>
+                </Button>
               </div>
             )}
 
@@ -285,26 +253,23 @@ export function SongPracticePickerModal({
         {phase === "attach" && (
           <div className="space-y-4 p-5">
             {/* Tabs */}
-            <div className="flex gap-1 rounded-xl bg-white/5 p-1">
-              {(["library", "import"] as AttachTab[]).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setAttachTab(tab)}
-                  className={cn(
-                    "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition-all",
-                    attachTab === tab
-                      ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-400"
-                      : "text-zinc-500 hover:text-zinc-300"
-                  )}
-                >
-                  {tab === "library" ? (
-                    <><FolderOpen className="h-3.5 w-3.5" /> {t("picker.my_files")}</>
-                  ) : (
-                    <><Upload className="h-3.5 w-3.5" /> {t("picker.import")}</>
-                  )}
-                </button>
-              ))}
-            </div>
+            <SegmentedControl<AttachTab>
+              label={t("picker.attach_gp")}
+              selected={[attachTab]}
+              onSelect={setAttachTab}
+              options={[
+                {
+                  value: "library",
+                  label: t("picker.my_files"),
+                  icon: <FolderOpen className="h-3.5 w-3.5 shrink-0" />,
+                },
+                {
+                  value: "import",
+                  label: t("picker.import"),
+                  icon: <Upload className="h-3.5 w-3.5 shrink-0" />,
+                },
+              ]}
+            />
 
             {attachTab === "library" && (
               <GpFileLibraryPicker userId={userId} onSelect={handleFileAttached} />
@@ -343,8 +308,13 @@ function GpFileLibraryPicker({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-8 text-zinc-600">
-        <Loader2 className="h-5 w-5 animate-spin" />
+      <div className="space-y-2" aria-busy="true">
+        {Array.from({ length: 3 }, (_, i) => (
+          <div key={i} className="flex items-center gap-3 rounded-lg bg-zinc-900/40 p-3">
+            <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        ))}
       </div>
     );
   }
@@ -354,7 +324,7 @@ function GpFileLibraryPicker({
       <div className="flex flex-col items-center gap-3 py-8 text-zinc-600">
         <FolderOpen className="h-8 w-8 opacity-40" />
         <p className="text-xs font-bold">{t("picker.no_files")}</p>
-        <p className="text-[10px] text-zinc-700">{t("picker.no_files_hint")}</p>
+        <p className="text-xs text-zinc-500">{t("picker.no_files_hint")}</p>
       </div>
     );
   }
@@ -374,7 +344,7 @@ function GpFileLibraryPicker({
               setLoadingId(null);
             }
           }}
-          className="flex w-full items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-left transition-colors hover:bg-white/[0.05] disabled:opacity-50"
+          className="flex w-full items-center gap-3 rounded-lg bg-white/[0.02] p-3 text-left transition-colors hover:bg-white/[0.05] disabled:opacity-50"
         >
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cyan-500/20 bg-cyan-500/10">
             <FileMusic className="h-4 w-4 text-cyan-400" />

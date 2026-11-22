@@ -65,7 +65,7 @@ export const OpenCaseButton = ({
       onClick={onClick}
       disabled={!canAfford || isOpening}
       className={cn(PRESSABLE, "border-b-black/30", 
-        "flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold capitalize tracking-wide transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
+        "flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
         fameCost !== undefined && "justify-between",
         isSolid
           ? canAfford

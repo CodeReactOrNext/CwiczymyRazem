@@ -34,7 +34,7 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
         <div className="flex flex-col gap-3">
              <div className="flex items-center gap-2 mb-1 px-1">
                 <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[12px] font-bold  tracking-[0.1em] text-zinc-500">
+                <span className="text-xs font-medium text-zinc-400">
                     Live Now ({uniqueUsers.length})
                 </span>
             </div>
@@ -127,7 +127,7 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
                     );
                 })}
                 {remainingCount > 0 && (
-                    <div className="relative -ml-3 z-0 h-10 w-10 flex items-center justify-center rounded-full bg-zinc-800 ring-2 ring-zinc-950 text-[10px] font-black text-zinc-400 border border-white/5 shadow-xl">
+                    <div className="relative -ml-3 z-0 h-10 w-10 flex items-center justify-center rounded-full bg-zinc-800 ring-2 ring-zinc-950 text-xs font-bold text-zinc-400 border border-white/5 shadow-xl">
                         +{remainingCount}
                     </div>
                 )}

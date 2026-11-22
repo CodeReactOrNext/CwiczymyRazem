@@ -39,10 +39,10 @@ export const SupporterInfo = () => {
 
         <div className='mt-6 grid gap-4 md:grid-cols-2'>
           {SURFACES.map(({ id, icon: Icon }) => (
-            <article key={id} className='rounded-lg bg-zinc-900/40 p-6 sm:p-7'>
+            <article key={id} className='rounded-lg bg-zinc-800/40 p-6 sm:p-7'>
               <div className='flex items-center gap-3'>
                 <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-300'>
-                  <Icon size={18} />
+                  <Icon className='h-5 w-5' />
                 </span>
                 <h3 className='text-base font-semibold text-zinc-100'>
                   {t(`panel.info.surfaces.${id}.title`)}
@@ -58,7 +58,7 @@ export const SupporterInfo = () => {
 
       <section className='space-y-5 rounded-lg bg-amber-500/5 p-6 sm:p-8'>
         <h2 className='flex items-center gap-2.5 text-lg font-semibold text-zinc-100'>
-          <AtSign size={18} className='text-amber-300' />
+          <AtSign className='h-5 w-5 text-amber-300' />
           {t("panel.info.donate_email")}
         </h2>
 
@@ -79,10 +79,8 @@ export const SupporterInfo = () => {
 
         <Button asChild variant='secondary' className='self-start'>
           <a href={DISCORD_INVITE_URL} target='_blank' rel='noreferrer'>
-            <span className='flex items-center gap-2'>
-              <FaDiscord size={16} />
-              {t("panel.info.message_discord")}
-            </span>
+            <FaDiscord size={16} />
+            {t("panel.info.message_discord")}
           </a>
         </Button>
       </section>

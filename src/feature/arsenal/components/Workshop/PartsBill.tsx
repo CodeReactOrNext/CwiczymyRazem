@@ -26,7 +26,7 @@ export const PartsBill = ({ parts, title }: PartsBillProps) => {
 
   return (
     <div className='flex flex-col gap-3 rounded-lg bg-zinc-950/40 p-4'>
-      <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
+      <span className='text-xs font-medium text-zinc-400'>
         {title}
       </span>
 
@@ -46,7 +46,7 @@ export const PartsBill = ({ parts, title }: PartsBillProps) => {
                 {labels.part(part.partId)}
               </span>
               <span
-                className='text-[10px] font-semibold'
+                className='text-[11px] font-semibold'
                 style={{ color: readableText(PART_TIER_COLORS[part.tier]) }}>
                 {labels.partTier(part.tier)}
               </span>

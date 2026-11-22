@@ -220,7 +220,7 @@ export const SectionRow = ({
                     setEditingName(false);
                   }}
                   className={cn(
-                    "px-2.5 py-1 rounded-[4px] text-[10px] font-medium transition-colors",
+                    "px-2.5 py-1 rounded-[4px] text-[11px] font-medium transition-colors",
                     nameValue === name
                       ? "bg-cyan-500/10 text-cyan-400"
                       : "bg-white/[0.03] text-zinc-500 hover:bg-cyan-500/10 hover:text-cyan-400"

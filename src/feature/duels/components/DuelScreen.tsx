@@ -1,11 +1,6 @@
 import { Button, buttonVariants } from "assets/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
+import { ConfirmDialog } from "components/ConfirmDialog/ConfirmDialog";
 import Avatar from "components/UI/Avatar";
 import {
   AttemptTicks,
@@ -130,7 +125,7 @@ export const DuelScreen = ({
           title={t("duel.back")}
           className={cn(
             buttonVariants({ variant: "ghost", size: "icon" }),
-            "size-10 shrink-0",
+            "shrink-0",
           )}>
           <ArrowLeft />
         </Link>
@@ -176,7 +171,7 @@ export const DuelScreen = ({
       </div>
 
       {/* The face-off: you with your best, the opponent as a silhouette and a row of attempts. */}
-      <div className='grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 rounded-2xl bg-zinc-900/60 p-5 sm:gap-6 sm:p-7'>
+      <div className='grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 rounded-lg bg-zinc-800/40 p-5 sm:gap-6 sm:p-6'>
         <div className='flex min-w-0 flex-col gap-3'>
           <div className='flex items-center gap-2.5'>
             <Avatar
@@ -226,7 +221,7 @@ export const DuelScreen = ({
             <span
               className='flex size-10 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-zinc-500'
               aria-hidden='true'>
-              <UserRound size={18} />
+              <UserRound className='h-5 w-5' />
             </span>
             <span className='truncate text-sm font-semibold text-zinc-400'>
               {t("active.anonymous")}
@@ -249,11 +244,11 @@ export const DuelScreen = ({
 
       <div className='flex flex-col gap-3'>
         {isOver || (isReady && isOpponentReady) ? (
-          <p className='rounded-xl bg-zinc-900/60 px-4 py-3 text-sm text-zinc-300'>
+          <p className='rounded-lg bg-zinc-800/40 px-4 py-3 text-sm text-zinc-300'>
             {t("active.settling_short")}
           </p>
         ) : isReady ? (
-          <p className='flex items-start gap-3 rounded-xl bg-zinc-900/60 px-4 py-3 text-sm leading-relaxed text-zinc-300'>
+          <p className='flex items-start gap-3 rounded-lg bg-zinc-800/40 px-4 py-3 text-sm leading-relaxed text-zinc-300'>
             <Check size={16} className='mt-0.5 shrink-0 text-emerald-400' />
             {t("ready.locked")}
           </p>
@@ -262,8 +257,8 @@ export const DuelScreen = ({
             <Link
               href={`/practice/duel/${duel.id}`}
               className={cn(
-                buttonVariants({ size: "lg" }),
-                "h-12 w-full border-b-zinc-400 bg-white text-base text-zinc-950 hover:bg-zinc-200",
+                buttonVariants({ size: "xl" }),
+                "w-full",
               )}>
               <Play className='fill-current' />
               {hasPlayed ? t("active.beat_best") : t("active.play")}
@@ -273,7 +268,7 @@ export const DuelScreen = ({
               <Button
                 variant='ghost'
                 size='lg'
-                className='h-11 w-full'
+                className='w-full'
                 onClick={() => setIsConfirming(true)}>
                 <Check />
                 {t("ready.button")}
@@ -288,48 +283,28 @@ export const DuelScreen = ({
         )}
       </div>
 
-      <Dialog
+      <ConfirmDialog
         open={isConfirming}
         onOpenChange={(open) => {
-          if (ready.isPending) return;
           setIsConfirming(open);
           if (!open) ready.reset();
-        }}>
-        <DialogContent className='flex max-w-md flex-col gap-4 bg-zinc-900 sm:border-0 sm:p-7'>
-          <DialogTitle className='pr-12 text-xl text-zinc-50'>
-            {t("ready.confirm_title", { score: score(duel.me.bestScore) })}
-          </DialogTitle>
-          <DialogDescription className='text-sm leading-relaxed text-zinc-300'>
-            {isOpponentReady
-              ? t("ready.confirm_body_last")
-              : t("ready.confirm_body")}
-          </DialogDescription>
-          {readyErrorText && (
-            <p role='alert' className='text-sm text-orange-300'>
-              {readyErrorText}
-            </p>
-          )}
-          <Button
-            size='lg'
-            onClick={lockIn}
-            loading={ready.isPending}
-            disabled={ready.isPending}
-            className='mt-2 h-12 w-full border-b-zinc-400 bg-white text-base text-zinc-950 hover:bg-zinc-200'>
-            {t("ready.confirm")}
-          </Button>
-          <Button
-            variant='ghost'
-            size='lg'
-            className='h-11 w-full'
-            disabled={ready.isPending}
-            onClick={() => {
-              setIsConfirming(false);
-              ready.reset();
-            }}>
-            {t("ready.cancel")}
-          </Button>
-        </DialogContent>
-      </Dialog>
+        }}
+        title={t("ready.confirm_title", { score: score(duel.me.bestScore) })}
+        description={
+          isOpponentReady
+            ? t("ready.confirm_body_last")
+            : t("ready.confirm_body")
+        }
+        cancelLabel={t("ready.cancel")}
+        confirmLabel={t("ready.confirm")}
+        loading={ready.isPending}
+        onConfirm={lockIn}>
+        {readyErrorText && (
+          <p role='alert' className='text-sm text-orange-300'>
+            {readyErrorText}
+          </p>
+        )}
+      </ConfirmDialog>
     </div>
   );
 };

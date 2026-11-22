@@ -2,6 +2,7 @@
 
 import { Button } from "assets/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
+import { Textarea } from "assets/components/ui/textarea";
 import { selectUserAuth, selectUserName } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
@@ -67,7 +68,7 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg border-white/10 bg-zinc-900 text-white shadow-2xl pb-24 sm:pb-6">
+      <DialogContent className="bg-zinc-900 text-white pb-24 sm:pb-6">
         {isPrompt ? (
           <>
             <DialogHeader className="border-b border-white/5 pb-4">
@@ -89,7 +90,7 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
                   <span>🐛</span> {t("prompt.found_bug")}
                   <span>😤</span> {t("prompt.annoys")}
                 </p>
-                <p className="text-xs text-zinc-600">
+                <p className="text-xs text-zinc-500">
                   <Interpolate
                     text={t("prompt.anytime")}
                     values={{
@@ -101,23 +102,24 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
                 </p>
               </div>
 
-              <textarea
+              <Textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder={t("prompt.placeholder")}
                 rows={5}
                 autoFocus
-                className="w-full resize-none rounded-xl border border-white/5 bg-zinc-800/50 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:border-cyan-500/40 focus:outline-none focus:ring-1 focus:ring-cyan-500/40 transition-colors"
+                className="resize-none px-4 py-3"
               />
 
               <div className="flex justify-end gap-2">
-                <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white">
+                <Button variant="ghost" size="lg" onClick={onClose} className="text-zinc-500 hover:text-white">
                   {t("prompt.maybe_later")}
                 </Button>
                 <Button
+                  size="lg"
                   onClick={send}
-                  disabled={loading || !message.trim()}
-                  className="bg-cyan-600 text-white hover:bg-cyan-500 disabled:opacity-50"
+                  disabled={!message.trim()}
+                  loading={loading}
                 >
                   {loading ? t("sending") : t("prompt.share")}
                 </Button>
@@ -153,22 +155,22 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
                         {cat.icon}
                       </span>
                       <span className="text-xs font-semibold leading-none">{t(`categories.${cat.value}.label`)}</span>
-                      <span className="text-[10px] leading-tight text-zinc-500">{t(`categories.${cat.value}.description`)}</span>
+                      <span className="text-xs leading-tight text-zinc-500">{t(`categories.${cat.value}.description`)}</span>
                     </button>
                   );
                 })}
               </div>
 
-              <textarea
+              <Textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder={t(`categories.${category}.placeholder`)}
                 rows={5}
-                className="w-full resize-none rounded-xl border border-white/5 bg-zinc-800/50 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:border-cyan-500/40 focus:outline-none focus:ring-1 focus:ring-cyan-500/40 transition-colors"
+                className="resize-none px-4 py-3"
               />
 
               <div className="flex items-center justify-between">
-                <span className="text-xs text-zinc-600">
+                <span className="text-xs text-zinc-500">
                   <Interpolate
                     text={t("sending_as")}
                     values={{
@@ -179,13 +181,14 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
                   />
                 </span>
                 <div className="flex gap-2">
-                  <Button variant="ghost" onClick={onClose} className="text-zinc-500 hover:text-white">
+                  <Button variant="ghost" size="lg" onClick={onClose} className="text-zinc-500 hover:text-white">
                     {t("cancel")}
                   </Button>
                   <Button
+                    size="lg"
                     onClick={send}
-                    disabled={loading || !message.trim()}
-                    className="bg-cyan-600 text-white hover:bg-cyan-500 disabled:opacity-50"
+                    disabled={!message.trim()}
+                    loading={loading}
                   >
                     {loading ? t("sending") : t("send_feedback")}
                   </Button>

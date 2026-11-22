@@ -115,11 +115,12 @@ const FilterSheet = ({
               {hasFilters && (
                 <Button
                   variant="ghost"
+                  size="sm"
                   onClick={() => {
                     onClearFilters();
                     onClose();
                   }}
-                  className="h-9 shrink-0 rounded-md border border-red-400/30 px-3 text-sm font-bold text-red-400 hover:border-red-400/50 hover:bg-red-500/10 hover:text-red-300"
+                  className="shrink-0"
                 >
                   {t("filter_sheet.reset")}
                 </Button>
@@ -132,7 +133,7 @@ const FilterSheet = ({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-semibold text-zinc-300">{t("filter_sheet.tiers")}</h4>
-                <span className="text-[10px] text-zinc-600 font-bold">{t("filter_sheet.selected", { count: localTiers.length })}</span>
+                <span className="text-xs text-zinc-500 font-medium">{t("filter_sheet.selected", { count: localTiers.length })}</span>
               </div>
               <div className="grid grid-cols-8 gap-2">
                 {tiers.map((t) => {
@@ -179,7 +180,7 @@ const FilterSheet = ({
                     {localGenres.map(g => (
                       <span 
                         key={g} 
-                        className="flex items-center gap-1.5 rounded-[4px] bg-cyan-500/10 px-3 py-1 text-[10px] font-bold text-cyan-400 animate-in zoom-in-95 duration-base"
+                        className="flex items-center gap-1.5 rounded-[4px] bg-cyan-500/10 px-3 py-1 text-[11px] font-bold text-cyan-400 animate-in zoom-in-95 duration-base"
                       >
                         {g}
                         <X 
@@ -225,13 +226,13 @@ const FilterSheet = ({
                   setLocalSortDirection(val === 'popularity' || val === 'createdAt' ? 'desc' : 'asc');
                 }}
               >
-                <SelectTrigger className="h-12 w-full rounded-lg bg-white/[0.02] text-zinc-300 focus:ring-0 border-none">
+                <SelectTrigger className="h-10 w-full">
                   <div className="flex items-center gap-2">
                     <ArrowUpDown className="h-4 w-4 opacity-50 text-cyan-500" />
                     <SelectValue placeholder={t("filter_sheet.sort_by")} />
                   </div>
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-900 shadow-2xl border-none">
+                <SelectContent>
                   <SelectItem value="title">{t("filter_sheet.sort_title")}</SelectItem>
                   <SelectItem value="popularity">{t("filter_sheet.sort_popularity")}</SelectItem>
                   <SelectItem value="createdAt">{t("filter_sheet.sort_date")}</SelectItem>
@@ -243,7 +244,8 @@ const FilterSheet = ({
           <div className="px-6 pt-6 pb-[calc(1.5rem_+_env(safe-area-inset-bottom))] bg-zinc-950/50 backdrop-blur-sm">
             <Button
                 onClick={handleApply}
-                className="h-14 w-full rounded-lg bg-white font-semibold text-black shadow-xl hover:bg-zinc-200 transition-all active:scale-[0.98]"
+                size="lg"
+                className="w-full"
             >
               {t("filter_sheet.apply")}
             </Button>

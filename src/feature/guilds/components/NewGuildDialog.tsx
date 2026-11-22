@@ -140,7 +140,7 @@ export const NewGuildDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-lg'>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("browser.found")}</DialogTitle>
           <DialogDescription>
@@ -183,7 +183,7 @@ export const NewGuildDialog = ({
               onChange={(event) => setName(event.target.value)}
               maxLength={GUILD_NAME_MAX}
               placeholder='Riff Raiders'
-              className='h-11 bg-white/5 font-bold'
+              className='h-11 font-bold'
             />
             {nameProblem ? (
               <p className='ml-1 text-xs text-amber-400/80'>
@@ -214,7 +214,7 @@ export const NewGuildDialog = ({
               onChange={(event) => setTag(normaliseTag(event.target.value))}
               maxLength={GUILD_TAG_MAX}
               placeholder='RIF'
-              className='h-11 w-32 bg-white/5 font-black tracking-widest'
+              className='h-11 w-32 font-bold'
             />
             {tagProblem && (
               <p className='ml-1 text-xs text-amber-400/80'>
@@ -246,11 +246,9 @@ export const NewGuildDialog = ({
                   type='button'
                   variant='ghost'
                   onClick={() => fileInput.current?.click()}
-                  className='h-9 bg-white/5 text-zinc-300 hover:text-zinc-100'>
-                  <span className='flex items-center gap-2'>
-                    <ImagePlus size={15} />
-                    {preview ? t("new.change") : t("new.add_image")}
-                  </span>
+                  className='bg-white/5 text-zinc-300 hover:text-zinc-100'>
+                  <ImagePlus size={15} />
+                  {preview ? t("new.change") : t("new.add_image")}
                 </Button>
 
                 {preview && (
@@ -258,11 +256,9 @@ export const NewGuildDialog = ({
                     type='button'
                     variant='ghost'
                     onClick={clearLogo}
-                    className='h-9 text-zinc-500 hover:text-red-400'>
-                    <span className='flex items-center gap-1.5'>
-                      <X size={14} />
-                      {t("new.remove")}
-                    </span>
+                    className='text-zinc-500 hover:text-red-400'>
+                    <X size={14} />
+                    {t("new.remove")}
                   </Button>
                 )}
 
@@ -297,7 +293,7 @@ export const NewGuildDialog = ({
               maxLength={GUILD_DESCRIPTION_MAX}
               rows={3}
               placeholder={t("new.what_for_placeholder")}
-              className='resize-none bg-white/5 font-medium'
+              className='resize-none font-medium'
             />
           </div>
         </div>

@@ -116,7 +116,12 @@ export const DuelResultScreen = ({
 
   return (
     <div className='mx-auto flex w-full max-w-md flex-col items-center gap-7 py-6 text-center sm:py-10'>
-      <Kostek mood={isWin ? "celebrate" : "idle"} className='h-28' />
+      {/* A lost duel is lost to another player: sad, like a failed exam. A draw
+          or a void duel has nothing to mourn. (MASCOT.md, `sad`) */}
+      <Kostek
+        mood={isWin ? "celebrate" : result === "lost" ? "sad" : "idle"}
+        className='h-28'
+      />
 
       <div>
         <h2
@@ -152,7 +157,7 @@ export const DuelResultScreen = ({
       )}
 
       <div className='grid w-full grid-cols-2 gap-3 text-left'>
-        <div className='rounded-2xl bg-zinc-900/60 p-4'>
+        <div className='rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
           <p className='text-xs font-semibold text-zinc-500'>
             {t("result.elo")}
           </p>
@@ -174,7 +179,7 @@ export const DuelResultScreen = ({
             {t("result.was", { rating: before })}
           </p>
         </div>
-        <div className='rounded-2xl bg-zinc-900/60 p-4'>
+        <div className='rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
           <p className='text-xs font-semibold text-zinc-500'>
             {t("result.place")}
           </p>
@@ -196,7 +201,7 @@ export const DuelResultScreen = ({
       <Button
         size='lg'
         onClick={onContinue}
-        className='h-12 w-full border-b-zinc-400 bg-white text-base text-zinc-950 hover:bg-zinc-200'>
+        className='w-full'>
         {t("result.continue")}
       </Button>
     </div>

@@ -1,23 +1,44 @@
 import { RARITY_RANK } from "../components/RarityProgress";
 import type { GuitarRarity } from "../types/arsenal.types";
 
-/** Which half of the collection is on screen. */
-export type CollectionScope = "all" | "guitars" | "pedals";
+/**
+ * Which shelf of the collection is on screen — the inventory tabs of any game:
+ * guitars, pedals, loose parts (scrap and rescued mods), and the Builder's
+ * pieces for putting a guitar together. One board for everything was hard to
+ * read and drew hundreds of sockets at once.
+ */
+export type CollectionScope = "guitars" | "pedals" | "parts" | "builder";
+
+export const COLLECTION_SCOPES: CollectionScope[] = [
+  "guitars",
+  "pedals",
+  "parts",
+  "builder",
+];
+
+/** The shelf a board piece lives on. */
+export const scopeOfPiece = (
+  kind: "guitar" | "effect" | "part" | "mod" | "component",
+): CollectionScope =>
+  kind === "guitar"
+    ? "guitars"
+    : kind === "effect"
+      ? "pedals"
+      : kind === "component"
+        ? "builder"
+        : "parts";
 
 /**
  * How the visible items are ordered.
  *
  * `manual` is the stash board's own: the player arranged it, so nothing is
- * allowed to re-order it afterwards. `type` is the board's too — it is the one
- * order that keeps guitars, pedals, mods and parts apart, which only a board
- * that hangs all four in one grid can express.
+ * allowed to re-order it afterwards.
  */
 export type CollectionSort =
   | "rarity"
   | "level"
   | "newest"
   | "equipped"
-  | "type"
   | "manual";
 
 /**
@@ -25,7 +46,7 @@ export type CollectionSort =
  * of these is chosen and gives it back on the way out — a glance at the cards
  * must not quietly re-sort the stash for good.
  */
-const STASH_ONLY_SORTS: CollectionSort[] = ["manual", "type"];
+const STASH_ONLY_SORTS: CollectionSort[] = ["manual"];
 
 export const isStashOnlySort = (sort: CollectionSort): boolean =>
   STASH_ONLY_SORTS.includes(sort);
@@ -120,8 +141,6 @@ export const sortEntries = <T>(
     return sorted;
   }
   // Rarest first, copies of the same model kept side by side, best copy leading.
-  // `type` lands here too: the split by kind is the board's to make, and inside
-  // one kind "by type" can only mean the default order.
   sorted.sort(
     (a, b) =>
       byRarity(a, b) ||
@@ -137,9 +156,3 @@ export const filterAndSortEntries = <T>(
   query: string,
   sort: CollectionSort,
 ): T[] => sortEntries(filterEntries(entries, query), sort).map((e) => e.item);
-
-/** Whether a section should render at all for the current scope. */
-export const isScopeVisible = (
-  scope: CollectionScope,
-  section: "guitars" | "pedals",
-): boolean => scope === "all" || scope === section;

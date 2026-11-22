@@ -85,7 +85,7 @@ const SessionTagPicker = ({
           name='reportTitle'
           placeholder={t("form.session_title_placeholder")}
           className={cn(
-            "h-11 bg-zinc-900/40 text-base focus-visible:ring-cyan-500/40 sm:text-sm",
+            "h-11",
             titleError && "ring-1 ring-red-500/40"
           )}
           value={title}

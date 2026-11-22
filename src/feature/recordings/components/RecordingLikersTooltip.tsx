@@ -60,8 +60,8 @@ export const RecordingLikersTooltip = ({
           then remount the button and drop its focus mid-click. */}
       <Tooltip open={open && likes.length > 0 && !isError} onOpenChange={setOpen}>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent side='top' className='max-w-[14rem] px-3 py-2'>
-          <p className='text-[11px] font-medium text-zinc-500'>{t("likers.title")}</p>
+        <TooltipContent side='top' className='max-w-[14rem] p-3'>
+          <p className='text-xs font-medium text-black/60'>{t("likers.title")}</p>
           <ul className='mt-1 space-y-0.5'>
             {names.map((name, index) => (
               <li key={`${name}-${index}`} translate='no' className='truncate'>
@@ -70,12 +70,12 @@ export const RecordingLikersTooltip = ({
             ))}
           </ul>
           {isResolving && (
-            <p className='mt-1 text-[11px] font-medium text-zinc-500'>
+            <p className='mt-1 text-xs font-medium text-black/60'>
               {t("likers.loading")}
             </p>
           )}
           {hiddenCount > 0 && (
-            <p className='mt-1 text-[11px] font-medium text-zinc-500'>
+            <p className='mt-1 text-xs font-medium text-black/60'>
               {t("likers.more", { count: hiddenCount })}
             </p>
           )}

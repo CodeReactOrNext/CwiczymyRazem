@@ -26,10 +26,12 @@ export const PRACTICE_CATEGORIES: {
   color: string;
   logField: "techniqueTime" | "theoryTime" | "hearingTime" | "creativityTime";
 }[] = [
-  { k: "tech",    label: "Tech",       color: "#ef4444", logField: "techniqueTime"  },
-  { k: "theory",  label: "Theory",     color: "#0891B2", logField: "theoryTime"     },
-  { k: "hearing", label: "Ear",        color: "#10b981", logField: "hearingTime"    },
-  { k: "creat",   label: "Creativity", color: "#f59e0b", logField: "creativityTime" },
+  // The same hues as the category chips everywhere else (categoryChip.ts):
+  // technique emerald, theory blue, hearing amber, creativity purple.
+  { k: "tech",    label: "Tech",       color: "#10b981", logField: "techniqueTime"  },
+  { k: "theory",  label: "Theory",     color: "#3b82f6", logField: "theoryTime"     },
+  { k: "hearing", label: "Ear",        color: "#f59e0b", logField: "hearingTime"    },
+  { k: "creat",   label: "Creativity", color: "#a855f7", logField: "creativityTime" },
 ];
 
 export function isSameDay(a: Date, b: Date) {

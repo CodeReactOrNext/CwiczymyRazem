@@ -271,7 +271,7 @@ export function HuntViewMenu({ showFullNeck, onShowFullNeckChange, noteSound, on
         collisionPadding={16}
         // Clear the session's full-screen layer (z-[999999] desktop / z-[9999999]
         // mobile); the default z-50 would paint underneath it.
-        className='z-[99999999] w-56 border-0 bg-zinc-900 p-1.5 text-zinc-100 shadow-none'>
+        className='z-[99999999] w-56'>
         <DropdownMenuCheckboxItem
           checked={showFullNeck}
           onCheckedChange={(checked) => onShowFullNeckChange(checked === true)}

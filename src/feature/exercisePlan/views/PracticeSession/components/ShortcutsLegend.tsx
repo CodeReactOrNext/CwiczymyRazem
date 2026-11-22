@@ -47,7 +47,7 @@ const ShortcutList = ({ rows }: { rows: ShortcutRow[] }) => (
         <div className="flex items-center gap-1 shrink-0">
           {row.keys.map((key, i) => (
             <span key={i} className="flex items-center gap-1">
-              {i > 0 && <span className="text-[10px] text-zinc-600">+</span>}
+              {i > 0 && <span className="text-xs text-zinc-500">+</span>}
               <Kbd>{key}</Kbd>
             </span>
           ))}
@@ -80,14 +80,14 @@ export const ShortcutsLegend = memo(function ShortcutsLegend({
         size="icon"
         title={t("shortcuts.title")}
         onClick={() => setIsOpen(true)}
-        className={cn("h-9 w-9 rounded-lg text-zinc-500 hover:text-white hover:bg-white/10", className)}
+        className={cn("text-zinc-500 hover:text-white hover:bg-white/10", className)}
       >
-        <Keyboard className="h-4 w-4" />
+        <Keyboard />
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         {/* z-index must beat the session view or this dialog opens invisibly behind it. */}
-        <DialogContent className="max-w-sm bg-zinc-900 text-white z-[99999999]">
+        <DialogContent className="sm:max-w-sm bg-zinc-900 text-white z-[99999999]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold tracking-tight">
               <Keyboard className="h-5 w-5 text-zinc-400" />

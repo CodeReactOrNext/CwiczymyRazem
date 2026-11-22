@@ -38,9 +38,16 @@ interface ActivityChartProps {
   showRangeSelect?: boolean;
   /** Extra classes for the outer Card (e.g. "bg-transparent p-0" for flat pages). */
   className?: string;
+  /** Card heading; defaults to "Activity overview". */
+  title?: string;
 }
 
-export function ActivityChart({ data, showRangeSelect = true, className }: ActivityChartProps) {
+export function ActivityChart({
+  data,
+  showRangeSelect = true,
+  className,
+  title,
+}: ActivityChartProps) {
   const { t } = useTranslation(["common", "ui"]);
   const intlLocale = useIntlLocale() ?? "en";
   const [timeRange, setTimeRange] = React.useState("all");
@@ -108,6 +115,11 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
     return last < first;
   }, [processedData]);
 
+  // Recharts animates in JS (a React update per frame over the whole path) and
+  // draws dots one element per point. On the all-time range that is a thousand-
+  // plus days, which froze the page for the length of the entrance animation.
+  const isLongSeries = processedData.length > 120;
+
   const chartColor = isNegative ? "#f43f5e" : "#10b981";
   // SVG attributes can't read the palette's CSS variables, so the axis ink is
   // picked here: white washes on the dark card, zinc ink on the light one.
@@ -118,23 +130,21 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
   return (
     <Card className={className}>
       <CardHeader
-        className={`flex p-0 pb-4 flex-col items-start justify-start gap-4 space-y-0 sm:flex-row sm:items-center ${
-          showRangeSelect ? "border-b border-white/10" : ""
-        }`}>
+        className='flex flex-col items-start justify-start gap-4 space-y-0 pb-4 sm:flex-row sm:items-center'>
         <div className='flex flex-col gap-1 text-left'>
           <CardTitle className='text-lg font-bold text-white'>
-            {t("chart.activity_overview")}
+            {title ?? t("chart.activity_overview")}
           </CardTitle>
         </div>
         {showRangeSelect && (
         <div className='flex items-center'>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
-              className='w-[160px] rounded-lg border-white/10 bg-white/5 text-white'
+              className='w-[160px]'
               aria-label={t("chart.time_ranges.all_time")}>
               <SelectValue placeholder={t("chart.time_ranges.all_time")} />
             </SelectTrigger>
-            <SelectContent className='rounded-xl border-white/10 bg-zinc-900/90 backdrop-blur-xl'>
+            <SelectContent>
               <SelectItem
                 value='all'
                 className='rounded-lg text-white hover:bg-white/10'>
@@ -160,7 +170,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
         </div>
         )}
       </CardHeader>
-      <CardContent className='px-2 pt-4 sm:px-6 sm:pt-6'>
+      <CardContent className='pt-4 sm:pt-6'>
         <ChartContainer
           config={chartConfig}
           className='aspect-auto h-[250px] w-full text-white'>
@@ -183,7 +193,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
               tickMargin={12}
               minTickGap={32}
               stroke={ink(0.5)}
-              className='font-openSans text-xs font-bold'
+              className='text-xs font-bold'
               tickFormatter={(value) => {
                 const date = new Date(value);
                 return date.toLocaleDateString(intlLocale, {
@@ -198,7 +208,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
               tickMargin={12}
               width={40}
               stroke={ink(0.5)}
-              className='font-openSans text-xs font-bold'
+              className='text-xs font-bold'
               tickCount={5}
               domain={[0, (dataMax: number) => {
                 const hours = Math.ceil(dataMax / 3600000);
@@ -222,9 +232,9 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
                   const entry = payload[0];
                   const hm = convertMsToHMObject(Number(entry.value) ?? 0);
                   return (
-                    <div className='rounded-lg border border-white/10 bg-zinc-950/90 p-4 text-white shadow-2xl backdrop-blur-xl'>
+                    <div className='rounded-lg bg-white p-3 text-xs text-black'>
                       <div className='flex flex-col gap-1'>
-                        <span className='text-[0.70rem] font-bold text-zinc-500'>
+                        <span className='text-xs font-bold text-black/60'>
                           {new Date(label ?? "").toLocaleDateString(intlLocale, {
                             month: "long",
                             day: "numeric",
@@ -232,7 +242,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
                           })}
                         </span>
                         <div className="flex items-baseline gap-2">
-                           <span className={`font-bold text-xl tracking-tight ${isNegative ? "text-rose-500" : "text-emerald-400"}`}>
+                           <span className={`font-bold text-xl tracking-tight ${isNegative ? "text-rose-600" : "text-emerald-700"}`}>
                             {Number(hm.hours) > 0 && `${Number(hm.hours)}h `}
                             {t("ui:minutes_short", { minutes: Number(hm.minutes) })}
                           </span>
@@ -250,7 +260,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
               fill='url(#fillPrice)'
               stroke={chartColor}
               strokeWidth={2}
-              dot={(props: any) => {
+              dot={isLongSeries ? false : (props: any) => {
                 const { cx, cy, payload } = props;
                 if (!payload || payload.totalTime === 0) return <></>;
                 return (
@@ -270,6 +280,7 @@ export function ActivityChart({ data, showRangeSelect = true, className }: Activ
                 r: 5,
                 strokeWidth: 0,
               }}
+              isAnimationActive={!isLongSeries}
               animationDuration={1500}
             />
           </AreaChart>

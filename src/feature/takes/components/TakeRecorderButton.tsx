@@ -1,8 +1,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { PRESSABLE_KEY } from "assets/components/ui/button";
+import { Button, buttonVariants, PRESSABLE_KEY } from "assets/components/ui/button";
 import { Slider } from "assets/components/ui/slider";
 import { Switch } from "assets/components/ui/switch";
 import { cn } from "assets/lib/utils";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import {
   placePopover,
   POPOVER_WIDTH,
@@ -84,25 +85,29 @@ function TakeRow({ take, onRemoved }: { take: TakeEntry; onRemoved: () => void }
           <span className='block truncate text-[11px] text-zinc-400'>{detail}</span>
         </span>
       </button>
-      <button
+      <Button
         type='button'
+        variant='ghost'
+        size='icon'
         onClick={() => main && window.takes?.reveal(main.name)}
         title={t("takes.show_in_folder")}
         aria-label={t("takes.show_in_folder")}
-        className='flex h-11 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400'>
-        <FolderOpen className='h-3.5 w-3.5' />
-      </button>
-      <button
+        className='h-11 w-10 shrink-0 text-zinc-400'>
+        <FolderOpen />
+      </Button>
+      <Button
         type='button'
+        variant='ghost'
+        size='icon'
         onClick={async () => {
           await window.takes?.remove(take.id);
           onRemoved();
         }}
         title={t("takes.delete")}
         aria-label={t("takes.delete")}
-        className='flex h-11 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400'>
-        <Trash2 className='h-3.5 w-3.5' />
-      </button>
+        className='h-11 w-10 shrink-0 text-zinc-400 hover:text-red-400'>
+        <Trash2 />
+      </Button>
     </div>
   );
 }
@@ -254,12 +259,12 @@ export const TakeRecorderButton = ({ title = "", compact = false, h = "h-12" }: 
           <Circle className={cn(compact ? "h-3.5 w-3.5" : "h-4 w-4 shrink-0")} />
         )}
         {recording ? (
-          <span className={cn("font-semibold tabular-nums", compact ? "ml-1.5 text-[10px]" : "text-[11px]")}>
+          <span className={cn("font-semibold tabular-nums", compact ? "ml-1.5 text-[11px]" : "text-[11px]")}>
             {formatClock(elapsed)}
           </span>
         ) : (
           !compact && (
-            <span className='text-[10px] font-semibold tracking-wide'>{t("takes.short")}</span>
+            <span className='text-[11px] font-semibold'>{t("takes.short")}</span>
           )
         )}
       </button>
@@ -282,29 +287,16 @@ export const TakeRecorderButton = ({ title = "", compact = false, h = "h-12" }: 
               <section className='flex flex-col gap-4'>
                 <div className='text-sm font-semibold leading-tight'>{t("takes.title")}</div>
 
-                <div role='tablist' aria-label={t("takes.mode_label")} className='grid grid-cols-2 gap-1 rounded-lg bg-zinc-950/60 p-1'>
-                  {MODES.map(({ mode: choice, icon: Icon }) => {
-                    const selected = mode === choice;
-                    return (
-                      <button
-                        key={choice}
-                        type='button'
-                        role='tab'
-                        aria-selected={selected}
-                        onClick={() => setMode(choice)}
-                        className={cn(
-                          "flex h-8 items-center justify-center gap-1.5 rounded px-2 text-sm transition-colors",
-                          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
-                          selected
-                            ? "bg-zinc-700/70 font-medium text-zinc-100"
-                            : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200",
-                        )}>
-                        <Icon className='h-3.5 w-3.5' />
-                        {t(`takes.mode.${choice}`)}
-                      </button>
-                    );
-                  })}
-                </div>
+                <SegmentedControl<TakeMode>
+                  label={t("takes.mode_label")}
+                  selected={[mode]}
+                  onSelect={setMode}
+                  options={MODES.map(({ mode: choice, icon: Icon }) => ({
+                    value: choice,
+                    label: t(`takes.mode.${choice}`),
+                    icon: <Icon className='h-3.5 w-3.5 shrink-0' />,
+                  }))}
+                />
 
                 <p className='text-[11px] leading-relaxed text-zinc-400'>{t(`takes.about.${mode}`)}</p>
 
@@ -321,11 +313,8 @@ export const TakeRecorderButton = ({ title = "", compact = false, h = "h-12" }: 
                 <button
                   type='button'
                   onClick={handleStart}
-                  className={cn(
-                    PRESSABLE_KEY,
-                    "flex h-10 items-center justify-center gap-2 rounded-lg bg-white text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400",
-                  )}>
-                  <Circle className='h-3.5 w-3.5 fill-red-500 text-red-500' />
+                  className={buttonVariants({ size: "lg" })}>
+                  <Circle className='fill-red-500 text-red-500' />
                   {t("takes.start")}
                 </button>
 

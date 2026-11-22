@@ -1,10 +1,10 @@
+import { Button } from "assets/components/ui/button";
 import {
   Pagination as ShadcnPagination,
   PaginationContent,
   PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
 } from "assets/components/ui/pagination";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
   currentPage: number;
@@ -19,39 +19,35 @@ export const Pagination = ({
   onPageChange,
   lastAccessiblePage,
 }: PaginationProps) => {
-  const handlePrevious = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1);
-    }
-  };
-
-  const handleNext = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    if (currentPage < totalPages && currentPage < lastAccessiblePage) {
-      onPageChange(currentPage + 1);
-    }
-  };
+  const canGoBack = currentPage > 1;
+  const canGoForward =
+    currentPage < totalPages && currentPage < lastAccessiblePage;
 
   return (
     <ShadcnPagination className='pb-4'>
       <PaginationContent className="gap-4">
         <PaginationItem>
-          <PaginationPrevious
-            onClick={handlePrevious}
-            className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 ${
-              currentPage === 1 ? "pointer-events-none opacity-50" : ""
-            }`}
-          />
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            aria-label='Go to previous page'
+            disabled={!canGoBack}
+            onClick={() => onPageChange(currentPage - 1)}>
+            <ChevronLeft />
+          </Button>
         </PaginationItem>
 
         <PaginationItem>
-          <PaginationNext
-            onClick={handleNext}
-            className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 ${
-              (currentPage === totalPages || currentPage >= lastAccessiblePage) ? "pointer-events-none opacity-50" : ""
-            }`}
-          />
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            aria-label='Go to next page'
+            disabled={!canGoForward}
+            onClick={() => onPageChange(currentPage + 1)}>
+            <ChevronRight />
+          </Button>
         </PaginationItem>
       </PaginationContent>
     </ShadcnPagination>

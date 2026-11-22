@@ -57,6 +57,7 @@
     "subtitle": "Pick up where you left off, or jump into any module.",
     "continue": "Continue",
     "start": "Start",
+    "replay": "Replay",
     "suggest": "Suggest a learning path",
     "missing_coming": "Missing a topic? {{topics}} are coming next — let us know what else you'd like to see.",
     "missing": "Missing a topic? Let us know what you'd like to see next."

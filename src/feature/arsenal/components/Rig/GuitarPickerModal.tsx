@@ -64,7 +64,7 @@ export const GuitarPickerModal = ({
         onOpenAutoFocus={(event) => event.preventDefault()}
         // No zoom on the way in or out: scaling a grid of lit, filtered sockets
         // re-draws every one of them on every frame of it. It fades instead.
-        className='flex flex-col gap-8 border-0 bg-zinc-900 shadow-none sm:max-w-2xl sm:overflow-y-auto sm:p-8 sm:data-[state=closed]:zoom-out-100 sm:data-[state=open]:zoom-in-100'>
+        className='flex flex-col gap-8 bg-zinc-900 sm:max-w-2xl sm:overflow-y-auto sm:p-8 sm:data-[state=closed]:zoom-out-100 sm:data-[state=open]:zoom-in-100'>
         <DialogTitle className='pr-12 text-xl font-bold leading-snug text-zinc-100'>
           {t("picker.choose_guitar")}
         </DialogTitle>

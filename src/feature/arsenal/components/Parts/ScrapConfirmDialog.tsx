@@ -8,6 +8,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "assets/components/ui/alert-dialog";
+import { buttonVariants } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import type {
   SalvageableMod,
   ScrappedMod,
@@ -59,7 +61,7 @@ export const ScrapConfirmDialog = ({
       onOpenChange={(open) => {
         if (!open && !isLoading) onCancel();
       }}>
-      <AlertDialogContent className='max-w-sm gap-6 border-0 bg-zinc-900 p-6'>
+      <AlertDialogContent className='max-w-sm gap-6'>
         <AlertDialogHeader className='space-y-2'>
           <AlertDialogTitle className='text-lg font-bold text-white'>
             {t(`scrap.title.${itemType}`)}
@@ -124,7 +126,7 @@ export const ScrapConfirmDialog = ({
         <AlertDialogFooter className='gap-2 sm:space-x-0'>
           <AlertDialogCancel
             disabled={isLoading}
-            className='mt-0 border-0 bg-zinc-700 text-white hover:bg-zinc-600 hover:text-white sm:flex-1'>
+            className='mt-0 sm:flex-1'>
             {t("common.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
@@ -135,7 +137,7 @@ export const ScrapConfirmDialog = ({
               onConfirm();
             }}
             disabled={isLoading}
-            className='bg-orange-600 text-white hover:bg-orange-700 sm:flex-1'>
+            className={cn(buttonVariants({ variant: "destructive" }), "sm:flex-1")}>
             {isLoading ? t("bulk.scrapping") : t("common.confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>

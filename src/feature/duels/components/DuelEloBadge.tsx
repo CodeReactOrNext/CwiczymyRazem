@@ -15,7 +15,14 @@ import { useMemo } from "react";
  * Shares the duels page's query key, but without its polling: the dashboard
  * only needs the number as it was when the page opened.
  */
-export const DuelEloBadge = ({ uid }: { uid: string | null }) => {
+export const DuelEloBadge = ({
+  uid,
+  inline = false,
+}: {
+  uid: string | null;
+  /** Label over a smaller figure with the rank beside it — for a horizontal strip. */
+  inline?: boolean;
+}) => {
   const { data } = useQuery({
     queryKey: duelOverviewQueryKey(uid),
     queryFn: fetchDuelOverview,
@@ -37,6 +44,26 @@ export const DuelEloBadge = ({ uid }: { uid: string | null }) => {
   const shown = useLastKnown("duel-rating", uid, fresh);
 
   if (!shown?.isRated || shown.rating === undefined) return null;
+
+  if (inline) {
+    return (
+      <Link
+        href='/duels'
+        className='flex flex-col gap-0.5 rounded-lg p-1 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/5'>
+        <span className='text-xs font-semibold text-zinc-400'>ELO</span>
+        <span className='flex items-baseline gap-2'>
+          <span className='font-teko text-[32px] font-semibold leading-[30px] tabular-nums text-zinc-50'>
+            {shown.rating}
+          </span>
+          {shown.rank ? (
+            <span className='text-xs font-medium text-zinc-400'>
+              #{shown.rank}
+            </span>
+          ) : null}
+        </span>
+      </Link>
+    );
+  }
 
   return (
     <Link

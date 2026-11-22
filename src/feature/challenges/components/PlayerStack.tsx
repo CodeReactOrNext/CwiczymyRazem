@@ -25,7 +25,7 @@ export const PlayerStack = ({
         <span
           key={submission.id}
           title={submission.userName}
-          className='flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-zinc-800 text-[9px] font-bold text-zinc-300 ring-2 ring-zinc-950'>
+          className='flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-zinc-800 text-[11px] font-bold text-zinc-300 ring-2 ring-zinc-950'>
           {submission.userAvatarUrl ? (
             <img
               src={submission.userAvatarUrl}
@@ -38,7 +38,7 @@ export const PlayerStack = ({
         </span>
       ))}
       {overflow > 0 && (
-        <span className='flex h-6 items-center rounded-full bg-zinc-800 px-2 text-[10px] font-bold text-zinc-400 ring-2 ring-zinc-950'>
+        <span className='flex h-6 items-center rounded-full bg-zinc-800 px-2 text-[11px] font-bold text-zinc-400 ring-2 ring-zinc-950'>
           +{overflow}
         </span>
       )}

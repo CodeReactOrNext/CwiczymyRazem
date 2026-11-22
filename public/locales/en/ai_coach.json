@@ -241,5 +241,21 @@
     "remove_step": "Remove this step",
     "phase_min": "A phase keeps at least one step",
     "broke": "Not enough tokens for a paid change."
+  },
+  "road": {
+    "open_lesson": "Open the lesson",
+    "read_again": "Read it again",
+    "materials": "Materials",
+    "practice": "Practice",
+    "play_song": "Play the song",
+    "next": "Next",
+    "back": "Back",
+    "back_to_map": "Back to the map",
+    "next_step": "Next step",
+    "materials_hint": "Tick what you have watched and practised. Everything ticked means the step is done.",
+    "checkpoint_body": "{{count}} questions on what this phase taught. You pass with {{pass}}.",
+    "checkpoint_locked": "Finish every step of this phase first ({{done}}/{{total}}).",
+    "take_check": "Take the checkpoint",
+    "passed_score": "Passed {{score}}/{{total}}"
   }
 }

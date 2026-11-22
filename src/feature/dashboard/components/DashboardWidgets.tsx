@@ -15,9 +15,12 @@ import {
 import { useIsFetching } from "@tanstack/react-query";
 import { Button } from "assets/components/ui/button";
 import { Skeleton } from "assets/components/ui/skeleton";
+import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { SupportBanner } from "feature/dashboard/components/SupportBanner";
 import {
   DashboardLayoutProvider,
+  useDashboardCustomize,
   useDashboardData,
 } from "feature/dashboard/context/DashboardContext";
 import {
@@ -66,7 +69,12 @@ export const DashboardWidgets = () => {
     userAuth,
     isNewPlayer,
   );
-  const [isEditing, setIsEditing] = useState(false);
+  // Home's hero holds the Customize key from `md` up, so there the mode lives
+  // above these cards; on its own the block keeps the mode to itself.
+  const lifted = useDashboardCustomize();
+  const [ownEditing, setOwnEditing] = useState(false);
+  const isEditing = lifted ? lifted.isEditing : ownEditing;
+  const setIsEditing = lifted ? lifted.setIsEditing : setOwnEditing;
   const [isAddOpen, setIsAddOpen] = useState(false);
   const isMobile = useResponsiveStore((state) => state.isMobile);
   // Cards keep showing what they had while fresher answers are on the way;
@@ -107,8 +115,14 @@ export const DashboardWidgets = () => {
     <DashboardLayoutProvider value={contextValue}>
       <div className='flex flex-col gap-6'>
 
-        <div className='space-y-4'>
-          <div className='flex flex-wrap items-center justify-between gap-3'>
+        {/* gap, not space-y: the toolbar row is gone from `md` up while the
+            hero holds the key, and a hidden row must not leave its margin. */}
+        <div className='flex flex-col gap-4'>
+          <div
+            className={cn(
+              "flex flex-wrap items-center justify-between gap-3",
+              lifted && !isEditing && "md:hidden",
+            )}>
             {isEditing ? (
               <p className='text-sm text-zinc-400'>
                 {t("customize.hint")}
@@ -130,28 +144,23 @@ export const DashboardWidgets = () => {
                   <Button
                     type='button'
                     variant='outline'
-                    size='sm'
-                    className='h-11 px-4'
+                    disabled={isLoading}
                     onClick={() => setIsAddOpen(true)}>
-                    <Plus aria-hidden className='' />
+                    <Plus aria-hidden />
                     {t("customize.add_widget")}
                   </Button>
                   <Button
                     type='button'
                     variant='ghost'
-                    size='sm'
-                    className='h-11 px-4'
-                    disabled={isDefaultLayout(layout)}
+                    // The hero's key can open this before the saved layout
+                    // lands; a reset then would write over it unseen.
+                    disabled={isLoading || isDefaultLayout(layout)}
                     onClick={() => updateLayout(normalizeLayout(undefined))}>
-                    <RotateCcw aria-hidden className='' />
+                    <RotateCcw aria-hidden />
                     {t("customize.reset")}
                   </Button>
-                  <Button
-                    type='button'
-                    size='sm'
-                    className='h-11 px-4'
-                    onClick={() => setIsEditing(false)}>
-                    <Check aria-hidden className='' />
+                  <Button type='button' onClick={() => setIsEditing(false)}>
+                    <Check aria-hidden />
                     {t("customize.done")}
                   </Button>
                 </>
@@ -159,11 +168,9 @@ export const DashboardWidgets = () => {
                 <Button
                   type='button'
                   variant='subtle'
-                  size='sm'
-                  className='h-9 px-4'
                   disabled={isLoading}
                   onClick={() => setIsEditing(true)}>
-                  <Settings2 aria-hidden className='' />
+                  <Settings2 aria-hidden />
                   {t("customize.customize")}
                 </Button>
               )}
@@ -177,28 +184,26 @@ export const DashboardWidgets = () => {
               <Skeleton className='h-48 rounded-lg lg:col-span-2' />
             </div>
           ) : layout.widgets.length === 0 ? (
-            <div className='rounded-lg bg-zinc-900/40 px-6 py-12 text-center'>
-              <p className='text-sm font-semibold text-zinc-200'>
-                {t("customize.empty_title")}
-              </p>
-              <p className='mt-1 text-sm text-zinc-400'>
-                {isEditing
+            <EmptyState
+              icon={<Settings2 />}
+              title={t("customize.empty_title")}
+              description={
+                isEditing
                   ? t("customize.empty_editing")
-                  : t("customize.empty_hint")}
-              </p>
-              <Button
-                type='button'
-                variant='outline'
-                size='sm'
-                className='mt-5 h-11 gap-1.5'
-                onClick={() => {
-                  setIsEditing(true);
-                  setIsAddOpen(true);
-                }}>
-                <Plus aria-hidden className='' />
-                {t("customize.add_widget")}
-              </Button>
-            </div>
+                  : t("customize.empty_hint")
+              }
+              action={
+                <Button
+                  type='button'
+                  onClick={() => {
+                    setIsEditing(true);
+                    setIsAddOpen(true);
+                  }}>
+                  <Plus aria-hidden />
+                  {t("customize.add_widget")}
+                </Button>
+              }
+            />
           ) : (
             <DndContext
               id='home-widgets'

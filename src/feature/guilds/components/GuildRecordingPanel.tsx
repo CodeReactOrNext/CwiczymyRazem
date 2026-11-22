@@ -32,13 +32,13 @@ export const GuildRecordingPanel = ({
 
   if (isLoading)
     return (
-      <p className='rounded-lg bg-zinc-900/40 p-6 text-sm text-zinc-400'>
+      <p className='rounded-lg bg-zinc-800/40 p-6 text-sm text-zinc-400'>
         {t("recording.loading")}
       </p>
     );
   if (isError || !data)
     return (
-      <p className='rounded-lg bg-zinc-900/40 p-6 text-sm text-zinc-400'>
+      <p className='rounded-lg bg-zinc-800/40 p-6 text-sm text-zinc-400'>
         {t("recording.load_failed")}
       </p>
     );

@@ -37,10 +37,10 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
   return (
     <div className='flex flex-col gap-3 rounded-lg bg-arsenal-section p-5'>
       <div className='flex items-center justify-between gap-4'>
-        <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
+        <p className='text-[11px] text-arsenal-text-tertiary'>
           {t("power.label")}
         </p>
-        <p className='text-[11px] tracking-wide text-arsenal-text-secondary'>
+        <p className='text-[11px] text-arsenal-text-secondary'>
           {supply.name}
         </p>
       </div>
@@ -68,7 +68,7 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
             style={{ width: `${share * 100}%` }}
           />
         </div>
-        <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
+        <p className='text-[11px] text-arsenal-text-tertiary'>
           {unpowered.length === 0 ? (
             <>{t("power.all_running")}</>
           ) : (
@@ -81,7 +81,7 @@ export const PowerPanel = ({ supply, state, unpowered }: PowerPanelProps) => {
         {/* Said out loud because the rig level moves when it happens: a dead
             pedal is off the board as far as the game is concerned. */}
         {unpowered.length > 0 && (
-          <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
+          <p className='text-[11px] text-arsenal-text-tertiary'>
             {t("power.dead_pedal_note")}
           </p>
         )}

@@ -131,7 +131,8 @@
     "plain": "Guild: {{tag}}"
   },
   "cover": {
-    "your_honor": "Your honor: {{earned}} earned · {{balance}} to spend on the shelf"
+    "your_honor": "Your honor: {{earned}} earned · {{balance}} to spend on the shelf",
+    "treasury": "Guild Fame"
   },
   "units": {
     "sessions": "{{value}} sessions",
@@ -1103,5 +1104,12 @@
         "l4": "Full luthier shop"
       }
     }
+  },
+  "toast": {
+    "founded": "Guild founded",
+    "request_sent": "Request sent — the founder decides from here",
+    "deposited": "{{fame}} Fame in the guild treasury",
+    "stash_left": "Left on the shelf",
+    "stash_taken": "Taken"
   }
 }

@@ -123,6 +123,23 @@ describe("useSessionControls — tempo hotkeys", () => {
     await vi.waitFor(() => expect(options.handleNextExercise).toHaveBeenCalled());
   });
 
+  it("saves scores on Next only for an exercise that was played out", async () => {
+    const { options } = buildOptions();
+    let playedOut = false;
+    const { result } = renderHook(() =>
+      useSessionControls({ ...options, isCurrentExercisePlayedOut: () => playedOut }),
+    );
+
+    await result.current.handleNextExerciseClick();
+    expect(options.saveCurrentScores).not.toHaveBeenCalled();
+    expect(options.handleNextExercise).toHaveBeenCalledTimes(1);
+
+    playedOut = true;
+    await result.current.handleNextExerciseClick();
+    expect(options.saveCurrentScores).toHaveBeenCalledTimes(1);
+    expect(options.handleNextExercise).toHaveBeenCalledTimes(2);
+  });
+
   it("ignores ArrowLeft/ArrowRight for exercise navigation", () => {
     const { options } = buildOptions({ metronomeSpeed: { min: 40, max: 208, recommended: 100 } } as any);
     renderHook(() => useSessionControls(options));

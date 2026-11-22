@@ -7,6 +7,7 @@
   },
   "open_in_practice_log": "Abrir en el diario de práctica",
   "activity": "Actividad",
+  "activity_details": "Detalles de la actividad",
   "minutes_short": "{{minutes}} min",
   "live_now": "En directo",
   "close": "Cerrar",

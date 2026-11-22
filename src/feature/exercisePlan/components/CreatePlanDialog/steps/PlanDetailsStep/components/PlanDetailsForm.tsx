@@ -75,10 +75,10 @@ export const PlanDetailsForm = ({
 
       {/* Appearance: icon + color with live preview */}
       <div className='space-y-3'>
-        <p className='text-xs font-bold tracking-wider text-zinc-500'>{t("plans:details.appearance")}</p>
+        <p className='text-xs font-medium text-zinc-400'>{t("plans:details.appearance")}</p>
         <div className='grid gap-5 md:grid-cols-2'>
           <div className='space-y-2'>
-            <p className='text-[11px] font-medium text-zinc-600'>{t("plans:details.preview")}</p>
+            <p className='text-xs font-medium text-zinc-400'>{t("plans:details.preview")}</p>
             <PlanCard plan={previewPlan} onStart={() => {}} startButtonText={t("common:start") as string} />
           </div>
           <Controller
@@ -108,7 +108,7 @@ export const PlanDetailsForm = ({
         control={control}
         render={({ field }) => (
           <div className="space-y-2">
-            <p className="text-xs font-bold tracking-wider text-zinc-500">{t("plans:details.visibility")}</p>
+            <p className="text-xs font-medium text-zinc-400">{t("plans:details.visibility")}</p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -121,7 +121,7 @@ export const PlanDetailsForm = ({
                 )}
               >
                 <div className="flex items-center gap-2 w-full">
-                  <Lock size={15} className={!field.value ? "text-cyan-400" : "text-zinc-500"} />
+                  <Lock className={cn("h-4 w-4", !field.value ? "text-cyan-400" : "text-zinc-500")} />
                   <span className={cn("text-sm font-bold", !field.value ? "text-white" : "text-zinc-400")}>{t("plans:details.private")}</span>
                   {!field.value && <Check size={12} className="text-cyan-400 ml-auto" />}
                 </div>
@@ -138,7 +138,7 @@ export const PlanDetailsForm = ({
                 )}
               >
                 <div className="flex items-center gap-2 w-full">
-                  <Globe size={15} className={field.value ? "text-emerald-400" : "text-zinc-500"} />
+                  <Globe className={cn("h-4 w-4", field.value ? "text-emerald-400" : "text-zinc-500")} />
                   <span className={cn("text-sm font-bold", field.value ? "text-white" : "text-zinc-400")}>{t("plans:details.public")}</span>
                   {field.value && <Check size={12} className="text-emerald-400 ml-auto" />}
                 </div>
@@ -162,7 +162,7 @@ export const PlanDetailsForm = ({
           type="submit"
           aria-disabled={missingFields.length > 0}
           className={cn(missingFields.length > 0 && "opacity-50")}>
-          {t("plans:details.create")}
+          {initialData ? t("plans:details.save") : t("plans:details.create")}
         </Button>
       </div>
     </motion.form>

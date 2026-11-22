@@ -934,5 +934,6 @@
     "show_in_folder": "Pokaż w folderze",
     "delete": "Przenieś do kosza",
     "untitled": "Nagranie"
-  }
+  },
+  "exam_click_failed": "{{limit}} błędnych kliknięć — egzamin niezaliczony."
 }

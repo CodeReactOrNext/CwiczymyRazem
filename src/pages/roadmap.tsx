@@ -1,3 +1,4 @@
+import { PageShell } from "components/PageShell/PageShell";
 import { RoadmapView } from "feature/roadmap/RoadmapView";
 import AppLayout from "layouts/AppLayout";
 import Head from "next/head";
@@ -9,12 +10,12 @@ const RoadmapPage: NextPageWithLayout = () => {
   const siteUrl = "https://riff.quest/roadmap";
 
   return (
-    <div className='flex min-h-screen flex-col overflow-visible rounded-xl border-none bg-second-600'>
+    <PageShell>
       <Head>
         <link rel='canonical' href={siteUrl} />
       </Head>
       <RoadmapView />
-    </div>
+    </PageShell>
   );
 };
 

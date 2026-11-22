@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
-import { cn } from "assets/lib/utils";
-import Avatar from "components/UI/Avatar/Avatar";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { RankRow } from "feature/leadboard/components/RankRow";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { Trophy } from "lucide-react";
@@ -8,18 +9,6 @@ import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 import { getExerciseLeaderboard, type LeaderboardEntry } from "../services/bpmProgressService";
-
-/** Gold / silver / bronze tint for the top 3 ranks — plain tinted bg + colored text, no border (Chip pattern). */
-const RANK_BADGE_STYLES: Record<number, string> = {
-  1: "bg-amber-400/15 text-amber-300",
-  2: "bg-zinc-300/15 text-zinc-200",
-  3: "bg-orange-600/15 text-orange-400",
-};
-
-const getRankBadgeStyle = (place: number, isCurrentUser: boolean) => {
-  if (isCurrentUser) return "bg-cyan-500 text-black";
-  return RANK_BADGE_STYLES[place] ?? "bg-zinc-800/60 text-zinc-400";
-};
 
 interface EarTrainingLeaderboardDialogProps {
   isOpen: boolean;
@@ -51,14 +40,14 @@ export const EarTrainingLeaderboardDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       {/* Above the Community drawer (z-110) — the activity feed opens this from inside it. */}
-      <DialogContent overlayClassName="z-[120]" className="z-[120] max-w-xl bg-zinc-950 border-0 p-0 sm:rounded-lg shadow-2xl max-h-[85vh] flex flex-col">
+      <DialogContent overlayClassName="z-[120]" className="z-[120] bg-zinc-950 p-0 max-h-[85vh] flex flex-col">
         <div className="p-8 pb-5 pr-14 sm:pr-16 shrink-0">
           <DialogHeader className="mb-0 text-left">
             <div className="flex items-center gap-3 mb-3">
               <Trophy className="w-5 h-5 text-amber-400" />
-              <span className="text-[10px] font-semibold text-zinc-500 tracking-wide">{t("leaderboard.title")}</span>
+              <span className="text-xs font-medium text-zinc-400">{t("leaderboard.title")}</span>
               {entries.length > 0 && (
-                <span className="text-[10px] font-semibold text-zinc-600 tabular-nums">
+                <span className="text-xs font-semibold text-zinc-500 tabular-nums">
                   · {entries.length === 1 ? t("leaderboard.player_one") : t("leaderboard.players", { count: entries.length })}
                 </span>
               )}
@@ -73,80 +62,39 @@ export const EarTrainingLeaderboardDialog = ({
           {isLoading ? (
             <div className="flex flex-col gap-3">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-lg bg-zinc-900/40 animate-pulse">
-                  <div className="w-9 h-9 rounded-full bg-zinc-800" />
-                  <div className="w-10 h-10 rounded-full bg-zinc-800" />
-                  <div className="flex-1 h-4 rounded bg-zinc-800" />
-                  <div className="w-16 h-5 rounded bg-zinc-800" />
+                <div key={i} className="flex items-center gap-4 p-4 rounded-lg bg-zinc-900/40">
+                  <Skeleton className="w-9 h-9 rounded-full" />
+                  <Skeleton className="w-10 h-10 rounded-full" />
+                  <Skeleton className="flex-1 h-4" />
+                  <Skeleton className="w-16 h-5" />
                 </div>
               ))}
             </div>
           ) : entries.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-zinc-600">
-              <Trophy size={32} className="mb-4 opacity-10" />
-              <p className="text-sm font-semibold text-zinc-500">{t("leaderboard.empty")}</p>
-              <p className="text-xs text-zinc-700 mt-1">{t("leaderboard.empty_hint")}</p>
-            </div>
+            <EmptyState
+              size="compact"
+              icon={<Trophy />}
+              title={t("leaderboard.empty")}
+              description={t("leaderboard.empty_hint")}
+              className="bg-transparent px-0"
+            />
           ) : (
-            <div className="flex flex-col gap-3">
-              {entries.map((entry, index) => {
-                const isCurrentUser = entry.userId === userAuth;
-                const place = index + 1;
-
-                return (
-                  <div
-                    key={entry.userId}
-                    className={cn(
-                      "flex items-center gap-4 p-4 rounded-lg transition-all",
-                      isCurrentUser
-                        ? "light-tint bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20"
-                        : "bg-zinc-900/40"
-                    )}
-                  >
-                    {/* Rank Badge — gold/silver/bronze for top 3, cyan overrides for the current user */}
-                    <div className={cn(
-                      "w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0",
-                      getRankBadgeStyle(place, isCurrentUser)
-                    )}>
-                      {place}
-                    </div>
-
-                    {/* Avatar */}
-                    <div className="flex-shrink-0">
-                      <Avatar
-                        avatarURL={entry.avatar}
-                        name={entry.displayName || "Player"}
-                        size="sm"
-                      />
-                    </div>
-
-                    {/* Name */}
-                    <span translate="no" className={cn(
-                      "flex-1 min-w-0 text-sm font-bold truncate",
-                      isCurrentUser ? "text-cyan-300" : "text-zinc-300"
-                    )}>
-                      {entry.displayName || t("custom.anonymous")}
-                    </span>
-
-                    {/* Score, and the tempo it was set at — older entries and
-                        metronome-less exercises simply have no tempo to show. */}
-                    <div className="shrink-0 text-right">
-                      <span className={cn(
-                        "block text-lg font-bold tabular-nums",
-                        isCurrentUser ? "text-cyan-400" : "text-white"
-                      )}>
-                        {entry.score}
-                      </span>
-                      {entry.bpm != null && (
-                        <span className="text-[11px] font-semibold tabular-nums text-zinc-500">
-                          {entry.bpm} BPM
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <ol className="flex flex-col gap-2">
+              {entries.map((entry, index) => (
+                <RankRow
+                  key={entry.userId}
+                  place={index + 1}
+                  nick={entry.displayName || t("custom.anonymous")}
+                  avatarUrl={entry.avatar}
+                  profileId={entry.userId}
+                  isCurrentUser={entry.userId === userAuth}
+                  score={entry.score}
+                  // Older entries and metronome-less exercises simply have no tempo to show.
+                  scoreLabel={entry.bpm != null ? `${entry.bpm} BPM` : undefined}
+                  density="compact"
+                />
+              ))}
+            </ol>
           )}
         </div>
       </DialogContent>

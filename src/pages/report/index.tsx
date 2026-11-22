@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
+import { PageShell } from "components/PageShell/PageShell";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import ReportView from "feature/user/view/ReportView";
 import AppLayout from "layouts/AppLayout";
@@ -9,7 +10,7 @@ import { withAuthInitialProps } from "utils/auth/authInitialProps";
 const ReportPage: NextPageWithLayout = () => {
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
+    <PageShell>
       <HeroBanner
         title="Manual Log"
         subtitle="Record and review your practice session"
@@ -23,10 +24,9 @@ const ReportPage: NextPageWithLayout = () => {
         }
         backgroundContent={<HeroPattern variant="log" />}
         compact
-        className="w-full !rounded-none !shadow-none"
       />
       <ReportView />
-    </div>
+    </PageShell>
   );
 };
 

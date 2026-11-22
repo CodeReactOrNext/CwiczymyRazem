@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { SongPreviewDialog } from "feature/challenges/components/SongPreviewDialog";
 import { useChallengeMutations } from "feature/challenges/hooks/useChallenges";
@@ -27,14 +28,20 @@ import {
   rankNominations,
   remainingVotes,
 } from "feature/challenges/utils/challengeProgress";
+import { placeKeyClass } from "feature/leadboard/components/rankRowStyles";
 import { SongPickerPanel } from "feature/songs/components/Playlists/SongPickerPanel";
+import {
+  SONG_ARTIST_SM_CLASS,
+  SONG_TITLE_SM_CLASS,
+  SongThumb,
+} from "feature/songs/components/SongRow/SongRow";
+import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
-import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import { Interpolate } from "lib/i18n/Interpolate";
-import { ChevronUp, Music, Play, Plus, Vote } from "lucide-react";
+import { ChevronUp, Play, Plus, Vote } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -44,12 +51,6 @@ interface VotingBoardProps {
   currentUserId: string | null;
   userName: string;
 }
-
-const RANK_TINTS: Record<number, string> = {
-  0: "text-amber-300",
-  1: "text-zinc-300",
-  2: "text-orange-400/90",
-};
 
 interface NominationRowProps {
   nomination: ChallengeNomination;
@@ -83,7 +84,7 @@ const NominationRow = ({
         "group relative flex items-center gap-3 rounded-lg px-2 py-2.5 transition-colors sm:px-3",
         isQualifying
           ? "bg-amber-400/[0.06] hover:bg-amber-400/[0.12]"
-          : "bg-white/[0.02] hover:bg-white/[0.06]",
+          : "bg-zinc-800/40 hover:bg-zinc-800/60",
       )}>
       {/* Whole row opens the song so you can hear it before spending a vote.
           Everything already interactive sits above it on the z-axis. */}
@@ -96,38 +97,33 @@ const NominationRow = ({
         </span>
       </button>
 
+      {/* Places that make next month's board wear the ranking key; the ones
+          below the cut keep the key but fade. */}
       <span
+        translate='no'
         className={cn(
-          "w-8 shrink-0 text-center text-2xl font-black tabular-nums leading-none sm:w-10",
+          "h-7 w-8 text-xl",
           isQualifying
-            ? (RANK_TINTS[index] ?? "text-amber-200/70")
-            : "text-zinc-700",
+            ? placeKeyClass(index + 1, false)
+            : cn(placeKeyClass(index + 1, false, false), "text-zinc-600"),
         )}>
         {index + 1}
       </span>
 
-      <div className='pointer-events-none relative h-10 w-10 shrink-0 overflow-hidden rounded-[4px] bg-zinc-800'>
-        {nomination.coverUrl ? (
-          <img
-            src={nomination.coverUrl}
-            alt=''
-            className='h-full w-full object-cover'
-          />
-        ) : (
-          <div className='flex h-full w-full items-center justify-center text-zinc-600'>
-            <Music className='h-4 w-4' />
-          </div>
-        )}
+      <SongThumb
+        coverUrl={nomination.coverUrl}
+        size='sm'
+        className='pointer-events-none'>
         <span className='force-dark absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100'>
           <Play className='h-4 w-4 fill-current' />
         </span>
-      </div>
+      </SongThumb>
 
       <div className='min-w-0 flex-1'>
-        <p translate='no' className='truncate text-sm font-semibold text-white'>
+        <p translate='no' className={SONG_TITLE_SM_CLASS}>
           {nomination.title}
         </p>
-        <p translate='no' className='truncate text-xs text-zinc-500'>
+        <p translate='no' className={SONG_ARTIST_SM_CLASS}>
           {nomination.artist}
           <span className='mx-1.5 text-zinc-700'>·</span>
           <UserTooltip userId={nomination.nominatedBy}>
@@ -140,11 +136,7 @@ const NominationRow = ({
         </p>
       </div>
 
-      <span
-        className='hidden shrink-0 rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold sm:inline'
-        style={{ backgroundColor: inkWash(tier.color, 12), color: inkAccent(tier.color) }}>
-        {tier.tier}
-      </span>
+      <TierPick tier={tier} className='hidden h-5 w-5 sm:block' />
 
       <Tooltip>
         <TooltipTrigger asChild>
@@ -168,14 +160,14 @@ const NominationRow = ({
         {(nomination.voters?.length ?? 0) > 0 && (
           <TooltipContent
             side='left'
-            className='max-w-xs border-white/10 bg-zinc-900 text-white'>
+            className='max-w-xs p-3'>
             <div className='space-y-1'>
-              <p className='mb-1 text-[11px] font-semibold text-zinc-300'>
+              <p className='mb-1 text-xs font-semibold text-black/60'>
                 {t("ballot.voted_by")}
               </p>
               {nomination.voters?.map((voter) => (
                 <UserTooltip key={voter.id} userId={voter.id}>
-                  <div className='cursor-pointer text-[11px] text-zinc-200 hover:text-white'>
+                  <div className='cursor-pointer text-[11px] text-black/70 hover:text-black'>
                     {voter.name}
                   </div>
                 </UserTooltip>
@@ -261,11 +253,9 @@ export const VotingBoard = ({
           <Button
             onClick={() => setIsNominateOpen(true)}
             disabled={!currentUserId || votesLeft === 0}
-            className='h-10 px-5 font-bold'>
-            <span className='flex items-center gap-2'>
-              <Plus className='h-4 w-4' />
-              {t("ballot.nominate")}
-            </span>
+            size='lg'>
+            <Plus />
+            {t("ballot.nominate")}
           </Button>
           <span
             className={cn(
@@ -282,23 +272,19 @@ export const VotingBoard = ({
       </div>
 
       {ranked.length === 0 ? (
-        <div className='flex flex-col items-center justify-center py-16 text-center'>
-          <div className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500'>
-            <Vote size={26} />
-          </div>
-          <h3 className='mb-1 text-lg font-bold text-white'>
-            {t("ballot.empty_title")}
-          </h3>
-          <p className='max-w-xs text-sm text-zinc-500'>
-            {t("ballot.empty_body", { month: challengeMonthLabel(ballotId, intlLocale) })}
-          </p>
-        </div>
+        <EmptyState
+          icon={<Vote />}
+          title={t("ballot.empty_title")}
+          description={t("ballot.empty_body", {
+            month: challengeMonthLabel(ballotId, intlLocale),
+          })}
+        />
       ) : (
         <div className='space-y-1.5'>
           {ranked.map((nomination, index) => (
             <div key={nomination.id}>
               {index === CHALLENGE_SONG_COUNT && (
-                <p className='px-3 pb-2 pt-6 text-[11px] font-bold text-zinc-600'>
+                <p className='px-3 pb-2 pt-6 text-xs font-medium text-zinc-400'>
                   {t("ballot.below_cut")}
                 </p>
               )}
@@ -335,9 +321,9 @@ export const VotingBoard = ({
       />
 
       <Dialog open={isNominateOpen} onOpenChange={setIsNominateOpen}>
-        <DialogContent className='flex h-full max-w-none flex-col border-white/5 bg-zinc-950 p-6 sm:h-[560px] sm:max-w-lg sm:rounded-2xl'>
+        <DialogContent className='flex h-full flex-col bg-zinc-950 sm:h-[560px]'>
           <DialogHeader className='mb-2'>
-            <DialogTitle className='font-openSans text-xl font-bold text-white'>
+            <DialogTitle className='text-xl font-bold text-white'>
               {t("ballot.nominate")}
               <span className='ml-2 text-sm font-semibold text-zinc-500'>
                 {votesLeft === 1 ? t("ballot.vote_left", { count: votesLeft }) : t("ballot.votes_left", { count: votesLeft })}

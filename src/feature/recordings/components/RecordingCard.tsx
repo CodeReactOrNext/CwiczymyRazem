@@ -1,17 +1,7 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "assets/components/ui/alert-dialog";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
+import { ConfirmDialog } from "components/ConfirmDialog/ConfirmDialog";
 import { UserLink } from "components/UserLink";
 import { AddRecordingModal } from "feature/recordings/components/AddRecordingModal";
 import { RecordingLikersTooltip } from "feature/recordings/components/RecordingLikersTooltip";
@@ -39,6 +29,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
   const { t } = useTranslation("recordings");
   const intlLocale = useIntlLocale();
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const userId = useAppSelector(selectUserAuth);
   const { toggleLike, deleteRecording, isDeleting } = useRecordingMutations();
 
@@ -75,7 +66,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
     // Title and song caption have a reserved height (title = 2 lines, caption = 1 line)
     // so the description starts at the same height across a row; the author row is
     // pushed to the bottom (mt-auto), so it lines up regardless of the text above.
-    <Card className='group/card flex h-full flex-col overflow-hidden bg-zinc-900/40 p-0 transition-colors hover:bg-zinc-900/60'>
+    <Card className='group/card flex h-full flex-col overflow-hidden p-0 transition-colors hover:bg-zinc-800/60'>
       <button
         type='button'
         aria-label={t("card.play", { title: recording.title })}
@@ -109,42 +100,37 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
             <div className='-mr-2 -mt-1 flex shrink-0 items-center opacity-100 transition-opacity focus-within:opacity-100 md:opacity-0 md:group-hover/card:opacity-100'>
               <Button
                 variant='ghost'
-                size='icon'
+                size='icon-sm'
                 aria-label={t("card.edit")}
                 onClick={() => setIsEditOpen(true)}
-                className='h-8 w-8 text-zinc-500 hover:bg-cyan-500/10 hover:text-cyan-400'>
-                <Pencil className='h-4 w-4' />
+                className='text-zinc-500 hover:bg-cyan-500/10 hover:text-cyan-400'>
+                <Pencil />
               </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    aria-label={t("card.delete_aria")}
-                    className='h-8 w-8 text-zinc-500 hover:bg-red-500/10 hover:text-red-400'>
-                    <Trash2 className='h-4 w-4' />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className='bg-zinc-950 text-white'>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{t("card.confirm_title")}</AlertDialogTitle>
-                    <AlertDialogDescription className='text-zinc-400'>
-                      {t("card.confirm_body")}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel className='bg-zinc-900 text-white hover:bg-zinc-800'>
-                      {t("modal.cancel")}
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDelete}
-                      disabled={isDeleting}
-                      className='border-none bg-red-600 text-white hover:bg-red-700'>
-                      {isDeleting ? t("card.deleting") : t("card.delete")}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <Button
+                variant='ghost'
+                size='icon-sm'
+                aria-label={t("card.delete_aria")}
+                onClick={() => setIsDeleteOpen(true)}
+                className='text-zinc-500 hover:bg-red-500/10 hover:text-red-400'>
+                <Trash2 />
+              </Button>
+              <ConfirmDialog
+                open={isDeleteOpen}
+                onOpenChange={setIsDeleteOpen}
+                title={t("card.confirm_title")}
+                description={t("card.confirm_body")}
+                cancelLabel={t("modal.cancel")}
+                confirmLabel={isDeleting ? t("card.deleting") : t("card.delete")}
+                onConfirm={async () => {
+                  try {
+                    await handleDelete();
+                  } finally {
+                    setIsDeleteOpen(false);
+                  }
+                }}
+                destructive
+                loading={isDeleting}
+              />
             </div>
           )}
         </div>
@@ -176,7 +162,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
         </div>
       </div>
 
-      <div className='flex items-center gap-1 bg-zinc-800/30 px-2 py-1.5'>
+      <div className='flex items-center gap-1 px-2 py-1.5'>
         <RecordingLikersTooltip likes={recording.likes} userId={userId}>
           <Button
             variant='ghost'
@@ -187,7 +173,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
               hasLiked && "text-red-400 hover:text-red-300",
             )}
             onClick={handleLike}>
-            <Heart className={cn("h-4 w-4", hasLiked && "fill-current")} />
+            <Heart className={hasLiked ? "fill-current" : undefined} />
             <span className='text-xs font-bold'>{recording.likes.length}</span>
           </Button>
         </RecordingLikersTooltip>
@@ -198,7 +184,7 @@ export const RecordingCard = ({ recording, onView }: RecordingCardProps) => {
           aria-label={t("card.comments")}
           className='text-zinc-400 hover:bg-zinc-800/60 hover:text-cyan-400'
           onClick={() => onView(recording.id)}>
-          <MessageSquare className='h-4 w-4' />
+          <MessageSquare />
           <span className='text-xs font-bold'>{recording.commentCount}</span>
         </Button>
 

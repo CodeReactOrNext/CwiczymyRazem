@@ -1,3 +1,4 @@
+import { Skeleton } from "assets/components/ui/skeleton";
 import {
   Tabs,
   TabsContent,
@@ -137,11 +138,11 @@ export const SkinShopTab = ({ enabled }: { enabled: boolean }) => {
   const preview = !enabled;
 
   if (!preview && shop.isLoading) {
-    return <div className='h-72 animate-pulse rounded-lg bg-zinc-900/40' />;
+    return <Skeleton variant='block' className='h-72' aria-busy />;
   }
   if (!preview && !shop.data) {
     return (
-      <p className='rounded-lg bg-zinc-900/40 p-6 text-sm text-zinc-400'>
+      <p className='rounded-lg bg-zinc-800/40 p-6 text-sm text-zinc-400'>
         {t("shop.load_failed")}
       </p>
     );

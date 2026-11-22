@@ -19,7 +19,7 @@ const StatisticsRestart = () => {
 
       {!restartConfirmShow && (
         <>
-          <p className='font-openSans text-sm font-bold '>
+          <p className='text-sm font-bold'>
             {t("settings:reset_warning")}
           </p>
           <Button

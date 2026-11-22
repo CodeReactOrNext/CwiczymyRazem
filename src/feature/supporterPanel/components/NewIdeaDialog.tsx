@@ -9,7 +9,7 @@ import {
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { Textarea } from "assets/components/ui/textarea";
-import { cn } from "assets/lib/utils";
+import { Segment, SegmentGroup } from "components/SegmentedControl/SegmentedControl";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import {
   IDEA_ICON_COMPONENTS,
@@ -54,31 +54,24 @@ const IconPicker = ({
 }) => {
   const { t } = useTranslation("supporter");
   return (
-    <div className='flex flex-wrap gap-2'>
+    <SegmentGroup className='flex-wrap'>
       {ROADMAP_IDEA_ICONS.map((icon) => {
         const Icon = IDEA_ICON_COMPONENTS[icon];
-        const isActive = icon === value;
+        const label = t(`panel.icons.${icon}`, IDEA_ICON_LABELS[icon]);
 
         return (
-          <button
+          <Segment
             key={icon}
-            type='button'
-            title={t(`panel.icons.${icon}`, IDEA_ICON_LABELS[icon])}
-            aria-label={t(`panel.icons.${icon}`, IDEA_ICON_LABELS[icon])}
-            aria-pressed={isActive}
-            onClick={() => onChange(icon)}
-            className={cn(
-              "flex h-10 w-10 items-center justify-center rounded transition-colors",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-              isActive
-                ? "bg-cyan-500/10 text-cyan-400"
-                : "bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-zinc-200",
-            )}>
-            <Icon size={18} />
-          </button>
+            active={icon === value}
+            onClick={() => onChange(icon)}>
+            <span title={label} className='flex'>
+              <Icon size={18} aria-hidden />
+              <span className='sr-only'>{label}</span>
+            </span>
+          </Segment>
         );
       })}
-    </div>
+    </SegmentGroup>
   );
 };
 
@@ -115,7 +108,7 @@ export const NewIdeaDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-lg'>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("panel.new_idea.title")}</DialogTitle>
           <DialogDescription>
@@ -158,7 +151,7 @@ export const NewIdeaDialog = ({
               onChange={(event) => setTitle(event.target.value)}
               maxLength={IDEA_TITLE_MAX}
               placeholder={t("panel.new_idea.idea_placeholder")}
-              className='h-12 bg-white/5 font-medium'
+              className='h-12 font-medium'
             />
           </div>
 
@@ -188,7 +181,7 @@ export const NewIdeaDialog = ({
               maxLength={IDEA_DESCRIPTION_MAX}
               rows={4}
               placeholder={t("panel.new_idea.why_placeholder")}
-              className='resize-none bg-white/5 font-medium'
+              className='resize-none font-medium'
             />
           </div>
         </div>

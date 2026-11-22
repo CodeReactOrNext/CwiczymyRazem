@@ -77,8 +77,8 @@ export const StashContextMenu = ({
         align='start'
         side='bottom'
         sideOffset={2}
-        className='w-56 border-0 bg-zinc-900 p-1'>
-        <div className='truncate px-3 pb-1.5 pt-2 text-[10px] font-bold tracking-wider text-zinc-500'>
+        className='w-56'>
+        <div className='truncate px-3 pb-1.5 pt-2 text-xs font-medium text-zinc-400'>
           {title}
         </div>
         {items.map((item) => (

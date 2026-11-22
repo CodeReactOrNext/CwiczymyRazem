@@ -57,6 +57,7 @@
     "subtitle": "Sigue donde lo dejaste o salta a cualquier módulo.",
     "continue": "Continuar",
     "start": "Empezar",
+    "replay": "Repetir",
     "suggest": "Sugerir una ruta de aprendizaje",
     "missing_coming": "¿Falta un tema? Lo próximo será {{topics}} — dinos qué más te gustaría ver.",
     "missing": "¿Falta un tema? Dinos qué te gustaría ver a continuación."

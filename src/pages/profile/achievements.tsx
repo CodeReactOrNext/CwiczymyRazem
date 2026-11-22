@@ -1,4 +1,5 @@
 import MainContainer from "components/MainContainer";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { AchievementsPanel } from "feature/achievements";
@@ -31,10 +32,9 @@ const ProfileAchievementsPage = () => {
         subtitle={t("page.subtitle")}
         eyebrow={t("page.eyebrow")}
         backgroundContent={<HeroPattern />}
-        className='min-h-[140px] w-full !rounded-none !shadow-none md:min-h-[120px] lg:min-h-[160px]'
       />
 
-      <div className='p-4'>
+      <div className={PAGE_CONTENT}>
         <div className='mb-6'>
           <PageTabs
             tabs={tabs}
@@ -43,10 +43,15 @@ const ProfileAchievementsPage = () => {
           />
         </div>
 
-        <div className='font-openSans flex flex-col gap-8'>
-          <SeasonalAchievements userId={userAuth as string} hideWhenEmpty />
-          <AchievementsPanel userAchievements={userStats?.achievements ?? []} />
-        </div>
+        <AchievementsPanel
+          userAchievements={userStats?.achievements ?? []}
+          afterSummary={
+            <SeasonalAchievements
+              userId={userAuth ?? undefined}
+              hideWhenEmpty
+            />
+          }
+        />
       </div>
     </MainContainer>
   );

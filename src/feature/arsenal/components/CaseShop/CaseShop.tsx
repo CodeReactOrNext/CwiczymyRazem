@@ -1,3 +1,4 @@
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { canDiscoverNew } from "feature/arsenal/utils/caseRoll";
@@ -143,14 +144,12 @@ export const CaseShop = ({
       />
 
       <section className='flex flex-col gap-5'>
-        <div>
-          <h2 className='font-display text-2xl font-black text-zinc-100'>
-            {t("cases.shelf_title")}
-          </h2>
-          <p className='mt-1 text-sm text-zinc-500'>
-            {t("cases.shelf_subtitle")}
-          </p>
-        </div>
+        <SectionHeader
+          size='lg'
+          title={t("cases.shelf_title")}
+          description={t("cases.shelf_subtitle")}
+          className='mb-0'
+        />
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
           {LADDER.map(renderGroup)}
         </div>

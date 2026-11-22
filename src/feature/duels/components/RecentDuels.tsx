@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import Avatar from "components/UI/Avatar";
 import { getDuelExercise } from "feature/duels/data/duelPool";
 import type {
@@ -9,6 +10,7 @@ import type {
 } from "feature/duels/types/duel.types";
 import { formatRatingDelta } from "feature/duels/utils/duelFormat";
 import { useTranslation } from "hooks/useTranslation";
+import { History } from "lucide-react";
 import Link from "next/link";
 
 const RESULT_TEXT: Record<NonNullable<DuelView["result"]>, string> = {
@@ -45,7 +47,7 @@ const RecentDuelRow = ({ duel }: { duel: DuelView }) => {
           query: { tab: "history", result: duel.id },
         }}
         shallow
-        className='flex items-center gap-4 rounded-xl px-3 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 hover:bg-zinc-900/60'>
+        className='flex items-center gap-4 rounded-lg px-3 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 hover:bg-white/5'>
         <span
           className={cn(
             "w-[4.5rem] shrink-0 text-sm font-semibold",
@@ -116,7 +118,7 @@ const LatestDuelRow = ({
   const [winner, loser] = entry.players;
   const isDraw = entry.kind === "draw";
   const exercise = getDuelExercise(entry.exerciseId);
-  const rowClass = "flex items-center gap-4 rounded-xl px-3 py-3";
+  const rowClass = "flex items-center gap-4 rounded-lg px-3 py-3";
 
   const content = (
     <>
@@ -155,7 +157,7 @@ const LatestDuelRow = ({
           shallow
           className={cn(
             rowClass,
-            "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 hover:bg-zinc-900/60",
+            "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 hover:bg-white/5",
           )}>
           {content}
         </Link>
@@ -182,7 +184,7 @@ export const LatestDuels = ({
   const { t } = useTranslation("duels");
   if (feed.length === 0) return null;
   return (
-    <section className='mt-6 flex flex-col gap-2'>
+    <section className='mt-6 flex flex-col gap-2 rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
       <h2 className='px-1 text-base font-semibold text-zinc-100'>
         {t("recent.title")}
       </h2>
@@ -203,7 +205,7 @@ export const LatestDuels = ({
 export const RecentDuels = ({ duels }: { duels: DuelView[] }) => {
   const { t } = useTranslation("duels");
   return (
-    <section className='flex max-w-2xl flex-col gap-4'>
+    <section className='flex max-w-2xl flex-col gap-4 rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
       <div className='flex items-baseline justify-between gap-3 px-1'>
         <h2 className='text-base font-semibold text-zinc-100'>
           {t("history.title")}
@@ -215,7 +217,11 @@ export const RecentDuels = ({ duels }: { duels: DuelView[] }) => {
         )}
       </div>
       {duels.length === 0 ? (
-        <p className='px-1 text-sm text-zinc-400'>{t("recent.empty")}</p>
+        <EmptyState
+          size='compact'
+          icon={<History />}
+          title={t("recent.empty")}
+        />
       ) : (
         <ul className='flex flex-col gap-0.5'>
           {duels.map((duel) => (

@@ -45,6 +45,16 @@ const lineOf = (tone: RoadTone): { stroke: string; dashed: boolean } => {
   }
 };
 
+/**
+ * A band road: a wide solid strip the stops stand on, so nothing has to cut the
+ * line around a key and the page behind it shows through cleanly. The stretch
+ * already walked takes a faint emerald; the rest stays a zinc strip.
+ */
+const bandOf = (tone: RoadTone) =>
+  tone === "done"
+    ? "var(--road-band-done, rgba(16,185,129,0.22))"
+    : "var(--road-band, rgba(39,39,42,0.92))";
+
 type Points = Record<string, { x: number; y: number }>;
 
 const samePoints = (a: Points, b: Points) => {
@@ -69,8 +79,11 @@ export const RoadPath = ({
   stops,
   footer,
   className,
+  trail = "line",
 }: {
   stops: RoadPathStop[];
+  /** `line`: a thin line cut around each key (What Next). `band`: a wide strip the keys stand on (Journey). */
+  trail?: "line" | "band";
   /** Under the last stop, on the road — Journey's finish card. */
   footer?: ReactNode;
   className?: string;
@@ -126,7 +139,9 @@ export const RoadPath = ({
     return [
       {
         d: `M ${p0.x} ${p0.y} C ${p0.x} ${p0.y + dy}, ${p1.x} ${p1.y - dy}, ${p1.x} ${p1.y}`,
-        ...lineOf(stop.tone),
+        ...(trail === "band"
+          ? { stroke: bandOf(stop.tone), dashed: false }
+          : lineOf(stop.tone)),
       },
     ];
   });
@@ -149,7 +164,7 @@ export const RoadPath = ({
             d={segment.d}
             fill='none'
             stroke={segment.stroke}
-            strokeWidth={4}
+            strokeWidth={trail === "band" ? 34 : 4}
             strokeLinecap='round'
             strokeDasharray={segment.dashed ? "2 10" : undefined}
           />
@@ -162,12 +177,17 @@ export const RoadPath = ({
           x > 0 ? "left" : x < 0 ? "right" : index % 4 === 0 ? "right" : "left";
         return (
           <Fragment key={id}>
-            {before && <div className='relative z-10'>{before}</div>}
+            {before && (
+              <div className='relative z-10 flex w-full justify-center'>
+                {before}
+              </div>
+            )}
             <div
               className='relative z-10 flex justify-center'
               style={{ transform: `translateX(${x}px)` }}>
               <RoadPathNode
                 {...node}
+                halo={trail === "band" ? "none" : "cut"}
                 buttonRef={(el) => {
                   if (el) nodeRefs.current.set(id, el);
                   else nodeRefs.current.delete(id);

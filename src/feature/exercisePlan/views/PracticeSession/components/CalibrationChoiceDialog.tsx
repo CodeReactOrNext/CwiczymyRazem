@@ -44,7 +44,7 @@ export const CalibrationChoiceDialog = ({
       <DialogContent className="sm:max-w-md z-[99999999]">
         <DialogHeader>
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
-            <Guitar size='1em' className="h-6 w-6 text-emerald-400" />
+            <Guitar className="h-6 w-6 text-emerald-400" />
           </div>
           <DialogTitle className="text-center text-xl">{t("choice.title")}</DialogTitle>
           <DialogDescription className="text-center text-zinc-400 leading-relaxed pt-2">
@@ -59,14 +59,14 @@ export const CalibrationChoiceDialog = ({
             </p>
           )}
         </DialogHeader>
-        <DialogFooter className="flex flex-col gap-2 sm:flex-col sm:gap-2 pt-4">
-          <Button onClick={onReuse} className="w-full bg-emerald-500 text-black hover:bg-emerald-400 font-bold">
+        <DialogFooter className="flex-col gap-2 pt-4 sm:flex-col sm:space-x-0">
+          <Button size="lg" onClick={onReuse} className="w-full">
             {t("choice.reuse")}
           </Button>
-          <Button variant="secondary" onClick={onRecalibrate} className="w-full">
+          <Button variant="secondary" size="lg" onClick={onRecalibrate} className="w-full">
             {t("choice.recalibrate")}
           </Button>
-          <Button variant="ghost" onClick={onCancel} className="w-full text-zinc-500 hover:text-zinc-300">
+          <Button variant="ghost" size="lg" onClick={onCancel} className="w-full text-zinc-500 hover:text-zinc-300">
             {t("error.cancel")}
           </Button>
         </DialogFooter>

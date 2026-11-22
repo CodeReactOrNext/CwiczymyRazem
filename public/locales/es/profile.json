@@ -99,7 +99,14 @@
   "seasonal_achievements": {
     "title": "Logros de temporada",
     "points": "puntos",
-    "no_achievements": "Aún no hay logros de temporada"
+    "no_achievements": "Aún no hay logros de temporada",
+    "heading": "Temporadas",
+    "best_place": "Mejor puesto: #{{place}}",
+    "top_ten": "En el top 10: {{count}}×",
+    "points_short": "pts",
+    "all_seasons": "Todas las temporadas",
+    "show_all": "Mostrar todas ({{count}})",
+    "show_less": "Mostrar menos"
   },
   "activity": "Actividad",
   "detailed_stats": {
@@ -465,6 +472,8 @@
     "practice": "Practicar",
     "practice_more": "Practicar más",
     "level": "Nivel",
-    "xp": "{{current}} / {{total}} XP"
+    "xp": "{{current}} / {{total}} XP",
+    "first_session": "Toca tu primera sesión",
+    "start": "Iniciar"
   }
 }

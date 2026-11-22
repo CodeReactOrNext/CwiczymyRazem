@@ -35,7 +35,7 @@ export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({
         {exercise.isPlayalong && (
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-red-500/10 shrink-0">
             <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-[10px] font-bold tracking-wide text-red-400">{t("playalong")}</span>
+            <span className="text-xs font-bold text-red-400">{t("playalong")}</span>
           </div>
         )}
         <span className="truncate" translate={exercise.songData ? "no" : undefined}>{activeExercise.title}</span>
@@ -63,7 +63,7 @@ export const ExerciseHeroHeader = memo(function ExerciseHeroHeader({
                 Challenge: {streakPlan.title}
               </h3>
               <p className="text-sm text-zinc-400 leading-relaxed">{streakPlan.description}</p>
-              <p className="text-xs text-main font-semibold tracking-wide">
+              <p className="text-xs text-main font-semibold">
                 Reward: {streakPlan.rewardDescription}
               </p>
             </div>

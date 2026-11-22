@@ -32,7 +32,7 @@ Punkty umiejętności wyznaczają jej poziom. Pierwszy awans wymaga 5 punktów, 
 Liczba przy kategorii to suma punktów jej umiejętności, a nie ich poziomów. Poziom ma pojedyncza umiejętność.
 </BlogAlert>
 
-Używaj tego jak lustra, a nie celu: jeśli teoria ledwo ruszyła w ciągu miesiąca, to jest tu użyteczna informacja, a Ćwicz → Katalog ćwiczeń pozwala wybrać ćwiczenie dokładnie na tę lukę.
+Używaj tego jak lustra, a nie celu: jeśli teoria ledwo ruszyła w ciągu miesiąca, to jest tu użyteczna informacja, a Ćwicz → Ćwiczenia pozwala wybrać ćwiczenie dokładnie na tę lukę.
 
 ## Osiągnięcia
 
@@ -50,4 +50,4 @@ Występują w czterech rzadkościach, pokazanych kolorem odznaki:
 
 <FaqList items="Jak zdobywam XP umiejętności?::Graj ćwiczenia oznaczone tą umiejętnością i zapisuj sesję. Swobodny czas ćwiczeń podnosi twoje punkty, ale tylko ćwiczenia zasilają konkretne umiejętności|Czy umiejętność może spaść?::Nie. Sumy umiejętności nigdy nie maleją|Czy osiągnięcia dają nagrody?::Nie, są tylko do kolekcjonowania. Wszystko, co faktycznie wydajesz, pochodzi z Fame|Gdzie zobaczę swoje odznaki?::Na swoim profilu, obok poziomu i statystyk" />
 
-<ReadNext links="Cztery kategorie::/wiki/the-four-categories|Sposoby ćwiczenia::/wiki/practice-modes-overview|Rutyny ćwiczeń i plan automatyczny::/wiki/exercise-plans-and-auto-plan|Ścieżka nauki i Mapa skal::/wiki/journey-and-scale-tree" />
+<ReadNext links="Cztery kategorie::/wiki/the-four-categories|Sposoby ćwiczenia::/wiki/practice-modes-overview|Plany ćwiczeń i plan automatyczny::/wiki/exercise-plans-and-auto-plan|Ścieżka nauki i Mapa skal::/wiki/journey-and-scale-tree" />

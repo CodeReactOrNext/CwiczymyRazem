@@ -1,7 +1,8 @@
 import type { DraggableProvided } from "@hello-pangea/dnd";
-import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
+import { getCategoryChipColor } from "feature/exercisePlan/constants/categoryChip";
 import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { SONG_PRACTICE_MODE_LABELS } from "feature/exercisePlan/utils/songToExercise";
@@ -50,21 +51,19 @@ export const ExerciseItem = ({
         <div className='flex flex-col gap-6 text-muted-foreground md:hidden'>
           <Button
             variant='ghost'
-            size='icon'
-            className='h-6 w-6 p-1'
+            size='icon-sm'
             onClick={handleMoveUp}
             disabled={isFirst}
             aria-label={t("plans:create.move_up")}>
-            <ArrowUp size='1em' />
+            <ArrowUp />
           </Button>
           <Button
             variant='ghost'
-            size='icon'
-            className='h-6 w-6 p-1'
+            size='icon-sm'
             onClick={handleMoveDown}
             disabled={isLast}
             aria-label={t("plans:create.move_down")}>
-            <ArrowDown size='1em' />
+            <ArrowDown />
           </Button>
         </div>
 
@@ -89,18 +88,18 @@ export const ExerciseItem = ({
             </h3>
             <div className='flex items-center gap-2'>
               <div className='flex items-center gap-1 text-sm text-muted-foreground'>
-                <Clock size='1em' className='h-3 w-3' />
+                <Clock className='h-3 w-3' />
                 <span>{exercise.timeInMinutes} min</span>
               </div>
               {isSong ? (
-                <Badge className='border-transparent bg-amber-500/10 text-amber-300 hover:bg-amber-500/15'>
+                <Chip color='amber' size='sm'>
                   {t("plans:song")}
                   {exercise.songData?.mode && ` · ${SONG_PRACTICE_MODE_LABELS[exercise.songData.mode]}`}
-                </Badge>
+                </Chip>
               ) : (
-                <Badge variant='secondary'>
+                <Chip color={getCategoryChipColor(exercise.category)} size='sm'>
                   {t(`exercises:categories.${exercise.category}` as any)}
-                </Badge>
+                </Chip>
               )}
             </div>
           </div>

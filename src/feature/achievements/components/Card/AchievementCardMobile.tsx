@@ -20,14 +20,14 @@ export const AchievementCardMobile = ({ Icon, rarity, name, description, childre
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className='border-none bg-main-900/95 text-white backdrop-blur-md max-w-[90vw] rounded-[2rem]'>
+      <DialogContent className='sm:max-w-sm'>
         <DialogHeader className='flex flex-col items-center gap-6 py-4'>
           <AchievementPhysicalCard
             Icon={Icon}
             rarity={rarity}
             isMobileView
             cardSize="lg"
-            className="h-32 w-32 rounded-[2rem] shadow-2xl"
+            className="h-32 w-32 rounded-lg"
             customStyle={{
               "--card-opacity": "0.6",
               "--pointer-x": "50%",
@@ -38,7 +38,7 @@ export const AchievementCardMobile = ({ Icon, rarity, name, description, childre
           />
           <div className='text-center'>
             <DialogTitle className='mb-1 text-xl font-bold'>{t(name as any)}</DialogTitle>
-            <DialogDescription className='text-main-100 text-sm'>
+            <DialogDescription className='text-sm text-zinc-400'>
               <span className='mb-2 block text-xs opacity-70 font-bold'>
                 {t(rarity as any)}
               </span>

@@ -43,6 +43,7 @@
     "create": "Plan erstellen"
   },
   "favorites": {
+    "eyebrow": "Bibliothek",
     "title": "Favoriten",
     "subtitle": "Gespeicherte Pläne, Übungen und Songs",
     "empty_title": "Noch nichts gespeichert",
@@ -168,6 +169,8 @@
     "folder_not_empty": "Verschiebe oder lösche zuerst den Inhalt des Ordners",
     "folder_deleted": "Ordner „{{name}}“ gelöscht",
     "folder_delete_failed": "Ordner konnte nicht gelöscht werden",
+    "delete_file": "{{name}} löschen",
+    "delete_folder": "Ordner {{name}} löschen",
     "title": "Guitar-Pro-Dateien",
     "subtitle": "Deine Guitar-Pro-Dateibibliothek",
     "practice": "Üben",

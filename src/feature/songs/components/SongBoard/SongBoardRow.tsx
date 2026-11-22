@@ -1,8 +1,13 @@
-import { Badge } from "assets/components/ui/badge";
 import { PRESSABLE } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { formatDistanceToNowStrict } from "date-fns";
 import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMarks";
+import {
+  SONG_ARTIST_CLASS,
+  SONG_TITLE_CLASS,
+  SongThumb,
+} from "feature/songs/components/SongRow/SongRow";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongPart } from "feature/songs/types/songs.type";
@@ -11,13 +16,11 @@ import {
   formatPlayTime,
   getPracticedArrangements,
 } from "feature/songs/utils/arrangements.utils";
-import { SONG_COVER_STYLE, songCoverLayoutId } from "feature/songs/utils/songCoverLayout";
-import { m } from "framer-motion";
+import { songCoverLayoutId } from "feature/songs/utils/songCoverLayout";
 import { useTranslation } from "hooks/useTranslation";
 import { useDateFnsLocale } from "lib/i18n/dateLocale";
-import { transitions } from "lib/motion/motion";
 import { useSharedElement } from "lib/motion/useSharedElement";
-import { Heart, ListMusic, Music, Play } from "lucide-react";
+import { Heart, ListMusic, Play } from "lucide-react";
 
 const StatCell = ({
   label,
@@ -29,7 +32,7 @@ const StatCell = ({
   muted?: boolean;
 }) => (
   <div className='min-w-0'>
-    <p className='text-[10px] font-bold tracking-wider text-zinc-500'>
+    <p className='text-xs font-medium text-zinc-400'>
       {label}
     </p>
     <p
@@ -89,52 +92,43 @@ export const SongBoardRow = ({
   return (
     <div
       onClick={() => runAfterSnapshot(onOpenDetails)}
-      className='group flex cursor-pointer items-center gap-3 rounded-lg bg-zinc-900/40 p-3 transition-background hover:bg-zinc-800/40 md:gap-4 md:px-4'>
+      className='group flex cursor-pointer items-center gap-3 rounded-lg bg-zinc-800/40 p-3 transition-background hover:bg-zinc-800/60 md:gap-4 md:px-4'>
       {/* Cover — morphs into the detail view's cover (see songCoverLayout) */}
-      <m.div
+      <SongThumb
+        coverUrl={song.coverUrl}
+        alt={`${song.title} cover`}
         layoutId={songCoverLayoutId(song.id)}
         layoutDependency={layoutDependency}
-        transition={transitions.move}
-        style={SONG_COVER_STYLE}
-        className='h-12 w-12 shrink-0 overflow-hidden md:h-14 md:w-14'>
-        {song.coverUrl ? (
-          <img
-            src={song.coverUrl}
-            alt={`${song.title} cover`}
-            className='h-full w-full object-cover'
-          />
-        ) : (
-          <div className='flex h-full w-full items-center justify-center bg-zinc-800'>
-            <Music className='h-5 w-5 text-zinc-600' />
-          </div>
-        )}
-      </m.div>
+      />
 
       {/* Title / artist (+ compact stats below lg) */}
       <div className='min-w-0 flex-1'>
-        <p translate='no' className='truncate text-[15px] font-bold text-white'>
+        <p translate='no' className={SONG_TITLE_CLASS}>
           {song.title}
         </p>
-        <p translate='no' className='truncate text-sm text-zinc-400'>
+        <p translate='no' className={SONG_ARTIST_CLASS}>
           {song.artist}
         </p>
         {/* The map badge leads this line instead of sharing the title row, so it
             stays fully visible while long titles keep the whole width to truncate in. */}
         <div className='mt-1 flex min-w-0 items-center gap-2'>
           {hasSectionMap && (
-            <Badge
-              variant='secondary'
+            <Chip
+              color='gray'
+              size='sm'
               title={t("board.map_available")}
-              className='shrink-0 gap-1 px-1.5 py-0 text-[10px]'>
+              className='shrink-0'>
               <ListMusic className='h-3 w-3' />
               {t("board.map")}
-            </Badge>
+            </Chip>
           )}
           {practicedArrangements.map(({ arrangement, progress: slice }) => (
-            <span
+            <Chip
               key={arrangement}
+              color='gray'
+              size='sm'
               title={`${t(`arrangements.${arrangement}.label`, ARRANGEMENT_META[arrangement].label)}: ${formatPlayTime(slice.totalPracticeMs)}`}
-              className='inline-flex shrink-0 items-center gap-1.5 rounded bg-zinc-800/60 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-zinc-300'>
+              className='shrink-0 gap-1.5 tabular-nums'>
               <span
                 aria-hidden
                 className={cn("h-1.5 w-1.5 rounded-full", ARRANGEMENT_META[arrangement].dot)}
@@ -144,7 +138,7 @@ export const SongBoardRow = ({
               </span>
               <span className='sm:hidden'>{ARRANGEMENT_META[arrangement].short}</span>
               <span className='text-zinc-400'>{formatPlayTime(slice.totalPracticeMs)}</span>
-            </span>
+            </Chip>
           ))}
           <p className='min-w-0 truncate text-xs text-zinc-500 2xl:hidden'>
             {hasPracticed ? (
@@ -219,7 +213,7 @@ export const SongBoardRow = ({
       <div className='hidden w-16 shrink-0 flex-col items-end sm:flex'>
         {bestAccuracy !== null ? (
           <>
-            <span className='text-[10px] font-bold tracking-wider text-zinc-500'>
+            <span className='text-xs font-medium text-zinc-400'>
               {t("board.best")}
             </span>
             <span className='text-xl font-black tabular-nums leading-tight text-amber-400'>

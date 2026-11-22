@@ -1,3 +1,4 @@
+import { Card } from "assets/components/ui/card";
 import {
   Tabs,
   TabsContent,
@@ -11,6 +12,8 @@ import {
   tabNavTriggerClass,
 } from "components/PageTabs/tabNav";
 import { useRailEdges } from "components/PageTabs/useRailEdges";
+import { PageTitle } from "components/PageTitle/PageTitle";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { AppearanceSettings } from "feature/settings/components/AppearanceSettings";
 import { AudioInputSettings } from "feature/settings/components/AudioInputSettings";
 import { DailyGoalSettings } from "feature/settings/components/DailyGoalSettings";
@@ -82,7 +85,7 @@ const SettingsView = () => {
         {/* Same underline tab bar as the rest of the app, so the form gets the
             full width instead of sharing it with a column of category cards. */}
         <div className="space-y-6">
-          <h1 className="px-1 text-2xl font-bold text-zinc-100">{t("settings:tabs.title")}</h1>
+          <PageTitle title={t("settings:tabs.title")} className='px-1' />
           <TabsList
             ref={railRef}
             className={cn(tabNavListClass, tabNavFadeClass(edges))}>
@@ -95,7 +98,7 @@ const SettingsView = () => {
           </TabsList>
 
           {/* Content Area */}
-          <div className="min-w-0 pb-20">
+          <div className="min-w-0">
             <TabsContent value="profile" className="mt-0 space-y-8">
               <ProfileBasics />
               <GuitarStartDate />
@@ -135,10 +138,13 @@ const SettingsView = () => {
                     </div>
                   </div>
                ) : (
-                 <div className="space-y-6">
-                    <EmailChange />
-                    <PasswordChange />
-                 </div>
+                 <Card>
+                    <SectionHeader title={t("settings:security")} description={t("settings:manage_your_account_security")} />
+                    <div className="space-y-8">
+                      <EmailChange />
+                      <PasswordChange />
+                    </div>
+                 </Card>
                )}
             </TabsContent>
           </div>

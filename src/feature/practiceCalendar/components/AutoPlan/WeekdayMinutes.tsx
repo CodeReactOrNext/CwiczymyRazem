@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 
 import { useCalendarDisplay } from "../../hooks/useCalendarDisplay";
@@ -55,13 +56,14 @@ export const WeekdayMinutes = ({
     <div className='space-y-4'>
       <div className='flex flex-wrap gap-2'>
         {presets.map((preset) => (
-          <button
+          <Button
             key={preset.id}
             type='button'
-            onClick={() => onChange(preset.apply())}
-            className='h-8 rounded bg-zinc-800/60 px-3 text-xs font-medium text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800 hover:text-zinc-100'>
+            variant='ghost'
+            size='sm'
+            onClick={() => onChange(preset.apply())}>
             {t(`planner.weekdays.presets.${preset.id}`)}
-          </button>
+          </Button>
         ))}
       </div>
       <div className='grid grid-cols-7 gap-1.5'>
@@ -101,7 +103,7 @@ export const WeekdayMinutes = ({
                       : "bg-zinc-800/60 text-zinc-100",
                 )}
               />
-              <span className='h-3 text-[10px] text-zinc-500'>
+              <span className='h-3 text-[11px] text-zinc-500'>
                 {isRest ? t("planner.weekdays.rest") : ""}
               </span>
             </label>

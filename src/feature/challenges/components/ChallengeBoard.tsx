@@ -16,11 +16,16 @@ import {
   getClearedSongIds,
   groupSubmissionsBySong,
 } from "feature/challenges/utils/challengeProgress";
+import {
+  SONG_ARTIST_CLASS,
+  SONG_TITLE_CLASS,
+  SongThumb,
+} from "feature/songs/components/SongRow/SongRow";
+import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
-import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import { Interpolate } from "lib/i18n/Interpolate";
-import { Check, Flag, Music, Play, Upload, Users } from "lucide-react";
+import { Check, Flag, Play, Upload, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 
 interface ChallengeBoardProps {
@@ -108,7 +113,7 @@ const ChallengeRow = ({
       {/* Station */}
       <div
         className={cn(
-          "relative my-1 flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-white/[0.02] px-2 py-3 transition-colors group-hover:bg-white/[0.06] sm:flex-nowrap sm:px-3",
+          "relative my-1 flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-zinc-800/40 px-2 py-3 transition-colors group-hover:bg-zinc-800/60 sm:flex-nowrap sm:px-3",
           isCleared && "opacity-80 group-hover:opacity-100",
         )}>
         {/* The station itself opens the song — everything already interactive
@@ -122,30 +127,17 @@ const ChallengeRow = ({
           </span>
         </button>
 
-        <div className='pointer-events-none relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-zinc-800'>
-          {song.coverUrl ? (
-            <img
-              src={song.coverUrl}
-              alt=''
-              className='h-full w-full object-cover'
-            />
-          ) : (
-            <div className='flex h-full w-full items-center justify-center text-zinc-600'>
-              <Music className='h-5 w-5' />
-            </div>
-          )}
+        <SongThumb coverUrl={song.coverUrl} className='pointer-events-none'>
           <span className='force-dark absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100'>
             <Play className='h-5 w-5 fill-current' />
           </span>
-        </div>
+        </SongThumb>
 
         <div className='min-w-0 flex-1'>
-          <p
-            translate='no'
-            className='truncate text-base font-semibold text-white'>
+          <p translate='no' className={SONG_TITLE_CLASS}>
             {song.title}
           </p>
-          <p translate='no' className='mt-0.5 truncate text-sm text-zinc-500'>
+          <p translate='no' className={SONG_ARTIST_CLASS}>
             {song.artist}
             {song.votes > 0 && (
               <span className='ml-2 text-zinc-600'>
@@ -181,11 +173,7 @@ const ChallengeRow = ({
           )}
         </button>
 
-        <span
-          className='hidden shrink-0 rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold sm:inline'
-          style={{ backgroundColor: inkWash(tier.color, 12), color: inkAccent(tier.color) }}>
-          {tier.tier}
-        </span>
+        <TierPick tier={tier} className='hidden h-5 w-5 sm:block' />
 
         {/* Both states share one width so the tier badges line up in a column
             instead of zig-zagging with the label length. */}
@@ -201,15 +189,13 @@ const ChallengeRow = ({
             disabled={isLocked}
             onClick={onSubmit}
             className={cn(
-              "relative z-10 ml-auto h-8 w-[92px] shrink-0 px-0 text-xs font-bold sm:ml-0",
+              "relative z-10 ml-auto w-[92px] shrink-0 px-0 font-bold sm:ml-0",
               isLocked
                 ? "text-zinc-600"
                 : "bg-white/5 text-zinc-200 hover:bg-white/10 hover:text-white",
             )}>
-            <span className='flex items-center gap-1.5'>
-              <Upload className='h-3.5 w-3.5' />
-              {t("board.submit")}
-            </span>
+            <Upload />
+            {t("board.submit")}
           </Button>
         )}
       </div>
@@ -283,7 +269,7 @@ export const ChallengeBoard = ({
                 className={cn(
                   "absolute left-1/2 top-1/2 z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors",
                   hasClearedBoard
-                    ? "bg-amber-400 text-black shadow-[0_0_24px_rgba(251,191,36,0.35)]"
+                    ? "bg-amber-400 text-black"
                     : "bg-zinc-900 text-zinc-500 ring-1 ring-white/10",
                 )}>
                 <Flag className='h-3.5 w-3.5' />

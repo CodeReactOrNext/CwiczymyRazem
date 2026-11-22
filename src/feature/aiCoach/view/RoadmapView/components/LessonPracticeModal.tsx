@@ -1,4 +1,4 @@
-import { buttonVariants } from "assets/components/ui/button";
+import { Button, buttonVariants } from "assets/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -9,6 +9,7 @@ import {
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import type { YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
 import {
   clearLessonProgress,
@@ -27,7 +28,7 @@ import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import useTimer from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Loader2, Pause, Play, X } from "lucide-react";
+import { Check, Pause, Play, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons/lib";
 import type { YouTubeProps } from "react-youtube";
@@ -284,11 +285,14 @@ const LessonPracticeModal = ({
           // A stray click beside the video must not end an hour-long session.
           onInteractOutside={(event) => event.preventDefault()}
           overlayClassName='z-[1000] bg-black/85 backdrop-blur-sm'
-          className='z-[1000] flex h-[100dvh] w-full max-w-3xl flex-col gap-0 overflow-y-auto border-0 bg-zinc-950 p-0 shadow-none sm:h-auto sm:max-h-[92dvh] sm:rounded-lg'>
+          // As wide as the screen allows while the 16:9 video plus the header
+          // and controls (~20rem) still fit in 92dvh — no scrolling to reach
+          // "Finish". The sm: overrides beat the base dialog's sm:max-w-lg/p-6.
+          className='z-[1000] flex h-[100dvh] w-full flex-col gap-0 overflow-y-auto border-0 bg-zinc-950 p-0 shadow-none sm:h-auto sm:max-h-[92dvh] sm:max-w-[min(94vw,1600px,max(32rem,calc((92dvh_-_20rem)*16/9)))] sm:overflow-y-auto sm:rounded-lg sm:p-0 short:p-0'>
           {/* ── Header ── */}
           <div className='flex items-start justify-between gap-4 px-5 pb-4 pt-5'>
             <div className='min-w-0'>
-              <p className='mb-1 text-[11px] font-semibold tracking-wide text-cyan-400'>
+              <p className='mb-1 text-xs font-medium text-cyan-400'>
                 {t("lesson_modal.session")}
               </p>
               <DialogTitle className='truncate text-sm font-bold leading-snug tracking-normal text-zinc-100'>
@@ -303,7 +307,7 @@ const LessonPracticeModal = ({
                 type='button'
                 aria-label={t("drawer.close")}
                 className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "shrink-0")}>
-                <X className='h-4 w-4' />
+                <X />
               </button>
             </DialogClose>
           </div>
@@ -336,20 +340,21 @@ const LessonPracticeModal = ({
                   {formatElapsed(elapsed)}
                 </span>
               </div>
-              <button
+              <Button
                 type='button'
-                onClick={handleToggle}
-                className='flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-xs font-semibold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700'>
+                variant='subtle'
+                size='sm'
+                onClick={handleToggle}>
                 {isRunning ? (
                   <>
-                    <Pause className='h-3.5 w-3.5' /> {t("lesson_modal.pause")}
+                    <Pause /> {t("lesson_modal.pause")}
                   </>
                 ) : (
                   <>
-                    <Play className='h-3.5 w-3.5' /> {t("lesson_modal.resume")}
+                    <Play /> {t("lesson_modal.resume")}
                   </>
                 )}
-              </button>
+              </Button>
             </div>
 
             {/* Skill category — where this time is logged */}
@@ -357,44 +362,29 @@ const LessonPracticeModal = ({
               <p className='text-xs font-semibold text-zinc-400'>
                 {t("lesson_modal.log_as")}
               </p>
-              <div role='radiogroup' className='grid grid-cols-4 gap-2'>
-                {SKILL_OPTIONS.map(({ id, label, Icon }) => {
-                  const active = skill === id;
-                  return (
-                    <button
-                      key={id}
-                      type='button'
-                      role='radio'
-                      aria-checked={active}
-                      onClick={() => setSkill(id)}
-                      className={cn(
-                        "flex flex-col items-center gap-1.5 rounded-lg px-2 py-2.5 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                        active
-                          ? "bg-cyan-500/10 text-cyan-400"
-                          : "bg-zinc-900/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-                      )}>
-                      <Icon className='h-4 w-4' />
-                      {t(`common:categories.${id}`, label)}
-                    </button>
-                  );
-                })}
-              </div>
+              <SegmentedControl<SkillsType>
+                label={t("lesson_modal.log_as")}
+                selected={[skill]}
+                onSelect={setSkill}
+                options={SKILL_OPTIONS.map(({ id, label, Icon }) => ({
+                  value: id,
+                  label: t(`common:categories.${id}`, label),
+                  icon: <Icon className='h-4 w-4 shrink-0' />,
+                }))}
+              />
             </div>
 
-            <button
+            <Button
               type='button'
+              size='lg'
               onClick={handleFinish}
-              disabled={isSubmitting}
-              className='flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-60 hover:bg-emerald-400'>
-              {isSubmitting ? (
-                <Loader2 className='h-4 w-4 animate-spin' />
-              ) : (
-                <Check className='h-4 w-4' />
-              )}
+              loading={isSubmitting}
+              className='w-full sm:w-auto sm:self-end'>
+              {!isSubmitting && <Check />}
               {isSubmitting
                 ? t("lesson_modal.logging")
                 : t("lesson_modal.finish")}
-            </button>
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -418,13 +408,13 @@ const LessonPracticeModal = ({
             <button
               type='button'
               onClick={onClose}
-              className='flex flex-1 items-center justify-center rounded-lg bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700'>
+              className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "flex-1")}>
               {t("lesson_modal.leave")}
             </button>
             <DialogClose asChild>
               <button
                 type='button'
-                className='flex flex-1 items-center justify-center rounded-lg bg-white px-4 py-2.5 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-200'>
+                className={cn(buttonVariants({ size: "lg" }), "flex-1")}>
                 {t("lesson_modal.keep_practicing")}
               </button>
             </DialogClose>

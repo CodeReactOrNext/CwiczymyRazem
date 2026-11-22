@@ -1,4 +1,5 @@
 import { buttonVariants } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
@@ -6,7 +7,6 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { IconBox } from "components/IconBox/IconBox";
 import { resolveLiveActivity } from "components/OnlineUsers/liveActivity";
 import Avatar from "components/UI/Avatar";
 import { AvatarDecoration } from "feature/cosmetics/components/AvatarDecoration";
@@ -38,17 +38,20 @@ const StatsBox = ({
   label: string;
   value: string | number;
 }) => (
-  <div className='flex items-center gap-2 rounded-lg bg-gray-100 p-2'>
-    <IconBox small Icon={Icon} />
+  <div className='flex items-center gap-2 rounded-lg bg-black/5 p-2'>
+    {/* Not IconBox: its themer text colour is white, lost on the white card. */}
+    <span className='m-1 mx-2 flex h-5 w-5 shrink-0 items-center justify-center text-sm text-black/70'>
+      <Icon size='1em' />
+    </span>
     <div>
-      <p className='text-xs font-medium text-gray-500'>{label}</p>
-      <p className='text-sm font-bold text-gray-900'>{value}</p>
+      <p className='text-xs font-medium text-black/60'>{label}</p>
+      <p className='text-sm font-bold'>{value}</p>
     </div>
   </div>
 );
 /** A name in the "Live now" card that opens what it names. */
 const LIVE_LINK_CLASS =
-  "block text-left underline decoration-gray-300 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-600 hover:decoration-cyan-400";
+  "block text-left underline decoration-black/30 decoration-dotted underline-offset-4 transition-colors hover:text-cyan-700 hover:decoration-cyan-600";
 
 interface UserTooltipProps {
   userId: string | null;
@@ -144,27 +147,27 @@ export const UserTooltip = ({
   const panel = (
     <>
       {loading ? (
-            <div className='h-24 w-56 animate-pulse rounded-lg bg-gray-100' />
+            <Skeleton className='h-24 w-56 rounded-lg' />
           ) : userData ? (
-            <div className='relative flex flex-col gap-5 text-gray-900'>
+            <div className='relative flex flex-col gap-5'>
                {/* Activity Section */}
                {currentActivity && (
-                <div className="relative z-10 mb-2 p-3 rounded-lg bg-cyan-50 border border-cyan-100">
-                  <div className="flex items-center gap-2 text-cyan-600 font-bold text-[12px]  mb-1.5">
+                <div className="relative z-10 mb-2 p-3 rounded-lg bg-cyan-500/10">
+                  <div className="flex items-center gap-2 text-cyan-700 font-bold text-xs mb-1.5">
                     <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
                     {t("ui:live_now")}
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-md bg-cyan-100 text-cyan-600">
-                      <Music size='1em' className="h-3 w-3" />
+                    <div className="p-2 rounded bg-cyan-500/10 text-cyan-700">
+                      <Music className="h-3 w-3" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] text-gray-500 font-medium">Practicing:</p>
+                      <p className="text-xs text-black/60 font-medium">Practicing:</p>
                       {currentPreview ? (
                         <button
                           type="button"
                           onClick={() => openActivity(currentPreview)}
-                          className={cn("text-xs font-bold text-gray-900 leading-tight", LIVE_LINK_CLASS)}>
+                          className={cn("text-xs font-bold leading-tight", LIVE_LINK_CLASS)}>
                           {currentActivity.exerciseTitle}
                         </button>
                       ) : currentHref ? (
@@ -175,11 +178,11 @@ export const UserTooltip = ({
                             // The page would otherwise open under the Community drawer.
                             useCommunityDrawer.getState().setOpen(false);
                           }}
-                          className={cn("text-xs font-bold text-gray-900 leading-tight", LIVE_LINK_CLASS)}>
+                          className={cn("text-xs font-bold leading-tight", LIVE_LINK_CLASS)}>
                           {currentActivity.exerciseTitle}
                         </Link>
                       ) : (
-                        <p className="text-xs font-bold text-gray-900 leading-tight">{currentActivity.exerciseTitle}</p>
+                        <p className="text-xs font-bold leading-tight">{currentActivity.exerciseTitle}</p>
                       )}
                       {/* A single exercise runs inside a plan named after it — no need to say it twice. */}
                       {currentActivity.planTitle !== currentActivity.exerciseTitle &&
@@ -187,11 +190,11 @@ export const UserTooltip = ({
                           <button
                             type="button"
                             onClick={() => openActivity(planPreview)}
-                            className={cn("mt-0.5 text-[10px] italic text-gray-400", LIVE_LINK_CLASS)}>
+                            className={cn("mt-0.5 text-xs italic text-black/60", LIVE_LINK_CLASS)}>
                             {currentActivity.planTitle}
                           </button>
                         ) : (
-                          <p className="text-[10px] text-gray-400 italic mt-0.5">{currentActivity.planTitle}</p>
+                          <p className="text-xs text-black/60 italic mt-0.5">{currentActivity.planTitle}</p>
                         ))}
                     </div>
                   </div>
@@ -209,18 +212,18 @@ export const UserTooltip = ({
                         size='sm'
                       />
                     ) : (
-                      <div className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-900'>
+                      <div className='flex h-10 w-10 items-center justify-center rounded-full bg-black/10 text-lg font-bold'>
                         {userData.displayName?.[0] ?? "?"}
                       </div>
                     )}
                   </AvatarDecoration>
                 </div>
                 <div className='flex flex-col items-start gap-1.5'>
-                  <h3 className='flex items-center gap-2 text-base font-bold text-gray-900'>
+                  <h3 className='flex items-center gap-2 text-base font-bold'>
                     {userData.displayName}
                     {/* The card is portalled out of whatever row opened it, so
                         the tag may carry its own link here. */}
-                    <GuildTagBadge badge={userData.guildBadge} tone='light' />
+                    <GuildTagBadge badge={userData.guildBadge} />
                   </h3>
                   {supportMember && (
                     <SupportBadge member={supportMember} tone='light' />
@@ -269,14 +272,17 @@ export const UserTooltip = ({
 
               <Link
                 href={`/user/${userId}`}
-                className='relative z-10 flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-gray-700'
+                className={cn(
+                  buttonVariants({ variant: "subtle" }),
+                  "relative z-10 w-full border-b-black/15 bg-black/5 font-bold text-black hover:bg-black/10 hover:text-black",
+                )}
               >
                 {t("tooltip.viewProfile")}
                 <ExternalLink size='1em' className='text-[10px]' />
               </Link>
             </div>
           ) : (
-            <div className='flex items-center gap-2 text-gray-500'>
+            <div className='flex items-center gap-2 text-black/60'>
               <svg
                 className='h-5 w-5'
                 fill='none'
@@ -318,15 +324,18 @@ export const UserTooltip = ({
               onClick={() => setOpen(false)}
             >
               <div
-                className="relative w-full max-w-[340px] overflow-hidden rounded-xl border border-gray-100 bg-white/95 p-4 shadow-2xl backdrop-blur-md"
+                className="tooltip-ink relative w-full max-w-[340px] overflow-hidden rounded-lg bg-white p-4 text-black"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
                   onClick={() => setOpen(false)}
                   aria-label={t("ui:close")}
-                  className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute right-2 top-2 z-30")}
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "icon" }),
+                    "absolute right-2 top-2 z-30 bg-black/5 text-black/70 hover:bg-black/10 hover:text-black",
+                  )}
                 >
-                  <X size={15} />
+                  <X />
                 </button>
                 {panel}
               </div>
@@ -355,7 +364,7 @@ export const UserTooltip = ({
           onFocus={() => setHasOpened(true)}>
           {children}
         </TooltipTrigger>
-        <TooltipContent className='rounded-xl bg-white/95 p-4 shadow-2xl border border-gray-100 backdrop-blur-md overflow-visible'>
+        <TooltipContent className='tooltip-ink overflow-visible p-3'>
           {panel}
         </TooltipContent>
       </Tooltip>

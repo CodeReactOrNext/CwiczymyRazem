@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -130,13 +131,15 @@ export const GlobalSearch = () => {
         </kbd>
       </button>
 
-      <button
+      <Button
         type='button'
+        variant='subtle'
+        size='icon-touch'
         onClick={() => setIsOpen(true)}
         aria-label={t("search.title")}
-        className='flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800/40 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 sm:hidden'>
-        <Search className='h-4 w-4' />
-      </button>
+        className='sm:hidden'>
+        <Search />
+      </Button>
 
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogContent
@@ -144,7 +147,7 @@ export const GlobalSearch = () => {
             event.preventDefault();
             inputRef.current?.focus();
           }}
-          className='gap-0 border-none bg-zinc-950 p-0 shadow-none sm:top-24 sm:max-w-2xl sm:translate-y-0'>
+          className='gap-0 bg-zinc-950 p-0 sm:top-24 sm:max-w-2xl sm:translate-y-0'>
           <DialogTitle className='sr-only'>{t("search.title")}</DialogTitle>
           <DialogDescription className='sr-only'>
             {t("search.description")}

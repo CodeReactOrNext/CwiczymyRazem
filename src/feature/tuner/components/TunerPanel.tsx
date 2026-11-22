@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
 import { Mic, MicOff, Volume2 } from "lucide-react";
@@ -72,7 +73,7 @@ export const TunerPanel = ({
     <div className='rounded-2xl bg-zinc-900/40 p-6 sm:p-8'>
       <div className='flex flex-wrap gap-1.5'>
         {/* Instrument first: it decides which tunings even exist. */}
-        <span className='w-full pb-1 text-[11px] font-bold tracking-wide text-zinc-500'>
+        <span className='w-full pb-1 text-xs font-medium text-zinc-400'>
           Instrument
         </span>
         {TUNER_INSTRUMENTS.map((option) => (
@@ -93,7 +94,7 @@ export const TunerPanel = ({
       </div>
 
       <div className='mt-6 flex flex-wrap gap-1.5'>
-        <span className='w-full pb-1 text-[11px] font-bold tracking-wide text-zinc-500'>
+        <span className='w-full pb-1 text-xs font-medium text-zinc-400'>
           Tuning
         </span>
         {instrument.tunings.map((option) => (
@@ -117,7 +118,7 @@ export const TunerPanel = ({
       <div className='mt-8 flex flex-col items-center gap-8 sm:flex-row sm:items-center sm:justify-center sm:gap-12'>
         <div className='w-full max-w-sm'>
           <ArcTuner cents={live ? cents : 0} hasNote={live} />
-          <div className='-mt-2 flex justify-between px-4 text-[10px] font-bold tracking-wide text-zinc-700'>
+          <div className='-mt-2 flex justify-between px-4 text-[11px] font-bold text-zinc-500'>
             <span>← Flat</span>
             <span>Sharp →</span>
           </div>
@@ -139,7 +140,7 @@ export const TunerPanel = ({
             )}>
             {live ? `${cents > 0 ? "+" : ""}${Math.round(cents)}¢` : "—"}
           </span>
-          <span className='font-mono text-xs text-zinc-600'>
+          <span className='font-mono text-xs text-zinc-500'>
             {target.hz.toFixed(2)} Hz
           </span>
         </div>
@@ -183,18 +184,14 @@ export const TunerPanel = ({
       </div>
 
       <div className='mt-8 flex flex-col items-center gap-3'>
-        <button
+        <Button
           type='button'
-          onClick={() => (isListening ? close() : void init())}
-          className={cn(
-            "flex items-center gap-2.5 rounded-lg px-6 py-3 text-sm font-bold transition-background",
-            isListening
-              ? "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-800"
-              : "bg-cyan-500 text-zinc-950 hover:bg-cyan-400",
-          )}>
-          {isListening ? <MicOff className='h-4 w-4' /> : <Mic className='h-4 w-4' />}
+          size='lg'
+          variant={isListening ? "ghost" : "default"}
+          onClick={() => (isListening ? close() : void init())}>
+          {isListening ? <MicOff /> : <Mic />}
           {isListening ? "Stop the microphone" : "Turn on the microphone"}
-        </button>
+        </Button>
 
         {error ? (
           <p className='max-w-sm text-center text-xs text-amber-400'>
@@ -202,7 +199,7 @@ export const TunerPanel = ({
             tap a string above to tune by ear instead.
           </p>
         ) : (
-          <p className='max-w-sm text-center text-xs text-zinc-600'>
+          <p className='max-w-sm text-center text-xs text-zinc-500'>
             Audio stays in your browser: nothing is recorded, stored or uploaded.
           </p>
         )}

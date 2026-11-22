@@ -659,6 +659,12 @@ html.theme-light:has([data-app-shell]) .light-tint {
   background-image: linear-gradient(var(--tw-gradient-from), var(--tw-gradient-from)) !important;
 }
 
+/* CorridorBackdrop doodles: kept very faint on black, where white lines catch
+   the eye; ink on the light page needs a touch more to read at all. */
+html.theme-light:has([data-app-shell]) .corridor-doodles {
+  opacity: 0.07;
+}
+
 /* The light theme is flat: Tailwind's shadow-* / drop-shadow-* utilities (and
    the arbitrary glows built on them) resolve to nothing. Rings share
    box-shadow but use their own variables, so focus rings stay. Road keys
@@ -673,8 +679,13 @@ html.theme-light:has([data-app-shell]) *::after {
 
 /* readableText() (lib/colorTheme): bright accent hexes used as text — rarity,
    part tiers, condition grades, case tiers — darkened to the 700 step of the
-   same hue so they read on white. Dark theme leaves these undefined. */
-html.theme-light:has([data-app-shell]) {
+   same hue so they read on white. Dark theme leaves these undefined.
+   `tooltip-ink`: a tooltip is white on the dark theme (bg-white flips to ink on
+   the light one), so inside it the mapping runs the other way round — the
+   darkened set on the dark theme, the raw hex on the light one (reset below). */
+html.theme-light:has([data-app-shell]),
+html:not(.theme-light:has([data-app-shell])) .tooltip-ink,
+html.theme-light:has([data-app-shell]) .force-dark .tooltip-ink {
   --ink-mix: 45%;
   --tx-a1a1aa: #52525b;
   --tx-d4d4d8: #52525b;
@@ -693,6 +704,8 @@ html.theme-light:has([data-app-shell]) {
   --tx-06b6d4: #0e7490;
   --tx-d4a373: #92400e;
   --tx-b45454: #991b1b;
+  /* Note grade "off" (NoteDeviationChart). */
+  --tx-f97316: #c2410c;
   /* Song tiers (getSongTier): pastel S–E on a dark page. */
   --tx-ff7f7f: #b91c1c;
   --tx-ffbf7f: #c2410c;
@@ -708,14 +721,15 @@ html.theme-light:has([data-app-shell]) {
   /* Card footer band (market seller/price/Buy): a light well, not a black wash. */
   --card-footer: rgba(24, 24, 27, 0.035);
 }
-html.theme-light:has([data-app-shell]) .force-dark {
+html.theme-light:has([data-app-shell]) .force-dark,
+html.theme-light:has([data-app-shell]) .tooltip-ink {
   --ink-mix: 0%;
   --tx-a1a1aa: initial; --tx-d4d4d8: initial; --tx-9ca3af: initial;
   --tx-10b981: initial; --tx-34d399: initial; --tx-3b82f6: initial;
   --tx-38bdf8: initial; --tx-818cf8: initial; --tx-a855f7: initial;
   --tx-c084fc: initial; --tx-f43f5e: initial; --tx-fbbf24: initial;
   --tx-f59e0b: initial; --tx-67e8f9: initial; --tx-06b6d4: initial;
-  --tx-d4a373: initial; --tx-b45454: initial;
+  --tx-d4a373: initial; --tx-b45454: initial; --tx-f97316: initial;
   --tx-ff7f7f: initial; --tx-ffbf7f: initial; --tx-ffff7f: initial;
   --tx-7fff7f: initial; --tx-7fffff: initial;
   --tx-f5a524: initial; --tx-7dd3fc: initial; --tx-6ee7b7: initial;
@@ -829,6 +843,59 @@ html.theme-light:has([data-app-shell]) {
   --road-lip-open: #a1a1aa;
   --road-lip-locked: #c4c4c9;
   --road-lip-current: #b45309;
+  --road-band: rgba(161, 161, 170, 0.28);
+  --road-band-done: rgba(16, 185, 129, 0.2);
+}
+
+/* Journey landmarks (JourneyLandmark.tsx): a scene beside the road where a
+   section starts. Placed against the road (480 px, centred, inside a wrapper
+   that clips sideways). Below xl they peek in from the screen edge, 62% size,
+   about 60% of the scene on screen; from xl the side space fits them whole. */
+.journey-landmark {
+  position: absolute;
+  top: 120px;
+  width: calc(var(--lm-w) * 0.62);
+  opacity: 0.75;
+  pointer-events: none;
+}
+.journey-landmark svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.journey-landmark[data-side="left"] {
+  left: calc(-12px - var(--lm-w) * 0.2356);
+}
+.journey-landmark[data-side="right"] {
+  right: calc(-12px - var(--lm-w) * 0.2356);
+}
+@media (min-width: 1280px) {
+  .journey-landmark {
+    top: 96px;
+    width: var(--lm-w);
+    opacity: 1;
+  }
+  .journey-landmark[data-side="left"] {
+    left: auto;
+    right: calc(100% - 24px);
+  }
+  .journey-landmark[data-side="right"] {
+    right: auto;
+    left: calc(100% - 24px);
+  }
+}
+/* The metronome landmark keeps time: one swing a beat, 60 BPM. */
+.journey-pendulum {
+  transform-box: view-box;
+  transform-origin: 110px 224px;
+  animation: journey-pendulum 1s ease-in-out infinite alternate;
+}
+@keyframes journey-pendulum {
+  from { transform: rotate(-13deg); }
+  to { transform: rotate(13deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-pendulum { animation: none; }
 }
 
 /* Recharts on a light page. The charts pass white strokes/fills as SVG
@@ -1004,4 +1071,22 @@ html.phone-session [role="dialog"][data-state="open"]:not([data-vaul-drawer]) {
 }
 html.phone-session [role="dialog"][data-state="closed"]:not([data-vaul-drawer]) {
   animation: phone-sheet-down 150ms cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+}
+
+/* PageTabs: after a tab switch the section's content rises in under the rail
+   (the rail is marked by useTabSwitchMotion). Covers both shapes a page uses —
+   content beside the rail, or beside the block that wraps it. */
+@keyframes tab-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  nav[data-tab-switch] ~ *,
+  :has(> nav[data-tab-switch]) ~ * {
+    animation: tab-content-in theme("transitionDuration.base")
+      theme("transitionTimingFunction.DEFAULT") backwards;
+  }
 }

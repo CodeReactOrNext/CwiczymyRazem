@@ -100,7 +100,7 @@ export const Metronome = ({
   const tempoColor = getTempoColor(bpm);
 
   return (
-    <Card className='relative overflow-hidden rounded-lg border-0 bg-card/80 p-3 shadow-xl backdrop-blur-sm'>
+    <Card className='relative overflow-hidden bg-card/80 p-3'>
       {onHalfSpeedToggle && (
         <div className='absolute left-3 top-3'>
           <button
@@ -113,27 +113,29 @@ export const Metronome = ({
             )}
             title={t("half_speed")}>
             <Gauge className='h-4 w-4 shrink-0' strokeWidth={2.5} />
-            <span className='text-[11px] font-bold tracking-wider'>0.5x</span>
+            <span className='text-[11px] font-bold'>0.5x</span>
           </button>
         </div>
       )}
 
       <div className='absolute right-2 top-2'>
-        <button
+        {/* Sounding = the speaker lights up; the face stays the same key. */}
+        <Button
+          type='button'
+          variant='ghost'
+          size='icon-sm'
           onClick={() => onMuteToggle?.(!isMuted)}
-          className={cn(
-            "rounded-lg p-1.5 transition-colors",
-            isMuted
-              ? "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
-              : "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-200",
-          )}
-          title={isMuted ? "Unmute" : "Mute"}>
+          className={
+            isMuted ? "text-zinc-400" : "text-cyan-400 hover:text-cyan-300"
+          }
+          title={isMuted ? "Unmute" : "Mute"}
+          aria-label={isMuted ? "Unmute" : "Mute"}>
           {isMuted ? (
-            <VolumeX className='h-4 w-4' strokeWidth={2.5} />
+            <VolumeX strokeWidth={2.5} />
           ) : (
-            <Volume2 className='h-4 w-4' strokeWidth={2.5} />
+            <Volume2 strokeWidth={2.5} />
           )}
-        </button>
+        </Button>
       </div>
 
       <div className='mt-1 flex flex-col items-center justify-center py-2'>
@@ -178,7 +180,7 @@ export const Metronome = ({
             {bpm}
           </button>
         )}
-        <span className='mt-2 select-none text-[10px] font-bold tracking-[0.2em] text-zinc-500'>
+        <span className='mt-2 select-none text-xs font-medium text-zinc-400'>
           {locked
             ? t("bpm_exam")
             : isEditingBpm
@@ -193,23 +195,23 @@ export const Metronome = ({
         <div className='flex items-center justify-center gap-3'>
           <Button
             variant='ghost'
-            size='icon'
-            className='h-8 w-8 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
+            size='icon-sm'
+            className='shrink-0'
             onClick={() => setBpm(clampBpm(bpm - 1))}
             disabled={locked || bpm <= minBpm}
             title='-1 BPM'
             aria-label={t("decrease")}>
-            <Minus className='h-4 w-4' strokeWidth={2.5} />
+            <Minus strokeWidth={2.5} />
           </Button>
           <Button
             variant='ghost'
-            size='icon'
-            className='h-8 w-8 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
+            size='icon-sm'
+            className='shrink-0'
             onClick={() => setBpm(clampBpm(bpm + 1))}
             disabled={locked || bpm >= maxBpm}
             title='+1 BPM'
             aria-label={t("increase")}>
-            <Plus className='h-4 w-4' strokeWidth={2.5} />
+            <Plus strokeWidth={2.5} />
           </Button>
         </div>
 
@@ -230,7 +232,7 @@ export const Metronome = ({
                 getSliderTrackColor(bpm),
               )}
             />
-            <div className='flex select-none items-center justify-between px-1 text-[10px] font-bold text-zinc-600'>
+            <div className='flex select-none items-center justify-between px-1 text-[11px] font-bold text-zinc-500'>
               <span>{minBpm}</span>
               <span>{maxBpm}</span>
             </div>
@@ -262,11 +264,11 @@ export const Metronome = ({
         {metronome.accentPattern && metronome.setBeatsPerBar && metronome.cycleBeatAccent && (
           <div className='flex flex-col gap-2 rounded-lg bg-zinc-900/40 p-2'>
             <div className='flex items-center justify-between px-1'>
-              <span className='select-none text-[10px] font-bold tracking-[0.2em] text-zinc-500'>
+              <span className='select-none text-xs font-medium text-zinc-400'>
                 {accentLocked && metronome.gridLabel ? metronome.gridLabel : t("beats_per_bar")}
               </span>
               {accentLocked ? (
-                <span className='flex select-none items-center gap-1 text-[10px] font-bold text-amber-400'>
+                <span className='flex select-none items-center gap-1 text-xs font-bold text-amber-400'>
                   <Lock size={11} />
                   {metronome.accentPattern.length}
                 </span>
@@ -274,24 +276,24 @@ export const Metronome = ({
                 <div className='flex items-center gap-1'>
                   <Button
                     variant='ghost'
-                    size='icon'
-                    className='h-6 w-6 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
+                    size='icon-sm'
+                    className='shrink-0'
                     onClick={() => metronome.setBeatsPerBar(metronome.accentPattern.length - 1)}
                     disabled={locked || metronome.accentPattern.length <= MIN_BEATS_PER_BAR}
                     aria-label={t("remove_beat")}>
-                    <Minus className='h-3 w-3' strokeWidth={2.5} />
+                    <Minus strokeWidth={2.5} />
                   </Button>
                   <span translate='no' className='w-4 select-none text-center text-xs font-bold tabular-nums text-zinc-300'>
                     {metronome.accentPattern.length}
                   </span>
                   <Button
                     variant='ghost'
-                    size='icon'
-                    className='h-6 w-6 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-100 transition-colors hover:bg-zinc-700/80 hover:text-white'
+                    size='icon-sm'
+                    className='shrink-0'
                     onClick={() => metronome.setBeatsPerBar(metronome.accentPattern.length + 1)}
                     disabled={locked || metronome.accentPattern.length >= MAX_BEATS_PER_BAR}
                     aria-label={t("add_beat")}>
-                    <Plus className='h-3 w-3' strokeWidth={2.5} />
+                    <Plus strokeWidth={2.5} />
                   </Button>
                 </div>
               )}
@@ -306,7 +308,7 @@ export const Metronome = ({
               onCycle={metronome.cycleBeatAccent}
             />
 
-            <span className='select-none px-1 text-[10px] text-zinc-600'>
+            <span className='select-none px-1 text-xs text-zinc-500'>
               {accentLocked
                 ? metronome.gridLabel?.includes("↔")
                   ? t("accent.follows_tab")

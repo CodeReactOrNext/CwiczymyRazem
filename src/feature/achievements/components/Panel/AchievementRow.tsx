@@ -183,7 +183,7 @@ export const AchievementRow = memo(
               size='sm'
               onClick={() => onClaim?.(data.id)}
               disabled={isClaiming}
-              className='shrink-0 px-4'>
+              className='shrink-0'>
               {t("panel.rewards.claim")}
             </Button>
           )}

@@ -105,28 +105,28 @@ const RunTooltip = ({ active, payload, metric }: RunTooltipProps) => {
         : t("timing.behind", { ms: point.timingBiasMs });
 
   return (
-    <div className='rounded-lg bg-zinc-950/95 px-3 py-2 text-xs'>
+    <div className='rounded-lg bg-white p-3 text-xs text-black'>
       {metric === "timing" && point.timingOffsetMs !== null ? (
         <>
-          <p className='font-semibold tabular-nums text-zinc-100'>
+          <p className='font-semibold tabular-nums'>
             {t("timing.offset", { ms: point.timingOffsetMs })}
           </p>
-          <p className='mt-0.5 text-zinc-400'>{lean}</p>
-          <p className='mt-0.5 text-zinc-400'>
+          <p className='mt-0.5 text-black/60'>{lean}</p>
+          <p className='mt-0.5 text-black/60'>
             {kind} · {point.bpm} BPM
           </p>
         </>
       ) : (
         <>
-          <p className='font-semibold tabular-nums text-zinc-100'>
+          <p className='font-semibold tabular-nums'>
             {point.bpm} BPM
           </p>
-          <p className='mt-0.5 text-zinc-400'>
+          <p className='mt-0.5 text-black/60'>
             {kind} · {t("chart.accuracy", { accuracy: point.accuracy })}
           </p>
         </>
       )}
-      <p className='mt-0.5 text-zinc-500'>
+      <p className='mt-0.5 text-black/50'>
         {format(point.createdAt, "PP", { locale: dateLocale })}
       </p>
     </div>

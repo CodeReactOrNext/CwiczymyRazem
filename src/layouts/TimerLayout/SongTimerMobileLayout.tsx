@@ -87,8 +87,8 @@ const SessionBar = ({
           </span>
         </button>
 
-        <Button onClick={onFinish} className='h-11 gap-2 rounded-lg px-5'>
-          <CheckCircle2 className='h-4 w-4' />
+        <Button size='lg' onClick={onFinish}>
+          <CheckCircle2 />
           {t("finish")}
         </Button>
       </div>
@@ -183,13 +183,15 @@ export const SongTimerMobileLayout = ({
     // Hides the app's bottom tab bar for the session, see globals.css.
     <div data-song-session='' className='space-y-4 px-3 pb-28'>
       <div ref={topRef} className='flex items-center gap-3 pt-2'>
-        <button
+        <Button
           type='button'
-          onClick={onBack}
+          variant='ghost'
+          size='icon'
           aria-label={tCommon("back")}
-          className='-ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 active:bg-zinc-800'>
-          <ArrowLeft className='h-5 w-5' />
-        </button>
+          onClick={onBack}
+          className='shrink-0'>
+          <ArrowLeft />
+        </Button>
         <div className='h-10 w-10 shrink-0 overflow-hidden rounded-lg'>
           {song.coverUrl ? (
             <img
@@ -262,7 +264,7 @@ export const SongTimerMobileLayout = ({
       </div>
 
       {isVideoShown && (
-        <div className='space-y-4 rounded-lg bg-zinc-900/40 p-4'>
+        <div className='space-y-4 rounded-lg bg-zinc-800/40 p-4'>
           {duration > 0 && (
             <SectionTimeline
               sections={sections}

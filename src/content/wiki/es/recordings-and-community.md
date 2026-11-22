@@ -32,4 +32,4 @@ Si quieres un ingreso constante de Fame sin machacar, comparte lo que ya haces: 
 
 <FaqList items="¿Puedo publicar algo privado?::Las grabaciones se comparten con la comunidad. Si prefieres guardarte una toma, simplemente no la subas, y aun así puedes marcar el hábito Grabación al registrar la sesión|¿Puedo borrar una grabación?::Sí, tus propias grabaciones se pueden eliminar en cualquier momento|¿Pagan puntos las grabaciones por sí solas?::Solo a través de los retos. Una grabación publicada fuera de un reto sirve para recibir feedback, no para puntuar|¿Quién puede comentar?::Cualquier jugador con sesión iniciada. Las notificaciones te avisan cuando alguien lo hace" />
 
-<ReadNext links="De dónde viene la Fame::/wiki/fame|Retos mensuales::/wiki/monthly-challenges|Canciones y dificultad::/wiki/songs-playlists-and-difficulty|Rutinas de práctica y compartir ejercicios::/wiki/exercise-plans-and-auto-plan" />
+<ReadNext links="De dónde viene la Fame::/wiki/fame|Retos mensuales::/wiki/monthly-challenges|Canciones y dificultad::/wiki/songs-playlists-and-difficulty|Planes de práctica y compartir ejercicios::/wiki/exercise-plans-and-auto-plan" />

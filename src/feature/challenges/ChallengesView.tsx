@@ -1,11 +1,13 @@
 import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { ChallengeBoard } from "feature/challenges/components/ChallengeBoard";
-import {
-  CHALLENGE_HERO_CLASS,
-  ChallengeHero,
-} from "feature/challenges/components/ChallengeHero";
+import { ChallengeHero } from "feature/challenges/components/ChallengeHero";
 import { PastChallenges } from "feature/challenges/components/PastChallenges";
 import { VotingBoard } from "feature/challenges/components/VotingBoard";
 import {
@@ -23,7 +25,7 @@ import {
 import { selectUserAuth, selectUserName } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
-import { ArrowLeft, History, Swords, Vote } from "lucide-react";
+import { History, Swords, Vote } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -36,9 +38,9 @@ const TABS: { id: ChallengeTab; label: string; icon: typeof Swords }[] = [
 ];
 
 const BoardSkeleton = () => (
-  <div className='space-y-2'>
+  <div className='space-y-2' aria-busy='true'>
     {Array.from({ length: 5 }, (_, i) => (
-      <div key={i} className='h-14 animate-pulse rounded-lg bg-zinc-900/40' />
+      <Skeleton key={i} variant='block' className='h-14' />
     ))}
   </div>
 );
@@ -77,7 +79,7 @@ export const ChallengesView = () => {
       : null;
 
   return (
-    <div className='font-openSans flex min-h-screen flex-col'>
+    <div className='flex flex-col'>
       {heroChallenge ? (
         <ChallengeHero
           challenge={heroChallenge}
@@ -105,13 +107,12 @@ export const ChallengesView = () => {
                 : t("view.board_subtitle")
           }
           backgroundContent={<HeroPattern />}
-          className={CHALLENGE_HERO_CLASS}
         />
       )}
 
       {/* Horizontal padding matches the banner's, so the tabs and the board line
           up with the title above them. */}
-      <div className='flex flex-col gap-6 px-6 pb-16 pt-6 md:px-8 lg:px-10'>
+      <div className={cn("flex flex-col gap-6", PAGE_CONTENT)}>
         <div className={tabNavListClass}>
           {TABS.map(({ id, label, icon: Icon }) => (
             <button
@@ -141,26 +142,17 @@ export const ChallengesView = () => {
                 userName={userName}
               />
             ) : (
-              <div className='flex flex-col items-center justify-center py-24 text-center'>
-                <div className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500'>
-                  <Swords size={26} />
-                </div>
-                <h3 className='mb-1 text-lg font-bold text-white'>
-                  {t("view.not_up_title")}
-                </h3>
-                <p className='max-w-sm text-sm text-zinc-500'>
-                  {t("view.not_up_body")}
-                </p>
-                <Button
-                  onClick={() => setTab("vote")}
-                  variant='ghost'
-                  className='mt-6 h-10 bg-white/5 px-5 font-bold text-zinc-300 hover:bg-white/10 hover:text-white'>
-                  <span className='flex items-center gap-2'>
-                    <Vote className='h-4 w-4' />
+              <EmptyState
+                mood='wait'
+                title={t("view.not_up_title")}
+                description={t("view.not_up_body")}
+                action={
+                  <Button onClick={() => setTab("vote")}>
+                    <Vote />
                     {t("view.open_ballot")}
-                  </span>
-                </Button>
-              </div>
+                  </Button>
+                }
+              />
             ))}
 
           {tab === "vote" && (
@@ -174,16 +166,10 @@ export const ChallengesView = () => {
           {tab === "archive" &&
             (showArchivedBoard ? (
               <div className='space-y-4'>
-                <Button
-                  variant='ghost'
-                  size='sm'
+                <BackLink
+                  label={t("view.back_to_archive")}
                   onClick={() => setArchivedChallenge(null)}
-                  className='bg-white/5 px-4 text-zinc-400 backdrop-blur-md hover:text-white'>
-                  <span className='flex items-center gap-2'>
-                    <ArrowLeft size={16} />
-                    <span className='text-xs font-bold'>{t("view.back_to_archive")}</span>
-                  </span>
-                </Button>
+                />
                 <ChallengeBoard
                   challenge={archivedChallenge}
                   submissions={submissions}

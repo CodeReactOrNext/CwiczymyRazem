@@ -1,5 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
+import { PageShell } from "components/PageShell/PageShell";
+import { PageTitle } from "components/PageTitle/PageTitle";
 import { SkillDashboard } from "feature/skills/components/SkillDashboard";
 import type { UserSkills } from "feature/skills/skills.types";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
@@ -50,28 +52,20 @@ const ProfileSkillsPage: NextPageWithLayout = () => {
   const isMapTab = isFullBleedMap({ query: router.query, isCompact: useIsCompactViewport() });
 
   return (
-    <div
-      className={cn(
-        "flex flex-col bg-second-600",
-        isMapTab ? "h-full overflow-hidden" : "min-h-screen overflow-visible",
-      )}>
+    <PageShell
+      className={cn(isMapTab && "h-full min-h-0 overflow-hidden rounded-none")}>
       {/* A plain title that names the open tab — the menu links to each one
           separately, so "Exercises" should not land on a page called Skills. */}
       <header className='mx-auto w-full max-w-7xl shrink-0 space-y-3 px-4 pt-6 lg:px-6 lg:pt-8'>
         <Breadcrumbs
           items={[{ label: "Practice", href: "/timer" }, { label: heading.title }]}
         />
-        <div>
-          <h1 className='text-2xl font-bold leading-tight text-white md:text-3xl'>
-            {heading.title}
-          </h1>
-          <p className='mt-1 text-sm text-zinc-400'>{heading.subtitle}</p>
-        </div>
+        <PageTitle title={heading.title} subtitle={heading.subtitle} />
       </header>
       <div className='min-h-0 flex-1'>
         <SkillDashboard userSkills={userSkills} />
       </div>
-    </div>
+    </PageShell>
   );
 };
 

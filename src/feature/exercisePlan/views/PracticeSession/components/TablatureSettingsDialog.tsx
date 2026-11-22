@@ -32,7 +32,7 @@ export function TablatureSettingsDialog({
           painted over. Both the panel and its backdrop have to clear the mobile layer
           too, hence the same tier every other in-session dialog uses. */}
       <DialogContent
-        className='z-[99999999] bg-zinc-950 text-white sm:max-w-2xl'
+        className='z-[99999999] bg-zinc-950 text-white'
         overlayClassName='z-[99999998]'>
         <DialogHeader>
           <DialogTitle>{t("tab.settings")}</DialogTitle>

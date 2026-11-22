@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { pageSubtitleClass, pageTitleClass } from "components/PageTitle/PageTitle";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
@@ -56,7 +57,7 @@ export const HeroBanner = ({
   const hasFigures = Boolean(characterImage || secondaryImage);
   return (
     <div
-      className={`relative flex rounded-none md:rounded-xl items-start border-none overflow-hidden md:overflow-visible ${!compact && hasFigures ? 'min-h-[220px] md:min-h-[160px] lg:min-h-[180px]' : ''} ${className}`}
+      className={`relative flex w-full rounded-none items-start border-none overflow-hidden md:overflow-visible ${!compact && hasFigures ? 'min-h-[220px] md:min-h-[160px] lg:min-h-[180px]' : ''} ${className}`}
     >
       {/* Backgrounds Container (Clipped) */}
       {/* rounded-[inherit]: a full-bleed caller passes !rounded-none, and a
@@ -77,7 +78,7 @@ export const HeroBanner = ({
         <div className="light-hide absolute inset-0 bg-[radial-gradient(ellipse_55%_100%_at_85%_100%,rgba(234,88,12,0.3),transparent_70%)]" />
 
         {/* Left-to-right fade so text stays readable — only rounded on desktop */}
-        <div className="light-hide absolute inset-0 bg-gradient-to-r from-second-600 via-second-600/90 via-60% to-transparent md:rounded-tl-2xl" />
+        <div className="light-hide absolute inset-0 bg-gradient-to-r from-zinc-900/60 via-zinc-900/55 via-60% to-transparent md:rounded-tl-lg" />
 
         {/* Renders after the fade so custom elements remain highly visible.
             Not hidden in the light theme: callers put real content here (the
@@ -85,7 +86,7 @@ export const HeroBanner = ({
         {backgroundContent}
 
         {/* Bottom edge fade — ties the banner into the cards below */}
-        <div className="light-hide absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-second-600/60 to-transparent" />
+        <div className="light-hide absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-zinc-900/35 to-transparent" />
       </div>
 
       {/* Glow blob behind the figures */}
@@ -139,12 +140,8 @@ export const HeroBanner = ({
             )
           )}
           <div className={`inline-block ${leftContent ? "!mb-4 md:!mb-6" : ""}`}>
-            <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
-              {title}
-            </h1>
-            {subtitle && (
-              <p className="text-zinc-400 text-sm font-medium mt-1">{subtitle}</p>
-            )}
+            <h1 className={pageTitleClass}>{title}</h1>
+            {subtitle && <p className={pageSubtitleClass}>{subtitle}</p>}
           </div>
           {leftContent && (
             <div className={`relative z-20 ${leftContentClassName ?? "mt-6 sm:mt-8"}`}>
@@ -159,9 +156,9 @@ export const HeroBanner = ({
               <div className="pt-1">{rightContent}</div>
             )}
             {!rightContent && buttonText && (
-              <Button onClick={onClick} className="group/btn h-10 shrink-0 px-5">
+              <Button onClick={onClick} size="lg" className="group/btn shrink-0">
                 {buttonText}
-                <ArrowRight className="h-4 w-4 transition-transform duration-base group-hover/btn:translate-x-1" />
+                <ArrowRight className="transition-transform duration-base group-hover/btn:translate-x-1" />
               </Button>
             )}
             {children && <div className="w-full md:w-auto md:mb-1">{children}</div>}

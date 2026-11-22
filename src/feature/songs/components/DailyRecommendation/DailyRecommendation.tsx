@@ -66,7 +66,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
 
             <div className="min-w-0 flex-1 space-y-1">
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-sm font-bold text-zinc-200 tracking-wider">Recommended Song</h3>
+                <h3 className="text-sm font-bold text-zinc-200">Recommended Song</h3>
               </div>
               <h3 className="truncate text-xl sm:text-2xl font-bold text-white group-hover:text-cyan-100 transition-colors">
                 {song.title}
@@ -74,11 +74,11 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
               <p className="truncate text-sm font-bold text-zinc-400 mb-2">{song.artist}</p>
               
               <div className="flex flex-wrap items-center gap-2 mt-4">
-                 <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/5 border border-white/5 text-[10px] font-bold text-zinc-400">
+                 <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/5 border border-white/5 text-[11px] font-bold text-zinc-400">
                     <Star className="h-3 w-3 text-amber-500 fill-amber-500/20" />
                     <span>{song.avgDifficulty?.toFixed(1) || 0} Difficulty</span>
                  </div>
-                 <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/5 border border-white/5 text-[10px] font-bold text-zinc-400">
+                 <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/5 border border-white/5 text-[11px] font-bold text-zinc-400">
                     <Users className="h-3 w-3 text-cyan-500" />
                     <span>{song.popularity || 0} practicing</span>
                  </div>
@@ -91,10 +91,10 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
               variant="ghost"
               size="icon"
               onClick={() => onOpenDetails(song)}
-              className="h-10 w-10 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-white"
+              className="shrink-0 bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-white"
               title={t("recommendation.view_details")}
             >
-              <Info className="h-5 w-5" />
+              <Info />
             </Button>
             
             {isLearning && (
@@ -114,7 +114,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
                 onClick={() => handleAdd("wantToLearn")}
                 className="flex-1 sm:flex-none whitespace-nowrap"
               >
-                <Plus className="h-3.5 w-3.5" />
+                <Plus />
                 {isAdding ? t("recommendation.adding") : t("want_to_learn")}
               </Button>
             )}

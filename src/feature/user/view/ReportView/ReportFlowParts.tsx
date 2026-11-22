@@ -4,6 +4,7 @@ import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
 import { ArrowLeft, Check, ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { categoryTone, TONE_CLASSES } from "./helpers/categoryTone";
 import type { CategoryKey } from "./helpers/timeSteps";
 
 interface StepHeaderProps {
@@ -30,8 +31,8 @@ export const StepHeader = ({
       <Button
         type='button'
         variant='ghost'
-        size='icon'
-        className='h-11 w-11'
+        size='icon-touch'
+        className=''
         aria-label={backLabel}
         onClick={onBack}>
         <ArrowLeft />
@@ -51,9 +52,72 @@ export const StepHeader = ({
   </div>
 );
 
+interface FormSectionProps {
+  /** The section's place in the form, drawn in its marker. */
+  step: number;
+  title: string;
+  description?: ReactNode;
+  /** Something answered here — the marker turns into a green tick. */
+  done: boolean;
+  /** Sits on the right of the title, e.g. a switch. */
+  action?: ReactNode;
+  /** "Optional", quietly after the title — the save does not wait on it. */
+  optionalLabel?: string;
+  children: ReactNode;
+}
+
+/**
+ * One part of the desktop form on its own plate: the plates and the space
+ * between them do the separating, the numbered marker gives the order and
+ * goes green once the part holds an answer.
+ */
+export const FormSection = ({
+  step,
+  title,
+  description,
+  done,
+  action,
+  optionalLabel,
+  children,
+}: FormSectionProps) => (
+  <section className='flex flex-col gap-8 rounded-lg bg-zinc-900/40 p-8 xl:p-10'>
+    <div className='flex flex-wrap items-start justify-between gap-x-6 gap-y-4'>
+      <div className='flex min-w-0 items-start gap-4'>
+        <span
+          aria-hidden
+          className={cn(
+            "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums transition-colors duration-base",
+            done ? "bg-emerald-500 text-zinc-950" : "bg-zinc-800 text-zinc-300",
+          )}>
+          {done ? <Check className='h-5 w-5' strokeWidth={3} /> : step}
+        </span>
+        <div className='min-w-0 pt-1'>
+          <h2 className='text-xl font-semibold text-zinc-100'>
+            {title}
+            {optionalLabel && (
+              <span className='ml-3 text-sm font-medium text-zinc-500'>
+                {optionalLabel}
+              </span>
+            )}
+          </h2>
+          {description && (
+            <p className='mt-1.5 text-sm leading-relaxed text-zinc-400'>
+              {description}
+            </p>
+          )}
+        </div>
+      </div>
+      {action}
+    </div>
+    {children}
+  </section>
+);
+
 interface CategoryBadgeProps {
   category: CategoryKey;
   size?: "sm" | "md";
+  /** Lit with the block it heads, once that block holds time. */
+  active?: boolean;
 }
 
 /**
@@ -64,13 +128,15 @@ interface CategoryBadgeProps {
 export const CategoryBadge = ({
   category,
   size = "md",
+  active = false,
 }: CategoryBadgeProps) => {
   const Icon = SKILL_CATEGORY_ICONS[category];
 
   return (
     <span
       className={cn(
-        "flex shrink-0 items-center justify-center rounded-lg bg-zinc-950/40 text-zinc-200",
+        "flex shrink-0 items-center justify-center rounded-lg transition-colors duration-base",
+        active ? TONE_CLASSES[categoryTone(category)].badge : "bg-zinc-950/40 text-zinc-200",
         size === "sm" ? "h-8 w-8 text-base" : "h-11 w-11 text-xl",
       )}>
       <Icon size='1em' />

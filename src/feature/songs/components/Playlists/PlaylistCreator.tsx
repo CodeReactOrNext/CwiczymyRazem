@@ -135,18 +135,19 @@ export const PlaylistCreator = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="h-full max-w-none overflow-hidden border-white/5 bg-zinc-950 p-0 sm:h-auto sm:max-w-lg sm:rounded-2xl">
+      <DialogContent className="bg-zinc-950 p-0">
         <div className="flex h-full flex-col overflow-y-auto p-6 pb-24 sm:max-h-[85vh] sm:pb-6">
           <DialogHeader className="mb-6">
-            <DialogTitle className="flex items-center gap-3 font-openSans text-2xl font-bold text-white">
+            <DialogTitle className="flex items-center gap-3 text-2xl font-bold text-white">
               {step !== "kind" && (
-                <button
-                  type="button"
-                  onClick={() => setStep(step === "songs" ? "details" : "kind")}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </button>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='icon'
+                  aria-label={t("common:back")}
+                  onClick={() => setStep(step === "songs" ? "details" : "kind")}>
+                  <ArrowLeft />
+                </Button>
               )}
               {stepTitle}
             </DialogTitle>
@@ -162,7 +163,7 @@ export const PlaylistCreator = ({
                     key={k}
                     type="button"
                     onClick={() => handlePickKind(k)}
-                    className="group flex items-center gap-4 rounded-xl bg-white/[0.03] p-4 text-left transition-all hover:bg-white/[0.07] active:scale-[0.98]"
+                    className="group flex items-center gap-4 rounded-lg bg-zinc-800/40 p-4 text-left transition-colors hover:bg-zinc-800/60"
                   >
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-zinc-300 transition-colors group-hover:text-white">
                       <Icon className="h-5 w-5" />
@@ -209,7 +210,7 @@ export const PlaylistCreator = ({
                         : t("creator.placeholder_playlist")
                     }
                     maxLength={80}
-                    className="h-12 border-white/5 bg-white/5 font-medium transition-all focus:border-cyan-500/50"
+                    className="h-10"
                   />
                 </div>
               </div>
@@ -226,7 +227,7 @@ export const PlaylistCreator = ({
                   placeholder={t("creator.description_placeholder")}
                   maxLength={300}
                   rows={3}
-                  className="resize-none border-white/5 bg-white/5 font-medium transition-all focus:border-cyan-500/50"
+                  className="resize-none"
                 />
               </div>
 
@@ -237,7 +238,7 @@ export const PlaylistCreator = ({
                     type="button"
                     onClick={() => setIsPublic(false)}
                     className={cn(
-                      "flex flex-1 items-center gap-3 rounded-xl p-3.5 text-left transition-all",
+                      "flex flex-1 items-center gap-3 rounded-lg p-3.5 text-left transition-all",
                       !isPublic ? "bg-white/10" : "bg-white/[0.03] hover:bg-white/[0.06]"
                     )}
                   >
@@ -253,7 +254,7 @@ export const PlaylistCreator = ({
                     type="button"
                     onClick={() => setIsPublic(true)}
                     className={cn(
-                      "flex flex-1 items-center gap-3 rounded-xl p-3.5 text-left transition-all",
+                      "flex flex-1 items-center gap-3 rounded-lg p-3.5 text-left transition-all",
                       isPublic ? "bg-white/10" : "bg-white/[0.03] hover:bg-white/[0.06]"
                     )}
                   >
@@ -273,20 +274,19 @@ export const PlaylistCreator = ({
               <div className="flex justify-end gap-2 pt-2">
                 <Button
                   variant="ghost"
+                  size="lg"
                   onClick={handleClose}
                   className="text-zinc-400 hover:bg-white/5 hover:text-white"
                 >
-                  Cancel
+                  {t("common:cancel")}
                 </Button>
                 <Button
                   onClick={() => setStep("songs")}
                   disabled={!name.trim()}
-                  className="h-11 px-6"
+                  size="lg"
                 >
-                  <span className="flex items-center gap-2">
-                    {t("creator.next")}
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
+                  {t("creator.next")}
+                  <ArrowRight />
                 </Button>
               </div>
             </div>
@@ -329,15 +329,18 @@ export const PlaylistCreator = ({
                             {entry.artist}
                           </p>
                         </div>
-                        <button
+                        <Button
                           type="button"
+                          variant='ghost'
+                          size='icon-sm'
+                          aria-label={t("remove_from_playlist")}
                           onClick={() =>
                             setEntries((prev) => prev.filter((e) => e.songId !== entry.songId))
                           }
-                          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-white/10 hover:text-white"
+                          className="shrink-0 text-zinc-400"
                         >
-                          <X className="h-3 w-3" />
-                        </button>
+                          <X />
+                        </Button>
                       </div>
                     ))}
                   </div>
@@ -360,17 +363,16 @@ export const PlaylistCreator = ({
               )}
 
               <div className="flex items-center justify-between gap-2 pt-1">
-                <p className="text-xs font-medium text-zinc-600">
+                <p className="text-xs font-medium text-zinc-500">
                   {t("creator.add_later")}
                 </p>
                 <Button
                   onClick={handleCreate}
-                  disabled={isSaving || !name.trim()}
-                  className="h-11 px-6"
+                  disabled={!name.trim()}
+                  loading={isSaving}
+                  size="lg"
                 >
-                  {isSaving ? (
-                    <span className="loading loading-spinner loading-sm" />
-                  ) : entries.length > 0 ? (
+                  {entries.length > 0 ? (
                     entries.length === 1
                       ? t("creator.create_with_one")
                       : t("creator.create_with", { count: entries.length })

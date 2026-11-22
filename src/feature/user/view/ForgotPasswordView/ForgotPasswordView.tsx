@@ -1,10 +1,10 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
+import { BackLink } from "components/BackLink/BackLink";
 import { Form, Formik } from "formik";
 import { useTranslation } from "hooks/useTranslation";
 import {
-  ArrowLeft,
   ChevronRight,
   Guitar,
   Headphones,
@@ -111,7 +111,7 @@ const ForgotPasswordView = () => {
                     We've sent password reset instructions to your email address. 
                   </p>
                   <Link href="/login" className="block w-full">
-                    <Button className="w-full mt-4 bg-zinc-800 hover:bg-zinc-700 text-white border-none font-bold">
+                    <Button variant="secondary" size="lg" className="w-full mt-4">
                       Back to Sign In
                     </Button>
                   </Link>
@@ -130,7 +130,7 @@ const ForgotPasswordView = () => {
                               Email Address
                             </Label>
                             <div className='relative group'>
-                              <Mail className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
+                              <Mail className='pointer-events-none absolute left-3 top-2.5 z-10 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
                               <Input
                                 id='email'
                                 name='email'
@@ -139,7 +139,7 @@ const ForgotPasswordView = () => {
                                 onChange={handleChange}
                                 onBlur={handleBlur}
                                 placeholder='name@example.com'
-                                className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-base text-white placeholder:text-zinc-500'
+                                className='h-11 pl-10'
                               />
                             </div>
                             {errors.email && touched.email && (
@@ -157,19 +157,17 @@ const ForgotPasswordView = () => {
                           disabled={isFetching}
                           className='w-full'>
                             {isFetching ? (
-                              <Loader2 className='h-5 w-5 animate-spin' />
+                              <Loader2 className='animate-spin' />
                             ) : (
                               <span className="flex items-center gap-2">
-                                Send Reset Link <ChevronRight className="w-4 h-4" />
+                                Send Reset Link <ChevronRight />
                               </span>
                             )}
                         </Button>
                       </div>
 
                       <div className="flex justify-center mt-6">
-                        <Link href="/login" className="text-sm font-bold text-zinc-400 hover:text-white transition-colors flex items-center gap-2 mt-4">
-                           <ArrowLeft className="w-4 h-4" /> Back to Sign In
-                        </Link>
+                        <BackLink href='/login' label='Back to Sign In' className='mt-4' />
                       </div>
                     </Form>
                   )}

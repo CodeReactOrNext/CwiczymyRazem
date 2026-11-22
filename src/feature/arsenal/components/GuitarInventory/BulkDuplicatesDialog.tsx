@@ -174,7 +174,7 @@ export const BulkDuplicatesDialog = ({
       onOpenChange={(open) => {
         if (!open && !busy) onCancel();
       }}>
-      <AlertDialogContent className='flex max-h-[85vh] max-w-md flex-col gap-6 border-0 bg-zinc-900 p-6'>
+      <AlertDialogContent className='flex max-h-[85vh] max-w-md flex-col gap-6'>
         <AlertDialogHeader className='space-y-2'>
           <AlertDialogTitle className='text-lg font-bold text-white'>
             {t("bulk.title")}
@@ -212,7 +212,7 @@ export const BulkDuplicatesDialog = ({
                       {item.name}
                     </p>
                     <p
-                      className='text-[10px] font-medium tracking-wider'
+                      className='text-[11px] font-medium'
                       style={{ color }}>
                       {labels.rarity(item.rarity)}
                     </p>
@@ -270,7 +270,7 @@ export const BulkDuplicatesDialog = ({
                           {qty}
                         </span>
                         <span
-                          className='text-[10px] font-semibold'
+                          className='text-[11px] font-semibold'
                           style={{ color: readableText(PART_TIER_COLORS[tier]) }}>
                           {labels.partTier(tier)}
                         </span>
@@ -318,7 +318,7 @@ export const BulkDuplicatesDialog = ({
         <AlertDialogFooter className='flex-shrink-0 sm:space-x-0'>
           <AlertDialogCancel
             disabled={busy}
-            className='mt-0 w-full border-0 bg-zinc-700 text-white hover:bg-zinc-600 hover:text-white'>
+            className='mt-0 w-full'>
             {t("common.cancel")}
           </AlertDialogCancel>
         </AlertDialogFooter>

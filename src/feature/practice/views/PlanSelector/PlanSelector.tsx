@@ -1,4 +1,4 @@
-import { PRESSABLE, PRESSABLE_KEY } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import {
   Tabs,
   TabsContent,
@@ -12,7 +12,11 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { PlanPreviewDialog } from "feature/exercisePlan/components/PlanPreviewDialog";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
@@ -24,7 +28,7 @@ import { toggleFavoritePlan } from "feature/user/store/userSlice.favoriteActions
 import { motion } from "framer-motion";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft, Flame, Globe, Heart, Music, Zap } from "lucide-react";
+import { Flame, Globe, Music, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -34,6 +38,7 @@ const PLAN_TABS = ["routines", "playalongs", "my_plans", "community"] as const;
 // Plan-level categories used by the built-in routines, in display order. The
 // filter only renders chips for the categories actually present in a tab.
 const CATEGORY_ORDER = ["technique", "theory", "creativity", "hearing", "mixed"] as const;
+const DIFFICULTY_ORDER = ["beginner", "easy", "medium", "hard"] as const;
 
 const RippleTabsTrigger = ({
   value,
@@ -79,9 +84,12 @@ const RippleTabsTrigger = ({
   );
 };
 
-const TabSpinner = () => (
-  <div className='flex h-[400px] items-center justify-center'>
-    <div className='h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-500' />
+/** Stands in for a tab's grid of PlanCards while its plans load. */
+const PlanGridSkeleton = () => (
+  <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3' aria-busy='true'>
+    {Array.from({ length: 6 }, (_, i) => (
+      <Skeleton key={i} variant='block' className='h-56' />
+    ))}
   </div>
 );
 
@@ -132,7 +140,9 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
     dispatch(toggleFavoritePlan({ planId, isFavorite: !favoritePlanIds.includes(planId) }));
   };
 
-  const renderPlanCard = (plan: ExercisePlan) => {
+  // Favorites only resolve built-in plans (see /favorites), so user and
+  // community plans render without the heart.
+  const renderPlanCard = (plan: ExercisePlan, canFavorite: boolean) => {
     const locked = !!plan.premium && !isPremium;
     return (
       <PlanCard
@@ -143,15 +153,15 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
         onPreview={locked ? undefined : () => setPreviewPlan(plan)}
         onStart={locked ? undefined : () => handleStartPlan(plan.id)}
         onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
-        onToggleFavorite={userAuth ? () => handleToggleFavorite(plan.id) : undefined}
-        isFavorite={favoritePlanIds.includes(plan.id)}
-        startButtonText={t("practice_hub:plans.open_plan")}
+        onToggleFavorite={canFavorite && userAuth ? () => handleToggleFavorite(plan.id) : undefined}
+        isFavorite={canFavorite && favoritePlanIds.includes(plan.id)}
+        startButtonText={t("common:start")}
         isLoading={loadingPlanId === plan.id}
       />
     );
   };
 
-  const renderDifficultyGroups = (sourcePlans: ExercisePlan[]) => {
+  const renderDifficultyGroups = (sourcePlans: ExercisePlan[], canFavorite = true) => {
     const availableCategories = CATEGORY_ORDER.filter((cat) =>
       sourcePlans.some((p) => p.category === cat)
     );
@@ -161,90 +171,77 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
         ? sourcePlans
         : sourcePlans.filter((p) => p.category === categoryFilter);
 
-    const favoritePlans = filteredPlans.filter((p) => favoritePlanIds.includes(p.id));
-
-    // Keys like the rest of the app: the picked one white with a lighter lip,
-    // the others zinc-800 with the shadow lip that reads on this mid-dark page.
-    const chipClass = (active: boolean) =>
-      cn(
-        active ? PRESSABLE : PRESSABLE_KEY,
-        "h-8 shrink-0 rounded-lg px-3 text-xs font-semibold tracking-wide transition-colors",
-        active
-          ? "border-b-black/25 bg-zinc-100 text-zinc-900"
-          : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200"
-      );
+    const favoritePlans = canFavorite
+      ? filteredPlans.filter((p) => favoritePlanIds.includes(p.id))
+      : [];
+    const isInFavorites = (p: ExercisePlan) => favoritePlans.includes(p);
+    // Plans saved in Firestore before difficulty was derived may lack one —
+    // file them under "medium" so they never drop out of the list.
+    const difficultyOf = (p: ExercisePlan) =>
+      (DIFFICULTY_ORDER as readonly string[]).includes(p.difficulty) ? p.difficulty : "medium";
 
     return (
       <>
         {availableCategories.length > 1 && (
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setCategoryFilter("all")}
-              className={chipClass(categoryFilter === "all")}
-            >
-              {t("common:filters.all", "All")}
-            </button>
-            {availableCategories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setCategoryFilter(cat)}
-                className={chipClass(categoryFilter === cat)}
-              >
-                {t(`exercises:categories.${cat}` as any)}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl
+            label={t("common:filters.category", "Category")}
+            selected={[categoryFilter]}
+            onSelect={setCategoryFilter}
+            options={[
+              {
+                value: "all",
+                label: t("common:filters.all", "All"),
+                count: sourcePlans.length,
+              },
+              ...availableCategories.map((cat) => ({
+                value: cat as string,
+                label: t(`exercises:categories.${cat}` as any),
+                count: sourcePlans.filter((p) => p.category === cat).length,
+              })),
+            ]}
+          />
         )}
 
         {favoritePlans.length > 0 && (
           <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <Heart className="h-4 w-4 fill-rose-500 text-rose-500" />
-              <h3 className="text-sm font-medium tracking-[0.2em] text-white">
-                {t("common:favorites", "FAVORITES")}
-              </h3>
-            </div>
+            <SectionHeader
+              as="h3"
+              title={t("common:favorites", "FAVORITES")}
+              count={favoritePlans.length}
+              className="mb-0"
+            />
 
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'
             >
-              {favoritePlans.map(renderPlanCard)}
+              {favoritePlans.map((p) => renderPlanCard(p, canFavorite))}
             </motion.div>
           </div>
         )}
 
-        {(["beginner", "easy", "medium", "hard"] as const).map((difficulty) => {
+        {DIFFICULTY_ORDER.map((difficulty) => {
           const plans = filteredPlans.filter(
-            (p) => p.difficulty === difficulty && !favoritePlanIds.includes(p.id)
+            (p) => difficultyOf(p) === difficulty && !isInFavorites(p)
           );
           if (plans.length === 0) return null;
 
-          const difficultyLabel = {
-            beginner: { color: "text-sky-500" },
-            easy: { color: "text-emerald-500" },
-            medium: { color: "text-amber-500" },
-            hard: { color: "text-red-500" },
-          }[difficulty];
-
           return (
             <div key={difficulty} className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className={`h-1.5 w-1.5 rounded-full bg-current ${difficultyLabel.color}`} />
-                <h3 className="text-sm font-medium tracking-[0.2em] text-white">
-                  {t(`common:difficulty.${difficulty}`)}
-                </h3>
-              </div>
+              <SectionHeader
+                as="h3"
+                title={t(`common:difficulty.${difficulty}`)}
+                count={plans.length}
+                className="mb-0"
+              />
 
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'
               >
-                {plans.map(renderPlanCard)}
+                {plans.map((p) => renderPlanCard(p, canFavorite))}
               </motion.div>
             </div>
           );
@@ -258,16 +255,10 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className='space-y-8 px-3 md:px-6 lg:px-8 py-6 md:py-8'
+        className={cn("space-y-8", PAGE_CONTENT)}
       >
               {onBack && (
-                <button
-                  onClick={onBack}
-                  className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-4"
-                >
-                  <ArrowLeft size={16} />
-                  <span className="text-sm font-medium">{t("practice_hub:back")}</span>
-                </button>
+                <BackLink label={t("practice_hub:back")} onClick={onBack} className='mb-4' />
               )}
               <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as (typeof PLAN_TABS)[number]); setCategoryFilter("all"); }} className="w-full">
               <TabsList className={tabNavListClass}>
@@ -287,65 +278,28 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
 
               <TabsContent value="my_plans" className="mt-6 focus-visible:outline-none space-y-8">
                 {isLoadingCustom ? (
-                  <TabSpinner />
+                  <PlanGridSkeleton />
                 ) : customPlans.length === 0 ? (
-                  <div className='rounded-lg p-12 text-center bg-zinc-900/30'>
+                  <div className='rounded-lg bg-zinc-800/40 p-12 text-center'>
                     <p className='text-zinc-400 text-sm'>
                       {t("exercises:my_plans.no_custom_plans")}
                     </p>
                   </div>
                 ) : (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'
-                  >
-                    {customPlans.map((plan) => {
-                      const locked = !!plan.premium && !isPremium;
-                      return (
-                        <PlanCard
-                          key={plan.id}
-                          plan={plan}
-                          isLocked={locked}
-                          onSelect={locked ? undefined : () => handleStartPlan(plan.id)}
-                          onPreview={locked ? undefined : () => setPreviewPlan(plan)}
-                          onStart={locked ? undefined : () => handleStartPlan(plan.id)}
-                          onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
-                          startButtonText={t("practice_hub:plans.open_plan")}
-                          isLoading={loadingPlanId === plan.id}
-                        />
-                      );
-                    })}
-                  </motion.div>
+                  renderDifficultyGroups(customPlans, false)
                 )}
               </TabsContent>
 
               <TabsContent value="community" className="mt-6 focus-visible:outline-none space-y-8">
                 {isLoadingCommunity ? (
-                  <TabSpinner />
+                  <PlanGridSkeleton />
                 ) : communityPlans.length === 0 ? (
-                  <div className='rounded-lg p-12 text-center bg-zinc-900/30'>
+                  <div className='rounded-lg bg-zinc-800/40 p-12 text-center'>
                     <p className='text-zinc-400 text-sm'>{t("practice_hub:no_community_plans")}</p>
                     <p className='text-zinc-500 text-xs mt-2'>{t("practice_hub:publish_hint")}</p>
                   </div>
                 ) : (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'
-                  >
-                    {communityPlans.map((plan) => (
-                      <PlanCard
-                        key={plan.id}
-                        plan={plan}
-                        onSelect={() => handleStartPlan(plan.id)}
-                        onPreview={() => setPreviewPlan(plan)}
-                        onStart={() => handleStartPlan(plan.id)}
-                        startButtonText={t("practice_hub:plans.open_plan")}
-                        isLoading={loadingPlanId === plan.id}
-                      />
-                    ))}
-                  </motion.div>
+                  renderDifficultyGroups(communityPlans, false)
                 )}
               </TabsContent>
             </Tabs>

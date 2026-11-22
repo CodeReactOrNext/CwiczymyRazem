@@ -3,6 +3,7 @@ import { Card } from "assets/components/ui/card";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { CategoryDifficultyFilter } from "feature/practice/utils/autoPlan";
 import {
@@ -51,8 +52,8 @@ export const PlanSetup = ({
 
   return (
     <MainContainer noBorder>
-      <div className='font-openSans mx-auto max-w-3xl space-y-8 px-4 py-6 sm:p-8'>
-        <Card className='space-y-10 rounded-2xl bg-transparent p-0 sm:bg-zinc-800/40 sm:p-7'>
+      <div className={cn(" mx-auto max-w-3xl space-y-8", PAGE_CONTENT)}>
+        <Card className='space-y-10 bg-transparent p-0 sm:bg-zinc-800/40 sm:p-6'>
           {/* Duration Section */}
           <div className='space-y-4'>
             <h2 className='text-xl font-extrabold'>
@@ -248,8 +249,7 @@ export const PlanSetup = ({
                   <span className='font-extrabold tabular-nums text-zinc-100'>
                     {matchingCount}
                   </span>{" "}
-                  {matchingCount === 1 ? "exercise matches" : "exercises match"}{" "}
-                  your picks
+                  {t("practice_hub:auto.matches", { count: matchingCount })}
                 </>
               )}
             </p>

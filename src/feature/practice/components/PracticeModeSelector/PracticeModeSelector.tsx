@@ -1,5 +1,7 @@
 import { buttonVariants, PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
+import { PageTitle } from "components/PageTitle/PageTitle";
 import { Ripple } from "components/Ripple/Ripple";
 import { useRipple } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
@@ -88,29 +90,43 @@ interface Mode {
 }
 
 /**
- * Every way to practise, under four quiet labels so the list is not read as
- * one run of eleven. Inside a group the order is how often players open each
- * mode from this page — routines and songs lead theirs.
+ * Every way to practise, a card per group so the list is not read as one run
+ * of eleven.
+ *
+ * The group names carry what the mode names alone did not. "Today's session"
+ * against "Longer courses" is the difference between a plan and a path or a
+ * roadmap: one is played through in a sitting, the others run for weeks. And
+ * no group is named after a mode inside it — "Songs" over Songs, "Exercises"
+ * over Exercise Catalog read as the same thing said twice. The last one is
+ * "Versus", not "Challenges": that is the sidebar's name for the monthly song
+ * board, a different thing from a duel or a boss.
+ *
+ * Inside a group the order is how often players open each mode from this page.
  */
 const MODE_GROUPS: { id: string; modes: Mode[] }[] = [
   {
-    id: "planned",
+    id: "today",
     modes: [
       { id: "routine", Icon: ListChecks, href: "/timer/plans" },
-      { id: "learning_path", Icon: Route, href: "/journey" },
       { id: "auto", Icon: WandSparkles, href: "/timer/auto" },
+    ],
+  },
+  {
+    id: "courses",
+    modes: [
+      { id: "learning_path", Icon: Route, href: "/journey" },
       { id: "roadmaps", Icon: ClipboardList, href: "/ai-coach" },
     ],
   },
   {
-    id: "songs",
+    id: "music",
     modes: [
       { id: "songs", Icon: CassetteTape, href: "/songs?view=board" },
       { id: "gp", Icon: SiGuitarpro, href: "/gp-tabs" },
     ],
   },
   {
-    id: "exercises",
+    id: "technique",
     modes: [
       { id: "exercises", Icon: Search, href: "/profile/skills?tab=browse" },
       { id: "skills", Icon: Brain, href: "/profile/skills" },
@@ -118,7 +134,7 @@ const MODE_GROUPS: { id: string; modes: Mode[] }[] = [
     ],
   },
   {
-    id: "challenges",
+    id: "versus",
     modes: [
       { id: "duels", Icon: Swords, href: "/duels" },
       { id: "bosses", Icon: Skull, href: "/bosses" },
@@ -154,9 +170,9 @@ export const PracticeModeSelector = () => {
       className={cn(PRESSABLE_KEY, "relative flex min-h-[52px] w-full items-center gap-3 overflow-hidden rounded-lg bg-zinc-800/50 px-3.5 text-left transition-background hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring")}>
       <Ripple className='bg-white/15' />
       {loadingMode === id ? (
-        <Loader2 className='h-[18px] w-[18px] shrink-0 animate-spin text-zinc-400' />
+        <Loader2 className='h-4 w-4 shrink-0 animate-spin text-zinc-400' />
       ) : (
-        <Icon className='h-[18px] w-[18px] shrink-0 text-zinc-400' />
+        <Icon className='h-4 w-4 shrink-0 text-zinc-400' />
       )}
       <span className='min-w-0 truncate text-sm font-semibold text-zinc-100'>
         {t(`modes.${id}.title`)}
@@ -165,77 +181,79 @@ export const PracticeModeSelector = () => {
   );
 
   return (
-    <div className='container mx-auto w-full max-w-6xl space-y-8 px-4 py-12 font-sans sm:px-6'>
-      <h1 className='font-display text-3xl font-extrabold tracking-tight text-zinc-100'>
-        {t("title")}
-      </h1>
+    <div className='flex flex-col'>
+      <div className={cn("mx-auto w-full max-w-6xl space-y-8 font-sans", PAGE_CONTENT, "md:pt-10")}>
+        <PageTitle title={t("title")} />
 
-      <div className='flex flex-col items-start gap-8 lg:flex-row'>
-        <section className='w-full min-w-0 flex-1 space-y-3'>
-          <h2 className='text-base font-semibold text-zinc-200'>
-            {t("sections.all")}
-          </h2>
-          <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/60 p-2 pt-4'>
-            {MODE_GROUPS.map((group) => (
-              <div key={group.id} className='space-y-0.5'>
-                <h3 className='px-3 pb-1 text-xs font-semibold text-zinc-400'>
-                  {t(`groups.${group.id}`)}
-                </h3>
-                {group.modes.map(({ id, Icon, href }) => (
-                  <ModeRow
-                    key={id}
-                    Icon={Icon}
-                    title={t(`modes.${id}.title`)}
-                    description={t(`modes.${id}.description`)}
-                    loading={loadingMode === id}
-                    onActivate={() => nav(href, id)}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <aside className='w-full shrink-0 space-y-8 lg:w-80'>
-          <section className='space-y-3'>
+        <div className='flex flex-col items-start gap-8 lg:flex-row'>
+          <section className='w-full min-w-0 flex-1 space-y-3'>
             <h2 className='text-base font-semibold text-zinc-200'>
-              {t("sections.log_time")}
+              {t("sections.all")}
             </h2>
-            <div className='space-y-2 rounded-lg bg-zinc-900/60 p-3'>
-              {logButton("free_timer", Clock, "/timer/practice")}
-              {logButton("manual_log", NotebookPen, "/report")}
+            <div className='flex flex-col gap-3'>
+              {MODE_GROUPS.map((group) => (
+                <div
+                  key={group.id}
+                  className='space-y-0.5 rounded-lg bg-zinc-900 p-2 pt-4'>
+                  <h3 className='px-3 pb-1 text-xs font-semibold text-zinc-400'>
+                    {t(`groups.${group.id}`)}
+                  </h3>
+                  {group.modes.map(({ id, Icon, href }) => (
+                    <ModeRow
+                      key={id}
+                      Icon={Icon}
+                      title={t(`modes.${id}.title`)}
+                      description={t(`modes.${id}.description`)}
+                      loading={loadingMode === id}
+                      onActivate={() => nav(href, id)}
+                    />
+                  ))}
+                </div>
+              ))}
             </div>
           </section>
 
-          <section className='space-y-3'>
-            <h2 className='text-base font-semibold text-zinc-200'>
-              {t("sections.my_stuff")}
-            </h2>
-            <div className='rounded-lg bg-zinc-900/60 p-2'>
-              <nav aria-label={t("sections.my_stuff")} className='space-y-0.5'>
-                {MY_STUFF.map(({ id, Icon, href }) => (
-                  <Link
-                    key={id}
-                    href={href}
-                    className='flex min-h-11 items-center gap-3 rounded-lg px-2.5 text-sm font-medium text-zinc-200 transition-background hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
-                    <Icon className='h-4 w-4 shrink-0 text-zinc-400' />
-                    {t(`modes.${id}.title`)}
+          <aside className='w-full shrink-0 space-y-8 lg:w-80'>
+            <section className='space-y-3'>
+              <h2 className='text-base font-semibold text-zinc-200'>
+                {t("sections.log_time")}
+              </h2>
+              <div className='space-y-2 rounded-lg bg-zinc-900 p-3'>
+                {logButton("free_timer", Clock, "/timer/practice")}
+                {logButton("manual_log", NotebookPen, "/report")}
+              </div>
+            </section>
+
+            <section className='space-y-3'>
+              <h2 className='text-base font-semibold text-zinc-200'>
+                {t("sections.my_stuff")}
+              </h2>
+              <div className='rounded-lg bg-zinc-900 p-2'>
+                <nav aria-label={t("sections.my_stuff")} className='space-y-0.5'>
+                  {MY_STUFF.map(({ id, Icon, href }) => (
+                    <Link
+                      key={id}
+                      href={href}
+                      className='flex min-h-11 items-center gap-3 rounded-lg px-2.5 text-sm font-medium text-zinc-200 transition-background hover:bg-zinc-800/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
+                      <Icon className='h-4 w-4 shrink-0 text-zinc-400' />
+                      {t(`modes.${id}.title`)}
+                    </Link>
+                  ))}
+                </nav>
+                <div className='flex flex-wrap gap-2 px-0.5 pb-0.5 pt-3'>
+                  <Link href='/plans/create' className={createLinkClass}>
+                    <Plus />
+                    {t("sections.create_plan")}
                   </Link>
-                ))}
-              </nav>
-              <div className='flex flex-wrap gap-2 px-0.5 pb-0.5 pt-3'>
-                <Link href='/plans/create' className={createLinkClass}>
-                  <Plus />
-                  {t("sections.create_plan")}
-                </Link>
-                <Link href='/tab-editor' className={createLinkClass}>
-                  <Plus />
-                  {t("sections.create_exercise")}
-                </Link>
+                  <Link href='/tab-editor' className={createLinkClass}>
+                    <Plus />
+                    {t("sections.create_exercise")}
+                  </Link>
+                </div>
               </div>
-            </div>
-          </section>
-        </aside>
+            </section>
+          </aside>
+        </div>
       </div>
     </div>
   );

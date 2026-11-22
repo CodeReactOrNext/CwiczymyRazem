@@ -1,5 +1,11 @@
-import { buttonVariants,PRESSABLE } from "assets/components/ui/button";
+import { Button, buttonVariants } from "assets/components/ui/button";
+import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
+import {
+  Segment,
+  SegmentedControl,
+  SegmentGroup,
+} from "components/SegmentedControl/SegmentedControl";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import type { RoadmapVisibility } from "feature/aiCoach/types/roadmap.types";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
@@ -69,18 +75,9 @@ const Field = ({ label, children }: { label: string; children: ReactNode }) => (
   </div>
 );
 
-const segmentClass = (selected: boolean) =>
-  cn(
-    "flex min-h-10 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-zinc-500",
-    selected
-      ? "bg-zinc-700 text-zinc-50"
-      : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-  );
-
 const EMPTY_CONTEXT: RoadmapGoalContext = { favourites: "", canPlay: "" };
 
-const contextInputClass =
-  "w-full rounded-lg bg-zinc-800/50 px-4 py-2.5 text-sm text-zinc-100 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-zinc-600";
+const contextInputClass = "h-10 px-4";
 
 /**
  * The optional part of the brief: who they love listening to and what they can
@@ -101,7 +98,7 @@ const GoalContextFields = ({
   ).length;
 
   return (
-    <div className='rounded-lg bg-zinc-800/30'>
+    <div className='rounded-lg bg-zinc-900/40'>
       <button
         type='button'
         onClick={() => setOpen((value) => !value)}
@@ -133,7 +130,7 @@ const GoalContextFields = ({
         <div className='space-y-5 px-4 pb-5 pt-2'>
           <div className='grid gap-5 md:grid-cols-2'>
             <Field label={t("panel.generate.more.favourites")}>
-              <input
+              <Input
                 type='text'
                 value={context.favourites}
                 maxLength={MAX_CONTEXT_FIELD_LENGTH}
@@ -145,7 +142,7 @@ const GoalContextFields = ({
               />
             </Field>
             <Field label={t("panel.generate.more.can_play")}>
-              <input
+              <Input
                 type='text'
                 value={context.canPlay}
                 maxLength={MAX_CONTEXT_FIELD_LENGTH}
@@ -311,7 +308,7 @@ export const GenerateRoadmapCard = ({
   // preview beside the button plays what it starts: goal, phases, steps.
   if (!expanded && status === "idle") {
     return (
-      <section className='grid gap-8 rounded-lg bg-zinc-900/40 p-5 sm:p-6 md:grid-cols-2 md:items-center md:gap-12 lg:p-8'>
+      <section className='grid gap-8 rounded-lg bg-zinc-800/40 p-5 sm:p-6 md:grid-cols-2 md:items-center md:gap-12 lg:p-8'>
         <div className='flex flex-col items-start gap-5'>
           <div className='space-y-1.5'>
             <h2 className='text-lg font-bold text-white'>
@@ -325,13 +322,10 @@ export const GenerateRoadmapCard = ({
           <button
             type='button'
             onClick={() => setExpanded(true)}
-            className={cn(
-              PRESSABLE,
-              "flex shrink-0 items-center justify-center gap-2 rounded-lg border-b-black/25 bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white",
-            )}>
+            className={cn(buttonVariants({ size: "lg" }), "shrink-0")}>
             <Sparkles size={15} />
             {t("panel.generate.create")}
-            <span className='ml-0.5 flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 tabular-nums'>
+            <span className='flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 tabular-nums'>
               <SupportToken size={14} />
               {roadmapGenerationCost("public")}
             </span>
@@ -344,7 +338,7 @@ export const GenerateRoadmapCard = ({
   }
 
   return (
-    <section className='rounded-lg bg-zinc-900/40 p-6 md:p-8'>
+    <section className='rounded-lg bg-zinc-800/40 p-6 md:p-8'>
       <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
         <div className='space-y-1.5'>
           <h2 className='text-lg font-bold text-zinc-100'>
@@ -425,18 +419,18 @@ export const GenerateRoadmapCard = ({
           </AnimatePresence>
 
           <Field label={t("panel.generate.title_label")}>
-            <input
+            <Input
               type='text'
               value={title}
               maxLength={MAX_TITLE_LENGTH}
               onChange={(event) => setTitle(event.target.value)}
               placeholder={t("panel.generate.title_placeholder")}
-              className='w-full rounded-lg bg-zinc-800/50 px-4 py-3 text-base font-semibold text-zinc-100 outline-none placeholder:font-normal placeholder:text-zinc-500 focus:ring-1 focus:ring-zinc-600'
+              className='h-12 px-4 text-base font-semibold placeholder:font-normal md:text-base'
             />
           </Field>
 
           <Field label={t("panel.generate.goal_label")}>
-            <div className='rounded-lg bg-zinc-800/50 focus-within:ring-1 focus-within:ring-zinc-600'>
+            <div className='rounded-lg bg-zinc-800/60 focus-within:ring-1 focus-within:ring-zinc-500'>
               <textarea
                 rows={3}
                 maxLength={MAX_GOAL_LENGTH}
@@ -462,20 +456,21 @@ export const GenerateRoadmapCard = ({
                 ) : (
                   <div className='flex flex-wrap gap-2'>
                     {GOAL_EXAMPLES.map((i) => (
-                      <button
+                      <Button
                         key={i}
                         type='button'
+                        variant='ghost'
+                        size='sm'
                         onClick={() => {
                           setTitle(t(`panel.generate.examples.${i}.title`));
                           setGoal(t(`panel.generate.examples.${i}.goal`));
-                        }}
-                        className='rounded-md bg-zinc-800 px-2.5 py-1 text-xs text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500 hover:bg-zinc-700 hover:text-zinc-200'>
+                        }}>
                         {t(`panel.generate.examples.${i}.title`)}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 )}
-                <span className='shrink-0 text-xs tabular-nums text-zinc-600'>
+                <span className='shrink-0 text-xs tabular-nums text-zinc-500'>
                   {goal.length}/{MAX_GOAL_LENGTH}
                 </span>
               </div>
@@ -486,38 +481,33 @@ export const GenerateRoadmapCard = ({
 
           <div className='grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]'>
             <Field label={t("panel.generate.level")}>
-              <div className='grid grid-cols-2 gap-1 rounded-lg bg-zinc-800/40 p-1 sm:grid-cols-4'>
-                {ROADMAP_LEVELS.map((candidate) => (
-                  <button
-                    key={candidate}
-                    type='button'
-                    onClick={() => setLevel(candidate)}
-                    aria-pressed={level === candidate}
-                    className={segmentClass(level === candidate)}>
-                    {t(`ai_coach:levels.${candidate}`, candidate)}
-                  </button>
-                ))}
-              </div>
+              <SegmentedControl
+                label={t("panel.generate.level")}
+                options={ROADMAP_LEVELS.map((candidate) => ({
+                  value: candidate,
+                  label: t(`ai_coach:levels.${candidate}`, candidate),
+                }))}
+                selected={[level]}
+                onSelect={setLevel}
+              />
             </Field>
 
             {/* A public roadmap gives the community something back for the
                 compute, so it is the cheaper one. */}
             <Field label={t("panel.generate.who_sees")}>
-              <div className='grid grid-cols-2 gap-1 rounded-lg bg-zinc-800/40 p-1'>
+              <SegmentGroup aria-label={t("panel.generate.who_sees")}>
                 {VISIBILITY_OPTIONS.map(({ value, Icon }) => (
-                  <button
+                  <Segment
                     key={value}
-                    type='button'
-                    onClick={() => setVisibility(value)}
-                    aria-pressed={visibility === value}
-                    className={segmentClass(visibility === value)}>
+                    active={visibility === value}
+                    onClick={() => setVisibility(value)}>
                     <Icon size={14} className='shrink-0' />
                     {t(`panel.generate.visibility.${value}.label`)}
                     <span className='text-zinc-500'>·</span>
                     <TokenAmount value={roadmapGenerationCost(value)} />
-                  </button>
+                  </Segment>
                 ))}
-              </div>
+              </SegmentGroup>
               <p className='text-sm text-zinc-500'>
                 {selectedVisibility &&
                   t(
@@ -564,10 +554,7 @@ export const GenerateRoadmapCard = ({
               type='button'
               onClick={() => void handleContinue()}
               disabled={!goalReady}
-              className={cn(
-                PRESSABLE,
-                "flex min-h-11 shrink-0 items-center justify-center gap-2.5 rounded-lg border-b-black/25 bg-zinc-100 px-5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 hover:bg-white",
-              )}>
+              className={cn(buttonVariants({ size: "lg" }), "shrink-0")}>
               {t("panel.generate.continue")}
               <ArrowRight size={16} />
             </button>
@@ -585,12 +572,14 @@ export const GenerateRoadmapCard = ({
         <div className='mt-8 flex items-center gap-3 rounded-lg bg-red-950/20 px-4 py-3'>
           <AlertTriangle size={16} className='shrink-0 text-red-400' />
           <p className='text-sm text-red-300'>{error}</p>
-          <button
+          <Button
             type='button'
+            variant='subtle'
+            size='sm'
             onClick={reset}
-            className='ml-auto shrink-0 rounded-lg bg-zinc-800 px-3 py-1.5 text-sm font-bold text-zinc-200 hover:bg-zinc-700'>
+            className='ml-auto shrink-0'>
             {t("panel.try_again")}
-          </button>
+          </Button>
         </div>
       )}
     </section>

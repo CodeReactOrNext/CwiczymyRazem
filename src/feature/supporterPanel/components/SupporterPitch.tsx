@@ -27,7 +27,7 @@ export const SupporterPitch = () => {
   const email = useAccountEmail();
 
   return (
-    <section className='relative flex flex-col gap-5 overflow-hidden rounded-lg bg-zinc-900/40 p-3 pb-7 md:flex-row md:items-center md:gap-9 md:p-7'>
+    <section className='relative flex flex-col gap-5 overflow-hidden rounded-lg bg-zinc-800/40 p-3 pb-7 md:flex-row md:items-center md:gap-9 md:p-7'>
       {/* Amber, the colour the badge and the avatar ring are already in. */}
       <div className='light-tint pointer-events-none absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-transparent' />
 
@@ -54,12 +54,10 @@ export const SupporterPitch = () => {
         <p className='mt-3 text-sm text-zinc-400'>{t("panel.pitch.sign")}</p>
 
         <div className='mt-7 flex flex-col gap-2.5 sm:items-start'>
-          <Button asChild size='lg' className='h-12 text-[15px]'>
+          <Button asChild size='xl'>
             <a href={BMC_URL} target='_blank' rel='noreferrer'>
-              <span className='flex items-center gap-2'>
-                <Heart size={16} fill='currentColor' />
-                {t("panel.pitch.support")}
-              </span>
+              <Heart size={16} fill='currentColor' />
+              {t("panel.pitch.support")}
             </a>
           </Button>
           <p className='text-center text-sm text-zinc-400 sm:text-left'>

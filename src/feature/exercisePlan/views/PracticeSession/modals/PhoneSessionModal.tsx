@@ -337,7 +337,7 @@ export function PhoneSessionModal({
                 room under the exercise sideways. */}
             {currentExercise.links && currentExercise.links.length > 0 && (
               <div className="space-y-3 rounded-lg light-tint bg-gradient-to-br from-red-500/10 to-zinc-900/40 p-4">
-                <div className="text-xs font-bold tracking-widest text-red-400">
+                <div className="text-xs font-bold text-red-400">
                   {t("instructions.support_author")}
                 </div>
                 <div className="flex flex-col gap-2">
@@ -523,17 +523,17 @@ export function PhoneSessionModal({
                         )}>
                           <TimeLeft />
                         </span>
-                        <Button onClick={handleRestart} variant="subtle" size="icon"
-                          className="h-11 w-11 shrink-0 text-amber-400 hover:text-amber-300">
-                          <RotateCcw size='1em' className="h-4 w-4" />
+                        <Button onClick={handleRestart} variant="subtle" size="icon-touch"
+                          className="shrink-0 text-amber-400 hover:text-amber-300">
+                          <RotateCcw />
                         </Button>
-                        <Button onClick={handleToggleTimer} size="icon" className="h-11 w-11 shrink-0">
-                          {isPlaying ? <Pause size='1em' className='h-4 w-4' /> : <PlayIcon size='1em' className='h-4 w-4' />}
+                        <Button onClick={handleToggleTimer} size="icon-touch" className="shrink-0">
+                          {isPlaying ? <Pause /> : <PlayIcon />}
                         </Button>
-                        <Button onClick={exitFullscreen} variant="subtle" size="icon"
+                        <Button onClick={exitFullscreen} variant="subtle" size="icon-touch"
                           aria-label={t("tab.exit_fullscreen")}
-                          className="h-11 w-11 shrink-0 text-zinc-400 hover:text-white">
-                          <Minimize2 size='1em' className="h-4 w-4" />
+                          className="shrink-0 text-zinc-400 hover:text-white">
+                          <Minimize2 />
                         </Button>
                       </div>
                       {showInstallHint && (
@@ -564,8 +564,8 @@ export function PhoneSessionModal({
                             </div>
                             <Button variant='ghost' size='icon' onClick={() => setInfoExerciseId(null)}
                               aria-label={t("header.close_info")}
-                              className='-mr-2 -mt-2 h-9 w-9 shrink-0 text-zinc-400 hover:text-white'>
-                              <X className='h-4 w-4' />
+                              className='-mr-2 -mt-2 shrink-0 text-zinc-400 hover:text-white'>
+                              <X />
                             </Button>
                           </div>
                           <MobileInstructionsCard exercise={currentExercise} plain />
@@ -588,58 +588,58 @@ export function PhoneSessionModal({
                       ? "h-full flex-col overflow-y-auto py-2"
                       : "h-16 flex-row overflow-x-auto px-3",
                   )}>
-                    <Button variant='ghost' size='icon' onClick={onClose}
+                    <Button variant='ghost' size='icon-touch' onClick={onClose}
                       aria-label={t("header.close_session")}
-                      className='h-10 w-10 shrink-0 text-zinc-500 hover:text-white'>
-                      <X className='h-4 w-4' />
+                      className='shrink-0 text-zinc-500 hover:text-white'>
+                      <X />
                     </Button>
 
-                    <Button variant='ghost' size='icon'
+                    <Button variant='ghost' size='icon-touch'
                       onClick={() => setIsPanelExpanded(prev => !prev)}
                       aria-label={isPanelExpanded ? t("tools.close_panel") : t("tools.open_panel")}
                       aria-expanded={isPanelExpanded}
                       className={cn(
-                        "h-10 w-10 shrink-0 hover:text-white",
+                        "shrink-0 hover:text-white",
                         isPanelExpanded ? "bg-white/15 text-white" : "text-zinc-400",
                       )}
                     >
-                      <SlidersHorizontal className='h-4 w-4' />
+                      <SlidersHorizontal />
                     </Button>
 
                     <div className="flex-1" />
 
                     {currentExerciseIndex > 0 && (
-                      <Button onClick={handleBackExerciseClick} variant="subtle" size="icon"
-                        className="h-11 w-11 shrink-0 text-zinc-400">
-                        <SkipBack size='1em' className="h-4 w-4" />
+                      <Button onClick={handleBackExerciseClick} variant="subtle" size="icon-touch"
+                        className="shrink-0 text-zinc-400">
+                        <SkipBack />
                       </Button>
                     )}
                     {hasTablature && (
-                      <Button onClick={handleRestart} variant="subtle" size="icon"
-                        className="h-11 w-11 shrink-0 text-amber-400 hover:text-amber-300">
-                        <RotateCcw size='1em' className="h-4 w-4" />
+                      <Button onClick={handleRestart} variant="subtle" size="icon-touch"
+                        className="shrink-0 text-amber-400 hover:text-amber-300">
+                        <RotateCcw />
                       </Button>
                     )}
 
                     {/* The one main action — white, like every primary button in the app. */}
                     <Button
                       onClick={handleToggleTimer}
-                      size="icon"
-                      className="h-12 w-12 shrink-0"
+                      size="icon-touch"
+                      className="shrink-0"
                     >
-                      {isPlaying ? <Pause size='1em' className='h-4 w-4' /> : <PlayIcon size='1em' className='h-4 w-4' />}
+                      {isPlaying ? <Pause /> : <PlayIcon />}
                     </Button>
 
                     {!examMode && (
                       <Button
                         onClick={isLastExercise ? onFinish : handleNextExerciseClick}
                         disabled={isFinishing || isSubmittingReport }
-                        variant="subtle" size="icon"
-                        className="h-11 w-11 shrink-0 text-zinc-400"
+                        variant="subtle" size="icon-touch"
+                        className="shrink-0 text-zinc-400"
                       >
                         {isFinishing || isSubmittingReport
                           ? <div className="h-3 w-3 animate-spin rounded-lg border-2 border-zinc-500/20 border-t-zinc-500" />
-                          : isLastExercise ? <Check size='1em' className="h-4 w-4" /> : <SkipForward size='1em' className="h-4 w-4" />
+                          : isLastExercise ? <Check /> : <SkipForward />
                         }
                       </Button>
                     )}

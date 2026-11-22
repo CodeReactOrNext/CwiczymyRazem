@@ -1,3 +1,5 @@
+import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import {
   Select,
   SelectContent,
@@ -5,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
-import { cn } from "assets/lib/utils";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { useTranslation } from "hooks/useTranslation";
 import { X } from "lucide-react";
 
@@ -49,7 +51,7 @@ interface PracticeLogFiltersProps {
 }
 
 const selectTriggerClass =
-  "h-8 w-auto gap-1.5 rounded-lg border-none bg-white/5 px-3 py-0 text-xs font-medium text-zinc-300 shadow-none transition-colors hover:bg-white/10 focus:ring-0 ring-offset-0";
+  "h-8 w-auto gap-1.5 px-3 py-0 text-xs font-medium text-zinc-300";
 const selectContentClass = "rounded-xl border-none bg-zinc-900 shadow-dark-lg";
 const selectItemClass =
   "rounded-lg text-xs text-zinc-300 focus:bg-white/10 focus:text-zinc-50";
@@ -63,29 +65,32 @@ export const PracticeLogFilters = ({
 
   return (
     <section className='flex flex-wrap items-center gap-x-3 gap-y-3'>
-      <div className='flex flex-wrap items-center gap-0.5'>
-        {RANGE_OPTIONS.map((range) => (
-          <button
-            key={range}
-            onClick={() => setFilters({ range })}
-            className={cn(
-              "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
-              filters.range === range
-                ? "bg-white/10 text-zinc-50"
-                : "text-zinc-500 hover:text-zinc-200",
-            )}>
-            {t(`filters.range_${range}`)}
-          </button>
-        ))}
+      <div className='flex flex-wrap items-center gap-2'>
+        <SegmentedControl
+          label={t("filters.range_label")}
+          options={RANGE_OPTIONS.map((range) => ({
+            value: range,
+            label: t(`filters.range_${range}`),
+          }))}
+          selected={filters.range === "custom" ? [] : [filters.range]}
+          onSelect={(range) => setFilters({ range })}
+        />
 
         {filters.range === "custom" && filters.from && filters.to && (
-          <button
-            onClick={() => setFilters({ range: "all" })}
-            title={t("filters.clear_custom")}
-            className='flex items-center gap-1.5 rounded-lg bg-cyan-400/15 px-3 py-1.5 text-xs font-semibold text-cyan-200 transition-colors hover:bg-cyan-400/25'>
-            {formatCustomRange(filters.from, filters.to)}
-            <X size={12} />
-          </button>
+          <span className='flex items-center gap-1'>
+            <Chip size='sm' color='gray' className='tabular-nums'>
+              {formatCustomRange(filters.from, filters.to)}
+            </Chip>
+            <Button
+              type='button'
+              variant='ghost'
+              size='icon-sm'
+              onClick={() => setFilters({ range: "all" })}
+              title={t("filters.clear_custom")}
+              aria-label={t("filters.clear_custom")}>
+              <X />
+            </Button>
+          </span>
         )}
       </div>
 
@@ -167,14 +172,16 @@ export const PracticeLogFilters = ({
         </Select>
 
         {isFiltered && (
-          <button
+          <Button
+            type='button'
+            variant='ghost'
+            size='sm'
             onClick={() =>
               setFilters({ range: "all", type: "all", duration: "all" })
-            }
-            className='flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-200'>
-            <X size={12} />
+            }>
+            <X />
             {t("filters.clear_all")}
-          </button>
+          </Button>
         )}
       </div>
     </section>

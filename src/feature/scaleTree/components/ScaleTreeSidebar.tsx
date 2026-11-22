@@ -68,7 +68,7 @@ export function ScaleTreeSidebar({
 
           return (
             <div key={family} className="space-y-1">
-              <span className={cn("mb-2 block px-3 text-xs font-semibold tracking-wide", meta.text)}>
+              <span className={cn("mb-2 block px-3 text-xs font-semibold", meta.text)}>
                 {t(`families.${family}.group`, meta.title)}
               </span>
 

@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
 import { type KostekMood, KostekSays } from "components/Mascot/Kostek";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
@@ -126,16 +127,7 @@ const StepHeading = ({
         <p className='text-base leading-relaxed text-zinc-300'>{description}</p>
       )}
       {onBack && (
-        <button
-          type='button'
-          onClick={onBack}
-          className={cn(
-            "mx-auto flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-200",
-            FOCUS_RING,
-          )}>
-          <ArrowLeft className='h-4 w-4' />
-          {t("back")}
-        </button>
+        <BackLink label={t("back")} onClick={onBack} className='mx-auto flex' />
       )}
     </div>
   );
@@ -418,7 +410,7 @@ const FirstRiffCard = ({
           onClick={onPlay}
           disabled={disabled}>
           {isPending ? (
-            <Loader2 className='h-4 w-4 animate-spin' />
+            <Loader2 className='animate-spin' />
           ) : (
             t("play_step.start")
           )}
@@ -827,21 +819,19 @@ const OnboardingView = () => {
                 />
               ))}
             </div>
-            <button
+            <Button
               type='button'
+              variant='ghost'
               onClick={handleAllPlans}
               disabled={!!pending}
-              className={cn(
-                "mx-auto mt-8 flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm text-zinc-300 transition-colors hover:bg-zinc-900 hover:text-zinc-100",
-                FOCUS_RING,
-              )}>
+              className='mx-auto mt-8 flex'>
               {pending === "all-plans" ? (
-                <Loader2 className='h-4 w-4 animate-spin' />
+                <Loader2 className='animate-spin' />
               ) : (
-                <Library className='h-4 w-4 text-zinc-400' />
+                <Library className='text-zinc-400' />
               )}
               {t("plan_step.browse_all", { count: ALL_PLANS_COUNT })}
-            </button>
+            </Button>
           </StepBody>
         )}
 
@@ -861,24 +851,23 @@ const OnboardingView = () => {
                   onClick={handleSongsContinue}
                   disabled={!!pending}>
                   {pending === "songs" ? (
-                    <Loader2 className='h-4 w-4 animate-spin' />
+                    <Loader2 className='animate-spin' />
                   ) : (
                     t("songs_step.continue")
                   )}
                 </Button>
                 {/* The way back is as plain as the way on: no tabs may be a
                     dealbreaker, and another answer is one tap away. */}
-                <button
+                <Button
                   type='button'
+                  variant='ghost'
+                  size='lg'
+                  className='w-full'
                   onClick={() => goTo("goal")}
-                  disabled={!!pending}
-                  className={cn(
-                    "flex w-full items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-200",
-                    FOCUS_RING,
-                  )}>
-                  <ArrowLeft className='h-4 w-4' />
+                  disabled={!!pending}>
+                  <ArrowLeft />
                   {t("songs_step.other")}
-                </button>
+                </Button>
               </div>
             </div>
           </StepBody>
@@ -897,7 +886,7 @@ const OnboardingView = () => {
                 onClick={handleDesktopContinue}
                 disabled={!!pending}>
                 {pending === "desktop" ? (
-                  <Loader2 className='h-4 w-4 animate-spin' />
+                  <Loader2 className='animate-spin' />
                 ) : (
                   t("desktop_hint.continue")
                 )}

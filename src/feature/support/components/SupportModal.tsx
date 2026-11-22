@@ -333,7 +333,7 @@ export function SupportModal({
               {/* Same pair as EmailConsentModal: the white key is the one
                   action, the secondary key steps away. */}
               <div className='flex flex-col gap-3 sm:flex-row-reverse sm:gap-2'>
-                <Button asChild size='lg' className='h-12 px-4 sm:h-10 sm:flex-1'>
+                <Button asChild size='lg' className='sm:flex-1'>
                   {isThanks ? (
                     <Link href='/roadmap' onClick={onDonate}>
                       {t("modal.thanks.cta")}
@@ -355,7 +355,7 @@ export function SupportModal({
                   size='lg'
                   variant='secondary'
                   onClick={() => onClose("button")}
-                  className='h-12 px-4 sm:h-10 sm:flex-1'>
+                  className='sm:flex-1'>
                   {t("modal.close")}
                 </Button>
               </div>

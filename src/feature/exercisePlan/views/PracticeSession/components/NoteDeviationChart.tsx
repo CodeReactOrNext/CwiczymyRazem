@@ -1,5 +1,6 @@
 import { ChartContainer, ChartTooltip } from "assets/components/ui/chart";
 import { useTranslation } from "hooks/useTranslation";
+import { readableText } from "lib/colorTheme/colorTheme";
 import { translateOr } from "lib/i18n/translate";
 import { useMemo } from "react";
 import { ReferenceArea, ReferenceLine, Scatter, ScatterChart, XAxis, YAxis } from "recharts";
@@ -73,9 +74,9 @@ const DeviationTooltip = ({ active, payload, noteLabel, format }: DeviationToolt
   const point = active ? payload?.[0]?.payload : undefined;
   if (!point) return null;
   return (
-    <div className='rounded-lg bg-zinc-950/90 px-3 py-2 text-xs'>
-      <span className='text-zinc-400'>{noteLabel(point.n)} </span>
-      <span className='font-bold' style={{ color: point.color }}>{format(point.value)}</span>
+    <div className='tooltip-ink rounded-lg bg-white p-3 text-xs text-black'>
+      <span className='text-black/60'>{noteLabel(point.n)} </span>
+      <span className='font-bold' style={{ color: readableText(point.color) }}>{format(point.value)}</span>
     </div>
   );
 };
@@ -131,7 +132,7 @@ export const NoteDeviationChart = ({ variant, notes }: NoteDeviationChartProps) 
   return (
     <div>
       <div className='mb-4 flex items-center justify-between'>
-        <p className='text-[11px] font-semibold tracking-wide text-zinc-500'>{title}</p>
+        <p className='text-xs font-medium text-zinc-400'>{title}</p>
         <span className='text-[11px] text-zinc-500'>
           {translateOr(t, "success.chart_notes", "{{count}} notes", { count: points.length })}
         </span>

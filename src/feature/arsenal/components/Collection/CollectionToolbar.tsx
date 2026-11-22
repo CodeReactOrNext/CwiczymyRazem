@@ -1,5 +1,4 @@
 import { PRESSABLE } from "assets/components/ui/button";
-import { Input } from "assets/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -8,20 +7,49 @@ import {
   SelectValue,
 } from "assets/components/ui/select";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import {
+  Segment,
+  SegmentedControl,
+  SegmentGroup,
+} from "components/SegmentedControl/SegmentedControl";
 import type {
   CollectionScope,
   CollectionSort,
   CollectionView,
 } from "feature/arsenal/utils/collectionFilter";
-import { isStashOnlySort } from "feature/arsenal/utils/collectionFilter";
+import {
+  COLLECTION_SCOPES,
+  isStashOnlySort,
+} from "feature/arsenal/utils/collectionFilter";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowUpDown, LayoutGrid, Rows3, Search } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  ArrowUpDown,
+  Cog,
+  Guitar,
+  Layers,
+  LayoutGrid,
+  Rows3,
+  Wrench,
+} from "lucide-react";
+import type { ReactNode } from "react";
 
 interface CollectionToolbarProps {
   scope: CollectionScope;
   onScopeChange: (scope: CollectionScope) => void;
+  /** How many pieces each shelf holds, shown after its name. */
+  counts: Record<CollectionScope, number>;
   sort: CollectionSort;
   onSortChange: (sort: CollectionSort) => void;
+  /**
+   * Whether ordering means anything here. Parts and Builder pieces have no
+   * level or rarity to sort by, so in the card view the dropdown would only
+   * offer choices that change nothing.
+   */
+  showSort?: boolean;
+  /** Same for search: the card view of parts and Builder pieces is a short list with no filter. */
+  showSearch?: boolean;
   query: string;
   onQueryChange: (query: string) => void;
   view: CollectionView;
@@ -32,15 +60,17 @@ interface CollectionToolbarProps {
    * only view there and a switch with one working option is just noise.
    */
   showViewSwitch?: boolean;
-  guitarCount: number;
-  pedalCount: number;
+  /** The shelf's own keys (tidy up, clear duplicates), at the end of the bar. */
+  actions?: ReactNode;
 }
 
-const SCOPES: { id: CollectionScope; label: string }[] = [
-  { id: "all", label: "All" },
-  { id: "guitars", label: "Guitars" },
-  { id: "pedals", label: "Pedals" },
-];
+const SCOPE_META: Record<CollectionScope, { label: string; Icon: LucideIcon }> =
+  {
+    guitars: { label: "Guitars", Icon: Guitar },
+    pedals: { label: "Pedals", Icon: Layers },
+    parts: { label: "Parts", Icon: Cog },
+    builder: { label: "Builder", Icon: Wrench },
+  };
 
 const SORTS: {
   id: CollectionSort;
@@ -63,149 +93,140 @@ const SORTS: {
   { id: "rarity", label: "Rarity", hint: "Rarest first, copies side by side" },
   { id: "level", label: "Level", hint: "Highest level first" },
   { id: "newest", label: "Newest", hint: "Most recent drops first" },
-  // Same reason as Manual: only a board that hangs all four kinds in one grid
-  // has anything to group.
-  {
-    id: "type",
-    label: "Type",
-    hint: "Guitars first, then pedals, then mods and parts",
-  },
 ];
 
-const VIEWS: { id: CollectionView; label: string; Icon: typeof LayoutGrid }[] =
-  [
-    { id: "stash", label: "Stash", Icon: LayoutGrid },
-    { id: "cards", label: "Cards", Icon: Rows3 },
-  ];
-
-/** Same chip language as the workshop rack, so the two lists are operated alike.
-    `h-full` so every chip fills the shared 36px control height set on its group. */
-const segmentClass = (isActive: boolean) =>
-  cn(
-    PRESSABLE,
-    "flex h-full items-center justify-center gap-1.5 rounded border-b-black/30 px-3 text-xs font-semibold transition-colors",
-    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
-    isActive
-      ? "bg-arsenal-accent/15 text-arsenal-accent"
-      : "bg-white/[0.04] text-arsenal-text-tertiary hover:bg-white/[0.08] hover:text-arsenal-text-primary",
-  );
+const VIEWS: { id: CollectionView; label: string; Icon: LucideIcon }[] = [
+  { id: "stash", label: "Stash", Icon: LayoutGrid },
+  { id: "cards", label: "Cards", Icon: Rows3 },
+];
 
 /**
- * One bar for the whole collection: what to show, how to order it, what to find.
+ * The collection's one bar: which shelf, then how to find and order what is
+ * on it.
  *
- * Guitars and pedals used to be two independent walls of cards with no way to
- * narrow either of them down — the only ordering was hard-coded, and the only way
- * to reach a specific item was to scroll. The rack in the workshop already solved
- * this for the same items, so the collection now speaks the same language.
+ * Shelves are the inventory tabs of any game — guitars, pedals, parts and the
+ * Builder's pieces — rather than a filter over one board that held everything
+ * at once. The tools sit on a row of their own under them, with whatever the
+ * shelf can do in bulk at its end, so there is no second header under the bar.
  */
 export const CollectionToolbar = ({
   scope,
   onScopeChange,
+  counts,
   sort,
   onSortChange,
+  showSort = true,
+  showSearch = true,
   query,
   onQueryChange,
   view,
   onViewChange,
   showViewSwitch = true,
-  guitarCount,
-  pedalCount,
+  actions,
 }: CollectionToolbarProps) => {
   const { t } = useTranslation("arsenal");
   const sortLabel = (id: CollectionSort, fallback: string) =>
     t(`collection.sort.${id}`, fallback);
-  const counts: Record<CollectionScope, number> = {
-    all: guitarCount + pedalCount,
-    guitars: guitarCount,
-    pedals: pedalCount,
-  };
 
-  // Only the stash view can honour manual/type ordering — see `isStashOnlySort`.
+  // Only the stash view can honour manual ordering — see `isStashOnlySort`.
   const visibleSorts = SORTS.filter(
     (s) => view === "stash" || !isStashOnlySort(s.id),
   );
 
   return (
-    <div className='flex flex-col gap-2.5 rounded-lg bg-arsenal-section p-3 sm:flex-row sm:items-center'>
-      <div className='flex h-9 shrink-0 gap-1 rounded-lg bg-arsenal-bg p-1'>
-        {SCOPES.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => onScopeChange(s.id)}
-            aria-pressed={scope === s.id}
-            className={cn(segmentClass(scope === s.id), "flex-1 sm:flex-none")}>
-            {t(`collection.scope.${s.id}`, s.label)}
-            <span className='tabular-nums opacity-60'>{counts[s.id]}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* The one item that absorbs the row's slack — everything else is
-          content-sized, so the placeholder never gets squeezed. */}
-      <div className='relative min-w-0 flex-1'>
-        <Search
-          size={14}
-          className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-arsenal-text-tertiary'
-        />
-        <Input
-          value={query}
-          onChange={(e) => onQueryChange(e.target.value)}
-          placeholder={t("collection.search")}
-          aria-label={t("collection.search")}
-          className='h-9 border-0 bg-arsenal-bg pl-9 text-sm text-arsenal-text-primary placeholder:text-arsenal-text-tertiary'
-        />
-      </div>
-
-      {/* A dropdown rather than six chips: at three controls wide it no longer
-          needs its own row's worth of space, and the current order still reads
-          straight off the trigger. */}
-      <Select
-        value={sort}
-        onValueChange={(value) => onSortChange(value as CollectionSort)}>
-        <SelectTrigger
-          aria-label={t("collection.sort_by")}
-          className={cn('h-9 w-full shrink-0 gap-2 border-0', PRESSABLE, 'border-b-black/30 bg-arsenal-bg px-3 text-xs font-semibold text-arsenal-text-primary sm:w-[9.5rem]')}>
-          <span className='flex items-center gap-1.5 text-arsenal-text-tertiary'>
-            <ArrowUpDown size={13} aria-hidden />
-            {t("collection.sort_prefix")}
-          </span>
-          {/* Explicit children rather than the auto-detected label — Radix only
-              knows an item's label once it has mounted inside the (closed by
-              default) content portal, so the trigger would show blank until
-              the menu had been opened once. */}
-          <SelectValue>
-            {sortLabel(sort, visibleSorts.find((s) => s.id === sort)?.label ?? "")}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          {visibleSorts.map((s) => (
-            <SelectItem
-              key={s.id}
-              value={s.id}
-              title={t(`collection.sort_hint.${s.id}`, s.hint)}>
-              {sortLabel(s.id, s.label)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {showViewSwitch && (
-        <div className='flex h-9 shrink-0 gap-1 rounded-lg bg-arsenal-bg p-1'>
-          {VIEWS.map(({ id, label: english, Icon }) => {
-            const label = t(`collection.view.${id}`, english);
-            return (
-            <button
-              key={id}
-              onClick={() => onViewChange(id)}
-              aria-pressed={view === id}
-              aria-label={t(`collection.view_title.${id}`)}
-              title={t(`collection.view_title.${id}`)}
-              className={cn(segmentClass(view === id), "flex-1 sm:flex-none")}>
-              <Icon size={14} />
-              <span className='sm:hidden'>{label}</span>
-            </button>
-            );
+    <div className='flex flex-col gap-4'>
+      {/* The same switch as the Songs board (Learning / Want to learn /
+          Mastered): one tray, the shelf's icon and how much it holds. */}
+      <div className='flex flex-wrap items-center gap-2'>
+        <SegmentedControl
+          label={t("collection.shelf", "Shelf")}
+          selected={[scope]}
+          onSelect={onScopeChange}
+          options={COLLECTION_SCOPES.map((id) => {
+            const { label, Icon } = SCOPE_META[id];
+            return {
+              value: id,
+              label: t(`collection.scope.${id}`, label),
+              icon: <Icon size={15} />,
+              count: counts[id],
+            };
           })}
+        />
+
+        {showViewSwitch && (
+          <SegmentGroup
+            aria-label={t("collection.view_switch", "View")}
+            className='ml-auto shrink-0'>
+            {VIEWS.map(({ id, Icon }) => (
+              <Segment
+                key={id}
+                active={view === id}
+                onClick={() => onViewChange(id)}>
+                <span className='sr-only'>
+                  {t(`collection.view_title.${id}`)}
+                </span>
+                <Icon size={15} aria-hidden />
+              </Segment>
+            ))}
+          </SegmentGroup>
+        )}
+      </div>
+
+      {(showSearch || showSort || actions) && (
+        <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+          {showSearch && (
+            <SearchInput
+              containerClassName='min-w-0 sm:max-w-xs'
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
+              onClear={() => onQueryChange("")}
+              placeholder={t("collection.search")}
+              aria-label={t("collection.search")}
+              className='h-9'
+            />
+          )}
+
+          {showSort && (
+            <Select
+              value={sort}
+              onValueChange={(value) => onSortChange(value as CollectionSort)}>
+              <SelectTrigger
+                aria-label={t("collection.sort_by")}
+                className={cn(
+                  PRESSABLE,
+                  "h-9 w-full shrink-0 gap-2 border-0 border-b-black/30 bg-arsenal-section px-3 text-xs font-semibold text-arsenal-text-primary sm:w-[9.5rem]",
+                )}>
+                <span className='flex items-center gap-1.5 text-arsenal-text-tertiary'>
+                  <ArrowUpDown size={13} aria-hidden />
+                  {t("collection.sort_prefix")}
+                </span>
+                {/* Explicit children rather than the auto-detected label — Radix
+                  only knows an item's label once it has mounted inside the
+                  (closed by default) content portal, so the trigger would show
+                  blank until the menu had been opened once. */}
+                <SelectValue>
+                  {sortLabel(
+                    sort,
+                    visibleSorts.find((s) => s.id === sort)?.label ?? "",
+                  )}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {visibleSorts.map((s) => (
+                  <SelectItem
+                    key={s.id}
+                    value={s.id}
+                    title={t(`collection.sort_hint.${s.id}`, s.hint)}>
+                    {sortLabel(s.id, s.label)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {actions && (
+            <div className='flex flex-wrap gap-2 sm:ml-auto'>{actions}</div>
+          )}
         </div>
       )}
     </div>

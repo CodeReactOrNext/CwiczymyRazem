@@ -1,12 +1,14 @@
-import { useTranslation } from "hooks/useTranslation";
 import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
-import Avatar from "components/UI/Avatar/Avatar";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import type { ScoredRun } from "feature/exercisePlan/types/exercise.types";
+import { RankRow } from "feature/leadboard/components/RankRow";
 import type { RankNeighbor } from "feature/leadboard/services/getExerciseRankNeighbors";
 import { getExerciseRankNeighbors } from "feature/leadboard/services/getExerciseRankNeighbors";
 import { selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { Trophy } from "lucide-react";
 import { useAppSelector } from "store/hooks";
 
@@ -14,21 +16,13 @@ import { useAppSelector } from "store/hooks";
 // record leaves that record — and therefore that place — untouched.
 const boardScoreOf = (run: ScoredRun) => Math.max(run.score, run.previousBest);
 
-/** Gold / silver / bronze for the podium, cyan for the player — same language as
- *  the exercise leaderboard dialog. */
-const rankBadgeClass = (rank: number, isPlayer: boolean) => {
-  if (isPlayer) return "bg-cyan-500 text-zinc-950";
-  if (rank === 1) return "bg-amber-400/15 text-amber-300";
-  if (rank === 2) return "bg-zinc-300/15 text-zinc-200";
-  if (rank === 3) return "bg-orange-600/15 text-orange-400";
-  return "bg-zinc-800/60 text-zinc-400";
-};
-
 interface StandingRowProps {
   rank: number;
   name: string;
   avatar: string;
   score: number;
+  /** Links the row to the player's profile. */
+  userId?: string;
   /** Tempo the standing score was played at; absent where it isn't known. */
   bpm?: number;
   isPlayer?: boolean;
@@ -36,40 +30,25 @@ interface StandingRowProps {
   runScore?: number;
 }
 
-function StandingRow({ rank, name, avatar, score, bpm, isPlayer = false, runScore }: StandingRowProps) {
+function StandingRow({ rank, name, avatar, score, userId, bpm, isPlayer = false, runScore }: StandingRowProps) {
   const { t } = useTranslation("session_summary");
   return (
-    <div
-      className={cn(
-        'flex items-center gap-4 rounded-lg px-4 py-3',
-        isPlayer ? 'bg-cyan-500/10' : 'bg-zinc-800/30'
-      )}>
-      <span
-        className={cn(
-          'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold tabular-nums',
-          rankBadgeClass(rank, isPlayer)
-        )}>
-        {rank}
-      </span>
-
-      <Avatar avatarURL={avatar} name={name || t('player')} size='sm' />
-
-      <div className='min-w-0 flex-1'>
-        <p translate='no' className={cn('truncate text-sm font-semibold', isPlayer ? 'text-cyan-300' : 'text-zinc-300')}>
-          {isPlayer ? t('you') : name}
-        </p>
-        {runScore !== undefined && (
-          <p className='text-[11px] tabular-nums text-zinc-500'>{t('this_run', { score: runScore.toLocaleString() })}</p>
-        )}
-      </div>
-
-      <div className='shrink-0 text-right'>
-        <span className={cn('block text-base font-bold tabular-nums', isPlayer ? 'text-cyan-400' : 'text-zinc-200')}>
-          {score.toLocaleString()}
-        </span>
-        {bpm !== undefined && <span className='text-[11px] font-semibold tabular-nums text-zinc-500'>{bpm} BPM</span>}
-      </div>
-    </div>
+    <RankRow
+      place={rank}
+      nick={isPlayer ? t('you') : name || t('player')}
+      avatarUrl={avatar}
+      profileId={userId}
+      isCurrentUser={isPlayer}
+      score={score.toLocaleString()}
+      scoreLabel={bpm !== undefined ? `${bpm} BPM` : undefined}
+      meta={
+        runScore !== undefined ? (
+          <span className='tabular-nums'>{t('this_run', { score: runScore.toLocaleString() })}</span>
+        ) : undefined
+      }
+      density='compact'
+      surface='bare'
+    />
   );
 }
 
@@ -118,9 +97,9 @@ function ExerciseStanding({
         <DeltaChip run={run} />
       </div>
 
-      <div className='space-y-2'>
+      <ol className='flex flex-col gap-1'>
         {above.map((entry) => (
-          <StandingRow key={entry.userId} rank={entry.rank} name={entry.displayName} avatar={entry.avatar} score={entry.score} bpm={entry.bpm} />
+          <StandingRow key={entry.userId} rank={entry.rank} name={entry.displayName} avatar={entry.avatar} score={entry.score} userId={entry.userId} bpm={entry.bpm} />
         ))}
 
         <StandingRow
@@ -136,20 +115,20 @@ function ExerciseStanding({
         />
 
         {below.map((entry) => (
-          <StandingRow key={entry.userId} rank={entry.rank} name={entry.displayName} avatar={entry.avatar} score={entry.score} bpm={entry.bpm} />
+          <StandingRow key={entry.userId} rank={entry.rank} name={entry.displayName} avatar={entry.avatar} score={entry.score} userId={entry.userId} bpm={entry.bpm} />
         ))}
-      </div>
+      </ol>
     </div>
   );
 }
 
 function StandingSkeleton() {
   return (
-    <div className='animate-pulse'>
-      <div className='mb-4 h-3.5 w-48 rounded bg-zinc-800/60' />
+    <div aria-busy='true'>
+      <Skeleton className='mb-4 h-3.5 w-48' />
       <div className='space-y-2'>
         {[0, 1, 2].map((row) => (
-          <div key={row} className='h-14 rounded-lg bg-zinc-800/30' />
+          <Skeleton key={row} className='h-14 rounded-lg' />
         ))}
       </div>
     </div>
@@ -195,11 +174,17 @@ export const SessionLeaderboardCard = ({ runs, className }: SessionLeaderboardCa
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className={cn('rounded-lg bg-zinc-900/40 p-7 md:p-8', className)}>
-      <div className='mb-6 flex items-center gap-2'>
-        <Trophy className='h-4 w-4 text-amber-500' aria-hidden />
-        <h3 className='text-sm font-semibold text-zinc-300'>{t('where_you_stand')}</h3>
-      </div>
+      className={cn('rounded-lg bg-zinc-800/40 p-7 md:p-8', className)}>
+      <SectionHeader
+        as='h3'
+        title={
+          <span className='flex items-center gap-2'>
+            <Trophy className='h-4 w-4 text-amber-500' aria-hidden />
+            {t('where_you_stand')}
+          </span>
+        }
+        className='mb-6'
+      />
 
       <div className='space-y-10'>
         {isLoading

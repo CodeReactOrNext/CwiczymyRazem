@@ -267,7 +267,7 @@ const JourneyView: React.FC = () => {
   }
 
   return (
-    <div className="relative h-full min-h-screen bg-zinc-950 overflow-x-hidden">
+    <div className="relative h-full min-h-screen overflow-x-hidden">
       <JourneyPath
         module={activeModule}
         openStepId={openStepId}

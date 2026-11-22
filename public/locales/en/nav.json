@@ -136,6 +136,9 @@
     },
     "summary": {
       "label": "Milestones"
+    },
+    "goals": {
+      "label": "Goals"
     }
   },
   "language_wip": "Translations are a work in progress — some parts may still be in English.",

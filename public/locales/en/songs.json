@@ -186,6 +186,7 @@
     "mastered": "Mastered",
     "total": "Total",
     "time_spent": "Time spent",
+    "chart_title": "Song practice",
     "master_more": "Master more songs to evaluate your level."
   },
   "board": {
@@ -369,5 +370,6 @@
     "board_empty_hint": "Add songs from the library to practice them and track your progress here.",
     "explore_library": "Explore library",
     "filter_by_tier": "Filter by Tier"
-  }
+  },
+  "points_delta": "({{points}} pts)"
 }

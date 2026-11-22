@@ -101,7 +101,7 @@ describe("countWrite", () => {
         day,
         "exercise",
       ),
-    ).toEqual({ refused: expect.stringMatching(/10 new exercises/) });
+    ).toEqual({ refused: expect.stringMatching(/20 new exercises/) });
   });
 });
 

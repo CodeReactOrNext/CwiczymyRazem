@@ -19,7 +19,7 @@ interface UserHeaderProps {
 // the user from the store themselves.
 const UserHeader = (_props: UserHeaderProps) => {
   return (
-    <header className='sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 shadow-lg backdrop-blur-xl'>
+    <header className='sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-xl'>
       <div className='relative w-full'>
         <div className='flex items-center justify-between px-4 py-2.5 sm:px-6 lg:px-8'>
           {/* Left Section - Level & Progress */}
@@ -55,9 +55,6 @@ const UserHeader = (_props: UserHeaderProps) => {
             </div>
         </div>
       </div>
-
-      {/* Bottom subtle shadow */}
-      <div className='absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-zinc-700/20 to-transparent'></div>
     </header>
   );
 };

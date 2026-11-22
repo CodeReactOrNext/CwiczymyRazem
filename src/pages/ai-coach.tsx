@@ -1,3 +1,4 @@
+import { PageShell } from "components/PageShell/PageShell";
 import AiCoachView from "feature/aiCoach/view/AiCoachView";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
@@ -48,11 +49,11 @@ const AiCoachPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="bg-second-600 flex min-h-screen flex-col overflow-visible rounded-lg">
+    <PageShell>
       <PremiumGate feature="ai-coach" requiredPlan="master">
         <AiCoachView />
       </PremiumGate>
-    </div>
+    </PageShell>
   );
 };
 

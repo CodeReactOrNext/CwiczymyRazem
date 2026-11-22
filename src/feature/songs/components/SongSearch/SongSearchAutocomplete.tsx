@@ -1,5 +1,5 @@
-import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
 import { useSongSuggestions } from "feature/songs/hooks/useSongSuggestions";
 import type {
   SongSuggestion,
@@ -89,12 +89,11 @@ export const SongSearchAutocomplete = ({
   };
 
   return (
-    <div ref={containerRef} className={cn("group relative", className)}>
-      <div className='pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4'>
-        <Icon className='h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-white' />
-      </div>
-      <Input
+    <div ref={containerRef} className={cn("relative", className)}>
+      <SearchInput
+        icon={Icon}
         placeholder={placeholder}
+        aria-label={placeholder}
         value={value}
         autoComplete='off'
         onChange={(event) => {
@@ -107,11 +106,10 @@ export const SongSearchAutocomplete = ({
           setHighlightedIndex(-1);
         }}
         onKeyDown={handleKeyDown}
-        className='h-12 w-full border-none bg-zinc-900/60 pl-11 font-medium text-white transition-all placeholder:text-zinc-400 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10'
       />
 
       {showDropdown && (
-        <div className='absolute left-0 right-0 top-[calc(100%+0.5rem)] z-40 max-h-80 space-y-1 overflow-y-auto rounded-lg bg-zinc-900 p-2 duration-fast animate-in fade-in-0 slide-in-from-top-1'>
+        <div className='absolute left-0 right-0 top-[calc(100%+0.5rem)] z-40 max-h-80 space-y-1 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-900 p-2 duration-fast animate-in fade-in-0 slide-in-from-top-1'>
           {isLoading && suggestions.length === 0 ? (
             <div className='flex items-center justify-center gap-2 px-3 py-4 text-sm text-zinc-500'>
               <Loader2 className='h-4 w-4 animate-spin' />

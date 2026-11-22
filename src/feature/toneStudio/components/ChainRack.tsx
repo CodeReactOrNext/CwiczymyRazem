@@ -191,7 +191,7 @@ export const ChainRack = ({
                 {chainBlockLabel(block, params, t)}
               </span>
             </span>
-            <span className='font-mono relative truncate text-[10px] text-zinc-500'>
+            <span className='font-mono relative truncate text-[11px] text-zinc-500'>
               {SUMMARY[block.key](params, t, namModelName, irName)}
             </span>
           </button>

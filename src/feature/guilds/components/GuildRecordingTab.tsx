@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { FameCoin } from "feature/arsenal/components/Workshop/FameCoin";
 import type {
   RecordingContract,
@@ -158,7 +159,7 @@ const Panes = ({ panes }: { panes: Pane[] }) => {
 
   return (
     <div className='space-y-6'>
-      <div role='tablist' className='flex flex-wrap gap-2'>
+      <div role='tablist' className={tabNavListClass}>
         {panes.map((pane) => {
           const selected = pane.id === open.id;
           return (
@@ -168,12 +169,7 @@ const Panes = ({ panes }: { panes: Pane[] }) => {
               role='tab'
               aria-selected={selected}
               onClick={() => setOpenId(pane.id)}
-              className={cn(
-                "rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                selected
-                  ? "bg-zinc-800/60 text-zinc-100"
-                  : "bg-zinc-900/40 text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200",
-              )}>
+              className={tabNavItemClass(selected)}>
               {pane.label}
             </button>
           );
@@ -289,7 +285,7 @@ const LastSession = ({
   const contract = getRecordingContract(last.contractId);
   if (!contract) return null;
   return (
-    <section className='flex items-center gap-4 rounded-lg bg-zinc-900/40 p-4 sm:p-5'>
+    <section className='flex items-center gap-4 rounded-lg bg-zinc-800/40 p-4 sm:p-5'>
       <Cover contract={contract} className='h-16 w-16 shrink-0' />
       <div className='min-w-0 space-y-1'>
         <p className='text-sm text-zinc-400'>
@@ -339,7 +335,7 @@ const RoomShare = ({
   const { t } = useTranslation("guilds");
   const studioText = useStudioText();
   return (
-    <section className='space-y-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+    <section className='space-y-5 rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
       <div className='flex flex-wrap items-start justify-between gap-4'>
         <div className='max-w-xl space-y-1'>
           <h3 className='font-display text-lg font-bold text-zinc-100'>
@@ -503,7 +499,7 @@ const TierStage = ({ state, bank, busy, onBook }: TierStageProps) => {
   const short = state.fee - bank;
 
   return (
-    <section className='overflow-hidden rounded-lg bg-zinc-900/40'>
+    <section className='overflow-hidden rounded-lg bg-zinc-800/40'>
       <div className='grid lg:min-h-[30rem] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]'>
         <div className='relative h-56 sm:h-72 lg:h-auto'>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -590,7 +586,8 @@ const TierStage = ({ state, bank, busy, onBook }: TierStageProps) => {
                 <Button
                   disabled={busy || short > 0}
                   onClick={onBook}
-                  className='h-14 min-w-56 gap-3 bg-white px-10 text-lg text-zinc-950 shadow-none hover:bg-zinc-200 [&_svg]:size-5'>
+                  size='xl'
+                  className='min-w-56'>
                   <Mic aria-hidden />
                   {t("recording.book_session")}
                 </Button>
@@ -675,7 +672,7 @@ const TierSelect = ({
 const ClientPool = () => {
   const { t } = useTranslation("guilds");
   return (
-    <section className='space-y-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+    <section className='space-y-5 rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
       <div className='max-w-2xl space-y-1'>
         <h3 className='font-display text-lg font-bold text-zinc-100'>
           {t("recording.pool_title")}
@@ -806,7 +803,7 @@ const SessionStage = ({ session, contract }: SessionStageProps) => {
   const [now] = useState(() => Date.now());
 
   return (
-    <section className='overflow-hidden rounded-lg bg-zinc-900/40'>
+    <section className='overflow-hidden rounded-lg bg-zinc-800/40'>
       <div className='grid lg:min-h-[30rem] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]'>
         <div className='relative h-64 sm:h-80 lg:h-auto'>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -894,7 +891,7 @@ const ClientMood = ({
   const mood = session.mood ?? "waiting";
 
   return (
-    <section className='flex flex-col gap-8 rounded-lg bg-zinc-900/40 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between'>
+    <section className='flex flex-col gap-8 rounded-lg bg-zinc-800/40 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between'>
       <div className='min-w-0 max-w-2xl space-y-3'>
         <p className='text-sm text-zinc-400'>
           {t("recording.client_title", { client: contract.client })}
@@ -1087,7 +1084,7 @@ const Session = ({
   // The parts are where a member acts, so they are what the tab opens on
   // under the stage; how it is going is one tap away.
   const record = (
-    <section className='space-y-8 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+    <section className='space-y-8 rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
       <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2'>
         <h3 className='font-display text-lg font-bold text-zinc-100'>
           {t("recording.parts_title")}
@@ -1117,7 +1114,7 @@ const Session = ({
   );
 
   const crew = (
-    <section className='grid gap-10 rounded-lg bg-zinc-900/40 p-5 sm:p-6 lg:grid-cols-2'>
+    <section className='grid gap-10 rounded-lg bg-zinc-800/40 p-5 sm:p-6 lg:grid-cols-2'>
       <div className='space-y-5'>
         <h3 className='font-display text-lg font-bold text-zinc-100'>
           {t("recording.recent_title")}

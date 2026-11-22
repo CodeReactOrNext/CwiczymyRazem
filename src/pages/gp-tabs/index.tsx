@@ -13,8 +13,12 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { Input } from "assets/components/ui/input";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { PAGE_CONTENT, PageShell } from "components/PageShell/PageShell";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import type {
   Exercise,
@@ -23,6 +27,7 @@ import type {
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
 import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
+import { SongThumb } from "feature/songs/components/SongRow/SongRow";
 import {
   GP_EXTENSIONS,
   isGpFile,
@@ -623,7 +628,7 @@ const GpTabsPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="bg-second-600 rounded-lg overflow-visible flex flex-col border-none shadow-sm min-h-screen">
+    <PageShell>
       <HeroBanner
         title={t("gp.title")}
         subtitle={t("gp.subtitle")}
@@ -636,7 +641,6 @@ const GpTabsPage: NextPageWithLayout = () => {
           />
         }
         backgroundContent={<HeroPattern variant="tabs" />}
-        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
         buttonText={t("gp.upload")}
         onClick={openFilePicker}
       />
@@ -653,7 +657,7 @@ const GpTabsPage: NextPageWithLayout = () => {
       <div>
 
       <div
-        className="px-4 md:px-8 pb-8 space-y-4"
+        className={cn("space-y-4", PAGE_CONTENT)}
         onDragOver={(e) => {
           // Only react to OS file drags — internal file-row drags (move to
           // folder) must not trigger the upload backdrop.
@@ -669,7 +673,7 @@ const GpTabsPage: NextPageWithLayout = () => {
       >
         {/* Folder navigation */}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2 text-sm font-semibold tracking-wide">
+          <div className="flex flex-wrap items-center gap-2 text-sm font-semibold">
             <button
               onClick={() => setCurrentFolderId(null)}
               {...makeFolderDropHandlers(null)}
@@ -718,9 +722,9 @@ const GpTabsPage: NextPageWithLayout = () => {
               <Button
                 onClick={() => setShowNewFolderDialog(true)}
                 variant="ghost"
-                className="h-9 px-4 rounded-lg text-xs font-bold bg-zinc-800/60 text-zinc-200 hover:bg-zinc-700/60 hover:text-white"
+                className="bg-zinc-800/60 text-zinc-200 hover:bg-zinc-700/60 hover:text-white"
               >
-                <FolderPlus className="h-4 w-4" />
+                <FolderPlus />
                 {t("gp.new_folder")}
               </Button>
             )}
@@ -772,34 +776,36 @@ const GpTabsPage: NextPageWithLayout = () => {
 
         {/* Folders + file list */}
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-24 text-zinc-600">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="text-xs font-bold capitalize tracking-widest">
-              {t("gp.loading")}
-            </span>
+          <div className="space-y-3" aria-busy="true">
+            <span className="sr-only">{t("gp.loading")}</span>
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-lg bg-zinc-800/40 p-4">
+                <Skeleton className="h-10 w-10 shrink-0 rounded" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-3 w-1/3" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : visibleFolders.length === 0 && visibleFiles.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-24 rounded-lg bg-zinc-900/40">
-            <FolderOpen className="h-12 w-12 text-zinc-600 opacity-40" />
-            <div className="text-center space-y-1">
-              <p className="text-sm font-bold capitalize tracking-widest text-zinc-500">
-                {currentFolder ? t("gp.folder_empty") : t("gp.no_files")}
-              </p>
-              <p className="text-xs text-zinc-600">
-                {atFileCap
-                  ? t("gp.limit_short", { max: MAX_USER_GP_FILES })
-                  : t("gp.empty_hint")}
-              </p>
-            </div>
-            <Button
-              onClick={openFilePicker}
-              disabled={atFileCap}
-              className="mt-2 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 h-10 px-6 rounded-lg text-xs font-bold capitalize tracking-widest"
-            >
-              <Upload className="h-3.5 w-3.5" />
-              {t("gp.upload_gp")}
-            </Button>
-          </div>
+          // An empty folder gets a plain icon; an empty library gets Kostek.
+          <EmptyState
+            mood='wait'
+            icon={currentFolder ? <FolderOpen /> : undefined}
+            title={currentFolder ? t("gp.folder_empty") : t("gp.no_files")}
+            description={
+              atFileCap
+                ? t("gp.limit_short", { max: MAX_USER_GP_FILES })
+                : t("gp.empty_hint")
+            }
+            action={
+              <Button onClick={openFilePicker} disabled={atFileCap}>
+                <Upload />
+                {t("gp.upload_gp")}
+              </Button>
+            }
+          />
         ) : (
           <div className="space-y-3">
             {/* Folders */}
@@ -822,20 +828,23 @@ const GpTabsPage: NextPageWithLayout = () => {
                     >
                       <div className="flex items-start justify-between">
                         <Folder className="h-8 w-8 text-zinc-400" />
-                        <button
+                        <Button
+                          variant='ghost'
+                          size='icon-sm'
+                          aria-label={t("gp.delete_folder", { name: folder.name })}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteFolder(folder);
                           }}
                           disabled={isDeleting}
-                          className="opacity-0 group-hover:opacity-100 rounded p-1 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 transition-all"
+                          className="text-zinc-400 opacity-0 transition-opacity hover:text-red-400 focus-visible:opacity-100 group-hover:opacity-100"
                         >
                           {isDeleting ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            <Loader2 className="animate-spin" />
                           ) : (
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 />
                           )}
-                        </button>
+                        </Button>
                       </div>
                       <p className="text-sm font-bold text-white truncate">{folder.name}</p>
                       <p className="text-xs text-zinc-400">
@@ -874,19 +883,12 @@ const GpTabsPage: NextPageWithLayout = () => {
                     )}
 
                     {/* Icon */}
-                    <div className="flex-shrink-0 h-11 w-11 rounded-lg overflow-hidden">
-                      {linked[0]?.coverUrl ? (
-                        <img
-                          src={linked[0].coverUrl}
-                          alt={linked[0].title}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full rounded-lg bg-zinc-800 flex items-center justify-center">
-                          <FileMusic className="h-5 w-5 text-zinc-400" />
-                        </div>
-                      )}
-                    </div>
+                    <SongThumb
+                      size="sm"
+                      coverUrl={linked[0]?.coverUrl}
+                      alt={linked[0]?.title}
+                      fallbackIcon={FileMusic}
+                    />
 
                     {/* Info */}
                     <div className="min-w-0 flex-1">
@@ -912,13 +914,13 @@ const GpTabsPage: NextPageWithLayout = () => {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            size="sm"
-                            variant="ghost"
+                            size='icon'
+                            variant='ghost'
                             disabled={folders.length === 0}
-                            className="h-9 w-9 p-0 rounded-lg text-zinc-600 hover:text-cyan-400 hover:bg-cyan-400/10"
+                            className="text-zinc-400"
                             aria-label={t("gp.move_to_folder")}
                           >
-                            <FolderOpen className="h-3.5 w-3.5" />
+                            <FolderOpen />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -940,31 +942,34 @@ const GpTabsPage: NextPageWithLayout = () => {
                         </DropdownMenuContent>
                       </DropdownMenu>
                       <Button
-                        size="sm"
-                        variant="ghost"
+                        size='icon'
+                        variant='ghost'
+                        aria-label={t("gp.delete_file", { name: file.name })}
                         onClick={() => handleDelete(file)}
                         disabled={isDeleting || !!loadingFileId}
-                        className="h-9 w-9 p-0 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-red-400/10"
+                        className="text-zinc-400 hover:text-red-400"
                       >
                         {isDeleting ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          <Loader2 className="animate-spin" />
                         ) : (
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Trash2 />
                         )}
                       </Button>
-                      <button
+                      <Button
                         type="button"
+                        variant='ghost'
+                        size='icon'
                         aria-label={t("gp.practice_file", { name: file.name })}
                         onClick={() => handleLoadForPractice(file)}
                         disabled={!!loadingFileId}
-                        className="click-behavior flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/5 text-zinc-200 transition-background hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                        className="shrink-0"
                       >
                         {isThisLoading ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="animate-spin" />
                         ) : (
-                          <Play className="h-4 w-4 fill-current" />
+                          <Play className="fill-current" />
                         )}
-                      </button>
+                      </Button>
                     </div>
                   </div>
 
@@ -975,13 +980,13 @@ const GpTabsPage: NextPageWithLayout = () => {
                         <Link
                           key={song.songId}
                           href={`/songs/practice/${song.songId}`}
-                          className="flex items-center gap-1.5 pl-1 pr-3 py-1 rounded bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold capitalize tracking-wider hover:bg-orange-500/20 transition-colors"
+                          className="flex items-center gap-1.5 pl-1 pr-3 py-1 rounded bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[11px] font-bold hover:bg-orange-500/20 transition-colors"
                         >
                           {song.coverUrl ? (
                             <img
                               src={song.coverUrl}
                               alt={song.title}
-                              className="h-5 w-5 rounded-full object-cover flex-shrink-0"
+                              className="h-5 w-5 rounded object-cover flex-shrink-0"
                             />
                           ) : (
                             <Music2 className="h-3 w-3" />
@@ -1022,7 +1027,6 @@ const GpTabsPage: NextPageWithLayout = () => {
               onClick={handleCreateFolder}
               loading={isCreatingFolder}
               disabled={!newFolderName.trim()}
-              className="bg-cyan-500 text-black font-bold hover:bg-cyan-400"
             >
               {t("gp.create")}
             </Button>
@@ -1044,7 +1048,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             {/* Header */}
             <div className="flex items-start justify-between">
               <div className="space-y-1">
-                <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
+                <p className="text-xs font-medium text-zinc-400">
                   {t("gp.session_setup")}
                 </p>
                 <h2 className="text-lg font-bold text-white leading-tight truncate max-w-[280px]">
@@ -1054,95 +1058,75 @@ const GpTabsPage: NextPageWithLayout = () => {
                   {staged.parsed.tracks[staged.selectedTrackIndex].name} · {staged.parsed.tempo} BPM
                 </p>
               </div>
-              <button
+              <Button
+                variant='ghost'
+                size='icon'
+                aria-label='Close'
                 onClick={() => setShowConfigModal(false)}
-                className="text-zinc-600 hover:text-white transition-colors mt-0.5"
+                className="shrink-0"
               >
-                <X className="h-5 w-5" />
-              </button>
+                <X />
+              </Button>
             </div>
 
             {/* Track selector */}
             {staged.parsed.tracks.length > 1 && (
               <div className="space-y-3">
-                <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
+                <p className="text-xs font-semibold text-zinc-400">
                   {t("gp.track")}
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {staged.parsed.tracks.map((track, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleTrackSelect(idx)}
-                      className={cn(
-                        "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold capitalize tracking-wider transition-colors",
-                        staged.selectedTrackIndex === idx
-                          ? "border border-zinc-100/50 bg-zinc-100/10 text-zinc-100"
-                          : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
-                      )}
-                    >
-                      <TrackTypeIcon type={track.trackType} />
-                      {track.name}
-                    </button>
-                  ))}
-                </div>
+                <SegmentedControl
+                  label={t("gp.track")}
+                  selected={[String(staged.selectedTrackIndex)]}
+                  onSelect={(idx) => handleTrackSelect(Number(idx))}
+                  options={staged.parsed.tracks.map((track, idx) => ({
+                    value: String(idx),
+                    label: track.name,
+                    icon: <TrackTypeIcon type={track.trackType} />,
+                  }))}
+                />
               </div>
             )}
 
             {/* Time mode toggle */}
             <div className="space-y-3">
-              <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
+              <p className="text-xs font-semibold text-zinc-400">
                 {t("gp.time_mode")}
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => setConfigFreeMode(false)}
-                  className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-lg text-sm font-bold transition-colors",
-                    !configFreeMode
-                      ? "border border-zinc-100/50 bg-zinc-100/10 text-zinc-100"
-                      : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
-                  )}
-                >
-                  <Clock className="h-5 w-5" />
-                  {t("gp.time_limit")}
-                </button>
-                <button
-                  onClick={() => setConfigFreeMode(true)}
-                  className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-lg text-sm font-bold transition-colors",
-                    configFreeMode
-                      ? "border border-zinc-100/50 bg-zinc-100/10 text-zinc-100"
-                      : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
-                  )}
-                >
-                  <Infinity className="h-5 w-5" />
-                  {t("gp.no_limit")}
-                </button>
-              </div>
+              <SegmentedControl
+                label={t("gp.time_mode")}
+                selected={[configFreeMode ? "free" : "limit"]}
+                onSelect={(mode) => setConfigFreeMode(mode === "free")}
+                options={[
+                  {
+                    value: "limit",
+                    label: t("gp.time_limit"),
+                    icon: <Clock className="h-4 w-4 shrink-0" />,
+                  },
+                  {
+                    value: "free",
+                    label: t("gp.no_limit"),
+                    icon: <Infinity className="h-4 w-4 shrink-0" />,
+                  },
+                ]}
+              />
             </div>
 
             {/* Time presets — only when time limit mode */}
             {!configFreeMode && (
               <div className="space-y-3 animate-in fade-in duration-base">
-                <p className="text-[10px] font-bold capitalize tracking-widest text-zinc-500">
+                <p className="text-xs font-semibold text-zinc-400">
                   {t("gp.duration")}
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {TIME_PRESETS.map((min) => (
-                    <button
-                      key={min}
-                      onClick={() => setConfigTimeMinutes(min)}
-                      className={cn(
-                        "px-4 py-2 rounded-lg text-xs font-bold capitalize tracking-wider transition-colors",
-                        configTimeMinutes === min
-                          ? "border border-zinc-100/50 bg-zinc-100/10 text-zinc-100"
-                          : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300"
-                      )}
-                    >
-                      {t("gp.minutes", { count: min })}
-                    </button>
-                  ))}
-                </div>
+                <SegmentedControl
+                  label={t("gp.duration")}
+                  selected={[String(configTimeMinutes)]}
+                  onSelect={(min) => setConfigTimeMinutes(Number(min))}
+                  options={TIME_PRESETS.map((min) => ({
+                    value: String(min),
+                    label: t("gp.minutes", { count: min }),
+                  }))}
+                />
               </div>
             )}
 
@@ -1152,7 +1136,8 @@ const GpTabsPage: NextPageWithLayout = () => {
                 startSession({ freeMode: configFreeMode, timeInMinutes: configTimeMinutes })
               }
               loading={isStarting}
-              className="w-full h-12 rounded-lg bg-white text-zinc-950 font-bold hover:bg-zinc-100 transition-colors"
+              size="lg"
+              className="w-full"
             >
               <span>{t("gp.start")}</span>
               <Zap className={cn("h-4 w-4 fill-current", isStarting && "hidden")} />
@@ -1160,7 +1145,7 @@ const GpTabsPage: NextPageWithLayout = () => {
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 };
 

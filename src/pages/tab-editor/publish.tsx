@@ -1,12 +1,17 @@
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
+import { Input } from "assets/components/ui/input";
+import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
+import { PageTitle } from "components/PageTitle/PageTitle";
 import {
   createCommunityExercise,
   getCommunityExerciseById,
   updateCommunityExercise,
 } from "feature/communityExercises/services/communityExerciseService";
 import type { CreateCommunityExerciseInput } from "feature/communityExercises/types";
+import { getCategoryChipColor } from "feature/exercisePlan/constants/categoryChip";
 import type {
   DifficultyLevel,
   ExerciseCategory,
@@ -88,13 +93,15 @@ const SKILL_GROUPS: { category: string; label: string }[] = [
   { category: "creativity", label: "Creativity" },
 ];
 
+// Input / Textarea get the base field; this adds the taller row and the error ring.
 const fieldClass = (hasError?: boolean) =>
-  cn(
-    "w-full rounded-lg bg-zinc-950/60 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-cyan-500/60",
-    hasError && "ring-1 ring-rose-500/60",
-  );
+  cn("h-11 px-4", hasError && "ring-1 ring-rose-500/60 focus-visible:ring-rose-500/60");
 
-const labelClass = "text-xs font-bold tracking-wide text-zinc-500";
+// The native <select> matches the base field by hand.
+const selectClass =
+  "h-11 w-full rounded-lg bg-zinc-800/60 px-4 text-sm text-zinc-100 outline-none transition-colors hover:bg-zinc-800/80 focus-visible:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-zinc-500";
+
+const labelClass = "text-xs font-medium text-zinc-400";
 
 function FormSection({
   title,
@@ -108,7 +115,7 @@ function FormSection({
   error?: string;
 }) {
   return (
-    <section className='space-y-3 rounded-lg bg-zinc-900/40 p-6'>
+    <section className='space-y-3 rounded-lg bg-zinc-800/40 p-6'>
       <div className='space-y-1'>
         <h2 className='text-sm font-bold text-zinc-100'>{title}</h2>
         {description && <p className='text-xs text-zinc-500'>{description}</p>}
@@ -353,12 +360,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   isEditing ? "/my-exercises" : "/profile/skills?tab=community",
                 )
               }
-              className={cn(
-                "shadow-none",
-                isPublic
-                  ? "bg-emerald-500 text-black hover:bg-emerald-400"
-                  : "bg-cyan-500 text-black hover:bg-cyan-400",
-              )}>
+              size='lg'>
               {isEditing
                 ? t("my_exercises.back")
                 : isPublic
@@ -368,6 +370,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
             {!hasGpFile && (
               <Button
                 variant='secondary'
+                size='lg'
                 onClick={() => router.push(editorHref)}>
                 {t("publish.back_editor")}
               </Button>
@@ -392,14 +395,12 @@ const PublishExercisePage: NextPageWithLayout = () => {
             }
             onClick={() => router.push(backHref)}
           />
-          <div>
-            <h1 className='text-3xl font-black tracking-tight text-zinc-100'>
-              {isEditing ? t("publish.edit_title") : t("publish.title")}
-            </h1>
-            <p className='mt-1 text-sm leading-relaxed text-zinc-400'>
-              {isEditing ? t("publish.edit_subtitle") : t("publish.subtitle")}
-            </p>
-          </div>
+          <PageTitle
+            title={isEditing ? t("publish.edit_title") : t("publish.title")}
+            subtitle={
+              isEditing ? t("publish.edit_subtitle") : t("publish.subtitle")
+            }
+          />
         </div>
 
         <div className='grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start'>
@@ -437,7 +438,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                       className='h-[220px]'
                     />
                   </div>
-                  <p className='text-xs text-zinc-600'>
+                  <p className='text-xs text-zinc-500'>
                     {t("publish.measures_loaded", { count: tablature.length })}
                   </p>
                 </div>
@@ -464,11 +465,11 @@ const PublishExercisePage: NextPageWithLayout = () => {
                     {t("publish.title_label")}{" "}
                     <span className='text-rose-500'>*</span>
                   </label>
-                  <span className='text-[10px] tabular-nums text-zinc-600'>
+                  <span className='text-[11px] tabular-nums text-zinc-500'>
                     {title.length}/100
                   </span>
                 </div>
-                <input
+                <Input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={t("publish.title_placeholder")}
@@ -486,11 +487,11 @@ const PublishExercisePage: NextPageWithLayout = () => {
                     {t("publish.description_label")}{" "}
                     <span className='text-rose-500'>*</span>
                   </label>
-                  <span className='text-[10px] tabular-nums text-zinc-600'>
+                  <span className='text-[11px] tabular-nums text-zinc-500'>
                     {description.length}/500
                   </span>
                 </div>
-                <textarea
+                <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={t("publish.description_placeholder")}
@@ -498,7 +499,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   maxLength={500}
                   className={cn(
                     fieldClass(!!errors.description),
-                    "resize-none",
+                    "h-auto resize-none py-3",
                   )}
                 />
                 {errors.description && (
@@ -515,7 +516,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                       onChange={(e) =>
                         setCategory(e.target.value as ExerciseCategory)
                       }
-                      className={cn(fieldClass(), "appearance-none")}>
+                      className={cn(selectClass, "appearance-none")}>
                       {CATEGORIES.map((c) => (
                         <option key={c.value} value={c.value}>
                           {categoryName(c.value)}
@@ -565,7 +566,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                 <label className={labelClass}>
                   {t("publish.time_label")}
                 </label>
-                <input
+                <Input
                   type='number'
                   min={1}
                   max={60}
@@ -595,16 +596,16 @@ const PublishExercisePage: NextPageWithLayout = () => {
                     ] as const
                   ).map((f) => (
                     <div key={f.label} className='space-y-1'>
-                      <label className='text-[10px] font-bold text-zinc-600'>
+                      <label className='text-xs font-medium text-zinc-400'>
                         {f.label}
                       </label>
-                      <input
+                      <Input
                         type='number'
                         min={20}
                         max={300}
                         value={f.value}
                         onChange={(e) => f.set(parseInt(e.target.value) || 60)}
-                        className={cn(fieldClass(!!errors.bpm), "py-2")}
+                        className={cn(fieldClass(!!errors.bpm), "h-9")}
                       />
                     </div>
                   ))}
@@ -628,7 +629,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   if (groupSkills.length === 0) return null;
                   return (
                     <div key={group.category} className='space-y-2'>
-                      <span className='text-[11px] font-semibold text-zinc-600'>
+                      <span className='text-[11px] font-semibold text-zinc-500'>
                         {categoryName(group.category)}
                       </span>
                       <div className='flex flex-wrap gap-2'>
@@ -663,10 +664,10 @@ const PublishExercisePage: NextPageWithLayout = () => {
               <div className='space-y-3'>
                 {instructions.map((inst, idx) => (
                   <div key={idx} className='flex items-start gap-2'>
-                    <span className='mt-3 w-5 text-center text-xs font-bold text-zinc-600'>
+                    <span className='mt-3 w-5 text-center text-xs font-bold text-zinc-500'>
                       {idx + 1}.
                     </span>
-                    <input
+                    <Input
                       value={inst}
                       onChange={(e) =>
                         updateListItem(
@@ -677,17 +678,19 @@ const PublishExercisePage: NextPageWithLayout = () => {
                         )
                       }
                       placeholder={t("publish.step_n", { n: idx + 1 })}
-                      className={cn(fieldClass(), "flex-1 py-2.5")}
+                      className={cn(fieldClass(), "h-10")}
                     />
-                    <button
+                    <Button
+                      variant='ghost'
+                      size='icon'
                       onClick={() =>
                         removeListItem(instructions, setInstructions, idx)
                       }
                       aria-label={t("publish.remove_step")}
-                      className='mt-2 p-1.5 text-zinc-600 transition-colors hover:text-rose-400'
+                      className='mt-1 shrink-0 text-zinc-400 hover:text-rose-400'
                       disabled={instructions.length === 1}>
-                      <Trash2 size={14} />
-                    </button>
+                      <Trash2 />
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -706,24 +709,26 @@ const PublishExercisePage: NextPageWithLayout = () => {
               <div className='space-y-3'>
                 {tips.map((tip, idx) => (
                   <div key={idx} className='flex items-start gap-2'>
-                    <span className='mt-3 w-5 text-center text-xs font-bold text-zinc-600'>
+                    <span className='mt-3 w-5 text-center text-xs font-bold text-zinc-500'>
                       ·
                     </span>
-                    <input
+                    <Input
                       value={tip}
                       onChange={(e) =>
                         updateListItem(tips, setTips, idx, e.target.value)
                       }
                       placeholder={t("publish.tip_n", { n: idx + 1 })}
-                      className={cn(fieldClass(), "flex-1 py-2.5")}
+                      className={cn(fieldClass(), "h-10")}
                     />
-                    <button
+                    <Button
+                      variant='ghost'
+                      size='icon'
                       onClick={() => removeListItem(tips, setTips, idx)}
                       aria-label={t("publish.remove_tip")}
-                      className='mt-2 p-1.5 text-zinc-600 transition-colors hover:text-rose-400'
+                      className='mt-1 shrink-0 text-zinc-400 hover:text-rose-400'
                       disabled={tips.length === 1}>
-                      <Trash2 size={14} />
-                    </button>
+                      <Trash2 />
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -819,7 +824,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
           {/* Summary rail — live preview of the listing, readiness checklist and
             the submit action, always in view on desktop instead of 2000px down. */}
           <aside className='space-y-4 pb-16 lg:sticky lg:top-24'>
-            <div className='space-y-5 rounded-lg bg-zinc-900/40 p-5'>
+            <div className='space-y-5 rounded-lg bg-zinc-800/40 p-5'>
               <div className='space-y-3'>
                 <h2 className='text-sm font-bold text-zinc-100'>
                   {t("publish.summary")}
@@ -832,22 +837,12 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   )}
                 </p>
                 <div className='flex flex-wrap items-center gap-2'>
-                  <span className='rounded bg-zinc-800 px-2 py-0.5 text-[11px] font-semibold text-zinc-300'>
+                  <Chip color={getCategoryChipColor(activeCategory?.value)} size='sm'>
                     {activeCategory && categoryName(activeCategory.value)}
-                  </span>
-                  <span
-                    className={cn(
-                      "flex items-center gap-1.5 rounded bg-zinc-800 px-2 py-0.5 text-[11px] font-semibold",
-                      activeDifficulty?.color,
-                    )}>
-                    <span
-                      className={cn(
-                        "h-1.5 w-1.5 rounded-full",
-                        activeDifficulty?.dot,
-                      )}
-                    />
+                  </Chip>
+                  <Chip color='gray' size='sm'>
                     {activeDifficulty && difficultyName(activeDifficulty.value)}
-                  </span>
+                  </Chip>
                 </div>
                 <p className='text-xs leading-relaxed text-zinc-500'>
                   {hasGpFile
@@ -882,7 +877,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
               <div className='space-y-2.5'>
                 <div className='flex items-baseline justify-between'>
                   <span className={labelClass}>{t("publish.ready")}</span>
-                  <span className='text-[10px] tabular-nums text-zinc-600'>
+                  <span className='text-[11px] tabular-nums text-zinc-500'>
                     {readyCount}/{checklist.length}
                   </span>
                 </div>
@@ -935,12 +930,8 @@ const PublishExercisePage: NextPageWithLayout = () => {
                   onClick={handleSubmit}
                   loading={isSubmitting}
                   disabled={isSubmitting || !isReady}
-                  className={cn(
-                    "w-full shadow-none",
-                    isPublic
-                      ? "bg-emerald-500 text-black hover:bg-emerald-400"
-                      : "bg-cyan-500 text-black hover:bg-cyan-400",
-                  )}>
+                  size='lg'
+                  className='w-full'>
                   {isSubmitting
                     ? isEditing
                       ? t("publish.saving")
@@ -955,6 +946,7 @@ const PublishExercisePage: NextPageWithLayout = () => {
                 </Button>
                 <Button
                   variant='secondary'
+                  size='lg'
                   onClick={() => router.push(backHref)}
                   className='w-full'>
                   {t("cancel")}

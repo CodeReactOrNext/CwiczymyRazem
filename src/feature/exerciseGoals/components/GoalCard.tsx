@@ -1,15 +1,8 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "assets/components/ui/alert-dialog";
-import { buttonVariants } from "assets/components/ui/button";
+import { Button, buttonVariants } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { ConfirmDialog } from "components/ConfirmDialog/ConfirmDialog";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { useTranslation } from "hooks/useTranslation";
 import { Pencil, Play, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -35,8 +28,7 @@ interface GoalCardProps {
   onDelete: (goalId: string) => Promise<void>;
 }
 
-const ICON_BUTTON =
-  "flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500 hover:bg-zinc-800 hover:text-zinc-200";
+const ICON_BUTTON = "text-zinc-400";
 
 /**
  * An open goal: the path of milestones up to its tempo with the current one
@@ -73,7 +65,7 @@ export const GoalCard = ({ uid, goal, onEdit, onDelete }: GoalCardProps) => {
   };
 
   return (
-    <section className='grid gap-8 rounded-lg bg-zinc-900/40 p-5 md:p-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10'>
+    <section className='grid gap-8 rounded-lg bg-zinc-800/40 p-5 md:p-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10'>
       <div className='flex min-w-0 flex-col gap-6'>
         <div className='flex items-start justify-between gap-4'>
           <div className='min-w-0'>
@@ -88,20 +80,24 @@ export const GoalCard = ({ uid, goal, onEdit, onDelete }: GoalCardProps) => {
             </p>
           </div>
           <div className='flex shrink-0 gap-1'>
-            <button
+            <Button
               type='button'
+              variant='ghost'
+              size='icon-sm'
               onClick={() => onEdit(goal)}
               aria-label={t("card.edit")}
               className={ICON_BUTTON}>
-              <Pencil className='h-4 w-4' />
-            </button>
-            <button
+              <Pencil />
+            </Button>
+            <Button
               type='button'
+              variant='ghost'
+              size='icon-sm'
               onClick={() => setIsConfirmingDelete(true)}
               aria-label={t("card.delete")}
               className={ICON_BUTTON}>
-              <Trash2 className='h-4 w-4' />
-            </button>
+              <Trash2 />
+            </Button>
           </div>
         </div>
 
@@ -167,8 +163,8 @@ export const GoalCard = ({ uid, goal, onEdit, onDelete }: GoalCardProps) => {
         <Link
           href={`/practice/goal/${goal.id}`}
           className={cn(
-            buttonVariants(),
-            "mt-auto h-11 w-full px-6 sm:w-auto sm:self-start",
+            buttonVariants({ size: "lg" }),
+            "mt-auto w-full sm:w-auto sm:self-start",
           )}>
           <Play className='h-4 w-4 fill-current' />
           {t("card.start_at", { bpm: goal.stageBpm })}
@@ -183,30 +179,18 @@ export const GoalCard = ({ uid, goal, onEdit, onDelete }: GoalCardProps) => {
           !isLoading && runs.length === 0 && "hidden lg:block",
         )}>
         <div className='mb-4 flex justify-end'>
-          <div
-            role='tablist'
-            aria-label={t("chart.metric_label")}
-            className='flex gap-1 rounded-lg bg-zinc-800/50 p-1'>
-            {CHART_METRICS.map((option) => (
-              <button
-                key={option}
-                type='button'
-                role='tab'
-                aria-selected={metric === option}
-                onClick={() => setMetric(option)}
-                className={cn(
-                  "rounded px-3 py-1.5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
-                  metric === option
-                    ? "bg-zinc-700 font-semibold text-zinc-100"
-                    : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-                )}>
-                {t(`chart.metric_${option}`)}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl
+            label={t("chart.metric_label")}
+            selected={[metric]}
+            onSelect={setMetric}
+            options={CHART_METRICS.map((option) => ({
+              value: option,
+              label: t(`chart.metric_${option}`),
+            }))}
+          />
         </div>
         {isLoading ? (
-          <div className='h-56 w-full animate-pulse rounded-lg bg-zinc-800/30' />
+          <Skeleton className='h-56 w-full rounded-lg' />
         ) : (
           <GoalRunsChart
             runs={runs}
@@ -218,36 +202,17 @@ export const GoalCard = ({ uid, goal, onEdit, onDelete }: GoalCardProps) => {
         )}
       </div>
 
-      <AlertDialog
+      <ConfirmDialog
         open={isConfirmingDelete}
-        onOpenChange={(open) => !isDeleting && setIsConfirmingDelete(open)}>
-        <AlertDialogContent className='max-w-sm gap-6 border-0 bg-zinc-900 p-6'>
-          <AlertDialogHeader className='space-y-2'>
-            <AlertDialogTitle className='text-lg font-bold text-white'>
-              {t("delete_confirm.title")}
-            </AlertDialogTitle>
-            <AlertDialogDescription className='text-sm text-zinc-400'>
-              {t("delete_confirm.body")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className='gap-2 sm:space-x-0'>
-            <AlertDialogCancel
-              disabled={isDeleting}
-              className='mt-0 border-0 bg-zinc-800 text-white hover:bg-zinc-700 hover:text-white sm:flex-1'>
-              {t("delete_confirm.cancel")}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(event) => {
-                event.preventDefault();
-                void handleDelete();
-              }}
-              disabled={isDeleting}
-              className='bg-zinc-100 text-zinc-950 hover:bg-white sm:flex-1'>
-              {t("delete_confirm.confirm")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onOpenChange={setIsConfirmingDelete}
+        title={t("delete_confirm.title")}
+        description={t("delete_confirm.body")}
+        cancelLabel={t("delete_confirm.cancel")}
+        confirmLabel={t("delete_confirm.confirm")}
+        onConfirm={handleDelete}
+        destructive
+        loading={isDeleting}
+      />
     </section>
   );
 };

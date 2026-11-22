@@ -50,6 +50,9 @@ interface UseSessionControlsOptions {
   setIsRiddleGuessed:     (v: boolean) => void;
   handleRevealRiddle:     () => void;
   saveCurrentScores:      () => Promise<void>;
+  /** Moving on before the clock ran down is an early finish for that exercise:
+   *  its scores are not saved. Left out, every exercise counts as played out. */
+  isCurrentExercisePlayedOut?: () => boolean;
   noteMatchingHandle:     RefObject<NoteMatchingHandle | null>;
   loopsCompletedRef:      { current: number };
   tabRestartKey:          number;
@@ -66,7 +69,7 @@ export function useSessionControls({
   isMicEnabled, closeAudio, updateMicPersistence,
   isAudioMuted, setIsAudioMuted, hasBacking = false, speedMultiplier, setSpeedMultiplier,
   setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
-  saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
+  saveCurrentScores, isCurrentExercisePlayedOut, noteMatchingHandle, loopsCompletedRef,
   tabRestartKey, setTabRestartKey,
   shortcutsDisabled = false,
   learnMode = false,
@@ -143,10 +146,12 @@ export function useSessionControls({
   }, [metronome, currentExercise]);
 
   const handleNextExerciseClick = useCallback(async () => {
+    // Read before stopTimer touches anything — the clock is what decides.
+    const playedOut = isCurrentExercisePlayedOut?.() ?? true;
     stopTimer(); metronome.restartMetronome();
-    await saveCurrentScores();
+    if (playedOut) await saveCurrentScores();
     handleNextExercise(resetTimer);
-  }, [stopTimer, metronome, saveCurrentScores, handleNextExercise, resetTimer]);
+  }, [stopTimer, metronome, saveCurrentScores, isCurrentExercisePlayedOut, handleNextExercise, resetTimer]);
 
   const handleMicToggle = useCallback(async () => {
     if (isMicEnabled) { closeAudio(); updateMicPersistence(false); }

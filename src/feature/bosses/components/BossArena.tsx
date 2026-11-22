@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar/Avatar";
 import { selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
@@ -682,18 +683,20 @@ const SoundToggle = ({ t, className }: { t: Translate; className?: string }) => 
   const label = t(enabled ? "arena.sounds_off" : "arena.sounds_on");
   const Icon = enabled ? Volume2 : VolumeX;
   return (
-    <button
+    <Button
       type='button'
+      variant='ghost'
+      size='icon'
       onClick={() => setEnabled(!enabled)}
       aria-pressed={enabled}
       aria-label={label}
       title={label}
       className={cn(
-        "rounded-md p-2 text-zinc-500 transition-colors duration-fast hover:bg-zinc-800/60 hover:text-zinc-200",
+        "text-zinc-400",
         className ?? "absolute right-2 top-2 z-20",
       )}>
-      <Icon className='h-4 w-4' aria-hidden />
-    </button>
+      <Icon aria-hidden />
+    </Button>
   );
 };
 

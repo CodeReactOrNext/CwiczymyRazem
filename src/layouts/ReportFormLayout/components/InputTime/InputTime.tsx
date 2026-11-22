@@ -51,7 +51,7 @@ const InputTime = ({
   const hasValue = parseInt(field.value, 10) > 0;
 
   return (
-    <div className='flex flex-col items-center font-openSans'>
+    <div className='flex flex-col items-center'>
       <motion.button
         type='button'
         onClick={() =>

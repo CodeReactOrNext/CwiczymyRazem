@@ -47,7 +47,7 @@ export const DuelStatsStrip = ({
         type='button'
         onClick={onEloClick}
         aria-label={t("strip.elo_aria", { rating: overview.rating })}
-        className='-m-2 flex flex-col items-start rounded-xl p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 hover:bg-white/5'>
+        className='-m-2 flex flex-col items-start rounded-lg p-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 hover:bg-white/5'>
         <span className='flex items-center gap-2 text-xs font-semibold text-zinc-300'>
           {t("rating.label")}
           <CircleHelp className='size-4 text-zinc-500' aria-hidden='true' />

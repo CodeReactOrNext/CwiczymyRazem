@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
 import { setColorTheme, useColorTheme } from "lib/colorTheme/colorTheme";
 import { Moon, Sun } from "lucide-react";
@@ -14,13 +15,14 @@ export const ThemeToggle = () => {
   const label = `${t("appearance.title")}: ${t(`appearance.${next}`)}`;
 
   return (
-    <button
+    <Button
       type='button'
+      variant='subtle'
+      size='icon-touch'
       onClick={() => setColorTheme(next)}
       aria-label={label}
-      title={label}
-      className='flex h-11 min-w-11 items-center justify-center rounded-[8px] bg-white/5 px-2.5 text-zinc-300 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-white/20 hover:bg-white/10 hover:text-white'>
-      <Icon className='h-[18px] w-[18px]' />
-    </button>
+      title={label}>
+      <Icon />
+    </Button>
   );
 };

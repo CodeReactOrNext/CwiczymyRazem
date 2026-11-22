@@ -5,7 +5,7 @@
 export const FundingProgressBarSkeleton = () => {
   return (
     <section
-      className='w-full animate-pulse rounded-lg bg-zinc-900/40 p-5 sm:p-6'
+      className='w-full animate-pulse rounded-lg bg-zinc-800/40 p-5 sm:p-6'
       aria-hidden>
       <div className='flex items-start justify-between gap-4'>
         <div className='space-y-2'>

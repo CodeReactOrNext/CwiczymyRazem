@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { SubmitRecordingDialog } from "feature/challenges/components/SubmitRecordingDialog";
@@ -140,14 +141,16 @@ export const MonthlyChallengeWidget = () => {
                       />
                     </span>
                   ) : (
-                    <button
+                    <Button
                       type='button'
+                      variant='ghost'
+                      size='icon-sm'
                       onClick={() => setSubmitSong(song)}
                       aria-label={t("challenge.submit_song", { title: song.title })}
                       title={t("challenge.submit")}
-                      className='flex h-8 w-8 shrink-0 items-center justify-center rounded text-zinc-500 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-800 hover:text-zinc-100'>
-                      <Plus size={16} />
-                    </button>
+                      className='shrink-0 text-zinc-400'>
+                      <Plus />
+                    </Button>
                   )}
                 </li>
               );

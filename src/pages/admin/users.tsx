@@ -1,6 +1,7 @@
 // App page outside AppLayout: register the app-only English namespaces.
 import "lib/i18n/fullCatalog";
 
+import { SearchInput } from "components/SearchInput/SearchInput";
 import AdminLogin from "feature/admin/components/AdminLogin";
 import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
 import type { SupportSearchResult } from "feature/admin/hooks/useAdminSupport";
@@ -15,7 +16,7 @@ import type {
 } from "feature/supportTeam/types/supportTeam.types";
 import { DEFAULT_SUPPORT_TITLE } from "feature/supportTeam/utils/supportTeam.utils";
 import { doc, getDoc } from "firebase/firestore";
-import { Clock, Heart, Search, Trash2, User, Users } from "lucide-react";
+import { Clock, Heart, Trash2, User, Users } from "lucide-react";
 import type { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth/next";
 import { useEffect, useState } from "react";
@@ -272,19 +273,12 @@ const AdminUsersPage = () => {
             </p>
           </div>
 
-          <div className='relative'>
-            <Search
-              size={15}
-              className='pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600'
-            />
-            <input
-              type='text'
-              value={term}
-              onChange={(e) => setTerm(e.target.value)}
-              placeholder='e.g. jenny or a user ID…'
-              className='w-full rounded-2xl border border-white/5 bg-zinc-900 py-3 pl-11 pr-4 text-sm text-zinc-200 placeholder:text-zinc-700 focus:border-amber-500/40 focus:outline-none'
-            />
-          </div>
+          <SearchInput
+            value={term}
+            onChange={(e) => setTerm(e.target.value)}
+            placeholder='e.g. jenny or a user ID…'
+            aria-label='Search users'
+          />
 
           {isSearching ? (
             <div className='space-y-2'>

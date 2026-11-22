@@ -1,3 +1,5 @@
+import { Card } from "assets/components/ui/card";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { AchievementPhysicalCard } from "feature/achievements/components/Card/AchievementPhysicalCard";
 import { achievementsMap } from "feature/achievements/data/achievementsData";
 import { achievementsRarity } from "feature/achievements/data/achievementsRarity";
@@ -43,20 +45,20 @@ export const TrophyCase = ({ trophies, isPinned, isOwner }: TrophyCaseProps) => 
   if (trophies.length === 0) return null;
 
   return (
-    <div className='rounded-2xl bg-zinc-900/30 p-6'>
-      <div className='flex flex-wrap items-end justify-between gap-2'>
-        <div>
-          <h2 className='text-2xl font-bold text-white'>{t("profile:layout.sections.trophies.title")}</h2>
-          {!isPinned && (
-            <p className='mt-1 text-sm text-zinc-400'>{t("profile:cases.rarest")}</p>
-          )}
-        </div>
-        {isOwner && !isPinned && (
-          <p className='text-xs text-zinc-500'>
-            {t("profile:cases.pin_hint")}
-          </p>
-        )}
-      </div>
+    <Card className='p-5 sm:p-6'>
+      <SectionHeader
+        title={t("profile:layout.sections.trophies.title")}
+        description={!isPinned && t("profile:cases.rarest")}
+        action={
+          isOwner &&
+          !isPinned && (
+            <p className='text-xs text-zinc-500'>
+              {t("profile:cases.pin_hint")}
+            </p>
+          )
+        }
+        className='mb-0 flex-wrap'
+      />
 
       <div className='mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5'>
         {trophies.map((id) => {
@@ -69,7 +71,7 @@ export const TrophyCase = ({ trophies, isPinned, isOwner }: TrophyCaseProps) => 
             <div
               key={id}
               title={t(description as never)}
-              className='flex flex-col items-center rounded-xl bg-zinc-800/40 px-4 pb-6 pt-8 text-center'
+              className='flex flex-col items-center rounded-lg px-4 pb-6 pt-8 text-center'
               style={{
                 backgroundImage: `radial-gradient(ellipse 75% 55% at 50% 32%, ${RARITY_LIGHT[rarity]}, transparent 75%)`,
               }}>
@@ -97,6 +99,6 @@ export const TrophyCase = ({ trophies, isPinned, isOwner }: TrophyCaseProps) => 
           );
         })}
       </div>
-    </div>
+    </Card>
   );
 };

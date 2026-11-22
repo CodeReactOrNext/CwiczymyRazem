@@ -1,3 +1,4 @@
+import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { useMemo } from "react";
@@ -74,7 +75,7 @@ export const DayTimeline = ({ sessions }: DayTimelineProps) => {
   const baselineTop = CONTAINER_HEIGHT - BASELINE_FROM_BOTTOM;
 
   return (
-    <section className="rounded-xl bg-white/[0.03] p-4 backdrop-blur-sm sm:p-5">
+    <Card className="p-5 sm:p-6">
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <h3 className="font-display text-[15px] font-semibold text-zinc-100">
           {t("timeline.heading")}
@@ -104,7 +105,7 @@ export const DayTimeline = ({ sessions }: DayTimelineProps) => {
             style={{ top: baselineTop, left: `${model.toPct(h)}%` }}
           >
             <span className="h-1.5 w-px bg-white/15" />
-            <span className="mt-1.5 text-[10px] tabular-nums text-zinc-600">
+            <span className="mt-1.5 text-xs tabular-nums text-zinc-500">
               {hourLabel(h)}
             </span>
           </div>
@@ -139,6 +140,6 @@ export const DayTimeline = ({ sessions }: DayTimelineProps) => {
           );
         })}
       </div>
-    </section>
+    </Card>
   );
 };

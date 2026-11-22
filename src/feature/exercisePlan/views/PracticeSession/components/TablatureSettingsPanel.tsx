@@ -63,7 +63,7 @@ interface SectionProps {
 function Section({ title, hint, children }: SectionProps) {
   return (
     <section className='rounded-lg bg-zinc-900/40 p-5'>
-      <h3 className='text-xs font-semibold tracking-wide text-zinc-300'>
+      <h3 className='text-xs font-semibold text-zinc-300'>
         {title}
       </h3>
       {hint && <p className='mt-1 text-[11px] text-zinc-500'>{hint}</p>}
@@ -364,7 +364,7 @@ export function TablatureSettingsPanel() {
               <span className='text-xs font-semibold text-zinc-100'>
                 {t(`fret_text.${key}.label`, FRET_TEXT_COLORS[key].label)}
               </span>
-              <span className='text-[10px] leading-tight text-zinc-500'>
+              <span className='text-xs leading-tight text-zinc-500'>
                 {t(`fret_text.${key}.desc`, FRET_TEXT_COLORS[key].desc)}
               </span>
             </OptionCard>
@@ -387,7 +387,7 @@ export function TablatureSettingsPanel() {
               <span className='flex items-center gap-1.5 text-xs font-semibold text-zinc-100'>
                 {t(`views.${key}.label`, label)}
               </span>
-              <span className='text-[10px] leading-tight text-zinc-500'>
+              <span className='text-xs leading-tight text-zinc-500'>
                 {t(`views.${key}.desc`, desc)}
               </span>
             </OptionCard>
@@ -415,7 +415,7 @@ export function TablatureSettingsPanel() {
                 <span className='text-xs font-semibold text-zinc-100'>
                   {t(`metronome:sounds.${key}.label`, METRONOME_SOUNDS[key].label)}
                 </span>
-                <span className='text-[10px] leading-tight text-zinc-500'>
+                <span className='text-xs leading-tight text-zinc-500'>
                   {t(`metronome:sounds.${key}.desc`, METRONOME_SOUNDS[key].desc)}
                 </span>
               </OptionCard>
@@ -439,7 +439,7 @@ export function TablatureSettingsPanel() {
               <span className='text-xs font-semibold text-zinc-100'>
                 {t(`pills.${key}.label`, PILL_PRESETS[key].label)}
               </span>
-              <span className='text-[10px] leading-tight text-zinc-500'>
+              <span className='text-xs leading-tight text-zinc-500'>
                 {t(`pills.${key}.desc`, PILL_PRESETS[key].desc)}
               </span>
             </OptionCard>
@@ -457,7 +457,7 @@ export function TablatureSettingsPanel() {
               <span className='text-xs font-semibold text-zinc-100'>
                 {t(`note_styles.${key}.label`, NOTE_STYLES[key].label)}
               </span>
-              <span className='text-[10px] leading-tight text-zinc-500'>
+              <span className='text-xs leading-tight text-zinc-500'>
                 {t(`note_styles.${key}.desc`, NOTE_STYLES[key].desc)}
               </span>
             </OptionCard>
@@ -486,7 +486,7 @@ export function TablatureSettingsPanel() {
               <span className='text-xs font-semibold text-zinc-100'>
                 {t(`palettes.${key}.label`, STRING_PALETTES[key].label)}
               </span>
-              <span className='text-[10px] leading-tight text-zinc-500'>
+              <span className='text-xs leading-tight text-zinc-500'>
                 {t(`palettes.${key}.desc`, STRING_PALETTES[key].desc)}
               </span>
             </OptionCard>
@@ -535,7 +535,7 @@ export function TablatureSettingsPanel() {
               <span className='text-xs font-semibold text-zinc-100'>
                 {t(`backgrounds.${key}.label`, BACKGROUNDS[key].label)}
               </span>
-              <span className='text-[10px] leading-tight text-zinc-500'>
+              <span className='text-xs leading-tight text-zinc-500'>
                 {t(`backgrounds.${key}.desc`, BACKGROUNDS[key].desc)}
               </span>
             </OptionCard>
@@ -617,7 +617,7 @@ export function TablatureSettingsPanel() {
               <span className='text-xs font-semibold text-zinc-100'>
                 {t(`performance_modes.${mode}.label`)}
               </span>
-              <span className='text-[10px] leading-tight text-zinc-500'>
+              <span className='text-xs leading-tight text-zinc-500'>
                 {t(`performance_modes.${mode}.desc`)}
               </span>
             </OptionCard>

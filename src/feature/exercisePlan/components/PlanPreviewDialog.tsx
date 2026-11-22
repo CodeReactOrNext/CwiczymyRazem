@@ -39,7 +39,7 @@ export const PlanPreviewDialog = ({
 
   return (
     <Dialog open={!!plan} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className='border-none bg-zinc-950 text-zinc-100 sm:max-w-lg'>
+      <DialogContent className='bg-zinc-950 text-zinc-100'>
         {plan && (
           <>
             <DialogHeader className='space-y-3 pr-10 text-left'>
@@ -56,11 +56,11 @@ export const PlanPreviewDialog = ({
               </DialogDescription>
               <div className='flex items-center gap-4 pt-1 text-xs font-medium text-zinc-400'>
                 <span className='flex items-center gap-1.5'>
-                  <Clock size='1em' className='h-3.5 w-3.5 text-zinc-500' />
+                  <Clock className='h-3.5 w-3.5 text-zinc-500' />
                   {totalDuration} {t("plans:min")}
                 </span>
                 <span className='flex items-center gap-1.5'>
-                  <ListIcon size='1em' className='h-3.5 w-3.5 text-zinc-500' />
+                  <ListIcon className='h-3.5 w-3.5 text-zinc-500' />
                   {plan.exercises.length}{" "}
                   {plan.exercises.length === 1 ? "exercise" : "exercises"}
                 </span>
@@ -96,14 +96,15 @@ export const PlanPreviewDialog = ({
             <DialogFooter className='gap-2 pt-2 sm:space-x-0'>
               <Button
                 variant='ghost'
+                size='lg'
                 onClick={onClose}
                 className='text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-100'>
                 {t("plans:close")}
               </Button>
               <Button
                 onClick={() => onOpenPlan(plan.id)}
-                loading={isLoading}
-                className='bg-white text-zinc-950 hover:bg-zinc-200'>
+                size='lg'
+                loading={isLoading}>
                 {/* It drops you straight into the session — not a link out. */}
                 <Play className='fill-current' />
                 {t("plans:start_plan")}

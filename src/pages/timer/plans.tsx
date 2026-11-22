@@ -1,5 +1,6 @@
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import MainContainer from "components/MainContainer";
+import { PageShell } from "components/PageShell/PageShell";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { usePublicExercisePlans, useUserExercisePlans } from "feature/exercisePlan/hooks/useExercisePlans";
@@ -116,20 +117,19 @@ const TimerPlans: NextPageWithLayout = () => {
       <PracticeSession plan={selectedPlan} onClose={handleBack} onFinish={handlePlanFinish} isFinishing={isFinishing} autoReport={true} />
     </MainContainer>
   ) : (
-    <div className="bg-second-600 rounded-lg overflow-visible flex flex-col border-none min-h-screen ">
+    <PageShell>
       <HeroBanner
-        title="Practice Routines"
+        title="Practice Plans"
         subtitle="Build your skills with focused practice exercises"
         eyebrowContent={
           <Breadcrumbs
-            items={[{ label: "Practice", href: "/timer" }, { label: "Routines" }]}
+            items={[{ label: "Practice", href: "/timer" }, { label: "Plans" }]}
           />
         }
         backgroundContent={<HeroPattern />}
-        className="w-full !rounded-none !shadow-none"
       />
       <PlanSelector onSelectPlan={handleSelectPlanFromList} loadingPlanId={loadingPlanId} />
-    </div>
+    </PageShell>
   );
 };
 

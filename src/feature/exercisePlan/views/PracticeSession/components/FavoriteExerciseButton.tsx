@@ -48,16 +48,15 @@ export const FavoriteExerciseButton = ({
       aria-pressed={isFavorite}
       title={isFavorite ? t("remove_favorite") : t("add_favorite")}
       className={cn(
-        buttonVariants({ variant: "subtle", size: "icon" }),
+        buttonVariants({ variant: "subtle", size: compact ? "icon-sm" : "icon" }),
         "shrink-0",
-        compact ? "h-6 w-6 [&_svg]:size-3.5" : "h-9 w-9",
         isFavorite
           ? "bg-rose-500/15 text-rose-400 hover:bg-rose-500/25 hover:text-rose-300"
           : "text-zinc-400 hover:bg-rose-500/10 hover:text-rose-300",
         className
       )}
     >
-      <Heart className={cn(compact ? "h-3.5 w-3.5" : "h-4 w-4", isFavorite && "fill-current")} />
+      <Heart className={cn(isFavorite && "fill-current")} />
     </button>
   );
 };

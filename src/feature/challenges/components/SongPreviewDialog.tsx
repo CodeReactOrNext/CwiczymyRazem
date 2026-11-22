@@ -5,12 +5,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { useSong } from "feature/songs/hooks/useSong";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
-import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import { ChevronUp, ExternalLink, Music } from "lucide-react";
 import Link from "next/link";
 
@@ -66,7 +67,7 @@ export const SongPreviewDialog = ({
 
   return (
     <Dialog open={!!song} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className='max-w-none border-white/5 bg-zinc-950 p-6 sm:max-w-md sm:rounded-2xl'>
+      <DialogContent className='bg-zinc-950 sm:max-w-md'>
         {song && (
           /* min-w-0: the dialog is a grid, so without it this column takes
              its min-content width from the button row and grows past
@@ -88,7 +89,7 @@ export const SongPreviewDialog = ({
               <div className='min-w-0 flex-1'>
                 <DialogTitle
                   translate='no'
-                  className='font-openSans line-clamp-2 break-words text-lg font-bold leading-snug text-white'>
+                  className='line-clamp-2 break-words text-lg font-bold leading-snug text-white'>
                   {song.title}
                 </DialogTitle>
                 <p
@@ -96,19 +97,12 @@ export const SongPreviewDialog = ({
                   className='mt-1 truncate text-sm font-medium text-zinc-500'>
                   {song.artist}
                 </p>
-                <span
-                  className='mt-2 inline-block rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold'
-                  style={{
-                    backgroundColor: inkWash(tier.color, 12),
-                    color: inkAccent(tier.color),
-                  }}>
-                  {tier.tier === "?" ? tier.label : tier.tier}
-                </span>
+                <TierPick tier={tier} className='mt-2 h-6 w-6' />
               </div>
             </DialogHeader>
 
             {isLoading ? (
-              <div className='h-20 animate-pulse rounded-lg bg-white/[0.03]' />
+              <Skeleton variant='block' className='h-20' />
             ) : fullSong?.spotifyId ? (
               <SpotifyPlayer trackId={fullSong.spotifyId} height={80} />
             ) : (
@@ -128,20 +122,19 @@ export const SongPreviewDialog = ({
                   onClick={vote.onToggle}
                   disabled={!vote.hasVoted && !vote.canVote}
                   aria-pressed={vote.hasVoted}
+                  size='lg'
                   className={cn(
-                    "h-11 flex-1 font-bold",
+                    "flex-1",
                     vote.hasVoted
                       ? "bg-amber-400/15 text-amber-300 hover:bg-amber-400/25"
                       : "",
                   )}>
-                  <span className='flex items-center gap-2'>
-                    <ChevronUp
-                      className={cn("h-4 w-4", vote.hasVoted && "fill-current")}
-                    />
-                    {vote.hasVoted ? t("preview.backed") : t("preview.back")}
-                    <span className='tabular-nums opacity-60'>
-                      {vote.count}
-                    </span>
+                  <ChevronUp
+                    className={vote.hasVoted ? "fill-current" : undefined}
+                  />
+                  {vote.hasVoted ? t("preview.backed") : t("preview.back")}
+                  <span className='tabular-nums opacity-60'>
+                    {vote.count}
                   </span>
                 </Button>
               )}
@@ -149,7 +142,7 @@ export const SongPreviewDialog = ({
               <Link
                 href={`/songs?view=explore&songId=${song.songId}`}
                 className={cn(
-                  "flex h-11 items-center justify-center rounded-lg bg-white/5 px-4 text-xs font-bold text-zinc-300 transition-colors hover:bg-white/10 hover:text-white",
+                  "flex h-10 items-center justify-center rounded-lg bg-white/5 px-4 text-xs font-bold text-zinc-300 transition-colors hover:bg-white/10 hover:text-white",
                   !vote && "flex-1",
                 )}>
                 {t("preview.open_board")}

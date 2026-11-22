@@ -1,3 +1,6 @@
+import type { CorridorPage } from "components/CorridorBackdrop/CorridorBackdrop";
+import { CorridorBackdrop } from "components/CorridorBackdrop/CorridorBackdrop";
+import { isTabSwitchTo } from "components/PageTabs/useTabSwitchMotion";
 import { RockSidebar } from "components/RockSidebar";
 import { CommunityDrawer } from "feature/logsBox/components/CommunityDrawer";
 import { m, useReducedMotion } from "framer-motion";
@@ -19,6 +22,7 @@ interface LandingLayoutProps {
   pageId: NavPagesTypes;
   variant: "primary" | "secondary" | "landing" | "fullscreen";
   wide?: boolean;
+  corridor?: CorridorPage;
   children: React.ReactNode;
 }
 
@@ -30,6 +34,7 @@ const MainLoggedLayout = ({
   pageId,
   variant,
   wide = false,
+  corridor,
 }: LandingLayoutProps) => {
   const { isElectron } = useElectronWindowControls();
   const router = useRouter();
@@ -39,9 +44,11 @@ const MainLoggedLayout = ({
   // never holds the old page back. Opacity alone: a transform would turn this
   // wrapper into the containing block of every `position: fixed` inside the page.
   // Keyed by route, which remounts nothing extra: a new route is a new page
-  // component anyway.
+  // component anyway. A tab switch skips it: the hero and tab rail are the same
+  // on both pages, so only the content under the rail animates (PageTabs).
   const pageEnter = {
-    initial: reduceMotion ? false : { opacity: 0 },
+    initial:
+      reduceMotion || isTabSwitchTo(router.asPath) ? false : { opacity: 0 },
     animate: { opacity: 1 },
     transition: transitions.fast,
   } as const;
@@ -62,6 +69,7 @@ const MainLoggedLayout = ({
           <RockSidebar  pageId={pageId} />
 
           <div className='relative flex h-full flex-1 flex-col overflow-hidden'>
+            {corridor && <CorridorBackdrop page={corridor} />}
             <MainLoggedWrapper>
               <DesktopHeaderWrapper>
                 <UserHeader

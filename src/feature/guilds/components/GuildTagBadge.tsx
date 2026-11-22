@@ -53,7 +53,7 @@ export const GuildTagBadge = ({
       }
       style={frameStyle(badge.frame, hex, tone)}
       className={cn(
-        "inline-flex shrink-0 items-center rounded font-black tracking-wider",
+        "inline-flex shrink-0 items-center rounded font-bold",
         size === "sm" ? "px-1.5 py-0.5 text-xs" : "px-2 py-1 text-xs",
         className,
       )}>

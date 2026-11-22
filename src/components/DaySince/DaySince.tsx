@@ -30,7 +30,7 @@ export const DaySinceMessage = ({ date }: { date: Date }) => {
       <div className={cn("h-1.5 w-1.5 shrink-0 rounded-full", getStatusColor())} />
       
       <p className={cn(
-        'font-medium text-[0.6rem] xs:text-[0.65rem] sm:text-xs',
+        'font-medium text-[11px] sm:text-xs',
         daysSinceNumber === 0 ? "text-cyan-400" : 
         daysSinceNumber === 1 ? "text-zinc-200" : "text-zinc-500"
       )}>

@@ -1,3 +1,6 @@
+import { Card } from "assets/components/ui/card";
+import { Chip, type ChipColor } from "assets/components/ui/chip";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { CursorTooltip } from "components/UI/CursorTooltip/CursorTooltip";
 import { CardModal } from "feature/arsenal/components/CardModal";
 import { EffectCard } from "feature/arsenal/components/GuitarInventory/EffectCard";
@@ -50,12 +53,13 @@ import { useTranslation } from "hooks/useTranslation";
 import { useState } from "react";
 
 /** How a visitor's eye is told what they are looking at. Chip pattern, no border. */
+// Chip has no red, so a broken chain shares warn's amber — the label says which.
 const CHAIN_TONES = {
-  good: "bg-emerald-500/10 text-emerald-400",
-  warn: "bg-amber-500/10 text-amber-400",
-  bad: "bg-red-500/10 text-red-400",
-  idle: "bg-zinc-800/60 text-zinc-400",
-} as const;
+  good: "emerald",
+  warn: "amber",
+  bad: "amber",
+  idle: "gray",
+} as const satisfies Record<string, ChipColor>;
 
 interface TooltipData {
   x: number;
@@ -268,28 +272,27 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
   };
 
   return (
-    <div
-      className='rounded-lg bg-zinc-900/30 p-4 sm:p-6'
-      onMouseMove={handleMouseMove}>
+    <Card className='p-5 sm:p-6' onMouseMove={handleMouseMove}>
       {/* The level as the owner reads it on their own Rig tab: a figure, not
           a chip — set against the title, on the same bottom line. */}
-      <div className='mb-6 flex items-end justify-between gap-6'>
-        <h2 className='text-2xl font-bold text-white'>
-          {t("layout.sections.rig.title")}
-        </h2>
-        <RigHeadline
-          caption={t("rig.level")}
-          value={getRigLevel(arsenal)}
-          tone='level'
-          title={t("rig.level_hint")}
-        />
-      </div>
+      <SectionHeader
+        title={t("layout.sections.rig.title")}
+        action={
+          <RigHeadline
+            caption={t("rig.level")}
+            value={getRigLevel(arsenal)}
+            tone='level'
+            title={t("rig.level_hint")}
+          />
+        }
+        className='mb-6 items-end gap-6'
+      />
 
       {/* The same lit wall the owner hangs them on in the Arsenal, read-only:
           no buttons, no condition, just each guitar and its level. */}
       {hasGuitars && (
         <div className='mb-6'>
-          <p className='mb-3 text-xs font-semibold tracking-wide text-zinc-400'>
+          <p className='mb-3 text-xs font-semibold text-zinc-400'>
             Guitars
           </p>
           <GuitarRack
@@ -313,20 +316,18 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
       {hasPedals && (
         <div>
           <div className='mb-3 flex flex-wrap items-center gap-3'>
-            <p className='text-xs font-semibold tracking-wide text-zinc-400'>
+            <p className='text-xs font-semibold text-zinc-400'>
               Pedalboard
             </p>
             {verdict.links.length > 0 && (
-              <span
-                title={chainTier.note}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-bold tracking-wide ${CHAIN_TONES[chainTier.tone]}`}>
+              <Chip title={chainTier.note} color={CHAIN_TONES[chainTier.tone]} size='sm'>
                 {chainTier.label}
                 {verdict.rate > 0 && (
                   <span className='tabular-nums text-amber-400/90'>
                     +{verdict.rate.toFixed(1)}/h
                   </span>
                 )}
-              </span>
+              </Chip>
             )}
           </div>
           {/* The owner's own case, so the board reads the same from outside.
@@ -386,7 +387,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
           {/* Equipped, but the board ran out of room for them. */}
           {board.overflow.length > 0 && (
             <div className='mt-4 flex flex-col gap-2'>
-              <p className='text-xs font-semibold tracking-wide text-zinc-500'>
+              <p className='text-xs font-semibold text-zinc-500'>
                 {t("rig.off_board")}
               </p>
               <div className='flex flex-wrap items-end gap-5'>
@@ -431,6 +432,6 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
       {pinnedCard && (
         <CardModal onClose={() => setPinnedCard(null)}>{pinnedCard}</CardModal>
       )}
-    </div>
+    </Card>
   );
 };

@@ -34,6 +34,8 @@
   "anonimity_info": "¿Quieres ocultar tu apodo en la clasificación?",
   "resolution_info": "Resolución máxima 250 × 250",
   "logged_in_via_google": "No puedes cambiar la contraseña ni el correo porque iniciaste sesión con Google.",
+  "reauth_title": "Confirma que eres tú",
+  "reauth_description": "Vuelve a iniciar sesión para cambiar tu correo o contraseña.",
   "bands": "Tus bandas",
   "guitarStartDate": {
     "title": "¿Cuándo empezaste a tocar la guitarra?",

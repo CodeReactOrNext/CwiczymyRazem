@@ -75,7 +75,7 @@ export const CardActionRow = ({
     <div className={cn(ROW, "flex-col", className)}>
       {primary != null && (
         <LayoutContext.Provider value='wide'>
-          <div className='flex'>{primary}</div>
+          <div className='flex gap-1.5'>{primary}</div>
         </LayoutContext.Provider>
       )}
       {hasKeys && (
@@ -98,9 +98,9 @@ const cardAction = cva(
   {
     variants: {
       layout: {
-        inline: "h-8 flex-1 gap-1.5 text-[11px] tracking-wide",
+        inline: "h-8 flex-1 gap-1.5 text-[11px]",
         /** A key of the lower row: glyph over label, so every label fits. */
-        key: "h-12 min-w-0 flex-1 flex-col gap-1 px-0.5 text-[10px] tracking-wide",
+        key: "h-12 min-w-0 flex-1 flex-col gap-1 px-0.5 text-[11px]",
         /** The card's main action, alone on the top row. */
         wide: "h-10 w-full gap-2 text-sm",
       },
@@ -108,7 +108,7 @@ const cardAction = cva(
         neutral:
           "text-zinc-300 enabled:hover:bg-zinc-700/60 enabled:hover:text-white",
         /** The card's main action — the app's primary CTA is white. */
-        primary: "bg-zinc-100 font-bold text-zinc-900 enabled:hover:bg-white",
+        primary: "bg-primary text-primary-foreground enabled:hover:bg-primary/90",
         market:
           "text-zinc-400 enabled:hover:bg-amber-500/15 enabled:hover:text-amber-300",
         /** Given to the guild stash — paid in honor, which is purple wherever it is counted. */

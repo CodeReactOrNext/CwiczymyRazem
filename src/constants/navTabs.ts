@@ -27,6 +27,13 @@ export const LIBRARY_TABS: PageTab[] = [
   { label: "Player Roadmaps", href: "/my-roadmaps", icon: Signpost },
 ];
 
+/**
+ * One hero height for every My Stuff tab, so switching tabs does not make the
+ * header jump between a short and a tall banner (eyebrow, wrapped subtitle and
+ * a right-hand button all fit inside it).
+ */
+export const LIBRARY_HERO_CLASS = "md:min-h-[172px]";
+
 export const PROGRESS_TABS: PageTab[] = [
   { label: "Activity", href: "/profile/activity", icon: Activity },
   { label: "Skills", href: "/profile/skill-points", icon: Sparkles },

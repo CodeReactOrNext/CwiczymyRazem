@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
 import {
   isExclusiveAsioWrapper,
@@ -34,13 +35,16 @@ function OutputStalledCard({ onClose }: { onClose: () => void }) {
             {t("output_stall.title")}
           </span>
         </div>
-        <button
+        <Button
           type='button'
+          variant='ghost'
+          size='icon-sm'
           onClick={onClose}
           title={t("output_stall.close")}
-          className='text-zinc-500 transition-colors hover:text-white'>
-          <X className='h-4 w-4' />
-        </button>
+          aria-label={t("output_stall.close")}
+          className='-mr-1 -mt-1 shrink-0'>
+          <X />
+        </Button>
       </div>
 
       <p className='text-xs leading-relaxed text-zinc-400'>

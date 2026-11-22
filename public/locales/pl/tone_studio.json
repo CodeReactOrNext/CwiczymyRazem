@@ -2,7 +2,10 @@
   "common": {
     "loading": "Ładowanie…",
     "cancel": "Anuluj",
-    "select": "Wybierz…"
+    "select": "Wybierz…",
+    "web_only_title": "Tone Studio działa tylko w aplikacji na komputer",
+    "web_only_body": "Pobierz i uruchom aplikację riff.quest na komputer, żeby kształtować brzmienie i wczytywać własne IR-y.",
+    "web_only_cta": "Pobierz aplikację"
   },
   "chain": {
     "gate": "Bramka",

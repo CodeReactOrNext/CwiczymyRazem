@@ -1,8 +1,4 @@
-import {
-  Button,
-  PRESSABLE_IN_GROUP,
-  PRESSABLE_KEY,
-} from "assets/components/ui/button";
+import { Button, PRESSABLE_IN_GROUP } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +7,12 @@ import {
 } from "assets/components/ui/dialog";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import {
+  Segment,
+  SegmentedControl,
+  SegmentGroup,
+} from "components/SegmentedControl/SegmentedControl";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useUserExercisePlans } from "feature/exercisePlan/hooks/useExercisePlans";
@@ -20,7 +22,7 @@ import type {
   SongPracticeMode,
 } from "feature/exercisePlan/types/exercise.types";
 import { RotationThumb } from "feature/rotation/components/RotationThumb";
-import { Check, ListChecks, Plus, Search } from "lucide-react";
+import { Check, ListChecks, Plus } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -352,7 +354,7 @@ export const AddItemDialog = ({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className='flex flex-col gap-6 border-0 bg-zinc-900 shadow-none sm:max-h-[90vh] sm:max-w-2xl sm:p-8'>
+      <DialogContent className='flex flex-col gap-6 bg-zinc-900 sm:max-h-[90vh] sm:p-8'>
         <div className='space-y-2 pr-10'>
           <DialogTitle className='text-xl font-bold text-zinc-100'>
             {t("add.title", { day: dateLabel })}
@@ -363,28 +365,19 @@ export const AddItemDialog = ({
         </div>
 
         <div className='space-y-4'>
-          <div className='-mx-1 flex gap-1 overflow-x-auto px-1 pb-1'>
-            {TABS.map((value) => (
-              <button
-                key={value}
-                type='button'
-                onClick={() => {
-                  setTab(value);
-                  setSearch("");
-                  setMinutes(DEFAULT_MINUTES[value]);
-                }}
-                aria-pressed={tab === value}
-                className={cn(
-                  PRESSABLE_KEY,
-                  "h-9 shrink-0 rounded-lg px-3.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
-                  tab === value
-                    ? "bg-zinc-700 text-zinc-100"
-                    : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-                )}>
-                {t(`kinds.${value}`)}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl<Tab>
+            label={t("add.title", { day: dateLabel })}
+            selected={[tab]}
+            onSelect={(value) => {
+              setTab(value);
+              setSearch("");
+              setMinutes(DEFAULT_MINUTES[value]);
+            }}
+            options={TABS.map((value) => ({
+              value,
+              label: t(`kinds.${value}`),
+            }))}
+          />
 
           {tab === "routine" ? (
             <p className='text-sm text-zinc-400'>{t("add.routine_hint")}</p>
@@ -408,39 +401,24 @@ export const AddItemDialog = ({
               <span className='text-sm text-zinc-400'>
                 {t("add.practise_with")}
               </span>
-              <div
-                role='radiogroup'
-                aria-label={t("add.practise_with")}
-                className='flex gap-1'>
-                {SONG_MODES.map((mode) => (
-                  <button
-                    key={mode}
-                    type='button'
-                    role='radio'
-                    aria-checked={songMode === mode}
-                    onClick={() => setSongMode(mode)}
-                    className={cn(
-                      PRESSABLE_KEY,
-                      "h-9 rounded-lg px-3.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
-                      songMode === mode
-                        ? "bg-zinc-700 text-zinc-100"
-                        : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-                    )}>
-                    {t(`song_modes.${mode}`)}
-                  </button>
-                ))}
-              </div>
+              <SegmentedControl
+                label={t("add.practise_with")}
+                selected={[songMode]}
+                onSelect={setSongMode}
+                options={SONG_MODES.map((mode) => ({
+                  value: mode,
+                  label: t(`song_modes.${mode}`),
+                }))}
+              />
             </div>
           )}
 
           {(tab === "exercise" || tab === "song" || tab === "routine") && (
-            <Input
+            <SearchInput
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder={t("add.search")}
               aria-label={t("add.search")}
-              startIcon={<Search className='h-4 w-4 text-zinc-500' />}
-              className='h-11 border-0 bg-zinc-800/60 text-zinc-100'
             />
           )}
         </div>
@@ -490,7 +468,7 @@ export const AddItemDialog = ({
                 placeholder={t("add.custom_title")}
                 aria-label={t("add.custom_title")}
                 maxLength={80}
-                className='h-11 border-0 bg-zinc-800/60 text-zinc-100'
+                className='h-11'
               />
               <Input
                 value={customNote}
@@ -498,40 +476,34 @@ export const AddItemDialog = ({
                 placeholder={t("add.custom_note")}
                 aria-label={t("add.custom_note")}
                 maxLength={140}
-                className='h-11 border-0 bg-zinc-800/60 text-zinc-100'
+                className='h-11'
               />
-              <div
-                role='radiogroup'
-                aria-label={t("add.custom_area")}
-                className='flex flex-wrap gap-2'>
+              <SegmentGroup aria-label={t("add.custom_area")}>
                 {PRACTICE_AREAS.map((area) => (
-                  <button
+                  <Segment
                     key={area}
-                    type='button'
-                    role='radio'
-                    aria-checked={customArea === area}
+                    active={customArea === area}
                     onClick={() => setCustomArea(area)}
-                    className={cn(
-                      PRESSABLE_KEY,
-                      "flex h-9 items-center gap-2 rounded-lg px-3.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
-                      customArea === area
-                        ? "bg-zinc-700 text-zinc-100"
-                        : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-                    )}>
+                    className='gap-2'>
                     <span
+                      aria-hidden
                       className={cn("h-2 w-2 rounded-full", AREA_DOT[area])}
                     />
                     {t(`areas.${area}`)}
-                  </button>
+                  </Segment>
                 ))}
+              </SegmentGroup>
+              <div className='flex justify-end'>
+                <Button
+                  type='submit'
+                  variant='secondary'
+                  size='lg'
+                  disabled={!customTitle.trim()}
+                  className='w-full sm:w-auto'>
+                  <Plus />
+                  {t("add.custom_submit")}
+                </Button>
               </div>
-              <Button
-                type='submit'
-                disabled={!customTitle.trim()}
-                className='h-11 w-full rounded-lg border-b-black/40 bg-zinc-800 text-zinc-100 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700'>
-                <Plus className='h-4 w-4' />
-                {t("add.custom_submit")}
-              </Button>
             </form>
           ) : listed.length === 0 ? (
             tab !== "exercise" && candidates.length === 0 ? (
@@ -563,8 +535,8 @@ export const AddItemDialog = ({
         </div>
 
         <Button
-          onClick={onClose}
-          className='h-11 rounded-lg border-b-black/25 bg-white font-bold text-zinc-950 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
+          size='lg'
+          onClick={onClose}>
           {t("add.done")}
         </Button>
       </DialogContent>

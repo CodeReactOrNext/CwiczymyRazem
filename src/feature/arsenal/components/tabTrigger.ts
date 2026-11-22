@@ -24,4 +24,4 @@ export const arsenalTabTriggerClass =
 
 /** The chip row on phones (pinned while scrolling), the rail from `sm` up — see above. */
 export const arsenalTabListClass =
-  "sticky top-0 z-30 -mx-4 flex h-auto w-auto snap-x scroll-px-4 justify-start gap-2 overflow-x-auto rounded-none bg-zinc-950/95 px-4 py-2.5 no-scrollbar backdrop-blur-md sm:static sm:mx-0 sm:w-full sm:max-w-full sm:gap-1 sm:border-b sm:border-arsenal-border sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none";
+  "sticky top-0 z-30 -mx-6 flex h-auto w-auto snap-x scroll-px-6 justify-start gap-2 overflow-x-auto rounded-none bg-zinc-950/95 px-6 py-2.5 no-scrollbar backdrop-blur-md sm:static sm:mx-0 sm:w-full sm:max-w-full sm:gap-1 sm:border-b sm:border-arsenal-border sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none";

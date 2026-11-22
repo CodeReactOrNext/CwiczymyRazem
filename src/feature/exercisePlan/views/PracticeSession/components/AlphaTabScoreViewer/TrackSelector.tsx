@@ -1,4 +1,4 @@
-import { cn } from "assets/lib/utils";
+import { Segment, SegmentGroup } from "components/SegmentedControl/SegmentedControl";
 import { useTranslation } from "hooks/useTranslation";
 
 import type { Track } from "./types";
@@ -17,23 +17,21 @@ const TrackButtons = ({ tracks, selectedIdx, onSelect }: TrackSelectorProps) => 
   const { t } = useTranslation("session");
 
   return (
-    <div className="flex items-center gap-1.5 flex-wrap">
-      <span className="text-[10px] text-zinc-500 shrink-0">{t("track", "Track")}</span>
-      {tracks.map((track) => (
-        <button
-          key={track.idx}
-          onClick={() => onSelect(track.idx)}
-          title={track.name}
-          className={cn(
-            "rounded px-2 py-0.5 text-[10px] font-medium transition-colors truncate max-w-[140px]",
-            selectedIdx === track.idx
-              ? "bg-blue-600 text-white"
-              : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600",
-          )}
-        >
-          {track.name}
-        </button>
-      ))}
+    <div className="flex items-center gap-2">
+      <span className="shrink-0 text-xs text-zinc-400">{t("track", "Track")}</span>
+      <SegmentGroup aria-label={t("track", "Track")}>
+        {tracks.map((track) => (
+          <Segment
+            key={track.idx}
+            active={selectedIdx === track.idx}
+            onClick={() => onSelect(track.idx)}
+            className="max-w-[160px]">
+            <span className="truncate" title={track.name}>
+              {track.name}
+            </span>
+          </Segment>
+        ))}
+      </SegmentGroup>
     </div>
   );
 };

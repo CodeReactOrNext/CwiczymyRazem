@@ -25,7 +25,7 @@ export const DuelEmptyState = ({
 }: DuelEmptyStateProps) => {
   const { t } = useTranslation("duels");
   return (
-    <Card className='bg-zinc-900/60 p-6 sm:p-8'>
+    <Card className='p-5 sm:p-6'>
       <div className='flex items-center justify-center gap-6 sm:gap-10'>
         <div className='flex flex-col items-center gap-2'>
           <Avatar avatarURL={myAvatar || undefined} name={myName} size='md' />

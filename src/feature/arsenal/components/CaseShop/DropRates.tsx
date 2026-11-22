@@ -44,11 +44,11 @@ export const RarityOddsTable = ({
         return (
           <div key={rarity} className='flex items-center gap-2'>
             <span
-              className='w-16 flex-shrink-0 text-[10px] font-semibold capitalize tracking-wider'
+              className='w-16 flex-shrink-0 text-[11px] font-semibold'
               style={{ color: readableText(rs.baseColor) }}>
               {labels.rarity(rarity)}
             </span>
-            <div className='h-1 flex-1 overflow-hidden rounded bg-black/40'>
+            <div className='h-1 flex-1 overflow-hidden rounded bg-black/10'>
               <div
                 className='h-full rounded'
                 style={{
@@ -70,9 +70,9 @@ export const RarityOddsTable = ({
   );
 };
 
-/** Shared tooltip surface — the base component's popover is light, and an odds
-    table in rarity colours needs the dark one it was coloured for. */
-export const oddsTooltipClass = "w-60 border border-zinc-700 bg-zinc-950 p-3";
+/** Shared tooltip surface. Tooltips are white, so `tooltip-ink` turns the
+    rarity inks (readableText) to the shades that read on it. */
+export const oddsTooltipClass = "tooltip-ink w-60 p-3";
 
 /**
  * Per-rarity odds behind a trigger. The default is the quiet "Drop Rates"
@@ -97,7 +97,7 @@ export const DropRates = ({
         <button
           type='button'
           className={cn(
-            "flex items-center gap-1.5 font-semibold tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            "flex items-center gap-1.5 font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             variant === "inline"
               ? "px-1 text-sm text-zinc-300 hover:text-zinc-100"
               : "text-[11px] text-zinc-400 hover:text-zinc-200",

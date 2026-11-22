@@ -11,9 +11,14 @@ import {
   tabNavListClass,
 } from "components/PageTabs/tabNav";
 import { useRailEdges } from "components/PageTabs/useRailEdges";
+import {
+  markTabSwitch,
+  useTabSwitchMotion,
+} from "components/PageTabs/useTabSwitchMotion";
 import { useTranslation } from "hooks/useTranslation";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
+import { useRef } from "react";
 
 export interface PageTab {
   label: string;
@@ -45,11 +50,24 @@ export const PageTabs = ({
 }: PageTabsProps) => {
   const { t } = useTranslation("nav");
   const { ref, edges } = useRailEdges<HTMLElement>();
+  const barRef = useRef<HTMLSpanElement>(null);
+  useTabSwitchMotion(ref, barRef, activeHref);
   return (
   <nav
     ref={ref}
     aria-label={ariaLabel}
-    className={cn(tabNavListClass, tabNavFadeClass(edges), className)}>
+    className={cn(
+      "relative",
+      tabNavListClass,
+      tabNavFadeClass(edges),
+      className,
+    )}>
+    {/* The underline in flight between two tabs; see useTabSwitchMotion. */}
+    <span
+      ref={barRef}
+      aria-hidden
+      className='pointer-events-none absolute bottom-0 left-0 h-0.5 w-0 bg-white opacity-0'
+    />
     {tabs.map(({ label, href, tooltip, badge, dot, icon: Icon }) => {
       const isActive = href === activeHref;
       // Tabs are defined in English next to their routes; the route is the key.
@@ -59,7 +77,12 @@ export const PageTabs = ({
           key={href}
           href={href}
           aria-current={isActive ? "page" : undefined}
-          className={tabNavItemClass(isActive)}>
+          data-tab-href={href}
+          onClick={() => markTabSwitch(activeHref, href)}
+          className={cn(
+            tabNavItemClass(isActive),
+            isActive && "[nav[data-tab-sliding]_&]:border-transparent",
+          )}>
           {Icon && (
             <span className='relative flex shrink-0'>
               <Icon size={16} />

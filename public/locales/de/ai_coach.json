@@ -241,5 +241,21 @@
     "remove_step": "Diesen Schritt entfernen",
     "phase_min": "Eine Phase behält mindestens einen Schritt",
     "broke": "Nicht genug Tokens für eine kostenpflichtige Änderung."
+  },
+  "road": {
+    "open_lesson": "Lektion öffnen",
+    "read_again": "Nochmal lesen",
+    "materials": "Material",
+    "practice": "Üben",
+    "play_song": "Song spielen",
+    "next": "Weiter",
+    "back": "Zurück",
+    "back_to_map": "Zurück zur Karte",
+    "next_step": "Nächster Schritt",
+    "materials_hint": "Hake ab, was du angeschaut und geübt hast. Alles abgehakt heißt: Schritt erledigt.",
+    "checkpoint_body": "{{count}} Fragen zu dieser Phase. Bestanden ab {{pass}} richtigen.",
+    "checkpoint_locked": "Schließe zuerst alle Schritte dieser Phase ab ({{done}}/{{total}}).",
+    "take_check": "Checkpoint starten",
+    "passed_score": "Bestanden {{score}}/{{total}}"
   }
 }

@@ -1,5 +1,6 @@
 import type { GuildBadge } from "feature/guilds/types/guild.types";
 import type { Recording } from "feature/recordings/types/types";
+import { sortByPopularity } from "feature/recordings/utils/popularity";
 import {
   collection,
   doc,
@@ -153,6 +154,44 @@ export const getRecordings = async (
     lastDoc,
   };
 };
+
+/**
+ * How far back "Most popular" looks. Popularity lives in a likes array and a
+ * comment counter, neither of which Firestore can order by as a sum, so the
+ * ranking is done here over the newest this-many recordings.
+ */
+export const POPULAR_POOL_SIZE = 300;
+
+/**
+ * The newest POPULAR_POOL_SIZE recordings (for the same user/song filters as
+ * getRecordings), most popular first. Authors are not hydrated here — that
+ * would read users for the whole pool; `hydrateRecordingAuthors` runs per page.
+ */
+export const getPopularRecordingPool = async (
+  userId?: string,
+  songId?: string,
+): Promise<Recording[]> => {
+  let baseQuery = query(collection(db, "recordings"));
+  if (userId) baseQuery = query(baseQuery, where("userId", "==", userId));
+  if (songId) baseQuery = query(baseQuery, where("songId", "==", songId));
+
+  const toRecordings = (docs: { id: string; data: () => object }[]) =>
+    docs.map((d) => ({ id: d.id, ...d.data() })) as Recording[];
+
+  try {
+    const snapshot = await trackedGetDocs(
+      query(baseQuery, orderBy("createdAt", "desc"), limit(POPULAR_POOL_SIZE)),
+    );
+    return sortByPopularity(toRecordings(snapshot.docs));
+  } catch (error: any) {
+    if (error?.code !== "failed-precondition") throw error;
+    console.warn("Index missing for recordings query, falling back to simple query.");
+    const snapshot = await trackedGetDocs(query(baseQuery, limit(POPULAR_POOL_SIZE)));
+    return sortByPopularity(toRecordings(snapshot.docs));
+  }
+};
+
+export const hydrateRecordingAuthors = withAuthorAvatars;
 
 export const getRecordingById = async (recordingId: string): Promise<Recording | null> => {
   try {

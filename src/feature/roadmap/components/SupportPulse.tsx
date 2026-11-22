@@ -57,7 +57,7 @@ export const SupportPulse = ({ className = "" }: { className?: string }) => {
         </TooltipTrigger>
         <TooltipContent
           side='bottom'
-          className='max-w-[230px] border-white/10 bg-zinc-900 font-normal leading-relaxed text-zinc-300'>
+          className='max-w-[230px] font-normal leading-relaxed'>
           {hasSupport
             ? t("pulse.tooltip", { count: supporters, amount: raisedThisMonth })
             : t("pulse.tooltip_empty")}

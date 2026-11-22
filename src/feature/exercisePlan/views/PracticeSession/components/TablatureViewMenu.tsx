@@ -96,7 +96,7 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
             className={cn("shrink-0", compact ? "h-3 w-3" : "h-4 w-4")}
           />
           {!compact && (
-            <span className='text-[10px] font-semibold tracking-wide'>
+            <span className='text-xs font-semibold'>
               {t(`views.${current}.label`, label)}
             </span>
           )}
@@ -114,8 +114,8 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
         sideOffset={8}
         // Clear the session's full-screen layer (z-[999999] desktop / z-[9999999] mobile) —
         // otherwise the default z-50 paints underneath it.
-        className='z-[99999999] w-56 rounded-lg border-white/10 bg-zinc-900/95 p-1.5 text-white backdrop-blur-md'>
-        <div className='px-2 py-1 text-[10px] font-semibold tracking-wide text-zinc-400'>
+        className='z-[99999999] w-56'>
+        <div className='px-2 py-1 text-xs font-medium text-zinc-400'>
           {t("view_menu.view")}
         </div>
         {options.map((mode) => {
@@ -143,7 +143,7 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
                   )}>
                   {t(`views.${mode}.label`, itemLabel)}
                 </div>
-                <div className='text-[10px] text-zinc-500'>{t(`views.${mode}.desc`, desc)}</div>
+                <div className='text-xs text-zinc-500'>{t(`views.${mode}.desc`, desc)}</div>
               </div>
               {active && <Check className={cn("h-4 w-4 shrink-0", accent)} />}
             </DropdownMenuItem>

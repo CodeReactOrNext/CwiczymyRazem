@@ -52,7 +52,7 @@ export const EmailConsentModal = ({
       {/* Above the mobile bottom nav (z-[100]), which would cover the buttons. */}
       <DialogContent
         overlayClassName='z-[120]'
-        className='z-[120] border-none bg-zinc-950 pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-zinc-100 shadow-none [align-content:safe_center] sm:max-w-md sm:p-8'>
+        className='z-[120] bg-zinc-950 pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-zinc-100 [align-content:safe_center] sm:max-w-md sm:p-8'>
         <div className='flex flex-col gap-6'>
           <div className='flex h-11 w-11 items-center justify-center rounded-full bg-cyan-500/10'>
             <Mail className='h-5 w-5 text-cyan-400' />
@@ -117,14 +117,14 @@ export const EmailConsentModal = ({
             <Button
               size='lg'
               onClick={() => onAnswer(true)}
-              className='h-12 px-4 font-semibold sm:h-10 sm:flex-1'>
+              className='sm:flex-1'>
               {t("email_consent.accept")}
             </Button>
             <Button
               size='lg'
               variant='secondary'
               onClick={() => onAnswer(false)}
-              className='h-12 px-4 font-semibold sm:h-10 sm:flex-1'>
+              className='sm:flex-1'>
               {t("email_consent.decline")}
             </Button>
           </div>

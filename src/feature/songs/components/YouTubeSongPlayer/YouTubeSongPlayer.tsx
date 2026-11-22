@@ -1,4 +1,5 @@
 import { Button, PRESSABLE_KEY } from "assets/components/ui/button";
+import { Input } from "assets/components/ui/input";
 import {
   Tooltip,
   TooltipContent,
@@ -6,6 +7,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { Segment, SegmentGroup } from "components/SegmentedControl/SegmentedControl";
 import {
   extractVideoId,
   pickSongSpeeds,
@@ -211,11 +213,11 @@ export const YouTubeSongPlayer = forwardRef<
 
     if (!isVideoShown) {
       return (
-        <div className='flex flex-col gap-5 rounded-lg bg-zinc-900/40 p-5'>
+        <div className='flex flex-col gap-5 rounded-lg bg-zinc-800/40 p-5'>
           {/* Step 1 — paste link */}
           <div className='flex flex-col gap-2.5'>
             <div className='flex items-center gap-2'>
-              <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800/60 text-[10px] font-bold text-zinc-400'>
+              <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800/60 text-[11px] font-bold text-zinc-400'>
                 1
               </span>
               <div className='flex items-center gap-1.5'>
@@ -228,11 +230,12 @@ export const YouTubeSongPlayer = forwardRef<
               </div>
             </div>
             <div className='flex gap-2'>
-              <input
+              <Input
                 className={cn(
-                  "h-10 flex-1 rounded-lg bg-zinc-800/40 px-4 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-500 focus:bg-zinc-800/60",
-                  inputError && "bg-red-500/10",
+                  "h-10 px-4",
+                  inputError && "ring-1 ring-red-500/60 focus-visible:ring-red-500/60",
                 )}
+                aria-invalid={inputError}
                 placeholder={t("youtube_player.placeholder")}
                 value={urlInput}
                 onChange={(e) => {
@@ -241,18 +244,18 @@ export const YouTubeSongPlayer = forwardRef<
                 }}
                 onKeyDown={(e) => e.key === "Enter" && handleSaveUrl()}
               />
-              <Button onClick={handleSaveUrl} className='h-10 px-5 font-bold'>
+              <Button onClick={handleSaveUrl} size='lg'>
                 {t("youtube_player.save")}
               </Button>
               {isEditing && (
                 <Button
                   variant='subtle'
+                  size='lg'
                   onClick={() => {
                     setIsEditing(false);
                     setUrlInput("");
                     setInputError(false);
-                  }}
-                  className='h-10 px-5'>
+                  }}>
                   {t("reset_dialog.cancel")}
                 </Button>
               )}
@@ -273,7 +276,7 @@ export const YouTubeSongPlayer = forwardRef<
               {/* Step 2 — pick suggestion */}
               <div className='flex flex-col gap-2.5'>
                 <div className='flex items-center gap-2'>
-                  <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800/60 text-[10px] font-bold text-zinc-400'>
+                  <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800/60 text-[11px] font-bold text-zinc-400'>
                     2
                   </span>
                   <div className='flex items-center gap-1.5'>
@@ -314,7 +317,7 @@ export const YouTubeSongPlayer = forwardRef<
                       <p className='line-clamp-2 text-xs font-medium leading-tight text-zinc-300'>
                         {video.title}
                       </p>
-                      <p className='truncate text-[10px] text-zinc-500'>
+                      <p className='truncate text-[11px] text-zinc-500'>
                         {video.channel}
                       </p>
                     </button>
@@ -362,22 +365,17 @@ export const YouTubeSongPlayer = forwardRef<
             <span className='mr-1 text-xs font-medium text-zinc-500'>
               {t("youtube_player.speed")}
             </span>
-            {speeds.map((rate) => (
-              <button
-                key={rate}
-                type='button'
-                onClick={() => handleSpeedChange(rate)}
-                aria-pressed={speed === rate}
-                className={cn(
-                  PRESSABLE_KEY,
-                  "rounded-lg px-3 py-1.5 text-xs font-bold tabular-nums transition-colors",
-                  speed === rate
-                    ? "bg-cyan-500/10 text-cyan-400"
-                    : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
-                )}>
-                {rate}×
-              </button>
-            ))}
+            <SegmentGroup aria-label={t("youtube_player.speed")}>
+              {speeds.map((rate) => (
+                <Segment
+                  key={rate}
+                  active={speed === rate}
+                  onClick={() => handleSpeedChange(rate)}
+                  className='tabular-nums'>
+                  {rate}×
+                </Segment>
+              ))}
+            </SegmentGroup>
 
             <div className='ml-auto flex items-center gap-2'>
               <TooltipProvider>
@@ -398,7 +396,7 @@ export const YouTubeSongPlayer = forwardRef<
                       ) : (
                         <LockKeyholeOpen className='h-3.5 w-3.5' />
                       )}
-                      <span className='text-[10px] font-bold'>
+                      <span className='text-[11px] font-bold'>
                         {isLocked ? "Locked" : "Lock"}
                       </span>
                     </button>

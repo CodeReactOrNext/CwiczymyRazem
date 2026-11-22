@@ -16,6 +16,14 @@ import {
 } from "assets/components/ui/tabs";
 import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import {
+  tabNavFadeClass,
+  tabNavListClass,
+  tabNavTriggerClass,
+} from "components/PageTabs/tabNav";
+import { useRailEdges } from "components/PageTabs/useRailEdges";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { achievementsMap } from "feature/achievements/data/achievementsData";
 import { achievementsRarity } from "feature/achievements/data/achievementsRarity";
 import type { AchievementList } from "feature/achievements/types";
@@ -46,9 +54,9 @@ import {
 } from "feature/profile/utils/profileLayout";
 import type { Song } from "feature/songs/types/songs.type";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Lock } from "lucide-react";
+import { Check, Lock, Trophy } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 
 import { ProfileSongRow } from "./SongSkillShowcase";
 
@@ -65,7 +73,7 @@ interface ProfileCardSheetProps {
 type EditorProps = Omit<ProfileCardSheetProps, "open" | "onOpenChange">;
 
 const SectionTitle = ({ children }: { children: string }) => (
-  <h4 className='text-sm font-semibold text-zinc-100'>{children}</h4>
+  <SectionHeader title={children} as='h3' className='mb-0' />
 );
 
 /** Texts are saved when the field loses focus, not on every keystroke. */
@@ -218,9 +226,11 @@ const AchievementOption = ({
 const EmptyAchievements = () => {
   const { t } = useProfileLabels();
   return (
-    <p className='rounded-lg bg-zinc-900/40 px-4 py-6 text-sm text-zinc-400'>
-      {t("card_sheet.no_achievements")}
-    </p>
+    <EmptyState
+      size='compact'
+      icon={<Trophy />}
+      title={t("card_sheet.no_achievements")}
+    />
   );
 };
 
@@ -405,7 +415,7 @@ const StyleTab = ({ layout, onChange, earned }: EditorProps) => {
               aria-pressed={layout.emblem === null}
               title={L.t("card_sheet.no_emblem")}
               className={cn(
-                "flex aspect-square items-center justify-center rounded-lg bg-zinc-800/60 text-[10px] text-zinc-400 transition-colors hover:bg-zinc-700/60",
+                "flex aspect-square items-center justify-center rounded-lg bg-zinc-800/60 text-[11px] text-zinc-400 transition-colors hover:bg-zinc-700/60",
                 layout.emblem === null && "ring-2 ring-zinc-100",
               )}>
               {L.t("card_sheet.none")}
@@ -493,6 +503,20 @@ const StyleTab = ({ layout, onChange, earned }: EditorProps) => {
   );
 };
 
+/**
+ * The sheet's tab rail. Its own component so the edge measurement starts when
+ * the sheet opens — the sheet's content is not mounted while it is closed.
+ * Five tabs overflow a phone-wide sheet, so the cut-off end fades.
+ */
+const CardSheetTabRail = ({ children }: { children: ReactNode }) => {
+  const { ref, edges } = useRailEdges<HTMLDivElement>();
+  return (
+    <TabsList ref={ref} className={cn(tabNavListClass, tabNavFadeClass(edges))}>
+      {children}
+    </TabsList>
+  );
+};
+
 /** Everything about how the profile presents its owner, paid for in achievements. */
 export const ProfileCardSheet = ({
   open,
@@ -513,13 +537,13 @@ export const ProfileCardSheet = ({
       </SheetHeader>
 
       <Tabs defaultValue='card' className='mt-6'>
-        <TabsList className='grid w-full grid-cols-5'>
-          <TabsTrigger value='card'>{t("card_sheet.tabs.card")}</TabsTrigger>
-          <TabsTrigger value='style'>{t("card_sheet.tabs.style")}</TabsTrigger>
-          <TabsTrigger value='title'>{t("card_sheet.tabs.title")}</TabsTrigger>
-          <TabsTrigger value='trophies'>{t("card_sheet.tabs.trophies")}</TabsTrigger>
-          <TabsTrigger value='songs'>{t("card_sheet.tabs.songs")}</TabsTrigger>
-        </TabsList>
+        <CardSheetTabRail>
+          <TabsTrigger value='card' className={tabNavTriggerClass}>{t("card_sheet.tabs.card")}</TabsTrigger>
+          <TabsTrigger value='style' className={tabNavTriggerClass}>{t("card_sheet.tabs.style")}</TabsTrigger>
+          <TabsTrigger value='title' className={tabNavTriggerClass}>{t("card_sheet.tabs.title")}</TabsTrigger>
+          <TabsTrigger value='trophies' className={tabNavTriggerClass}>{t("card_sheet.tabs.trophies")}</TabsTrigger>
+          <TabsTrigger value='songs' className={tabNavTriggerClass}>{t("card_sheet.tabs.songs")}</TabsTrigger>
+        </CardSheetTabRail>
         <TabsContent value='card' className='mt-6'>
           <CardTab {...editor} />
         </TabsContent>

@@ -122,7 +122,7 @@ export const TierPlate = ({
 
     {count != null && count > 0 && (
       <span
-        className='absolute bottom-0.5 right-0.5 rounded-[3px] bg-zinc-950/80 px-1 py-0.5 text-[10px] font-black tabular-nums leading-none text-zinc-100'
+        className='absolute bottom-0.5 right-0.5 rounded-[3px] bg-zinc-950/80 px-1 py-0.5 text-[11px] font-bold tabular-nums leading-none text-zinc-100'
         style={{ boxShadow: "0 1px 3px var(--ars-drop)" }}>
         ×{count}
       </span>

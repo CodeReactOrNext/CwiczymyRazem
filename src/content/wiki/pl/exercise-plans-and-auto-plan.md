@@ -1,5 +1,5 @@
 ---
-title: "Rutyny ćwiczeń i plan automatyczny"
+title: "Plany ćwiczeń i plan automatyczny"
 description: "Jak składane są rutyny, jak plan automatyczny buduje sesję wokół czasu, który masz, i jak działa dzielenie się ćwiczeniami ze społecznością."
 slug: "exercise-plans-and-auto-plan"
 section: "Practice"
@@ -8,7 +8,7 @@ order: 3
 
 **Rutyna** (aplikacja nazywa ją też planem ćwiczeń) to nic sprytniejszego niż uporządkowana lista ćwiczeń z nazwą, poziomem trudności i kategorią. Przechodzisz ją od góry do dołu, a na końcu zapisuje za ciebie sesję.
 
-<ClickPath steps="Ćwicz|Rutyny ćwiczeń" caption="Gotowe rutyny, granie z podkładem, twoje własne plany i plany udostępnione przez innych graczy." />
+<ClickPath steps="Ćwicz|Plany ćwiczeń" caption="Gotowe rutyny, granie z podkładem, twoje własne plany i plany udostępnione przez innych graczy." />
 
 ## Trzy sposoby na rutynę
 
@@ -40,7 +40,7 @@ Rutyna może zawierać utwory z twojej biblioteki obok ćwiczeń, więc cała se
 
 Każde ćwiczenie, które tworzysz, trafia do jednej puli; jeden przełącznik publiczne/prywatne decyduje, kto je widzi.
 
-<Checklist items="Moje ćwiczenia::Wszystko, co napisałeś, publiczne lub prywatne, w Moje rzeczy|Społeczność::Tylko publiczne, dostępne dla wszystkich i sortowane według oceny, w Ćwicz → Katalog ćwiczeń" />
+<Checklist items="Moje ćwiczenia::Wszystko, co napisałeś, publiczne lub prywatne, w Moje rzeczy|Społeczność::Tylko publiczne, dostępne dla wszystkich i sortowane według oceny, w Ćwicz → Ćwiczenia" />
 
 Ćwiczenia społeczności można oceniać od jednej do pięciu gwiazdek. Dzielenie się też trochę płaci: „dzięki” od innego gracza daje ci **+5 Fame**, a pierwszy raz, gdy ktoś inny niż ty ukończy twoje ćwiczenie, daje **+1 Fame**. Granie własnego ćwiczenia nie liczy się do jego liczby odtworzeń.
 

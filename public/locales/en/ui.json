@@ -7,6 +7,7 @@
   },
   "open_in_practice_log": "Open in Practice Log",
   "activity": "Activity",
+  "activity_details": "Activity details",
   "minutes_short": "{{minutes}} min",
   "live_now": "Live Now",
   "close": "Close",

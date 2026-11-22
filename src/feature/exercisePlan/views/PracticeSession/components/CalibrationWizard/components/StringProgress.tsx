@@ -35,7 +35,7 @@ export const StringProgress = React.memo(function StringProgress({
               isCurrent ? "bg-zinc-700" : isDone ? "bg-emerald-500/15" : "bg-zinc-900/60"
             )}>
               {isDone
-                ? <Check size='1em' className="h-3.5 w-3.5 text-emerald-400" />
+                ? <Check className="h-3.5 w-3.5 text-emerald-400" />
                 : isCurrent
                 ? <span className="h-2 w-2 rounded-full bg-zinc-200" />
                 : null}

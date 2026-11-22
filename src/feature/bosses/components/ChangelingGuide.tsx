@@ -231,7 +231,7 @@ export const ChangelingGuide = ({
 
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent className='max-w-2xl gap-0 border-0 bg-zinc-900 p-0 text-zinc-100 shadow-none sm:rounded-xl'>
+      <DialogContent className='gap-0 bg-zinc-900 p-0 text-zinc-100 sm:max-w-2xl'>
         <div className='space-y-6 p-6 sm:p-8'>
           <ol
             className='flex gap-1.5 pr-10'
@@ -305,13 +305,14 @@ export const ChangelingGuide = ({
             type='button'
             onClick={() => setStep((s) => Math.max(0, s - 1))}
             disabled={step === 0}
-            className='h-10 bg-zinc-800 px-5 text-zinc-100 shadow-none hover:bg-zinc-700'>
+            variant='ghost'
+            size='lg'>
             {t("guide.back")}
           </Button>
           {last ? (
             <Button
               asChild
-              className='h-10 bg-white px-8 text-zinc-950 shadow-none hover:bg-zinc-200'>
+              size='lg'>
               <Link href={fightHref} onClick={() => onOpenChange(false)}>
                 {t("lair.fight")}
               </Link>
@@ -320,7 +321,7 @@ export const ChangelingGuide = ({
             <Button
               type='button'
               onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
-              className='h-10 bg-white px-8 text-zinc-950 shadow-none hover:bg-zinc-200'>
+              size='lg'>
               {t("guide.next")}
             </Button>
           )}

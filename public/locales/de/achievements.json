@@ -24,7 +24,16 @@
       "tokensHeldOne": "1 kostenloses Case auf Lager – lös es für ein beliebiges Case im Arsenal ein.",
       "readyToCollect": "Belohnung bereit zum Abholen",
       "onCompletion": "Belohnung für diesen Erfolg",
-      "collected": "Belohnung bereits abgeholt"
+      "collected": "Belohnung bereits abgeholt",
+      "toCollect": "{{count}} Belohnungen abzuholen",
+      "toCollectOne": "1 Belohnung abzuholen",
+      "moreAfterSession": "+{{count}} nach deiner nächsten Session",
+      "collectedCount": "{{count}} Belohnungen abgeholt",
+      "collectedOne": "1 Belohnung abgeholt",
+      "casesInHand": "{{count}} kostenlose Cases auf Lager",
+      "casesInHandOne": "1 kostenloses Case auf Lager",
+      "openCase": "Case öffnen",
+      "openArsenal": "Im Arsenal öffnen"
     }
   },
   "time_1": {

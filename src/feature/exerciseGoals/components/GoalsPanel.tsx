@@ -1,5 +1,9 @@
 import { Button } from "assets/components/ui/button";
-import { Kostek } from "components/Mascot/Kostek";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { useTranslation } from "hooks/useTranslation";
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -104,43 +108,47 @@ export const GoalsPanel = ({
 
   if (!uid || isLoading) {
     return (
-      <div className='space-y-6 px-3 py-6 md:px-6 md:py-8 lg:px-8'>
-        <div className='h-72 animate-pulse rounded-lg bg-zinc-900/40' />
+      <div
+        className={cn("space-y-6", PAGE_CONTENT)}
+        aria-busy='true'>
+        <div className='flex items-center justify-between gap-4'>
+          <Skeleton className='h-4 w-28' />
+          <Skeleton className='h-9 w-32 rounded-lg' />
+        </div>
+        <Skeleton variant='block' className='h-72' />
+        <Skeleton variant='block' className='h-72' />
       </div>
     );
   }
 
   return (
-    <div className='space-y-12 px-3 py-6 md:px-6 md:py-8 lg:px-8'>
+    <div className={cn("space-y-12", PAGE_CONTENT)}>
       {goals.length === 0 ? (
-        <div className='flex flex-col items-center justify-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-          {/* No goals: Kostek rubs its hands, ready to aim at one. */}
-          <Kostek mood='lookAround' className='mb-4 h-24 md:h-36' />
-          <p className='text-base font-semibold text-zinc-100'>
-            {t("empty.title")}
-          </p>
-          <p className='mt-2 max-w-md text-sm text-zinc-400'>
-            {t("empty.body")}
-          </p>
-          <Button
-            onClick={() => setDialog({ mode: "new" })}
-            className='mt-8 h-11 rounded-lg bg-white px-6 font-bold text-zinc-950 hover:bg-zinc-200'>
-            <Plus className='h-4 w-4' />
-            {t("empty.cta")}
-          </Button>
-        </div>
+        // No goals: Kostek looks around for one to aim at.
+        <EmptyState
+          mood='lookAround'
+          title={t("empty.title")}
+          description={t("empty.body")}
+          action={
+            <Button onClick={() => setDialog({ mode: "new" })}>
+              <Plus />
+              {t("empty.cta")}
+            </Button>
+          }
+        />
       ) : (
         <>
           <section className='space-y-6'>
             <div className='flex items-center justify-between gap-4'>
-              <h2 className='text-sm font-medium text-zinc-100'>
-                {t("active_title")}{" "}
-                <span className='ml-1 text-zinc-500'>{activeGoals.length}</span>
-              </h2>
+              <SectionHeader
+                title={t("active_title")}
+                count={activeGoals.length}
+                className='mb-0'
+              />
               <Button
-                onClick={() => setDialog({ mode: "new" })}
-                className='h-9 rounded-lg bg-zinc-800 px-4 text-sm text-zinc-100 hover:bg-zinc-700'>
-                <Plus className='h-4 w-4' />
+                variant='secondary'
+                onClick={() => setDialog({ mode: "new" })}>
+                <Plus />
                 {t("page.new_goal")}
               </Button>
             </div>
@@ -159,7 +167,7 @@ export const GoalsPanel = ({
                 ))}
               </div>
             ) : (
-              <p className='rounded-lg bg-zinc-900/40 px-5 py-6 text-sm text-zinc-400'>
+              <p className='rounded-lg bg-zinc-800/40 px-5 py-6 text-sm text-zinc-400'>
                 {t("no_active")}
               </p>
             )}
@@ -167,12 +175,11 @@ export const GoalsPanel = ({
 
           {reachedGoals.length > 0 && (
             <section className='space-y-6'>
-              <h2 className='text-sm font-medium text-zinc-100'>
-                {t("history_title")}{" "}
-                <span className='ml-1 text-zinc-500'>
-                  {reachedGoals.length}
-                </span>
-              </h2>
+              <SectionHeader
+                title={t("history_title")}
+                count={reachedGoals.length}
+                className='mb-0'
+              />
               <GoalHistory
                 goals={reachedGoals}
                 busyExerciseIds={busyExerciseIds}

@@ -2,7 +2,9 @@ import { Button } from "assets/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
 import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { CommunityExercisesTab } from "feature/communityExercises/components/CommunityExercisesTab";
 import { recordExerciseCompletion } from "feature/communityExercises/services/communityExerciseService";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
@@ -25,7 +27,7 @@ import { getSkillLevels } from "feature/skills/utils/skillLevel";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useIsCompactViewport } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft, Check,ChevronRight, Ear, Lock,Mic, MousePointerClick, Network, Search, Star, Trophy, Users } from "lucide-react";
+import { Check,ChevronRight, Ear, Lock,Mic, MousePointerClick, Network, Search, Star, Trophy, Users } from "lucide-react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect,useMemo, useRef,useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -267,18 +269,13 @@ export const SkillDashboard = ({
           "relative w-full bg-zinc-900/40",
           isFullBleedMap
             ? "h-full overflow-y-auto"
-            : "min-h-[600px] overflow-hidden rounded-lg"
+            : "overflow-hidden rounded-lg"
         )}>
         <div className="absolute top-6 left-6 z-[100]">
-           <Button
-            variant="ghost"
-            size="sm"
+           <BackLink
+            label={t("common:back") as string}
             onClick={handleClose}
-            className="text-zinc-500 hover:text-white hover:bg-white/10"
-           >
-              <ArrowLeft size={16} className="" />
-              {returnTo ? "Back to Roadmap" : "Back to Skills"}
-           </Button>
+           />
         </div>
         <PracticeSession
           plan={selectedChallenge as any}
@@ -382,33 +379,16 @@ export const SkillDashboard = ({
               <>
                 {/* Difficulty tab buttons */}
                 <div className="flex-shrink-0 px-6 pt-4 pb-0">
-                  <div className="flex gap-1 bg-zinc-900 rounded p-1">
-                    {uniqueDifficulties.map((d) => {
-                      const isActive = currentDifficulty === d;
-                      const label = d === 'beginner' ? 'Beginner' : d === 'easy' ? 'Easy' : d === 'medium' ? 'Medium' : 'Hard';
-                      const count = filteredTree[Object.keys(filteredTree)[0]]?.[selectedSkillId!]?.filter(c => c.difficulty === d).length ?? 0;
-                      const activeClass = d === 'beginner'
-                        ? 'bg-sky-500/15 text-sky-400'
-                        : d === 'easy'
-                        ? 'bg-emerald-500/15 text-emerald-400'
-                        : d === 'medium'
-                        ? 'bg-amber-500/15 text-amber-400'
-                        : 'bg-rose-500/15 text-rose-400';
-                      return (
-                        <button
-                          key={d}
-                          onClick={() => setActiveDifficulty(d)}
-                          className={cn(
-                            "flex-1 flex items-center justify-center gap-2 px-3 py-1.5 rounded text-sm font-semibold transition-colors",
-                            isActive ? activeClass : "text-zinc-400 hover:text-zinc-200"
-                          )}
-                        >
-                          {label}
-                          <span className="text-xs opacity-50 font-normal">{count}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <SegmentedControl
+                    label={selectedSkillName ?? ""}
+                    selected={currentDifficulty ? [currentDifficulty] : []}
+                    onSelect={setActiveDifficulty}
+                    options={uniqueDifficulties.map((d) => ({
+                      value: d,
+                      label: d === "beginner" ? "Beginner" : d === "easy" ? "Easy" : d === "medium" ? "Medium" : "Hard",
+                      count: filteredTree[Object.keys(filteredTree)[0]]?.[selectedSkillId!]?.filter(c => c.difficulty === d).length ?? 0,
+                    }))}
+                  />
                 </div>
 
                 {/* Scrollable exercise list */}
@@ -448,7 +428,7 @@ export const SkillDashboard = ({
                               <p className="text-[15px] font-bold text-zinc-500 group-hover:text-zinc-400 leading-snug flex-1 transition-colors">{challenge.title}</p>
                               <div className="flex items-center gap-1.5 rounded bg-amber-500/10 px-2.5 py-0.5 ring-1 ring-amber-500/25 flex-shrink-0">
                                 <Lock className="h-3 w-3 text-amber-500" />
-                                <span className="text-[10px] font-bold capitalize tracking-wider text-amber-500">Pro</span>
+                                <span className="text-[11px] font-bold text-amber-500">Pro</span>
                               </div>
                             </div>
                             {challenge.description && (
@@ -475,13 +455,14 @@ export const SkillDashboard = ({
                               <ExerciseCheckmark done={hasBeenAttempted} />
                               <p className={cn("text-[16px] font-bold leading-snug transition-colors", hasBeenAttempted ? "text-white" : "text-zinc-300 group-hover:text-zinc-100")}>{challenge.title}</p>
                             </div>
-                            <button
+                            <Button
+                              size="sm"
                               onClick={() => handleStartChallenge(challenge)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold transition-colors flex-shrink-0"
+                              className="shrink-0 gap-1.5"
                             >
-                              <ChevronRight size={14} strokeWidth={2.5} />
+                              <ChevronRight strokeWidth={2.5} />
                               Start
-                            </button>
+                            </Button>
                           </div>
 
                           {challenge.description && (
@@ -498,14 +479,14 @@ export const SkillDashboard = ({
                           {(hasBpmProgress || (micHighScore != null && micHighScore > 0) || (earTrainingHighScore != null && earTrainingHighScore > 0) || (clickHighScore != null && clickHighScore > 0) || hasLeaderboard) && (
                             <div className="flex flex-wrap items-center gap-5 pt-4 mt-3">
                               {hasBpmProgress && (
-                                <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-zinc-300">
-                                  <Check size='1em' className="h-3.5 w-3.5 text-emerald-400" />
+                                <div className="flex items-center gap-2 text-[13px] font-semibold text-zinc-300">
+                                  <Check className="h-3.5 w-3.5 text-emerald-400" />
                                   {completedBpms.length}/{bpmStages.length} BPM
                                 </div>
                               )}
                               
                               {micHighScore != null && micHighScore > 0 && (
-                                <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-amber-400">
+                                <div className="flex items-center gap-2 text-[13px] font-semibold text-amber-400">
                                   <Mic className="h-4 w-4 text-amber-500/80" />
                                   <span>{micHighScore.toLocaleString()} Pts</span>
                                   {micAccuracy != null && <span className="text-amber-500/60 font-medium">({micAccuracy}%)</span>}
@@ -513,14 +494,14 @@ export const SkillDashboard = ({
                               )}
 
                               {earTrainingHighScore != null && earTrainingHighScore > 0 && (
-                                <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-cyan-400">
+                                <div className="flex items-center gap-2 text-[13px] font-semibold text-cyan-400">
                                   <Ear className="h-4 w-4 text-cyan-400/80" />
                                   <span>{earTrainingHighScore} Pts</span>
                                 </div>
                               )}
 
                               {clickHighScore != null && clickHighScore > 0 && (
-                                <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-purple-400">
+                                <div className="flex items-center gap-2 text-[13px] font-semibold text-purple-400">
                                   <MousePointerClick className="h-4 w-4 text-purple-400/80" />
                                   <span>{clickHighScore.toLocaleString()} Pts</span>
                                   {clickAccuracy != null && <span className="text-purple-400/60 font-medium">({clickAccuracy}%)</span>}
@@ -529,13 +510,15 @@ export const SkillDashboard = ({
 
                               {hasLeaderboard && (
                                 <div className="flex-1 flex justify-end">
-                                  <button
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
                                     onClick={(e) => { e.stopPropagation(); setLeaderboardExercise({ id: challenge.id, title: challenge.title as string }); }}
-                                    className="inline-flex items-center gap-2 text-[11px] font-bold capitalize tracking-wider px-3 py-1.5 rounded border border-zinc-700/60 bg-zinc-800/40 text-zinc-400 hover:text-white hover:border-zinc-600 hover:bg-zinc-700/80 transition-colors"
                                   >
-                                    <Trophy className="h-4 w-4" />
+                                    <Trophy />
                                     <span className={cn(hasBeenAttempted ? "" : "opacity-0 invisible w-0")}>Leaderboard</span>
-                                  </button>
+                                  </Button>
                                 </div>
                               )}
                             </div>

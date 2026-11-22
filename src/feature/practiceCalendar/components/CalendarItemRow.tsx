@@ -97,7 +97,7 @@ export const CalendarItemRow = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align='start'
-          className='w-64 border-0 bg-zinc-900 p-1.5 text-zinc-200'>
+          className='w-64'>
           <DropdownMenuItem
             onSelect={onPlay}
             className='gap-2.5 rounded-lg py-2 font-medium text-zinc-100 focus:bg-zinc-800'>
@@ -150,7 +150,7 @@ export const CalendarItemRow = ({
                     day: "numeric",
                   })}
                   className='flex h-11 flex-col items-center justify-center gap-0.5 rounded-lg p-0 focus:bg-zinc-800 data-[disabled]:bg-zinc-800/60 data-[disabled]:opacity-100'>
-                  <span className='text-[10px] text-zinc-500'>
+                  <span className='text-xs text-zinc-500'>
                     {formatDate(target, { weekday: "narrow" })}
                   </span>
                   <span className='text-sm tabular-nums text-zinc-200'>

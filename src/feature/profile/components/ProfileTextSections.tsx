@@ -1,3 +1,5 @@
+import { Card } from "assets/components/ui/card";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import type { Song } from "feature/songs/types/songs.type";
 import { useTranslation } from "hooks/useTranslation";
 
@@ -8,12 +10,15 @@ export const AboutSection = ({ text }: { text: string }) => {
   const { t } = useTranslation("profile");
   if (!text) return null;
   return (
-    <div className='h-full rounded-2xl bg-zinc-900/30 p-6'>
-      <h2 className='text-2xl font-bold text-white'>{t("layout.sections.about.title")}</h2>
+    <Card className='h-full p-5 sm:p-6'>
+      <SectionHeader
+        title={t("layout.sections.about.title")}
+        className='mb-0'
+      />
       <p className='mt-4 whitespace-pre-line break-words text-sm leading-relaxed text-zinc-300'>
         {text}
       </p>
-    </div>
+    </Card>
   );
 };
 
@@ -28,11 +33,12 @@ export const LearningSection = ({
   const { t } = useTranslation("profile");
   if (!songs || songs.length === 0) return null;
   return (
-    <div className='h-full rounded-2xl bg-zinc-900/30 p-6'>
-      <h2 className='text-2xl font-bold text-white'>{t("layout.sections.learning.title")}</h2>
-      <p className='mt-1 text-sm text-zinc-400'>
-        {songs.length} {songs.length === 1 ? "song" : "songs"} in progress
-      </p>
+    <Card className='h-full p-5 sm:p-6'>
+      <SectionHeader
+        title={t("layout.sections.learning.title")}
+        description={`${songs.length} ${songs.length === 1 ? "song" : "songs"} in progress`}
+        className='mb-0'
+      />
       <div className='mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2'>
         {songs.slice(0, 8).map((song) => (
           <ProfileSongRow
@@ -42,6 +48,6 @@ export const LearningSection = ({
           />
         ))}
       </div>
-    </div>
+    </Card>
   );
 };

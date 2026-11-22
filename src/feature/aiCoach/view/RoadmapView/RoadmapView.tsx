@@ -1,16 +1,15 @@
-import { PRESSABLE } from "assets/components/ui/button";
+import { Button, PRESSABLE } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
 import {
-  Check,
   CheckCircle2,
   ChevronRight,
   ClipboardCheck,
   Coins,
   Dumbbell,
   Loader2,
-  Lock,
   Play,
   Sparkles,
   Zap,
@@ -37,12 +36,9 @@ import type {
   RoadmapStep,
 } from "../../types/roadmap.types";
 import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
-import type { PhaseCheckState } from "../../utils/phaseCheck";
 import {
   countPassedCheckpoints,
   getNextCheckpoint,
-  getPhaseCheckState,
-  isPhaseCleared,
   withCheckAttempt,
 } from "../../utils/phaseCheck";
 import type { RoadmapStepRef } from "../../utils/roadmapSteps";
@@ -59,7 +55,13 @@ import {
 } from "../../utils/stepStatus";
 import LessonPracticeModal from "./components/LessonPracticeModal";
 import { PhaseCheckDrawer } from "./components/PhaseCheckDrawer";
+import {
+  RoadmapCheckpointBubble,
+  RoadmapStepBubble,
+} from "./components/RoadmapBubbles";
 import { RoadmapFinishCard } from "./components/RoadmapFinishCard";
+import { checkpointStopId, RoadmapRoad } from "./components/RoadmapRoad";
+import { RoadmapStepLesson } from "./components/RoadmapStepLesson";
 import type {
   StepDrawerAdminProps,
   StepDrawerView,
@@ -67,169 +69,6 @@ import type {
 import { StepDrawer } from "./components/StepDrawer";
 import type { RefineBusy } from "./components/StepRefineMenu";
 import { isRefineBusy, StepRefineMenu } from "./components/StepRefineMenu";
-
-// ─── Map styling ─────────────────────────────────────────────────────────────
-
-const STEP_CLS: Record<StepStatus, string> = {
-  "not-started": "bg-zinc-900 text-zinc-300 hover:bg-zinc-800/80",
-  "in-progress": "bg-amber-500/10 text-amber-200 hover:bg-amber-500/15",
-  done: "bg-emerald-950/30 text-emerald-400/80 hover:bg-emerald-950/50",
-};
-
-const STATUS_DOT: Record<StepStatus, string> = {
-  "not-started": "bg-zinc-600",
-  "in-progress": "bg-amber-400",
-  done: "bg-emerald-500",
-};
-
-const PATH_COLOR: Record<StepStatus, string> = {
-  "not-started": "#3f3f46",
-  "in-progress": "#78350f",
-  done: "#065f46",
-};
-
-const PHASE_BADGE = [
-  "bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/30",
-  "bg-sky-500/20 text-sky-300 ring-1 ring-sky-500/30",
-  "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/30",
-  "bg-rose-500/20 text-rose-300 ring-1 ring-rose-500/30",
-  "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/30",
-  "bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/30",
-];
-
-/** Labels are keys in the `ai_coach` namespace. */
-const LEGEND: { status: StepStatus; label: string }[] = [
-  { status: "not-started", label: "status.not_started" },
-  { status: "in-progress", label: "status.in_progress" },
-  { status: "done", label: "status.done" },
-];
-
-// ─── Small pieces of the map ─────────────────────────────────────────────────
-
-interface StepMapButtonProps {
-  step: RoadmapStep;
-  isActive: boolean;
-  isLoading: boolean;
-  textAlign: "left" | "right";
-  fullWidth?: boolean;
-  /** Marks the node the connector lines attach to (the desktop copy of the step). */
-  connector?: boolean;
-  onClick: () => void;
-}
-
-const StepMapButton = ({
-  step,
-  isActive,
-  isLoading,
-  textAlign,
-  fullWidth = false,
-  connector = false,
-  onClick,
-}: StepMapButtonProps) => {
-  const status = getStepStatus(step);
-  return (
-    <button
-      type='button'
-      data-step-id={connector ? step.id : undefined}
-      onClick={onClick}
-      className={cn(PRESSABLE, "border-b-black/30", 
-        "flex items-center gap-2.5 rounded px-3 py-2.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-        STEP_CLS[status],
-        fullWidth ? "w-full" : "max-w-[260px]",
-        textAlign === "right" ? "text-right" : "text-left",
-        isActive &&
-          "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950",
-      )}>
-      <span
-        className={cn(
-          "h-2 w-2 shrink-0 rounded-full",
-          isLoading ? "animate-pulse bg-zinc-500" : STATUS_DOT[status],
-        )}
-      />
-      <span>{step.title}</span>
-    </button>
-  );
-};
-
-const CHECK_CLS: Record<PhaseCheckState, string> = {
-  locked: "bg-zinc-900/40 text-zinc-500 hover:bg-zinc-900/70",
-  ready: "bg-amber-500/10 text-amber-200 hover:bg-amber-500/15",
-  passed: "bg-emerald-950/30 text-emerald-400/80 hover:bg-emerald-950/50",
-};
-
-/** Keys in the `ai_coach` namespace. */
-const CHECK_LABEL: Record<PhaseCheckState, string> = {
-  locked: "checkpoint.locked",
-  ready: "checkpoint.ready",
-  passed: "checkpoint.passed",
-};
-
-interface CheckpointMapButtonProps {
-  phase: RoadmapPhase;
-  isActive: boolean;
-  textAlign: "left" | "right";
-  fullWidth?: boolean;
-  /** Marks the node the connector line attaches to (the desktop copy). */
-  connector?: boolean;
-  onClick: () => void;
-}
-
-/** The quiz at the end of a phase, drawn after its steps as one more node. */
-const CheckpointMapButton = ({
-  phase,
-  isActive,
-  textAlign,
-  fullWidth = false,
-  connector = false,
-  onClick,
-}: CheckpointMapButtonProps) => {
-  const { t } = useTranslation("ai_coach");
-  const state = getPhaseCheckState(phase);
-  const Icon =
-    state === "locked" ? Lock : state === "passed" ? Check : ClipboardCheck;
-  return (
-    <button
-      type='button'
-      data-check-id={connector ? phase.id : undefined}
-      onClick={onClick}
-      className={cn(PRESSABLE, "border-b-black/30", 
-        "flex items-center gap-2.5 rounded px-3 py-2.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-        CHECK_CLS[state],
-        fullWidth ? "w-full" : "max-w-[260px]",
-        textAlign === "right" ? "flex-row-reverse text-right" : "text-left",
-        isActive &&
-          "ring-1 ring-cyan-500/50 ring-offset-1 ring-offset-zinc-950",
-      )}>
-      <Icon className='h-3.5 w-3.5 shrink-0' />
-      <span>
-        {t(CHECK_LABEL[state])}
-        {state === "passed" && phase.check && (
-          <span className='ml-1.5 tabular-nums opacity-70'>
-            {phase.check.bestScore}/{phase.check.total}
-          </span>
-        )}
-      </span>
-    </button>
-  );
-};
-
-const PhaseBadge = ({
-  phaseIdx,
-  allDone,
-}: {
-  phaseIdx: number;
-  allDone: boolean;
-}) => (
-  <span
-    className={cn(
-      "flex h-8 w-8 shrink-0 items-center justify-center rounded text-[11px] font-bold transition-colors",
-      allDone
-        ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40"
-        : PHASE_BADGE[phaseIdx % PHASE_BADGE.length],
-    )}>
-    {allDone ? <Check className='h-4 w-4' /> : phaseIdx + 1}
-  </span>
-);
 
 // ─── Data helpers ────────────────────────────────────────────────────────────
 
@@ -356,25 +195,6 @@ const parseYouTubeId = (url: string): string | null => {
   return m?.[1] ?? null;
 };
 
-/** The DOM nodes the connector lines run between, keyed by id. */
-const collectNodes = (
-  container: HTMLElement,
-  attribute: "data-phase-id" | "data-step-id" | "data-check-id",
-) => {
-  const nodes = new Map<string, HTMLElement>();
-  container.querySelectorAll<HTMLElement>(`[${attribute}]`).forEach((el) => {
-    const id = el.getAttribute(attribute);
-    if (id) nodes.set(id, el);
-  });
-  return nodes;
-};
-
-interface SvgPath {
-  d: string;
-  key: string;
-  status: StepStatus;
-}
-
 interface BatchState {
   label: string;
   color: string;
@@ -407,11 +227,13 @@ interface RoadmapViewProps {
 }
 
 /**
- * The roadmap as a map: phases down the spine, steps branching off, the
- * reward at the bottom. A step opens in a side drawer, so the map stays in
- * view and the drawer's prev/next walk the whole path. The open step also
- * lives in the URL (`?step=`), so a refresh, or coming back from the exercise
- * page, lands in the same place.
+ * The roadmap as one winding road, the way Journey draws a module (owner's
+ * call, 2026-11-22): every step a stop, each phase's checkpoint after its
+ * steps, the reward at the end. A tap opens the stop's bubble under it; the
+ * lesson opens on the full screen, page by page, and ends on the step's kit
+ * and the way to the next step. The admin editor keeps its side drawer. The
+ * open lesson also lives in the URL (`?step=`), so a refresh, or coming back
+ * from the exercise page, lands in the same place.
  */
 const RoadmapView: React.FC<RoadmapViewProps> = ({
   roadmap,
@@ -450,7 +272,15 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       ? initialStepId
       : null,
   );
+  // Open = the step's lesson on the full screen (the editor's drawer in admin
+  // mode). Closing it leaves the step's bubble open on the road.
   const [isDrawerOpen, setIsDrawerOpen] = useState(() => activeStepId !== null);
+  // The stop whose bubble is open on the road: a step id or a checkpoint's.
+  const [selectedStopId, setSelectedStopId] = useState<string | null>(
+    () => activeStepId,
+  );
+  // The bubble's "Materials" opens the lesson on its last page, the kit.
+  const [lessonAtEnd, setLessonAtEnd] = useState(false);
 
   // The checkpoint panel, same shape: the phase outlives the panel being open.
   const [activeCheckPhaseId, setActiveCheckPhaseId] = useState<string | null>(
@@ -501,9 +331,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   );
   const [batch, setBatch] = useState<BatchState | null>(null);
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [svgPaths, setSvgPaths] = useState<SvgPath[]>([]);
-  const [svgDims, setSvgDims] = useState({ w: 0, h: 0 });
 
   // ─── Derived ───────────────────────────────────────────────────────────────
 
@@ -543,84 +370,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     );
     return total > 0 ? Math.round((completed / total) * 100) : 0;
   }, [steps]);
-
-  // ─── Connector lines ───────────────────────────────────────────────────────
-
-  const recalcPaths = useCallback(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const cRect = container.getBoundingClientRect();
-    if (cRect.width === 0) return;
-
-    const phaseNodes = collectNodes(container, "data-phase-id");
-    const stepNodes = collectNodes(container, "data-step-id");
-    const checkNodes = collectNodes(container, "data-check-id");
-
-    const newPaths: SvgPath[] = [];
-    phases.forEach((phase, phaseIdx) => {
-      const phaseEl = phaseNodes.get(phase.id);
-      if (!phaseEl) return;
-      const pRect = phaseEl.getBoundingClientRect();
-      const pCY = pRect.top + pRect.height / 2 - cRect.top;
-      const pLX = pRect.left - cRect.left;
-      const pRX = pRect.right - cRect.left;
-      const stepsRight = phaseIdx % 2 === 0;
-
-      // The checkpoint hangs off the phase like one more step, in the
-      // colour of where it stands.
-      const checkState = getPhaseCheckState(phase);
-      const targets: { key: string; el: HTMLElement; status: StepStatus }[] =
-        phase.steps.flatMap((step) => {
-          const el = stepNodes.get(step.id);
-          return el ? [{ key: step.id, el, status: getStepStatus(step) }] : [];
-        });
-      const checkEl = checkNodes.get(phase.id);
-      if (checkEl) {
-        targets.push({
-          key: `check-${phase.id}`,
-          el: checkEl,
-          status:
-            checkState === "passed"
-              ? "done"
-              : checkState === "ready"
-                ? "in-progress"
-                : "not-started",
-        });
-      }
-
-      targets.forEach(({ key, el, status }) => {
-        const sRect = el.getBoundingClientRect();
-        const sCY = sRect.top + sRect.height / 2 - cRect.top;
-
-        let d: string;
-        if (stepsRight) {
-          const x0 = pRX;
-          const x3 = sRect.left - cRect.left;
-          const span = x3 - x0;
-          d = `M ${x0} ${pCY} C ${x0 + span * 0.75} ${pCY} ${x0 + span * 0.25} ${sCY} ${x3} ${sCY}`;
-        } else {
-          const x0 = pLX;
-          const x3 = sRect.right - cRect.left;
-          const span = x0 - x3;
-          d = `M ${x0} ${pCY} C ${x0 - span * 0.75} ${pCY} ${x0 - span * 0.25} ${sCY} ${x3} ${sCY}`;
-        }
-        newPaths.push({ d, key: `${phase.id}-${key}`, status });
-      });
-    });
-
-    setSvgPaths(newPaths);
-    setSvgDims({ w: cRect.width, h: cRect.height });
-  }, [phases]);
-
-  useEffect(() => {
-    const timer = setTimeout(recalcPaths, 60);
-    return () => clearTimeout(timer);
-  }, [recalcPaths]);
-
-  useEffect(() => {
-    window.addEventListener("resize", recalcPaths);
-    return () => window.removeEventListener("resize", recalcPaths);
-  }, [recalcPaths]);
 
   // ─── State plumbing ────────────────────────────────────────────────────────
 
@@ -683,8 +432,10 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   );
 
   const openStep = useCallback(
-    (ref: RoadmapStepRef) => {
+    (ref: RoadmapStepRef, options?: { atEnd?: boolean }) => {
       setActiveStepId(ref.step.id);
+      setSelectedStopId(ref.step.id);
+      setLessonAtEnd(!!options?.atEnd);
       setIsDrawerOpen(true);
       syncStepQuery(ref.step.id);
     },
@@ -695,6 +446,25 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     setIsDrawerOpen(false);
     syncStepQuery(null);
   }, [syncStepQuery]);
+
+  /**
+   * A tap on the road: opens that stop's bubble, or folds it again. A step
+   * becomes the active one at once, so its lessons load while the bubble is up.
+   * The editor skips the bubble and goes straight to its drawer.
+   */
+  const selectStop = (stopId: string) => {
+    const ref = findRoadmapStep(steps, stopId);
+    if (ref && adminMode) {
+      openStep(ref);
+      return;
+    }
+    if (selectedStopId === stopId) {
+      setSelectedStopId(null);
+      return;
+    }
+    setSelectedStopId(stopId);
+    if (ref) setActiveStepId(ref.step.id);
+  };
 
   // ─── Checkpoints ───────────────────────────────────────────────────────────
 
@@ -1470,7 +1240,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
         }
       : undefined;
 
-  const markerId = `arr-${roadmap.id.slice(0, 8)}`;
   const isFinished = progress === 100 && passedCheckpoints === phases.length;
   // A finished phase's checkpoint comes before the next phase's first step.
   const checkpointUpNext =
@@ -1479,45 +1248,19 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       : null;
   const totalSteps = steps.length;
   const hasStarted = doneCount > 0 || inProgressCount > 0;
-  const isStepLoading = (step: RoadmapStep) =>
-    loadingDetailIds.has(step.id) ||
-    isRefineBusy(refineBusyIds[step.id]) ||
-    (step.id === activeStepId && !!drawerView?.isGenerating);
   const anyRefineBusy = Object.values(refineBusyIds).some(isRefineBusy);
 
-  /**
-   * A step's node, with the owner's refining wand beside it in refine mode.
-   * The wand sits on the outer side, away from the phase the arrows come
-   * from, so the connector still lands on the node itself.
-   */
-  const renderStep = (
-    step: RoadmapStep,
-    textAlign: "left" | "right",
-    fullWidth: boolean,
-  ) => {
-    const node = (
-      <StepMapButton
-        key={step.id}
-        step={step}
-        isActive={isDrawerOpen && activeStepId === step.id}
-        isLoading={isStepLoading(step)}
-        textAlign={textAlign}
-        fullWidth={fullWidth}
-        connector={!fullWidth}
-        onClick={() => navigateStep(step.id)}
-      />
-    );
-    const ref = refine ? findRoadmapStep(steps, step.id) : null;
-    if (!refine || !ref) return node;
-    const menu = (
+  /** The owner's refining wand, in the corner of a step's bubble in refine mode. */
+  const refineMenuFor = (ref: RoadmapStepRef) =>
+    refine ? (
       <StepRefineMenu
         stepRef={ref}
         costs={refine.costs}
         tokensLeft={refine.tokensLeft}
-        busy={refineBusyIds[step.id] ?? {}}
+        busy={refineBusyIds[ref.step.id] ?? {}}
         anyBusy={anyRefineBusy}
-        exerciseOptions={exerciseOptions[step.id]}
-        side={textAlign === "right" ? "left" : "right"}
+        exerciseOptions={exerciseOptions[ref.step.id]}
+        side='left'
         onRewrite={refineRewrite}
         onSwapExercise={refineSwapExercise}
         onSelectExercise={refineSelectExercise}
@@ -1529,20 +1272,14 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
         onAddStep={refineAddStep}
         onRemoveStep={refineRemoveStep}
       />
-    );
-    return (
-      <div
-        key={step.id}
-        className={cn(
-          "flex items-center gap-1.5",
-          fullWidth ? "w-full" : "max-w-[300px]",
-        )}>
-        {textAlign === "right" && menu}
-        {node}
-        {textAlign === "left" && menu}
-      </div>
-    );
-  };
+    ) : undefined;
+
+  // A step still being written shows a spinner on its stop — in the editor,
+  // where the coach writes it. A player's blank step just reads as blank.
+  const isStopLoading = (stepId: string) =>
+    loadingDetailIds.has(stepId) ||
+    isRefineBusy(refineBusyIds[stepId]) ||
+    (adminMode && stepId === activeStepId && !!drawerView?.isGenerating);
 
   // ─── Render ────────────────────────────────────────────────────────────────
 
@@ -1622,9 +1359,9 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                 {roadmap.level && (
                   <>
                     <span className='text-zinc-700'>·</span>
-                    <span className='rounded bg-zinc-800 px-2 py-0.5 text-xs'>
+                    <Chip color='gray' size='sm'>
                       {t(`levels.${roadmap.level}`, roadmap.level)}
-                    </span>
+                    </Chip>
                   </>
                 )}
               </div>
@@ -1693,24 +1430,27 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                       </span>
                     </div>
                     <div className='flex flex-wrap gap-2'>
-                      <button
+                      <Button
                         type='button'
-                        onClick={handleGenerateAll}
-                        className='flex items-center gap-1.5 rounded bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-cyan-300'>
-                        <Sparkles className='h-3.5 w-3.5' /> All descriptions
-                      </button>
-                      <button
+                        variant='subtle'
+                        size='sm'
+                        onClick={handleGenerateAll}>
+                        <Sparkles /> All descriptions
+                      </Button>
+                      <Button
                         type='button'
-                        onClick={handleFindAllExercises}
-                        className='flex items-center gap-1.5 rounded bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-violet-300'>
-                        <Dumbbell className='h-3.5 w-3.5' /> All exercises
-                      </button>
-                      <button
+                        variant='subtle'
+                        size='sm'
+                        onClick={handleFindAllExercises}>
+                        <Dumbbell /> All exercises
+                      </Button>
+                      <Button
                         type='button'
-                        onClick={handleFindAllLessons}
-                        className='flex items-center gap-1.5 rounded bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-red-300'>
-                        <FaYoutube className='h-3.5 w-3.5' /> All lessons
-                      </button>
+                        variant='subtle'
+                        size='sm'
+                        onClick={handleFindAllLessons}>
+                        <FaYoutube /> All lessons
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -1778,19 +1518,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                 </div>
               )}
 
+              {refine && (
               <div className='flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-lg bg-zinc-900/40 px-4 py-3 text-xs text-zinc-400 md:shrink-0'>
-                {LEGEND.map(({ status, label }) => (
-                  <span key={status} className='flex items-center gap-1.5'>
-                    <span
-                      className={cn(
-                        "h-1.5 w-1.5 rounded-full",
-                        STATUS_DOT[status],
-                      )}
-                    />
-                    {t(label)}
-                  </span>
-                ))}
-                {refine && (
                   <span className='flex items-center gap-1.5 text-zinc-300'>
                     <Coins className='h-3.5 w-3.5 text-amber-300' />
                     {refine.tokensLeft === null ? (
@@ -1808,156 +1537,45 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                       />
                     )}
                   </span>
-                )}
               </div>
+              )}
             </div>
 
-            {/* ─── Graph ─── */}
-            <div ref={containerRef} className='relative'>
-              {svgDims.w > 0 && (
-                <svg
-                  className='pointer-events-none absolute left-0 top-0 hidden overflow-visible sm:block'
-                  width={svgDims.w}
-                  height={svgDims.h}
-                  style={{ zIndex: 0 }}>
-                  <defs>
-                    {LEGEND.map(({ status }) => (
-                      <marker
-                        key={status}
-                        id={`${markerId}-${status}`}
-                        markerWidth='5'
-                        markerHeight='4'
-                        refX='5'
-                        refY='2'
-                        orient='auto'>
-                        <polygon
-                          points='0 0, 5 2, 0 4'
-                          fill={PATH_COLOR[status]}
-                        />
-                      </marker>
-                    ))}
-                  </defs>
-                  {svgPaths.map((path) => (
-                    <path
-                      key={path.key}
-                      d={path.d}
-                      stroke={PATH_COLOR[path.status]}
-                      strokeWidth='2'
-                      fill='none'
-                      strokeDasharray='5 3'
-                      markerEnd={`url(#${markerId}-${path.status})`}
-                      opacity='0.8'
-                    />
-                  ))}
-                </svg>
+            {/* ─── The road ─── */}
+            <RoadmapRoad
+              phases={phases}
+              steps={steps}
+              selectedId={selectedStopId}
+              upNextId={
+                checkpointUpNext
+                  ? checkpointStopId(checkpointUpNext.phase.id)
+                  : (upNext?.step.id ?? null)
+              }
+              hasStarted={hasStarted}
+              isStepLoading={isStopLoading}
+              onSelect={selectStop}
+              renderStepBubble={(ref, pointerOffset) => (
+                <RoadmapStepBubble
+                  stepRef={ref}
+                  pointerOffset={pointerOffset}
+                  lessons={lessonsCache[ref.step.id] ?? []}
+                  onOpenLesson={() => openStep(ref)}
+                  onOpenMaterials={() => openStep(ref, { atEnd: true })}
+                  onPractice={handleOpenExercise}
+                  onPlaySong={handleOpenSong}
+                  refineMenu={refineMenuFor(ref)}
+                />
               )}
-
-              <div
-                className='relative flex flex-col items-center'
-                style={{ zIndex: 1 }}>
-                {/* Root node */}
-                <div className='max-w-sm rounded-lg bg-zinc-800/90 px-8 py-4 text-center text-sm font-bold text-zinc-100'>
-                  {roadmap.title}
-                </div>
-
-                <div className='relative w-full'>
-                  <div className='absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-zinc-800 sm:block' />
-                  <div
-                    className='absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-emerald-600/50 transition-all duration-slow sm:block'
-                    style={{ height: `${progress}%` }}
-                  />
-
-                  {phases.map((phase, phaseIdx) => {
-                    const stepsRight = phaseIdx % 2 === 0;
-                    const phaseAllDone = isPhaseCleared(phase);
-                    const phaseDone = phase.steps.filter(
-                      (s) => getStepStatus(s) === "done",
-                    ).length;
-                    const columnSteps = (textAlign: "left" | "right") => (
-                      <>
-                        {phase.steps.map((step) =>
-                          renderStep(step, textAlign, false),
-                        )}
-                        <CheckpointMapButton
-                          phase={phase}
-                          isActive={
-                            isCheckOpen && activeCheckPhaseId === phase.id
-                          }
-                          textAlign={textAlign}
-                          connector
-                          onClick={() => openCheckpoint(phase.id)}
-                        />
-                      </>
-                    );
-
-                    return (
-                      <div
-                        key={phase.id}
-                        className='flex w-full flex-col py-6 sm:items-center sm:py-10'>
-                        {/* ── Mobile ── */}
-                        <div className='flex w-full flex-col gap-3 sm:hidden'>
-                          <div className='flex items-center gap-2.5'>
-                            <PhaseBadge
-                              phaseIdx={phaseIdx}
-                              allDone={phaseAllDone}
-                            />
-                            <span className='text-sm font-semibold text-zinc-200'>
-                              {phase.title}
-                            </span>
-                            {!phaseAllDone && (
-                              <span className='ml-auto shrink-0 text-[11px] font-medium tabular-nums text-zinc-400'>
-                                {phaseDone}/{phase.steps.length}
-                              </span>
-                            )}
-                          </div>
-                          <div className='ml-4 flex flex-col gap-3 pl-4'>
-                            {phase.steps.map((step) =>
-                              renderStep(step, "left", true),
-                            )}
-                            <CheckpointMapButton
-                              phase={phase}
-                              isActive={
-                                isCheckOpen && activeCheckPhaseId === phase.id
-                              }
-                              textAlign='left'
-                              fullWidth
-                              onClick={() => openCheckpoint(phase.id)}
-                            />
-                          </div>
-                        </div>
-
-                        {/* ── Desktop ── */}
-                        <div className='hidden w-full sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-x-24 md:gap-x-40'>
-                          <div className='flex flex-col items-end gap-5'>
-                            {!stepsRight && columnSteps("right")}
-                          </div>
-
-                          <div
-                            data-phase-id={phase.id}
-                            className='relative z-10 flex shrink-0 items-center gap-2.5 whitespace-nowrap bg-zinc-950 py-1 pl-1 pr-3'>
-                            <PhaseBadge
-                              phaseIdx={phaseIdx}
-                              allDone={phaseAllDone}
-                            />
-                            <span className='text-sm font-semibold text-zinc-200'>
-                              {phase.title}
-                            </span>
-                            {!phaseAllDone && (
-                              <span className='text-[11px] font-medium tabular-nums text-zinc-400'>
-                                {phaseDone}/{phase.steps.length}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className='flex flex-col items-start gap-5'>
-                            {stepsRight && columnSteps("left")}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
+              renderCheckpointBubble={(phase, phaseIdx, pointerOffset) => (
+                <RoadmapCheckpointBubble
+                  phase={phase}
+                  phaseIdx={phaseIdx}
+                  pointerOffset={pointerOffset}
+                  onOpen={() => openCheckpoint(phase.id)}
+                />
+              )}
+              footer={
+                <>
                 {/* Finish node — the reward card on the authored roadmaps, whose
                     steps ship in the repo and can therefore be paid for; the plain
                     plate on a roadmap the player generated for themselves. */}
@@ -1982,8 +1600,9 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                         : `🏆 ${t("finish")}`}
                     </div>
                   ))}
-              </div>
-            </div>
+                </>
+              }
+            />
           </div>
         </div>
       </div>
@@ -1999,30 +1618,56 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
         onResult={handleCheckResult}
       />
 
-      <StepDrawer
-        open={isDrawerOpen}
-        view={drawerView}
-        navigationLocked={!!practiceLesson}
-        onClose={closeStep}
-        onNavigate={navigateStep}
-        onSetStatus={handleSetStatus}
-        onRetryDetail={handleRetryDetail}
-        onOpenExercise={handleOpenExercise}
-        onToggleExercise={handleToggleExercise}
-        onOpenSong={handleOpenSong}
-        onToggleSong={handleToggleSong}
-        onToggleLesson={handleToggleLesson}
-        onPracticeLesson={(lesson) => {
-          if (activeStep) {
-            setPracticeLesson({
-              lesson,
-              stepId: activeStep.step.id,
-              phaseId: activeStep.phase.id,
-            });
-          }
-        }}
-        admin={adminProps}
-      />
+      {adminMode ? (
+        <StepDrawer
+          open={isDrawerOpen}
+          view={drawerView}
+          navigationLocked={!!practiceLesson}
+          onClose={closeStep}
+          onNavigate={navigateStep}
+          onSetStatus={handleSetStatus}
+          onRetryDetail={handleRetryDetail}
+          onOpenExercise={handleOpenExercise}
+          onToggleExercise={handleToggleExercise}
+          onOpenSong={handleOpenSong}
+          onToggleSong={handleToggleSong}
+          onToggleLesson={handleToggleLesson}
+          onPracticeLesson={(lesson) => {
+            if (activeStep) {
+              setPracticeLesson({
+                lesson,
+                stepId: activeStep.step.id,
+                phaseId: activeStep.phase.id,
+              });
+            }
+          }}
+          admin={adminProps}
+        />
+      ) : (
+        <RoadmapStepLesson
+          open={isDrawerOpen}
+          view={drawerView}
+          startAtEnd={lessonAtEnd}
+          onClose={closeStep}
+          onNextStep={navigateStep}
+          onSetStatus={handleSetStatus}
+          onRetryDetail={handleRetryDetail}
+          onOpenExercise={handleOpenExercise}
+          onToggleExercise={handleToggleExercise}
+          onOpenSong={handleOpenSong}
+          onToggleSong={handleToggleSong}
+          onToggleLesson={handleToggleLesson}
+          onPracticeLesson={(lesson) => {
+            if (activeStep) {
+              setPracticeLesson({
+                lesson,
+                stepId: activeStep.step.id,
+                phaseId: activeStep.phase.id,
+              });
+            }
+          }}
+        />
+      )}
 
       {practiceLesson && (
         <LessonPracticeModal

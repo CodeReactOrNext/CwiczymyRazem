@@ -188,11 +188,11 @@ export const SessionDialogs = ({
             className='fixed left-1/2 top-0 z-[99999] rounded-xl border border-white/20 bg-cyan-500 px-8 py-4 shadow-[0_0_30px_rgba(34,211,238,0.5)]'>
             <div className='flex items-center gap-4'>
               <div className='rounded-lg bg-white/20 p-2'>
-                <Check size='1em' className='h-6 w-6 text-black' />
+                <Check className='h-6 w-6 text-black' />
               </div>
               <div>
                 <h4 className='text-lg font-bold tracking-tight text-black leading-none'>{t("dialogs.finished")}</h4>
-                <p className='mt-1 text-[10px] font-semibold text-black/60 tracking-wide'>{t("dialogs.great_job")}</p>
+                <p className='mt-1 text-xs font-semibold text-black/60'>{t("dialogs.great_job")}</p>
               </div>
             </div>
           </motion.div>

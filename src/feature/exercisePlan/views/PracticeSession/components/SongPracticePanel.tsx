@@ -80,7 +80,7 @@ export const SongPracticePanel = memo(function SongPracticePanel({
         )}
 
         <div className='min-w-0 flex-1'>
-          <span className='inline-flex items-center gap-1.5 rounded bg-amber-500/15 px-2.5 py-1 text-[10px] font-bold tracking-wider text-amber-300'>
+          <span className='inline-flex items-center gap-1.5 rounded bg-amber-500/15 px-2.5 py-1 text-xs font-bold text-amber-300'>
             <span className='h-1.5 w-1.5 rounded-full bg-amber-400' />
             {t("song_panel.song")}
           </span>

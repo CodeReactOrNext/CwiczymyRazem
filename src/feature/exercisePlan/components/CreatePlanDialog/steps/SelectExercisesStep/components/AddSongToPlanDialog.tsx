@@ -86,7 +86,7 @@ function AddSongToPlanForm({
 
   return (
     <DialogContent
-      className='sm:max-w-[420px]'>
+      className='sm:max-w-md'>
       <DialogHeader>
         <DialogTitle className='flex items-center gap-3 pr-6'>
           <span className='h-10 w-10 shrink-0 overflow-hidden rounded bg-zinc-800'>

@@ -1,6 +1,12 @@
+import { Card } from "assets/components/ui/card";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import {
+  WidgetHeader,
+  WidgetLink,
+} from "feature/dashboard/components/widgets/WidgetHeader";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, History } from "lucide-react";
-import Link from "next/link";
+import { NotebookPen } from "lucide-react";
 import { useState } from "react";
 
 import { usePracticeLogSessions } from "../hooks/usePracticeLogSessions";
@@ -35,36 +41,27 @@ export const RecentSessionsWidget = ({
   };
 
   return (
-    <section className="flex flex-col gap-3 rounded-2xl bg-zinc-800/30 p-4 ring-1 ring-white/5 sm:p-5">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <History size={17} className="text-cyan-400" />
-          <h3 className="text-lg font-semibold text-white">
-            {t("widget.title")}
-          </h3>
-        </div>
-        <Link
-          href="/practice-log"
-          className="flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1.5 text-sm font-semibold text-cyan-400 transition-colors hover:bg-white/10 hover:text-cyan-300"
-        >
-          {t("widget.view_all")}
-          <ArrowRight size={14} />
-        </Link>
-      </div>
+    <Card className="flex flex-col gap-3 p-5 sm:p-6">
+      <WidgetHeader
+        title={t("widget.title")}
+        action={
+          <WidgetLink href="/practice-log">{t("widget.view_all")}</WidgetLink>
+        }
+      />
 
       {isLoading || sessions === null ? (
         <div className="flex flex-col gap-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-16 animate-pulse rounded-xl bg-zinc-900/40"
-            />
+            <Skeleton key={i} className="h-16" />
           ))}
         </div>
       ) : recentSessions.length === 0 ? (
-        <p className="py-6 text-center text-sm text-zinc-500">
-          {t("widget.empty")}
-        </p>
+        <EmptyState
+          size='compact'
+          className='bg-transparent px-0'
+          icon={<NotebookPen />}
+          title={t("widget.empty")}
+        />
       ) : (
         <div className="flex flex-col gap-2">
           {recentSessions.map((session) => (
@@ -89,6 +86,6 @@ export const RecentSessionsWidget = ({
         onOpenChange={(open) => !open && setDeletingSession(null)}
         onDeleted={handleMutated}
       />
-    </section>
+    </Card>
   );
 };

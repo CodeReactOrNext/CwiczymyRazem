@@ -4,17 +4,11 @@ import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
-const JourneyPage: NextPageWithLayout = () => {
-  return (
-    <div className="flex min-h-screen flex-col overflow-visible rounded-lg bg-zinc-950">
-      <JourneyView />
-    </div>
-  );
-};
+const JourneyPage: NextPageWithLayout = () => <JourneyView />;
 
 JourneyPage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <AppLayout pageId="journey" subtitle="Guitar Journey" variant="secondary">
+    <AppLayout pageId="journey" subtitle="Guitar Journey" variant="secondary" corridor="path">
       {page}
     </AppLayout>
   );

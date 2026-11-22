@@ -131,11 +131,12 @@ export const SongTimerLayout = ({
         <div className='pl-14 sm:pl-0'>
           <div className='flex items-center gap-2'>
             <Button
+              type='button'
               variant='ghost'
               size='icon'
-              onClick={onBack}
-              className='rounded-full hover:bg-white/10'>
-              <ArrowLeft className='h-5 w-5' />
+              aria-label={t("common:back")}
+              onClick={onBack}>
+              <ArrowLeft />
             </Button>
             <h1 className='text-xl font-bold'>{t("practice_session")}</h1>
           </div>
@@ -179,21 +180,19 @@ export const SongTimerLayout = ({
               onClick={toggleTimer}
               variant={timerEnabled ? "subtle" : "default"}
               size='icon'
-              className='h-10 w-10 shrink-0'>
+              className='shrink-0'>
               {timerEnabled ? (
-                <Pause className='h-4 w-4 fill-current' />
+                <Pause className='fill-current' />
               ) : (
-                <Play className='h-4 w-4 fill-current' />
+                <Play className='fill-current' />
               )}
             </Button>
 
             {/* Electron-only amp simulator (renders nothing on web). Non-compact
                 so the "AMP"/"AMP ON" label is visible, not just a bare icon. */}
-            <AmpSimButton h='h-10' />
+            <AmpSimButton h='h-9' />
 
-            <Button
-              onClick={handleFinish}
-              className='ml-1 h-10 rounded-lg px-4 sm:ml-3'>
+            <Button onClick={handleFinish} className='ml-1 sm:ml-3'>
               {t("finish")}
             </Button>
           </div>
@@ -250,7 +249,7 @@ export const SongTimerLayout = ({
 
           {/* Shortcuts Legend - only show when YouTube URL exists */}
           {youtubeUrl && (
-            <div className='hidden items-center gap-6 rounded-lg bg-zinc-900/40 px-6 py-4 md:flex'>
+            <div className='hidden items-center gap-6 rounded-lg bg-zinc-800/40 px-6 py-4 md:flex'>
               <div className='flex items-center gap-2 text-zinc-500'>
                 <Keyboard className='h-4 w-4' />
                 <span className='text-xs font-bold text-zinc-500'>
@@ -259,25 +258,25 @@ export const SongTimerLayout = ({
               </div>
               <div className='flex flex-wrap gap-x-6 gap-y-2'>
                 <div className='flex items-center gap-2'>
-                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
+                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-xs text-zinc-100'>
                     {t("song_timer.key_space")}
                   </kbd>
                   <span className='text-xs text-zinc-500'>{t("song_timer.play_pause")}</span>
                 </div>
                 <div className='flex items-center gap-2'>
-                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
+                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-xs text-zinc-100'>
                     M
                   </kbd>
                   <span className='text-xs text-zinc-500'>{t("song_timer.mark_section")}</span>
                 </div>
                 <div className='flex items-center gap-2'>
-                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
+                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-xs text-zinc-100'>
                     L
                   </kbd>
                   <span className='text-xs text-zinc-500'>{t("song_timer.toggle_loop")}</span>
                 </div>
                 <div className='flex items-center gap-2'>
-                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] text-zinc-100'>
+                  <kbd className='font-mono rounded bg-zinc-800/60 px-1.5 py-0.5 text-xs text-zinc-100'>
                     ← →
                   </kbd>
                   <span className='text-xs text-zinc-500'>{t("song_timer.seek")}</span>

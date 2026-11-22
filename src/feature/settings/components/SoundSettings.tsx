@@ -1,11 +1,6 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "assets/components/ui/card";
+import { Card } from "assets/components/ui/card";
 import { Switch } from "assets/components/ui/switch";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { useTranslation } from "hooks/useTranslation";
 import { playUiSound } from "lib/uiSounds/uiSounds";
 import { useUiSoundsStore } from "lib/uiSounds/uiSoundsStore";
@@ -26,11 +21,8 @@ export const SoundSettings = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{t("sounds.title")}</CardTitle>
-        <CardDescription>{t("sounds.subtitle")}</CardDescription>
-      </CardHeader>
-      <CardContent>
+      <SectionHeader title={t("sounds.title")} description={t("sounds.subtitle")} />
+      <div>
         <div className='flex items-center justify-between gap-6 rounded-lg bg-zinc-900/40 px-4 py-3'>
           <div className='min-w-0'>
             <p className='text-sm font-semibold text-zinc-200'>
@@ -46,7 +38,7 @@ export const SoundSettings = () => {
             aria-label={t("sounds.label")}
           />
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 };

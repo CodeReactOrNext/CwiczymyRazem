@@ -2,7 +2,10 @@
   "common": {
     "loading": "Cargando…",
     "cancel": "Cancelar",
-    "select": "Seleccionar…"
+    "select": "Seleccionar…",
+    "web_only_title": "Tone Studio solo está disponible en la app de escritorio",
+    "web_only_body": "Descarga y abre la app de escritorio de riff.quest para dar forma a tu sonido y cargar tus propios IR.",
+    "web_only_cta": "Descargar la app"
   },
   "chain": {
     "gate": "Puerta",

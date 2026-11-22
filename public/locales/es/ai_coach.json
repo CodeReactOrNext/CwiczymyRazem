@@ -241,5 +241,21 @@
     "remove_step": "Eliminar este paso",
     "phase_min": "Una fase conserva al menos un paso",
     "broke": "No tienes tokens suficientes para un cambio de pago."
+  },
+  "road": {
+    "open_lesson": "Abrir la lección",
+    "read_again": "Leer de nuevo",
+    "materials": "Materiales",
+    "practice": "Practicar",
+    "play_song": "Tocar la canción",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "back_to_map": "Volver al mapa",
+    "next_step": "Siguiente paso",
+    "materials_hint": "Marca lo que has visto y practicado. Todo marcado significa paso completado.",
+    "checkpoint_body": "{{count}} preguntas sobre esta fase. Apruebas con {{pass}}.",
+    "checkpoint_locked": "Termina primero todos los pasos de esta fase ({{done}}/{{total}}).",
+    "take_check": "Hacer el checkpoint",
+    "passed_score": "Aprobado {{score}}/{{total}}"
   }
 }

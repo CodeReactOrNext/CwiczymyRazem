@@ -9,6 +9,7 @@ import type {
   RoadmapBoard,
   RoadmapIdeaStatus,
 } from "feature/supporterPanel/types/supporterPanel.types";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 
 export const SUPPORTER_ROADMAP_KEY = ["supporter-roadmap"] as const;
@@ -33,6 +34,7 @@ const errorMessage = (error: unknown, fallback: string): string => {
 
 export const useRoadmapMutations = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation("supporter");
 
   const applyBoard = (board: RoadmapBoard) =>
     queryClient.setQueryData(SUPPORTER_ROADMAP_KEY, board);
@@ -49,7 +51,7 @@ export const useRoadmapMutations = () => {
     mutationFn: postRoadmapIdea,
     onSuccess: (board) => {
       applyBoard(board);
-      toast.success("Idea posted");
+      toast.success(t("toast.idea_posted"));
     },
     onError: (error) =>
       toast.error(errorMessage(error, "Could not post that idea")),

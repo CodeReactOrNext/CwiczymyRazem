@@ -1,5 +1,8 @@
 import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import Avatar from "components/UI/Avatar";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { GuildBanner } from "feature/guilds/components/GuildBanner";
@@ -14,8 +17,13 @@ import {
   equippedItem,
   motifIcons,
 } from "feature/guilds/utils/guildCosmetics.utils";
+import {
+  isPodiumPlace,
+  placeKeyClass,
+  PODIUM_LIGHT,
+} from "feature/leadboard/components/rankRowStyles";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Clock, Plus, Shield, Users, X } from "lucide-react";
+import { Check, Clock, Plus, Users, X } from "lucide-react";
 import { useState } from "react";
 
 /** Who is in it, as faces — names on hover, the roster tab reads them. */
@@ -83,7 +91,14 @@ const GuildRankRow = ({
     <li
       className={cn(
         "relative flex flex-wrap items-center gap-x-3 gap-y-3 overflow-hidden rounded-lg p-4 transition-background sm:flex-nowrap sm:gap-5 sm:px-6 sm:py-5",
-        isMine ? "bg-zinc-800/60" : "bg-zinc-900/40 hover:bg-zinc-900/60",
+        isMine ? "bg-zinc-800/60" : "bg-zinc-800/40 hover:bg-zinc-800/60",
+        // The medal's light from the left, as on the player leaderboard.
+        !isMine &&
+          isPodiumPlace(rank) &&
+          cn(
+            "light-tint bg-gradient-to-r via-transparent to-transparent",
+            PODIUM_LIGHT[rank],
+          ),
       )}>
       {/* The banner, faded in from the right and gone before the text. */}
       <div
@@ -104,8 +119,8 @@ const GuildRankRow = ({
       <span
         aria-label={t("browser.rank", { rank })}
         className={cn(
-          "relative w-6 shrink-0 text-center text-xl font-bold tabular-nums",
-          rank <= 3 ? "text-zinc-200" : "text-zinc-500",
+          "relative h-7 w-8 text-xl sm:h-9 sm:w-10 sm:text-2xl",
+          placeKeyClass(rank, isMine),
         )}>
         {rank}
       </span>
@@ -147,7 +162,7 @@ const GuildRankRow = ({
               "inline-flex items-center gap-1.5 tabular-nums",
               full && "text-zinc-500",
             )}>
-            <Users size={13} />
+            <Users className='h-3.5 w-3.5' />
             {guild.memberCount}/{guild.memberLimit}
           </span>
           <span className='truncate text-zinc-500'>
@@ -186,7 +201,7 @@ const GuildRankRow = ({
             variant='ghost'
             disabled={busy}
             onClick={onLeave}
-            className='h-9 text-zinc-400 hover:text-red-400'>
+            className='text-zinc-400 hover:text-red-400'>
             {t("browser.leave")}
           </Button>
         ) : application ? (
@@ -221,8 +236,7 @@ const GuildRankRow = ({
                 : blocked
                   ? t("browser.leave_first")
                   : undefined
-            }
-            className='h-9'>
+            }>
             {full ? t("browser.full") : t("browser.join")}
           </Button>
         )}
@@ -247,17 +261,17 @@ const ApplicationQueue = ({
   const { t } = useTranslation("guilds");
   return (
     <section className='space-y-3'>
-      <h2 className='flex items-center gap-2.5 text-lg font-bold text-white'>
-        {t("browser.asking")}
-        <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-semibold tabular-nums text-zinc-400'>
-          {applications.length}
-        </span>
-      </h2>
+      <SectionHeader
+        title={t("browser.asking")}
+        count={applications.length}
+        size='lg'
+        className='mb-0'
+      />
 
       {applications.map((application) => (
         <div
           key={application.uid}
-          className='flex flex-wrap items-center gap-3 rounded-lg bg-zinc-900/40 p-4'>
+          className='flex flex-wrap items-center gap-3 rounded-lg bg-zinc-800/40 p-4'>
           <Avatar
             name={application.displayName}
             avatarURL={application.avatar ?? undefined}
@@ -287,10 +301,8 @@ const ApplicationQueue = ({
                 size='sm'
                 disabled={busy}
                 onClick={() => onDecide(application.uid, true)}>
-                <span className='flex items-center gap-1.5'>
-                  <Check size={14} />
-                  {t("browser.accept")}
-                </span>
+                <Check size={14} />
+                {t("browser.accept")}
               </Button>
               <Button
                 size='sm'
@@ -325,12 +337,9 @@ export const GuildBrowser = ({
 
   if (isLoading || !data) {
     return (
-      <div className='space-y-4'>
+      <div className='space-y-4' aria-busy='true'>
         {Array.from({ length: 3 }, (_, index) => (
-          <div
-            key={index}
-            className='h-28 animate-pulse rounded-lg bg-zinc-900/40'
-          />
+          <Skeleton key={index} variant='block' className='h-28' />
         ))}
       </div>
     );
@@ -360,13 +369,11 @@ export const GuildBrowser = ({
                 ? t("browser.not_enough_tokens")
                 : t("browser.name_yours")
           }>
-          <span className='flex items-center gap-2'>
-            <Plus size={16} />
-            {t("browser.found")}
-            <span className='ml-1 inline-flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 text-sm font-bold tabular-nums'>
-              <SupportToken size={16} />
-              {data.foundingCost}
-            </span>
+          <Plus size={16} />
+          {t("browser.found")}
+          <span className='ml-1 inline-flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 text-sm font-bold tabular-nums'>
+            <SupportToken size={16} />
+            {data.foundingCost}
           </span>
         </Button>
       </section>
@@ -386,25 +393,19 @@ export const GuildBrowser = ({
       )}
 
       {data.guilds.length === 0 ? (
-        <div className='flex flex-col items-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-          <span className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-400'>
-            <Shield size={26} />
-          </span>
-          <h3 className='mb-2 text-lg font-bold text-zinc-100'>
-            {t("browser.empty_title")}
-          </h3>
-          <p className='max-w-sm text-sm text-zinc-400'>
-            {t("browser.empty_body")}
-          </p>
-        </div>
+        <EmptyState
+          mood='wait'
+          title={t("browser.empty_title")}
+          description={t("browser.empty_body")}
+        />
       ) : (
         <section className='space-y-4'>
-          <h2 className='flex items-center gap-2.5 text-lg font-bold text-white'>
-            {t("browser.ranking")}
-            <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-semibold tabular-nums text-zinc-400'>
-              {data.guilds.length}
-            </span>
-          </h2>
+          <SectionHeader
+            title={t("browser.ranking")}
+            count={data.guilds.length}
+            size='lg'
+            className='mb-0'
+          />
           <ol className='space-y-3'>
             {ranked.map((guild, index) => (
               <GuildRankRow

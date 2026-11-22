@@ -1,3 +1,4 @@
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import type { YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
 import { useTranslation } from "hooks/useTranslation";
@@ -14,13 +15,6 @@ function formatDuration(seconds: number): string {
   }
   return `${m}:${String(s).padStart(2, "0")}`;
 }
-
-const LEVEL_STYLES: Record<string, string> = {
-  beginner: "bg-cyan-500/10 text-cyan-400",
-  intermediate: "bg-amber-500/10 text-amber-400",
-  advanced: "bg-rose-500/10 text-rose-400",
-  all: "bg-zinc-800/60 text-zinc-400",
-};
 
 interface YouTubeLessonCardProps {
   lesson: YouTubeLessonResult;
@@ -48,7 +42,6 @@ const YouTubeLessonCard = ({
   };
 
   const levelKey = lesson.level?.toLowerCase() ?? "";
-  const levelStyle = LEVEL_STYLES[levelKey] ?? "bg-zinc-700/60 text-zinc-300";
 
   return (
     <button
@@ -83,13 +76,9 @@ const YouTubeLessonCard = ({
         </p>
         <div className='mt-2 flex flex-wrap items-center gap-2'>
           {lesson.level && (
-            <span
-              className={cn(
-                "rounded px-2 py-0.5 text-[11px] font-semibold capitalize",
-                levelStyle,
-              )}>
+            <Chip color='gray' size='sm' className='capitalize'>
               {t(`lesson_levels.${levelKey}`, lesson.level)}
-            </span>
+            </Chip>
           )}
           {!!lesson.duration && (
             <span className='flex items-center gap-1 text-[11px] text-zinc-400'>

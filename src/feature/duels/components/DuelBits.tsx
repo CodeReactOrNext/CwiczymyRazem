@@ -150,7 +150,7 @@ export const FormGuide = ({
           key={i}
           title={t(`recent.${result}`)}
           className={cn(
-            "flex size-5 items-center justify-center rounded text-[10px] font-bold",
+            "flex size-5 items-center justify-center rounded text-[11px] font-bold",
             FORM_STYLE[result],
           )}>
           {t(`form.${result}`)}

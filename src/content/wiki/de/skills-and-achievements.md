@@ -50,4 +50,4 @@ Sie kommen in vier Seltenheitsstufen, gezeigt durch die Farbe des Abzeichens:
 
 <FaqList items="Wie bekomme ich Fähigkeiten-XP?::Spiel die mit dieser Fähigkeit markierten Übungen und trage die Session ein. Freie Übungszeit erhöht deine Punkte, aber nur Übungen speisen bestimmte Fähigkeiten|Kann eine Fähigkeit sinken?::Nein. Fähigkeitssummen nehmen nie ab|Geben Erfolge Belohnungen?::Nein, sie sind nur zum Sammeln. Alles, was du tatsächlich ausgibst, kommt aus Fame|Wo sehe ich meine Abzeichen?::Auf deinem Profil, neben deinem Level und deinen Statistiken" />
 
-<ReadNext links="Die vier Kategorien::/wiki/the-four-categories|Wege zu üben::/wiki/practice-modes-overview|Übungsroutinen & Auto-Plan::/wiki/exercise-plans-and-auto-plan|Lernpfad & Scale Map::/wiki/journey-and-scale-tree" />
+<ReadNext links="Die vier Kategorien::/wiki/the-four-categories|Wege zu üben::/wiki/practice-modes-overview|Übungspläne & Auto-Plan::/wiki/exercise-plans-and-auto-plan|Lernpfad & Scale Map::/wiki/journey-and-scale-tree" />

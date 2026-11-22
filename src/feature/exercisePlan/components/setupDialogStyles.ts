@@ -7,7 +7,7 @@
 
 /** DialogContent: flex column capped to the screen, middle part scrolls. */
 export const SETUP_DIALOG_CONTENT =
-  "!flex max-h-[100dvh] flex-col sm:max-h-[92dvh] sm:max-w-[550px]";
+  "!flex max-h-[100dvh] flex-col sm:max-h-[92dvh]";
 
 /** Scrolling body between the header and the footer. */
 export const SETUP_DIALOG_BODY =
@@ -20,8 +20,7 @@ export const SETUP_DIALOG_FOOTER = "flex shrink-0 justify-end gap-3 pt-2";
 export const SETUP_SURFACE = "rounded-lg bg-zinc-900/60";
 
 /**
- * Input / Textarea / SelectTrigger: a filled surface instead of the base
- * bordered, transparent field — matches SETUP_SURFACE.
+ * Input / Textarea / SelectTrigger in the setup dialogs: the base field
+ * (filled, borderless) at the dialogs' taller row height.
  */
-export const SETUP_FIELD =
-  "h-11 rounded-lg border-0 bg-zinc-900/60 text-zinc-100 shadow-none transition-colors placeholder:text-zinc-500 hover:bg-zinc-900 focus:ring-1 focus:ring-zinc-500 focus-visible:ring-1 focus-visible:ring-zinc-500";
+export const SETUP_FIELD = "h-11";

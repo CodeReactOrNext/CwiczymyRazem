@@ -1,13 +1,15 @@
 import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
-import Avatar from "components/UI/Avatar";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import type { DuelOverview } from "feature/duels/types/duel.types";
 import type { RankRowEntry } from "feature/duels/utils/duelScreens";
 import { rankGap, rankNeighbours } from "feature/duels/utils/duelScreens";
+import { RankRow } from "feature/leadboard/components/RankRow";
 import { useTranslation } from "hooks/useTranslation";
+import { Trophy } from "lucide-react";
 import { Fragment } from "react";
 
-const RankRow = ({
+/** One place on the ELO ladder, in the app's shared ranking row. */
+const DuelRankRow = ({
   entry,
   showRecord = true,
 }: {
@@ -16,42 +18,23 @@ const RankRow = ({
 }) => {
   const { t } = useTranslation("duels");
   return (
-    <li
-      className={cn(
-        "flex items-center gap-3 rounded-xl px-3 py-2.5",
-        entry.isMe && "bg-zinc-800/70",
-      )}>
-      <span
-        className={cn(
-          "w-7 shrink-0 text-center font-teko text-xl font-semibold tabular-nums leading-none",
-          entry.isMe ? "text-cyan-300" : "text-zinc-500",
-        )}>
-        {entry.place}
-      </span>
-      <Avatar
-        avatarURL={entry.avatar || undefined}
-        name={entry.displayName}
-        size='xs'
-        className='shrink-0'
-      />
-      <span className='min-w-0 flex-1'>
-        <span
-          className={cn(
-            "block truncate text-sm",
-            entry.isMe ? "font-semibold text-zinc-50" : "text-zinc-200",
-          )}>
-          {entry.displayName}
-        </span>
-        {showRecord && (
-          <span className='block text-[11px] tabular-nums text-zinc-500'>
+    <RankRow
+      place={entry.place}
+      nick={entry.displayName}
+      avatarUrl={entry.avatar}
+      // The player's own row falls back to "me" when signed out — no profile.
+      profileId={entry.key === "me" ? undefined : entry.key}
+      isCurrentUser={entry.isMe}
+      score={entry.rating}
+      density={showRecord ? "default" : "compact"}
+      meta={
+        showRecord && (
+          <span className='tabular-nums'>
             {t("ranking.record", { wins: entry.wins, losses: entry.losses })}
           </span>
-        )}
-      </span>
-      <span className='shrink-0 font-teko text-2xl font-semibold tabular-nums leading-none text-zinc-50'>
-        {entry.rating}
-      </span>
-    </li>
+        )
+      }
+    />
   );
 };
 
@@ -120,18 +103,21 @@ export const DuelRanking = ({
       </div>
 
       {listed.length === 0 ? (
-        <p className='px-1 text-sm leading-relaxed text-zinc-400'>
-          {t("ranking.empty")}
-        </p>
+        // A plain icon: the duels page already has Kostek on its empty seat.
+        <EmptyState
+          size='compact'
+          icon={<Trophy />}
+          title={t("ranking.empty")}
+        />
       ) : (
-        <ol className='flex flex-col gap-0.5'>
+        <ol className='flex flex-col gap-1.5'>
           {listed.map((entry) => (
-            <RankRow key={entry.key} entry={entry} />
+            <DuelRankRow key={entry.key} entry={entry} />
           ))}
           {showMeBelow && (
             <>
               <Ellipsis />
-              <RankRow
+              <DuelRankRow
                 entry={{
                   key: uid ?? "me",
                   displayName: myName,
@@ -170,7 +156,7 @@ export const DuelRankPeek = ({
   });
 
   return (
-    <section className='flex flex-col gap-3 rounded-2xl bg-zinc-900/60 p-5'>
+    <section className='flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
       <h2 className='text-base font-semibold text-zinc-100'>
         {t("rank.peek_title")}
       </h2>
@@ -182,17 +168,17 @@ export const DuelRankPeek = ({
         </p>
       )}
       {rows.length > 0 && (
-        <ol className='-mx-2 flex flex-col gap-0.5'>
+        <ol className='flex flex-col gap-1.5'>
           {rows.map((entry, i) => (
             <Fragment key={entry.key}>
               {/* Places skipped between two rows (you, far below the list). */}
               {i > 0 && rows[i - 1].place + 1 < entry.place && <Ellipsis />}
-              <RankRow entry={entry} showRecord={false} />
+              <DuelRankRow entry={entry} showRecord={false} />
             </Fragment>
           ))}
         </ol>
       )}
-      <Button variant='ghost' className='h-10 w-full' onClick={onOpenRanking}>
+      <Button variant='ghost' size='lg' className='w-full' onClick={onOpenRanking}>
         {t("rank.full")}
       </Button>
     </section>

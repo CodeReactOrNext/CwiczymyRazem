@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
@@ -75,8 +76,10 @@ export function TrackMixer({ tracks, onChange, className }: TrackMixerProps) {
 
         return (
           <div key={track.id} className='flex min-w-0 items-center gap-2.5'>
-            <button
+            <Button
               type='button'
+              variant='ghost'
+              size='icon-sm'
               onClick={() => onChange(track.id, { isMuted: !track.isMuted })}
               title={
                 track.isMuted
@@ -84,18 +87,23 @@ export function TrackMixer({ tracks, onChange, className }: TrackMixerProps) {
                   : t("common.mute", { what: label })
               }
               aria-pressed={track.isMuted}
-              className={cn(
-                "flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors",
+              aria-label={
                 track.isMuted
-                  ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
-                  : "bg-zinc-800 text-zinc-400 hover:text-white",
+                  ? t("common.unmute", { what: label })
+                  : t("common.mute", { what: label })
+              }
+              className={cn(
+                "shrink-0",
+                track.isMuted
+                  ? "text-red-400 hover:text-red-300"
+                  : "text-zinc-400",
               )}>
               {track.isMuted ? (
-                <VolumeX className='h-3.5 w-3.5' strokeWidth={2.5} />
+                <VolumeX strokeWidth={2.5} />
               ) : (
-                <Volume2 className='h-3.5 w-3.5' strokeWidth={2.5} />
+                <Volume2 strokeWidth={2.5} />
               )}
-            </button>
+            </Button>
 
             <div className='min-w-0 flex-1'>
               <div className='flex items-center gap-1.5'>
@@ -107,7 +115,7 @@ export function TrackMixer({ tracks, onChange, className }: TrackMixerProps) {
                   )}>
                   {label}
                 </span>
-                <span className='ml-auto shrink-0 font-mono text-[10px] tabular-nums text-zinc-500'>
+                <span className='ml-auto shrink-0 font-mono text-[11px] tabular-nums text-zinc-500'>
                   {track.isMuted ? "muted" : `${percent}%`}
                 </span>
               </div>

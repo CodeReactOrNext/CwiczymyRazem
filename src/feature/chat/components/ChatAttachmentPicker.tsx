@@ -5,8 +5,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
-import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { useUserArsenal } from "feature/arsenal/hooks/useUserArsenal";
@@ -212,7 +212,7 @@ export const ChatAttachmentPicker = ({
       <DialogContent
         // Opened from the community drawer, which sits at z-[110].
         overlayClassName='z-[120]'
-        className='dark-theme z-[120] flex max-h-[85vh] flex-col gap-5 rounded-lg bg-zinc-950 p-6 sm:max-w-lg'>
+        className='dark-theme z-[120] flex max-h-[85vh] flex-col gap-5 bg-zinc-950'>
         <DialogHeader>
           <DialogTitle className='text-base'>{t("attachment.share_title")}</DialogTitle>
         </DialogHeader>
@@ -235,12 +235,12 @@ export const ChatAttachmentPicker = ({
           ))}
         </div>
 
-        <Input
+        <SearchInput
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder={t("attachment.search")}
+          aria-label={t("attachment.search")}
           autoComplete='off'
-          className='h-10 rounded-lg border-none bg-zinc-900'
         />
 
         <div className='-mx-2 min-h-[200px] flex-1 overflow-y-auto px-2 scrollbar scrollbar-track-transparent scrollbar-thumb-zinc-700'>

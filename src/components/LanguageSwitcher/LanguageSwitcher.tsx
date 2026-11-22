@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,10 +63,16 @@ export const LanguageSwitcher = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        aria-label={`Language: ${current?.englishLabel ?? "English"}`}
-        className='flex h-11 min-w-11 items-center justify-center rounded-[8px] bg-white/5 px-2.5 outline-none transition-colors focus-visible:ring-1 focus-visible:ring-white/20 hover:bg-white/10'>
-        <Flag locale={locale} />
+      <DropdownMenuTrigger asChild>
+        {/* The key's svg rule would square the flag; give it back its 20×14. */}
+        <Button
+          type='button'
+          variant='subtle'
+          size='icon-touch'
+          aria-label={`Language: ${current?.englishLabel ?? "English"}`}
+          className='[&_svg]:h-3.5 [&_svg]:w-5'>
+          <Flag locale={locale} />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='min-w-[10rem]'>
         {SUPPORTED_LOCALES.map(({ code, label, englishLabel }) => (

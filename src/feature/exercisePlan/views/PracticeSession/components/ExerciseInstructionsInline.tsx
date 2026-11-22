@@ -75,7 +75,7 @@ export const ExerciseInstructionsInline = ({
     <div className="space-y-3">
       <div className="flex items-center gap-2.5 text-red-400">
         <Heart size={14} className="animate-pulse" />
-        <h4 className="text-[11px] font-semibold capitalize tracking-wider">{t("session:instructions.support_author")}</h4>
+        <h4 className="text-xs font-medium">{t("session:instructions.support_author")}</h4>
       </div>
       <div className="flex flex-col gap-2">
         {exercise.links!.map((link, idx) => {
@@ -99,7 +99,7 @@ export const ExerciseInstructionsInline = ({
                 )} />
                 <span className="text-zinc-300 group-hover:text-white font-medium">{link.label}</span>
               </div>
-              <ExternalLink size='1em' className="h-3 w-3 text-zinc-600 group-hover:text-zinc-400" />
+              <ExternalLink className="h-3 w-3 text-zinc-600 group-hover:text-zinc-400" />
             </a>
           );
         })}
@@ -116,7 +116,7 @@ export const ExerciseInstructionsInline = ({
                     <div className="space-y-4">
                       <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
                         <InfoIcon size={14} />
-                        <h4 className="text-[11px] font-semibold capitalize tracking-wider">{t("session:instructions.instructions")}</h4>
+                        <h4 className="text-xs font-medium">{t("session:instructions.instructions")}</h4>
                       </div>
                       <div className="space-y-3">
                         {exercise.instructions.map((instruction, idx) => (
@@ -132,7 +132,7 @@ export const ExerciseInstructionsInline = ({
                     <div className="space-y-4">
                       <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
                         <GraduationCap size={14} />
-                        <h4 className="text-[11px] font-semibold capitalize tracking-wider">{t("session:instructions.why")}</h4>
+                        <h4 className="text-xs font-medium">{t("session:instructions.why")}</h4>
                       </div>
                       <p className="text-zinc-400 text-sm leading-relaxed font-normal">
                         {exercise.whyItMatters}
@@ -149,7 +149,7 @@ export const ExerciseInstructionsInline = ({
                       <div className="p-3.5 bg-amber-500/10 rounded-lg flex items-start gap-3 text-amber-400 text-sm leading-relaxed font-semibold">
                         <InfoIcon size={16} className="shrink-0 text-amber-500 mt-0.5" />
                         <div>
-                          <div className="text-[11px] font-semibold capitalize tracking-wider text-amber-500/80 mb-1">{t("session:instructions.backing_recommended")}</div>
+                          <div className="text-xs font-medium text-amber-500/80 mb-1">{t("session:instructions.backing_recommended")}</div>
                           {t("session:instructions.backing_hint")}
                         </div>
                       </div>
@@ -159,7 +159,7 @@ export const ExerciseInstructionsInline = ({
                       <div className="space-y-4">
                         <div className="flex items-center gap-2.5 text-zinc-200 mb-2">
                           <Lightbulb size={14} />
-                          <h4 className="text-[11px] font-semibold capitalize tracking-wider">{t("session:instructions.pro_tips")}</h4>
+                          <h4 className="text-xs font-medium">{t("session:instructions.pro_tips")}</h4>
                         </div>
                         <div className="flex flex-col gap-3">
                           {exercise.tips.map((tip, idx) => (
@@ -186,7 +186,7 @@ export const ExerciseInstructionsInline = ({
                           exercise.difficulty === 'easy' ? 'text-emerald-500/80' :
                           exercise.difficulty === 'medium' ? 'text-amber-500/80' : 'text-rose-500/80'
                         )} />
-                        <h4 className="text-[11px] font-semibold capitalize tracking-wider">{t("session:instructions.difficulty")}</h4>
+                        <h4 className="text-xs font-medium">{t("session:instructions.difficulty")}</h4>
                       </div>
                       <p className={cn(
                         "text-sm font-semibold capitalize pl-6",
@@ -201,7 +201,7 @@ export const ExerciseInstructionsInline = ({
                     <div className="space-y-2">
                       <div className="flex items-center gap-2.5 text-zinc-200">
                         <Check size={14} className="text-emerald-500/80" />
-                        <h4 className="text-[11px] font-semibold capitalize tracking-wider">{t("session:instructions.reward")}</h4>
+                        <h4 className="text-xs font-medium">{t("session:instructions.reward")}</h4>
                       </div>
                       <div className="space-y-1.5 pl-6">
                         {displaySkillIds.map(skillId => {

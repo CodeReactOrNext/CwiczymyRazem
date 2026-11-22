@@ -1,10 +1,11 @@
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
+import { useBenchReadiness } from "feature/arsenal/hooks/useBenchReadiness";
 import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
-import { getWorkshopEntries } from "feature/arsenal/utils/workshopEntries";
 import { useTranslation } from "hooks/useTranslation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { InServiceTags } from "../InServiceTags";
+import { ReadyMark } from "./ReadyMark";
 import { WalletStrip } from "./WalletStrip";
 import { WorkshopBench } from "./WorkshopBench";
 import { WorkshopRack } from "./WorkshopRack";
@@ -20,7 +21,7 @@ interface WorkshopTabProps {
  * is what stops you.
  */
 export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
-  const entries = useMemo(() => getWorkshopEntries(data), [data]);
+  const { entries, readyIds } = useBenchReadiness(data);
   const { t } = useTranslation("arsenal");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [rackOpen, setRackOpen] = useState(false);
@@ -64,11 +65,13 @@ export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
               {t("workshop.change_instrument", { count: entries.length })}
             </span>
           </span>
+          {readyIds.size > 0 && <ReadyMark count={readyIds.size} />}
         </button>
 
         <div className='hidden lg:block'>
           <WorkshopRack
             entries={entries}
+            readyIds={readyIds}
             selectedId={selected?.id ?? null}
             onSelect={(entry) => pickInstrument(entry.id)}
           />
@@ -96,6 +99,7 @@ export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
           <WorkshopRack
             bare
             entries={entries}
+            readyIds={readyIds}
             selectedId={selected?.id ?? null}
             onSelect={(entry) => pickInstrument(entry.id)}
           />

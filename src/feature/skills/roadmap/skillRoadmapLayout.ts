@@ -55,7 +55,9 @@ export const ROADMAP_GEOMETRY = {
   tierKeySize: 80,
   tierKeyLip: 7,
   /** The tier's name and count, stacked above its key. */
-  tierLabelHeight: 70,
+  // Room for the stop name and count over a tier key, plus the gap down to
+  // its progress ring (ProgressArc), which reaches 61 px above the key centre.
+  tierLabelHeight: 84,
   /** From under a tier's key to its first pair of skills. */
   tierToBranches: 26,
   /** After a tier's last pair, before the next tier's name. */

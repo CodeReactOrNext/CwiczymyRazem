@@ -1,4 +1,7 @@
+import { Skeleton } from "assets/components/ui/skeleton";
+import { cn } from "assets/lib/utils";
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { GearProposalForm } from "feature/gearProposals/components/GearProposalForm";
 import { GearProposalSummary } from "feature/gearProposals/components/GearProposalSummary";
@@ -37,11 +40,7 @@ const toProposalInput = (draft: GearDraft): GearProposalInput => ({
 const FormSkeleton = () => (
   <div className='space-y-5'>
     {[220, 260, 300].map((height) => (
-      <div
-        key={height}
-        className='animate-pulse rounded-lg bg-zinc-900/40'
-        style={{ height }}
-      />
+      <Skeleton key={height} variant='block' style={{ height }} />
     ))}
   </div>
 );
@@ -82,7 +81,7 @@ export const ProposeGearView = () => {
   };
 
   return (
-    <div className='font-openSans flex w-full flex-col'>
+    <div className='flex w-full flex-col'>
       <HeroBanner
         title={t("panel.gear.propose_title")}
         subtitle={t("panel.gear.propose_subtitle")}
@@ -96,7 +95,6 @@ export const ProposeGearView = () => {
           />
         }
         backgroundContent={<HeroPattern variant='heart' />}
-        className='min-h-[150px] w-full !rounded-none !shadow-none md:min-h-[120px] lg:min-h-[140px]'
         rightContent={
           isSupporter && board ? (
             <TokenWalletBar wallet={board.wallet} />
@@ -104,11 +102,11 @@ export const ProposeGearView = () => {
         }
       />
 
-      <div className='mx-auto flex w-full max-w-7xl flex-col gap-8 p-4 pb-14 sm:p-6 md:p-8 md:pb-20 lg:p-10 lg:pb-24'>
+      <div className={cn("mx-auto flex w-full max-w-7xl flex-col gap-8", PAGE_CONTENT)}>
         {isRosterLoading ? (
           // The roster answers "not a supporter" for everyone until it lands,
           // so waiting is what keeps a supporter off the sales pitch.
-          <div className='h-72 animate-pulse rounded-lg bg-zinc-900/40' />
+          <Skeleton variant='block' className='h-72' />
         ) : !isSupporter ? (
           <SupporterPitch />
         ) : isLoading || !board ? (

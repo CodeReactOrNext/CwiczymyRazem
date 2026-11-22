@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { SongSection } from "feature/songs/types/songSection.type";
 import {
@@ -76,7 +77,10 @@ const SkipButton = ({
     onClick={onClick}
     disabled={disabled}
     aria-label={label}
-    className='flex h-12 w-12 items-center justify-center rounded-full text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 hover:bg-zinc-800 hover:text-zinc-100 active:bg-zinc-800'>
+    className={cn(
+      buttonVariants({ variant: "subtle", size: "icon" }),
+      "h-12 w-12 disabled:opacity-40 [&_svg]:size-5",
+    )}>
     {children}
   </button>
 );

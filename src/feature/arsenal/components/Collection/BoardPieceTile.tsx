@@ -2,6 +2,7 @@ import { PART_TIER_COLORS } from "feature/arsenal/data/partDefinitions";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import type { BoardPiece } from "feature/arsenal/utils/boardPieces";
 import type { DexStatus } from "feature/arsenal/utils/dex";
+import { getTierProgress } from "feature/arsenal/utils/workshopReadiness";
 import { ComponentPreviewCard } from "feature/guitarBuilder/components/ComponentPreviewCard";
 import { ComponentThumb } from "feature/guitarBuilder/components/ComponentThumb";
 import { PartPlate } from "feature/guitarBuilder/components/PartPlate";
@@ -34,6 +35,11 @@ interface BoardPieceTileProps extends StashPlacement {
    * corner glyph. Parts and mods are not collected and ignore it.
    */
   dexStatus?: DexStatus;
+  /**
+   * The viewer's Fame, on their own board — lets a part socket say whether its
+   * stack can climb a tier today. Absent on a board that is not theirs.
+   */
+  fame?: number;
   /** Under the hover card, whatever the piece — see `StashTile`. */
   previewFooter?: ReactNode;
   onClick?: StashTileClick;
@@ -53,6 +59,7 @@ export const BoardPieceTile = ({
   rigSlot = null,
   isOnPedalboard = false,
   dexStatus,
+  fame,
   previewFooter,
   onClick,
   ...placement
@@ -121,9 +128,14 @@ export const BoardPieceTile = ({
     );
   }
 
+  const tierProgress =
+    fame != null ? getTierProgress(piece.part, fame) : null;
+
   return (
     <StashTile
       {...placement}
+      ready={tierProgress?.ready ?? false}
+      tierProgress={tierProgress}
       color={PART_TIER_COLORS[piece.part.tier]}
       // Sized off the socket rather than in px: the board's cells grow with
       // the viewport, and a fixed box left a part swimming in a wide one.

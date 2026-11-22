@@ -42,6 +42,26 @@ export const useDashboardData = (): DashboardDataContextValue => {
   return value;
 };
 
+/**
+ * Customize mode, held by a page whose own header carries the Customize key —
+ * Home's hero strip does, from `md` up. The cards read it from here and then
+ * only keep their own key for phones; without a provider they hold the mode
+ * themselves.
+ */
+export interface DashboardCustomizeContextValue {
+  isEditing: boolean;
+  setIsEditing: (isEditing: boolean) => void;
+}
+
+const DashboardCustomizeContext =
+  createContext<DashboardCustomizeContextValue | null>(null);
+
+export const DashboardCustomizeProvider = DashboardCustomizeContext.Provider;
+
+export const useDashboardCustomize =
+  (): DashboardCustomizeContextValue | null =>
+    useContext(DashboardCustomizeContext);
+
 /** The layout being shown, whether it is being customised, and how to change it. */
 export interface DashboardLayoutContextValue {
   layout: DashboardLayout;

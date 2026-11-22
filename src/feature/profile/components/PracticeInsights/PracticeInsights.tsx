@@ -1,3 +1,5 @@
+import { Card } from "assets/components/ui/card";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { useTranslation } from "hooks/useTranslation";
 import { Brain, Clock, Trophy } from "lucide-react";
 import { useMemo } from "react";
@@ -12,14 +14,16 @@ export const PracticeInsights = ({ statistics }: PracticeInsightsProps) => {
 
   if (!statistics) {
     return (
-      <div className='rounded-xl bg-zinc-900/30 p-6 backdrop-blur-sm'>
-        <h3 className='mb-2 text-xl font-bold text-white'>
-          {t("practice_insights")}
-        </h3>
+      <Card className='p-5 sm:p-6'>
+        <SectionHeader
+          as='h3'
+          title={t("practice_insights")}
+          className='mb-2'
+        />
         <p className='text-sm text-zinc-400'>
           {t("insights.advice.first_steps")}
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -33,19 +37,19 @@ export const PracticeInsights = ({ statistics }: PracticeInsightsProps) => {
 
   const insights: InsightItem[] = [
     {
-      icon: <Clock size='1em' className='h-5 w-5' />,
+      icon: <Clock className='h-5 w-5' />,
       label: t("insights.avg_session"),
       value: convertMsToHM(avgSessionLength),
       description: t("insights.avg_session_desc"),
     },
     {
-      icon: <Trophy size='1em' className='h-5 w-5' />,
+      icon: <Trophy className='h-5 w-5' />,
       label: t("insights.points_per_hour"),
       value: Math.round(avgPointsPerHour),
       description: t("insights.points_per_hour_desc"),
     },
     {
-      icon: <Brain size='1em' className='h-5 w-5' />,
+      icon: <Brain className='h-5 w-5' />,
       label: t("insights.strongest_area"),
       value: t(`${strongestArea.name}` as any),
       description: t("insights.strongest_area_desc"),

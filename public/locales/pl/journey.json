@@ -63,6 +63,7 @@
     "subtitle": "Wróć tam, gdzie skończyłeś, albo wskocz do dowolnego modułu.",
     "continue": "Kontynuuj",
     "start": "Zacznij",
+    "replay": "Powtórz",
     "suggest": "Zaproponuj ścieżkę nauki",
     "missing_coming": "Brakuje tematu? Następne będą: {{topics}} — daj znać, co jeszcze chciałbyś zobaczyć.",
     "missing": "Brakuje tematu? Daj znać, co chciałbyś zobaczyć następne."

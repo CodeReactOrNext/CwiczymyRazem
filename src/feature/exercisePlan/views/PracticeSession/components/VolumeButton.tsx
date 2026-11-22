@@ -33,7 +33,7 @@ interface VolumeButtonProps {
   mobile?: boolean;
 }
 
-const sectionLabel = "text-[10px] font-semibold tracking-[0.12em] text-zinc-400";
+const sectionLabel = "text-xs font-medium text-zinc-400";
 const valueBadge = (highlighted: boolean) =>
   cn(
     "min-w-[2.75rem] rounded-md px-1.5 py-0.5 text-center font-mono text-[11px] font-bold tabular-nums",
@@ -117,7 +117,7 @@ export const VolumeButton = ({
         // a long GP track list needs to scroll no matter where the trigger sits on screen.
         // z-[99999999] clears the session's full-screen layer (z-[999999] desktop /
         // z-[9999999] mobile) — the default z-50 would paint underneath it.
-        className='z-[99999999] w-72 max-h-[var(--radix-dropdown-menu-content-available-height)] overflow-y-auto rounded-xl border border-white/10 bg-zinc-900/95 p-3.5 text-white shadow-xl shadow-black/40 backdrop-blur-md'>
+        className='z-[99999999] w-72 max-h-[var(--radix-dropdown-menu-content-available-height)] overflow-y-auto p-3.5'>
         {showMetronome && (
           <div>
             <div className='mb-3 flex items-center justify-between'>
@@ -186,7 +186,7 @@ export const VolumeButton = ({
                   : "[&>span:first-child>span]:bg-white [&_[role=slider]]:border-white/60 [&_[role=slider]]:bg-white"
               )}
             />
-            <p className='mt-2 text-[10px] leading-relaxed text-zinc-500'>
+            <p className='mt-2 text-xs leading-relaxed text-zinc-500'>
               {t("media.boost_hint")}
             </p>
           </div>
@@ -256,7 +256,7 @@ export const VolumeButton = ({
                         as "this is on" to anyone looking for what to silence. */}
                     <span
                       className={cn(
-                        "w-10 shrink-0 text-right font-mono text-[10px]",
+                        "w-10 shrink-0 text-right font-mono text-[11px]",
                         track.isMuted ? "text-red-400" : "text-zinc-500"
                       )}>
                       {track.isMuted ? t("volume.muted") : `${Math.round(track.volume * 100)}%`}

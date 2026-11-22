@@ -1,3 +1,4 @@
+import { isTabSwitchTo } from "components/PageTabs/useTabSwitchMotion";
 import { useRouter } from "next/router";
 import { useEffect, useRef } from "react";
 
@@ -12,7 +13,22 @@ const MainLoggedWrapper = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const resetScroll = (url: string, { shallow }: { shallow: boolean }) => {
       if (shallow || url.includes("#")) return;
-      scrollRef.current?.scrollTo({ top: 0 });
+      const scroller = scrollRef.current;
+      if (!scroller) return;
+      // A tab switch whose rail is still on screen keeps the offset: the hero
+      // above it is the same height on every tab, so the page stays put and only
+      // the content under the rail changes.
+      if (isTabSwitchTo(url)) {
+        const rail = scroller.querySelector("nav[data-tab-switch]");
+        if (
+          rail &&
+          rail.getBoundingClientRect().top >=
+            scroller.getBoundingClientRect().top
+        ) {
+          return;
+        }
+      }
+      scroller.scrollTo({ top: 0 });
     };
 
     router.events.on("routeChangeComplete", resetScroll);

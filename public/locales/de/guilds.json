@@ -131,7 +131,8 @@
     "plain": "Gilde: {{tag}}"
   },
   "cover": {
-    "your_honor": "Deine Ehre: {{earned}} verdient · {{balance}} für das Regal"
+    "your_honor": "Deine Ehre: {{earned}} verdient · {{balance}} für das Regal",
+    "treasury": "Gilden-Fame"
   },
   "units": {
     "sessions": "{{value}} Sessions",
@@ -1103,5 +1104,12 @@
         "l4": "Komplette Gitarrenbauwerkstatt"
       }
     }
+  },
+  "toast": {
+    "founded": "Gilde gegründet",
+    "request_sent": "Anfrage gesendet – jetzt entscheidet der Gründer",
+    "deposited": "{{fame}} Fame in der Gildenkasse",
+    "stash_left": "Ins Regal gelegt",
+    "stash_taken": "Genommen"
   }
 }

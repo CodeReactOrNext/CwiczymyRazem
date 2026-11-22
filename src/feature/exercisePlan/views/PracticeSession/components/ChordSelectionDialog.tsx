@@ -17,13 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import {
   type ChordExerciseConfig,
   generateChordExercise,
@@ -59,6 +54,8 @@ export function ChordSelectionDialog({
   const [hideNotes, setHideNotes] = useState(false);
   const [changesPerMeasure, setChangesPerMeasure] = useState(1);
   const categorizedChords = getCategorizedChords();
+  const [chordLevel, setChordLevel] =
+    useState<keyof typeof categorizedChords>("beginner");
 
   // Reset the form whenever the dialog opens (or is reopened for another
   // exercise) — adjusted during render instead of in an effect.
@@ -72,6 +69,7 @@ export function ChordSelectionDialog({
   ) {
     setSyncedFor({ isOpen, initialExercise });
     if (isOpen) {
+      setChordLevel("beginner");
       if (initialExercise && initialExercise._generatorConfig) {
         const conf = initialExercise._generatorConfig as ChordExerciseConfig;
         setSelectedChords(conf.chords || []);
@@ -145,13 +143,15 @@ export function ChordSelectionDialog({
                 <div key={idx} className='flex items-center gap-2'>
                   <span className='flex items-center gap-1 rounded bg-zinc-800 py-1 pl-3 pr-1 text-sm font-semibold text-zinc-100'>
                     {chord}
-                    <button
+                    <Button
                       type='button'
+                      variant='ghost'
+                      size='icon'
                       onClick={() => handleRemoveChord(idx)}
                       aria-label={t("chord_dialog.remove_chord", { chord })}
-                      className='rounded p-1 text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 hover:bg-zinc-700 hover:text-zinc-100'>
-                      <X size={14} />
-                    </button>
+                      className='h-6 w-6 rounded text-zinc-400 [&_svg]:size-3.5'>
+                      <X />
+                    </Button>
                   </span>
                   {idx < selectedChords.length - 1 && (
                     <span className='text-zinc-500'>→</span>
@@ -166,39 +166,30 @@ export function ChordSelectionDialog({
             </div>
           </div>
 
-          <Tabs defaultValue='beginner' className='w-full'>
-            <TabsList className='grid w-full grid-cols-3'>
-              <TabsTrigger value='beginner'>
-                {t("chord_dialog.beginner")}
-              </TabsTrigger>
-              <TabsTrigger value='intermediate'>
-                {t("chord_dialog.intermediate")}
-              </TabsTrigger>
-              <TabsTrigger value='advanced'>
-                {t("chord_dialog.advanced")}
-              </TabsTrigger>
-            </TabsList>
-
-            {(
-              Object.keys(categorizedChords) as Array<
-                keyof typeof categorizedChords
-              >
-            ).map((level) => (
-              <TabsContent key={level} value={level} className='mt-4'>
-                <div className='grid max-h-[180px] grid-cols-4 gap-2 overflow-y-auto pr-1 sm:grid-cols-5'>
-                  {categorizedChords[level].map((chord) => (
-                    <Button
-                      key={chord}
-                      variant='secondary'
-                      onClick={() => handleAddChord(chord)}
-                      disabled={selectedChords.length >= 8}>
-                      {chord}
-                    </Button>
-                  ))}
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+          <div className='w-full space-y-4'>
+            <SegmentedControl<keyof typeof categorizedChords>
+              label={t("chord_dialog.click_to_add")}
+              selected={[chordLevel]}
+              onSelect={setChordLevel}
+              options={(["beginner", "intermediate", "advanced"] as const).map(
+                (level) => ({
+                  value: level,
+                  label: t(`chord_dialog.${level}`),
+                }),
+              )}
+            />
+            <div className='grid max-h-[180px] grid-cols-4 gap-2 overflow-y-auto pr-1 sm:grid-cols-5'>
+              {categorizedChords[chordLevel].map((chord) => (
+                <Button
+                  key={chord}
+                  variant='secondary'
+                  onClick={() => handleAddChord(chord)}
+                  disabled={selectedChords.length >= 8}>
+                  {chord}
+                </Button>
+              ))}
+            </div>
+          </div>
 
           <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
             <div className='space-y-2'>

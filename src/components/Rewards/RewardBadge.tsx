@@ -68,7 +68,7 @@ export const RewardBadge = ({ reward, earned, claimed }: RewardBadgeProps) => {
     return (
       <Dialog>
         <DialogTrigger asChild>{trigger}</DialogTrigger>
-        <DialogContent className='max-w-[90vw] rounded-2xl border-none bg-zinc-900/95 text-white backdrop-blur-md'>
+        <DialogContent className='bg-zinc-900 text-white sm:max-w-sm'>
           <DialogHeader className='gap-5 py-2 text-left'>
             <DialogTitle className='text-base font-bold'>{heading}</DialogTitle>
             <DialogDescription asChild>
@@ -83,19 +83,14 @@ export const RewardBadge = ({ reward, earned, claimed }: RewardBadgeProps) => {
   return (
     <Tooltip delayDuration={50}>
       <TooltipTrigger asChild>{trigger}</TooltipTrigger>
-      {/*
-        Dark, unlike the default tooltip: the payout is read by its colours —
-        amber Fame, cyan free case, the part's own tier colour — and none of
-        those survive being put on a near-white ground.
-      */}
       <TooltipContent
         side='left'
         sideOffset={8}
-        className='z-[100] flex flex-col gap-3 border-none bg-zinc-900 px-4 py-3.5 text-zinc-100 shadow-xl'>
-        <span className='text-[0.6875rem] font-bold tracking-wide text-zinc-500'>
+        className='tooltip-ink z-[100] flex flex-col gap-3 p-3'>
+        <span className='text-xs font-bold text-black/60'>
           {heading}
         </span>
-        <RewardSummary reward={reward} size='lg' muted={claimed} />
+        <RewardSummary reward={reward} size='lg' muted={claimed} inTooltip />
       </TooltipContent>
     </Tooltip>
   );

@@ -138,6 +138,7 @@ Schemat: `bg-{kolor}-500/10` + `border-{kolor}-500/20..30` + `text-{kolor}-400`.
 bg-{kolor}-950/30 text-{kolor}-400      // nazwane kolory (cyan/emerald/purple/amber/yellow/blue)
 bg-zinc-800/40 text-zinc-300            // neutralny/gray (np. poziom itemu, licznik dni)
 ```
+W gęstych wierszach (karty, listy) `size="sm"` (`rounded px-2 py-0.5 text-[11px]`). Kategoria ćwiczenia → `getCategoryChipColor()` z `feature/exercisePlan/constants/categoryChip` (technique emerald, theory blue, hearing amber, creativity purple); trudność zawsze neutralna `<Chip color="gray" size="sm">`. Tier utworu to zawsze kostka `TierBadge`/`TierPick`, nie chip. Licznik na rogu przycisku ikonowego → `components/CountBadge` (`tone="alert" | "info"`).
 Dla dynamicznych kolorów (hex z rzadkości/tieru, nie ma stałej klasy Tailwind) użyj `getChipCustomStyle(hex)` z tego samego pliku — daje `backgroundColor: hex+"1a"` + `color: hex`. **Nigdy pełne nasycone tło (`bg-emerald-600`) + biały tekst** — to nie pasuje do reszty aplikacji i ma gorszy kontrast niż tinted-dark + tinted-text.
 
 ### ⚙️ Tokeny semantyczne z configu (dozwolone, częściowo wdrożone)

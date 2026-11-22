@@ -4,60 +4,6 @@ import { Minus, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 
-interface SegmentedProps<T extends string> {
-  value: T;
-  options: { value: T; label: string; hint?: string }[];
-  onChange: (value: T) => void;
-  ariaLabel: string;
-  className?: string;
-}
-
-/** A row of mutually exclusive options; the picked one sits a shade lighter. */
-export const Segmented = <T extends string>({
-  value,
-  options,
-  onChange,
-  ariaLabel,
-  className,
-}: SegmentedProps<T>) => (
-  <div
-    role='radiogroup'
-    aria-label={ariaLabel}
-    className={cn("grid gap-1 rounded-lg bg-zinc-800/50 p-1", className)}
-    style={{
-      gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
-    }}>
-    {options.map((option) => {
-      const active = option.value === value;
-      return (
-        <button
-          key={option.value}
-          type='button'
-          role='radio'
-          aria-checked={active}
-          onClick={() => onChange(option.value)}
-          className={cn(
-            "rounded px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
-            active
-              ? "bg-zinc-700 text-zinc-100"
-              : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-          )}>
-          <span className='block text-sm font-medium'>{option.label}</span>
-          {option.hint && (
-            <span
-              className={cn(
-                "mt-0.5 block text-xs",
-                active ? "text-zinc-300" : "text-zinc-500",
-              )}>
-              {option.hint}
-            </span>
-          )}
-        </button>
-      );
-    })}
-  </div>
-);
-
 interface FieldProps {
   label: string;
   hint?: string;

@@ -41,7 +41,7 @@ export const LearnModeButton = memo(function LearnModeButton({ compact = false }
           needsMic && "cursor-not-allowed opacity-50 hover:bg-zinc-800 hover:text-zinc-400",
         )}>
         <GraduationCap className='h-4 w-4 shrink-0' />
-        {!compact && <span className='text-[10px] font-semibold tracking-wide'>{t("learn.button")}</span>}
+        {!compact && <span className='text-xs font-semibold'>{t("learn.button")}</span>}
       </button>
     </SessionTooltip>
   );

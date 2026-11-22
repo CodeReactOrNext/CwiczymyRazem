@@ -72,7 +72,7 @@ export const ProposeTrackDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-lg'>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("upload.title")}</DialogTitle>
           <DialogDescription>{t("upload.description")}</DialogDescription>
@@ -93,7 +93,7 @@ export const ProposeTrackDialog = ({
               }}
               placeholder='https://www.youtube.com/watch?v=…'
               aria-invalid={isBadLink}
-              className='h-11 border-zinc-700 bg-zinc-950/60'
+              className='h-11'
             />
             <p
               role={isBadLink || error ? "alert" : undefined}
@@ -122,7 +122,8 @@ export const ProposeTrackDialog = ({
               type='submit'
               loading={propose.isPending}
               disabled={!youtubeId}
-              className='h-11 shrink-0 px-5'>
+              size='lg'
+              className='shrink-0'>
               {t("upload.submit")}
             </Button>
           </div>

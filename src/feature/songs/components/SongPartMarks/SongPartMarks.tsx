@@ -173,19 +173,19 @@ export const SongPartMarks = ({
               </TooltipTrigger>
               <TooltipContent
                 side="top"
-                className="max-w-[230px] border-white/10 bg-zinc-900 text-xs text-zinc-200"
+                className="max-w-[230px]"
               >
                 <p className="font-bold">
                   {t(`parts.${part}.label`, meta.label)}
                   {isMarked && !isCovered && ` — ${t("parts.marked")}`}
                 </p>
-                <p className="mt-1 text-zinc-400">
+                <p className="mt-1 text-black/60">
                   {isCovered
                     ? t("parts.covered")
                     : t(`parts.${part}.hint`, meta.hint)}
                 </p>
                 {isInteractive && (
-                  <p className="mt-1 text-zinc-500">
+                  <p className="mt-1 text-black/50">
                     {isMarked ? t("parts.tap_unmark") : t("parts.tap_mark")}
                   </p>
                 )}

@@ -22,15 +22,15 @@ export const AchievementCardDesktop = ({ name, description, children, progress }
       <TooltipContent 
         side="top" 
         sideOffset={35}
-        className='z-[100] bg-white text-black border-none px-3 py-2 shadow-xl'
+        className='z-[100] py-2'
       >
         <h3 className='font-bold text-sm leading-tight'>{t(name as any)}</h3>
-        <p className='text-xs mt-0.5 opacity-90'>{t(description as any)}</p>
-        
+        <p className='text-xs mt-0.5 font-normal text-black/60'>{t(description as any)}</p>
+
         {progress && (
-          <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between gap-4">
-             <span className="text-xs font-bold text-gray-500">{t("progress", "Progress")}</span>
-             <span className={`text-xs font-bold ${progress.current >= progress.max ? "text-amber-500" : "text-green-600"}`}>
+          <div className="mt-3 flex items-center justify-between gap-4">
+             <span className="text-xs font-bold text-black/60">{t("progress", "Progress")}</span>
+             <span className={`text-xs font-bold ${progress.current >= progress.max ? "text-amber-700" : "text-emerald-700"}`}>
                 {progress.current} / {progress.max}
              </span>
           </div>

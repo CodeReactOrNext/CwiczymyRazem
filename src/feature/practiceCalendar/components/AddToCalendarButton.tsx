@@ -90,7 +90,7 @@ const AddToCalendarDialog = ({
 
   return (
     <Dialog open onOpenChange={(next) => !next && onClose()}>
-      <DialogContent className='flex flex-col gap-6 border-0 bg-zinc-900 shadow-none sm:max-w-md sm:p-8'>
+      <DialogContent className='flex flex-col gap-6 bg-zinc-900 sm:max-w-md sm:p-8'>
         <div className='space-y-2 pr-10'>
           <DialogTitle className='text-xl font-bold text-zinc-100'>
             {t("to_calendar.title")}
@@ -127,7 +127,7 @@ const AddToCalendarDialog = ({
                 )}>
                 <span
                   className={cn(
-                    "text-[10px]",
+                    "text-xs",
                     selected ? "text-zinc-600" : "text-zinc-500",
                   )}>
                   {formatDate(key, { weekday: "narrow" })}
@@ -161,8 +161,8 @@ const AddToCalendarDialog = ({
 
         <Button
           onClick={() => void add()}
-          disabled={calendar.isLoading || isSaving}
-          className='h-11 rounded-lg border-b-black/25 bg-white font-bold text-zinc-950 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
+          size='lg'
+          disabled={calendar.isLoading || isSaving}>
           {t("to_calendar.submit", {
             day: formatDate(date, { weekday: "short", day: "numeric" }),
           })}
@@ -199,7 +199,7 @@ export const AddToCalendarButton = ({
           "gap-1.5 text-zinc-300 hover:bg-white/5 hover:text-zinc-100",
           className,
         )}>
-        <CalendarPlus className='h-3.5 w-3.5' />
+        <CalendarPlus />
         {t("to_calendar.button")}
       </Button>
       {open && (

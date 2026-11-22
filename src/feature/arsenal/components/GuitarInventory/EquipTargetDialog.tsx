@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { Chip, getChipCustomStyle } from "assets/components/ui/chip";
 import {
   Dialog,
@@ -82,7 +83,7 @@ const GuitarArt = ({
     />
     {withLevel && view.level > 0 && (
       <span
-        className='absolute left-0 top-0 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-[10px] font-black tabular-nums leading-none text-white'
+        className='absolute left-0 top-0 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-[11px] font-bold tabular-nums leading-none text-white'
         style={{
           background: "radial-gradient(circle at 50% 35%, #1c1c22, #0b0b0e)",
           boxShadow: `inset 0 0 0 1px ${view.color}, 0 0 8px ${view.color}55`,
@@ -166,7 +167,7 @@ export const EquipTargetDialog = ({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className='flex flex-col gap-8 border-0 bg-zinc-900 shadow-none sm:max-w-xl sm:p-8'>
+      <DialogContent className='flex flex-col gap-8 bg-zinc-900 sm:max-w-2xl sm:p-8'>
         {/* The guitar being placed */}
         <div className='flex items-center gap-5 pr-10'>
           <GuitarArt view={subject} className='h-28 w-28' />
@@ -259,14 +260,16 @@ export const EquipTargetDialog = ({
                   </button>
 
                   {active && (
-                    <button
+                    <Button
                       type='button'
+                      variant='ghost'
+                      size='icon-sm'
                       onClick={() => onRemove(target)}
                       aria-label={t("equip.take_out_of", { target: label })}
                       title={t("equip.take_out_of", { target: label })}
-                      className='absolute right-2 top-2 rounded p-1.5 text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-red-500/10 hover:text-red-400'>
-                      <X size={14} strokeWidth={2.5} />
-                    </button>
+                      className='absolute right-2 top-2 text-zinc-400 hover:text-red-400'>
+                      <X strokeWidth={2.5} />
+                    </Button>
                   )}
                 </div>
               );

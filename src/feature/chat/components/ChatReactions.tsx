@@ -63,8 +63,8 @@ export const ChatReactionChips = ({
           </TooltipTrigger>
           <TooltipContent
             side='top'
-            className='max-w-xs border-none bg-zinc-900 text-white'>
-            <p className='text-xs text-zinc-300'>
+            className='max-w-xs'>
+            <p className='text-xs'>
               {group.reactors.map((reactor) => reactor.username).join(", ")}
             </p>
           </TooltipContent>

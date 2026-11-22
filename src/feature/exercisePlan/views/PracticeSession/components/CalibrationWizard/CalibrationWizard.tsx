@@ -134,7 +134,7 @@ const WizardBody = ({
   }, [savedLatencyMs, showSummary]);
 
   return (
-    <div className="fixed inset-0 z-[99999999] flex items-center justify-center bg-black/80 font-openSans">
+    <div className="fixed inset-0 z-[99999999] flex items-center justify-center bg-black/80">
       {/* A phone gets the whole screen, upright or sideways — a floating card
           there only lost height to its margins and pushed every step into
           scrolling. */}

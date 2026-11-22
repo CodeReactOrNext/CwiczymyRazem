@@ -57,7 +57,7 @@ const FAQ: { q: string; a: ReactNode }[] = [
 export const RoadmapFaq = () => {
   const { t } = useTranslation("supporter");
   return (
-    <section className='rounded-lg bg-zinc-900/40 p-5 sm:p-7'>
+    <section className='rounded-lg bg-zinc-800/40 p-5 sm:p-7'>
       <h2 className='text-base font-semibold text-zinc-100'>{t("faq.title")}</h2>
 
       <Accordion type='single' collapsible className='mt-2 w-full'>

@@ -5,7 +5,11 @@
     "comment_added": "¡Comentario añadido!",
     "comment_failed": "No se pudo añadir el comentario.",
     "logged_out": "Debes iniciar sesión.",
-    "bad_url": "Introduce una URL de YouTube válida."
+    "bad_url": "Introduce una URL de YouTube válida.",
+    "updated": "Grabación actualizada.",
+    "update_failed": "No se pudo actualizar la grabación.",
+    "deleted": "Grabación eliminada.",
+    "delete_failed": "No se pudo eliminar la grabación."
   },
   "modal": {
     "edit_title": "Editar grabación",
@@ -52,7 +56,12 @@
     "subtitle": "Escucha y comparte tus sesiones de práctica",
     "add": "Añadir grabación",
     "all": "Todas las grabaciones",
-    "mine": "Mis grabaciones"
+    "mine": "Mis grabaciones",
+    "count_one": "{{count}} grabación",
+    "count_other": "{{count}} grabaciones",
+    "sort_newest": "Más recientes",
+    "sort_popular": "Más populares",
+    "sort_label": "Ordenar grabaciones"
   },
   "viewer": {
     "not_found": "Grabación no encontrada",

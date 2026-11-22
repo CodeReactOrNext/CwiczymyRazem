@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
@@ -182,7 +183,7 @@ const BranchRow = ({
               {t("roadmap.done_of", { done, total })}
             </span>
             {!!level && (
-              <span className='text-[11px] tabular-nums text-zinc-600'>
+              <span className='text-[11px] tabular-nums text-zinc-500'>
                 {t("roadmap.lvl", { level })}
               </span>
             )}
@@ -387,20 +388,23 @@ export const SkillRoadmapMobile = ({
               </span>
             </p>
             <div className='mt-4 flex items-center gap-2'>
-              <button
+              <Button
                 type='button'
+                size='touch'
                 onClick={() => startExercise(current.exercise)}
-                className='flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-100 text-sm font-bold text-zinc-950 transition-background active:bg-white'>
-                <Play className='h-4 w-4' fill='currentColor' />
+                className='flex-1'>
+                <Play fill='currentColor' />
                 {t("roadmap.start")}
-              </button>
-              <button
+              </Button>
+              <Button
                 type='button'
+                variant='ghost'
+                size='icon-touch'
                 onClick={showCurrentInPath}
                 aria-label={t("roadmap.show_in_path")}
-                className='flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-background active:bg-zinc-700'>
-                <Crosshair className='h-4 w-4' />
-              </button>
+                className='flex-shrink-0'>
+                <Crosshair />
+              </Button>
             </div>
           </div>
         )}
@@ -414,7 +418,7 @@ export const SkillRoadmapMobile = ({
             {progress.completed}
             <span className='text-zinc-600'>/{progress.total}</span>
           </span>
-          <span className='text-xs tabular-nums text-zinc-600'>{percent}%</span>
+          <span className='text-xs tabular-nums text-zinc-500'>{percent}%</span>
         </div>
 
         {/* Seven tiers is more than a thumb wants to scroll past, so each one
@@ -433,13 +437,13 @@ export const SkillRoadmapMobile = ({
                 type='button'
                 onClick={() => scrollToElement(tierDomId(tier.id), "start")}
                 className='flex h-11 flex-shrink-0 items-center gap-2 rounded-lg bg-zinc-900/60 px-3 transition-background active:bg-zinc-800'>
-                <span className='text-[11px] tabular-nums text-zinc-600'>
+                <span className='text-[11px] tabular-nums text-zinc-500'>
                   {TIER_NUMBER(index)}
                 </span>
                 <span className='text-xs font-semibold text-zinc-300'>
                   {tierTitle(tier)}
                 </span>
-                <span className='text-[11px] tabular-nums text-zinc-600'>
+                <span className='text-[11px] tabular-nums text-zinc-500'>
                   {stats.completed}/{stats.total}
                 </span>
               </button>
@@ -461,7 +465,7 @@ export const SkillRoadmapMobile = ({
         />
       ))}
 
-      <p className='px-4 pb-8 text-center text-xs text-zinc-600'>
+      <p className='px-4 pb-8 text-center text-xs text-zinc-500'>
         {progress.completed === progress.total
           ? t("roadmap.mastery_done")
           : t("roadmap.mastery_left", {

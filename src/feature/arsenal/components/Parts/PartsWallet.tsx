@@ -91,7 +91,7 @@ export const PartsWallet = ({ parts, className }: PartsWalletProps) => {
                       <PartIcon partId={row.partId} size={30} />
                     </TierPlate>
                     <span
-                      className='text-[9px] font-bold'
+                      className='text-[11px] font-bold'
                       style={{ color: readableText(PART_TIER_COLORS[t.tier]) }}>
                       {labels.partTier(t.tier)}
                     </span>

@@ -3,7 +3,7 @@ import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronLeft, ChevronRight, type LucideIcon, Music2, RefreshCw, Volume1, Volume2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, type LucideIcon, Music2, RefreshCw, Volume1, Volume2 } from "lucide-react";
 import React from "react";
 import { useResponsiveStore } from "store/useResponsiveStore";
 
@@ -127,14 +127,14 @@ export const SustainStep = React.memo(function SustainStep({
     <div className="flex flex-1 flex-col px-5 py-5 text-white sm:px-12 sm:py-10 shortwide:px-8 shortwide:py-4">
       <div className="mb-6 flex items-center justify-between gap-3 sm:mb-8 shortwide:mb-3">
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onBack}
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
             aria-label={t("back")}
-            className="-ml-2 rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
+            onClick={onBack}>
+            <ArrowLeft />
+          </Button>
           <h2 className="text-xl font-semibold text-zinc-50">{t("sustain.title")}</h2>
         </div>
         <CloseButton onClick={onCancel} label={t("close")} />
@@ -170,12 +170,13 @@ export const SustainStep = React.memo(function SustainStep({
             <Button
               type="button"
               variant="secondary"
+              size="lg"
               onClick={retry}
               disabled={state.phase === "waiting"}
-              className="h-10 shrink-0 px-4"
+              className="shrink-0"
             >
               <span className="flex items-center gap-2">
-                <RefreshCw className="h-4 w-4 shrink-0" />
+                <RefreshCw className="shrink-0" />
                 <span>{t("sustain.again")}</span>
               </span>
             </Button>
@@ -225,9 +226,9 @@ export const SustainStep = React.memo(function SustainStep({
             Pinned to the bottom of the screen: a warning or the auto-gain
             result grows the step, and Next must not drop below the fold. */}
         <div className="sticky bottom-0 z-10 -mx-5 mt-auto flex justify-end bg-zinc-950 px-5 py-3 sm:-mx-12 sm:px-12 shortwide:mx-0 shortwide:self-end shortwide:px-0 shortwide:py-2 shortwide:[grid-area:next]">
-          <Button onClick={onNext} disabled={!passedOnce} className="h-12 w-full gap-2 px-6 text-base font-semibold sm:h-11 sm:w-auto">
+          <Button onClick={onNext} disabled={!passedOnce} size="lg" className="w-full sm:w-auto">
             {t("sustain.next")}
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight />
           </Button>
         </div>
       </div>

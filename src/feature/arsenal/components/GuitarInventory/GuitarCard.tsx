@@ -52,6 +52,7 @@ import { ScrapYieldList } from "../Parts/ScrapYieldList";
 import { RARITY_STYLES } from "../RarityBadge";
 import { SpecTags } from "../SpecTags";
 import { ModArt } from "../Workshop/ModArt";
+import { WorkshopCardAction } from "../Workshop/WorkshopCardAction";
 
 export type EquipTarget = "profile" | 0 | 1 | 2;
 
@@ -72,6 +73,10 @@ interface GuitarCardProps {
   /** Leaves the guitar in the guild stash. Only passed for a guild member. */
   onStashClick?: (inventoryItemId: string) => void;
   isStashing?: boolean;
+  /** Puts this copy on the Workshop bench. Absent where there is no bench (read-only, someone else's gear). */
+  onWorkshopClick?: () => void;
+  /** A bench job runs today — the Workshop key wears the green hammer mark. */
+  workshopReady?: boolean;
   /** Rig slot index (0-2) this item occupies, or null/undefined if not in the rig. */
   rigSlot?: number | null;
   /** Hide the Equip/Sell footer — for tooltips, reveals and read-only previews. */
@@ -102,6 +107,8 @@ export const GuitarCard = ({
   merge,
   onStashClick,
   isStashing,
+  onWorkshopClick,
+  workshopReady = false,
   rigSlot,
   readOnly = false,
   footer,
@@ -226,7 +233,7 @@ export const GuitarCard = ({
       <div className='flex flex-shrink-0 items-start justify-between gap-2 px-3 pb-1.5 pt-3'>
         <div className='min-w-0'>
           <p
-            className='text-[10px] font-semibold leading-none tracking-wider'
+            className='text-[11px] font-semibold leading-none'
             style={{ color: readableText(rs.baseColor) }}>
             {guitar.brand}
           </p>
@@ -234,14 +241,14 @@ export const GuitarCard = ({
             {guitar.name}
           </p>
           <p
-            className='mt-0.5 text-[9px] font-medium capitalize tracking-[0.15em]'
+            className='mt-0.5 text-[11px] font-medium'
             style={{ color: readableText(rs.baseColor), opacity: 0.7 }}>
             {labels.rarity(rarity)}
           </p>
         </div>
 
         {item.serial != null && (
-          <span className='font-mono flex-shrink-0 text-[9px] tracking-tight text-zinc-500'>
+          <span className='font-mono flex-shrink-0 text-[11px] text-zinc-500'>
             #{String(item.serial).padStart(4, "0")}
           </span>
         )}
@@ -339,7 +346,7 @@ export const GuitarCard = ({
                   className='h-1.5 w-1.5 rounded-full bg-amber-400'
                   style={{ boxShadow: "0 0 8px rgba(251,191,36,1)" }}
                 />
-                <span className='text-[8px] font-medium tracking-wide text-amber-400/70'>
+                <span className='text-[11px] font-medium text-amber-400/70'>
                   {t("card.guitar.equipped")}
                 </span>
               </div>
@@ -350,7 +357,7 @@ export const GuitarCard = ({
                   className='h-1.5 w-1.5 rounded-full bg-cyan-400'
                   style={{ boxShadow: "0 0 8px rgba(34,211,238,0.9)" }}
                 />
-                <span className='text-[8px] font-medium tracking-wide text-cyan-400/70'>
+                <span className='text-[11px] font-medium text-cyan-400/70'>
                   {t("card.guitar.rig_slot", { slot: rigSlot + 1 })}
                 </span>
               </div>
@@ -383,7 +390,8 @@ export const GuitarCard = ({
               // bounce. It keeps its full opacity — the row's disabled style
               // drops to 30%, which on a small label is a key the player cannot
               // read at all, and "unreadable" is not the same message as "off".
-              lockedLvl != null ? (
+              <>
+              {lockedLvl != null ? (
                 <Tooltip delayDuration={150}>
                   <TooltipTrigger asChild>
                     {/* Wrapper span keeps the tooltip working while the button is disabled. */}
@@ -399,7 +407,7 @@ export const GuitarCard = ({
                   </TooltipTrigger>
                   <TooltipContent
                     side='top'
-                    className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-xs text-white'>
+                    className='max-w-[260px]'>
                     {rarityLockReason(rarity, lockedLvl, t, labels.rarity(rarity))}
                   </TooltipContent>
                 </Tooltip>
@@ -413,7 +421,14 @@ export const GuitarCard = ({
                   disabled={isEquipping}>
                   {t("card.equip")}
                 </CardAction>
-              )
+              )}
+              {onWorkshopClick && (
+                <WorkshopCardAction
+                  ready={workshopReady}
+                  onClick={onWorkshopClick}
+                />
+              )}
+              </>
             }>
             {onListClick && (
               <Tooltip delayDuration={150}>
@@ -429,9 +444,7 @@ export const GuitarCard = ({
                     </CardAction>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent
-                  side='top'
-                  className='border border-zinc-700 bg-zinc-950 text-xs text-white'>
+                <TooltipContent side='top'>
                   {marketTooltip}
                 </TooltipContent>
               </Tooltip>
@@ -451,9 +464,7 @@ export const GuitarCard = ({
                     </CardAction>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent
-                  side='top'
-                  className='border border-zinc-700 bg-zinc-950 text-xs text-white'>
+                <TooltipContent side='top'>
                   {stashTooltip}
                 </TooltipContent>
               </Tooltip>
@@ -487,7 +498,7 @@ export const GuitarCard = ({
                 </TooltipTrigger>
                 <TooltipContent
                   side='top'
-                  className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-white'>
+                  className='tooltip-ink max-w-[260px]'>
                   {isEquipped ? (
                     <span className='text-xs'>
                       {t("card.guitar.scrap_unequip")}
@@ -498,12 +509,12 @@ export const GuitarCard = ({
                     </span>
                   ) : (
                     <div className='flex flex-col gap-1.5'>
-                      <span className='text-[10px] font-bold capitalize tracking-wider text-zinc-400'>
+                      <span className='text-xs font-medium text-black/60'>
                         {t("card.scraps_into", { count: scrapTotal })}
                       </span>
                       <ScrapYieldList parts={scrapParts} compact />
                       {salvagedMod && (
-                        <span className='text-[11px] text-purple-300'>
+                        <span className='text-[11px] text-purple-700'>
                           {t("card.mod_comes_off", {
                             name: labels.mod(salvagedMod.featureId, salvagedMod.label),
                             points: salvagedMod.points,
@@ -553,9 +564,7 @@ export const GuitarCard = ({
                   </CardAction>
                 </span>
               </TooltipTrigger>
-              <TooltipContent
-                side='top'
-                className='border border-zinc-700 bg-zinc-950 text-xs text-white'>
+              <TooltipContent side='top'>
                 {sellTooltip}
               </TooltipContent>
             </Tooltip>

@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { pageTitleClass } from "components/PageTitle/PageTitle";
 import {
   FameIcon,
   PointsIcon,
@@ -100,9 +101,7 @@ export const ImprovHero = ({
                   {improvDateRange(round.startsAt, round.endsAt)}
                 </span>
               </p>
-              <h1 className='text-3xl font-bold leading-tight text-white md:text-4xl'>
-                {round.title}
-              </h1>
+              <h1 className={pageTitleClass}>{round.title}</h1>
               {round.channel && (
                 <p className='text-sm text-zinc-400'>{round.channel}</p>
               )}
@@ -136,13 +135,11 @@ export const ImprovHero = ({
           </div>
 
           <div className='mt-auto flex flex-wrap gap-3 pt-1'>
-            <Button onClick={onLinkTake} className='h-11 px-5'>
-              <span className='flex items-center gap-2'>
-                <Link2 />
-                {t("hero.cta")}
-              </span>
+            <Button onClick={onLinkTake} size='xl'>
+              <Link2 />
+              {t("hero.cta")}
             </Button>
-            <Button asChild variant='subtle' className='h-11 px-5'>
+            <Button asChild variant='subtle' size='xl'>
               <a href={discordUrl} target='_blank' rel='noreferrer'>
                 <FaDiscord size='1em' />
                 {round.discordThreadUrl

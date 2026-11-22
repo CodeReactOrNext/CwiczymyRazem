@@ -26,9 +26,6 @@ import { useIntlLocale } from "lib/i18n/dateLocale";
 import { Swords, Trophy } from "lucide-react";
 import { useMemo } from "react";
 
-/** Shared with the section banners so every tab wears the same header. */
-export const CHALLENGE_HERO_CLASS = "w-full !rounded-none !shadow-none";
-
 interface ChallengeHeroProps {
   challenge: Challenge;
   submissions: ChallengeSubmission[];
@@ -97,7 +94,6 @@ export const ChallengeHero = ({
           : t("hero.closed_subtitle")
       }
       backgroundContent={<HeroPattern />}
-      className={CHALLENGE_HERO_CLASS}
       leftContentClassName='mt-4'
       eyebrowContent={
         <p className='flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold'>

@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { RotationThumb } from "feature/rotation/components/RotationThumb";
 import { Shuffle } from "lucide-react";
@@ -65,13 +66,14 @@ export const PlanPreview = ({
             )}
           </p>
         </div>
-        <button
+        <Button
           type='button'
+          variant='subtle'
           onClick={onReshuffle}
-          className='flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-800 px-3 text-sm font-medium text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700'>
-          <Shuffle className='h-4 w-4 text-zinc-400' aria-hidden />
+          className='shrink-0'>
+          <Shuffle className='text-zinc-400' aria-hidden />
           {t("planner.reshuffle")}
-        </button>
+        </Button>
       </div>
 
       <div
@@ -96,7 +98,7 @@ export const PlanPreview = ({
               )}>
               <span
                 className={cn(
-                  "text-[10px] tabular-nums",
+                  "text-xs tabular-nums",
                   active ? "text-zinc-200" : "text-zinc-500",
                 )}>
                 {minutes > 0 ? minutes : "–"}
@@ -139,7 +141,7 @@ export const PlanPreview = ({
                   )}>
                   {formatDate(date, { weekday: "narrow" })}
                 </span>
-                <span className='text-[10px] tabular-nums text-zinc-500'>
+                <span className='text-xs tabular-nums text-zinc-500'>
                   {formatDate(date, { day: "numeric" })}
                 </span>
               </span>

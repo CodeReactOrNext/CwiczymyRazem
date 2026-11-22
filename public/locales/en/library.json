@@ -43,6 +43,7 @@
     "create": "Create Plan"
   },
   "favorites": {
+    "eyebrow": "Library",
     "title": "Favorites",
     "subtitle": "Saved plans, exercises and songs",
     "empty_title": "Nothing saved yet",
@@ -168,6 +169,8 @@
     "folder_not_empty": "Move or delete the folder's contents first",
     "folder_deleted": "Folder \"{{name}}\" deleted",
     "folder_delete_failed": "Failed to delete folder",
+    "delete_file": "Delete {{name}}",
+    "delete_folder": "Delete folder {{name}}",
     "title": "Guitar Pro Files",
     "subtitle": "Your Guitar Pro file library",
     "practice": "Practice",

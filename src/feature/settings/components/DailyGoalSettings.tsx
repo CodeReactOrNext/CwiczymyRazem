@@ -1,11 +1,6 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "assets/components/ui/card";
-import { cn } from "assets/lib/utils";
+import { Card } from "assets/components/ui/card";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { DAILY_GOAL_OPTIONS, getDailyGoalMinutes } from "constants/dailyGoal";
 import { firebaseUpdateDailyGoalMinutes } from "feature/settings/services/settings.service";
 import {
@@ -40,32 +35,18 @@ export const DailyGoalSettings = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{t("daily_goal.title")}</CardTitle>
-        <CardDescription>{t("daily_goal.subtitle")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className='grid grid-cols-4 gap-2 sm:max-w-md'>
-          {DAILY_GOAL_OPTIONS.map((minutes) => {
-            const active = minutes === current;
-            return (
-              <button
-                key={minutes}
-                type='button'
-                aria-pressed={active}
-                onClick={() => choose(minutes)}
-                className={cn(
-                  "rounded-lg px-3 py-2.5 text-sm font-semibold tabular-nums outline-none transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/50",
-                  active
-                    ? "bg-cyan-500/10 text-cyan-300"
-                    : "bg-zinc-900/40 text-zinc-300 hover:bg-zinc-900/70",
-                )}>
-                {t("daily_goal.minutes", { minutes })}
-              </button>
-            );
-          })}
-        </div>
-      </CardContent>
+      <SectionHeader title={t("daily_goal.title")} description={t("daily_goal.subtitle")} />
+      <div>
+        <SegmentedControl
+          label={t("daily_goal.title")}
+          selected={[String(current)]}
+          onSelect={(minutes) => choose(Number(minutes))}
+          options={DAILY_GOAL_OPTIONS.map((minutes) => ({
+            value: String(minutes),
+            label: t("daily_goal.minutes", { minutes }),
+          }))}
+        />
+      </div>
     </Card>
   );
 };

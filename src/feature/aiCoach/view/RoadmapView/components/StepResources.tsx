@@ -1,4 +1,5 @@
 import { Chip } from "assets/components/ui/chip";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { useTranslation } from "hooks/useTranslation";
@@ -45,11 +46,11 @@ const ResourceToggle = ({ checked, label, onClick }: ResourceToggleProps) => (
 );
 
 const SkeletonRow = () => (
-  <div className='flex h-[76px] animate-pulse items-center gap-4 rounded-lg bg-zinc-900/40 px-4'>
-    <div className='h-10 w-10 shrink-0 rounded-lg bg-zinc-800' />
+  <div className='flex h-[76px] items-center gap-4 rounded-lg bg-zinc-900/40 px-4'>
+    <Skeleton className='h-10 w-10 shrink-0 rounded-lg' />
     <div className='flex-1 space-y-2'>
-      <div className='h-3 w-3/4 rounded bg-zinc-800' />
-      <div className='h-2.5 w-1/2 rounded bg-zinc-800' />
+      <Skeleton className='h-3 w-3/4' />
+      <Skeleton className='h-2.5 w-1/2' />
     </div>
   </div>
 );

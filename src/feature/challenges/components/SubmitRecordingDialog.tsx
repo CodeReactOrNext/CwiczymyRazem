@@ -96,15 +96,15 @@ export const SubmitRecordingDialog = ({
 
   return (
     <Dialog open={!!song} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className='max-w-lg border-white/5 bg-zinc-950 p-6'>
+      <DialogContent className='bg-zinc-950'>
         <DialogHeader className='mb-1'>
-          <DialogTitle className='font-openSans text-xl font-bold text-white'>
+          <DialogTitle className='text-xl font-bold text-white'>
             {t("submit.title")}
           </DialogTitle>
         </DialogHeader>
 
         {song && (
-          <div className='flex items-center gap-3 rounded-xl bg-white/[0.03] p-3'>
+          <div className='flex items-center gap-3 rounded-lg bg-zinc-800/40 p-3'>
             <div className='h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-zinc-800'>
               {song.coverUrl ? (
                 <img
@@ -139,13 +139,13 @@ export const SubmitRecordingDialog = ({
               {t("submit.youtube_link")}
             </Label>
             <div className='relative'>
-              <Video className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600' />
+              <Video className='pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-zinc-500' />
               <Input
                 id='challenge-video'
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
                 placeholder='https://youtu.be/...'
-                className='h-12 border-white/5 bg-white/5 pl-10 font-medium transition-all focus:border-cyan-500/50'
+                className='h-10 pl-10'
               />
             </div>
             {videoUrl.trim() && !videoId ? (
@@ -178,7 +178,7 @@ export const SubmitRecordingDialog = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={100}
-              className='h-12 border-white/5 bg-white/5 font-medium transition-all focus:border-cyan-500/50'
+              className='h-10'
             />
           </div>
 
@@ -195,7 +195,7 @@ export const SubmitRecordingDialog = ({
               maxLength={300}
               rows={3}
               placeholder={t("submit.notes_placeholder")}
-              className='resize-none border-white/5 bg-white/5 font-medium transition-all focus:border-cyan-500/50'
+              className='resize-none'
             />
           </div>
 
@@ -258,13 +258,9 @@ export const SubmitRecordingDialog = ({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!isValid || isSubmitting}
-            className='font-bold'>
-            {isSubmitting ? (
-              <span className='loading loading-spinner loading-sm' />
-            ) : (
-              t("submit.submit_run")
-            )}
+            disabled={!isValid}
+            loading={isSubmitting}>
+            {t("submit.submit_run")}
           </Button>
         </DialogFooter>
       </DialogContent>

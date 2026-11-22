@@ -18,9 +18,6 @@ import {
   useState,
 } from "react";
 
-const FOCUS_RING =
-  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60";
-
 /** How many names the @ list shows at once. */
 const MAX_SUGGESTIONS = 6;
 
@@ -52,16 +49,15 @@ const ComposerStrip = ({
       <span className='block text-zinc-400'>{label}</span>
       <span className='block truncate text-zinc-300'>{text}</span>
     </span>
-    <button
+    <Button
       type='button'
+      variant='ghost'
+      size='icon'
       aria-label={clearLabel}
       onClick={onClear}
-      className={cn(
-        "-my-2 -mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-200",
-        FOCUS_RING,
-      )}>
-      <X className='h-4 w-4' />
-    </button>
+      className='-my-1 -mr-1 shrink-0 text-zinc-400'>
+      <X />
+    </Button>
   </div>
 );
 
@@ -233,16 +229,15 @@ export const ChatComposer = ({
           </div>
         )}
 
-        <button
+        <Button
           type='button'
+          variant='ghost'
+          size='icon'
           aria-label={t("composer.share")}
           onClick={onOpenPicker}
-          className={cn(
-            "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-zinc-950/50 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100",
-            FOCUS_RING,
-          )}>
-          <Paperclip className='h-5 w-5' />
-        </button>
+          className='h-12 w-12 shrink-0 text-zinc-400 [&_svg]:size-5'>
+          <Paperclip />
+        </Button>
         <textarea
           ref={inputRef}
           rows={1}
@@ -271,8 +266,8 @@ export const ChatComposer = ({
           type='submit'
           size='icon'
           aria-label={t("composer.send")}
-          className='h-12 w-12 shrink-0 rounded-lg bg-white font-bold text-black transition-colors hover:bg-zinc-200 active:click-behavior'>
-          <SendHorizontal className='h-5 w-5' />
+          className='h-12 w-12 shrink-0 [&_svg]:size-5'>
+          <SendHorizontal />
         </Button>
       </form>
 

@@ -27,7 +27,7 @@ export const TitleField = ({ register, error }: TitleFieldProps) => {
         // Keeps the field clear of the sticky header when a failed submit focuses it.
         className={cn(
           "scroll-mt-32",
-          error && "border-red-500/60 focus-visible:ring-red-500/60",
+          error && "ring-1 ring-red-500/60 focus-visible:ring-red-500/60",
         )}
         {...register("title", {
           validate: (value) =>

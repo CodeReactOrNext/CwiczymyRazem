@@ -6,6 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { SearchInput } from "components/SearchInput/SearchInput";
 import {
   getCommunityExercises,
   getUserCommunityExercises,
@@ -380,12 +383,10 @@ export const SelectExercisesStep = ({
           {/* Building a new exercise is a side path — one menu, not three buttons ahead of the library. */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="subtle"
-                className="h-10 rounded-lg bg-zinc-800/60 px-4 text-sm font-semibold text-zinc-200 hover:bg-zinc-700/60 hover:text-white">
-                <Plus className="h-4 w-4" />
+              <Button variant="ghost" size="lg">
+                <Plus />
                 {t("select.create_exercise")}
-                <ChevronDown className="h-3.5 w-3.5 opacity-70" />
+                <ChevronDown className="opacity-70" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
@@ -428,23 +429,24 @@ export const SelectExercisesStep = ({
             />
           ) : (
             <>
-              <input
-                type="text"
+              <SearchInput
                 value={remoteSearch}
                 onChange={e => setRemoteSearch(e.target.value)}
                 placeholder={isMineTab ? t("select.search_mine") : t("select.search_community")}
-                className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-4 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-cyan-500/50"
+                aria-label={isMineTab ? t("select.search_mine") : t("select.search_community")}
               />
               {remoteLoading ? (
-                <div className="flex h-40 items-center justify-center">
-                  <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-cyan-500" />
+                <div className="flex flex-col gap-2" aria-busy="true">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <Skeleton key={i} variant="block" className="h-16" />
+                  ))}
                 </div>
               ) : remoteExercises.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-white/5 p-12 text-center">
-                  <p className="text-zinc-500 text-sm max-w-sm mx-auto leading-relaxed">
-                    {remoteEmptyMessage}
-                  </p>
-                </div>
+                <EmptyState
+                  size='compact'
+                  mood='lookAround'
+                  title={remoteEmptyMessage}
+                />
               ) : (
                 <ExerciseGrid
                   exercises={remoteExercises}
@@ -476,10 +478,11 @@ export const SelectExercisesStep = ({
         </p>
         <Button
           onClick={onNext}
+          size='lg'
           disabled={selectedExercises.length === 0}
-          className="shrink-0 flex items-center gap-2 h-11 px-6 bg-white text-black hover:bg-zinc-200 rounded-lg font-bold transition-colors disabled:opacity-40">
+          className='shrink-0'>
           {t("select.next_step")}
-          <ArrowRight className="h-4 w-4" />
+          <ArrowRight />
         </Button>
       </div>
 

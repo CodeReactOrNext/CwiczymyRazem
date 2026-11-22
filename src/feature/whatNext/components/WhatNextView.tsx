@@ -3,6 +3,8 @@ import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
 import MainContainer from "components/MainContainer";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
+import { PageTitle } from "components/PageTitle/PageTitle";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
@@ -77,29 +79,26 @@ export const WhatNextView = () => {
   ) : null;
 
   return (
-    <div className='mx-auto w-full max-w-3xl px-3 pb-24 pt-8 md:px-6'>
-      <h1 className='font-display text-3xl font-black tracking-tight text-zinc-100'>
-        {t("page.title")}
-      </h1>
-      <p className='mt-2 max-w-xl text-sm leading-relaxed text-zinc-400'>
-        {t("page.subtitle")}
-      </p>
-      {/* The same card as after a session, with "play the whole road" added. */}
-      <Card className='mt-6 flex flex-col p-5 sm:p-6'>
-        <LoadingSwap
-          isLoading={isLoading || !result}
-          skeleton={<RoadStripSkeleton />}>
-          {() =>
-            result && (
-              <WhatNextRoadStrip
-                result={result}
-                playRoad={playRoad}
-                onOpen={track}
-              />
-            )
-          }
-        </LoadingSwap>
-      </Card>
+    <div className='flex flex-col'>
+      <div className={cn("mx-auto w-full max-w-3xl", PAGE_CONTENT, "md:pt-10")}>
+        <PageTitle title={t("page.title")} subtitle={t("page.subtitle")} />
+        {/* The same card as after a session, with "play the whole road" added. */}
+        <Card className='mt-6 flex flex-col bg-zinc-900 p-5 sm:p-6'>
+          <LoadingSwap
+            isLoading={isLoading || !result}
+            skeleton={<RoadStripSkeleton />}>
+            {() =>
+              result && (
+                <WhatNextRoadStrip
+                  result={result}
+                  playRoad={playRoad}
+                  onOpen={track}
+                />
+              )
+            }
+          </LoadingSwap>
+        </Card>
+      </div>
     </div>
   );
 };

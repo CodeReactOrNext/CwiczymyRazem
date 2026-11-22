@@ -6,13 +6,18 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import { Input } from "assets/components/ui/input";
-import { cn } from "assets/lib/utils";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import {
+  Segment,
+  SegmentedControl,
+  SegmentGroup,
+} from "components/SegmentedControl/SegmentedControl";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
-import { Minus, Plus, Search } from "lucide-react";
-import type { ReactNode } from "react";
+import { Minus, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { useOwnExercises } from "../hooks/useExerciseGoals";
@@ -44,47 +49,10 @@ const COUNTING_OPTIONS: GoalCounting[] = ["streak", "total"];
 type ExerciseSource = "library" | "mine";
 const SOURCE_OPTIONS: ExerciseSource[] = ["library", "mine"];
 
-interface SegmentedProps<T extends string> {
-  value: T;
-  options: { value: T; label: ReactNode }[];
-  onChange: (value: T) => void;
-  label: string;
-}
-
-const Segmented = <T extends string>({
-  value,
-  options,
-  onChange,
-  label,
-}: SegmentedProps<T>) => (
-  <div
-    role='radiogroup'
-    aria-label={label}
-    className='grid auto-cols-fr grid-flow-col gap-1 rounded-lg bg-zinc-800/50 p-1'>
-    {options.map((option) => (
-      <button
-        key={option.value}
-        type='button'
-        role='radio'
-        aria-checked={value === option.value}
-        onClick={() => onChange(option.value)}
-        className={cn(
-          "rounded px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
-          value === option.value
-            ? "bg-zinc-700 font-semibold text-zinc-100"
-            : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-        )}>
-        {option.label}
-      </button>
-    ))}
-  </div>
-);
-
 const isValidBpm = (bpm: number) =>
   Number.isFinite(bpm) && bpm >= MIN_GOAL_BPM && bpm <= MAX_GOAL_BPM;
 
-const STEP_BUTTON =
-  "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700 hover:text-zinc-100";
+const STEP_BUTTON = "h-11 w-11 shrink-0";
 
 interface BpmFieldProps {
   id: string;
@@ -110,13 +78,15 @@ const BpmField = ({ id, label, value, onChange, fallback }: BpmFieldProps) => {
         {label}
       </label>
       <div className='flex items-center gap-2'>
-        <button
+        <Button
           type='button'
+          variant='ghost'
+          size='icon'
           onClick={() => step(-5)}
           aria-label={t("create.bpm_down")}
           className={STEP_BUTTON}>
-          <Minus className='h-4 w-4' />
-        </button>
+          <Minus />
+        </Button>
         <Input
           id={id}
           type='number'
@@ -125,15 +95,17 @@ const BpmField = ({ id, label, value, onChange, fallback }: BpmFieldProps) => {
           max={MAX_GOAL_BPM}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className='h-11 w-20 border-0 bg-zinc-800/60 text-center text-lg font-semibold tabular-nums text-zinc-100 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
+          className='h-11 w-20 text-center text-lg font-semibold tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
         />
-        <button
+        <Button
           type='button'
+          variant='ghost'
+          size='icon'
           onClick={() => step(5)}
           aria-label={t("create.bpm_up")}
           className={STEP_BUTTON}>
-          <Plus className='h-4 w-4' />
-        </button>
+          <Plus />
+        </Button>
       </div>
     </div>
   );
@@ -282,7 +254,7 @@ export const CreateGoalDialog = ({
 
   return (
     <Dialog open onOpenChange={(open) => !open && !isSaving && onClose()}>
-      <DialogContent className='flex flex-col gap-8 border-0 bg-zinc-900 shadow-none sm:max-w-lg sm:p-8'>
+      <DialogContent className='flex flex-col gap-8 bg-zinc-900 sm:p-8'>
         <div className='space-y-2 pr-10'>
           <DialogTitle className='text-xl font-bold text-zinc-100'>
             {title ?? t("create.title")}
@@ -297,7 +269,7 @@ export const CreateGoalDialog = ({
             {t("create.exercise_label")}
           </p>
           {isResolvingExercise ? (
-            <div className='h-[3.75rem] animate-pulse rounded-lg bg-zinc-800/50' />
+            <Skeleton className='h-[3.75rem] rounded-lg' />
           ) : exercise ? (
             <div className='flex items-center justify-between gap-3 rounded-lg bg-zinc-800/50 px-4 py-3'>
               <div className='min-w-0'>
@@ -324,31 +296,26 @@ export const CreateGoalDialog = ({
             </div>
           ) : (
             <div className='space-y-2'>
-              <Segmented
+              <SegmentedControl
                 label={t("create.source_label")}
-                value={source}
-                onChange={setSource}
+                selected={[source]}
+                onSelect={setSource}
                 options={SOURCE_OPTIONS.map((option) => ({
                   value: option,
                   label: t(`create.source.${option}`),
                 }))}
               />
-              <Input
+              <SearchInput
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder={t("create.search")}
                 aria-label={t("create.search")}
-                startIcon={<Search className='h-4 w-4 text-zinc-500' />}
-                className='h-11 border-0 bg-zinc-800/60 text-zinc-100'
               />
               <div className='max-h-72 space-y-1 overflow-y-auto pr-1'>
                 {source === "mine" && ownQuery.isLoading ? (
                   <div className='space-y-1'>
                     {[0, 1, 2].map((row) => (
-                      <div
-                        key={row}
-                        className='h-10 animate-pulse rounded-lg bg-zinc-800/40'
-                      />
+                      <Skeleton key={row} className='h-10 rounded-lg' />
                     ))}
                   </div>
                 ) : (
@@ -462,28 +429,19 @@ export const CreateGoalDialog = ({
               <p className='text-sm font-medium text-zinc-200'>
                 {t("create.strictness_label")}
               </p>
-              <Segmented
-                label={t("create.strictness_label")}
-                value={strictness}
-                onChange={setStrictness}
-                options={GOAL_STRICTNESS_OPTIONS.map((option) => ({
-                  value: option,
-                  label: (
-                    <span className='flex flex-col items-center leading-tight'>
-                      <span>{t(`strictness.${option}`)}</span>
-                      <span
-                        className={cn(
-                          "text-xs font-normal tabular-nums",
-                          strictness === option
-                            ? "text-zinc-300"
-                            : "text-zinc-500",
-                        )}>
-                        {STRICTNESS_ACCURACY[option]}%
-                      </span>
+              <SegmentGroup aria-label={t("create.strictness_label")}>
+                {GOAL_STRICTNESS_OPTIONS.map((option) => (
+                  <Segment
+                    key={option}
+                    active={strictness === option}
+                    onClick={() => setStrictness(option)}>
+                    {t(`strictness.${option}`)}{" "}
+                    <span className='font-medium tabular-nums text-zinc-400'>
+                      {STRICTNESS_ACCURACY[option]}%
                     </span>
-                  ),
-                }))}
-              />
+                  </Segment>
+                ))}
+              </SegmentGroup>
               <p className='text-xs text-zinc-500'>
                 {t("create.strictness_hint")}
               </p>
@@ -493,10 +451,10 @@ export const CreateGoalDialog = ({
               <p className='text-sm font-medium text-zinc-200'>
                 {t("create.counting_label")}
               </p>
-              <Segmented
+              <SegmentedControl
                 label={t("create.counting_label")}
-                value={counting}
-                onChange={setCounting}
+                selected={[counting]}
+                onSelect={setCounting}
                 options={COUNTING_OPTIONS.map((option) => ({
                   value: option,
                   label: t(`create.counting_option.${option}`),
@@ -513,15 +471,16 @@ export const CreateGoalDialog = ({
           <Button
             type='button'
             onClick={onClose}
-            disabled={isSaving}
-            className='h-11 rounded-lg bg-zinc-800 px-5 text-zinc-100 hover:bg-zinc-700'>
+            variant='ghost'
+            size='lg'
+            disabled={isSaving}>
             {t("create.cancel")}
           </Button>
           <Button
             type='button'
             onClick={() => void handleSave()}
-            disabled={!canSave}
-            className='h-11 rounded-lg bg-white px-6 font-semibold text-zinc-950 hover:bg-zinc-200'>
+            size='lg'
+            disabled={!canSave}>
             {editing ? t("edit.save") : t("create.save")}
           </Button>
         </div>

@@ -67,7 +67,7 @@ export const TimingBreakdown = ({ timing, variant = "timing", precision, biasCen
   return (
     <div className={className}>
       <div className='flex items-baseline justify-between'>
-        <p className='text-[11px] font-semibold tracking-wide text-zinc-500'>{t(`${copy.namespace}.title`, copy.title)}</p>
+        <p className='text-xs font-medium text-zinc-400'>{t(`${copy.namespace}.title`, copy.title)}</p>
         <p className='text-[11px] tabular-nums text-zinc-400'>
           {translateOr(t, `${copy.namespace}.share`, copy.share, { pct: topPct })}
         </p>

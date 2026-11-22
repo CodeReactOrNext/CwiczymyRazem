@@ -5,15 +5,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
-import {
-  EFFECT_DEFINITIONS,
-  EFFECTS_BY_ID,
-} from "feature/arsenal/data/effectDefinitions";
+import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectValue } from "feature/arsenal/data/effectStats";
-import {
-  GUITAR_DEFINITIONS,
-  GUITARS_BY_ID,
-} from "feature/arsenal/data/guitarDefinitions";
+import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getItemValue } from "feature/arsenal/data/itemStats";
 import {
   EFFECT_MERGE,
@@ -26,17 +20,12 @@ import {
   getPartResaleValue,
 } from "feature/arsenal/data/resale";
 import {
-  canFitSalvagedMod,
   getSalvageableMod,
-  getSalvagedModOptions,
   getScrappedMods,
 } from "feature/arsenal/data/salvage";
-import {
-  getEffectSubject,
-  getGuitarSubject,
-  getModDef,
-} from "feature/arsenal/data/workshop";
+import { getModDef } from "feature/arsenal/data/workshop";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
+import { useBenchReadiness } from "feature/arsenal/hooks/useBenchReadiness";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useFuseParts } from "feature/arsenal/hooks/useFuseParts";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
@@ -56,7 +45,6 @@ import { useUnequipGuitar } from "feature/arsenal/hooks/useUnequipGuitar";
 import { useUpdatePedalboard } from "feature/arsenal/hooks/useUpdatePedalboard";
 import { useUpdateRig } from "feature/arsenal/hooks/useUpdateRig";
 import { useUpdateStashLayout } from "feature/arsenal/hooks/useUpdateStashLayout";
-import { useWorkshopMod } from "feature/arsenal/hooks/useWorkshopMod";
 import type { BoardPiece } from "feature/arsenal/utils/boardPieces";
 import {
   componentPieces,
@@ -74,8 +62,8 @@ import type {
   CollectionSort,
 } from "feature/arsenal/utils/collectionFilter";
 import {
+  COLLECTION_SCOPES,
   filterAndSortEntries,
-  isScopeVisible,
   matchesQuery,
 } from "feature/arsenal/utils/collectionFilter";
 import {
@@ -92,6 +80,7 @@ import {
   columnOf,
   resolveLayout,
   rowOf,
+  toTabbedLayout,
 } from "feature/arsenal/utils/stashLayout";
 import { ShelfDepositDialog } from "feature/guilds/components/ShelfDepositDialog";
 import { useShelfDeposit } from "feature/guilds/hooks/useShelfDeposit";
@@ -112,6 +101,7 @@ import {
   ArrowDownWideNarrow,
   Boxes,
   Guitar,
+  Hammer,
   Info,
   Layers,
   Merge,
@@ -121,7 +111,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { useRouter } from "next/router";
-import type { MouseEvent as ReactMouseEvent } from "react";
+import type { MouseEvent as ReactMouseEvent, ReactNode } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAppSelector } from "store/hooks";
@@ -145,17 +135,16 @@ import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { SellConfirmDialog } from "../GuitarInventory/SellConfirmDialog";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
+import { useBenchDialogStore } from "../Workshop/benchDialogStore";
 import { BoardPieceTile } from "./BoardPieceTile";
 import { CollectionEmptyResult } from "./CollectionEmptyResult";
-import { CollectionSectionHeader } from "./CollectionSectionHeader";
-import { FitSalvagedDialog } from "./FitSalvagedDialog";
 import { SalvagedModCard } from "./SalvagedModCard";
 import { ScrapPartCard } from "./ScrapPartCard";
 import { StashBoard } from "./StashBoard";
 import type { StashMenuItem } from "./StashContextMenu";
 import { StashContextMenu } from "./StashContextMenu";
 import { StashItemDialog } from "./StashItemDialog";
-import type { StashDropTarget, StashPlacement } from "./StashTile";
+import type { StashPlacement } from "./StashTile";
 import { useStashDrag } from "./useStashDrag";
 
 /** Which half of the arsenal an id belongs to. */
@@ -179,16 +168,23 @@ interface StashInventoryProps {
   data: ArsenalUserData;
   query: string;
   sort: CollectionSort;
+  /** The shelf on screen — every shelf is a board of its own. */
   scope: CollectionScope;
   /** The player dragged something while a sort was still driving the board. */
   onManualArrange: () => void;
+  /**
+   * Draws the collection's toolbar with this shelf's own keys (tidy up, clear
+   * duplicates) on its right — one bar above the board instead of a second
+   * header row under it.
+   */
+  renderToolbar: (actions: ReactNode) => ReactNode;
 }
 
 const bulkButtonClass =
-  `${PRESSABLE} flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20 border-b-black/30`;
+  `${PRESSABLE} flex h-9 shrink-0 items-center gap-2 rounded-lg bg-red-500/10 px-3 text-xs font-bold text-red-300 transition-colors disabled:opacity-50 hover:bg-red-500/20 border-b-black/30`;
 
 const arrangeButtonClass =
-  `${PRESSABLE} flex items-center gap-2 rounded-lg bg-zinc-800/60 px-3 py-2 text-xs font-bold text-zinc-300 transition-colors hover:bg-zinc-700/60 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60 border-b-black/30`;
+  `${PRESSABLE} flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-800/60 px-3 text-xs font-bold text-zinc-300 transition-colors hover:bg-zinc-700/60 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60 border-b-black/30`;
 
 /**
  * The orders Tidy up can lay the board out in, said as what the player gets
@@ -197,7 +193,6 @@ const arrangeButtonClass =
  */
 const ARRANGE_ORDERS: CollectionSort[] = [
   "equipped",
-  "type",
   "rarity",
   "level",
   "newest",
@@ -218,6 +213,7 @@ export const StashInventory = ({
   sort,
   scope,
   onManualArrange,
+  renderToolbar,
 }: StashInventoryProps) => {
   const router = useRouter();
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
@@ -244,15 +240,15 @@ export const StashInventory = ({
   const { mutate: sellMod, isPending: isSellingMod } = useSellSalvagedMod();
   const { mutate: sellPart, isPending: isSellingPart } = useSellPart();
   const { mutate: fusePartsStack, isPending: isFusingPart } = useFuseParts();
-  const { mutate: fitMod, isPending: isFitting } = useWorkshopMod({
-    scene: true,
-  });
   // One duplicate at a time plays the merge scene; the sweep over every
   // duplicate at once just reports what it did, with a toast.
   const mergeScene = useMergeScene();
   const { mutate: mergeBulk, isPending: isMergingBulk } = useMergeDuplicates();
   const shelf = useShelfDeposit(data);
   const currentFame = useAppSelector(selectCurrentUserStats)?.fame || 0;
+  // What the bench could do right now: the green hammer mark on sockets and in the menu.
+  const { readyIds: benchReadyIds, modTargets } = useBenchReadiness(data);
+  const openBench = useBenchDialogStore((state) => state.openBench);
   const playerLvl = usePlayerLvl();
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const labels = useArsenalLabels();
@@ -327,11 +323,6 @@ export const StashInventory = ({
   );
   const { mutate: sellComponent, isPending: isSellingComponent } =
     useSellComponent();
-  /** A rescued mod dropped onto an instrument, waiting on the bill. */
-  const [fitPending, setFitPending] = useState<{
-    mod: SalvagedMod;
-    targetId: string;
-  } | null>(null);
   /** The socket that was right-clicked, and where the menu should hang. */
   const [menu, setMenu] = useState<{
     piece: BoardPiece;
@@ -434,35 +425,6 @@ export const StashInventory = ({
     };
   };
 
-  /** The bench's view of one owned item, built on demand for a drop check. */
-  const subjectOf = useCallback(
-    (kind: Kind, itemId: string) => {
-      if (kind === "guitar") {
-        const item = data.inventory.find((i) => i.id === itemId);
-        const def = item ? GUITARS_BY_ID.get(item.guitarId) : undefined;
-        return item && def ? getGuitarSubject(item, def) : null;
-      }
-      const item = effectInventory.find((i) => i.id === itemId);
-      const def = item ? EFFECTS_BY_ID.get(item.effectId) : undefined;
-      return item && def ? getEffectSubject(item, def) : null;
-    },
-    [data.inventory, effectInventory],
-  );
-
-  /**
-   * Whether the carried piece is a rescued mod and the piece under it is an
-   * instrument that could take it. Drives both the highlight and the drop.
-   */
-  const canApplySalvaged = useCallback(
-    (carriedId: string, targetId: string) => {
-      const mod = salvagedMods.find((m) => m.id === carriedId);
-      if (!mod) return false;
-      const subject = subjectOf(mod.kind, targetId);
-      return subject != null && canFitSalvagedMod(subject, mod);
-    },
-    [salvagedMods, subjectOf],
-  );
-
   const guitarDuplicates = useMemo(
     () =>
       getGuitarDuplicates(data.inventory, {
@@ -489,89 +451,59 @@ export const StashInventory = ({
 
   const manual = sort === "manual";
 
-  // Everything the player owns, as pieces. Under a sort the board is a listing
-  // and only shows what passes the filters; arranged by hand it is a place, so
-  // filters dim rather than reshuffle — a stash you have to re-learn after every
-  // search is not worth arranging.
+  // One shelf of what the player owns, as pieces. Under a sort the board is a
+  // listing and only shows what passes the search; arranged by hand it is a
+  // place, so the search dims rather than reshuffles — a stash you have to
+  // re-learn after every search is not worth arranging.
   //
-  // Takes the order it should build in rather than reading it off the props,
-  // because Tidy up asks for one the board is not currently showing: it needs
-  // the whole collection in a chosen order to write it into the arrangement.
+  // Takes the order and the shelf it should build rather than reading them off
+  // the props, because Tidy up asks for an order the board is not showing, and
+  // the per-shelf layout needs every shelf at once.
   const buildPieces = useCallback(
     (
       order: CollectionSort,
       search: string,
-      within: CollectionScope,
+      shelfId: CollectionScope,
     ): BoardPiece[] => {
       const byHand = order === "manual";
+      const keep = (piece: BoardPiece) =>
+        byHand || matchesQuery(piece.name, search);
 
-      const parts = partPieces(data.parts ?? []).filter(
-        (piece) =>
-          byHand || (within === "all" && matchesQuery(piece.name, search)),
-      );
-
-      // Rescued mods hang with everything else — they are gear, not a counter,
-      // and the whole point of the stash is that you can see what you hold.
-      const mods = modPieces(salvagedMods).filter(
-        (piece) =>
-          byHand || (within === "all" && matchesQuery(piece.name, search)),
-      );
+      // Rescued mods hang next to the scrap they came out with: both are loose
+      // parts waiting for a bench. Mods lead — they are the rarer of the two.
+      if (shelfId === "parts") {
+        const parts = partPieces(data.parts ?? []).filter(keep);
+        const mods = modPieces(salvagedMods).filter(keep);
+        return byHand ? [...parts, ...mods] : [...mods, ...parts];
+      }
 
       // Guitar Builder parts are owned copies like mods — one socket each,
       // gone from the board once a build uses them.
-      const components = componentPieces(data.components ?? []).filter(
-        (piece) =>
-          byHand || (within === "all" && matchesQuery(piece.name, search)),
-      );
+      if (shelfId === "builder")
+        return componentPieces(data.components ?? []).filter(keep);
 
       // Hand-arranged: the saved layout decides where everything hangs, so the
       // order the pieces are listed in only settles what was never placed.
-      if (byHand)
-        return [
-          ...parts,
-          ...mods,
-          ...components,
-          ...data.inventory.map(guitarPiece),
-          ...effectInventory.map(pedalPiece),
-        ];
+      if (shelfId === "guitars" && byHand) return data.inventory.map(guitarPiece);
+      if (shelfId === "pedals" && byHand) return effectInventory.map(pedalPiece);
 
-      // Under an auto-sort, guitars and pedals are ordered as one collection
-      // rather than two blocks — a Legendary pedal earns the place next to a
-      // Legendary guitar. The kinds are only kept apart by `type`, which is the
-      // order for a player who wants to walk the guitars first.
-      const guitarEntries = isScopeVisible(within, "guitars")
-        ? getGuitarEntries(data.inventory, inUseGuitarIds).map((entry) => ({
+      if (shelfId === "guitars")
+        return filterAndSortEntries(
+          getGuitarEntries(data.inventory, inUseGuitarIds).map((entry) => ({
             ...entry,
             item: guitarPiece(entry.item),
-            // Both kinds key their group off a bare model id, so a guitar and a
-            // pedal could tie-break into each other's runs of copies.
-            groupKey: `guitar:${entry.groupKey}`,
-          }))
-        : [];
-      const pedalEntries = isScopeVisible(within, "pedals")
-        ? getEffectEntries(effectInventory, pedalboardItemIds).map((entry) => ({
-            ...entry,
-            item: pedalPiece(entry.item),
-            groupKey: `pedal:${entry.groupKey}`,
-          }))
-        : [];
-
-      const gear =
-        order === "type"
-          ? [
-              ...filterAndSortEntries(guitarEntries, search, "rarity"),
-              ...filterAndSortEntries(pedalEntries, search, "rarity"),
-            ]
-          : filterAndSortEntries(
-              [...guitarEntries, ...pedalEntries],
-              search,
-              order,
-            );
-
-      // The gear leads and the loose stuff trails: mods are a shelf of
-      // blueprints waiting for a build, parts are a currency, and neither is
-      // what the player came to the stash to look at.
-      return [...gear, ...components, ...mods, ...parts];
+          })),
+          search,
+          order,
+        );
+      return filterAndSortEntries(
+        getEffectEntries(effectInventory, pedalboardItemIds).map((entry) => ({
+          ...entry,
+          item: pedalPiece(entry.item),
+        })),
+        search,
+        order,
+      );
     },
     [
       data.inventory,
@@ -589,78 +521,77 @@ export const StashInventory = ({
     [buildPieces, sort, query, scope],
   );
 
+  // Every shelf counts its own cells, so a layout saved back when everything
+  // hung on one board is folded into one per shelf before it is drawn. The
+  // fold is only written back with the player's next drop or tidy-up.
+  const savedLayout = useMemo(
+    () =>
+      toTabbedLayout(
+        data.stashLayout ?? {},
+        COLLECTION_SCOPES.map((id) => buildPieces("manual", "", id)),
+      ),
+    [data.stashLayout, buildPieces],
+  );
+  /** Every shelf's positions, with whatever the player just changed on top. */
+  const baseLayout = draft ?? savedLayout;
+
   // Hand-arranged positions are only honoured under Manual order; every other
   // order flows the pieces from the top-left in the order the toolbar chose.
   const { layout, rows } = useMemo(
-    () =>
-      resolveLayout(pieces, manual ? (draft ?? data.stashLayout ?? {}) : {}),
-    [pieces, manual, draft, data.stashLayout],
+    () => resolveLayout(pieces, manual ? baseLayout : {}),
+    [pieces, manual, baseLayout],
   );
 
-  const applyMove = (next: StashLayout) => {
+  /** Writes this shelf's positions back into the whole map and saves it. */
+  const commitShelf = (shelfLayout: StashLayout) => {
+    const next = { ...baseLayout, ...shelfLayout };
     setDraft(next);
     saveLayout(next);
   };
 
   /**
-   * Sort the arrangement itself, rather than looking at the collection through
-   * a sort.
+   * Sort the arrangement itself, rather than looking at the shelf through a
+   * sort.
    *
    * The toolbar's orders are a way of *looking* at the board and leave the
    * saved positions alone — the point of arranging a stash by hand is that
    * nothing moves behind your back. But a board that has been lived in gets
    * messy, and re-dragging sixty sockets to fix it is not a hobby. This lays the
-   * whole collection out in a chosen order and writes that down as the player's
-   * own arrangement, which they can then keep pulling apart by hand.
+   * whole shelf out in a chosen order and writes that down as the player's own
+   * arrangement, which they can then keep pulling apart by hand.
    */
-  // Counted off the collection rather than off what is on the board, so a
-  // search that narrows the view down to one socket doesn't take the button away
-  // — it arranges everything either way.
-  const canArrange =
-    data.inventory.length +
-      effectInventory.length +
-      salvagedMods.length +
-      (data.parts?.length ?? 0) >
-    1;
+  // Counted off the shelf rather than off what is on the board, so a search
+  // that narrows the view down to one socket doesn't take the button away —
+  // it arranges the whole shelf either way.
+  const canArrange = buildPieces("manual", "", scope).length > 1;
 
   const arrangeBy = (order: CollectionSort) => {
-    // Everything, not just what the filters are showing: a tidy-up that only
-    // placed the search results would bury the rest of the stash underneath.
-    const { layout: next } = resolveLayout(buildPieces(order, "", "all"), {});
-    setDraft(next);
-    saveLayout(next);
+    // The whole shelf, not just what the search is showing: a tidy-up that
+    // only placed the results would bury the rest underneath.
+    commitShelf(resolveLayout(buildPieces(order, "", scope), {}).layout);
     // It is a hand-made arrangement now, made by machine — so the board goes
     // back to Manual and the next drag is an edit, not a takeover.
     onManualArrange();
   };
 
-  const { ghost, drop, applyTarget, dragHandlers, consumeClick } = useStashDrag(
-    {
-      pieces,
-      layout,
-      rows,
-      gridRef,
-      canApply: canApplySalvaged,
-      // Parts leave the wallet, so the drop asks first rather than fitting on
-      // release — the bench never charges without showing the bill either.
-      onApply: (carriedId, targetId) => {
-        const mod = salvagedMods.find((m) => m.id === carriedId);
-        if (mod) setFitPending({ mod, targetId });
-      },
-      // A draggable socket has to swallow touch gestures to work at all, which
-      // would cost the player the ability to scroll the board on a phone. So on
-      // touch the pieces only come loose once Manual order is chosen deliberately.
-      enabled: manual || !isMobile,
-      onMove: applyMove,
-      // The first drag under a sort freezes what is on screen and hands the board
-      // over to the player, so the piece doesn't snap back the moment it lands.
-      onTakeOver: () => {
-        if (manual) return;
-        setDraft(layout);
-        onManualArrange();
-      },
+  const { ghost, drop, dragHandlers, consumeClick } = useStashDrag({
+    pieces,
+    layout,
+    rows,
+    gridRef,
+    // A draggable socket has to swallow touch gestures to work at all, which
+    // would cost the player the ability to scroll the board on a phone. So on
+    // touch the pieces only come loose once Manual order is chosen deliberately.
+    enabled: manual || !isMobile,
+    onMove: commitShelf,
+    // The first drag under a sort freezes what is on screen and hands the board
+    // over to the player, so the piece doesn't snap back the moment it lands.
+    onTakeOver: () => {
+      if (manual) return;
+      setDraft({ ...baseLayout, ...layout });
+      onManualArrange();
     },
-  );
+  });
 
   const closeDetail = () => setDetail(null);
   /** Builder parts have no sheet of their own — they're used on the bench. */
@@ -799,50 +730,9 @@ export const StashInventory = ({
 
   const isSelling = isSellingGuitar || isSellingEffect;
   const isScrapping = isScrappingGuitar || isScrappingEffect;
-  const uniqueOwned =
-    new Set(data.inventory.map((i) => i.guitarId)).size +
-    new Set(effectInventory.map((i) => i.effectId)).size;
-
-  /** The rescued mod currently in hand, if that is what is being carried. */
-  const carriedMod = ghost
-    ? (salvagedMods.find((m) => m.id === ghost.id) ?? null)
-    : null;
-
-  // Every instrument the carried mod could go into. Computed once per pickup
-  // rather than per socket per frame — a drag re-renders the whole board on
-  // every pointer move.
-  const fitTargets = useMemo(() => {
-    if (!carriedMod) return null;
-    const ids = new Set<string>();
-    const items =
-      carriedMod.kind === "guitar"
-        ? data.inventory.map((i) => i.id)
-        : effectInventory.map((i) => i.id);
-    for (const id of items) {
-      if (canApplySalvaged(carriedMod.id, id)) ids.add(id);
-    }
-    return ids;
-  }, [canApplySalvaged, carriedMod, data.inventory, effectInventory]);
-
-  const dropTargetOf = (piece: BoardPiece): StashDropTarget | undefined => {
-    if (!fitTargets?.has(piece.id)) return undefined;
-    return applyTarget === piece.id ? "active" : "candidate";
-  };
-
-  /** Under Manual order the filters grey a piece out instead of removing it. */
-  const isDimmed = (piece: BoardPiece) => {
-    // While a mod is in hand the board answers one question only, so everything
-    // it cannot go into steps back — including whatever the filters think.
-    if (fitTargets) return !fitTargets.has(piece.id) && piece.id !== ghost?.id;
-    if (!manual) return false;
-    const inScope =
-      piece.kind === "part" ||
-      piece.kind === "mod" ||
-      piece.kind === "component"
-        ? scope === "all"
-        : isScopeVisible(scope, piece.kind === "guitar" ? "guitars" : "pedals");
-    return !inScope || !matchesQuery(piece.name, query);
-  };
+  /** Under Manual order the search greys a piece out instead of removing it. */
+  const isDimmed = (piece: BoardPiece) =>
+    manual && !matchesQuery(piece.name, query);
 
   /**
    * What the right-click menu offers for one piece.
@@ -876,6 +766,12 @@ export const StashInventory = ({
           label: t("stash.menu.details"),
           icon: Info,
           onSelect: () => setDetail({ kind: "guitar", itemId: piece.id }),
+        },
+        {
+          id: "workshop",
+          label: t("stash.menu.workshop"),
+          icon: Hammer,
+          onSelect: () => openBench(piece.id),
         },
         {
           id: "equip",
@@ -973,6 +869,12 @@ export const StashInventory = ({
           icon: Info,
           onSelect: () => setDetail({ kind: "effect", itemId: piece.id }),
         },
+        {
+          id: "workshop",
+          label: t("stash.menu.workshop"),
+          icon: Hammer,
+          onSelect: () => openBench(piece.id),
+        },
         ...(onBoard
           ? [
               {
@@ -1041,8 +943,20 @@ export const StashInventory = ({
       ];
     }
 
-    if (piece.kind === "mod")
+    if (piece.kind === "mod") {
+      // Where the mod could go right now, if anywhere — a free slot that takes it.
+      const target = modTargets.get(piece.mod.id);
       return [
+        ...(target
+          ? [
+              {
+                id: "install",
+                label: t("stash.menu.install_on", { name: target.name }),
+                icon: Hammer,
+                onSelect: () => openBench(target.id, piece.mod.featureId),
+              },
+            ]
+          : []),
         {
           id: "details",
           label: t("stash.menu.details"),
@@ -1065,6 +979,7 @@ export const StashInventory = ({
           onSelect: () => setResale({ kind: "mod", mod: piece.mod }),
         },
       ];
+    }
 
     if (piece.kind === "component")
       return [
@@ -1135,7 +1050,6 @@ export const StashInventory = ({
           row: rowOf(layout[piece.id]),
           dragging: ghost?.id === piece.id,
           dimmed: isDimmed(piece),
-          dropTarget: dropTargetOf(piece),
           dragHandlers: dragHandlers(piece),
           onContextMenu: openMenu(piece),
         };
@@ -1148,6 +1062,12 @@ export const StashInventory = ({
         isEquipped={data.equippedItemId === piece.id}
         rigSlot={rigSlotOf(piece.id)}
         isOnPedalboard={pedalboardItemIds.has(piece.id)}
+        ready={
+          piece.kind === "mod"
+            ? modTargets.has(piece.mod.id)
+            : benchReadyIds.has(piece.id)
+        }
+        fame={currentFame}
         onClick={(event) => openPiece(piece, event)}
       />
     );
@@ -1156,64 +1076,57 @@ export const StashInventory = ({
   const carried = ghost ? pieces.find((p) => p.id === ghost.id) : undefined;
 
   return (
-    <div className='flex flex-col gap-3'>
-      <CollectionSectionHeader
-        eyebrow={t("stash.eyebrow")}
-        title={t("stash.title")}
-        owned={uniqueOwned}
-        total={GUITAR_DEFINITIONS.length + EFFECT_DEFINITIONS.length}
-        unit={t("stash.items_collected")}
-        action={
-          <div className='flex flex-wrap gap-2'>
-            {canArrange && (
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  className={arrangeButtonClass}
-                  title={t("stash.tidy_hint")}>
-                  <ArrowDownWideNarrow size={14} />
-                  {t("stash.tidy_up")}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align='end'
-                  className='border-0 bg-zinc-900 p-1'>
-                  {ARRANGE_ORDERS.map((order) => (
-                    <DropdownMenuItem
-                      key={order}
-                      onSelect={() => arrangeBy(order)}
-                      className='cursor-pointer rounded px-3 py-2 text-xs font-semibold text-zinc-300 focus:bg-zinc-800 focus:text-white'>
-                      {t(`stash.arrange.${order}`)}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            {guitarDuplicates.ids.length > 0 && (
-              <button
-                onClick={() => setBulk("guitar")}
-                disabled={isSellingGuitarsBulk || isScrappingGuitarsBulk}
-                className={bulkButtonClass}
-                title={t("stash.dupes_guitars_hint")}>
-                <Layers size={14} />
-                {t("stash.dupes_guitars", {
-                  count: guitarDuplicates.ids.length,
-                })}
-              </button>
-            )}
-            {effectDuplicates.ids.length > 0 && (
-              <button
-                onClick={() => setBulk("effect")}
-                disabled={isSellingEffectsBulk || isScrappingEffectsBulk}
-                className={bulkButtonClass}
-                title={t("stash.dupes_pedals_hint")}>
-                <Layers size={14} />
-                {t("stash.dupes_pedals", {
-                  count: effectDuplicates.ids.length,
-                })}
-              </button>
-            )}
-          </div>
-        }
-      />
+    <div className='flex flex-col gap-5'>
+      {renderToolbar(
+        <>
+          {/* Only under Manual: under a sort the board is already in order,
+              and re-laying an arrangement is the one thing this key does. */}
+          {manual && canArrange && (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={arrangeButtonClass}
+                title={t("stash.tidy_hint")}>
+                <ArrowDownWideNarrow size={14} />
+                {t("stash.tidy_up")}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end'>
+                {ARRANGE_ORDERS.map((order) => (
+                  <DropdownMenuItem
+                    key={order}
+                    onSelect={() => arrangeBy(order)}
+                    className='cursor-pointer rounded px-3 py-2 text-xs font-semibold text-zinc-300 focus:bg-zinc-800 focus:text-white'>
+                    {t(`stash.arrange.${order}`)}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          {scope === "guitars" && guitarDuplicates.ids.length > 0 && (
+            <button
+              onClick={() => setBulk("guitar")}
+              disabled={isSellingGuitarsBulk || isScrappingGuitarsBulk}
+              className={bulkButtonClass}
+              title={t("stash.dupes_guitars_hint")}>
+              <Layers size={14} />
+              {t("collection.clear_dupes", {
+                count: guitarDuplicates.ids.length,
+              })}
+            </button>
+          )}
+          {scope === "pedals" && effectDuplicates.ids.length > 0 && (
+            <button
+              onClick={() => setBulk("effect")}
+              disabled={isSellingEffectsBulk || isScrappingEffectsBulk}
+              className={bulkButtonClass}
+              title={t("stash.dupes_pedals_hint")}>
+              <Layers size={14} />
+              {t("collection.clear_dupes", {
+                count: effectDuplicates.ids.length,
+              })}
+            </button>
+          )}
+        </>,
+      )}
 
       {pieces.length === 0 ? (
         <CollectionEmptyResult query={query} />
@@ -1289,6 +1202,11 @@ export const StashInventory = ({
                     : undefined
                 }
                 isStashing={shelf.isDepositing}
+                onWorkshopClick={() => {
+                  closeDetail();
+                  openBench(item.id);
+                }}
+                workshopReady={benchReadyIds.has(item.id)}
               />
             </StashItemDialog>
           );
@@ -1319,43 +1237,17 @@ export const StashInventory = ({
               isStashing={shelf.isDepositing}
               onRemoveFromBoard={handleRemoveFromBoard}
               isRemovingFromBoard={isRemovingFromBoard}
+              onWorkshopClick={() => {
+                closeDetail();
+                openBench(item.id);
+              }}
+              workshopReady={benchReadyIds.has(item.id)}
             />
           </StashItemDialog>
         );
       })()}
 
       <ShelfDepositDialog {...shelf.dialog} />
-
-      {/* Dropped a rescued mod onto an instrument: confirm, then the job. */}
-      {(() => {
-        if (!fitPending) return null;
-        const subject = subjectOf(fitPending.mod.kind, fitPending.targetId);
-        if (!subject) return null;
-        const option = getSalvagedModOptions(subject, [fitPending.mod])[0];
-        if (!option) return null;
-
-        return (
-          <FitSalvagedDialog
-            isOpen
-            option={option}
-            targetName={subject.name}
-            onConfirm={() =>
-              fitMod(
-                {
-                  itemId: fitPending.targetId,
-                  kind: fitPending.mod.kind,
-                  featureId: null,
-                  action: "fit-salvaged",
-                  salvagedId: fitPending.mod.id,
-                },
-                { onSuccess: () => setFitPending(null) },
-              )
-            }
-            onCancel={() => setFitPending(null)}
-            isLoading={isFitting}
-          />
-        );
-      })()}
 
       {/* A rescued mod has no card anywhere else — this is the only place it
           explains itself. */}
@@ -1376,6 +1268,17 @@ export const StashInventory = ({
               setListMod(modDetail);
             }}
             isListing={isListing}
+            install={(() => {
+              const target = modTargets.get(modDetail.id);
+              if (!target) return undefined;
+              return {
+                targetName: target.name,
+                onClick: () => {
+                  setModDetail(null);
+                  openBench(target.id, modDetail.featureId);
+                },
+              };
+            })()}
           />
         )}
       </StashItemDialog>
@@ -1383,6 +1286,7 @@ export const StashInventory = ({
       {/* Same for a stack of parts: a currency the player can cash out. */}
       <StashItemDialog
         isOpen={partDetail !== null}
+        wide
         onClose={() => setPartDetail(null)}
         title={
           partDetail ? labels.partName(partDetail.tier, partDetail.partId) : ""

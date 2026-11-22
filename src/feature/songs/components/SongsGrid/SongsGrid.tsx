@@ -103,11 +103,11 @@ export const SongsGrid = ({
   };
 
   return (
-    <div className='space-y-8 min-h-[400px] flex flex-col justify-between pb-12 transition-all duration-base'>
+    <div className='space-y-8 flex flex-col pb-12 transition-all duration-base'>
       {isLoading ? (
         <>
           {/* Phones: Spotify-style list */}
-          <div className='space-y-1 sm:hidden'>
+          <div className='space-y-2 sm:hidden'>
             {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
               <SongRowSkeleton key={i} />
             ))}
@@ -126,7 +126,7 @@ export const SongsGrid = ({
       ) : (
         <>
           {/* Phones: Spotify-style list — the 2-col card grid is too cramped to read. */}
-          <div className='space-y-1 sm:hidden animate-in fade-in duration-slow'>
+          <div className='space-y-2 sm:hidden animate-in fade-in duration-slow'>
             {songs.map((song) => {
               const userStatus = getUserStatus(song);
               return (
@@ -173,15 +173,16 @@ export const SongsGrid = ({
       <div className='mt-auto pt-8'>
         {(currentPage > 1 || hasMore) && (
           <div className='flex justify-center'>
-            <div className='rounded-2xl bg-zinc-900/40 p-2 backdrop-blur-sm flex items-center gap-4'>
+            <div className='flex items-center gap-4 rounded-lg bg-zinc-800/40 p-2'>
               <Button
                 variant="ghost"
+                size="lg"
                 onClick={() => {
                   posthog.capture("song_library_action", { action: "page_change", direction: "prev", page: currentPage - 1 });
                   onPageChange(currentPage - 1);
                 }}
                 disabled={currentPage <= 1}
-                className="h-10 px-4 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
+                className="bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
               >
                 Previous
               </Button>
@@ -192,12 +193,13 @@ export const SongsGrid = ({
 
               <Button
                 variant="ghost"
+                size="lg"
                 onClick={() => {
                   posthog.capture("song_library_action", { action: "page_change", direction: "next", page: currentPage + 1 });
                   onPageChange(currentPage + 1);
                 }}
                 disabled={!hasMore}
-                className="h-10 px-4 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
+                className="bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
               >
                 Next
               </Button>

@@ -1,3 +1,4 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { addDays, isSameDay, startOfWeek } from "date-fns";
@@ -6,13 +7,12 @@ import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userS
 import { useRemoteSessionRefresh } from "hooks/useRemoteSessionRefresh";
 import { useTranslation } from "hooks/useTranslation";
 import { Coffee, Flame } from "lucide-react";
-import { useRouter } from "next/router";
+import Link from "next/link";
 import { useAppSelector } from "store/hooks";
 import { getReconciledStreak, hasRestDays } from "utils/gameLogic";
 
 export const StreakBox = () => {
   const { t } = useTranslation("nav");
-  const router = useRouter();
   const userAuth = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
   // The header stays mounted across navigation, so the log is fetched once.
@@ -43,14 +43,17 @@ export const StreakBox = () => {
 
   return (
     <ScoreBreakdownTooltip streak={dayWithoutBreak} restDays={restDays}>
-    <div
-      onClick={() => router.push("/practice-log")}
-      className='flex h-11 cursor-pointer items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm transition-colors hover:bg-zinc-800/70'>
+    <Link
+      href='/practice-log'
+      className={cn(
+        PRESSABLE_KEY,
+        "flex h-11 items-center gap-3 rounded-lg bg-zinc-800/40 px-3 transition-colors hover:bg-zinc-800/70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+      )}>
       <div className="flex items-center gap-1.5 shrink-0 px-1">
         <Flame size='1em' className={cn(
           "text-xl transition-all duration-slow",
           dayWithoutBreak > 0
-            ? "text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]"
+            ? "text-orange-500"
             : "text-zinc-700 opacity-50"
         )} />
         {dayWithoutBreak > 0 && (
@@ -60,7 +63,7 @@ export const StreakBox = () => {
         )}
       </div>
 
-      <div className='flex items-center gap-1 border-l border-white/5 pl-2'>
+      <div className='flex items-center gap-1'>
         {t("weekday_letters").split(",").map((dayLabel, index) => {
           const today = new Date();
           const start = startOfWeek(today, { weekStartsOn: 1 });
@@ -83,7 +86,7 @@ export const StreakBox = () => {
               className={cn(
                 "flex h-6 w-6 items-center justify-center rounded-[4px] text-xs font-bold transition-all duration-base",
                 isActive
-                  ? "bg-white text-zinc-900 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
+                  ? "bg-white text-zinc-900"
                   : isRest
                     ? "bg-zinc-700 text-zinc-200"
                     : "bg-zinc-800 text-zinc-300"
@@ -95,7 +98,7 @@ export const StreakBox = () => {
           );
         })}
       </div>
-    </div>
+    </Link>
     </ScoreBreakdownTooltip>
   );
 };

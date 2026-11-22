@@ -32,8 +32,8 @@ export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstru
       {exercise.whyItMatters && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-zinc-200">
-            <GraduationCap size={12} />
-            <h4 className="text-[10px] font-semibold capitalize tracking-wider">{t("instructions.why")}</h4>
+            <GraduationCap className="h-3.5 w-3.5" />
+            <h4 className="text-xs font-medium">{t("instructions.why")}</h4>
           </div>
           <p className="text-xs leading-relaxed text-zinc-400">{exercise.whyItMatters}</p>
         </div>
@@ -42,8 +42,8 @@ export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstru
       {instructions.length > 0 && (
         <div className="space-y-2.5">
           <div className="flex items-center gap-2 text-zinc-200">
-            <InfoIcon size={12} />
-            <h4 className="text-[10px] font-semibold capitalize tracking-wider">{t("instructions.instructions")}</h4>
+            <InfoIcon className="h-3.5 w-3.5" />
+            <h4 className="text-xs font-medium">{t("instructions.instructions")}</h4>
           </div>
           <ol className="space-y-2.5">
             {instructions.map((instruction, idx) => (
@@ -59,8 +59,8 @@ export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstru
       {tips.length > 0 && (
         <div className="space-y-2.5">
           <div className="flex items-center gap-2 text-zinc-200">
-            <Lightbulb size={12} className="text-amber-400/80" />
-            <h4 className="text-[10px] font-semibold capitalize tracking-wider">{t("instructions.pro_tips")}</h4>
+            <Lightbulb className="h-3.5 w-3.5 text-amber-400/80" />
+            <h4 className="text-xs font-medium">{t("instructions.pro_tips")}</h4>
           </div>
           <div className="space-y-2.5">
             {tips.map((tip, idx) => (
@@ -83,7 +83,7 @@ export const MobileInstructionsCard = ({ exercise, plain = false }: MobileInstru
         onClick={() => setIsExpanded((prev) => !prev)}
         className="flex min-h-12 w-full items-center gap-2.5 px-4 py-3 text-left"
       >
-        <InfoIcon size={14} className="shrink-0 text-cyan-400/80" />
+        <InfoIcon className="h-3.5 w-3.5 shrink-0 text-cyan-400/80" />
         <span className="flex-1 text-[13px] font-semibold text-zinc-200">
           {t("instructions.instructions")}
         </span>

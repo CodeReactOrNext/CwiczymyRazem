@@ -36,7 +36,7 @@ export const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({
         </div>
 
         <div className='flex flex-col items-center gap-1.5'>
-          <p className='text-[11px] font-semibold tracking-widest text-cyan-400/80'>
+          <p className='text-xs font-medium text-cyan-400/80'>
             {t("loader.thinking")}
           </p>
           <p
@@ -60,7 +60,7 @@ export const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({
       </div>
 
       <div className='rounded-lg bg-zinc-900/50 px-4 py-3'>
-        <p className='mb-1 text-[10px] font-semibold tracking-widest text-zinc-500'>
+        <p className='mb-1 text-xs font-medium text-zinc-400'>
           {t("loader.generating_for")}
         </p>
         <p className='text-sm font-medium text-zinc-300'>{stepTitle}</p>

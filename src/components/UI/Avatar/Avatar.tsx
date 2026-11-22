@@ -1,49 +1,80 @@
 /* eslint-disable @next/next/no-img-element */
+import { cn } from "assets/lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
+
+/**
+ * Always a circle — the size only scales it. Spans, not divs, so it can sit in
+ * a line of text (a `<p>`, a link). Keep the two-element structure: some
+ * callers resize the inner circle with `[&>span]:` selectors (`AVATAR_SHRINK`).
+ */
+const avatarVariants = cva(
+  "relative z-10 flex items-center justify-center overflow-hidden rounded-full",
+  {
+    variants: {
+      size: {
+        // Inline, next to a line of text (owner of a playlist, a backer).
+        "2xs": "h-5 w-5",
+        xs: "h-8 w-8",
+        sm: "h-10 w-10",
+        md: "h-12 w-12",
+        lg: "h-14 w-14",
+        xl: "h-16 w-16",
+        default: "h-20 w-20",
+        "2xl": "h-32 w-32",
+      },
+    },
+    defaultVariants: { size: "default" },
+  },
+);
+
+const initialVariants = cva("font-bold leading-none text-zinc-200", {
+  variants: {
+    size: {
+      "2xs": "text-[11px]",
+      xs: "text-sm",
+      sm: "text-base",
+      md: "text-lg",
+      lg: "text-xl",
+      xl: "text-2xl",
+      default: "text-4xl",
+      "2xl": "text-4xl",
+    },
+  },
+  defaultVariants: { size: "default" },
+});
+
+export type AvatarSize = NonNullable<VariantProps<typeof avatarVariants>["size"]>;
 
 interface AvatarProps {
   name: string;
   avatarURL?: string;
-  size?: "xs" | "sm" | "md" | "lg" | "2xl";
+  size?: AvatarSize;
   className?: string;
 }
 
-const Avatar = ({ name, avatarURL, size, className }: AvatarProps) => {
-  const isCompact =
-    size === "xs" || size === "sm" || size === "md" || size === "lg";
-
-  let containerSizeClass = "h-20 w-20 rounded-xl";
-  if (size === "xs") containerSizeClass = "h-8 w-8 rounded-full";
-  if (size === "sm") containerSizeClass = "h-10 w-10 rounded-full";
-  if (size === "md") containerSizeClass = "h-12 w-12 rounded-lg";
-  if (size === "lg") containerSizeClass = "h-14 w-14 rounded-xl";
-  if (size === "2xl") containerSizeClass = "h-32 w-32 rounded-2xl";
-
-  // The light fill is only for the initial: behind a photo it leaks through the
-  // anti-aliased edge of the clip and draws a pale, ragged hairline round it.
-  const fillClass = avatarURL ? "" : "bg-tertiary-400";
-
-  return (
-    <div className={`relative inline-block ${className || ""}`}>
-      <div
-        className={`relative z-10 flex items-center justify-center overflow-hidden ${fillClass} ${containerSizeClass}`}>
-        {avatarURL ? (
-          <img
-            referrerPolicy='no-referrer'
-            className='h-full w-full object-cover'
-            src={avatarURL}
-            alt={name}
-          />
-        ) : (
-          <p
-            className={`font-openSans font-bold text-zinc-800 ${
-              isCompact ? "text-base" : "text-4xl"
-            }`}>
-            {name?.[0]?.toUpperCase()}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-};
+const Avatar = ({ name, avatarURL, size, className }: AvatarProps) => (
+  <span className={cn("relative inline-block", className)}>
+    <span
+      className={cn(
+        avatarVariants({ size }),
+        // The fill is only for the initial: behind a photo it leaks through the
+        // anti-aliased edge of the clip and draws a pale, ragged hairline round it.
+        !avatarURL && "bg-zinc-700",
+      )}>
+      {avatarURL ? (
+        <img
+          referrerPolicy='no-referrer'
+          className='h-full w-full object-cover'
+          src={avatarURL}
+          alt={name}
+        />
+      ) : (
+        <span className={initialVariants({ size })}>
+          {name?.[0]?.toUpperCase()}
+        </span>
+      )}
+    </span>
+  </span>
+);
 
 export default Avatar;

@@ -1,5 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Button } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -109,18 +110,17 @@ export const RackSlot = ({
           {String(index + 1).padStart(2, "0")}
         </span>
         <Lamp slot={slot} />
-        <button
+        <Button
           ref={setActivatorNodeRef}
           type='button'
+          variant='ghost'
+          size='icon-sm'
           aria-label={t("rack_vst.drag", { name: slot.name })}
-          className={cn(
-            iconButton,
-            "ml-auto h-7 w-7 cursor-grab text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 active:cursor-grabbing",
-          )}
+          className='ml-auto cursor-grab text-zinc-400 active:cursor-grabbing'
           {...attributes}
           {...listeners}>
-          <GripVertical size={15} />
-        </button>
+          <GripVertical />
+        </Button>
       </div>
 
       <div
@@ -177,19 +177,18 @@ export const RackSlot = ({
         </button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button
+            <Button
               type='button'
+              variant='ghost'
+              size='icon-sm'
               aria-label={t("rack_vst.more", { name: slot.name })}
-              className={cn(
-                iconButton,
-                "text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300",
-              )}>
-              <MoreHorizontal size={15} />
-            </button>
+              className='text-zinc-400'>
+              <MoreHorizontal />
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align='end'
-            className='w-48 rounded-lg border-0 bg-zinc-900 p-1 text-zinc-200 shadow-none'>
+            className='w-48'>
             <DropdownMenuItem
               disabled={index === 0}
               onSelect={() => onMove(index - 1)}

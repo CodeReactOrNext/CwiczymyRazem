@@ -6,7 +6,7 @@ import type { AudioInitFailure, AudioRefs, WebAudioInput } from "hooks/useAudioA
 import { useNativeAudioDevices } from "hooks/useNativeAudioDevices";
 import { isExclusiveAsioWrapper, useNativeOutputDevice } from "hooks/useNativeOutputDevice";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { ArrowLeft, ChevronRight, RefreshCw } from "lucide-react";
 import React, { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 
 import { useInputLevel } from "../hooks/useInputLevel";
@@ -345,14 +345,14 @@ export const SetupStep = React.memo(function SetupStep({
     <div className="flex flex-1 flex-col px-5 py-5 text-white sm:px-12 sm:py-10 shortwide:px-8 shortwide:py-4">
       <div className="mb-6 flex items-center justify-between gap-3 sm:mb-8 shortwide:mb-3">
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onBack}
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
             aria-label={t("back")}
-            className="-ml-2 rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
+            onClick={onBack}>
+            <ArrowLeft />
+          </Button>
           <h2 className="text-xl font-semibold text-zinc-50">{title}</h2>
         </div>
         <CloseButton onClick={onCancel} label={t("close")} />
@@ -399,12 +399,12 @@ export const SetupStep = React.memo(function SetupStep({
           {isListening ? (
             // No further until the guitar has actually been heard: every
             // later step listens to it.
-            <Button onClick={onNext} disabled={!heard} className="h-12 w-full gap-2 px-6 text-base font-semibold sm:h-11 sm:w-auto">
+            <Button onClick={onNext} disabled={!heard} size="lg" className="w-full sm:w-auto">
               {t("setup.next")}
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight />
             </Button>
           ) : (
-            <Button onClick={onGrant} disabled={isLoading} className="h-12 w-full gap-2 px-6 text-base font-semibold sm:h-11 sm:w-auto">
+            <Button onClick={onGrant} disabled={isLoading} size="lg" className="w-full sm:w-auto">
               {isLoading ? t("setup.connecting") : isNative ? t("setup.start_listening") : t("setup.grant")}
             </Button>
           )}

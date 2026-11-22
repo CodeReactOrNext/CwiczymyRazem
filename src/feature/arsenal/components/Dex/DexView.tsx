@@ -1,5 +1,8 @@
-import { Input } from "assets/components/ui/input";
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import {
   EFFECT_DEFINITIONS,
   EFFECTS_BY_ID,
@@ -33,7 +36,6 @@ import {
   ChevronRight,
   Guitar,
   Layers,
-  Search,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
@@ -206,12 +208,7 @@ export const DexView = ({ data }: DexViewProps) => {
     <div className='flex flex-col gap-5'>
       {/* Header: title and the one number that matters, with its bar. */}
       <div className='flex flex-wrap items-end justify-between gap-4'>
-        <div className='flex items-center gap-3'>
-          <span className='h-6 w-0.5 rounded-full bg-cyan-400' aria-hidden />
-          <h2 className='font-display text-2xl font-black text-zinc-100'>
-            {t("dex.title")}
-          </h2>
-        </div>
+        <SectionHeader size='lg' title={t("dex.title")} className='mb-0' />
         <div className='min-w-[14rem] flex-1 sm:max-w-xs'>
           <p className='text-right text-sm text-zinc-400'>
             <span className='font-bold tabular-nums text-zinc-100'>
@@ -296,13 +293,11 @@ export const DexView = ({ data }: DexViewProps) => {
         </SegmentGroup>
 
         <div className='w-full sm:ml-auto sm:w-56'>
-          <Input
+          <SearchInput
             value={query}
             onChange={(e) => changeQuery(e.target.value)}
             placeholder={t("dex.search_placeholder")}
             aria-label={t("dex.search")}
-            startIcon={<Search size={14} className='ml-1 text-zinc-500' />}
-            className='h-9 border-0 bg-arsenal-section text-sm text-zinc-100 placeholder:text-zinc-500'
           />
         </div>
       </div>
@@ -310,9 +305,12 @@ export const DexView = ({ data }: DexViewProps) => {
       {/* The wall itself: one darker surface, the slots hung on it. */}
       <div className='rounded-lg bg-arsenal-bg p-3 sm:p-4'>
         {wall.items.length === 0 ? (
-          <p className='py-16 text-center text-sm text-zinc-500'>
-            {t("dex.no_match")}
-          </p>
+          <EmptyState
+            mood='lookAround'
+            size='compact'
+            title={t("dex.no_match")}
+            className='bg-transparent px-0'
+          />
         ) : (
           <div className='grid grid-cols-2 gap-3 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-6'>
             {wall.items.map(({ key, kind: _kind, id: _id, ...entry }) => (
@@ -323,28 +321,30 @@ export const DexView = ({ data }: DexViewProps) => {
 
         <div className='mt-5 flex flex-col items-center gap-2'>
           <div className='flex items-center gap-6'>
-            <button
+            <Button
               type='button'
+              variant='ghost'
+              size='icon'
               onClick={() => setPage(wall.page - 1)}
               disabled={wall.page === 0}
-              aria-label={t("dex.prev_wall")}
-              className='rounded-md p-1.5 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:text-zinc-700 hover:bg-zinc-100/10 hover:text-zinc-100 disabled:hover:bg-transparent'>
-              <ChevronLeft size={18} />
-            </button>
+              aria-label={t("dex.prev_wall")}>
+              <ChevronLeft />
+            </Button>
             <p className='text-sm text-zinc-300'>
               {kindLabel} ·{" "}
               <span className='font-semibold tabular-nums text-zinc-100'>
                 {wall.page + 1} / {wall.pageCount}
               </span>
             </p>
-            <button
+            <Button
               type='button'
+              variant='ghost'
+              size='icon'
               onClick={() => setPage(wall.page + 1)}
               disabled={wall.page >= wall.pageCount - 1}
-              aria-label={t("dex.next_wall")}
-              className='rounded-md p-1.5 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:text-zinc-700 hover:bg-zinc-100/10 hover:text-zinc-100 disabled:hover:bg-transparent'>
-              <ChevronRight size={18} />
-            </button>
+              aria-label={t("dex.next_wall")}>
+              <ChevronRight />
+            </Button>
           </div>
           {wall.pageCount > 1 && wall.pageCount <= 12 && (
             <div className='flex items-center gap-1.5'>

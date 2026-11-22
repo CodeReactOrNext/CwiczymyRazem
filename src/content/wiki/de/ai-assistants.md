@@ -38,7 +38,7 @@ Zum Ausprobieren: „Fass meine letzte Übungswoche zusammen“, „Plane eine 3
 
 ## Limits
 
-<StatRow stats="20:Änderungen pro Tag|10:neue Übungen pro Tag|60:Anfragen pro Minute" />
+<StatRow stats="35:Änderungen pro Tag|20:neue Übungen pro Tag|60:Anfragen pro Minute" />
 
 Lesen zählt nie zum Tageslimit. Jede gespeicherte Änderung sagt dem Assistenten, wie viele heute noch übrig sind, damit er dich vorwarnen kann.
 

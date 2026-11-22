@@ -1,11 +1,13 @@
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
 import MainContainer from "components/MainContainer";
+import { PageShell } from "components/PageShell/PageShell";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { AutoPlanGenerator } from "feature/practice/views/AutoPlanGenerator/AutoPlanGenerator";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
@@ -16,6 +18,7 @@ import { withAuthInitialProps } from "utils/auth/authInitialProps";
 
 const TimerAuto: NextPageWithLayout = () => {
   const router = useRouter();
+  const { t } = useTranslation("practice_hub");
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlan | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
@@ -55,28 +58,27 @@ const TimerAuto: NextPageWithLayout = () => {
           <PracticeSession onClose={handleBack} plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
         </MainContainer>
       ) : (
-        <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
+        <PageShell>
           <HeroBanner
-            title="Auto Plan"
-            subtitle="Automatically generated practice session"
+            title={t("modes.auto.title")}
+            subtitle={t("modes.auto.description")}
             eyebrowContent={
               <Breadcrumbs
                 items={[
-                  { label: "Practice", href: "/timer" },
-                  { label: "Auto Plan" },
+                  { label: t("title"), href: "/timer" },
+                  { label: t("modes.auto.title") },
                 ]}
               />
             }
             backgroundContent={<HeroPattern withShuffle />}
             compact
-            className="w-full !rounded-none !shadow-none"
           />
           <AutoPlanGenerator
             onBack={handleBack}
             onSelectPlan={handleAutoPlanSelect}
             isStarting={isStarting}
           />
-        </div>
+        </PageShell>
       )}
     </PremiumGate>
   );

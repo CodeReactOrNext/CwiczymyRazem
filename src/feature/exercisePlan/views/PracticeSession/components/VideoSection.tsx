@@ -51,7 +51,7 @@ export const VideoSection = memo(function VideoSection({
     const match = videoUrl.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/);
     const videoId = match && match[2].length === 11 ? match[2] : null;
     return (
-      <div className="aspect-video w-full">
+      <div className="mx-auto aspect-video w-full max-w-4xl">
         {videoId ? (
           <iframe
             className="h-full w-full"

@@ -23,7 +23,7 @@ export const LibrarySortSelect = ({ value, onChange }: LibrarySortSelectProps) =
       onValueChange={(next) => isLibrarySort(next) && onChange(next)}>
       <SelectTrigger
         aria-label={t("sort.label")}
-        className='h-10 w-full gap-2 border-0 bg-zinc-900/60 px-3 text-sm font-semibold text-zinc-200 sm:w-48'>
+        className='h-10 w-full gap-2 px-3 text-sm font-semibold text-zinc-200 sm:w-48'>
         <span className='flex items-center text-zinc-500'>
           <ArrowUpDown size={14} aria-hidden />
         </span>

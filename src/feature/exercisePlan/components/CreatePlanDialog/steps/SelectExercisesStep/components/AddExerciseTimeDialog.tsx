@@ -40,7 +40,7 @@ function AddExerciseTimeForm({
   };
 
   return (
-    <DialogContent className="sm:max-w-[380px]">
+    <DialogContent className="sm:max-w-sm">
       <DialogHeader>
         <DialogTitle className="pr-6">
           {localizeExercise(exercise).title}

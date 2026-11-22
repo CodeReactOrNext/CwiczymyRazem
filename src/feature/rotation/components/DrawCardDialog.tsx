@@ -58,7 +58,7 @@ export const DrawCardDialog = ({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className='flex flex-col gap-8 border-0 bg-zinc-900 shadow-none sm:max-w-md sm:p-8'>
+      <DialogContent className='flex flex-col gap-8 bg-zinc-900 sm:max-w-md sm:p-8'>
         <div className='space-y-2 pr-10'>
           <DialogTitle className='text-xl font-bold text-zinc-100'>
             {t("draw.title")}
@@ -126,13 +126,13 @@ export const DrawCardDialog = ({
         <div className='grid gap-3 sm:grid-cols-2'>
           <Button
             onClick={() => entry && onPlay(entry)}
-            disabled={!entry || isStarting}
-            className='h-12 rounded-lg bg-white font-bold text-black focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
+            size='lg'
+            disabled={!entry || isStarting}>
             <span className='flex items-center gap-2.5'>
               {entry && !isSessionPlayable(entry.item) ? (
-                <Check className='h-4 w-4' />
+                <Check />
               ) : (
-                <Play className='h-4 w-4 fill-current' />
+                <Play className='fill-current' />
               )}
               {entry && !isSessionPlayable(entry.item)
                 ? t("draw.done")
@@ -141,10 +141,11 @@ export const DrawCardDialog = ({
           </Button>
           <Button
             onClick={drawAgain}
-            disabled={entries.length < 2 || isStarting}
-            className='h-12 rounded-lg bg-zinc-800 font-semibold text-zinc-100 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700'>
+            size='lg'
+            variant='secondary'
+            disabled={entries.length < 2 || isStarting}>
             <span className='flex items-center gap-2.5'>
-              <Layers className='h-4 w-4 text-zinc-400' />
+              <Layers className='text-zinc-400' />
               {t("draw.again")}
             </span>
           </Button>

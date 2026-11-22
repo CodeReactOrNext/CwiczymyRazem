@@ -31,7 +31,7 @@ export const CommunityMapImportModal = ({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className='border-none bg-zinc-900 text-zinc-100 sm:rounded-xl'>
+      <AlertDialogContent>
         <AlertDialogHeader>
           <div className='flex items-center gap-2'>
             <Sparkles className='h-5 w-5 text-cyan-400' />
@@ -47,12 +47,12 @@ export const CommunityMapImportModal = ({
           <p className='text-xs leading-relaxed text-zinc-500'>
             {t("community_map.explainer")}
           </p>
-          <p className='text-xs leading-relaxed text-zinc-600'>
+          <p className='text-xs leading-relaxed text-zinc-500'>
             {t("community_map.disclaimer")}
           </p>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className='border-none bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-zinc-100'>
+          <AlertDialogCancel>
             {t("community_map.not_now")}
           </AlertDialogCancel>
           <AlertDialogAction
@@ -60,8 +60,7 @@ export const CommunityMapImportModal = ({
               event.preventDefault();
               onImport();
               onOpenChange(false);
-            }}
-            className='bg-cyan-600 text-white hover:bg-cyan-500'>
+            }}>
             {t("community_map.import")}
           </AlertDialogAction>
         </AlertDialogFooter>

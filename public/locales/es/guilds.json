@@ -131,7 +131,8 @@
     "plain": "Gremio: {{tag}}"
   },
   "cover": {
-    "your_honor": "Tu honor: {{earned}} ganado · {{balance}} para gastar en el estante"
+    "your_honor": "Tu honor: {{earned}} ganado · {{balance}} para gastar en el estante",
+    "treasury": "Fame del gremio"
   },
   "units": {
     "sessions": "{{value}} sesiones",
@@ -1103,5 +1104,12 @@
         "l4": "Taller de luthier completo"
       }
     }
+  },
+  "toast": {
+    "founded": "Gremio fundado",
+    "request_sent": "Solicitud enviada: ahora decide el fundador",
+    "deposited": "{{fame}} de Fama en el tesoro del gremio",
+    "stash_left": "Dejado en la estantería",
+    "stash_taken": "Recogido"
   }
 }

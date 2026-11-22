@@ -1,18 +1,21 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { LibrarySortSelect } from "components/LibrarySortSelect/LibrarySortSelect";
 import { LoadingSwap } from "components/LoadingSwap/LoadingSwap";
-import { Kostek } from "components/Mascot/Kostek";
+import { PAGE_CONTENT, PAGE_GUTTER, PageShell } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { LIBRARY_TABS } from "constants/navTabs";
+import { LIBRARY_HERO_CLASS, LIBRARY_TABS } from "constants/navTabs";
 import { userCommunityExercisesQuery } from "feature/communityExercises/hooks/communityExerciseQueries";
 import { deleteCommunityExercise, setCommunityExerciseVisibility } from "feature/communityExercises/services/communityExerciseService";
 import type { CommunityExercise } from "feature/communityExercises/types";
 import { isReadyToPublish } from "feature/communityExercises/utils/isReadyToPublish";
+import { getCategoryChipColor } from "feature/exercisePlan/constants/categoryChip";
 import { clearTabEditorDraft, saveTabEditorDraft } from "feature/exercisePlan/utils/tabEditorDraft";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
@@ -30,21 +33,6 @@ import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuthInitialProps } from "utils/auth/authInitialProps";
 import { sortLibraryItems } from "utils/librarySort";
-
-const DIFFICULTY_COLORS: Record<string, string> = {
-  beginner: "bg-sky-500/15 text-sky-400 border-sky-500/20",
-  easy: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
-  medium: "bg-amber-500/15 text-amber-400 border-amber-500/20",
-  hard: "bg-rose-500/15 text-rose-400 border-rose-500/20",
-};
-
-const CATEGORY_COLORS: Record<string, string> = {
-  technique: "bg-blue-500/15 text-blue-400 border-blue-500/20",
-  theory: "bg-violet-500/15 text-violet-400 border-violet-500/20",
-  hearing: "bg-cyan-500/15 text-cyan-400 border-cyan-500/20",
-  creativity: "bg-green-500/15 text-green-400 border-green-500/20",
-  mixed: "bg-zinc-500/15 text-zinc-400 border-zinc-500/20",
-};
 
 const buildChallenge = (ex: CommunityExercise): DashboardExercise => ({
   id: ex.id,
@@ -171,7 +159,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
 
   if (activeExercise && sessionOpen) {
     return (
-      <div className="bg-second-600 rounded-lg overflow-visible flex flex-col min-h-screen ">
+      <PageShell>
         <div className="px-4 pt-6 pb-2">
           <BackLink label={t("my_exercises.back")} onClick={() => setActiveExercise(null)} />
         </div>
@@ -183,23 +171,23 @@ const MyExercisesPage: NextPageWithLayout = () => {
             forceFullDuration={true}
           />
         </div>
-      </div>
+      </PageShell>
     );
   }
 
   return (
-    <div className="bg-second-600 rounded-lg overflow-visible flex flex-col min-h-screen ">
+    <PageShell>
       <HeroBanner
         title={t("my_exercises.title")}
         subtitle={t("my_exercises.subtitle")}
         eyebrow={t("my_exercises.eyebrow")}
+        className={LIBRARY_HERO_CLASS}
         backgroundContent={<HeroPattern />}
-        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
         buttonText={t("my_exercises.create")}
         onClick={handleCreate}
       />
 
-      <div className="px-4 lg:px-6 mb-6">
+      <div className={cn(PAGE_GUTTER, "pt-6")}>
         <PageTabs
           tabs={LIBRARY_TABS}
           activeHref="/my-exercises"
@@ -207,7 +195,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
         />
       </div>
 
-      <div className="px-4 lg:px-6 pb-24">
+      <div className={PAGE_CONTENT}>
         <LoadingSwap
           isLoading={isLoading}
           skeleton={
@@ -218,31 +206,24 @@ const MyExercisesPage: NextPageWithLayout = () => {
             </div>
           }>
           {exercises.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-6 text-center">
-              {/* No exercises of your own: Kostek rubs its hands, ready for the first. */}
-              <Kostek mood="lookAround" className="h-24 md:h-36" />
-              <div className="space-y-2">
-                <p className="text-zinc-100 font-semibold">{t("my_exercises.empty_title")}</p>
-                <p className="text-zinc-400 text-sm max-w-sm">
-                  {t("my_exercises.empty_body")}
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                <Button onClick={handleCreate} size="lg" className="px-5">
-                  <Music2 className="" />
-                  {t("my_exercises.with_tab")}
-                </Button>
-                <Button
-                  variant="subtle"
-                  size="lg"
-                  onClick={handleCreateWithoutTab}
-                  className="px-5"
-                >
-                  <FileText className="" />
-                  {t("my_exercises.instructions_only")}
-                </Button>
-              </div>
-            </div>
+            // No exercises of your own: Kostek looks around for the first one.
+            <EmptyState
+              mood='lookAround'
+              title={t("my_exercises.empty_title")}
+              description={t("my_exercises.empty_body")}
+              action={
+                <>
+                  <Button onClick={handleCreate}>
+                    <Music2 />
+                    {t("my_exercises.with_tab")}
+                  </Button>
+                  <Button variant='ghost' onClick={handleCreateWithoutTab}>
+                    <FileText />
+                    {t("my_exercises.instructions_only")}
+                  </Button>
+                </>
+              }
+            />
           ) : (
             <div className="space-y-3">
               {exercises.length > 1 && (
@@ -253,36 +234,36 @@ const MyExercisesPage: NextPageWithLayout = () => {
               {sortedExercises.map(ex => (
                 <div
                   key={ex.id}
-                  className="flex flex-col gap-3 bg-zinc-900/40 hover:bg-zinc-900/60 rounded-xl px-4 py-4 transition-background sm:flex-row sm:items-center sm:gap-4 sm:rounded-lg sm:px-5"
+                  className="flex flex-col gap-3 bg-zinc-800/40 hover:bg-zinc-800/60 rounded-lg px-4 py-4 transition-background sm:flex-row sm:items-center sm:gap-4 sm:px-5"
                 >
                   {/* Title + meta */}
                   <div className="flex-1 min-w-0 space-y-1.5">
                     <div className="flex items-center gap-2">
                       <p className="font-semibold text-zinc-100 truncate">{ex.title}</p>
                       {ex.isPublic ? (
-                        <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
-                          <Globe size={9} />
+                        <Chip color='emerald' size='sm' className="shrink-0">
+                          <Globe size={10} />
                           {t("my_exercises.public")}
-                        </span>
+                        </Chip>
                       ) : (
-                        <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border border-cyan-500/30 bg-cyan-500/10 text-cyan-400">
-                          <Lock size={9} />
+                        <Chip color='gray' size='sm' className="shrink-0">
+                          <Lock size={10} />
                           {t("my_exercises.private")}
-                        </span>
+                        </Chip>
                       )}
                     </div>
                     {ex.description && (
                       <p className="text-xs text-zinc-500 truncate">{ex.description}</p>
                     )}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider border", CATEGORY_COLORS[ex.category] ?? CATEGORY_COLORS.mixed)}>
+                      <Chip color={getCategoryChipColor(ex.category)} size='sm'>
                         {t(`common:categories.${ex.category}`, ex.category)}
-                      </span>
-                      <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold capitalize tracking-wider border", DIFFICULTY_COLORS[ex.difficulty])}>
+                      </Chip>
+                      <Chip color='gray' size='sm'>
                         {t(`common:difficulty.${ex.difficulty}`, ex.difficulty)}
-                      </span>
+                      </Chip>
                       {ex.metronomeSpeed && (
-                        <span className="text-[10px] text-zinc-500 font-mono">
+                        <span className="text-xs text-zinc-500 font-mono">
                           {ex.metronomeSpeed.min}–{ex.metronomeSpeed.max} BPM
                         </span>
                       )}
@@ -301,21 +282,20 @@ const MyExercisesPage: NextPageWithLayout = () => {
                           <Star size={12} className="text-amber-400" fill="currentColor" />
                           <span className="text-sm font-bold text-zinc-200">{ex.averageRating.toFixed(1)}</span>
                         </div>
-                        <span className="text-[10px] text-zinc-500">{t("my_exercises.ratings", { count: ex.ratingCount })}</span>
+                        <span className="text-xs text-zinc-500">{t("my_exercises.ratings", { count: ex.ratingCount })}</span>
                       </>
                     ) : ex.isPublic ? (
-                      <span className="text-[10px] text-zinc-500">{t("my_exercises.no_ratings")}</span>
+                      <span className="text-xs text-zinc-500">{t("my_exercises.no_ratings")}</span>
                     ) : null}
                   </div>
 
                   {/* Play */}
                   <Button
                     variant="subtle"
-                    size="sm"
                     onClick={() => setActiveExercise(buildChallenge(ex))}
-                    className="h-10 flex-1 shrink-0 sm:h-9 sm:flex-none"
+                    className="flex-1 shrink-0 sm:flex-none"
                   >
-                    <Play fill="currentColor" className="" />
+                    <Play fill="currentColor" />
                     {t("my_exercises.practice")}
                   </Button>
 
@@ -323,8 +303,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                   {ex.isPublic && (
                     <Button
                       variant="subtle"
-                      size="sm"
-                      onClick={() => router.push("/profile/skills?tab=community")}
+                      onClick={() => router.push(`/profile/skills?tab=community&communityExercise=${ex.id}`)}
                       className="shrink-0"
                     >
                       {t("my_exercises.view")}
@@ -338,7 +317,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                       size="icon"
                       onClick={() => handleToggleVisibility(ex)}
                       disabled={togglingId === ex.id}
-                      className="h-10 w-10 shrink-0 sm:h-8 sm:w-8 hover:text-cyan-400"
+                      className="shrink-0 hover:text-cyan-400"
                       title={t("my_exercises.make_private")}
                       aria-label={t("my_exercises.make_private")}
                     >
@@ -347,12 +326,11 @@ const MyExercisesPage: NextPageWithLayout = () => {
                   ) : (
                     <Button
                       variant="subtle"
-                      size="sm"
                       onClick={() => handleToggleVisibility(ex)}
                       disabled={togglingId === ex.id}
-                      className="h-10 shrink-0 sm:h-9 hover:text-emerald-400"
+                      className="shrink-0 hover:text-emerald-400"
                     >
-                      <Globe className="" />
+                      <Globe />
                       {t("my_exercises.make_public")}
                     </Button>
                   )}
@@ -362,7 +340,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                     variant="subtle"
                     size="icon"
                     onClick={() => handleEdit(ex)}
-                    className="h-10 w-10 shrink-0 sm:h-8 sm:w-8 hover:text-cyan-400"
+                    className="shrink-0 hover:text-cyan-400"
                     title={t("my_exercises.edit")}
                     aria-label={t("my_exercises.edit")}
                   >
@@ -375,7 +353,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
                     size="icon"
                     onClick={() => handleDelete(ex.id)}
                     disabled={deletingId === ex.id}
-                    className="h-10 w-10 shrink-0 sm:h-8 sm:w-8 hover:text-rose-400"
+                    className="shrink-0 hover:text-rose-400"
                     title={t("my_exercises.delete")}
                     aria-label={t("my_exercises.delete")}
                   >
@@ -396,7 +374,7 @@ const MyExercisesPage: NextPageWithLayout = () => {
           )}
         </LoadingSwap>
       </div>
-    </div>
+    </PageShell>
   );
 };
 

@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import {
   Drawer,
   DrawerClose,
@@ -109,8 +110,11 @@ export const MobileMoreSheet = ({
           <div className='min-w-0 flex-1'>{header}</div>
           <DrawerClose
             aria-label={t("close_menu")}
-            className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-white'>
-            <X size={18} />
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon-touch" }),
+              "shrink-0",
+            )}>
+            <X />
           </DrawerClose>
         </div>
 

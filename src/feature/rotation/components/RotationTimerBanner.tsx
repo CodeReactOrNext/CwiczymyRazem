@@ -13,7 +13,7 @@ export const RotationTimerBanner = ({ item }: { item: RotationItem }) => {
   const { t } = useRotationDisplay();
 
   return (
-    <div className='mx-3 mt-6 flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-5 sm:flex-row sm:items-center sm:justify-between md:mx-6 lg:mx-8'>
+    <div className='mx-6 mt-6 flex flex-col gap-4 rounded-lg bg-zinc-800/40 p-5 sm:flex-row sm:items-center sm:justify-between md:mx-8 lg:mx-10'>
       <div className='flex min-w-0 items-center gap-4'>
         <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400'>
           <Bookmark className='h-5 w-5' />

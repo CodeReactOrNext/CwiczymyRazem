@@ -1,9 +1,15 @@
+import { TierScale } from "feature/songs/components/SongLearningStats/TierScale";
 import type { Song } from "feature/songs/types/songs.type";
-import { getGatedSkillPower } from "feature/songs/utils/difficulty.utils";
+import {
+  getGatedSkillPower,
+  getSongsUntilNextTier,
+} from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
+import { Interpolate } from "lib/i18n/Interpolate";
+import type { LucideIcon } from "lucide-react";
 import { Music2, Star, Trophy } from "lucide-react";
-
+import type { ReactNode } from "react";
 
 interface SongLearningStatsProps {
   userSongs: {
@@ -13,96 +19,131 @@ interface SongLearningStatsProps {
   };
 }
 
+/** Same anatomy as the profile's StatsField: grey icon inline with the label, then the number. */
+const StatTile = ({
+  Icon,
+  label,
+  aside,
+  children,
+}: {
+  Icon: LucideIcon;
+  label: string;
+  aside?: ReactNode;
+  children: ReactNode;
+}) => (
+  <div className='flex h-full flex-col gap-1.5 rounded-lg bg-zinc-800/40 p-5'>
+    <div className='flex items-center justify-between gap-2'>
+      <div className='flex items-center gap-2'>
+        <Icon className='h-4 w-4 text-zinc-500' />
+        <span className='text-xs font-medium text-zinc-400'>{label}</span>
+      </div>
+      {aside}
+    </div>
+    {children}
+  </div>
+);
+
 export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
   const { t } = useTranslation("songs");
 
+  const learnedCount = userSongs?.learned?.length || 0;
   const totalSongs =
     (userSongs?.wantToLearn?.length || 0) +
     (userSongs?.learning?.length || 0) +
-    (userSongs?.learned?.length || 0);
+    learnedCount;
 
-  const learnedPercentage = totalSongs
-    ? ((userSongs?.learned?.length || 0) / totalSongs) * 100
-    : 0;
+  const learnedPercentage = totalSongs ? (learnedCount / totalSongs) * 100 : 0;
 
   const skillPower = getGatedSkillPower(userSongs?.learned || []);
   const playerTier = skillPower > 0 ? getSongTier(skillPower) : null;
+  const nextTierProgress = getSongsUntilNextTier(userSongs?.learned || []);
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {/* Total Songs */}
-      <div className="rounded-lg p-4 text-card-foreground flex flex-col bg-zinc-900/40 shadow-sm h-full backdrop-blur-sm">
-         <div className="flex items-center gap-3 mb-6">
-            <div className="h-8 w-8 rounded-[4px] light-tint bg-gradient-to-br from-zinc-500/20 to-zinc-500/5 flex items-center justify-center text-zinc-400 border border-white/5 border-t-zinc-500/40 border-l-zinc-500/20 shadow-lg">
-               <Music2 className="h-4 w-4" />
-            </div>
-            <span className="text-[10px] font-bold text-zinc-400">{t("total_songs")}</span>
-         </div>
-         <div className="mt-auto">
-            <div className="flex items-baseline gap-2">
-               <h3 className="text-3xl font-black text-white">{totalSongs}</h3>
-               <span className="text-[11px] text-zinc-500 font-bold">{t("songs_in_your_library", "in library")}</span>
-            </div>
-         </div>
-      </div>
+    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+      <StatTile Icon={Music2} label={t("total_songs")}>
+        <p className='text-2xl font-bold tabular-nums text-white'>{totalSongs}</p>
+        <p className='text-xs text-zinc-500'>
+          {t("songs_in_your_library", "in library")}
+        </p>
+      </StatTile>
 
-      {/* Completion Rate */}
-      <div className="rounded-lg p-4 text-card-foreground flex flex-col bg-zinc-900/40 shadow-sm h-full backdrop-blur-sm">
-         <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-               <div className="h-8 w-8 rounded-[4px] light-tint bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center text-emerald-400 border border-white/5 border-t-emerald-500/40 border-l-emerald-500/20 shadow-lg">
-                  <Trophy className="h-4 w-4" />
-               </div>
-               <span className="text-[10px] font-bold text-zinc-400">{t("completion_rate")}</span>
-            </div>
-            <span className="text-[10px] font-bold text-zinc-500 tabular-nums">{userSongs?.learned?.length || 0} / {totalSongs}</span>
-         </div>
-         <div className="mt-auto space-y-2.5">
-             <h3 className="text-3xl font-black text-white">{learnedPercentage.toFixed(0)}%</h3>
-             <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-900/50">
-                <div
-                    className="bar-shine h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400"
-                    style={{ width: `${learnedPercentage}%` }}
-                />
-             </div>
-         </div>
-      </div>
+      <StatTile
+        Icon={Trophy}
+        label={t("completion_rate")}
+        aside={
+          <span className='text-xs tabular-nums text-zinc-500'>
+            {learnedCount} / {totalSongs}
+          </span>
+        }>
+        <p className='text-2xl font-bold tabular-nums text-white'>
+          {learnedPercentage.toFixed(0)}%
+        </p>
+        <div className='mt-1 h-1.5 w-full overflow-hidden rounded-full bg-zinc-900/60'>
+          <div
+            className='h-full rounded-full bg-emerald-500'
+            style={{ width: `${learnedPercentage}%` }}
+          />
+        </div>
+      </StatTile>
 
-      {/* Player Tier */}
-      <div className="rounded-lg p-4 text-card-foreground flex flex-col bg-zinc-900/40 shadow-sm h-full backdrop-blur-sm">
-         <div className="flex items-center gap-3 mb-6">
-            <div className="h-8 w-8 rounded-[4px] light-tint bg-gradient-to-br from-amber-500/20 to-amber-500/5 flex items-center justify-center text-amber-400 border border-white/5 border-t-amber-500/40 border-l-amber-500/20 shadow-lg">
-               <Star className="h-4 w-4" />
-            </div>
-            <span className="text-[10px] font-bold text-zinc-400">{t("your_skill_tier", "Skill tier")}</span>
-         </div>
-         
-         <div className="mt-auto">
-            {playerTier ? (
-               <div className="flex items-center gap-4">
-                  <div
-                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg text-2xl font-black shadow-lg"
-                    style={{ color: playerTier.color, backgroundColor: 'rgba(10,10,10,0.9)' }}
-                  >
-                    {playerTier.tier}
-                  </div>
-                  <div className="flex flex-col">
-                     <span className="text-lg font-black text-white/90 leading-none">{t("detail.tier")}</span>
-                     <span className="text-[10px] font-bold text-zinc-500 mt-1">
-                        {t("power.score_label")} <span className="text-zinc-300">{skillPower.toFixed(1)}</span>
-                     </span>
-                  </div>
-               </div>
-            ) : (
-               <div className="flex flex-col">
-                  <h3 className="text-2xl font-black text-zinc-500">{t("tier.unrated")}</h3>
-                  <p className="text-[10px] font-medium text-zinc-600 mt-1 leading-snug">
-                     {t("power.master_more")}
-                  </p>
-               </div>
-            )}
-         </div>
-      </div>
+      <StatTile
+        Icon={Star}
+        label={t("your_skill_tier", "Skill tier")}
+        aside={
+          playerTier && (
+            <span className='text-xs text-zinc-500'>
+              {t("power.score_label")}{" "}
+              <span className='tabular-nums text-zinc-300'>
+                {skillPower.toFixed(1)}
+              </span>
+            </span>
+          )
+        }>
+        {playerTier ? (
+          <p className='flex items-baseline gap-2'>
+            <span
+              className='text-2xl font-bold'
+              style={{ color: playerTier.color }}>
+              {playerTier.tier}
+            </span>
+            <span className='text-sm font-medium text-zinc-300'>
+              {t(playerTier.description)}
+            </span>
+          </p>
+        ) : (
+          <p className='text-2xl font-bold text-zinc-500'>
+            {t("tier.unrated")}
+          </p>
+        )}
+
+        <TierScale skillPower={skillPower} className='mt-3' />
+
+        {nextTierProgress ? (
+          <p className='mt-2 text-xs text-zinc-500'>
+            {nextTierProgress.songsNeeded > 1
+              ? t("power.more_songs", { count: nextTierProgress.songsNeeded })
+              : t("power.more_song_one")}{" "}
+            <Interpolate
+              text={t("power.as_hard_as")}
+              values={{
+                tier: (
+                  <span
+                    className='font-bold'
+                    style={{ color: getSongTier(nextTierProgress.nextTier).color }}>
+                    {nextTierProgress.nextTier}
+                  </span>
+                ),
+              }}
+            />
+          </p>
+        ) : (
+          !playerTier && (
+            <p className='mt-2 text-xs text-zinc-500'>
+              {t("power.master_more")}
+            </p>
+          )
+        )}
+      </StatTile>
     </div>
   );
 };

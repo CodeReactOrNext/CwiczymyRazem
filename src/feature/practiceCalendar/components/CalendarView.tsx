@@ -1,10 +1,12 @@
 import { Button, buttonVariants } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import MainContainer from "components/MainContainer";
-import { Kostek } from "components/Mascot/Kostek";
+import { PAGE_CONTENT, PAGE_GUTTER, PageShell } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { LIBRARY_TABS } from "constants/navTabs";
+import { LIBRARY_HERO_CLASS, LIBRARY_TABS } from "constants/navTabs";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
@@ -309,17 +311,17 @@ export const CalendarView = () => {
   const weekIsEmpty = !calendar.isLoading && week.planned === 0;
 
   return (
-    <div className='flex min-h-screen flex-col overflow-visible rounded-lg bg-second-600'>
+    <PageShell>
       <HeroBanner
         title={t("page.title")}
         subtitle={t("page.subtitle")}
         eyebrow={t("page.eyebrow")}
         eyebrowClassName='text-cyan-400/80'
+        className={LIBRARY_HERO_CLASS}
         backgroundContent={<HeroPattern />}
-        className='mb-6 min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]'
       />
 
-      <div className='px-3 md:px-6 lg:px-8'>
+      <div className={cn(PAGE_GUTTER, "pt-6")}>
         <PageTabs
           tabs={LIBRARY_TABS}
           activeHref='/calendar'
@@ -327,7 +329,7 @@ export const CalendarView = () => {
         />
       </div>
 
-      <div className='space-y-8 px-3 py-6 md:px-6 md:py-8 lg:px-8'>
+      <div className={cn("space-y-8", PAGE_CONTENT)}>
         <div className='flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex items-center gap-4'>
             <div className='flex items-center gap-1.5'>
@@ -336,7 +338,7 @@ export const CalendarView = () => {
                 onClick={() => setWeekAnchor(addDays(shownMonday, -7))}
                 aria-label={t("week.previous")}
                 className={buttonVariants({ variant: "ghost", size: "icon" })}>
-                <ChevronLeft className='h-4 w-4' />
+                <ChevronLeft />
               </button>
               <button
                 type='button'
@@ -350,7 +352,7 @@ export const CalendarView = () => {
                 onClick={() => setWeekAnchor(addDays(shownMonday, 7))}
                 aria-label={t("week.next")}
                 className={buttonVariants({ variant: "ghost", size: "icon" })}>
-                <ChevronRight className='h-4 w-4' />
+                <ChevronRight />
               </button>
             </div>
             <div>
@@ -366,23 +368,24 @@ export const CalendarView = () => {
           <div className='flex gap-2'>
             {week.planned > 0 && (
               <Button
+                variant='secondary'
+                size='icon'
                 onClick={clearWeek}
                 aria-label={t("week.clear")}
-                className='h-10 w-10 shrink-0 rounded-lg border-b-black/40 bg-zinc-800 p-0 text-zinc-300 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700'>
-                <Eraser className='h-4 w-4' />
+                className='shrink-0 text-zinc-300'>
+                <Eraser />
               </Button>
             )}
             <Button
+              variant='secondary'
               onClick={() => setDialog({ date: selectedDate })}
-              className='h-10 flex-1 rounded-lg border-b-black/40 bg-zinc-800 px-4 text-zinc-100 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700 sm:flex-none'>
-              <Plus className='h-4 w-4' />
+              className='flex-1 sm:flex-none'>
+              <Plus />
               {t("actions.add")}
             </Button>
-            <Button
-              asChild
-              className='h-10 flex-1 rounded-lg border-b-black/25 bg-white px-5 font-bold text-zinc-950 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200 sm:flex-none'>
+            <Button asChild className='flex-1 sm:flex-none'>
               <Link href={planHref}>
-                <Sparkles className='h-4 w-4' />
+                <Sparkles />
                 {t("actions.autoplan")}
               </Link>
             </Button>
@@ -390,31 +393,23 @@ export const CalendarView = () => {
         </div>
 
         {calendar.isLoading ? (
-          <div
-            className='h-[120px] animate-pulse rounded-lg bg-zinc-900/40'
-            aria-busy
-          />
+          <Skeleton variant='block' className='h-[120px]' aria-busy />
         ) : weekIsEmpty ? (
-          <section className='flex flex-col items-start gap-6 rounded-lg bg-zinc-900/40 p-6 sm:flex-row sm:items-center sm:p-8'>
-            {/* An empty week: Kostek points at the plan beside it. */}
-            <Kostek mood='nudge' lookAt='right' className='h-20 shrink-0 md:h-28' />
-            <div className='min-w-0 flex-1'>
-              <p className='text-base font-semibold text-zinc-100'>
-                {t("empty.title")}
-              </p>
-              <p className='mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-400'>
-                {t("empty.body")}
-              </p>
-            </div>
-            <Button
-              asChild
-              className='h-11 rounded-lg border-b-black/25 bg-white px-6 font-bold text-zinc-950 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
-              <Link href={planHref}>
-                <Sparkles className='h-4 w-4' />
-                {t("empty.cta")}
-              </Link>
-            </Button>
-          </section>
+          // An empty week: Kostek nudges towards the plan.
+          <EmptyState
+            mood='nudge'
+            size='compact'
+            title={t("empty.title")}
+            description={t("empty.body")}
+            action={
+              <Button asChild size='lg'>
+                <Link href={planHref}>
+                  <Sparkles />
+                  {t("empty.cta")}
+                </Link>
+              </Button>
+            }
+          />
         ) : (
           <WeekOverview
             planned={week.planned}
@@ -427,10 +422,11 @@ export const CalendarView = () => {
         {calendar.isLoading ? (
           <div className='grid gap-3 lg:grid-cols-7'>
             {dates.map((date) => (
-              <div
+              <Skeleton
                 key={date}
+                variant='block'
                 className={cn(
-                  "h-40 animate-pulse rounded-lg bg-zinc-900/40 lg:h-[22rem]",
+                  "h-40 lg:h-[22rem]",
                   date !== dates[0] && "hidden lg:block",
                 )}
               />
@@ -495,6 +491,6 @@ export const CalendarView = () => {
           onClose={() => setResizing(null)}
         />
       )}
-    </div>
+    </PageShell>
   );
 };

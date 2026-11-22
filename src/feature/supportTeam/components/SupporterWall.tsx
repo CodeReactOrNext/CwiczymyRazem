@@ -1,4 +1,7 @@
+import { Chip } from "assets/components/ui/chip";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { UserLink } from "components/UserLink/UserLink";
 import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
 import { useSupporterWall } from "feature/supportTeam/hooks/useSupporterWall";
@@ -14,7 +17,7 @@ import Link from "next/link";
 const SupporterCard = ({ member }: { member: SupportTeamMember }) => {
   const { t } = useTranslation("supporter");
   return (
-    <div className='flex items-center gap-4 rounded-lg bg-zinc-900/40 p-5 transition-colors hover:bg-zinc-900/70 sm:p-6'>
+    <div className='flex items-center gap-4 rounded-lg bg-zinc-800/40 p-5 transition-colors hover:bg-zinc-800/60 sm:p-6'>
       {/* Avatar only — the name sits below the badges, which the row form of
         UserLink has no place for. The ring and the hover card come along. */}
       <UserLink
@@ -35,11 +38,9 @@ const SupporterCard = ({ member }: { member: SupportTeamMember }) => {
         <div className='flex flex-wrap items-center gap-2'>
           <SupportBadge member={member} />
           {typeof member.lvl === "number" && (
-            <span
-              translate='no'
-              className='rounded-full bg-zinc-800/60 px-2 py-0.5 text-[10px] font-bold leading-none text-zinc-400'>
+            <Chip translate='no' color='gray' size='sm'>
               {t("wall.lvl", { lvl: member.lvl })}
-            </span>
+            </Chip>
           )}
         </div>
       </div>
@@ -79,16 +80,15 @@ export const SupporterWall = ({ className }: SupporterWallProps) => {
       {isLoading ? (
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
           {Array.from({ length: 6 }, (_, index) => (
-            <div
-              key={index}
-              className='h-[86px] animate-pulse rounded-lg bg-zinc-900/40'
-            />
+            <Skeleton key={index} variant='block' className='h-[86px]' />
           ))}
         </div>
       ) : members.length === 0 ? (
-        <p className='rounded-lg bg-zinc-900/40 p-6 text-sm text-zinc-500'>
-          {t("wall.empty")}
-        </p>
+        <EmptyState
+          size='compact'
+          icon={<Heart />}
+          title={t("wall.empty")}
+        />
       ) : (
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
           {members.map((member) => (

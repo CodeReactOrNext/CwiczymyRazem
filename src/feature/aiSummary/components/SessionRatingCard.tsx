@@ -79,7 +79,7 @@ export function ScoreRing({ score, grade, animated }: { score: number; grade: Se
         <span className={cn("text-2xl font-black tabular-nums leading-none", cfg.text)}>
           {score.toFixed(1)}
         </span>
-        <span className={cn("text-xs font-black tracking-wider", cfg.text)}>{grade}</span>
+        <span className={cn("text-xs font-bold", cfg.text)}>{grade}</span>
       </div>
     </div>
   );
@@ -128,7 +128,7 @@ export function RatingSkeleton({ messages = SESSION_LOADING_MESSAGES }: { messag
             />
           </svg>
         </div>
-        <Sparkles size={16} className="relative text-zinc-600" />
+        <Sparkles className="relative h-4 w-4 text-zinc-600" />
       </div>
       <div className="flex flex-col items-center gap-2">
         <p className="text-sm text-zinc-400">{messages[phase]}</p>
@@ -194,8 +194,8 @@ function RatingBody({ rating, ringAnimated, cfg, compact = false }: {
         {rating.strengths.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 size={15} className="text-emerald-400" />
-              <h4 className="text-sm font-semibold text-emerald-400 capitalize tracking-wide">Strengths</h4>
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              <h4 className="text-sm font-semibold text-emerald-400">Strengths</h4>
             </div>
             <ItemList items={rating.strengths} color="text-zinc-200" markerColor="text-emerald-500/60" />
           </div>
@@ -203,8 +203,8 @@ function RatingBody({ rating, ringAnimated, cfg, compact = false }: {
         {rating.improvements.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center gap-1.5">
-              <TriangleAlert size={15} className="text-yellow-400" />
-              <h4 className="text-sm font-semibold text-yellow-400 capitalize tracking-wide">To Improve</h4>
+              <TriangleAlert className="h-4 w-4 text-yellow-400" />
+              <h4 className="text-sm font-semibold text-yellow-400">To Improve</h4>
             </div>
             <ItemList items={rating.improvements} color="text-zinc-200" markerColor="text-yellow-500/60" />
           </div>
@@ -213,7 +213,7 @@ function RatingBody({ rating, ringAnimated, cfg, compact = false }: {
 
       {rating.nextSessionTip && (
         <div className="flex items-start gap-2.5 rounded-lg border-none bg-zinc-800/40 px-4 py-3">
-          <Sparkles size={14} className="mt-0.5 shrink-0 text-zinc-400" />
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
           <p className="text-sm leading-relaxed text-zinc-300">{rating.nextSessionTip}</p>
         </div>
       )}
@@ -450,8 +450,8 @@ export function DailyAssessmentCard({
             {rating.strengths.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center gap-1.5">
-                  <CheckCircle2 size={15} className="text-emerald-400" />
-                  <h4 className="text-sm font-semibold text-emerald-400 capitalize tracking-wide">Strengths</h4>
+                  <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                  <h4 className="text-sm font-semibold text-emerald-400">Strengths</h4>
                 </div>
                 <ItemList items={rating.strengths} color="text-zinc-200" markerColor="text-emerald-500/60" />
               </div>
@@ -459,8 +459,8 @@ export function DailyAssessmentCard({
             {rating.improvements.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center gap-1.5">
-                  <TriangleAlert size={15} className="text-yellow-400" />
-                  <h4 className="text-sm font-semibold text-yellow-400 capitalize tracking-wide">To Improve</h4>
+                  <TriangleAlert className="h-4 w-4 text-yellow-400" />
+                  <h4 className="text-sm font-semibold text-yellow-400">To Improve</h4>
                 </div>
                 <ItemList items={rating.improvements} color="text-zinc-200" markerColor="text-yellow-500/60" />
               </div>
@@ -469,7 +469,7 @@ export function DailyAssessmentCard({
 
           {rating.nextSessionTip && (
             <div className="flex items-start gap-2.5 rounded-lg border-none bg-zinc-800/40 px-4 py-3">
-              <Sparkles size={14} className="mt-0.5 shrink-0 text-zinc-400" />
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
               <p className="text-sm leading-relaxed text-zinc-300">{rating.nextSessionTip}</p>
             </div>
           )}

@@ -7,6 +7,7 @@ import type {
   GuildStash,
   StashDeposit,
 } from "feature/guilds/types/stash.types";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { auth } from "utils/firebase/client/firebase.utils";
 
@@ -55,6 +56,7 @@ const errorMessage = (error: unknown, fallback: string): string => {
 
 export const useStashMutations = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation("guilds");
 
   const settle = (stash: GuildStash) => {
     queryClient.setQueryData(GUILD_STASH_KEY, stash);
@@ -68,7 +70,7 @@ export const useStashMutations = () => {
     mutationFn: (input: StashDeposit) => post({ action: "deposit", ...input }),
     onSuccess: (stash) => {
       settle(stash);
-      toast.success("Left on the shelf");
+      toast.success(t("toast.stash_left"));
     },
     onError: (error) =>
       toast.error(errorMessage(error, "Could not put that in")),
@@ -80,7 +82,7 @@ export const useStashMutations = () => {
       post({ action: "take", ...input }),
     onSuccess: (stash) => {
       settle(stash);
-      toast.success("Taken");
+      toast.success(t("toast.stash_taken"));
     },
     onError: (error) => toast.error(errorMessage(error, "Could not take that")),
   });

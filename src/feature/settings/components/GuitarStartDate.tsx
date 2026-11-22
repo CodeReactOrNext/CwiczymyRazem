@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { Card } from "assets/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -6,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { differenceInYears } from "date-fns";
 import { doc, getDoc } from "firebase/firestore";
 import { useTranslation } from "hooks/useTranslation";
@@ -54,11 +56,8 @@ export const GuitarStartDate = () => {
   const durationYears = date ? differenceInYears(new Date(), date) : 0;
 
   return (
-    <div className='flex flex-col gap-6'>
-      <h3 className='font-sans text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
-        {t("guitarStartDate.title")}
-      </h3>
-
+    <Card>
+      <SectionHeader title={t("guitarStartDate.title")} />
       <div className='flex flex-col gap-4'>
         <Select
           value={date?.getFullYear().toString()}
@@ -76,7 +75,7 @@ export const GuitarStartDate = () => {
         </Select>
         
         {date && (
-            <div className="bg-muted/50 p-3 rounded-lg text-sm text-foreground">
+            <div className="text-sm text-zinc-300">
                 <span role="img" aria-label="guitar" className="mr-2">🎸</span>
                 {t("guitarStartDate.duration_years", { years: durationYears })}
             </div>
@@ -86,6 +85,6 @@ export const GuitarStartDate = () => {
           {t("guitarStartDate.save")}
         </Button>
       </div>
-    </div>
+    </Card>
   );
 };

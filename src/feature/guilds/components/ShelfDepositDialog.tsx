@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { StashItemDialog } from "feature/arsenal/components/Collection/StashItemDialog";
 import { HonorMark } from "feature/guilds/components/HonorMark";
 import type { ShelfDepositTarget } from "feature/guilds/hooks/useShelfDeposit";
@@ -49,13 +50,9 @@ export const ShelfDepositDialog = ({
             {t("deposit.from_then_on")}
           </p>
 
-          <button
-            type='button'
-            onClick={onConfirm}
-            disabled={busy}
-            className='rounded-lg bg-purple-500/15 px-4 py-3 text-sm font-bold text-purple-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 hover:bg-purple-500/25'>
+          <Button type='button' size='lg' onClick={onConfirm} disabled={busy}>
             {busy ? t("deposit.leaving") : t("deposit.confirm")}
-          </button>
+          </Button>
         </div>
       )}
     </StashItemDialog>

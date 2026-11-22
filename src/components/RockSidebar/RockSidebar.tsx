@@ -7,6 +7,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { FeedbackModal } from "components/FeedbackBubble";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
+import { LogoutDialog } from "components/LogoutDialog/LogoutDialog";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
 import { ResetClock } from "components/ResetClock/ResetClock";
 import {
@@ -32,7 +33,6 @@ import {
   selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
-import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAppVersion } from "hooks/useAppVersion";
 import { useElectronWindowControls } from "hooks/useElectronWindowControls";
@@ -70,7 +70,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaDiscord } from "react-icons/fa6";
-import { useAppDispatch, useAppSelector } from "store/hooks";
+import { useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
 
 export interface SidebarLinkInterface {
@@ -333,6 +333,8 @@ const SidebarExpandableNavLink = ({
 
 const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  // Outside the More sheet: it closes on the tap that opens this.
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const {
     show: showFeedbackPrompt,
     markAsDismissed,
@@ -349,7 +351,6 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const emailConsentPrompt = useEmailConsentPrompt();
   const { isElectron } = useElectronWindowControls();
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const { t } = useTranslation("nav");
 
   // Surfacing it next to the logo makes a stale desktop install (see
@@ -657,7 +658,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             size='md'
           />
           <div className='flex min-w-0 flex-1 flex-col justify-center'>
-            <span className='truncate text-[15px] font-bold tracking-wide text-white'>
+            <span className='truncate text-[15px] font-bold text-white'>
               {userName}
             </span>
           </div>
@@ -776,7 +777,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
             name={userName}
             size='sm'
           />
-          <span className='truncate text-[15px] font-bold tracking-wide text-white'>
+          <span className='truncate text-[15px] font-bold text-white'>
             {userName}
           </span>
         </Link>
@@ -796,7 +797,7 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         type='button'
         onClick={() => {
           handleLinkClick();
-          dispatch(logUserOff());
+          setIsLogoutDialogOpen(true);
         }}
         className='flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-zinc-400 transition-colors duration-base hover:bg-red-500/10 hover:text-red-400'>
         <span className={NAV_ICON_SLOT}>
@@ -854,6 +855,11 @@ const RockSidebar = ({ pageId }: RockSidebarProps) => {
         header={moreSheetHeader}
         groups={moreSheetGroups}
         footer={moreSheetFooter}
+      />
+
+      <LogoutDialog
+        open={isLogoutDialogOpen}
+        onOpenChange={setIsLogoutDialogOpen}
       />
 
       <EmailConsentModal

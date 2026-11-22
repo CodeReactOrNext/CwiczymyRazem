@@ -1,5 +1,6 @@
-import { buttonVariants, PRESSABLE_KEY } from "assets/components/ui/button";
+import { Button, buttonVariants } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
+import { Chip } from "assets/components/ui/chip";
 import {
   Tooltip,
   TooltipContent,
@@ -38,24 +39,26 @@ interface PlanCardProps {
   isLocked?: boolean;
 }
 
+// Category hues follow CATEGORY_CHIP_COLOR (constants/categoryChip): technique emerald,
+// theory blue, creativity purple, hearing amber.
 const categoryStyles = {
   technique: {
-    gradient: "from-blue-500/15 via-zinc-900/60 to-zinc-950",
-    icon: Guitar,
-    text: "text-blue-400",
-    iconTile: "bg-blue-500/10 text-blue-400",
-    badge: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    glow: "bg-blue-500/25",
-    cta: "group-hover:bg-blue-500 group-hover:text-zinc-950",
-  },
-  theory: {
     gradient: "from-emerald-500/15 via-zinc-900/60 to-zinc-950",
-    icon: Brain,
+    icon: Guitar,
     text: "text-emerald-400",
     iconTile: "bg-emerald-500/10 text-emerald-400",
     badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
     glow: "bg-emerald-500/25",
     cta: "group-hover:bg-emerald-500 group-hover:text-zinc-950",
+  },
+  theory: {
+    gradient: "from-blue-500/15 via-zinc-900/60 to-zinc-950",
+    icon: Brain,
+    text: "text-blue-400",
+    iconTile: "bg-blue-500/10 text-blue-400",
+    badge: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    glow: "bg-blue-500/25",
+    cta: "group-hover:bg-blue-500 group-hover:text-zinc-950",
   },
   creativity: {
     gradient: "from-purple-500/15 via-zinc-900/60 to-zinc-950",
@@ -218,12 +221,12 @@ export const PlanCard = ({
             )}>
                 <Icon className="h-4 w-4" />
             </div>
-            <span className="text-[11px] font-medium capitalize tracking-wide text-zinc-300">
+            <span className="text-xs font-medium text-zinc-300">
                 {t(`exercises:categories.${plan.category}` as any)}
             </span>
 
             {!isLocked && (
-                <span className="text-[11px] font-medium capitalize tracking-wide text-zinc-500">
+                <span className="text-xs font-medium text-zinc-400">
                     {t(`exercises:difficulty.${difficulty}` as any)}
                 </span>
             )}
@@ -235,7 +238,7 @@ export const PlanCard = ({
             )}
             {hasVideo && !isLocked && (
                 <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-500">
-                    <VideoIcon size='1em' className="h-2.5 w-2.5" />
+                    <VideoIcon className="h-2.5 w-2.5" />
                     {t("plans:video")}
                 </span>
             )}
@@ -250,16 +253,17 @@ export const PlanCard = ({
                                 aria-label={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                                 aria-pressed={isFavorite}
                                 className={cn(
-                                    "flex h-9 w-9 items-center justify-center rounded-[4px] border shadow-lg backdrop-blur-sm transition-all duration-base focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500/50 focus-visible:opacity-100",
+                                    buttonVariants({ variant: "ghost", size: "icon" }),
+                                    "transition-[background-color,color,opacity] focus-visible:opacity-100",
                                     isFavorite
-                                        // Already favorited — always visible so the state is recognizable at a glance.
-                                        ? "border-rose-500/30 bg-rose-500/15 text-rose-400 opacity-100 hover:bg-rose-500/25 hover:text-rose-300"
-                                        // Not favorited — fades in on card hover, with a tinted background so it reads as a button.
-                                        : "border-white/10 bg-zinc-950/50 text-zinc-300 opacity-0 hover:bg-white/10 hover:text-rose-300 group-hover:opacity-100"
+                                        // Already favorited — always visible, the heart lights up; the face stays the same key.
+                                        ? "text-rose-400 opacity-100 hover:text-rose-300"
+                                        // Not favorited — fades in on card hover.
+                                        : "opacity-0 hover:text-rose-300 group-hover:opacity-100"
                                 )}
                                 onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
                             >
-                                <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
+                                <Heart className={cn(isFavorite && "fill-current")} />
                             </button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -332,10 +336,10 @@ export const PlanCard = ({
                 </TooltipProvider>
             )}
             {isLocked && (
-              <div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 ring-1 ring-amber-500/25">
-                <Lock className="h-3 w-3 text-amber-500" />
-                <span className="text-[11px] font-medium text-amber-500">{t("plans:pro")}</span>
-              </div>
+              <Chip color='amber' size='sm'>
+                <Lock className="h-3 w-3" />
+                {t("plans:pro")}
+              </Chip>
             )}
         </div>
       </div>
@@ -428,7 +432,7 @@ export const PlanCard = ({
           {onPreview && (
             <button
               type="button"
-              className={cn(buttonVariants({ variant: "ghost" }), "h-10 px-3 text-xs font-semibold")}
+              className={buttonVariants({ variant: "ghost" })}
               onClick={(e) => {
                 e.stopPropagation();
                 onPreview();
@@ -439,27 +443,19 @@ export const PlanCard = ({
           {/* Labelled pill rather than a bare ↗ — that glyph reads as "opens a
               new tab", and next to the text Preview it was unclear which of
               the two actually starts the plan. */}
-          <button
+          <Button
             type="button"
-            className={cn(
-              PRESSABLE_KEY,
-              "flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg bg-white/10 px-4 text-xs font-semibold text-zinc-100 transition-colors duration-base",
-              "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60",
-              style.cta
-            )}
+            variant="subtle"
+            className={cn("shrink-0 gap-1.5 text-zinc-100", style.cta)}
             onClick={(e) => {
                 e.stopPropagation();
                 onStart();
             }}
-            disabled={isLoading}
+            loading={isLoading}
           >
             <span>{startButtonText || "Start"}</span>
-            {isLoading ? (
-              <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-            ) : (
-              <ArrowRight className="h-3.5 w-3.5" />
-            )}
-          </button>
+            {!isLoading && <ArrowRight />}
+          </Button>
           </div>
         )}
       </div>

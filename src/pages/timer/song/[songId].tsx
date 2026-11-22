@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { TimeSplitterModal } from "feature/practice/components/TimeSplitterModal";
 import { ensureSongIsLearning,updateSongStatus } from "feature/songs/services/udateSongStatus";
@@ -24,6 +25,19 @@ import type { NextPageWithLayout } from "types/page";
 import { withAuthInitialProps } from "utils/auth/authInitialProps";
 import { convertMsToHMS } from "utils/converter";
 import { db } from "utils/firebase/client/firebase.utils";
+
+/** Mirrors SongTimerLayout: the title row, the timer bar, then the song's content. */
+const SongTimerSkeleton = () => (
+    <div className='h-full space-y-5 px-4 pb-8 md:p-8' aria-busy='true'>
+        <div className='pl-14 sm:pl-0'>
+            <Skeleton className='h-9 w-48' />
+        </div>
+        <div className='mx-auto w-full space-y-8 px-2'>
+            <Skeleton variant='block' className='h-16 sm:h-[68px]' />
+            <Skeleton variant='block' className='h-[420px]' />
+        </div>
+    </div>
+);
 
 const SongPracticeTimer: NextPageWithLayout = () => {
     const router = useRouter();
@@ -264,11 +278,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     }, [timer.timerEnabled, song, timer]);
 
     if (isLoading || !song) {
-         return (
-             <div className="flex h-screen items-center justify-center">
-                 <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-cyan-500" />
-             </div>
-         );
+        return <SongTimerSkeleton />;
     }
 
     if (showSuccess && raitingData && currentUserStats && previousUserStats) {

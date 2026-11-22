@@ -1,4 +1,6 @@
+import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import type { Song } from "feature/songs/types/songs.type";
 import { formatPlayTime } from "feature/songs/utils/arrangements.utils";
@@ -32,7 +34,7 @@ export const ProfileSongRow = ({
   /** Time spent on the song; hidden when unknown or zero. */
   practiceMs?: number;
 }) => (
-  <div className='flex items-center gap-3 rounded-xl bg-zinc-800/20 p-3'>
+  <div className='flex items-center gap-3 py-1.5'>
     {song.coverUrl ? (
       <img
         src={song.coverUrl}
@@ -99,8 +101,11 @@ export const SongSkillShowcase = ({
   if (userSongs.learned.length === 0) {
     const learningCount = userSongs.learning.length;
     return (
-      <div className='rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm'>
-        <h2 className='text-2xl font-bold text-white'>{t("layout.sections.repertoire.title")}</h2>
+      <Card className='p-5 sm:p-6'>
+        <SectionHeader
+          title={t("layout.sections.repertoire.title")}
+          className='mb-0'
+        />
         <p className='mt-2 text-sm text-zinc-400'>
           {isOwnProfile
             ? learningCount > 0
@@ -110,26 +115,27 @@ export const SongSkillShowcase = ({
               ? t("repertoire.empty_visitor_learning", { count: learningCount })
               : t("repertoire.empty_visitor")}
         </p>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className='rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm'>
+    <Card className='p-5 sm:p-6'>
       {/* Header */}
-      <div className='mb-6 flex items-center justify-between gap-4'>
-        <div>
-          <h2 className='text-2xl font-bold text-white'>{t("layout.sections.repertoire.title")}</h2>
-          <p className='mt-1 text-sm text-zinc-400'>
+      <SectionHeader
+        title={t("layout.sections.repertoire.title")}
+        description={
+          <>
             {t("repertoire.learned", { count: userSongs.learned.length })}
             {userSongs.learning.length > 0 && (
               <span className='ml-2 text-cyan-400'>
                 · {t("repertoire.in_progress", { count: userSongs.learning.length })}
               </span>
             )}
-          </p>
-        </div>
-      </div>
+          </>
+        }
+        className='mb-6'
+      />
 
       {/* Tier Groups */}
       <div className='space-y-5'>
@@ -172,6 +178,6 @@ export const SongSkillShowcase = ({
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 };

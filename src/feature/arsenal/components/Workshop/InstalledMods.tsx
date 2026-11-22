@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { FittedMod, ModSlots } from "feature/arsenal/data/workshop";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
@@ -264,8 +265,10 @@ export const InstalledMods = ({
                   chasing a better roll — it still asks before spending parts,
                   it just skips the "what do you want to do" step. */}
               {mod.affordable && (
-                <button
+                <Button
                   type='button'
+                  variant='ghost'
+                  size='icon'
                   onClick={() =>
                     onOpenSlot({ kind: "fitted", index, mod, intent: "reroll" })
                   }
@@ -274,12 +277,13 @@ export const InstalledMods = ({
                     name: labels.mod(mod.id, mod.label),
                   })}
                   className={cn(
-                    "absolute -top-3 flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800 text-zinc-300 opacity-0 transition-opacity focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-purple-300/60 group-hover:opacity-100 hover:bg-zinc-700 hover:text-white",
+                    // A solid face: the key floats over the mod's art.
+                    "absolute -top-3 bg-zinc-800 text-zinc-300 opacity-0 transition-opacity focus-visible:opacity-100 focus-visible:ring-purple-300/60 group-hover:opacity-100 hover:bg-zinc-700",
                     // Outer corner, away from the wire leaving the inner edge.
                     side === "left" ? "-left-3" : "-right-3",
                   )}>
-                  <Dices size={18} />
-                </button>
+                  <Dices />
+                </Button>
               )}
             </div>
           );

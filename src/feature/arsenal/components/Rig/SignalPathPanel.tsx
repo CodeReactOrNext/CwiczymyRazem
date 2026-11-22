@@ -45,7 +45,7 @@ const StageChip = ({ label, why, filled }: StageChipProps) => (
   <span
     title={why}
     className={cn(
-      "cursor-default rounded px-2 py-1 text-[11px] tracking-wide transition-colors",
+      "cursor-default rounded px-2 py-1 text-[11px] transition-colors",
       filled
         ? "bg-arsenal-card text-arsenal-text-secondary"
         : "text-arsenal-text-tertiary",
@@ -69,7 +69,7 @@ export const SignalPathPanel = ({ verdict }: SignalPathPanelProps) => {
   return (
     <div className='flex flex-col gap-3 rounded-lg bg-arsenal-section p-5'>
       <div className='flex items-center justify-between gap-4'>
-        <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
+        <p className='text-[11px] text-arsenal-text-tertiary'>
           {t("signal.path")}
         </p>
         <div className='flex items-baseline gap-1'>
@@ -89,7 +89,7 @@ export const SignalPathPanel = ({ verdict }: SignalPathPanelProps) => {
       <Pop trigger={tierLabel}>
         <p
           className={cn(
-            "text-xl font-black capitalize tracking-wide",
+            "text-xl font-black",
             tone.text,
           )}>
           {tierLabel}
@@ -109,7 +109,7 @@ export const SignalPathPanel = ({ verdict }: SignalPathPanelProps) => {
               />
             ))}
           </div>
-          <p className='text-[11px] tracking-wide text-arsenal-text-tertiary'>
+          <p className='text-[11px] text-arsenal-text-tertiary'>
             {t("signal.cables_in_order", {
               ok: verdict.okLinks,
               count: verdict.links.length,

@@ -5,6 +5,7 @@ import {
   getGatedSkillPower,
   getSongsUntilNextTier,
   getTierFromDifficulty,
+  getTierScalePosition,
   MIN_LEARNED_SONGS_FOR_TIER,
 } from "./difficulty.utils";
 
@@ -69,5 +70,26 @@ describe("getSongsUntilNextTier", () => {
         progress!.nextTier,
       );
     }
+  });
+});
+
+describe("getTierScalePosition", () => {
+  it("maps tier thresholds to equal segment boundaries", () => {
+    expect(getTierScalePosition(0)).toBe(0);
+    expect(getTierScalePosition(4)).toBeCloseTo(0.2);
+    expect(getTierScalePosition(6)).toBeCloseTo(0.4);
+    expect(getTierScalePosition(7.5)).toBeCloseTo(0.6);
+    expect(getTierScalePosition(9)).toBeCloseTo(0.8);
+    expect(getTierScalePosition(10)).toBe(1);
+  });
+
+  it("is linear inside a segment", () => {
+    // A runs 7.5–9: 8.25 is halfway through the 4th segment.
+    expect(getTierScalePosition(8.25)).toBeCloseTo(0.7);
+  });
+
+  it("clamps out-of-range scores", () => {
+    expect(getTierScalePosition(-1)).toBe(0);
+    expect(getTierScalePosition(12)).toBe(1);
   });
 });

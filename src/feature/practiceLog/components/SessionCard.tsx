@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -29,7 +30,7 @@ const DurationStat = ({
     title={label}
     className={cn("flex items-center gap-1.5 tabular-nums", className)}
   >
-    <Clock size={13} className="shrink-0 text-zinc-500" aria-hidden />
+    <Clock className="h-3.5 w-3.5 shrink-0 text-zinc-500" aria-hidden />
     <span className="font-bold text-zinc-100">{convertMsToHM(timeMs)}</span>
   </span>
 );
@@ -94,30 +95,25 @@ export const SessionCard = ({
   return (
     <div
       className={cn(
-        "group flex items-center gap-3 rounded-lg transition-colors hover:bg-white/[0.05]",
+        "group flex items-center gap-3.5 rounded-lg transition-colors hover:bg-white/[0.05]",
         compact ? "px-2.5 py-2" : "px-3 py-2.5"
       )}
     >
+      {/* Same neutral tile as the /timer hub rows and the feed thumbs. */}
       <div
         className={cn(
-          "relative flex flex-shrink-0 items-center justify-center rounded-lg shadow-lg transition-all duration-base",
-          config.iconBg,
-          config.iconBorder,
-          compact ? "h-10 w-10" : "h-12 w-12"
+          "relative flex flex-shrink-0 items-center justify-center rounded-lg bg-zinc-800/80 text-zinc-300",
+          compact ? "h-9 w-9" : "h-10 w-10"
         )}
       >
         <TypeIcon
-          className={cn(
-            config.iconText,
-            "transition-colors duration-base",
-            compact ? "h-5 w-5" : "h-6 w-6"
-          )}
+          className={compact ? "h-4 w-4" : "h-5 w-5"}
           aria-label={t(config.labelKey)}
         />
         {index !== undefined && (
           <span
             className={cn(
-              "absolute -left-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold tabular-nums shadow-md ring-2 ring-zinc-900",
+              "absolute -left-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full text-[11px] font-bold tabular-nums ring-2 ring-zinc-900",
               config.accentSolid,
               config.accentText
             )}
@@ -202,27 +198,34 @@ export const SessionCard = ({
       </div>
 
       {isManual ? (
-        <div className="flex shrink-0 items-center sm:opacity-0 sm:transition-opacity sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
-          <button
+        <div className="flex shrink-0 items-center gap-1 sm:opacity-0 sm:transition-opacity sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
             onClick={() => onEdit(session)}
-            className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+            className="text-zinc-400"
             title={t("card.edit")}
             aria-label={t("card.edit")}
           >
-            <Pencil size={14} />
-          </button>
-          <button
+            <Pencil />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
             onClick={() => onDelete(session)}
-            className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-white/5 hover:text-rose-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+            className="text-zinc-400 hover:text-rose-400"
             title={t("card.delete")}
             aria-label={t("card.delete")}
           >
-            <Trash2 size={14} />
-          </button>
+            <Trash2 />
+          </Button>
         </div>
       ) : (
         // Hover-only tooltip — nothing a touch device can reveal, so it stays off mobile.
-        <div className="hidden w-[60px] shrink-0 items-center justify-center sm:flex">
+        // As wide as the edit/delete pair, so the stats line up across rows.
+        <div className="hidden w-[68px] shrink-0 items-center justify-center sm:flex">
           <TooltipProvider delayDuration={100}>
             <Tooltip>
               <TooltipTrigger asChild>

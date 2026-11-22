@@ -1,4 +1,13 @@
+import { Button } from "assets/components/ui/button";
+import { Input } from "assets/components/ui/input";
+import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
 import type { RoadmapSongRef } from "feature/aiCoach/types/roadmap.types";
+import {
+  SONG_ARTIST_SM_CLASS,
+  SONG_TITLE_SM_CLASS,
+  SongThumb,
+} from "feature/songs/components/SongRow/SongRow";
 import { addSong } from "feature/songs/services/addSong";
 import { enrichSong } from "feature/songs/services/enrichment.service";
 import { getSongs } from "feature/songs/services/getSongs";
@@ -10,7 +19,7 @@ import type { Song } from "feature/songs/types/songs.type";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { MAX_BRIEF_SONGS } from "lib/roadmaps/generation/questionBank";
-import { Check, Loader2, Music, Plus, Search, X } from "lucide-react";
+import { Check, Loader2, Plus, Search, X } from "lucide-react";
 import posthog from "posthog-js";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -96,16 +105,6 @@ const spotifyMatch = async (
   );
 };
 
-const Cover = ({ coverUrl }: { coverUrl?: string | null }) => (
-  <span className='flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded bg-zinc-800 text-zinc-600'>
-    {coverUrl ? (
-      <img src={coverUrl} alt='' className='h-full w-full object-cover' />
-    ) : (
-      <Music size={14} />
-    )}
-  </span>
-);
-
 const Row = ({
   title,
   artist,
@@ -125,12 +124,10 @@ const Row = ({
     onClick={onClick}
     disabled={state !== "add"}
     className='group flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-left transition-colors disabled:cursor-default hover:bg-zinc-800 disabled:hover:bg-transparent'>
-    <Cover coverUrl={coverUrl} />
+    <SongThumb coverUrl={coverUrl} size='sm' />
     <span className='min-w-0 flex-1'>
-      <span className='block truncate text-sm font-semibold text-zinc-100'>
-        {title}
-      </span>
-      <span className='block truncate text-xs text-zinc-500'>
+      <span className={cn("block", SONG_TITLE_SM_CLASS)}>{title}</span>
+      <span className={cn("block", SONG_ARTIST_SM_CLASS)}>
         {artist}
         {tag && <span className='ml-2 text-cyan-300/80'>{tag}</span>}
       </span>
@@ -333,20 +330,22 @@ export const LibrarySongPicker = ({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.85 }}
               className='flex items-center gap-2 rounded-lg bg-zinc-700/70 py-1.5 pl-1.5 pr-2 text-sm text-zinc-100'>
-              <Cover coverUrl={song.coverUrl} />
+              <SongThumb coverUrl={song.coverUrl} size='sm' />
               <span className='flex min-w-0 flex-col leading-tight'>
                 <span className='truncate font-semibold'>{song.title}</span>
                 <span className='truncate text-xs text-zinc-400'>
                   {song.artist}
                 </span>
               </span>
-              <button
+              <Button
                 type='button'
+                variant='ghost'
+                size='icon-sm'
                 onClick={() => remove(song.id)}
                 aria-label={t("panel.songs.remove", { title: song.title })}
-                className='ml-1 rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-600 hover:text-zinc-100'>
-                <X size={14} />
-              </button>
+                className='shrink-0 text-zinc-400'>
+                <X />
+              </Button>
             </motion.span>
           ))}
         </AnimatePresence>
@@ -358,28 +357,19 @@ export const LibrarySongPicker = ({
       </div>
 
       <div className='space-y-2'>
-        <label className='flex items-center gap-3 rounded-lg bg-zinc-800/50 px-4 py-2.5 focus-within:ring-1 focus-within:ring-zinc-600'>
-          {searching ? (
-            <Loader2
-              size={16}
-              className='shrink-0 animate-spin text-zinc-500'
-            />
-          ) : (
-            <Search size={16} className='shrink-0 text-zinc-500' />
-          )}
-          <input
-            type='text'
-            value={query}
-            onChange={(event) => search(event.target.value)}
-            disabled={full}
-            placeholder={
-              full
-                ? t("panel.songs.full", { max: MAX_BRIEF_SONGS })
-                : t("panel.songs.search")
-            }
-            className='w-full bg-transparent text-sm text-zinc-100 outline-none placeholder:text-zinc-500 disabled:cursor-not-allowed'
-          />
-        </label>
+        <SearchInput
+          icon={searching ? Loader2 : Search}
+          iconClassName={searching ? "animate-spin" : undefined}
+          value={query}
+          onChange={(event) => search(event.target.value)}
+          disabled={full}
+          placeholder={
+            full
+              ? t("panel.songs.full", { max: MAX_BRIEF_SONGS })
+              : t("panel.songs.search")
+          }
+          aria-label={t("panel.songs.search")}
+        />
 
         <AnimatePresence>
           {(results.length > 0 || suggestions.length > 0) && !full && (
@@ -440,13 +430,13 @@ export const LibrarySongPicker = ({
         <span className='text-xs font-semibold text-zinc-400'>
           {t("panel.songs.reference")}
         </span>
-        <input
+        <Input
           type='text'
           value={otherSongs}
           onChange={(event) => onOtherSongsChange(event.target.value)}
           maxLength={300}
           placeholder={t("panel.songs.reference_placeholder")}
-          className='w-full rounded-lg bg-zinc-800/50 px-4 py-2.5 text-sm text-zinc-100 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-zinc-600'
+          className='h-10'
         />
       </label>
     </div>

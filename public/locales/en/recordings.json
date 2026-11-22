@@ -5,7 +5,11 @@
     "comment_added": "Comment added!",
     "comment_failed": "Failed to add comment.",
     "logged_out": "You must be logged in.",
-    "bad_url": "Please enter a valid YouTube URL."
+    "bad_url": "Please enter a valid YouTube URL.",
+    "updated": "Recording updated.",
+    "update_failed": "Couldn't update the recording.",
+    "deleted": "Recording deleted.",
+    "delete_failed": "Couldn't delete the recording."
   },
   "modal": {
     "edit_title": "Edit Recording",
@@ -52,7 +56,12 @@
     "subtitle": "Listen back and share your practice sessions",
     "add": "Add Recording",
     "all": "All Recordings",
-    "mine": "My Recordings"
+    "mine": "My Recordings",
+    "count_one": "{{count}} recording",
+    "count_other": "{{count}} recordings",
+    "sort_newest": "Newest",
+    "sort_popular": "Most popular",
+    "sort_label": "Sort recordings"
   },
   "viewer": {
     "not_found": "Recording not found",

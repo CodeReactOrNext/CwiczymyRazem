@@ -9,6 +9,7 @@ import {
   getSalvageableMod,
   getScrappedMods,
 } from "feature/arsenal/data/salvage";
+import { useBenchReadiness } from "feature/arsenal/hooks/useBenchReadiness";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapEffect } from "feature/arsenal/hooks/useScrapEffect";
 import { useScrapEffectsBulk } from "feature/arsenal/hooks/useScrapEffectsBulk";
@@ -33,6 +34,7 @@ import { CollectionEmptyResult } from "../Collection/CollectionEmptyResult";
 import { CollectionSectionHeader } from "../Collection/CollectionSectionHeader";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
+import { useBenchDialogStore } from "../Workshop/benchDialogStore";
 import { BulkDuplicatesDialog } from "./BulkDuplicatesDialog";
 import { EffectCard } from "./EffectCard";
 import { SellConfirmDialog } from "./SellConfirmDialog";
@@ -59,6 +61,8 @@ export const EffectCollection = ({
   const { mutate: savePedalboard, isPending: isRemovingFromBoard } =
     useUpdatePedalboard();
   const shelf = useShelfDeposit(data);
+  const { readyIds: benchReadyIds } = useBenchReadiness(data);
+  const openBench = useBenchDialogStore((state) => state.openBench);
   const userStats = useAppSelector(selectCurrentUserStats);
   const currentFame = userStats?.fame || 0;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -201,7 +205,6 @@ export const EffectCollection = ({
     <>
       <div className='flex flex-col gap-3'>
         <CollectionSectionHeader
-          eyebrow={t("collection.pedals_eyebrow")}
           title={t("collection.scope.pedals")}
           owned={uniqueOwnedCount}
           total={totalEffectsCount}
@@ -222,7 +225,10 @@ export const EffectCollection = ({
         {sortedItems.length === 0 ? (
           <CollectionEmptyResult query={query} />
         ) : (
-          <div className='grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
+          // Cards scrolled out of view skip layout and paint; `auto` remembers
+          // each card's real height once it has been drawn, so the scrollbar
+          // does not jump.
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 [&>*]:[contain-intrinsic-size:auto_440px] [&>*]:[content-visibility:auto]'>
             {sortedItems.map((item) => (
               <EffectCard
                 key={item.id}
@@ -240,6 +246,8 @@ export const EffectCollection = ({
                     : undefined
                 }
                 isStashing={shelf.isDepositing}
+                onWorkshopClick={() => openBench(item.id)}
+                workshopReady={benchReadyIds.has(item.id)}
                 onRemoveFromBoard={handleRemoveFromBoard}
                 isRemovingFromBoard={isRemovingFromBoard}
               />

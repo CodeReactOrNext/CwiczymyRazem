@@ -15,17 +15,21 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove,sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { Button, PRESSABLE } from "assets/components/ui/button";
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { Kostek } from "components/Mascot/Kostek";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { tabNavItemClass, tabNavListClass } from "components/PageTabs/tabNav";
 import { Ripple } from "components/Ripple/Ripple";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
 import FilterSheet from "feature/songs/components/FilterSheet/FilterSheet";
 import { PlaylistsView } from "feature/songs/components/Playlists/PlaylistsView";
 import { SkillPowerHero } from "feature/songs/components/SongBoard/SkillPowerHero";
 import { SongBoardRow } from "feature/songs/components/SongBoard/SongBoardRow";
 import { SongDetailView } from "feature/songs/components/SongBoard/SongDetailView";
+import { SongPracticeChart } from "feature/songs/components/SongBoard/SongPracticeChart";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
 import { SongSearchAutocomplete } from "feature/songs/components/SongSearch/SongSearchAutocomplete";
 import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
@@ -39,9 +43,8 @@ import type { Song } from "feature/songs/types/songs.type";
 import type { SongStatus } from "feature/songs/types/songs.type";
 import { getGatedSkillPower, getSongsUntilNextTier } from "feature/songs/utils/difficulty.utils";
 import { getAllTiers,getSongTier } from "feature/songs/utils/getSongTier";
-import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import {
   LayoutGrid,
   Library as LibraryIcon,
@@ -77,8 +80,6 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
   const { t } = useTranslation("songs");
 
   const userAuth = useAppSelector(selectUserAuth);
-  const userInfo = useAppSelector(selectUserInfo);
-  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const [practiceTarget, setPracticeTarget] = useState<Song | null>(null);
   const [detailsTarget, setDetailsTarget] = useState<Song | null>(null);
@@ -115,6 +116,9 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
     updateUserSongsCache,
     getSongStatus,
   } = useSongs();
+  // What the filter sheet has narrowed — shown as a number on its button.
+  const activeFilterCount =
+    (difficultyFilter !== "all" ? 1 : 0) + tierFilters.length + genreFilters.length;
 
   const { handleSongRemoval, handleStatusChange } = useSongsStatusChange({
     userSongs,
@@ -387,7 +391,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
     <>
       {/* On phones the view ends exactly at the bottom nav; with the layout's
           matching bottom padding the shell is exactly 100dvh and doesn't scroll. */}
-      <div className="flex flex-col h-[calc(100dvh-var(--mobile-nav-height))] md:h-[calc(100dvh-8rem)] overflow-hidden font-openSans">
+      <div className="flex flex-col h-[calc(100dvh-var(--mobile-nav-height))] md:h-[calc(100dvh-8rem)] overflow-hidden">
         <DndContext
           sensors={activeSensors}
           collisionDetection={closestCenter}
@@ -399,16 +403,16 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
           <main className={cn(
             "flex-1 min-h-0 overflow-y-auto no-scrollbar relative bg-black/20",
             // Playlists view manages its own padding so the header hue wash can bleed to the edges.
-            !detailsTarget && view !== 'playlists' ? "p-4 sm:p-6 md:p-10" : ""
+            !detailsTarget && view !== 'playlists' ? PAGE_CONTENT : ""
           )}>
             {/* View switcher — Board / Explore / Playlists. Scrolls away with the content instead of pinning as a second header bar. */}
             {!detailsTarget && (
               <div className={cn(
                 tabNavListClass,
                 "mb-6",
-                // Same offsets as the p-4/sm:p-6/md:p-10 the other views get
-                // from <main>, so the tabs don't jump when switching views.
-                view === 'playlists' ? "mx-4 mt-4 w-auto sm:mx-6 sm:mt-6 md:mx-10 md:mt-10" : ""
+                // Same offsets as the PAGE_CONTENT the other views get from
+                // <main>, so the tabs don't jump when switching views.
+                view === 'playlists' ? "mx-6 mt-6 w-auto md:mx-8 lg:mx-10" : ""
               )}>
                 {(
                   [
@@ -472,17 +476,22 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                   nextTierProgress={nextTierProgress}
                 />
 
+                {/* Phones skip it: the song list has to start above the fold. */}
+                {userAuth && (
+                  <SongPracticeChart userAuth={userAuth} className="hidden sm:block" />
+                )}
+
                 {totalSongsCount > 0 && (
                   // Phones: one row — the search field (count inside it, the
                   // way a native list shows it) and an Add key beside it.
                   <div className="flex items-center gap-2 sm:justify-between sm:gap-3">
                     <div className="relative flex-1 sm:max-w-xs">
-                      <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500 sm:left-3 sm:h-3.5 sm:w-3.5 sm:text-zinc-600" />
-                      <input
+                      <SearchInput
                         value={boardSearchQuery}
                         onChange={(e) => setBoardSearchQuery(e.target.value)}
                         placeholder={t("view.search_yours")}
-                        className="h-11 w-full rounded-full border-none bg-zinc-800/60 pl-10 pr-12 text-base text-white placeholder:text-zinc-500 transition-all focus:bg-zinc-900/70 focus:outline-none focus:ring-4 focus:ring-cyan-500/5 sm:h-10 sm:rounded-lg sm:bg-zinc-900/50 sm:pl-9 sm:pr-3 sm:text-sm"
+                        aria-label={t("view.search_yours")}
+                        className="pr-12 sm:pr-3"
                       />
                       <span
                         aria-hidden
@@ -495,7 +504,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                       size="icon"
                       onClick={() => handleSwitchView("explore")}
                       aria-label={t("view.add_songs")}
-                      className="h-11 w-11 shrink-0 rounded-full text-zinc-200 sm:hidden">
+                      className="shrink-0 text-zinc-200 sm:hidden">
                       <Plus />
                     </Button>
                     <div className="hidden shrink-0 items-center gap-2 rounded-lg bg-zinc-900/40 px-4 py-2 text-xs font-bold text-zinc-400 sm:flex">
@@ -549,50 +558,27 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
 
                     return (
                       <div className="space-y-3 sm:space-y-6">
-                        {/* Phones: a three-key segmented control across the
-                            width (icon + count over a short label) instead of
-                            chips wrapping onto two rows; Add moved up beside
-                            the search field. */}
-                        <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
-                          {sections.map((section) => {
-                            const isActive = section.key === activeTab;
-                            return (
-                              <button
-                                key={section.key}
-                                onClick={() => setBoardTab(section.key)}
-                                aria-pressed={isActive}
-                                className={cn(
-                                  PRESSABLE,
-                                  "relative flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl border-b-black/30 px-2 py-2.5 text-xs transition-colors sm:h-10 sm:flex-row sm:gap-2 sm:rounded-lg sm:px-4 sm:py-0 sm:text-sm",
-                                  isActive
-                                    ? "border-b-black/25 bg-white text-zinc-900"
-                                    : "bg-white/10 text-zinc-400 hover:bg-white/15 hover:text-zinc-200"
-                                )}>
-                                <span className={cn("flex items-center gap-1.5", isActive ? "text-zinc-900" : "text-zinc-500")}>
-                                  {section.icon}
-                                  <span className="text-sm font-bold tabular-nums sm:hidden">
-                                    {section.songs.length}
-                                  </span>
-                                </span>
-                                <span className="w-full truncate text-center font-semibold sm:hidden">
-                                  {section.short}
-                                </span>
-                                <span className="hidden sm:inline">{section.title}</span>
-                                <span
-                                  className={cn(
-                                    "hidden text-xs font-bold sm:inline",
-                                    "text-zinc-500"
-                                  )}>
-                                  {section.songs.length}
-                                </span>
-                              </button>
-                            );
-                          })}
+                        {/* The same switch as every other filter in the app. On a
+                            phone the short names keep all three on one line. */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <SegmentedControl
+                            label={t("view.sections.learning")}
+                            selected={[activeTab]}
+                            onSelect={setBoardTab}
+                            options={sections.map((section) => ({
+                              value: section.key,
+                              label: section.title,
+                              shortLabel: section.short,
+                              icon: section.icon,
+                              count: section.songs.length,
+                            }))}
+                          />
                           <Button
                             variant="subtle"
+                            size="lg"
                             onClick={() => handleSwitchView("explore")}
-                            className="ml-auto hidden h-10 px-4 text-zinc-200 sm:inline-flex">
-                            <Plus className="" />
+                            className="ml-auto hidden text-zinc-200 sm:inline-flex">
+                            <Plus />
                             {t("view.add_songs")}
                           </Button>
                         </div>
@@ -612,48 +598,37 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                             ))}
                           </div>
                         ) : query ? (
-                          <div className="flex flex-col items-center justify-center py-20 text-center">
-                            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800">
-                              <Search size={32} className="text-zinc-500" />
-                            </div>
-                            <h3 className="mb-2 text-xl font-bold text-white">{t("view.no_match", { query: boardSearchQuery })}</h3>
-                            <p className="max-w-xs text-sm text-zinc-400">
-                              {visibleCount > 0
+                          <EmptyState
+                            mood='lookAround'
+                            title={t("view.no_match", { query: boardSearchQuery })}
+                            description={
+                              visibleCount > 0
                                 ? t("view.check_other_tabs")
-                                : t("view.try_different")}
-                            </p>
-                          </div>
+                                : t("view.try_different")
+                            }
+                          />
                         ) : (
-                          <div className="flex flex-col items-center justify-center rounded-xl bg-zinc-900/30 py-16 text-center">
-                            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800 text-zinc-500">
-                              {activeSection.icon}
-                            </div>
-                            <h3 className="mb-2 text-lg font-bold text-white">
-                              {t("view.section_empty", { section: activeSection.title })}
-                            </h3>
-                            <p className="max-w-xs text-sm text-zinc-400">
-                              {t("view.section_empty_hint")}
-                            </p>
-                          </div>
+                          <EmptyState
+                            icon={activeSection.icon}
+                            title={t("view.section_empty", { section: activeSection.title })}
+                            description={t("view.section_empty_hint")}
+                          />
                         )}
                       </div>
                     );
                   })()}
 
                   {totalSongsCount === 0 && (
-                    <div className="flex flex-col items-center justify-center py-20 text-center">
-                      <Kostek mood="lookAround" className="mb-6 h-24 md:h-36" />
-                      <h3 className="mb-2 text-xl font-bold text-white">{t("view.board_empty")}</h3>
-                      <p className="max-w-xs text-sm text-zinc-400">
-                        {t("view.board_empty_hint")}
-                      </p>
-                      <Button
-                        onClick={() => handleSwitchView("explore")}
-                        className="mt-8 h-11 rounded-lg bg-white px-8 font-bold text-black hover:bg-zinc-100"
-                      >
-                        {t("view.explore_library")}
-                      </Button>
-                    </div>
+                    <EmptyState
+                      mood='lookAround'
+                      title={t("view.board_empty")}
+                      description={t("view.board_empty_hint")}
+                      action={
+                        <Button onClick={() => handleSwitchView("explore")}>
+                          {t("view.explore_library")}
+                        </Button>
+                      }
+                    />
                   )}
                 </div>
               </div>
@@ -669,43 +644,25 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
             ) : (
               <div className="space-y-6 animate-in fade-in-50 duration-base">
                 {/* Tier Selection Grid */}
-                <div className="space-y-4">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-xs font-bold text-zinc-400">{t("view.filter_by_tier")}</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {getAllTiers().map((tier) => {
-                      const isActive = tierFilters.includes(tier.tier);
-                      return (
-                        <button
-                          key={tier.tier}
-                          onClick={() => {
-                            if (isActive) {
-                              setTierFilters(tierFilters.filter((t: string) => t !== tier.tier));
-                            } else {
-                              posthog.capture("song_library_action", { action: "filter_tier", tier: tier.tier });
-                              setTierFilters([...tierFilters, tier.tier]);
-                            }
-                          }}
-                          className={cn(
-                            PRESSABLE,
-                            "relative flex h-11 w-11 items-center justify-center rounded-lg border-b-black/30 font-bold transition-colors",
-                            isActive
-                              ? ""
-                              : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white"
-                          )}
-                          style={{
-                            backgroundColor: isActive ? inkWash(tier.color, 16) : "",
-                            color: isActive ? inkAccent(tier.color) : "",
-                          }}
-                        >
-                          <Ripple />
-                          {tier.tier}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                <SegmentedControl
+                  label={t("view.filter_by_tier")}
+                  multiple
+                  isLoading={isLoading}
+                  selected={tierFilters}
+                  options={getAllTiers().map((tier) => ({
+                    value: tier.tier,
+                    label: tier.label,
+                    accent: tier.color,
+                  }))}
+                  onSelect={(tier) => {
+                    if (tierFilters.includes(tier)) {
+                      setTierFilters(tierFilters.filter((t: string) => t !== tier));
+                    } else {
+                      posthog.capture("song_library_action", { action: "filter_tier", tier });
+                      setTierFilters([...tierFilters, tier]);
+                    }
+                  }}
+                />
 
                 {/* Search & Filter Bar */}
                 <div className="relative z-30 py-4">
@@ -716,7 +673,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                       placeholder={t("artist", "Artist...") as string}
                       value={artistQuery}
                       onChange={setArtistQuery}
-                      className="flex-1"
+                      className="md:w-64"
                     />
 
                     <SongSearchAutocomplete
@@ -725,20 +682,23 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                       placeholder={t("title", "Title...") as string}
                       value={titleQuery}
                       onChange={setTitleQuery}
-                      className="flex-[1.2]"
+                      className="md:w-72"
                     />
 
                     <div className="flex items-center gap-2">
                       <Button
                         variant="subtle"
+                        size="lg"
                         onClick={() => setIsFilterSheetOpen(true)}
-                        className={cn(
-                          "relative h-12 flex-1 bg-zinc-900/60 px-6 font-bold text-zinc-300 hover:bg-zinc-800 md:flex-initial",
-                          hasFilters && "bg-cyan-500/5 text-cyan-400"
-                        )}
+                        className="w-full sm:w-auto"
                       >
-                        <SlidersHorizontal className="h-4 w-4" />
+                        <SlidersHorizontal />
                         {t("filter_sheet.title")}
+                        {activeFilterCount > 0 && (
+                          <span className="tabular-nums text-zinc-400">
+                            {activeFilterCount}
+                          </span>
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -803,7 +763,7 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                  </div>
                  <div className="flex-1 min-w-0">
                    <p className="truncate text-xs font-bold text-white">{activeSong.title}</p>
-                   <p className="truncate text-[10px] text-zinc-500">{activeSong.artist}</p>
+                   <p className="truncate text-[11px] text-zinc-500">{activeSong.artist}</p>
                  </div>
                </div>
             </div>
@@ -824,7 +784,6 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
         <SongPracticePickerModal
           song={practiceTarget}
           userId={userAuth}
-          isPremium={isPremium}
           progress={progressMap[practiceTarget.id] ?? null}
           onAttachGpFile={attachGpFile}
           onDetachGpFile={detachGpFile}

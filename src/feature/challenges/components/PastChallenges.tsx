@@ -1,3 +1,4 @@
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { ChallengeCover } from "feature/challenges/components/ChallengeCover";
 import type { Challenge } from "feature/challenges/types/challenge.types";
 import { challengeMonthLabel } from "feature/challenges/utils/challengeMonth";
@@ -16,15 +17,11 @@ export const PastChallenges = ({ challenges, onOpen }: PastChallengesProps) => {
   const intlLocale = useIntlLocale();
   if (challenges.length === 0) {
     return (
-      <div className='flex flex-col items-center justify-center py-24 text-center'>
-        <div className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500'>
-          <History size={26} />
-        </div>
-        <h3 className='mb-1 text-lg font-bold text-white'>{t("archive.empty_title")}</h3>
-        <p className='max-w-xs text-sm text-zinc-500'>
-          {t("archive.empty_body")}
-        </p>
-      </div>
+      <EmptyState
+        icon={<History />}
+        title={t("archive.empty_title")}
+        description={t("archive.empty_body")}
+      />
     );
   }
 
@@ -35,7 +32,7 @@ export const PastChallenges = ({ challenges, onOpen }: PastChallengesProps) => {
           key={challenge.id}
           type='button'
           onClick={() => onOpen(challenge)}
-          className='flex items-center gap-4 rounded-xl bg-white/[0.03] p-4 text-left transition-colors hover:bg-white/[0.07]'>
+          className='flex items-center gap-4 rounded-lg bg-zinc-800/40 p-4 text-left transition-colors hover:bg-zinc-800/60'>
           <ChallengeCover
             songs={challenge.songs}
             className='h-20 w-20 shrink-0 rounded-lg'

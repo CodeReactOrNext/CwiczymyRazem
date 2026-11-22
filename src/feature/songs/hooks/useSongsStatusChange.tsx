@@ -102,7 +102,7 @@ export const useSongsStatusChange = ({
         toast.info(t("learned_needs_practice_time"));
       } else {
         const pointsMsg = result.pointsAdded !== 0
-          ? ` (${result.pointsAdded > 0 ? "+" : ""}${result.pointsAdded} pkt)`
+          ? ` ${t("points_delta", { points: `${result.pointsAdded > 0 ? "+" : ""}${result.pointsAdded}` })}`
           : "";
 
         toast.success(`${t("status_updated")}${pointsMsg}`);
@@ -139,7 +139,7 @@ export const useSongsStatusChange = ({
       onChange(newUserSongs);
       
       const pointsMsg = result.pointsAdded !== 0 
-        ? ` (${result.pointsAdded} pkt)` 
+        ? ` ${t("points_delta", { points: result.pointsAdded })}` 
         : "";
         
       toast.success(`${t("song_removed")}${pointsMsg}`);

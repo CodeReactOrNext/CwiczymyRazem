@@ -22,7 +22,7 @@ export const ImprovDiscordCard = ({
 }) => {
   const { t } = useTranslation("improv");
   return (
-    <Card className='flex flex-col gap-4 p-5'>
+    <Card className='flex flex-col gap-4'>
       <div className='flex items-start gap-3'>
         <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-300'>
           <FaDiscord size={20} />
@@ -43,7 +43,7 @@ export const ImprovDiscordCard = ({
           Admin · bot: {adminIssue}
         </p>
       )}
-      <Button asChild variant='ghost' className='h-10'>
+      <Button asChild variant='ghost' size='lg'>
         <a href={discordUrl} target='_blank' rel='noreferrer'>
           {hasThread ? t("side.open_thread") : t("hero.discord_join")}
           <ArrowUpRight />
@@ -57,7 +57,7 @@ export const ImprovPlayersCard = ({ players }: { players: ImprovPlayer[] }) => {
   const { t } = useTranslation("improv");
   if (players.length === 0) return null;
   return (
-    <Card className='p-5'>
+    <Card>
       <h2 className='text-base font-semibold text-zinc-100'>
         {t("side.players_title")}
       </h2>

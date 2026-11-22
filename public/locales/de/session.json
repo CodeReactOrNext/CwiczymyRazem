@@ -837,5 +837,6 @@
     "show_in_folder": "Im Ordner zeigen",
     "delete": "In den Papierkorb",
     "untitled": "Aufnahme"
-  }
+  },
+  "exam_click_failed": "{{limit}} falsche Klicks – Prüfung nicht bestanden."
 }

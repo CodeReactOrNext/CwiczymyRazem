@@ -16,6 +16,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
@@ -104,33 +105,33 @@ const SortableItem = ({
             {exercise.timeInMinutes < 1 ? (
               <>
                 <span className="text-[12px] font-bold">{Math.round(exercise.timeInMinutes * 60)}</span>
-                <span className="text-[10px] font-medium text-zinc-500 group-hover/time:text-cyan-500/70 transition-colors">s</span>
+                <span className="text-xs font-medium text-zinc-500 group-hover/time:text-cyan-500/70 transition-colors">s</span>
               </>
             ) : (
               <>
                 <span className="text-[12px] font-bold">{exercise.timeInMinutes}</span>
-                <span className="text-[10px] font-medium text-zinc-500 group-hover/time:text-cyan-500/70 transition-colors">{t("plans:min")}</span>
+                <span className="text-xs font-medium text-zinc-500 group-hover/time:text-cyan-500/70 transition-colors">{t("plans:min")}</span>
               </>
             )}
             <Edit2 className="h-3 w-3 text-zinc-600 group-hover/time:text-cyan-400 transition-colors ml-0.5" />
           </button>
           
           {isCustom && (
-            <span className="px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400/90 text-[9px] font-bold tracking-wide">
+            <Chip color='cyan' size='sm'>
               {t("plans:custom")}
-            </span>
+            </Chip>
           )}
           {!!exercise._generatorConfig && (
-            <span className="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400/90 text-[9px] font-bold tracking-wide">
+            <Chip color='purple' size='sm'>
               {t("plans:generated")}
-            </span>
+            </Chip>
           )}
           {!!exercise.songData && (
-            <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 text-[9px] font-bold tracking-wide">
+            <Chip color='amber' size='sm'>
               {t("plans:song")}
               {exercise.songData.mode &&
                 ` · ${t(`plans:song_modes.${exercise.songData.mode}`, SONG_PRACTICE_MODE_LABELS[exercise.songData.mode])}`}
-            </span>
+            </Chip>
           )}
         </div>
       </div>
@@ -139,33 +140,33 @@ const SortableItem = ({
         {(isCustom || !!exercise._generatorConfig) && (
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-sm"
             onClick={() => onEditExercise?.(exercise)}
-            className="h-8 w-8 text-zinc-500 hover:text-cyan-400 hover:bg-cyan-400/10 rounded-lg transition-all"
+            className="text-zinc-500 hover:text-cyan-400 hover:bg-cyan-400/10 rounded-lg transition-all"
             title={t("exercises:custom_exercise.edit_button")}
           >
-            <Edit2 size={14} />
+            <Edit2 />
           </Button>
         )}
         {isCustom && (
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-sm"
             onClick={() => onCloneExercise?.(exercise)}
-            className="h-8 w-8 text-zinc-500 hover:text-emerald-400 hover:bg-emerald-400/10 rounded-lg transition-all"
+            className="text-zinc-500 hover:text-emerald-400 hover:bg-emerald-400/10 rounded-lg transition-all"
             title={t("exercises:custom_exercise.clone_button")}
           >
-            <Copy className="h-3.5 w-3.5" />
+            <Copy />
           </Button>
         )}
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-sm"
           onClick={() => onToggleExercise(exercise)}
-          className="h-8 w-8 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
+          className="text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
           title={t("common:button.remove")}
         >
-          <Trash2 className="h-4 w-4" />
+          <Trash2 />
         </Button>
       </div>
     </div>
@@ -252,7 +253,7 @@ export const SelectedExercisesList = ({
             </div>
             <p className="text-zinc-400 font-medium text-[13px] leading-relaxed max-w-[180px]">
               {t("plans:none_selected")}
-              <span className="block text-zinc-600 text-[11px] mt-1.5 tracking-wider text-balance">
+              <span className="block text-zinc-500 text-xs mt-1.5 text-balance">
                 {t("plans:choose_from_library")}
               </span>
             </p>

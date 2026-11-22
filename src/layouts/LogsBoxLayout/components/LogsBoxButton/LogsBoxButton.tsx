@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { CountBadge } from "components/CountBadge/CountBadge";
 import { tabNavItemClass } from "components/PageTabs/tabNav";
 import type { LucideIcon } from "lucide-react";
 
@@ -32,9 +33,13 @@ const LogsBoxButton = ({
     {/* Phones get the icons alone, so four tabs still fit on one rail. */}
     <span className='hidden sm:inline'>{title}</span>
     {hasNewMessages && (
-      <span className='flex h-5 min-w-[20px] items-center justify-center rounded-[8px] bg-red-600 px-1 text-[11px] font-extrabold text-white'>
-        {notificationCount || "!"}
-      </span>
+      // Inline next to the label rather than pinned to a corner; no cap, as before.
+      <CountBadge
+        count={notificationCount || "!"}
+        tone='alert'
+        max={Infinity}
+        className='static'
+      />
     )}
     {hasNewDot && !hasNewMessages && (
       <span className='absolute right-1.5 top-2 h-2 w-2 rounded-full bg-red-600' />

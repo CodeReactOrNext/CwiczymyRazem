@@ -230,19 +230,20 @@ const CategoryBox = ({
       {showControls && (
         <Button
           variant={isActive ? "default" : "subtle"}
-          className='relative z-10 h-10 w-full'
+          size='lg'
+          className='relative z-10 w-full'
           onClick={(e) => {
             e.stopPropagation();
             handleCardClick();
           }}>
           {isActive ? (
             <span translate='no' className='flex items-center'>
-              <Pause size='1em' className='mr-2 h-4 w-4' />
+              <Pause />
               {t("pause")}
             </span>
           ) : (
             <span translate='no' className='flex items-center'>
-              <Play size='1em' className='mr-2 h-4 w-4' />
+              <Play />
               {t("start")}
             </span>
           )}

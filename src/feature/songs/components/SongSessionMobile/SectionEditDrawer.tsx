@@ -5,8 +5,9 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from "assets/components/ui/drawer";
+import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
-import { MASTERY_STYLES } from "feature/songs/components/SongSections/MasteryBadge";
+import { Segment, SegmentGroup } from "components/SegmentedControl/SegmentedControl";
 import { PREDEFINED_NAMES } from "feature/songs/components/SongSections/SectionRow";
 import type {
   MasteryLevel,
@@ -19,6 +20,15 @@ import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
 const MASTERY_LEVELS: MasteryLevel[] = [0, 1, 2, 3, 4];
+
+/** The colour each level wears in MASTERY_STYLES, as a dot. */
+const MASTERY_DOT: Record<MasteryLevel, string> = {
+  0: "bg-zinc-500",
+  1: "bg-red-400",
+  2: "bg-amber-400",
+  3: "bg-green-400",
+  4: "bg-zinc-400",
+};
 
 /** Steps a start can be moved by: 5 s to get near, 1 s to land on the beat. */
 const NUDGES = [-5, -1, 1, 5];
@@ -102,7 +112,7 @@ const SectionEditBody = ({
           className='text-xs font-semibold text-zinc-400'>
           {t("song_timer.section_name")}
         </label>
-        <input
+        <Input
           id='section-name'
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -110,7 +120,7 @@ const SectionEditBody = ({
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
           }}
-          className='h-11 w-full rounded-lg bg-zinc-800/60 px-4 text-base text-zinc-100 outline-none transition-colors focus:bg-zinc-800'
+          className='h-11 px-4'
         />
         <div className='flex flex-wrap gap-1.5'>
           {PREDEFINED_NAMES.map((preset) => (
@@ -156,55 +166,59 @@ const SectionEditBody = ({
             />
           ))}
         </div>
-        <button
+        <Button
           type='button'
+          variant='subtle'
+          size='touch'
           disabled={playhead === section.startTime}
           onClick={() => setStart(playhead)}
-          className='h-11 w-full rounded-lg bg-cyan-500/10 text-sm font-semibold text-cyan-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-cyan-500/20'>
+          className='w-full'>
           {t("song_timer.set_to_playhead", {
             time: formatSectionTime(playhead),
           })}
-        </button>
+        </Button>
       </div>
 
       <div className='space-y-3'>
         <span className='text-xs font-semibold text-zinc-400'>
           {t("song_timer.mastery")}
         </span>
-        <div className='flex flex-wrap gap-1.5'>
-          {MASTERY_LEVELS.map((level) => (
-            <button
-              key={level}
-              type='button'
-              onClick={() => onMasteryChange(section.id, level)}
-              aria-pressed={section.mastery === level}
-              className={cn(
-                "h-9 rounded-lg px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                section.mastery === level
-                  ? cn(
-                      MASTERY_STYLES[level],
-                      level === 0 && "bg-zinc-800 text-zinc-100",
-                    )
-                  : "bg-zinc-800/40 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300",
-              )}>
-              {t(`sections.mastery_${level}`, MASTERY_LABELS[level])}
-            </button>
-          ))}
-        </div>
+        <SegmentGroup aria-label={t("song_timer.mastery")}>
+          {MASTERY_LEVELS.map((level) => {
+            const active = section.mastery === level;
+            return (
+              <Segment
+                key={level}
+                active={active}
+                onClick={() => onMasteryChange(section.id, level)}>
+                {/* The level's colour stays on the picked one only. */}
+                <span
+                  aria-hidden
+                  className={cn(
+                    "h-1.5 w-1.5 shrink-0 rounded-full",
+                    active ? MASTERY_DOT[level] : "bg-zinc-600",
+                  )}
+                />
+                {t(`sections.mastery_${level}`, MASTERY_LABELS[level])}
+              </Segment>
+            );
+          })}
+        </SegmentGroup>
       </div>
 
       <div className='flex items-center justify-between gap-3 pt-2'>
         <Button
           variant='ghost'
+          size='lg'
           onClick={() => {
             onDelete(section.id);
             onClose();
           }}
-          className='h-11 gap-2 px-3 text-red-400 hover:bg-red-500/10 hover:text-red-300'>
-          <Trash2 className='h-4 w-4' />
+          className='px-3 text-red-400 hover:bg-red-500/10 hover:text-red-300'>
+          <Trash2 />
           {t("song_timer.delete_section")}
         </Button>
-        <Button onClick={onClose} className='h-11 px-6'>
+        <Button onClick={onClose} size='lg'>
           {t("song_timer.done")}
         </Button>
       </div>

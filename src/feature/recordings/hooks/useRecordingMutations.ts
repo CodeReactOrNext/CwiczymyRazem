@@ -56,13 +56,13 @@ export const useRecordingMutations = () => {
       recordingData: RecordingUpdateData;
     }) => updateRecordingService(data.recordingId, data.userId, data.recordingData),
     onSuccess: (_, variables) => {
-      toast.success("Recording updated!");
+      toast.success(t("toast.updated"));
       queryClient.invalidateQueries(["recordings"] as any);
       queryClient.invalidateQueries(["recording", variables.recordingId] as any);
     },
     onError: (error: any) => {
       console.error(error);
-      toast.error("Failed to update recording.");
+      toast.error(t("toast.update_failed"));
     },
   });
 
@@ -70,12 +70,12 @@ export const useRecordingMutations = () => {
     mutationFn: (data: { recordingId: string; userId: string }) =>
       deleteRecordingService(data.recordingId, data.userId),
     onSuccess: () => {
-      toast.success("Recording deleted successfully.");
+      toast.success(t("toast.deleted"));
       queryClient.invalidateQueries(["recordings"] as any);
     },
     onError: (error) => {
       console.error(error);
-      toast.error("Failed to delete recording.");
+      toast.error(t("toast.delete_failed"));
     }
   });
 

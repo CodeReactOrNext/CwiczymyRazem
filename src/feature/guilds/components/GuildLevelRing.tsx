@@ -77,7 +77,7 @@ export const GuildLevelRing = ({
 
       <span className='relative flex flex-col items-center leading-none'>
         {roomy && (
-          <span className='text-[8px] font-semibold text-cyan-300/80'>
+          <span className='text-[11px] font-semibold text-cyan-300/80'>
             {t("lvl")}
           </span>
         )}

@@ -98,12 +98,10 @@ const ActionButton = ({
     type='button'
     onClick={onClick}
     disabled={disabled}
-    className={cn(
-      "flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40",
-      tone === "primary"
-        ? "bg-zinc-100 text-zinc-900 hover:bg-white"
-        : "bg-zinc-800 text-zinc-200 hover:bg-zinc-700",
-    )}>
+    className={buttonVariants({
+      variant: tone === "primary" ? "default" : "ghost",
+      size: "lg",
+    })}>
     {children}
   </button>
 );
@@ -334,7 +332,7 @@ const PhaseCheckBody = ({
                 {stage.index === stage.questions.length - 1
                   ? t("check.see_result")
                   : t("check.next_question")}
-                <ChevronRight className='h-4 w-4' />
+                <ChevronRight />
               </ActionButton>
             </div>
           </motion.div>
@@ -386,7 +384,7 @@ const PhaseCheckBody = ({
           <DrawerClose asChild>
             <button
               type='button'
-              className='flex items-center justify-center gap-2 rounded-lg bg-zinc-100 px-5 py-2.5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
+              className={buttonVariants({ size: "lg" })}>
               {t("check.back_to_map")}
             </button>
           </DrawerClose>
@@ -452,7 +450,7 @@ const PhaseCheckBody = ({
         ) : (
           <div className='flex justify-end'>
             <ActionButton onClick={start}>
-              <ClipboardCheck className='h-4 w-4' />
+              <ClipboardCheck />
               {state === "passed" ? t("check.take_again") : t("check.start")}
             </ActionButton>
           </div>
@@ -473,7 +471,7 @@ const PhaseCheckBody = ({
               type='button'
               aria-label={t("drawer.close")}
               className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
-              <X className='h-4 w-4' />
+              <X />
             </button>
           </DrawerClose>
         </div>

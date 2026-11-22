@@ -1,9 +1,11 @@
 import { Button } from "assets/components/ui/button";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { TableSkeleton } from "assets/components/ui/table-skeleton";
-import { Tabs, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { LEADERBOARD_TABS } from "constants/navTabs";
 import {
@@ -15,7 +17,7 @@ import type { LeaderboardViewType } from "feature/leadboard/hooks/useLeaderboard
 import type { LeaderboardNeighbors } from "feature/leadboard/services/getLeaderboardNeighbors";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, CloudOff } from "lucide-react";
 import { useRef, useState } from "react";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
@@ -208,10 +210,9 @@ export const LeadboardLayout = ({
       };
 
   return (
-    <div className='min-h-screen flex flex-col'>
+    <div className='flex flex-col'>
       <HeroBanner
         {...hero}
-        className='w-full !rounded-none !shadow-none'
         backgroundContent={<HeroPattern />}
         compact
         // The rewards belong to the season, so they sit under its name — one
@@ -221,7 +222,7 @@ export const LeadboardLayout = ({
         rightContent={rankContent}
       />
 
-      <div className='mt-8 mx-auto max-w-7xl px-4 w-full'>
+      <div className={PAGE_CONTENT}>
         <PageTabs
           tabs={LEADERBOARD_TABS}
           activeHref={activeTabHref}
@@ -240,23 +241,16 @@ export const LeadboardLayout = ({
               />
             )}
             {canShowAround && (
-              <Tabs
-                value={activeScope}
-                onValueChange={(value) => setScope(value as ListScope)}
-                className='ml-auto'>
-                <TabsList className='h-10 bg-zinc-900/60 text-zinc-400'>
-                  <TabsTrigger
-                    value='top'
-                    className='px-4 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:shadow-none'>
-                    {t("scope.top")}
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value='around'
-                    className='px-4 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:shadow-none'>
-                    {t("scope.around")}
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+              <SegmentedControl<ListScope>
+                label={`${t("scope.top")} / ${t("scope.around")}`}
+                selected={[activeScope]}
+                onSelect={setScope}
+                className='ml-auto'
+                options={[
+                  { value: "top", label: t("scope.top") },
+                  { value: "around", label: t("scope.around") },
+                ]}
+              />
             )}
           </div>
         )}
@@ -278,9 +272,11 @@ export const LeadboardLayout = ({
                 </ul>
               </>
             ) : (
-              <p className='py-16 text-center text-sm text-zinc-500'>
-                {t("scope.around_error")}
-              </p>
+              <EmptyState
+                size='compact'
+                icon={<CloudOff />}
+                title={t("scope.around_error")}
+              />
             )
           ) : isLoading ? (
             <>
@@ -288,27 +284,23 @@ export const LeadboardLayout = ({
                 <TableSkeleton rows={itemsPerPage} />
               </ul>
               <div className='mt-8 flex justify-center'>
-                 <div className='h-16 w-64 animate-pulse rounded-2xl bg-zinc-900/30 backdrop-blur-sm' />
+                <Skeleton className='mb-4 h-9 w-64 rounded-lg' />
               </div>
             </>
           ) : !usersData.length ? (
-            <div className='flex h-[50vh] items-center justify-center'>
-              <div className='text-center'>
-                <div className='mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/50'>
-                  <span className='text-2xl'>📊</span>
-                </div>
-                <h3 className='mb-2 text-xl font-semibold text-zinc-300'>
-                  {isSeasonalView ? t("no_seasonal_data") : t("empty_users_title")}
-                </h3>
-                <p className='text-sm text-zinc-500'>
-                  {isSeasonalView
-                    ? t("no_seasonal_data_found")
-                    : isGearView
+            <EmptyState
+              mood='lookAround'
+              title={
+                isSeasonalView ? t("no_seasonal_data") : t("empty_users_title")
+              }
+              description={
+                isSeasonalView
+                  ? t("no_seasonal_data_found")
+                  : isGearView
                     ? t("no_gear_data_found")
-                    : t("no_users_found")}
-                </p>
-              </div>
-            </div>
+                    : t("no_users_found")
+              }
+            />
           ) : (
             <>
               {listHeader}
@@ -324,7 +316,7 @@ export const LeadboardLayout = ({
 
               {/* Clean Pagination */}
               <div className='mt-8 flex justify-center'>
-                <div className='rounded-2xl bg-zinc-900/30 p-4 backdrop-blur-sm'>
+                <div className='rounded-lg bg-zinc-800/40 p-4'>
                   <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}

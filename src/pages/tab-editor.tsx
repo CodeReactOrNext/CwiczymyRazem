@@ -2,6 +2,7 @@
 import "lib/i18n/fullCatalog";
 
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import {
   Tooltip,
   TooltipContent,
@@ -9,6 +10,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
+import { ConfirmDialog } from "components/ConfirmDialog/ConfirmDialog";
 import { getCommunityExerciseById } from "feature/communityExercises/services/communityExerciseService";
 import { useTablatureAudio } from "feature/exercisePlan/hooks/useTablatureAudio";
 import type {
@@ -518,28 +520,32 @@ function ToolbarIconButton({
   onClick,
   disabled,
   active,
-  hoverClass = "hover:bg-zinc-800 hover:text-zinc-100",
+  hoverClass,
 }: {
   icon: React.ComponentType<{ size?: number }>;
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  /** "On" state (e.g. muted) — shown by the icon's colour, not a different face. */
   active?: boolean;
   hoverClass?: string;
 }) {
   return (
-    <button
+    <Button
       type='button'
+      variant='subtle'
+      size='icon-sm'
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
       title={label}
       className={cn(
-        "flex h-8 w-8 items-center justify-center rounded text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30",
-        active ? "bg-zinc-700 text-zinc-100" : hoverClass,
+        "disabled:opacity-30",
+        active && "text-amber-300 hover:text-amber-200",
+        hoverClass,
       )}>
       <Icon size={14} />
-    </button>
+    </Button>
   );
 }
 
@@ -583,6 +589,7 @@ export default function TabEditor() {
     stringIdx: number;
   } | null>(null);
   const [isGpModalOpen, setIsGpModalOpen] = useState(false);
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
   const gridRef = React.useRef<HTMLDivElement>(null);
   const gridScrollRef = React.useRef<HTMLDivElement>(null);
   // Filled in by the preview: parks its viewport at a given beat.
@@ -975,12 +982,13 @@ export default function TabEditor() {
     }
   };
 
-  const clearAll = () => {
-    if (confirm(t("tab_editor.confirm_clear"))) {
-      commit([createMeasure()]);
-      setSelectedCell(null);
-      setActiveSelection(null);
-    }
+  const clearAll = () => setIsClearConfirmOpen(true);
+
+  const confirmClearAll = () => {
+    commit([createMeasure()]);
+    setSelectedCell(null);
+    setActiveSelection(null);
+    setIsClearConfirmOpen(false);
   };
 
   // Boolean articulation flags that default to false/undefined — stripped from
@@ -1630,7 +1638,7 @@ export default function TabEditor() {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (isGpModalOpen) return;
+      if (isGpModalOpen || isClearConfirmOpen) return;
 
       // Text fields own their keystrokes. This listener lives on window, so
       // without the guard the digits typed into BPM (or the fret box) would
@@ -1812,6 +1820,7 @@ export default function TabEditor() {
       handleCopySelection,
       handleDeleteSelection,
       isGpModalOpen,
+      isClearConfirmOpen,
       undo,
       redo,
       applyPickStroke,
@@ -2146,20 +2155,24 @@ export default function TabEditor() {
                 size='sm'
                 className='w-44'
               />
-              <div className='flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/60 p-1'>
-                <button
-                  onClick={() => setIsGpModalOpen(true)}
-                  className='flex items-center gap-2 rounded px-3 py-1.5 text-[11px] font-bold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
+              <div className='flex items-center gap-1 rounded-lg bg-zinc-900/60 p-1'>
+                <Button
+                  type='button'
+                  variant='subtle'
+                  size='sm'
+                  onClick={() => setIsGpModalOpen(true)}>
                   <LucideFileMusic size={13} className='text-zinc-400' />
                   <span>{t("tab_editor.import_gp")}</span>
-                </button>
-                <button
-                  onClick={copyCode}
-                  className='flex items-center gap-2 rounded px-3 py-1.5 text-[11px] font-bold text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
+                </Button>
+                <Button
+                  type='button'
+                  variant='subtle'
+                  size='sm'
+                  onClick={copyCode}>
                   <LucideCopy size={13} className='text-zinc-400' />
                   <span>{t("tab_editor.copy_code")}</span>
-                </button>
-                <div className='mx-1 h-5 w-px bg-zinc-800' />
+                </Button>
+                <div aria-hidden className='w-2' />
                 <ToolbarIconButton
                   icon={LucideUndo2}
                   label={t("tab_editor.undo")}
@@ -2172,45 +2185,39 @@ export default function TabEditor() {
                   onClick={redo}
                   disabled={!canRedo}
                 />
-                <div className='mx-1 h-5 w-px bg-zinc-800' />
+                <div aria-hidden className='w-2' />
                 <ToolbarIconButton
                   icon={LucideEraser}
                   label={t("tab_editor.clear_all")}
                   onClick={clearAll}
-                  hoverClass='hover:bg-red-500/10 hover:text-red-400'
+                  hoverClass='hover:text-red-400'
                 />
               </div>
 
-              <div className='flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/60 p-1'>
-                <button
+              <div className='flex items-center gap-1 rounded-lg bg-zinc-900/60 p-1'>
+                <Button
+                  variant='subtle'
+                  size='icon-sm'
                   onClick={() => (isPlaying ? stopPlayback() : startPlayback())}
                   aria-label={isPlaying ? t("tab_editor.stop") : t("tab_editor.play")}
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                     isPlaying
-                      ? "bg-red-500 text-white"
-                      : "bg-zinc-800 text-zinc-100 hover:bg-zinc-700",
+                      ? "text-red-400 hover:text-red-300"
+                      : "text-zinc-100",
                   )}>
                   {isPlaying ? (
                     <LucideSquare size={13} fill='currentColor' />
                   ) : (
-                    <LucidePlay
-                      size={13}
-                      fill='currentColor'
-                      className='ml-0.5'
-                    />
+                    <LucidePlay size={13} fill='currentColor' />
                   )}
-                </button>
+                </Button>
                 <ToolbarIconButton
                   icon={isMuted ? LucideVolumeX : LucideVolume2}
                   label={isMuted ? t("tab_editor.unmute") : t("tab_editor.mute")}
                   onClick={() => setIsMuted(!isMuted)}
                   active={isMuted}
-                  hoverClass={
-                    isMuted ? "" : "hover:bg-zinc-800 hover:text-zinc-100"
-                  }
                 />
-                <div className='mx-1 h-5 w-px bg-zinc-800' />
+                <div aria-hidden className='w-2' />
                 <ToolbarIconButton
                   icon={LucideMinus}
                   label={t("tab_editor.tempo_down")}
@@ -2239,7 +2246,7 @@ export default function TabEditor() {
                     }}
                     className='w-10 rounded bg-transparent text-right text-lg font-bold tabular-nums text-zinc-100 outline-none transition-colors focus-visible:bg-zinc-800/60'
                   />
-                  <span className='text-[10px] font-bold text-zinc-500'>
+                  <span className='text-[11px] font-bold text-zinc-500'>
                     BPM
                   </span>
                 </label>
@@ -2251,10 +2258,12 @@ export default function TabEditor() {
                 />
               </div>
 
-              <div className='flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/60 p-1'>
+              <div className='flex items-center gap-1 rounded-lg bg-zinc-900/60 p-1'>
                 {DURATIONS.map((d) => (
-                  <button
+                  <Button
                     key={d.value}
+                    variant='subtle'
+                    size='icon-sm'
                     onClick={() => applyGridResolution(d.value)}
                     title={t("tab_editor.grid_title", {
                       short: d.short,
@@ -2264,22 +2273,21 @@ export default function TabEditor() {
                       name: t(`tab_editor.durations.d${String(d.value).replace(".", "_")}`, d.label),
                     })}
                     className={cn(
-                      "flex h-8 w-8 items-center justify-center rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                       uniformDuration === d.value
-                        ? "bg-zinc-700 text-zinc-100"
-                        : "text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200",
+                        ? "text-white"
+                        : "text-zinc-500 hover:text-zinc-200",
                     )}>
                     <NoteDurationIcon duration={d.value} size={15} />
-                  </button>
+                  </Button>
                 ))}
-                <div className='mx-1 h-5 w-px bg-zinc-800' />
+                <div aria-hidden className='w-2' />
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
                       onClick={() => setAutoAdvance(!autoAdvance)}
                       aria-pressed={autoAdvance}
                       className={cn(
-                        "flex h-8 items-center justify-center gap-2 rounded px-2.5 text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                        "flex h-8 items-center justify-center gap-2 rounded px-2.5 text-[11px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                         autoAdvance
                           ? "bg-zinc-700 text-zinc-100"
                           : "text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200",
@@ -2319,8 +2327,7 @@ export default function TabEditor() {
                       ? `/tab-editor/publish?edit=${editId}`
                       : "/tab-editor/publish",
                   );
-                }}
-                className='gap-2 bg-zinc-100 text-zinc-900 shadow-none hover:bg-zinc-200'>
+                }}>
                 <span>
                   {editId
                     ? t("tab_editor.save_changes")
@@ -2335,6 +2342,16 @@ export default function TabEditor() {
         </div>
 
         <div className='mx-auto max-w-[1700px] space-y-8 px-4 pb-24 pt-36 md:px-8 lg:pr-80'>
+          <ConfirmDialog
+            open={isClearConfirmOpen}
+            onOpenChange={setIsClearConfirmOpen}
+            title={t("tab_editor.confirm_clear")}
+            cancelLabel={t("cancel")}
+            confirmLabel={t("tab_editor.clear_all")}
+            destructive
+            onConfirm={confirmClearAll}
+          />
+
           {/* GP Import Modal */}
           <AnimatePresence>
             {isGpModalOpen && (
@@ -2389,14 +2406,14 @@ export default function TabEditor() {
           </AnimatePresence>
 
           {/* Live Preview Section */}
-          <section className='overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/40'>
-            <div className='flex items-center gap-2 border-b border-zinc-800 bg-zinc-900/60 px-4 py-2.5'>
+          <section className='space-y-4 overflow-hidden rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
+            <div className='flex items-center gap-2'>
               <div className='h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-500' />
               <h2 className='text-xs font-bold text-zinc-300'>
                 {t("tab_editor.live_preview")}
               </h2>
             </div>
-            <div className='relative p-4'>
+            <div className='relative'>
               <TablatureViewer
                 measures={measures}
                 stringCount={stringCount}
@@ -2411,8 +2428,8 @@ export default function TabEditor() {
           </section>
 
           {/* Editor Grid — all measures side by side in one continuous tab strip */}
-          <section className='overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/40'>
-            <div className='flex items-center gap-3 border-b border-zinc-800 bg-zinc-900/60 px-4 py-2.5'>
+          <section className='space-y-4 overflow-hidden rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
+            <div className='flex items-center gap-3'>
               <h2 className='text-xs font-bold text-zinc-300'>
                 {t("tab_editor.tablature")}
               </h2>
@@ -2421,10 +2438,10 @@ export default function TabEditor() {
               </span>
               {incompleteCount > 0 && (
                 <>
-                  <span className='flex items-center gap-1.5 rounded bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold text-rose-400'>
+                  <Chip color='amber' size='sm'>
                     <LucideTriangleAlert size={11} />
                     {t("tab_editor.incomplete", { count: incompleteCount })}
-                  </span>
+                  </Chip>
                   <button
                     onClick={fixAllMeasureLengths}
                     title={t("tab_editor.fix_all_hint")}
@@ -2434,7 +2451,7 @@ export default function TabEditor() {
                 </>
               )}
             </div>
-            <div className='p-5'>
+            <div>
               <div className='flex'>
                 {/* String labels (standard tuning, highest string on top) */}
                 <div className='mr-2 flex flex-col pt-[25px]'>
@@ -2904,7 +2921,7 @@ export default function TabEditor() {
         </div>
 
         {/* Note Inspector — mouse-friendly fret & articulation editor for the selected cell */}
-        <div className='custom-scrollbar fixed right-6 top-1/2 z-40 hidden max-h-[calc(100vh-8rem)] w-72 -translate-y-1/2 flex-col gap-5 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-900/80 p-5 backdrop-blur-xl lg:flex'>
+        <div className='custom-scrollbar fixed right-6 top-1/2 z-40 hidden max-h-[calc(100vh-8rem)] w-72 -translate-y-1/2 flex-col gap-8 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-900/80 p-5 backdrop-blur-xl lg:flex'>
           {selectedCell ? (
             <>
               <div className='space-y-1'>
@@ -2931,12 +2948,14 @@ export default function TabEditor() {
                 </p>
               </div>
 
-              <div className='space-y-2 border-t border-zinc-800 pt-4'>
+              <div className='space-y-2'>
                 <span className='text-[11px] font-semibold text-zinc-500'>
                   {isBlockSelection ? t("tab_editor.frets") : t("tab_editor.fret")}
                 </span>
                 <div className='flex items-center gap-2'>
-                  <button
+                  <Button
+                    variant='subtle'
+                    size='icon'
                     onClick={() => nudgeSelectedFret(-1)}
                     disabled={
                       isBlockSelection ? selectedNoteCount === 0 : !selectedNote
@@ -2946,9 +2965,9 @@ export default function TabEditor() {
                         ? t("tab_editor.transpose_down")
                         : t("tab_editor.fret_down")
                     }
-                    className='flex h-10 w-10 items-center justify-center rounded border border-zinc-800 bg-zinc-800/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-zinc-700'>
+                    className='h-10 w-10 shrink-0 disabled:opacity-30'>
                     <LucideMinus size={16} />
-                  </button>
+                  </Button>
                   <input
                     type='number'
                     min={0}
@@ -2960,7 +2979,9 @@ export default function TabEditor() {
                     }
                     className='h-10 w-full rounded border border-zinc-800 bg-zinc-950/60 text-center text-xl font-black text-zinc-100 outline-none focus-visible:ring-1 focus-visible:ring-ring'
                   />
-                  <button
+                  <Button
+                    variant='subtle'
+                    size='icon'
                     onClick={() => nudgeSelectedFret(1)}
                     disabled={isBlockSelection && selectedNoteCount === 0}
                     aria-label={
@@ -2968,33 +2989,35 @@ export default function TabEditor() {
                         ? t("tab_editor.transpose_up")
                         : t("tab_editor.fret_up")
                     }
-                    className='flex h-10 w-10 items-center justify-center rounded border border-zinc-800 bg-zinc-800/60 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-zinc-700'>
+                    className='h-10 w-10 shrink-0 disabled:opacity-30'>
                     <LucidePlus size={16} />
-                  </button>
+                  </Button>
                 </div>
                 <div className='grid grid-cols-6 gap-1.5'>
                   {QUICK_FRETS.map((f) => (
-                    <button
+                    <Button
                       key={f}
+                      type='button'
+                      variant='subtle'
+                      size='sm'
                       onClick={() => setSelectedFret(f)}
+                      aria-pressed={!isBlockSelection && selectedNote?.fret === f}
                       className={cn(
-                        "flex h-7 items-center justify-center rounded border text-[11px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                        !isBlockSelection && selectedNote?.fret === f
-                          ? "border-zinc-600 bg-zinc-700 text-zinc-100"
-                          : "border-zinc-800 bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
+                        "px-0",
+                        !isBlockSelection && selectedNote?.fret === f && "bg-white/25 text-white hover:bg-white/25",
                       )}>
                       {f}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
 
-              <div className='space-y-2 border-t border-zinc-800 pt-4'>
+              <div className='space-y-2'>
                 <div className='flex items-baseline justify-between gap-2'>
                   <span className='text-[11px] font-semibold text-zinc-500'>
                     {t("tab_editor.note_value")}
                   </span>
-                  <span className='text-[10px] font-semibold text-zinc-400'>
+                  <span className='text-[11px] font-semibold text-zinc-400'>
                     {selectedDuration === null
                       ? t("tab_editor.mixed")
                       : durationLabel(selectedDuration, t)}
@@ -3002,22 +3025,24 @@ export default function TabEditor() {
                 </div>
                 <div className='grid grid-cols-6 gap-1'>
                   {DURATIONS.map((d) => (
-                    <button
+                    <Button
                       key={d.value}
+                      type='button'
+                      variant='subtle'
+                      size='icon'
                       onClick={() => applyDurationToSelection(d.value)}
+                      aria-pressed={selectedDuration === d.value}
                       title={t("tab_editor.duration_title", {
                         name: t(`tab_editor.durations.d${String(d.value).replace(".", "_")}`, d.label),
                         short: d.short,
                       })}
                       aria-label={t(`tab_editor.durations.d${String(d.value).replace(".", "_")}`, d.label)}
                       className={cn(
-                        "flex h-9 items-center justify-center rounded border transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                        selectedDuration === d.value
-                          ? "border-zinc-600 bg-zinc-700 text-zinc-100"
-                          : "border-zinc-800 bg-zinc-800/40 text-zinc-500 hover:bg-zinc-700 hover:text-zinc-200",
+                        "w-auto",
+                        selectedDuration === d.value && "bg-white/25 text-white hover:bg-white/25",
                       )}>
                       <NoteDurationIcon duration={d.value} size={16} />
-                    </button>
+                    </Button>
                   ))}
                 </div>
                 <div className='flex gap-1.5'>
@@ -3033,21 +3058,24 @@ export default function TabEditor() {
                     <span className='text-sm font-black leading-none'>·</span>
                     {t("tab_editor.dotted")}
                   </button>
-                  <button
+                  <Button
+                    type='button'
+                    variant='subtle'
+                    size='sm'
                     onClick={restSelection}
                     title={t(
                       isBlockSelection
                         ? "tab_editor.rest_title_block"
                         : "tab_editor.rest_title",
                     )}
-                    className='flex h-8 flex-1 items-center justify-center gap-2 rounded bg-zinc-800/40 text-[11px] font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-zinc-200'>
+                    className='flex-1'>
                     <RestIcon duration={selectedDuration ?? 1} size={13} />
                     {t("tab_editor.rest")}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
-              <div className='space-y-2 border-t border-zinc-800 pt-4'>
+              <div className='space-y-2'>
                 <span className='text-[11px] font-semibold text-zinc-500'>
                   {t("tab_editor.articulation")}
                 </span>
@@ -3070,7 +3098,7 @@ export default function TabEditor() {
                           ? a.activeClass
                           : "border border-zinc-800 bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
                       )}>
-                      <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded bg-zinc-950/60 text-[10px] font-black'>
+                      <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded bg-zinc-950/60 text-[11px] font-bold'>
                         {a.letter}
                       </span>
                       {t(`tab_editor.articulations.${a.type}`, a.label)}
@@ -3086,20 +3114,21 @@ export default function TabEditor() {
                       className='overflow-hidden'>
                       <div className='flex gap-1 pt-1.5'>
                         {BEND_AMOUNTS.map((b) => (
-                          <button
+                          <Button
                             key={b.value}
+                            type='button'
+                            variant='subtle'
+                            size='sm'
                             title={t(`tab_editor.bends.b${String(b.value).replace(".", "_")}`, b.label)}
                             onClick={() => setSelectedBendAmount(b.value)}
                             className={cn(
-                              "flex h-7 flex-1 items-center justify-center rounded text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                              "flex-1 px-0",
                               bentNotes.every(
                                 (note) => (note.bendSemitones ?? 2) === b.value,
-                              )
-                                ? "bg-cyan-500/20 text-cyan-400 ring-1 ring-cyan-500/40"
-                                : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
+                              ) && "bg-white/25 text-white hover:bg-white/25",
                             )}>
                             {b.short}
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     </motion.div>
@@ -3107,12 +3136,12 @@ export default function TabEditor() {
                 </AnimatePresence>
               </div>
 
-              <div className='space-y-2 border-t border-zinc-800 pt-4'>
+              <div className='space-y-2'>
                 <div className='flex items-baseline justify-between gap-2'>
                   <span className='text-[11px] font-semibold text-zinc-500'>
                     {t("tab_editor.picking")}
                   </span>
-                  <span className='text-[10px] font-semibold text-zinc-500'>
+                  <span className='text-[11px] font-semibold text-zinc-500'>
                     Shift + ↓ / ↑
                   </span>
                 </div>
@@ -3141,34 +3170,42 @@ export default function TabEditor() {
                       {t(`tab_editor.pick.${p.value}`, p.label)}
                     </button>
                   ))}
-                  <button
+                  <Button
+                    variant='subtle'
+                    size='icon'
                     onClick={removePickStroke}
                     disabled={!selectedPickStroke}
                     title={t("tab_editor.remove_pick")}
                     aria-label={t("tab_editor.remove_pick")}
-                    className='flex h-9 w-9 items-center justify-center rounded bg-zinc-800/40 text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-zinc-700 hover:text-zinc-200'>
+                    className='shrink-0 text-zinc-400 disabled:opacity-30'>
                     <LucideEraser size={13} />
-                  </button>
+                  </Button>
                 </div>
-                <button
+                <Button
+                  type='button'
+                  variant='subtle'
+                  size='sm'
                   onClick={applyAlternatePicking}
-                  className='flex w-full items-center justify-center gap-2 rounded bg-zinc-800/40 py-2 text-[11px] font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700 hover:text-zinc-200'>
+                  className='w-full'>
                   <PickStrokeIcon stroke='down' size={13} />
                   <PickStrokeIcon stroke='up' size={13} />
                   {isBlockSelection
                     ? t("tab_editor.alternate_selection")
                     : t("tab_editor.alternate_measure")}
-                </button>
+                </Button>
               </div>
 
-              <div className='space-y-2 border-t border-zinc-800 pt-4'>
+              <div className='space-y-2'>
                 <span className='text-[11px] font-semibold text-zinc-500'>
                   {t("tab_editor.time_signature")}
                 </span>
                 <div className='grid grid-cols-6 gap-1'>
                   {TIME_SIGNATURES.map((ts) => (
-                    <button
+                    <Button
                       key={`${ts[0]}/${ts[1]}`}
+                      type='button'
+                      variant='subtle'
+                      size='sm'
                       onClick={() =>
                         updateTimeSignature(selectedCell.measureIdx, ts)
                       }
@@ -3177,43 +3214,43 @@ export default function TabEditor() {
                         n: selectedCell.measureIdx + 1,
                       })}
                       className={cn(
-                        "flex h-7 items-center justify-center rounded text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                        "px-0",
                         selectedMeasure?.timeSignature[0] === ts[0] &&
-                          selectedMeasure?.timeSignature[1] === ts[1]
-                          ? "bg-zinc-700 text-zinc-100"
-                          : "bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
+                          selectedMeasure?.timeSignature[1] === ts[1] &&
+                          "bg-white/25 text-white hover:bg-white/25",
                       )}>
                       {ts[0]}/{ts[1]}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
 
-              <div className='space-y-2 border-t border-zinc-800 pt-4'>
+              <div className='space-y-2'>
                 <span className='text-[11px] font-semibold text-zinc-500'>
                   {t("tab_editor.measure_steps_label")}
                 </span>
                 <div className='flex gap-1'>
                   {STEP_OPTIONS.map((s) => (
-                    <button
+                    <Button
                       key={s.value}
+                      type='button'
+                      variant='subtle'
+                      size='sm'
                       onClick={() =>
                         updateMeasureSteps(selectedCell.measureIdx, s.value)
                       }
                       title={t(`tab_editor.steps.${s.value}`, s.title)}
                       className={cn(
-                        "flex h-7 flex-1 items-center justify-center rounded border text-[10px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                        "flex-1 px-0",
                         measures[selectedCell.measureIdx]?.beats.length ===
-                          s.value
-                          ? "border-zinc-600 bg-zinc-700 text-zinc-100"
-                          : "border-zinc-800 bg-zinc-800/40 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200",
+                          s.value && "bg-white/25 text-white hover:bg-white/25",
                       )}>
                       {s.value}
-                    </button>
+                    </Button>
                   ))}
                 </div>
                 {selectedMeasure && !isMeasureComplete(selectedMeasure) && (
-                  <div className='space-y-2 rounded bg-rose-500/10 p-2'>
+                  <div className='space-y-2 rounded-lg bg-rose-500/10 p-2'>
                     <p className='flex items-start gap-2 text-[11px] font-semibold leading-relaxed text-rose-400'>
                       <LucideTriangleAlert
                         size={13}
@@ -3233,31 +3270,40 @@ export default function TabEditor() {
                         })}
                       </span>
                     </p>
-                    <button
+                    <Button
+                      type='button'
+                      variant='subtle'
+                      size='sm'
                       onClick={() => fixMeasureLength(selectedCell.measureIdx)}
                       title={t("tab_editor.fill_hint")}
-                      className='w-full rounded bg-rose-500/20 py-1.5 text-[11px] font-bold text-rose-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-rose-500/30'>
+                      className='w-full bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 hover:text-rose-200'>
                       {t("tab_editor.fill_with_rests")}
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
 
-              <div className='flex gap-1.5 border-t border-zinc-800 pt-4'>
-                <button
+              <div className='flex flex-col gap-2'>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='sm'
                   onClick={clearSelectedNotesInGrid}
                   disabled={selectedNoteCount === 0}
-                  className='flex flex-1 items-center justify-center gap-2 rounded border border-red-500/20 bg-red-500/10 py-2 text-[11px] font-bold text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-red-500/20'>
+                  className='w-full'>
                   <LucideEraser size={13} />
                   {t("tab_editor.clear_notes", { count: selectedNoteCount })}
-                </button>
-                <button
+                </Button>
+                <Button
+                  type='button'
+                  variant='destructive'
+                  size='sm'
                   onClick={() => removeMeasure(selectedCell.measureIdx)}
                   disabled={measures.length === 1}
-                  className='flex flex-1 items-center justify-center gap-2 rounded border border-red-500/20 bg-red-500/10 py-2 text-[11px] font-bold text-red-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 hover:bg-red-500/20'>
+                  className='w-full'>
                   <LucideTrash2 size={13} />
                   {t("tab_editor.delete_measure")}
-                </button>
+                </Button>
               </div>
             </>
           ) : (
@@ -3352,7 +3398,7 @@ export default function TabEditor() {
                 onClick={handleCopySelection}
                 className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
                 <span>{t("tab_editor.copy")}</span>
-                <span className='text-[10px] text-zinc-500'>Ctrl+C</span>
+                <span className='text-[11px] text-zinc-500'>Ctrl+C</span>
               </button>
               <button
                 onClick={() => {
@@ -3361,7 +3407,7 @@ export default function TabEditor() {
                 }}
                 className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
                 <span>{t("tab_editor.paste")}</span>
-                <span className='text-[10px] text-zinc-500'>Ctrl+V</span>
+                <span className='text-[11px] text-zinc-500'>Ctrl+V</span>
               </button>
               <button
                 onClick={() => {
@@ -3370,13 +3416,13 @@ export default function TabEditor() {
                 }}
                 className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
                 <span>{t("tab_editor.cut")}</span>
-                <span className='text-[10px] text-zinc-500'>Ctrl+X</span>
+                <span className='text-[11px] text-zinc-500'>Ctrl+X</span>
               </button>
               <button
                 onClick={handleDeleteSelection}
                 className='flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs font-semibold text-red-400 transition-colors hover:bg-red-500/10'>
                 <span>{t("tab_editor.clear_area")}</span>
-                <span className='text-[10px] opacity-60'>Del</span>
+                <span className='text-[11px] opacity-60'>Del</span>
               </button>
             </motion.div>
           )}

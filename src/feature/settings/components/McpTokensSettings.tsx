@@ -1,13 +1,8 @@
 import { Button } from "assets/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "assets/components/ui/card";
+import { Card } from "assets/components/ui/card";
 import { Input } from "assets/components/ui/input";
 import { Switch } from "assets/components/ui/switch";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { McpConnectGuide } from "feature/settings/components/McpConnectGuide";
 import { McpSupporterNotice } from "feature/settings/components/McpSupporterNotice";
 import {
@@ -37,7 +32,7 @@ const CopyButton = ({ value }: { value: string }) => {
   };
   return (
     <Button variant='ghost' size='sm' onClick={copy} className='shrink-0'>
-      {copied ? <Check className='h-4 w-4' /> : <Copy className='h-4 w-4' />}
+      {copied ? <Check /> : <Copy />}
       {copied ? t("mcp.copied") : t("mcp.copy")}
     </Button>
   );
@@ -139,11 +134,8 @@ export const McpTokensSettings = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{t("mcp.title")}</CardTitle>
-        <CardDescription>{t("mcp.subtitle")}</CardDescription>
-      </CardHeader>
-      <CardContent className='space-y-8'>
+      <SectionHeader title={t("mcp.title")} description={t("mcp.subtitle")} />
+      <div className='space-y-8'>
         {hasAccess === false && <McpSupporterNotice />}
         {loadFailed && (
           <p className='text-sm text-zinc-400'>{t("mcp.error")}</p>
@@ -285,7 +277,7 @@ export const McpTokensSettings = () => {
             ))}
           </div>
         )}
-      </CardContent>
+      </div>
     </Card>
   );
 };

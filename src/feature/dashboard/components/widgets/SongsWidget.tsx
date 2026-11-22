@@ -25,7 +25,7 @@ export const SongsWidget = () => {
       />
 
       {isError ? (
-        <p className='rounded-lg bg-zinc-900/40 p-4 text-sm text-zinc-400'>
+        <p className='rounded-lg bg-zinc-800/40 p-4 text-sm text-zinc-400'>
           {t("songs.error")}
         </p>
       ) : isLoading || !songs ? (

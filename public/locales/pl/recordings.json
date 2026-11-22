@@ -5,7 +5,11 @@
     "comment_added": "Komentarz dodany!",
     "comment_failed": "Nie udało się dodać komentarza.",
     "logged_out": "Musisz być zalogowany.",
-    "bad_url": "Wpisz prawidłowy link do YouTube."
+    "bad_url": "Wpisz prawidłowy link do YouTube.",
+    "updated": "Nagranie zaktualizowane.",
+    "update_failed": "Nie udało się zaktualizować nagrania.",
+    "deleted": "Nagranie usunięte.",
+    "delete_failed": "Nie udało się usunąć nagrania."
   },
   "modal": {
     "edit_title": "Edytuj nagranie",
@@ -52,7 +56,14 @@
     "subtitle": "Odsłuchuj i udostępniaj swoje sesje ćwiczeń",
     "add": "Dodaj nagranie",
     "all": "Wszystkie nagrania",
-    "mine": "Moje nagrania"
+    "mine": "Moje nagrania",
+    "count_one": "{{count}} nagranie",
+    "count_few": "{{count}} nagrania",
+    "count_many": "{{count}} nagrań",
+    "count_other": "{{count}} nagrania",
+    "sort_newest": "Najnowsze",
+    "sort_popular": "Najpopularniejsze",
+    "sort_label": "Sortuj nagrania"
   },
   "viewer": {
     "not_found": "Nie znaleziono nagrania",

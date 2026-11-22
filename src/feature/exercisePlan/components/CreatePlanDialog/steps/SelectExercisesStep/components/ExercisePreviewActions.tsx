@@ -63,9 +63,9 @@ export function AddToPlanMenu({ exercise, userId }: AddToPlanMenuProps) {
           disabled={isPending}
           className='gap-1.5 text-zinc-300 hover:bg-white/5 hover:text-zinc-100'>
           {isPending ? (
-            <Loader2 className='h-3.5 w-3.5 animate-spin' />
+            <Loader2 className='animate-spin' />
           ) : (
-            <ListPlus className='h-3.5 w-3.5' />
+            <ListPlus />
           )}
           {t("add_to_plan")}
         </Button>

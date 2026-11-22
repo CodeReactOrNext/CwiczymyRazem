@@ -440,7 +440,7 @@ export function AnswerTile({
       {subtitle !== undefined && (
         <span
           className={cn(
-            "text-xs font-medium leading-tight tracking-wide opacity-70 transition-opacity duration-base",
+            "text-xs font-medium leading-tight opacity-70 transition-opacity duration-base",
             state === "idle" && "invisible opacity-0",
           )}>
           {subtitle}

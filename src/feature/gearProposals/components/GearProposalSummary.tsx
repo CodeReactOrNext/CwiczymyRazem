@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { Chip, getChipCustomStyle } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
@@ -17,7 +18,6 @@ import { safeImageUrl } from "feature/gearProposals/utils/gearProposal.utils";
 import { GEAR_PROPOSAL_COST } from "feature/supporterPanel/constants/supporterPanel.constants";
 import { useTranslation } from "hooks/useTranslation";
 import { ImageOff } from "lucide-react";
-import Link from "next/link";
 
 interface GearProposalSummaryProps {
   draft: GearDraft;
@@ -48,7 +48,7 @@ export const GearProposalSummary = ({
   const affordable = tokensLeft >= GEAR_PROPOSAL_COST;
 
   return (
-    <aside className='space-y-6 rounded-lg bg-zinc-900/40 p-5 sm:p-6 lg:sticky lg:top-6'>
+    <aside className='space-y-6 rounded-lg bg-zinc-800/40 p-5 sm:p-6 lg:sticky lg:top-6'>
       <div className='flex items-start gap-4'>
         <TierPlate color={styles.baseColor} size={92} className='shrink-0'>
           {preview ? (
@@ -163,9 +163,11 @@ export const GearProposalSummary = ({
               : t("panel.gear.tokens_left", { count: tokensLeft })}
         </p>
 
-        <Button asChild variant='ghost' className='w-full text-zinc-400'>
-          <Link href={GEAR_BOARD_HREF}>{t("panel.gear.back_to_board")}</Link>
-        </Button>
+        <BackLink
+          href={GEAR_BOARD_HREF}
+          label={t("panel.gear.back_to_board")}
+          className='w-full'
+        />
       </div>
     </aside>
   );

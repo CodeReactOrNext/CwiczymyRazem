@@ -292,7 +292,7 @@ export const CaseOpeningModal = ({
             <motion.h2
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-2xl font-black capitalize tracking-[0.3em] text-zinc-300 drop-shadow-lg"
+              className="text-2xl font-bold text-zinc-300"
             >
               {caseDef ? labels.caseName(caseDef) : t("opening.title")}
             </motion.h2>
@@ -374,7 +374,7 @@ export const CaseOpeningModal = ({
                                   slot: t(`builder.slots.${item.def.slot}`, SLOT_LABELS[item.def.slot]),
                                 })}
                         </span>
-                        <span className="text-[11px] font-bold capitalize tracking-wide text-center leading-tight truncate w-full" style={{ color: readableText(rs.baseColor) }}>
+                        <span className="text-[11px] font-bold text-center leading-tight truncate w-full" style={{ color: readableText(rs.baseColor) }}>
                           {item.def.name}
                         </span>
                       </div>
@@ -398,7 +398,7 @@ export const CaseOpeningModal = ({
                     initial={{ opacity: 0, y: 14, scale: 0.85 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ type: "spring", stiffness: 220, damping: 16, delay: 0.15 }}
-                    className="font-display text-3xl sm:text-4xl font-black capitalize tracking-wide"
+                    className="font-display text-3xl sm:text-4xl font-black tracking-wide"
                     style={{
                       color: readableText(rarityStyles.baseColor),
                       textShadow: `0 0 32px ${rarityStyles.baseColor}88`,
@@ -513,15 +513,17 @@ export const CaseOpeningModal = ({
                         router.replace({ query: { ...router.query, tab: "builder" } }, undefined, { shallow: true });
                       }}
                       disabled={isBusy}
-                      className="h-12 w-full bg-white text-sm font-medium tracking-widest text-zinc-900 hover:bg-zinc-200 disabled:opacity-50"
+                      size="lg"
+                      className="w-full"
                     >
                       {t("opening.open_in_builder")}
                     </Button>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       onClick={onClose}
                       disabled={isBusy}
-                      className="h-12 w-full border-zinc-700 bg-zinc-900 text-sm font-medium tracking-widest text-white hover:bg-zinc-800 disabled:opacity-50"
+                      size="lg"
+                      className="w-full"
                     >
                       {t("opening.keep")}
                     </Button>
@@ -532,7 +534,8 @@ export const CaseOpeningModal = ({
                     <Button
                       onClick={handleMerge}
                       disabled={isBusy}
-                      className="w-full bg-white hover:bg-zinc-200 text-zinc-900 font-medium capitalize tracking-widest h-12 text-sm disabled:opacity-50"
+                      size="lg"
+                      className="w-full"
                     >
                       {isMerging
                         ? t("pack.merging")
@@ -547,24 +550,27 @@ export const CaseOpeningModal = ({
                     <Button
                       onClick={() => equip({ guitarId: guitar.id, year: result?.newItem?.year, country: result?.newItem?.country }, { onSuccess: onClose })}
                       disabled={isBusy}
-                      className="w-full bg-white hover:bg-zinc-200 text-zinc-900 font-medium capitalize tracking-widest h-12 text-sm disabled:opacity-50"
+                      size="lg"
+                      className="w-full"
                     >
                       {t("opening.equip_now")}
                     </Button>
                   )}
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={onClose}
                     disabled={isBusy}
-                    className="w-full border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-white font-medium capitalize tracking-widest h-12 text-sm disabled:opacity-50"
+                    size="lg"
+                    className="w-full"
                   >
                     {winDef.kind === "guitar" ? t("opening.keep_in_arsenal") : t("opening.add_to_collection")}
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={handleSell}
                     disabled={isBusy}
-                    className="w-full border-amber-600/40 bg-amber-950/30 hover:bg-amber-900/40 text-amber-300 font-medium capitalize tracking-widest h-12 text-sm disabled:opacity-50"
+                    size="lg"
+                    className="w-full bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200"
                   >
                     {isSelling ? (
                       t("common.selling")
@@ -583,10 +589,11 @@ export const CaseOpeningModal = ({
 
                   {onOpenAgain && caseDef && (
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       onClick={() => onOpenAgain(openAgainPayment?.kind === "token")}
                       disabled={isBusy || !openAgainPayment}
-                      className="h-12 w-full border-zinc-700 bg-zinc-900 text-sm font-medium tracking-widest text-white hover:bg-zinc-800 disabled:opacity-50"
+                      size="lg"
+                      className="w-full"
                     >
                       {isOpeningAgain ? (
                         t("cases.opening")

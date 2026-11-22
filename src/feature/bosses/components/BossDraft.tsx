@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, m } from "framer-motion";
 import type { Translate } from "lib/i18n/translate";
@@ -134,14 +135,15 @@ export const BossDraft = ({ boss }: { boss: BossDefinition }) => {
                   </h2>
                   <PlayerStatus fight={fight} t={t} />
                 </div>
-                <button
+                <Button
                   type='button'
+                  variant='ghost'
                   onClick={reroll}
                   disabled={fight.rerollsLeft <= 0}
-                  className='inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-900 px-3 text-sm text-zinc-200 transition-colors hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40'>
+                  className='px-3'>
                   <Shuffle className='h-4 w-4 text-zinc-400' aria-hidden />
                   {t("draft.reroll", { count: fight.rerollsLeft })}
-                </button>
+                </Button>
               </header>
 
               <PhaseBriefing fight={fight} t={t} />

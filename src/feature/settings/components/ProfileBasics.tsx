@@ -1,11 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "assets/components/ui/card";
+import { Card } from "assets/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +10,7 @@ import {
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { Slider } from "assets/components/ui/slider";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import Avatar from "components/UI/Avatar";
 import {
   selectCurrentUserStats,
@@ -130,11 +125,8 @@ const ProfileBasics = () => {
   return (
     <>
       <Card className="h-full">
-        <CardHeader>
-          <CardTitle>{t("settings:profile_settings")}</CardTitle>
-          <CardDescription>{t("settings:profile_basics.description")}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-8">
+        <SectionHeader title={t("settings:profile_settings")} description={t("settings:profile_basics.description")} />
+        <div className="space-y-8">
           <div className="flex flex-col md:flex-row gap-6 items-start">
 
             <div className="flex flex-col items-center space-y-3 min-w-[150px]">
@@ -184,11 +176,11 @@ const ProfileBasics = () => {
                 isFetching ||
                 (!imageUpload && displayName === currentUserName)
               }>
-              {isFetching && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isFetching && <Loader2 className="animate-spin" />}
               {t("settings:save")}
             </Button>
           </div>
-        </CardContent>
+        </div>
       </Card>
 
 

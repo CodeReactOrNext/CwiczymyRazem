@@ -837,5 +837,6 @@
     "show_in_folder": "Mostrar en la carpeta",
     "delete": "Mover a la papelera",
     "untitled": "Grabación"
-  }
+  },
+  "exam_click_failed": "{{limit}} clics erróneos: examen suspendido."
 }

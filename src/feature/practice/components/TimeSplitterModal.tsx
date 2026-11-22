@@ -53,7 +53,7 @@ export const TimeSplitterModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className='flex flex-col gap-0 border-0 bg-zinc-950 text-zinc-100 sm:max-w-xl'>
+      <DialogContent className='flex flex-col gap-0 bg-zinc-950 text-zinc-100'>
         <DialogHeader className='space-y-2 pr-10 text-left'>
           <DialogTitle className='text-lg font-semibold'>{t("time_splitter.title")}</DialogTitle>
           <DialogDescription className='text-sm leading-relaxed text-zinc-400'>
@@ -155,6 +155,7 @@ export const TimeSplitterModal = ({
         <div className='mt-8 flex flex-col-reverse gap-2 sm:flex-row sm:justify-between'>
           <Button
             variant='ghost'
+            size='lg'
             onClick={onCancel}
             disabled={isLoading}
             className='text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-100'>
@@ -162,8 +163,8 @@ export const TimeSplitterModal = ({
           </Button>
           <Button
             onClick={() => onConfirm(hearingTime, techniqueTime, markAsLearned)}
-            loading={isLoading}
-            className='bg-white text-zinc-950 shadow-none hover:bg-zinc-200'>
+            size='lg'
+            loading={isLoading}>
             {isLoading ? t("time_splitter.saving") : t("time_splitter.confirm")}
           </Button>
         </div>

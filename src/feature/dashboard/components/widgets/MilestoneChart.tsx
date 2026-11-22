@@ -9,11 +9,12 @@ import {
   dayMeetsRule,
   milestoneStreakDays,
 } from "feature/dashboard/utils/milestoneWeek";
-import { Check, X } from "lucide-react";
+import { Check } from "lucide-react";
 import type { ReactNode } from "react";
 
 import {
   CHART_H,
+  dayTrack,
   MilestoneDayLabels,
   milestoneDayTitle,
   MilestoneWeek,
@@ -22,42 +23,44 @@ import {
 interface ChartProps {
   days: MilestoneDay[];
   rule: MilestoneDayRule;
-  /** The tier's own colour — what a day in the running streak is tinted with. */
-  color: string;
 }
+
+/** A running streak is tinted the app's streak orange, not the tier's own colour. */
+const STREAK = "#fb923c";
+const STREAK_TINT = "rgba(249,115,22,0.16)";
+/** A day that covered all four categories — lifted, not coloured. */
+const FULL_DAY = "rgba(255,255,255,0.09)";
 
 /** The day cell every non-bar chart is built from. */
 const Tile = ({
   day,
   rule,
   met,
-  lit,
+  tint,
   joinNext = false,
-  color,
   children,
 }: {
   day: MilestoneDay;
   rule: MilestoneDayRule;
   met: boolean;
-  /** Part of the streak that is running, or a day that covered everything. */
-  lit: boolean;
+  /** Background for a day in the running streak or a full day; none = the plain track. */
+  tint?: string;
   /** The run carries on into tomorrow — a band bridges the gap so the streak reads as one piece. */
   joinNext?: boolean;
-  color: string;
   children?: ReactNode;
 }) => (
   <div
     title={milestoneDayTitle(day, rule, met)}
-    className='relative flex flex-1 flex-col items-center justify-center gap-[3px] rounded-sm px-1'
+    className='relative flex flex-1 flex-col items-center justify-center gap-[3px] rounded px-1'
     style={{
       height: CHART_H,
-      backgroundColor: lit ? `${color}26` : "rgba(255,255,255,0.03)",
+      backgroundColor: tint ?? dayTrack(day),
     }}>
     {joinNext && (
       <span
         aria-hidden
         className='absolute -right-1 top-1/2 h-3 w-1 -translate-y-1/2'
-        style={{ backgroundColor: `${color}26` }}
+        style={{ backgroundColor: tint }}
       />
     )}
     {children}
@@ -66,10 +69,10 @@ const Tile = ({
 
 /**
  * The streak tiers' week: one tile a day, tinted along the run the player is
- * currently on. A cleared day carries the tick, a short one its minutes and a
- * missed one the cross that broke the run.
+ * currently on. A cleared day carries the tick, a short one its minutes; a
+ * missed one is left empty — the gap in the tint already shows the break.
  */
-const StreakWeek = ({ days, rule, color }: ChartProps) => {
+const StreakWeek = ({ days, rule }: ChartProps) => {
   const streak = milestoneStreakDays(days, rule);
 
   return (
@@ -77,7 +80,6 @@ const StreakWeek = ({ days, rule, color }: ChartProps) => {
       <div className='flex gap-1'>
         {days.map((day, index) => {
           const met = !day.isFuture && dayMeetsRule(day, rule);
-          const missed = !met && !day.isFuture && !day.isToday;
 
           return (
             <Tile
@@ -85,21 +87,18 @@ const StreakWeek = ({ days, rule, color }: ChartProps) => {
               day={day}
               rule={rule}
               met={met}
-              lit={streak[index]}
-              joinNext={streak[index] && !!streak[index + 1]}
-              color={color}>
+              tint={streak[index] ? STREAK_TINT : undefined}
+              joinNext={streak[index] && !!streak[index + 1]}>
               {met ? (
                 <Check
                   size={16}
                   strokeWidth={3}
-                  style={{ color: streak[index] ? color : "#71717a" }}
+                  style={{ color: streak[index] ? STREAK : "#a1a1aa" }}
                 />
               ) : day.minutes > 0 ? (
                 <span className='text-xs font-semibold tabular-nums text-zinc-400'>
                   {day.minutes}
                 </span>
-              ) : missed ? (
-                <X size={13} className='text-zinc-600' />
               ) : null}
             </Tile>
           );
@@ -155,7 +154,7 @@ const CategoryDots = ({
  * that day actually touched, so a full day and a lopsided one cannot look
  * alike the way two equally tall bars would.
  */
-const CategoryWeek = ({ days, rule, color }: ChartProps) => (
+const CategoryWeek = ({ days, rule }: ChartProps) => (
   <div className='w-full'>
     <div className='flex gap-1'>
       {days.map((day) => {
@@ -166,8 +165,7 @@ const CategoryWeek = ({ days, rule, color }: ChartProps) => (
             day={day}
             rule={rule}
             met={met}
-            lit={met}
-            color={color}>
+            tint={met ? FULL_DAY : undefined}>
             <CategoryDots day={day} rule={rule} />
           </Tile>
         );
@@ -184,7 +182,7 @@ const CategoryWeek = ({ days, rule, color }: ChartProps) => (
  * far each one got rather than whether it arrived — on goals this long, the
  * useful question is which category is about to break the run.
  */
-const CategoryStreakWeek = ({ days, rule, color }: ChartProps) => {
+const CategoryStreakWeek = ({ days, rule }: ChartProps) => {
   const streak = milestoneStreakDays(days, rule);
 
   return (
@@ -199,9 +197,8 @@ const CategoryStreakWeek = ({ days, rule, color }: ChartProps) => {
               day={day}
               rule={rule}
               met={met}
-              lit={streak[index]}
-              joinNext={streak[index] && !!streak[index + 1]}
-              color={color}>
+              tint={streak[index] ? STREAK_TINT : undefined}
+              joinNext={streak[index] && !!streak[index + 1]}>
               {PRACTICE_CATEGORIES.map((cat) => {
                 const filled = Math.min(
                   day.categories[cat.k] / rule.goalMin,

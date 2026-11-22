@@ -1,4 +1,4 @@
-import { buttonVariants,PRESSABLE } from "assets/components/ui/button";
+import { buttonVariants } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -27,11 +27,11 @@ import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
 import { Lock, Wrench, X } from "lucide-react";
 import { useState } from "react";
 
-import { SectionLabel, sectionLabelClass } from "../SectionLabel";
+import { SectionLabel } from "../SectionLabel";
 import { BuildLadder } from "./BuildLadder";
 import { BuildPanel } from "./BuildPanel";
-import { CostTable } from "./CostTable";
-import { MaterialsBill } from "./MaterialsBill";
+import { CostChips } from "./CostChips";
+import { GO_KEY } from "./goKey";
 import { ModPicker } from "./ModPicker";
 import { ModRemoveDialog } from "./ModRemoveDialog";
 import { RestorePanel } from "./RestorePanel";
@@ -278,7 +278,7 @@ export const WorkshopJobModal = ({
         onEscapeKeyDown={(e) => isPending && e.preventDefault()}
         onInteractOutside={(e) => isPending && e.preventDefault()}
         className={cn(
-          "flex max-h-[100dvh] flex-col gap-7 border-0 bg-zinc-900 p-6 sm:max-h-[90vh] sm:overflow-y-auto sm:p-7",
+          "flex max-h-[100dvh] flex-col gap-7 bg-zinc-900 p-6 sm:max-h-[90vh] sm:overflow-y-auto sm:p-7",
           // MobileBottomNav (z-[100]) floats over this dialog below lg; leave room
           // under the action buttons so they can scroll clear of it.
           "pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-7",
@@ -307,7 +307,7 @@ export const WorkshopJobModal = ({
                 className={
                   captionIsSentence
                     ? "text-sm text-zinc-400"
-                    : sectionLabelClass
+                    : "text-sm font-semibold text-zinc-400"
                 }>
                 {caption}
               </DialogDescription>
@@ -329,14 +329,14 @@ export const WorkshopJobModal = ({
             <div className='flex flex-col gap-3 sm:flex-row-reverse'>
               <button
                 onClick={close}
-                className={cn(PRESSABLE, "rounded-lg bg-zinc-100 px-5 py-3.5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-white sm:flex-1 border-b-black/25")}>
+                className={cn(buttonVariants({ size: "lg" }), "sm:flex-1")}>
                 {t("mods.done")}
               </button>
               {nextJobs.map((next) => (
                 <button
                   key={next.job}
                   onClick={() => goTo(next.job)}
-                  className={cn(PRESSABLE, "rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-zinc-700 hover:text-white sm:flex-1 border-b-black/30")}>
+                  className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "sm:flex-1")}>
                   {next.label}
                 </button>
               ))}
@@ -351,35 +351,38 @@ export const WorkshopJobModal = ({
               toLevel={entry.level + repairQuote.gain}
             />
 
-            <MaterialsBill
-              recipe={repairQuote.recipe}
-              job={t("workshop.restoration")}
-              readyLabel={t("workshop.ready_to_restore")}
+            {/* The bill as chips — "have/need" per part, amber when short,
+                and "Make" where the tier below can cover the gap. */}
+            <CostChips
+              lines={repairQuote.recipe}
+              wallet={wallet}
+              playerFame={fame}
+              busy={isPending}
             />
 
             <div className='flex flex-col gap-3 sm:flex-row'>
               <button
                 onClick={close}
                 disabled={isPending}
-                className={cn(PRESSABLE, "rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44 border-b-black/30")}>
+                className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "sm:w-44")}>
                 {t("common.cancel")}
               </button>
               <button
                 onClick={runRepair}
                 disabled={!repairQuote.canRepair || isPending}
-                className={cn(PRESSABLE, "border-b-black/30", 
-                  "flex flex-1 items-center justify-center gap-2.5 rounded-lg px-5 py-3.5 text-sm font-bold transition-colors",
-                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400",
-                  "disabled:pointer-events-none disabled:opacity-40",
-                  repairQuote.canRepair
-                    ? "bg-emerald-400 text-zinc-950 hover:bg-emerald-300"
-                    : "bg-zinc-800/60 text-zinc-500",
+                className={cn(
+                  buttonVariants({ size: "xl" }),
+                  repairQuote.canRepair && GO_KEY,
+                  "flex-1",
                 )}>
                 <Wrench size={16} />
                 {repair.isPending
                   ? t("workshop.restoring")
-                  : t("workshop.restore_to", {
-                      grade: conditionName(repairQuote.target ?? ""),
+                  : t("workshop.job_with_gain", {
+                      job: t("workshop.restore_to", {
+                        grade: conditionName(repairQuote.target ?? ""),
+                      }),
+                      count: repairQuote.gain,
                     })}
               </button>
             </div>
@@ -436,54 +439,63 @@ export const WorkshopJobModal = ({
               promotesTo={buildQuote.requirement.promotesTo}
             />
 
-            <GateRow
-              ok={conditionCheck.ok}
-              condition={entry.condition}
-              required={getGradeByRank(conditionCheck.required)}
-              onRestore={
-                repairQuote.canRepair ? () => goTo("repair") : undefined
-              }
-            />
+            {/* Only when it blocks: a condition that is already good enough
+                is not news, and the green line saying so was one more block
+                to read past on the way to the button. */}
+            {!conditionCheck.ok && (
+              <GateRow
+                ok={false}
+                condition={entry.condition}
+                required={getGradeByRank(conditionCheck.required)}
+                onRestore={
+                  repairQuote.canRepair ? () => goTo("repair") : undefined
+                }
+              />
+            )}
 
-            <CostTable
-              title={t("workshop.upgrade_cost")}
-              recipe={buildQuote.recipe}
+            <CostChips
+              lines={buildQuote.recipe}
               fame={{
                 need: fameCheck.required,
                 have: fameCheck.current,
               }}
+              wallet={wallet}
+              playerFame={fame}
+              busy={isPending}
             />
-
-            <BuildLadder subject={entry.subject} wallet={wallet} />
 
             <div className='flex flex-col gap-3 sm:flex-row'>
               <button
                 onClick={close}
                 disabled={isPending}
-                className={cn(PRESSABLE, "rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44 border-b-black/30")}>
+                className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "sm:w-44")}>
                 {t("common.cancel")}
               </button>
               <button
                 onClick={runBuild}
                 disabled={!buildQuote.canBuild || isPending}
-                className={cn(PRESSABLE, "border-b-black/30", 
-                  "flex flex-1 items-center justify-center gap-2.5 rounded-lg px-5 py-3.5 text-sm font-bold transition-colors",
-                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400",
-                  "disabled:pointer-events-none disabled:opacity-40",
-                  buildQuote.canBuild
-                    ? "bg-cyan-400 text-zinc-950 hover:bg-cyan-300"
-                    : "bg-zinc-800/60 text-zinc-500",
+                className={cn(
+                  buttonVariants({ size: "xl" }),
+                  buildQuote.canBuild && GO_KEY,
+                  "flex-1",
                 )}>
                 {!conditionCheck.ok && <Lock size={16} />}
                 {build.isPending
                   ? t("workshop.building")
-                  : buildQuote.requirement.promotesTo
-                    ? buildLabel(buildQuote, labels)
-                    : t("workshop.upgrade_to_build", {
-                        build: buildQuote.requirement.level,
-                      })}
+                  : t("workshop.job_with_gain", {
+                      job: buildQuote.requirement.promotesTo
+                        ? buildLabel(buildQuote, labels)
+                        : t("workshop.upgrade_to_build", {
+                            build: buildQuote.requirement.level,
+                          }),
+                      count: buildQuote.gain,
+                    })}
               </button>
             </div>
+
+            {/* Every rung of the ladder, folded away under its own toggle —
+                for the player planning ahead, not in the way of this job. */}
+            <BuildLadder subject={entry.subject} wallet={wallet} />
           </>
         )}
       </DialogContent>

@@ -108,6 +108,13 @@ export const resolveLayout = (
 };
 
 /**
+ * Stamped into a layout whose positions are counted per shelf (guitars,
+ * pedals, parts, Builder) rather than on one shared board. Not an item id, so
+ * `resolveLayout` never places it.
+ */
+export const STASH_TABBED_MARKER = "__tabbed";
+
+/**
  * Whether the player has ever arranged this board by hand.
  *
  * A saved arrangement is only honoured under `manual` order, so this is what
@@ -116,7 +123,35 @@ export const resolveLayout = (
  * work was in the document and never on the screen.
  */
 export const hasSavedArrangement = (saved?: StashLayout): boolean =>
-  saved != null && Object.keys(saved).length > 0;
+  saved != null &&
+  Object.keys(saved).some((key) => key !== STASH_TABBED_MARKER);
+
+/**
+ * Turns a one-board arrangement into one per shelf.
+ *
+ * The collection used to hang every kind on a single board, so a saved guitar
+ * position counted the pedals and parts around it. Shown on a shelf of guitars
+ * alone, those cells would be holes. Each shelf keeps the reading order the
+ * player gave its pieces and closes the gaps the other kinds left — once: the
+ * result carries the marker, and a layout that already has it is left alone.
+ */
+export const toTabbedLayout = (
+  saved: StashLayout,
+  shelves: StashPiece[][],
+  columns = STASH_COLUMNS,
+): StashLayout => {
+  if (saved[STASH_TABBED_MARKER] === 1) return saved;
+  const next: StashLayout = { [STASH_TABBED_MARKER]: 1 };
+  for (const shelf of shelves) {
+    const placed = shelf
+      .filter((piece) => typeof saved[piece.id] === "number")
+      .sort((a, b) => saved[a.id] - saved[b.id]);
+    // Never placed by hand: they had no position to keep, so they are left
+    // for `resolveLayout` to flow in wherever the shelf has room.
+    Object.assign(next, resolveLayout(placed, {}, columns).layout);
+  }
+  return next;
+};
 
 /**
  * The piece covering a cell, if any. `exceptId` skips the piece being carried,

@@ -1,32 +1,56 @@
-import { Button } from "assets/components/ui/button";
+import { useIsFetching } from "@tanstack/react-query";
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
-import { Kostek } from "components/Mascot/Kostek";
-import { HeroBanner } from "components/UI/HeroBanner";
+import { PAGE_CONTENT, PageShell } from "components/PageShell/PageShell";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
 import { getEquippedRarity } from "feature/arsenal/data/equippedGuitar";
-import { guitarDefinitionByImageId } from "feature/arsenal/data/guitarDefinitions";
+import {
+  guitarDefinitionByImageId,
+  GUITARS_BY_ID,
+} from "feature/arsenal/data/guitarDefinitions";
+import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useEquippedGuitar } from "feature/arsenal/hooks/useUserArsenal";
+import type { GuitarRarity } from "feature/arsenal/types/arsenal.types";
 import {
   getRankBadgeSrc,
   isGuitarImageId,
 } from "feature/arsenal/utils/guitarImage";
 import { DashboardWidgets } from "feature/dashboard/components/DashboardWidgets";
 import type { DashboardDataContextValue } from "feature/dashboard/context/DashboardContext";
-import { DashboardDataProvider } from "feature/dashboard/context/DashboardContext";
+import {
+  DashboardCustomizeProvider,
+  DashboardDataProvider,
+} from "feature/dashboard/context/DashboardContext";
 import { DuelEloBadge } from "feature/duels/components/DuelEloBadge";
+import { CUSTOM_IMAGE_PREFIX } from "feature/guitarBuilder/utils/customGuitar";
 import { HeroLevelStat } from "feature/profile/components/HeroLevelStat";
+import { HomeHero } from "feature/profile/components/HomeHero";
 import { SongTierBadge } from "feature/profile/components/SongTierBadge";
 import { getTrendData } from "feature/profile/utils/getTrendData";
 import { useUserSongs } from "feature/songs/hooks/useUserSongs";
 import { useTranslation } from "hooks/useTranslation";
 import { useLastKnown } from "lib/querySnapshot/useLastKnown";
-import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { convertMsToHM } from "utils/converter";
+import { getReconciledStreak, hasRestDays } from "utils/gameLogic";
+
+/**
+ * How far the stage's wash goes into the rarity colour. The hue already says
+ * which tier the guitar is; this makes a rarer one light the stage more. Kept
+ * low on purpose — a large accent area much past this reads as a neon sign.
+ */
+const RARITY_LIGHT: Record<GuitarRarity, number> = {
+  Common: 0.1,
+  Uncommon: 0.14,
+  Rare: 0.18,
+  Epic: 0.21,
+  Legendary: 0.24,
+  Mythic: 0.27,
+  "Custom Shop": 0.3,
+};
 
 interface LandingLayoutProps {
   userStats: StatisticsDataInterface;
@@ -43,6 +67,8 @@ const ProfileLandingLayout = ({
   userInfo,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("profile");
+  const { t: tDashboard } = useTranslation("dashboard");
+  const arsenalLabels = useArsenalLabels();
   const router = useRouter();
   const { datasWithReports, year, setYear, isLoading, reportList } =
     useActivityLog(userAuth);
@@ -52,14 +78,20 @@ const ProfileLandingLayout = ({
     isError: isSongsError,
   } = useUserSongs(userAuth);
   const { item: equippedGuitar } = useEquippedGuitar(userAuth);
+  // Customize mode lives here, not in the cards: from md up its key sits in
+  // the hero's strip.
+  const [isEditing, setIsEditing] = useState(false);
+  const customize = useMemo(() => ({ isEditing, setIsEditing }), [isEditing]);
+  // Cards keep showing what they had while fresher answers are on the way;
+  // the spinner by the Customize key is the only sign of that.
+  const isRefreshing = useIsFetching() > 0;
 
   // The tier is worked out from the learned songs, and those load late (and
   // cannot go into the boot snapshot — they hold Firestore timestamps). The
   // difficulties from the last visit are enough to draw the same badge at
   // once; the real list replaces them when it lands.
   const freshLearned = useMemo(
-    () =>
-      songs?.learned.map((song) => ({ avgDifficulty: song.avgDifficulty })),
+    () => songs?.learned.map((song) => ({ avgDifficulty: song.avgDifficulty })),
     [songs],
   );
   const learnedForTier = useLastKnown("song-tier", userAuth, freshLearned);
@@ -68,11 +100,44 @@ const ProfileLandingLayout = ({
   const lastReportDate = userStats?.lastReportDate
     ? new Date(userStats.lastReportDate).toDateString()
     : null;
-  const isTodayCompleted =
-    lastReportDate === todayStr ||
-    datasWithReports.some(
-      (d) => d.date.toDateString() === todayStr && d.report,
-    );
+  const todayReport = datasWithReports.find(
+    (d) => d.date.toDateString() === todayStr && d.report,
+  )?.report;
+  const isTodayCompleted = lastReportDate === todayStr || !!todayReport;
+  // Nothing logged, ever: the hero asks for the first session instead of
+  // today's, and leaves out the numbers that have nothing to show yet.
+  const hasNeverPracticed =
+    (userStats?.sessionCount ?? 0) === 0 &&
+    !userStats?.lastReportDate &&
+    !isTodayCompleted;
+
+  // The same reconciliation as the Streak and This week cards: the activity
+  // log is the timezone-correct source, the stored counter fills in until it loads.
+  const { dayWithoutBreak } = getReconciledStreak({
+    actualDayWithoutBreak: userStats?.actualDayWithoutBreak ?? 0,
+    lastReportDate: userStats?.lastReportDate ?? "",
+    reportDates: reportList.map((report) => report.date),
+    restDays: userStats ? hasRestDays(userStats) : false,
+  });
+
+  // One fact under the title. After the session: what today came to. Before
+  // it: the streak a session keeps alive. Never both, and nothing when there
+  // is neither.
+  const todayMs = todayReport?.timeSumary.sumTime ?? 0;
+  const fact = hasNeverPracticed
+    ? null
+    : isTodayCompleted
+      ? todayMs > 0
+        ? {
+            text: t("week_widget.practiced", { time: convertMsToHM(todayMs) }),
+          }
+        : null
+      : dayWithoutBreak > 0
+        ? {
+            text: t("score_tooltip.streak", { count: dayWithoutBreak }),
+            isStreak: true,
+          }
+        : null;
 
   const totalTimeValue = userStats
     ? convertMsToHM(
@@ -114,138 +179,132 @@ const ProfileLandingLayout = ({
   const specialGuitarDef = isSpecialGuitar
     ? guitarDefinitionByImageId(imgPath)
     : null;
-  // Lit by what the guitar is now: the workshop can promote it past its mint
+  // Named by what the guitar is now: the workshop can promote it past its mint
   // rarity, and that promotion only exists on the owner's inventory item.
   const equippedRarity = getEquippedRarity(equippedGuitar, specialGuitarDef);
-  // No special guitar equipped falls back to the brand cyan, not to a rarity.
-  const glowColor = equippedRarity ? getRarityColor(equippedRarity) : "#0891b2";
+  // A Builder guitar's picture only knows "Custom guitar"; the name its owner
+  // gave it is on the inventory item. It has no brand to put in front either.
+  const equippedDef = equippedGuitar
+    ? GUITARS_BY_ID.get(equippedGuitar.guitarId)
+    : undefined;
+  const namedDef =
+    equippedDef && equippedDef.imageId === specialGuitarDef?.imageId
+      ? equippedDef
+      : specialGuitarDef;
+  const isCustomBuild =
+    typeof imgPath === "string" && imgPath.startsWith(CUSTOM_IMAGE_PREFIX);
+  const guitarName = namedDef
+    ? isCustomBuild
+      ? namedDef.name
+      : `${namedDef.brand} ${namedDef.name}`
+    : null;
 
-  // ELO, song tier and level share one anatomy — label, 56px figure, value —
-  // so they stand on one line. Rendered twice: in a row of their own under
-  // Practice on phones and in the right column from md up (CSS picks one, so
-  // nothing flashes on load). Equal columns on a phone, whether or not the
-  // player has a duel rating yet.
-  const renderProgress = () => (
-    <div className='grid auto-cols-fr grid-flow-col items-start gap-2 md:flex md:gap-8'>
-      <DuelEloBadge uid={userAuth} />
+  const lvl = userStats?.lvl ?? 1;
+  const points = userStats?.points ?? 0;
+
+  // ELO, song tier and level are drawn twice — CSS picks one, so nothing
+  // flashes on load. On a phone they share one anatomy (label, 56px figure,
+  // value) in equal columns under the Practice key, whether or not the player
+  // has a duel rating yet. From md up they lie in the strip, and the level
+  // takes the room the other two leave.
+  const renderStats = (inline: boolean) => (
+    <>
+      <DuelEloBadge uid={userAuth} inline={inline} />
       <SongTierBadge
         learnedSongs={learnedForTier}
         isLoading={isSongsLoading && !learnedForTier}
         isError={isSongsError && !learnedForTier}
         isOwnProfile
+        inline={inline}
         onClick={() => router.push("/songs?view=board")}
       />
       <HeroLevelStat
-        lvl={userStats?.lvl ?? 1}
-        points={userStats?.points ?? 0}
+        lvl={lvl}
+        points={points}
+        variant={inline ? "bar" : "ring"}
       />
-    </div>
+    </>
   );
+  // Before the first session only the level is there: a rating and a tier
+  // with nothing behind them would only say what is missing.
+  const levelBar = <HeroLevelStat lvl={lvl} points={points} variant='bar' />;
 
   return (
-    <div className='flex flex-col rounded-lg border-none bg-second-600'>
-      <HeroBanner
+    <PageShell>
+      <HomeHero
         title={
-          isTodayCompleted ? t("landing.great_job") : t("landing.start_today")
+          hasNeverPracticed
+            ? t("landing.first_session")
+            : isTodayCompleted
+              ? t("landing.great_job")
+              : t("landing.start_today")
         }
-        // The tall banner is there to frame a special guitar; without one it
-        // would only push the dashboard down, so it shrinks to its content.
-        compact={!isSpecialGuitar}
-        leftContentClassName={isSpecialGuitar ? undefined : "mt-0"}
-        className={cn(
-          "w-full !flex-row !items-center !justify-between !rounded-none !shadow-none",
-          // Still the tall banner — the guitar is the emotional part of Home —
-          // only a notch shorter, so it pushes the cards down less.
-          isSpecialGuitar && "min-h-[160px] md:min-h-[185px] lg:min-h-[205px]",
-        )}
-        backgroundContent={
-          isSpecialGuitar ? (
-            <div className='absolute inset-0 z-0 overflow-hidden rounded-none md:rounded-xl'>
-              {/* Glow Blur on the left */}
-              <div
-                className='light-hide pointer-events-none absolute left-[0%] top-[-10%] opacity-25 blur-[80px] md:left-[5%] md:top-[-15%] md:opacity-30'
-                style={{
-                  backgroundColor: glowColor,
-                  width: "350px",
-                  height: "350px",
-                  borderRadius: "50%",
-                }}
-              />
-
-              {/* Guitar with CSS fade on the right side. On a phone it lies
-                    across the banner at the same angle as on desktop, body
-                    bottom-left and neck rising behind the progress. Stood
-                    upright (-90°) it needed the old tall banner; in the short
-                    one only the neck was left inside. */}
-              <img
-                src={getRankBadgeSrc(imgPath, "large")}
-                className='light-flat pointer-events-none absolute left-[-8%] top-[-12%] h-[250px] max-w-none -rotate-[15deg] opacity-[0.75] md:left-[8%] md:top-[-35%] md:h-[410px]'
-                style={{
-                  filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
-                  WebkitMaskImage:
-                    "linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)",
-                  maskImage:
-                    "linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)",
-                }}
-                alt=''
-                aria-hidden
-              />
-
-              {/* The title and the button sit on the guitar's body; a pale
-                  guitar under a white title needs a little dark behind it. */}
-              <div
-                aria-hidden
-                className='light-hide pointer-events-none absolute inset-y-0 left-0 w-56 bg-gradient-to-r from-zinc-950/60 to-transparent md:w-80'
-              />
+        fact={fact}
+        cta={{
+          label: hasNeverPracticed
+            ? t("landing.start")
+            : isTodayCompleted
+              ? t("landing.practice_more")
+              : t("landing.practice"),
+          isPrimary: !isTodayCompleted,
+          onClick: () => router.push("/timer"),
+        }}
+        guitar={
+          isSpecialGuitar
+            ? {
+                src: getRankBadgeSrc(imgPath, "large"),
+                caption:
+                  guitarName && equippedRarity
+                    ? {
+                        name: guitarName,
+                        rarity: arsenalLabels.rarity(equippedRarity),
+                      }
+                    : undefined,
+                light: equippedRarity
+                  ? {
+                      color: getRarityColor(equippedRarity),
+                      strength: RARITY_LIGHT[equippedRarity],
+                    }
+                  : undefined,
+              }
+            : null
+        }
+        // With no guitar on the stage Kostek has it: waving at a newcomer,
+        // pointing at the Practice key before today's session, pleased after.
+        mascot={
+          hasNeverPracticed
+            ? { mood: "wave" }
+            : isTodayCompleted
+              ? { mood: "celebrate" }
+              : { mood: "nudge", lookAt: "left" }
+        }
+        stackedStats={
+          hasNeverPracticed ? (
+            levelBar
+          ) : (
+            <div className='grid auto-cols-fr grid-flow-col items-start gap-2'>
+              {renderStats(false)}
             </div>
-          ) : null
+          )
         }
-        // Phones get the progress in leftContent, under the Practice button;
-        // as the banner's own column it stacked below everything and doubled
-        // the banner's height.
-        rightContentClassName='hidden md:flex'
-        rightContent={
-          <div className='relative select-none'>{renderProgress()}</div>
-        }
-        leftContent={
-          <div className='flex flex-col gap-5'>
-            <div className='flex items-center gap-4 md:gap-5'>
-              {/* White until today's session is in; after it the button steps
-                  back, because the day's one job is done. */}
-              <Button
-                variant={isTodayCompleted ? "secondary" : "default"}
-                onClick={() => router.push("/timer")}
-                className='group/btn h-14 flex-1 px-8 text-base font-semibold md:flex-none'>
-                {isTodayCompleted
-                  ? t("landing.practice_more")
-                  : t("landing.practice")}
-                <ArrowRight className='h-5 w-5 transition-transform duration-base group-hover/btn:translate-x-1' />
-              </Button>
-              {/* With no special guitar to fill the banner, Kostek stands by
-                  the button: pointing at it before today's session, pleased
-                  after. A guitar is the banner's character on its own. */}
-              {!isSpecialGuitar && (
-                <Kostek
-                  mood={isTodayCompleted ? "celebrate" : "nudge"}
-                  lookAt={isTodayCompleted ? undefined : "left"}
-                  className='-my-2 h-16 shrink-0 md:-my-4 md:h-24'
-                />
-              )}
-            </div>
-            {/* Always a row of its own on a phone. Beside the button it fitted
-                or wrapped depending on whether the player had a duel rating.
-                No backdrop: the banner is the one level of card. */}
-            <div className='select-none md:hidden'>{renderProgress()}</div>
-          </div>
-        }
+        stripStats={hasNeverPracticed ? levelBar : renderStats(true)}
+        customize={{
+          label: tDashboard("customize.customize"),
+          refreshingLabel: tDashboard("customize.refreshing", "Updating…"),
+          isEditing,
+          isRefreshing,
+          onClick: () => setIsEditing(true),
+        }}
       />
 
-      <div className='relative z-10 p-4 md:mt-6 md:p-6'>
+      <div className={cn("relative z-10", PAGE_CONTENT)}>
         <DashboardDataProvider value={dashboardData}>
-          <DashboardWidgets />
+          <DashboardCustomizeProvider value={customize}>
+            <DashboardWidgets />
+          </DashboardCustomizeProvider>
         </DashboardDataProvider>
       </div>
-    </div>
+    </PageShell>
   );
 };
 

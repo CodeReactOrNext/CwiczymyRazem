@@ -56,7 +56,7 @@ const RigGuitarTile = ({
         draggable={false}
       />
       <span
-        className='absolute bottom-0.5 right-0.5 rounded bg-zinc-950/80 px-1 py-0.5 text-[10px] font-semibold tabular-nums leading-none text-zinc-200'
+        className='absolute bottom-0.5 right-0.5 rounded bg-zinc-950/80 px-1 py-0.5 text-[11px] font-semibold tabular-nums leading-none text-zinc-200'
         title={t("rig.guitar_level")}>
         {level}
       </span>
@@ -88,7 +88,7 @@ const RigGuitarTile = ({
     <TooltipProvider>
       <Tooltip delayDuration={150}>
         <TooltipTrigger asChild>{tile}</TooltipTrigger>
-        <TooltipContent className='p-0 border-0 bg-transparent shadow-2xl' side='top'>
+        <TooltipContent className='bg-transparent p-0' side='top'>
           <div style={{ width: 250 }}>
             <GuitarCard item={item} readOnly />
           </div>

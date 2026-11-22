@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -8,13 +9,14 @@ import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
 import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMarks";
 import { SongCardMenu, STATUS_META } from "feature/songs/components/SongsGrid/SongCardMenu";
+import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import type { Song, SongPart, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { SONG_COVER_STYLE, songCoverLayoutId } from "feature/songs/utils/songCoverLayout";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { inkWash, readableText } from "lib/colorTheme/colorTheme";
+import { inkWash } from "lib/colorTheme/colorTheme";
 import { transitions } from "lib/motion/motion";
 import { useSharedElement } from "lib/motion/useSharedElement";
 import {
@@ -145,7 +147,7 @@ export const SongCard = ({
                     <StatusIcon className="h-3.5 w-3.5" />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="bg-zinc-900 border-white/10 text-xs font-bold text-zinc-200">
+                <TooltipContent side="right">
                   {meta.label}
                 </TooltipContent>
               </Tooltip>
@@ -162,14 +164,16 @@ export const SongCard = ({
           onClick={(e) => e.stopPropagation()}
         >
           {onPlay && (
-            <button
+            <Button
+              variant='ghost'
+              size='icon-sm'
               aria-label={t("card.practice")}
               onClick={(e) => { e.stopPropagation(); onPlay(); }}
-              className="flex h-8 w-8 items-center justify-center gap-1.5 rounded-md bg-black text-white shadow-lg transition-colors hover:bg-zinc-900 active:scale-95 lg:w-auto lg:px-2.5"
+              className="gap-1.5 bg-zinc-950/70 text-white hover:bg-zinc-900 lg:w-auto lg:px-2.5"
             >
-              <Play className="h-4 w-4 fill-current" />
+              <Play className="fill-current" />
               <span className="hidden text-xs font-bold lg:inline">{t("card.practice")}</span>
-            </button>
+            </Button>
           )}
 
           <SongCardMenu
@@ -179,7 +183,7 @@ export const SongCard = ({
             onPlay={onPlay}
             open={isMenuOpen}
             onOpenChange={setIsMenuOpen}
-            triggerClassName="flex h-8 w-8 items-center justify-center rounded-md bg-black text-white shadow-lg transition-colors hover:bg-zinc-900 active:scale-95 data-[state=open]:bg-zinc-900"
+            triggerClassName="h-8 w-8 bg-zinc-950/70 text-white hover:bg-zinc-900 data-[state=open]:bg-zinc-900"
           />
         </div>
       </m.div>
@@ -197,13 +201,13 @@ export const SongCard = ({
                 {song.title}
               </h3>
             </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-[260px] border-white/10 bg-zinc-900 text-xs font-bold text-zinc-200">
+            <TooltipContent side="top" className="max-w-[260px]">
               {song.title}
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
 
-        <p translate="no" className="truncate text-sm font-medium tracking-wide text-zinc-300 mt-1">
+        <p translate="no" className="truncate text-sm font-medium text-zinc-300 mt-1">
           {song.artist}
         </p>
 
@@ -246,7 +250,7 @@ export const SongCard = ({
                   <TooltipTrigger asChild>
                     <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400" />
                   </TooltipTrigger>
-                  <TooltipContent side="top" className="border-white/10 bg-zinc-900 text-xs font-bold text-zinc-200">
+                  <TooltipContent side="top">
                     {t("card.rated_by_you")}
                   </TooltipContent>
                 </Tooltip>
@@ -254,19 +258,7 @@ export const SongCard = ({
             )}
           </div>
 
-          {/* Tier / difficulty badge */}
-          <div
-            className="flex shrink-0 items-center gap-2 rounded-[4px] px-2 py-1"
-            style={{ backgroundColor: inkWash(tier.color, 12) }}
-          >
-            <span className="text-[11px] font-semibold leading-none" style={{ color: readableText(tier.color) }}>
-              {tier.tier}
-            </span>
-            <span className="h-3 w-px" style={{ backgroundColor: inkWash(tier.color, 20) }} />
-            <span className="text-sm font-semibold leading-none tabular-nums" style={{ color: readableText(tier.color) }}>
-              {avgDifficulty.toFixed(1)}
-            </span>
-          </div>
+          <TierBadge song={song} className="h-6 w-6" />
         </div>
 
         {/* Part marks: what of this song the user can already play */}

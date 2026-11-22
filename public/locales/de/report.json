@@ -217,6 +217,7 @@
     "habits_count": "{{count}} von {{total}}",
     "your_session": "Deine Session",
     "summary_empty": "Hier entsteht deine Zusammenfassung, während du antwortest.",
+    "ready_title": "Bereit zum Speichern",
     "save": "Session speichern",
     "back": "Zurück",
     "done": "Fertig",

@@ -97,5 +97,11 @@
   "sidebar": {
     "title": "Selector de escalas",
     "body": "Elige una escala para ver su árbol y sus formas."
+  },
+  "toast": {
+    "new_record": "Nuevo récord: {{bpm}} BPM",
+    "new_record_was": "Nuevo récord: {{bpm}} BPM (antes {{previous}})",
+    "record_stands": "Pasada limpia, pero tu récord sigue en {{bpm}} BPM",
+    "no_record": "Sin récord: una pasada cuenta a partir del {{accuracy}} % de precisión"
   }
 }

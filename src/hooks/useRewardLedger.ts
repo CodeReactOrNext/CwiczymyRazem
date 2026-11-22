@@ -60,15 +60,27 @@ const useClaimSideEffects = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
-  return (reward: RewardPayout, newFame: number, headline: string) => {
+  return (
+    reward: RewardPayout,
+    newFame: number,
+    headline: string,
+    announce = true,
+  ) => {
     dispatch(setFame(newFame));
-    toast.success(`${headline}: ${payoutLine(reward)}`);
+    if (announce) toast.success(`${headline}: ${payoutLine(reward)}`);
     queryClient.invalidateQueries({ queryKey: REWARD_LEDGER_QUERY_KEY });
     queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
   };
 };
 
-export const useClaimAchievementRewards = () => {
+/**
+ * `quiet` drops the toast for a caller that shows the payout itself — the
+ * achievements summary card turns into the receipt after "Collect all", and a
+ * toast saying the same thing in the corner would only repeat it.
+ */
+export const useClaimAchievementRewards = ({
+  quiet = false,
+}: { quiet?: boolean } = {}) => {
   const onClaimed = useClaimSideEffects();
 
   return useMutation({
@@ -80,6 +92,7 @@ export const useClaimAchievementRewards = () => {
         result.reward,
         result.newFame,
         count === 1 ? "Reward collected" : `${count} rewards collected`,
+        !quiet,
       );
     },
     onError: (error: any) => {

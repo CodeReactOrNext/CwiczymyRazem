@@ -70,7 +70,7 @@ export const SummaryStep = React.memo(function SummaryStep({
         <p className="mt-3 text-xs leading-relaxed text-zinc-500">{t("summary.latency_later")}</p>
       )}
 
-      <Button onClick={onConfirm} className="mt-8 h-12 w-full font-bold shortwide:mt-5">
+      <Button onClick={onConfirm} size="lg" className="mt-8 w-full shortwide:mt-5">
         {t("summary.start")}
       </Button>
     </div>

@@ -1,3 +1,5 @@
+import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import {
   Tabs,
   TabsContent,
@@ -5,12 +7,15 @@ import {
   TabsTrigger,
 } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import {
   tabNavFadeClass,
   tabNavListClass,
   tabNavTriggerClass,
 } from "components/PageTabs/tabNav";
 import { useRailEdges } from "components/PageTabs/useRailEdges";
+import { pageTitleClass } from "components/PageTitle/PageTitle";
 import Chat from "feature/chat/Chat";
 import { guildChatPath } from "feature/chat/services/chatService";
 import { GuildBanner } from "feature/guilds/components/GuildBanner";
@@ -89,21 +94,16 @@ const NeedsAGuild = ({
 }) => {
   const { t } = useTranslation("guilds");
   return (
-    <div className='flex flex-col items-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-      <span className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-400'>
-        <Shield size={26} />
-      </span>
-      <h3 className='mb-2 text-lg font-bold text-zinc-100'>
-        {t("needs_guild.title")}
-      </h3>
-      <p className='max-w-sm text-sm text-zinc-400'>{what}</p>
-      <button
-        type='button'
-        onClick={onBrowse}
-        className='mt-6 rounded-lg bg-white/5 px-4 py-2 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white/10 hover:text-zinc-100'>
-        {t("needs_guild.browse")}
-      </button>
-    </div>
+    <EmptyState
+      icon={<Shield />}
+      title={t("needs_guild.title")}
+      description={what}
+      action={
+        <Button type='button' onClick={onBrowse}>
+          {t("needs_guild.browse")}
+        </Button>
+      }
+    />
   );
 };
 
@@ -118,9 +118,9 @@ const GuildHeader = ({ guild }: { guild: Guild }) => {
     <GuildCover
       guild={guild}
       size='lg'
-      className='pb-6 sm:px-6'
+      className='pb-5 sm:px-6'
       meta={
-        <p className='text-sm text-zinc-400'>
+        <p className='line-clamp-2 text-sm text-zinc-400'>
           {guild.description ||
             t("header.founded_by", { name: guild.founderName })}
         </p>
@@ -141,19 +141,17 @@ const NoGuildHeader = ({ isLoading }: { isLoading: boolean }) => {
       <GuildBanner
         bannerId='banner:wash'
         hex='#22d3ee'
-        className='h-24 sm:h-32'
+        className='h-16 sm:h-20'
       />
-      <div className='px-5 pb-6 sm:px-6'>
-        <div className='-mt-12 flex items-start gap-5 sm:-mt-14'>
-          <span className='flex h-24 w-24 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-cyan-400 sm:h-32 sm:w-32'>
-            <Shield size={40} />
+      <div className='px-5 pb-5 sm:px-6'>
+        <div className='-mt-8 flex items-start gap-5 sm:-mt-10'>
+          <span className='flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-cyan-400 sm:h-20 sm:w-20'>
+            <Shield size={32} />
           </span>
-          <div className='min-w-0 flex-1 pt-14 sm:pt-16'>
-            <h1 className='text-2xl font-bold text-zinc-100'>
-              {t("tabs.browse")}
-            </h1>
+          <div className='min-w-0 flex-1 pt-10 sm:pt-12'>
+            <h1 className={pageTitleClass}>{t("tabs.browse")}</h1>
             {isLoading ? (
-              <span className='mt-2 block h-4 w-64 max-w-full animate-pulse rounded bg-zinc-800/60' />
+              <Skeleton className='mt-2 h-4 w-64 max-w-full' />
             ) : (
               <p className='mt-1 text-sm text-zinc-400'>{t("header.intro")}</p>
             )}
@@ -188,8 +186,8 @@ export const GuildsView = () => {
   const active = tabs.some((entry) => entry.id === tab) ? tab : "browse";
 
   return (
-    <div className='space-y-8 p-4 sm:p-6 md:p-10'>
-      <header className='overflow-hidden rounded-lg bg-zinc-900/40'>
+    <div className={cn("flex flex-col gap-6", PAGE_CONTENT)}>
+      <header className='overflow-hidden rounded-lg bg-zinc-800/40'>
         {myGuild ? (
           <GuildHeader guild={myGuild} />
         ) : (
@@ -200,7 +198,7 @@ export const GuildsView = () => {
       <Tabs
         value={active}
         onValueChange={(next) => setTab(next as GuildTab)}
-        className='space-y-8'>
+        className='space-y-6'>
         <TabsList
           ref={railRef}
           className={cn(tabNavListClass, tabNavFadeClass(edges))}>

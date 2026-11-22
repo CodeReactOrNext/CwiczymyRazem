@@ -90,7 +90,8 @@
     "public_hint": "Widoczny dla wszystkich.",
     "missing": "Brakuje jeszcze: {{fields}}",
     "create": "Utwórz plan",
-    "name_required": "Nadaj planowi nazwę"
+    "name_required": "Nadaj planowi nazwę",
+    "save": "Zapisz zmiany"
   },
   "add_song": {
     "practise_with": "Ćwicz z",

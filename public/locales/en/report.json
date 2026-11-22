@@ -217,6 +217,7 @@
     "habits_count": "{{count}} of {{total}}",
     "your_session": "Your session",
     "summary_empty": "Your summary builds up here as you answer.",
+    "ready_title": "Ready to save",
     "save": "Save session",
     "back": "Back",
     "done": "Done",

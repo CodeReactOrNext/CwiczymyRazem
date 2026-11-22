@@ -97,5 +97,11 @@
   "sidebar": {
     "title": "Wybór skali",
     "body": "Wybierz skalę, aby zobaczyć jej drzewo i kształty."
+  },
+  "toast": {
+    "new_record": "Nowy rekord: {{bpm}} BPM",
+    "new_record_was": "Nowy rekord: {{bpm}} BPM (było {{previous}})",
+    "record_stands": "Czysty przebieg, ale rekord dalej wynosi {{bpm}} BPM",
+    "no_record": "Bez rekordu — przebieg liczy się od {{accuracy}}% celności"
   }
 }

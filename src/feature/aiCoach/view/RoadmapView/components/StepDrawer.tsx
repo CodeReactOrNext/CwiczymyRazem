@@ -1,4 +1,4 @@
-import { buttonVariants,PRESSABLE } from "assets/components/ui/button";
+import { Button, buttonVariants, PRESSABLE } from "assets/components/ui/button";
 import { Chip } from "assets/components/ui/chip";
 import {
   Drawer,
@@ -186,12 +186,14 @@ const StepDrawerBody = ({
           {t("drawer.failed_title")}
         </p>
         <p className='text-xs text-zinc-400'>{t("drawer.failed_body")}</p>
-        <button
+        <Button
           type='button'
+          variant='subtle'
+          size='sm'
           onClick={onRetryDetail}
-          className='mt-2 flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-xs font-semibold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-700'>
-          <RefreshCw className='h-3.5 w-3.5' /> {t("drawer.try_again")}
-        </button>
+          className='mt-2'>
+          <RefreshCw /> {t("drawer.try_again")}
+        </Button>
       </div>
     );
   } else {
@@ -201,7 +203,7 @@ const StepDrawerBody = ({
 
         {step.successCriteria && (
           <section className='rounded-lg bg-cyan-500/10 p-5'>
-            <h3 className='flex items-center gap-2 text-xs font-semibold tracking-wide text-cyan-400'>
+            <h3 className='flex items-center gap-2 text-xs font-medium text-cyan-400'>
               <Target className='h-3.5 w-3.5' /> {t("drawer.got_it_when")}
             </h3>
             <p className='mt-3 text-sm leading-relaxed text-zinc-200'>
@@ -240,19 +242,20 @@ const StepDrawerBody = ({
           </p>
           <div className='flex shrink-0 items-center gap-1'>
             {admin && step.description && !isGenerating && (
-              <button
+              <Button
                 type='button'
-                onClick={() => admin.onRegenerate(current)}
-                className='flex h-9 items-center gap-1.5 rounded-lg px-3 text-xs text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-100'>
-                <RefreshCw className='h-3.5 w-3.5' /> Regenerate
-              </button>
+                variant='ghost'
+                size='sm'
+                onClick={() => admin.onRegenerate(current)}>
+                <RefreshCw /> Regenerate
+              </Button>
             )}
             <DrawerClose asChild>
               <button
                 type='button'
                 aria-label={t("drawer.close")}
                 className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
-                <X className='h-4 w-4' />
+                <X />
               </button>
             </DrawerClose>
           </div>

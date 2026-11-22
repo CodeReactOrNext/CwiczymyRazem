@@ -106,8 +106,8 @@ export const TuningStep = React.memo(function TuningStep({
           <div className="mx-auto flex w-full max-w-[300px] flex-col items-center sm:max-w-md shortwide:max-w-[230px] shortwide:self-center shortwide:[grid-area:tuner]">
             <ArcTuner cents={currentDone ? 0 : (cents ?? 0)} hasNote={hasNote || currentDone} />
             <div className="flex justify-between w-full px-3 -mt-1 mb-2">
-              <span className="text-xs text-zinc-600">← {t("tuning.flat_label")}</span>
-              <span className="text-xs text-zinc-600">{t("tuning.sharp_label")} →</span>
+              <span className="text-xs text-zinc-500">← {t("tuning.flat_label")}</span>
+              <span className="text-xs text-zinc-500">{t("tuning.sharp_label")} →</span>
             </div>
 
             <div className="text-center space-y-0.5 mb-3 shortwide:mb-1">
@@ -134,7 +134,7 @@ export const TuningStep = React.memo(function TuningStep({
         </div>
 
         <div className="mt-6 w-full space-y-2 sm:mt-8 shortwide:mt-3 shortwide:flex shortwide:items-center shortwide:gap-3 shortwide:space-y-0 shortwide:[grid-area:btns]">
-          <Button onClick={advance} variant="secondary" disabled={currentDone} className="h-12 w-full sm:h-11 shortwide:flex-1">
+          <Button onClick={advance} variant="secondary" size="lg" disabled={currentDone} className="w-full shortwide:flex-1">
             {t("tuning.skip_string")}
           </Button>
           <button

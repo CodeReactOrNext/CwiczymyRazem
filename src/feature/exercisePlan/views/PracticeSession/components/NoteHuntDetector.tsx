@@ -179,7 +179,7 @@ export function NoteHuntDetector({
             // hint the way the octave hunts can afford to.
             <div className="flex max-w-xs flex-col items-center gap-1 rounded-lg bg-amber-500/10 px-4 py-3 text-center">
               <span className="flex items-center gap-2 text-sm font-bold text-amber-300">
-                <Mic size='1em' className="h-3.5 w-3.5" aria-hidden /> {t("note_hunt.needs_pitch")}
+                <Mic className="h-3.5 w-3.5" aria-hidden /> {t("note_hunt.needs_pitch")}
               </span>
               <span className="text-xs font-semibold text-amber-200/70">
                 {t("note_hunt.turn_on")}
@@ -266,12 +266,13 @@ export function NoteHuntDetector({
             {solved ? `★ ${t("note_hunt.correct")}` : t("note_hunt.find_target")}
           </p>
           {!isMicEnabled && !solved && octaves.length > 0 && (
-            <button
+            <Button
               type="button"
-              onClick={() => markNoteHuntOctave(octaves[0])}
-              className="rounded bg-emerald-500/10 px-4 py-1.5 text-sm font-bold text-emerald-400 transition-colors hover:bg-emerald-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+              variant="ghost"
+              size="sm"
+              onClick={() => markNoteHuntOctave(octaves[0])}>
               {t("note_hunt.reveal")}
-            </button>
+            </Button>
           )}
         </div>
       ) : (

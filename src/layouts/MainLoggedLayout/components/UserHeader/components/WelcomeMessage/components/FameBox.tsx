@@ -1,9 +1,11 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { cn } from "assets/lib/utils";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
@@ -21,8 +23,11 @@ export const FameBox = () => {
         <TooltipTrigger asChild>
           <button
             onClick={() => router.push("/arsenal")}
-            className='fame-chip hidden h-11 cursor-pointer items-center justify-center gap-2 rounded-lg bg-amber-500/10 px-3 py-2 shadow-sm backdrop-blur-sm md:flex hover:bg-amber-500/20 transition-colors'
-          >
+            type='button'
+            className={cn(
+              PRESSABLE_KEY,
+              "fame-chip hidden h-11 items-center justify-center gap-2 rounded-lg bg-amber-500/10 px-3 transition-colors hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:flex"
+            )}>
             <img
               src="/images/tokens/coin.png"
               alt="fame"

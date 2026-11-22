@@ -94,17 +94,16 @@ export const TakeSubmitForm = ({
             placeholder={t("submit.placeholder")}
             aria-label={t("submit.placeholder")}
             aria-invalid={!!error}
-            className='h-11 border-zinc-700 bg-zinc-950/60'
+            className='h-10'
           />
           <Button
             type='submit'
             loading={submit.isPending}
             disabled={takesLeft === 0 || !url.trim()}
-            className='h-11 shrink-0 px-5'>
-            <span className='flex items-center gap-2'>
-              <Upload />
-              {t("submit.button")}
-            </span>
+            size='lg'
+            className='shrink-0'>
+            <Upload />
+            {t("submit.button")}
           </Button>
         </div>
 
@@ -115,7 +114,7 @@ export const TakeSubmitForm = ({
           disabled={takesLeft === 0 || submit.isPending}
           placeholder={t("submit.note_placeholder")}
           aria-label={t("submit.note_placeholder")}
-          className='h-10 border-zinc-700 bg-zinc-950/60'
+          className='h-10'
         />
 
         {error && (

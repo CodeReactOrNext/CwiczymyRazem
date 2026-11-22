@@ -101,7 +101,7 @@ const OpeningStage = ({
           />
         </div>
       )}
-      <p className='text-sm font-semibold tracking-widest text-zinc-400'>
+      <p className='text-sm font-medium text-zinc-400'>
         {t("pack.opening", { count: count ?? 0 })}
       </p>
     </motion.div>,
@@ -263,7 +263,7 @@ export const CasePackModal = ({
 
       <div className='relative z-10 my-auto flex w-full max-w-5xl flex-col gap-8 px-4'>
         <div className='flex flex-col items-center gap-3 text-center'>
-          <h2 className='text-2xl font-black capitalize tracking-[0.3em] text-zinc-300'>
+          <h2 className='text-2xl font-bold text-zinc-300'>
             {caseDef
               ? t("pack.title", {
                   name: labels.caseName(caseDef),
@@ -498,7 +498,8 @@ export const CasePackModal = ({
               <Button
                 onClick={handleMerge}
                 disabled={merged || isMerging}
-                className='h-12 w-full bg-white text-sm font-medium tracking-widest text-zinc-900 disabled:opacity-50 hover:bg-zinc-200'>
+                size='lg'
+                className='w-full'>
                 {merged
                   ? t("pack.merged")
                   : isMerging
@@ -509,20 +510,22 @@ export const CasePackModal = ({
             <div className='flex flex-col gap-3 sm:flex-row'>
               {onOpenAgain && caseDef && (
                 <Button
-                  variant='outline'
+                  variant='ghost'
                   onClick={onOpenAgain}
                   disabled={!canOpenAgain || isOpeningAgain || isMerging}
-                  className='h-12 w-full border-zinc-700 bg-zinc-900 text-sm font-medium tracking-widest text-white disabled:opacity-50 hover:bg-zinc-800'>
+                  size='lg'
+                  className='w-full'>
                   {isOpeningAgain
                     ? t("cases.opening")
                     : t("pack.again", { count: pack.requested })}
                 </Button>
               )}
               <Button
-                variant='outline'
+                variant='ghost'
                 onClick={onClose}
                 disabled={isMerging}
-                className='h-12 w-full border-zinc-700 bg-zinc-900 text-sm font-medium tracking-widest text-white disabled:opacity-50 hover:bg-zinc-800'>
+                size='lg'
+                className='w-full'>
                 {t("pack.close")}
               </Button>
             </div>

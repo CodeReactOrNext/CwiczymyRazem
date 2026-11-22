@@ -35,7 +35,7 @@ const FreeTimerMetronome = () => {
   };
 
   return (
-    <AccordionItem value='metronome' className='rounded-lg border-none bg-zinc-900/40'>
+    <AccordionItem value='metronome' className='rounded-lg border-none bg-zinc-800/40'>
       <AccordionTrigger className='px-4 py-3 hover:no-underline'>
         <div className='flex items-center gap-2'>
           <GiMetronome className='h-4 w-4 text-zinc-400' />
@@ -69,16 +69,17 @@ const FreeTimerMetronome = () => {
         <Button
           onClick={handleTogglePlay}
           variant={metronome.isPlaying ? "default" : "subtle"}
-          className='h-11 w-full'
+          size='lg'
+          className='w-full'
           aria-label={metronome.isPlaying ? t("metronome.stop") : t("metronome.start")}>
           {metronome.isPlaying ? (
             <>
-              <Pause className='mr-2 h-4 w-4' fill='currentColor' />
+              <Pause fill='currentColor' />
               {t("metronome.stop")}
             </>
           ) : (
             <>
-              <Play className='mr-2 h-4 w-4' fill='currentColor' />
+              <Play fill='currentColor' />
               {t("metronome.start")}
             </>
           )}

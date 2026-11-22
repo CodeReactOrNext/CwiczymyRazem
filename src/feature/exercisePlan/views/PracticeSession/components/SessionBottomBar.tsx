@@ -73,9 +73,9 @@ const SessionBottomBarComponent = ({
   // Only meaningful mid-plan: the last exercise already has its own "Finish
   // Session" action, and a single-exercise plan has nothing to skip ahead of.
   const canFinishEarly = !examMode && !isLastExercise && totalExercises > 1;
-  // Below the session's own bar — a skill exercise that wasn't played out, or a
-  // plan whose exercises never got their 20s. Finishing from here is still
-  // allowed, it just doesn't earn the skill points; the dialog spells that out.
+  // The session isn't played out yet — its last exercise still has time on the
+  // clock (on every route alike). Finishing from here is still allowed, it just
+  // keeps the time only; the dialog spells that out.
   const isEarlyFinish = !canFinishSession;
   const finishDisabled = !hasLoggedPractice;
 
@@ -100,9 +100,9 @@ const SessionBottomBarComponent = ({
           <Button
             variant="subtle"
             onClick={handleExitClick}
-            className="font-bold text-[11px] tracking-wide text-zinc-400 px-4 gap-2"
+            className="text-zinc-400"
           >
-            <LogOut size='1em' />
+            <LogOut />
             {t("common:practice.exit")}
           </Button>
           <ShortcutsLegend hasTempoControl={hasTempoControl} hasBackingTrack={hasBackingTrack} />
@@ -127,12 +127,11 @@ const SessionBottomBarComponent = ({
         <div className="flex-1 flex justify-end items-center gap-3">
           {currentExerciseIndex > 0 && (
             <Button
-              size="sm"
               variant="subtle"
-              className="font-bold text-[11px] tracking-wide text-zinc-400 px-4 gap-2"
+              className="text-zinc-400"
               onClick={onGoToPreviousExercise}
             >
-              <SkipBack size='1em' /> {t("common:back") || "Back"}
+              <SkipBack /> {t("common:back") || "Back"}
             </Button>
           )}
           {canFinishEarly && (
@@ -140,17 +139,16 @@ const SessionBottomBarComponent = ({
               <TooltipTrigger asChild>
                 <span tabIndex={finishDisabled ? 0 : -1}>
                   <Button
-                    size="sm"
                     variant="subtle"
                     loading={isFinishing || isSubmittingReport}
                     className={cn(
-                      "font-bold text-[11px] tracking-wide text-zinc-400 px-4 gap-2",
+                      "text-zinc-400",
                       finishDisabled && "opacity-50 cursor-not-allowed"
                     )}
                     disabled={finishDisabled}
                     onClick={() => setShowFinishEarlyDialog(true)}
                   >
-                    <FlagIcon size='1em' className="" /> {t("common:practice.finish_plan_early")}
+                    <FlagIcon /> {t("common:practice.finish_plan_early")}
                   </Button>
                 </span>
               </TooltipTrigger>
@@ -167,8 +165,6 @@ const SessionBottomBarComponent = ({
                 variant={isLastExercise ? "default" : "subtle"}
                 loading={isFinishing || isSubmittingReport}
                 className={cn(
-                  "font-bold text-[11px] tracking-wide",
-                  isLastExercise ? "h-10 px-5" : "px-4",
                   isLastExercise && finishDisabled && "opacity-50 cursor-not-allowed"
                 )}
                 onClick={
@@ -187,17 +183,17 @@ const SessionBottomBarComponent = ({
                 ) : isLastExercise ? (
                   <span className="flex items-center gap-2">
                     {t("common:finish_session")}
-                    <Check size='1em' />
+                    <Check />
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
                     {t("next") || "Next"}
-                    <SkipForward size='1em' />
+                    <SkipForward />
                   </span>
                 )}
               </Button>
               {isLastExercise && isEarlyFinish && (
-                <span className="text-[11px] text-zinc-500 tracking-wide">
+                <span className="text-[11px] text-zinc-500">
                   {finishDisabled
                     ? t("common:practice.finish_early.blocked")
                     : t("common:practice.finish_early.hint")}
@@ -214,7 +210,7 @@ const SessionBottomBarComponent = ({
       {/* z-index must beat the session view, overlay included, or this dialog
           opens invisibly behind it. */}
       <DialogContent
-        className='max-w-md bg-zinc-900 text-white sm:p-8 z-[99999999]'
+        className='bg-zinc-900 text-white sm:max-w-md sm:p-8 z-[99999999]'
         overlayClassName='z-[99999998]'
         // Radix would focus the first button — Exit — so a stray Enter threw the
         // session away. Land on the harmless choice instead.
@@ -232,10 +228,11 @@ const SessionBottomBarComponent = ({
           {!finishDisabled && (
             <div className='flex flex-col gap-2'>
               <Button
-                className='h-10 w-full text-sm font-bold'
+                size='lg'
+                className='w-full'
                 loading={isFinishing || isSubmittingReport}
                 onClick={async () => { setShowExitDialog(false); await onFinishSession({ earlyFinish: isEarlyFinish }); }}>
-                <Check size='1em' className='' />
+                <Check />
                 {t("session:exit.finish_save")}
               </Button>
               {isEarlyFinish && (
@@ -249,15 +246,17 @@ const SessionBottomBarComponent = ({
           <div className='flex flex-col-reverse gap-2 sm:flex-row'>
             <Button
               variant='subtle'
-              className='flex-1 text-sm text-zinc-400 hover:bg-red-500/15 hover:text-red-400'
+              size='lg'
+              className='flex-1 text-zinc-400 hover:bg-red-500/15 hover:text-red-400'
               onClick={() => { setShowExitDialog(false); onClose?.(); }}>
-              <LogOut size='1em' className='' />
+              <LogOut />
               {finishDisabled ? t("session:exit.exit") : t("session:exit.exit_no_save")}
             </Button>
             <Button
               ref={stayButtonRef}
               variant={finishDisabled ? "default" : "subtle"}
-              className={cn("flex-1 text-sm", finishDisabled && "font-bold")}
+              size="lg"
+              className="flex-1"
               onClick={() => setShowExitDialog(false)}>
               {t("session:exit.stay")}
             </Button>

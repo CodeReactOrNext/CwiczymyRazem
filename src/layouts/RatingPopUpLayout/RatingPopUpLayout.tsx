@@ -1,7 +1,9 @@
 import { Button } from "assets/components/ui/button";
+import { chipVariants } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import { Kostek } from "components/Mascot/Kostek";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { TIME_POINTS_VALUE } from "constants/ratingValue";
 import type { AchievementList } from "feature/achievements";
@@ -97,16 +99,25 @@ interface RatingPopUpProps {
 // ─── Card shell ───────────────────────────────────────────────────────────────
 
 function Card({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={cn("rounded-lg bg-zinc-900/40 p-7 md:p-8", className)}>{children}</div>;
+  return <div className={cn("rounded-lg bg-zinc-800/40 p-7 md:p-8", className)}>{children}</div>;
 }
 
-function CardHeading({ icon, children, suffix }: { icon?: React.ReactNode; children: React.ReactNode; suffix?: React.ReactNode }) {
+function CardHeading({ icon, children }: { icon?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="mb-6 flex items-center gap-2">
-      {icon && <span className="text-zinc-400">{icon}</span>}
-      <h3 className="text-sm font-semibold text-zinc-300">{children}</h3>
-      {suffix}
-    </div>
+    <SectionHeader
+      as="h3"
+      className="mb-6"
+      title={
+        icon ? (
+          <span className="flex items-center gap-2">
+            <span aria-hidden className="text-zinc-400">{icon}</span>
+            {children}
+          </span>
+        ) : (
+          children
+        )
+      }
+    />
   );
 }
 
@@ -315,19 +326,21 @@ const RatingPopUpLayout = ({
               {onRestart && (
                 <Button
                   variant="ghost"
+                  size="lg"
                   onClick={onRestart}
                   className="w-full text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto shortwide:w-auto"
                 >
-                  <RotateCcw className="h-4 w-4" aria-hidden />
+                  <RotateCcw aria-hidden />
                   {restartLabel ?? t("practise_more")}
                 </Button>
               )}
               <Button
+                size="lg"
                 onClick={handleContinue}
-                className="w-full bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto shortwide:w-auto"
+                className="w-full sm:w-auto shortwide:w-auto"
               >
-                {t("back_to_dashboard")}
-                <ArrowRight className="h-4 w-4" aria-hidden />
+                {t("continue")}
+                <ArrowRight aria-hidden />
               </Button>
             </div>
           </div>
@@ -434,7 +447,7 @@ const RatingPopUpLayout = ({
                       initial={{ scale: 0.7, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 1.1, type: "spring", stiffness: 220, damping: 12 }}
-                      className="inline-flex items-center gap-1 rounded bg-cyan-500/15 px-2 py-0.5 text-xs font-bold text-cyan-300"
+                      className={chipVariants({ color: "cyan", size: "sm" })}
                     >
                       <Sparkles className="h-3 w-3" aria-hidden /> {t("level_up")}
                     </motion.span>
@@ -461,19 +474,21 @@ const RatingPopUpLayout = ({
                 {onRestart && (
                   <Button
                     variant="ghost"
+                    size="lg"
                     onClick={onRestart}
                     className="w-full text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto shortwide:w-auto"
                   >
-                    <RotateCcw className="h-4 w-4" aria-hidden />
+                    <RotateCcw aria-hidden />
                     {restartLabel ?? t("repeat_session")}
                   </Button>
                 )}
                 <Button
+                  size="lg"
                   onClick={handleContinue}
-                  className="w-full bg-white font-semibold text-zinc-950 hover:bg-zinc-200 sm:w-auto shortwide:w-auto"
+                  className="w-full sm:w-auto shortwide:w-auto"
                 >
                   {t("continue")}
-                  <ArrowRight className="h-4 w-4" aria-hidden />
+                  <ArrowRight aria-hidden />
                 </Button>
               </div>
             </div>
@@ -520,7 +535,7 @@ const RatingPopUpLayout = ({
                     const pct = sessionTimeMs > 0 ? (c.ms / sessionTimeMs) * 100 : 0;
                     return (
                       <div key={c.key} className="flex items-center gap-3">
-                        <c.Icon size={15} className="shrink-0 text-zinc-400" />
+                        <c.Icon className="h-4 w-4 shrink-0 text-zinc-400" />
                         <div className="flex-1">
                           <div className="mb-2 flex items-center justify-between text-sm">
                             <span className="font-medium text-zinc-300">{t(`cat.${c.key}`)}</span>
@@ -590,19 +605,21 @@ const RatingPopUpLayout = ({
               {onRestart && (
                 <Button
                   variant="ghost"
+                  size="lg"
                   onClick={onRestart}
-                  className="h-11 flex-1 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+                  className="flex-1 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
                 >
-                  <RotateCcw className="h-4 w-4 shrink-0" aria-hidden />
+                  <RotateCcw className="shrink-0" aria-hidden />
                   <span className="truncate">{restartLabel ?? t("repeat_session")}</span>
                 </Button>
               )}
               <Button
+                size="lg"
                 onClick={handleContinue}
-                className="h-11 flex-1 bg-white font-semibold text-zinc-950 hover:bg-zinc-200"
+                className="flex-1"
               >
                 {t("continue")}
-                <ArrowRight className="h-4 w-4" aria-hidden />
+                <ArrowRight aria-hidden />
               </Button>
             </div>
           )}

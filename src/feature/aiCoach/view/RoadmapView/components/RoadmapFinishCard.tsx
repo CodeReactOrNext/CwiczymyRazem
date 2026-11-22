@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { RewardSummary } from "components/Rewards/RewardSummary";
 import { getRarityColor } from "feature/arsenal/components/RarityBadge";
@@ -86,7 +87,7 @@ export const RoadmapFinishCard = ({
 
         <div>
           <span
-            className='text-[0.6875rem] font-bold tracking-wide'
+            className='text-[0.6875rem] font-bold'
             style={{ color: rarityColor }}>
             {guitar.rarity}
           </span>
@@ -122,10 +123,7 @@ export const RoadmapFinishCard = ({
         <button
           onClick={() => claim(roadmapId)}
           disabled={isPending}
-          className={cn(
-            "relative rounded-lg bg-zinc-100 px-6 py-2.5 text-xs font-bold capitalize tracking-wide text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white",
-            isPending && "cursor-wait opacity-70",
-          )}>
+          className={cn(buttonVariants({ size: "lg" }), "relative")}>
           {isPending ? t("finish_card.collecting") : t("finish_card.collect")}
         </button>
       ) : (

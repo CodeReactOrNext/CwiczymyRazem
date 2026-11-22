@@ -9,6 +9,7 @@ import {
   getSalvageableMod,
   getScrappedMods,
 } from "feature/arsenal/data/salvage";
+import { useBenchReadiness } from "feature/arsenal/hooks/useBenchReadiness";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useListItem } from "feature/arsenal/hooks/useMarketplace";
 import { useScrapGuitar } from "feature/arsenal/hooks/useScrapGuitar";
@@ -41,6 +42,7 @@ import { CollectionEmptyResult } from "../Collection/CollectionEmptyResult";
 import { CollectionSectionHeader } from "../Collection/CollectionSectionHeader";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
+import { useBenchDialogStore } from "../Workshop/benchDialogStore";
 import { BulkDuplicatesDialog } from "./BulkDuplicatesDialog";
 import { EquipTargetDialog } from "./EquipTargetDialog";
 import type { EquipTarget } from "./GuitarCard";
@@ -79,6 +81,8 @@ export const GuitarInventory = ({
     useScrapGuitarsBulk();
   const { mutate: saveRig } = useUpdateRig();
   const shelf = useShelfDeposit(data);
+  const { readyIds: benchReadyIds } = useBenchReadiness(data);
+  const openBench = useBenchDialogStore((state) => state.openBench);
   const userStats = useAppSelector(selectCurrentUserStats);
   const currentFame = userStats?.fame || 0;
 
@@ -241,7 +245,6 @@ export const GuitarInventory = ({
     <>
       <div className='flex flex-col gap-3'>
         <CollectionSectionHeader
-          eyebrow={t("collection.guitars_eyebrow")}
           title={t("collection.scope.guitars")}
           owned={uniqueOwnedCount}
           total={totalGuitarsCount}
@@ -263,7 +266,10 @@ export const GuitarInventory = ({
         {sortedItems.length === 0 ? (
           <CollectionEmptyResult query={query} />
         ) : (
-          <div className='grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
+          // Cards scrolled out of view skip layout and paint; `auto` remembers
+          // each card's real height once it has been drawn, so the scrollbar
+          // does not jump.
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 [&>*]:[contain-intrinsic-size:auto_440px] [&>*]:[content-visibility:auto]'>
             {sortedItems.map((item) => (
               <GuitarCard
                 key={item.id}
@@ -287,6 +293,8 @@ export const GuitarInventory = ({
                     : undefined
                 }
                 isStashing={shelf.isDepositing}
+                onWorkshopClick={() => openBench(item.id)}
+                workshopReady={benchReadyIds.has(item.id)}
               />
             ))}
           </div>

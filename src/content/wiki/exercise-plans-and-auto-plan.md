@@ -1,5 +1,5 @@
 ---
-title: "Practice Routines & Auto Plan"
+title: "Practice Plans & Auto Plan"
 description: "How routines are put together, how Auto Plan builds a session around the time you have, and how sharing exercises with the community works."
 slug: "exercise-plans-and-auto-plan"
 section: "Practice"
@@ -8,7 +8,7 @@ order: 3
 
 A **routine** (the app also calls it a practice plan) is nothing more clever than an ordered list of exercises with a name, a difficulty and a category. You follow it top to bottom, and at the end it logs the session for you.
 
-<ClickPath steps="Practice|Practice Routines" caption="Ready-made routines, playalongs, your own plans, and plans shared by other players." />
+<ClickPath steps="Practice|Practice Plans" caption="Ready-made routines, playalongs, your own plans, and plans shared by other players." />
 
 ## Three ways to get a routine
 

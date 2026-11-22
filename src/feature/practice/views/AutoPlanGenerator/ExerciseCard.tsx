@@ -212,7 +212,7 @@ export const ExerciseCard = ({
             align='end'
             sideOffset={6}
             collisionPadding={16}
-            className='w-48 border-white/10 bg-zinc-900 p-1.5 text-zinc-100 shadow-none'>
+            className='w-48'>
             {onPreview && (
               <DropdownMenuItem
                 onSelect={() => onPreview(exercise)}

@@ -90,7 +90,7 @@ export const RarityLockNote = ({
       style={{ color, filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.95))" }}
     />
     <span
-      className='text-[12px] font-bold tracking-wide'
+      className='text-[12px] font-bold'
       style={{ color, textShadow: "0 1px 3px rgba(0,0,0,0.95)" }}>
       {rarityLockLabel(lvl, labels.t)}
     </span>

@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { Input } from "assets/components/ui/input";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import { useSongSuggestions } from "feature/songs/hooks/useSongSuggestions";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { getAllUserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
-import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import { Check, Loader2, Music, Search } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useMemo, useState } from "react";
@@ -59,16 +60,7 @@ const TierChip = ({ song }: { song: Song }) => {
       ? "?"
       : song.tier || song.avgDifficulty || "?",
   );
-  return (
-    <span
-      className='shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold'
-      style={{
-        backgroundColor: inkWash(tier.color, 12),
-        color: inkAccent(tier.color),
-      }}>
-      {tier.tier}
-    </span>
-  );
+  return <TierPick tier={tier} className='h-5 w-5' />;
 };
 
 const SongRow = ({
@@ -265,33 +257,36 @@ const SessionSongPicker = ({
 
   if (!userId || isLoading) {
     return (
-      <div className='flex items-center justify-center rounded-lg bg-zinc-900/40 py-12 text-zinc-500'>
-        <Loader2 className='h-5 w-5 animate-spin' />
+      <div
+        className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-3 sm:p-4'
+        aria-busy='true'>
+        <Skeleton className='h-11 rounded-lg' />
+        <div className='flex flex-col gap-1'>
+          {Array.from({ length: 4 }, (_, i) => (
+            <div key={i} className='flex items-center gap-3 p-2'>
+              <Skeleton className='h-10 w-10 shrink-0 rounded-lg' />
+              <Skeleton className='h-4 w-1/2' />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
     <div className='flex flex-col gap-4 rounded-lg bg-zinc-900/40 p-3 sm:p-4'>
-      <div className='group relative'>
-        <div className='pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3.5'>
-          {isSearching ? (
-            <Loader2 className='h-4 w-4 animate-spin text-zinc-400' />
-          ) : (
-            <Search className='h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-zinc-200' />
-          )}
-        </div>
-        <Input
-          placeholder={t("flow.song_search")}
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          onKeyDown={(event) => {
-            // The field lives inside the report form; Enter must not save it.
-            if (event.key === "Enter") event.preventDefault();
-          }}
-          className='h-11 border-none bg-zinc-950/40 pl-10 text-base text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-cyan-500/40 sm:text-sm'
-        />
-      </div>
+      <SearchInput
+        icon={isSearching ? Loader2 : Search}
+        iconClassName={isSearching ? "animate-spin text-zinc-400" : undefined}
+        placeholder={t("flow.song_search")}
+        aria-label={t("flow.song_search")}
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        onKeyDown={(event) => {
+          // The field lives inside the report form; Enter must not save it.
+          if (event.key === "Enter") event.preventDefault();
+        }}
+      />
 
       {isAtLimit && (
         <p className='px-2 text-xs font-semibold text-amber-400'>

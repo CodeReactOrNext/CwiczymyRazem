@@ -1,5 +1,5 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { RippleButton } from "hooks/useRipple";
 import { useTranslation } from "hooks/useTranslation";
 import { Lock, X } from "lucide-react";
 import type { GuitarTuningPreset } from "utils/audio/tunings";
@@ -80,13 +80,17 @@ export function TunerDialog({
       <div
         className='relative max-h-[calc(100dvh-1.5rem)] w-80 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-lg bg-zinc-900 p-6 shadow-2xl short:p-4'
         onClick={(e) => e.stopPropagation()}>
-        <RippleButton
+        <Button
+          type='button'
+          variant='ghost'
+          size='icon'
           onClick={onClose}
-          className='absolute right-4 top-4 text-zinc-500 transition-colors hover:text-white'>
-          <X size={16} />
-        </RippleButton>
+          aria-label={t("close")}
+          className='absolute right-4 top-4 z-10'>
+          <X />
+        </Button>
 
-        <p className='text-center text-[10px] font-semibold tracking-wide text-zinc-500'>
+        <p className='text-center text-xs font-medium text-zinc-400'>
           {t("tuner.title")}
         </p>
         <p className='mt-1 flex items-center justify-center gap-1.5 text-center text-xs font-semibold text-zinc-300'>

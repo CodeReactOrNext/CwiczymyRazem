@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
-import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { TrackPlayer } from "feature/improv/components/TrackPlayer";
 import {
   useRemoveImprovTrack,
@@ -9,6 +9,7 @@ import {
 } from "feature/improv/hooks/useImprov";
 import type { ImprovTrack } from "feature/improv/types/improv.types";
 import { IMPROV_ROUND_DAYS } from "feature/improv/types/improv.types";
+import { placeKeyClass } from "feature/leadboard/components/rankRowStyles";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import { ChevronUp, Music2, Plus, Trash2 } from "lucide-react";
@@ -40,8 +41,13 @@ const PoolRow = ({
 
   return (
     <li className='flex flex-wrap items-center gap-4 rounded-lg bg-zinc-800/40 p-4'>
-      <span className='w-6 shrink-0 text-center text-sm font-semibold tabular-nums text-zinc-500'>
-        {String(rank).padStart(2, "0")}
+      {/* The gold key on top says it leads: that track becomes the round. */}
+      <span
+        translate='no'
+        title={rank === 1 ? t("next.leading") : undefined}
+        className={cn("h-7 w-8 text-xl", placeKeyClass(rank, false))}>
+        {rank}
+        {rank === 1 && <span className='sr-only'>{t("next.leading")}</span>}
       </span>
       <TrackPlayer
         variant='thumb'
@@ -50,11 +56,8 @@ const PoolRow = ({
       />
 
       <div className='min-w-0 flex-1 basis-48'>
-        <p className='flex flex-wrap items-center gap-2'>
-          <span className='truncate text-base font-semibold text-zinc-100'>
-            {track.title}
-          </span>
-          {rank === 1 && <Chip color='amber'>{t("next.leading")}</Chip>}
+        <p className='truncate text-base font-semibold text-zinc-100'>
+          {track.title}
         </p>
         {track.channel && (
           <p className='mt-0.5 truncate text-sm text-zinc-400'>
@@ -94,16 +97,14 @@ const PoolRow = ({
             })
           }
           className={cn(
-            "h-10 min-w-[5.5rem] px-4",
+            "min-w-[5.5rem]",
             track.hasMyVote &&
               "bg-amber-400/15 text-amber-300 hover:bg-amber-400/20 hover:text-amber-200",
           )}>
-          <span className='flex items-center gap-2'>
-            <ChevronUp />
-            <span className='tabular-nums'>{track.voteCount}</span>
-            <span className='sr-only'>
-              {track.hasMyVote ? t("next.voted") : t("next.vote")}
-            </span>
+          <ChevronUp />
+          <span className='tabular-nums'>{track.voteCount}</span>
+          <span className='sr-only'>
+            {track.hasMyVote ? t("next.voted") : t("next.vote")}
           </span>
         </Button>
       </div>
@@ -142,26 +143,18 @@ export const TrackPool = ({
             {t("next.body", { days: IMPROV_ROUND_DAYS })}
           </p>
         </div>
-        <Button onClick={onUpload} className='h-11 shrink-0 px-5'>
-          <span className='flex items-center gap-2'>
-            <Plus />
-            {t("next.upload")}
-          </span>
+        <Button onClick={onUpload} size='lg' className='shrink-0'>
+          <Plus />
+          {t("next.upload")}
         </Button>
       </Card>
 
       {pool.length === 0 ? (
-        <div className='flex flex-col items-center justify-center py-16 text-center'>
-          <div className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500'>
-            <Music2 size={26} />
-          </div>
-          <h3 className='mb-1 text-lg font-bold text-zinc-100'>
-            {t("next.empty_title")}
-          </h3>
-          <p className='max-w-sm text-sm text-zinc-400'>
-            {t("next.empty_body")}
-          </p>
-        </div>
+        <EmptyState
+          icon={<Music2 />}
+          title={t("next.empty_title")}
+          description={t("next.empty_body")}
+        />
       ) : (
         <ol className='flex flex-col gap-3'>
           {pool.map((track, index) => (

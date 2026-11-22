@@ -43,6 +43,7 @@
     "create": "Crear plan"
   },
   "favorites": {
+    "eyebrow": "Biblioteca",
     "title": "Favoritos",
     "subtitle": "Planes, ejercicios y canciones guardados",
     "empty_title": "Aún no has guardado nada",
@@ -168,6 +169,8 @@
     "folder_not_empty": "Primero mueve o elimina el contenido de la carpeta",
     "folder_deleted": "Carpeta «{{name}}» eliminada",
     "folder_delete_failed": "No se pudo eliminar la carpeta",
+    "delete_file": "Eliminar {{name}}",
+    "delete_folder": "Eliminar carpeta {{name}}",
     "title": "Archivos de Guitar Pro",
     "subtitle": "Tu biblioteca de archivos de Guitar Pro",
     "practice": "Práctica",

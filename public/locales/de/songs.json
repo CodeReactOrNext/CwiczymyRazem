@@ -185,6 +185,7 @@
     "mastered": "Gemeistert",
     "total": "Gesamt",
     "time_spent": "Verbrachte Zeit",
+    "chart_title": "Song-Übung",
     "master_more": "Meistere mehr Songs, um dein Niveau zu bewerten."
   },
   "board": {
@@ -368,5 +369,6 @@
     "board_empty_hint": "Füge Songs aus der Bibliothek hinzu, um sie zu üben und hier deinen Fortschritt zu verfolgen.",
     "explore_library": "Bibliothek entdecken",
     "filter_by_tier": "Nach Stufe filtern"
-  }
+  },
+  "points_delta": "({{points}} Pkt.)"
 }

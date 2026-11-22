@@ -21,7 +21,7 @@ export const ShopWindowBank = () => {
   const { t } = useTranslation("supporter");
 
   return (
-    <div className='relative flex flex-col gap-5 overflow-hidden rounded-lg bg-zinc-900/40 p-6 md:flex-row md:items-center md:gap-8 md:px-7'>
+    <div className='relative flex flex-col gap-5 overflow-hidden rounded-lg bg-zinc-800/40 p-6 md:flex-row md:items-center md:gap-8 md:px-7'>
       <div className='light-tint pointer-events-none absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-transparent' />
 
       <div className='relative flex shrink-0 items-center gap-3'>
@@ -50,10 +50,8 @@ export const ShopWindowBank = () => {
 
       <Button asChild size='lg' className='relative shrink-0'>
         <a href={BMC_URL} target='_blank' rel='noreferrer'>
-          <span className='flex items-center gap-2'>
-            <Heart size={16} fill='currentColor' />
-            {t("panel.pitch.support")}
-          </span>
+          <Heart size={16} fill='currentColor' />
+          {t("panel.pitch.support")}
         </a>
       </Button>
     </div>

@@ -1,4 +1,4 @@
-import { PRESSABLE } from "assets/components/ui/button";
+import { Button, PRESSABLE } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -563,12 +563,13 @@ const Plate = ({ index, item, onOpenPicker, onRemove }: PlateProps) => {
           </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button
+              <Button
                 type='button'
-                aria-label={t("rack.more_for_slot", { slot: numeral })}
-                className='rounded p-1.5 text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-100/10 hover:text-white'>
-                <MoreVertical size={18} />
-              </button>
+                variant='ghost'
+                size='icon'
+                aria-label={t("rack.more_for_slot", { slot: numeral })}>
+                <MoreVertical />
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end' className='min-w-[10rem]'>
               <DropdownMenuItem

@@ -69,6 +69,8 @@ export interface RoadPathNodeProps {
   startLabel?: string;
   /** Sits on the key's corner — Journey's tick on a finished step. */
   badge?: ReactNode;
+  /** Just under the key, over the road — Journey's stars on a finished step. */
+  below?: ReactNode;
   /**
    * `cut`: a page-coloured ring that cuts the road's line where the stop sits.
    * `none`: no ring, for a row of stops with no line behind it.
@@ -92,6 +94,7 @@ export const RoadPathNode = ({
   selected,
   startLabel,
   badge,
+  below,
   halo = "cut",
   disabled,
   onClick,
@@ -152,6 +155,11 @@ export const RoadPathNode = ({
           {badge}
         </button>
       </div>
+      {below && (
+        <div className='pointer-events-none absolute left-1/2 top-full z-10 -mt-1 -translate-x-1/2'>
+          {below}
+        </div>
+      )}
     </div>
   );
 };

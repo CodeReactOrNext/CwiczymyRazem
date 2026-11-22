@@ -1,4 +1,7 @@
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { BoardPieceTile } from "feature/arsenal/components/Collection/BoardPieceTile";
 import { StashBoard } from "feature/arsenal/components/Collection/StashBoard";
 import { StashItemDialog } from "feature/arsenal/components/Collection/StashItemDialog";
@@ -8,12 +11,15 @@ import { useUpdateStashLayout } from "feature/arsenal/hooks/useUpdateStashLayout
 import type { ScrapPart } from "feature/arsenal/types/arsenal.types";
 import type { BoardPiece } from "feature/arsenal/utils/boardPieces";
 import {
+  componentPieces,
   guitarPiece,
   modPieces,
   partPiece,
   partPieces,
   pedalPiece,
 } from "feature/arsenal/utils/boardPieces";
+import type { CollectionScope } from "feature/arsenal/utils/collectionFilter";
+import { COLLECTION_SCOPES } from "feature/arsenal/utils/collectionFilter";
 import type { DexLookup, DexStatus } from "feature/arsenal/utils/dex";
 import { buildDexLookup } from "feature/arsenal/utils/dex";
 import type { StashLayout } from "feature/arsenal/utils/stashLayout";
@@ -21,6 +27,7 @@ import {
   columnOf,
   resolveLayout,
   rowOf,
+  toTabbedLayout,
 } from "feature/arsenal/utils/stashLayout";
 import { HonorMark } from "feature/guilds/components/HonorMark";
 import { HonorPriceTag } from "feature/guilds/components/HonorPriceTag";
@@ -46,11 +53,28 @@ import {
 import { shelfRowsUsed } from "feature/guilds/utils/guildShelf.utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
-import { ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import type { LucideIcon } from "lucide-react";
+import {
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Cog,
+  Guitar,
+  Layers,
+} from "lucide-react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useResponsiveStore } from "store/useResponsiveStore";
 import { auth } from "utils/firebase/client/firebase.utils";
+
+/** A shelf of the member's own gear. Builder parts never go to a guild, so no tab. */
+type GearShelf = Exclude<CollectionScope, "builder">;
+
+/** The Arsenal stash's own tabs and icons, so the two boards read as one stash. */
+const GEAR_SHELVES: { id: GearShelf; label: string; Icon: LucideIcon }[] = [
+  { id: "guitars", label: "Guitars", Icon: Guitar },
+  { id: "pedals", label: "Pedals", Icon: Layers },
+  { id: "parts", label: "Parts", Icon: Cog },
+];
 
 /**
  * One entry on the shelf as a socket, keyed by the entry rather than the item.
@@ -104,7 +128,7 @@ const Ledger = ({ tallies }: { tallies: StashTally[] }) => (
       return (
         <div
           key={tally.uid}
-          className='flex items-center gap-3 rounded-lg bg-zinc-900/40 px-4 py-2.5'>
+          className='flex items-center gap-3 rounded-lg bg-zinc-800/40 px-4 py-2.5'>
           <span className='min-w-0 flex-1 truncate text-sm font-semibold text-zinc-200'>
             {tally.displayName}
           </span>
@@ -150,7 +174,7 @@ export const GuildStashTab = ({
   enabled: boolean;
   guild: Guild;
 }) => {
-  const { t } = useTranslation("guilds");
+  const { t } = useTranslation(["guilds", "arsenal"]);
   const { data: stash, isLoading } = useGuildStash(enabled);
   const { data: gear } = useMyGear(enabled);
   const { deposit, take } = useStashMutations();
@@ -162,6 +186,8 @@ export const GuildStashTab = ({
   /** The arrangement being edited, before it comes back from the server. */
   const [draft, setDraft] = useState<StashLayout | null>(null);
   const [amount, setAmount] = useState<AmountPrompt | null>(null);
+  /** The gear tab picked by hand; until then, the first one with anything on it. */
+  const [pickedShelf, setPickedShelf] = useState<GearShelf | null>(null);
 
   const busy = deposit.isPending || take.isPending;
 
@@ -188,18 +214,52 @@ export const GuildStashTab = ({
   const shelfRows = Math.max(guild.stashRowLimit, rowsUsed);
   const rowsFree = Math.max(0, guild.stashRowLimit - rowsUsed);
 
-  const gearPieces = useMemo(
-    () => [
-      ...partPieces(gear?.parts ?? []),
-      ...modPieces(gear?.salvagedMods ?? []),
-      ...(gear?.inventory ?? []).map(guitarPiece),
-      ...(gear?.effectInventory ?? []).map(pedalPiece),
-    ],
+  // The member's gear on the same shelves the Arsenal stash keeps it on, in the
+  // same order, so a piece hangs in the same socket on both screens.
+  const gearShelfPieces = useCallback(
+    (shelfId: CollectionScope): BoardPiece[] => {
+      if (shelfId === "guitars") return (gear?.inventory ?? []).map(guitarPiece);
+      if (shelfId === "pedals")
+        return (gear?.effectInventory ?? []).map(pedalPiece);
+      if (shelfId === "parts")
+        return [
+          ...partPieces(gear?.parts ?? []),
+          ...modPieces(gear?.salvagedMods ?? []),
+        ];
+      return componentPieces(gear?.components ?? []);
+    },
     [gear],
   );
+  const gearCounts = useMemo(
+    () =>
+      Object.fromEntries(
+        GEAR_SHELVES.map(({ id }) => [id, gearShelfPieces(id).length]),
+      ) as Record<GearShelf, number>,
+    [gearShelfPieces],
+  );
+  const gearTotal = GEAR_SHELVES.reduce((sum, { id }) => sum + gearCounts[id], 0);
+  const gearShelf: GearShelf =
+    pickedShelf ??
+    GEAR_SHELVES.find(({ id }) => gearCounts[id] > 0)?.id ??
+    "guitars";
+  const gearPieces = useMemo(
+    () => gearShelfPieces(gearShelf),
+    [gearShelfPieces, gearShelf],
+  );
+  // Every shelf counts its own cells — the Arsenal's tabbed layout — so a
+  // layout from before the tabs is folded per shelf, exactly as it is there.
+  const savedLayout = useMemo(
+    () =>
+      toTabbedLayout(
+        gear?.stashLayout ?? {},
+        COLLECTION_SCOPES.map(gearShelfPieces),
+      ),
+    [gear?.stashLayout, gearShelfPieces],
+  );
+  const baseLayout = draft ?? savedLayout;
   const mine = useMemo(
-    () => resolveLayout(gearPieces, draft ?? gear?.stashLayout ?? {}),
-    [gearPieces, draft, gear?.stashLayout],
+    () => resolveLayout(gearPieces, baseLayout),
+    [gearPieces, baseLayout],
   );
   // What the shelf holds that the member already has, or has had — read off
   // the same arsenal query the gear board is drawn from.
@@ -263,7 +323,9 @@ export const GuildStashTab = ({
     setAmount({ mode: "confirm", entry });
   };
 
-  const applyMove = (next: StashLayout) => {
+  /** This shelf's new positions, written back into every shelf's map. */
+  const applyMove = (shelfLayout: StashLayout) => {
+    const next = { ...baseLayout, ...shelfLayout };
     setDraft(next);
     saveLayout(next);
   };
@@ -355,12 +417,9 @@ export const GuildStashTab = ({
 
   if (isLoading || !stash) {
     return (
-      <div className='space-y-3'>
+      <div className='space-y-3' aria-busy='true'>
         {Array.from({ length: 4 }, (_, index) => (
-          <div
-            key={index}
-            className='h-20 animate-pulse rounded-lg bg-zinc-900/40'
-          />
+          <Skeleton key={index} variant='block' className='h-20' />
         ))}
       </div>
     );
@@ -376,7 +435,7 @@ export const GuildStashTab = ({
     <div className='space-y-10'>
       <section className='space-y-4'>
         <h2 className='flex items-center gap-2 text-sm font-bold text-zinc-200'>
-          <ArrowDownToLine size={15} className='text-cyan-400' />
+          <ArrowDownToLine className='h-4 w-4 text-cyan-400' />
           {t("stash.on_shelf")}
           <span className='font-medium text-zinc-500'>
             {shelfPieces.length}
@@ -423,14 +482,29 @@ export const GuildStashTab = ({
 
       <section className='space-y-4'>
         <h2 className='flex items-center gap-2 text-sm font-bold text-zinc-200'>
-          <ArrowUpFromLine size={15} className='text-emerald-400' />
+          <ArrowUpFromLine className='h-4 w-4 text-emerald-400' />
           {t("stash.your_gear")}
         </h2>
 
-        {gearPieces.length === 0 ? (
+        {gearTotal === 0 ? (
           <p className='text-sm text-zinc-500'>{t("stash.no_gear")}</p>
         ) : (
           <>
+            <SegmentedControl
+              label={t("arsenal:collection.shelf", "Shelf")}
+              selected={[gearShelf]}
+              onSelect={(id) => {
+                setPickedShelf(id);
+                setAmount(null);
+              }}
+              options={GEAR_SHELVES.map(({ id, label, Icon }) => ({
+                value: id,
+                label: t(`arsenal:collection.scope.${id}`, label),
+                icon: <Icon size={15} />,
+                count: gearCounts[id],
+              }))}
+            />
+
             <StashBoard
               rows={mine.rows}
               gridRef={gearGrid}
@@ -446,21 +520,18 @@ export const GuildStashTab = ({
       </section>
 
       <section className='space-y-4'>
-        <div className='flex flex-col gap-1'>
-          <h2 className='text-sm font-bold text-zinc-200'>
-            {t("stash.ledger_title")}
-          </h2>
-          <p className='text-sm text-zinc-400'>{t("stash.ledger_body")}</p>
-        </div>
+        <SectionHeader
+          title={t("stash.ledger_title")}
+          description={t("stash.ledger_body")}
+          className='mb-0'
+        />
         <Ledger tallies={stash.tallies} />
       </section>
 
       {stash.log.length > 0 && (
         <section className='space-y-4'>
-          <h2 className='text-sm font-bold text-zinc-200'>
-            {t("stash.recent")}
-          </h2>
-          <div className='space-y-2 rounded-lg bg-zinc-900/40 px-4 py-3.5'>
+          <SectionHeader title={t("stash.recent")} className='mb-0' />
+          <div className='space-y-2 rounded-lg bg-zinc-800/40 px-4 py-3.5'>
             {stash.log.map((entry) => (
               <p key={entry.id} className='text-xs text-zinc-500'>
                 <Interpolate

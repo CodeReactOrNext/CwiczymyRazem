@@ -61,7 +61,7 @@ export const RoadmapIdeaCard = ({
   return (
     <article
       className={cn(
-        "flex gap-5 rounded-lg bg-zinc-900/40 p-5 transition-background hover:bg-zinc-900/60 sm:p-6",
+        "flex gap-5 rounded-lg bg-zinc-800/40 p-5 transition-background hover:bg-zinc-800/60 sm:p-6",
         idea.status === "declined" && "opacity-60",
       )}>
       {/* The place on the board, so "what is next" is a number, not a guess.

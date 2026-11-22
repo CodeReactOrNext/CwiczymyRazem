@@ -1,3 +1,5 @@
+import { cn } from "assets/lib/utils";
+import { PAGE_GUTTER, PageShell } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { SummaryView } from "feature/aiSummary/view/SummaryView";
 import { LevelGate } from "feature/levelGate/components/LevelGate";
@@ -20,7 +22,7 @@ import { withAuthInitialProps } from "utils/auth/authInitialProps";
 const MilestonesTabs = () => {
   const tabs = useProgressTabs();
   return (
-    <div className='px-4 pt-6 md:px-6'>
+    <div className={cn(PAGE_GUTTER, "pt-6")}>
       <PageTabs tabs={tabs} activeHref='/summary' ariaLabel='Progress sections' />
     </div>
   );
@@ -33,7 +35,7 @@ const SummaryPage: NextPageWithLayout = () => {
 
   const milestones =
     !isMaster && userInfo !== null ? (
-      <div className='min-h-screen bg-zinc-950'>
+      <div className='flex flex-col'>
         <MilestonesTabs />
         <PremiumFeaturePreview
           eyebrow='Session'
@@ -69,22 +71,21 @@ const SummaryPage: NextPageWithLayout = () => {
         />
       </div>
     ) : (
-      <div className='flex min-h-screen flex-col overflow-visible rounded-lg border-none bg-second-600 shadow-sm'>
+      <PageShell>
         <PremiumGate feature='summary' requiredPlan='master'>
           <SummaryView />
         </PremiumGate>
-      </div>
+      </PageShell>
     );
 
   // Milestones are read out of your own practice history, so the page waits for
   // one behind the level gate.
   return (
-    <LevelGate
-      feature='summary'
-      header={<MilestonesTabs />}
-      className='min-h-screen bg-zinc-950'>
-      {milestones}
-    </LevelGate>
+    <PageShell>
+      <LevelGate feature='summary' header={<MilestonesTabs />}>
+        {milestones}
+      </LevelGate>
+    </PageShell>
   );
 };
 

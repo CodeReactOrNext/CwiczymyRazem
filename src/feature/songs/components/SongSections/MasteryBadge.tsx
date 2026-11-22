@@ -78,7 +78,7 @@ export const MasteryBadge = ({
       </button>
 
       {open && (
-        <div className='absolute bottom-full right-0 z-50 mb-1 min-w-[130px] rounded-lg bg-zinc-950 p-1 shadow-2xl'>
+        <div className='absolute bottom-full right-0 z-50 mb-1 min-w-[130px] rounded-lg bg-zinc-900 p-1'>
           {([0, 1, 2, 3, 4] as MasteryLevel[]).map((level) => (
             <button
               key={level}

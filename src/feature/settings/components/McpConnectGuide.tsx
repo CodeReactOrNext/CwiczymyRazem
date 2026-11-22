@@ -1,10 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "assets/components/ui/tabs";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import {
   ClaudeAddConnectorScreen,
   ClaudeChatScreen,
@@ -72,7 +67,7 @@ const CopyLine = ({ value }: { value: string }) => {
         onClick={copy}
         className='shrink-0'
         aria-label={t("mcp.copy")}>
-        {copied ? <Check className='h-4 w-4' /> : <Copy className='h-4 w-4' />}
+        {copied ? <Check /> : <Copy />}
       </Button>
     </div>
   );
@@ -141,6 +136,7 @@ const Steps = ({ steps }: { steps: Step[] }) => (
 export const McpConnectGuide = ({ url }: { url: string }) => {
   const { t } = useTranslation("settings");
   const g = (key: string) => t(`mcp.guide.${key}`);
+  const [client, setClient] = useState<ClientId>("claude");
   const cursorConfig = JSON.stringify(
     { mcpServers: { "riff-quest": { url } } },
     null,
@@ -248,23 +244,19 @@ export const McpConnectGuide = ({ url }: { url: string }) => {
         <p className='text-sm font-semibold text-zinc-200'>{g("title")}</p>
         <p className='mt-1 text-sm text-zinc-400'>{g("subtitle")}</p>
       </div>
-      <Tabs defaultValue='claude'>
-        <TabsList className='h-auto flex-wrap justify-start gap-1 bg-zinc-900/60'>
-          {CLIENTS.map((client) => (
-            <TabsTrigger
-              key={client}
-              value={client}
-              className='text-zinc-400 data-[state=active]:bg-zinc-800 data-[state=active]:text-zinc-100 data-[state=active]:shadow-none'>
-              {CLIENT_NAMES[client]}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        {CLIENTS.map((client) => (
-          <TabsContent key={client} value={client} className='mt-8'>
-            <Steps steps={steps[client]} />
-          </TabsContent>
-        ))}
-      </Tabs>
+      {/* Which app you use is a choice, not a page section — a segmented
+          control, so it does not read as a second tab bar under Settings'. */}
+      <div>
+        <SegmentedControl<ClientId>
+          label={g("title")}
+          selected={[client]}
+          onSelect={setClient}
+          options={CLIENTS.map((id) => ({ value: id, label: CLIENT_NAMES[id] }))}
+        />
+        <div className='mt-8'>
+          <Steps steps={steps[client]} />
+        </div>
+      </div>
       <p className='pt-2 text-sm text-zinc-500'>{g("then")}</p>
     </div>
   );

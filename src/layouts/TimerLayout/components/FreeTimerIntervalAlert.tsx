@@ -79,7 +79,7 @@ const FreeTimerIntervalAlert = ({ elapsedMs, isRunning }: FreeTimerIntervalAlert
   };
 
   return (
-    <AccordionItem value='interval-alert' className='rounded-lg border-none bg-zinc-900/40'>
+    <AccordionItem value='interval-alert' className='rounded-lg border-none bg-zinc-800/40'>
       <AccordionTrigger className='px-4 py-3 hover:no-underline'>
         <div className='flex items-center gap-2'>
           {enabled ? (
@@ -133,8 +133,8 @@ const FreeTimerIntervalAlert = ({ elapsedMs, isRunning }: FreeTimerIntervalAlert
               className={cn(
                 "h-7 rounded px-2 py-1 text-center text-xs [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
                 customInput !== ""
-                  ? "border-cyan-500/40 text-cyan-400"
-                  : "border-transparent bg-zinc-800/50 text-zinc-400"
+                  ? "text-cyan-400 ring-1 ring-cyan-500/40"
+                  : "text-zinc-400"
               )}
             />
           </div>
@@ -152,16 +152,17 @@ const FreeTimerIntervalAlert = ({ elapsedMs, isRunning }: FreeTimerIntervalAlert
         <Button
           onClick={() => setEnabled((prev) => !prev)}
           variant={enabled ? "default" : "subtle"}
-          className='h-11 w-full'
+          size='lg'
+          className='w-full'
           aria-label={enabled ? t("interval_alert.disable") : t("interval_alert.enable")}>
           {enabled ? (
             <>
-              <BellOff className='mr-2 h-4 w-4' />
+              <BellOff />
               {t("interval_alert.disable")}
             </>
           ) : (
             <>
-              <Bell className='mr-2 h-4 w-4' />
+              <Bell />
               {t("interval_alert.enable")}
             </>
           )}

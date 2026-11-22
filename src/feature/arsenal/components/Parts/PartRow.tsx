@@ -169,8 +169,9 @@ export const PartRow = ({
           <span className='flex min-w-0 flex-1 flex-col gap-0.5'>
             <span
               className={cn(
-                "font-bold text-zinc-100",
-                dense ? "text-xs" : "text-base",
+                "font-bold",
+                // Dense rows sit in a white tooltip: inherit its ink.
+                dense ? "text-xs" : "text-base text-zinc-100",
               )}>
               {name}
             </span>
@@ -178,7 +179,7 @@ export const PartRow = ({
               <span
                 className={cn(
                   "font-semibold",
-                  dense ? "text-[10px]" : "text-sm",
+                  dense ? "text-[11px]" : "text-sm",
                 )}
                 style={{ color: readableText(tierColor) }}>
                 {tierName}
@@ -252,8 +253,8 @@ export const PartRow = ({
           ) : (
             <span
               className={cn(
-                "shrink-0 font-black tabular-nums text-white",
-                dense ? "text-xs" : "text-base",
+                "shrink-0 font-black tabular-nums",
+                dense ? "text-xs" : "text-base text-white",
               )}>
               ×{qty}
             </span>

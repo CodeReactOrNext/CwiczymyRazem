@@ -21,7 +21,8 @@ export const UserRecordingsSection = ({ userId }: UserRecordingsSectionProps) =>
   } = useRecordings(userId);
 
   return (
-    <div className="rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm">
+    // The recording cards are the cards here — no frame around them.
+    <div>
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-white leading-tight">{t("layout.sections.recordings.title")}</h2>
         <p className="mt-1 text-sm text-zinc-400">{t("recordings_hint")}</p>

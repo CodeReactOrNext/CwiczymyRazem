@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { format } from "date-fns";
 import { useTranslation } from "hooks/useTranslation";
 import { useDateFnsLocale } from "lib/i18n/dateLocale";
@@ -57,14 +58,16 @@ export const GoalHistory = ({
             {goal.targetBpm} BPM
           </span>
           {raisable.has(goal.id) && (
-            <button
+            <Button
               type='button'
+              variant='subtle'
+              size='sm'
               onClick={() => onRaise(goal)}
-              className='flex shrink-0 items-center gap-1.5 rounded-lg bg-zinc-800 px-3 py-2 text-xs font-medium text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700'>
-              <ArrowUp className='h-3.5 w-3.5' />
+              className='shrink-0 gap-1.5'>
+              <ArrowUp />
               <span className='hidden sm:inline'>{t("history.raise")}</span>
               <span className='sr-only sm:hidden'>{t("history.raise")}</span>
-            </button>
+            </Button>
           )}
         </div>
       ))}

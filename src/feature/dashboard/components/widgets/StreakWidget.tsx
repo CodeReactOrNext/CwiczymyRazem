@@ -50,7 +50,7 @@ export const StreakWidget = () => {
 
       <div className='flex items-end justify-between gap-4'>
         <div className='flex items-baseline gap-2'>
-          <span className='text-4xl font-bold tabular-nums text-white'>
+          <span className='text-3xl font-bold tabular-nums text-white'>
             {dayWithoutBreak}
           </span>
           <span className='text-sm text-zinc-400'>

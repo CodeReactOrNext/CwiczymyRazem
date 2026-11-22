@@ -5,8 +5,8 @@ import type { CollectionEntry } from "./collectionFilter";
 import {
   filterAndSortEntries,
   filterEntries,
-  isScopeVisible,
   matchesQuery,
+  scopeOfPiece,
   sortEntries,
 } from "./collectionFilter";
 
@@ -120,13 +120,6 @@ describe("sortEntries", () => {
     expect(order).toEqual(["epic", "rare-old", "common"]);
   });
 
-  it("orders one kind by rarity under type — the split by kind is the board's", () => {
-    const order = sortEntries([common, rareOld, epic], "type").map(
-      (e) => e.item,
-    );
-    expect(order).toEqual(["epic", "rare-old", "common"]);
-  });
-
   it("does not mutate the input array", () => {
     const input = [common, epic];
     sortEntries(input, "rarity");
@@ -148,14 +141,12 @@ describe("filterAndSortEntries", () => {
   });
 });
 
-describe("isScopeVisible", () => {
-  it("shows both sections for the all scope", () => {
-    expect(isScopeVisible("all", "guitars")).toBe(true);
-    expect(isScopeVisible("all", "pedals")).toBe(true);
-  });
-
-  it("hides the other section for a narrowed scope", () => {
-    expect(isScopeVisible("guitars", "pedals")).toBe(false);
-    expect(isScopeVisible("pedals", "guitars")).toBe(false);
+describe("scopeOfPiece", () => {
+  it("puts every kind of piece on exactly one shelf", () => {
+    expect(scopeOfPiece("guitar")).toBe("guitars");
+    expect(scopeOfPiece("effect")).toBe("pedals");
+    expect(scopeOfPiece("part")).toBe("parts");
+    expect(scopeOfPiece("mod")).toBe("parts");
+    expect(scopeOfPiece("component")).toBe("builder");
   });
 });

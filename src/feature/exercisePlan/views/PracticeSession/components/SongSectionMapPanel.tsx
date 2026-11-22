@@ -104,7 +104,7 @@ export const SongSectionMapPanel = memo(function SongSectionMapPanel({
               </span>
               {SHORTCUTS.map(({ keys, label }) => (
                 <span key={keys} className='flex items-center gap-2'>
-                  <kbd className='rounded bg-zinc-800/60 px-1.5 py-0.5 font-mono text-[10px] text-zinc-100'>
+                  <kbd className='rounded bg-zinc-800/60 px-1.5 py-0.5 font-mono text-xs text-zinc-100'>
                     {keys}
                   </kbd>
                   <span className='text-xs text-zinc-500'>{t(`song_timer.${SHORTCUT_KEYS[label] ?? "shortcuts"}`, label)}</span>

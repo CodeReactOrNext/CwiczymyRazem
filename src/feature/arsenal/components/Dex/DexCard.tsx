@@ -260,7 +260,7 @@ export const DexCard = ({
         {discovered && (
           <span className='absolute bottom-2.5 right-2.5 flex items-center gap-1'>
             {ownedCount > 1 && (
-              <span className='text-[10px] font-bold tabular-nums text-zinc-400'>
+              <span className='text-[11px] font-bold tabular-nums text-zinc-400'>
                 ×{ownedCount}
               </span>
             )}
@@ -305,28 +305,28 @@ export const DexCard = ({
       <Tooltip delayDuration={150}>
         <TooltipTrigger asChild>{tile}</TooltipTrigger>
         {hasPreview ? (
-          <TooltipContent className='border-0 bg-transparent p-0' side='top'>
+          <TooltipContent className='bg-transparent p-0' side='top'>
             <div style={{ width: 250 }}>{preview}</div>
           </TooltipContent>
         ) : (
           <TooltipContent
             side='top'
-            className='max-w-[15rem] border-zinc-700 bg-zinc-950 p-3'>
+            className='max-w-[15rem] p-3'>
             {discovered ? (
               <>
-                <p className='text-xs font-bold text-zinc-100'>
+                <p className='text-xs font-bold'>
                   {brand} {name}
                 </p>
-                <p className='mt-1 text-[11px] text-zinc-400'>
+                <p className='mt-1 text-[11px] text-black/60'>
                   {t("dex.discovered_hint")}
                 </p>
               </>
             ) : (
               <>
-                <p className='text-xs font-bold text-zinc-100'>
+                <p className='text-xs font-bold'>
                   {t("rack.slot", { slot: formatSlotNumber(number) })}
                 </p>
-                <p className='mt-1 text-[11px] text-zinc-400'>
+                <p className='mt-1 text-[11px] text-black/60'>
                   {t("dex.undiscovered_hint")}
                 </p>
               </>

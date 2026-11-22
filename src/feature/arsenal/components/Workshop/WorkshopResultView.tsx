@@ -60,7 +60,7 @@ export const WorkshopResultView = ({ result }: WorkshopResultViewProps) => {
     <div className='flex flex-col gap-5'>
       {result.headline && (
         <div className='flex flex-col gap-2 rounded-lg bg-zinc-800/40 p-4'>
-          <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
+          <span className='text-xs font-medium text-zinc-400'>
             {t("mods.done")}
           </span>
           <span className='text-lg font-black text-purple-300'>
@@ -71,7 +71,7 @@ export const WorkshopResultView = ({ result }: WorkshopResultViewProps) => {
 
       {result.rarityBefore && result.rarityAfter && (
         <Reveal className='flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-5'>
-          <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
+          <span className='text-xs font-medium text-zinc-400'>
             {t("workshop.promoted")}
           </span>
           <RarityDelta from={result.rarityBefore} to={result.rarityAfter} />
@@ -79,7 +79,7 @@ export const WorkshopResultView = ({ result }: WorkshopResultViewProps) => {
       )}
 
       <div className='flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-4'>
-        <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
+        <span className='text-xs font-medium text-zinc-400'>
           {t("workshop.level")}
         </span>
         <LevelDelta
@@ -91,7 +91,7 @@ export const WorkshopResultView = ({ result }: WorkshopResultViewProps) => {
 
       {result.conditionAfter !== result.conditionBefore && (
         <div className='flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-4'>
-          <span className='text-xs font-bold tracking-[0.15em] text-zinc-400'>
+          <span className='text-xs font-medium text-zinc-400'>
             {t("condition.label")}
           </span>
           <ConditionDelta

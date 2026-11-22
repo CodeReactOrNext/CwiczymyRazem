@@ -2,7 +2,10 @@
   "common": {
     "loading": "Wird geladen…",
     "cancel": "Abbrechen",
-    "select": "Auswählen…"
+    "select": "Auswählen…",
+    "web_only_title": "Tone Studio gibt es nur in der Desktop-App",
+    "web_only_body": "Lade die riff.quest Desktop-App herunter und starte sie, um deinen Sound zu formen und eigene IRs zu laden.",
+    "web_only_cta": "Desktop-App holen"
   },
   "chain": {
     "gate": "Gate",

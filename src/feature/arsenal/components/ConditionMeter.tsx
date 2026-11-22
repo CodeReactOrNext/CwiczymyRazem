@@ -1,3 +1,4 @@
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import {
   CONDITION_TIERS,
@@ -53,17 +54,17 @@ export const ConditionMeter = ({
       }>
       {showLabel && (
         <div className='flex items-center justify-between gap-3'>
-          <span className='text-[9px] font-medium tracking-widest text-zinc-500'>
+          <span className='text-xs font-medium text-zinc-400'>
             {t("condition.label")}
           </span>
           <span className='flex items-baseline gap-1.5'>
             {restored && (
-              <span className='rounded bg-zinc-800/80 px-1.5 py-0.5 text-[9px] font-bold text-zinc-400'>
+              <Chip color='gray' size='sm'>
                 {t("condition.restored")}
-              </span>
+              </Chip>
             )}
             <span
-              className='light-flat text-[10px] font-bold tracking-wider'
+              className='light-flat text-xs font-bold'
               style={{
                 color: readableText(dimmed ? "#a1a1aa" : grade.color),
                 textShadow: dimmed ? undefined : `0 0 8px ${grade.color}55`,

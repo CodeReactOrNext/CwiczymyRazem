@@ -90,7 +90,9 @@
     "predefined_plans_description": "Von uns vorbereitete Übungspläne",
     "create_plan": "Plan erstellen",
     "create_first": "Ersten Plan erstellen",
-    "no_custom_plans": "Du hast noch keine eigenen Übungspläne"
+    "no_custom_plans": "Du hast noch keine eigenen Übungspläne",
+    "update_success": "Plan gespeichert",
+    "update_error": "Plan konnte nicht gespeichert werden"
   },
   "categories": {
     "technique": "Technik",

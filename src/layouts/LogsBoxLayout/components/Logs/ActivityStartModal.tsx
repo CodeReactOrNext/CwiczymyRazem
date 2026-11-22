@@ -116,7 +116,7 @@ export const ActivityStartModal = ({
           apart by spacing — no washes, chips or rules. */}
       <DialogContent
         overlayClassName='z-[120]'
-        className='z-[120] flex flex-col gap-5 rounded-lg p-6 sm:max-w-[480px]'>
+        className='z-[120] flex flex-col gap-5'>
         <DialogHeader className='space-y-1.5 text-left'>
           <span className='text-xs font-medium text-zinc-500'>
             {t(`activity_kind.${kind}`)}
@@ -189,16 +189,17 @@ export const ActivityStartModal = ({
             {pickedExercise && (
               <Button
                 variant='ghost'
-                onClick={() => setPickedExercise(null)}
-                className='h-11 sm:h-10'>
+                size='lg'
+                onClick={() => setPickedExercise(null)}>
                 {t("back")}
               </Button>
             )}
-            {/* Button wraps its children in its own flex span, so the variant's
-                `gap-2` never reaches the icon — the margin has to live here. */}
             {canStart && (
-              <Button onClick={handleStart} className='h-11 w-full sm:h-10 sm:w-auto sm:px-6'>
-                <Play className='h-4 w-4' />
+              <Button
+                size='lg'
+                onClick={handleStart}
+                className='w-full sm:w-auto'>
+                <Play />
                 {t("start")}
               </Button>
             )}

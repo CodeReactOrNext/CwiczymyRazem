@@ -6,11 +6,14 @@ import {
   TabsList,
   TabsTrigger,
 } from "assets/components/ui/tabs";
+import { cn } from "assets/lib/utils";
 import { Kostek } from "components/Mascot/Kostek";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import {
   tabNavListClass,
   tabNavTriggerClass,
 } from "components/PageTabs/tabNav";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { DuelJoinDialog } from "feature/duels/components/DuelJoinDialog";
 import { DuelOnboarding } from "feature/duels/components/DuelOnboarding";
@@ -185,7 +188,7 @@ export const DuelsView = () => {
   );
 
   const shell = (content: ReactNode) => (
-    <div className='flex min-h-screen flex-col px-4 pb-16 pt-6 md:px-8 lg:px-10'>
+    <div className={cn("flex flex-col", PAGE_CONTENT)}>
       {content}
       {dialogs}
     </div>
@@ -222,7 +225,7 @@ export const DuelsView = () => {
       <div className='mx-auto flex w-full max-w-md flex-col items-center gap-6 py-10'>
         <Skeleton className='size-28 rounded-full' />
         <Skeleton className='h-10 w-48 rounded-lg' />
-        <Skeleton className='h-24 w-full rounded-2xl' />
+        <Skeleton variant='block' className='h-24 w-full' />
       </div>,
     );
   }
@@ -234,13 +237,12 @@ export const DuelsView = () => {
   // ── Home ──
 
   return (
-    <div className='flex min-h-screen flex-col'>
+    <div className='flex flex-col'>
       <HeroBanner
         eyebrow={t("hero.eyebrow")}
         title={t("hero.title")}
         subtitle={t("hero.subtitle")}
         backgroundContent={<HeroPattern />}
-        className='w-full !rounded-none !shadow-none'
         rightContent={
           <DuelStatsStrip
             overview={overview}
@@ -251,7 +253,7 @@ export const DuelsView = () => {
 
       {/* Horizontal padding matches the banner's, so the tabs and the tiles
           line up with the title above them. */}
-      <div className='flex flex-col gap-6 px-6 pb-16 pt-6 md:px-8 lg:px-10'>
+      <div className={cn("flex flex-col gap-6", PAGE_CONTENT)}>
         <Tabs
           value={tab}
           onValueChange={(next) => setTab(next as DuelsTab)}
@@ -276,7 +278,7 @@ export const DuelsView = () => {
                 )}
 
                 {pending && (
-                  <div className='flex items-center gap-4 rounded-2xl bg-emerald-500/10 p-4 sm:px-5'>
+                  <div className='flex items-center gap-4 rounded-lg bg-emerald-500/10 p-4 sm:px-5'>
                     <Kostek mood='idle' className='h-11 shrink-0' />
                     <div className='min-w-0 flex-1'>
                       <p className='font-semibold text-zinc-50'>
@@ -295,23 +297,23 @@ export const DuelsView = () => {
                     </div>
                     <Button
                       onClick={() => go({ result: pending.id })}
-                      className='h-10 shrink-0 border-b-zinc-400 bg-white px-5 text-zinc-950 hover:bg-zinc-200'>
+                      size='lg'
+                      className='shrink-0'>
                       {t("pending.open")}
                     </Button>
                   </div>
                 )}
 
                 <section className='flex flex-col gap-4'>
-                  <div className='flex items-baseline justify-between gap-3 px-1'>
-                    <h2 className='text-base font-semibold text-zinc-100 lg:text-lg'>
-                      {t("slots.title")}
-                    </h2>
-                    {overview && (
-                      <span className='text-sm tabular-nums text-zinc-500'>
-                        {t("slots.used", { used, max: DUEL_MAX_OPEN })}
-                      </span>
-                    )}
-                  </div>
+                  <SectionHeader
+                    title={t("slots.title")}
+                    count={
+                      overview
+                        ? t("slots.used", { used, max: DUEL_MAX_OPEN })
+                        : undefined
+                    }
+                    className='mb-0 px-1'
+                  />
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-5'>
                     {overview
                       ? slots.map((slot, i) => (
@@ -335,7 +337,8 @@ export const DuelsView = () => {
                       : Array.from({ length: DUEL_MAX_OPEN }, (_, i) => (
                           <Skeleton
                             key={i}
-                            className='h-[15.5rem] rounded-2xl lg:h-[19rem]'
+                            variant='block'
+                            className='h-[15.5rem] lg:h-[19rem]'
                           />
                         ))}
                   </div>
@@ -346,7 +349,7 @@ export const DuelsView = () => {
                 <Button
                   variant='ghost'
                   size='lg'
-                  className='h-11 w-full xl:hidden'
+                  className='w-full sm:w-auto sm:self-start xl:hidden'
                   onClick={() => setRulesView("rules")}>
                   {t("rules_short.open")}
                 </Button>
@@ -362,9 +365,9 @@ export const DuelsView = () => {
                     onOpenRanking={() => setTab("ranking")}
                   />
                 ) : (
-                  <Skeleton className='h-60 w-full rounded-2xl' />
+                  <Skeleton variant='block' className='h-60 w-full' />
                 )}
-                <section className='flex flex-col gap-4 rounded-2xl bg-zinc-900/60 p-5'>
+                <section className='flex flex-col gap-4 rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
                   <div className='flex items-center gap-4'>
                     <Kostek mood='duel' className='h-14 shrink-0' />
                     <div className='min-w-0'>
@@ -378,7 +381,8 @@ export const DuelsView = () => {
                   </div>
                   <Button
                     variant='ghost'
-                    className='h-10 w-full'
+                    size='lg'
+                    className='w-full'
                     onClick={() => setRulesView("rules")}>
                     {t("rules_short.open")}
                   </Button>
@@ -396,7 +400,7 @@ export const DuelsView = () => {
                 myAvatar={myAvatar}
               />
             ) : (
-              <Skeleton className='h-80 w-full max-w-2xl rounded-2xl' />
+              <Skeleton variant='block' className='h-80 w-full max-w-2xl' />
             )}
           </TabsContent>
 
@@ -404,7 +408,7 @@ export const DuelsView = () => {
             {overview ? (
               <RecentDuels duels={recent} />
             ) : (
-              <Skeleton className='h-80 w-full max-w-2xl rounded-2xl' />
+              <Skeleton variant='block' className='h-80 w-full max-w-2xl' />
             )}
           </TabsContent>
         </Tabs>

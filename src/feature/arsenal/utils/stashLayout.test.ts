@@ -6,6 +6,8 @@ import {
   pieceAt,
   planMove,
   resolveLayout,
+  STASH_TABBED_MARKER,
+  toTabbedLayout,
 } from "./stashLayout";
 
 // A four-column board keeps the arithmetic readable in the expectations.
@@ -119,5 +121,43 @@ describe("hasSavedArrangement", () => {
 
   it("is true once anything has a saved position", () => {
     expect(hasSavedArrangement({ a: 0 })).toBe(true);
+  });
+
+  it("does not count the per-shelf marker as an arrangement", () => {
+    expect(hasSavedArrangement({ [STASH_TABBED_MARKER]: 1 })).toBe(false);
+  });
+});
+
+describe("toTabbedLayout", () => {
+  // Four columns: a guitar (tall) at 1, a pedal at 0, a part at 2, a pedal at 7.
+  const guitar = { id: "g", tall: true };
+  const pedalA = { id: "p1", tall: false };
+  const pedalB = { id: "p2", tall: false };
+  const part = { id: "x", tall: false };
+  const legacy = { g: 1, p1: 0, x: 2, p2: 7 };
+
+  it("closes the gaps other kinds left, keeping each shelf's order", () => {
+    const next = toTabbedLayout(
+      legacy,
+      [[guitar], [pedalB, pedalA], [part]],
+      COLS,
+    );
+    expect(next[STASH_TABBED_MARKER]).toBe(1);
+    expect(next.g).toBe(0);
+    // p1 came first on the old board, so it still leads its own shelf.
+    expect(next.p1).toBe(0);
+    expect(next.p2).toBe(1);
+    expect(next.x).toBe(0);
+  });
+
+  it("leaves pieces that were never placed for the board to flow in", () => {
+    const next = toTabbedLayout({ p1: 3 }, [[pedalA, pedalB]], COLS);
+    expect(next.p1).toBe(0);
+    expect(next.p2).toBeUndefined();
+  });
+
+  it("leaves a layout that is already per shelf untouched", () => {
+    const tabbed = { [STASH_TABBED_MARKER]: 1, g: 6 };
+    expect(toTabbedLayout(tabbed, [[guitar]], COLS)).toBe(tabbed);
   });
 });

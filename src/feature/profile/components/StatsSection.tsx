@@ -1,5 +1,6 @@
 import type { DateWithReport } from "components/ActivityLog/activityLog.types";
 import { StatsCard } from "components/Cards";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import SkillsRadarChart from "feature/profile/components/SkillsRadarChart/SkillsRadarChart";
 import {
   StatsField,
@@ -207,12 +208,12 @@ export const StatsSection = ({
 
           {/* Skills Chart - Mobile */}
           <div className='lg:hidden'>
-            <div className='relative mb-6'>
-              <h3 className='text-xl font-semibold text-white'>{t("layout.sections.skills.title")}</h3>
-              <p className='text-xs text-zinc-400'>
-                {t("stats_section.skills_hint")}
-              </p>
-            </div>
+            <SectionHeader
+              as='h3'
+              title={t("layout.sections.skills.title")}
+              description={t("stats_section.skills_hint")}
+              className='mb-6'
+            />
             <SkillsRadarChart statistics={statistics} />
           </div>
         </div>

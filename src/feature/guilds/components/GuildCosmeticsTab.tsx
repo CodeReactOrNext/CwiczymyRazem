@@ -1,3 +1,5 @@
+import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { GuildBanner } from "feature/guilds/components/GuildBanner";
 import { GuildCover } from "feature/guilds/components/GuildCover";
@@ -97,7 +99,7 @@ const Preview = ({
               logo={guild.logo}
               tag={guild.tag}
               accentHex={hex}
-              className='h-10 w-10 text-[9px]'
+              className='h-10 w-10'
             />
             <span
               aria-hidden
@@ -169,9 +171,9 @@ const CosmeticTile = ({
           {cosmeticName(item)}
           {worn && <Check size={13} style={{ color: hex }} />}
           {locked && (
-            <span className='rounded bg-cyan-500/10 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-cyan-300'>
+            <Chip color='cyan' size='sm' className='tabular-nums'>
               {t("kit.lvl", { level: unlockLevel(item) })}
-            </span>
+            </Chip>
           )}
         </p>
         <p className='mt-1 text-xs leading-relaxed text-zinc-500'>
@@ -190,17 +192,19 @@ const CosmeticTile = ({
           </p>
         ) : locked ? (
           <p className='flex h-9 items-center gap-1.5 text-xs font-semibold text-zinc-400'>
-            <Lock size={13} />
+            <Lock className='h-3.5 w-3.5' />
             {t("kit.unlocks_at_cap", { level: unlockLevel(item) })}
           </p>
         ) : (
-          <button
+          <Button
             type='button'
+            variant='subtle'
+            size='sm'
             disabled={busy}
             onClick={onWear}
-            className='flex h-9 w-full items-center justify-center rounded-lg bg-white/5 text-xs font-bold text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-white/10'>
+            className='w-full'>
             {t("kit.wear_it")}
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -222,13 +226,13 @@ export const GuildCosmeticsTab = ({ guild }: { guild: Guild }) => {
         {/* The card as the rest of the board sees it, drawn by the same
             component the guild list draws it with — and at the width a card is
             really given, rather than stretched across the page. */}
-        <article className='w-full shrink-0 overflow-hidden rounded-lg bg-zinc-900/40 lg:w-[28rem]'>
+        <article className='w-full shrink-0 overflow-hidden rounded-lg bg-zinc-800/40 lg:w-[28rem]'>
           <GuildCover
             guild={guild}
             className={guild.description ? undefined : "pb-5"}
             meta={
               <span className='inline-flex items-center gap-1.5 tabular-nums'>
-                <Users size={13} />
+                <Users className='h-3.5 w-3.5' />
                 {t("founding.seats", {
                   count: guild.memberCount,
                   limit: guild.memberLimit,
@@ -244,7 +248,7 @@ export const GuildCosmeticsTab = ({ guild }: { guild: Guild }) => {
           )}
         </article>
 
-        <div className='flex min-w-0 flex-1 items-center rounded-lg bg-zinc-900/40 p-5'>
+        <div className='flex min-w-0 flex-1 items-center rounded-lg bg-zinc-800/40 p-5'>
           <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
             {t("kit.intro")}
           </p>

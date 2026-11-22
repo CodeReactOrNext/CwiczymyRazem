@@ -1,11 +1,9 @@
+import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
 import { RotateCcw, SkipForward } from "lucide-react";
 import { memo } from "react";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
-
-const actionClass =
-  "flex h-9 items-center gap-2 rounded-lg bg-zinc-800 px-3 text-xs font-semibold text-zinc-300 outline-none transition-colors hover:bg-zinc-700 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-400/50";
 
 /**
  * The strip above the tab while learn mode is on: what the tab is waiting for,
@@ -35,13 +33,13 @@ export const LearnModeBar = memo(function LearnModeBar() {
         </div>
 
         <div className='flex items-center gap-2'>
-          <button type='button' onClick={learn.skip} className={actionClass}>
-            <SkipForward className='h-3.5 w-3.5 shrink-0 text-zinc-400' />
+          <Button type='button' variant='ghost' onClick={learn.skip}>
+            <SkipForward className='text-zinc-400' />
             {t("learn.skip")}
-          </button>
-          <button type='button' onClick={learn.restart} aria-label={t("learn.restart")} title={t("learn.restart")} className={actionClass}>
-            <RotateCcw className='h-3.5 w-3.5 shrink-0 text-zinc-400' />
-          </button>
+          </Button>
+          <Button type='button' variant='ghost' size='icon' onClick={learn.restart} aria-label={t("learn.restart")} title={t("learn.restart")}>
+            <RotateCcw className='text-zinc-400' />
+          </Button>
         </div>
       </div>
     </div>

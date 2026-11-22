@@ -3,6 +3,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "assets/components/ui/dialog";
+import { cn } from "assets/lib/utils";
 import type { ReactNode } from "react";
 
 interface StashItemDialogProps {
@@ -12,6 +13,12 @@ interface StashItemDialogProps {
   title: string;
   /** The full item card, with its own actions. */
   children: ReactNode;
+  /**
+   * Room for a sheet rather than a card. Gear opens at the width of its grid
+   * card; a part stack has no card to match and is a small screen of its own,
+   * which at 300px had no air around the trade and the keys.
+   */
+  wide?: boolean;
 }
 
 /**
@@ -24,11 +31,18 @@ export const StashItemDialog = ({
   onClose,
   title,
   children,
+  wide = false,
 }: StashItemDialogProps) => (
   <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-    <DialogContent className='flex items-center justify-center border-0 bg-transparent p-4 shadow-none sm:max-w-[320px] sm:p-0'>
+    <DialogContent
+      className={cn(
+        "flex items-center justify-center bg-transparent p-4 sm:p-0",
+        wide ? "sm:max-w-lg" : "sm:max-w-sm",
+      )}>
       <DialogTitle className='sr-only'>{title}</DialogTitle>
-      <div className='w-full max-w-[300px]'>{children}</div>
+      <div className={cn("w-full", wide ? "max-w-lg" : "max-w-[300px]")}>
+        {children}
+      </div>
     </DialogContent>
   </Dialog>
 );

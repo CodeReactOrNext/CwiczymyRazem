@@ -11,6 +11,7 @@ import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/Prac
 import { BASE_ROOT_NOTE, isScaleTreeKey } from "feature/scaleTree/data/scaleTreeKeys";
 import { isRecordRunClean, RECORD_PASS_ACCURACY } from "feature/scaleTree/data/scaleTreeRecords";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -22,6 +23,7 @@ const EXAM_TIME_IN_MINUTES = 1.5;
 
 export default function PracticeScalePage() {
   const router = useRouter();
+  const { t } = useTranslation("scale_tree");
   const {
     type, pos, pattern, string: stringParam, exam, requiredBpm, nodeId,
     root, mode, exerciseId: exerciseIdParam,
@@ -125,11 +127,13 @@ export default function PracticeScalePage() {
           );
           toast[isNewRecord ? 'success' : 'message'](
             isNewRecord
-              ? `New record: ${requiredBpm} BPM${previousBpm ? ` (was ${previousBpm})` : ''}`
-              : `Clean run, but your record still stands at ${previousBpm} BPM`
+              ? previousBpm
+                ? t("toast.new_record_was", { bpm: requiredBpm, previous: previousBpm })
+                : t("toast.new_record", { bpm: requiredBpm })
+              : t("toast.record_stands", { bpm: previousBpm })
           );
         } else {
-          toast.message(`No record — a run needs ${RECORD_PASS_ACCURACY}% accuracy to count`);
+          toast.message(t("toast.no_record", { accuracy: RECORD_PASS_ACCURACY }));
         }
       } else {
         await addBpmStage(

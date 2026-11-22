@@ -101,7 +101,7 @@ function StarRequirement({ label, value, target, progress }: { label: string; va
   return (
     <div>
       <div className="flex items-baseline justify-between gap-4 text-[11px]">
-        <span className="font-semibold tracking-wide text-zinc-500">{label}</span>
+        <span className="font-semibold text-zinc-500">{label}</span>
         <span className="tabular-nums text-zinc-400">
           <span className={cn("font-semibold", value >= target ? "text-emerald-400" : "text-zinc-200")}>{value}%</span> / {target}%
         </span>
@@ -412,13 +412,13 @@ export const ExerciseSuccessView = ({
               {isExam && (
                 <div className="mb-8 flex items-end justify-between shortwide:mb-4">
                   <div>
-                    <p className="text-[11px] font-semibold text-zinc-500 tracking-wide mb-1">{t("session:success.total_score")}</p>
+                    <p className="text-xs font-medium text-zinc-400 mb-1">{t("session:success.total_score")}</p>
                     <div className="font-teko text-5xl font-bold text-zinc-100 tabular-nums leading-none">{displayScore.toLocaleString()}</div>
                   </div>
                   {/* Tier badge */}
                   <div className={cn('flex flex-col items-center justify-center h-14 w-14 rounded-lg', tier.bg)}>
                     <span className={cn('text-2xl font-black leading-none', tier.color)}>{tierKey}</span>
-                    <span className="text-zinc-500 text-[9px] tracking-wide mt-0.5">{t("session:success.grade")}</span>
+                    <span className="text-zinc-500 text-[11px] mt-0.5">{t("session:success.grade")}</span>
                   </div>
                 </div>
               )}
@@ -464,28 +464,26 @@ export const ExerciseSuccessView = ({
             className="relative order-6 flex gap-3 px-7 pb-7 pt-5 shortwide:pb-5 shortwide:pt-3">
             {((isExam && !isPassed) || offerRestart) && onRestart && (
               <Button
+                variant='secondary'
+                size='lg'
                 onClick={onRestart}
                 disabled={isBusy}
-                className="h-11 flex-1 rounded-lg bg-zinc-800 text-sm font-medium text-zinc-100 hover:bg-zinc-700">
+                className="flex-1">
                 {t("session:timing.try_again")}
               </Button>
             )}
             {/* Not `disabled` while busy: that would dim the one thing on screen
                 that says the tap landed. `handleFinish` ignores repeat taps. */}
             <Button
+              variant={isExam && !isPassed ? 'secondary' : 'default'}
+              size='lg'
               onClick={handleFinish}
               aria-busy={isBusy}
-              className={cn(
-                'flex h-11 flex-1 items-center justify-center rounded-lg text-sm font-medium',
-                isExam && !isPassed
-                  ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-100'
-                  : 'bg-white hover:bg-zinc-200 text-zinc-950 font-semibold',
-                isBusy && 'pointer-events-none'
-              )}>
+              className={cn('flex-1', isBusy && 'pointer-events-none')}>
               {isBusy ? (
                 <>
                   <span className={cn(
-                    "mr-2 h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2",
+                    "h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2",
                     isExam && !isPassed ? "border-zinc-600 border-t-zinc-100" : "border-zinc-400 border-t-zinc-950"
                   )} />
                   <FinishingLabel />
@@ -493,8 +491,7 @@ export const ExerciseSuccessView = ({
               ) : (
                 <>
                   <span>{isExam && !isPassed ? t('session:success.back_to_menu') : t("practice.finish")}</span>
-                  {/* The Button wraps its children, so its own gap never reaches them. */}
-                  {(!isExam || isPassed) && <Check className="ml-2 h-4 w-4" />}
+                  {(!isExam || isPassed) && <Check />}
                 </>
               )}
             </Button>
@@ -528,8 +525,8 @@ export const ExerciseSuccessView = ({
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
               className="relative order-5 px-7 py-5 shortwide:py-3">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-[11px] font-semibold text-zinc-500 tracking-wide">{t("session:success.over_time")}</p>
-                <span className="text-[11px] text-zinc-600">{timeline!.length} notes</span>
+                <p className="text-xs font-medium text-zinc-400">{t("session:success.over_time")}</p>
+                <span className="text-[11px] text-zinc-500">{timeline!.length} notes</span>
               </div>
 
               <ChartContainer
@@ -559,9 +556,9 @@ export const ExerciseSuccessView = ({
                       const { active, payload } = props;
                       if (active && payload?.length) {
                         return (
-                          <div className="rounded-lg bg-zinc-950/90 px-3 py-2 text-xs">
-                            <span className="text-zinc-400">{t("session:success.accuracy")} </span>
-                            <span className="text-zinc-100 font-bold">{payload[0].value}%</span>
+                          <div className="rounded-lg bg-white p-3 text-xs text-black">
+                            <span className="text-black/60">{t("session:success.accuracy")} </span>
+                            <span className="font-bold">{payload[0].value}%</span>
                           </div>
                         );
                       }

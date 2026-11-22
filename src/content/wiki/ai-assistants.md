@@ -38,7 +38,7 @@ Some things to try: "Review my last week of practice", "Plan a 30-minute session
 
 ## Limits
 
-<StatRow stats="35:changes a day|10:new exercises a day|60:requests a minute" />
+<StatRow stats="35:changes a day|20:new exercises a day|60:requests a minute" />
 
 Reading never counts against the daily limit. Every change the assistant saves tells it how many are left today, so it can warn you before you run out.
 

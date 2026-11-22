@@ -24,7 +24,16 @@
       "tokensHeldOne": "Masz 1 darmową skrzynkę — wydaj ją na dowolną skrzynkę w Arsenale.",
       "readyToCollect": "Nagroda gotowa do odbioru",
       "onCompletion": "Nagroda za zdobycie tego osiągnięcia",
-      "collected": "Nagroda już odebrana"
+      "collected": "Nagroda już odebrana",
+      "toCollect": "Nagrody do odebrania: {{count}}",
+      "toCollectOne": "1 nagroda do odebrania",
+      "moreAfterSession": "+{{count}} po następnej sesji",
+      "collectedCount": "Odebrane nagrody: {{count}}",
+      "collectedOne": "Odebrano 1 nagrodę",
+      "casesInHand": "Darmowe skrzynki: {{count}}",
+      "casesInHandOne": "1 darmowa skrzynka",
+      "openCase": "Otwórz skrzynkę",
+      "openArsenal": "Otwórz w Arsenale"
     }
   },
   "time_1": {

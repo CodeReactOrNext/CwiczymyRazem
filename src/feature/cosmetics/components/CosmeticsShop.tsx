@@ -166,12 +166,7 @@ export const CosmeticsShop = ({
         item,
         <div className='flex h-36 items-center justify-center rounded-lg bg-zinc-800/40'>
           <AvatarDecoration item={item}>
-            <Avatar
-              size='md'
-              name={userName}
-              avatarURL={avatarUrl}
-              className='[&>div]:!h-16 [&>div]:!w-16 [&>div]:!rounded-full'
-            />
+            <Avatar size='xl' name={userName} avatarURL={avatarUrl} />
           </AvatarDecoration>
         </div>,
       ),

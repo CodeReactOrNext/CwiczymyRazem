@@ -1,14 +1,17 @@
+import { Button } from "assets/components/ui/button";
 import { X } from "lucide-react";
 
 /** The wizard's close control — a real button, not a bare glyph. */
 export const CloseButton = ({ onClick, label }: { onClick: () => void; label: string }) => (
-  <button
+  <Button
     type="button"
+    variant="ghost"
+    size="icon"
     onClick={onClick}
     aria-label={label}
     title={label}
-    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400"
+    className="shrink-0"
   >
-    <X className="h-4 w-4" />
-  </button>
+    <X />
+  </Button>
 );

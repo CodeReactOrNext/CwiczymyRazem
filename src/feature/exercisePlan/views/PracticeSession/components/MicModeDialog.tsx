@@ -109,11 +109,11 @@ const MicModeBody = ({
           {examMode ? t("mic_mode.exam_body") : t("mic_mode.body")}
         </DialogDescription>
         <div className='flex flex-col gap-2 pt-6 shortwide:pt-5'>
-          <Button onClick={onEnableMic} className='w-full font-bold'>
+          <Button size='lg' onClick={onEnableMic} className='w-full'>
             {t("mic_mode.enable")}
           </Button>
           {!examMode && (
-            <Button variant='ghost' onClick={onSkipMic} className='w-full text-zinc-500 hover:text-zinc-300'>
+            <Button variant='ghost' size='lg' onClick={onSkipMic} className='w-full text-zinc-500 hover:text-zinc-300'>
               {t("mic_mode.skip")}
             </Button>
           )}
@@ -146,7 +146,7 @@ export const MicModeDialog = ({ isOpen, examMode, turned, onEnableMic, onSkipMic
         <DialogPrimitive.Portal>
           <DialogPrimitive.Overlay className='app-scrim fixed inset-0 z-[99999998] bg-black/80 data-[state=open]:animate-in data-[state=open]:fade-in-0' />
           <DialogPrimitive.Content
-            className='sideways-screen fixed left-0 top-0 z-[99999999] flex items-center justify-center overflow-y-auto overscroll-contain p-6 font-openSans outline-none'
+            className='sideways-screen fixed left-0 top-0 z-[99999999] flex items-center justify-center overflow-y-auto overscroll-contain p-6 outline-none'
             style={{
               ...QUARTER_TURN_STYLE,
               width: "100dvh",

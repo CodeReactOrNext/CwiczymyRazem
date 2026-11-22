@@ -13,17 +13,8 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "assets/components/ui/alert-dialog";
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import {
   Dialog,
   DialogContent,
@@ -40,7 +31,20 @@ import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
+import { ConfirmDialog } from "components/ConfirmDialog/ConfirmDialog";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
+import { pageTitleClass } from "components/PageTitle/PageTitle";
+import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { placeKeyClass } from "feature/leadboard/components/rankRowStyles";
+import {
+  SONG_ARTIST_SM_CLASS,
+  SONG_TITLE_SM_CLASS,
+  SongThumb,
+} from "feature/songs/components/SongRow/SongRow";
+import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import {
   deletePlaylist,
   importPlaylist,
@@ -65,10 +69,8 @@ import {
   selectUserName,
 } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
 import {
   ArrowDownToLine,
-  ArrowLeft,
   Check,
   Flag,
   Flame,
@@ -94,12 +96,6 @@ import { useAppSelector } from "store/hooks";
 import { PlaylistCover } from "./PlaylistCover";
 import { getPlaylistAccent, KIND_META } from "./playlistVisuals";
 import { SongPickerPanel } from "./SongPickerPanel";
-
-const RANK_TINTS: Record<number, string> = {
-  0: "text-amber-300",
-  1: "text-zinc-300",
-  2: "text-orange-400/90",
-};
 
 interface PlaylistDetailViewProps {
   playlist: Playlist;
@@ -152,37 +148,20 @@ const TrackRow = ({
     (entry.avgDifficulty ?? 0) === 0 ? "?" : entry.tier || entry.avgDifficulty || "?"
   );
 
-  const cover = (
-    <div className="h-10 w-10 shrink-0 overflow-hidden rounded-[4px] bg-zinc-800">
-      {entry.coverUrl ? (
-        <img src={entry.coverUrl} alt="" className="h-full w-full object-cover" />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center text-zinc-600">
-          <Music className="h-4 w-4" />
-        </div>
-      )}
-    </div>
-  );
+  const cover = <SongThumb coverUrl={entry.coverUrl} size="sm" />;
 
   const info = (
     <div className="min-w-0 flex-1">
-      <p translate="no" className="truncate text-sm font-semibold text-white">
+      <p translate="no" className={SONG_TITLE_SM_CLASS}>
         {entry.title}
       </p>
-      <p translate="no" className="truncate text-xs text-zinc-500">
+      <p translate="no" className={SONG_ARTIST_SM_CLASS}>
         {entry.artist}
       </p>
     </div>
   );
 
-  const tierChip = (
-    <span
-      className="hidden shrink-0 rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold sm:inline"
-      style={{ backgroundColor: inkWash(tier.color, 12), color: inkAccent(tier.color) }}
-    >
-      {tier.tier}
-    </span>
-  );
+  const tierChip = <TierPick tier={tier} className="hidden h-5 w-5 sm:block" />;
 
   const actions = (
     <div
@@ -190,31 +169,37 @@ const TrackRow = ({
       onClick={(e) => e.stopPropagation()}
     >
       {kind !== "playlist" && (
-        <button
+        <Button
+          variant='ghost'
+          size='icon-sm'
           aria-label={t("practice")}
           onClick={onPractice}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
+          className="text-zinc-400"
         >
-          <Play className="h-3.5 w-3.5 fill-current" />
-        </button>
+          <Play className="fill-current" />
+        </Button>
       )}
       {isOwner && (
         <>
-          <button
+          <Button
+            variant='ghost'
+            size='icon-sm'
             aria-label={t("remove_from_playlist")}
             onClick={onRemove}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/10 hover:text-red-400"
+            className="text-zinc-400 hover:text-red-400"
           >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
-          <button
+            <Trash2 />
+          </Button>
+          <Button
+            variant='ghost'
+            size='icon-sm'
             aria-label={t("reorder")}
             {...attributes}
             {...listeners}
-            className="hidden h-8 w-8 cursor-grab touch-none items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-white/10 hover:text-zinc-300 active:cursor-grabbing sm:flex"
+            className="hidden cursor-grab touch-none text-zinc-400 hover:text-zinc-200 active:cursor-grabbing sm:flex"
           >
-            <GripVertical className="h-4 w-4" />
-          </button>
+            <GripVertical />
+          </Button>
         </>
       )}
     </div>
@@ -271,16 +256,16 @@ const TrackRow = ({
         <div
           className={cn(
             "my-1 flex min-w-0 flex-1 items-center gap-3 rounded-lg px-2 py-2 transition-colors sm:px-3",
-            isDragging ? "bg-zinc-800/90 shadow-xl" : "bg-white/[0.02] group-hover:bg-white/[0.06]",
+            isDragging ? "bg-zinc-800/90 shadow-xl" : "bg-zinc-800/40 group-hover:bg-zinc-800/60",
             isLearned && "opacity-75 group-hover:opacity-100"
           )}
         >
           {cover}
           {info}
           {isNextUp && (
-            <span className="hidden shrink-0 rounded-full bg-cyan-400/10 px-2 py-0.5 text-[10px] font-bold text-cyan-300 sm:inline">
+            <Chip color='cyan' size='sm' className="hidden shrink-0 sm:inline-flex">
               {t("up_next")}
-            </span>
+            </Chip>
           )}
           {tierChip}
           {actions}
@@ -302,11 +287,8 @@ const TrackRow = ({
     >
       {kind === "top" ? (
         <span
-          className={cn(
-            "w-8 shrink-0 text-center text-2xl font-black tabular-nums leading-none sm:w-10",
-            RANK_TINTS[index] ?? "text-zinc-600"
-          )}
-        >
+          translate='no'
+          className={cn("h-7 w-8 text-xl", placeKeyClass(index + 1, false))}>
           {index + 1}
         </span>
       ) : (
@@ -314,16 +296,18 @@ const TrackRow = ({
           <span className="text-sm font-semibold tabular-nums text-zinc-500 group-hover:invisible">
             {index + 1}
           </span>
-          <button
+          <Button
+            variant='ghost'
+            size='icon-sm'
             aria-label={t("practice")}
             onClick={(e) => {
               e.stopPropagation();
               onPractice();
             }}
-            className="invisible absolute inset-0 flex items-center justify-center text-white group-hover:visible"
+            className="invisible absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white group-hover:visible"
           >
-            <Play className="h-3.5 w-3.5 fill-current" />
-          </button>
+            <Play className="fill-current" />
+          </Button>
         </span>
       )}
 
@@ -527,18 +511,8 @@ export const PlaylistDetailView = ({
         }}
       />
 
-      <div className="relative z-10 space-y-7 p-4 sm:p-6 md:p-10">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onBack}
-          className="bg-white/5 px-4 text-zinc-400 backdrop-blur-md hover:text-white"
-        >
-          <span className="flex items-center gap-2">
-            <ArrowLeft size={16} />
-            <span className="text-xs font-bold">Back to playlists</span>
-          </span>
-        </Button>
+      <div className={cn("relative z-10 space-y-7", PAGE_CONTENT)}>
+        <BackLink label='Back to playlists' onClick={onBack} />
 
         {/* Header */}
         <div className="flex flex-col gap-6 md:flex-row md:items-end">
@@ -583,10 +557,7 @@ export const PlaylistDetailView = ({
 
             <h1
               translate="no"
-              className={cn(
-                "break-words font-black tracking-tight text-white",
-                playlist.name.length > 40 ? "text-2xl md:text-4xl" : "text-3xl md:text-5xl"
-              )}
+              className={cn("break-words", pageTitleClass)}
             >
               {playlist.name}
             </h1>
@@ -605,17 +576,11 @@ export const PlaylistDetailView = ({
                       href={`/user/${playlist.ownerId}`}
                       className="flex items-center gap-1.5 hover:opacity-80"
                     >
-                      {playlist.ownerAvatar ? (
-                        <img
-                          src={playlist.ownerAvatar}
-                          alt=""
-                          className="h-5 w-5 rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-700 text-[9px] font-bold text-zinc-300">
-                          {playlist.ownerName.charAt(0).toUpperCase()}
-                        </span>
-                      )}
+                      <Avatar
+                        size="2xs"
+                        name={playlist.ownerName}
+                        avatarURL={playlist.ownerAvatar || undefined}
+                      />
                       <span className="font-bold text-white">{playlist.ownerName}</span>
                     </Link>
                   </UserTooltip>
@@ -659,17 +624,11 @@ export const PlaylistDetailView = ({
                       )}
                     >
                       <GitFork className="h-3 w-3" />
-                      {playlist.importedFrom.ownerAvatar ? (
-                        <img
-                          src={playlist.importedFrom.ownerAvatar}
-                          alt=""
-                          className="h-4 w-4 rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-zinc-700 text-[8px] font-bold text-zinc-400">
-                          {playlist.importedFrom.ownerName.charAt(0).toUpperCase()}
-                        </span>
-                      )}
+                      <Avatar
+                        size="2xs"
+                        name={playlist.importedFrom.ownerName}
+                        avatarURL={playlist.importedFrom.ownerAvatar || undefined}
+                      />
                       {t("from_owner", { name: playlist.importedFrom.ownerName })}
                     </Link>
                   </UserTooltip>
@@ -722,35 +681,33 @@ export const PlaylistDetailView = ({
             <>
               <Button
                 onClick={() => setIsAddOpen(true)}
-                className="h-10 px-5 font-bold"
+                size="lg"
               >
-                <span className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  {t("add_songs")}
-                </span>
+                <Plus />
+                {t("add_songs")}
               </Button>
               <Button
-                variant="ghost"
+                variant="subtle"
+                size="lg"
                 onClick={() => setIsShareOpen(true)}
-                className="h-10 bg-white/5 px-5 font-bold text-zinc-300 hover:bg-white/10 hover:text-white"
               >
-                <span className="flex items-center gap-2">
-                  <Share2 className="h-4 w-4" />
-                  {t("share")}
-                </span>
+                <Share2 />
+                {t("share")}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button
+                  <Button
+                    variant='ghost'
+                    size='icon'
                     aria-label={t("options")}
-                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+                    className="text-zinc-300"
                   >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </button>
+                    <MoreHorizontal />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="start"
-                  className="w-52 space-y-1 rounded-lg bg-zinc-950 p-2 text-zinc-400 shadow-2xl"
+                  className="w-52 space-y-1"
                 >
                   <DropdownMenuItem
                     onClick={() => {
@@ -792,17 +749,11 @@ export const PlaylistDetailView = ({
             <>
               <Button
                 onClick={handleImport}
-                disabled={isImporting}
-                className="h-10 px-5 font-bold"
+                loading={isImporting}
+                size="lg"
               >
-                <span className="flex items-center gap-2">
-                  {isImporting ? (
-                    <span className="loading loading-spinner loading-xs" />
-                  ) : (
-                    <ArrowDownToLine className="h-4 w-4" />
-                  )}
-                  {t("save_to_yours")}
-                </span>
+                {!isImporting && <ArrowDownToLine />}
+                {t("save_to_yours")}
               </Button>
               <button
                 type="button"
@@ -825,31 +776,25 @@ export const PlaylistDetailView = ({
 
         {/* Track list */}
         {songs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500">
-              <Music size={26} />
-            </div>
-            <h3 className="mb-1 text-lg font-bold text-white">{t("empty.title")}</h3>
-            <p className="max-w-xs text-sm text-zinc-500">
-              {isOwner
+          <EmptyState
+            icon={<Music />}
+            title={t("empty.title")}
+            description={
+              isOwner
                 ? isTop
                   ? t("empty.owner_top", { count: TOP_LIST_LIMIT })
                   : t("empty.owner")
-                : t("empty.other")}
-            </p>
-            {isOwner && (
-              <Button
-                onClick={() => setIsAddOpen(true)}
-                variant="ghost"
-                className="mt-6 h-10 bg-white/5 px-5 font-bold text-zinc-300 hover:bg-white/10 hover:text-white"
-              >
-                <span className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
+                : t("empty.other")
+            }
+            action={
+              isOwner && (
+                <Button onClick={() => setIsAddOpen(true)}>
+                  <Plus />
                   {t("add_songs")}
-                </span>
-              </Button>
-            )}
-          </div>
+                </Button>
+              )
+            }
+          />
         ) : (
           <DndContext
             sensors={sensors}
@@ -895,7 +840,7 @@ export const PlaylistDetailView = ({
                         className={cn(
                           "absolute left-1/2 top-1/2 z-10 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-colors",
                           learnedCount === songs.length
-                            ? "bg-amber-400 text-black shadow-[0_0_24px_rgba(251,191,36,0.35)]"
+                            ? "bg-amber-400 text-black"
                             : "bg-zinc-900 text-zinc-500 ring-1 ring-white/10"
                         )}
                       >
@@ -930,9 +875,9 @@ export const PlaylistDetailView = ({
 
       {/* Share dialog */}
       <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
-        <DialogContent className="max-w-md border-white/5 bg-zinc-950 p-6">
+        <DialogContent className="bg-zinc-950 sm:max-w-md">
           <DialogHeader className="mb-2">
-            <DialogTitle className="font-openSans text-xl font-bold text-white">
+            <DialogTitle className="text-xl font-bold text-white">
               {t(`share_title.${playlist.kind}`)}
             </DialogTitle>
           </DialogHeader>
@@ -990,9 +935,9 @@ export const PlaylistDetailView = ({
 
       {/* Edit details dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-md border-white/5 bg-zinc-950 p-6">
+        <DialogContent className="bg-zinc-950 sm:max-w-md">
           <DialogHeader className="mb-2">
-            <DialogTitle className="font-openSans text-xl font-bold text-white">
+            <DialogTitle className="text-xl font-bold text-white">
               {t("edit_details")}
             </DialogTitle>
           </DialogHeader>
@@ -1006,7 +951,7 @@ export const PlaylistDetailView = ({
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 maxLength={80}
-                className="h-12 border-white/5 bg-white/5 font-medium transition-all focus:border-cyan-500/50"
+                className="h-10"
               />
             </div>
             <div className="space-y-2">
@@ -1019,7 +964,7 @@ export const PlaylistDetailView = ({
                 onChange={(e) => setEditDescription(e.target.value)}
                 maxLength={300}
                 rows={3}
-                className="resize-none border-white/5 bg-white/5 font-medium transition-all focus:border-cyan-500/50"
+                className="resize-none"
               />
             </div>
             <div className="flex justify-end gap-2">
@@ -1030,8 +975,8 @@ export const PlaylistDetailView = ({
               >
                 Cancel
               </Button>
-              <Button onClick={handleSaveMeta} disabled={isSavingMeta || !editName.trim()}>
-                {isSavingMeta ? <span className="loading loading-spinner loading-sm" /> : "Save"}
+              <Button onClick={handleSaveMeta} disabled={!editName.trim()} loading={isSavingMeta}>
+                Save
               </Button>
             </div>
           </div>
@@ -1040,9 +985,9 @@ export const PlaylistDetailView = ({
 
       {/* Add songs dialog */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="flex h-full max-w-none flex-col border-white/5 bg-zinc-950 p-6 sm:h-[560px] sm:max-w-lg sm:rounded-2xl">
+        <DialogContent className="flex h-full flex-col bg-zinc-950 sm:h-[560px]">
           <DialogHeader className="mb-2">
-            <DialogTitle className="font-openSans text-xl font-bold text-white">
+            <DialogTitle className="text-xl font-bold text-white">
               {t("add_songs")}
               {isTop && (
                 <span className="ml-2 text-sm font-semibold text-zinc-500">
@@ -1068,29 +1013,19 @@ export const PlaylistDetailView = ({
       </Dialog>
 
       {/* Delete confirm */}
-      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <AlertDialogContent className="border-white/5 bg-zinc-950">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">
-              {t("delete_title", { name: playlist.name })}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
-              {t(`delete_body.${playlist.kind}`)}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="border-none bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white">
-              {t("keep_it")}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-red-500/90 text-white hover:bg-red-500"
-            >
-              {t("delete")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        title={t("delete_title", { name: playlist.name })}
+        description={t(`delete_body.${playlist.kind}`)}
+        cancelLabel={t("keep_it")}
+        confirmLabel={t("delete")}
+        onConfirm={() => {
+          setIsDeleteOpen(false);
+          void handleDelete();
+        }}
+        destructive
+      />
     </div>
   );
 };

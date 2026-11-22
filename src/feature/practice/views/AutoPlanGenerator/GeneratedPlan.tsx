@@ -14,6 +14,7 @@ import {
 } from "@dnd-kit/sortable";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
+import { PageTitle } from "components/PageTitle/PageTitle";
 import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
 import type {
   Exercise,
@@ -92,11 +93,12 @@ export const GeneratedPlan = ({
   const exerciseCount = plan.exercises.length;
 
   return (
-    <div className='mx-auto mt-3 max-w-3xl space-y-6 px-4 font-openSans'>
+    <div className='mx-auto mt-3 max-w-3xl space-y-6 px-4'>
       <div className='mb-6 flex flex-col gap-4 sm:mb-10 sm:gap-6'>
-        <h1 className='pt-2 text-2xl font-bold sm:pt-4 sm:text-3xl'>
-          {t("exercises:auto_plan.generated_plan")}
-        </h1>
+        <PageTitle
+          title={t("exercises:auto_plan.generated_plan")}
+          className='pt-2 sm:pt-4'
+        />
 
         <div className='flex flex-wrap gap-2'>
           <Button
@@ -111,32 +113,21 @@ export const GeneratedPlan = ({
             onClick={onRegenerate}
             disabled={isStarting}
 >
-            <RefreshCw className='h-4 w-4' />
+            <RefreshCw />
             {t("practice_hub:auto.regenerate")}
           </Button>
           <Button
             onClick={() => onStart(plan)}
             className='ml-auto'
-            disabled={isStarting}
+            loading={isStarting}
           >
-            <span className="flex items-center gap-2">
-              {isStarting ? (
-                  <>
-                    <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>{t("practice_hub:loading")}</span>
-                  </>
-              ) : (
-                  <>
-                    <Play size='1em' className='h-3.5 w-3.5' />
-                    <span>{t("common:start")}</span>
-                  </>
-              )}
-            </span>
+            {!isStarting && <Play />}
+            {isStarting ? t("practice_hub:loading") : t("common:start")}
           </Button>
         </div>
       </div>
 
-      <Card className='rounded-2xl bg-transparent p-0 sm:bg-zinc-800/40 sm:p-7'>
+      <Card className='bg-transparent p-0 sm:bg-zinc-800/40 sm:p-6'>
         <div className='flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
           <h2 className='text-2xl font-extrabold tabular-nums sm:text-[26px]'>
             {formatMinutesDuration(totalMinutes)}{" "}
@@ -194,27 +185,15 @@ export const GeneratedPlan = ({
           </SortableContext>
         </DndContext>
 
-        <div className='mt-6 pt-4 sm:mt-8'>
+        <div className='mt-6 flex justify-end pt-4 sm:mt-8'>
           <Button
             onClick={() => onStart(plan)}
-            className='w-full'
+            className='w-full sm:w-auto'
             size='lg'
-            variant='default'
-            disabled={isStarting}
+            loading={isStarting}
           >
-            <span className="flex items-center gap-2">
-              {isStarting ? (
-                  <>
-                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>{t("practice_hub:loading")}</span>
-                  </>
-              ) : (
-                  <>
-                    <Play size='1em' className='h-4 w-4' />
-                    <span>{t("common:start")}</span>
-                  </>
-              )}
-            </span>
+            {!isStarting && <Play />}
+            {isStarting ? t("practice_hub:loading") : t("common:start")}
           </Button>
         </div>
       </Card>

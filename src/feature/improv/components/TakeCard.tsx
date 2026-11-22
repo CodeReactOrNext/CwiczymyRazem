@@ -82,8 +82,7 @@ export const TakeCard = ({ take, uid, canModerate }: TakeCardProps) => {
             <Button
               type='button'
               variant='ghost'
-              size='icon'
-              className='h-8 w-8'
+              size='icon-sm'
               loading={remove.isPending}
               aria-label={t("take.remove")}
               title={t("take.remove")}

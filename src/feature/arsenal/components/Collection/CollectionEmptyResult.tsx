@@ -1,3 +1,4 @@
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { useTranslation } from "hooks/useTranslation";
 import { SearchX } from "lucide-react";
 
@@ -12,14 +13,16 @@ export const CollectionEmptyResult = ({
 }: CollectionEmptyResultProps) => {
   const { t } = useTranslation("arsenal");
 
+  // A plain icon, not Kostek: several sections can come up empty at once.
   return (
-  <div className='flex items-center gap-3 rounded-lg bg-zinc-900/40 px-6 py-10 text-zinc-400'>
-    <SearchX size={18} className='shrink-0 text-zinc-500' />
-    <p className='text-sm'>
-      {query.trim()
-        ? t("collection.no_match", { query: query.trim() })
-        : t("collection.nothing_yet")}
-    </p>
-  </div>
+    <EmptyState
+      size='compact'
+      icon={<SearchX />}
+      title={
+        query.trim()
+          ? t("collection.no_match", { query: query.trim() })
+          : t("collection.nothing_yet")
+      }
+    />
   );
 };

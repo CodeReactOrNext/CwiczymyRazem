@@ -1,3 +1,4 @@
+import { PageShell } from "components/PageShell/PageShell";
 import { LeadboardView } from "feature/leadboard/LeadboardView";
 import AppLayout from "layouts/AppLayout";
 import Head from "next/head";
@@ -9,12 +10,12 @@ const SeasonsPage: NextPageWithLayout = () => {
   const siteUrl = "https://riff.quest/seasons";
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
+    <PageShell>
       <Head>
         <link rel='canonical' href={siteUrl} />
       </Head>
       <LeadboardView defaultView='seasonal' />
-    </div>
+    </PageShell>
   );
 };
 

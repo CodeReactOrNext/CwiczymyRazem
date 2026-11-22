@@ -1,5 +1,7 @@
 import "react-circular-progressbar/dist/styles.css";
 
+import { Button } from "assets/components/ui/button";
+import { BackLink } from "components/BackLink/BackLink";
 import type { BossScore } from "feature/autoBacking/bossBacking";
 import { useAutoBacking } from "feature/autoBacking/hooks/useAutoBacking";
 import { useAutoBackingStore } from "feature/autoBacking/store/autoBackingStore";
@@ -245,7 +247,7 @@ const PracticeSessionInner = ({
     videoDuration, setVideoDuration, setTabDuration, setTimerTime, autoSubmitReport,
     isSubmittingReport, reportResult, currentUserStats, previousUserStats,
     planTitleString,  timer, activityDataToUse,
-    jumpToExercise,  canFinishSession, hasLoggedPractice,
+    jumpToExercise,  canFinishSession, hasLoggedPractice, isCurrentExercisePlayedOut,
     completedExercises, restartFullSession,
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount });
   // The upright phone, where PhoneSessionModal lays the practice screen on its
@@ -296,14 +298,12 @@ const PracticeSessionInner = ({
             {t("update.body")}
           </p>
           <div className="flex flex-col items-center gap-3">
-            <button
-              onClick={() => window.electronApp?.installUpdate()}
-              className="rounded-lg bg-cyan-500 px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-cyan-400">
+            <Button
+              size='lg'
+              onClick={() => window.electronApp?.installUpdate()}>
               {t("update.restart")}
-            </button>
-            <button onClick={onClose} className="mt-2 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold capitalize tracking-widest text-[10px]">
-              ← {t("update.return")}
-            </button>
+            </Button>
+            <BackLink label={t("update.return")} onClick={onClose} className='mt-2' />
           </div>
         </div>
       </div>
@@ -315,9 +315,11 @@ const PracticeSessionInner = ({
       <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6">
         <div className="w-full max-w-lg animate-in fade-in zoom-in duration-slow">
           <PremiumGate feature="gp-practice" children={<div />} />
-          <button onClick={() => router.back()} className="mt-8 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold capitalize tracking-widest text-[10px]">
-            ← {t("update.return")}
-          </button>
+          <BackLink
+            label={t("update.return")}
+            onClick={() => router.back()}
+            className='mx-auto mt-8 flex'
+          />
         </div>
       </div>
     );
@@ -1262,7 +1264,7 @@ const PracticeSessionInner = ({
     isMicEnabled, closeAudio, updateMicPersistence,
     isAudioMuted, setIsAudioMuted, hasBacking, speedMultiplier, setSpeedMultiplier,
     setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
-    saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
+    saveCurrentScores, isCurrentExercisePlayedOut, noteMatchingHandle, loopsCompletedRef,
     tabRestartKey, setTabRestartKey,
     learnMode: learnEnabled,
   });
@@ -1492,7 +1494,7 @@ const PracticeSessionInner = ({
           intonation={hasTrackedPerformance && !isEarTrainingRiddle && !examMistakeFailed ? successSnapshot.intonation : null}
           intonationBiasCents={successSnapshot.intonationBiasCents ?? null}
           noteLog={hasTrackedPerformance && !isEarTrainingRiddle && !examMistakeFailed ? successSnapshot.noteLog : null}
-          failMessage={examMistakeFailed ? `${CLICK_EXAM_MISTAKE_LIMIT} wrong clicks — exam failed.` : undefined}
+          failMessage={examMistakeFailed ? (t("exam_click_failed", { limit: CLICK_EXAM_MISTAKE_LIMIT }) as string) : undefined}
           eyebrow={goalRun?.summaryEyebrow}
           extraContent={goalVerdict}
           offerRestart={isGoalMode}

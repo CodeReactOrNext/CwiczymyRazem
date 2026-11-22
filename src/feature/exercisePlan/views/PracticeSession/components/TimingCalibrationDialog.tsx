@@ -14,8 +14,8 @@ import type { CalibrationResult } from "../utils/timingCalibration";
 import { CALIBRATION_BPM, CALIBRATION_CLICKS, CALIBRATION_COUNT_IN, CALIBRATION_MIN_HITS } from "../utils/timingCalibration";
 import { TimingHitMap } from "./TimingHitMap";
 
-const PRIMARY = "h-10 flex-1 rounded-lg bg-white text-sm font-semibold text-zinc-950 hover:bg-zinc-200";
-const SECONDARY = "h-10 flex-1 rounded-lg bg-zinc-800 text-sm font-medium text-zinc-100 hover:bg-zinc-700";
+const PRIMARY = "flex-1";
+const SECONDARY = "flex-1 bg-zinc-800 text-zinc-100 hover:bg-zinc-700";
 
 const Step = ({ n, children }: { n: number; children: React.ReactNode }) => (
   <li className='flex gap-3'>
@@ -94,10 +94,10 @@ const IdleStep = ({
 
     <div className={cn("mt-6 flex gap-2.5", sideways && "shortwide:mt-3")}>
       {isListening ? (
-        <Button onClick={onStart} className={PRIMARY}>{t("start")}</Button>
+        <Button size='lg' onClick={onStart} className={PRIMARY}>{t("start")}</Button>
       ) : (
-        <Button onClick={onEnableMic} className={PRIMARY}>
-          <Mic className='h-4 w-4' />
+        <Button size='lg' onClick={onEnableMic} className={PRIMARY}>
+          <Mic />
           {t("timing.mic_first")}
         </Button>
       )}
@@ -152,7 +152,7 @@ const RunningStep = ({
       </div>
 
       <div className='mt-8 flex'>
-        <Button onClick={onCancel} className={SECONDARY}>{t("cancel")}</Button>
+        <Button size='lg' onClick={onCancel} className={SECONDARY}>{t("cancel")}</Button>
       </div>
     </>
   );
@@ -175,9 +175,9 @@ const ResultStep = ({
   // their ear may trust a run our spread check doesn't.
   const actions = (
     <div className='mt-8 flex gap-2.5'>
-      <Button onClick={onRetry} className={result.ok ? SECONDARY : PRIMARY}>{t("timing.try_again")}</Button>
+      <Button size='lg' onClick={onRetry} className={result.ok ? SECONDARY : PRIMARY}>{t("timing.try_again")}</Button>
       {latencyMs !== null && (
-        <Button onClick={() => onSave(latencyMs)} className={result.ok ? PRIMARY : SECONDARY}>
+        <Button size='lg' onClick={() => onSave(latencyMs)} className={result.ok ? PRIMARY : SECONDARY}>
           {t("timing.use", { ms: latencyMs })}
         </Button>
       )}
@@ -220,7 +220,7 @@ const ResultStep = ({
   return (
     <>
       <div className='mt-8 flex flex-col items-center text-center'>
-        <span className='text-[11px] font-semibold tracking-wide text-zinc-500'>{t("timing.measured_delay")}</span>
+        <span className='text-xs font-medium text-zinc-400'>{t("timing.measured_delay")}</span>
         <span className='mt-1 font-teko text-6xl font-bold leading-none tabular-nums text-zinc-100'>
           {result.latencyMs} ms
         </span>
@@ -324,7 +324,7 @@ export const TimingCalibrationDialog = (props: Omit<TimingCalibrationPanelProps,
       {/* Above the session's full-screen layer (z-[999999] desktop, z-[9999999]
           mobile) — at the default z-50 it opens behind it, invisible. */}
       <DialogContent
-        className='z-[99999999] max-w-md border-0 bg-zinc-950 p-0 shadow-none sm:rounded-lg'
+        className='z-[99999999] bg-zinc-950 p-0 sm:max-w-md'
         overlayClassName='z-[99999998]'>
         <div className='px-7 pb-7 pt-7'>
           <div className='flex items-center gap-2.5 pr-10'>

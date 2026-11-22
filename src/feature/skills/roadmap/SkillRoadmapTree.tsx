@@ -92,7 +92,12 @@ const DifficultyPips = ({
   </g>
 );
 
-/** Progress round a tier's key, drawn outside the ring that cuts the trunk. */
+/**
+ * Progress round a tier's key: a thick ring, track and fill the same width.
+ * It stays clear of the dark ring that cuts the trunk round the key — that one
+ * is taller than wide (the key's lip), so a ring closer in lost its inner edge
+ * at the top. A light streak rides on the fill, like the app's progress bars.
+ */
 const ProgressArc = ({
   x,
   y,
@@ -102,28 +107,43 @@ const ProgressArc = ({
   y: number;
   share: number;
 }) => {
-  const r = G.tierKeySize / 2 + 11;
+  const width = 8;
+  const r = G.tierKeySize / 2 + 17;
   const cy = y + G.tierKeyLip / 2;
   const circumference = 2 * Math.PI * r;
+  const filled = circumference * share;
+  // The streak starts and ends inside the fill's rounded ends.
+  const streak = Math.max(0, filled - width * 2);
   return (
-    <g fill='none'>
+    <g fill='none' transform={`rotate(-90 ${x} ${cy})`}>
       <circle
         cx={x}
         cy={cy}
         r={r}
-        strokeWidth={2}
+        strokeWidth={width}
         className='stroke-zinc-800'
       />
       <circle
         cx={x}
         cy={cy}
         r={r}
-        strokeWidth={3}
+        strokeWidth={width}
         strokeLinecap='round'
-        strokeDasharray={`${circumference * share} ${circumference}`}
-        transform={`rotate(-90 ${x} ${cy})`}
+        strokeDasharray={`${filled} ${circumference}`}
         className='stroke-emerald-500'
       />
+      {streak > 0 && (
+        <circle
+          cx={x}
+          cy={cy}
+          r={r + 1.5}
+          strokeWidth={2}
+          strokeLinecap='round'
+          strokeDasharray={`${streak} ${circumference}`}
+          strokeDashoffset={-width}
+          className='light-hide stroke-white/30'
+        />
+      )}
     </g>
   );
 };

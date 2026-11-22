@@ -31,17 +31,9 @@ const ExerciseControls = ({
 }: ExerciseControlsProps) => {
   const { t } = useTranslation("session");
 
-  const btnSizes = {
-    sm: "h-10 w-10",
-    md: "h-12 w-12",
-    lg: "h-14 w-14",
-  };
-
-  const iconSizes = {
-    sm: "h-4 w-4",
-    md: "h-5 w-5",
-    lg: "h-6 w-6",
-  };
+  // One size for the whole row: the compact deck gets lg, the full one the
+  // big xl key. Restart is the same key made square, so it lines up with Start.
+  const buttonSize = size === "sm" ? "lg" : "xl";
 
   const containerClasses =
     variant === "centered"
@@ -53,16 +45,14 @@ const ExerciseControls = ({
       {!hidePlayButton && !isFinished && (
         <div className={cn("relative", variant !== "centered" && "flex-1")}>
           <Button
+            size={buttonSize}
             onClick={toggleTimer}
-            className={cn(
-              variant === "centered" ? (size === "lg" ? "h-14 px-8 w-auto" : size === "sm" ? "h-10 px-5 w-auto" : "h-12 px-6 w-auto") : "w-full",
-              "font-black"
-            )}>
+            className={variant === "centered" ? "w-auto" : "w-full"}>
             {!isPlaying && (
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 whitespace-nowrap z-[60] pointer-events-none">
                 <div className="animate-bounce flex flex-col items-center">
-                  <div className="bg-white  px-4 py-1.5 rounded-lg  text-[13px]  tracking-wider shadow-2xl shadow-white/20 flex items-center gap-1.5">
-                    <Play size='1em' className="h-2.5 w-2.5" /> 
+                  <div className="bg-white  px-4 py-1.5 rounded-lg  text-[13px]  shadow-2xl shadow-white/20 flex items-center gap-1.5">
+                    <Play />
                     <span>{t("controls.press_start")}</span>
                   </div>
                   <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white -mt-[1px]"></div>
@@ -72,12 +62,12 @@ const ExerciseControls = ({
             {isPlaying ? (
               <div className="flex items-center gap-2">
                 <span>{t("controls.pause")}</span>
-                <Pause size='1em' className={iconSizes[size]} />
+                <Pause />
               </div>
             ) : (
                <div className="flex items-center gap-2">
                 <span>{t("start")}</span>
-                <Play size='1em' className={cn(iconSizes[size], "ml-0.5")} />
+                <Play />
               </div>
             )}
            </Button>
@@ -86,14 +76,13 @@ const ExerciseControls = ({
  
        {handleRestart && (
          <Button
-           size={size === "lg" ? "lg" : "default"}
+           size={buttonSize}
            variant="subtle"
            onClick={handleRestart}
-           className={cn(btnSizes[size], "text-zinc-400")}
+           className="aspect-square px-0 text-zinc-400"
            title={t("controls.restart")}
          >
-           <svg 
-             className={iconSizes[size]} 
+           <svg
              viewBox="0 0 24 24" 
              fill="none" 
              stroke="currentColor" 
@@ -110,11 +99,11 @@ const ExerciseControls = ({
       {/* Primary Action Button - ONLY if NOT centered deck (where it's separate) */}
       {variant !== "centered" && !isLastExercise && (
         <Button
-          size={size === "lg" ? "lg" : "default"}
+          size={buttonSize}
           variant='subtle'
           onClick={handleNextExercise}
           className='flex-1'>
-          <SkipForward size='1em' className={iconSizes[size]} />
+          <SkipForward />
         </Button>
       )}
     </div>

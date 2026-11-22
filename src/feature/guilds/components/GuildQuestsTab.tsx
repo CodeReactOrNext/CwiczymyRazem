@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { FameCoin } from "feature/arsenal/components/Workshop/FameCoin";
 import { GuildQuestCard } from "feature/guilds/components/GuildQuestCard";
 import {
@@ -46,7 +47,7 @@ const Payout = ({
   const amount = fame.toLocaleString();
 
   return (
-    <section className='flex flex-wrap items-center justify-between gap-4 rounded-lg bg-zinc-900/40 p-5'>
+    <section className='flex flex-wrap items-center justify-between gap-4 rounded-lg bg-zinc-800/40 p-5'>
       <div className='flex items-center gap-4'>
         <FameCoin size={32} />
         <div>
@@ -81,9 +82,9 @@ const ChapterPlate = ({
         state === "locked" && "bg-zinc-800/40 text-zinc-500",
       )}>
       {state === "passed" ? (
-        <Check size={18} />
+        <Check className='h-5 w-5' />
       ) : state === "locked" ? (
-        <Lock size={15} />
+        <Lock className='h-5 w-5' />
       ) : (
         index + 1
       )}
@@ -100,14 +101,16 @@ const Chapters = ({ board }: { board: GuildQuestBoard }) => {
   return (
     <section className='space-y-4'>
       <div className='space-y-1'>
-        <h2 className='flex items-center gap-2.5 text-lg font-bold text-white'>
-          {t("quests.road_ahead")}
-          {board.lap > 1 && (
-            <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-semibold text-zinc-400'>
-              {t("quests.lap", { lap: romanNumeral(board.lap) })}
-            </span>
-          )}
-        </h2>
+        <SectionHeader
+          size='lg'
+          title={t("quests.road_ahead")}
+          count={
+            board.lap > 1
+              ? t("quests.lap", { lap: romanNumeral(board.lap) })
+              : undefined
+          }
+          className='mb-0'
+        />
         {/* Only past the first lap is there anything to explain: the numbers
             are no longer the ones a member remembers. */}
         {board.lap > 1 && (
@@ -190,18 +193,19 @@ export const GuildQuestsTab = ({
 
       <section className='space-y-4'>
         <div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1'>
-          <h2 className='flex flex-wrap items-center gap-2.5 text-lg font-bold text-white'>
-            {chapterName(board.chapter.index, board.chapter.name)}
-            <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-semibold tabular-nums text-zinc-400'>
-              {t("quests.chapter_of_cap", {
-                index: board.chapter.index + 1,
-                total: board.chaptersTotal,
-              })}
-              {board.lap > 1
+          <SectionHeader
+            size='lg'
+            title={chapterName(board.chapter.index, board.chapter.name)}
+            count={`${t("quests.chapter_of_cap", {
+              index: board.chapter.index + 1,
+              total: board.chaptersTotal,
+            })}${
+              board.lap > 1
                 ? ` · ${t("quests.lap", { lap: romanNumeral(board.lap) })}`
-                : ""}
-            </span>
-          </h2>
+                : ""
+            }`}
+            className='mb-0'
+          />
 
           <p className='text-sm tabular-nums text-zinc-400'>
             <Interpolate

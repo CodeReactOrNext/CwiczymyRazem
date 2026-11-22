@@ -8,8 +8,10 @@ import {
 } from "assets/components/ui/dialog";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
 import { useRecordingMutations } from "feature/recordings/hooks/useRecordingMutations";
 import type { Recording } from "feature/recordings/types/types";
 import { getSongs } from "feature/songs/services/getSongs";
@@ -17,7 +19,7 @@ import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import debounce from "lodash/debounce";
-import { ArrowRight, Loader2, Music, Pencil, Search, Video, X } from "lucide-react";
+import { ArrowRight, Music, Pencil, Search, Video, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
@@ -212,13 +214,12 @@ export const AddRecordingModal = ({
     }
   };
 
-  const fieldClass =
-    "border-none bg-zinc-900/60 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium";
+  const fieldClass = "font-medium";
   const hasSongQuery = !!(searchArtist.trim() || searchTitle.trim());
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-none sm:max-w-xl bg-zinc-950 text-white p-0 overflow-hidden h-full sm:h-auto flex flex-col">
+      <DialogContent className="bg-zinc-950 text-white p-0 overflow-hidden h-full sm:h-auto flex flex-col">
         <div className="flex-1 overflow-y-auto p-6 pb-24 sm:pb-6 sm:max-h-[85vh]">
           <DialogHeader className="mb-6">
             <DialogTitle className="flex items-center gap-3 text-xl font-bold">
@@ -258,27 +259,27 @@ export const AddRecordingModal = ({
                        <Button
                           type="button"
                           variant="ghost"
-                          size="icon"
+                          size="icon-sm"
                           onClick={handleRemoveSelectedSong}
-                          className="h-8 w-8 text-cyan-400 hover:text-cyan-200 hover:bg-cyan-500/20"
+                          className="text-cyan-400 hover:text-cyan-200 hover:bg-cyan-500/20"
                        >
-                           <X className="h-4 w-4" />
+                           <X />
                        </Button>
                    </div>
                ) : (
                    <>
                       <div className="grid grid-cols-2 gap-3">
-                         <Input
+                         <SearchInput
                              value={searchArtist}
                              onChange={(e) => setSearchArtist(e.target.value)}
                              placeholder={t("modal.artist")}
-                             className={cn("h-11", fieldClass)}
+                             aria-label={t("modal.artist")}
                          />
-                         <Input
+                         <SearchInput
                              value={searchTitle}
                              onChange={(e) => setSearchTitle(e.target.value)}
                              placeholder={t("modal.song_title")}
-                             className={cn("h-11", fieldClass)}
+                             aria-label={t("modal.song_title")}
                          />
                       </div>
 
@@ -293,11 +294,11 @@ export const AddRecordingModal = ({
                           </div>
                         ) : isSearching ? (
                           Array.from({ length: 3 }).map((_, i) => (
-                            <div key={i} className="flex animate-pulse items-center gap-3 rounded-lg bg-zinc-800/40 p-2.5">
-                              <div className="h-10 w-10 shrink-0 rounded-lg bg-zinc-800" />
+                            <div key={i} className="flex items-center gap-3 rounded-lg bg-zinc-800/40 p-2.5">
+                              <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
                               <div className="flex-1 space-y-2">
-                                <div className="h-3.5 w-2/5 rounded bg-zinc-800" />
-                                <div className="h-2.5 w-1/4 rounded bg-zinc-800" />
+                                <Skeleton className="h-3.5 w-2/5" />
+                                <Skeleton className="h-2.5 w-1/4" />
                               </div>
                             </div>
                           ))
@@ -320,7 +321,7 @@ export const AddRecordingModal = ({
             <div className="space-y-2">
               <Label htmlFor="videoUrl" className="text-zinc-400 font-bold ml-1">{t("modal.youtube_url")}</Label>
               <div className="relative">
-                  <FaYoutube className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                  <FaYoutube className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 h-4 w-4 text-zinc-500" />
                   <Input
                   id="videoUrl"
                   value={videoUrl}
@@ -360,8 +361,7 @@ export const AddRecordingModal = ({
               <Button type="button" variant="ghost" onClick={handleClose} disabled={isSaving}>
                 {t("modal.cancel")}
               </Button>
-              <Button type="submit" disabled={isSaving} className="bg-cyan-600 hover:bg-cyan-500 text-white">
-                {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
+              <Button type="submit" loading={isSaving}>
                 {isEditing ? t("modal.save") : t("modal.share")}
               </Button>
             </DialogFooter>

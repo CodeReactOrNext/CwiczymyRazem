@@ -1,5 +1,5 @@
 ---
-title: "Übungsroutinen & Auto-Plan"
+title: "Übungspläne & Auto-Plan"
 description: "Wie Routinen zusammengestellt werden, wie der Auto-Plan eine Session um die Zeit herum baut, die du hast, und wie das Teilen von Übungen mit der Community funktioniert."
 slug: "exercise-plans-and-auto-plan"
 section: "Practice"
@@ -8,7 +8,7 @@ order: 3
 
 Eine **Routine** (die App nennt sie auch Übungsplan) ist nichts Raffinierteres als eine geordnete Liste von Übungen mit einem Namen, einem Schwierigkeitsgrad und einer Kategorie. Du gehst sie von oben nach unten durch, und am Ende trägt sie die Session für dich ein.
 
-<ClickPath steps="Üben|Übungsroutinen" caption="Fertige Routinen, Playalongs, deine eigenen Pläne und von anderen Spielern geteilte Pläne." />
+<ClickPath steps="Üben|Übungspläne" caption="Fertige Routinen, Playalongs, deine eigenen Pläne und von anderen Spielern geteilte Pläne." />
 
 ## Drei Wege zu einer Routine
 

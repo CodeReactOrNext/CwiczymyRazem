@@ -134,7 +134,7 @@ export const ProfileHeader = ({
   if (facts.has("streak") && streak > 0) {
     factItems.push(
       <Fact key='streak' label={labels.fact("streak")}>
-        <Flame className='text-orange-500' size={13} />
+        <Flame className='h-3.5 w-3.5 text-orange-500' />
         <span className='tabular-nums'>
           {t(streak === 1 ? "header.days_one" : "header.days", { count: streak })}
         </span>
@@ -206,13 +206,12 @@ export const ProfileHeader = ({
       }
       title={displayName}
       subtitle={layout.tagline || undefined}
-      className='w-full !rounded-none !shadow-none'
       backgroundContent={
         <>
           {bannerLayers && (
             <div
               aria-hidden
-              className='absolute inset-0 rounded-none md:rounded-xl'
+              className='absolute inset-0'
               style={{ background: bannerLayers }}
             />
           )}
@@ -225,7 +224,7 @@ export const ProfileHeader = ({
             />
           )}
           {isSpecialGuitar ? (
-            <div className='absolute inset-0 z-0 overflow-hidden rounded-none md:rounded-xl'>
+            <div className='absolute inset-0 z-0 overflow-hidden'>
               <div
                 className='light-hide pointer-events-none absolute left-[0%] top-[-10%] opacity-25 blur-[80px] md:left-[5%] md:top-[-15%] md:opacity-30'
                 style={{
@@ -351,7 +350,7 @@ export const ProfileHeader = ({
           </div>
 
           {(factItems.length > 0 || showLinks) && (
-            <div className='light-card space-y-3 rounded-xl bg-zinc-950/60 px-4 py-3 backdrop-blur-md'>
+            <div className='light-card space-y-3 rounded-lg bg-zinc-950/60 px-4 py-3 backdrop-blur-md'>
               {factItems.length > 0 && (
                 <dl className='grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap'>
                   {factItems}
@@ -365,7 +364,7 @@ export const ProfileHeader = ({
                       rel='noreferrer'
                       href={youTubeLink}
                       className='flex items-center gap-1.5 rounded-lg bg-red-500/15 px-2.5 py-1.5 text-xs font-semibold text-zinc-100 transition-colors hover:bg-red-500/30'>
-                      <FaYoutube size={13} className='text-red-400' /> YouTube
+                      <FaYoutube className='h-3.5 w-3.5 text-red-400' /> YouTube
                     </a>
                   )}
                   {soundCloudLink && (
@@ -374,7 +373,7 @@ export const ProfileHeader = ({
                       rel='noreferrer'
                       href={soundCloudLink}
                       className='flex items-center gap-1.5 rounded-lg bg-orange-500/15 px-2.5 py-1.5 text-xs font-semibold text-zinc-100 transition-colors hover:bg-orange-500/30'>
-                      <FaSoundcloud size={13} className='text-orange-400' />{" "}
+                      <FaSoundcloud className='h-3.5 w-3.5 text-orange-400' />{" "}
                       SoundCloud
                     </a>
                   )}

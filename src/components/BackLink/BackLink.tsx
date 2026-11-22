@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -9,14 +10,18 @@ interface BackLinkProps {
   className?: string;
 }
 
-const baseClass =
-  "inline-flex w-fit items-center gap-1.5 rounded-lg text-sm font-semibold text-zinc-500 transition-colors hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+/**
+ * The app's one "back" control. A key like every other button (ghost, sm),
+ * so going back reads the same on every page instead of as grey text on one,
+ * a bare arrow on another and a cyan chip on a third.
+ */
+const baseClass = cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-fit");
 
 export const BackLink = ({ label, href, onClick, className }: BackLinkProps) => {
   if (href) {
     return (
       <Link href={href} onClick={onClick} className={cn(baseClass, className)}>
-        <ArrowLeft size={16} />
+        <ArrowLeft />
         {label}
       </Link>
     );
@@ -24,7 +29,7 @@ export const BackLink = ({ label, href, onClick, className }: BackLinkProps) => 
 
   return (
     <button type="button" onClick={onClick} className={cn(baseClass, className)}>
-      <ArrowLeft size={16} />
+      <ArrowLeft />
       {label}
     </button>
   );

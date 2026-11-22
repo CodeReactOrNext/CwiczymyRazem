@@ -20,13 +20,13 @@ export const GuildStudioPanel = () => {
 
   if (isLoading)
     return (
-      <p className='rounded-lg bg-zinc-900/40 p-6 text-sm text-zinc-400'>
+      <p className='rounded-lg bg-zinc-800/40 p-6 text-sm text-zinc-400'>
         {t("studio.loading")}
       </p>
     );
   if (isError || !data)
     return (
-      <p className='rounded-lg bg-zinc-900/40 p-6 text-sm text-zinc-400'>
+      <p className='rounded-lg bg-zinc-800/40 p-6 text-sm text-zinc-400'>
         {t("studio.load_failed")}
       </p>
     );

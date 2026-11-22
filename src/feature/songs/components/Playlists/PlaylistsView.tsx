@@ -1,6 +1,12 @@
-import { Button, PRESSABLE } from "assets/components/ui/button";
+import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { Ripple } from "components/Ripple/Ripple";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
+import { SongRowSkeleton } from "feature/songs/components/SongsGrid/SongCardRow";
 import {
   getPlaylistById,
   getPublicPlaylists,
@@ -42,9 +48,9 @@ const GRID_CLASS =
 
 const CardSkeleton = () => (
   <div className="flex flex-col p-3">
-    <div className="aspect-square w-full animate-pulse rounded-md bg-zinc-800/60" />
-    <div className="mt-3 h-4 w-3/4 animate-pulse rounded bg-zinc-800/60" />
-    <div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-zinc-800/60" />
+    <Skeleton className="aspect-square w-full rounded-lg" />
+    <Skeleton className="mt-3 h-4 w-3/4" />
+    <Skeleton className="mt-2 h-3 w-1/2" />
   </div>
 );
 
@@ -152,35 +158,37 @@ export const PlaylistsView = ({
   if (activePlaylistId) {
     if (detailNotFound) {
       return (
-        <div className="flex h-full flex-col items-center justify-center p-10 text-center">
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500">
-            <ListMusic size={26} />
-          </div>
-          <h3 className="mb-1 text-lg font-bold text-white">{t("view.not_available")}</h3>
-          <p className="max-w-xs text-sm text-zinc-500">
-            {t("view.not_available_body")}
-          </p>
-          <Button
-            variant="ghost"
-            onClick={() => onOpenPlaylist(null)}
-            className="mt-6 h-10 bg-white/5 px-5 font-bold text-zinc-300 hover:bg-white/10 hover:text-white"
-          >
-            {t("view.back")}
-          </Button>
+        <div className={PAGE_CONTENT}>
+          <EmptyState
+            icon={<ListMusic />}
+            title={t("view.not_available")}
+            description={t("view.not_available_body")}
+            action={
+              <BackLink
+                label={t("view.back")}
+                onClick={() => onOpenPlaylist(null)}
+              />
+            }
+          />
         </div>
       );
     }
 
     if (!activePlaylist) {
       return (
-        <div className="space-y-6 p-4 sm:p-6 md:p-10">
+        <div className={cn("space-y-6", PAGE_CONTENT)} aria-busy="true">
           <div className="flex items-end gap-6">
-            <div className="h-40 w-40 animate-pulse rounded-md bg-zinc-800/60 md:h-48 md:w-48" />
+            <Skeleton className="h-40 w-40 rounded-lg md:h-48 md:w-48" />
             <div className="flex-1 space-y-3">
-              <div className="h-3 w-24 animate-pulse rounded bg-zinc-800/60" />
-              <div className="h-10 w-2/3 animate-pulse rounded bg-zinc-800/60" />
-              <div className="h-3 w-40 animate-pulse rounded bg-zinc-800/60" />
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-10 w-2/3" />
+              <Skeleton className="h-3 w-40" />
             </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            {Array.from({ length: 5 }, (_, i) => (
+              <SongRowSkeleton key={i} className="bg-transparent px-2 py-2 sm:px-3" />
+            ))}
           </div>
         </div>
       );
@@ -214,54 +222,39 @@ export const PlaylistsView = ({
     tab === "discover" || (hasMine && myPlaylists.length >= FEW_PLAYLISTS);
 
   return (
-    <div className="space-y-8 p-4 sm:p-6 md:p-10 animate-in fade-in-50 duration-base">
+    <div className={cn("space-y-8 animate-in fade-in-50 duration-base", PAGE_CONTENT)}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="sr-only">{t("view.title")}</h1>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            aria-pressed={tab === "mine"}
-            onClick={() => setTab("mine")}
-            className={cn(
-                PRESSABLE,
-                "flex h-10 items-center gap-2 rounded-lg border-b-black/30 px-4 text-sm transition-colors",
-                tab === "mine"
-                  ? "border-b-black/25 bg-white text-zinc-900"
-                  : "bg-white/10 text-zinc-400 hover:bg-white/15 hover:text-zinc-200"
-              )}
-          >
-            <ListMusic size={15} className={tab === "mine" ? "text-zinc-900" : "text-zinc-500"} />
-            {t("view.yours")}
-          </button>
-          <button
-            type="button"
-            aria-pressed={tab === "discover"}
-            onClick={() => {
-              setTab("discover");
+        <SegmentedControl<PlaylistTab>
+          label={t("view.title")}
+          selected={[tab]}
+          onSelect={(value) => {
+            setTab(value);
+            if (value === "discover") {
               posthog.capture("playlist_action", { action: "open_discover" });
-            }}
-            className={cn(
-                PRESSABLE,
-                "flex h-10 items-center gap-2 rounded-lg border-b-black/30 px-4 text-sm transition-colors",
-                tab === "discover"
-                  ? "border-b-black/25 bg-white text-zinc-900"
-                  : "bg-white/10 text-zinc-400 hover:bg-white/15 hover:text-zinc-200"
-              )}
-          >
-            <Compass size={15} className={tab === "discover" ? "text-zinc-900" : "text-zinc-500"} />
-            {t("view.discover")}
-          </button>
-        </div>
+            }
+          }}
+          options={[
+            {
+              value: "mine",
+              label: t("view.yours"),
+              icon: <ListMusic size={15} className="shrink-0 text-zinc-400" />,
+            },
+            {
+              value: "discover",
+              label: t("view.discover"),
+              icon: <Compass size={15} className="shrink-0 text-zinc-400" />,
+            },
+          ]}
+        />
 
         {showCreateButton && (
           <Button
             onClick={() => setIsCreatorOpen(true)}
-            className="h-10 px-5 font-bold"
+            size="lg"
           >
-            <span className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              {t("view.new")}
-            </span>
+            <Plus />
+            {t("view.new")}
           </Button>
         )}
       </div>
@@ -273,19 +266,29 @@ export const PlaylistsView = ({
           ))}
         </div>
       ) : tab === "mine" && myPlaylists.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-14 text-center">
-          <h3 className="mb-2 text-xl font-bold text-white">{t("view.first_title")}</h3>
-          <p className="mb-8 max-w-sm text-sm text-zinc-400">
-            {t("view.first_body")}
-          </p>
-          <div className="mb-8 grid w-full max-w-2xl gap-3 sm:grid-cols-3">
+        <div className="space-y-3">
+          <EmptyState
+            mood='lookAround'
+            title={t("view.first_title")}
+            description={t("view.first_body")}
+            action={
+              <Button
+                onClick={() => setIsCreatorOpen(true)}
+                size="lg"
+              >
+                <Plus />
+                {t("view.create_one")}
+              </Button>
+            }
+          />
+          <div className="grid gap-3 sm:grid-cols-3">
             {(Object.keys(KIND_META) as (keyof typeof KIND_META)[]).map((k) => {
               const meta = KIND_META[k];
               const Icon = meta.icon;
               return (
                 <div
                   key={k}
-                  className="flex flex-col items-start gap-2 rounded-xl bg-white/[0.03] p-4 text-left"
+                  className="flex flex-col items-start gap-2 rounded-lg bg-zinc-800/40 p-4 text-left"
                 >
                   <Icon className="h-4 w-4 text-zinc-400" />
                   <p className="text-sm font-bold text-white">{t(`kinds.${k}.label`, meta.label)}</p>
@@ -296,26 +299,13 @@ export const PlaylistsView = ({
               );
             })}
           </div>
-          <Button
-            onClick={() => setIsCreatorOpen(true)}
-            className="h-11 px-6 font-bold"
-          >
-            <span className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              {t("view.create_one")}
-            </span>
-          </Button>
         </div>
       ) : tab === "discover" && discoverPlaylists.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-500">
-            <ListMusic size={26} />
-          </div>
-          <h3 className="mb-1 text-lg font-bold text-white">{t("view.nothing_public")}</h3>
-          <p className="max-w-xs text-sm text-zinc-500">
-            {t("view.nothing_public_body")}
-          </p>
-        </div>
+        <EmptyState
+          mood='lookAround'
+          title={t("view.nothing_public")}
+          description={t("view.nothing_public_body")}
+        />
       ) : (
         <div className={GRID_CLASS}>
           {showCreateTile && (

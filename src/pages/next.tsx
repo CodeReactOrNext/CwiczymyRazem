@@ -8,7 +8,7 @@ const WhatNextPage: NextPageWithLayout = () => <WhatNextView />;
 
 WhatNextPage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <AppLayout pageId='what-next' variant='secondary' wide>
+    <AppLayout pageId='what-next' variant='secondary' corridor='next'>
       {page}
     </AppLayout>
   );

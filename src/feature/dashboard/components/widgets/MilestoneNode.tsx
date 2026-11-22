@@ -3,8 +3,8 @@ import type { MilestoneStatus } from "feature/dashboard/utils/milestoneSummary";
 import { Check, Gift, Lock } from "lucide-react";
 import type { CSSProperties } from "react";
 
-/** "Reached" green, the same one the trail and the goal tick use. */
-export const MILESTONE_GREEN = "#22c55e";
+/** "Reached" — the app's success emerald, shared by the trail, the ring and the bars. */
+export const MILESTONE_GREEN = "#10b981";
 const NODE = 56;
 const CENTER = NODE / 2;
 const RING_R = 23;
@@ -12,7 +12,7 @@ const CIRC = 2 * Math.PI * RING_R;
 
 /** The key's lip: the face's own hue, a few shades down. */
 const LIP = {
-  reached: "#15803d",
+  reached: "#047857",
   reward: "#b45309",
   open: "#1f1f23",
   locked: "#141417",
@@ -26,7 +26,6 @@ export type MilestoneNodeStatus = Pick<
   | "claimed"
   | "cost"
   | "lockedAtLvl"
-  | "color"
   | "Icon"
   | "progress"
 >;
@@ -55,7 +54,7 @@ export const MilestoneNode = ({
   pressable = false,
 }: {
   status: MilestoneNodeStatus;
-  /** The goal being worked towards — icon in the tier's colour, thicker ring. */
+  /** The goal being worked towards — a brighter icon and a thicker ring. */
   isCurrent?: boolean;
   /** Picked in the strip: an outline around the key, not a glow. */
   selected?: boolean;
@@ -153,7 +152,7 @@ export const MilestoneNode = ({
         ) : (
           <Icon
             className='h-5 w-5'
-            style={{ color: isCurrent ? status.color : "#8e8e98" }}
+            style={{ color: isCurrent ? "#f4f4f5" : "#8e8e98" }}
           />
         )}
       </span>

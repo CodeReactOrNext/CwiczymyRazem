@@ -146,14 +146,14 @@ export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
               </span>
               <span
                 className={cn(
-                  "truncate text-[12px] font-bold capitalize tracking-wide",
+                  "truncate text-xs font-bold",
                 )}
                 style={{ color: readableText(unmet ? "#71717a" : EMERALD) }}>
                 {labels.traitLabel(trait)}
               </span>
               <span className='font-mono ml-auto flex flex-shrink-0 items-baseline gap-1.5 text-[12px] font-bold tabular-nums'>
                 {units != null && (
-                  <span className='text-[10px] font-semibold text-zinc-600'>
+                  <span className='text-[11px] font-semibold text-zinc-500'>
                     ×{units}
                   </span>
                 )}
@@ -163,8 +163,8 @@ export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
               </span>
             </div>
             <p
-              className='pl-[19px] text-[10px] leading-snug'
-              style={{ color: readableText(unmet ? "#52525b" : "#a1a1aa") }}>
+              className='pl-[19px] text-xs leading-snug'
+              style={{ color: readableText(unmet ? "#71717a" : "#a1a1aa") }}>
               {labels.traitDescription(trait)}
             </p>
           </div>
@@ -180,16 +180,16 @@ export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
             </TooltipTrigger>
             <TooltipContent
               side='top'
-              className='max-w-[240px] border border-zinc-700 bg-zinc-950 text-white'>
+              className='max-w-[240px]'>
               <div className='flex flex-col gap-1.5'>
                 {hidden.map(({ trait }) => (
                   <div
                     key={trait.def.id}
                     className='flex items-baseline justify-between gap-3 text-[11px]'>
-                    <span className='truncate font-semibold text-emerald-300'>
+                    <span className='truncate font-semibold text-emerald-700'>
                       {labels.traitLabel(trait)}
                     </span>
-                    <span className='font-mono shrink-0 text-emerald-200'>
+                    <span className='font-mono shrink-0 text-emerald-700'>
                       {formatTraitValue(trait.value)} Fame/h
                     </span>
                   </div>

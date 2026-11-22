@@ -1,6 +1,8 @@
+import { cn } from "assets/lib/utils";
+import { PAGE_GUTTER, PageShell } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { LIBRARY_TABS } from "constants/navTabs";
+import { LIBRARY_HERO_CLASS, LIBRARY_TABS } from "constants/navTabs";
 import { MyPlans } from "feature/exercisePlan/components/MyPlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
@@ -32,8 +34,8 @@ const MyPlansPage: NextPageWithLayout = () => {
   // Show premium preview for non-premium users
   if (!isPremium && userInfo !== null) {
     return (
-      <div className="flex min-h-screen flex-col">
-        <div className="px-4 pt-6 md:px-6">
+      <div className="flex flex-col">
+        <div className={cn(PAGE_GUTTER, "pt-6")}>
           <PageTabs
             tabs={LIBRARY_TABS}
             activeHref="/plans"
@@ -76,17 +78,17 @@ const MyPlansPage: NextPageWithLayout = () => {
 
   return (
     <PremiumGate feature="plans">
-      <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
+      <PageShell>
         <HeroBanner
           title={t("plans.title")}
           subtitle={t("plans.subtitle")}
           eyebrow={t("plans.eyebrow")}
+          className={LIBRARY_HERO_CLASS}
           backgroundContent={<HeroPattern />}
-          className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
           buttonText={planCount ? t("plans.create") : undefined}
           onClick={() => router.push('/plans/create')}
         />
-        <div className="mb-6 px-4 md:px-6">
+        <div className={cn(PAGE_GUTTER, "pt-6")}>
           <PageTabs
             tabs={LIBRARY_TABS}
             activeHref="/plans"
@@ -94,7 +96,7 @@ const MyPlansPage: NextPageWithLayout = () => {
           />
         </div>
         <MyPlans onPlanSelect={handlePlanSelect} hideTabs={["routines", "playalongs"]} hideLayout hideSectionHeader onPlansLoaded={setPlanCount} />
-      </div>
+      </PageShell>
     </PremiumGate>
   );
 };

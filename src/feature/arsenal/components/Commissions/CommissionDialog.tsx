@@ -1,4 +1,4 @@
-import { buttonVariants,PRESSABLE } from "assets/components/ui/button";
+import { buttonVariants } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -117,7 +117,7 @@ export const CommissionDialog = ({
         onEscapeKeyDown={(e) => commission.isPending && e.preventDefault()}
         onInteractOutside={(e) => commission.isPending && e.preventDefault()}
         className={cn(
-          "flex max-h-[100dvh] flex-col gap-7 border-0 bg-zinc-900 p-6 sm:max-h-[90vh] sm:max-w-3xl sm:overflow-y-auto sm:p-7",
+          "flex max-h-[100dvh] flex-col gap-7 bg-zinc-900 p-6 sm:max-h-[90vh] sm:max-w-3xl sm:overflow-y-auto sm:p-7",
           // MobileBottomNav (z-[100]) floats over dialogs below lg; leave room
           // under the buttons so they can scroll clear of it.
           "pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-7",
@@ -167,7 +167,7 @@ export const CommissionDialog = ({
         {delivered ? (
           <button
             onClick={close}
-            className={cn(PRESSABLE, "rounded-lg bg-zinc-100 px-5 py-3.5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 hover:bg-white border-b-black/25")}>
+            className={buttonVariants({ size: "lg" })}>
             {t("mods.done")}
           </button>
         ) : (
@@ -175,7 +175,7 @@ export const CommissionDialog = ({
             <button
               onClick={close}
               disabled={commission.isPending}
-              className={cn(PRESSABLE, "rounded-lg bg-zinc-800 px-5 py-3.5 text-sm font-bold text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400 disabled:opacity-40 hover:bg-zinc-700 hover:text-white sm:w-44 border-b-black/30")}>
+              className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "sm:w-44")}>
               {t("common.cancel")}
             </button>
             <button
@@ -194,15 +194,7 @@ export const CommissionDialog = ({
                 )
               }
               disabled={!quote.canAfford || commission.isPending}
-              className={cn(
-                PRESSABLE,
-                "flex-1 rounded-lg border-b-black/25 px-5 py-3.5 text-sm font-bold transition-colors",
-                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-400",
-                "disabled:pointer-events-none disabled:opacity-40",
-                quote.canAfford
-                  ? "bg-zinc-100 text-zinc-900 hover:bg-white"
-                  : "bg-zinc-800/60 text-zinc-500",
-              )}>
+              className={cn(buttonVariants({ size: "lg" }), "flex-1")}>
               {commission.isPending ? t("workshop.building") : t("commissions.commission")}
             </button>
           </div>

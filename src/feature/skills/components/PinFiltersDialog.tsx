@@ -52,7 +52,7 @@ export const PinFiltersDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md border-white/5 bg-zinc-950 p-6">
+      <DialogContent className="bg-zinc-950 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold text-white">Pin to Home</DialogTitle>
           <DialogDescription className="text-sm text-zinc-400">
@@ -75,7 +75,7 @@ export const PinFiltersDialog = ({
             maxLength={MAX_CUSTOM_SHORTCUT_LABEL}
             onChange={e => setLabel(e.target.value)}
             autoFocus
-            className="h-11 border-white/5 bg-white/5 text-base text-zinc-100 sm:text-sm"
+            className="h-11 sm:text-sm"
           />
           {limitReached && (
             <p className="text-xs font-semibold text-amber-400">
@@ -85,10 +85,10 @@ export const PinFiltersDialog = ({
         </form>
 
         <DialogFooter className="gap-2 pt-2">
-          <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-zinc-400">
+          <Button variant="ghost" size="lg" onClick={() => onOpenChange(false)} className="text-zinc-400">
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={!canSave} className="bg-white text-zinc-950 hover:bg-zinc-200">
+          <Button size="lg" onClick={handleSave} disabled={!canSave}>
             Pin
           </Button>
         </DialogFooter>

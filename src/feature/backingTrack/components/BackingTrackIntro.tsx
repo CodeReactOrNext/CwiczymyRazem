@@ -1,3 +1,5 @@
+import { buttonVariants } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 
 const INTRO_SEEN_KEY = "rq_backing_intro_seen";
@@ -79,7 +81,7 @@ export function BackingTrackIntro({ desktopAvailable, onDone }: BackingTrackIntr
             markBackingIntroSeen();
             onDone();
           }}
-          className='self-start rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'>
+          className={cn(buttonVariants({ size: "lg" }), "self-start")}>
           {t("intro.start")}
         </button>
       </div>

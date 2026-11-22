@@ -1,3 +1,5 @@
+import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { tierDescription, tierLabel } from "feature/roadmap/utils/tierText";
 import { useTranslation } from "hooks/useTranslation";
@@ -24,8 +26,9 @@ const BOX_TOP = TRACK_TOP + TRACK_H + 22;
 const CONTAINER_H = 352;
 
 /** Shape and placement only — each chevron paints itself, see below. Centred on the track. */
+// A solid face: the keys sit over the scrolling ladder.
 const SCROLL_BUTTON_CLASS =
-  "absolute top-[21px] z-30 flex h-9 w-9 items-center justify-center rounded-full transition-background focus-visible:outline-none focus-visible:ring-1";
+  "absolute top-[21px] z-30 bg-zinc-800 hover:bg-zinc-700";
 
 /**
  * Every state gets its own accent, because on a ladder this long "which one is
@@ -118,7 +121,7 @@ export const FundingProgressBar = ({
 
   return (
     <div className='w-full'>
-      <section className='rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+      <section className='rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
         <header className='mb-2 flex items-start justify-between gap-4'>
           <div>
             <h2 className='text-base font-semibold text-zinc-100'>
@@ -143,16 +146,15 @@ export const FundingProgressBar = ({
           {canLeft && (
             <>
               <div className='pointer-events-none absolute inset-y-0 left-0 z-30 w-16 bg-gradient-to-r from-zinc-900 to-transparent' />
-              <button
+              <Button
                 type='button'
+                variant='ghost'
+                size='icon'
                 aria-label={t("funding.scroll_left")}
                 onClick={() => scrollBy(-1)}
-                className={cn(
-                  SCROLL_BUTTON_CLASS,
-                  "left-2 bg-zinc-800 text-zinc-300 focus-visible:ring-ring hover:bg-zinc-700",
-                )}>
-                <ChevronLeft size={18} />
-              </button>
+                className={cn(SCROLL_BUTTON_CLASS, "left-2 text-zinc-300")}>
+                <ChevronLeft />
+              </Button>
             </>
           )}
 
@@ -162,16 +164,18 @@ export const FundingProgressBar = ({
           {canRight && (
             <>
               <div className='pointer-events-none absolute inset-y-0 right-0 z-30 w-20 bg-gradient-to-l from-zinc-900 to-transparent' />
-              <button
+              <Button
                 type='button'
+                variant='ghost'
+                size='icon'
                 aria-label={t("funding.scroll_right")}
                 onClick={() => scrollBy(1)}
                 className={cn(
                   SCROLL_BUTTON_CLASS,
-                  "right-2 animate-pulse bg-cyan-500/20 text-cyan-300 focus-visible:ring-cyan-500/50 hover:bg-cyan-500/30 motion-reduce:animate-none",
+                  "right-2 animate-pulse text-cyan-300 hover:text-cyan-200 motion-reduce:animate-none",
                 )}>
-                <ChevronRight size={18} />
-              </button>
+                <ChevronRight />
+              </Button>
             </>
           )}
 
@@ -266,10 +270,10 @@ export const FundingProgressBar = ({
                       />
 
                       {isFeature && (
-                        <span className='mb-2 inline-flex items-center gap-1 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300'>
+                        <Chip color='amber' size='sm' className='mb-2'>
                           <Sparkles size={11} />
                           {t("funding.feature")}
-                        </span>
+                        </Chip>
                       )}
 
                       <div className='flex items-baseline justify-between gap-2'>

@@ -1,5 +1,11 @@
+import { Button } from "assets/components/ui/button";
+import { Card } from "assets/components/ui/card";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { cn } from "assets/lib/utils";
 import { ActivityChart } from "components/Charts/ActivityChart";
-import { Kostek } from "components/Mascot/Kostek";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { NotebookPen } from "lucide-react";
@@ -105,7 +111,7 @@ export const PracticeLogView = () => {
   };
 
   return (
-    <div className='mx-auto flex w-full max-w-[1600px] flex-col gap-8 px-4 pb-24 pt-2 lg:px-8'>
+    <div className={cn("mx-auto flex w-full max-w-[1600px] flex-col gap-8", PAGE_CONTENT)}>
       <PracticeLogFilters
         filters={filters}
         setFilters={setFilters}
@@ -114,67 +120,54 @@ export const PracticeLogView = () => {
 
       {isLoading || sessions === null ? (
         <div className='grid gap-6 lg:grid-cols-[300px_1fr] lg:gap-8'>
-          <div className='h-80 animate-pulse rounded-xl bg-white/[0.03]' />
+          <Skeleton variant='block' className='h-80' />
           <div className='flex flex-col gap-4'>
             {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className='h-36 animate-pulse rounded-xl bg-white/[0.03]'
-              />
+              <Skeleton key={i} variant='block' className='h-36' />
             ))}
           </div>
         </div>
       ) : !hasAnySessions ? (
-        <div className='flex flex-col items-center gap-4 py-24 text-center'>
-          {/* No sessions yet: Kostek drums its fingers, waiting for the first one. */}
-          <Kostek mood='wait' className='h-24 md:h-36' />
-          <div className='space-y-1'>
-            <p className='text-sm font-medium text-zinc-200'>
-              {t("page.empty")}
-            </p>
-            <p className='mx-auto max-w-xs text-[13px] leading-relaxed text-zinc-500'>
-              {t("page.empty_hint")}
-            </p>
-          </div>
-        </div>
+        // No sessions yet: Kostek drums its fingers, waiting for the first one.
+        <EmptyState
+          mood='wait'
+          title={t("page.empty")}
+          description={t("page.empty_hint")}
+        />
       ) : (
         <div className='grid gap-6 lg:grid-cols-[300px_1fr] lg:gap-8'>
           <aside className='flex flex-col gap-5 lg:sticky lg:top-6 lg:self-start'>
-            <div className='rounded-xl bg-white/[0.03] p-4 backdrop-blur-sm sm:p-5'>
+            <Card className='p-5 sm:p-6'>
               <PracticeCalendar
                 days={allDayGroups}
                 from={filters.from}
                 to={filters.to}
                 onSelect={(from, to) => setFilters({ from, to })}
               />
-            </div>
+            </Card>
             {hasResults && (
-              <div className='rounded-xl bg-white/[0.03] p-4 backdrop-blur-sm sm:p-5'>
+              <Card className='p-5 sm:p-6'>
                 <PracticeLogSummary summary={summary} />
-              </div>
+              </Card>
             )}
           </aside>
 
           <div className='flex min-w-0 flex-col gap-6'>
             {!hasResults ? (
-              <div className='flex flex-col items-center gap-4 rounded-xl bg-white/[0.03] py-20 text-center'>
-                <NotebookPen size={24} className='text-zinc-600' />
-                <div className='space-y-1'>
-                  <p className='text-sm font-medium text-zinc-200'>
-                    {t("page.empty_filtered")}
-                  </p>
-                  <p className='mx-auto max-w-xs text-[13px] leading-relaxed text-zinc-500'>
-                    {t("page.empty_filtered_hint")}
-                  </p>
-                </div>
-                <button
-                  onClick={() =>
-                    setFilters({ range: "all", type: "all", duration: "all" })
-                  }
-                  className='text-xs font-semibold text-cyan-300 transition-colors hover:text-cyan-200'>
-                  {t("filters.clear_all")}
-                </button>
-              </div>
+              <EmptyState
+                icon={<NotebookPen />}
+                title={t("page.empty_filtered")}
+                description={t("page.empty_filtered_hint")}
+                action={
+                  <Button
+                    variant='ghost'
+                    onClick={() =>
+                      setFilters({ range: "all", type: "all", duration: "all" })
+                    }>
+                    {t("filters.clear_all")}
+                  </Button>
+                }
+              />
             ) : (
               <>
                 {selectedDay ? (
@@ -184,31 +177,33 @@ export const PracticeLogView = () => {
                     <ActivityChart
                       data={summary.dailyRows}
                       showRangeSelect={false}
-                      className='bg-white/[0.03] p-4 backdrop-blur-sm sm:p-5'
+                      className='p-5 sm:p-6'
                     />
                   )
                 )}
 
                 <section ref={listRef} className='flex flex-col gap-4'>
-                  <div className='flex items-baseline justify-between gap-3 px-3'>
-                    <h2 className='text-xs font-semibold text-zinc-500'>
-                      {t("page.sessions_heading")} · {filteredSessions.length}
-                    </h2>
-                    {totalPages > 1 && (
-                      <p className='text-[11px] tabular-nums text-zinc-600'>
-                        {t("pagination.page_of", {
-                          page: currentPage,
-                          total: totalPages,
-                        })}
-                      </p>
-                    )}
-                  </div>
+                  <SectionHeader
+                    title={t("page.sessions_heading")}
+                    count={filteredSessions.length}
+                    action={
+                      totalPages > 1 && (
+                        <p className='text-xs tabular-nums text-zinc-500'>
+                          {t("pagination.page_of", {
+                            page: currentPage,
+                            total: totalPages,
+                          })}
+                        </p>
+                      )
+                    }
+                    className='mb-0 items-baseline px-3'
+                  />
 
                   <div className='flex flex-col gap-4'>
                     {visibleGroups.map((group) => (
-                      <div
+                      <Card
                         key={group.dateKey}
-                        className='rounded-xl bg-white/[0.03] p-2 backdrop-blur-sm sm:p-2.5'>
+                        className='p-2 sm:p-2.5'>
                         {/* Stacked below sm so the date keeps a full line to
                             itself instead of wrapping around the day totals. */}
                         <div className='flex flex-col gap-0.5 px-3 pb-1 pt-1.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3'>
@@ -251,7 +246,7 @@ export const PracticeLogView = () => {
                             />
                           ))}
                         </div>
-                      </div>
+                      </Card>
                     ))}
                   </div>
 

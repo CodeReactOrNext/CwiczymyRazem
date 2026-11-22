@@ -32,7 +32,7 @@ export const DesktopUpdateRequired = () => {
         </p>
         <Button asChild size="lg">
           <a href={DESKTOP_APP_RELEASES_URL} target="_blank" rel="noreferrer">
-            <Download className="mr-2 h-4 w-4" />
+            <Download />
             {t("update_required.download")}
           </a>
         </Button>

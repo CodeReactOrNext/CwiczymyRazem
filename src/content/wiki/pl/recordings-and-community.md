@@ -32,4 +32,4 @@ Jeśli chcesz stałego dochodu w Fame bez mielenia, dziel się tym, co już twor
 
 <FaqList items="Czy mogę opublikować coś prywatnego?::Nagrania są udostępniane społeczności. Jeśli wolisz zachować podejście dla siebie, po prostu go nie wgrywaj, a nawyk Nagrywanie nadal możesz zaznaczyć przy zapisie sesji|Czy mogę usunąć nagranie?::Tak, własne nagrania możesz usunąć w dowolnej chwili|Czy nagrania płacą punkty same z siebie?::Tylko przez wyzwania. Nagranie opublikowane poza wyzwaniem służy opinii, a nie wynikowi|Kto może komentować?::Każdy zalogowany gracz. Powiadomienia informują, kiedy ktoś to zrobi" />
 
-<ReadNext links="Skąd bierze się Fame::/wiki/fame|Miesięczne wyzwania::/wiki/monthly-challenges|Utwory i trudność::/wiki/songs-playlists-and-difficulty|Rutyny ćwiczeń i udostępnianie ćwiczeń::/wiki/exercise-plans-and-auto-plan" />
+<ReadNext links="Skąd bierze się Fame::/wiki/fame|Miesięczne wyzwania::/wiki/monthly-challenges|Utwory i trudność::/wiki/songs-playlists-and-difficulty|Plany ćwiczeń i udostępnianie ćwiczeń::/wiki/exercise-plans-and-auto-plan" />

@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import {
   Dialog,
   DialogContent,
@@ -116,12 +117,12 @@ const RoomHeader = ({ studio, bank, busy, onUpgrade }: RoomHeaderProps) => {
     <section className='flex flex-wrap items-center justify-between gap-x-6 gap-y-4'>
       <h2 className='flex flex-wrap items-center gap-2.5 text-lg font-bold text-white'>
         {text.roomName(studio.roomLevel)}
-        <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-semibold tabular-nums text-zinc-400'>
+        <Chip color='gray' size='sm' className='tabular-nums'>
           {t("studio.room_level", {
             level: studio.roomLevel,
             max: STUDIO_MAX_ROOM_LEVEL,
           })}
-        </span>
+        </Chip>
       </h2>
 
       <div className='flex flex-wrap items-center gap-x-5 gap-y-3'>

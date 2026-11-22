@@ -80,13 +80,37 @@ export const getGatedSkillPower = (learnedSongs: { avgDifficulty?: number }[]): 
   return calculateSkillPower(learnedSongs);
 };
 
-const TIER_THRESHOLDS: { tier: string; minDifficulty: number }[] = [
+export const TIER_THRESHOLDS: { tier: string; minDifficulty: number }[] = [
   { tier: "D", minDifficulty: 0 },
   { tier: "C", minDifficulty: 4 },
   { tier: "B", minDifficulty: 6 },
   { tier: "A", minDifficulty: 7.5 },
   { tier: "S", minDifficulty: 9 },
 ];
+
+const MAX_SKILL_POWER = 10;
+
+/**
+ * Where a power score sits on a tier scale drawn as equal-width segments
+ * (D, C, B, A, S), as 0–1. Inside a segment the position is linear, so the
+ * wide D range (0–4) doesn't squeeze the tiers players actually move between.
+ */
+export const getTierScalePosition = (power: number): number => {
+  const segmentWidth = 1 / TIER_THRESHOLDS.length;
+  const clamped = Math.min(Math.max(power, 0), MAX_SKILL_POWER);
+
+  let index = 0;
+  while (
+    index < TIER_THRESHOLDS.length - 1 &&
+    clamped >= TIER_THRESHOLDS[index + 1].minDifficulty
+  ) {
+    index++;
+  }
+
+  const min = TIER_THRESHOLDS[index].minDifficulty;
+  const max = TIER_THRESHOLDS[index + 1]?.minDifficulty ?? MAX_SKILL_POWER;
+  return (index + (clamped - min) / (max - min)) * segmentWidth;
+};
 
 const MAX_SIMULATED_SONGS = 20;
 

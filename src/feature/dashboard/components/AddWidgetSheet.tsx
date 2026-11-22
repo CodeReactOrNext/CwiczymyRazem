@@ -59,7 +59,7 @@ export const AddWidgetSheet = <Id extends string>({
               disabled={!!disabledReason}
               onClick={() => onAdd(definition.id)}
               className='flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 disabled:cursor-not-allowed disabled:opacity-40 hover:bg-zinc-800/60 disabled:hover:bg-transparent'>
-              <Icon size={18} className='mt-0.5 shrink-0 text-zinc-400' />
+              <Icon className='mt-0.5 h-4 w-4 shrink-0 text-zinc-400' />
               <span className='min-w-0 flex-1'>
                 <span className='block text-sm font-semibold text-zinc-100'>
                   {definition.title}

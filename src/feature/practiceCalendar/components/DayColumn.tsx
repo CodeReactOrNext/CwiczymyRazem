@@ -165,15 +165,10 @@ export const DayColumn = ({
         <div className='mt-4 flex items-center gap-2'>
           {left > 0 ? (
             <Button
+              variant={isToday ? "default" : "secondary"}
               onClick={onPlay}
-              className={cn(
-                // Button wraps its children in a span, so the gap goes there.
-                "h-11 flex-1 rounded-lg px-3 text-sm focus-visible:ring-1 focus-visible:ring-zinc-400 lg:h-9 lg:text-[13px] [&>span]:gap-2",
-                isToday
-                  ? "border-b-black/25 bg-white text-zinc-950 hover:bg-zinc-200"
-                  : "border-b-black/40 bg-zinc-800 text-zinc-100 hover:bg-zinc-700",
-              )}>
-              <Play className='h-3.5 w-3.5' aria-hidden />
+              className='flex-1'>
+              <Play aria-hidden />
               {formatMinutes(left)}
             </Button>
           ) : (
@@ -182,10 +177,12 @@ export const DayColumn = ({
             </span>
           )}
           <Button
+            variant='secondary'
+            size='icon'
             onClick={onAdd}
             aria-label={t("day.add")}
-            className='h-11 w-11 shrink-0 rounded-lg border-b-black/40 bg-zinc-800/80 p-0 text-zinc-300 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700 lg:h-9 lg:w-9'>
-            <Plus className='h-4 w-4' />
+            className='shrink-0 text-zinc-300'>
+            <Plus />
           </Button>
         </div>
       )}

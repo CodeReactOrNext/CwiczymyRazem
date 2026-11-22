@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
 import { useSong } from "feature/songs/hooks/useSong";
@@ -7,10 +6,9 @@ import {
   detachGpFileFromSong,
   getUserSongProgress,
 } from "feature/songs/services/userSongProgress.service";
-import { selectUserInfo } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { useAppSelector } from "store/hooks";
 
 interface SongPracticePickerLauncherProps {
   /** The song to practise; `null` keeps the picker closed. */
@@ -32,11 +30,6 @@ export const SongPracticePickerLauncher = ({
 }: SongPracticePickerLauncherProps) => {
   const { t } = useTranslation("songs");
   const queryClient = useQueryClient();
-  const userInfo = useAppSelector(selectUserInfo);
-  const isPremium =
-    userInfo?.role === "pro" ||
-    userInfo?.role === "master" ||
-    userInfo?.role === "admin";
 
   const { data: song, isFetched: isSongFetched } = useSong(songId);
   const progressKey = ["songProgress", userId, songId];
@@ -66,7 +59,6 @@ export const SongPracticePickerLauncher = ({
     <SongPracticePickerModal
       song={song}
       userId={userId}
-      isPremium={isPremium}
       progress={progress ?? null}
       onAttachGpFile={async (id, gpFileId, gpFileName, trackIndex) => {
         await attachGpFileToSong(userId, id, gpFileId, gpFileName, trackIndex);

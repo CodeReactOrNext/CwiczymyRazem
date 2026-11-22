@@ -29,7 +29,7 @@ export const ItemLengthDialog = ({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className='flex flex-col gap-6 border-0 bg-zinc-900 shadow-none sm:max-w-sm sm:p-8'>
+      <DialogContent className='flex flex-col gap-6 bg-zinc-900 sm:max-w-sm sm:p-8'>
         <div className='space-y-2 pr-10'>
           <DialogTitle className='text-xl font-bold text-zinc-100'>
             {t("length.title")}
@@ -58,7 +58,8 @@ export const ItemLengthDialog = ({
           </div>
           <Button
             type='submit'
-            className='h-11 w-full rounded-lg border-b-black/25 bg-white font-bold text-zinc-950 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
+            size='lg'
+            className='w-full'>
             {t("length.save")}
           </Button>
         </form>

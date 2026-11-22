@@ -76,7 +76,7 @@ export const AudioSelect = ({
         <SelectValue placeholder={placeholder ?? t("common.select")} />
       </SelectTrigger>
       {/* Above the in-session toolbar popover, which sits on a very high z-index. */}
-      <SelectContent className='z-[999999999] max-h-72 border-0 bg-zinc-900 text-zinc-200'>
+      <SelectContent className='z-[999999999] max-h-72'>
         {options.map((option) => (
           <SelectItem
             key={option.value}

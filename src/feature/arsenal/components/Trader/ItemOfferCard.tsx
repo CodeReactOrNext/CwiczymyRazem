@@ -100,9 +100,9 @@ export const ItemOfferCard = ({
               </TooltipTrigger>
               <TooltipContent
                 side='top'
-                className='max-w-[260px] border border-zinc-700 bg-zinc-950 text-white'>
+                className='tooltip-ink max-w-[260px]'>
                 <div className='flex flex-col gap-1.5'>
-                  <span className='text-xs text-zinc-400'>
+                  <span className='text-xs text-black/60'>
                     {t("card.scraps_into", { count: scrapTotal })}
                   </span>
                   <ScrapYieldList parts={scrapParts} compact />

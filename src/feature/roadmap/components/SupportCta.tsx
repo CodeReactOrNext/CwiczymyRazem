@@ -1,4 +1,4 @@
-import { PRESSABLE } from "assets/components/ui/button";
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Coffee } from "lucide-react";
@@ -9,6 +9,8 @@ import { BMC_URL } from "../data/roadmap.data";
 interface SupportCtaProps {
   className?: string;
   children?: ReactNode;
+  /** `xl` in the hero, where it is the page's one main action. */
+  size?: "lg" | "xl";
 }
 
 /**
@@ -20,6 +22,7 @@ interface SupportCtaProps {
 export const SupportCta = ({
   className,
   children,
+  size = "lg",
 }: SupportCtaProps) => {
   const { t } = useTranslation("supporter");
   return (
@@ -27,11 +30,7 @@ export const SupportCta = ({
     href={BMC_URL}
     target='_blank'
     rel='noopener noreferrer'
-    className={cn(
-      PRESSABLE,
-      "border-b-black/25 flex items-center justify-center gap-2 rounded-lg bg-zinc-100 px-5 py-3 text-sm font-semibold text-zinc-950 transition-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300/60 hover:bg-white",
-      className,
-    )}>
+    className={cn(buttonVariants({ size }), className)}>
     <Coffee size={16} />
     {children ?? t("cta.support")}
   </a>

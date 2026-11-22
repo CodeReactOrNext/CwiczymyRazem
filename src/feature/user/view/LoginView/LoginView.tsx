@@ -102,7 +102,7 @@ const LoginView = () => {
                           {t("login:email_label")}
                         </Label>
                         <div className='group relative'>
-                          <Mail className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
+                          <Mail className='pointer-events-none absolute left-3 top-2.5 z-10 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
                           <Input
                             id='email'
                             name='email'
@@ -111,7 +111,7 @@ const LoginView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder='name@example.com'
-                            className='h-11 rounded-lg border-white/10 bg-black/40 pl-10 text-white transition-all duration-base placeholder:text-zinc-500 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10'
+                            className='h-11 pl-10'
                           />
                         </div>
                         {errors.email && touched.email && (
@@ -131,13 +131,13 @@ const LoginView = () => {
                           </Label>
                           <Link
                             href='/forgot-password'
-                            className='text-[10px] font-bold text-cyan-500 transition-colors hover:text-cyan-400'>
+                            className='text-xs font-bold text-cyan-500 transition-colors hover:text-cyan-400'>
                             {t("login:forgot_password")}
                           </Link>
                         </div>
 
                         <div className='group relative'>
-                          <Lock className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
+                          <Lock className='pointer-events-none absolute left-3 top-2.5 z-10 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
                           <Input
                             id='password'
                             name='password'
@@ -150,7 +150,7 @@ const LoginView = () => {
                               setTypingPassword(false);
                             }}
                             placeholder='••••••••'
-                            className='h-11 rounded-lg border-white/10 bg-black/40 pl-10 pr-10 text-white transition-all duration-base placeholder:text-zinc-500 focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10'
+                            className='h-11 pl-10 pr-10'
                           />
                           <button
                             type='button'
@@ -181,11 +181,11 @@ const LoginView = () => {
                           disabled={isFetching}
                           className='w-full'>
                           {isFetching ? (
-                            <Loader2 className='h-5 w-5 animate-spin' />
+                            <Loader2 className='animate-spin' />
                           ) : (
                             <span className='flex items-center gap-2'>
                               {t("login:submit_button")}{" "}
-                              <ChevronRight className='h-4 w-4' />
+                              <ChevronRight />
                             </span>
                           )}
                         </Button>
@@ -210,12 +210,13 @@ const LoginView = () => {
                   onClick={googleLogInHandler}
                   disabled={isGoogleFetching}
                   variant='outline'
-                  className='h-11 w-full rounded-lg border-white/5 bg-zinc-900/50 text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white'>
+                  size='lg'
+                  className='w-full border-white/5 bg-zinc-900/50 text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white'>
                   <span className='flex items-center justify-center gap-2'>
                     {isGoogleFetching ? (
-                      <Loader2 className='h-5 w-5 animate-spin' />
+                      <Loader2 className='animate-spin' />
                     ) : (
-                      <FcGoogle className='h-5 w-5' />
+                      <FcGoogle />
                     )}
                     {t("login:google_button")}
                   </span>

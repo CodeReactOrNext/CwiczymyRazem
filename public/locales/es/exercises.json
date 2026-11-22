@@ -90,7 +90,9 @@
     "predefined_plans_description": "Planes de práctica preparados por nosotros",
     "create_plan": "Crear plan",
     "create_first": "Crear el primer plan",
-    "no_custom_plans": "Aún no tienes planes de práctica personalizados"
+    "no_custom_plans": "Aún no tienes planes de práctica personalizados",
+    "update_success": "Plan guardado",
+    "update_error": "No se pudo guardar el plan"
   },
   "categories": {
     "technique": "Técnica",

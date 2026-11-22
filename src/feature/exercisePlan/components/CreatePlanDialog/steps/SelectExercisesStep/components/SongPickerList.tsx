@@ -1,13 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
+import { Chip } from "assets/components/ui/chip";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { songExerciseId } from "feature/exercisePlan/utils/songToExercise";
+import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
-import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
-import { Check, FileMusic, Library, ListVideo, Loader2, Music, Plus } from "lucide-react";
+import { Check, FileMusic, Library, ListVideo, Music, Plus } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -39,13 +42,7 @@ const TierChip = ({ song }: { song: Song }) => {
   const tier = getSongTier(
     (song.avgDifficulty ?? 0) === 0 ? "?" : song.tier || song.avgDifficulty || "?"
   );
-  return (
-    <span
-      className='shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold'
-      style={{ backgroundColor: inkWash(tier.color, 12), color: inkAccent(tier.color) }}>
-      {tier.tier}
-    </span>
-  );
+  return <TierPick tier={tier} className='h-5 w-5' />;
 };
 
 const SongRow = ({
@@ -80,20 +77,24 @@ const SongRow = ({
     </div>
     {/* What the song can be practised with — the same choice the dialog offers. */}
     {hasGpFile && (
-      <span
-        className='hidden shrink-0 items-center gap-1 rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300 sm:inline-flex'
+      <Chip
+        color='gray'
+        size='sm'
+        className='hidden shrink-0 sm:inline-flex'
         title={t("song_picker.gp_attached")}>
         <FileMusic className='h-3 w-3 text-zinc-400' />
         {t("song_modes.gp")}
-      </span>
+      </Chip>
     )}
     {(song.totalSections ?? 0) > 0 && (
-      <span
-        className='hidden shrink-0 items-center gap-1 rounded bg-zinc-800/60 px-1.5 py-0.5 text-[10px] font-bold text-zinc-300 sm:inline-flex'
+      <Chip
+        color='gray'
+        size='sm'
+        className='hidden shrink-0 sm:inline-flex'
         title={t("song_picker.sections_marked")}>
         <ListVideo className='h-3 w-3 text-zinc-400' />
         {song.totalSections}
-      </span>
+      </Chip>
     )}
     <TierChip song={song} />
     <span
@@ -165,8 +166,14 @@ export const SongPickerList = ({
 
   if (!userId || isLoading) {
     return (
-      <div className='flex h-40 items-center justify-center text-zinc-500'>
-        <Loader2 className='h-5 w-5 animate-spin' />
+      <div className='space-y-6' aria-busy='true'>
+        <Skeleton className='h-10 w-full rounded-lg' />
+        <div className='space-y-2'>
+          <Skeleton className='h-3 w-24' />
+          {Array.from({ length: 4 }, (_, i) => (
+            <Skeleton key={i} variant='block' className='h-16' />
+          ))}
+        </div>
       </div>
     );
   }
@@ -190,12 +197,11 @@ export const SongPickerList = ({
 
   return (
     <div className='space-y-6'>
-      <input
-        type='text'
+      <SearchInput
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder={t("song_picker.search")}
-        className='h-10 w-full rounded-lg bg-zinc-900 px-4 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/40'
+        aria-label={t("song_picker.search")}
       />
 
       {groups.length === 0 ? (
@@ -205,7 +211,7 @@ export const SongPickerList = ({
       ) : (
         groups.map((group) => (
           <div key={group.label} className='space-y-2'>
-            <p className='px-1 text-[11px] font-bold tracking-wide text-zinc-500'>
+            <p className='px-1 text-xs font-medium text-zinc-400'>
               {group.label}
             </p>
             {group.songs.map((song) => {

@@ -3,6 +3,7 @@ import {
   Sheet,
   SheetContent,
 } from "assets/components/ui/sheet";
+import { Skeleton } from "assets/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
@@ -10,6 +11,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import Avatar from "components/UI/Avatar";
 import { SongRating } from "feature/songs/components/SongsTable/components/SongRating";
 import { RATE_SONG_FAME_REWARD } from "feature/songs/constants/rating.constants";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
@@ -190,7 +192,7 @@ const SongSheet = ({
                 {song.genres && song.genres.length > 0 && (
                    <div className="mt-3 flex flex-wrap gap-2">
                      {song.genres.map(g => (
-                       <span key={g} className="px-2 py-1 rounded-[4px] bg-zinc-800 text-[10px] font-bold text-zinc-400">
+                       <span key={g} className="px-2 py-1 rounded-[4px] bg-zinc-800 text-[11px] font-bold text-zinc-400">
                          {g}
                        </span>
                      ))}
@@ -267,7 +269,7 @@ const SongSheet = ({
                           )}>
                             {t(`status_labels.${opt.id}`, opt.label)}
                           </p>
-                          <p className="text-[10px] font-medium text-zinc-600">{t(`sheet.status_desc.${opt.id}`, opt.desc)}</p>
+                          <p className="text-xs font-medium text-zinc-500">{t(`sheet.status_desc.${opt.id}`, opt.desc)}</p>
                         </div>
                       </div>
                       {isActive && !isPending && <CheckCircle className="h-4 w-4 text-cyan-500" />}
@@ -283,25 +285,18 @@ const SongSheet = ({
                {isLoadingUsers ? (
                  <div className="flex gap-2">
                     {[...Array(3)].map((_, i) => (
-                        <div key={i} className="h-10 w-10 rounded-full bg-white/5 animate-pulse" />
+                        <Skeleton key={i} className="h-10 w-10 rounded-full" />
                     ))}
                  </div>
                ) : practitioners.length > 0 ? (
                  <div className="flex flex-wrap gap-3">
                    {practitioners.map(user => (
-                     <div key={user.id} className="group/user relative">
-                        {user.avatar ? (
-                          <img 
-                            src={user.avatar} 
-                            alt={user.displayName}
-                            className="h-10 w-10 rounded-full object-cover transition-transform group-hover/user:scale-110"
-                            title={user.displayName}
-                          />
-                        ) : (
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-xs font-bold text-zinc-500 transition-transform group-hover/user:scale-110">
-                            {user.displayName.charAt(0)}
-                          </div>
-                        )}
+                     <div key={user.id} title={user.displayName}>
+                        <Avatar
+                          size="sm"
+                          name={user.displayName}
+                          avatarURL={user.avatar || undefined}
+                        />
                      </div>
                    ))}
                    {song.practicingUsers && song.practicingUsers.length > 10 && (
@@ -311,7 +306,7 @@ const SongSheet = ({
                    )}
                  </div>
                ) : (
-                 <p className="text-[11px] font-medium text-zinc-600 italic">{t("sheet.nobody_practicing")}</p>
+                 <p className="text-[11px] font-medium text-zinc-500 italic">{t("sheet.nobody_practicing")}</p>
                )}
             </div>
 
@@ -323,7 +318,7 @@ const SongSheet = ({
                     <TooltipTrigger asChild>
                       <HelpCircle className="h-3 w-3 cursor-help text-cyan-500" />
                     </TooltipTrigger>
-                    <TooltipContent className="bg-zinc-900 text-zinc-300">
+                    <TooltipContent>
                       <p>{t("sheet.rate_tooltip")}</p>
                       <p className="mt-1 flex items-center gap-1">
                         {t("sheet.you_receive", { amount: RATE_SONG_FAME_REWARD })}
@@ -350,18 +345,16 @@ const SongSheet = ({
         </div>
 
         <div className="px-6 pt-6 pb-[calc(1.5rem_+_env(safe-area-inset-bottom))] bg-zinc-950/80 backdrop-blur-xl flex gap-3">
-          <Link href={`/timer/song/${song.id}`} onClick={onClose} className="flex-1">
-            <Button
-                className="relative h-14 w-full overflow-hidden rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold flex items-center justify-center transition-all active:scale-95 shadow-2xl border-none"
-            >
-              <span className="pointer-events-none absolute inset-y-0 -left-1/4 w-1/3 animate-shine bg-gradient-to-r from-transparent via-black/[0.07] to-transparent" />
-              <Play className="h-5 w-5 fill-current" />
-              <span className="text-sm">{t("card.practice")}</span>
-            </Button>
-          </Link>
+          <Button asChild size="lg" className="flex-1">
+            <Link href={`/timer/song/${song.id}`} onClick={onClose}>
+              <Play className="fill-current" />
+              {t("card.practice")}
+            </Link>
+          </Button>
           <Button
               onClick={onClose}
-              className="h-14 px-6 rounded-lg bg-zinc-900 font-bold text-zinc-500 hover:text-cyan-400 hover:bg-zinc-800 transition-all shadow-2xl"
+              variant="ghost"
+              size="lg"
           >
             Close
           </Button>

@@ -14,6 +14,7 @@ import {
 } from "@dnd-kit/sortable";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import type { AchievementList } from "feature/achievements/types";
 import { AddWidgetSheet } from "feature/dashboard/components/AddWidgetSheet";
 import {
@@ -127,7 +128,7 @@ export const ProfileSections = ({
                   size='sm'
                   className='gap-1.5'
                   onClick={() => setIsCardOpen(true)}>
-                  <IdCard size={14} />
+                  <IdCard />
                   {t("card_sheet.title")}
                 </Button>
                 <Button
@@ -136,7 +137,7 @@ export const ProfileSections = ({
                   size='sm'
                   className='gap-1.5'
                   onClick={() => setIsAddOpen(true)}>
-                  <Plus size={14} />
+                  <Plus />
                   {t("sections.add")}
                 </Button>
                 <Button
@@ -158,7 +159,7 @@ export const ProfileSections = ({
                       emblem: layout.emblem,
                     })
                   }>
-                  <RotateCcw size={14} />
+                  <RotateCcw />
                   {t("sections.reset")}
                 </Button>
                 <Button
@@ -166,7 +167,7 @@ export const ProfileSections = ({
                   size='sm'
                   className='gap-1.5'
                   onClick={() => setIsEditing(false)}>
-                  <Check size={14} />
+                  <Check />
                   {t("sections.done")}
                 </Button>
               </>
@@ -177,7 +178,7 @@ export const ProfileSections = ({
                 size='sm'
                 className='gap-1.5 text-zinc-400 hover:text-zinc-100'
                 onClick={() => setIsEditing(true)}>
-                <Settings2 size={14} />
+                <Settings2 />
                 {t("sections.customize")}
               </Button>
             )}
@@ -186,27 +187,25 @@ export const ProfileSections = ({
       )}
 
       {layout.sections.length === 0 ? (
-        <div className='rounded-2xl bg-zinc-900/30 px-6 py-12 text-center'>
-          <p className='text-sm font-semibold text-zinc-200'>
-            {isOwner
-              ? t("sections.empty_owner")
-              : t("sections.empty_visitor")}
-          </p>
-          {isOwner && (
-            <Button
-              type='button'
-              variant='outline'
-              size='sm'
-              className='mt-5 gap-1.5'
-              onClick={() => {
-                setIsEditing(true);
-                setIsAddOpen(true);
-              }}>
-              <Plus size={14} />
-              {t("sections.add")}
-            </Button>
-          )}
-        </div>
+        <EmptyState
+          icon={<Settings2 />}
+          title={
+            isOwner ? t("sections.empty_owner") : t("sections.empty_visitor")
+          }
+          action={
+            isOwner && (
+              <Button
+                type='button'
+                onClick={() => {
+                  setIsEditing(true);
+                  setIsAddOpen(true);
+                }}>
+                <Plus />
+                {t("sections.add")}
+              </Button>
+            )
+          }
+        />
       ) : (
         <DndContext
           id='profile-sections'

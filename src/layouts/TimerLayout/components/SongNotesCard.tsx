@@ -21,7 +21,7 @@ export const SongNotesCard = ({
   const { t } = useTranslation("timer");
 
   return (
-    <div className={cn("rounded-lg bg-zinc-900/40", className)}>
+    <div className={cn("rounded-lg bg-zinc-800/40", className)}>
       <div className='flex items-center justify-between px-5 pt-4'>
         <div className='flex items-center gap-2 text-zinc-400'>
           <FileText className='h-4 w-4' />
@@ -31,13 +31,13 @@ export const SongNotesCard = ({
         </div>
         <div className='flex items-center gap-2'>
           {isSaving && (
-            <span className='animate-pulse text-[10px] text-zinc-500'>
+            <span className='animate-pulse text-xs text-zinc-500'>
               {t("saving")}
             </span>
           )}
           <span
             className={cn(
-              "text-[10px] font-medium",
+              "text-xs font-medium",
               notes.split(" ").length > 250
                 ? "text-amber-400"
                 : "text-zinc-500",

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "assets/lib/utils";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { GoalRunsChart } from "feature/exerciseGoals/components/GoalRunsChart";
 import { exerciseRunsKey } from "feature/exerciseGoals/hooks/useExerciseGoals";
 import { getExerciseRuns } from "feature/exerciseGoals/services/exerciseGoals.service";
@@ -47,22 +48,26 @@ export const RecentRunsCard = ({ runs, className }: { runs: ScoredRun[]; classNa
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("rounded-lg bg-zinc-900/40 p-7 md:p-8", className)}>
-      <div className='mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1'>
-        <div className='flex items-center gap-2'>
-          <TrendingUp className='h-4 w-4 text-zinc-400' aria-hidden />
-          <h3 className='text-sm font-semibold text-zinc-300'>
+      className={cn("rounded-lg bg-zinc-800/40 p-7 md:p-8", className)}>
+      <SectionHeader
+        as='h3'
+        title={
+          <span className='flex items-center gap-2'>
+            <TrendingUp className='h-4 w-4 text-zinc-400' aria-hidden />
             {t("recent_runs.title")}
-          </h3>
-        </div>
-        <span className='text-xs tabular-nums text-zinc-500'>
-          {t("recent_runs.runs", {
-            count: history.length,
-            from: history[0].bpm,
-            to: history[history.length - 1].bpm,
-          })}
-        </span>
-      </div>
+          </span>
+        }
+        action={
+          <span className='text-xs tabular-nums text-zinc-500'>
+            {t("recent_runs.runs", {
+              count: history.length,
+              from: history[0].bpm,
+              to: history[history.length - 1].bpm,
+            })}
+          </span>
+        }
+        className='mb-6 flex-wrap items-baseline gap-x-4 gap-y-1'
+      />
       {/* Beside the standings on a wide screen, where the card is as tall as
           they are: the plot grows into it rather than leaving the room empty. */}
       <GoalRunsChart runs={history} showTempo showAccuracy chartClassName='lg:h-[22rem]' />

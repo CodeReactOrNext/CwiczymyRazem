@@ -247,5 +247,21 @@
     "remove_step": "Usuń ten krok",
     "phase_min": "Faza musi mieć co najmniej jeden krok",
     "broke": "Za mało tokenów na płatną zmianę."
+  },
+  "road": {
+    "open_lesson": "Otwórz lekcję",
+    "read_again": "Przeczytaj ponownie",
+    "materials": "Materiały",
+    "practice": "Ćwicz",
+    "play_song": "Zagraj utwór",
+    "next": "Dalej",
+    "back": "Wstecz",
+    "back_to_map": "Wróć do mapy",
+    "next_step": "Następny krok",
+    "materials_hint": "Odhacz, co obejrzałeś i przećwiczyłeś. Wszystko odhaczone to krok zrobiony.",
+    "checkpoint_body": "{{count}} pytań o tym, czego uczyła ta faza. Zdajesz przy {{pass}} dobrych.",
+    "checkpoint_locked": "Najpierw skończ wszystkie kroki tej fazy ({{done}}/{{total}}).",
+    "take_check": "Rozwiąż test",
+    "passed_score": "Zdany {{score}}/{{total}}"
   }
 }

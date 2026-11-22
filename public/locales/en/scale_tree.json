@@ -97,5 +97,11 @@
   "sidebar": {
     "title": "Scale selector",
     "body": "Pick a scale to see its tree and shapes."
+  },
+  "toast": {
+    "new_record": "New record: {{bpm}} BPM",
+    "new_record_was": "New record: {{bpm}} BPM (was {{previous}})",
+    "record_stands": "Clean run, but your record still stands at {{bpm}} BPM",
+    "no_record": "No record — a run needs {{accuracy}}% accuracy to count"
   }
 }

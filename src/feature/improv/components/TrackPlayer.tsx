@@ -62,7 +62,7 @@ export const TrackPlayer = ({
           className='h-full w-full object-cover'
         />
         <div className='absolute inset-0 flex items-center justify-center bg-black/30'>
-          <Button asChild size='icon' className='h-9 w-9'>
+          <Button asChild size='icon'>
             <a
               href={improvTrackUrl(youtubeId)}
               target='_blank'
@@ -97,7 +97,7 @@ export const TrackPlayer = ({
             />
             <div className='absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/60' />
             {label && (
-              <p className='absolute left-5 top-4 text-xs font-bold tracking-wide text-amber-300'>
+              <p className='absolute left-5 top-4 text-xs font-semibold text-amber-300'>
                 {label}
               </p>
             )}

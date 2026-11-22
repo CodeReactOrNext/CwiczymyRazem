@@ -28,7 +28,7 @@ export const PlanAppearancePicker = ({
       {/* Icon */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold tracking-wider text-zinc-500">{t("appearance.icon")}</p>
+          <p className="text-xs font-medium text-zinc-400">{t("appearance.icon")}</p>
           {icon && (
             <button
               type="button"
@@ -69,7 +69,7 @@ export const PlanAppearancePicker = ({
       {/* Color */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold tracking-wider text-zinc-500">{t("appearance.color")}</p>
+          <p className="text-xs font-medium text-zinc-400">{t("appearance.color")}</p>
           {color && (
             <button
               type="button"
@@ -104,7 +104,7 @@ export const PlanAppearancePicker = ({
         </div>
       </div>
 
-      <p className="text-[11px] leading-relaxed text-zinc-600">
+      <p className="text-[11px] leading-relaxed text-zinc-500">
         {t("appearance.hint")}
       </p>
     </div>

@@ -17,7 +17,7 @@ const NotFoundLayout = () => {
       <div className='relative z-40 flex min-h-[70vh] w-full flex-col items-center justify-center gap-8 px-4 py-12 text-center'>
         <div className='flex flex-col items-center gap-1'>
           <p className='font-teko text-7xl font-bold leading-none text-zinc-100 md:text-8xl'>404</p>
-          <p className='text-xs font-semibold tracking-wide text-zinc-400'>{t("page_not_found")}</p>
+          <p className='text-xs font-semibold text-zinc-400'>{t("page_not_found")}</p>
         </div>
         <KostekSays
           mood='unplugged'
@@ -27,7 +27,7 @@ const NotFoundLayout = () => {
           kostekClassName='h-48 md:h-60'
           bubbleClassName='text-base'
         />
-        <Button asChild className='h-11 rounded-lg bg-white px-6 font-semibold text-zinc-950 hover:bg-zinc-200'>
+        <Button asChild size='lg'>
           <Link href='/'>{t("back")}</Link>
         </Button>
       </div>

@@ -1,4 +1,6 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { AudioSettingsPanel } from "feature/toneStudio/components/AudioSettingsPanel";
 import type { ChainKey } from "feature/toneStudio/components/ChainRack";
 import { ChainRack } from "feature/toneStudio/components/ChainRack";
@@ -162,7 +164,7 @@ export const ToneStudioView = () => {
     // as much of it as it can get. A plugin window is wide — the rack wants to
     // show five units side by side without crowding, and the amp's faceplate is
     // a landscape panel that only gets better with room.
-    <div className='mx-auto w-full max-w-[1400px] p-3 sm:p-6'>
+    <div className={cn("mx-auto w-full max-w-[1400px]", PAGE_CONTENT)}>
       {/* force-dark: the chassis is hardware — it stays dark in the light theme. */}
       <div
         className='force-dark relative overflow-hidden rounded-xl'
@@ -214,24 +216,24 @@ export const ToneStudioView = () => {
               the ASIO buffer live, and "where do I pick my interface" is the
               first question anyone has. The driver API doubles as the label
               once it is known, so the word ASIO is visible on the rail. */}
-          <button
+          <Button
             type='button'
+            variant='subtle'
             onClick={() => setShowSettings((open) => !open)}
             title={t("view.audio_hint")}
+            aria-pressed={showSettings}
             className={cn(
-              "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
-              showSettings
-                ? "bg-zinc-700/70 text-zinc-100"
-                : "bg-zinc-800/60 text-zinc-300 hover:bg-zinc-700/60 hover:text-white",
+              "shrink-0 px-3",
+              showSettings && "bg-white/20 text-white hover:bg-white/20",
             )}>
             <Settings2 size={16} />
             <span className='hidden sm:inline'>{t("view.audio")}</span>
             {api && (
-              <span className='font-mono hidden rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] text-zinc-400 md:inline'>
+              <span className='font-mono hidden rounded bg-zinc-900/70 px-1.5 py-0.5 text-[11px] text-zinc-400 md:inline'>
                 {api}
               </span>
             )}
-          </button>
+          </Button>
 
           <PowerRocker
             on={amp.isOn}
@@ -251,17 +253,17 @@ export const ToneStudioView = () => {
         {(!amp.available || amp.error || amp.overload) && (
           <div className='relative flex flex-col gap-2 px-4 pt-3'>
             {!amp.available && (
-              <p className='rounded-md bg-amber-500/10 px-3 py-2 text-xs text-amber-400'>
+              <p className='rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-400'>
                 {t("view.no_connection")}
               </p>
             )}
             {amp.error && (
-              <p className='rounded-md bg-red-500/10 px-3 py-2 text-xs text-red-400'>
+              <p className='rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400'>
                 {amp.error}
               </p>
             )}
             {amp.overload && (
-              <p className='rounded-md bg-amber-500/10 px-3 py-2 text-xs text-amber-400'>
+              <p className='rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-400'>
                 {t("view.overload", {
                   drift: Math.round(amp.overload.driftMs),
                 })}

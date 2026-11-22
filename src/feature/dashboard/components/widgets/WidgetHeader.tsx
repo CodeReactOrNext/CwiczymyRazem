@@ -1,44 +1,29 @@
-import { cn } from "assets/lib/utils";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { SectionHeader, SectionLink } from "components/SectionHeader/SectionHeader";
 import type { ReactNode } from "react";
 
 interface WidgetHeaderProps {
   title: string;
   action?: ReactNode;
+  /** A number after the title, e.g. progress towards a goal. */
+  count?: ReactNode;
   className?: string;
 }
 
-/** The title every dashboard card opens with. */
+/** The title every dashboard card opens with — the shared section header at card level. */
 export const WidgetHeader = ({
   title,
   action,
+  count,
   className,
 }: WidgetHeaderProps) => (
-  <div
-    className={cn("mb-4 flex items-center justify-between gap-3", className)}>
-    <h3 className='text-base font-semibold text-zinc-100'>
-      {title}
-    </h3>
-    {action}
-  </div>
+  <SectionHeader
+    title={title}
+    action={action}
+    count={count}
+    as='h3'
+    className={className}
+  />
 );
-
-interface WidgetLinkProps {
-  href: string;
-  children: ReactNode;
-  className?: string;
-}
 
 /** "See all" in the corner of a card — text only, so it never competes with the numbers. */
-export const WidgetLink = ({ href, children, className }: WidgetLinkProps) => (
-  <Link
-    href={href}
-    className={cn(
-      "flex shrink-0 items-center gap-1 rounded text-xs font-semibold text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:text-zinc-100",
-      className,
-    )}>
-    {children}
-    <ArrowRight size={12} />
-  </Link>
-);
+export const WidgetLink = SectionLink;

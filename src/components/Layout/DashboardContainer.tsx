@@ -1,3 +1,4 @@
+import { PageShell } from "components/PageShell/PageShell";
 import type { ReactNode } from "react";
 
 interface DashboardContainerProps {
@@ -7,16 +8,16 @@ interface DashboardContainerProps {
 
 export const DashboardContainer = ({
   children,
-  className = "",
+  className,
 }: DashboardContainerProps) => {
   return (
-    <div className={`bg-second-600 rounded-xl ${className}`}>
+    <PageShell className={className}>
       <div className='md:mt-6 space-y-6 p-4 md:p-6'>
           <div
             className='relative z-10'>
             <div className='space-y-6'>{children}</div>
           </div>
       </div>
-    </div>
+    </PageShell>
   );
 };

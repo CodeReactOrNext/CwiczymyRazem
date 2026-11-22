@@ -1,8 +1,10 @@
-import { PRESSABLE } from "assets/components/ui/button";
+import { Button, PRESSABLE } from "assets/components/ui/button";
 import { Chip, chipVariants } from "assets/components/ui/chip";
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { MAX_CUSTOM_SHORTCUT_LABEL } from "feature/dashboard/utils/dashboardLayout";
 import { ExercisePreviewDialog } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/ExercisePreviewDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
@@ -29,7 +31,7 @@ import {
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { toggleFavoriteExercise } from "feature/user/store/userSlice.favoriteActions";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowUpDown, Check, ChevronRight, Ear, Hand, Heart, Info, LayoutGrid, Lightbulb, Lock, Music, Pin, Search, SlidersHorizontal, Timer, Trophy, X } from "lucide-react";
+import { ArrowUpDown, Check, ChevronRight, Ear, Hand, Heart, Info, LayoutGrid, Lightbulb, Lock, Music, Pin, SlidersHorizontal, Timer, Trophy, X } from "lucide-react";
 import { useRouter } from "next/router";
 import { type SetStateAction, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -165,12 +167,11 @@ const SEARCH_ALIASES: Record<string, string> = {
   noGuitar: "no guitar without guitar bus couch silent phone unplugged",
 };
 
-const filterPill = (active: boolean, big = false) =>
+/** An applied filter, shown as a chip that clears itself on click. */
+const filterPill = (active: boolean) =>
   cn(PRESSABLE, "border-b-black/30", 
     chipVariants({ color: active ? "cyan" : "gray" }),
-    "cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-    // The sheet's pills are finger-sized; the desktop bar keeps its compact look.
-    big ? "px-3.5 py-2 text-[13px]" : "px-3 py-1.5 text-[12px]"
+    "cursor-pointer whitespace-nowrap px-3 py-1.5 text-[12px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
   );
 
 export const ExerciseBrowseTab = ({
@@ -634,88 +635,83 @@ export const ExerciseBrowseTab = ({
           : "bg-zinc-800/60 text-zinc-400";
 
   // ── Filter controls, shared by the desktop bar and the mobile sheet ──────
-  const groupLabel = "text-[11px] font-bold tracking-wider text-zinc-500";
+  const groupLabel = "text-xs font-medium text-zinc-400";
 
-  const skillPills = (big = false) =>
+  // Every group is the app's one filter switch: a tray, picked choices raised
+  // as keys. Skills, modes and statuses take any number; length takes one.
+  const skillPills = () =>
     skillGroups.map(group => (
       <div key={group.label} className="flex flex-wrap items-center gap-2">
-        <span className="text-[11px] font-semibold text-zinc-600">{group.label}</span>
-        {group.skills.map(skill => {
-          const Icon = skill.icon;
-          const active = selectedSkills.includes(skill.id);
-          return (
-            <button
-              key={skill.id}
-              onClick={() => setSelectedSkills(prev => toggle(prev, skill.id))}
-              aria-pressed={active}
-              className={cn(filterPill(active, big), "flex items-center gap-1.5")}
-            >
-              {Icon && <Icon className="h-3.5 w-3.5 shrink-0" />}
-              {String(t(`skills:skills.${skill.id}.name` as never))}
-              <span className="tabular-nums opacity-50">{skillCounts.get(skill.id) ?? 0}</span>
-            </button>
-          );
-        })}
+        <span className="text-xs font-medium text-zinc-400">{group.label}</span>
+        <SegmentedControl
+          label={group.label}
+          multiple
+          options={group.skills.map(skill => {
+            const Icon = skill.icon;
+            return {
+              value: skill.id,
+              label: String(t(`skills:skills.${skill.id}.name` as never)),
+              icon: Icon ? <Icon className="h-3.5 w-3.5 shrink-0" /> : undefined,
+              count: skillCounts.get(skill.id) ?? 0,
+            };
+          })}
+          selected={selectedSkills}
+          onSelect={skillId => setSelectedSkills(prev => toggle(prev, skillId))}
+        />
       </div>
     ));
 
-  const modePills = (big = false) =>
-    PRACTICE_MODES.filter(
-      mode => (modeCounts.get(mode) ?? 0) > 0 || selectedModes.includes(mode)
-    ).map(mode => {
-      const Icon = MODE_ICONS[mode];
-      const active = selectedModes.includes(mode);
-      return (
-        <button
-          key={mode}
-          onClick={() => setSelectedModes(prev => toggle(prev, mode))}
-          aria-pressed={active}
-          className={cn(filterPill(active, big), "flex items-center gap-1.5")}
-        >
-          <Icon className="h-3.5 w-3.5 shrink-0" />
-          {PRACTICE_MODE_LABELS[mode]}
-          <span className="tabular-nums opacity-50">{modeCounts.get(mode) ?? 0}</span>
-        </button>
-      );
-    });
+  const modePills = () => (
+    <SegmentedControl
+      label="How you practice"
+      multiple
+      options={PRACTICE_MODES.filter(
+        mode => (modeCounts.get(mode) ?? 0) > 0 || selectedModes.includes(mode)
+      ).map(mode => {
+        const Icon = MODE_ICONS[mode];
+        return {
+          value: mode,
+          label: PRACTICE_MODE_LABELS[mode],
+          icon: <Icon className="h-3.5 w-3.5 shrink-0" />,
+          count: modeCounts.get(mode) ?? 0,
+        };
+      })}
+      selected={selectedModes}
+      onSelect={mode => setSelectedModes(prev => toggle(prev, mode))}
+    />
+  );
 
-  const statusPills = (big = false) =>
-    STATUSES.map(status => (
-      <button
-        key={status.id}
-        onClick={() => setSelectedStatuses(prev => toggle(prev, status.id))}
-        aria-pressed={selectedStatuses.includes(status.id)}
-        className={cn(filterPill(selectedStatuses.includes(status.id), big), "flex items-center gap-1.5")}
-      >
-        {status.label}
-        <span className="tabular-nums opacity-50">{statusCounts.get(status.id) ?? 0}</span>
-      </button>
-    ));
+  const statusPills = () => (
+    <SegmentedControl
+      label="Status"
+      multiple
+      options={STATUSES.map(status => ({
+        value: status.id,
+        label: status.label,
+        count: statusCounts.get(status.id) ?? 0,
+      }))}
+      selected={selectedStatuses}
+      onSelect={status => setSelectedStatuses(prev => toggle(prev, status))}
+    />
+  );
 
-  const lengthPills = (big = false) => [
-    <button
-      key="any"
-      onClick={() => setSelectedLength(null)}
-      aria-pressed={selectedLength === null}
-      className={filterPill(selectedLength === null, big)}
-    >
-      Any length
-    </button>,
-    ...LENGTHS.map(length => {
-      const active = selectedLength === length.id;
-      return (
-        <button
-          key={length.id}
-          onClick={() => setSelectedLength(active ? null : length.id)}
-          aria-pressed={active}
-          className={cn(filterPill(active, big), "flex items-center gap-1.5")}
-        >
-          {length.label}
-          <span className="tabular-nums opacity-50">{lengthCounts.get(length.id) ?? 0}</span>
-        </button>
-      );
-    }),
-  ];
+  const lengthPills = () => (
+    <SegmentedControl<LengthId | "any">
+      label="Length"
+      options={[
+        { value: "any", label: "Any length" },
+        ...LENGTHS.map(length => ({
+          value: length.id,
+          label: length.label,
+          count: lengthCounts.get(length.id) ?? 0,
+        })),
+      ]}
+      selected={[selectedLength ?? "any"]}
+      onSelect={length =>
+        setSelectedLength(length === "any" || length === selectedLength ? null : length)
+      }
+    />
+  );
 
   const activeFilterChips = [
     ...selectedSkills.map(skill => ({
@@ -869,12 +865,12 @@ export const ExerciseBrowseTab = ({
                 </TooltipTrigger>
                 <TooltipContent>
                   <div className="flex flex-col gap-1.5">
-                    <span className="text-zinc-200">
+                    <span>
                       {completedBpms.length} / {stages.length} tempos · {bpmPct}%
                     </span>
-                    <div className="h-1 w-32 overflow-hidden rounded-full bg-zinc-700">
+                    <div className="h-1 w-32 overflow-hidden rounded-full bg-black/10">
                       <div
-                        className="h-full rounded-full bg-cyan-400"
+                        className="h-full rounded-full bg-cyan-500"
                         style={{ width: `${bpmPct}%` }}
                       />
                     </div>
@@ -896,40 +892,47 @@ export const ExerciseBrowseTab = ({
             drop to a second line indented under it. */}
         <span className="basis-full sm:hidden" aria-hidden />
 
-        <div className="ml-[18px] flex shrink-0 items-center gap-0.5 sm:ml-0">
+        <div className="ml-[18px] flex shrink-0 items-center gap-1.5 sm:ml-0">
           {userAuth && (
-            <button
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
               onClick={() => handleToggleFavorite(exercise.id)}
               className={cn(
-                "flex h-8 w-8 items-center justify-center rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-rose-500/50",
-                isFavorite
-                  ? "text-rose-400 hover:bg-rose-500/20"
-                  : "text-zinc-500 hover:bg-white/10 hover:text-rose-300"
+                // Favourited = the heart lights up; the face stays the same key.
+                isFavorite ? "text-rose-400 hover:text-rose-300" : "text-zinc-400 hover:text-rose-300"
               )}
               title={isFavorite ? "Remove from favorites" : "Add to favorites"}
               aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
               aria-pressed={isFavorite}
             >
-              <Heart size={15} className={cn(isFavorite && "fill-current")} />
-            </button>
+              <Heart className={cn(isFavorite && "fill-current")} />
+            </Button>
           )}
-          <button
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
             onClick={() => setPreviewExercise(exercise)}
-            className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
+            className="text-zinc-400"
             title="Exercise details"
             aria-label="Exercise details"
           >
-            <Info size={15} />
-          </button>
+            <Info />
+          </Button>
           {hasLeaderboard && (
-            <button
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
               onClick={() => onShowLeaderboard(exercise.id, titleOf(exercise))}
-              className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-amber-500/20 hover:text-amber-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500/50"
+              className="text-zinc-400 hover:text-amber-400"
               title="Leaderboard"
               aria-label="Leaderboard"
             >
-              <Trophy size={15} />
-            </button>
+              <Trophy />
+            </Button>
           )}
         </div>
 
@@ -942,13 +945,14 @@ export const ExerciseBrowseTab = ({
             Pro
           </button>
         ) : (
-          <button
+          <Button
+            size="sm"
             onClick={() => handleStart(exercise)}
-            className={cn(PRESSABLE, "ml-auto flex shrink-0 items-center gap-1 rounded bg-zinc-100 py-2 pl-3 pr-3.5 sm:ml-0 text-[13px] font-bold text-zinc-950 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border-b-black/25")}
+            className="ml-auto shrink-0 gap-1 sm:ml-0"
           >
-            <ChevronRight size={14} strokeWidth={2.5} />
+            <ChevronRight strokeWidth={2.5} />
             Start
-          </button>
+          </Button>
         )}
       </div>
     );
@@ -970,7 +974,7 @@ export const ExerciseBrowseTab = ({
     return (
       <div
         key={set.id}
-        className="overflow-hidden rounded-lg border border-white/[0.02] bg-white/[0.02] backdrop-blur-sm"
+        className="overflow-hidden rounded-lg bg-zinc-800/40"
       >
         {/* `group` and the hover live on the header, not on the card. On the card
             they fired from anywhere inside it, so pointing at a variant row lit
@@ -992,7 +996,7 @@ export const ExerciseBrowseTab = ({
           )}
 
           {matches.some(ex => isExerciseNew(ex)) && (
-            <Chip color="cyan" className="shrink-0 rounded px-1.5 py-0 text-[10px] tracking-wider">
+            <Chip color="cyan" size="sm" className="shrink-0">
               New
             </Chip>
           )}
@@ -1039,29 +1043,19 @@ export const ExerciseBrowseTab = ({
         {/* ── Filters ── */}
         <div className="flex flex-col gap-3 rounded-lg bg-zinc-900/60 p-3 sm:gap-4 sm:p-5">
           <div className="flex items-center gap-2">
-            <div className="relative min-w-0 flex-1">
-              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" />
-              <input
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search: shred, warm up, no guitar, chord changes…"
-                // text-base on mobile stops iOS Safari zooming in on focus.
-                className="h-11 w-full rounded-lg bg-zinc-800/70 pl-9 pr-9 text-base text-zinc-200 transition-colors placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 sm:h-10 sm:text-[15px]"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded text-zinc-500 transition-colors hover:text-zinc-300"
-                  aria-label="Clear search"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
+            <SearchInput
+              containerClassName="min-w-0 flex-1"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search: shred, warm up, no guitar, chord changes…"
+              aria-label="Search exercises"
+              onClear={() => setSearchQuery("")}
+              clearLabel="Clear search"
+            />
             <button
               onClick={() => setShowFilters(true)}
               className={cn(PRESSABLE, "border-b-black/30", 
-                "flex h-11 shrink-0 items-center gap-1.5 rounded-lg px-3.5 text-[13px] font-bold transition-colors sm:hidden",
+                "flex h-10 shrink-0 items-center gap-1.5 rounded-lg px-3.5 text-[13px] font-bold transition-colors sm:hidden",
                 activeFilterCount > 0 ? "bg-cyan-500/15 text-cyan-400" : "bg-zinc-800/70 text-zinc-400"
               )}
             >
@@ -1168,36 +1162,40 @@ export const ExerciseBrowseTab = ({
             <div className="flex flex-1 flex-col gap-6 overflow-y-auto overscroll-contain px-5 py-4">
               <div className="flex flex-col gap-2.5">
                 <span className={groupLabel}>Skill</span>
-                <div className="flex flex-col gap-3">{skillPills(true)}</div>
+                <div className="flex flex-col gap-3">{skillPills()}</div>
               </div>
               <div className="flex flex-col gap-2.5">
                 <span className={groupLabel}>How you practice</span>
-                <div className="flex flex-wrap gap-2">{modePills(true)}</div>
+                <div className="flex flex-wrap gap-2">{modePills()}</div>
               </div>
               <div className="flex flex-col gap-2.5">
                 <span className={groupLabel}>Status</span>
-                <div className="flex flex-wrap gap-2">{statusPills(true)}</div>
+                <div className="flex flex-wrap gap-2">{statusPills()}</div>
               </div>
               <div className="flex flex-col gap-2.5">
                 <span className={groupLabel}>Length</span>
-                <div className="flex flex-wrap gap-2">{lengthPills(true)}</div>
+                <div className="flex flex-wrap gap-2">{lengthPills()}</div>
               </div>
             </div>
 
             <div className="flex items-center gap-3 bg-zinc-950 px-5 pb-6 pt-4">
-              <button
+              <Button
+                variant="ghost"
+                size="lg"
                 onClick={clearFilters}
                 disabled={activeFilterCount === 0}
-                className={cn(PRESSABLE, "h-11 rounded-lg bg-zinc-900 px-4 text-sm font-bold text-zinc-400 transition-colors disabled:opacity-40 border-b-black/25")}
               >
                 Clear
-              </button>
-              <button
+              </Button>
+              <Button
+                size="lg"
                 onClick={() => setShowFilters(false)}
-                className={cn(PRESSABLE, "h-11 flex-1 rounded-lg bg-zinc-100 text-sm font-bold text-zinc-950 transition-colors active:bg-zinc-300 border-b-black/25")}
+                className="flex-1"
               >
-                Show {totalMatches} exercise{totalMatches !== 1 ? "s" : ""}
-              </button>
+                <span>
+                  Show {totalMatches} exercise{totalMatches !== 1 ? "s" : ""}
+                </span>
+              </Button>
             </div>
           </SheetContent>
         </Sheet>
@@ -1253,7 +1251,7 @@ export const ExerciseBrowseTab = ({
             )}
 
             {visibleSets.length === 0 && (
-              <div className="flex flex-col items-center gap-4 rounded-lg bg-zinc-900/40 px-4 py-12 text-center">
+              <div className="flex flex-col items-center gap-4 rounded-lg bg-zinc-800/40 px-4 py-12 text-center">
                 <p className="text-sm text-zinc-500">No exercises match the current filters.</p>
                 {(activeFilterCount > 0 || searchQuery) && (
                   <button

@@ -142,7 +142,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
               variant="ghost"
               size="sm"
               onClick={removeFile}
-              className="h-7 text-xs font-bold text-zinc-500 hover:text-red-400 hover:bg-red-400/10"
+              className="text-zinc-500 hover:text-red-400 hover:bg-red-400/10"
             >
               {t("import_tab.remove")}
             </Button>
@@ -150,7 +150,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
 
           {/* Track Selection */}
           <div className="space-y-2">
-            <div className="text-xs font-bold text-zinc-600 px-1">
+            <div className="text-xs font-medium text-zinc-400 px-1">
               {t("import_tab.choose_track")}
             </div>
             <div className="flex flex-wrap gap-2">
@@ -187,16 +187,16 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
                 className="border border-white/5 shadow-2xl"
               />
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
-              <div className="absolute top-4 right-4 px-2 py-1 rounded bg-black/60 border border-white/10 backdrop-blur-md text-[10px] font-medium text-zinc-400 flex items-center gap-2 text-center">
+              <div className="absolute top-4 right-4 px-2 py-1 rounded bg-black/60 border border-white/10 backdrop-blur-md text-[11px] font-medium text-zinc-400 flex items-center gap-2 text-center">
                 <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
                 {t("import_tab.all_tracks")}
               </div>
             </div>
           ) : selectedTrack?.trackType === 'drums' ? (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/5 bg-white/[0.02] py-10 text-zinc-500">
+            <div className="flex flex-col items-center justify-center gap-3 rounded-lg bg-zinc-800/40 py-10 text-zinc-500">
               <Drum className="h-8 w-8 opacity-40" />
               <p className="text-xs font-bold">{t("import_tab.drums")}</p>
-              <p className="text-[10px] text-zinc-600">{t("import_tab.drums_hint")}</p>
+              <p className="text-xs text-zinc-500">{t("import_tab.drums_hint")}</p>
             </div>
           ) : null}
         </div>

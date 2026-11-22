@@ -46,7 +46,7 @@ export const SectionList = ({
     <div className="space-y-1">
       {sorted.length === 0 && (
         <div className="py-6 flex flex-col items-center gap-4">
-          <p className="text-xs text-zinc-600">
+          <p className="text-xs text-zinc-500">
             {t("sections.empty")}
           </p>
           {!isLocked && (

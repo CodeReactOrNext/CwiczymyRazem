@@ -294,7 +294,7 @@ const TablatureViewerInner = ({
             isLightBoard ? "bg-black/5 text-zinc-600" : "bg-white/8 text-white/50",
           )}>
             <span className="leading-none">𝄽</span>
-            <span className="tracking-wider">{t("tab.rest")}</span>
+            <span>{t("tab.rest")}</span>
           </div>
         </div>
       )}
@@ -302,7 +302,7 @@ const TablatureViewerInner = ({
       {showReset && (
         <button
           onClick={(e) => { e.stopPropagation(); resetSeek(); }}
-          className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 rounded-lg bg-zinc-900/85 px-3 py-1.5 text-[10px] font-semibold text-zinc-400 backdrop-blur-sm hover:bg-zinc-800 hover:text-white transition-colors border border-white/10"
+          className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 rounded-lg bg-zinc-900/85 px-3 py-1.5 text-xs font-semibold text-zinc-400 backdrop-blur-sm hover:bg-zinc-800 hover:text-white transition-colors border border-white/10"
         >
           <SkipBack className="h-3 w-3" />
           {t("tab.from_start")}

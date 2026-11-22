@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
 import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { Plus, Timer } from "lucide-react";
 import { useState } from "react";
 import type { SkillsType } from "types/skillsTypes";
@@ -79,13 +80,14 @@ export const CustomItemForm = ({ onAdd }: CustomItemFormProps) => {
         <p className='text-sm text-zinc-400'>{t("custom.examples_label")}</p>
         <div className='flex flex-wrap gap-2'>
           {EXAMPLES.map((example) => (
-            <button
+            <Button
               key={example.key}
               type='button'
-              onClick={() => fillExample(example)}
-              className='rounded-lg bg-zinc-800/60 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800 hover:text-zinc-100'>
+              variant='ghost'
+              size='sm'
+              onClick={() => fillExample(example)}>
               {t(`custom.examples.${example.key}.title`)}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -100,7 +102,7 @@ export const CustomItemForm = ({ onAdd }: CustomItemFormProps) => {
             maxLength={MAX_TITLE}
             onChange={(event) => setTitle(event.target.value)}
             placeholder={t("custom.name_placeholder")}
-            className='h-11 border-0 bg-zinc-800/60 text-zinc-100'
+            className='h-11'
           />
         </label>
         <label className='block space-y-2'>
@@ -112,7 +114,7 @@ export const CustomItemForm = ({ onAdd }: CustomItemFormProps) => {
             maxLength={MAX_NOTE}
             onChange={(event) => setNote(event.target.value)}
             placeholder={t("custom.note_placeholder")}
-            className='h-11 border-0 bg-zinc-800/60 text-zinc-100'
+            className='h-11'
           />
         </label>
         <label className='block space-y-2'>
@@ -125,7 +127,7 @@ export const CustomItemForm = ({ onAdd }: CustomItemFormProps) => {
             onChange={(event) => setLink(event.target.value)}
             placeholder={t("custom.link_placeholder")}
             aria-invalid={isLinkInvalid}
-            className='h-11 border-0 bg-zinc-800/60 text-zinc-100'
+            className='h-11'
           />
           {isLinkInvalid && (
             <span className='block text-xs text-orange-400'>
@@ -166,44 +168,32 @@ export const CustomItemForm = ({ onAdd }: CustomItemFormProps) => {
         </button>
 
         {timer && (
-          <div
-            role='radiogroup'
-            aria-label={t("custom.category_label")}
-            className='grid grid-cols-4 gap-2'>
-            {CATEGORIES.map((id) => {
+          <SegmentedControl<SkillsType>
+            label={t("custom.category_label")}
+            selected={[category]}
+            onSelect={setCategory}
+            options={CATEGORIES.map((id) => {
               const Icon = SKILL_CATEGORY_ICONS[id];
-              const active = category === id;
-              return (
-                <button
-                  key={id}
-                  type='button'
-                  role='radio'
-                  aria-checked={active}
-                  onClick={() => setCategory(id)}
-                  className={cn(
-                    "flex flex-col items-center gap-2 rounded-lg px-2 py-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
-                    active
-                      ? "bg-zinc-700 text-zinc-100"
-                      : "bg-zinc-900/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-                  )}>
-                  <Icon className='h-4 w-4' />
-                  {t(`common:categories.${id}`)}
-                </button>
-              );
+              return {
+                value: id,
+                label: t(`common:categories.${id}`),
+                icon: <Icon className='h-4 w-4 shrink-0' />,
+              };
             })}
-          </div>
+          />
         )}
       </div>
 
-      <Button
-        type='submit'
-        disabled={!canSave}
-        className='h-11 w-full rounded-lg bg-zinc-100 font-bold text-black focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-white'>
-        <span className='flex items-center gap-2'>
-          <Plus className='h-4 w-4' />
+      <div className='flex justify-end'>
+        <Button
+          type='submit'
+          size='lg'
+          disabled={!canSave}
+          className='w-full sm:w-auto'>
+          <Plus />
           {t("custom.add")}
-        </span>
-      </Button>
+        </Button>
+      </div>
     </form>
   );
 };

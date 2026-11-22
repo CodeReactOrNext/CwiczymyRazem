@@ -5,6 +5,7 @@ import { ChevronRight } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 
 import { dotWash, hatchWash, plateStyle, QUIET_WASH } from "./blueprintPlate";
+import { ReadyMark } from "./ReadyMark";
 import { CountUp, ReadyShine } from "./workshopMotion";
 
 type JobAccent = "emerald" | "cyan" | "purple";
@@ -101,6 +102,10 @@ export const JobCard = ({
             ready ? ACCENTS[accent].fg : "text-arsenal-text-tertiary",
           )}
         />
+        {/* The same hammer mark the collection's sockets wear: this job runs today. */}
+        {ready && !disabled && (
+          <ReadyMark className='absolute -right-1.5 -top-1.5' />
+        )}
       </span>
 
       <span className='relative flex min-w-0 flex-1 flex-col gap-1.5'>

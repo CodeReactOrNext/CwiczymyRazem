@@ -2,13 +2,12 @@ import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
 import AppLayout from "layouts/AppLayout";
-import { BarChart2 } from "lucide-react";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 
 const ProfileOverviewPage: NextPageWithLayout = () => {
   return (
-    <ExerciseLayout title="Statistics" subtitle="Your practice history and progress overview" icon={<BarChart2 size={18} />}>
+    <ExerciseLayout title="Statistics" subtitle="Your practice history and progress overview">
       <NavigationCards />
       <div className="mt-8">
         <LogsBoxView />

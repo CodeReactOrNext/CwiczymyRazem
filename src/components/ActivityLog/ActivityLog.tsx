@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import {
   Dialog,
@@ -5,7 +6,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
-import { useRipple } from "hooks/useRipple";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -20,34 +22,6 @@ import { useActivityLog } from "./hooks/useActivityLog";
 
 const CALENDAR_CELL_SIZE = 19;
 const CALENDAR_HEIGHT = 7 * CALENDAR_CELL_SIZE;
-
-const YearTabButton = ({
-  yearValue,
-  active,
-  onSelect,
-}: {
-  yearValue: number;
-  active: boolean;
-  onSelect: () => void;
-}) => {
-  const { createRipple, ripple } = useRipple();
-  return (
-    <button
-      role='tab'
-      onClick={(e) => {
-        createRipple(e);
-        onSelect();
-      }}
-      className={`relative h-8 overflow-hidden rounded px-2.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 sm:h-7 ${
-        active
-          ? "bg-white/20 text-white"
-          : "text-white/60 hover:bg-white/15 hover:text-white"
-      }`}>
-      {ripple}
-      {yearValue}
-    </button>
-  );
-};
 
 interface ActivityLogViewProps {
   year: number;
@@ -133,16 +107,15 @@ export const ActivityLogView = ({
          <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
           <h3 className='mr-2 text-base font-semibold text-zinc-100'>Activity</h3>
 
-          <div className='flex gap-0.5 rounded-lg bg-white/10 p-0.5'>
-            {yearButtons.map((yearValue) => (
-              <YearTabButton
-                key={`year-btn-${yearValue}`}
-                yearValue={yearValue}
-                active={year === yearValue}
-                onSelect={() => setYear(yearValue)}
-              />
-            ))}
-          </div>
+          <SegmentedControl
+            label={String(year)}
+            selected={[String(year)]}
+            onSelect={(value) => setYear(Number(value))}
+            options={yearButtons.map((yearValue) => ({
+              value: String(yearValue),
+              label: String(yearValue),
+            }))}
+          />
         </div>
 
         <div className='flex items-start gap-3'>
@@ -163,9 +136,9 @@ export const ActivityLogView = ({
                 {Array.from({ length: 53 }).map((_, col) => (
                   <div key={col} className='flex flex-col gap-[5px]'>
                     {Array.from({ length: 7 }).map((_, row) => (
-                      <div
+                      <Skeleton
                         key={row}
-                        className='animate-pulse rounded-[3px] bg-zinc-800'
+                        className='rounded-[3px]'
                         style={{ width: 14, height: 14 }}
                       />
                     ))}
@@ -187,7 +160,7 @@ export const ActivityLogView = ({
       {hoveredItem?.report &&
         createPortal(
           <div
-            className='pointer-events-none fixed z-50 rounded-xl border border-[#e8e4db] bg-[#fcfbf7] p-3 shadow-2xl backdrop-blur-md sm:block hidden'
+            className='pointer-events-none fixed z-50 hidden rounded-lg bg-white p-3 text-black sm:block'
             style={{
               left: tooltipPosition.x,
               top: tooltipPosition.y - 16,
@@ -202,10 +175,10 @@ export const ActivityLogView = ({
         )}
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-none sm:max-w-[425px] border-[#e8e4db] bg-[#fcfbf7] text-zinc-900 h-full sm:h-auto max-h-[90dvh] !p-0 flex flex-col">
-          <div className="flex-1 overflow-y-auto p-5 sm:p-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-stone-300">
+        <DialogContent className="sm:max-w-md max-h-[90dvh] !p-0 flex flex-col">
+          <div className="flex-1 overflow-y-auto p-5 sm:p-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20">
             <DialogHeader className="mb-4">
-              <DialogTitle className="text-zinc-900">Activity Details</DialogTitle>
+              <DialogTitle>{t("ui:activity_details")}</DialogTitle>
             </DialogHeader>
             {selectedDay?.report && (
               <>
@@ -216,7 +189,10 @@ export const ActivityLogView = ({
                 />
                 <Link
                   href={`/practice-log?date=${getLocalDateKey(selectedDay.date)}`}
-                  className="mt-4 flex items-center justify-center gap-1.5 rounded-lg border border-[#e8e4db] bg-black/[0.03] px-4 py-2.5 text-sm font-semibold text-stone-700 transition-colors hover:bg-black/[0.06] hover:text-stone-900"
+                  className={buttonVariants({
+                    variant: "subtle",
+                    className: "mt-4 w-full font-semibold",
+                  })}
                 >
                   {t("ui:open_in_practice_log")}
                   <ArrowRight size={14} />

@@ -359,7 +359,7 @@ export function ScaleTreeGridNode({
         {recordBpm && !isLocked && !isReward && (
           <span
             title={t('node.record', { bpm: recordBpm })}
-            className="pointer-events-none absolute -right-1.5 -top-1.5 z-20 rounded-full bg-orange-500 px-1.5 py-[1px] text-[9px] font-bold leading-tight tabular-nums text-zinc-950"
+            className="pointer-events-none absolute -right-1.5 -top-1.5 z-20 rounded-full bg-orange-500 px-1.5 py-[1px] text-[11px] font-bold leading-tight tabular-nums text-zinc-950"
           >
             {recordBpm}
           </span>

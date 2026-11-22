@@ -3,7 +3,7 @@ import {
   useRewardLedger,
 } from "hooks/useRewardLedger";
 import { useTranslation } from "hooks/useTranslation";
-import { useCallback, useMemo } from "react";
+import { type ReactNode, useCallback, useMemo, useState } from "react";
 
 import { resolveAchievementReward } from "../../data/achievementRewards";
 import { useAchievementContext } from "../../hooks/useAchievementContext";
@@ -11,7 +11,10 @@ import { useAchievementStats } from "../../hooks/useAchievementStats";
 import type { AchievementList } from "../../types";
 import { buildAchievementPanelState } from "../../utils/achievementPanelState";
 import { AchievementRow } from "./AchievementRow";
-import { ClaimRewardsBanner } from "./ClaimRewardsBanner";
+import {
+  AchievementsSummary,
+  type CollectedRewards,
+} from "./AchievementsSummary";
 
 /**
  * The whole collection: one count, then one list, commonest badge first.
@@ -26,15 +29,28 @@ import { ClaimRewardsBanner } from "./ClaimRewardsBanner";
  */
 export const AchievementsPanel = ({
   userAchievements,
+  afterSummary,
 }: {
   userAchievements: AchievementList[];
+  /**
+   * A section that belongs between the count and the list — the season
+   * finishes. Below 77 rows nobody would reach it; above the count it pushed
+   * the collection itself off the first screen.
+   */
+  afterSummary?: ReactNode;
 }) => {
   const { t } = useTranslation("achievements");
   const context = useAchievementContext();
   const { data: stats } = useAchievementStats();
   const { data: ledger } = useRewardLedger();
   const rewards = ledger?.achievements;
-  const { mutate: claim, isPending: isClaiming } = useClaimAchievementRewards();
+  const { mutate: claim, isPending: isClaimingOne } =
+    useClaimAchievementRewards();
+  // "Collect all" says what it paid on the summary card, so it skips the toast.
+  const { mutate: claimEverything, isPending: isClaimingAll } =
+    useClaimAchievementRewards({ quiet: true });
+  const isClaiming = isClaimingOne || isClaimingAll;
+  const [collected, setCollected] = useState<CollectedRewards | null>(null);
 
   // Which badges have already been paid for. Empty while the ledger loads,
   // which reads as "nothing collected yet" — the claim button it briefly shows
@@ -48,43 +64,41 @@ export const AchievementsPanel = ({
     (id: AchievementList) => claim([id]),
     [claim]
   );
-  const claimAll = useCallback(() => claim(undefined), [claim]);
+  const claimAll = useCallback(
+    () =>
+      claimEverything(undefined, {
+        onSuccess: (result) =>
+          setCollected({ count: result.claimed.length, reward: result.reward }),
+      }),
+    [claimEverything],
+  );
 
   const state = useMemo(
     () => buildAchievementPanelState(userAchievements, context, stats ?? null),
     [userAchievements, context, stats]
   );
 
-  const earnedPercent = state.total > 0 ? Math.round((state.owned / state.total) * 100) : 0;
+  // Badges one logged session away from unlocking — and from paying out.
+  const readyCount = useMemo(
+    () => state.entries.filter((entry) => entry.state === "ready").length,
+    [state.entries],
+  );
 
   return (
     <div className='flex flex-col gap-6'>
-      {rewards && (
-        <ClaimRewardsBanner
-          waiting={rewards.claimable.length}
-          pending={rewards.pending}
-          caseTokens={ledger?.caseTokens ?? 0}
-          isClaiming={isClaiming}
-          onClaimAll={claimAll}
-        />
-      )}
+      <AchievementsSummary
+        owned={state.owned}
+        total={state.total}
+        waiting={rewards ? rewards.claimable.length : null}
+        pending={rewards?.pending ?? null}
+        readyCount={readyCount}
+        caseTokens={ledger?.caseTokens ?? 0}
+        collected={collected}
+        isClaiming={isClaimingAll}
+        onClaimAll={claimAll}
+      />
 
-      <div className='flex flex-col gap-2 rounded-lg bg-zinc-900/40 p-5'>
-        <div className='flex items-baseline justify-between gap-4'>
-          <p className='text-sm font-bold text-zinc-200'>
-            {t("panel.earnedHeadline", { owned: state.owned, total: state.total })}
-          </p>
-          <span className='shrink-0 text-sm font-bold tabular-nums text-zinc-400'>
-            ({earnedPercent}%)
-          </span>
-        </div>
-        <div className='h-2 overflow-hidden rounded-full bg-zinc-800'>
-          <div
-            className='bar-shine h-full rounded-full bg-cyan-500'
-            style={{ width: `${earnedPercent}%` }}
-          />
-        </div>
-      </div>
+      {afterSummary}
 
       <div className='flex flex-col gap-2'>
         <div className='flex justify-end px-1'>

@@ -1,5 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { WidgetSize } from "feature/dashboard/types/dashboard.types";
 import type { ProfileSectionDefinition } from "feature/profile/data/profileSectionCatalog";
@@ -28,8 +29,7 @@ interface SectionTileProps {
   children: ReactNode;
 }
 
-const controlButton =
-  "rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-700/60 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 disabled:pointer-events-none disabled:opacity-30";
+const controlButton = "h-8 w-8 text-zinc-400 disabled:opacity-30";
 
 /**
  * One profile section. While reading, just the section. While customising,
@@ -81,7 +81,9 @@ export const SectionTile = ({
         "flex items-center gap-3 rounded-xl bg-zinc-800/40 px-3 py-4",
         isDragging && "relative z-20 bg-zinc-700/60",
       )}>
-      <button
+      <Button
+        variant='ghost'
+        size='icon'
         ref={setActivatorNodeRef}
         type='button'
         {...attributes}
@@ -89,36 +91,42 @@ export const SectionTile = ({
         aria-label={t("tile.move", { title: definition.title })}
         title={t("tile.drag")}
         className={cn(controlButton, "cursor-grab touch-none active:cursor-grabbing")}>
-        <GripVertical size={18} />
-      </button>
-      <Icon size={18} className='shrink-0 text-zinc-500' />
+        <GripVertical />
+      </Button>
+      <Icon className='h-4 w-4 shrink-0 text-zinc-500' />
       <div className='min-w-0 flex-1'>
         <p className='truncate text-sm font-semibold text-zinc-100'>
           {definition.title}
         </p>
         <p className='truncate text-xs text-zinc-500'>{definition.description}</p>
       </div>
-      <div className='flex shrink-0 items-center'>
-        <button
+      <div className='flex shrink-0 items-center gap-1.5'>
+        <Button
+          variant='ghost'
+          size='icon'
           type='button'
           disabled={isFirst}
           onClick={() => onMove(-1)}
           aria-label={t("tile.move_up_aria", { title: definition.title })}
           title={t("tile.move_up")}
           className={controlButton}>
-          <ArrowUp size={16} />
-        </button>
-        <button
+          <ArrowUp />
+        </Button>
+        <Button
+          variant='ghost'
+          size='icon'
           type='button'
           disabled={isLast}
           onClick={() => onMove(1)}
           aria-label={t("tile.move_down_aria", { title: definition.title })}
           title={t("tile.move_down")}
           className={controlButton}>
-          <ArrowDown size={16} />
-        </button>
+          <ArrowDown />
+        </Button>
         {canResize && (
-          <button
+          <Button
+            variant='ghost'
+            size='icon'
             type='button'
             onClick={() => onResize(isFull ? "half" : "full")}
             aria-label={
@@ -128,17 +136,19 @@ export const SectionTile = ({
             }
             title={isFull ? t("tile.half") : t("tile.full")}
             className={controlButton}>
-            {isFull ? <Columns2 size={16} /> : <RectangleHorizontal size={16} />}
-          </button>
+            {isFull ? <Columns2 /> : <RectangleHorizontal />}
+          </Button>
         )}
-        <button
+        <Button
+          variant='ghost'
+          size='icon'
           type='button'
           onClick={onRemove}
           aria-label={t("tile.hide_aria", { title: definition.title })}
           title={t("tile.hide")}
           className={controlButton}>
-          <EyeOff size={16} />
-        </button>
+          <EyeOff />
+        </Button>
       </div>
     </div>
   );

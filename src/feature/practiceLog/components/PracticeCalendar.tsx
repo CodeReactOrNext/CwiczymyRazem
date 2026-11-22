@@ -167,19 +167,19 @@ export const PracticeCalendar = ({
             {t("calendar.clear_range")}
           </button>
         ) : (
-          <span className='text-xs text-zinc-600'>
+          <span className='text-xs text-zinc-500'>
             {t("calendar.hint")}
           </span>
         )}
         <div className='flex items-center gap-1.5'>
-          <span className='text-[10px] text-zinc-600'>
+          <span className='text-xs text-zinc-500'>
             {t("calendar.less")}
           </span>
           <span className='h-2.5 w-2.5 rounded-sm bg-cyan-500/15' />
           <span className='h-2.5 w-2.5 rounded-sm bg-cyan-500/25' />
           <span className='h-2.5 w-2.5 rounded-sm bg-cyan-500/40' />
           <span className='h-2.5 w-2.5 rounded-sm bg-cyan-500/60' />
-          <span className='text-[10px] text-zinc-600'>
+          <span className='text-xs text-zinc-500'>
             {t("calendar.more")}
           </span>
         </div>

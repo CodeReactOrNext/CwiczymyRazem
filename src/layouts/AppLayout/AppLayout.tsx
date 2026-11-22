@@ -1,6 +1,7 @@
 // App-only English text; public pages that skip AppLayout never download it.
 import "lib/i18n/fullCatalog";
 
+import type { CorridorPage } from "components/CorridorBackdrop/CorridorBackdrop";
 import { selectAutoLogInFailed, selectCurrentUserStats, selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
 import { useIsCompactViewport } from "hooks/useMediaQuery";
 import { usePresence } from "hooks/usePresence";
@@ -31,6 +32,8 @@ interface AppLayoutProps {
   variant?: LayoutVariant | ((route: { query: ParsedUrlQuery; isCompact: boolean }) => LayoutVariant);
   wide?: boolean;
   isPublic?: boolean;
+  /** Draws the corridor wall (wash + icon pattern) behind the page, edge to edge. */
+  corridor?: CorridorPage;
 }
 
 const AppLayout = ({
@@ -39,6 +42,7 @@ const AppLayout = ({
   variant = "secondary",
   wide = false,
   isPublic = false,
+  corridor,
 }: AppLayoutProps) => {
   usePresence();
   const { status } = useSession();
@@ -102,6 +106,7 @@ const AppLayout = ({
       pageId={pageId}
       variant={resolvedVariant}
       wide={wide}
+      corridor={corridor}
       userStats={userStats}
       userName={userName ?? ""}
       userAvatar={userAvatar}>

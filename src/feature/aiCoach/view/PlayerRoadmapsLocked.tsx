@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
 import { RoadmapBuildPreview } from "feature/supporterPanel/components/RoadmapBuildPreview";
@@ -40,18 +42,15 @@ const TeaserTile = ({
     <div
       aria-hidden={blurred || undefined}
       className={cn(
-        "flex h-full flex-col gap-4 rounded-lg bg-zinc-900/40 p-5",
+        "flex h-full flex-col gap-4 rounded-lg bg-zinc-800/40 p-5",
         blurred && "pointer-events-none select-none blur-[3px]",
       )}>
       <span className='flex items-center justify-between gap-3'>
         {item.level ? (
-          <span
-            className={cn(
-              "rounded-md px-2 py-0.5 text-[11px] font-bold",
-              levelTone(item.level),
-            )}>
+          // Same level colours as the curated roadmap cards (levelTone).
+          <Chip color='custom' size='sm' className={levelTone(item.level)}>
             {t(`levels.${item.level}`, item.level)}
-          </span>
+          </Chip>
         ) : (
           <span />
         )}
@@ -69,7 +68,7 @@ const TeaserTile = ({
         </span>
         {item.followerCount > 0 && (
           <span className='flex items-center gap-1.5'>
-            <Users size={13} />
+            <Users className='h-3.5 w-3.5' />
             {t("following", { count: item.followerCount })}
           </span>
         )}
@@ -95,10 +94,7 @@ const BoardPreview = () => {
     return (
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3'>
         {Array.from({ length: CLEAR_TILES }, (_, index) => (
-          <div
-            key={index}
-            className='h-40 animate-pulse rounded-lg bg-zinc-900/40'
-          />
+          <Skeleton key={index} variant='block' className='h-40' />
         ))}
       </div>
     );
@@ -159,7 +155,7 @@ export const PlayerRoadmapsLocked = () => {
   return (
     <div className='space-y-12'>
       <div className='space-y-4'>
-        <section className='grid gap-10 rounded-lg bg-zinc-900/40 p-6 sm:p-8 md:p-10 lg:grid-cols-2 lg:items-center lg:gap-16'>
+        <section className='grid gap-10 rounded-lg bg-zinc-800/40 p-6 sm:p-8 md:p-10 lg:grid-cols-2 lg:items-center lg:gap-16'>
           <div className='flex flex-col gap-8'>
             <div className='space-y-2'>
               <h2 className='text-2xl font-bold leading-tight text-zinc-100'>
@@ -193,7 +189,7 @@ export const PlayerRoadmapsLocked = () => {
           <RoadmapBuildPreview />
         </section>
 
-        <section className='grid gap-8 rounded-lg bg-zinc-900/40 p-6 sm:p-8 md:p-10 lg:grid-cols-2 lg:gap-16'>
+        <section className='grid gap-8 rounded-lg bg-zinc-800/40 p-6 sm:p-8 md:p-10 lg:grid-cols-2 lg:gap-16'>
           <div className='space-y-5'>
             <h3 className='flex items-center gap-2 text-base font-bold text-zinc-100'>
               <Lock size={16} className='text-amber-400' aria-hidden />
@@ -225,10 +221,8 @@ export const PlayerRoadmapsLocked = () => {
 
             <Button asChild size='lg'>
               <a href={BMC_URL} target='_blank' rel='noreferrer'>
-                <span className='flex items-center gap-2'>
-                  <Heart size={16} fill='currentColor' />
-                  {t("locked.support")}
-                </span>
+                <Heart size={16} fill='currentColor' />
+                {t("locked.support")}
               </a>
             </Button>
 

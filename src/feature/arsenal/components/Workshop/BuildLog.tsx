@@ -55,7 +55,7 @@ export const BuildLog = ({ entries }: BuildLogProps) => {
               key={`${entry.label}-${entry.at ?? i}`}
               className='flex items-baseline justify-between gap-4'>
               <span className='text-sm text-zinc-300'>{entry.label}</span>
-              <span className='shrink-0 text-xs tabular-nums text-zinc-600'>
+              <span className='shrink-0 text-xs tabular-nums text-zinc-500'>
                 {formatDate(entry.at)}
               </span>
             </div>

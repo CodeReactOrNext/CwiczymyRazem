@@ -122,7 +122,7 @@ export const MicTroubleshootingDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='z-[99999999] !flex max-h-[100dvh] flex-col sm:max-h-[85vh] sm:max-w-lg'>
+      <DialogContent className='z-[99999999] !flex max-h-[100dvh] flex-col sm:max-h-[85vh]'>
         <DialogHeader className='shrink-0'>
           <div className='mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-950 text-emerald-400'>
             <Mic className='h-6 w-6' />
@@ -163,11 +163,12 @@ export const MicTroubleshootingDialog = ({
             onClick={handleResetMicSettings}
             disabled={didReset}
             variant='destructive'
-            className='w-full font-bold'>
-            <RotateCcw className='h-4 w-4' />
+            size='lg'
+            className='w-full'>
+            <RotateCcw />
             {didReset ? t("mic_help.resetting") : t("mic_help.reset")}
           </Button>
-          <p className='text-center text-[10px] text-zinc-500'>
+          <p className='text-center text-xs text-zinc-500'>
             {t("mic_help.reset_hint")}
           </p>
           <Button
@@ -207,7 +208,7 @@ export const MicTroubleshooting = ({
         <RippleButton
           onClick={() => setIsOpen(true)}
           className={cn(
-            "flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-zinc-500 transition-colors hover:text-zinc-200",
+            "flex items-center gap-1.5 text-[11px] font-semibold text-zinc-500 transition-colors hover:text-zinc-200",
             className,
           )}>
           <Bug className='h-3.5 w-3.5' />

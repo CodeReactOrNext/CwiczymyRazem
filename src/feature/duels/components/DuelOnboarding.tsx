@@ -55,7 +55,7 @@ export const DuelOnboarding = ({ onDone }: DuelOnboardingProps) => {
       <Button
         size='lg'
         onClick={() => (isLast ? onDone() : setStep(step + 1))}
-        className='h-12 w-full border-b-zinc-400 bg-white text-base text-zinc-950 hover:bg-zinc-200'>
+        className='w-full'>
         {isLast ? t("onboarding.start") : t("onboarding.next")}
       </Button>
     </div>

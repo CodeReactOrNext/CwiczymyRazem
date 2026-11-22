@@ -117,7 +117,7 @@ export const ChangelogVideoCard = ({
           />
         </div>
         <DialogClose className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute -top-12 right-0")}>
-          <X className='h-5 w-5' aria-hidden />
+          <X aria-hidden />
           <span className='sr-only'>{t("close")}</span>
         </DialogClose>
       </DialogContent>

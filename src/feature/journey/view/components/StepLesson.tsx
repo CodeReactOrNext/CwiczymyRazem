@@ -1,6 +1,8 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { pageTitleClass } from "components/PageTitle/PageTitle";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
@@ -54,7 +56,7 @@ function LessonBlock({ block }: { block: StepContentBlock }) {
       return (
         <section className='space-y-3'>
           {block.label && (
-            <h3 className='font-display text-2xl font-black leading-tight text-zinc-100 [text-wrap:balance] sm:text-3xl'>
+            <h3 className={cn(pageTitleClass, "[text-wrap:balance]")}>
               {block.label}
             </h3>
           )}
@@ -141,7 +143,7 @@ function FinishPage({
 
       {!step.modalOnly && step.examGoal && (
         <section className='space-y-3'>
-          <h3 className='font-display text-2xl font-black text-zinc-100 sm:text-3xl'>
+          <h3 className={pageTitleClass}>
             {t("lesson.how_to_pass")}
           </h3>
           <p className='text-lg leading-relaxed text-zinc-300'>
@@ -153,7 +155,7 @@ function FinishPage({
       {!!step.checklist?.length && (
         <section className='space-y-4'>
           <div className='space-y-2'>
-            <h3 className='font-display text-2xl font-black text-zinc-100 sm:text-3xl'>
+            <h3 className={pageTitleClass}>
               {t("lesson.before_you_start")}
             </h3>
             <p className='text-base text-zinc-400'>{t("lesson.tick_all")}</p>
@@ -188,12 +190,12 @@ function FinishPage({
 
       {!!step.songPicker?.length && (
         <section className='space-y-4'>
-          <h3 className='font-display text-2xl font-black text-zinc-100 sm:text-3xl'>
+          <h3 className={pageTitleClass}>
             {t("sidebar.choose_target")}
           </h3>
           <div className='grid grid-cols-1 gap-2'>
             {pickerSongs.length === 0 ? (
-              <div className='h-16 animate-pulse rounded-lg bg-zinc-900' />
+              <Skeleton variant='block' className='h-16' />
             ) : (
               pickerSongs.map((song) => (
                 <button
@@ -382,7 +384,7 @@ function LessonBody({
             <Button
               variant='subtle'
               size='icon'
-              className='h-11 w-11 flex-shrink-0'
+              className='h-10 w-10 flex-shrink-0'
               onClick={() => goTo(pageIndex - 1)}
               aria-label={t("lesson.back")}>
               <ChevronLeft />
@@ -391,23 +393,24 @@ function LessonBody({
 
           {!isLast ? (
             <Button
-              className='h-11 flex-1 gap-2 text-sm font-bold'
+              size='lg'
+              className='flex-1 sm:ml-auto sm:flex-none'
               onClick={() => goTo(pageIndex + 1)}>
               {t("lesson.next")}
               <ChevronRight />
             </Button>
           ) : !step.modalOnly ? (
-            <div className='grid flex-1 grid-cols-2 gap-3'>
+            <div className='grid flex-1 grid-cols-2 gap-3 sm:ml-auto sm:flex-none'>
               <Button
                 variant='subtle'
-                className='h-11 gap-2 text-sm font-bold'
+                size='lg'
                 disabled={isLocked}
                 onClick={() => onPractice(step)}>
                 <Play className='fill-current' />
                 {t("sidebar.practice")}
               </Button>
               <Button
-                className='h-11 gap-2 text-sm font-bold'
+                size='lg'
                 disabled={isLocked}
                 onClick={() => onExam(step)}>
                 <Target />
@@ -416,13 +419,15 @@ function LessonBody({
             </div>
           ) : isCompleted ? (
             <Button
-              className='h-11 flex-1 gap-2 text-sm font-bold'
+              size='lg'
+              className='flex-1 sm:ml-auto sm:flex-none'
               onClick={onClose}>
               {t("sidebar.close")}
             </Button>
           ) : (
             <Button
-              className='h-11 flex-1 gap-2 text-sm font-bold'
+              size='lg'
+              className='flex-1 sm:ml-auto sm:flex-none'
               disabled={isLocked || isSaving || !canComplete}
               onClick={complete}>
               {isSaving

@@ -1,13 +1,17 @@
 import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { Slider } from "assets/components/ui/slider";
 import { Switch } from "assets/components/ui/switch";
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
+import { PAGE_GUTTER, PageShell } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { LIBRARY_TABS } from "constants/navTabs";
+import { LIBRARY_HERO_CLASS, LIBRARY_TABS } from "constants/navTabs";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { ArrowLeft, ChevronDown, Sparkles } from "lucide-react";
+import { ChevronDown, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
@@ -39,7 +43,7 @@ import {
 } from "../../utils/planner";
 import type { PlanRange } from "../../utils/planRange";
 import { isPlanRange, PLAN_RANGES, rangeDates } from "../../utils/planRange";
-import { Field, Segmented, Stepper } from "../PlannerControls";
+import { Field, Stepper } from "../PlannerControls";
 import { PlanPreview } from "../PlanPreview";
 import { PlanSection } from "./PlanSection";
 import { SkillPicker } from "./SkillPicker";
@@ -200,34 +204,38 @@ const AutoPlanner = ({
   const applyButton = (className?: string) => (
     <Button
       onClick={apply}
+      size='xl'
       disabled={isSaving || result.totalMinutes === 0}
-      className={cn(
-        "h-12 rounded-lg border-b-black/25 bg-white px-6 font-bold text-zinc-950 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200",
-        className,
-      )}>
-      <Sparkles className='h-4 w-4' />
+      className={className}>
+      <Sparkles />
       {t("planner.apply", { count: dayCount })}
     </Button>
   );
 
   return (
     <>
-      <div className='grid items-start gap-4 px-3 pb-32 md:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:gap-8 lg:px-8 lg:pb-12'>
+      <div className={cn("grid items-start gap-4 pb-32 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:gap-8 lg:pb-16", PAGE_GUTTER)}>
         <div className='space-y-4'>
           <PlanSection index={1} title={t("planner.range.label")}>
-            <Segmented
-              ariaLabel={t("planner.range.label")}
-              value={range}
-              onChange={setRange}
-              options={PLAN_RANGES.map((value) => {
-                const span = rangeDates(value, today);
-                return {
+            <div className='space-y-2'>
+              <SegmentedControl
+                label={t("planner.range.label")}
+                selected={[range]}
+                onSelect={setRange}
+                options={PLAN_RANGES.map((value) => ({
                   value,
                   label: t(`planner.range.${value}`),
-                  hint: `${formatDate(span[0], { day: "numeric", month: "short" })} – ${formatDate(span[span.length - 1], { day: "numeric", month: "short" })}`,
-                };
-              })}
-            />
+                }))}
+              />
+              {(() => {
+                const span = rangeDates(range, today);
+                return (
+                  <p className='text-xs tabular-nums text-zinc-400'>
+                    {`${formatDate(span[0], { day: "numeric", month: "short" })} – ${formatDate(span[span.length - 1], { day: "numeric", month: "short" })}`}
+                  </p>
+                );
+              })()}
+            </div>
           </PlanSection>
 
           <PlanSection
@@ -248,38 +256,34 @@ const AutoPlanner = ({
                 aria-label={t("planner.minutes.label")}
                 className='py-3 [&_[data-slot=slider-range]]:bg-zinc-100 [&_[data-slot=slider-track]]:bg-zinc-800 [&_[role=slider]]:h-6 [&_[role=slider]]:w-6 [&_[role=slider]]:border-0 [&_[role=slider]]:bg-zinc-100 lg:[&_[role=slider]]:h-5 lg:[&_[role=slider]]:w-5'
               />
-              <div className='flex flex-wrap gap-2'>
-                {QUICK_MINUTES.map((minutes) => (
-                  <button
-                    key={minutes}
-                    type='button'
-                    onClick={() => patch({ minutesPerDay: minutes })}
-                    aria-pressed={prefs.minutesPerDay === minutes}
-                    className={cn(
-                      "h-9 rounded-lg px-3.5 text-sm tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400",
-                      prefs.minutesPerDay === minutes
-                        ? "bg-zinc-700 text-zinc-100"
-                        : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-                    )}>
-                    {formatMinutes(minutes)}
-                  </button>
-                ))}
-              </div>
+              <SegmentedControl
+                label={t("planner.minutes.label")}
+                selected={[String(prefs.minutesPerDay)]}
+                onSelect={(minutes) => patch({ minutesPerDay: Number(minutes) })}
+                options={QUICK_MINUTES.map((minutes) => ({
+                  value: String(minutes),
+                  label: formatMinutes(minutes),
+                }))}
+              />
             </div>
           </PlanSection>
 
           <PlanSection index={3} title={t("planner.level.label")}>
             <div className='space-y-9'>
-              <Segmented
-                ariaLabel={t("planner.level.label")}
-                value={prefs.level}
-                onChange={(level) => patch({ level })}
-                options={PLAYER_LEVELS.map((level) => ({
-                  value: level,
-                  label: t(`levels.${level}.name`),
-                  hint: t(`levels.${level}.hint`),
-                }))}
-              />
+              <div className='space-y-2'>
+                <SegmentedControl
+                  label={t("planner.level.label")}
+                  selected={[prefs.level]}
+                  onSelect={(level) => patch({ level })}
+                  options={PLAYER_LEVELS.map((level) => ({
+                    value: level,
+                    label: t(`levels.${level}.name`),
+                  }))}
+                />
+                <p className='text-xs text-zinc-400'>
+                  {t(`levels.${prefs.level}.hint`)}
+                </p>
+              </div>
               <Field
                 label={t("planner.focus.label")}
                 hint={t("planner.focus.hint")}>
@@ -360,11 +364,12 @@ const AutoPlanner = ({
             title={t("planner.advanced.label")}
             hint={t("planner.advanced.hint")}
             aside={
-              <button
+              <Button
                 type='button'
+                variant='subtle'
                 onClick={() => setAdvanced((open) => !open)}
                 aria-expanded={advanced}
-                className='flex h-9 shrink-0 items-center gap-2 rounded-lg bg-zinc-800 px-3 text-sm font-medium text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700'>
+                className='shrink-0'>
                 {advancedCount > 0 && (
                   <span className='tabular-nums text-zinc-400'>
                     {advancedCount}
@@ -375,12 +380,12 @@ const AutoPlanner = ({
                   : t("planner.advanced.show")}
                 <ChevronDown
                   className={cn(
-                    "h-4 w-4 text-zinc-400 transition-transform",
+                    "text-zinc-400 transition-transform",
                     advanced && "rotate-180",
                   )}
                   aria-hidden
                 />
-              </button>
+              </Button>
             }>
             {advanced && (
               <div className='space-y-12'>
@@ -417,32 +422,40 @@ const AutoPlanner = ({
 
                 <div className='grid gap-12 xl:grid-cols-2 xl:gap-8'>
                   <Field label={t("planner.variety.label")}>
-                    <Segmented
-                      ariaLabel={t("planner.variety.label")}
-                      value={prefs.variety}
-                      onChange={(variety) => patch({ variety })}
-                      options={(["steady", "balanced", "explore"] as const).map(
-                        (value) => ({
-                          value,
-                          label: t(`planner.variety.${value}`),
-                          hint: t(`planner.variety.${value}_hint`),
-                        }),
-                      )}
-                    />
+                    <div className='space-y-2'>
+                      <SegmentedControl
+                        label={t("planner.variety.label")}
+                        selected={[prefs.variety]}
+                        onSelect={(variety) => patch({ variety })}
+                        options={(["steady", "balanced", "explore"] as const).map(
+                          (value) => ({
+                            value,
+                            label: t(`planner.variety.${value}`),
+                          }),
+                        )}
+                      />
+                      <p className='text-xs text-zinc-400'>
+                        {t(`planner.variety.${prefs.variety}_hint`)}
+                      </p>
+                    </div>
                   </Field>
                   <Field label={t("planner.intensity.label")}>
-                    <Segmented
-                      ariaLabel={t("planner.intensity.label")}
-                      value={prefs.intensity}
-                      onChange={(intensity) => patch({ intensity })}
-                      options={(["light", "steady", "push"] as const).map(
-                        (value) => ({
-                          value,
-                          label: t(`planner.intensity.${value}`),
-                          hint: t(`planner.intensity.${value}_hint`),
-                        }),
-                      )}
-                    />
+                    <div className='space-y-2'>
+                      <SegmentedControl
+                        label={t("planner.intensity.label")}
+                        selected={[prefs.intensity]}
+                        onSelect={(intensity) => patch({ intensity })}
+                        options={(["light", "steady", "push"] as const).map(
+                          (value) => ({
+                            value,
+                            label: t(`planner.intensity.${value}`),
+                          }),
+                        )}
+                      />
+                      <p className='text-xs text-zinc-400'>
+                        {t(`planner.intensity.${prefs.intensity}_hint`)}
+                      </p>
+                    </div>
                   </Field>
                 </div>
 
@@ -493,7 +506,7 @@ const AutoPlanner = ({
           </PlanSection>
         </div>
 
-        <aside className='rounded-lg bg-zinc-900/40 p-5 sm:p-7 lg:sticky lg:top-6'>
+        <aside className='rounded-lg bg-zinc-800/40 p-5 sm:p-7 lg:sticky lg:top-6'>
           <PlanPreview
             dates={dates}
             today={today}
@@ -603,17 +616,17 @@ export const AutoPlanView = () => {
   };
 
   return (
-    <div className='flex min-h-screen flex-col overflow-visible rounded-lg bg-second-600'>
+    <PageShell>
       <HeroBanner
         title={t("planner.title")}
         subtitle={t("planner.subtitle")}
         eyebrow={t("page.title")}
         eyebrowClassName='text-cyan-400/80'
+        className={LIBRARY_HERO_CLASS}
         backgroundContent={<HeroPattern />}
-        className='mb-6 min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]'
       />
 
-      <div className='px-3 md:px-6 lg:px-8'>
+      <div className={cn(PAGE_GUTTER, "pt-6")}>
         <PageTabs
           tabs={LIBRARY_TABS}
           activeHref='/calendar'
@@ -621,13 +634,8 @@ export const AutoPlanView = () => {
         />
       </div>
 
-      <div className='px-3 pb-6 pt-6 md:px-6 md:pt-8 lg:px-8'>
-        <Link
-          href='/calendar'
-          className='-ml-2 inline-flex h-9 items-center gap-2 rounded-lg px-2 text-sm text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-100'>
-          <ArrowLeft className='h-4 w-4' aria-hidden />
-          {t("planner.back")}
-        </Link>
+      <div className={cn(PAGE_GUTTER, "py-6")}>
+        <BackLink href='/calendar' label={t("planner.back")} />
       </div>
 
       {isReady ? (
@@ -641,19 +649,16 @@ export const AutoPlanView = () => {
         />
       ) : (
         <div
-          className='grid items-start gap-6 px-3 pb-12 md:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:gap-8 lg:px-8'
+          className={cn("grid items-start gap-6 pb-16 lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:gap-8", PAGE_GUTTER)}
           aria-busy>
           <div className='space-y-4'>
             {[0, 1, 2, 3].map((index) => (
-              <div
-                key={index}
-                className='h-40 animate-pulse rounded-lg bg-zinc-900/40'
-              />
+              <Skeleton key={index} variant='block' className='h-40' />
             ))}
           </div>
-          <div className='h-[32rem] animate-pulse rounded-lg bg-zinc-900/40' />
+          <Skeleton variant='block' className='h-[32rem]' />
         </div>
       )}
-    </div>
+    </PageShell>
   );
 };

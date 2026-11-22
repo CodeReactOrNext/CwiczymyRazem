@@ -291,7 +291,9 @@
     "scope": {
       "all": "Wszystko",
       "guitars": "Gitary",
-      "pedals": "Efekty"
+      "pedals": "Efekty",
+      "parts": "Części",
+      "builder": "Builder"
     },
     "search": "Szukaj w kolekcji",
     "sort_by": "Sortuj według",
@@ -327,12 +329,14 @@
     "guitars_collected": "zebranych gitar",
     "pedals_eyebrow": "Efekty",
     "pedals_collected": "zebranych efektów",
-    "clear_dupes": "Usuń duplikaty ({{count}})"
+    "clear_dupes": "Usuń duplikaty ({{count}})",
+    "shelf": "Półka",
+    "view_switch": "Widok"
   },
   "salvage": {
     "title": "Odzysk",
     "salvaged_mod": "Odzyskany mod",
-    "salvaged_mod_caps": "ODZYSKANY MOD",
+    "salvaged_mod_caps": "Odzyskany mod",
     "fit_title": "Zamontować {{name}}?",
     "fit_body": "Na {{target}}, z wartością, z jaką został odzyskany. Nic nie jest losowane od nowa.",
     "off_source": "z {{source}}",
@@ -395,7 +399,8 @@
     "sell_it": "Sprzedaj",
     "sell_one": "Sprzedaj jedną za {{fame}} Fame",
     "salvaged_parts": "Odzyskane części",
-    "wallet_empty": "Rozbierz gitarę lub efekt z kolekcji, żeby odzyskać pierwsze części."
+    "wallet_empty": "Rozbierz gitarę lub efekt z kolekcji, żeby odzyskać pierwsze części.",
+    "sell_one_short": "Sprzedaj 1"
   },
   "stash": {
     "part": "Część",
@@ -415,12 +420,14 @@
       "sell_for": "Sprzedaj · {{fame}}",
       "sell_all": "Sprzedaj wszystkie ×{{qty}}",
       "merge": "Scal · +{{gain}} lvl",
-      "merge_plain": "Scal z najlepszą kopią"
+      "merge_plain": "Scal z najlepszą kopią",
+      "workshop": "Warsztat…",
+      "install_on": "Zamontuj w: {{name}}"
     },
     "eyebrow": "Arsenał",
     "title": "Schowek",
     "items_collected": "zebranych przedmiotów",
-    "tidy_hint": "Ułóż cały schowek od nowa za jednym razem — potem to nadal Twój układ",
+    "tidy_hint": "Ułóż całą półkę od nowa jednym ruchem — potem dalej to Twój układ",
     "tidy_up": "Uporządkuj",
     "arrange": {
       "equipped": "Najpierw to, na czym gram",
@@ -477,7 +484,9 @@
     },
     "merge": "Scal +{{gain}}",
     "merge_plain": "Scal",
-    "merge_hint": "Wchłoń do najlepszej kopii za +{{gain}} do Poziomu przedmiotu"
+    "merge_hint": "Wchłoń do najlepszej kopii za +{{gain}} do Poziomu przedmiotu",
+    "workshop": "Warsztat",
+    "workshop_hint": "Odnów, ulepsz i zamontuj mody na warsztacie"
   },
   "bulk": {
     "title": "Usunąć duplikaty?",
@@ -968,7 +977,20 @@
     "levels_word": "poziomu",
     "empty": "Najpierw otwórz skrzynkę. Gdy będziesz mieć gitarę albo efekt, możesz go odnawiać i rozbudowywać odzyskanymi częściami.",
     "change_instrument": "Zmień instrument · na stojaku: {{count}}",
-    "pick_instrument": "Wybierz instrument"
+    "pick_instrument": "Wybierz instrument",
+    "ready_now": "Możesz to zrobić teraz",
+    "make": "Zrób",
+    "make_hint_one": "Przerób {{count}} w górę z części {{tier}}",
+    "make_hint_few": "Przerób {{count}} w górę z części {{tier}}",
+    "make_hint_many": "Przerób {{count}} w górę z części {{tier}}",
+    "make_hint": "Przerób {{count}} w górę z części {{tier}}",
+    "job_with_gain_one": "{{job}} · +{{count}} poziom",
+    "job_with_gain_few": "{{job}} · +{{count}} poziomy",
+    "job_with_gain_many": "{{job}} · +{{count}} poziomów",
+    "job_with_gain": "{{job}} · +{{count}} poziomu",
+    "previous_instrument": "Poprzedni instrument",
+    "next_instrument": "Następny instrument",
+    "n_of_total": "{{n}} z {{total}}"
   },
   "mods": {
     "remove_aria": "Zdejmij ten mod za {{fame}} Fame",
@@ -1026,7 +1048,10 @@
     "no_match": "Żaden pasujący mod nie ma takiej nazwy.",
     "bonus": "+{{points}} premii",
     "bonus_word": "premii",
-    "compatible_slot": "Pasuje do tego slotu"
+    "compatible_slot": "Pasuje do tego slotu",
+    "install_named": "Zamontuj {{name}}",
+    "reroll_range": "Przelosuj · od +{{min}} do +{{max}}",
+    "take_off_for": "Zdejmij · {{fame}} Fame"
   },
   "toasts": {
     "mod_added": "Mod trafił do schowka — zamontuj go z Kolekcji albo w warsztacie",

@@ -8,7 +8,7 @@ const CalendarPage: NextPageWithLayout = () => <CalendarView />;
 
 CalendarPage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <AppLayout pageId='calendar' variant='secondary' wide>
+    <AppLayout pageId='calendar' variant='secondary'>
       {page}
     </AppLayout>
   );

@@ -1,5 +1,6 @@
-import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import { addSong } from "feature/songs/services/addSong";
 import { enrichSong } from "feature/songs/services/enrichment.service";
 import { getSongs } from "feature/songs/services/getSongs";
@@ -10,8 +11,7 @@ import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { Timestamp } from "firebase/firestore";
 import { useTranslation } from "hooks/useTranslation";
-import { inkAccent, inkWash } from "lib/colorTheme/colorTheme";
-import { Check, Loader2, Music, Plus, Search } from "lucide-react";
+import { Check, Loader2, Music, Plus } from "lucide-react";
 import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -116,12 +116,7 @@ const SongPickerRow = ({
     >
       <RowCover coverUrl={song.coverUrl} />
       <RowText title={song.title} subtitle={song.artist} />
-      <span
-        className="shrink-0 rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold"
-        style={{ backgroundColor: inkWash(tier.color, 12), color: inkAccent(tier.color) }}
-      >
-        {tier.tier}
-      </span>
+      <TierPick tier={tier} className="h-5 w-5" />
       <RowAction isAdded={isAdded} />
     </button>
   );
@@ -313,17 +308,12 @@ export const SongPickerPanel = ({
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      <div className="group relative">
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-3.5">
-          <Search className="h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-white" />
-        </div>
-        <Input
-          placeholder={allowCreate ? t("picker.search_create") : t("picker.search_library")}
-          value={searchQuery}
-          onChange={(e) => handleQueryChange(e.target.value)}
-          className="h-11 w-full border-none bg-zinc-900/60 pl-10 text-white placeholder:text-zinc-500 transition-all focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10"
-        />
-      </div>
+      <SearchInput
+        placeholder={allowCreate ? t("picker.search_create") : t("picker.search_library")}
+        aria-label={allowCreate ? t("picker.search_create") : t("picker.search_library")}
+        value={searchQuery}
+        onChange={(e) => handleQueryChange(e.target.value)}
+      />
 
       <div className="min-h-0 flex-1 space-y-0.5 overflow-y-auto pr-1">
         {hasQuery ? (
@@ -379,7 +369,7 @@ export const SongPickerPanel = ({
             )}
 
             {allowCreate && !isSearching && !typedSong && (
-              <p className="px-2 pb-2 pt-4 text-xs text-zinc-600">
+              <p className="px-2 pb-2 pt-4 text-xs text-zinc-500">
                 {t("picker.cant_find")}
               </p>
             )}

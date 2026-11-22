@@ -31,7 +31,7 @@ export const TimingHitMap = ({ delays }: TimingHitMapProps) => {
           ? t("timing.map.title")
           : t("timing.map.aria", { hits, total: rows.length, ms: Math.round(centerMs) })
       }>
-      <p className='text-[11px] font-semibold tracking-wide text-zinc-500'>{t("timing.map.title")}</p>
+      <p className='text-xs font-medium text-zinc-400'>{t("timing.map.title")}</p>
 
       <div className='relative mt-3 h-4 whitespace-nowrap text-[11px] leading-4' aria-hidden>
         <span

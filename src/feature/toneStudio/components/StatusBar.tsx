@@ -29,7 +29,7 @@ const Cell = ({
   tone?: "warn";
 }) => (
   <span className='flex items-baseline gap-1.5' title={title}>
-    <span className='text-[10px] text-zinc-600'>{label}</span>
+    <span className='text-[11px] text-zinc-500'>{label}</span>
     <span
       className={cn(
         "font-mono text-[11px] tabular-nums",
@@ -95,7 +95,7 @@ export const StatusBar = ({
               )}
             </span>
             {api && (
-              <span className='font-mono shrink-0 rounded bg-zinc-800/80 px-1.5 py-0.5 text-[10px] text-zinc-400'>
+              <span className='font-mono shrink-0 rounded bg-zinc-800/80 px-1.5 py-0.5 text-[11px] text-zinc-400'>
                 {api}
               </span>
             )}

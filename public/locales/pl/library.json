@@ -45,6 +45,7 @@
     "create": "Utwórz plan"
   },
   "favorites": {
+    "eyebrow": "Biblioteka",
     "title": "Ulubione",
     "subtitle": "Zapisane plany, ćwiczenia i utwory",
     "empty_title": "Nic jeszcze nie zapisano",
@@ -176,6 +177,8 @@
     "folder_not_empty": "Najpierw przenieś lub usuń zawartość folderu",
     "folder_deleted": "Usunięto folder „{{name}}”",
     "folder_delete_failed": "Nie udało się usunąć folderu",
+    "delete_file": "Usuń {{name}}",
+    "delete_folder": "Usuń folder {{name}}",
     "title": "Pliki Guitar Pro",
     "subtitle": "Twoja biblioteka plików Guitar Pro",
     "practice": "Ćwiczenie",

@@ -1,3 +1,4 @@
+import { Chip, getChipCustomStyle } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import { getEffectiveRarity } from "feature/arsenal/data/itemStats";
 import type { WorkshopSubject } from "feature/arsenal/data/workshop";
@@ -117,14 +118,12 @@ export const BuildLadder = ({ subject, wallet }: BuildLadderProps) => {
 
                 <span className='flex items-center gap-3'>
                   {requirement.promotesTo && (
-                    <span
-                      className='rounded px-2 py-0.5 text-xs font-bold'
-                      style={{
-                        backgroundColor: `${RARITY_STYLES[requirement.promotesTo].baseColor}1f`,
-                        color: RARITY_STYLES[requirement.promotesTo].baseColor,
-                      }}>
+                    <Chip
+                      color='custom'
+                      size='sm'
+                      style={getChipCustomStyle(RARITY_STYLES[requirement.promotesTo].baseColor)}>
                       → {labels.rarity(requirement.promotesTo)}
-                    </span>
+                    </Chip>
                   )}
                   <span className='text-xs text-zinc-500'>
                     {t(`labels.condition.${requirement.condition}`, requirement.condition)}

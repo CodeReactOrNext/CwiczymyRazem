@@ -7,8 +7,18 @@ import { dayMeetsRule } from "feature/dashboard/utils/milestoneWeek";
 
 /** Every milestone chart is this tall, so a row of cards lines up. */
 export const CHART_H = 44;
-const GREEN = "#4ade80";
-const CYAN = "rgb(6,182,212)";
+/** A day that met the goal — the app's success emerald. */
+const MET = "#10b981";
+/** A day with some practice that fell short — neutral, not an accent. */
+const SHORT = "#71717a";
+
+/** The empty track behind a day: brighter for today, fainter for days to come. */
+export const dayTrack = (day: Pick<MilestoneDay, "isToday" | "isFuture">) =>
+  day.isToday
+    ? "rgba(255,255,255,0.07)"
+    : day.isFuture
+      ? "rgba(255,255,255,0.02)"
+      : "rgba(255,255,255,0.035)";
 
 /**
  * What one day says when pointed at. Shared by all four charts so hovering a
@@ -37,17 +47,17 @@ export const milestoneDayTitle = (
 
 /** The weekday axis under a chart: M T W T F S S, today picked out. */
 export const MilestoneDayLabels = ({ days }: { days: MilestoneDay[] }) => (
-  <div className='mt-1 flex gap-1'>
+  <div className='mt-1.5 flex gap-1'>
     {days.map((day) => (
       <span
         key={day.date.toISOString()}
         className={cn(
-          "flex-1 text-center text-xs font-semibold leading-none",
+          "flex-1 text-center text-xs font-medium leading-none",
           day.isToday
-            ? "text-zinc-100"
+            ? "text-zinc-50"
             : day.isFuture
-              ? "text-zinc-400"
-              : "text-zinc-300",
+              ? "text-zinc-600"
+              : "text-zinc-400",
         )}>
         {day.label}
       </span>
@@ -81,36 +91,30 @@ export const MilestoneWeek = ({
   return (
     <div className={cn("w-full", className)}>
       <div className='relative' style={{ height: CHART_H }}>
+        {/* The goal as a faint solid rule, not a dashed border. */}
         <div
           aria-hidden
-          className='pointer-events-none absolute inset-x-0 border-t border-dashed border-white/20'
-          style={{ bottom: goalOffset }}
+          data-goal-line
+          className='pointer-events-none absolute inset-x-0 z-10 h-0.5 rounded-full bg-zinc-400/25'
+          style={{ bottom: goalOffset - 1 }}
         />
         <div className='flex h-full items-end gap-1'>
           {days.map((day) => {
             const met = !day.isFuture && dayMeetsRule(day, rule);
-            const missed = !met && !day.isFuture && !day.isToday;
+            // A day with nothing logged stays an empty track — no red stub.
             const height = day.minutes
               ? Math.max((day.minutes / peak) * CHART_H, 4)
-              : missed
-                ? 2
-                : 0;
-            const color = met
-              ? GREEN
-              : day.minutes > 0
-                ? CYAN
-                : missed
-                  ? "rgba(239,68,68,0.35)"
-                  : "transparent";
+              : 0;
 
             return (
               <div
                 key={day.date.toISOString()}
                 title={milestoneDayTitle(day, rule, met)}
-                className='flex h-full flex-1 items-end rounded-sm bg-white/[0.03]'>
+                className='flex h-full flex-1 items-end rounded'
+                style={{ backgroundColor: dayTrack(day) }}>
                 <div
                   className='w-full rounded-b-sm rounded-t transition-all'
-                  style={{ height, backgroundColor: color }}
+                  style={{ height, backgroundColor: met ? MET : SHORT }}
                 />
               </div>
             );

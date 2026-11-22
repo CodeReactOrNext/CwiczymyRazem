@@ -103,7 +103,7 @@ export const ConditionDelta = ({ from, to }: ConditionDeltaProps) => {
   return (
     <div className='flex items-center gap-3'>
       <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
-        <span className='text-[10px] font-semibold text-zinc-500'>
+        <span className='text-xs font-semibold text-zinc-500'>
           {labels.condition(fromGrade)}
         </span>
         <ConditionMeter condition={from} showLabel={false} dimmed />
@@ -113,7 +113,7 @@ export const ConditionDelta = ({ from, to }: ConditionDeltaProps) => {
 
       <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
         <span
-          className='text-[10px] font-bold'
+          className='text-xs font-bold'
           style={{ color: readableText(toGrade.color) }}>
           {labels.condition(toGrade)}
         </span>

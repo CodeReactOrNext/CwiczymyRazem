@@ -179,12 +179,13 @@ const SingupView = () => {
                 onClick={googleLogInHandler}
                 disabled={isGoogleFetching}
                 variant='outline'
-                className='w-full border-white/5 bg-zinc-900/50 rounded-lg hover:bg-zinc-800 hover:text-white transition-colors h-11 text-zinc-300'>
+                size='lg'
+                className='w-full border-white/5 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white transition-colors text-zinc-300'>
                 <span className='flex items-center justify-center gap-2'>
                   {isGoogleFetching ? (
-                    <Loader2 className='h-5 w-5 animate-spin' />
+                    <Loader2 className='animate-spin' />
                   ) : (
-                    <FcGoogle className='h-5 w-5' />
+                    <FcGoogle />
                   )}
                   {t("signup:google_button")}
                 </span>
@@ -216,7 +217,7 @@ const SingupView = () => {
                           {t("signup:email_label")}
                         </Label>
                         <div className='relative group'>
-                          <Mail className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
+                          <Mail className='pointer-events-none absolute left-3 top-2.5 z-10 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
                           <Input
                             id='email'
                             name='email'
@@ -225,7 +226,7 @@ const SingupView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder='name@example.com'
-                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-base text-white placeholder:text-zinc-500'
+                            className='h-11 pl-10'
                           />
                         </div>
                         {errors.email && touched.email && (
@@ -243,7 +244,7 @@ const SingupView = () => {
                           {t("signup:username_label")}
                         </Label>
                         <div className='relative group'>
-                          <User className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
+                          <User className='pointer-events-none absolute left-3 top-2.5 z-10 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
                           <Input
                             id='login'
                             name='login'
@@ -252,7 +253,7 @@ const SingupView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder={t("signup:username_placeholder")}
-                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-base text-white placeholder:text-zinc-500'
+                            className='h-11 pl-10'
                           />
                         </div>
                         {errors.login && touched.login && (
@@ -272,7 +273,7 @@ const SingupView = () => {
                         </Label>
 
                     <div className='relative group'>
-                      <Lock className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
+                      <Lock className='pointer-events-none absolute left-3 top-2.5 z-10 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
                       <Input
                         id='password'
                         name='password'
@@ -285,7 +286,7 @@ const SingupView = () => {
                           setTypingPassword(false);
                         }}
                         placeholder='••••••••'
-                        className='pl-10 pr-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-base text-white placeholder:text-zinc-500'
+                        className='h-11 pl-10 pr-10'
                       />
                       <button
                         type='button'
@@ -304,9 +305,9 @@ const SingupView = () => {
                     {values.password && (
                         <div className="space-y-1.5 px-0.5">
                             <div className="flex justify-between items-center">
-                                <span className="text-[10px] font-bold text-zinc-400">Security</span>
+                                <span className="text-xs font-bold text-zinc-400">Security</span>
                                 <span className={cn(
-                                    "text-[10px] font-bold",
+                                    "text-xs font-bold",
                                     strength < 50 ? "text-red-400" : strength < 75 ? "text-amber-400" : "text-emerald-400"
                                 )}>
                                     {strength < 50 ? "Weak" : strength < 75 ? "Medium" : "Strong"}
@@ -356,11 +357,11 @@ const SingupView = () => {
                       disabled={isFetching}
                       className='w-full'>
                         {isFetching ? (
-                          <Loader2 className='h-5 w-5 animate-spin' />
+                          <Loader2 className='animate-spin' />
                         ) : (
                           <span className="flex items-center gap-2">
                             {t("signup:submit_button")}
-                            <ChevronRight className="w-4 h-4" />
+                            <ChevronRight />
                           </span>
                         )}
                     </Button>

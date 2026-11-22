@@ -1,11 +1,6 @@
 import { Button } from "assets/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "assets/components/ui/card";
+import { Card } from "assets/components/ui/card";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import {
   helpItems,
   NativeDeviceFields,
@@ -66,11 +61,8 @@ export const AudioInputSettings = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{t("audio_input.title")}</CardTitle>
-        <CardDescription>{t("audio_input.subtitle")}</CardDescription>
-      </CardHeader>
-      <CardContent className='space-y-6'>
+      <SectionHeader title={t("audio_input.title")} description={t("audio_input.subtitle")} />
+      <div className='space-y-6'>
         <div className='flex flex-wrap items-center justify-between gap-x-6 gap-y-4 rounded-lg bg-zinc-900/40 px-4 py-3'>
           <div className='min-w-0'>
             <p className='text-sm font-semibold text-zinc-200'>
@@ -127,7 +119,7 @@ export const AudioInputSettings = () => {
             )}
           </div>
         )}
-      </CardContent>
+      </div>
     </Card>
   );
 };

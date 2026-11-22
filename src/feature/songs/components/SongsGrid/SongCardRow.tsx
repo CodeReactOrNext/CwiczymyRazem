@@ -1,16 +1,16 @@
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { Ripple } from "components/Ripple/Ripple";
 import { SongPartMarks } from "feature/songs/components/SongPartMarks/SongPartMarks";
+import { SongRow, SongThumb } from "feature/songs/components/SongRow/SongRow";
 import { SongCardMenu, STATUS_META } from "feature/songs/components/SongsGrid/SongCardMenu";
+import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import type { Song, SongPart, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { SONG_COVER_STYLE, songCoverLayoutId } from "feature/songs/utils/songCoverLayout";
+import { songCoverLayoutId } from "feature/songs/utils/songCoverLayout";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { m } from "framer-motion";
-import { inkAccent } from "lib/colorTheme/colorTheme";
-import { transitions } from "lib/motion/motion";
 import { useSharedElement } from "lib/motion/useSharedElement";
-import { Music, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -50,80 +50,60 @@ export const SongCardRow = ({
   const { layoutDependency, runAfterSnapshot } = useSharedElement();
 
   return (
-    <div
+    <SongRow
       onClick={() => runAfterSnapshot(onOpenDetails)}
       onContextMenu={(e) => {
         e.preventDefault();
         setIsMenuOpen(true);
       }}
-      className="group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-lg p-2 transition-background click-behavior hover:bg-zinc-800/40 active:bg-zinc-800/60"
-    >
-      <Ripple />
-
-      {/* Thumbnail */}
-      <m.div
-        layoutId={songCoverLayoutId(song.id)}
-        layoutDependency={layoutDependency}
-        transition={transitions.move}
-        style={SONG_COVER_STYLE}
-        className="relative h-14 w-14 shrink-0 overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.25)]">
-        {song.coverUrl ? (
-          <img
-            src={song.coverUrl}
-            alt={`${song.title} cover`}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-zinc-800 text-white/30">
-            <Music className="h-6 w-6" />
-          </div>
-        )}
-        {/* Tier pinned to the cover so it never squeezes the title */}
-        <span
-          className="absolute right-1 top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-[4px] bg-black/70 px-1 text-[10px] font-black leading-none backdrop-blur-sm"
-          style={{ color: inkAccent(tier.color) }}
-        >
-          {tier.tier}
-        </span>
-        {statusMeta && StatusIcon && (
-          <div className="force-dark absolute inset-x-0 bottom-0 flex items-end justify-start bg-gradient-to-t from-black/60 to-transparent p-1">
-            <StatusIcon className={cn("h-3.5 w-3.5 drop-shadow", statusMeta.color)} />
-          </div>
-        )}
-      </m.div>
-
-      {/* Title / artist */}
-      <div className="min-w-0 flex-1">
-        <p translate="no" className="truncate text-[15px] font-bold text-white">
-          {song.title}
-        </p>
-        <div className="flex min-w-0 items-center gap-1.5">
-          <p translate="no" className="min-w-0 truncate text-sm text-zinc-400">
-            {song.artist}
-          </p>
-          {isRated && <Star className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />}
-        </div>
-        {/* Part marks: what of this song the user can already play */}
-        {userStatus && onPartsChange && (
+      className="click-behavior active:bg-zinc-800/80"
+      leading={<Ripple />}
+      cover={
+        <SongThumb
+          coverUrl={song.coverUrl}
+          alt={`${song.title} cover`}
+          layoutId={songCoverLayoutId(song.id)}
+          layoutDependency={layoutDependency}>
+          {/* Tier pinned to the cover so it never squeezes the title */}
+          <TierPick tier={tier} className="absolute right-1 top-1 h-5 w-5" />
+          {statusMeta && StatusIcon && (
+            <span className="force-dark absolute inset-x-0 bottom-0 flex items-end justify-start bg-gradient-to-t from-black/60 to-transparent p-1">
+              <StatusIcon className={cn("h-3.5 w-3.5 drop-shadow", statusMeta.color)} />
+            </span>
+          )}
+        </SongThumb>
+      }
+      title={song.title}
+      artist={
+        <>
+          {song.artist}
+          {isRated && (
+            <Star className="ml-1.5 inline h-3.5 w-3.5 fill-amber-400 align-[-2px] text-amber-400" />
+          )}
+        </>
+      }
+      meta={
+        // Part marks: what of this song the user can already play
+        userStatus && onPartsChange ? (
           <div className="mt-1.5" onClick={(e) => e.stopPropagation()}>
             <SongPartMarks parts={parts ?? []} onChange={onPartsChange} />
           </div>
-        )}
-      </div>
-
-      {/* Actions */}
-      <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
-        <SongCardMenu
-          song={song}
-          userStatus={userStatus}
-          onStatusChange={onStatusChange}
-          onPlay={onPlay}
-          open={isMenuOpen}
-          onOpenChange={setIsMenuOpen}
-          triggerClassName="flex h-9 w-9 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white"
-        />
-      </div>
-    </div>
+        ) : undefined
+      }
+      trailing={
+        <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+          <SongCardMenu
+            song={song}
+            userStatus={userStatus}
+            onStatusChange={onStatusChange}
+            onPlay={onPlay}
+            open={isMenuOpen}
+            onOpenChange={setIsMenuOpen}
+            triggerClassName="text-zinc-400 data-[state=open]:bg-zinc-800 data-[state=open]:text-white"
+          />
+        </div>
+      }
+    />
   );
 };
 
@@ -132,12 +112,12 @@ interface SongRowSkeletonProps {
 }
 
 export const SongRowSkeleton = ({ className }: SongRowSkeletonProps) => (
-  <div className={cn("flex items-center gap-3 p-2", className)}>
-    <div className="h-14 w-14 shrink-0 animate-pulse rounded-md bg-zinc-800/60" />
+  <div className={cn("flex items-center gap-3 rounded-lg bg-zinc-800/40 p-3", className)}>
+    <Skeleton className="h-12 w-12 shrink-0 rounded-lg md:h-14 md:w-14" />
     <div className="min-w-0 flex-1 space-y-2">
-      <div className="h-3.5 w-2/3 animate-pulse rounded-[4px] bg-zinc-800/60" />
-      <div className="h-3 w-1/3 animate-pulse rounded-[4px] bg-zinc-800/60" />
+      <Skeleton className="h-3.5 w-2/3" />
+      <Skeleton className="h-3 w-1/3" />
     </div>
-    <div className="h-8 w-8 shrink-0 animate-pulse rounded-[4px] bg-zinc-800/60" />
+    <Skeleton className="h-8 w-8 shrink-0" />
   </div>
 );

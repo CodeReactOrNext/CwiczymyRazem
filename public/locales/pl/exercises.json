@@ -90,7 +90,9 @@
     "predefined_plans_description": "Plany ćwiczeń przygotowane przez nas",
     "create_plan": "Utwórz plan",
     "create_first": "Utwórz pierwszy plan",
-    "no_custom_plans": "Nie masz jeszcze żadnych własnych planów ćwiczeń"
+    "no_custom_plans": "Nie masz jeszcze żadnych własnych planów ćwiczeń",
+    "update_success": "Plan zapisany",
+    "update_error": "Nie udało się zapisać planu"
   },
   "categories": {
     "technique": "Technika",

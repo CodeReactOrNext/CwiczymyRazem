@@ -1,3 +1,4 @@
+import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
@@ -226,7 +227,7 @@ export const NextUpCard = ({ className }: { className?: string }) => {
   if (!paid && ahead.length === 0) return null;
 
   return (
-    <div className={cn("rounded-lg bg-zinc-900/40 p-7 md:p-8", className)}>
+    <Card className={cn("p-5 sm:p-6", className)}>
       {paid && (
         <div className='mb-9 space-y-4'>
           <div className='flex flex-wrap items-baseline gap-x-3 gap-y-1'>
@@ -240,7 +241,7 @@ export const NextUpCard = ({ className }: { className?: string }) => {
             </span>
           </div>
 
-          <div className='rounded-2xl bg-amber-500/10 p-5'>
+          <div>
             <RewardIcons reward={paid} size={52} />
           </div>
 
@@ -312,6 +313,6 @@ export const NextUpCard = ({ className }: { className?: string }) => {
           </p>
         </div>
       )}
-    </div>
+    </Card>
   );
 };

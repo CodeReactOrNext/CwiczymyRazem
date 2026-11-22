@@ -2,9 +2,9 @@ import { Skeleton } from "assets/components/ui/skeleton";
 
 export const SongCardSkeleton = () => {
   return (
-    <div className="relative flex flex-col overflow-hidden rounded-md p-3">
+    <div className="relative flex flex-col overflow-hidden rounded-lg p-3">
       {/* Cover (mirrors SongCard) */}
-      <Skeleton className="aspect-square w-full rounded-md" />
+      <Skeleton className="aspect-square w-full rounded-lg" />
 
       {/* Info - row heights mirror SongCard exactly to avoid layout shift */}
       <div className="flex flex-col pt-3">

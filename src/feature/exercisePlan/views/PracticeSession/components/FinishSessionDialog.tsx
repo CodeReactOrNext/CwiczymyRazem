@@ -68,7 +68,7 @@ export const FinishSessionDialog = ({
       {/* z-index must beat the session view, overlay included, or this dialog
           opens invisibly behind it. */}
       <DialogContent
-        className='max-w-md bg-zinc-900 text-white sm:p-8 z-[99999999]'
+        className='bg-zinc-900 text-white sm:max-w-md sm:p-8 z-[99999999]'
         overlayClassName='z-[99999998]'>
         <DialogHeader className='space-y-3'>
           <span
@@ -111,12 +111,14 @@ export const FinishSessionDialog = ({
         <DialogFooter className='mt-8 flex flex-col gap-2 sm:flex-row'>
           <Button
             variant='subtle'
-            className='flex-1 text-sm'
+            size='lg'
+            className='flex-1'
             onClick={() => onOpenChange(false)}>
             {t("common:cancel")}
           </Button>
           <Button
-            className='flex-1 text-sm font-bold'
+            size='lg'
+            className='flex-1'
             loading={isLoading}
             disabled={disabled}
             onClick={onConfirm}>

@@ -1,3 +1,4 @@
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
@@ -49,7 +50,7 @@ export const SkillCategoryCard = ({
       initial={{ y: 10, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: index * 0.1 }}
-      className="relative rounded-lg p-0 backdrop-blur-sm transition-background sm:bg-zinc-900/40 sm:p-6 sm:hover:bg-zinc-900/60"
+      className="relative rounded-lg p-0 transition-background sm:bg-zinc-800/40 sm:p-6 sm:hover:bg-zinc-800/60"
     >
       <div className="flex flex-col h-full gap-5">
         {/* Header */}
@@ -57,7 +58,7 @@ export const SkillCategoryCard = ({
           <div className={cn("rounded-lg p-2.5 flex items-center justify-center", getCategoryColors())}>
             <CategoryIcon className="h-5 w-5" />
           </div>
-          <h3 className="text-xs font-bold capitalize tracking-widest text-zinc-100">
+          <h3 className="text-xs font-bold text-zinc-100">
             {t(`skills:categories.${category}` as any)}
           </h3>
         </div>
@@ -75,19 +76,19 @@ export const SkillCategoryCard = ({
                   >
                     <div className="flex items-center gap-2">
                       {skill.icon && <skill.icon className="h-3.5 w-3.5 text-zinc-500 group-hover:text-zinc-300 transition-colors" />}
-                      <span className="text-[11px] capitalize tracking-wider font-semibold text-zinc-400 group-hover:text-zinc-300 transition-colors">
+                      <span className="text-xs font-medium text-zinc-400 group-hover:text-zinc-300 transition-colors">
                         {t(`skills:skills.${skill.id}.name` as any)}
                       </span>
                     </div>
-                    <span className="text-[10px] font-bold text-zinc-400 tabular-nums bg-white/5 px-2 py-0.5 rounded shrink-0">
+                    <Chip color='gray' size='sm' className="shrink-0 tabular-nums">
                       Lvl {level}
-                    </span>
+                    </Chip>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <p className="text-[11px] text-zinc-500 font-semibold tracking-wide flex items-center h-full">
+            <p className="text-xs text-zinc-400 font-medium flex items-center h-full">
               No skills unlocked yet.
             </p>
           )}

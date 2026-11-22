@@ -67,7 +67,7 @@ export const StepDescription: React.FC<{ description: string }> = ({
         return (
           <section key={i} className='flex flex-col gap-3'>
             {section.heading && (
-              <h3 className='flex items-center gap-2 text-xs font-semibold tracking-wide text-zinc-400'>
+              <h3 className='flex items-center gap-2 text-xs font-medium text-zinc-400'>
                 <Icon
                   className={cn("h-3.5 w-3.5", meta?.color ?? "text-zinc-400")}
                 />

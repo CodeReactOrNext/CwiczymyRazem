@@ -133,7 +133,8 @@
     "plain": "Gildia: {{tag}}"
   },
   "cover": {
-    "your_honor": "Twój honor: zdobyty {{earned}} · do wydania na półce {{balance}}"
+    "your_honor": "Twój honor: zdobyty {{earned}} · do wydania na półce {{balance}}",
+    "treasury": "Fame gildii"
   },
   "units": {
     "sessions": "{{value}} sesji",
@@ -1130,5 +1131,12 @@
         "l4": "Pełna pracownia lutnicza"
       }
     }
+  },
+  "toast": {
+    "founded": "Gildia założona",
+    "request_sent": "Prośba wysłana — teraz decyduje założyciel",
+    "deposited": "{{fame}} Fame w skarbcu gildii",
+    "stash_left": "Zostawione na półce",
+    "stash_taken": "Zabrane"
   }
 }

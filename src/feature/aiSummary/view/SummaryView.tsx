@@ -1,6 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { buttonVariants, PRESSABLE } from "assets/components/ui/button";
+import { Button, buttonVariants } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
+import { PAGE_CONTENT, PAGE_GUTTER } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import {
@@ -11,10 +13,10 @@ import {
 } from "feature/aiSummary/services/practiceLevels.service";
 import {
   computeProgressData, currentWeekDates, isoWeekKey, isSameDay,
-  LEVEL_COLORS, LEVELS, localDateStr, milestoneLockedAtLvl, MS_15,
+  LEVELS, localDateStr, milestoneLockedAtLvl, MS_15,
   PRACTICE_CATEGORIES,
 } from "feature/aiSummary/utils/milestoneLogic";
-import { MilestoneNode } from "feature/dashboard/components/widgets/MilestoneNode";
+import { MILESTONE_GREEN, MilestoneNode } from "feature/dashboard/components/widgets/MilestoneNode";
 import { practiceLevelsQueryKey } from "feature/dashboard/hooks/useMilestoneProgress";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
@@ -32,7 +34,7 @@ import { Interpolate } from "lib/i18n/Interpolate";
 import type { Translate } from "lib/i18n/translate";
 import {
   Check, CheckCircle2, ChevronLeft, ChevronRight, Info,
-  Lock, Sparkles, TrendingUp, Trophy, X,
+  Lock, TrendingUp, Trophy, X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -48,6 +50,20 @@ function fmtMin(min: number) {
   const rem = min % 60;
   return rem > 0 ? `${h}h ${rem} min` : `${h}h`;
 }
+
+// Day colours for the week charts. Colour only where it means something:
+// emerald = the day counted, orange = a running streak (as everywhere else in
+// the app), a lighter track = the day being looked at. Tiers have no colour.
+const SHORT_DAY   = "#71717a";                 // practised, but short of the goal
+const STREAK      = "#fb923c";                 // orange-400
+const STREAK_TINT = "rgba(249,115,22,0.16)";
+const FULL_DAY    = "rgba(255,255,255,0.09)";  // all four categories covered
+
+const dayTile = (shown: boolean, future: boolean) =>
+  shown ? "rgba(255,255,255,0.07)" : future ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.035)";
+
+const dayLabel = (shown: boolean, future: boolean) =>
+  shown ? "#fafafa" : future ? "#52525b" : "#a1a1aa";
 
 /** Level names and goals are catalogued by id in `milestones:levels`. */
 const levelName = (t: Translate, level: { id: number; name: string }) =>
@@ -114,21 +130,22 @@ function PracticeProgressTracker({
     container.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
   }, [activeIdx]);
 
-  const GREEN = "#22c55e";     // "reached" colour, shared by discs, trail and labels
+  const GREEN = MILESTONE_GREEN; // "reached" emerald, shared by discs, trail and bars
   const NODE = 56;             // node diameter
   const CENTER = NODE / 2;     // vertical centre → trail height
 
   return (
-    <div className="flex w-full flex-col gap-7 rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm px-4 pb-6 pt-2 sm:px-6 sm:pb-7 sm:pt-3">
+    <div className="flex w-full flex-col gap-4 rounded-lg bg-zinc-800/40 px-4 pb-6 pt-2 sm:px-6 sm:pb-7 sm:pt-3">
       {/* arrows flank the strip like a carousel, aligned to the node centres */}
       <div className="flex items-start gap-1 sm:gap-2">
         <button
+          type="button"
           onClick={() => onPreviewChange(Math.max(0, activeIdx - 1))}
           disabled={activeIdx === 0}
           aria-label={t("page.prev_level")}
-          className="mt-[50px] flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
+          className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "mt-[50px] shrink-0 text-zinc-400 disabled:opacity-25")}
         >
-          <ChevronLeft size={20} strokeWidth={2.5} />
+          <ChevronLeft strokeWidth={2.5} />
         </button>
 
         {/* milestone nodes */}
@@ -145,7 +162,6 @@ function PracticeProgressTracker({
           // padlock, not two stories — the card below tells them apart.
           const lockedLvl   = milestoneLockedAtLvl(level, playerLvl, isOwned);
           const showLock    = !isOwned && (level.cost > 0 || lockedLvl != null);
-          const baseColor   = LEVEL_COLORS[level.id - 1];
           const prevMet     = idx > 0 && levelStatuses[idx - 1].met;
 
           return (
@@ -155,7 +171,7 @@ function PracticeProgressTracker({
               type="button"
               onClick={() => onPreviewChange(idx)}
               aria-label={`${levelName(t, level)} — ${level.met ? t("page.reached_lc") : showLock ? t("page.locked_lc") : t("page.in_progress_lc")}`}
-              className="group relative flex w-[80px] shrink-0 snap-center flex-col items-center gap-3 outline-none sm:w-auto sm:flex-1 sm:min-w-0"
+              className="group relative flex w-[80px] shrink-0 snap-center flex-col items-center gap-3 outline-none sm:w-auto sm:flex-1 sm:min-w-0 rounded-lg focus-visible:ring-1 focus-visible:ring-zinc-400"
             >
               {/* trail segment linking this node to the previous one */}
               {idx > 0 && (
@@ -189,7 +205,6 @@ function PracticeProgressTracker({
                     claimed: isClaimed,
                     cost: level.cost,
                     lockedAtLvl: lockedLvl ?? null,
-                    color: baseColor,
                     Icon: level.Icon,
                     progress: level.progress,
                   }}
@@ -213,37 +228,21 @@ function PracticeProgressTracker({
         </div>
 
         <button
+          type="button"
           onClick={() => onPreviewChange(Math.min(LEVELS.length - 1, activeIdx + 1))}
           disabled={activeIdx === LEVELS.length - 1}
           aria-label={t("page.next_level")}
-          className="mt-[50px] flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100 active:scale-95 disabled:opacity-25 disabled:cursor-not-allowed"
+          className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "mt-[50px] shrink-0 text-zinc-400 disabled:opacity-25")}
         >
-          <ChevronRight size={20} strokeWidth={2.5} />
+          <ChevronRight strokeWidth={2.5} />
         </button>
       </div>
 
-      {/* legend */}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-        <span className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
-          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: GREEN }} />
-          {t("page.reached")}
-        </span>
-        <span className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
-          <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
-          {t("page.reward_ready")}
-        </span>
-        <span className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
-          <span className="h-2.5 w-2.5 rounded-full border-2 bg-transparent" style={{ borderColor: GREEN }} />
-          {t("page.current_goal")}
-        </span>
-        <span className="flex items-center gap-1.5 text-xs font-medium text-zinc-400">
-          <Lock size={11} className="text-zinc-500" />
-          {t("page.locked")}
-        </span>
-        <span className="ml-auto text-xs font-semibold tabular-nums text-zinc-400">
-          {t("page.reached_of", { done: metCount, total: LEVELS.length })}
-        </span>
-      </div>
+      {/* The keys read on their own (tick, gift, ring, padlock), so a legend
+          only repeated them — the count is the one thing they don't say. */}
+      <p className="text-right text-sm font-medium tabular-nums text-zinc-400">
+        {t("page.reached_of", { done: metCount, total: LEVELS.length })}
+      </p>
     </div>
   );
 }
@@ -304,14 +303,13 @@ function LevelGoalCard({
 
   if (!nextLevel) {
     return (
-      <div className="flex items-center gap-3 rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm px-5 py-4">
+      <div className="flex items-center gap-3 rounded-lg bg-zinc-800/40 px-5 py-4">
         <Trophy size={20} className="text-amber-400" />
         <p className="text-sm font-semibold text-zinc-200">{t("page.all_unlocked")}</p>
       </div>
     );
   }
 
-  const color          = LEVEL_COLORS[nextLevel.id - 1];
   const { value, max } = nextLevel.progress;
 
   const levelType =
@@ -388,7 +386,7 @@ function LevelGoalCard({
           <Lock size={18} />
           <span>{t("page.unlocks_at", { lvl: lockedLvl })}</span>
         </div>
-        <p className="text-center text-[12px] leading-snug text-zinc-500">
+        <p className="text-center text-xs leading-snug text-zinc-500">
           {nextLevel.cost > 0
             ? t("page.you_are_level_cost", { lvl: playerLvl, cost: nextLevel.cost })
             : t("page.you_are_level", { lvl: playerLvl })}
@@ -397,20 +395,16 @@ function LevelGoalCard({
     );
   } else if (isLocked) {
     actionButton = (
-      <button
+      <Button
+        size="xl"
         onClick={() => onPurchase(nextLevel.id)}
         disabled={busy || !canAfford}
         className={cn(
-          PRESSABLE,
-          btnBase,
-          "transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300",
-          canAfford
-            ? "border-b-zinc-800 bg-zinc-700 text-zinc-50 hover:bg-zinc-600"
-            : "cursor-not-allowed border-b-zinc-900 bg-zinc-800 text-zinc-500",
-          "disabled:opacity-60",
+          "w-full sm:w-auto",
+          !canAfford && "border-b-zinc-900 bg-zinc-800 text-zinc-500",
         )}
       >
-        <Lock size={18} />
+        <Lock />
         <span>{t("page.unlock_once")}</span>
         <img src="/images/tokens/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
         <span className="tabular-nums">{nextLevel.cost}</span>
@@ -419,33 +413,28 @@ function LevelGoalCard({
             {t("page.need_more", { count: nextLevel.cost - fame })}
           </span>
         )}
-      </button>
+      </Button>
     );
   } else if (canClaim) {
-    // goal reached → reward unlocked, claimable
+    // goal reached → reward unlocked, claimable. Amber like every Fame claim
+    // (the Home card's included): the colour says "reward", not "done".
     actionButton = (
-      <button
+      <Button
+        size="xl"
         onClick={() => onClaim(nextLevel.id)}
         disabled={busy}
-        className={cn(
-          PRESSABLE,
-          btnBase,
-          "border-b-green-700 bg-green-500 text-green-950 transition-colors duration-fast hover:bg-green-400",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900",
-          "disabled:opacity-50",
-        )}
+        className="w-full border-b-amber-700 bg-amber-500 text-amber-950 hover:bg-amber-400 focus-visible:ring-amber-300 sm:w-auto"
       >
-        <Sparkles size={18} />
         <span>{t("page.claim_reward")}</span>
         <img src="/images/tokens/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
         <span className="tabular-nums">+{nextLevel.reward}</span>
-      </button>
+      </Button>
     );
   } else if (isOwned && isClaimedThisWeek) {
     // nothing left to do this week — a quiet status line, not a fake button
     actionButton = (
-      <p className="flex items-center gap-2 text-[13px] text-zinc-500">
-        <CheckCircle2 size={15} className="shrink-0 text-emerald-500" />
+      <p className="flex items-center gap-2 text-sm text-zinc-400">
+        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
         <span>
           <Interpolate
             text={t("page.claimed_line")}
@@ -463,8 +452,8 @@ function LevelGoalCard({
   } else if (isOwned && !isMet) {
     // reward preview stays plain text; it only becomes a button once claimable
     actionButton = (
-      <p className="flex items-center gap-2 text-[13px] text-zinc-500">
-        <img src="/images/tokens/coin.png" alt="Fame" className="h-4 w-4 shrink-0 object-contain" />
+      <p className="flex items-center gap-2 text-sm text-zinc-400">
+        <img src="/images/tokens/coin.png" alt="Fame" className="h-[18px] w-[18px] shrink-0 object-contain" />
         <span>
           <Interpolate
             text={t("page.reward_line")}
@@ -481,62 +470,46 @@ function LevelGoalCard({
     );
   }
 
-  // Goal statement — plain typography, deliberately not a box so it can't be
-  // mistaken for a button. The claim button is the only button-shaped thing here.
-  const goalAccent = isMet ? "#22c55e" : color;
-  const goalBox = (
-    <div className="flex w-full items-start gap-3 text-left">
-      <div
-        className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all"
-        style={{
-          backgroundColor: isMet ? goalAccent : "transparent",
-          border: isMet ? undefined : "2px solid #52525b",
-        }}
-      >
-        {isMet && <Check size={15} strokeWidth={3.5} className="text-zinc-950" />}
-      </div>
-      <div className="min-w-0 flex-1 leading-tight">
-        <p className="text-xs font-medium" style={{ color: isMet ? goalAccent : "#a1a1aa" }}>
-          {isMet ? t("page.goal_complete") : t("page.goal_this_week")}
-        </p>
-        <p className="mt-0.5 text-lg font-bold leading-snug text-zinc-50">
-          {t(`levels.${nextLevel.id}.req`, nextLevel.req)}
-        </p>
-      </div>
-    </div>
-  );
+  // The same key the strip and the Home card draw, so a tier looks like one
+  // thing wherever it shows up; the goal itself is the headline next to it.
+  const isCurrent = !isMet && !isLocked;
+  const percent   = Math.min(1, max > 0 ? value / max : 0) * 100;
 
   return (
-    <div className="rounded-lg bg-zinc-800/40 backdrop-blur-sm shadow-sm p-5 sm:p-7 space-y-6">
-      <div className="flex items-center gap-3">
-        <div
-          className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
-          style={{ backgroundColor: `${color}18`, color }}
-        >
-          <nextLevel.Icon size={20} />
-          {isLocked && (
-            <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-zinc-900 flex items-center justify-center">
-              <Lock size={9} className="text-zinc-500" />
-            </div>
-          )}
-        </div>
+    <div className="rounded-lg bg-zinc-800/40 p-5 sm:p-7 space-y-6">
+      <div className="flex items-center gap-4">
+        <MilestoneNode
+          status={{
+            met: isMet,
+            owned: isOwned,
+            claimed: isClaimedThisWeek,
+            cost: nextLevel.cost,
+            lockedAtLvl: lockedLvl ?? null,
+            Icon: nextLevel.Icon,
+            progress: nextLevel.progress,
+          }}
+          isCurrent={isCurrent}
+        />
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-bold text-zinc-100 leading-tight">
-              {levelName(t, nextLevel)}
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-medium text-zinc-400">
+              {levelName(t, nextLevel)} · {isMet ? t("page.goal_complete") : t("page.goal_this_week")}
             </p>
             {isOwned && isClaimedThisWeek && (
-              <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-bold text-emerald-400">
+              <Chip color='emerald' size='sm'>
                 {t("card.claimed")}
-              </span>
+              </Chip>
             )}
             {isOwned && !isClaimedThisWeek && isMet && (
-              <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-bold text-amber-400">
+              <Chip color='amber' size='sm'>
                 {t("page.claim")}
-              </span>
+              </Chip>
             )}
           </div>
+          <h2 className="mt-1 text-lg font-semibold leading-snug text-zinc-50 sm:text-xl">
+            {t(`levels.${nextLevel.id}.req`, nextLevel.req)}
+          </h2>
         </div>
 
         <div className="text-right shrink-0">
@@ -548,50 +521,48 @@ function LevelGoalCard({
                   {t("page.cost_once", { cost: nextLevel.cost })}
                 </span>
               </p>
-              <p className="mt-0.5 flex items-center justify-end gap-1 font-black leading-none text-amber-400">
+              <p className="mt-1 flex items-center justify-end gap-1 leading-none text-amber-400">
                 <img src="/images/tokens/coin.png" alt="Fame" className="h-5 w-5 object-contain" />
-                <span className="text-2xl tabular-nums">+{nextLevel.reward}</span>
+                <span className="font-teko text-3xl font-semibold tabular-nums">+{nextLevel.reward}</span>
                 <span className="text-sm text-zinc-500">{t("page.per_week")}</span>
               </p>
             </>
           ) : (
-            <>
-              <p className="tabular-nums leading-none font-black" style={{ color }}>
-                <span className="text-3xl">{value}</span>
-                <span className="text-lg text-zinc-500">/{max}</span>
-              </p>
-            </>
+            // Big numbers are Teko across the game (duels, bosses, ranks).
+            <p className="font-teko font-semibold leading-[0.8] tabular-nums">
+              <span className="text-5xl text-zinc-50">{value}</span>
+              <span className="text-3xl text-zinc-500">/{max}</span>
+            </p>
           )}
         </div>
       </div>
 
-      {/* Goal + reward surfaced right under the header so the claim is impossible
-          to miss — the chart below is supporting detail, not the call-to-action. */}
+      {/* Reward surfaced right under the header so the claim is impossible to
+          miss — the chart below is supporting detail, not the call-to-action. */}
       {!isLocked && (
-        <div className="space-y-4">
-          {goalBox}
+        <div className="space-y-4 sm:pl-[72px]">
           {/* the week as one thick bar — the number in the corner, made visible */}
           <div
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={max}
             aria-valuenow={value}
-            className="relative ml-10 h-3 overflow-hidden rounded-full bg-zinc-800"
+            className="relative h-3 overflow-hidden rounded-full bg-zinc-800"
           >
             <div
-              className="absolute inset-y-0 left-0 rounded-full bg-green-500 transition-[width] duration-slow ease-out"
-              style={{ width: `${Math.min(1, max > 0 ? value / max : 0) * 100}%` }}
+              className="absolute inset-y-0 left-0 rounded-full bg-emerald-500 transition-[width] duration-slow ease-out"
+              style={{ width: `${percent}%` }}
             />
             {value > 0 && (
               <div
                 aria-hidden
                 className="light-hide absolute left-1.5 top-[3px] h-[3px] rounded-full bg-white/30"
-                style={{ width: `calc(${Math.min(1, max > 0 ? value / max : 0) * 100}% - 12px)` }}
+                style={{ width: `calc(${percent}% - 12px)` }}
               />
             )}
           </div>
           {actionButton && (
-            <div className="[&>button]:w-full [&>p]:pl-10">
+            <div className="[&>button]:w-full">
               {actionButton}
             </div>
           )}
@@ -602,48 +573,29 @@ function LevelGoalCard({
       {!isLocked && levelType === "week-bars" && (() => {
         const maxMin     = Math.max(dayGoalMin * 2, ...dayBars.map(d => d.minutes));
         const CHART_H    = 160;          // bar track height
-        const LABEL_AREA = 52;           // status mark + weekday below
-        const VALUE_H    = 22;           // minutes value above bar
+        const LABEL_AREA = 40;           // weekday + today's dot below
+        const VALUE_H    = 24;           // minutes value above bar
         const GOAL_PX    = (dayGoalMin / maxMin) * CHART_H;
-        const GREEN      = "#4ade80";
-        const CYAN       = "rgb(6,182,212)";
         return (
           <div className="pt-2">
             <div className="relative">
-            {/* 15-min goal line */}
+            {/* the daily goal — a faint solid rule, labelled at its end */}
             <div
-              className="pointer-events-none absolute left-0 right-0 z-10 flex items-end"
-              style={{ bottom: `${LABEL_AREA + GOAL_PX}px` }}
+              className="pointer-events-none absolute inset-x-0 z-10"
+              style={{ bottom: `${LABEL_AREA + GOAL_PX - 1}px` }}
             >
-              <div className="flex-1 border-t border-dashed border-white/25" />
-              <span className="-mb-2 ml-2 rounded bg-zinc-900/70 px-1.5 py-0.5 text-[11px] font-semibold text-white/45">
+              <div className="h-0.5 rounded-full bg-zinc-400/25" />
+              <span className="absolute bottom-1.5 right-0 text-xs font-medium text-zinc-400">
                 {t("page.min_goal", { min: dayGoalMin })}
               </span>
             </div>
             <div className="flex items-end gap-1.5 sm:gap-2.5">
               {dayBars.map((entry, i) => {
                 const day      = weekDays[i];
-                const isMissed = !entry.ok && !entry.isFuture && !entry.isToday;
+                // Nothing logged stays an empty track — no red stub, no cross.
                 const heightPx = entry.minutes > 0
                   ? Math.max((entry.minutes / maxMin) * CHART_H, 6)
-                  : isMissed ? 3 : 0;
-                const barColor = entry.ok
-                  ? GREEN
-                  : entry.minutes > 0
-                  ? CYAN
-                  : isMissed
-                  ? "rgba(239,68,68,0.45)"
-                  : "rgba(255,255,255,0.06)";
-                const valueColor = entry.ok ? GREEN : entry.minutes > 0 ? CYAN : "transparent";
-                const labelColor = entry.isSelected
-                  ? "#fafafa"
-                  : entry.ok
-                  ? GREEN
-                  : entry.isToday
-                  ? "#e4e4e7"
-                  : entry.isFuture
-                  ? "#3f3f46"
-                  : "#a1a1aa";
+                  : 0;
                 return (
                   <button
                     key={i}
@@ -651,66 +603,55 @@ function LevelGoalCard({
                     onMouseEnter={() => onPeekDay(day)}
                     onMouseLeave={() => onPeekDay(null)}
                     onClick={() => onSelectDay(day)}
-                    className="group flex flex-1 flex-col items-center justify-end cursor-pointer select-none touch-manipulation outline-none"
+                    className="group flex flex-1 flex-col items-center justify-end cursor-pointer select-none touch-manipulation outline-none rounded-lg focus-visible:ring-1 focus-visible:ring-zinc-400"
                   >
-                    {/* minutes value above the bar */}
+                    {/* minutes above the bar — the unit lives on the goal line */}
                     <span
-                      className="text-xs sm:text-sm font-bold tabular-nums leading-none"
-                      style={{ height: VALUE_H, color: valueColor }}
+                      className="text-xs sm:text-sm font-semibold tabular-nums leading-none"
+                      style={{ height: VALUE_H, color: entry.ok ? "#34d399" : "#a1a1aa" }}
                     >
-                      {entry.minutes > 0 ? fmtMin(entry.minutes) : ""}
+                      {entry.minutes > 0 ? entry.minutes : ""}
                     </span>
-                    {/* bar + track */}
+                    {/* bar + track; the picked day is a lighter track, not an outline */}
                     <div
-                      className="flex w-full max-w-[56px] items-end justify-center rounded-lg"
-                      style={{
-                        height: CHART_H,
-                        backgroundColor: "rgba(255,255,255,0.03)",
-                        outline: entry.isSelected ? `2px solid ${entry.ok ? GREEN : CYAN}` : undefined,
-                        outlineOffset: "2px",
-                      }}
+                      className="flex w-full max-w-[56px] items-end justify-center rounded-lg transition-colors"
+                      style={{ height: CHART_H, backgroundColor: dayTile(entry.isSelected, entry.isFuture) }}
                     >
                       <div
-                        className="w-full rounded-b rounded-t-lg transition-[height,filter] duration-slow ease-out group-hover:brightness-125"
+                        className="w-full rounded-b rounded-t-md transition-[height,filter] duration-slow ease-out group-hover:brightness-125"
                         style={{
                           height: heightPx,
-                          backgroundColor: barColor,
+                          backgroundColor: entry.ok ? MILESTONE_GREEN : SHORT_DAY,
                         }}
                       />
                     </div>
-                    {/* status mark + weekday */}
-                    <div className="flex flex-col items-center gap-0.5 pt-2" style={{ height: LABEL_AREA }}>
-                      <span className="flex h-5 items-center">
-                        {entry.ok ? (
-                          <CheckCircle2 size={18} style={{ color: GREEN }} />
-                        ) : isMissed ? (
-                          <X size={16} className="text-red-500/60" />
-                        ) : null}
-                      </span>
-                      <span className="text-xs sm:text-sm font-bold transition-colors" style={{ color: labelColor }}>
+                    {/* weekday, today dotted */}
+                    <div className="flex flex-col items-center gap-1.5 pt-2.5" style={{ height: LABEL_AREA }}>
+                      <span
+                        className="text-xs sm:text-sm font-medium leading-none transition-colors"
+                        style={{ color: dayLabel(entry.isSelected, entry.isFuture) }}
+                      >
                         <span className="sm:hidden">{day.toLocaleDateString(intl, { weekday: "narrow" })}</span>
                         <span className="hidden sm:inline">{entry.label}</span>
                       </span>
+                      {entry.isToday && <span aria-hidden className="h-1 w-1 rounded-full bg-zinc-50" />}
                     </div>
                   </button>
                 );
               })}
             </div>
             </div>
-            <p className="mt-5 flex items-center gap-1.5 text-xs leading-snug text-zinc-400">
-              <CheckCircle2 size={12} style={{ color: GREEN }} className="shrink-0" />
-              <span>
-                <Interpolate
-                  text={t("page.bars_hint")}
-                  values={{
-                    min: (
-                      <span className="font-semibold text-zinc-300">
-                        {t("page.min_plus", { min: dayGoalMin })}
-                      </span>
-                    ),
-                  }}
-                />
-              </span>
+            <p className="mt-5 text-xs leading-snug text-zinc-400">
+              <Interpolate
+                text={t("page.bars_hint")}
+                values={{
+                  min: (
+                    <span className="font-semibold text-zinc-300">
+                      {t("page.min_plus", { min: dayGoalMin })}
+                    </span>
+                  ),
+                }}
+              />
             </p>
           </div>
         );
@@ -736,61 +677,53 @@ function LevelGoalCard({
                   onMouseEnter={() => onPeekDay(day)}
                   onMouseLeave={() => onPeekDay(null)}
                   onClick={() => onSelectDay(day)}
-                  className="group flex flex-1 flex-col items-center gap-2 cursor-pointer select-none touch-manipulation outline-none"
+                  className="group flex flex-1 flex-col items-center gap-2 cursor-pointer select-none touch-manipulation outline-none rounded-lg focus-visible:ring-1 focus-visible:ring-zinc-400"
                 >
                   <div
-                    className="relative flex w-full h-28 flex-col items-center justify-center gap-1 rounded-lg transition-[filter] group-hover:brightness-125"
-                    style={{
-                      backgroundColor: inStreak ? `${color}30` : "#18181b",
-                      boxShadow: isToday && !inStreak ? "inset 0 0 0 2px #3f3f46" : undefined,
-                      outline: isShown ? `2px solid ${color}` : undefined,
-                      outlineOffset: 2,
-                    }}
+                    className="relative flex w-full h-28 flex-col items-center justify-center gap-1 rounded-lg transition-[filter,background-color] group-hover:brightness-125"
+                    style={{ backgroundColor: inStreak ? STREAK_TINT : dayTile(isShown, isFuture) }}
                   >
                     {/* the run carries on tomorrow — bridge the gap so it reads as one streak */}
                     {inStreak && i < 6 && streakKeys.has(localDateStr(weekDays[i + 1])) && (
                       <span
                         aria-hidden
                         className="absolute left-full top-1/2 h-5 w-1.5 -translate-y-1/2 sm:w-2"
-                        style={{ backgroundColor: `${color}30` }}
+                        style={{ backgroundColor: STREAK_TINT }}
                       />
                     )}
+                    {/* a missed day stays empty — the gap in the tint is the break */}
                     {met ? (
                       <>
-                        <CheckCircle2 size={28} style={{ color: inStreak ? color : "#71717a" }} />
-                        <span className="text-sm font-bold tabular-nums" style={{ color: inStreak ? color : "#a1a1aa" }}>
+                        <Check size={28} strokeWidth={3} style={{ color: inStreak ? STREAK : "#a1a1aa" }} />
+                        <span className="text-sm font-semibold tabular-nums" style={{ color: inStreak ? STREAK : "#a1a1aa" }}>
                           {fmtMin(minutes)}
                         </span>
                       </>
                     ) : minutes > 0 ? (
-                      <span className="text-base font-bold tabular-nums text-zinc-300">{fmtMin(minutes)}</span>
-                    ) : isFuture ? (
-                      <span className="text-zinc-700 text-xl leading-none">·</span>
-                    ) : (
-                      <X size={24} className="text-zinc-600" />
-                    )}
+                      <span className="text-base font-semibold tabular-nums text-zinc-300">{fmtMin(minutes)}</span>
+                    ) : null}
                   </div>
-                  <span className="text-sm font-bold transition-colors" style={{ color: isShown ? color : "#a1a1aa" }}>
-                    {day.toLocaleDateString(intl, { weekday: "narrow" })}
+                  <span className="flex flex-col items-center gap-1.5">
+                    <span className="text-sm font-medium leading-none transition-colors" style={{ color: dayLabel(isShown, isFuture) }}>
+                      {day.toLocaleDateString(intl, { weekday: "narrow" })}
+                    </span>
+                    {isToday && <span aria-hidden className="h-1 w-1 rounded-full bg-zinc-50" />}
                   </span>
                 </button>
               );
             })}
           </div>
-          <p className="flex items-center gap-1.5 text-xs leading-snug text-zinc-400">
-            <CheckCircle2 size={11} style={{ color }} className="shrink-0" />
-            <span>
-              <Interpolate
-                text={t("page.streak_hint")}
-                values={{
-                  rule: (
-                    <span className="font-semibold text-zinc-300">
-                      {t("page.streak_rule")}
-                    </span>
-                  ),
-                }}
-              />
-            </span>
+          <p className="text-xs leading-snug text-zinc-400">
+            <Interpolate
+              text={t("page.streak_hint")}
+              values={{
+                rule: (
+                  <span className="font-semibold text-zinc-300">
+                    {t("page.streak_rule")}
+                  </span>
+                ),
+              }}
+            />
           </p>
         </div>
       )}
@@ -805,7 +738,9 @@ function LevelGoalCard({
               const met      = CATS.map(c => (stats?.[c.k] ?? 0) >= MS_15);
               const metCount = met.filter(Boolean).length;
               const allMet   = metCount === CATS.length;
+              const isToday  = isSameDay(day, today);
               const isShown  = isSameDay(day, displayDate);
+              const isFuture = day.getTime() > today.getTime();
               return (
                 <button
                   key={i}
@@ -813,54 +748,56 @@ function LevelGoalCard({
                   onMouseEnter={() => onPeekDay(day)}
                   onMouseLeave={() => onPeekDay(null)}
                   onClick={() => onSelectDay(day)}
-                  className="group flex-1 min-w-0 flex flex-col items-center justify-center gap-2 sm:gap-2.5 rounded-lg py-3 px-0.5 sm:py-4 sm:px-1 cursor-pointer select-none touch-manipulation transition-[filter] hover:brightness-125 focus-visible:ring-2 focus-visible:ring-zinc-300"
-                  style={{
-                    minHeight: 112,
-                    backgroundColor: allMet ? `${color}24` : "#18181b",
-                    outline: isShown ? `2px solid ${color}` : undefined,
-                    outlineOffset: 2,
-                  }}
+                  className="group flex flex-1 min-w-0 flex-col items-center gap-2 cursor-pointer select-none touch-manipulation outline-none rounded-lg focus-visible:ring-1 focus-visible:ring-zinc-400"
                 >
-                  {/* one dot per category — lit when that category hit 15+ min */}
-                  <div className="grid grid-cols-2 gap-1 sm:gap-1.5">
-                    {CATS.map((cat, ci) => (
-                      <div
-                        key={cat.k}
-                        title={`${catLabel(cat)}${met[ci] ? " ✓" : ""}`}
-                        className="h-3 w-3 sm:h-4 sm:w-4 rounded-full transition-all"
-                        style={{
-                          backgroundColor: met[ci] ? cat.color : "#3f3f46",
-                        }}
-                      />
-                    ))}
+                  <div
+                    className="flex w-full flex-col items-center justify-center gap-2 sm:gap-2.5 rounded-lg py-3 px-0.5 sm:py-4 sm:px-1 transition-[filter,background-color] group-hover:brightness-125"
+                    style={{
+                      minHeight: 112,
+                      backgroundColor: allMet ? FULL_DAY : dayTile(isShown, isFuture),
+                    }}
+                  >
+                    {/* one dot per category — lit when that category hit 15+ min */}
+                    <div className="grid grid-cols-2 gap-1 sm:gap-1.5">
+                      {CATS.map((cat, ci) => (
+                        <div
+                          key={cat.k}
+                          title={`${catLabel(cat)}${met[ci] ? " ✓" : ""}`}
+                          className="h-3 w-3 sm:h-4 sm:w-4 rounded-full transition-all"
+                          style={{
+                            backgroundColor: met[ci] ? cat.color : "#3f3f46",
+                          }}
+                        />
+                      ))}
+                    </div>
+                    {/* clear status: full check or n/4 */}
+                    {allMet ? (
+                      <Check size={20} strokeWidth={3} style={{ color: MILESTONE_GREEN }} />
+                    ) : (
+                      <span className="text-sm font-semibold tabular-nums text-zinc-400">{metCount}/4</span>
+                    )}
                   </div>
-                  {/* clear status: full check or n/4 */}
-                  {allMet ? (
-                    <CheckCircle2 size={20} style={{ color }} />
-                  ) : (
-                    <span className="text-sm font-bold tabular-nums text-zinc-400">{metCount}/4</span>
-                  )}
-                  <span className="text-sm font-bold" style={{ color: isShown || allMet ? color : "#a1a1aa" }}>
-                    {day.toLocaleDateString(intl, { weekday: "narrow" })}
+                  <span className="flex flex-col items-center gap-1.5">
+                    <span className="text-sm font-medium leading-none transition-colors" style={{ color: dayLabel(isShown, isFuture) }}>
+                      {day.toLocaleDateString(intl, { weekday: "narrow" })}
+                    </span>
+                    {isToday && <span aria-hidden className="h-1 w-1 rounded-full bg-zinc-50" />}
                   </span>
                 </button>
               );
             })}
           </div>
-          <p className="flex items-center gap-1.5 text-xs leading-snug text-zinc-400">
-            <CheckCircle2 size={11} style={{ color }} className="shrink-0" />
-            <span>
-              <Interpolate
-                text={t("page.cats_hint")}
-                values={{
-                  rule: (
-                    <span className="font-semibold text-zinc-300">
-                      {t("page.cats_rule")}
-                    </span>
-                  ),
-                }}
-              />
-            </span>
+          <p className="text-xs leading-snug text-zinc-400">
+            <Interpolate
+              text={t("page.cats_hint")}
+              values={{
+                rule: (
+                  <span className="font-semibold text-zinc-300">
+                    {t("page.cats_rule")}
+                  </span>
+                ),
+              }}
+            />
           </p>
           <div className="flex gap-3 flex-wrap">
             {CATS.map(cat => (
@@ -883,6 +820,7 @@ function LevelGoalCard({
               const inStreak = streakKeys.has(key);
               const isToday  = isSameDay(day, today);
               const isShown  = isSameDay(day, displayDate);
+              const isFuture = day.getTime() > today.getTime();
               const metCount = CATS.filter(c => (stats?.[c.k] ?? 0) >= MS_15).length;
               const allMet   = metCount === CATS.length;
               return (
@@ -892,31 +830,28 @@ function LevelGoalCard({
                   onMouseEnter={() => onPeekDay(day)}
                   onMouseLeave={() => onPeekDay(null)}
                   onClick={() => onSelectDay(day)}
-                  className="group flex flex-1 min-w-0 flex-col items-center gap-2 cursor-pointer select-none touch-manipulation outline-none"
+                  className="group flex flex-1 min-w-0 flex-col items-center gap-2 cursor-pointer select-none touch-manipulation outline-none rounded-lg focus-visible:ring-1 focus-visible:ring-zinc-400"
                 >
                   <div
-                    className="relative flex w-full flex-col rounded-lg p-1.5 sm:p-2.5 transition-[filter] group-hover:brightness-125"
+                    className="relative flex w-full flex-col rounded-lg p-1.5 sm:p-2.5 transition-[filter,background-color] group-hover:brightness-125"
                     style={{
                       minHeight: 128,
-                      backgroundColor: allMet ? `${color}26` : inStreak ? `${color}18` : "#18181b",
-                      boxShadow: isToday && !inStreak ? "inset 0 0 0 2px #3f3f46" : undefined,
-                      outline: isShown ? `2px solid ${color}` : undefined,
-                      outlineOffset: 2,
+                      backgroundColor: inStreak ? STREAK_TINT : allMet ? FULL_DAY : dayTile(isShown, isFuture),
                     }}
                   >
                     {inStreak && i < 6 && streakKeys.has(localDateStr(weekDays[i + 1])) && (
                       <span
                         aria-hidden
                         className="absolute left-full top-1/2 h-5 w-1.5 -translate-y-1/2 sm:w-2"
-                        style={{ backgroundColor: `${color}18` }}
+                        style={{ backgroundColor: STREAK_TINT }}
                       />
                     )}
                     {/* status: full check or how many of 4 categories done */}
                     <div className="flex h-6 items-center justify-center mb-2">
                       {allMet ? (
-                        <CheckCircle2 size={22} style={{ color }} />
+                        <Check size={22} strokeWidth={3} style={{ color: inStreak ? STREAK : MILESTONE_GREEN }} />
                       ) : (
-                        <span className="text-sm font-bold tabular-nums text-zinc-400">{metCount}/4</span>
+                        <span className="text-sm font-semibold tabular-nums text-zinc-400">{metCount}/4</span>
                       )}
                     </div>
                     <div className="flex flex-1 flex-col justify-center gap-2">
@@ -937,31 +872,31 @@ function LevelGoalCard({
                       })}
                     </div>
                   </div>
-                  <span
-                    className="text-xs sm:text-sm font-bold transition-colors"
-                    style={{ color: isShown ? color : allMet ? color : isToday ? "#e4e4e7" : "#a1a1aa" }}
-                  >
-                    <span className="sm:hidden">{day.toLocaleDateString(intl, { weekday: "narrow" })}</span>
-                    <span className="hidden sm:inline">{day.toLocaleDateString(intl, { weekday: "short" })}</span>
+                  <span className="flex flex-col items-center gap-1.5">
+                    <span
+                      className="text-xs sm:text-sm font-medium leading-none transition-colors"
+                      style={{ color: dayLabel(isShown, isFuture) }}
+                    >
+                      <span className="sm:hidden">{day.toLocaleDateString(intl, { weekday: "narrow" })}</span>
+                      <span className="hidden sm:inline">{day.toLocaleDateString(intl, { weekday: "short" })}</span>
+                    </span>
+                    {isToday && <span aria-hidden className="h-1 w-1 rounded-full bg-zinc-50" />}
                   </span>
                 </button>
               );
             })}
           </div>
-          <p className="flex items-center gap-1.5 text-xs leading-snug text-zinc-400">
-            <CheckCircle2 size={11} style={{ color }} className="shrink-0" />
-            <span>
-              <Interpolate
-                text={t("page.streak_cats_hint")}
-                values={{
-                  rule: (
-                    <span className="font-semibold text-zinc-300">
-                      {t("page.streak_cats_rule")}
-                    </span>
-                  ),
-                }}
-              />
-            </span>
+          <p className="text-xs leading-snug text-zinc-400">
+            <Interpolate
+              text={t("page.streak_cats_hint")}
+              values={{
+                rule: (
+                  <span className="font-semibold text-zinc-300">
+                    {t("page.streak_cats_rule")}
+                  </span>
+                ),
+              }}
+            />
           </p>
           <div className="flex gap-3 flex-wrap">
             {CATS.map(cat => (
@@ -977,7 +912,6 @@ function LevelGoalCard({
       {isLocked ? (
         /* Locked level: no charts — just the goal, the investment explainer and a centered unlock button */
         <div className="flex flex-col items-center gap-6 py-6">
-          {goalBox}
           {/* The "it pays for itself" pitch is for a tier the player could buy
               today. Under a level lock it is an answer to a question they have
               not reached yet, so it waits. */}
@@ -986,7 +920,7 @@ function LevelGoalCard({
             return (
               <div className="flex w-full max-w-md items-start gap-2.5">
                 <TrendingUp size={16} className="mt-0.5 shrink-0 text-emerald-400" aria-hidden />
-                <p className="text-[12px] leading-snug text-zinc-400">
+                <p className="text-xs leading-snug text-zinc-400">
                   <Interpolate
                     text={t("page.investment")}
                     values={{
@@ -1042,21 +976,21 @@ function RulesAlert() {
   );
 
   return (
-    <div className="relative rounded-lg border border-zinc-800 bg-zinc-900/50 px-6 py-5 pr-14 sm:px-7 sm:py-6">
+    <div className="relative rounded-lg bg-zinc-800/40 px-6 py-5 pr-14 sm:px-7 sm:py-6">
       <button
         onClick={dismiss}
         className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "absolute top-4 right-4")}
         aria-label={t("page.dismiss")}
       >
-        <X size={16} />
+        <X />
       </button>
 
       <p className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
-        <Info size={15} className="text-zinc-400" />
+        <Info className="h-4 w-4 text-zinc-400" />
         {t("page.how_it_works")}
       </p>
 
-      <ol className="mt-4 space-y-2.5 text-[13px] leading-relaxed text-zinc-400">
+      <ol className="mt-4 space-y-2.5 text-sm leading-relaxed text-zinc-400">
         {steps.map((s, i) => (
           <li key={s.title} className="flex gap-2.5">
             <span className="shrink-0 font-semibold tabular-nums text-zinc-500">{i + 1}.</span>
@@ -1067,7 +1001,7 @@ function RulesAlert() {
         ))}
       </ol>
 
-      <p className="mt-5 border-t border-zinc-800/80 pt-4 text-xs leading-relaxed text-zinc-500">
+      <p className="mt-5 text-xs leading-relaxed text-zinc-500">
         {t("page.example")}
       </p>
     </div>
@@ -1209,10 +1143,9 @@ export const SummaryView = () => {
         subtitle={t("page.subtitle", { date: subtitleDate })}
         eyebrow={t("page.eyebrow")}
         backgroundContent={<HeroPattern />}
-        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
 
-      <div className="mt-6 px-4 md:px-6">
+      <div className={cn(PAGE_GUTTER, "pt-6")}>
         <PageTabs
           tabs={progressTabs}
           activeHref="/summary"
@@ -1220,7 +1153,7 @@ export const SummaryView = () => {
         />
       </div>
 
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 p-4 pb-14 md:gap-10 md:p-8 md:pb-20 lg:p-10 lg:pb-24">
+      <div className={cn("mx-auto flex w-full max-w-5xl flex-col gap-8 md:gap-10", PAGE_CONTENT)}>
         <RulesAlert />
 
         {/* Progress tracker */}

@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
-import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
-import {Plus, RefreshCw, Search, ShieldCheck } from "lucide-react";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import {Plus, RefreshCw, ShieldCheck } from "lucide-react";
 
 interface AdminActionCenterProps {
   searchTerm: string;
@@ -34,15 +34,13 @@ const AdminActionCenter = ({
     <div className="flex flex-col gap-4 bg-zinc-900/40 p-5 rounded-2xl border border-white/5 backdrop-blur-md">
       {/* ... (search and filters) ... */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="relative flex-1 w-full md:w-auto">
-          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-          <Input 
-            placeholder="Search collection..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-12 h-11 border-white/5 bg-black/40 text-sm focus:border-cyan-500/30 transition-all rounded-xl w-full"
-          />
-        </div>
+        <SearchInput
+          containerClassName="flex-1 md:w-auto"
+          placeholder="Search collection..."
+          aria-label="Search collection"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         <div className="flex items-center gap-2 bg-black/40 p-1 rounded-xl ring-1 ring-white/5 overflow-x-auto no-scrollbar max-w-full">
           <Button 
             variant="ghost" 

@@ -193,7 +193,7 @@ export function ProgressionQuiz({
                 "disabled:pointer-events-none disabled:opacity-40",
               )}>
               {degree}
-              <span className='text-[10px] font-normal text-zinc-500'>
+              <span className='text-xs font-normal text-zinc-500'>
                 {QUALITY_LABEL[DEGREES[degree].quality]}
               </span>
             </button>

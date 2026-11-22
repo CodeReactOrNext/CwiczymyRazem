@@ -1,4 +1,7 @@
 import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { GearProposalCard } from "feature/gearProposals/components/GearProposalCard";
 import { PROPOSE_GEAR_HREF } from "feature/gearProposals/constants/gearProposal.constants";
@@ -21,10 +24,7 @@ const BoardSkeleton = () => (
   <div className='space-y-8'>
     <div className='space-y-3'>
       {Array.from({ length: 3 }, (_, index) => (
-        <div
-          key={index}
-          className='h-40 animate-pulse rounded-lg bg-zinc-900/40'
-        />
+        <Skeleton key={index} variant='block' className='h-40' />
       ))}
     </div>
   </div>
@@ -54,20 +54,16 @@ const ProposeGearButton = ({
   return affordable ? (
     <Button asChild className={className}>
       <Link href={PROPOSE_GEAR_HREF}>
-        <span className='flex items-center gap-2'>
-          <Plus size={16} />
-          {t("panel.gear.propose")}
-          <Price cost={GEAR_PROPOSAL_COST} />
-        </span>
+        <Plus size={16} />
+        {t("panel.gear.propose")}
+        <Price cost={GEAR_PROPOSAL_COST} />
       </Link>
     </Button>
   ) : (
     <Button disabled title={t("panel.gear.not_enough")} className={className}>
-      <span className='flex items-center gap-2'>
-        <Plus size={16} />
-        {t("panel.gear.propose")}
-        <Price cost={GEAR_PROPOSAL_COST} />
-      </span>
+      <Plus size={16} />
+      {t("panel.gear.propose")}
+      <Price cost={GEAR_PROPOSAL_COST} />
     </Button>
   );
 };
@@ -85,9 +81,9 @@ const Section = ({
   <section className='space-y-4'>
     <h3 className='flex items-center gap-2.5 text-lg font-bold text-zinc-100'>
       {title}
-      <span className='rounded bg-zinc-800/60 px-2 py-0.5 text-xs font-semibold tabular-nums text-zinc-400'>
+      <Chip color='gray' size='sm' className='tabular-nums'>
         {count}
-      </span>
+      </Chip>
     </h3>
     <div className='grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>{children}</div>
   </section>
@@ -133,18 +129,13 @@ export const GearBoardTab = ({ enabled }: { enabled: boolean }) => {
       </div>
 
       {board.proposals.length === 0 ? (
-        <div className='flex flex-col items-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-          <span className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-400'>
-            <Guitar size={26} />
-          </span>
-          <h3 className='mb-2 text-lg font-bold text-zinc-100'>
-            {t("panel.gear.empty")}
-          </h3>
-          <ProposeGearButton
-            affordable={tokensLeft >= GEAR_PROPOSAL_COST}
-            className='mt-7'
-          />
-        </div>
+        <EmptyState
+          icon={<Guitar />}
+          title={t("panel.gear.empty")}
+          action={
+            <ProposeGearButton affordable={tokensLeft >= GEAR_PROPOSAL_COST} />
+          }
+        />
       ) : (
         <div className='space-y-12'>
           {/* Nothing open is said by the Propose button above, not a box. */}

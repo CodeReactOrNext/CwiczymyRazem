@@ -1,5 +1,8 @@
 import { Card } from "assets/components/ui/card";
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { FameIcon, PointsIcon } from "feature/challenges/components/RewardIcons";
 import {
   Calendar,
@@ -41,13 +44,6 @@ const PointsValue = ({
   </span>
 );
 
-const SectionHeader = ({ title, subtitle }: { title: string; subtitle: string }) => (
-  <div className='mb-4'>
-    <h2 className='text-base font-bold text-white tracking-wide'>{title}</h2>
-    <p className='mt-0.5 text-xs text-zinc-500'>{subtitle}</p>
-  </div>
-);
-
 const EarnCard = ({
   icon,
   title,
@@ -64,12 +60,16 @@ const EarnCard = ({
   children?: React.ReactNode;
 }) => (
   <Card className='flex flex-col p-5 sm:p-6'>
-    <div className='flex items-center gap-3'>
-      <span className='text-zinc-600'>{icon}</span>
-      <h3 className='text-[12px] font-semibold text-zinc-400 tracking-wide'>
-        {title}
-      </h3>
-    </div>
+    <SectionHeader
+      as='h3'
+      className='mb-0'
+      title={
+        <span className='flex items-center gap-3'>
+          <span className='text-zinc-400'>{icon}</span>
+          {title}
+        </span>
+      }
+    />
     <PointsValue
       value={reward}
       currency={currency}
@@ -99,12 +99,12 @@ const HABITS = [
 
 export const ScoringGuideView = () => {
   return (
-    <div className='mx-auto w-full max-w-5xl space-y-10 p-4 sm:p-6'>
+    <div className={cn("mx-auto w-full max-w-5xl space-y-10", PAGE_CONTENT)}>
       {/* Ways to earn */}
       <section>
         <SectionHeader
           title='Ways to Earn Points'
-          subtitle='Every action below feeds your level, the leaderboard, and the current season.'
+          description='Every action below feeds your level, the leaderboard, and the current season.'
         />
         <div className='grid gap-4 md:grid-cols-2'>
           <EarnCard
@@ -120,7 +120,7 @@ export const ScoringGuideView = () => {
               ].map(({ time, pts }) => (
                 <div
                   key={time}
-                  className='flex flex-col items-center gap-1 rounded-lg bg-zinc-800/60 px-2 py-3'>
+                  className='flex flex-col items-center gap-1 px-2 py-3'>
                   <span className='text-[11px] font-medium text-zinc-500'>{time}</span>
                   <PointsValue
                     value={pts}
@@ -139,11 +139,9 @@ export const ScoringGuideView = () => {
             description='Check off the habits you used when logging a session — up to 5 points per report.'>
             <div className='mt-4 flex flex-wrap gap-1.5'>
               {HABITS.map((habit) => (
-                <span
-                  key={habit}
-                  className='rounded-full bg-zinc-800/80 px-2.5 py-1 text-[11px] font-medium text-zinc-300'>
+                <Chip key={habit} size='sm'>
                   {habit}
-                </span>
+                </Chip>
               ))}
             </div>
           </EarnCard>
@@ -190,21 +188,14 @@ export const ScoringGuideView = () => {
       <section>
         <SectionHeader
           title='Streak Multiplier'
-          subtitle='Practice on consecutive days and your whole session (time + habits) is worth more. Skip a day and the streak resets.'
+          description='Practice on consecutive days and your whole session (time + habits) is worth more. Skip a day and the streak resets.'
         />
         <Card className='p-5 sm:p-6'>
           <div className='grid grid-cols-5 gap-2'>
             {STREAK_STEPS.map(({ day, bonus, active, max }) => (
               <div
                 key={day}
-                className={cn(
-                  "flex flex-col items-center gap-1.5 rounded-lg border px-1 py-3.5",
-                  max
-                    ? "border-orange-500/40 bg-orange-500/15"
-                    : active
-                    ? "border-transparent bg-zinc-800/80"
-                    : "border-transparent bg-zinc-800/40"
-                )}>
+                className='flex flex-col items-center gap-1.5 px-1 py-3.5'>
                 <Flame
                   size={18}
                   className={
@@ -215,7 +206,7 @@ export const ScoringGuideView = () => {
                       : "text-zinc-600"
                   }
                 />
-                <span className='text-[10px] font-medium text-zinc-500'>{day}</span>
+                <span className='text-xs font-medium text-zinc-500'>{day}</span>
                 <span
                   className={cn(
                     "text-sm font-bold",
@@ -233,21 +224,21 @@ export const ScoringGuideView = () => {
       <section>
         <SectionHeader
           title='Example Session'
-          subtitle='30 minutes of practice, 3 healthy habits, on a 5-day streak.'
+          description='30 minutes of practice, 3 healthy habits, on a 5-day streak.'
         />
         <Card className='p-5 sm:p-6'>
           <div className='flex flex-wrap items-center justify-center gap-2 text-center sm:gap-3'>
-            <div className='flex min-w-[100px] flex-col items-center gap-1.5 rounded-lg bg-zinc-800/60 px-4 py-3.5'>
+            <div className='flex min-w-[100px] flex-col items-center gap-1.5 px-4 py-3.5'>
               <span className='text-[11px] text-zinc-500'>30 min practice</span>
               <PointsValue value='+11' className='text-base text-white' iconClassName='h-4 w-4' />
             </div>
             <span className='text-lg font-bold text-zinc-600'>+</span>
-            <div className='flex min-w-[100px] flex-col items-center gap-1.5 rounded-lg bg-zinc-800/60 px-4 py-3.5'>
+            <div className='flex min-w-[100px] flex-col items-center gap-1.5 px-4 py-3.5'>
               <span className='text-[11px] text-zinc-500'>3 habits</span>
               <PointsValue value='+3' className='text-base text-white' iconClassName='h-4 w-4' />
             </div>
             <span className='text-lg font-bold text-zinc-600'>+</span>
-            <div className='flex min-w-[100px] flex-col items-center gap-1.5 rounded-lg bg-orange-500/10 px-4 py-3.5'>
+            <div className='flex min-w-[100px] flex-col items-center gap-1.5 px-4 py-3.5'>
               <span className='text-[11px] text-orange-400/80'>streak +50%</span>
               <PointsValue
                 value='+7'
@@ -256,7 +247,7 @@ export const ScoringGuideView = () => {
               />
             </div>
             <span className='text-lg font-bold text-zinc-600'>=</span>
-            <div className='flex min-w-[110px] flex-col items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-5 py-3.5'>
+            <div className='flex min-w-[110px] flex-col items-center gap-1.5 px-5 py-3.5'>
               <span className='text-[11px] text-cyan-400/80'>session total</span>
               <PointsValue value='+21' className='text-xl text-cyan-300' iconClassName='h-5 w-5' />
             </div>
@@ -268,7 +259,7 @@ export const ScoringGuideView = () => {
       <section>
         <SectionHeader
           title='What Points Do'
-          subtitle='Points are more than a number on your profile.'
+          description='Points are more than a number on your profile.'
         />
         <div className='grid gap-4 md:grid-cols-3'>
           {[
@@ -289,12 +280,16 @@ export const ScoringGuideView = () => {
             },
           ].map(({ icon, title, text }) => (
             <Card key={title} className='flex flex-col p-5 sm:p-6'>
-              <div className='flex items-center gap-3'>
-                <span className='text-zinc-600'>{icon}</span>
-                <h3 className='text-[12px] font-semibold text-zinc-400 tracking-wide'>
-                  {title}
-                </h3>
-              </div>
+              <SectionHeader
+                as='h3'
+                className='mb-0'
+                title={
+                  <span className='flex items-center gap-3'>
+                    <span className='text-zinc-400'>{icon}</span>
+                    {title}
+                  </span>
+                }
+              />
               <p className='mt-3 text-xs leading-relaxed text-zinc-400'>{text}</p>
             </Card>
           ))}

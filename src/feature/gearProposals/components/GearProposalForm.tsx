@@ -1,7 +1,9 @@
+import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
+import { Segment, SegmentGroup } from "components/SegmentedControl/SegmentedControl";
 import { PartIcon } from "feature/arsenal/components/Parts/PartIcon";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
 import { TierPlate } from "feature/arsenal/components/TierPlate";
@@ -55,7 +57,7 @@ const Section = ({
   hint?: ReactNode;
   children: ReactNode;
 }) => (
-  <section className='space-y-5 rounded-lg bg-zinc-900/40 p-5 sm:p-6'>
+  <section className='space-y-5 rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
     <div className='space-y-1.5'>
       <h2 className='text-base font-bold text-zinc-100'>{title}</h2>
       {hint && <p className='text-sm text-zinc-400'>{hint}</p>}
@@ -88,7 +90,7 @@ const RarityPicker = ({
             type='button'
             onClick={() => onChange(rarity)}
             className={cn(
-              "rounded px-3 py-1.5 text-[11px] font-black tracking-widest transition-colors",
+              "rounded px-3 py-1.5 text-xs font-bold transition-colors",
               "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
               isActive ? styles.text : "text-zinc-500 hover:text-zinc-300",
             )}
@@ -199,7 +201,7 @@ const ScrapPicker = ({
 
             <span
               className={cn(
-                "max-w-full truncate text-[10px] font-semibold",
+                "max-w-full truncate text-[11px] font-semibold",
                 slot ? "text-cyan-400" : "text-zinc-500",
               )}>
               {labels.part(part.id)}
@@ -234,7 +236,7 @@ const TierChips = ({
   if (tiers.length === 1) {
     return (
       <span
-        className='text-[10px] font-black tracking-widest'
+        className='text-[11px] font-bold'
         style={{ color: PART_TIER_COLORS[tiers[0]] }}>
         {labels.partTier(tiers[0])}
       </span>
@@ -253,7 +255,7 @@ const TierChips = ({
             type='button'
             onClick={() => onChange(tier)}
             className={cn(
-              "rounded px-2 py-1 text-[10px] font-black tracking-widest transition-colors",
+              "rounded px-2 py-1 text-[11px] font-bold transition-colors",
               "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
               !isActive && "text-zinc-500 hover:text-zinc-300",
             )}
@@ -303,7 +305,7 @@ const ScrapOrder = ({
           <div
             key={slot.partId}
             className='flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg bg-white/5 p-2.5'>
-            <span className='w-3 text-xs font-bold tabular-nums text-zinc-600'>
+            <span className='w-3 text-xs font-bold tabular-nums text-zinc-500'>
               {index + 1}
             </span>
 
@@ -339,21 +341,19 @@ const ScrapOrder = ({
                 ×{slot.qty}
               </button>
 
-              <button
+              <Button
                 type='button'
+                variant='ghost'
+                size='icon-sm'
                 aria-label={t("panel.gear.take_out", { part: label })}
                 onClick={() =>
                   onChange(
                     bom.filter((candidate) => candidate.partId !== slot.partId),
                   )
                 }
-                className={cn(
-                  "flex h-7 w-7 items-center justify-center rounded transition-colors",
-                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                  "text-zinc-500 hover:bg-white/10 hover:text-zinc-200",
-                )}>
-                <X size={14} />
-              </button>
+                className='text-zinc-400'>
+                <X />
+              </Button>
             </div>
           </div>
         );
@@ -390,25 +390,17 @@ export const GearProposalForm = ({
       <Section
         title={t("panel.gear.form.what_title")}
         hint={t("panel.gear.form.what_hint")}>
-        <div className='flex gap-2'>
+        <SegmentGroup aria-label={t("panel.gear.form.what_title")}>
           {(["guitar", "effect"] as GearKind[]).map((option) => (
-            <button
+            <Segment
               key={option}
-              type='button'
-              onClick={() => pickKind(option)}
-              aria-pressed={draft.kind === option}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg py-3 text-sm font-bold transition-colors",
-                "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                draft.kind === option
-                  ? "bg-cyan-500/10 text-cyan-400"
-                  : "bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-zinc-200",
-              )}>
+              active={draft.kind === option}
+              onClick={() => pickKind(option)}>
               {renderKindIcon(option, 16)}
               {labels.kind(option)}
-            </button>
+            </Segment>
           ))}
-        </div>
+        </SegmentGroup>
 
         <div className='space-y-3'>
           <Input
@@ -417,7 +409,7 @@ export const GearProposalForm = ({
             onChange={(event) => onChange({ name: event.target.value })}
             maxLength={GEAR_NAME_MAX}
             placeholder='Nightjar Custom'
-            className='h-12 bg-white/5 text-base font-bold'
+            className='h-12 text-base font-bold'
           />
 
           <div className='grid gap-3 sm:grid-cols-2'>
@@ -426,14 +418,14 @@ export const GearProposalForm = ({
               value={draft.brand}
               onChange={(event) => onChange({ brand: event.target.value })}
               placeholder={t("panel.gear.form.brand_placeholder")}
-              className='h-10 bg-white/5 text-sm font-medium'
+              className='h-10 text-sm font-medium'
             />
             <Input
               aria-label={t("panel.gear.form.image")}
               value={draft.imageUrl}
               onChange={(event) => onChange({ imageUrl: event.target.value })}
               placeholder={t("panel.gear.form.image_placeholder")}
-              className='h-10 bg-white/5 text-sm font-medium'
+              className='h-10 text-sm font-medium'
             />
           </div>
 
@@ -484,7 +476,7 @@ export const GearProposalForm = ({
             maxLength={GEAR_DESCRIPTION_MAX}
             rows={4}
             placeholder={t("panel.gear.form.description_placeholder")}
-            className='resize-none bg-white/5 font-medium'
+            className='resize-none font-medium'
           />
         </div>
 
@@ -511,7 +503,7 @@ export const GearProposalForm = ({
               }
               maxLength={GEAR_INSCRIPTION_MAX}
               placeholder={t("panel.gear.form.engraving_placeholder")}
-              className='h-9 border-0 bg-transparent px-1 italic text-amber-300/90 placeholder:text-zinc-700 focus-visible:ring-0'
+              className='h-9 bg-transparent px-1 italic text-amber-300/90 placeholder:text-zinc-700 hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0'
             />
           </div>
           <p className='ml-1 text-xs text-zinc-500'>

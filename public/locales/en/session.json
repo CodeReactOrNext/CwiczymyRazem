@@ -926,5 +926,6 @@
     "show_in_folder": "Show in folder",
     "delete": "Move to the recycle bin",
     "untitled": "Recording"
-  }
+  },
+  "exam_click_failed": "{{limit}} wrong clicks — exam failed."
 }

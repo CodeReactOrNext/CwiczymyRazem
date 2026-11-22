@@ -38,7 +38,7 @@ export const RewardBreakdown = ({ rows, delay = 0.6, className }: RewardBreakdow
             transition={{ delay: delay + i * 0.12, duration: 0.35, ease: "easeOut" }}
           >
             <div className="flex items-center gap-2.5">
-              <Icon size={15} className="shrink-0 text-zinc-400" aria-hidden />
+              <Icon className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
               <span className="flex-1 text-sm text-zinc-300">{row.label}</span>
               <span className="text-sm font-bold tabular-nums text-zinc-100">+{row.amount}</span>
             </div>

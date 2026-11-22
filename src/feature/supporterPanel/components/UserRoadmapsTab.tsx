@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { PRESSABLE_IN_GROUP } from "assets/components/ui/button";
+import { Button, PRESSABLE_IN_GROUP } from "assets/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -7,7 +7,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { SearchInput } from "components/SearchInput/SearchInput";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { firebaseUpdateRoadmap } from "feature/aiCoach/services/roadmap.service";
 import {
@@ -56,7 +62,6 @@ import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
 import { ROADMAP_LEVELS } from "lib/roadmaps/generation/levels";
 import {
-  ArrowLeft,
   ArrowRight,
   ArrowUpDown,
   Dumbbell,
@@ -64,7 +69,6 @@ import {
   Map as MapIcon,
   Music,
   Play,
-  Search,
   Sparkles,
   User,
   Users,
@@ -307,26 +311,19 @@ const RoadmapDetail = ({
     [data],
   );
 
-  const backButton = (
-    <button
-      type='button'
-      onClick={onBack}
-      className='flex w-fit items-center gap-2 rounded-lg bg-zinc-900/60 px-4 py-2 text-sm text-zinc-400 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 hover:text-zinc-200'>
-      <ArrowLeft className='h-4 w-4' />
-      {t("panel.brief.back")}
-    </button>
-  );
+  const backButton = <BackLink label={t("panel.brief.back")} onClick={onBack} />;
 
   const startButton =
     !isOwn && !isFollowing && viewerUid && roadmap ? (
-      <button
+      <Button
         type='button'
+        size='lg'
         onClick={() => void startRoadmap()}
         disabled={starting}
-        className='flex w-fit items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 disabled:cursor-wait disabled:opacity-70 hover:bg-cyan-400'>
-        <Play className='h-4 w-4' />
+        className='w-fit'>
+        <Play />
         {starting ? t("panel.players.starting") : t("panel.players.start")}
-      </button>
+      </Button>
     ) : null;
 
   const refineToggle =
@@ -370,10 +367,8 @@ const RoadmapDetail = ({
         }
         eyebrow={summary.displayName ?? t("panel.players.unknown")}
         backgroundContent={<HeroPattern variant='ai' />}
-        className={cn(
-          "min-h-[100px] w-full !shadow-none md:min-h-[90px] lg:min-h-[100px]",
-          isPage && "!rounded-none",
-        )}
+        // Full-bleed on its own page; inside the panel's tab it is a card.
+        className={cn(!isPage && "rounded-lg")}
         rightContent={
           <div className='flex flex-wrap items-center gap-2'>
             {startButton}
@@ -391,10 +386,7 @@ const RoadmapDetail = ({
         {isLoading ? (
           <div className='space-y-3'>
             {Array.from({ length: 6 }, (_, index) => (
-              <div
-                key={index}
-                className='h-12 animate-pulse rounded-lg bg-zinc-900/40'
-              />
+              <Skeleton key={index} variant='block' className='h-12' />
             ))}
           </div>
         ) : !roadmap ? (
@@ -548,7 +540,7 @@ const RoadmapTile = ({
           <span
             className='flex items-center gap-1.5'
             title={t("panel.players.exercises")}>
-            <Dumbbell size={13} aria-hidden />
+            <Dumbbell className='h-3.5 w-3.5' aria-hidden />
             <span className='sr-only'>{t("panel.players.exercises")}</span>
             {summary.exerciseSteps}
           </span>
@@ -556,7 +548,7 @@ const RoadmapTile = ({
             <span
               className='flex items-center gap-1.5'
               title={t("panel.players.songs")}>
-              <Music size={13} aria-hidden />
+              <Music className='h-3.5 w-3.5' aria-hidden />
               <span className='sr-only'>{t("panel.players.songs")}</span>
               {summary.songSteps}
             </span>
@@ -564,20 +556,20 @@ const RoadmapTile = ({
           <span
             className='flex items-center gap-1.5'
             title={t("panel.players.lessons")}>
-            <FaYoutube size={13} aria-hidden />
+            <FaYoutube className='h-3.5 w-3.5' aria-hidden />
             <span className='sr-only'>{t("panel.players.lessons")}</span>
             {summary.lessonSteps}
           </span>
         </span>
         {summary.visibility === "private" && (
           <span className='flex items-center gap-1.5'>
-            <Lock size={13} aria-hidden />
+            <Lock className='h-3.5 w-3.5' aria-hidden />
             {t("panel.generate.visibility.private.label")}
           </span>
         )}
         {summary.followerCount > 0 && (
           <span className='flex items-center gap-1.5'>
-            <Users size={13} aria-hidden />
+            <Users className='h-3.5 w-3.5' aria-hidden />
             {t("panel.players.following_count", {
               count: summary.followerCount,
             })}
@@ -666,7 +658,7 @@ const RoadmapTile = ({
           PRESSABLE_IN_GROUP,
           "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors",
           run
-            ? "border-b-black/25 bg-white text-zinc-950 group-hover:bg-zinc-200"
+            ? "border-b-black/25 bg-primary text-primary-foreground group-hover:bg-primary/90"
             : "border-b-black/30 bg-zinc-800 text-zinc-200 group-hover:bg-zinc-700",
         )}>
         {action}
@@ -696,7 +688,7 @@ const RoadmapTile = ({
     <button
       type='button'
       onClick={onOpen}
-      className='group flex h-full w-full flex-col gap-5 rounded-lg bg-zinc-900/40 p-5 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-900/70 sm:p-6'>
+      className='group flex h-full w-full flex-col gap-5 rounded-lg bg-zinc-800/40 p-5 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800/60 sm:p-6'>
       {author}
       {heading}
       {descriptionText}
@@ -725,15 +717,6 @@ const TileGrid = ({
       />
     ))}
   </div>
-);
-
-const SectionHeading = ({ title, count }: { title: string; count: number }) => (
-  <h2 className='flex items-baseline gap-2.5 text-lg font-bold text-zinc-100'>
-    {title}
-    <span className='text-sm font-normal tabular-nums text-zinc-500'>
-      {count}
-    </span>
-  </h2>
 );
 
 /**
@@ -872,19 +855,13 @@ export const UserRoadmapsTab = ({
 
   if (!shownRow && pendingId) {
     return isLoading ? (
-      <div className='h-72 animate-pulse rounded-lg bg-zinc-900/40' />
+      <Skeleton variant='block' className='h-72' />
     ) : (
-      <div className='flex flex-col items-start gap-4 rounded-lg bg-zinc-900/40 p-6 md:p-8'>
+      <div className='flex flex-col items-start gap-4 rounded-lg bg-zinc-800/40 p-6 md:p-8'>
         <p className='text-sm text-zinc-400'>
           {t("panel.players.not_on_board")}
         </p>
-        <button
-          type='button'
-          onClick={closeRow}
-          className='flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700'>
-          <ArrowLeft className='h-4 w-4' />
-          {t("panel.players.back_to_list")}
-        </button>
+        <BackLink label={t("panel.players.back_to_list")} onClick={closeRow} />
       </div>
     );
   }
@@ -909,31 +886,24 @@ export const UserRoadmapsTab = ({
       {isLoading ? (
         <div className='grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3'>
           {Array.from({ length: 6 }, (_, index) => (
-            <div
-              key={index}
-              className='h-44 animate-pulse rounded-lg bg-zinc-900/40'
-            />
+            <Skeleton key={index} variant='block' className='h-44' />
           ))}
         </div>
       ) : !roadmaps.length ? (
-        <div className='flex flex-col items-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-          <span className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-400'>
-            <MapIcon size={26} />
-          </span>
-          <h3 className='mb-2 text-lg font-bold text-zinc-100'>
-            {t("panel.players.empty_title")}
-          </h3>
-          <p className='max-w-sm text-sm text-zinc-400'>
-            {t("panel.players.empty_body")}
-          </p>
-        </div>
+        <EmptyState
+          icon={<MapIcon />}
+          title={t("panel.players.empty_title")}
+          description={t("panel.players.empty_body")}
+        />
       ) : (
         <>
           {own.length > 0 && (
             <section className='space-y-5'>
-              <SectionHeading
+              <SectionHeader
                 title={t("panel.players.yours")}
                 count={own.length}
+                size='lg'
+                className='mb-0'
               />
               {featured && (
                 <RoadmapTile
@@ -956,56 +926,42 @@ export const UserRoadmapsTab = ({
           {board.length > 0 && (
             <section className='space-y-5'>
               <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-                <SectionHeading
+                <SectionHeader
                   title={t("panel.players.others")}
                   count={others.length}
+                  size='lg'
+                  className='mb-0'
                 />
 
-                <div className='relative w-full sm:max-w-xs'>
-                  <Search
-                    size={15}
-                    className='pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500'
-                  />
-                  <input
-                    type='text'
-                    value={term}
-                    onChange={(event) => setTerm(event.target.value)}
-                    placeholder={t("panel.players.filter")}
-                    className='w-full rounded-lg bg-zinc-900/60 py-2.5 pl-11 pr-4 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-700'
-                  />
-                </div>
+                <SearchInput
+                  containerClassName='sm:max-w-xs'
+                  value={term}
+                  onChange={(event) => setTerm(event.target.value)}
+                  placeholder={t("panel.players.filter")}
+                  aria-label={t("panel.players.filter")}
+                />
               </div>
 
               <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
-                <div
-                  role='group'
-                  aria-label={t("panel.generate.level")}
-                  className='flex flex-wrap gap-1 rounded-lg bg-zinc-900/40 p-1'>
-                  {["all", ...ROADMAP_LEVELS].map((candidate) => (
-                    <button
-                      key={candidate}
-                      type='button'
-                      onClick={() => setLevel(candidate)}
-                      aria-pressed={level === candidate}
-                      className={cn(
-                        "rounded-md px-3 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-zinc-500",
-                        level === candidate
-                          ? "bg-zinc-700 text-zinc-50"
-                          : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-                      )}>
-                      {candidate === "all"
+                <SegmentedControl
+                  label={t("panel.generate.level")}
+                  options={["all", ...ROADMAP_LEVELS].map((candidate) => ({
+                    value: candidate,
+                    label:
+                      candidate === "all"
                         ? t("panel.players.all_levels")
-                        : t(`ai_coach:levels.${candidate}`, candidate)}
-                    </button>
-                  ))}
-                </div>
+                        : t(`ai_coach:levels.${candidate}`, candidate),
+                  }))}
+                  selected={[level]}
+                  onSelect={setLevel}
+                />
 
                 <Select
                   value={sort}
                   onValueChange={(value) => setSort(value as RoadmapSort)}>
                   <SelectTrigger
                     aria-label={t("panel.players.sort_by")}
-                    className='h-10 w-full gap-2 border-0 bg-zinc-900/60 px-3 text-sm font-semibold text-zinc-200 md:w-48'>
+                    className='h-10 w-full gap-2 px-3 text-sm font-semibold text-zinc-200 md:w-48'>
                     <span className='flex items-center gap-1.5 text-zinc-500'>
                       <ArrowUpDown size={14} aria-hidden />
                     </span>
@@ -1034,9 +990,11 @@ export const UserRoadmapsTab = ({
                   onOpen={openFromList}
                 />
               ) : (
-                <p className='py-10 text-center text-sm text-zinc-400'>
-                  {t("panel.players.no_match")}
-                </p>
+                <EmptyState
+                  mood='lookAround'
+                  size='compact'
+                  title={t("panel.players.no_match")}
+                />
               )}
             </section>
           )}

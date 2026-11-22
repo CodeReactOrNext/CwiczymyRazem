@@ -829,5 +829,9 @@
       "boards": "Pedalboardy",
       "cables": "Kable"
     }
+  },
+  "toast": {
+    "idea_posted": "Pomysł dodany",
+    "proposal_filed": "Propozycja zgłoszona"
   }
 }

@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { useClientNow } from "components/ResetClock/ResetClock";
 import { getQuestTaskHref } from "feature/user/store/dailyQuest.routes";
@@ -26,15 +27,15 @@ const DailyQuestSkeleton = () => {
         <h3 className='text-base font-semibold text-zinc-100'>
           {t("daily_quests.title")}
         </h3>
-        <div className='h-11 animate-pulse rounded-lg bg-white/[0.06]' />
+        <Skeleton className='h-11 rounded-lg' />
       </div>
-      <div className='flex animate-pulse flex-col gap-5'>
+      <div className='flex flex-col gap-5' aria-busy='true'>
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className='flex items-center gap-3.5'>
-            <div className='h-6 w-6 shrink-0 rounded-full bg-white/[0.08]' />
+            <Skeleton className='h-6 w-6 shrink-0 rounded-full' />
             <div className='flex-1 space-y-2'>
-              <div className='h-3 w-40 rounded bg-white/[0.08]' />
-              <div className='h-3.5 rounded-full bg-white/[0.06]' />
+              <Skeleton className='h-3 w-40' />
+              <Skeleton className='h-3.5 rounded-full' />
             </div>
           </div>
         ))}
@@ -186,8 +187,9 @@ export const DailyQuestWidget = () => {
             than on any one quest. The rows below already show the progress. */}
         {allCompleted ? (
           <Button
+            size='xl'
             onClick={handleClaim}
-            className='h-12 w-full gap-3 border-b-amber-700 bg-amber-400 text-[15px] font-bold text-zinc-950 hover:bg-amber-300'>
+            className='w-full gap-3 border-b-amber-700 bg-amber-400 text-zinc-950 hover:bg-amber-300'>
             <Gift aria-hidden />
             {t("daily_quests.claim_reward")}
             <RewardAmounts plain />

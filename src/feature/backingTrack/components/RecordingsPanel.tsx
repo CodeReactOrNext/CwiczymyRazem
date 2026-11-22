@@ -1,3 +1,4 @@
+import { buttonVariants } from "assets/components/ui/button";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
@@ -10,9 +11,9 @@ const sectionTitle = "text-sm font-semibold text-zinc-100";
 const bodyText = "text-xs leading-relaxed text-zinc-400";
 const smallButton =
   "flex items-center gap-2 rounded-lg bg-zinc-800/60 px-3 py-1.5 text-xs font-medium text-zinc-200 transition-colors hover:bg-zinc-700 hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
-const rowIcon =
-  "flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
-const rowIconIdle = "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100";
+// A key like every button; a toggle's "on" shows in the icon's colour.
+const rowIcon = cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "shrink-0");
+const rowIconIdle = "text-zinc-400";
 
 interface RecordingsPanelProps {
   controller: BackingTrackController;
@@ -115,7 +116,7 @@ export function RecordingsPanel({ controller }: RecordingsPanelProps) {
                     }
                     className={cn(
                       rowIcon,
-                      stem.muted ? "bg-amber-500/10 text-amber-400" : rowIconIdle,
+                      stem.muted ? "text-amber-400 hover:text-amber-300" : rowIconIdle,
                     )}>
                     {stem.muted ? <VolumeX className='h-3.5 w-3.5' /> : <Volume2 className='h-3.5 w-3.5' />}
                   </button>
@@ -154,7 +155,7 @@ export function RecordingsPanel({ controller }: RecordingsPanelProps) {
                 ? t("common.unmute", { what: t("recordings.everything") })
                 : t("common.mute", { what: t("recordings.everything") })
             }
-            className={cn(rowIcon, alignment.muted ? "bg-amber-500/10 text-amber-400" : rowIconIdle)}>
+            className={cn(rowIcon, alignment.muted ? "text-amber-400 hover:text-amber-300" : rowIconIdle)}>
             {alignment.muted ? <VolumeX className='h-3.5 w-3.5' /> : <Volume2 className='h-3.5 w-3.5' />}
           </button>
           <span className='w-20 shrink-0 text-xs text-zinc-400'>{t("recordings.master")}</span>

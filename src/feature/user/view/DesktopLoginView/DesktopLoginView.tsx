@@ -193,9 +193,9 @@ export const DesktopLoginView = () => {
                 className='w-full'>
                 <span className='flex items-center justify-center gap-2'>
                   {busy ? (
-                    <Loader2 className='h-5 w-5 animate-spin' />
+                    <Loader2 className='animate-spin' />
                   ) : (
-                    <FcGoogle className='h-5 w-5' />
+                    <FcGoogle />
                   )}
                   {user ? t("desktop.other_account") : t("google_button")}
                 </span>

@@ -19,7 +19,7 @@ import Link from "next/link";
 
 /** Roomier from `lg` up: on a desktop the three tiles are the page, so they get the space. */
 const TILE =
-  "flex min-h-[15.5rem] flex-col gap-4 rounded-2xl p-5 lg:min-h-[19rem] lg:gap-6 lg:p-6";
+  "flex min-h-[15.5rem] flex-col gap-4 rounded-lg p-5 lg:min-h-[19rem] lg:gap-6 lg:p-6";
 
 /**
  * One running duel, cut down to what decides the next tap: what to play, how
@@ -42,7 +42,7 @@ const ActiveTile = ({ duel, now }: { duel: DuelView; now: number }) => {
     <div
       className={cn(
         TILE,
-        "group relative bg-zinc-900/60 transition-colors hover:bg-zinc-900",
+        "group relative bg-zinc-800/40 transition-colors hover:bg-zinc-800/60",
       )}>
       <div>
         <p className='flex items-center gap-1.5 text-xs font-medium text-zinc-400 lg:text-sm'>
@@ -61,7 +61,7 @@ const ActiveTile = ({ duel, now }: { duel: DuelView; now: number }) => {
           href={{ pathname: "/duels", query: { duel: duel.id } }}
           shallow
           aria-label={t("slots.open_aria", { title })}
-          className='mt-1 block text-lg font-semibold leading-tight text-zinc-50 [text-wrap:balance] after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-zinc-500 lg:mt-1.5 lg:text-2xl'>
+          className='mt-1 block text-lg font-semibold leading-tight text-zinc-50 [text-wrap:balance] after:absolute after:inset-0 after:rounded-lg focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-zinc-500 lg:mt-1.5 lg:text-2xl'>
           {title}
         </Link>
       </div>
@@ -83,7 +83,7 @@ const ActiveTile = ({ duel, now }: { duel: DuelView; now: number }) => {
               endsAt={duel.endsAt}
               isEnding={isEnding}
               className={cn(
-                "font-openSans text-xs font-semibold lg:text-sm",
+                "text-xs font-semibold lg:text-sm",
                 isEnding ? "text-orange-400" : "text-zinc-300",
               )}
             />
@@ -122,7 +122,7 @@ const ActiveTile = ({ duel, now }: { duel: DuelView; now: number }) => {
       </div>
 
       {isOver || duel.me.isReady ? (
-        <p className='flex h-11 items-center gap-2 text-sm font-semibold text-emerald-400 lg:h-12 lg:text-base'>
+        <p className='flex h-12 items-center gap-2 text-sm font-semibold text-emerald-400 lg:text-base'>
           {duel.me.isReady && (
             <>
               <Check size={16} />
@@ -134,8 +134,8 @@ const ActiveTile = ({ duel, now }: { duel: DuelView; now: number }) => {
         <Link
           href={`/practice/duel/${duel.id}`}
           className={cn(
-            buttonVariants({ size: "lg" }),
-            "relative z-10 h-11 w-full border-b-zinc-400 bg-white text-zinc-950 hover:bg-zinc-200 lg:h-12 lg:text-base",
+            buttonVariants({ size: "xl" }),
+            "relative z-10 w-full",
           )}>
           <Play className='fill-current' />
           {hasPlayed ? t("active.beat_best") : t("active.play")}
@@ -162,7 +162,7 @@ const SearchingTile = ({
     <div
       className={cn(
         TILE,
-        "items-center justify-center bg-zinc-900/60 text-center",
+        "items-center justify-center bg-zinc-800/40 text-center",
       )}>
       <Kostek mood='wait' className='h-16 lg:h-20' />
       <p className='flex items-center gap-2 font-semibold text-zinc-100 lg:text-lg'>
@@ -203,11 +203,7 @@ const FreeTile = ({
         "items-center justify-center text-center outline-dashed outline-2 -outline-offset-2 outline-zinc-800",
       )}>
       <p className='text-sm text-zinc-400 lg:text-base'>{t("slots.free")}</p>
-      <Button
-        size='lg'
-        onClick={onJoin}
-        disabled={disabled}
-        className='h-11 border-b-zinc-400 bg-white text-zinc-950 hover:bg-zinc-200 lg:h-12 lg:px-6 lg:text-base'>
+      <Button size='xl' onClick={onJoin} disabled={disabled}>
         <Swords />
         {t("join.confirm")}
       </Button>

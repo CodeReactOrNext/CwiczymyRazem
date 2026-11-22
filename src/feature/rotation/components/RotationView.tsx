@@ -1,9 +1,13 @@
 import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import { EmptyState } from "components/EmptyState/EmptyState";
 import MainContainer from "components/MainContainer";
+import { PAGE_CONTENT, PAGE_GUTTER, PageShell } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { LIBRARY_TABS } from "constants/navTabs";
+import { LIBRARY_HERO_CLASS, LIBRARY_TABS } from "constants/navTabs";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
@@ -11,7 +15,7 @@ import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
 import { useSongDurations } from "feature/songs/hooks/useSongDurations";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence } from "framer-motion";
-import { Dumbbell, Music, Plus, Target } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
@@ -48,13 +52,6 @@ const LEVEL_DOT: Record<FreshnessLevel, string> = {
 };
 
 type SessionSource = "stalest" | "row" | "draw";
-
-/** Three blank cards for the empty state, one per kind of thing that goes in. */
-const EMPTY_HAND = [
-  { Icon: Music, className: "-rotate-[10deg] translate-x-5 translate-y-2" },
-  { Icon: Dumbbell, className: "z-10" },
-  { Icon: Target, className: "rotate-[10deg] -translate-x-5 translate-y-2" },
-];
 
 /**
  * The Rotation panel: what the player chose to keep in their hands, stalest
@@ -202,16 +199,16 @@ export const RotationView = () => {
   }
 
   return (
-    <div className='flex min-h-screen flex-col overflow-visible rounded-lg bg-second-600'>
+    <PageShell>
       <HeroBanner
         title={t("page.title")}
         subtitle={t("page.subtitle")}
-        compact
+        eyebrow={t("page.eyebrow")}
+        className={LIBRARY_HERO_CLASS}
         backgroundContent={<HeroPattern withShuffle />}
-        className='mb-2 w-full !rounded-none !shadow-none md:mb-6 md:min-h-[90px] lg:min-h-[100px]'
       />
 
-      <div className='px-3 md:px-6 lg:px-8'>
+      <div className={cn(PAGE_GUTTER, "pt-6")}>
         <PageTabs
           tabs={LIBRARY_TABS}
           activeHref='/rotation'
@@ -219,46 +216,25 @@ export const RotationView = () => {
         />
       </div>
 
-      <div className='space-y-12 px-3 py-6 md:px-6 md:py-8 lg:px-8'>
+      <div className={cn("space-y-12", PAGE_CONTENT)}>
         {isLoading ? (
           <div className='space-y-4' aria-busy>
-            <div className='h-44 animate-pulse rounded-lg bg-zinc-900/40' />
+            <Skeleton variant='block' className='h-44' />
             {Array.from({ length: 3 }, (_, index) => (
-              <div
-                key={index}
-                className='h-[4.5rem] animate-pulse rounded-lg bg-zinc-900/40'
-              />
+              <Skeleton key={index} variant='block' className='h-[4.5rem]' />
             ))}
           </div>
         ) : entries.length === 0 ? (
-          <div className='flex flex-col items-center rounded-lg bg-zinc-900/40 px-6 py-16 text-center sm:py-20'>
-            <div className='flex' aria-hidden>
-              {EMPTY_HAND.map(({ Icon, className }, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "flex h-24 w-[4.5rem] items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 ring-4 ring-zinc-950",
-                    className,
-                  )}>
-                  <Icon className='h-6 w-6' />
-                </div>
-              ))}
-            </div>
-            <p className='mt-10 text-lg font-semibold text-zinc-100'>
-              {t("empty.title")}
-            </p>
-            <p className='mt-3 max-w-md text-sm leading-relaxed text-zinc-400'>
-              {t("empty.body")}
-            </p>
-            <Button
-              onClick={() => setDialog("add")}
-              className='mt-10 h-12 rounded-lg bg-white px-7 font-bold text-black focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
-              <span className='flex items-center gap-2.5'>
-                <Plus className='h-4 w-4' />
+          <EmptyState
+            title={t("empty.title")}
+            description={t("empty.body")}
+            action={
+              <Button size='lg' onClick={() => setDialog("add")}>
+                <Plus />
                 {t("empty.cta")}
-              </span>
-            </Button>
-          </div>
+              </Button>
+            }
+          />
         ) : (
           <>
             <RotationSpotlight
@@ -272,17 +248,17 @@ export const RotationView = () => {
 
             <section className='space-y-8'>
               <div className='flex items-center justify-between gap-4'>
-                <h2 className='flex items-baseline gap-3 text-base font-semibold text-zinc-100'>
-                  {t("list_title")}
-                  <span className='text-sm font-normal tabular-nums text-zinc-500'>
-                    {entries.length}
-                  </span>
-                </h2>
+                <SectionHeader
+                  title={t("list_title")}
+                  count={entries.length}
+                  className='mb-0'
+                />
                 <Button
-                  onClick={() => setDialog("add")}
-                  className='h-10 rounded-lg bg-zinc-800 px-5 font-semibold text-zinc-100 focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-700'>
+                  variant='secondary'
+                  size='lg'
+                  onClick={() => setDialog("add")}>
                   <span className='flex items-center gap-2'>
-                    <Plus className='h-4 w-4' />
+                    <Plus />
                     {t("add")}
                   </span>
                 </Button>
@@ -344,6 +320,6 @@ export const RotationView = () => {
           isStarting={!!activePlan}
         />
       )}
-    </div>
+    </PageShell>
   );
 };

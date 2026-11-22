@@ -14,7 +14,7 @@ const Timer: NextPageWithLayout = () => {
 
 Timer.getLayout = function getLayout(page: ReactElement) {
   return (
-    <AppLayout pageId={"exercise"} subtitle='Timer' variant='secondary'>
+    <AppLayout pageId={"exercise"} subtitle='Timer' variant='secondary' corridor='practice'>
       {page}
     </AppLayout>
   );

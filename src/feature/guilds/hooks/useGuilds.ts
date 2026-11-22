@@ -7,6 +7,7 @@ import {
 import type { GuildsState } from "feature/guilds/types/guild.types";
 import type { GuildUpgrade } from "feature/guilds/utils/guildUpgrades.utils";
 import { GUILD_SEATS_PER_UPGRADE } from "feature/supporterPanel/constants/supporterPanel.constants";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { auth } from "utils/firebase/client/firebase.utils";
 
@@ -57,6 +58,7 @@ const errorMessage = (error: unknown, fallback: string): string => {
 
 export const useGuildMutations = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation("guilds");
 
   const apply = (state: GuildsState) =>
     queryClient.setQueryData(GUILDS_KEY, state);
@@ -79,7 +81,7 @@ export const useGuildMutations = () => {
     },
     onSuccess: (state) => {
       apply(state);
-      toast.success("Guild founded");
+      toast.success(t("toast.founded"));
     },
     // An upload that fell over happened before the API was called, so nothing
     // was charged — worth saying, rather than a founding that "failed".
@@ -96,7 +98,7 @@ export const useGuildMutations = () => {
       post("/api/supporter/guild/membership", { action: "apply", ...input }),
     onSuccess: (state) => {
       apply(state);
-      toast.success("Request sent — the founder decides from here");
+      toast.success(t("toast.request_sent"));
     },
     onError: (error) => toast.error(errorMessage(error, "Could not apply")),
   });
@@ -200,7 +202,7 @@ export const useGuildMutations = () => {
       }),
     onSuccess: (state) => {
       apply(state);
-      toast.success(`${state.paid} Fame into the guild's`);
+      toast.success(t("toast.deposited", { fame: state.paid }));
     },
     onError: (error) =>
       toast.error(errorMessage(error, "Could not put that in")),

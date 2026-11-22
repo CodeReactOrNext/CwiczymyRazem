@@ -1,3 +1,6 @@
+import { cn } from "assets/lib/utils";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
+
 import { FundingProgressBar } from "./components/FundingProgressBar";
 import { FundingProgressBarSkeleton } from "./components/FundingProgressBarSkeleton";
 import { RoadmapFaq } from "./components/RoadmapFaq";
@@ -27,7 +30,7 @@ export const RoadmapView = () => {
         isLoading={isLoading}
       />
 
-      <div className='w-full space-y-6 p-4 sm:p-6'>
+      <div className={cn("w-full space-y-6", PAGE_CONTENT)}>
         {/* What the money builds comes first — it is the argument. */}
         {isLoading ? (
           <FundingProgressBarSkeleton />

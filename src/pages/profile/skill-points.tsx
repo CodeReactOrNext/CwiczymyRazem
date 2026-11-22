@@ -1,4 +1,5 @@
 import MainContainer from "components/MainContainer";
+import { PAGE_CONTENT } from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { useProgressTabs } from "feature/profile/hooks/useProgressTabs";
@@ -42,10 +43,10 @@ const ProfileSkillPointsPage = () => {
             />
           </div>
         }
-        className='min-h-[140px] w-full !flex-col !rounded-none !shadow-none md:min-h-[120px] md:!flex-row lg:min-h-[160px]'
+        className='!flex-col md:!flex-row'
       />
 
-      <div className='p-4'>
+      <div className={PAGE_CONTENT}>
         <div className='mb-6'>
           <PageTabs
             tabs={tabs}

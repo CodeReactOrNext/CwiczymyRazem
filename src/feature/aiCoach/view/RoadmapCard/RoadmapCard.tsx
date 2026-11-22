@@ -1,4 +1,4 @@
-import { PRESSABLE } from "assets/components/ui/button";
+import { buttonVariants } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { Roadmap } from "feature/aiCoach/types/roadmap.types";
 import {
@@ -150,9 +150,9 @@ const RoadmapCard = ({ roadmap, onOpen }: RoadmapCardProps) => {
             type='button'
             onClick={onOpen}
             aria-label={`${action}: ${shortTitle}`}
-            className={cn(PRESSABLE, "inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-white px-4 text-sm font-semibold text-zinc-950 transition-colors after:absolute after:inset-0 focus-visible:bg-zinc-200 focus-visible:outline-none group-hover:bg-zinc-200 border-b-black/25")}>
+            className={cn(buttonVariants({ size: "lg" }), "shrink-0 after:absolute after:inset-0 group-hover:bg-primary/90")}>
             {action}
-            <ArrowRight aria-hidden='true' className='h-4 w-4' />
+            <ArrowRight aria-hidden='true' />
           </button>
         </div>
       </div>

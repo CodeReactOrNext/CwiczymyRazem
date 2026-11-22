@@ -5,8 +5,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { InstrumentPicker } from "feature/tuner/components/InstrumentPicker";
 import { useTranslation } from "hooks/useTranslation";
 import { Check, Lock } from "lucide-react";
@@ -41,21 +41,18 @@ const TuningOptions = () => {
   return (
     <div className='space-y-3'>
       {showStringTabs && (
-        <Tabs value={stringTab} onValueChange={setStringTab}>
-          <TabsList
-            aria-label={t("tuning_modal.strings")}
-            className={cn("flex h-auto w-full gap-1 bg-zinc-900/60", isLocked && "pointer-events-none opacity-40")}>
-            {countsOnOffer.map((count) => (
-              <TabsTrigger
-                key={count}
-                value={String(count)}
-                disabled={isLocked}
-                className='flex-1 py-1.5 font-semibold text-zinc-300 hover:text-white data-[state=active]:bg-zinc-700/80 data-[state=active]:text-white data-[state=active]:shadow-none'>
-                {t("tuning_modal.string_count", { count })}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+        <SegmentedControl
+          label={t("tuning_modal.strings")}
+          selected={[stringTab]}
+          onSelect={(value) => {
+            if (!isLocked) setStringTab(value);
+          }}
+          className={cn(isLocked && "pointer-events-none opacity-40")}
+          options={countsOnOffer.map((count) => ({
+            value: String(count),
+            label: t("tuning_modal.string_count", { count }),
+          }))}
+        />
       )}
 
       <div
@@ -109,7 +106,7 @@ export const TuningSettingsModal = () => {
           or this dialog opens invisibly behind it — and since Radix disables pointer
           events on the rest of the page while a dialog is open, the whole session
           becomes unresponsive with no visible way to close it. */}
-      <DialogContent className="max-w-md z-[99999999]">
+      <DialogContent className="sm:max-w-md z-[99999999]">
         <DialogHeader>
           <DialogTitle>{t(isBass ? "media.bass_tuning" : "media.guitar_tuning")}</DialogTitle>
           <DialogDescription>

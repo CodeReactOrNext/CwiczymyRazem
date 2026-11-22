@@ -194,14 +194,15 @@ export const BossResultOverlay = ({ boss }: { boss: BossDefinition }) => {
             <div className='flex flex-col gap-2'>
               <Button
                 onClick={restart}
-                className='h-10 bg-white text-zinc-950 shadow-none hover:bg-zinc-200'>
+                size='lg'>
                 {t("result.retry")}
               </Button>
               <Button
                 onClick={finish}
                 loading={isFinishing}
                 variant='ghost'
-                className='h-10 text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200'>
+                size='lg'
+                className='text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200'>
                 {t("result.finish")}
               </Button>
             </div>

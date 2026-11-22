@@ -1,4 +1,7 @@
+import { Button } from "assets/components/ui/button";
+import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
+import { BackLink } from "components/BackLink/BackLink";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import type { RoadmapSongRef } from "feature/aiCoach/types/roadmap.types";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
@@ -17,7 +20,6 @@ import {
   type QuestionOption,
 } from "lib/roadmaps/generation/questionBank";
 import {
-  ArrowLeft,
   ArrowRight,
   Music,
   Pencil,
@@ -231,13 +233,10 @@ export const BriefWizard = ({
   return (
     <div className='space-y-8'>
       <div className='flex items-center justify-between gap-4'>
-        <button
-          type='button'
+        <BackLink
+          label={index === 0 ? t("panel.brief.edit_goal") : t("panel.brief.back")}
           onClick={() => (index === 0 ? onBack() : go(index - 1))}
-          className='flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
-          <ArrowLeft size={15} />
-          {index === 0 ? t("panel.brief.edit_goal") : t("panel.brief.back")}
-        </button>
+        />
 
         {questionCount > 0 && (
           <ol
@@ -288,13 +287,13 @@ export const BriefWizard = ({
                     {preflight.reason || t("panel.brief.obscure_body")}
                   </p>
                 </div>
-                <textarea
+                <Textarea
                   rows={3}
                   value={notes}
                   maxLength={MAX_NOTES}
                   onChange={(event) => setNotes(event.target.value)}
                   placeholder={t("panel.brief.notes_placeholder")}
-                  className='block w-full resize-none rounded-lg bg-zinc-800/50 px-4 py-3 text-sm leading-relaxed text-zinc-100 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-zinc-600'
+                  className='resize-none px-4 py-3 leading-relaxed'
                 />
               </div>
             )}
@@ -378,13 +377,15 @@ export const BriefWizard = ({
                           </span>
                         </span>
                         {songsScreenAt >= 0 && (
-                          <button
+                          <Button
                             type='button'
+                            variant='ghost'
+                            size='icon-sm'
                             onClick={() => go(songsScreenAt)}
                             aria-label={t("panel.brief.change_songs")}
-                            className='rounded p-1 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
-                            <Pencil size={14} />
-                          </button>
+                            className='shrink-0 text-zinc-400'>
+                            <Pencil />
+                          </Button>
                         )}
                       </li>
                     )}
@@ -399,15 +400,17 @@ export const BriefWizard = ({
                           </span>
                           <span className='text-zinc-100'>{line.answer}</span>
                         </span>
-                        <button
+                        <Button
                           type='button'
+                          variant='ghost'
+                          size='icon-sm'
                           onClick={() => go(line.at)}
                           aria-label={t("panel.brief.change", {
                             question: line.question,
                           })}
-                          className='rounded p-1 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
-                          <Pencil size={14} />
-                        </button>
+                          className='shrink-0 text-zinc-400'>
+                          <Pencil />
+                        </Button>
                       </li>
                     ))}
                   </ul>
@@ -468,26 +471,23 @@ export const BriefWizard = ({
             </button>
           )}
           {isConfirm ? (
-            <button
+            <Button
               type='button'
+              size='lg'
               onClick={() => onGenerate(buildBrief())}
-              disabled={!canAfford}
-              className='flex min-h-11 items-center justify-center gap-2.5 rounded-lg bg-amber-400 px-5 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 hover:bg-amber-300'>
+              disabled={!canAfford}>
               <Sparkles size={16} />
               {t("panel.brief.generate")}
               <span className='flex items-center gap-1 rounded-md bg-zinc-950/10 px-1.5 py-0.5 tabular-nums'>
                 <SupportToken size={15} />
                 {cost}
               </span>
-            </button>
+            </Button>
           ) : (
-            <button
-              type='button'
-              onClick={() => go(index + 1)}
-              className='flex min-h-11 items-center justify-center gap-2 rounded-lg bg-zinc-100 px-5 text-sm font-bold text-zinc-900 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-white'>
+            <Button type='button' size='lg' onClick={() => go(index + 1)}>
               {t("panel.brief.next")}
               <ArrowRight size={15} />
-            </button>
+            </Button>
           )}
         </div>
       </div>

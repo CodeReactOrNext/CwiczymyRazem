@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "components/Breadcrumbs/Breadcrumbs";
+import { PageShell } from "components/PageShell/PageShell";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { RotationTimerBanner } from "feature/rotation/components/RotationTimerBanner";
 import { useCustomRotationItem } from "feature/rotation/hooks/useCustomRotationItem";
@@ -86,7 +87,7 @@ const TimerPractice: NextPageWithLayout = () => {
   }, [timer, dispatch]);
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen ">
+    <PageShell>
       <HeroBanner
         title="Free Timer"
         subtitle="Open stopwatch for any skill"
@@ -99,7 +100,6 @@ const TimerPractice: NextPageWithLayout = () => {
           />
         }
         backgroundContent={<HeroPattern variant="timer" />}
-        className="w-full !rounded-none !shadow-none"
       />
       {rotationItem && <RotationTimerBanner item={rotationItem} />}
       <TimerLayout
@@ -112,7 +112,7 @@ const TimerPractice: NextPageWithLayout = () => {
         onResetTimer={resetTimerHandler}
         isFinishing={isFinishing}
       />
-    </div>
+    </PageShell>
   );
 };
 

@@ -1,4 +1,4 @@
-import { PRESSABLE_KEY } from "assets/components/ui/button";
+import { Button, buttonVariants, PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AudioSelect } from "feature/toneStudio/components/AudioSelect";
 import { InputMeter } from "feature/toneStudio/components/InputMeter";
@@ -351,7 +351,7 @@ export const AmpSimButton = ({
           )}
         />
         {!compact && (
-          <span className='text-[10px] font-semibold tracking-wide'>
+          <span className='text-[11px] font-semibold'>
             {needsAttention
               ? t("amp_button.amp_alert")
               : amp.isOn
@@ -421,12 +421,10 @@ export const AmpSimButton = ({
                   type='button'
                   onClick={() => amp.toggle()}
                   disabled={amp.isBusy}
-                  className={cn(
-                    "flex h-10 items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50",
-                    amp.isOn
-                      ? "bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
-                      : "bg-white text-zinc-950 hover:bg-zinc-200",
-                  )}>
+                  className={buttonVariants({
+                    variant: amp.isOn ? "ghost" : "default",
+                    size: "lg",
+                  })}>
                   <Power size={15} />
                   {amp.isOn ? t("power.turn_off") : t("power.turn_on")}
                 </button>
@@ -577,16 +575,16 @@ export const AmpSimButton = ({
                               <Save size={13} />
                               {t("presets.save")}
                             </button>
-                            <button
+                            <Button
                               type='button'
+                              variant='ghost'
+                              size='icon-sm'
                               onClick={() => setNaming(false)}
                               title={t("common.cancel")}
-                              className={cn(
-                                smallButton,
-                                "px-2 text-zinc-400 hover:bg-zinc-800 hover:text-white",
-                              )}>
-                              <X size={13} />
-                            </button>
+                              aria-label={t("common.cancel")}
+                              className='shrink-0 text-zinc-400'>
+                              <X />
+                            </Button>
                           </div>
                         ) : (
                           // The preset's own actions, small and right under it —
@@ -698,8 +696,10 @@ export const AmpSimButton = ({
                           )}>
                           {slot.name}
                         </button>
-                        <button
+                        <Button
                           type='button'
+                          variant='ghost'
+                          size='icon-sm'
                           onClick={() => vst.openEditor(slot.id)}
                           disabled={
                             !!vst.openingSlotId || slot.status === "error"
@@ -711,17 +711,15 @@ export const AmpSimButton = ({
                             name: slot.name,
                           })}
                           className={cn(
-                            "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors disabled:opacity-50",
-                            slot.editorOpen
-                              ? "bg-zinc-700/80 text-zinc-100 hover:bg-zinc-600/80"
-                              : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
+                            "shrink-0",
+                            slot.editorOpen ? "text-zinc-100" : "text-zinc-400",
                           )}>
                           {vst.openingSlotId === slot.id ? (
-                            <Loader2 size={14} className='animate-spin' />
+                            <Loader2 className='animate-spin' />
                           ) : (
-                            <AppWindow size={14} />
+                            <AppWindow />
                           )}
-                        </button>
+                        </Button>
                       </div>
                     ))}
                   </div>
@@ -784,7 +782,7 @@ export const AmpSimButton = ({
                               <span className='text-[11px] font-medium'>
                                 {latencyLabel(choice.label)}
                               </span>
-                              <span className='text-[10px] opacity-70'>
+                              <span className='text-[11px] opacity-70'>
                                 ~{bufferMs(choice.size)} ms
                               </span>
                             </button>

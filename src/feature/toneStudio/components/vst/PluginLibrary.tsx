@@ -5,8 +5,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
-import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
+import { SearchInput } from "components/SearchInput/SearchInput";
 import { useVstHost } from "feature/toneStudio/hooks/useVstHost";
 import type { VstCategory } from "feature/toneStudio/utils/vstLibrary";
 import {
@@ -83,7 +83,7 @@ export const PluginLibrary = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align='end'
-        className='w-56 rounded-lg border-0 bg-zinc-900 p-1 text-zinc-200 shadow-none'>
+        className='w-56'>
         <DropdownMenuItem
           onSelect={() => vst.addFile()}
           className='rounded focus:bg-zinc-800 focus:text-zinc-100'>
@@ -190,14 +190,12 @@ export const PluginLibrary = ({
         <>
           <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
             <div className='sm:w-72'>
-              <Input
+              <SearchInput
                 ref={searchRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("library.search")}
                 aria-label={t("library.search")}
-                startIcon={<Search size={14} className='ml-1 text-zinc-500' />}
-                className='border-0 bg-zinc-900/60 text-zinc-100 placeholder:text-zinc-500'
               />
             </div>
             {categories.length > 1 && (
@@ -262,13 +260,15 @@ export const PluginLibrary = ({
                       </span>
                     </button>
                     {plugin.source === "file" && plugin.sourcePath && (
-                      <button
+                      <Button
                         type='button'
+                        variant='ghost'
+                        size='icon-sm'
                         onClick={() => vst.removeSource(plugin.sourcePath!)}
                         aria-label={t("library.forget", { name: plugin.name })}
-                        className='mr-2 flex h-7 w-7 shrink-0 items-center justify-center rounded text-zinc-600 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800 hover:text-zinc-300'>
-                        <X size={13} />
-                      </button>
+                        className='mr-2 shrink-0 text-zinc-400'>
+                        <X />
+                      </Button>
                     )}
                   </li>
                 );
@@ -300,13 +300,15 @@ export const PluginLibrary = ({
                   key={folder}
                   className='flex items-center gap-2 text-xs text-zinc-400'>
                   <span className='min-w-0 truncate'>{folder}</span>
-                  <button
+                  <Button
                     type='button'
+                    variant='ghost'
+                    size='icon-sm'
                     onClick={() => vst.removeSource(folder)}
                     aria-label={t("library.forget", { name: folder })}
-                    className='flex h-6 w-6 shrink-0 items-center justify-center rounded text-zinc-600 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-800 hover:text-zinc-300'>
-                    <X size={12} />
-                  </button>
+                    className='shrink-0 text-zinc-400'>
+                    <X />
+                  </Button>
                 </div>
               ))}
             </div>

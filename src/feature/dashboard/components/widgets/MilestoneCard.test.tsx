@@ -162,14 +162,14 @@ describe("the week under a milestone", () => {
   it("draws a minutes goal as bars under a goal line", () => {
     const { container } = cardFor("Spark");
 
-    expect(container.querySelector(".border-dashed")).not.toBeNull();
+    expect(container.querySelector("[data-goal-line]")).not.toBeNull();
     expect(screen.queryByText("Ear")).toBeNull();
   });
 
   it("drops the goal line on a streak goal, where the run is the point", () => {
     const { container } = cardFor("Hot Streak");
 
-    expect(container.querySelector(".border-dashed")).toBeNull();
+    expect(container.querySelector("[data-goal-line]")).toBeNull();
     expect(screen.queryByText("Ear")).toBeNull();
   });
 
@@ -180,7 +180,7 @@ describe("the week under a milestone", () => {
 
     expect(screen.getByText("Ear")).toBeTruthy();
     expect(screen.getByText("Creativity")).toBeTruthy();
-    expect(container.querySelector(".border-dashed")).toBeNull();
+    expect(container.querySelector("[data-goal-line]")).toBeNull();
   });
 
   it("keeps the categories on the all-round streaks too", () => {

@@ -27,7 +27,7 @@ export const ScoreControls = ({
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[10px] text-zinc-400 tabular-nums w-10 text-right">
+      <span className="text-[11px] text-zinc-400 tabular-nums w-10 text-right">
         {formatTime(currentMs)}
       </span>
       <div className="relative flex-1 h-1 bg-zinc-700 rounded-full overflow-hidden">
@@ -36,15 +36,15 @@ export const ScoreControls = ({
           style={{ width: `${progress}%` }}
         />
       </div>
-      <span className="text-[10px] text-zinc-400 tabular-nums w-10">
+      <span className="text-[11px] text-zinc-400 tabular-nums w-10">
         {formatTime(totalMs)}
       </span>
 
       {!uiReady && (
-        <span className="text-[10px] text-zinc-500 animate-pulse">{t("loading.loading_text")}</span>
+        <span className="text-xs text-zinc-500 animate-pulse">{t("loading.loading_text")}</span>
       )}
       {uiReady && uiPlaying && (
-        <span className="text-[10px] text-blue-400">▶</span>
+        <span className="text-xs text-blue-400">▶</span>
       )}
     </div>
   );

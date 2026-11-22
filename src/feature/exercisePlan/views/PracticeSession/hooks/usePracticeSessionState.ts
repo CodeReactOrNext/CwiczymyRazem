@@ -83,6 +83,7 @@ export const usePracticeSessionState = ({
     setShowSuccessView,
     canFinishSession,
     hasLoggedPractice,
+    isCurrentExercisePlayedOut,
     resetProgress,
   } = useSessionProgress({
     timer,
@@ -90,7 +91,6 @@ export const usePracticeSessionState = ({
     currentExerciseIndex,
     isLastExercise,
     freeMode,
-    isSkillExercise,
   });
 
 
@@ -192,6 +192,7 @@ export const usePracticeSessionState = ({
     },
     canFinishSession,
     hasLoggedPractice,
+    isCurrentExercisePlayedOut,
     isSkillExercise,
     isSubmittingReport,
     completedExercises,
@@ -207,7 +208,7 @@ export const usePracticeSessionState = ({
     isFullSessionModalOpen, isMounted, currentExercise, isLastExercise,
     setShowCompleteDialog, handleNextExercise, timer, showSuccessView,
     restartFullSession, setVideoDuration, videoDuration, setTabDuration, handleFinishSession,
-    canFinishSession, hasLoggedPractice, isSkillExercise, isSubmittingReport,
+    canFinishSession, hasLoggedPractice, isCurrentExercisePlayedOut, isSkillExercise, isSubmittingReport,
     completedExercises, reportResult, currentUserStats, previousUserStats,
     planTitleString, activityDataToUse
   ]);

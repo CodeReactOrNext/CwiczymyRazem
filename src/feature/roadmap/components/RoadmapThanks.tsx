@@ -9,7 +9,7 @@ import { SupportCta } from "./SupportCta";
 export const RoadmapThanks = () => {
   const { t } = useTranslation("supporter");
   return (
-    <section className='rounded-lg bg-zinc-900/40 p-5 sm:p-7'>
+    <section className='rounded-lg bg-zinc-800/40 p-5 sm:p-7'>
       <div className='flex flex-wrap items-center gap-x-12 gap-y-6'>
         {/* Full width until lg: the shrink-0 CTA would otherwise squeeze the
             copy down to a word per line on a phone. */}

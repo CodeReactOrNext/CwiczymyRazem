@@ -1,4 +1,7 @@
 import { Button } from "assets/components/ui/button";
+import { Skeleton } from "assets/components/ui/skeleton";
+import { EmptyState } from "components/EmptyState/EmptyState";
+import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import { NewIdeaDialog } from "feature/supporterPanel/components/NewIdeaDialog";
 import { RoadmapIdeaCard } from "feature/supporterPanel/components/RoadmapIdeaCard";
@@ -14,45 +17,29 @@ import { Lightbulb, Plus } from "lucide-react";
 import { useState } from "react";
 
 const BoardSkeleton = () => (
-  <div className='space-y-8'>
+  <div className='space-y-8' aria-busy='true'>
     <div className='space-y-3'>
       {Array.from({ length: 4 }, (_, index) => (
-        <div
-          key={index}
-          className='h-28 animate-pulse rounded-lg bg-zinc-900/40'
-        />
+        <Skeleton key={index} variant='block' className='h-28' />
       ))}
     </div>
   </div>
 );
 
-const SectionHeading = ({ title, count }: { title: string; count: number }) => (
-  <h2 className='flex items-baseline gap-2 text-sm font-bold text-zinc-200'>
-    {title}
-    <span className='font-normal tabular-nums text-zinc-500'>{count}</span>
-  </h2>
-);
-
 const EmptyBoard = ({ onPost }: { onPost: () => void }) => {
   const { t } = useTranslation("supporter");
   return (
-    <div className='flex flex-col items-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-      <span className='mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/60 text-zinc-400'>
-        <Lightbulb size={26} />
-      </span>
-      <h3 className='mb-2 text-lg font-bold text-zinc-100'>
-        {t("panel.board.empty_title")}
-      </h3>
-      <p className='max-w-sm text-sm text-zinc-400'>
-        {t("panel.board.empty_body")}
-      </p>
-      <Button onClick={onPost} className='mt-7'>
-        <span className='flex items-center gap-2'>
+    <EmptyState
+      icon={<Lightbulb />}
+      title={t("panel.board.empty_title")}
+      description={t("panel.board.empty_body")}
+      action={
+        <Button onClick={onPost}>
           <Plus size={16} />
           {t("panel.board.post")}
-        </span>
-      </Button>
-    </div>
+        </Button>
+      }
+    />
   );
 };
 
@@ -89,10 +76,8 @@ export const RoadmapBoardTab = ({
           <span className='flex items-center gap-2'>
             <Plus size={16} />
             {t("panel.board.post")}
-            <span className='ml-1 inline-flex items-center gap-1 rounded bg-zinc-900/10 px-1.5 py-0.5 text-sm font-bold tabular-nums'>
-              <SupportToken size={16} />
-              {IDEA_COST}
-            </span>
+            <SupportToken size={16} />
+            {IDEA_COST}
           </span>
         </Button>
       </div>
@@ -103,9 +88,10 @@ export const RoadmapBoardTab = ({
         <div className='space-y-12'>
           {groupIdeas(board.ideas).map((group) => (
             <section key={group.key} className='space-y-4'>
-              <SectionHeading
+              <SectionHeader
                 title={t(`panel.board.groups.${group.key}`, group.title)}
                 count={group.ideas.length}
+                className='mb-0'
               />
               <div className='space-y-3'>
                 {group.ideas.map((idea, index) => (

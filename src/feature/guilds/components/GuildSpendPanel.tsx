@@ -239,7 +239,7 @@ export const PledgeButton = ({
         "border-b-black/30",
         "flex items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-sm font-bold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40",
         finishes
-          ? "bg-white text-zinc-950 hover:bg-zinc-200"
+          ? "bg-primary text-primary-foreground hover:bg-primary/90"
           : "bg-zinc-950/50 text-zinc-100 hover:bg-zinc-950/70",
       )}>
       +

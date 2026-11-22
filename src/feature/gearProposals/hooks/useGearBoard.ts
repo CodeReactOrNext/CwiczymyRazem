@@ -4,6 +4,7 @@ import type {
   GearBoard,
   ProposalStatus,
 } from "feature/gearProposals/types/gearProposal.types";
+import { useTranslation } from "hooks/useTranslation";
 import type { GearProposalInput } from "lib/gear/gearBoard";
 import { toast } from "sonner";
 import { auth } from "utils/firebase/client/firebase.utils";
@@ -40,6 +41,7 @@ const errorMessage = (error: unknown, fallback: string): string => {
 
 export const useGearMutations = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation("supporter");
 
   const applyBoard = (board: GearBoard) =>
     queryClient.setQueryData(GEAR_BOARD_KEY, board);
@@ -49,7 +51,7 @@ export const useGearMutations = () => {
       post("/api/supporter/gear/propose", input),
     onSuccess: (board) => {
       applyBoard(board);
-      toast.success("Proposal filed");
+      toast.success(t("toast.proposal_filed"));
     },
     onError: (error) =>
       toast.error(errorMessage(error, "Could not file that proposal")),

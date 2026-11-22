@@ -38,7 +38,7 @@ export const EloExplainer = () => {
   );
 
   return (
-    <section className='flex flex-col gap-3 rounded-2xl bg-zinc-800/50 p-4 sm:p-5'>
+    <section className='flex flex-col gap-3 rounded-lg bg-zinc-800/40 p-5 sm:p-6'>
       <h3 className='text-base font-semibold text-zinc-50'>{t("elo.title")}</h3>
       <p className='text-sm leading-relaxed text-zinc-300'>
         {t("elo.body_0", { start: DUEL_START_RATING })}
@@ -113,7 +113,7 @@ export const DuelRulesDialog = ({
     <Dialog
       open={view !== null}
       onOpenChange={(open) => !open && onViewChange(null)}>
-      <DialogContent className='flex max-w-lg flex-col gap-5 bg-zinc-900 sm:max-h-[calc(100dvh-2rem)] sm:overflow-y-auto sm:border-0 sm:p-7'>
+      <DialogContent className='flex flex-col gap-5 bg-zinc-900 sm:max-h-[calc(100dvh-2rem)] sm:overflow-y-auto sm:p-7'>
         {view === "elo" ? (
           <>
             <DialogTitle className='pr-12 text-xl text-zinc-50'>
@@ -123,7 +123,7 @@ export const DuelRulesDialog = ({
             <Button
               variant='ghost'
               size='lg'
-              className='h-11 w-full'
+              className='w-full'
               onClick={() => onViewChange("rules")}>
               {t("elo.all_rules")}
             </Button>

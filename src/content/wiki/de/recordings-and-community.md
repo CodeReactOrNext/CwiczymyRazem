@@ -32,4 +32,4 @@ Wenn du ein stetiges Fame-Einkommen ohne Grinden willst, teile, was du ohnehin e
 
 <FaqList items="Kann ich etwas Privates posten?::Aufnahmen werden mit der Community geteilt. Wenn du einen Take lieber für dich behalten willst, lade ihn einfach nicht hoch, und die Gewohnheit Aufnahme kannst du beim Eintragen der Session trotzdem abhaken|Kann ich eine Aufnahme löschen?::Ja, deine eigenen Aufnahmen können jederzeit entfernt werden|Zahlen Aufnahmen allein Punkte?::Nur über Challenges. Eine außerhalb einer Challenge gepostete Aufnahme dient dem Feedback, nicht der Wertung|Wer kann kommentieren?::Jeder angemeldete Spieler. Benachrichtigungen sagen dir, wenn jemand es tut" />
 
-<ReadNext links="Woher Fame kommt::/wiki/fame|Monatliche Challenges::/wiki/monthly-challenges|Songs & Schwierigkeit::/wiki/songs-playlists-and-difficulty|Übungsroutinen & Übungen teilen::/wiki/exercise-plans-and-auto-plan" />
+<ReadNext links="Woher Fame kommt::/wiki/fame|Monatliche Challenges::/wiki/monthly-challenges|Songs & Schwierigkeit::/wiki/songs-playlists-and-difficulty|Übungspläne & Übungen teilen::/wiki/exercise-plans-and-auto-plan" />

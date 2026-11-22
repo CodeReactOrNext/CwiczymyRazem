@@ -90,7 +90,8 @@
     "public_hint": "Für alle Nutzer sichtbar.",
     "missing": "Noch erforderlich: {{fields}}",
     "create": "Plan erstellen",
-    "name_required": "Gib deinem Plan einen Namen"
+    "name_required": "Gib deinem Plan einen Namen",
+    "save": "Änderungen speichern"
   },
   "add_song": {
     "practise_with": "Üben mit",

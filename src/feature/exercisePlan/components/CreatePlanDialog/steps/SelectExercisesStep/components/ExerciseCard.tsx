@@ -1,6 +1,7 @@
-import { Badge } from "assets/components/ui/badge";
-import { PRESSABLE } from "assets/components/ui/button";
+import { Button } from "assets/components/ui/button";
+import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
+import { getCategoryChipColor } from "feature/exercisePlan/constants/categoryChip";
 import { useLocalizeExercise } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
@@ -101,54 +102,39 @@ export const ExerciseCard = ({
 
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-4">
-            <Badge variant="outline" className={cn(
-              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-base",
-              exercise.category === "technique"  && "text-emerald-400 group-hover:border-emerald-500/30 group-hover:bg-emerald-500/10",
-              exercise.category === "theory"     && "text-blue-400 group-hover:border-blue-500/30 group-hover:bg-blue-500/10",
-              exercise.category === "creativity" && "text-purple-400 group-hover:border-purple-500/30 group-hover:bg-purple-500/10",
-              exercise.category === "hearing"    && "text-amber-400 group-hover:border-amber-500/30 group-hover:bg-amber-500/10",
-            )}>
+            <Chip color={getCategoryChipColor(exercise.category)} size='sm'>
               {t(`common:categories.${exercise.category}` as any)}
-            </Badge>
+            </Chip>
 
-            <Badge variant="outline" className={cn(
-              "px-2.5 py-0.5 text-[11px] font-medium tracking-wide rounded border-white/5 bg-white/5 backdrop-blur-md shadow-none transition-colors duration-base",
-              exercise.difficulty === "beginner" && "text-sky-400 group-hover:border-sky-500/30 group-hover:bg-sky-500/10",
-              exercise.difficulty === "easy"   && "text-green-400 group-hover:border-green-500/30 group-hover:bg-green-500/10",
-              exercise.difficulty === "medium" && "text-yellow-400 group-hover:border-yellow-500/30 group-hover:bg-yellow-500/10",
-              exercise.difficulty === "hard"   && "text-red-400 group-hover:border-red-500/30 group-hover:bg-red-500/10",
-            )}>
+            <Chip color='gray' size='sm'>
               {t(`common:difficulty.${exercise.difficulty}` as any)}
-            </Badge>
+            </Chip>
 
             {isPrivate && (
-              <Badge className="bg-cyan-500/10 text-cyan-400 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">
-                <Lock className="mr-1 h-3 w-3" />{t("plans:private")}
-              </Badge>
+              <Chip color='gray' size='sm'>
+                <Lock className="h-3 w-3" />{t("plans:private")}
+              </Chip>
             )}
 
             {exercise.isPlayalong && (
-              <Badge className="bg-red-500/10 text-red-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">
-                <FaYoutube className="mr-1 h-3.5 w-3.5" />{t("plans:playalong")}
-              </Badge>
+              <Chip color='gray' size='sm'>
+                <FaYoutube className="h-3.5 w-3.5 text-red-500" />{t("plans:playalong")}
+              </Chip>
             )}
             {exercise.videoUrl && !exercise.isPlayalong && (
-              <Badge className="bg-cyan-500/10 text-cyan-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded shadow-none">
-                <Video className="mr-1 h-3.5 w-3.5" />{t("plans:video")}
-              </Badge>
+              <Chip color='gray' size='sm'>
+                <Video className="h-3.5 w-3.5" />{t("plans:video")}
+              </Chip>
             )}
 
             {skills.map((skill) => {
               if (!skill) return null;
               const Icon = skill.icon;
               return (
-                <span
-                  key={skill.id}
-                  className="inline-flex items-center gap-1 mt-0.5 sm:mt-0 px-2.5 py-0.5 text-[11px] font-medium text-zinc-400 group-hover:text-zinc-300 transition-colors bg-white/[0.03] border border-white/5 rounded"
-                >
+                <Chip key={skill.id} color='gray' size='sm' className='text-zinc-400'>
                   {Icon && <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />}
                   {t(`common:skills.${skill.id}` as any)}
-                </span>
+                </Chip>
               );
             })}
           </div>
@@ -165,37 +151,41 @@ export const ExerciseCard = ({
 
           {/* Action button on Desktop */}
           {isLocked ? (
-            <div className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-1.5 ring-1 ring-amber-500/20">
-              <Lock className="h-3.5 w-3.5 text-amber-500" />
-              <span className="text-[11px] font-bold text-amber-500">{t("plans:pro")}</span>
-            </div>
+            <Chip color='amber'>
+              <Lock className="h-3.5 w-3.5" />
+              {t("plans:pro")}
+            </Chip>
           ) : (
             <div className="flex items-center gap-1.5 shrink-0">
               {onToggleFavorite && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
                   aria-label={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                   aria-pressed={isFavorite}
-                  className={cn(PRESSABLE, "border-b-black/30", 
-                    "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden ring-1",
-                    isFavorite
-                      ? "bg-rose-500/15 text-rose-400 ring-rose-500/30 hover:bg-rose-500/25 hover:text-rose-300"
-                      : "bg-white/5 text-zinc-400 ring-white/10 hover:text-rose-300 hover:bg-rose-500/10"
+                  // Favourited = the heart lights up; the face stays the same key.
+                  className={cn(
+                    "shrink-0",
+                    isFavorite ? "text-rose-400 hover:text-rose-300" : "text-zinc-400 hover:text-rose-300"
                   )}
                   title={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                 >
-                  <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
-                </button>
+                  <Heart className={cn(isFavorite && "fill-current")} />
+                </Button>
               )}
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={(e) => { e.stopPropagation(); onPreview?.(exercise); }}
-                className={cn(PRESSABLE, "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 ring-1 ring-white/10 border-b-black/30")}
+                className="shrink-0 text-zinc-400"
                 title={t("plans:preview_details")}
+                aria-label={t("plans:preview_details")}
               >
-                <Info className="h-4 w-4" />
-              </button>
+                <Info />
+              </Button>
               <div className={cn(
                 "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-slow overflow-hidden shrink-0",
                 isSelected
@@ -221,35 +211,35 @@ export const ExerciseCard = ({
              {isSelected ? t("plans:card.exercise_added") : t("plans:card.pick_exercise")}
            </span>
            {isLocked ? (
-             <div className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-1.5 ring-1 ring-amber-500/20">
-               <Lock className="h-3.5 w-3.5 text-amber-500" />
-               <span className="text-[11px] font-bold text-amber-500">{t("plans:pro")}</span>
-             </div>
+             <Chip color='amber'>
+               <Lock className="h-3.5 w-3.5" />
+               {t("plans:pro")}
+             </Chip>
            ) : (
              <div className="flex flex-row items-center gap-2">
                {onToggleFavorite && (
-                 <button
+                 <Button
                    type="button"
+                   variant="ghost"
+                   size="icon"
                    onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
                    aria-label={isFavorite ? t("plans:remove_favorite") : t("plans:add_favorite")}
                    aria-pressed={isFavorite}
-                   className={cn(PRESSABLE, "border-b-black/30", 
-                     "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden ring-1",
-                     isFavorite
-                       ? "bg-rose-500/15 text-rose-400 ring-rose-500/30"
-                       : "bg-white/5 text-zinc-400 ring-white/10"
-                   )}
+                   className={cn("shrink-0", isFavorite ? "text-rose-400" : "text-zinc-400")}
                  >
-                   <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
-                 </button>
+                   <Heart className={cn(isFavorite && "fill-current")} />
+                 </Button>
                )}
-               <button
+               <Button
                  type="button"
+                 variant="ghost"
+                 size="icon"
                  onClick={(e) => { e.stopPropagation(); onPreview?.(exercise); }}
-                 className={cn(PRESSABLE, "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-base overflow-hidden bg-white/5 text-zinc-400 ring-1 ring-white/10 border-b-black/30")}
+                 className="shrink-0 text-zinc-400"
+                 aria-label={t("plans:preview_details")}
                >
-                 <Info className="h-4 w-4" />
-               </button>
+                 <Info />
+               </Button>
                <div className={cn(
                  "flex items-center justify-center min-w-[36px] h-[36px] rounded-lg transition-colors duration-slow overflow-hidden",
                  isSelected

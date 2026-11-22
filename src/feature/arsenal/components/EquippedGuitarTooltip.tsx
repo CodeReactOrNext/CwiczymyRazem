@@ -71,7 +71,7 @@ export const EquippedGuitarTooltip = ({
         <TooltipTrigger asChild>{children}</TooltipTrigger>
         {item && (
           <TooltipContent
-            className='border-0 bg-transparent p-0 shadow-2xl'
+            className='bg-transparent p-0'
             side='top'>
             <div style={{ width: CARD_WIDTH }}>
               <GuitarCard item={item} readOnly />

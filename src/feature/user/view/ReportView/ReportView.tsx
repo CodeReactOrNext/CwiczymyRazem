@@ -11,7 +11,8 @@ import {
 import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { SKILL_CATEGORY_ICONS } from "components/Icon/skillCategoryIcons";
-import Backdrop from "components/UI/Backdrop";
+import { pageTitleClass } from "components/PageTitle/PageTitle";
+import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { MAX_DAYS_BACK } from "constants/gameSettings";
 import { isAutoPlanId, isRecognizedPracticePlanId } from "feature/exercisePlan/utils/isRecognizedPracticePlan";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
@@ -32,6 +33,7 @@ import {
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { Formik } from "formik";
+import { useMediaQuery } from "hooks/useMediaQuery";
 import { useTranslation } from "hooks/useTranslation";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
@@ -70,6 +72,7 @@ import {
 import { resolveInternalPath } from "utils/resolveInternalPath";
 import { i18n } from "utils/translation";
 
+import { categoryTone, TONE_CLASSES } from "./helpers/categoryTone";
 import {
   getLastReportInstant,
   isLastReportTimeExceeded,
@@ -103,7 +106,7 @@ import {
   withSongHearingMinutes,
   withSongTotalMinutes,
 } from "./helpers/timeSteps";
-import { CategoryBadge, ChoiceTile, DetailRow, StepHeader } from "./ReportFlowParts";
+import { CategoryBadge, ChoiceTile, DetailRow, FormSection, StepHeader } from "./ReportFlowParts";
 import type { ReportFormikInterface } from "./ReportView.types";
 import SessionSkillPicker from "./SessionSkillPicker";
 import SessionSongPicker, { SongCover } from "./SessionSongPicker";
@@ -153,6 +156,11 @@ const ReportView = () => {
   const [freeInput, setFreeInput] = useState<FreeInput>("categories");
   const [skillMinutes, setSkillMinutes] = useState<SkillMinutes>({});
   const autoApplyTimer = applyTimer === "true";
+  // Phones and tablets answer the log as three questions, one per screen.
+  // Desktop keeps the whole form on one page — players with a mouse found
+  // the steps and detail sheets too much clicking. The server renders the
+  // questions, so a phone never flashes the desktop form.
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
   const { t } = useTranslation("report");
   const { t: tSkills } = useTranslation("skills");
   const intlLocale = useIntlLocale();
@@ -829,6 +837,7 @@ const ReportView = () => {
                     minutes: skillMinutes[skill.id] ?? 0,
                     isName: false,
                     leading: <CategoryBadge size='sm' category={skill.category} />,
+                    barClassName: TONE_CLASSES[categoryTone(skill.category)].bar,
                   }))
                 : categories
                     .filter(({ key }) => activeCategories.includes(key))
@@ -838,6 +847,7 @@ const ReportView = () => {
                       minutes: getCategoryMinutes(values, key),
                       isName: false,
                       leading: <CategoryBadge size='sm' category={key} />,
+                      barClassName: TONE_CLASSES[categoryTone(key)].bar,
                     }));
 
             const detailMeta = {
@@ -856,14 +866,317 @@ const ReportView = () => {
                 size='lg'
                 loading={isFetching}
                 disabled={!hasTime || hasErrors}
-                className='h-12 w-full text-base'>
+                className='w-full'>
                 {isFetching ? t("form.saving") : t("flow.save")}
               </Button>
             );
 
+            const songArrangementPicker = (song: PickedSong) => (
+              <ArrangementPicker
+                value={song.arrangement ?? null}
+                onChange={(arrangement) => setSongArrangement(song.id, arrangement)}
+                noneLabel={t("songs.any_part")}
+                size='sm'
+                className='bg-zinc-950/50'
+              />
+            );
+
+            const songByEarStepper = (song: PickedSong) => (
+              <MinutesStepper
+                label={`${song.title} — ${t("hearing")}`}
+                minutes={song.hearingMinutes}
+                max={songTotalMinutes(song)}
+                onChange={(minutes) =>
+                  updateSong(
+                    song.id,
+                    (picked) => withSongHearingMinutes(picked, minutes),
+                    setFieldValue
+                  )
+                }
+              />
+            );
+
+            // Today and yesterday by name; older days by weekday and date,
+            // short enough for all of them to sit in one row.
+            const dayOptionLabel = (days: number) =>
+              days <= 1
+                ? dayLabel(days)
+                : getDateFromPast(days).toLocaleDateString(intlLocale, {
+                    weekday: "short",
+                    day: "numeric",
+                  });
+
+            // Desktop: the pre-wizard structure — what and how long, then the
+            // title and tags, the habits and the day — all on one page, each
+            // part on its own plate, with the session summary and the save
+            // beside them.
+            const tagsStep = 2;
+            const habitsStep = isSongMode ? 2 : 3;
+            const whenStep = habitsStep + 1;
+            const desktopForm = (
+              <div className='grid grid-cols-[minmax(0,1fr)_20rem] gap-10 xl:grid-cols-[minmax(0,1fr)_24rem] xl:gap-16'>
+                <div className='flex min-w-0 flex-col gap-10'>
+                  <FormSection
+                    step={1}
+                    title={t("flow.q_what")}
+                    done={hasTime}
+                    action={
+                      <SegmentedControl<SessionMode>
+                        label={t("flow.q_what")}
+                        selected={[sessionMode]}
+                        onSelect={(mode) => chooseMode(mode, setFieldValue)}
+                        options={[
+                          {
+                            value: "free",
+                            label: t("flow.kind_free"),
+                            icon: <Target className='h-4 w-4' />,
+                          },
+                          {
+                            value: "songs",
+                            label: t("flow.kind_songs"),
+                            icon: <Music className='h-4 w-4' />,
+                          },
+                        ]}
+                      />
+                    }>
+                    {hasSavedTime && (
+                      <ChoiceTile
+                        quiet
+                        icon={<Timer size='1em' />}
+                        title={t("flow.timer_title")}
+                        hint={t("flow.timer_hint", { time: formatPracticed(savedTimerSum) })}
+                        onClick={() => applyTimerShortcut(setFieldValue)}
+                      />
+                    )}
+
+                    {!isSongMode && (
+                      <SegmentedControl<FreeInput>
+                        label={t("flow.q_focus")}
+                        selected={[freeInput]}
+                        onSelect={(input) => switchFreeInput(input, setFieldValue)}
+                        options={[
+                          { value: "categories", label: t("flow.by_category") },
+                          { value: "skills", label: t("flow.by_skill") },
+                        ]}
+                      />
+                    )}
+
+                    {!isSongMode && !isBySkill && (
+                      <div className='grid grid-cols-1 gap-4 2xl:grid-cols-2'>
+                        {categories.map(({ key, label, hint }) => {
+                          const minutes = getCategoryMinutes(values, key);
+                          return (
+                            <TimeBlock
+                              key={key}
+                              variant='row'
+                              tone={categoryTone(key)}
+                              leading={<CategoryBadge category={key} active={minutes > 0} />}
+                              title={label}
+                              subtitle={hint}
+                              minutes={minutes}
+                              max={MAX_CATEGORY_MINUTES}
+                              onChange={(next) =>
+                                setMinutesField(
+                                  `${key}Hours`,
+                                  `${key}Minutes`,
+                                  Math.max(0, Math.min(next, MAX_CATEGORY_MINUTES)),
+                                  setFieldValue
+                                )
+                              }
+                            />
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {isBySkill && (
+                      <>
+                        <SessionSkillPicker
+                          value={skillMinutes}
+                          onToggle={(skillId) => toggleSkill(skillId, setFieldValue)}
+                        />
+                        {pickedSkills.length > 0 && (
+                          <div className='flex flex-col gap-5'>
+                            <h3 className='text-base font-semibold text-zinc-300'>
+                              {t("flow.q_time")}
+                            </h3>
+                            <div className='grid grid-cols-1 gap-4 2xl:grid-cols-2'>
+                              {pickedSkills.map((skill) => {
+                                const minutes = skillMinutes[skill.id] ?? 0;
+                                return (
+                                  <TimeBlock
+                                    key={skill.id}
+                                    variant='row'
+                                    tone={categoryTone(skill.category)}
+                                    leading={
+                                      <CategoryBadge
+                                        category={skill.category}
+                                        active={minutes > 0}
+                                      />
+                                    }
+                                    title={tSkills(`skills.${skill.id}.name` as never)}
+                                    minutes={minutes}
+                                    max={MAX_SKILL_MINUTES}
+                                    onChange={(next) =>
+                                      setSkillMinutesFor(skill.id, next, setFieldValue)
+                                    }
+                                    onRemove={() => toggleSkill(skill.id, setFieldValue)}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {isSongMode && (
+                      <>
+                        <SessionSongPicker
+                          userId={userAuth as string | null}
+                          selected={pickedSongs}
+                          onToggle={(song) => toggleSong(song, setFieldValue)}
+                        />
+                        {pickedSongs.length > 0 && (
+                          <div className='flex flex-col gap-5'>
+                            <h3 className='text-base font-semibold text-zinc-300'>
+                              {t("flow.q_time")}
+                            </h3>
+                            <div className='flex flex-col gap-4'>
+                              {pickedSongs.map((song) => (
+                                <TimeBlock
+                                  key={song.id}
+                                  variant='row'
+                                  isName
+                                  leading={<SongCover coverUrl={song.coverUrl} />}
+                                  title={song.title}
+                                  subtitle={song.artist}
+                                  minutes={songTotalMinutes(song)}
+                                  max={MAX_SONG_CATEGORY_MINUTES}
+                                  onChange={(minutes) =>
+                                    updateSong(
+                                      song.id,
+                                      (picked) => withSongTotalMinutes(picked, minutes),
+                                      setFieldValue
+                                    )
+                                  }
+                                  onRemove={() => toggleSong(song, setFieldValue)}>
+                                  <div className='flex flex-wrap items-center justify-between gap-x-8 gap-y-4'>
+                                    {songArrangementPicker(song)}
+                                    <div className='flex items-center gap-3'>
+                                      <span className='text-sm text-zinc-400'>
+                                        {t("flow.by_ear")}
+                                      </span>
+                                      {songByEarStepper(song)}
+                                    </div>
+                                  </div>
+                                </TimeBlock>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </FormSection>
+
+                  {!isSongMode && (
+                    <FormSection
+                      step={tagsStep}
+                      title={t("flow.detail_tags")}
+                      description={t("description.sesion_title")}
+                      optionalLabel={t("form.optional")}
+                      done={values.reportTitle.trim().length > 0}>
+                      <SessionTagPicker
+                        title={values.reportTitle}
+                        titleError={errors.reportTitle}
+                        selectedTags={selectedTags}
+                        onTitleChange={(title) => {
+                          setSelectedTags([]);
+                          setFieldValue("reportTitle", title);
+                        }}
+                        onToggleTag={(label) => toggleTag(label, setFieldValue)}
+                      />
+                    </FormSection>
+                  )}
+
+                  <FormSection
+                    step={habitsStep}
+                    title={t("flow.detail_habits")}
+                    description={streakText}
+                    optionalLabel={t("form.optional")}
+                    done={habitCount > 0}
+                    action={
+                      <span className='pt-1.5 text-sm font-semibold tabular-nums text-zinc-400'>
+                        {t("flow.habits_count", {
+                          count: habitCount,
+                          total: healthHabbitsList.length,
+                        })}
+                      </span>
+                    }>
+                    {/* One even column: in a grid the five long questions
+                        broke into ragged rows of two and three. */}
+                    <div className='flex max-w-3xl flex-col gap-3'>
+                      {healthHabbitsList.map(({ name, questionMarkProps, title }) => (
+                        <HealthHabbitsBox
+                          key={name}
+                          name={name}
+                          title={title}
+                          questionMarkProps={questionMarkProps}
+                        />
+                      ))}
+                    </div>
+                  </FormSection>
+
+                  <FormSection
+                    step={whenStep}
+                    title={t("form.when")}
+                    description={t("description.max_days", { days: MAX_DAYS_BACK })}
+                    optionalLabel={t("form.optional")}
+                    done={hasTime}>
+                    <div className='flex flex-col gap-4'>
+                      <SegmentedControl
+                        label={t("form.when")}
+                        selected={[String(values.countBackDays)]}
+                        onSelect={(days) => setFieldValue("countBackDays", Number(days))}
+                        options={Array.from({ length: MAX_DAYS_BACK + 1 }, (_, days) => ({
+                          value: String(days),
+                          label: dayOptionLabel(days),
+                        }))}
+                      />
+                      <p className='text-sm text-zinc-400'>
+                        {t("form.selected")}{" "}
+                        <span className='text-zinc-200'>
+                          {getDateFromPast(values.countBackDays).toLocaleDateString(intlLocale)}
+                        </span>
+                      </p>
+                    </div>
+                  </FormSection>
+
+                  {hasErrors && <ErrorBox errors={errors} />}
+                </div>
+
+                <aside>
+                  <SessionSummary
+                    lines={summaryLines}
+                    totalMs={totalMs}
+                    isReady={hasTime && !hasErrors}
+                    footer={
+                      <>
+                        {saveButton}
+                        {!hasTime && (
+                          <p className='text-sm text-zinc-400'>{t("flow.add_time_hint")}</p>
+                        )}
+                      </>
+                    }
+                  />
+                </aside>
+              </div>
+            );
+
             return (
               <>
-                <ReportFormLayout>
+                <ReportFormLayout className={isDesktop ? "max-w-none" : undefined}>
+                  {isDesktop ? desktopForm : (
                   <div className='grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,42rem)_20rem] lg:justify-between lg:gap-12'>
                     <div
                       ref={flowTopRef}
@@ -882,7 +1195,7 @@ const ReportView = () => {
                       {/* QUESTION 1: WHAT */}
                       {step === "what" && (
                         <section className='flex flex-col gap-8 duration-base animate-in fade-in slide-in-from-bottom-1'>
-                          <h2 className='text-2xl font-bold tracking-tight text-zinc-100 sm:text-3xl'>
+                          <h2 className={pageTitleClass}>
                             {t("flow.q_what")}
                           </h2>
                           <div className='flex flex-col gap-4'>
@@ -925,7 +1238,7 @@ const ReportView = () => {
                       {step === "pick" && (
                         <section className='flex flex-col gap-8 duration-base animate-in fade-in slide-in-from-bottom-1'>
                           <div className='flex flex-col gap-2'>
-                            <h2 className='text-2xl font-bold tracking-tight text-zinc-100 sm:text-3xl'>
+                            <h2 className={pageTitleClass}>
                               {isSongMode ? t("flow.q_songs") : t("flow.q_focus")}
                             </h2>
                             <p className='text-base text-zinc-400'>{t("flow.pick_hint")}</p>
@@ -939,31 +1252,15 @@ const ReportView = () => {
                             />
                           ) : (
                             <div className='flex flex-col gap-4'>
-                              <div
-                                role='tablist'
-                                className='flex gap-1 self-start rounded-lg bg-zinc-900/60 p-1'>
-                                {(
-                                  [
-                                    { input: "categories", label: t("flow.by_category") },
-                                    { input: "skills", label: t("flow.by_skill") },
-                                  ] as const
-                                ).map(({ input, label }) => (
-                                  <button
-                                    key={input}
-                                    type='button'
-                                    role='tab'
-                                    aria-selected={freeInput === input}
-                                    onClick={() => switchFreeInput(input, setFieldValue)}
-                                    className={cn(
-                                      "min-h-10 rounded px-4 py-2 text-sm font-semibold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                                      freeInput === input
-                                        ? "bg-zinc-700/80 text-white"
-                                        : "text-zinc-400 hover:bg-zinc-800/70 hover:text-white"
-                                    )}>
-                                    {label}
-                                  </button>
-                                ))}
-                              </div>
+                              <SegmentedControl<FreeInput>
+                                label={t("flow.q_focus")}
+                                selected={[freeInput]}
+                                onSelect={(input) => switchFreeInput(input, setFieldValue)}
+                                options={[
+                                  { value: "categories", label: t("flow.by_category") },
+                                  { value: "skills", label: t("flow.by_skill") },
+                                ]}
+                              />
 
                               {isBySkill ? (
                                 <SessionSkillPicker
@@ -996,7 +1293,7 @@ const ReportView = () => {
                           <Button
                             type='button'
                             size='lg'
-                            className='h-12 text-base sm:min-w-56 sm:self-end'
+                            className='sm:min-w-56 sm:self-end'
                             disabled={!canContinue}
                             onClick={() => setStep("time")}>
                             {t("flow.next")}
@@ -1008,7 +1305,7 @@ const ReportView = () => {
                       {step === "time" && (
                         <section className='flex flex-col gap-8 duration-base animate-in fade-in slide-in-from-bottom-1'>
                           <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-3'>
-                            <h2 className='text-2xl font-bold tracking-tight text-zinc-100 sm:text-3xl'>
+                            <h2 className={pageTitleClass}>
                               {t("flow.q_time")}
                             </h2>
                             <Button
@@ -1203,10 +1500,11 @@ const ReportView = () => {
                       />
                     </aside>
                   </div>
+                  )}
                 </ReportFormLayout>
 
                 <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-                  <DialogContent className='dark-theme gap-6 sm:max-w-xl sm:overflow-y-auto'>
+                  <DialogContent className='dark-theme gap-6 sm:overflow-y-auto'>
                     <DialogHeader className='pr-10 text-left'>
                       <DialogTitle>{detailMeta.title}</DialogTitle>
                       <DialogDescription>{detailMeta.description}</DialogDescription>
@@ -1223,29 +1521,10 @@ const ReportView = () => {
                               className='truncate text-base font-semibold text-zinc-100'>
                               {song.title}
                             </p>
-                            <ArrangementPicker
-                              value={song.arrangement ?? null}
-                              onChange={(arrangement) =>
-                                setSongArrangement(song.id, arrangement)
-                              }
-                              noneLabel={t("songs.any_part")}
-                              size='sm'
-                              className='bg-zinc-950/50'
-                            />
+                            {songArrangementPicker(song)}
                             <div className='flex flex-wrap items-center justify-between gap-3'>
                               <span className='text-sm text-zinc-400'>{t("flow.by_ear")}</span>
-                              <MinutesStepper
-                                label={`${song.title} — ${t("hearing")}`}
-                                minutes={song.hearingMinutes}
-                                max={songTotalMinutes(song)}
-                                onChange={(minutes) =>
-                                  updateSong(
-                                    song.id,
-                                    (picked) => withSongHearingMinutes(picked, minutes),
-                                    setFieldValue
-                                  )
-                                }
-                              />
+                              {songByEarStepper(song)}
                             </div>
                           </div>
                         ))}
@@ -1318,7 +1597,8 @@ const ReportView = () => {
                       <DialogFooter>
                         <Button
                           type='button'
-                          className='h-11 sm:h-9 sm:min-w-28'
+                          size='lg'
+                          className='sm:min-w-28'
                           onClick={() => setIsDetailOpen(false)}>
                           {t("flow.done")}
                         </Button>
@@ -1327,36 +1607,26 @@ const ReportView = () => {
                   </DialogContent>
                 </Dialog>
 
-                {acceptPopUpVisible && exceedingTime && (
-                  <Backdrop selector='overlays'>
-                    <div>
-                      <AcceptExceedingPopUp
-                        exceedingTime={exceedingTime}
-                        onAccept={() => reportOnSubmit(values)}
-                        isFetching={isFetching}
-                        setAcceptExceedingTime={setAcceptExceedingTime}
-                        setAcceptPopUpVisible={setAcceptPopUpVisible}
-                      />
-                    </div>
-                  </Backdrop>
-                )}
+                <AcceptExceedingPopUp
+                  open={acceptPopUpVisible && !!exceedingTime}
+                  exceedingTime={exceedingTime || 0}
+                  onAccept={() => reportOnSubmit(values)}
+                  isFetching={isFetching}
+                  setAcceptExceedingTime={setAcceptExceedingTime}
+                  setAcceptPopUpVisible={setAcceptPopUpVisible}
+                />
 
-                {longTimePopUpVisible && (
-                  <Backdrop selector='overlays'>
-                    <div>
-                      <LongPracticeConfirmPopUp
-                        totalTime={getSumTime(values)}
-                        onAccept={() => {
-                          setLongTimePopUpVisible(false);
-                          reportOnSubmit(values);
-                        }}
-                        isFetching={isFetching}
-                        setAcceptLongTime={setAcceptLongTime}
-                        setLongTimePopUpVisible={setLongTimePopUpVisible}
-                      />
-                    </div>
-                  </Backdrop>
-                )}
+                <LongPracticeConfirmPopUp
+                  open={longTimePopUpVisible}
+                  totalTime={getSumTime(values)}
+                  onAccept={() => {
+                    setLongTimePopUpVisible(false);
+                    reportOnSubmit(values);
+                  }}
+                  isFetching={isFetching}
+                  setAcceptLongTime={setAcceptLongTime}
+                  setLongTimePopUpVisible={setLongTimePopUpVisible}
+                />
               </>
             );
           }}

@@ -1,9 +1,7 @@
-import { Badge } from "assets/components/ui/badge";
-import { cn } from "assets/lib/utils";
+import { Chip } from "assets/components/ui/chip";
+import { getCategoryChipColor } from "feature/exercisePlan/constants/categoryChip";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
-
-import { categoryColors } from "../constants/categoryStyles";
-import type { Exercise } from "../types/exercise.types";
 
 interface ExerciseDescriptionProps {
   exercise: Exercise;
@@ -15,16 +13,10 @@ export const ExerciseDescription = ({ exercise }: ExerciseDescriptionProps) => {
   return (
     <div className='space-y-4 p-4'>
       <div className='flex items-center justify-between'>
-        <Badge
-          className={cn(
-            "rounded-full px-3 py-1 text-xs",
-            categoryColors[exercise.category]
-          )}>
+        <Chip color={getCategoryChipColor(exercise.category)}>
           {t(`categories.${exercise.category}` as any)}
-        </Badge>
-        <Badge variant='outline' className='rounded-full text-xs'>
-          {t(`difficulty.${exercise.difficulty}`)}
-        </Badge>
+        </Chip>
+        <Chip color='gray'>{t(`difficulty.${exercise.difficulty}`)}</Chip>
       </div>
 
       <div className='space-y-2 text-center'>

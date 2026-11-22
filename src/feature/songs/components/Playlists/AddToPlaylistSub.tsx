@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import {
   DropdownMenuItem,
   DropdownMenuSub,
@@ -15,6 +14,7 @@ import type { Playlist } from "feature/songs/types/playlist.types";
 import { TOP_LIST_LIMIT } from "feature/songs/types/playlist.types";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { Check, ListPlus, Plus } from "lucide-react";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
@@ -72,7 +72,7 @@ export const AddToPlaylistSub = ({ song }: { song: Song }) => {
         <ListPlus className="h-3.5 w-3.5" />
         {t("add_to_playlist")}
       </DropdownMenuSubTrigger>
-      <DropdownMenuSubContent className="w-56 space-y-1 rounded-lg border-white/5 bg-zinc-950 p-2 text-zinc-400 shadow-2xl">
+      <DropdownMenuSubContent className="w-56">
         {playlists === null ? (
           <div className="px-3 py-2.5 text-xs font-medium text-zinc-500">{t("loading")}</div>
         ) : (

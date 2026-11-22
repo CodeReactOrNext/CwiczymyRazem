@@ -1,27 +1,25 @@
 import { HeadDecoration } from "components/HeadDecoration";
+import { PageShell } from "components/PageShell/PageShell";
 import React from "react";
 
 interface MainContainerProps {
   children: React.ReactNode;
   title?: string;
+  /** No-op since the frame lost its top line; kept so existing call sites compile. */
   noBorder?: boolean;
 }
 
-const MainContainer = ({ children, title, noBorder }: MainContainerProps) => {
+const MainContainer = ({ children, title }: MainContainerProps) => {
   return (
-    <div className='relative  overflow-visible rounded-md bg-second-600'>
-      {!noBorder && (
-        <div className='absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent'></div>
-      )}
-
+    <PageShell className='relative'>
       {title && (
         <div className='relative pb-2 pt-8'>
           <HeadDecoration title={title} />
         </div>
       )}
 
-      <div className='relative '>{children}</div>
-    </div>
+      <div className='relative'>{children}</div>
+    </PageShell>
   );
 };
 

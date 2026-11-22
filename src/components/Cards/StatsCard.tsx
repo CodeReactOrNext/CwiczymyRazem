@@ -25,12 +25,12 @@ export const StatsCard = ({
   const valueSize = compact ? "text-xl" : "text-2xl";
 
   return (
-    <Card>
+    <Card size='sm'>
       {/* Header with icon */}
       {(icon || title) && (
         <div className='mb-2 flex items-center gap-2'>
           {icon && <div className='text-zinc-500'>{icon}</div>}
-          <span className='text-[11px] font-semibold tracking-widest text-zinc-500'>{title}</span>
+          <span className='text-xs font-medium text-zinc-400'>{title}</span>
         </div>
       )}
 

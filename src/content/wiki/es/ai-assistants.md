@@ -38,7 +38,7 @@ Para empezar: «Resume mi última semana de práctica», «Planifica una sesión
 
 ## Límites
 
-<StatRow stats="20:cambios al día|10:ejercicios nuevos al día|60:peticiones por minuto" />
+<StatRow stats="35:cambios al día|20:ejercicios nuevos al día|60:peticiones por minuto" />
 
 Leer nunca cuenta para el límite diario. Cada cambio guardado le dice al asistente cuántos quedan hoy, así puede avisarte antes de que se acaben.
 

@@ -1,7 +1,13 @@
+import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
+import {
+  PAGE_CONTENT,
+  PAGE_GUTTER,
+  PageShell,
+} from "components/PageShell/PageShell";
 import { PageTabs } from "components/PageTabs/PageTabs";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
-import { LIBRARY_TABS } from "constants/navTabs";
+import { LIBRARY_HERO_CLASS, LIBRARY_TABS } from "constants/navTabs";
 import { PlayerRoadmapsLocked } from "feature/aiCoach/view/PlayerRoadmapsLocked";
 import { TokenWalletBar } from "feature/supporterPanel/components/TokenWalletBar";
 import { UserRoadmapsTab } from "feature/supporterPanel/components/UserRoadmapsTab";
@@ -49,7 +55,7 @@ export const PlayerRoadmapsView = () => {
   };
 
   return (
-    <div className='flex min-h-screen flex-col overflow-visible rounded-lg bg-second-600'>
+    <PageShell>
       {!detailOpen && (
         <>
           <HeroBanner
@@ -57,8 +63,8 @@ export const PlayerRoadmapsView = () => {
             subtitle={t("panel.players.page.subtitle")}
             eyebrow={t("panel.players.page.eyebrow")}
             eyebrowClassName='text-cyan-400/80'
+            className={LIBRARY_HERO_CLASS}
             backgroundContent={<HeroPattern variant='ai' />}
-            className='mb-6 min-h-[100px] w-full !rounded-none !shadow-none md:min-h-[90px] lg:min-h-[100px]'
             rightContent={
               isSupporter && board ? (
                 <TokenWalletBar wallet={board.wallet} />
@@ -66,7 +72,7 @@ export const PlayerRoadmapsView = () => {
             }
           />
 
-          <div className='px-3 md:px-6 lg:px-8'>
+          <div className={cn(PAGE_GUTTER, "pt-6")}>
             <PageTabs
               tabs={LIBRARY_TABS}
               activeHref='/my-roadmaps'
@@ -76,10 +82,10 @@ export const PlayerRoadmapsView = () => {
         </>
       )}
 
-      <div className={cn(!detailOpen && "px-3 py-6 md:px-6 md:py-8 lg:px-8")}>
+      <div className={cn(!detailOpen && PAGE_CONTENT)}>
         {isRosterLoading ? (
           // The roster answers "not a supporter" until it lands.
-          <div className='h-72 animate-pulse rounded-lg bg-zinc-900/40' />
+          <Skeleton variant='block' className='h-72' />
         ) : isSupporter ? (
           <UserRoadmapsTab
             enabled={isSupporter}
@@ -92,6 +98,6 @@ export const PlayerRoadmapsView = () => {
           <PlayerRoadmapsLocked />
         )}
       </div>
-    </div>
+    </PageShell>
   );
 };

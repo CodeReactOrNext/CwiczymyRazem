@@ -289,7 +289,9 @@
     "scope": {
       "all": "Todo",
       "guitars": "Guitarras",
-      "pedals": "Pedales"
+      "pedals": "Pedales",
+      "parts": "Piezas",
+      "builder": "Builder"
     },
     "search": "Buscar en tu colección",
     "sort_by": "Ordenar por",
@@ -325,12 +327,14 @@
     "guitars_collected": "guitarras coleccionadas",
     "pedals_eyebrow": "Efectos",
     "pedals_collected": "pedales coleccionados",
-    "clear_dupes": "Eliminar duplicados ({{count}})"
+    "clear_dupes": "Eliminar duplicados ({{count}})",
+    "shelf": "Estante",
+    "view_switch": "Vista"
   },
   "salvage": {
     "title": "Rescate",
     "salvaged_mod": "Mod rescatado",
-    "salvaged_mod_caps": "MOD RESCATADO",
+    "salvaged_mod_caps": "Mod rescatado",
     "fit_title": "¿Instalar {{name}}?",
     "fit_body": "En {{target}}, con el valor con el que se rescató. No se vuelve a tirar nada.",
     "off_source": "de {{source}}",
@@ -393,7 +397,8 @@
     "sell_it": "Venderla",
     "sell_one": "Vender una por {{fame}} Fame",
     "salvaged_parts": "Piezas rescatadas",
-    "wallet_empty": "Desguaza una guitarra o un pedal de tu colección para rescatar tus primeras piezas."
+    "wallet_empty": "Desguaza una guitarra o un pedal de tu colección para rescatar tus primeras piezas.",
+    "sell_one_short": "Vender 1"
   },
   "stash": {
     "part": "Pieza",
@@ -413,12 +418,14 @@
       "sell_for": "Vender · {{fame}}",
       "sell_all": "Vender todas ×{{qty}}",
       "merge": "Fusionar · +{{gain}} niv.",
-      "merge_plain": "Fusionar con la mejor copia"
+      "merge_plain": "Fusionar con la mejor copia",
+      "workshop": "Taller…",
+      "install_on": "Montar en {{name}}"
     },
     "eyebrow": "Arsenal",
     "title": "Almacén",
     "items_collected": "objetos coleccionados",
-    "tidy_hint": "Reordena todo el almacén de una vez — después sigue siendo tu disposición",
+    "tidy_hint": "Reordena este estante de una vez — después sigue siendo tu disposición",
     "tidy_up": "Ordenar",
     "arrange": {
       "equipped": "Lo que toco primero",
@@ -473,7 +480,9 @@
     },
     "merge": "Fusionar +{{gain}}",
     "merge_plain": "Fusionar",
-    "merge_hint": "Absorber en tu mejor copia por +{{gain}} de nivel"
+    "merge_hint": "Absorber en tu mejor copia por +{{gain}} de nivel",
+    "workshop": "Taller",
+    "workshop_hint": "Restaurar, mejorar y montar mods en el taller"
   },
   "bulk": {
     "title": "¿Eliminar duplicados?",
@@ -946,7 +955,16 @@
     "levels_word": "niveles",
     "empty": "Primero abre una caja. Cuando tengas una guitarra o un pedal podrás restaurarlo y seguir mejorándolo con piezas rescatadas.",
     "change_instrument": "Cambiar instrumento · {{count}} en el rack",
-    "pick_instrument": "Elige un instrumento"
+    "pick_instrument": "Elige un instrumento",
+    "ready_now": "Puedes hacerlo ahora",
+    "make": "Fabricar",
+    "make_hint_one": "Mejorar {{count}} a partir de piezas {{tier}}",
+    "make_hint": "Mejorar {{count}} a partir de piezas {{tier}}",
+    "job_with_gain_one": "{{job}} · +{{count}} nivel",
+    "job_with_gain": "{{job}} · +{{count}} niveles",
+    "previous_instrument": "Instrumento anterior",
+    "next_instrument": "Instrumento siguiente",
+    "n_of_total": "{{n}} de {{total}}"
   },
   "mods": {
     "remove_aria": "Quitar este mod por {{fame}} Fame",
@@ -1004,7 +1022,10 @@
     "no_match": "Ningún mod compatible coincide con ese nombre.",
     "bonus": "+{{points}} de bonus",
     "bonus_word": "de bonus",
-    "compatible_slot": "Compatible con esta ranura"
+    "compatible_slot": "Compatible con esta ranura",
+    "install_named": "Montar {{name}}",
+    "reroll_range": "Volver a tirar · +{{min}} a +{{max}}",
+    "take_off_for": "Quitar · {{fame}} Fame"
   },
   "toasts": {
     "mod_added": "Mod añadido a tu almacén — instálalo desde Colección o en el banco",

@@ -244,7 +244,7 @@ export const ArtistSongSelector = ({
             <div className='mb-10'>
                 <div className='relative flex gap-4'>
                     <div className='relative flex-1'>
-                        <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+                        <div className="absolute inset-y-0 left-5 z-10 flex items-center pointer-events-none">
                             <Search className="h-6 w-6 text-zinc-600" />
                         </div>
                         <Input
