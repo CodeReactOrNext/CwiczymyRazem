@@ -285,6 +285,8 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
             kind: z.string(),
             skills: z.array(z.string()),
             minutes: z.number().nullable(),
+            bpmMax: z.number().nullable(),
+            scoredByMic: z.boolean(),
           }),
         ),
       },
@@ -308,15 +310,22 @@ export function registerCatalogTools(server: McpServer, context: McpContext) {
         const page = pageOf(matches, offset, limit ?? 20);
         return jsonResult({
           ...page.meta,
-          exercises: page.items.map((entry) => ({
-            id: entry.id,
-            title: entry.title,
-            category: entry.category,
-            difficulty: entry.difficulty,
-            kind: entry.kind,
-            skills: entry.skills,
-            minutes: exercisesById.get(entry.id)?.timeInMinutes ?? null,
-          })),
+          exercises: page.items.map((entry) => {
+            const exercise = exercisesById.get(entry.id);
+            return {
+              id: entry.id,
+              title: entry.title,
+              category: entry.category,
+              difficulty: entry.difficulty,
+              kind: entry.kind,
+              skills: entry.skills,
+              minutes: exercise?.timeInMinutes ?? null,
+              // The top of the tempo range — what a roadmap step's test can ask for.
+              bpmMax: exercise?.metronomeSpeed?.max ?? null,
+              scoredByMic:
+                !!exercise?.tablature?.length && !exercise.disableMic,
+            };
+          }),
         });
       }),
   );

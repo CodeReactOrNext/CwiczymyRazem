@@ -25,10 +25,11 @@ import { consumeWriteQuota, type McpContext } from "../auth";
 import {
   ROADMAP_GUIDE,
   ROADMAP_LESSONS_PER_STEP,
-  ROADMAP_MAX_WISHES,
+  ROADMAP_MAX_SCOPE_NOTES,
   ROADMAP_SESSIONS,
   ROADMAP_STEPS_PER_WRITE,
 } from "../content/roadmapGuide";
+import { exercisesById } from "../data";
 import { firestore } from "../db";
 import {
   LESSON_LEVELS,
@@ -51,10 +52,13 @@ import {
   checkCheckpoint,
   checkPlanReview,
   checkRoadmapPlan,
+  checkSchoolTitle,
   checkStepText,
+  checkSyllabus,
   type PlanPhaseInput,
   REVIEW_CRITERIA,
   REVIEW_CRITERION_IDS,
+  SYLLABUS_TOPICS,
 } from "../roadmapPlan";
 
 const ROADMAPS = "roadmaps";
@@ -282,17 +286,27 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
     "riffquest_create_roadmap",
     {
       title: "Save a roadmap plan",
-      description: `Saves a plan that passes riffquest_check_roadmap_plan as a private roadmap, with its review (every criterion of the roadmap guide answered) and the player's wishes. Returns a stepId per step; the steps have no text yet. Up to ${MAX_MCP_ROADMAPS} per player.`,
+      description: `Saves a plan that passes riffquest_check_roadmap_plan as a private roadmap, with its syllabus (the subject's topics and the steps that teach each) and its review (every criterion of the roadmap guide answered). Returns a stepId per step; the steps have no text yet. Up to ${MAX_MCP_ROADMAPS} per player.`,
       inputSchema: strictInput({
         title: z.string().min(3).max(80),
         goal: z.string().min(5).max(500),
         level: levelInput,
         phases: phasesInput,
-        wishes: z
+        scope: z
           .array(z.string().min(3).max(200))
-          .max(ROADMAP_MAX_WISHES)
+          .max(ROADMAP_MAX_SCOPE_NOTES)
           .optional()
-          .describe("What the player asked for, a line each"),
+          .describe("What is in and out, a line each"),
+        syllabus: z
+          .array(
+            z
+              .object({
+                topic: z.string().min(2).max(80),
+                steps: z.array(z.string().min(2).max(80)).min(1).max(6),
+              })
+              .strict(),
+          )
+          .max(SYLLABUS_TOPICS.max),
         review: z
           .array(
             z
@@ -308,7 +322,7 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
       }),
       annotations: WRITE_TOOL_ANNOTATIONS,
     },
-    ({ title, goal, level, phases, wishes, review, playerApproved }) =>
+    ({ title, goal, level, phases, scope, syllabus, review, playerApproved }) =>
       runTool("riffquest_create_roadmap", async () => {
         const songs = await readSongs(phases);
         const check = checkRoadmapPlan(phases, level as RoadmapLevel, songs);
@@ -317,13 +331,22 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
             `Not saved — the plan has problems:\n${check.problems.map((problem) => `- ${problem}`).join("\n")}`,
           );
         }
+        const outlineProblems = [
+          ...checkSchoolTitle(title),
+          ...checkSyllabus(syllabus, phases),
+        ];
+        if (outlineProblems.length) {
+          return errorResult(
+            `Not saved — the syllabus does not match the plan:\n${outlineProblems.map((problem) => `- ${problem}`).join("\n")}`,
+          );
+        }
         const reviewProblems = checkPlanReview(review, playerApproved);
         if (reviewProblems.length) {
           return errorResult(
             `Not saved — the review is not done:\n${reviewProblems.map((problem) => `- ${problem}`).join("\n")}`,
           );
         }
-        const constraints = (wishes ?? [])
+        const constraints = (scope ?? [])
           .map((wish) => wish.replace(/\s+/g, " ").trim())
           .filter(Boolean);
         const existing = (await ownRoadmaps()).filter(
@@ -369,6 +392,15 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
           visibility: "private",
           source: "mcp",
           ...(constraints.length ? { constraints } : {}),
+          syllabus: syllabus.map((entry) => ({
+            topic: entry.topic.trim(),
+            steps: entry.steps.map((step) => step.trim()),
+          })),
+          review: review.map((entry) => ({
+            criterion: entry.criterion,
+            pass: entry.pass,
+            note: entry.note.trim(),
+          })),
         };
         await firestore
           .collection(ROADMAPS)
@@ -453,6 +485,9 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
               phase.steps.map((step) => [step.id, step] as const),
             ),
           );
+          const ordered = roadmap.phases.flatMap((phase) => phase.steps);
+          const firstId = ordered[0]?.id;
+          const lastId = ordered[ordered.length - 1]?.id;
           const problems: string[] = [];
           const texts = new Map<string, (typeof steps)[number]>();
           for (const text of steps) {
@@ -461,7 +496,15 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
               problems.push(`No step "${text.stepId}" in this roadmap.`);
               continue;
             }
-            problems.push(...checkStepText(step, text));
+            problems.push(
+              ...checkStepText(
+                step,
+                text,
+                { first: step.id === firstId, last: step.id === lastId },
+                exercisesById.get(step.suggestedExerciseId ?? "")
+                  ?.metronomeSpeed?.max,
+              ),
+            );
             texts.set(step.id, text);
           }
           if (problems.length) return { problems };
@@ -533,6 +576,11 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
           ...left,
           saved: steps.length,
           stepsWithoutText: missing,
+          // A school has a lesson on nearly every step.
+          writtenStepsWithoutLesson: saved.phases
+            .flatMap((phase) => phase.steps)
+            .filter((step) => hasText(step) && !step.suggestedLessonIds?.length)
+            .map((step) => step.title),
           // A rewritten step makes its phase's checkpoint stale; a phase just
           // completed has none yet.
           checkpointsToWrite: checkpointsToWrite(
@@ -733,7 +781,8 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
           goal: roadmap.goal,
           level: roadmap.level,
           writtenByAssistant: roadmap.source === "mcp",
-          ...(roadmap.constraints?.length && { wishes: roadmap.constraints }),
+          ...(roadmap.constraints?.length && { scope: roadmap.constraints }),
+          ...(roadmap.syllabus?.length && { syllabus: roadmap.syllabus }),
           checkpointsToWrite: assistantMayEdit(roadmap)
             ? checkpointsToWrite(roadmap, checkpoints)
             : [],

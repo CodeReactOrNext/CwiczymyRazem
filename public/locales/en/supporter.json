@@ -616,12 +616,12 @@
       "waiting": "Your plan is waiting for your OK"
     },
     "assistant": {
-      "title": "Build it with your AI assistant",
-      "body": "riff.quest does not write roadmaps itself. Your own assistant — Claude, ChatGPT — builds one from your practice history and the app's exercises and songs; riff.quest checks it and saves it here. It costs no tokens.",
-      "goal_label": "What do you want to be able to play?",
+      "title": "Build a school with your AI assistant",
+      "body": "A roadmap here is a school of one subject — legato, rhythm guitar, playing like an artist. riff.quest does not write them itself: your own assistant — Claude, ChatGPT — builds one from the app's exercises, songs and lessons; riff.quest checks it and saves it here. It costs no tokens.",
+      "goal_label": "What should the school teach?",
       "prompt_label": "Paste this to your assistant",
-      "prompt": "Use riff.quest to build me a roadmap for this goal: {{goal}}\n\nFollow the riff.quest roadmap guide. Look at my practice history first, ask me only what would change the plan, and show me the plan before saving anything. Then write every step, pick lessons that really fit, and write each phase's checkpoint.",
-      "prompt_no_goal": "Use riff.quest to build me a roadmap. Ask me what I want to be able to play.\n\nFollow the riff.quest roadmap guide. Look at my practice history first, ask me only what would change the plan, and show me the plan before saving anything. Then write every step, pick lessons that really fit, and write each phase's checkpoint.",
+      "prompt": "Use riff.quest to build me a roadmap that is a complete school of: {{goal}}\n\nFollow the riff.quest roadmap guide. It is a course for any player at the level, not a plan for me personally: ask me only what settles its scope and level. Study the app's exercises for the subject first, write the syllabus, and show me the plan before saving anything. Then write every step, pick lessons that really fit, and write each phase's checkpoint.",
+      "prompt_no_goal": "Use riff.quest to build me a roadmap that is a complete school of one subject. Ask me which subject.\n\nFollow the riff.quest roadmap guide. It is a course for any player at the level, not a plan for me personally: ask me only what settles its scope and level. Study the app's exercises for the subject first, write the syllabus, and show me the plan before saving anything. Then write every step, pick lessons that really fit, and write each phase's checkpoint.",
       "copy": "Copy",
       "copied": "Copied",
       "connect": "How to connect an assistant",

@@ -4,28 +4,53 @@ import {
 } from "feature/aiCoach/utils/phaseCheck";
 import { renderExemplars } from "lib/roadmaps/generation/houseStyle";
 import { HOUSE_VOICE } from "lib/roadmaps/generation/houseVoice";
-import { DESCRIPTION_LENGTH } from "lib/roadmaps/generation/lengths";
 import { LEVEL_RULES } from "lib/roadmaps/generation/levels";
 import {
   OVERUSED_EXERCISE_IDS,
   STRUCTURE_LIMITS,
   TOTAL_STEPS,
 } from "lib/roadmaps/generation/limits";
-import { QUESTION_BANK } from "lib/roadmaps/generation/questionBank";
+import {
+  type BankQuestionId,
+  QUESTION_BANK,
+} from "lib/roadmaps/generation/questionBank";
 
-import { REVIEW_CRITERIA } from "../roadmapPlan";
+import {
+  REVIEW_CRITERIA,
+  SCHOOL_FRAME,
+  SCHOOL_SIZE,
+  SCHOOL_TEXT,
+  SYLLABUS_TOPICS,
+} from "../roadmapPlan";
 
 /** Steps whose texts one riffquest_write_roadmap_steps call may carry. */
 export const ROADMAP_STEPS_PER_WRITE = 8;
 export const ROADMAP_SESSIONS = { min: 2, max: 14 } as const;
-/** Lessons one step may carry, and wishes a roadmap keeps. */
+/** Lessons one step may carry, and scope notes a roadmap keeps. */
 export const ROADMAP_LESSONS_PER_STEP = 3;
-export const ROADMAP_MAX_WISHES = 8;
+export const ROADMAP_MAX_SCOPE_NOTES = 8;
 
-/** The in-app builder's own questions: what to ask, and when it is worth asking. */
-const questions = QUESTION_BANK.map(
-  (question) => `- "${question.question}" — ${question.when}`,
-).join("\n");
+/**
+ * The builder's questions that are about the school's scope. The rest of the
+ * bank asks about one player — where they stand, what they find hard, how
+ * they like to practise — and a school is not written for one player.
+ */
+const SCOPE_QUESTIONS: readonly BankQuestionId[] = [
+  "focus",
+  "useFor",
+  "sides",
+  "songs",
+  "repertoireDepth",
+  "replicateOrCreate",
+  "includes",
+  "ending",
+];
+
+const questions = QUESTION_BANK.filter((question) =>
+  SCOPE_QUESTIONS.includes(question.id),
+)
+  .map((question) => `- "${question.question}" — ${question.when}`)
+  .join("\n");
 
 const criteria = REVIEW_CRITERIA.map(
   (criterion) => `- \`${criterion.id}\` — ${criterion.question}`,
@@ -36,82 +61,111 @@ const criteria = REVIEW_CRITERIA.map(
  * `riffquest_get_roadmap_guide` tool and the `riffquest://docs/roadmap-guide`
  * resource.
  *
- * It is the in-app generator's own brief — the same level rules, voice,
- * limits and exemplars, imported rather than copied, so the two cannot drift —
- * minus everything that only made sense for a model with no player to talk
- * to. The rules marked "checked" are the ones the tools refuse a plan or a
- * text over.
+ * A roadmap is a school of one subject — the curated ones ("Rhythm Guitar
+ * Basics", the artist roadmaps) are the bar, and the numbers quoted here are
+ * measured on them. The level rules, the voice, the limits and the two
+ * exemplars are imported from the generator rather than copied, so they
+ * cannot drift. The rules marked "checked" are the ones the tools refuse a
+ * plan or a text over.
  */
 export const ROADMAP_GUIDE = `# riff.quest roadmap guide
 
-A roadmap is a practice plan for one goal: phases in order, each a handful of
-steps, each step one skill the player works on over several sessions. In the app
-it is a road the player walks; a step opens as a short lesson with its exercise
-and, when it is about one, its song.
+A roadmap is a **school of one subject**: Legato, Rhythm Guitar Basics, Thrash
+Rhythm Picking, Playing in the Style of Jimi Hendrix. A complete course a
+guitarist at the stated level walks from the first motion to playing music
+with it — the kind of thing a good teacher would sell as a masterclass. It is
+not one player's personal plan and not a list of tips: anybody at that level
+should be able to take it.
+
+In the app it is a road: phases in order, each a handful of steps, each step
+one skill worked on over several sessions, opened as a lesson with its
+exercise, its videos and, when it is about one, its song.
 
 You write it; riff.quest checks and stores it. Nothing on riff.quest's side
 writes or rewrites a word of it.
 
+The bar is the app's own curated schools. Measured on them: 7 phases, 34–38
+steps, an exercise on more than 80% of the steps, a lesson on more than 90%,
+about 205 words to a step, a last phase that is a performance.
+
 ## How it goes
 
-1. **Know the player.** \`riffquest_get_profile_summary\`,
-   \`riffquest_get_skill_breakdown\` and \`riffquest_get_weak_spots\` say how long
-   they have played, what they practise and what they avoid.
-2. **Ask before planning** — see "Questions" below. A few, not a form.
-3. **Know the library.** \`riffquest_list_exercises\` and \`riffquest_list_songs\`
-   give the ids a step can open. A step can only use a library exercise; the
-   player's own exercises do not go on a roadmap.
-4. **Write the plan** — titles only — and run it through
-   \`riffquest_check_roadmap_plan\` until it has no problems.
-5. **Review it** — see "The review" below — as a teacher who did not write it.
+1. **Settle the subject and its scope** with the player — see "Questions". A
+   few, not a form. What is the school of, at which level, which sides of the
+   subject are in.
+2. **Study the library for the subject before planning.**
+   \`riffquest_list_exercises\` by skill and by words, every page, gives each
+   exercise's difficulty and the top of its tempo range (\`bpmMax\`);
+   \`riffquest_get_exercise\` has what it trains and how it is scored;
+   \`riffquest_list_songs\` the songs with a tab. The school is built around
+   what the app can make the player do and measure — an exercise the library
+   has for this subject and the plan does not use is a hole in the plan.
+3. **Write the syllabus** — see "The syllabus": what the subject is made of.
+4. **Write the plan** — phases and step titles — so that every topic of the
+   syllabus has its steps, and run it through \`riffquest_check_roadmap_plan\`
+   until it has no problems.
+5. **Review it** — see "The review" — as a specialist who did not write it.
    Whatever does not pass changes the plan, and the plan is checked again.
 6. **Show the plan to the player** as a plain list of phases and steps, and
-   change what they ask for. This is the moment changes are cheap.
-7. **Save it** with \`riffquest_create_roadmap\`, with the review and the
-   player's wishes. It answers with an id for every step.
+   change what they ask for.
+7. **Save it** with \`riffquest_create_roadmap\`, with the syllabus and the
+   review. It answers with an id for every step.
 8. **Write the steps**, a phase at a time, with
    \`riffquest_write_roadmap_steps\` (up to ${ROADMAP_STEPS_PER_WRITE} steps a call), each with its lessons —
    see "Lessons". The answer lists the steps still without text.
 9. **Write each phase's checkpoint** with \`riffquest_write_roadmap_checkpoint\`
    once the phase's steps are written — see "Checkpoints".
 
-A roadmap saved this way is private to the player. Every save counts against
-the day's changes (see the write answers); a whole roadmap is about a dozen.
+A roadmap saved this way is private to the player for now. Every save counts
+against the day's changes (see the write answers); a whole school is 12–15.
 
 ## Questions
 
-Ask only what would change the plan — at most five, often two or three, and
-none when the goal already says it. One at a time or all at once, as the
-conversation goes; offer a few concrete options rather than an open question.
-These are the questions the app's own builder picks from, each with when it is
-worth asking:
+A school is not about the player who asked, so do not ask about them — not
+their weak spots, not their gear, not how much time they have. Ask what
+decides the school's scope: at most four questions, often two, none when the
+request already says it. Offer concrete options rather than open questions.
+The ones worth choosing from, each with when it is worth asking:
 
 ${questions}
 
-Do not ask what the app already knows (how long they have played, what they
-practise — it is in their profile) or what does not change a roadmap (their
-gear, where they will play).
+Always settle the level — it decides where the school starts.
 
-What they answer becomes the plan's \`wishes\`: one plain line per wish ("Songs:
-Sultans of Swing and Romeo and Juliet in depth", "No theory beyond what a step
-needs", "Play it like the record, no improvising"). They are saved with the
-roadmap and held to in every later rewrite.
+What is agreed becomes the plan's \`scope\`: one plain line each ("Electric
+lead legato, not acoustic", "Songs: Satch Boogie and Cliffs of Dover", "No
+tapping — that is its own school"). It is saved with the roadmap and held to
+in every later rewrite.
+
+## The syllabus
+
+Before the plan, write down what the subject is made of — as a specialist
+would list it for a course outline. For legato: hammer-ons, pull-offs, the
+two combined, trills, hammer-ons from nowhere, three-notes-per-string
+patterns, crossing strings, position shifts and slides, muting the idle
+strings, keeping the picked and the slurred notes even, legato in a phrase,
+legato at speed, licks from real players, a full solo. ${SYLLABUS_TOPICS.min} topics at the very
+least (checked); most subjects have 12–20.
+
+\`riffquest_create_roadmap\` takes it as \`syllabus\`: each topic with the titles
+of the steps that teach it. It is checked both ways: a topic no step teaches
+is a hole in the school, and a step that teaches no topic does not belong in
+it. A topic that matters gets two or three steps, not one thin one.
 
 ## The review
 
 The checks in \`riffquest_check_roadmap_plan\` are code: ids, level, size,
-song placement, duplicates. What they cannot judge is whether the plan is a
+song placement, duplicates. What they cannot judge is whether the school is a
 good one. That is the review, and \`riffquest_create_roadmap\` takes it as
 \`review\`: every criterion below answered once, \`pass\` true or false, with a
 \`note\` that names what you looked at — the phases, the step titles.
 
 ${criteria}
 
-Read the plan for the review as somebody who did not write it and has to teach
-from it. A criterion that does not pass is not a formality to argue away: the
-plan changes, goes through the check again, and is reviewed again. A plan is
-saved only when every criterion passes and the player has agreed to it
-(\`playerApproved\`).
+Read the plan for the review as somebody who did not write it and teaches this
+subject for a living. A criterion that does not pass is not a formality to
+argue away: the plan changes, goes through the check again, and is reviewed
+again. A plan is saved only when every criterion passes and the player has
+agreed to it (\`playerApproved\`). The review is kept with the roadmap.
 
 ## Level
 
@@ -119,31 +173,39 @@ ${LEVEL_RULES}
 
 ## The plan
 
-- **Size follows the goal** (checked: ${STRUCTURE_LIMITS.phases.min}–${STRUCTURE_LIMITS.phases.max} phases of ${STRUCTURE_LIMITS.stepsPerPhase.min}–${STRUCTURE_LIMITS.stepsPerPhase.max} steps, ${TOTAL_STEPS.min}–${TOTAL_STEPS.max} steps in all). One song,
-  one technique or one habit: 3–4 phases, 10–18 steps. A handful of songs or one
-  side of a style: 4–6 phases, 18–30 steps. Playing like an artist or a whole
-  genre: 6–8 phases, 30–45 steps. Never pad: a player who asked for one song
-  does not want a year of work.
-- **The goal is played from the start.** When the plan has songs, a short
-  fragment at reduced tempo sits in the first third of the phases (checked);
-  the full versions stay late.
+- **A whole subject** (checked: at least ${SCHOOL_SIZE.phases} phases and ${SCHOOL_SIZE.steps} steps; at most ${STRUCTURE_LIMITS.phases.max}
+  phases of ${STRUCTURE_LIMITS.stepsPerPhase.min}–${STRUCTURE_LIMITS.stepsPerPhase.max} steps, ${TOTAL_STEPS.max} steps). Aim for 6–7 phases and 30–38 steps. A
+  subject that seems to need fewer has not been taken apart far enough — go
+  back to the syllabus. Never pad either: every step earns its place by
+  teaching a topic.
+- **The arc of a course.** The basic motion done right; its variants; putting
+  them together; playing real music with them; and a last phase that is a
+  performance — a whole piece start to finish, a tempo range, a recorded take,
+  playing with others. "Rhythm Guitar Basics" runs: Pulse and the Strumming
+  Hand → Open Chords in Time → Eighth Notes and Strum Patterns → Muting,
+  Accents and Dynamics → Syncopation, Feel and Groove → Playing Songs →
+  Performance.
+- **Music from the first phase.** When the plan has songs, a short fragment at
+  reduced tempo sits in the first third of the phases (checked); the full
+  versions stay late. A school that is drills for five phases and songs in the
+  sixth is wrong.
 - **Every step is something the player does repeatedly** over several sessions.
   Never a one-off task, and never a step named after a piece of gear — a
-  pickup, a pedal, an amp (checked). Tone that matters becomes a listening skill:
-  matching a sound by ear against the record on whatever they own.
+  pickup, a pedal, an amp (checked).
 - **Each skill once** (checked: two steps with nearly the same title, or the
-  same exercise twice in one phase). A harder version of a skill is the same
-  step at a harder level, not a second step.
-- **Ear and rhythm run through the plan**, not in a block at the end. A scale
-  arrives with the chords it is played over.
+  same exercise twice in one phase). A harder version of a skill is its own
+  step only when it is really a different thing to practise.
+- **Ear and rhythm run through the school**, not in a block at the end.
 - **A song is not a template.** When a song gets several steps, each is about a
-  different problem of that song — the bar that breaks, the stretch, the
-  change — named in its title. Not "reduced tempo / 80% / album tempo" repeated
-  for every song.
-- **Step titles**: a specific skill in 2–8 words, written for this goal. A song
-  title, a chord name or a tuning is welcome. Not "Finger independence" or any
-  title that could sit in every roadmap.
-- **Phase titles**: short themes ("The Lead Voice", "Songs"), not sentences.
+  different problem of that song, named in its title — not "reduced tempo /
+  80% / album tempo" repeated for every song.
+- **Step titles**: a specific skill in 2–8 words. "THE pattern: D DU UDU",
+  "Rests inside a pattern", "Percussive chucks: the fretting hand mutes" — not
+  "Finger independence" or any title that could sit in every roadmap.
+- **Phase titles**: short themes ("Muting, Accents and Dynamics"), not
+  sentences.
+- **The title** names the subject the way a course is named (checked): no
+  tempo or number in it, nothing about one player.
 
 ### A step in the plan
 
@@ -153,17 +215,16 @@ ${LEVEL_RULES}
 
 - \`skillType\`: \`physical\` (a motion, a technique), \`conceptual\` (theory,
   harmony, the fretboard), \`musical\` (ear, phrasing, improvising, repertoire).
-  It decides how long the step's text is.
 - \`gist\`: one plain sentence — what the player actually does, on what
   material.
 - \`exerciseId\`: a library exercise that fits the step and the level (checked:
-  it exists, its difficulty fits the level, it is on at most ${STRUCTURE_LIMITS.maxExerciseReuse} steps). No
-  exercise is an honest answer for a song step or a listening step; a technique
-  step without one is worth a second look through the library.
+  it exists, its difficulty fits the level, it is on at most ${STRUCTURE_LIMITS.maxExerciseReuse} steps). Nearly
+  every step should have one — the check notes it when more than a fifth of
+  the steps open nothing. A technique step without one is a gap: look through
+  the library again.
 - \`exerciseFit\`: \`direct\` when doing the exercise is doing the step;
-  \`support\` when it is only a related warm-up and the step's own material — a
-  song's riff, a specific phrase — is not in it. When unsure, \`support\`. The
-  app labels a support exercise as a warm-up.
+  \`support\` when it is only a related warm-up and the step's own material is
+  not in it. When unsure, \`support\`. The app labels it as a warm-up.
 - These exercises fit almost anything and end up everywhere:
   ${OVERUSED_EXERCISE_IDS.join(", ")}. Only on a step that is exactly about
   what they train.
@@ -175,32 +236,46 @@ ${LEVEL_RULES}
 ## The text of a step
 
 \`\`\`
-{ stepId, description, successCriteria, sessionsRequired, exerciseSetup? }
+{ stepId, description, successCriteria, sessionsRequired, exerciseSetup?, lessonIds? }
 \`\`\`
 
-- **description** — sections in square brackets (checked: all three present):
-  \`[What it is]\`, \`[Why it matters]\`, \`[How to practice]\`. A physical step: one
-  sentence, one sentence, at most three sentences (${DESCRIPTION_LENGTH.physical.min}–${DESCRIPTION_LENGTH.physical.max} words, checked). A
-  conceptual or musical step: 2–3 sentences each (${DESCRIPTION_LENGTH.conceptual.min}–${DESCRIPTION_LENGTH.conceptual.max} words, checked).
-  \`[Common trap]\` may follow on a conceptual or musical step that has a real,
-  specific trap.
-- Name chords, strings, frets, the count ("1 & 2 &"), the motion, a real
-  record. Explain the why with what the technique makes possible or what a
-  record does with it.
+A step reads like a page of a masterclass: it explains the thing fully enough
+that the player needs nothing else to start, and it is specific enough that
+they cannot do it wrong without noticing.
+
+- **description** — ${SCHOOL_TEXT.min}–${SCHOOL_TEXT.max} words (checked: under ${SCHOOL_TEXT.floor} or over ${SCHOOL_TEXT.ceiling} is
+  refused), in sections in square brackets (checked: all three present):
+  - \`[What it is]\` — the skill itself: the motion, the shape, the sound, in
+    two or three sentences.
+  - \`[Why it matters]\` — what it makes possible, what a record does with it,
+    what goes wrong later in this school without it.
+  - \`[How to practice]\` — the sequence: where to start, what to play, at what
+    tempo, what to listen for, when to move on. The longest section.
+  - \`[Common trap]\` may follow when there is a real, specific one.
+- **The first step of the school** opens with \`${SCHOOL_FRAME.first}\` (checked): what the
+  player has to be able to do already, and what they will be able to do at the
+  end. **The last step** ends with \`${SCHOOL_FRAME.last}\` (checked): what they
+  have now, concretely, and where to go next.
+- Name chords, strings, frets, fingers, the count ("1 & 2 &"), the motion, a
+  real record.
 - A \`direct\` exercise is named in \`[How to practice]\` by its exact title
-  (checked), with what to listen for in it. A \`support\` exercise gets at most
-  one clause as a warm-up — never write that the step's riff or phrase is
-  played "in" it.
+  (checked), with how to use it and what to watch in it — the reading it
+  gives, the tempo to set. A \`support\` exercise gets at most one clause as a
+  warm-up; never write that the step's riff or phrase is played "in" it.
+- **Tempos stay inside the exercise's range** (checked): a tempo the text
+  asks for in an exercise that tops out below it is a test nobody can take.
 - Earlier steps are known: at most one clause of reference, no re-explaining.
-- **successCriteria** — a test the player can run: what they play, how fast (a
-  number), what it must sound like, what must not happen.
+- **successCriteria** — a test the player can run, with a number in it
+  (checked), and wherever the step has an exercise, in the terms the app
+  measures: the tempo set in that exercise, the accuracy it reports, clean runs
+  in a row. "You can play Legato — Scale Run at 120 BPM with 90% accuracy on 3
+  runs in a row, every slurred note as loud as the picked one."
 - **sessionsRequired** — ${ROADMAP_SESSIONS.min}–${ROADMAP_SESSIONS.max}, different from step to step: a listening
   step 2–3, a refinement of a known motion 4–5, a new technique 6–8, a deep
-  musical skill 9–14.
+  musical skill 9–14. The curated schools come to 170–240 sessions in all.
 - **exerciseSetup** — for an exercise the player configures (a key, chords, a
   scale, a tempo): the settings for this step in a few words, "A minor,
   i–VI–III–VII, 80 BPM". Left out otherwise.
-- **lessonIds** — see "Lessons".
 - Facts about a song — key, tuning, tempo — come from \`riffquest_get_song\` or
   from what you are certain of. A confident wrong fact about a song the player
   knows is the worst thing a step can contain.
@@ -212,19 +287,19 @@ with a metronome", "focus on accuracy", "muscle memory", "solid foundation".
 
 ## Lessons
 
-A step can carry up to ${ROADMAP_LESSONS_PER_STEP} YouTube lessons from the app's index.
-\`riffquest_find_lessons\` searches it by plain words (the technique, the
-style, the song or the artist) and answers with candidates: title, channel,
-level, topics, length. You are the judge of them:
+Nearly every step of a school has a lesson — one to three YouTube videos from
+the app's index. \`riffquest_find_lessons\` searches it by plain words (the
+technique, the style, the song or the artist) and answers with candidates:
+title, channel, level, topics, length. You are the judge of them:
 
 - A lesson goes on a step only when it teaches that step's skill — the same
   technique at about the same level, or that song. A good video on a
   neighbouring topic is not a lesson for this step.
-- None is a fine answer. A step with its exercise and no lesson is complete;
-  a step with a lesson that misses is worse than one without.
-- Two searches with different words beat one long query.
-- Lessons help; they never hold a step back. The exercise and the song are
-  what finish a step.
+- Search for every step, and search twice with different words before giving
+  up: the write answer counts the steps left without a lesson.
+- A lesson must not teach against the school's scope — no downpicking lesson
+  on a step of a school that is strictly alternate picking.
+- A step with a lesson that misses is still worse than one without.
 
 ## Checkpoints
 
@@ -238,9 +313,9 @@ the phase has its text.
 - Something the player can only answer from having done the step, never a
   definition anyone could look up, and never something the phase did not
   teach.
-- Four options, all plausible to somebody who skipped the practice. Wrong
-  options are real mistakes, not jokes. The right one is not always the
-  longest and not always in the same place (checked).
+- Four options, all plausible to somebody who skipped the practice, all about
+  as long and as specific as each other. The right one is the longest in at
+  most half of the questions and not always in the same place (checked).
 - The prompt is one direct sentence. The explanation says in one or two
   sentences why the right answer is right.
 - Rewriting a step's text later makes its phase's checkpoint stale: the answer
@@ -252,6 +327,6 @@ ${renderExemplars()}
 
 ## Talking to the player
 
-They are a guitarist. Show the plan as phases and step titles, the steps as
+They are a guitarist. Show the school as phases and step titles, the steps as
 what to play and how to tell it worked. No JSON, ids or field names.
 `;

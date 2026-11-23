@@ -145,6 +145,14 @@ nothing, where the generator spent about $0.40 a roadmap on OpenAI. The
 generator's code stays: these tools are built from its checks, limits, voice
 and exemplars, and the admin queue for the curated roadmaps still runs it.
 
+A roadmap written this way is a **school of one subject** (owner's call,
+2026-11-24) — "Legato", "Rhythm Guitar Basics" — a complete course anybody at
+the level can take, held to the curated roadmaps as the bar (measured: 7
+phases, 34–38 steps, an exercise on 80–89% of the steps, a lesson on 95%+,
+about 205 words to a step, a last phase that is a performance). It is not one
+player's plan for one goal: the guide asks only what settles the scope and the
+level, and the review has a `general` criterion.
+
 1. `riffquest_get_roadmap_guide` — the generator's own brief as a guide
    (`content/roadmapGuide.ts`). The level rules, the voice, the limits and the
    two curated exemplars are imported from `lib/roadmaps/generation`, not
@@ -154,20 +162,31 @@ and exemplars, and the admin queue for the curated roadmaps still runs it.
    level and is on at most two steps; every song id is in the library; and the
    generator's code checks (`skeletonChecks.ts`: a song in the first third, no
    gear-named step, no near-duplicate titles, no exercise twice in a phase).
-   Problems block a save; notes do not.
-3. `riffquest_create_roadmap` — refuses a plan with problems, and one whose
-   **review** is not done: the nine criteria the generator's reviewer judges
-   on (`REVIEW_CRITERIA` in `roadmapPlan.ts` — goal, level, specificity, order,
-   gaps, repeatable, size, exercises, wishes), each answered once with `pass`
-   and a note, all passing, plus `playerApproved`. The client's model is the
+   A plan under 5 phases or 24 steps is refused as a lesson plan, not a
+   school. Problems block a save; notes do not (one of them: more than a fifth
+   of the steps open nothing in the app). `riffquest_list_exercises` gives each
+   exercise's `bpmMax` and `scoredByMic`, so the school can be planned around
+   what the library can make a player do and measure.
+3. `riffquest_create_roadmap` — refuses a plan with problems; one whose
+   **syllabus** does not cover it (`checkSyllabus`: the subject's topics, at
+   least 8, each with the titles of the steps that teach it — a topic no step
+   teaches and a step that teaches no topic are both refused); a title that is
+   not a subject (`checkSchoolTitle`); and one whose **review** is not done:
+   nine criteria (`REVIEW_CRITERIA` in `roadmapPlan.ts` — subject, coverage,
+   level, arc, specificity, repeatable, exercises, measurable, general), each
+   answered once with `pass` and a note, all passing, plus `playerApproved`.
+   The syllabus and the review are stored on the roadmap. The client's model is the
    reviewer; the server only makes the review impossible to skip. Then saves
    through the generator's `finishSkeleton` to `roadmaps/{id}` with
    `visibility: "private"`, `source: "mcp"` and the player's `wishes`
    (`constraints`), steps without text. At most 12 such roadmaps a player.
 4. `riffquest_write_roadmap_steps` — the text of up to 8 steps a call, each
-   checked by `checkStepText` (the three sections, the length for the step's
-   skill type, no filler, a `direct` exercise named by its title, criteria that
-   are a test with a number in it). One failing text saves none. A step may
+   checked by `checkStepText` (the three sections; 150–260 words, refused
+   under 120 or over 340; `[Before you start]` in the school's first step and
+   `[What you can do now]` in its last; no filler; a `direct` exercise named
+   by its title; no tempo above that exercise's range; criteria that are a
+   test with a number in it). The answer lists the written steps still without
+   a lesson. One failing text saves none. A step may
    carry up to three `lessonIds` from `riffquest_find_lessons`. The same call
    rewrites a step later — of a roadmap the assistant wrote, and, while the
    in-app generator is off, of one it generated earlier too (with Refine gone
@@ -181,7 +200,7 @@ and exemplars, and the admin queue for the curated roadmaps still runs it.
    client's model picks — it is the judge the generator runs on our key.
 6. `riffquest_write_roadmap_checkpoint` — a phase's six questions, through
    the app's own `normaliseQuizQuestions` plus two checks (the right answer
-   not always in one place, not always the longest), stored in
+   not always in one place, the longest in at most half the questions), stored in
    `roadmapPhaseQuizzes` with the phase's fingerprint. With it in place the
    app does not write a quiz with our model when the player sits the
    checkpoint; a step rewritten later makes it stale and it is listed to

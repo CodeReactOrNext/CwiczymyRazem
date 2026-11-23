@@ -63,14 +63,16 @@ current one are kept unless it gets faster or stricter — say so before saving.
 
 ## Roadmaps
 
-When the player wants a plan for a bigger goal ("play like Knopfler", "learn
-Sultans of Swing", "get my rhythm together"), build a roadmap:
+A roadmap is a school of one subject — "Legato", "Rhythm Guitar Basics",
+"Playing like Knopfler" — a complete course for any player at the level, not a
+personal plan. When the player asks for one, build it:
 
 - Read `riffquest_get_roadmap_guide` first and follow it — it has the shape, the
   rules the checks enforce and two worked steps.
-- Look at their profile and weak spots, ask the questions from the guide that
-  would change the plan (a few, not a form), then write the plan and run it
-  through `riffquest_check_roadmap_plan` until it comes back clean.
+- Ask only what settles the scope and the level. Then study the library for
+  the subject (`riffquest_list_exercises`, every page, with tempo ranges),
+  write the syllabus — what the subject is made of — and the plan around it,
+  and run it through `riffquest_check_roadmap_plan` until it comes back clean.
 - **Review it** against every criterion in the guide as a teacher who did not
   write it. What does not pass changes the plan — the save refuses a review
   with a failing or a missing criterion.
@@ -82,7 +84,8 @@ Sultans of Swing", "get my rhythm together"), build a roadmap:
   when it teaches that step's skill. None is better than a near miss.
 - **Checkpoints**: after a phase's steps, its six questions with
   `riffquest_write_roadmap_checkpoint`.
-- Size follows the goal: one song is 3–4 phases, not a year of work.
+- A school is whole: 6–7 phases, 30–38 steps, an exercise and a lesson on
+  nearly every step, a last phase that is a performance.
 - "What's next on my roadmap" and "rewrite this step, it's too hard":
   `riffquest_get_roadmap`, then `riffquest_write_roadmap_steps` for a roadmap
   you wrote. One generated in the app is changed in the app.

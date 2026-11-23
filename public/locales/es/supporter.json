@@ -631,12 +631,12 @@
       "waiting": "Tu plan espera tu visto bueno"
     },
     "assistant": {
-      "title": "Constrúyela con tu asistente de IA",
-      "body": "riff.quest no escribe rutas por su cuenta. Tu propio asistente — Claude, ChatGPT — la construye con tu historial de práctica y los ejercicios y canciones de la app; riff.quest la revisa y la guarda aquí. No cuesta tokens.",
-      "goal_label": "¿Qué quieres poder tocar?",
+      "title": "Construye una escuela con tu asistente de IA",
+      "body": "Aquí una ruta es la escuela de un tema — legato, guitarra rítmica, tocar como un artista. riff.quest no las escribe por su cuenta: tu propio asistente — Claude, ChatGPT — la construye con los ejercicios, canciones y lecciones de la app; riff.quest la revisa y la guarda aquí. No cuesta tokens.",
+      "goal_label": "¿Qué debe enseñar la escuela?",
       "prompt_label": "Pega esto en tu asistente",
-      "prompt": "Usa riff.quest y constrúyeme una ruta para este objetivo: {{goal}}\n\nSigue la guía de rutas de riff.quest. Mira primero mi historial de práctica, pregúntame solo lo que cambiaría el plan y enséñame el plan antes de guardar nada. Después escribe cada paso, elige lecciones que encajen de verdad y escribe el checkpoint de cada fase.",
-      "prompt_no_goal": "Usa riff.quest y constrúyeme una ruta. Pregúntame qué quiero poder tocar.\n\nSigue la guía de rutas de riff.quest. Mira primero mi historial de práctica, pregúntame solo lo que cambiaría el plan y enséñame el plan antes de guardar nada. Después escribe cada paso, elige lecciones que encajen de verdad y escribe el checkpoint de cada fase.",
+      "prompt": "Usa riff.quest y constrúyeme una ruta que sea una escuela completa de este tema: {{goal}}\n\nSigue la guía de rutas de riff.quest. Es un curso para cualquier guitarrista de ese nivel, no un plan para mí personalmente: pregúntame solo lo que define su alcance y su nivel. Estudia primero los ejercicios de la app para el tema, escribe el temario y enséñame el plan antes de guardar nada. Después escribe cada paso, elige lecciones que encajen de verdad y escribe el checkpoint de cada fase.",
+      "prompt_no_goal": "Usa riff.quest y constrúyeme una ruta que sea una escuela completa de un tema. Pregúntame cuál.\n\nSigue la guía de rutas de riff.quest. Es un curso para cualquier guitarrista de ese nivel, no un plan para mí personalmente: pregúntame solo lo que define su alcance y su nivel. Estudia primero los ejercicios de la app para el tema, escribe el temario y enséñame el plan antes de guardar nada. Después escribe cada paso, elige lecciones que encajen de verdad y escribe el checkpoint de cada fase.",
       "copy": "Copiar",
       "copied": "Copiado",
       "connect": "Cómo conectar un asistente",

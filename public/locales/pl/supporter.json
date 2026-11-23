@@ -645,12 +645,12 @@
       "waiting": "Plan czeka na twoją akceptację"
     },
     "assistant": {
-      "title": "Zbuduj ją ze swoim asystentem AI",
-      "body": "riff.quest nie pisze ścieżek sam. Robi to twój asystent — Claude, ChatGPT — na podstawie twojej historii ćwiczeń oraz ćwiczeń i utworów z aplikacji; riff.quest ją sprawdza i zapisuje tutaj. Nie kosztuje to tokenów.",
-      "goal_label": "Co chcesz umieć zagrać?",
+      "title": "Zbuduj szkołę ze swoim asystentem AI",
+      "body": "Ścieżka to tutaj szkoła jednego tematu — legato, gitara rytmiczna, gra w stylu artysty. riff.quest nie pisze ich sam: robi to twój asystent — Claude, ChatGPT — z ćwiczeń, utworów i lekcji z aplikacji; riff.quest ją sprawdza i zapisuje tutaj. Nie kosztuje to tokenów.",
+      "goal_label": "Czego ma uczyć ta szkoła?",
       "prompt_label": "Wklej to swojemu asystentowi",
-      "prompt": "Użyj riff.quest i zbuduj mi ścieżkę do tego celu: {{goal}}\n\nTrzymaj się przewodnika riff.quest po ścieżkach. Najpierw zajrzyj do mojej historii ćwiczeń, zapytaj tylko o to, co zmieniłoby plan, i pokaż mi plan, zanim cokolwiek zapiszesz. Potem napisz każdy krok, dobierz lekcje, które naprawdę pasują, i napisz test na koniec każdej fazy.",
-      "prompt_no_goal": "Użyj riff.quest i zbuduj mi ścieżkę. Zapytaj mnie, co chcę umieć zagrać.\n\nTrzymaj się przewodnika riff.quest po ścieżkach. Najpierw zajrzyj do mojej historii ćwiczeń, zapytaj tylko o to, co zmieniłoby plan, i pokaż mi plan, zanim cokolwiek zapiszesz. Potem napisz każdy krok, dobierz lekcje, które naprawdę pasują, i napisz test na koniec każdej fazy.",
+      "prompt": "Użyj riff.quest i zbuduj mi ścieżkę, która jest kompletną szkołą tematu: {{goal}}\n\nTrzymaj się przewodnika riff.quest po ścieżkach. To kurs dla każdego gracza na danym poziomie, a nie plan dla mnie osobiście: zapytaj tylko o to, co ustala zakres i poziom. Najpierw przejrzyj ćwiczenia z aplikacji dla tego tematu, napisz sylabus i pokaż mi plan, zanim cokolwiek zapiszesz. Potem napisz każdy krok, dobierz lekcje, które naprawdę pasują, i napisz test na koniec każdej fazy.",
+      "prompt_no_goal": "Użyj riff.quest i zbuduj mi ścieżkę, która jest kompletną szkołą jednego tematu. Zapytaj mnie, jakiego.\n\nTrzymaj się przewodnika riff.quest po ścieżkach. To kurs dla każdego gracza na danym poziomie, a nie plan dla mnie osobiście: zapytaj tylko o to, co ustala zakres i poziom. Najpierw przejrzyj ćwiczenia z aplikacji dla tego tematu, napisz sylabus i pokaż mi plan, zanim cokolwiek zapiszesz. Potem napisz każdy krok, dobierz lekcje, które naprawdę pasują, i napisz test na koniec każdej fazy.",
       "copy": "Kopiuj",
       "copied": "Skopiowano",
       "connect": "Jak podłączyć asystenta",

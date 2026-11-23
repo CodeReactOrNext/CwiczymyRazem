@@ -111,6 +111,16 @@ export interface Roadmap {
    * is held to the same wishes.
    */
   constraints?: string[];
+  /**
+   * What the subject is made of, and which steps teach each part — the course
+   * outline a school written through the MCP server is checked against.
+   */
+  syllabus?: { topic: string; steps: string[] }[];
+  /**
+   * The review the plan was saved with: every criterion, the verdict and what
+   * its author looked at. Kept so the review itself can be judged later.
+   */
+  review?: { criterion: string; pass: boolean; note: string }[];
 }
 
 // Static roadmap stored in JSON (no per-user progress data)

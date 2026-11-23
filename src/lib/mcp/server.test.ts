@@ -156,10 +156,12 @@ describe("riff.quest MCP server", () => {
   // `tuning` argument on the four tab tools (~0.4k; the ids live in the guide),
   // then from 41.5k for the seven roadmap tools (~7.9k: a plan's shape is in
   // two of them, the check that only reads and the save that writes; the save
-  // also takes the review, and a checkpoint its six questions).
+  // also takes the review, and a checkpoint its six questions), then from
+  // 49.5k for the syllabus on the save and the tempo ceiling in the exercise
+  // list (~0.4k).
   it("keeps the tool list within its size budget", async () => {
     const { tools } = await client.listTools();
-    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(49_500);
+    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(50_000);
   });
 
   it("refuses arguments a tool doesn't take", async () => {

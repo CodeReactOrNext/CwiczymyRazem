@@ -631,12 +631,12 @@
       "waiting": "Dein Plan wartet auf dein OK"
     },
     "assistant": {
-      "title": "Bau sie mit deinem KI-Assistenten",
-      "body": "riff.quest schreibt keine Roadmaps selbst. Dein eigener Assistent — Claude, ChatGPT — baut sie aus deinem Übungsverlauf und den Übungen und Songs der App; riff.quest prüft sie und speichert sie hier. Das kostet keine Tokens.",
-      "goal_label": "Was willst du spielen können?",
+      "title": "Bau eine Schule mit deinem KI-Assistenten",
+      "body": "Eine Roadmap ist hier die Schule eines Themas — Legato, Rhythmusgitarre, Spielen wie ein Künstler. riff.quest schreibt sie nicht selbst: Dein eigener Assistent — Claude, ChatGPT — baut sie aus den Übungen, Songs und Lektionen der App; riff.quest prüft sie und speichert sie hier. Das kostet keine Tokens.",
+      "goal_label": "Was soll die Schule lehren?",
       "prompt_label": "Füge das bei deinem Assistenten ein",
-      "prompt": "Nutze riff.quest und baue mir eine Roadmap für dieses Ziel: {{goal}}\n\nHalte dich an den riff.quest-Roadmap-Leitfaden. Sieh dir zuerst meinen Übungsverlauf an, frag mich nur, was den Plan ändern würde, und zeig mir den Plan, bevor du etwas speicherst. Schreib dann jeden Schritt, wähle Lektionen, die wirklich passen, und schreib den Checkpoint jeder Phase.",
-      "prompt_no_goal": "Nutze riff.quest und baue mir eine Roadmap. Frag mich, was ich spielen können will.\n\nHalte dich an den riff.quest-Roadmap-Leitfaden. Sieh dir zuerst meinen Übungsverlauf an, frag mich nur, was den Plan ändern würde, und zeig mir den Plan, bevor du etwas speicherst. Schreib dann jeden Schritt, wähle Lektionen, die wirklich passen, und schreib den Checkpoint jeder Phase.",
+      "prompt": "Nutze riff.quest und baue mir eine Roadmap, die eine vollständige Schule dieses Themas ist: {{goal}}\n\nHalte dich an den riff.quest-Roadmap-Leitfaden. Es ist ein Kurs für jeden Spieler auf dem Niveau, kein Plan für mich persönlich: Frag mich nur, was Umfang und Niveau festlegt. Sieh dir zuerst die Übungen der App zum Thema an, schreib den Lehrplan und zeig mir den Plan, bevor du etwas speicherst. Schreib dann jeden Schritt, wähle Lektionen, die wirklich passen, und schreib den Checkpoint jeder Phase.",
+      "prompt_no_goal": "Nutze riff.quest und baue mir eine Roadmap, die eine vollständige Schule eines Themas ist. Frag mich, welches.\n\nHalte dich an den riff.quest-Roadmap-Leitfaden. Es ist ein Kurs für jeden Spieler auf dem Niveau, kein Plan für mich persönlich: Frag mich nur, was Umfang und Niveau festlegt. Sieh dir zuerst die Übungen der App zum Thema an, schreib den Lehrplan und zeig mir den Plan, bevor du etwas speicherst. Schreib dann jeden Schritt, wähle Lektionen, die wirklich passen, und schreib den Checkpoint jeder Phase.",
       "copy": "Kopieren",
       "copied": "Kopiert",
       "connect": "So verbindest du einen Assistenten",

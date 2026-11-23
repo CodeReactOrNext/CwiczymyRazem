@@ -11,6 +11,7 @@ vi.mock("utils/firebase/api/firebase.config", () => ({
 
 import { ROADMAP_GUIDE } from "../content/roadmapGuide";
 import { REVIEW_CRITERIA } from "../roadmapPlan";
+import { SCHOOL_TITLES } from "../roadmapPlan.fixtures";
 import { createRiffQuestMcpServer } from "../server";
 
 /** A review that answers every criterion, each with its own note. */
@@ -18,7 +19,7 @@ const review = (failing?: string) =>
   REVIEW_CRITERIA.map((criterion) => ({
     criterion: criterion.id,
     pass: criterion.id !== failing,
-    note: `Looked at ${criterion.id} across all three phases.`,
+    note: `Looked at ${criterion.id} across all five phases.`,
   }));
 
 const textOf = (result: Awaited<ReturnType<Client["callTool"]>>) =>
@@ -31,32 +32,20 @@ const step = (title: string, extra: Record<string, unknown> = {}) => ({
   ...extra,
 });
 
-const plan = () => [
-  {
-    title: "The Hand",
-    steps: [
-      step("Thumb and two fingers"),
-      step("Snapped treble notes"),
-      step("Quarter-note thumb pulse"),
-    ],
-  },
-  {
-    title: "The Chords",
-    steps: [
-      step("D minor triads up the neck"),
-      step("Double stops in sixths"),
-      step("Two-bar call and response"),
-    ],
-  },
-  {
-    title: "The Phrases",
-    steps: [
-      step("Bends into chord tones"),
-      step("Vibrato on held notes"),
-      step("Eight-bar solo over Dm–C–B♭–A"),
-    ],
-  },
-];
+const plan = () =>
+  SCHOOL_TITLES.map((titles, index) => ({
+    title: `Phase ${index + 1}`,
+    steps: titles.map((title) => step(title)),
+  }));
+
+/** Eight topics that between them name every step of the plan. */
+const syllabus = () => {
+  const titles = SCHOOL_TITLES.flat();
+  return Array.from({ length: 8 }, (_unused, index) => ({
+    topic: `Topic ${index + 1}`,
+    steps: titles.filter((_title, at) => at % 8 === index),
+  }));
+};
 
 describe("roadmap tools", () => {
   let client: Client;
@@ -110,7 +99,7 @@ describe("roadmap tools", () => {
     expect(ok.structuredContent).toMatchObject({
       ok: true,
       problems: [],
-      size: { phases: 3, steps: 9 },
+      size: { phases: 5, steps: 25 },
     });
     // The part of the review code cannot do comes back with every check.
     expect(
@@ -141,14 +130,15 @@ describe("roadmap tools", () => {
 
   it("refuses to save a plan with problems, and a read-only token before touching the database", async () => {
     const broken = plan();
-    broken[1].steps[0].title = "Thumb and two fingers";
+    broken[1].steps[0].title = "Trills between two fingers";
     const refused = await client.callTool({
       name: "riffquest_create_roadmap",
       arguments: {
-        title: "Knopfler lead",
-        goal: "Play lead like Mark Knopfler",
+        title: "Legato",
+        goal: "A complete school of legato for electric lead guitar",
         level: "Intermediate",
         phases: broken,
+        syllabus: syllabus(),
         review: review(),
         playerApproved: true,
       },
@@ -163,28 +153,53 @@ describe("roadmap tools", () => {
       client.callTool({
         name: "riffquest_create_roadmap",
         arguments: {
-          title: "Knopfler lead",
-          goal: "Play lead like Mark Knopfler",
+          title: "Legato",
+          goal: "A complete school of legato for electric lead guitar",
           level: "Intermediate",
           phases: plan(),
+          syllabus: syllabus(),
           ...extra,
         },
       });
 
     const failing = await save({
-      review: review("gaps"),
+      review: review("coverage"),
       playerApproved: true,
     });
-    expect(textOf(failing)).toMatch(/"gaps" did not pass/);
+    expect(textOf(failing)).toMatch(/"coverage" did not pass/);
 
     const partial = await save({
       review: review().slice(0, 4),
       playerApproved: true,
     });
-    expect(textOf(partial)).toMatch(/leaves out: .*wishes/);
+    expect(textOf(partial)).toMatch(/leaves out: .*general/);
 
     const unseen = await save({ review: review(), playerApproved: false });
     expect(textOf(unseen)).toMatch(/has not seen and agreed/);
+  });
+
+  it("refuses to save a school whose syllabus does not cover it, or whose title is not a subject", async () => {
+    const save = (extra: Record<string, unknown>) =>
+      client.callTool({
+        name: "riffquest_create_roadmap",
+        arguments: {
+          title: "Legato",
+          goal: "A complete school of legato for electric lead guitar",
+          level: "Intermediate",
+          phases: plan(),
+          syllabus: syllabus(),
+          review: review(),
+          playerApproved: true,
+          ...extra,
+        },
+      });
+
+    const thin = await save({ syllabus: syllabus().slice(0, 7) });
+    expect(textOf(thin)).toMatch(/syllabus does not match the plan/);
+    expect(textOf(thin)).toMatch(/teach no topic/);
+
+    const numbered = await save({ title: "Legato: 90 to 160 BPM" });
+    expect(textOf(numbered)).toMatch(/names a number/);
   });
 
   it("names the questions and the review criteria in the guide", () => {
@@ -192,6 +207,11 @@ describe("roadmap tools", () => {
       expect(ROADMAP_GUIDE).toContain(`\`${criterion.id}\``);
     }
     expect(ROADMAP_GUIDE).toContain("Which songs should be in the roadmap?");
+    // A school is not about the player who asked: the personal questions stay out.
+    expect(ROADMAP_GUIDE).not.toContain("What do you find hardest");
+    expect(ROADMAP_GUIDE).toContain("[Before you start]");
+    expect(ROADMAP_GUIDE).toContain("[What you can do now]");
+    expect(ROADMAP_GUIDE).toContain("The syllabus");
     expect(ROADMAP_GUIDE).toContain("riffquest_write_roadmap_checkpoint");
     expect(ROADMAP_GUIDE).toContain("riffquest_find_lessons");
   });

@@ -140,28 +140,28 @@ export function registerPrompts(server: McpServer) {
   server.registerPrompt(
     "build_roadmap",
     {
-      title: "Build a roadmap for a goal",
+      title: "Build a school of a subject",
       description:
-        "Plans a multi-phase roadmap for one goal from the player's history and the library, and saves it once they agree.",
+        "Builds a roadmap that works as a complete course on one subject — a technique, a style, an artist — from the app's exercises, songs and lessons, and saves it once the player agrees.",
       argsSchema: {
-        goal: z
+        subject: z
           .string()
           .describe(
-            "What you want to be able to play — an artist, a style, a song, a technique",
+            "What the school teaches — legato, rhythm guitar, thrash picking, playing like an artist",
           ),
       },
     },
-    ({ goal }) => ({
+    ({ subject }) => ({
       messages: [
         {
           role: "user",
           content: {
             type: "text",
             text: [
-              `Build me a riff.quest roadmap for this goal: ${goal}`,
-              "1. Call riffquest_get_roadmap_guide and follow it exactly. Look at riffquest_get_profile_summary, riffquest_get_skill_breakdown and riffquest_get_weak_spots, then ask me the questions from the guide that would change the plan — a few, not a form.",
-              "2. Find the exercises and songs with riffquest_list_exercises and riffquest_list_songs. Write the plan and run it through riffquest_check_roadmap_plan until it has no problems.",
-              "3. Review the plan against every criterion in the guide as a teacher who did not write it. Change whatever does not pass and check the plan again.",
+              `Build me a riff.quest roadmap that is a complete school of this subject: ${subject}`,
+              "1. Call riffquest_get_roadmap_guide and follow it exactly. It is a course for any player at the level, not a plan for me personally. Ask me only what settles its scope and level — a couple of questions.",
+              "2. Study the library for the subject before planning: every exercise for it with riffquest_list_exercises (all pages, with their tempo ranges) and the songs with riffquest_list_songs. Write the syllabus — what the subject is made of — then the plan around it, and run the plan through riffquest_check_roadmap_plan until it has no problems.",
+              "3. Review the plan against every criterion in the guide as a specialist who did not write it. Change whatever does not pass and check the plan again.",
               "4. Show me the plan as a plain list of phases and steps and ask what I want changed. Do not save anything before I agree.",
               "5. Save it with riffquest_create_roadmap. Then, a phase at a time: write its steps with riffquest_write_roadmap_steps — looking for lessons with riffquest_find_lessons and keeping only the ones that teach that step — and its checkpoint with riffquest_write_roadmap_checkpoint. Fix whatever a call refuses and send it again. Go on until no step is without text and no checkpoint is left to write.",
               "6. Give me the link and tell me in two sentences where to start.",

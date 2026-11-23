@@ -8,7 +8,7 @@ import {
   DIFFICULTY_FOR_LEVEL,
   findCatalogEntry,
 } from "lib/roadmaps/generation/exerciseCatalog";
-import { DESCRIPTION_LENGTH, wordCount } from "lib/roadmaps/generation/lengths";
+import { wordCount } from "lib/roadmaps/generation/lengths";
 import type { RoadmapLevel } from "lib/roadmaps/generation/levels";
 import {
   OVERUSED_EXERCISE_IDS,
@@ -30,8 +30,28 @@ import type {
  * no model on our side reads the plan; the client's model wrote it and fixes
  * it from the list this returns.
  *
+ * What a roadmap is here (owner's call, 2026-11-24): a school of one subject —
+ * "Legato", "Rhythm Guitar Basics" — a complete course anybody at the level
+ * can walk, not one player's plan for one goal. The numbers below are the
+ * curated roadmaps', measured: 7 phases, 34–38 steps, a description of about
+ * 205 words (170–265), an exercise on 80–89% of the steps, a last phase that
+ * is a performance.
+ *
  * Pure: the tools hand in the library songs they looked up.
  */
+
+/** The least a school is: below this it is a lesson plan, not a course. */
+export const SCHOOL_SIZE = { phases: 5, steps: 24 } as const;
+/** A step's description, in words: the range to aim for, and what is refused. */
+export const SCHOOL_TEXT = { min: 150, max: 260, floor: 120, ceiling: 340 };
+/** The frame the first and the last step add, with room for it. */
+export const SCHOOL_FRAME = {
+  first: "[Before you start]",
+  last: "[What you can do now]",
+  extraWords: 110,
+} as const;
+/** Topics a school's syllabus names — fewer is a list of phases, not a subject. */
+export const SYLLABUS_TOPICS = { min: 8, max: 30 } as const;
 export interface PlanStepInput {
   title: string;
   skillType: SkillType;
@@ -151,6 +171,14 @@ export const checkRoadmapPlan = (
       `${steps.length} steps in all; a roadmap has ${TOTAL_STEPS.min}–${TOTAL_STEPS.max}.`,
     );
   }
+  if (
+    structure.length < SCHOOL_SIZE.phases ||
+    steps.length < SCHOOL_SIZE.steps
+  ) {
+    problems.push(
+      `${structure.length} phases and ${steps.length} steps is a lesson plan, not a school: a subject takes at least ${SCHOOL_SIZE.phases} phases and ${SCHOOL_SIZE.steps} steps — the curated ones run 7 phases and about 35. Cover the whole subject, from the first motion to playing music with it.`,
+    );
+  }
   problems.push(...checkSkeleton(structure));
 
   const bareTechnique = steps.filter(
@@ -187,9 +215,12 @@ export const checkRoadmapPlan = (
   const nothing = steps.filter(
     (step) => !step.suggestedExerciseId && !step.songTitle,
   );
-  if (steps.length && nothing.length / steps.length > 0.35) {
+  if (steps.length && nothing.length / steps.length > 0.2) {
     notes.push(
-      `${nothing.length} of ${steps.length} steps have neither an exercise nor a song — nothing to open in the app.`,
+      `${nothing.length} of ${steps.length} steps have neither an exercise nor a song — nothing to open in the app. The curated schools have an exercise on more than 80% of their steps: ${nothing
+        .slice(0, 8)
+        .map((step) => quote(step.title))
+        .join(", ")}.`,
     );
   }
 
@@ -201,12 +232,129 @@ export const checkRoadmapPlan = (
   };
 };
 
+export interface SyllabusTopic {
+  /** One thing the subject is made of — "pull-offs", "muting the idle strings". */
+  topic: string;
+  /** Titles of the steps that teach it. */
+  steps: string[];
+}
+
+/**
+ * Whether the plan covers the subject it claims to teach. The author lists
+ * what the subject is made of and which steps teach each part; code can then
+ * see two things no reviewer has to be trusted on: a part of the subject that
+ * no step teaches, and a step that teaches no part of it.
+ */
+export const checkSyllabus = (
+  syllabus: SyllabusTopic[],
+  phases: PlanPhaseInput[],
+): string[] => {
+  const problems: string[] = [];
+  const titles = new Map(
+    phases
+      .flatMap((phase) => phase.steps)
+      .map((step) => [step.title.trim().toLowerCase(), step.title.trim()]),
+  );
+  if (syllabus.length < SYLLABUS_TOPICS.min) {
+    problems.push(
+      `The syllabus names ${syllabus.length} topics — a subject has at least ${SYLLABUS_TOPICS.min}. List what the subject is really made of (the motions, their variants, how they combine, the musical uses), then see which steps teach each.`,
+    );
+  }
+  const taught = new Set<string>();
+  const seen = new Set<string>();
+  syllabus.forEach(({ topic, steps }) => {
+    const key = topic.trim().toLowerCase();
+    if (seen.has(key))
+      problems.push(`The syllabus lists ${quote(topic)} twice.`);
+    seen.add(key);
+    const unknown = steps.filter(
+      (title) => !titles.has(title.trim().toLowerCase()),
+    );
+    if (unknown.length) {
+      problems.push(
+        `Syllabus topic ${quote(topic)} points at steps the plan does not have: ${unknown.map(quote).join(", ")}.`,
+      );
+    }
+    const known = steps.filter((title) =>
+      titles.has(title.trim().toLowerCase()),
+    );
+    if (!known.length) {
+      problems.push(
+        `Nothing in the plan teaches ${quote(topic)} — add a step for it, or it is not part of this school.`,
+      );
+    }
+    known.forEach((title) => taught.add(title.trim().toLowerCase()));
+  });
+  const orphans = [...titles.entries()]
+    .filter(([key]) => !taught.has(key))
+    .map(([, title]) => title);
+  if (orphans.length) {
+    problems.push(
+      `These steps teach no topic of the syllabus — either the syllabus is missing a topic or the step does not belong in this school: ${orphans.map(quote).join(", ")}.`,
+    );
+  }
+  return problems;
+};
+
+/** A school is named after its subject, the way a course is. */
+export const checkSchoolTitle = (title: string): string[] => {
+  const problems: string[] = [];
+  if (/\b\d+\s*(bpm|%)|\bbpm\b/i.test(title)) {
+    problems.push(
+      `The title ${quote(title)} names a number, not a subject — a school is called after what it teaches ("Legato", "Rhythm Guitar Basics", "Thrash Rhythm Picking").`,
+    );
+  }
+  if (title.trim().split(/\s+/).length > 8) {
+    problems.push(
+      `The title ${quote(title)} is a sentence — name the subject in a few words.`,
+    );
+  }
+  if (/\b(my|me|mine|i)\b/i.test(title)) {
+    problems.push(
+      `The title ${quote(title)} is about one player — a school is for everybody at its level.`,
+    );
+  }
+  return problems;
+};
+
 export interface StepTextInput {
   description: string;
   successCriteria: string;
 }
 
 const SECTIONS = ["[What it is]", "[Why it matters]", "[How to practice]"];
+
+/** Where a step sits in the school: the first carries the way in, the last the way out. */
+export interface StepPosition {
+  first?: boolean;
+  last?: boolean;
+}
+
+/**
+ * Whether a text names the exercise. The full title, or its name without the
+ * family it is filed under — the curated steps say "the Metronome Gap Test"
+ * for "Timing — Metronome Gap Test", and that is naming it.
+ */
+const namesExercise = (text: string, title: string): boolean => {
+  const haystack = text.toLowerCase();
+  const full = title.toLowerCase();
+  if (haystack.includes(full)) return true;
+  const short = full.split(/\s+[—–-]\s+/).pop() ?? "";
+  return short.split(/\s+/).length >= 2 && haystack.includes(short);
+};
+
+/**
+ * Whether a test has a measure in it. Digits, or a count in words — the
+ * curated criteria say "three attempts in a row" as often as "3".
+ */
+const MEASURE =
+  /\d|\b(once|twice|two|three|four|five|six|seven|eight|nine|ten|twelve|sixteen|half|every|whole|full|all)\b/i;
+
+/** Every tempo a text names, as numbers: "at 140 BPM", "from 100 to 125 BPM". */
+const temposIn = (text: string): number[] =>
+  [...text.matchAll(/(\d{2,3})(?:\s*(?:–|-|to)\s*(\d{2,3}))?\s*BPM/gi)].flatMap(
+    (match) => [match[1], match[2]].filter(Boolean).map(Number),
+  );
 
 /**
  * What is wrong with a step's text, by the rules the roadmap guide gives.
@@ -218,6 +366,9 @@ export const checkStepText = (
     "title" | "skillType" | "suggestedExerciseId" | "exerciseRole"
   >,
   text: StepTextInput,
+  position: StepPosition = {},
+  /** The top of the exercise's tempo range, when it has one. */
+  exerciseMaxBpm?: number | null,
 ): string[] => {
   const problems: string[] = [];
   const description = text.description.trim();
@@ -227,12 +378,24 @@ export const checkStepText = (
   if (missing.length) {
     problems.push(`${label}: the description lacks ${missing.join(", ")}.`);
   }
-
-  const range = DESCRIPTION_LENGTH[step.skillType ?? "physical"];
-  const words = wordCount(description);
-  if (words > range.max * 1.3 || words < range.min * 0.7) {
+  if (position.first && !description.includes(SCHOOL_FRAME.first)) {
     problems.push(
-      `${label}: the description is ${words} words; a ${step.skillType ?? "physical"} step takes ${range.min}–${range.max}.`,
+      `${label} opens the school: it starts with ${SCHOOL_FRAME.first} — what the player needs before starting, and what they will be able to do at the end.`,
+    );
+  }
+  if (position.last && !description.includes(SCHOOL_FRAME.last)) {
+    problems.push(
+      `${label} closes the school: it ends with ${SCHOOL_FRAME.last} — what the player has now, in concrete terms.`,
+    );
+  }
+
+  const frame =
+    (position.first ? SCHOOL_FRAME.extraWords : 0) +
+    (position.last ? SCHOOL_FRAME.extraWords : 0);
+  const words = wordCount(description);
+  if (words > SCHOOL_TEXT.ceiling + frame || words < SCHOOL_TEXT.floor) {
+    problems.push(
+      `${label}: the description is ${words} words; a step takes ${SCHOOL_TEXT.min}–${SCHOOL_TEXT.max}${frame ? ` (plus the frame section)` : ""}. ${words < SCHOOL_TEXT.floor ? "A masterclass explains the motion, the reason and the practice fully — this is a note." : "Cut what repeats an earlier step."}`,
     );
   }
 
@@ -247,18 +410,40 @@ export const checkStepText = (
   if (
     entry &&
     step.exerciseRole !== "support" &&
-    !description.toLowerCase().includes(entry.title.toLowerCase())
+    !namesExercise(description, entry.title)
   ) {
     problems.push(
       `${label}: its exercise is ${quote(entry.title)} — [How to practice] names it by that exact title.`,
     );
   }
 
+  // A tempo the exercise cannot be set to is a test nobody can take.
+  if (entry && step.exerciseRole !== "support" && exerciseMaxBpm) {
+    const tooFast = [
+      ...new Set(
+        temposIn(`${description} ${text.successCriteria}`).filter(
+          (tempo) => tempo > exerciseMaxBpm,
+        ),
+      ),
+    ];
+    if (tooFast.length) {
+      problems.push(
+        `${label}: ${quote(entry.title)} goes up to ${exerciseMaxBpm} BPM, and the text asks for ${tooFast.join(", ")} BPM in it — keep the tempo inside the exercise's range, or give the step an exercise that reaches it.`,
+      );
+    }
+  }
+
   if (wordCount(text.successCriteria) < 8) {
     problems.push(
       `${label}: the success criteria are a test the player can run — what they play, how fast, what it must sound like.`,
     );
-  } else if (!/\d/.test(text.successCriteria)) {
+  } else if (
+    // Only where the app can measure it: a step with its own exercise. "Play
+    // Hey Joe with the record from start to finish" is a test without a number.
+    entry &&
+    step.exerciseRole !== "support" &&
+    !MEASURE.test(text.successCriteria)
+  ) {
     problems.push(
       `${label}: the success criteria have no number in them — a tempo, a count of bars or repeats, a duration.`,
     );
@@ -275,29 +460,29 @@ export const checkStepText = (
  */
 export const REVIEW_CRITERIA = [
   {
-    id: "goal",
+    id: "subject",
     question:
-      "Does every phase move the player towards the goal? Would a fan of the artist or the style recognise the plan as theirs?",
+      "Is this a school of the subject — would a teacher of it recognise the course as complete and theirs, or is it a generic guitar plan with the subject's name on it?",
+  },
+  {
+    id: "coverage",
+    question:
+      "Go through the syllabus as a specialist: which part of the subject is still missing, and which is covered by one thin step where it needs two or three?",
   },
   {
     id: "level",
     question:
-      "Nothing the level already has, nothing out of reach too early — and it starts from what the player's history shows, not from zero.",
+      "Does it start exactly where the stated level stands (said in [Before you start]) — nothing the level already has, nothing out of reach too early?",
+  },
+  {
+    id: "arc",
+    question:
+      "Does it run the way a course does: the basic motion, its variants, combining them, playing real music with them, and a last phase that is a performance? Is music played from the first phase, not saved for the end?",
   },
   {
     id: "specificity",
     question:
-      "Is every step a concrete skill for this goal? Name any title that could sit in any roadmap.",
-  },
-  {
-    id: "order",
-    question:
-      "Prerequisites first, the goal itself played early, ear and rhythm spread through the phases rather than left for the end.",
-  },
-  {
-    id: "gaps",
-    question:
-      "What would a good teacher say is missing for this goal, or sits in the wrong phase?",
+      "Is every step a concrete skill of this subject? Name any title that could sit in any roadmap.",
   },
   {
     id: "repeatable",
@@ -305,19 +490,19 @@ export const REVIEW_CRITERIA = [
       "Is every step something done across several sessions — no checklist task, no setup note?",
   },
   {
-    id: "size",
-    question:
-      "Is the size right for the goal: a narrow goal not stretched to a year, a wide one not squeezed into a few steps?",
-  },
-  {
     id: "exercises",
     question:
-      "Is every exercise marked direct really the step itself, with the step's own material in it? Anything only related is support, or dropped.",
+      "Is every exercise marked direct really the step itself? Does nearly every step have an exercise or a song to open — and is the library used as far as it goes for this subject?",
   },
   {
-    id: "wishes",
+    id: "measurable",
     question:
-      "Does the plan keep every wish the player stated — songs they named, sides they left out, how they want to learn?",
+      "Can each step end in a test the app can run — a tempo inside the exercise's range, an accuracy, a count of clean repeats?",
+  },
+  {
+    id: "general",
+    question:
+      "Is it written for every player at this level, not for one person — no step that only makes sense for the player who asked?",
   },
 ] as const;
 
@@ -415,9 +600,9 @@ export const checkCheckpoint = (
         index === question.answerIndex || option.length < right,
     );
   });
-  if (normalised.length > 1 && longest.length === normalised.length) {
+  if (normalised.length > 1 && longest.length > normalised.length / 2) {
     problems.push(
-      "The right answer is the longest option in every question — a player can pass by length alone.",
+      `The right answer is the longest option in ${longest.length} of ${normalised.length} questions — a player can pass by length alone. Make the wrong options as long and as specific as the right one.`,
     );
   }
   return problems.length ? { problems } : { questions: normalised };
