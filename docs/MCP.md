@@ -73,9 +73,12 @@ per server.
 | Calendar (read/write) | `riffquest_get_planned_days`, `riffquest_set_calendar_days` — writes `users/{uid}/settings/calendar` (owner-only, no rules change). A written day replaces its slots, leaves its repeat group, and a slot playing what the day already had keeps its id and tick |
 | Practice log (write) | `riffquest_log_practice` |
 | Own exercises | `riffquest_get_tab_format`, `riffquest_validate_tablature`, `riffquest_preview_tab`, `riffquest_get_exercise_tablature`, `riffquest_get_my_exercises`, `riffquest_create_exercise`, `riffquest_update_exercise` |
+| Roadmaps | `riffquest_get_roadmap_guide`, `riffquest_check_roadmap_plan`, `riffquest_create_roadmap`, `riffquest_write_roadmap_steps`, `riffquest_find_lessons`, `riffquest_write_roadmap_checkpoint`, `riffquest_get_roadmap` — see [Roadmaps](#roadmaps) |
 
-Prompts: `weekly_review`, `plan_next_session`, `log_session`, `write_exercise`.
-Resource: `riffquest://docs/tab-format` (same text as `riffquest_get_tab_format`).
+Prompts: `weekly_review`, `plan_next_session`, `log_session`, `write_exercise`,
+`build_roadmap`.
+Resources: `riffquest://docs/tab-format` (same text as `riffquest_get_tab_format`)
+and `riffquest://docs/roadmap-guide` (same text as `riffquest_get_roadmap_guide`).
 
 For the Claude connector directory review (enforced in `server.test.ts`): every
 tool has a `title` and all four annotations spelled out (a missing
@@ -126,7 +129,79 @@ How tools answer (`results.ts`, all tested):
 
 Deliberately left out: anything social (leaderboard, guilds, duels, chat),
 publishing exercises, marking songs learned (awards points), logging practice
-(points must come from real playing), roadmaps and the OpenAI-backed searches.
+(points must come from real playing), and anything that runs our own model:
+the in-app roadmap generator and the OpenAI-backed searches. Roadmaps written
+by the player's own assistant are in — see below.
+
+## Roadmaps
+
+The only way a player gets a new roadmap since 2026-11-23: the in-app
+generator and its paid Refine are switched off
+(`IN_APP_ROADMAP_GENERATION` in `lib/roadmaps/generationSwitch.ts` — the
+builder is replaced by a screen that hands the player a request for their
+assistant, and the routes behind it answer 410). The player's assistant writes
+the roadmap; riff.quest checks and stores it and runs no model — it costs us
+nothing, where the generator spent about $0.40 a roadmap on OpenAI. The
+generator's code stays: these tools are built from its checks, limits, voice
+and exemplars, and the admin queue for the curated roadmaps still runs it.
+
+1. `riffquest_get_roadmap_guide` — the generator's own brief as a guide
+   (`content/roadmapGuide.ts`). The level rules, the voice, the limits and the
+   two curated exemplars are imported from `lib/roadmaps/generation`, not
+   copied, so a change to the generator changes the guide.
+2. `riffquest_check_roadmap_plan` — read-only. Runs the plan through
+   `checkRoadmapPlan` (`roadmapPlan.ts`): every exercise id exists, fits the
+   level and is on at most two steps; every song id is in the library; and the
+   generator's code checks (`skeletonChecks.ts`: a song in the first third, no
+   gear-named step, no near-duplicate titles, no exercise twice in a phase).
+   Problems block a save; notes do not.
+3. `riffquest_create_roadmap` — refuses a plan with problems, and one whose
+   **review** is not done: the nine criteria the generator's reviewer judges
+   on (`REVIEW_CRITERIA` in `roadmapPlan.ts` — goal, level, specificity, order,
+   gaps, repeatable, size, exercises, wishes), each answered once with `pass`
+   and a note, all passing, plus `playerApproved`. The client's model is the
+   reviewer; the server only makes the review impossible to skip. Then saves
+   through the generator's `finishSkeleton` to `roadmaps/{id}` with
+   `visibility: "private"`, `source: "mcp"` and the player's `wishes`
+   (`constraints`), steps without text. At most 12 such roadmaps a player.
+4. `riffquest_write_roadmap_steps` — the text of up to 8 steps a call, each
+   checked by `checkStepText` (the three sections, the length for the step's
+   skill type, no filler, a `direct` exercise named by its title, criteria that
+   are a test with a number in it). One failing text saves none. A step may
+   carry up to three `lessonIds` from `riffquest_find_lessons`. The same call
+   rewrites a step later — of a roadmap the assistant wrote, and, while the
+   in-app generator is off, of one it generated earlier too (with Refine gone
+   nothing else could change those). The answer lists the phases whose
+   checkpoint is to write (`checkpointsToWrite`).
+5. `riffquest_find_lessons` — candidates from the lesson index by plain words,
+   no embedding and no model (`lessonCatalog.ts`): the ~1 900 lessons rated 7+
+   are packed into one cached document (`adminConfig/mcpLessonCatalog`,
+   ~330 KB, rebuilt weekly, an hour in memory), so a search is one read. Words
+   nearly every lesson has ("guitar", "lesson") do not count as a match. The
+   client's model picks — it is the judge the generator runs on our key.
+6. `riffquest_write_roadmap_checkpoint` — a phase's six questions, through
+   the app's own `normaliseQuizQuestions` plus two checks (the right answer
+   not always in one place, not always the longest), stored in
+   `roadmapPhaseQuizzes` with the phase's fingerprint. With it in place the
+   app does not write a quiz with our model when the player sits the
+   checkpoint; a step rewritten later makes it stale and it is listed to
+   write again.
+7. `riffquest_get_roadmap` — the player's roadmaps, one roadmap's outline
+   (with its wishes and the checkpoints still to write), or one step's text;
+   how a conversation picks a half-written roadmap up again.
+
+The guide also carries the in-app builder's question bank (what to ask before
+planning, and when each question is worth asking), rendered from
+`questionBank.ts`.
+
+A whole roadmap — plan, texts, checkpoints — is about a dozen writes of the
+day's 35. What such a roadmap does not have: a place on the Players board
+(always private — nothing we wrote or reviewed). A checkpoint the assistant
+did not write falls back to our model the first time the player sits it, as
+for every roadmap.
+
+Not verified live: the flow has unit tests, but has not been run from Claude
+or ChatGPT against a deployed server.
 
 ## Practice log
 

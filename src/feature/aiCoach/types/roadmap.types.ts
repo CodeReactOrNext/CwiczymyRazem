@@ -1,3 +1,5 @@
+import type { RoadmapBrief } from "lib/roadmaps/generation/brief";
+
 import type { PhaseCheckResult } from "./phaseCheck.types";
 import type { YouTubeLessonResult } from "./youtubeLesson.types";
 
@@ -25,6 +27,32 @@ export interface RoadmapStep {
    */
   suggestedSong?: RoadmapSongRef;
   songCompleted?: boolean;
+  /**
+   * One sentence from the plan: what the student does in this step. Written
+   * with the skeleton, so every phase can be described knowing what the others
+   * are about.
+   */
+  summary?: string;
+  /**
+   * How the exercise relates to the step. "support" is a warm-up or a related
+   * drill — it does not contain the step's own material, and the step never
+   * claims it does. Absent means the exercise trains the step directly.
+   */
+  exerciseRole?: "direct" | "support";
+  /** Why this exercise, in the planner's words — context for the description. */
+  exerciseWhy?: string;
+  /**
+   * How to set a configurable exercise up for this step ("A minor, i–VI–III–VII,
+   * 80 BPM"), shown next to it so the player does not dig it out of the prose.
+   */
+  exerciseSetup?: string;
+  /**
+   * The song this step is about when the library did not have it at generation
+   * time. Kept so the step links itself once the song is added.
+   */
+  songRequest?: { title: string; artist: string };
+  /** Finished practice sessions started from this step — counted, never typed in. */
+  practiceSessions?: number;
 }
 
 /** The library song a step practises, denormalised so the map needs no lookup. */
@@ -63,6 +91,26 @@ export interface Roadmap {
   phases: RoadmapPhase[];
   image?: string;
   visibility?: RoadmapVisibility;
+  /**
+   * What the player answered before generating — the constraints the plan was
+   * built to. Kept with the roadmap so a later change to it (a rewritten step,
+   * an added one) is held to the same answers.
+   */
+  brief?: RoadmapBrief | null;
+  /** When the unlinked song steps were last looked up in the library. */
+  songsCheckedAt?: string;
+  /**
+   * "mcp" when the player's own AI assistant wrote it through the MCP server
+   * rather than the in-app generator. Such a roadmap is always private, and
+   * the assistant may rewrite its steps for free.
+   */
+  source?: "mcp";
+  /**
+   * What the player asked for, one line each, as their assistant wrote it down
+   * when the plan was made — so a later rewrite, in another conversation,
+   * is held to the same wishes.
+   */
+  constraints?: string[];
 }
 
 // Static roadmap stored in JSON (no per-user progress data)

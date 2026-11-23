@@ -14,6 +14,7 @@ export const stripProgress = (phases: RoadmapPhase[]): RoadmapPhase[] =>
         exerciseCompleted: _exercise,
         completedLessonIds: _lessons,
         songCompleted: _song,
+        practiceSessions: _sessions,
         ...step
       }) => ({ ...step, sessionsCompleted: 0 }),
     ),

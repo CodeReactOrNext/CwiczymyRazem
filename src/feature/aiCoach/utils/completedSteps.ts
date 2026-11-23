@@ -62,6 +62,7 @@ export const hasAdvancedStep = (
         const previous = stepsBefore.get(step.id);
         return (
           (step.sessionsCompleted ?? 0) > (previous?.sessionsCompleted ?? 0) ||
+          (step.practiceSessions ?? 0) > (previous?.practiceSessions ?? 0) ||
           tickedResource(previous, step)
         );
       }),

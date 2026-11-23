@@ -64,7 +64,7 @@ const EXTRA_PAGES: SearchPage[] = [
   { id: "rotation", label: "Rotation", titleKey: "practice_hub:modes.rotation.title", href: "/rotation", icon: Repeat, group: "library" },
   { id: "goals", label: "Goals", titleKey: "practice_hub:modes.goals.title", href: "/goals", icon: Target, group: "library" },
   { id: "calendar", label: "Calendar", titleKey: "practice_hub:modes.calendar.title", href: "/calendar", icon: CalendarDays, group: "library", keywords: "schedule planner week auto plan" },
-  { id: "player-roadmaps", label: "Player Roadmaps", titleKey: "practice_hub:modes.player_roadmaps.title", href: "/my-roadmaps", icon: Signpost, group: "library" },
+  { id: "player-roadmaps", label: "Player Roadmaps", titleKey: "practice_hub:modes.player_roadmaps.title", href: "/ai-coach?tab=players", icon: Signpost, group: "library" },
   { id: "practice-log", label: "Practice Log", href: "/practice-log", icon: ScrollText, group: "progress", keywords: "history sessions" },
   { id: "skill-points", label: "Skill Points", href: "/profile/skill-points", icon: Sparkles, group: "progress", keywords: "skills technique theory hearing creativity" },
   { id: "achievements", label: "Achievements", href: "/profile/achievements", icon: Medal, group: "progress", keywords: "badges" },

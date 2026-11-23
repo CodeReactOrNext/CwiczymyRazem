@@ -1,18 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Button, PRESSABLE_IN_GROUP } from "assets/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "assets/components/ui/select";
+import { Button } from "assets/components/ui/button";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
 import { EmptyState } from "components/EmptyState/EmptyState";
 import { SearchInput } from "components/SearchInput/SearchInput";
-import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { firebaseUpdateRoadmap } from "feature/aiCoach/services/roadmap.service";
@@ -27,8 +19,13 @@ import type {
 } from "feature/aiCoach/types/roadmap.types";
 import { withPhaseChecks } from "feature/aiCoach/utils/phaseCheck";
 import { stripProgress } from "feature/aiCoach/utils/stripProgress";
+import {
+  roadFromCounts,
+  RoadmapSummaryCard,
+} from "feature/aiCoach/view/RoadmapCard/RoadmapSummaryCard";
 import RoadmapView from "feature/aiCoach/view/RoadmapView/RoadmapView";
-import { GenerateRoadmapCard } from "feature/supporterPanel/components/GenerateRoadmapCard";
+import { AssistantRoadmapDialog } from "feature/supporterPanel/components/AssistantRoadmapDialog";
+import { RoadmapBuilder } from "feature/supporterPanel/components/RoadmapBuilder";
 import { useOwnRoadmapPersist } from "feature/supporterPanel/hooks/useOwnRoadmapPersist";
 import { useRoadmapRefine } from "feature/supporterPanel/hooks/useRoadmapRefine";
 import {
@@ -43,53 +40,24 @@ import type {
   UserRoadmapSummary,
 } from "feature/supporterPanel/types/userRoadmaps.types";
 import {
-  arrangeOwnRoadmaps,
   arrangeRoadmaps,
-  featuredRoadmap,
   isViewersRoadmap,
   type LevelFilter,
-  ROADMAP_SORTS,
-  type RoadmapSort,
   viewerRun,
 } from "feature/supporterPanel/utils/roadmapBoard";
 import {
   displayDescription,
   displayTitle,
-  levelTextTone,
 } from "feature/supporterPanel/utils/roadmapGoal";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { useIntlLocale } from "lib/i18n/dateLocale";
 import { ROADMAP_LEVELS } from "lib/roadmaps/generation/levels";
-import {
-  ArrowRight,
-  ArrowUpDown,
-  Dumbbell,
-  Lock,
-  Map as MapIcon,
-  Music,
-  Play,
-  Sparkles,
-  User,
-  Users,
-} from "lucide-react";
+import { IN_APP_ROADMAP_GENERATION } from "lib/roadmaps/generationSwitch";
+import { Lock, Map as MapIcon, Play, Sparkles, User } from "lucide-react";
 import { useRouter } from "next/router";
-import { useCallback, useMemo, useState } from "react";
-import { FaYoutube } from "react-icons/fa6";
+import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-
-const formatDate = (iso: string | null, locale?: string) => {
-  if (!iso) return null;
-  const date = new Date(iso);
-  return Number.isNaN(date.getTime())
-    ? null
-    : date.toLocaleDateString(locale, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-};
 
 /**
  * The stored roadmap with that player's sessions on its steps — the shape
@@ -115,6 +83,7 @@ const withProgress = (
           resourceProgress[step.id]?.exerciseCompleted ?? false,
         completedLessonIds: resourceProgress[step.id]?.completedLessonIds ?? [],
         songCompleted: resourceProgress[step.id]?.songCompleted ?? false,
+        practiceSessions: resourceProgress[step.id]?.practiceSessions ?? 0,
       })),
     })),
     phaseChecks,
@@ -123,68 +92,6 @@ const withProgress = (
 
 /** Nothing a supporter does in the map belongs in somebody else's document. */
 const doNotPersist = async () => {};
-
-const PlayerAvatar = ({
-  summary,
-  className,
-}: {
-  summary: UserRoadmapSummary;
-  className?: string;
-}) => (
-  <span
-    className={cn(
-      "h-8 w-8 shrink-0 overflow-hidden rounded-full bg-zinc-800",
-      className,
-    )}>
-    {summary.avatar ? (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src={summary.avatar} alt='' className='h-full w-full object-cover' />
-    ) : (
-      <span className='flex h-full w-full items-center justify-center text-zinc-500'>
-        <User size={14} />
-      </span>
-    )}
-  </span>
-);
-
-/**
- * The roadmap's shape: one segment per phase, as wide as its steps, filled
- * with the steps the run has finished — emerald once a phase is through.
- * Drawn on every card, started or not: the shape says how the roadmap is
- * built, which an empty progress bar never did.
- */
-const PhaseStrip = ({
-  sizes,
-  done,
-  className,
-}: {
-  sizes: number[];
-  done: number[];
-  className?: string;
-}) => (
-  <span aria-hidden className={cn("flex h-1.5 w-full gap-1", className)}>
-    {sizes.map((size, index) => {
-      const finished = Math.min(done[index] ?? 0, size);
-      const complete = size > 0 && finished === size;
-      return (
-        <span
-          key={index}
-          className='relative h-full min-w-1.5 overflow-hidden rounded-full bg-zinc-800'
-          style={{ flex: `${Math.max(size, 1)} 1 0%` }}>
-          {finished > 0 && (
-            <span
-              className={cn(
-                "absolute inset-y-0 left-0 rounded-full",
-                complete ? "bg-emerald-400" : "bg-cyan-400",
-              )}
-              style={{ width: `${(finished / size) * 100}%` }}
-            />
-          )}
-        </span>
-      );
-    })}
-  </span>
-);
 
 /**
  * The owner's own roadmap with the paid refining kit switched on.
@@ -318,7 +225,9 @@ const RoadmapDetail = ({
     [data],
   );
 
-  const backButton = <BackLink label={t("panel.brief.back")} onClick={onBack} />;
+  const backButton = (
+    <BackLink label={t("panel.brief.back")} onClick={onBack} />
+  );
 
   const startButton =
     !isOwn && !isFollowing && viewerUid && roadmap ? (
@@ -333,8 +242,10 @@ const RoadmapDetail = ({
       </Button>
     ) : null;
 
+  // Refine ran on our own model; with in-app generation closed, a roadmap
+  // is changed by the assistant that wrote it.
   const refineToggle =
-    isOwn && roadmap ? (
+    IN_APP_ROADMAP_GENERATION && isOwn && roadmap ? (
       <button
         type='button'
         onClick={onToggleRefine}
@@ -442,19 +353,37 @@ const RoadmapDetail = ({
   );
 };
 
+/** A listing from before the per-phase counts: the finished steps, laid along the road in order. */
+const sequentialDone = (sizes: number[], completed: number): number[] => {
+  let left = completed;
+  return sizes.map((size) => {
+    const taken = Math.min(size, left);
+    left -= taken;
+    return taken;
+  });
+};
+
+/** `total` steps split as evenly as they go over `phases` phases. */
+const evenSizes = (total: number, phases: number): number[] => {
+  const count = Math.max(1, phases);
+  return Array.from(
+    { length: count },
+    (_, index) => Math.floor(total / count) + (index < total % count ? 1 : 0),
+  );
+};
+
 /**
- * One roadmap on the board, laid out like the curated cards on /ai-coach: the
- * name, the level and size, the goal, the shape of the phases, and the step a
- * session would start on — the one thing a card can say about what to do next.
+ * One player's roadmap on the same card the curated ones use: whose it is,
+ * the name and level, and the road in miniature.
  *
- * The author line is only there when it says something: on the viewer's own
- * roadmaps it would be their own name on every card of the section.
+ * The author is only named when that says something: on the viewer's own
+ * roadmaps it would be their own name on every card.
  *
  * The numbers are only ever the viewer's own run: their roadmap, or one they
  * follow. On anybody else's roadmap the owner's progress is not shown at all —
- * the card offers the first step instead.
+ * the road is drawn untouched.
  */
-const RoadmapTile = ({
+const PlayerRoadmapCard = ({
   summary,
   viewerUid,
   onOpen,
@@ -463,276 +392,135 @@ const RoadmapTile = ({
   summary: UserRoadmapSummary;
   viewerUid: string | null;
   onOpen: () => void;
-  /**
-   * The roadmap under way, drawn wide at the head of "Your roadmaps": the
-   * name and goal on one side, the phases and the next step on the other.
-   */
   featured?: boolean;
 }) => {
   const { t } = useTranslation(["supporter", "ai_coach"]);
-  const intl = useIntlLocale();
   const isOwn = viewerUid != null && viewerUid === summary.userId;
   const run = viewerRun(summary, viewerUid);
   const following = summary.viewerProgress != null;
   const started = !!run && run.sessionsCompleted > 0;
-  const complete =
-    !!run && summary.stepCount > 0 && run.completedSteps >= summary.stepCount;
-  const title = displayTitle(summary);
-  const description = displayDescription(summary);
-  const created = formatDate(
-    following ? (summary.viewerProgress?.startedAt ?? null) : summary.createdAt,
-    intl,
-  );
-  const practised = formatDate(run?.lastPractisedAt ?? null, intl);
-  // A listing from before the per-phase counts: even segments, nothing filled.
-  const phaseSizes = summary.phaseSteps?.length
+  const done = run?.completedSteps ?? 0;
+  const complete = !!run && summary.stepCount > 0 && done >= summary.stepCount;
+  const sizes = summary.phaseSteps?.length
     ? summary.phaseSteps
-    : Array.from({ length: summary.phaseCount }, () => 1);
-  const nextStep = run ? run.nextStep : summary.firstStep;
+    : evenSizes(summary.stepCount, summary.phaseCount);
+  const phaseDone = run?.phaseDone?.length
+    ? run.phaseDone
+    : sequentialDone(sizes, done);
+  const name = summary.displayName ?? t("panel.players.unknown");
+  // Everybody on it: the players who started it, and its owner once they have.
+  const players = summary.followerCount + (summary.lastPractisedAt ? 1 : 0);
 
-  const nextLabel = complete
-    ? t("ai_coach:card.all_done")
-    : started
-      ? t("ai_coach:card.up_next")
-      : run
-        ? t("ai_coach:card.first_step")
-        : t("panel.players.first_step");
-  const action = !run
-    ? t("panel.players.view")
-    : complete
-      ? t("ai_coach:card.review")
-      : started
-        ? t("ai_coach:card.continue")
-        : t("ai_coach:card.start");
-
-  const author = !isOwn && (
-    <span className='flex w-full items-center gap-2.5'>
-      <PlayerAvatar summary={summary} className='h-6 w-6' />
-      <span className='min-w-0 flex-1 truncate text-sm text-zinc-400'>
-        {following
-          ? t("panel.by", {
-              name: summary.displayName ?? t("panel.players.unknown"),
-            })
-          : (summary.displayName ?? t("panel.players.unknown"))}
-      </span>
-    </span>
-  );
-
-  const heading = (
-    <span className='flex flex-col gap-2.5'>
-      <span
-        className={cn(
-          "line-clamp-2 break-words font-bold leading-tight tracking-tight text-zinc-100",
-          featured ? "text-2xl md:text-3xl" : "text-xl",
-        )}>
-        {title}
-      </span>
-      <span className='flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-400'>
-        {summary.level && (
-          <span
-            className={cn(
-              "inline-flex items-center gap-2 font-medium",
-              levelTextTone(summary.level),
-            )}>
-            <span aria-hidden className='h-1.5 w-1.5 rounded-full bg-current' />
-            {t(`ai_coach:levels.${summary.level}`, summary.level)}
-          </span>
-        )}
-        <span className='tabular-nums'>
-          {t("ai_coach:phases_steps", {
-            phases: summary.phaseCount,
-            steps: summary.stepCount,
-          })}
-        </span>
-        <span className='flex items-center gap-3 tabular-nums text-zinc-500'>
-          <span
-            className='flex items-center gap-1.5'
-            title={t("panel.players.exercises")}>
-            <Dumbbell className='h-3.5 w-3.5' aria-hidden />
-            <span className='sr-only'>{t("panel.players.exercises")}</span>
-            {summary.exerciseSteps}
-          </span>
-          {summary.songSteps > 0 && (
-            <span
-              className='flex items-center gap-1.5'
-              title={t("panel.players.songs")}>
-              <Music className='h-3.5 w-3.5' aria-hidden />
-              <span className='sr-only'>{t("panel.players.songs")}</span>
-              {summary.songSteps}
-            </span>
-          )}
-          <span
-            className='flex items-center gap-1.5'
-            title={t("panel.players.lessons")}>
-            <FaYoutube className='h-3.5 w-3.5' aria-hidden />
-            <span className='sr-only'>{t("panel.players.lessons")}</span>
-            {summary.lessonSteps}
-          </span>
-        </span>
-        {summary.visibility === "private" && (
-          <span className='flex items-center gap-1.5'>
-            <Lock className='h-3.5 w-3.5' aria-hidden />
-            {t("panel.generate.visibility.private.label")}
-          </span>
-        )}
-        {summary.followerCount > 0 && (
-          <span className='flex items-center gap-1.5'>
-            <Users className='h-3.5 w-3.5' aria-hidden />
-            {t("panel.players.following_count", {
-              count: summary.followerCount,
-            })}
-          </span>
-        )}
-      </span>
-    </span>
-  );
-
-  const descriptionText = description && (
-    <span
-      className={cn(
-        "text-sm leading-relaxed text-zinc-400",
-        featured ? "line-clamp-3" : "line-clamp-2",
-      )}>
-      {description}
-    </span>
-  );
-
-  const progress = (
-    <span className='flex flex-col gap-2.5'>
-      <PhaseStrip
-        sizes={phaseSizes}
-        done={run?.phaseDone ?? []}
-        className={featured ? "h-2" : undefined}
-      />
-      <span className='flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm text-zinc-500'>
-        {started && run ? (
+  return (
+    <RoadmapSummaryCard
+      eyebrow={
+        isOwn ? (
           <>
-            <span className='tabular-nums text-zinc-300'>
-              {t("ai_coach:steps_of", {
-                done: run.completedSteps,
-                total: summary.stepCount,
-              })}{" "}
-              ·{" "}
-              {t("ai_coach:refine.sessions", {
-                count: run.sessionsCompleted,
-              })}
-            </span>
-            {practised && (
-              <span>
-                {t("panel.players.last_practised", { date: practised })}
-              </span>
+            {t("ai_coach:hub.built_for_you")}
+            {summary.visibility === "private" && (
+              <Lock
+                className='h-3.5 w-3.5'
+                aria-label={t("panel.generate.visibility.private.label")}
+              />
             )}
           </>
+        ) : following ? (
+          t("panel.by", { name })
         ) : (
-          <span>
-            {following
-              ? t("panel.players.following_none")
-              : t("panel.players.not_started")}
-            {created
-              ? ` · ${following ? t("panel.players.started_on", { date: created }) : t("panel.players.created_on", { date: created })}`
-              : ""}
+          name
+        )
+      }
+      leading={
+        isOwn ? (
+          <span className='flex h-full w-full items-center justify-center bg-amber-500/10 text-amber-400'>
+            <Sparkles className='h-10 w-10' strokeWidth={1.5} aria-hidden />
           </span>
-        )}
-      </span>
-    </span>
-  );
-
-  const footer = (
-    <span className='mt-auto flex w-full flex-wrap items-end justify-between gap-4'>
-      <span className='flex min-w-0 flex-1 basis-40 flex-col gap-1'>
-        {nextStep !== undefined && (
-          <>
-            <span
-              className={cn(
-                "text-sm",
-                complete ? "text-emerald-300" : "text-zinc-500",
-              )}>
-              {nextLabel}
-            </span>
-            <span
-              className={cn(
-                "line-clamp-2 font-medium leading-relaxed text-zinc-200",
-                featured ? "text-base" : "text-sm",
-              )}>
-              {nextStep ?? t("ai_coach:card.revisit")}
-            </span>
-          </>
-        )}
-      </span>
-      {/* The whole card is the button; this only says what pressing it does. */}
-      <span
-        aria-hidden
-        className={cn(
-          PRESSABLE_IN_GROUP,
-          "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors",
-          run
-            ? "border-b-black/25 bg-primary text-primary-foreground group-hover:bg-primary/90"
-            : "border-b-black/30 bg-zinc-800 text-zinc-200 group-hover:bg-zinc-700",
-        )}>
-        {action}
-        <ArrowRight size={16} />
-      </span>
-    </span>
-  );
-
-  // Wide, it sits a shade lighter than the grid under it — set apart by its
-  // ground, not by a frame.
-  return featured ? (
-    <button
-      type='button'
-      onClick={onOpen}
-      className='group grid w-full gap-8 rounded-lg bg-zinc-800/40 p-6 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800/60 md:p-8 lg:grid-cols-2 lg:gap-12'>
-      <span className='flex min-w-0 flex-col gap-5'>
-        {author}
-        {heading}
-        {descriptionText}
-      </span>
-      <span className='flex min-w-0 flex-col gap-8 lg:justify-center'>
-        {progress}
-        {footer}
-      </span>
-    </button>
-  ) : (
-    <button
-      type='button'
-      onClick={onOpen}
-      className='group flex h-full w-full flex-col gap-5 rounded-lg bg-zinc-800/40 p-5 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800/60 sm:p-6'>
-      {author}
-      {heading}
-      {descriptionText}
-      {progress}
-      {footer}
-    </button>
+        ) : summary.avatar ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={summary.avatar}
+            alt=''
+            className='absolute inset-0 h-full w-full object-cover'
+          />
+        ) : (
+          <span className='flex h-full w-full items-center justify-center text-zinc-500'>
+            <User className='h-10 w-10' strokeWidth={1.5} aria-hidden />
+          </span>
+        )
+      }
+      title={displayTitle(summary)}
+      level={summary.level || undefined}
+      levelLabel={
+        summary.level
+          ? t(`ai_coach:levels.${summary.level}`, summary.level)
+          : undefined
+      }
+      road={roadFromCounts(sizes, phaseDone)}
+      done={done}
+      total={summary.stepCount}
+      players={players}
+      playersLabel={t("ai_coach:card.players", { count: players })}
+      countLabel={t("ai_coach:card.steps_done", {
+        done,
+        total: summary.stepCount,
+      })}
+      action={
+        !run
+          ? t("panel.players.view")
+          : complete
+            ? t("ai_coach:card.review")
+            : started
+              ? t("ai_coach:card.continue")
+              : t("ai_coach:card.start")
+      }
+      primary={started && !complete}
+      featured={featured}
+      onOpen={onOpen}
+    />
   );
 };
 
-const TileGrid = ({
-  summaries,
-  viewerUid,
-  onOpen,
-}: {
-  summaries: UserRoadmapSummary[];
-  viewerUid: string | null;
-  onOpen: (summary: UserRoadmapSummary) => void;
-}) => (
-  <div className='grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3'>
-    {summaries.map((summary) => (
-      <RoadmapTile
-        key={summary.rowId}
-        summary={summary}
-        viewerUid={viewerUid}
-        onOpen={() => onOpen(summary)}
-      />
+const CARD_LIST = "flex flex-col gap-4";
+
+const CardSkeletons = ({ count }: { count: number }) => (
+  <div className={CARD_LIST} aria-busy='true'>
+    {Array.from({ length: count }, (_, index) => (
+      <Skeleton key={index} variant='block' className='h-36' />
     ))}
   </div>
 );
 
 /**
  * Where the tab sits. The supporter panel draws the open roadmap inside the
- * panel, under its own banner; /ai-coach hides its banner and tabs while one
- * is open and lets the roadmap's banner run edge to edge, like a curated one.
+ * panel, under its own banner; the Roadmaps page hides its banner and tabs
+ * while one is open and lets the roadmap's banner run edge to edge, like a
+ * curated one.
  */
 export type UserRoadmapsTabVariant = "panel" | "page";
+
+/**
+ * Which part of the players' roadmaps the page is showing: the viewer's own
+ * (generated or started), the rest of the board, or neither — the tab stays
+ * mounted then, so an open roadmap and a running generation survive.
+ */
+export type UserRoadmapsSection = "own" | "board" | "none";
+
+/**
+ * Something that belongs among the viewer's own roadmaps but is not a
+ * player's roadmap — a curated one they started. It is sorted in with the
+ * rest and can be the one drawn wide up front.
+ */
+export interface OwnRoadmapEntry {
+  key: string;
+  /** When it was last practised — the order of the list. */
+  lastAt: string;
+  /** Sessions on it and steps still to go: a candidate for the wide card. */
+  underWay: boolean;
+  render: (featured: boolean) => ReactNode;
+}
+
+/** An own entry that is a player's roadmap carries its row; a curated one draws itself. */
+type OwnEntry = OwnRoadmapEntry & { summary?: UserRoadmapSummary };
 
 /**
  * The roadmaps the AI generated for the players, with how far each one got.
@@ -743,20 +531,36 @@ export const UserRoadmapsTab = ({
   enabled,
   wallet,
   variant = "panel",
+  section,
+  extraOwn,
+  extraOwnLoading = false,
+  ownEmpty,
+  builderOpen = false,
+  onBuilderOpenChange,
   onDetailChange,
   initialRoadmapId = null,
 }: {
   enabled: boolean;
-  /** The signed-in supporter's wallet, for the price on the generator card. */
+  /** The signed-in supporter's wallet, for the prices in the builder. */
   wallet?: SupporterWallet;
   variant?: UserRoadmapsTabVariant;
+  section: UserRoadmapsSection;
+  /** Curated roadmaps the viewer started, listed with their own. */
+  extraOwn?: OwnRoadmapEntry[];
+  extraOwnLoading?: boolean;
+  /** What "own" shows when there is nothing in it. */
+  ownEmpty?: ReactNode;
+  builderOpen?: boolean;
+  onBuilderOpenChange?: (open: boolean) => void;
   /** Told when a roadmap opens or closes, so the page can hide its own chrome. */
   onDetailChange?: (open: boolean) => void;
   /** A roadmap to open once the list is in — the link in a "roadmap ready" notification. */
   initialRoadmapId?: string | null;
 }) => {
   const { t } = useTranslation(["supporter", "ai_coach"]);
-  const { data, isLoading } = useUserRoadmaps(enabled);
+  const { data, isLoading: isListLoading } = useUserRoadmaps(enabled);
+  // Without the badge the list is never asked for, so it is never "loading".
+  const isLoading = enabled && isListLoading;
   const [openRow, setOpenRowState] = useState<UserRoadmapSummary | null>(null);
   // Waits for the list rather than for an effect: the row is looked up on
   // every render until it is there, then cleared on the way back.
@@ -766,7 +570,6 @@ export const UserRoadmapsTab = ({
   const [refining, setRefining] = useState(false);
   const [term, setTerm] = useState("");
   const [level, setLevel] = useState<LevelFilter>("all");
-  const [sort, setSort] = useState<RoadmapSort>("recent");
   const queryClient = useQueryClient();
 
   const userAuth = useAppSelector(selectUserAuth);
@@ -782,8 +585,8 @@ export const UserRoadmapsTab = ({
 
   /**
    * The list is re-fetched right after saving, so the new roadmap's own row
-   * exists to open — falling back to just closing the generator card if the
-   * refetch and the write ever race.
+   * exists to open — falling back to just closing the builder if the refetch
+   * and the write ever race.
    */
   const openGenerated = async (roadmapId: string) => {
     await queryClient.invalidateQueries({ queryKey: USER_ROADMAPS_KEY });
@@ -818,28 +621,48 @@ export const UserRoadmapsTab = ({
   };
 
   // The viewer's own roadmaps — the ones they generated and the ones they
-  // started — stand apart from the board, above it: they are what the viewer
-  // came back for, so the board's filters never hide them. The one under way
-  // goes up front, wide.
-  const own = useMemo(
-    () =>
-      arrangeOwnRoadmaps(
-        roadmaps.filter((summary) => isViewersRoadmap(summary, viewerUid)),
-        viewerUid,
-      ),
-    [roadmaps, viewerUid],
-  );
-  const featured = featuredRoadmap(own, viewerUid);
-  const ownRest = featured
-    ? own.filter((summary) => summary !== featured)
-    : own;
+  // started — together with the curated ones they are on, in the order they
+  // would pick them up: under way first, last practised first. The first one
+  // under way goes up front, wide.
+  const own = useMemo(() => {
+    const entries: OwnEntry[] = roadmaps
+      .filter((summary) => isViewersRoadmap(summary, viewerUid))
+      .map((summary) => {
+        const run = viewerRun(summary, viewerUid);
+        return {
+          key: summary.rowId,
+          summary,
+          lastAt:
+            run?.lastPractisedAt ??
+            summary.viewerProgress?.startedAt ??
+            summary.createdAt,
+          underWay:
+            !!run &&
+            run.sessionsCompleted > 0 &&
+            run.completedSteps < summary.stepCount,
+          render: () => null,
+        };
+      });
+    const all: OwnEntry[] = [...entries, ...(extraOwn ?? [])];
+    return all.sort((a, b) =>
+      a.underWay !== b.underWay
+        ? a.underWay
+          ? -1
+          : 1
+        : a.lastAt < b.lastAt
+          ? 1
+          : a.lastAt > b.lastAt
+            ? -1
+            : 0,
+    );
+  }, [roadmaps, viewerUid, extraOwn]);
 
   const board = useMemo(
     () => roadmaps.filter((summary) => !isViewersRoadmap(summary, viewerUid)),
     [roadmaps, viewerUid],
   );
   const others = useMemo(() => {
-    const arranged = arrangeRoadmaps(board, { level, sort });
+    const arranged = arrangeRoadmaps(board, { level, sort: "recent" });
     const needle = term.trim().toLowerCase();
     if (!needle) return arranged;
     return arranged.filter((roadmap) =>
@@ -853,7 +676,7 @@ export const UserRoadmapsTab = ({
         .filter(Boolean)
         .some((field) => String(field).toLowerCase().includes(needle)),
     );
-  }, [board, term, level, sort]);
+  }, [board, term, level]);
 
   const pendingRow =
     !openRow && pendingId
@@ -887,127 +710,114 @@ export const UserRoadmapsTab = ({
     );
   }
 
+  const renderOwn = (entry: OwnEntry, featured: boolean): ReactNode => {
+    const { summary } = entry;
+    return summary ? (
+      <PlayerRoadmapCard
+        featured={featured}
+        summary={summary}
+        viewerUid={viewerUid}
+        onOpen={() => openFromList(summary)}
+      />
+    ) : (
+      entry.render(featured)
+    );
+  };
+  const featured = own[0]?.underWay ? own[0] : null;
+  const ownRest = featured ? own.slice(1) : own;
+
   return (
-    <div className='space-y-12'>
-      <GenerateRoadmapCard onGenerated={openGenerated} wallet={wallet} />
+    <div className='space-y-6'>
+      {enabled &&
+        onBuilderOpenChange &&
+        (IN_APP_ROADMAP_GENERATION ? (
+          <RoadmapBuilder
+            open={builderOpen}
+            onOpenChange={onBuilderOpenChange}
+            onGenerated={openGenerated}
+            wallet={wallet}
+          />
+        ) : (
+          <AssistantRoadmapDialog
+            open={builderOpen}
+            onOpenChange={onBuilderOpenChange}
+          />
+        ))}
 
-      {isLoading ? (
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3'>
-          {Array.from({ length: 6 }, (_, index) => (
-            <Skeleton key={index} variant='block' className='h-44' />
-          ))}
-        </div>
-      ) : !roadmaps.length ? (
-        <EmptyState
-          icon={<MapIcon />}
-          title={t("panel.players.empty_title")}
-          description={t("panel.players.empty_body")}
-        />
-      ) : (
-        <>
-          {own.length > 0 && (
-            <section className='space-y-5'>
-              <SectionHeader
-                title={t("panel.players.yours")}
-                count={own.length}
-                size='lg'
-                className='mb-0'
+      {section === "own" &&
+        (isLoading || extraOwnLoading ? (
+          <CardSkeletons count={4} />
+        ) : own.length === 0 ? (
+          ownEmpty
+        ) : (
+          <div className='space-y-4'>
+            {featured && renderOwn(featured, true)}
+            {ownRest.length > 0 && (
+              <div className={CARD_LIST}>
+                {ownRest.map((entry) => (
+                  <div key={entry.key} className='min-w-0'>
+                    {renderOwn(entry, false)}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+
+      {section === "board" &&
+        (isLoading ? (
+          <CardSkeletons count={6} />
+        ) : board.length === 0 ? (
+          <EmptyState
+            icon={<MapIcon />}
+            title={t("panel.players.empty_title")}
+            description={t("panel.players.empty_body")}
+          />
+        ) : (
+          <div className='space-y-6'>
+            <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
+              <SegmentedControl
+                label={t("panel.generate.level")}
+                options={["all", ...ROADMAP_LEVELS].map((candidate) => ({
+                  value: candidate,
+                  label:
+                    candidate === "all"
+                      ? t("panel.players.all_levels")
+                      : t(`ai_coach:levels.${candidate}`, candidate),
+                }))}
+                selected={[level]}
+                onSelect={setLevel}
               />
-              {featured && (
-                <RoadmapTile
-                  featured
-                  summary={featured}
-                  viewerUid={viewerUid}
-                  onOpen={() => openFromList(featured)}
-                />
-              )}
-              {ownRest.length > 0 && (
-                <TileGrid
-                  summaries={ownRest}
-                  viewerUid={viewerUid}
-                  onOpen={openFromList}
-                />
-              )}
-            </section>
-          )}
 
-          {board.length > 0 && (
-            <section className='space-y-5'>
-              <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-                <SectionHeader
-                  title={t("panel.players.others")}
-                  count={others.length}
-                  size='lg'
-                  className='mb-0'
-                />
+              <SearchInput
+                containerClassName='md:max-w-xs'
+                value={term}
+                onChange={(event) => setTerm(event.target.value)}
+                placeholder={t("panel.players.filter")}
+                aria-label={t("panel.players.filter")}
+              />
+            </div>
 
-                <SearchInput
-                  containerClassName='sm:max-w-xs'
-                  value={term}
-                  onChange={(event) => setTerm(event.target.value)}
-                  placeholder={t("panel.players.filter")}
-                  aria-label={t("panel.players.filter")}
-                />
+            {others.length > 0 ? (
+              <div className={CARD_LIST}>
+                {others.map((summary) => (
+                  <PlayerRoadmapCard
+                    key={summary.rowId}
+                    summary={summary}
+                    viewerUid={viewerUid}
+                    onOpen={() => openFromList(summary)}
+                  />
+                ))}
               </div>
-
-              <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
-                <SegmentedControl
-                  label={t("panel.generate.level")}
-                  options={["all", ...ROADMAP_LEVELS].map((candidate) => ({
-                    value: candidate,
-                    label:
-                      candidate === "all"
-                        ? t("panel.players.all_levels")
-                        : t(`ai_coach:levels.${candidate}`, candidate),
-                  }))}
-                  selected={[level]}
-                  onSelect={setLevel}
-                />
-
-                <Select
-                  value={sort}
-                  onValueChange={(value) => setSort(value as RoadmapSort)}>
-                  <SelectTrigger
-                    aria-label={t("panel.players.sort_by")}
-                    className='h-10 w-full gap-2 px-3 text-sm font-semibold text-zinc-200 md:w-48'>
-                    <span className='flex items-center gap-1.5 text-zinc-500'>
-                      <ArrowUpDown size={14} aria-hidden />
-                    </span>
-                    <SelectValue>
-                      {t(
-                        `panel.players.sorts.${sort}`,
-                        ROADMAP_SORTS.find((option) => option.id === sort)
-                          ?.label ?? sort,
-                      )}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ROADMAP_SORTS.map((option) => (
-                      <SelectItem key={option.id} value={option.id}>
-                        {t(`panel.players.sorts.${option.id}`, option.label)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {others.length > 0 ? (
-                <TileGrid
-                  summaries={others}
-                  viewerUid={viewerUid}
-                  onOpen={openFromList}
-                />
-              ) : (
-                <EmptyState
-                  mood='lookAround'
-                  size='compact'
-                  title={t("panel.players.no_match")}
-                />
-              )}
-            </section>
-          )}
-        </>
-      )}
+            ) : (
+              <EmptyState
+                mood='lookAround'
+                size='compact'
+                title={t("panel.players.no_match")}
+              />
+            )}
+          </div>
+        ))}
     </div>
   );
 };

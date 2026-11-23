@@ -118,7 +118,7 @@ export const notificationHref = (n: AppNotification): string | null => {
   if (n.type === "exercise_thanked" || n.type === "exercise_completed")
     return "/profile/skills?tab=community";
   if (n.type === "roadmap_ready" && n.roadmapId)
-    return `/my-roadmaps?roadmap=${n.roadmapId}`;
+    return `/ai-coach?roadmap=${n.roadmapId}`;
   if (n.type === "daily_exercise_win") return "/arsenal";
   // The board it reports on is closed — send them to today's, on the dashboard.
   if (n.type === "daily_exercise_place") return "/dashboard";

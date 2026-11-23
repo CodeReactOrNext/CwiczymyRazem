@@ -1,5 +1,6 @@
 import {
   advanceJob,
+  approveOverdueJobs,
   findIdleJobs,
 } from "lib/roadmaps/generation/backgroundJob";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -25,6 +26,11 @@ export default async function handler(
   }
 
   const deadline = Date.now() + RUN_FOR_MS;
+  // A plan left unanswered on the approval screen is taken as approved, and
+  // is then one of the idle jobs below.
+  await approveOverdueJobs().catch((error) =>
+    console.error("[cron/roadmap-jobs] auto-approve", error),
+  );
   const ids = await findIdleJobs();
   const advanced: string[] = [];
 

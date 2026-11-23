@@ -63,11 +63,11 @@ export const SupporterPanelView = () => {
    * writing a gear proposal — can send somebody back to the board they left
    * rather than to the roadmap.
    */
-  // Player Roadmaps moved to a page of its own under My Stuff; an old link to
-  // the tab that used to hold them lands there instead of on the roadmap tab.
+  // Player Roadmaps are a tab of the Roadmaps page now; an old link to the
+  // tab that used to hold them here lands there instead of on the roadmap tab.
   const movedToRoadmaps = router.query.tab === "players";
   useEffect(() => {
-    if (movedToRoadmaps) void router.replace("/my-roadmaps");
+    if (movedToRoadmaps) void router.replace("/ai-coach?tab=players");
   }, [movedToRoadmaps, router]);
 
   // A visitor sees two tabs; a link to the shop lands on the window, anything else on the ask.

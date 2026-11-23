@@ -1,5 +1,10 @@
 import type { RefineAction } from "feature/aiCoach/types/refine.types";
-import type { RoadmapPhase } from "feature/aiCoach/types/roadmap.types";
+import type {
+  Roadmap,
+  RoadmapPhase,
+} from "feature/aiCoach/types/roadmap.types";
+import type { DocumentSnapshot } from "firebase-admin/firestore";
+import { briefForModel } from "lib/roadmaps/generation/brief";
 import { describePhaseSteps } from "lib/roadmaps/generation/descriptions";
 import { matchExercisesForStep } from "lib/roadmaps/generation/exerciseMatch";
 import { extendPhase } from "lib/roadmaps/generation/extendPhase";
@@ -11,18 +16,24 @@ import {
 import { GenerationError } from "lib/roadmaps/generation/openaiJson";
 import { extractSongFromStep } from "lib/roadmaps/generation/songMatch";
 import { UsageLedger } from "lib/roadmaps/generation/usage";
+import {
+  GENERATION_CLOSED_MESSAGE,
+  IN_APP_ROADMAP_GENERATION,
+} from "lib/roadmaps/generationSwitch";
 import { searchLessonsForStep } from "lib/roadmaps/lessonSearch";
 import { clampAddCount, isRefineAction, refineCost } from "lib/roadmaps/refine";
 import { findLibrarySong } from "lib/roadmaps/songLookup";
 import { requireSupporter } from "lib/support/supporterAuth";
 import { refundTokens, spendTokens } from "lib/support/tokenWallet";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { firestore } from "utils/firebase/api/firebase.config";
 
 const MAX_GUIDANCE_LENGTH = 500;
 const MAX_TEXT_LENGTH = 4000;
 
 interface RefineBody {
   action?: unknown;
+  roadmapId?: unknown;
   goal?: unknown;
   level?: unknown;
   guidance?: unknown;
@@ -58,12 +69,39 @@ interface ActionContext {
   guidance: string;
   count: number;
   ledger: UsageLedger;
+  /** The roadmap's own brief, rendered for the prompts; empty when it has none. */
+  brief: string;
 }
+
+/**
+ * The brief the roadmap was generated to, read off the roadmap itself — so a
+ * rewritten or an added step is held to the answers the plan was built on
+ * ("play it like the record", "no tone steps"), which the browser has no say
+ * in. Empty for a roadmap from before briefs were kept, or one that is not
+ * the caller's.
+ */
+const readRoadmapBrief = async (
+  roadmapId: unknown,
+  uid: string,
+): Promise<string> => {
+  if (typeof roadmapId !== "string" || !roadmapId) return "";
+  try {
+    const snap = (await firestore
+      .collection("roadmaps")
+      .doc(roadmapId)
+      .get()) as DocumentSnapshot;
+    const roadmap = snap.exists ? (snap.data() as Roadmap) : null;
+    return roadmap?.userId === uid ? briefForModel(roadmap.brief) : "";
+  } catch (error) {
+    console.error("[refine-roadmap] brief read failed", roadmapId, error);
+    return "";
+  }
+};
 
 async function runAction(
   action: RefineAction,
   body: RefineBody,
-  { goal, level, guidance, count, ledger }: ActionContext,
+  { goal, level, guidance, count, ledger, brief }: ActionContext,
 ): Promise<Record<string, unknown>> {
   switch (action) {
     case "rewriteStep": {
@@ -84,6 +122,7 @@ async function runAction(
         phaseIndex: target.phaseIndex,
         stepIds: [stepId],
         guidance,
+        brief,
         ledger,
       });
       return { phase };
@@ -142,6 +181,7 @@ async function runAction(
           typeof body.afterStepId === "string" ? body.afterStepId : null,
         count,
         guidance,
+        brief,
         ledger,
         resolveSong: findLibrarySong,
       });
@@ -168,6 +208,9 @@ export default async function handler(
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
+  }
+  if (!IN_APP_ROADMAP_GENERATION) {
+    return res.status(410).json({ message: GENERATION_CLOSED_MESSAGE });
   }
   const auth = await requireSupporter(req);
   if (!auth.ok) return res.status(auth.status).json({ message: auth.error });
@@ -203,6 +246,7 @@ export default async function handler(
       guidance,
       count,
       ledger,
+      brief: await readRoadmapBrief(body.roadmapId, uid),
     });
     return res.status(200).json({
       ...result,

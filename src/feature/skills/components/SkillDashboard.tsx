@@ -5,6 +5,7 @@ import { cn } from "assets/lib/utils";
 import { BackLink } from "components/BackLink/BackLink";
 import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav";
 import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
+import { markStepPracticed } from "feature/aiCoach/utils/roadmapEstimate";
 import { CommunityExercisesTab } from "feature/communityExercises/components/CommunityExercisesTab";
 import { recordExerciseCompletion } from "feature/communityExercises/services/communityExerciseService";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
@@ -234,7 +235,9 @@ export const SkillDashboard = ({
       // completes their exercise. Never blocks navigating to the report.
       recordExerciseCompletion(selectedChallenge.communityExerciseId);
     }
-    router.push(returnTo ? `/report?returnTo=${encodeURIComponent(returnTo)}` : "/report");
+    // Finished from a roadmap step: the step hears about it on the way back.
+    const backTo = markStepPracticed(returnTo, "exercise");
+    router.push(backTo ? `/report?returnTo=${encodeURIComponent(backTo)}` : "/report");
   };
 
   const handleClose = () => {

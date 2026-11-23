@@ -203,6 +203,9 @@ const WRITE_TOOLS = new Set([
   "riffquest_create_exercise",
   "riffquest_update_exercise",
   "riffquest_set_calendar_days",
+  "riffquest_create_roadmap",
+  "riffquest_write_roadmap_steps",
+  "riffquest_write_roadmap_checkpoint",
 ]);
 
 export async function runTool(

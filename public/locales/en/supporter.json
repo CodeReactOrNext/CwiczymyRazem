@@ -463,7 +463,8 @@
       "needs": "This one needs {{cost}} tokens and you have {{left}}.",
       "donation_adds": "Every donation adds tokens",
       "next_free": "Next, the coach checks the goal and asks a few questions — free. Generating costs {{cost}}.",
-      "continue": "Continue"
+      "continue": "Continue",
+      "back_to_roadmaps": "Back to roadmaps"
     },
     "brief": {
       "told_coach": "What you told the coach",
@@ -602,6 +603,34 @@
         }
       }
     },
+    "approval": {
+      "title": "Here is the plan",
+      "body": "{{phases}} phases, {{steps}} steps. Read it before the lessons are written.",
+      "note": "One round of changes is free.",
+      "failed": "That did not go through. Try again.",
+      "keep": "Keep it as it is",
+      "change": "Change the plan",
+      "approve": "Looks good, write it",
+      "feedback_label": "Anything to change?",
+      "feedback_placeholder": "Fewer theory steps, more of the second song, drop the last phase…",
+      "waiting": "Your plan is waiting for your OK"
+    },
+    "assistant": {
+      "title": "Build it with your AI assistant",
+      "body": "riff.quest does not write roadmaps itself. Your own assistant — Claude, ChatGPT — builds one from your practice history and the app's exercises and songs; riff.quest checks it and saves it here. It costs no tokens.",
+      "goal_label": "What do you want to be able to play?",
+      "prompt_label": "Paste this to your assistant",
+      "prompt": "Use riff.quest to build me a roadmap for this goal: {{goal}}\n\nFollow the riff.quest roadmap guide. Look at my practice history first, ask me only what would change the plan, and show me the plan before saving anything. Then write every step, pick lessons that really fit, and write each phase's checkpoint.",
+      "prompt_no_goal": "Use riff.quest to build me a roadmap. Ask me what I want to be able to play.\n\nFollow the riff.quest roadmap guide. Look at my practice history first, ask me only what would change the plan, and show me the plan before saving anything. Then write every step, pick lessons that really fit, and write each phase's checkpoint.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "connect": "How to connect an assistant",
+      "steps": {
+        "0": "Connect riff.quest to your assistant, once. It takes a minute.",
+        "1": "Paste the request. The assistant asks a few questions and shows you the plan.",
+        "2": "When you agree, the roadmap appears here under Yours."
+      }
+    },
     "preflight": {
       "lines": {
         "0": "Reading your goal",
@@ -648,7 +677,7 @@
       "created_on": "created {{date}}",
       "last_practised": "Last practised {{date}}",
       "not_on_board": "That roadmap is not on the board any more.",
-      "back_to_list": "Back to Player Roadmaps",
+      "back_to_list": "Back to Roadmaps",
       "empty_title": "No roadmaps yet",
       "empty_body": "This is where the roadmaps players generate for themselves show up.",
       "count": "{{total}} roadmaps from {{players}} players",

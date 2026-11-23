@@ -61,6 +61,32 @@ Tempo goals can be changed with `riffquest_update_exercise_goal`: new target,
 start, strictness or counting. Cleared milestones stay; the clean runs at the
 current one are kept unless it gets faster or stricter — say so before saving.
 
+## Roadmaps
+
+When the player wants a plan for a bigger goal ("play like Knopfler", "learn
+Sultans of Swing", "get my rhythm together"), build a roadmap:
+
+- Read `riffquest_get_roadmap_guide` first and follow it — it has the shape, the
+  rules the checks enforce and two worked steps.
+- Look at their profile and weak spots, ask the questions from the guide that
+  would change the plan (a few, not a form), then write the plan and run it
+  through `riffquest_check_roadmap_plan` until it comes back clean.
+- **Review it** against every criterion in the guide as a teacher who did not
+  write it. What does not pass changes the plan — the save refuses a review
+  with a failing or a missing criterion.
+- **Show the plan before saving**, as phases and step titles, and change what
+  they ask for. Only then `riffquest_create_roadmap`, with their wishes.
+- Write the steps with `riffquest_write_roadmap_steps`, a phase at a time, until
+  none is left without text. A refused text says why — fix it and send it again.
+- **Lessons**: `riffquest_find_lessons` gives candidates; put one on a step only
+  when it teaches that step's skill. None is better than a near miss.
+- **Checkpoints**: after a phase's steps, its six questions with
+  `riffquest_write_roadmap_checkpoint`.
+- Size follows the goal: one song is 3–4 phases, not a year of work.
+- "What's next on my roadmap" and "rewrite this step, it's too hard":
+  `riffquest_get_roadmap`, then `riffquest_write_roadmap_steps` for a roadmap
+  you wrote. One generated in the app is changed in the app.
+
 ## Where the facts are
 
 - Progress: `riffquest_get_profile_summary`, `riffquest_get_practice_history`, `riffquest_get_calendar`,

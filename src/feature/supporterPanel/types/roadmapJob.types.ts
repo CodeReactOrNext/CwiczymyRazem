@@ -6,13 +6,36 @@ export type StructureStep = "draft" | "review" | "revise";
 /** What the stepper and the progress bar draw. */
 export type GenerationStage =
   | { name: "structure"; step: StructureStep }
+  | { name: "approval" }
   | { name: "phase"; done: number; total: number }
   | { name: "lessons"; done: number; total: number };
 
-export type RoadmapJobStatus = "running" | "done" | "failed";
+/**
+ * "awaiting_approval" is the one stop on the way: the plan is drafted and
+ * reviewed, and its owner gets to read it — and ask for one round of changes —
+ * before the slow part is written. Nobody advances a job in that state; it
+ * approves itself after a while so a closed tab still ends with a roadmap.
+ */
+export type RoadmapJobStatus =
+  | "running"
+  | "awaiting_approval"
+  | "done"
+  | "failed";
 
 /** The unit of work a background generation is on. */
-export type RoadmapJobStep = "draft" | "review" | "phases" | "lessons" | "save";
+export type RoadmapJobStep =
+  | "draft"
+  | "review"
+  | "reshape"
+  | "phases"
+  | "lessons"
+  | "save";
+
+/** One phase of the plan as the approval screen lists it. */
+export interface SkeletonPhaseView {
+  title: string;
+  steps: string[];
+}
 
 /** A background generation as the browser sees it — no drafts, no leases. */
 export interface RoadmapJobView {
@@ -34,11 +57,18 @@ export interface RoadmapJobView {
   /** A failed generation gave its tokens back. */
   refunded: boolean;
   updatedAt: string;
+  /** The plan to read, while the job waits for its owner's OK. */
+  skeleton?: SkeletonPhaseView[];
+  /** Whether the free round of changes is still unused. */
+  feedbackLeft?: boolean;
 }
 
 /** Where the stepper sits for a job in this state. */
 export const jobStage = (job: RoadmapJobView): GenerationStage => {
+  if (job.status === "awaiting_approval") return { name: "approval" };
   switch (job.step) {
+    case "reshape":
+      return { name: "structure", step: "revise" };
     case "draft":
       return { name: "structure", step: "draft" };
     case "review":

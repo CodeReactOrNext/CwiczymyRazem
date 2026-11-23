@@ -58,11 +58,13 @@ describe("extractStepProgress", () => {
       exerciseCompleted: true,
       completedLessonIds: ["abc"],
       songCompleted: false,
+      practiceSessions: 0,
     });
     expect(resourceProgress.s2).toStrictEqual({
       exerciseCompleted: false,
       completedLessonIds: [],
       songCompleted: false,
+      practiceSessions: 0,
     });
   });
 

@@ -70,7 +70,9 @@ interface StepResourcesProps {
 
 /**
  * The step's practice kit: the recommended exercise, the library song when the
- * step is about one, and the lessons, each as a row you open plus a tick you set. Ticking everything is what completes the step.
+ * step is about one, and the lessons, each as a row you open plus a tick you set.
+ * The exercise and the song are what complete the step; the lessons help and
+ * never hold it back.
  */
 export const StepResources: React.FC<StepResourcesProps> = ({
   step,
@@ -105,6 +107,14 @@ export const StepResources: React.FC<StepResourcesProps> = ({
           <p className='mt-1 text-xs leading-relaxed text-zinc-400'>
             {t("kit.body")}
           </p>
+          {!!step.practiceSessions && (
+            <p className='mt-1 text-xs tabular-nums text-zinc-400'>
+              {t("kit.sessions", {
+                done: step.practiceSessions,
+                total: step.sessionsRequired,
+              })}
+            </p>
+          )}
         </div>
         {total > 0 && (
           <Chip
@@ -144,6 +154,9 @@ export const StepResources: React.FC<StepResourcesProps> = ({
                 </span>
                 {exercise.difficulty && (
                   <span className='mt-0.5 block truncate text-xs capitalize text-zinc-400'>
+                    {step.exerciseRole === "support" && (
+                      <>{t("kit.warm_up")} · </>
+                    )}
                     {t(
                       `common:difficulty.${exercise.difficulty}`,
                       exercise.difficulty,
@@ -153,6 +166,11 @@ export const StepResources: React.FC<StepResourcesProps> = ({
                       `common:categories.${exercise.category}`,
                       exercise.category,
                     )}
+                  </span>
+                )}
+                {step.exerciseSetup && (
+                  <span className='mt-1 block text-xs leading-relaxed text-zinc-300'>
+                    {t("kit.setup", { setup: step.exerciseSetup })}
                   </span>
                 )}
               </span>

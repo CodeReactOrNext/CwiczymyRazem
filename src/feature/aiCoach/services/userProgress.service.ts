@@ -13,6 +13,8 @@ export interface UserRoadmapStepResourceProgress {
   exerciseCompleted?: boolean;
   completedLessonIds?: string[];
   songCompleted?: boolean;
+  /** Finished practice sessions started from the step. */
+  practiceSessions?: number;
 }
 
 export interface UserRoadmapProgress {

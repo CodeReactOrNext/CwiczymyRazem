@@ -478,7 +478,8 @@
       "needs": "Diese braucht {{cost}} Tokens, und du hast {{left}}.",
       "donation_adds": "Jede Spende bringt Tokens",
       "next_free": "Als Nächstes prüft der Coach das Ziel und stellt ein paar Fragen — kostenlos. Die Erstellung kostet {{cost}}.",
-      "continue": "Weiter"
+      "continue": "Weiter",
+      "back_to_roadmaps": "Zurück zu den Roadmaps"
     },
     "brief": {
       "told_coach": "Was du dem Coach gesagt hast",
@@ -617,6 +618,34 @@
         }
       }
     },
+    "approval": {
+      "title": "Hier ist der Plan",
+      "body": "{{phases}} Phasen, {{steps}} Schritte. Lies ihn, bevor die Lektionen geschrieben werden.",
+      "note": "Eine Änderungsrunde ist kostenlos.",
+      "failed": "Das hat nicht geklappt. Versuch es noch einmal.",
+      "keep": "So lassen",
+      "change": "Plan ändern",
+      "approve": "Passt, schreib ihn",
+      "feedback_label": "Soll sich etwas ändern?",
+      "feedback_placeholder": "Weniger Theorie, mehr vom zweiten Song, letzte Phase weg…",
+      "waiting": "Dein Plan wartet auf dein OK"
+    },
+    "assistant": {
+      "title": "Bau sie mit deinem KI-Assistenten",
+      "body": "riff.quest schreibt keine Roadmaps selbst. Dein eigener Assistent — Claude, ChatGPT — baut sie aus deinem Übungsverlauf und den Übungen und Songs der App; riff.quest prüft sie und speichert sie hier. Das kostet keine Tokens.",
+      "goal_label": "Was willst du spielen können?",
+      "prompt_label": "Füge das bei deinem Assistenten ein",
+      "prompt": "Nutze riff.quest und baue mir eine Roadmap für dieses Ziel: {{goal}}\n\nHalte dich an den riff.quest-Roadmap-Leitfaden. Sieh dir zuerst meinen Übungsverlauf an, frag mich nur, was den Plan ändern würde, und zeig mir den Plan, bevor du etwas speicherst. Schreib dann jeden Schritt, wähle Lektionen, die wirklich passen, und schreib den Checkpoint jeder Phase.",
+      "prompt_no_goal": "Nutze riff.quest und baue mir eine Roadmap. Frag mich, was ich spielen können will.\n\nHalte dich an den riff.quest-Roadmap-Leitfaden. Sieh dir zuerst meinen Übungsverlauf an, frag mich nur, was den Plan ändern würde, und zeig mir den Plan, bevor du etwas speicherst. Schreib dann jeden Schritt, wähle Lektionen, die wirklich passen, und schreib den Checkpoint jeder Phase.",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "connect": "So verbindest du einen Assistenten",
+      "steps": {
+        "0": "Verbinde riff.quest einmalig mit deinem Assistenten. Das dauert eine Minute.",
+        "1": "Füge die Anfrage ein. Der Assistent stellt ein paar Fragen und zeigt dir den Plan.",
+        "2": "Wenn du zustimmst, erscheint die Roadmap hier unter Deine."
+      }
+    },
     "preflight": {
       "lines": {
         "0": "Dein Ziel wird gelesen",
@@ -663,7 +692,7 @@
       "created_on": "erstellt am {{date}}",
       "last_practised": "Zuletzt geübt am {{date}}",
       "not_on_board": "Diese Roadmap ist nicht mehr auf dem Board.",
-      "back_to_list": "Zurück zu den Spieler-Roadmaps",
+      "back_to_list": "Zurück zu den Roadmaps",
       "empty_title": "Noch keine Roadmaps",
       "empty_body": "Hier erscheinen die Roadmaps, die Spieler für sich erstellen.",
       "count": "{{total}} Roadmaps von {{players}} Spielern",

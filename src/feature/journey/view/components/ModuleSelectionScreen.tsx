@@ -11,9 +11,12 @@ import {
   Lightbulb,
   type LucideIcon,
   Play,
+  Plus,
   RotateCcw,
   Ruler,
+  Signpost,
 } from "lucide-react";
+import Link from "next/link";
 import React, { useState } from "react";
 
 import type {
@@ -235,6 +238,39 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
               </motion.button>
             );
           })}
+
+          {/* ─── Own roadmap ─── */}
+          {/* The modules are the same for everyone; the coach builds a path
+              around the player's own goal on Player Roadmaps. */}
+          <Link
+            href='/my-roadmaps'
+            className='group flex w-full flex-col gap-4 rounded-xl bg-zinc-900 px-4 py-[18px] transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-[#1f1f23] sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-[22px]'>
+            <div className='flex min-w-0 flex-1 items-center gap-4'>
+              <div className='flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-lg bg-zinc-800 sm:h-12 sm:w-12'>
+                <Signpost
+                  className='h-5 w-5 text-zinc-200 sm:h-[22px] sm:w-[22px]'
+                  strokeWidth={2}
+                />
+              </div>
+              <div className='min-w-0 flex-1'>
+                <h2 className='font-display text-base font-bold text-white sm:text-lg'>
+                  {t("modules.create_title")}
+                </h2>
+                <p className='mt-0.5 text-sm text-zinc-400'>
+                  {t("modules.create_body")}
+                </p>
+              </div>
+            </div>
+            <span
+              aria-hidden
+              className={cn(
+                PRESSABLE_IN_GROUP,
+                "inline-flex h-9 shrink-0 items-center justify-center gap-2 self-start rounded-lg border-b-black/25 bg-zinc-800/60 px-4 text-sm text-zinc-200 transition-colors group-hover:bg-zinc-800 group-hover:text-white sm:self-auto [&_svg]:size-4",
+              )}>
+              <Plus strokeWidth={2.5} />
+              {t("modules.create_cta")}
+            </span>
+          </Link>
 
           {/* ─── Suggest a path ─── */}
           <button

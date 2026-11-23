@@ -28,6 +28,10 @@ import {
   emptyUsage,
   UsageLedger,
 } from "lib/roadmaps/generation/usage";
+import {
+  GENERATION_CLOSED_MESSAGE,
+  IN_APP_ROADMAP_GENERATION,
+} from "lib/roadmaps/generationSwitch";
 import { findLibrarySong } from "lib/roadmaps/songLookup";
 import { isRoadmapVisibility } from "lib/roadmaps/visibility";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -295,6 +299,10 @@ export default async function handler(
     }
   }
 
+  // ── Supporter: closed. Only the admin queue above still generates. ──
+  if (!IN_APP_ROADMAP_GENERATION) {
+    return res.status(410).json({ message: GENERATION_CLOSED_MESSAGE });
+  }
   // ── Supporter: tokens first, then whichever half was asked for ──
   if (stage === "draft") {
     return runDraftStage(res, auth.uid, goal, level, chosenVisibility);

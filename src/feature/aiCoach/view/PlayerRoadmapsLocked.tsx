@@ -4,31 +4,18 @@ import { Chip } from "assets/components/ui/chip";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
-import { RoadmapBuildPreview } from "feature/supporterPanel/components/RoadmapBuildPreview";
 import { useAccountEmail } from "feature/supporterPanel/hooks/useAccountEmail";
 import { fetchRoadmapTeaser } from "feature/supporterPanel/services/roadmapTeaser.service";
 import type { RoadmapTeaserItem } from "feature/supporterPanel/types/userRoadmaps.types";
 import { levelTone } from "feature/supporterPanel/utils/roadmapGoal";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
-import { Dumbbell, FileText, Heart, Lock, Users } from "lucide-react";
-import type { ComponentType } from "react";
-import { FaYoutube } from "react-icons/fa6";
+import { Heart, Lock, Users } from "lucide-react";
+import posthog from "posthog-js";
+import { useEffect } from "react";
 
 /** Tiles past this many are drawn out of focus — enough to read the board, not to browse it. */
 const CLEAR_TILES = 3;
-
-type Icon = ComponentType<{ className?: string }>;
-
-/** What every step of a roadmap comes with. Copy: `ai_coach:locked.step.<id>`. */
-const STEP_PARTS: { id: string; Icon: Icon }[] = [
-  { id: "exercise", Icon: Dumbbell },
-  { id: "description", Icon: FileText },
-  { id: "video", Icon: FaYoutube },
-];
-
-/** Why the page is locked, in order. Copy: `ai_coach:locked.why.<id>`. */
-const WHY_REASONS = ["ai", "cost", "donations"];
 
 const TeaserTile = ({
   item,
@@ -42,7 +29,7 @@ const TeaserTile = ({
     <div
       aria-hidden={blurred || undefined}
       className={cn(
-        "flex h-full flex-col gap-4 rounded-lg bg-zinc-800/40 p-5",
+        "flex h-full flex-col gap-4 rounded-lg bg-zinc-900 p-5",
         blurred && "pointer-events-none select-none blur-[3px]",
       )}>
       <span className='flex items-center justify-between gap-3'>
@@ -139,112 +126,61 @@ const BoardPreview = () => {
 };
 
 /**
- * What a player without the badge sees on Player Roadmaps.
- *
- * Two plain cards, each with one job. The first shows what a roadmap is: the
- * build animation the generator card plays, and the three things every step
- * comes with. The second says why the page is locked — three numbered
- * reasons — and, beside them, what opens it. The roadmaps are written for a
- * single goal by a model that costs money per run, so the reasons say so
- * plainly instead of pretending it is a premium perk.
+ * What a player without the badge sees on the Players tab: one card that says
+ * what a player roadmap is, why it is locked — a model that costs money per
+ * run writes each one, so it says so plainly instead of pretending it is a
+ * premium perk — and what opens it. The board shows through underneath.
  */
 export const PlayerRoadmapsLocked = () => {
   const { t } = useTranslation("ai_coach");
   const email = useAccountEmail();
 
+  // The top of the funnel: how many players meet the locked board at all,
+  // against how many of them go on to the support page.
+  useEffect(() => {
+    posthog.capture("roadmap_locked_seen");
+  }, []);
+
   return (
     <div className='space-y-12'>
-      <div className='space-y-4'>
-        <section className='grid gap-10 rounded-lg bg-zinc-800/40 p-6 sm:p-8 md:p-10 lg:grid-cols-2 lg:items-center lg:gap-16'>
-          <div className='flex flex-col gap-8'>
-            <div className='space-y-2'>
-              <h2 className='text-2xl font-bold leading-tight text-zinc-100'>
-                {t("locked.title")}
-              </h2>
-              <p className='max-w-md text-sm leading-relaxed text-zinc-400'>
-                {t("locked.lead")}
-              </p>
-            </div>
+      <section className='flex flex-col gap-6 rounded-lg bg-zinc-900 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between lg:gap-12'>
+        <div className='space-y-2'>
+          <h2 className='flex items-center gap-2.5 text-2xl font-bold leading-tight text-zinc-100'>
+            <Lock size={18} className='shrink-0 text-amber-400' aria-hidden />
+            {t("locked.title")}
+          </h2>
+          <p className='max-w-xl text-sm leading-relaxed text-zinc-400'>
+            {t("locked.short")}
+          </p>
+        </div>
 
-            <div className='space-y-4'>
-              <p className='text-sm text-zinc-500'>{t("locked.steps_title")}</p>
-              <ul className='space-y-4'>
-                {STEP_PARTS.map(({ id, Icon }) => (
-                  <li key={id} className='flex items-start gap-3.5'>
-                    <Icon className='mt-0.5 h-4 w-4 shrink-0 text-zinc-400' />
-                    <span className='flex flex-col gap-0.5'>
-                      <span className='text-sm font-semibold text-zinc-100'>
-                        {t(`locked.step.${id}.title`)}
-                      </span>
-                      <span className='text-sm text-zinc-500'>
-                        {t(`locked.step.${id}.body`)}
-                      </span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <RoadmapBuildPreview />
-        </section>
-
-        <section className='grid gap-8 rounded-lg bg-zinc-800/40 p-6 sm:p-8 md:p-10 lg:grid-cols-2 lg:gap-16'>
-          <div className='space-y-5'>
-            <h3 className='flex items-center gap-2 text-base font-bold text-zinc-100'>
-              <Lock size={16} className='text-amber-400' aria-hidden />
-              {t("locked.why_title")}
-            </h3>
-            <ol className='space-y-3'>
-              {WHY_REASONS.map((id, index) => (
-                <li
-                  key={id}
-                  className='flex items-baseline gap-4 text-sm text-zinc-300'>
-                  <span className='w-5 shrink-0 text-xs font-semibold tabular-nums text-zinc-500'>
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  {t(`locked.why.${id}`)}
-                </li>
-              ))}
-            </ol>
-          </div>
-
-          <div className='flex flex-col items-start gap-5 lg:justify-center'>
-            <div className='space-y-1'>
-              <p className='text-lg font-bold text-amber-200'>
-                {t("locked.why.unlock")}
-              </p>
-              <p className='text-sm text-zinc-400'>
-                {t("locked.why.unlock_note")}
-              </p>
-            </div>
-
-            <Button asChild size='lg'>
-              <a href={BMC_URL} target='_blank' rel='noreferrer'>
-                <Heart size={16} fill='currentColor' />
-                {t("locked.support")}
-              </a>
-            </Button>
-
-            <p className='max-w-md text-xs leading-relaxed text-zinc-500'>
-              {email ? (
-                <Interpolate
-                  text={t("locked.email_known")}
-                  values={{
-                    email: (
-                      <span className='font-semibold text-zinc-300'>
-                        {email}
-                      </span>
-                    ),
-                  }}
-                />
-              ) : (
-                t("locked.email")
-              )}
-            </p>
-          </div>
-        </section>
-      </div>
+        <div className='flex shrink-0 flex-col items-start gap-3 lg:max-w-xs'>
+          <Button asChild size='lg'>
+            <a
+              href={BMC_URL}
+              target='_blank'
+              rel='noreferrer'
+              onClick={() => posthog.capture("roadmap_locked_support_click")}>
+              <Heart size={16} fill='currentColor' />
+              {t("locked.support")}
+            </a>
+          </Button>
+          <p className='text-xs leading-relaxed text-zinc-500'>
+            {email ? (
+              <Interpolate
+                text={t("locked.email_known")}
+                values={{
+                  email: (
+                    <span className='font-semibold text-zinc-300'>{email}</span>
+                  ),
+                }}
+              />
+            ) : (
+              t("locked.email")
+            )}
+          </p>
+        </div>
+      </section>
 
       <BoardPreview />
     </div>

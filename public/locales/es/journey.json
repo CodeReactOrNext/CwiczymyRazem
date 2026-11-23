@@ -58,6 +58,9 @@
     "continue": "Continuar",
     "start": "Empezar",
     "replay": "Repetir",
+    "create_title": "Crea tu propia hoja de ruta",
+    "create_body": "Dile al coach qué quieres tocar y te armará un camino paso a paso con ejercicios, canciones y lecciones.",
+    "create_cta": "Crear",
     "suggest": "Sugerir una ruta de aprendizaje",
     "missing_coming": "¿Falta un tema? Lo próximo será {{topics}} — dinos qué más te gustaría ver.",
     "missing": "¿Falta un tema? Dinos qué te gustaría ver a continuación."

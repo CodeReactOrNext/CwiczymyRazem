@@ -492,7 +492,8 @@
       "needs": "Ta potrzebuje {{cost}} tokenów, a masz {{left}}.",
       "donation_adds": "Każda darowizna dodaje tokeny",
       "next_free": "Dalej coach sprawdzi cel i zada kilka pytań — za darmo. Generowanie kosztuje {{cost}}.",
-      "continue": "Dalej"
+      "continue": "Dalej",
+      "back_to_roadmaps": "Wróć do ścieżek"
     },
     "brief": {
       "told_coach": "Co powiedziałeś coachowi",
@@ -631,6 +632,34 @@
         }
       }
     },
+    "approval": {
+      "title": "Oto plan",
+      "body": "{{phases}} faz, {{steps}} kroków. Przeczytaj go, zanim powstaną lekcje.",
+      "note": "Jedna runda poprawek jest za darmo.",
+      "failed": "Nie udało się wysłać. Spróbuj jeszcze raz.",
+      "keep": "Zostaw bez zmian",
+      "change": "Zmień plan",
+      "approve": "Jest dobrze, pisz",
+      "feedback_label": "Coś zmienić?",
+      "feedback_placeholder": "Mniej teorii, więcej drugiego utworu, bez ostatniej fazy…",
+      "waiting": "Plan czeka na twoją akceptację"
+    },
+    "assistant": {
+      "title": "Zbuduj ją ze swoim asystentem AI",
+      "body": "riff.quest nie pisze ścieżek sam. Robi to twój asystent — Claude, ChatGPT — na podstawie twojej historii ćwiczeń oraz ćwiczeń i utworów z aplikacji; riff.quest ją sprawdza i zapisuje tutaj. Nie kosztuje to tokenów.",
+      "goal_label": "Co chcesz umieć zagrać?",
+      "prompt_label": "Wklej to swojemu asystentowi",
+      "prompt": "Użyj riff.quest i zbuduj mi ścieżkę do tego celu: {{goal}}\n\nTrzymaj się przewodnika riff.quest po ścieżkach. Najpierw zajrzyj do mojej historii ćwiczeń, zapytaj tylko o to, co zmieniłoby plan, i pokaż mi plan, zanim cokolwiek zapiszesz. Potem napisz każdy krok, dobierz lekcje, które naprawdę pasują, i napisz test na koniec każdej fazy.",
+      "prompt_no_goal": "Użyj riff.quest i zbuduj mi ścieżkę. Zapytaj mnie, co chcę umieć zagrać.\n\nTrzymaj się przewodnika riff.quest po ścieżkach. Najpierw zajrzyj do mojej historii ćwiczeń, zapytaj tylko o to, co zmieniłoby plan, i pokaż mi plan, zanim cokolwiek zapiszesz. Potem napisz każdy krok, dobierz lekcje, które naprawdę pasują, i napisz test na koniec każdej fazy.",
+      "copy": "Kopiuj",
+      "copied": "Skopiowano",
+      "connect": "Jak podłączyć asystenta",
+      "steps": {
+        "0": "Podłącz riff.quest do swojego asystenta, jeden raz. To zajmuje minutę.",
+        "1": "Wklej prośbę. Asystent zada kilka pytań i pokaże ci plan.",
+        "2": "Gdy się zgodzisz, ścieżka pojawi się tutaj, w zakładce Twoje."
+      }
+    },
     "preflight": {
       "lines": {
         "0": "Czytam twój cel",
@@ -677,7 +706,7 @@
       "created_on": "utworzona {{date}}",
       "last_practised": "Ostatnio ćwiczona {{date}}",
       "not_on_board": "Tej ścieżki nie ma już na tablicy.",
-      "back_to_list": "Wróć do Ścieżek graczy",
+      "back_to_list": "Wróć do Ścieżek",
       "empty_title": "Nie ma jeszcze ścieżek",
       "empty_body": "Tu pojawiają się ścieżki, które gracze generują dla siebie.",
       "count": "Ścieżki: {{total}}, gracze: {{players}}",

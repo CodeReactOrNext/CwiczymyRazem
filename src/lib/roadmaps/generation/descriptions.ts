@@ -18,6 +18,7 @@ interface DescribedStep {
   description: string;
   successCriteria: string;
   sessionsRequired: number;
+  exerciseSetup: string | null;
 }
 
 interface DescriptionsOutput {
@@ -39,8 +40,19 @@ const DESCRIPTIONS_SCHEMA = {
             type: "integer",
             description: `${SESSIONS_RANGE.min}–${SESSIONS_RANGE.max}, calibrated to the step`,
           },
+          exerciseSetup: {
+            type: ["string", "null"],
+            description:
+              "For a configurable app exercise only: the settings for this step in a few words (key, chords or scale, tempo). Null otherwise",
+          },
         },
-        required: ["id", "description", "successCriteria", "sessionsRequired"],
+        required: [
+          "id",
+          "description",
+          "successCriteria",
+          "sessionsRequired",
+          "exerciseSetup",
+        ],
         additionalProperties: false,
       },
     },
@@ -71,7 +83,10 @@ WHAT EVERY DESCRIPTION DOES:
   - Conceptual or musical step: [What it is] / [Why it matters] / [How to practice], each 2–3 sentences (add [Common trap] in 1–2 sentences only when there is a real, specific trap — not on every step).
   - If you are about to write a fourth sentence in a section, stop and cut one of the existing three instead.
 - Be concrete: name chords, strings, positions, counting ("1 & 2 &"), the actual motion, a real song or record when the goal is an artist or a genre. Tempo targets belong in the success criteria, as numbers.
-- When the step has an app exercise, [How to practice] tells the student to play it BY ITS EXACT TITLE and what to listen for in it ("Then play Timing — Quarter Notes, and check that every re-entry lands on the click"). Never mention an exercise that is not assigned to that step.
+- When the step has an app exercise marked "trains this step", [How to practice] tells the student to play it BY ITS EXACT TITLE and what to listen for in it ("Then play Timing — Quarter Notes, and check that every re-entry lands on the click"). Never mention an exercise that is not assigned to that step.
+- When the app exercise is marked "warm-up only", it does NOT contain the step's material — not the riff, not the phrase, not the song. At most one clause may send the student to it by its exact title as a warm-up before the real work ("Warm up with Play by Ear — Medium, then…"). Never write that the step's phrase, riff or song is played "in" that exercise, and never build [How to practice] around it. Leaving it out of the text altogether is fine.
+- exerciseSetup: when the app exercise is one the student configures (its title says "Pick Your…", "Builder", or it takes a key, chords, a scale or a tempo), give the settings for THIS step in a few words — "A minor, i–VI–III–VII, 80 BPM". The app shows it next to the exercise. Null for every other exercise and for steps without one.
+- "plan note" is what the plan's author meant the step to be. Write the step it describes; do not quote it.
 - Explain the "why" with something real: what the technique makes possible, what a record does with it, what goes wrong without it.
 - Length: physical ${DESCRIPTION_LENGTH.physical.min}–${DESCRIPTION_LENGTH.physical.max} words, conceptual and musical ${DESCRIPTION_LENGTH.conceptual.min}–${DESCRIPTION_LENGTH.conceptual.max} words. The sentence caps above are what gets you there — count sentences as you write, not words after the fact.
 
@@ -106,10 +121,16 @@ interface DescribeParams {
 const exerciseLine = (step: RoadmapStep) => {
   const entry = findCatalogEntry(step.suggestedExerciseId);
   if (!entry) return "app exercise: none";
-  return `app exercise: "${entry.title}" — ${entry.description}${
+  const role =
+    step.exerciseRole === "support" ? "warm-up only" : "trains this step";
+  return `app exercise (${role}): "${entry.title}" — ${entry.description}${
     entry.whyItMatters ? ` ${entry.whyItMatters.slice(0, 220)}` : ""
-  }`;
+  }${step.exerciseWhy ? `\n   why this exercise: ${step.exerciseWhy}` : ""}`;
 };
+
+/** A step as the other phases see it: its title, and what it is about when the plan said. */
+const outlineStep = (step: RoadmapStep) =>
+  step.summary ? `${step.title} (${step.summary})` : step.title;
 
 const buildDescriptionsUser = ({
   goal,
@@ -127,12 +148,17 @@ const buildDescriptionsUser = ({
     .slice(0, phaseIndex)
     .map(
       (p, i) =>
-        `Phase ${i + 1}: ${p.title} — ${p.steps.map((s) => s.title).join("; ")}`,
+        `Phase ${i + 1}: ${p.title} — ${p.steps.map(outlineStep).join("; ")}`,
     )
     .join("\n");
+  // The later phases with their steps: a description that knows a song or a
+  // technique has its own step further on does not teach it here.
   const upcoming = phases
     .slice(phaseIndex + 1)
-    .map((p, i) => `Phase ${phaseIndex + 2 + i}: ${p.title}`)
+    .map(
+      (p, i) =>
+        `Phase ${phaseIndex + 2 + i}: ${p.title} — ${p.steps.map((s) => s.title).join("; ")}`,
+    )
     .join("\n");
 
   const stepsText = phase.steps
@@ -140,7 +166,11 @@ const buildDescriptionsUser = ({
       const marker = wanted.has(step.id) ? "WRITE" : "context only";
       return `${index + 1}. [${marker}] id=${step.id}
    title: ${step.title}
-   skill type: ${step.skillType ?? "physical"}
+   skill type: ${step.skillType ?? "physical"}${step.summary ? `\n   plan note: ${step.summary}` : ""}${
+     step.suggestedSong
+       ? `\n   library song (has a tab in the app): "${step.suggestedSong.title}" — ${step.suggestedSong.artist}`
+       : ""
+   }
    ${exerciseLine(step)}`;
     })
     .join("\n");
@@ -163,6 +193,22 @@ const clampSessions = (value: unknown): number => {
   const n = Math.round(Number(value));
   if (!Number.isFinite(n)) return 8;
   return Math.min(SESSIONS_RANGE.max, Math.max(SESSIONS_RANGE.min, n));
+};
+
+const MAX_SETUP_LENGTH = 80;
+
+/**
+ * The settings line for the step's exercise — only when the step has one, and
+ * cleared when a rewrite no longer gives any.
+ */
+const exerciseSetupOf = (
+  step: RoadmapStep,
+  setup: string | null | undefined,
+): { exerciseSetup?: string } => {
+  const text = step.suggestedExerciseId
+    ? (setup ?? "").replace(/\s+/g, " ").trim().slice(0, MAX_SETUP_LENGTH)
+    : "";
+  return text ? { exerciseSetup: text } : { exerciseSetup: undefined };
 };
 
 /**
@@ -189,6 +235,23 @@ export async function describePhaseSteps(
   });
 
   const byId = new Map(output.steps.map((step) => [step.id, step]));
+  // An id copied with a character off is still the right text in the right
+  // place: when the model answered one entry per requested step, an entry
+  // whose id matches nothing is taken for the step at its position, rather
+  // than failing the whole phase over a typo in a uuid.
+  if (output.steps.length === wanted.length) {
+    const known = new Set(wanted);
+    wanted.forEach((id, index) => {
+      const atPosition = output.steps[index];
+      if (
+        !byId.get(id)?.description?.trim() &&
+        atPosition?.description?.trim() &&
+        !known.has(atPosition.id)
+      ) {
+        byId.set(id, atPosition);
+      }
+    });
+  }
   const missing = wanted.filter((id) => !byId.get(id)?.description?.trim());
   if (missing.length) {
     throw new GenerationError(
@@ -206,6 +269,7 @@ export async function describePhaseSteps(
         description: written.description.trim(),
         successCriteria: written.successCriteria.trim(),
         sessionsRequired: clampSessions(written.sessionsRequired),
+        ...exerciseSetupOf(step, written.exerciseSetup),
       };
     }),
   };

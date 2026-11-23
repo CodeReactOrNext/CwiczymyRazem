@@ -11,7 +11,6 @@ import {
   Milestone,
   Repeat,
   ScrollText,
-  Signpost,
   Sparkles,
   Target,
   Trophy,
@@ -24,7 +23,6 @@ export const LIBRARY_TABS: PageTab[] = [
   { label: "Calendar", href: "/calendar", icon: CalendarDays },
   { label: "My Plans", href: "/plans", icon: ListChecks },
   { label: "My Exercises", href: "/my-exercises", icon: Dumbbell },
-  { label: "Player Roadmaps", href: "/my-roadmaps", icon: Signpost },
 ];
 
 /**

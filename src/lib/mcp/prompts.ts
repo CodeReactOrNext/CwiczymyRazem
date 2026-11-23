@@ -136,4 +136,40 @@ export function registerPrompts(server: McpServer) {
       ],
     }),
   );
+
+  server.registerPrompt(
+    "build_roadmap",
+    {
+      title: "Build a roadmap for a goal",
+      description:
+        "Plans a multi-phase roadmap for one goal from the player's history and the library, and saves it once they agree.",
+      argsSchema: {
+        goal: z
+          .string()
+          .describe(
+            "What you want to be able to play — an artist, a style, a song, a technique",
+          ),
+      },
+    },
+    ({ goal }) => ({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: [
+              `Build me a riff.quest roadmap for this goal: ${goal}`,
+              "1. Call riffquest_get_roadmap_guide and follow it exactly. Look at riffquest_get_profile_summary, riffquest_get_skill_breakdown and riffquest_get_weak_spots, then ask me the questions from the guide that would change the plan — a few, not a form.",
+              "2. Find the exercises and songs with riffquest_list_exercises and riffquest_list_songs. Write the plan and run it through riffquest_check_roadmap_plan until it has no problems.",
+              "3. Review the plan against every criterion in the guide as a teacher who did not write it. Change whatever does not pass and check the plan again.",
+              "4. Show me the plan as a plain list of phases and steps and ask what I want changed. Do not save anything before I agree.",
+              "5. Save it with riffquest_create_roadmap. Then, a phase at a time: write its steps with riffquest_write_roadmap_steps — looking for lessons with riffquest_find_lessons and keeping only the ones that teach that step — and its checkpoint with riffquest_write_roadmap_checkpoint. Fix whatever a call refuses and send it again. Go on until no step is without text and no checkpoint is left to write.",
+              "6. Give me the link and tell me in two sentences where to start.",
+              "Talk to me as a guitarist, not a programmer: no JSON, tool names, field names or ids — just the music and the numbers.",
+            ].join("\n"),
+          },
+        },
+      ],
+    }),
+  );
 }

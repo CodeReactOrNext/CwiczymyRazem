@@ -55,6 +55,18 @@ export const preflightRoadmap = (request: PreflightRequest) =>
 export const advanceRoadmapJob = async (ticketId: string) =>
   (await post<{ job: RoadmapJobView | null }>("advance", { ticketId })).job;
 
+/**
+ * The owner's answer to the plan the job stopped on: an OK, or one free note
+ * on what to change. Answers with the job as it stands afterwards.
+ */
+export const approveRoadmapJob = async (ticketId: string, feedback?: string) =>
+  (
+    await post<{ job: RoadmapJobView | null }>("approve", {
+      ticketId,
+      ...(feedback?.trim() ? { feedback: feedback.trim() } : {}),
+    })
+  ).job;
+
 /** One job, or — with no id — the player's running one. */
 export const fetchRoadmapJob = async (ticketId?: string) =>
   (

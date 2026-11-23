@@ -109,18 +109,41 @@ describe("getResourceStatus", () => {
     ).toBeNull();
   });
 
-  it("walks not-started, in-progress, done as resources get ticked", () => {
+  it("is done once what is played is ticked — lessons never hold a step back", () => {
     const withExercise = step({ suggestedExerciseId: "ex" });
-    const lessons = [lesson("a")];
+    const lessons = [lesson("a"), lesson("b")];
     expect(getResourceStatus(withExercise, lessons)).toBe("not-started");
+    // A watched lesson starts the step, it does not finish it.
+    expect(
+      getResourceStatus({ ...withExercise, completedLessonIds: ["a"] }, lessons),
+    ).toBe("in-progress");
+    // The exercise does, with every lesson still unwatched.
     expect(
       getResourceStatus({ ...withExercise, exerciseCompleted: true }, lessons),
-    ).toBe("in-progress");
+    ).toBe("done");
+  });
+
+  it("needs both the exercise and the song when the step has both", () => {
+    const both = step({
+      suggestedExerciseId: "ex",
+      suggestedSong: { id: "song", title: "Little Wing", artist: "Jimi Hendrix" },
+    });
+    expect(getResourceStatus({ ...both, exerciseCompleted: true }, [])).toBe(
+      "in-progress",
+    );
     expect(
       getResourceStatus(
-        { ...withExercise, exerciseCompleted: true, completedLessonIds: ["a"] },
-        lessons,
+        { ...both, exerciseCompleted: true, songCompleted: true },
+        [],
       ),
+    ).toBe("done");
+  });
+
+  it("finishes a lessons-only step after one lesson", () => {
+    const lessons = [lesson("a"), lesson("b"), lesson("c")];
+    expect(getResourceStatus(step(), lessons)).toBe("not-started");
+    expect(
+      getResourceStatus(step({ completedLessonIds: ["b"] }), lessons),
     ).toBe("done");
   });
 });

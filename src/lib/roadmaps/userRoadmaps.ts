@@ -1,6 +1,9 @@
 import type { UserRoadmapStepResourceProgress } from "feature/aiCoach/services/userProgress.service";
 import type { PhaseCheckResult } from "feature/aiCoach/types/phaseCheck.types";
-import type { Roadmap } from "feature/aiCoach/types/roadmap.types";
+import type {
+  Roadmap,
+  RoadmapSongRef,
+} from "feature/aiCoach/types/roadmap.types";
 import { stripProgress } from "feature/aiCoach/utils/stripProgress";
 import type {
   RoadmapRunProgress,
@@ -10,6 +13,8 @@ import type {
 import type { DocumentSnapshot, QuerySnapshot } from "firebase-admin/firestore";
 import { firestore } from "utils/firebase/api/firebase.config";
 
+import { findLibrarySong } from "./songLookup";
+import { dueSongRequests, linkFoundSongs, songRequestKey } from "./songRelink";
 import { isRoadmapVisibleTo, visibilityOf } from "./visibility";
 
 const ROADMAPS_COLLECTION = "roadmaps";
@@ -263,6 +268,40 @@ export async function listUserRoadmaps(
 }
 
 /**
+ * Looks up, once a day, the songs a roadmap asked for when the library did
+ * not have them, and links the ones that have arrived since. Returns the
+ * roadmap as it now is. A failed lookup or write changes nothing: the roadmap
+ * opens as it was and the check runs again next time.
+ */
+async function relinkSongs(roadmap: Roadmap): Promise<Roadmap> {
+  const requests = dueSongRequests(roadmap);
+  if (!requests.length) return roadmap;
+  try {
+    const found = new Map<string, RoadmapSongRef>();
+    await Promise.all(
+      requests.map(async (request) => {
+        const song = await findLibrarySong(request);
+        if (song) found.set(songRequestKey(request), song);
+      }),
+    );
+    const { phases, linked } = linkFoundSongs(roadmap.phases ?? [], found);
+    const songsCheckedAt = new Date().toISOString();
+    await firestore
+      .collection(ROADMAPS_COLLECTION)
+      .doc(roadmap.id)
+      .update(
+        linked
+          ? { phases: JSON.parse(JSON.stringify(phases)), songsCheckedAt }
+          : { songsCheckedAt },
+      );
+    return { ...roadmap, phases, songsCheckedAt };
+  } catch (error) {
+    console.error("[user-roadmaps] song relink failed", roadmap.id, error);
+    return roadmap;
+  }
+}
+
+/**
  * One roadmap with its steps, and what the viewer logged against them — never
  * anybody else's run. The owner sees their own progress; everyone else sees
  * theirs, which is empty until they start the roadmap. Whose progress it is
@@ -287,11 +326,13 @@ export async function getUserRoadmap(
 
   if (!snap.exists) return null;
 
-  const roadmap = snap.data() as Roadmap;
+  const stored = snap.data() as Roadmap;
   // A private roadmap answers "not found" to anyone but its owner, the same
   // as one that is not there: its existence is theirs too.
-  if (!isRoadmapVisibleTo(roadmap, viewerUid)) return null;
-  const isOwner = !!viewerUid && viewerUid === roadmap.userId;
+  if (!isRoadmapVisibleTo(stored, viewerUid)) return null;
+  const isOwner = !!viewerUid && viewerUid === stored.userId;
+  // Only the owner's visit spends reads on the library.
+  const roadmap = isOwner ? await relinkSongs(stored) : stored;
   const run = runSnap?.exists ? (runSnap.data() as StoredProgress) : undefined;
   const authors = await fetchAuthors(roadmap.userId ? [roadmap.userId] : []);
 

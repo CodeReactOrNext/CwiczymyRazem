@@ -2,7 +2,8 @@ import type { RoadmapPhase } from "feature/aiCoach/types/roadmap.types";
 
 import { findCatalogEntry } from "./exerciseCatalog";
 import { DESCRIPTION_LENGTH, wordCount } from "./lengths";
-import { STRUCTURE_LIMITS } from "./limits";
+import { STRUCTURE_LIMITS, TOTAL_STEPS } from "./limits";
+import { nearDuplicateTitles } from "./titleOverlap";
 
 export interface QualityReport {
   /** Things that must be fixed before the roadmap ships. */
@@ -31,74 +32,8 @@ const GENERIC_TITLES = [
  * The register the prompts forbid: metronome platitudes, and the momentum
  * words a model reaches for when it has run out of facts.
  */
-const FILLER =
+export const FILLER =
   /start slow(ly)?,? (and|then) (increase|speed up|build)|practi[cs]e with a metronome|focus on accuracy|muscle memory|solid foundation|next level|unlock(s|ing)? (your|the|new)|(guitar|musical) journey|trust the process|stay consistent|truly (essential|powerful|transform)|it'?s worth noting|keep in mind/i;
-
-/** Connector words dropped before comparing two step titles for overlap. */
-const STOPWORDS = new Set([
-  "the",
-  "a",
-  "an",
-  "and",
-  "or",
-  "of",
-  "on",
-  "in",
-  "with",
-  "to",
-  "for",
-  "your",
-  "you",
-  "by",
-  "at",
-  "into",
-  "over",
-  "under",
-  "up",
-  "down",
-]);
-
-/**
- * Rough stemming — just enough to see "anchors" and "anchoring" as the same
- * word, which is what turns "Thumb-Over Bass Anchors" and "Thumb-Over Bass
- * Anchoring (Comping)" from an 0.4 overlap into an obvious 0.75.
- */
-const stem = (word: string): string => {
-  if (word.length > 5 && word.endsWith("ing")) return word.slice(0, -3);
-  if (word.length > 4 && word.endsWith("ed")) return word.slice(0, -2);
-  if (word.length > 4 && word.endsWith("s") && !word.endsWith("ss")) {
-    return word.slice(0, -1);
-  }
-  return word;
-};
-
-const titleTokens = (title: string): Set<string> =>
-  new Set(
-    title
-      .toLowerCase()
-      .replace(/[^\p{L}\p{N}\s]/gu, " ")
-      .split(/\s+/)
-      .filter((word) => word.length > 1 && !STOPWORDS.has(word))
-      .map(stem),
-  );
-
-const jaccard = (a: Set<string>, b: Set<string>): number => {
-  if (!a.size || !b.size) return 0;
-  let intersection = 0;
-  a.forEach((word) => {
-    if (b.has(word)) intersection++;
-  });
-  return intersection / new Set([...a, ...b]).size;
-};
-
-/**
- * Two titles count as near-duplicates once most of their real words overlap.
- * High on purpose: two titles that merely share a genre word or a phase-local
- * theme ("Pentatonic Box 1" / "Pentatonic Box 2") are a legitimate
- * progression, not a duplicate — this only fires when almost nothing besides
- * the shared words is left.
- */
-const NEAR_DUPLICATE_THRESHOLD = 0.7;
 
 /**
  * The same bar the curated roadmaps pass in staticRoadmaps.test, applied to a
@@ -118,8 +53,10 @@ export const checkRoadmapQuality = (phases: RoadmapPhase[]): QualityReport => {
       `${phases.length} phases (expected ${STRUCTURE_LIMITS.phases.min}–${STRUCTURE_LIMITS.phases.max})`,
     );
   }
-  if (steps.length < 24 || steps.length > 50) {
-    warnings.push(`${steps.length} steps in total (expected 24–50)`);
+  if (steps.length < TOTAL_STEPS.min || steps.length > TOTAL_STEPS.max) {
+    warnings.push(
+      `${steps.length} steps in total (expected ${TOTAL_STEPS.min}–${TOTAL_STEPS.max})`,
+    );
   }
 
   const seen = new Map<string, string>();
@@ -148,8 +85,11 @@ export const checkRoadmapQuality = (phases: RoadmapPhase[]): QualityReport => {
       warnings.push(`Filler advice in "${step.title}"`);
     }
     const entry = findCatalogEntry(step.suggestedExerciseId);
+    // A support exercise is a warm-up: the description is told not to build
+    // the step around it, so its absence from the text is not a fault.
     if (
       entry &&
+      step.exerciseRole !== "support" &&
       step.description &&
       !step.description.toLowerCase().includes(entry.title.toLowerCase())
     ) {
@@ -175,25 +115,9 @@ export const checkRoadmapQuality = (phases: RoadmapPhase[]): QualityReport => {
   // Near-duplicate titles: two steps whose real words mostly overlap, even
   // across phases — an exact match is already a "problem" above, this catches
   // the same skill written twice under slightly different words.
-  const stepTokens = steps.map((step) => titleTokens(step.title));
-  const reportedPairs = new Set<string>();
-  for (let i = 0; i < steps.length; i++) {
-    for (let j = i + 1; j < steps.length; j++) {
-      const a = steps[i];
-      const b = steps[j];
-      if (a.title.trim().toLowerCase() === b.title.trim().toLowerCase())
-        continue;
-      if (stepTokens[i].size < 2 || stepTokens[j].size < 2) continue;
-      if (jaccard(stepTokens[i], stepTokens[j]) < NEAR_DUPLICATE_THRESHOLD)
-        continue;
-      const key = [a.title, b.title].sort().join("|");
-      if (reportedPairs.has(key)) continue;
-      reportedPairs.add(key);
-      warnings.push(
-        `Near-duplicate step titles: "${a.title}" and "${b.title}"`,
-      );
-    }
-  }
+  nearDuplicateTitles(steps.map((step) => step.title)).forEach(([a, b]) => {
+    warnings.push(`Near-duplicate step titles: "${a}" and "${b}"`);
+  });
 
   // Same exercise, same phase: usually the tell that a review issue was
   // "fixed" by adding a sibling step instead of editing the original one.

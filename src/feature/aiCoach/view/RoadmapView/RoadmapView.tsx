@@ -16,6 +16,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/router";
+import posthog from "posthog-js";
 import React, {
   useCallback,
   useEffect,
@@ -43,6 +44,7 @@ import {
   getNextCheckpoint,
   withCheckAttempt,
 } from "../../utils/phaseCheck";
+import { estimateRoadmapWeeks } from "../../utils/roadmapEstimate";
 import type { RoadmapStepRef } from "../../utils/roadmapSteps";
 import {
   findRoadmapStep,
@@ -486,6 +488,12 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   /** An attempt is recorded the moment the last question is answered. */
   const handleCheckResult = useCallback(
     (phaseId: string, score: number, total: number) => {
+      posthog.capture("roadmap_checkpoint_attempt", {
+        roadmapId: roadmap.id,
+        phaseIndex: phasesRef.current.findIndex((p) => p.id === phaseId),
+        score,
+        total,
+      });
       const next = phasesRef.current.map((p) =>
         p.id !== phaseId ? p : withCheckAttempt(p, score, total),
       );
@@ -508,6 +516,73 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     },
     [steps, openStep],
   );
+
+  // Who opens a roadmap at all — the step between "it was generated" and
+  // "a step was finished" that nothing used to record.
+  const openedRef = useRef(false);
+  useEffect(() => {
+    if (adminMode || openedRef.current) return;
+    openedRef.current = true;
+    posthog.capture("roadmap_opened", {
+      roadmapId: roadmap.id,
+      generated: !!roadmap.userId,
+      readOnly,
+    });
+  }, [adminMode, readOnly, roadmap.id, roadmap.userId]);
+
+  // Back from a finished practice session that a step started: the step ticks
+  // that resource off and counts the session by itself. The flag is taken out
+  // of the URL straight away, so a refresh cannot count it twice.
+  const practicedHandledRef = useRef(false);
+  const practicedKind = router.query.practiced;
+  const practicedStepId = router.query.step;
+  useEffect(() => {
+    if (!router.isReady || practicedHandledRef.current) return;
+    if (practicedKind !== "exercise" && practicedKind !== "song") return;
+    practicedHandledRef.current = true;
+
+    const query: Record<string, string | string[]> = {};
+    Object.entries(router.query).forEach(([key, value]) => {
+      if (value !== undefined && key !== "practiced") query[key] = value;
+    });
+    void router.replace({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
+      scroll: false,
+    });
+
+    if (readOnly || adminMode || typeof practicedStepId !== "string") return;
+    const phase = phasesRef.current.find((candidate) =>
+      candidate.steps.some((step) => step.id === practicedStepId),
+    );
+    if (!phase) return;
+    posthog.capture("roadmap_step_practiced", {
+      roadmapId: roadmap.id,
+      kind: practicedKind,
+    });
+    // After this render, not during it: the save updates the map.
+    queueMicrotask(() =>
+      saveStep(phase.id, practicedStepId, (step) =>
+        withResourceStatus(
+          {
+            ...step,
+            practiceSessions: (step.practiceSessions ?? 0) + 1,
+            ...(practicedKind === "exercise"
+              ? { exerciseCompleted: true }
+              : { songCompleted: true }),
+          },
+          [],
+        ),
+      ),
+    );
+  }, [
+    adminMode,
+    practicedKind,
+    practicedStepId,
+    readOnly,
+    roadmap.id,
+    router,
+    saveStep,
+  ]);
 
   // The open step's lessons, fetched once and kept.
   useEffect(() => {
@@ -581,9 +656,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   };
 
   /**
-   * Back to this page on this step after the exercise or song page — the page
-   * the map is on, not always /ai-coach: a player's roadmap lives on
-   * /my-roadmaps, and /ai-coach does not know its id.
+   * Back to this page on this step after the exercise or song page. The
+   * Roadmaps page tells a curated roadmap from a player's by the id itself.
    */
   const stepReturnPath = () =>
     `${router.pathname}?roadmapId=${roadmap.id}${activeStep ? `&step=${activeStep.step.id}` : ""}`;
@@ -1261,6 +1335,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       ? nextCheckpoint
       : null;
   const totalSteps = steps.length;
+  const estimatedWeeks = estimateRoadmapWeeks(phases);
   const hasStarted = doneCount > 0 || inProgressCount > 0;
   const anyRefineBusy = Object.values(refineBusyIds).some(isRefineBusy);
 
@@ -1323,6 +1398,12 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                 <span>{t("n_steps", { count: totalSteps })}</span>
                 <span className='text-zinc-600'>·</span>
                 <span>{t("n_phases", { count: phases.length })}</span>
+                {estimatedWeeks > 0 && (
+                  <>
+                    <span className='text-zinc-600'>·</span>
+                    <span>{t("about_weeks", { count: estimatedWeeks })}</span>
+                  </>
+                )}
               </div>
               <h2 className='font-display text-xl font-bold text-zinc-100 md:text-2xl'>
                 {roadmap.title}
@@ -1376,6 +1457,12 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
                     <Chip color='gray' size='sm'>
                       {t(`levels.${roadmap.level}`, roadmap.level)}
                     </Chip>
+                  </>
+                )}
+                {estimatedWeeks > 0 && (
+                  <>
+                    <span className='text-zinc-700'>·</span>
+                    <span>{t("about_weeks", { count: estimatedWeeks })}</span>
                   </>
                 )}
               </div>

@@ -18,7 +18,11 @@ import { v4 as uuidv4 } from "uuid";
 import { roadmapGenerationCost } from "../visibility";
 import type { RoadmapBrief } from "./brief";
 import type { StoredRoadmapJob } from "./jobPlan";
-import type { GeneratedStructure, StructurePhase } from "./structure";
+import type {
+  GeneratedStructure,
+  StructureExtras,
+  StructurePhase,
+} from "./structure";
 import type { TokenUsage } from "./usage";
 
 /**
@@ -79,6 +83,11 @@ export interface GenerationTicket {
   context?: RoadmapGoalContext | null;
   /** What the player answered before paying — the constraints the prompts are held to. */
   brief?: RoadmapBrief | null;
+  /**
+   * What the job gathered before drafting: the player's practice history and
+   * the library songs by the goal's artists. Null once looked up and empty.
+   */
+  extras?: StructureExtras | null;
   /** The server-side run of the rest of the pipeline, when it runs in the background. */
   job?: StoredRoadmapJob | null;
 }
@@ -150,7 +159,9 @@ export async function openTicket(
     if (
       existing &&
       !isTicketExpired(existing) &&
-      (!existing.job || existing.job.status === "running")
+      (!existing.job ||
+        existing.job.status === "running" ||
+        existing.job.status === "awaiting_approval")
     ) {
       return { ticket: existing, charged: false, userData: user.data() };
     }

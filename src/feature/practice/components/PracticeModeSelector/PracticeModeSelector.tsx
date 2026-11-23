@@ -152,7 +152,7 @@ const MY_STUFF = [
   { id: "calendar", Icon: CalendarDays, href: "/calendar" },
   { id: "my_plans", Icon: ClipboardCheck, href: "/plans" },
   { id: "my_exercises", Icon: Music2, href: "/my-exercises" },
-  { id: "player_roadmaps", Icon: Signpost, href: "/my-roadmaps" },
+  { id: "player_roadmaps", Icon: Signpost, href: "/ai-coach?tab=players" },
 ];
 
 export const PracticeModeSelector = () => {

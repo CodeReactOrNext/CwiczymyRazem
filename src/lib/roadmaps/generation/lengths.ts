@@ -7,14 +7,18 @@ import type { SkillType } from "./structure";
  * stated word count more often than a stated sentence budget, so the prompt
  * also caps sentences per section; this range is the backstop that catches it
  * when it still runs long.
+ *
+ * Conceptual and musical steps sat at a median of 118–121 words against a
+ * 120–190 target: three sections of two or three sentences simply come to
+ * about that, so the range now says what the sentence caps produce.
  */
 export const DESCRIPTION_LENGTH: Record<
   SkillType,
   { min: number; max: number }
 > = {
   physical: { min: 70, max: 130 },
-  conceptual: { min: 120, max: 190 },
-  musical: { min: 120, max: 190 },
+  conceptual: { min: 100, max: 160 },
+  musical: { min: 100, max: 160 },
 };
 
 export const wordCount = (text: string): number =>

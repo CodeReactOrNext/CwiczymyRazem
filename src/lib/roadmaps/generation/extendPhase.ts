@@ -111,6 +111,8 @@ export interface ExtendPhaseParams {
   count: number;
   /** What the student asked for, in their words. */
   guidance?: string;
+  /** The brief the roadmap was built to, rendered by `briefForModel`; empty when none. */
+  brief?: string;
   ledger?: UsageLedger;
   resolveSong?: SongResolver;
 }
@@ -133,6 +135,7 @@ const buildProposalUser = ({
   afterStepId,
   count,
   guidance,
+  brief,
 }: ExtendPhaseParams): string => {
   const phase = phases[phaseIndex];
   const afterIndex = afterStepId
@@ -148,7 +151,7 @@ const buildProposalUser = ({
 
   return `Student's goal: "${goal}"
 Skill level: ${level}
-
+${brief?.trim() ? `\n${brief.trim()}\nA new step never breaks one of these, whatever the wish below says.\n` : ""}
 THE WHOLE ROADMAP (every existing step — nothing new may repeat one):
 ${outline(phases)}
 
@@ -260,6 +263,7 @@ export async function extendPhase(
     phaseIndex,
     stepIds: addedStepIds,
     guidance: params.guidance,
+    brief: params.brief,
     ledger,
   });
 

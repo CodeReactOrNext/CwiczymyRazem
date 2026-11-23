@@ -42,6 +42,11 @@ export const getResourceProgress = (
 /**
  * Status derived from the resources, so ticking things off is what moves a step
  * through its lifecycle. Null when the step has nothing to tick.
+ *
+ * What finishes a step is what is played: its exercise and its song. Lessons
+ * are there to help and never hold a step back — when every video had to be
+ * ticked, finishing a 38-step roadmap meant ticking off more than a hundred of
+ * them. A step with nothing to play, only lessons, is done after one.
  */
 export const getResourceStatus = (
   step: RoadmapStep,
@@ -50,8 +55,14 @@ export const getResourceStatus = (
   const { completed, total } = getResourceProgress(step, lessons);
   if (total === 0) return null;
   if (completed === 0) return "not-started";
-  if (completed >= total) return "done";
-  return "in-progress";
+
+  const hasExercise = !!step.suggestedExerciseId && !step.noExercise;
+  const hasSong = !!step.suggestedSong;
+  if (!hasExercise && !hasSong) return "done";
+  const played =
+    (!hasExercise || !!step.exerciseCompleted) &&
+    (!hasSong || !!step.songCompleted);
+  return played ? "done" : "in-progress";
 };
 
 /** The sessions count that encodes a status — "done" is the step's full requirement. */

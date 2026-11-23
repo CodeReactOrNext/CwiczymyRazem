@@ -1,10 +1,12 @@
 import { Button } from "assets/components/ui/button";
 import { Textarea } from "assets/components/ui/textarea";
-import { cn } from "assets/lib/utils";
-import { BackLink } from "components/BackLink/BackLink";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
 import type { RoadmapSongRef } from "feature/aiCoach/types/roadmap.types";
 import { BMC_URL } from "feature/roadmap/data/roadmap.data";
+import {
+  BuilderFrame,
+  BuilderHeading,
+} from "feature/supporterPanel/components/roadmapBrief/BuilderFrame";
 import { LibrarySongPicker } from "feature/supporterPanel/components/roadmapBrief/LibrarySongPicker";
 import { QuestionScreen } from "feature/supporterPanel/components/roadmapBrief/QuestionScreen";
 import { AnimatePresence, motion } from "framer-motion";
@@ -19,13 +21,7 @@ import {
   PRACTICE_STYLE_OPTIONS,
   type QuestionOption,
 } from "lib/roadmaps/generation/questionBank";
-import {
-  ArrowRight,
-  Music,
-  Pencil,
-  Quote,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, Music, Pencil, Quote, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
 /** One screen of the wizard: a question from the bank, one the model wrote, the facts screen, or the summary. */
@@ -63,8 +59,11 @@ interface BriefWizardProps {
   cost: number;
   tokensLeft?: number;
   canAfford: boolean;
-  /** Back to the goal itself. */
+  /** Screens the builder showed before these, for the bar across the top. */
+  stepsBefore: number;
+  /** Back to the screen before the questions. */
   onBack: () => void;
+  onClose: () => void;
   onGenerate: (brief: RoadmapBrief | null) => void;
 }
 
@@ -79,7 +78,9 @@ export const BriefWizard = ({
   cost,
   tokensLeft,
   canAfford,
+  stepsBefore,
   onBack,
+  onClose,
   onGenerate,
 }: BriefWizardProps) => {
   const { t } = useTranslation("supporter");
@@ -230,43 +231,68 @@ export const BriefWizard = ({
     (item) => item.kind === "bank" && item.id === "songs",
   );
 
+  const note = isConfirm ? (
+    !canAfford ? (
+      <>
+        <Interpolate
+          text={t("panel.generate.needs")}
+          values={{
+            cost: <span className='font-bold text-zinc-200'>{cost}</span>,
+            left: <span className='font-bold text-zinc-200'>{tokensLeft}</span>,
+          }}
+        />{" "}
+        <a
+          href={BMC_URL}
+          target='_blank'
+          rel='noreferrer'
+          className='font-semibold text-amber-300 underline-offset-2 hover:underline'>
+          {t("panel.generate.donation_adds")}
+        </a>
+      </>
+    ) : (
+      t("panel.brief.takes_minutes")
+    )
+  ) : (
+    t("panel.brief.n_of", { n: index + 1, total: questionCount })
+  );
+
+  const actions = isConfirm ? (
+    <Button
+      type='button'
+      size='lg'
+      onClick={() => onGenerate(buildBrief())}
+      disabled={!canAfford}>
+      <Sparkles size={16} />
+      {t("panel.brief.generate")}
+      <span className='flex items-center gap-1 rounded bg-zinc-950/10 px-1.5 py-0.5 tabular-nums'>
+        <SupportToken size={15} />
+        {cost}
+      </span>
+    </Button>
+  ) : (
+    <>
+      <Button
+        type='button'
+        variant='ghost'
+        size='lg'
+        onClick={() => go(index + 1)}>
+        {t("panel.brief.skip")}
+      </Button>
+      <Button type='button' size='lg' onClick={() => go(index + 1)}>
+        {t("panel.brief.next")}
+        <ArrowRight size={15} />
+      </Button>
+    </>
+  );
+
   return (
-    <div className='space-y-8'>
-      <div className='flex items-center justify-between gap-4'>
-        <BackLink
-          label={index === 0 ? t("panel.brief.edit_goal") : t("panel.brief.back")}
-          onClick={() => (index === 0 ? onBack() : go(index - 1))}
-        />
-
-        {questionCount > 0 && (
-          <ol
-            className='flex items-center gap-1.5'
-            aria-label={t("panel.brief.progress")}>
-            {screens.map((item, at) => (
-              <motion.li
-                key={at}
-                animate={{
-                  width: at === index ? 22 : 8,
-                  opacity: at <= index ? 1 : 0.35,
-                }}
-                className={cn(
-                  "h-2 rounded-full",
-                  at < index
-                    ? "bg-emerald-400/80"
-                    : at === index
-                      ? "bg-amber-400"
-                      : "bg-zinc-600",
-                )}
-                aria-current={at === index ? "step" : undefined}
-                title={
-                  item.kind === "confirm" ? t("panel.brief.summary") : undefined
-                }
-              />
-            ))}
-          </ol>
-        )}
-      </div>
-
+    <BuilderFrame
+      progress={(stepsBefore + index + 1) / (stepsBefore + screens.length)}
+      onBack={() => (index === 0 ? onBack() : go(index - 1))}
+      onClose={onClose}
+      tokensLeft={tokensLeft}
+      note={note}
+      actions={actions}>
       <div className='relative min-h-[260px] overflow-hidden'>
         <AnimatePresence mode='wait' custom={direction} initial={false}>
           <motion.div
@@ -278,15 +304,11 @@ export const BriefWizard = ({
             exit='exit'
             transition={{ duration: 0.22, ease: "easeOut" }}>
             {screen.kind === "notes" && (
-              <div className='space-y-5'>
-                <div className='space-y-1.5'>
-                  <h3 className='text-lg font-bold text-zinc-100'>
-                    {t("panel.brief.obscure_title")}
-                  </h3>
-                  <p className='text-sm leading-relaxed text-zinc-400'>
-                    {preflight.reason || t("panel.brief.obscure_body")}
-                  </p>
-                </div>
+              <div className='space-y-7'>
+                <BuilderHeading
+                  title={t("panel.brief.obscure_title")}
+                  hint={preflight.reason || t("panel.brief.obscure_body")}
+                />
                 <Textarea
                   rows={3}
                   value={notes}
@@ -299,15 +321,11 @@ export const BriefWizard = ({
             )}
 
             {screen.kind === "bank" && screen.id === "songs" && (
-              <div className='space-y-6'>
-                <div className='space-y-1.5'>
-                  <h3 className='text-lg font-bold text-zinc-100'>
-                    {bankText("songs").question}
-                  </h3>
-                  <p className='text-sm text-zinc-400'>
-                    {bankText("songs").hint}
-                  </p>
-                </div>
+              <div className='space-y-7'>
+                <BuilderHeading
+                  title={bankText("songs").question}
+                  hint={bankText("songs").hint}
+                />
                 <LibrarySongPicker
                   songs={songs}
                   onChange={setSongs}
@@ -344,7 +362,8 @@ export const BriefWizard = ({
             )}
 
             {screen.kind === "confirm" && (
-              <div className='space-y-6'>
+              <div className='space-y-7'>
+                <BuilderHeading title={t("panel.brief.summary")} />
                 <div className='flex gap-3 rounded-lg bg-zinc-800/40 px-5 py-4'>
                   <Quote
                     size={16}
@@ -426,71 +445,6 @@ export const BriefWizard = ({
           </motion.div>
         </AnimatePresence>
       </div>
-
-      <div className='flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between'>
-        <p className='text-sm leading-relaxed text-zinc-500'>
-          {isConfirm ? (
-            !canAfford ? (
-              <>
-                <Interpolate
-                  text={t("panel.generate.needs")}
-                  values={{
-                    cost: (
-                      <span className='font-bold text-zinc-200'>{cost}</span>
-                    ),
-                    left: (
-                      <span className='font-bold text-zinc-200'>
-                        {tokensLeft}
-                      </span>
-                    ),
-                  }}
-                />{" "}
-                <a
-                  href={BMC_URL}
-                  target='_blank'
-                  rel='noreferrer'
-                  className='font-semibold text-amber-300 underline-offset-2 hover:underline'>
-                  {t("panel.generate.donation_adds")}
-                </a>
-              </>
-            ) : (
-              t("panel.brief.takes_minutes")
-            )
-          ) : (
-            t("panel.brief.n_of", { n: index + 1, total: questionCount })
-          )}
-        </p>
-
-        <div className='flex shrink-0 items-center gap-2'>
-          {!isConfirm && (
-            <button
-              type='button'
-              onClick={() => go(index + 1)}
-              className='rounded-lg px-4 py-2.5 text-sm font-semibold text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100'>
-              {t("panel.brief.skip")}
-            </button>
-          )}
-          {isConfirm ? (
-            <Button
-              type='button'
-              size='lg'
-              onClick={() => onGenerate(buildBrief())}
-              disabled={!canAfford}>
-              <Sparkles size={16} />
-              {t("panel.brief.generate")}
-              <span className='flex items-center gap-1 rounded-md bg-zinc-950/10 px-1.5 py-0.5 tabular-nums'>
-                <SupportToken size={15} />
-                {cost}
-              </span>
-            </Button>
-          ) : (
-            <Button type='button' size='lg' onClick={() => go(index + 1)}>
-              {t("panel.brief.next")}
-              <ArrowRight size={15} />
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>
+    </BuilderFrame>
   );
 };

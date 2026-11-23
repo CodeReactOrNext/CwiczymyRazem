@@ -25,7 +25,7 @@
     "board_body": "{{total}} rutas de {{players}} jugadores. Como supporter puedes abrir cualquiera y empezarla gratis.",
     "board_body_one": "{{total}} rutas de {{players}} jugador. Como supporter puedes abrir cualquiera y empezarla gratis.",
     "title": "Crea una ruta en torno a tu propio objetivo",
-    "lead": "Describe lo que quieres tocar — el coach lo convierte en fases y pasos.",
+    "lead": "Describe lo que quieres tocar — tu propio asistente de IA lo convierte en fases y pasos, y riff.quest los revisa y los guarda.",
     "steps_title": "Cada paso incluye",
     "step": {
       "exercise": {
@@ -51,7 +51,8 @@
     },
     "support": "Apoya el proyecto",
     "email": "Paga con el correo de esta cuenta, para que la donación llegue a la cuenta correcta.",
-    "email_known": "Paga con el correo de esta cuenta — {{email}} — para que la donación llegue a la cuenta correcta."
+    "email_known": "Paga con el correo de esta cuenta — {{email}} — para que la donación llegue a la cuenta correcta.",
+    "short": "La construyes con tu propio asistente de IA conectado a riff.quest — una ventaja para quienes apoyan. riff.quest vive de donaciones — cualquier donación lo desbloquea para siempre. Sin suscripción."
   },
   "card": {
     "review": "Repasar la ruta",
@@ -65,7 +66,9 @@
     "up_next": "A continuación",
     "first_step": "Tu primer paso",
     "revisit": "Vuelve a una lección favorita o sigue practicando.",
-    "explore": "Explora la ruta."
+    "explore": "Explora la ruta.",
+    "players": "{{count}} jugadores",
+    "players_one": "1 jugador"
   },
   "status": {
     "not_started": "Pendiente",
@@ -97,6 +100,8 @@
   "n_steps_one": "1 paso",
   "n_phases": "{{count}} fases",
   "n_phases_one": "1 fase",
+  "about_weeks": "unas {{count}} semanas",
+  "about_weeks_one": "1 semana aprox.",
   "in_progress_count": "{{count}} en curso",
   "steps_of": "{{done}}/{{total}} pasos",
   "start_here": "Empieza aquí",
@@ -154,14 +159,17 @@
   },
   "kit": {
     "title": "Kit de práctica",
-    "body": "Abre un recurso, trabaja con él y márcalo. Marcarlo todo completa el paso.",
+    "body": "Abre un recurso y trabaja con él. El ejercicio y la canción completan el paso; las lecciones son de apoyo.",
     "practiced_undo": "Practicado. Toca para deshacer",
     "mark_practiced": "Marcar como practicado",
     "from_library": "de la biblioteca de canciones",
     "played_undo": "Tocada. Toca para deshacer",
     "mark_played": "Marcar como tocada",
     "watched_undo": "Vista. Toca para deshacer",
-    "mark_watched": "Marcar como vista"
+    "mark_watched": "Marcar como vista",
+    "warm_up": "Calentamiento",
+    "setup": "Ajústalo a: {{setup}}",
+    "sessions": "{{done}} de {{total}} sesiones practicadas"
   },
   "lesson_levels": {
     "beginner": "principiante",
@@ -257,5 +265,17 @@
     "checkpoint_locked": "Termina primero todos los pasos de esta fase ({{done}}/{{total}}).",
     "take_check": "Hacer el checkpoint",
     "passed_score": "Aprobado {{score}}/{{total}}"
+  },
+  "hub": {
+    "title": "Rutas",
+    "intro": "Rutas guiadas para habilidades y estilos — seleccionadas, las tuyas y las de otros jugadores.",
+    "tabs": {
+      "yours": "Tuyas",
+      "mastery": "Maestría",
+      "players": "Jugadores"
+    },
+    "built_for_you": "Creada para ti",
+    "yours_empty_title": "Aún no has empezado nada",
+    "yours_empty_body": "Empieza una ruta y aparecerá aquí."
   }
 }

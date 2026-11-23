@@ -184,7 +184,7 @@ export const briefForModel = (
   const depth = answer("repertoireDepth");
   if (has(depth, "deep")) {
     lines.push(
-      "Repertoire depth: 2–3 songs in depth — a song is several steps (sections, reduced tempo, album tempo, a recorded take), not one.",
+      "Repertoire depth: 2–3 songs in depth — a song is several steps, not one, and each step is about a different problem of that song (the hardest bar, the stretch, the change, the feel), named in its title. Never the same list of tempo stages repeated for every song; at most one step per song is the whole thing at album tempo.",
     );
   } else if (has(depth, "wide")) {
     lines.push(

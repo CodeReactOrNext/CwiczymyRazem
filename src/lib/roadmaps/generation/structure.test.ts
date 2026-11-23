@@ -13,10 +13,12 @@ vi.mock("./openaiJson", async () => {
 
 const {
   draftRoadmapStructure,
+  fillMissingExercises,
   generateRoadmapStructure,
   reviewRoadmapStructure,
   STRUCTURE_LIMITS,
   toRoadmapPhases,
+  toStructurePhases,
 } = await import("./structure");
 
 const skeleton = (stepsPerPhase = 4, phases = 6) => ({
@@ -29,6 +31,8 @@ const skeleton = (stepsPerPhase = 4, phases = 6) => ({
       skillType: "physical" as const,
       suggestedExerciseId: null as string | null,
       exerciseWhy: "",
+      exerciseFit: null as "direct" | "support" | null,
+      gist: "",
       songTitle: null as string | null,
       songArtist: null as string | null,
     })),
@@ -78,6 +82,64 @@ describe("toRoadmapPhases", () => {
   });
 });
 
+describe("what a step carries out of the skeleton", () => {
+  it("keeps the gist, the exercise's role and the song it asked for", () => {
+    const draft = skeleton(2, 1);
+    Object.assign(draft.phases[0].steps[0], {
+      suggestedExerciseId: "one_chord_improv",
+      exerciseWhy: "Same vamp, one chord.",
+      exerciseFit: "support",
+      gist: "Improvise over an A7 vamp with three notes.",
+    });
+    Object.assign(draft.phases[0].steps[1], {
+      songTitle: "Red House",
+      songArtist: "Jimi Hendrix",
+    });
+
+    const { phases, songRequests } = toRoadmapPhases(
+      draft.phases,
+      "Intermediate",
+    );
+    const [first, second] = phases[0].steps;
+
+    expect(first.summary).toBe("Improvise over an A7 vamp with three notes.");
+    expect(first.exerciseRole).toBe("support");
+    expect(first.exerciseWhy).toBe("Same vamp, one chord.");
+    expect(second.songRequest).toEqual({
+      title: "Red House",
+      artist: "Jimi Hendrix",
+    });
+    expect(songRequests).toHaveLength(1);
+    // And back again, for a rewrite of a plan that was already converted.
+    const back = toStructurePhases(phases);
+    expect(back[0].steps[0].exerciseFit).toBe("support");
+    expect(back[0].steps[1].songTitle).toBe("Red House");
+  });
+
+  it("gives a bare technique step a second look at the library", async () => {
+    const draft = skeleton(3, 1);
+    draft.phases[0].steps[0].suggestedExerciseId = "one_chord_improv";
+    draft.phases[0].steps[2].skillType = "musical" as never;
+    const { phases } = toRoadmapPhases(draft.phases, "Intermediate");
+    const matchExercise = vi
+      .fn()
+      // Already in the phase, then unknown, then a real one.
+      .mockResolvedValue(["one_chord_improv", "nope", "metronome_gap_test"]);
+
+    const filled = await fillMissingExercises(
+      phases,
+      "Play like Hendrix",
+      "Intermediate",
+      matchExercise,
+    );
+
+    // Only the physical step without an exercise is searched for.
+    expect(matchExercise).toHaveBeenCalledTimes(1);
+    expect(filled[0].steps[1].suggestedExerciseId).toBe("metronome_gap_test");
+    expect(filled[0].steps[2].suggestedExerciseId).toBeUndefined();
+  });
+});
+
 describe("generateRoadmapStructure", () => {
   it("returns the draft when the reviewer accepts it", async () => {
     completeJson.mockResolvedValueOnce(skeleton()).mockResolvedValueOnce({
@@ -102,9 +164,8 @@ describe("generateRoadmapStructure", () => {
     completeJson
       .mockResolvedValueOnce(skeleton())
       .mockResolvedValueOnce({
-        issues: ["Phase 2 is generic"],
+        issues: [{ text: "Phase 2 is generic", severity: "shape" }],
         suggestions: [],
-        isValid: false,
       })
       .mockResolvedValueOnce(revised);
 
@@ -118,6 +179,77 @@ describe("generateRoadmapStructure", () => {
     expect(revisionPrompt.user).toContain("Phase 2 is generic");
     expect(result.phases).toHaveLength(7);
     expect(result.review.revised).toBe(true);
+    expect(result.review.isValid).toBe(false);
+    expect(result.review.shapeIssues).toBe(1);
+  });
+
+  it("keeps a draft the reviewer only has small notes on", async () => {
+    completeJson.mockResolvedValueOnce(skeleton()).mockResolvedValueOnce({
+      issues: [{ text: "Rename step 3", severity: "detail" }],
+      suggestions: [],
+    });
+
+    const result = await generateRoadmapStructure(
+      "Play like Hendrix",
+      "Intermediate",
+    );
+
+    // No third call: a note about one step is not worth writing the plan twice.
+    expect(completeJson).toHaveBeenCalledTimes(2);
+    expect(result.review.revised).toBe(false);
+    expect(result.review.isValid).toBe(true);
+    expect(result.review.issues).toEqual(["Rename step 3"]);
+  });
+
+  it("rewrites on what the code checks find, whatever the reviewer says", async () => {
+    const draft = skeleton(4, 6);
+    // Every song in the last phase: the pattern half the first reviews named.
+    draft.phases[5].steps[0].songTitle = "Little Wing";
+    draft.phases[5].steps[0].songArtist = "Jimi Hendrix";
+    const fixed = skeleton(4, 6);
+    fixed.phases[0].steps[3].songTitle = "Little Wing";
+    fixed.phases[0].steps[3].songArtist = "Jimi Hendrix";
+    completeJson
+      .mockResolvedValueOnce(draft)
+      .mockResolvedValueOnce({ issues: [], suggestions: [] })
+      .mockResolvedValueOnce(fixed);
+
+    const result = await generateRoadmapStructure(
+      "Play like Hendrix",
+      "Intermediate",
+    );
+
+    expect(completeJson).toHaveBeenCalledTimes(3);
+    const reviewPrompt = completeJson.mock.calls[1][0] as { user: string };
+    expect(reviewPrompt.user).toContain("CODE CHECKS");
+    const revisionPrompt = completeJson.mock.calls[2][0] as { user: string };
+    expect(revisionPrompt.user).toContain("first song step is in phase 6");
+    expect(result.review.mechanical).toHaveLength(1);
+    expect(result.review.revised).toBe(true);
+    expect(result.review.remaining).toEqual([]);
+  });
+
+  it("keeps the draft when a rewrite for the code checks comes back worse", async () => {
+    const draft = skeleton(4, 6);
+    draft.phases[5].steps[0].songTitle = "Little Wing";
+    draft.phases[5].steps[0].songArtist = "Jimi Hendrix";
+    const worse = skeleton(4, 6);
+    worse.phases[5].steps[0].songTitle = "Little Wing";
+    worse.phases[5].steps[0].songArtist = "Jimi Hendrix";
+    worse.phases[2].steps[0].title = "Fuzz Face settings";
+    completeJson
+      .mockResolvedValueOnce(draft)
+      .mockResolvedValueOnce({ issues: [], suggestions: [] })
+      .mockResolvedValueOnce(worse);
+
+    const result = await generateRoadmapStructure(
+      "Play like Hendrix",
+      "Intermediate",
+    );
+
+    expect(result.review.revised).toBe(false);
+    expect(result.phases[2].steps[0].title).toBe("Skill 2-0");
+    expect(result.review.remaining).toHaveLength(1);
   });
 
   it("rejects a goal that is not about guitar with a 400", async () => {
@@ -262,9 +394,8 @@ describe("the two halves of the skeleton", () => {
     const draft = skeleton(4, 6).phases;
     completeJson
       .mockResolvedValueOnce({
-        issues: ["Phase 3 repeats phase 1"],
+        issues: [{ text: "Phase 3 repeats phase 1", severity: "shape" }],
         suggestions: [],
-        isValid: false,
       })
       .mockResolvedValueOnce(skeleton(5, 6));
     const onRevise = vi.fn();

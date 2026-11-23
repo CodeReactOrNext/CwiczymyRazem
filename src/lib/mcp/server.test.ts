@@ -44,8 +44,11 @@ describe("riff.quest MCP server", () => {
     expect(tools.map((tool) => tool.name).sort()).toEqual(
       [
         "riffquest_add_song_to_list",
+        "riffquest_check_roadmap_plan",
         "riffquest_create_exercise",
         "riffquest_create_practice_plan",
+        "riffquest_create_roadmap",
+        "riffquest_find_lessons",
         "riffquest_get_calendar",
         "riffquest_get_daily_exercise",
         "riffquest_get_exercise",
@@ -59,6 +62,8 @@ describe("riff.quest MCP server", () => {
         "riffquest_get_practice_history",
         "riffquest_get_profile_summary",
         "riffquest_get_recent_runs",
+        "riffquest_get_roadmap",
+        "riffquest_get_roadmap_guide",
         "riffquest_get_skill_breakdown",
         "riffquest_get_song",
         "riffquest_get_tab_format",
@@ -76,6 +81,8 @@ describe("riff.quest MCP server", () => {
         "riffquest_update_exercise_goal",
         "riffquest_update_practice_plan",
         "riffquest_validate_tablature",
+        "riffquest_write_roadmap_checkpoint",
+        "riffquest_write_roadmap_steps",
       ].sort(),
     );
   });
@@ -112,12 +119,15 @@ describe("riff.quest MCP server", () => {
       "riffquest_add_song_to_list",
       "riffquest_create_exercise",
       "riffquest_create_practice_plan",
+      "riffquest_create_roadmap",
       "riffquest_log_practice",
       "riffquest_set_calendar_days",
       "riffquest_set_exercise_goal",
       "riffquest_update_exercise",
       "riffquest_update_exercise_goal",
       "riffquest_update_practice_plan",
+      "riffquest_write_roadmap_checkpoint",
+      "riffquest_write_roadmap_steps",
     ]);
     const repeatableWrites = tools
       .filter(
@@ -133,6 +143,8 @@ describe("riff.quest MCP server", () => {
       "riffquest_update_exercise",
       "riffquest_update_exercise_goal",
       "riffquest_update_practice_plan",
+      "riffquest_write_roadmap_checkpoint",
+      "riffquest_write_roadmap_steps",
     ]);
   });
 
@@ -141,10 +153,13 @@ describe("riff.quest MCP server", () => {
   // Raised from 35k for the practice log and goal edit (~2.8k together),
   // then from 37k for the calendar read and write (~2.9k together), then
   // from 40k for the player's own song lists (~0.7k), then from 41k for the
-  // `tuning` argument on the four tab tools (~0.4k; the ids live in the guide).
+  // `tuning` argument on the four tab tools (~0.4k; the ids live in the guide),
+  // then from 41.5k for the seven roadmap tools (~7.9k: a plan's shape is in
+  // two of them, the check that only reads and the save that writes; the save
+  // also takes the review, and a checkpoint its six questions).
   it("keeps the tool list within its size budget", async () => {
     const { tools } = await client.listTools();
-    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(41_500);
+    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(49_500);
   });
 
   it("refuses arguments a tool doesn't take", async () => {
@@ -204,6 +219,7 @@ describe("riff.quest MCP server", () => {
   it("offers the prompts and the tab format resource", async () => {
     const { prompts } = await client.listPrompts();
     expect(prompts.map((prompt) => prompt.name).sort()).toEqual([
+      "build_roadmap",
       "log_session",
       "plan_next_session",
       "weekly_review",

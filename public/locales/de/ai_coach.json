@@ -25,7 +25,7 @@
     "board_body": "{{total}} Roadmaps von {{players}} Spielern. Als Supporter kannst du jede davon öffnen und kostenlos starten.",
     "board_body_one": "{{total}} Roadmaps von {{players}} Spieler. Als Supporter kannst du jede davon öffnen und kostenlos starten.",
     "title": "Bau dir eine Roadmap um dein eigenes Ziel",
-    "lead": "Beschreib, was du spielen willst — der Coach macht daraus Phasen und Schritte.",
+    "lead": "Beschreib, was du spielen willst — dein eigener KI-Assistent macht daraus Phasen und Schritte, und riff.quest prüft und speichert sie.",
     "steps_title": "Zu jedem Schritt bekommst du",
     "step": {
       "exercise": {
@@ -51,7 +51,8 @@
     },
     "support": "Projekt unterstützen",
     "email": "Zahl mit der E-Mail-Adresse dieses Kontos, damit die Spende beim richtigen Konto ankommt.",
-    "email_known": "Zahl mit der E-Mail-Adresse dieses Kontos — {{email}} —, damit die Spende beim richtigen Konto ankommt."
+    "email_known": "Zahl mit der E-Mail-Adresse dieses Kontos — {{email}} —, damit die Spende beim richtigen Konto ankommt.",
+    "short": "Du baust sie mit deinem eigenen KI-Assistenten, der mit riff.quest verbunden ist — ein Extra für Unterstützer. riff.quest lebt von Spenden — jede Spende schaltet es dauerhaft frei. Kein Abo."
   },
   "card": {
     "review": "Roadmap ansehen",
@@ -65,7 +66,9 @@
     "up_next": "Als Nächstes",
     "first_step": "Dein erster Schritt",
     "revisit": "Schau dir eine Lieblingslektion noch mal an oder übe weiter.",
-    "explore": "Entdecke die Roadmap."
+    "explore": "Entdecke die Roadmap.",
+    "players": "{{count}} Spieler",
+    "players_one": "1 Spieler"
   },
   "status": {
     "not_started": "Offen",
@@ -97,6 +100,8 @@
   "n_steps_one": "1 Schritt",
   "n_phases": "{{count}} Phasen",
   "n_phases_one": "1 Phase",
+  "about_weeks": "ca. {{count}} Wochen",
+  "about_weeks_one": "ca. 1 Woche",
   "in_progress_count": "{{count}} in Arbeit",
   "steps_of": "{{done}}/{{total}} Schritte",
   "start_here": "Hier starten",
@@ -154,14 +159,17 @@
   },
   "kit": {
     "title": "Übungsset",
-    "body": "Öffne ein Material, arbeite damit und hak es ab. Wenn alles abgehakt ist, ist der Schritt erledigt.",
+    "body": "Öffne ein Material und arbeite damit. Übung und Song schließen den Schritt ab; die Lektionen helfen dabei.",
     "practiced_undo": "Geübt. Tippen zum Rückgängigmachen",
     "mark_practiced": "Als geübt markieren",
     "from_library": "aus der Song-Bibliothek",
     "played_undo": "Gespielt. Tippen zum Rückgängigmachen",
     "mark_played": "Als gespielt markieren",
     "watched_undo": "Angesehen. Tippen zum Rückgängigmachen",
-    "mark_watched": "Als angesehen markieren"
+    "mark_watched": "Als angesehen markieren",
+    "warm_up": "Aufwärmen",
+    "setup": "Einstellung: {{setup}}",
+    "sessions": "{{done}} von {{total}} Sessions geübt"
   },
   "lesson_levels": {
     "beginner": "Anfänger",
@@ -257,5 +265,17 @@
     "checkpoint_locked": "Schließe zuerst alle Schritte dieser Phase ab ({{done}}/{{total}}).",
     "take_check": "Checkpoint starten",
     "passed_score": "Bestanden {{score}}/{{total}}"
+  },
+  "hub": {
+    "title": "Roadmaps",
+    "intro": "Geführte Pfade für Techniken und Spielstile — kuratiert, deine eigenen und von anderen Spielern.",
+    "tabs": {
+      "yours": "Deine",
+      "mastery": "Mastery",
+      "players": "Spieler"
+    },
+    "built_for_you": "Für dich gebaut",
+    "yours_empty_title": "Noch nichts begonnen",
+    "yours_empty_body": "Starte eine Roadmap, dann erscheint sie hier."
   }
 }

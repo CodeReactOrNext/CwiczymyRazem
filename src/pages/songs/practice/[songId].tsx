@@ -2,6 +2,7 @@
 import "lib/i18n/fullCatalog";
 
 import { BackLink } from "components/BackLink/BackLink";
+import { markStepPracticed } from "feature/aiCoach/utils/roadmapEstimate";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
@@ -134,7 +135,8 @@ export default function SongPracticePage() {
 
     // `returnTo` sends the report's "Continue" button back to the songs page
     // once the time is logged, instead of leaving the user on the log form.
-    router.push(`/report?returnTo=${encodeURIComponent(resolveSongsReturnPath(router.query.returnTo))}`);
+    const backTo = resolveSongsReturnPath(router.query.returnTo);
+    router.push(`/report?returnTo=${encodeURIComponent(markStepPracticed(backTo, "song") ?? backTo)}`);
   };
 
   const handleClose = () => {

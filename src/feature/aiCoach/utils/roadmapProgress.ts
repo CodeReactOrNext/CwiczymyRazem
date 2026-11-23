@@ -33,6 +33,7 @@ export const extractStepProgress = (
         exerciseCompleted: step.exerciseCompleted ?? false,
         completedLessonIds: step.completedLessonIds ?? [],
         songCompleted: step.songCompleted ?? false,
+        practiceSessions: step.practiceSessions ?? 0,
       };
     }),
   );

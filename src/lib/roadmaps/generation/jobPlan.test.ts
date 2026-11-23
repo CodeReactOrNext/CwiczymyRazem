@@ -2,7 +2,11 @@ import type { RoadmapPhase } from "feature/aiCoach/types/roadmap.types";
 import { describe, expect, it } from "vitest";
 
 import {
+  APPROVAL_TIMEOUT_MS,
+  approved,
+  awaitingApproval,
   initialJob,
+  isApprovalOverdue,
   isLeaseFree,
   type JobTicket,
   MAX_JOB_ATTEMPTS,
@@ -11,6 +15,7 @@ import {
   toJobView,
   withDescribedPhases,
   withFailure,
+  withFeedback,
   withLessons,
   withSkeleton,
 } from "./jobPlan";
@@ -146,5 +151,55 @@ describe("toJobView", () => {
     });
     expect(view.step).toBe("review");
     expect(view.revising).toBe(true);
+  });
+});
+
+describe("the stop for the owner's OK", () => {
+  const reviewed = withSkeleton(initialJob(ticket(), now), [
+    phase("a", 2),
+    phase("b", 1),
+  ]);
+  const waiting = awaitingApproval(reviewed, now);
+
+  it("shows the plan by its titles and offers one round of changes", () => {
+    expect(waiting.status).toBe("awaiting_approval");
+    const view = toJobView({ ...ticket(), job: waiting });
+    expect(view.skeleton).toEqual([
+      { title: "Phase a", steps: ["Step 0", "Step 1"] },
+      { title: "Phase b", steps: ["Step 0"] },
+    ]);
+    expect(view.feedbackLeft).toBe(true);
+    // A running job carries no plan: the browser has nothing to ask.
+    expect(toJobView({ ...ticket(), job: reviewed }).skeleton).toBeUndefined();
+  });
+
+  it("goes on to the descriptions once approved", () => {
+    const next = approved(waiting);
+    expect(next.status).toBe("running");
+    expect(next.step).toBe("phases");
+  });
+
+  it("sends the plan back once, and only once, for the owner's note", () => {
+    const reshaping = withFeedback(waiting, "  fewer theory steps  ");
+    expect(reshaping.status).toBe("running");
+    expect(reshaping.step).toBe("reshape");
+    expect(reshaping.feedback).toBe("fewer theory steps");
+
+    const again = awaitingApproval(reshaping, now);
+    expect(again.feedback).toBeNull();
+    expect(toJobView({ ...ticket(), job: again }).feedbackLeft).toBe(false);
+  });
+
+  it("is overdue after the timeout, and never while it is running", () => {
+    const asked = now.getTime();
+    expect(isApprovalOverdue(waiting, asked + APPROVAL_TIMEOUT_MS - 1)).toBe(
+      false,
+    );
+    expect(isApprovalOverdue(waiting, asked + APPROVAL_TIMEOUT_MS + 1)).toBe(
+      true,
+    );
+    expect(isApprovalOverdue(reviewed, asked + APPROVAL_TIMEOUT_MS * 2)).toBe(
+      false,
+    );
   });
 });

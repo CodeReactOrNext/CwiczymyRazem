@@ -173,25 +173,53 @@ afterEach(cleanup);
 
 describe("UserRoadmapsTab", () => {
   it("lists a player's roadmap without their progress", () => {
-    render(<UserRoadmapsTab enabled />);
+    render(<UserRoadmapsTab enabled section='board' />);
 
-    expect(screen.getByText("Shred like Friedman")).toBeDefined();
+    expect(screen.getByText("Plan: shred")).toBeDefined();
     expect(screen.getByText("Ann")).toBeDefined();
-    // Ann's 3 sessions are hers: the viewer never started this roadmap.
-    expect(screen.queryByText(/1\/2 steps · 3 sessions/)).toBeNull();
+    // Ann's finished step is hers: the viewer never started this roadmap.
+    expect(screen.getByLabelText("0 of 2 steps completed")).toBeDefined();
+    expect(screen.getByText("View roadmap")).toBeDefined();
   });
 
-  it("puts the viewer's own roadmaps in a section of their own", () => {
-    render(<UserRoadmapsTab enabled />);
+  it("keeps the viewer's own roadmaps and the board apart", () => {
+    const { unmount } = render(<UserRoadmapsTab enabled section='own' />);
+    expect(screen.getByText("Built for you")).toBeDefined();
+    expect(screen.queryByText("Ann")).toBeNull();
+    unmount();
 
-    expect(screen.getByText("Your roadmaps")).toBeDefined();
-    expect(screen.getByText("From other players")).toBeDefined();
+    render(<UserRoadmapsTab enabled section='board' />);
+    expect(screen.queryByText("Built for you")).toBeNull();
+    expect(screen.getByText("Ann")).toBeDefined();
+  });
+
+  it("lists a curated roadmap the viewer started among their own", () => {
+    render(
+      <UserRoadmapsTab
+        enabled
+        section='own'
+        extraOwn={[
+          {
+            key: "curated:rhythm",
+            lastAt: "2026-03-01T00:00:00.000Z",
+            underWay: true,
+            render: (featured) => (
+              <p>{featured ? "Rhythm, featured" : "Rhythm"}</p>
+            ),
+          },
+        ]}
+      />,
+    );
+
+    // Under way, so it goes up front, ahead of the untouched own roadmap.
+    expect(screen.getByText("Rhythm, featured")).toBeDefined();
+    expect(screen.getByText("Built for you")).toBeDefined();
   });
 
   it("opens the roadmap in the same map /ai-coach draws", () => {
-    render(<UserRoadmapsTab enabled />);
+    render(<UserRoadmapsTab enabled section='board' />);
 
-    fireEvent.click(screen.getByText("Shred like Friedman"));
+    fireEvent.click(screen.getByText("Plan: shred"));
 
     // The phase spine and every step of the map, not the summary row.
     expect(screen.getAllByText("Picking").length).toBeGreaterThan(0);
@@ -202,8 +230,8 @@ describe("UserRoadmapsTab", () => {
   });
 
   it("never writes to the roadmap it is showing", () => {
-    render(<UserRoadmapsTab enabled />);
-    fireEvent.click(screen.getByText("Shred like Friedman"));
+    render(<UserRoadmapsTab enabled section='board' />);
+    fireEvent.click(screen.getByText("Plan: shred"));
 
     // Opening a step is the interaction that would persist on /ai-coach.
     fireEvent.click(screen.getAllByText("Alternate picking")[0]);
@@ -211,17 +239,9 @@ describe("UserRoadmapsTab", () => {
     expect(updateRoadmap).not.toHaveBeenCalled();
   });
 
-  it("shows how many players follow a roadmap", () => {
-    render(<UserRoadmapsTab enabled />);
-
-    expect(screen.getAllByText(/2 players following/).length).toBeGreaterThan(
-      0,
-    );
-  });
-
   it("starts somebody else's roadmap under the viewer's own uid", async () => {
-    render(<UserRoadmapsTab enabled />);
-    fireEvent.click(screen.getByText("Shred like Friedman"));
+    render(<UserRoadmapsTab enabled section='board' />);
+    fireEvent.click(screen.getByText("Plan: shred"));
 
     fireEvent.click(screen.getByText("Start this roadmap"));
 
@@ -233,28 +253,24 @@ describe("UserRoadmapsTab", () => {
   });
 
   it("treats the viewer's own generated roadmap as writable, with no read-only notice", () => {
-    render(<UserRoadmapsTab enabled />);
+    render(<UserRoadmapsTab enabled section='own' />);
 
-    fireEvent.click(screen.getByText("My own roadmap"));
+    fireEvent.click(screen.getByText("Plan: shred"));
 
     expect(screen.queryByText(/Somebody else.s roadmap/)).toBeNull();
     expect(screen.queryByText("Start this roadmap")).toBeNull();
   });
 
-  it("offers somebody else's roadmap by its first step, not by their progress", () => {
-    render(<UserRoadmapsTab enabled />);
-
-    expect(screen.getByText("First step")).toBeDefined();
-    expect(screen.getByText("Alternate picking")).toBeDefined();
-    expect(screen.getByText("View roadmap")).toBeDefined();
-  });
-
-  it("keeps the viewer's own name off their own cards and starts them on their next step", () => {
-    render(<UserRoadmapsTab enabled />);
+  it("keeps the viewer's own name off their own cards and offers to start them", () => {
+    render(<UserRoadmapsTab enabled section='own' />);
 
     expect(screen.queryByText("You")).toBeNull();
-    expect(screen.getByText("Your first step")).toBeDefined();
-    expect(screen.getByText("String skipping")).toBeDefined();
     expect(screen.getByText("Start learning")).toBeDefined();
+  });
+
+  it("shows nothing of the lists while another tab is up", () => {
+    render(<UserRoadmapsTab enabled section='none' />);
+
+    expect(screen.queryByText("Plan: shred")).toBeNull();
   });
 });

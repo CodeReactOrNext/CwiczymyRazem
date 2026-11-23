@@ -7,6 +7,7 @@ import { firebaseAddRoadmapStepLog } from "feature/logs/services/addRoadmapStepL
 import type { UserRoadmapDetail } from "feature/supporterPanel/types/userRoadmaps.types";
 import { displayTitle } from "feature/supporterPanel/utils/roadmapGoal";
 import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
+import posthog from "posthog-js";
 import { useCallback, useRef } from "react";
 import { useAppDispatch } from "store/hooks";
 
@@ -28,6 +29,7 @@ const lastSavedPhases = (detail: UserRoadmapDetail): RoadmapPhase[] =>
         exerciseCompleted: resources?.exerciseCompleted ?? false,
         completedLessonIds: resources?.completedLessonIds ?? [],
         songCompleted: resources?.songCompleted ?? false,
+        practiceSessions: resources?.practiceSessions ?? 0,
       };
     }),
   }));
@@ -84,6 +86,33 @@ export const useOwnRoadmapPersist = (
         const key = `${roadmapId}:${step.id}`;
         if (loggedStepsRef.current.has(key)) return;
         loggedStepsRef.current.add(key);
+        // The far end of the funnel: who gets past the first step, and who
+        // finishes a phase.
+        const current = phases.find((candidate) => candidate.id === phase.id);
+        const doneInPhase = (current?.steps ?? []).filter(
+          (candidate) =>
+            candidate.sessionsCompleted >= candidate.sessionsRequired,
+        ).length;
+        posthog.capture("roadmap_step_completed", {
+          roadmapId,
+          own: runnerUid === userId,
+          phaseIndex: phases.findIndex(
+            (candidate) => candidate.id === phase.id,
+          ),
+          stepsDone: phases
+            .flatMap((candidate) => candidate.steps)
+            .filter(
+              (candidate) =>
+                candidate.sessionsCompleted >= candidate.sessionsRequired,
+            ).length,
+        });
+        if (current && doneInPhase === current.steps.length) {
+          posthog.capture("roadmap_phase_completed", {
+            roadmapId,
+            own: runnerUid === userId,
+            phaseIndex: phases.indexOf(current),
+          });
+        }
         void firebaseAddRoadmapStepLog(runnerUid, {
           roadmapId,
           roadmapTitle: cached ? displayTitle(cached.summary) : "",

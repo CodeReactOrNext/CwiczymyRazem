@@ -25,7 +25,7 @@
     "board_body": "{{total}} roadmaps from {{players}} players. As a supporter you can open any of them and start it for free.",
     "board_body_one": "{{total}} roadmaps from {{players}} player. As a supporter you can open any of them and start it for free.",
     "title": "Build a roadmap around your own goal",
-    "lead": "Describe what you want to play — the coach turns it into phases and steps.",
+    "lead": "Describe what you want to play — your own AI assistant turns it into phases and steps, and riff.quest checks and saves them.",
     "steps_title": "Every step comes with",
     "step": {
       "exercise": {
@@ -51,7 +51,8 @@
     },
     "support": "Support the project",
     "email": "Pay with the email this account is on, so the donation lands on the right account.",
-    "email_known": "Pay with the email this account is on — {{email}}, so the donation lands on the right account."
+    "email_known": "Pay with the email this account is on — {{email}}, so the donation lands on the right account.",
+    "short": "You build it with your own AI assistant, connected to riff.quest — a supporter perk. riff.quest runs on donations — any donation unlocks it for life. No subscription."
   },
   "card": {
     "review": "Review roadmap",
@@ -65,7 +66,9 @@
     "up_next": "Up next",
     "first_step": "Your first step",
     "revisit": "Revisit a favourite lesson or keep practising.",
-    "explore": "Explore the roadmap."
+    "explore": "Explore the roadmap.",
+    "players": "{{count}} players",
+    "players_one": "1 player"
   },
   "status": {
     "not_started": "To do",
@@ -97,6 +100,8 @@
   "n_steps_one": "1 step",
   "n_phases": "{{count}} phases",
   "n_phases_one": "1 phase",
+  "about_weeks": "about {{count}} weeks",
+  "about_weeks_one": "about 1 week",
   "in_progress_count": "{{count}} in progress",
   "steps_of": "{{done}}/{{total}} steps",
   "start_here": "Start here",
@@ -154,14 +159,17 @@
   },
   "kit": {
     "title": "Practice kit",
-    "body": "Open a resource to work with it, then tick it off. Ticking everything completes the step.",
+    "body": "Open a resource and work with it. The exercise and the song are what finish the step; the lessons are there to help.",
     "practiced_undo": "Practiced. Tap to undo",
     "mark_practiced": "Mark as practiced",
     "from_library": "from the song library",
     "played_undo": "Played. Tap to undo",
     "mark_played": "Mark as played",
     "watched_undo": "Watched. Tap to undo",
-    "mark_watched": "Mark as watched"
+    "mark_watched": "Mark as watched",
+    "warm_up": "Warm-up",
+    "setup": "Set it to: {{setup}}",
+    "sessions": "{{done}} of {{total}} sessions practised"
   },
   "lesson_levels": {
     "beginner": "beginner",
@@ -257,5 +265,17 @@
     "checkpoint_locked": "Finish every step of this phase first ({{done}}/{{total}}).",
     "take_check": "Take the checkpoint",
     "passed_score": "Passed {{score}}/{{total}}"
+  },
+  "hub": {
+    "title": "Roadmaps",
+    "intro": "Guided paths for skills and playing styles — curated, your own, and from other players.",
+    "tabs": {
+      "yours": "Yours",
+      "mastery": "Mastery",
+      "players": "Players"
+    },
+    "built_for_you": "Built for you",
+    "yours_empty_title": "Nothing started yet",
+    "yours_empty_body": "Start a roadmap and it shows up here."
   }
 }

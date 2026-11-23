@@ -39,9 +39,7 @@ describe("RoadmapCard", () => {
   it("offers a focusable start action and a short artist heading", () => {
     const onOpen = vi.fn();
     render(<RoadmapCard roadmap={makeRoadmap([0, 0])} onOpen={onOpen} />);
-    expect(
-      screen.getByRole("heading", { name: "Marty Friedman" }),
-    ).toBeTruthy();
+    expect(screen.getByText("Marty Friedman")).toBeTruthy();
     const button = screen.getByRole("button", {
       name: "Start learning: Marty Friedman",
     });
@@ -56,10 +54,7 @@ describe("RoadmapCard", () => {
     expect(
       screen.getByRole("button", { name: "Continue: Marty Friedman" }),
     ).toBeTruthy();
-    expect(screen.getByText("Lesson 2")).toBeTruthy();
-    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe(
-      "0",
-    );
+    expect(screen.getByLabelText("0 of 2 steps completed")).toBeTruthy();
   });
 
   it("offers review instead of continuing after all steps are complete", () => {
@@ -67,10 +62,6 @@ describe("RoadmapCard", () => {
     expect(
       screen.getByRole("button", { name: "Review roadmap: Marty Friedman" }),
     ).toBeTruthy();
-    expect(screen.getByText("Completed")).toBeTruthy();
-    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe(
-      "100",
-    );
-    expect(screen.queryByText("Up next")).toBeNull();
+    expect(screen.getByLabelText("2 of 2 steps completed")).toBeTruthy();
   });
 });

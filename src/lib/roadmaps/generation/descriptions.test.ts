@@ -109,7 +109,9 @@ describe("describePhaseSteps", () => {
       user: string;
       system: string;
     };
-    expect(prompt.user).toContain('app exercise: "Improv — One Chord"');
+    expect(prompt.user).toContain(
+      'app exercise (trains this step): "Improv — One Chord"',
+    );
     expect(prompt.user).toContain("UPCOMING PHASES");
     // The house-style exemplars ride in the system prompt.
     expect(prompt.system).toContain("Thumb over the neck");
@@ -162,5 +164,39 @@ describe("describePhaseSteps", () => {
         phaseIndex: 0,
       }),
     ).rejects.toThrow(/Descriptions missing for 1 of 2 steps/);
+  });
+
+  it("takes an entry with a mistyped id for the step at its position", async () => {
+    completeJson.mockResolvedValueOnce({
+      steps: [
+        {
+          id: "s0",
+          description: "Feel the pulse.",
+          successCriteria: "Steady.",
+          sessionsRequired: 5,
+          exerciseSetup: "A7, 70 BPM",
+        },
+        {
+          // One character off: still the second step's text.
+          id: "s1x",
+          description: "Stop the strings on the rest.",
+          successCriteria: "Silent rests.",
+          sessionsRequired: 4,
+          exerciseSetup: "ignored without an exercise",
+        },
+      ],
+    });
+
+    const phase = await describePhaseSteps({
+      goal: "Rhythm guitar",
+      level: "Beginner",
+      phases,
+      phaseIndex: 0,
+    });
+
+    expect(phase.steps[1].description).toBe("Stop the strings on the rest.");
+    // The settings line belongs to an exercise; a step without one keeps none.
+    expect(phase.steps[0].exerciseSetup).toBe("A7, 70 BPM");
+    expect(phase.steps[1].exerciseSetup).toBeUndefined();
   });
 });

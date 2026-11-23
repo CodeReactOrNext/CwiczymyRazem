@@ -25,7 +25,7 @@
     "board_body": "Ścieżki: {{total}}, gracze: {{players}}. Jako wspierający możesz otworzyć każdą z nich i zacząć za darmo.",
     "board_body_one": "Ścieżki: {{total}}, gracze: {{players}}. Jako wspierający możesz otworzyć każdą z nich i zacząć za darmo.",
     "title": "Zbuduj ścieżkę wokół własnego celu",
-    "lead": "Opisz, co chcesz grać — coach zamieni to w fazy i kroki.",
+    "lead": "Opisz, co chcesz grać — twój asystent AI zamieni to w fazy i kroki, a riff.quest je sprawdzi i zapisze.",
     "steps_title": "Do każdego kroku dostajesz",
     "step": {
       "exercise": {
@@ -51,7 +51,8 @@
     },
     "support": "Wesprzyj projekt",
     "email": "Zapłać z adresu e-mail przypisanego do tego konta, żeby darowizna trafiła na właściwe konto.",
-    "email_known": "Zapłać z adresu e-mail przypisanego do tego konta — {{email}} — żeby darowizna trafiła na właściwe konto."
+    "email_known": "Zapłać z adresu e-mail przypisanego do tego konta — {{email}} — żeby darowizna trafiła na właściwe konto.",
+    "short": "Budujesz ją ze swoim asystentem AI podłączonym do riff.quest — to dodatek dla wspierających. riff.quest działa dzięki darowiznom — każda odblokowuje to na zawsze. Bez subskrypcji."
   },
   "card": {
     "review": "Przejrzyj ścieżkę",
@@ -65,7 +66,11 @@
     "up_next": "Następny krok",
     "first_step": "Twój pierwszy krok",
     "revisit": "Wróć do ulubionej lekcji albo ćwicz dalej.",
-    "explore": "Poznaj ścieżkę."
+    "explore": "Poznaj ścieżkę.",
+    "players": "{{count}} graczy",
+    "players_one": "1 gracz",
+    "players_few": "{{count}} graczy",
+    "players_many": "{{count}} graczy"
   },
   "status": {
     "not_started": "Do zrobienia",
@@ -101,6 +106,10 @@
   "n_phases_one": "1 faza",
   "n_phases_few": "{{count}} fazy",
   "n_phases_many": "{{count}} faz",
+  "about_weeks": "ok. {{count}} tygodni",
+  "about_weeks_one": "ok. 1 tydzień",
+  "about_weeks_few": "ok. {{count}} tygodnie",
+  "about_weeks_many": "ok. {{count}} tygodni",
   "in_progress_count": "W trakcie: {{count}}",
   "steps_of": "Kroki: {{done}}/{{total}}",
   "start_here": "Zacznij tutaj",
@@ -160,14 +169,17 @@
   },
   "kit": {
     "title": "Zestaw do ćwiczeń",
-    "body": "Otwórz materiał, popracuj z nim i odhacz. Odhaczenie wszystkiego kończy krok.",
+    "body": "Otwórz materiał i popracuj z nim. Krok kończą ćwiczenie i utwór; lekcje są do pomocy.",
     "practiced_undo": "Przećwiczone. Dotknij, aby cofnąć",
     "mark_practiced": "Oznacz jako przećwiczone",
     "from_library": "z biblioteki utworów",
     "played_undo": "Zagrane. Dotknij, aby cofnąć",
     "mark_played": "Oznacz jako zagrane",
     "watched_undo": "Obejrzane. Dotknij, aby cofnąć",
-    "mark_watched": "Oznacz jako obejrzane"
+    "mark_watched": "Oznacz jako obejrzane",
+    "warm_up": "Rozgrzewka",
+    "setup": "Ustaw: {{setup}}",
+    "sessions": "Przećwiczone sesje: {{done}} z {{total}}"
   },
   "lesson_levels": {
     "beginner": "początkujący",
@@ -263,5 +275,17 @@
     "checkpoint_locked": "Najpierw skończ wszystkie kroki tej fazy ({{done}}/{{total}}).",
     "take_check": "Rozwiąż test",
     "passed_score": "Zdany {{score}}/{{total}}"
+  },
+  "hub": {
+    "title": "Ścieżki",
+    "intro": "Prowadzone ścieżki dla umiejętności i stylów gry — gotowe, własne i od innych graczy.",
+    "tabs": {
+      "yours": "Twoje",
+      "mastery": "Mistrzostwa",
+      "players": "Graczy"
+    },
+    "built_for_you": "Zbudowana dla ciebie",
+    "yours_empty_title": "Nic jeszcze nie zaczęte",
+    "yours_empty_body": "Zacznij ścieżkę, a pojawi się tutaj."
   }
 }

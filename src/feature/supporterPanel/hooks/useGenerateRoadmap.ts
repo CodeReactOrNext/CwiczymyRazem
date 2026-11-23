@@ -3,6 +3,7 @@ import type { RoadmapVisibility } from "feature/aiCoach/types/roadmap.types";
 import { SUPPORTER_ROADMAP_KEY } from "feature/supporterPanel/hooks/useSupporterRoadmap";
 import {
   advanceRoadmapJob,
+  approveRoadmapJob,
   fetchRoadmapJob,
   startRoadmapJob,
 } from "feature/supporterPanel/services/roadmapJob.service";
@@ -18,7 +19,8 @@ import type { RoadmapBrief } from "lib/roadmaps/generation/brief";
 import type { RoadmapLevel } from "lib/roadmaps/generation/levels";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type GenerateStatus = "idle" | "running" | "done" | "error";
+/** "awaiting" is the plan on screen, waiting for its owner's OK. */
+export type GenerateStatus = "idle" | "running" | "awaiting" | "done" | "error";
 
 /** Where the bar sits when a stage begins, and where that stage crawls towards. */
 type Bounds = [from: number, to: number];
@@ -111,6 +113,8 @@ export const stageLabel = (stage: GenerationStage): string => {
       return `Writing the phases (${stage.done}/${stage.total})`;
     case "lessons":
       return `Finding lessons (${stage.done}/${stage.total})`;
+    case "approval":
+      return "The plan is ready for you to read";
     default:
       return "Working…";
   }
@@ -124,6 +128,8 @@ const stageBounds = (stage: GenerationStage): Bounds => {
       return segment(PHASES_BAND, stage.done, stage.total);
     case "lessons":
       return segment(LESSONS_BAND, stage.done, stage.total);
+    case "approval":
+      return [PHASES_BAND[0], PHASES_BAND[0]];
     default:
       return [0, 1];
   }
@@ -161,11 +167,13 @@ export const applyJob = (prev: State, job: RoadmapJobView): State => {
   }
 
   const stage = jobStage(job);
-  if (sameStage(prev.stage, stage)) return { ...prev, status: "running", job };
+  const status: GenerateStatus =
+    job.status === "awaiting_approval" ? "awaiting" : "running";
+  if (sameStage(prev.stage, stage)) return { ...prev, status, job };
   const bounds = stageBounds(stage);
   return {
     ...prev,
-    status: "running",
+    status,
     job,
     stage,
     stageLabel: stageLabel(stage),
@@ -268,6 +276,8 @@ export const useGenerateRoadmap = ({
       fetchRoadmapJob().then(
         (job) => {
           if (job?.status === "running") void drive(job);
+          // A plan left waiting for its owner: show it, nothing to advance.
+          else if (job?.status === "awaiting_approval") hear(job);
         },
         () => {},
       );
@@ -276,7 +286,7 @@ export const useGenerateRoadmap = ({
       mountedRef.current = false;
       drivingRef.current = null;
     };
-  }, [enabled, drive]);
+  }, [enabled, drive, hear]);
 
   // The bar keeps moving between reports, because several stages are a single
   // model call that says nothing until it is finished.
@@ -343,10 +353,32 @@ export const useGenerateRoadmap = ({
     [drive, queryClient],
   );
 
+  /**
+   * Answers the plan on screen — an OK, or the one free note on what to
+   * change — and goes back to advancing the job. False when the answer did not
+   * get through; the plan stays on screen to be answered again.
+   */
+  const ticketId = state.job?.ticketId;
+  const approve = useCallback(
+    async (feedback?: string): Promise<boolean> => {
+      if (!ticketId) return false;
+      try {
+        const job = await approveRoadmapJob(ticketId, feedback);
+        if (!job) return false;
+        if (job.status === "running") void drive(job);
+        else hear(job);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [ticketId, drive, hear],
+  );
+
   const reset = useCallback(() => {
     drivingRef.current = null;
     setState(IDLE_STATE);
   }, []);
 
-  return { ...state, start, reset };
+  return { ...state, start, approve, reset };
 };

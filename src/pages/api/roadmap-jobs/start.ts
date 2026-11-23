@@ -12,6 +12,10 @@ import {
   isRoadmapLevel,
   MAX_GOAL_LENGTH,
 } from "lib/roadmaps/generation/levels";
+import {
+  GENERATION_CLOSED_MESSAGE,
+  IN_APP_ROADMAP_GENERATION,
+} from "lib/roadmaps/generationSwitch";
 import { isRoadmapVisibility } from "lib/roadmaps/visibility";
 import { requireSupporter } from "lib/support/supporterAuth";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -29,6 +33,9 @@ export default async function handler(
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
+  }
+  if (!IN_APP_ROADMAP_GENERATION) {
+    return res.status(410).json({ message: GENERATION_CLOSED_MESSAGE });
   }
   const auth = await requireSupporter(req);
   if (!auth.ok) return res.status(auth.status).json({ message: auth.error });

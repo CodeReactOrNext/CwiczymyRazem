@@ -478,7 +478,8 @@
       "needs": "Esta necesita {{cost}} tokens y tienes {{left}}.",
       "donation_adds": "Cada donación añade tokens",
       "next_free": "Después, el coach revisa el objetivo y hace unas preguntas — gratis. Generarla cuesta {{cost}}.",
-      "continue": "Continuar"
+      "continue": "Continuar",
+      "back_to_roadmaps": "Volver a las rutas"
     },
     "brief": {
       "told_coach": "Lo que le dijiste al coach",
@@ -617,6 +618,34 @@
         }
       }
     },
+    "approval": {
+      "title": "Este es el plan",
+      "body": "{{phases}} fases, {{steps}} pasos. Léelo antes de que se escriban las lecciones.",
+      "note": "Una ronda de cambios es gratis.",
+      "failed": "No se pudo enviar. Inténtalo de nuevo.",
+      "keep": "Dejarlo como está",
+      "change": "Cambiar el plan",
+      "approve": "Está bien, escríbelo",
+      "feedback_label": "¿Algo que cambiar?",
+      "feedback_placeholder": "Menos teoría, más de la segunda canción, sin la última fase…",
+      "waiting": "Tu plan espera tu visto bueno"
+    },
+    "assistant": {
+      "title": "Constrúyela con tu asistente de IA",
+      "body": "riff.quest no escribe rutas por su cuenta. Tu propio asistente — Claude, ChatGPT — la construye con tu historial de práctica y los ejercicios y canciones de la app; riff.quest la revisa y la guarda aquí. No cuesta tokens.",
+      "goal_label": "¿Qué quieres poder tocar?",
+      "prompt_label": "Pega esto en tu asistente",
+      "prompt": "Usa riff.quest y constrúyeme una ruta para este objetivo: {{goal}}\n\nSigue la guía de rutas de riff.quest. Mira primero mi historial de práctica, pregúntame solo lo que cambiaría el plan y enséñame el plan antes de guardar nada. Después escribe cada paso, elige lecciones que encajen de verdad y escribe el checkpoint de cada fase.",
+      "prompt_no_goal": "Usa riff.quest y constrúyeme una ruta. Pregúntame qué quiero poder tocar.\n\nSigue la guía de rutas de riff.quest. Mira primero mi historial de práctica, pregúntame solo lo que cambiaría el plan y enséñame el plan antes de guardar nada. Después escribe cada paso, elige lecciones que encajen de verdad y escribe el checkpoint de cada fase.",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "connect": "Cómo conectar un asistente",
+      "steps": {
+        "0": "Conecta riff.quest a tu asistente, una sola vez. Lleva un minuto.",
+        "1": "Pega la petición. El asistente hace unas preguntas y te enseña el plan.",
+        "2": "Cuando aceptes, la ruta aparece aquí, en Tuyas."
+      }
+    },
     "preflight": {
       "lines": {
         "0": "Leyendo tu objetivo",
@@ -663,7 +692,7 @@
       "created_on": "creada el {{date}}",
       "last_practised": "Practicada por última vez el {{date}}",
       "not_on_board": "Esa ruta ya no está en el tablero.",
-      "back_to_list": "Volver a Rutas de jugadores",
+      "back_to_list": "Volver a Rutas",
       "empty_title": "Todavía no hay rutas",
       "empty_body": "Aquí aparecen las rutas que los jugadores generan para sí mismos.",
       "count": "{{total}} rutas de {{players}} jugadores",

@@ -9,6 +9,7 @@ import type {
   RoadmapJobView,
 } from "feature/supporterPanel/types/roadmapJob.types";
 
+import type { QualityReport } from "./qualityGate";
 import type { TokenUsage } from "./usage";
 
 /**
@@ -42,6 +43,14 @@ export interface StoredRoadmapJob {
   costUsd?: number;
   startedAt: string;
   updatedAt: string;
+  /** When the plan was shown to its owner, and whether their free round of changes is spent. */
+  approval?: { askedAt: string; feedbackUsed: boolean } | null;
+  /** What the owner asked to change, while the plan is being reshaped to it. */
+  feedback?: string | null;
+  /** What the quality gate said about the roadmap as it was saved. */
+  quality?: QualityReport | null;
+  /** Phases were sent back for their texts once already; the gate does not loop. */
+  qualityRetried?: boolean;
 }
 
 /** The ticket fields a job reads — the rest of `GenerationTicket` is its own business. */
@@ -74,6 +83,8 @@ export const JOB_GIVE_UP_MS = 6 * 60 * 60 * 1000;
 export const UNIT_BUDGET_MS: Record<RoadmapJobStep, number> = {
   draft: 150_000,
   review: 210_000,
+  // One rewrite of the skeleton to the owner's note, then the library lookups.
+  reshape: 180_000,
   phases: 130_000,
   // A batch now includes the judge and, for steps the index cannot serve, a
   // live YouTube search with the analysis of what it finds.
@@ -121,6 +132,58 @@ export const withSkeleton = (
   lessonCursor: 0,
   lessonsTotal: allSteps(phases).length,
 });
+
+/** How long a plan waits for its owner before it is taken as approved. */
+export const APPROVAL_TIMEOUT_MS = 20 * 60 * 1000;
+export const MAX_FEEDBACK_LENGTH = 500;
+
+/** The reviewed plan put in front of its owner: nothing runs until they answer. */
+export const awaitingApproval = (
+  job: StoredRoadmapJob,
+  now: Date,
+): StoredRoadmapJob => ({
+  ...job,
+  status: "awaiting_approval",
+  leaseUntil: 0,
+  feedback: null,
+  approval: {
+    askedAt: now.toISOString(),
+    feedbackUsed: job.approval?.feedbackUsed ?? false,
+  },
+});
+
+/** The owner said yes — or said nothing for long enough: on to the descriptions. */
+export const approved = (job: StoredRoadmapJob): StoredRoadmapJob => ({
+  ...job,
+  status: "running",
+  step: "phases",
+  feedback: null,
+});
+
+/** The owner asked for changes: the plan goes back for its one free rewrite. */
+export const withFeedback = (
+  job: StoredRoadmapJob,
+  feedback: string,
+): StoredRoadmapJob => ({
+  ...job,
+  status: "running",
+  step: "reshape",
+  feedback: feedback.trim().slice(0, MAX_FEEDBACK_LENGTH),
+  attempts: 0,
+  error: null,
+  approval: {
+    askedAt: job.approval?.askedAt ?? new Date().toISOString(),
+    feedbackUsed: true,
+  },
+});
+
+export const isApprovalOverdue = (
+  job: StoredRoadmapJob,
+  now: number,
+): boolean =>
+  job.status === "awaiting_approval" &&
+  now - new Date(job.approval?.askedAt ?? job.updatedAt).getTime() >
+    APPROVAL_TIMEOUT_MS;
 
 /** Indexes of the next phases to describe, in map order. */
 export const nextPhaseBatch = (
@@ -230,5 +293,14 @@ export const toJobView = (
     error: job.error,
     refunded: job.refunded,
     updatedAt: job.updatedAt,
+    ...(job.status === "awaiting_approval"
+      ? {
+          skeleton: (job.phases ?? []).map((phase) => ({
+            title: phase.title,
+            steps: phase.steps.map((step) => step.title),
+          })),
+          feedbackLeft: !job.approval?.feedbackUsed,
+        }
+      : {}),
   };
 };

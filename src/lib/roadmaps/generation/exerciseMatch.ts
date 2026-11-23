@@ -1,6 +1,7 @@
 import { isCatalogExerciseId, renderExerciseCatalog } from "./exerciseCatalog";
 import type { RoadmapLevel } from "./levels";
 import { completeJson } from "./openaiJson";
+import type { UsageLedger } from "./usage";
 
 interface MatchOutput {
   exerciseIds: string[];
@@ -33,6 +34,8 @@ export async function matchExercisesForStep(params: {
   description: string;
   goal: string;
   level: RoadmapLevel | string;
+  /** Where the call's token usage is recorded, when the caller keeps count. */
+  ledger?: UsageLedger;
 }): Promise<string[]> {
   const output = await completeJson<MatchOutput>({
     system: MATCH_SYSTEM,
@@ -46,6 +49,7 @@ ${renderExerciseCatalog()}`,
     schema: MATCH_SCHEMA,
     maxTokens: 4000,
     reasoningEffort: "low",
+    ledger: params.ledger,
   });
 
   return output.exerciseIds.filter(isCatalogExerciseId).slice(0, 2);

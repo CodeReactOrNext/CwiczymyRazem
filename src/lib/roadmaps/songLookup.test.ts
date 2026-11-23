@@ -2,7 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("utils/firebase/api/firebase.config", () => ({ firestore: {} }));
 
-const { normaliseSongText, pickLibrarySong } = await import("./songLookup");
+const { normaliseSongText, pickLibrarySong, shortSongTitle } = await import(
+  "./songLookup"
+);
 
 const library = [
   { id: "lw", title: "Little Wing", artist: "Jimi Hendrix", coverUrl: "c.jpg" },
@@ -77,5 +79,23 @@ describe("pickLibrarySong", () => {
     expect(
       pickLibrarySong(library, { title: "Hey Joe", artist: "Deep Purple" }),
     ).toBeNull();
+  });
+});
+
+describe("shortSongTitle", () => {
+  it("cuts the subtitle a model adds and the library does not carry", () => {
+    expect(shortSongTitle("Soothsayer (Dedicated to Aunt Suzie)")).toBe(
+      "soothsayer",
+    );
+    expect(shortSongTitle("Going Home: Theme of the Local Hero")).toBe(
+      "going home",
+    );
+    expect(shortSongTitle("Layla - Unplugged")).toBe("layla");
+  });
+
+  it("is null when there is nothing to cut, so no second lookup runs", () => {
+    expect(shortSongTitle("Little Wing")).toBeNull();
+    expect(shortSongTitle("Knockin' on Heaven's Door")).toBeNull();
+    expect(shortSongTitle("(Untitled)")).toBeNull();
   });
 });

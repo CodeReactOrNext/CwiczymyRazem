@@ -1,0 +1,155 @@
+[
+  {
+    "name": "repeat: Mark Knopfler",
+    "level": "Intermediate",
+    "minutes": 3.5,
+    "costUsd": 0.37,
+    "calls": {
+      "artistsAndDraft": 2,
+      "reviewAndRewrite": 3,
+      "descriptions": 7,
+      "describeRetries": 0
+    },
+    "artists": [
+      "Mark Knopfler",
+      "Dire Straits"
+    ],
+    "librarySongsOffered": 3,
+    "review": {
+      "codeChecksOnDraft": [],
+      "shapeIssues": 1,
+      "issues": [
+        "“Sultans full-song pacing” jumps from the opening response, first solo and outro cascade to the full song without teaching the recurring verse rhythm/lead figures or later solo material; add intermediate song-specific steps for those sections before the full-song performance.",
+        "“Bends into chord tones” and the later “Half-step and whole-step targets” both teach calibrated target-pitch bending, but the latter is framed as the prerequisite after its application; merge pitch calibration into “Bends into chord tones” or move “Half-step and whole-step targets” before it.",
+        "“Open G, capo 3” is largely a one-off setup instruction; retitle it as a repeatable open-G fretboard skill that maps movable chord fragments and melody notes around the capo, leaving tuning and capo placement as setup notes."
+      ],
+      "suggestions": [],
+      "rewritten": true,
+      "codeChecksAfter": []
+    },
+    "size": {
+      "phases": 7,
+      "steps": 38,
+      "sessions": 244,
+      "weeks": 61
+    },
+    "exercises": {
+      "stepsWithExercisePct": 65.8,
+      "supportSharePct": 36,
+      "overusedUses": 3,
+      "withSetup": 1,
+      "techniqueStepsWithNone": [],
+      "stepsWithNothingToPlay": 6
+    },
+    "songs": {
+      "linkedSteps": 8,
+      "stillWaiting": [
+        "Brothers in Arms — Dire Straits",
+        "Going Home: Theme of the Local Hero — Mark Knopfler",
+        "Brothers in Arms — Dire Straits",
+        "Going Home: Theme of the Local Hero — Mark Knopfler"
+      ],
+      "firstSongPhase": 1
+    },
+    "text": {
+      "outsideLengthBand": 0,
+      "gateProblems": [],
+      "gateWarnings": []
+    },
+    "plan": [
+      {
+        "title": "The Pick-Less Hand",
+        "steps": [
+          "Thumb, index, middle roles [physical; ex:fingerstyle_alternating_thumb; song:-; ses:6]",
+          "Thumb pulse, finger backbeat [physical; ex:fingerstyle_travis_pinch (support); song:-; ses:5]",
+          "Snapped treble attacks [physical; ex:chicken_pickin (support); song:-; ses:5]",
+          "Sultans clean tone by ear [musical; ex:tone_matching_challenge; song:-; ses:6]",
+          "Sultans opening response [musical; ex:-; song:Sultans of Swing; ses:7]",
+          "Lift a 2-beat phrase [musical; ex:transcription_lift_a_lick; song:-; ses:9]"
+        ]
+      },
+      {
+        "title": "Chords That Answer",
+        "steps": [
+          "Partial triads under melody [conceptual; ex:triad_improvisation; song:-; ses:8]",
+          "Hammer-pull chord ornaments [physical; ex:sus_ornaments_full_progression (support); song:-; ses:6]",
+          "Treble-string thirds [physical; ex:double_stops_thirds_g_major; song:-; ses:5]",
+          "Skipped-string sixths [physical; ex:double_stops_sixths_g_major; song:-; ses:5]",
+          "Bass, chord, fill cycle [physical; ex:jazz_chord_melody (support); song:-; ses:6]",
+          "Two-bar call and response [musical; ex:call_and_response_phrasing; song:-; ses:9]"
+        ]
+      },
+      {
+        "title": "The Sultans Vocabulary",
+        "steps": [
+          "D minor inside F major [conceptual; ex:scale_practice_configurable; song:-; ses:7; setup:D Dorian (notes of F major), 70 BPM]",
+          "Dm–C–B♭–A chord tones [conceptual; ex:chord_tone_improvisation; song:-; ses:6]",
+          "Bends into chord tones [physical; ex:expressive_bend_phrasing; song:-; ses:8]",
+          "Two-note chord replies [musical; ex:two_notes_per_bar_phrasing; song:-; ses:5]",
+          "Sing the target notes [musical; ex:sing_what_you_play; song:-; ses:5]",
+          "Sultans recurring verse figures [musical; ex:-; song:Sultans of Swing; ses:7]",
+          "Sultans first-solo dialogue [musical; ex:-; song:Sultans of Swing; ses:9]"
+        ]
+      },
+      {
+        "title": "Open G Resonator",
+        "steps": [
+          "Open-G chord and melody map [conceptual; ex:-; song:-; ses:6]",
+          "Drone bass under chord shifts [physical; ex:fingerstyle_alternating_thumb; song:-; ses:5]",
+          "Syncopated treble roll [physical; ex:fingerstyle_travis_pinch (support); song:-; ses:6]",
+          "Romeo intro voicing changes [musical; ex:-; song:Romeo And Juliet; ses:8]",
+          "Hear the bass movement [musical; ex:transcription_chords_by_ear (support); song:-; ses:4]"
+        ]
+      },
+      {
+        "title": "The Lyrical Lead",
+        "steps": [
+          "Vibrato on bent notes [physical; ex:vibrato_control_drill; song:-; ses:7]",
+          "Double-stop resolutions [conceptual; ex:guide_tone_voice_leading (support); song:-; ses:6]",
+          "Brothers vocal-like phrases [musical; ex:-; song:? Brothers in Arms; ses:9]",
+          "Brothers sustain by ear [musical; ex:tone_matching_challenge; song:-; ses:6]",
+          "Going Home theme fragment [musical; ex:transcription_melody_by_ear (support); song:? Going Home: Theme of the Local Hero; ses:7]"
+        ]
+      },
+      {
+        "title": "Three Full Arrangements",
+        "steps": [
+          "Romeo verse-to-chorus balance [musical; ex:-; song:Romeo And Juliet; ses:6]",
+          "Brothers long rests and entrances [musical; ex:-; song:? Brothers in Arms; ses:7]",
+          "Going Home recurring theme [musical; ex:-; song:? Going Home: Theme of the Local Hero; ses:6]",
+          "Verse-to-solo level changes [musical; ex:dynamic_crescendo; song:-; ses:6]"
+        ]
+      },
+      {
+        "title": "Sultans and the Set",
+        "steps": [
+          "Sultans later-solo bends and dyads [musical; ex:-; song:Sultans of Swing; ses:8]",
+          "Sultans outro arpeggio cascade [physical; ex:string_skipping_arpeggios (support); song:Sultans of Swing; ses:6]",
+          "Sultans full-song pacing [musical; ex:-; song:Sultans of Swing; ses:6]",
+          "Four-song set order [musical; ex:-; song:-; ses:4]",
+          "Recorded Knopfler-style set [musical; ex:-; song:-; ses:7]"
+        ]
+      }
+    ],
+    "sample": [
+      {
+        "title": "Thumb pulse, finger backbeat",
+        "summary": "Keep quarter notes under the thumb while index and middle answer on beats 2 and 4.",
+        "description": "[What it is] Keeping quarter-note bass under the thumb while the index and middle play answers on beats 2 and 4. [Why it matters] The backbeat on 2 and 4 makes melody phrases sit against a steady pulse and creates the push-pull feel in hybrid rhythm-and-lead parts. [How to practice] Use Fingerstyle — Travis Pinch Pattern as a warm-up to feel the pinch on beat 1, then play C for four bars with the thumb on beats 1 and 3 and index on beat 2 and middle on beat 4. Count aloud \"1 2 3 4\" and keep the thumb unmoving while the fingers pluck the backbeat notes.",
+        "successCriteria": "You can hold quarter-note thumb pulses on beats 1 and 3 while playing single treble-note answers on beats 2 and 4 for eight bars in a row at 80 BPM with every finger attack aligned to the counted beat."
+      },
+      {
+        "title": "Snapped treble attacks",
+        "summary": "Pull the B and high E strings outward, then release them against the frets above a steady thumb bass.",
+        "description": "[What it is] Pulling the B and high E strings outward and releasing them so they snap against the frets while the thumb maintains a steady bass. [Why it matters] The outward snap creates the sharp, percussive treble attack Knopfler uses to make melody notes cut through a clean rhythm part. [How to practice] Warm up with Hybrid Picking — Chicken Pickin' to drill the outward pull and release motion. Then play a 2-bar G–Em loop with the thumb alternating on the low E and A strings while you snap the B string on the \"&\" of 2 and the high E on the \"&\" of 4 at 75 BPM, listening for a quick high-frequency attack and immediate damping after each snap.",
+        "successCriteria": "You can snap the B string on the \"&\" of 2 and the high E on the \"&\" of 4 over a steady alternating thumb for eight consecutive 2-bar loops at 75 BPM with each snap audible and the note stopped within one beat."
+      },
+      {
+        "title": "Thumb, index, middle roles",
+        "summary": "Assign bass strings to the thumb and treble strings to index and middle across short chord-and-melody loops.",
+        "description": "[What it is] Assigning the low bass strings to the thumb and the B and high E strings to the index and middle fingers while you play short chord-and-melody loops. [Why it matters] A steady thumb bass frees the fingers to place melody and fills without losing the pulse, which is the backbone of Knopfler-style fingerstyle. [How to practice] Warm up with Fingerstyle — Alternating Thumb and feel the thumb rock between two bass strings on every beat over C, G and A minor. Then play a two-bar loop C–G with the thumb on the A and low E strings on beats 1 and 3 and index+middle filling beats 2 and 4 with single-note melodies on B and high E. Repeat at 70 BPM, keeping the thumb steady while you alter the treble notes each loop.",
+        "successCriteria": "You hold a steady alternating-thumb pulse on two bass strings while playing changing treble melodies on B and high E for four consecutive 2-bar loops at 70 BPM without the thumb missing a beat."
+      }
+    ]
+  }
+]
