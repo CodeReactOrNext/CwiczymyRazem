@@ -14,15 +14,22 @@ import { userRoadmapDetailKey } from "./useUserRoadmaps";
 
 /**
  * The map as it stood at the last save — the stored roadmap with the cached
- * sessions on its steps — so a save can tell which steps it just finished.
+ * sessions and ticked resources on its steps — so a save can tell which steps
+ * it just finished or moved forward.
  */
 const lastSavedPhases = (detail: UserRoadmapDetail): RoadmapPhase[] =>
   (detail.roadmap.phases ?? []).map((phase) => ({
     ...phase,
-    steps: (phase.steps ?? []).map((step) => ({
-      ...step,
-      sessionsCompleted: detail.stepProgress[step.id] ?? 0,
-    })),
+    steps: (phase.steps ?? []).map((step) => {
+      const resources = detail.resourceProgress?.[step.id];
+      return {
+        ...step,
+        sessionsCompleted: detail.stepProgress[step.id] ?? 0,
+        exerciseCompleted: resources?.exerciseCompleted ?? false,
+        completedLessonIds: resources?.completedLessonIds ?? [],
+        songCompleted: resources?.songCompleted ?? false,
+      };
+    }),
   }));
 
 /**
@@ -54,9 +61,11 @@ export const useOwnRoadmapPersist = (
       const finished = cached
         ? newlyCompletedSteps(lastSavedPhases(cached), phases)
         : [];
-      // Only the player's own run counts toward their daily quest.
+      // The run being saved is always the signed-in player's — their own
+      // roadmap, or somebody else's they started (a read-only viewer never gets
+      // here) — so either one counts toward their daily quest.
       const advanced =
-        !!cached && runnerUid === userId && hasAdvancedStep(lastSavedPhases(cached), phases);
+        !!cached && hasAdvancedStep(lastSavedPhases(cached), phases);
 
       const { stepProgress, resourceProgress, phaseChecks } =
         extractStepProgress(phases);

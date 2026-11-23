@@ -11,7 +11,11 @@ vi.mock("feature/aiCoach/services/userProgress.service", () => ({
 }));
 
 const firebaseAddRoadmapStepLog = vi.fn();
-vi.mock("store/hooks", () => ({ useAppDispatch: () => vi.fn() }));
+const dispatch = vi.fn();
+vi.mock("store/hooks", () => ({ useAppDispatch: () => dispatch }));
+vi.mock("feature/user/store/userSlice.questActions", () => ({
+  updateQuestProgress: (payload: unknown) => ({ quest: payload }),
+}));
 vi.mock("feature/logs/services/addRoadmapStepLog.service", () => ({
   firebaseAddRoadmapStepLog: (...args: unknown[]) =>
     firebaseAddRoadmapStepLog(...args),
@@ -78,6 +82,7 @@ beforeEach(() => {
   firebaseAddRoadmapStepLog.mockReset();
   setQueryData.mockReset();
   getQueryData.mockReset();
+  dispatch.mockReset();
 });
 
 describe("useOwnRoadmapPersist", () => {
@@ -154,5 +159,42 @@ describe("useOwnRoadmapPersist", () => {
     await result.current(finishedPhases);
 
     expect(firebaseAddRoadmapStepLog).not.toHaveBeenCalled();
+  });
+
+  it("counts a step moved forward on a roadmap the player started, not only their own", async () => {
+    getQueryData.mockReturnValue(cachedDetail(0));
+    const { result } = renderHook(() =>
+      useOwnRoadmapPersist("owner", "r1", "follower"),
+    );
+
+    await result.current(phases);
+
+    expect(dispatch).toHaveBeenCalledWith({ quest: { type: "roadmap_step" } });
+  });
+
+  it("counts a lesson ticked off on a step that stays in progress", async () => {
+    getQueryData.mockReturnValue({
+      ...cachedDetail(4),
+      resourceProgress: { s1: { exerciseCompleted: true, completedLessonIds: [] } },
+    });
+    const { result } = renderHook(() => useOwnRoadmapPersist("u1", "r1"));
+
+    await result.current(phases);
+
+    expect(dispatch).toHaveBeenCalledWith({ quest: { type: "roadmap_step" } });
+  });
+
+  it("does not count a save that moved nothing", async () => {
+    getQueryData.mockReturnValue({
+      ...cachedDetail(4),
+      resourceProgress: {
+        s1: { exerciseCompleted: true, completedLessonIds: ["yt-1"] },
+      },
+    });
+    const { result } = renderHook(() => useOwnRoadmapPersist("u1", "r1"));
+
+    await result.current(phases);
+
+    expect(dispatch).not.toHaveBeenCalled();
   });
 });

@@ -31,24 +31,40 @@ export const newlyCompletedSteps = (
 };
 
 /**
- * Whether a save moved any step forward: a session more on it, or it newly
- * done. That is "practiced a step from your roadmap" for the daily quest.
+ * Whether the step ticked off something it had not: its exercise, its song or
+ * a lesson. A step already "in progress" stays at the same session count while
+ * the player works through its lessons one by one, so the count alone misses
+ * every tick between the first and the last.
+ */
+const tickedResource = (before: RoadmapStep | undefined, after: RoadmapStep) => {
+  if (after.exerciseCompleted && !before?.exerciseCompleted) return true;
+  if (after.songCompleted && !before?.songCompleted) return true;
+  const watched = new Set(before?.completedLessonIds ?? []);
+  return (after.completedLessonIds ?? []).some((id) => !watched.has(id));
+};
+
+/**
+ * Whether a save moved any step forward: a session more on it, it newly done,
+ * or one of its resources newly ticked off. That is "practiced a step from your
+ * roadmap" for the daily quest.
  */
 export const hasAdvancedStep = (
   before: RoadmapPhase[],
   after: RoadmapPhase[],
 ): boolean => {
-  const sessionsBefore = new Map(
-    before.flatMap((phase) =>
-      phase.steps.map((step) => [step.id, step.sessionsCompleted ?? 0] as const),
-    ),
+  const stepsBefore = new Map(
+    before.flatMap((phase) => phase.steps.map((step) => [step.id, step] as const)),
   );
   return (
     newlyCompletedSteps(before, after).length > 0 ||
     after.some((phase) =>
-      phase.steps.some(
-        (step) => (step.sessionsCompleted ?? 0) > (sessionsBefore.get(step.id) ?? 0),
-      ),
+      phase.steps.some((step) => {
+        const previous = stepsBefore.get(step.id);
+        return (
+          (step.sessionsCompleted ?? 0) > (previous?.sessionsCompleted ?? 0) ||
+          tickedResource(previous, step)
+        );
+      }),
     )
   );
 };

@@ -38,16 +38,28 @@ export const PlayerRoadmapsView = () => {
   // 403s without the badge.
   const { data: board } = useSupporterRoadmap(isSupporter);
 
-  const [linkedRoadmapId] = useState<string | null>(() =>
-    typeof router.query.roadmap === "string" ? router.query.roadmap : null,
-  );
+  // `?roadmap=` from a "roadmap ready" notification; `?roadmapId=` from the
+  // map itself — the open step's URL and the way back from an exercise or song.
+  const [linkedRoadmapId] = useState<string | null>(() => {
+    const { roadmap, roadmapId } = router.query;
+    if (typeof roadmap === "string") return roadmap;
+    return typeof roadmapId === "string" ? roadmapId : null;
+  });
   const [detailOpen, setDetailOpen] = useState(() => linkedRoadmapId !== null);
 
   const handleDetail = (open: boolean) => {
     setDetailOpen(open);
     // Drop the deep link on the way back, or a refresh reopens the roadmap.
-    if (!open && router.query.roadmap) {
-      const { roadmap: _dropped, ...query } = router.query;
+    if (
+      !open &&
+      (router.query.roadmap || router.query.roadmapId || router.query.step)
+    ) {
+      const {
+        roadmap: _roadmap,
+        roadmapId: _roadmapId,
+        step: _step,
+        ...query
+      } = router.query;
       void router.replace({ pathname: router.pathname, query }, undefined, {
         shallow: true,
       });

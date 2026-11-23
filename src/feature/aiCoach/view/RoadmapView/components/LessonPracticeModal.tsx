@@ -81,8 +81,12 @@ interface LessonPlayer {
 
 interface LessonPracticeModalProps {
   lesson: YouTubeLessonResult;
-  /** Called after the elapsed time (if any) has been logged — the caller marks the lesson watched and closes this modal. */
-  onFinish: () => void;
+  /**
+   * Called after the elapsed time (if any) has been logged — the caller marks
+   * the lesson watched and closes this modal. `loggedMinutes` is 0 when the
+   * stopwatch never ran and nothing was logged.
+   */
+  onFinish: (loggedMinutes: number) => void;
   onClose: () => void;
 }
 
@@ -209,7 +213,7 @@ const LessonPracticeModal = ({
     const time = timer.getTime();
     if (time < 1000) {
       markFinished();
-      onFinish();
+      onFinish(0);
       return;
     }
 
@@ -254,7 +258,7 @@ const LessonPracticeModal = ({
       );
       toast.success(t("lesson_modal.logged", { minutes }));
       markFinished();
-      onFinish();
+      onFinish(minutes);
     } catch {
       toast.error(t("lesson_modal.log_failed"));
     } finally {

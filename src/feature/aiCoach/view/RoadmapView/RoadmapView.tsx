@@ -1,6 +1,7 @@
 import { Button, PRESSABLE } from "assets/components/ui/button";
 import { Chip } from "assets/components/ui/chip";
 import { cn } from "assets/lib/utils";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import { Interpolate } from "lib/i18n/Interpolate";
 import {
@@ -24,6 +25,7 @@ import React, {
 } from "react";
 import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
+import { useAppDispatch } from "store/hooks";
 
 import { isRewardableRoadmap } from "../../data/roadmapRewards";
 import { firebaseUpdateRoadmap } from "../../services/roadmap.service";
@@ -248,6 +250,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
 }) => {
   const { t } = useTranslation("ai_coach");
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const persist = useCallback(
     async (phases: RoadmapPhase[]) => {
@@ -577,9 +580,17 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     );
   };
 
+  /**
+   * Back to this page on this step after the exercise or song page — the page
+   * the map is on, not always /ai-coach: a player's roadmap lives on
+   * /my-roadmaps, and /ai-coach does not know its id.
+   */
+  const stepReturnPath = () =>
+    `${router.pathname}?roadmapId=${roadmap.id}${activeStep ? `&step=${activeStep.step.id}` : ""}`;
+
   /** The song's own practice page: tab, backing track, timed practice. */
   const handleOpenSong = (songId: string) => {
-    const returnTo = `/ai-coach?roadmapId=${roadmap.id}${activeStep ? `&step=${activeStep.step.id}` : ""}`;
+    const returnTo = stepReturnPath();
     void router.push(
       `/songs/practice/${songId}?returnTo=${encodeURIComponent(returnTo)}`,
     );
@@ -598,16 +609,18 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
     });
   };
 
-  // The practice window forces a lesson to "watched" on finish (never toggles it back off).
+  // The practice window forces a lesson to "watched" on finish (never toggles
+  // it back off). True when that is news — the save then counts the step as
+  // practiced for the daily quest on its own.
   const markLessonWatched = (
     phaseId: string,
     stepId: string,
     videoId: string,
-  ) => {
+  ): boolean => {
     const step = phasesRef.current
       .find((p) => p.id === phaseId)
       ?.steps.find((s) => s.id === stepId);
-    if (!step || step.completedLessonIds?.includes(videoId)) return;
+    if (!step || step.completedLessonIds?.includes(videoId)) return false;
     const lessons = lessonsCache[stepId] ?? [];
     saveStep(phaseId, stepId, (s) =>
       withResourceStatus(
@@ -618,6 +631,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
         lessons,
       ),
     );
+    return true;
   };
 
   const handleSetStatus = (status: StepStatus) => {
@@ -629,7 +643,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
   };
 
   const handleOpenExercise = (exerciseId: string) => {
-    const returnTo = `/ai-coach?roadmapId=${roadmap.id}${activeStep ? `&step=${activeStep.step.id}` : ""}`;
+    const returnTo = stepReturnPath();
     void router.push(
       `/profile/skills?exerciseId=${exerciseId}&returnTo=${encodeURIComponent(returnTo)}`,
     );
@@ -1672,12 +1686,17 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({
       {practiceLesson && (
         <LessonPracticeModal
           lesson={practiceLesson.lesson}
-          onFinish={() => {
-            markLessonWatched(
+          onFinish={(loggedMinutes) => {
+            const ticked = markLessonWatched(
               practiceLesson.phaseId,
               practiceLesson.stepId,
               practiceLesson.lesson.videoId,
             );
+            // A logged session on a lesson watched before is still a step
+            // practiced today; the save above only counts a new tick.
+            if (loggedMinutes > 0 && !ticked && !readOnly && !adminMode) {
+              dispatch(updateQuestProgress({ type: "roadmap_step" }));
+            }
             setPracticeLesson(null);
           }}
           onClose={() => setPracticeLesson(null)}

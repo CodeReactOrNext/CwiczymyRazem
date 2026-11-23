@@ -7,6 +7,13 @@ import type {
 } from "feature/supporterPanel/types/userRoadmaps.types";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+// jsdom ships no ResizeObserver, which the map's road measures its width with.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as unknown as typeof ResizeObserver;
+
 const summary: UserRoadmapSummary = {
   rowId: "u1_gen-1",
   id: "gen-1",

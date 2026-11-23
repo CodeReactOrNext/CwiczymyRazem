@@ -73,6 +73,7 @@ import {
   User,
   Users,
 } from "lucide-react";
+import { useRouter } from "next/router";
 import { useCallback, useMemo, useState } from "react";
 import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
@@ -258,6 +259,12 @@ const RoadmapDetail = ({
   variant: UserRoadmapsTabVariant;
 }) => {
   const { t } = useTranslation(["supporter", "ai_coach"]);
+  const router = useRouter();
+  // The step the map had open — a refresh, or the way back from the step's
+  // exercise or song, lands on it again. Read once: the map owns it after.
+  const [initialStepId] = useState(() =>
+    typeof router.query.step === "string" ? router.query.step : undefined,
+  );
   const isPage = variant === "page";
   const isOwn = viewerUid != null && viewerUid === summary.userId;
   const [startedHere, setStartedHere] = useState(false);
@@ -423,6 +430,7 @@ const RoadmapDetail = ({
               <RoadmapView
                 key={`${summary.rowId}-${runnerUid}`}
                 roadmap={roadmap}
+                initialStepId={initialStepId}
                 onPersist={canWrite ? ownPersist : doNotPersist}
                 readOnly={!canWrite}
               />

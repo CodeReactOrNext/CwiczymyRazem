@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { RoadmapPhase } from "../types/roadmap.types";
-import { newlyCompletedSteps } from "./completedSteps";
+import { hasAdvancedStep, newlyCompletedSteps } from "./completedSteps";
 
 const phases = (sessions: Record<string, number>): RoadmapPhase[] => [
   {
@@ -58,5 +58,57 @@ describe("newlyCompletedSteps", () => {
     expect(newlyCompletedSteps(phases({ s1: 2 }), phases({ s1: 0 }))).toEqual(
       [],
     );
+  });
+});
+
+describe("hasAdvancedStep", () => {
+  const withStep = (
+    base: RoadmapPhase[],
+    stepId: string,
+    patch: Partial<RoadmapPhase["steps"][number]>,
+  ): RoadmapPhase[] =>
+    base.map((phase) => ({
+      ...phase,
+      steps: phase.steps.map((step) =>
+        step.id === stepId ? { ...step, ...patch } : step,
+      ),
+    }));
+
+  it("counts a session more on a step", () => {
+    expect(hasAdvancedStep(phases({ s1: 0 }), phases({ s1: 1 }))).toBe(true);
+  });
+
+  it("counts a lesson ticked off on a step already in progress", () => {
+    const before = withStep(phases({ s1: 1 }), "s1", {
+      completedLessonIds: ["yt-1"],
+    });
+    const after = withStep(phases({ s1: 1 }), "s1", {
+      completedLessonIds: ["yt-1", "yt-2"],
+    });
+    expect(hasAdvancedStep(before, after)).toBe(true);
+  });
+
+  it("counts the step's exercise or song ticked off", () => {
+    expect(
+      hasAdvancedStep(
+        phases({ s1: 1 }),
+        withStep(phases({ s1: 1 }), "s1", { exerciseCompleted: true }),
+      ),
+    ).toBe(true);
+    expect(
+      hasAdvancedStep(
+        phases({ s1: 1 }),
+        withStep(phases({ s1: 1 }), "s1", { songCompleted: true }),
+      ),
+    ).toBe(true);
+  });
+
+  it("does not count unticking or an unchanged map", () => {
+    const ticked = withStep(phases({ s1: 1 }), "s1", {
+      exerciseCompleted: true,
+      completedLessonIds: ["yt-1"],
+    });
+    expect(hasAdvancedStep(ticked, phases({ s1: 0 }))).toBe(false);
+    expect(hasAdvancedStep(ticked, ticked)).toBe(false);
   });
 });
