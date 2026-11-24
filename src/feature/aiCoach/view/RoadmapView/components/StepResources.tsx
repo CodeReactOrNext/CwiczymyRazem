@@ -87,9 +87,19 @@ export const StepResources: React.FC<StepResourcesProps> = ({
   onPracticeLesson,
 }) => {
   const { t } = useTranslation(["ai_coach", "common"]);
+  // From the built-in library, or — on a roadmap an assistant wrote — an
+  // exercise written for the step, whose title and level travel on the step.
   const exercise =
     step.suggestedExerciseId && !step.noExercise
-      ? exercisesAgregat.find((e) => e.id === step.suggestedExerciseId)
+      ? (exercisesAgregat.find((e) => e.id === step.suggestedExerciseId) ??
+        (step.exerciseRef
+          ? {
+              id: step.suggestedExerciseId,
+              title: step.exerciseRef.title,
+              difficulty: step.exerciseRef.difficulty,
+              category: step.exerciseRef.category,
+            }
+          : undefined))
       : undefined;
   const exerciseDone = !!step.exerciseCompleted;
   const song = step.suggestedSong;

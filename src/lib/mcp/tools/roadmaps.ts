@@ -8,6 +8,11 @@ import type {
 } from "feature/aiCoach/types/roadmap.types";
 import { PHASE_CHECK_QUESTIONS } from "feature/aiCoach/utils/phaseCheck";
 import { estimateRoadmapWeeks } from "feature/aiCoach/utils/roadmapEstimate";
+import {
+  communityDocId,
+  communityExerciseId,
+} from "feature/communityExercises/utils/communityToExercise";
+import { isReadyToPublish } from "feature/communityExercises/utils/isReadyToPublish";
 import { findCatalogEntry } from "lib/roadmaps/generation/exerciseCatalog";
 import {
   ROADMAP_LEVELS,
@@ -18,6 +23,7 @@ import { finishSkeleton } from "lib/roadmaps/generation/structure";
 import { IN_APP_ROADMAP_GENERATION } from "lib/roadmaps/generationSwitch";
 import { phaseFingerprint } from "lib/roadmaps/phaseQuizzes";
 import { findLibrarySong } from "lib/roadmaps/songLookup";
+import { isRoadmapWritten, visibilityOf } from "lib/roadmaps/visibility";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
@@ -29,7 +35,7 @@ import {
   ROADMAP_SESSIONS,
   ROADMAP_STEPS_PER_WRITE,
 } from "../content/roadmapGuide";
-import { exercisesById } from "../data";
+import { exercisesById, readOwnExercise } from "../data";
 import { firestore } from "../db";
 import {
   LESSON_LEVELS,
@@ -55,6 +61,9 @@ import {
   checkSchoolTitle,
   checkStepText,
   checkSyllabus,
+  checkTrapShare,
+  type OwnExerciseRef,
+  type PlanCheck,
   type PlanPhaseInput,
   REVIEW_CRITERIA,
   REVIEW_CRITERION_IDS,
@@ -97,6 +106,19 @@ const phasesInput = z
   .max(STRUCTURE_LIMITS.phases.max);
 
 const levelInput = z.enum(ROADMAP_LEVELS);
+const visibilityInput = z.enum(["public", "private"]);
+
+/**
+ * Where a roadmap stands with the Players board: what its owner chose, and
+ * whether other players can see it yet — a public roadmap goes up only once
+ * every step has its text.
+ */
+const boardView = (roadmap: Roadmap) => ({
+  visibility: visibilityOf(roadmap),
+  onPlayersBoard:
+    visibilityOf(roadmap) === "public" &&
+    (roadmap.source !== "mcp" || isRoadmapWritten(roadmap)),
+});
 
 const roadmapUrl = (id: string) => appLink(`/ai-coach?roadmapId=${id}`);
 
@@ -108,7 +130,13 @@ const clean = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
 /** A step as the tools show it: what it opens, by name. */
 const stepView = (step: RoadmapStep) => {
-  const exercise = findCatalogEntry(step.suggestedExerciseId);
+  const library = findCatalogEntry(step.suggestedExerciseId);
+  // A library exercise, or one written for the roadmap.
+  const exercise = library
+    ? { id: library.id, title: library.title }
+    : step.suggestedExerciseId && step.exerciseRef
+      ? { id: step.suggestedExerciseId, title: step.exerciseRef.title }
+      : undefined;
   const song = step.suggestedSong ?? step.songRequest;
   return {
     stepId: step.id,
@@ -119,6 +147,7 @@ const stepView = (step: RoadmapStep) => {
       exercise: exercise.title,
       exerciseId: exercise.id,
       exerciseFit: step.exerciseRole ?? "direct",
+      ...(!library && { writtenForTheRoadmap: true }),
     }),
     ...(song && {
       song: `${song.title} — ${song.artist}`,
@@ -180,6 +209,98 @@ const withoutText = (roadmap: Roadmap) =>
 
 export function registerRoadmapTools(server: McpServer, context: McpContext) {
   const { uid } = context;
+
+  /**
+   * The player's own exercises a plan names — whatever id is on a step that
+   * the library does not have. Keyed by the id as the plan wrote it (with or
+   * without the `community-` prefix), so the check finds it either way.
+   */
+  async function readOwnExercises(phases: PlanPhaseInput[]) {
+    const ids = [
+      ...new Set(
+        phases
+          .flatMap((phase) => phase.steps)
+          .map((step) => step.exerciseId)
+          .filter((id): id is string => !!id && !findCatalogEntry(id)),
+      ),
+    ];
+    const own = new Map<string, OwnExerciseRef>();
+    await Promise.all(
+      ids.map(async (id) => {
+        // An id with a "/" in it is no document id; the check reports it.
+        if (id.includes("/")) return;
+        const found = await readOwnExercise(uid, id);
+        if (!found) return;
+        own.set(id, {
+          id: communityExerciseId(found.id),
+          title: found.data.title,
+          difficulty: found.data.difficulty,
+          category: found.data.category,
+          ...(found.data.metronomeSpeed?.max
+            ? { bpmMax: found.data.metronomeSpeed.max }
+            : {}),
+        });
+      }),
+    );
+    return own;
+  }
+
+  /** The steps the generator's pipeline left bare get the player's own exercise put on. */
+  const withOwnExercises = (
+    phases: RoadmapPhase[],
+    own: PlanCheck["own"],
+  ): RoadmapPhase[] =>
+    own.size === 0
+      ? phases
+      : phases.map((phase) => ({
+          ...phase,
+          steps: phase.steps.map((step): RoadmapStep => {
+            const mine = own.get(step.title.trim().toLowerCase());
+            if (!mine) return step;
+            const { id, ...ref } = mine.exercise;
+            return {
+              ...step,
+              suggestedExerciseId: id,
+              exerciseRef: ref,
+              ...(mine.fit === "support"
+                ? { exerciseRole: "support" as const }
+                : {}),
+            };
+          }),
+        }));
+
+  /**
+   * The player's own exercises on a roadmap's steps that are still private —
+   * a public roadmap takes them public with it, into the community exercises
+   * like any other, so every player who starts the roadmap can open them.
+   * `problems` lists the ones that cannot be published as they are.
+   */
+  async function privateExercisesOf(phases: RoadmapPhase[]) {
+    const ids = [
+      ...new Set(
+        phases
+          .flatMap((phase) => phase.steps)
+          .map((step) => communityDocId(step.suggestedExerciseId ?? ""))
+          .filter((id): id is string => !!id),
+      ),
+    ];
+    const found = (
+      await Promise.all(ids.map((id) => readOwnExercise(uid, id)))
+    ).filter(
+      (exercise): exercise is NonNullable<typeof exercise> =>
+        !!exercise && !exercise.data.isPublic,
+    );
+    return {
+      refs: found.map((exercise) => exercise.ref),
+      titles: found.map((exercise) => exercise.data.title),
+      problems: found
+        .filter((exercise) => !isReadyToPublish(exercise.data))
+        .map(
+          (exercise) =>
+            `"${exercise.data.title}" needs a description and at least one instruction before it can go public — riffquest_update_exercise.`,
+        ),
+    };
+  }
 
   /** The library songs a plan names by id, in one read. */
   async function readSongs(phases: PlanPhaseInput[]) {
@@ -266,10 +387,15 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
     },
     ({ level, phases }) =>
       runTool("riffquest_check_roadmap_plan", async () => {
+        const [songs, ownExercises] = await Promise.all([
+          readSongs(phases),
+          readOwnExercises(phases),
+        ]);
         const check = checkRoadmapPlan(
           phases,
           level as RoadmapLevel,
-          await readSongs(phases),
+          songs,
+          ownExercises,
         );
         return jsonResult({
           ok: check.problems.length === 0,
@@ -286,12 +412,13 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
     "riffquest_create_roadmap",
     {
       title: "Save a roadmap plan",
-      description: `Saves a plan that passes riffquest_check_roadmap_plan as a private roadmap, with its syllabus (the subject's topics and the steps that teach each) and its review (every criterion of the roadmap guide answered). Returns a stepId per step; the steps have no text yet. Up to ${MAX_MCP_ROADMAPS} per player.`,
+      description: `Saves a plan that passes riffquest_check_roadmap_plan as a roadmap — public (on the Players board once every step is written) or private — with its syllabus (the subject's topics and the steps that teach each) and its review (every criterion of the roadmap guide answered). Returns a stepId per step; the steps have no text yet. Up to ${MAX_MCP_ROADMAPS} per player.`,
       inputSchema: strictInput({
         title: z.string().min(3).max(80),
         goal: z.string().min(5).max(500),
         level: levelInput,
         phases: phasesInput,
+        visibility: visibilityInput.describe("The player's choice"),
         scope: z
           .array(z.string().min(3).max(200))
           .max(ROADMAP_MAX_SCOPE_NOTES)
@@ -322,10 +449,28 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
       }),
       annotations: WRITE_TOOL_ANNOTATIONS,
     },
-    ({ title, goal, level, phases, scope, syllabus, review, playerApproved }) =>
+    ({
+      title,
+      goal,
+      level,
+      phases,
+      visibility,
+      scope,
+      syllabus,
+      review,
+      playerApproved,
+    }) =>
       runTool("riffquest_create_roadmap", async () => {
-        const songs = await readSongs(phases);
-        const check = checkRoadmapPlan(phases, level as RoadmapLevel, songs);
+        const [songs, ownExercises] = await Promise.all([
+          readSongs(phases),
+          readOwnExercises(phases),
+        ]);
+        const check = checkRoadmapPlan(
+          phases,
+          level as RoadmapLevel,
+          songs,
+          ownExercises,
+        );
         if (check.problems.length) {
           return errorResult(
             `Not saved — the plan has problems:\n${check.problems.map((problem) => `- ${problem}`).join("\n")}`,
@@ -378,6 +523,18 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
           },
         );
 
+        const written = withOwnExercises(finished.phases, check.own);
+        // A public roadmap takes the exercises written for it public too.
+        const toPublish =
+          visibility === "public"
+            ? await privateExercisesOf(written)
+            : { refs: [], titles: [], problems: [] };
+        if (toPublish.problems.length) {
+          return errorResult(
+            `Not saved — a public roadmap publishes its exercises, and these are not ready:\n${toPublish.problems.map((problem) => `- ${problem}`).join("\n")}`,
+          );
+        }
+
         const left = await consumeWriteQuota(context, "write");
         const now = new Date().toISOString();
         const roadmap: Roadmap = {
@@ -388,8 +545,8 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
           level,
           createdAt: now,
           updatedAt: now,
-          phases: finished.phases,
-          visibility: "private",
+          phases: written,
+          visibility,
           source: "mcp",
           ...(constraints.length ? { constraints } : {}),
           syllabus: syllabus.map((entry) => ({
@@ -406,6 +563,9 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
           .collection(ROADMAPS)
           .doc(roadmap.id)
           .set(clean(roadmap));
+        await Promise.all(
+          toPublish.refs.map((ref) => ref.update({ isPublic: true })),
+        );
 
         return jsonResult({
           ...left,
@@ -415,6 +575,10 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
             steps: phase.steps.map(stepView),
           })),
           stepsWithoutText: withoutText(roadmap).length,
+          ...boardView(roadmap),
+          ...(toPublish.titles.length && {
+            exercisesPublished: toPublish.titles,
+          }),
           notes: check.notes,
           url: roadmapUrl(roadmap.id),
         });
@@ -502,11 +666,23 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
                 text,
                 { first: step.id === firstId, last: step.id === lastId },
                 exercisesById.get(step.suggestedExerciseId ?? "")
-                  ?.metronomeSpeed?.max,
+                  ?.metronomeSpeed?.max ?? step.exerciseRef?.bpmMax,
               ),
             );
             texts.set(step.id, text);
           }
+          // A trap on every step of a phase is a template: counted over the
+          // phase as it will stand, the texts already saved included.
+          roadmap.phases.forEach((phase) => {
+            if (!phase.steps.some((step) => texts.has(step.id))) return;
+            const refused = checkTrapShare(
+              phase.title,
+              phase.steps.map(
+                (step) => texts.get(step.id)?.description ?? step.description,
+              ),
+            );
+            if (refused) problems.push(refused);
+          });
           if (problems.length) return { problems };
           return {
             roadmap: {
@@ -576,6 +752,7 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
           ...left,
           saved: steps.length,
           stepsWithoutText: missing,
+          ...boardView(saved),
           // A school has a lesson on nearly every step.
           writtenStepsWithoutLesson: saved.phases
             .flatMap((phase) => phase.steps)
@@ -590,6 +767,62 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
           ...(missing.length === 0 && {
             estimatedWeeks: estimateRoadmapWeeks(saved.phases),
           }),
+          url: roadmapUrl(roadmapId),
+        });
+      }),
+  );
+
+  server.registerTool(
+    "riffquest_set_roadmap_visibility",
+    {
+      title: "Make a roadmap public or private",
+      description:
+        "Puts one of the player's roadmaps on the Players board for every supporter to follow (public), or takes it off (private). A public one appears there once every step is written.",
+      inputSchema: strictInput({
+        roadmapId: docId(),
+        visibility: visibilityInput,
+      }),
+      annotations: IDEMPOTENT_WRITE_TOOL_ANNOTATIONS,
+    },
+    ({ roadmapId, visibility }) =>
+      runTool("riffquest_set_roadmap_visibility", async () => {
+        const roadmap = await readOwn(roadmapId);
+        if (visibilityOf(roadmap) === visibility) {
+          return jsonResult({
+            roadmapId,
+            unchanged: true,
+            ...boardView(roadmap),
+            url: roadmapUrl(roadmapId),
+          });
+        }
+        // Going public takes the roadmap's own exercises public with it;
+        // going private leaves them — other players may be using them.
+        const toPublish =
+          visibility === "public"
+            ? await privateExercisesOf(roadmap.phases)
+            : { refs: [], titles: [], problems: [] };
+        if (toPublish.problems.length) {
+          return errorResult(
+            `Not changed — a public roadmap publishes its exercises, and these are not ready:\n${toPublish.problems.map((problem) => `- ${problem}`).join("\n")}`,
+          );
+        }
+        const left = await consumeWriteQuota(context, "write");
+        const updatedAt = new Date().toISOString();
+        await firestore
+          .collection(ROADMAPS)
+          .doc(roadmapId)
+          .update({ visibility, updatedAt });
+        await Promise.all(
+          toPublish.refs.map((ref) => ref.update({ isPublic: true })),
+        );
+        return jsonResult({
+          ...left,
+          roadmapId,
+          ...(toPublish.titles.length && {
+            exercisesPublished: toPublish.titles,
+          }),
+          ...boardView({ ...roadmap, visibility }),
+          stepsWithoutText: withoutText(roadmap).length,
           url: roadmapUrl(roadmapId),
         });
       }),
@@ -742,6 +975,7 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
                   stepsWithoutText: steps.filter((step) => !hasText(step))
                     .length,
                   writtenByAssistant: roadmap.source === "mcp",
+                  ...boardView(roadmap),
                   updatedAt: roadmap.updatedAt,
                   url: roadmapUrl(roadmap.id),
                 };
@@ -781,6 +1015,7 @@ export function registerRoadmapTools(server: McpServer, context: McpContext) {
           goal: roadmap.goal,
           level: roadmap.level,
           writtenByAssistant: roadmap.source === "mcp",
+          ...boardView(roadmap),
           ...(roadmap.constraints?.length && { scope: roadmap.constraints }),
           ...(roadmap.syllabus?.length && { syllabus: roadmap.syllabus }),
           checkpointsToWrite: assistantMayEdit(roadmap)

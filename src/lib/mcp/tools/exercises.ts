@@ -421,7 +421,7 @@ export function registerExerciseTools(server: McpServer, context: McpContext) {
     {
       title: "Create an exercise from a tab",
       description:
-        "Saves a new exercise with a tab as the player's private exercise (publishing is done in the app). The tab is checked first and nothing is saved if it has errors. Returns the tab as text (asciiTab) and a link to play it.",
+        "Saves a new exercise with a tab as the player's private exercise (it goes public in the app, or with a public roadmap that uses it). The tab is checked first and nothing is saved if it has errors. Returns the tab as text (asciiTab) and a link to play it.",
       inputSchema: strictInput(exerciseFields),
       annotations: WRITE_TOOL_ANNOTATIONS,
     },

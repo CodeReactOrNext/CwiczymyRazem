@@ -77,6 +77,7 @@ describe("riff.quest MCP server", () => {
         "riffquest_search_wiki",
         "riffquest_set_calendar_days",
         "riffquest_set_exercise_goal",
+        "riffquest_set_roadmap_visibility",
         "riffquest_update_exercise",
         "riffquest_update_exercise_goal",
         "riffquest_update_practice_plan",
@@ -123,6 +124,7 @@ describe("riff.quest MCP server", () => {
       "riffquest_log_practice",
       "riffquest_set_calendar_days",
       "riffquest_set_exercise_goal",
+      "riffquest_set_roadmap_visibility",
       "riffquest_update_exercise",
       "riffquest_update_exercise_goal",
       "riffquest_update_practice_plan",
@@ -140,6 +142,7 @@ describe("riff.quest MCP server", () => {
       "riffquest_add_song_to_list",
       "riffquest_set_calendar_days",
       "riffquest_set_exercise_goal",
+      "riffquest_set_roadmap_visibility",
       "riffquest_update_exercise",
       "riffquest_update_exercise_goal",
       "riffquest_update_practice_plan",
@@ -158,10 +161,11 @@ describe("riff.quest MCP server", () => {
   // two of them, the check that only reads and the save that writes; the save
   // also takes the review, and a checkpoint its six questions), then from
   // 49.5k for the syllabus on the save and the tempo ceiling in the exercise
-  // list (~0.4k).
+  // list (~0.4k), then from 50k for choosing and changing a roadmap's
+  // visibility (~0.9k).
   it("keeps the tool list within its size budget", async () => {
     const { tools } = await client.listTools();
-    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(50_000);
+    expect(JSON.stringify({ tools }).length).toBeLessThanOrEqual(51_000);
   });
 
   it("refuses arguments a tool doesn't take", async () => {

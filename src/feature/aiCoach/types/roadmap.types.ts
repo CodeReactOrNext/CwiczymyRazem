@@ -39,6 +39,19 @@ export interface RoadmapStep {
    * claims it does. Absent means the exercise trains the step directly.
    */
   exerciseRole?: "direct" | "support";
+  /**
+   * The step's exercise when it is not from the built-in library: one a player
+   * (through their assistant) wrote, kept in `communityExercises`. The id on
+   * the step is then `community-<docId>`, and what the step's kit shows is
+   * carried here so the map needs no lookup.
+   */
+  exerciseRef?: {
+    title: string;
+    difficulty: string;
+    category: string;
+    /** The top of its tempo range, when it has one. */
+    bpmMax?: number;
+  };
   /** Why this exercise, in the planner's words — context for the description. */
   exerciseWhy?: string;
   /**

@@ -73,7 +73,7 @@ per server.
 | Calendar (read/write) | `riffquest_get_planned_days`, `riffquest_set_calendar_days` — writes `users/{uid}/settings/calendar` (owner-only, no rules change). A written day replaces its slots, leaves its repeat group, and a slot playing what the day already had keeps its id and tick |
 | Practice log (write) | `riffquest_log_practice` |
 | Own exercises | `riffquest_get_tab_format`, `riffquest_validate_tablature`, `riffquest_preview_tab`, `riffquest_get_exercise_tablature`, `riffquest_get_my_exercises`, `riffquest_create_exercise`, `riffquest_update_exercise` |
-| Roadmaps | `riffquest_get_roadmap_guide`, `riffquest_check_roadmap_plan`, `riffquest_create_roadmap`, `riffquest_write_roadmap_steps`, `riffquest_find_lessons`, `riffquest_write_roadmap_checkpoint`, `riffquest_get_roadmap` — see [Roadmaps](#roadmaps) |
+| Roadmaps | `riffquest_get_roadmap_guide`, `riffquest_check_roadmap_plan`, `riffquest_create_roadmap`, `riffquest_write_roadmap_steps`, `riffquest_find_lessons`, `riffquest_write_roadmap_checkpoint`, `riffquest_set_roadmap_visibility`, `riffquest_get_roadmap` — see [Roadmaps](#roadmaps) |
 
 Prompts: `weekly_review`, `plan_next_session`, `log_session`, `write_exercise`,
 `build_roadmap`.
@@ -181,8 +181,10 @@ level, and the review has a `general` criterion.
    `visibility: "private"`, `source: "mcp"` and the player's `wishes`
    (`constraints`), steps without text. At most 12 such roadmaps a player.
 4. `riffquest_write_roadmap_steps` — the text of up to 8 steps a call, each
-   checked by `checkStepText` (the three sections; 150–260 words, refused
-   under 120 or over 340; `[Before you start]` in the school's first step and
+   checked by `checkStepText` (the three sections; 220–300 words, refused
+   under 170 or over 380; `[What it is]` at least 45 words and
+   `[Why it matters]` at least 50, so a step explains and does not only
+   instruct; `[Common trap]` on at most one step in three of a phase; `[Before you start]` in the school's first step and
    `[What you can do now]` in its last; no filler; a `direct` exercise named
    by its title; no tempo above that exercise's range; criteria that are a
    test with a number in it). The answer lists the written steps still without
@@ -214,8 +216,25 @@ planning, and when each question is worth asking), rendered from
 `questionBank.ts`.
 
 A whole roadmap — plan, texts, checkpoints — is about a dozen writes of the
-day's 35. What such a roadmap does not have: a place on the Players board
-(always private — nothing we wrote or reviewed). A checkpoint the assistant
+day's 35. **Exercises written for a school** (2026-11-24). Where the library has
+nothing for a step, the assistant writes the exercise with
+`riffquest_create_exercise` and puts its id on the step. The plan check takes
+the player's own exercises (`readOwnExercises`), holds them to the level and
+the two-step cap like library ones, and the step stores `community-<docId>`
+plus `exerciseRef` (title, difficulty, category, `bpmMax`) so the map shows
+it without a lookup. The app opens it through `/profile/skills?exerciseId=`
+like a library exercise (`SkillDashboard` resolves the `community-` id). A
+public roadmap **publishes** these exercises (`isPublic: true`) into the
+community exercises, like any other — refused while one lacks a description
+or instructions; going private again leaves them public.
+
+**Public or private** is the player's choice (2026-11-24): `visibility` on
+`riffquest_create_roadmap`, changed either way later with
+`riffquest_set_roadmap_visibility` (any roadmap of theirs). A public roadmap
+from an assistant is on the Players board only once every step has its text
+(`isRoadmapVisibleTo` in `lib/roadmaps/visibility.ts`; the tools answer
+`onPlayersBoard`), so a half-written school never shows there. Nothing of ours
+reviews what goes public beyond the code checks every text passes. A checkpoint the assistant
 did not write falls back to our model the first time the player sits it, as
 for every roadmap.
 

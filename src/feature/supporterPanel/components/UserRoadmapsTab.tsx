@@ -16,6 +16,7 @@ import type { PhaseCheckResult } from "feature/aiCoach/types/phaseCheck.types";
 import type {
   Roadmap,
   RoadmapPhase,
+  RoadmapVisibility,
 } from "feature/aiCoach/types/roadmap.types";
 import { withPhaseChecks } from "feature/aiCoach/utils/phaseCheck";
 import { stripProgress } from "feature/aiCoach/utils/stripProgress";
@@ -55,6 +56,7 @@ import { ROADMAP_LEVELS } from "lib/roadmaps/generation/levels";
 import { IN_APP_ROADMAP_GENERATION } from "lib/roadmaps/generationSwitch";
 import { Lock, Map as MapIcon, Play, Sparkles, User } from "lucide-react";
 import { useRouter } from "next/router";
+import posthog from "posthog-js";
 import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
@@ -194,6 +196,30 @@ const RoadmapDetail = ({
   const canWrite = isOwn || isFollowing;
   const queryClient = useQueryClient();
 
+  // Public or private is the owner's to change at any time — the same choice
+  // their assistant makes when it saves the roadmap. Shown as picked straight
+  // away, and put back if the write does not go through.
+  const [visibility, setVisibility] = useState<RoadmapVisibility>(
+    summary.visibility,
+  );
+  const [savingVisibility, setSavingVisibility] = useState(false);
+  const changeVisibility = async (next: RoadmapVisibility) => {
+    if (next === visibility || savingVisibility) return;
+    const previous = visibility;
+    setVisibility(next);
+    setSavingVisibility(true);
+    try {
+      await firebaseUpdateRoadmap(summary.id, { visibility: next });
+      posthog.capture("roadmap_visibility_changed", { to: next });
+      void queryClient.invalidateQueries({ queryKey: USER_ROADMAPS_KEY });
+    } catch {
+      setVisibility(previous);
+      toast.error(t("ai_coach:toasts.save_failed"));
+    } finally {
+      setSavingVisibility(false);
+    }
+  };
+
   const startRoadmap = async () => {
     if (!viewerUid || starting) return;
     setStarting(true);
@@ -276,7 +302,7 @@ const RoadmapDetail = ({
               t(`ai_coach:levels.${summary.level}`, summary.level),
             t("ai_coach:n_phases", { count: summary.phaseCount }),
             t("ai_coach:n_steps", { count: summary.stepCount }),
-            summary.visibility === "private"
+            visibility === "private"
               ? t("panel.generate.visibility.private.label")
               : null,
           ]
@@ -291,6 +317,18 @@ const RoadmapDetail = ({
           <div className='flex flex-wrap items-center gap-2'>
             {startButton}
             {refineToggle}
+            {isOwn && (
+              <SegmentedControl
+                label={t("panel.generate.who_sees")}
+                options={(["public", "private"] as const).map((value) => ({
+                  value,
+                  label: t(`panel.generate.visibility.${value}.label`),
+                }))}
+                selected={[visibility]}
+                onSelect={(value) => void changeVisibility(value)}
+                isLoading={savingVisibility}
+              />
+            )}
             {backButton}
           </div>
         }

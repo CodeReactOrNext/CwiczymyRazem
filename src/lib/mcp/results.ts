@@ -206,6 +206,7 @@ const WRITE_TOOLS = new Set([
   "riffquest_create_roadmap",
   "riffquest_write_roadmap_steps",
   "riffquest_write_roadmap_checkpoint",
+  "riffquest_set_roadmap_visibility",
 ]);
 
 export async function runTool(

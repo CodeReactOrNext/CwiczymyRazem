@@ -8,12 +8,15 @@ import {
   checkSchoolTitle,
   checkStepText,
   checkSyllabus,
+  checkTrapShare,
   type PlanPhaseInput,
   type PlanStepInput,
   REVIEW_CRITERIA,
   SCHOOL_FRAME,
+  SCHOOL_SECTIONS,
   SCHOOL_SIZE,
   SCHOOL_TEXT,
+  sectionWords,
 } from "./roadmapPlan";
 import { SCHOOL_TITLES } from "./roadmapPlan.fixtures";
 
@@ -238,7 +241,8 @@ describe("checkStepText", () => {
       ...good,
       description: `[What it is] ${words(20)}. [Why it matters] ${words(20)}. [How to practice] Play Improv — One Chord ${words(20)}.`,
     });
-    expect(short).toHaveLength(1);
+    // Too short overall, and both explaining sections are too thin.
+    expect(short).toHaveLength(3);
     expect(short[0]).toContain(`${SCHOOL_TEXT.min}–${SCHOOL_TEXT.max}`);
     expect(short[0]).toContain("this is a note");
 
@@ -468,5 +472,191 @@ describe("checkCheckpoint", () => {
     expect("problems" in most && most.problems.join(" ")).toContain(
       "longest option in 4 of 6",
     );
+  });
+});
+
+describe("an exercise written for the school", () => {
+  const mine = {
+    id: "community-abc",
+    title: "Hammer-on Ladder on One String",
+    difficulty: "medium",
+    category: "technique",
+    bpmMax: 140,
+  };
+  const own = new Map([
+    ["community-abc", mine],
+    // The same exercise, named by its bare document id.
+    ["abc", mine],
+  ]);
+  const withMine = (id = "community-abc") =>
+    plan((phases) => {
+      phases[0].steps[0].skillType = "physical";
+      phases[0].steps[0].exerciseId = id;
+    });
+
+  it("goes on a step the library has nothing for, and stops the gap being noted", () => {
+    const check = checkRoadmapPlan(withMine(), "Intermediate", songs, own);
+    expect(check.problems).toEqual([]);
+    expect(check.own.get("hammer-ons from a fretted note")).toEqual({
+      exercise: mine,
+      fit: "direct",
+    });
+    // The generator's pipeline only knows the library: the step stays bare
+    // there and gets the exercise put on afterwards.
+    expect(check.structure[0].steps[0].suggestedExerciseId).toBeNull();
+    expect(
+      check.notes.some((note) =>
+        note.includes("Technique steps with no exercise"),
+      ),
+    ).toBe(false);
+    expect(
+      checkRoadmapPlan(withMine("abc"), "Intermediate", songs, own).problems,
+    ).toEqual([]);
+  });
+
+  it("is held to the level and to two steps like any other", () => {
+    const tooHard = checkRoadmapPlan(
+      withMine(),
+      "Absolute Beginner",
+      songs,
+      own,
+    );
+    expect(tooHard.problems[0]).toContain(
+      '"Hammer-on Ladder on One String" is medium',
+    );
+
+    const thrice = checkRoadmapPlan(
+      plan((phases) => {
+        phases[0].steps[0].exerciseId = "community-abc";
+        phases[1].steps[0].exerciseId = "community-abc";
+        phases[2].steps[0].exerciseId = "abc";
+      }),
+      "Intermediate",
+      songs,
+      own,
+    );
+    expect(thrice.problems).toHaveLength(1);
+    expect(thrice.problems[0]).toContain("more than 2 steps");
+  });
+
+  it("is refused when it is not the player's — and the message says where ids come from", () => {
+    const check = checkRoadmapPlan(
+      withMine("someone-elses"),
+      "Intermediate",
+      songs,
+      own,
+    );
+    expect(check.problems[0]).toContain("riffquest_get_my_exercises");
+  });
+
+  it("is named and kept to its tempo range in the step's text, like a library one", () => {
+    const step = {
+      title: "Hammer-ons from a fretted note",
+      skillType: "physical" as const,
+      suggestedExerciseId: "community-abc",
+      exerciseRef: {
+        title: mine.title,
+        difficulty: mine.difficulty,
+        category: mine.category,
+        bpmMax: 140,
+      },
+    };
+    const words = (count: number) =>
+      Array.from({ length: count }, () => "note").join(" ");
+    const text = (howTo: string) => ({
+      description: `[What it is] ${words(50)}. [Why it matters] ${words(50)}. [How to practice] ${howTo} ${words(80)}.`,
+      successCriteria:
+        "You play it at 120 BPM for 8 bars with every hammered note as loud as the picked one.",
+    });
+
+    expect(
+      checkStepText(
+        step,
+        text("Play Hammer-on Ladder on One String and"),
+        {},
+        140,
+      ),
+    ).toEqual([]);
+    expect(
+      checkStepText(step, text("Play the ladder and"), {}, 140)[0],
+    ).toContain('"Hammer-on Ladder on One String"');
+    expect(
+      checkStepText(
+        step,
+        text("Play Hammer-on Ladder on One String at 160 BPM and"),
+        {},
+        140,
+      )[0],
+    ).toContain("goes up to 140 BPM");
+  });
+});
+
+describe("a step explains, it does not only instruct", () => {
+  const step = {
+    title: "Bends inside a phrase",
+    skillType: "musical" as const,
+  };
+  const words = (count: number) =>
+    Array.from({ length: count }, () => "note").join(" ");
+  const text = (what: number, why: number, how: number) => ({
+    description: `[What it is] ${words(what)}. [Why it matters] ${words(why)}. [How to practice] ${words(how)}.`,
+    successCriteria:
+      "You play 4 phrases in a row, each with one bend in pitch.",
+  });
+
+  it("counts the words under each heading", () => {
+    expect(sectionWords(text(50, 55, 90).description)).toEqual({
+      "What it is": 50,
+      "Why it matters": 55,
+      "How to practice": 90,
+    });
+  });
+
+  it("takes a step whose explanation is as full as its instructions", () => {
+    expect(checkStepText(step, text(50, 55, 90))).toEqual([]);
+  });
+
+  it("refuses the right length made of commands: two lines of what, the rest orders", () => {
+    // 209 words in all — what the first school averaged — with 33 and 45 on
+    // the explaining sections.
+    const problems = checkStepText(step, text(33, 45, 131));
+    expect(problems).toHaveLength(2);
+    expect(problems[0]).toContain(
+      `[What it is] is 33 words; it takes at least ${SCHOOL_SECTIONS.what}`,
+    );
+    expect(problems[1]).toContain(
+      `[Why it matters] is 45 words; it takes at least ${SCHOOL_SECTIONS.why}`,
+    );
+  });
+});
+
+describe("checkTrapShare", () => {
+  const plain = "[What it is] … [Why it matters] … [How to practice] …";
+  const trapped = `${plain} [Common trap] …`;
+
+  it("lets one step in three of a phase carry a trap", () => {
+    expect(
+      checkTrapShare("Bends", [trapped, trapped, plain, plain, plain, plain]),
+    ).toBeNull();
+    // Rounded up: a phase of four may have two.
+    expect(
+      checkTrapShare("Bends", [trapped, trapped, plain, plain]),
+    ).toBeNull();
+  });
+
+  it("refuses a trap closing every step", () => {
+    const refused = checkTrapShare("Bends", [
+      trapped,
+      trapped,
+      trapped,
+      trapped,
+      trapped,
+      plain,
+    ]);
+    expect(refused).toContain("on 5 of its 6 steps; at most 2 may");
+  });
+
+  it("does not count steps that have no text yet", () => {
+    expect(checkTrapShare("Bends", [trapped, "", "", "", "", ""])).toBeNull();
   });
 });

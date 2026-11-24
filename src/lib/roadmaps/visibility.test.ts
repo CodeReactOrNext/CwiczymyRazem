@@ -47,4 +47,33 @@ describe("roadmap visibility", () => {
     ).toBe(true);
     expect(isRoadmapVisibleTo({ userId: "u1" }, undefined)).toBe(true);
   });
+
+  it("keeps a public roadmap from an assistant off the board until it is written", () => {
+    const step = (description: string) => ({
+      id: "s",
+      title: "Hammer-ons",
+      description,
+      successCriteria: description ? "8 clean bars at 90 BPM." : "",
+      sessionsRequired: 6,
+      sessionsCompleted: 0,
+      order: 0,
+    });
+    const school = (description: string) => ({
+      userId: "u1",
+      visibility: "public" as const,
+      source: "mcp" as const,
+      phases: [
+        { id: "p", title: "Slurs", order: 0, steps: [step(description)] },
+      ],
+    });
+
+    // Its owner sees it either way; others only once every step has its text.
+    expect(isRoadmapVisibleTo(school(""), "u1")).toBe(true);
+    expect(isRoadmapVisibleTo(school(""), "u2")).toBe(false);
+    expect(isRoadmapVisibleTo(school("[What it is] …"), "u2")).toBe(true);
+    // A roadmap the app generated was always saved whole.
+    expect(isRoadmapVisibleTo({ ...school(""), source: undefined }, "u2")).toBe(
+      true,
+    );
+  });
 });

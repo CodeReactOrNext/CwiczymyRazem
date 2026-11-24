@@ -18,6 +18,7 @@ import {
 import {
   REVIEW_CRITERIA,
   SCHOOL_FRAME,
+  SCHOOL_SECTIONS,
   SCHOOL_SIZE,
   SCHOOL_TEXT,
   SYLLABUS_TOPICS,
@@ -108,16 +109,32 @@ about 205 words to a step, a last phase that is a performance.
    Whatever does not pass changes the plan, and the plan is checked again.
 6. **Show the plan to the player** as a plain list of phases and steps, and
    change what they ask for.
-7. **Save it** with \`riffquest_create_roadmap\`, with the syllabus and the
-   review. It answers with an id for every step.
+7. **Save it** with \`riffquest_create_roadmap\`, with the syllabus, the
+   review and the player's choice of public or private. It answers with an id
+   for every step.
 8. **Write the steps**, a phase at a time, with
    \`riffquest_write_roadmap_steps\` (up to ${ROADMAP_STEPS_PER_WRITE} steps a call), each with its lessons —
    see "Lessons". The answer lists the steps still without text.
 9. **Write each phase's checkpoint** with \`riffquest_write_roadmap_checkpoint\`
    once the phase's steps are written — see "Checkpoints".
 
-A roadmap saved this way is private to the player for now. Every save counts
-against the day's changes (see the write answers); a whole school is 12–15.
+Every save counts against the day's changes (see the write answers); a whole
+school is 12–15.
+
+## Public or private
+
+The player decides, and can change their mind at any time. Ask before saving
+— it is \`visibility\` on \`riffquest_create_roadmap\`:
+
+- **public** — the school goes on the Players board, where every supporter
+  can open it and start it. It appears there once every step has its text, not
+  before; the write answers say whether it is up yet (\`onPlayersBoard\`). It
+  carries the player's name as its author.
+- **private** — only the player sees it.
+
+\`riffquest_set_roadmap_visibility\` switches a roadmap either way later. A
+school meant for the board has to stand without the conversation it came
+from: nothing in a step may refer to the player who asked.
 
 ## Questions
 
@@ -217,11 +234,22 @@ ${LEVEL_RULES}
   harmony, the fretboard), \`musical\` (ear, phrasing, improvising, repertoire).
 - \`gist\`: one plain sentence — what the player actually does, on what
   material.
-- \`exerciseId\`: a library exercise that fits the step and the level (checked:
+- \`exerciseId\`: a library exercise — or one written for the school, see
+  below — that fits the step and the level (checked:
   it exists, its difficulty fits the level, it is on at most ${STRUCTURE_LIMITS.maxExerciseReuse} steps). Nearly
   every step should have one — the check notes it when more than a fifth of
   the steps open nothing. A technique step without one is a gap: look through
   the library again.
+- **When the library has nothing for a step, write the exercise.** The check
+  lists the technique steps left without one. For each, look once more; if the
+  library really has nothing that drills that motion, write it with
+  \`riffquest_create_exercise\` (\`riffquest_get_tab_format\` first, and
+  \`riffquest_validate_tablature\` until it passes): a short loop that is
+  exactly the step's motion, with a description, instructions and a tempo
+  range wide enough for the step's test. Put the id it answers with on the
+  step as \`exerciseId\`. Never instead of a library exercise that fits — the
+  library first. In a public school these exercises are published with it,
+  into the community exercises, under the player's name.
 - \`exerciseFit\`: \`direct\` when doing the exercise is doing the step;
   \`support\` when it is only a related warm-up and the step's own material is
   not in it. When unsure, \`support\`. The app labels it as a warm-up.
@@ -245,13 +273,23 @@ they cannot do it wrong without noticing.
 
 - **description** — ${SCHOOL_TEXT.min}–${SCHOOL_TEXT.max} words (checked: under ${SCHOOL_TEXT.floor} or over ${SCHOOL_TEXT.ceiling} is
   refused), in sections in square brackets (checked: all three present):
-  - \`[What it is]\` — the skill itself: the motion, the shape, the sound, in
-    two or three sentences.
-  - \`[Why it matters]\` — what it makes possible, what a record does with it,
-    what goes wrong later in this school without it.
+  - \`[What it is]\` — the skill itself, at least ${SCHOOL_SECTIONS.what} words (checked): the
+    motion, the shape, the sound, which fingers and strings, what it looks and
+    feels like when it is right. Full enough that the player could do it from
+    this section alone.
+  - \`[Why it matters]\` — at least ${SCHOOL_SECTIONS.why} words (checked): what it makes
+    possible, what a record does with it, what goes wrong later in this school
+    without it. This is where the step earns the player's patience.
   - \`[How to practice]\` — the sequence: where to start, what to play, at what
-    tempo, what to listen for, when to move on. The longest section.
-  - \`[Common trap]\` may follow when there is a real, specific one.
+    tempo, what to listen for, when to move on.
+  - \`[Common trap]\` — on at most one step in three of a phase (checked), and
+    only where something really goes wrong that the practice notes cannot
+    carry. Not a closing line for every step: most warnings belong inside
+    \`[How to practice]\`, at the moment they apply.
+- **A step explains, it does not only instruct.** The first school written
+  this way had the right length and read like a list of commands: two
+  sentences on what the thing is, then twelve orders. The explaining sections
+  are half of the step.
 - **The first step of the school** opens with \`${SCHOOL_FRAME.first}\` (checked): what the
   player has to be able to do already, and what they will be able to do at the
   end. **The last step** ends with \`${SCHOOL_FRAME.last}\` (checked): what they
@@ -281,6 +319,14 @@ they cannot do it wrong without noticing.
   knows is the worst thing a step can contain.
 
 ${HOUSE_VOICE}
+
+In a school, one rule above is narrower: "one idea per sentence, no sentence
+longer than about twenty words" holds for \`[How to practice]\`, where the
+player follows steps with a guitar in their hands. \`[What it is]\` and
+\`[Why it matters]\` are explanation, and an explanation joins a cause to its
+effect — write those as a teacher talks, in full sentences, not as a string
+of four-word commands. Everything else in the voice stands: facts over
+adjectives, no filler, no selling.
 
 Filler is refused (checked): "start slow and increase gradually", "practice
 with a metronome", "focus on accuracy", "muscle memory", "solid foundation".
@@ -316,6 +362,12 @@ the phase has its text.
 - Four options, all plausible to somebody who skipped the practice, all about
   as long and as specific as each other. The right one is the longest in at
   most half of the questions and not always in the same place (checked).
+- **At least two of the six put the player in a situation at the guitar**
+  rather than asking back a fact from the text: "Your phrase sounds like a
+  scale run — what do you change first?", "The bend lands flat every time on
+  the G string — what is the likeliest cause?". A question whose answer is a
+  number quoted from the step ("over which beats does the note come down?")
+  tests reading, not playing; keep those to a couple.
 - The prompt is one direct sentence. The explanation says in one or two
   sentences why the right answer is right.
 - Rewriting a step's text later makes its phase's checkpoint stale: the answer

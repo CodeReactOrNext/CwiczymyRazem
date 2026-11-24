@@ -7,7 +7,8 @@ import { tabNavListClass, tabNavTriggerClass } from "components/PageTabs/tabNav"
 import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import { markStepPracticed } from "feature/aiCoach/utils/roadmapEstimate";
 import { CommunityExercisesTab } from "feature/communityExercises/components/CommunityExercisesTab";
-import { recordExerciseCompletion } from "feature/communityExercises/services/communityExerciseService";
+import { getCommunityExerciseById, recordExerciseCompletion } from "feature/communityExercises/services/communityExerciseService";
+import { communityDocId, communityToExercise } from "feature/communityExercises/utils/communityToExercise";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
@@ -111,6 +112,38 @@ export const SkillDashboard = ({
       // full navigation.
       setSelectedChallenge((prev) => (prev ? null : prev));
       return;
+    }
+    // A community exercise — a roadmap step can point at one written for it.
+    // Opened the way the Community tab opens it, under its prefixed id.
+    const communityId = communityDocId(exerciseId);
+    if (communityId) {
+      let cancelled = false;
+      getCommunityExerciseById(communityId).then((found) => {
+        if (cancelled || !found) return;
+        const own = communityToExercise(found);
+        setSelectedChallenge({
+          id: own.id,
+          title: own.title as any,
+          description: own.description as any,
+          category: (own.category !== 'mixed' ? own.category : 'technique') as any,
+          requiredSkillId: own.relatedSkills[0] || 'general',
+          requiredLevel: own.difficulty === 'hard' ? 2 : own.difficulty === 'medium' ? 1 : 0,
+          rewardDescription: 'Practice complete',
+          exercises: [own],
+          unlockDescription: "",
+          streakDays: 0,
+          intensity: "medium",
+          shortGoal: "",
+          accentColor: "#ffffff",
+          difficulty: own.difficulty,
+          tablature: own.tablature,
+          communityExerciseId: found.id,
+          communityExerciseAuthorId: found.authorId,
+        });
+      }).catch(() => {});
+      return () => {
+        cancelled = true;
+      };
     }
     const exercise = exercisesAgregat.find(e => e.id === exerciseId);
     if (exercise) {

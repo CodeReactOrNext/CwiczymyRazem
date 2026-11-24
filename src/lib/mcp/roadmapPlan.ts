@@ -43,7 +43,16 @@ import type {
 /** The least a school is: below this it is a lesson plan, not a course. */
 export const SCHOOL_SIZE = { phases: 5, steps: 24 } as const;
 /** A step's description, in words: the range to aim for, and what is refused. */
-export const SCHOOL_TEXT = { min: 150, max: 260, floor: 120, ceiling: 340 };
+export const SCHOOL_TEXT = { min: 220, max: 300, floor: 170, ceiling: 380 };
+/**
+ * The least the two explaining sections take, in words. The first school an
+ * assistant wrote matched the curated ones in total length and still read as
+ * a list of commands: "what it is" ran 33 words against their 50, "why" 45
+ * against 56–71, and the rest was instructions.
+ */
+export const SCHOOL_SECTIONS = { what: 45, why: 50 } as const;
+/** How many of a phase's steps may carry a [Common trap]: one in three. */
+export const TRAP_SHARE = 3;
 /** The frame the first and the last step add, with room for it. */
 export const SCHOOL_FRAME = {
   first: "[Before you start]",
@@ -79,6 +88,22 @@ export interface PlanCheck {
   /** The plan in the shape the generator's own pipeline takes. */
   structure: StructurePhase[];
   size: { phases: number; steps: number };
+  /**
+   * The steps whose exercise is the player's own, by step title in lower
+   * case. The generator's pipeline only knows the library, so these are put
+   * on their steps after it has run.
+   */
+  own: Map<string, { exercise: OwnExerciseRef; fit: ExerciseFit }>;
+}
+
+/** One of the player's own exercises, as a roadmap step can use it. */
+export interface OwnExerciseRef {
+  /** `community-<docId>` — the id a step stores. */
+  id: string;
+  title: string;
+  difficulty: string;
+  category: string;
+  bpmMax?: number;
 }
 
 const quote = (text: string) => `"${text.trim()}"`;
@@ -87,9 +112,12 @@ export const checkRoadmapPlan = (
   phases: PlanPhaseInput[],
   level: RoadmapLevel,
   songsById: Map<string, RoadmapSongRef>,
+  /** The player's own exercises the plan names, by the id it names them with. */
+  ownExercises: Map<string, OwnExerciseRef> = new Map(),
 ): PlanCheck => {
   const problems: string[] = [];
   const notes: string[] = [];
+  const own: PlanCheck["own"] = new Map();
   const allowed = new Set(DIFFICULTY_FOR_LEVEL[level] ?? []);
   const uses = new Map<string, number>();
   const titles = new Map<string, string>();
@@ -105,12 +133,30 @@ export const checkRoadmapPlan = (
       titles.set(key, title);
 
       let exerciseId: string | null = null;
-      if (step.exerciseId) {
+      const mine = step.exerciseId
+        ? ownExercises.get(step.exerciseId)
+        : undefined;
+      if (mine) {
+        // An exercise written for the school, where the library had none.
+        const count = uses.get(mine.id) ?? 0;
+        if (allowed.size > 0 && !allowed.has(mine.difficulty as never)) {
+          problems.push(
+            `${quote(title)}: ${quote(mine.title)} is ${mine.difficulty}; a ${level} roadmap takes ${[...allowed].join(", ")} exercises.`,
+          );
+        } else if (count >= STRUCTURE_LIMITS.maxExerciseReuse) {
+          problems.push(
+            `${quote(mine.title)} is on more than ${STRUCTURE_LIMITS.maxExerciseReuse} steps (${quote(title)} is one too many).`,
+          );
+        } else {
+          uses.set(mine.id, count + 1);
+          own.set(key, { exercise: mine, fit: step.exerciseFit ?? "direct" });
+        }
+      } else if (step.exerciseId) {
         const entry = findCatalogEntry(step.exerciseId);
         const count = uses.get(step.exerciseId) ?? 0;
         if (!entry) {
           problems.push(
-            `${quote(title)}: no library exercise ${quote(step.exerciseId)} — ids come from riffquest_list_exercises (own exercises cannot go on a roadmap step).`,
+            `${quote(title)}: no exercise ${quote(step.exerciseId)} — library ids come from riffquest_list_exercises, the player's own from riffquest_get_my_exercises.`,
           );
         } else if (allowed.size > 0 && !allowed.has(entry.difficulty)) {
           problems.push(
@@ -181,15 +227,18 @@ export const checkRoadmapPlan = (
   }
   problems.push(...checkSkeleton(structure));
 
+  const hasOwn = (step: { title: string }) =>
+    own.has(step.title.trim().toLowerCase());
   const bareTechnique = steps.filter(
     (step) =>
       step.skillType === "physical" &&
       !step.suggestedExerciseId &&
+      !hasOwn(step) &&
       !step.songTitle,
   );
   if (bareTechnique.length) {
     notes.push(
-      `Technique steps with no exercise: ${bareTechnique.map((step) => quote(step.title)).join(", ")}. The library may have one that drills the motion.`,
+      `Technique steps with no exercise: ${bareTechnique.map((step) => quote(step.title)).join(", ")}. Look through the library once more; where it really has nothing that drills the motion, write the exercise (riffquest_create_exercise) and put its id on the step.`,
     );
   }
   const overused = steps.filter(
@@ -213,7 +262,7 @@ export const checkRoadmapPlan = (
     );
   }
   const nothing = steps.filter(
-    (step) => !step.suggestedExerciseId && !step.songTitle,
+    (step) => !step.suggestedExerciseId && !hasOwn(step) && !step.songTitle,
   );
   if (steps.length && nothing.length / steps.length > 0.2) {
     notes.push(
@@ -229,6 +278,7 @@ export const checkRoadmapPlan = (
     notes,
     structure,
     size: { phases: structure.length, steps: steps.length },
+    own,
   };
 };
 
@@ -350,6 +400,35 @@ const namesExercise = (text: string, title: string): boolean => {
 const MEASURE =
   /\d|\b(once|twice|two|three|four|five|six|seven|eight|nine|ten|twelve|sixteen|half|every|whole|full|all)\b/i;
 
+/** Words under each `[Heading]` of a description, by heading. */
+export const sectionWords = (description: string): Record<string, number> => {
+  const parts = description.split(/\[([A-Z][^\]\n]{1,40})\]/);
+  const words: Record<string, number> = {};
+  for (let i = 1; i < parts.length; i += 2) {
+    words[parts[i]] = wordCount(parts[i + 1] ?? "");
+  }
+  return words;
+};
+
+const TRAP = "[Common trap]";
+
+/**
+ * Why a phase's texts cannot be saved as they are, or nothing: a trap on
+ * every step is a template, not a warning. One step in three may have one —
+ * the steps where something really goes wrong that the practice notes cannot
+ * carry.
+ */
+export const checkTrapShare = (
+  phaseTitle: string,
+  descriptions: string[],
+): string | null => {
+  const allowed = Math.ceil(descriptions.length / TRAP_SHARE);
+  const traps = descriptions.filter((text) => text.includes(TRAP)).length;
+  return traps > allowed
+    ? `Phase "${phaseTitle}" has ${TRAP} on ${traps} of its ${descriptions.length} steps; at most ${allowed} may. Keep it where something really goes wrong, and fold the rest into [How to practice].`
+    : null;
+};
+
 /** Every tempo a text names, as numbers: "at 140 BPM", "from 100 to 125 BPM". */
 const temposIn = (text: string): number[] =>
   [...text.matchAll(/(\d{2,3})(?:\s*(?:–|-|to)\s*(\d{2,3}))?\s*BPM/gi)].flatMap(
@@ -363,7 +442,11 @@ const temposIn = (text: string): number[] =>
 export const checkStepText = (
   step: Pick<
     RoadmapStep,
-    "title" | "skillType" | "suggestedExerciseId" | "exerciseRole"
+    | "title"
+    | "skillType"
+    | "suggestedExerciseId"
+    | "exerciseRole"
+    | "exerciseRef"
   >,
   text: StepTextInput,
   position: StepPosition = {},
@@ -399,6 +482,25 @@ export const checkStepText = (
     );
   }
 
+  // The explanation has to be there, not only the instructions.
+  const sections = sectionWords(description);
+  if (
+    sections["What it is"] !== undefined &&
+    sections["What it is"] < SCHOOL_SECTIONS.what
+  ) {
+    problems.push(
+      `${label}: [What it is] is ${sections["What it is"]} words; it takes at least ${SCHOOL_SECTIONS.what} — the motion, the shape, the sound, said fully enough that the player could do it from this alone.`,
+    );
+  }
+  if (
+    sections["Why it matters"] !== undefined &&
+    sections["Why it matters"] < SCHOOL_SECTIONS.why
+  ) {
+    problems.push(
+      `${label}: [Why it matters] is ${sections["Why it matters"]} words; it takes at least ${SCHOOL_SECTIONS.why} — what it makes possible, what a record does with it, what goes wrong later without it.`,
+    );
+  }
+
   const filler = description.match(FILLER);
   if (filler) {
     problems.push(
@@ -406,19 +508,22 @@ export const checkStepText = (
     );
   }
 
-  const entry = findCatalogEntry(step.suggestedExerciseId);
+  // A library exercise, or one the player's assistant wrote for the step.
+  const exerciseTitle =
+    findCatalogEntry(step.suggestedExerciseId)?.title ??
+    (step.suggestedExerciseId ? step.exerciseRef?.title : undefined);
   if (
-    entry &&
+    exerciseTitle &&
     step.exerciseRole !== "support" &&
-    !namesExercise(description, entry.title)
+    !namesExercise(description, exerciseTitle)
   ) {
     problems.push(
-      `${label}: its exercise is ${quote(entry.title)} — [How to practice] names it by that exact title.`,
+      `${label}: its exercise is ${quote(exerciseTitle)} — [How to practice] names it by that exact title.`,
     );
   }
 
   // A tempo the exercise cannot be set to is a test nobody can take.
-  if (entry && step.exerciseRole !== "support" && exerciseMaxBpm) {
+  if (exerciseTitle && step.exerciseRole !== "support" && exerciseMaxBpm) {
     const tooFast = [
       ...new Set(
         temposIn(`${description} ${text.successCriteria}`).filter(
@@ -428,7 +533,7 @@ export const checkStepText = (
     ];
     if (tooFast.length) {
       problems.push(
-        `${label}: ${quote(entry.title)} goes up to ${exerciseMaxBpm} BPM, and the text asks for ${tooFast.join(", ")} BPM in it — keep the tempo inside the exercise's range, or give the step an exercise that reaches it.`,
+        `${label}: ${quote(exerciseTitle)} goes up to ${exerciseMaxBpm} BPM, and the text asks for ${tooFast.join(", ")} BPM in it — keep the tempo inside the exercise's range, or give the step an exercise that reaches it.`,
       );
     }
   }
@@ -440,7 +545,7 @@ export const checkStepText = (
   } else if (
     // Only where the app can measure it: a step with its own exercise. "Play
     // Hey Joe with the record from start to finish" is a test without a number.
-    entry &&
+    exerciseTitle &&
     step.exerciseRole !== "support" &&
     !MEASURE.test(text.successCriteria)
   ) {

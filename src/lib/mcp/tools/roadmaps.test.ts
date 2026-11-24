@@ -2,10 +2,15 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// The guide and the plan check never touch Firestore when the plan names no
-// library song; the mock keeps firebase-admin from initialising.
+// The guide and the plan check touch Firestore only to look up an exercise
+// id the library does not have, in case it is one of the player's own — here
+// there never is one. The mock keeps firebase-admin from initialising.
 vi.mock("utils/firebase/api/firebase.config", () => ({
-  firestore: { collection: vi.fn() },
+  firestore: {
+    collection: () => ({
+      doc: () => ({ get: async () => ({ data: () => undefined }) }),
+    }),
+  },
   auth: {},
 }));
 
@@ -138,6 +143,7 @@ describe("roadmap tools", () => {
         goal: "A complete school of legato for electric lead guitar",
         level: "Intermediate",
         phases: broken,
+        visibility: "public",
         syllabus: syllabus(),
         review: review(),
         playerApproved: true,
@@ -157,6 +163,7 @@ describe("roadmap tools", () => {
           goal: "A complete school of legato for electric lead guitar",
           level: "Intermediate",
           phases: plan(),
+          visibility: "public",
           syllabus: syllabus(),
           ...extra,
         },
@@ -187,6 +194,7 @@ describe("roadmap tools", () => {
           goal: "A complete school of legato for electric lead guitar",
           level: "Intermediate",
           phases: plan(),
+          visibility: "public",
           syllabus: syllabus(),
           review: review(),
           playerApproved: true,

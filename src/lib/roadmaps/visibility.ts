@@ -26,10 +26,29 @@ export const roadmapGenerationCost = (visibility: RoadmapVisibility): number =>
     ? ROADMAP_PRIVATE_GENERATION_COST
     : ROADMAP_GENERATION_COST;
 
-/** A private roadmap is its owner's alone; a public one is everybody's to read. */
+/**
+ * Whether every step has its text. A roadmap the player's assistant writes
+ * (`source: "mcp"`) is saved as a plan first and filled in afterwards, so a
+ * public one would otherwise sit on the board half empty.
+ */
+export const isRoadmapWritten = (roadmap: Pick<Roadmap, "phases">): boolean =>
+  (roadmap.phases ?? []).every((phase) =>
+    (phase.steps ?? []).every(
+      (step) => !!step.description?.trim() && !!step.successCriteria?.trim(),
+    ),
+  );
+
+/**
+ * A private roadmap is its owner's alone; a public one is everybody's to read
+ * — once it is written. Until then a public roadmap from an assistant is
+ * still only its owner's.
+ */
 export const isRoadmapVisibleTo = (
-  roadmap: Pick<Roadmap, "visibility" | "userId">,
+  roadmap: Pick<Roadmap, "visibility" | "userId"> &
+    Partial<Pick<Roadmap, "source" | "phases">>,
   viewerUid: string | null | undefined,
 ): boolean =>
-  visibilityOf(roadmap) === "public" ||
-  (!!viewerUid && roadmap.userId === viewerUid);
+  (!!viewerUid && roadmap.userId === viewerUid) ||
+  (visibilityOf(roadmap) === "public" &&
+    (roadmap.source !== "mcp" ||
+      isRoadmapWritten({ phases: roadmap.phases ?? [] })));
