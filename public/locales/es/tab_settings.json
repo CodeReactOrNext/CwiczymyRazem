@@ -63,7 +63,9 @@
     "counting": "Conteo",
     "counting_desc": "«1 e & a» bajo el pentagrama: cómo contar el compás",
     "technique": "Marcas de técnica",
-    "technique_desc": "H/P, bendings, PM, vibrato, armónicos, púa ⊓/⋁"
+    "technique_desc": "H/P, bendings, PM, vibrato, armónicos, púa ⊓/⋁",
+    "fingering_hand": "Mano con digitación",
+    "fingering_hand_desc": "La mano junto a la tablatura que muestra qué dedos usar"
   },
   "views": {
     "tab": {

@@ -1,4 +1,5 @@
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
+import { withUniqueModIds } from "feature/arsenal/data/salvage";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -58,11 +59,13 @@ export default async function handler(
       }
 
       if (listing.itemType === "mod") {
-        // Straight back into the stash under the id it left with — nothing could
-        // have claimed that id while the listing was up. Nothing else moves: a
+        // Straight back into the stash, under the id it left with unless
+        // something claimed it while the listing was up. Nothing else moves: a
         // stashed mod sits on no instrument, so there is no rig level to redo.
         const stash: any[] = data.arsenal?.salvagedMods || [];
-        t.update(userRef, { "arsenal.salvagedMods": [...stash, listing.item] });
+        t.update(userRef, {
+          "arsenal.salvagedMods": withUniqueModIds([...stash, listing.item]),
+        });
         t.update(listingRef, { status: "cancelled" });
         return;
       }

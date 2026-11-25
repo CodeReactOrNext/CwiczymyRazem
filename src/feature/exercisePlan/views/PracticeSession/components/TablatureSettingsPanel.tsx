@@ -298,6 +298,16 @@ export function TablatureSettingsPanel() {
       label: t("toggles.technique"),
       desc: t("toggles.technique_desc"),
     },
+    // The phone board never draws the hand, so it has nothing to switch there.
+    ...(isPhoneLayout
+      ? []
+      : [
+          {
+            key: "showFingeringHand" as const,
+            label: t("toggles.fingering_hand"),
+            desc: t("toggles.fingering_hand_desc"),
+          },
+        ]),
   ];
 
   return (

@@ -63,7 +63,9 @@
     "counting": "Counting",
     "counting_desc": "“1 e & a” under the staff — how to count the bar",
     "technique": "Technique markers",
-    "technique_desc": "H/P, bends, PM, vibrato, harmonics, picking ⊓/⋁"
+    "technique_desc": "H/P, bends, PM, vibrato, harmonics, picking ⊓/⋁",
+    "fingering_hand": "Fingering hand",
+    "fingering_hand_desc": "The hand beside the tab that shows which fingers to use"
   },
   "views": {
     "tab": {

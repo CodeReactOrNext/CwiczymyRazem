@@ -63,7 +63,9 @@
     "counting": "Zählzeiten",
     "counting_desc": "„1 e & a“ unter der Notenzeile — so zählst du den Takt",
     "technique": "Technik-Markierungen",
-    "technique_desc": "H/P, Bendings, PM, Vibrato, Flageoletts, Anschlag ⊓/⋁"
+    "technique_desc": "H/P, Bendings, PM, Vibrato, Flageoletts, Anschlag ⊓/⋁",
+    "fingering_hand": "Hand mit Fingersatz",
+    "fingering_hand_desc": "Die Hand neben der Tabulatur, die zeigt, welche Finger du nimmst"
   },
   "views": {
     "tab": {

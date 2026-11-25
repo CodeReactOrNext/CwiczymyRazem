@@ -86,9 +86,17 @@ export function useSessionAudio({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentExerciseId, selectedGpTrackIdx]);
 
-  // Keep main track mute in sync with global toggle
+  // Keep main track mute in sync with global toggle. Dragging the fader to zero mutes
+  // and stores that zero, so turning the guitar back on has to bring its level back too.
   useEffect(() => {
-    setTrackConfigs(prev => ({ ...prev, main: { ...prev.main, isMuted: isAudioMuted } }));
+    setTrackConfigs(prev => ({
+      ...prev,
+      main: {
+        ...prev.main,
+        volume: !isAudioMuted && prev.main?.volume === 0 ? 1 : prev.main?.volume,
+        isMuted: isAudioMuted,
+      },
+    }));
   }, [isAudioMuted]);
 
   // Track volume is a device-wide preference — persist it so the next exercise (or

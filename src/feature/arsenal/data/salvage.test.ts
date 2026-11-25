@@ -11,6 +11,7 @@ import {
   getScrappedMods,
   SALVAGE_POINT_LOSS,
   toSalvagedMod,
+  withUniqueModIds,
 } from "./salvage";
 import { getModDef, type WorkshopSubject } from "./workshop";
 
@@ -249,6 +250,36 @@ describe("toSalvagedMod", () => {
       sourceName: "Dead Strat",
       salvagedAt: 1234,
     });
+  });
+});
+
+describe("withUniqueModIds", () => {
+  const mod = (id: string): SalvagedMod => ({
+    id,
+    featureId: "cts-pots",
+    kind: "guitar",
+    points: 3,
+    sourceName: "Dead Strat",
+    salvagedAt: 1,
+  });
+
+  it("leaves a stash without clashes untouched", () => {
+    const mods = [mod("a"), mod("b")];
+    expect(withUniqueModIds(mods)).toBe(mods);
+  });
+
+  it("re-issues every later holder of an id, keeping the first", () => {
+    const ids = withUniqueModIds([mod("a"), mod("a"), mod("a")]).map(
+      (m) => m.id,
+    );
+    expect(ids).toEqual(["a", "a-2", "a-3"]);
+  });
+
+  it("never re-issues an id another mod already holds", () => {
+    const ids = withUniqueModIds([mod("a"), mod("a"), mod("a-2")]).map(
+      (m) => m.id,
+    );
+    expect(ids).toEqual(["a", "a-3", "a-2"]);
   });
 });
 

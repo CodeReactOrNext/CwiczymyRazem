@@ -590,7 +590,9 @@ export const TablatureSection = memo(function TablatureSection({
             countInRemaining={countInRemaining}
             startTime={startTime}
             bpm={effectiveBpm}
-            volume={isAudioMuted ? 0 : masterVolume}
+            // With other tracks in the score only the guitar goes quiet — its own
+            // track mute (trackConfigs.main) does that, and the band plays on.
+            volume={isAudioMuted && !backingTrackIds?.length ? 0 : masterVolume}
             isMetronomeMuted={isMetronomeMuted}
             metronomeVolume={metronomeVolume}
             trackConfigs={trackConfigs}
@@ -612,7 +614,7 @@ export const TablatureSection = memo(function TablatureSection({
           <LearnModeBar />
           <div className='flex items-stretch gap-2'>
           {/* The hand for the current grip — draws nothing unless the notes carry fingering. */}
-          {!hideNotes && !cinema && !obscured && (
+          {settings.showFingeringHand && !hideNotes && !cinema && !obscured && (
             <FingeringHand
               measures={activeTablature}
               currentBeatRef={currentBeatRef}

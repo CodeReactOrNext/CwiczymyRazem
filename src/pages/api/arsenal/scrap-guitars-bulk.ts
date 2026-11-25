@@ -1,6 +1,10 @@
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
-import { getSalvageableMod, toSalvagedMod } from "feature/arsenal/data/salvage";
+import {
+  getSalvageableMod,
+  toSalvagedMod,
+  withUniqueModIds,
+} from "feature/arsenal/data/salvage";
 import { mergeScrapParts } from "feature/arsenal/data/scrapYield";
 import type {
   InventoryItem,
@@ -115,7 +119,7 @@ export default async function handler(
     await userRef.update({
       "arsenal.inventory": newInventory,
       "arsenal.parts": newParts,
-      "arsenal.salvagedMods": salvagedMods,
+      "arsenal.salvagedMods": withUniqueModIds(salvagedMods),
       rigLevel,
     });
 

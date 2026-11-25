@@ -164,6 +164,36 @@ export const toSalvagedMod = (
 });
 
 /**
+ * The stash with every entry under an id of its own.
+ *
+ * A mod's id is built from where it came from, so the same source paying out
+ * twice writes the same id twice — a guitar torn down, put back by a stale
+ * write and torn down again, or one level rolling the same mod twice. Everything
+ * downstream keys on that id: the board drew both on one cell and left one of
+ * them behind on the other shelves, and selling or fitting either used up both.
+ * The first holder keeps the id (a saved board position and any open dialog
+ * still point at it), later ones are re-issued. Returns the same array when
+ * there is nothing to do.
+ */
+export const withUniqueModIds = (mods: SalvagedMod[]): SalvagedMod[] => {
+  const taken = new Set(mods.map((mod) => mod.id));
+  if (taken.size === mods.length) return mods;
+
+  const seen = new Set<string>();
+  return mods.map((mod) => {
+    let { id } = mod;
+    if (seen.has(id)) {
+      let copy = 2;
+      while (taken.has(`${mod.id}-${copy}`)) copy++;
+      id = `${mod.id}-${copy}`;
+      taken.add(id);
+    }
+    seen.add(id);
+    return id === mod.id ? mod : { ...mod, id };
+  });
+};
+
+/**
  * Whether this instrument could physically take this rescued mod — right pool,
  * fits the construction, not already fitted, and a slot free for it.
  *

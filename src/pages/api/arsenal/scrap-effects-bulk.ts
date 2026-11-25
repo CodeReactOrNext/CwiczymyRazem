@@ -1,6 +1,10 @@
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
-import { getSalvageableMod, toSalvagedMod } from "feature/arsenal/data/salvage";
+import {
+  getSalvageableMod,
+  toSalvagedMod,
+  withUniqueModIds,
+} from "feature/arsenal/data/salvage";
 import { mergeScrapParts } from "feature/arsenal/data/scrapYield";
 import type {
   EffectInventoryItem,
@@ -110,7 +114,7 @@ export default async function handler(
     await userRef.update({
       "arsenal.effectInventory": newEffectInventory,
       "arsenal.parts": newParts,
-      "arsenal.salvagedMods": salvagedMods,
+      "arsenal.salvagedMods": withUniqueModIds(salvagedMods),
       rigLevel,
     });
 

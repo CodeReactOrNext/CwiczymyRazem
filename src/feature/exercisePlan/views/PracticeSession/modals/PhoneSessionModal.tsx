@@ -81,7 +81,7 @@ interface PhoneSessionModalProps {
   isMicEnabled: boolean;
   toggleMic: () => Promise<void>;
   isAudioMuted: boolean;
-  setIsAudioMuted: (v: boolean) => void;
+  onAudioToggle: () => void;
   isMetronomeMuted: boolean;
   setIsMetronomeMuted: (v: boolean) => void;
   audioTracks?: AudioTrackConfig[];
@@ -158,7 +158,7 @@ export function PhoneSessionModal({
   isMicEnabled,
   toggleMic,
   isAudioMuted,
-  setIsAudioMuted,
+  onAudioToggle,
   isMetronomeMuted,
   setIsMetronomeMuted,
   audioTracks,
@@ -322,7 +322,7 @@ export function PhoneSessionModal({
               onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}
               isAudioMuted={isAudioMuted}
               isRiddleMode={currentExercise.riddleConfig?.mode === "sequenceRepeat"}
-              onAudioToggle={() => setIsAudioMuted(!isAudioMuted)}
+              onAudioToggle={onAudioToggle}
               isMicEnabled={isMicEnabled}
               onMicToggle={toggleMic}
               onRecalibrate={onRecalibrate ?? (() => {})}

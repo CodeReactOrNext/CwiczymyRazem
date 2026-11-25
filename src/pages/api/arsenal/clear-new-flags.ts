@@ -1,7 +1,18 @@
-import type { InventoryItem } from "feature/arsenal/types/arsenal.types";
+import type {
+  EffectInventoryItem,
+  InventoryItem,
+} from "feature/arsenal/types/arsenal.types";
+import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
+/**
+ * Marks every drop as seen.
+ *
+ * Runs on its own whenever the collection opens and writes both inventories
+ * whole, so it has to be a transaction: landing beside a teardown or a sale, a
+ * plain read-then-write put the sold item back.
+ */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -19,26 +30,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const userRef = firestore.collection("users").doc(userId);
-    const userDoc = await userRef.get();
+    const userRef = firestore
+      .collection("users")
+      .doc(userId) as DocumentReference;
 
-    if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
+    const found = await firestore.runTransaction(async (t: Transaction) => {
+      const userDoc = await t.get(userRef);
+      if (!userDoc.exists) return false;
 
-    const data = userDoc.data()!;
-    const inventory: InventoryItem[] = data.arsenal?.inventory || [];
-    const effectInventory = data.arsenal?.effectInventory || [];
+      const data = userDoc.data()!;
+      const seen = <T extends { isNew?: boolean }>(items: T[]): T[] =>
+        items.map((item) => (item.isNew ? { ...item, isNew: false } : item));
+      const inventory: InventoryItem[] = data.arsenal?.inventory || [];
+      const effectInventory: EffectInventoryItem[] =
+        data.arsenal?.effectInventory || [];
 
-    const updatedInventory = inventory.map((item) =>
-      item.isNew ? { ...item, isNew: false } : item
-    );
-    const updatedEffectInventory = effectInventory.map((item: any) =>
-      item.isNew ? { ...item, isNew: false } : item
-    );
-
-    await userRef.update({
-      "arsenal.inventory": updatedInventory,
-      "arsenal.effectInventory": updatedEffectInventory,
+      t.update(userRef, {
+        "arsenal.inventory": seen(inventory),
+        "arsenal.effectInventory": seen(effectInventory),
+      });
+      return true;
     });
+
+    if (!found) return res.status(404).json({ error: "User not found" });
 
     return res.status(200).json({ success: true });
   } catch (error) {

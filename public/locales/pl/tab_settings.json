@@ -63,7 +63,9 @@
     "counting": "Liczenie",
     "counting_desc": "„1 e & a” pod pięciolinią — jak liczyć takt",
     "technique": "Oznaczenia technik",
-    "technique_desc": "H/P, podciągnięcia, PM, wibrato, flażolety, kostkowanie ⊓/⋁"
+    "technique_desc": "H/P, podciągnięcia, PM, wibrato, flażolety, kostkowanie ⊓/⋁",
+    "fingering_hand": "Dłoń z palcowaniem",
+    "fingering_hand_desc": "Dłoń obok tabulatury, która pokazuje, których palców użyć"
   },
   "views": {
     "tab": {

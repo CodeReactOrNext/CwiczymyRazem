@@ -329,6 +329,8 @@ export interface TablatureSettings {
   /** "1 e & a" under the staff — how each beat is counted out loud. */
   showCounting: boolean;
   showTechniqueLabels: boolean;
+  /** The drawn hand beside the board, where the exercise carries fingering. */
+  showFingeringHand: boolean;
   // ── Feedback ──
   hitAnimations: boolean;
   /** "Early"/"Late"/"+" over notes and a late note's fill starting where it was
@@ -374,6 +376,7 @@ export const DEFAULT_SETTINGS: TablatureSettings = {
   showMeasureLines: true,
   showCounting: true,
   showTechniqueLabels: true,
+  showFingeringHand: true,
   hitAnimations: true,
   timingHints: true,
   ambientGlow: true,

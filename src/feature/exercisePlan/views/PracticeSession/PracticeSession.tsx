@@ -105,6 +105,7 @@ import { useSessionAudio } from "./hooks/useSessionAudio";
 import { useSessionControls } from "./hooks/useSessionControls";
 import { useSongExerciseGpFile } from "./hooks/useSongExerciseGpFile";
 import { timingInputPath, useTimingCalibration } from "./hooks/useTimingCalibration";
+import { useTrackConfigChange } from "./hooks/useTrackConfigChange";
 import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
 import { DRILL_PASSES, DRILL_SPEED } from "./utils/barPasses";
@@ -774,6 +775,11 @@ const PracticeSessionInner = ({
     isBass,
     bandRage: !!bossFight?.enraged,
   });
+  // Every mixer the player can reach goes through this, so muting the guitar there sticks.
+  const changeTrackConfigs = useTrackConfigChange({
+    trackConfigs, setTrackConfigs, setIsAudioMuted, hasBacking,
+    syncsGuitar: !isExamMode && !isEarTrainingRiddle,
+  });
 
   // ── The tab ends with the time ────────────────────────────────────────────
   // A looping tab used to run straight into the time-up, so the last bars on
@@ -831,7 +837,7 @@ const PracticeSessionInner = ({
   const handleMixerChange = useCallback(
     (id: string, next: { volume?: number; isMuted?: boolean }) => {
       const current = audioTracks.find(track => track.id === id);
-      setTrackConfigs(prev => ({
+      changeTrackConfigs(prev => ({
         ...prev,
         [id]: {
           volume:  next.volume  ?? prev[id]?.volume  ?? current?.volume  ?? 1,
@@ -839,7 +845,7 @@ const PracticeSessionInner = ({
         },
       }));
     },
-    [audioTracks, setTrackConfigs],
+    [audioTracks, changeTrackConfigs],
   );
 
   useEffect(() => { setAudioSystem(prev => ({ ...prev, isActive: gpAudioActive })); }, [gpAudioActive]);
@@ -1820,9 +1826,9 @@ const PracticeSessionInner = ({
           isMicEnabled={isMicEnabled} toggleMic={handleMicToggle}
           frequencyRef={audioRefs.frequencyRef} volumeRef={audioRefs.volumeRef} isListening={isListening}
           onRecalibrate={handleRecalibrate}
-          isAudioMuted={isAudioMuted} setIsAudioMuted={setIsAudioMuted}
+          isAudioMuted={isAudioMuted} onAudioToggle={handleAudioToggle}
           isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
-          audioTracks={audioTracks} setTrackConfigs={setTrackConfigs}
+          audioTracks={audioTracks} setTrackConfigs={changeTrackConfigs}
           masterVolume={masterVolume} setMasterVolume={setMasterVolume}
           speedMultiplier={speedMultiplier} onSpeedMultiplierChange={handleSpeedMultiplierChange}
           activeTablature={activeTablature} isRiddleRevealed={isRiddleRevealed}
@@ -1900,7 +1906,7 @@ const PracticeSessionInner = ({
         handleSpeedMultiplierChange={handleSpeedMultiplierChange}
         metronome={metronome} isMetronomeMuted={isMetronomeMuted}
         setIsMetronomeMuted={setIsMetronomeMuted} audioTracks={audioTracks}
-        trackConfigs={trackConfigs} setTrackConfigs={setTrackConfigs}
+        trackConfigs={trackConfigs} setTrackConfigs={changeTrackConfigs}
         backingTrackIds={backingTrackIds}
         masterVolume={masterVolume} setMasterVolume={setMasterVolume}
         examMode={examModeObject} isExamMode={isExamMode} isScaleExam={isScaleExam} exerciseKey={exerciseKey} isLastExercise={isLastExercise}

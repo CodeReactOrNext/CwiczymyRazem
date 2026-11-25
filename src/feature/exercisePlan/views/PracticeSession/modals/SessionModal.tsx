@@ -46,7 +46,7 @@ interface SessionModalProps {
   onRecalibrate?: () => void;
   isListening: boolean;
   isAudioMuted: boolean;
-  setIsAudioMuted: (bool: boolean) => void;
+  onAudioToggle: () => void;
   isMetronomeMuted: boolean;
   setIsMetronomeMuted: (bool: boolean) => void;
   audioTracks?: AudioTrackConfig[];
@@ -90,7 +90,7 @@ const SessionModal = ({
   isMicEnabled, toggleMic,
   frequencyRef, volumeRef, onRecalibrate,
   isListening,
-  isAudioMuted, setIsAudioMuted,
+  isAudioMuted, onAudioToggle,
   isMetronomeMuted, setIsMetronomeMuted,
   audioTracks, setTrackConfigs, masterVolume, setMasterVolume,
   speedMultiplier, onSpeedMultiplierChange,
@@ -180,7 +180,7 @@ const SessionModal = ({
         metronome={metronome} effectiveBpm={effectiveBpm}
         audioStartTime={audioStartTime}
         isMicEnabled={isMicEnabled} toggleMic={toggleMic}
-        isAudioMuted={isAudioMuted} setIsAudioMuted={setIsAudioMuted}
+        isAudioMuted={isAudioMuted} onAudioToggle={onAudioToggle}
         isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
         audioTracks={audioTracks} setTrackConfigs={setTrackConfigs}
         masterVolume={masterVolume} setMasterVolume={setMasterVolume}

@@ -1,6 +1,10 @@
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
-import { getSalvageableMod, toSalvagedMod } from "feature/arsenal/data/salvage";
+import {
+  getSalvageableMod,
+  toSalvagedMod,
+  withUniqueModIds,
+} from "feature/arsenal/data/salvage";
 import type {
   SalvagedMod,
   ScrapPart,
@@ -90,7 +94,7 @@ export default async function handler(
       : null;
     const salvagedMods: SalvagedMod[] = data.arsenal?.salvagedMods ?? [];
     const newSalvagedMods = salvaged
-      ? [...salvagedMods, salvaged]
+      ? withUniqueModIds([...salvagedMods, salvaged])
       : salvagedMods;
 
     const newInventory = inventory.filter(

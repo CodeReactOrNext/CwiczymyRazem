@@ -1,11 +1,30 @@
 import { readBoardSkins } from "feature/arsenal/data/boardSkins";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
-import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
+import { withUniqueModIds } from "feature/arsenal/data/salvage";
+import type {
+  ArsenalUserData,
+  SalvagedMod,
+} from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
+import type { DocumentReference, Transaction } from "firebase-admin/firestore";
 import { readRewardLedger } from "lib/rewards/rewardLedger";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
+
+/**
+ * Stashes that already hold two mods under one id are repaired on read. In a
+ * transaction, unlike the updates below: the whole array goes back, and a mod
+ * that landed in the meantime must not be rolled out of it.
+ */
+const healModIds = (userRef: DocumentReference): Promise<SalvagedMod[]> =>
+  firestore.runTransaction(async (t: Transaction) => {
+    const stored = (await t.get(userRef)).data()?.arsenal?.salvagedMods;
+    const mods: SalvagedMod[] = Array.isArray(stored) ? stored : [];
+    const healed = withUniqueModIds(mods);
+    if (healed !== mods) t.update(userRef, { "arsenal.salvagedMods": healed });
+    return healed;
+  });
 
 export default async function handler(
   req: NextApiRequest,
@@ -27,7 +46,9 @@ export default async function handler(
   }
 
   try {
-    const userRef = firestore.collection("users").doc(userId);
+    const userRef = firestore
+      .collection("users")
+      .doc(userId) as DocumentReference;
     const userDoc = await userRef.get();
 
     if (!userDoc.exists)
@@ -84,6 +105,15 @@ export default async function handler(
       (item) => item.effectId,
     );
 
+    let salvagedMods: SalvagedMod[] | undefined = Array.isArray(
+      data.arsenal.salvagedMods,
+    )
+      ? data.arsenal.salvagedMods
+      : undefined;
+    if (salvagedMods && withUniqueModIds(salvagedMods) !== salvagedMods) {
+      salvagedMods = await healModIds(userRef);
+    }
+
     const arsenal: ArsenalUserData = {
       inventory,
       equippedGuitarId,
@@ -122,9 +152,7 @@ export default async function handler(
         : {}),
       // Mods rescued from teardowns. Absent on every account that has not
       // scrapped a modded instrument yet.
-      ...(Array.isArray(data.arsenal.salvagedMods)
-        ? { salvagedMods: data.arsenal.salvagedMods }
-        : {}),
+      ...(salvagedMods ? { salvagedMods } : {}),
       // Guitar Builder parts. Absent until the first one drops from a case.
       components: Array.isArray(data.arsenal.components)
         ? data.arsenal.components

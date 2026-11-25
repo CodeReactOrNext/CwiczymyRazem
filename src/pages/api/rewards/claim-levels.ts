@@ -1,3 +1,4 @@
+import { withUniqueModIds } from "feature/arsenal/data/salvage";
 import type {
   SalvagedMod,
   ScrapPart,
@@ -104,7 +105,8 @@ export default async function handler(
       const newParts = addPartsToWallet(wallet, parts);
 
       // Mods land in the stash exactly as a teardown's would. The id carries
-      // the rung, so a mod cannot collide with the same mod from another level.
+      // the rung, so a mod cannot collide with the same mod from another level;
+      // a rung that rolls the same mod twice is told apart on the way in.
       const stash: SalvagedMod[] = data.arsenal?.salvagedMods ?? [];
       const granted: SalvagedMod[] = rewards.flatMap((reward) =>
         reward.mods.map((mod) => ({
@@ -121,7 +123,12 @@ export default async function handler(
         ...sealBaseline,
         "arsenal.parts": newParts,
         ...(granted.length
-          ? { "arsenal.salvagedMods": [...stash, ...granted] }
+          ? {
+              "arsenal.salvagedMods": withUniqueModIds([
+                ...stash,
+                ...granted,
+              ]),
+            }
           : {}),
         // A union rather than the array read above: a claim landing beside a
         // report that has just paid another rung must not roll that one back.
