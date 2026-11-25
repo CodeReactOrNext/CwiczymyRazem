@@ -4,7 +4,6 @@ import {
   cumulativeRigFame,
   formatRigFameRate,
   getRigFameRate,
-  RIG_FAME_HOURLY_CEILING,
 } from "./rigFame";
 
 describe("getRigFameRate", () => {
@@ -53,13 +52,8 @@ describe("getRigFameRate", () => {
     expect(high).toBeGreaterThan(low * 0.5);
   });
 
-  it("clamps an absurd rig to the ceiling", () => {
-    expect(getRigFameRate(1_000_000)).toBe(RIG_FAME_HOURLY_CEILING);
-  });
-
-  it("leaves today's top rig well under the ceiling", () => {
-    // The ceiling is a backstop against uncapped buildLevel, not a balance lever.
-    expect(getRigFameRate(750)).toBeLessThan(RIG_FAME_HOURLY_CEILING);
+  it("has no hourly ceiling", () => {
+    expect(getRigFameRate(1_000_000)).toBeGreaterThan(1000);
   });
 });
 

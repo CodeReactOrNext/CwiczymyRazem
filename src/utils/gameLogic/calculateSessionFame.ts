@@ -31,7 +31,6 @@ import {
   cumulativeRateFame,
   cumulativeRigFame,
   getRigFameRate,
-  RIG_FAME_HOURLY_CEILING,
 } from "feature/arsenal/data/rigFame";
 
 /** `fame = FAME_CURVE_FACTOR * sqrt(dailyMinutes)` — 1h ≈ 23, 2h ≈ 33, 4h ≈ 46. */
@@ -93,7 +92,7 @@ export interface SessionFameInput {
    * unchanged.
    */
   traitFame?: number;
-  /** The same payout as a Fame/h rate, which is what the ceiling applies to. */
+  /** The same payout as a Fame/h rate. */
   traitRate?: number;
   /**
    * Fame/h the pedalboard's wiring order is worth — see
@@ -114,13 +113,13 @@ export interface SessionFameResult {
   rigFame: number;
   /** Fame/hour the rig is worth right now, so the UI can show the rate itself. */
   rigFameRate: number;
-  /** The trait component, after the rig ceiling took its cut. */
+  /** The trait component. */
   traitFame: number;
-  /** Fame/hour the traits actually paid, i.e. after the ceiling. */
+  /** Fame/hour the traits actually paid. */
   traitFameRate: number;
   /** The signal-path component — what the board's wiring paid this session. */
   chainFame: number;
-  /** Fame/hour that wiring is worth, after the ceiling. */
+  /** Fame/hour that wiring is worth. */
   chainFameRate: number;
   /** Whether the accuracy multiplier applied — the UI can call it out. */
   accuracyBonusApplied: boolean;
@@ -164,24 +163,11 @@ export const calculateSessionFame = ({
   const streakBonusClaimed = isSameDay ? Boolean(fameDay?.streakBonusClaimed) : false;
   const rigFameRate = getRigFameRate(rigLevel);
 
-  // Every gear payout shares the rig's one ceiling rather than getting a cap of
-  // its own: three ceilings would mean three numbers to explain, and a player at
-  // the cap could not tell which one was binding. They are taken in the order
-  // they are earned — the rig's own rate first, then the wiring, then the traits
-  // — and each gets whatever headroom the ones before it left.
-  const chainFameRate = Math.max(
-    0,
-    Math.min(chainRate, RIG_FAME_HOURLY_CEILING - rigFameRate),
-  );
-  const gearRate = rigFameRate + chainFameRate;
-
-  // Whatever headroom is left is what the traits get, and the payout is scaled by
-  // the same fraction so the rate the header shows is always the rate paid.
-  const traitHeadroom = Math.max(0, RIG_FAME_HOURLY_CEILING - gearRate);
-  const traitScale =
-    traitRate > 0 ? Math.min(1, traitHeadroom / traitRate) : traitRate === 0 ? 1 : 0;
-  const traitFameRate = Math.round(Math.min(traitRate, traitHeadroom) * 10) / 10;
-  const traitFameAwarded = Math.round(Math.max(0, traitFame) * traitScale);
+  // No hourly ceiling: the rig, the wiring and the traits each pay their full
+  // rate. A negative trait rate (a net penalty) still pays nothing.
+  const chainFameRate = Math.max(0, chainRate);
+  const traitFameRate = Math.round(traitRate * 10) / 10;
+  const traitFameAwarded = traitRate < 0 ? 0 : Math.round(Math.max(0, traitFame));
 
   if (isDateBackReport) {
     return {

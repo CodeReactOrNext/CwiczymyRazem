@@ -21,9 +21,7 @@
  *
  * Amplifiers run before penalties so that `Diva` is a real cost — docking a
  * trait that has already been amplified is the only way the two interact
- * honestly. And nothing here clamps the total: the existing
- * `RIG_FAME_HOURLY_CEILING` is the one ceiling in the system, applied where the
- * base rate and the trait rate finally meet in `calculateSessionFame`.
+ * honestly. Nothing clamps the total — trait Fame is uncapped.
  */
 
 import type {
@@ -654,11 +652,11 @@ export const getTraitClockMinutes = (
   );
 
 export interface RigTraitPayout {
-  /** Fame the rig's traits earned for this session, before any ceiling. */
+  /** Fame the rig's traits earned for this session. */
   fame: number;
   /**
    * The same payout expressed as Fame/h over the session — what the header
-   * shows, and the number the rig ceiling is applied to.
+   * shows.
    */
   rate: number;
   entries: EvaluatedTrait[];
