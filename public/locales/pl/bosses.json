@@ -26,29 +26,8 @@
         "title": "Kolos cię zmiażdżył"
       },
       "lair": {
-        "pitch": "Jedna niekończąca się walka na zmiany akordów. W każdej fazie kolos składa się na nowo wokół nowej progresji — akordy otwarte, power chordy, barré, septymowe — a zmiany przychodzą coraz szybciej. Sprawdź, jak daleko zajdziesz."
-      },
-      "rules": {
-        "sword": {
-          "body": "Każda czysta zmiana go ładuje: idealnie 4, na czas 3, blisko 2, luźno 1. Akord się liczy, gdy słychać wszystkie struny poza jedną. Pudło rozbija ładunek."
-        },
-        "strike": {
-          "body": "Pełny miecz uderza sam — tym mocniej, im dłuższa seria czystych zmian, aż do ×2 przy {{max}} z rzędu."
-        },
-        "bite": {
-          "title": "Każde pudło to cios pięścią",
-          "body": "Akord, na który nie zdążysz, kosztuje HP. Skończy się HP — koniec biegu."
-        },
-        "slam": {
-          "title": "Przetrwaj wstrząs",
-          "body": "Od fazy {{slams}} kolos wywołuje wstrząsy: przez dwa takty akordy zmieniają się dwa razy częściej. Zagraj każdy czysto, a zablokujesz — blok ładuje miecz do połowy."
-        },
-        "endless": {
-          "body": "Zbij HP fazy, a kolos składa się na nowo: nowa progresja, nowe akordy i szybsze tempo za każdym razem. Najpierw akordy otwarte, potem power chordy, barré i septymowe. Każda zaliczona faza leczy cię o {{heal}} HP."
-        },
-        "threats": {
-          "body": "Od fazy {{weak}} znajduje twoją słabą zmianę — tę, na której mylisz się najczęściej — a czysto zagrana ładuje miecz ×{{weakCharge}}. Od fazy {{affix}} zdobywa moce: pył, zrastanie, wstrząsy wtórne i skamienienie, które zamienia tabulaturę w kamień."
-        }
+        "pitch": "Jedna niekończąca się walka na zmiany akordów. W każdej fazie kolos składa się na nowo wokół nowej progresji — akordy otwarte, power chordy, barré, septymowe — a zmiany przychodzą coraz szybciej. Sprawdź, jak daleko zajdziesz.",
+        "skill": "Zmiany akordów"
       },
       "boons": {
         "armor": {
@@ -93,6 +72,11 @@
         "faster": "Zmiany o {{percent}}% szybciej",
         "slower": "Zmiany o {{percent}}% wolniej",
         "same_speed": "Zmiany w tym samym tempie"
+      },
+      "how": {
+        "play": "Zmieniaj akordy w tempie, z tabulatury.",
+        "strike": "Czyste zmiany ładują miecz. Pełny miecz uderza.",
+        "survive": "Spóźniony akord kosztuje HP. Przetrwaj jak najwięcej faz."
       }
     },
     "changeling": {
@@ -121,34 +105,8 @@
         "title": "Zmiany cię pochłonęły"
       },
       "lair": {
-        "pitch": "Jedna niekończąca się walka bez nut do czytania. W każdej fazie odmieniec bierze nową progresję w nowej tonacji i staje się po kolei każdym akordem — improwizuj nad nim. Dźwięki akordu na 1 i 3 w takcie i skala pomiędzy ranią jego; cokolwiek innego na tych miarach albo dźwięk spoza tonacji rani ciebie. Sprawdź, jak daleko zajdziesz."
-      },
-      "rules": {
-        "sword": {
-          "body": "Na 1 i 3 w takcie zagraj dźwięk akordu, na którym jesteś — prymę, tercję, kwintę albo septymę — a naładuje go za 4. Pomiędzy ładuje każdy dźwięk skali: dźwięk akordu za 3, reszta za 1, do dwóch nut na miarę. Gryf pokazuje jedno i drugie: dźwięki akordu duże, skalę małą."
-        },
-        "strike": {
-          "body": "Pełny miecz uderza sam — tym mocniej, im dłuższa seria dźwięków akordu, aż do ×2 przy {{max}} z rzędu."
-        },
-        "combo": {
-          "title": "Graj zmiany na combo",
-          "body": "Wejdź w nowy akord na raz — pierwszą nutą najwyżej pół miary od zmiany — albo gładko, pierwszą nutą najwyżej {{smooth}} półtony od poprzedniej. Każde to trik: łącz je akord po akordzie, aż do ×{{comboMax}}. Combo uderza w Odmieńca, gdy progresja się zamyka albo gdy akord wejdzie bez triku. Błąd je zabiera."
-        },
-        "bite": {
-          "title": "Każdy akord potrzebuje dźwięku",
-          "body": "Zagraj na 1 albo 3 jako pierwsze coś innego niż dźwięk akordu, zagraj nutę spoza tonacji albo przepuść akord bez żadnego z jego dźwięków, a odmieniec sięgnie szponami. Skończy się HP — koniec biegu."
-        },
-        "slam": {
-          "title": "Przetrwaj zryw",
-          "body": "Od fazy {{slams}} odmieniec przyspiesza: przez dwa takty akordy zmieniają się dwa razy częściej. Traf dźwięk każdego z nich, a zablokujesz — blok ładuje miecz do połowy."
-        },
-        "endless": {
-          "body": "Zbij HP fazy, a odmieniec zmienia kształt: nowa tonacja, jeden akord więcej i szybsze zmiany za każdym razem — na początek trzy różne akordy. Co jakiś czas dochodzą septymy, akord zapożyczony, dominanta wtrącona albo akord zmniejszony. Najpierw dur i moll, potem skale modalne i blues. Każda zaliczona faza leczy {{heal}} HP."
-        },
-        "threats": {
-          "title": "Uczy się",
-          "body": "Od fazy {{weak}} dźwięki prowadzące — tercje i septymy, które mówią, jaki to akord — ładują miecz ×{{weakCharge}}. Od fazy {{affix}} zyskuje moce: dysonans, przemianę, wiry i kurtynę zasłaniającą tablicę."
-        }
+        "pitch": "Jedna niekończąca się walka bez nut do czytania. W każdej fazie odmieniec bierze nową progresję w nowej tonacji i staje się po kolei każdym akordem — improwizuj nad nim. Dźwięki akordu na 1 i 3 w takcie i skala pomiędzy ranią jego; cokolwiek innego na tych miarach albo dźwięk spoza tonacji rani ciebie. Sprawdź, jak daleko zajdziesz.",
+        "skill": "Solo po akordach"
       },
       "boons": {
         "armor": {
@@ -307,59 +265,19 @@
   },
   "lair": {
     "pitch": "Jedna niekończąca się walka. W każdej fazie pająk linieje w szybszą formę z nowym ćwiczeniem — sprawdź, jak daleko zajdziesz.",
-    "best_phase": "Najlepsza faza",
-    "runs": "Biegi",
     "fight": "Walcz",
     "difficulty": "Poziom trudności",
     "effect_damage": "Otrzymywane obrażenia",
     "effect_tempo": "Tempo",
     "effect_score": "Wynik",
     "start_at": "Zacznij od",
-    "phase_option": "Faza {{phase}}",
-    "next_savepoint": "Faza {{phase}} otworzy się, gdy do niej dojdziesz",
     "skip_note_one": "Pomijasz {{count}} fazę — pokonaj fazę {{phase}}, a jej HP doliczy się do wyniku.",
     "skip_note_few": "Pomijasz {{count}} fazy — pokonaj fazę {{phase}}, a ich HP doliczy się do wyniku.",
     "skip_note_many": "Pomijasz {{count}} faz — pokonaj fazę {{phase}}, a ich HP doliczy się do wyniku.",
     "skip_note_other": "Pomijasz {{count}} fazy — pokonaj fazę {{phase}}, a ich HP doliczy się do wyniku.",
-    "best_score": "Najlepszy wynik",
-    "not_fought": "Jeszcze bez walki",
-    "desktop_only": "Walki z bossami nie są obsługiwane na urządzeniach mobilnych",
-    "desktop_hint": "Walka wymaga dużego ekranu, żeby nadążyć za tabulaturą. Otwórz riff.quest na laptopie lub komputerze, żeby zmierzyć się z tym bossem."
-  },
-  "rules": {
-    "title": "Jak działa walka",
-    "sword": {
-      "title": "Naładuj miecz",
-      "body": "Każde trafienie go ładuje: idealnie 4, na czas 3, blisko 2, luźno 1. Pudło rozbija ładunek."
-    },
-    "strike": {
-      "title": "Cios",
-      "body": "Pełny miecz uderza sam — tym mocniej, im dłuższa seria, aż do ×2 przy {{max}} z rzędu."
-    },
-    "bite": {
-      "title": "Każde pudło to ukąszenie",
-      "body": "Nietrafiona nuta kosztuje HP. Skończy się HP — koniec biegu."
-    },
-    "slam": {
-      "title": "Zablokuj uderzenie",
-      "body": "Od fazy {{slams}} pająk bierze zamach. Miej serię {{parry}}, gdy uderza, a zablokujesz — blok ładuje miecz do połowy."
-    },
-    "endless": {
-      "title": "Bez końca i losowo",
-      "body": "Zbij HP fazy, a pająk linieje: losowa kolejność palców, trasa, pozycja i rytm, za każdym razem szybciej. Każda zaliczona faza leczy cię o {{heal}} HP."
-    },
-    "draft": {
-      "title": "Ulepszenia",
-      "body": "Po każdej fazie bierzesz jedno z trzech losowych ulepszeń — pancerz, ostrzejszy miecz, wolniejsze tempo… Część się kumuluje, rzadkie trafiają się rzadko. Jedno przetasowanie na bieg, kolejne co pięć faz."
-    },
-    "threats": {
-      "title": "Uczy się",
-      "body": "Od fazy {{weak}} odsłania słabe punkty — miecz ładuje się wtedy ×{{weakCharge}}. Od fazy {{affix}} zdobywa moce: jad, regenerację, szał i sieć plutą na tabulaturę — im dalej, tym więcej naraz."
-    },
-    "gates": {
-      "title": "Bramy i punkty zapisu",
-      "body": "Co {{gate}} faz boss strzeże bramy: {{gateHp}}% więcej HP i mocniejsze ciosy. Dojdź do bramy, a następny bieg może się od niej zacząć — pominięte fazy liczą się do wyniku, gdy pokonasz tę, od której zaczynasz."
-    }
+    "phase_label": "Faza",
+    "on_computer": "Walcz na komputerze",
+    "skill": "Przebiegi chromatyczne"
   },
   "draft": {
     "eyebrow": "Zaczyna się faza {{phase}}",
@@ -572,5 +490,66 @@
     "normal": "Normalny",
     "hard": "Trudny",
     "brutal": "Brutalny"
+  },
+  "guide": {
+    "open": "Jak grać",
+    "progress": "Krok {{step}} z {{count}}",
+    "next": "Dalej",
+    "got_it": "Jasne"
+  },
+  "how": {
+    "play": "Graj przebiegi z tabulatury, w tempie.",
+    "strike": "Czyste trafienia ładują miecz. Pełny miecz uderza.",
+    "survive": "Pudło kosztuje HP. Przetrwaj jak najwięcej faz."
+  },
+  "rules": {
+    "title": "Jak działa walka",
+    "sword": {
+      "title": "Naładuj miecz",
+      "body": "Każde trafienie go ładuje: idealnie 4, na czas 3, blisko 2, luźno 1. Pudło rozbija ładunek."
+    },
+    "strike": {
+      "title": "Cios",
+      "body": "Pełny miecz uderza sam — tym mocniej, im dłuższa seria, aż do ×2 przy {{max}} z rzędu."
+    },
+    "bite": {
+      "title": "Każde pudło to ukąszenie",
+      "body": "Nietrafiona nuta kosztuje HP. Skończy się HP — koniec biegu."
+    },
+    "slam": {
+      "title": "Zablokuj uderzenie",
+      "body": "Od fazy {{slams}} pająk bierze zamach. Miej serię {{parry}}, gdy uderza, a zablokujesz — blok ładuje miecz do połowy."
+    },
+    "endless": {
+      "title": "Bez końca i losowo",
+      "body": "Zbij HP fazy, a pająk linieje: losowa kolejność palców, trasa, pozycja i rytm, za każdym razem szybciej. Każda zaliczona faza leczy cię o {{heal}} HP."
+    },
+    "draft": {
+      "title": "Ulepszenia",
+      "body": "Po każdej fazie bierzesz jedno z trzech losowych ulepszeń — pancerz, ostrzejszy miecz, wolniejsze tempo… Część się kumuluje, rzadkie trafiają się rzadko. Jedno przetasowanie na bieg, kolejne co pięć faz."
+    },
+    "threats": {
+      "title": "Uczy się",
+      "body": "Od fazy {{weak}} odsłania słabe punkty — miecz ładuje się wtedy ×{{weakCharge}}. Od fazy {{affix}} zdobywa moce: jad, regenerację, szał i sieć plutą na tabulaturę — im dalej, tym więcej naraz."
+    },
+    "gates": {
+      "title": "Bramy i punkty zapisu",
+      "body": "Co {{gate}} faz boss strzeże bramy: {{gateHp}}% więcej HP i mocniejsze ciosy. Dojdź do bramy, a następny bieg może się od niej zacząć — pominięte fazy liczą się do wyniku, gdy pokonasz tę, od której zaczynasz."
+    }
+  },
+  "primer": {
+    "title": "Czym jest walka z bossem",
+    "looks": {
+      "title": "Ty grasz, on odgryza się",
+      "body": "Boss wisi nad tabulaturą albo akordami. Grasz je w tempie z włączonym mikrofonem. Pudło zabiera HP."
+    },
+    "goes": {
+      "title": "Czysta gra zadaje ciosy",
+      "body": "Każda czysta nuta ładuje miecz. Pełny uderza sam, tym mocniej, im dłuższa seria."
+    },
+    "why": {
+      "title": "Po co walczyć",
+      "body": "Każda faza to nowe ćwiczenie, trochę szybsze, więc poznajesz swoją prawdziwą granicę. Czas liczy się jako ćwiczenie, a najlepsza faza pokazuje, ile już potrafisz."
+    }
   }
 }

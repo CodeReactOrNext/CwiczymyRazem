@@ -1,17 +1,15 @@
 {
   "page": {
     "empty": "Noch keine Übungssessions",
-    "empty_hint": "Schließ eine Übungssession ab oder füge einen manuellen Eintrag hinzu, damit er hier erscheint.",
     "empty_filtered": "Nichts entspricht deinen Filtern",
     "empty_filtered_hint": "Erweitere den Zeitraum oder setze die Filter zurück.",
     "sessions_heading": "Sessions",
-    "day_sessions": "{{count}} Session(s)"
+    "start": "Mit dem Üben beginnen",
+    "day_sessions_one": "{{count}} Session",
+    "day_sessions_other": "{{count}} Sessions"
   },
   "pagination": {
-    "label": "Session-Seiten",
-    "previous": "Vorherige Seite",
-    "next": "Nächste Seite",
-    "page_of": "Seite {{page}} von {{total}}"
+    "show_more": "Mehr Sessions anzeigen"
   },
   "timeline": {
     "heading": "Tagesverlauf"
@@ -20,9 +18,8 @@
     "prev_month": "Vorheriger Monat",
     "next_month": "Nächster Monat",
     "clear_range": "Ausgewählte Tage zurücksetzen",
-    "hint": "Tippe auf zwei Tage für einen Zeitraum",
-    "less": "Weniger",
-    "more": "Mehr"
+    "streak_goal_one": "Serie: {{count}} Tag",
+    "streak_goal_other": "Serie: {{count}} Tage"
   },
   "filters": {
     "heading": "Filter",
@@ -30,6 +27,10 @@
     "range_30d": "30 Tage",
     "range_90d": "90 Tage",
     "range_all": "Gesamter Zeitraum",
+    "range_7d_short": "7 T",
+    "range_30d_short": "30 T",
+    "range_90d_short": "90 T",
+    "range_all_short": "Alle",
     "range_label": "Zeitraum",
     "clear_custom": "Ausgewählte Tage zurücksetzen",
     "clear_all": "Filter zurücksetzen",
@@ -50,7 +51,6 @@
     "sort_points_desc": "Meiste Punkte"
   },
   "summary": {
-    "heading": "Überblick",
     "time_split": "Zeitaufteilung",
     "total_time": "Gesamtzeit",
     "sessions": "Sessions",
@@ -67,7 +67,7 @@
     "points": "Punkte",
     "edit": "Eintrag bearbeiten",
     "delete": "Eintrag löschen",
-    "recorded_tooltip": "Aufgezeichnete Übung – kann nicht bearbeitet werden"
+    "play_again": "Noch einmal üben"
   },
   "edit_modal": {
     "title": "Eintrag bearbeiten",
@@ -107,5 +107,11 @@
     "subtitle": "Durchsuche, filtere und bearbeite deine Übungshistorie Tag für Tag",
     "eyebrow": "Deine Historie",
     "add": "Eintrag hinzufügen"
+  },
+  "chart": {
+    "day": "Übungszeit pro Tag",
+    "week": "Übungszeit pro Woche",
+    "month": "Übungszeit pro Monat",
+    "year": "Übungszeit pro Jahr"
   }
 }

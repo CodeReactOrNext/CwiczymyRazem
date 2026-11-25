@@ -147,6 +147,16 @@
     "hide_tabs": "Ukryj tabulaturę",
     "by_ear": "Graj ze słuchu/z pamięci"
   },
+  "toolbar": {
+    "play_tab": "Odsłuch tabu",
+    "backing": "Podkład",
+    "standard_tuning": "E standard",
+    "mic_scoring": "Ocena mikrofonem",
+    "mic_setup": "Ustawienia mikrofonu",
+    "wait_mode": "Tryb czekania",
+    "progress": "Postęp",
+    "slow_down": "Zwolnij"
+  },
   "quick": {
     "tempo_reset": "Tempo metronomu — przywróć zalecane",
     "slower_hint": "Wolniej (Shift: −5 BPM)",
@@ -204,6 +214,14 @@
       "5": "A",
       "6": "niska E"
     },
+    "find_every": "Znajdź każde {{note}}",
+    "skip": "Pomiń",
+    "gate_title": "Znajdź każdą nutę",
+    "gate_detail": "Łącznie {{minutes}} min, {{seconds}} s na każdą nutę.",
+    "round_solved": "Wszystkie {{total}} w {{seconds}} s",
+    "round_next": "Zaraz następna nuta",
+    "round_missed": "Znalezione: {{found}} z {{total}}",
+    "round_missed_detail": "Zabrakło: {{notes}}",
     "tap_octaves": "Stuknij każdą znalezioną oktawę",
     "tap_octaves_region": "Stuknij każdą oktawę znalezioną w obszarze"
   },
@@ -224,6 +242,7 @@
     "close_panel": "Ukryj narzędzia ćwiczenia"
   },
   "success": {
+    "correct": "Poprawne",
     "mastered": "Opanowane!",
     "passed": "Egzamin zdany!",
     "failed": "Egzamin niezdany",
@@ -251,9 +270,23 @@
     "chart_notes_one": "{{count}} nuta",
     "chart_notes_few": "{{count}} nuty",
     "chart_notes_many": "{{count}} nut",
-    "chart_notes_other": "{{count}} nuty"
+    "chart_notes_other": "{{count}} nuty",
+    "time": "Czas",
+    "best_run": "Najdłuższa seria"
   },
   "quiz": {
+    "paused_note": "Pauza. Odpowiedzi liczą się znowu, gdy ruszy stoper.",
+    "hear_it": "Posłuchaj",
+    "trust_ears": "bez liczb, zaufaj uszom",
+    "thats_in_tune": "Stroi",
+    "gate_detail": "{{minutes}} min. Słuchawki pomagają.",
+    "gate": {
+      "chordType": "Nazwij akord, który słyszysz",
+      "progression": "Ułóż progresję, którą słyszysz",
+      "detune": "Przesuń, aż przestanie falować",
+      "scaleMode": "Nazwij skalę, którą słyszysz",
+      "interval": "Nazwij interwał, który słyszysz"
+    },
     "stop": "Stop",
     "play_again": "Odtwórz ponownie",
     "play": "Odtwórz",
@@ -291,7 +324,6 @@
     "play_slowly": "Odtwórz powoli",
     "root": "Dźwięk podstawowy: {{root}}",
     "root_held": "Tonika brzmi cały czas pod spodem — odnoś do niej każdy kolejny dźwięk",
-    "hear_again_slowly": "Posłuchaj jeszcze raz, powoli",
     "hear_from_root": "Posłuchaj: {{name}} od {{root}}",
     "which_chord": "Jaki to rodzaj akordu?",
     "play_chord": "Odtwórz akord",
@@ -460,6 +492,10 @@
     "change": "Zmień podkład"
   },
   "ear": {
+    "listen_play_back": "Posłuchaj i zagraj to samo",
+    "missed_it": "Nie trafiłem",
+    "next_melody_key": "Następna melodia",
+    "score": "Wynik",
     "correct": "Dobrze — punkt zdobyty",
     "next_melody": "Następna melodia w drodze…",
     "tab_shows": "Tabulatura poniżej pokazuje melodię. Odtwórz ją, żeby porównać.",
@@ -495,15 +531,15 @@
     "boost": "Wzmocnij głośność",
     "unmute": "Włącz dźwięk",
     "mute": "Wycisz",
-    "main_instrument": "Główny instrument"
+    "main_instrument": "Główny instrument",
+    "mix": "Miks"
   },
   "auto_backing": {
-    "title": "Podkład",
     "toggle": "Generowany podkład",
     "description": "Perkusja, bas i miękki pad napisane pod to ćwiczenie: w jego tonacji i zgodnie z jego akordami.",
     "drums_only": "Tylko perkusja: nuty przechodzą przez wszystkie progi, więc każdy akord by z nimi zgrzytał.",
-    "drone": "Bas i power chordy na podstawie, bo nuty nie rozstrzygają, czy to dur, czy moll.",
     "headphones": "Przy włączonym mikrofonie załóż słuchawki. Inaczej mikrofon usłyszy zespół jako twoje granie. Jeśli aplikacja zalicza nuty, których nie grasz, sprawdź najpierw to.",
+    "headphones_short": "Mikrofon włączony? Załóż słuchawki.",
     "groove": {
       "rock": "Rock",
       "pop": "Pop",
@@ -588,13 +624,10 @@
     "now_above": "{{interval}} nad tym {{root}}",
     "click_any": "Kliknij dowolne {{note}}",
     "on_highlighted": "na podświetlonych strunach",
-    "root": "Podstawa",
-    "target": "Cel",
     "play_root": "Odtwórz dźwięk podstawowy, od którego liczony jest interwał",
     "hide_distance": "Ukryj odległość",
     "how_far": "Jak daleko?",
     "autoplay": "Autoodtwarzanie",
-    "step": "Krok {{step}} z 2",
     "anywhere": "Gdziekolwiek na progach {{from}}–{{to}}",
     "near_zone": "Blisko twojego {{root}}, w podświetlonym polu",
     "near": "W zasięgu twojego {{root}}",
@@ -603,7 +636,27 @@
     "frets_up_few": "{{count}} progi wyżej",
     "frets_up_many": "{{count}} progów wyżej",
     "frets_up_other": "{{count}} progu wyżej",
-    "hear_root": "Posłuchaj podstawy"
+    "lives": "Pozostałe życia: {{count}} z {{limit}}",
+    "time_up": "Koniec czasu",
+    "next_round": "Zaraz następna runda",
+    "answer_was": "{{interval}} nad {{root}} to {{target}}",
+    "wrong_note": "To było {{note}}",
+    "wrong_interval": "To było {{note}}, czyli {{interval}}",
+    "too_far": "Dobry dźwięk, ale za daleko od twojego {{root}}",
+    "same_string": "Ta sama struna",
+    "same_fret": "ten sam próg",
+    "strings_higher_one": "{{count}} struna wyżej",
+    "strings_higher_few": "{{count}} struny wyżej",
+    "strings_higher_many": "{{count}} strun wyżej",
+    "strings_higher_other": "{{count}} struny wyżej",
+    "strings_lower_one": "{{count}} struna niżej",
+    "strings_lower_few": "{{count}} struny niżej",
+    "strings_lower_many": "{{count}} strun niżej",
+    "strings_lower_other": "{{count}} struny niżej",
+    "frets_down_one": "{{count}} próg niżej",
+    "frets_down_few": "{{count}} progi niżej",
+    "frets_down_many": "{{count}} progów niżej",
+    "frets_down_other": "{{count}} progu niżej"
   },
   "instructions": {
     "support_author": "Wesprzyj autora",
@@ -654,10 +707,6 @@
     "exit": "Wyjdź",
     "exit_no_save": "Wyjdź bez zapisywania",
     "stay": "Zostań w sesji"
-  },
-  "dialogs": {
-    "finished": "Ćwiczenie ukończone!",
-    "great_job": "Świetna robota!"
   },
   "speed": {
     "active_hint": "Prędkość odtwarzania {{speed}} — klik i podkład grają w {{effective}} BPM zamiast {{base}}",
@@ -757,13 +806,11 @@
     "read": "Przeczytaj instrukcje poniżej, żeby zacząć"
   },
   "progress": {
-    "title": "Postęp sesji",
-    "song": "Utwór: {{title}}",
-    "exercise": "Ćwiczenie {{n}}",
     "go_to": "Przejdź do: {{label}}"
   },
   "controls": {
-    "press_start": "Naciśnij Start, by zagrać",
+    "resume": "Wznów",
+    "again": "Jeszcze raz",
     "pause": "Pauza",
     "restart": "Zacznij ćwiczenie od nowa"
   },
@@ -882,12 +929,22 @@
     "skip": "Pomiń nutę",
     "restart": "Zacznij od nowa"
   },
+  "bar": {
+    "more": "Więcej",
+    "time_only": "Tylko czas",
+    "save": "Zapisz sesję"
+  },
   "start_gate": {
     "start": "Start",
-    "preview": "Podgląd",
-    "hint_count_in": "Metronom odliczy wejście, potem grasz. Podgląd pokaże tabulaturę bez liczenia czasu.",
-    "hint": "Czas liczy się od naciśnięcia Start. Podgląd pozwala najpierw się rozejrzeć.",
-    "hint_no_preview": "Czas i punkty liczą się od naciśnięcia Start."
+    "count_in_short": "Metronom odliczy wejście",
+    "clock_short": "Czas rusza po Start",
+    "preview_first": "Najpierw obejrzyj tabulaturę",
+    "hint_no_preview": "Czas i punkty liczą się od naciśnięcia Start.",
+    "mic_label": "Mikrofon",
+    "mic_on": "Graj z mikrofonem",
+    "mic_on_detail": "Aplikacja słucha i ocenia Twoją grę",
+    "mic_off": "Graj bez mikrofonu",
+    "mic_off_detail": "Czas ćwiczenia i tak się liczy"
   },
   "mic_open_failed": {
     "title": "Mikrofon się nie włączył",
@@ -935,5 +992,33 @@
     "delete": "Przenieś do kosza",
     "untitled": "Nagranie"
   },
-  "exam_click_failed": "{{limit}} błędnych kliknięć — egzamin niezaliczony."
+  "exam_click_failed": "{{limit}} błędnych kliknięć — egzamin niezaliczony.",
+  "verdict": {
+    "time": "{{minutes}} min za Tobą",
+    "clean": "Czysto zagrane",
+    "rough": "Ćwiczenie skończone",
+    "weak_bar": "Takt {{bar}} uciekł",
+    "next": "Dalej: {{title}}",
+    "stats": "{{accuracy}}% trafień, {{count}} z rzędu",
+    "again": "Jeszcze raz",
+    "drill": "Takt {{bar}} wolniej",
+    "continue": "Dalej"
+  },
+  "drill": {
+    "title": "Takt {{bar}} wolniej",
+    "detail": "Czyste przejścia do zagrania: {{count}}, tempo {{bpm}} BPM",
+    "done": "Masz to",
+    "done_detail": "Takt {{bar}} czysto w {{bpm}} BPM",
+    "skip": "Pomiń",
+    "passes": "Czyste przejścia: {{done}} z {{total}}"
+  },
+  "interlude": {
+    "halfway": "Połowa za Tobą.",
+    "done_of": "{{done}} z {{total}} zrobione.",
+    "streak": "{{streak}} {{progress}}",
+    "in_a_row": "{{count}} z rzędu."
+  },
+  "combo": {
+    "in_a_row": "{{count}} z rzędu"
+  }
 }

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { mirrorStyle, uprightTransform, useIsLeftHanded } from "hooks/useHandedness";
 import { useTranslation } from "hooks/useTranslation";
+import { useColorTheme } from "lib/colorTheme/colorTheme";
 import { type CSSProperties, memo, useCallback, useId, useLayoutEffect, useRef, useState } from "react";
 
 interface ClickableFretboardProps {
@@ -23,6 +24,15 @@ interface ClickableFretboardProps {
   markedKeys?: string[];
   /** Single character drawn inside every `markedKeys` marker, e.g. "R". */
   markedLabel?: string;
+  /** Words for the markers on found, marked and revealed cells — note names. A
+   *  found cell without one is ticked. */
+  cellLabels?: Record<string, string>;
+  /** Cells shown as the answer nobody found, drawn hollow. */
+  revealKeys?: string[];
+  /** Two cells joined by a line, behind their markers. */
+  linkKeys?: readonly [string, string];
+  /** Marks the last clicked cell as wrong, under this name. */
+  wrongLabel?: string;
   /** Cells the current step still accepts, tinted as a zone — the interval drill's
    *  hand span around the placed root. A whole area, never the answers alone. */
   zoneKeys?: string[];
@@ -76,6 +86,9 @@ const TIME_PILL_W = 165;
 const TIME_PILL_H = 60;
 // Square the mic's pulsing ring is drawn in — its r=30 circle plus the stroke.
 const LIVE_RING_BOX = 70;
+const WRONG_MARK_BOX = 72;
+// A marker that has to hold a note name, up to "A#".
+const LABELLED_MARK_R = 33;
 
 const CELL_W = 190;
 const ROW_H = 75;
@@ -97,15 +110,171 @@ const BOTTOM_LEAN = 13;
 // boundary — replacing what would otherwise be a plain thin fret divider.
 const NUT_WIDTH = 18;
 
-// Strings are the instrument — brushed steel, not stark white, so it reads as
-// metal rather than UI text. Frets are just structural markers on the neck —
-// thin, muted, and stay out of the way.
-const STRING_ACTIVE_COLOR = "#9ca3af";
-const STRING_ACTIVE_HIGHLIGHT = "#d1d5db";
-const STRING_INACTIVE_COLOR = "#57534e";
-const FRET_COLOR = "#52525b";
-const FRET_NUMBER_COLOR = "#a1a1aa";
-const FRET_NUMBER_CONTEXT_COLOR = "#52525b";
+/**
+ * Everything on the board that has a colour, per theme. The neck is drawn in
+ * raw SVG colours, which the light theme's palette remap never reaches, so it
+ * carries its own pair.
+ */
+interface NeckColors {
+  /** The fretboard, top to bottom. */
+  neckTop: string;
+  neckBottom: string;
+  /** The neck's edge under the last string, top to bottom. */
+  edgeTop: string;
+  edgeBottom: string;
+  sheenOpacity: number;
+  // Frets are just structural markers on the neck — thin, muted, and stay out
+  // of the way. Strings are the instrument — brushed steel, not stark white, so
+  // it reads as metal rather than UI text.
+  fret: string;
+  fretOpacity: number;
+  inlay: string;
+  inlayOpacity: number;
+  sideDot: string;
+  nut: string;
+  string: string;
+  stringHighlight: string;
+  stringOff: string;
+  stringOffOpacity: number;
+  /** Added to the thin out-of-play strings, which a bright neck swallows. */
+  stringOffExtraWidth: number;
+  /** The fret window: the columns that count. */
+  window: string;
+  windowOpacity: number;
+  /** The same window while the zone inside it is lit. */
+  windowBehindZoneOpacity: number;
+  /** The string(s) in play, along the whole neck. */
+  row: string;
+  rowOpacity: number;
+  /** …and where they cross the window: the cells that count. */
+  rowInWindowOpacity: number;
+  zone: string;
+  zoneOpacity: number;
+  /** Window and rows once every position is found. */
+  complete: string;
+  windowCompleteOpacity: number;
+  /** Over the strings out of play. */
+  scrim: string;
+  scrimOpacity: number;
+  hoverClass: string;
+  fretNumber: string;
+  fretNumberContext: string;
+  fretNumberContextOpacity: number;
+  label: string;
+  labelScoped: string;
+  labelOff: string;
+  labelOffSize: number;
+  root: string;
+  rootInk: string;
+  found: string;
+  foundInk: string;
+  foundRing: string;
+  link: string;
+  linkOpacity: number;
+  revealed: string;
+  revealedInk: string;
+}
+
+const NECK_COLORS: Record<"dark" | "light", NeckColors> = {
+  dark: {
+    neckTop: "#26232a",
+    neckBottom: "#0c0b0d",
+    edgeTop: "#0c0b0d",
+    edgeBottom: "#000000",
+    sheenOpacity: 0.05,
+    fret: "#52525b",
+    fretOpacity: 0.5,
+    inlay: "#a1a1aa",
+    inlayOpacity: 1,
+    sideDot: "#3f3f46",
+    // Bone, like the real thing: amber is what a placed root wears.
+    nut: "#d4d4d8",
+    string: "#9ca3af",
+    stringHighlight: "#d1d5db",
+    stringOff: "#57534e",
+    stringOffOpacity: 0.5,
+    stringOffExtraWidth: 0,
+    window: "#22d3ee",
+    windowOpacity: 0.08,
+    windowBehindZoneOpacity: 0.03,
+    row: "#22d3ee",
+    rowOpacity: 0.1,
+    rowInWindowOpacity: 0,
+    zone: "#22d3ee",
+    zoneOpacity: 0.14,
+    complete: "#34d399",
+    windowCompleteOpacity: 0.08,
+    scrim: "#09090b",
+    scrimOpacity: 0.55,
+    hoverClass: "hover:fill-zinc-200/10",
+    fretNumber: "#a1a1aa",
+    fretNumberContext: "#52525b",
+    fretNumberContextOpacity: 0.6,
+    label: "#9ca3af",
+    labelScoped: "#67e8f9",
+    labelOff: "#57534e",
+    labelOffSize: 20,
+    root: "#f59e0b",
+    rootInk: "#432003",
+    found: "#10b981",
+    foundInk: "#052e1f",
+    foundRing: "#052e1f",
+    link: "#34d399",
+    linkOpacity: 0.45,
+    revealed: "#18181b",
+    revealedInk: "#fafafa",
+  },
+  // A maple neck: bleached away from the window, full-coloured inside it, with
+  // the cells in play in solid gold.
+  light: {
+    neckTop: "#faf4e8",
+    neckBottom: "#f7eedd",
+    edgeTop: "#c39a63",
+    edgeBottom: "#c39a63",
+    sheenOpacity: 0,
+    fret: "#8a7350",
+    fretOpacity: 0.85,
+    inlay: "#4a3823",
+    inlayOpacity: 0.75,
+    sideDot: "#4a3823",
+    nut: "#57534e",
+    string: "#45423e",
+    stringHighlight: "#8b8780",
+    stringOff: "#8f7d62",
+    stringOffOpacity: 0.9,
+    stringOffExtraWidth: 0.9,
+    window: "#e0b878",
+    windowOpacity: 1,
+    windowBehindZoneOpacity: 1,
+    row: "#f59e0b",
+    rowOpacity: 0.12,
+    rowInWindowOpacity: 0.72,
+    zone: "#f59e0b",
+    zoneOpacity: 0.5,
+    complete: "#6ee7b7",
+    windowCompleteOpacity: 0.75,
+    scrim: "#ffffff",
+    scrimOpacity: 0.32,
+    // Not a zinc class: the remapped palette would wash out on the wood.
+    hoverClass: "hover:fill-[rgba(67,32,3,0.14)]",
+    fretNumber: "#18181b",
+    fretNumberContext: "#71717a",
+    fretNumberContextOpacity: 1,
+    label: "#27272a",
+    labelScoped: "#92400e",
+    labelOff: "#71717a",
+    labelOffSize: 24,
+    root: "#f59e0b",
+    rootInk: "#432003",
+    found: "#047857",
+    foundInk: "#ffffff",
+    foundRing: "#ffffff",
+    link: "#047857",
+    linkOpacity: 0.6,
+    revealed: "#fffaf0",
+    revealedInk: "#27272a",
+  },
+};
 
 // Real string gauges get thinner from low E (thickest) to high e (thinnest).
 // Index 0 = string 1 (high e) .. index 5 = string 6 (low E).
@@ -192,14 +361,26 @@ export const ClickableFretboard = memo(function ClickableFretboard({
   markedKeys,
   markedLabel,
   zoneKeys,
+  cellLabels,
+  revealKeys,
+  linkKeys,
+  wrongLabel,
   showFullNeck = false,
 }: ClickableFretboardProps) {
   const { t } = useTranslation("session");
+  const colors = NECK_COLORS[useColorTheme()];
   const isInScope = (stringNum: number) => !strings || strings.includes(stringNum);
   const found = new Set(foundKeys);
   const marked = new Set(markedKeys);
   const zone = new Set(zoneKeys);
+  const revealed = new Set(revealKeys);
   const allFound = totalTargets > 0 && found.size >= totalTargets;
+  const windowOpacity =
+    zone.size > 0
+      ? colors.windowBehindZoneOpacity
+      : allFound
+        ? colors.windowCompleteOpacity
+        : colors.windowOpacity;
   const interactive = !!onCellClick;
   // Only worth shouting about which string to use when the exercise actually
   // narrows it down — with all six in play there's nothing to distinguish.
@@ -233,7 +414,9 @@ export const ClickableFretboard = memo(function ClickableFretboard({
   const neckH = 6 * ROW_H;
   const vh = TOP_PAD + neckH + BOTTOM_BAND_H + BOT_PAD;
   const neckW = colX(drawEnd + 1) - neckX;
-  const nutColor = allFound ? "#34d399" : "#f59e0b";
+
+  // Where the gradient passes from the fretboard to the edge below it.
+  const neckEndOffset = `${(neckH / (neckH + BOTTOM_BAND_H)) * 100}%`;
 
   const rowY = (i: number) => TOP_PAD + i * ROW_H;
   const reactId = useId();
@@ -254,15 +437,17 @@ export const ClickableFretboard = memo(function ClickableFretboard({
   const svgRef = useRef<SVGSVGElement>(null);
   const viewClipRef = useRef<SVGRectElement>(null);
   const labelsRef = useRef<SVGGElement>(null);
-  const bandRef = useRef<SVGRectElement>(null);
+  const bandRef = useRef<SVGGElement>(null);
   useTweenedGeometry([camLeft, camRight, colX(startFret), colX(endFret + 1)], ([left, right, bandLeft, bandRight]) => {
     const x = left - LEFT_PAD;
     svgRef.current?.setAttribute("viewBox", `${x} 0 ${right - x + 10} ${vh}`);
     viewClipRef.current?.setAttribute("x", String(left));
     viewClipRef.current?.setAttribute("width", String(right - left + 4));
     labelsRef.current?.setAttribute("transform", `translate(${x} 0)`);
-    bandRef.current?.setAttribute("x", String(bandLeft));
-    bandRef.current?.setAttribute("width", String(bandRight - bandLeft));
+    for (const rect of Array.from(bandRef.current?.children ?? [])) {
+      rect.setAttribute("x", String(bandLeft));
+      rect.setAttribute("width", String(bandRight - bandLeft));
+    }
   });
 
   // Percent box of the overlay layer for a rect in viewBox units.
@@ -279,6 +464,12 @@ export const ClickableFretboard = memo(function ClickableFretboard({
     if (!isInScope(stringNum) || fret < startFret || fret > endFret) return null;
     return { cx: colX(fret) + colWidth(fret) / 2, cy: rowY(stringNum - 1) + ROW_H / 2 };
   })();
+
+  const cellCenter = (key: string) => {
+    const [stringNum, fret] = key.split("-").map(Number);
+    return { cx: colX(fret) + colWidth(fret) / 2, cy: rowY(stringNum - 1) + ROW_H / 2 };
+  };
+  const link = linkKeys && { from: cellCenter(linkKeys[0]), to: cellCenter(linkKeys[1]) };
 
   return (
     <div className="w-full overflow-x-auto">
@@ -301,13 +492,14 @@ export const ClickableFretboard = memo(function ClickableFretboard({
         >
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#26232a" />
-              <stop offset={`${(neckH / (neckH + BOTTOM_BAND_H)) * 100}%`} stopColor="#0c0b0d" />
-              <stop offset="100%" stopColor="#000000" />
+              <stop offset="0%" stopColor={colors.neckTop} />
+              <stop offset={neckEndOffset} stopColor={colors.neckBottom} />
+              <stop offset={neckEndOffset} stopColor={colors.edgeTop} />
+              <stop offset="100%" stopColor={colors.edgeBottom} />
             </linearGradient>
             <linearGradient id={sheenId} x1="0" y1="0" x2="1" y2="0.3">
               <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
-              <stop offset="45%" stopColor="#ffffff" stopOpacity="0.05" />
+              <stop offset="45%" stopColor="#ffffff" stopOpacity={colors.sheenOpacity} />
               <stop offset="60%" stopColor="#ffffff" stopOpacity="0" />
             </linearGradient>
             {/* Everything on the neck is cut to the camera, so the neck to the left
@@ -324,20 +516,8 @@ export const ClickableFretboard = memo(function ClickableFretboard({
           <rect x={neckX} y={TOP_PAD} width={neckW} height={neckH + BOTTOM_BAND_H} rx={6} fill={`url(#${gradientId})`} />
           <rect x={neckX} y={TOP_PAD} width={neckW} height={neckH} fill={`url(#${sheenId})`} clipPath={`url(#${clipId})`} />
 
-          {/* Search-zone band — marks exactly which columns are clickable,
-              distinguishing them from the surrounding context-only frets. */}
-          <rect
-            ref={bandRef}
-            x={colX(startFret)}
-            y={TOP_PAD}
-            width={colX(endFret + 1) - colX(startFret)}
-            height={neckH}
-            fill={allFound ? "#34d399" : "#22d3ee"}
-            opacity={0.08}
-          />
-
           {/* String-scope band — runs the full length of the neck along every
-              string in play. Crossed with the fret window above, the two bands
+              string in play. Crossed with the fret window below, the two bands
               intersect exactly on the cells that count. */}
           {stringScoped && STRING_LABELS.map((_, i) =>
             isInScope(i + 1) ? (
@@ -347,11 +527,39 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                 y={rowY(i)}
                 width={neckW}
                 height={ROW_H}
-                fill={allFound ? "#34d399" : "#22d3ee"}
-                opacity={0.1}
+                fill={allFound ? colors.complete : colors.row}
+                opacity={colors.rowOpacity}
               />
             ) : null,
           )}
+
+          {/* Search-zone band — marks exactly which columns are clickable,
+              distinguishing them from the surrounding context-only frets — and,
+              over it, the in-play strings' share of those columns. The camera
+              tween moves and sizes every rect in this group as the window. */}
+          <g ref={bandRef}>
+            <rect
+              x={colX(startFret)}
+              y={TOP_PAD}
+              width={colX(endFret + 1) - colX(startFret)}
+              height={neckH}
+              fill={allFound ? colors.complete : colors.window}
+              opacity={windowOpacity}
+            />
+            {stringScoped && colors.rowInWindowOpacity > 0 && STRING_LABELS.map((_, i) =>
+              isInScope(i + 1) ? (
+                <rect
+                  key={i}
+                  x={colX(startFret)}
+                  y={rowY(i)}
+                  width={colX(endFret + 1) - colX(startFret)}
+                  height={ROW_H}
+                  fill={allFound ? colors.complete : colors.row}
+                  opacity={colors.rowInWindowOpacity}
+                />
+              ) : null,
+            )}
+          </g>
 
           {/* Inlay markers — sit on the fretboard itself, between strings, like a real neck. */}
           {Array.from({ length: fretCount }, (_, i) => {
@@ -360,13 +568,13 @@ export const ClickableFretboard = memo(function ClickableFretboard({
             const x = colX(fret) + CELL_W / 2;
             const centerY = TOP_PAD + neckH / 2;
             if (SINGLE_INLAY_FRETS.has(fret)) {
-              return <circle key={i} cx={x} cy={centerY} r={11} fill="#a1a1aa" className="pointer-events-none" />;
+              return <circle key={i} cx={x} cy={centerY} r={11} fill={colors.inlay} opacity={colors.inlayOpacity} className="pointer-events-none" />;
             }
             if (DOUBLE_INLAY_FRETS.has(fret)) {
               return (
                 <g key={i} className="pointer-events-none">
-                  <circle cx={x} cy={centerY - ROW_H} r={11} fill="#a1a1aa" />
-                  <circle cx={x} cy={centerY + ROW_H} r={11} fill="#a1a1aa" />
+                  <circle cx={x} cy={centerY - ROW_H} r={11} fill={colors.inlay} opacity={colors.inlayOpacity} />
+                  <circle cx={x} cy={centerY + ROW_H} r={11} fill={colors.inlay} opacity={colors.inlayOpacity} />
                 </g>
               );
             }
@@ -385,9 +593,9 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                 y1={TOP_PAD}
                 x2={x}
                 y2={TOP_PAD + neckH}
-                stroke={FRET_COLOR}
+                stroke={colors.fret}
                 strokeWidth={3}
-                opacity={0.5}
+                opacity={colors.fretOpacity}
                 vectorEffect="non-scaling-stroke"
               />
             );
@@ -408,9 +616,9 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                 y1={TOP_PAD + neckH}
                 x2={spreadX}
                 y2={TOP_PAD + neckH + BOTTOM_BAND_H}
-                stroke={FRET_COLOR}
+                stroke={colors.fret}
                 strokeWidth={3}
-                opacity={0.4}
+                opacity={colors.fretOpacity * 0.8}
                 vectorEffect="non-scaling-stroke"
               />
             );
@@ -424,7 +632,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
             const xTop = colX(fret) + CELL_W / 2;
             const x = xTop - BOTTOM_LEAN / 2;
             const y = TOP_PAD + neckH + BOTTOM_BAND_H / 2;
-            return <circle key={i} cx={x} cy={y} r={8} fill="#3f3f46" className="pointer-events-none" />;
+            return <circle key={i} cx={x} cy={y} r={8} fill={colors.sideDot} className="pointer-events-none" />;
           })}
 
           {/* Nut — replaces the plain divider between fret 0 and fret 1: wide,
@@ -436,10 +644,10 @@ export const ClickableFretboard = memo(function ClickableFretboard({
             const nutRight = nutCenterX + NUT_WIDTH / 2;
             return (
               <>
-                <rect x={nutLeft} y={TOP_PAD - 4} width={NUT_WIDTH} height={neckH + 8} rx={4} fill={nutColor} />
+                <rect x={nutLeft} y={TOP_PAD - 4} width={NUT_WIDTH} height={neckH + 8} rx={4} fill={colors.nut} />
                 <polygon
                   points={`${nutLeft},${TOP_PAD + neckH} ${nutRight},${TOP_PAD + neckH} ${nutRight - BOTTOM_LEAN},${TOP_PAD + neckH + BOTTOM_BAND_H} ${nutLeft - BOTTOM_LEAN},${TOP_PAD + neckH + BOTTOM_BAND_H}`}
-                  fill={nutColor}
+                  fill={colors.nut}
                   opacity={0.75}
                 />
               </>
@@ -452,7 +660,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
             const stringNum = i + 1;
             const active = isInScope(stringNum);
             const y = rowY(i) + ROW_H / 2;
-            const width = active ? STRING_ACTIVE_WIDTHS[i] : STRING_INACTIVE_WIDTHS[i];
+            const width = active ? STRING_ACTIVE_WIDTHS[i] : STRING_INACTIVE_WIDTHS[i] + colors.stringOffExtraWidth;
             return (
               <g key={i}>
                 <line
@@ -460,9 +668,9 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                   y1={y}
                   x2={neckX + neckW}
                   y2={y}
-                  stroke={active ? STRING_ACTIVE_COLOR : STRING_INACTIVE_COLOR}
+                  stroke={active ? colors.string : colors.stringOff}
                   strokeWidth={width}
-                  opacity={active ? 1 : 0.5}
+                  opacity={active ? 1 : colors.stringOffOpacity}
                   strokeLinecap="round"
                 />
                 {active && (
@@ -471,7 +679,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                     y1={y - width / 4}
                     x2={neckX + neckW}
                     y2={y - width / 4}
-                    stroke={STRING_ACTIVE_HIGHLIGHT}
+                    stroke={colors.stringHighlight}
                     strokeWidth={Math.max(1, width / 4)}
                     opacity={0.5}
                     strokeLinecap="round"
@@ -492,8 +700,8 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                 y={rowY(i)}
                 width={neckW}
                 height={ROW_H}
-                fill="#09090b"
-                opacity={0.55}
+                fill={colors.scrim}
+                opacity={colors.scrimOpacity}
                 className="pointer-events-none"
               />
             ),
@@ -513,13 +721,27 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                 textAnchor="middle"
                 fontSize={inTarget ? 30 : 22}
                 fontWeight={inTarget ? "bold" : "600"}
-                fill={inTarget ? FRET_NUMBER_COLOR : FRET_NUMBER_CONTEXT_COLOR}
-                opacity={inTarget ? 1 : 0.6}
+                fill={inTarget ? colors.fretNumber : colors.fretNumberContext}
+                opacity={inTarget ? 1 : colors.fretNumberContextOpacity}
               >
                 {fret}
               </text>
             );
           })}
+
+          {link && (
+            <line
+              x1={link.from.cx}
+              y1={link.from.cy}
+              x2={link.to.cx}
+              y2={link.to.cy}
+              stroke={colors.link}
+              strokeWidth={10}
+              strokeLinecap="round"
+              opacity={colors.linkOpacity}
+              className="pointer-events-none"
+            />
+          )}
 
           {/* Target cells — only inside in-scope rows, only inside the actual
               search window. Read-only boards keep the found markers but drop the
@@ -535,6 +757,8 @@ export const ClickableFretboard = memo(function ClickableFretboard({
               const key = `${stringNum}-${fret}`;
               const isFound = found.has(key);
               const isMarked = !isFound && marked.has(key);
+              const isRevealed = !isFound && !isMarked && revealed.has(key);
+              const label = cellLabels?.[key];
               const cx = x + w / 2;
               const cy = y + ROW_H / 2;
               cells.push(
@@ -545,8 +769,8 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                       y={y}
                       width={w}
                       height={ROW_H}
-                      fill="#f59e0b"
-                      opacity={0.09}
+                      fill={colors.zone}
+                      opacity={colors.zoneOpacity}
                       className="pointer-events-none"
                     />
                   )}
@@ -560,28 +784,36 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                       // No colour transition: tweening a fill inside the <svg>
                       // repaints the whole neck for every frame of it, on every
                       // cell the pointer crosses.
-                      className="cursor-pointer hover:fill-zinc-200/10"
+                      className={`cursor-pointer ${colors.hoverClass}`}
                       onClick={() => onCellClick!(stringNum, fret)}
                     />
                   )}
                   {isMarked && (
                     <g className="pointer-events-none">
-                      <circle cx={cx} cy={cy} r={32} fill="#f59e0b" opacity={0.15} />
-                      <circle cx={cx} cy={cy} r={24} fill="#f59e0b" stroke="#432003" strokeWidth={3} />
-                      {markedLabel && (
-                        <text x={cx} y={cy + 9} transform={upright(cx)} textAnchor="middle" fontSize={25} fontWeight="bold" fill="#432003">
-                          {markedLabel}
+                      <circle cx={cx} cy={cy} r={32} fill={colors.root} opacity={0.15} />
+                      <circle cx={cx} cy={cy} r={label ? LABELLED_MARK_R : 24} fill={colors.root} stroke={colors.rootInk} strokeWidth={3} />
+                      {(label ?? markedLabel) && (
+                        <text x={cx} y={cy + 9} transform={upright(cx)} textAnchor="middle" fontSize={30} fontWeight="bold" fill={colors.rootInk}>
+                          {label ?? markedLabel}
                         </text>
                       )}
                     </g>
                   )}
+                  {isRevealed && (
+                    <g className="pointer-events-none">
+                      <circle cx={cx} cy={cy} r={LABELLED_MARK_R - 2} fill={colors.revealed} stroke={colors.revealedInk} strokeWidth={4} strokeDasharray="9 7" />
+                      <text x={cx} y={cy + 9} transform={upright(cx)} textAnchor="middle" fontSize={30} fontWeight="bold" fill={colors.revealedInk}>
+                        {label}
+                      </text>
+                    </g>
+                  )}
                   {isFound && (
                     <g className="pointer-events-none">
-                      <circle cx={cx} cy={cy} r={42} fill="#10b981" opacity={0.12} />
-                      <circle cx={cx} cy={cy} r={32} fill="#10b981" opacity={0.2} />
-                      <circle cx={cx} cy={cy} r={24} fill="#10b981" stroke="#052e1f" strokeWidth={3} />
-                      <text x={cx} y={cy + 9} transform={upright(cx)} textAnchor="middle" fontSize={27} fontWeight="bold" fill="#052e1f">
-                        ✓
+                      <circle cx={cx} cy={cy} r={42} fill={colors.found} opacity={0.12} />
+                      {!label && <circle cx={cx} cy={cy} r={32} fill={colors.found} opacity={0.2} />}
+                      <circle cx={cx} cy={cy} r={label ? LABELLED_MARK_R : 24} fill={colors.found} stroke={colors.foundRing} strokeWidth={3} />
+                      <text x={cx} y={cy + 9} transform={upright(cx)} textAnchor="middle" fontSize={27} fontWeight="bold" fill={colors.foundInk}>
+                        {label ?? "✓"}
                       </text>
                     </g>
                   )}
@@ -606,9 +838,9 @@ export const ClickableFretboard = memo(function ClickableFretboard({
                 y={y}
                 transform={upright(LEFT_PAD - 20)}
                 textAnchor={leftHanded ? "start" : "end"}
-                fontSize={active ? 32 : 20}
+                fontSize={active ? 32 : colors.labelOffSize}
                 fontWeight={active ? "800" : "600"}
-                fill={active ? (stringScoped ? "#67e8f9" : STRING_ACTIVE_COLOR) : STRING_INACTIVE_COLOR}
+                fill={active ? (stringScoped ? colors.labelScoped : colors.label) : colors.labelOff}
               >
                 {label}
               </text>
@@ -633,7 +865,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
             animate={{ opacity: [0.9, 0.2, 0.9], scale: [0.75, 1.15, 0.75] }}
             transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}>
             <svg viewBox={`0 0 ${LIVE_RING_BOX} ${LIVE_RING_BOX}`} className="block h-full w-full">
-              <circle cx={LIVE_RING_BOX / 2} cy={LIVE_RING_BOX / 2} r={30} fill="none" stroke="#34d399" strokeWidth={5} />
+              <circle cx={LIVE_RING_BOX / 2} cy={LIVE_RING_BOX / 2} r={30} fill="none" stroke={colors.link} strokeWidth={5} />
             </svg>
           </motion.div>
         )}
@@ -653,6 +885,29 @@ export const ClickableFretboard = memo(function ClickableFretboard({
             animate={{ opacity: 0 }}
             transition={{ duration: 0.45 }}
           />
+        )}
+
+        {/* The wrong cell, named — it stays for as long as the panel says so. */}
+        {wrongLabel && lastClick && !lastClick.correct && isInScope(lastClick.string) && (
+          <motion.div
+            key={`wrong-${lastClick.id}`}
+            className="absolute"
+            style={overlayBox(
+              colX(lastClick.fret) + colWidth(lastClick.fret) / 2 - WRONG_MARK_BOX / 2,
+              rowY(lastClick.string - 1) + ROW_H / 2 - WRONG_MARK_BOX / 2,
+              WRONG_MARK_BOX,
+              WRONG_MARK_BOX,
+            )}
+            initial={{ x: 0 }}
+            animate={{ x: ["0%", "-14%", "12%", "-6%", "0%"] }}
+            transition={{ duration: 0.36 }}>
+            <svg viewBox={`0 0 ${WRONG_MARK_BOX} ${WRONG_MARK_BOX}`} className="block h-full w-full" style={{ transform: mirrorStyle(leftHanded) }}>
+              <circle cx={WRONG_MARK_BOX / 2} cy={WRONG_MARK_BOX / 2} r={LABELLED_MARK_R} fill="#ef4444" />
+              <text x={WRONG_MARK_BOX / 2} y={WRONG_MARK_BOX / 2 + 11} textAnchor="middle" fontSize={30} fontWeight="bold" fill="#ffffff">
+                {wrongLabel}
+              </text>
+            </svg>
+          </motion.div>
         )}
 
         {/* "✓ 1.3s" tooltip — how long it took to find this position, floating

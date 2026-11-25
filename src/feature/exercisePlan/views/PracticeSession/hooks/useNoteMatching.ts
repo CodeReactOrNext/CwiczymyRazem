@@ -749,7 +749,7 @@ export function useNoteMatching({
               const newCombo      = gs.combo + 1;
               if (newCombo > maxComboRef.current) maxComboRef.current = newCombo;
               const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
-              const logIndex = logRunNote({ hit: true, timingMs: attackDeltaMs === null ? null : Math.round(attackDeltaMs), cents: null });
+              const logIndex = logRunNote({ hit: true, timingMs: attackDeltaMs === null ? null : Math.round(attackDeltaMs), cents: null, measure: Number.parseInt(noteKey, 10) });
               const intonationKind = pitchFocused && beat.notes.length === 1 ? intonationKindOf(note) : null;
               if (intonationKind) {
                 // Scored once the note has played out — a bend is judged on
@@ -821,7 +821,7 @@ export function useNoteMatching({
             }
             needsFlushRef.current = true;
             s.misses++;
-            logRunNote({ hit: false, timingMs: null, cents: null });
+            logRunNote({ hit: false, timingMs: null, cents: null, measure: Number.parseInt(noteKey, 10) });
             // A miss breaks the streak, and the multiplier is the streak's — the
             // next hit scores at x1 — so the HUD drops to x1 right away too.
             gs.combo = 0;

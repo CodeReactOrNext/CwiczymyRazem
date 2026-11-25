@@ -5,10 +5,10 @@ import {
   onboardingHref,
   parseOnboardingSource,
   trackOnboardingCompleted,
-  trackOnboardingDesktopHintContinued,
-  trackOnboardingGoalChosen,
+  trackOnboardingDailyGoalChosen,
+  trackOnboardingFirstMinuteLeft,
   trackOnboardingLevelChosen,
-  trackOnboardingPlanChosen,
+  trackOnboardingPlayChosen,
   trackOnboardingSkipped,
   trackOnboardingViewed,
 } from "./onboardingAnalytics";
@@ -55,73 +55,62 @@ describe("onboardingAnalytics", () => {
     });
   });
 
-  it("records which goals were on offer next to the one picked", () => {
-    trackOnboardingGoalChosen({
-      goal: "songs",
-      level: "new",
+  it("stores the daily goal on the person", () => {
+    trackOnboardingDailyGoalChosen({
+      minutes: 30,
+      level: "some",
       position: 3,
-      optionsShown: ["journey", "plans", "songs"],
-      timeOnStepMs: 4000,
+      timeOnStepMs: 2200,
       source: "signup",
     });
 
     const [event, props] = lastCall();
-    expect(event).toBe("onboarding_goal_chosen");
+    expect(event).toBe("onboarding_daily_goal_chosen");
     expect(props).toMatchObject({
-      goal: "songs",
-      level: "new",
-      options_count: 3,
-      options_shown: ["journey", "plans", "songs"],
-      $set: { onboarding_goal: "songs" },
-    });
-  });
-
-  it("describes a listed plan pick", () => {
-    trackOnboardingPlanChosen({
-      plan: {
-        id: "strumming_foundations",
-        title: "Strumming Foundations",
-        difficulty: "beginner",
-        minutes: 8,
-        position: 3,
-      },
-      level: "new",
-      timeOnStepMs: 2000,
-      source: "signup",
-    });
-
-    expect(lastCall()[1]).toMatchObject({
-      choice: "listed_plan",
-      plan_id: "strumming_foundations",
-      plan_difficulty: "beginner",
-      plan_minutes: 8,
+      minutes: 30,
+      level: "some",
       position: 3,
-      $set: { onboarding_plan_id: "strumming_foundations" },
+      time_on_step_ms: 2200,
+      $set: { onboarding_daily_goal: 30 },
     });
   });
 
-  it("tells a jump to the full library apart from a listed plan", () => {
-    trackOnboardingPlanChosen({
-      plan: null,
-      level: "experienced",
-      timeOnStepMs: 900,
+  it("keeps the old event name for the first-minute choice", () => {
+    trackOnboardingPlayChosen({
+      choice: "hunt",
+      level: "new",
+      timeOnStepMs: 1800,
       source: "direct",
     });
 
-    expect(lastCall()[1]).toMatchObject({
-      choice: "all_plans",
-      plan_id: null,
-      $set: { onboarding_plan_id: "all_plans" },
+    const [event, props] = lastCall();
+    expect(event).toBe("onboarding_play_chosen");
+    expect(props).toMatchObject({
+      choice: "hunt",
+      $set: { onboarding_play_choice: "hunt" },
     });
+  });
+
+  it("tells a finished first minute from one left early", () => {
+    trackOnboardingFirstMinuteLeft({
+      kind: "riff",
+      level: "experienced",
+      finished: false,
+      source: "signup",
+    });
+
+    expect(lastCall()).toEqual([
+      "onboarding_first_minute_left",
+      { kind: "riff", level: "experienced", finished: false, source: "signup" },
+    ]);
   });
 
   it("fires one terminal event with the whole answer", () => {
     trackOnboardingCompleted({
       level: "new",
-      goal: "journey",
-      planId: null,
+      dailyGoalMinutes: 15,
       playChoice: "browse",
-      destination: "/journey",
+      destination: "/dashboard?tour=1",
       durationMs: 12000,
       source: "google_signup",
     });
@@ -130,33 +119,13 @@ describe("onboardingAnalytics", () => {
     expect(event).toBe("onboarding_completed");
     expect(props).toMatchObject({
       level: "new",
-      goal: "journey",
-      plan_id: null,
+      daily_goal_minutes: 15,
       play_choice: "browse",
-      destination: "/journey",
+      destination: "/dashboard?tour=1",
       duration_ms: 12000,
       source: "google_signup",
     });
     expect(props).toHaveProperty("$set_once.onboarding_completed_at");
-  });
-
-  it("records a phone player tapping through the desktop step", () => {
-    trackOnboardingDesktopHintContinued({
-      level: "new",
-      goal: "journey",
-      timeOnStepMs: 2500,
-      source: "google_signup",
-    });
-
-    expect(lastCall()).toEqual([
-      "onboarding_desktop_hint_continued",
-      {
-        level: "new",
-        goal: "journey",
-        time_on_step_ms: 2500,
-        source: "google_signup",
-      },
-    ]);
   });
 
   it("records where a skip happened", () => {

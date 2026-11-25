@@ -21,6 +21,13 @@ export interface HuntBarClock {
   msPerBar: number;
 }
 
+/** How the round on screen ended — held until the next target comes up. */
+export interface HuntRoundEnd {
+  kind: "solved" | "timeUp";
+  /** Seconds the round took. */
+  seconds: number;
+}
+
 export interface NoteHuntRotation {
   /** Current target (note/chord + optional prompt/region), or null when not a rotating hunt. */
   target: HuntTarget | null;
@@ -31,6 +38,13 @@ export interface NoteHuntRotation {
   secondsTotal: number | null;
   /** Manually advance to the next target now (for players not using pitch detection). */
   advance: () => void;
+  /** Set while a round that ends on a verdict (noteHuntConfig.roundVerdict)
+   *  waits for `advance`. A round played on the guitar holds the session's
+   *  clock meanwhile; a click-answered one, scored on a leaderboard, doesn't. */
+  roundEnd: HuntRoundEnd | null;
+  /** Rounds solved in a row; a missed or skipped one ends it. */
+  streak: number;
+  resetStreak: () => void;
 }
 
 // Once the player has fully solved the current goal, fast-forward the countdown
@@ -85,6 +99,8 @@ export function useNoteHuntRotation(
   solvedRef?: React.MutableRefObject<boolean>,
   isExamMode = false,
   barClock?: HuntBarClock,
+  /** False once the exercise's own clock is down — the last round just rotates. */
+  verdictAllowed = true,
 ): NoteHuntRotation {
   const configuredRotateSeconds = exercise.noteHuntConfig?.rotateSeconds ?? 0;
   const isExamClickHunt = isExamMode && isClickAnsweredMode(exercise.noteHuntConfig?.mode);
@@ -104,6 +120,23 @@ export function useNoteHuntRotation(
     enabled && exercise.noteHuntConfig?.advanceOn === "bar" && barStartTime !== null && msPerChange > 0;
 
   const countsDown = enabled && !waitsForAnswer && !barLocked;
+  // Click-answered rounds keep their verdict in exams: it doesn't stop the clock.
+  const isClickAnswered = isClickAnsweredMode(exercise.noteHuntConfig?.mode);
+  const endsOnVerdict = countsDown && (!isExamMode || isClickAnswered) && verdictAllowed && !!exercise.noteHuntConfig?.roundVerdict;
+
+  const [roundEnd, setRoundEnd] = useState<HuntRoundEnd | null>(null);
+  const [streak, setStreak] = useState(0);
+  const resetStreak = useCallback(() => setStreak(0), []);
+  // Until when `solvedRef` may still be the last target's (see SOLVED_SETTLE_MS).
+  const settleUntilRef = useRef(0);
+  // A poll can come round again before the verdict has rendered.
+  const isRoundOverRef = useRef(false);
+  const endRound = useCallback((kind: HuntRoundEnd["kind"], seconds: number) => {
+    if (isRoundOverRef.current) return;
+    isRoundOverRef.current = true;
+    setRoundEnd({ kind, seconds });
+    setStreak((count) => (kind === "solved" ? count + 1 : 0));
+  }, []);
 
   // Fresh ref to the roll fn so the interval/advance never hold a stale closure.
   const rollRef = useRef(exercise.rollHuntTarget);
@@ -123,6 +156,9 @@ export function useNoteHuntRotation(
     secondsRef.current = rotateSeconds;
     setTarget(enabled ? rollRef.current!() : null);
     setSecondsLeft(countsDown ? rotateSeconds : null);
+    isRoundOverRef.current = false;
+    setRoundEnd(null);
+    setStreak(0);
   }, [exercise.id, enabled, countsDown, rotateSeconds]);
 
   // Jump to a fresh target immediately and restart the countdown.
@@ -131,13 +167,25 @@ export function useNoteHuntRotation(
     setTarget(rollRef.current!());
     secondsRef.current = rotateSeconds;
     setSecondsLeft(countsDown ? rotateSeconds : null);
-  }, [enabled, countsDown, rotateSeconds]);
+    settleUntilRef.current = Date.now() + SOLVED_SETTLE_MS;
+    // Leaving a round that has no verdict yet is a skip.
+    if (!roundEnd) setStreak(0);
+    isRoundOverRef.current = false;
+    setRoundEnd(null);
+  }, [enabled, countsDown, rotateSeconds, roundEnd]);
 
+  const isRoundOver = roundEnd !== null;
   useEffect(() => {
-    if (!countsDown || !isPlaying) return;
+    if (!countsDown || !isPlaying || isRoundOver) return;
     const id = setInterval(() => {
+      if (endsOnVerdict && secondsRef.current <= 1) {
+        secondsRef.current = 0;
+        setSecondsLeft(0);
+        endRound("timeUp", rotateSeconds);
+        return;
+      }
       // Goal complete → hurry to the next target.
-      if (solvedRef?.current && secondsRef.current > SOLVED_FASTFORWARD_SECONDS) {
+      if (!endsOnVerdict && solvedRef?.current && secondsRef.current > SOLVED_FASTFORWARD_SECONDS) {
         secondsRef.current = SOLVED_FASTFORWARD_SECONDS;
       }
       if (secondsRef.current <= 1) {
@@ -149,7 +197,7 @@ export function useNoteHuntRotation(
       setSecondsLeft(secondsRef.current);
     }, 1000);
     return () => clearInterval(id);
-  }, [countsDown, isPlaying, rotateSeconds, solvedRef]);
+  }, [countsDown, isPlaying, isRoundOver, endsOnVerdict, endRound, rotateSeconds, solvedRef]);
 
   // Bar-locked pacing: the change lands on the bar line, and the countdown shows
   // the time left in the current group of bars.
@@ -200,10 +248,18 @@ export function useNoteHuntRotation(
   // Countdown hunts answered on the guitar: once the mic has heard the whole
   // goal there is nothing left to wait for, so the next target comes up at once
   // instead of sitting out what is left of the clock. Click-answered hunts are
-  // left alone — their panel already moves on by itself.
-  const advancesWhenHeard = countsDown && !isClickAnsweredMode(exercise.noteHuntConfig?.mode);
+  // left alone — their panel already moves on by itself — unless they end on a
+  // verdict, which then waits for its own time.
+  const advancesWhenHeard = countsDown && (!isClickAnswered || endsOnVerdict);
   useEffect(() => {
-    if (!advancesWhenHeard || !isPlaying) return;
+    if (!advancesWhenHeard || !isPlaying || isRoundOver) return;
+    if (endsOnVerdict) {
+      const id = setInterval(() => {
+        if (!solvedRef?.current || Date.now() < settleUntilRef.current) return;
+        endRound("solved", Math.max(1, rotateSeconds - secondsRef.current));
+      }, HEARD_POLL_MS);
+      return () => clearInterval(id);
+    }
     let hold: ReturnType<typeof setTimeout> | undefined;
     const id = setInterval(() => {
       if (hold || !solvedRef?.current) return;
@@ -213,7 +269,7 @@ export function useNoteHuntRotation(
       }, HEARD_HOLD_MS);
     }, HEARD_POLL_MS);
     return () => { clearInterval(id); if (hold) clearTimeout(hold); };
-  }, [advancesWhenHeard, isPlaying, solvedRef]);
+  }, [advancesWhenHeard, isPlaying, isRoundOver, endsOnVerdict, endRound, rotateSeconds, solvedRef]);
 
   const secondsTotal = countsDown ? rotateSeconds : barLocked ? Math.max(1, Math.ceil(msPerChange / 1000)) : null;
 
@@ -222,5 +278,8 @@ export function useNoteHuntRotation(
     secondsLeft: enabled ? secondsLeft : null,
     secondsTotal: enabled ? secondsTotal : null,
     advance,
+    roundEnd,
+    streak,
+    resetStreak,
   };
 }

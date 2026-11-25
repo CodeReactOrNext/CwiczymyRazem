@@ -1,3 +1,4 @@
+import { DAILY_GOAL_OPTIONS } from "constants/dailyGoal";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { existsSync } from "fs";
 import { join } from "path";
@@ -5,24 +6,21 @@ import { describe, expect, it } from "vitest";
 
 import type { OnboardingLevel } from "../types";
 import {
+  DAILY_GOAL_CHOICES,
+  FIRST_HUNT_DURATION_LABEL,
+  FIRST_HUNT_PREVIEWS,
+  FIRST_HUNT_SECONDS,
   FIRST_RIFF_DURATION_LABEL,
   FIRST_RIFF_EXERCISE_IDS,
   FIRST_RIFF_IMAGE,
-  getAfterFirstRiffHref,
+  getFirstHuntExercise,
+  getFirstHuntHref,
   getFirstRiffHref,
-  getGoalOptions,
-  getOnboardingPlans,
-  getPlanHref,
-  getPlanMinutes,
-  GOAL_OPTIONS,
   LEVEL_OPTIONS,
-  LEVEL_PLAN_IDS,
-  LOOK_AROUND_CHOICES,
+  toFirstMinutePlan,
 } from "./onboardingGoals";
 
 const LEVELS: OnboardingLevel[] = LEVEL_OPTIONS.map((option) => option.level);
-const goalsFor = (level: OnboardingLevel) =>
-  getGoalOptions(level).map((option) => option.goal);
 
 describe("LEVEL_OPTIONS", () => {
   it("asks about three levels, beginner first", () => {
@@ -38,59 +36,20 @@ describe("LEVEL_OPTIONS", () => {
   });
 });
 
-describe("getGoalOptions", () => {
-  it("has one option per goal", () => {
-    const goals = GOAL_OPTIONS.map((option) => option.goal);
-    expect(new Set(goals).size).toBe(goals.length);
+describe("DAILY_GOAL_CHOICES", () => {
+  it("offers four goals, shortest first", () => {
+    const minutes = DAILY_GOAL_CHOICES.map((choice) => choice.minutes);
+    expect(minutes).toEqual([5, 15, 30, 60]);
   });
 
-  it("offers learning from scratch only to beginners", () => {
-    expect(goalsFor("new")).toContain("journey");
-    expect(goalsFor("some")).not.toContain("journey");
-    expect(goalsFor("experienced")).not.toContain("journey");
-  });
-
-  it("keeps roadmaps for players past the basics", () => {
-    expect(goalsFor("new")).not.toContain("roadmap");
-    expect(goalsFor("some")).toContain("roadmap");
-    expect(goalsFor("experienced")).toContain("roadmap");
-  });
-
-  it("no longer offers logging existing practice", () => {
-    for (const level of LEVELS) {
-      expect(goalsFor(level)).not.toContain("log");
+  it("only offers values Settings → Daily goal can show", () => {
+    for (const { minutes } of DAILY_GOAL_CHOICES) {
+      expect(DAILY_GOAL_OPTIONS).toContain(minutes);
     }
-  });
-
-  it.each(LEVELS)("leaves roadmaps out on a phone for %s players", (level) => {
-    const onPhone = getGoalOptions(level, { isPhone: true }).map(
-      (option) => option.goal,
-    );
-    expect(onPhone).not.toContain("roadmap");
-    expect(onPhone).toEqual(
-      goalsFor(level).filter((goal) => goal !== "roadmap"),
-    );
-  });
-
-  it.each(LEVELS)("offers plans and songs to %s players", (level) => {
-    expect(goalsFor(level)).toEqual(expect.arrayContaining(["plans", "songs"]));
-  });
-
-  it.each(GOAL_OPTIONS)("$goal illustration exists in public/", (option) => {
-    expect(existsSync(join(process.cwd(), "public", option.image))).toBe(true);
-  });
-
-  it("sends only the plans goal to the in-onboarding plan picker", () => {
-    const pickers = GOAL_OPTIONS.filter((option) => option.href === null);
-    expect(pickers.map((option) => option.goal)).toEqual(["plans"]);
   });
 });
 
-describe("play step", () => {
-  it("offers looking around with or without a guitar under the riff", () => {
-    expect(LOOK_AROUND_CHOICES).toEqual(["browse", "no_guitar"]);
-  });
-
+describe("first riff", () => {
   it("shows the riff with a screenshot that exists in public/", () => {
     expect(existsSync(join(process.cwd(), "public", FIRST_RIFF_IMAGE))).toBe(
       true,
@@ -100,9 +59,7 @@ describe("play step", () => {
   it("labels the riff the way the session timer shows 40 s", () => {
     expect(FIRST_RIFF_DURATION_LABEL).toBe("0:40");
   });
-});
 
-describe("first riff", () => {
   it.each(LEVELS)(
     "gives %s players a hidden exercise of at most 40 s",
     (level) => {
@@ -142,40 +99,66 @@ describe("first riff", () => {
     }
   });
 
-  it("keeps the level and source on the way there and back", () => {
+  it("keeps the level and source in the link", () => {
     expect(getFirstRiffHref("some", "google_signup")).toBe(
       "/onboarding/first-riff?level=some&from=google_signup",
-    );
-    expect(getAfterFirstRiffHref("some", "google_signup")).toBe(
-      "/onboarding?step=goal&level=some&played=1&from=google_signup",
     );
   });
 });
 
-describe("getOnboardingPlans", () => {
-  it.each(LEVELS)("resolves every %s plan id", (level) => {
-    expect(getOnboardingPlans(level).map((plan) => plan.id)).toEqual(
-      LEVEL_PLAN_IDS[level],
-    );
+describe("first hunt", () => {
+  it("lasts one minute", () => {
+    expect(FIRST_HUNT_SECONDS).toBe(60);
+    expect(FIRST_HUNT_DURATION_LABEL).toBe("1:00");
   });
 
-  it.each(LEVELS.flatMap((level) => getOnboardingPlans(level)))(
-    "$id is short enough for a first session",
-    (plan) => {
-      expect(getPlanMinutes(plan)).toBeGreaterThan(0);
-      expect(getPlanMinutes(plan)).toBeLessThanOrEqual(20);
+  it.each(LEVELS)(
+    "gives %s players a click hunt from the library, cut to a minute",
+    (level) => {
+      const exercise = getFirstHuntExercise(level);
+      const original = exercisesAgregat.find((ex) => ex.id === exercise.id);
+      expect(original).toBeDefined();
+      expect(exercise.noteHuntConfig?.mode).toBe("click");
+      expect(exercise.disableMic).toBe(true);
+      expect(exercise.timeInMinutes * 60).toBe(60);
+      // The library copy keeps its own length.
+      expect(original!.timeInMinutes * 60).toBeGreaterThan(60);
     },
   );
 
-  it("gives beginners only beginner-friendly plans", () => {
-    for (const plan of getOnboardingPlans("new")) {
-      expect(["beginner", "easy"]).toContain(plan.difficulty);
-    }
+  it("starts beginners on one string and the rest wider", () => {
+    expect(getFirstHuntExercise("new").customGoalStrings).toEqual([6]);
+    expect(
+      getFirstHuntExercise("experienced").customGoalStrings,
+    ).toBeUndefined();
   });
 
-  it("links a plan to the practice screen", () => {
-    expect(getPlanHref("strumming_foundations")).toBe(
-      "/timer/plans?planId=strumming_foundations",
+  it.each(LEVELS)(
+    "draws the %s card's example spots inside frets 0–6",
+    (level) => {
+      for (const [string, fret] of FIRST_HUNT_PREVIEWS[level].spots) {
+        expect(string).toBeGreaterThanOrEqual(1);
+        expect(string).toBeLessThanOrEqual(6);
+        expect(fret).toBeGreaterThanOrEqual(0);
+        expect(fret).toBeLessThanOrEqual(6);
+      }
+    },
+  );
+
+  it("keeps the level and source in the link", () => {
+    expect(getFirstHuntHref("new", "signup")).toBe(
+      "/onboarding/first-hunt?level=new&from=signup",
     );
+  });
+
+  it("wraps the exercise in a one-item plan for the session", () => {
+    const plan = toFirstMinutePlan(
+      getFirstHuntExercise("some"),
+      "hunt",
+      "uid-1",
+    );
+    expect(plan.id).toBe("onboarding-first-hunt");
+    expect(plan.userId).toBe("uid-1");
+    expect(plan.exercises).toHaveLength(1);
   });
 });

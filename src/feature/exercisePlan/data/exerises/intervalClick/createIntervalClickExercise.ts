@@ -123,6 +123,6 @@ export function createIntervalClickExercise(config: IntervalClickConfig): Exerci
       current = rollPrompt(config, roots, intervals, current);
       return { goal: current.target, prompt: promptFor(current), region: current.region };
     },
-    noteHuntConfig: { rotateSeconds: config.rotateSeconds, mode: "intervalClick" },
+    noteHuntConfig: { rotateSeconds: config.rotateSeconds, mode: "intervalClick", roundVerdict: true },
   };
 }

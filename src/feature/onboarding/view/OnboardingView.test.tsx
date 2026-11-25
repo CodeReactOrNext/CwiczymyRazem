@@ -6,26 +6,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getTourHref } from "../tour/tourSteps";
 import OnboardingView from "./OnboardingView";
 
-/** Every answer now goes through Home, where the tour ends on it. */
-const viaTour = (goal: "journey" | "plans" | "songs", next: string, noGuitar = false) =>
-  getTourHref({ goal, next, noGuitar });
-
-const { router, viewport, saveOnboarding } = vi.hoisted(() => ({
+const { router, saveOnboarding, saveDailyGoal, dispatch } = vi.hoisted(() => ({
   router: {
     query: {} as Record<string, string>,
     push: vi.fn(),
-    prefetch: vi.fn(),
   },
-  viewport: { isMobile: false },
   saveOnboarding: vi.fn(),
+  saveDailyGoal: vi.fn(),
+  dispatch: vi.fn(),
 }));
 
 vi.mock("next/router", () => ({ useRouter: () => router }));
-
-vi.mock("store/useResponsiveStore", () => ({
-  useResponsiveStore: (select: (state: { isMobile: boolean }) => unknown) =>
-    select(viewport),
-}));
 
 vi.mock("hooks/useTranslation", () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -37,165 +28,150 @@ vi.mock("../services/onboarding.service", () => ({
   firebaseSaveOnboarding: saveOnboarding,
 }));
 
+vi.mock("feature/settings/services/settings.service", () => ({
+  firebaseUpdateDailyGoalMinutes: saveDailyGoal,
+}));
+
+vi.mock("feature/user/store/userSlice", () => ({
+  setDailyGoalMinutes: (minutes: number) => ({
+    type: "user/setDailyGoalMinutes",
+    payload: minutes,
+  }),
+}));
+
+vi.mock("store/hooks", () => ({ useAppDispatch: () => dispatch }));
+
 vi.mock("feature/logs/services/addPlayerJoinedLog.service", () => ({
   addPlayerJoinedLog: vi.fn(),
 }));
 
-// None of these tests reaches the plan picker, so its cards stay out.
-vi.mock("feature/exercisePlan/components/PlanCard", () => ({
-  PlanCard: () => null,
-}));
+const heading = (name: string) => screen.findByRole("heading", { name });
 
-const lookAroundAsBeginner = async () => {
-  fireEvent.click(screen.getByText("levels.new.label"));
-  fireEvent.click(await screen.findByText("play_step.options.browse"));
+/** Level, then daily goal: the two answers before the first minute. */
+const answerUpToFirstMinute = async (
+  level = "levels.some.label",
+  minutes = "30",
+) => {
+  fireEvent.click(screen.getByText(level));
+  await heading("daily_step.title");
+  fireEvent.click(screen.getByText(minutes));
+  await heading("first_step.title");
 };
 
 describe("OnboardingView", () => {
   beforeEach(() => {
     router.query = {};
     router.push.mockReset().mockResolvedValue(true);
-    router.prefetch.mockReset().mockResolvedValue(undefined);
     saveOnboarding.mockReset().mockResolvedValue(undefined);
+    saveDailyGoal.mockReset().mockResolvedValue(undefined);
+    dispatch.mockReset();
   });
   afterEach(cleanup);
 
-  it("asks about the guitar right after the level", async () => {
-    viewport.isMobile = false;
+  it("asks the level, then the daily goal, then the first minute", async () => {
+    render(<OnboardingView />);
+    expect(await heading("level_step.title")).toBeTruthy();
+
+    await answerUpToFirstMinute();
+
+    expect(screen.getByText("first_step.riff_title")).toBeTruthy();
+    expect(screen.getByText("first_step.hunt_title")).toBeTruthy();
+    expect(screen.getByText("first_step.browse")).toBeTruthy();
+  });
+
+  it("writes the daily goal to the settings field as soon as it is picked", async () => {
     render(<OnboardingView />);
 
-    fireEvent.click(screen.getByText("levels.some.label"));
+    await answerUpToFirstMinute("levels.new.label", "60");
 
-    expect(await screen.findByRole("heading", { name: "play_step.title" })).toBeTruthy();
-    expect(screen.getByText("play_step.start")).toBeTruthy();
-    expect(screen.getByText("play_step.options.no_guitar")).toBeTruthy();
+    expect(saveDailyGoal).toHaveBeenCalledWith(60);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "user/setDailyGoalMinutes",
+      payload: 60,
+    });
+    // The rest of the answers are saved only at the end.
+    expect(saveOnboarding).not.toHaveBeenCalled();
   });
 
   it("sends a player who wants to play to the first riff for their level", async () => {
-    viewport.isMobile = true;
     router.query = { from: "signup" };
     render(<OnboardingView />);
+    await answerUpToFirstMinute("levels.experienced.label", "15");
 
-    fireEvent.click(screen.getByText("levels.experienced.label"));
-    fireEvent.click(await screen.findByText("play_step.start"));
-
-    expect(router.push).toHaveBeenCalledWith(
-      "/onboarding/first-riff?level=experienced&from=signup",
-    );
-    // The goal is asked after the riff, so nothing is saved yet.
-    expect(saveOnboarding).not.toHaveBeenCalled();
-  });
-
-  it("comes back from the first riff on the goal question, without the desktop step", async () => {
-    viewport.isMobile = true;
-    router.query = { step: "goal", level: "some", played: "1", from: "signup" };
-    render(<OnboardingView />);
-
-    expect(screen.getByRole("heading", { name: "goal_step.title_after_play" })).toBeTruthy();
-
-    fireEvent.click(screen.getByText("goals.songs.label"));
-    fireEvent.click(await screen.findByText("songs_step.continue"));
+    fireEvent.click(screen.getByText("first_step.riff_title"));
 
     await vi.waitFor(() =>
       expect(router.push).toHaveBeenCalledWith(
-        viaTour("songs", "/songs?view=management"),
+        "/onboarding/first-riff?level=experienced&from=signup",
       ),
     );
     expect(saveOnboarding).toHaveBeenCalledWith({
-      level: "some",
-      goal: "songs",
+      level: "experienced",
+      dailyGoalMinutes: 15,
       playChoice: "play",
     });
-    expect(screen.queryByRole("heading", { name: "desktop_hint.title" })).toBeNull();
   });
 
-  it("shows a player looking around the plan library, not a plan session", async () => {
-    viewport.isMobile = false;
+  it("sends the fretboard answer to the one-minute hunt", async () => {
     render(<OnboardingView />);
+    await answerUpToFirstMinute("levels.new.label", "5");
 
-    await lookAroundAsBeginner();
-    fireEvent.click(await screen.findByText("goals.plans.label"));
+    fireEvent.click(screen.getByText("first_step.hunt_title"));
 
     await vi.waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith(viaTour("plans", "/timer/plans")),
+      expect(router.push).toHaveBeenCalledWith(
+        "/onboarding/first-hunt?level=new&from=direct",
+      ),
     );
-    expect(screen.queryByRole("heading", { name: "plan_step.title" })).toBeNull();
     expect(saveOnboarding).toHaveBeenCalledWith({
       level: "new",
-      goal: "plans",
-      playChoice: "browse",
+      dailyGoalMinutes: 5,
+      playChoice: "hunt",
     });
   });
 
-  it("stops a phone player looking around on the desktop step", async () => {
-    viewport.isMobile = true;
+  it("takes a player who looks around straight to Home and the tour", async () => {
     render(<OnboardingView />);
+    await answerUpToFirstMinute();
 
-    await lookAroundAsBeginner();
-    fireEvent.click(await screen.findByText("goals.journey.label"));
+    fireEvent.click(screen.getByText("first_step.browse"));
 
-    expect(await screen.findByRole("heading", { name: "desktop_hint.title" })).toBeTruthy();
-    expect(router.push).not.toHaveBeenCalled();
-    // Nothing is left to skip once the answers are saved.
-    expect(screen.queryByText("skip")).toBeNull();
-
-    fireEvent.click(screen.getByText("desktop_hint.continue"));
     await vi.waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith(viaTour("journey", "/journey")),
+      expect(router.push).toHaveBeenCalledWith(getTourHref(null)),
     );
   });
 
-  it("tells a player without a guitar what they can already look at", async () => {
-    viewport.isMobile = false;
+  it("goes back one question with the back key", async () => {
     render(<OnboardingView />);
+    fireEvent.click(screen.getByText("levels.some.label"));
+    await heading("daily_step.title");
 
-    fireEvent.click(screen.getByText("levels.new.label"));
-    fireEvent.click(
-      await screen.findByText("play_step.options.no_guitar"),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "back" }));
 
-    expect(await screen.findByRole("heading", { name: "goal_step.title_no_guitar" })).toBeTruthy();
-    expect(screen.getByText("goal_step.no_guitar_hint")).toBeTruthy();
-
-    // The tour ends on exercises that need no guitar, so it has to know.
-    fireEvent.click(screen.getByText("goals.journey.label"));
-    await vi.waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith(viaTour("journey", "/journey", true)),
-    );
+    expect(await heading("level_step.title")).toBeTruthy();
   });
 
-  it("explains songs before committing a player to them", async () => {
-    viewport.isMobile = false;
+  it("picks answers with the number keys", async () => {
     render(<OnboardingView />);
 
-    await lookAroundAsBeginner();
-    fireEvent.click(await screen.findByText("goals.songs.label"));
+    fireEvent.keyDown(window, { key: "2" });
+    await heading("daily_step.title");
+    fireEvent.keyDown(window, { key: "1" });
+    await heading("first_step.title");
 
-    expect(await screen.findByText("songs_step.no_tabs")).toBeTruthy();
-    expect(saveOnboarding).not.toHaveBeenCalled();
-
-    // No tabs can be a dealbreaker: the way back leads to the other answers.
-    fireEvent.click(screen.getByText("songs_step.other"));
-    fireEvent.click(await screen.findByText("goals.songs.label"));
-
-    fireEvent.click(await screen.findByText("songs_step.continue"));
+    expect(saveDailyGoal).toHaveBeenCalledWith(5);
+    fireEvent.keyDown(window, { key: "2" });
     await vi.waitFor(() =>
       expect(router.push).toHaveBeenCalledWith(
-        viaTour("songs", "/songs?view=management"),
+        "/onboarding/first-hunt?level=some&from=direct",
       ),
     );
   });
 
-  it("sends a desktop player to Home with the tour, which ends on their answer", async () => {
-    viewport.isMobile = false;
+  it("skips to Home and the tour", () => {
     render(<OnboardingView />);
-
-    await lookAroundAsBeginner();
-    fireEvent.click(await screen.findByText("goals.journey.label"));
-
-    await vi.waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith(viaTour("journey", "/journey")),
-    );
-    expect(screen.queryByRole("heading", { name: "desktop_hint.title" })).toBeNull();
+    expect(
+      screen.getByRole("link", { name: "skip" }).getAttribute("href"),
+    ).toBe(getTourHref(null));
   });
 });

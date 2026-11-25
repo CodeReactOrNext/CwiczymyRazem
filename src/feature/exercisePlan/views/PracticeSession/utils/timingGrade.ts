@@ -34,6 +34,8 @@ export interface RunNote {
   /** Signed cents off the pitch (+ = sharp), on runs that score intonation;
    *  null until the note is graded, or where it couldn't be read. */
   cents: number | null;
+  /** Index of the tab measure the note sits in; absent without a tab. */
+  measure?: number;
 }
 
 /** How many hits of a run landed on each grade. */

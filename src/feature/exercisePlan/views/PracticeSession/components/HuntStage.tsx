@@ -34,6 +34,9 @@ interface HuntStageProps {
   /** Progress, Next, dev shortcuts — reads under the board. */
   footer?: ReactNode;
   className?: string;
+  /** "column" keeps the prompt over the board at every width, so the neck gets
+   *  all of it. */
+  layout?: "rail" | "column";
   /** Widens the side rail for prompts that need more than one tile. */
   railClassName?: string;
 }
@@ -63,6 +66,7 @@ export function HuntStage({
   board,
   footer,
   className,
+  layout = "rail",
   railClassName,
 }: HuntStageProps) {
   return (
@@ -74,12 +78,13 @@ export function HuntStage({
       <div
         className={cn(
           "flex w-full flex-col items-center gap-5",
-          "xl:flex-row xl:items-center xl:justify-center xl:gap-10",
+          layout === "rail" && "xl:flex-row xl:items-center xl:justify-center xl:gap-10",
           "shortwide:gap-2",
         )}>
         <div
           className={cn(
-            "flex w-full flex-col items-center gap-3 xl:w-48 xl:shrink-0 xl:gap-4",
+            "flex w-full flex-col items-center gap-3",
+            layout === "rail" && "xl:w-48 xl:shrink-0 xl:gap-4",
             "shortwide:flex-row shortwide:flex-wrap shortwide:justify-center shortwide:gap-4",
             railClassName,
           )}>
@@ -88,7 +93,7 @@ export function HuntStage({
         </div>
 
         {(board || footer) && (
-          <div className="flex w-full min-w-0 flex-col items-center gap-4 xl:flex-1 shortwide:gap-2">
+          <div className={cn("flex w-full min-w-0 flex-col items-center gap-4 shortwide:gap-2", layout === "rail" && "xl:flex-1")}>
             {board}
             {footer}
           </div>
@@ -125,6 +130,8 @@ interface HuntStatsProps {
   complete?: boolean;
   /** Drill-specific pills (e.g. the chromatic hunt's note counter). */
   children?: ReactNode;
+  /** Closes the row — the hunt's Skip. */
+  trailing?: ReactNode;
 }
 
 /**
@@ -136,7 +143,7 @@ interface HuntStatsProps {
  * the words next to it ("8 s left") say how much. Amber from 5 s, red from 3 s;
  * a solved round fills it green.
  */
-export function HuntStats({ score, mistakes, secondsLeft, secondsTotal, complete, children }: HuntStatsProps) {
+export function HuntStats({ score, mistakes, secondsLeft, secondsTotal, complete, children, trailing }: HuntStatsProps) {
   const { t } = useTranslation("session");
   const counting = secondsLeft !== null && secondsLeft !== undefined;
   const tone: TimerTone = complete ? "done" : !counting ? "ok" : secondsLeft <= 3 ? "crit" : secondsLeft <= 5 ? "warn" : "ok";
@@ -179,6 +186,7 @@ export function HuntStats({ score, mistakes, secondsLeft, secondsTotal, complete
           ✕ {mistakes.count}/{mistakes.limit}
         </span>
       )}
+      {trailing}
     </div>
   );
 }
@@ -190,7 +198,10 @@ interface HuntAskProps {
   title: string;
   /** One short line on where to look. */
   hint?: string;
+  /** The hint says what went wrong. */
+  isAlert?: boolean;
   solved?: boolean;
+  className?: string;
 }
 
 /**
@@ -199,11 +210,14 @@ interface HuntAskProps {
  * The instruction used to sit under the tiles as the smallest text in the rail,
  * read last. It leads now and the tiles illustrate it.
  */
-export function HuntAsk({ step, title, hint, solved }: HuntAskProps) {
+export function HuntAsk({ step, title, hint, isAlert, solved, className }: HuntAskProps) {
   return (
     <div
       aria-live='polite'
-      className='flex flex-col items-center gap-1 text-center xl:items-start xl:text-left shortwide:max-w-[14rem] shortwide:items-start shortwide:text-left'>
+      className={cn(
+        "flex flex-col items-center gap-1 text-center xl:items-start xl:text-left shortwide:max-w-[14rem] shortwide:items-start shortwide:text-left",
+        className,
+      )}>
       {step && <p className={cn("text-sm font-semibold", solved ? "text-emerald-400" : "text-zinc-500")}>{step}</p>}
       <p
         className={cn(
@@ -212,7 +226,7 @@ export function HuntAsk({ step, title, hint, solved }: HuntAskProps) {
         )}>
         {title}
       </p>
-      {hint && <p className="text-sm text-zinc-400 shortwide:text-xs">{hint}</p>}
+      {hint && <p className={cn("text-sm shortwide:text-xs", isAlert ? "font-semibold text-red-400" : "text-zinc-400")}>{hint}</p>}
     </div>
   );
 }

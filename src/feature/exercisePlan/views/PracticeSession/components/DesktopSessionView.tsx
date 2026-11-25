@@ -22,8 +22,9 @@ import { GpTrackSelector } from "./GpTrackSelector";
 import { LearnModeButton } from "./LearnModeButton";
 import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { SessionBottomBar } from "./SessionBottomBar";
+import type { VerdictTone } from "./SessionVerdict";
 import { SpeedsMasteredButton } from "./SpeedsMasteredButton";
-import { StartGate, useStartGate } from "./StartGate";
+import { StartGate, type StartGateMic, useGateIntro, useStartGate } from "./StartGate";
 import { TablatureViewMenu } from "./TablatureViewMenu";
 
 interface DesktopSessionViewProps {
@@ -42,6 +43,15 @@ interface DesktopSessionViewProps {
   category:                 string;
   currentExerciseIndex:     number;
   completedExercises:       number[];
+  exerciseTimes:            Record<number, number>;
+  /** The exercise opens behind the start gate over its tab. */
+  hasTabGate:               boolean;
+  /** The exercise on screen has run its clock down. */
+  isTimeUp:                 boolean;
+  gateMic?:                 StartGateMic;
+  /** The answer to a run that just ended, in place of the bottom bar's transport. */
+  verdict?:                 { tone: VerdictTone; strip: React.ReactNode };
+  roundVerdict?:            { tone: VerdictTone; strip: React.ReactNode };
   handleExerciseSelect:     (idx: number) => void;
   isMicEnabled:             boolean;
   allGpTracks:              BackingTrack[] | null;
@@ -63,13 +73,10 @@ interface DesktopSessionViewProps {
   effectiveAudioStartTime:  number | null;
   tabResetKey:              number;
   isRiddleRevealed:         boolean;
-  isRiddleGuessed:          boolean;
   hasPlayedRiddleOnce:      boolean;
   earTrainingScore:         number;
   earTrainingHighScore:     number | null;
   handleRevealRiddle:       () => void;
-  handleNextRiddle:         () => void;
-  handleEarTrainingGuessed: () => void;
   /** Ear training's own Play/Stop — replays the phrase from the top, unlike the session toggle. */
   onPlayRiddle:             () => void;
   riddleProgress:           RiddleProgress | null;
@@ -151,8 +158,12 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
   // own arena — neither asks for Start, so neither gets the gate.
   const { learn } = useNoteMatchingContext();
   const startGate = useStartGate(p.isPlaying);
+  const gateIntro = useGateIntro(p.currentExercise);
+  const nextExercise = p.plan.exercises[p.currentExerciseIndex + 1];
   const showStartGate = startGate.open && !isMobile && !learn?.enabled && !p.heroSlot
-    && !p.backingCinema && !p.backingAligning && !p.setupOpen && !p.reportResult;
+    && !p.backingCinema && !p.backingAligning && !p.setupOpen && !p.reportResult
+    // A riddle's tab is the answer — it only comes up to be read.
+    && p.currentExercise.riddleConfig?.mode !== "sequenceRepeat";
 
   const handleTablatureSeek = React.useCallback((beatPosition: number) => {
     if (!p.metronome.isPlaying) {
@@ -241,8 +252,8 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
       {/* TEMPO island: the BPM slider and the playback-speed picker are one bar —
           the picker sits inside ExerciseQuickActionsBar, right after the BPM it scales. */}
       {hasMetronome && !p.isExamMode && (
-        <div className="flex items-center rounded-lg bg-zinc-900/40 p-1.5">
-          <div className="w-[640px] max-w-full [&>*]:!mb-0">
+        <div className="flex w-full justify-center">
+          <div className="w-[680px] max-w-full [&>*]:!mb-0">
             <ExerciseQuickActionsBar
               exercise={p.currentExercise}
               metronome={p.metronome}
@@ -260,11 +271,12 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
     <div
       // Hides MobileBottomNav on tablets, see globals.css.
       data-desktop-session={isMobile ? undefined : ""}
+      data-session-scroller
       className={cn(" fixed inset-0 z-[999999] bg-zinc-950", "overflow-y-auto", isMobile && "hidden")}>
       <BackgroundAmbiance category={p.category as any} isPlayalong={p.currentExercise.isPlayalong} visible={!p.reportResult} />
       <TooltipProvider>
         <div>
-          <div className={cn("mx-auto max-w-[2400px] px-6 pb-64 pt-4 relative z-10", p.reportResult && "max-w-7xl px-4 pt-8", isElectron && (p.reportResult ? "pt-[72px]" : "pt-[56px]"))}>
+          <div className={cn("mx-auto max-w-[2400px] px-6 pb-64 pt-4 relative z-10", p.reportResult && "max-w-7xl px-4 pb-0 pt-2", isElectron && (p.reportResult ? "pt-[72px]" : "pt-[56px]"))}>
             {p.reportResult && p.currentUserStats && p.previousUserStats ? (
               <div className="animate-in fade-in duration-slow slide-in-from-bottom-4">
                 <RatingPopUp
@@ -280,19 +292,18 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
               <>
                 {/* A game mode's arena carries the identity; the title row would repeat it. */}
                 {!p.backingCinema && !p.heroSlot && (
-                <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
-                  <div className="min-w-0 flex-1">
+                <div className="mb-8 space-y-5">
+                  <ExerciseProgress
+                    plan={p.plan} currentExerciseIndex={p.currentExerciseIndex}
+                    completedExercises={p.completedExercises} exerciseTimes={p.exerciseTimes}
+                    onExerciseSelect={p.handleExerciseSelect}
+                  />
+                  <div>
                     <ExerciseHeroHeader
                       variant="header"
                       exercise={p.currentExercise}
                       activeExercise={p.activeExercise}
                       plan={p.plan}
-                    />
-                  </div>
-                  <div className="w-full sm:max-w-sm">
-                    <ExerciseProgress
-                      plan={p.plan} currentExerciseIndex={p.currentExerciseIndex}
-                      completedExercises={p.completedExercises} onExerciseSelect={p.handleExerciseSelect}
                     />
                   </div>
                 </div>
@@ -339,11 +350,10 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     countInRemaining={p.countInRemaining} frequencyRef={p.frequencyRef}
                     isListening={p.isListening} audioContext={p.metronomeAudioContext}
                     audioStartTime={p.effectiveAudioStartTime} tabResetKey={p.tabResetKey}
-                    isRiddleRevealed={p.isRiddleRevealed} isRiddleGuessed={p.isRiddleGuessed}
+                    isRiddleRevealed={p.isRiddleRevealed}
                     hasPlayedRiddleOnce={p.hasPlayedRiddleOnce} earTrainingScore={p.earTrainingScore}
                     earTrainingHighScore={p.earTrainingHighScore} onPlayRiddle={p.onPlayRiddle}
-                    onRevealRiddle={p.handleRevealRiddle} onNextRiddle={p.handleNextRiddle}
-                    onEarTrainingGuessed={p.handleEarTrainingGuessed}
+                    onRevealRiddle={p.handleRevealRiddle}
                     riddleProgress={p.riddleProgress}
                     onLeaderboardClick={() => openLeaderboard()}
                     startTimer={p.startTimer} stopTimer={p.stopTimer}
@@ -366,9 +376,12 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     startGate={showStartGate ? (
                       <StartGate
                         onStart={p.handleToggleTimer}
-                        onPreview={startGate.dismiss}
+                        // Under a hunt's gate is the answer sheet, not a tab to read first.
+                        onPreview={gateIntro ? undefined : startGate.dismiss}
+                        intro={gateIntro}
                         countsIn={!!p.currentExercise.metronomeSpeed}
                         micOn={p.isMicEnabled}
+                        mic={p.gateMic}
                       />
                     ) : undefined}
                   />
@@ -376,8 +389,14 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
 
                 {!p.reportResult && (
                   <SessionBottomBar
+                    verdict={p.verdict}
+                    roundVerdict={p.roundVerdict}
+                    hideTransport={showStartGate && p.hasTabGate}
+                    isTimeUp={p.isTimeUp}
+                    nextTitle={nextExercise?.songData?.title ?? nextExercise?.title}
+                    isNextSong={!!nextExercise?.songData}
                     examMode={p.isExamMode} onClose={p.onClose} skipExitDialog={p.skipExitDialog}
-                    exerciseKey={p.exerciseKey} currentExercise={p.currentExercise}
+                    currentExercise={p.currentExercise}
                     isLastExercise={p.isLastExercise} isPlaying={p.isPlaying}
                     toggleTimer={p.handleToggleTimer} handleRestart={p.handleRestart}
                     handleNextExerciseClick={p.handleNextExerciseClick}

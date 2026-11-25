@@ -34,6 +34,8 @@ export interface PracticeLogSession {
   /** Per-song breakdown of a multi-song session; absent for single-song ones. */
   songs?: ReportSongEntry[];
   isDateBackReport?: string;
+  /** Page to play the same thing again; absent when it has none (see getReplayHref). */
+  replayHref?: string;
 }
 
 export interface PracticeLogFilters {

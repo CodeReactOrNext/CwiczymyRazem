@@ -6,48 +6,35 @@
   "level_step": {
     "title": "Od jak dawna grasz?"
   },
-  "play_step": {
-    "title": "Masz gitarę pod ręką?",
+  "daily_step": {
+    "title": "Ile chcesz ćwiczyć dziennie?",
+    "hint": "Zmienisz to w każdej chwili w Ustawieniach.",
+    "unit": "min dziennie",
+    "vibes": {
+      "casual": "Na luzie",
+      "regular": "Regularnie",
+      "serious": "Na serio",
+      "intense": "Intensywnie"
+    }
+  },
+  "first_step": {
+    "title": "Co chcesz spróbować?",
     "riff_title": "Zagraj pierwszy riff",
     "riff_levels": {
       "new": "Trzy puste struny, bez przyciskania.",
       "some": "Pentatonika a-moll w górę i w dół, {{bpm}} BPM.",
       "experienced": "Zagrywka pentatoniczna ósemkami, {{bpm}} BPM."
     },
-    "riff_mic": "Mikrofon słyszy każdą zagraną nutę.",
-    "start": "Gramy",
-    "options": {
-      "browse": "Najpierw się rozejrzę",
-      "no_guitar": "Nie mam jeszcze gitary"
-    }
-  },
-  "goal_step": {
-    "title": "Co cię sprowadza do Riff Quest?",
-    "title_after_play": "Co dalej?",
-    "title_no_guitar": "Na razie się rozejrzyj",
-    "no_guitar_hint": "Bez gitary możesz już obczaić to:"
-  },
-  "plan_step": {
-    "title": "Wybierz plan na start",
-    "open": "Otwórz plan",
-    "browse_all": "Przeglądaj wszystkie plany ({{count}})"
-  },
-  "songs_step": {
-    "title": "Jak działa nauka utworów",
-    "description": "Nie dostarczamy tabów. Oto, co dostajesz zamiast nich.",
-    "no_tabs": "Bez tabów",
-    "features": {
-      "library": "Zapisuj utwory, których się uczysz, w bibliotece",
-      "time": "Liczymy, ile czasu ćwiczysz każdy utwór",
-      "sources": "Mapuj fragmenty z YouTube albo wgraj Guitar Pro"
+    "riff_needs": "Gitara i mikrofon",
+    "hunt_title": "Znajdź nuty na gryfie",
+    "hunt_levels": {
+      "new": "Struna E, progi 0–6.",
+      "some": "Wszystkie struny, 5. próg.",
+      "experienced": "Naturalne nuty na całym gryfie."
     },
-    "continue": "Rozumiem, przejdź do utworów",
-    "other": "Wybierz coś innego"
-  },
-  "desktop_hint": {
-    "title": "Najlepiej na komputerze",
-    "description": "Na telefonie wszystko działa, ale Riff Quest powstał z myślą o komputerze. Wróć do nas na komputerze, będzie dużo wygodniej.",
-    "continue": "Rozumiem, zaczynamy"
+    "hunt_needs": "Tylko klikasz, gitara niepotrzebna",
+    "hunt_find": "Znajdź",
+    "browse": "Najpierw się rozejrzę"
   },
   "levels": {
     "new": {
@@ -64,24 +51,6 @@
       "unit": "lata",
       "label": "Gram od lat",
       "description": "Swobodnie poruszam się po gryfie, chcę się dalej rozwijać"
-    }
-  },
-  "goals": {
-    "journey": {
-      "label": "Idź Ścieżką nauki",
-      "description": "Ucz się gry od zera, krok po kroku"
-    },
-    "plans": {
-      "label": "Ćwicz z planami ćwiczeń",
-      "description": "Gotowe rutyny z timerem, który cię prowadzi"
-    },
-    "songs": {
-      "label": "Ucz się utworów i śledź postępy",
-      "description": "Zapisuj utwory, które chcesz grać, i obserwuj swoje postępy"
-    },
-    "roadmap": {
-      "label": "Idź roadmapą do celu",
-      "description": "Ścieżka krok po kroku, np. do gry w stylu twojego idola"
     }
   },
   "first_riff_intro": {

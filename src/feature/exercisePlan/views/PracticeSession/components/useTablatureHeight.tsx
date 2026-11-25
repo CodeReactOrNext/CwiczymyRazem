@@ -5,8 +5,9 @@ import React, { useCallback, useRef, useState } from "react";
 import { TAB_BASE_HEIGHT } from "./useTablatureWorkerBridge";
 
 export const TAB_HEIGHT_MIN = 200;
-export const TAB_HEIGHT_MAX = 700;
-const HEIGHT_STORAGE_KEY = "practice-tab-height";
+export const TAB_HEIGHT_MAX = 900;
+// "-2": heights dragged before the board sized itself to the screen are not kept.
+const HEIGHT_STORAGE_KEY = "practice-tab-height-2";
 
 /** The height the player dragged the viewer to, or null when they never did. */
 const loadStoredHeight = (
@@ -93,13 +94,13 @@ interface TablatureResizeHandleProps {
  */
 export function TablatureResizeHandle({ height, onChange, onReset, className }: TablatureResizeHandleProps) {
   const { t } = useTranslation("session");
-  const dragRef = useRef<{ startY: number; startH: number } | null>(null);
+  const dragRef = useRef<{ startY: number; startH: number; moved: boolean } | null>(null);
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      dragRef.current = { startY: e.clientY, startH: height };
+      dragRef.current = { startY: e.clientY, startH: height, moved: false };
       e.currentTarget.setPointerCapture(e.pointerId);
     },
     [height],
@@ -109,6 +110,7 @@ export function TablatureResizeHandle({ height, onChange, onReset, className }: 
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (!dragRef.current) return;
       e.stopPropagation();
+      dragRef.current.moved = true;
       onChange(dragRef.current.startH + (e.clientY - dragRef.current.startY), false);
     },
     [onChange],
@@ -117,9 +119,11 @@ export function TablatureResizeHandle({ height, onChange, onReset, className }: 
   const endDrag = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (!dragRef.current) return;
+      const { moved } = dragRef.current;
       dragRef.current = null;
       e.currentTarget.releasePointerCapture(e.pointerId);
-      onChange(height); // persist final height
+      // A press that went nowhere must not pin a viewer that sizes itself.
+      if (moved) onChange(height); // persist final height
     },
     [height, onChange],
   );
@@ -137,11 +141,11 @@ export function TablatureResizeHandle({ height, onChange, onReset, className }: 
       onPointerCancel={endDrag}
       onDoubleClick={() => (onReset ? onReset() : onChange(TAB_BASE_HEIGHT))}
       className={cn(
-        "group absolute inset-x-0 bottom-0 z-20 flex h-4 cursor-ns-resize touch-none select-none items-end justify-center",
+        "group absolute inset-x-0 bottom-0 z-20 flex h-5 cursor-ns-resize touch-none select-none items-end justify-center",
         className,
       )}
     >
-      <div className="mb-1 h-1 w-10 rounded-full bg-white/15 transition-colors group-hover:bg-white/40" />
+      <div className="mb-1 h-1.5 w-16 rounded-full bg-white/25 transition-colors group-hover:bg-white/60" />
     </div>
   );
 }

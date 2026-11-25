@@ -57,11 +57,11 @@ przerwana. Widżet serii na dashboardzie: Kostek nie śpi, dopóki seria trwa.
 
 | Stan | Twarz i ciało | Efekt | Gdzie |
 |---|---|---|---|
-| `idle` | oczy-kreski, oddycha i lekko się kołysze, dłonie unoszą się; z `lively` zerka, macha, przeciąga się; `arrive` — wskakuje i macha | — | domyślnie, logowanie, podsumowanie |
-| `celebrate` | oczy-łuki, dwa podskoki, jedna dłoń „rock”, obie pompują | fale | po sesji, rekord, 3 gwiazdki |
+| `idle` | oczy-kreski, oddycha i lekko się kołysze, dłonie unoszą się; z `lively` zerka, macha, przeciąga się; `arrive` — wskakuje i macha | — | domyślnie, logowanie, podsumowanie, pasek odpowiedzi po słabszym przebiegu |
+| `celebrate` | oczy-łuki, dwa podskoki, jedna dłoń „rock”, obie pompują | fale | po sesji, rekord, 3 gwiazdki, przerywnik w połowie planu po serii od 16 trafień |
 | `hop` | jeden podskok, dłonie podrywają się | fala | rezerwowe |
 | `levelUp` | przysiad, obrót w powietrzu, pięść i „rock” w górze | fale | nowy poziom |
-| `approve` | oczy-łuki, podnosi tabliczkę z ptaszkiem i kiwa głową, co chwilę nią potrząsa | — | zaliczone ćwiczenie, koniec ćwiczenia |
+| `approve` | oczy-łuki, podnosi tabliczkę z ptaszkiem i kiwa głową, co chwilę nią potrząsa | — | zaliczone ćwiczenie, koniec ćwiczenia (pasek odpowiedzi w sesji), przerywnik w połowie planu |
 | `wave` | macha dłonią | — | pusty czat (powitanie), Home przed pierwszą sesją |
 | `asleep` | zamknięte oczy, przechylony, dłonie opadłe | — | przerwana seria |
 | `emptyCase` | trzyma skrzynię za rączkę, obraca ją do góry dnem, potrząsa — nic nie wypada — i wzrusza wolną dłonią | — | pusta kolekcja (arsenał) |
@@ -70,7 +70,7 @@ przerwana. Widżet serii na dashboardzie: Kostek nie śpi, dopóki seria trwa.
 | `standby` | oczy w pół, przygaszona | — | rezerwowe |
 | `wait` | stuka palcami, zerka w bok, wzdycha | — | pusty dziennik, szukanie przeciwnika |
 | `ready` | zaciera dłonie, podryguje | — | onboarding (krok „graj”) |
-| `focus` | zmrużone oczy, przysiad, pięści w gardzie | — | boss |
+| `focus` | zmrużone oczy, przysiad, pięści w gardzie | — | rezerwowe |
 | `nudge` | wskazuje palcem w stronę `lookAt`, stuka nim | — | aktualizacja, blokada funkcji, kalendarz |
 | `shrug` | dłonie do góry, wzrusza się | — | „za krótko”, pusta kolekcja |
 | `dizzy` | spiralki, chwieje się, dłonie latają | — | przegrana z bossem |

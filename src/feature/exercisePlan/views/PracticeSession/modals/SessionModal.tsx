@@ -4,7 +4,10 @@ import type { Dispatch, SetStateAction } from "react";
 import React, { useState } from "react";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
+import type { ExercisePlan } from "../../../types/exercise.types";
 import { FinishSessionDialog } from "../components/FinishSessionDialog";
+import type { VerdictTone } from "../components/SessionVerdict";
+import type { StartGateMic } from "../components/StartGate";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
 import { PhoneSessionModal } from "./PhoneSessionModal";
 
@@ -54,13 +57,10 @@ interface SessionModalProps {
   onSpeedMultiplierChange?: (value: number) => void;
   activeTablature?: any;
   isRiddleRevealed?: boolean;
-  isRiddleGuessed?: boolean;
   hasPlayedRiddleOnce?: boolean;
-  handleNextRiddle?: () => void;
   earTrainingScore?: number;
   earTrainingHighScore?: number | null;
   handleRevealRiddle?: () => void;
-  onEarTrainingGuessed?: () => void;
   /** Ear training's own Play/Stop — replays the phrase from the top, unlike the session toggle. */
   onPlayRiddle?: () => void;
   riddleProgress?: RiddleProgress | null;
@@ -69,6 +69,13 @@ interface SessionModalProps {
   songSectionMapSlot?: React.ReactNode;
   /** Above the exercise, upright only — a boss fight's arena. */
   heroSlot?: React.ReactNode;
+  plan: ExercisePlan;
+  completedExercises: number[];
+  exerciseTimes: Record<number, number>;
+  gateMic?: StartGateMic;
+  /** The answer to a run that just ended, under the exercise. */
+  verdict?: { tone: VerdictTone; strip: React.ReactNode };
+  roundVerdict?: { tone: VerdictTone; strip: React.ReactNode };
 }
 
 const SessionModal = ({
@@ -88,13 +95,14 @@ const SessionModal = ({
   audioTracks, setTrackConfigs, masterVolume, setMasterVolume,
   speedMultiplier, onSpeedMultiplierChange,
   activeTablature,
-  isRiddleRevealed, isRiddleGuessed, hasPlayedRiddleOnce,
-  handleNextRiddle, handleRevealRiddle,
-  earTrainingScore, earTrainingHighScore, onEarTrainingGuessed,
+  isRiddleRevealed, hasPlayedRiddleOnce,
+  handleRevealRiddle,
+  earTrainingScore, earTrainingHighScore,
   riddleProgress, onPlayRiddle,
   examMode,
   songSectionMapSlot,
   heroSlot,
+  plan, completedExercises, exerciseTimes, gateMic, verdict, roundVerdict,
 }: SessionModalProps) => {
   const [tabResetKey, setTabResetKey] = useState(0);
   const [showFinishEarlyDialog, setShowFinishEarlyDialog] = useState(false);
@@ -178,11 +186,10 @@ const SessionModal = ({
         masterVolume={masterVolume} setMasterVolume={setMasterVolume}
         speedMultiplier={speedMultiplier} onSpeedMultiplierChange={onSpeedMultiplierChange}
         activeTablature={activeTablature}
-        isRiddleRevealed={isRiddleRevealed} isRiddleGuessed={isRiddleGuessed}
+        isRiddleRevealed={isRiddleRevealed}
         hasPlayedRiddleOnce={hasPlayedRiddleOnce}
-        handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddle}
+        handleRevealRiddle={handleRevealRiddle}
         earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
-        onEarTrainingGuessed={onEarTrainingGuessed}
         riddleProgress={riddleProgress} onPlayRiddle={onPlayRiddle}
         examMode={examMode} isListening={isListening} frequencyRef={frequencyRef}
         volumeRef={volumeRef} onRecalibrate={onRecalibrate}
@@ -195,6 +202,8 @@ const SessionModal = ({
         handleRestart={handleRestart}
         songSectionMapSlot={songSectionMapSlot}
         heroSlot={heroSlot}
+        plan={plan} completedExercises={completedExercises} exerciseTimes={exerciseTimes}
+        gateMic={gateMic} verdict={verdict} roundVerdict={roundVerdict}
       />
       {finishEarlyDialog}
     </>

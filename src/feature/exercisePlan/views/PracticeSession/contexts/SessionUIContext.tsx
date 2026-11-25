@@ -11,15 +11,22 @@ interface SessionUIContextType {
   closeTimingCalibration: () => void;
   /** Opens the mic setup wizard again (input, level, tuning, timing). */
   openMicSetup: () => void;
+  /** A listening round's verdict was read — the held clock runs on. */
+  onQuizContinue: () => void;
 }
 
 const SessionUIContext = createContext<SessionUIContextType | undefined>(undefined);
 
-const noop = () => { /* no mic setup outside a session */ };
+const noop = () => { /* nothing to open or hold outside a session */ };
 
-export const SessionUIProvider: React.FC<{ children: React.ReactNode; onOpenMicSetup?: () => void }> = ({
+export const SessionUIProvider: React.FC<{
+  children: React.ReactNode;
+  onOpenMicSetup?: () => void;
+  onQuizContinue?: () => void;
+}> = ({
   children,
   onOpenMicSetup = noop,
+  onQuizContinue = noop,
 }) => {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [backingVideoId, setBackingVideoId] = useState<string | null>(null);
@@ -34,7 +41,7 @@ export const SessionUIProvider: React.FC<{ children: React.ReactNode; onOpenMicS
     <SessionUIContext.Provider value={{
       isLeaderboardOpen, openLeaderboard, closeLeaderboard, backingVideoId, setBackingVideoId,
       isTimingCalibrationOpen, openTimingCalibration, closeTimingCalibration,
-      openMicSetup: onOpenMicSetup,
+      openMicSetup: onOpenMicSetup, onQuizContinue,
     }}>
       {children}
     </SessionUIContext.Provider>

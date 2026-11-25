@@ -17,6 +17,7 @@ import {
 } from "feature/levelGate/utils/levelGate.utils";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { useAutoClaimLevels } from "hooks/useRewardLedger";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 
 import type { LevelMilestone, MilestoneUnlock } from "../data/levelMilestones";
@@ -189,6 +190,72 @@ const Stop = ({
       )}
     </div>
   );
+};
+
+/** What reaching a level has just paid, as the things themselves. */
+export const PaidLevels = ({ paid }: { paid: RewardLike & { levels: number[] } }) => {
+  const { t } = useTranslation("session_summary");
+  return (
+    <div className='flex w-full flex-col items-center gap-5 text-center'>
+      <p className='font-display text-xl font-bold text-zinc-100'>
+        {paid.levels.length === 1
+          ? t("paid_level", { lvl: paid.levels[0] })
+          : t("paid_levels", { count: paid.levels.length })}
+      </p>
+      <RewardIcons reward={paid} size={88} />
+    </div>
+  );
+};
+
+/**
+ * The next stop of the climb on its own: what it pays, full size, and how far
+ * it is. The session summary shows one thing at a time, so the two stops after
+ * it stay on the dashboard's card.
+ */
+export const NextReward = ({ className }: { className?: string }) => {
+  const { t } = useTranslation("session_summary");
+  const stats = useAppSelector(selectCurrentUserStats);
+  const lvl = stats?.lvl ?? 1;
+  const points = stats?.points ?? 0;
+  const next = LEVEL_MILESTONES.find((milestone) => milestone.lvl > lvl);
+  if (!next) return null;
+
+  const reward = rollLevelReward(next);
+  const progress = progressToLvl(points, lvl, next.lvl);
+
+  return (
+    <div className={cn("flex w-full flex-col items-center gap-6 text-center", className)}>
+      {reward && <RewardIcons reward={reward} size={112} />}
+      <div className='space-y-1'>
+        <p className='font-display text-2xl font-extrabold text-zinc-50'>
+          {t("level")} {next.lvl}
+        </p>
+        {next.unlocks.length > 0 && (
+          <p className='text-sm font-medium text-zinc-300'>{next.unlocks.map(unlockLabel).join(", ")}</p>
+        )}
+        <p className='text-sm tabular-nums text-zinc-400'>
+          {t("points_to_go", { count: pointsToReachLvl(points, next.lvl) })}
+        </p>
+      </div>
+      <div
+        className='h-4 w-full max-w-md overflow-hidden rounded-full bg-zinc-800'
+        role='progressbar'
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(progress * 100)}
+        aria-label={`${t("level")} ${next.lvl}`}>
+        <div className='relative h-full rounded-full bg-amber-500' style={{ width: `${Math.max(MIN_FILL_PCT, progress * 100)}%` }}>
+          <span aria-hidden className='light-hide absolute inset-x-2 top-1 h-1 rounded-full bg-white/30' />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/** Whether there is a level left to climb to. */
+export const useHasNextReward = () => {
+  const lvl = useAppSelector(selectCurrentUserStats)?.lvl ?? 1;
+  return LEVEL_MILESTONES.some((milestone) => milestone.lvl > lvl);
 };
 
 /**

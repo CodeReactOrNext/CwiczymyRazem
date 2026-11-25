@@ -3,13 +3,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "assets/c
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { AutoBackingSection } from "feature/autoBacking/components/AutoBackingSection";
-import { useAutoBackingStore } from "feature/autoBacking/store/autoBackingStore";
 import { useTranslation } from "hooks/useTranslation";
-import { Volume1, Volume2, VolumeX } from "lucide-react";
-import type { Dispatch, SetStateAction } from "react";
-import { GiGuitar, GiMetronome } from "react-icons/gi";
+import { AudioLines, ChevronDown, Mic, Volume2, VolumeX } from "lucide-react";
+import type { ComponentType, Dispatch, ReactNode, SetStateAction } from "react";
+import { GiDrumKit, GiGuitar, GiGuitarBassHead, GiMetronome, GiPianoKeys } from "react-icons/gi";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
+import type { TabTrackType } from "../../../types/exercise.types";
 import { SessionTooltip } from "./SessionTooltip";
 
 interface VolumeButtonProps {
@@ -29,16 +29,86 @@ interface VolumeButtonProps {
   compact?: boolean;
   /** Height class to align with sibling toolbar buttons (e.g. "h-12" / "h-8"). */
   h?: string;
+  /** Says "Volume" beside the icon. */
+  labelled?: boolean;
   /** Full-width labelled trigger for the mobile/landscape-drawer toolbar layout. */
   mobile?: boolean;
 }
 
-const sectionLabel = "text-xs font-medium text-zinc-400";
-const valueBadge = (highlighted: boolean) =>
-  cn(
-    "min-w-[2.75rem] rounded-md px-1.5 py-0.5 text-center font-mono text-[11px] font-bold tabular-nums",
-    highlighted ? "bg-cyan-500/15 text-cyan-400" : "bg-white/10 text-white"
-  );
+// One heading for every section of the menu.
+const sectionLabel = "text-[13px] font-semibold text-zinc-200";
+
+// Every fader the same: a white fill on a zinc track.
+const faderClass = cn(
+  "cursor-pointer",
+  "[&>span:first-child]:bg-zinc-700 [&>span:first-child>span]:bg-white",
+  "[&_[role=slider]]:border-white/60 [&_[role=slider]]:bg-white",
+);
+
+type IconComponent = ComponentType<{ className?: string }>;
+
+/** A channel known by its instrument, so a row reads without its name. */
+const TRACK_ICONS: Partial<Record<TabTrackType, IconComponent>> = {
+  guitar: GiGuitar,
+  bass: GiGuitarBassHead,
+  drums: GiDrumKit,
+  keys: GiPianoKeys,
+  arp: AudioLines,
+  vocals: Mic,
+};
+
+/**
+ * One channel of the mix: its instrument as a key that mutes it, the name and
+ * level over the fader. A muted channel dims and reads "Muted", not a level.
+ */
+const MixRow = ({
+  icon: Icon,
+  name,
+  value,
+  valueClassName,
+  muted = false,
+  onToggleMute,
+  muteLabel,
+  children,
+}: {
+  icon: IconComponent;
+  name: string;
+  value: string;
+  valueClassName?: string;
+  muted?: boolean;
+  onToggleMute?: () => void;
+  muteLabel?: string;
+  children: ReactNode;
+}) => (
+  <div className='flex items-center gap-3'>
+    {onToggleMute ? (
+      <button
+        type='button'
+        onClick={onToggleMute}
+        aria-pressed={muted}
+        aria-label={muteLabel}
+        title={muteLabel}
+        className={cn(
+          PRESSABLE_KEY,
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
+          muted ? "bg-zinc-800 text-zinc-600 hover:text-zinc-300" : "bg-zinc-700 text-zinc-100 hover:bg-zinc-600",
+        )}>
+        <Icon className='h-4 w-4' />
+      </button>
+    ) : (
+      <span aria-hidden className='flex h-9 w-9 shrink-0 items-center justify-center text-zinc-500'>
+        <Icon className='h-4 w-4' />
+      </span>
+    )}
+    <div className={cn("min-w-0 flex-1 transition-opacity", muted && "opacity-50")}>
+      <div className='mb-2 flex items-center justify-between gap-2 text-xs font-medium text-zinc-300'>
+        <span className='truncate'>{name}</span>
+        <span className={cn("shrink-0 font-semibold tabular-nums text-zinc-400", valueClassName)}>{value}</span>
+      </div>
+      {children}
+    </div>
+  </div>
+);
 
 export const VolumeButton = ({
   metronome,
@@ -50,10 +120,10 @@ export const VolumeButton = ({
   setTrackConfigs,
   compact = false,
   h = "h-12",
+  labelled = false,
   mobile = false,
 }: VolumeButtonProps) => {
   const { t } = useTranslation("session");
-  const autoBackingAvailable = useAutoBackingStore((state) => state.available);
   const showMetronome = !!metronome && !!setIsMetronomeMuted && metronome.volume !== undefined;
   const showMasterVolume = masterVolume !== undefined && !!onMasterVolumeChange;
   // Shown whenever there's at least the main (backing) track — a GP file with
@@ -92,12 +162,21 @@ export const VolumeButton = ({
       className={cn(
         PRESSABLE_KEY,
         "flex items-center justify-center shrink-0 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
-        compact ? "h-8 w-8" : cn("w-12", h),
+        compact ? "h-8 w-8" : cn(labelled ? "gap-2 px-2.5 font-medium" : "w-12", h),
         isBoosted
           ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
-          : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
+          : labelled
+            ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100"
+            : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
       )}>
-      <VolumeIcon className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={2.5} />
+      <VolumeIcon className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} strokeWidth={labelled ? 2 : 2.5} />
+      {labelled && !compact && (
+        <>
+          <span className='text-[13px] font-medium'>{t("toolbar.backing")}</span>
+          {/* A menu, so it carries the chevron every menu key in the toolbar does. */}
+          <ChevronDown aria-hidden className='h-3.5 w-3.5 shrink-0 text-zinc-500' />
+        </>
+      )}
     </button>
   );
 
@@ -117,156 +196,103 @@ export const VolumeButton = ({
         // a long GP track list needs to scroll no matter where the trigger sits on screen.
         // z-[99999999] clears the session's full-screen layer (z-[999999] desktop /
         // z-[9999999] mobile) — the default z-50 would paint underneath it.
-        className='z-[99999999] w-72 max-h-[var(--radix-dropdown-menu-content-available-height)] overflow-y-auto p-3.5'>
-        {showMetronome && (
-          <div>
-            <div className='mb-3 flex items-center justify-between'>
-              <span className={cn(sectionLabel, "flex items-center gap-1.5")}>
-                <GiMetronome className='h-3 w-3' />
-                {t("volume.metronome")}
-              </span>
-              <span className={valueBadge(!isMetronomeMuted)}>
-                {isMetronomeMuted ? t("volume.muted") : `${Math.round(metronomeVolume * 100)}%`}
-              </span>
-            </div>
-            <div className='flex items-center gap-2.5'>
-              <button
-                onClick={() => setIsMetronomeMuted!(!isMetronomeMuted)}
-                title={isMetronomeMuted ? t("volume.unmute_metronome") : t("volume.mute_metronome")}
-                className={cn(
-                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors active:scale-95",
-                  isMetronomeMuted
-                    ? "bg-zinc-800 text-zinc-500 hover:text-zinc-300"
-                    : "bg-white/10 text-white hover:bg-white/20"
-                )}>
-                {isMetronomeMuted || metronomeVolume <= 0.0001 ? (
-                  <VolumeX className='h-4 w-4' strokeWidth={2.5} />
-                ) : metronomeVolume < 0.5 ? (
-                  <Volume1 className='h-4 w-4' strokeWidth={2.5} />
-                ) : (
-                  <Volume2 className='h-4 w-4' strokeWidth={2.5} />
-                )}
-              </button>
+        className='z-[99999999] flex w-80 max-h-[var(--radix-dropdown-menu-content-available-height)] flex-col gap-6 overflow-y-auto p-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/15'>
+        {/* Every level in one place (metronome, the tab's own instrument and
+            the band), so silencing the drums no longer means scrolling past the
+            band's description to the bottom of the menu. */}
+        <section className='flex flex-col gap-4'>
+          <h4 className={sectionLabel}>{t("volume.mix")}</h4>
+
+          {showMetronome && (
+            <MixRow
+              icon={GiMetronome}
+              name={t("volume.metronome")}
+              value={isMetronomeMuted ? t("volume.muted") : `${Math.round(metronomeVolume * 100)}%`}
+              muted={isMetronomeMuted}
+              onToggleMute={() => setIsMetronomeMuted!(!isMetronomeMuted)}
+              muteLabel={isMetronomeMuted ? t("volume.unmute_metronome") : t("volume.mute_metronome")}>
               <Slider
                 value={[isMetronomeMuted ? 0 : metronomeVolume]}
                 min={0}
                 max={1}
                 step={0.05}
+                aria-label={t("volume.metronome")}
                 onValueChange={([v]) => {
                   if (isMetronomeMuted && v > 0) setIsMetronomeMuted!(false);
                   metronome?.setVolume?.(v);
                 }}
-                className={cn(
-                  "flex-1 cursor-pointer",
-                  "[&>span:first-child]:bg-white/15 [&>span:first-child>span]:bg-white",
-                  "[&_[role=slider]]:border-white/60 [&_[role=slider]]:bg-white"
-                )}
+                className={faderClass}
               />
-            </div>
-          </div>
-        )}
+            </MixRow>
+          )}
 
-        {showMasterVolume && (
-          <div className={showMetronome ? "mt-4" : undefined}>
-            <div className='mb-3 flex items-center justify-between'>
-              <span className={sectionLabel}>{t("volume.boost")}</span>
-              <span className={valueBadge(isBoosted)}>{Math.round(masterVolume! * 100)}%</span>
-            </div>
-            <Slider
-              value={[masterVolume! * 100]}
-              min={0}
-              max={200}
-              step={5}
-              onValueChange={([v]) => onMasterVolumeChange!(v / 100)}
-              className={cn(
-                "cursor-pointer",
-                "[&>span:first-child]:bg-white/15",
-                isBoosted
-                  ? "[&>span:first-child>span]:bg-cyan-400 [&_[role=slider]]:border-cyan-400/60 [&_[role=slider]]:bg-cyan-400"
-                  : "[&>span:first-child>span]:bg-white [&_[role=slider]]:border-white/60 [&_[role=slider]]:bg-white"
-              )}
-            />
-            <p className='mt-2 text-xs leading-relaxed text-zinc-500'>
-              {t("media.boost_hint")}
-            </p>
-          </div>
-        )}
-
-        <AutoBackingSection
-          labelClassName={sectionLabel}
-          className={cn((showMetronome || showMasterVolume) && "mt-4")}
-        />
-
-        {showTracks && (
-          <div className={cn("space-y-3", (showMetronome || showMasterVolume || autoBackingAvailable) && "mt-4")}>
-            <span className={cn(sectionLabel, "flex items-center gap-1.5")}>
-              <GiGuitar className='h-3 w-3' />
-              {tracksLabel}
-            </span>
-            {audioTracks!.map((track) => {
-              const muteButton = (
-                <button
-                  onClick={() =>
-                    setTrackConfigs!((prev) => ({
-                      ...prev,
-                      [track.id]: { ...prev[track.id], isMuted: !prev[track.id]?.isMuted },
-                    }))
-                  }
-                  title={track.isMuted ? t("volume.unmute") : t("volume.mute")}
-                  className={cn(
-                    "shrink-0 rounded p-1 transition-colors",
-                    track.isMuted ? "bg-red-500/10 text-red-400" : "text-zinc-500 hover:text-white"
-                  )}>
-                  {track.isMuted ? (
-                    <VolumeX className='h-3.5 w-3.5' strokeWidth={2.5} />
-                  ) : (
-                    <Volume2 className='h-3.5 w-3.5' strokeWidth={2.5} />
-                  )}
-                </button>
-              );
-
+          {showTracks &&
+            audioTracks!.map((track) => {
+              // A single row is always the session's own instrument (see tracksLabel).
+              const name =
+                audioTracks!.length === 1
+                  ? tracksLabel
+                  : track.id === "main"
+                    ? t("volume.main_instrument")
+                    : (track.name ?? track.id);
+              const toggleMute = () =>
+                setTrackConfigs!((prev) => ({
+                  ...prev,
+                  [track.id]: { ...prev[track.id], isMuted: !prev[track.id]?.isMuted },
+                }));
               return (
-                <div key={track.id} className='space-y-1.5'>
-                  {/* A single track's name is already covered by the section label above —
-                      only label individual rows once there's more than one to tell apart. */}
-                  {audioTracks!.length > 1 && (
-                    <div className='flex items-center justify-between'>
-                      <span className='max-w-[150px] truncate text-[11px] font-semibold text-zinc-300'>
-                        {track.id === "main" ? t("volume.main_instrument") : track.name}
-                      </span>
-                      {muteButton}
-                    </div>
-                  )}
-                  <div className='flex items-center gap-2.5'>
-                    {audioTracks!.length === 1 && muteButton}
-                    <Slider
-                      value={[track.isMuted ? 0 : track.volume * 100]}
-                      max={100}
-                      step={1}
-                      className='flex-1 cursor-pointer'
-                      onValueChange={([val]) =>
-                        setTrackConfigs!((prev) => ({
-                          ...prev,
-                          [track.id]: { ...prev[track.id], volume: val / 100, isMuted: val === 0 },
-                        }))
-                      }
-                    />
-                    {/* Read the mute, not the stored level: a muted track kept
-                        showing "100%" next to a slider sitting at zero, which read
-                        as "this is on" to anyone looking for what to silence. */}
-                    <span
-                      className={cn(
-                        "w-10 shrink-0 text-right font-mono text-[11px]",
-                        track.isMuted ? "text-red-400" : "text-zinc-500"
-                      )}>
-                      {track.isMuted ? t("volume.muted") : `${Math.round(track.volume * 100)}%`}
-                    </span>
-                  </div>
-                </div>
+                <MixRow
+                  key={track.id}
+                  icon={(track.trackType && TRACK_ICONS[track.trackType]) || GiGuitar}
+                  name={name}
+                  // Read the mute, not the stored level: a muted track kept
+                  // showing "100%" next to a slider sitting at zero.
+                  value={track.isMuted ? t("volume.muted") : `${Math.round(track.volume * 100)}%`}
+                  muted={track.isMuted}
+                  onToggleMute={toggleMute}
+                  muteLabel={`${track.isMuted ? t("volume.unmute") : t("volume.mute")}: ${name}`}>
+                  <Slider
+                    value={[track.isMuted ? 0 : track.volume * 100]}
+                    max={100}
+                    step={1}
+                    aria-label={name}
+                    className={faderClass}
+                    onValueChange={([val]) =>
+                      setTrackConfigs!((prev) => ({
+                        ...prev,
+                        [track.id]: { ...prev[track.id], volume: val / 100, isMuted: val === 0 },
+                      }))
+                    }
+                  />
+                </MixRow>
               );
             })}
-          </div>
-        )}
+
+          {showMasterVolume && (
+            <MixRow
+              icon={Volume2}
+              name={t("volume.boost")}
+              value={`${Math.round(masterVolume! * 100)}%`}
+              valueClassName={isBoosted ? "text-cyan-400" : undefined}>
+              <Slider
+                value={[masterVolume! * 100]}
+                min={0}
+                max={200}
+                step={5}
+                aria-label={t("volume.boost")}
+                onValueChange={([v]) => onMasterVolumeChange!(v / 100)}
+                className={cn(
+                  faderClass,
+                  isBoosted &&
+                    "[&>span:first-child>span]:bg-cyan-400 [&_[role=slider]]:border-cyan-400/60 [&_[role=slider]]:bg-cyan-400",
+                )}
+              />
+              {isBoosted && <p className='mt-2 text-xs leading-relaxed text-zinc-500'>{t("media.boost_hint")}</p>}
+            </MixRow>
+          )}
+        </section>
+
+        <AutoBackingSection labelClassName={sectionLabel} />
       </DropdownMenuContent>
     </DropdownMenu>
   );

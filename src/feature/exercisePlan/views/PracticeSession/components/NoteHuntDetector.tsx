@@ -3,12 +3,14 @@ import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Mic } from "lucide-react";
 import { useMemo } from "react";
+import { getUniformTuningShift } from "utils/audio/tunings";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { huntPositions } from "../hooks/useNoteHunt";
 import { ClickableFretboard, useShowFullNeck } from "./ClickableFretboard";
 import { DetectionWave } from "./DetectionWave";
-import { HuntPromptCard, HuntStage, HuntStats, HuntSteps, HuntTargetCard, HuntViewMenu } from "./HuntStage";
+import { HuntOctaveLabel, HuntOctaves } from "./HuntOctaves";
+import { HuntAsk, HuntPromptCard, HuntStage, HuntStats, HuntSteps, HuntTargetCard, HuntViewMenu } from "./HuntStage";
 
 interface NoteHuntDetectorProps {
   targetNote: string;
@@ -22,15 +24,15 @@ interface NoteHuntDetectorProps {
   /** Dev-only (non-production): fast-tracks the WHOLE EXAM finish flow instantly.
    *  Undefined outside exam mode. */
   onDevPassExam?: () => void;
+  /** Off where the session's own readout shows the score beside the hunt. */
+  showScore?: boolean;
 }
 
 // Index = string number (1 = high e … 6 = low E).
 const STRING_NAMES = ["", "high e", "B", "G", "D", "A", "low E"];
 const STRING_ORDINALS = ["", "1st", "2nd", "3rd", "4th", "5th", "6th"];
-
-const SUPERSCRIPT = ["⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"];
-const toSuperscript = (n: number) =>
-  String(n).split("").map(d => SUPERSCRIPT[Number(d)] ?? d).join("");
+/** Solved rounds in a row from which the streak is worth a word. */
+const MIN_SHOWN_STREAK = 3;
 
 export function NoteHuntDetector({
   targetNote: targetNoteProp,
@@ -39,9 +41,11 @@ export function NoteHuntDetector({
   isListening,
   isPlaying,
   onDevPassExam,
+  showScore = true,
 }: NoteHuntDetectorProps) {
   const { t } = useTranslation("session");
-  const { noteHunt, noteHuntSecondsLeft, noteHuntSecondsTotal, noteHuntRegion, noteHuntStrings, customGoalPrompt, huntTarget, chromaticProgress, volumeRef, advanceHunt, canAdvanceHunt, markNoteHuntOctave } = useNoteMatchingContext();
+  const { noteHunt, noteHuntSecondsLeft, noteHuntSecondsTotal, noteHuntRegion, noteHuntStrings, noteHuntStreak, noteHuntRoundEnd, customGoalPrompt, huntTarget, chromaticProgress, volumeRef, advanceHunt, canAdvanceHunt, markNoteHuntOctave, tuningOffsets } = useNoteMatchingContext();
+  const tuningShift = getUniformTuningShift(tuningOffsets);
 
   // Read the live target from context (not the prop) so it updates through the
   // memoized desktop content wrapper when the target rotates. Falls back to the
@@ -94,8 +98,20 @@ export function NoteHuntDetector({
   const wrongOctave = !isPrompt && !!noteHuntRegion && isMatch && detectedOctave !== null
     && octaves.length > 0 && !octaves.includes(detectedOctave);
 
+  // The whole neck, every octave: the note, its one instruction, and an equal tile
+  // per octave. Nothing here needs a diagram or a hidden answer.
+  const isWholeNeck = !isPrompt && !noteHuntRegion;
+
   const stats = (
-    <HuntStats score={isMicEnabled ? score : undefined} secondsLeft={isRotating ? noteHuntSecondsLeft : null} secondsTotal={noteHuntSecondsTotal} complete={complete}>
+    <HuntStats score={isMicEnabled && showScore ? score : undefined} secondsLeft={isRotating ? noteHuntSecondsLeft : null} secondsTotal={noteHuntSecondsTotal} complete={complete}
+      trailing={isWholeNeck && canAdvanceHunt && !noteHuntRoundEnd ? (
+        <Button type="button" variant="ghost" size="sm" onClick={advanceHunt}>
+          {t("note_hunt.skip")}
+        </Button>
+      ) : undefined}>
+      {isWholeNeck && noteHuntStreak >= MIN_SHOWN_STREAK && (
+        <span className="shrink-0 text-sm font-bold text-orange-400">{t("combo.in_a_row", { count: noteHuntStreak })}</span>
+      )}
       {chromaticProgress && (
         <span
           className={cn(
@@ -201,11 +217,11 @@ export function NoteHuntDetector({
             so without this the score just silently refuses to move. */}
         {isMicEnabled && wrongOctave && (
           <p className="text-center text-xs font-bold text-amber-400">
-            {t("note_hunt.wrong_octave", { note: `${targetNote}${toSuperscript(detectedOctave!)}` })}{" "}
+            {t("note_hunt.wrong_octave", { note: `${targetNote}${detectedOctave}` })}{" "}
             {soleString
               ? t("note_hunt.string_gives", {
                   string: t(`note_hunt.strings.${soleString}`, STRING_NAMES[soleString]),
-                  note: `${targetNote}${toSuperscript(octaves[0])}`,
+                  note: `${targetNote}${octaves[0]}`,
                 })
               : t("note_hunt.stay_inside", {
                   from: noteHuntRegion?.startFret,
@@ -238,7 +254,7 @@ export function NoteHuntDetector({
               ? "bg-emerald-500/10 text-emerald-400"
               : "bg-zinc-800/60 text-zinc-300",
           );
-          const label = `${targetNote}${toSuperscript(o)}`;
+          const label = <HuntOctaveLabel note={targetNote} octave={o} />;
           return !isMicEnabled ? (
             <button
               key={o}
@@ -253,6 +269,16 @@ export function NoteHuntDetector({
         })}
       </div>
     </div>
+  );
+
+  const devPass = onDevPassExam && (
+    <button
+      type="button"
+      onClick={onDevPassExam}
+      className="inline-flex items-center gap-2 self-center rounded-lg bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-400 transition-colors hover:bg-emerald-500/20"
+      title="Dev-only: ends the WHOLE EXAM right now and runs the normal finish flow">
+      🏁 Pass whole exam (dev)
+    </button>
   );
 
   const footer = (isPrompt || octaves.length > 0 || canAdvanceHunt) && (
@@ -295,17 +321,40 @@ export function NoteHuntDetector({
           {t("hunt.next")} <ArrowRight aria-hidden />
         </Button>
       )}
-      {onDevPassExam && (
-        <button
-          type="button"
-          onClick={onDevPassExam}
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-400 transition-colors hover:bg-emerald-500/20"
-          title="Dev-only: ends the WHOLE EXAM right now and runs the normal finish flow">
-          🏁 Pass whole exam (dev)
-        </button>
-      )}
+      {devPass}
     </div>
   );
+
+  if (isWholeNeck) {
+    return (
+      <div className="flex w-full max-w-xl flex-col gap-6 shortwide:max-w-2xl shortwide:gap-3">
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6 shortwide:flex-row shortwide:gap-5">
+          <HuntTargetCard value={targetNote} complete={complete} foundCount={foundUnits} animationKey={targetNote} />
+          <div className="flex w-full min-w-0 flex-1 flex-col gap-1">
+            <HuntAsk
+              className="sm:items-start sm:text-left shortwide:max-w-none"
+              title={t("note_hunt.find_every", { note: targetNote })}
+              hint={!isMicEnabled ? t("note_hunt.tap_octaves") : !isListening ? t("note_hunt.starting_mic") : undefined}
+              solved={complete}
+            />
+            {isMicEnabled && isListening && (
+              <DetectionWave volumeRef={volumeRef} active={isListening} isMatch={isMatch} className="h-10 sm:justify-start shortwide:h-8 shortwide:justify-start" />
+            )}
+          </div>
+        </div>
+        {stats}
+        <HuntOctaves
+          note={targetNote}
+          octaves={octaves}
+          foundOctaves={foundOctaves}
+          liveOctave={isMatch ? detectedOctave : null}
+          tuningShift={tuningShift}
+          onMark={isMicEnabled ? undefined : markNoteHuntOctave}
+        />
+        {devPass}
+      </div>
+    );
+  }
 
   // No region → no neck diagram, and the side-rail layout has nothing to sit
   // beside: keep the original narrow single column.

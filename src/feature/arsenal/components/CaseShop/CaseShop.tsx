@@ -58,6 +58,7 @@ interface GroupProps {
   casePity?: CasePityState;
   guitarSeen: ReadonlySet<number | string>;
   effectSeen: ReadonlySet<number | string>;
+  wide?: boolean;
 }
 
 /** One card of the shelf, with a guitar/pedal switch when its rung has both. */
@@ -119,9 +120,10 @@ export const CaseShop = ({
   const guitarSeen = useMemo(() => new Set(dexGuitarIds), [dexGuitarIds]);
   const effectSeen = useMemo(() => new Set(dexEffectIds), [dexEffectIds]);
 
-  const renderGroup = (ids: CaseType[]) => (
+  const renderGroup = (ids: CaseType[], wide = false) => (
     <CaseGroupCard
       key={ids[0]}
+      wide={wide}
       ids={ids}
       currentFame={currentFame}
       isOpening={isOpening}
@@ -147,15 +149,12 @@ export const CaseShop = ({
         <SectionHeader
           size='lg'
           title={t("cases.shelf_title")}
-          description={t("cases.shelf_subtitle")}
           className='mb-0'
         />
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
-          {LADDER.map(renderGroup)}
+          {LADDER.map((ids) => renderGroup(ids))}
         </div>
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
-          {SIDE.map(renderGroup)}
-        </div>
+        {SIDE.map((ids) => renderGroup(ids, true))}
       </section>
     </div>
   );

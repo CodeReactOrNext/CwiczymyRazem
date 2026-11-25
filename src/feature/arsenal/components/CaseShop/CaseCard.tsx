@@ -9,10 +9,8 @@ import type {
   CaseDefinition,
   CasePityCounters,
 } from "../../types/arsenal.types";
+import { CaseBuyControl } from "./CaseBuyControl";
 import { DropRates } from "./DropRates";
-import { FreeCaseButton } from "./FreeCaseButton";
-import { OpenCaseButton } from "./OpenCaseButton";
-import { PackButtons } from "./PackButtons";
 import { PityMeter } from "./PityMeter";
 
 /** Per-tier identity: the tier word in the name, one tinted wash behind the
@@ -93,7 +91,11 @@ interface CaseCardProps {
   canDiscoverNew?: boolean;
   /** The guitar/pedal switch of a case that comes in both, shown in the card's corner. */
   toggle?: ReactNode;
-  className?: string;
+  /**
+   * The row of its own under the ladder: art, name and controls side by side
+   * across the whole shelf instead of one card alone in a row of four.
+   */
+  wide?: boolean;
 }
 
 export const CaseCard = ({
@@ -106,13 +108,12 @@ export const CaseCard = ({
   pity,
   canDiscoverNew = true,
   toggle,
-  className,
+  wide = false,
 }: CaseCardProps) => {
   const tier = caseDef.id.split("-")[0];
   const meta = CASE_TIER[tier] || CASE_TIER.standard;
   const isEffectCase = caseDef.dropKind === "effect";
   const { image } = getCaseArt(caseDef);
-  const canAfford = currentFame >= caseDef.fameCost;
   const labels = useArsenalLabels();
   const { t } = labels;
 
@@ -127,21 +128,30 @@ export const CaseCard = ({
   return (
     <article
       className={cn(
-        "group relative flex flex-col gap-4 overflow-hidden rounded-lg bg-arsenal-section p-5 transition-colors hover:bg-arsenal-card",
-        className,
+        // On a phone the card is a shop row: art on the left, the name and its
+        // guarantee beside it, the controls across the bottom.
+        "group relative isolate grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-x-4 gap-y-3 overflow-hidden rounded-lg bg-arsenal-section p-4 transition-colors hover:bg-arsenal-card sm:flex sm:p-5",
+        wide ? "sm:gap-6" : "sm:flex-col sm:items-stretch sm:gap-4",
       )}>
       {/* Tier tint — a wash off the top edge instead of a tier-colored frame. */}
       <div
-        className='light-hide pointer-events-none absolute inset-0'
+        className='light-hide pointer-events-none absolute inset-0 -z-10'
         style={{
           background: `radial-gradient(120% 80% at 50% 0%, ${meta.wash} 0%, transparent 70%)`,
         }}
       />
 
-      <div className='relative flex items-center justify-between gap-3'>
-        {toggle ?? <span />}
-        <DropRates probabilities={caseDef.probabilities} />
-      </div>
+      {/* A case that comes one way keeps the row empty on the wide shelf, so
+          the art lines up across the ladder. */}
+      {!wide && (
+        <div
+          className={cn(
+            "relative col-span-2 sm:min-h-[44px]",
+            !toggle && "hidden sm:block",
+          )}>
+          {toggle}
+        </div>
+      )}
 
       {/* The case itself is the card. Every render is a three-quarter view
           from above, lit from the upper left, lying with its long axis from
@@ -149,9 +159,13 @@ export const CaseCard = ({
           turned along that same axis and pushed a little to the lower right,
           away from the light. The art is bottomed out in the box so its base
           actually meets the shadow instead of hovering above it. */}
-      <div className='relative flex h-40 items-end justify-center pb-2 sm:h-44'>
+      <div
+        className={cn(
+          "relative flex h-20 items-end justify-center pb-2",
+          wide ? "sm:h-28 sm:w-44 sm:shrink-0" : "sm:h-44",
+        )}>
         <div
-          className='light-hide pointer-events-none absolute left-1/2 top-1/2 h-24 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[48px]'
+          className='light-hide pointer-events-none absolute left-1/2 top-1/2 h-24 w-full max-w-56 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[48px]'
           style={{
             background: `radial-gradient(ellipse at center, ${meta.color}33 0%, ${meta.color}0d 55%, transparent 80%)`,
           }}
@@ -171,82 +185,64 @@ export const CaseCard = ({
         <img
           src={image}
           alt={labels.caseName(caseDef)}
-          className='relative z-10 max-h-[92%] w-[90%] object-contain object-bottom transition-transform duration-base group-hover:-translate-y-1'
+          className='relative z-10 max-h-[92%] w-full object-contain object-bottom transition-transform duration-base group-hover:-translate-y-1 sm:w-[90%]'
           draggable={false}
           loading='lazy'
         />
       </div>
 
-      <div className='relative min-w-0'>
-        <h3 className='font-display text-lg font-bold text-zinc-100'>
-          <Interpolate
-            text={title}
-            values={{
-              tier: (
-                <span style={{ color: readableText(meta.color) }}>
-                  {t(`cases.tier_word.${tier}`, tierWord)}
-                </span>
-              ),
-            }}
-          />
-        </h3>
-        <p className='mt-1 text-xs leading-relaxed text-zinc-500'>
-          {labels.caseDescription(caseDef)}
-        </p>
-      </div>
-
-      {hasPity(caseDef) && (
-        <PityMeter
-          caseDef={caseDef}
-          counters={pity ?? { sinceNew: 0, sinceTop: 0 }}
-          showNew={canDiscoverNew}
-          className='relative'
-        />
-      )}
-
-      <div className='relative mt-auto flex flex-col gap-2 pt-1'>
-        <div className='flex items-center justify-between gap-4'>
-          <span className='flex items-center gap-2 text-sm font-bold tabular-nums'>
-            <img
-              src='/images/tokens/coin.png'
-              alt=''
-              className={cn(
-                "h-5 w-5 object-contain",
-                !canAfford && "opacity-50 grayscale",
-              )}
+      <div className={cn("flex min-w-0 flex-col gap-2.5", wide && "sm:flex-1")}>
+        <div className='flex items-center gap-2'>
+          <h3 className='min-w-0 flex-1 font-display text-base font-bold leading-tight text-zinc-100 sm:flex-initial sm:text-lg'>
+            <Interpolate
+              text={title}
+              values={{
+                tier: (
+                  <span style={{ color: readableText(meta.color) }}>
+                    {t(`cases.tier_word.${tier}`, tierWord)}
+                  </span>
+                ),
+              }}
             />
-            <span className={canAfford ? "text-amber-400" : "text-red-400"}>
-              {caseDef.fameCost}
-            </span>
-            <span className='text-xs font-medium text-zinc-500'>
-              {t("common.fame")}
-            </span>
-          </span>
-          <OpenCaseButton
-            canAfford={canAfford}
-            isOpening={isOpening}
-            onClick={() => onOpen(caseDef.id)}
-            variant='soft'
-            className='px-5'
+          </h3>
+          {/* Beside the name on a row; in a ladder card's corner it leaves the
+              whole line to the name, which then fits without wrapping. */}
+          <DropRates
+            probabilities={caseDef.probabilities}
+            className={cn(
+              "-my-2 -mr-2",
+              !wide && "sm:absolute sm:right-4 sm:top-[26px] sm:m-0",
+            )}
           />
         </div>
-        {onOpenPack && (
-          <PackButtons
-            fameCost={caseDef.fameCost}
-            currentFame={currentFame}
-            isOpening={isOpening}
-            onOpen={(count) => onOpenPack(caseDef.id, count)}
+
+        {hasPity(caseDef) ? (
+          <PityMeter
+            caseDef={caseDef}
+            counters={pity ?? { sinceNew: 0, sinceTop: 0 }}
+            showNew={canDiscoverNew}
           />
-        )}
-        {freeTokens > 0 && !caseDef.noFreeCase && (
-          <FreeCaseButton
-            isOpening={isOpening}
-            tokens={freeTokens}
-            onClick={() => onOpen(caseDef.id, true)}
-            className='w-full'
-          />
+        ) : (
+          // Only where there is no guarantee to say what the case is for.
+          <p className='text-xs leading-relaxed text-zinc-400'>
+            {labels.caseDescription(caseDef)}
+          </p>
         )}
       </div>
+
+      <CaseBuyControl
+        caseDef={caseDef}
+        currentFame={currentFame}
+        isOpening={isOpening}
+        freeTokens={freeTokens}
+        onOpen={onOpen}
+        onOpenPack={onOpenPack}
+        variant='soft'
+        className={cn(
+          "relative col-span-2 flex-col",
+          wide ? "sm:w-72 sm:shrink-0" : "sm:mt-auto",
+        )}
+      />
     </article>
   );
 };

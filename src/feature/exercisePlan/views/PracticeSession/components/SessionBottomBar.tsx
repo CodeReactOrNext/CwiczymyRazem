@@ -3,24 +3,30 @@ import {
   Dialog, DialogContent, DialogDescription,
   DialogHeader, DialogTitle,
 } from "assets/components/ui/dialog";
-import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, FlagIcon, LogOut, SkipBack, SkipForward } from "lucide-react";
+import { Check, Ellipsis, Flag, Keyboard, LogOut, SkipForward } from "lucide-react";
+import type { ReactNode } from "react";
 import { memo, useRef, useState } from "react";
 
 import type { Exercise } from "../../../types/exercise.types";
 import { sumSessionTime, useSessionTimeStore } from "../hooks/sessionTimeStore";
 import { FinishSessionDialog } from "./FinishSessionDialog";
-import { MainTimerSection } from "./MainTimerSection";
-import { ShortcutsLegend } from "./ShortcutsLegend";
+import { SessionTransport } from "./SessionTransport";
+import { VERDICT_GROUND, type VerdictTone } from "./SessionVerdict";
+import { ShortcutsDialog } from "./ShortcutsLegend";
 
 interface SessionBottomBarProps {
   /** Song practice with a backing track — surfaces its nudge keys in the legend. */
   hasBackingTrack?: boolean;
   onClose?: () => void;
   skipExitDialog?: boolean;
-  exerciseKey: number;
   currentExercise: Exercise;
   isLastExercise: boolean;
   isPlaying: boolean;
@@ -39,14 +45,58 @@ interface SessionBottomBarProps {
   isSubmittingReport: boolean;
   onFinishSession: (options?: { earlyFinish?: boolean }) => Promise<void>;
   examMode?: boolean;
+  /** The start gate over the tab offers Start, so the bar doesn't. */
+  hideTransport?: boolean;
+  /** The exercise's clock is down: the white key moves on from Start. */
+  isTimeUp?: boolean;
+  /** What Next leads to. */
+  nextTitle?: string;
+  /** `nextTitle` is a song's name — left untranslated. */
+  isNextSong?: boolean;
+  /** The answer to a run that just ended, in place of the transport. */
+  verdict?: { tone: VerdictTone; strip: ReactNode };
+  /** The answer to one round of a hunt, over the bar — the transport stays. */
+  roundVerdict?: { tone: VerdictTone; strip: ReactNode };
 }
 
+interface MoveOnKeyProps {
+  title: string;
+  detail?: string;
+  icon: ReactNode;
+  /** The bar's one white key. */
+  isPrimary: boolean;
+  onClick: () => void;
+  isBusy?: boolean;
+  isDetailName?: boolean;
+}
+
+/** Next or Finish: what it does, and under it where that leads. */
+const MoveOnKey = ({ title, detail, icon, isPrimary, onClick, isBusy, isDetailName }: MoveOnKeyProps) => (
+  <Button
+    variant={isPrimary ? "default" : "subtle"}
+    size="xl"
+    className="h-14 max-w-full gap-4 px-5"
+    loading={isBusy}
+    onClick={onClick}>
+    <span className="min-w-0 text-left">
+      <span className="block text-base font-bold leading-tight">{title}</span>
+      {detail && (
+        <span translate={isDetailName ? "no" : undefined} className="block max-w-48 truncate text-xs font-medium leading-tight opacity-75">
+          {detail}
+        </span>
+      )}
+    </span>
+    {icon}
+  </Button>
+);
+
 /**
- * Fixed bottom navigation bar: exit button, timer, back/next controls.
+ * Fixed bottom bar: the way out on the left, the exercise's clock and Start in
+ * the middle, the way on at the right. One key is white at a time — Start while
+ * there is something to play, Next or Finish once its clock is down.
  */
 const SessionBottomBarComponent = ({
   onClose,
-  exerciseKey,
   currentExercise,
   isLastExercise,
   isPlaying,
@@ -64,12 +114,19 @@ const SessionBottomBarComponent = ({
   skipExitDialog = false,
   examMode = false,
   hasBackingTrack = false,
+  hideTransport = false,
+  isTimeUp = false,
+  nextTitle,
+  isNextSong = false,
+  verdict,
+  roundVerdict,
 }: SessionBottomBarProps) => {
   const { t } = useTranslation(["common", "session"]);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const stayButtonRef = useRef<HTMLButtonElement>(null);
   const hasTempoControl = !!currentExercise.metronomeSpeed;
   const [showFinishEarlyDialog, setShowFinishEarlyDialog] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   // Only meaningful mid-plan: the last exercise already has its own "Finish
   // Session" action, and a single-exercise plan has nothing to skip ahead of.
   const canFinishEarly = !examMode && !isLastExercise && totalExercises > 1;
@@ -78,6 +135,7 @@ const SessionBottomBarComponent = ({
   // keeps the time only; the dialog spells that out.
   const isEarlyFinish = !canFinishSession;
   const finishDisabled = !hasLoggedPractice;
+  const isBusy = !!isFinishing || isSubmittingReport;
 
   // Nothing was practised yet (timer never ran) — there is no progress to lose,
   // so Exit leaves straight away instead of warning about an unsaved session.
@@ -92,116 +150,92 @@ const SessionBottomBarComponent = ({
 
   return (
     <>
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-950 border-t border-white/5">
-      <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between gap-8">
+    <div className={cn(
+      "fixed bottom-0 left-0 right-0 z-50 transition-colors duration-base",
+      verdict ? VERDICT_GROUND[verdict.tone] : "bg-zinc-950",
+    )}>
+      {roundVerdict && !verdict && (
+        <div className={VERDICT_GROUND[roundVerdict.tone]}>
+          <div className="mx-auto flex max-w-7xl items-center px-6 py-3">{roundVerdict.strip}</div>
+        </div>
+      )}
+      <div className={cn(
+        "mx-auto max-w-7xl items-center gap-6 px-6 py-3",
+        verdict ? "flex justify-between" : "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]",
+      )}>
 
         {/* Left: Exit */}
-        <div className="flex-1 flex items-center justify-start gap-4">
-          <Button
-            variant="subtle"
-            onClick={handleExitClick}
-            className="text-zinc-400"
-          >
+        <div className="flex items-center justify-start gap-2.5">
+          <Button variant="subtle" size="touch" onClick={handleExitClick}>
             <LogOut />
             {t("common:practice.exit")}
           </Button>
-          <ShortcutsLegend hasTempoControl={hasTempoControl} hasBackingTrack={hasBackingTrack} />
+          {!verdict && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="subtle" size="icon-touch" aria-label={t("session:bar.more")} title={t("session:bar.more")}>
+                  <Ellipsis />
+                </Button>
+              </DropdownMenuTrigger>
+              {/* Clears the session's full-screen layer, like its dialogs. */}
+              <DropdownMenuContent side="top" align="start" sideOffset={8} className="z-[99999999] min-w-52">
+                <DropdownMenuItem className="gap-3 py-2.5 font-semibold" onSelect={() => setShowShortcuts(true)}>
+                  <Keyboard className="size-4 text-zinc-400" aria-hidden />
+                  {t("session:shortcuts.title")}
+                </DropdownMenuItem>
+                {/* Not offered before there is anything to save. */}
+                {canFinishEarly && !finishDisabled && (
+                  <DropdownMenuItem className="gap-3 py-2.5 font-semibold" onSelect={() => setShowFinishEarlyDialog(true)}>
+                    <Flag className="size-4 text-zinc-400" aria-hidden />
+                    {t("common:practice.finish_plan_early")}
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
-        {/* Center: Timer */}
-        <div className="flex-none flex justify-center">
-          <MainTimerSection
-            exerciseKey={exerciseKey}
-            currentExercise={currentExercise}
-            isLastExercise={isLastExercise}
-            isPlaying={isPlaying}
-            toggleTimer={toggleTimer}
-            handleRestart={handleRestart}
-            handleNextExercise={handleNextExerciseClick}
-            showExerciseInfo={false}
-            variant="compact"
-          />
-        </div>
+        {verdict ? verdict.strip : (
+        <>
 
-        {/* Right: Back / Next / Finish */}
-        <div className="flex-1 flex justify-end items-center gap-3">
-          {currentExerciseIndex > 0 && (
-            <Button
-              variant="subtle"
-              className="text-zinc-400"
-              onClick={onGoToPreviousExercise}
-            >
-              <SkipBack /> {t("common:back") || "Back"}
-            </Button>
-          )}
-          {canFinishEarly && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span tabIndex={finishDisabled ? 0 : -1}>
-                  <Button
-                    variant="subtle"
-                    loading={isFinishing || isSubmittingReport}
-                    className={cn(
-                      "text-zinc-400",
-                      finishDisabled && "opacity-50 cursor-not-allowed"
-                    )}
-                    disabled={finishDisabled}
-                    onClick={() => setShowFinishEarlyDialog(true)}
-                  >
-                    <FlagIcon /> {t("common:practice.finish_plan_early")}
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              {finishDisabled && (
-                <TooltipContent side="top">
-                  {t("common:practice.finish_early.blocked")}
-                </TooltipContent>
-              )}
-            </Tooltip>
-          )}
-          {!examMode && (
-            <div className="flex flex-col items-end gap-1">
-              <Button
-                variant={isLastExercise ? "default" : "subtle"}
-                loading={isFinishing || isSubmittingReport}
-                className={cn(
-                  isLastExercise && finishDisabled && "opacity-50 cursor-not-allowed"
-                )}
-                onClick={
-                  !isLastExercise
-                    ? handleNextExerciseClick
-                    : isEarlyFinish
-                      // Below the bar — never finish on the first click, the
-                      // dialog has to state what the player is giving up first.
-                      ? () => setShowFinishEarlyDialog(true)
-                      : () => onFinishSession()
-                }
-                disabled={isLastExercise ? finishDisabled : false}
-              >
-                {(isFinishing || isSubmittingReport) ? (
-                  <span>{t("session:saving")}</span>
-                ) : isLastExercise ? (
-                  <span className="flex items-center gap-2">
-                    {t("common:finish_session")}
-                    <Check />
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    {t("next") || "Next"}
-                    <SkipForward />
-                  </span>
-                )}
-              </Button>
-              {isLastExercise && isEarlyFinish && (
-                <span className="text-[11px] text-zinc-500">
-                  {finishDisabled
-                    ? t("common:practice.finish_early.blocked")
-                    : t("common:practice.finish_early.hint")}
-                </span>
-              )}
-            </div>
-          )}
+        <SessionTransport
+          isPlaying={isPlaying}
+          onToggle={toggleTimer}
+          onRestart={handleRestart}
+          onBack={currentExerciseIndex > 0 ? onGoToPreviousExercise : undefined}
+          hidePlay={currentExercise.riddleConfig?.mode === "sequenceRepeat"}
+          clockOnly={hideTransport}
+        />
+
+        <div className="flex min-w-0 items-center justify-end">
+          {!examMode && (isLastExercise ? (
+            // Nothing to finish before there is something to save.
+            !finishDisabled && (
+              <MoveOnKey
+                title={isBusy ? t("session:saving") : t("common:finish_session")}
+                detail={isEarlyFinish ? t("session:bar.time_only") : t("session:bar.save")}
+                icon={<Check />}
+                isPrimary={isTimeUp || !isEarlyFinish}
+                isBusy={isBusy}
+                // Below the bar — never finish on the first click, the
+                // dialog has to state what the player is giving up first.
+                onClick={isEarlyFinish ? () => setShowFinishEarlyDialog(true) : () => void onFinishSession()}
+              />
+            )
+          ) : (
+            <MoveOnKey
+              title={t("common:next") || "Next"}
+              detail={nextTitle}
+              isDetailName={isNextSong}
+              icon={<SkipForward />}
+              isPrimary={isTimeUp}
+              isBusy={isBusy}
+              onClick={() => void handleNextExerciseClick()}
+            />
+          ))}
         </div>
+        </>
+        )}
 
       </div>
     </div>
@@ -264,6 +298,13 @@ const SessionBottomBarComponent = ({
         </div>
       </DialogContent>
     </Dialog>
+
+    <ShortcutsDialog
+      open={showShortcuts}
+      onOpenChange={setShowShortcuts}
+      hasTempoControl={hasTempoControl}
+      hasBackingTrack={hasBackingTrack}
+    />
 
     <FinishSessionDialog
       open={showFinishEarlyDialog}

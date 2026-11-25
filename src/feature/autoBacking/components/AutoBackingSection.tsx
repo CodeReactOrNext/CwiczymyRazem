@@ -1,8 +1,8 @@
+import { PRESSABLE_KEY } from "assets/components/ui/button";
 import { Switch } from "assets/components/ui/switch";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Lock } from "lucide-react";
-import { GiDrumKit } from "react-icons/gi";
+import { Headphones, Lock } from "lucide-react";
 
 import type { AutoBackingSummary } from "../generateAutoBacking";
 import { useAutoBackingStore } from "../store/autoBackingStore";
@@ -20,34 +20,31 @@ function StylePicker({ playing }: { playing: AutoBackingSummary["style"] }) {
   const style = useAutoBackingStore((state) => state.style);
   const setStyle = useAutoBackingStore((state) => state.setStyle);
   return (
-    <div className='mt-3'>
-      <p className='text-xs text-zinc-500'>
-        {t("auto_backing.style.label")}
-      </p>
-      <div className='mt-1.5 flex flex-wrap gap-1'>
-        {STYLE_CHOICES.map((choice) => {
-          const active = choice === style;
-          return (
-            <button
-              key={choice}
-              type='button'
-              onClick={() => setStyle(choice)}
-              aria-pressed={active}
-              className={cn(
-                "rounded px-2 py-1 text-[11px] font-medium transition-colors",
-                active
-                  ? "bg-white/10 text-white"
-                  : "bg-white/[0.03] text-zinc-500 hover:text-zinc-300",
-              )}>
-              {choice === "auto"
-                ? t("auto_backing.style.auto", {
-                    style: t(`auto_backing.style.${playing}`),
-                  })
-                : t(`auto_backing.style.${choice}`)}
-            </button>
-          );
-        })}
-      </div>
+    <div role='group' aria-label={t("auto_backing.style.label")} className='flex flex-wrap gap-1.5'>
+      {STYLE_CHOICES.map((choice) => {
+        const active = choice === style;
+        return (
+          <button
+            key={choice}
+            type='button'
+            onClick={() => setStyle(choice)}
+            aria-pressed={active}
+            className={cn(
+              PRESSABLE_KEY,
+              "h-8 rounded-lg px-2.5 text-xs transition-colors",
+              // The band playing is green, as every picked switch in the session is.
+              active
+                ? "bg-emerald-500/15 text-emerald-300"
+                : "bg-zinc-800 font-medium text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100",
+            )}>
+            {choice === "auto"
+              ? t("auto_backing.style.auto", {
+                  style: t(`auto_backing.style.${playing}`),
+                })
+              : t(`auto_backing.style.${choice}`)}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -59,11 +56,8 @@ function StylePicker({ playing }: { playing: AutoBackingSummary["style"] }) {
 function LockedStyle({ playing }: { playing: AutoBackingSummary["style"] }) {
   const { t } = useTranslation("session");
   return (
-    <div className='mt-3'>
-      <p className='text-xs text-zinc-500'>
-        {t("auto_backing.style.label")}
-      </p>
-      <p className='mt-1.5 flex items-center gap-1.5 text-[11px] font-medium text-zinc-200'>
+    <div>
+      <p className='flex items-center gap-1.5 text-xs font-medium text-zinc-200'>
         <Lock className='h-3 w-3 text-zinc-500' aria-hidden />
         {t(`auto_backing.style.${playing}`)}
       </p>
@@ -78,7 +72,7 @@ function LockedStyle({ playing }: { playing: AutoBackingSummary["style"] }) {
 const MAX_CHORDS = 8;
 
 interface AutoBackingSectionProps {
-  /** The section label style of the menu it sits in. */
+  /** The section heading style of the menu it sits in. */
   labelClassName: string;
   className?: string;
 }
@@ -98,31 +92,28 @@ function useSummaryText(summary: AutoBackingSummary) {
   return { heading: [key, groove].filter(Boolean).join(" · "), chords };
 }
 
+/** What the band plays, on a quiet tile: key and groove, then the chords. */
 function Summary({ summary }: { summary: AutoBackingSummary }) {
   const { t } = useTranslation("session");
   const { heading, chords } = useSummaryText(summary);
   return (
-    <div className='mt-2.5 space-y-1'>
-      <p className='text-[11px] font-semibold text-zinc-300'>{heading}</p>
+    <div className='space-y-1 rounded-lg bg-zinc-800/50 px-3 py-2.5'>
+      <p className='text-xs font-semibold text-zinc-200'>{heading}</p>
       {summary.kind === "rhythm" ? (
         <p className='text-xs leading-relaxed text-zinc-500'>
           {t("auto_backing.drums_only")}
         </p>
       ) : (
-        <p className='font-mono text-[11px] text-zinc-400'>{chords}</p>
-      )}
-      {summary.kind === "drone" && (
-        <p className='text-xs leading-relaxed text-zinc-500'>
-          {t("auto_backing.drone")}
-        </p>
+        <p className='font-mono text-xs text-zinc-400'>{chords}</p>
       )}
     </div>
   );
 }
 
 /**
- * The generated backing's switch, for the session's volume menu. Renders
- * nothing when the exercise on screen can't have one.
+ * The generated band, for the session's backing menu: its switch, what it
+ * plays and who plays it. Renders nothing when the exercise on screen can't
+ * have one. Its volumes live in the menu's Mix, with every other channel.
  */
 export const AutoBackingSection = ({
   labelClassName,
@@ -138,30 +129,41 @@ export const AutoBackingSection = ({
   if (!available || !summary) return null;
 
   return (
-    <div className={className}>
+    <section className={cn("flex flex-col gap-3", className)}>
       <div className='flex items-center justify-between gap-3'>
-        <span className={cn(labelClassName, "flex items-center gap-1.5")}>
-          <GiDrumKit className='h-3 w-3' />
-          {t("auto_backing.title")}
-        </span>
+        <h4 className={labelClassName}>{t("auto_backing.style.label")}</h4>
         <Switch
           checked={enabled}
           onChange={() => setEnabled(!enabled)}
+          tone='emerald'
           aria-label={t("auto_backing.toggle")}
         />
       </div>
+      {/* Shown off too: what the band would play is what decides whether to switch it on. */}
       <Summary summary={summary} />
-      {/* A boss fight plays its own score, whatever band was picked. */}
-      {enabled &&
-        summary.groove !== "boss" &&
-        (styleLocked ? (
-          <LockedStyle playing={summary.style} />
-        ) : (
-          <StylePicker playing={summary.style} />
-        ))}
-      <p className='mt-2 text-xs leading-relaxed text-zinc-500'>
-        {enabled ? t("auto_backing.headphones") : t("auto_backing.description")}
-      </p>
-    </div>
+      {enabled ? (
+        <>
+          {/* A boss fight plays its own score, whatever band was picked. */}
+          {summary.groove !== "boss" &&
+            (styleLocked ? (
+              <LockedStyle playing={summary.style} />
+            ) : (
+              <StylePicker playing={summary.style} />
+            ))}
+          {/* The short form; the full reason (the mic hears the band as you) is
+              one hover away for whoever wonders why. */}
+          <p
+            title={t("auto_backing.headphones")}
+            className='flex items-center gap-2 text-xs text-zinc-500'>
+            <Headphones className='h-3.5 w-3.5 shrink-0' aria-hidden />
+            {t("auto_backing.headphones_short")}
+          </p>
+        </>
+      ) : (
+        <p className='text-xs leading-relaxed text-zinc-500'>
+          {t("auto_backing.description")}
+        </p>
+      )}
+    </section>
   );
 };

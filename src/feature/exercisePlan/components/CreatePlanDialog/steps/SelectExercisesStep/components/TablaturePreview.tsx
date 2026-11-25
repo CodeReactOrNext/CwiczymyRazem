@@ -1,11 +1,14 @@
 import { cn } from "assets/lib/utils";
 import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { inkAccent } from "lib/colorTheme/colorTheme";
 
 interface TablaturePreviewProps {
   measures: TablatureMeasure[];
   className?: string;
 }
 
+// Neutrals come from the theme's --c-white / --c-black, so the preview flips to ink
+// on a pale plate in the light theme (and back inside force-dark).
 const STRING_COLORS = ["#f87171", "#fb923c", "#facc15", "#4ade80", "#60a5fa", "#c084fc"] as const;
 
 const VIEW_W      = 280;
@@ -66,13 +69,13 @@ export const TablaturePreview = ({ measures, className }: TablaturePreviewProps)
             <path
               d={`M ${x1} ${arcY + 1} Q ${midX} ${arcY - 4} ${x2} ${arcY + 1}`}
               fill="none"
-              stroke="rgba(255,255,255,0.35)"
+              style={{ stroke: "rgb(var(--c-white) / 0.35)" }}
               strokeWidth={0.7}
             />
             <text
               x={midX}
               y={arcY - 5}
-              fill="rgba(255,255,255,0.45)"
+              style={{ fill: "rgb(var(--c-white) / 0.45)" }}
               fontSize={5}
               fontFamily="monospace"
               fontWeight="700"
@@ -92,7 +95,7 @@ export const TablaturePreview = ({ measures, className }: TablaturePreviewProps)
             key={`bend-${key}`}
             x={cx + bgW / 2 + 1}
             y={cy - 4}
-            fill={color}
+            style={{ fill: inkAccent(color) }}
             fontSize={5}
             fontFamily="monospace"
             fontWeight="700"
@@ -114,7 +117,7 @@ export const TablaturePreview = ({ measures, className }: TablaturePreviewProps)
             y1={cy}
             x2={sustainX2}
             y2={cy}
-            stroke={color}
+            style={{ stroke: inkAccent(color) }}
             strokeWidth={0.8}
             opacity={0.25}
           />
@@ -130,13 +133,13 @@ export const TablaturePreview = ({ measures, className }: TablaturePreviewProps)
             width={bgW}
             height={12}
             fill={color}
-            fillOpacity={0.22}
+            style={{ fillOpacity: "var(--tab-pill-alpha, 0.22)" }}
             rx={2}
           />
           <text
             x={cx}
             y={cy}
-            fill="white"
+            style={{ fill: "rgb(var(--c-white))" }}
             fontSize={8.5}
             fontFamily="monospace"
             fontWeight="700"
@@ -155,7 +158,7 @@ export const TablaturePreview = ({ measures, className }: TablaturePreviewProps)
   return (
     <div
       className={cn("w-full rounded-lg overflow-hidden", className)}
-      style={{ background: "linear-gradient(to bottom, transparent, rgba(0,0,0,0.45))" }}
+      style={{ background: "linear-gradient(to bottom, transparent, rgb(var(--c-black) / 0.45))" }}
     >
       <svg
         viewBox={`0 0 ${VIEW_W} ${ROW_H}`}
@@ -182,7 +185,7 @@ export const TablaturePreview = ({ measures, className }: TablaturePreviewProps)
               y1={strY(s)}
               x2={VIEW_W - 2}
               y2={strY(s)}
-              stroke="rgba(255,255,255,0.12)"
+              style={{ stroke: "rgb(var(--c-white) / 0.12)" }}
               strokeWidth={1}
             />
           ))}
@@ -193,7 +196,7 @@ export const TablaturePreview = ({ measures, className }: TablaturePreviewProps)
             y1={strY(1)}
             x2={LABEL_W - 1}
             y2={strY(6)}
-            stroke="rgba(255,255,255,0.2)"
+            style={{ stroke: "rgb(var(--c-white) / 0.2)" }}
             strokeWidth={0.8}
           />
 

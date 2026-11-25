@@ -1,46 +1,38 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, Check, Ear, Eye, Mic, Play, Square, Trophy, Volume2, X } from "lucide-react";
+import { Eye, Trophy } from "lucide-react";
 
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
+import { EarQuizLayout, ListenKey, QuizPrompt } from "./EarQuiz/EarQuizChrome";
 
 interface EarTrainingViewProps {
   onPlayRiddle: () => void;
   onReveal: () => void;
-  onNextRiddle: () => void;
-  onGuessed: () => void;
   score: number;
   highScore?: number | null;
   isRevealed: boolean;
-  isGuessed?: boolean;
   isPlaying: boolean;
   canGuess: boolean;
-  difficulty: "easy" | "medium" | "hard";
   isMicEnabled?: boolean;
   riddleProgress?: RiddleProgress | null;
   className?: string;
   onRecordsClick?: () => void;
 }
 
-const difficultyDot: Record<EarTrainingViewProps["difficulty"], string> = {
-  easy: "bg-emerald-400",
-  medium: "bg-blue-400",
-  hard: "bg-orange-400",
-};
-
+/**
+ * Play by Ear: hear the melody, find it on the guitar. Once the answer is up the
+ * strip over the session bar takes over (EarRiddleStrip), and sideways this
+ * steps aside for the tab.
+ */
 export const EarTrainingView = ({
   onPlayRiddle,
   onReveal,
-  onNextRiddle,
-  onGuessed,
   score,
   highScore,
   isRevealed,
-  isGuessed,
   isPlaying,
   canGuess,
-  difficulty,
   isMicEnabled,
   riddleProgress,
   className,
@@ -48,184 +40,80 @@ export const EarTrainingView = ({
 }: EarTrainingViewProps) => {
   const { t } = useTranslation("session");
   const listening = !!riddleProgress?.listening;
-  const showDots = !!isMicEnabled && !!riddleProgress && riddleProgress.total > 0 && !isRevealed;
+  const showNotes = !!isMicEnabled && !!riddleProgress && riddleProgress.total > 0;
   const isNewBest = highScore != null && highScore > 0 && score > highScore;
 
-  const status = isRevealed
-    ? isGuessed
-      ? { title: t("ear.correct"), caption: isMicEnabled ? t("ear.next_melody") : t("ear.tab_shows") }
-      : { title: t("ear.revealed"), caption: t("ear.compare") }
+  const caption = isRevealed
+    ? t("ear.compare")
     : isPlaying
-      ? { title: t("ear.playing"), caption: t("ear.plays_once") }
+      ? t("ear.plays_once")
       : !canGuess
-        ? { title: t("ear.listen_repeat"), caption: t("ear.listen_repeat_caption") }
+        ? t("ear.listen_repeat_caption")
         : listening
-          ? { title: t("ear.listening"), caption: t("ear.listening_caption") }
-          : { title: t("ear.your_turn"), caption: isMicEnabled ? t("ear.your_turn_mic") : t("ear.your_turn_memory") };
+          ? t("ear.listening_caption")
+          : isMicEnabled ? t("ear.your_turn_mic") : t("ear.your_turn_memory");
 
   return (
-    <div className={cn("mx-auto w-full max-w-xl", className)}>
-      <div className="rounded-xl border border-white/5 bg-zinc-900/70 px-4 py-3.5 sm:px-5 sm:py-4">
-
-        {/* Header: label + score */}
-        <div className="mb-3 flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2">
-            <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", difficultyDot[difficulty])} />
-            <span className="truncate text-xs font-semibold text-zinc-500">
-              {t("ear.title")}
-            </span>
-          </div>
-          <div className="flex shrink-0 items-center gap-3 text-xs tabular-nums">
-            <span className="text-zinc-500">
-              Score <span className="font-bold text-zinc-100">{score}</span>
-            </span>
-            {highScore != null && highScore > 0 && (
-              <button
-                type="button"
-                onClick={onRecordsClick}
-                className={cn(
-                  "flex items-center gap-1",
-                  isNewBest ? "text-amber-400" : "text-zinc-500",
-                  onRecordsClick && "transition-colors hover:text-zinc-300",
-                )}
-              >
-                <Trophy className="h-3 w-3" />
-                {isNewBest
-                  ? <span className="font-bold">{t("ear.new_best")}</span>
-                  : <>{t("ear.best")} <span className="font-bold">{highScore}</span></>}
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Status */}
-        <div className="mb-4 flex items-center gap-3">
-          <div
+    <div className={cn("mx-auto flex w-full max-w-2xl flex-col gap-2 text-left", isRevealed && "shortwide:hidden", className)}>
+      <div className='flex min-h-5 items-center justify-end gap-4 text-sm tabular-nums text-zinc-400'>
+        <span>{t("ear.score")} <span className='font-bold text-zinc-100'>{score}</span></span>
+        {highScore != null && highScore > 0 && (
+          <button
+            type='button'
+            onClick={onRecordsClick}
             className={cn(
-              "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border",
-              isRevealed && isGuessed
-                ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
-                : isPlaying
-                  ? "border-cyan-400/40 bg-cyan-400/10 text-cyan-300"
-                  : listening
-                    ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
-                    : "border-white/10 bg-white/5 text-zinc-500",
-            )}
-          >
-            {isRevealed && isGuessed ? (
-              <Check className="h-4 w-4" />
-            ) : isRevealed ? (
-              <Eye className="h-4 w-4" />
-            ) : isPlaying ? (
-              <Volume2 className="h-4 w-4 animate-pulse" />
-            ) : listening ? (
-              <Mic className="h-4 w-4" />
-            ) : (
-              <Ear className="h-4 w-4" />
-            )}
-          </div>
+              "flex items-center gap-1.5 rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+              isNewBest ? "text-amber-400" : "text-zinc-400",
+              onRecordsClick && "transition-colors hover:text-zinc-200",
+            )}>
+            <Trophy aria-hidden className='h-3.5 w-3.5' />
+            {isNewBest
+              ? <span className='font-bold'>{t("ear.new_best")}</span>
+              : <span>{t("ear.best")} <span className='font-bold'>{highScore}</span></span>}
+          </button>
+        )}
+      </div>
 
-          <div className="min-w-0 flex-1">
-            <p className={cn("text-sm font-medium", isRevealed && isGuessed ? "text-emerald-300" : "text-zinc-200")}>
-              {status.title}
-            </p>
-            <p className="text-xs text-zinc-500">{status.caption}</p>
-          </div>
+      <EarQuizLayout>
+        <QuizPrompt question={t("ear.listen_play_back")} hint={<span aria-live='polite'>{caption}</span>}>
+          <ListenKey
+            onClick={onPlayRiddle}
+            isPlaying={isPlaying}
+            label={canGuess ? t("ear.replay") : t("quiz.play")}
+          />
+        </QuizPrompt>
 
-          {/* Sequence progress (mic mode) */}
-          {showDots && riddleProgress && (
-            <div className="flex shrink-0 flex-col items-end gap-1">
-              <div className="flex items-center gap-1.5">
-                {Array.from({ length: riddleProgress.total }, (_, i) => (
-                  <span
-                    key={i}
-                    className={cn(
-                      "h-2.5 w-2.5 rounded-full transition-all duration-base",
-                      i < riddleProgress.matched
-                        ? "bg-emerald-400"
-                        : i === riddleProgress.matched && listening
-                          ? "animate-pulse bg-white/10 ring-1 ring-emerald-400/60"
-                          : "bg-white/10",
-                    )}
-                  />
-                ))}
+        {!isRevealed && (
+          <div className='flex flex-col items-center gap-4'>
+            {showNotes && (
+              <div
+                className='grid w-full gap-3 shortwide:gap-2'
+                style={{ gridTemplateColumns: `repeat(${Math.min(riddleProgress.total, 6)}, minmax(0, 1fr))` }}>
+                {Array.from({ length: riddleProgress.total }, (_, i) => {
+                  const found = i < riddleProgress.matched;
+                  return (
+                    <span
+                      key={i}
+                      translate='no'
+                      className={cn(
+                        "flex h-20 items-center justify-center rounded-lg font-display text-2xl font-extrabold transition-colors duration-fast shortwide:h-14 shortwide:text-xl",
+                        found ? "bg-emerald-900 text-emerald-200" : "bg-zinc-950 text-zinc-500 shortwide:bg-zinc-900",
+                      )}>
+                      {found
+                        ? riddleProgress.matchedNotes[i]
+                        // What the mic hears, in the place it would fill.
+                        : i === riddleProgress.matched && listening ? riddleProgress.heardNote : null}
+                    </span>
+                  );
+                })}
               </div>
-              <span className="h-3 font-mono text-[11px] leading-3 text-zinc-500">
-                {listening ? riddleProgress.heardNote ?? " " : " "}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Controls */}
-        {!isRevealed ? (
-          <div className="flex items-center gap-2">
-            <Button
-              variant={isPlaying ? "secondary" : "default"}
-              className="flex-1 sm:max-w-[180px]"
-              onClick={onPlayRiddle}
-            >
-              {isPlaying
-                ? <><Square /> {t("quiz.stop")}</>
-                : <><Play /> {canGuess ? t("ear.replay") : t("quiz.play")}</>}
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-zinc-400 hover:text-zinc-100"
-              onClick={onReveal}
-            >
+            )}
+            <Button variant='ghost' onClick={onReveal}>
               <Eye /> {isMicEnabled ? t("ear.stuck_reveal") : t("ear.show_answer")}
             </Button>
           </div>
-        ) : !isGuessed ? (
-          <div className="space-y-2.5">
-          <div className="flex items-center gap-2">
-            <Button
-              size="icon"
-              variant="ghost"
-              className="text-zinc-400 hover:text-zinc-100"
-              onClick={onPlayRiddle}
-              title={isPlaying ? t("quiz.stop") : t("ear.replay_melody")}
-            >
-              {isPlaying ? <Square /> : <Play />}
-            </Button>
-            <Button
-              className="flex-1 bg-emerald-500/90 text-emerald-950 hover:bg-emerald-400"
-              onClick={() => { onGuessed(); onNextRiddle(); }}
-            >
-              <Check /> <span>{t("ear.had_it")}&nbsp;<span className="opacity-70">+1</span></span>
-            </Button>
-            <Button
-              variant="secondary"
-              className="flex-1 bg-white/5 text-zinc-300 hover:bg-white/10"
-              onClick={onNextRiddle}
-            >
-              <X /> Missed it
-            </Button>
-          </div>
-          <p className="text-[11px] text-zinc-500">{t("ear.self_marked_note")}</p>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Button
-              size="icon"
-              variant="ghost"
-              className="text-zinc-400 hover:text-zinc-100"
-              onClick={onPlayRiddle}
-              title={isPlaying ? t("quiz.stop") : t("ear.replay_melody")}
-            >
-              {isPlaying ? <Square /> : <Play />}
-            </Button>
-            <Button
-              className="flex-1 bg-emerald-500/90 text-emerald-950 hover:bg-emerald-400"
-              onClick={onNextRiddle}
-            >
-              Next melody <ArrowRight />
-            </Button>
-          </div>
         )}
-
-      </div>
+      </EarQuizLayout>
     </div>
   );
 };

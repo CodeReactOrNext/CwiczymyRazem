@@ -571,6 +571,7 @@ html.theme-light:has([data-app-shell]) .force-dark {
   --ring: 0 0% 83.1%;
   --colors-mainText: 255, 255, 255;
   --colors-secondText: 181, 181, 181;
+  --tab-pill-alpha: 0.22;
 }
 
 /* Light-theme helpers. `light-hide`: decorative glows, washes and icon patterns
@@ -845,6 +846,9 @@ html.theme-light:has([data-app-shell]) {
   --road-lip-current: #b45309;
   --road-band: rgba(161, 161, 170, 0.28);
   --road-band-done: rgba(16, 185, 129, 0.2);
+  --road-card-hover: #f4f4f5;
+  /* Fret pills in TablaturePreview: 22% of a pale hue vanishes on a light plate. */
+  --tab-pill-alpha: 0.5;
 }
 
 /* Journey landmarks (JourneyLandmark.tsx): a scene beside the road where a

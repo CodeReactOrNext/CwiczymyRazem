@@ -14,7 +14,7 @@ const OnboardingPage: NextPage = () => {
         <title>Welcome to Riff Quest · Quick setup</title>
         <meta
           name='description'
-          content='Tell us what you came for — exercise plans, songs, roadmaps or a practice log — and start there.'
+          content='Three quick questions, then your first minute on the guitar.'
         />
         <meta name='robots' content='noindex' />
       </Head>

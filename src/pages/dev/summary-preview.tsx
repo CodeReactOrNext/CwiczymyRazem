@@ -283,12 +283,12 @@ function SummaryPreview() {
       {router.query.wrap === "mobile" ? (
         // PracticeSession's phone wrapper.
         <TurnedScreen turned={turned} className='bg-zinc-950'>
-          {summary(false)}
+          {summary(true)}
         </TurnedScreen>
       ) : (
         // DesktopSessionView's wrapper once the report is in.
         <div className='font-openSans fixed inset-0 overflow-y-auto bg-zinc-950'>
-          <div className='relative z-10 mx-auto max-w-7xl px-4 pb-64 pt-8'>{summary(true)}</div>
+          <div className='relative z-10 mx-auto max-w-7xl px-4 pt-2'>{summary(true)}</div>
         </div>
       )}
     </QueryClientProvider>

@@ -6,48 +6,35 @@
   "level_step": {
     "title": "¿Cuánto tiempo llevas tocando?"
   },
-  "play_step": {
-    "title": "¿Tienes la guitarra a mano?",
+  "daily_step": {
+    "title": "¿Cuánto quieres practicar al día?",
+    "hint": "Puedes cambiarlo cuando quieras en Ajustes.",
+    "unit": "min al día",
+    "vibes": {
+      "casual": "Tranquilo",
+      "regular": "Constante",
+      "serious": "En serio",
+      "intense": "Intenso"
+    }
+  },
+  "first_step": {
+    "title": "¿Qué quieres probar?",
     "riff_title": "Toca tu primer riff",
     "riff_levels": {
       "new": "Tres cuerdas al aire, sin pisar trastes.",
       "some": "Pentatónica de la menor, arriba y abajo a {{bpm}} BPM.",
       "experienced": "Un lick pentatónico en corcheas a {{bpm}} BPM."
     },
-    "riff_mic": "El micro oye cada nota que tocas.",
-    "start": "A tocar",
-    "options": {
-      "browse": "Primero echo un vistazo",
-      "no_guitar": "Aún no tengo guitarra"
-    }
-  },
-  "goal_step": {
-    "title": "¿Qué te trae a Riff Quest?",
-    "title_after_play": "¿Y ahora qué?",
-    "title_no_guitar": "Echa un vistazo primero",
-    "no_guitar_hint": "¿Aún sin guitarra? Esto ya lo puedes ver:"
-  },
-  "plan_step": {
-    "title": "Elige un plan para empezar",
-    "open": "Abrir plan",
-    "browse_all": "Ver los {{count}} planes"
-  },
-  "songs_step": {
-    "title": "Así funciona aprender canciones",
-    "description": "No ofrecemos tablaturas. Esto es lo que tienes a cambio.",
-    "no_tabs": "Sin tablaturas",
-    "features": {
-      "library": "Guarda en tu biblioteca las canciones que aprendes",
-      "time": "Registramos cuánto practicas cada canción",
-      "sources": "Marca partes desde YouTube o sube un Guitar Pro"
+    "riff_needs": "Guitarra y micro",
+    "hunt_title": "Encuentra notas en el mástil",
+    "hunt_levels": {
+      "new": "Cuerda Mi grave, trastes 0 a 6.",
+      "some": "Todas las cuerdas, en el traste 5.",
+      "experienced": "Notas naturales en todo el mástil."
     },
-    "continue": "Entendido, ir a mis canciones",
-    "other": "Elegir otra cosa"
-  },
-  "desktop_hint": {
-    "title": "Mejor en el ordenador",
-    "description": "En el móvil funciona todo, pero Riff Quest está pensado para el ordenador. Vuelve desde el ordenador para una experiencia mejor.",
-    "continue": "Entendido, vamos"
+    "hunt_needs": "Solo haz clic, sin guitarra",
+    "hunt_find": "Busca",
+    "browse": "Primero echo un vistazo"
   },
   "levels": {
     "new": {
@@ -64,24 +51,6 @@
       "unit": "años",
       "label": "Llevo años tocando",
       "description": "Me muevo bien por el mástil, quiero seguir mejorando"
-    }
-  },
-  "goals": {
-    "journey": {
-      "label": "Seguir la Ruta de aprendizaje",
-      "description": "Aprende guitarra desde cero, paso a paso"
-    },
-    "plans": {
-      "label": "Practicar con planes de ejercicios",
-      "description": "Rutinas listas con un temporizador que te guía"
-    },
-    "songs": {
-      "label": "Aprender canciones y seguirlas",
-      "description": "Guarda las canciones que quieres tocar y mira tu progreso"
-    },
-    "roadmap": {
-      "label": "Seguir una hoja de ruta hacia una meta",
-      "description": "Un camino paso a paso, como tocar al estilo de tu ídolo"
     }
   },
   "first_riff_intro": {

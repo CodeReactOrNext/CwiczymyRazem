@@ -22,6 +22,9 @@ interface MainTimerSectionProps {
   variant?: "default" | "compact";
  
   handleRestart?: () => void;
+  /** The start gate over the tab offers Start — one place is enough. */
+  hideTransport?: boolean;
+  showStartHint?: boolean;
 }
 
 export const MainTimerSection = ({
@@ -34,7 +37,9 @@ export const MainTimerSection = ({
   showExerciseInfo = true,
   variant = "default",
 
-  handleRestart
+  handleRestart,
+  hideTransport = false,
+  showStartHint = false,
 }: MainTimerSectionProps) => {
   const { t } = useTranslation("session");
   const { formattedTimeLeft, progress: timerProgressValue, isFinished } = useTimerContext();
@@ -82,6 +87,7 @@ export const MainTimerSection = ({
           </div>
 
           {/* Compact Inline Controls */}
+          {!hideTransport && (
           <div className="flex items-center gap-4">
                 <ExerciseControls
                   isPlaying={isPlaying}
@@ -92,10 +98,12 @@ export const MainTimerSection = ({
                   variant="centered"
           
                   hidePlayButton={currentExercise.riddleConfig?.mode === 'sequenceRepeat'}
+                  showStartHint={showStartHint}
                   isFinished={isFinished}
                   handleRestart={handleRestart}
                 />
           </div>
+          )}
       </div>
     );
   }

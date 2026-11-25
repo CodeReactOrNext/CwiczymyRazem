@@ -21,9 +21,6 @@ const renderPanel = (isPlaying = false, onStart: () => void = () => {}) =>
     />,
   );
 
-/** The two prompt tiles, in order: root, then the hidden answer. */
-const stepTiles = () => screen.getAllByText(/^(Root|Target)$/).map((caption) => caption.parentElement!);
-
 // No global setup file in this project, so cleanup is explicit — otherwise the
 // second render finds the first one's fretboard still in the document.
 afterEach(cleanup);
@@ -31,18 +28,17 @@ afterEach(cleanup);
 describe("IntervalClickPanel", () => {
   it("shows the root and the interval, and keeps the answer hidden", () => {
     renderPanel();
-    const [root, target] = stepTiles();
+    const root = screen.getByRole("button", { name: /play the root/i });
 
     expect(within(root).getByText("A")).toBeDefined();
     expect(screen.getByText("Perfect 5th ↑")).toBeDefined();
     // The note the interval lands on must not be shown before it is found.
-    expect(within(target).getByText("?")).toBeDefined();
-    expect(within(target).queryByText("E")).toBeNull();
+    expect(screen.getByText("?")).toBeDefined();
+    expect(screen.getAllByText("E").every((label) => label.closest("svg"))).toBe(true);
   });
 
-  it("leads with the step and the instruction, then where to look", () => {
+  it("leads with the instruction, then where to look", () => {
     renderPanel();
-    expect(screen.getByText("Step 1 of 2")).toBeDefined();
     expect(screen.getByText("Click any A")).toBeDefined();
     expect(screen.getByText("Anywhere in frets 0–4")).toBeDefined();
   });

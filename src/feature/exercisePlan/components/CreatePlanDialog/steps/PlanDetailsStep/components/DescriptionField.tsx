@@ -21,7 +21,7 @@ export const DescriptionField = ({ register }: DescriptionFieldProps) => {
       <Textarea
         id='description'
         placeholder={t("plan.description_placeholder")}
-        rows={4}
+        rows={3}
         {...register("description")}
       />
       <p className='text-xs text-muted-foreground'>

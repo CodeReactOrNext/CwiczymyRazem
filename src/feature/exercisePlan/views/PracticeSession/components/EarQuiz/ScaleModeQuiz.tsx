@@ -9,22 +9,14 @@ import { useTranslation } from "hooks/useTranslation";
 import { Snail } from "lucide-react";
 import { useState } from "react";
 
+import { useAnswerKeys } from "../../hooks/useAnswerKeys";
+import { useAutoListen } from "../../hooks/useAutoListen";
 import { useEarQuizPlayback } from "../../hooks/useEarQuizPlayback";
-import {
-  AnswerTile,
-  ListenButton,
-  QuizNote,
-  QuizPrimarySlot,
-  QuizQuestion,
-  QuizSecondaryButton,
-} from "./EarQuizChrome";
+import type { EarQuizBodyProps } from "./earQuizBody.types";
+import { AnswerTile, ListenAidKey, ListenKey, QuizPrompt } from "./EarQuizChrome";
 
-interface ScaleModeQuizProps {
+interface ScaleModeQuizProps extends EarQuizBodyProps {
   question: ScaleModeQuestion;
-  isAnswered: boolean;
-  isCorrect: boolean;
-  onAnswer: (correct: boolean) => void;
-  onNext: () => void;
 }
 
 const NOTE_SECONDS = 0.44;
@@ -40,11 +32,12 @@ export function ScaleModeQuiz({
   isCorrect,
   onAnswer,
   onNext,
+  autoPlay = false,
+  keysEnabled = false,
 }: ScaleModeQuizProps) {
   const { t } = useTranslation("session");
   const { isPlaying, play, stop } = useEarQuizPlayback();
   const [picked, setPicked] = useState<ScaleModeId | null>(null);
-  const [hasPlayed, setHasPlayed] = useState(false);
   /** Which option is sounding, once the tiles have turned into players. */
   const [auditioned, setAuditioned] = useState<ScaleModeId | null>(null);
 
@@ -74,7 +67,6 @@ export function ScaleModeQuiz({
   const playScale = (noteSeconds: number) => {
     playRun(question.midis, noteSeconds);
     setAuditioned(null);
-    setHasPlayed(true);
   };
 
   // The primary button doubles as a stop; the slow button always restarts, so it
@@ -112,36 +104,36 @@ export function ScaleModeQuiz({
       }
     : null;
 
+  useAutoListen(autoPlay && !isAnswered, () => playScale(NOTE_SECONDS));
+  useAnswerKeys(question.options.length, (index) => handlePick(question.options[index]), keysEnabled);
+
   return (
     <>
-      <div className='flex flex-col items-center gap-3'>
-        <QuizQuestion question={t("quiz.which_scale")} verdict={verdict} />
-        <div className='flex flex-wrap items-center justify-center gap-3'>
-          <QuizPrimarySlot isAnswered={isAnswered} onNext={onNext}>
-            <ListenButton
-              onClick={toggleScale}
-              isPlaying={isPlaying}
-              label={t("quiz.play_scale")}
-              hasPlayed={hasPlayed}
-            />
-          </QuizPrimarySlot>
-          <QuizSecondaryButton
-            onClick={() => playScale(SLOW_NOTE_SECONDS)}
-            icon={<Snail />}>
-            {isAnswered ? t("quiz.hear_again_slowly") : t("quiz.play_slowly")}
-          </QuizSecondaryButton>
-        </div>
-        <QuizNote hint={t("quiz.root_held")} verdict={verdict} />
-      </div>
+      <QuizPrompt
+        question={t("quiz.which_scale")}
+        verdict={verdict && {
+          isCorrect,
+          answer: verdict.answer,
+          detail: `${verdict.explanation} ${verdict.footnote}`,
+          onHear: () => playScale(SLOW_NOTE_SECONDS),
+          onContinue: onNext,
+        }}>
+        <ListenKey onClick={toggleScale} isPlaying={isPlaying && auditioned === null} label={t("quiz.play_scale")} />
+        <ListenAidKey
+          onClick={() => playScale(SLOW_NOTE_SECONDS)}
+          icon={<Snail aria-hidden />}
+          label={t("quiz.play_slowly")}
+        />
+      </QuizPrompt>
 
       <div
         className={cn(
-          "grid gap-3",
+          "grid gap-3 shortwide:gap-2",
           question.options.length > 3
-            ? "grid-cols-2 sm:grid-cols-3"
+            ? "grid-cols-2 sm:grid-cols-3 shortwide:grid-cols-2"
             : "grid-cols-1 sm:grid-cols-3",
         )}>
-        {question.options.map((id) => {
+        {question.options.map((id, index) => {
           const scale = SCALE_MODES[id];
           const state = !isAnswered
             ? "idle"
@@ -155,6 +147,7 @@ export function ScaleModeQuiz({
               key={id}
               onClick={() => handlePick(id)}
               state={state}
+              number={index + 1}
               title={scaleName(id)}
               subtitle={scale.formula}
               listenLabel={

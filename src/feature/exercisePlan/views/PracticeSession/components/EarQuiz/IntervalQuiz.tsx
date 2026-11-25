@@ -9,22 +9,14 @@ import { useTranslation } from "hooks/useTranslation";
 import { AudioWaveform, Layers } from "lucide-react";
 import { useState } from "react";
 
+import { useAnswerKeys } from "../../hooks/useAnswerKeys";
+import { useAutoListen } from "../../hooks/useAutoListen";
 import { useEarQuizPlayback } from "../../hooks/useEarQuizPlayback";
-import {
-  AnswerTile,
-  ListenButton,
-  QuizNote,
-  QuizPrimarySlot,
-  QuizQuestion,
-  QuizSecondaryButton,
-} from "./EarQuizChrome";
+import type { EarQuizBodyProps } from "./earQuizBody.types";
+import { AnswerTile, ListenAidKey, ListenKey, QuizPrompt } from "./EarQuizChrome";
 
-interface IntervalQuizProps {
+interface IntervalQuizProps extends EarQuizBodyProps {
   question: IntervalQuestion;
-  isAnswered: boolean;
-  isCorrect: boolean;
-  onAnswer: (correct: boolean) => void;
-  onNext: () => void;
 }
 
 const NOTE_DURATION = 1.6;
@@ -42,11 +34,12 @@ export function IntervalQuiz({
   isCorrect,
   onAnswer,
   onNext,
+  autoPlay = false,
+  keysEnabled = false,
 }: IntervalQuizProps) {
   const { t } = useTranslation("session");
   const { isPlaying, play, stop } = useEarQuizPlayback();
   const [picked, setPicked] = useState<IntervalId | null>(null);
-  const [hasPlayed, setHasPlayed] = useState(false);
   /** Which option is sounding, once the tiles have turned into players. */
   const [auditioned, setAuditioned] = useState<IntervalId | null>(null);
 
@@ -67,7 +60,6 @@ export function IntervalQuiz({
   const playInterval = (together: boolean) => {
     sound(question.midis, together);
     setAuditioned(null);
-    setHasPlayed(true);
   };
 
   // The primary button doubles as a stop; the other-way button always restarts.
@@ -110,41 +102,44 @@ export function IntervalQuiz({
       }
     : null;
 
+  useAutoListen(autoPlay && !isAnswered, () => playInterval(isHarmonic));
+  useAnswerKeys(question.options.length, (index) => handlePick(question.options[index]), keysEnabled);
+
+  // The other presentation is a hint before the answer — two notes are easier
+  // apart, a melodic step is easier to size once stacked — and simply another
+  // way to hear it afterwards.
+  const aid = {
+    icon: isHarmonic ? <AudioWaveform aria-hidden /> : <Layers aria-hidden />,
+    label: isHarmonic ? t("quiz.one_note") : t("quiz.play_together"),
+    onClick: () => playInterval(!isHarmonic),
+  };
+
   return (
     <>
-      <div className='flex flex-col items-center gap-3'>
-        <QuizQuestion question={t("quiz.which_interval")} verdict={verdict} />
-        <div className='flex flex-wrap items-center justify-center gap-3'>
-          <QuizPrimarySlot isAnswered={isAnswered} onNext={onNext}>
-            <ListenButton
-              onClick={toggleInterval}
-              isPlaying={isPlaying}
-              label={t("quiz.play_interval")}
-              hasPlayed={hasPlayed}
-            />
-          </QuizPrimarySlot>
-          {/* The other presentation is a hint before the answer — two notes are
-              easier apart, a melodic step is easier to size once stacked — and
-              simply another way to hear it afterwards. */}
-          <QuizSecondaryButton
-            onClick={() => playInterval(!isHarmonic)}
-            icon={isHarmonic ? <AudioWaveform /> : <Layers />}>
-            {isHarmonic ? t("quiz.one_note") : t("quiz.play_together")}
-          </QuizSecondaryButton>
-        </div>
-        <QuizNote hint={t("quiz.interval_hint")} verdict={verdict} />
-      </div>
+      <QuizPrompt
+        question={t("quiz.which_interval")}
+        verdict={verdict && {
+          isCorrect,
+          answer: verdict.answer,
+          detail: `${verdict.explanation} ${verdict.footnote}`,
+          onHear: () => playInterval(isHarmonic),
+          aid,
+          onContinue: onNext,
+        }}>
+        <ListenKey onClick={toggleInterval} isPlaying={isPlaying && auditioned === null} label={t("quiz.play_interval")} />
+        <ListenAidKey {...aid} />
+      </QuizPrompt>
 
       <div
         className={cn(
-          "grid gap-3",
+          "grid gap-3 shortwide:gap-2",
           question.options.length > 6
-            ? "grid-cols-2 sm:grid-cols-4"
+            ? "grid-cols-2 sm:grid-cols-4 shortwide:grid-cols-3"
             : question.options.length > 4
               ? "grid-cols-2 sm:grid-cols-3"
               : "grid-cols-2",
         )}>
-        {question.options.map((id) => {
+        {question.options.map((id, index) => {
           const state = !isAnswered
             ? "idle"
             : id === question.interval
@@ -157,6 +152,8 @@ export function IntervalQuiz({
               key={id}
               onClick={() => handlePick(id)}
               state={state}
+              number={index + 1}
+              dense={question.options.length > 6}
               title={intervalName(id)}
               subtitle={INTERVALS[id].formula}
               listenLabel={

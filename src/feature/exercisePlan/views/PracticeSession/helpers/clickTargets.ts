@@ -1,6 +1,8 @@
 import { getNotePositionsInRange } from "feature/exercisePlan/scales/fretboardMapper";
 import { NOTES } from "utils/audio/noteUtils";
 
+import { midiForPosition } from "./clickHuntNoteSound";
+
 /** A single answerable cell on the neck diagram. */
 export interface ClickTarget {
   string: number;
@@ -74,6 +76,27 @@ export function reachZoneKeys(
     }
   }
   return keys;
+}
+
+/**
+ * The round's answer, for a board that shows it after the time ran out: from the
+ * root the player placed, or from the root that has the answer nearest to it.
+ */
+export function revealInterval(
+  anchor: ClickTarget | null,
+  roots: ClickTarget[],
+  targets: ClickTarget[],
+): { root: ClickTarget; target: ClickTarget } | null {
+  // The interval is asked for upwards, so a lower answer is the last resort.
+  const distance = (root: ClickTarget, target: ClickTarget) =>
+    Math.abs(root.fret - target.fret) +
+    Math.abs(root.string - target.string) +
+    (midiForPosition(target.string, target.fret) < midiForPosition(root.string, root.fret) ? 100 : 0);
+  const pairs = (anchor ? [anchor] : roots).flatMap((root) => targets.map((target) => ({ root, target })));
+  return pairs.reduce<(typeof pairs)[number] | null>(
+    (best, pair) => (!best || distance(pair.root, pair.target) < distance(best.root, best.target) ? pair : best),
+    null,
+  );
 }
 
 /** Multiplier the next find is worth once `n` positions are already found. */

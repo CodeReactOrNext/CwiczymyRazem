@@ -7,6 +7,8 @@ export interface RiddleProgress {
   /** How many notes of the answer have been matched so far, in order. */
   matched: number;
   total: number;
+  /** The notes matched so far, by name ("C", "F#") — never the ones still to find. */
+  matchedNotes: string[];
   /** Pitch currently sounding on the mic (e.g. "G#4"), or null in silence. */
   heardNote: string | null;
   /** Increments on every correct hit — drives the dot animations. */
@@ -160,7 +162,10 @@ export function useRiddleSequenceMatcher({
 
   // Stable identity while values are unchanged — the views are memoized.
   return useMemo<RiddleProgress>(
-    () => ({ matched, total, heardNote, hitId, listening: active }),
-    [matched, total, heardNote, hitId, active],
+    () => ({
+      matched, total, heardNote, hitId, listening: active,
+      matchedNotes: expected.slice(0, matched).map((key) => key.replace(/-?\d+$/, "")),
+    }),
+    [expected, matched, total, heardNote, hitId, active],
   );
 }

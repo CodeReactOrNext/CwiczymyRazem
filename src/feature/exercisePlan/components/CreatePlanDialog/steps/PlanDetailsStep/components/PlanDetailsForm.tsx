@@ -1,4 +1,4 @@
-import { Button } from "assets/components/ui/button";
+import { Button, PRESSABLE_KEY } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import type {
@@ -9,6 +9,7 @@ import { determinePlanCategory } from "feature/exercisePlan/utils/deteminePlanCa
 import { determinePlanDifficulty } from "feature/exercisePlan/utils/determinePlanDifficulty";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
+import type { LucideIcon } from "lucide-react";
 import { Check, Globe, Lock } from "lucide-react";
 import { Controller, useWatch } from "react-hook-form";
 
@@ -16,6 +17,49 @@ import { usePlanDetailsForm } from "../hooks/usePlanDetailsForm";
 import { DescriptionField } from "./DescriptionField";
 import { PlanAppearancePicker } from "./PlanAppearancePicker";
 import { TitleField } from "./TitleField";
+
+/**
+ * One answer to who can see the plan. The picked one is green with a ticked
+ * dot, like every picked choice in the app; the other is a plain key.
+ */
+const VisibilityTile = ({
+  icon: Icon,
+  title,
+  hint,
+  selected,
+  onClick,
+}: {
+  icon: LucideIcon;
+  title: string;
+  hint: string;
+  selected: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    type='button'
+    role='radio'
+    aria-checked={selected}
+    onClick={onClick}
+    className={cn(
+      PRESSABLE_KEY,
+      "flex items-center gap-3.5 rounded-xl px-4 py-3.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:px-[18px] sm:py-4",
+      selected ? "bg-emerald-500/15 hover:bg-emerald-500/20" : "bg-zinc-800 hover:bg-zinc-700/70",
+    )}>
+    <Icon aria-hidden className={cn("h-[18px] w-[18px] shrink-0", selected ? "text-emerald-400" : "text-zinc-400")} />
+    <span className='min-w-0 flex-1'>
+      <span className={cn("block text-sm font-bold", selected ? "text-emerald-300" : "text-zinc-200")}>{title}</span>
+      <span className={cn("block text-xs leading-snug", selected ? "text-emerald-200/70" : "text-zinc-400")}>{hint}</span>
+    </span>
+    <span
+      aria-hidden
+      className={cn(
+        "flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
+        selected ? "bg-emerald-500 text-emerald-950" : "ring-2 ring-inset ring-zinc-600",
+      )}>
+      {selected && <Check className='h-3 w-3' strokeWidth={3.5} />}
+    </span>
+  </button>
+);
 
 interface PlanDetailsFormProps {
   selectedExercises: Exercise[];
@@ -107,43 +151,23 @@ export const PlanDetailsForm = ({
         name="isPublic"
         control={control}
         render={({ field }) => (
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-zinc-400">{t("plans:details.visibility")}</p>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
+          <div className="space-y-2.5">
+            <p id="plan-visibility" className="text-sm font-semibold text-zinc-200">{t("plans:details.visibility")}</p>
+            <div role="radiogroup" aria-labelledby="plan-visibility" className="grid gap-3 sm:grid-cols-2">
+              <VisibilityTile
+                icon={Lock}
+                title={t("plans:details.private")}
+                hint={t("plans:details.private_hint")}
+                selected={!field.value}
                 onClick={() => field.onChange(false)}
-                className={cn(
-                  "flex flex-col items-start gap-2 p-4 rounded-lg border text-left transition-all",
-                  !field.value
-                    ? "border-cyan-500/50 bg-cyan-500/10"
-                    : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"
-                )}
-              >
-                <div className="flex items-center gap-2 w-full">
-                  <Lock className={cn("h-4 w-4", !field.value ? "text-cyan-400" : "text-zinc-500")} />
-                  <span className={cn("text-sm font-bold", !field.value ? "text-white" : "text-zinc-400")}>{t("plans:details.private")}</span>
-                  {!field.value && <Check size={12} className="text-cyan-400 ml-auto" />}
-                </div>
-                <p className="text-xs text-zinc-500 leading-relaxed">{t("plans:details.private_hint")}</p>
-              </button>
-              <button
-                type="button"
+              />
+              <VisibilityTile
+                icon={Globe}
+                title={t("plans:details.public")}
+                hint={t("plans:details.public_hint")}
+                selected={!!field.value}
                 onClick={() => field.onChange(true)}
-                className={cn(
-                  "flex flex-col items-start gap-2 p-4 rounded-lg border text-left transition-all",
-                  field.value
-                    ? "border-emerald-500/50 bg-emerald-500/10"
-                    : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"
-                )}
-              >
-                <div className="flex items-center gap-2 w-full">
-                  <Globe className={cn("h-4 w-4", field.value ? "text-emerald-400" : "text-zinc-500")} />
-                  <span className={cn("text-sm font-bold", field.value ? "text-white" : "text-zinc-400")}>{t("plans:details.public")}</span>
-                  {field.value && <Check size={12} className="text-emerald-400 ml-auto" />}
-                </div>
-                <p className="text-xs text-zinc-500 leading-relaxed">{t("plans:details.public_hint")}</p>
-              </button>
+              />
             </div>
           </div>
         )}
@@ -155,13 +179,16 @@ export const PlanDetailsForm = ({
             {t("plans:details.missing", { fields: missingFields.join(", ") })}
           </p>
         )}
-        <Button type="button" variant="ghost" onClick={onBack}>
+        <Button type="button" variant="ghost" size="lg" onClick={onBack}>
           {t("plans:back")}
         </Button>
         <Button
           type="submit"
+          size="lg"
           aria-disabled={missingFields.length > 0}
-          className={cn(missingFields.length > 0 && "opacity-50")}>
+          // Grey until it has a name, like the builder's Next — still clickable,
+          // so a press shows what's missing.
+          className={cn("font-extrabold", missingFields.length > 0 && "bg-zinc-800 text-zinc-500 hover:bg-zinc-800")}>
           {initialData ? t("plans:details.save") : t("plans:details.create")}
         </Button>
       </div>

@@ -26,7 +26,7 @@ export const TitleField = ({ register, error }: TitleFieldProps) => {
         aria-describedby={error ? "title-error" : undefined}
         // Keeps the field clear of the sticky header when a failed submit focuses it.
         className={cn(
-          "scroll-mt-32",
+          "h-11 scroll-mt-32 text-[15px] md:text-[15px]",
           error && "ring-1 ring-red-500/60 focus-visible:ring-red-500/60",
         )}
         {...register("title", {

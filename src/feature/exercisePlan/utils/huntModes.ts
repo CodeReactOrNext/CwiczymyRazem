@@ -12,3 +12,16 @@ export type NoteHuntMode = NonNullable<Exercise["noteHuntConfig"]>["mode"];
 export function isClickAnsweredMode(mode: NoteHuntMode): boolean {
   return mode === "click" || mode === "intervalClick";
 }
+
+/**
+ * Whole-neck hunts for a named note, played into the mic: no neck diagram, every
+ * octave is the goal. They open behind the start gate and lay their octaves out
+ * as tiles, where the hunts with a diagram or a hidden answer don't.
+ */
+export function isWholeNeckHunt(
+  exercise: Pick<Exercise, "customGoal" | "customGoalRegion" | "noteHuntConfig">,
+): boolean {
+  const mode = exercise.noteHuntConfig?.mode;
+  return !!exercise.customGoal && !!exercise.noteHuntConfig && !exercise.customGoalRegion
+    && (mode === undefined || mode === "octaves" || mode === "accumulate");
+}

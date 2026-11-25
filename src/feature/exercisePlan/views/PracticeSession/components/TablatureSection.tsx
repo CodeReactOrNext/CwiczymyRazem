@@ -19,6 +19,7 @@ import { useNoteMarks, useNoteMatchingContext } from "../contexts/NoteMatchingCo
 import { useSessionUI } from "../contexts/SessionUIContext";
 import { useTabOverlay } from "../contexts/TabOverlayContext";
 import { useTabPlayUntilStore } from "../hooks/tabPlayUntilStore";
+import { useFitTabHeight } from "../hooks/useFitTabHeight";
 import { accuracyPerMeasure } from "../utils/measureAccuracy";
 import { buildTabSections } from "../utils/tabSections";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
@@ -43,9 +44,9 @@ import {
   TablatureResizeHandle,
   useTablatureHeight,
 } from "./useTablatureHeight";
-import { useTabLiteMode } from "./useTabLiteMode";
 import { useTablatureRenderData } from "./useTablatureRenderData";
 import type { TuningGutterString } from "./useTablatureWorkerBridge";
+import { useTabLiteMode } from "./useTabLiteMode";
 
 // The floating control and the "Note spacing" slider in settings drive one and
 // the same stored value, so the two can never disagree.
@@ -122,6 +123,8 @@ interface TablatureSectionProps {
    * the sound goes on.
    */
   obscured?: boolean;
+  /** What stands under the board and has to stay on the screen — see useFitTabHeight. */
+  belowRef?: React.RefObject<HTMLElement | null>;
 }
 
 interface TablatureZoomControlProps {
@@ -219,6 +222,7 @@ export const TablatureSection = memo(function TablatureSection({
   isExamMode = false,
   isMicEnabled = false,
   obscured = false,
+  belowRef,
 }: TablatureSectionProps) {
   const { t } = useTranslation("session");
   const { overlay: tabOverlay, gameMode } = useTabOverlay();
@@ -288,7 +292,7 @@ export const TablatureSection = memo(function TablatureSection({
   const zoom = settings.noteSpacing;
   const setSetting = useTablatureSettings((s) => s.set);
   // Shared viewer height (tab / notation), persisted to localStorage.
-  const { height, setHeight } = useTablatureHeight();
+  const { height: draggedHeight, setHeight, isCustom, clearHeight } = useTablatureHeight();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleZoomChange = useCallback(
@@ -296,6 +300,10 @@ export const TablatureSection = memo(function TablatureSection({
     [setSetting],
   );
   const boardRef = useRef<HTMLDivElement>(null);
+  // Untouched, the board takes the room there is; dragged, it is as tall as the
+  // player made it, even when that pushes the keys under it off the screen.
+  const fitHeight = useFitTabHeight(boardRef, belowRef, !cinema && !gameMode);
+  const height = isCustom ? draggedHeight : (fitHeight ?? draggedHeight);
   const fitZoom = useAutoTabZoom({
     storageKey: exerciseId,
     measures: activeTablature,
@@ -593,7 +601,7 @@ export const TablatureSection = memo(function TablatureSection({
             onLoopRestart={markAlphaTabPassStart}
             heightPx={height}
             resizeHandle={
-              <TablatureResizeHandle height={height} onChange={setHeight} />
+              <TablatureResizeHandle height={height} onChange={setHeight} onReset={clearHeight} />
             }
           />
         </div>
@@ -665,7 +673,7 @@ export const TablatureSection = memo(function TablatureSection({
                 onChange={handleZoomChange}
               />
             </div>
-            <TablatureResizeHandle height={height} onChange={setHeight} />
+            <TablatureResizeHandle height={height} onChange={setHeight} onReset={clearHeight} />
           </div>
           </div>
         </div>

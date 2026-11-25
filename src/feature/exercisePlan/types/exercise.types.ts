@@ -281,6 +281,11 @@ export interface Exercise {
     advanceOn?: "timer" | "solved" | "bar";
     /** Bars per target under `advanceOn: "bar"`. Defaults to 1. */
     advanceEveryBars?: number;
+    /** Every round ends on an answer: the session clock stops, a strip over the
+     *  session bar says how the round went, and the next target follows on its
+     *  own. For countdown hunts; off in exams. Click-answered ones keep it in
+     *  exams too and never stop the clock. */
+    roundVerdict?: boolean;
   };
   /** Restricts which strings (1-6, 1 = high e) are in play. Omitted = all 6.
    *  Combined with customGoalRegion's fret window to compute the exact set of

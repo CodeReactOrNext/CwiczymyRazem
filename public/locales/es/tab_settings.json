@@ -206,6 +206,8 @@
     "lime": "Lima"
   },
   "view_menu": {
+    "button_tab": "Vista: tab",
+    "button_notation": "Vista: partitura",
     "hint": "Cambia cómo se muestra el ejercicio",
     "view": "Vista"
   }

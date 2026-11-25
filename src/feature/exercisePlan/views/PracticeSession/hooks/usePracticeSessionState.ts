@@ -106,7 +106,7 @@ export const usePracticeSessionState = ({
     currentExercise,
   });
 
-  const { saveTime, getTime, resetExerciseTimes } = useExerciseTimerSync();
+  const { exerciseTimes, saveTime, getTime, resetExerciseTimes } = useExerciseTimerSync();
 
 
 
@@ -196,6 +196,7 @@ export const usePracticeSessionState = ({
     isSkillExercise,
     isSubmittingReport,
     completedExercises,
+    exerciseTimes,
     reportResult,
     currentUserStats,
     previousUserStats,
@@ -209,7 +210,7 @@ export const usePracticeSessionState = ({
     setShowCompleteDialog, handleNextExercise, timer, showSuccessView,
     restartFullSession, setVideoDuration, videoDuration, setTabDuration, handleFinishSession,
     canFinishSession, hasLoggedPractice, isCurrentExercisePlayedOut, isSkillExercise, isSubmittingReport,
-    completedExercises, reportResult, currentUserStats, previousUserStats,
+    completedExercises, exerciseTimes, reportResult, currentUserStats, previousUserStats,
     planTitleString, activityDataToUse
   ]);
 };

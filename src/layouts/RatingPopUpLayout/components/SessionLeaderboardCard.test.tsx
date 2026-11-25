@@ -56,7 +56,7 @@ describe("SessionLeaderboardCard", () => {
   beforeEach(() => vi.clearAllMocks());
   afterEach(cleanup);
 
-  it("names who stands above and below, with their scores", async () => {
+  it("names who stands right above and below, with their scores", async () => {
     vi.mocked(getExerciseRankNeighbors).mockResolvedValue({
       rank: 3,
       above: [neighbor("piotr", 44_000, 1), neighbor("kasia", 31_490, 2)],
@@ -66,11 +66,24 @@ describe("SessionLeaderboardCard", () => {
     renderCard();
 
     await waitFor(() => expect(screen.getByText("kasia")).toBeDefined());
-    expect(screen.getByText("piotr")).toBeDefined();
+    expect(screen.queryByText("piotr")).toBeNull();
     expect(screen.getByText("bartek")).toBeDefined();
     expect(screen.getByText(num(31_490))).toBeDefined();
     expect(screen.getByText("You")).toBeDefined();
     expect(screen.getByText(num(21_375))).toBeDefined();
+  });
+
+  it("shows two on the side that has them when the other is empty", async () => {
+    vi.mocked(getExerciseRankNeighbors).mockResolvedValue({
+      rank: 3,
+      above: [neighbor("piotr", 44_000, 1), neighbor("kasia", 31_490, 2)],
+      below: [],
+    });
+
+    renderCard();
+
+    await waitFor(() => expect(screen.getByText("kasia")).toBeDefined());
+    expect(screen.getByText("piotr")).toBeDefined();
   });
 
   it("measures the run against the record it beat", async () => {

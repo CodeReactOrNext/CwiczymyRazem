@@ -11,6 +11,7 @@ import { Label } from "assets/components/ui/label";
 import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
+import { useIntlLocale } from "lib/i18n/dateLocale";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { convertMsToHM } from "utils/converter";
@@ -93,6 +94,7 @@ const EditReportForm = ({
   onSaved: () => void;
 }) => {
   const { t } = useTranslation(["practice_log", "common"]);
+  const intlLocale = useIntlLocale() ?? "en";
   const [title, setTitle] = useState(session.title);
   const [description, setDescription] = useState(session.description ?? "");
   const [timeFields, setTimeFields] = useState<TimeFields>(() => ({
@@ -164,7 +166,7 @@ const EditReportForm = ({
           {t("edit_modal.title")}
         </DialogTitle>
         <p className="text-xs text-zinc-500">
-          {session.date.toLocaleDateString("en", {
+          {session.date.toLocaleDateString(intlLocale, {
             day: "2-digit",
             month: "long",
             year: "numeric",

@@ -6,48 +6,35 @@
   "level_step": {
     "title": "Wie lange spielst du schon?"
   },
-  "play_step": {
-    "title": "Hast du deine Gitarre zur Hand?",
+  "daily_step": {
+    "title": "Wie lange willst du am Tag üben?",
+    "hint": "Du kannst das jederzeit in den Einstellungen ändern.",
+    "unit": "Min. am Tag",
+    "vibes": {
+      "casual": "Locker",
+      "regular": "Regelmäßig",
+      "serious": "Ernsthaft",
+      "intense": "Intensiv"
+    }
+  },
+  "first_step": {
+    "title": "Was willst du ausprobieren?",
     "riff_title": "Spiel dein erstes Riff",
     "riff_levels": {
       "new": "Drei leere Saiten, ohne Greifen.",
       "some": "A-Moll-Pentatonik rauf und runter, {{bpm}} BPM.",
       "experienced": "Ein Pentatonik-Lick in Achteln, {{bpm}} BPM."
     },
-    "riff_mic": "Dein Mikro hört jede Note, die du spielst.",
-    "start": "Los geht's",
-    "options": {
-      "browse": "Erst mal umschauen",
-      "no_guitar": "Ich habe noch keine Gitarre"
-    }
-  },
-  "goal_step": {
-    "title": "Was führt dich zu Riff Quest?",
-    "title_after_play": "Wie geht's weiter?",
-    "title_no_guitar": "Schau dich erst mal um",
-    "no_guitar_hint": "Noch keine Gitarre? Das hier kannst du dir schon ansehen:"
-  },
-  "plan_step": {
-    "title": "Wähle einen Plan für den Start",
-    "open": "Plan öffnen",
-    "browse_all": "Alle {{count}} Pläne ansehen"
-  },
-  "songs_step": {
-    "title": "So funktioniert das Lernen von Songs",
-    "description": "Wir liefern keine Tabs. Das bekommst du stattdessen.",
-    "no_tabs": "Ohne Tabs",
-    "features": {
-      "library": "Speichere die Songs, die du lernst, in deiner Bibliothek",
-      "time": "Wir erfassen, wie lange du jeden Song übst",
-      "sources": "Songteile aus YouTube markieren oder Guitar Pro hochladen"
+    "riff_needs": "Gitarre und Mikro",
+    "hunt_title": "Finde Töne auf dem Griffbrett",
+    "hunt_levels": {
+      "new": "Tiefe E-Saite, Bünde 0 bis 6.",
+      "some": "Alle Saiten, im 5. Bund.",
+      "experienced": "Stammtöne auf dem ganzen Griffbrett."
     },
-    "continue": "Verstanden, zu meinen Songs",
-    "other": "Etwas anderes wählen"
-  },
-  "desktop_hint": {
-    "title": "Am besten am Computer",
-    "description": "Auf dem Handy funktioniert alles, aber Riff Quest ist für den Computer gemacht. Komm am Computer zurück, dort ist es viel bequemer.",
-    "continue": "Verstanden, los geht's"
+    "hunt_needs": "Nur klicken, keine Gitarre nötig",
+    "hunt_find": "Finde",
+    "browse": "Erst mal umschauen"
   },
   "levels": {
     "new": {
@@ -64,24 +51,6 @@
       "unit": "Jahre",
       "label": "Ich spiele seit Jahren",
       "description": "Sicher auf dem Griffbrett, ich will mich weiter verbessern"
-    }
-  },
-  "goals": {
-    "journey": {
-      "label": "Dem Lernpfad folgen",
-      "description": "Gitarre von Grund auf lernen, Schritt für Schritt"
-    },
-    "plans": {
-      "label": "Mit Übungsplänen üben",
-      "description": "Fertige Routinen mit einem Timer, der dich führt"
-    },
-    "songs": {
-      "label": "Songs lernen und verfolgen",
-      "description": "Speichere Songs, die du spielen willst, und sieh deinen Fortschritt"
-    },
-    "roadmap": {
-      "label": "Einer Roadmap zu einem Ziel folgen",
-      "description": "Ein Weg Schritt für Schritt, etwa im Stil deines Idols zu spielen"
     }
   },
   "first_riff_intro": {

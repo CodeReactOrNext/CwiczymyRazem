@@ -80,16 +80,29 @@ describe("useNoteHunt — prompt drills (round-graded)", () => {
   });
 });
 
-describe("useNoteHunt — octave hunts (unchanged)", () => {
-  it("still grades by octave, out of every octave on the neck", () => {
-    const { result } = setup(false);
-    // D is reachable in four octaves, so one of them is a quarter of the goal —
-    // which is the right answer to a question that asks for all four.
+describe("useNoteHunt — octave hunts", () => {
+  it("grades the first note by octave, out of every octave asked for", () => {
+    const { result } = setup(false, "F");
     expect(result.current.state.octaves).toHaveLength(4);
 
     act(() => result.current.markOctave(3));
     expect(result.current.state.accuracy).toBe(25);
     expect(result.current.state.rounds).toBeNull();
+    // Nothing to read out before a round is over.
+    expect(result.current.state.tally).toEqual({ hits: 0, misses: 0 });
+  });
+
+  it("keeps the grade over the whole run instead of starting each note at zero", () => {
+    const { result, rerender } = setup(false, "F");
+    for (const octave of [2, 3, 4, 5]) act(() => result.current.markOctave(octave));
+    rerender({ target: "C" });
+    expect(result.current.state.accuracy).toBe(100);
+
+    // C has three octaves; one found, two missed by the time it is gone.
+    act(() => result.current.markOctave(3));
+    rerender({ target: "G" });
+    expect(result.current.state.accuracy).toBe(71);
+    expect(result.current.state.tally).toEqual({ hits: 5, misses: 2 });
   });
 });
 

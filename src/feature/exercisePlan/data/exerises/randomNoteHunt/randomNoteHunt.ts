@@ -23,7 +23,7 @@ export const randomNoteHuntExercise: Exercise = {
   category: "theory",
   timeInMinutes: 2,
   instructions: [
-    "A target note appears on screen and changes every 30 seconds — find and play it on every string where it occurs.",
+    "A target note appears on screen and changes every 30 seconds — find and play it in every octave.",
     "Enable Pitch Detect so the app verifies each hit and tracks which octaves you've found.",
     "Start from the low E string and move up, then try finding the note in different octaves before the timer rotates.",
   ],
@@ -40,10 +40,10 @@ export const randomNoteHuntExercise: Exercise = {
   // Static value only gates rendering / first paint; the live rotating target is
   // owned by useNoteHuntRotation via rollHuntTarget (survives object spreads).
   customGoal: currentTarget,
-  customGoalDescription: "Find this note on every string & octave",
+  customGoalDescription: "Find this note in every octave",
   rollHuntTarget: () => {
     currentTarget = pickNote(currentTarget);
     return { goal: currentTarget };
   },
-  noteHuntConfig: { rotateSeconds: 30 },
+  noteHuntConfig: { rotateSeconds: 30, roundVerdict: true },
 };

@@ -9,22 +9,14 @@ import { useTranslation } from "hooks/useTranslation";
 import { AudioWaveform } from "lucide-react";
 import { useState } from "react";
 
+import { useAnswerKeys } from "../../hooks/useAnswerKeys";
+import { useAutoListen } from "../../hooks/useAutoListen";
 import { useEarQuizPlayback } from "../../hooks/useEarQuizPlayback";
-import {
-  AnswerTile,
-  ListenButton,
-  QuizNote,
-  QuizPrimarySlot,
-  QuizQuestion,
-  QuizSecondaryButton,
-} from "./EarQuizChrome";
+import type { EarQuizBodyProps } from "./earQuizBody.types";
+import { AnswerTile, ListenAidKey, ListenKey, QuizPrompt } from "./EarQuizChrome";
 
-interface ChordTypeQuizProps {
+interface ChordTypeQuizProps extends EarQuizBodyProps {
   question: ChordTypeQuestion;
-  isAnswered: boolean;
-  isCorrect: boolean;
-  onAnswer: (correct: boolean) => void;
-  onNext: () => void;
 }
 
 const CHORD_DURATION = 2.6;
@@ -38,11 +30,12 @@ export function ChordTypeQuiz({
   isCorrect,
   onAnswer,
   onNext,
+  autoPlay = false,
+  keysEnabled = false,
 }: ChordTypeQuizProps) {
   const { t } = useTranslation("session");
   const { isPlaying, play, stop } = useEarQuizPlayback();
   const [picked, setPicked] = useState<ChordQualityId | null>(null);
-  const [hasPlayed, setHasPlayed] = useState(false);
   /** Which option is sounding, once the tiles have turned into players. */
   const [auditioned, setAuditioned] = useState<ChordQualityId | null>(null);
 
@@ -55,7 +48,6 @@ export function ChordTypeQuiz({
   const playChord = (spread: number) => {
     strum(question.midis, spread);
     setAuditioned(null);
-    setHasPlayed(true);
   };
 
   // The primary button doubles as a stop; the arpeggio button always restarts,
@@ -81,44 +73,38 @@ export function ChordTypeQuiz({
   const verdict = isAnswered
     ? {
         isCorrect,
+        onHear: () => playChord(ARPEGGIO_SPREAD),
+        onContinue: onNext,
         answer: `${question.rootName}${answerQuality.suffix} — ${qualityName(question.quality)}`,
-        explanation: t(
+        detail: t(
           `quiz.chords.${question.quality}.character`,
           answerQuality.character,
         ),
       }
     : null;
 
+  useAutoListen(autoPlay && !isAnswered, () => playChord(STRUM_SPREAD));
+  useAnswerKeys(question.options.length, (index) => handlePick(question.options[index]), keysEnabled);
+
   return (
     <>
-      <div className='flex flex-col items-center gap-3'>
-        <QuizQuestion question={t("quiz.which_chord")} verdict={verdict} />
-        <div className='flex flex-wrap items-center justify-center gap-3'>
-          <QuizPrimarySlot isAnswered={isAnswered} onNext={onNext}>
-            <ListenButton
-              onClick={toggleChord}
-              isPlaying={isPlaying}
-              label={t("quiz.play_chord")}
-              hasPlayed={hasPlayed}
-            />
-          </QuizPrimarySlot>
-          <QuizSecondaryButton
-            onClick={() => playChord(ARPEGGIO_SPREAD)}
-            icon={<AudioWaveform />}>
-            {isAnswered ? t("quiz.hear_again_slowly") : t("quiz.one_note")}
-          </QuizSecondaryButton>
-        </div>
-        <QuizNote hint={t("quiz.root_moves")} verdict={verdict} />
-      </div>
+      <QuizPrompt question={t("quiz.which_chord")} verdict={verdict}>
+        <ListenKey onClick={toggleChord} isPlaying={isPlaying && auditioned === null} label={t("quiz.play_chord")} />
+        <ListenAidKey
+          onClick={() => playChord(ARPEGGIO_SPREAD)}
+          icon={<AudioWaveform aria-hidden />}
+          label={t("quiz.one_note")}
+        />
+      </QuizPrompt>
 
       <div
         className={cn(
           "grid gap-3",
           question.options.length > 4
-            ? "grid-cols-2 sm:grid-cols-4"
-            : "grid-cols-2",
+            ? "grid-cols-2 sm:grid-cols-4 shortwide:grid-cols-2 shortwide:gap-2"
+            : "grid-cols-2 shortwide:gap-2",
         )}>
-        {question.options.map((id) => {
+        {question.options.map((id, index) => {
           const quality = CHORD_QUALITIES[id];
           const state = !isAnswered
             ? "idle"
@@ -132,6 +118,7 @@ export function ChordTypeQuiz({
               key={id}
               onClick={() => handlePick(id)}
               state={state}
+              number={index + 1}
               title={qualityName(id)}
               subtitle={quality.formula}
               listenLabel={

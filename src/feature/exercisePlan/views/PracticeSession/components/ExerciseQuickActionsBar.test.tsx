@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -26,6 +26,8 @@ const metronome = {
   maxBpm: 240,
   subdivision: 1,
   accentPattern: [2, 1, 1, 1],
+  setBeatsPerBar: vi.fn(),
+  cycleBeatAccent: vi.fn(),
 };
 
 afterEach(cleanup);
@@ -44,7 +46,7 @@ describe("ExerciseQuickActionsBar", () => {
     const bar = screen.getByText("61").closest("div");
     expect(bar).not.toBeNull();
     // Same container as the BPM readout — not a sibling island.
-    expect(screen.getByText("Speed").closest("div")).toBe(bar);
+    expect(screen.getByText("Slow down").closest("div")).toBe(bar);
     expect(screen.getByText("75%")).toBeDefined();
     expect(screen.getByText("46")).toBeDefined();
   });
@@ -53,7 +55,7 @@ describe("ExerciseQuickActionsBar", () => {
     render(<ExerciseQuickActionsBar exercise={exercise} metronome={metronome} />);
 
     expect(screen.getByText("61")).toBeDefined();
-    expect(screen.queryByText("Speed")).toBeNull();
+    expect(screen.queryByText("Slow down")).toBeNull();
   });
 
   it("never squeezes the picker into the compact strip", () => {
@@ -67,7 +69,32 @@ describe("ExerciseQuickActionsBar", () => {
       />,
     );
 
-    expect(screen.queryByText("Speed")).toBeNull();
+    expect(screen.queryByText("Slow down")).toBeNull();
     expect(screen.queryByText("50%")).toBeNull();
+  });
+
+  it("reads the beat count as a meter", () => {
+    render(<ExerciseQuickActionsBar exercise={exercise} metronome={metronome} />);
+    expect(screen.getByText("4/4")).toBeDefined();
+  });
+
+  it("offers the way back to the exercise's tempo only once it has moved off it", () => {
+    const handleSetRecommendedBpm = vi.fn();
+    const { rerender } = render(
+      <ExerciseQuickActionsBar
+        exercise={exercise}
+        metronome={{ ...metronome, recommendedBpm: 61, handleSetRecommendedBpm }}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /reset to recommended/i })).toBeNull();
+
+    rerender(
+      <ExerciseQuickActionsBar
+        exercise={exercise}
+        metronome={{ ...metronome, bpm: 70, recommendedBpm: 61, handleSetRecommendedBpm }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /reset to recommended/i }));
+    expect(handleSetRecommendedBpm).toHaveBeenCalledTimes(1);
   });
 });

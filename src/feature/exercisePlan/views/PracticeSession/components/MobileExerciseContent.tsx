@@ -28,7 +28,6 @@ interface MobileExerciseContentProps {
   audioStartTime?: number | null;
   metronome: any;
   isRiddleRevealed?: boolean;
-  isRiddleGuessed?: boolean;
   hasPlayedRiddleOnce?: boolean;
   isPlaying: boolean;
   isListening: boolean;
@@ -43,8 +42,6 @@ interface MobileExerciseContentProps {
   earTrainingScore?: number;
   earTrainingHighScore?: number | null;
   handleRevealRiddle?: () => void;
-  handleNextRiddle?: () => void;
-  onEarTrainingGuessed?: () => void;
   riddleProgress?: RiddleProgress | null;
   onPlayRiddle: () => void;
   /** Shows the click hunt's mistake counter under the exam's strike limit. */
@@ -72,7 +69,6 @@ export function MobileExerciseContent({
   audioStartTime,
   metronome,
   isRiddleRevealed,
-  isRiddleGuessed,
   hasPlayedRiddleOnce,
   isPlaying,
   isListening,
@@ -87,8 +83,6 @@ export function MobileExerciseContent({
   earTrainingScore,
   earTrainingHighScore,
   handleRevealRiddle,
-  handleNextRiddle,
-  onEarTrainingGuessed,
   riddleProgress,
   onPlayRiddle,
   isExamMode,
@@ -101,7 +95,7 @@ export function MobileExerciseContent({
   onTabFullscreenChange,
 }: MobileExerciseContentProps) {
   const { t } = useTranslation("session");
-  const { openLeaderboard, backingVideoId, setBackingVideoId } = useSessionUI();
+  const { openLeaderboard, backingVideoId, setBackingVideoId, onQuizContinue } = useSessionUI();
 
   // Listening quizzes are the whole player slot — they carry no tab, video or
   // image to fall through to.
@@ -112,6 +106,7 @@ export function MobileExerciseContent({
         config={currentExercise.earQuizConfig}
         exerciseId={currentExercise.id}
         isSessionRunning={isPlaying}
+        onContinue={onQuizContinue}
       />
     );
   }
@@ -167,14 +162,10 @@ export function MobileExerciseContent({
       )}
       {currentExercise.riddleConfig?.mode === 'sequenceRepeat' && (
         <EarTrainingView
-          difficulty={currentExercise.riddleConfig.difficulty}
           isRevealed={isRiddleRevealed || false}
-          isGuessed={isRiddleGuessed || false}
           isPlaying={metronome.isPlaying}
           onPlayRiddle={onPlayRiddle}
           onReveal={handleRevealRiddle || (() => {})}
-          onNextRiddle={handleNextRiddle || (() => {})}
-          onGuessed={() => { if (onEarTrainingGuessed) onEarTrainingGuessed(); }}
           score={earTrainingScore || 0}
           highScore={earTrainingHighScore}
           canGuess={hasPlayedRiddleOnce || false}

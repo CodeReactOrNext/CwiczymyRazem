@@ -18,6 +18,7 @@ import { useIntervalClickHunt } from "../hooks/useIntervalClickHunt";
 import type { LearnModeState } from "../hooks/useLearnModeMatcher";
 import type { NoteHuntState } from "../hooks/useNoteHunt";
 import { useNoteHunt } from "../hooks/useNoteHunt";
+import type { HuntRoundEnd } from "../hooks/useNoteHuntRotation";
 import type { NoteJudgement } from "../hooks/useNoteMatching";
 import { useNoteMatching } from "../hooks/useNoteMatching";
 import type { SlotResult } from "../hooks/useStrummingMatcher";
@@ -83,6 +84,10 @@ interface NoteMatchingContextValue {
   noteHuntSecondsLeft: number | null;
   /** The round length the countdown starts from, or null when not rotating. */
   noteHuntSecondsTotal: number | null;
+  /** Rounds of the hunt solved in a row. */
+  noteHuntStreak: number;
+  /** How the round on screen ended, while it waits for the next target. */
+  noteHuntRoundEnd: HuntRoundEnd | null;
   /** Fret window for region-mode note hunts, or null when not in region mode. */
   noteHuntRegion: { startFret: number; endFret: number } | null;
   /** The current round's fret window for any hunt that has one — it can move from
@@ -217,6 +222,8 @@ const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   chromaticProgress: null,
   noteHuntSecondsLeft: null,
   noteHuntSecondsTotal: null,
+  noteHuntStreak: 0,
+  noteHuntRoundEnd: null,
   noteHuntRegion: null,
   huntRegion: null,
   noteHuntStrings: null,
@@ -285,6 +292,8 @@ interface NoteMatchingProviderProps {
   noteHuntSecondsLeft: number | null;
   // the round length that countdown starts from (null when not rotating)
   noteHuntSecondsTotal?: number | null;
+  noteHuntStreak?: number;
+  noteHuntRoundEnd?: HuntRoundEnd | null;
   // flipped to true once the current hunt goal is fully solved (drives fast-forward)
   solvedRef?: React.MutableRefObject<boolean>;
   // manually advance the hunt to the next target (for no-mic practice)
@@ -345,6 +354,8 @@ export function NoteMatchingProvider({
   noteHuntMode,
   noteHuntSecondsLeft,
   noteHuntSecondsTotal = null,
+  noteHuntStreak = 0,
+  noteHuntRoundEnd = null,
   solvedRef,
   onAdvanceHunt,
   canAdvanceHunt = false,
@@ -523,6 +534,7 @@ export function NoteMatchingProvider({
     regionEnd ?? 12,
     huntStrings,
     huntRunKey,
+    isPlaying,
   );
 
   // Exam mode, click-answered hunts only: too many wrong clicks fails the exam
@@ -583,7 +595,7 @@ export function NoteMatchingProvider({
   const isStrummingExercise = !!activeStrumPattern;
   const gameState = isHunt ? huntGameState : isStrummingExercise ? strumGameState : tabGameState;
   const sessionAccuracy = isHunt ? huntAccuracy : isStrummingExercise ? strumAccuracy : tabAccuracy;
-  const sessionStats = isHunt ? null : isStrummingExercise ? strumStats : tabStats;
+  const sessionStats = isHunt ? (isNoteHunt && !isAccumulatingHunt ? noteHunt.tally : null) : isStrummingExercise ? strumStats : tabStats;
   const effectiveMaxPossibleScore = isHunt ? huntMaxScore : maxPossibleScore;
   const effectiveMaxCombo = isHunt ? huntMaxCombo : maxCombo;
 
@@ -742,6 +754,8 @@ export function NoteMatchingProvider({
       chromaticProgress: isAccumulatingHunt ? { found: accumulatedNotes.size, total: 12 } : null,
       noteHuntSecondsLeft: isHunt ? noteHuntSecondsLeft : null,
       noteHuntSecondsTotal: isHunt ? noteHuntSecondsTotal : null,
+      noteHuntStreak: isHunt ? noteHuntStreak : 0,
+      noteHuntRoundEnd: isHunt ? noteHuntRoundEnd : null,
       noteHuntRegion: isNoteHunt && fretRange ? { startFret: fretRange[0], endFret: fretRange[1] } : null,
       huntRegion: isHunt && fretRange ? { startFret: fretRange[0], endFret: fretRange[1] } : null,
       noteHuntStrings: isNoteHunt ? (huntStrings ?? null) : null,
@@ -762,7 +776,7 @@ export function NoteMatchingProvider({
       estimateLatencyMs: getLatencyMs,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [learn, livePitchRef, fillFeedRef, streamFills, scoringFocus, strumSlotFeedback, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, noteHuntSecondsTotal, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick, markAlphaTabPassStart, calibratedLatencyMs, getLatencyMs],
+    [learn, livePitchRef, fillFeedRef, streamFills, scoringFocus, strumSlotFeedback, isNoteHunt, noteHunt, isChordHunt, chordHunt, isClickHunt, clickHunt, isIntervalClickHunt, intervalClickHunt, registerIntervalClick, isAccumulatingHunt, accumulatedNotes, isHunt, noteHuntSecondsLeft, noteHuntSecondsTotal, noteHuntStreak, noteHuntRoundEnd, fretRange, huntStrings, customGoalPrompt, customGoal, tuningOffsets, onAdvanceHunt, canAdvanceHunt, onEnableMic, markNoteHuntOctave, markChordTone, registerFretClick, markAlphaTabPassStart, calibratedLatencyMs, getLatencyMs],
   );
 
   return (

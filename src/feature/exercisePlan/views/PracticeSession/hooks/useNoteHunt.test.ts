@@ -6,7 +6,7 @@ import { stringHuntLowEExercise } from "feature/exercisePlan/data/exerises/strin
 import { NOTES } from "utils/audio/noteUtils";
 import { describe, expect, it } from "vitest";
 
-import { huntPositions, playableOctaves } from "./useNoteHunt";
+import { HUNT_MAX_FRET, huntPositions, playableOctaves, wholeNeckOctaves } from "./useNoteHunt";
 
 describe("huntPositions", () => {
   it("finds a note across every string when no string scope is given", () => {
@@ -29,6 +29,19 @@ describe("huntPositions", () => {
 describe("playableOctaves", () => {
   it("covers the standard-tuned neck", () => {
     expect(playableOctaves("E")).toEqual([2, 3, 4, 5, 6]);
+  });
+});
+
+describe("wholeNeckOctaves", () => {
+  it("asks for nothing past the fret every guitar has", () => {
+    expect(wholeNeckOctaves("E")).toEqual([2, 3, 4, 5]);
+    expect(wholeNeckOctaves("C")).toEqual([3, 4, 5]);
+    expect(wholeNeckOctaves("G")).toEqual([2, 3, 4, 5]);
+  });
+
+  it.each(NOTES)("leaves every octave of %s a place on the neck", (note) => {
+    const placed = new Set(huntPositions(note, [0, HUNT_MAX_FRET]).map(p => p.octave));
+    for (const octave of wholeNeckOctaves(note)) expect(placed.has(octave)).toBe(true);
   });
 });
 

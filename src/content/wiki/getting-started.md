@@ -36,7 +36,7 @@ No microphone, no interface, no setup is required for any of this. [Note detecti
 
 ## Pick a starting point
 
-Right after signing up you're asked where you'd like to begin. It only decides which screen you land on first, and nothing is locked, and you can use all four from day one. Pick the one that matches your problem:
+Right after signing up you answer three quick questions: how long you've been playing, how many minutes a day you want to practise (you can change that later in Settings), and what to do with your first minute: play a short riff, find notes on the neck without a guitar, or just look around. After that Kostek shows you around. Nothing is locked, and all four of these are open from day one. Pick the one that matches your problem:
 
 <Checklist items="Guided Journey::You don't know what to practise. The app picks the next step for you, one at a time|Exercise Library::You know your weak spot and want a drill for it|Practice Journal::You already have a routine and just want it tracked|Song Library::You're here to learn songs, and want your repertoire in one place" />
 

@@ -26,30 +26,8 @@
         "title": "Zermalmt"
       },
       "lair": {
-        "pitch": "Ein endloser Kampf um Akkordwechsel. In jeder Phase setzt sich der Koloss um eine neue Akkordfolge neu zusammen — offene Akkorde, Powerchords, Barrégriffe, Septakkorde — und die Wechsel kommen immer schneller. Wie weit kommst du?"
-      },
-      "rules": {
-        "sword": {
-          "body": "Jeder saubere Wechsel lädt es: exakt 4, pünktlich 3, knapp 2, locker 1. Ein Akkord zählt, sobald alle Saiten bis auf eine zu hören sind. Ein Fehler zerschlägt die Ladung."
-        },
-        "strike": {
-          "body": "Ein volles Schwert schlägt von selbst zu — umso härter, je länger deine Serie sauberer Wechsel, bis ×2 bei {{max}} in Folge."
-        },
-        "bite": {
-          "title": "Jeder Fehler ist ein Faustschlag",
-          "body": "Ein Akkord, den du nicht rechtzeitig greifst, kostet HP. Sind sie weg, ist der Lauf vorbei."
-        },
-        "slam": {
-          "title": "Übersteh das Beben",
-          "body": "Ab Phase {{slams}} lässt der Koloss die Erde beben: zwei Takte lang wechseln die Akkorde doppelt so oft. Spiel jeden davon sauber, um es zu blocken — ein Block lädt dein Schwert zur Hälfte."
-        },
-        "endless": {
-          "body": "Bring die HP einer Phase auf null und der Koloss setzt sich neu zusammen: neue Akkordfolge, neue Akkorde, jedes Mal schneller. Erst offene Akkorde, dann Powerchords, Barrégriffe und Septakkorde. Jede geschaffte Phase heilt dich um {{heal}} HP."
-        },
-        "threats": {
-          "title": "Er lernt dazu",
-          "body": "Ab Phase {{weak}} findet er deinen schwachen Wechsel — den, bei dem du am häufigsten danebenliegst — und ein sauberer dort lädt dein Schwert ×{{weakCharge}}. Ab Phase {{affix}} bekommt er Kräfte: Staub, Steinheilung, Nachbeben und Versteinerung, die die Tabulatur zu Stein macht."
-        }
+        "pitch": "Ein endloser Kampf um Akkordwechsel. In jeder Phase setzt sich der Koloss um eine neue Akkordfolge neu zusammen — offene Akkorde, Powerchords, Barrégriffe, Septakkorde — und die Wechsel kommen immer schneller. Wie weit kommst du?",
+        "skill": "Akkordwechsel"
       },
       "boons": {
         "armor": {
@@ -94,6 +72,11 @@
         "faster": "Wechsel {{percent}} % schneller",
         "slower": "Wechsel {{percent}} % langsamer",
         "same_speed": "Wechsel im gleichen Tempo"
+      },
+      "how": {
+        "play": "Wechsle die Akkorde im Takt der Tabulatur.",
+        "strike": "Saubere Wechsel laden dein Schwert. Ein volles Schwert schlägt zu.",
+        "survive": "Ein später Akkord kostet HP. Überstehe so viele Phasen wie möglich."
       }
     },
     "changeling": {
@@ -122,34 +105,8 @@
         "title": "Von den Wechseln verschluckt"
       },
       "lair": {
-        "pitch": "Ein endloser Kampf ohne Noten zum Lesen. In jeder Phase nimmt der Wechselbalg eine neue Akkordfolge in einer neuen Tonart an und wird nacheinander zu jedem Akkord — improvisiere darüber. Triff die Akkordtöne auf 1 und 3 und spiel dazwischen die Tonleiter, und du verwundest ihn; alles andere auf diesen Schlägen oder ein Ton außerhalb der Tonart verwundet dich. Wie weit kommst du?"
-      },
-      "rules": {
-        "sword": {
-          "body": "Auf 1 und 3 spielst du einen Ton des Akkords, auf dem du bist — Grundton, Terz, Quinte oder Septime — und es lädt 4. Dazwischen lädt jeder Ton der Tonleiter: ein Akkordton 3, der Rest 1, bis zu zwei Noten pro Schlag. Das Griffbrett zeigt beides: die Akkordtöne groß, die Tonleiter klein."
-        },
-        "strike": {
-          "body": "Ein volles Schwert schlägt von selbst zu — umso härter, je länger deine Serie von Akkordtönen, bis ×2 bei {{max}} in Folge."
-        },
-        "combo": {
-          "title": "Spiel die Wechsel für ein Combo",
-          "body": "Triff einen neuen Akkord auf die Eins — seine erste Note höchstens einen halben Schlag vom Wechsel — oder gleite hinein, seine erste Note höchstens {{smooth}} Halbtöne von der davor. Jedes ist ein Trick: reih sie Akkord für Akkord aneinander, bis ×{{comboMax}}. Das Combo trifft den Wechselbalg, wenn die Progression von vorn beginnt oder ein Akkord ohne Trick landet. Ein Fehler kostet es."
-        },
-        "bite": {
-          "title": "Jeder Akkord braucht einen Ton",
-          "body": "Spiel als Erstes auf 1 oder 3 etwas anderes als einen Akkordton, spiel einen Ton außerhalb der Tonart oder lass einen Akkord ohne einen seiner Töne vorbeiziehen, und er schlägt mit den Krallen zu. Sind die HP weg, ist der Lauf vorbei."
-        },
-        "slam": {
-          "title": "Übersteh den Ansturm",
-          "body": "Ab Phase {{slams}} stürmt der Wechselbalg los: zwei Takte lang wechseln die Akkorde doppelt so schnell. Triff in jedem einen Ton, um ihn zu blocken — ein Block lädt dein Schwert zur Hälfte."
-        },
-        "endless": {
-          "body": "Bring die HP einer Phase auf null und der Wechselbalg nimmt eine neue Gestalt an: neue Tonart, ein Akkord mehr, schnellere Wechsel — zu Beginn drei verschiedene Akkorde. Ab und zu kommen Septakkorde, ein geborgter Akkord, eine Zwischendominante oder ein verminderter dazu. Erst Dur und Moll, dann die Modi und der Blues. Jede geschaffte Phase heilt dich um {{heal}} HP."
-        },
-        "threats": {
-          "title": "Er lernt",
-          "body": "Ab Phase {{weak}} laden die Leittöne — Terzen und Septimen, die sagen, was ein Akkord ist — dein Schwert ×{{weakCharge}}. Ab Phase {{affix}} gewinnt er Kräfte: Dissonanz, Gestaltwandel, Wirbel und einen Vorhang über der Tafel."
-        }
+        "pitch": "Ein endloser Kampf ohne Noten zum Lesen. In jeder Phase nimmt der Wechselbalg eine neue Akkordfolge in einer neuen Tonart an und wird nacheinander zu jedem Akkord — improvisiere darüber. Triff die Akkordtöne auf 1 und 3 und spiel dazwischen die Tonleiter, und du verwundest ihn; alles andere auf diesen Schlägen oder ein Ton außerhalb der Tonart verwundet dich. Wie weit kommst du?",
+        "skill": "Solieren über Akkorde"
       },
       "boons": {
         "armor": {
@@ -302,57 +259,17 @@
   },
   "lair": {
     "pitch": "Ein endloser Kampf. In jeder Phase häutet sich die Spinne in eine schnellere Gestalt mit einer neuen Übung — wie weit kommst du?",
-    "best_phase": "Beste Phase",
-    "runs": "Läufe",
     "fight": "Kämpfen",
     "difficulty": "Schwierigkeit",
     "effect_damage": "Erlittener Schaden",
     "effect_tempo": "Tempo",
     "effect_score": "Punkte",
     "start_at": "Start bei",
-    "phase_option": "Phase {{phase}}",
-    "next_savepoint": "Phase {{phase}} öffnet sich, sobald du sie erreichst",
     "skip_note_one": "Überspringt {{count}} Phase — schaff Phase {{phase}}, damit ihre HP in deine Punkte eingehen.",
     "skip_note_other": "Überspringt {{count}} Phasen — schaff Phase {{phase}}, damit ihre HP in deine Punkte eingehen.",
-    "best_score": "Bestwert",
-    "not_fought": "Noch nicht gekämpft",
-    "desktop_only": "Bosskämpfe werden auf Mobilgeräten nicht unterstützt",
-    "desktop_hint": "Für einen Kampf brauchst du einen großen Bildschirm, um die Tabulatur im Tempo zu lesen. Öffne riff.quest auf einem Laptop oder Computer, um diesen Boss herauszufordern."
-  },
-  "rules": {
-    "title": "So läuft der Kampf",
-    "sword": {
-      "title": "Lade dein Schwert",
-      "body": "Jeder Treffer lädt es: exakt 4, pünktlich 3, knapp 2, locker 1. Ein Fehler zerschlägt die Ladung."
-    },
-    "strike": {
-      "title": "Hieb",
-      "body": "Ein volles Schwert schlägt von selbst zu — umso härter, je länger deine Serie, bis ×2 bei {{max}} in Folge."
-    },
-    "bite": {
-      "title": "Jeder Fehler ist ein Biss",
-      "body": "Eine verpasste Note kostet HP. Sind sie weg, ist der Lauf vorbei."
-    },
-    "slam": {
-      "title": "Blocke den Schmetterschlag",
-      "body": "Ab Phase {{slams}} holt die Spinne aus. Hast du beim Aufprall eine Serie von {{parry}}, blockst du ihn — ein Block lädt dein Schwert zur Hälfte."
-    },
-    "endless": {
-      "title": "Endlos und zufällig",
-      "body": "Bring die HP einer Phase auf null und die Spinne häutet sich: zufällige Fingerfolge, Route, Lage und Rhythmus, jedes Mal schneller. Jede geschaffte Phase heilt dich um {{heal}} HP."
-    },
-    "draft": {
-      "title": "Verbesserungen",
-      "body": "Nach jeder Phase nimmst du eine von drei zufälligen Verbesserungen — Rüstung, schärfere Klinge, langsameres Tempo… Manche stapeln sich, seltene kommen selten. Einmal neu mischen pro Lauf, ein weiteres Mal alle fünf Phasen."
-    },
-    "threats": {
-      "title": "Sie lernt dazu",
-      "body": "Ab Phase {{weak}} zeigt sie Schwachstellen — dein Schwert lädt dann ×{{weakCharge}}. Ab Phase {{affix}} bekommt sie Kräfte: Gift, Regeneration, Raserei und Netze über der Tabulatur, je weiter, desto mehr auf einmal."
-    },
-    "gates": {
-      "title": "Tore und Speicherpunkte",
-      "body": "Jede {{gate}}. Phase bewacht der Boss ein Tor: {{gateHp}} % mehr HP und härtere Treffer. Erreichst du ein Tor, kann dein nächster Lauf dort beginnen — übersprungene Phasen zählen zu deinen Punkten, sobald du die schaffst, bei der du startest."
-    }
+    "phase_label": "Phase",
+    "on_computer": "Kämpfe am Computer",
+    "skill": "Chromatische Läufe"
   },
   "draft": {
     "eyebrow": "Phase {{phase}} beginnt",
@@ -557,5 +474,66 @@
     "normal": "Normal",
     "hard": "Schwer",
     "brutal": "Brutal"
+  },
+  "guide": {
+    "open": "So wird gespielt",
+    "progress": "Schritt {{step}} von {{count}}",
+    "next": "Weiter",
+    "got_it": "Alles klar"
+  },
+  "how": {
+    "play": "Spiel die Läufe aus der Tabulatur im Takt.",
+    "strike": "Saubere Treffer laden dein Schwert. Ein volles Schwert schlägt zu.",
+    "survive": "Ein verpasster Ton kostet HP. Überstehe so viele Phasen wie möglich."
+  },
+  "rules": {
+    "title": "So läuft der Kampf",
+    "sword": {
+      "title": "Lade dein Schwert",
+      "body": "Jeder Treffer lädt es: exakt 4, pünktlich 3, knapp 2, locker 1. Ein Fehler zerschlägt die Ladung."
+    },
+    "strike": {
+      "title": "Hieb",
+      "body": "Ein volles Schwert schlägt von selbst zu — umso härter, je länger deine Serie, bis ×2 bei {{max}} in Folge."
+    },
+    "bite": {
+      "title": "Jeder Fehler ist ein Biss",
+      "body": "Eine verpasste Note kostet HP. Sind sie weg, ist der Lauf vorbei."
+    },
+    "slam": {
+      "title": "Blocke den Schmetterschlag",
+      "body": "Ab Phase {{slams}} holt die Spinne aus. Hast du beim Aufprall eine Serie von {{parry}}, blockst du ihn — ein Block lädt dein Schwert zur Hälfte."
+    },
+    "endless": {
+      "title": "Endlos und zufällig",
+      "body": "Bring die HP einer Phase auf null und die Spinne häutet sich: zufällige Fingerfolge, Route, Lage und Rhythmus, jedes Mal schneller. Jede geschaffte Phase heilt dich um {{heal}} HP."
+    },
+    "draft": {
+      "title": "Verbesserungen",
+      "body": "Nach jeder Phase nimmst du eine von drei zufälligen Verbesserungen — Rüstung, schärfere Klinge, langsameres Tempo… Manche stapeln sich, seltene kommen selten. Einmal neu mischen pro Lauf, ein weiteres Mal alle fünf Phasen."
+    },
+    "threats": {
+      "title": "Sie lernt dazu",
+      "body": "Ab Phase {{weak}} zeigt sie Schwachstellen — dein Schwert lädt dann ×{{weakCharge}}. Ab Phase {{affix}} bekommt sie Kräfte: Gift, Regeneration, Raserei und Netze über der Tabulatur, je weiter, desto mehr auf einmal."
+    },
+    "gates": {
+      "title": "Tore und Speicherpunkte",
+      "body": "Jede {{gate}}. Phase bewacht der Boss ein Tor: {{gateHp}} % mehr HP und härtere Treffer. Erreichst du ein Tor, kann dein nächster Lauf dort beginnen — übersprungene Phasen zählen zu deinen Punkten, sobald du die schaffst, bei der du startest."
+    }
+  },
+  "primer": {
+    "title": "Was ein Bosskampf ist",
+    "looks": {
+      "title": "Du spielst, er beißt zurück",
+      "body": "Der Boss hängt über deiner Tabulatur oder deinen Akkorden. Spiel sie im Takt, mit Mikrofon. Ein Fehler kostet HP."
+    },
+    "goes": {
+      "title": "Sauberes Spiel trifft",
+      "body": "Jeder saubere Ton lädt dein Schwert. Ist es voll, schlägt es von selbst zu, umso härter, je länger deine Serie."
+    },
+    "why": {
+      "title": "Wozu kämpfen",
+      "body": "Jede Phase ist eine neue, etwas schnellere Übung, so findest du deine echte Grenze. Die Zeit zählt als Üben, und deine beste Phase zeigt, wie weit du bist."
+    }
   }
 }

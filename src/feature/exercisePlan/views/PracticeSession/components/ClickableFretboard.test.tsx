@@ -98,3 +98,26 @@ describe("ClickableFretboard moving window", () => {
     expect(viewBox()).toBe(AT_FRETS_8_11);
   });
 });
+
+describe("ClickableFretboard light theme", () => {
+  afterEach(() => document.documentElement.classList.remove("theme-light"));
+
+  const goldCells = () => document.querySelectorAll('rect[fill="#f59e0b"][opacity="0.72"]');
+  const oneString = (
+    <ClickableFretboard startFret={6} endFret={12} strings={[6]} foundKeys={[]} totalTargets={1} lastClick={null} />
+  );
+
+  it("lights the string in play only across the window", () => {
+    document.documentElement.classList.add("theme-light");
+    render(oneString);
+
+    expect(goldCells()).toHaveLength(1);
+    // Seven frets, 6–12.
+    expect(goldCells()[0].getAttribute("width")).toBe(String(7 * 190));
+  });
+
+  it("leaves the dark neck without it", () => {
+    render(oneString);
+    expect(goldCells()).toHaveLength(0);
+  });
+});

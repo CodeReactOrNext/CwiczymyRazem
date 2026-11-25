@@ -127,6 +127,9 @@ export function useIntervalClickHunt(
   /** Identity of the run. A new value (restart, next exercise) starts the score,
    *  accuracy and mistakes over from zero instead of banking onto the last run. */
   runKey: string | number = 0,
+  /** Whether the session's clock runs. A find is timed from when it was last
+   *  started, so the wait at the Start gate isn't counted into the first one. */
+  isRunning = true,
 ): IntervalClickControls {
   const runKeyRef = useRef(runKey);
   const stringsKey = strings ? strings.join(",") : "all";
@@ -204,6 +207,10 @@ export function useIntervalClickHunt(
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [promptKey, runKey]);
+
+  useEffect(() => {
+    if (isRunning) stepStartRef.current = Date.now();
+  }, [isRunning]);
 
   const registerClick = useCallback((string: number, fret: number) => {
     // Round already solved — the panel is on its way to the next prompt, and

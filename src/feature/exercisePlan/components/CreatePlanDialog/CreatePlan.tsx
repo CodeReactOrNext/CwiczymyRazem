@@ -1,10 +1,8 @@
-import { cn } from "assets/lib/utils";
 import { OrderExercisesStep } from "feature/exercisePlan/components/CreatePlanDialog/steps/OrderExercisesStep/OrderExercisesStep";
 import { PlanDetailsStep } from "feature/exercisePlan/components/CreatePlanDialog/steps/PlanDetailsStep/PlanDetailsStep";
 import { SelectExercisesStep } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/SelectExercisesStep";
 import { AnimatePresence } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { Check } from "lucide-react";
 import { useState } from "react";
 
 import type {
@@ -55,37 +53,29 @@ export const CreatePlan = ({ initialPlan, onSubmit, onUpdate }: CreatePlanProps)
 
   return (
     <div className='w-full'>
-      <div className='mb-6 flex items-center gap-2' aria-label={t("create.step_of", { step: currentIndex + 1, total: STEPS.length })}>
-        {STEPS.map((s, i) => (
-          <div key={s.id} className='flex flex-1 items-center gap-2 last:flex-none'>
-            <div
-              className={cn(
-                "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-                i < currentIndex
-                  ? "bg-cyan-500 text-zinc-950"
-                  : i === currentIndex
-                  ? "bg-cyan-500/10 text-cyan-300"
-                  : "bg-zinc-800/60 text-zinc-500"
-              )}>
-              {i < currentIndex ? <Check size={14} /> : i + 1}
-            </div>
-            <span
-              className={cn(
-                "hidden text-xs font-semibold sm:inline",
-                i === currentIndex ? "text-white" : "text-zinc-500"
-              )}>
-              {t(`create.steps.${s.id}`, s.label)}
-            </span>
-            {i < STEPS.length - 1 && (
-              <div
-                className={cn(
-                  "h-0.5 flex-1 rounded-full",
-                  i < currentIndex ? "bg-cyan-500" : "bg-zinc-800"
-                )}
-              />
-            )}
+      {/* Where the builder is: one thick bar with the app's white glint, filled
+          a step at a time, and the step in words beside it. */}
+      <div className='mb-6 flex items-center gap-4'>
+        <div
+          role='progressbar'
+          aria-valuemin={1}
+          aria-valuemax={STEPS.length}
+          aria-valuenow={currentIndex + 1}
+          aria-label={t("create.step_of", { step: currentIndex + 1, total: STEPS.length })}
+          className='relative h-4 flex-1 overflow-hidden rounded-full bg-zinc-800'>
+          <div
+            className='absolute inset-y-0 left-0 rounded-full bg-emerald-500 transition-[width] duration-slow'
+            style={{ width: `${((currentIndex + 1) / STEPS.length) * 100}%` }}>
+            <span className='light-hide absolute left-3 right-6 top-1 h-1 rounded-full bg-white/30' />
           </div>
-        ))}
+        </div>
+        <p className='shrink-0 text-[13px] font-semibold text-zinc-400'>
+          <span className='tabular-nums text-zinc-500'>{t("create.step_of", { step: currentIndex + 1, total: STEPS.length })}</span>
+          <span className='hidden sm:inline'>
+            {" · "}
+            {t(`create.steps.${STEPS[currentIndex].id}`, STEPS[currentIndex].label)}
+          </span>
+        </p>
       </div>
 
       <AnimatePresence mode='wait'>

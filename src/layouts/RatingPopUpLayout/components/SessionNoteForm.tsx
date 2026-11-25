@@ -1,10 +1,11 @@
-import { useTranslation } from "hooks/useTranslation";
 import { Button } from "assets/components/ui/button";
 import { Textarea } from "assets/components/ui/textarea";
 import { cn } from "assets/lib/utils";
 import { saveReportNote } from "feature/practiceLog/services/practiceLogMutations.service";
+import { useTranslation } from "hooks/useTranslation";
 import { Check } from "lucide-react";
-import { useState } from "react";
+import type { Ref } from "react";
+import { useImperativeHandle, useState } from "react";
 import { toast } from "sonner";
 
 // Mirrors MAX_DESCRIPTION_LENGTH in pages/api/user/report/manage.
@@ -12,7 +13,13 @@ export const MAX_NOTE_LENGTH = 500;
 // The counter only shows up once the limit is worth knowing about.
 const COUNTER_FROM = 400;
 
+export interface SessionNoteHandle {
+  /** Saves what is typed, if it isn't yet, on the way out of the summary. False when it could not. */
+  save: () => Promise<boolean>;
+}
+
 interface SessionNoteFormProps {
+  ref?: Ref<SessionNoteHandle>;
   /** The report's Firestore doc id — its `reportDate` as an ISO string. */
   reportId: string;
 }
@@ -22,7 +29,7 @@ interface SessionNoteFormProps {
  * by the time the summary shows, so saving is a plain PATCH of its description
  * and never touches the points.
  */
-export const SessionNoteForm = ({ reportId }: SessionNoteFormProps) => {
+export const SessionNoteForm = ({ reportId, ref }: SessionNoteFormProps) => {
   const { t } = useTranslation("session_summary");
   const [note, setNote] = useState("");
   const [savedNote, setSavedNote] = useState("");
@@ -35,25 +42,25 @@ export const SessionNoteForm = ({ reportId }: SessionNoteFormProps) => {
     !isSaving && trimmed !== savedNote && note.length <= MAX_NOTE_LENGTH;
 
   const handleSave = async () => {
-    if (!canSave) return;
+    if (!canSave) return true;
     setIsSaving(true);
     try {
       await saveReportNote(reportId, trimmed);
       setSavedNote(trimmed);
+      return true;
     } catch (error) {
       console.error("Failed to save session note:", error);
       toast.error(t("note.save_error"));
+      return false;
     } finally {
       setIsSaving(false);
     }
   };
 
+  useImperativeHandle(ref, () => ({ save: handleSave }));
+
   return (
     <div className='flex flex-col gap-4'>
-      <p className='text-sm leading-relaxed text-zinc-400'>
-        {t("note.intro")}
-      </p>
-
       <Textarea
         value={note}
         maxLength={MAX_NOTE_LENGTH}
@@ -72,7 +79,7 @@ export const SessionNoteForm = ({ reportId }: SessionNoteFormProps) => {
         )}
         <Button
           variant='secondary'
-          onClick={handleSave}
+          onClick={() => void handleSave()}
           disabled={!canSave}
           className={cn(
             isSaved && "bg-emerald-500/10 text-emerald-400 disabled:opacity-100"

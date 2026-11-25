@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 interface HuntSuccessBurstProps {
   /** How many units (octaves / chord tones) are currently found. */
@@ -16,18 +16,20 @@ interface HuntSuccessBurstProps {
 export function HuntSuccessBurst({ foundCount, complete }: HuntSuccessBurstProps) {
   const [hitKey, setHitKey] = useState(0);
   const [doneKey, setDoneKey] = useState(0);
-  const prevFound = useRef(foundCount);
-  const prevComplete = useRef(complete);
+  const [prevFound, setPrevFound] = useState(foundCount);
+  const [prevComplete, setPrevComplete] = useState(complete);
 
-  useEffect(() => {
-    if (foundCount > prevFound.current) setHitKey(k => k + 1);
-    prevFound.current = foundCount;
-  }, [foundCount]);
-
-  useEffect(() => {
-    if (complete && !prevComplete.current) setDoneKey(k => k + 1);
-    prevComplete.current = complete;
-  }, [complete]);
+  // Adjusted while rendering: a count that fell is a new target, and the last
+  // one's hit ring must be gone before this paint — once `complete` drops it
+  // would mount again and celebrate a note nobody has played.
+  if (foundCount !== prevFound) {
+    setPrevFound(foundCount);
+    setHitKey(k => (foundCount > prevFound ? k + 1 : 0));
+  }
+  if (complete !== prevComplete) {
+    setPrevComplete(complete);
+    if (complete) setDoneKey(k => k + 1);
+  }
 
   return (
     <div className="pointer-events-none absolute inset-0">

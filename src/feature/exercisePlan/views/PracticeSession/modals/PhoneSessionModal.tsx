@@ -12,13 +12,16 @@ import type { Dispatch, SetStateAction } from "react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
+import type { ExercisePlan } from "../../../types/exercise.types";
+import { ExerciseProgress } from "../components/ExerciseProgress";
 import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
 import { FavoriteExerciseButton } from "../components/FavoriteExerciseButton";
 import { MediaControlsToolbar } from "../components/MediaControlsToolbar";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
 import { MobileInstructionsCard } from "../components/MobileInstructionsCard";
 import { MobileMicGameHud } from "../components/MobileMicGameHud";
-import { StartGate, useStartGate } from "../components/StartGate";
+import { VERDICT_GROUND, type VerdictTone } from "../components/SessionVerdict";
+import { StartGate, type StartGateMic, useGateIntro, useStartGate } from "../components/StartGate";
 import { QUARTER_TURN_STYLE } from "../components/tablatureDirection";
 import { useNoteScore } from "../contexts/NoteMatchingContext";
 import { useTimerContext } from "../contexts/TimerContext";
@@ -89,15 +92,12 @@ interface PhoneSessionModalProps {
   onSpeedMultiplierChange?: (value: number) => void;
   activeTablature?: any;
   isRiddleRevealed?: boolean;
-  isRiddleGuessed?: boolean;
   hasPlayedRiddleOnce?: boolean;
   /** Ear training's own Play/Stop — replays the phrase from the top, unlike the session toggle. */
   onPlayRiddle?: () => void;
   handleRevealRiddle?: () => void;
-  handleNextRiddle?: () => void;
   earTrainingScore?: number;
   earTrainingHighScore?: number | null;
-  onEarTrainingGuessed?: () => void;
   riddleProgress?: RiddleProgress | null;
   examMode?: boolean;
   isListening: boolean;
@@ -117,6 +117,14 @@ interface PhoneSessionModalProps {
   songSectionMapSlot?: React.ReactNode;
   /** Above the exercise, upright only — a boss fight's arena. */
   heroSlot?: React.ReactNode;
+  plan: ExercisePlan;
+  completedExercises: number[];
+  exerciseTimes: Record<number, number>;
+  gateMic?: StartGateMic;
+  /** The answer to a run that just ended, under the exercise. */
+  verdict?: { tone: VerdictTone; strip: React.ReactNode };
+  /** The answer to one round of a hunt — the controls strip stays. */
+  roundVerdict?: { tone: VerdictTone; strip: React.ReactNode };
 }
 
 /**
@@ -161,14 +169,11 @@ export function PhoneSessionModal({
   onSpeedMultiplierChange,
   activeTablature,
   isRiddleRevealed,
-  isRiddleGuessed,
   hasPlayedRiddleOnce,
   onPlayRiddle,
   handleRevealRiddle,
-  handleNextRiddle,
   earTrainingScore,
   earTrainingHighScore,
-  onEarTrainingGuessed,
   riddleProgress,
   examMode,
   isListening,
@@ -186,6 +191,12 @@ export function PhoneSessionModal({
   handleRestart,
   songSectionMapSlot,
   heroSlot,
+  plan,
+  completedExercises,
+  exerciseTimes,
+  gateMic,
+  verdict,
+  roundVerdict,
 }: PhoneSessionModalProps) {
   const { t } = useTranslation("session");
   const isPortrait = orientation === "portrait";
@@ -220,7 +231,8 @@ export function PhoneSessionModal({
   // Start sits in the strip at the screen's far edge, away from the tab the
   // player is reading — until the first start the tab itself offers it.
   const startGate = useStartGate(isPlaying);
-  const showStartGate = startGate.open && !heroSlot && !!activeTablature?.length
+  const gateIntro = useGateIntro(currentExercise);
+  const showStartGate = startGate.open && !heroSlot && (!!activeTablature?.length || !!gateIntro)
     && currentExercise.riddleConfig?.mode !== "sequenceRepeat";
   // The tab's own controls (look, zoom, full screen) live in the top bar — a row under the
   // tab cost it height on a screen that has none to spare.
@@ -405,6 +417,13 @@ export function PhoneSessionModal({
                   {/* Top bar — what is being played and how long is left, one slim row over
                       the exercise. The title opens the instructions the screen has no room for. */}
                   {!isFullscreen && (
+                    <ExerciseProgress
+                      slim
+                      plan={plan} currentExerciseIndex={currentExerciseIndex}
+                      completedExercises={completedExercises} exerciseTimes={exerciseTimes}
+                    />
+                  )}
+                  {!isFullscreen && (
                   <div className="flex h-10 shrink-0 items-center gap-2 pl-3 pr-2">
                     <button
                       type="button"
@@ -449,7 +468,6 @@ export function PhoneSessionModal({
                           audioStartTime={audioStartTime}
                           metronome={metronome}
                           isRiddleRevealed={isRiddleRevealed}
-                          isRiddleGuessed={isRiddleGuessed}
                           hasPlayedRiddleOnce={hasPlayedRiddleOnce}
                           isPlaying={isPlaying}
                           isListening={isListening}
@@ -464,8 +482,6 @@ export function PhoneSessionModal({
                           earTrainingScore={earTrainingScore}
                           earTrainingHighScore={earTrainingHighScore}
                           handleRevealRiddle={handleRevealRiddle}
-                          handleNextRiddle={handleNextRiddle}
-                          onEarTrainingGuessed={onEarTrainingGuessed}
                           riddleProgress={riddleProgress}
                           onPlayRiddle={onPlayRiddle ?? handleToggleTimer}
                           isExamMode={examMode}
@@ -498,12 +514,23 @@ export function PhoneSessionModal({
                   {showStartGate && !isPanelExpanded && (
                     <StartGate
                       onStart={handleToggleTimer}
-                      onPreview={startGate.dismiss}
+                      onPreview={gateIntro ? undefined : startGate.dismiss}
+                      intro={gateIntro}
                       countsIn={!!currentExercise.metronomeSpeed}
                       micOn={isMicEnabled}
+                      mic={gateMic}
                       // Under the top bar — the title and the clock stay readable.
-                      className='top-10'
+                      className='top-11'
                     />
+                  )}
+
+                  {(verdict ?? roundVerdict) && (
+                    <div className={cn(
+                      "relative z-10 flex shrink-0 items-center px-4 py-3 transition-colors duration-base shortwide:py-2",
+                      VERDICT_GROUND[(verdict ?? roundVerdict)!.tone],
+                    )}>
+                      {(verdict ?? roundVerdict)!.strip}
+                    </div>
                   )}
 
                   {!isFullscreen && drawer}
@@ -621,16 +648,19 @@ export function PhoneSessionModal({
                       </Button>
                     )}
 
-                    {/* The one main action — white, like every primary button in the app. */}
-                    <Button
-                      onClick={handleToggleTimer}
-                      size="icon-touch"
-                      className="shrink-0"
-                    >
-                      {isPlaying ? <Pause /> : <PlayIcon />}
-                    </Button>
+                    {/* The one main action — white, like every primary button in the app. The
+                        gate's Start and a verdict's Continue are it while they are up. */}
+                    {!verdict && !(showStartGate && !isPanelExpanded) && (
+                      <Button
+                        onClick={handleToggleTimer}
+                        size="icon-touch"
+                        className="shrink-0"
+                      >
+                        {isPlaying ? <Pause /> : <PlayIcon />}
+                      </Button>
+                    )}
 
-                    {!examMode && (
+                    {!examMode && !verdict && (
                       <Button
                         onClick={isLastExercise ? onFinish : handleNextExerciseClick}
                         disabled={isFinishing || isSubmittingReport }

@@ -1,32 +1,28 @@
-import { Button } from "assets/components/ui/button";
+import {
+  Button,
+  buttonVariants,
+  PRESSABLE_KEY,
+} from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { BackLink } from "components/BackLink/BackLink";
 import { type KostekMood, KostekSays } from "components/Mascot/Kostek";
-import { PlanCard } from "feature/exercisePlan/components/PlanCard";
-import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { addPlayerJoinedLog } from "feature/logs/services/addPlayerJoinedLog.service";
-import type { Variants } from "framer-motion";
+import { firebaseUpdateDailyGoalMinutes } from "feature/settings/services/settings.service";
+import { setDailyGoalMinutes } from "feature/user/store/userSlice";
 import { m } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { EASE, fadeUp, transitions } from "lib/motion/motion";
-import type { LucideIcon } from "lucide-react";
 import {
   ArrowLeft,
   ArrowRight,
-  Clock,
-  FileMusic,
-  Library,
-  ListMusic,
-  Loader2,
-  Monitor,
-  Smartphone,
+  Check,
+  Guitar,
+  MousePointerClick,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
-import { useResponsiveStore } from "store/useResponsiveStore";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useAppDispatch } from "store/hooks";
 
 import type { OnboardingStep } from "../analytics/onboardingAnalytics";
 import {
@@ -34,875 +30,577 @@ import {
   parseOnboardingSource,
   trackOnboardingBack,
   trackOnboardingCompleted,
-  trackOnboardingDesktopHintContinued,
-  trackOnboardingFirstRiffReturned,
-  trackOnboardingGoalChosen,
+  trackOnboardingDailyGoalChosen,
   trackOnboardingLevelChosen,
-  trackOnboardingPlanChosen,
   trackOnboardingPlayChosen,
   trackOnboardingSkipped,
   trackOnboardingViewed,
 } from "../analytics/onboardingAnalytics";
-import type { GoalOption } from "../data/onboardingGoals";
 import {
-  ALL_PLANS_COUNT,
-  ALL_PLANS_HREF,
+  DAILY_GOAL_CHOICES,
+  FIRST_HUNT_DURATION_LABEL,
+  FIRST_HUNT_PREVIEWS,
   FIRST_RIFF_DURATION_LABEL,
   FIRST_RIFF_IMAGE,
+  getFirstHuntHref,
   getFirstRiffExercise,
   getFirstRiffHref,
-  getGoalOptions,
-  getOnboardingPlans,
-  getPlanHref,
-  getPlanMinutes,
-  isOnboardingLevel,
   LEVEL_OPTIONS,
-  LOOK_AROUND_CHOICES,
-  LOOK_AROUND_LABELS,
-  SONGS_HREF,
 } from "../data/onboardingGoals";
 import { firebaseSaveOnboarding } from "../services/onboarding.service";
 import { getTourHref } from "../tour/tourSteps";
-import type {
-  OnboardingGoal,
-  OnboardingLevel,
-  OnboardingPlayChoice,
-  OnboardingResult,
-} from "../types";
+import type { OnboardingLevel, OnboardingPlayChoice } from "../types";
+import { HuntPreview } from "./HuntPreview";
 
 const FOCUS_RING =
   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60";
 
-/**
- * `desktop` comes after every answer is in, on phones only, right before the
- * player is sent on — it asks nothing, so it gets no segment of its own.
- */
-type Step = OnboardingStep | "desktop";
-
-/**
- * The progress bar's segment for each step: the questions, then the last
- * one for whatever follows the goal — plan picker or the songs explainer.
- */
-const PROGRESS: Record<Step, number> = {
-  level: 0,
-  play: 1,
-  goal: 2,
-  plan: 3,
-  songs: 3,
-  desktop: 3,
-};
-const PROGRESS_SEGMENTS = 4;
-
-/**
- * Where the onboarding opens: the first question, or — back from the first
- * riff (`?step=goal&level=…&played=1`) — the goal question with the level
- * already answered.
- */
-const readStart = (
-  query: Record<string, string | string[] | undefined>,
-): { step: Step; level: OnboardingLevel; returnedFromRiff: boolean } => {
-  const level = Array.isArray(query.level) ? query.level[0] : query.level;
-  if (query.step === "goal" && query.played === "1" && isOnboardingLevel(level)) {
-    return { step: "goal", level, returnedFromRiff: true };
-  }
-  return { step: "level", level: "new", returnedFromRiff: false };
+const STEPS: OnboardingStep[] = ["level", "daily", "first"];
+const PREVIOUS: Partial<Record<OnboardingStep, OnboardingStep>> = {
+  daily: "level",
+  first: "daily",
 };
 
-/**
- * What sits under Kostek's question on a step: the one line the question
- * can't carry alone, and the way back.
- */
-const StepHeading = ({
-  description,
-  onBack,
-}: {
-  /** Only where the question can't carry the message alone. */
-  description?: string;
-  onBack?: () => void;
-}) => {
-  const { t } = useTranslation("onboarding");
-  if (!description && !onBack) return <div className='mb-8 sm:mb-10' />;
-  return (
-    <div className='mx-auto mb-8 max-w-xl space-y-3 text-center sm:mb-10'>
-      {description && (
-        <p className='text-base leading-relaxed text-zinc-300'>{description}</p>
-      )}
-      {onBack && (
-        <BackLink label={t("back")} onClick={onBack} className='mx-auto flex' />
-      )}
-    </div>
-  );
-};
-
-/** Kostek's face for each step; it changes as the player moves on. */
-const STEP_MOOD: Record<Step, KostekMood> = {
+/** Kostek's face for each question; a picked answer gets a nod ("approve"). */
+const STEP_MOOD: Record<OnboardingStep, KostekMood> = {
   level: "idle",
-  play: "ready",
-  goal: "think",
-  plan: "approve",
-  songs: "shrug",
-  desktop: "nudge",
+  daily: "think",
+  first: "ready",
 };
 
-/** A few bars of tab, shown so the strike through them reads at a glance. */
-const TAB_LINES = [
-  "e|-----0-----3---|",
-  "B|---1-----0-----|",
-  "G|-0-----0-------|",
-  "D|---------------|",
-  "A|-3-------------|",
-  "E|---------3-----|",
-];
+/** How long a picked answer stays green before the next question comes in. */
+const PICK_MS = 350;
+
+const FIRST_CHOICES: OnboardingPlayChoice[] = ["play", "hunt", "browse"];
 
 /**
- * "No tabs here": a greyed-out tab gets struck through once the step settles,
- * so the first thing a songs player learns is the thing they expected.
+ * One thick bar for the three questions, the same as the goal bar on the
+ * session summary: emerald, with the white highlight along its top.
  */
-const TabsNotIncluded = () => {
-  const { t } = useTranslation("onboarding");
+const ProgressBar = ({ value, label }: { value: number; label: string }) => {
+  const percent = (value / STEPS.length) * 100;
   return (
-    <div className='relative flex flex-col items-center gap-3 rounded-lg bg-zinc-900/40 px-6 py-5'>
-      <div aria-hidden className='relative'>
-        <pre className='font-mono text-[11px] leading-[14px] text-zinc-600'>
-          {TAB_LINES.join("\n")}
-        </pre>
-        {/* framer-motion owns this element's transform, so the tilt goes
-            through `style`, not a rotate class it would overwrite. */}
-        <m.span
-          className='absolute left-[-6%] top-[68%] h-0.5 w-[112%] origin-left rounded-full bg-orange-400'
-          style={{ rotate: -12 }}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ ...transitions.slow, delay: 0.4 }}
+    <div
+      role='progressbar'
+      aria-label={label}
+      aria-valuemin={1}
+      aria-valuemax={STEPS.length}
+      aria-valuenow={value}
+      className='relative h-3.5 min-w-0 flex-1 overflow-hidden rounded-full bg-zinc-800'>
+      <m.div
+        className='absolute inset-y-0 left-0 rounded-full bg-emerald-500'
+        initial={false}
+        animate={{ width: `${percent}%` }}
+        transition={{ type: "spring", stiffness: 170, damping: 18 }}>
+        <span
+          aria-hidden
+          className='light-hide absolute inset-x-2 top-[3px] h-[3px] rounded-full bg-white/30'
         />
-      </div>
-      <m.span
-        className='text-sm font-medium text-orange-400'
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ ...transitions.base, delay: 0.8 }}>
-        {t("songs_step.no_tabs")}
-      </m.span>
+      </m.div>
     </div>
   );
 };
 
-const SONG_FEATURES: { key: string; icon: LucideIcon }[] = [
-  { key: "library", icon: ListMusic },
-  { key: "time", icon: Clock },
-  { key: "sources", icon: FileMusic },
-];
-
-/** Waits for the strike and its label, then lists the rows one by one. */
-const AFTER_STRIKE: Variants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.12, delayChildren: 1 } },
-};
-
-/** What a songs player does get, arriving one by one after the strike. */
-const SongFeatures = () => {
-  const { t } = useTranslation("onboarding");
-  return (
-    <m.ul
-      className='space-y-2'
-      initial='hidden'
-      animate='visible'
-      variants={AFTER_STRIKE}>
-      {SONG_FEATURES.map(({ key, icon: Icon }) => (
-        <m.li
-          key={key}
-          variants={fadeUp}
-          className='flex items-center gap-3 rounded-lg bg-zinc-900/40 px-3 py-2.5'>
-          <span className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400'>
-            <Icon className='h-4 w-4' />
-          </span>
-          <span className='min-w-0 text-sm leading-snug text-zinc-200'>
-            {t(`songs_step.features.${key}`)}
-          </span>
-        </m.li>
-      ))}
-    </m.ul>
-  );
-};
-
-/** One phone → computer hop, in seconds; the dot and the glow share it. */
-const HOP_LOOP = 2.4;
-/** Track width (w-20) minus the dot (w-2): how far the dot travels. */
-const HOP_DISTANCE = 72;
+/** The number key that picks an answer; only where there is a keyboard. */
+const ShortcutKey = ({ children }: { children: ReactNode }) => (
+  <kbd className='hidden h-6 min-w-6 place-items-center rounded-md border-b-2 border-black bg-zinc-800 px-1.5 font-sans text-xs font-semibold text-zinc-400 lg:grid'>
+    {children}
+  </kbd>
+);
 
 /**
- * Phone → computer: a dot leaves the phone, crosses a dotted track and lands
- * in the monitor, which lights up as it arrives. With reduced motion on the dot
- * stays put and only fades, and the glow still plays.
+ * Every answer is a key: a face, the lip, and a press. Picked, it turns green
+ * with a tick for a moment before the next question; the others fade.
  */
-const PhoneToDesktop = () => (
-  <div
-    aria-hidden
-    className='flex items-center justify-center gap-5 rounded-lg bg-zinc-900/40 py-14'>
-    <Smartphone className='h-10 w-10 text-zinc-400' />
-
-    <span className='relative flex w-20 items-center justify-between'>
-      {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className='h-1 w-1 rounded-full bg-zinc-700' />
-      ))}
-      <m.span
-        className='absolute left-0 h-2 w-2 rounded-full bg-cyan-400'
-        animate={{
-          x: [0, 0, HOP_DISTANCE, HOP_DISTANCE],
-          opacity: [0, 1, 1, 0],
-        }}
-        transition={{
-          duration: HOP_LOOP,
-          times: [0, 0.15, 0.75, 0.85],
-          ease: EASE.inOut,
-          repeat: Infinity,
-        }}
-      />
-    </span>
-
-    <span className='relative flex items-center justify-center'>
-      <m.span
-        className='absolute inset-0 rounded-full bg-cyan-400/25 blur-xl'
-        animate={{ opacity: [0, 0, 1, 0] }}
-        transition={{
-          duration: HOP_LOOP,
-          times: [0, 0.7, 0.85, 1],
-          repeat: Infinity,
-        }}
-      />
-      <Monitor className='relative h-16 w-16 text-cyan-400' />
-    </span>
-  </div>
-);
-
-/** Fades each step in as it replaces the previous one. */
-const StepBody = ({ children }: { children: ReactNode }) => (
-  <div className='duration-base animate-in fade-in slide-in-from-bottom-2'>
-    {children}
-  </div>
-);
-
-const GoalTile = ({
-  option,
-  isWide,
-  isPending,
-  isDimmed,
+const AnswerKey = ({
+  picked,
+  dimmed,
+  disabled,
+  shortcut,
   onClick,
+  className,
+  cornerClassName,
+  children,
 }: {
-  option: GoalOption;
-  isWide: boolean;
-  isPending: boolean;
-  isDimmed: boolean;
+  picked: boolean;
+  dimmed: boolean;
+  disabled: boolean;
+  shortcut?: number;
   onClick: () => void;
-}) => {
-  const { t } = useTranslation("onboarding");
+  className?: string;
+  /** Where the tick and the number key sit; top right by default. */
+  cornerClassName?: string;
+  children: ReactNode;
+}) => (
+  <button
+    type='button'
+    disabled={disabled}
+    onClick={onClick}
+    data-picked={picked}
+    className={cn(
+      PRESSABLE_KEY,
+      "group relative flex rounded-lg text-left font-normal transition-[background-color,opacity] duration-fast disabled:cursor-default",
+      picked ? "bg-emerald-500/15" : "bg-zinc-900 enabled:hover:bg-zinc-800/80",
+      dimmed && "opacity-40",
+      FOCUS_RING,
+      className,
+    )}>
+    <span className={cn("absolute right-3 top-3 z-10 flex", cornerClassName)}>
+      {picked ? (
+        <span className='grid h-6 w-6 place-items-center rounded-full bg-emerald-500 text-zinc-950'>
+          <Check className='h-3.5 w-3.5' strokeWidth={3.5} />
+        </span>
+      ) : (
+        shortcut !== undefined && <ShortcutKey>{shortcut}</ShortcutKey>
+      )}
+    </span>
+    {children}
+  </button>
+);
 
-  return (
-    <button
-      type='button'
-      disabled={isPending || isDimmed}
-      onClick={onClick}
-      className={cn(
-        "group flex overflow-hidden rounded-lg bg-zinc-900/60 text-left transition-colors disabled:cursor-default hover:bg-zinc-800/60 sm:flex-col",
-        FOCUS_RING,
-        isWide && "sm:col-span-2",
-        isDimmed && "opacity-50",
-      )}>
+/** Answer text that turns green with its key. */
+const PICKED_TEXT = "group-data-[picked=true]:text-emerald-300";
+
+/** The text half of a first-minute card: what it is, how long, what it needs. */
+const FirstMinuteText = ({
+  title,
+  duration,
+  description,
+  needs,
+}: {
+  title: string;
+  duration: string;
+  description: string;
+  needs: ReactNode;
+}) => (
+  <span className='flex min-w-0 flex-1 flex-col gap-1.5 p-4 sm:p-5'>
+    <span className='flex items-start justify-between gap-3'>
       <span
         className={cn(
-          "relative block min-h-[112px] w-28 shrink-0 sm:w-full",
-          isWide ? "sm:h-52" : "sm:h-40",
+          "min-w-0 text-base font-medium text-zinc-100",
+          PICKED_TEXT,
         )}>
-        <Image
-          src={option.image}
-          alt=''
-          fill
-          sizes='(min-width: 640px) 440px, 112px'
-          className={cn(
-            "object-cover opacity-60 transition-opacity duration-base group-hover:opacity-90",
-            option.imagePosition,
-          )}
-        />
-        {/* Lets the screenshot sink into the tile instead of ending on an
-            edge — the tile's own background, not a line. */}
-        <span
-          aria-hidden
-          className='absolute inset-0 bg-gradient-to-r from-transparent to-zinc-900/60 sm:bg-gradient-to-b sm:from-transparent sm:via-transparent sm:to-zinc-900/90'
-        />
-        {isPending && (
-          <span className='absolute inset-0 flex items-center justify-center bg-zinc-950/50'>
-            <Loader2 className='h-5 w-5 animate-spin text-zinc-200' />
-          </span>
-        )}
+        {title}
       </span>
-
-      <span className='flex min-w-0 flex-1 items-center gap-3 p-4 sm:p-5'>
-        <span className='min-w-0 flex-1'>
-          <span className='block text-base font-medium text-zinc-100'>
-            {t(`goals.${option.goal}.label`, option.label)}
-          </span>
-          <span className='mt-1 block text-sm leading-relaxed text-zinc-400'>
-            {t(`goals.${option.goal}.description`, option.description)}
-          </span>
-        </span>
-        <ArrowRight className='h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-200' />
+      <span className='shrink-0 font-teko text-3xl font-medium tabular-nums leading-none text-zinc-100 sm:text-4xl'>
+        {duration}
       </span>
-    </button>
-  );
-};
+    </span>
+    <span className='text-sm leading-relaxed text-zinc-400'>{description}</span>
+    <span className='mt-1'>{needs}</span>
+  </span>
+);
 
 /**
- * The answer we hope for, as the one card on the step: a crop of the real
- * practice screen, what the riff is for this level, its length the way the
- * session timer will show it, and a white key to start.
- */
-const FirstRiffCard = ({
-  level,
-  isPending,
-  disabled,
-  onPlay,
-}: {
-  level: OnboardingLevel;
-  isPending: boolean;
-  disabled: boolean;
-  onPlay: () => void;
-}) => {
-  const { t } = useTranslation("onboarding");
-  const bpm = getFirstRiffExercise(level).metronomeSpeed?.recommended;
-
-  return (
-    <div className='overflow-hidden rounded-lg bg-zinc-900'>
-      <div className='relative aspect-[2/1] sm:aspect-[972/280]'>
-        <Image
-          src={FIRST_RIFF_IMAGE}
-          alt=''
-          fill
-          sizes='(min-width: 640px) 512px, 100vw'
-          className='object-cover object-left'
-        />
-        {/* The screenshot's own near-black runs into the card instead of ending on an edge. */}
-        <span
-          aria-hidden
-          className='absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent to-zinc-900'
-        />
-      </div>
-      <div className='space-y-5 p-5 sm:p-6'>
-        <div>
-          {/* The length sits beside the title only; the description below gets
-              the card's full width, or a phone squeezes it to four lines. */}
-          <div className='flex items-center justify-between gap-4'>
-            <h2 className='min-w-0 text-xl font-semibold text-zinc-100'>
-              {t("play_step.riff_title")}
-            </h2>
-            <span className='shrink-0 font-teko text-5xl font-medium leading-none tabular-nums text-zinc-100'>
-              {FIRST_RIFF_DURATION_LABEL}
-            </span>
-          </div>
-          <p className='mt-1 text-sm leading-relaxed text-zinc-400'>
-            <span className='block'>
-              {t(`play_step.riff_levels.${level}`, { bpm: bpm ?? "" })}
-            </span>
-            <span className='block'>{t("play_step.riff_mic")}</span>
-          </p>
-        </div>
-        <Button
-          size='lg'
-          className='w-full'
-          onClick={onPlay}
-          disabled={disabled}>
-          {isPending ? (
-            <Loader2 className='animate-spin' />
-          ) : (
-            t("play_step.start")
-          )}
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-/**
- * How long the player has played decides which answers the next question
- * offers, and which plans the plan step lists. Every answer shows the real
- * screen it leads to, and picking the plan stays the player's call — from a
- * short list for their level or the full library.
+ * Three questions, then straight into playing: how long the player has been
+ * playing, how long a day they want to practise (written to Settings → Daily
+ * goal on the spot) and what to do with the first minute — a 40-second riff,
+ * a minute of finding notes on the neck (no guitar needed) or a look around.
+ * Every way out lands on Home, where Kostek's tour starts.
  *
- * Between the two sits "got your guitar with you?": a yes plays a 40-second
- * first riff (its own page) and comes back here for the goal; the other
- * answers show what the app has without opening a session.
+ * The daily goal comes before the first minute on purpose: about half the
+ * players who open the first riff never come back from it, and a question
+ * after it would reach only the other half.
  */
 const OnboardingView = () => {
   const router = useRouter();
   const { t } = useTranslation("onboarding");
-  // The query is in place on the first render (the page has getInitialProps).
-  const [start] = useState(() => readStart(router.query));
-  const [step, setStep] = useState<Step>(start.step);
-  const [level, setLevel] = useState<OnboardingLevel>(start.level);
-  const [playChoice, setPlayChoice] = useState<OnboardingPlayChoice | null>(
-    start.returnedFromRiff ? "play" : null,
-  );
-  // Looking around: the answers show the app, none of them opens an exercise.
-  const isBrowsing = playChoice === "browse" || playChoice === "no_guitar";
-  const [pending, setPending] = useState<string | null>(null);
-  // Held by the desktop step while a phone player reads it.
-  const [destination, setDestination] = useState<{
-    href: string;
-    goal: OnboardingGoal;
-  } | null>(null);
-  const isMobile = useResponsiveStore((state) => state.isMobile);
+  const dispatch = useAppDispatch();
+  const [step, setStep] = useState<OnboardingStep>("level");
+  const [direction, setDirection] = useState<"forward" | "back">("forward");
+  const [level, setLevel] = useState<OnboardingLevel>("new");
+  const [dailyGoal, setDailyGoal] = useState<number | null>(null);
+  // The answer showing green before the next question, or the one being opened.
+  const [picked, setPicked] = useState<string | null>(null);
   // Where the player came from (?from=signup / google_signup), read once.
   const source = parseOnboardingSource(router.query.from);
   // Time-on-step and total duration for the events below.
   const [clock] = useState(createOnboardingClock);
-  const goals = getGoalOptions(level, { isPhone: isMobile });
+  const pickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const busy = picked !== null;
 
   useEffect(() => {
     clock.restart();
-    if (start.returnedFromRiff) {
-      trackOnboardingFirstRiffReturned({ level: start.level, source });
-    } else {
-      trackOnboardingViewed(source);
-    }
+    trackOnboardingViewed(source);
+    return () => {
+      if (pickTimer.current) clearTimeout(pickTimer.current);
+    };
     // Once per mount — a re-render must not count as a second view.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const goTo = (next: OnboardingStep) => {
-    if (step === "desktop") return;
+  /** Shows the answer green for a moment, then runs what it leads to. */
+  const confirm = (key: string, then: () => void) => {
+    if (busy) return;
+    setPicked(key);
+    pickTimer.current = setTimeout(then, PICK_MS);
+  };
+
+  const moveTo = (next: OnboardingStep, to: "forward" | "back") => {
+    setDirection(to);
+    setPicked(null);
+    setStep(next);
+  };
+
+  const goBack = () => {
+    const previous = PREVIOUS[step];
+    if (!previous || busy) return;
     trackOnboardingBack({
       fromStep: step,
       level,
       timeOnStepMs: clock.takeStep(),
     });
-    setStep(next);
+    moveTo(previous, "back");
   };
 
-  const finish = async (
-    result: Omit<OnboardingResult, "level">,
-    href: string,
-    key: string,
-  ) => {
-    setPending(key);
-    trackOnboardingCompleted({
-      level,
-      goal: result.goal,
-      planId: result.planId ?? null,
-      playChoice,
-      destination: href,
-      durationMs: clock.total(),
-      source,
-    });
-    await firebaseSaveOnboarding({
-      level,
-      ...result,
-      playChoice: playChoice ?? undefined,
-    }).catch(() => null);
-    // After the save: the feed's welcome row reads the goal and plan off the user document.
-    void addPlayerJoinedLog();
-    // Not straight to the answer: Home first, where Kostek's tour shows the
-    // app around and ends on the answer. Players dropped on it cold did not
-    // know where they were.
-    const tourHref = getTourHref({
-      goal: result.goal,
-      next: href,
-      noGuitar: playChoice === "no_guitar",
-    });
-    // The answers are saved by now, so a phone player who closes the tab on
-    // the desktop step loses nothing. Someone who just played their first riff
-    // on the phone has seen it work there, so they skip the step.
-    if (isMobile && playChoice !== "play") {
-      clock.takeStep();
-      void router.prefetch(tourHref);
-      setDestination({ href: tourHref, goal: result.goal });
-      setPending(null);
-      setStep("desktop");
-      return;
-    }
-    await router.push(tourHref);
-  };
-
-  const handleDesktopContinue = async () => {
-    if (!destination || pending) return;
-    setPending("desktop");
-    trackOnboardingDesktopHintContinued({
-      level,
-      goal: destination.goal,
-      timeOnStepMs: clock.takeStep(),
-      source,
-    });
-    await router.push(destination.href);
-  };
-
-  const handleLevel = (next: OnboardingLevel, position: number) => {
-    trackOnboardingLevelChosen({
-      level: next,
-      position,
-      timeOnStepMs: clock.takeStep(),
-      source,
-    });
-    setLevel(next);
-    setStep("play");
-  };
-
-  const handlePlayChoice = (choice: OnboardingPlayChoice) => {
-    if (pending) return;
-    trackOnboardingPlayChosen({
-      choice,
-      level,
-      timeOnStepMs: clock.takeStep(),
-      source,
-    });
-    setPlayChoice(choice);
-    if (choice === "play") {
-      setPending("play");
-      void router.push(getFirstRiffHref(level, source));
-      return;
-    }
-    setStep("goal");
-  };
-
-  const handleGoal = (option: GoalOption, position: number) => {
-    if (pending) return;
-    trackOnboardingGoalChosen({
-      goal: option.goal,
-      level,
-      position,
-      optionsShown: goals.map((o) => o.goal),
-      timeOnStepMs: clock.takeStep(),
-      source,
-    });
-    if (option.href === null) {
-      // A player looking around gets the plan library, not a plan opened
-      // on the practice screen.
-      if (isBrowsing) {
-        finish({ goal: option.goal }, ALL_PLANS_HREF, option.goal);
-        return;
-      }
-      setStep("plan");
-      return;
-    }
-    // Songs players expected tabs; they see what they get before committing.
-    if (option.goal === "songs") {
-      setStep("songs");
-      return;
-    }
-    finish({ goal: option.goal }, option.href, option.goal);
-  };
-
-  const handleSongsContinue = () => {
-    if (pending) return;
-    clock.takeStep();
-    finish({ goal: "songs" }, SONGS_HREF, "songs");
-  };
-
-  const handlePlan = (plan: ExercisePlan, position: number) => {
-    if (pending) return;
-    trackOnboardingPlanChosen({
-      plan: {
-        id: plan.id,
-        title: plan.title,
-        difficulty: plan.difficulty,
-        minutes: getPlanMinutes(plan),
+  const handleLevel = (next: OnboardingLevel, position: number) =>
+    confirm(next, () => {
+      trackOnboardingLevelChosen({
+        level: next,
         position,
-      },
-      level,
-      timeOnStepMs: clock.takeStep(),
-      source,
+        timeOnStepMs: clock.takeStep(),
+        source,
+      });
+      setLevel(next);
+      moveTo("daily", "forward");
     });
-    finish({ goal: "plans", planId: plan.id }, getPlanHref(plan.id), plan.id);
-  };
 
-  const handleAllPlans = () => {
-    if (pending) return;
-    trackOnboardingPlanChosen({
-      plan: null,
-      level,
-      timeOnStepMs: clock.takeStep(),
-      source,
+  const handleDailyGoal = (minutes: number, position: number) =>
+    confirm(`daily-${minutes}`, () => {
+      trackOnboardingDailyGoalChosen({
+        minutes,
+        level,
+        position,
+        timeOnStepMs: clock.takeStep(),
+        source,
+      });
+      setDailyGoal(minutes);
+      // The same setting as Settings → Daily goal, saved now: a player who
+      // leaves during the first minute keeps it. The store copy keeps Home's
+      // chart in step without a reload.
+      dispatch(setDailyGoalMinutes(minutes));
+      void firebaseUpdateDailyGoalMinutes(minutes).catch(() => null);
+      moveTo("first", "forward");
     });
-    finish({ goal: "plans" }, ALL_PLANS_HREF, "all-plans");
-  };
+
+  const handleFirst = (choice: OnboardingPlayChoice) =>
+    confirm(choice, async () => {
+      trackOnboardingPlayChosen({
+        choice,
+        level,
+        timeOnStepMs: clock.takeStep(),
+        source,
+      });
+      const href =
+        choice === "play"
+          ? getFirstRiffHref(level, source)
+          : choice === "hunt"
+            ? getFirstHuntHref(level, source)
+            : getTourHref(null);
+      trackOnboardingCompleted({
+        level,
+        dailyGoalMinutes: dailyGoal,
+        playChoice: choice,
+        destination: href,
+        durationMs: clock.total(),
+        source,
+      });
+      await firebaseSaveOnboarding({
+        level,
+        dailyGoalMinutes: dailyGoal,
+        playChoice: choice,
+      }).catch(() => null);
+      // After the save: the feed's welcome row reads the user document.
+      void addPlayerJoinedLog();
+      await router.push(href);
+    });
 
   const handleSkip = () => {
-    if (step === "desktop") return;
     trackOnboardingSkipped({
       step,
       level: step === "level" ? null : level,
       durationMs: clock.total(),
       source,
     });
-    // Skipping is still a new player arriving — they get a feed row, just without a goal on it.
+    // Skipping is still a new player arriving — they get a feed row too.
     void addPlayerJoinedLog();
   };
 
-  const stepIndex = PROGRESS[step];
-  const question: Record<Step, string> = {
+  // The answers on screen, in order, for the number keys.
+  const answers: (() => void)[] =
+    step === "level"
+      ? LEVEL_OPTIONS.map((option, i) => () => handleLevel(option.level, i + 1))
+      : step === "daily"
+        ? DAILY_GOAL_CHOICES.map(
+            (choice, i) => () => handleDailyGoal(choice.minutes, i + 1),
+          )
+        : FIRST_CHOICES.map((choice) => () => handleFirst(choice));
+
+  // Swapped in as the step renders, so a key pressed right after a question
+  // changes already answers the new one.
+  useLayoutEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const { target } = event;
+      if (
+        target instanceof Element &&
+        target.closest("input, textarea, [contenteditable='true']")
+      )
+        return;
+      const index = Number(event.key) - 1;
+      if (!Number.isInteger(index) || !answers[index]) return;
+      event.preventDefault();
+      answers[index]();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [answers]);
+
+  const question: Record<OnboardingStep, string> = {
     level: t("level_step.title"),
-    play: t("play_step.title"),
-    goal: t(
-      start.returnedFromRiff
-        ? "goal_step.title_after_play"
-        : playChoice === "no_guitar"
-          ? "goal_step.title_no_guitar"
-          : "goal_step.title",
-    ),
-    plan: t("plan_step.title"),
-    songs: t("songs_step.title"),
-    desktop: t("desktop_hint.title"),
+    daily: t("daily_step.title"),
+    first: t("first_step.title"),
   };
-  // Back from the first riff they ever played here: that is a party.
-  const mood: KostekMood =
-    step === "goal" && start.returnedFromRiff ? "celebrate" : STEP_MOOD[step];
+  const isPicked = (key: string) => picked === key;
+  const isDimmed = (key: string) => busy && picked !== key;
+  const riffBpm = getFirstRiffExercise(level).metronomeSpeed?.recommended;
+  const huntPreview = FIRST_HUNT_PREVIEWS[level];
 
   return (
     <div className='flex min-h-[100dvh] flex-col bg-zinc-950 text-zinc-100'>
-      <header className='mx-auto flex w-full max-w-4xl items-center justify-between gap-4 px-4 py-5 sm:px-6'>
+      <header className='mx-auto flex w-full max-w-4xl items-center gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6'>
         <Image
           src='/images/longlightlogo.svg'
           alt='Riff Quest'
           width={100}
           height={24}
-          className='block max-h-5 w-auto'
+          className='mr-4 hidden max-h-5 w-auto lg:block'
           priority
         />
-        {/* Nothing is left to skip once the answers are in. */}
-        {step !== "desktop" && (
-          <Link
-            href={getTourHref(null)}
-            onClick={handleSkip}
-            className={cn(
-              "rounded-lg px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-200",
-              FOCUS_RING,
-            )}>
-            {t("skip")}
-          </Link>
-        )}
+        <Button
+          type='button'
+          variant='ghost'
+          size='icon'
+          aria-label={t("back")}
+          onClick={goBack}
+          disabled={busy}
+          className={cn("shrink-0", !PREVIOUS[step] && "invisible")}>
+          <ArrowLeft />
+        </Button>
+        <ProgressBar value={STEPS.indexOf(step) + 1} label={t("progress")} />
+        <Link
+          href={getTourHref(null)}
+          onClick={handleSkip}
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "sm" }),
+            "shrink-0",
+          )}>
+          {t("skip")}
+        </Link>
       </header>
 
-      <div
-        className='mx-auto flex w-full max-w-4xl gap-2 px-4 sm:px-6'
-        role='progressbar'
-        aria-label={t("progress")}
-        aria-valuemin={1}
-        aria-valuemax={PROGRESS_SEGMENTS}
-        aria-valuenow={stepIndex + 1}>
-        {Array.from({ length: PROGRESS_SEGMENTS }, (_, i) => (
-          <span
-            key={i}
-            className={cn(
-              "h-1 flex-1 rounded-full transition-colors duration-base",
-              i <= stepIndex ? "bg-cyan-400" : "bg-zinc-800",
-            )}
+      <main className='mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 pb-16 pt-6 sm:px-6 sm:pt-10'>
+        {/* On a computer the question and its answers sit in the middle of
+            the window, not against its top edge. */}
+        <div className='lg:my-auto lg:pb-12'>
+          {/* Kostek asks every question. On a phone it sits small on the left
+              and the bubble takes the rest of the row, so the question needs
+              one or two lines and the answers start above the fold. */}
+          <KostekSays
+            heading
+            text={question[step]}
+            mood={picked ? "approve" : STEP_MOOD[step]}
+            cue={picked ? `${step}-picked` : step}
+            short
+            lively
+            arrive
+            delay={0.25}
+            className='mb-6 w-full justify-start gap-3 sm:mx-auto sm:mb-10 sm:max-w-2xl sm:justify-center sm:gap-5'
+            kostekClassName='h-16 sm:h-28'
+            bubbleClassName='w-fit max-w-full px-4 py-3 text-xl font-semibold leading-snug tracking-tight sm:px-6 sm:py-4 sm:text-3xl'
+            bubbleSlotClassName='min-w-0 flex-1 shrink sm:w-[28rem] sm:flex-none'
           />
-        ))}
-      </div>
 
-      <main className='mx-auto w-full max-w-4xl flex-1 px-4 pb-16 pt-8 sm:px-6 sm:pt-12'>
-        {/* Kostek stays on screen for the whole onboarding and asks each
-            question in its bubble; moving on makes it bounce and change face
-            while the new question types itself out. */}
-        <KostekSays
-          heading
-          text={question[step]}
-          mood={mood}
-          cue={step}
-          short
-          lively
-          arrive
-          delay={0.25}
-          // A fixed-width row: the bubble grows to the right, Kostek never
-          // shifts when a longer or shorter question comes in.
-          className='mx-auto mb-6 w-full max-w-2xl justify-center gap-3 sm:mb-8 sm:gap-5'
-          kostekClassName='h-24 sm:h-36'
-          bubbleClassName='w-fit max-w-full px-4 py-3 text-lg font-semibold leading-snug tracking-tight sm:px-6 sm:py-4 sm:text-3xl'
-          bubbleSlotClassName='w-[13rem] sm:w-[28rem]'
-        />
-        {step === "level" && (
-          <StepBody key='level'>
-            <StepHeading />
-            <div className='grid gap-4 sm:grid-cols-3'>
-              {LEVEL_OPTIONS.map((option, index) => (
-                <button
-                  key={option.level}
-                  type='button'
-                  onClick={() => handleLevel(option.level, index + 1)}
-                  className={cn(
-                    "group flex items-center gap-5 rounded-lg bg-zinc-900/60 p-5 text-left transition-colors hover:bg-zinc-800/60 sm:flex-col sm:items-stretch sm:gap-6 sm:p-6",
-                    FOCUS_RING,
-                  )}>
-                  <span className='flex w-24 shrink-0 flex-col sm:w-auto'>
-                    <span className='font-teko text-6xl font-medium tabular-nums leading-none text-zinc-100 transition-colors duration-base group-hover:text-cyan-400 sm:text-8xl'>
-                      {option.years}
+          <div
+            key={step}
+            className={cn(
+              "duration-base animate-in fade-in",
+              direction === "forward"
+                ? "slide-in-from-right-8"
+                : "slide-in-from-left-8",
+            )}>
+            {step === "level" && (
+              <div className='grid gap-3 sm:grid-cols-3 sm:gap-4'>
+                {LEVEL_OPTIONS.map((option, index) => (
+                  <AnswerKey
+                    key={option.level}
+                    picked={isPicked(option.level)}
+                    dimmed={isDimmed(option.level)}
+                    disabled={busy}
+                    shortcut={index + 1}
+                    onClick={() => handleLevel(option.level, index + 1)}
+                    className='items-center gap-5 p-5 pr-12 sm:flex-col sm:items-stretch sm:gap-6 sm:p-6'>
+                    <span className='flex w-24 shrink-0 flex-col sm:w-auto'>
+                      <span
+                        className={cn(
+                          "font-teko text-6xl font-medium tabular-nums leading-none text-zinc-100 sm:text-8xl",
+                          PICKED_TEXT,
+                        )}>
+                        {option.years}
+                      </span>
+                      <span className='text-sm text-zinc-500'>
+                        {t(`levels.${option.level}.unit`, option.unit)}
+                      </span>
                     </span>
-                    <span className='text-sm text-zinc-500'>{t(`levels.${option.level}.unit`, option.unit)}</span>
-                  </span>
-                  <span className='min-w-0'>
-                    <span className='block text-base font-medium text-zinc-100'>
-                      {t(`levels.${option.level}.label`, option.label)}
+                    <span className='min-w-0'>
+                      <span
+                        className={cn(
+                          "block text-base font-medium text-zinc-100",
+                          PICKED_TEXT,
+                        )}>
+                        {t(`levels.${option.level}.label`, option.label)}
+                      </span>
+                      <span className='mt-1 block text-sm leading-relaxed text-zinc-400'>
+                        {t(
+                          `levels.${option.level}.description`,
+                          option.description,
+                        )}
+                      </span>
                     </span>
-                    <span className='mt-1 block text-sm leading-relaxed text-zinc-400'>
-                      {t(`levels.${option.level}.description`, option.description)}
-                    </span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </StepBody>
-        )}
-
-        {step === "play" && (
-          <StepBody key='play'>
-            <StepHeading
-              onBack={pending ? undefined : () => goTo("level")}
-            />
-            <div className='mx-auto max-w-lg'>
-              <FirstRiffCard
-                level={level}
-                isPending={pending === "play"}
-                disabled={!!pending}
-                onPlay={() => handlePlayChoice("play")}
-              />
-              {/* The other answers stay quiet: rows, not cards, under the one we hope for. */}
-              <div className='mt-6 space-y-1'>
-                {LOOK_AROUND_CHOICES.map((choice) => (
-                  <button
-                    key={choice}
-                    type='button'
-                    disabled={!!pending}
-                    onClick={() => handlePlayChoice(choice)}
-                    className={cn(
-                      "group flex w-full items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-sm text-zinc-300 transition-colors hover:bg-zinc-900 hover:text-zinc-100",
-                      FOCUS_RING,
-                    )}>
-                    {t(`play_step.options.${choice}`, LOOK_AROUND_LABELS[choice])}
-                    <ArrowRight className='h-4 w-4 shrink-0 text-zinc-500 transition-colors group-hover:text-zinc-200' />
-                  </button>
+                  </AnswerKey>
                 ))}
               </div>
-            </div>
-          </StepBody>
-        )}
+            )}
 
-        {step === "goal" && (
-          <StepBody key='goal'>
-            <StepHeading
-              // One line so the tiles read as what's worth a look without a guitar.
-              description={
-                playChoice === "no_guitar"
-                  ? t("goal_step.no_guitar_hint")
-                  : undefined
-              }
-              onBack={pending ? undefined : () => goTo("play")}
-            />
-            <div className='grid gap-4 sm:grid-cols-2'>
-              {goals.map((option, index) => (
-                <GoalTile
-                  key={option.goal}
-                  option={option}
-                  // An odd count leaves one tile alone on its row; the first
-                  // one takes the full width instead.
-                  isWide={index === 0 && goals.length % 2 === 1}
-                  isPending={pending === option.goal}
-                  isDimmed={!!pending && pending !== option.goal}
-                  onClick={() => handleGoal(option, index + 1)}
-                />
-              ))}
-            </div>
-          </StepBody>
-        )}
+            {step === "daily" && (
+              <>
+                <p className='-mt-2 mb-5 text-sm text-zinc-400 sm:-mt-4 sm:mb-8 sm:text-center'>
+                  {t("daily_step.hint")}
+                </p>
+                <div className='grid gap-3 sm:grid-cols-4 sm:gap-4'>
+                  {DAILY_GOAL_CHOICES.map((choice, index) => {
+                    const key = `daily-${choice.minutes}`;
+                    return (
+                      <AnswerKey
+                        key={choice.minutes}
+                        picked={isPicked(key)}
+                        dimmed={isDimmed(key)}
+                        disabled={busy}
+                        shortcut={index + 1}
+                        onClick={() =>
+                          handleDailyGoal(choice.minutes, index + 1)
+                        }
+                        cornerClassName='top-1/2 -translate-y-1/2 sm:top-3 sm:translate-y-0'
+                        className='items-center gap-4 px-5 py-3 pr-14 sm:flex-col sm:items-stretch sm:gap-5 sm:p-6'>
+                        <span className='flex w-16 shrink-0 flex-col sm:w-auto'>
+                          <span
+                            className={cn(
+                              "font-teko text-5xl font-medium tabular-nums leading-none text-zinc-100 sm:text-7xl",
+                              PICKED_TEXT,
+                            )}>
+                            {choice.minutes}
+                          </span>
+                          <span className='text-sm text-zinc-500'>
+                            {t("daily_step.unit")}
+                          </span>
+                        </span>
+                        <span
+                          className={cn(
+                            "ml-auto text-sm text-zinc-400 sm:ml-0",
+                            PICKED_TEXT,
+                          )}>
+                          {t(`daily_step.vibes.${choice.vibe}`)}
+                        </span>
+                      </AnswerKey>
+                    );
+                  })}
+                </div>
+              </>
+            )}
 
-        {step === "plan" && (
-          <StepBody key='plan'>
-            <StepHeading
-              onBack={pending ? undefined : () => goTo("goal")}
-            />
-            <div className='grid gap-4 sm:grid-cols-2'>
-              {getOnboardingPlans(level).map((plan, index) => (
-                <PlanCard
-                  key={plan.id}
-                  plan={plan}
-                  onSelect={() => handlePlan(plan, index + 1)}
-                  onStart={() => handlePlan(plan, index + 1)}
-                  startButtonText={t("plan_step.open")}
-                  isLoading={pending === plan.id}
-                />
-              ))}
-            </div>
-            <Button
-              type='button'
-              variant='ghost'
-              onClick={handleAllPlans}
-              disabled={!!pending}
-              className='mx-auto mt-8 flex'>
-              {pending === "all-plans" ? (
-                <Loader2 className='animate-spin' />
-              ) : (
-                <Library className='text-zinc-400' />
-              )}
-              {t("plan_step.browse_all", { count: ALL_PLANS_COUNT })}
-            </Button>
-          </StepBody>
-        )}
+            {step === "first" && (
+              <>
+                <div className='grid gap-3 sm:grid-cols-2 sm:gap-4'>
+                  <AnswerKey
+                    picked={isPicked("play")}
+                    dimmed={isDimmed("play")}
+                    disabled={busy}
+                    shortcut={1}
+                    onClick={() => handleFirst("play")}
+                    cornerClassName='left-2.5 top-auto bottom-2.5 right-auto sm:bottom-auto sm:left-auto sm:right-3 sm:top-3'
+                    className='overflow-hidden sm:flex-col'>
+                    <span className='relative block min-h-[128px] w-28 shrink-0 bg-zinc-950 sm:h-40 sm:w-full'>
+                      <Image
+                        src={FIRST_RIFF_IMAGE}
+                        alt=''
+                        fill
+                        sizes='(min-width: 640px) 440px, 112px'
+                        className='object-cover object-left'
+                      />
+                    </span>
+                    <FirstMinuteText
+                      title={t("first_step.riff_title")}
+                      duration={FIRST_RIFF_DURATION_LABEL}
+                      description={t(`first_step.riff_levels.${level}`, {
+                        bpm: riffBpm ?? "",
+                      })}
+                      needs={
+                        <span className='inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400'>
+                          <Guitar className='h-3.5 w-3.5' />
+                          {t("first_step.riff_needs")}
+                        </span>
+                      }
+                    />
+                  </AnswerKey>
 
-        {step === "songs" && (
-          <StepBody key='songs'>
-            <StepHeading
-              description={t("songs_step.description")}
-            />
-            {/* Sized to fit a phone screen without scrolling, buttons included. */}
-            <div className='mx-auto max-w-md space-y-5'>
-              <TabsNotIncluded />
-              <SongFeatures />
-              <div className='space-y-1'>
-                <Button
-                  size='lg'
-                  className='w-full'
-                  onClick={handleSongsContinue}
-                  disabled={!!pending}>
-                  {pending === "songs" ? (
-                    <Loader2 className='animate-spin' />
-                  ) : (
-                    t("songs_step.continue")
-                  )}
-                </Button>
-                {/* The way back is as plain as the way on: no tabs may be a
-                    dealbreaker, and another answer is one tap away. */}
-                <Button
-                  type='button'
-                  variant='ghost'
-                  size='lg'
-                  className='w-full'
-                  onClick={() => goTo("goal")}
-                  disabled={!!pending}>
-                  <ArrowLeft />
-                  {t("songs_step.other")}
-                </Button>
-              </div>
-            </div>
-          </StepBody>
-        )}
+                  <AnswerKey
+                    picked={isPicked("hunt")}
+                    dimmed={isDimmed("hunt")}
+                    disabled={busy}
+                    shortcut={2}
+                    onClick={() => handleFirst("hunt")}
+                    cornerClassName='left-2.5 top-auto bottom-2.5 right-auto sm:bottom-auto sm:left-auto sm:right-3 sm:top-3'
+                    className='overflow-hidden sm:flex-col'>
+                    <span className='relative block min-h-[128px] w-28 shrink-0 bg-zinc-950 sm:h-40 sm:w-full'>
+                      <HuntPreview preview={huntPreview} />
+                      <span className='absolute left-2 top-2 rounded-md bg-zinc-950/85 px-2 py-0.5 text-xs font-medium text-zinc-400'>
+                        {t("first_step.hunt_find")}{" "}
+                        <b className='font-bold text-zinc-100'>
+                          {huntPreview.target}
+                        </b>
+                      </span>
+                    </span>
+                    <FirstMinuteText
+                      title={t("first_step.hunt_title")}
+                      duration={FIRST_HUNT_DURATION_LABEL}
+                      description={t(`first_step.hunt_levels.${level}`)}
+                      needs={
+                        <span className='inline-flex items-center gap-1.5 text-xs font-medium text-emerald-300'>
+                          <MousePointerClick className='h-3.5 w-3.5' />
+                          {t("first_step.hunt_needs")}
+                        </span>
+                      }
+                    />
+                  </AnswerKey>
+                </div>
 
-        {step === "desktop" && (
-          <StepBody key='desktop'>
-            <StepHeading
-              description={t("desktop_hint.description")}
-            />
-            <div className='mx-auto max-w-md space-y-8'>
-              <PhoneToDesktop />
-              <Button
-                size='lg'
-                className='w-full'
-                onClick={handleDesktopContinue}
-                disabled={!!pending}>
-                {pending === "desktop" ? (
-                  <Loader2 className='animate-spin' />
-                ) : (
-                  t("desktop_hint.continue")
-                )}
-              </Button>
-            </div>
-          </StepBody>
-        )}
+                <AnswerKey
+                  picked={isPicked("browse")}
+                  dimmed={isDimmed("browse")}
+                  disabled={busy}
+                  shortcut={3}
+                  onClick={() => handleFirst("browse")}
+                  cornerClassName='top-1/2 -translate-y-1/2'
+                  className='mt-4 w-full items-center px-4 py-3 pr-14 text-sm font-medium text-zinc-300'>
+                  <span className={cn("flex-1", PICKED_TEXT)}>
+                    {t("first_step.browse")}
+                  </span>
+                  <ArrowRight className='h-4 w-4 shrink-0 text-zinc-500 group-data-[picked=true]:hidden lg:hidden' />
+                </AnswerKey>
+              </>
+            )}
+          </div>
+        </div>
       </main>
     </div>
   );

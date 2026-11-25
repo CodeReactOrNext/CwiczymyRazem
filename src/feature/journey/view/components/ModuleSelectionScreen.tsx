@@ -182,7 +182,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                   ease: "easeOut",
                 }}
                 aria-label={module.title}
-                className='group relative flex w-full flex-col gap-4 overflow-hidden rounded-xl bg-zinc-900 px-4 py-[18px] text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-[#1f1f23] sm:gap-5 sm:px-6 sm:py-[22px]'>
+                className='group relative flex w-full flex-col gap-4 overflow-hidden rounded-xl bg-zinc-900 px-4 py-[18px] text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-[var(--road-card-hover,#1f1f23)] sm:gap-5 sm:px-6 sm:py-[22px]'>
                 <div className='flex items-center gap-4'>
                   <div
                     className={cn(
@@ -244,7 +244,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
               around the player's own goal on Player Roadmaps. */}
           <Link
             href='/my-roadmaps'
-            className='group flex w-full flex-col gap-4 rounded-xl bg-zinc-900 px-4 py-[18px] transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-[#1f1f23] sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-[22px]'>
+            className='group flex w-full flex-col gap-4 rounded-xl bg-zinc-900 px-4 py-[18px] transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-[var(--road-card-hover,#1f1f23)] sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-[22px]'>
             <div className='flex min-w-0 flex-1 items-center gap-4'>
               <div className='flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-lg bg-zinc-800 sm:h-12 sm:w-12'>
                 <Signpost

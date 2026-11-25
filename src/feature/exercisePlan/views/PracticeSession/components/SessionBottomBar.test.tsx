@@ -7,8 +7,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { useSessionTimeStore } from "../hooks/sessionTimeStore";
 import { SessionBottomBar } from "./SessionBottomBar";
 
-vi.mock("./MainTimerSection", () => ({ MainTimerSection: () => null, default: () => null }));
-vi.mock("./ShortcutsLegend", () => ({ ShortcutsLegend: () => null }));
+vi.mock("./SessionTransport", () => ({ SessionTransport: () => null }));
+vi.mock("./ShortcutsLegend", () => ({ ShortcutsDialog: () => null }));
 
 afterEach(() => {
   cleanup();
@@ -20,7 +20,6 @@ const renderBar = (overrides: Partial<Parameters<typeof SessionBottomBar>[0]> = 
   render(
     <SessionBottomBar
       onClose={onClose}
-      exerciseKey={0}
       currentExercise={{ id: "ex", title: "Ex", metronomeSpeed: null } as unknown as Exercise}
       isLastExercise={false}
       isPlaying={false}
@@ -41,6 +40,15 @@ const renderBar = (overrides: Partial<Parameters<typeof SessionBottomBar>[0]> = 
 };
 
 const clickExit = () => fireEvent.click(screen.getAllByRole("button")[0]);
+
+describe("SessionBottomBar verdict", () => {
+  it("answers a finished run in place of the transport, with the way out kept", () => {
+    renderBar({ totalExercises: 4, verdict: { tone: "good", strip: <p>Clean run</p> } });
+    expect(screen.getByText("Clean run")).toBeDefined();
+    expect(screen.queryByRole("button", { name: /next/i })).toBeNull();
+    expect(screen.getAllByRole("button")).toHaveLength(1);
+  });
+});
 
 describe("SessionBottomBar exit", () => {
   it("leaves straight away when nothing was practised yet", () => {
@@ -82,5 +90,35 @@ describe("SessionBottomBar exit", () => {
     clickExit();
 
     expect(document.activeElement).toBe(screen.getByRole("button", { name: /stay in session/i }));
+  });
+});
+
+describe("SessionBottomBar moving on", () => {
+  it("says what Next leads to, and turns white once the clock is down", () => {
+    renderBar({ totalExercises: 3, nextTitle: "Spider walk" });
+    const quiet = screen.getByRole("button", { name: /spider walk/i });
+    expect(quiet.className).not.toContain("bg-primary");
+
+    cleanup();
+    renderBar({ totalExercises: 3, nextTitle: "Spider walk", isTimeUp: true });
+    expect(screen.getByRole("button", { name: /spider walk/i }).className).toContain("bg-primary");
+  });
+
+  it("offers Finish only once there is something to save", () => {
+    renderBar({ isLastExercise: true });
+    expect(screen.queryByRole("button", { name: /finish session/i })).toBeNull();
+
+    cleanup();
+    renderBar({ isLastExercise: true, hasLoggedPractice: true });
+    expect(screen.getByRole("button", { name: /finish session/i }).className).not.toContain("bg-primary");
+
+    cleanup();
+    renderBar({ isLastExercise: true, hasLoggedPractice: true, canFinishSession: true });
+    expect(screen.getByRole("button", { name: /finish session/i }).className).toContain("bg-primary");
+  });
+
+  it("has neither in an exam", () => {
+    renderBar({ examMode: true, isLastExercise: true, hasLoggedPractice: true });
+    expect(screen.queryByRole("button", { name: /finish session|next/i })).toBeNull();
   });
 });

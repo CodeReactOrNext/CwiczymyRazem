@@ -178,8 +178,8 @@ describe("useNoteMatching — run log", () => {
     expect(Object.keys(result.current.hitNotes)).toHaveLength(1);
     // …but the run remembers both notes, with what each was graded on.
     expect(result.current.runLogRef.current).toEqual([
-      { hit: true, timingMs: 0, cents: 10 },
-      { hit: true, timingMs: 0, cents: 10 },
+      { hit: true, timingMs: 0, cents: 10, measure: 0 },
+      { hit: true, timingMs: 0, cents: 10, measure: 0 },
     ]);
   });
 });

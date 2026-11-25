@@ -25,7 +25,7 @@ import { useSuppressUiSounds } from "lib/uiSounds/uiSounds";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
@@ -38,17 +38,22 @@ import { getCountInDurationMs } from "../../components/Metronome/utils/countInDu
 import { deriveMetronomeGrid } from "../../components/Metronome/utils/meterGrid";
 import type { ExercisePlan } from "../../types/exercise.types";
 import { hasLeaderboard } from "../../utils/hasLeaderboard";
-import { isClickAnsweredMode } from "../../utils/huntModes";
+import { isClickAnsweredMode, isWholeNeckHunt } from "../../utils/huntModes";
 import { SONG_TAB_METRONOME_SPEED } from "../../utils/songToExercise";
 import { DesktopSessionView } from "./components/DesktopSessionView";
+import { EarRiddleStrip } from "./components/EarRiddleStrip";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
 import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
 import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
+import { getRoundVerdictMs, HuntRoundStrip, IntervalRoundStrip, ROUND_VERDICT_TONE } from "./components/HuntRoundStrip";
 import { OutputStalledNotice } from "./components/OutputStalledNotice";
+import { PlanInterlude } from "./components/PlanInterlude";
 import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
 import { SessionDialogs } from "./components/SessionDialogs";
 import { gpLoadingSteps, isStillLoading } from "./components/SessionLoadingSteps";
+import { BarDrillStrip, getVerdictTone, RunVerdictStrip } from "./components/SessionVerdict";
 import { SongSectionMapPanel } from "./components/SongSectionMapPanel";
+import type { StartGateMic } from "./components/StartGate";
 import { useTablatureSettings } from "./components/tablatureSettings";
 import { TimingCalibrationDialog } from "./components/TimingCalibrationDialog";
 import { TuningSettingsModal } from "./components/TuningSettingsModal";
@@ -63,6 +68,7 @@ import { TabOverlayProvider } from "./contexts/TabOverlayContext";
 import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
 import { withBackingTempo } from "./helpers/backingTempoOverlay";
 import { earQuizExamAccuracy, earQuizExamMinAnswers, useEarQuizRunStore } from "./helpers/earQuizRunStore";
+import { useEarQuizVerdictStore } from "./helpers/earQuizVerdictStore";
 import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
 import {
   loadGlobalMasterVolume,
@@ -76,10 +82,12 @@ import { strumSynthVolume } from "./helpers/strumSynthVolume";
 import { useTabPlayUntilStore } from "./hooks/tabPlayUntilStore";
 import type { TempoRuler } from "./hooks/tempoBeatClock";
 import { createTempoRulerFromMeasures } from "./hooks/tempoBeatClock";
+import { useBarDrill } from "./hooks/useBarDrill";
 import { useBossFightSession } from "./hooks/useBossFightSession";
 import { useCalibration } from "./hooks/useCalibration";
 import { useDesktopSessionIntegration } from "./hooks/useDesktopSessionIntegration";
 import { useEarTraining } from "./hooks/useEarTraining";
+import { useExerciseTimeUp } from "./hooks/useExerciseTimeUp";
 import { useGeneratedExercise, willHaveTablature } from "./hooks/useGeneratedExercise";
 import { useGoalRunVerdict } from "./hooks/useGoalRunVerdict";
 import { useGpFileLoader } from "./hooks/useGpFileLoader";
@@ -99,8 +107,10 @@ import { useSongExerciseGpFile } from "./hooks/useSongExerciseGpFile";
 import { timingInputPath, useTimingCalibration } from "./hooks/useTimingCalibration";
 import { useUpdateRequiredGate } from "./hooks/useUpdateRequiredGate";
 import SessionModal from "./modals/SessionModal";
+import { DRILL_PASSES, DRILL_SPEED } from "./utils/barPasses";
 import type { FreePlayFrame } from "./utils/freePlay";
 import { buildLearnSteps } from "./utils/learnSteps";
+import { getRunVerdict, isPlanHalfway } from "./utils/runVerdict";
 import { shiftTabPitch } from "./utils/shiftTabPitch";
 import { tabPlayUntil } from "./utils/tabPlayUntil";
 import type { TimingPrecision } from "./utils/timingPrecision";
@@ -248,7 +258,7 @@ const PracticeSessionInner = ({
     isSubmittingReport, reportResult, currentUserStats, previousUserStats,
     planTitleString,  timer, activityDataToUse,
     jumpToExercise,  canFinishSession, hasLoggedPractice, isCurrentExercisePlayedOut,
-    completedExercises, restartFullSession,
+    completedExercises, exerciseTimes, restartFullSession,
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount });
   // The upright phone, where PhoneSessionModal lays the practice screen on its
   // side: the run summary and the session summary that follow it lie the same way.
@@ -373,6 +383,16 @@ const PracticeSessionInner = ({
     setIsAudioMuted, setIsMetronomeMuted, setSpeedMultiplier, setSelectedGpTrackIdx,
     setShowAlphaTabScore, toggleAlphaTabScore, resetForExercise
   } = usePlaybackReducer();
+
+  // ── Bar drill ─────────────────────────────────────────────────────────────
+  // The run's weakest bar, looped on its own a little slower. It comes after the
+  // clock ran out, so it never touches the run: that one is frozen first, and
+  // its score is what Next and Finish save (frozenRunRef).
+  const { drill, isDone: isDrillDone, start: startBarDrill, stop: stopBarDrill, handleNoteJudged: handleDrillNote } =
+    useBarDrill(currentExercise.id);
+  const isDrilling = !!drill;
+  const frozenRunRef = useRef<NoteMatchingSnapshot | null>(null);
+  const sessionSpeed = speedMultiplier * (isDrilling ? DRILL_SPEED : 1);
   const [tabRepeatCount] = useState(0);
   const loopsCompletedRef = useRef(0);
   // Suppresses the settings-save effect's first run right after an exercise
@@ -425,7 +445,7 @@ const PracticeSessionInner = ({
     // for the whole `showAlphaTabScore` duration left the count-in completely silent.
     // Only mute the *steady* click post-count-in; count-in beeps stay on this metronome.
     mutePlaybackClick: showAlphaTabScore,
-    speedMultiplier: speedMultiplier,
+    speedMultiplier: sessionSpeed,
     tempoRulerRef,
     onTick:         useCallback(() => { tabTickBridgeRef.current?.(); }, []),
     externalAudioContext: effectiveRawGpFile ? audioSystem.context : undefined,
@@ -435,7 +455,7 @@ const PracticeSessionInner = ({
   // `bpm * speedMultiplier`, so the tablature audio + visual cursor (which use
   // effectiveBpm) must use the same exact value or they drift apart at non-100%
   // speeds (e.g. 55 × 0.75 = 41.25 vs rounded 41).
-  const effectiveBpm           = metronome.bpm * speedMultiplier;
+  const effectiveBpm           = metronome.bpm * sessionSpeed;
   const isAudioPlaying         = metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime;
 
   // ── Aligning a backing track is start-stop-start work ─────────────────────
@@ -621,7 +641,8 @@ const PracticeSessionInner = ({
     [gpTrackMeasures, gpPitchShift],
   );
 
-  const rawTablature = riddleMeasures
+  const rawTablature = drill?.tablature
+    || riddleMeasures
     || (parsedGpTracks ? playedGpMeasures : undefined)
     || activeExercise.tablature;
 
@@ -690,15 +711,17 @@ const PracticeSessionInner = ({
     measures: activeTablature,
     tuningOffsets: guitarTuning.tuning.offsets,
     repeatCount: tabRepeatCount,
-    blocked: !!effectiveRawGpFile || !!parsedGpTracks || !!riddleMeasures || (isExamMode && !!activeExercise.examBacking),
+    blocked: !!effectiveRawGpFile || !!parsedGpTracks || !!riddleMeasures || isDrilling || (isExamMode && !!activeExercise.examBacking),
     boss: bossFight ? { phase: bossFight.phase, score: bossFight.score } : undefined,
   });
 
   const dynamicBackingTracks = useMemo(() => {
+    // A backing plays the whole tab; under one bar of it, it would be the wrong bars.
+    if (isDrilling) return undefined;
     if (parsedGpTracks && parsedGpTracks.length > 1) return parsedGpTracks.filter((_, idx) => idx !== gpTrackIdx);
     if (activeExercise.backingTracks?.length) return activeExercise.backingTracks;
     return autoBacking.tracks;
-  }, [parsedGpTracks, gpTrackIdx, activeExercise.backingTracks, autoBacking.tracks]);
+  }, [isDrilling, parsedGpTracks, gpTrackIdx, activeExercise.backingTracks, autoBacking.tracks]);
 
   // ── The tab's guitar starts off over a backing ────────────────────────────
   // With a band (generated, the exercise's own, a GP file's other tracks or the
@@ -764,7 +787,7 @@ const PracticeSessionInner = ({
   // its backing, a riddle plays once.
   const setTabPlayUntil = useTabPlayUntilStore(s => s.setUntil);
   const cutsTabAtTimeUp = !freeMode && exerciseDurationSeconds > 0 && !isExamMode
-    && !isEarTrainingRiddle && !effectiveRawGpFile && !showAlphaTabScore;
+    && !isEarTrainingRiddle && !effectiveRawGpFile && !showAlphaTabScore && !isDrilling;
   useEffect(() => {
     const ctx = metronome.audioContext;
     if (!cutsTabAtTimeUp || !isAudioPlaying || !ctx || effectiveAudioStartTime == null) {
@@ -790,6 +813,12 @@ const PracticeSessionInner = ({
     { file: t("loading_steps.file"), parse: t("loading_steps.parse"), sound: t("loading_steps.sound") },
   );
   const gpLoading = isStillLoading(gpSteps);
+
+  // Whether this exercise opens behind the start gate over its tab.
+  const hasTabGate = isWholeNeckHunt(currentExercise) || !!currentExercise.earQuizConfig
+    || !!activeTablature?.length && !bossFight && !backingTrack.isCinema
+    && !currentExercise.customGoal && !currentExercise.earQuizConfig
+    && currentExercise.id !== "metronome_gap_test" && !isEarTrainingRiddle;
 
   /**
    * One instrument level, changed from the alignment screen's mixer.
@@ -823,11 +852,13 @@ const PracticeSessionInner = ({
   // desktop app keep separate measurements (different capture chains).
   const calibratedLatencyMs = timingByPath[timingInputPath(isNative)].latencyMs;
 
+  const isMicRequired = (isExamMode || isGoalMode || !!plan.duel || isRecordingTake) && !currentExercise.disableMic;
+  const micAskedOnGate = !isMicRequired && (gpLoading || hasTabGate);
   const {
     sessionPhase, isMicEnabled: _isMicEnabled, handleEnableMic, handleSkipMic,
     handleReuseCalibration, handleRecalibrate, handleCalibrationComplete, handleCalibrationCancel,
     getAdjustedTargetFreq, existingCalibrationTimestamp, setIsMicEnabled: updateMicPersistence, setSessionPhase,
-  } = useCalibration(planHasTablature, (isExamMode || isGoalMode || !!plan.duel || isRecordingTake) && !currentExercise.disableMic, micStart);
+  } = useCalibration(planHasTablature, isMicRequired, micStart);
   // The wizard opens the input itself and enables the mic only when it
   // finishes — closing it early has to close that stream too, or the tuner keeps
   // reading the guitar and the mic looks on while nothing is being scored.
@@ -1078,8 +1109,59 @@ const PracticeSessionInner = ({
     startTime: metronome.startTime,
     msPerBar: (60000 / effectiveBpm) * (huntBarSteps / stepsPerBeat(metronome.gridUnit)),
   };
-  const { target: huntTarget, secondsLeft: noteHuntSecondsLeft, secondsTotal: noteHuntSecondsTotal, advance: advanceHunt } = useNoteHuntRotation(currentExercise, isPlaying, huntSolvedRef, isExamMode, huntBarClock);
+  const isTimeUp = useExerciseTimeUp(timer, exerciseDurationSeconds, freeMode);
+  const {
+    target: huntTarget, secondsLeft: noteHuntSecondsLeft, secondsTotal: noteHuntSecondsTotal, advance: advanceHunt,
+    roundEnd: huntRoundEnd, streak: huntStreak, resetStreak: resetHuntStreak,
+  } = useNoteHuntRotation(currentExercise, isPlaying, huntSolvedRef, isExamMode, huntBarClock, !isTimeUp);
+  // A round's verdict holds the session's clock. To the player the session is
+  // still running: Pause stays Pause, and pressing it lets the next note come
+  // up with the clock stopped. Click-answered rounds don't hold it: their score
+  // goes on a leaderboard, and held time would buy extra rounds.
+  const huntMode = currentExercise.noteHuntConfig?.mode;
+  const isClickHunt = isClickAnsweredMode(huntMode);
+  const isHuntHeld = huntRoundEnd !== null && !isClickHunt;
+  const isQuizVerdictShown = useEarQuizVerdictStore((state) => state.isShown);
+  // A listening round's explanation is there to be read, so it doesn't cost
+  // practice time either. Exams, duels and takes are against the clock.
+  const [isQuizHeld, setIsQuizHeld] = useState(false);
+  const holdsForQuiz = isQuizVerdictShown && !isExamMode && !plan.duel && !plan.recording;
+  if (holdsForQuiz && isPlaying && !isQuizHeld) setIsQuizHeld(true);
+  if (!isQuizVerdictShown && isQuizHeld) setIsQuizHeld(false);
+  useEffect(() => { if (isQuizHeld) stopTimer(); }, [isQuizHeld, stopTimer]);
+  const continueQuiz = useCallback(() => {
+    if (isQuizHeld) startTimer();
+  }, [isQuizHeld, startTimer]);
+  const isRunning = isPlaying || isHuntHeld || isQuizHeld;
+  useEffect(() => { if (isHuntHeld) stopTimer(); }, [isHuntHeld, stopTimer]);
+  const continueHunt = useCallback(() => {
+    advanceHunt();
+    if (!isClickHunt) startTimer();
+  }, [advanceHunt, startTimer, isClickHunt]);
+  // Finished from the verdict: the clock must not come back under the summary.
+  const isWrappingUp = isSubmittingReport || !!reportResult;
+  useEffect(() => {
+    if (!huntRoundEnd || isWrappingUp) return undefined;
+    const id = setTimeout(continueHunt, getRoundVerdictMs(huntRoundEnd.kind, huntMode));
+    return () => clearTimeout(id);
+  }, [huntRoundEnd, isWrappingUp, continueHunt, huntMode]);
+  const stopRun = useCallback(() => {
+    if (huntRoundEnd) advanceHunt();
+    setIsQuizHeld(false);
+    stopTimer();
+  }, [huntRoundEnd, advanceHunt, stopTimer]);
   const [successSnapshot, setSuccessSnapshot] = useState<NoteMatchingSnapshot | null>(null);
+  // How the exercise on screen went, once its clock ran down — what the bar at
+  // the bottom answers it with. The last exercise has the result view for that.
+  const showsVerdict = isTimeUp && !isLastExercise && !isExamMode && !bossFight && !currentExercise.isPlayalong;
+  const [runSnapshot, setRunSnapshot] = useState<NoteMatchingSnapshot | null>(null);
+  useEffect(() => {
+    // A clock that reads open again is a restart: a new run, and no bar drill over it.
+    if (!isTimeUp) stopBarDrill();
+    frozenRunRef.current = null;
+    setRunSnapshot(isTimeUp ? noteMatchingHandle.current?.snapshot() ?? null : null);
+  }, [isTimeUp, currentExerciseIndex, stopBarDrill]);
+  const [showInterlude, setShowInterlude] = useState(false);
   useEffect(() => { if (showSuccessView) setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null); }, [showSuccessView]);
   // The listening quizzes are graded by their own panel, outside the
   // note-matching context, so an exam on one reads its accuracy off the quiz run.
@@ -1108,9 +1190,18 @@ const PracticeSessionInner = ({
   // `micStandingRef`/`earTrainingStandingRef` carry the tempo and leaderboard
   // place of the run that was just saved — every finish path below awaits
   // saveCurrentScores() first, so they are filled by the time the report goes out.
+  // The run that counts: the frozen one while (and after) a bar of it is drilled.
+  const [scoredRunRef] = useState<RefObject<NoteMatchingHandle | null>>(() => ({
+    get current() {
+      const handle = noteMatchingHandle.current;
+      const frozen = frozenRunRef.current;
+      return handle && frozen ? { ...handle, snapshot: () => frozen } : handle;
+    },
+  }));
   const { saveCurrentScores, exerciseRecordsRef, scoredRuns, micStandingRef, earTrainingStandingRef } = useScoreSaving({
-    activeExercise, currentExercise, isMicEnabled, earTrainingScore, getEarTrainingBoardScore, noteMatchingHandle,
-    sessionBpm: effectiveBpm,
+    activeExercise, currentExercise, isMicEnabled, earTrainingScore, getEarTrainingBoardScore,
+    noteMatchingHandle: scoredRunRef,
+    sessionBpm: metronome.bpm * speedMultiplier,
     recordGoalChartRuns: !isGoalMode,
     // A song played through its whole tab is a whole run, however long the song.
     videoDurationSeconds: videoDuration ?? songTabSeconds,
@@ -1257,8 +1348,11 @@ const PracticeSessionInner = ({
   } = useSessionControls({
     // The mic prompt and setup wizard sit over the session too: Space on one of
     // their buttons would otherwise start the run (and an exam's clock) behind them.
-    shortcutsDisabled: isAligningBacking || !!bossFight?.isOver || !!bossFight?.isHolding || sessionPhase !== "ready",
-    isPlaying, stopTimer, startTimer, resetTimer, metronome,
+    // A verdict and the interlude hold the focus on Continue, so Space is theirs.
+    shortcutsDisabled: isAligningBacking || !!bossFight?.isOver || !!bossFight?.isHolding
+      || (sessionPhase !== "ready" && !(sessionPhase === "mic_prompt" && micAskedOnGate))
+      || (showsVerdict && !isDrilling) || showInterlude || isQuizVerdictShown,
+    isPlaying: isRunning, stopTimer: stopRun, startTimer, resetTimer, metronome,
     currentExercise, currentExerciseIndex, isLastExercise, jumpToExercise,
     handleNextExercise, restartFullSession,
     isMicEnabled, closeAudio, updateMicPersistence,
@@ -1268,11 +1362,136 @@ const PracticeSessionInner = ({
     tabRestartKey, setTabRestartKey,
     learnMode: learnEnabled,
   });
+  const handleRestartRun = useCallback(() => {
+    resetHuntStreak();
+    handleRestart();
+  }, [resetHuntStreak, handleRestart]);
   // A restarted session plays the exam again, so its old result must not linger.
   const restartSessionAndExam = () => {
     setExamStars(null);
     handleRestartFullSession();
   };
+
+  // ── Start gate ────────────────────────────────────────────────────────────
+  // The gate over the tab asks about the mic itself, so the question doesn't come
+  // up as a window on top of it. Where no gate stands (hunts, quizzes) or the
+  // mic is a must (exams, duels), it is still the window.
+  const gateMic: StartGateMic | undefined = isMicRequired || currentExercise.disableMic || currentExercise.isPlayalong
+    ? undefined
+    : {
+        enabled: isMicEnabled,
+        isListening,
+        volumeRef: audioRefs.volumeRef,
+        // Never set up: through the wizard first, as the mic prompt does.
+        onEnable: () => {
+          if (isMicEnabled) return;
+          if (sessionPhase === "mic_prompt") handleEnableMic();
+          else void handleMicToggle();
+        },
+        onSkip: () => {
+          if (sessionPhase === "mic_prompt") handleSkipMic();
+          else if (isMicEnabled) void handleMicToggle();
+        },
+      };
+  // Playing without an answer is a "not today" — nothing is saved, so the next
+  // session asks again.
+  useEffect(() => {
+    if (isPlaying && sessionPhase === "mic_prompt") setSessionPhase("ready");
+  }, [isPlaying, sessionPhase, setSessionPhase]);
+
+  // ── The answer to a finished run ──────────────────────────────────────────
+
+  const canDrill = isMicEnabled && !learnEnabled && !isExamMode && !isGoalMode && !plan.duel && !plan.recording
+    && !effectiveRawGpFile && !parsedGpTracks && !riddleMeasures && !showAlphaTabScore && !currentExercise.customGoal;
+  const handleStartDrill = (measure: number) => {
+    const bar = activeExercise.tablature?.[measure];
+    if (!bar) return;
+    stopTimer();
+    metronome.restartMetronome();
+    // Drilled a second time, the run is already kept — what is live now is the drill.
+    frozenRunRef.current ??= noteMatchingHandle.current?.snapshot() ?? null;
+    noteMatchingHandle.current?.resetGame();
+    setTabRestartKey(k => k + 1);
+    startBarDrill(measure, bar);
+  };
+  const handleLeaveDrill = () => {
+    stopTimer();
+    metronome.restartMetronome();
+    stopBarDrill();
+    noteMatchingHandle.current?.resetGame();
+    setTabRestartKey(k => k + 1);
+  };
+  // The third clean pass is the end of it: the bar stops on its own.
+  useEffect(() => {
+    if (!isDrillDone) return;
+    stopTimer();
+    metronome.stopMetronome();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDrillDone]);
+
+  // Saving the run's scores can wait on the network; the tap has to show.
+  const [isMovingOn, setIsMovingOn] = useState(false);
+  const moveOn = async () => {
+    if (isMovingOn) return;
+    setIsMovingOn(true);
+    try {
+      await handleNextExerciseClick();
+    } finally {
+      setIsMovingOn(false);
+      setShowInterlude(false);
+    }
+  };
+  const handleVerdictContinue = () => {
+    if (isPlanHalfway(currentExerciseIndex, plan.exercises.length)) setShowInterlude(true);
+    else void moveOn();
+  };
+
+  const isRunJudged = hasTrackedPerformance && !isEarTrainingRiddle;
+  // A listening quiz keeps its own run; nothing the mic heard comes into it.
+  const quizRun = useEarQuizRunStore();
+  const quizResult = currentExercise.earQuizConfig && quizRun.answered > 0
+    ? {
+        accuracy: Math.round((quizRun.correct / quizRun.answered) * 100),
+        maxStreak: quizRun.bestStreak,
+        tally: `${quizRun.correct}/${quizRun.answered}`,
+      }
+    : null;
+  const runVerdict = getRunVerdict(
+    quizResult
+      ? { accuracy: quizResult.accuracy, maxCombo: quizResult.maxStreak }
+      : isRunJudged ? runSnapshot : null,
+  );
+  const resultVerdict = getRunVerdict(isRunJudged ? successSnapshot : null);
+  const sessionVerdict = drill
+    ? {
+        tone: drill.passes >= DRILL_PASSES ? "good" as const : "plain" as const,
+        strip: (
+          <BarDrillStrip
+            bar={drill.measure + 1}
+            bpm={Math.round(effectiveBpm)}
+            passes={drill.passes}
+            isPlaying={isPlaying}
+            onToggle={handleToggleTimer}
+            onLeave={handleLeaveDrill}
+          />
+        ),
+      }
+    : showsVerdict
+      ? {
+          tone: getVerdictTone(runVerdict),
+          strip: (
+            <RunVerdictStrip
+              verdict={runVerdict}
+              minutes={Math.max(1, Math.round(exerciseDurationSeconds / 60))}
+              nextTitle={plan.exercises[currentExerciseIndex + 1]?.title ?? ""}
+              onAgain={handleRestart}
+              onDrill={canDrill ? handleStartDrill : undefined}
+              onContinue={handleVerdictContinue}
+              isBusy={isMovingOn}
+            />
+          ),
+        }
+      : undefined;
 
   // ── Boss fight ────────────────────────────────────────────────────────────
 
@@ -1357,6 +1576,29 @@ const PracticeSessionInner = ({
     }, RIDDLE_AUTO_ADVANCE_MS);
   }, [recordVerifiedEarPoint, handleEarTrainingGuessed, cancelRiddleAutoAdvance, handleNextRiddleClick]);
 
+  const roundVerdict = huntRoundEnd && !showsVerdict
+    ? {
+        tone: ROUND_VERDICT_TONE[huntRoundEnd.kind],
+        strip: huntMode === "intervalClick"
+          ? <IntervalRoundStrip roundEnd={huntRoundEnd} isExamMode={isExamMode} onContinue={continueHunt} />
+          : <HuntRoundStrip roundEnd={huntRoundEnd} onContinue={continueHunt} />,
+      }
+    : isEarTrainingRiddle && isRiddleRevealed && !showsVerdict
+      ? {
+          tone: isRiddleGuessed ? "good" as const : "plain" as const,
+          strip: (
+            <EarRiddleStrip
+              isGuessed={isRiddleGuessed}
+              isMicEnabled={isMicEnabled}
+              isPlaying={metronome.isPlaying}
+              onReplay={handlePlayRiddle}
+              onGuessed={handleEarTrainingGuessed}
+              onNext={handleNextRiddleClick}
+            />
+          ),
+        }
+      : undefined;
+
   // Armed only while the phrase is silent — otherwise the mic would hear the
   // riddle itself coming from the speakers and solve it on its own. The session
   // clock may keep running meanwhile: answering is practice time too.
@@ -1380,7 +1622,8 @@ const PracticeSessionInner = ({
 
   useEffect(() => {
     const duration = exerciseDurationSeconds;
-    if (freeMode || duration === 0) return;
+    // A drilled bar plays on past the exercise's own time.
+    if (freeMode || duration === 0 || isDrilling) return;
 
     return timer.subscribe((time) => {
       const remaining = Math.max(0, Math.floor((duration * 1000 - time) / 1000));
@@ -1388,7 +1631,7 @@ const PracticeSessionInner = ({
       if (isPlaying) stopTimer();
       if (metronome.isPlaying) metronome.toggleMetronome();
     });
-  }, [timer, isPlaying, metronome, stopTimer, freeMode, exerciseDurationSeconds]);
+  }, [timer, isPlaying, metronome, stopTimer, freeMode, exerciseDurationSeconds, isDrilling]);
 
   useEffect(() => {
     const header = document.querySelector("header.sticky") as HTMLElement | null;
@@ -1425,7 +1668,7 @@ const PracticeSessionInner = ({
       effectiveBpm={effectiveBpm} rawBpm={metronome.bpm}
       activeTablature={isEarTrainingRiddle ? undefined : activeTablature}
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
-      speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} getAttackLatencyMs={getAttackLatencyMs} calibratedLatencyMs={calibratedLatencyMs} audioRefs={audioRefs}
+      speedMultiplier={sessionSpeed} getLatencyMs={getLatencyMs} getAttackLatencyMs={getAttackLatencyMs} calibratedLatencyMs={calibratedLatencyMs} audioRefs={audioRefs}
       scoringFocus={currentExercise.scoringFocus}
       getAdjustedTargetFreq={getAdjustedTargetFreq} tuningOffsets={guitarTuning.tuning.offsets}
       activeStrumPattern={activeStrumPattern}
@@ -1436,6 +1679,8 @@ const PracticeSessionInner = ({
       noteHuntMode={currentExercise.noteHuntConfig?.mode}
       noteHuntSecondsLeft={noteHuntSecondsLeft}
       noteHuntSecondsTotal={noteHuntSecondsTotal}
+      noteHuntStreak={huntStreak}
+      noteHuntRoundEnd={huntRoundEnd}
       solvedRef={huntSolvedRef}
       onAdvanceHunt={advanceHunt}
       canAdvanceHunt={huntTarget !== null}
@@ -1446,12 +1691,12 @@ const PracticeSessionInner = ({
       onExamFail={handleExamMistakeFail}
       playbackLeakingRef={playbackLeakingRef}
       learn={learn}
-      onNoteJudged={bossFight?.onNoteJudged}
+      onNoteJudged={bossFight?.onNoteJudged ?? (isDrilling && !isDrillDone ? handleDrillNote : undefined)}
       onFreePlay={bossFight?.onFreePlay}
     >
     <TimerProvider timer={timer} durationInSeconds={exerciseDurationSeconds} freeMode={freeMode}>
     <BpmProgressProvider exercise={currentExercise}>
-    <SessionUIProvider onOpenMicSetup={handleRecalibrate}>
+    <SessionUIProvider onOpenMicSetup={handleRecalibrate} onQuizContinue={continueQuiz}>
     <TabOverlayProvider value={tabOverlayValue}>
     <>
       {/* Intro splash that always plays on session mount, then parts open
@@ -1470,21 +1715,34 @@ const PracticeSessionInner = ({
         <TurnedScreen turned={isUprightPhone} className="z-[999999999] bg-zinc-950">
           <RatingPopUp ratingData={reportResult} currentUserStats={currentUserStats} previousUserStats={previousUserStats}
             onClick={onClose} activityData={activityDataToUse} onRestart={restartSessionAndExam}
-            scoredRuns={scoredRuns} examPassed={examPassed}
+            scoredRuns={scoredRuns} examPassed={examPassed} hideWrapper
           />
         </TurnedScreen>
       )}
 
       {gpLoading && <GpLoadingOverlay steps={gpSteps} />}
 
-      {(showSuccessView || examMistakeFailed) && !reportResult && successSnapshot && (
+      {showInterlude && (
+        <PlanInterlude
+          done={currentExerciseIndex + 1}
+          total={plan.exercises.length}
+          streak={runVerdict.kind === "clean" ? runVerdict.streak : 0}
+          turned={isUprightPhone}
+          onContinue={moveOn}
+          isBusy={isMovingOn}
+        />
+      )}
+
+      {(showSuccessView || examMistakeFailed) && !isDrilling && !reportResult && successSnapshot && (
         <ExerciseSuccessView
           planTitle={planTitleString} examMode={isExamMode}
           score={examMistakeFailed ? 0 : successSnapshot.score} maxScore={successSnapshot.maxPossibleScore}
           examAccuracy={examMistakeFailed ? 0 : examAccuracyOf(successSnapshot)}
           examOnTimePct={examMistakeFailed ? null : successSnapshot.onTimePct ?? null}
           stats={
-            hasTrackedPerformance && !isEarTrainingRiddle
+            quizResult && !isExamMode
+              ? quizResult
+              : hasTrackedPerformance && !isEarTrainingRiddle
               ? { accuracy: examMistakeFailed ? 0 : successSnapshot.accuracy, maxStreak: successSnapshot.maxCombo }
               : undefined
           }
@@ -1498,6 +1756,8 @@ const PracticeSessionInner = ({
           eyebrow={goalRun?.summaryEyebrow}
           extraContent={goalVerdict}
           offerRestart={isGoalMode}
+          weakMeasure={resultVerdict.kind === "rough" ? resultVerdict.weakMeasure : null}
+          onDrill={canDrill ? handleStartDrill : undefined}
           turned={isUprightPhone}
           onFinish={async () => {
             metronome.stopMetronome(); await saveCurrentScores();
@@ -1527,7 +1787,7 @@ const PracticeSessionInner = ({
       {isMobileView && createPortal(
         <SessionModal
           examMode={isExamMode}
-          isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult && !showSuccessView}
+          isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult && (!showSuccessView || isDrilling)}
           onClose={onClose}
           canFinishSession={canFinishSession} hasLoggedPractice={hasLoggedPractice}
           onFinish={isLastExercise ? async (options?: { earlyFinish?: boolean }) => {
@@ -1545,12 +1805,12 @@ const PracticeSessionInner = ({
           } : onFinish}
           isMounted={isMounted} currentExercise={currentExercise}
           currentExerciseIndex={currentExerciseIndex} totalExercises={plan.exercises.length}
-          isLastExercise={isLastExercise} isPlaying={isPlaying}
+          isLastExercise={isLastExercise} isPlaying={isRunning}
           handleNextExercise={handleNextExerciseClick}
-          handleBackExercise={() => { stopTimer(); metronome.restartMetronome(); jumpToExercise(currentExerciseIndex - 1); }}
+          handleBackExercise={() => { stopRun(); metronome.restartMetronome(); jumpToExercise(currentExerciseIndex - 1); }}
           setVideoDuration={setVideoDuration} setTimerTime={setTimerTime}
-          startTimer={startTimer} stopTimer={stopTimer}
-          resetScore={() => { noteMatchingHandle.current?.resetGame(); setEarTrainingScore(0); }}
+          startTimer={startTimer} stopTimer={stopRun}
+          resetScore={() => { resetHuntStreak(); noteMatchingHandle.current?.resetGame(); setEarTrainingScore(0); }}
           isFinishing={isFinishing} isSubmittingReport={isSubmittingReport}
           metronome={metronome} effectiveBpm={effectiveBpm}
           audioStartTime={effectiveAudioStartTime}
@@ -1563,13 +1823,14 @@ const PracticeSessionInner = ({
           masterVolume={masterVolume} setMasterVolume={setMasterVolume}
           speedMultiplier={speedMultiplier} onSpeedMultiplierChange={handleSpeedMultiplierChange}
           activeTablature={activeTablature} isRiddleRevealed={isRiddleRevealed}
-          isRiddleGuessed={isRiddleGuessed} hasPlayedRiddleOnce={hasPlayedRiddleOnce}
-          handleNextRiddle={handleNextRiddleClick} handleRevealRiddle={handleRevealRiddle}
+          hasPlayedRiddleOnce={hasPlayedRiddleOnce}
+          handleRevealRiddle={handleRevealRiddle}
           earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
-          onEarTrainingGuessed={handleEarTrainingGuessed}
           riddleProgress={riddleProgress} onPlayRiddle={handlePlayRiddle}
           songSectionMapSlot={isMobileView ? songSectionMapSlot : undefined}
           heroSlot={bossFight ? (bossFight.compactArena ?? bossFight.arena) : undefined}
+          plan={plan} completedExercises={completedExercises} exerciseTimes={exerciseTimes}
+          gateMic={gateMic} verdict={sessionVerdict} roundVerdict={roundVerdict}
         />,
         document.body,
       )}
@@ -1582,6 +1843,10 @@ const PracticeSessionInner = ({
         plan={plan} currentExercise={currentExercise} activeExercise={activeExercise}
         category={currentExercise.category || "mixed"}
         currentExerciseIndex={currentExerciseIndex} completedExercises={completedExercises}
+        exerciseTimes={exerciseTimes}
+        hasTabGate={hasTabGate} gateMic={gateMic} isTimeUp={isTimeUp}
+        verdict={isMobileView ? undefined : sessionVerdict}
+        roundVerdict={isMobileView ? undefined : roundVerdict}
         handleExerciseSelect={handleExerciseSelect} isMicEnabled={isMicEnabled}
         allGpTracks={parsedGpTracks} showAlphaTabScore={showAlphaTabScore}
         selectedGpTrackIdx={gpTrackIdx} setSelectedGpTrackIdx={setSelectedGpTrackIdx}
@@ -1618,13 +1883,12 @@ const PracticeSessionInner = ({
         isListening={isListening} metronomeAudioContext={metronome.audioContext}
         effectiveAudioStartTime={effectiveAudioStartTime}
         tabResetKey={tabResetKey + tabRestartKey}
-        isRiddleRevealed={isRiddleRevealed} isRiddleGuessed={isRiddleGuessed}
+        isRiddleRevealed={isRiddleRevealed}
         hasPlayedRiddleOnce={hasPlayedRiddleOnce} earTrainingScore={earTrainingScore}
         earTrainingHighScore={earTrainingHighScore}
-        handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddleClick}
-        handleEarTrainingGuessed={handleEarTrainingGuessed}
+        handleRevealRiddle={handleRevealRiddle}
         riddleProgress={riddleProgress} onPlayRiddle={handlePlayRiddle}
-        isPlaying={isPlaying} handleToggleTimer={handleToggleTimer}
+        isPlaying={isRunning} handleToggleTimer={handleToggleTimer}
         startTimer={startTimer} stopTimer={stopTimer}
         setVideoDuration={setVideoDuration} setTimerTime={setTimerTime}
         handleNextExerciseClick={handleNextExerciseClick}
@@ -1638,7 +1902,7 @@ const PracticeSessionInner = ({
         masterVolume={masterVolume} setMasterVolume={setMasterVolume}
         examMode={examModeObject} isExamMode={isExamMode} isScaleExam={isScaleExam} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
         onDevPassExam={process.env.NODE_ENV !== "production" && isExamMode && currentExercise.customGoal ? handleDevCompleteExam : undefined}
-        handleRestart={handleRestart}
+        handleRestart={handleRestartRun}
         canFinishSession={canFinishSession} hasLoggedPractice={hasLoggedPractice}
         jumpToExercise={jumpToExercise} isFinishing={isFinishing}
         isSubmittingReport={isSubmittingReport}
@@ -1651,8 +1915,8 @@ const PracticeSessionInner = ({
       <SessionDialogs
         showCompleteDialog={showCompleteDialog} setShowCompleteDialog={setShowCompleteDialog}
         exerciseTitle={currentExercise.title} exerciseDuration={currentExercise.timeInMinutes}
-        onFinish={onFinish} handleRestart={handleRestart}
-        sessionPhase={sessionPhase} examMode={isExamMode} turned={isUprightPhone}
+        onFinish={onFinish} handleRestart={handleRestartRun}
+        sessionPhase={sessionPhase} micAskedOnGate={micAskedOnGate} examMode={isExamMode} turned={isUprightPhone}
         handleEnableMic={handleEnableMic} handleSkipMic={handleSkipMic} onLeave={onClose}
         existingCalibrationTimestamp={existingCalibrationTimestamp}
         handleReuseCalibration={handleReuseCalibration} handleRecalibrate={handleRecalibrate}

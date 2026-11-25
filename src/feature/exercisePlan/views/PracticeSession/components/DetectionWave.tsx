@@ -8,6 +8,7 @@ interface DetectionWaveProps {
   active: boolean;
   /** Tint the wave green while the player is on a correct note. */
   isMatch: boolean;
+  className?: string;
 }
 
 const BARS = 28;
@@ -18,7 +19,7 @@ const MIN_H = 5;
  * + direct DOM writes (no React re-renders), and eases the volume toward its target,
  * so it glides instead of jumping the way a per-frame text readout does.
  */
-export function DetectionWave({ volumeRef, active, isMatch }: DetectionWaveProps) {
+export function DetectionWave({ volumeRef, active, isMatch, className }: DetectionWaveProps) {
   const barsRef = useRef<(HTMLDivElement | null)[]>([]);
   const levelRef = useRef(0);
   const phaseRef = useRef(0);
@@ -47,7 +48,7 @@ export function DetectionWave({ volumeRef, active, isMatch }: DetectionWaveProps
   }, [active, volumeRef]);
 
   return (
-    <div className="flex h-14 w-full items-center justify-center gap-[3px]">
+    <div className={cn("flex h-14 w-full items-center justify-center gap-[3px]", className)}>
       {Array.from({ length: BARS }, (_, i) => (
         <div
           key={i}

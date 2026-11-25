@@ -36,7 +36,7 @@ Für nichts davon braucht es ein Mikrofon, ein Interface oder irgendeine Einrich
 
 ## Such dir einen Startpunkt aus
 
-Gleich nach der Anmeldung wirst du gefragt, wo du anfangen möchtest. Es entscheidet nur, auf welchem Bildschirm du zuerst landest, nichts ist gesperrt, und du kannst alle vier ab Tag eins nutzen. Wähle den, der zu deinem Problem passt:
+Gleich nach der Anmeldung beantwortest du drei kurze Fragen: wie lange du schon spielst, wie viele Minuten am Tag du üben willst (das kannst du später in den Einstellungen ändern) und was du in deiner ersten Minute machst: ein kurzes Riff spielen, ohne Gitarre Töne auf dem Griffbrett finden oder dich einfach umschauen. Danach führt dich Kostek herum. Nichts ist gesperrt, und alle vier Orte unten stehen dir ab Tag eins offen. Wähle den, der zu deinem Problem passt:
 
 <Checklist items="Geführte Reise::Du weißt nicht, was du üben sollst. Die App wählt den nächsten Schritt für dich, einen nach dem anderen|Übungsbibliothek::Du kennst deine Schwachstelle und willst eine Übung dafür|Übungstagebuch::Du hast schon eine Routine und willst sie nur verfolgen|Song-Bibliothek::Du bist hier, um Songs zu lernen, und willst dein Repertoire an einem Ort" />
 

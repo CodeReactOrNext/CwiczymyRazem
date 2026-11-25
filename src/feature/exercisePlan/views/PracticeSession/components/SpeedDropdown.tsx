@@ -93,7 +93,7 @@ export function SpeedDropdown({
           />
           {!compact && (
             <span className='text-xs font-semibold'>
-              {t("speed.speed")}
+              {inline ? t("toolbar.slow_down") : t("speed.speed")}
             </span>
           )}
           <span

@@ -1,6 +1,7 @@
 import posthog from "posthog-js";
 
 import type {
+  FirstMinuteKind,
   OnboardingGoal,
   OnboardingLevel,
   OnboardingPlayChoice,
@@ -12,13 +13,15 @@ import type {
  * list instead of a filter chain (same reasoning as lib/signupFunnel).
  *
  * The answers are also written onto the person (`onboarding_level`,
- * `onboarding_goal`, `onboarding_plan_id`), so any later metric — a finished
- * session, a song added, a second day of practice — can be broken down by
- * what the player said they came for.
+ * `onboarding_daily_goal`, `onboarding_play_choice`), so any later metric — a
+ * finished session, a second day of practice — can be broken down by them.
+ *
+ * Since 2026-11-25 the onboarding is level → daily goal → first minute. The
+ * goal, plan, songs and "best on a computer" steps and their events are gone.
  */
 
-/** `songs` explains what learning songs here looks like (no tabs) before the player commits to it. */
-export type OnboardingStep = "level" | "play" | "goal" | "plan" | "songs";
+/** The three questions, in order. */
+export type OnboardingStep = "level" | "daily" | "first";
 
 /**
  * Wall-clock timing for time-on-step and total duration. Kept out of the
@@ -85,10 +88,29 @@ export const trackOnboardingLevelChosen = (props: {
   });
 };
 
+/** The daily goal; the same answer is written to Settings → Daily goal. */
+export const trackOnboardingDailyGoalChosen = (props: {
+  minutes: number;
+  level: OnboardingLevel;
+  position: number;
+  timeOnStepMs: number;
+  source: OnboardingSource;
+}) => {
+  posthog.capture("onboarding_daily_goal_chosen", {
+    minutes: props.minutes,
+    level: props.level,
+    position: props.position,
+    time_on_step_ms: props.timeOnStepMs,
+    source: props.source,
+    $set: { onboarding_daily_goal: props.minutes },
+  });
+};
+
 /**
- * The answer to "got your guitar with you?". Its funnel goes on through
- * onboarding_first_riff_opened, practice_session_finished and
- * onboarding_first_riff_returned.
+ * The first minute: `play` (the riff), `hunt` (the fretboard) or `browse`.
+ * The event keeps its old name so the funnel from before 2026-11-25 lines up.
+ * Its funnel goes on through onboarding_first_riff_opened /
+ * onboarding_first_hunt_opened and onboarding_first_minute_left.
  */
 export const trackOnboardingPlayChosen = (props: {
   choice: OnboardingPlayChoice;
@@ -112,6 +134,19 @@ export const trackOnboardingFirstRiffOpened = (props: {
   source: OnboardingSource;
 }) => {
   posthog.capture("onboarding_first_riff_opened", {
+    level: props.level,
+    exercise_id: props.exerciseId,
+    source: props.source,
+  });
+};
+
+/** The fretboard hunt page loaded its exercise and the session starts. */
+export const trackOnboardingFirstHuntOpened = (props: {
+  level: OnboardingLevel;
+  exerciseId: string;
+  source: OnboardingSource;
+}) => {
+  posthog.capture("onboarding_first_hunt_opened", {
     level: props.level,
     exercise_id: props.exerciseId,
     source: props.source,
@@ -152,104 +187,40 @@ export const trackOnboardingFirstRiffIntroDone = (props: {
 };
 
 /**
- * Back on the onboarding after the first riff, finished or not (the
- * session's own practice_session_finished tells which). Sent instead of a
- * second onboarding_viewed.
+ * Out of the first minute, on the way to Home and the tour: `finished` when
+ * the session ran to its end, `false` when the player left early.
  */
-export const trackOnboardingFirstRiffReturned = (props: {
+export const trackOnboardingFirstMinuteLeft = (props: {
+  kind: FirstMinuteKind;
   level: OnboardingLevel;
+  finished: boolean;
   source: OnboardingSource;
 }) => {
-  posthog.capture("onboarding_first_riff_returned", {
+  posthog.capture("onboarding_first_minute_left", {
+    kind: props.kind,
     level: props.level,
+    finished: props.finished,
     source: props.source,
-  });
-};
-
-export const trackOnboardingGoalChosen = (props: {
-  goal: OnboardingGoal;
-  level: OnboardingLevel;
-  position: number;
-  optionsShown: OnboardingGoal[];
-  timeOnStepMs: number;
-  source: OnboardingSource;
-}) => {
-  posthog.capture("onboarding_goal_chosen", {
-    goal: props.goal,
-    level: props.level,
-    position: props.position,
-    options_shown: props.optionsShown,
-    options_count: props.optionsShown.length,
-    time_on_step_ms: props.timeOnStepMs,
-    source: props.source,
-    $set: { onboarding_goal: props.goal },
-  });
-};
-
-export const trackOnboardingPlanChosen = (props: {
-  /** `null` when the player went to the full library instead of a listed plan. */
-  plan: {
-    id: string;
-    title: string;
-    difficulty: string;
-    minutes: number;
-    position: number;
-  } | null;
-  level: OnboardingLevel;
-  timeOnStepMs: number;
-  source: OnboardingSource;
-}) => {
-  posthog.capture("onboarding_plan_chosen", {
-    choice: props.plan ? "listed_plan" : "all_plans",
-    plan_id: props.plan?.id ?? null,
-    plan_title: props.plan?.title ?? null,
-    plan_difficulty: props.plan?.difficulty ?? null,
-    plan_minutes: props.plan?.minutes ?? null,
-    position: props.plan?.position ?? null,
-    level: props.level,
-    time_on_step_ms: props.timeOnStepMs,
-    source: props.source,
-    $set: { onboarding_plan_id: props.plan?.id ?? "all_plans" },
   });
 };
 
 /** The one terminal event: the player answered everything and was sent on. */
 export const trackOnboardingCompleted = (props: {
   level: OnboardingLevel;
-  goal: OnboardingGoal;
-  planId: string | null;
-  playChoice: OnboardingPlayChoice | null;
+  dailyGoalMinutes: number | null;
+  playChoice: OnboardingPlayChoice;
   destination: string;
   durationMs: number;
   source: OnboardingSource;
 }) => {
   posthog.capture("onboarding_completed", {
     level: props.level,
-    goal: props.goal,
-    plan_id: props.planId,
+    daily_goal_minutes: props.dailyGoalMinutes,
     play_choice: props.playChoice,
     destination: props.destination,
     duration_ms: props.durationMs,
     source: props.source,
     $set_once: { onboarding_completed_at: new Date().toISOString() },
-  });
-};
-
-/**
- * A phone player tapped through the "best on a computer" step. Its drop-off is
- * `onboarding_completed` on mobile minus this event.
- */
-export const trackOnboardingDesktopHintContinued = (props: {
-  level: OnboardingLevel;
-  goal: OnboardingGoal;
-  timeOnStepMs: number;
-  source: OnboardingSource;
-}) => {
-  posthog.capture("onboarding_desktop_hint_continued", {
-    level: props.level,
-    goal: props.goal,
-    time_on_step_ms: props.timeOnStepMs,
-    source: props.source,
   });
 };
 

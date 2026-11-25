@@ -1,11 +1,9 @@
-import { Button } from "assets/components/ui/button";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "assets/components/ui/dialog";
-import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { Keyboard } from "lucide-react";
-import { memo, useState } from "react";
+import { memo } from "react";
 
 interface ShortcutRow {
   keys: string[];
@@ -57,35 +55,25 @@ const ShortcutList = ({ rows }: { rows: ShortcutRow[] }) => (
   </div>
 );
 
-/** Compact keyboard-shortcuts legend for the practice session — desktop only. */
-export const ShortcutsLegend = memo(function ShortcutsLegend({
+/** The keyboard shortcuts of the practice session — desktop only. */
+export const ShortcutsDialog = memo(function ShortcutsDialog({
+  open,
+  onOpenChange,
   hasTempoControl,
   hasBackingTrack = false,
-  className,
 }: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   hasTempoControl: boolean;
   /** Song practice with a backing track — adds the live nudge keys. */
   hasBackingTrack?: boolean;
-  className?: string;
 }) {
   const { t } = useTranslation("session");
-  const [isOpen, setIsOpen] = useState(false);
   const localize = (rows: ShortcutRow[], group: string): ShortcutRow[] =>
     rows.map((row, i) => ({ ...row, label: t(`shortcuts.${group}.${i}`, row.label) }));
 
   return (
-    <>
-      <Button
-        variant="ghost"
-        size="icon"
-        title={t("shortcuts.title")}
-        onClick={() => setIsOpen(true)}
-        className={cn("text-zinc-500 hover:text-white hover:bg-white/10", className)}
-      >
-        <Keyboard />
-      </Button>
-
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
         {/* z-index must beat the session view or this dialog opens invisibly behind it. */}
         <DialogContent className="sm:max-w-sm bg-zinc-900 text-white z-[99999999]">
           <DialogHeader>
@@ -116,6 +104,5 @@ export const ShortcutsLegend = memo(function ShortcutsLegend({
           </div>
         </DialogContent>
       </Dialog>
-    </>
   );
 });

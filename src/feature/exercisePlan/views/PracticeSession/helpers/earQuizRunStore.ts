@@ -6,6 +6,9 @@ interface EarQuizRunState {
   correct: number;
   /** All answers given while the session clock ran, this run. */
   answered: number;
+  /** Right answers in a row, now and at best, this run. */
+  streak: number;
+  bestStreak: number;
   record: (isCorrect: boolean) => void;
   reset: () => void;
 }
@@ -19,12 +22,19 @@ interface EarQuizRunState {
 export const useEarQuizRunStore = create<EarQuizRunState>()((set) => ({
   correct: 0,
   answered: 0,
+  streak: 0,
+  bestStreak: 0,
   record: (isCorrect) =>
-    set((state) => ({
-      correct: state.correct + (isCorrect ? 1 : 0),
-      answered: state.answered + 1,
-    })),
-  reset: () => set({ correct: 0, answered: 0 }),
+    set((state) => {
+      const streak = isCorrect ? state.streak + 1 : 0;
+      return {
+        correct: state.correct + (isCorrect ? 1 : 0),
+        answered: state.answered + 1,
+        streak,
+        bestStreak: Math.max(state.bestStreak, streak),
+      };
+    }),
+  reset: () => set({ correct: 0, answered: 0, streak: 0, bestStreak: 0 }),
 }));
 
 /**

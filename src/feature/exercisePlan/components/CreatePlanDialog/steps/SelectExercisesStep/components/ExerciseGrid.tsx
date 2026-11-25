@@ -67,7 +67,8 @@ export const ExerciseGrid = ({
     <>
       <div className="flex flex-col gap-2">
         {paginatedExercises.map((exercise) => {
-          const isSelected = selectedExercises.some((e) => e.id === exercise.id);
+          const added = selectedExercises.find((e) => e.id === exercise.id);
+          const isSelected = !!added;
           const locked = !!exercise.premium && !isPremium;
           const isFavorite = favoriteExerciseIds.includes(exercise.id);
 
@@ -76,6 +77,7 @@ export const ExerciseGrid = ({
               key={exercise.id}
               exercise={exercise}
               isSelected={isSelected}
+              addedMinutes={added?.timeInMinutes}
               onToggle={onToggleExercise}
               onPreview={onPreviewExercise}
               isPrivate={privateExerciseIds?.has(exercise.id)}
@@ -129,7 +131,7 @@ export const ExerciseGrid = ({
                   className={cn(PRESSABLE, "border-b-black/30", 
                     "flex items-center justify-center w-[34px] h-[34px] rounded-[8px] text-[12px] font-bold transition-colors duration-base backdrop-blur-md",
                     currentPage === page
-                      ? "bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 shadow-[0_0_10px_-2px_rgba(6,182,212,0.2)]"
+                      ? "border-b-[3px] border-b-black/30 bg-zinc-700 text-zinc-50"
                       : "border border-white/5 border-b-[3px] border-b-black/30 bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/10 hover:border-white/10"
                   )}
                 >

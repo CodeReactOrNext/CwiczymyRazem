@@ -147,6 +147,16 @@
     "hide_tabs": "Tabs ausblenden",
     "by_ear": "Nach Gehör/aus dem Gedächtnis spielen"
   },
+  "toolbar": {
+    "play_tab": "Tab abspielen",
+    "backing": "Begleitung",
+    "standard_tuning": "E-Standard",
+    "mic_scoring": "Mikro-Wertung",
+    "mic_setup": "Mikro einrichten",
+    "wait_mode": "Wartemodus",
+    "progress": "Fortschritt",
+    "slow_down": "Langsamer"
+  },
   "quick": {
     "tempo_reset": "Metronom-Tempo – auf empfohlen zurücksetzen",
     "slower_hint": "Langsamer (Shift: −5 BPM)",
@@ -204,6 +214,14 @@
       "5": "A",
       "6": "tiefe E"
     },
+    "find_every": "Finde jedes {{note}}",
+    "skip": "Überspringen",
+    "gate_title": "Finde jeden Ton",
+    "gate_detail": "Insgesamt {{minutes}} Min., {{seconds}} s pro Ton.",
+    "round_solved": "Alle {{total}} in {{seconds}} s",
+    "round_next": "Gleich kommt der nächste Ton",
+    "round_missed": "{{found}} von {{total}} gefunden",
+    "round_missed_detail": "Verpasst: {{notes}}",
     "tap_octaves": "Tippe auf jede Oktave, die du findest",
     "tap_octaves_region": "Tippe auf jede Oktave, die du im Bereich findest"
   },
@@ -224,6 +242,7 @@
     "close_panel": "Übungswerkzeuge ausblenden"
   },
   "success": {
+    "correct": "Richtig",
     "mastered": "Gemeistert!",
     "passed": "Prüfung bestanden!",
     "failed": "Prüfung nicht bestanden",
@@ -249,9 +268,23 @@
     "chart_early": "{{ms}} ms zu früh",
     "chart_late": "{{ms}} ms zu spät",
     "chart_notes_one": "{{count}} Ton",
-    "chart_notes_other": "{{count}} Töne"
+    "chart_notes_other": "{{count}} Töne",
+    "time": "Zeit",
+    "best_run": "Beste Serie"
   },
   "quiz": {
+    "paused_note": "Pause. Antworten zählen wieder, sobald der Timer läuft.",
+    "hear_it": "Anhören",
+    "trust_ears": "keine Zahlen, vertrau deinen Ohren",
+    "thats_in_tune": "Das stimmt",
+    "gate_detail": "{{minutes}} Min. Kopfhörer helfen.",
+    "gate": {
+      "chordType": "Benenne den Akkord, den du hörst",
+      "progression": "Baue die Progression, die du hörst",
+      "detune": "Schieb die Schwebung weg",
+      "scaleMode": "Benenne die Tonleiter, die du hörst",
+      "interval": "Benenne das Intervall, das du hörst"
+    },
     "stop": "Stopp",
     "play_again": "Nochmal abspielen",
     "play": "Abspielen",
@@ -289,7 +322,6 @@
     "play_slowly": "Langsam abspielen",
     "root": "Grundton: {{root}}",
     "root_held": "Der Grundton liegt darunter – miss jeden Ton daran",
-    "hear_again_slowly": "Nochmal langsam hören",
     "hear_from_root": "{{name}} von {{root}} anhören",
     "which_chord": "Was für ein Akkord ist das?",
     "play_chord": "Akkord abspielen",
@@ -380,6 +412,10 @@
     "change": "Backing Track ändern"
   },
   "ear": {
+    "listen_play_back": "Hör zu und spiel es nach",
+    "missed_it": "Daneben",
+    "next_melody_key": "Nächste Melodie",
+    "score": "Punkte",
     "correct": "Richtig – Punkt verdient",
     "next_melody": "Die nächste Melodie kommt gleich…",
     "tab_shows": "Der Tab unten zeigt die Melodie. Spiel sie zum Vergleich noch einmal ab.",
@@ -415,15 +451,15 @@
     "boost": "Lautstärke anheben",
     "unmute": "Ton an",
     "mute": "Stumm",
-    "main_instrument": "Hauptinstrument"
+    "main_instrument": "Hauptinstrument",
+    "mix": "Mix"
   },
   "auto_backing": {
-    "title": "Backing Track",
     "toggle": "Generierter Backing Track",
     "description": "Schlagzeug, Bass und ein weiches Pad für genau diese Übung, in ihrer Tonart und nach ihren Akkorden.",
     "drums_only": "Nur Schlagzeug: Die Töne laufen über alle Bünde, jeder Akkord würde mit ihnen reiben.",
-    "drone": "Bass und Powerchords auf dem Grundton, weil die Töne weder Dur noch Moll festlegen.",
     "headphones": "Mit aktivem Mikrofon Kopfhörer aufsetzen. Sonst hört das Mikrofon die Band als dein Spiel. Wenn Töne gezählt werden, die du nicht gespielt hast, prüf das zuerst.",
+    "headphones_short": "Mikro an? Kopfhörer aufsetzen.",
     "groove": {
       "rock": "Rock",
       "pop": "Pop",
@@ -508,20 +544,31 @@
     "now_above": "{{interval}} über diesem {{root}}",
     "click_any": "Klick ein beliebiges {{note}}",
     "on_highlighted": "auf den markierten Saiten",
-    "root": "Grundton",
-    "target": "Ziel",
     "play_root": "Den Grundton spielen, von dem das Intervall gemessen wird",
     "hide_distance": "Abstand ausblenden",
     "how_far": "Wie weit ist es?",
     "autoplay": "Autoplay",
-    "step": "Schritt {{step}} von 2",
     "anywhere": "Irgendwo in den Bünden {{from}}–{{to}}",
     "near_zone": "Nah an deinem {{root}}, im hellen Bereich",
     "near": "In Reichweite deines {{root}}",
     "solved": "{{root}} + {{interval}} = {{target}}",
     "frets_up_one": "{{count}} Bund höher",
     "frets_up_other": "{{count}} Bünde höher",
-    "hear_root": "Grundton anhören"
+    "lives": "{{count}} von {{limit}} Leben übrig",
+    "time_up": "Zeit abgelaufen",
+    "next_round": "Nächste Runde kommt",
+    "answer_was": "{{interval}} über {{root}} ist {{target}}",
+    "wrong_note": "Das war {{note}}",
+    "wrong_interval": "Das war {{note}}, also {{interval}}",
+    "too_far": "Richtiger Ton, aber zu weit von deinem {{root}}",
+    "same_string": "Gleiche Saite",
+    "same_fret": "gleicher Bund",
+    "strings_higher_one": "{{count}} Saite höher",
+    "strings_higher_other": "{{count}} Saiten höher",
+    "strings_lower_one": "{{count}} Saite tiefer",
+    "strings_lower_other": "{{count}} Saiten tiefer",
+    "frets_down_one": "{{count}} Bund tiefer",
+    "frets_down_other": "{{count}} Bünde tiefer"
   },
   "instructions": {
     "support_author": "Autor unterstützen",
@@ -572,10 +619,6 @@
     "exit": "Verlassen",
     "exit_no_save": "Ohne Speichern verlassen",
     "stay": "In der Session bleiben"
-  },
-  "dialogs": {
-    "finished": "Übung abgeschlossen!",
-    "great_job": "Super gemacht!"
   },
   "speed": {
     "active_hint": "Wiedergabetempo {{speed}} – Klick und Backing Track laufen mit {{effective}} BPM statt {{base}}",
@@ -675,13 +718,11 @@
     "read": "Lies die Anleitung unten, um loszulegen"
   },
   "progress": {
-    "title": "Session-Fortschritt",
-    "song": "Song: {{title}}",
-    "exercise": "Übung {{n}}",
     "go_to": "Gehe zu {{label}}"
   },
   "controls": {
-    "press_start": "Drücke Start zum Spielen",
+    "resume": "Weiter",
+    "again": "Nochmal",
     "pause": "Pause",
     "restart": "Übung neu starten"
   },
@@ -785,12 +826,22 @@
     "body": "Dieser Durchgang kommt nicht in die Ranglisten. Setz Kopfhörer auf oder schalte den Gitarrenklang aus und starte den Durchgang neu.",
     "mute": "Gitarre aus"
   },
+  "bar": {
+    "more": "Mehr",
+    "time_only": "Nur die Zeit",
+    "save": "Session speichern"
+  },
   "start_gate": {
     "start": "Start",
-    "preview": "Vorschau",
-    "hint_count_in": "Das Metronom zählt ein, dann spielst du. Mit Vorschau siehst du die Tabulatur, ohne dass die Zeit läuft.",
-    "hint": "Die Zeit läuft ab Start. Mit Vorschau kannst du dich erst umsehen.",
-    "hint_no_preview": "Zeit und Punkte zählen ab Start."
+    "count_in_short": "Das Metronom zählt ein",
+    "clock_short": "Die Zeit läuft ab Start",
+    "preview_first": "Erst die Tabulatur ansehen",
+    "hint_no_preview": "Zeit und Punkte zählen ab Start.",
+    "mic_label": "Mikrofon",
+    "mic_on": "Mit Mikrofon spielen",
+    "mic_on_detail": "Die App hört zu und bewertet dein Spiel",
+    "mic_off": "Ohne Mikrofon",
+    "mic_off_detail": "Deine Übungszeit zählt trotzdem"
   },
   "mic_open_failed": {
     "title": "Das Mikrofon ging nicht an",
@@ -838,5 +889,33 @@
     "delete": "In den Papierkorb",
     "untitled": "Aufnahme"
   },
-  "exam_click_failed": "{{limit}} falsche Klicks – Prüfung nicht bestanden."
+  "exam_click_failed": "{{limit}} falsche Klicks – Prüfung nicht bestanden.",
+  "verdict": {
+    "time": "{{minutes}} Min. geschafft",
+    "clean": "Sauber gespielt",
+    "rough": "Durchgang beendet",
+    "weak_bar": "Takt {{bar}} hat gewackelt",
+    "next": "Als Nächstes: {{title}}",
+    "stats": "{{accuracy}} % getroffen, {{count}} in Folge",
+    "again": "Nochmal",
+    "drill": "Takt {{bar}} langsamer",
+    "continue": "Weiter"
+  },
+  "drill": {
+    "title": "Takt {{bar}} langsamer",
+    "detail": "{{count}} saubere Durchgänge bei {{bpm}} BPM",
+    "done": "Sitzt",
+    "done_detail": "Takt {{bar}} ist sauber bei {{bpm}} BPM",
+    "skip": "Überspringen",
+    "passes": "{{done}} von {{total}} sauberen Durchgängen"
+  },
+  "interlude": {
+    "halfway": "Die Hälfte ist geschafft.",
+    "done_of": "{{done}} von {{total}} geschafft.",
+    "streak": "{{streak}} {{progress}}",
+    "in_a_row": "{{count}} in Folge."
+  },
+  "combo": {
+    "in_a_row": "{{count}} in Folge"
+  }
 }

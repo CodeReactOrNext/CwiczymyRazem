@@ -26,29 +26,8 @@
         "title": "El coloso te aplastó"
       },
       "lair": {
-        "pitch": "Un combate sin fin de cambios de acorde. En cada fase el coloso se recompone en torno a una progresión nueva — acordes abiertos, power chords, cejillas, séptimas — y los cambios llegan cada vez más rápido. A ver hasta dónde llegas."
-      },
-      "rules": {
-        "sword": {
-          "body": "Cada cambio limpio la carga: justo en el pulso 4, a tiempo 3, cerca 2, suelto 1. Un acorde cuenta en cuanto suenan todas las cuerdas menos una. Un fallo rompe la carga."
-        },
-        "strike": {
-          "body": "Una espada llena golpea sola — más fuerte cuanto más larga tu racha de cambios limpios, hasta ×2 con {{max}} seguidos."
-        },
-        "bite": {
-          "title": "Cada fallo es un puñetazo",
-          "body": "Un acorde al que no llegas a tiempo cuesta PV. Sin PV, se acaba la partida."
-        },
-        "slam": {
-          "title": "Aguanta el terremoto",
-          "body": "Desde la fase {{slams}} el coloso hace temblar la tierra: durante dos compases los acordes cambian el doble de seguido. Tócalos todos limpios para bloquearlo — un bloqueo carga media espada."
-        },
-        "endless": {
-          "body": "Deja a cero los PV de una fase y el coloso se recompone: progresión nueva, acordes nuevos y un tempo más rápido cada vez. Primero acordes abiertos, luego power chords, cejillas y séptimas. Cada fase superada te cura {{heal}} PV."
-        },
-        "threats": {
-          "body": "Desde la fase {{weak}} encuentra tu cambio débil — el que más fallas — y uno limpio ahí carga tu espada ×{{weakCharge}}. Desde la fase {{affix}} gana poderes: polvo, piedra que sana, réplicas y petrificación, que convierte la tablatura en piedra."
-        }
+        "pitch": "Un combate sin fin de cambios de acorde. En cada fase el coloso se recompone en torno a una progresión nueva — acordes abiertos, power chords, cejillas, séptimas — y los cambios llegan cada vez más rápido. A ver hasta dónde llegas.",
+        "skill": "Cambios de acorde"
       },
       "boons": {
         "armor": {
@@ -93,6 +72,11 @@
         "faster": "Cambios un {{percent}} % más rápidos",
         "slower": "Cambios un {{percent}} % más lentos",
         "same_speed": "Cambios a la misma velocidad"
+      },
+      "how": {
+        "play": "Cambia de acorde al ritmo de la tablatura.",
+        "strike": "Los cambios limpios cargan tu espada. Llena, golpea.",
+        "survive": "Un acorde tarde cuesta PV. Aguanta tantas fases como puedas."
       }
     },
     "changeling": {
@@ -121,34 +105,8 @@
         "title": "Los cambios te engulleron"
       },
       "lair": {
-        "pitch": "Un combate sin fin y sin nada que leer. En cada fase el cambiaformas adopta una progresión nueva en una tonalidad nueva y se convierte en cada acorde por turno — improvisa encima. Las notas del acorde en el 1 y el 3 y la escala entre medias lo hieren a él; cualquier otra cosa en esos pulsos, o una nota fuera de la tonalidad, te hiere a ti. A ver hasta dónde llegas."
-      },
-      "rules": {
-        "sword": {
-          "body": "En el 1 y el 3, toca una nota del acorde en el que estás — fundamental, tercera, quinta o séptima — y la carga con 4. Entre medias carga cualquier nota de la escala: una nota del acorde 3, el resto 1, hasta dos notas por pulso. El mástil muestra las dos cosas: las notas del acorde grandes, la escala pequeña."
-        },
-        "strike": {
-          "body": "Una espada llena golpea sola — más fuerte cuanto más larga tu racha de notas del acorde, hasta ×2 con {{max}} seguidas."
-        },
-        "combo": {
-          "title": "Toca los cambios en combo",
-          "body": "Entra en un acorde nuevo en el uno — su primera nota a medio pulso del cambio como mucho — o deslízate a él, su primera nota a {{smooth}} semitonos como mucho de la anterior. Cada uno es un truco: encadénalos acorde tras acorde, hasta ×{{comboMax}}. El combo golpea al Cambiaformas cuando la progresión vuelve a empezar o cuando un acorde entra sin truco. Un fallo lo pierde."
-        },
-        "bite": {
-          "title": "Cada acorde necesita una nota",
-          "body": "Toca primero en el 1 o el 3 algo que no sea una nota del acorde, toca una nota fuera de la tonalidad o deja pasar un acorde sin ninguna de sus notas, y te dará un zarpazo. Sin PV, se acaba la partida."
-        },
-        "slam": {
-          "title": "Aguanta el arrebato",
-          "body": "Desde la fase {{slams}} el cambiaformas se arrebata: durante dos compases los acordes cambian el doble de rápido. Toca una nota de cada uno para bloquearlo — un bloqueo carga media espada."
-        },
-        "endless": {
-          "body": "Deja a cero los PV de una fase y el cambiaformas toma otra forma: tonalidad nueva, un acorde más y cambios más rápidos cada vez — al principio tres acordes distintos. De vez en cuando se suman séptimas, un acorde prestado, una dominante secundaria o uno disminuido. Primero mayor y menor, luego los modos y el blues. Cada fase superada te cura {{heal}} PV."
-        },
-        "threats": {
-          "title": "Aprende",
-          "body": "Desde la fase {{weak}} las notas guía — terceras y séptimas, las que dicen qué acorde es — cargan tu espada ×{{weakCharge}}. Desde la fase {{affix}} gana poderes: disonancia, metamorfosis, torbellinos y un telón sobre el tablero."
-        }
+        "pitch": "Un combate sin fin y sin nada que leer. En cada fase el cambiaformas adopta una progresión nueva en una tonalidad nueva y se convierte en cada acorde por turno — improvisa encima. Las notas del acorde en el 1 y el 3 y la escala entre medias lo hieren a él; cualquier otra cosa en esos pulsos, o una nota fuera de la tonalidad, te hiere a ti. A ver hasta dónde llegas.",
+        "skill": "Solos sobre acordes"
       },
       "boons": {
         "armor": {
@@ -301,57 +259,17 @@
   },
   "lair": {
     "pitch": "Un combate sin fin. En cada fase la araña muda a una forma más rápida con un ejercicio nuevo: a ver hasta dónde llegas.",
-    "best_phase": "Mejor fase",
-    "runs": "Partidas",
     "fight": "Luchar",
     "difficulty": "Dificultad",
     "effect_damage": "Daño recibido",
     "effect_tempo": "Tempo",
     "effect_score": "Puntuación",
     "start_at": "Empezar en",
-    "phase_option": "Fase {{phase}}",
-    "next_savepoint": "La fase {{phase}} se abre cuando la alcances",
     "skip_note_one": "Te saltas {{count}} fase — supera la fase {{phase}} para sumar sus PV a tu puntuación.",
     "skip_note_other": "Te saltas {{count}} fases — supera la fase {{phase}} para sumar sus PV a tu puntuación.",
-    "best_score": "Mejor puntuación",
-    "not_fought": "Aún sin combatir",
-    "desktop_only": "Las peleas contra jefes no están disponibles en el móvil",
-    "desktop_hint": "Una pelea necesita una pantalla grande para leer la tablatura a tiempo. Abre riff.quest en un portátil u ordenador para enfrentarte a este jefe."
-  },
-  "rules": {
-    "title": "Cómo funciona el combate",
-    "sword": {
-      "title": "Carga la espada",
-      "body": "Cada acierto la carga: justo en el pulso 4, a tiempo 3, cerca 2, suelto 1. Un fallo rompe la carga."
-    },
-    "strike": {
-      "title": "Tajo",
-      "body": "Una espada llena golpea sola — más fuerte cuanto más larga tu racha, hasta ×2 con {{max}} seguidas."
-    },
-    "bite": {
-      "title": "Cada fallo es un mordisco",
-      "body": "Una nota fallada cuesta PV. Sin PV, se acaba la partida."
-    },
-    "slam": {
-      "title": "Bloquea el golpe",
-      "body": "Desde la fase {{slams}} la araña prepara golpes. Ten una racha de {{parry}} cuando caiga para bloquearlo — un bloqueo carga media espada."
-    },
-    "endless": {
-      "title": "Sin fin y al azar",
-      "body": "Deja a cero los PV de una fase y la araña muda: orden de dedos, recorrido, posición y ritmo al azar, cada vez más rápido. Cada fase superada te cura {{heal}} PV."
-    },
-    "draft": {
-      "title": "Mejoras",
-      "body": "Tras cada fase tomas una de tres mejoras al azar: armadura, una espada más afilada, un tempo más lento… Algunas se acumulan y las raras salen poco. Un barajado por partida y otro cada cinco fases."
-    },
-    "threats": {
-      "title": "Aprende",
-      "body": "Desde la fase {{weak}} muestra puntos débiles: tu espada carga ×{{weakCharge}} mientras están abiertos. Desde la fase {{affix}} gana poderes: veneno, regeneración, frenesí y redes sobre la tablatura, más a la vez cuanto más avances."
-    },
-    "gates": {
-      "title": "Puertas y puntos de guardado",
-      "body": "Cada {{gate}} fases el jefe guarda una puerta: {{gateHp}} % más PV y golpes más duros. Alcanza una puerta y tu siguiente partida puede empezar ahí — las fases que te saltes cuentan para tu puntuación cuando superes aquella en la que empiezas."
-    }
+    "phase_label": "Fase",
+    "on_computer": "Lucha en un ordenador",
+    "skill": "Escalas cromáticas"
   },
   "draft": {
     "eyebrow": "Empieza la fase {{phase}}",
@@ -556,5 +474,66 @@
     "normal": "Normal",
     "hard": "Difícil",
     "brutal": "Brutal"
+  },
+  "guide": {
+    "open": "Cómo se juega",
+    "progress": "Paso {{step}} de {{count}}",
+    "next": "Siguiente",
+    "got_it": "Entendido"
+  },
+  "how": {
+    "play": "Toca las series de la tablatura, a tempo.",
+    "strike": "Los aciertos limpios cargan tu espada. Llena, golpea.",
+    "survive": "Fallar una nota cuesta PV. Aguanta tantas fases como puedas."
+  },
+  "rules": {
+    "title": "Cómo funciona el combate",
+    "sword": {
+      "title": "Carga la espada",
+      "body": "Cada acierto la carga: justo en el pulso 4, a tiempo 3, cerca 2, suelto 1. Un fallo rompe la carga."
+    },
+    "strike": {
+      "title": "Tajo",
+      "body": "Una espada llena golpea sola — más fuerte cuanto más larga tu racha, hasta ×2 con {{max}} seguidas."
+    },
+    "bite": {
+      "title": "Cada fallo es un mordisco",
+      "body": "Una nota fallada cuesta PV. Sin PV, se acaba la partida."
+    },
+    "slam": {
+      "title": "Bloquea el golpe",
+      "body": "Desde la fase {{slams}} la araña prepara golpes. Ten una racha de {{parry}} cuando caiga para bloquearlo — un bloqueo carga media espada."
+    },
+    "endless": {
+      "title": "Sin fin y al azar",
+      "body": "Deja a cero los PV de una fase y la araña muda: orden de dedos, recorrido, posición y ritmo al azar, cada vez más rápido. Cada fase superada te cura {{heal}} PV."
+    },
+    "draft": {
+      "title": "Mejoras",
+      "body": "Tras cada fase tomas una de tres mejoras al azar: armadura, una espada más afilada, un tempo más lento… Algunas se acumulan y las raras salen poco. Un barajado por partida y otro cada cinco fases."
+    },
+    "threats": {
+      "title": "Aprende",
+      "body": "Desde la fase {{weak}} muestra puntos débiles: tu espada carga ×{{weakCharge}} mientras están abiertos. Desde la fase {{affix}} gana poderes: veneno, regeneración, frenesí y redes sobre la tablatura, más a la vez cuanto más avances."
+    },
+    "gates": {
+      "title": "Puertas y puntos de guardado",
+      "body": "Cada {{gate}} fases el jefe guarda una puerta: {{gateHp}} % más PV y golpes más duros. Alcanza una puerta y tu siguiente partida puede empezar ahí — las fases que te saltes cuentan para tu puntuación cuando superes aquella en la que empiezas."
+    }
+  },
+  "primer": {
+    "title": "Qué es un combate contra un jefe",
+    "looks": {
+      "title": "Tú tocas, él muerde",
+      "body": "El jefe cuelga sobre tu tablatura o tus acordes. Tócalos a tempo con el micrófono. Un fallo te quita PV."
+    },
+    "goes": {
+      "title": "Tocar limpio golpea",
+      "body": "Cada nota limpia carga tu espada. Cuando está llena golpea sola, más fuerte cuanto más larga es tu racha."
+    },
+    "why": {
+      "title": "Para qué luchar",
+      "body": "Cada fase es un ejercicio nuevo, un poco más rápido, así descubres tu límite real. El tiempo cuenta como práctica y tu mejor fase muestra hasta dónde has llegado."
+    }
   }
 }

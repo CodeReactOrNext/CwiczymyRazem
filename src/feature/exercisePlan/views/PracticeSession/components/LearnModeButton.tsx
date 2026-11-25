@@ -6,6 +6,7 @@ import { memo } from "react";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { SessionTooltip } from "./SessionTooltip";
+import { StateDot } from "./StateDot";
 
 /**
  * Switches learn mode on and off: the tab stops keeping time and waits on each
@@ -33,15 +34,25 @@ export const LearnModeButton = memo(function LearnModeButton({ compact = false }
         aria-pressed={learn.enabled}
         className={cn(
           PRESSABLE_KEY,
-          "flex items-center gap-2 rounded-lg px-4 font-semibold outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
-          compact ? "h-8 px-2" : "h-12",
-          learn.enabled
-            ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
-            : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
+          "flex items-center gap-2 rounded-lg px-2.5 font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
+          compact ? "h-8 px-2" : "h-9",
+          compact
+            ? learn.enabled
+              ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
+              : "bg-zinc-800/60 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200"
+            : // The desktop toolbar's switch: green face and dot when on, plain face and grey dot when off.
+              learn.enabled
+              ? "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+              : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100",
           needsMic && "cursor-not-allowed opacity-50 hover:bg-zinc-800 hover:text-zinc-400",
         )}>
-        <GraduationCap className='h-4 w-4 shrink-0' />
-        {!compact && <span className='text-xs font-semibold'>{t("learn.button")}</span>}
+        <GraduationCap className={cn("h-4 w-4 shrink-0", !compact && learn.enabled && "text-emerald-400")} />
+        {!compact && (
+          <>
+            <span className='text-[13px] font-medium'>{t("toolbar.wait_mode")}</span>
+            <StateDot on={learn.enabled} />
+          </>
+        )}
       </button>
     </SessionTooltip>
   );

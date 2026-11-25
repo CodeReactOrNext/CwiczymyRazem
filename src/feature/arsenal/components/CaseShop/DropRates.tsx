@@ -1,9 +1,3 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useTranslation } from "hooks/useTranslation";
@@ -12,6 +6,7 @@ import { Info } from "lucide-react";
 
 import type { CaseDefinition, GuitarRarity } from "../../types/arsenal.types";
 import { RARITY_STYLES } from "../RarityBadge";
+import { TapTooltip } from "./TapTooltip";
 
 /**
  * A single rarity's odds out of one case, for the per-item tooltip.
@@ -70,47 +65,45 @@ export const RarityOddsTable = ({
   );
 };
 
-/** Shared tooltip surface. Tooltips are white, so `tooltip-ink` turns the
-    rarity inks (readableText) to the shades that read on it. */
-export const oddsTooltipClass = "tooltip-ink w-60 p-3";
-
 /**
- * Per-rarity odds behind a trigger. The default is the quiet "Drop Rates"
- * link every shelf card carries in its corner; `inline` is the same thing a
- * size up, sitting next to the featured CTA as "View drop rates".
+ * Per-rarity odds behind a trigger. On a shelf card it is a bare info key next
+ * to the name; `inline` spells itself out beside the featured case's contents
+ * wherever the row has the width for it.
  */
 export const DropRates = ({
   probabilities,
-  variant = "link",
+  variant = "icon",
   className,
 }: {
   probabilities: CaseDefinition["probabilities"];
-  variant?: "link" | "inline";
+  variant?: "icon" | "inline";
   className?: string;
 }) => {
   const { t } = useTranslation("arsenal");
+  const isInline = variant === "inline";
 
   return (
-  <TooltipProvider>
-    <Tooltip delayDuration={150}>
-      <TooltipTrigger asChild>
+    <TapTooltip
+      trigger={
         <button
           type='button'
+          aria-label={t(isInline ? "cases.view_drop_rates" : "cases.drop_rates")}
           className={cn(
-            "flex items-center gap-1.5 font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            variant === "inline"
-              ? "px-1 text-sm text-zinc-300 hover:text-zinc-100"
-              : "text-[11px] text-zinc-400 hover:text-zinc-200",
+            "flex shrink-0 items-center rounded-lg text-zinc-400 transition-colors hover:text-zinc-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            isInline
+              ? "-mr-2 h-11 gap-1.5 px-2 text-sm font-semibold sm:h-9"
+              : "h-11 w-11 justify-center hover:bg-zinc-100/10 sm:h-8 sm:w-8",
             className,
           )}>
-          <Info size={variant === "inline" ? 14 : 12} />
-          {variant === "inline" ? t("cases.view_drop_rates") : t("cases.drop_rates")}
+          <Info size={16} />
+          {isInline && (
+            <span className='hidden sm:inline'>
+              {t("cases.view_drop_rates")}
+            </span>
+          )}
         </button>
-      </TooltipTrigger>
-      <TooltipContent side='top' className={oddsTooltipClass}>
-        <RarityOddsTable probabilities={probabilities} />
-      </TooltipContent>
-    </Tooltip>
-  </TooltipProvider>
+      }>
+      <RarityOddsTable probabilities={probabilities} />
+    </TapTooltip>
   );
 };

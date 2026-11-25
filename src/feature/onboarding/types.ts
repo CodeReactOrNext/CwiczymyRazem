@@ -1,20 +1,24 @@
 /** How long the player has been playing — the first onboarding question. */
 export type OnboardingLevel = "new" | "some" | "experienced";
 
-/** What the player came to Riff Quest for — the second onboarding question. */
+/**
+ * What a player came for. The onboarding no longer asks it; the tour still
+ * reads one from older links (`?goal=`) and ends on it.
+ */
 export type OnboardingGoal = "plans" | "songs" | "roadmap" | "journey" | "log";
 
 /**
- * Asked right after the level: play a 40-second first riff now, or look
- * around first (with or without a guitar to play later).
+ * The first minute, the last onboarding question: play a 40-second riff,
+ * find notes on the neck by clicking (no guitar needed), or look around.
  */
-export type OnboardingPlayChoice = "play" | "browse" | "no_guitar";
+export type OnboardingPlayChoice = "play" | "hunt" | "browse";
+
+/** Which first minute the player went into. */
+export type FirstMinuteKind = "riff" | "hunt";
 
 export interface OnboardingResult {
   level: OnboardingLevel;
-  goal: OnboardingGoal;
-  /** Only for the "plans" goal — the plan the player picked. */
-  planId?: string;
-  playChoice?: OnboardingPlayChoice;
+  /** The daily goal picked in the onboarding; `null` when that step was skipped. */
+  dailyGoalMinutes: number | null;
+  playChoice: OnboardingPlayChoice | null;
 }
-

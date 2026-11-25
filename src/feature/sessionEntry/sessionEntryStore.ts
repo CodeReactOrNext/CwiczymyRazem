@@ -164,7 +164,7 @@ export const setSessionEntrySteps = (steps: readonly LoadingStep[]) => {
 };
 
 /** Pages whose first screen is a practice session. */
-const SESSION_PATH = /^\/(?:practice\/|songs\/practice\/|onboarding\/first-riff)/;
+const SESSION_PATH = /^\/(?:practice\/|songs\/practice\/|onboarding\/first-(?:riff|hunt))/;
 
 export const isSessionEntryPath = (url: string): boolean => SESSION_PATH.test(url);
 

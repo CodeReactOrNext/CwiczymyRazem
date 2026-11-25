@@ -8,9 +8,8 @@ import {
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Lock, Minus, Plus } from "lucide-react";
+import { Check, Lock, Minus, Plus, RotateCcw } from "lucide-react";
 import { memo, useRef, useState } from "react";
-import { GiMetronome } from "react-icons/gi";
 
 import { AccentGrid } from "../../../components/Metronome/AccentGrid";
 import {
@@ -66,6 +65,14 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   const setBpm = metronome.setBpm;
   const minBpm = metronome.minBpm;
   const maxBpm = metronome.maxBpm;
+  const recommendedBpm: number | undefined = metronome.recommendedBpm;
+  const canReset =
+    typeof recommendedBpm === "number" && !!metronome.handleSetRecommendedBpm && bpm !== recommendedBpm;
+
+  // The meter as a guitarist reads it: the exercise's own ("7/8"), or the
+  // beat count over quarters. A grid that changes meter keeps the bare count.
+  const beats: number = metronome.accentPattern?.length ?? 4;
+  const meterLabel = accentLocked && gridLabel && !gridLabel.includes("↔") ? gridLabel : `${beats}/4`;
 
   const startEdit = () => {
     setInput(String(bpm));
@@ -81,7 +88,7 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
   const stepBtn = cn(
     PRESSABLE_KEY,
     "flex items-center justify-center shrink-0 rounded-lg bg-zinc-900/60 text-zinc-200 transition-colors hover:bg-zinc-700 hover:text-white disabled:opacity-40 disabled:hover:bg-zinc-900/60",
-    compact ? "h-7 w-7" : "h-8 w-8",
+    compact ? "h-7 w-7" : "h-9 w-9",
   );
 
   // The compact strip has no room for the picker; those layouts stack it below.
@@ -97,19 +104,11 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
           // as wide and as tall as the keys it sits under.
           compact
             ? "h-12 justify-between gap-2 rounded-lg px-2.5"
-            : "h-12 gap-3 px-4",
+            : "relative h-14 gap-3 px-2.5",
           // The speed picker ("Speed 75% = 46 BPM") needs the extra width or
           // the slider shrinks to nothing.
           !compact && (showSpeed ? "max-w-2xl" : "max-w-md"),
         )}>
-        {!compact && (
-          <SessionTooltip label={t("quick.tempo_reset")} keys={["Enter"]}>
-            <span className='shrink-0'>
-              <GiMetronome className='h-5 w-5 text-zinc-400' />
-            </span>
-          </SessionTooltip>
-        )}
-
         <SessionTooltip label={t("quick.slower_hint")} keys={["↓"]}>
           <button
             type='button'
@@ -148,11 +147,21 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
               onClick={startEdit}
               aria-label={t("quick.edit_bpm")}
               className={cn(
-                "font-mono shrink-0 font-black tabular-nums tracking-tight transition-transform active:scale-95",
-                compact ? "text-lg" : "text-2xl",
-                tempoColor(bpm),
+                "shrink-0 tabular-nums transition-transform active:scale-95",
+                compact
+                  ? cn("font-mono text-lg font-black tracking-tight", tempoColor(bpm))
+                  : "flex w-14 flex-col items-center",
               )}>
-              {bpm}
+              {compact ? (
+                bpm
+              ) : (
+                <>
+                  <span className={cn("pt-1.5 font-teko text-[40px] font-semibold leading-[0.8]", tempoColor(bpm))}>{bpm}</span>
+                  <span translate='no' className='text-[11px] font-medium leading-none text-zinc-500'>
+                    bpm
+                  </span>
+                </>
+              )}
             </button>
           </SessionTooltip>
         )}
@@ -246,9 +255,10 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
                   className={cn(
                     stepBtn,
                     "font-mono text-xs font-bold",
+                    !compact && "w-auto min-w-9 px-2",
                     accentLocked && "text-amber-400",
                   )}>
-                  {metronome.accentPattern.length}
+                  {compact ? metronome.accentPattern.length : meterLabel}
                 </button>
               </DropdownMenuTrigger>
             </SessionTooltip>
@@ -319,12 +329,32 @@ export const ExerciseQuickActionsBar = memo(function ExerciseQuickActionsBar({
         {showSpeed && (
           <SpeedDropdown
             inline
-            h='h-8'
+            h='h-9'
             className='ml-1'
             speedMultiplier={speedMultiplier}
             onSpeedMultiplierChange={onSpeedMultiplierChange}
             baseBpm={bpm}
           />
+        )}
+
+        {/* Back to the exercise's tempo, shown only once it has moved off it.
+            Hangs off the bar's end so it never shifts the bar when it comes and goes. */}
+        {!compact && canReset && (
+          <span className='absolute inset-y-0 left-full flex items-center pl-2.5'>
+            <SessionTooltip label={t("quick.tempo_reset")} keys={["Enter"]}>
+              <button
+                type='button'
+                onClick={metronome.handleSetRecommendedBpm}
+                aria-label={t("quick.tempo_reset")}
+                className={cn(
+                  PRESSABLE_KEY,
+                  "flex h-9 items-center gap-1.5 rounded-lg bg-zinc-800 px-2.5 text-[13px] font-medium tabular-nums text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-100",
+                )}>
+                <RotateCcw className='h-3.5 w-3.5' />
+                {recommendedBpm}
+              </button>
+            </SessionTooltip>
+          </span>
         )}
       </div>
     </div>

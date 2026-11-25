@@ -36,36 +36,53 @@ export const SpeedsMasteredButton = memo(function SpeedsMasteredButton({
 
   if (!hasBpmProgress) return null;
 
-  const h = compact ? "h-8" : "h-12";
+  const h = compact ? "h-8" : "h-9";
 
   return (
     <>
-      {!compact && <div className="h-7 w-px bg-white/10 self-center" aria-hidden />}
       <button
         type='button'
         onClick={() => setIsOpen(true)}
         className={cn(
           PRESSABLE_KEY,
-          "flex items-center gap-2 rounded-lg font-bold transition-colors",
+          "flex items-center gap-2 rounded-lg font-medium transition-colors",
           h,
-          compact ? "px-2" : "px-4",
+          compact ? "px-2" : "px-2.5",
           isOpen
             ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
-            : "bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700"
+            : "bg-zinc-800 text-zinc-300 hover:text-zinc-100 hover:bg-zinc-700"
         )}
         title={t("speeds_mastered.hint")}
       >
-        <Check size='1em' className={cn("shrink-0", compact ? "h-3 w-3" : "h-3.5 w-3.5")} />
-        {!compact && <span className="text-xs font-semibold">{t("speeds_mastered.label")}</span>}
-        <span
-          className={cn(
-            "rounded bg-zinc-900 font-mono",
-            compact ? "px-1 text-[11px]" : "px-1.5 py-0.5 text-xs",
-            completedBpms.length > 0 ? "text-emerald-400" : "text-zinc-500"
-          )}
-        >
-          {completedBpms.length}/{bpmStages.length}
-        </span>
+        {compact ? (
+          <>
+            <Check size='1em' className='h-3 w-3 shrink-0' />
+            <span
+              className={cn(
+                "rounded bg-zinc-900 px-1 font-mono text-[11px] tabular-nums",
+                completedBpms.length > 0 ? "text-emerald-400" : "text-zinc-500"
+              )}>
+              {completedBpms.length}/{bpmStages.length}
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="text-[13px] font-medium">{t("toolbar.progress")}</span>
+            {/* The app's progress bar in small: a thick fill with the white glint on top. */}
+            <span aria-hidden className='relative h-2 w-10 shrink-0 overflow-hidden rounded-full bg-zinc-700'>
+              <span
+                className='absolute inset-y-0 left-0 rounded-full bg-emerald-500'
+                style={{ width: `${(completedBpms.length / bpmStages.length) * 100}%` }}
+              />
+              {completedBpms.length > 0 && (
+                <span className='light-hide absolute left-[3px] top-[2px] h-0.5 w-[7px] rounded-full bg-white/50' />
+              )}
+            </span>
+            <span className='text-[13px] font-semibold tabular-nums text-zinc-100'>
+              {completedBpms.length}/{bpmStages.length}
+            </span>
+          </>
+        )}
       </button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

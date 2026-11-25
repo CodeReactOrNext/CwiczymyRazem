@@ -87,7 +87,7 @@ describe("PracticeCalendar", () => {
     // The muted resting colour is inherited, so it can never win over one
     // declared on the cell itself.
     expect(container.querySelector(".rdp-root")?.className).toContain(
-      "text-zinc-600",
+      "text-zinc-400",
     );
   });
 
@@ -124,6 +124,35 @@ describe("PracticeCalendar", () => {
     expect(cell(container, "2026-08-05")?.className).toContain(
       "bg-cyan-500/25",
     );
+  });
+
+  it("joins days practised back to back into one ribbon", () => {
+    const { container } = render(<Harness />);
+
+    expect(cell(container, "2026-08-04")?.className).toContain(
+      "before:rounded-l-full",
+    );
+    expect(cell(container, "2026-08-05")?.className).toContain(
+      "before:rounded-r-full",
+    );
+    // On its own: no ribbon to either side.
+    expect(cell(container, "2026-08-11")?.className).not.toContain("before:");
+  });
+
+  it("flags the day the next streak milestone falls on", () => {
+    const { container } = render(
+      <PracticeCalendar
+        days={days}
+        from={null}
+        to={null}
+        onSelect={() => {}}
+        milestone={{ days: 7, date: new Date(2026, 7, 20) }}
+      />,
+    );
+
+    expect(dayButton(container, "2026-08-20").title).toBe("7-day streak");
+    expect(dayButton(container, "2026-08-20").querySelector("svg")).toBeTruthy();
+    expect(dayButton(container, "2026-08-19").querySelector("svg")).toBeNull();
   });
 
   it("does not let future days be picked", () => {

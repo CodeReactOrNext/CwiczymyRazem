@@ -42,14 +42,15 @@ export const SESSION_TYPE_CONFIG: Record<SessionType, SessionTypeConfig> = {
   },
 };
 
+/** Same hues as the category chips (exercisePlan/constants/categoryChip). */
 export const CATEGORY_META: {
   key: "techniqueTime" | "theoryTime" | "hearingTime" | "creativityTime";
   labelKey: string;
   text: string;
   dot: string;
 }[] = [
-  { key: "techniqueTime", labelKey: "common:calendar.technique", text: "text-blue-400", dot: "bg-blue-400" },
-  { key: "theoryTime", labelKey: "common:calendar.theory", text: "text-violet-400", dot: "bg-violet-400" },
-  { key: "hearingTime", labelKey: "common:calendar.hearing", text: "text-cyan-400", dot: "bg-cyan-400" },
-  { key: "creativityTime", labelKey: "common:calendar.creativity", text: "text-green-400", dot: "bg-green-400" },
+  { key: "techniqueTime", labelKey: "common:calendar.technique", text: "text-emerald-400", dot: "bg-emerald-400" },
+  { key: "theoryTime", labelKey: "common:calendar.theory", text: "text-blue-400", dot: "bg-blue-400" },
+  { key: "hearingTime", labelKey: "common:calendar.hearing", text: "text-amber-400", dot: "bg-amber-400" },
+  { key: "creativityTime", labelKey: "common:calendar.creativity", text: "text-purple-400", dot: "bg-purple-400" },
 ];

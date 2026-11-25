@@ -1,17 +1,15 @@
 {
   "page": {
     "empty": "No practice sessions yet",
-    "empty_hint": "Complete a practice session or add a manual report to see it here.",
     "empty_filtered": "Nothing matches your filters",
     "empty_filtered_hint": "Try widening the date range or clearing the filters.",
     "sessions_heading": "Sessions",
-    "day_sessions": "{{count}} session(s)"
+    "start": "Start practicing",
+    "day_sessions_one": "{{count}} session",
+    "day_sessions_other": "{{count}} sessions"
   },
   "pagination": {
-    "label": "Sessions pages",
-    "previous": "Previous page",
-    "next": "Next page",
-    "page_of": "Page {{page}} of {{total}}"
+    "show_more": "Show more sessions"
   },
   "timeline": {
     "heading": "Day timeline"
@@ -20,9 +18,8 @@
     "prev_month": "Previous month",
     "next_month": "Next month",
     "clear_range": "Clear selected dates",
-    "hint": "Tap two days for a range",
-    "less": "Less",
-    "more": "More"
+    "streak_goal_one": "{{count}}-day streak",
+    "streak_goal_other": "{{count}}-day streak"
   },
   "filters": {
     "heading": "Filters",
@@ -30,6 +27,10 @@
     "range_30d": "30 days",
     "range_90d": "90 days",
     "range_all": "All time",
+    "range_7d_short": "7d",
+    "range_30d_short": "30d",
+    "range_90d_short": "90d",
+    "range_all_short": "All",
     "range_label": "Date range",
     "clear_custom": "Clear the selected dates",
     "clear_all": "Clear filters",
@@ -50,7 +51,6 @@
     "sort_points_desc": "Most points"
   },
   "summary": {
-    "heading": "Overview",
     "time_split": "Time split",
     "total_time": "Total time",
     "sessions": "Sessions",
@@ -67,7 +67,7 @@
     "points": "Points",
     "edit": "Edit report",
     "delete": "Delete report",
-    "recorded_tooltip": "Recorded exercise — cannot be edited"
+    "play_again": "Practice again"
   },
   "edit_modal": {
     "title": "Edit report",
@@ -107,5 +107,11 @@
     "subtitle": "Browse, filter and edit your practice history day by day",
     "eyebrow": "Your history",
     "add": "Add Log"
+  },
+  "chart": {
+    "day": "Daily practice",
+    "week": "Weekly practice",
+    "month": "Monthly practice",
+    "year": "Yearly practice"
   }
 }

@@ -147,6 +147,16 @@
     "hide_tabs": "Ocultar tablatura",
     "by_ear": "Tocar de oído/de memoria"
   },
+  "toolbar": {
+    "play_tab": "Escuchar tab",
+    "backing": "Acompañamiento",
+    "standard_tuning": "E estándar",
+    "mic_scoring": "Puntuar con micro",
+    "mic_setup": "Ajustes del micro",
+    "wait_mode": "Modo espera",
+    "progress": "Progreso",
+    "slow_down": "Más lento"
+  },
   "quick": {
     "tempo_reset": "Tempo del metrónomo: volver al recomendado",
     "slower_hint": "Más lento (Mayús: −5 BPM)",
@@ -204,6 +214,14 @@
       "5": "la",
       "6": "mi grave"
     },
+    "find_every": "Encuentra cada {{note}}",
+    "skip": "Saltar",
+    "gate_title": "Encuentra cada nota",
+    "gate_detail": "{{minutes}} min en total, {{seconds}} s por nota.",
+    "round_solved": "Las {{total}} en {{seconds}} s",
+    "round_next": "Ahora viene la siguiente nota",
+    "round_missed": "{{found}} de {{total}} encontradas",
+    "round_missed_detail": "Faltaron: {{notes}}",
     "tap_octaves": "Toca cada octava que encuentres",
     "tap_octaves_region": "Toca cada octava que encuentres en la región"
   },
@@ -224,6 +242,7 @@
     "close_panel": "Ocultar herramientas del ejercicio"
   },
   "success": {
+    "correct": "Correctas",
     "mastered": "¡Dominado!",
     "passed": "¡Examen aprobado!",
     "failed": "Examen suspendido",
@@ -249,9 +268,23 @@
     "chart_early": "{{ms}} ms antes",
     "chart_late": "{{ms}} ms tarde",
     "chart_notes_one": "{{count}} nota",
-    "chart_notes_other": "{{count}} notas"
+    "chart_notes_other": "{{count}} notas",
+    "time": "Tiempo",
+    "best_run": "Mejor racha"
   },
   "quiz": {
+    "paused_note": "En pausa. Las respuestas vuelven a contar cuando corre el temporizador.",
+    "hear_it": "Escuchar",
+    "trust_ears": "sin números, confía en tu oído",
+    "thats_in_tune": "Está afinado",
+    "gate_detail": "{{minutes}} min. Los auriculares ayudan.",
+    "gate": {
+      "chordType": "Nombra el acorde que oyes",
+      "progression": "Construye la progresión que oyes",
+      "detune": "Desliza hasta que deje de ondular",
+      "scaleMode": "Nombra la escala que oyes",
+      "interval": "Nombra el intervalo que oyes"
+    },
     "stop": "Parar",
     "play_again": "Volver a reproducir",
     "play": "Reproducir",
@@ -289,7 +322,6 @@
     "play_slowly": "Reproducir despacio",
     "root": "Raíz: {{root}}",
     "root_held": "La raíz suena de fondo: mide cada nota respecto a ella",
-    "hear_again_slowly": "Escuchar otra vez, despacio",
     "hear_from_root": "Escuchar {{name}} desde {{root}}",
     "which_chord": "¿Qué tipo de acorde es?",
     "play_chord": "Reproducir acorde",
@@ -380,6 +412,10 @@
     "change": "Cambiar pista de acompañamiento"
   },
   "ear": {
+    "listen_play_back": "Escucha y tócalo",
+    "missed_it": "No la tenía",
+    "next_melody_key": "Siguiente melodía",
+    "score": "Puntos",
     "correct": "Correcto: punto ganado",
     "next_melody": "La siguiente melodía está en camino…",
     "tab_shows": "La tablatura de abajo muestra la melodía. Vuelve a reproducirla para comparar.",
@@ -415,15 +451,15 @@
     "boost": "Subir volumen",
     "unmute": "Activar sonido",
     "mute": "Silenciar",
-    "main_instrument": "Instrumento principal"
+    "main_instrument": "Instrumento principal",
+    "mix": "Mezcla"
   },
   "auto_backing": {
-    "title": "Pista de acompañamiento",
     "toggle": "Acompañamiento generado",
     "description": "Batería, bajo y un pad suave escritos para este ejercicio, en su tonalidad y siguiendo sus acordes.",
     "drums_only": "Solo batería: las notas recorren todos los trastes, así que cualquier acorde chocaría con ellas.",
-    "drone": "Bajo y power chords sobre la raíz, porque las notas no dicen si es mayor o menor.",
     "headphones": "Con el micrófono activo, usa auriculares. Si no, el micrófono oirá la banda como si tocaras tú. Si se cuentan notas que no tocaste, revisa esto primero.",
+    "headphones_short": "¿Micrófono activo? Usa auriculares.",
     "groove": {
       "rock": "Rock",
       "pop": "Pop",
@@ -508,20 +544,31 @@
     "now_above": "{{interval}} por encima de ese {{root}}",
     "click_any": "Haz clic en cualquier {{note}}",
     "on_highlighted": "en las cuerdas resaltadas",
-    "root": "Raíz",
-    "target": "Objetivo",
     "play_root": "Toca la nota raíz desde la que se mide el intervalo",
     "hide_distance": "Ocultar la distancia",
     "how_far": "¿A qué distancia está?",
     "autoplay": "Reproducción automática",
-    "step": "Paso {{step}} de 2",
     "anywhere": "En cualquier lugar de los trastes {{from}}–{{to}}",
     "near_zone": "Cerca de tu {{root}}, dentro de la zona iluminada",
     "near": "Al alcance de tu {{root}}",
     "solved": "{{root}} + {{interval}} = {{target}}",
     "frets_up_one": "{{count}} traste más arriba",
     "frets_up_other": "{{count}} trastes más arriba",
-    "hear_root": "Escuchar la raíz"
+    "lives": "Quedan {{count}} de {{limit}} vidas",
+    "time_up": "Se acabó el tiempo",
+    "next_round": "Viene la siguiente ronda",
+    "answer_was": "{{interval}} por encima de {{root}} es {{target}}",
+    "wrong_note": "Era {{note}}",
+    "wrong_interval": "Era {{note}}, o sea {{interval}}",
+    "too_far": "Nota correcta, pero demasiado lejos de tu {{root}}",
+    "same_string": "Misma cuerda",
+    "same_fret": "mismo traste",
+    "strings_higher_one": "{{count}} cuerda más aguda",
+    "strings_higher_other": "{{count}} cuerdas más agudas",
+    "strings_lower_one": "{{count}} cuerda más grave",
+    "strings_lower_other": "{{count}} cuerdas más graves",
+    "frets_down_one": "{{count}} traste más abajo",
+    "frets_down_other": "{{count}} trastes más abajo"
   },
   "instructions": {
     "support_author": "Apoyar al autor",
@@ -572,10 +619,6 @@
     "exit": "Salir",
     "exit_no_save": "Salir sin guardar",
     "stay": "Seguir en la sesión"
-  },
-  "dialogs": {
-    "finished": "¡Ejercicio terminado!",
-    "great_job": "¡Buen trabajo!"
   },
   "speed": {
     "active_hint": "Velocidad {{speed}}: el clic y la pista suenan a {{effective}} BPM en lugar de {{base}}",
@@ -675,13 +718,11 @@
     "read": "Lee las instrucciones de abajo para empezar"
   },
   "progress": {
-    "title": "Progreso de la sesión",
-    "song": "Canción: {{title}}",
-    "exercise": "Ejercicio {{n}}",
     "go_to": "Ir a {{label}}"
   },
   "controls": {
-    "press_start": "Pulsa Start para tocar",
+    "resume": "Reanudar",
+    "again": "Otra vez",
     "pause": "Pausa",
     "restart": "Reiniciar ejercicio"
   },
@@ -785,12 +826,22 @@
     "body": "Esta ronda no entrará en las clasificaciones. Ponte auriculares o apaga el sonido de la guitarra y vuelve a empezar la ronda.",
     "mute": "Apagar guitarra"
   },
+  "bar": {
+    "more": "Más",
+    "time_only": "Solo el tiempo",
+    "save": "Guardar la sesión"
+  },
   "start_gate": {
     "start": "Empezar",
-    "preview": "Vista previa",
-    "hint_count_in": "El metrónomo marca la entrada y luego tocas. Vista previa te deja ver la tablatura sin que corra el tiempo.",
-    "hint": "El tiempo empieza al pulsar Empezar. Vista previa te deja mirar antes.",
-    "hint_no_preview": "El tiempo y los puntos cuentan desde que pulsas Empezar."
+    "count_in_short": "El metrónomo marca la entrada",
+    "clock_short": "El tiempo corre al pulsar Empezar",
+    "preview_first": "Ver antes la tablatura",
+    "hint_no_preview": "El tiempo y los puntos cuentan desde que pulsas Empezar.",
+    "mic_label": "Micrófono",
+    "mic_on": "Tocar con micrófono",
+    "mic_on_detail": "La app te escucha y puntúa lo que tocas",
+    "mic_off": "Tocar sin micrófono",
+    "mic_off_detail": "Tu tiempo de práctica cuenta igual"
   },
   "mic_open_failed": {
     "title": "El micrófono no se activó",
@@ -838,5 +889,33 @@
     "delete": "Mover a la papelera",
     "untitled": "Grabación"
   },
-  "exam_click_failed": "{{limit}} clics erróneos: examen suspendido."
+  "exam_click_failed": "{{limit}} clics erróneos: examen suspendido.",
+  "verdict": {
+    "time": "{{minutes}} min hechos",
+    "clean": "Toma limpia",
+    "rough": "Ejercicio terminado",
+    "weak_bar": "Se escapó el compás {{bar}}",
+    "next": "Siguiente: {{title}}",
+    "stats": "{{accuracy}} % de aciertos, {{count}} seguidas",
+    "again": "Otra vez",
+    "drill": "Compás {{bar}} más lento",
+    "continue": "Continuar"
+  },
+  "drill": {
+    "title": "Compás {{bar}} más lento",
+    "detail": "{{count}} pasadas limpias a {{bpm}} BPM",
+    "done": "Ya lo tienes",
+    "done_detail": "El compás {{bar}} sale limpio a {{bpm}} BPM",
+    "skip": "Saltar",
+    "passes": "{{done}} de {{total}} pasadas limpias"
+  },
+  "interlude": {
+    "halfway": "Ya llevas la mitad.",
+    "done_of": "{{done}} de {{total}} hechos.",
+    "streak": "{{streak}} {{progress}}",
+    "in_a_row": "{{count}} seguidas."
+  },
+  "combo": {
+    "in_a_row": "{{count}} seguidas"
+  }
 }

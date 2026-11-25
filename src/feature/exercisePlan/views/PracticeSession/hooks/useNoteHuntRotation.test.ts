@@ -91,6 +91,80 @@ describe("useNoteHuntRotation — timer pacing", () => {
   });
 });
 
+describe("useNoteHuntRotation — rounds that end on a verdict", () => {
+  const verdictExercise = () => makeExercise({ rotateSeconds: 10, roundVerdict: true });
+
+  it("holds a missed round until it is moved on", () => {
+    const { result } = renderRotation(verdictExercise());
+    const first = result.current.rotation.target!.goal;
+
+    act(() => void vi.advanceTimersByTime(10_000));
+    expect(result.current.rotation.roundEnd).toEqual({ kind: "timeUp", seconds: 10 });
+    expect(result.current.rotation.secondsLeft).toBe(0);
+
+    act(() => void vi.advanceTimersByTime(30_000));
+    expect(result.current.rotation.target!.goal).toBe(first);
+
+    act(() => result.current.rotation.advance());
+    expect(result.current.rotation.roundEnd).toBeNull();
+    expect(result.current.rotation.target!.goal).not.toBe(first);
+    expect(result.current.rotation.secondsLeft).toBe(10);
+  });
+
+  it("answers a solved round once, and not again off the stale solved flag", () => {
+    const { result } = renderRotation(verdictExercise());
+    act(() => void vi.advanceTimersByTime(4000));
+    act(() => {
+      result.current.solvedRef.current = true;
+      vi.advanceTimersByTime(200);
+    });
+    expect(result.current.rotation.roundEnd).toEqual({ kind: "solved", seconds: 4 });
+    expect(result.current.rotation.streak).toBe(1);
+
+    act(() => result.current.rotation.advance());
+    act(() => void vi.advanceTimersByTime(300));
+    expect(result.current.rotation.roundEnd).toBeNull();
+    expect(result.current.rotation.streak).toBe(1);
+  });
+
+  it("ends the streak on a skipped round and on a missed one", () => {
+    const { result } = renderRotation(verdictExercise());
+    act(() => {
+      result.current.solvedRef.current = true;
+      vi.advanceTimersByTime(200);
+    });
+    act(() => result.current.rotation.advance());
+    result.current.solvedRef.current = false;
+    act(() => result.current.rotation.advance());
+    expect(result.current.rotation.streak).toBe(0);
+  });
+
+  it("keeps a click-answered round's verdict in an exam", () => {
+    const exercise = makeExercise({ rotateSeconds: 25, mode: "intervalClick", roundVerdict: true });
+    const { result } = renderHook(() => {
+      const solvedRef = useRef(false);
+      return { rotation: useNoteHuntRotation(exercise, true, solvedRef, true), solvedRef };
+    });
+    act(() => {
+      result.current.solvedRef.current = true;
+      vi.advanceTimersByTime(300);
+    });
+    expect(result.current.rotation.roundEnd?.kind).toBe("solved");
+  });
+
+  it("just rotates in an exam", () => {
+    const exercise = verdictExercise();
+    const { result } = renderHook(() => {
+      const solvedRef = useRef(false);
+      return useNoteHuntRotation(exercise, true, solvedRef, true);
+    });
+    const first = result.current.target!.goal;
+    act(() => void vi.advanceTimersByTime(10_000));
+    expect(result.current.roundEnd).toBeNull();
+    expect(result.current.target!.goal).not.toBe(first);
+  });
+});
+
 describe("useNoteHuntRotation — wait-for-answer pacing", () => {
   const waitingExercise = () => makeExercise({ rotateSeconds: 0, mode: "interval", advanceOn: "solved" });
 

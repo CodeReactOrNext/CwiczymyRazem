@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -30,6 +30,15 @@ const renderShop = (overrides = {}) => {
   return props;
 };
 
+const buttonIn = (root: HTMLElement, text: RegExp) =>
+  Array.from(root.querySelectorAll("button")).find((b) =>
+    text.test(b.textContent ?? ""),
+  ) as HTMLButtonElement | undefined;
+
+/** The card's one key — the only button of a card named by what it opens. */
+const openKey = (root: HTMLElement) =>
+  within(root).getByRole("button", { name: /^Open (case|[0-9])/ }) as HTMLButtonElement;
+
 const card = (name: string) =>
   screen.getByRole("heading", { name }).closest("article") as HTMLElement;
 
@@ -40,12 +49,13 @@ describe("CaseShop", () => {
     expect(screen.getByRole("heading", { name: "Featured Case" })).toBeTruthy();
     expect(screen.getByText(/Refreshes in/)).toBeTruthy();
     expect(screen.getByText("Inside this drop")).toBeTruthy();
+    expect(screen.getByText("0 / 10 in your Dex")).toBeTruthy();
     expect(
       document.querySelector('img[src="/images/case-featured-hero.webp"]'),
     ).toBeTruthy();
   });
 
-  it("shelves six cards: the ladder across the top, the side cases under it", () => {
+  it("shelves one card per case: the ladder across the top, the side cases under it", () => {
     renderShop();
 
     const names = screen
@@ -120,9 +130,37 @@ describe("CaseShop", () => {
     );
     expect(onOpenCase).toHaveBeenLastCalledWith("daily", undefined);
 
-    const [firstFree] = screen.getAllByRole("button", { name: /Open free/ });
-    fireEvent.click(firstFree);
-    expect(onOpenCase).toHaveBeenLastCalledWith("daily", true);
+    const standard = card("Standard Case");
+    fireEvent.click(buttonIn(standard, /Open free/)!);
+    fireEvent.click(
+      within(standard).getByRole("button", { name: "Open free" }),
+    );
+    expect(onOpenCase).toHaveBeenLastCalledWith("standard", true);
+  });
+
+  it("starts every card on a single paid open, free cases in hand or not", () => {
+    const { onOpenCase } = renderShop({ freeTokens: 2 });
+
+    fireEvent.click(openKey(card("Standard Case")));
+    expect(onOpenCase).toHaveBeenLastCalledWith("standard", undefined);
+  });
+
+  it("falls back to a paid open once the last free case is spent", () => {
+    const props = {
+      currentFame: 5000,
+      onOpenCase: vi.fn(),
+      onOpenPack: vi.fn(),
+      isOpening: false,
+      lastResult: null,
+    };
+    const { rerender } = render(<CaseShop {...props} freeTokens={1} />, {
+      wrapper: Wrapper,
+    });
+    fireEvent.click(buttonIn(card("Standard Case"), /Open free/)!);
+    rerender(<CaseShop {...props} freeTokens={0} />);
+
+    fireEvent.click(openKey(card("Standard Case")));
+    expect(props.onOpenCase).toHaveBeenLastCalledWith("standard", undefined);
   });
 
   it("keeps the free-case button off the vault, which no token can open", () => {
@@ -146,14 +184,17 @@ describe("CaseShop", () => {
     const { onOpenPack } = renderShop();
 
     const standard = card("Standard Case");
-    fireEvent.click(
-      Array.from(standard.querySelectorAll("button")).find((b) =>
-        /×5/.test(b.textContent ?? ""),
-      )!,
+    fireEvent.click(buttonIn(standard, /×5/)!);
+    // Picking a size spends nothing: the key does.
+    expect(onOpenPack).not.toHaveBeenCalled();
+    expect(openKey(standard).getAttribute("aria-label")).toBe(
+      "Open 5 at once · 900",
     );
+    fireEvent.click(openKey(standard));
     expect(onOpenPack).toHaveBeenLastCalledWith("standard", 5);
-    expect(standard.textContent).toContain("900");
-    expect(standard.textContent).toContain("1800");
+
+    fireEvent.click(buttonIn(standard, /×10/)!);
+    expect(openKey(standard).getAttribute("aria-label")).toContain("1800");
   });
 
   it("opens the pack of the case the switch is on, not the one it started on", () => {
@@ -166,11 +207,8 @@ describe("CaseShop", () => {
       )!,
     );
     const effects = card("Elite Effects Case");
-    fireEvent.click(
-      Array.from(effects.querySelectorAll("button")).find((b) =>
-        /×10/.test(b.textContent ?? ""),
-      )!,
-    );
+    fireEvent.click(buttonIn(effects, /×10/)!);
+    fireEvent.click(openKey(effects));
     expect(onOpenPack).toHaveBeenLastCalledWith("elite-effect", 10);
   });
 
@@ -178,11 +216,21 @@ describe("CaseShop", () => {
     renderShop({ currentFame: 1000 });
 
     const standard = card("Standard Case");
-    const buttons = Array.from(standard.querySelectorAll("button"));
-    const five = buttons.find((b) => /×5/.test(b.textContent ?? ""))!;
-    const ten = buttons.find((b) => /×10/.test(b.textContent ?? ""))!;
-    expect((five as HTMLButtonElement).disabled).toBe(false);
-    expect((ten as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(buttonIn(standard, /×5/)!);
+    expect(openKey(standard).disabled).toBe(false);
+    fireEvent.click(buttonIn(standard, /×10/)!);
+    expect(openKey(standard).disabled).toBe(true);
+  });
+
+  it("opens the drop rates on a tap, which Radix alone does not", async () => {
+    renderShop();
+
+    const rates = within(card("Standard Case")).getByRole("button", {
+      name: "Drop Rates",
+    });
+    fireEvent.pointerDown(rates, { pointerType: "touch" });
+    fireEvent.click(rates);
+    expect(rates.getAttribute("data-state")).not.toBe("closed");
   });
 
   it("prints a case's pity counters, and says so when the next open is owed", () => {
@@ -230,10 +278,7 @@ describe("CaseShop", () => {
     renderShop({ currentFame: 200 });
 
     const elite = card("Elite Guitar Case");
-    const openButton = Array.from(elite.querySelectorAll("button")).find((b) =>
-      /Open case/.test(b.textContent ?? ""),
-    ) as HTMLButtonElement;
-    expect(openButton.disabled).toBe(true);
+    expect(openKey(elite).disabled).toBe(true);
     expect(elite.textContent).toContain("500");
   });
 });

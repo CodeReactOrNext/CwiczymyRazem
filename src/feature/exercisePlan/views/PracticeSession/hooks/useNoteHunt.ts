@@ -34,7 +34,15 @@ export interface NoteHuntState {
   /** Round tally for the prompt drills, `null` for the octave hunts — how many
    *  questions the session has put up and how many were answered. */
   rounds: { solved: number; presented: number } | null;
+  /** Whole-neck octave hunts: octaves found and missed over the run, for the
+   *  live readout. Both 0 until the first round is over. Null elsewhere. */
+  tally: { hits: number; misses: number } | null;
 }
+
+/** The neck's end for the whole-neck hunts. Every guitar has this many frets —
+ *  asking for every octave up to the 24th made E impossible to finish on 22. */
+export const HUNT_MAX_FRET = 15;
+const HIGH_E_OPEN_MIDI = 64;
 
 const SAMPLE_MS = 50;            // ~20 Hz, same cadence as the live tuner
 const CONFIRM_SAMPLES = 2;       // require ~100ms of a stable pitch before counting it
@@ -66,10 +74,16 @@ export function huntPositions(
   note: string,
   fretRange: [number, number],
   strings?: readonly number[],
-): { string: number; fret: number; octave: number }[] {
+): { string: number; fret: number; midiNote: number; octave: number }[] {
   const idx = NOTES.indexOf(note);
   if (idx < 0) return [];
   return getNotePositionsInRange(idx, fretRange[0], fretRange[1], strings);
+}
+
+/** The octaves a whole-neck hunt asks for: up to HUNT_MAX_FRET. */
+export function wholeNeckOctaves(note: string): number[] {
+  const idx = NOTES.indexOf(note);
+  return playableOctaves(note).filter(o => (o + 1) * 12 + idx <= HIGH_E_OPEN_MIDI + HUNT_MAX_FRET);
 }
 
 /**
@@ -82,8 +96,14 @@ export function huntPositions(
  * the same note played on a different string lands in the wrong octave and is
  * not counted — the mic can't hear which string was plucked, but it can hear that.
  */
-function targetOctaves(note: string, fretRange?: [number, number], strings?: readonly number[]): number[] {
-  if (!fretRange) return playableOctaves(note);
+function targetOctaves(
+  note: string,
+  fretRange?: [number, number],
+  strings?: readonly number[],
+  /** Prompt drills take the answer in any octave the guitar has. */
+  anyOctave = false,
+): number[] {
+  if (!fretRange) return anyOctave ? playableOctaves(note) : wholeNeckOctaves(note);
   const positions = huntPositions(note, fretRange, strings);
   return Array.from(new Set(positions.map(p => p.octave))).sort((a, b) => a - b);
 }
@@ -102,6 +122,9 @@ function sameState(a: NoteHuntState, b: NoteHuntState): boolean {
     a.isMatch === b.isMatch &&
     a.hitId === b.hitId &&
     a.gameState.score === b.gameState.score &&
+    a.accuracy === b.accuracy &&
+    a.tally?.hits === b.tally?.hits &&
+    a.tally?.misses === b.tally?.misses &&
     a.foundOctaves.length === b.foundOctaves.length &&
     a.octaves.length === b.octaves.length &&
     Math.abs(a.cents - b.cents) < 3
@@ -120,6 +143,8 @@ function buildState(
   /** Rounds banked so far (the current one excluded from `solved`, included in
    *  `presented`). `null` grades by octave instead — see below. */
   rounds: { solved: number; presented: number } | null = null,
+  /** Whole-neck octave hunts: octaves found and asked for in the rounds gone by. */
+  banked: { found: number; total: number } | null = null,
 ): NoteHuntState {
   const foundInRange = octaves.filter(o => found.has(o)).length;
 
@@ -133,6 +158,12 @@ function buildState(
   const units = rounds ? rounds.solved + (foundInRange > 0 ? 1 : 0) : foundInRange;
   const total = rounds ? rounds.presented : octaves.length;
   const multiplier = Math.min(8, Math.floor(units / 5) + 1);
+  // A hunt of many notes is graded over all of them. The note on screen only
+  // costs what it misses once it is over; until the first one is, it is all
+  // there is to grade.
+  const hasBanked = !!banked && banked.total > 0;
+  const gradedFound = hasBanked ? banked.found + foundInRange : units;
+  const gradedTotal = hasBanked ? banked.total + foundInRange : total;
   return {
     detectedNote, detectedOctave, cents, isMatch, hitId, octaves,
     foundOctaves: Array.from(found).sort((a, b) => a - b),
@@ -143,10 +174,14 @@ function buildState(
       combo: units,
       multiplier,
     },
-    accuracy: total > 0 ? Math.round((units / total) * 100) : 0,
+    accuracy: gradedTotal > 0 ? Math.round((gradedFound / gradedTotal) * 100) : 0,
     maxPossibleScore: scoreForCount(total),
     maxCombo: units,
     rounds,
+    tally: banked && {
+      hits: hasBanked ? gradedFound : 0,
+      misses: banked.total - banked.found,
+    },
   };
 }
 
@@ -200,10 +235,12 @@ export function useNoteHunt(
   const countingRef = useRef(counting);
   useEffect(() => { countingRef.current = counting; });
   const shiftedTargetNote = shiftNote(targetNote, tuningShift);
+  const gradesWholeRun = !roundGraded && !fretRange;
   const [state, setState] = useState<NoteHuntState>(() =>
     buildState(
-      targetOctaves(shiftedTargetNote, fretRange, strings), new Set(), null, null, 0, false, 0, 0,
+      targetOctaves(shiftedTargetNote, fretRange, strings, roundGraded), new Set(), null, null, 0, false, 0, 0,
       roundGraded ? { solved: 0, presented: 1 } : null,
+      gradesWholeRun ? { found: 0, total: 0 } : null,
     ),
   );
 
@@ -220,7 +257,7 @@ export function useNoteHunt(
   const prevFoundRef   = useRef(0);
   const hitIdRef       = useRef(0);
   const targetRef      = useRef(shiftedTargetNote);
-  const octavesRef     = useRef<number[]>(targetOctaves(shiftedTargetNote, fretRange, strings));
+  const octavesRef     = useRef<number[]>(targetOctaves(shiftedTargetNote, fretRange, strings, roundGraded));
   // Score banked from previous targets — keeps the total accumulating across rotations.
   const sessionScoreRef = useRef(0);
   const firstTargetRef  = useRef(true);
@@ -229,6 +266,10 @@ export function useNoteHunt(
   // unanswered question already counts against the grade).
   const roundsSolvedRef    = useRef(0);
   const roundsPresentedRef = useRef(1);
+  // Whole-neck octave hunts: what the rounds gone by asked for and got. A target
+  // swapped out before the clock ever ran on it was never asked.
+  const bankedRef = useRef<{ found: number; total: number } | null>(gradesWholeRun ? { found: 0, total: 0 } : null);
+  const roundLiveRef = useRef(false);
 
   // Retarget in place when the goal note or region changes (no remount). Refs
   // only — the RAF loop pushes the cleared state on its next tick.
@@ -241,14 +282,22 @@ export function useNoteHunt(
       sessionScoreRef.current = 0;
       roundsSolvedRef.current = 0;
       roundsPresentedRef.current = 1;
+      bankedRef.current = gradesWholeRun ? { found: 0, total: 0 } : null;
     } else if (!firstTargetRef.current) {
       sessionScoreRef.current += scoreForCount(prevFoundRef.current);
       if (prevFoundRef.current > 0) roundsSolvedRef.current += 1;
       roundsPresentedRef.current += 1;
+      if (bankedRef.current && roundLiveRef.current) {
+        bankedRef.current = {
+          found: bankedRef.current.found + prevFoundRef.current,
+          total: bankedRef.current.total + octavesRef.current.length,
+        };
+      }
     }
+    roundLiveRef.current = countingRef.current;
     firstTargetRef.current = false;
     targetRef.current     = shiftedTargetNote;
-    octavesRef.current    = targetOctaves(shiftedTargetNote, fretRange, strings);
+    octavesRef.current    = targetOctaves(shiftedTargetNote, fretRange, strings, roundGraded);
     foundRef.current      = new Set();
     stableRef.current     = null;
     wasMatchingRef.current = false;
@@ -259,9 +308,13 @@ export function useNoteHunt(
     setState(buildState(
       octavesRef.current, foundRef.current, null, null, 0, false, 0, sessionScoreRef.current,
       roundGraded ? { solved: roundsSolvedRef.current, presented: roundsPresentedRef.current } : null,
+      bankedRef.current,
     ));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetKey, runKey]);
+
+  // After the retarget above, so a round that opens on a running clock counts as live.
+  useEffect(() => { if (counting) roundLiveRef.current = true; }, [counting]);
 
   useEffect(() => {
     if (!active) return () => { /* nothing to clean up */ };
@@ -309,6 +362,7 @@ export function useNoteHunt(
               octaves, foundRef.current, data.note, data.octave, data.cents,
               isMatch, hitIdRef.current, sessionScoreRef.current,
               roundGraded ? { solved: roundsSolvedRef.current, presented: roundsPresentedRef.current } : null,
+              bankedRef.current,
             );
             setState(prev => sameState(prev, next) ? prev : next);
           }
@@ -347,6 +401,7 @@ export function useNoteHunt(
       octavesRef.current, found, prev.detectedNote, prev.detectedOctave, prev.cents,
       prev.isMatch, hitIdRef.current, sessionScoreRef.current,
       roundGraded ? { solved: roundsSolvedRef.current, presented: roundsPresentedRef.current } : null,
+      bankedRef.current,
     ));
   }, [roundGraded]);
 

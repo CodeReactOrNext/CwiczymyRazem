@@ -147,6 +147,7 @@ const ROADMAP_STEPS: RoadmapStep[] = [
   },
   {
     id: "journey-intervals",
+    done: true,
     cost: 40,
     icon: Route,
     label: "Journey: Intervals",

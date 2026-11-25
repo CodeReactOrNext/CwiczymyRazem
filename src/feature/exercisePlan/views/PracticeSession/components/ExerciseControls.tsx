@@ -12,6 +12,8 @@ interface ExerciseControlsProps {
   variant?: "default" | "centered";
 
   hidePlayButton?: boolean;
+  /** Point at Start — only where nothing on the exercise itself offers it yet. */
+  showStartHint?: boolean;
   isFinished?: boolean;
   riddleConfig?: any;
   handleRestart?: () => void;
@@ -26,6 +28,7 @@ const ExerciseControls = ({
   variant = "default",
 
   hidePlayButton = false,
+  showStartHint = false,
   isFinished = false,
   handleRestart
 }: ExerciseControlsProps) => {
@@ -48,10 +51,10 @@ const ExerciseControls = ({
             size={buttonSize}
             onClick={toggleTimer}
             className={variant === "centered" ? "w-auto" : "w-full"}>
-            {!isPlaying && (
+            {!isPlaying && showStartHint && (
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 whitespace-nowrap z-[60] pointer-events-none">
                 <div className="animate-bounce flex flex-col items-center">
-                  <div className="bg-white  px-4 py-1.5 rounded-lg  text-[13px]  shadow-2xl shadow-white/20 flex items-center gap-1.5">
+                  <div className="bg-white px-4 py-1.5 rounded-lg text-[13px] text-black flex items-center gap-1.5">
                     <Play />
                     <span>{t("controls.press_start")}</span>
                   </div>

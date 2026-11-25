@@ -118,6 +118,7 @@ describe("sessionEntryStore", () => {
     expect(isSessionEntryPath("/practice/exercise/spider")).toBe(true);
     expect(isSessionEntryPath("/songs/practice/abc")).toBe(true);
     expect(isSessionEntryPath("/onboarding/first-riff")).toBe(true);
+    expect(isSessionEntryPath("/onboarding/first-hunt?level=new")).toBe(true);
     expect(isSessionEntryPath("/songs")).toBe(false);
     expect(isSessionEntryPath("/dashboard")).toBe(false);
   });

@@ -36,7 +36,7 @@ Mikrofon, interfejs ani żadna konfiguracja nie są potrzebne do niczego z tego.
 
 ## Wybierz punkt startowy
 
-Zaraz po rejestracji jesteś pytany, od czego chciałbyś zacząć. To tylko decyduje, na jakim ekranie wylądujesz najpierw, nic nie jest zablokowane i możesz używać wszystkich czterech od pierwszego dnia. Wybierz ten, który pasuje do twojego problemu:
+Zaraz po rejestracji odpowiadasz na trzy krótkie pytania: od jak dawna grasz, ile minut dziennie chcesz ćwiczyć (zmienisz to potem w Ustawieniach) i co robisz w pierwszej minucie: grasz krótki riff, szukasz nut na gryfie bez gitary albo po prostu się rozglądasz. Potem Kostek oprowadza cię po aplikacji. Nic nie jest zablokowane i wszystkie cztery miejsca poniżej masz od pierwszego dnia. Wybierz to, które pasuje do twojego problemu:
 
 <Checklist items="Prowadzona podróż::Nie wiesz, co ćwiczyć. Aplikacja wybiera ci następny krok, po jednym|Biblioteka ćwiczeń::Znasz swoją słabość i chcesz ćwiczenie na nią|Dziennik ćwiczeń::Masz już rutynę i chcesz ją tylko śledzić|Biblioteka utworów::Jesteś tu, żeby uczyć się utworów, i chcesz mieć repertuar w jednym miejscu" />
 

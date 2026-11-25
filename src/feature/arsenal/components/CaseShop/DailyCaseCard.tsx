@@ -1,9 +1,3 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
 import {
@@ -15,21 +9,21 @@ import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { buildDexLookup } from "feature/arsenal/utils/dex";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
-import { readableText,useColorTheme } from "lib/colorTheme/colorTheme";
+import { readableText, useColorTheme } from "lib/colorTheme/colorTheme";
 import { Clock3 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { DexCornerMark, DexMarks } from "../DexMarks";
 import { RARITY_STYLES } from "../RarityBadge";
-import { DropRates, oddsTooltipClass, rollChance } from "./DropRates";
-import { FreeCaseButton } from "./FreeCaseButton";
-import { OpenCaseButton } from "./OpenCaseButton";
+import { CaseBuyControl } from "./CaseBuyControl";
+import { DropRates, rollChance } from "./DropRates";
+import { TapTooltip } from "./TapTooltip";
 
 interface DailyCaseCardProps {
   currentFame: number;
   onOpen: (caseType: string, useToken?: boolean) => void;
   isOpening: boolean;
-  /** Free cases the player is holding. Zero hides the second button entirely. */
+  /** Free cases the player is holding. Zero hides that choice. */
   freeTokens?: number;
 }
 
@@ -51,11 +45,10 @@ export const DailyCaseCard = ({
 }: DailyCaseCardProps) => {
   const caseDef = CASE_DEFINITIONS.daily;
   const labels = useArsenalLabels();
-  // Light theme: the pool tiles go flat — a plain rarity tint, no lit edge,
-  // corner glow or contact shadow.
+  // Light theme: the pool tiles go flat — a plain rarity tint, no corner glow
+  // or contact shadow.
   const isLight = useColorTheme() === "light";
   const { t } = labels;
-  const canAfford = currentFame >= caseDef.fameCost;
 
   // Ticking clock drives both the countdown and the automatic pool rollover
   // at the rotation boundary (every 3 UTC days). Deriving the pool each tick
@@ -74,6 +67,11 @@ export const DailyCaseCard = ({
   const { data: arsenalData } = useArsenalData();
   const dexStatusOf = useMemo(() => buildDexLookup(arsenalData), [arsenalData]);
 
+  const inDexCount = pool.filter((entry) => {
+    const status = dexStatusOf(entry.kind, entry.def.id);
+    return status.isOwned || status.inDex;
+  }).length;
+
   return (
     <section className='overflow-hidden rounded-lg bg-arsenal-section'>
       {/* Hero band. The render was composed for this slot — case in the right
@@ -84,57 +82,43 @@ export const DailyCaseCard = ({
           runs under the tiles below. */}
       {/* force-dark: the render is composed on near-black, so the band stays a
           dark photo banner in the light theme instead of melting into white. */}
-      <div className='force-dark relative min-h-[22rem] overflow-hidden bg-arsenal-section'>
+      <div className='force-dark relative overflow-hidden bg-arsenal-section'>
         <img
           src='/images/case-featured-hero.webp'
           alt=''
-          className='absolute inset-0 h-full w-full object-cover'
-          style={{ objectPosition: "right 25%" }}
+          className='absolute inset-x-0 top-0 h-[68%] w-full object-cover object-[78%_25%] sm:h-full sm:object-[right_25%]'
           draggable={false}
         />
         {/* Edges dissolve into the section rather than ending in a seam: a
             wash from the left for the copy, a fade at the foot, and a touch
             of dark at the top so the ceiling of the render goes quiet. */}
-        <div className='pointer-events-none absolute inset-0 bg-gradient-to-r from-arsenal-section via-arsenal-section/70 to-transparent lg:via-arsenal-section/20' />
-        <div className='light-hide pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-arsenal-section via-arsenal-section/50 to-transparent' />
+        <div className='pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-arsenal-section via-arsenal-section/70 to-transparent sm:block lg:via-arsenal-section/20' />
+        {/* On a phone the case is above the copy, so the wash comes up from the foot. */}
+        <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-arsenal-section from-[34%] to-transparent to-[75%] sm:hidden' />
+        <div className='light-hide pointer-events-none absolute inset-x-0 bottom-0 hidden h-24 sm:block bg-gradient-to-t from-arsenal-section via-arsenal-section/50 to-transparent' />
         <div className='pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-arsenal-section/50 to-transparent' />
 
-        <div className='relative flex min-h-[22rem] flex-col justify-center gap-5 p-6 sm:p-8 lg:max-w-[46%]'>
+        <div className='relative flex min-h-[22rem] flex-col justify-end gap-4 p-5 sm:min-h-[20rem] sm:justify-center sm:gap-5 sm:p-8 lg:max-w-[46%]'>
           <div>
-            <h2 className='font-display text-3xl font-black tracking-tight text-zinc-100 sm:text-4xl'>
+            <p className='flex items-center gap-1.5 text-sm font-semibold tabular-nums text-orange-300'>
+              <Clock3 size={14} aria-hidden />
+              <span className='sr-only'>{t("cases.refreshes_in")} </span>
+              {formatCountdown(msLeft)}
+            </p>
+            <h2 className='mt-1.5 font-display text-3xl font-black tracking-tight text-zinc-100 sm:text-4xl'>
               {labels.caseName(caseDef)}
             </h2>
-            <p className='mt-1.5 text-sm text-zinc-300'>
-              {t("cases.featured_pool", { count: pool.length })}
-            </p>
           </div>
 
-          <div className='flex w-fit items-center gap-2 rounded-lg bg-zinc-100/10 px-3.5 py-2 text-xs text-zinc-300'>
-            <Clock3 size={14} className='text-zinc-400' />
-            {t("cases.refreshes_in")}
-            <span className='font-bold tabular-nums text-zinc-100'>
-              {formatCountdown(msLeft)}
-            </span>
-          </div>
-
-          <div className='flex flex-wrap items-center gap-3'>
-            <OpenCaseButton
-              canAfford={canAfford}
-              isOpening={isOpening}
-              onClick={() => onOpen(caseDef.id)}
-              fameCost={caseDef.fameCost}
-              variant='featured'
-            />
-            <DropRates probabilities={caseDef.probabilities} variant='inline' />
-            {freeTokens > 0 && (
-              <FreeCaseButton
-                isOpening={isOpening}
-                tokens={freeTokens}
-                onClick={() => onOpen(caseDef.id, true)}
-                className='py-3'
-              />
-            )}
-          </div>
+          <CaseBuyControl
+            caseDef={caseDef}
+            currentFame={currentFame}
+            isOpening={isOpening}
+            freeTokens={freeTokens}
+            onOpen={onOpen}
+            variant='featured'
+            className='w-full flex-col sm:w-64'
+          />
         </div>
       </div>
 
@@ -143,127 +127,106 @@ export const DailyCaseCard = ({
           Each one carries the odds for its own rarity on hover: standing in
           front of a Mythic, the question is what the chance of *that* is. */}
       <div className='relative p-5 sm:p-6'>
-        <p className='text-sm font-semibold text-zinc-300'>{t("cases.inside_drop")}</p>
+        <div className='flex items-center justify-between gap-x-4'>
+          <p className='text-sm font-semibold text-zinc-300'>
+            {t("cases.inside_drop")}
+            <span className='ml-2 font-medium tabular-nums text-zinc-400'>
+              {t("cases.in_dex", { count: inDexCount, total: pool.length })}
+            </span>
+          </p>
+          <DropRates probabilities={caseDef.probabilities} variant='inline' />
+        </div>
 
-        <TooltipProvider>
-          <div className='mt-4 grid grid-cols-2 gap-3.5 xsm:grid-cols-3 sm:grid-cols-5 xl:grid-cols-10'>
-            {pool.map((entry) => {
-              const rs = RARITY_STYLES[entry.def.rarity];
-              const chance = rollChance(
-                caseDef.probabilities,
-                entry.def.rarity,
-              );
-              const imageSrc =
-                entry.kind === "guitar"
-                  ? getRankBadgeSrc(entry.def.imageId, "medium")
-                  : getEffectImageSrc(entry.def.imageId, "medium");
+        {/* One row on a phone, scrolled sideways: five rows of two pushed the
+            shelf two screens down. */}
+        <div className='no-scrollbar -mx-5 mt-3 flex snap-x scroll-px-5 gap-3 overflow-x-auto px-5 sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0 xl:grid-cols-10'>
+          {pool.map((entry) => {
+            const rs = RARITY_STYLES[entry.def.rarity];
+            const chance = rollChance(
+              caseDef.probabilities,
+              entry.def.rarity,
+            );
+            const imageSrc =
+              entry.kind === "guitar"
+                ? getRankBadgeSrc(entry.def.imageId, "medium")
+                : getEffectImageSrc(entry.def.imageId, "medium");
 
-              const dexStatus = dexStatusOf(entry.kind, entry.def.id);
+            const dexStatus = dexStatusOf(entry.kind, entry.def.id);
 
-              return (
-                <Tooltip
-                  key={`${entry.kind}-${entry.def.id}`}
-                  delayDuration={150}>
-                  <TooltipTrigger asChild>
-                    <div
-                      tabIndex={0}
-                      className='group flex cursor-help flex-col gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'>
-                      {/* Near-black tile lit from its bottom-left corner: the
-                          rarity colour comes in as light from one side — a
-                          1px gradient edge that is strongest on the left and
-                          fades to a neutral hairline, and a corner glow that
-                          spreads across the tile the same way. The bottom
-                          darkens so the tile reads as sitting on the panel. */}
-                      <div
+            return (
+              <TapTooltip
+                key={`${entry.kind}-${entry.def.id}`}
+                trigger={
+                  // The rarity is the tile's own base rather than a second
+                  // line of text under it; the name is on the tooltip.
+                  <button
+                    type='button'
+                    className='group relative w-28 shrink-0 cursor-help snap-start overflow-hidden rounded-lg bg-arsenal-bg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring sm:w-auto'
+                    style={
+                      isLight ? { backgroundColor: `${rs.baseColor}1f` } : undefined
+                    }>
+                    <span className='relative flex aspect-square items-center justify-center overflow-hidden'>
+                      {/* Soft pool of light tucked into the bottom-left corner */}
+                      <span
+                        className='light-hide pointer-events-none absolute -bottom-1/3 -left-1/3 h-full w-full rounded-full opacity-90 blur-2xl transition-opacity group-hover:opacity-100'
+                        style={{
+                          background: `radial-gradient(circle at center, ${rs.baseColor}8c 0%, ${rs.baseColor}26 50%, transparent 72%)`,
+                        }}
+                      />
+                      {/* Contact shadow only: a pool of dark right under the
+                          instrument's base, as if it stood on the tile — no
+                          shadow on the silhouette itself. */}
+                      <span className='light-hide pointer-events-none absolute bottom-[4%] left-1/2 h-[7%] w-[52%] -translate-x-1/2 rounded-[100%] bg-black/85 blur-[5px]' />
+                      <img
+                        src={imageSrc}
+                        alt={`${entry.def.brand} ${entry.def.name}`}
                         className={cn(
-                          "rounded-xl p-px",
-                          !isLight && "shadow-[0_10px_18px_-12px_rgba(0,0,0,0.6)]",
+                          "relative z-10 h-[86%] w-[86%] object-contain",
+                          entry.kind === "guitar" && "-rotate-90",
                         )}
-                        style={
-                          isLight
-                            ? undefined
-                            : {
-                                background: `linear-gradient(45deg, ${rs.baseColor}a6 0%, ${rs.baseColor}40 30%, rgba(244,244,245,0.10) 60%, rgba(244,244,245,0.10) 100%)`,
-                              }
-                        }>
-                        <div
-                          className='relative flex aspect-square items-center justify-center overflow-hidden rounded-[11px] bg-arsenal-bg'
-                          style={isLight ? { backgroundColor: `${rs.baseColor}1f` } : undefined}>
-                          {/* Soft pool of light tucked into the bottom-left corner */}
-                          <div
-                            className='light-hide pointer-events-none absolute -bottom-1/3 -left-1/3 h-full w-full rounded-full opacity-90 blur-2xl transition-opacity group-hover:opacity-100'
-                            style={{
-                              background: `radial-gradient(circle at center, ${rs.baseColor}8c 0%, ${rs.baseColor}26 50%, transparent 72%)`,
-                            }}
-                          />
-                          {/* Contact shadow only: a pool of dark right under
-                              the instrument's base, as if it stood on the
-                              tile — no shadow on the silhouette itself. */}
-                          <div className='light-hide pointer-events-none absolute bottom-[4%] left-1/2 h-[7%] w-[52%] -translate-x-1/2 rounded-[100%] bg-black/85 blur-[5px]' />
-                          <div className='relative z-10 flex h-[86%] w-[86%] items-center justify-center transition-transform duration-base'>
-                            <img
-                              src={imageSrc}
-                              alt={`${entry.def.brand} ${entry.def.name}`}
-                              className={cn(
-                                "h-full w-full object-contain",
-                                entry.kind === "guitar" && "-rotate-90",
-                              )}
-                              draggable={false}
-                              loading='lazy'
-                            />
-                          </div>
-
-                          {/* Owned / Dex / new glyph, top-right of the tile. */}
-                          <div className='absolute right-1.5 top-1.5 z-20'>
-                            <DexCornerMark status={dexStatus} />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className='min-w-0 px-1'>
-                        <p className='flex items-start gap-2 text-[13px] font-semibold leading-snug text-zinc-100'>
-                          <span
-                            className='mt-[5px] h-2 w-2 flex-shrink-0 rounded-full'
-                            style={{ backgroundColor: rs.baseColor }}
-                          />
-                          <span className='line-clamp-2'>{entry.def.name}</span>
-                        </p>
-                        <p
-                          className='mt-1 pl-4 text-[13px] font-medium'
-                          style={{ color: readableText(rs.baseColor) }}>
-                          {labels.rarity(entry.def.rarity)}
-                        </p>
-                      </div>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side='top' className={oddsTooltipClass}>
-                    <p className='truncate text-xs font-bold'>
-                      {entry.def.brand} {entry.def.name}
-                    </p>
-                    <div className='mt-2.5 flex items-baseline justify-between gap-4'>
-                      <span
-                        className='text-[11px] font-semibold'
-                        style={{ color: readableText(rs.baseColor) }}>
-                        {labels.rarity(entry.def.rarity)}
+                        draggable={false}
+                        loading='lazy'
+                      />
+                      {/* Owned / Dex / new glyph, top-right of the tile. */}
+                      <span className='absolute right-1.5 top-1.5 z-20'>
+                        <DexCornerMark status={dexStatus} />
                       </span>
-                      <span
-                        className='text-lg font-black tabular-nums'
-                        style={{ color: readableText(rs.baseColor) }}>
-                        {chance !== undefined
-                          ? `${(chance * 100).toFixed(1)}%`
-                          : "—"}
-                      </span>
-                    </div>
-                    <DexMarks status={dexStatus} className='mt-2' inTooltip />
-                    <p className='mt-0.5 text-xs text-black/60'>
-                      {t("cases.chance_from_case")}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
-          </div>
-        </TooltipProvider>
+                    </span>
+                    <span
+                      className='block truncate px-1 py-1.5 text-center text-xs font-bold'
+                      style={{
+                        color: readableText(rs.baseColor),
+                        backgroundColor: `${rs.baseColor}29`,
+                      }}>
+                      {labels.rarity(entry.def.rarity)}
+                    </span>
+                  </button>
+                }>
+                <p className='truncate text-xs font-bold'>
+                  {entry.def.brand} {entry.def.name}
+                </p>
+                <div className='mt-2.5 flex items-baseline justify-between gap-4'>
+                  <span
+                    className='text-[11px] font-semibold'
+                    style={{ color: readableText(rs.baseColor) }}>
+                    {labels.rarity(entry.def.rarity)}
+                  </span>
+                  <span
+                    className='text-lg font-black tabular-nums'
+                    style={{ color: readableText(rs.baseColor) }}>
+                    {chance !== undefined
+                      ? `${(chance * 100).toFixed(1)}%`
+                      : "—"}
+                  </span>
+                </div>
+                <DexMarks status={dexStatus} className='mt-2' inTooltip />
+                <p className='mt-0.5 text-xs text-black/60'>
+                  {t("cases.chance_from_case")}
+                </p>
+              </TapTooltip>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

@@ -1,8 +1,9 @@
 import { cn } from "assets/lib/utils";
 import type { BackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
-import React, { memo, useEffect } from "react";
+import React, { memo, useEffect, useRef } from "react";
 
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
+import { isWholeNeckHunt } from "../../../utils/huntModes";
 import { isOpenExercise } from "../../../utils/isOpenExercise";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import { useTabOverlay } from "../contexts/TabOverlayContext";
@@ -73,14 +74,11 @@ interface ExerciseContentAreaProps {
 
   // Ear training
   isRiddleRevealed: boolean;
-  isRiddleGuessed: boolean;
   hasPlayedRiddleOnce: boolean;
   earTrainingScore: number;
   earTrainingHighScore: number | null;
   onPlayRiddle: () => void;
   onRevealRiddle: () => void;
-  onNextRiddle: () => void;
-  onEarTrainingGuessed: () => void;
   onLeaderboardClick: () => void;
   riddleProgress?: RiddleProgress | null;
 
@@ -152,14 +150,11 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   audioStartTime,
   tabResetKey,
   isRiddleRevealed,
-  isRiddleGuessed,
   hasPlayedRiddleOnce,
   earTrainingScore,
   earTrainingHighScore,
   onPlayRiddle,
   onRevealRiddle,
-  onNextRiddle,
-  onEarTrainingGuessed,
   onLeaderboardClick,
   riddleProgress,
   startTimer,
@@ -185,7 +180,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   obscured = false,
   startGate,
 }: ExerciseContentAreaProps) {
-  const { backingVideoId, setBackingVideoId } = useSessionUI();
+  const { backingVideoId, setBackingVideoId, onQuizContinue } = useSessionUI();
   const { gameMode } = useTabOverlay();
 
   useEffect(() => {
@@ -196,6 +191,9 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
     activeTablature &&
     activeTablature.length > 0 &&
     (currentExercise.riddleConfig?.mode !== "sequenceRepeat" || isRiddleRevealed);
+
+  // The tab takes what the keys and the guide under it leave of the screen.
+  const belowRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className={cn(
@@ -216,14 +214,10 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
       {currentExercise.riddleConfig?.mode === "sequenceRepeat" && (
         <div className="p-4">
           <EarTrainingView
-            difficulty={currentExercise.riddleConfig.difficulty}
             isRevealed={isRiddleRevealed}
-            isGuessed={isRiddleGuessed}
             isPlaying={isMetronomePlaying}
             onPlayRiddle={onPlayRiddle}
             onReveal={onRevealRiddle}
-            onNextRiddle={onNextRiddle}
-            onGuessed={onEarTrainingGuessed}
             score={earTrainingScore}
             highScore={earTrainingHighScore}
             canGuess={hasPlayedRiddleOnce}
@@ -243,20 +237,30 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
 
       {/* Content: ear quiz / note hunt / chord hunt / tablature / video / strumming / image */}
       {currentExercise.earQuizConfig ? (
-        <div className='p-4 sm:p-6'>
-          <EarQuizPanel
-            key={currentExercise.id}
-            config={currentExercise.earQuizConfig}
-            exerciseId={currentExercise.id}
-            isSessionRunning={isPlaying}
-          />
+        // The card's own width, for the verdict that runs across all of it (see QuizVerdictStrip).
+        <div className='[--quiz-strip-radius:0px] [--quiz-strip-width:100cqw] [container-type:inline-size]'>
+          <div className='relative p-4 sm:p-8'>
+            {startGate}
+            {/* The phone view has its own copy, and a round plays by itself — a
+                hidden one here would sound along with it. */}
+            {!suppressVideo && (
+              <EarQuizPanel
+                key={currentExercise.id}
+                config={currentExercise.earQuizConfig}
+                exerciseId={currentExercise.id}
+                isSessionRunning={isPlaying}
+                onContinue={onQuizContinue}
+              />
+            )}
+          </div>
         </div>
       ) : currentExercise.id === "metronome_gap_test" ? (
         <div className="p-4">
           <MetronomeGapTest isSessionRunning={isPlaying} onStartSession={startTimer} />
         </div>
       ) : currentExercise.customGoal ? (
-        <div className="flex w-full justify-center px-3 py-6 sm:px-5 sm:py-8">
+        <div className="relative flex w-full justify-center px-3 py-6 sm:px-5 sm:py-8">
+          {isWholeNeckHunt(currentExercise) && startGate}
           {currentExercise.noteHuntConfig?.mode === "chord" ? (
             <ChordHuntPanel
               chordName={currentExercise.customGoal}
@@ -265,7 +269,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
               isListening={isListening}
             />
           ) : currentExercise.noteHuntConfig?.mode === "intervalClick" ? (
-            <IntervalClickPanel
+            // The phone view has its own copy; a hidden one would sound along.
+            !suppressVideo && <IntervalClickPanel
               rootNote={currentExercise.customGoalPrompt?.title ?? ""}
               intervalLabel={currentExercise.customGoalPrompt?.subtitle}
               targetNote={currentExercise.customGoal}
@@ -297,6 +302,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
               isListening={isListening}
               isPlaying={isPlaying}
               onDevPassExam={onDevPassExam}
+              // The readout over the card has the score already.
+              showScore={false}
             />
           )}
         </div>
@@ -338,6 +345,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           isMicEnabled={isMicEnabled}
           onLoopRestart={onLoopRestart}
           obscured={obscured}
+          belowRef={belowRef}
         />}
         </div>
         </>
@@ -389,11 +397,9 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         />
       )}
       
+      <div ref={belowRef}>
       {controlsSlot && !cinema && (
-        <div
-          style={{ zoom: 0.9 }}
-          className="flex flex-row flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 py-4 [&>*]:!mb-0"
-        >
+        <div className="flex flex-row flex-wrap items-center justify-center gap-x-8 gap-y-3 px-4 pb-1 pt-5 [&>*]:!mb-0">
           {controlsSlot}
         </div>
       )}
@@ -401,11 +407,11 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
       {!gameMode && (
         <ExerciseInstructionsInline
           exercise={activeExercise}
-          isPlaying={isPlaying}
           rewardSkillId={rewardSkillId}
           rewardAmount={rewardAmount}
         />
       )}
+      </div>
     </div>
   );
 });

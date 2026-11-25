@@ -1,13 +1,11 @@
-import type {
-  EarQuizConfig,
-  EarQuizMode,
-} from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
-import { useTranslation } from "hooks/useTranslation";
+import type { EarQuizConfig } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
+import { useState } from "react";
 
+import { useEarQuizVerdictShown } from "../../helpers/earQuizVerdictStore";
 import { useEarQuizGame } from "../../hooks/useEarQuizGame";
 import { ChordTypeQuiz } from "./ChordTypeQuiz";
 import { DetuneQuiz } from "./DetuneQuiz";
-import { EarQuizCard, EarQuizHeader, StartTimerHint } from "./EarQuizChrome";
+import { EarQuizLayout, EarQuizStatus } from "./EarQuizChrome";
 import { IntervalQuiz } from "./IntervalQuiz";
 import { ProgressionQuiz } from "./ProgressionQuiz";
 import { ScaleModeQuiz } from "./ScaleModeQuiz";
@@ -17,66 +15,53 @@ interface EarQuizPanelProps {
   /** Scopes the saved best streak — each exercise keeps its own record. */
   exerciseId: string;
   /** Whether the session timer is running. The quiz never blocks on it; it just
-   *  reminds the player that practice time isn't being counted yet. */
+   *  says that answers aren't counted while it is paused. */
   isSessionRunning?: boolean;
+  /** The verdict was read and the next round is up. */
+  onContinue?: () => void;
 }
-
-const MODE_LABEL: Record<EarQuizMode, string> = {
-  chordType: "Chord quality",
-  progression: "Chord progressions",
-  detune: "Tuning by ear",
-  scaleMode: "Scales & modes",
-  interval: "Intervals",
-};
 
 /**
  * The five click-to-answer listening drills. Each one owns its answer UI; this
- * panel holds the round loop and the scoreboard they all share, so a session can
- * drop in any of them by setting `earQuizConfig` on the exercise.
+ * panel holds the round loop they all share, so a session can drop in any of
+ * them by setting `earQuizConfig` on the exercise. How a round went is said
+ * where its question stood (see QuizPrompt).
  */
-export function EarQuizPanel({
-  config,
-  exerciseId,
-  isSessionRunning,
-}: EarQuizPanelProps) {
-  const { t } = useTranslation("session");
+export function EarQuizPanel({ config, exerciseId, isSessionRunning, onContinue }: EarQuizPanelProps) {
   const { question, round, isAnswered, isCorrect, stats, answer, next } =
     useEarQuizGame(config, exerciseId, isSessionRunning);
 
+  useEarQuizVerdictShown(isAnswered);
+
+  // The first round plays as the session starts, the ones after it as they open.
+  const [hasStarted, setHasStarted] = useState(!!isSessionRunning);
+  if (isSessionRunning && !hasStarted) setHasStarted(true);
+
   // Every quiz body is keyed on the round (below), so a new question remounts it
   // and its per-round state resets by construction.
-  const shared = { isAnswered, isCorrect, onAnswer: answer, onNext: next };
+  const shared = {
+    isAnswered,
+    isCorrect,
+    onAnswer: answer,
+    onNext: () => {
+      next();
+      onContinue?.();
+    },
+    autoPlay: hasStarted || round > 0,
+    // Under the start gate the answers are out of sight, so their keys sleep too.
+    keysEnabled: isSessionRunning !== false && !isAnswered,
+  };
 
   return (
-    <EarQuizCard>
-      <EarQuizHeader
-        label={t(`quiz.modes.${config.mode}`, MODE_LABEL[config.mode])}
-        stats={stats}
-        hint={isSessionRunning === false && <StartTimerHint className='hidden shortwide:flex' />}
-      />
-      {isSessionRunning === false && <StartTimerHint className='shortwide:hidden' />}
-
-      {/* Sideways the stack runs past the screen: the question and its listen buttons move
-          into a left column, the answers beside them, the verdict across both underneath.
-          Every quiz body is laid out as those three parts in that order. */}
-      <div className='flex flex-col gap-6 shortwide:grid shortwide:grid-cols-2 shortwide:items-center shortwide:gap-x-6 shortwide:gap-y-4 shortwide:[&>*:nth-child(n+3)]:col-span-2'>
-        {question.kind === "chordType" && (
-          <ChordTypeQuiz key={round} question={question} {...shared} />
-        )}
-        {question.kind === "progression" && (
-          <ProgressionQuiz key={round} question={question} {...shared} />
-        )}
-        {question.kind === "detune" && (
-          // Past the first round Next was the click, so the notes start on their own.
-          <DetuneQuiz key={round} question={question} autoPlay={round > 0} {...shared} />
-        )}
-        {question.kind === "scaleMode" && (
-          <ScaleModeQuiz key={round} question={question} {...shared} />
-        )}
-        {question.kind === "interval" && (
-          <IntervalQuiz key={round} question={question} {...shared} />
-        )}
-      </div>
-    </EarQuizCard>
+    <div className='mx-auto flex w-full max-w-2xl flex-col gap-2 shortwide:max-w-3xl'>
+      <EarQuizStatus stats={stats} isPaused={isSessionRunning === false && hasStarted} />
+      <EarQuizLayout>
+        {question.kind === "chordType" && <ChordTypeQuiz key={round} question={question} {...shared} />}
+        {question.kind === "progression" && <ProgressionQuiz key={round} question={question} {...shared} />}
+        {question.kind === "detune" && <DetuneQuiz key={round} question={question} {...shared} />}
+        {question.kind === "scaleMode" && <ScaleModeQuiz key={round} question={question} {...shared} />}
+        {question.kind === "interval" && <IntervalQuiz key={round} question={question} {...shared} />}
+      </EarQuizLayout>
+    </div>
   );
 }

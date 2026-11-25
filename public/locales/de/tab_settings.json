@@ -206,6 +206,8 @@
     "lime": "Limette"
   },
   "view_menu": {
+    "button_tab": "Ansicht: Tab",
+    "button_notation": "Ansicht: Noten",
     "hint": "Ändern, wie die Übung angezeigt wird",
     "view": "Ansicht"
   }

@@ -831,13 +831,11 @@ type Action =
   | "glance"
   | "bounce"
   | "tilt"
-  | "ping"
   | "lookUp"
   | "wave"
   | "stretch";
 const ACTIONS: Action[] = [
   "glance",
-  "ping",
   "tilt",
   "wave",
   "glance",
@@ -1661,7 +1659,7 @@ export const Kostek = ({
         setTimeout(resolve, 1600);
       });
       setJoy(false);
-    } else if (act === "stretch") {
+    } else {
       g.gesture(
         "l",
         { x: [12, 12, 13], y: [40, 40, 86], r: [-20, -20, -10] },
@@ -1675,12 +1673,6 @@ export const Kostek = ({
       await action.start(
         { scaleY: [1, 1.06, 1.06, 1], scaleX: [1, 0.97, 0.97, 1] },
         { duration: 1.6, times: [0, 0.35, 0.7, 1] },
-      );
-    } else {
-      burstRings(0);
-      await action.start(
-        { scaleX: [1, 1.04, 1], scaleY: [1, 0.97, 1] },
-        { duration: 0.35 },
       );
     }
     busy.current = false;

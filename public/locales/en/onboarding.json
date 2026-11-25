@@ -6,48 +6,35 @@
   "level_step": {
     "title": "How long have you been playing?"
   },
-  "play_step": {
-    "title": "Got your guitar with you?",
+  "daily_step": {
+    "title": "How long do you want to practice a day?",
+    "hint": "You can change it any time in Settings.",
+    "unit": "min a day",
+    "vibes": {
+      "casual": "Casual",
+      "regular": "Regular",
+      "serious": "Serious",
+      "intense": "Intense"
+    }
+  },
+  "first_step": {
+    "title": "Which one do you want to try?",
     "riff_title": "Play your first riff",
     "riff_levels": {
       "new": "Three open strings, no fretting.",
       "some": "A minor pentatonic, up and down at {{bpm}} BPM.",
       "experienced": "A pentatonic lick in eighth notes at {{bpm}} BPM."
     },
-    "riff_mic": "Your mic hears every note you hit.",
-    "start": "Let's play",
-    "options": {
-      "browse": "Look around first",
-      "no_guitar": "I don't have a guitar yet"
-    }
-  },
-  "goal_step": {
-    "title": "What brings you to Riff Quest?",
-    "title_after_play": "Where to next?",
-    "title_no_guitar": "Have a look around first",
-    "no_guitar_hint": "No guitar yet? You can already check these out:"
-  },
-  "plan_step": {
-    "title": "Pick a plan to start with",
-    "open": "Open plan",
-    "browse_all": "Browse all {{count}} plans"
-  },
-  "songs_step": {
-    "title": "How learning songs works",
-    "description": "We don't provide tabs. Here's what you get instead.",
-    "no_tabs": "Tabs not included",
-    "features": {
-      "library": "Save the songs you're learning in your library",
-      "time": "We track how long you practice each song",
-      "sources": "Map song parts from YouTube or upload Guitar Pro"
+    "riff_needs": "Guitar and mic",
+    "hunt_title": "Find notes on the neck",
+    "hunt_levels": {
+      "new": "Low E string, frets 0 to 6.",
+      "some": "Every string, on fret 5.",
+      "experienced": "Natural notes across the whole neck."
     },
-    "continue": "Got it, take me to my songs",
-    "other": "Choose something else"
-  },
-  "desktop_hint": {
-    "title": "Best on a computer",
-    "description": "Everything works on your phone, but Riff Quest is built for a computer. Come back on a computer for a better experience.",
-    "continue": "Got it, let's go"
+    "hunt_needs": "Just click, no guitar needed",
+    "hunt_find": "Find",
+    "browse": "Look around first"
   },
   "levels": {
     "new": {
@@ -64,24 +51,6 @@
       "unit": "years",
       "label": "I've played for years",
       "description": "Comfortable on the neck, I want to keep improving"
-    }
-  },
-  "goals": {
-    "journey": {
-      "label": "Follow the Learning Path",
-      "description": "Learn guitar from scratch, one step at a time"
-    },
-    "plans": {
-      "label": "Practice with exercise plans",
-      "description": "Ready-made routines with a timer that guides you"
-    },
-    "songs": {
-      "label": "Learn songs and track them",
-      "description": "Save songs you want to play and see your progress"
-    },
-    "roadmap": {
-      "label": "Follow a roadmap to a goal",
-      "description": "A step-by-step path, like playing in the style of your hero"
     }
   },
   "first_riff_intro": {

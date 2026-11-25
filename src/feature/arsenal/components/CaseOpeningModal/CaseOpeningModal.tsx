@@ -217,6 +217,11 @@ export const CaseOpeningModal = ({
     });
   };
 
+  const keepLabel =
+    winDef?.kind === "guitar"
+      ? t("opening.keep_in_arsenal")
+      : t("opening.add_to_collection");
+
   const handleSell = () => {
     if (!winDef || isBusy) return;
     if (winDef.kind === "guitar" && result?.newItem?.id) {
@@ -503,10 +508,10 @@ export const CaseOpeningModal = ({
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex w-full flex-col gap-2 sm:gap-3"
+                  className="flex w-full max-w-md flex-col gap-2 sm:gap-3"
                 >
                   {winDef.kind === "component" ? (
-                  <div className="flex w-full flex-col gap-2 sm:flex-row sm:gap-3">
+                  <div className="flex w-full flex-col gap-2 sm:gap-3">
                     <Button
                       onClick={() => {
                         onClose();
@@ -529,8 +534,11 @@ export const CaseOpeningModal = ({
                     </Button>
                   </div>
                   ) : (
-                  <div className="flex w-full flex-col gap-2 sm:flex-row sm:gap-3">
-                  {mergeOffer && (
+                  <>
+                  {/* One full-width key: merge when there is a copy to merge
+                      into, otherwise carry on. Everything else is a quieter
+                      key under it. */}
+                  {mergeOffer ? (
                     <Button
                       onClick={handleMerge}
                       disabled={isBusy}
@@ -545,32 +553,44 @@ export const CaseOpeningModal = ({
                             after: mergeOffer.levelAfter,
                           })}
                     </Button>
-                  )}
-                  {winDef.kind === "guitar" && guitar && !mergeOffer && (
+                  ) : (
                     <Button
-                      onClick={() => equip({ guitarId: guitar.id, year: result?.newItem?.year, country: result?.newItem?.country }, { onSuccess: onClose })}
+                      onClick={onClose}
                       disabled={isBusy}
                       size="lg"
                       className="w-full"
                     >
-                      {t("opening.equip_now")}
+                      {keepLabel}
                     </Button>
                   )}
-                  <Button
-                    variant="ghost"
-                    onClick={onClose}
-                    disabled={isBusy}
-                    size="lg"
-                    className="w-full"
-                  >
-                    {winDef.kind === "guitar" ? t("opening.keep_in_arsenal") : t("opening.add_to_collection")}
-                  </Button>
+                  <div className={cn("grid gap-2 sm:gap-3", (mergeOffer || guitar) && "grid-cols-2")}>
+                  {mergeOffer ? (
+                    <Button
+                      variant="ghost"
+                      onClick={onClose}
+                      disabled={isBusy}
+                      size="lg"
+                      className="px-3"
+                    >
+                      {keepLabel}
+                    </Button>
+                  ) : guitar ? (
+                    <Button
+                      variant="ghost"
+                      onClick={() => equip({ guitarId: guitar.id, year: result?.newItem?.year, country: result?.newItem?.country }, { onSuccess: onClose })}
+                      disabled={isBusy}
+                      size="lg"
+                      className="px-3"
+                    >
+                      {t("opening.equip_now")}
+                    </Button>
+                  ) : null}
                   <Button
                     variant="ghost"
                     onClick={handleSell}
                     disabled={isBusy}
                     size="lg"
-                    className="w-full bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200"
+                    className="px-3"
                   >
                     {isSelling ? (
                       t("common.selling")
@@ -585,6 +605,7 @@ export const CaseOpeningModal = ({
                     )}
                   </Button>
                   </div>
+                  </>
                   )}
 
                   {onOpenAgain && caseDef && (

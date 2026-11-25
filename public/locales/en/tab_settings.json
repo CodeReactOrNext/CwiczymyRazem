@@ -206,6 +206,8 @@
     "lime": "Lime"
   },
   "view_menu": {
+    "button_tab": "View: Tab",
+    "button_notation": "View: Notation",
     "hint": "Change how the exercise is shown",
     "view": "View"
   }

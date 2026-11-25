@@ -2,7 +2,7 @@
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { playUiSound, resetUiSoundsForTests, useSuppressUiSounds } from "./uiSounds";
+import { playChime, playUiSound, resetUiSoundsForTests, useSuppressUiSounds } from "./uiSounds";
 import { useUiSoundsStore } from "./uiSoundsStore";
 
 const started = vi.fn();
@@ -80,5 +80,21 @@ describe("playUiSound", () => {
     act(() => rerender({ active: false }));
     playUiSound("reward");
     expect(started).toHaveBeenCalled();
+  });
+});
+
+describe("playChime", () => {
+  const note = [{ freq: 440, at: 0, length: 0.2 }];
+
+  it("rings through the session's suppression, for drills nothing listens to", () => {
+    renderHook(() => useSuppressUiSounds(true));
+    playChime(note, 0.05);
+    expect(started).toHaveBeenCalled();
+  });
+
+  it("stays quiet when the player turned sounds off", () => {
+    useUiSoundsStore.setState({ enabled: false });
+    playChime(note, 0.05);
+    expect(started).not.toHaveBeenCalled();
   });
 });

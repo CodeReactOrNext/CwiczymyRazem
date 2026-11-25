@@ -67,7 +67,7 @@ export const DayTimeline = ({ sessions }: DayTimelineProps) => {
 
     const totalMs = ordered.reduce((sum, s) => sum + s.timeMs, 0);
 
-    return { ticks, toPct, markers, totalMs, count: ordered.length };
+    return { ticks, toPct, markers, totalMs };
   }, [sessions]);
 
   if (!model) return null;
@@ -80,9 +80,8 @@ export const DayTimeline = ({ sessions }: DayTimelineProps) => {
         <h3 className="font-display text-[15px] font-semibold text-zinc-100">
           {t("timeline.heading")}
         </h3>
-        <p className="flex items-center gap-2.5 text-[11px] tabular-nums text-zinc-500">
-          <span>{t("page.day_sessions", { count: model.count })}</span>
-          <span>{convertMsToHM(model.totalMs)}</span>
+        <p className="text-sm tabular-nums text-zinc-400">
+          {convertMsToHM(model.totalMs)}
         </p>
       </div>
 

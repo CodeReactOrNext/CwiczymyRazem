@@ -16,11 +16,11 @@ import { useUiSoundsStore } from "./uiSoundsStore";
  */
 export type UiSound = "reward" | "levelUp" | "sessionComplete";
 
-type Note = { freq: number; at: number; length: number };
+export type ChimeNote = { freq: number; at: number; length: number };
 
 // Pitches in Hz: G5 D6 / C5 E5 G5 C6 / G4 D5 — open fifths and a major arpeggio,
 // bright but not shrill, and out of the way of the guitar's low register.
-const CUES: Record<UiSound, { gain: number; notes: Note[] }> = {
+const CUES: Record<UiSound, { gain: number; notes: ChimeNote[] }> = {
   reward: {
     gain: 0.07,
     notes: [
@@ -65,26 +65,18 @@ const getContext = (): AudioContext | null => {
 
 export const isUiSoundSuppressed = () => suppressions.size > 0;
 
-/** Plays a cue unless sounds are off, something is listening, or it just played. */
-export const playUiSound = (sound: UiSound) => {
-  if (!useUiSoundsStore.getState().enabled || isUiSoundSuppressed()) return;
-
-  const now = Date.now();
-  if (now - (lastPlayed.get(sound) ?? 0) < DEDUPE_MS) return;
-  lastPlayed.set(sound, now);
-
+const ring = (notes: ChimeNote[], gain: number) => {
   const ctx = getContext();
   if (!ctx) return;
   // Cues follow a click, so the context may start — but never block on it.
   if (ctx.state === "suspended") void ctx.resume().catch(() => {});
 
-  const cue = CUES[sound];
   const start = ctx.currentTime + 0.01;
-  for (const { freq, at, length } of cue.notes) {
+  for (const { freq, at, length } of notes) {
     const t = start + at;
     const envelope = ctx.createGain();
     envelope.gain.setValueAtTime(0.0001, t);
-    envelope.gain.exponentialRampToValueAtTime(cue.gain, t + 0.008);
+    envelope.gain.exponentialRampToValueAtTime(gain, t + 0.008);
     envelope.gain.exponentialRampToValueAtTime(0.0001, t + length);
     envelope.connect(ctx.destination);
 
@@ -103,6 +95,26 @@ export const playUiSound = (sound: UiSound) => {
       osc.stop(t + length + 0.05);
     }
   }
+};
+
+/**
+ * A chime of the caller's own notes, for an answer inside an exercise that is
+ * clicked rather than played. It sounds through the session's suppression —
+ * the caller promises nothing is listening — but not when sounds are off.
+ */
+export const playChime = (notes: ChimeNote[], gain: number) => {
+  if (useUiSoundsStore.getState().enabled) ring(notes, gain);
+};
+
+/** Plays a cue unless sounds are off, something is listening, or it just played. */
+export const playUiSound = (sound: UiSound) => {
+  if (!useUiSoundsStore.getState().enabled || isUiSoundSuppressed()) return;
+
+  const now = Date.now();
+  if (now - (lastPlayed.get(sound) ?? 0) < DEDUPE_MS) return;
+  lastPlayed.set(sound, now);
+
+  ring(CUES[sound].notes, CUES[sound].gain);
 };
 
 /** Silences UI sounds while `active` — for anything that listens to the guitar. */

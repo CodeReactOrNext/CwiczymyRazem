@@ -28,13 +28,9 @@ export const BuilderProgressBar = ({
         className,
       )}>
       <div
-        className='relative h-full rounded-full bg-amber-400 transition-[width] duration-slow'
-        style={{ width: `${percent}%` }}>
-        <span
-          aria-hidden
-          className='absolute inset-x-2 top-1 h-1 rounded-full bg-white/40'
-        />
-      </div>
+        className='bar-shine h-full rounded-full bg-amber-400 transition-[width] duration-slow [--shine-inset:8px]'
+        style={{ width: `${percent}%` }}
+      />
     </div>
   );
 };

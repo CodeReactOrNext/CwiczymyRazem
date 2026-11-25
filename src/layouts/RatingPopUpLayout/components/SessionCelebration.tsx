@@ -5,8 +5,8 @@ import { Flame } from "lucide-react";
 /**
  * Full-screen "session complete" transition shown before the summary — the
  * shared anime moment with the session's headline numbers. Kostek shares a
- * layoutId with the summary card, so on the way out it flies (and shrinks)
- * straight into its place there.
+ * layoutId with the summary, so on the way out it flies (and shrinks) straight
+ * into its place there.
  */
 
 interface SessionCelebrationProps {
@@ -22,6 +22,14 @@ interface SessionCelebrationProps {
 
 export const MASCOT_LAYOUT_ID = "session-summary-mascot";
 
+/**
+ * Above every screen the summary opens in. After a session the summary lives
+ * inside the session's own fixed layer (z-[999999] on a computer,
+ * z-[999999999] for the phone summary); at AnimeMoment's default 60 the
+ * celebration played underneath it, unseen, and only Kostek's fly-in showed.
+ */
+export const CELEBRATION_Z_INDEX = 2_000_000_000;
+
 export const SessionCelebration = ({ points, fame, streak, levelUp = false, streakMilestone = false, onDone }: SessionCelebrationProps) => {
   const { t } = useTranslation("session_summary");
   // An ordinary session ends calmly; the full show is kept for what is rare —
@@ -34,6 +42,7 @@ export const SessionCelebration = ({ points, fame, streak, levelUp = false, stre
       mood={levelUp ? "levelUp" : "celebrate"}
       layoutId={MASCOT_LAYOUT_ID}
       calm={calm}
+      zIndex={CELEBRATION_Z_INDEX}
       onDone={onDone}>
       <AnimeChip index={0} className='text-cyan-400'>
         <img src='/images/tokens/pick.png' alt='' className='h-6 w-6 object-contain' />

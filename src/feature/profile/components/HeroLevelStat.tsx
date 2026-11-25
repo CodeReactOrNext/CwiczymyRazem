@@ -59,13 +59,9 @@ export const HeroLevelStat = ({
           className='h-3 overflow-hidden rounded-full bg-zinc-700'>
           {progress > 0 && (
             <div
-              className='relative h-full min-w-3 rounded-full bg-cyan-400'
-              style={{ width: `${progress * 100}%` }}>
-              <span
-                aria-hidden
-                className='absolute inset-x-1.5 top-0.5 h-0.5 rounded-full bg-cyan-200/70'
-              />
-            </div>
+              className='bar-shine h-full min-w-3 rounded-full bg-cyan-400 [--shine-inset:6px]'
+              style={{ width: `${progress * 100}%` }}
+            />
           )}
         </div>
       </div>

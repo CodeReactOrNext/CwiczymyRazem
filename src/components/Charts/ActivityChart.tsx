@@ -108,19 +108,12 @@ export function ActivityChart({
     return result;
   }, [data, timeRange]);
 
-  const isNegative = React.useMemo(() => {
-    if (processedData.length < 2) return false;
-    const first = processedData[0].totalTime;
-    const last = processedData[processedData.length - 1].totalTime;
-    return last < first;
-  }, [processedData]);
-
   // Recharts animates in JS (a React update per frame over the whole path) and
   // draws dots one element per point. On the all-time range that is a thousand-
   // plus days, which froze the page for the length of the entrance animation.
   const isLongSeries = processedData.length > 120;
 
-  const chartColor = isNegative ? "#f43f5e" : "#10b981";
+  const chartColor = "#10b981";
   // SVG attributes can't read the palette's CSS variables, so the axis ink is
   // picked here: white washes on the dark card, zinc ink on the light one.
   const isLight = useColorTheme() === "light";
@@ -216,8 +209,10 @@ export function ActivityChart({
               }]}
               tickFormatter={(value) => {
                 if (value === 0) return "0";
-                const hours = value / 3600000;
-                return `${Math.round(hours)}h`;
+                // Ticks fall between whole hours: rounding them printed
+                // the same label twice.
+                if (value < 3600000) return `${Math.round(value / 60000)}m`;
+                return `${Number((value / 3600000).toFixed(1))}h`;
               }}
             />
             <ChartTooltip
@@ -242,7 +237,7 @@ export function ActivityChart({
                           })}
                         </span>
                         <div className="flex items-baseline gap-2">
-                           <span className={`font-bold text-xl tracking-tight ${isNegative ? "text-rose-600" : "text-emerald-700"}`}>
+                           <span className="font-bold text-xl tracking-tight text-emerald-700">
                             {Number(hm.hours) > 0 && `${Number(hm.hours)}h `}
                             {t("ui:minutes_short", { minutes: Number(hm.minutes) })}
                           </span>

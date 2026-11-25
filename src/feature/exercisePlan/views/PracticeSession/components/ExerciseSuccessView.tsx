@@ -13,6 +13,8 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 
+import { sumSessionTime, useSessionTimeStore } from "../hooks/sessionTimeStore";
+import { CLEAN_RUN_ACCURACY } from "../utils/runVerdict";
 import type { RunNote, TimingCounts } from "../utils/timingGrade";
 import type { TimingPrecision } from "../utils/timingPrecision";
 import { chartValues, MIN_CHART_POINTS, NoteDeviationChart } from "./NoteDeviationChart";
@@ -24,6 +26,8 @@ interface ExerciseStats {
   maxStreak?: number;
   perfectHits?: number;
   timingMsg?: string;
+  /** A listening quiz: right answers over answers given ("14/18"). */
+  tally?: string;
 }
 
 interface ExerciseSuccessViewProps {
@@ -71,7 +75,31 @@ interface ExerciseSuccessViewProps {
   /** Offer "Try again" after any run, not only a failed exam — goal mode is
    *  played run after run. */
   offerRestart?: boolean;
+  /** The bar the run went worst in (index), offered to play on its own. */
+  weakMeasure?: number | null;
+  /** Loops that bar; left out where the session can't. */
+  onDrill?: (measure: number) => void;
 }
+
+/** One number of the run: big, named underneath. On a phone the tile has no
+ *  ground of its own — the card around it is the only card. */
+function ResultTile({ value, label, index }: { value: string; label: string; index: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.35 + index * 0.12 }}
+      className="min-w-0 flex-1 px-2 pb-2 pt-4 text-center sm:rounded-lg sm:bg-zinc-800/40 shortwide:bg-transparent shortwide:pt-2">
+      <div className="font-teko text-5xl font-bold leading-[0.85] tabular-nums text-zinc-100 sm:text-6xl shortwide:text-5xl">{value}</div>
+      <div className="mt-1 text-sm font-medium text-zinc-400">{label}</div>
+    </motion.div>
+  );
+}
+
+const formatClock = (ms: number) => {
+  const seconds = Math.round(ms / 1000);
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+};
 
 type TierKey = 'S' | 'A' | 'B' | 'C' | 'D';
 
@@ -194,6 +222,8 @@ export const ExerciseSuccessView = ({
   extraContent,
   offerRestart = false,
   turned = false,
+  weakMeasure = null,
+  onDrill,
 }: ExerciseSuccessViewProps) => {
   const { t } = useTranslation(["common", "session"]);
   const [isVisible, setIsVisible] = useState(false);
@@ -215,6 +245,7 @@ export const ExerciseSuccessView = ({
 
   const isExam = examMode && typeof score !== 'undefined' && typeof maxScore !== 'undefined';
   const hasStats = !!stats;
+  const sessionMs = useSessionTimeStore((state) => sumSessionTime(state.time));
   const displayStats = stats ?? {};
   const accuracy = displayStats.accuracy ?? 0;
   const tierKey = getTierFromAccuracy(accuracy);
@@ -287,7 +318,8 @@ export const ExerciseSuccessView = ({
         });
       }
 
-      if (!isExam || isPassed) {
+      // Confetti is for a result: a passed exam, or a run the mic heard go clean.
+      if (isExam ? isPassed : hasStats && accuracy >= CLEAN_RUN_ACCURACY) {
         const end = Date.now() + 3000;
         const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
         const rnd = (a: number, b: number) => Math.random() * (b - a) + a;
@@ -303,7 +335,7 @@ export const ExerciseSuccessView = ({
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [isExam, isPassed, score]);  
+  }, [isExam, isPassed, score, hasStats, accuracy]);
 
   const overlay = (
     <motion.div
@@ -402,26 +434,50 @@ export const ExerciseSuccessView = ({
             )}
           </div>
 
-          {/* Score + Stats — exam only or when real stats are available */}
-          {(isExam || stats) && (
+          {/* The run in numbers: tiles for practice, score and grade for an exam */}
+          {!isExam && (
+            <div className="relative order-2 px-7 pb-3 pt-6 shortwide:pt-3">
+              <div className="flex gap-2 sm:gap-3">
+                {[
+                  { key: "time", value: formatClock(sessionMs), label: t("session:success.time") },
+                  ...(hasStats
+                    ? [
+                        displayStats.tally
+                          ? { key: "accuracy", value: displayStats.tally, label: t("session:success.correct") }
+                          : { key: "accuracy", value: `${accuracy}%`, label: t("session:success.accuracy") },
+                        { key: "run", value: String(displayStats.maxStreak ?? 0), label: t("session:success.best_run") },
+                      ]
+                    : []),
+                ].map(({ key, value, label }, i) => (
+                  <ResultTile key={key} value={value} label={label} index={i} />
+                ))}
+              </div>
+              {/* A quiz has no score of its own: right answers are it. */}
+              {hasStats && !displayStats.tally && (
+                <div className="mt-4 flex justify-center">
+                  <StatItem icon={<Star className="h-4 w-4" />} value={(score ?? 0).toLocaleString()} label={t("session:success.score")} />
+                </div>
+              )}
+            </div>
+          )}
+
+          {isExam && (
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
               className="relative order-2 px-7 pb-3 pt-6 shortwide:pt-3">
 
               {/* Score — exam only */}
-              {isExam && (
-                <div className="mb-8 flex items-end justify-between shortwide:mb-4">
-                  <div>
-                    <p className="text-xs font-medium text-zinc-400 mb-1">{t("session:success.total_score")}</p>
-                    <div className="font-teko text-5xl font-bold text-zinc-100 tabular-nums leading-none">{displayScore.toLocaleString()}</div>
-                  </div>
-                  {/* Tier badge */}
-                  <div className={cn('flex flex-col items-center justify-center h-14 w-14 rounded-lg', tier.bg)}>
-                    <span className={cn('text-2xl font-black leading-none', tier.color)}>{tierKey}</span>
-                    <span className="text-zinc-500 text-[11px] mt-0.5">{t("session:success.grade")}</span>
-                  </div>
+              <div className="mb-8 flex items-end justify-between shortwide:mb-4">
+                <div>
+                  <p className="text-xs font-medium text-zinc-400 mb-1">{t("session:success.total_score")}</p>
+                  <div className="font-teko text-5xl font-bold text-zinc-100 tabular-nums leading-none">{displayScore.toLocaleString()}</div>
                 </div>
-              )}
+                {/* Tier badge */}
+                <div className={cn('flex flex-col items-center justify-center h-14 w-14 rounded-lg', tier.bg)}>
+                  <span className={cn('text-2xl font-black leading-none', tier.color)}>{tierKey}</span>
+                  <span className="text-zinc-500 text-[11px] mt-0.5">{t("session:success.grade")}</span>
+                </div>
+              </div>
 
               {/* Accuracy / Combo / Score — grouped in one panel, not repeated cards.
                   Only shown when something was actually tracked (mic or click hunt) —
@@ -430,21 +486,10 @@ export const ExerciseSuccessView = ({
                 <div>
                   {/* Zones are set apart by space alone: a tinted panel here was
                       a card inside the card. */}
-                  {isExam ? (
-                    <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
-                      <StatItem icon={<Target className="h-4 w-4" />} value={`${accuracy}%`} label={t("session:success.accuracy")} />
-                      <StatItem icon={<Flame className="h-4 w-4" />} value={displayStats.maxStreak ?? 0} label={t("session:success.max_combo")} accent="text-orange-400" />
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center">
-                      <div className="font-teko text-8xl font-bold leading-[0.85] tabular-nums text-zinc-100 shortwide:text-7xl">{accuracy}%</div>
-                      <div className="text-sm font-medium text-zinc-400">{t("session:success.accuracy")}</div>
-                      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 shortwide:mt-4">
-                        <StatItem icon={<Flame className="h-4 w-4" />} value={displayStats.maxStreak ?? 0} label={t("session:success.max_combo")} accent="text-orange-400" />
-                        <StatItem icon={<Star className="h-4 w-4" />} value={(score ?? 0).toLocaleString()} label={t("session:success.score")} />
-                      </div>
-                    </div>
-                  )}
+                  <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+                    <StatItem icon={<Target className="h-4 w-4" />} value={`${accuracy}%`} label={t("session:success.accuracy")} />
+                    <StatItem icon={<Flame className="h-4 w-4" />} value={displayStats.maxStreak ?? 0} label={t("session:success.max_combo")} accent="text-orange-400" />
+                  </div>
                 </div>
               )}
             </motion.div>
@@ -462,6 +507,16 @@ export const ExerciseSuccessView = ({
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: hasChart ? 1.3 : 1 }}
             className="relative order-6 flex gap-3 px-7 pb-7 pt-5 shortwide:pb-5 shortwide:pt-3">
+            {weakMeasure !== null && onDrill && !isExam && (
+              <Button
+                variant='secondary'
+                size='lg'
+                onClick={() => onDrill(weakMeasure)}
+                disabled={isBusy}
+                className="flex-1">
+                {t("session:verdict.drill", { bar: weakMeasure + 1 })}
+              </Button>
+            )}
             {((isExam && !isPassed) || offerRestart) && onRestart && (
               <Button
                 variant='secondary'

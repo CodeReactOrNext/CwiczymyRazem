@@ -1,8 +1,5 @@
-import { AnimatePresence, motion } from "framer-motion";
 import type { AudioInitResult, AudioRefs, WebAudioInput } from "hooks/useAudioAnalyzer";
-import { useTranslation } from "hooks/useTranslation";
-import { Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { playCompletionSound } from "utils/audioUtils";
 
 import { EarTrainingLeaderboardDialog } from "../../../components/EarTrainingLeaderboardDialog";
@@ -14,6 +11,8 @@ import { CalibrationWizard } from "./CalibrationWizard";
 import { MicModeDialog } from "./MicModeDialog";
 
 interface SessionDialogsProps {
+  /** The start gate asks about the mic, so the prompt stays away. */
+  micAskedOnGate: boolean;
   // ExerciseCompleteDialog
   showCompleteDialog: boolean;
   setShowCompleteDialog: (open: boolean) => void;
@@ -63,6 +62,7 @@ interface SessionDialogsProps {
 }
 
 export const SessionDialogs = ({
+  micAskedOnGate,
   showCompleteDialog,
   setShowCompleteDialog,
   exerciseTitle,
@@ -98,14 +98,10 @@ export const SessionDialogs = ({
   showSuccessView,
   isLastExercise,
 }: SessionDialogsProps) => {
-  const { t } = useTranslation("session");
   const { isLeaderboardOpen, closeLeaderboard } = useSessionUI();
-  const [showCompletionNotification, setShowCompletionNotification] = useState(false);
   const { timeLeft } = useTimerContext();
 
   useEffect(() => {
-
-
     if (
       timeLeft <= 0 &&
       isMounted &&
@@ -114,10 +110,8 @@ export const SessionDialogs = ({
       !showSuccessView &&
       !isLastExercise
     ) {
+      // What happened is on the session's own bar (SessionVerdict).
       playCompletionSound();
-      setShowCompletionNotification(true);
-      const timer = setTimeout(() => setShowCompletionNotification(false), 3000);
-      return () => clearTimeout(timer);
     }
   }, [timeLeft, isMounted, showCompleteDialog, hasReportResult, showSuccessView, isLastExercise]);
 
@@ -138,7 +132,7 @@ export const SessionDialogs = ({
       />
 
       <MicModeDialog
-        isOpen={sessionPhase === "mic_prompt"}
+        isOpen={sessionPhase === "mic_prompt" && !micAskedOnGate}
         examMode={examMode}
         turned={turned}
         onEnableMic={handleEnableMic}
@@ -178,26 +172,6 @@ export const SessionDialogs = ({
         exerciseId={exerciseId}
         exerciseTitle={exerciseTitle}
       />
-
-      <AnimatePresence>
-        {showCompletionNotification && (
-          <motion.div
-            initial={{ opacity: 0, y: -50, x: "-50%" }}
-            animate={{ opacity: 1, y: 50, x: "-50%" }}
-            exit={{ opacity: 0, y: -50, x: "-50%" }}
-            className='fixed left-1/2 top-0 z-[99999] rounded-xl border border-white/20 bg-cyan-500 px-8 py-4 shadow-[0_0_30px_rgba(34,211,238,0.5)]'>
-            <div className='flex items-center gap-4'>
-              <div className='rounded-lg bg-white/20 p-2'>
-                <Check className='h-6 w-6 text-black' />
-              </div>
-              <div>
-                <h4 className='text-lg font-bold tracking-tight text-black leading-none'>{t("dialogs.finished")}</h4>
-                <p className='mt-1 text-xs font-semibold text-black/60'>{t("dialogs.great_job")}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };

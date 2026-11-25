@@ -55,6 +55,8 @@
   "generated": "Generated",
   "edit": "Edit",
   "delete": "Delete",
+  "your_plan": "Your plan",
+  "your_plan_hint": "Drag to reorder. Click the time to change it.",
   "none_selected": "No exercises selected yet.",
   "choose_from_library": "Choose from the library →",
   "song_modes": {
@@ -172,6 +174,7 @@
     "published_hint": "Published — click to unpublish",
     "publish_hint": "Click to publish",
     "exercise_added": "Exercise added",
-    "pick_exercise": "Pick this exercise"
+    "pick_exercise": "Pick this exercise",
+    "added_minutes": "Added · {{time}}"
   }
 }

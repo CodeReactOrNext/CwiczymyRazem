@@ -10,6 +10,7 @@ import type {
   SessionType,
 } from "../types/practiceLog.types";
 import { isManualReport } from "./isManualReport";
+import { getReplayHref } from "./replayHref";
 
 const DURATION_BOUNDS_MS = {
   short: { min: 0, max: 15 * 60 * 1000 },
@@ -76,6 +77,7 @@ export const mapLogToSession = (
     songArtist: log.songArtist,
     songs: log.songs,
     isDateBackReport: log.isDateBackReport,
+    replayHref: getReplayHref(log),
   };
 };
 

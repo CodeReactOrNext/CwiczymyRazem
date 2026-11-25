@@ -206,6 +206,8 @@
     "lime": "Limonka"
   },
   "view_menu": {
+    "button_tab": "Widok: tab",
+    "button_notation": "Widok: nuty",
     "hint": "Zmień sposób wyświetlania ćwiczenia",
     "view": "Widok"
   }

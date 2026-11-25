@@ -28,7 +28,7 @@ const VIEWS: Record<ViewMode, ViewConfig> = {
     label: "Tablature",
     desc: "Classic fretboard tab",
     Icon: AlignJustify,
-    trigger: "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white",
+    trigger: "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100",
     accent: "text-zinc-200",
   },
   notation: {
@@ -76,7 +76,7 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
   };
 
   const { Icon: CurrentIcon, label } = VIEWS[current];
-  const h = compact ? "h-8" : "h-12";
+  const h = compact ? "h-8" : "h-9";
 
   return (
     <DropdownMenu>
@@ -86,24 +86,25 @@ export const TablatureViewMenu = memo(function TablatureViewMenu({
           title={t("view_menu.hint")}
           className={cn(
             PRESSABLE_KEY,
-            "flex items-center gap-2 rounded-lg outline-none transition-colors",
+            "flex items-center gap-2 rounded-lg font-medium outline-none transition-colors",
             "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
             h,
-            compact ? "px-2" : "px-4",
+            compact ? "px-2" : "px-2.5",
             VIEWS[current].trigger,
           )}>
           <CurrentIcon
             className={cn("shrink-0", compact ? "h-3 w-3" : "h-4 w-4")}
           />
           {!compact && (
-            <span className='text-xs font-semibold'>
-              {t(`views.${current}.label`, label)}
+            <span className='text-[13px] font-medium'>
+              {t(`view_menu.button_${current}`, label)}
             </span>
           )}
           <ChevronDown
+            aria-hidden
             className={cn(
-              "shrink-0 opacity-60",
-              compact ? "h-2.5 w-2.5" : "h-3 w-3",
+              "shrink-0",
+              compact ? "h-2.5 w-2.5" : "h-3.5 w-3.5 opacity-60",
             )}
           />
         </button>

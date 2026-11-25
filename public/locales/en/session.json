@@ -147,6 +147,16 @@
     "hide_tabs": "Hide Fret Tabs",
     "by_ear": "Play by ear/memory"
   },
+  "toolbar": {
+    "play_tab": "Play tab",
+    "backing": "Backing",
+    "standard_tuning": "E Standard",
+    "mic_scoring": "Mic scoring",
+    "mic_setup": "Mic setup",
+    "wait_mode": "Wait mode",
+    "progress": "Progress",
+    "slow_down": "Slow down"
+  },
   "quick": {
     "tempo_reset": "Metronome tempo — reset to recommended",
     "slower_hint": "Slower (Shift: −5 BPM)",
@@ -204,6 +214,14 @@
       "5": "A",
       "6": "low E"
     },
+    "find_every": "Find every {{note}}",
+    "skip": "Skip",
+    "gate_title": "Find every note",
+    "gate_detail": "{{minutes}} min in total, {{seconds}} s for each note.",
+    "round_solved": "All {{total}} in {{seconds}} s",
+    "round_next": "Next note coming up",
+    "round_missed": "{{found}} of {{total}} found",
+    "round_missed_detail": "Missed: {{notes}}",
     "tap_octaves": "Tap each octave you find",
     "tap_octaves_region": "Tap each octave you find in the region"
   },
@@ -224,6 +242,7 @@
     "close_panel": "Hide exercise tools"
   },
   "success": {
+    "correct": "Correct",
     "mastered": "Mastered!",
     "passed": "Exam Passed!",
     "failed": "Exam Failed",
@@ -249,9 +268,23 @@
     "chart_early": "{{ms}} ms early",
     "chart_late": "{{ms}} ms late",
     "chart_notes_one": "{{count}} note",
-    "chart_notes_other": "{{count}} notes"
+    "chart_notes_other": "{{count}} notes",
+    "time": "Time",
+    "best_run": "Best run"
   },
   "quiz": {
+    "paused_note": "Paused. Answers count again once the timer runs.",
+    "hear_it": "Hear it",
+    "trust_ears": "no numbers, trust your ears",
+    "thats_in_tune": "That's in tune",
+    "gate_detail": "{{minutes}} min. Headphones help.",
+    "gate": {
+      "chordType": "Name the chord you hear",
+      "progression": "Build the progression you hear",
+      "detune": "Slide the wobble away",
+      "scaleMode": "Name the scale you hear",
+      "interval": "Name the interval you hear"
+    },
     "stop": "Stop",
     "play_again": "Play again",
     "play": "Play",
@@ -289,7 +322,6 @@
     "play_slowly": "Play it slowly",
     "root": "Root: {{root}}",
     "root_held": "The root is held underneath — measure every note against it",
-    "hear_again_slowly": "Hear it again, slowly",
     "hear_from_root": "Hear {{name}} from {{root}}",
     "which_chord": "What kind of chord is this?",
     "play_chord": "Play chord",
@@ -456,6 +488,10 @@
     "change": "Change backing track"
   },
   "ear": {
+    "listen_play_back": "Listen, then play it back",
+    "missed_it": "Missed it",
+    "next_melody_key": "Next melody",
+    "score": "Score",
     "correct": "Correct — point earned",
     "next_melody": "Next melody is on its way…",
     "tab_shows": "The tab below shows the melody. Replay it to compare.",
@@ -491,15 +527,15 @@
     "boost": "Boost volume",
     "unmute": "Unmute",
     "mute": "Mute",
-    "main_instrument": "Main Instrument"
+    "main_instrument": "Main Instrument",
+    "mix": "Mix"
   },
   "auto_backing": {
-    "title": "Backing track",
     "toggle": "Generated backing track",
     "description": "Drums, bass and a soft pad written for this exercise, in its key and following its chords.",
     "drums_only": "Drums only: the notes cover every fret, so any chord would clash with them.",
-    "drone": "Bass and power chords on the root, because the notes never say major or minor.",
     "headphones": "With the mic on, wear headphones. Otherwise the mic hears the band as your playing. If notes you didn't play get counted, this is the first thing to check.",
+    "headphones_short": "Mic on? Wear headphones.",
     "groove": {
       "rock": "Rock",
       "pop": "Pop",
@@ -584,20 +620,31 @@
     "now_above": "{{interval}} above that {{root}}",
     "click_any": "Click any {{note}}",
     "on_highlighted": "on the highlighted strings",
-    "root": "Root",
-    "target": "Target",
     "play_root": "Play the root note the interval is measured from",
     "hide_distance": "Hide the distance",
     "how_far": "How far is it?",
     "autoplay": "Autoplay",
-    "step": "Step {{step}} of 2",
     "anywhere": "Anywhere in frets {{from}}–{{to}}",
     "near_zone": "Close to your {{root}}, inside the lit area",
     "near": "Within reach of your {{root}}",
     "solved": "{{root}} + {{interval}} = {{target}}",
     "frets_up_one": "{{count}} fret up",
     "frets_up_other": "{{count}} frets up",
-    "hear_root": "Hear the root"
+    "lives": "{{count}} of {{limit}} lives left",
+    "time_up": "Time's up",
+    "next_round": "Next round coming up",
+    "answer_was": "The {{interval}} above {{root}} is {{target}}",
+    "wrong_note": "That was {{note}}",
+    "wrong_interval": "That was {{note}}, a {{interval}}",
+    "too_far": "Right note, but too far from your {{root}}",
+    "same_string": "Same string",
+    "same_fret": "same fret",
+    "strings_higher_one": "{{count}} string higher",
+    "strings_higher_other": "{{count}} strings higher",
+    "strings_lower_one": "{{count}} string lower",
+    "strings_lower_other": "{{count}} strings lower",
+    "frets_down_one": "{{count}} fret down",
+    "frets_down_other": "{{count}} frets down"
   },
   "instructions": {
     "support_author": "Support Author",
@@ -648,10 +695,6 @@
     "exit": "Exit",
     "exit_no_save": "Exit without saving",
     "stay": "Stay in session"
-  },
-  "dialogs": {
-    "finished": "Exercise Finished!",
-    "great_job": "Great job on this one!"
   },
   "speed": {
     "active_hint": "Playback speed {{speed}} — the click and backing track run at {{effective}} BPM instead of {{base}}",
@@ -751,13 +794,11 @@
     "read": "Read the instructions below to get started"
   },
   "progress": {
-    "title": "Session Progress",
-    "song": "Song: {{title}}",
-    "exercise": "Exercise {{n}}",
     "go_to": "Go to {{label}}"
   },
   "controls": {
-    "press_start": "Press Start to play",
+    "resume": "Resume",
+    "again": "Again",
     "pause": "Pause",
     "restart": "Restart Exercise"
   },
@@ -874,12 +915,22 @@
     "skip": "Skip note",
     "restart": "Start over"
   },
+  "bar": {
+    "more": "More",
+    "time_only": "Time only",
+    "save": "Save the session"
+  },
   "start_gate": {
     "start": "Start",
-    "preview": "Preview",
-    "hint_count_in": "The metronome counts you in, then you play. Preview lets you look at the tab without the clock.",
-    "hint": "The clock starts when you press Start. Preview lets you look first.",
-    "hint_no_preview": "The clock and the score start when you press Start."
+    "count_in_short": "The metronome counts you in",
+    "clock_short": "The clock starts with Start",
+    "preview_first": "Look at the tab first",
+    "hint_no_preview": "The clock and the score start when you press Start.",
+    "mic_label": "Microphone",
+    "mic_on": "Play with the mic",
+    "mic_on_detail": "The app hears you and scores your playing",
+    "mic_off": "Play without",
+    "mic_off_detail": "Your practice time still counts"
   },
   "mic_open_failed": {
     "title": "The microphone didn't turn on",
@@ -927,5 +978,33 @@
     "delete": "Move to the recycle bin",
     "untitled": "Recording"
   },
-  "exam_click_failed": "{{limit}} wrong clicks — exam failed."
+  "exam_click_failed": "{{limit}} wrong clicks — exam failed.",
+  "verdict": {
+    "time": "{{minutes}} min done",
+    "clean": "Clean run",
+    "rough": "Run finished",
+    "weak_bar": "Bar {{bar}} slipped",
+    "next": "Next: {{title}}",
+    "stats": "{{accuracy}}% hit, {{count}} in a row",
+    "again": "Again",
+    "drill": "Bar {{bar}}, slower",
+    "continue": "Continue"
+  },
+  "drill": {
+    "title": "Bar {{bar}}, slower",
+    "detail": "{{count}} clean passes at {{bpm}} BPM",
+    "done": "Got it",
+    "done_detail": "Bar {{bar}} is clean at {{bpm}} BPM",
+    "skip": "Skip",
+    "passes": "{{done}} of {{total}} clean passes"
+  },
+  "interlude": {
+    "halfway": "Halfway there.",
+    "done_of": "{{done}} of {{total}} done.",
+    "streak": "{{streak}} {{progress}}",
+    "in_a_row": "{{count}} in a row."
+  },
+  "combo": {
+    "in_a_row": "{{count}} in a row"
+  }
 }

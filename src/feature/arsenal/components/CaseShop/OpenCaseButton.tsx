@@ -1,92 +1,79 @@
 import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
 import { useTranslation } from "hooks/useTranslation";
 
 interface OpenCaseButtonProps {
   canAfford: boolean;
   isOpening: boolean;
   onClick: () => void;
-  /** When set, the price rides inside the button instead of sitting on its own row. */
-  fameCost?: number;
+  /** What the press takes: this much Fame, or one free case. */
+  payment: { kind: "fame"; cost: number } | { kind: "token" };
+  /** How many cases the press opens. */
+  count: number;
   /**
-   * `featured` is the one loud CTA on the screen — amber, with the price
-   * folded into the label. `solid` is the white flavour of the same thing.
-   * Shop cards use `soft` so six bars don't compete with the featured one —
-   * and with each other — at once.
+   * `featured` is the one loud CTA on the screen — amber. Shelf cards use
+   * `soft`, so five keys don't compete with the featured one and each other.
    */
-  variant?: "featured" | "solid" | "soft";
+  variant: "featured" | "soft";
   className?: string;
 }
 
+/** The one key that opens a case. The price rides on it and nowhere else. */
 export const OpenCaseButton = ({
   canAfford,
   isOpening,
   onClick,
-  fameCost,
-  variant = "solid",
+  payment,
+  count,
+  variant,
   className,
 }: OpenCaseButtonProps) => {
-  const isFeatured = variant === "featured";
-  const isSolid = variant === "solid";
   const { t } = useTranslation("arsenal");
-  const label = isOpening ? t("cases.opening") : t("cases.open_case");
-
-  if (isFeatured) {
-    return (
-      <button
-        onClick={onClick}
-        disabled={!canAfford || isOpening}
-        className={cn(PRESSABLE, "border-b-black/30", 
-          "flex items-center justify-center gap-2.5 rounded-lg px-5 py-3 text-sm font-bold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-300/60",
-          canAfford
-            ? "bg-amber-400 text-zinc-950 hover:bg-amber-300"
-            : "cursor-not-allowed bg-arsenal-card text-arsenal-text-tertiary",
-          isOpening && "cursor-wait opacity-70",
-          className,
-        )}>
-        <img
-          src='/images/tokens/coin.png'
-          alt=''
-          className={cn(
-            "h-5 w-5 object-contain",
-            !canAfford && "opacity-50 grayscale",
-          )}
-        />
-        <span>{label}</span>
-        {fameCost !== undefined && (
-          <span className='tabular-nums'>· {fameCost}</span>
-        )}
-      </button>
-    );
-  }
+  const isFeatured = variant === "featured";
+  // The visible word stays short so it fits beside a five-digit price in every
+  // language; what exactly the press does is in the accessible name.
+  const action =
+    payment.kind === "token"
+      ? t("cases.open_free")
+      : count > 1
+        ? t("cases.open_pack", { count })
+        : t("cases.open_case");
 
   return (
     <button
+      type='button'
+      aria-label={
+        payment.kind === "fame" ? `${action} · ${payment.cost}` : action
+      }
       onClick={onClick}
       disabled={!canAfford || isOpening}
-      className={cn(PRESSABLE, "border-b-black/30", 
-        "flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-bold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
-        fameCost !== undefined && "justify-between",
-        isSolid
-          ? canAfford
-            ? "bg-arsenal-accent text-arsenal-bg hover:bg-arsenal-accent/90"
-            : "cursor-not-allowed bg-arsenal-card text-arsenal-text-tertiary"
-          : canAfford
-            ? "bg-arsenal-accent/15 text-arsenal-accent hover:bg-arsenal-accent/25"
-            : "cursor-not-allowed bg-arsenal-bg text-arsenal-text-tertiary",
+      className={cn(
+        PRESSABLE,
+        "flex h-11 items-center justify-center gap-2.5 whitespace-nowrap rounded-lg border-b-black/30 px-4 text-sm font-bold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        !canAfford
+          ? "cursor-not-allowed bg-arsenal-bg text-arsenal-text-tertiary"
+          : isFeatured
+            ? "bg-amber-400 text-zinc-950 hover:bg-amber-300"
+            : "bg-arsenal-accent/15 text-arsenal-accent hover:bg-arsenal-accent/25",
         isOpening && "cursor-wait opacity-70",
         className,
       )}>
-      <span>{label}</span>
-      {fameCost !== undefined && (
-        // Fame keeps its gold even on the button — on the solid white CTA the
-        // price takes the button's own dark text instead; the soft variant
-        // keeps the coin's gold.
+      <span>{isOpening
+          ? t("cases.opening")
+          : isFeatured
+            ? t("cases.open_case")
+            : t("cases.open")}</span>
+      {payment.kind === "token" ? (
+        <FreeCaseIcon size={20} />
+      ) : (
         <span
           className={cn(
-            "flex items-center gap-1.5 text-sm tabular-nums",
-            isSolid ? "text-arsenal-bg" : "text-amber-400",
-            !canAfford && "text-red-400",
+            "flex items-center gap-1.5 tabular-nums",
+            !canAfford
+              ? "text-red-400"
+              : // Gold on the amber key would vanish into it.
+                !isFeatured && "text-amber-400",
           )}>
           <img
             src='/images/tokens/coin.png'
@@ -96,7 +83,7 @@ export const OpenCaseButton = ({
               !canAfford && "opacity-50 grayscale",
             )}
           />
-          {fameCost}
+          {payment.cost.toLocaleString()}
         </span>
       )}
     </button>

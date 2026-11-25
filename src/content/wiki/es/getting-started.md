@@ -36,7 +36,7 @@ No hace falta micrófono, interfaz ni ninguna configuración para nada de esto. 
 
 ## Elige un punto de partida
 
-Justo después de registrarte se te pregunta por dónde te gustaría empezar. Solo decide en qué pantalla aterrizas primero, nada está bloqueado y puedes usar las cuatro desde el primer día. Elige la que encaje con tu problema:
+Justo después de registrarte respondes tres preguntas rápidas: cuánto tiempo llevas tocando, cuántos minutos al día quieres practicar (puedes cambiarlo luego en Ajustes) y qué hacer en tu primer minuto: tocar un riff corto, encontrar notas en el mástil sin guitarra o simplemente echar un vistazo. Después, Kostek te enseña la app. Nada está bloqueado y los cuatro sitios de abajo están abiertos desde el primer día. Elige el que encaje con tu problema:
 
 <Checklist items="Viaje guiado::No sabes qué practicar. La app elige el siguiente paso por ti, de uno en uno|Biblioteca de ejercicios::Conoces tu punto débil y quieres un ejercicio para él|Diario de práctica::Ya tienes una rutina y solo quieres seguirla|Biblioteca de canciones::Estás aquí para aprender canciones y quieres tu repertorio en un solo sitio" />
 

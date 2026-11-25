@@ -46,7 +46,7 @@ export const Calendar = ({
   <DayPicker
     showOutsideDays={showOutsideDays}
     weekStartsOn={1}
-    className={cn("relative w-full text-zinc-600", className)}
+    className={cn("relative w-full text-zinc-400", className)}
     classNames={{
       months: "flex flex-col gap-4",
       month: "flex flex-col gap-3",
@@ -58,7 +58,7 @@ export const Calendar = ({
       month_grid: "w-full border-collapse",
       weekdays: "flex",
       weekday:
-        "flex-1 pb-1 text-center text-xs font-medium text-zinc-600",
+        "flex-1 pb-1 text-center text-xs font-medium text-zinc-400",
       weeks: "flex flex-col gap-1",
       week: "flex w-full gap-1",
       day: "h-9 flex-1 rounded-lg text-[13px] tabular-nums transition-colors",
@@ -75,7 +75,7 @@ export const Calendar = ({
       range_end: "font-semibold text-cyan-100 ring-2 ring-inset ring-cyan-300",
       range_middle: "ring-1 ring-inset ring-cyan-300/40",
       outside: "text-zinc-700",
-      disabled: "text-zinc-800",
+      disabled: "text-zinc-600",
       hidden: "invisible",
       ...classNames,
     }}

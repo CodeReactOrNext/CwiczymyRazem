@@ -42,11 +42,43 @@ describe("StartGate", () => {
     render(<StartGate onStart={onStart} onPreview={onPreview} countsIn />);
 
     fireEvent.click(screen.getByText("start_gate.start"));
-    fireEvent.click(screen.getByText("start_gate.preview"));
+    fireEvent.click(screen.getByText("start_gate.preview_first"));
 
     expect(onStart).toHaveBeenCalledOnce();
     expect(onPreview).toHaveBeenCalledOnce();
-    expect(screen.getByText("start_gate.hint_count_in")).toBeTruthy();
+    expect(screen.getByText("start_gate.count_in_short")).toBeTruthy();
+  });
+});
+
+describe("StartGate mic question", () => {
+  const gate = (enabled: boolean) => {
+    const onEnable = vi.fn();
+    const onSkip = vi.fn();
+    render(
+      <StartGate
+        onStart={() => {}}
+        onPreview={() => {}}
+        countsIn={false}
+        mic={{ enabled, isListening: false, volumeRef: { current: 0 }, onEnable, onSkip }}
+      />,
+    );
+    return { onEnable, onSkip };
+  };
+
+  it("marks the way the player plays now and takes the other answer", () => {
+    const { onEnable, onSkip } = gate(false);
+    const [withMic, without] = screen.getAllByRole("radio");
+    expect(withMic.getAttribute("aria-checked")).toBe("false");
+    expect(without.getAttribute("aria-checked")).toBe("true");
+    fireEvent.click(withMic);
+    fireEvent.click(without);
+    expect(onEnable).toHaveBeenCalledOnce();
+    expect(onSkip).toHaveBeenCalledOnce();
+  });
+
+  it("asks nothing where the mic is no choice", () => {
+    render(<StartGate onStart={() => {}} onPreview={() => {}} countsIn={false} />);
+    expect(screen.queryByRole("radio")).toBeNull();
   });
 });
 

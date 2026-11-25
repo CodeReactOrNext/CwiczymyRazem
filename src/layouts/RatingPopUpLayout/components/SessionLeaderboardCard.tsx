@@ -92,7 +92,7 @@ function ExerciseStanding({
 
   return (
     <div>
-      <div className='mb-4 flex items-center justify-between gap-4'>
+      <div className='mb-4 flex items-center justify-between gap-4 shortwide:mb-2'>
         <p className='min-w-0 truncate text-sm font-semibold text-zinc-200'>{run.exerciseTitle}</p>
         <DeltaChip run={run} />
       </div>
@@ -135,6 +135,12 @@ function StandingSkeleton() {
   );
 }
 
+/** Who to show around the player: one either side, or two where the other side is empty. */
+const closest = (above: RankNeighbor[], below: RankNeighbor[]) => ({
+  above: above.slice(below.length > 0 ? -1 : -2),
+  below: below.slice(0, above.length > 0 ? 1 : 2),
+});
+
 interface SessionLeaderboardCardProps {
   runs: ScoredRun[];
   className?: string;
@@ -174,7 +180,7 @@ export const SessionLeaderboardCard = ({ runs, className }: SessionLeaderboardCa
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className={cn('rounded-lg bg-zinc-800/40 p-7 md:p-8', className)}>
+      className={cn('rounded-lg bg-zinc-800/40 p-7 md:p-8 shortwide:p-4', className)}>
       <SectionHeader
         as='h3'
         title={
@@ -183,7 +189,7 @@ export const SessionLeaderboardCard = ({ runs, className }: SessionLeaderboardCa
             {t('where_you_stand')}
           </span>
         }
-        className='mb-6'
+        className='mb-6 shortwide:mb-3'
       />
 
       <div className='space-y-10'>
@@ -194,8 +200,7 @@ export const SessionLeaderboardCard = ({ runs, className }: SessionLeaderboardCa
                 key={run.exerciseId}
                 run={run}
                 rank={neighbors.rank}
-                above={neighbors.above}
-                below={neighbors.below}
+                {...closest(neighbors.above, neighbors.below)}
                 playerName={playerName}
                 playerAvatar={playerAvatar}
               />

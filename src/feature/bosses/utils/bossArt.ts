@@ -26,6 +26,25 @@ export const stageStyle = (boss: BossId, form: BossForm) => {
 };
 
 /**
+ * A boss's poster on the select screen: one flat ground in its colour, light
+ * enough that the near-black figure reads whole, running into its own shade.
+ */
+const POSTER_GROUND: Record<BossId, { face: string; shade: string }> = {
+  fretweaver: { face: "#6b4a8c", shade: "#43305a" },
+  colossus: { face: "#3f6f80", shade: "#284753" },
+  changeling: { face: "#3c7a64", shade: "#264e40" },
+};
+
+export const posterStyle = (boss: BossId) => ({
+  backgroundImage: `linear-gradient(180deg, ${POSTER_GROUND[boss].face}, ${POSTER_GROUND[boss].shade})`,
+});
+
+/** The shade the poster's name and keys stand on, over the figure's feet. */
+export const posterFadeStyle = (boss: BossId) => ({
+  backgroundImage: `linear-gradient(0deg, ${POSTER_GROUND[boss].shade} 55%, transparent)`,
+});
+
+/**
  * The form the art draws for a phase: the first three phases, up to the
  * seventh, and after that — the spider purple, gold, then its orange queen
  * with a later level's markings; the colossus's runes cyan, amber, orange.

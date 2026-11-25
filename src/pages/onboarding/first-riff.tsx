@@ -2,18 +2,19 @@
 import "lib/i18n/fullCatalog";
 
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import {
   parseOnboardingSource,
+  trackOnboardingFirstMinuteLeft,
   trackOnboardingFirstRiffOpened,
 } from "feature/onboarding/analytics/onboardingAnalytics";
 import {
   FIRST_RIFF_EXERCISE_IDS,
-  getAfterFirstRiffHref,
   isOnboardingLevel,
+  toFirstMinutePlan,
 } from "feature/onboarding/data/onboardingGoals";
+import { getTourHref } from "feature/onboarding/tour/tourSteps";
 import { FirstRiffIntro } from "feature/onboarding/view/FirstRiffIntro";
 import { useRequireUserAuth } from "hooks/useRequireUserAuth";
 import { LocalizedRegion } from "lib/i18n/LocalizedRegion";
@@ -29,7 +30,8 @@ import { withAuthInitialProps } from "utils/auth/authInitialProps";
  * walk-through (FirstRiffIntro), then one 40-second exercise for the level the
  * player gave. It is a normal session — finishing it writes the practice log,
  * points and the first streak day — and every way out (the summary's Continue
- * or leaving early) goes back to the onboarding's goal question.
+ * or leaving early) goes to Home, where Kostek's tour starts. The first riff is
+ * the onboarding's last step; nothing is asked after it.
  */
 const FirstRiffPage: NextPage = () => {
   const router = useRouter();
@@ -46,24 +48,12 @@ const FirstRiffPage: NextPage = () => {
   const level = isOnboardingLevel(rawLevel) ? rawLevel : "new";
   const source = parseOnboardingSource(router.query.from);
 
-  const plan = useMemo<ExercisePlan | null>(() => {
+  const plan = useMemo(() => {
     if (!userAuth) return null;
     const exercise = exercisesAgregat.find(
       (ex) => ex.id === FIRST_RIFF_EXERCISE_IDS[level],
     );
-    if (!exercise) return null;
-    return {
-      id: "onboarding-first-riff",
-      title: exercise.title,
-      description: exercise.description,
-      category: exercise.category,
-      difficulty: exercise.difficulty,
-      exercises: [exercise],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: userAuth,
-      image: null,
-    };
+    return exercise ? toFirstMinutePlan(exercise, "riff", userAuth) : null;
   }, [level, userAuth]);
 
   useEffect(() => {
@@ -76,10 +66,11 @@ const FirstRiffPage: NextPage = () => {
     });
   }, [router.isReady, plan, level, source]);
 
-  const backToOnboarding = () => {
+  const leave = (finished: boolean) => {
     if (isLeaving) return;
     setIsLeaving(true);
-    void router.replace(getAfterFirstRiffHref(level, source));
+    trackOnboardingFirstMinuteLeft({ kind: "riff", level, finished, source });
+    void router.replace(getTourHref(null));
   };
 
   const head = (
@@ -121,8 +112,8 @@ const FirstRiffPage: NextPage = () => {
       {head}
       <PracticeSession
         plan={plan}
-        onClose={backToOnboarding}
-        onFinish={backToOnboarding}
+        onClose={() => leave(false)}
+        onFinish={() => leave(true)}
         isFinishing={isLeaving}
         micStart={withMic ? "setup" : "off"}
       />

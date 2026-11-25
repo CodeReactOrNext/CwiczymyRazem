@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Button, PRESSABLE } from "assets/components/ui/button";
+import { Button } from "assets/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +9,7 @@ import {
 import { Skeleton } from "assets/components/ui/skeleton";
 import { EmptyState } from "components/EmptyState/EmptyState";
 import { SearchInput } from "components/SearchInput/SearchInput";
+import { Segment, SegmentGroup } from "components/SegmentedControl/SegmentedControl";
 import {
   getCommunityExercises,
   getUserCommunityExercises,
@@ -362,23 +363,14 @@ export const SelectExercisesStep = ({
         <div className="order-1 lg:col-span-8 space-y-5 min-w-0">
           <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Source tabs */}
-          <div className="flex flex-wrap items-center gap-1 bg-zinc-900 rounded-lg p-1 w-fit">
+          <SegmentGroup>
             {SOURCE_TABS.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setSourceTab(id)}
-                className={`${PRESSABLE} flex items-center gap-2 px-4 py-2 rounded border-b-black/30 text-sm font-bold transition-colors ${
-                  sourceTab === id
-                    ? "bg-zinc-800 text-white"
-                    : "bg-white/[0.04] text-zinc-500 hover:bg-white/[0.08] hover:text-zinc-300"
-                }`}
-              >
+              <Segment key={id} active={sourceTab === id} onClick={() => setSourceTab(id)}>
                 <Icon size={14} />
                 {label}
-              </button>
+              </Segment>
             ))}
-          </div>
+          </SegmentGroup>
 
           {/* Building a new exercise is a side path — one menu, not three buttons ahead of the library. */}
           <DropdownMenu>
@@ -476,11 +468,12 @@ export const SelectExercisesStep = ({
             </>
           )}
         </p>
+        {/* Grey until there is something to take on, then the app's white key. */}
         <Button
           onClick={onNext}
           size='lg'
           disabled={selectedExercises.length === 0}
-          className='shrink-0'>
+          className='shrink-0 font-extrabold disabled:bg-zinc-800 disabled:text-zinc-500 disabled:opacity-100'>
           {t("select.next_step")}
           <ArrowRight />
         </Button>

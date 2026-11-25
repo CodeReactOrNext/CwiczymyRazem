@@ -26,6 +26,7 @@ import {
 } from "./MicTroubleshooting";
 import { SessionTooltip } from "./SessionTooltip";
 import { SpeedDropdown } from "./SpeedDropdown";
+import { StateDot } from "./StateDot";
 import { VolumeButton } from "./VolumeButton";
 
 interface MediaControlsToolbarProps {
@@ -141,7 +142,6 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
 
   const hasTuner =
     hasMicControls && !!frequencyRef && !!volumeRef && !disableTuner;
-  const h = compact ? "h-8" : "h-12";
 
   if (mobile) {
     // min-w-0 + truncated labels: the toolbar renders both full-width in
@@ -496,15 +496,27 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
     );
   }
 
-  // Desktop layout: controls grouped into "islands" — shared quiet backgrounds
-  // build the hierarchy (sound / input / view), spacing separates the groups.
+  // Desktop layout: the keys in groups (sound / input / view), set apart by
+  // space alone — a plate under each group only boxed the keys in.
   // The speed dropdown is intentionally absent here: on desktop it sits inside
   // the metronome bar (ExerciseQuickActionsBar), so the whole tempo axis lives in one place.
   const island =
-    "flex items-center gap-1.5 rounded-lg bg-zinc-900/40 p-1.5 empty:hidden";
+    "flex items-center gap-1.5 empty:hidden";
+
+  // A key with nothing to be on or off, and a switch in its two positions.
+  // A switch off reads as plainly as any key: its StateDot says it's off,
+  // so the face doesn't have to look disabled.
+  const plainKey = "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100";
+  // On is green — a lighter grey alone was too close to off to tell at a glance.
+  const onKey = "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25";
+  const offKey = plainKey;
+  const menuChevron = <ChevronDown aria-hidden className='h-3.5 w-3.5 shrink-0 text-zinc-500' />;
+  const desktopH = "h-9";
+  // The tuning by its name, and the standard one as a guitarist calls it.
+  const tuningLabel = isNonStandardTuning ? tuning.name : t("toolbar.standard_tuning");
 
   return (
-    <div className='mb-4 flex flex-wrap items-center justify-center gap-4'>
+    <div className='mb-4 flex flex-wrap items-center justify-center gap-x-10 gap-y-3'>
       {/* ── SOUND island: backing track + volume + tuning ── */}
       {((showBacking && hasAudioTrack) ||
         hasAudioTrack ||
@@ -523,23 +535,25 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 onClick={onAudioToggle}
                 disabled={isRiddleMode}
                 aria-label={t("media.playback")}
+                aria-pressed={!isAudioMuted}
                 className={cn(
                   PRESSABLE_KEY,
-                  "flex w-12 items-center justify-center rounded-lg transition-colors",
-                  h,
-                  isAudioMuted
-                    ? "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
-                    : "bg-white/15 text-white hover:bg-white/25",
+                  "flex items-center justify-center gap-2 rounded-lg px-2.5 font-medium transition-colors",
+                  desktopH,
+                  isAudioMuted ? offKey : onKey,
                   isRiddleMode && "cursor-not-allowed opacity-50",
                 )}>
-                <GiGuitar className='text-lg' />
+                <GiGuitar className='text-base' />
+                <span className='text-[13px] font-medium'>{t("toolbar.play_tab")}</span>
+                <StateDot on={!isAudioMuted} />
               </button>
             </SessionTooltip>
           )}
 
           {showVolumeButton && (
             <VolumeButton
-              h={h}
+              h={desktopH}
+              labelled
               metronome={hasMetronome && showSpeed ? metronome : undefined}
               isMetronomeMuted={isMetronomeMuted}
               setIsMetronomeMuted={
@@ -566,20 +580,19 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 onClick={openTuningSettings}
                 className={cn(
                   PRESSABLE_KEY,
-                  "flex items-center gap-2 rounded-lg px-3 transition-colors",
-                  h,
+                  "flex items-center gap-2 rounded-lg px-2.5 font-medium transition-colors",
+                  desktopH,
                   isNonStandardTuning
                     ? "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
-                    : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
+                    : plainKey,
                 )}>
                 {isTuningLocked ? (
                   <Lock className='h-3.5 w-3.5 shrink-0' />
                 ) : (
                   <GiGuitarHead className='h-4 w-4 shrink-0' />
                 )}
-                <span className='text-xs font-semibold'>
-                  {t("tuning_modal.tunings")}
-                </span>
+                <span className='text-[13px] font-medium'>{tuningLabel}</span>
+                {menuChevron}
               </button>
             </SessionTooltip>
           )}
@@ -603,35 +616,34 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
               disabled={examMode && isMicEnabled}
               className={cn(
                 PRESSABLE_KEY,
-                "flex items-center gap-2 rounded-lg px-4 font-semibold transition-colors",
-                h,
-                isMicEnabled
-                  ? "bg-emerald-950 text-emerald-400 hover:bg-emerald-900"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
+                "flex items-center gap-2 rounded-lg px-2.5 font-medium transition-colors",
+                desktopH,
+                isMicEnabled ? onKey : offKey,
                 examMode &&
                   isMicEnabled &&
-                  "cursor-not-allowed hover:bg-emerald-950",
+                  "cursor-not-allowed hover:bg-emerald-500/15",
               )}>
-              <Mic className='h-4 w-4 shrink-0' />
-              <span className='text-xs font-semibold'>
-                {t("media.pitch_detect")}
+              <Mic className={cn("h-4 w-4 shrink-0", isMicEnabled && "text-emerald-400")} />
+              <span className='text-[13px] font-medium'>
+                {t("toolbar.mic_scoring")}
               </span>
+              <StateDot on={isMicEnabled} />
             </button>
           </SessionTooltip>
 
           {/* Rarely-used mic tools live behind one chevron, so toggling the mic
               never adds/removes buttons and the row keeps a constant width. */}
           <DropdownMenu>
-            <SessionTooltip label={t("media.mic_tools_hint")}>
+            <SessionTooltip label={t("toolbar.mic_setup")}>
               <DropdownMenuTrigger asChild>
                 <button
                   type='button'
-                  aria-label={t("media.mic_tools")}
+                  aria-label={t("toolbar.mic_setup")}
                   className={cn(
                     PRESSABLE_KEY,
                     "flex w-8 items-center justify-center rounded-lg outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-400/50",
-                    h,
-                    "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white",
+                    desktopH,
+                    plainKey,
                   )}>
                   <ChevronDown className='h-3.5 w-3.5' />
                 </button>
@@ -669,10 +681,10 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
           </DropdownMenu>
 
           {/* Electron-only amp simulator (renders nothing on web) */}
-          <AmpSimButton h={h} />
+          <AmpSimButton h={desktopH} />
 
           {/* Electron-only take recorder (renders nothing on web) */}
-          <TakeRecorderButton h={h} compact={compact} title={takeTitle} />
+          <TakeRecorderButton h={desktopH} compact={compact} title={takeTitle} />
         </div>
       )}
 

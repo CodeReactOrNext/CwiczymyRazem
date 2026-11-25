@@ -2,8 +2,10 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { EarQuizConfig } from "feature/exercisePlan/logic/earQuiz/earQuiz.types";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { useEarQuizRunStore } from "../../helpers/earQuizRunStore";
+import { useEarQuizVerdictStore } from "../../helpers/earQuizVerdictStore";
 import { EarQuizPanel } from "./EarQuizPanel";
 
 // jsdom has no Web Audio, so every playback call short-circuits to a no-op —
@@ -39,7 +41,7 @@ describe("EarQuizPanel — chord quality", () => {
 
     // The round is settled: a verdict with a way onwards, and the formula of the
     // chord that actually played is now on screen.
-    expect(button(/Next/)).toBeDefined();
+    expect(button(/Continue/)).toBeDefined();
     expect(screen.getAllByText(/1 · (3|♭3|4) · 5/).length).toBeGreaterThan(0);
   });
 
@@ -56,14 +58,13 @@ describe("EarQuizPanel — chord quality", () => {
     fireEvent.click(button(/Hear Minor from/));
     fireEvent.click(button(/Hear Sus4 from/));
 
-    expect(screen.getByText("/1")).toBeDefined();
     expect(
       screen.getByText(/ — (Major|Minor|Dominant 7|Sus4)$/).textContent,
     ).toBe(verdict);
 
-    fireEvent.click(button(/Next/));
+    fireEvent.click(button(/Continue/));
 
-    expect(screen.queryByRole("button", { name: /Next/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Continue/ })).toBeNull();
     expect(
       screen.queryByRole("button", { name: /Hear Major from/ }),
     ).toBeNull();
@@ -85,23 +86,23 @@ describe("EarQuizPanel — progressions", () => {
 
     expect(button("Check").disabled).toBe(true);
 
-    fireEvent.click(button("Imajor"));
-    fireEvent.click(button("IVmajor"));
+    fireEvent.click(button(/I\s*major/));
+    fireEvent.click(button(/IV\s*major/));
     expect(button("Check").disabled).toBe(true); // still a slot short
 
-    fireEvent.click(button("Vmajor"));
+    fireEvent.click(button(/^\d?\s*V\s*major/));
     expect(button("Check").disabled).toBe(false);
 
     fireEvent.click(button("Check"));
 
     expect(screen.getByText("I – IV – V")).toBeDefined();
-    expect(button(/Next/)).toBeDefined();
+    expect(button(/Continue/)).toBeDefined();
   });
 
   it("clears a filled slot when it is tapped", () => {
     render(<EarQuizPanel config={config} exerciseId='test_progression_quiz' />);
 
-    fireEvent.click(button("Imajor"));
+    fireEvent.click(button(/I\s*major/));
     fireEvent.click(button(/Slot 1: I, tap to clear/));
 
     expect(screen.getByLabelText("Slot 1: empty")).toBeDefined();
@@ -122,7 +123,7 @@ describe("EarQuizPanel — tuning by ear", () => {
   it("keeps the error hidden until the answer is in", () => {
     render(<EarQuizPanel config={config} exerciseId='test_detune_quiz' />);
 
-    expect(screen.getByText("no numbers — trust your ears")).toBeDefined();
+    expect(screen.getByText(/trust your ears/)).toBeDefined();
 
     // Leaving the slider where it started is always outside the window here,
     // since the question is drawn at least 20 cents out.
@@ -130,7 +131,7 @@ describe("EarQuizPanel — tuning by ear", () => {
 
     expect(screen.getByText(/cents$/)).toBeDefined();
     expect(screen.getByText(/cents (sharp|flat) —/)).toBeDefined();
-    expect(button(/Next/)).toBeDefined();
+    expect(button(/Continue/)).toBeDefined();
   });
 });
 
@@ -145,15 +146,13 @@ describe("EarQuizPanel — scales and modes", () => {
   it("offers each mode and reveals the formula of the one that played", () => {
     render(<EarQuizPanel config={config} exerciseId='test_mode_quiz' />);
 
-    fireEvent.click(button(/Play scale/));
     fireEvent.click(button(/Dorian/));
 
-    expect(button(/Next/)).toBeDefined();
+    expect(button(/Continue/)).toBeDefined();
     expect(screen.getByText(/Listen for the .+ — 1 /)).toBeDefined();
 
     // Every mode can now be heard from the same root, Dorian included.
-    fireEvent.click(button(/Hear Aeolian .* from/));
-    expect(screen.getByText("/1")).toBeDefined();
+    expect(button(/Hear Aeolian .* from/)).toBeDefined();
   });
 });
 
@@ -169,13 +168,60 @@ describe("EarQuizPanel — intervals", () => {
   it("offers each interval, grades the pick and lets every one be heard after", () => {
     render(<EarQuizPanel config={config} exerciseId='test_interval_quiz' />);
 
-    fireEvent.click(button(/Play interval/));
     fireEvent.click(button(/Perfect 5th/));
 
-    expect(button(/Next/)).toBeDefined();
+    expect(button(/Continue/)).toBeDefined();
     expect(screen.getByText(/frets? from .+ on one string/)).toBeDefined();
 
-    fireEvent.click(button(/Hear Minor 3rd from/));
-    expect(screen.getByText("/1")).toBeDefined();
+    expect(button(/Hear Minor 3rd from/)).toBeDefined();
+  });
+});
+
+describe("EarQuizPanel — the run", () => {
+  afterEach(() => {
+    cleanup();
+    useEarQuizRunStore.getState().reset();
+  });
+
+  it("counts answers only while the session runs", () => {
+    const { rerender } = render(<EarQuizPanel config={CHORD_CONFIG} exerciseId='test_run' isSessionRunning={false} />);
+    fireEvent.click(button(/Major/));
+    expect(useEarQuizRunStore.getState().answered).toBe(0);
+
+    fireEvent.click(button(/Continue/));
+    rerender(<EarQuizPanel config={CHORD_CONFIG} exerciseId='test_run' isSessionRunning />);
+    fireEvent.click(button(/Major/));
+    expect(useEarQuizRunStore.getState().answered).toBe(1);
+  });
+
+  it("answers from the number keys while it runs, and not under the start gate", () => {
+    const { rerender } = render(<EarQuizPanel config={CHORD_CONFIG} exerciseId='test_keys' isSessionRunning={false} />);
+    fireEvent.keyDown(window, { key: "2" });
+    expect(screen.queryByRole("button", { name: /Continue/ })).toBeNull();
+
+    rerender(<EarQuizPanel config={CHORD_CONFIG} exerciseId='test_keys' isSessionRunning />);
+    fireEvent.keyDown(window, { key: "2" });
+    expect(button(/Continue/)).toBeDefined();
+  });
+
+  it("takes the verdict down with the panel", () => {
+    render(<EarQuizPanel config={CHORD_CONFIG} exerciseId='test_unmount' isSessionRunning />);
+    fireEvent.click(button(/Major/));
+    expect(useEarQuizVerdictStore.getState().isShown).toBe(true);
+    cleanup();
+    expect(useEarQuizVerdictStore.getState().isShown).toBe(false);
+  });
+
+  it("says the verdict in the question's place and reports Continue", () => {
+    const onContinue = vi.fn();
+    render(<EarQuizPanel config={CHORD_CONFIG} exerciseId='test_continue' isSessionRunning onContinue={onContinue} />);
+    fireEvent.click(button(/Major/));
+    expect(document.activeElement).toBe(button(/Continue/));
+    expect(screen.getByText("What kind of chord is this?").closest(".invisible")).not.toBeNull();
+
+    fireEvent.click(button(/Continue/));
+    expect(onContinue).toHaveBeenCalledTimes(1);
+    expect(useEarQuizVerdictStore.getState().isShown).toBe(false);
+    expect(screen.getByText("What kind of chord is this?").closest(".invisible")).toBeNull();
   });
 });

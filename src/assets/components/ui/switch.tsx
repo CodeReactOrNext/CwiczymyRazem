@@ -7,10 +7,13 @@ interface SwitchProps {
   /** Accessible name when no visible <label> points at the switch. */
   "aria-label"?: string;
   id?: string;
+  /** Colour when on. Cyan everywhere by default; the session's backing menu
+   *  uses emerald, the green every picked control in the session wears. */
+  tone?: "cyan" | "emerald";
 }
 
 /** On/off switch (role="switch"). Cyan when on, per the semantic palette. */
-export const Switch = ({ checked, onChange, disabled, id, "aria-label": ariaLabel }: SwitchProps) => (
+export const Switch = ({ checked, onChange, disabled, id, tone = "cyan", "aria-label": ariaLabel }: SwitchProps) => (
   <button
     type="button"
     role="switch"
@@ -21,7 +24,7 @@ export const Switch = ({ checked, onChange, disabled, id, "aria-label": ariaLabe
     onClick={onChange}
     className={cn(
       "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-base outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 disabled:cursor-not-allowed disabled:opacity-50",
-      checked ? "bg-cyan-500" : "bg-zinc-700"
+      checked ? (tone === "emerald" ? "bg-emerald-500" : "bg-cyan-500") : "bg-zinc-700"
     )}
   >
     <span

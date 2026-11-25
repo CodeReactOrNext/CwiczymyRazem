@@ -48,7 +48,7 @@ export const RecentRunsCard = ({ runs, className }: { runs: ScoredRun[]; classNa
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("rounded-lg bg-zinc-800/40 p-7 md:p-8", className)}>
+      className={cn("rounded-lg bg-zinc-800/40 p-7 md:p-8 shortwide:p-4", className)}>
       <SectionHeader
         as='h3'
         title={
@@ -68,9 +68,8 @@ export const RecentRunsCard = ({ runs, className }: { runs: ScoredRun[]; classNa
         }
         className='mb-6 flex-wrap items-baseline gap-x-4 gap-y-1'
       />
-      {/* Beside the standings on a wide screen, where the card is as tall as
-          they are: the plot grows into it rather than leaving the room empty. */}
-      <GoalRunsChart runs={history} showTempo showAccuracy chartClassName='lg:h-[22rem]' />
+      {/* Beside the standings on a wide screen: as tall as their three rows. */}
+      <GoalRunsChart runs={history} showTempo showAccuracy chartClassName='lg:h-[16rem] shortwide:h-36' />
     </motion.div>
   );
 };

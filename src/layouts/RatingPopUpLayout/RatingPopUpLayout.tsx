@@ -6,18 +6,21 @@ import { Kostek } from "components/Mascot/Kostek";
 import { SectionHeader } from "components/SectionHeader/SectionHeader";
 import { HeroPattern } from "components/UI/HeroBanner";
 import { TIME_POINTS_VALUE } from "constants/ratingValue";
+import { STREAK_MILESTONES } from "constants/streakMilestones";
 import type { AchievementList } from "feature/achievements";
 import { AchievementCard, useAchievementContext } from "feature/achievements";
 import type { ScoredRun } from "feature/exercisePlan/types/exercise.types";
-import { NextUpCard } from "feature/progression/components/NextUpCard";
+import { NextReward, PaidLevels, useHasNextReward } from "feature/progression/components/NextUpCard";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { AnimatePresence, motion } from "framer-motion";
+import { useAutoClaimLevels } from "hooks/useRewardLedger";
 import { useTranslation } from "hooks/useTranslation";
 import { useIntlLocale } from "lib/i18n/dateLocale";
+import { fadeUp } from "lib/motion/motion";
 import { playUiSound } from "lib/uiSounds/uiSounds";
-import { ArrowRight, Brain, Check, Ear, Flame, Hand, Music, NotebookPen, RotateCcw, Sparkles, Trophy } from "lucide-react";
+import { ArrowRight, Brain, Check, Ear, Hand, Music, NotebookPen, RotateCcw, Sparkles, Timer } from "lucide-react";
 import Router from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { StatisticsDataInterface } from "types/api.types";
 import {
@@ -27,22 +30,24 @@ import {
 } from "utils/gameLogic";
 
 import { RecentRunsCard } from "./components/RecentRunsCard";
-import { RewardBreakdown } from "./components/RewardBreakdown";
 import { MASCOT_LAYOUT_ID, SessionCelebration } from "./components/SessionCelebration";
+import { SessionDetails } from "./components/SessionDetails";
 import { SessionLeaderboardCard } from "./components/SessionLeaderboardCard";
-import { SessionNoteForm } from "./components/SessionNoteForm";
+import { SessionNoteForm, type SessionNoteHandle } from "./components/SessionNoteForm";
+import { SessionTiles, TileTime } from "./components/SessionTiles";
+import { StreakWeek } from "./components/StreakWeek";
 import { useRatingPopUp } from "./hooks/useRatingPopUp";
 import { buildFameBreakdown, buildPointsBreakdown } from "./utils/rewardBreakdown";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Post-session summary. Styleguide: colour = meaning. Neutral zinc base, cyan as
-// the single dominant accent (gems / level / XP / data). Sparing accents only
-// where they carry meaning: amber = Fame, orange = streak, amber = achievements.
+// Post-session summary: one thing on the screen at a time, in at most three
+// steps — what the session came to, how the exercise went (only where one was
+// scored), and what comes next. Where the numbers came from stands under them.
+// Styleguide: colour = meaning — cyan points and level, amber Fame and rewards,
+// orange streak.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const MIN = 60 * 1000;
-// Streak lengths worth a headline of their own on the celebration screen.
-const STREAK_MILESTONES = [7, 30, 100, 365];
 // Time points are floor(ms × TIME_POINTS_VALUE), so this is the practice time the
 // *first* point actually costs (~3min). Derived from the rate in
 // constants/ratingValue so the "no points" screen can never quote a stale number.
@@ -55,6 +60,8 @@ type ActivityDay = {
   hearingTime: number;
   creativityTime: number;
 };
+
+type SummaryStep = "result" | "exercise" | "next";
 
 type CatKey = "technique" | "theory" | "hearing" | "creativity";
 
@@ -121,24 +128,6 @@ function CardHeading({ icon, children }: { icon?: React.ReactNode; children: Rea
   );
 }
 
-/** A duration as big digits with small units, so the number leads and "min" follows. */
-function BigTime({ minutes }: { minutes: number }) {
-  const hours = Math.floor(minutes / 60);
-  const unit = "text-3xl font-semibold text-zinc-400";
-  return (
-    <p className="flex items-baseline gap-1.5 font-teko text-6xl font-bold leading-none tabular-nums text-zinc-100">
-      {hours > 0 && (
-        <>
-          <span>{hours}</span>
-          <span className={cn(unit, "mr-1.5")}>h</span>
-        </>
-      )}
-      <span>{minutes % 60}</span>
-      <span className={unit}>min</span>
-    </p>
-  );
-}
-
 const RatingPopUpLayout = ({
   ratingData,
   currentUserStats,
@@ -181,7 +170,15 @@ const RatingPopUpLayout = ({
   const fame = ratingData.fameEarned ?? 0;
   const isRest = ratingData.totalPoints <= 0;
   // A session that earned something opens on the full-screen celebration first.
+  const streakMilestone =
+    STREAK_MILESTONES.includes(currentUserStats.actualDayWithoutBreak ?? 0) &&
+    (currentUserStats.actualDayWithoutBreak ?? 0) > (previousUserStats.actualDayWithoutBreak ?? 0);
   const [celebrating, setCelebrating] = useState(!isRest && !examFailed);
+
+  // Levels are paid by the summary opening, whichever step the player leaves on.
+  const collected = useAutoClaimLevels();
+  const paidLevels = collected && collected.levels.length > 0 ? collected : null;
+  const hasNextReward = useHasNextReward();
 
   const handleContinue = () => (onClick ? onClick(false) : Router.push("/dashboard"));
 
@@ -190,12 +187,37 @@ const RatingPopUpLayout = ({
   const reportDate = new Date(ratingData.reportDate);
   const reportId = Number.isNaN(reportDate.getTime()) ? null : reportDate.toISOString();
 
+  const noteRef = useRef<SessionNoteHandle>(null);
   const noteCard = reportId && (
-    <Card>
+    <Card className="w-full text-left shortwide:p-5">
       <CardHeading icon={<NotebookPen className="h-4 w-4" />}>{t("notes_heading")}</CardHeading>
-      <SessionNoteForm reportId={reportId} />
+      <SessionNoteForm ref={noteRef} reportId={reportId} />
     </Card>
   );
+
+  // ── Steps ──
+  const steps: SummaryStep[] = [
+    "result",
+    ...(scoredRuns.length > 0 ? ["exercise" as const] : []),
+    ...(hasNextReward || noteCard ? ["next" as const] : []),
+  ];
+  const [stepIndex, setStepIndex] = useState(0);
+  const step = steps[Math.min(stepIndex, steps.length - 1)];
+  const isLastStep = stepIndex >= steps.length - 1;
+  const [isLeaving, setIsLeaving] = useState(false);
+
+  const handleNext = async () => {
+    if (!isLastStep) {
+      setStepIndex(stepIndex + 1);
+      topRef.current?.scrollIntoView({ block: "start" });
+      return;
+    }
+    // What was typed into the note is not lost for want of its own Save.
+    setIsLeaving(true);
+    const noteKept = (await noteRef.current?.save()) ?? true;
+    setIsLeaving(false);
+    if (noteKept) handleContinue();
+  };
 
   // ── derived data ──
   // Same source of truth as the header / user tooltip: reconcile the stored
@@ -235,6 +257,8 @@ const RatingPopUpLayout = ({
     accuracyBonus: ratingData.fameAccuracyBonus,
   }, t);
 
+  const shownFameRows = fame > 0 ? fameRows : [];
+
   const skillGains = Object.entries(ratingData.skillPointsGained ?? {}).filter(([, v]) => v > 0);
 
   const sessionTimeMs = ratingData.bonusPoints?.time ?? 0;
@@ -268,14 +292,31 @@ const RatingPopUpLayout = ({
     });
   }, [activityData, intlLocale]);
 
+  const streakDays = weekData.map((day) => ({
+    label: day.label,
+    isToday: day.isToday,
+    practised: day.minutes > 0 || (day.isToday && didPracticeToday),
+  }));
+  const timeLines = CATS.map((c) => ({ ...c, ms: sessionBreakdown[c.key] || 0 }))
+    .filter((c) => c.ms > 0)
+    .sort((a, b) => b.ms - a.ms)
+    .map((c) => ({ key: c.key, label: t(`cat.${c.key}`), value: fmtMin(Math.round(c.ms / MIN)) }));
+  const skillLines = skillGains.map(([key, points]) => ({
+    key,
+    label: CAT_BY_KEY[key] ? t(`cat.${key}`) : prettify(key),
+    value: `+${points}`,
+  }));
+
   const content = (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
       className={cn(
-        "mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 md:p-8",
-        !hideWrapper && "pb-32 pt-16 sm:pb-10 sm:pt-6 shortwide:pb-10 shortwide:pt-4"
+        "mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 pb-0 pt-6 md:px-8 shortwide:gap-3 shortwide:pb-0 shortwide:pt-4",
+        // Tall enough that the way on stands at the bottom of the screen.
+        hideWrapper ? "min-h-[calc(100dvh-2rem)] shortwide:min-h-full" : "min-h-[70dvh] shortwide:min-h-0",
+        isRest && "pb-32 sm:pb-10"
       )}
     >
       <div ref={topRef} />
@@ -351,278 +392,130 @@ const RatingPopUpLayout = ({
 
       {!isRest && (
         <>
-          {/* ── Hero ── */}
-          <div className="relative overflow-hidden rounded-lg bg-zinc-900/60 px-7 py-12 text-center md:px-10 md:py-14 shortwide:py-8">
-            <HeroPattern className="opacity-[0.035]" maskImage="radial-gradient(ellipse at top, black 10%, transparent 70%)" />
+          {steps.length > 1 && (
+            <ol className="flex gap-1.5" aria-label={t("step_of", { step: stepIndex + 1, count: steps.length })}>
+              {steps.map((key, i) => (
+                <li key={key} className={cn("h-2 flex-1 rounded-full transition-colors duration-slow", i <= stepIndex ? "bg-cyan-500" : "bg-zinc-800")} />
+              ))}
+            </ol>
+          )}
 
-            <div className="relative">
-              {/* The slot keeps its height while the celebration is up, so the
-                  card does not jump when Kostek flies in from it. */}
-              <div className="mx-auto mb-4 flex h-28 justify-center md:h-32">
-                {examFailed ? (
-                  <Kostek mood="sad" delay={0.3} className="h-28 md:h-32" />
-                ) : (
-                  !celebrating && (
-                    <motion.div layoutId={MASCOT_LAYOUT_ID} transition={{ type: "spring", stiffness: 140, damping: 20 }}>
-                      <Kostek lively arrive className="h-28 md:h-32" />
-                    </motion.div>
-                  )
-                )}
-              </div>
-              {examFailed ? (
-                <div className="space-y-1">
-                  <p className="text-xl font-semibold text-red-400">{t("exam_failed")}</p>
-                  <p className="text-sm text-zinc-400">{t("exam_failed_body")}</p>
-                </div>
-              ) : (
-                <p className="text-sm font-medium text-zinc-400">{t("great_progress")}</p>
-              )}
-
-              {/* The two rewards stand side by side once there is room: stacked,
-                  the Fame receipt pushed Continue below the fold of a laptop. Each
-                  headline keeps its own height, so the two receipts start level. */}
-              <div
-                className={cn(
-                  "mx-auto mt-4 grid grid-cols-1 gap-x-16 gap-y-10",
-                  fame > 0 && "max-w-3xl md:grid-cols-2 shortwide:grid-cols-2",
-                )}>
-                <div>
-                  <div className="flex h-24 items-end justify-center gap-4">
-                    <span className="font-teko text-8xl font-bold leading-none tabular-nums text-cyan-400">
-                      +{displayedPoints}
-                    </span>
-                    <img src="/images/tokens/pick.png" alt="points" className="mb-2 h-12 w-12 object-contain" />
-                  </div>
-
-                  <RewardBreakdown rows={pointRows} delay={0.5} className="mt-7" />
-                </div>
-
-                {fame > 0 && (
-                  <div>
-                    <div className="flex items-end justify-center gap-2.5 md:h-24 md:pb-2 shortwide:h-24 shortwide:pb-2">
-                      <img src="/images/tokens/coin.png" alt="" className="mb-1 h-7 w-7 object-contain md:mb-2 md:h-9 md:w-9 shortwide:mb-2 shortwide:h-9 shortwide:w-9" />
-                      <span className="font-teko text-5xl font-bold leading-none tabular-nums text-amber-400 md:text-7xl shortwide:text-7xl">
-                        +{fame}
-                      </span>
-                      <span className="mb-1 text-base font-semibold text-amber-400 md:mb-2.5 shortwide:mb-2.5">{t("fame")}</span>
+          <div className="flex flex-1 flex-col items-center justify-center py-4 shortwide:py-0">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={step}
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                className="flex w-full flex-col items-center gap-8 shortwide:gap-5">
+                {step === "result" ? (
+                  <>
+                    {/* The slot keeps its height while the celebration is up, so the
+                        screen does not jump when Kostek flies in from it. A phone
+                        held sideways has the height for the numbers only. */}
+                    <div className={cn("flex h-24 justify-center md:h-28 shortwide:h-20", !examFailed && "shortwide:hidden")}>
+                      {examFailed ? (
+                        <Kostek mood="sad" delay={0.3} className="h-full" />
+                      ) : (
+                        !celebrating && (
+                          <motion.div layoutId={MASCOT_LAYOUT_ID} transition={{ type: "spring", stiffness: 140, damping: 20 }} className="h-full">
+                            <Kostek lively arrive className="h-full" />
+                          </motion.div>
+                        )
+                      )}
+                    </div>
+                    <div className="space-y-1 text-center">
+                      <h1 className={cn("font-display text-3xl font-extrabold tracking-tight sm:text-4xl shortwide:text-2xl", examFailed ? "text-red-400" : "text-zinc-50 shortwide:sr-only")}>
+                        {examFailed ? t("exam_failed") : t("great_progress")}
+                      </h1>
+                      {examFailed && <p className="text-sm text-zinc-400">{t("exam_failed_body")}</p>}
                     </div>
 
-                    <RewardBreakdown rows={fameRows} delay={0.8} className="mt-7" />
+                    <div className="flex w-full max-w-3xl flex-col gap-6 shortwide:gap-4">
+                      <SessionTiles
+                        tiles={[
+                          { label: t("points"), value: `+${displayedPoints}`, icon: <img src="/images/tokens/pick.png" alt="" className="h-full w-full object-contain" />, tone: "points" as const },
+                          ...(fame > 0 ? [{ label: t("fame"), value: `+${fame}`, icon: <img src="/images/tokens/coin.png" alt="" className="h-full w-full object-contain" />, tone: "fame" as const }] : []),
+                          { label: t("time"), icon: <Timer className="h-full w-full text-zinc-400" aria-hidden />, value: <TileTime minutes={Math.round(sessionTimeMs / MIN)} /> },
+                        ]}
+                      />
+
+                      <div className="flex flex-col gap-6 shortwide:flex-row shortwide:items-center">
+                      {/* level progress (XP = cyan) */}
+                      <div className="shortwide:flex-1">
+                        <div className="mb-2.5 flex items-baseline justify-between text-sm">
+                          <span className="font-medium text-zinc-300">
+                            {t("level")} <span className="font-bold text-zinc-100">{currentLevel}</span>
+                          </span>
+                          {isGetNewLevel ? (
+                            <span className={chipVariants({ color: "cyan", size: "sm" })}>
+                              <Sparkles className="h-3 w-3" aria-hidden /> {t("level_up")}
+                            </span>
+                          ) : (
+                            <span className="font-bold tabular-nums text-cyan-400">{Math.round(currProgressPercent)}%</span>
+                          )}
+                        </div>
+                        <div className="h-4 w-full overflow-hidden rounded-full bg-zinc-800">
+                          <motion.div
+                            className="relative h-full rounded-full bg-cyan-500"
+                            initial={{ width: `${prevProgressPercent}%` }}
+                            animate={{ width: `${currProgressPercent}%` }}
+                            transition={{ delay: 0.5, duration: 1.1, ease: [0.22, 1, 0.36, 1] }}>
+                            <span aria-hidden className="light-hide absolute inset-x-2 top-1 h-1 rounded-full bg-white/30" />
+                          </motion.div>
+                        </div>
+                      </div>
+
+                      <StreakWeek streak={streak} week={streakDays} bonusPct={streakBonusPct} />
+                      </div>
+                      {paidLevels && <PaidLevels paid={paidLevels} />}
+                      <SessionDetails pointRows={pointRows} fameRows={shownFameRows} time={timeLines} skills={skillLines} />
+                    </div>
+
+                    {newAchievements.length > 0 && <Achievements achievements={newAchievements} />}
+                  </>
+                ) : step === "exercise" ? (
+                  /* Where the run stands, and how the last ones went. Either can
+                     have nothing to show, and the other then takes the row. */
+                  <div className="flex w-full flex-col items-stretch gap-6 lg:flex-row shortwide:flex-row">
+                    <SessionLeaderboardCard runs={scoredRuns} className="min-w-0 lg:flex-1 shortwide:flex-1" />
+                    <RecentRunsCard runs={scoredRuns} className="min-w-0 lg:flex-1 shortwide:flex-1" />
+                    <p className="hidden w-full text-center text-lg font-semibold text-zinc-200 only:block">{t("run_saved")}</p>
+                  </div>
+                ) : (
+                  <div className="flex w-full flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-12 shortwide:flex-row shortwide:gap-8">
+                    {hasNextReward && (
+                      <div className="flex w-full flex-1 flex-col items-center gap-6 shortwide:gap-3">
+                        <h2 className="font-display text-2xl font-extrabold tracking-tight text-zinc-50 shortwide:text-xl">{t("next_reward")}</h2>
+                        <NextReward className="shortwide:[zoom:0.75]" />
+                      </div>
+                    )}
+                    {noteCard && <div className="w-full flex-1">{noteCard}</div>}
                   </div>
                 )}
-              </div>
-
-              {skillGains.length > 0 && (
-                <div className="mx-auto mt-10 flex max-w-md flex-wrap justify-center gap-2.5">
-                  {skillGains.map(([key, points], i) => {
-                    const cat = CAT_BY_KEY[key];
-                    const Icon = cat?.Icon;
-                    return (
-                      <motion.div
-                        key={key}
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 + i * 0.08 }}
-                        className="flex items-center gap-2 rounded bg-zinc-800/50 px-3.5 py-2"
-                      >
-                        {Icon && <Icon size={14} className="text-zinc-400" />}
-                        <span className="text-sm text-zinc-300">{cat ? t(`cat.${cat.key}`) : prettify(key)}</span>
-                        <span className="text-sm font-bold tabular-nums text-cyan-400">+{points}</span>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* level progress (XP = cyan) */}
-              <div className="mx-auto mt-10 max-w-md">
-                <div className="mb-2.5 flex items-baseline justify-between text-sm">
-                  <span className="font-medium text-zinc-300">
-                    {t("level")} <span className="font-bold text-zinc-100">{currentLevel}</span>
-                    <ArrowRight className="mx-1.5 inline h-3.5 w-3.5 text-zinc-500" />
-                    <span className="font-bold text-cyan-400">{currentLevel + 1}</span>
-                  </span>
-                  {isGetNewLevel ? (
-                    <motion.span
-                      initial={{ scale: 0.7, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 1.1, type: "spring", stiffness: 220, damping: 12 }}
-                      className={chipVariants({ color: "cyan", size: "sm" })}
-                    >
-                      <Sparkles className="h-3 w-3" aria-hidden /> {t("level_up")}
-                    </motion.span>
-                  ) : (
-                    <span className="font-bold tabular-nums text-cyan-400">{Math.round(currProgressPercent)}%</span>
-                  )}
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
-                  <motion.div
-                    className="h-full rounded-full bg-cyan-500"
-                    initial={{ width: `${prevProgressPercent}%` }}
-                    animate={{ width: `${currProgressPercent}%` }}
-                    transition={{ delay: 0.8, duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                  />
-                </div>
-              </div>
-
-              {/* CTA — on a phone it lives in the bar pinned to the bottom of
-                  the screen instead (see below), where it needs no scrolling. */}
-              <div className={cn(
-                "mt-10 flex-col items-center justify-center gap-3 sm:flex-row shortwide:flex-row",
-                hideWrapper ? "flex" : "hidden lg:flex",
-              )}>
-                {onRestart && (
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    onClick={onRestart}
-                    className="w-full text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 sm:w-auto shortwide:w-auto"
-                  >
-                    <RotateCcw aria-hidden />
-                    {restartLabel ?? t("repeat_session")}
-                  </Button>
-                )}
-                <Button
-                  size="lg"
-                  onClick={handleContinue}
-                  className="w-full sm:w-auto shortwide:w-auto"
-                >
-                  {t("continue")}
-                  <ArrowRight aria-hidden />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Note + new achievements ──
-              A flex row, not a grid: whichever is missing leaves the other the
-              whole width instead of an empty column. */}
-          <div className="flex flex-col items-stretch gap-6 empty:hidden md:flex-row shortwide:flex-row">
-            {noteCard && <div className="min-w-0 md:flex-[2] shortwide:flex-[2] [&>*]:h-full">{noteCard}</div>}
-            <AnimatePresence>
-              {newAchievements.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="min-w-0 md:flex-1 shortwide:flex-1 [&>*]:h-full">
-                  <Achievements achievements={newAchievements} />
-                </motion.div>
-              )}
+              </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* ── The exercise: where the run stands, and how the last ones went ──
-              Both are about the same exercise, so they share a row; either can
-              render nothing, and the other then takes the row. */}
-          <div className="flex flex-col items-stretch gap-6 empty:hidden lg:flex-row shortwide:flex-row">
-            {scoredRuns.length > 0 && <SessionLeaderboardCard runs={scoredRuns} className="min-w-0 lg:flex-1 shortwide:flex-1" />}
-            <RecentRunsCard runs={scoredRuns} className="min-w-0 lg:flex-1 shortwide:flex-1" />
-          </div>
-
-          {/* ── Session time + Streak ── */}
-          <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 shortwide:grid-cols-2">
-            {/* Session time */}
-            <Card className="h-full">
-              <CardHeading>{t("session_time")}</CardHeading>
-              <BigTime minutes={Math.round(sessionTimeMs / MIN)} />
-
-              <div className="mt-8 space-y-5">
-                {CATS.map((c) => ({ ...c, ms: sessionBreakdown[c.key] || 0 }))
-                  .filter((c) => c.ms > 0)
-                  .sort((a, b) => b.ms - a.ms)
-                  .map((c) => {
-                    const pct = sessionTimeMs > 0 ? (c.ms / sessionTimeMs) * 100 : 0;
-                    return (
-                      <div key={c.key} className="flex items-center gap-3">
-                        <c.Icon className="h-4 w-4 shrink-0 text-zinc-400" />
-                        <div className="flex-1">
-                          <div className="mb-2 flex items-center justify-between text-sm">
-                            <span className="font-medium text-zinc-300">{t(`cat.${c.key}`)}</span>
-                            <span className="font-semibold tabular-nums text-zinc-100">{fmtMin(Math.round(c.ms / MIN))}</span>
-                          </div>
-                          <div className="h-3 w-full overflow-hidden rounded-full bg-zinc-800">
-                            <div className="relative h-full rounded-full bg-cyan-600" style={{ width: `${pct}%` }}>
-                              <span aria-hidden className="absolute inset-x-1.5 top-[3px] h-[3px] rounded-full bg-white/20" />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-            </Card>
-
-            {/* Streak */}
-            <Card className="h-full">
-              <CardHeading>{t("streak")}</CardHeading>
-
-              <div className="flex items-baseline gap-2">
-                <Flame className="h-10 w-10 shrink-0 self-center fill-orange-400 text-orange-400" aria-hidden />
-                <span className="font-teko text-6xl font-bold leading-none tabular-nums text-orange-400">{streak}</span>
-                <span className="text-sm font-medium text-zinc-400">{t("days_in_a_row", { count: streak })}</span>
-              </div>
-
-              {streakBonusPct > 0 && (
-                <div className="mt-3 inline-flex items-center gap-1.5 rounded bg-orange-500/10 px-2.5 py-1">
-                  <Flame className="h-3.5 w-3.5 text-orange-400" aria-hidden />
-                  <span className="text-xs font-bold text-orange-400">{t("streak_bonus_points", { pct: streakBonusPct })}</span>
-                </div>
-              )}
-
-              <div className="mt-8 flex justify-between gap-2">
-                {weekData.map((d, i) => {
-                  const active = d.minutes > 0 || (d.isToday && didPracticeToday);
-                  return (
-                    <div key={i} className="flex flex-1 flex-col items-center gap-2.5">
-                      <div
-                        className={cn(
-                          "flex aspect-square w-full max-w-[2.5rem] items-center justify-center rounded-full",
-                          active ? "bg-orange-500" : "bg-zinc-800/60"
-                        )}
-                      >
-                        {active && <Check className="h-5 w-5 text-zinc-950" strokeWidth={3} aria-hidden />}
-                      </div>
-                      <span className={cn("text-xs", d.isToday ? "font-bold text-zinc-100" : "font-medium text-zinc-500")}>
-                        {d.isToday ? t("today") : d.label.slice(0, 1)}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
-          </div>
-
-          {/* ── The climb ahead, and anything already owed ── */}
-          <NextUpCard />
-
-          {/* ── Way out, always in reach ──
-              The summary is several screens long on a phone and Continue sat
-              under the rewards, a scroll away. Pinned to the bottom edge it is
-              where the thumb already is, whatever the player is reading. */}
-          {!hideWrapper && (
-            <div className="sticky bottom-0 z-20 -mx-4 flex items-center gap-3 bg-zinc-950/95 px-4 py-3 backdrop-blur-sm md:-mx-8 md:px-8 lg:hidden">
-              {onRestart && (
-                <Button
-                  variant="ghost"
-                  size="lg"
-                  onClick={onRestart}
-                  className="flex-1 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
-                >
-                  <RotateCcw className="shrink-0" aria-hidden />
-                  <span className="truncate">{restartLabel ?? t("repeat_session")}</span>
-                </Button>
-              )}
-              <Button
-                size="lg"
-                onClick={handleContinue}
-                className="flex-1"
-              >
-                {t("continue")}
-                <ArrowRight aria-hidden />
+          {/* ── The way on, always in reach at the bottom edge ── */}
+          <div className={cn(
+            "sticky bottom-0 z-20 -mx-4 flex items-center justify-between gap-3 px-4 py-3 md:-mx-8 md:px-8",
+            hideWrapper ? "bg-zinc-950 pb-5 shortwide:pb-3" : "bg-zinc-950 lg:bg-transparent",
+          )}>
+            {isLastStep && onRestart ? (
+              <Button variant="ghost" size="lg" onClick={onRestart} className="min-w-0 px-5">
+                <RotateCcw className="shrink-0" aria-hidden />
+                <span className="truncate">{restartLabel ?? t("repeat_session")}</span>
               </Button>
-            </div>
-          )}
+            ) : (
+              <span />
+            )}
+            <Button size="xl" autoFocus loading={isLeaving} onClick={() => void handleNext()} className="min-w-40 max-sm:flex-1">
+              {isLastStep ? t("done") : t("continue")}
+              {isLastStep ? <Check aria-hidden /> : <ArrowRight aria-hidden />}
+            </Button>
+          </div>
         </>
       )}
     </motion.div>
@@ -639,7 +532,7 @@ const RatingPopUpLayout = ({
             fame={fame}
             streak={streak}
             levelUp={isGetNewLevel}
-            streakMilestone={STREAK_MILESTONES.includes(streak) && streak > (previousUserStats.actualDayWithoutBreak ?? 0)}
+            streakMilestone={streakMilestone}
             onDone={() => setCelebrating(false)}
           />
         )}
@@ -670,16 +563,16 @@ function Achievements({ achievements }: { achievements: AchievementList[] }) {
   const { t } = useTranslation("session_summary");
   const context = useAchievementContext();
   return (
-    <Card>
-      <CardHeading icon={<Trophy className="h-4 w-4 text-amber-500" />}>{t("new_achievements")}</CardHeading>
-      <div className="flex flex-wrap gap-5">
+    <div className="flex flex-wrap items-center justify-center gap-4">
+      <span className="text-sm font-semibold text-zinc-300">{t("new_achievements")}</span>
+      <div className="flex flex-wrap gap-4">
         {achievements.map((id) => (
           <div key={id} className="h-16 w-16">
             <AchievementCard id={id} context={context} isUnlocked={true} />
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   );
 }
 
