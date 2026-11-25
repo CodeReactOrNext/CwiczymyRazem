@@ -55,7 +55,7 @@ export const EffectStashTile = ({
         lockedLvl != null
           ? ` — ${labels.t("card.needs_level", { lvl: lockedLvl })}`
           : ""
-      }`}
+      }${isOnPedalboard ? ` — ${labels.t("stash.in_use")}` : ""}`}
       level={getEffectLevel(item, effect)}
       isNew={item.isNew}
       locked={lockedLvl != null}

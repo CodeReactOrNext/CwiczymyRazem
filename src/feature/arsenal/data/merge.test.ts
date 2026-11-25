@@ -14,9 +14,9 @@ import {
   EFFECT_MERGE,
   getMergeGain,
   getMergeOffer,
-  MERGE_GAIN_MULTIPLIER,
   getMergeState,
   GUITAR_MERGE,
+  MERGE_GAIN_MULTIPLIER,
   planMerge,
 } from "./merge";
 
@@ -69,7 +69,10 @@ describe("canMergeAway", () => {
 
   it("refuses anything the player has paid to improve", () => {
     expect(canMergeAway(copy("a", { buildLevel: 1 }))).toBe(false);
-    expect(canMergeAway(copy("a", { mergeBonus: 2 }))).toBe(false);
+  });
+
+  it("accepts a copy that has absorbed others: those points go with it", () => {
+    expect(canMergeAway(copy("a", { mergeBonus: 2 }))).toBe(true);
   });
 
   it("refuses a Guitar Builder guitar", () => {
@@ -124,6 +127,15 @@ describe("getMergeOffer", () => {
 
     expect(offer.targetId).toBe("high");
     expect(offer.gain).toBe(getMergeGain(guitar.rarity));
+    expect(offer.levelAfter).toBe(offer.levelBefore + offer.gain);
+  });
+
+  it("quotes the levels a merged copy brings along on top of the step", () => {
+    const keep = copy("keep", { condition: 0.95 });
+    const merged = copy("merged", { condition: 0.1, mergeBonus: 3 });
+    const offer = getMergeOffer([keep, merged], "merged", GUITAR_MERGE)!;
+
+    expect(offer.gain).toBe(getMergeGain(guitar.rarity) + 3);
     expect(offer.levelAfter).toBe(offer.levelBefore + offer.gain);
   });
 
@@ -186,6 +198,44 @@ describe("planMerge", () => {
     expect(plan.items).toHaveLength(1);
     expect(plan.items[0].mergeBonus).toBe(5 * getMergeGain(guitar.rarity));
     expect(plan.items[0].mergeCount).toBe(5);
+  });
+
+  it("carries a merged copy's own levels over to the target", () => {
+    const step = getMergeGain(guitar.rarity);
+    const plan = planMerge(
+      [
+        copy("keep", { mergeBonus: step, mergeCount: 1 }),
+        copy("merged", { mergeBonus: 2 * step, mergeCount: 2 }),
+      ],
+      ["merged"],
+      GUITAR_MERGE,
+    );
+
+    expect(plan.gain).toBe(3 * step);
+    expect(plan.items).toHaveLength(1);
+    expect(plan.items[0]).toMatchObject({
+      id: "keep",
+      mergeBonus: 4 * step,
+      mergeCount: 4,
+    });
+  });
+
+  it("is worth the same in any order, so merging in stages prints nothing", () => {
+    const direct = planMerge(
+      ["a", "b", "c", "d"].map((id) => copy(id)),
+      ["b", "c", "d"],
+      GUITAR_MERGE,
+    );
+    // The same four copies paired up first, then the two pairs folded together.
+    const left = planMerge([copy("a"), copy("b")], ["b"], GUITAR_MERGE);
+    const right = planMerge([copy("c"), copy("d")], ["d"], GUITAR_MERGE);
+    const staged = planMerge(
+      [...left.items, ...right.items],
+      ["c"],
+      GUITAR_MERGE,
+    );
+
+    expect(staged.items).toEqual(direct.items);
   });
 
   it("never consumes every copy: sources are not targets", () => {
@@ -279,14 +329,23 @@ describe("getMergeState", () => {
     });
   });
 
-  it("blocks a copy carrying workshop levels or an earlier merge", () => {
+  it("blocks a copy carrying workshop levels", () => {
     const built = [weak, copy("built", { buildLevel: 1 })];
     expect(getMergeState(built, "built", GUITAR_MERGE)?.blocked).toBe("built");
+  });
 
-    const merged = [weak, copy("merged", { mergeBonus: 2 })];
-    expect(getMergeState(merged, "merged", GUITAR_MERGE)?.blocked).toBe(
-      "built",
+  it("offers a copy that has merged before, next to a stronger one in service", () => {
+    // Two wahs, one on the board and one that came out of the guild stash with
+    // a merge already in it: neither could be folded into the other.
+    const merged = copy("merged", { condition: 0.1, mergeBonus: 3 });
+    const state = getMergeState(
+      [strong, merged],
+      "merged",
+      GUITAR_MERGE,
+      new Set(["strong"]),
     );
+    expect(state?.blocked).toBeUndefined();
+    expect(state?.offer?.targetId).toBe("strong");
   });
 
   it("blocks a copy in service and names that as the reason", () => {

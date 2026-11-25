@@ -67,7 +67,7 @@ export const GuitarStashTile = ({
         lockedLvl != null
           ? ` — ${labels.t("card.needs_level", { lvl: lockedLvl })}`
           : ""
-      }`}
+      }${inUse ? ` — ${labels.t("stash.in_use")}` : ""}`}
       level={getItemLevel(item, guitar)}
       isNew={item.isNew}
       locked={lockedLvl != null}

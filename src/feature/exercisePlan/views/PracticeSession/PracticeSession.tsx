@@ -403,7 +403,7 @@ const PracticeSessionInner = ({
   // ── Generated exercise ────────────────────────────────────────────────────
 
   const { showScaleDialog, setShowScaleDialog, showChordDialog, setShowChordDialog, activeExercise, handleGenerated } =
-    useGeneratedExercise({ currentExercise });
+    useGeneratedExercise({ currentExercise, exerciseIndex: currentExerciseIndex });
 
   // ── AlphaTab AudioContext + metronome bridge ───────────────────────────────
 
@@ -1646,6 +1646,9 @@ const PracticeSessionInner = ({
   // and two hands on every keyboard shortcut.
   const songSectionMapSlot = songItemOverSections && songItem && userId ? (
     <SongSectionMapPanel
+      // The panel saves what it holds under the song it is given, so the next
+      // song in the plan needs a panel of its own.
+      key={songItem.songId}
       song={songItem}
       userId={userId}
       onVideoPlay={startTimer}

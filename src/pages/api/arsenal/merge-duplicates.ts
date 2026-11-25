@@ -23,10 +23,10 @@ const MAX_MERGE_BATCH = 50;
  *
  * The client says which copies to fold away, never what they are worth or what
  * they land on: the target is the highest-level copy of the same model that is
- * not itself being folded, and the gain is the model's mint-rarity step, both
- * recomputed here from the stored stash (`data/merge`). Copies that are in
- * service, carry workshop levels or an earlier merge, or have nothing to land on
- * are skipped and stay where they are.
+ * not itself being folded, and the gain is the model's mint-rarity step plus
+ * whatever the folded copy had absorbed itself, both recomputed here from the
+ * stored stash (`data/merge`). Copies that are in service, carry workshop levels
+ * or have nothing to land on are skipped and stay where they are.
  */
 export default async function handler(
   req: NextApiRequest,

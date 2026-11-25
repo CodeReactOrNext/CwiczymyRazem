@@ -34,7 +34,11 @@ export type Rng = () => number;
 const pick = <T>(items: readonly T[], rng: Rng): T =>
   items[Math.floor(rng() * items.length) % items.length];
 
-/** Draws from `items`, never returning `exclude` — unless it is the only option. */
+/**
+ * Draws from `items`, never returning `exclude` — unless it is the only option.
+ * Not for an answer the player picks from a short list: ruling out the last one
+ * gives the next one away (with two options it simply alternates).
+ */
 const pickFresh = <T>(
   items: readonly T[],
   exclude: T | undefined,
@@ -54,6 +58,21 @@ const KEY_ROOT_RANGE = { min: 50, max: 59 } as const; // D3 – B3 (the bass not
 const SCALE_ROOT_RANGE = { min: 55, max: 64 } as const; // G3 – E4
 // An octave fits above and below without leaving the range the sampled guitar covers.
 const INTERVAL_ROOT_RANGE = { min: 55, max: 64 } as const; // G3 – E4
+
+/**
+ * The root moves every round, so the same answer twice in a row still sounds
+ * like a new question — and the move itself says nothing about the answer.
+ */
+const rollRoot = (
+  range: { min: number; max: number },
+  previousRoot: number | undefined,
+  rng: Rng,
+): number =>
+  pickFresh(
+    Array.from({ length: range.max - range.min + 1 }, (_, i) => range.min + i),
+    previousRoot,
+    rng,
+  );
 
 export interface ChordTypeQuestion {
   kind: "chordType";
@@ -133,8 +152,8 @@ export const generateChordTypeQuestion = (
   previous?: ChordTypeQuestion | null,
   rng: Rng = Math.random,
 ): ChordTypeQuestion => {
-  const quality = pickFresh(config.qualities, previous?.quality, rng);
-  const rootMidi = randomInt(CHORD_ROOT_RANGE.min, CHORD_ROOT_RANGE.max, rng);
+  const quality = pick(config.qualities, rng);
+  const rootMidi = rollRoot(CHORD_ROOT_RANGE, previous?.rootMidi, rng);
   return {
     kind: "chordType",
     rootMidi,
@@ -217,8 +236,8 @@ export const generateScaleModeQuestion = (
   previous?: ScaleModeQuestion | null,
   rng: Rng = Math.random,
 ): ScaleModeQuestion => {
-  const scale = pickFresh(config.scales, previous?.scale, rng);
-  const rootMidi = randomInt(SCALE_ROOT_RANGE.min, SCALE_ROOT_RANGE.max, rng);
+  const scale = pick(config.scales, rng);
+  const rootMidi = rollRoot(SCALE_ROOT_RANGE, previous?.rootMidi, rng);
   return {
     kind: "scaleMode",
     rootMidi,
@@ -235,13 +254,9 @@ export const generateIntervalQuestion = (
   previous?: IntervalQuestion | null,
   rng: Rng = Math.random,
 ): IntervalQuestion => {
-  const interval = pickFresh(config.intervals, previous?.interval, rng);
+  const interval = pick(config.intervals, rng);
   const direction = pick(config.directions, rng);
-  const rootMidi = randomInt(
-    INTERVAL_ROOT_RANGE.min,
-    INTERVAL_ROOT_RANGE.max,
-    rng,
-  );
+  const rootMidi = rollRoot(INTERVAL_ROOT_RANGE, previous?.rootMidi, rng);
   return {
     kind: "interval",
     rootMidi,

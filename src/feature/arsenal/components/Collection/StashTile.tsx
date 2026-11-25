@@ -27,6 +27,7 @@ import {
   plateStyle,
 } from "../TierPlate";
 import { ReadyMark } from "../Workshop/ReadyMark";
+import { InUseMark } from "./InUseMark";
 
 /** A tap on a socket; the event says where, for a menu hung off the cursor. */
 export type StashTileClick = (event: ReactMouseEvent<HTMLElement>) => void;
@@ -76,6 +77,8 @@ export interface StashPlacement {
    * for this mod, a stack ready to climb a tier. The green hammer mark in the corner.
    */
   ready?: boolean;
+  /** The current choice in a picker — an amber frame. The board never sets it. */
+  selected?: boolean;
 }
 
 interface StashTileProps {
@@ -125,14 +128,11 @@ interface StashTileProps {
    * does, and the hover card behind it names the number.
    */
   locked?: boolean;
-  /** In use somewhere (profile, rig, pedalboard) — a lit frame and a corner dot. */
+  /** In use somewhere (profile, rig, pedalboard) — the plug mark, bottom-right. */
   inUse?: boolean;
   /**
    * Where this model stands with the viewer, for a board that is not theirs —
-   * the guild's shelf. A corner glyph: owned, or on the Dex. Shares the corner
-   * with the in-use dot, which never applies to the same socket: a piece on
-   * the shelf is in nobody's rig, and a piece in the player's own cabinet is
-   * owned by definition and says nothing.
+   * the guild's shelf. A corner glyph: owned, or on the Dex.
    */
   dexStatus?: DexStatus;
   /**
@@ -142,6 +142,8 @@ interface StashTileProps {
   tierProgress?: TierProgress | null;
   /** The green hammer mark in the corner — see `StashPlacement.ready`. */
   ready?: boolean;
+  /** The current choice in a picker — see `StashPlacement.selected`. */
+  selected?: boolean;
   /** Full card shown on hover. Desktop only; touch opens the sheet instead. */
   preview?: ReactNode;
   /**
@@ -186,6 +188,7 @@ export const StashTile = ({
   inUse = false,
   dexStatus,
   ready = false,
+  selected = false,
   tierProgress = null,
   preview,
   previewFooter,
@@ -194,7 +197,7 @@ export const StashTile = ({
   const isMobile = useResponsiveStore((state) => state.isMobile);
   // Light theme, "studio" (owner's pick): a pale grey socket lit from the
   // middle instead of a pastel tier tint, the level in an ink chip, and the
-  // tier reduced to a dot in the corner. Rings (drop target, in use) stay.
+  // tier reduced to a dot in the corner. Rings (drop target, selected) stay.
   const isLight = useColorTheme() === "light";
 
   // Locked gear goes unlit rather than faint: `dimmed` (0.28) is for a piece the
@@ -210,14 +213,14 @@ export const StashTile = ({
   // that does nothing is a promise the stash cannot keep.
   const Socket = onClick ? "button" : "div";
 
-  const ringColor = dropTarget ? MOD_ACCENT : inUse ? "#fbbf24" : undefined;
+  const ringColor = dropTarget ? MOD_ACCENT : selected ? "#fbbf24" : undefined;
   const ringWidth = dropTarget === "active" ? 2 : 1;
   const glow =
     dropTarget === "active"
       ? `0 0 18px ${MOD_ACCENT}a6`
       : dropTarget
         ? `0 0 9px ${MOD_ACCENT}52`
-        : inUse
+        : selected
           ? "0 0 10px rgba(251,191,36,0.35)"
           : "0 1px 2px var(--ars-drop)";
 
@@ -388,7 +391,7 @@ export const StashTile = ({
         </span>
       )}
 
-      {isLight && !inUse && !dexStatus && !ready && (
+      {isLight && !dexStatus && !ready && (
         <span
           aria-hidden
           className='absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full'
@@ -396,16 +399,11 @@ export const StashTile = ({
         />
       )}
 
-      {/* The hammer mark takes the corner; an item in use still says so by its ring. */}
       {ready && <ReadyMark className='absolute right-1 top-1' />}
 
-      {inUse && !ready && (
-        <span
-          aria-hidden
-          className='absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-amber-400'
-          style={{ boxShadow: "0 0 6px rgba(251,191,36,0.9)" }}
-        />
-      )}
+      {/* A corner of its own, so the hammer never covers it: the padlock skips
+          gear in use, and only parts carry a stack size. */}
+      {inUse && <InUseMark className='absolute bottom-1 right-1' />}
 
       {dexStatus && (
         <DexCornerMark

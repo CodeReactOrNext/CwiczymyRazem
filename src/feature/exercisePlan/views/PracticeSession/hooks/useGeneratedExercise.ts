@@ -14,30 +14,36 @@ export const willHaveTablature = (exercise: Exercise): boolean =>
 
 interface UseGeneratedExerciseOptions {
   currentExercise: Exercise;
+  /** Where the plan is — a plan may hold the same configurable exercise twice. */
+  exerciseIndex: number;
 }
 
-export function useGeneratedExercise({ currentExercise }: UseGeneratedExerciseOptions) {
+export function useGeneratedExercise({ currentExercise, exerciseIndex }: UseGeneratedExerciseOptions) {
   const [showScaleDialog,   setShowScaleDialog]   = useState(false);
   const [showChordDialog,   setShowChordDialog]   = useState(false);
-  const [generatedExercise, setGeneratedExercise] = useState<Exercise | null>(null);
+  // Tied to the plan item it was set up for: without that, the generated tab
+  // stayed on screen under the next exercise's title.
+  const [generated, setGenerated] = useState<{ index: number; sourceId: string; exercise: Exercise } | null>(null);
+  const generatedExercise =
+    generated?.index === exerciseIndex && generated.sourceId === currentExercise.id ? generated.exercise : null;
 
   useEffect(() => {
     if (currentExercise.id === "scale_practice_configurable") {
       setShowScaleDialog(true);
       setShowChordDialog(false);
-      setGeneratedExercise(null);
+      setGenerated(null);
     } else if (currentExercise.id === "chord_practice_configurable") {
       setShowChordDialog(true);
       setShowScaleDialog(false);
-      setGeneratedExercise(null);
+      setGenerated(null);
     } else {
       setShowScaleDialog(false);
       setShowChordDialog(false);
     }
-  }, [currentExercise.id]);
+  }, [currentExercise.id, exerciseIndex]);
 
   const handleGenerated = (exercise: Exercise) => {
-    setGeneratedExercise(exercise);
+    setGenerated({ index: exerciseIndex, sourceId: currentExercise.id, exercise });
     setShowScaleDialog(false);
     setShowChordDialog(false);
   };

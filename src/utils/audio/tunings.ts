@@ -54,6 +54,7 @@ export const SEVEN_STRING_TUNINGS: GuitarTuningPreset[] = [
   sevenString("seven-drop-g-sharp",            "Drop G#/Ab",      "Ab Eb Ab Db Gb Bb Eb", [-1, -1, -1, -1, -1, -1, -3]),
   sevenString("seven-whole-step-down",         "Whole Step Down", "A D G C F A D",        [-2, -2, -2, -2, -2, -2, -2]),
   sevenString("seven-drop-g",                  "Drop G",          "G D G C F A D",        [-2, -2, -2, -2, -2, -2, -4]),
+  sevenString("seven-aeadead",                 "AEADEAD",         "A E A D E A D",        [-2, -2, -3, 0, 0, 0, -2]),
 ];
 
 /** String counts a guitar tuning comes in — the tabs of the tuning picker. */

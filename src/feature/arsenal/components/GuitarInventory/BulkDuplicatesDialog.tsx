@@ -118,7 +118,7 @@ interface BulkDuplicatesDialogProps {
   salvagedCount?: number;
   /**
    * What folding the batch into the copies being kept would add, and for how many
-   * of them: copies carrying workshop levels or an earlier merge are skipped, so
+   * of them: copies carrying workshop levels are skipped, so
    * this can be fewer than `items`. Omitting `onMerge` hides the option.
    */
   mergeGain?: number;

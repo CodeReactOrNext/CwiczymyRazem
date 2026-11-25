@@ -357,7 +357,9 @@ const PublishExercisePage: NextPageWithLayout = () => {
             <Button
               onClick={() =>
                 router.push(
-                  isEditing ? "/my-exercises" : "/profile/skills?tab=community",
+                  isEditing || !isPublic
+                    ? "/my-exercises"
+                    : "/profile/skills?tab=community",
                 )
               }
               size='lg'>

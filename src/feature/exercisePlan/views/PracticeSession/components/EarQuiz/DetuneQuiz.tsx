@@ -68,7 +68,8 @@ export function DetuneQuiz({
     onAnswer(isDetuneSolved(question, sliderCents));
   };
 
-  const snapToPitch = () => setSliderCents(-question.offsetCents);
+  const targetCents = -question.offsetCents;
+  const snapToPitch = () => setSliderCents(targetCents);
 
   // On the turned phone screen the slider's track runs down the page, but Radix reads the
   // pointer's x — so the drag is taken here instead, before it reaches the slider. The thumb
@@ -106,7 +107,7 @@ export function DetuneQuiz({
   // the thumb — the marks live in a box inset by half the thumb, so the two line up.
   const along = (cents: number) =>
     `${((cents + SLIDER_RANGE_CENTS) / (SLIDER_RANGE_CENTS * 2)) * 100}%`;
-  const targetCents = -question.offsetCents;
+  const isSnapped = isAnswered && sliderCents === targetCents;
   const verdict = isAnswered
     ? {
         isCorrect,
@@ -171,19 +172,31 @@ export function DetuneQuiz({
                       style={{ left: along(cents) }}
                     />
                   ))}
-                  {/* Answered: where in tune actually was, and how wide the window. */}
+                  {/* Answered: where in tune actually was, and how wide the window.
+                      Centred through `x`, not a Tailwind translate: the transform
+                      framer writes for scaleY would replace the class, and the
+                      window would sit half its width too far right. */}
                   {isAnswered && (
                     <motion.div
+                      data-testid='detune-window'
                       initial={{ opacity: 0, scaleY: 0.4 }}
                       animate={{ opacity: 1, scaleY: 1 }}
                       transition={{ duration: 0.3, ease: "easeOut" }}
-                      className='absolute inset-y-1.5 -translate-x-1/2 rounded bg-emerald-500/25'
+                      className='absolute inset-y-1.5 rounded bg-emerald-500/25'
                       style={{
+                        x: "-50%",
                         left: along(targetCents),
                         width: `${(question.toleranceCents / SLIDER_RANGE_CENTS) * 100}%`,
                       }}>
                       <span className='absolute inset-y-1 left-1/2 w-0.5 -translate-x-1/2 rounded-full bg-emerald-400' />
                     </motion.div>
+                  )}
+                  {/* Snapped in tune: the mark that was judged stays where it was left. */}
+                  {isSnapped && !solved && (
+                    <span
+                      className='absolute inset-y-1.5 w-1 -translate-x-1/2 rounded-full bg-red-400'
+                      style={{ left: along(judgedCents) }}
+                    />
                   )}
                 </div>
               </SliderPrimitive.Track>
@@ -192,7 +205,7 @@ export function DetuneQuiz({
                   PRESSABLE,
                   "block h-14 w-[26px] rounded-lg border-b-black/25 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-100/40 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900",
                   !isAnswered && "bg-zinc-100 hover:bg-white",
-                  isAnswered && (solved ? "bg-emerald-400" : "bg-red-400"),
+                  isAnswered && (solved || isSnapped ? "bg-emerald-400" : "bg-red-400"),
                 )}
               />
             </SliderPrimitive.Root>

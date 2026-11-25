@@ -133,6 +133,14 @@ describe("EarQuizPanel — tuning by ear", () => {
     expect(screen.getByText(/cents (sharp|flat) —/)).toBeDefined();
     expect(button(/Continue/)).toBeDefined();
   });
+
+  it("centres the revealed window on the pitch, whatever its entrance animates", () => {
+    render(<EarQuizPanel config={config} exerciseId='test_detune_quiz' />);
+
+    fireEvent.click(button(/in tune/));
+
+    expect(screen.getByTestId("detune-window").style.transform).toContain("translateX(-50%)");
+  });
 });
 
 describe("EarQuizPanel — scales and modes", () => {

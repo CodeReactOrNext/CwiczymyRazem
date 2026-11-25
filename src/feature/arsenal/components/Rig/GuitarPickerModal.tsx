@@ -94,6 +94,7 @@ export const GuitarPickerModal = ({
                   <GuitarStashTile
                     item={item}
                     isEquipped={isSelected}
+                    selected={isSelected}
                     // Locked is not dimmed. A guitar the player is a few levels
                     // away from should still catch their eye — it is the reason
                     // to go and practise — so it keeps its light and says why

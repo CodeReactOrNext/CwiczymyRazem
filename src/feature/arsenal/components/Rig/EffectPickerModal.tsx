@@ -108,6 +108,7 @@ export const EffectPickerModal = ({
                   <EffectStashTile
                     item={item}
                     isOnPedalboard={isSelected}
+                    selected={isSelected}
                     dimmed={unavailable}
                     disabled={unavailable || lockedLvl != null}
                     onClick={() => {

@@ -203,6 +203,7 @@ export function MobileExerciseContent({
       ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (
         <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">
           <YouTubePlayalong
+            key={currentExercise.id}
             videoId={currentExercise.youtubeVideoId}
             isPlaying={isPlaying}
             onEnd={onVideoEnd}
@@ -242,7 +243,7 @@ export function MobileExerciseContent({
         <div className="w-full overflow-hidden rounded-lg bg-zinc-900/60">
           {backingVideoId
             ? <BackingVideoPlayer videoId={backingVideoId} onChangeClick={() => setBackingVideoId(null)} />
-            : <BackingTrackPicker exerciseTitle={currentExercise.title} searchQueries={currentExercise.backingTrackSearchQueries} compact />}
+            : <BackingTrackPicker key={currentExercise.id} exerciseTitle={currentExercise.title} searchQueries={currentExercise.backingTrackSearchQueries} compact />}
         </div>
       ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
         <div className="w-full overflow-hidden rounded-2xl border border-white/5 shadow-lg">

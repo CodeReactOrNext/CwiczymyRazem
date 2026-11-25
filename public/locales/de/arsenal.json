@@ -402,6 +402,7 @@
     "sell_one_short": "1 verkaufen"
   },
   "stash": {
+    "in_use": "In deinem Rig",
     "part": "Teil",
     "component_name": "{{name}} · Lvl {{level}}",
     "reason_unequip_profile": "Nimm sie zuerst vom Profil",
@@ -441,7 +442,7 @@
     "dupes_pedals": "Doppelte Pedale ({{count}})",
     "board_label": "Arsenal-Lager",
     "pedals_protected": "Pedale auf deinem Pedalboard werden nie angerührt.",
-    "reason_merge_built": "Ausgebaute oder bereits verschmolzene Kopien lassen sich nicht aufgehen",
+    "reason_merge_built": "In der Werkstatt ausgebaute Kopien lassen sich nicht verschmelzen",
     "reason_merge_best": "Das ist deine beste Kopie — verschmilz die anderen damit"
   },
   "card": {

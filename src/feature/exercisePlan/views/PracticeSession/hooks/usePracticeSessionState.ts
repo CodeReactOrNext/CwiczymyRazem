@@ -33,8 +33,6 @@ export const usePracticeSessionState = ({
   const previousUserStats = useAppSelector(selectPreviousUserStats);
   const avatar = useAppSelector((state) => state.user.userInfo?.avatar);
 
-  const [videoDuration, setVideoDuration] = useState<number | null>(null);
-
   // A fresh session starts from zero. Whatever the player left unreported
   // before (an abandoned drill, the Free Timer) stays in Redux and is theirs to
   // report later — it must not be folded into this session's category split.
@@ -64,6 +62,15 @@ export const usePracticeSessionState = ({
   useTimeTracking(timer, currentExercise);
 
   const isSkillExercise = !!skillRewardSkillId || !!forceFullDuration;
+
+  // A playalong lasts as long as its video. Keyed by item like the tab below:
+  // the next exercise must not run for the length of the last one's video.
+  const [videoLength, setVideoLength] = useState<{ exerciseId: string; seconds: number } | null>(null);
+  const currentExerciseId = currentExercise.id;
+  const setVideoDuration = useCallback((seconds: number | null) => {
+    setVideoLength(seconds === null ? null : { exerciseId: currentExerciseId, seconds });
+  }, [currentExerciseId]);
+  const videoDuration = videoLength?.exerciseId === currentExerciseId ? videoLength.seconds : null;
 
   // A song item's slot stretches to its tab: an 8-minute song in a 5-minute
   // slot would be cut off mid-solo. Keyed by item, so it never outlives it.

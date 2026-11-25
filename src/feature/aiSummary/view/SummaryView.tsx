@@ -14,7 +14,7 @@ import {
 import {
   computeProgressData, currentWeekDates, isoWeekKey, isSameDay,
   LEVELS, localDateStr, milestoneLockedAtLvl, MS_15,
-  PRACTICE_CATEGORIES,
+  openingMilestoneIndex, PRACTICE_CATEGORIES,
 } from "feature/aiSummary/utils/milestoneLogic";
 import { MILESTONE_GREEN, MilestoneNode } from "feature/dashboard/components/widgets/MilestoneNode";
 import { practiceLevelsQueryKey } from "feature/dashboard/hooks/useMilestoneProgress";
@@ -87,11 +87,11 @@ const CAT_KEY: Record<string, string> = {
 // levels are reached. Tapping a node loads its goal into the card below.
 
 function PracticeProgressTracker({
-  logs, today, previewIdx, onPreviewChange, ownedSet, claimedSet, playerLvl,
+  logs, today, activeIdx, onPreviewChange, ownedSet, claimedSet, playerLvl,
 }: {
   logs: FirebaseUserExceriseLog[];
   today: Date;
-  previewIdx: number | null;
+  activeIdx: number;
   onPreviewChange: (idx: number) => void;
   ownedSet: Set<number>;
   claimedSet: Set<number>;
@@ -107,7 +107,6 @@ function PracticeProgressTracker({
   }));
 
   const realNextIdx = levelStatuses.findIndex(s => !s.met);
-  const activeIdx   = previewIdx ?? (realNextIdx === -1 ? LEVELS.length - 1 : realNextIdx);
   const metCount    = levelStatuses.filter(s => s.met).length;
   // The bubble sits over the goal the week is heading for — the first one not
   // met yet, and only while it is the player's to work on (owned, not shut).
@@ -270,7 +269,7 @@ function buildByDate(logs: FirebaseUserExceriseLog[]) {
 }
 
 function LevelGoalCard({
-  logs, today, displayDate, onSelectDay, onPeekDay, previewIdx,
+  logs, today, displayDate, onSelectDay, onPeekDay, activeIdx,
   isOwned, isClaimedThisWeek, fame, busy, onPurchase, onClaim, playerLvl,
 }: {
   logs: FirebaseUserExceriseLog[];
@@ -278,7 +277,7 @@ function LevelGoalCard({
   displayDate: Date;
   onSelectDay: (d: Date) => void;
   onPeekDay: (d: Date | null) => void;
-  previewIdx: number | null;
+  activeIdx: number;
   isOwned: boolean;
   isClaimedThisWeek: boolean;
   fame: number;
@@ -296,8 +295,6 @@ function LevelGoalCard({
     () => LEVELS.map(l => ({ ...l, met: l.isMet(progressData), progress: l.getProgress(progressData) })),
     [progressData]
   );
-  const realNextIdx = levelStatuses.findIndex(s => !s.met);
-  const activeIdx   = previewIdx ?? (realNextIdx === -1 ? LEVELS.length - 1 : realNextIdx);
   const nextLevel   = levelStatuses[activeIdx];
   const byDate      = useMemo(() => buildByDate(logs), [logs]);
 
@@ -1043,8 +1040,13 @@ export const SummaryView = () => {
 
   useEffect(() => {
     if (!userAuth) return;
-    firebaseGetUserRaprotsLogs(userAuth, new Date().getFullYear()).then(setLogs);
-    firebaseGetPracticeLevels(userAuth).then(setLevelsState);
+    // The logs wait for the claims: shown first, they would open the page on a
+    // reward already collected this week, with a live Claim button under it.
+    const levelsReady = firebaseGetPracticeLevels(userAuth).then(setLevelsState);
+    Promise.all([
+      firebaseGetUserRaprotsLogs(userAuth, new Date().getFullYear()),
+      levelsReady,
+    ]).then(([loaded]) => setLogs(loaded));
   }, [userAuth]);
 
   const ownedSet = useMemo(() => new Set(levelsState.ownedLevelIds), [levelsState.ownedLevelIds]);
@@ -1055,12 +1057,12 @@ export const SummaryView = () => {
     [levelsState.claims, currentWeekKey]
   );
 
-  const activeLevel = useMemo(() => {
-    const data = computeProgressData(logs, today);
-    const realNextIdx = LEVELS.findIndex(l => !l.isMet(data));
-    const idx = previewIdx ?? (realNextIdx === -1 ? LEVELS.length - 1 : realNextIdx);
-    return LEVELS[idx];
-  }, [logs, today, previewIdx]);
+  const openingIdx = useMemo(
+    () => openingMilestoneIndex(computeProgressData(logs, today), ownedSet, claimedSet),
+    [logs, today, ownedSet, claimedSet]
+  );
+  const activeIdx   = previewIdx ?? openingIdx;
+  const activeLevel = LEVELS[activeIdx];
 
   const isActiveOwned = ownedSet.has(activeLevel.id);
   const isActiveClaimedThisWeek = levelsState.claims[activeLevel.id]?.weekKey === currentWeekKey;
@@ -1160,7 +1162,7 @@ export const SummaryView = () => {
         <PracticeProgressTracker
           logs={logs}
           today={today}
-          previewIdx={previewIdx}
+          activeIdx={activeIdx}
           onPreviewChange={setPreviewIdx}
           ownedSet={ownedSet}
           claimedSet={claimedSet}
@@ -1174,7 +1176,7 @@ export const SummaryView = () => {
           displayDate={displayDate}
           onSelectDay={setSelectedDate}
           onPeekDay={setPeekDate}
-          previewIdx={previewIdx}
+          activeIdx={activeIdx}
           isOwned={isActiveOwned}
           isClaimedThisWeek={isActiveClaimedThisWeek}
           fame={fame}

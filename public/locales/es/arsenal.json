@@ -402,6 +402,7 @@
     "sell_one_short": "Vender 1"
   },
   "stash": {
+    "in_use": "En tu rig",
     "part": "Pieza",
     "component_name": "{{name}} · Nv. {{level}}",
     "reason_unequip_profile": "Primero quítala de tu perfil",
@@ -441,7 +442,7 @@
     "dupes_pedals": "Pedales duplicados ({{count}})",
     "board_label": "Almacén del Arsenal",
     "pedals_protected": "Los pedales de tu pedalera nunca se tocan.",
-    "reason_merge_built": "Las copias mejoradas o ya fusionadas no se pueden absorber",
+    "reason_merge_built": "Las copias mejoradas en el Taller no se pueden absorber",
     "reason_merge_best": "Esta es tu mejor copia — fusiona las demás con ella"
   },
   "card": {

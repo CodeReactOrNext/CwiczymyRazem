@@ -147,6 +147,12 @@ export const TUNER_INSTRUMENTS: TunerInstrument[] = [
         notation: "Bb Eb Ab Db Gb Bb Eb",
         midi: [34, 39, 44, 49, 54, 58, 63],
       },
+      {
+        id: "aeadead",
+        name: "AEADEAD",
+        notation: "A E A D E A D",
+        midi: [33, 40, 45, 50, 52, 57, 62],
+      },
     ],
   },
   {

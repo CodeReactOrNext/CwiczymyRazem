@@ -59,4 +59,13 @@ describe("StashTile", () => {
 
     expect(screen.getByText("+8")).toBeTruthy();
   });
+
+  it("says a piece is in use next to the hammer, not instead of it", () => {
+    const { container } = render(
+      <StashTile color='#fbbf24' label='Astral Forge' level={134} inUse ready />,
+    );
+
+    expect(container.querySelector(".lucide-hammer")).toBeTruthy();
+    expect(container.querySelector(".lucide-plug")).toBeTruthy();
+  });
 });

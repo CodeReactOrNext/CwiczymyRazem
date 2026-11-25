@@ -227,6 +227,25 @@ export const milestoneLockedAtLvl = (
   owned = false,
 ): number | null => lockedAtLvl(level.reqLvl, playerLvl, owned);
 
+/**
+ * The tier the Milestones page shows until the player picks one: the first
+ * whose Fame is waiting to be collected, otherwise the first goal not met yet,
+ * otherwise (everything met and collected) the top of the ladder.
+ */
+export function openingMilestoneIndex(
+  progress: ProgressData,
+  ownedIds: ReadonlySet<number>,
+  claimedIds: ReadonlySet<number>,
+): number {
+  const claimable = LEVELS.findIndex(
+    l => l.isMet(progress) && ownedIds.has(l.id) && !claimedIds.has(l.id),
+  );
+  if (claimable !== -1) return claimable;
+
+  const next = LEVELS.findIndex(l => !l.isMet(progress));
+  return next === -1 ? LEVELS.length - 1 : next;
+}
+
 export function computeProgressData(logs: FirebaseUserExceriseLog[], today: Date): ProgressData {
   const byDate = new Map<string, DayStats>();
 

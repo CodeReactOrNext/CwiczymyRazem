@@ -11,49 +11,59 @@ interface UseGpFileLoaderOptions {
 }
 
 export function useGpFileLoader({ rawGpFile, gpFileUrl, exerciseTitle }: UseGpFileLoaderOptions) {
-  const [fetchedGpFile,    setFetchedGpFile]    = useState<File | null>(null);
-  const [isFetchingGpFile, setIsFetchingGpFile] = useState(false);
+  // Both results below carry what they were loaded from, and only count while
+  // that is still the current source: moving on in a plan must not leave the
+  // previous exercise's tab up, nor let its late download replace the new one.
+  const [fetched, setFetched] = useState<{ url: string; file: File | null } | null>(null);
+  const isFetched = !!gpFileUrl && fetched?.url === gpFileUrl;
+  const fetchedGpFile = isFetched ? fetched.file : null;
+  const isFetchingGpFile = !!gpFileUrl && !isFetched;
 
   useEffect(() => {
-    if (!gpFileUrl) { setFetchedGpFile(null); return; }
+    if (!gpFileUrl) return;
+    let isStale = false;
     const fileName = exerciseTitle.replace(/[^a-zA-Z0-9._-]/g, "_") + ".gp5";
-    setIsFetchingGpFile(true);
     fetchGpFileAsFile(gpFileUrl, fileName)
-      .then(file => { setFetchedGpFile(file);   setIsFetchingGpFile(false); })
-      .catch(()   => { setFetchedGpFile(null);  setIsFetchingGpFile(false); });
+      .then(file => { if (!isStale) setFetched({ url: gpFileUrl, file }); })
+      .catch(()   => { if (!isStale) setFetched({ url: gpFileUrl, file: null }); });
+    return () => { isStale = true; };
   }, [gpFileUrl]);
 
   const effectiveRawGpFile = rawGpFile ?? fetchedGpFile ?? undefined;
 
-  const [parsedGpTracks, setParsedGpTracks] = useState<BackingTrack[] | null>(null);
+  const [parsed, setParsed] = useState<{ file: File; tracks: BackingTrack[] | null; tempo: number | null } | null>(null);
+  const isParsed = !!effectiveRawGpFile && parsed?.file === effectiveRawGpFile;
+  const parsedGpTracks = isParsed ? parsed.tracks : null;
   // The score's own tempo, kept alongside the tracks: a backing recording of the
   // same song was almost certainly played at it, so it seeds the sync defaults
   // (see feature/backingTrack). Null until the file is parsed.
-  const [gpTempo,        setGpTempo]        = useState<number | null>(null);
-  // The file the tracks above were read from (or failed to be): until it is the
-  // current one, that file is still being parsed.
-  const [parsedFile,     setParsedFile]     = useState<File | null>(null);
+  const gpTempo = isParsed ? parsed.tempo : null;
 
   useEffect(() => {
-    if (!effectiveRawGpFile) { setParsedGpTracks(null); setGpTempo(null); return; }
+    if (!effectiveRawGpFile) return;
+    let isStale = false;
     parseGpFile(effectiveRawGpFile)
       .then(data => {
-        setParsedGpTracks(data.tracks.map((t, idx) => ({
-          id:        `track-${idx}`,
-          name:      t.name,
-          measures:  t.measures,
-          trackType: t.trackType as BackingTrack["trackType"],
-          stringCount: t.stringCount,
-          openStringMidi: t.openStringMidi,
-          pan:       t.pan,
-        })));
-        setGpTempo(data.tempo > 0 ? data.tempo : null);
-        setParsedFile(effectiveRawGpFile);
+        if (isStale) return;
+        setParsed({
+          file: effectiveRawGpFile,
+          tracks: data.tracks.map((t, idx) => ({
+            id:        `track-${idx}`,
+            name:      t.name,
+            measures:  t.measures,
+            trackType: t.trackType as BackingTrack["trackType"],
+            stringCount: t.stringCount,
+            openStringMidi: t.openStringMidi,
+            pan:       t.pan,
+          })),
+          tempo: data.tempo > 0 ? data.tempo : null,
+        });
       })
-      .catch(() => { setParsedGpTracks(null); setGpTempo(null); setParsedFile(effectiveRawGpFile); });
+      .catch(() => { if (!isStale) setParsed({ file: effectiveRawGpFile, tracks: null, tempo: null }); });
+    return () => { isStale = true; };
   }, [effectiveRawGpFile]);
 
-  const isParsingGpFile = !!effectiveRawGpFile && parsedFile !== effectiveRawGpFile;
+  const isParsingGpFile = !!effectiveRawGpFile && !isParsed;
 
   return { effectiveRawGpFile, isFetchingGpFile, isParsingGpFile, parsedGpTracks, gpTempo };
 }

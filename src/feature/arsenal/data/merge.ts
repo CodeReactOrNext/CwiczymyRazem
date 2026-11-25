@@ -45,10 +45,16 @@ import { getItemLevel, RARITY_BUILD_GAIN } from "./itemStats";
  *
  * ─── What can be folded away ────────────────────────────────────────────────
  *
- * The source is consumed, so it must not be carrying anything the player paid
- * for: no workshop build levels, no earlier merges, and never a Guitar Builder
- * guitar. It must not be in service either. Mods and traits on it are lost —
- * a merge is not a teardown, and scrapping is still the way to keep a mod.
+ * The source is consumed, so it must not be carrying anything that would be lost
+ * with it: no workshop build levels, and never a Guitar Builder guitar. It must
+ * not be in service either. Mods and traits on it are lost — a merge is not a
+ * teardown, and scrapping is still the way to keep a mod.
+ *
+ * Earlier merges are not lost: whatever the source had absorbed goes over to the
+ * target on top of the step. So the total is the same whichever copies go into
+ * which, and in what order — five copies are worth four steps either way — and
+ * a copy that was merged once and then handed on through the Guild or the Market
+ * is not a dead end for whoever gets it.
  */
 
 /**
@@ -70,18 +76,28 @@ interface Mergeable {
   mergeCount?: number;
 }
 
-/** Can this copy be folded into another? It must carry nothing worth keeping. */
+/**
+ * Can this copy be folded into another? It must carry nothing the merge would
+ * throw away — its own earlier merges do not count, they go over to the target.
+ */
 export const canMergeAway = (item: Mergeable): boolean =>
-  !item.custom &&
-  !((item.buildLevel ?? 0) > 0) &&
-  !((item.mergeBonus ?? 0) > 0);
+  !item.custom && !((item.buildLevel ?? 0) > 0);
 
 interface MergeKind<T extends Mergeable> {
   sameModel: (a: T, b: T) => boolean;
   levelOf: (item: T) => number;
-  /** Points one merge of this item adds, or 0 when the model is unknown. */
-  gainOf: (item: T) => number;
+  /** Points one merge of this model adds, or 0 when the model is unknown. */
+  stepOf: (item: T) => number;
 }
+
+/**
+ * What folding this copy away hands to its target: one step, plus everything it
+ * had absorbed itself. 0 when the model is unknown.
+ */
+const gainOf = <T extends Mergeable>(item: T, kind: MergeKind<T>): number => {
+  const step = kind.stepOf(item);
+  return step > 0 ? step + (item.mergeBonus ?? 0) : 0;
+};
 
 export const GUITAR_MERGE: MergeKind<InventoryItem> = {
   sameModel: (a, b) => a.guitarId === b.guitarId,
@@ -89,7 +105,7 @@ export const GUITAR_MERGE: MergeKind<InventoryItem> = {
     const def = GUITARS_BY_ID.get(item.guitarId);
     return def ? getItemLevel(item, def) : 0;
   },
-  gainOf: (item) => {
+  stepOf: (item) => {
     const def = GUITARS_BY_ID.get(item.guitarId);
     return def ? getMergeGain(def.rarity) : 0;
   },
@@ -101,7 +117,7 @@ export const EFFECT_MERGE: MergeKind<EffectInventoryItem> = {
     const def = EFFECTS_BY_ID.get(item.effectId);
     return def ? getEffectLevel(item, def) : 0;
   },
-  gainOf: (item) => {
+  stepOf: (item) => {
     const def = EFFECTS_BY_ID.get(item.effectId);
     return def ? getMergeGain(def.rarity) : 0;
   },
@@ -146,7 +162,7 @@ export const getMergeOffer = <T extends Mergeable>(
   const source = items.find((item) => item.id === sourceId);
   if (!source || blocked.has(sourceId) || !canMergeAway(source)) return null;
 
-  const gain = kind.gainOf(source);
+  const gain = gainOf(source, kind);
   if (gain <= 0) return null;
 
   const target = pickTarget(items, source, new Set([sourceId]), kind);
@@ -198,7 +214,7 @@ export const planMerge = <T extends Mergeable>(
 
   for (const id of sources) {
     const source = list.find((item) => item.id === id);
-    const gain = source ? kind.gainOf(source) : 0;
+    const gain = source ? gainOf(source, kind) : 0;
     if (!source || gain <= 0 || blocked.has(id) || !canMergeAway(source)) {
       skipped.push(id);
       continue;
@@ -217,7 +233,8 @@ export const planMerge = <T extends Mergeable>(
           ? {
               ...item,
               mergeBonus: (item.mergeBonus ?? 0) + gain,
-              mergeCount: (item.mergeCount ?? 0) + 1,
+              mergeCount:
+                (item.mergeCount ?? 0) + 1 + (source.mergeCount ?? 0),
             }
           : item,
       );
@@ -253,8 +270,8 @@ export interface MergeState {
  * key is shown but cannot be pressed, `blocked` says which rule is in the way, in
  * the order the player can act on them:
  *
- *   built   workshop levels or an earlier merge — folding it away would throw
- *           that work out (`canMergeAway`)
+ *   built   workshop levels (or a Guitar Builder guitar) — folding it away would
+ *           throw that work out (`canMergeAway`)
  *   in-use  equipped, in the rig or on the board; take it out first
  *   best    it is the strongest copy, the one the others are folded *into*
  */

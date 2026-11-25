@@ -438,7 +438,7 @@ export const StashInventory = ({
     [effectInventory, pedalboardItemIds],
   );
   // What folding every duplicate would do, worked out the way the server will.
-  // Copies that carry workshop levels or an earlier merge are skipped there, so
+  // Copies that carry workshop levels are skipped there, so
   // the figure the dialog quotes is the one that will actually be paid.
   const guitarMergePlan = useMemo(
     () => planMerge(data.inventory, guitarDuplicates.ids, GUITAR_MERGE),

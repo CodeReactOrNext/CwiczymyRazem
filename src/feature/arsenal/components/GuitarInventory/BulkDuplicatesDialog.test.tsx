@@ -73,7 +73,7 @@ describe("BulkDuplicatesDialog merge option", () => {
   });
 
   it("hides the option when nothing in the batch can be merged", () => {
-    // Every copy carries workshop levels or an earlier merge: the server would
+    // Every copy carries workshop levels: the server would
     // skip all of them, so there is nothing to put on a button.
     renderDialog({ mergeGain: 0, mergeCount: 0 });
 

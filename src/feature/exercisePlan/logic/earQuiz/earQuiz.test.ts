@@ -8,6 +8,7 @@ import {
 import type {
   ChordTypeQuizConfig,
   DetuneQuizConfig,
+  EarQuizConfig,
   IntervalQuizConfig,
   ProgressionQuizConfig,
   ScaleModeQuizConfig,
@@ -25,7 +26,7 @@ import {
   PROGRESSIONS,
   sortDegrees,
 } from "./progressions";
-import type { Rng } from "./questions";
+import type { EarQuizQuestion, Rng } from "./questions";
 import {
   beatsPerSecond,
   checkProgressionAnswer,
@@ -170,21 +171,46 @@ describe("scale modes", () => {
   });
 });
 
+const answerOf = (question: EarQuizQuestion) => {
+  if (question.kind === "chordType") return question.quality;
+  if (question.kind === "scaleMode") return question.scale;
+  if (question.kind === "interval") return question.interval;
+  throw new Error(`no single answer in a ${question.kind} round`);
+};
+
+const rootOf = (question: EarQuizQuestion) => {
+  if ("rootMidi" in question) return question.rootMidi;
+  throw new Error(`no root in a ${question.kind} round`);
+};
+
 describe("question generation", () => {
   const chordConfig: ChordTypeQuizConfig = {
     mode: "chordType",
     qualities: ["major", "minor", "dom7"],
   };
 
-  it("never repeats the previous chord quality", () => {
-    const first = generateChordTypeQuestion(chordConfig, null, seeded([0, 0]));
+  // Ruling out the last answer made two-option quizzes strictly alternate.
+  it.each<EarQuizConfig>([
+    { mode: "chordType", qualities: ["major", "minor"] },
+    { mode: "scaleMode", scales: ["ionian", "aeolian"] },
+    { mode: "interval", intervals: ["m3", "M3"], directions: ["ascending"] },
+  ])("does not give the next $mode answer away", (quiz) => {
+    const first = generateEarQuizQuestion(quiz, null, seeded([0]));
+    const repeated = generateEarQuizQuestion(quiz, first, seeded([0]));
+    const changed = generateEarQuizQuestion(quiz, first, seeded([0.9]));
+    expect(answerOf(repeated)).toBe(answerOf(first));
+    expect(answerOf(changed)).not.toBe(answerOf(first));
+  });
+
+  it.each<EarQuizConfig>([
+    { mode: "chordType", qualities: ["major", "minor"] },
+    { mode: "scaleMode", scales: ["ionian", "aeolian"] },
+    { mode: "interval", intervals: ["m3", "M3"], directions: ["ascending"] },
+  ])("moves the root every $mode round", (quiz) => {
+    const first = generateEarQuizQuestion(quiz, null, seeded([0]));
     for (let i = 0; i < 20; i++) {
-      const next = generateChordTypeQuestion(
-        chordConfig,
-        first,
-        seeded([i / 20, i / 20]),
-      );
-      expect(next.quality).not.toBe(first.quality);
+      const next = generateEarQuizQuestion(quiz, first, seeded([i / 20]));
+      expect(rootOf(next)).not.toBe(rootOf(first));
     }
   });
 
@@ -319,12 +345,6 @@ describe("intervals", () => {
 
   it("orders the answers narrow to wide whatever the config lists", () => {
     expect(sortIntervals(["P8", "m3", "P5"])).toEqual(["m3", "P5", "P8"]);
-  });
-
-  it("never repeats the previous interval", () => {
-    const first = generateIntervalQuestion(config, null, seeded([0]));
-    const second = generateIntervalQuestion(config, first, seeded([0]));
-    expect(second.interval).not.toBe(first.interval);
   });
 
   it("sounds the interval it asks about, the way the round says", () => {

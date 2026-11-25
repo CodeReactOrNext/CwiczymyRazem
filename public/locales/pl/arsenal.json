@@ -404,6 +404,7 @@
     "sell_one_short": "Sprzedaj 1"
   },
   "stash": {
+    "in_use": "W Twoim rigu",
     "part": "Część",
     "component_name": "{{name}} · Poz. {{level}}",
     "reason_unequip_profile": "Najpierw zdejmij ją z profilu",
@@ -443,7 +444,7 @@
     "dupes_pedals": "Zduplikowane efekty ({{count}})",
     "board_label": "Schowek Arsenału",
     "pedals_protected": "Efekty na pedalboardzie nigdy nie są ruszane.",
-    "reason_merge_built": "Rozbudowanych lub już scalonych kopii nie da się wchłonąć",
+    "reason_merge_built": "Kopii rozbudowanych w Warsztacie nie da się wchłonąć",
     "reason_merge_best": "To twoja najlepsza kopia — scalaj do niej pozostałe"
   },
   "card": {

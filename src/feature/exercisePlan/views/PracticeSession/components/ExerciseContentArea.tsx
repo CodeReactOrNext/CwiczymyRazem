@@ -351,6 +351,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         </>
       ) : currentExercise.isPlayalong || currentExercise.videoUrl ? (
         suppressVideo ? null : <VideoSection
+          key={currentExercise.id}
           youtubeVideoId={currentExercise.youtubeVideoId}
           videoUrl={currentExercise.videoUrl}
           isPlayalong={currentExercise.isPlayalong}
@@ -366,7 +367,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         // The phone view shares backingVideoId — a hidden copy here would autoplay it twice.
         suppressVideo ? null : backingVideoId
           ? <BackingVideoPlayer videoId={backingVideoId} onChangeClick={() => setBackingVideoId(null)} />
-          : <BackingTrackPicker exerciseTitle={currentExercise.title} searchQueries={currentExercise.backingTrackSearchQueries} />
+          : <BackingTrackPicker key={currentExercise.id} exerciseTitle={currentExercise.title} searchQueries={currentExercise.backingTrackSearchQueries} />
       ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
         <StrummingSection
           patterns={currentExercise.strummingPatterns}

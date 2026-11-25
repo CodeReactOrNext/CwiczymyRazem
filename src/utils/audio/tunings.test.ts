@@ -60,6 +60,7 @@ describe("tunings", () => {
   it("matches a seven-string Guitar Pro track to its preset", () => {
     expect(getFileTuning([64, 59, 55, 50, 45, 40, 35], "guitar")?.id).toBe(SEVEN_STRING_STANDARD_TUNING_ID);
     expect(getFileTuning([64, 59, 55, 50, 45, 40, 33], "guitar")?.id).toBe("seven-drop-a");
+    expect(getFileTuning([62, 57, 52, 50, 45, 40, 33], "guitar")?.id).toBe("seven-aeadead");
     expect(getFileTuning([64, 59, 55, 50, 45, 40, 34], "guitar")?.stringCount).toBe(7);
   });
 
