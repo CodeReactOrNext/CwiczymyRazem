@@ -44,6 +44,8 @@ Es lo más parecido a unos ingresos que tiene la app. Publica una vez los ejerci
 
 Hay una cosa por la que te pagan por hacerla tú mismo: **valorar la dificultad de una canción** paga 3 de Fame la primera vez que valoras una canción dada. Poco, pero te cuesta cinco segundos y las valoraciones son lo que hace útiles los niveles de dificultad para todos los demás.
 
+**Motivar a alguien mientras toca** os paga a los dos. Pasa el ratón en Live Now sobre un jugador con el avatar latiendo y pulsa Motivar: recibe 15 de Fama al momento, con una burbuja en su sesión, y tú recibes 3. Una vez por jugador y sesión, hasta 10 al día. Si tres jugadores motivan a la misma persona en un minuto, es un Hype y recibe 10 más.
+
 ## Y vender
 
 Todo lo del Arsenal puede volver a salir. Desguazar equipo lo rompe en piezas, venderlo paga Fame al instante, y el Mercado te deja publicar un anuncio a tu propio precio para que lo compre otro jugador. El equipo que nunca vas a equipar es Fame que aún no has cobrado.

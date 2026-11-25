@@ -1,14 +1,19 @@
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { LiveMotivatedMark, LiveMotivateSlot } from "feature/liveMotivate/components/LiveMotivateSlot";
+import { liveSessionKey } from "feature/liveMotivate/liveMotivate.rules";
+import { liveSentKey, useLiveMotivateStore } from "feature/liveMotivate/store/useLiveMotivateStore";
 import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
 import { SupportMark } from "feature/supportTeam/components/SupportBadge";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
 import { sortSupportFirst } from "feature/supportTeam/utils/supportTeam.utils";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
 import { useOnlineUsers } from "hooks/useOnlineUsers";
 import { useTranslation } from "hooks/useTranslation";
 import type { ActivityPreview } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { Monitor } from "lucide-react";
 import Link from "next/link";
+import { useAppSelector } from "store/hooks";
 
 interface OnlineUsersProps {
     /** Opens what a practicing player is on right now — named in their card. */
@@ -19,6 +24,8 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
     const { t } = useTranslation("ui");
     const { onlineUsers, isDbEnabled } = useOnlineUsers();
     const { isSupport, getSupportMember } = useSupportTeam();
+    const myUid = useAppSelector(selectUserAuth);
+    const sentLive = useLiveMotivateStore((state) => state.sent);
 
     if (!isDbEnabled || onlineUsers.length === 0) return null;
 
@@ -27,7 +34,11 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
 
     // Supporters lead the stack: they sit on top of the overlap, so their gold
     // ring stays whole instead of being clipped by the next avatar.
-    const displayUsers = sortSupportFirst(uniqueUsers, isSupport).slice(0, 8);
+    // Players who are practicing go first, where their Motivate key has room to slide out;
+    // the sort is stable, so supporters still lead within each group.
+    const displayUsers = sortSupportFirst(uniqueUsers, isSupport)
+        .sort((a, b) => Number(!!b.currentActivity) - Number(!!a.currentActivity))
+        .slice(0, 8);
     const remainingCount = uniqueUsers.length - 8;
 
     return (
@@ -42,6 +53,9 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
                 {displayUsers.map((user, i) => {
                     const isPracticing = !!user.currentActivity;
                     const supportMember = getSupportMember(user.uid);
+                    const canMotivate = isPracticing && !!myUid && user.uid !== myUid;
+                    const sessionKey = user.currentActivity ? liveSessionKey(user.currentActivity) : 0;
+                    const isMotivated = canMotivate && !!sentLive[liveSentKey(user.uid, sessionKey)];
 
                     const avatar = (
                         <div className={`
@@ -58,71 +72,83 @@ export const OnlineUsers = ({ onOpenActivity }: OnlineUsersProps) => {
                         </div>
                     );
 
+                    const avatarLink = (
+                        <UserTooltip
+                            userId={user.uid}
+                            currentActivity={user.currentActivity}
+                            onOpenActivity={onOpenActivity}
+                        >
+                            <Link href={`/user/${user.uid}`}>
+                                <div className="cursor-pointer relative transition-transform duration-base hover:-translate-y-1">
+                                    {/* Practicing Animation */}
+                                    {isPracticing && (
+                                        <motion.div
+                                            initial={{ scale: 0.8, opacity: 0 }}
+                                            animate={{
+                                                scale: [1, 1.2, 1],
+                                                opacity: [0.5, 0.2, 0.5]
+                                            }}
+                                            transition={{
+                                                duration: 2,
+                                                repeat: Infinity,
+                                                ease: "easeInOut"
+                                            }}
+                                            className={`absolute -inset-1 rounded-full z-0 ${supportMember ? "bg-amber-400" : "bg-cyan-500"}`}
+                                        />
+                                    )}
+
+                                    {supportMember ? (
+                                        <SupportAvatarRing>{avatar}</SupportAvatarRing>
+                                    ) : (
+                                        avatar
+                                    )}
+
+                                    {/* Bottom-right: heart mark for supporters, plain state dot for
+                                    everyone else — the gold ring already says "online" for them.
+                                    Both marks carry a z-index so they sit above the ring layers. */}
+                                    {isMotivated ? (
+                                        <LiveMotivatedMark className="absolute -bottom-0.5 -right-0.5 z-10" />
+                                    ) : supportMember ? (
+                                        <SupportMark
+                                            member={supportMember}
+                                            className="absolute -bottom-0.5 -right-0.5 z-10"
+                                        />
+                                    ) : (
+                                        <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-zinc-950 ${isPracticing ? 'bg-cyan-500' : 'bg-emerald-500'}`}>
+                                            {isPracticing && (
+                                                <div className="absolute inset-0 rounded-full bg-white animate-ping opacity-75" />
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Desktop app badge — top-right: the left edge of every
+                                    avatar but the first sits under its higher z-indexed
+                                    neighbor in the stack, so bottom-left gets hidden there. */}
+                                    {user.platform === "desktop" && (
+                                        <div
+                                            className="absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-zinc-950 bg-zinc-800"
+                                            title={t("using_desktop_app")}>
+                                            <Monitor className="h-2 w-2 text-zinc-400" strokeWidth={2.5} />
+                                        </div>
+                                    )}
+                                </div>
+                            </Link>
+                        </UserTooltip>
+                    );
+
                     return (
                         <div
                             key={user.uid}
                             className="relative -ml-3 first:ml-0 hover:z-20 transition-all duration-base"
                             style={{ zIndex: displayUsers.length - i }}
                         >
-                            <UserTooltip
-                                userId={user.uid}
-                                currentActivity={user.currentActivity}
-                                onOpenActivity={onOpenActivity}
-                            >
-                                <Link href={`/user/${user.uid}`}>
-                                    <div className="cursor-pointer relative transition-transform duration-base hover:-translate-y-1">
-                                        {/* Practicing Animation */}
-                                        {isPracticing && (
-                                            <motion.div
-                                                initial={{ scale: 0.8, opacity: 0 }}
-                                                animate={{
-                                                    scale: [1, 1.2, 1],
-                                                    opacity: [0.5, 0.2, 0.5]
-                                                }}
-                                                transition={{
-                                                    duration: 2,
-                                                    repeat: Infinity,
-                                                    ease: "easeInOut"
-                                                }}
-                                                className={`absolute -inset-1 rounded-full z-0 ${supportMember ? "bg-amber-400" : "bg-cyan-500"}`}
-                                            />
-                                        )}
-
-                                        {supportMember ? (
-                                            <SupportAvatarRing>{avatar}</SupportAvatarRing>
-                                        ) : (
-                                            avatar
-                                        )}
-
-                                        {/* Bottom-right: heart mark for supporters, plain state dot for
-                                        everyone else — the gold ring already says "online" for them.
-                                        Both marks carry a z-index so they sit above the ring layers. */}
-                                        {supportMember ? (
-                                            <SupportMark
-                                                member={supportMember}
-                                                className="absolute -bottom-0.5 -right-0.5 z-10"
-                                            />
-                                        ) : (
-                                            <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-zinc-950 ${isPracticing ? 'bg-cyan-500' : 'bg-emerald-500'}`}>
-                                                {isPracticing && (
-                                                    <div className="absolute inset-0 rounded-full bg-white animate-ping opacity-75" />
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Desktop app badge — top-right: the left edge of every
-                                        avatar but the first sits under its higher z-indexed
-                                        neighbor in the stack, so bottom-left gets hidden there. */}
-                                        {user.platform === "desktop" && (
-                                            <div
-                                                className="absolute -top-1 -right-1 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-zinc-950 bg-zinc-800"
-                                                title={t("using_desktop_app")}>
-                                                <Monitor className="h-2 w-2 text-zinc-400" strokeWidth={2.5} />
-                                            </div>
-                                        )}
-                                    </div>
-                                </Link>
-                            </UserTooltip>
+                            {canMotivate ? (
+                                <LiveMotivateSlot recipientId={user.uid} recipientName={user.displayName} sessionKey={sessionKey}>
+                                    {avatarLink}
+                                </LiveMotivateSlot>
+                            ) : (
+                                avatarLink
+                            )}
                         </div>
                     );
                 })}

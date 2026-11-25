@@ -7,10 +7,14 @@
  * is linear, so six 15-minute reports and one 90-minute report come to the same
  * number by arithmetic rather than by bookkeeping.
  *
- * Time is counted in whole 15-minute blocks throughout. A three-minute report
- * therefore pays nothing at all, which is the point: every gate in the trait
- * table is a multiple of 15, and a unit finer than the gates would only be a way
- * to farm them.
+ * Gates and payout read time differently. A gate ("15 min of technique") is
+ * judged in whole 15-minute blocks, since every gate in the trait table is a
+ * multiple of 15. The payout is `rate × minutes` on the exact minutes, the same
+ * way the rig level and the signal path pay. It used to be in blocks too, and
+ * that meant a 10-minute session showed "+446.8 Fame/h" in the Arsenal and paid
+ * 0. Paying per minute can't be farmed: the payout is linear, so splitting a
+ * session never earns more, and a gate only gets harder to meet when the
+ * session is split.
  *
  * Order of operations, which is load-bearing:
  *   1. base rate per trait — the rolled value, times its counter, or zero if its
@@ -46,7 +50,7 @@ import type {
 } from "./traits";
 import { DRIVE_TYPES, PRACTICE_CATEGORIES, TRAITS_BY_ID } from "./traits";
 
-/** Practice time is only ever counted in whole quarter-hours. */
+/** Trait gates count practice in whole quarter-hours (the payout does not). */
 export const TRAIT_TIME_BLOCK_MINUTES = 15;
 
 export const toTraitBlocks = (minutes: number): number =>
@@ -634,7 +638,8 @@ export const evaluateRigTraits = (
 };
 
 /**
- * Minutes a trait's rate is actually paid on — its own clock, in whole blocks.
+ * Minutes a trait's rate is actually paid on: the exact minutes on its own
+ * clock. Only the gates are counted in blocks (see the file header).
  *
  * This is why the total cannot be expressed as one Fame/h number and then
  * multiplied by the session: a `Shred Machine` on a session that was half theory
@@ -645,7 +650,8 @@ export const getTraitClockMinutes = (
   def: TraitDef,
   session: TraitSessionContext,
 ): number =>
-  toTraitBlocks(
+  Math.max(
+    0,
     def.clock === "session"
       ? sessionMinutes(session)
       : session.minutes[def.clock],
@@ -672,7 +678,7 @@ export const getRigTraitPayout = (
     (sum, e) => sum + (e.rate * getTraitClockMinutes(e.def, session)) / 60,
     0,
   );
-  const hours = toTraitBlocks(sessionMinutes(session)) / 60;
+  const hours = Math.max(0, sessionMinutes(session)) / 60;
   return {
     fame: Math.round(fame * 10) / 10,
     rate: hours > 0 ? Math.round((fame / hours) * 10) / 10 : 0,

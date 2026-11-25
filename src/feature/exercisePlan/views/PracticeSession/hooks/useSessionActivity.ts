@@ -1,5 +1,5 @@
 import { selectUserAuth, setActivity } from 'feature/user/store/userSlice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 
 import type { Exercise, ExercisePlan } from '../../../types/exercise.types';
@@ -12,7 +12,8 @@ interface UseSessionActivityProps {
 export const useSessionActivity = ({ plan, currentExercise }: UseSessionActivityProps) => {
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectUserAuth);
-
+  // One value for the whole mounted session, so live motivations count per session, not per exercise.
+  const [sessionStartedAt] = useState(() => Date.now());
 
   useEffect(() => {
     if (userAuth && plan.duel) {
@@ -24,6 +25,7 @@ export const useSessionActivity = ({ plan, currentExercise }: UseSessionActivity
           planTitle: plan.title,
           exerciseTitle: plan.title,
           timestamp: Date.now(),
+          sessionStartedAt,
         })
       );
     } else if (userAuth && (plan.boss || plan.recording)) {
@@ -35,6 +37,7 @@ export const useSessionActivity = ({ plan, currentExercise }: UseSessionActivity
           exerciseTitle: currentExercise.title,
           category: currentExercise.category,
           timestamp: Date.now(),
+          sessionStartedAt,
         })
       );
     } else if (userAuth) {
@@ -44,6 +47,7 @@ export const useSessionActivity = ({ plan, currentExercise }: UseSessionActivity
           exerciseTitle: currentExercise.title,
           category: currentExercise.category,
           timestamp: Date.now(),
+          sessionStartedAt,
           // What lets the "Live now" row open this session for someone else. A song wrapper is
           // opened through its song; anything else through its plan and exercises.
           planId: plan.id,
@@ -58,5 +62,5 @@ export const useSessionActivity = ({ plan, currentExercise }: UseSessionActivity
     return () => {
       dispatch(setActivity(null));
     };
-  }, [userAuth, currentExercise, plan, dispatch]);
+  }, [userAuth, currentExercise, plan, dispatch, sessionStartedAt]);
 };

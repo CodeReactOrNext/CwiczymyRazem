@@ -41,6 +41,9 @@ export const DesktopNotifications = () => {
     notifications.forEach((n) => {
       if (n.isRead || seenIds.current!.has(n.id)) return;
       seenIds.current!.add(n.id);
+      // A live motivation arrives mid-session: the session shows it itself, and an OS toast
+      // (often with a sound the mic would pick up) must not interrupt the playing.
+      if (n.type === "live_motivate") return;
 
       const { title, body } = notificationText(n);
       const toast = new Notification(title, {

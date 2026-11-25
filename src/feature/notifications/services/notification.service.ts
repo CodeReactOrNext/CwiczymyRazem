@@ -17,6 +17,7 @@ type NotificationType =
   | "like"
   | "comment"
   | "reaction"
+  | "live_motivate"
   | "season_reward"
   | "season_start"
   | "marketplace_sold"
@@ -79,6 +80,9 @@ export interface AppNotification {
   duelResult?: "won" | "lost" | "draw" | "void";
   ratingDelta?: number;
   opponentName?: string;
+  // A live motivation: whether it completed a Hype, and how many players made it.
+  hype?: boolean;
+  hypeCount?: number;
   timestamp: any;
   isRead: boolean;
 }
@@ -160,6 +164,11 @@ export const notificationText = (
         // Reactions recorded before the amount was stored can't report one, so they stay silent
         // about it rather than quoting a number that was never actually awarded.
         body: `${sender}motivated you${n.fameAwarded ? ` and gave you +${n.fameAwarded}` : ""}`,
+      };
+    case "live_motivate":
+      return {
+        title: n.hype ? "Hype!" : "You got motivated!",
+        body: `${sender}motivated you while you played and gave you +${n.fameAwarded ?? 0}`,
       };
     case "season_reward":
       return {

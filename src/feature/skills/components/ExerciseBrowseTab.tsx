@@ -761,7 +761,11 @@ export const ExerciseBrowseTab = ({
   );
 
   // ── One variant row inside an expanded set ──────────────────────────────
-  const renderExerciseRow = (exercise: Exercise, showVariantLabel: boolean) => {
+  const renderExerciseRow = (
+    exercise: Exercise,
+    showVariantLabel: boolean,
+    markNew: boolean
+  ) => {
     const progress = progressMap.get(exercise.id);
     const stages = BPM_STAGES.get(exercise.id) ?? [];
     const completedBpms = progress?.completedBpms ?? [];
@@ -820,8 +824,9 @@ export const ExerciseBrowseTab = ({
 
         {/* Name, level and length travel together, so the row reads as one
             phrase instead of two islands with a blank gap between them.
-            No "New" chip here — the set header already carries it, and the New
-            filter narrows the rows to exactly those. */}
+            "New" shows here only when the set mixes old and new exercises: with
+            the chip on the header alone, players couldn't tell which of the
+            17 Interval Clicks rows had just arrived. */}
         <button
           onClick={() => setPreviewExercise(exercise)}
           // The colour sits here, not on the span: an explicit `text-zinc-300`
@@ -833,6 +838,11 @@ export const ExerciseBrowseTab = ({
           <span className="break-words text-[14px] sm:truncate">
             {showVariantLabel ? variantOf(exercise) : titleOf(exercise)}
           </span>
+          {markNew && (
+            <Chip color="cyan" size="sm" className="shrink-0 self-center">
+              New
+            </Chip>
+          )}
           <span
             className="hidden shrink-0 text-[12px] font-semibold capitalize lg:inline"
             style={{ color: DIFFICULTY_HEX[exercise.difficulty] ?? DIFFICULTY_HEX.easy }}
@@ -970,6 +980,10 @@ export const ExerciseBrowseTab = ({
     const { set, matches } = entry;
     const isExpanded = expandedSets.includes(set.id);
     const isSingle = set.exercises.length === 1;
+    const newCount = matches.filter(ex => isExerciseNew(ex)).length;
+    // A set that arrived whole is "New" on the header and nowhere else; a set
+    // that grew says how many rows are new and marks exactly those.
+    const wholeSetNew = set.exercises.every(ex => isExerciseNew(ex));
 
     return (
       <div
@@ -995,9 +1009,9 @@ export const ExerciseBrowseTab = ({
             </span>
           )}
 
-          {matches.some(ex => isExerciseNew(ex)) && (
+          {newCount > 0 && (
             <Chip color="cyan" size="sm" className="shrink-0">
-              New
+              {wholeSetNew ? "New" : `${newCount} new`}
             </Chip>
           )}
 
@@ -1030,7 +1044,13 @@ export const ExerciseBrowseTab = ({
                 {set.exercises[0].whyItMatters}
               </p>
             )}
-            {matches.map(exercise => renderExerciseRow(exercise, !isSingle))}
+            {matches.map(exercise =>
+              renderExerciseRow(
+                exercise,
+                !isSingle,
+                !wholeSetNew && isExerciseNew(exercise)
+              )
+            )}
           </div>
         )}
       </div>

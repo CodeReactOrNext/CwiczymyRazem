@@ -179,5 +179,18 @@
       "headline": "Your guitar wants friends. You might too.",
       "body": "Guilds, challenges and people practising the same thing you are. Join the Riff Quest Discord."
     }
-  }
+  },
+  "live_motivate": "Motivate",
+  "live_motivate_aria": "Motivate {{name}} while they play and give them {{fame}} Fame",
+  "live_motivate_receipt": "+{{fame}} for you",
+  "live_motivate_not_playing": "{{name}} just stopped playing.",
+  "live_motivate_daily_limit": "You have used today's 10 live motivations.",
+  "live_motivate_session_full": "{{name}} has had all the motivation this session can take.",
+  "live_motivate_error": "Could not motivate. Try again.",
+  "live_motivated_you": "{{name}} motivated you",
+  "live_motivated_many": "{{name}} and {{count}} more",
+  "live_keep_playing": "Keep playing!",
+  "live_hype": "Hype ×{{count}}!",
+  "live_summary_one": "{{name}} motivated you while you played",
+  "live_summary_many": "{{name}} and {{count}} more motivated you while you played"
 }

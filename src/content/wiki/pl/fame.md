@@ -44,6 +44,8 @@ To najbliższa dochodowi rzecz, jaką ma aplikacja. Opublikuj raz napisane ćwic
 
 Jest jedna rzecz, za którą dostajesz zapłatę, robiąc ją sam: **ocena trudności utworu** płaci 3 Fame za pierwszym razem, gdy oceniasz dany utwór. Mało, ale kosztuje pięć sekund, a oceny sprawiają, że poziomy trudności są użyteczne dla wszystkich innych.
 
+**Motywowanie kogoś w trakcie grania** płaci wam obojgu. Najedź w Live Now na gracza z pulsującym avatarem i naciśnij Motywuj: dostaje od razu 15 Fame i dymek w swojej sesji, a ty 3. Raz na gracza w jednej sesji, do 10 dziennie. Gdy trzech graczy zmotywuje tę samą osobę w ciągu minuty, robi się Hype i dostaje ona jeszcze 10.
+
 ## I sprzedaż
 
 Wszystko w Arsenale może wrócić na zewnątrz. Złomowanie sprzętu rozbija go na części, sprzedaż płaci Fame od razu, a Rynek pozwala wystawić ofertę po własnej cenie, by kupił ją inny gracz. Sprzęt, którego nigdy nie założysz, to Fame, którego jeszcze nie zebrałeś.

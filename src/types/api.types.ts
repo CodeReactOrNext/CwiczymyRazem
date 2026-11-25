@@ -290,6 +290,11 @@ export interface CurrentActivityInterface {
   songId?: string;
   /** YouTube id of an AI Coach lesson being practiced along to. */
   lessonVideoId?: string;
+  /**
+   * When the whole session began. `timestamp` moves with every exercise of a plan; this one
+   * does not, so live motivations count once per session rather than once per exercise.
+   */
+  sessionStartedAt?: number;
 }
 
 export interface userSliceInitialState {

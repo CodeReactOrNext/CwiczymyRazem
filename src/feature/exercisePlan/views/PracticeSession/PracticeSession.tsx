@@ -12,6 +12,7 @@ import { getBackingTrackStatus } from "feature/backingTrack/utils/backingTrackSt
 import { useCommunityPlayCount } from "feature/communityExercises/hooks/useCommunityPlayCount";
 import { useLocalizedPlan } from "feature/exercisePlan/hooks/useLocalizedExercises";
 import { accuracyToStars } from "feature/journey/utils/examStars";
+import { LiveMotivationToasts } from "feature/liveMotivate/components/LiveMotivationToasts";
 import { saveLastSession } from "feature/practice/utils/lastSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { useInstrumentPreferenceStore } from "feature/tuner/store/instrumentPreferenceStore";
@@ -1713,6 +1714,13 @@ const PracticeSessionInner = ({
       <PracticeLoadingScreen isReady={!gpLoading} steps={gpSteps} />
 
       <SessionPageHead exerciseTitle={activeExercise.title} />
+
+      {/* Live motivations from other players. Exams, bosses, duels and hunt rounds keep them
+          until the run is over, so nothing pops up mid-attempt. */}
+      <LiveMotivationToasts
+        compact={isMobileView} turned={isUprightPhone}
+        hold={!reportResult && (isExamMode || !!plan.duel || !!bossFight || huntTarget !== null)}
+      />
 
       <GeneratedExerciseDialogs
         showScaleDialog={showScaleDialog} setShowScaleDialog={setShowScaleDialog}

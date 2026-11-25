@@ -323,12 +323,35 @@ describe("time blocks", () => {
     expect(toTraitBlocks(60)).toBe(60);
   });
 
-  it("pays nothing for a session under one block", () => {
+  // A 10-minute session used to pay 0 here while the Arsenal advertised the
+  // full rate — blocks gate the conditions, never the minutes paid.
+  it("pays an ungated trait for every minute, even under one block", () => {
     const rig = {
-      guitars: [guitar({ traits: [{ id: "workhorse", value: 3 }] })],
+      guitars: [guitar({ traits: [{ id: "workhorse", value: 6 }] })],
       pedals: [],
     };
-    expect(getRigTraitPayout(rig, session({ technique: 14 })).fame).toBe(0);
+    const payout = getRigTraitPayout(rig, session({ technique: 10 }));
+    expect(payout.fame).toBe(1);
+    expect(payout.rate).toBe(6);
+  });
+
+  it("pays a part block on top of whole ones", () => {
+    const rig = {
+      guitars: [guitar({ traits: [{ id: "workhorse", value: 6 }] })],
+      pedals: [],
+    };
+    expect(getRigTraitPayout(rig, session({ technique: 25 })).fame).toBe(2.5);
+  });
+
+  it("is split-proof: two short sessions pay what one long one does", () => {
+    const rig = {
+      guitars: [guitar({ traits: [{ id: "workhorse", value: 6 }] })],
+      pedals: [],
+    };
+    const split =
+      getRigTraitPayout(rig, session({ technique: 10 })).fame +
+      getRigTraitPayout(rig, session({ technique: 20 })).fame;
+    expect(split).toBe(getRigTraitPayout(rig, session({ technique: 30 })).fame);
   });
 });
 

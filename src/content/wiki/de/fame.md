@@ -44,6 +44,8 @@ Das ist das Nächste an einem Einkommen, was die App hat. Veröffentliche die Ü
 
 Für eine Sache wirst du bezahlt, wenn du sie selbst tust: **die Schwierigkeit eines Songs zu bewerten** zahlt 3 Fame beim ersten Mal, dass du einen bestimmten Song bewertest. Klein, aber es kostet dich fünf Sekunden, und die Bewertungen machen die Schwierigkeitsstufen für alle anderen nützlich.
 
+**Jemanden beim Spielen zu motivieren** zahlt euch beiden. Fahr in Live Now über einen Spieler mit pulsierendem Avatar und drück Motivieren: Er bekommt sofort 15 Fame und eine Sprechblase in seiner Session, du bekommst 3. Einmal pro Spieler und Session, bis zu 10 am Tag. Motivieren drei Spieler dieselbe Person innerhalb einer Minute, ist das ein Hype, und es gibt 10 obendrauf.
+
 ## Und Verkaufen
 
 Alles im Arsenal kann wieder hinaus. Equipment zu verschrotten zerlegt es in Teile, Verkaufen zahlt direkt Fame, und der Markt lässt dich ein Angebot zu eigenem Preis einstellen, damit ein anderer Spieler es kauft. Equipment, das du nie ausrüsten wirst, ist Fame, das du noch nicht eingesammelt hast.

@@ -113,6 +113,20 @@ const typeConfig = {
         t("bell.reaction")
       ),
   },
+  live_motivate: {
+    icon: <img src='/images/tokens/coin.png' alt='' className='object-contain' />,
+    tone: "amber",
+    label: (n: any, t: Translate) => (
+      <span className='inline-flex items-center gap-1'>
+        {t("bell.live_motivate", { fame: n.fameAwarded ?? 0 })}
+        <img
+          src='/images/tokens/coin.png'
+          alt='coin'
+          className='h-3 w-3 object-contain'
+        />
+      </span>
+    ),
+  },
   season_reward: {
     icon: <Trophy className='fill-current' />,
     tone: "amber",
@@ -473,7 +487,7 @@ export const NotificationsBell = () => {
                               size='sm'
                             />
                           </div>
-                          {n.type !== "reaction" && (
+                          {n.type !== "reaction" && n.type !== "live_motivate" && (
                             // A solid disc under the tint, so the badge reads the same over any photo.
                             <div className='absolute -bottom-1 -right-1 z-10 h-5 w-5 rounded-full bg-zinc-900 ring-2 ring-zinc-900'>
                               <div
@@ -505,7 +519,7 @@ export const NotificationsBell = () => {
                         )}
                         {config.label(n, t)}
                       </p>
-                      {n.recordingTitle && n.type !== "reaction" && (
+                      {n.recordingTitle && n.type !== "reaction" && n.type !== "live_motivate" && (
                         <p className='mt-1 truncate text-xs italic text-zinc-500'>
                           &ldquo;{n.recordingTitle}&rdquo;
                         </p>

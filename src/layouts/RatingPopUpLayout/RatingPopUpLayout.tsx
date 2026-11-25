@@ -10,6 +10,7 @@ import { STREAK_MILESTONES } from "constants/streakMilestones";
 import type { AchievementList } from "feature/achievements";
 import { AchievementCard, useAchievementContext } from "feature/achievements";
 import type { ScoredRun } from "feature/exercisePlan/types/exercise.types";
+import { LiveFameSummary } from "feature/liveMotivate/components/LiveFameSummary";
 import { NextReward, PaidLevels, useHasNextReward } from "feature/progression/components/NextUpCard";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -440,6 +441,8 @@ const RatingPopUpLayout = ({
                           { label: t("time"), icon: <Timer className="h-full w-full text-zinc-400" aria-hidden />, value: <TileTime minutes={Math.round(sessionTimeMs / MIN)} /> },
                         ]}
                       />
+
+                      <LiveFameSummary />
 
                       <div className="flex flex-col gap-6 shortwide:flex-row shortwide:items-center">
                       {/* level progress (XP = cyan) */}

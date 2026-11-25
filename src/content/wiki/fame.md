@@ -44,6 +44,8 @@ This is the closest thing to income the app has. Publish the exercises you write
 
 There's one thing you get paid for doing yourself: **rating a song's difficulty** pays 3 Fame the first time you rate a given song. Small, but it costs you five seconds and the ratings are what make the difficulty tiers useful for everyone else.
 
+**Motivating someone while they play** pays both of you. Hover over a player in Live Now whose avatar is pulsing and press Motivate: they get 15 Fame on the spot, with a bubble in their session, and you get 3. One per player per session, up to 10 a day. When three players motivate the same person within a minute, that's a Hype, and it adds 10 more for them.
+
 ## And selling
 
 Everything in the Arsenal can go back out again. Scrapping gear breaks it into parts, selling it pays Fame outright, and the Market lets you put a listing up at your own price for another player to buy. Gear you'll never equip is Fame you haven't collected yet.

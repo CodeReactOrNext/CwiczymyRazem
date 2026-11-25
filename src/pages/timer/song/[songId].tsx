@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "assets/components/ui/skeleton";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
+import { LiveMotivationToasts } from "feature/liveMotivate/components/LiveMotivationToasts";
 import { TimeSplitterModal } from "feature/practice/components/TimeSplitterModal";
 import { ensureSongIsLearning,updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongArrangement } from "feature/songs/types/songs.type";
@@ -303,7 +304,9 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                 userId={userId as string}
                 songId={song.id}
             />
-            
+
+            <LiveMotivationToasts compact={false} turned={false} hold={false} />
+
             <TimeSplitterModal 
                 isOpen={isSplitterOpen}
                 totalTime={timer.getTime()}
