@@ -300,28 +300,15 @@ describe("calculateSessionFame", () => {
       expect(result.fame).toBe(result.curveFame + result.rigFame + 20);
     });
 
-    it("shares the rig ceiling instead of getting a second cap", () => {
-      // Deliberately absurd numbers: the ceiling sits at 1000/h and the top rig
-      // pays ~129, so nothing reachable comes near it. What is pinned here is the
-      // mechanism — one shared ceiling, and the excess given back scaled, so the
-      // rate the header showed is the rate that got paid.
+    it("pays traits in full, with no hourly ceiling", () => {
       const result = session(60, {
         rigLevel: 750,
         traitFame: 1000,
         traitRate: 1000,
       });
 
-      expect(result.rigFameRate + result.traitFameRate).toBeCloseTo(1000, 1);
-      expect(result.traitFame).toBeLessThan(1000);
-    });
-
-    it("leaves a realistic trait build untouched by the ceiling", () => {
-      // The ceiling is a backstop, not a balance lever — a good rig plus a good
-      // set of traits has to land under it, or the cards advertise rates the
-      // game never pays.
-      const result = session(60, { rigLevel: 400, traitFame: 60, traitRate: 60 });
-
-      expect(result.traitFame).toBe(60);
+      expect(result.traitFameRate).toBe(1000);
+      expect(result.traitFame).toBe(1000);
     });
 
     it("pays no trait fame on a back-dated report", () => {
@@ -407,9 +394,7 @@ describe("calculateSessionFame", () => {
       expect(result.fame).toBe(BACKDATED_REPORT_FAME);
     });
 
-    it("shares the one gear ceiling with the rig and the traits", () => {
-      // Absurd numbers again: what is pinned is that the three gear components
-      // add up to the ceiling rather than each getting their own.
+    it("pays rig, wiring and traits in full, with no shared ceiling", () => {
       const result = session(60, {
         rigLevel: 750,
         chainRate: 1000,
@@ -417,23 +402,11 @@ describe("calculateSessionFame", () => {
         traitRate: 1000,
       });
 
+      expect(result.chainFameRate).toBe(1000);
+      expect(result.traitFameRate).toBe(1000);
       expect(
         result.rigFameRate + result.chainFameRate + result.traitFameRate,
-      ).toBeCloseTo(1000, 1);
-    });
-
-    it("takes its headroom before the traits do, not after", () => {
-      // The order matters: wiring is a property of the rig itself, so it is paid
-      // ahead of the traits riding on it.
-      const result = session(60, {
-        rigLevel: 750,
-        chainRate: 30,
-        traitFame: 1000,
-        traitRate: 1000,
-      });
-
-      expect(result.chainFameRate).toBe(30);
-      expect(result.traitFameRate).toBeLessThan(1000);
+      ).toBeGreaterThan(2000);
     });
   });
 });

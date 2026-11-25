@@ -11,7 +11,7 @@ import {
   readBoardLevel,
 } from "../../data/boardDuplicates";
 import { isPoweredIn } from "../../data/powerSupply";
-import { getRigFameRate, RIG_FAME_HOURLY_CEILING } from "../../data/rigFame";
+import { getRigFameRate } from "../../data/rigFame";
 import { getRigLevel } from "../../data/rigLevel";
 import { getChainFameRate } from "../../data/signalChain";
 import {
@@ -312,15 +312,9 @@ export const RigStatsPanel = ({ data }: RigStatsPanelProps) => {
     };
   }, [data]);
 
-  // Traits are paid out of whatever headroom the base rate leaves under the one
-  // ceiling in the system (see `calculateSessionFame`), so the honest total is
-  // the clamped one — base + traits raw would advertise Fame no report pays.
-  // The ceiling itself stays off the sheet: nothing in the game reaches it, so
-  // showing it only invited the question of why the number was short.
-  const totalRate = Math.min(
-    RIG_FAME_HOURLY_CEILING,
-    baseRate + chainRate + traitRate,
-  );
+  // No hourly ceiling: every gear payout is paid in full (see
+  // `calculateSessionFame`), so the total is the plain sum.
+  const totalRate = baseRate + chainRate + traitRate;
   const [showBreakdown, setShowBreakdown] = useState(false);
 
   return (
