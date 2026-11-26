@@ -484,6 +484,25 @@ export interface SalvagedMod {
   salvagedAt: number;
 }
 
+/** A one-use tool that lifts one trait off an instrument. */
+export interface TraitExtractor {
+  id: string;
+  acquiredAt: number;
+}
+
+/** A trait lifted off an instrument, waiting to be put into another. */
+export interface TraitImprint {
+  /** Stash id. Random — an imprint keeps no trace of where it came from. */
+  id: string;
+  traitId: string;
+  /** Guitar or pedal — a guitar trait never goes into a pedal. */
+  kind: WorkshopKind;
+  /** The rolled Fame/h it had on the old instrument, unchanged. */
+  value: number;
+  params?: Record<string, string>;
+  extractedAt: number;
+}
+
 export interface ArsenalUserData {
   inventory: InventoryItem[];
   equippedGuitarId: number | string | null;
@@ -514,6 +533,10 @@ export interface ArsenalUserData {
   dexEffects?: (number | string)[];
   /** Guitar Builder parts: bodies, necks, pickups, finishes… from cases. */
   components?: OwnedComponent[];
+  /** One-use tools that lift a trait off an instrument. See `data/traitCraft.ts`. */
+  traitExtractors?: TraitExtractor[];
+  /** Traits lifted off instruments, waiting to go into another one. */
+  traitImprints?: TraitImprint[];
   /**
    * Pedalboard skins bought in the supporter panel, and which the board wears.
    * Written only by `/api/supporter/skins`; read through `readBoardSkins`,
@@ -581,6 +604,8 @@ export interface OpenCaseResult {
   pityHit?: "new" | "top";
   /** The case's counters after this pull, so the shelf updates without a refetch. */
   pity?: CasePityCounters;
+  /** A Trait Extractor that dropped alongside a Parts Crate pull. */
+  extractor?: TraitExtractor;
 }
 
 /** A duplicate that can be folded into the best copy of the same model. */

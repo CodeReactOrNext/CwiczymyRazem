@@ -357,7 +357,9 @@
       "Effect": "Effekt verkaufen?",
       "Mod": "Mod verkaufen?",
       "Parts": "Teile verkaufen?",
-      "Part": "Teil verkaufen?"
+      "Part": "Teil verkaufen?",
+      "Imprint": "Abdruck verkaufen?",
+      "Extractor": "Extraktor verkaufen?"
     },
     "you_receive": "Du erhältst",
     "fame_points": "Fame"
@@ -369,7 +371,9 @@
       "Guitar": "Gitarre auf dem Markt anbieten",
       "Effect": "Effekt auf dem Markt anbieten",
       "Mod": "Mod auf dem Markt anbieten",
-      "Part": "Teil auf dem Markt anbieten"
+      "Part": "Teil auf dem Markt anbieten",
+      "Imprint": "Abdruck auf dem Markt anbieten",
+      "Extractor": "Extraktor auf dem Markt anbieten"
     },
     "your_price": "Dein Preis",
     "minimum": "Minimum: {{price}} Fame (der normale Verkaufswert)",
@@ -1394,5 +1398,58 @@
       "working": "{{name}} wird restauriert",
       "done": "Restauriert auf {{grade}}"
     }
+  },
+  "trait_craft": {
+    "imprint_caps": {
+      "guitar": "Gitarren-Merkmalsabdruck",
+      "effect": "Pedal-Merkmalsabdruck"
+    },
+    "extractor_caps": "Seltenes Werkzeug",
+    "imprint_name": "Merkmalsabdruck",
+    "extractor_name": "Merkmalsextraktor",
+    "owned_one": "Du hast {{count}}",
+    "owned_other": "Du hast {{count}}",
+    "owned": "Du hast {{count}}",
+    "imprint_body": "Ein Merkmal mit unverändertem Wert. Setz es in eine Gitarre oder ein Pedal ein: Das kostet Fame, mehr für jedes Merkmal, das das Instrument schon hat, und ein Instrument trägt höchstens drei.",
+    "extractor_body": "Ein Einweg-Werkzeug aus der Parts Crate. Rechtsklick auf ein Instrument mit Merkmal und Merkmal extrahieren wählen: Das Merkmal kommt als Abdruck heraus, den du verkaufen, anbieten oder woanders einsetzen kannst.",
+    "insert_into": "In ein Instrument einsetzen…",
+    "insert_title": "Merkmal einsetzen",
+    "insert_body": "Wähle ein Instrument. Es trägt bis zu {{max}} Merkmale, nie dasselbe zweimal, und jedes vorhandene Merkmal erhöht den Preis.",
+    "slots": "{{count}}/{{max}} Merkmale",
+    "refusal": {
+      "UNKNOWN_TRAIT": "Merkmal gibt es nicht mehr",
+      "WRONG_KIND": "falsche Instrumentart",
+      "NOT_ELIGIBLE": "passt nicht zu diesem Instrument",
+      "DUPLICATE": "hat dieses Merkmal schon",
+      "FULL": "3/3 Merkmale"
+    },
+    "no_targets": {
+      "guitar": "Du hast keine Gitarren, in die es passt.",
+      "effect": "Du hast keine Pedale, in die es passt."
+    },
+    "not_enough_fame": "Dir fehlen {{missing}} Fame.",
+    "insert": "Einsetzen",
+    "insert_for": "Einsetzen · {{fame}} Fame",
+    "inserting": "Wird eingesetzt…",
+    "extract_title": "Merkmal extrahieren",
+    "extract_body": "Wähle das Merkmal, das aus {{name}} gezogen wird. Es kommt als Abdruck mit demselben Wert heraus, das Instrument verliert es.",
+    "extract_cost": "Verbraucht 1 Merkmalsextraktor. Du hast {{count}}.",
+    "extract": "Extrahieren",
+    "extracting": "Wird extrahiert…",
+    "menu_extract": "Merkmal extrahieren… ({{count}})",
+    "need_extractor": "Braucht einen Merkmalsextraktor aus der Parts Crate",
+    "bonus_extractor": "+ Merkmalsextraktor",
+    "bonus_extractors_one": "+{{count}} Merkmalsextraktor",
+    "bonus_extractors_other": "+{{count}} Merkmalsextraktoren",
+    "bonus_extractors": "+{{count}} Merkmalsextraktoren",
+    "err": {
+      "extract": "Merkmal konnte nicht extrahiert werden.",
+      "insert": "Merkmal konnte nicht eingesetzt werden.",
+      "sell": "Verkauf fehlgeschlagen."
+    },
+    "use": "Extraktor benutzen",
+    "use_title": "Merkmal zum Extrahieren wählen",
+    "use_body": "Alle Merkmale deiner Instrumente. Jedes Extrahieren verbraucht einen Extraktor, du hast {{count}}.",
+    "use_empty": "Noch keine deiner Gitarren oder Pedale hat ein Merkmal."
   }
 }

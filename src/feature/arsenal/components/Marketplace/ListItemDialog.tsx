@@ -7,7 +7,7 @@ import { MARKETPLACE_LISTING_FEE } from "../../types/marketplace.types";
 
 interface ListItemDialogProps {
   isOpen: boolean;
-  itemType: "Guitar" | "Effect" | "Mod" | "Part";
+  itemType: "Guitar" | "Effect" | "Mod" | "Part" | "Imprint" | "Extractor";
   itemName: string;
   /** Price floor — the normal system sell value of this instance. */
   minPrice: number;

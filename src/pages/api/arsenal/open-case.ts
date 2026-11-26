@@ -19,6 +19,7 @@ import {
   getMergeOffer,
   GUITAR_MERGE,
 } from "feature/arsenal/data/merge";
+import { EXTRACTOR_DROP_CHANCE, makeExtractor } from "feature/arsenal/data/traitCraft";
 import { rollItemTraits } from "feature/arsenal/data/traits";
 import type {
   CaseDefinition,
@@ -28,6 +29,7 @@ import type {
   InventoryItem,
   OpenCasePackResult,
   OpenCaseResult,
+  TraitExtractor,
 } from "feature/arsenal/types/arsenal.types";
 import { buildDiscoveredSet } from "feature/arsenal/utils/dex";
 import { hasPity, isAtLeast, readPity } from "feature/arsenal/utils/pity";
@@ -202,6 +204,11 @@ async function openCases(
       const components: OwnedComponent[] = [
         ...(data.arsenal?.components || []),
       ];
+      // Trait Extractors ride along with Parts Crate pulls — see `data/traitCraft.ts`.
+      const extractors: TraitExtractor[] = [
+        ...(data.arsenal?.traitExtractors || []),
+      ];
+      const extractorsBefore = extractors.length;
       const newGuitarIds = new Set<number | string>();
       const newEffectIds = new Set<number | string>();
 
@@ -218,12 +225,19 @@ async function openCases(
 
         if (draw.kind === "component") {
           components.push(draw.item);
+          const extractor =
+            caseDef.dropKind === "component" &&
+            Math.random() < EXTRACTOR_DROP_CHANCE
+              ? makeExtractor(Date.now(), `${i}${generateId()}`)
+              : null;
+          if (extractor) extractors.push(extractor);
           return {
             ...base,
             type: "component",
             component: getComponent(draw.item.defId)!,
             componentItem: draw.item,
             isNewToDex: false,
+            ...(extractor ? { extractor } : {}),
           };
         }
 
@@ -334,6 +348,9 @@ async function openCases(
           : {}),
         ...(components.length !== (data.arsenal?.components || []).length
           ? { "arsenal.components": components }
+          : {}),
+        ...(extractors.length !== extractorsBefore
+          ? { "arsenal.traitExtractors": extractors }
           : {}),
       });
       for (const [key, ref] of serialRefs) {

@@ -157,6 +157,14 @@ export default async function handler(
       components: Array.isArray(data.arsenal.components)
         ? data.arsenal.components
         : [],
+      // Trait Extractors and the imprints they lifted. Absent until the first
+      // extractor drops from a Parts Crate.
+      traitExtractors: Array.isArray(data.arsenal.traitExtractors)
+        ? data.arsenal.traitExtractors
+        : [],
+      traitImprints: Array.isArray(data.arsenal.traitImprints)
+        ? data.arsenal.traitImprints
+        : [],
       // Skins bought in the supporter panel. Read through the sanitiser, so
       // the board never wears one the account does not own.
       boardSkins: readBoardSkins(data.arsenal.boardSkins),

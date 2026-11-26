@@ -11,12 +11,15 @@
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getPartLabel } from "feature/arsenal/data/partDefinitions";
+import { getTraitLabel } from "feature/arsenal/data/traitCraft";
 import { getModDef } from "feature/arsenal/data/workshop";
 import type {
   EffectInventoryItem,
   InventoryItem,
   SalvagedMod,
   ScrapPart,
+  TraitExtractor,
+  TraitImprint,
 } from "feature/arsenal/types/arsenal.types";
 import type { OwnedComponent } from "feature/guitarBuilder/types/guitarBuilder.types";
 import { getComponent } from "feature/guitarBuilder/utils/components";
@@ -58,6 +61,21 @@ export type BoardPiece =
       tall: false;
       kind: "component";
       component: OwnedComponent;
+      name: string;
+    }
+  | {
+      id: string;
+      tall: false;
+      kind: "imprint";
+      imprint: TraitImprint;
+      name: string;
+    }
+  | {
+      id: string;
+      tall: false;
+      /** Every extractor the player holds, stacked in one socket. */
+      kind: "extractor";
+      extractors: TraitExtractor[];
       name: string;
     };
 
@@ -123,3 +141,32 @@ export const componentPiece = (component: OwnedComponent): BoardPiece => ({
 
 export const componentPieces = (components: OwnedComponent[]): BoardPiece[] =>
   components.filter((c) => getComponent(c.defId)).map(componentPiece);
+
+/** A Trait Imprint: one socket per imprint, each with its own trait and value. */
+export const imprintPiece = (imprint: TraitImprint): BoardPiece => ({
+  id: imprint.id,
+  tall: false,
+  kind: "imprint",
+  imprint,
+  name: getTraitLabel(imprint.traitId, imprint.params),
+});
+
+export const imprintPieces = (imprints: TraitImprint[]): BoardPiece[] =>
+  imprints.map(imprintPiece);
+
+/** Stable id of the one socket every extractor stacks into. */
+export const EXTRACTOR_PIECE_ID = "trait-extractors";
+
+/** Extractors are identical tools, so they stack — one socket, or none. */
+export const extractorPieces = (extractors: TraitExtractor[]): BoardPiece[] =>
+  extractors.length > 0
+    ? [
+        {
+          id: EXTRACTOR_PIECE_ID,
+          tall: false,
+          kind: "extractor",
+          extractors,
+          name: "Trait Extractor",
+        },
+      ]
+    : [];

@@ -199,6 +199,7 @@ export const CasePackModal = ({
       dupes: results.filter((r) => r.type !== "component" && !r.isNewToDex)
         .length,
       parts: results.filter((r) => r.type === "component").length,
+      extractors: results.filter((r) => r.extractor).length,
       gain: results.reduce((sum, r) => sum + (r.merge?.gain ?? 0), 0),
     };
   }, [pack]);
@@ -294,6 +295,11 @@ export const CasePackModal = ({
                 {stats.dupes > 0 && (
                   <span className='text-zinc-400'>
                     {t("pack.dupes", { count: stats.dupes })}
+                  </span>
+                )}
+                {stats.extractors > 0 && (
+                  <span className='font-bold text-amber-300'>
+                    {t("trait_craft.bonus_extractors", { count: stats.extractors })}
                   </span>
                 )}
                 {stats.parts > 0 && (

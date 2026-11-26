@@ -4,8 +4,17 @@ import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import { getItemValue } from "feature/arsenal/data/itemStats";
 import { getModResaleValue } from "feature/arsenal/data/resale";
 import { getRigLevel } from "feature/arsenal/data/rigLevel";
+import {
+  EXTRACTOR_RESALE_FAME,
+  getImprintResaleValue,
+  getTraitLabel,
+} from "feature/arsenal/data/traitCraft";
 import { getModDef } from "feature/arsenal/data/workshop";
-import type { SalvagedMod } from "feature/arsenal/types/arsenal.types";
+import type {
+  SalvagedMod,
+  TraitExtractor,
+  TraitImprint,
+} from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import type { MarketplaceItemType } from "feature/arsenal/types/marketplace.types";
 import { MARKETPLACE_LISTING_FEE } from "feature/arsenal/types/marketplace.types";
@@ -39,7 +48,9 @@ export default async function handler(
     itemType !== "guitar" &&
     itemType !== "effect" &&
     itemType !== "mod" &&
-    itemType !== "component"
+    itemType !== "component" &&
+    itemType !== "imprint" &&
+    itemType !== "extractor"
   ) {
     return res.status(400).json({ error: "Invalid itemType" });
   }
@@ -86,7 +97,36 @@ export default async function handler(
       let itemRarity: string;
       let itemImageId: number | string;
 
-      if (itemType === "component") {
+      if (itemType === "imprint") {
+        const imprints: TraitImprint[] = data.arsenal?.traitImprints || [];
+        const index = imprints.findIndex((m) => m.id === inventoryItemId);
+        if (index === -1) throw new Error("ITEM_NOT_FOUND");
+        const imprint = imprints[index];
+
+        minPrice = getImprintResaleValue(imprint);
+        escrowed = imprint;
+        defId = imprint.traitId;
+        itemName = getTraitLabel(imprint.traitId, imprint.params);
+        itemBrand = imprint.kind === "guitar" ? "Guitar trait" : "Pedal trait";
+        itemRarity = "";
+        itemImageId = imprint.traitId;
+
+        userUpdate["arsenal.traitImprints"] = imprints.filter((_, i) => i !== index);
+      } else if (itemType === "extractor") {
+        const extractors: TraitExtractor[] = data.arsenal?.traitExtractors || [];
+        const index = extractors.findIndex((m) => m.id === inventoryItemId);
+        if (index === -1) throw new Error("ITEM_NOT_FOUND");
+
+        minPrice = EXTRACTOR_RESALE_FAME;
+        escrowed = extractors[index];
+        defId = "trait-extractor";
+        itemName = "Trait Extractor";
+        itemBrand = "Tool";
+        itemRarity = "";
+        itemImageId = "trait-extractor";
+
+        userUpdate["arsenal.traitExtractors"] = extractors.filter((_, i) => i !== index);
+      } else if (itemType === "component") {
         const components: OwnedComponent[] = data.arsenal?.components || [];
         const index = components.findIndex((c) => c.uid === inventoryItemId);
         if (index === -1) throw new Error("ITEM_NOT_FOUND");
@@ -246,9 +286,9 @@ export default async function handler(
       };
     });
 
-    // Public activity log (panel only). Builder parts stay out of the feed —
-    // it only knows how to draw gear and mods.
-    if (itemType !== "component") try {
+    // Public activity log (panel only). Builder parts and trait items stay out
+    // of the feed — it only knows how to draw gear and mods.
+    if (itemType === "guitar" || itemType === "effect" || itemType === "mod") try {
       await firestore.collection("logs").add({
         type: "marketplace_listing",
         uid: userId,

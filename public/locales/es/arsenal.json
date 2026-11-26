@@ -357,7 +357,9 @@
       "Effect": "¿Vender el efecto?",
       "Mod": "¿Vender el mod?",
       "Parts": "¿Vender las piezas?",
-      "Part": "¿Vender la pieza?"
+      "Part": "¿Vender la pieza?",
+      "Imprint": "¿Vender huella?",
+      "Extractor": "¿Vender extractor?"
     },
     "you_receive": "Recibirás",
     "fame_points": "Fame"
@@ -369,7 +371,9 @@
       "Guitar": "Publicar guitarra en el mercado",
       "Effect": "Publicar efecto en el mercado",
       "Mod": "Publicar mod en el mercado",
-      "Part": "Publicar pieza en el mercado"
+      "Part": "Publicar pieza en el mercado",
+      "Imprint": "Publicar huella en el mercado",
+      "Extractor": "Publicar extractor en el mercado"
     },
     "your_price": "Tu precio",
     "minimum": "Mínimo: {{price}} Fame (el valor normal de venta)",
@@ -1394,5 +1398,58 @@
       "working": "Restaurando tu {{name}}",
       "done": "Restaurado a {{grade}}"
     }
+  },
+  "trait_craft": {
+    "imprint_caps": {
+      "guitar": "Huella de rasgo de guitarra",
+      "effect": "Huella de rasgo de pedal"
+    },
+    "extractor_caps": "Herramienta rara",
+    "imprint_name": "Huella de rasgo",
+    "extractor_name": "Extractor de rasgos",
+    "owned_one": "Tienes {{count}}",
+    "owned_other": "Tienes {{count}}",
+    "owned": "Tienes {{count}}",
+    "imprint_body": "Un rasgo con su valor intacto. Ponlo en una guitarra o un pedal: cuesta Fame, más por cada rasgo que ya tenga el instrumento, y un instrumento admite tres como máximo.",
+    "extractor_body": "Herramienta de un solo uso de la Parts Crate. Haz clic derecho en un instrumento con un rasgo y elige Extraer rasgo: el rasgo sale como una huella que puedes vender, publicar o poner en otro.",
+    "insert_into": "Poner en un instrumento…",
+    "insert_title": "Poner el rasgo",
+    "insert_body": "Elige un instrumento. Admite hasta {{max}} rasgos, nunca el mismo dos veces, y cada rasgo que ya tiene sube el precio.",
+    "slots": "{{count}}/{{max}} rasgos",
+    "refusal": {
+      "UNKNOWN_TRAIT": "el rasgo ya no existe",
+      "WRONG_KIND": "tipo de instrumento equivocado",
+      "NOT_ELIGIBLE": "este rasgo no le encaja",
+      "DUPLICATE": "ya tiene este rasgo",
+      "FULL": "3/3 rasgos"
+    },
+    "no_targets": {
+      "guitar": "No tienes guitarras donde ponerla.",
+      "effect": "No tienes pedales donde ponerla."
+    },
+    "not_enough_fame": "Te faltan {{missing}} de Fame.",
+    "insert": "Ponerlo",
+    "insert_for": "Poner · {{fame}} Fame",
+    "inserting": "Poniéndolo…",
+    "extract_title": "Extraer un rasgo",
+    "extract_body": "Elige el rasgo que sacarás de {{name}}. Sale como una huella con el mismo valor y el instrumento lo pierde.",
+    "extract_cost": "Usa 1 extractor de rasgos. Tienes {{count}}.",
+    "extract": "Extraer",
+    "extracting": "Extrayendo…",
+    "menu_extract": "Extraer rasgo… ({{count}})",
+    "need_extractor": "Necesitas un extractor de rasgos de la Parts Crate",
+    "bonus_extractor": "+ Extractor de rasgos",
+    "bonus_extractors_one": "+{{count}} extractor de rasgos",
+    "bonus_extractors_other": "+{{count}} extractores de rasgos",
+    "bonus_extractors": "+{{count}} extractores de rasgos",
+    "err": {
+      "extract": "No se pudo extraer el rasgo.",
+      "insert": "No se pudo poner el rasgo.",
+      "sell": "No se pudo vender."
+    },
+    "use": "Usar extractor",
+    "use_title": "Elige un rasgo para extraer",
+    "use_body": "Todos los rasgos de tus instrumentos. Extraer uno gasta un extractor; tienes {{count}}.",
+    "use_empty": "Ninguna de tus guitarras o pedales tiene rasgos todavía."
   }
 }

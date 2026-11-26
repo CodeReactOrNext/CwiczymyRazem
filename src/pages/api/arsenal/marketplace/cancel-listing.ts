@@ -49,6 +49,17 @@ export default async function handler(
       if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
       const data = userDoc.data()!;
 
+      if (listing.itemType === "imprint" || listing.itemType === "extractor") {
+        // Back into the stash. Its id came off a listing or a teardown of the
+        // seller's own, so nothing in their stash can have claimed it since.
+        const stashKey =
+          listing.itemType === "imprint" ? "traitImprints" : "traitExtractors";
+        const stash: any[] = data.arsenal?.[stashKey] || [];
+        t.update(userRef, { [`arsenal.${stashKey}`]: [...stash, listing.item] });
+        t.update(listingRef, { status: "cancelled" });
+        return;
+      }
+
       if (listing.itemType === "component") {
         // Back into the stash under its own uid; the escrow `id` goes.
         const { id: _escrowId, ...part } = listing.item;

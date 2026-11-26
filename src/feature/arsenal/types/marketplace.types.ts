@@ -4,6 +4,8 @@ import type {
   EffectInventoryItem,
   InventoryItem,
   SalvagedMod,
+  TraitExtractor,
+  TraitImprint,
 } from "./arsenal.types";
 
 /**
@@ -16,10 +18,31 @@ import type {
  * waiting on a roughly 2%-a-day counter. The market is the answer: mods a player
  * cannot use are exactly the mods somebody else has been hunting.
  */
-export type MarketplaceItemType = "guitar" | "effect" | "mod" | "component";
+export type MarketplaceItemType =
+  | "guitar"
+  | "effect"
+  | "mod"
+  | "component"
+  | "imprint"
+  | "extractor";
 
 /** A Guitar Builder part in escrow — carries an `id` like every other listing. */
 export type ListedComponent = OwnedComponent & { id: string };
+
+/** Gear — the two kinds with a Dex, a teardown and a rig behind them. */
+export const isGearListingType = (
+  itemType: MarketplaceItemType,
+): itemType is "guitar" | "effect" =>
+  itemType === "guitar" || itemType === "effect";
+
+/** Anything that can sit in a listing's escrow. */
+export type ListedItem =
+  | InventoryItem
+  | EffectInventoryItem
+  | SalvagedMod
+  | ListedComponent
+  | TraitImprint
+  | TraitExtractor;
 
 export type MarketplaceListingStatus = "active" | "sold" | "cancelled";
 
@@ -37,7 +60,7 @@ export interface MarketplaceListing {
    * own rolled value, so a listing is a specific `+5 Hand-wound pickups` and not
    * a generic one.
    */
-  item: InventoryItem | EffectInventoryItem | SalvagedMod | ListedComponent;
+  item: ListedItem;
   /** Instance id (== item.id) for quick lookups. */
   itemId: string;
   /** guitarId | effectId | featureId — for definition lookups on the client. */
@@ -69,5 +92,5 @@ export interface ListItemResult {
 export interface BuyItemResult {
   newFame: number;
   itemType: MarketplaceItemType;
-  item: InventoryItem | EffectInventoryItem | SalvagedMod | ListedComponent;
+  item: ListedItem;
 }

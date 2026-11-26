@@ -4,6 +4,7 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
+import { ExtractorArt } from "feature/arsenal/components/Traits/TraitItemArt";
 import { getDailyPool } from "feature/arsenal/data/dailyCase";
 import { EFFECTS_BY_ID, EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
 import { getEffectValue } from "feature/arsenal/data/effectStats";
@@ -438,6 +439,23 @@ export const CaseOpeningModal = ({
                         ? t("opening.pity_top", { rarity: labels.rarity(caseDef.pity.top.rarity) })
                         : t("opening.pity_new")}
                     </motion.p>
+                  )}
+
+                  {/* The bonus a Parts Crate sometimes carries: it lands a beat
+                      after the part, so it reads as a second drop. */}
+                  {result?.extractor && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.6, y: 12 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{ delay: 1.1, type: "spring", stiffness: 420, damping: 16 }}
+                      className="flex items-center gap-3 rounded-lg bg-amber-500/15 px-4 py-2">
+                      <div className="h-9 w-9 shrink-0">
+                        <ExtractorArt />
+                      </div>
+                      <span className="text-sm font-bold text-amber-200">
+                        {t("trait_craft.bonus_extractor")}
+                      </span>
+                    </motion.div>
                   )}
 
                   <div className="relative flex items-center justify-center">

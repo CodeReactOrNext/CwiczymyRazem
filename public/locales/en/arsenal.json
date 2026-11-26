@@ -357,7 +357,9 @@
       "Effect": "Sell Effect?",
       "Mod": "Sell Mod?",
       "Parts": "Sell Parts?",
-      "Part": "Sell Part?"
+      "Part": "Sell Part?",
+      "Imprint": "Sell Imprint?",
+      "Extractor": "Sell Extractor?"
     },
     "you_receive": "You will receive",
     "fame_points": "Fame Points"
@@ -369,7 +371,9 @@
       "Guitar": "List Guitar on Market",
       "Effect": "List Effect on Market",
       "Mod": "List Mod on Market",
-      "Part": "List Part on Market"
+      "Part": "List Part on Market",
+      "Imprint": "List Imprint on Market",
+      "Extractor": "List Extractor on Market"
     },
     "your_price": "Your price",
     "minimum": "Minimum: {{price}} Fame (the normal sell value)",
@@ -1393,5 +1397,60 @@
       "working": "Restoring your {{name}}",
       "done": "Restored to {{grade}}"
     }
+  },
+  "trait_craft": {
+    "imprint_caps": {
+      "guitar": "Guitar trait imprint",
+      "effect": "Pedal trait imprint"
+    },
+    "extractor_caps": "Rare tool",
+    "imprint_name": "Trait Imprint",
+    "extractor_name": "Trait Extractor",
+    "owned_one": "You have {{count}}",
+    "owned_other": "You have {{count}}",
+    "owned": "You have {{count}}",
+    "imprint_body": "A trait with its value intact. Put it into a guitar or pedal: it costs Fame, more for every trait the instrument already carries, and an instrument holds three at most.",
+    "extractor_body": "A one-use tool from the Parts Crate. Right-click an instrument with a trait and pick Extract trait: the trait comes out as an imprint you can sell, list or put into something else.",
+    "insert_into": "Put into an instrument…",
+    "insert_title": "Put the trait in",
+    "insert_body": "Pick an instrument. It can carry up to {{max}} traits, never the same one twice, and every trait it already has raises the price.",
+    "slots": "{{count}}/{{max}} traits",
+    "refusal": {
+      "UNKNOWN_TRAIT": "trait no longer exists",
+      "WRONG_KIND": "wrong kind of instrument",
+      "NOT_ELIGIBLE": "this trait doesn't fit it",
+      "DUPLICATE": "already has this trait",
+      "FULL": "3/3 traits"
+    },
+    "no_targets": {
+      "guitar": "You have no guitars to put it into.",
+      "effect": "You have no pedals to put it into."
+    },
+    "not_enough_fame": "You need {{missing}} more Fame.",
+    "insert": "Put it in",
+    "insert_for": "Put in · {{fame}} Fame",
+    "inserting": "Putting it in…",
+    "extract_title": "Extract a trait",
+    "extract_body": "Pick the trait to lift out of {{name}}. It comes out as an imprint with the same value, and the instrument loses it.",
+    "extract_cost": "Uses 1 Trait Extractor. You have {{count}}.",
+    "extract": "Extract",
+    "extracting": "Extracting…",
+    "menu_extract": "Extract trait… ({{count}})",
+    "need_extractor": "Needs a Trait Extractor from the Parts Crate",
+    "bonus_extractor": "+ Trait Extractor",
+    "bonus_extractors_one": "+{{count}} Trait Extractor",
+    "bonus_extractors_other": "+{{count}} Trait Extractors",
+    "bonus_extractors": "+{{count}} Trait Extractors",
+    "err": {
+      "extract": "Couldn't extract the trait.",
+      "insert": "Couldn't put the trait in.",
+      "sell": "Couldn't sell it."
+    },
+    "use": "Use extractor",
+    "use_title": "Pick a trait to extract",
+    "use_body_one": "Every trait on your instruments. Extracting one uses an extractor — you have {{count}}.",
+    "use_body_other": "Every trait on your instruments. Extracting one uses an extractor — you have {{count}}.",
+    "use_body": "Every trait on your instruments. Extracting one uses an extractor — you have {{count}}.",
+    "use_empty": "None of your guitars or pedals has a trait yet."
   }
 }

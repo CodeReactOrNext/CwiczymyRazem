@@ -359,7 +359,9 @@
       "Effect": "Sprzedać efekt?",
       "Mod": "Sprzedać mod?",
       "Parts": "Sprzedać części?",
-      "Part": "Sprzedać część?"
+      "Part": "Sprzedać część?",
+      "Imprint": "Sprzedać odcisk?",
+      "Extractor": "Sprzedać ekstraktor?"
     },
     "you_receive": "Otrzymasz",
     "fame_points": "Fame"
@@ -371,7 +373,9 @@
       "Guitar": "Wystaw gitarę na targu",
       "Effect": "Wystaw efekt na targu",
       "Mod": "Wystaw mod na targu",
-      "Part": "Wystaw część na targu"
+      "Part": "Wystaw część na targu",
+      "Imprint": "Wystaw odcisk na rynku",
+      "Extractor": "Wystaw ekstraktor na rynku"
     },
     "your_price": "Twoja cena",
     "minimum": "Minimum: {{price}} Fame (zwykła cena sprzedaży)",
@@ -1428,5 +1432,62 @@
       "working": "Odnawianie: {{name}}",
       "done": "Odnowione do: {{grade}}"
     }
+  },
+  "trait_craft": {
+    "imprint_caps": {
+      "guitar": "Odcisk cechy gitary",
+      "effect": "Odcisk cechy pedału"
+    },
+    "extractor_caps": "Rzadkie narzędzie",
+    "imprint_name": "Odcisk cechy",
+    "extractor_name": "Ekstraktor cech",
+    "owned_one": "Masz {{count}}",
+    "owned_few": "Masz {{count}}",
+    "owned_many": "Masz {{count}}",
+    "owned_other": "Masz {{count}}",
+    "owned": "Masz {{count}}",
+    "imprint_body": "Cecha z nienaruszoną wartością. Włóż ją w gitarę albo pedał: kosztuje to Fame, tym więcej, im więcej cech instrument już ma, a jeden instrument mieści najwyżej trzy.",
+    "extractor_body": "Jednorazowe narzędzie ze skrzynki z częściami. Kliknij prawym instrument z cechą i wybierz Wyjmij cechę: cecha wyjdzie jako odcisk, który możesz sprzedać, wystawić albo włożyć w coś innego.",
+    "insert_into": "Włóż w instrument…",
+    "insert_title": "Włóż cechę",
+    "insert_body": "Wybierz instrument. Może mieć najwyżej {{max}} cechy, nigdy dwa razy tę samą, a każda cecha, którą już ma, podnosi cenę.",
+    "slots": "cechy {{count}}/{{max}}",
+    "refusal": {
+      "UNKNOWN_TRAIT": "cecha już nie istnieje",
+      "WRONG_KIND": "zły rodzaj instrumentu",
+      "NOT_ELIGIBLE": "ta cecha do niego nie pasuje",
+      "DUPLICATE": "ma już tę cechę",
+      "FULL": "cechy 3/3"
+    },
+    "no_targets": {
+      "guitar": "Nie masz gitar, w które można ją włożyć.",
+      "effect": "Nie masz pedałów, w które można ją włożyć."
+    },
+    "not_enough_fame": "Brakuje ci {{missing}} Fame.",
+    "insert": "Włóż",
+    "insert_for": "Włóż · {{fame}} Fame",
+    "inserting": "Wkładanie…",
+    "extract_title": "Wyjmij cechę",
+    "extract_body": "Wybierz cechę, którą wyjmiesz z {{name}}. Wyjdzie jako odcisk z tą samą wartością, a instrument ją straci.",
+    "extract_cost": "Zużywa 1 ekstraktor cech. Masz {{count}}.",
+    "extract": "Wyjmij",
+    "extracting": "Wyjmowanie…",
+    "menu_extract": "Wyjmij cechę… ({{count}})",
+    "need_extractor": "Potrzebny ekstraktor cech ze skrzynki z częściami",
+    "bonus_extractor": "+ Ekstraktor cech",
+    "bonus_extractors_one": "+{{count}} ekstraktor cech",
+    "bonus_extractors_few": "+{{count}} ekstraktory cech",
+    "bonus_extractors_many": "+{{count}} ekstraktorów cech",
+    "bonus_extractors_other": "+{{count}} ekstraktorów cech",
+    "bonus_extractors": "Ekstraktory cech: +{{count}}",
+    "err": {
+      "extract": "Nie udało się wyjąć cechy.",
+      "insert": "Nie udało się włożyć cechy.",
+      "sell": "Nie udało się sprzedać."
+    },
+    "use": "Użyj ekstraktora",
+    "use_title": "Wybierz cechę do wyjęcia",
+    "use_body": "Wszystkie cechy na twoich instrumentach. Wyjęcie zużywa jeden ekstraktor, masz ich: {{count}}.",
+    "use_empty": "Żadna twoja gitara ani pedał nie ma jeszcze cechy."
   }
 }

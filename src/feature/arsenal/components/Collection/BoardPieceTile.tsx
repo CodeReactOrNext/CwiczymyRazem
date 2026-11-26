@@ -13,6 +13,13 @@ import { EffectStashTile } from "../GuitarInventory/EffectStashTile";
 import { GuitarStashTile } from "../GuitarInventory/GuitarStashTile";
 import { PartIcon } from "../Parts/PartIcon";
 import { getRarityColor } from "../RarityBadge";
+import {
+  EXTRACTOR_TILE_COLOR,
+  ExtractorArt,
+  IMPRINT_TILE_COLOR,
+  ImprintArt,
+} from "../Traits/TraitItemArt";
+import { TraitItemCard } from "../Traits/TraitItemCard";
 import { ModArt } from "../Workshop/ModArt";
 import { SalvagedModCard } from "./SalvagedModCard";
 import { ScrapPartCard } from "./ScrapPartCard";
@@ -101,6 +108,43 @@ export const BoardPieceTile = ({
         level={piece.mod.points}
         levelPrefix='+'
         preview={<SalvagedModCard mod={piece.mod} />}
+        previewFooter={previewFooter}
+        onClick={onClick}
+      />
+    );
+
+  if (piece.kind === "imprint")
+    return (
+      <StashTile
+        {...placement}
+        color={IMPRINT_TILE_COLOR}
+        art={<ImprintArt className='p-[14%]' />}
+        label={`${labels.t("trait_craft.imprint_name")}: ${piece.name} +${piece.imprint.value}`}
+        level={piece.imprint.value}
+        levelPrefix='+'
+        preview={<TraitItemCard item={{ kind: "imprint", imprint: piece.imprint }} />}
+        previewFooter={previewFooter}
+        onClick={onClick}
+      />
+    );
+
+  if (piece.kind === "extractor")
+    return (
+      <StashTile
+        {...placement}
+        color={EXTRACTOR_TILE_COLOR}
+        art={<ExtractorArt className='p-[14%]' />}
+        label={`${labels.t("trait_craft.extractor_name")} ×${piece.extractors.length}`}
+        count={piece.extractors.length}
+        preview={
+          <TraitItemCard
+            item={{
+              kind: "extractor",
+              extractor: piece.extractors[0],
+              owned: piece.extractors.length,
+            }}
+          />
+        }
         previewFooter={previewFooter}
         onClick={onClick}
       />

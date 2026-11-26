@@ -24,6 +24,12 @@ import {
   getSalvageableMod,
   getScrappedMods,
 } from "feature/arsenal/data/salvage";
+import {
+  EXTRACTOR_RESALE_FAME,
+  getImprintResaleValue,
+  imprintAsTrait,
+} from "feature/arsenal/data/traitCraft";
+import { getItemTraits } from "feature/arsenal/data/traits";
 import { getModDef } from "feature/arsenal/data/workshop";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useBenchReadiness } from "feature/arsenal/hooks/useBenchReadiness";
@@ -42,6 +48,11 @@ import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
 import { useSellGuitarsBulk } from "feature/arsenal/hooks/useSellGuitarsBulk";
 import { useSellPart } from "feature/arsenal/hooks/useSellPart";
 import { useSellSalvagedMod } from "feature/arsenal/hooks/useSellSalvagedMod";
+import {
+  useExtractTrait,
+  useInsertTrait,
+  useSellTraitItem,
+} from "feature/arsenal/hooks/useTraitCraft";
 import { useUnequipGuitar } from "feature/arsenal/hooks/useUnequipGuitar";
 import { useUpdatePedalboard } from "feature/arsenal/hooks/useUpdatePedalboard";
 import { useUpdateRig } from "feature/arsenal/hooks/useUpdateRig";
@@ -49,7 +60,9 @@ import { useUpdateStashLayout } from "feature/arsenal/hooks/useUpdateStashLayout
 import type { BoardPiece } from "feature/arsenal/utils/boardPieces";
 import {
   componentPieces,
+  extractorPieces,
   guitarPiece,
+  imprintPieces,
   modPieces,
   partPieces,
   pedalPiece,
@@ -107,6 +120,7 @@ import {
   Layers,
   Merge,
   Store,
+  Syringe,
   Trash2,
   Unplug,
   Wrench,
@@ -125,6 +139,8 @@ import type {
   PartTier,
   RigSetup,
   SalvagedMod,
+  TraitExtractor,
+  TraitImprint,
 } from "../../types/arsenal.types";
 import { DEFAULT_RIG } from "../../types/arsenal.types";
 import type { CardMergeAction } from "../CardActions";
@@ -136,6 +152,10 @@ import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { SellConfirmDialog } from "../GuitarInventory/SellConfirmDialog";
 import { ListItemDialog } from "../Marketplace/ListItemDialog";
 import { ScrapConfirmDialog } from "../Parts/ScrapConfirmDialog";
+import { ExtractTraitDialog } from "../Traits/ExtractTraitDialog";
+import { InsertTraitDialog } from "../Traits/InsertTraitDialog";
+import { TraitItemCard } from "../Traits/TraitItemCard";
+import { UseExtractorDialog } from "../Traits/UseExtractorDialog";
 import { useBenchDialogStore } from "../Workshop/benchDialogStore";
 import { BoardPieceTile } from "./BoardPieceTile";
 import { CollectionEmptyResult } from "./CollectionEmptyResult";
@@ -163,6 +183,14 @@ type ResalePending =
   | { kind: "mod"; mod: SalvagedMod }
   | { kind: "component"; component: OwnedComponent }
   | { kind: "part"; partId: PartId; tier: PartTier; qty: number }
+  | { kind: "imprint"; imprint: TraitImprint }
+  | { kind: "extractor"; extractor: TraitExtractor }
+  | null;
+
+/** A Trait Imprint or the player's extractors, opened or on the way to the market. */
+type TraitItemPending =
+  | { kind: "imprint"; imprint: TraitImprint }
+  | { kind: "extractor"; extractor: TraitExtractor }
   | null;
 
 interface StashInventoryProps {
@@ -264,13 +292,22 @@ export const StashInventory = ({
       name: getComponent(component.defId)?.name ?? t("stash.part"),
       level: component.level,
     });
+  /** A trait imprint by its translated trait name. */
+  const imprintTitle = (imprint: TraitImprint) => {
+    const [trait] = getItemTraits({ traits: [imprintAsTrait(imprint)] });
+    return trait ? labels.traitLabel(trait) : imprint.traitId;
+  };
   /** What a piece is called on screen; `piece.name` stays English for search. */
   const pieceTitle = (piece: BoardPiece) =>
     piece.kind === "part"
       ? labels.partName(piece.part.tier, piece.part.partId)
       : piece.kind === "mod"
         ? modName(piece.mod)
-        : piece.name;
+        : piece.kind === "imprint"
+          ? `${t("trait_craft.imprint_name")}: ${imprintTitle(piece.imprint)}`
+          : piece.kind === "extractor"
+            ? t("trait_craft.extractor_name")
+            : piece.name;
 
   const rig: RigSetup = data.rig ?? DEFAULT_RIG;
   // Stable identity: the pieces and the arrangement are both memoised on it.
@@ -281,6 +318,14 @@ export const StashInventory = ({
   const salvagedMods = useMemo(
     () => data.salvagedMods ?? [],
     [data.salvagedMods],
+  );
+  const traitImprints = useMemo(
+    () => data.traitImprints ?? [],
+    [data.traitImprints],
+  );
+  const traitExtractors = useMemo(
+    () => data.traitExtractors ?? [],
+    [data.traitExtractors],
   );
   // Memoised because "what is in use" is now an ordering input, not just a flag
   // on a card: it feeds the pieces of the whole board.
@@ -332,6 +377,29 @@ export const StashInventory = ({
   );
   const { mutate: sellComponent, isPending: isSellingComponent } =
     useSellComponent();
+  const { mutate: sellTraitItem, isPending: isSellingTraitItem } =
+    useSellTraitItem();
+  const { mutate: extractTraitJob, isPending: isExtracting } =
+    useExtractTrait();
+  const { mutate: insertTraitJob, isPending: isInserting } = useInsertTrait();
+  /** An imprint or the extractor stack the player tapped. */
+  const [traitDetail, setTraitDetail] = useState<TraitItemPending>(null);
+  /** An imprint or an extractor on its way to the market. */
+  const [listTrait, setListTrait] = useState<TraitItemPending>(null);
+  /** The instrument a trait is about to be pulled out of. */
+  const [extractFrom, setExtractFrom] = useState<{
+    kind: Kind;
+    itemId: string;
+    name: string;
+  } | null>(null);
+  /** The extractor's own picker: every trait it could pull out, on one screen. */
+  const [usingExtractor, setUsingExtractor] = useState(false);
+  /** "itemId:traitId" of the trait coming out right now. */
+  const [extractingKey, setExtractingKey] = useState<string | null>(null);
+  /** The imprint whose destination the player is choosing. */
+  const [insertImprint, setInsertImprint] = useState<TraitImprint | null>(
+    null,
+  );
   /** The socket that was right-clicked, and where the menu should hang. */
   const [menu, setMenu] = useState<{
     piece: BoardPiece;
@@ -511,7 +579,14 @@ export const StashInventory = ({
       if (shelfId === "parts") {
         const parts = partPieces(data.parts ?? []).filter(keep);
         const mods = modPieces(salvagedMods).filter(keep);
-        return byHand ? [...parts, ...mods] : [...mods, ...parts];
+        // Trait items lead: they are rarer than either.
+        const traitItems = [
+          ...extractorPieces(traitExtractors),
+          ...imprintPieces(traitImprints),
+        ].filter(keep);
+        return byHand
+          ? [...parts, ...mods, ...traitItems]
+          : [...traitItems, ...mods, ...parts];
       }
 
       // Guitar Builder parts are owned copies like mods — one socket each,
@@ -550,6 +625,8 @@ export const StashInventory = ({
       inUseGuitarIds,
       pedalboardItemIds,
       salvagedMods,
+      traitImprints,
+      traitExtractors,
     ],
   );
 
@@ -659,6 +736,12 @@ export const StashInventory = ({
       setDetail({ kind: piece.kind, itemId: piece.id });
     } else if (piece.kind === "mod") {
       setModDetail(piece.mod);
+    } else if (piece.kind === "imprint") {
+      // A tap goes straight to what an imprint is for: choosing where it goes.
+      setInsertImprint(piece.imprint);
+    } else if (piece.kind === "extractor") {
+      // …and an extractor straight to the traits it can pull out.
+      setUsingExtractor(true);
     } else if (piece.kind === "component") {
       // A Builder part has no sheet, and jumping tabs on a tap read as "you
       // can't do anything with this". Its menu says what can be done instead.
@@ -779,6 +862,31 @@ export const StashInventory = ({
    * rather than vanishing — "why can this not be scrapped" is a question the
    * menu should answer, and a missing row answers nothing.
    */
+  /** "Extract trait…" for an instrument that carries one — locked without an extractor. */
+  const extractEntry = (
+    kind: Kind,
+    itemId: string,
+    name: string,
+    traitCount: number,
+  ): StashMenuItem[] =>
+    traitCount > 0
+      ? [
+          {
+            id: "extract",
+            label: t("trait_craft.menu_extract", {
+              count: traitExtractors.length,
+            }),
+            icon: Syringe,
+            disabled: traitExtractors.length === 0 || isExtracting,
+            reason:
+              traitExtractors.length === 0
+                ? t("trait_craft.need_extractor")
+                : undefined,
+            onSelect: () => setExtractFrom({ kind, itemId, name }),
+          },
+        ]
+      : [];
+
   const menuItemsFor = (piece: BoardPiece): StashMenuItem[] => {
     if (piece.kind === "guitar") {
       const equipped = data.equippedItemId === piece.id;
@@ -810,6 +918,7 @@ export const StashInventory = ({
           icon: Hammer,
           onSelect: () => openBench(piece.id),
         },
+        ...extractEntry("guitar", piece.id, piece.name, piece.item.traits?.length ?? 0),
         {
           id: "equip",
           label: t("stash.menu.equip"),
@@ -912,6 +1021,7 @@ export const StashInventory = ({
           icon: Hammer,
           onSelect: () => openBench(piece.id),
         },
+        ...extractEntry("effect", piece.id, piece.name, piece.item.traits?.length ?? 0),
         ...(onBoard
           ? [
               {
@@ -1017,6 +1127,75 @@ export const StashInventory = ({
         },
       ];
     }
+
+    if (piece.kind === "imprint")
+      return [
+        {
+          id: "insert",
+          label: t("trait_craft.insert_into"),
+          icon: Syringe,
+          onSelect: () => setInsertImprint(piece.imprint),
+        },
+        {
+          id: "details",
+          label: t("stash.menu.details"),
+          icon: Info,
+          onSelect: () =>
+            setTraitDetail({ kind: "imprint", imprint: piece.imprint }),
+        },
+        {
+          id: "list",
+          label: t("stash.menu.market"),
+          icon: Store,
+          disabled: isListing,
+          onSelect: () =>
+            setListTrait({ kind: "imprint", imprint: piece.imprint }),
+        },
+        {
+          id: "sell",
+          label: t("stash.menu.sell_for", {
+            fame: getImprintResaleValue(piece.imprint),
+          }),
+          icon: Trash2,
+          danger: true,
+          disabled: isSellingTraitItem,
+          onSelect: () => setResale({ kind: "imprint", imprint: piece.imprint }),
+        },
+      ];
+
+    if (piece.kind === "extractor")
+      return [
+        {
+          id: "use",
+          label: t("trait_craft.use"),
+          icon: Syringe,
+          onSelect: () => setUsingExtractor(true),
+        },
+        {
+          id: "details",
+          label: t("stash.menu.details"),
+          icon: Info,
+          onSelect: () =>
+            setTraitDetail({ kind: "extractor", extractor: piece.extractors[0] }),
+        },
+        {
+          id: "list",
+          label: t("stash.menu.market"),
+          icon: Store,
+          disabled: isListing,
+          onSelect: () =>
+            setListTrait({ kind: "extractor", extractor: piece.extractors[0] }),
+        },
+        {
+          id: "sell",
+          label: t("stash.menu.sell_for", { fame: EXTRACTOR_RESALE_FAME }),
+          icon: Trash2,
+          danger: true,
+          disabled: isSellingTraitItem,
+          onSelect: () =>
+            setResale({ kind: "extractor", extractor: piece.extractors[0] }),
+        },
+      ];
 
     if (piece.kind === "component")
       return [
@@ -1366,14 +1545,22 @@ export const StashInventory = ({
               ? "Mod"
               : resale.kind === "component"
                 ? "Part"
-                : "Parts"
+                : resale.kind === "imprint"
+                  ? "Imprint"
+                  : resale.kind === "extractor"
+                    ? "Extractor"
+                    : "Parts"
           }
           itemName={
             resale.kind === "mod"
               ? `${modName(resale.mod)} +${resale.mod.points}`
               : resale.kind === "component"
                 ? componentName(resale.component)
-                : `${labels.partName(resale.tier, resale.partId)} ×${resale.qty}`
+                : resale.kind === "imprint"
+                  ? `${t("trait_craft.imprint_name")}: ${imprintTitle(resale.imprint)}`
+                  : resale.kind === "extractor"
+                    ? t("trait_craft.extractor_name")
+                    : `${labels.partName(resale.tier, resale.partId)} ×${resale.qty}`
           }
           fameReward={
             resale.kind === "mod"
@@ -1384,7 +1571,11 @@ export const StashInventory = ({
                 )
               : resale.kind === "component"
                 ? getComponentResaleValue(resale.component)
-                : getPartResaleValue(resale.partId, resale.tier, resale.qty)
+                : resale.kind === "imprint"
+                  ? getImprintResaleValue(resale.imprint)
+                  : resale.kind === "extractor"
+                    ? EXTRACTOR_RESALE_FAME
+                    : getPartResaleValue(resale.partId, resale.tier, resale.qty)
           }
           onConfirm={() => {
             if (resale.kind === "component") {
@@ -1397,13 +1588,31 @@ export const StashInventory = ({
               sellMod(resale.mod.id, { onSuccess: () => setResale(null) });
               return;
             }
+            if (resale.kind === "imprint" || resale.kind === "extractor") {
+              sellTraitItem(
+                {
+                  itemType: resale.kind,
+                  id:
+                    resale.kind === "imprint"
+                      ? resale.imprint.id
+                      : resale.extractor.id,
+                },
+                { onSuccess: () => setResale(null) },
+              );
+              return;
+            }
             sellPart(
               { partId: resale.partId, tier: resale.tier, qty: resale.qty },
               { onSuccess: () => setResale(null) },
             );
           }}
           onCancel={() => setResale(null)}
-          isLoading={isSellingMod || isSellingPart || isSellingComponent}
+          isLoading={
+            isSellingMod ||
+            isSellingPart ||
+            isSellingComponent ||
+            isSellingTraitItem
+          }
         />
       )}
 
@@ -1432,6 +1641,168 @@ export const StashInventory = ({
           }
           onCancel={() => setListComponent(null)}
           isLoading={isListing}
+        />
+      )}
+
+      {/* Trait items explain themselves here, the way a rescued mod does. */}
+      <StashItemDialog
+        isOpen={traitDetail !== null}
+        onClose={() => setTraitDetail(null)}
+        title={
+          traitDetail?.kind === "imprint"
+            ? t("trait_craft.imprint_name")
+            : t("trait_craft.extractor_name")
+        }>
+        {traitDetail && (
+          <TraitItemCard
+            item={
+              traitDetail.kind === "imprint"
+                ? traitDetail
+                : {
+                    kind: "extractor",
+                    extractor: traitDetail.extractor,
+                    owned: traitExtractors.length,
+                  }
+            }
+            onInsertClick={
+              traitDetail.kind === "imprint"
+                ? () => {
+                    setTraitDetail(null);
+                    setInsertImprint(traitDetail.imprint);
+                  }
+                : undefined
+            }
+            onUseClick={
+              traitDetail.kind === "extractor"
+                ? () => {
+                    setTraitDetail(null);
+                    setUsingExtractor(true);
+                  }
+                : undefined
+            }
+            onListClick={() => {
+              setTraitDetail(null);
+              setListTrait(traitDetail);
+            }}
+            isListing={isListing}
+            onSellClick={() => {
+              setTraitDetail(null);
+              setResale(traitDetail);
+            }}
+            isSelling={isSellingTraitItem}
+          />
+        )}
+      </StashItemDialog>
+
+      {listTrait && (
+        <ListItemDialog
+          isOpen
+          itemType={listTrait.kind === "imprint" ? "Imprint" : "Extractor"}
+          itemName={
+            listTrait.kind === "imprint"
+              ? `${imprintTitle(listTrait.imprint)} +${listTrait.imprint.value}`
+              : t("trait_craft.extractor_name")
+          }
+          minPrice={
+            listTrait.kind === "imprint"
+              ? getImprintResaleValue(listTrait.imprint)
+              : EXTRACTOR_RESALE_FAME
+          }
+          currentFame={currentFame}
+          onConfirm={(price) =>
+            listOnMarket(
+              {
+                itemType: listTrait.kind,
+                inventoryItemId:
+                  listTrait.kind === "imprint"
+                    ? listTrait.imprint.id
+                    : listTrait.extractor.id,
+                price,
+              },
+              { onSuccess: () => setListTrait(null) },
+            )
+          }
+          onCancel={() => setListTrait(null)}
+          isLoading={isListing}
+        />
+      )}
+
+      {extractFrom &&
+        (() => {
+          const item =
+            extractFrom.kind === "guitar"
+              ? data.inventory.find((entry) => entry.id === extractFrom.itemId)
+              : effectInventory.find((entry) => entry.id === extractFrom.itemId);
+          if (!item) return null;
+          return (
+            <ExtractTraitDialog
+              isOpen
+              itemName={extractFrom.name}
+              traits={getItemTraits(item)}
+              extractors={traitExtractors.length}
+              onConfirm={(traitId) =>
+                extractTraitJob(
+                  { itemId: extractFrom.itemId, kind: extractFrom.kind, traitId },
+                  {
+                    onSuccess: (result) => {
+                      setExtractFrom(null);
+                      setTraitDetail({ kind: "imprint", imprint: result.imprint });
+                    },
+                  },
+                )
+              }
+              onCancel={() => setExtractFrom(null)}
+              isLoading={isExtracting}
+            />
+          );
+        })()}
+
+      {usingExtractor && (
+        <UseExtractorDialog
+          isOpen
+          inventory={data.inventory}
+          effectInventory={effectInventory}
+          extractors={traitExtractors.length}
+          pendingTraitKey={extractingKey}
+          onExtract={(input) => {
+            setExtractingKey(`${input.itemId}:${input.traitId}`);
+            extractTraitJob(input, {
+              onSuccess: (result) => {
+                setUsingExtractor(false);
+                // Straight on to where the new imprint can go.
+                setInsertImprint(result.imprint);
+              },
+              onSettled: () => setExtractingKey(null),
+            });
+          }}
+          onCancel={() => setUsingExtractor(false)}
+        />
+      )}
+
+      {insertImprint && (
+        <InsertTraitDialog
+          isOpen
+          imprint={insertImprint}
+          inventory={data.inventory}
+          effectInventory={effectInventory}
+          fame={currentFame}
+          onConfirm={(target) =>
+            insertTraitJob(
+              {
+                imprintId: insertImprint.id,
+                itemId: target.itemId,
+                kind: target.kind,
+              },
+              {
+                onSuccess: () => {
+                  setInsertImprint(null);
+                  setDetail({ kind: target.kind, itemId: target.itemId });
+                },
+              },
+            )
+          }
+          onCancel={() => setInsertImprint(null)}
+          isLoading={isInserting}
         />
       )}
 

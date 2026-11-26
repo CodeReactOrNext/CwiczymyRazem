@@ -1,5 +1,6 @@
 import { Skeleton } from "assets/components/ui/skeleton";
 import { EmptyState } from "components/EmptyState/EmptyState";
+import { isGearListingType } from "feature/arsenal/types/marketplace.types";
 import {
   selectCurrentUserStats,
   selectUserAuth,
@@ -65,9 +66,9 @@ export const MarketplaceView = () => {
           // Mods are not part of the collection — every one of them would
           // otherwise wear a "new for your collection" badge forever.
           dexStatus={
-            listing.itemType === "mod" || listing.itemType === "component"
-              ? undefined
-              : dexStatusOf(listing.itemType, listing.defId)
+            isGearListingType(listing.itemType)
+              ? dexStatusOf(listing.itemType, listing.defId)
+              : undefined
           }
           currentFame={fame}
           onBuy={() => buy({ listingId: listing.id, price: listing.price })}

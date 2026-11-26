@@ -4,7 +4,7 @@ import { useTranslation } from "hooks/useTranslation";
 interface SellConfirmDialogProps {
   isOpen: boolean;
   /** What is being sold. Stash clutter — mods and loose parts — sells here too. */
-  itemType: "Guitar" | "Effect" | "Mod" | "Parts" | "Part";
+  itemType: "Guitar" | "Effect" | "Mod" | "Parts" | "Part" | "Imprint" | "Extractor";
   itemName: string;
   fameReward: number;
   onConfirm: () => void;

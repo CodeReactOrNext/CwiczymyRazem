@@ -25,17 +25,21 @@ import type {
   InventoryItem,
   SalvagedMod,
   ScrapPart,
+  TraitExtractor,
+  TraitImprint,
 } from "../../types/arsenal.types";
 import type {
   ListedComponent,
   MarketplaceListing,
 } from "../../types/marketplace.types";
+import { isGearListingType } from "../../types/marketplace.types";
 import { BuyButton } from "../BuyButton";
 import { SalvagedModCard } from "../Collection/SalvagedModCard";
 import { DexWord } from "../DexMarks";
 import { EffectCard } from "../GuitarInventory/EffectCard";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { ScrapYieldStrip } from "../Parts/ScrapYieldStrip";
+import { TraitItemCard } from "../Traits/TraitItemCard";
 import { ModArt } from "../Workshop/ModArt";
 
 interface MarketListingCardProps {
@@ -59,8 +63,8 @@ interface MarketListingCardProps {
  * a duplicate, so it belongs next to the price rather than behind a purchase.
  */
 const getListingScrapYield = (listing: MarketplaceListing): ScrapPart[] => {
-  // A mod or a Builder part is already the component — nothing to break down.
-  if (listing.itemType === "mod" || listing.itemType === "component") return [];
+  // Only gear comes apart — a mod, a Builder part or a trait item is the piece.
+  if (!isGearListingType(listing.itemType)) return [];
 
   if (listing.itemType === "guitar") {
     const item = listing.item as InventoryItem;
@@ -91,13 +95,12 @@ export const MarketListingCard = ({
   // The mod a teardown of this instance would hand over. Picked by hashing the
   // item's own id, so the buyer gets exactly the one advertised here — nothing
   // is rolled at purchase.
-  const salvaged =
-    listing.itemType === "mod" || listing.itemType === "component"
-      ? null
-      : getSalvageableMod(
-          listing.item as InventoryItem | EffectInventoryItem,
-          listing.itemType,
-        );
+  const salvaged = !isGearListingType(listing.itemType)
+    ? null
+    : getSalvageableMod(
+        listing.item as InventoryItem | EffectInventoryItem,
+        listing.itemType,
+      );
 
   // Seller + price + action, rendered inside the card's own frame so the whole
   // thing reads as one trading card instead of a floating, detached badge.
@@ -208,6 +211,24 @@ export const MarketListingCard = ({
   if (listing.itemType === "mod") {
     return (
       <SalvagedModCard mod={listing.item as SalvagedMod} footer={footer} />
+    );
+  }
+
+  if (listing.itemType === "imprint") {
+    return (
+      <TraitItemCard
+        item={{ kind: "imprint", imprint: listing.item as TraitImprint }}
+        footer={footer}
+      />
+    );
+  }
+
+  if (listing.itemType === "extractor") {
+    return (
+      <TraitItemCard
+        item={{ kind: "extractor", extractor: listing.item as TraitExtractor }}
+        footer={footer}
+      />
     );
   }
 

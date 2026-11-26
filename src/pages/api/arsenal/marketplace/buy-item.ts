@@ -70,7 +70,17 @@ export default async function handler(
         "statistics.fame": buyerFame - price,
       };
 
-      if (itemType === "component") {
+      if (itemType === "imprint" || itemType === "extractor") {
+        // Re-keyed like a mod: a listing id cannot repeat, a stash id might.
+        const stashKey =
+          itemType === "imprint" ? "traitImprints" : "traitExtractors";
+        transferredItem =
+          itemType === "imprint"
+            ? { ...listing.item, id: `market:${listingId}` }
+            : { ...listing.item, id: `market:${listingId}`, acquiredAt: Date.now() };
+        const stash: any[] = buyerData.arsenal?.[stashKey] || [];
+        buyerUpdate[`arsenal.${stashKey}`] = [...stash, transferredItem];
+      } else if (itemType === "component") {
         // Re-keyed like a mod: the seller's uid only had to be unique in
         // their stash. The escrow `id` is dropped — stashed parts key on uid.
         const { id: _escrowId, ...part } = listing.item;
@@ -171,8 +181,12 @@ export default async function handler(
 
     // Public activity log (panel only) — mirrors the listing log so purchases are visible
     // in the feed and can be motivated like any other activity. Builder parts
-    // are left out, as they are from the listing log.
-    if (result.itemType !== "component") try {
+    // and trait items are left out, as they are from the listing log.
+    if (
+      result.itemType === "guitar" ||
+      result.itemType === "effect" ||
+      result.itemType === "mod"
+    ) try {
       await firestore.collection("logs").add({
         type: "marketplace_purchase",
         uid: buyerId,
