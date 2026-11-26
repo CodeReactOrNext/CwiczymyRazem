@@ -10,6 +10,8 @@ import { ExerciseSuccessView } from "feature/exercisePlan/views/PracticeSession/
 import { TurnedScreen } from "feature/exercisePlan/views/PracticeSession/components/TurnedScreen";
 import type { RunNote } from "feature/exercisePlan/views/PracticeSession/utils/timingGrade";
 import type { ExerciseRankNeighbors } from "feature/leadboard/services/getExerciseRankNeighbors";
+import { pickTargetsKey } from "feature/picks/hooks/usePickTargets";
+import type { PickTargetsResponse } from "feature/picks/picks.rules";
 import { restoreUserSnapshot } from "feature/user/store/userSlice";
 import type { UserSnapshot } from "feature/user/store/userSnapshot";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
@@ -182,6 +184,19 @@ const NOTE_LOG: RunNote[] = Array.from({ length: 64 }, (_, i) => {
 
 const TIMELINE = NOTE_LOG.map((note) => (note.hit ? ("hit" as const) : ("miss" as const)));
 
+/** Players the "Toss a pick" step offers. Tossing works here without a server (see picks.service). */
+const PICK_TARGETS: PickTargetsResponse = {
+  picksLeft: 5,
+  perDay: 5,
+  targets: [
+    { logId: "pick-1", uid: "p1", userName: "Mira", avatarUrl: null, minutes: 32, title: "Blues in A", motivations: 0, fame: 32, timestamp: new Date().toISOString() },
+    { logId: "pick-2", uid: "p2", userName: "Tomek", avatarUrl: null, minutes: 18, title: "Spider Walk", motivations: 0, fame: 18, timestamp: new Date().toISOString() },
+    { logId: "pick-3", uid: "p3", userName: "Ana", avatarUrl: null, minutes: 20, title: "Chord Changes", motivations: 1, fame: 20, timestamp: new Date().toISOString() },
+    { logId: "pick-4", uid: "p4", userName: "Cookie", avatarUrl: null, minutes: 25, title: "Fretboard Mastery", motivations: 2, fame: 25, timestamp: new Date().toISOString() },
+    { logId: "pick-5", uid: "p5", userName: "Olek", avatarUrl: null, minutes: 12, title: null, motivations: 3, fame: 12, timestamp: new Date().toISOString() },
+  ],
+};
+
 const seededClient = (runs: ScoredRun[]) => {
   const client = new QueryClient({
     defaultOptions: { queries: { staleTime: Infinity, retry: false } },
@@ -191,6 +206,7 @@ const seededClient = (runs: ScoredRun[]) => {
     runs.map((run) => ({ run, neighbors: STANDING })),
   );
   client.setQueryData(exerciseRunsKey(UID, EXERCISE_ID), RUN_HISTORY);
+  client.setQueryData(pickTargetsKey(UID), PICK_TARGETS, { updatedAt: Date.now() + 365 * 24 * 60 * 60 * 1000 });
   return client;
 };
 

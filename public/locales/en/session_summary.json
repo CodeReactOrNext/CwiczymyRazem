@@ -72,5 +72,27 @@
     "title": "Session complete!",
     "days": "{{days}} days",
     "streak_milestone": "{{days}} days in a row!"
+  },
+  "picks": {
+    "title": "Toss a pick",
+    "subtitle": "These players practiced in the last day. A pick is a Motivate: they get the Fame.",
+    "pocket_aria": "Picks left today: {{count}}",
+    "left_one": "{{count}} pick left today",
+    "left_other": "{{count}} picks left today",
+    "left": "{{count}} picks left today",
+    "out": "No picks left today. New ones tomorrow.",
+    "all_out": "All your picks are out. New ones tomorrow.",
+    "toss": "Toss",
+    "caught": "Caught",
+    "caught_fame": "Caught it: +{{fame}} Fame for them",
+    "already": "You already motivated this one",
+    "no_motivations": "Nobody has motivated this yet",
+    "motivations_one": "{{count}} motivation so far",
+    "motivations_other": "{{count}} motivations so far",
+    "motivations": "{{count}} motivations so far",
+    "minutes": "{{minutes}} min",
+    "more": "Show others",
+    "error": "The pick didn't land. Try again.",
+    "daily_limit": "No picks left today."
   }
 }

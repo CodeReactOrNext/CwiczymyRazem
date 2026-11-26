@@ -19,6 +19,7 @@ import {
   notificationHref,
   placeSuffix,
 } from "feature/notifications/services/notification.service";
+import { PickIcon } from "feature/picks/components/PickIcon";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { useDateFnsLocale } from "lib/i18n/dateLocale";
@@ -112,6 +113,20 @@ const typeConfig = {
       ) : (
         t("bell.reaction")
       ),
+  },
+  pick: {
+    icon: <PickIcon className='h-3 w-3' />,
+    tone: "amber",
+    label: (n: any, t: Translate) => (
+      <span className='inline-flex items-center gap-1'>
+        {t("bell.pick", { fame: n.fameAwarded ?? 0 })}
+        <img
+          src='/images/tokens/coin.png'
+          alt='coin'
+          className='h-3 w-3 object-contain'
+        />
+      </span>
+    ),
   },
   live_motivate: {
     icon: <img src='/images/tokens/coin.png' alt='' className='object-contain' />,

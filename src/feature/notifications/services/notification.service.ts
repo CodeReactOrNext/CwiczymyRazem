@@ -18,6 +18,7 @@ type NotificationType =
   | "comment"
   | "reaction"
   | "live_motivate"
+  | "pick"
   | "season_reward"
   | "season_start"
   | "marketplace_sold"
@@ -111,8 +112,8 @@ export const placeSuffix = (place: number) => {
 export const notificationHref = (n: AppNotification): string | null => {
   if ((n.type === "like" || n.type === "comment") && n.recordingId)
     return `/recordings?recordingId=${n.recordingId}`;
-  // Reactions stay unlinked: they store the practice-log id in `recordingId`, not a recording,
-  // so they must never be routed like one.
+  // Reactions and picks stay unlinked: they store the practice-log id in `recordingId`, not a
+  // recording, so they must never be routed like one.
   if (n.type === "marketplace_sold") return "/arsenal?tab=market";
   if (
     (n.type === "playlist_saved" || n.type === "playlist_liked") &&
@@ -164,6 +165,11 @@ export const notificationText = (
         // Reactions recorded before the amount was stored can't report one, so they stay silent
         // about it rather than quoting a number that was never actually awarded.
         body: `${sender}motivated you${n.fameAwarded ? ` and gave you +${n.fameAwarded}` : ""}`,
+      };
+    case "pick":
+      return {
+        title: "You caught a pick!",
+        body: `${sender}tossed you a pick and gave you +${n.fameAwarded ?? 0}`,
       };
     case "live_motivate":
       return {

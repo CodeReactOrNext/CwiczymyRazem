@@ -72,5 +72,27 @@
     "title": "Session abgeschlossen!",
     "days": "{{days}} Tage",
     "streak_milestone": "{{days}} Tage am Stück!"
+  },
+  "picks": {
+    "title": "Wirf ein Plektrum",
+    "subtitle": "Diese Spieler haben in den letzten 24 Stunden geübt. Ein Plektrum ist ein Motivate: Sie bekommen den Fame.",
+    "pocket_aria": "Plektren übrig heute: {{count}}",
+    "left_one": "Heute noch {{count}} Plektrum",
+    "left_other": "Heute noch {{count}} Plektren",
+    "left": "Heute noch {{count}} Plektren",
+    "out": "Für heute keine Plektren mehr. Morgen gibt es neue.",
+    "all_out": "Alle Plektren geworfen. Morgen gibt es neue.",
+    "toss": "Werfen",
+    "caught": "Gefangen",
+    "caught_fame": "Gefangen: +{{fame}} Fame für sie",
+    "already": "Das hast du schon motiviert",
+    "no_motivations": "Noch niemand hat das motiviert",
+    "motivations_one": "Bisher {{count}} Motivation",
+    "motivations_other": "Bisher {{count}} Motivationen",
+    "motivations": "Bisher {{count}} Motivationen",
+    "minutes": "{{minutes}} Min.",
+    "more": "Andere zeigen",
+    "error": "Das Plektrum ist nicht angekommen. Versuch es noch mal.",
+    "daily_limit": "Für heute keine Plektren mehr."
   }
 }

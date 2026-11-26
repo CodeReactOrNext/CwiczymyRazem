@@ -72,5 +72,27 @@
     "title": "¡Sesión completada!",
     "days": "{{days}} días",
     "streak_milestone": "¡{{days}} días seguidos!"
+  },
+  "picks": {
+    "title": "Lanza una púa",
+    "subtitle": "Estos jugadores practicaron en las últimas 24 horas. Una púa es un Motivate: ellos reciben la Fame.",
+    "pocket_aria": "Púas que te quedan hoy: {{count}}",
+    "left_one": "Te queda {{count}} púa hoy",
+    "left_other": "Te quedan {{count}} púas hoy",
+    "left": "Te quedan {{count}} púas hoy",
+    "out": "No te quedan púas hoy. Mañana tendrás nuevas.",
+    "all_out": "Has lanzado todas tus púas. Mañana tendrás nuevas.",
+    "toss": "Lanzar",
+    "caught": "Atrapada",
+    "caught_fame": "Atrapada: +{{fame}} Fame para esa persona",
+    "already": "Ya motivaste esta actividad",
+    "no_motivations": "Nadie lo ha motivado todavía",
+    "motivations_one": "{{count}} motivación hasta ahora",
+    "motivations_other": "{{count}} motivaciones hasta ahora",
+    "motivations": "{{count}} motivaciones hasta ahora",
+    "minutes": "{{minutes}} min",
+    "more": "Ver otros",
+    "error": "La púa no llegó. Inténtalo de nuevo.",
+    "daily_limit": "No te quedan púas hoy."
   }
 }

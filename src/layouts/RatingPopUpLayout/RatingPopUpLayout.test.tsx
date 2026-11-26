@@ -8,7 +8,10 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vite
 
 import RatingPopUpLayout from "./RatingPopUpLayout";
 
-const { claimLevels } = vi.hoisted(() => ({ claimLevels: vi.fn(() => null) }));
+const { claimLevels, pickTargets } = vi.hoisted(() => ({
+  claimLevels: vi.fn(() => null),
+  pickTargets: vi.fn((): { data?: unknown } => ({ data: undefined })),
+}));
 
 vi.mock("hooks/useRewardLedger", () => ({ useAutoClaimLevels: claimLevels }));
 vi.mock("feature/progression/components/NextUpCard", () => ({
@@ -23,6 +26,8 @@ vi.mock("./components/SessionCelebration", () => ({ SessionCelebration: () => <p
 vi.mock("./components/SessionLeaderboardCard", () => ({ SessionLeaderboardCard: () => <p>standings</p> }));
 vi.mock("./components/RecentRunsCard", () => ({ RecentRunsCard: () => <p>chart</p> }));
 vi.mock("lib/uiSounds/uiSounds", () => ({ playUiSound: vi.fn() }));
+vi.mock("feature/picks/hooks/usePickTargets", () => ({ usePickTargets: pickTargets }));
+vi.mock("feature/picks/components/PickTossStep", () => ({ PickTossStep: () => <p>toss a pick</p> }));
 
 const REPORT: ReportDataInterface = {
   reportDate: new Date("2026-11-24T10:00:00Z"),
@@ -51,7 +56,10 @@ describe("RatingPopUpLayout", () => {
   beforeAll(() => {
     Element.prototype.scrollIntoView = vi.fn();
   });
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    pickTargets.mockReturnValue({ data: undefined });
+  });
   afterEach(cleanup);
 
   it("walks a scored session through its result, the exercise with its chart, and what comes next", async () => {
@@ -70,6 +78,26 @@ describe("RatingPopUpLayout", () => {
     fireEvent.click(await key("Done"));
     await waitFor(() => expect(onClick).toHaveBeenCalledWith(false));
     expect(saveReportNote).not.toHaveBeenCalled();
+  });
+
+  it("offers picks between the exercise and what comes next, while there are picks and players", async () => {
+    pickTargets.mockReturnValue({ data: { picksLeft: 3, perDay: 5, targets: [{ logId: "l1" }] } });
+    show({ scoredRuns: [run] });
+
+    fireEvent.click(await key("Continue"));
+    expect(await screen.findByText("standings")).toBeTruthy();
+    fireEvent.click(await key("Continue"));
+    expect(await screen.findByText("toss a pick")).toBeTruthy();
+    fireEvent.click(await key("Continue"));
+    expect(await screen.findByText("the next reward")).toBeTruthy();
+  });
+
+  it("leaves the picks out when none are left today", async () => {
+    pickTargets.mockReturnValue({ data: { picksLeft: 0, perDay: 5, targets: [{ logId: "l1" }] } });
+    show();
+    fireEvent.click(await key("Continue"));
+    expect(await screen.findByText("the next reward")).toBeTruthy();
+    expect(screen.queryByText("toss a pick")).toBeNull();
   });
 
   it("takes a session with no scored exercise straight to what comes next", async () => {

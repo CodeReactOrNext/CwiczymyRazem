@@ -72,5 +72,31 @@
     "title": "Sesja ukończona!",
     "days": "{{days}} dni",
     "streak_milestone": "{{days}} dni z rzędu!"
+  },
+  "picks": {
+    "title": "Rzuć kostkę",
+    "subtitle": "Ci gracze ćwiczyli w ciągu ostatniej doby. Kostka to Motivate: Fame trafia do nich.",
+    "pocket_aria": "Kostki na dziś: {{count}}",
+    "left_one": "Została {{count}} kostka na dziś",
+    "left_few": "Zostały {{count}} kostki na dziś",
+    "left_many": "Zostało {{count}} kostek na dziś",
+    "left_other": "Zostało {{count}} kostek na dziś",
+    "left": "Kostki na dziś: {{count}}",
+    "out": "Na dziś koniec kostek. Jutro dostaniesz nowe.",
+    "all_out": "Wszystkie kostki rzucone. Jutro dostaniesz nowe.",
+    "toss": "Rzuć",
+    "caught": "Złapane",
+    "caught_fame": "Złapane: +{{fame}} Fame dla tej osoby",
+    "already": "Ta aktywność ma już twoją motywację",
+    "no_motivations": "Nikt jeszcze tego nie zmotywował",
+    "motivations_one": "{{count}} motywacja do tej pory",
+    "motivations_few": "{{count}} motywacje do tej pory",
+    "motivations_many": "{{count}} motywacji do tej pory",
+    "motivations_other": "{{count}} motywacji do tej pory",
+    "motivations": "Motywacje: {{count}}",
+    "minutes": "{{minutes}} min",
+    "more": "Pokaż innych",
+    "error": "Kostka nie doleciała. Spróbuj jeszcze raz.",
+    "daily_limit": "Na dziś nie masz już kostek."
   }
 }

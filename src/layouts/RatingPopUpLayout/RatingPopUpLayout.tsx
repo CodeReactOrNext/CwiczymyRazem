@@ -11,6 +11,8 @@ import type { AchievementList } from "feature/achievements";
 import { AchievementCard, useAchievementContext } from "feature/achievements";
 import type { ScoredRun } from "feature/exercisePlan/types/exercise.types";
 import { LiveFameSummary } from "feature/liveMotivate/components/LiveFameSummary";
+import { PickTossStep } from "feature/picks/components/PickTossStep";
+import { usePickTargets } from "feature/picks/hooks/usePickTargets";
 import { NextReward, PaidLevels, useHasNextReward } from "feature/progression/components/NextUpCard";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -41,9 +43,9 @@ import { useRatingPopUp } from "./hooks/useRatingPopUp";
 import { buildFameBreakdown, buildPointsBreakdown } from "./utils/rewardBreakdown";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Post-session summary: one thing on the screen at a time, in at most three
-// steps — what the session came to, how the exercise went (only where one was
-// scored), and what comes next. Where the numbers came from stands under them.
+// Post-session summary: one thing on the screen at a time — what the session
+// came to, how the exercise went (only where one was scored), picks to toss at
+// other players (only while there are picks and players), and what comes next. Where the numbers came from stands under them.
 // Styleguide: colour = meaning — cyan points and level, amber Fame and rewards,
 // orange streak.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -62,7 +64,7 @@ type ActivityDay = {
   creativityTime: number;
 };
 
-type SummaryStep = "result" | "exercise" | "next";
+type SummaryStep = "result" | "exercise" | "picks" | "next";
 
 type CatKey = "technique" | "theory" | "hearing" | "creativity";
 
@@ -196,10 +198,19 @@ const RatingPopUpLayout = ({
     </Card>
   );
 
+  // Picks are fetched while the celebration plays. Whether the step is there is
+  // settled when the player leaves the first step, so a late answer cannot slip
+  // a step in ahead of the one they are on.
+  const { data: pickData } = usePickTargets();
+  const picksAvailable = !examFailed && !!pickData && pickData.picksLeft > 0 && pickData.targets.length > 0;
+  const [picksLocked, setPicksLocked] = useState<boolean | null>(null);
+  const showPicks = picksLocked ?? picksAvailable;
+
   // ── Steps ──
   const steps: SummaryStep[] = [
     "result",
     ...(scoredRuns.length > 0 ? ["exercise" as const] : []),
+    ...(showPicks ? ["picks" as const] : []),
     ...(hasNextReward || noteCard ? ["next" as const] : []),
   ];
   const [stepIndex, setStepIndex] = useState(0);
@@ -208,6 +219,7 @@ const RatingPopUpLayout = ({
   const [isLeaving, setIsLeaving] = useState(false);
 
   const handleNext = async () => {
+    if (stepIndex === 0 && picksLocked === null) setPicksLocked(picksAvailable);
     if (!isLastStep) {
       setStepIndex(stepIndex + 1);
       topRef.current?.scrollIntoView({ block: "start" });
@@ -478,6 +490,8 @@ const RatingPopUpLayout = ({
 
                     {newAchievements.length > 0 && <Achievements achievements={newAchievements} />}
                   </>
+                ) : step === "picks" && pickData ? (
+                  <PickTossStep targets={pickData.targets} picksLeft={pickData.picksLeft} perDay={pickData.perDay} />
                 ) : step === "exercise" ? (
                   /* Where the run stands, and how the last ones went. Either can
                      have nothing to show, and the other then takes the row. */

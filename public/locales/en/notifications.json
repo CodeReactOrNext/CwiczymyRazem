@@ -19,6 +19,7 @@
     "reaction": "motivated you",
     "reaction_fame": "motivated you and gave you +{{fame}}",
     "live_motivate": "motivated you while you played and gave you +{{fame}}",
+    "pick": "tossed you a pick: +{{fame}}",
     "ordinal": "{{place}}{{suffix}}",
     "season_reward": "You earned {{fame}} fame for {{place}} place!",
     "season_start": "A new season has started!",

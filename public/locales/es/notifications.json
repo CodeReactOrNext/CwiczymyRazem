@@ -19,6 +19,7 @@
     "reaction": "te motivó",
     "reaction_fame": "te motivó y te dio +{{fame}}",
     "live_motivate": "te motivó mientras tocabas y te dio +{{fame}}",
+    "pick": "te lanzó una púa: +{{fame}}",
     "ordinal": "{{place}}.º",
     "season_reward": "¡Ganaste {{fame}} de fama por el {{place}} puesto!",
     "season_start": "¡Ha empezado una nueva temporada!",

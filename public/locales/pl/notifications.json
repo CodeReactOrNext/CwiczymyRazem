@@ -19,6 +19,7 @@
     "reaction": "zmotywował(a) cię",
     "reaction_fame": "zmotywował(a) cię i dał(a) ci +{{fame}}",
     "live_motivate": "zmotywował(a) cię podczas grania i dał(a) ci +{{fame}}",
+    "pick": "rzucił(a) ci kostkę: +{{fame}}",
     "ordinal": "{{place}}.",
     "season_reward": "Zdobyłeś {{fame}} fame za {{place}} miejsce!",
     "season_start": "Wystartował nowy sezon!",

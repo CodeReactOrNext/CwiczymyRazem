@@ -14,7 +14,7 @@ import { useUiSoundsStore } from "./uiSoundsStore";
  * holds a suppression via `useSuppressUiSounds`, so a cue can neither distract nor
  * leak into the microphone and get scored as a note.
  */
-export type UiSound = "reward" | "levelUp" | "sessionComplete";
+export type UiSound = "reward" | "levelUp" | "sessionComplete" | "pick";
 
 export type ChimeNote = { freq: number; at: number; length: number };
 
@@ -35,6 +35,14 @@ const CUES: Record<UiSound, { gain: number; notes: ChimeNote[] }> = {
       { freq: 659.25, at: 0.09, length: 0.2 },
       { freq: 783.99, at: 0.18, length: 0.24 },
       { freq: 1046.5, at: 0.27, length: 0.6 },
+    ],
+  },
+  // A pick caught: a quick plucked fourth, lighter than a reward.
+  pick: {
+    gain: 0.05,
+    notes: [
+      { freq: 659.25, at: 0, length: 0.12 },
+      { freq: 880.0, at: 0.06, length: 0.26 },
     ],
   },
   sessionComplete: {
