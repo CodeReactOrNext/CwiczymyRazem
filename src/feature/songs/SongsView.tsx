@@ -29,7 +29,6 @@ import { PlaylistsView } from "feature/songs/components/Playlists/PlaylistsView"
 import { SkillPowerHero } from "feature/songs/components/SongBoard/SkillPowerHero";
 import { SongBoardRow } from "feature/songs/components/SongBoard/SongBoardRow";
 import { SongDetailView } from "feature/songs/components/SongBoard/SongDetailView";
-import { SongPracticeChart } from "feature/songs/components/SongBoard/SongPracticeChart";
 import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
 import { SongSearchAutocomplete } from "feature/songs/components/SongSearch/SongSearchAutocomplete";
 import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
@@ -475,11 +474,6 @@ const SongsView = ({ view = "board", initialSongId = "" }: SongsViewProps) => {
                   totalPracticeMs={totalPracticeMs}
                   nextTierProgress={nextTierProgress}
                 />
-
-                {/* Phones skip it: the song list has to start above the fold. */}
-                {userAuth && (
-                  <SongPracticeChart userAuth={userAuth} className="hidden sm:block" />
-                )}
 
                 {totalSongsCount > 0 && (
                   // Phones: one row — the search field (count inside it, the
