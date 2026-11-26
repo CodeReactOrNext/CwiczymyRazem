@@ -152,8 +152,9 @@ describe("CasePackModal", () => {
     fireEvent.click(screen.getByRole("button", { name: /Merge duplicates/ }));
 
     await waitFor(() => expect(mockedMerge).toHaveBeenCalledTimes(2));
-    expect(mockedMerge).toHaveBeenCalledWith("guitar", ["g-dupe"]);
-    expect(mockedMerge).toHaveBeenCalledWith("effect", ["e-dupe"]);
+    // A pack merge never throws Workshop work away — only a confirmed single merge does.
+    expect(mockedMerge).toHaveBeenCalledWith("guitar", ["g-dupe"], false);
+    expect(mockedMerge).toHaveBeenCalledWith("effect", ["e-dupe"], false);
     // The first copy of a new model is never offered up.
     expect(
       mockedMerge.mock.calls.some(([, ids]) => ids.includes("g-new")),

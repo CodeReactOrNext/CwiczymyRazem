@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
+import { ConfirmDialog } from "components/ConfirmDialog/ConfirmDialog";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectValue } from "feature/arsenal/data/effectStats";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
@@ -297,6 +298,14 @@ export const StashInventory = ({
     null,
   );
   const [pending, setPending] = useState<Pending>(null);
+  /** A merge waiting for the player to accept losing the copy's workshop levels. */
+  const [mergeLoss, setMergeLoss] = useState<{
+    kind: Kind;
+    itemId: string;
+    name: string;
+    levels: number;
+    gain: number;
+  } | null>(null);
   /** A salvaged mod the player tapped. Its own sheet — it has no card. */
   const [modDetail, setModDetail] = useState<SalvagedMod | null>(null);
   /** A part stack the player tapped. Parts have no card of their own either. */
@@ -360,7 +369,11 @@ export const StashInventory = ({
   const mergeStateOf = (
     kind: Kind,
     itemId: string,
-  ): { offer: MergeOffer | null; reason?: string } | null => {
+  ): {
+    offer: MergeOffer | null;
+    reason?: string;
+    discardsBuild?: number;
+  } | null => {
     const state =
       kind === "guitar"
         ? getMergeState(data.inventory, itemId, GUITAR_MERGE, inUseGuitarIds)
@@ -371,7 +384,9 @@ export const StashInventory = ({
             pedalboardItemIds,
           );
     if (!state) return null;
-    if (state.offer) return { offer: state.offer };
+    if (state.offer) {
+      return { offer: state.offer, discardsBuild: state.discardsBuild };
+    }
 
     if (state.blocked === "built") {
       return { offer: null, reason: t("stash.reason_merge_built") };
@@ -394,9 +409,14 @@ export const StashInventory = ({
     };
   };
 
-  /** Plays the scene and sends the merge, for the one copy the player picked. */
-  const startMerge = (kind: Kind, itemId: string) => {
-    const offer = mergeStateOf(kind, itemId)?.offer;
+  /**
+   * Plays the scene and sends the merge, for the one copy the player picked. A
+   * copy with workshop levels asks first — those levels go with it — and comes
+   * back here with `confirmed` once the player agreed.
+   */
+  const startMerge = (kind: Kind, itemId: string, confirmed = false) => {
+    const state = mergeStateOf(kind, itemId);
+    const offer = state?.offer;
     const def =
       kind === "guitar"
         ? GUITARS_BY_ID.get(
@@ -407,7 +427,24 @@ export const StashInventory = ({
           );
     if (!offer || !def || mergeScene.isActive) return;
     setDetail(null);
-    mergeScene.start({ kind, itemId, def, offer });
+    const discardsBuild = state.discardsBuild ?? 0;
+    if (discardsBuild > 0 && !confirmed) {
+      setMergeLoss({
+        kind,
+        itemId,
+        name: def.name,
+        levels: discardsBuild,
+        gain: offer.gain,
+      });
+      return;
+    }
+    mergeScene.start({
+      kind,
+      itemId,
+      def,
+      offer,
+      discardBuilds: discardsBuild > 0,
+    });
   };
 
   /** The merge key of one item's card, or nothing when there is no copy to fold it into. */
@@ -1524,6 +1561,31 @@ export const StashInventory = ({
         isSelling={isSellingGuitarsBulk || isSellingEffectsBulk}
         isScrapping={isScrappingGuitarsBulk || isScrappingEffectsBulk}
         isMerging={isMergingBulk}
+      />
+
+      <ConfirmDialog
+        open={mergeLoss !== null}
+        onOpenChange={(next) => {
+          if (!next) setMergeLoss(null);
+        }}
+        title={t("stash.merge_built.title")}
+        description={
+          mergeLoss
+            ? t("stash.merge_built.body", {
+                name: mergeLoss.name,
+                count: mergeLoss.levels,
+                gain: mergeLoss.gain,
+              })
+            : undefined
+        }
+        confirmLabel={t("stash.merge_built.confirm")}
+        cancelLabel={t("stash.merge_built.cancel")}
+        destructive
+        onConfirm={() => {
+          if (!mergeLoss) return;
+          setMergeLoss(null);
+          startMerge(mergeLoss.kind, mergeLoss.itemId, true);
+        }}
       />
 
       {mergeScene.element}

@@ -9,6 +9,8 @@ import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 export interface MergeDuplicatesInput {
   kind: WorkshopKind;
   itemIds: string[];
+  /** Workshop levels on the copies may go — the player confirmed it. */
+  discardBuilds?: boolean;
 }
 
 /**
@@ -23,8 +25,8 @@ export const useMergeDuplicates = ({ silent = false } = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ kind, itemIds }: MergeDuplicatesInput) =>
-      mergeDuplicates(kind, itemIds),
+    mutationFn: ({ kind, itemIds, discardBuilds }: MergeDuplicatesInput) =>
+      mergeDuplicates(kind, itemIds, discardBuilds === true),
     onSuccess: (result) => {
       if (!silent) {
         toast.success(

@@ -62,11 +62,13 @@ export const openCasePack = async (
 export const mergeDuplicates = async (
   kind: WorkshopKind,
   itemIds: string[],
+  /** Fold away copies with workshop levels too — only after the player confirmed it. */
+  discardBuilds = false,
 ): Promise<MergeDuplicatesResult> => {
   const idToken = await getIdToken();
   const { data } = await axios.post<MergeDuplicatesResult & { success: boolean }>(
     "/api/arsenal/merge-duplicates",
-    { idToken, kind, itemIds },
+    { idToken, kind, itemIds, discardBuilds },
   );
   return data;
 };

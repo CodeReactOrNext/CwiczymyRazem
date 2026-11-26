@@ -442,8 +442,15 @@
     "dupes_pedals": "Duplicate pedals ({{count}})",
     "board_label": "Arsenal stash",
     "pedals_protected": "Pedals on your pedalboard are never touched.",
-    "reason_merge_built": "Copies built up at the Workshop can't be folded away",
-    "reason_merge_best": "This is your best copy — merge the others into it"
+    "reason_merge_built": "Guitar Builder guitars can't be folded away",
+    "reason_merge_best": "This is your best copy — merge the others into it",
+    "merge_built": {
+      "title": "Merge a Workshop-built copy?",
+      "body_one": "{{name}} has {{count}} Workshop level on it. It won't carry over: your best copy gets +{{gain}} lvl, and the work on this one is gone for good.",
+      "body_other": "{{name}} has {{count}} Workshop levels on it. They won't carry over: your best copy gets +{{gain}} lvl, and the work on this one is gone for good.",
+      "confirm": "Merge anyway",
+      "cancel": "Keep it"
+    }
   },
   "card": {
     "new": "New",

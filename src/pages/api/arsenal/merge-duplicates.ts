@@ -25,8 +25,9 @@ const MAX_MERGE_BATCH = 50;
  * they land on: the target is the highest-level copy of the same model that is
  * not itself being folded, and the gain is the model's mint-rarity step plus
  * whatever the folded copy had absorbed itself, both recomputed here from the
- * stored stash (`data/merge`). Copies that are in service, carry workshop levels
- * or have nothing to land on are skipped and stay where they are.
+ * stored stash (`data/merge`). Copies that are in service or have nothing to
+ * land on are skipped and stay where they are; so are copies with workshop
+ * levels, unless `discardBuilds` says the player confirmed losing them.
  */
 export default async function handler(
   req: NextApiRequest,
@@ -36,11 +37,14 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { idToken, kind, itemIds } = req.body as {
+  const { idToken, kind, itemIds, discardBuilds } = req.body as {
     idToken: string;
     kind: "guitar" | "effect";
     itemIds: string[];
+    discardBuilds?: boolean;
   };
+  // Only a literal `true` throws workshop work away — anything else is the safe default.
+  const rules = { discardBuilds: discardBuilds === true };
 
   if (!idToken) return res.status(401).json({ error: "Unauthorized" });
   if (kind !== "guitar" && kind !== "effect") {
@@ -97,7 +101,13 @@ export default async function handler(
         );
 
         if (kind === "guitar") {
-          const plan = planMerge(inventory, requested, GUITAR_MERGE, blocked);
+          const plan = planMerge(
+            inventory,
+            requested,
+            GUITAR_MERGE,
+            blocked,
+            rules,
+          );
           if (plan.merged === 0) throw new Error("NOTHING_TO_MERGE");
 
           const rigLevel = getRigLevel({
@@ -120,6 +130,7 @@ export default async function handler(
           requested,
           EFFECT_MERGE,
           blocked,
+          rules,
         );
         if (plan.merged === 0) throw new Error("NOTHING_TO_MERGE");
 

@@ -45,10 +45,15 @@ import { getItemLevel, RARITY_BUILD_GAIN } from "./itemStats";
  *
  * ─── What can be folded away ────────────────────────────────────────────────
  *
- * The source is consumed, so it must not be carrying anything that would be lost
- * with it: no workshop build levels, and never a Guitar Builder guitar. It must
- * not be in service either. Mods and traits on it are lost — a merge is not a
- * teardown, and scrapping is still the way to keep a mod.
+ * The source is consumed, so it must not be in service, and it is never a Guitar
+ * Builder guitar. Mods and traits on it are lost — a merge is not a teardown,
+ * and scrapping is still the way to keep a mod.
+ *
+ * Workshop build levels are lost with it too, so a built copy only goes when the
+ * player has said so: a single merge from the stash asks first and then passes
+ * `discardBuilds`, while the sweep over every duplicate never sets it and leaves
+ * built copies where they are. They used to be blocked outright, which left a
+ * player holding two restored copies of one model with no way to merge either.
  *
  * Earlier merges are not lost: whatever the source had absorbed goes over to the
  * target on top of the step. So the total is the same whichever copies go into
@@ -76,12 +81,28 @@ interface Mergeable {
   mergeCount?: number;
 }
 
+/** What a merge may consume beyond a plain copy. */
+export interface MergeRules {
+  /**
+   * Fold away copies with workshop build levels too. Those levels are lost, so
+   * only a merge the player confirmed for that copy sets it.
+   */
+  discardBuilds?: boolean;
+}
+
+/** Workshop build levels on this copy — what merging it away would throw out. */
+export const buildLevelsOf = (item: Mergeable): number =>
+  Math.max(0, item.buildLevel ?? 0);
+
 /**
- * Can this copy be folded into another? It must carry nothing the merge would
- * throw away — its own earlier merges do not count, they go over to the target.
+ * Can this copy be folded into another? Never a Guitar Builder guitar; a built
+ * copy only under `discardBuilds`. Its own earlier merges do not count against
+ * it, they go over to the target.
  */
-export const canMergeAway = (item: Mergeable): boolean =>
-  !item.custom && !((item.buildLevel ?? 0) > 0);
+export const canMergeAway = (
+  item: Mergeable,
+  { discardBuilds = false }: MergeRules = {},
+): boolean => !item.custom && (discardBuilds || buildLevelsOf(item) === 0);
 
 interface MergeKind<T extends Mergeable> {
   sameModel: (a: T, b: T) => boolean;
@@ -158,9 +179,12 @@ export const getMergeOffer = <T extends Mergeable>(
   sourceId: string,
   kind: MergeKind<T>,
   blocked: ReadonlySet<string> = new Set(),
+  rules: MergeRules = {},
 ): MergeOffer | null => {
   const source = items.find((item) => item.id === sourceId);
-  if (!source || blocked.has(sourceId) || !canMergeAway(source)) return null;
+  if (!source || blocked.has(sourceId) || !canMergeAway(source, rules)) {
+    return null;
+  }
 
   const gain = gainOf(source, kind);
   if (gain <= 0) return null;
@@ -204,6 +228,7 @@ export const planMerge = <T extends Mergeable>(
   sourceIds: readonly string[],
   kind: MergeKind<T>,
   blocked: ReadonlySet<string> = new Set(),
+  rules: MergeRules = {},
 ): MergePlan<T> => {
   const sources = new Set(sourceIds);
   let list = [...items];
@@ -215,7 +240,12 @@ export const planMerge = <T extends Mergeable>(
   for (const id of sources) {
     const source = list.find((item) => item.id === id);
     const gain = source ? gainOf(source, kind) : 0;
-    if (!source || gain <= 0 || blocked.has(id) || !canMergeAway(source)) {
+    if (
+      !source ||
+      gain <= 0 ||
+      blocked.has(id) ||
+      !canMergeAway(source, rules)
+    ) {
       skipped.push(id);
       continue;
     }
@@ -259,6 +289,11 @@ export interface MergeState {
   /** What merging it would do. Null when `blocked` says why it cannot. */
   offer: MergeOffer | null;
   blocked?: MergeBlock;
+  /**
+   * Workshop build levels the merge would throw away. Set only with an offer:
+   * the key works, but has to ask first and then merge with `discardBuilds`.
+   */
+  discardsBuild?: number;
 }
 
 /**
@@ -270,10 +305,12 @@ export interface MergeState {
  * key is shown but cannot be pressed, `blocked` says which rule is in the way, in
  * the order the player can act on them:
  *
- *   built   workshop levels (or a Guitar Builder guitar) — folding it away would
- *           throw that work out (`canMergeAway`)
+ *   built   a Guitar Builder guitar, which is never folded away
  *   in-use  equipped, in the rig or on the board; take it out first
  *   best    it is the strongest copy, the one the others are folded *into*
+ *
+ * A copy with workshop levels is not blocked: it gets an offer with
+ * `discardsBuild`, and the screen confirms the loss before merging.
  */
 export const getMergeState = <T extends Mergeable>(
   items: readonly T[],
@@ -287,15 +324,20 @@ export const getMergeState = <T extends Mergeable>(
   const copies = items.filter((i) => kind.sameModel(i, item));
   if (copies.length < 2) return null;
 
-  if (!canMergeAway(item)) return { offer: null, blocked: "built" };
+  if (!canMergeAway(item, { discardBuilds: true })) {
+    return { offer: null, blocked: "built" };
+  }
   if (inUse.has(itemId)) return { offer: null, blocked: "in-use" };
 
-  const offer = getMergeOffer(items, itemId, kind, inUse);
+  const offer = getMergeOffer(items, itemId, kind, inUse, {
+    discardBuilds: true,
+  });
   if (!offer) return null;
 
   // Folding the strongest copy into a weaker one would be the wrong way round.
   if (kind.levelOf(item) > offer.levelBefore) {
     return { offer: null, blocked: "best" };
   }
-  return { offer };
+  const built = buildLevelsOf(item);
+  return built > 0 ? { offer, discardsBuild: built } : { offer };
 };

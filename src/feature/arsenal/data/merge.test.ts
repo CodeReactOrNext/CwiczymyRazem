@@ -71,18 +71,22 @@ describe("canMergeAway", () => {
     expect(canMergeAway(copy("a", { buildLevel: 1 }))).toBe(false);
   });
 
+  it("accepts a built copy once the player agreed to lose the levels", () => {
+    expect(
+      canMergeAway(copy("a", { buildLevel: 2 }), { discardBuilds: true }),
+    ).toBe(true);
+  });
+
   it("accepts a copy that has absorbed others: those points go with it", () => {
     expect(canMergeAway(copy("a", { mergeBonus: 2 }))).toBe(true);
   });
 
-  it("refuses a Guitar Builder guitar", () => {
-    expect(
-      canMergeAway(
-        copy("a", {
-          custom: { level: 20 } as unknown as InventoryItem["custom"],
-        }),
-      ),
-    ).toBe(false);
+  it("refuses a Guitar Builder guitar, whatever the player agreed to", () => {
+    const custom = copy("a", {
+      custom: { level: 20 } as unknown as InventoryItem["custom"],
+    });
+    expect(canMergeAway(custom)).toBe(false);
+    expect(canMergeAway(custom, { discardBuilds: true })).toBe(false);
   });
 });
 
@@ -157,6 +161,19 @@ describe("getMergeOffer", () => {
     ).toBeNull();
   });
 
+  it("offers a built copy under discardBuilds, worth one plain step", () => {
+    const built = copy("built", { buildLevel: 2 });
+    const offer = getMergeOffer(
+      [copy("keep", { condition: 0.95 }), built],
+      "built",
+      GUITAR_MERGE,
+      new Set(),
+      { discardBuilds: true },
+    );
+    expect(offer?.targetId).toBe("keep");
+    expect(offer?.gain).toBe(getMergeGain(guitar.rarity));
+  });
+
   it("offers nothing for a copy in service", () => {
     const offer = getMergeOffer(
       [copy("keep"), copy("worn")],
@@ -184,6 +201,23 @@ describe("planMerge", () => {
     });
     expect(plan.gain).toBe(getMergeGain(guitar.rarity));
     expect(plan.raised.map((i) => i.id)).toEqual(["keep"]);
+  });
+
+  it("leaves a built copy alone unless told to discard builds", () => {
+    const stash = [copy("keep"), copy("built", { buildLevel: 3 })];
+
+    const safe = planMerge(stash, ["built"], GUITAR_MERGE);
+    expect(safe.merged).toBe(0);
+    expect(safe.skipped).toEqual(["built"]);
+
+    const confirmed = planMerge(stash, ["built"], GUITAR_MERGE, new Set(), {
+      discardBuilds: true,
+    });
+    expect(confirmed.merged).toBe(1);
+    expect(confirmed.items.map((i) => i.id)).toEqual(["keep"]);
+    // The workshop levels do not travel: the target gets the plain step.
+    expect(confirmed.items[0].mergeBonus).toBe(getMergeGain(guitar.rarity));
+    expect(confirmed.items[0].buildLevel).toBeUndefined();
   });
 
   it("stacks without limit as more duplicates come in", () => {
@@ -329,9 +363,40 @@ describe("getMergeState", () => {
     });
   });
 
-  it("blocks a copy carrying workshop levels", () => {
-    const built = [weak, copy("built", { buildLevel: 1 })];
-    expect(getMergeState(built, "built", GUITAR_MERGE)?.blocked).toBe("built");
+  it("offers a copy carrying workshop levels, flagged as losing them", () => {
+    const built = [strong, copy("built", { buildLevel: 1 })];
+    const state = getMergeState(built, "built", GUITAR_MERGE);
+    expect(state?.blocked).toBeUndefined();
+    expect(state?.offer?.targetId).toBe("strong");
+    expect(state?.discardsBuild).toBe(1);
+  });
+
+  it("does not flag a plain copy as losing anything", () => {
+    expect(
+      getMergeState(stash, "weak", GUITAR_MERGE)?.discardsBuild,
+    ).toBeUndefined();
+  });
+
+  it("lets the weaker of two built copies go into the stronger", () => {
+    // Two restored copies of one model: before, neither could be merged at all.
+    const low = copy("low", { buildLevel: 2, condition: 0.3 });
+    const high = copy("high", { buildLevel: 2, condition: 0.9 });
+    expect(getMergeState([low, high], "low", GUITAR_MERGE)).toMatchObject({
+      offer: { targetId: "high" },
+      discardsBuild: 2,
+    });
+    expect(getMergeState([low, high], "high", GUITAR_MERGE)?.blocked).toBe(
+      "best",
+    );
+  });
+
+  it("still blocks a Guitar Builder guitar", () => {
+    const custom = copy("custom", {
+      custom: { level: 20 } as unknown as InventoryItem["custom"],
+    });
+    expect(getMergeState([weak, custom], "custom", GUITAR_MERGE)?.blocked).toBe(
+      "built",
+    );
   });
 
   it("offers a copy that has merged before, next to a stronger one in service", () => {
@@ -353,12 +418,12 @@ describe("getMergeState", () => {
     expect(state).toEqual({ offer: null, blocked: "in-use" });
   });
 
-  it("puts the rule about work lost ahead of the one about use", () => {
-    // A built copy that is also in service: the loss is the bigger news.
+  it("blocks a built copy in service as in use", () => {
+    // Being built no longer blocks it, so what stands in the way is the rig.
     const built = [weak, copy("built", { buildLevel: 2 })];
     expect(
       getMergeState(built, "built", GUITAR_MERGE, new Set(["built"]))?.blocked,
-    ).toBe("built");
+    ).toBe("in-use");
   });
 
   it("lets a copy in service be the one that receives the merge", () => {

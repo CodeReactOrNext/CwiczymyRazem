@@ -442,8 +442,15 @@
     "dupes_pedals": "Doppelte Pedale ({{count}})",
     "board_label": "Arsenal-Lager",
     "pedals_protected": "Pedale auf deinem Pedalboard werden nie angerührt.",
-    "reason_merge_built": "In der Werkstatt ausgebaute Kopien lassen sich nicht verschmelzen",
-    "reason_merge_best": "Das ist deine beste Kopie — verschmilz die anderen damit"
+    "reason_merge_built": "Gitarren aus dem Builder lassen sich nicht verschmelzen",
+    "reason_merge_best": "Das ist deine beste Kopie — verschmilz die anderen damit",
+    "merge_built": {
+      "title": "In der Werkstatt ausgebaute Kopie verschmelzen?",
+      "body_one": "{{name}} hat {{count}} Werkstatt-Stufe. Sie wird nicht übertragen: Deine beste Kopie bekommt +{{gain}} Lvl, und die Arbeit an dieser ist endgültig weg.",
+      "body_other": "{{name}} hat {{count}} Werkstatt-Stufen. Sie werden nicht übertragen: Deine beste Kopie bekommt +{{gain}} Lvl, und die Arbeit an dieser ist endgültig weg.",
+      "confirm": "Trotzdem verschmelzen",
+      "cancel": "Behalten"
+    }
   },
   "card": {
     "new": "Neu",

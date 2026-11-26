@@ -442,8 +442,15 @@
     "dupes_pedals": "Pedales duplicados ({{count}})",
     "board_label": "Almacén del Arsenal",
     "pedals_protected": "Los pedales de tu pedalera nunca se tocan.",
-    "reason_merge_built": "Las copias mejoradas en el Taller no se pueden absorber",
-    "reason_merge_best": "Esta es tu mejor copia — fusiona las demás con ella"
+    "reason_merge_built": "Las guitarras del Builder no se pueden absorber",
+    "reason_merge_best": "Esta es tu mejor copia — fusiona las demás con ella",
+    "merge_built": {
+      "title": "¿Fusionar una copia mejorada en el Taller?",
+      "body_one": "{{name}} tiene {{count}} nivel del Taller. No se transfiere: tu mejor copia gana +{{gain}} niv. y el trabajo hecho en esta se pierde para siempre.",
+      "body_other": "{{name}} tiene {{count}} niveles del Taller. No se transfieren: tu mejor copia gana +{{gain}} niv. y el trabajo hecho en esta se pierde para siempre.",
+      "confirm": "Fusionar igualmente",
+      "cancel": "Conservarla"
+    }
   },
   "card": {
     "new": "Nuevo",

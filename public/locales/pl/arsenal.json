@@ -444,8 +444,17 @@
     "dupes_pedals": "Zduplikowane efekty ({{count}})",
     "board_label": "Schowek Arsenału",
     "pedals_protected": "Efekty na pedalboardzie nigdy nie są ruszane.",
-    "reason_merge_built": "Kopii rozbudowanych w Warsztacie nie da się wchłonąć",
-    "reason_merge_best": "To twoja najlepsza kopia — scalaj do niej pozostałe"
+    "reason_merge_built": "Gitar z Buildera nie da się wchłonąć",
+    "reason_merge_best": "To twoja najlepsza kopia — scalaj do niej pozostałe",
+    "merge_built": {
+      "title": "Scalić kopię rozbudowaną w Warsztacie?",
+      "body_one": "{{name}} ma {{count}} poziom z Warsztatu. Nie przejdzie dalej: najlepsza kopia dostanie +{{gain}} lvl, a praca włożona w tę przepadnie.",
+      "body_few": "{{name}} ma {{count}} poziomy z Warsztatu. Nie przejdą dalej: najlepsza kopia dostanie +{{gain}} lvl, a praca włożona w tę przepadnie.",
+      "body_many": "{{name}} ma {{count}} poziomów z Warsztatu. Nie przejdą dalej: najlepsza kopia dostanie +{{gain}} lvl, a praca włożona w tę przepadnie.",
+      "body_other": "{{name}} ma {{count}} poziomu z Warsztatu. Nie przejdą dalej: najlepsza kopia dostanie +{{gain}} lvl, a praca włożona w tę przepadnie.",
+      "confirm": "Scal mimo to",
+      "cancel": "Zostaw"
+    }
   },
   "card": {
     "new": "Nowość",

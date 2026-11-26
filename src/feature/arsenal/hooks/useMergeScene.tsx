@@ -17,6 +17,8 @@ export interface MergeSceneRequest {
   def: GuitarDefinition | EffectDefinition;
   /** What the merge will do, as the screen computed it. */
   offer: MergeOffer;
+  /** The copy has workshop levels and the player agreed to lose them. */
+  discardBuilds?: boolean;
 }
 
 interface UseMergeSceneOptions {
@@ -53,12 +55,18 @@ export const useMergeScene = ({ onFinished }: UseMergeSceneOptions = {}) => {
     onFinished?.();
   };
 
-  const start = ({ kind, itemId, def, offer }: MergeSceneRequest) => {
+  const start = ({
+    kind,
+    itemId,
+    def,
+    offer,
+    discardBuilds,
+  }: MergeSceneRequest) => {
     saved.current = false;
     played.current = false;
     setScene({ kind, def, offer });
     mutate(
-      { kind, itemIds: [itemId] },
+      { kind, itemIds: [itemId], discardBuilds },
       {
         onSuccess: () => {
           saved.current = true;
