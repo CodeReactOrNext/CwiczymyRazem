@@ -32,6 +32,7 @@ import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import type { Instrument } from "utils/audio/tunings";
+import { getStandardTuningId, getTuningPreset } from "utils/audio/tunings";
 
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
 import { DEFAULT_ACCENT_PATTERN, stepsPerBeat } from "../../components/Metronome/utils/accentPattern";
@@ -113,7 +114,7 @@ import { DRILL_PASSES, DRILL_SPEED } from "./utils/barPasses";
 import type { FreePlayFrame } from "./utils/freePlay";
 import { buildLearnSteps } from "./utils/learnSteps";
 import { getRunVerdict, isPlanHalfway } from "./utils/runVerdict";
-import { shiftTabPitch } from "./utils/shiftTabPitch";
+import { retuneTabPitch, shiftTabPitch } from "./utils/shiftTabPitch";
 import { tabPlayUntil } from "./utils/tabPlayUntil";
 import type { TimingPrecision } from "./utils/timingPrecision";
 
@@ -643,10 +644,21 @@ const PracticeSessionInner = ({
     [gpTrackMeasures, gpPitchShift],
   );
 
+  // A tab exercise can carry real pitches as well (a Guitar Pro file pasted into
+  // the tab editor keeps them). They sound in the tuning the tab is written in —
+  // its own, else Standard — so they move to the player's like the frets do.
+  const exerciseTablature = activeExercise.tablature;
+  const writtenOffsets = (guitarTuning.fileTuning ?? getTuningPreset(getStandardTuningId(guitarTuning.instrument))).offsets;
+  const playedOffsets = guitarTuning.tuning.offsets;
+  const playedExerciseTablature = useMemo(
+    () => retuneTabPitch(exerciseTablature, writtenOffsets, playedOffsets),
+    [exerciseTablature, writtenOffsets, playedOffsets],
+  );
+
   const rawTablature = drill?.tablature
     || riddleMeasures
     || (parsedGpTracks ? playedGpMeasures : undefined)
-    || activeExercise.tablature;
+    || playedExerciseTablature;
 
   /**
    * The recording's tempo curve, one step behind the hand that is dragging it.
@@ -1411,7 +1423,7 @@ const PracticeSessionInner = ({
   const canDrill = isMicEnabled && !learnEnabled && !isExamMode && !isGoalMode && !plan.duel && !plan.recording
     && !effectiveRawGpFile && !parsedGpTracks && !riddleMeasures && !showAlphaTabScore && !currentExercise.customGoal;
   const handleStartDrill = (measure: number) => {
-    const bar = activeExercise.tablature?.[measure];
+    const bar = playedExerciseTablature?.[measure];
     if (!bar) return;
     stopTimer();
     metronome.restartMetronome();
