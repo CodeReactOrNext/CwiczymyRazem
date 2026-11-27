@@ -127,3 +127,58 @@ describe("useNoteHunt — a new question on the same note", () => {
     expect(result.current.state.rounds).toEqual({ solved: 1, presented: 2 });
   });
 });
+
+describe("useNoteHunt — one-string hunts that move on after each find", () => {
+  // Low E string, frets 0–11: every note has exactly one spot, an octave of its own.
+  const setupString = (scoreFactor = 1) =>
+    renderHook(
+      ({ target, factor }) =>
+        useNoteHunt(target, undefined, undefined, false, [0, 11], [6], 0, false, undefined, 0, true, factor),
+      { initialProps: { target: "A", factor: scoreFactor } },
+    );
+
+  it("grades the run, not the fresh note it ends on", () => {
+    const { result, rerender } = setupString();
+
+    act(() => result.current.markOctave(2));
+    rerender({ target: "G", factor: 1 });
+
+    // Used to read 0% here: the new note had nothing found yet.
+    expect(result.current.state.accuracy).toBe(100);
+    expect(result.current.state.gameState.score).toBe(100);
+    // No hits/misses readout outside the whole-neck hunts.
+    expect(result.current.state.tally).toBeNull();
+  });
+
+  it("charges for a note skipped unfound", () => {
+    const { result, rerender } = setupString();
+
+    act(() => result.current.markOctave(2));
+    rerender({ target: "G", factor: 1 });
+    rerender({ target: "B", factor: 1 });
+
+    expect(result.current.state.accuracy).toBe(50);
+  });
+
+  it("pays a fraction while the neck shows the answer", () => {
+    const { result, rerender } = setupString(0.2);
+
+    act(() => result.current.markOctave(2));
+    expect(result.current.state.gameState.score).toBe(20);
+
+    rerender({ target: "G", factor: 0.2 });
+    act(() => result.current.markOctave(2));
+    expect(result.current.state.gameState.score).toBe(40);
+  });
+
+  it("keeps what was earned before the answer was switched on", () => {
+    const { result, rerender } = setupString();
+
+    act(() => result.current.markOctave(2));
+    rerender({ target: "G", factor: 1 });
+    rerender({ target: "G", factor: 0.2 });
+    act(() => result.current.markOctave(2));
+
+    expect(result.current.state.gameState.score).toBe(120);
+  });
+});

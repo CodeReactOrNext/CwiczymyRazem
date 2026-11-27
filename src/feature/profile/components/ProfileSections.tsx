@@ -17,6 +17,7 @@ import { cn } from "assets/lib/utils";
 import { EmptyState } from "components/EmptyState/EmptyState";
 import type { AchievementList } from "feature/achievements/types";
 import { AddWidgetSheet } from "feature/dashboard/components/AddWidgetSheet";
+import type { WidgetSize } from "feature/dashboard/types/dashboard.types";
 import {
   getProfileSectionDefinition,
   PROFILE_SECTION_CATALOG,
@@ -53,6 +54,11 @@ interface ProfileSectionsProps {
   updateLayout: (layout: ProfileLayoutConfig) => void;
   isOwner: boolean;
   renderSection: (id: ProfileSectionId) => ReactNode;
+  /**
+   * Widths the page decides for itself while reading (the two cases pair up);
+   * Customize keeps showing the stored ones.
+   */
+  sizeOverrides?: Partial<Record<ProfileSectionId, WidgetSize>>;
   earned: AchievementList[];
   learnedSongs: Song[];
 }
@@ -68,6 +74,7 @@ export const ProfileSections = ({
   updateLayout,
   isOwner,
   renderSection,
+  sizeOverrides,
   earned,
   learnedSongs,
 }: ProfileSectionsProps) => {
@@ -226,7 +233,11 @@ export const ProfileSections = ({
                 return (
                   <SectionTile
                     key={placement.id}
-                    placement={placement}
+                    placement={
+                      !editing && sizeOverrides?.[placement.id]
+                        ? { ...placement, size: sizeOverrides[placement.id]! }
+                        : placement
+                    }
                     definition={definition}
                     isEditing={editing}
                     canResize={definition.resizable && !isMobile}

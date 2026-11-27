@@ -19,10 +19,13 @@ export const HeroLevelStat = ({
   lvl,
   points,
   variant = "ring",
+  barColor,
 }: {
   lvl: number;
   points: number;
   variant?: "ring" | "bar";
+  /** Fill of the bar when it is not the app's cyan — a profile's own accent. */
+  barColor?: string;
 }) => {
   const { t } = useTranslation("profile");
   const lvlXpStart = getPointsToLvlUp(lvl - 1);
@@ -60,7 +63,10 @@ export const HeroLevelStat = ({
           {progress > 0 && (
             <div
               className='bar-shine h-full min-w-3 rounded-full bg-cyan-400 [--shine-inset:6px]'
-              style={{ width: `${progress * 100}%` }}
+              style={{
+                width: `${progress * 100}%`,
+                backgroundColor: barColor,
+              }}
             />
           )}
         </div>

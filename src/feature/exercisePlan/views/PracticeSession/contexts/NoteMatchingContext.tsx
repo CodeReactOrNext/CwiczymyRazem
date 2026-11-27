@@ -1,3 +1,4 @@
+import { SHOWN_NOTES_SCORE_FACTOR, useNoteLearnerStore } from "feature/exercisePlan/data/exerises/noteLearner/noteLearnerStore";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { createContext, type MutableRefObject, type ReactNode,useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { NOTES } from "utils/audio/noteUtils";
@@ -291,6 +292,8 @@ interface NoteMatchingProviderProps {
   customGoalStrings: number[] | undefined;
   // which hunt variant the current exercise is (selects the detection hook)
   noteHuntMode: "octaves" | "region" | "interval" | "chord" | "click" | "accumulate" | "intervalClick" | undefined;
+  // the hunt offers "show the note on the neck" (noteHuntConfig.pickTargets)
+  noteHuntCanShowNotes?: boolean;
   // countdown until the note-hunt target rotates (null when not rotating)
   noteHuntSecondsLeft: number | null;
   // the round length that countdown starts from (null when not rotating)
@@ -355,6 +358,7 @@ export function NoteMatchingProvider({
   customGoalPrompt,
   customGoalStrings,
   noteHuntMode,
+  noteHuntCanShowNotes = false,
   noteHuntSecondsLeft,
   noteHuntSecondsTotal = null,
   noteHuntStreak = 0,
@@ -487,6 +491,8 @@ export function NoteMatchingProvider({
   // Every hunt banks its score across rotations; a restart or the next exercise
   // is a new run, so the hunts start their totals over when this key changes.
   const [huntRestarts, setHuntRestarts] = useState(0);
+  // The learning hunt can draw the answer on the neck; finds made that way pay a fraction.
+  const huntNotesShown = useNoteLearnerStore(state => state.showNotes) && noteHuntCanShowNotes;
   const huntRunKey = `${currentExerciseIndex}:${huntRestarts}`;
   const { state: noteHunt, markOctave: markNoteHuntOctave } = useNoteHunt(
     customGoal ?? "",
@@ -503,6 +509,7 @@ export function NoteMatchingProvider({
     huntRunKey,
     // Nothing counts until Start is pressed, and nothing while paused.
     isPlaying,
+    huntNotesShown ? SHOWN_NOTES_SCORE_FACTOR : 1,
   );
 
   // Chord-mode: derive the chord's member pitch classes from its name.

@@ -403,6 +403,7 @@
     "title_from": "Titel aus einem Erfolg · {{rarity}}"
   },
   "cases": {
+    "all": "Alle",
     "rarest": "Seltenste Erfolge",
     "hardest": "Schwerste gelernte Songs",
     "pin_hint": "Pinne eigene unter Profil anpassen → Profilkarte.",

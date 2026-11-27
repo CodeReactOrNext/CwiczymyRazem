@@ -626,7 +626,8 @@
     "next": "Next",
     "view": "View",
     "play_notes": "Play notes",
-    "show_notes": "Show the note on the neck"
+    "show_notes": "Show the note on the neck",
+    "show_notes_cost": "Finds pay 20% of the points"
   },
   "interval_click": {
     "now_above": "{{interval}} above that {{root}}",

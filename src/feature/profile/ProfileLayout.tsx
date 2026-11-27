@@ -84,29 +84,45 @@ const ProfileLayout = ({
     getUserSkills(userAuth).then((skills) => setUserSkills(skills));
   }, [userAuth]);
 
+  const trophies = resolveTrophies(layout, achievements ?? []);
+  const featuredSongs = resolveFeaturedSongs(layout, songs?.learned ?? []);
+  // The two cases stand side by side when the player keeps them next to each
+  // other and both have something in them; alone, a case takes the whole row.
+  const trophiesAt = layout.sections.findIndex((s) => s.id === "trophies");
+  const songsAt = layout.sections.findIndex((s) => s.id === "signature-songs");
+  const casesPaired =
+    trophiesAt !== -1 &&
+    songsAt !== -1 &&
+    Math.abs(trophiesAt - songsAt) === 1 &&
+    trophies.length > 0 &&
+    featuredSongs.length > 0;
+
   const renderSection = (id: ProfileSectionId) => {
     switch (id) {
       case "trophies": {
         const owned = new Set(achievements ?? []);
         return (
           <TrophyCase
-            trophies={resolveTrophies(layout, achievements ?? [])}
+            trophies={trophies}
             isPinned={layout.trophies.some((t) => owned.has(t))}
             isOwner={isOwner}
+            wide={!casesPaired}
           />
         );
       }
       case "signature-songs": {
-        const learned = songs?.learned ?? [];
-        const learnedIds = new Set(learned.map((song) => song.id));
+        const learnedIds = new Set(
+          (songs?.learned ?? []).map((song) => song.id),
+        );
         return (
           <SongCase
-            songs={resolveFeaturedSongs(layout, learned)}
+            songs={featuredSongs}
             isPinned={layout.featuredSongs.some((songId) =>
               learnedIds.has(songId),
             )}
             isOwner={isOwner}
             practiceTimes={practiceTimes}
+            wide={!casesPaired}
           />
         );
       }
@@ -195,6 +211,11 @@ const ProfileLayout = ({
           updateLayout={updateLayout}
           isOwner={isOwner}
           renderSection={renderSection}
+          sizeOverrides={
+            casesPaired
+              ? { trophies: "half", "signature-songs": "half" }
+              : undefined
+          }
           earned={achievements ?? []}
           learnedSongs={songs?.learned ?? []}
         />

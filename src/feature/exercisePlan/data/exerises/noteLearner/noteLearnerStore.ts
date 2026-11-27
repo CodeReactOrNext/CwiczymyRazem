@@ -5,6 +5,9 @@ import { persist } from "zustand/middleware";
 export type NoteLearnerStrings = "all" | 1 | 2 | 3 | 4 | 5 | 6;
 export type NoteLearnerNotes = "naturals" | "all";
 
+/** Share of the points a find pays while the neck is showing where the note is. */
+export const SHOWN_NOTES_SCORE_FACTOR = 0.2;
+
 interface NoteLearnerState {
   strings: NoteLearnerStrings;
   notes: NoteLearnerNotes;

@@ -403,6 +403,7 @@
     "title_from": "Título de un logro · {{rarity}}"
   },
   "cases": {
+    "all": "Todos",
     "rarest": "Logros más raros",
     "hardest": "Canciones aprendidas más difíciles",
     "pin_hint": "Fija los tuyos en Personalizar perfil → Tarjeta de perfil.",

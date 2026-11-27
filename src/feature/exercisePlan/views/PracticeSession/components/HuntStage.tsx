@@ -295,7 +295,10 @@ export function HuntViewMenu({ showFullNeck, onShowFullNeckChange, noteSound, on
             onCheckedChange={(checked) => onShowNotesChange(checked === true)}
             onSelect={keepOpen}
             className={itemClass}>
-            {t("hunt.show_notes")}
+            <span className='flex flex-col'>
+              {t("hunt.show_notes")}
+              <span className='text-xs font-medium text-zinc-400'>{t("hunt.show_notes_cost")}</span>
+            </span>
           </DropdownMenuCheckboxItem>
         )}
         <DropdownMenuCheckboxItem

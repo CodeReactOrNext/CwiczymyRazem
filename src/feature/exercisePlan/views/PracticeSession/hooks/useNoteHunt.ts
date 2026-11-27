@@ -143,8 +143,12 @@ function buildState(
   /** Rounds banked so far (the current one excluded from `solved`, included in
    *  `presented`). `null` grades by octave instead — see below. */
   rounds: { solved: number; presented: number } | null = null,
-  /** Whole-neck octave hunts: octaves found and asked for in the rounds gone by. */
+  /** Octave hunts: octaves found and asked for in the rounds gone by. */
   banked: { found: number; total: number } | null = null,
+  /** Share of the points the note on screen pays (see `scoreFactor` on the hook). */
+  scoreFactor = 1,
+  /** Whether the run's hits and misses are read out live (whole-neck hunts). */
+  tallied = true,
 ): NoteHuntState {
   const foundInRange = octaves.filter(o => found.has(o)).length;
 
@@ -170,7 +174,7 @@ function buildState(
     gameState: {
       // Cumulative across the session either way: the round tally already spans
       // it, and the octave hunts add the banked total of the targets gone by.
-      score: rounds ? scoreForCount(units) : scoreOffset + scoreForCount(foundInRange),
+      score: rounds ? scoreForCount(units) : scoreOffset + Math.round(scoreForCount(foundInRange) * scoreFactor),
       combo: units,
       multiplier,
     },
@@ -178,7 +182,7 @@ function buildState(
     maxPossibleScore: scoreForCount(total),
     maxCombo: units,
     rounds,
-    tally: banked && {
+    tally: !banked || !tallied ? null : {
       hits: hasBanked ? gradedFound : 0,
       misses: banked.total - banked.found,
     },
@@ -230,17 +234,30 @@ export function useNoteHunt(
    *  shows what it hears, so the player can check it works, but nothing is
    *  found or scored — a hunt can't be answered ahead of its own clock. */
   counting = true,
+  /** Share of the points an octave hunt's finds are worth, 1 = all of them. Less
+   *  where the neck is showing the answer: looking a note up is practice too,
+   *  but it is not the recall the full score stands for. Read when a find is
+   *  scored and when the target is banked, so switching mid-run only changes
+   *  the notes from there on. */
+  scoreFactor = 1,
 ): NoteHuntControls {
   const runKeyRef = useRef(runKey);
   const countingRef = useRef(counting);
   useEffect(() => { countingRef.current = counting; });
+  const scoreFactorRef = useRef(scoreFactor);
   const shiftedTargetNote = shiftNote(targetNote, tuningShift);
-  const gradesWholeRun = !roundGraded && !fretRange;
+  // Every octave hunt is graded over the whole run. Without the bank a region
+  // hunt graded only the note on screen, so a run that moved on after each find
+  // always ended on a fresh note and read 0%.
+  const gradesWholeRun = !roundGraded;
+  // The live hits/misses readout stays with the whole-neck hunts.
+  const tallied = !fretRange;
   const [state, setState] = useState<NoteHuntState>(() =>
     buildState(
       targetOctaves(shiftedTargetNote, fretRange, strings, roundGraded), new Set(), null, null, 0, false, 0, 0,
       roundGraded ? { solved: 0, presented: 1 } : null,
       gradesWholeRun ? { found: 0, total: 0 } : null,
+      scoreFactor, tallied,
     ),
   );
 
@@ -266,7 +283,7 @@ export function useNoteHunt(
   // unanswered question already counts against the grade).
   const roundsSolvedRef    = useRef(0);
   const roundsPresentedRef = useRef(1);
-  // Whole-neck octave hunts: what the rounds gone by asked for and got. A target
+  // Octave hunts: what the rounds gone by asked for and got. A target
   // swapped out before the clock ever ran on it was never asked.
   const bankedRef = useRef<{ found: number; total: number } | null>(gradesWholeRun ? { found: 0, total: 0 } : null);
   const roundLiveRef = useRef(false);
@@ -284,7 +301,7 @@ export function useNoteHunt(
       roundsPresentedRef.current = 1;
       bankedRef.current = gradesWholeRun ? { found: 0, total: 0 } : null;
     } else if (!firstTargetRef.current) {
-      sessionScoreRef.current += scoreForCount(prevFoundRef.current);
+      sessionScoreRef.current += Math.round(scoreForCount(prevFoundRef.current) * scoreFactorRef.current);
       if (prevFoundRef.current > 0) roundsSolvedRef.current += 1;
       roundsPresentedRef.current += 1;
       if (bankedRef.current && roundLiveRef.current) {
@@ -308,10 +325,13 @@ export function useNoteHunt(
     setState(buildState(
       octavesRef.current, foundRef.current, null, null, 0, false, 0, sessionScoreRef.current,
       roundGraded ? { solved: roundsSolvedRef.current, presented: roundsPresentedRef.current } : null,
-      bankedRef.current,
+      bankedRef.current, scoreFactorRef.current, tallied,
     ));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetKey, runKey]);
+
+  // After the retarget above: a target banks at the rate it was played under.
+  useEffect(() => { scoreFactorRef.current = scoreFactor; }, [scoreFactor]);
 
   // After the retarget above, so a round that opens on a running clock counts as live.
   useEffect(() => { if (counting) roundLiveRef.current = true; }, [counting]);
@@ -362,7 +382,7 @@ export function useNoteHunt(
               octaves, foundRef.current, data.note, data.octave, data.cents,
               isMatch, hitIdRef.current, sessionScoreRef.current,
               roundGraded ? { solved: roundsSolvedRef.current, presented: roundsPresentedRef.current } : null,
-              bankedRef.current,
+              bankedRef.current, scoreFactorRef.current, tallied,
             );
             setState(prev => sameState(prev, next) ? prev : next);
           }
@@ -382,7 +402,7 @@ export function useNoteHunt(
 
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [active, frequencyRef, volumeRef, roundGraded]);
+  }, [active, frequencyRef, volumeRef, roundGraded, tallied]);
 
   // Self-check for players without a mic: tap to toggle an octave as found. Feeds
   // the same found-set/scoring path as live detection.
@@ -401,9 +421,9 @@ export function useNoteHunt(
       octavesRef.current, found, prev.detectedNote, prev.detectedOctave, prev.cents,
       prev.isMatch, hitIdRef.current, sessionScoreRef.current,
       roundGraded ? { solved: roundsSolvedRef.current, presented: roundsPresentedRef.current } : null,
-      bankedRef.current,
+      bankedRef.current, scoreFactorRef.current, tallied,
     ));
-  }, [roundGraded]);
+  }, [roundGraded, tallied]);
 
   return { state, markOctave };
 }

@@ -630,7 +630,8 @@
     "next": "Dalej",
     "view": "Widok",
     "play_notes": "Odtwarzaj dźwięki",
-    "show_notes": "Pokaż nutę na gryfie"
+    "show_notes": "Pokaż nutę na gryfie",
+    "show_notes_cost": "Trafienia dają 20% punktów"
   },
   "interval_click": {
     "now_above": "{{interval}} nad tym {{root}}",

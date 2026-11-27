@@ -550,7 +550,8 @@
     "next": "Siguiente",
     "view": "Vista",
     "play_notes": "Reproducir notas",
-    "show_notes": "Mostrar la nota en el mástil"
+    "show_notes": "Mostrar la nota en el mástil",
+    "show_notes_cost": "Los aciertos dan el 20 % de los puntos"
   },
   "interval_click": {
     "now_above": "{{interval}} por encima de ese {{root}}",

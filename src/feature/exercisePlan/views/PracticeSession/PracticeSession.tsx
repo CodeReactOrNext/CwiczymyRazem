@@ -1720,6 +1720,7 @@ const PracticeSessionInner = ({
       customGoalPrompt={huntTarget ? huntTarget.prompt : currentExercise.customGoalPrompt}
       customGoalStrings={huntTarget?.strings ?? currentExercise.customGoalStrings}
       noteHuntMode={currentExercise.noteHuntConfig?.mode}
+      noteHuntCanShowNotes={!!currentExercise.noteHuntConfig?.pickTargets}
       noteHuntSecondsLeft={noteHuntSecondsLeft}
       noteHuntSecondsTotal={noteHuntSecondsTotal}
       noteHuntStreak={huntStreak}

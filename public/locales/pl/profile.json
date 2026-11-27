@@ -403,6 +403,7 @@
     "title_from": "Tytuł z osiągnięcia · {{rarity}}"
   },
   "cases": {
+    "all": "Wszystkie",
     "rarest": "Najrzadsze osiągnięcia",
     "hardest": "Najtrudniejsze opanowane utwory",
     "pin_hint": "Przypnij własne w Dostosuj profil → Karta profilu.",

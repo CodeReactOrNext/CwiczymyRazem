@@ -405,6 +405,7 @@
     "title_from": "Title from an achievement · {{rarity}}"
   },
   "cases": {
+    "all": "All",
     "rarest": "Rarest achievements",
     "hardest": "Hardest songs learned",
     "pin_hint": "Pin your own in Customize profile → Profile card.",
