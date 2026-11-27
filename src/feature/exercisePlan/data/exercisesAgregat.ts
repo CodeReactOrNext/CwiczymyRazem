@@ -53,7 +53,7 @@ import { meterSwitch128To44Exercise } from "feature/exercisePlan/data/exerises/m
 import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
 import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
 import { mutingDisciplineDrillExercise } from "feature/exercisePlan/data/exerises/mutingDisciplineDrill/mutingDisciplineDrill";
-import { noteLearnerExercise } from "feature/exercisePlan/data/exerises/noteLearner/noteLearner";
+import { noteRecallExercise } from "feature/exercisePlan/data/exerises/noteLearner/noteLearner";
 import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneChordImprov/oneChordImprov";
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
 import { openChordsBluesSeventhsExercise, openChordsFirstChangesExercise, pickedOpenChordArpeggiosExercise } from "feature/exercisePlan/data/exerises/openChords/openChords";
@@ -486,7 +486,7 @@ const rawExercises: Exercise[] = [
   stringRepetitionExercise,
   randomNoteHuntExercise,
   chromaticNoteHuntExercise,
-  noteLearnerExercise,
+  noteRecallExercise,
   fretboardRegionHuntExercise,
   fretClickLowEOpenExercise,
   fretClickLowEHighExercise,

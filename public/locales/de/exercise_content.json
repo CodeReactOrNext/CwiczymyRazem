@@ -606,21 +606,21 @@
       "customGoal": "G",
       "customGoalDescription": "Finde diese Note auf jeder Saite und in jeder Oktave"
     },
-    "note_learner": {
-      "title": "Notenjagd — Lernmodus",
-      "description": "Lerne, wo jeder Ton liegt: Das Griffbrett zeigt dir die Stelle, du spielst ihn, das Mikro prüft.",
-      "whyItMatters": "Du merkst dir die Lage eines Tons erst, wenn du ihn dort ein paar Mal gefunden hast. Dieser Modus zeigt dir zuerst die Stelle, damit die Wiederholung ins Lernen geht und nicht ins Raten.",
+    "note_recall": {
+      "title": "Notenjagd — Abrufmodus",
+      "description": "Sieh einen Tonnamen, finde ihn auf der gewählten Saite und spiel ihn. Ohne Markierungen, ohne Timer.",
+      "whyItMatters": "Einen Ton ohne jede Hilfe auf dem Griffbrett zu finden lehrt dich, wo er liegt, und genau das brauchst du beim Spielen.",
       "instructions": {
         "0": "Wähle unter dem Griffbrett eine Saite (oder das ganze Griffbrett) und nur Stammtöne oder alle 12.",
-        "1": "Ein Ton erscheint, und jede Stelle, an der er liegt, ist auf dem Griffbrett markiert. Spiel ihn.",
+        "1": "Ein Tonname erscheint. Das Griffbrett zeigt nicht, wo er liegt, also finde ihn und spiel ihn.",
         "2": "Der nächste Ton kommt, sobald das Mikro den aktuellen gehört hat. Es gibt keinen Timer, lass dir Zeit."
       },
       "tips": {
-        "0": "Sag den Tonnamen laut, während du ihn spielst. Ihn auszusprechen, während du die Stelle siehst, lässt ihn hängen bleiben.",
-        "1": "Schau vor dem Spielen auf die Bundnummer und die Punkte daneben, nicht nur auf die Markierung.",
-        "2": "Wenn eine Saite leicht fällt, wechsle zur Notenjagd ohne Markierungen und prüfe, was hängen geblieben ist."
+        "0": "Hängst du bei einem Ton? Zähl vom nächsten Ton, den du kennst, oder von der Leersaite hoch.",
+        "1": "Nutze die Punkte in Bund 3, 5, 7, 9 und 12 als Orientierung.",
+        "2": "Sag den Tonnamen laut, während du ihn spielst, damit Name und Stelle zusammen hängen bleiben."
       },
-      "customGoalDescription": "Spiel den Ton an einer der markierten Stellen"
+      "customGoalDescription": "Finde diesen Ton und spiel ihn"
     },
     "fretboard_region_hunt": {
       "title": "Notenjagd — in einem Bereich",

@@ -228,8 +228,7 @@
     "learn_notes": "音",
     "learn_whole_neck": "ネック全体",
     "learn_naturals": "幹音のみ",
-    "learn_all_notes": "全12音",
-    "learn_hint": "印のある場所で弾こう"
+    "learn_all_notes": "全12音"
   },
   "tools": {
     "tempo": "テンポ",

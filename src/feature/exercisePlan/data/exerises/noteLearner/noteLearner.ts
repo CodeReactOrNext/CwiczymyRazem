@@ -5,7 +5,7 @@ import { type NoteLearnerNotes, type NoteLearnerStrings, useNoteLearnerStore } f
 
 const NATURAL_NOTES = ["C", "D", "E", "F", "G", "A", "B"];
 
-/** One string: frets 0–11 hold every note exactly once, so each target has one
+/** One string: frets 0â€“11 hold every note exactly once, so each target has one
  *  spot. The whole neck runs to the 12th, the landmark the player counts from. */
 export function noteLearnerRegion(strings: NoteLearnerStrings) {
   return { startFret: 0, endFret: strings === "all" ? 12 : 11 };
@@ -50,35 +50,37 @@ function rollTarget() {
 
 const firstTarget = rollTarget();
 
-export const noteLearnerExercise: Exercise = {
-  id: "note_learner",
+/**
+ * The note name and the neck, nothing else: the player finds the spot from
+ * memory on the string and notes they picked, and the next note waits until
+ * the mic has heard this one.
+ */
+export const noteRecallExercise: Exercise = {
+  id: "note_recall",
   addedAt: "2026-11-27",
   isHiddenFromLanding: true,
-  title: "Note Hunt — Learn Mode",
-  description: "Learn where every note lives: the neck shows you the spot, you play it, the mic checks it.",
+  title: "Note Hunt â€” Recall Mode",
+  description: "See a note name, find it on the string you picked and play it. No markers, no timer.",
   difficulty: "beginner",
   category: "theory",
   timeInMinutes: 3,
   instructions: [
     "Pick a string (or the whole neck) and natural notes or all 12 under the fretboard.",
-    "A note appears and every place it lives is marked on the neck. Play it.",
+    "A note name appears. The neck doesn't show where it is, so find it and play it.",
     "The next note comes up once the mic has heard it. There's no timer, so take your time.",
   ],
   tips: [
-    "Say the note name out loud as you play it. Saying it while you see the spot is how it sticks.",
-    "Before you play, look at the fret number and the dots near it, not just the marker.",
-    "Once one string feels easy, switch to the Note Hunt without the markers and see what stayed.",
+    "Stuck on a note? Count up from the nearest one you know, or from the open string.",
+    "Use the dots at frets 3, 5, 7, 9 and 12 as landmarks.",
+    "Say the note name out loud as you play it, so the name and the spot stick together.",
   ],
-  whyItMatters: "You can't remember a note's place on the neck until you've found it there a few times. This mode shows you the spot first, so the repetition goes into learning it, not guessing.",
+  whyItMatters: "Finding a note with nothing on the neck to help is how you learn where it lives, and it's what you'll need when you play.",
   metronomeSpeed: null,
   relatedSkills: ["music_theory"],
   disableBackingTrack: true,
   customGoal: firstTarget.goal,
-  customGoalDescription: "Play the note at one of the marked spots",
+  customGoalDescription: "Find this note and play it",
   customGoalRegion: firstTarget.region,
-  // No customGoalStrings: the strings come with each rolled target (the player
-  // picks them in the session), and a static value here would outlive a switch
-  // to the whole neck, where the target carries none.
   rollHuntTarget: rollTarget,
-  noteHuntConfig: { rotateSeconds: 0, mode: "region", advanceOn: "solved", showPositions: true },
+  noteHuntConfig: { rotateSeconds: 0, mode: "region", advanceOn: "solved", pickTargets: true },
 };

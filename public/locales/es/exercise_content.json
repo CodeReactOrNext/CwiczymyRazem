@@ -606,21 +606,21 @@
       "customGoal": "G",
       "customGoalDescription": "Encuentra esta nota en cada cuerda y octava"
     },
-    "note_learner": {
-      "title": "Caza de notas — modo aprendizaje",
-      "description": "Aprende dónde está cada nota: el mástil te muestra el lugar, tú la tocas y el micrófono lo comprueba.",
-      "whyItMatters": "No puedes recordar dónde está una nota en el mástil hasta haberla encontrado allí varias veces. Este modo te enseña el lugar primero, así que la repetición sirve para aprender, no para adivinar.",
+    "note_recall": {
+      "title": "Caza de notas — modo memoria",
+      "description": "Ve el nombre de una nota, encuéntrala en la cuerda elegida y tócala. Sin marcadores ni temporizador.",
+      "whyItMatters": "Encontrar una nota sin nada en el mástil que te ayude es como aprendes dónde está, y es lo que necesitarás al tocar.",
       "instructions": {
         "0": "Bajo el mástil, elige una cuerda (o todo el mástil) y solo notas naturales o las 12.",
-        "1": "Aparece una nota y cada lugar donde está queda marcado en el mástil. Tócala.",
+        "1": "Aparece el nombre de una nota. El mástil no muestra dónde está, así que encuéntrala y tócala.",
         "2": "La siguiente nota llega cuando el micrófono oye la actual. No hay temporizador, así que tómate tu tiempo."
       },
       "tips": {
-        "0": "Di el nombre de la nota en voz alta mientras la tocas. Decirlo mientras ves el lugar hace que se quede.",
-        "1": "Antes de tocar, mira el número de traste y los puntos cercanos, no solo el marcador.",
-        "2": "Cuando una cuerda te resulte fácil, pasa a la Caza de notas sin marcadores y comprueba qué se te ha quedado."
+        "0": "¿Atascado en una nota? Cuenta hacia arriba desde la más cercana que conozcas o desde la cuerda al aire.",
+        "1": "Usa los puntos de los trastes 3, 5, 7, 9 y 12 como referencia.",
+        "2": "Di el nombre de la nota en voz alta mientras la tocas, para que el nombre y el lugar se queden juntos."
       },
-      "customGoalDescription": "Toca la nota en uno de los lugares marcados"
+      "customGoalDescription": "Encuentra esta nota y tócala"
     },
     "fretboard_region_hunt": {
       "title": "Caza de notas — en una región",

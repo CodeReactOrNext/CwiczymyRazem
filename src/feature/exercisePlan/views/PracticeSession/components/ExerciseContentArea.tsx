@@ -298,7 +298,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
             <NoteHuntDetector
               targetNote={currentExercise.customGoal}
               description={currentExercise.customGoalDescription}
-              showPositions={!!currentExercise.noteHuntConfig?.showPositions}
+              pickTargets={!!currentExercise.noteHuntConfig?.pickTargets}
               isMicEnabled={!!isMicEnabled}
               isListening={isListening}
               isPlaying={isPlaying}

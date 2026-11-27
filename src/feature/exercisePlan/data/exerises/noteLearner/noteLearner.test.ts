@@ -2,7 +2,7 @@ import { huntPositions } from "feature/exercisePlan/views/PracticeSession/hooks/
 import { NOTES } from "utils/audio/noteUtils";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { nextLearnerNote, noteLearnerExercise, noteLearnerRegion } from "./noteLearner";
+import { nextLearnerNote, noteLearnerRegion, noteRecallExercise } from "./noteLearner";
 import { useNoteLearnerStore } from "./noteLearnerStore";
 
 const NATURALS = ["C", "D", "E", "F", "G", "A", "B"];
@@ -39,24 +39,26 @@ describe("noteLearner", () => {
 
   it("rolls targets from the picked string and notes", () => {
     useNoteLearnerStore.setState({ strings: 3, notes: "naturals" });
-    const onG = noteLearnerExercise.rollHuntTarget!();
+    const onG = noteRecallExercise.rollHuntTarget!();
     expect(onG.strings).toEqual([3]);
     expect(onG.region).toEqual({ startFret: 0, endFret: 11 });
     expect(NATURALS).toContain(onG.goal);
 
     useNoteLearnerStore.setState({ strings: "all", notes: "all" });
-    const wholeNeck = noteLearnerExercise.rollHuntTarget!();
+    const wholeNeck = noteRecallExercise.rollHuntTarget!();
     expect(wholeNeck.strings).toBeUndefined();
     expect(wholeNeck.region).toEqual({ startFret: 0, endFret: 12 });
   });
 
-  it("is a mic hunt that waits for the answer and shows the positions", () => {
-    expect(noteLearnerExercise.noteHuntConfig).toMatchObject({
+  it("is a mic hunt with the picker that waits for the answer and hides the positions", () => {
+    expect(noteRecallExercise.noteHuntConfig).toMatchObject({
       mode: "region",
       advanceOn: "solved",
-      showPositions: true,
+      pickTargets: true,
     });
-    expect(noteLearnerExercise.disableMic).toBeUndefined();
-    expect(noteLearnerExercise.customGoalStrings).toBeUndefined();
+    expect(noteRecallExercise.disableMic).toBeUndefined();
+    // Strings come with each rolled target; a static value would outlive a
+    // switch to the whole neck.
+    expect(noteRecallExercise.customGoalStrings).toBeUndefined();
   });
 });
