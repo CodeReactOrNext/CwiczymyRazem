@@ -5,7 +5,7 @@ import { type NoteLearnerNotes, type NoteLearnerStrings, useNoteLearnerStore } f
 
 const NATURAL_NOTES = ["C", "D", "E", "F", "G", "A", "B"];
 
-/** One string: frets 0â€“11 hold every note exactly once, so each target has one
+/** One string: frets 0–11 hold every note exactly once, so each target has one
  *  spot. The whole neck runs to the 12th, the landmark the player counts from. */
 export function noteLearnerRegion(strings: NoteLearnerStrings) {
   return { startFret: 0, endFret: strings === "all" ? 12 : 11 };
@@ -56,10 +56,10 @@ const firstTarget = rollTarget();
  * the mic has heard this one.
  */
 export const noteRecallExercise: Exercise = {
-  id: "note_recall",
+  id: "note_hunt_mic",
   addedAt: "2026-11-27",
   isHiddenFromLanding: true,
-  title: "Note Hunt â€” Recall Mode",
+  title: "Note Hunt — With Mic",
   description: "See a note name, find it on the string you picked and play it. No markers, no timer.",
   difficulty: "beginner",
   category: "theory",

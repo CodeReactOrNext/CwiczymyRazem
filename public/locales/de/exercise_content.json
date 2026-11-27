@@ -606,8 +606,8 @@
       "customGoal": "G",
       "customGoalDescription": "Finde diese Note auf jeder Saite und in jeder Oktave"
     },
-    "note_recall": {
-      "title": "Notenjagd — Abrufmodus",
+    "note_hunt_mic": {
+      "title": "Notenjagd — mit Mikro",
       "description": "Sieh einen Tonnamen, finde ihn auf der gewählten Saite und spiel ihn. Ohne Markierungen, ohne Timer.",
       "whyItMatters": "Einen Ton ohne jede Hilfe auf dem Griffbrett zu finden lehrt dich, wo er liegt, und genau das brauchst du beim Spielen.",
       "instructions": {

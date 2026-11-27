@@ -606,8 +606,8 @@
       "customGoal": "G",
       "customGoalDescription": "Znajdź tę nutę na każdej strunie i w każdej oktawie"
     },
-    "note_recall": {
-      "title": "Polowanie na nuty — tryb pamięci",
+    "note_hunt_mic": {
+      "title": "Polowanie na nuty — z mikrofonem",
       "description": "Zobacz nazwę nuty, znajdź ją na wybranej strunie i zagraj. Bez znaczników, bez licznika czasu.",
       "whyItMatters": "Znalezienie nuty, gdy na gryfie nic nie podpowiada, uczy, gdzie ona leży, i tego potrzebujesz, kiedy grasz.",
       "instructions": {

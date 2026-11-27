@@ -606,8 +606,8 @@
       "customGoal": "G",
       "customGoalDescription": "Encuentra esta nota en cada cuerda y octava"
     },
-    "note_recall": {
-      "title": "Caza de notas — modo memoria",
+    "note_hunt_mic": {
+      "title": "Caza de notas — con micrófono",
       "description": "Ve el nombre de una nota, encuéntrala en la cuerda elegida y tócala. Sin marcadores ni temporizador.",
       "whyItMatters": "Encontrar una nota sin nada en el mástil que te ayude es como aprendes dónde está, y es lo que necesitarás al tocar.",
       "instructions": {

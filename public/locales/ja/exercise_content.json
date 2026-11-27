@@ -606,8 +606,8 @@
       "customGoal": "C#",
       "customGoalDescription": "この音をすべての弦とオクターブで見つけよう"
     },
-    "note_recall": {
-      "title": "ノートハント — 想起モード",
+    "note_hunt_mic": {
+      "title": "ノートハント — マイクで",
       "description": "音名を見て、選んだ弦で探して弾こう。印もタイマーもありません。",
       "whyItMatters": "何の助けもないネックで音を見つけることで、その位置が身につきます。演奏で必要なのはこれです。",
       "instructions": {

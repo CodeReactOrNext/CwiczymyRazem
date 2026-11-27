@@ -22,7 +22,7 @@ describe("house style", () => {
     // ~4 chars per token: keep the library under ~16.5k tokens. Raised from
     // 60k chars on 2026-11-19, when the 22 Interval Mastery drills took the
     // library from 59.4k to 63.6k; to 67k on 2026-11-27 for Note Hunt
-    // Recall Mode, which took it past 66k.
+    // — With Mic, which took it past 66k.
     expect(catalog.length).toBeLessThan(67_000);
     expect(catalog).toContain(
       "one_chord_improv | Improv — One Chord | medium | creativity",
