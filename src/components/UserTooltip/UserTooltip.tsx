@@ -20,7 +20,7 @@ import { useTranslation } from "hooks/useTranslation";
 import type { ActivityPreview } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { Clock, ExternalLink, Flame, Leaf, Music, Trophy,X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useResponsiveStore } from "store/useResponsiveStore";
 import type { CurrentActivityInterface } from "types/api.types";
@@ -80,6 +80,11 @@ export const UserTooltip = ({
   const { t } = useTranslation(["common", "ui"]);
   const isMobile = useResponsiveStore((state) => state.isMobile);
   const [open, setOpen] = useState(false);
+  // Where the phone card is portalled. Inside an open Radix dialog (the Community drawer) the
+  // body is pointer-events: none and everything outside the dialog is blocked — a card on the
+  // body could then never be closed. So it goes into the dialog that holds the row.
+  const triggerRef = useRef<HTMLSpanElement>(null);
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   // The card is a hover/tap surface and the feeds using it render a dozen at a
   // time — fetching on mount meant a user doc plus that user's whole exerciseData
   // collection per row, for cards nobody opens. Load on first open instead.
@@ -272,6 +277,11 @@ export const UserTooltip = ({
 
               <Link
                 href={`/user/${userId}`}
+                onClick={() => {
+                  setOpen(false);
+                  // The profile would otherwise open under the Community drawer.
+                  useCommunityDrawer.getState().setOpen(false);
+                }}
                 className={cn(
                   buttonVariants({ variant: "subtle" }),
                   "relative z-10 w-full border-b-black/15 bg-black/5 font-bold text-black hover:bg-black/10 hover:text-black",
@@ -307,17 +317,22 @@ export const UserTooltip = ({
     return (
       <>
         <span
+          ref={triggerRef}
           className="contents"
           onClickCapture={(e) => {
             e.preventDefault();
             e.stopPropagation();
+            setPortalTarget(
+              triggerRef.current?.closest<HTMLElement>('[role="dialog"]') ??
+                document.body,
+            );
             setHasOpened(true);
             setOpen(true);
           }}
         >
           {children}
         </span>
-        {open && typeof document !== "undefined" &&
+        {open && portalTarget &&
           createPortal(
             <div
               className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
@@ -340,7 +355,7 @@ export const UserTooltip = ({
                 {panel}
               </div>
             </div>,
-            document.body
+            portalTarget
           )}
       </>
     );
