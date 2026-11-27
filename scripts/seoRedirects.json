@@ -190,6 +190,11 @@
     "permanent": true
   },
   {
+    "source": "/exercises/note-learner",
+    "destination": "/guitar-scale-practice-routine#note-learner",
+    "permanent": true
+  },
+  {
     "source": "/exercises/fretboard-region-hunt",
     "destination": "/guitar-scale-practice-routine",
     "permanent": true

@@ -63,7 +63,7 @@ describe("the real library", () => {
     expect(count("bpm")).toBe(242);
     expect(count("tab")).toBe(190);
     expect(count("strum")).toBe(34);
-    expect(count("fretboard")).toBe(53);
+    expect(count("fretboard")).toBe(54);
     expect(count("ear")).toBe(22);
     expect(count("noGuitar")).toBe(57);
   });

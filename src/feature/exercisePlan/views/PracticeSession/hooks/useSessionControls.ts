@@ -119,12 +119,16 @@ export function useSessionControls({
   // A one-exercise session (the exercise of the day) stays on index 0, so the
   // index-change reset never fires — the run's score has to be cleared here,
   // or the next run banks on top of the last one.
+  // The metronome has to go back to the top too: a stopped metronome remembers
+  // where it was paused, so Start after "Practice again" would otherwise pick
+  // the tab up where the last run's time ran out, with the clock back at 0.
   const handleRestartFullSession = useCallback(() => {
+    metronome.restartMetronome();
     restartFullSession(); setTabRestartKey(prev => prev + 1);
     loopsCompletedRef.current = 0;
     setEarTrainingScore(0);
     noteMatchingHandle.current?.resetGame();
-  }, [restartFullSession, loopsCompletedRef, setEarTrainingScore, noteMatchingHandle]);
+  }, [metronome, restartFullSession, loopsCompletedRef, setEarTrainingScore, noteMatchingHandle]);
 
   const handleSpeedMultiplierChange = useCallback((value: number) => {
     setSpeedMultiplier((prev: number) => {

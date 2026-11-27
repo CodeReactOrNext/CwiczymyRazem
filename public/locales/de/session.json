@@ -223,7 +223,13 @@
     "round_missed": "{{found}} von {{total}} gefunden",
     "round_missed_detail": "Verpasst: {{notes}}",
     "tap_octaves": "Tippe auf jede Oktave, die du findest",
-    "tap_octaves_region": "Tippe auf jede Oktave, die du im Bereich findest"
+    "tap_octaves_region": "Tippe auf jede Oktave, die du im Bereich findest",
+    "learn_strings": "Saite",
+    "learn_notes": "Töne",
+    "learn_whole_neck": "Ganzes Griffbrett",
+    "learn_naturals": "Stammtöne",
+    "learn_all_notes": "Alle 12",
+    "learn_hint": "Spiel ihn an einer markierten Stelle"
   },
   "tools": {
     "tempo": "Tempo",

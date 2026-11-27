@@ -606,6 +606,22 @@
       "customGoal": "G",
       "customGoalDescription": "Finde diese Note auf jeder Saite und in jeder Oktave"
     },
+    "note_learner": {
+      "title": "Notenjagd — Lernmodus",
+      "description": "Lerne, wo jeder Ton liegt: Das Griffbrett zeigt dir die Stelle, du spielst ihn, das Mikro prüft.",
+      "whyItMatters": "Du merkst dir die Lage eines Tons erst, wenn du ihn dort ein paar Mal gefunden hast. Dieser Modus zeigt dir zuerst die Stelle, damit die Wiederholung ins Lernen geht und nicht ins Raten.",
+      "instructions": {
+        "0": "Wähle unter dem Griffbrett eine Saite (oder das ganze Griffbrett) und nur Stammtöne oder alle 12.",
+        "1": "Ein Ton erscheint, und jede Stelle, an der er liegt, ist auf dem Griffbrett markiert. Spiel ihn.",
+        "2": "Der nächste Ton kommt, sobald das Mikro den aktuellen gehört hat. Es gibt keinen Timer, lass dir Zeit."
+      },
+      "tips": {
+        "0": "Sag den Tonnamen laut, während du ihn spielst. Ihn auszusprechen, während du die Stelle siehst, lässt ihn hängen bleiben.",
+        "1": "Schau vor dem Spielen auf die Bundnummer und die Punkte daneben, nicht nur auf die Markierung.",
+        "2": "Wenn eine Saite leicht fällt, wechsle zur Notenjagd ohne Markierungen und prüfe, was hängen geblieben ist."
+      },
+      "customGoalDescription": "Spiel den Ton an einer der markierten Stellen"
+    },
     "fretboard_region_hunt": {
       "title": "Notenjagd — in einem Bereich",
       "description": "Finde eine Note in einem bestimmten, auf einem Griffbrettdiagramm gezeigten Bereich des Halses — unter Zeitdruck.",

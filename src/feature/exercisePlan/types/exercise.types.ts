@@ -286,6 +286,10 @@ export interface Exercise {
      *  own. For countdown hunts; off in exams. Click-answered ones keep it in
      *  exams too and never stop the clock. */
     roundVerdict?: boolean;
+    /** Learning mode: the neck marks every position of the target, named, before
+     *  it is played, so the drill teaches where a note lives instead of testing
+     *  it. Mic-driven region hunts only. */
+    showPositions?: boolean;
   };
   /** Restricts which strings (1-6, 1 = high e) are in play. Omitted = all 6.
    *  Combined with customGoalRegion's fret window to compute the exact set of
@@ -301,6 +305,9 @@ export interface Exercise {
     goal: string;
     prompt?: HuntPrompt;
     region?: { startFret: number; endFret: number };
+    /** Strings in play for this target, when the drill lets the player pick
+     *  them during the session. Overrides `customGoalStrings`. */
+    strings?: number[];
   };
   /** For region-mode note hunts: the fret window the target must be found in.
    *  Re-rolled alongside customGoal. */

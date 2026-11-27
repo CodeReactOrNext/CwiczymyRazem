@@ -223,7 +223,13 @@
     "round_missed": "{{found}} of {{total}} found",
     "round_missed_detail": "Missed: {{notes}}",
     "tap_octaves": "Tap each octave you find",
-    "tap_octaves_region": "Tap each octave you find in the region"
+    "tap_octaves_region": "Tap each octave you find in the region",
+    "learn_strings": "String",
+    "learn_notes": "Notes",
+    "learn_whole_neck": "Whole neck",
+    "learn_naturals": "Naturals",
+    "learn_all_notes": "All 12",
+    "learn_hint": "Play it at a marked spot"
   },
   "tools": {
     "tempo": "Tempo",

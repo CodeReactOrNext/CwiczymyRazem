@@ -8,6 +8,7 @@ export interface HuntTarget {
   goal: string;
   prompt?: HuntPrompt;
   region?: { startFret: number; endFret: number };
+  strings?: number[];
 }
 
 /**

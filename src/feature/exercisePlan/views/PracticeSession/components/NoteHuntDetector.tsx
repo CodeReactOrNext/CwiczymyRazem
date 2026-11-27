@@ -11,6 +11,7 @@ import { ClickableFretboard, useShowFullNeck } from "./ClickableFretboard";
 import { DetectionWave } from "./DetectionWave";
 import { HuntOctaveLabel, HuntOctaves } from "./HuntOctaves";
 import { HuntAsk, HuntPromptCard, HuntStage, HuntStats, HuntSteps, HuntTargetCard, HuntViewMenu } from "./HuntStage";
+import { NoteLearnerPicker } from "./NoteLearnerPicker";
 
 interface NoteHuntDetectorProps {
   targetNote: string;
@@ -26,6 +27,10 @@ interface NoteHuntDetectorProps {
   onDevPassExam?: () => void;
   /** Off where the session's own readout shows the score beside the hunt. */
   showScore?: boolean;
+  /** Learning mode (noteHuntConfig.showPositions): every position of the target
+   *  is marked and named on the neck before it is played, and the player picks
+   *  the string and the notes under it. */
+  showPositions?: boolean;
 }
 
 // Index = string number (1 = high e … 6 = low E).
@@ -42,6 +47,7 @@ export function NoteHuntDetector({
   isPlaying,
   onDevPassExam,
   showScore = true,
+  showPositions = false,
 }: NoteHuntDetectorProps) {
   const { t } = useTranslation("session");
   const { noteHunt, noteHuntSecondsLeft, noteHuntSecondsTotal, noteHuntRegion, noteHuntStrings, noteHuntStreak, noteHuntRoundEnd, customGoalPrompt, huntTarget, chromaticProgress, volumeRef, advanceHunt, canAdvanceHunt, markNoteHuntOctave, tuningOffsets } = useNoteMatchingContext();
@@ -90,6 +96,11 @@ export function NoteHuntDetector({
     [targetNote, noteHuntRegion, noteHuntStrings],
   );
   const foundKeys = regionPositions.filter(p => foundOctaves.includes(p.octave)).map(p => `${p.string}-${p.fret}`);
+  // Learning mode gives the answer away on purpose: every spot is drawn, named,
+  // and fills in as the mic hears its octave.
+  const positionKeys = showPositions ? regionPositions.map(p => `${p.string}-${p.fret}`) : [];
+  const revealKeys = positionKeys.filter(key => !foundKeys.includes(key));
+  const cellLabels = showPositions ? Object.fromEntries(positionKeys.map(key => [key, targetNote])) : undefined;
   const liveCell = isMatch && detectedOctave !== null
     ? regionPositions.find(p => p.octave === detectedOctave)
     : undefined;
@@ -173,7 +184,9 @@ export function NoteHuntDetector({
             {/* Says the quiet part loudly: the note alone isn't the task — the
                 string is half of it. Replaces the prose description, which said
                 the same thing. */}
-            {soleString ? (
+            {showPositions && !soleString ? (
+              <p className="text-center text-sm font-bold text-zinc-200 shortwide:text-left">{t("note_hunt.learn_hint")}</p>
+            ) : soleString ? (
               <p className="text-center text-sm font-bold text-zinc-200 shortwide:text-left">
                 Play it on the <span className="text-cyan-400">{STRING_NAMES[soleString]}</span> string
                 <span className="ml-1 font-semibold text-zinc-500">({STRING_ORDINALS[soleString]})</span>
@@ -386,9 +399,18 @@ export function NoteHuntDetector({
           lastClick={null}
           liveKey={liveCell ? `${liveCell.string}-${liveCell.fret}` : null}
           showFullNeck={showFullNeck}
+          revealKeys={revealKeys}
+          cellLabels={cellLabels}
         />
       }
-      footer={footer}
+      footer={
+        showPositions ? (
+          <div className="flex flex-col items-center gap-4 shortwide:gap-2">
+            {footer}
+            <NoteLearnerPicker onChange={advanceHunt} />
+          </div>
+        ) : footer
+      }
     />
   );
 }

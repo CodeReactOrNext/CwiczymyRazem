@@ -606,6 +606,22 @@
       "customGoal": "G",
       "customGoalDescription": "Encuentra esta nota en cada cuerda y octava"
     },
+    "note_learner": {
+      "title": "Caza de notas — modo aprendizaje",
+      "description": "Aprende dónde está cada nota: el mástil te muestra el lugar, tú la tocas y el micrófono lo comprueba.",
+      "whyItMatters": "No puedes recordar dónde está una nota en el mástil hasta haberla encontrado allí varias veces. Este modo te enseña el lugar primero, así que la repetición sirve para aprender, no para adivinar.",
+      "instructions": {
+        "0": "Bajo el mástil, elige una cuerda (o todo el mástil) y solo notas naturales o las 12.",
+        "1": "Aparece una nota y cada lugar donde está queda marcado en el mástil. Tócala.",
+        "2": "La siguiente nota llega cuando el micrófono oye la actual. No hay temporizador, así que tómate tu tiempo."
+      },
+      "tips": {
+        "0": "Di el nombre de la nota en voz alta mientras la tocas. Decirlo mientras ves el lugar hace que se quede.",
+        "1": "Antes de tocar, mira el número de traste y los puntos cercanos, no solo el marcador.",
+        "2": "Cuando una cuerda te resulte fácil, pasa a la Caza de notas sin marcadores y comprueba qué se te ha quedado."
+      },
+      "customGoalDescription": "Toca la nota en uno de los lugares marcados"
+    },
     "fretboard_region_hunt": {
       "title": "Caza de notas — en una región",
       "description": "Localiza una nota dentro de una región concreta del mástil mostrada en un diagrama, contra el reloj.",

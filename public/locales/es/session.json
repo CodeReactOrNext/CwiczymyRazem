@@ -223,7 +223,13 @@
     "round_missed": "{{found}} de {{total}} encontradas",
     "round_missed_detail": "Faltaron: {{notes}}",
     "tap_octaves": "Toca cada octava que encuentres",
-    "tap_octaves_region": "Toca cada octava que encuentres en la región"
+    "tap_octaves_region": "Toca cada octava que encuentres en la región",
+    "learn_strings": "Cuerda",
+    "learn_notes": "Notas",
+    "learn_whole_neck": "Todo el mástil",
+    "learn_naturals": "Naturales",
+    "learn_all_notes": "Las 12",
+    "learn_hint": "Tócala en un punto marcado"
   },
   "tools": {
     "tempo": "Tempo",

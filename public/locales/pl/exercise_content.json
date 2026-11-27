@@ -606,6 +606,22 @@
       "customGoal": "G",
       "customGoalDescription": "Znajdź tę nutę na każdej strunie i w każdej oktawie"
     },
+    "note_learner": {
+      "title": "Polowanie na nuty — tryb nauki",
+      "description": "Naucz się, gdzie leży każda nuta: gryf pokazuje miejsce, ty grasz, mikrofon sprawdza.",
+      "whyItMatters": "Nie zapamiętasz miejsca nuty na gryfie, dopóki nie znajdziesz jej tam kilka razy. Ten tryb najpierw pokazuje miejsce, więc powtórki idą w naukę, a nie w zgadywanie.",
+      "instructions": {
+        "0": "Pod gryfem wybierz strunę (albo cały gryf) i same nuty naturalne albo wszystkie 12.",
+        "1": "Pojawia się nuta, a na gryfie zaznaczone są wszystkie miejsca, w których leży. Zagraj ją.",
+        "2": "Następna nuta pojawia się, gdy mikrofon usłyszy poprzednią. Nie ma licznika czasu, więc się nie spiesz."
+      },
+      "tips": {
+        "0": "Wypowiadaj nazwę nuty na głos, kiedy ją grasz. Mówienie jej, gdy widzisz miejsce, pomaga ją zapamiętać.",
+        "1": "Zanim zagrasz, spójrz na numer progu i kropki obok, a nie tylko na znacznik.",
+        "2": "Gdy jedna struna stanie się łatwa, przejdź do Polowania na nuty bez znaczników i sprawdź, co zostało w głowie."
+      },
+      "customGoalDescription": "Zagraj nutę w jednym z zaznaczonych miejsc"
+    },
     "fretboard_region_hunt": {
       "title": "Polowanie na nuty — w regionie",
       "description": "Znajdź nutę w konkretnym regionie gryfu pokazanym na diagramie — na czas.",

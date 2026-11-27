@@ -153,6 +153,7 @@ export function MobileExerciseContent({
             <NoteHuntDetector
               targetNote={currentExercise.customGoal}
               description={currentExercise.customGoalDescription}
+              showPositions={!!currentExercise.noteHuntConfig?.showPositions}
               isMicEnabled={!!isMicEnabled}
               isListening={isListening}
               isPlaying={isPlaying}

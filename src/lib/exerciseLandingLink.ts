@@ -58,6 +58,7 @@ const EMBEDDED_EXERCISE_PAGE: Record<string, SeoLandingPageKey> = {
   pull_off_pentatonic_run: "scales",
   scale_practice_configurable: "scales",
   random_note_hunt: "scales",
+  note_learner: "scales",
   strumming_funk: "intermediate",
   muting_discipline_drill: "intermediate",
   smooth_chord_transitions: "intermediate",

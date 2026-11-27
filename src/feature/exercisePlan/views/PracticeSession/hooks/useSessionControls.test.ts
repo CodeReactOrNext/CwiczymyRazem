@@ -173,3 +173,20 @@ describe("useSessionControls — guitar toggle", () => {
     expect(localStorage.getItem("guitar_playback_enabled")).toBe("true");
   });
 });
+
+describe("useSessionControls — practice again", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("sends the metronome back to the top, so Start doesn't resume where the last run's time ran out", () => {
+    const { metronome, options } = buildOptions();
+    const { result } = renderHook(() => useSessionControls(options));
+
+    result.current.handleRestartFullSession();
+
+    expect(metronome.restartMetronome).toHaveBeenCalledTimes(1);
+    expect(options.restartFullSession).toHaveBeenCalledTimes(1);
+    expect(metronome.stopMetronome).not.toHaveBeenCalled();
+  });
+});

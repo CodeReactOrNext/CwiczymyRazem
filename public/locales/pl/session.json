@@ -223,7 +223,13 @@
     "round_missed": "Znalezione: {{found}} z {{total}}",
     "round_missed_detail": "Zabrakło: {{notes}}",
     "tap_octaves": "Stuknij każdą znalezioną oktawę",
-    "tap_octaves_region": "Stuknij każdą oktawę znalezioną w obszarze"
+    "tap_octaves_region": "Stuknij każdą oktawę znalezioną w obszarze",
+    "learn_strings": "Struna",
+    "learn_notes": "Dźwięki",
+    "learn_whole_neck": "Cały gryf",
+    "learn_naturals": "Bez krzyżyków",
+    "learn_all_notes": "Wszystkie 12",
+    "learn_hint": "Zagraj go w zaznaczonym miejscu"
   },
   "tools": {
     "tempo": "Tempo",
