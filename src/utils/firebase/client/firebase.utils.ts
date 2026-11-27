@@ -19,9 +19,8 @@ import {
   getDoc,
   initializeFirestore,
   limit,
+  memoryLocalCache,
   orderBy,
-  persistentLocalCache,
-  persistentSingleTabManager,
   query,
   startAfter,
   Timestamp,
@@ -57,14 +56,22 @@ export const firebaseSignInWithCredential = (credential: any) =>
 export const firebaseSignInWithCustomToken = (token: string) =>
   signInWithCustomToken(auth, token);
 
-export const db =
-  typeof window !== "undefined"
-    ? initializeFirestore(firebaseApp, {
-      localCache: persistentLocalCache({
-        tabManager: persistentSingleTabManager(undefined),
-      }),
-    })
-    : initializeFirestore(firebaseApp, {});
+/**
+ * A memory cache in every tab, never the IndexedDB one.
+ *
+ * The persistent cache can be owned by one tab at a time. With the single-tab
+ * manager a second tab died outright (`INTERNAL ASSERTION FAILED: Unexpected
+ * state (b815)` — "Failed to obtain exclusive access to the persistence
+ * layer"), and a tab frozen overnight lost its lease to another one and
+ * failed every operation afterwards ("The current tab is not in the required
+ * state…") until it was reloaded. The multi-tab manager was tried and reverted
+ * on 2026-03-24. In memory each tab owns its cache, so there is nothing to
+ * contend for; the cost is re-reading listener results after a reload, which
+ * every second tab already paid.
+ */
+export const db = initializeFirestore(firebaseApp, {
+  localCache: memoryLocalCache(),
+});
 
 export const storage = getStorage(firebaseApp);
 

@@ -143,9 +143,7 @@ function FinishPage({
 
       {!step.modalOnly && step.examGoal && (
         <section className='space-y-3'>
-          <h3 className={pageTitleClass}>
-            {t("lesson.how_to_pass")}
-          </h3>
+          <h3 className={pageTitleClass}>{t("lesson.how_to_pass")}</h3>
           <p className='text-lg leading-relaxed text-zinc-300'>
             {step.examGoal}
           </p>
@@ -155,9 +153,7 @@ function FinishPage({
       {!!step.checklist?.length && (
         <section className='space-y-4'>
           <div className='space-y-2'>
-            <h3 className={pageTitleClass}>
-              {t("lesson.before_you_start")}
-            </h3>
+            <h3 className={pageTitleClass}>{t("lesson.before_you_start")}</h3>
             <p className='text-base text-zinc-400'>{t("lesson.tick_all")}</p>
           </div>
           <div className='space-y-2'>
@@ -190,9 +186,7 @@ function FinishPage({
 
       {!!step.songPicker?.length && (
         <section className='space-y-4'>
-          <h3 className={pageTitleClass}>
-            {t("sidebar.choose_target")}
-          </h3>
+          <h3 className={pageTitleClass}>{t("sidebar.choose_target")}</h3>
           <div className='grid grid-cols-1 gap-2'>
             {pickerSongs.length === 0 ? (
               <Skeleton variant='block' className='h-16' />
@@ -315,26 +309,31 @@ function LessonBody({
   return (
     <div className='flex min-h-0 flex-1 flex-col' onKeyDown={onKeyDown}>
       {/* ── Top bar: leave, and how far through ── */}
-      <div className='flex flex-shrink-0 items-center gap-4 px-4 pb-3 pt-[max(1rem,env(safe-area-inset-top))] sm:px-8 sm:pt-6'>
-        <DialogPrimitive.Close asChild>
-          <Button variant='subtle' size='icon' aria-label={t("sidebar.close")}>
-            <X />
-          </Button>
-        </DialogPrimitive.Close>
-        <div className='flex flex-1 gap-1' aria-hidden>
-          {pages.map((_, i) => (
-            <span
-              key={i}
-              className={cn(
-                "h-1.5 flex-1 rounded-full transition-colors",
-                i <= pageIndex ? "bg-zinc-200" : "bg-zinc-800",
-              )}
-            />
-          ))}
+      <div className='flex-shrink-0 px-4 pb-3 pt-[max(1rem,env(safe-area-inset-top))] sm:px-8 sm:pt-6'>
+        <div className='mx-auto flex w-full max-w-2xl items-center gap-4'>
+          <DialogPrimitive.Close asChild>
+            <Button
+              variant='subtle'
+              size='icon'
+              aria-label={t("sidebar.close")}>
+              <X />
+            </Button>
+          </DialogPrimitive.Close>
+          <div className='flex flex-1 gap-1' aria-hidden>
+            {pages.map((_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "h-1.5 flex-1 rounded-full transition-colors",
+                  i <= pageIndex ? "bg-zinc-200" : "bg-zinc-800",
+                )}
+              />
+            ))}
+          </div>
+          <span className='text-xs font-medium tabular-nums text-zinc-500'>
+            {pageIndex + 1} / {pages.length}
+          </span>
         </div>
-        <span className='text-xs font-medium tabular-nums text-zinc-500'>
-          {pageIndex + 1} / {pages.length}
-        </span>
       </div>
 
       {/* ── The page ── */}

@@ -1,145 +1,77 @@
 import { PRESSABLE_IN_GROUP } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { FeedbackModal } from "components/FeedbackBubble/FeedbackBubble";
 import { PageTitle } from "components/PageTitle/PageTitle";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import {
-  Check,
-  Grid3x3,
-  Guitar,
-  Lightbulb,
-  type LucideIcon,
-  Play,
-  Plus,
-  RotateCcw,
-  Ruler,
-  Signpost,
-} from "lucide-react";
+import { Lock, Play, Plus, RotateCcw, Signpost } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React from "react";
 
-import type {
-  JourneyModuleWithStatus,
-  LockedModulePlaceholder,
-} from "../../types/journey.types";
+import { getComingSoonModules } from "../../data/comingSoonModules";
+import type { JourneyModuleWithStatus } from "../../types/journey.types";
+import { LandmarkScene } from "./JourneyLandmark";
 
-// ─── Config ───────────────────────────────────────────────────────────────────
-// One accent per module, drawn from the app's semantic palette. It colours the
-// icon tile only: the card itself is plain zinc, and the road inside it keeps
-// the app's meaning colours (emerald = done, white = next) whatever the module.
+// ─── Scene ────────────────────────────────────────────────────────────────────
+// Each card has one fixed cover: the road's landmark that says what the whole
+// module is about (picked by the owner, 2026-11-27). Section scenes like the
+// bend only read beside the road, not as the face of a module. A module with
+// no cover yet shows its current section's scene.
 
-const MODULE_CFG: Record<
-  string,
-  {
-    Icon: LucideIcon;
-    tileBg: string;
-    tileFg: string;
-  }
-> = {
-  fundamentals: {
-    Icon: Guitar,
-    tileBg: "bg-cyan-500/10",
-    tileFg: "text-cyan-400",
-  },
-  fretboard: {
-    Icon: Grid3x3,
-    tileBg: "bg-purple-500/10",
-    tileFg: "text-purple-400",
-  },
-  intervals: {
-    Icon: Ruler,
-    tileBg: "bg-amber-500/10",
-    tileFg: "text-amber-400",
-  },
+const MODULE_COVER: Record<string, string> = {
+  fundamentals: "stage_1", // metronome
+  fretboard: "stage_1", // note names on the neck
+  intervals: "stage_1", // a note and the one a fret above it
 };
 
-// ─── Road ─────────────────────────────────────────────────────────────────────
-// A miniature of the module's path: one small key per lesson, grouped by the
-// module's real sections, so the card shows what is inside and how far along
-// the player is.
+const cardSceneStageId = (
+  module: JourneyModuleWithStatus,
+  stageIdx: number,
+): string | undefined => MODULE_COVER[module.id] ?? module.stages[stageIdx]?.id;
 
-const ModuleRoad = ({ module }: { module: JourneyModuleWithStatus }) => {
-  const { t } = useTranslation("journey");
-  const steps = module.stages.flatMap((stage) => stage.steps);
-  const currentId = steps.find((step) => step.status !== "completed")?.id;
+// ─── Progress ─────────────────────────────────────────────────────────────────
 
-  return (
-    <div
-      aria-hidden
-      className='flex min-w-0 flex-1 flex-wrap gap-x-4 gap-y-3 sm:gap-x-[22px] sm:gap-y-3.5'>
-      {module.stages.map((stage, idx) => {
-        const isCurrentStage = stage.steps.some(
-          (step) => step.id === currentId,
-        );
-
-        return (
-          <div key={stage.id} className='flex min-w-0 flex-col gap-2'>
-            <span
-              className={cn(
-                "truncate text-[11px] font-medium",
-                isCurrentStage ? "text-zinc-300" : "text-zinc-500",
-              )}>
-              {stage.label ?? t("path.stage", { n: idx + 1 })}
-            </span>
-            <div className='flex items-end gap-[5px] sm:gap-1.5'>
-              {stage.steps.map((step) => {
-                if (step.status === "completed") {
-                  return (
-                    <span
-                      key={step.id}
-                      className='grid h-4 w-4 place-items-center rounded-[5px] border-b-[3px] border-b-black/35 bg-emerald-500 text-emerald-950 sm:h-5 sm:w-5 sm:rounded-md'>
-                      <Check
-                        className='h-2.5 w-2.5 sm:h-3 sm:w-3'
-                        strokeWidth={3.5}
-                      />
-                    </span>
-                  );
-                }
-                if (step.id === currentId) {
-                  return (
-                    <span
-                      key={step.id}
-                      className='grid h-[22px] w-[22px] place-items-center rounded-md border-b-[3px] border-b-black/35 bg-white text-zinc-950 sm:h-[26px] sm:w-[26px] sm:rounded-[7px]'>
-                      <Play
-                        className='h-2.5 w-2.5 fill-current sm:h-3 sm:w-3'
-                        strokeWidth={0}
-                      />
-                    </span>
-                  );
-                }
-                return (
-                  <span
-                    key={step.id}
-                    className='h-4 w-4 rounded-[5px] border-b-[3px] border-b-black/35 bg-zinc-800 sm:h-5 sm:w-5 sm:rounded-md'
-                  />
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+/**
+ * One thick bar for the whole module. The road inside the module shows the
+ * lessons one by one; the card only needs how far along it is.
+ */
+const ModuleProgress = ({
+  percent,
+  isComplete,
+}: {
+  percent: number;
+  isComplete: boolean;
+}) => (
+  <div className='h-4 overflow-hidden rounded-full bg-zinc-800'>
+    {percent > 0 && (
+      <div
+        className={cn(
+          "bar-shine h-full min-w-4 rounded-full [--shine-inset:6px]",
+          isComplete ? "bg-emerald-500" : "bg-cyan-400",
+        )}
+        style={{ width: `${percent}%` }}
+      />
+    )}
+  </div>
+);
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface ModuleSelectionScreenProps {
   modules: JourneyModuleWithStatus[];
-  placeholders: LockedModulePlaceholder[];
   onSelectModule: (id: string) => void;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+const CARD =
+  "rounded-2xl bg-zinc-900 px-6 py-6 sm:px-9 sm:py-9 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+
 export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
   modules,
-  placeholders,
   onSelectModule,
 }) => {
   const { t } = useTranslation("journey");
-  const [suggestOpen, setSuggestOpen] = useState(false);
+  const comingSoon = getComingSoonModules();
 
   // First module that isn't fully finished yet — gets the white key.
   const activeIdx = modules.findIndex(
@@ -155,14 +87,25 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
           className='mb-6'
         />
 
-        <div className='space-y-3.5'>
+        <div className='space-y-5 sm:space-y-6'>
           {modules.map((module, idx) => {
-            const cfg = MODULE_CFG[module.id] ?? MODULE_CFG.fundamentals;
-            const Icon = cfg.Icon;
             const completed = module.completedCount;
             const total = module.totalCount;
             const isComplete = total > 0 && completed === total;
             const isCurrent = idx === activeIdx;
+            const percent =
+              total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            // The section holding the first unfinished step; the last one once
+            // the module is done.
+            const openIdx = module.stages.findIndex((stage) =>
+              stage.steps.some((step) => step.status !== "completed"),
+            );
+            const stageIdx =
+              openIdx === -1 ? module.stages.length - 1 : openIdx;
+            const stage = module.stages[stageIdx];
+            const sceneStageId = cardSceneStageId(module, stageIdx);
+
             const ctaLabel = isComplete
               ? t("modules.replay")
               : completed > 0
@@ -182,69 +125,109 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                   ease: "easeOut",
                 }}
                 aria-label={module.title}
-                className='group relative flex w-full flex-col gap-4 overflow-hidden rounded-xl bg-zinc-900 px-4 py-[18px] text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-[var(--road-card-hover,#1f1f23)] sm:gap-5 sm:px-6 sm:py-[22px]'>
-                <div className='flex items-center gap-4'>
-                  <div
-                    className={cn(
-                      "flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-lg sm:h-12 sm:w-12",
-                      isComplete ? "bg-emerald-500/10" : cfg.tileBg,
-                    )}>
-                    {isComplete ? (
-                      <Check
-                        className='h-5 w-5 text-emerald-400'
-                        strokeWidth={2.5}
-                      />
-                    ) : (
-                      <Icon
-                        className={cn(
-                          "h-5 w-5 sm:h-[22px] sm:w-[22px]",
-                          cfg.tileFg,
-                        )}
-                        strokeWidth={2}
-                      />
-                    )}
-                  </div>
-
-                  <div className='min-w-0 flex-1'>
-                    <h2 className='truncate font-display text-base font-bold text-white sm:text-lg'>
+                className={cn(
+                  CARD,
+                  "group grid w-full grid-cols-[minmax(0,1fr)_96px] items-center gap-5 text-left hover:bg-[var(--road-card-hover,#1f1f23)] sm:grid-cols-[minmax(0,1fr)_220px] sm:gap-10",
+                )}>
+                <div className='flex min-w-0 flex-col gap-5 sm:gap-7'>
+                  <div className='min-w-0'>
+                    <h2 className='font-display text-lg font-extrabold leading-tight text-white sm:text-[22px]'>
                       {module.title}
                     </h2>
-                    <p className='mt-0.5 hidden truncate text-sm text-zinc-400 sm:block'>
-                      {module.subtitle}
-                    </p>
+                    {/* Where the player is, and how far: the percent stands
+                        on its own here, in white, where the bar's own label
+                        sank into the fill. */}
+                    <div className='mt-2.5 flex items-baseline justify-between gap-3'>
+                      <p className='min-w-0 truncate text-[13px] text-zinc-400 sm:text-sm'>
+                        {isComplete || !stage ? (
+                          t("sidebar.status.completed")
+                        ) : (
+                          <>
+                            {t("path.stage", { n: stageIdx + 1 })}
+                            {stage.label && (
+                              <>
+                                {" · "}
+                                <span className='font-semibold text-zinc-200'>
+                                  {stage.label}
+                                </span>
+                              </>
+                            )}
+                          </>
+                        )}
+                      </p>
+                      <span className='shrink-0 text-base font-bold tabular-nums text-white sm:text-lg'>
+                        {percent}%
+                      </span>
+                    </div>
                   </div>
 
-                  <span className='shrink-0 whitespace-nowrap font-teko text-[34px] font-semibold tabular-nums leading-[0.8] text-white'>
-                    {completed}
-                    <span className='text-[22px] text-zinc-500'>/{total}</span>
-                  </span>
-                </div>
+                  <ModuleProgress percent={percent} isComplete={isComplete} />
 
-                <div className='flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6'>
-                  <ModuleRoad module={module} />
                   <span
                     aria-hidden
                     className={cn(
                       PRESSABLE_IN_GROUP,
-                      "inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg px-4 text-sm transition-colors [&_svg]:size-4",
+                      "inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm transition-colors sm:max-w-[300px] sm:text-[15px] [&_svg]:size-4",
                       isCurrent
                         ? "border-b-black/25 bg-primary text-primary-foreground group-hover:bg-primary/90"
-                        : "border-b-black/25 bg-zinc-800/60 text-zinc-200 group-hover:bg-zinc-800 group-hover:text-white",
+                        : "border-b-black/25 bg-zinc-800 text-zinc-200 group-hover:bg-zinc-700 group-hover:text-white",
                     )}>
-                    {isComplete && <RotateCcw strokeWidth={2.5} />}
+                    {isComplete ? (
+                      <RotateCcw strokeWidth={2.5} />
+                    ) : (
+                      isCurrent && (
+                        <Play className='fill-current' strokeWidth={0} />
+                      )
+                    )}
                     {ctaLabel}
                   </span>
                 </div>
+
+                {sceneStageId && (
+                  <LandmarkScene
+                    moduleId={module.id}
+                    stageId={sceneStageId}
+                    className='light-hide flex h-24 items-end justify-center sm:h-[170px] [&_svg]:h-full [&_svg]:w-auto [&_svg]:max-w-full'
+                  />
+                )}
               </motion.button>
             );
           })}
+
+          {/* ─── Coming next ─── */}
+          {/* The Journey modules still waiting on the public roadmap, so this
+              list promises what /roadmap does. Each opens the roadmap. */}
+          {comingSoon.map((upcoming) => (
+            <Link
+              key={upcoming.id}
+              href='/roadmap'
+              className={cn(
+                CARD,
+                "flex items-center justify-between gap-4 hover:bg-[var(--road-card-hover,#1f1f23)]",
+              )}>
+              <div className='min-w-0'>
+                <h2 className='font-display text-lg font-extrabold leading-tight text-zinc-500 sm:text-[22px]'>
+                  {upcoming.title}
+                </h2>
+                {upcoming.subtitle && (
+                  <p className='mt-2 text-[13px] text-zinc-500 sm:text-sm'>
+                    {upcoming.subtitle}
+                  </p>
+                )}
+                <p className='mt-4 flex items-center gap-1.5 text-[13px] font-semibold text-zinc-500'>
+                  <Lock size={13} strokeWidth={2.5} aria-hidden />
+                  {t("modules.coming_soon")}
+                </p>
+              </div>
+            </Link>
+          ))}
 
           {/* ─── Own roadmap ─── */}
           {/* The modules are the same for everyone; the coach builds a path
               around the player's own goal on Player Roadmaps. */}
           <Link
             href='/my-roadmaps'
-            className='group flex w-full flex-col gap-4 rounded-xl bg-zinc-900 px-4 py-[18px] transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-[var(--road-card-hover,#1f1f23)] sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-[22px]'>
+            className='group flex w-full flex-col gap-4 rounded-2xl bg-zinc-900 px-6 py-6 transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-[var(--road-card-hover,#1f1f23)] sm:flex-row sm:items-center sm:gap-8 sm:px-9 sm:py-8'>
             <div className='flex min-w-0 flex-1 items-center gap-4'>
               <div className='flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-lg bg-zinc-800 sm:h-12 sm:w-12'>
                 <Signpost
@@ -265,40 +248,14 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
               aria-hidden
               className={cn(
                 PRESSABLE_IN_GROUP,
-                "inline-flex h-9 shrink-0 items-center justify-center gap-2 self-start rounded-lg border-b-black/25 bg-zinc-800/60 px-4 text-sm text-zinc-200 transition-colors group-hover:bg-zinc-800 group-hover:text-white sm:self-auto [&_svg]:size-4",
+                "inline-flex h-9 shrink-0 items-center justify-center gap-2 self-start rounded-lg border-b-black/25 bg-zinc-800 px-4 text-sm text-zinc-200 transition-colors group-hover:bg-zinc-700 group-hover:text-white sm:self-auto [&_svg]:size-4",
               )}>
               <Plus strokeWidth={2.5} />
               {t("modules.create_cta")}
             </span>
           </Link>
-
-          {/* ─── Suggest a path ─── */}
-          <button
-            onClick={() => setSuggestOpen(true)}
-            className='flex w-full items-center gap-4 rounded-lg bg-zinc-900 px-5 py-4 text-left transition-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring hover:bg-zinc-800 active:click-behavior'>
-            <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-800'>
-              <Lightbulb className='h-4 w-4 text-zinc-400' />
-            </div>
-            <div>
-              <p className='text-sm font-semibold text-zinc-300'>
-                {t("modules.suggest")}
-              </p>
-              <p className='text-xs text-zinc-500'>
-                {placeholders.length > 0
-                  ? t("modules.missing_coming", {
-                      topics: placeholders.map((p) => p.title).join(", "),
-                    })
-                  : t("modules.missing")}
-              </p>
-            </div>
-          </button>
         </div>
       </div>
-
-      <FeedbackModal
-        isOpen={suggestOpen}
-        onClose={() => setSuggestOpen(false)}
-      />
     </div>
   );
 };

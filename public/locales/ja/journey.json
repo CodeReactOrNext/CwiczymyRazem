@@ -1,0 +1,66 @@
+{
+  "fret_diagram": "指板図",
+  "toast": {
+    "load_failed": "進捗を読み込めませんでした。ページを更新してください。",
+    "exam_failed": "試験は不合格 — スコア：{{accuracy}}%。もう少し練習して、また挑戦しよう！",
+    "exam_passed": "試験に合格！ {{stars}} — 正確さ{{accuracy}}%",
+    "step_completed": "ステップ完了！ 🎸",
+    "save_failed": "保存できませんでした。もう一度試してください。"
+  },
+  "sidebar": {
+    "status": {
+      "locked": "ロック中",
+      "available": "挑戦可能",
+      "in-progress": "進行中",
+      "completed": "完了"
+    },
+    "close": "閉じる",
+    "step": "ステップ{{n}}",
+    "choose_target": "目標を選ぶ",
+    "saving": "保存中...",
+    "done_complete": "完了にする",
+    "practice": "練習",
+    "retake": "受け直す",
+    "exam": "試験"
+  },
+  "lesson": {
+    "next": "次へ",
+    "back": "戻る",
+    "how_to_pass": "合格の条件",
+    "before_you_start": "始める前に",
+    "tick_all": "このステップを終えるには、当てはまるものすべてにチェックを入れてください。",
+    "tick_more_one": "終えるにはあと1つチェック",
+    "tick_more_other": "終えるにはあと{{count}}つチェック",
+    "pick_song": "終えるには曲を選んでください",
+    "open_one": "レッスンを始める · 1ページ",
+    "open_other": "レッスンを始める · {{count}}ページ",
+    "read_again_one": "レッスンを読む · 1ページ",
+    "read_again_other": "レッスンを読む · {{count}}ページ"
+  },
+  "finish": {
+    "in_arsenal": "Arsenalにあります。ほかの誰も持っていないシリアル付きで。",
+    "complete": "ロードマップ完了 — ギターはあなたのものです。",
+    "steps_left": "手に入れるまで、{{total}}ステップ中あと{{left}}ステップ。",
+    "collecting": "受け取り中...",
+    "collect": "ギターを受け取る",
+    "collected": "受け取り済み",
+    "moment": "ギターはあなたのものです！",
+    "steps": "{{done}}/{{total}}ステップ"
+  },
+  "path": {
+    "modules": "モジュール",
+    "start": "スタート",
+    "stage": "セクション{{n}}"
+  },
+  "modules": {
+    "title": "ラーニングパス",
+    "subtitle": "前回の続きから、またはどのモジュールからでも始められます。",
+    "continue": "続ける",
+    "start": "スタート",
+    "replay": "もう一度",
+    "create_title": "自分のロードマップを作る",
+    "create_body": "弾きたいものをコーチに伝えると、エクササイズ、曲、レッスンをそろえた、あなただけのステップごとの道のりを作ってくれます。",
+    "create_cta": "作成",
+    "coming_soon": "近日公開"
+  }
+}

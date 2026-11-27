@@ -1,0 +1,39 @@
+{
+  "errors": {
+    "fetch_error": "データを取得できませんでした",
+    "password": "パスワードがまちがっています",
+    "email": "メールアドレスが正しくありません",
+    "timeout": "ログインできませんでした — 時間切れです",
+    "email_already-in-use": "そのメールアドレスはすでに使われています",
+    "login": "ログインできませんでした",
+    "popup_closed_by_user": "ログインできませんでした — ログインのウィンドウが閉じられました",
+    "credential_already_in_use": "その認証情報はすでに使われています",
+    "nick_already_in_use": "そのニックネームはすでに使われています",
+    "singup": "登録できませんでした",
+    "upadate": "データを更新できませんでした。もう一度試してください。",
+    "avatar_max": "アバターは最大250px × 250pxです。",
+    "wrong_file_type": "png、jpg/jpegのファイルのみ使えます",
+    "generic": "問題が発生しました。もう一度試してください。"
+  },
+  "info": {
+    "new_user_tip": "Riff Questの使い方はFAQをチェックしてください",
+    "log_in_again": "データを変更するには、もう一度ログインしてください。",
+    "copy_link": "クリップボードにコピー",
+    "update_ready": "riff.questの新しいバージョンをインストールする準備ができました。",
+    "update_ready_action": "今すぐ再起動",
+    "update_available": "riff.quest {{version}}が利用できます",
+    "update_available_description": "このコピーは自分でアップデートできません。新しいバージョンをダウンロードして上書きインストールしてください — 進捗はそのまま残ります。",
+    "update_available_action": "ダウンロード"
+  },
+  "success": {
+    "update_email": "メールアドレスを更新しました",
+    "update": "データを更新しました",
+    "update_password": "パスワードを更新しました",
+    "update_avatar ": "アバターを更新しました",
+    "logOut": "ログアウトしました",
+    "report_success": "記録しました",
+    "update_displayname": "ニックネームを変更しました",
+    "restart": "統計をリセットしました",
+    "singup": "登録しました"
+  }
+}

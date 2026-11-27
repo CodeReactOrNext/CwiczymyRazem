@@ -1,4 +1,5 @@
 import axios from "axios";
+import { rememberStoredQuest } from "feature/user/store/storedQuest";
 import type { User } from "firebase/auth";
 import type {
   FetchedReportDataInterface,
@@ -32,7 +33,12 @@ export const fetchUserData = async (
       // its loading spinner. Reject instead so autoLogIn.rejected can recover.
       { timeout: 15000 }
     )
-    .then((response) => response.data);
+    .then((response) => {
+      // Fresh from the server: what the quest sync's offline fallback merges
+      // against until a sync of its own reaches Firestore.
+      rememberStoredQuest(user.uid, response.data.currentUserStats?.dailyQuest ?? null);
+      return response.data;
+    });
 
 // Firebase saying the account itself is no longer good — not that it couldn't
 // be reached (`auth/network-request-failed` is the offline case).

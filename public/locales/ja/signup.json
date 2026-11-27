@@ -1,0 +1,22 @@
+{
+  "subtitlebar_text": "練習して、記録して、ポイントを貯めよう！",
+  "back_to_login": "ログインに戻る",
+  "title": "参加しよう",
+  "subtitle": "アカウントを作って、旅を始めましょう",
+  "value_prop": "ずっと無料、課金の壁なし。実際の練習時間、曲、進捗を記録できます。",
+  "username_label": "ユーザー名",
+  "username_placeholder": "ニックネーム",
+  "email_label": "メールアドレス",
+  "email_placeholder": "name@example.com",
+  "email_option": "またはメールアドレスで登録",
+  "password_label": "パスワード",
+  "password_placeholder": "••••••••",
+  "submit_button": "アカウントを作成",
+  "google_button": "Googleで続ける",
+  "already_have_account": "すでにアカウントをお持ちですか？",
+  "login_link": "ログイン",
+  "email_consent_label": "連続記録のリマインダー、シーズンのお知らせ、Riff Questからのときどきのニュースを受け取ります。設定でいつでもオフにできます。",
+  "legal_notice": "アカウントを作成すると、{{terms}}と{{privacy}}に同意したものとみなされます。",
+  "terms_link": "利用規約",
+  "privacy_link": "プライバシーポリシー"
+}

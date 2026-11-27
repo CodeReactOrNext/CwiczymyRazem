@@ -40,9 +40,14 @@ interface ClickableFretboardProps {
    *  the toggle can sit in its control row instead of in a caption above the
    *  board — the neck itself draws exactly the same either way. */
   showFullNeck?: boolean;
+  /** Strings (1-6) a hint is pointing at: their names are ringed and drawn in white. */
+  pointedStrings?: number[];
 }
 
 const STRING_LABELS = ["e", "B", "G", "D", "A", "E"];
+// The high e is the one lowercase name: at the capitals' size its x-height left
+// it reading as a dot beside them, so it is set larger to stand as tall.
+const LOWERCASE_LABEL_SCALE = 1.3;
 const SINGLE_INLAY_FRETS = new Set([3, 5, 7, 9, 15, 17, 19, 21]);
 const DOUBLE_INLAY_FRETS = new Set([12, 24]);
 
@@ -173,6 +178,8 @@ interface NeckColors {
   linkOpacity: number;
   revealed: string;
   revealedInk: string;
+  /** A string name a hint points at, and the ring around it — off the neck, on the page. */
+  pointedRing: string;
 }
 
 const NECK_COLORS: Record<"dark" | "light", NeckColors> = {
@@ -223,6 +230,7 @@ const NECK_COLORS: Record<"dark" | "light", NeckColors> = {
     linkOpacity: 0.45,
     revealed: "#18181b",
     revealedInk: "#fafafa",
+    pointedRing: "#fafafa",
   },
   // A maple neck: bleached away from the window, full-coloured inside it, with
   // the cells in play in solid gold.
@@ -273,6 +281,7 @@ const NECK_COLORS: Record<"dark" | "light", NeckColors> = {
     linkOpacity: 0.6,
     revealed: "#fffaf0",
     revealedInk: "#27272a",
+    pointedRing: "#18181b",
   },
 };
 
@@ -366,6 +375,7 @@ export const ClickableFretboard = memo(function ClickableFretboard({
   linkKeys,
   wrongLabel,
   showFullNeck = false,
+  pointedStrings,
 }: ClickableFretboardProps) {
   const { t } = useTranslation("session");
   const colors = NECK_COLORS[useColorTheme()];
@@ -830,20 +840,29 @@ export const ClickableFretboard = memo(function ClickableFretboard({
           {STRING_LABELS.map((label, i) => {
             const stringNum = i + 1;
             const active = isInScope(stringNum);
+            const pointed = active && !!pointedStrings?.includes(stringNum);
             const y = rowY(i) + ROW_H / 2 + (active ? 10 : 6);
+            const baseSize = active ? 32 : colors.labelOffSize;
+            const fontSize = label === label.toLowerCase() ? Math.round(baseSize * LOWERCASE_LABEL_SCALE) : baseSize;
             return (
-              <text
-                key={i}
-                x={LEFT_PAD - 20}
-                y={y}
-                transform={upright(LEFT_PAD - 20)}
-                textAnchor={leftHanded ? "start" : "end"}
-                fontSize={active ? 32 : colors.labelOffSize}
-                fontWeight={active ? "800" : "600"}
-                fill={active ? (stringScoped ? colors.labelScoped : colors.label) : colors.labelOff}
-              >
-                {label}
-              </text>
+              <g key={i}>
+                {/* The name ends at LEFT_PAD - 20 either way round — in left-handed
+                    mode the upright flip turns its start anchor into the same span. */}
+                {pointed && (
+                  <circle cx={LEFT_PAD - 30} cy={rowY(i) + ROW_H / 2} r={26} fill='none' stroke={colors.pointedRing} strokeWidth={4} />
+                )}
+                <text
+                  x={LEFT_PAD - 20}
+                  y={y}
+                  transform={upright(LEFT_PAD - 20)}
+                  textAnchor={leftHanded ? "start" : "end"}
+                  fontSize={fontSize}
+                  fontWeight={active ? "800" : "600"}
+                  fill={pointed ? colors.pointedRing : active ? (stringScoped ? colors.labelScoped : colors.label) : colors.labelOff}
+                >
+                  {label}
+                </text>
+              </g>
             );
           })}
           </g>

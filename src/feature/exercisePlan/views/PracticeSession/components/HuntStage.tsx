@@ -516,10 +516,14 @@ interface HuntTargetCardProps {
   foundCount: number;
   /** Re-runs the swap animation — pass the target note so a new one animates in. */
   animationKey?: string;
+  /** How many positions the note has. Above one, a dot per position sits under
+   *  the tile and lights as each is found — a "1 / 2 found" in the footer was
+   *  too far from the tile for players to notice a second one was wanted. */
+  total?: number;
 }
 
-/** The big note tile every hunt leads with. */
-export function HuntTargetCard({ value, complete, foundCount, animationKey }: HuntTargetCardProps) {
+/** The tile on its own — HuntTargetCard adds the found dots under it. */
+function HuntTargetTile({ value, complete, foundCount, animationKey }: Omit<HuntTargetCardProps, "total">) {
   return (
     <div className="relative">
       <div
@@ -552,6 +556,28 @@ export function HuntTargetCard({ value, complete, foundCount, animationKey }: Hu
           </motion.span>
         </AnimatePresence>
       </motion.div>
+    </div>
+  );
+}
+
+/** The big note tile every hunt leads with. */
+export function HuntTargetCard({ value, complete, foundCount, animationKey, total = 0 }: HuntTargetCardProps) {
+  const tile = <HuntTargetTile value={value} complete={complete} foundCount={foundCount} animationKey={animationKey} />;
+  if (total < 2) return tile;
+  return (
+    <div className="flex flex-col items-center gap-3 shortwide:gap-2">
+      {tile}
+      <div className="flex gap-2" role="img" aria-label={`${Math.min(foundCount, total)} / ${total}`}>
+        {Array.from({ length: total }, (_, index) => (
+          <span
+            key={index}
+            className={cn(
+              "h-3.5 w-3.5 rounded-full transition-[background-color,transform] duration-base motion-reduce:transition-none shortwide:h-2.5 shortwide:w-2.5",
+              index < foundCount ? "scale-110 bg-emerald-500" : "bg-zinc-800",
+            )}
+          />
+        ))}
+      </div>
     </div>
   );
 }

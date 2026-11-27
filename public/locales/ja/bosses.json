@@ -1,0 +1,539 @@
+{
+  "bosses": {
+    "fretweaver": {
+      "name": "フレットウィーバー",
+      "title": "半音の巣の女王"
+    },
+    "colossus": {
+      "name": "石の巨人",
+      "title": "遅いコードチェンジを砕く者",
+      "threats": {
+        "bites": "拳",
+        "weak_spots": "弱いチェンジ",
+        "venom": "砂ぼこり",
+        "regen": "石の修復",
+        "frenzy": "余震",
+        "web": "石化"
+      },
+      "arena": {
+        "slam": "地震",
+        "webbed": "石化 — コード進行を記憶で弾こう",
+        "poisoned": "目に砂ぼこり — チャージが半分の速さに",
+        "poisoned_short": "砂ぼこり",
+        "regenerating": "修復中 — 攻撃して止めよう"
+      },
+      "result": {
+        "title": "押しつぶされた"
+      },
+      "lair": {
+        "pitch": "コードチェンジの終わりなき戦い。フェーズごとに巨人は新しいコード進行のまわりに組み直され — オープンコード、パワーコード、バレーコード、セブンス — チェンジはどんどん速くなります。どこまで行けるか試してみよう。",
+        "skill": "コードチェンジ"
+      },
+      "boons": {
+        "armor": {
+          "body": "拳で失うHPが{{armorPercent}}%減ります。重ねがけ可。"
+        },
+        "shield": {
+          "body": "次の{{shieldCharges}}回の拳を受け止めます。"
+        },
+        "thorns": {
+          "body": "拳のたびに、巨人がフェーズのHPの{{thornsPercent}}%を失います。重ねがけ可。"
+        },
+        "secondWind": {
+          "body": "各フェーズでチェンジのミス{{secondWindMisses}}回が許されます：拳なし、連続とチャージもそのまま。"
+        },
+        "steadyHand": {
+          "body": "コードを{{steadyHandQuakeMisses}}回ミスしても地震を防げます。"
+        },
+        "antidote": {
+          "name": "防じんマスク",
+          "body": "砂ぼこりが効きません。"
+        },
+        "clearSight": {
+          "body": "石化の時間が半分になります。"
+        },
+        "precision": {
+          "body": "ぴったりのチェンジが4ではなく{{precisionPoints}}チャージします。"
+        },
+        "momentum": {
+          "body": "連続が{{maxStreak}}回ではなく{{momentumStreak}}回で×2になります。"
+        },
+        "exploit": {
+          "body": "弱いチェンジをきれいに決めると、剣のチャージが×{{exploitCharge}}になります。"
+        }
+      },
+      "preview": {
+        "armor": "拳 {{from}} → {{to}} HP",
+        "thorns": "拳ごと {{from}} → {{to}}ダメージ",
+        "steadyHand": "地震で許されるミス {{from}} → {{to}}",
+        "exploit": "弱いチェンジ {{from}} → {{to}}"
+      },
+      "briefing": {
+        "faster": "チェンジが{{percent}}%速くなります",
+        "slower": "チェンジが{{percent}}%遅くなります",
+        "same_speed": "チェンジの速さは同じです"
+      },
+      "how": {
+        "play": "TAB譜に合わせてコードを替えよう。",
+        "strike": "きれいなチェンジで剣がチャージされます。満タンになると攻撃します。",
+        "survive": "コードが遅れるとHPが減ります。できるだけ多くのフェーズを生き延びよう。"
+      }
+    },
+    "changeling": {
+      "name": "チェンジリング",
+      "title": "聴こえたコードをすべてまとう者",
+      "threats": {
+        "bites": "爪",
+        "quake": "突進",
+        "weak_spots": "ガイドトーン",
+        "venom": "不協和音",
+        "regen": "変形",
+        "frenzy": "つむじ風",
+        "web": "幕"
+      },
+      "arena": {
+        "slam": "突進",
+        "webbed": "幕 — 聴こえるものを頼りに弾こう",
+        "poisoned": "不協和音 — チャージが半分の速さに",
+        "poisoned_short": "不協和音",
+        "regenerating": "変形中 — 攻撃して止めよう",
+        "quake_coming": "1小節後に突進 — コードが2倍の速さで変わります",
+        "quake_on": "突進 — すべてのコードで1音ずつ当てよう · 残り{{count}}",
+        "quake_on_steady": "突進 — 1コードまでは逃してもOK · 残り{{count}}"
+      },
+      "result": {
+        "title": "チェンジに飲み込まれた"
+      },
+      "lair": {
+        "pitch": "読むものが何もない終わりなき戦い。フェーズごとにチェンジリングは新しいキーの新しいコード進行をまとい、順番に各コードになります — その上でソロを弾こう。1拍目と3拍目にコードの音を当て、その間はスケールを弾けば傷を与えられます。その拍でそれ以外の音を弾いたり、キーの外の音を弾いたりすると、傷を負うのはあなたです。どこまで行けるか試してみよう。",
+        "skill": "コードの上でのソロ"
+      },
+      "boons": {
+        "armor": {
+          "body": "爪で失うHPが{{armorPercent}}%減ります。重ねがけ可。"
+        },
+        "shield": {
+          "body": "次の{{shieldCharges}}回の爪を受け止めます。"
+        },
+        "thorns": {
+          "body": "爪のたびに、チェンジリングがフェーズのHPの{{thornsPercent}}%を失います。重ねがけ可。"
+        },
+        "secondWind": {
+          "body": "各フェーズでミス{{secondWindMisses}}回が許されます：爪なし、連続とチャージもそのまま。"
+        },
+        "steadyHand": {
+          "body": "コードを{{steadyHandQuakeMisses}}つ逃しても突進を防げます。"
+        },
+        "antidote": {
+          "name": "絶対音感",
+          "body": "不協和音が効きません。"
+        },
+        "clearSight": {
+          "body": "幕が下りている時間が半分になります。"
+        },
+        "precision": {
+          "body": "チェンジぴったりの音が4ではなく{{precisionPoints}}チャージします。"
+        },
+        "momentum": {
+          "body": "連続が{{maxStreak}}回ではなく{{momentumStreak}}回で×2になります。"
+        },
+        "exploit": {
+          "body": "ガイドトーンで剣のチャージが×{{exploitCharge}}になります。"
+        }
+      },
+      "preview": {
+        "armor": "爪 {{from}} → {{to}} HP",
+        "thorns": "爪ごと {{from}} → {{to}}ダメージ",
+        "steadyHand": "突進で逃せるコード {{from}} → {{to}}",
+        "exploit": "ガイドトーン {{from}} → {{to}}"
+      },
+      "briefing": {
+        "faster": "コードが{{percent}}%速く変わります",
+        "slower": "コードが{{percent}}%遅く変わります",
+        "same_speed": "コードの変わる速さは同じです",
+        "quakes": "突進"
+      },
+      "guide": {
+        "open": "遊び方",
+        "progress": "ステップ{{step}} / {{count}}",
+        "back": "戻る",
+        "next": "次へ",
+        "lane": {
+          "title": "コードはいつも3つ",
+          "body": "上にはいつも3つのコードが見えます：今鳴っているコード、次のコード、その次のコード。「今」のカードを線が横切っていき、端まで来ると次のカードがその場所に滑り込んで、そのコードが始まります。最初のフェーズは3コードで、そのあとのフェーズごとに1つずつ増えます。"
+        },
+        "accents": {
+          "title": "1拍目と3拍目：コードの音",
+          "body": "アクセントは毎小節の1拍目と3拍目、背の高い印のところです。そこで最初に弾く音はコードの音でなければなりません：4のヒットになり、印が緑になります。それ以外はミス — 印がオレンジになり、チェンジリングがあなたを爪で引っかきます。2拍目と4拍目、その間のどこでも、スケールの音なら何でも弾けて、1音ごとに剣が少しずつチャージされます。",
+          "chord": "コードの音",
+          "scale": "スケール"
+        },
+        "neck": {
+          "title": "どこで弾く？",
+          "body": "ネックは1つのポジションを照らし、あなたの手についていきます。大きな点はコードの音 — 1拍目と3拍目用です。小さな点はスケールの残りの音で、その間用です。コードが変わると点も変わり、キーの外のコードの上では、スケールがそれに合わせて形を変えます。"
+        },
+        "combo": {
+          "title": "技とコンボ",
+          "body": "新しいコードにチェンジぴったりで入る（On the one）、または2半音以内の音から入る（スムーズ）。技はつながってコンボになり、コード進行がひと回りしたときにチェンジリングに当たります。1回ミスするとコンボはすべて消えます。",
+          "strung": "つなぎ中",
+          "banked": "決まった"
+        },
+        "watch": {
+          "title": "ダメージになるもの",
+          "body": "次のどれでも爪を受け、コンボを失います：",
+          "outside": "キーの外の音。",
+          "strong": "1拍目か3拍目で、最初の音がコードの音以外。",
+          "silent": "そのコードの音を1つも弾かずに、コードが過ぎてしまった。",
+          "rush": "オレンジのコードは突進：2小節の間、2倍の速さで変わります — どのコードでも1音は当てよう。",
+          "headphones": "ヘッドホンをつけて弾きましょう：マイクにはバッキングではなく、ギターの音を聴かせてください。"
+        }
+      }
+    }
+  },
+  "arena": {
+    "you": "あなた",
+    "record": "記録：フェーズ{{phase}}",
+    "your_hp": "HP",
+    "sword": "剣",
+    "poisoned": "毒 — チャージが半分の速さに",
+    "streak": "連続{{count}} · ×{{multiplier}}",
+    "phase": "フェーズ{{phase}}",
+    "phase_caption": "フェーズ{{phase}} · {{bpm}} BPM",
+    "slam_coming": "叩きつけが来る — 連続{{streak}}を保とう",
+    "weak_spot": "弱点 — 剣のチャージが×{{multiplier}}",
+    "regenerating": "再生中 — 攻撃して止めよう",
+    "blocked": "防いだ",
+    "slam": "叩きつけ",
+    "webbed": "巣 — 記憶で弾こう",
+    "caught_shield": "盾",
+    "caught_secondWind": "セカンドウィンド",
+    "sword_ready": "攻撃準備完了",
+    "poisoned_short": "毒",
+    "enraged": "激怒",
+    "quake_coming": "1小節後に地震 — チェンジが2倍の速さに",
+    "quake_on": "地震 — すべてのコードをきれいに · 残り{{count}}",
+    "quake_on_steady": "地震 — 1回までミスOK · 残り{{count}}",
+    "weak_change": "今は弱いチェンジ：{{change}} — 剣×{{multiplier}}",
+    "weak_change_label": "弱いチェンジ：",
+    "gate": "関門",
+    "gate_intro": "関門 — HPが多く、攻撃が強くなります。たどり着けば、次回はここから始められます。",
+    "sounds_on": "戦闘の効果音をオン",
+    "sounds_off": "戦闘の効果音をオフ"
+  },
+  "threats": {
+    "bites": "噛みつき",
+    "slams": "叩きつけ",
+    "weak_spots": "弱点",
+    "venom": "毒",
+    "regen": "再生",
+    "frenzy": "狂乱",
+    "web": "巣",
+    "quake": "地震"
+  },
+  "result": {
+    "title": "巣に捕まった",
+    "body": "挑戦はフェーズ{{phase}}で終わりました。",
+    "new_record": "新記録",
+    "phase": "到達フェーズ",
+    "damage": "与えたダメージ",
+    "best_streak": "最高の連続",
+    "best_combo": "最高のコンボ",
+    "tricks": "On the one · スムーズ",
+    "accuracy": "正確さ",
+    "retry": "もう一度戦う",
+    "finish": "終了",
+    "build": "あなたのビルド",
+    "chart_title": "フェーズごとに失ったHP",
+    "hardest": "いちばんきつかった：フェーズ{{phase}}（−{{hp}} HP）",
+    "phase_detail": "フェーズ{{phase}} · {{bpm}} BPM · {{rhythm}} · −{{hp}} HP",
+    "no_damage": "無傷",
+    "ahead_one": "記録より{{count}}フェーズ先",
+    "ahead_other": "記録より{{count}}フェーズ先",
+    "behind_one": "記録まであと{{count}}フェーズ",
+    "behind_other": "記録まであと{{count}}フェーズ",
+    "level_with": "記録に並びました",
+    "score": "スコア",
+    "skipped_one": "{{count}}フェーズを飛ばしました",
+    "skipped_other": "{{count}}フェーズを飛ばしました",
+    "skipped_lost": "フェーズ{{phase}}をクリアすると、飛ばしたフェーズがスコアに入ります。"
+  },
+  "lair": {
+    "pitch": "終わりなき戦い。フェーズごとにクモは脱皮して、新しいドリルを持ったより速い姿になります — どこまで行けるか試してみよう。",
+    "fight": "戦う",
+    "difficulty": "難易度",
+    "effect_damage": "受けるダメージ",
+    "effect_tempo": "テンポ",
+    "effect_score": "スコア",
+    "start_at": "開始位置",
+    "skip_note_one": "{{count}}フェーズを飛ばします — フェーズ{{phase}}をクリアすると、そのHPがスコアに入ります。",
+    "skip_note_other": "{{count}}フェーズを飛ばします — フェーズ{{phase}}をクリアすると、それらのHPがスコアに入ります。",
+    "phase_label": "フェーズ",
+    "on_computer": "パソコンで戦おう",
+    "skill": "半音のラン"
+  },
+  "draft": {
+    "eyebrow": "フェーズ{{phase}}開始",
+    "title": "恩恵を選ぶ",
+    "reroll": "引き直し（{{count}}）",
+    "owned": "{{count}}個所持",
+    "counters": "対策：{{threat}}",
+    "pairs": "相性：{{list}}"
+  },
+  "rarity": {
+    "common": "コモン",
+    "rare": "レア",
+    "epic": "エピック"
+  },
+  "boons": {
+    "armor": {
+      "name": "鎧",
+      "body": "噛みつきで失うHPが{{armorPercent}}%減ります。重ねがけ可。"
+    },
+    "shield": {
+      "name": "盾",
+      "body": "次の{{shieldCharges}}回の噛みつきを受け止めます。"
+    },
+    "vitality": {
+      "name": "活力",
+      "body": "最大HP+{{vitalityHp}}、すぐに回復します。"
+    },
+    "bandage": {
+      "name": "包帯",
+      "body": "今すぐHPを{{bandageHp}}回復。"
+    },
+    "lifesteal": {
+      "name": "吸血",
+      "body": "攻撃のたびにHPが{{lifestealHp}}回復します。重ねがけ可。"
+    },
+    "thorns": {
+      "name": "トゲ",
+      "body": "噛みつきのたびに、クモがフェーズのHPの{{thornsPercent}}%を失います。重ねがけ可。"
+    },
+    "secondWind": {
+      "name": "セカンドウィンド",
+      "body": "各フェーズでミス{{secondWindMisses}}回が許されます：噛みつきなし、連続とチャージもそのまま。"
+    },
+    "steadyHand": {
+      "name": "安定した手",
+      "body": "連続わずか{{steadyHandStreak}}で叩きつけを防げます。"
+    },
+    "antidote": {
+      "name": "解毒剤",
+      "body": "毒が効きません。"
+    },
+    "clearSight": {
+      "name": "澄んだ目",
+      "body": "TAB譜にかかる巣の時間が半分になります。"
+    },
+    "blade": {
+      "name": "鋭い刃",
+      "body": "攻撃のダメージが{{bladePercent}}%増えます。重ねがけ可。"
+    },
+    "lightBlade": {
+      "name": "軽い刃",
+      "body": "剣が{{lightBladePercent}}%少ないポイントで満タンになります。重ねがけ可。"
+    },
+    "precision": {
+      "name": "精密",
+      "body": "ぴったりの音が4ではなく{{precisionPoints}}チャージします。"
+    },
+    "momentum": {
+      "name": "勢い",
+      "body": "連続が48回ではなく{{momentumStreak}}回で×2になります。"
+    },
+    "exploit": {
+      "name": "弱点突き",
+      "body": "弱点で剣のチャージが×{{exploitCharge}}になり、弱点が開いている時間も長くなります。"
+    },
+    "slowDown": {
+      "name": "スローダウン",
+      "body": "これ以降のすべてのフェーズで−{{slowDownBpm}} BPM。"
+    },
+    "overdrive": {
+      "name": "オーバードライブ",
+      "body": "すべてのフェーズで+{{overdriveBpm}} BPMになる代わりに、攻撃のダメージが{{overdrivePercent}}%増えます。"
+    }
+  },
+  "briefing": {
+    "title": "変わること",
+    "tempo": "テンポ",
+    "rhythm": "リズム",
+    "route": "ルート",
+    "fingers": "指",
+    "neck": "ネック",
+    "frets": "{{low}}〜{{high}}フレット",
+    "gained": "新しく：{{list}}",
+    "lost": "なくなる：{{list}}",
+    "faster": "音が{{percent}}%速く来ます",
+    "slower": "音が{{percent}}%遅く来ます",
+    "same_speed": "音の速さは同じです",
+    "unchanged": "変わらず — {{list}}",
+    "first_bar": "最初の小節",
+    "chords": "コード",
+    "progression": "コード進行",
+    "quakes": "地震",
+    "quakes_per_pass_one": "1周に{{count}}回",
+    "quakes_per_pass_other": "1周に{{count}}回",
+    "shapes": "形",
+    "key": "キー",
+    "tones": "コードトーン"
+  },
+  "subdivision": {
+    "quarters": "4分音符",
+    "eighths": "8分音符",
+    "triplets": "3連符",
+    "sixteenths": "16分音符",
+    "halves": "2分音符",
+    "wholes": "全音符"
+  },
+  "route": {
+    "walk": "弦をまたいで",
+    "skip": "弦飛び",
+    "diagonal": "斜め"
+  },
+  "preview": {
+    "armor": "噛みつき {{from}} → {{to}} HP",
+    "shield": "盾 {{from}} → {{to}}",
+    "vitality": "最大HP {{from}} → {{to}}",
+    "bandage": "HP {{from}} → {{to}}",
+    "lifesteal": "攻撃ごと +{{from}} → +{{to}} HP",
+    "thorns": "噛みつきごと {{from}} → {{to}}ダメージ",
+    "secondWind": "無料のミス {{from}} → {{to}}",
+    "steadyHand": "防げる連続 {{from}} → {{to}}",
+    "blade": "攻撃の威力 {{from}} → {{to}}",
+    "lightBlade": "剣 {{from}} → {{to}}ポイント",
+    "precision": "ぴったり {{from}} → {{to}}ポイント",
+    "momentum": "×2になる連続 {{from}} → {{to}}",
+    "exploit": "弱点 {{from}} → {{to}}",
+    "slowDown": "テンポ {{from}} → {{to}} BPM",
+    "overdrive": "テンポ {{from}} → {{to}} BPM"
+  },
+  "chord_family": {
+    "open": "オープンコード",
+    "power": "パワーコード",
+    "barre": "バレーコード",
+    "seventh": "セブンスコード"
+  },
+  "changes_rhythm": {
+    "bar": "1小節に1コード",
+    "half_bar": "1小節に2コード"
+  },
+  "key_mode": {
+    "ionian": "メジャー",
+    "aeolian": "マイナー",
+    "dorian": "ドリアン",
+    "mixolydian": "ミクソリディアン",
+    "harmonicMinor": "ハーモニックマイナー",
+    "blues": "ブルース"
+  },
+  "harmony_family": {
+    "triads": "トライアド",
+    "sevenths": "セブンスコード"
+  },
+  "board": {
+    "now": "今",
+    "first_chord": "最初のコード",
+    "first_in_one": "{{count}}拍後に最初のコード",
+    "first_in_other": "{{count}}拍後に最初のコード",
+    "then": "その次",
+    "next": "次",
+    "next_in_one": "{{count}}拍後に次",
+    "next_in_other": "{{count}}拍後に次",
+    "passing": "経過音",
+    "outside": "キーの外",
+    "root": "ルート",
+    "third": "3度",
+    "fifth": "5度",
+    "seventh": "7度",
+    "fretboard": "ネック上の{{chord}}の構成音の位置",
+    "ahead": "これから来るコード",
+    "heard": "聴こえた音",
+    "beats_left_one": "残り{{count}}拍",
+    "beats_left_other": "残り{{count}}拍",
+    "landed": "決まった",
+    "legend_chord": "{{chord}} — 1拍目と3拍目に",
+    "legend_scale": "{{scale}} — その間に",
+    "scale_for": "{{chord}}の上のスケール",
+    "miss": {
+      "outside": "{{note}} — キーの外",
+      "outside_chord": "{{note}} — {{chord}}の上のスケールの外",
+      "strong": "{{beat}}：{{note}}は{{chord}}の音ではありません",
+      "strong_veiled": "{{beat}}：{{note}}はコードの音ではありません",
+      "silent": "{{chord}}の音を1つも弾かずに過ぎました",
+      "silent_veiled": "コードの音を1つも弾かずに過ぎました"
+    }
+  },
+  "combo": {
+    "onTheOne": "On the one",
+    "smooth": "スムーズ",
+    "banked": "コンボ×{{multiplier}}",
+    "lost": "コンボ消失"
+  },
+  "difficulty": {
+    "easy": "イージー",
+    "normal": "ノーマル",
+    "hard": "ハード",
+    "brutal": "鬼"
+  },
+  "guide": {
+    "open": "遊び方",
+    "progress": "ステップ{{step}} / {{count}}",
+    "next": "次へ",
+    "got_it": "わかった"
+  },
+  "how": {
+    "play": "TAB譜のランを、タイミングどおりに弾こう。",
+    "strike": "きれいなヒットで剣がチャージされます。満タンになると攻撃します。",
+    "survive": "音をミスするとHPが減ります。できるだけ多くのフェーズを生き延びよう。"
+  },
+  "rules": {
+    "title": "戦いのしくみ",
+    "sword": {
+      "title": "剣をチャージ",
+      "body": "ヒットのたびにチャージされます：ぴったり4、タイミング内3、惜しい2、ゆるい1。ミスするとチャージが砕けます。"
+    },
+    "strike": {
+      "title": "攻撃",
+      "body": "剣が満タンになると自動で攻撃します — 連続が長いほど強く、{{max}}回連続で最大×2。"
+    },
+    "bite": {
+      "title": "ミスはすべて噛みつき",
+      "body": "音をミスするとHPが減ります。なくなると挑戦は終わりです。"
+    },
+    "slam": {
+      "title": "叩きつけを防ぐ",
+      "body": "フェーズ{{slams}}から、クモは叩きつけの構えに入ります。当たる瞬間に連続{{parry}}を保っていれば防げて、防ぐと剣が半分チャージされます。"
+    },
+    "endless": {
+      "title": "終わりなく、ランダム",
+      "body": "フェーズのHPを削り切るとクモは脱皮します：ランダムな指の順番、ルート、ポジション、リズムで、毎回速くなります。フェーズをクリアするごとにHPが{{heal}}回復します。"
+    },
+    "draft": {
+      "title": "恩恵を選ぶ",
+      "body": "フェーズのたびに、ランダムに配られる3つの恩恵から1つを選びます — 鎧、鋭い刃、遅いテンポ… 重ねがけできるものもあり、レアなものはめったに出ません。引き直しは1回の挑戦で1回、さらに5フェーズごとに1回。"
+    },
+    "threats": {
+      "title": "学習してくる",
+      "body": "フェーズ{{weak}}から弱点を見せるようになり — 弱点が開いている間、剣のチャージは×{{weakCharge}}です。フェーズ{{affix}}から能力を得ます：毒、再生、狂乱、そしてTAB譜に吐きかけられる巣。先へ進むほど増えていきます。"
+    },
+    "gates": {
+      "title": "関門とセーブポイント",
+      "body": "{{gate}}フェーズごとに、ボスが関門を守っています：HPが{{gateHp}}%多く、攻撃も強くなります。関門にたどり着けば次の挑戦はそこから始められ、飛ばしたフェーズは、開始したフェーズをクリアするとスコアに数えられます。"
+    }
+  },
+  "primer": {
+    "title": "ボス戦とは",
+    "looks": {
+      "title": "あなたが弾き、ボスが反撃する",
+      "body": "ボスはTAB譜やコードの上にいます。マイクをオンにして、タイミングどおりに弾きましょう。ミスするとHPが減ります。"
+    },
+    "goes": {
+      "title": "きれいな演奏が攻撃になる",
+      "body": "きれいな音のたびに剣がチャージされます。満タンになると自動で攻撃し、連続が長いほど強くなります。"
+    },
+    "why": {
+      "title": "なぜ戦うのか",
+      "body": "フェーズごとに新しいドリルが少しずつ速くなるので、本当の限界がわかります。時間は練習として数えられ、ベストのフェーズがどこまで来たかを示してくれます。"
+    }
+  }
+}

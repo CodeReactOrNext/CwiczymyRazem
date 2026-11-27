@@ -8,6 +8,7 @@ import { PageTitle } from "components/PageTitle/PageTitle";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
+import { CaseProgress } from "feature/whatNext/components/CaseProgress";
 import {
   RoadStripSkeleton,
   WhatNextRoadStrip,
@@ -73,7 +74,7 @@ export const WhatNextView = () => {
         const plan = roadSession.build();
         if (plan) setSession(plan);
       }}
-      className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-cyan-400 hover:text-cyan-300")}>
+      className={buttonVariants({ variant: "ghost", size: "sm" })}>
       {t("road.play_all", { count: ROAD_SESSION_MINUTES })}
     </button>
   ) : null;
@@ -82,8 +83,13 @@ export const WhatNextView = () => {
     <div className='flex flex-col'>
       <div className={cn("mx-auto w-full max-w-3xl", PAGE_CONTENT, "md:pt-10")}>
         <PageTitle title={t("page.title")} subtitle={t("page.subtitle")} />
-        {/* The same card as after a session, with "play the whole road" added. */}
+        {/* The same road as after a session; "play the whole road" sits over
+            it rather than in the bubble, and the free-case bar gets a card of
+            its own below. */}
         <Card className='mt-6 flex flex-col bg-zinc-900 p-5 sm:p-6'>
+          {playRoad && !isLoading && (
+            <div className='-mb-6 flex justify-end'>{playRoad}</div>
+          )}
           <LoadingSwap
             isLoading={isLoading || !result}
             skeleton={<RoadStripSkeleton />}>
@@ -91,13 +97,16 @@ export const WhatNextView = () => {
               result && (
                 <WhatNextRoadStrip
                   result={result}
-                  playRoad={playRoad}
+                  showCaseProgress={false}
                   onOpen={track}
                 />
               )
             }
           </LoadingSwap>
         </Card>
+        {!isLoading && (
+          <CaseProgress className='mt-4 max-w-none rounded-lg bg-zinc-900 p-5 sm:p-6' />
+        )}
       </div>
     </div>
   );

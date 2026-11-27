@@ -1,0 +1,1452 @@
+{
+  "labels": {
+    "rarity": {
+      "Common": "コモン",
+      "Uncommon": "アンコモン",
+      "Rare": "レア",
+      "Epic": "エピック",
+      "Legendary": "レジェンダリー",
+      "Mythic": "ミシック",
+      "Custom Shop": "カスタムショップ"
+    },
+    "effect_type": {
+      "Overdrive": "オーバードライブ",
+      "Distortion": "ディストーション",
+      "Delay": "ディレイ",
+      "Reverb": "リバーブ",
+      "Chorus": "コーラス",
+      "Wah": "ワウ",
+      "Compressor": "コンプレッサー",
+      "EQ": "EQ",
+      "Fuzz": "ファズ",
+      "Phaser": "フェイザー",
+      "Flanger": "フランジャー",
+      "Boost": "ブースト",
+      "Vibrato": "ビブラート",
+      "Tremolo": "トレモロ",
+      "Tuner": "チューナー"
+    },
+    "part": {
+      "body": "ボディ",
+      "neck": "ネック",
+      "bridge": "ブリッジ",
+      "pickup": "ピックアップ",
+      "tuners": "ペグ",
+      "enclosure": "筐体",
+      "opamp": "オペアンプ",
+      "diode": "ダイオード",
+      "pot": "ポット",
+      "screws": "ネジ"
+    },
+    "part_tier": {
+      "Standard": "スタンダード",
+      "Epic": "エピック",
+      "Legendary": "レジェンダリー",
+      "Unique": "ユニーク"
+    },
+    "kind": {
+      "guitar": "ギター",
+      "effect": "エフェクター"
+    },
+    "part_name": "{{tier}}の{{part}}",
+    "mod": {
+      "coil-split": "コイルスプリット",
+      "hand-wound": "ハンドワウンド・ピックアップ",
+      "push-pull": "プッシュプル・ポット",
+      "phase-switch": "フェイズスイッチ",
+      "treble-bleed": "トレブルブリード",
+      "cts-pots": "CTSポット",
+      "pio-caps": "オイルペーパーコンデンサー",
+      "active-preamp": "アクティブプリアンプ",
+      "copper-shielding": "銅箔シールド",
+      "bone-nut": "牛骨ナット",
+      "brass-trem-block": "真鍮トレモロブロック",
+      "steel-saddles": "スチールサドル",
+      "locking-tuners": "ロック式ペグ",
+      "torrefied-wood": "トレファイド材",
+      "chambered-body": "チェンバードボディ",
+      "plek": "Plekセットアップ",
+      "stainless-frets": "ステンレスフレット",
+      "rolled-edges": "ロールドエッジ",
+      "scalloped-frets": "スキャロップド指板",
+      "compound-radius": "コンパウンドラディアス",
+      "graphite-neck": "グラファイト補強ネック",
+      "satin-neck": "サテンネック",
+      "low-action": "プロ仕様の低い弦高",
+      "truss-wheel": "トラスロッドホイール",
+      "fret-level": "フレットすり合わせ",
+      "nos-opamp": "NOSオペアンプ（JRC4558）",
+      "germanium-diodes": "ゲルマニウムダイオード",
+      "matched-transistors": "選別トランジスタ",
+      "asym-clipping": "非対称クリッピング",
+      "led-clipping": "LEDクリッピング",
+      "mosfet-clipping": "MOSFETクリッピング",
+      "carbon-comp": "カーボンコンポジション抵抗",
+      "film-caps": "フィルムコンデンサー",
+      "charge-pump-18v": "18Vレール",
+      "true-bypass": "トゥルーバイパス",
+      "premium-buffer": "プレミアムバッファー",
+      "shielding": "低ノイズシールド",
+      "star-grounding": "スターグラウンド",
+      "gold-jacks": "金メッキジャック",
+      "filtered-power": "フィルター付き電源",
+      "midi": "MIDIコントロール",
+      "tap-tempo": "タップテンポ",
+      "stereo-io": "ステレオ入出力",
+      "presets": "プリセット",
+      "expression-in": "エクスプレッション入力",
+      "trim-pots": "内部トリムポット",
+      "dip-switches": "DIPスイッチ",
+      "relay-switch": "リレー式ソフトスイッチ",
+      "kill-dry": "キルドライ／トレイル"
+    },
+    "condition": {
+      "Museum": "ミュージアムグレード",
+      "Mint": "ミント",
+      "Good": "良好",
+      "Worn": "使用感あり",
+      "Relic": "レリック"
+    }
+  },
+  "common": {
+    "fame": "Fame",
+    "lvl": "Lv {{level}}",
+    "sell": "売る",
+    "selling": "売却中…",
+    "cancel": "キャンセル",
+    "confirm": "確定",
+    "sell_for": "{{fame}} Fameで売る",
+    "close": "閉じる",
+    "fame_amount": "{{fame}} Fame"
+  },
+  "view": {
+    "title": "ギターArsenal",
+    "subtitle": "ケースを開けて、リグを組んで、機材をいい状態に保とう",
+    "eyebrow": "集めて装備する",
+    "free_cases_one": "無料ケース",
+    "free_cases": "無料ケース",
+    "free_cases_hint": "エピックの実績でもらえます。1つで棚のどのケースでも — エリートも含めて — Fameを使わずに開けられます。",
+    "tabs": {
+      "cases": "ケース",
+      "collection": "コレクション",
+      "rig": "リグ",
+      "builder": "ビルダー",
+      "workshop": "ワークショップ",
+      "commissions": "コミッション",
+      "trader": "トレーダー",
+      "market": "マーケット",
+      "dex": "Dex"
+    }
+  },
+  "cases": {
+    "shelf_title": "ケースを選ぶ",
+    "open_free": "無料で開ける",
+    "opening": "開封中...",
+    "open_case": "ケースを開ける",
+    "open": "開ける",
+    "how_many": "開ける数",
+    "in_dex": "Dexに{{count}} / {{total}}",
+    "view_drop_rates": "排出率を見る",
+    "drop_rates": "排出率",
+    "refreshes_in": "入れ替えまで",
+    "inside_drop": "この中身",
+    "chance_from_case": "このケースでの確率",
+    "tier_word": {
+      "standard": "スタンダード",
+      "premium": "プレミアム",
+      "elite": "エリート",
+      "vault": "Vault",
+      "parts": "パーツ"
+    },
+    "defs": {
+      "standard": {
+        "name": "スタンダードケース",
+        "title": "{{tier}}ケース",
+        "description": "ロッカーを目指すすべての人のための、定番のケース。"
+      },
+      "premium-guitar": {
+        "name": "プレミアム・ギターケース",
+        "title": "{{tier}}・ギターケース",
+        "description": "レアで人気のものが出やすくなっています。"
+      },
+      "premium-effect": {
+        "name": "プレミアム・エフェクトケース",
+        "title": "{{tier}}・エフェクトケース",
+        "description": "レアで人気のものが出やすくなっています。"
+      },
+      "daily": {
+        "name": "注目ケース",
+        "description": "入れ替わる10アイテムのプール。"
+      },
+      "elite-guitar": {
+        "name": "エリート・ギターケース",
+        "title": "{{tier}}・ギターケース",
+        "description": "いちばん熱心なプレイヤーのために。"
+      },
+      "elite-effect": {
+        "name": "エリート・エフェクトケース",
+        "title": "{{tier}}・エフェクトケース",
+        "description": "いちばん熱心なプレイヤーのために。"
+      },
+      "vault-guitar": {
+        "name": "Vault・ギターケース",
+        "title": "{{tier}}・ギターケース",
+        "description": "毎回エピック以上。"
+      },
+      "vault-effect": {
+        "name": "Vault・エフェクトケース",
+        "title": "{{tier}}・エフェクトケース",
+        "description": "毎回エピック以上。"
+      },
+      "parts": {
+        "name": "パーツクレート",
+        "title": "{{tier}}クレート",
+        "description": "ギタービルダーのパーツのみ。機材は出ません。"
+      }
+    },
+    "open_pack": "{{count}}個まとめて開ける",
+    "pity": {
+      "new": "あと{{count}}回で新モデル",
+      "new_next": "次の開封で新モデル",
+      "top": "あと{{count}}回で{{rarity}}以上",
+      "top_next": "次の開封で{{rarity}}以上"
+    }
+  },
+  "opening": {
+    "title": "ケースを開封中",
+    "part_of_slot": "{{slot}} · パーツ",
+    "builder_part": "ギタービルダーのパーツ",
+    "first_pull": "新規 — 初入手",
+    "duplicate": "ダブり — Dexに登録済み",
+    "open_in_builder": "ビルダーで開く",
+    "keep": "残す",
+    "equip_now": "今すぐ装備",
+    "keep_in_arsenal": "Arsenalに残す",
+    "add_to_collection": "コレクションに追加",
+    "open_another": "{{name}}をもう1つ開ける",
+    "cost_needed": "{{cost}}必要",
+    "pity_new": "保証どおり — まだ見つけていなかったモデル",
+    "pity_top": "保証どおり — {{rarity}}以上",
+    "merge": "いちばん良いものに合成 · +{{gain}} Lv（{{before}} → {{after}}）"
+  },
+  "builder": {
+    "slots": {
+      "body": "ボディ",
+      "neck": "ネック",
+      "head": "ヘッド",
+      "pickups": "ピックアップ",
+      "finish": "塗装",
+      "pickguard": "ピックガード",
+      "sticker": "ステッカー"
+    },
+    "pickup_types": {
+      "S": "シングルコイル",
+      "H": "ハムバッカー",
+      "P90": "P90"
+    },
+    "title": "ギタービルダー",
+    "parts_collected": "パーツ集めた",
+    "open_builder": "ビルダーを開く",
+    "none_yet": "まだありません — パーツはスタンダード、プレミアム・ギター、エリート・ギターのケースから出ます。",
+    "name_guitar": "ギターに名前を付ける",
+    "name_guitar_optional": "ギターに名前を付ける（任意）",
+    "guitar_name": "ギターの名前",
+    "save_name": "名前を保存",
+    "rebuilt": "{{name}}を組み直しました",
+    "built": "{{name}}が完成 — リグに掛けましょう",
+    "rebuild_guitar": "ギターを組み直す",
+    "build_guitar": "ギターを組む",
+    "no_slot_yet": "{{slot}}がまだありません。パーツはスタンダード、プレミアム・ギター、エリート・ギターのケースから出ます。",
+    "open_cases": "ケースを開ける",
+    "new_guitar": "新しいギター",
+    "custom_name": "カスタム{{name}}",
+    "custom_build": "カスタムビルド",
+    "best_of": "{{total}}個中ベスト{{best}}",
+    "size": "サイズ",
+    "rotate": "回転",
+    "sticker_hint": "ギター上のステッカーを選ぶと、サイズや向きを変えられます。",
+    "peel_off": "はがす",
+    "peel_off_all": "すべてはがす",
+    "renamed": "名前を変更しました",
+    "err_build": "ギターを組めませんでした",
+    "err_rename": "ギターの名前を変更できませんでした",
+    "errors": {
+      "part_once": "同じパーツは1回しか付けられません",
+      "too_many_stickers": "ステッカーが多すぎます",
+      "not_owned": "そのパーツを持っていません",
+      "wrong_slot": "パーツの位置がまちがっています",
+      "unknown_sticker": "不明なステッカー",
+      "missing_core": "ボディ、ネック、ヘッド、ピックアップ、塗装がすべて必要です",
+      "wrong_routing": "このボディのザグリに合いません",
+      "no_pickguard": "このボディには交換するピックガードがありません",
+      "not_enough_fame": "Fameが足りません"
+    }
+  },
+  "lock": {
+    "unlocks_at": "レベル{{lvl}}で解放",
+    "reason": "{{rarity}}の機材はレベル{{lvl}}からリグに入れられます。それまでは持っておく、売る、手を入れることはできますが、弾くことはできません。"
+  },
+  "collection": {
+    "scope": {
+      "all": "すべて",
+      "guitars": "ギター",
+      "pedals": "エフェクター",
+      "parts": "パーツ",
+      "builder": "ビルダー"
+    },
+    "search": "コレクションを検索",
+    "sort_by": "並べ替え",
+    "sort_prefix": "並び：",
+    "sort": {
+      "manual": "手動",
+      "equipped": "装備中",
+      "rarity": "レアリティ",
+      "level": "レベル",
+      "newest": "新しい順",
+      "type": "種類"
+    },
+    "sort_hint": {
+      "manual": "自分だけの並び — 好きな場所へドラッグしましょう",
+      "equipped": "弾いているものを先に：プロフィールのギター、リグの枠、エフェクターボード",
+      "rarity": "珍しいものから、同じものは隣どうしに",
+      "level": "レベルの高いものから",
+      "newest": "最近出たものから",
+      "type": "ギター、エフェクター、モッドとパーツの順"
+    },
+    "view": {
+      "stash": "収納",
+      "cards": "カード"
+    },
+    "view_title": {
+      "stash": "収納表示",
+      "cards": "カード表示"
+    },
+    "no_match": "「{{query}}」に一致するものはありません。",
+    "nothing_yet": "まだ何もありません。",
+    "empty": "コレクションは空です。ケースを開けて始めましょう！",
+    "guitars_eyebrow": "楽器",
+    "guitars_collected": "本のギターを集めた",
+    "pedals_eyebrow": "エフェクト",
+    "pedals_collected": "台のエフェクターを集めた",
+    "clear_dupes": "ダブりを片付ける（{{count}}）",
+    "shelf": "棚",
+    "view_switch": "表示"
+  },
+  "salvage": {
+    "title": "回収",
+    "salvaged_mod": "回収したモッド",
+    "salvaged_mod_caps": "回収したモッド",
+    "fit_title": "{{name}}を取り付けますか？",
+    "fit_body": "{{target}}に、回収したときの値で取り付けます。何も引き直されません。",
+    "off_source": "{{source}}から",
+    "fit_note": "費用はかかりません — {{source}}を払ってもう手に入れています。また外すには、取り付けた先を分解することになります。",
+    "installing": "取り付け中...",
+    "install": "取り付ける",
+    "mod_listing_body": {
+      "guitar": "モッドの枠が空いているどのギターにも合い、何も引き直さずに+{{points}}で付きます。ワークショップではこれを作れません — モッドは人の手から手へ渡るだけです。",
+      "effect": "モッドの枠が空いているどのエフェクターにも合い、何も引き直さずに+{{points}}で付きます。ワークショップではこれを作れません — モッドは人の手から手へ渡るだけです。"
+    },
+    "mod_owned_body": {
+      "guitar": "光ったギターの上にドラッグすれば、今の値のまま付きます：支払いも引き直しもなし。ワークショップの作業台でも待っています。",
+      "effect": "光ったエフェクターの上にドラッグすれば、今の値のまま付きます：支払いも引き直しもなし。ワークショップの作業台でも待っています。"
+    }
+  },
+  "sell": {
+    "title": {
+      "Guitar": "ギターを売りますか？",
+      "Effect": "エフェクターを売りますか？",
+      "Mod": "モッドを売りますか？",
+      "Parts": "パーツを売りますか？",
+      "Part": "パーツを売りますか？",
+      "Imprint": "インプリントを売りますか？",
+      "Extractor": "エクストラクターを売りますか？"
+    },
+    "you_receive": "受け取る額",
+    "fame_points": "Fame"
+  },
+  "market": {
+    "listing": "出品中…",
+    "sell_on_market": "マーケットで売る",
+    "list_title": {
+      "Guitar": "ギターをマーケットに出品",
+      "Effect": "エフェクターをマーケットに出品",
+      "Mod": "モッドをマーケットに出品",
+      "Part": "パーツをマーケットに出品",
+      "Imprint": "インプリントを出品",
+      "Extractor": "エクストラクターを出品"
+    },
+    "your_price": "あなたの値段",
+    "minimum": "最低：{{price}} Fame（ふつうの売値）",
+    "mod_price_hint": "最低額は処分価格にすぎません。モッドは誰にも作れないので、トレーダーでの値段を目安に付けましょう。",
+    "listing_fee": "出品手数料",
+    "fee_short": "出品手数料{{fee}}に足りるFameがありません。",
+    "list_item": "出品する",
+    "empty": "マーケットにはまだ何もありません。コレクションから出品してみましょう！",
+    "salvage_hint_guitar": "これを分解すると、{{name}}がまるごと外れ、+{{before}}から+{{points}}にすり減ります。収納に入り、別のギターに無料で付けられます。",
+    "salvage_hint_effect": "これを分解すると、{{name}}がまるごと外れ、+{{before}}から+{{points}}にすり減ります。収納に入り、別のエフェクターに無料で付けられます。",
+    "cancelling": "取り消し中...",
+    "cancel_listing": "出品を取り消す"
+  },
+  "parts": {
+    "tier_part": "{{tier}}のパーツ",
+    "card_body": "ワークショップの作業台で使います — 強化、修理、モッドはすべてパーツで払います。売るのは、作業台が決して求めないものだけにしましょう。",
+    "rework": "作り直す",
+    "rework_cost": "{{tier}}{{count}}個 + {{fame}} Fame",
+    "you_have": "{{needed}}個中{{qty}}個あります",
+    "rework_times": "作り直す ×{{count}}",
+    "rework_one": "1つ作り直す",
+    "uses_of": "{{qty}}個のうち{{used}}個を使います",
+    "rework_just_one": "{{fame}} Fameで1つだけ作り直す",
+    "not_enough_fame": "Fameが足りません — {{fame}}必要です",
+    "sell_all": "{{count}}個すべて売る",
+    "sell_it": "売る",
+    "sell_one": "{{fame}} Fameで1つ売る",
+    "salvaged_parts": "回収したパーツ",
+    "wallet_empty": "コレクションのギターやエフェクターを分解すると、最初のパーツが手に入ります。",
+    "sell_one_short": "1つ売る"
+  },
+  "stash": {
+    "in_use": "リグで使用中",
+    "part": "パーツ",
+    "component_name": "{{name}} · Lv {{level}}",
+    "reason_unequip_profile": "先にプロフィールから外してください",
+    "reason_remove_rig": "先にリグの枠{{slot}}から外してください",
+    "reason_off_board": "先にエフェクターボードから外してください",
+    "menu": {
+      "details": "詳細",
+      "equip": "装備…",
+      "unequip_profile": "プロフィールから外す",
+      "take_out_rig": "リグの枠{{slot}}から外す",
+      "remove_from_board": "ボードから外す",
+      "market": "マーケット",
+      "guild_stash": "ギルドの収納",
+      "scrap": "分解",
+      "sell_for": "売る · {{fame}}",
+      "sell_all": "すべて売る ×{{qty}}",
+      "merge": "合成 · +{{gain}} Lv",
+      "merge_plain": "いちばん良いものに合成",
+      "workshop": "ワークショップ…",
+      "install_on": "{{name}}に取り付ける"
+    },
+    "eyebrow": "Arsenal",
+    "title": "収納",
+    "items_collected": "個のアイテムを集めた",
+    "tidy_hint": "この棚を一度に並べ直します — そのあとも、あなたの並びのままです",
+    "tidy_up": "整理する",
+    "arrange": {
+      "equipped": "弾いているものを先に",
+      "type": "ギター、次にエフェクター",
+      "rarity": "珍しいものから",
+      "level": "レベルの高いものから",
+      "newest": "新しいものから"
+    },
+    "dupes_guitars_hint": "レベルの低いダブりのギターをすべて売るか分解し、それぞれいちばん良いものを残します",
+    "dupes_guitars": "ダブりのギター（{{count}}）",
+    "dupes_pedals_hint": "レベルの低いダブりのエフェクターをすべて売るか分解し、それぞれいちばん良いものを残します",
+    "dupes_pedals": "ダブりのエフェクター（{{count}}）",
+    "board_label": "Arsenalの収納",
+    "pedals_protected": "エフェクターボードの上のエフェクターには一切触れません。",
+    "reason_merge_built": "ギタービルダーのギターは合成できません",
+    "reason_merge_best": "これがいちばん良いものです — ほかのものをこれに合成してください",
+    "merge_built": {
+      "title": "ワークショップで強化したものを合成しますか？",
+      "body_one": "{{name}}にはワークショップのレベルが{{count}}あります。引き継がれません：いちばん良いものが+{{gain}} Lvになり、これに加えた作業は永久に失われます。",
+      "body_other": "{{name}}にはワークショップのレベルが{{count}}あります。引き継がれません：いちばん良いものが+{{gain}} Lvになり、これに加えた作業は永久に失われます。",
+      "confirm": "それでも合成する",
+      "cancel": "残しておく"
+    }
+  },
+  "card": {
+    "new": "新着",
+    "locked": "ロック中",
+    "equip": "装備",
+    "guild": "ギルド",
+    "list_on_market": "マーケットに出品",
+    "sell_for_fame": "Fameで売る",
+    "guild_hint": "名誉のために、ギルドの収納に置いていく",
+    "needs_level": "レベル{{lvl}}が必要",
+    "scraps_into": "分解するとパーツ{{count}}個",
+    "mod_comes_off": "{{name}} +{{points}}がまるごと外れます",
+    "mods_go_with_it_one": "{{names}}は一緒に失われます",
+    "mods_go_with_it": "{{names}}は一緒に失われます",
+    "guitar": {
+      "level": "ギターのレベル",
+      "equipped": "装備中",
+      "rig_slot": "リグの枠{{slot}}",
+      "market_unequip": "マーケットに出品する前に、プロフィールから外してください",
+      "market_unrig": "マーケットに出品する前に、リグの枠{{slot}}から外してください",
+      "sell_unequip": "売る前に、プロフィールから外してください",
+      "guild_unequip": "ギルドに渡す前に、プロフィールから外してください",
+      "guild_unrig": "ギルドに渡す前に、リグの枠{{slot}}から外してください",
+      "scrap_unequip": "分解する前に、プロフィールから外してください",
+      "scrap_unrig": "分解する前に、リグの枠{{slot}}から外してください"
+    },
+    "effect": {
+      "level": "エフェクターのレベル",
+      "on_board": "ボード上",
+      "remove_hint": "このエフェクターをボードから外す",
+      "market_unboard": "出品する前に、エフェクターボードから外してください",
+      "guild_unboard": "ギルドに渡す前に、エフェクターボードから外してください",
+      "scrap_unboard": "分解する前に、エフェクターボードから外してください",
+      "sell_unboard": "ボード上のエフェクターは売れません"
+    },
+    "merge": "合成 +{{gain}}",
+    "merge_plain": "合成",
+    "merge_hint": "いちばん良いものに合成して、アイテムレベル+{{gain}}",
+    "workshop": "ワークショップ",
+    "workshop_hint": "作業台で修復、強化、モッドの取り付けができます"
+  },
+  "bulk": {
+    "title": "ダブりを片付けますか？",
+    "body_one": "レベルの低いダブり{{n}}個を片付け、それぞれいちばん良いものを残します。",
+    "body": "レベルの低いダブり{{n}}個を片付け、それぞれいちばん良いものを残します。",
+    "protected_guitars": "装備中のギターとリグのギターには一切触れません。",
+    "no_undo": "元に戻せません。",
+    "paid_into_fame": "そのままFameとして支払われます",
+    "scrapping": "分解中...",
+    "scrap_all": "{{count}}個すべて分解",
+    "mods_pulled_one": "モッド{{count}}個を外して収納しました",
+    "mods_pulled": "モッド{{count}}個を外して収納しました",
+    "merge_all": "{{count}}個をいちばん良いものに合成",
+    "merge_detail": "残すものにアイテムレベルが加わります。Fameもパーツもなし。"
+  },
+  "equip": {
+    "profile": "プロフィール",
+    "rig_slot": "リグの枠{{slot}}",
+    "where": "どこに付けますか？",
+    "already_here": "ここにあります",
+    "gets_replaced": "入れ替わります",
+    "empty": "空き",
+    "take_out_of": "{{target}}から外す"
+  },
+  "traits": {
+    "workhorse": {
+      "label": "働き者",
+      "description": "どんな練習でも、何を弾いてもFame/h。"
+    },
+    "long-take": {
+      "label": "ロングテイク",
+      "description": "どんな練習でも、何を弾いてもFame/h。"
+    },
+    "reliable": {
+      "label": "頼れる相棒",
+      "description": "どんな練習でもFame/h。条件なし、驚きなし。"
+    },
+    "shred-machine": {
+      "label": "速弾きマシン",
+      "description": "テクニックの練習でFame/h。"
+    },
+    "jazz-box": {
+      "label": "ジャズボックス",
+      "description": "理論の練習でFame/h。速さではなく、コードのために作られています。"
+    },
+    "songbook": {
+      "label": "ソングブック",
+      "description": "クリエイティブの練習でFame/h。"
+    },
+    "intonation-monster": {
+      "label": "ピッチの怪物",
+      "description": "耳トレでFame/h。ネックのいちばん上まで音程が狂いません。"
+    },
+    "ear-trainer": {
+      "label": "耳トレーナー",
+      "description": "耳トレでFame/h。リピートを設定して追いかけましょう。"
+    },
+    "timing-trainer": {
+      "label": "タイミングトレーナー",
+      "description": "テクニックの練習でFame/h。リピートをテンポに合わせましょう。"
+    },
+    "frequency-work": {
+      "label": "周波数ワーク",
+      "description": "耳トレでFame/h。帯域がどこにあるかを覚えましょう。"
+    },
+    "harmony-bench": {
+      "label": "ハーモニーの作業台",
+      "description": "理論の練習でFame/h。"
+    },
+    "texture-lab": {
+      "label": "テクスチャーラボ",
+      "description": "クリエイティブの練習でFame/h。"
+    },
+    "noise-session": {
+      "label": "ノイズセッション",
+      "description": "クリエイティブの練習でFame/h。"
+    },
+    "pitch-reference": {
+      "label": "ピッチリファレンス",
+      "description": "耳トレでFame/h。"
+    },
+    "picking-bench": {
+      "label": "ピッキングの作業台",
+      "description": "セッションでオルタネイトピッキングを鍛えている間、Fame/h。"
+    },
+    "legato-neck": {
+      "label": "レガートネック",
+      "description": "セッションでレガートを鍛えている間、Fame/h。"
+    },
+    "bender": {
+      "label": "ベンダー",
+      "description": "セッションでチョーキングを鍛えている間、Fame/h。"
+    },
+    "vibrato-arm": {
+      "label": "ビブラートアーム",
+      "description": "セッションでビブラートを鍛えている間、Fame/h。"
+    },
+    "chord-shop": {
+      "label": "コードショップ",
+      "description": "セッションでコードを鍛えている間、Fame/h。"
+    },
+    "scale-runner": {
+      "label": "スケールランナー",
+      "description": "セッションでスケールを鍛えている間、Fame/h。"
+    },
+    "metronome": {
+      "label": "メトロノーム",
+      "description": "セッションでリズムを鍛えている間、Fame/h。"
+    },
+    "phrase-repeat": {
+      "label": "フレーズリピート",
+      "description": "セッションでフレージングを鍛えている間、Fame/h。ディレイが自分のフレーズを返してくれます。"
+    },
+    "harmony-ear": {
+      "label": "和声の耳",
+      "description": "セッションで和声の聴き取りを鍛えている間、Fame/h。"
+    },
+    "interval-trainer": {
+      "label": "インターバルトレーナー",
+      "description": "セッションで耳トレを鍛えている間、Fame/h。"
+    },
+    "improv-pedal": {
+      "label": "アドリブペダル",
+      "description": "セッションでアドリブを鍛えている間、Fame/h。"
+    },
+    "phrase-machine": {
+      "label": "フレーズマシン",
+      "description": "セッションでフレージングを鍛えている間、Fame/h。"
+    },
+    "improv-room": {
+      "label": "アドリブルーム",
+      "description": "セッションでアドリブを鍛えている間、Fame/h。"
+    },
+    "theory-board": {
+      "label": "理論ボード",
+      "description": "セッションで音楽理論を鍛えている間、Fame/h。"
+    },
+    "brand-endorsement": {
+      "label": "{{brand}}エンドース",
+      "description": "使用中の{{brand}}のアイテム1つごとにFame/h。3つまで数えます。"
+    },
+    "pedal-platform": {
+      "label": "ペダルプラットフォーム",
+      "description": "ボード上のエフェクター1台ごとにFame/h。6台まで数えます。前に何を置いてもけんかしません。"
+    },
+    "backline": {
+      "label": "バックライン",
+      "description": "枠に入ったほかのギター1本ごとにFame/h。"
+    },
+    "vintage-row": {
+      "label": "ヴィンテージの列",
+      "description": "1985年より前に作られた使用中のアイテム1つごとにFame/h。4つまで数えます。"
+    },
+    "boutique-row": {
+      "label": "ブティックの列",
+      "description": "ボード上のエピック以上のエフェクター1台ごとにFame/h。4台まで数えます。"
+    },
+    "bench-boss": {
+      "label": "作業台の親方",
+      "description": "リグのほかのアイテムの強化レベル1つごとにFame/h。20まで数えます。"
+    },
+    "well-equipped": {
+      "label": "装備充実",
+      "description": "リグのほかの特性1つごとにFame/h。8つまで数えます。"
+    },
+    "wants-dirt": {
+      "label": "歪みが欲しい",
+      "description": "ボードにオーバードライブ、ディストーション、ファズのどれかがある間、Fame/h。パッシブのハムバッカーには押してくれるものが必要です。"
+    },
+    "clean-machine": {
+      "label": "クリーンマシン",
+      "description": "ボードに歪み系のエフェクターが1台もない間、Fame/h。手のすることがすべて聴こえます。"
+    },
+    "solo-act": {
+      "label": "ソロアクト",
+      "description": "装備しているギターがこれ1本だけの間、Fame/h。"
+    },
+    "straight-to-amp": {
+      "label": "アンプ直",
+      "description": "エフェクターボードが完全に空の間、Fame/h。"
+    },
+    "cable-and-amp": {
+      "label": "ケーブルとアンプ",
+      "description": "エフェクターボードが完全に空の間、Fame/h。弦とスピーカーの間に何もありません。"
+    },
+    "nothing-but-the-guitar": {
+      "label": "ギターだけ",
+      "description": "エフェクターボードが完全に空の間、Fame/h。助けはいらないし、これまでもいらなかった。"
+    },
+    "matched-set": {
+      "label": "おそろいのセット",
+      "description": "同じブランドのアイテムがほかにも使用中の間、Fame/h。"
+    },
+    "ambient-pair": {
+      "label": "アンビエントペア",
+      "description": "ディレイとリバーブが両方ボードにある間、Fame/h。別々だと仕事は半分です。"
+    },
+    "gain-stack": {
+      "label": "ゲインスタック",
+      "description": "2台目の歪み系エフェクターがボードにある間、Fame/h。歪みの重ねがけはやり方であって、事故ではありません。"
+    },
+    "front-of-chain": {
+      "label": "チェーンの先頭",
+      "description": "このエフェクターがボード上のすべての歪みより前にある間、Fame/h。ファズとコンプはピックアップの生の音が欲しいのです。"
+    },
+    "tail-of-chain": {
+      "label": "チェーンの最後",
+      "description": "このエフェクターがボード上のすべての歪みより後ろにある間、Fame/h。空間系は最後に置かないと、ぐちゃぐちゃになります。"
+    },
+    "purist": {
+      "label": "純粋主義者",
+      "description": "ボードのエフェクターが2台以下の間、Fame/h。"
+    },
+    "full-board": {
+      "label": "フルボード",
+      "description": "ボードのエフェクターが6台以上の間、Fame/h。"
+    },
+    "metal-rig": {
+      "label": "メタルリグ",
+      "description": "ボードに歪み系エフェクターが2台以上あり、セッションにテクニックが45分以上あるとき、Fame/h。"
+    },
+    "ambient-study": {
+      "label": "アンビエントの研究",
+      "description": "ボードにリバーブがあり、セッションに耳トレが30分以上あるとき、Fame/h。"
+    },
+    "writing-room": {
+      "label": "作曲部屋",
+      "description": "ボードのエフェクターが2台以下で、セッションにクリエイティブが45分以上あるとき、Fame/h。"
+    },
+    "practice-room": {
+      "label": "練習部屋",
+      "description": "装備しているギターがこれ1本だけで、セッションが60分以上のとき、Fame/h。"
+    },
+    "theory-desk": {
+      "label": "理論の机",
+      "description": "ボードにチューナーがあり、セッションに理論が30分以上あるとき、Fame/h。"
+    },
+    "session-rig": {
+      "label": "セッションリグ",
+      "description": "ギターの3つの枠がすべて埋まっていて、セッションに3つの違うカテゴリーがそれぞれ15分以上あるとき、Fame/h。"
+    },
+    "fuzz-workout": {
+      "label": "ファズワークアウト",
+      "description": "このエフェクターがほかのすべての歪みより前にあり、セッションにテクニックが45分以上あるとき、Fame/h。"
+    },
+    "modulation-study": {
+      "label": "モジュレーションの研究",
+      "description": "ボードにディレイがあり、セッションでフレージングを鍛えているとき、Fame/h。"
+    },
+    "vintage-session": {
+      "label": "ヴィンテージセッション",
+      "description": "1985年より前に作られたアイテムが3つ使用中で、セッションが45分以上のとき、Fame/h。"
+    },
+    "stack-study": {
+      "label": "スタックの研究",
+      "description": "2台目の歪み系エフェクターがボードにあり、セッションでオルタネイトピッキングを鍛えているとき、Fame/h。"
+    },
+    "tone-lab": {
+      "label": "トーンラボ",
+      "description": "ボードにエフェクターが4台以上あり、セッションにクリエイティブが30分以上あるとき、Fame/h。"
+    },
+    "quiet-room": {
+      "label": "静かな部屋",
+      "description": "ボードが空で、セッションに耳トレが45分以上あるとき、Fame/h。"
+    },
+    "monk": {
+      "label": "修行僧",
+      "description": "エフェクターボードが空で、装備しているギターがこれ1本だけで、セッションが1つのカテゴリーだけのとき、Fame/h。"
+    },
+    "virtuoso": {
+      "label": "ヴィルトゥオーゾ",
+      "description": "セッションでオルタネイトピッキング、レガート、スウィープピッキングを鍛え、テクニックが60分以上あるとき、Fame/h。"
+    },
+    "conservatory": {
+      "label": "音楽院",
+      "description": "セッションで音楽理論、ハーモニー、コードを鍛え、60分以上続いたとき、Fame/h。"
+    },
+    "total-recall": {
+      "label": "トータルリコール",
+      "description": "セッションで耳トレと和声の聴き取りを鍛え、ボードにリバーブとチューナーが両方あるとき、Fame/h。"
+    },
+    "brand-artist": {
+      "label": "{{brand}}アーティスト",
+      "description": "枠のギターがすべて{{brand}}で、セッションが45分以上のとき、Fame/h。"
+    },
+    "wall-of-sound": {
+      "label": "ウォール・オブ・サウンド",
+      "description": "ボードにエフェクターが6台以上あり、そのうち3台がエピック以上で、セッションが60分以上のとき、Fame/h。"
+    },
+    "time-capsule": {
+      "label": "タイムカプセル",
+      "description": "使用中のアイテムがすべて1985年より前に作られたもので、セッションが45分以上のとき、Fame/h。"
+    },
+    "one-man-band": {
+      "label": "ワンマンバンド",
+      "description": "セッションに4つのカテゴリーすべてがそれぞれ15分以上あり、ボードにエフェクターが4台以上あるとき、Fame/h。"
+    },
+    "arranger": {
+      "label": "アレンジャー",
+      "description": "セッションでアドリブ、フレージング、ハーモニーを鍛え、60分以上続いたとき、Fame/h。"
+    },
+    "signal-booster": {
+      "label": "シグナルブースター",
+      "description": "ボード上のほかのエフェクターすべてが、それぞれの特性でこの分だけ多くFame/hを払います。"
+    },
+    "master-class": {
+      "label": "マスタークラス",
+      "description": "リグの耳トレと理論の特性すべてが、この分だけ多くFame/hを払います。"
+    },
+    "drive-trainer": {
+      "label": "ドライブトレーナー",
+      "description": "リグのテクニックの特性すべてが、この分だけ多くFame/hを払います。"
+    },
+    "skill-coach": {
+      "label": "スキルコーチ",
+      "description": "リグのスキル系の特性すべてが、この分だけ多くFame/hを払います。"
+    },
+    "patchbay": {
+      "label": "パッチベイ",
+      "description": "チェーンでこれより後ろにあるエフェクターすべてが、それぞれの特性でこの分だけ多くFame/hを払います。"
+    },
+    "house-band": {
+      "label": "ハウスバンド",
+      "description": "このギターと同じブランドのアイテムの特性すべてが、この分だけ多くFame/hを払います。"
+    },
+    "session-leader": {
+      "label": "セッションリーダー",
+      "description": "いちばん多く払う特性1つが、この分だけ多くFame/hを払います。"
+    },
+    "temperamental": {
+      "label": "気まぐれ",
+      "description": "Fame/h。ただしセッションが30分未満なら何も払いません。"
+    },
+    "diva": {
+      "label": "ディーバ",
+      "description": "Fame/h。ただしほかの装備アイテムの特性すべてが9.0 Fame/h少なくなります。"
+    },
+    "prima-donna": {
+      "label": "プリマドンナ",
+      "description": "Fame/h。ただしリグのほかの特性はすべて何も払いません。"
+    }
+  },
+  "condition": {
+    "label": "状態",
+    "title": "状態：{{grade}}",
+    "title_restored": "状態：{{grade}} — ワークショップで修復済み",
+    "restored": "修復済み"
+  },
+  "traits_ui": {
+    "more": "ほか{{count}}"
+  },
+  "in_service": {
+    "pedalboard": "エフェクターボード"
+  },
+  "dex_marks": {
+    "owned": "所持",
+    "in_dex": "Dex登録済み",
+    "new": "コレクションに新登場"
+  },
+  "buy": {
+    "buy": "買う",
+    "buying": "購入中…",
+    "not_enough_fame": "Fameが足りません",
+    "not_enough_fame_points": "Fameが足りません"
+  },
+  "part_row": {
+    "title": "{{name}} — {{have}}個所持、必要なのは{{need}}個",
+    "required": "必要",
+    "owned": "所持",
+    "after_left": "{{job}}のあと：残り{{left}}",
+    "short": "{{count}}足りません",
+    "you_have": "{{have}}個所持",
+    "you_have_short": "{{have}}個所持 — {{short}}足りません"
+  },
+  "scrap": {
+    "title": {
+      "Guitar": "ギターを分解しますか？",
+      "Effect": "エフェクターを分解しますか？"
+    },
+    "body": {
+      "Guitar": "{{name}} — 元に戻せません。ギターは永久になくなります。",
+      "Effect": "{{name}} — 元に戻せません。エフェクターは永久になくなります。"
+    },
+    "will_salvage_one": "パーツ{{count}}個を回収します",
+    "will_salvage": "パーツ{{count}}個を回収します",
+    "blueprint": "設計図",
+    "mods_go_one": "このモッドは一緒に失われます",
+    "mods_go": "この{{count}}個のモッドは一緒に失われます"
+  },
+  "blockers": {
+    "more_parts": "{{tier}}の{{parts}}があと{{count}}個",
+    "restore_first": "先に{{grade}}まで修復",
+    "plus_others_one": "{{first}}、ほかにパーツ{{count}}個",
+    "plus_others": "{{first}}、ほかにパーツ{{count}}個",
+    "more_fame": "Fameがあと{{count}}必要"
+  },
+  "workshop": {
+    "level_now": "今のレベル",
+    "level_after": "この作業のあとのレベル",
+    "build_log": "作業記録",
+    "build_log_hint": "このアイテムへの作業台での作業、新しい順",
+    "build_n": "強化{{build}}",
+    "level": "レベル",
+    "levels_gain_one": "{{gain}}レベル",
+    "levels_gain": "{{gain}}レベル",
+    "current": "現在",
+    "next_build": "次の強化",
+    "you_pay": "支払い",
+    "have_it_all": "すべてそろっています",
+    "still_short": "まだ{{count}}足りません",
+    "materials_required": "必要な材料",
+    "parts_short_one": "パーツが{{count}}個足りません",
+    "parts_short": "パーツが{{count}}個足りません",
+    "build_progression": "強化の進み方",
+    "view_all_builds": "全{{count}}段階の強化と昇格する場所を見る",
+    "next": "次",
+    "past_last_build": "強化{{count}}を過ぎてもレシピは大きくなり続けますが、もう昇格はありません。",
+    "path_now": "{{name}} — 今いるところ",
+    "path_target": "{{name}} — この作業の目標",
+    "path_not_yet": "{{name}} — まだ",
+    "promotion_path": "昇格の道のり",
+    "resources_available": "使える資源",
+    "required": "必要",
+    "owned": "所持",
+    "have_n": "{{have}}所持",
+    "short_n": "{{short}}足りません",
+    "needs_n": "{{need}}必要",
+    "after_restoration": "修復後",
+    "condition_ok": "状態は十分です — {{grade}}",
+    "restore_first": "先に{{grade}}まで修復",
+    "requires_condition": "この強化には{{grade}}以上の状態が必要です。",
+    "go_to_restoration": "修復へ",
+    "slots_used": "モッドの枠 {{max}}中{{used}}使用",
+    "unlocked_next_promotion": "次の昇格で解放",
+    "parts": "パーツ",
+    "nothing_salvaged": "まだ何も回収していません — コレクションから何か分解してください。",
+    "fully_restored": "完全に修復済み",
+    "restore_condition": "状態を修復",
+    "promote_to": "{{rarity}}に昇格",
+    "upgrade_to_build": "強化{{build}}にアップグレード",
+    "mod_taken_off": "{{name}} +{{points}}を外しました",
+    "restore_name": "{{name}}を修復",
+    "upgrade_name": "{{name}}を強化",
+    "improve_condition_one": "状態を良くして{{count}}レベル獲得。",
+    "improve_condition": "状態を良くして{{count}}レベル獲得。",
+    "build_arrow": "強化{{from}} → 強化{{to}}",
+    "restore_to": "{{grade}}まで修復",
+    "install_another_mod": "別のモッドを取り付ける",
+    "reroll_a_mod": "モッドを引き直す",
+    "restoration": "修復",
+    "ready_to_restore": "修復できます",
+    "restoring": "修復中…",
+    "mod_slots": "モッドの枠",
+    "slots_no_more": "{{rarity}}ではこれ以上付けられません — 昇格で枠が増えます",
+    "you_own_fit_one": "持っているもの{{count}}個がこの強化に合います",
+    "you_own_fit": "持っているもの{{count}}個がこの強化に合います",
+    "nothing_fits_yet": "持っているものでこの強化に合うものはまだありません",
+    "upgrade_cost": "強化の費用",
+    "building": "強化中…",
+    "search_rack": "ラックを検索",
+    "nothing_matches": "一致するものはありません。",
+    "rack_filter": {
+      "all": "すべて",
+      "guitar": "ギター",
+      "effect": "エフェクター"
+    },
+    "promoted": "昇格済み",
+    "parts_used": "使ったパーツ",
+    "levels_word_one": "レベル",
+    "levels_word": "レベル",
+    "empty": "まずケースを開けましょう。ギターやエフェクターを手に入れたら、修復して、回収したパーツで強化を続けられます。",
+    "change_instrument": "楽器を変える · ラックに{{count}}",
+    "pick_instrument": "楽器を選ぶ",
+    "ready_now": "今すぐできます",
+    "make": "作る",
+    "make_hint_one": "{{tier}}のパーツから{{count}}個作り直す",
+    "make_hint": "{{tier}}のパーツから{{count}}個作り直す",
+    "job_with_gain_one": "{{job}} · +{{count}}レベル",
+    "job_with_gain": "{{job}} · +{{count}}レベル",
+    "previous_instrument": "前の楽器",
+    "next_instrument": "次の楽器",
+    "n_of_total": "{{total}}中{{n}}"
+  },
+  "mods": {
+    "remove_aria": "{{fame}} Fameでこのモッドを外す",
+    "remove_hint": "{{fame}} Fameで楽器からモッドを外し、枠を空けます。モッドは外すときに壊れます — 収納には入らず、もう一度付けることもできません。",
+    "rerolls_range": "+{{min}}〜+{{max}}で引き直し",
+    "rolls_range": "+{{min}}〜+{{max}}",
+    "range": "+{{min}}〜+{{max}}",
+    "from_source": "{{source}}から — そのまま付き、何も引き直されません",
+    "from_stash": "収納から",
+    "stash_intro": "モッドは部品で、作業台は渡されたものを取り付けるだけ — 作ることはできません。モッドは分解した機材やトレーダーのカウンターから手に入り、今の値のまま付きます：何も引き直されず、費用もかかりません。",
+    "slots_full": "このレアリティのモッドの枠はすべて埋まっています — 昇格すると、これらを付ける余地ができます。",
+    "nothing_fits": "持っているものでこの楽器に合うものはありません。モッドが付いたものを分解するか — 分解では必ず1つ残ります — 今日のトレーダーをのぞいてみましょう。",
+    "installed": "取り付け済み",
+    "reroll_intro": "引き直しは、ここでパーツを使う唯一の作業です。モッドの範囲からまったく新しい値を買い、出た値が今の値と入れ替わります — 良いほうを残すことはできません。",
+    "remove_intro": "外すには{{fame}} Fameかかり、枠が空きます。モッドは楽器から永久に外れます：収納には戻らず、ほかのどこにも付けられず、その分のレベルも一緒に消えます。",
+    "reroll": "引き直す",
+    "reroll_hint": "この費用をもう一度払って、+{{min}}〜+{{max}}の間で1回引き直します。どちらにしても+{{points}}と入れ替わります — {{odds}}。",
+    "reroll_worse": "{{total}}通りの結果のうち{{worse}}通りは今の値より悪くなります",
+    "reroll_only_up": "ここから先は上がるか横ばいだけです",
+    "would_fit": "この強化に合うもの",
+    "would_fit_hint": "探しておく価値のあるもの。どれでも収納に入ったその日に、この楽器に付けられます。",
+    "remove_title": "{{name}}を外しますか？",
+    "remove_body": "{{item}}から外れ、外すときに壊れます — 収納には入らず、ほかの何にも付けられず、元に戻す方法はありません。",
+    "remove_effect": "+{{points}}レベルが一緒に消えます · 枠が1つ空きます",
+    "keep_it": "残しておく",
+    "taking_off": "外しています…",
+    "take_off": "外す",
+    "installed_aria": "{{name}}、取り付け済み",
+    "reroll_name": "{{name}}を引き直す",
+    "empty_slot_title": "空き枠 · モッドを取り付ける",
+    "empty_slot_aria": "空き枠、モッドを取り付ける",
+    "rolls_aria": "+{{min}}〜+{{max}}、現在+{{current}}",
+    "was": "以前",
+    "cost": "費用",
+    "can_roll_lower": "今の+{{points}}より低い値が出ることもあります。",
+    "better": "{{count}}良い",
+    "worse": "{{count}}悪い",
+    "same_value": "同じ値",
+    "done": "完了",
+    "back": "戻る",
+    "rolling": "引き直し中…",
+    "not_enough_parts": "パーツが足りません",
+    "roll_again": "もう一度引く",
+    "slot": "枠{{slot}}",
+    "install_mod": "モッドを取り付ける",
+    "reroll_mod": "モッドを引き直す",
+    "manage_mod": "モッドを管理",
+    "remove_mod": "モッドを外す",
+    "choose_compatible": "合うモッドを選ぶ",
+    "choose_hint": "収納からこの枠に付けるモッドを選びます。今の値のまま付き、何も引き直されません。",
+    "search_placeholder": "合うモッドを検索...",
+    "search": "合うモッドを検索",
+    "nothing_in_stash": "収納にはこの強化に合うものがありません。",
+    "would_take": "モッドは作業台でほかの楽器から外したり、トレーダーで手に入れたりします。この楽器に付けられるもの：",
+    "no_match": "その名前に一致する合うモッドはありません。",
+    "bonus": "+{{points}}ボーナス",
+    "bonus_word": "ボーナス",
+    "compatible_slot": "この枠に合います",
+    "install_named": "{{name}}を取り付ける",
+    "reroll_range": "引き直す · +{{min}}〜+{{max}}",
+    "take_off_for": "外す · {{fame}} Fame"
+  },
+  "toasts": {
+    "mod_added": "モッドを収納に追加しました — コレクションか作業台から取り付けられます",
+    "reworked": "{{part}} {{qty}}個に作り直しました！",
+    "listed": "マーケットに出品しました",
+    "purchase_complete": "購入しました！",
+    "listing_cancelled": "出品を取り消しました",
+    "scrapped_one": "分解してパーツ{{count}}個に！",
+    "scrapped": "分解してパーツ{{count}}個に！",
+    "mod_pulled": "{{name}} +{{points}}を外して収納しました",
+    "scrapped_pedals": "エフェクター{{count}}台を分解してパーツ{{parts}}個に！",
+    "scrapped_guitars": "ギター{{count}}本を分解してパーツ{{parts}}個に！",
+    "sold_for": "{{fame}} Fameで売れました！",
+    "sold_pedals": "エフェクター{{count}}台を{{fame}} Fameで売りました！",
+    "sold_guitars": "ギター{{count}}本を{{fame}} Fameで売りました！",
+    "bolted_in": "{{name}}を取り付けました — {{fame}} Fame",
+    "racked_up": "{{name}}をラックに入れました — {{fame}} Fame",
+    "build_done": "強化{{build}} — +{{gain}}レベル",
+    "restored": "{{grade}}まで修復 — +{{gain}}レベル",
+    "mod_fitted": "{{name}}を取り付けました — +{{points}}レベル",
+    "mod_removed": "{{name}}を外しました — モッドは消え、枠が空きました",
+    "mod_respec": "{{name}}を引き直し — +{{before}} → +{{after}}",
+    "err": {
+      "purchase": "購入できませんでした",
+      "equip": "ギターを装備できませんでした",
+      "rework": "パーツを作り直せませんでした",
+      "list": "出品できませんでした",
+      "buy": "購入できませんでした",
+      "cancel_listing": "出品を取り消せませんでした",
+      "open_case": "ケースを開けられませんでした",
+      "scrap_effect": "エフェクターを分解できませんでした",
+      "scrap_pedals": "エフェクターを分解できませんでした",
+      "scrap_guitar": "ギターを分解できませんでした",
+      "scrap_guitars": "ギターを分解できませんでした",
+      "sell_effect": "エフェクターを売れませんでした",
+      "sell_pedals": "エフェクターを売れませんでした",
+      "sell_guitar": "ギターを売れませんでした",
+      "sell_guitars": "ギターを売れませんでした",
+      "sell_parts": "パーツを売れませんでした",
+      "sell_mod": "モッドを売れませんでした",
+      "unequip": "ギターを外せませんでした",
+      "pedalboard": "エフェクターボードを更新できませんでした",
+      "rig": "リグを更新できませんでした",
+      "stash_layout": "収納の並びを保存できませんでした",
+      "upgrade": "アップグレードを購入できませんでした",
+      "build": "強化できませんでした",
+      "commission": "注文できませんでした",
+      "mod": "モッドを取り付けられませんでした",
+      "repair": "修理できませんでした",
+      "merge": "ダブりを合成できませんでした"
+    },
+    "merged": "合成しました — +{{gain}} Lv"
+  },
+  "categories": {
+    "technique": "テクニック",
+    "theory": "理論",
+    "hearing": "耳コピ",
+    "creativity": "クリエイティブ"
+  },
+  "signal": {
+    "path": "シグナルパス",
+    "backwards": "{{cables}}本中{{wrong}}本が逆向き",
+    "all_in_order": "{{count}}本すべて正しい順番",
+    "wire_it_up": "配線する",
+    "wire_it_up_hint": "ボード全体を、定石どおりの順番に並べます",
+    "cables_in_order_one": "{{count}}本中{{ok}}本が正しい順番",
+    "cables_in_order": "{{count}}本中{{ok}}本が正しい順番",
+    "stage_empty": "この種類のものは使われていません。",
+    "stage_lost": "（ダブりで{{count}}を失っています）",
+    "stage_level_one": "エフェクター1台が使用中で、リグレベルのうちLv {{level}}分{{lost}}。",
+    "stage_level": "エフェクター{{count}}台が使用中で、リグレベルのうちLv {{level}}分{{lost}}。",
+    "amber_backwards": "アンバーのエフェクターは逆向きのケーブルの上にあります",
+    "full_chain_done": "すべてのステージが使われています。ボードはケーブルの分に加えて1時間{{fame}} Fameを払います。",
+    "full_chain_hint": "すべてのステージを一度に埋めると、ボードはケーブルの分に加えて1時間{{fame}} Fameを払います。",
+    "full_chain": "フルチェーン",
+    "stages": {
+      "tuner": {
+        "label": "チューナー",
+        "why": "弦そのままの音を読むので、前で信号に色を付けるものがあってはいけません。"
+      },
+      "filter": {
+        "label": "フィルター",
+        "why": "クリーンな信号をスイープします。歪みの後ろだと、ザラつきをスイープすることになります。"
+      },
+      "compressor": {
+        "label": "コンプレッサー",
+        "why": "後ろの何かが増幅する前に、ピッキングのアタックをそろえます。"
+      },
+      "fuzz": {
+        "label": "ファズ",
+        "why": "ピックアップの音をほぼ直接聴きたい — 前にバッファーがあると息が詰まります。"
+      },
+      "overdrive": {
+        "label": "オーバードライブ",
+        "why": "クリーンな信号にざらつきを足し、ディストーションを重ねる土台になります。"
+      },
+      "distortion": {
+        "label": "ディストーション",
+        "why": "いちばん強いクリッピングは、歪みのセクションの最後に置きます。"
+      },
+      "boost": {
+        "label": "ブースト",
+        "why": "すでに歪んだ音を押し出します。前に置くと、音量が上がるだけです。"
+      },
+      "eq": {
+        "label": "EQ",
+        "why": "空間系が聴く前に、仕上がった歪みを整えます。"
+      },
+      "modulation": {
+        "label": "モジュレーション",
+        "why": "落ち着いた音を揺らします。同じ仲間どうしの順番は好みです。"
+      },
+      "delay": {
+        "label": "ディレイ",
+        "why": "仕上がった音をくり返します。歪みの前だと、ぐちゃぐちゃをくり返します。"
+      },
+      "reverb": {
+        "label": "リバーブ",
+        "why": "リグ全体が鳴る部屋なので、いつも最後です。"
+      }
+    },
+    "tiers": {
+      "empty": {
+        "label": "未配線",
+        "note": "ボードにエフェクターを置くと、置いた順番が報酬を生み始めます。"
+      },
+      "single": {
+        "label": "エフェクター1台",
+        "note": "チェーンには、信号が次に向かう場所が必要です。2台目を足しましょう。"
+      },
+      "book": {
+        "label": "定石どおり",
+        "note": "どのケーブルも、次に来るべきエフェクターにつながっています。これが定石の順番です。"
+      },
+      "one-off": {
+        "label": "ケーブル1本ずれ",
+        "note": "エフェクターが1台だけまちがった場所にあります。ほかはすべて正しい位置です。"
+      },
+      "rough": {
+        "label": "雑な配線",
+        "note": "2本のケーブルがチェーンを逆向きに走っています。"
+      },
+      "spaghetti": {
+        "label": "スパゲッティ",
+        "note": "信号がボード中で自分と交差しています。"
+      }
+    }
+  },
+  "power": {
+    "label": "電源",
+    "one_unpowered": "{{name}}に電源がありません",
+    "many_unpowered": "エフェクター{{count}}台に電源がありません",
+    "nothing_plugged": "まだ何もつながっていません",
+    "all_running": "すべてのエフェクターが動いています",
+    "patch": "電源をつなぐ",
+    "patch_hint": "ブロックの空いている穴の分だけ、すべてつなぎます",
+    "outputs": "出力 {{used}} / {{total}}",
+    "outputs_total": "出力{{total}}",
+    "no_power_for": "{{names}}に電源がありません",
+    "dead_pedal_note": "電源のないエフェクターは、リグレベルを加えず、Fameももらえません。"
+  },
+  "duplicates": {
+    "title": "ダブり",
+    "copy_line": "{{name}} Lv {{level}} → {{counted}}として数える",
+    "rule": "いちばん良い1台はすべて、2台目は半分、それ以上は何も数えません。",
+    "keeper": "{{name}}が{{total}}台、ボードで電源につながっています。これがいちばん良い1台なので、すべて数えられます（Lv {{level}}）— ほかの台の印は、それぞれ数えられている値です。",
+    "copy": "ボード上の{{n}}台目の{{name}} — {{worth}}（Lv {{level}} → {{counted}}）。別のエフェクターに替えれば、すべてのレベルが数えられます。",
+    "worth_none": "リグレベルに何も加えません",
+    "worth_half": "レベルの半分をリグレベルに加えます",
+    "worth_pct": "レベルの{{pct}}%をリグレベルに加えます"
+  },
+  "picker": {
+    "choose_effect": "エフェクターを選ぶ",
+    "remove_from_slot": "枠から外す",
+    "no_effects": "コレクションにはまだエフェクターがありません。",
+    "no_effects_hint": "エフェクトのパックを引いて始めましょう！",
+    "on_another_slot": "別の枠にあります",
+    "no_room": "満杯 — 入れ替える",
+    "choose_guitar": "ギターを選ぶ",
+    "in_another_slot": "別の枠にあります"
+  },
+  "rig": {
+    "upgrade": "アップグレード",
+    "category_extra": "そのカテゴリーを練習したときの1時間あたりの追加分",
+    "rig_level": "リグレベル",
+    "fame_per_hour": "Fame / 時",
+    "breakdown": "内訳",
+    "base": "基本",
+    "traits": "特性",
+    "category_bonus": "{{category}}ボーナス",
+    "hardware_costs": "{{name}}は{{fame}} Fame — あと{{missing}}必要です",
+    "pedalboard_hw": "エフェクターボード",
+    "power_supply_hw": "パワーサプライ"
+  },
+  "rack": {
+    "fit_slot": "枠{{slot}}にギターを入れる",
+    "equip_guitar": "ギターを装備",
+    "slot": "枠{{slot}}",
+    "change": "変更",
+    "more_for_slot": "枠{{slot}}のほかの候補",
+    "take_off": "ラックから外す",
+    "condition_word": "状態"
+  },
+  "board": {
+    "touch_tip": "スマホを横にして、全画面にするといちばん使いやすいです。",
+    "fullscreen": "全画面",
+    "gestures_toggle": "操作のしかた",
+    "gesture_zoom": "ボードをピンチしてズーム。",
+    "gesture_drag": "エフェクターをドラッグして移動、または隣と入れ替え。",
+    "gesture_tap": "エフェクターをタップして電源を抜くか、ボードから外す。",
+    "gesture_cable": "パワーサプライをタップしてからエフェクターをタップすると、ケーブルをつなげます。",
+    "title": "エフェクターボード",
+    "full": "ボードが満杯です — 追加する前にエフェクターを1台外してください。",
+    "no_output_one": "{{supply}}には、エフェクター{{count}}台分の出力がありません — 電源がないので、シグナルチェーンからもリグからも外れています。",
+    "no_output": "{{supply}}には、エフェクター{{count}}台分の出力がありません — 電源がないので、シグナルチェーンからもリグからも外れています。",
+    "tap_target": "次に、このケーブルをつなぐエフェクターをタップしてください。",
+    "outputs_taken": "{{supply}}の出力はすべて使われています — 先にケーブルを1本抜いてください。",
+    "no_room_wired_one": "エフェクター{{count}}台分の場所がありません — 残りは正しい順番につながっています。",
+    "no_room_wired": "エフェクター{{count}}台分の場所がありません — 残りは正しい順番につながっています。",
+    "no_room_parked_one": "エフェクター{{count}}台分の場所がありません — ボードの下に置いてあります。",
+    "no_room_parked": "エフェクター{{count}}台分の場所がありません — ボードの下に置いてあります。",
+    "unplug": "電源を抜く",
+    "plug_in": "電源をつなぐ",
+    "off_the_board": "ボードから外す",
+    "by_the_book": "定石どおり — ボードが+{{rate}} Fame/hを払います",
+    "tidy_hint": "すべてのエフェクターを列に並べる",
+    "add_pedal": "エフェクターを追加",
+    "brick_hint": "{{supply}} — ケーブルをエフェクターにドラッグすると電源が入ります",
+    "unplug_name": "{{name}}の電源を抜く",
+    "take_off_name": "{{name}}をボードから外す",
+    "remove_name": "{{name}}を外す",
+    "zoom_in": "拡大",
+    "zoom_out": "縮小",
+    "fit_board": "ボード全体を表示",
+    "open_fullscreen": "ボードを全画面で開く",
+    "leave_fullscreen": "全画面を終了",
+    "overflow_hint_one": "このエフェクターを置く場所がありません — 場所を探すで入れ替えるか、ボードを詰めてください。",
+    "overflow_hint": "これらのエフェクターを置く場所がありません — 場所を探すで1台入れ替えるか、ボードを詰めてください。",
+    "make_room_title": "{{name}}を置く場所がありません",
+    "make_room_ready": "{{name}}の場所が見つかりました",
+    "make_room_ready_hint": "今は十分な大きさのすき間があります。",
+    "make_room_swap_hint": "入れ替える光ったエフェクターを選んでください — それはコレクションに戻るだけで、何も失われません。またはエフェクターをドラッグして、すき間を空けてください。",
+    "make_room_squeeze_hint": "どれか1台を外しても十分な場所は空きません — ボードを詰めて収めましょう。",
+    "make_room_too_big": "詰めても、このケースには入りません — エフェクターを2、3台外すか、もっと大きなケースを手に入れてください。",
+    "make_room_cancel": "キャンセル",
+    "place_now": "置く",
+    "squeeze_in": "詰めて入れる",
+    "squeeze_hint": "シグナルの順番はそのままに、すべてのエフェクターを寄せて場所を作ります",
+    "swap": "入れ替え",
+    "swapped": "{{incoming}}がボードに入り、{{outgoing}}はコレクションに戻りました。",
+    "squeezed": "詰めて入れました — {{name}}がボードにあります。",
+    "find_room": "場所を探す"
+  },
+  "trader": {
+    "parts_mods": "パーツとモッド",
+    "col_in_stash": "収納",
+    "col_left": "残り",
+    "featured_gear": "注目の機材",
+    "in_stash": "収納に",
+    "left": "残り",
+    "taken": "売り切れ",
+    "scrap_parts_one": "パーツ{{count}}個",
+    "scrap_parts": "パーツ{{count}}個",
+    "restocks_in": "入荷まで",
+    "mod_of_day": "今日のモッド",
+    "guitar_mod": "ギター用モッド",
+    "pedal_mod": "エフェクター用モッド",
+    "one_fewer": "1つ減らす",
+    "one_more": "1つ増やす",
+    "quantity": "数量",
+    "max": "最大",
+    "all": "すべて"
+  },
+  "dex": {
+    "close_preview": "プレビューを閉じる",
+    "silhouette": "未発見アイテムのシルエット",
+    "in_stash": "収納にあります",
+    "discovered_not_stash": "発見済み、収納にはなし",
+    "discovered_hint": "発見済み · 永久に記録されています。今は収納にありません。",
+    "undiscovered_hint": "まだ発見していません — ケースを開けて探しましょう。",
+    "title": "発見",
+    "discovered_count": "{{total}}個発見",
+    "discovered": "発見済み",
+    "missing": "未発見",
+    "search_placeholder": "検索...",
+    "search": "発見を検索",
+    "no_match": "この壁には一致するものがありません。フィルターを1つか2つ外してください。",
+    "prev_wall": "前の壁",
+    "next_wall": "次の壁",
+    "wall_n": "壁{{n}}"
+  },
+  "commissions": {
+    "commission_name": "{{name}}を注文",
+    "delivered": "納品済み",
+    "delivered_body": "収納に入り、Dexに記録されました。モッドの枠はすべて空いています。",
+    "built_stock": "標準仕様：ミント、モッドなし、特性なし。",
+    "cost": "注文の費用",
+    "commission": "注文する",
+    "dex_complete": "Dexはコンプリートです — 作業台で作れるものはもう残っていません。",
+    "nothing_here": "ここで作れるものはもうありません。別のレアリティか種類を試してください。"
+  },
+  "pack": {
+    "title": "{{name}} ×{{count}}",
+    "new": "新規：{{count}}",
+    "dupes": "ダブり：{{count}}",
+    "parts": "パーツ：{{count}}",
+    "stopped": "Fameが尽きました — {{asked}}個中{{done}}個開封",
+    "merge": "ダブりを合成 · +{{gain}} Lv",
+    "merging": "合成中...",
+    "merged": "合成済み",
+    "again": "もう一度×{{count}}開ける",
+    "close": "閉じる",
+    "dup_gain": "ダブり · +{{gain}} Lv",
+    "dup_tag": "ダブり",
+    "new_tag": "新規",
+    "merged_total": "合成しました — +{{gain}} Lv",
+    "opening": "×{{count}}開封中...",
+    "skip": "スキップ"
+  },
+  "merge_anim": {
+    "caption": "ダブりをいちばん良い{{name}}に合成しています",
+    "done": "合成しました",
+    "level": "アイテムレベル",
+    "continue": "続ける",
+    "sr": "{{name}}を合成しました。アイテムレベル{{before}}から{{after}}へ。"
+  },
+  "scene": {
+    "more": "ほか{{count}}",
+    "teardown": {
+      "working_one": "{{name}}を分解しています",
+      "working_many": "{{count}}個の機材を分解しています",
+      "done": "分解しました",
+      "parts": "回収したパーツ"
+    },
+    "rework": {
+      "working": "{{part}}を{{count}}個作り直しています",
+      "done": "作り直しました",
+      "from": "{{part}} {{count}}個から"
+    },
+    "fit": {
+      "working": "{{mod}}を{{name}}に取り付けています",
+      "done": "取り付けました"
+    },
+    "delivery": {
+      "working_commission": "作業台があなたの{{name}}を作っています",
+      "working_trader": "トレーダーがあなたの{{name}}を梱包しています",
+      "done_commission": "納品しました",
+      "done_trader": "購入しました",
+      "new_dex": "Dexに新登場",
+      "sr": "{{name}}が収納に届きました。"
+    },
+    "build": {
+      "working": "作業台があなたの{{name}}に取り組んでいます",
+      "promoted": "{{rarity}}に昇格"
+    },
+    "restore": {
+      "working": "あなたの{{name}}を修復しています",
+      "done": "{{grade}}まで修復しました"
+    }
+  },
+  "trait_craft": {
+    "imprint_caps": {
+      "guitar": "ギターの特性インプリント",
+      "effect": "ペダルの特性インプリント"
+    },
+    "extractor_caps": "レアツール",
+    "imprint_name": "特性インプリント",
+    "extractor_name": "特性エクストラクター",
+    "owned_other": "所持数：{{count}}",
+    "owned": "所持数：{{count}}",
+    "imprint_body": "値そのままの特性です。ギターやペダルに入れられます。Fameが必要で、楽器が持つ特性が多いほど高くなり、1つの楽器に入るのは最大3つまでです。",
+    "extractor_body": "Parts Crateから出る使い切りの道具。特性を持つ楽器を右クリックして「特性を取り出す」を選ぶと、特性がインプリントとして出てきます。売る、出品する、別の楽器に入れることができます。",
+    "insert_into": "楽器に入れる…",
+    "insert_title": "特性を入れる",
+    "insert_body": "楽器を選んでください。特性は最大{{max}}つまで、同じものは2つ入りません。すでに持っている特性が多いほど価格が上がります。",
+    "slots": "特性 {{count}}/{{max}}",
+    "refusal": {
+      "UNKNOWN_TRAIT": "この特性はもう存在しません",
+      "WRONG_KIND": "楽器の種類が違います",
+      "NOT_ELIGIBLE": "この楽器には合いません",
+      "DUPLICATE": "すでにこの特性があります",
+      "FULL": "特性 3/3"
+    },
+    "no_targets": {
+      "guitar": "入れられるギターがありません。",
+      "effect": "入れられるペダルがありません。"
+    },
+    "not_enough_fame": "Fameがあと{{missing}}足りません。",
+    "insert": "入れる",
+    "insert_for": "入れる・{{fame}} Fame",
+    "inserting": "入れています…",
+    "extract_title": "特性を取り出す",
+    "extract_body": "{{name}}から取り出す特性を選んでください。同じ値のインプリントとして出てきて、楽器からはなくなります。",
+    "extract_cost": "特性エクストラクターを1つ使います。所持数：{{count}}",
+    "extract": "取り出す",
+    "extracting": "取り出しています…",
+    "menu_extract": "特性を取り出す…（{{count}}）",
+    "need_extractor": "Parts Crateの特性エクストラクターが必要です",
+    "bonus_extractor": "+ 特性エクストラクター",
+    "bonus_extractors_other": "+{{count}} 特性エクストラクター",
+    "bonus_extractors": "+{{count}} 特性エクストラクター",
+    "err": {
+      "extract": "特性を取り出せませんでした。",
+      "insert": "特性を入れられませんでした。",
+      "sell": "売却できませんでした。"
+    },
+    "use": "エクストラクターを使う",
+    "use_title": "取り出す特性を選ぶ",
+    "use_body": "あなたの楽器にあるすべての特性です。取り出すたびにエクストラクターを1つ使います（所持数：{{count}}）。",
+    "use_empty": "特性を持つギターやペダルはまだありません。"
+  }
+}

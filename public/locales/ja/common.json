@@ -1,0 +1,217 @@
+{
+  "or": "または",
+  "favorites": "お気に入り",
+  "start": "スタート",
+  "finish": "終了",
+  "min": "分",
+  "button": {
+    "sign_in": "ログイン",
+    "sign_up": "新規登録",
+    "edit": "編集",
+    "logout": "ログアウト",
+    "link_copy_profile": "プロフィールのリンクをコピー",
+    "random": "ランダム",
+    "remove": "削除"
+  },
+  "loading": {
+    "subtitle": "読み込み中...",
+    "loading_text": "読み込み中..."
+  },
+  "nav": {
+    "profile": "プロフィール",
+    "leadboard": "リーダーボード",
+    "exercise": "エクササイズ",
+    "report": "記録",
+    "songs": "曲",
+    "challenges": "チャレンジ"
+  },
+  "day_since": {
+    "no_practice": "まだ練習していません",
+    "practice_last_24": "今日練習しました",
+    "practice_yesterday": "昨日練習しました",
+    "practice_day": "最後の練習：{{days}}日前",
+    "actual_streak": "現在の連続記録："
+  },
+  "header": {
+    "hey": "こんにちは",
+    "lvl_short": "Lv",
+    "earned_points": "獲得ポイント",
+    "your_level": "レベル",
+    "points": "ポイント",
+    "points_short": "pt",
+    "practice_today": "今日は練習する？",
+    "total_practice_time": "合計時間"
+  },
+  "logsBox": {
+    "logs": "ログ",
+    "events": "イベント",
+    "lvl_up": "レベルアップ：",
+    "lvl": "Lv",
+    "achievement": "実績",
+    "achievements": "実績：",
+    "got_points": "{{points}}獲得",
+    "points": "pt",
+    "top_players": "シーズンランキング",
+    "level": "レベル",
+    "days_left": "日残り"
+  },
+  "calendar": {
+    "title": "アクティビティカレンダー",
+    "monday": "月",
+    "thursday": "木",
+    "sunday": "日",
+    "points": "ポイント",
+    "technique": "テクニック",
+    "theory": "理論",
+    "hearing": "耳コピ",
+    "creativity": "クリエイティブ",
+    "backDate": "過去の日付の記録",
+    "hasTitle": "タイトル付きの記録"
+  },
+  "sort": {
+    "sort_by": "並び替え：",
+    "points": "ポイント",
+    "time": "時間",
+    "session_count": "セッション数"
+  },
+  "tooltip": {
+    "totalTime": "合計時間",
+    "points": "ポイント",
+    "sessions": "セッション",
+    "habits": "習慣",
+    "userNotFound": "ユーザーが見つかりません",
+    "actual_streak": "連続記録",
+    "fame_description": "Fameはもらった「いいね」とコミュニティでの活動で貯まります。",
+    "viewProfile": "プロフィールを見る"
+  },
+  "song_status": {
+    "move_to": "移動先",
+    "remove": "削除",
+    "add": "追加",
+    "learned": "{{song}}をマスターしました",
+    "learning": "{{song}}を練習中です",
+    "wantToLearn": "{{song}}を練習したい曲リストに追加しました",
+    "added": "{{song}}を曲リストに追加しました",
+    "difficulty_rate": "{{song}}の難易度を評価しました",
+    "practiced": "{{song}}を練習しました",
+    "practiced_other": "{{song}}を練習しました",
+    "updated": "{{song}}の進捗を更新しました"
+  },
+  "chart": {
+    "activity_overview": "アクティビティの概要",
+    "showing_activity": "選択した期間のアクティビティを表示中",
+    "time_ranges": {
+      "all_time": "全期間",
+      "last_3_months": "過去3か月",
+      "last_30_days": "過去30日",
+      "last_7_days": "過去7日"
+    },
+    "categories": {
+      "technique": "テクニック",
+      "theory": "理論",
+      "hearing": "耳コピ",
+      "creativity": "クリエイティブ",
+      "mixed": "ミックス"
+    }
+  },
+  "duration": "{minutes}分",
+  "skills": {
+    "alternate_picking": "オルタネイトピッキング",
+    "legato": "レガート",
+    "sweep_picking": "スウィープピッキング",
+    "chord_theory": "コード理論",
+    "scales": "スケール",
+    "rhythm": "リズム",
+    "ear_training": "耳トレ",
+    "sight_reading": "初見演奏",
+    "improvisation": "アドリブ",
+    "composition": "作曲",
+    "harmony": "ハーモニー",
+    "vibrato": "ビブラート",
+    "music_theory": "音楽理論",
+    "slide_guitar": "スライドギター",
+    "audio_production": "音作り・録音",
+    "hybrid_picking": "ピッキングコントロール",
+    "transcription": "耳コピ（採譜）",
+    "picking": "ピッキング",
+    "finger_independence": "指の独立",
+    "string_skipping": "弦飛び",
+    "technique": "テクニック",
+    "phrasing": "フレージング",
+    "articulation": "アーティキュレーション",
+    "chords": "コード",
+    "bending": "チョーキング",
+    "tapping": "タッピング",
+    "harmony-ear": "耳でハーモニー"
+  },
+  "back": "戻る",
+  "next": "次へ",
+  "search": {
+    "placeholder": "検索..."
+  },
+  "filters": {
+    "category": "カテゴリー",
+    "all": "すべて",
+    "difficulty": "難易度"
+  },
+  "difficulty": {
+    "beginner": "入門",
+    "easy": "やさしい",
+    "medium": "ふつう",
+    "hard": "むずかしい"
+  },
+  "categories": {
+    "technique": "テクニック",
+    "theory": "理論",
+    "creativity": "クリエイティブ",
+    "hearing": "耳コピ",
+    "mixed": "ミックス"
+  },
+  "minutes": "分",
+  "cancel": "キャンセル",
+  "select": "選択",
+  "details": "詳細",
+  "timer_status": {
+    "active": "進行中",
+    "paused": "一時停止中"
+  },
+  "finish_session": "セッションを終了",
+  "next_step": "次のステップ",
+  "skip": "次へ",
+  "practice": {
+    "congratulations": "おめでとう！",
+    "completed_session": "練習セッションを完了しました：",
+    "practice_again": "もう一度練習",
+    "finish": "終了",
+    "exit": "やめる",
+    "finish_plan_early": "プランを早めに終了",
+    "finish_plan_early_title": "プランを早めに終了しますか？",
+    "finish_plan_early_description": "プランをここで終了し、これまでの練習時間を保存します。このプランの残りのエクササイズは練習しません。",
+    "finish_plan_early_action": "終了して時間を保存",
+    "finish_plan_early_disabled_skill": "プランを早めに終了する前に、エクササイズを最後まで終えてください",
+    "finish_plan_early_disabled_time": "プランを早めに終了するには、20秒以上練習してください",
+    "finish_early": {
+      "action": "早めに終了",
+      "title": "早めに終了しますか？",
+      "description": "最後まで弾かなくても大丈夫です。ここで終えても練習した時間はすべて残ります — ただし、エクササイズの完了にはなりません。",
+      "kept_title": "練習時間は保存されます",
+      "kept_description": "時間は練習ログに記録され、連続記録、統計、デイリークエストにも反映されます。",
+      "lost_title": "今回の演奏は採点されません",
+      "lost_description": "スキルポイント、ハイスコア、リーダーボードへの記録はなく、エクササイズも完了扱いになりません。すべてを獲得するには最後まで弾きましょう。",
+      "confirm": "早めに終了して時間を保存",
+      "blocked": "セッションを保存するには、20秒以上練習してください。",
+      "hint": "早めに終了 — 時間のみ、採点なし"
+    }
+  },
+  "video": "動画",
+  "confirm_delete": "本当にこのプランを削除しますか？",
+  "create": "作成",
+  "success": "成功",
+  "error": "エラー",
+  "pwa": {
+    "install_title": "Riff Questをインストール",
+    "install_description_android": "アプリをスマホに追加",
+    "install_description_ios": "共有をタップして「ホーム画面に追加」",
+    "install_button": "ダウンロード"
+  }
+}

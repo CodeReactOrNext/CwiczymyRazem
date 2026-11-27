@@ -22,6 +22,7 @@ import { readableText } from "lib/colorTheme/colorTheme";
 import { Hammer, Wrench } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { CardTraits, useItemTraitStates } from "../CardTraits";
 import { ConditionMeter } from "../ConditionMeter";
 import { InServiceTags } from "../InServiceTags";
 import { LevelEmblem } from "../LevelEmblem";
@@ -77,6 +78,8 @@ export const WorkshopBench = ({
     () => getSalvagedModOptions(entry.subject, salvagedMods),
     [entry.subject, salvagedMods],
   );
+
+  const traitStates = useItemTraitStates(entry.id, entry.traits);
 
   const [job, setJob] = useState<WorkshopJob | null>(null);
   const labels = useArsenalLabels();
@@ -203,6 +206,15 @@ export const WorkshopBench = ({
             title={t("workshop.level")}
           />
         </div>
+
+        {/* What the item pays on top of its level. No bench job touches traits,
+            but this is where the player decides how much to sink into an item,
+            and a trait is often the reason it is worth it. */}
+        {entry.traits.length > 0 && (
+          <div className='relative mx-auto w-full max-w-md overflow-hidden rounded-lg'>
+            <CardTraits traits={entry.traits} states={traitStates} />
+          </div>
+        )}
       </div>
 
       {/* ─── The things you can do ─── */}

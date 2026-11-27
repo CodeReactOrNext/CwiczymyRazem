@@ -2,6 +2,7 @@ import type { Locale } from "date-fns";
 import { de } from "date-fns/locale/de";
 import { enUS } from "date-fns/locale/en-US";
 import { es } from "date-fns/locale/es";
+import { ja } from "date-fns/locale/ja";
 import { pl } from "date-fns/locale/pl";
 import { useActiveLocale } from "lib/i18n/LocalizedRegion";
 
@@ -12,6 +13,7 @@ const DATE_FNS_LOCALES: Record<AppLocale, Locale> = {
   pl,
   de,
   es,
+  ja,
 };
 
 /** The date-fns locale for an app language — month names, "2 hours ago" and so on. */

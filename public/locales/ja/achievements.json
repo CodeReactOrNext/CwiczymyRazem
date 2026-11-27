@@ -1,0 +1,348 @@
+{
+  "common": "コモン",
+  "rare": "レア",
+  "veryRare": "ベリーレア",
+  "empty": "空",
+  "epic": "エピック",
+  "page": {
+    "eyebrow": "コレクション",
+    "title": "実績",
+    "subtitle": "練習して手に入れるバッジ — よくあるものも、めったにないものも"
+  },
+  "panel": {
+    "earnedHeadline": "実績 {{owned}}/{{total}} 獲得",
+    "globalColumn": "全プレイヤー中の割合",
+    "readyHint": "条件達成 — 次にセッションを記録すると解放されます",
+    "earned": "獲得済み",
+    "rewards": {
+      "claim": "受け取る",
+      "claimAll": "すべて受け取る",
+      "claiming": "受け取り中...",
+      "waiting": "受け取り待ちの報酬が{{count}}個あります",
+      "waitingOne": "受け取り待ちの報酬が1個あります",
+      "tokensHeld": "無料ケースを{{count}}個持っています — Arsenalのどのケースにも使えます。",
+      "tokensHeldOne": "無料ケースを1個持っています — Arsenalのどのケースにも使えます。",
+      "readyToCollect": "報酬を受け取れます",
+      "onCompletion": "獲得するともらえる報酬",
+      "collected": "報酬は受け取り済み",
+      "toCollect": "受け取れる報酬：{{count}}個",
+      "toCollectOne": "受け取れる報酬：1個",
+      "moreAfterSession": "次のセッション後にさらに+{{count}}",
+      "collectedCount": "報酬を{{count}}個受け取りました",
+      "collectedOne": "報酬を1個受け取りました",
+      "casesInHand": "無料ケース{{count}}個",
+      "casesInHandOne": "無料ケース1個",
+      "openCase": "ケースを開ける",
+      "openArsenal": "Arsenalで開く"
+    }
+  },
+  "time_1": {
+    "title": "努力は報われる",
+    "description": "練習時間の合計が10時間を超える。"
+  },
+  "time_2": {
+    "title": "不屈の決意",
+    "description": "練習時間の合計が30時間を超える。"
+  },
+  "time_3": {
+    "title": "1% — 1万時間の法則",
+    "description": "練習時間の合計が100時間を超える。"
+  },
+  "balance": {
+    "title": "黄金の中庸",
+    "description": "1回の記録で、4つのスキル分野それぞれに1時間以上を記録する。"
+  },
+  "fire": {
+    "title": "ギターパワー",
+    "description": "1回の記録で60ポイントを獲得する。"
+  },
+  "health_habits": {
+    "title": "元気いっぱい",
+    "description": "1回の記録で健康的な習慣をすべて達成する。"
+  },
+  "points_1": {
+    "title": "まずは表面から",
+    "description": "100ポイントを獲得する"
+  },
+  "points_2": {
+    "title": "小鳥のコード",
+    "description": "1000ポイントを獲得する"
+  },
+  "points_3": {
+    "title": "カエルのコード",
+    "description": "10000ポイントを獲得する"
+  },
+  "doctor": {
+    "title": "ドクター",
+    "description": "健康的な習慣を100回実践する"
+  },
+  "tired": {
+    "title": "もう無理…",
+    "description": "5時間のセッションを完了する"
+  },
+  "diamond": {
+    "title": "ダイヤモンドギター",
+    "description": "レベル28に到達する"
+  },
+  "scientist": {
+    "title": "科学者",
+    "description": "理論で50時間に到達する"
+  },
+  "artist": {
+    "title": "ミュージシャン",
+    "description": "クリエイティブで10時間に到達する"
+  },
+  "book": {
+    "title": "博識",
+    "description": "理論で10時間に到達する"
+  },
+  "bigear": {
+    "title": "大きな耳",
+    "description": "耳コピで50時間に到達する"
+  },
+  "wizard": {
+    "title": "魔法使い",
+    "description": "クリエイティブで50時間に到達する"
+  },
+  "medal": {
+    "title": "受賞者",
+    "description": "実績を20個獲得する"
+  },
+  "day_1": {
+    "title": "継続",
+    "description": "3日連続で練習する"
+  },
+  "day_2": {
+    "title": "1週間",
+    "description": "7日連続で練習する"
+  },
+  "day_3": {
+    "title": "無限",
+    "description": "15日連続で練習する"
+  },
+  "session_1": {
+    "title": "クリッカー",
+    "description": "セッションを20回完了する"
+  },
+  "session_2": {
+    "title": "ギターの旅人",
+    "description": "セッションを50回完了する"
+  },
+  "session_3": {
+    "title": "カウボーイ",
+    "description": "セッションを100回完了する"
+  },
+  "ring": {
+    "title": "弦の指輪",
+    "description": "すべての分野でそれぞれ5時間以上練習する"
+  },
+  "headphones": {
+    "title": "よく聴く人",
+    "description": "耳コピで10時間以上練習する"
+  },
+  "ninja": {
+    "title": "テクニックの戦士",
+    "description": "テクニックで10時間以上練習する"
+  },
+  "record": {
+    "title": "何かを録音した",
+    "description": "このプレイヤーは熱心に何かを録音しています。"
+  },
+  "vinyl": {
+    "title": "アイデアを録音",
+    "description": "このプレイヤーはアイデアを思いついて録音しました…たぶん。"
+  },
+  "dumbbel": {
+    "title": "本気のハードワーク",
+    "description": "このプレイヤーは本当に努力しています。"
+  },
+  "rightway": {
+    "title": "ケガ知らず",
+    "description": "このプレイヤーは教科書どおりにウォームアップしています。"
+  },
+  "path": {
+    "title": "すばらしいプラン",
+    "description": "このプレイヤーはすばらしい練習プランを持ち、目標に向かって順調に進んでいます。"
+  },
+  "yolo": {
+    "title": "Yolo",
+    "description": "このプレイヤーは健康的な習慣を気にしません。"
+  },
+  "vip": {
+    "title": "功労者",
+    "description": "このプレイヤーはRiff Questの開発を手伝いました"
+  },
+  "short": {
+    "title": "根性",
+    "description": "このプレイヤーは何があっても練習を続けました"
+  },
+  "event": {
+    "title": "イベント",
+    "description": "このプレイヤーはDiscordのイベントに参加しました"
+  },
+  "lvl100": {
+    "title": "伝説のピック",
+    "description": "このプレイヤーはレベル100に到達しました"
+  },
+  "fireSession": {
+    "title": "炎のセッション",
+    "description": "このプレイヤーは完璧な記録を達成しました"
+  },
+  "batteryHearth": {
+    "title": "バッテリーハート",
+    "description": "このプレイヤーは習慣を2000回達成しています"
+  },
+  "100days": {
+    "title": "100日",
+    "description": "このプレイヤーは100日間練習しました"
+  },
+  "bomb": {
+    "title": "危機一髪",
+    "description": "このプレイヤーは連続記録を守り抜きました"
+  },
+  "wannaLearn1": {
+    "title": "孤高の戦士",
+    "description": "初めての曲を学びたいリストに入れた"
+  },
+  "wannaLearn2": {
+    "title": "ダブルパワー",
+    "description": "学びたい曲が2曲になった"
+  },
+  "wannaLearn3": {
+    "title": "ノートが埋まった",
+    "description": "学びたい曲が3曲になった"
+  },
+  "wannaLearn10": {
+    "title": "音符に迷子",
+    "description": "学びたい曲が10曲になった"
+  },
+  "wannaLearn30": {
+    "title": "無限ループ",
+    "description": "学びたい曲が30曲になった"
+  },
+  "learning1": {
+    "title": "最初の重り",
+    "description": "初めての曲を練習中"
+  },
+  "learning3": {
+    "title": "バーを上げる",
+    "description": "3曲を同時に練習中"
+  },
+  "learning5": {
+    "title": "前へ進め",
+    "description": "5曲を同時に練習中"
+  },
+  "learning10": {
+    "title": "音楽の筋肉",
+    "description": "10曲を同時に練習中"
+  },
+  "learning20": {
+    "title": "マルチプレイヤー",
+    "description": "20曲を同時に練習中"
+  },
+  "learning30": {
+    "title": "音楽のオーラ",
+    "description": "30曲を同時に練習中"
+  },
+  "learned1": {
+    "title": "ハートの2",
+    "description": "初めての曲をマスターした"
+  },
+  "learned3": {
+    "title": "ダイヤの3",
+    "description": "3曲をマスターした"
+  },
+  "learned5": {
+    "title": "ダイヤの4",
+    "description": "5曲をマスターした"
+  },
+  "learned10": {
+    "title": "ダイヤの5",
+    "description": "10曲をマスターした"
+  },
+  "learned20": {
+    "title": "ダイヤの6",
+    "description": "20曲をマスターした"
+  },
+  "learned30": {
+    "title": "ダイヤのジャック",
+    "description": "30曲をマスターした"
+  },
+  "learned50": {
+    "title": "ダイヤのキング",
+    "description": "50曲をマスターした"
+  },
+  "learned100": {
+    "title": "ダイヤのエース",
+    "description": "100曲をマスターした — まさにエース！"
+  },
+  "rig_50": {
+    "title": "シグナルパス",
+    "description": "リグレベル50のリグを組む。"
+  },
+  "rig_150": {
+    "title": "ステージ準備完了",
+    "description": "リグレベル150のリグを組む。"
+  },
+  "rig_300": {
+    "title": "スタジオの壁",
+    "description": "リグレベル300のリグを組む。"
+  },
+  "rig_500": {
+    "title": "ヘッドライナーのリグ",
+    "description": "リグレベル500のリグを組む。"
+  },
+  "rig_800": {
+    "title": "ウォール・オブ・サウンド",
+    "description": "リグレベル800のリグを組む。"
+  },
+  "rig_1000": {
+    "title": "4桁の大台",
+    "description": "リグレベル1000のリグを組む。"
+  },
+  "first_rare": {
+    "title": "ちょっと特別",
+    "description": "初めてのレア機材を手に入れる。"
+  },
+  "first_epic": {
+    "title": "コレクター級",
+    "description": "初めてのエピック機材を手に入れる。"
+  },
+  "first_legendary": {
+    "title": "名器のひとつ",
+    "description": "初めてのレジェンダリー機材を手に入れる。"
+  },
+  "first_mythic": {
+    "title": "聖杯",
+    "description": "初めてのミシック機材を手に入れる。"
+  },
+  "rarity_full_set": {
+    "title": "全レアリティ制覇",
+    "description": "ケースから出るすべてのレアリティの機材を持つ。"
+  },
+  "museum_1": {
+    "title": "ガラスケースの中",
+    "description": "ミュージアムグレードの機材を1つ持つ。"
+  },
+  "museum_5": {
+    "title": "プライベートコレクション",
+    "description": "ミュージアムグレードの機材を5つ持つ。"
+  },
+  "serial_one": {
+    "title": "ナンバーワン",
+    "description": "どれかのモデルで、最初に作られた1台を持つ。"
+  },
+  "globetrotter": {
+    "title": "世界を旅して",
+    "description": "8つの国で作られた機材を持つ。"
+  },
+  "vintage_1970": {
+    "title": "アンプより年上",
+    "description": "1970年より前に作られたギターを持つ。"
+  },
+  "performance": {
+    "title": "ステージデビュー",
+    "description": "フルパフォーマンスのセッションを記録する — 曲を練習し、テクニックを1時間やって、録音もする。"
+  },
+  "progress": "進捗"
+}

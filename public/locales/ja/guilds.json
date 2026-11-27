@@ -1,0 +1,1115 @@
+{
+  "tabs": {
+    "recording": "レコーディング",
+    "browse": "ギルド",
+    "members": "メンバー",
+    "chat": "チャット",
+    "stash": "収納",
+    "quests": "クエスト",
+    "upgrades": "アップグレード",
+    "kit": "装い",
+    "studio": "スタジオ"
+  },
+  "tab_locked": "{{label}} — まずギルドに参加してください",
+  "seats_taken": "{{limit}}席中{{count}}席が埋まっています",
+  "lvl": "Lv",
+  "level": "レベル",
+  "level_ring": "ギルドレベル{{level}} · この周回で{{lap}}個中{{done}}個のクエスト",
+  "needs_guild": {
+    "recording": "セッションはギルドが予約するもので、あなたはまだギルドに入っていません。",
+    "title": "まずギルドに参加しましょう",
+    "browse": "ギルドを見る",
+    "members": "メンバー表は一緒にいる人たちのもので、あなたはまだギルドに入っていません。",
+    "chat": "チャットは一緒に弾く仲間のためのものです。",
+    "stash": "棚はギルドのもので、あなたはギルドに入っていません。",
+    "quests": "クエストはギルドでクリアするもので、あなたはまだギルドに入っていません。",
+    "upgrades": "アップグレードはギルドが払うもので、あなたはまだギルドに入っていません。",
+    "studio": "スタジオはギルドのもので、あなたはまだギルドに入っていません。"
+  },
+  "header": {
+    "founded_by": "{{name}}が設立。",
+    "intro": "一緒に練習する仲間を見つけましょう。参加は無料です。"
+  },
+  "browser": {
+    "rank": "{{rank}}位",
+    "yours": "あなたのギルド",
+    "by": "{{name}}のギルド",
+    "level": "レベル{{level}}",
+    "leave": "脱退",
+    "waiting": "返事待ち",
+    "turned_down": "断られました",
+    "withdraw": "取り下げる",
+    "clear": "消す",
+    "no_seats": "空席なし",
+    "leave_first": "ほかのギルドへの参加を申し込む前に、今のギルドを脱退してください",
+    "full": "満員",
+    "join": "参加",
+    "asking": "参加を申し込んでいます",
+    "already_turned_down": "すでに断っています — 相手はまだ取り下げられます。",
+    "accept": "承認",
+    "intro": "ギルドはみんなでクエストをクリアして上がっていきます。参加は無料です。",
+    "leave_before_founding": "設立する前に、今のギルドを脱退してください",
+    "not_enough_tokens": "トークンが足りません",
+    "name_yours": "名前はずっとあなたのものです",
+    "found": "ギルドを設立",
+    "empty_title": "まだギルドはありません",
+    "empty_body": "まだ誰も名前を取っていません。最初の1つは空いています。",
+    "ranking": "ギルドランキング"
+  },
+  "members": {
+    "sessions_one": "1セッション",
+    "sessions": "{{count}}セッション",
+    "hours": "練習{{hours}}時間",
+    "honor_title": "名誉{{earned}}獲得 · 棚で使える残り{{balance}}",
+    "founder": "設立者",
+    "together": "一緒に{{sessions}}セッション、{{hours}}",
+    "together_since": "{{since}}から一緒に{{sessions}}セッション、{{hours}}"
+  },
+  "upgrades": {
+    "intro": "みんなで少しずつ出し合い、ポットが満タンになった瞬間にアップグレードが買われます。入れた分だけ、棚で使える{{honor}}がもらえます。",
+    "honor": "名誉",
+    "seats_title": "席を増やす",
+    "seats_buys": "席を{{count}}つ追加",
+    "seats_max": "ギルドの席は最大{{count}}席です",
+    "rows_title": "棚の段を増やす",
+    "rows_buys": "段を1つ追加",
+    "rows_max": "棚は最大{{count}}段です"
+  },
+  "founding": {
+    "seats": "{{limit}}席中{{count}}席",
+    "yours": "あなたの",
+    "open": "開く",
+    "founder_note": "このギルドはあなたが設立したもので、1人が入れるギルドは一度に1つだけです。設立者が抜けられるのは、ほかの全員が抜けたあとだけです。",
+    "member_note": "あなたはギルドに入っていて、1人が入れるのは一度に1つだけです。自分のギルドを設立する前に、ギルドのページから脱退してください。",
+    "seats_note": "席はトークンで{{count}}つずつ増やせ、中にいる人なら誰でも買えます — ボタンは/guildsのギルド自体のカードにあります。",
+    "title": "ギルドを設立：",
+    "body": "このパネルでいちばん高いものです。ほかの誰もあとから手に入れられないもの — 名前とタグ — をずっと取るのはこれだけだからです。そのあとは誰でも参加を申し込めて、誰を入れるかはあなたが決めます。",
+    "cta": "設立する：",
+    "not_enough": "トークンが足りません",
+    "see_existing": "すでにあるギルドを見る →"
+  },
+  "fund": {
+    "member_left": "脱退したメンバー",
+    "paid_by": "支払った人",
+    "and_more": "ほか{{count}}人",
+    "maxed": "最大です — {{maxed}}。",
+    "next_step": "次の段階で{{buys}}",
+    "wallet_empty": "今回はお財布に何も残っていません。",
+    "you_have": "トークン{{count}}個"
+  },
+  "treasury": {
+    "filled_by": "入れた人",
+    "title": "ギルドのFame",
+    "counting_towards": "{{goal}}に数えられます。",
+    "counts": "ギルドのクエストに数えられ、使われることはありません。",
+    "empty": "今回は自分のFameがありません。",
+    "you_have": "{{count}} Fameあります",
+    "bank": "今、金庫に{{fame}} Fame。",
+    "bank_spent": "今、金庫に{{fame}} Fame。使えた頃に{{spent}}を使いました。"
+  },
+  "honor": {
+    "left_by": "{{name}}が置いたもの",
+    "a_member": "メンバー",
+    "costs": "費用",
+    "yours": "あなたの名誉",
+    "take_for": "名誉{{cost}}で受け取る",
+    "short": "名誉が{{count}}足りません",
+    "how_to_earn": "名誉はギルドに入れることで得られます：金庫にFameを、ポットにトークンを、この棚に機材を。",
+    "take_label": "受け取る：",
+    "amount": "名誉{{count}}"
+  },
+  "deposit": {
+    "title": "{{name}}をギルドの収納に置く",
+    "into_stash": "ギルドの収納へ",
+    "earns": "もらえるもの",
+    "from_then_on": "それからはギルドのもの — どのメンバーでも受け取れます。",
+    "leaving": "置いています…",
+    "confirm": "収納に置く"
+  },
+  "badge": {
+    "with_level": "ギルド：{{tag}} · レベル{{level}}",
+    "plain": "ギルド：{{tag}}"
+  },
+  "cover": {
+    "your_honor": "あなたの名誉：{{earned}}獲得 · 棚で使える{{balance}}",
+    "treasury": "ギルドのFame"
+  },
+  "units": {
+    "sessions": "{{value}}セッション",
+    "sessions_one": "{{value}}セッション",
+    "hours": "{{value}}時間",
+    "fame": "{{value}} Fame",
+    "members": "{{value}}人",
+    "members_one": "{{value}}人",
+    "songs": "{{value}}曲",
+    "songs_one": "{{value}}曲",
+    "recordings": "録音{{value}}本",
+    "recordings_one": "録音{{value}}本",
+    "quests": "クエスト{{value}}個",
+    "quests_one": "クエスト{{value}}個",
+    "exams": "試験{{value}}回",
+    "exams_one": "試験{{value}}回",
+    "entries": "{{value}}件の参加",
+    "entries_one": "{{value}}件の参加",
+    "points": "{{value}}ポイント",
+    "points_one": "{{value}}ポイント"
+  },
+  "asks": {
+    "all_categories": "4つのカテゴリーすべてで{{amount}}",
+    "streak": "{{days}}日の連続記録"
+  },
+  "describe": {
+    "members": "メンバー{{count}}人",
+    "members_one": "メンバー1人",
+    "each": "{{members}}がそれぞれ{{amount}}。",
+    "sessions": "みんなで{{amount}}。",
+    "time": "合計{{amount}}の練習。",
+    "technique": "テクニックで{{amount}}。",
+    "theory": "理論で{{amount}}。",
+    "hearing": "耳トレで{{amount}}。",
+    "creativity": "クリエイティブな演奏で{{amount}}。",
+    "points": "みんなで練習ポイント{{count}}。",
+    "all_categories": "{{members}}が4つのカテゴリーそれぞれで{{amount}}。",
+    "treasury": "ギルドの金庫に{{amount}}。",
+    "streak": "{{members}}が同時に{{days}}日の連続記録。",
+    "songs": "{{amount}}をマスター済みに。",
+    "recordings": "{{amount}}を公開。",
+    "exams": "ジャーニーの試験に{{count}}回合格。",
+    "daily_quests": "デイリークエストを{{count}}回達成。",
+    "submissions": "月間チャレンジに{{amount}}。"
+  },
+  "quests": {
+    "waiting": "受け取り待ちのFame",
+    "fame": "{{amount}} Fame",
+    "plus_fame": "+{{amount}} Fame",
+    "claim": "{{amount}} Fameを受け取る",
+    "lap": "{{lap}}周目",
+    "chapter_of_cap": "第{{index}}章（全{{total}}章）",
+    "chapter": "第{{index}}章",
+    "road_ahead": "この先の道",
+    "ladder_lap": "10章を終えると、はしごがもう一度回ってきます — 今は{{lap}}周目で、すべての目標と報酬が×{{times}}です。",
+    "cleared_of": "{{total}}個中{{done}}個クリア",
+    "chapters": {
+      "0": {
+        "name": "ウォームアップ",
+        "blurb": "みんなで顔を出して、数え始めよう。"
+      },
+      "1": {
+        "name": "リハーサル",
+        "blurb": "時間が積み上がり始め、耳も加わります。"
+      },
+      "2": {
+        "name": "レパートリー",
+        "blurb": "覚えた曲、弾いた曲、録音した曲。"
+      },
+      "3": {
+        "name": "規律",
+        "blurb": "全員で、毎日引っぱる。"
+      },
+      "4": {
+        "name": "バランス",
+        "blurb": "演奏のあらゆる面を、メンバー全員で。"
+      },
+      "5": {
+        "name": "テンポ",
+        "blurb": "試験を受け、千セッションを重ね、理論もそれに見合うだけ。"
+      },
+      "6": {
+        "name": "ステージ",
+        "blurb": "ギルドの名前を背負って、人前へ。"
+      },
+      "7": {
+        "name": "マシン",
+        "blurb": "ギルドが勝手に回っていく。背後には千時間。"
+      },
+      "8": {
+        "name": "学者たち",
+        "blurb": "難しいカテゴリーを、本気の量で。"
+      },
+      "9": {
+        "name": "伝説",
+        "blurb": "ほとんどのギルドが見ることのない数字。"
+      }
+    },
+    "items": {
+      "sessions-100": {
+        "name": "最初の100",
+        "blurb": "みんなで練習セッション100回。"
+      },
+      "hours-50": {
+        "name": "50時間",
+        "blurb": "合計50時間の練習。"
+      },
+      "members-sessions-5-x3": {
+        "name": "常連3人",
+        "blurb": "メンバー3人がそれぞれ5セッション。"
+      },
+      "technique-10": {
+        "name": "手を動かそう",
+        "blurb": "テクニックで10時間。"
+      },
+      "treasury-300": {
+        "name": "元手",
+        "blurb": "ギルドの金庫に300 Fame。"
+      },
+      "sessions-250": {
+        "name": "250",
+        "blurb": "250セッション。"
+      },
+      "hours-150": {
+        "name": "長丁場",
+        "blurb": "150時間の練習。"
+      },
+      "theory-25": {
+        "name": "本の虫",
+        "blurb": "理論で25時間。"
+      },
+      "hearing-25": {
+        "name": "開かれた耳",
+        "blurb": "耳トレで25時間。"
+      },
+      "streak-7-x3": {
+        "name": "3つの炎",
+        "blurb": "メンバー3人が同時に7日の連続記録。"
+      },
+      "songs-learned-25": {
+        "name": "セットリスト",
+        "blurb": "ギルド全体で25曲をマスター済みに。"
+      },
+      "points-2000": {
+        "name": "2000ポイント",
+        "blurb": "みんなで練習ポイント2000。"
+      },
+      "recordings-5": {
+        "name": "テープに残す",
+        "blurb": "メンバーが録音を5本公開。"
+      },
+      "technique-50": {
+        "name": "テクニック50",
+        "blurb": "テクニックで50時間。"
+      },
+      "creativity-25": {
+        "name": "ジャムルーム",
+        "blurb": "クリエイティブな演奏で25時間。"
+      },
+      "sessions-500": {
+        "name": "500",
+        "blurb": "500セッション。"
+      },
+      "hours-300": {
+        "name": "300時間",
+        "blurb": "300時間の練習。"
+      },
+      "members-sessions-20-x4": {
+        "name": "常連4人",
+        "blurb": "メンバー4人がそれぞれ20セッション。"
+      },
+      "daily-quests-30": {
+        "name": "クエストログ",
+        "blurb": "みんなでデイリークエストを30回達成。"
+      },
+      "streak-30-x1": {
+        "name": "1か月",
+        "blurb": "メンバー1人が30日の連続記録。"
+      },
+      "technique-100": {
+        "name": "テクニック100",
+        "blurb": "テクニックで100時間。"
+      },
+      "theory-50": {
+        "name": "理論50",
+        "blurb": "理論で50時間。"
+      },
+      "hearing-50": {
+        "name": "耳トレ50",
+        "blurb": "耳トレで50時間。"
+      },
+      "creativity-50": {
+        "name": "クリエイティブ50",
+        "blurb": "クリエイティブな演奏で50時間。"
+      },
+      "members-all-categories-x4": {
+        "name": "オールラウンダー",
+        "blurb": "メンバー4人が4つのカテゴリーそれぞれで1時間。"
+      },
+      "theory-100": {
+        "name": "理論100",
+        "blurb": "理論で100時間。"
+      },
+      "exams-10": {
+        "name": "試験済み",
+        "blurb": "ジャーニーの試験に10回合格。"
+      },
+      "sessions-1000": {
+        "name": "1000",
+        "blurb": "1000セッション。"
+      },
+      "hours-600": {
+        "name": "600時間",
+        "blurb": "600時間の練習。"
+      },
+      "hearing-100": {
+        "name": "耳トレ100",
+        "blurb": "耳トレで100時間。"
+      },
+      "recordings-20": {
+        "name": "テープ20本",
+        "blurb": "録音を20本公開。"
+      },
+      "submissions-5": {
+        "name": "挑戦者たち",
+        "blurb": "月間チャレンジに5件参加。"
+      },
+      "songs-learned-50": {
+        "name": "50曲",
+        "blurb": "50曲をマスター済みに。"
+      },
+      "points-20000": {
+        "name": "2万ポイント",
+        "blurb": "みんなで練習ポイント2万。"
+      },
+      "treasury-3000": {
+        "name": "軍資金",
+        "blurb": "ギルドの金庫に3000 Fame。"
+      },
+      "sessions-2000": {
+        "name": "2000",
+        "blurb": "2000セッション。"
+      },
+      "hours-1000": {
+        "name": "1000時間",
+        "blurb": "1000時間の練習。"
+      },
+      "technique-250": {
+        "name": "テクニック250",
+        "blurb": "テクニックで250時間。"
+      },
+      "members-sessions-50-x5": {
+        "name": "常連5人",
+        "blurb": "メンバー5人がそれぞれ50セッション。"
+      },
+      "streak-14-x5": {
+        "name": "5つの炎",
+        "blurb": "メンバー5人が同時に14日の連続記録。"
+      },
+      "theory-150": {
+        "name": "理論150",
+        "blurb": "理論で150時間。"
+      },
+      "hearing-150": {
+        "name": "耳トレ150",
+        "blurb": "耳トレで150時間。"
+      },
+      "creativity-150": {
+        "name": "クリエイティブ150",
+        "blurb": "クリエイティブな演奏で150時間。"
+      },
+      "daily-quests-100": {
+        "name": "クエスト100",
+        "blurb": "デイリークエストを100回達成。"
+      },
+      "exams-50": {
+        "name": "試験50回",
+        "blurb": "ジャーニーの試験に50回合格。"
+      },
+      "sessions-5000": {
+        "name": "5000",
+        "blurb": "5000セッション。"
+      },
+      "hours-2500": {
+        "name": "2500時間",
+        "blurb": "2500時間の練習。"
+      },
+      "songs-learned-100": {
+        "name": "100曲",
+        "blurb": "100曲をマスター済みに。"
+      },
+      "recordings-50": {
+        "name": "テープ50本",
+        "blurb": "録音を50本公開。"
+      },
+      "streak-100-x1": {
+        "name": "100日",
+        "blurb": "メンバー1人が100日の連続記録。"
+      }
+    }
+  },
+  "card": {
+    "you_of": "あなた：{{mine}} / {{target}}",
+    "you_categories": "あなた：{{mine}} / {{count}}カテゴリー",
+    "your_streak": "あなたの連続記録：{{mine}} / {{count}}日",
+    "members_need": "あと{{count}}人のメンバーが{{ask}}必要",
+    "members_need_one": "あと1人のメンバーが{{ask}}必要",
+    "to_go": "あと{{amount}}",
+    "you": "あなた：{{amount}}",
+    "cleared_on": "{{date}}にクリア",
+    "former_members": "元メンバー"
+  },
+  "spend": {
+    "token_amount": "トークン{{amount}}個",
+    "token_amount_one": "トークン{{amount}}個",
+    "fame_amount": "{{amount}} Fame",
+    "in_bank": "金庫に",
+    "covered": "まかなえます",
+    "have_of": "{{need}}中{{have}}",
+    "finish": "仕上げる"
+  },
+  "parts": {
+    "tier_part": "{{tier}}のパーツ",
+    "of": "/ {{count}}",
+    "how_many_leave": "置く数",
+    "how_many_take": "受け取る数",
+    "earns_honor": "名誉{{honor}}を獲得",
+    "costs_honor": "名誉{{honor}}がかかります",
+    "you_have": "{{count}}個所持",
+    "leave": "{{count}}個置く",
+    "take": "{{count}}個受け取る",
+    "leave_all": "{{count}}個すべて置く",
+    "take_all": "{{count}}個すべて受け取る"
+  },
+  "kit": {
+    "slot": "枠{{index}}：{{icon}}",
+    "slot_lit": "枠{{index}}：{{icon}} — この枠を選んでいます",
+    "pick_for": "枠{{index}}を選んでください — または枠をクリックして、そこだけを変えましょう。",
+    "unlocked_of": "{{total}}個中{{done}}個解放",
+    "unlocks_at": "ギルドレベル{{level}}で解放",
+    "unlocks_at_cap": "ギルドレベル{{level}}で解放",
+    "wear_four": "この4つにする",
+    "back_to_worn": "今の装いに戻す",
+    "worn_now": "現在の装い",
+    "wear_it": "これにする",
+    "lvl": "Lv {{level}}",
+    "intro": "左のカードが、ほかのあらゆる場所でのギルドの見た目です。下の色、バナー、アイコン、タグはどれも無料で、あなたがこのギルドを設立したので選べます。シンプルなものは最初から使え、残りはギルドのレベルが上がると解放され、各タイルに解放レベルが書かれています。1つ選べば、すぐにメンバー全員がそれを身につけます。",
+    "unlocked_at_level": "ギルドレベル{{level}}で{{total}}個中{{done}}個解放"
+  },
+  "new": {
+    "logo_types": "PNG、JPG、WebPのみ",
+    "logo_size": "そのファイルは{{mb}}MBを超えています",
+    "logo_unreadable": "その画像を読み込めませんでした",
+    "description": "費用は{{cost}} — 残りは{{left}}です。名前とタグは、一度取ればあなただけのものです。",
+    "name": "名前",
+    "name_problems": {
+      "too-short": "ギルド名は{{min}}文字以上です",
+      "too-long": "ギルド名は{{max}}文字以下です",
+      "no-letters": "ギルド名には文字か数字が必要です"
+    },
+    "tag": "タグ",
+    "tag_hint": "名前の横に付きます",
+    "tag_problems": {
+      "too-short": "タグは{{min}}文字以上です",
+      "too-long": "タグは{{max}}文字以下です"
+    },
+    "picture": "画像",
+    "picture_hint": "任意、正方形がおすすめ",
+    "change": "変更",
+    "add_image": "画像を追加",
+    "remove": "削除",
+    "what_for": "どんなギルド？",
+    "optional": "任意",
+    "what_for_placeholder": "誰のためのギルドか、何を練習するか、いつ集まるか。",
+    "cancel": "キャンセル"
+  },
+  "stash": {
+    "on_shelf": "棚の上",
+    "rows_of": "{{count}}段中{{done}}段",
+    "honor_title": "名誉{{earned}}獲得、{{spent}}使用",
+    "guild_stash": "ギルドの収納",
+    "empty": "まだ何もありません。自分の機材から何かをドラッグして置けば、誰かが使ってくれます。",
+    "full": "棚がいっぱいです — 何かを受け取るか、アップグレードのタブで次の段にトークンを少し入れてください。",
+    "how": "ソケットを自分の棚へドラッグするかクリックすると受け取れます。置くとレアリティに応じて名誉がもらえ、棚から何かを受け取るには一律{{cost}}かかり、1日{{limit}}回までです。誰が何を置いたかは下の記録にあります。",
+    "your_gear": "あなたの機材",
+    "no_gear": "渡せる余分な機材がありません。",
+    "your_stash": "あなたの収納",
+    "gear_how": "ギター、エフェクター、回収したパーツ、救い出したモッドはすべて棚に置けます — 上にドラッグするか、クリックしてください。このボードの中でドラッグすると並べ替えになり、それがArsenalで表示される並びです。装備は自動で外れます。エフェクターは先にボードから外す必要があります。",
+    "ledger_title": "誰が置き、誰が受け取ったか",
+    "ledger_body": "すべての預け入れと受け取りを、メンバーごとに数えています。",
+    "recent": "最近の動き",
+    "log_left": "{{name}}が{{item}}を置きました",
+    "log_took": "{{name}}が{{item}}を受け取りました",
+    "take_it": "受け取る",
+    "how_many": "数"
+  },
+  "cosmetics": {
+    "slots": {
+      "accent": {
+        "label": "色",
+        "blurb": "装い全体のもとになる色 — 変えると、バナー、アイコン、枠もそれに合わせて変わります。"
+      },
+      "banner": {
+        "label": "バナー",
+        "blurb": "カードの上部に走る帯。ギルド一覧とこのページに表示されます。"
+      },
+      "motif": {
+        "label": "アイコン",
+        "blurb": "バナーに並ぶ4つのアイコン。好きな4つをどうぞ。"
+      },
+      "frame": {
+        "label": "タグ",
+        "blurb": "ボード上で、メンバー全員の名前の横にタグがどう描かれるか。"
+      }
+    },
+    "items": {
+      "accent_steel": {
+        "name": "スチール",
+        "blurb": "どのギルドも最初はこのシンプルな色です。"
+      },
+      "accent_ivory": {
+        "name": "アイボリー",
+        "blurb": "ほぼ白。ボードの上で何よりも先に目に入ります。"
+      },
+      "accent_bone": {
+        "name": "ボーン",
+        "blurb": "古いピックガードのような、温かいグレー。"
+      },
+      "accent_signal": {
+        "name": "シグナル",
+        "blurb": "アプリ自身のシアン。"
+      },
+      "accent_sky": {
+        "name": "スカイ",
+        "blurb": "コバルトより明るく、涼しげ。"
+      },
+      "accent_cobalt": {
+        "name": "コバルト",
+        "blurb": "2月のリハーサル室のように冷たい、深い青。"
+      },
+      "accent_indigo": {
+        "name": "インディゴ",
+        "blurb": "紫寄りの青。"
+      },
+      "accent_nightshade": {
+        "name": "ナイトシェード",
+        "blurb": "紫 — レアの色。"
+      },
+      "accent_neon": {
+        "name": "ネオン",
+        "blurb": "フューシャ。ボードの上でほかに似たものはありません。"
+      },
+      "accent_bubblegum": {
+        "name": "バブルガム",
+        "blurb": "ピンク、悪びれずに。"
+      },
+      "accent_crimson": {
+        "name": "クリムゾン",
+        "blurb": "派手で、ボードの上でほかに誰も着ていません。"
+      },
+      "accent_ember": {
+        "name": "エンバー",
+        "blurb": "連続記録のオレンジ。一度も休まないギルドに。"
+      },
+      "accent_brass": {
+        "name": "ブラス",
+        "blurb": "Fameそのものの金色。"
+      },
+      "accent_sulphur": {
+        "name": "サルファー",
+        "blurb": "黄色。ブラスより少しシャープ。"
+      },
+      "accent_acid": {
+        "name": "アシッド",
+        "blurb": "ライム。クリムゾンとは違う方向に派手。"
+      },
+      "accent_verdant": {
+        "name": "ヴァーダント",
+        "blurb": "緑。1週間をクリアした色。"
+      },
+      "accent_lagoon": {
+        "name": "ラグーン",
+        "blurb": "ティール。アプリのシアンと、1週間をクリアした色の間。"
+      },
+      "banner_none": {
+        "name": "無地",
+        "blurb": "色はまったくなし — シンプルな帯にアイコンだけ。"
+      },
+      "banner_wash": {
+        "name": "ウォッシュ",
+        "blurb": "角から角へ：左上から色を置き、右下に向かって薄くなっていきます。"
+      },
+      "banner_aurora": {
+        "name": "オーロラ",
+        "blurb": "左から右へ、その色の両隣の色を通っていきます。"
+      },
+      "banner_sunburst": {
+        "name": "サンバースト",
+        "blurb": "上は暗く、下の端に向かって色が集まっていきます。"
+      },
+      "banner_stage": {
+        "name": "夕暮れ",
+        "blurb": "右上のその色から、左下の涼しげな隣の色へ。"
+      },
+      "banner_halo": {
+        "name": "フェード",
+        "blurb": "左の暗がりから、右のその色へ。"
+      },
+      "frame_plain": {
+        "name": "プレーン",
+        "blurb": "ギルドの色のタグ、まわりには何もなし。"
+      },
+      "frame_ring": {
+        "name": "リング",
+        "blurb": "ギルドの色の細いリング。"
+      },
+      "frame_double": {
+        "name": "ダブル",
+        "blurb": "細いリングが2本、間にわずかな暗い隙間。"
+      },
+      "frame_plate": {
+        "name": "プレート",
+        "blurb": "塗りつぶしで、にぎやかな列でもタグが最初に目に入ります。"
+      },
+      "frame_heavy": {
+        "name": "ヘビー",
+        "blurb": "塗りつぶしとリング。タグでいちばん派手なもの。"
+      },
+      "frame_solid": {
+        "name": "ソリッド",
+        "blurb": "その色のブロックに、タグが黒で切り抜かれています。"
+      },
+      "frame_pill": {
+        "name": "ピル",
+        "blurb": "塗りつぶしで角が完全に丸い、何もしないボタンのような形。"
+      },
+      "frame_sunken": {
+        "name": "くぼみ",
+        "blurb": "列に彫り込まれた暗い溝に、その色のタグ。"
+      },
+      "frame_brackets": {
+        "name": "ブラケット",
+        "blurb": "タグの両側に、その色の縦線。"
+      },
+      "frame_dot": {
+        "name": "ドット",
+        "blurb": "名前の前のステータスランプのように、タグの前にその色の点。"
+      }
+    },
+    "motif_groups": {
+      "instruments": "楽器",
+      "beasts": "生き物",
+      "arms": "武具",
+      "elements": "自然",
+      "things": "そのほか"
+    },
+    "motif_icons": {
+      "guitar": "ギター",
+      "bass": "ベースのヘッド",
+      "headstock": "ヘッド",
+      "notes": "音符",
+      "score": "楽譜",
+      "mic": "マイク",
+      "oldmic": "古いマイク",
+      "speaker": "スピーカー",
+      "headphones": "ヘッドホン",
+      "drum": "ドラム",
+      "drumkit": "ドラムセット",
+      "piano": "ピアノの鍵盤",
+      "keyboard": "キーボード",
+      "trombone": "トロンボーン",
+      "cassette": "カセット",
+      "vinyl": "レコード",
+      "horn": "ホーン",
+      "metalhand": "メロイックサイン",
+      "skull": "ドクロ",
+      "crossbones": "ドクロと骨",
+      "bones": "交差した骨",
+      "pirate": "海賊のドクロ",
+      "burning": "燃えるドクロ",
+      "dragon": "ドラゴン",
+      "wolf": "オオカミ",
+      "howl": "遠吠えするオオカミ",
+      "werewolf": "オオカミ男",
+      "raven": "カラス",
+      "eagle": "ワシ",
+      "lion": "ライオン",
+      "tiger": "トラ",
+      "bear": "クマ",
+      "bull": "雄牛",
+      "snake": "ヘビ",
+      "spider": "クモ",
+      "web": "クモの巣",
+      "bat": "コウモリ",
+      "owl": "フクロウ",
+      "cat": "ネコ",
+      "shark": "サメ",
+      "octopus": "タコ",
+      "scorpion": "サソリ",
+      "reaper": "死神",
+      "ghost": "おばけ",
+      "devil": "悪魔",
+      "robot": "ロボット",
+      "crown": "王冠",
+      "imperial": "帝冠",
+      "laurel": "月桂冠",
+      "swords": "交差した剣",
+      "sword": "剣",
+      "axes": "交差した斧",
+      "battleaxe": "戦斧",
+      "hammer": "ハンマー",
+      "warhammer": "ウォーハンマー",
+      "shield": "盾",
+      "spartan": "スパルタの兜",
+      "viking": "ヴァイキングの兜",
+      "knight": "騎士の兜",
+      "samurai": "侍の兜",
+      "hornedhelm": "角付きの兜",
+      "castle": "城",
+      "banner": "旗",
+      "pirateflag": "海賊旗",
+      "fist": "拳",
+      "anarchy": "アナーキー",
+      "wings": "翼",
+      "angelwings": "天使の翼",
+      "bullseye": "的",
+      "bomb": "爆弾",
+      "key": "古い鍵",
+      "flame": "炎",
+      "candle": "ろうそく",
+      "campfire": "たき火",
+      "lightning": "稲妻",
+      "storm": "嵐",
+      "sun": "太陽",
+      "moon": "月",
+      "star": "星",
+      "shuriken": "手裏剣",
+      "comet": "彗星",
+      "crystal": "水晶玉",
+      "potion": "ポーション",
+      "heart": "翼のあるハート",
+      "rose": "バラと短剣",
+      "beer": "ビール",
+      "drinkinghorn": "角杯",
+      "coffee": "コーヒー",
+      "anvil": "金床",
+      "gears": "歯車",
+      "dice": "サイコロ",
+      "trophy": "トロフィー",
+      "rocket": "ロケット",
+      "compass": "コンパス",
+      "anchor": "いかり"
+    }
+  },
+  "recording": {
+    "panes": {
+      "record": "録音",
+      "client": "クライアント",
+      "crew": "クルー",
+      "studio": "スタジオ",
+      "how": "しくみ",
+      "clients": "クライアント"
+    },
+    "steps": {
+      "s1_title": "セッションを予約",
+      "s1_body": "どのメンバーでもできます。費用はギルドの金庫から出て、クライアントがトラックを持ってやってきます。",
+      "s2_title": "テイクを録る",
+      "s2_body": "1テイクはマイクをオンにした1分間です。1人1日{{takes}}回で、残したテイクごとにパートのテープが埋まっていきます。",
+      "s3_title": "報酬を受け取る",
+      "s3_body": "1週間以内にすべてのテープを埋めると、トラックがリリースされます。{{count}}テイク以上録った全員にFameが支払われます。"
+    },
+    "stage_difficulty": "難しさ",
+    "stage_reward": "リリースの報酬",
+    "loading": "スタジオの扉を開けています…",
+    "load_failed": "セッションを読み込めませんでした。少ししてからもう一度試してください。",
+    "failed": "うまくいきませんでした。もう一度試してください。",
+    "booked": "{{client}}がスタジオに入りました。",
+    "short": "Fameが{{count}}足りません",
+    "now": "録音中",
+    "parts_title": "パート",
+    "takes_today": "今日のテイク：残り{{left}} / {{total}}",
+    "takes_none": "今日のテイクはもう残っていません。リハーサルして、また明日来てください。",
+    "rehearse": "リハーサル",
+    "record": "テイクを録る",
+    "part_done": "テープ完了",
+    "crew": "弾いた人",
+    "crew_empty": "まだ誰もテイクを録っていません。",
+    "crew_row": "{{takes}}テイク · テープに{{points}}",
+    "deliver": "今すぐトラックを渡す",
+    "deliver_confirm": "これでセッションを終えます：{{rating}}。",
+    "deliver_yes": "渡す",
+    "deliver_no": "録音を続ける",
+    "delivered": "トラックはクライアントの手に渡りました。",
+    "pay_waiting": "終わったセッションから{{fame}} Fameが届いています。",
+    "collect": "受け取る",
+    "collected": "+{{fame}} Fame",
+    "last_title": "前回のセッション",
+    "last_bank": "クライアントが金庫に{{fame}} Fameを払いました。",
+    "last_none": "何にもなりませんでした。クライアントはテープを持って帰りました。",
+    "room_title": "スタジオで加わるもの",
+    "room_hint": "録音にはどれも必要ありません。どれもセッションを楽にしてくれるだけです。",
+    "room_link": "スタジオを開く",
+    "take": {
+      "kept": "{{part}}のテイクを残しました：{{bpm}} BPMで{{accuracy}}%、テープに{{points}}。",
+      "scrapped": "テイクは破棄：{{accuracy}}%は{{min}}%未満です。テイクの回数は減っていません。",
+      "no_takes": "今日の最後のテイクのあとだったので、そのテイクは残りませんでした。",
+      "over": "セッションはすでに終わっていたので、そのテイクは残りませんでした。"
+    },
+    "session": {
+      "take_title": "レコーディングセッション",
+      "rehearsal_title": "リハーサル"
+    },
+    "perks": {
+      "takes": "1日のテイク数",
+      "sound": "テイクごとのポイント",
+      "tape": "埋めるテープ",
+      "desk": "クライアントの小切手",
+      "walls": "プレイヤーのFame",
+      "bench": "セッション料"
+    },
+    "ratings": {
+      "shelved": "お蔵入り",
+      "demo": "デモ",
+      "record": "リリース",
+      "gold": "ゴールドディスク",
+      "platinum": "プラチナディスク"
+    },
+    "genres": {
+      "punk": "パンク",
+      "blues": "ブルース",
+      "synth": "シンセポップ",
+      "folk": "インディーフォーク",
+      "metal": "メタル",
+      "fusion": "フュージョン",
+      "funk": "ファンク",
+      "reggae": "レゲエ",
+      "surf": "サーフロック"
+    },
+    "parts": {
+      "riff": "リズムギター",
+      "bass": "ベースライン",
+      "arp": "アルペジオ",
+      "hook": "リードメロディー",
+      "run": "ソロのラン"
+    },
+    "part_hints": {
+      "riff": "ルートの刻みに、上でアクセント。",
+      "bass": "ルートと5度で、次のコードへ歩いていく。",
+      "arp": "コードを、弦をまたいで1音ずつ。",
+      "hook": "自分で答えを返す短いメロディー。",
+      "run": "ポジションを上って戻るスケールのシーケンス。"
+    },
+    "contracts": {
+      "rust-buckets": {
+        "pitch": "3コード、2テイク、午後ひとつ。俺たちはきれいに弾けないから、君が弾いてくれ。"
+      },
+      "late-shift": {
+        "pitch": "バンドは2時に帰った。曲はまだ仕上げが必要で、コーヒーは無料だ。"
+      },
+      "neon-motel": {
+        "pitch": "うちは全部機械でやってる。レーベルは、誰かが弦に触ったような音にしてほしいそうだ。"
+      },
+      "paper-lanterns": {
+        "pitch": "縁側で書いた曲なの。縁側の空気を残して。それと、Aメロより長いソロはやめてね。"
+      },
+      "iron-harvest": {
+        "pitch": "タイトに、でかく、グリッドぴったりに。スイングしたら払わないぞ。"
+      },
+      "long-take": {
+        "pitch": "君たちよりうまいバンドもクビにしてきた。一発録りで弾いてくれたら、名前を覚えてやってもいい。"
+      },
+      "loose-change": {
+        "pitch": "俺が指ささない限り、誰も1拍目に音を出すな。あとは全部君たちのものだ。"
+      },
+      "night-ferry": {
+        "pitch": "もっと少なく弾いて。それからもっと少なく。すき間が曲で、残りはこだまだ。"
+      },
+      "riptides": {
+        "pitch": "速く、ウェットに、マイナーキーで。リバーブタンクがガタガタ鳴ってなかったら、やり直しだ。"
+      }
+    },
+    "tiers": {
+      "t1": "ガレージレーベル",
+      "t2": "地元のレーベル",
+      "t3": "インディーレーベル",
+      "t4": "メジャーレーベル",
+      "t5": "世界リリース",
+      "t6": "殿堂"
+    },
+    "tier_locked": "先に「{{tier}}」でレコードをリリースしてください",
+    "session_meta": "ランク{{tier}} · {{name}} · {{bpm}} BPM",
+    "pool_title": "やってくるかもしれない人",
+    "pool_hint": "選ぶのはランクで、クライアントではありません。誰が来るか、何を弾くか、そしてそのすべての音は予約したときに決まるので、同じセッションは2つとありません。",
+    "tier_of": "ランク{{tier}}（全{{max}}）",
+    "tiers_label": "ランク",
+    "tier_open": "解放済み",
+    "tier_closed": "ロック中",
+    "stat_tempo": "テンポ",
+    "stat_parts": "パート",
+    "stat_rhythm": "いちばん細かいリズム",
+    "stat_fame": "プレイヤーごとのFame",
+    "stat_bank": "金庫へ",
+    "rhythm_short": {
+      "d2": "8分",
+      "d3": "3連符",
+      "d4": "16分"
+    },
+    "book_session": "セッションを予約",
+    "treasury_has": "ギルドの金庫には{{fame}} Fameあります。",
+    "tier_pitch": {
+      "t1": "木箱の上の4トラックと裸電球。ゆっくり、シンプルに、3パート。みんなここから始めます。",
+      "t2": "レコード店の奥の部屋。少し速くなりますが、まだ声に出して数えられないものはありません。",
+      "t3": "ちゃんとした部屋とちゃんとした卓。トラックそのもののテンポで、埋めるパートは4つ。",
+      "t4": "ピアノのあるライブルーム。もうクライアントのテンポを超えていて、相手は何でも気づきます。",
+      "t5": "最上階、窓の下に街全体。5パート、16分音符、隠れる場所はありません。",
+      "t6": "レコードが飾られる殿堂。いちばん速く、いちばん厚く。これは壁に残ります。"
+    },
+    "time_days": "{{days}}日{{hours}}時間",
+    "time_hours": "{{hours}}時間{{minutes}}分",
+    "goal": {
+      "record": "リリースまでのテイク",
+      "gold": "ゴールドディスクまでのテイク",
+      "platinum": "プラチナディスクまでのテイク"
+    },
+    "goal_done": "もう証明することはありません",
+    "stat_on_tape": "テープ",
+    "stat_time": "残り",
+    "release_rule": "すべてのパートのテープが100%になると、トラックがリリースされます。",
+    "client_title": "クライアント · {{client}}",
+    "mood_level": "機嫌 {{level}} / {{max}}",
+    "moods": {
+      "waiting": "何か聴けるのを待っている",
+      "cold": "感心していない",
+      "listening": "聴いている",
+      "nodding": "うなずいている",
+      "grinning": "にやにやしている",
+      "speechless": "言葉もない"
+    },
+    "mood_lines": {
+      "cold": "学校の体育館でももっとタイトなバンドを聴いたぞ。もう一回。",
+      "listening": "続けて。まだ納得してないけど。",
+      "nodding": "それだ。それがこのトラックだ。",
+      "grinning": "何も変えるな。もう一度テープを回せ。",
+      "speechless": "…君たち、何者なんだ？"
+    },
+    "stat_accuracy": "テイクの平均の正確さ",
+    "stat_takes": "テープのテイク",
+    "stat_tip": "小切手のチップ",
+    "part_to_go": "あと{{count}}テイクほど",
+    "part_stats": "{{takes}}テイク、平均{{accuracy}}%",
+    "part_no_takes": "まだテイクなし",
+    "recent_title": "最近のテイク",
+    "recent_empty": "テープにはまだテイクがありません。"
+  },
+  "studio": {
+    "treasury": "ギルドのFame",
+    "room_level": "部屋のレベル {{level}} / {{max}}",
+    "move_to": "{{room}}に移る",
+    "maxed": "最大までアップグレード済み",
+    "needs_room": "先に{{room}}が必要です",
+    "short": "ギルドのFameが{{count}}足りません",
+    "not_built": "まだありません",
+    "build": "作る：{{name}}",
+    "upgrade_to": "{{name}}にアップグレード",
+    "level_of": "レベル{{level}} / {{max}}",
+    "empty_spot": "{{name}} · 空きスペース",
+    "week_so_far": "今週ここまで",
+    "unlocks_at": "{{title}} · レベル{{level}}",
+    "nobody_yet": "まだ誰もいません",
+    "bought": "完了：{{name}}",
+    "moved": "{{room}}に移りました",
+    "failed": "購入できませんでした",
+    "loading": "スタジオを開いています…",
+    "load_failed": "スタジオが開きませんでした。少ししてからもう一度試してください。",
+    "awards": {
+      "hours": "最長時間",
+      "sessions": "最多セッション",
+      "streak": "最長連続記録",
+      "points": "最多ポイント"
+    },
+    "values": {
+      "hours": "{{value}}時間",
+      "sessions": "{{value}}",
+      "streak": "{{value}}日",
+      "points": "{{value}}"
+    },
+    "rooms": {
+      "r1": "ガレージ",
+      "r2": "リハーサルスペース",
+      "r3": "プロジェクトスタジオ",
+      "r4": "プロスタジオ"
+    },
+    "items": {
+      "board": {
+        "name": "ウィークリーボード",
+        "l1": "コルクボード",
+        "l2": "棚付きボード",
+        "l3": "電飾付きボード",
+        "l4": "ショーケースボード"
+      },
+      "amp": {
+        "name": "アンプ",
+        "l1": "練習用コンボ",
+        "l2": "真空管コンボ",
+        "l3": "ハーフスタック",
+        "l4": "フルスタック"
+      },
+      "drums": {
+        "name": "ドラムセット",
+        "l1": "練習パッド",
+        "l2": "中古のセット",
+        "l3": "フルセット",
+        "l4": "スタジオ用セット"
+      },
+      "mic": {
+        "name": "マイク",
+        "l1": "ダイナミックマイク",
+        "l2": "ブームスタンド",
+        "l3": "コンデンサー",
+        "l4": "ヴィンテージの真空管マイク"
+      },
+      "monitors": {
+        "name": "モニター",
+        "l1": "デスクスピーカー",
+        "l2": "ニアフィールド",
+        "l3": "スタンド付きモニター",
+        "l4": "メインモニター"
+      },
+      "panels": {
+        "name": "吸音パネル",
+        "l1": "四角いスポンジ",
+        "l2": "くさび形スポンジ",
+        "l3": "布張りパネル",
+        "l4": "音響調整済みの部屋"
+      },
+      "walls": {
+        "name": "壁",
+        "l1": "ライブのポスター",
+        "l2": "額入りのレコード",
+        "l3": "ギャラリーの壁",
+        "l4": "名声の壁"
+      },
+      "sofa": {
+        "name": "ソファ",
+        "l1": "キャンプ用の椅子",
+        "l2": "古いソファ",
+        "l3": "革のソファ",
+        "l4": "ラウンジコーナー"
+      },
+      "desk": {
+        "name": "ミキシングデスク",
+        "l1": "ノートパソコン",
+        "l2": "オーディオインターフェース",
+        "l3": "小型コンソール",
+        "l4": "大型コンソール"
+      },
+      "tape": {
+        "name": "テープマシン",
+        "l1": "カセットデッキ",
+        "l2": "4トラック",
+        "l3": "オープンリール",
+        "l4": "2インチテープマシン"
+      },
+      "bench": {
+        "name": "リペア作業台",
+        "l1": "工具箱",
+        "l2": "作業台",
+        "l3": "万力付きの作業台",
+        "l4": "本格的なリペア工房"
+      }
+    }
+  },
+  "toast": {
+    "founded": "ギルドを設立しました",
+    "request_sent": "申し込みを送りました — ここからは設立者が決めます",
+    "deposited": "ギルドの金庫に{{fame}} Fame",
+    "stash_left": "棚に置きました",
+    "stash_taken": "受け取りました"
+  }
+}

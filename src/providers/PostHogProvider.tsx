@@ -6,8 +6,13 @@ export function PostHogProvider() {
   const router = useRouter();
 
   useEffect(() => {
+    const token = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+    // No key (local dev without .env): stay uninitialized. posthog.capture is
+    // then a silent no-op, instead of init logging a misconfiguration error.
+    if (!token) return;
+
     const init = () => {
-      posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+      posthog.init(token, {
         // Analytics goes straight to PostHog rather than through a /ingest rewrite on
         // our own domain. The proxy only bought resistance to ad blockers, and it made
         // every event from every browser an edge request — and therefore a billed

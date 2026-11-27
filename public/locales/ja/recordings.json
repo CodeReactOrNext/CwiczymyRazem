@@ -1,0 +1,75 @@
+{
+  "toast": {
+    "added": "録音を追加しました！",
+    "add_failed": "録音を追加できませんでした。",
+    "comment_added": "コメントを追加しました！",
+    "comment_failed": "コメントを追加できませんでした。",
+    "logged_out": "ログインが必要です。",
+    "bad_url": "正しいYouTubeのURLを入力してください。",
+    "updated": "録音を更新しました。",
+    "update_failed": "録音を更新できませんでした。",
+    "deleted": "録音を削除しました。",
+    "delete_failed": "録音を削除できませんでした。"
+  },
+  "modal": {
+    "edit_title": "録音を編集",
+    "add_title": "新しい録音を追加",
+    "which_song": "何の曲ですか？",
+    "optional": "（任意）",
+    "artist": "アーティスト...",
+    "song_title": "曲のタイトル...",
+    "search_hint": "アーティストか曲のタイトルを入力して、ライブラリを検索",
+    "not_in_library": "ライブラリにありません",
+    "saved_as_typed": "大丈夫 — 入力どおりに保存します。",
+    "youtube_url": "YouTubeのURL *",
+    "title": "タイトル *",
+    "title_placeholder": "最高のカバー",
+    "description": "説明",
+    "description_placeholder": "録音について教えてください...",
+    "cancel": "キャンセル",
+    "save": "変更を保存",
+    "share": "録音を共有"
+  },
+  "card": {
+    "play": "{{title}}を再生",
+    "edit": "録音を編集",
+    "delete_aria": "録音を削除",
+    "confirm_title": "本当にいいですか？",
+    "confirm_body": "この操作は元に戻せません。録音は完全に削除されます。",
+    "deleting": "削除中...",
+    "delete": "削除",
+    "like": "録音にいいね",
+    "comments": "コメントを見る"
+  },
+  "likers": {
+    "title": "いいねした人",
+    "you": "あなた",
+    "loading": "読み込み中...",
+    "more": "ほか{{count}}人"
+  },
+  "grid": {
+    "empty_title": "録音が見つかりません",
+    "empty_body": "最初にカバーをアップロードしよう！"
+  },
+  "view": {
+    "title": "レコーディング",
+    "subtitle": "練習セッションを聴き返して、共有しよう",
+    "add": "録音を追加",
+    "all": "すべての録音",
+    "mine": "自分の録音",
+    "count_one": "録音{{count}}本",
+    "count_other": "録音{{count}}本",
+    "sort_newest": "新しい順",
+    "sort_popular": "人気順",
+    "sort_label": "録音を並べ替え"
+  },
+  "viewer": {
+    "not_found": "録音が見つかりません",
+    "comments": "コメント（{{count}}）",
+    "no_comments": "まだコメントはありません。",
+    "write_comment": "コメントを書く..."
+  },
+  "song_section": {
+    "empty": "この曲の録音はまだありません — 最初にカバーを共有しよう。"
+  }
+}

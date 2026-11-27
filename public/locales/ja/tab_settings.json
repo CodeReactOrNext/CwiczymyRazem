@@ -1,0 +1,216 @@
+{
+  "spacing": "間隔",
+  "spacing_hint": "小節内の音符どうし、弦どうしの間隔。",
+  "note_spacing": "音符の間隔",
+  "string_spacing": "弦の間隔",
+  "paged_scroll": "固定ボード",
+  "paged_scroll_desc": "TAB譜は動かず、カーソルが上を進み、端まで来たら次のページへ切り替わります。動かない音符はくっきり見えます。",
+  "fret_numbers": "フレット番号",
+  "size": "サイズ",
+  "default_view": "デフォルトの表示",
+  "default_view_hint": "練習セッションを始めたときに自動で開く表示。",
+  "metronome_sound": "メトロノームの音",
+  "metronome_sound_hint": "タップで試聴できます。カウントインとTAB譜表示で使われ、五線譜表示ではAlphaTab独自のクリックのままです。",
+  "note_pills": "音符のピル",
+  "note_pills_hint": "フレット番号が入るブロックの形と、音の長さの描き方。",
+  "string_palette": "弦のカラーパレット",
+  "string_palette_hint": "弦ごとに1色、1弦（高いE）から。",
+  "hit_colour": "ヒットの色",
+  "hit_colour_hint": "音を正しく伸ばしている間、音符を塗りつぶします。",
+  "board_background": "ボードの背景",
+  "board_background_hint": "譜面、余白、フェードの背景色。",
+  "visible_elements": "表示する要素",
+  "visible_elements_hint": "不要なレイヤーを隠して、譜面をすっきりさせます。",
+  "handedness": "利き手",
+  "handedness_hint": "左利きのプレイヤー向け。このデバイスのすべてに適用されます。",
+  "mirror": "指板図を左右反転",
+  "mirror_desc": "クリック系・ハント系のドリルでナットが右側になります。TAB譜には反転するネックの軸がないので、そのままです。",
+  "rtl": "右から左のボード",
+  "rtl_desc": "TAB譜が右端から始まり、反転したネックのようにカーソルが左へ進みます。TAB譜のみで、五線譜表示は通常の向きのままです。",
+  "flip": "弦の順番を反転",
+  "flip_desc": "いちばん上の線が6弦（低いE）になります — 逆張りの右利き用ギター向け。TAB譜のみで、五線譜表示は通常の順番のままです。",
+  "feedback": "フィードバック",
+  "hit_animations": "ヒットのアニメーション",
+  "hit_animations_desc": "音が決まったときのフラッシュと衝撃波リング",
+  "timing_hints": "タイミングのヒント",
+  "timing_hints_desc": "弾いた瞬間に音符の上に「早い」「遅い」または緑の＋を表示し、遅れた音は弾いた位置から塗りつぶします。どちらの場合もタイミングはスコアに反映されます。",
+  "ambient_glow": "マイクのアンビエントグロー",
+  "ambient_glow_desc": "演奏の音量に反応してTAB譜の下が光ります",
+  "performance": "パフォーマンス",
+  "performance_hint": "TAB譜がカクつくとき用。ライト版のTAB譜は半分のフレームレートで描画され、1ページずつ止まり、エフェクトを省きます。音符、塗りつぶし、採点は変わりません。",
+  "performance_modes": {
+    "auto": { "label": "自動", "desc": "処理が追いつかないスマホではライト" },
+    "lite": { "label": "ライト", "desc": "常にシンプルなTAB譜" },
+    "full": { "label": "フル", "desc": "常にフルのTAB譜" }
+  },
+  "reset": "TAB譜の設定をリセット",
+  "sizing": "サイズ調整",
+  "sizing_hint": "AlphaTab独自のズームと音符の間隔 — 上のTAB譜用スライダーとは別です。",
+  "zoom": "ズーム",
+  "board": "ボード",
+  "board_hint": "五線譜ボードの色。",
+  "dark_score": "ダークな譜面",
+  "dark_score_desc": "白い紙の代わりに、黒いボードに白い五線と音符",
+  "toggles": {
+    "rhythm_lane": "リズムレーン",
+    "rhythm_lane_desc": "譜面の上の符幹、連桁、休符",
+    "chord_names": "コードネーム",
+    "chord_names_desc": "小節の上の白いコードピル",
+    "tuning_gutter": "チューニング欄",
+    "tuning_gutter_desc": "左側に固定した弦の名前",
+    "measure_lines": "小節線",
+    "measure_lines_desc": "小節を区切る縦線",
+    "counting": "カウント",
+    "counting_desc": "譜面の下の「1 e & a」 — 小節の数え方",
+    "technique": "奏法記号",
+    "technique_desc": "H/P、チョーキング、PM、ビブラート、ハーモニクス、ピッキング ⊓/⋁",
+    "fingering_hand": "運指の手",
+    "fingering_hand_desc": "TAB譜の横に、どの指を使うかを示す手を表示"
+  },
+  "views": {
+    "tab": {
+      "label": "TAB譜",
+      "desc": "おなじみのギターTAB譜"
+    },
+    "notation": {
+      "label": "五線譜",
+      "desc": "標準的な楽譜"
+    }
+  },
+  "fret_text": {
+    "black": {
+      "label": "黒",
+      "desc": "明るいピルに黒文字"
+    },
+    "white": {
+      "label": "白",
+      "desc": "暗めのパレット向け"
+    },
+    "auto": {
+      "label": "自動",
+      "desc": "ピルの明るさに合わせる"
+    }
+  },
+  "note_styles": {
+    "headTail": {
+      "label": "ヘッド＋テール",
+      "desc": "塗りつぶしのヘッドと細い持続テール"
+    },
+    "bar": {
+      "label": "ソリッドバー",
+      "desc": "長さ全体を1つのブロックで"
+    }
+  },
+  "pills": {
+    "capsule": {
+      "label": "カプセル",
+      "desc": "両端が完全に丸い"
+    },
+    "rounded": {
+      "label": "角丸",
+      "desc": "やわらかい角"
+    },
+    "sharp": {
+      "label": "シャープ",
+      "desc": "ほぼ四角、テクニカル"
+    },
+    "chunky": {
+      "label": "太め",
+      "desc": "高さがあって力強い"
+    }
+  },
+  "palettes": {
+    "rainbow": {
+      "label": "レインボー",
+      "desc": "弦ごとに1色"
+    },
+    "stringCode": {
+      "label": "弦コード",
+      "desc": "6弦が赤、1弦が紫"
+    },
+    "ocean": {
+      "label": "オーシャン",
+      "desc": "涼しげな青と紫"
+    },
+    "sunset": {
+      "label": "サンセット",
+      "desc": "温かい赤から金色まで"
+    },
+    "forest": {
+      "label": "フォレスト",
+      "desc": "緑と青緑"
+    },
+    "neon": {
+      "label": "ネオン",
+      "desc": "暗いボードで最大のコントラスト"
+    },
+    "pastel": {
+      "label": "パステル",
+      "desc": "やわらかい色調で、長いセッションでも目にやさしい"
+    },
+    "poster": {
+      "label": "ポスター",
+      "desc": "マットで力強い、フラットな印刷色"
+    },
+    "vintage": {
+      "label": "ヴィンテージ",
+      "desc": "くすんで色あせた、古いポスター風"
+    },
+    "colorblind": {
+      "label": "色覚サポート",
+      "desc": "Okabe–Ito配色、ほとんどのタイプで見分けやすい"
+    },
+    "mono": {
+      "label": "モノ",
+      "desc": "グレースケール — 色ではなく位置で判断"
+    }
+  },
+  "backgrounds": {
+    "midnight": {
+      "label": "ミッドナイト",
+      "desc": "デフォルトの黒に近い色"
+    },
+    "black": {
+      "label": "真っ黒",
+      "desc": "最も高いコントラスト、有機EL向け"
+    },
+    "charcoal": {
+      "label": "チャコール",
+      "desc": "明るめのグレーで、まぶしさ控えめ"
+    },
+    "navy": {
+      "label": "ネイビー",
+      "desc": "クールな青みの黒"
+    },
+    "plum": {
+      "label": "プラム",
+      "desc": "温かい紫がかった黒"
+    },
+    "paper": {
+      "label": "ペーパー",
+      "desc": "温かい白、印刷物のよう"
+    },
+    "white": {
+      "label": "白",
+      "desc": "真っ白な紙"
+    },
+    "sepia": {
+      "label": "セピア",
+      "desc": "古い紙、まぶしさ控えめ"
+    }
+  },
+  "hit_colors": {
+    "emerald": "エメラルド",
+    "cyan": "シアン",
+    "amber": "アンバー",
+    "white": "白",
+    "magenta": "マゼンタ",
+    "lime": "ライム"
+  },
+  "view_menu": {
+    "button_tab": "表示：TAB譜",
+    "button_notation": "表示：五線譜",
+    "hint": "エクササイズの表示方法を変更",
+    "view": "表示"
+  }
+}

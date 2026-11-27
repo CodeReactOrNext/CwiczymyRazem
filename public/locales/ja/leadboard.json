@@ -1,0 +1,70 @@
+{
+  "fetch_error": "データの取得中にエラーが発生しました。ページを再読み込みしてください。",
+  "points": "ポイント",
+  "exercise_time": "練習時間",
+  "achievements": "実績",
+  "empty": "空",
+  "sort_by_points": "ポイント順",
+  "sort_by_sessions": "セッション順",
+  "global_leaderboard": "総合",
+  "seasonal_leaderboard": "シーズン",
+  "gear_leaderboard": "機材",
+  "gear_title": "機材リーダーボード",
+  "gear_subtitle": "最強のリグは誰のもの？",
+  "rig_level": "リグレベル",
+  "guitars": "ギター",
+  "effects": "エフェクト",
+  "no_gear_data_found": "機材を持っているユーザーが見つかりません",
+  "current_season": "現在のシーズン",
+  "showing": "表示中",
+  "of": "/",
+  "users": "ユーザー",
+  "no_users_found": "ユーザーが見つかりません",
+  "no_seasonal_data": "シーズンのデータがありません",
+  "no_seasonal_data_found": "このシーズンのユーザーが見つかりません",
+  "seasons_fetch_error": "シーズンの読み込みエラー",
+  "season_change_error": "シーズンの切り替えエラー",
+  "view_change_error": "表示の切り替えエラー",
+  "empty_users_title": "プレイヤーがいません",
+  "select_season": "シーズンを選ぶ",
+  "rank": {
+    "your_position": "あなたの順位",
+    "out_of": "{{total}}人中",
+    "to_pass": "{{name}}（{{place}}位）を抜くまであと{{unit}}",
+    "jump": "自分の順位へ",
+    "level": "レベル",
+    "levels": "レベル",
+    "point": "ポイント",
+    "points": "ポイント"
+  },
+  "rewards": {
+    "title": "シーズン報酬",
+    "place": "{{place}}位：{{fame}} Fame",
+    "range": "{{from}}〜{{to}}位：{{max}}〜{{min}} Fame",
+    "summary": "上位{{count}}人がFameを獲得",
+    "show": "報酬",
+    "hide": "隠す"
+  },
+  "hero": {
+    "season": "シーズン",
+    "season_subtitle": "練習してリーダーボードを駆け上がろう。",
+    "seasonal_eyebrow": "シーズンランキング",
+    "rig_eyebrow": "リグランキング",
+    "title": "リーダーボード",
+    "subtitle": "他のプレイヤーと比べた自分の順位を見よう",
+    "all_time_eyebrow": "通算ランキング",
+    "sections": "リーダーボードのセクション"
+  },
+  "scope": {
+    "top": "トッププレイヤー",
+    "around": "あなたの周辺",
+    "around_error": "周辺のプレイヤーを読み込めませんでした。少ししてからもう一度お試しください。"
+  },
+  "rig": {
+    "guitar_level": "ギターレベル",
+    "empty_slot": "空きスロット{{n}}",
+    "title": "リグ"
+  },
+  "player_level": "プレイヤーレベル",
+  "player": "プレイヤー"
+}

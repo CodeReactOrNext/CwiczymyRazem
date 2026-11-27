@@ -1,0 +1,137 @@
+{
+  "player": {
+    "play": "{{title}}を再生",
+    "open": "YouTubeで開く",
+    "open_title": "{{title}}をYouTubeで開く"
+  },
+  "hero": {
+    "track_label": "バッキングトラック #{{number}}",
+    "eyebrow": "アドリブラウンド #{{number}}",
+    "over": "ラウンド終了",
+    "left_days_one": "残り{{count}}日",
+    "left_days_other": "残り{{count}}日",
+    "left_hours_one": "残り{{count}}時間",
+    "left_hours_other": "残り{{count}}時間",
+    "left_minutes_one": "残り{{count}}分",
+    "left_minutes_other": "残り{{count}}分",
+    "takes_so_far": "これまでのテイク",
+    "players_one": "{{count}}人",
+    "players_other": "{{count}}人",
+    "points_per_take": "テイクごとのポイント",
+    "fame_for_joining": "参加でもらえるFame",
+    "cta": "テイクをリンクする",
+    "discord_thread": "Discordのスレッド",
+    "discord_join": "Discordに参加",
+    "track_by": "バッキングトラック：{{name}}"
+  },
+  "empty": {
+    "eyebrow": "{{days}}日ごとに新しいバッキングトラック",
+    "title": "このラウンドのバッキングトラックはまだありません",
+    "body": "合わせて弾くトラックができた瞬間にラウンドが始まります。YouTubeのリンクを追加すればすぐに公開され、みんながそれに合わせてジャムし、テイクを撮ってここにリンクできます。"
+  },
+  "how": {
+    "title": "アドリブラウンドのしくみ",
+    "intro": "1つのバッキングトラック、{{days}}日間、みんながその上で弾きます。スコアも勝者もありません — これはジャムで、感想のやりとりはDiscordで行われます。",
+    "steps": {
+      "listen": {
+        "title": "合わせて弾く",
+        "body": "ここで再生するか、YouTubeでトラックを開きましょう。好きなだけウォームアップしてください。"
+      },
+      "record": {
+        "title": "テイクを撮る",
+        "body": "スマホでアドリブしている自分を撮りましょう。一発撮り、編集なし — ミスも大歓迎です。"
+      },
+      "link": {
+        "title": "ここにリンクする",
+        "body": "動画をYouTube、Instagram、Googleドライブに置いて、リンクを貼り付けてください。それがあなたのテイクです。"
+      },
+      "discord": {
+        "title": "Discordで感想をもらう",
+        "body": "ボットがあなたのテイクをラウンドのスレッドに投稿します。みんなが反応して話すのはそこです。"
+      }
+    },
+    "discord_title": "Discordを中心に。",
+    "discord_body": "ラウンドごとにサーバーに専用のスレッドができます。ボットがそこでトラックを告知し、リンクした瞬間に各テイクを投稿し、感想はそのスレッドに集まります — このページは弾いて提出する場所、Discordは話す場所です。"
+  },
+  "rules": {
+    "0": "楽しもう。スコアも勝者もありません。",
+    "1": "アドリブしよう。ざっくりしたアイデアはOK、書き上げたソロはNG。",
+    "2": "ウォームアップは好きなだけ。録音ボタンを押したら、それがあなたのテイクです。",
+    "3": "編集なし。ミスも大歓迎です。",
+    "4": "感想はポジティブなものだけ。",
+    "title": "ハウスルール"
+  },
+  "tabs": {
+    "takes": "テイク",
+    "next": "次のトラック",
+    "past": "過去のラウンド",
+    "how": "しくみ"
+  },
+  "submit": {
+    "placeholder": "YouTube、Instagram、Googleドライブのリンクを貼り付け…",
+    "note_placeholder": "テイクについてひとこと（任意）",
+    "button": "提出",
+    "hint": "テイクはすべて、ラウンドのDiscordスレッドに自動で投稿されます。",
+    "limit": "このラウンドのテイク{{max}}回をすべて使いました。",
+    "takes_left_one": "テイク残り{{count}} / {{max}}",
+    "takes_left_other": "テイク残り{{count}} / {{max}}",
+    "error_BAD_LINK": "YouTube、Instagram、Googleドライブの動画のリンクではないようです。",
+    "error_LIMIT": "このラウンドにはすでに{{max}}回テイクを投稿しています。",
+    "error_DUPLICATE": "このリンクはすでに投稿しています。",
+    "error_NO_ROUND": "今は開催中のラウンドがありません。",
+    "error": "問題が発生しました。少ししてからもう一度試してください。",
+    "success": "テイクを投稿しました — +{{points}}ポイント",
+    "success_first": "参加しました！ +{{points}}ポイント、+{{fame}} Fame"
+  },
+  "take": {
+    "watch": "{{name}}のテイクを{{provider}}で見る",
+    "number": "テイク{{number}}",
+    "remove": "テイクを削除",
+    "removed": "テイクを削除しました",
+    "feedback": "Discordの感想",
+    "none_title": "まだテイクはありません",
+    "none_body": "誰かが最初にならないと。トラックに合わせて弾いて撮り、上にリンクを貼り付けてください。",
+    "no_round": "バッキングトラックが公開されると、テイクの受け付けが始まります。"
+  },
+  "side": {
+    "discord_title": "Discordのスレッド",
+    "discord_body": "このラウンド専用のスレッド。すべてのテイクと感想がそこに集まります。",
+    "discord_body_no_thread": "感想のやりとりはDiscordサーバーで。参加してあいさつしてみてください。",
+    "open_thread": "スレッドを開く",
+    "players_title": "プレイヤー",
+    "takes_one": "{{count}}テイク",
+    "takes_other": "{{count}}テイク"
+  },
+  "next": {
+    "title": "次のラウンドは{{date}}に始まります",
+    "body": "{{days}}日ごとに、いちばん票を集めたトラックが新しいラウンドになります。YouTubeからバッキングトラックを追加するか、誰かのトラックを応援してください — 同票なら、先に追加されたほうが勝ちます。",
+    "upload": "バッキングトラックを追加",
+    "leading": "次はこれ",
+    "by": "{{name}}",
+    "remove": "トラックを削除",
+    "vote": "このトラックに投票",
+    "voted": "投票を取り消す",
+    "empty_title": "候補は空です",
+    "empty_body": "待っているトラックはありません。1つ追加すれば、次のラウンドの投票でトップになります。"
+  },
+  "upload": {
+    "title": "バッキングトラックを追加",
+    "description": "YouTubeのバッキングトラックのリンクを貼り付けてください。候補に入り、みんなが投票して、いちばん応援されたトラックが次のラウンドになります。",
+    "link": "YouTubeのリンク",
+    "link_hint": "YouTubeのバッキングトラックならどれでもOK — 名前は動画から取られます。2〜5分がちょうどいい長さです。",
+    "rights": "誰かの曲そのものではなく、バッキングトラックにリンクしてください。",
+    "submit": "候補に追加",
+    "success": "トラックを候補に追加しました",
+    "error": "うまくいきませんでした。少ししてからもう一度試してください。",
+    "error_LIMIT": "候補で待っているトラックがすでに{{max}}つあります。",
+    "error_DUPLICATE": "そのトラックはすでに候補にあります。",
+    "error_link": "そのリンクは使えません。公開されているYouTubeの動画にしてください。"
+  },
+  "past": {
+    "empty_title": "過去のラウンドはまだありません",
+    "empty_body": "終わったラウンドは、バッキングトラックとすべてのテイクと一緒にここに残ります。",
+    "view_takes": "テイクを見る",
+    "no_takes": "このラウンドには誰もテイクを投稿しませんでした。"
+  },
+  "error": "アドリブラウンドを読み込めませんでした。少ししてからもう一度試してください。"
+}

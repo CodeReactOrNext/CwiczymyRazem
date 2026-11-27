@@ -1,0 +1,193 @@
+{
+  "close": "閉じる",
+  "back": "戻る",
+  "start": "スタート",
+  "exercises": "エクササイズ",
+  "activity": "アクティビティ",
+  "chat": "チャット",
+  "guild": "ギルド",
+  "changelog": "更新履歴",
+  "item_level": "アイテムレベル",
+  "item_level_short": "Lv {{level}}",
+  "points_short": "pt:",
+  "no_top_players": "トッププレイヤーのデータがありません。",
+  "guild_level_up": "ギルドレベルアップ",
+  "guild_reached_level": "{{guild}}がレベル{{level}}に到達",
+  "cleared": "クリア",
+  "and_more": "ほか{{count}}件",
+  "duel_finished": "デュエル終了",
+  "duel_waiting_label": "参加受付中のデュエル",
+  "duel_waiting_title": "対戦相手を待っている人がいます",
+  "duel_waiting_join": "デュエルに参加",
+  "duel_waiting_hint": "参加するとすぐに組み合わせが決まります。相手が誰かはデュエル終了後にわかります。",
+  "support_riff_quest": "Riff Questを応援する",
+  "someone": "誰か",
+  "donation_backed_times": "{{name}}がRiff Questを{{count}}回応援しました",
+  "donation_monthly": "{{name}}が毎月のサポーターになりました",
+  "donation_coffee": "{{name}}がRiff Questに${{amount}}のコーヒーをおごりました",
+  "monthly_support": "毎月のサポート",
+  "coffee_amount": "${{amount}}のコーヒー",
+  "new_supporter": "新しいサポーター",
+  "leaderboard_place_hint": "スコアを出した時点でのこのエクササイズのリーダーボード順位",
+  "score": "スコア：",
+  "open_song_hint": "クリックしてこの曲を開く",
+  "difficulty_rated": "難易度を{{rating}}/10（{{tier}}）と評価",
+  "added_recording": "新しいレコーディングを追加しました：",
+  "opened_case": "{{case}}を開けて獲得：",
+  "listed": "出品",
+  "bought": "購入",
+  "from": "出品者：",
+  "playlist_kind": {
+    "playlist": "プレイリスト",
+    "path": "ラーニングパス",
+    "top": "トップ10"
+  },
+  "created_playlist": "新しい{{kind}}を作成しました：",
+  "song_count_other": "{{count}}曲",
+  "passed_exam": "{{step}}の試験に合格しました",
+  "completed_roadmap_step": "ロードマップ「{{roadmap}}」の{{step}}を完了しました",
+  "reached_exercise_goal": "{{exercise}}でテンポ目標を達成しました",
+  "set_exercise_goal": "{{exercise}}にテンポ目標を設定しました",
+  "joined": "Riff Questに参加しました",
+  "joined_with": "Riff Questに参加しました。{{phrase}}",
+  "completed_daily_quests": "{{quests}}をすべてクリアしました！",
+  "daily_quests": "デイリークエスト",
+  "session_time_hint": "このセッションで記録した練習時間",
+  "level_short": "Lv {{level}}",
+  "plan_hint": "クリックしてこのプランの内容を見る",
+  "lesson_hint": "クリックしてこのレッスンを見る",
+  "exercise_hint": "クリックしてこのエクササイズをプレビュー・開始",
+  "boss_hint": "クリックしてボス戦へ",
+  "boss_phase_cleared": "{{boss}} · フェーズ{{phase}}クリア",
+  "ranking_hint": "クリックしてこのエクササイズのランキングを見る",
+  "new_since_last_visit": "前回の訪問以降の新着",
+  "show_more": "もっと見る",
+  "show_more_count": "あと{{count}}件を表示",
+  "practiced_item": "{{item}}を練習しました",
+  "fought_boss": "{{item}}と戦いました",
+  "phase_cleared": "フェーズ{{phase}}クリア",
+  "logged_session": "練習セッションを記録しました",
+  "reached_level": "レベル{{level}}に到達しました",
+  "stat": {
+    "points": "ポイント",
+    "time": "時間",
+    "score": "スコア",
+    "accuracy": "正確さ",
+    "tempo": "テンポ",
+    "place": "順位",
+    "price": "価格",
+    "rarity": "レア度",
+    "level": "レベル",
+    "rating": "評価"
+  },
+  "just_now": "たった今",
+  "activity_kind": {
+    "plan": "プラン",
+    "routine": "ルーティン",
+    "exercise": "エクササイズ",
+    "lesson": "レッスン"
+  },
+  "support_ask": {
+    "roadmap": {
+      "eyebrow": "ロードマップ"
+    },
+    "server_cost": {
+      "eyebrow": "Riff Questづくりを応援する",
+      "headline_covered": "今月のサーバー代はまかなえました",
+      "headline": "サーバー代への協力をお願いします",
+      "body_covered": "今月のホスティング代はすでに集まっています。それ以上の分は、下のロードマップに直接使われます。",
+      "body": "Riff Questは1人で作っている、無料でオープンなプロジェクトです。今月のホスティング代はまだ集まっていません。"
+    },
+    "one_person": {
+      "eyebrow": "1人のプロジェクト",
+      "headline": "Riff Questは1人で、オープンに作られています",
+      "body": "チームも投資家も成長目標もありません。どれだけ時間をかけられるか、次に何を作るかは、みなさんの応援で決まります。"
+    },
+    "one_off_ok": {
+      "eyebrow": "サブスク不要",
+      "headline": "1回きりのコーヒーも、毎月の応援と同じくらい大切です",
+      "body": "登録も、あとで解約する手間もありません。コーヒー1杯を1回だけ、それも立派な応援です。"
+    },
+    "roadmap_tier": {
+      "headline_done": "ロードマップの目標はすべて達成しました。ありがとうございます",
+      "body_done": "これまでのロードマップはすべてコミュニティの応援で実現しました。次の応援は、次の段階のスタートに使われます。",
+      "headline": "「{{tier}}」まであと${{amount}}",
+      "body_covered": "今月のホスティング代は支払い済みなので、ここからの応援はすべて次の機能づくりに使われます。",
+      "body": "これまでの応援の累計で、ロードマップが段階的に解放されていきます。これが次の段階です。"
+    },
+    "roadmap_momentum": {
+      "headline": "ロードマップの目標{{total}}個のうち{{funded}}個を達成",
+      "body_next": "サーバー代はまかなえています — 応援は機能づくりに使われます。次は「{{tier}}」です。",
+      "body": "サーバー代はまかなえているので、応援はそのままロードマップの機能づくりに使われます。"
+    },
+    "value_received": {
+      "eyebrow": "ずっと無料",
+      "headline": "Riff Questは、どの練習セッションもずっと無料です",
+      "body_covered": "エクササイズ、プラン、記録に課金の壁はありません。今月のホスティング代はまかなえているので、今のコーヒーはロードマップの次の機能に使われます。",
+      "body": "エクササイズ、プラン、記録に課金の壁はありません。演奏の役に立ったなら、コーヒー1杯でこのままの形を守れます。"
+    },
+    "social_proof": {
+      "eyebrow": "コミュニティの応援",
+      "headline": "これまでに{{supporters}}人のプレイヤーがRiff Questを応援しました",
+      "headline_none": "Riff Questはコミュニティの応援で運営されています",
+      "body": "応援はRiff Questを無料に保ち、ロードマップの資金になります。タップして使い道を見てみましょう。"
+    }
+  },
+  "highlights": {
+    "improv_label": "アドリブラウンド",
+    "improv_title": "{{name}}がテイクを投稿しました",
+    "challenge_label": "月間チャレンジ",
+    "challenge_title_other": "ボードに{{count}}件のレコーディング",
+    "days_left_other": "残り{{count}}日",
+    "duel_won": "{{winner}}が{{loser}}に勝利",
+    "duel_draw": "{{winner}}と{{loser}}は引き分け",
+    "boss_label": "ボス戦",
+    "boss_title": "{{name}}が{{boss}}のフェーズ{{phase}}をクリア"
+  },
+  "community": {
+    "label": "アクティビティとチャット",
+    "new_in_feed": "フィードに{{count}}件の新着",
+    "unread_messages": "未読メッセージ",
+    "title": "アクティビティとチャット",
+    "online": "{{count}}人がオンライン",
+    "practicing": "{{count}}人が練習中",
+    "sheet_title": "コミュニティ"
+  },
+  "discord_promo": {
+    "eyebrow": "Riff Quest Discord",
+    "join": "サーバーに参加",
+    "v1": {
+      "headline": "アンプには電源スイッチがある。うちのDiscordにはない。",
+      "body": "機材の話、リフの投稿、音作りをめぐる終わらない議論が24時間。気軽に挨拶しに来てください。"
+    },
+    "v2": {
+      "headline": "1人で練習するのはいい。1人で愚痴るのはよくない。",
+      "body": "うまくいったことを共有して、テクニックを質問して、同じレベルの仲間を見つけて刺激し合いましょう。"
+    },
+    "v3": {
+      "headline": "機材チャンネルがあります。眠りません。",
+      "body": "エフェクター、弦、とても手が出ないあのギター。持論を持ってきてください。"
+    },
+    "v4": {
+      "headline": "リフを録った？ ちゃんとした耳で聴いてもらおう。",
+      "body": "クリップを投稿すれば、そのチョーキングの感覚をよく知るプレイヤーからフィードバックがもらえます。"
+    },
+    "v5": {
+      "headline": "ギターは仲間を欲しがっている。あなたもかも。",
+      "body": "ギルド、チャレンジ、そして同じことを練習している人たち。Riff QuestのDiscordに参加しよう。"
+    }
+  },
+  "live_motivate": "応援する",
+  "live_motivate_aria": "演奏中の{{name}}を応援して{{fame}} Fameを贈る",
+  "live_motivate_receipt": "あなたに+{{fame}}",
+  "live_motivate_not_playing": "{{name}}はちょうど演奏をやめました。",
+  "live_motivate_daily_limit": "今日のライブ応援10回をすべて使いました。",
+  "live_motivate_session_full": "{{name}}はこのセッションで受け取れる応援の上限に達しました。",
+  "live_motivate_error": "応援できませんでした。もう一度お試しください。",
+  "live_motivated_you": "{{name}}があなたを応援しています",
+  "live_motivated_many": "{{name}}ほか{{count}}人",
+  "live_keep_playing": "その調子！",
+  "live_hype": "Hype ×{{count}}！",
+  "live_summary_one": "演奏中に{{name}}が応援してくれました",
+  "live_summary_many": "演奏中に{{name}}ほか{{count}}人が応援してくれました"
+}

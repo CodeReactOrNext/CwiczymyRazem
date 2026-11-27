@@ -1,0 +1,257 @@
+{
+  "page": {
+    "title": "カレンダー",
+    "subtitle": "曲、目標、ロードマップを日ごとに並べて",
+    "eyebrow": "ライブラリ"
+  },
+  "week": {
+    "today": "今日",
+    "this_week": "今週",
+    "next_week": "来週",
+    "last_week": "先週",
+    "previous": "前の週",
+    "next": "次の週",
+    "clear": "今週を空にする",
+    "planned": "予定",
+    "played": "演奏済み",
+    "days": "練習日"
+  },
+  "actions": {
+    "add": "追加",
+    "autoplan": "自動プラン"
+  },
+  "empty": {
+    "title": "今週は何も予定がありません",
+    "body": "使える時間をプランナーに伝えると、曲、テンポの目標、ロードマップから、あなたのレベルに合わせて日々を組んでくれます。手で追加することもできます。",
+    "cta": "1週間を計画する"
+  },
+  "day": {
+    "progress": "予定のうち演奏済み",
+    "empty": "練習を追加",
+    "nothing_past": "予定なし",
+    "complete": "すべて演奏済み",
+    "add": "この日に追加",
+    "repeat": "この日をくり返す",
+    "linked_one": "ほか{{count}}日と同期中",
+    "linked_other": "ほか{{count}}日と同期中"
+  },
+  "item": {
+    "menu": "{{title}}のオプション",
+    "warmup": "ウォームアップ",
+    "play": "今すぐ弾く",
+    "mark_done": "演奏済みにする",
+    "undo_done": "未演奏に戻す",
+    "open_goal": "目標を開く",
+    "open_step": "ロードマップのステップを開く",
+    "move": "移動先",
+    "remove": "削除",
+    "goal_bpm": "目標 · {{bpm}} BPM",
+    "change_length": "長さを変える"
+  },
+  "kinds": {
+    "exercise": "エクササイズ",
+    "song": "曲",
+    "goal": "目標",
+    "roadmap": "ロードマップ",
+    "custom": "自分の項目",
+    "routine": "ルーティン"
+  },
+  "song_modes": {
+    "gp": "TAB譜",
+    "sections": "セクション"
+  },
+  "areas": {
+    "technique": "テクニック",
+    "songs": "曲",
+    "theory": "理論",
+    "hearing": "耳",
+    "creativity": "クリエイティブ"
+  },
+  "levels": {
+    "beginner": {
+      "name": "初心者",
+      "hint": "1年目"
+    },
+    "intermediate": {
+      "name": "中級",
+      "hint": "基本はわかる"
+    },
+    "advanced": {
+      "name": "上級",
+      "hint": "何年も弾いている"
+    }
+  },
+  "time": {
+    "minutes_one": "{{count}}分",
+    "minutes_other": "{{count}}分",
+    "hours_one": "{{count}}時間",
+    "hours_other": "{{count}}時間",
+    "hours_minutes": "{{hours}}時間{{minutes}}分",
+    "minutes_short": "{{count}}分"
+  },
+  "planner": {
+    "title": "自動プラン",
+    "reshuffle": "組み直す",
+    "rest_day": "休息日",
+    "apply_one": "{{count}}日分を埋める",
+    "apply_other": "{{count}}日分を埋める",
+    "footer_keep": "手で追加したものと、すでに演奏したものはそのままです。",
+    "footer_replace": "これらの日のまだ演奏していないものは、すべて置き換えられます。",
+    "range": {
+      "label": "日",
+      "rest_of_week": "今週の残り",
+      "next_week": "来週",
+      "two_weeks": "両方"
+    },
+    "minutes": {
+      "label": "1日の時間"
+    },
+    "level": {
+      "label": "あなたのレベル"
+    },
+    "focus": {
+      "label": "重点",
+      "hint": "選んだ分野に多めの時間が割り当てられます。選ばなければ均等に。"
+    },
+    "sources": {
+      "label": "使うもの",
+      "hint": "アプリのほかの場所ですでに取り組んでいるもの。",
+      "songs": "練習中の曲",
+      "songs_learning_one": "練習中{{count}}曲",
+      "songs_learning_other": "練習中{{count}}曲",
+      "songs_wishlist_one": "学びたい{{count}}曲",
+      "songs_wishlist_other": "学びたい{{count}}曲",
+      "songs_empty": "練習中の曲を追加",
+      "goals": "テンポの目標",
+      "goals_empty": "テンポの目標を設定",
+      "roadmaps": "ロードマップのステップ",
+      "roadmaps_empty": "ロードマップを始める"
+    },
+    "advanced": {
+      "label": "詳細オプション",
+      "hint": "スキル、曜日ごと、バリエーション、強度、ウォームアップ",
+      "show": "表示",
+      "hide": "隠す"
+    },
+    "weekdays": {
+      "label": "曜日ごとの時間",
+      "hint": "空欄なら上の時間を使います。0にすると休息日です。",
+      "rest": "休み",
+      "presets": {
+        "same": "毎日同じ",
+        "weekends_off": "週末は休み",
+        "longer_weekends": "週末は長め",
+        "every_other": "1日おき"
+      }
+    },
+    "variety": {
+      "label": "バリエーション",
+      "steady": "安定",
+      "steady_hint": "いつもの少しのドリル",
+      "balanced": "バランス",
+      "balanced_hint": "ときどきくり返し",
+      "explore": "探索",
+      "explore_hint": "毎日何か新しいもの"
+    },
+    "intensity": {
+      "label": "強度",
+      "light": "軽め",
+      "light_hint": "やさしめ、短いブロック",
+      "steady": "ふつう",
+      "steady_hint": "あなたのレベルで",
+      "push": "攻め",
+      "push_hint": "難しめ、長いブロック"
+    },
+    "max_items": {
+      "label": "1日のブロック数",
+      "hint": "最大、ウォームアップを含む"
+    },
+    "toggles": {
+      "warmup": "最初にウォームアップ",
+      "warmup_hint": "毎日、やさしいドリル5分から始めます。",
+      "lightDay": "軽めの日を1日",
+      "lightDay_hint": "週の半ばの1日を半分にして、1週間に余裕を持たせます。",
+      "keepManual": "追加したものを残す",
+      "keepManual_hint": "手で日に入れたものを避けて計画します。"
+    },
+    "subtitle": "あなたの時間、レベル、曲、目標 — 日ごとに並べて",
+    "back": "カレンダーに戻る",
+    "summary": {
+      "blocks_one": "{{count}}ブロック",
+      "blocks_other": "{{count}}ブロック",
+      "rest_one": "休息日{{count}}日",
+      "rest_other": "休息日{{count}}日"
+    },
+    "skills": {
+      "label": "スキル",
+      "hint": "選んだスキルを鍛えるドリルだけ。選ばなければどのスキルでも。",
+      "clear_one": "{{count}}個をクリア",
+      "clear_other": "{{count}}個をクリア"
+    }
+  },
+  "add": {
+    "title": "{{day}}に追加",
+    "description": "タップするたびに、下の長さのブロックが1つ追加されます。",
+    "search": "検索",
+    "practise_with": "練習方法",
+    "no_tab": "Guitar Proファイルが添付されていません — 曲のページで追加してください。",
+    "no_results": "一致するものはありません。",
+    "add_item": "{{title}}を追加",
+    "done": "完了",
+    "custom_title": "練習するもの",
+    "custom_note": "メモ（任意）",
+    "custom_area": "分野",
+    "custom_submit": "この日に追加",
+    "custom_added": "{{title}}を追加しました",
+    "length_minutes": "長さ（分）",
+    "routine_hint": "各項目はルーティンでの長さのままです。",
+    "routine_summary_one": "{{count}}項目 · {{time}}",
+    "routine_summary_other": "{{count}}項目 · {{time}}",
+    "routine_added": "{{title}}を追加しました",
+    "routines_own": "あなたのルーティン",
+    "routines_ready": "既製のもの",
+    "loading": "読み込み中…"
+  },
+  "toast": {
+    "error": "保存できませんでした。もう一度試してください。",
+    "nothing_to_play": "この日に弾くものはもう残っていません。",
+    "planned_one": "{{count}}日分を計画しました",
+    "planned_other": "{{count}}日分を計画しました",
+    "cleared": "今週を空にしました",
+    "removed": "削除しました",
+    "undo": "元に戻す",
+    "linked_one": "{{count}}日が同期されました",
+    "linked_other": "{{count}}日が同期されました",
+    "copied_one": "{{count}}日にコピーしました",
+    "copied_other": "{{count}}日にコピーしました",
+    "unlinked": "この日は単独になりました"
+  },
+  "length": {
+    "title": "長さ",
+    "save": "保存"
+  },
+  "repeat": {
+    "title": "{{day}}をくり返す",
+    "description": "同じ練習を入れる日を選んでください。今そこにあるものは置き換えられます。",
+    "linked_with_one": "ほか{{count}}日と同期中",
+    "linked_with_other": "ほか{{count}}日と同期中",
+    "unlink": "同期をやめる",
+    "same_weekday_one": "来週の同じ曜日",
+    "same_weekday_other": "{{count}}週間、同じ曜日",
+    "sync": "同期を続ける",
+    "sync_on_hint": "どれか1日を変えると、ほかの日もついてきます。チェックはそれぞれの日に残ります。",
+    "sync_off_hint": "1回だけのコピー — そのあとはそれぞれの日が別々になります。",
+    "replaces_one": "{{count}}日の予定を置き換えます。",
+    "replaces_other": "{{count}}日の予定を置き換えます。",
+    "apply_one": "{{count}}日にコピー",
+    "apply_other": "{{count}}日にコピー"
+  },
+  "to_calendar": {
+    "button": "カレンダーに追加",
+    "title": "カレンダーに追加",
+    "day": "日",
+    "submit": "{{day}}に追加",
+    "added": "{{day}}に追加しました",
+    "open": "開く"
+  }
+}

@@ -787,7 +787,20 @@
   },
   "click_hunt": {
     "play_note": "Odtwórz szukany dźwięk",
-    "hear_it": "Posłuchaj"
+    "hear_it": "Posłuchaj",
+    "find_both_on_fret": "Znajdź oba {{note}} na progu {{fret}}",
+    "find_all_on_fret": "Znajdź wszystkie {{note}} na progu {{fret}} (jest ich {{count}})",
+    "to_find_one": "{{count}} pozycja do znalezienia",
+    "to_find_few": "{{count}} pozycje do znalezienia",
+    "to_find_many": "{{count}} pozycji do znalezienia",
+    "to_find_other": "{{count}} pozycji do znalezienia",
+    "left_one": "Jeszcze {{count}}",
+    "left_few": "Jeszcze {{count}}",
+    "left_many": "Jeszcze {{count}}",
+    "left_other": "Jeszcze {{count}}",
+    "all_found": "Wszystkie pozycje znalezione",
+    "hint_scan": "Sprawdź każdą strunę, od góry do dołu.",
+    "hint_same_e": "Cienka struna e ma te same dźwięki co gruba E."
   },
   "strum": {
     "strum": "Uderz w struny",
@@ -993,6 +1006,8 @@
     "untitled": "Nagranie"
   },
   "exam_click_failed": "{{limit}} błędnych kliknięć — egzamin niezaliczony.",
+  "exam_click_time_up": "Runda minęła bez odpowiedzi — egzamin niezaliczony.",
+  "exam_click_rounds_short": "Rozwiązane rundy: {{solved}} — egzamin wymaga {{min}}.",
   "verdict": {
     "time": "{{minutes}} min za Tobą",
     "clean": "Czysto zagrane",

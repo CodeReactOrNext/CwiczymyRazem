@@ -47,7 +47,7 @@ import { EarRiddleStrip } from "./components/EarRiddleStrip";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
 import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
 import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
-import { getRoundVerdictMs, HuntRoundStrip, IntervalRoundStrip, ROUND_VERDICT_TONE } from "./components/HuntRoundStrip";
+import { getRoundVerdictMs, HuntRoundStrip, ROUND_VERDICT_TONE } from "./components/HuntRoundStrip";
 import { OutputStalledNotice } from "./components/OutputStalledNotice";
 import { PlanInterlude } from "./components/PlanInterlude";
 import { PracticeLoadingScreen } from "./components/PracticeLoadingScreen";
@@ -69,6 +69,7 @@ import { SessionUIProvider } from "./contexts/SessionUIContext";
 import { TabOverlayProvider } from "./contexts/TabOverlayContext";
 import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
 import { withBackingTempo } from "./helpers/backingTempoOverlay";
+import { intervalClickExamAccuracy, intervalClickExamMinRounds } from "./helpers/clickExamGrade";
 import { earQuizExamAccuracy, earQuizExamMinAnswers, useEarQuizRunStore } from "./helpers/earQuizRunStore";
 import { useEarQuizVerdictStore } from "./helpers/earQuizVerdictStore";
 import { loadGuitarPlaybackPreference } from "./helpers/guitarPlaybackPreference";
@@ -1182,18 +1183,25 @@ const PracticeSessionInner = ({
   }, [isTimeUp, currentExerciseIndex, stopBarDrill]);
   const [showInterlude, setShowInterlude] = useState(false);
   useEffect(() => { if (showSuccessView) setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null); }, [showSuccessView]);
+  // Interval-click exams pass on hearts and solved rounds, not on the click rate
+  // (see intervalClickExamAccuracy).
+  const isIntervalClickExam = isExamMode && currentExercise.noteHuntConfig?.mode === "intervalClick";
+  const intervalClickMinRounds = intervalClickExamMinRounds(currentExercise.timeInMinutes);
   // The listening quizzes are graded by their own panel, outside the
   // note-matching context, so an exam on one reads its accuracy off the quiz run.
   const examAccuracyOf = (snap: NoteMatchingSnapshot): number => {
+    if (isIntervalClickExam) return intervalClickExamAccuracy(snap.accuracy, snap.solvedRounds ?? 0, intervalClickMinRounds);
     const quizMode = currentExercise.earQuizConfig?.mode;
     if (!quizMode) return snap.accuracy;
     const { correct, answered } = useEarQuizRunStore.getState();
     return earQuizExamAccuracy(correct, answered, earQuizExamMinAnswers(quizMode));
   };
-  // Set by the click-hunt mistake-limit fail path below — shows the same
-  // success/fail modal as a normal exam finish, forced into its failed state,
-  // instead of redirecting away before the player sees why they failed.
-  const [examMistakeFailed, setExamMistakeFailed] = useState(false);
+  // Set by the click-hunt fail paths below (the mistake limit, and a click
+  // round left unanswered) — shows the same success/fail modal as a normal exam
+  // finish, forced into its failed state, instead of redirecting away before the
+  // player sees why they failed.
+  const [examFailReason, setExamFailReason] = useState<"mistakes" | "timeUp" | null>(null);
+  const examMistakeFailed = examFailReason !== null;
   // How the exam ended, by the same rule that saves its stars, so the session
   // summary does not celebrate a failed one. Null until an exam is handed in;
   // an exam left before the end has none and counts as not passed.
@@ -1312,7 +1320,7 @@ const PracticeSessionInner = ({
         hasTrackedPerformance && snap ? { score: snap.score, accuracy: snap.accuracy, ...micStandingRef.current } : null,
         null,
       );
-      completeExam(snap?.accuracy ?? 0, snap?.onTimePct ?? null);
+      completeExam(snap ? examAccuracyOf(snap) : 0, snap?.onTimePct ?? null);
     })();
     // Intentionally narrow deps — this should fire exactly once per showSuccessView
     // transition, not re-run when metronome/save/report identities change each render.
@@ -1343,20 +1351,30 @@ const PracticeSessionInner = ({
 
   // Exam mode, click hunts only: 3 wrong clicks ends the exam immediately as a
   // failure instead of just diluting accuracy (see NoteMatchingProvider's
-  // mistake-tracking effect, which calls this once the limit is hit). Freezes
+  // mistake-tracking effect, which calls this once the limit is hit), and so does
+  // a click round that runs out unanswered (the effect under this). Freezes
   // the session and shows the same success/fail modal as a normal finish,
   // forced into its failed state — score saving, report submission, and
   // navigation only happen once the player acknowledges the modal, instead of
   // silently redirecting away before they see why they failed.
-  const handleExamMistakeFail = useCallback(() => {
+  const failExamEarly = useCallback((reason: "mistakes" | "timeUp") => {
     if (examAutoFinishedRef.current) return;
     examAutoFinishedRef.current = true;
     metronome.stopMetronome();
     stopTimer();
     setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null);
-    setExamMistakeFailed(true);
+    setExamFailReason(reason);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const handleExamMistakeFail = useCallback(() => failExamEarly("mistakes"), [failExamEarly]);
+  // The exam's own clock running out mid-round gives no verdict (see
+  // useNoteHuntRotation's verdictAllowed), so only a round the player let run
+  // out reads as "timeUp" here. Covers both click drills: the interval one and
+  // the plain "find the note" one.
+  const isClickHuntExam = isExamMode && isClickHunt;
+  useEffect(() => {
+    if (isClickHuntExam && huntRoundEnd?.kind === "timeUp") failExamEarly("timeUp");
+  }, [isClickHuntExam, huntRoundEnd, failExamEarly]);
 
   // ── Controls & handlers ───────────────────────────────────────────────────
 
@@ -1595,12 +1613,12 @@ const PracticeSessionInner = ({
     }, RIDDLE_AUTO_ADVANCE_MS);
   }, [recordVerifiedEarPoint, handleEarTrainingGuessed, cancelRiddleAutoAdvance, handleNextRiddleClick]);
 
-  const roundVerdict = huntRoundEnd && !showsVerdict
+  // The interval drill shows its round verdict at the top of its own panel
+  // (IntervalClickPanel); every other hunt keeps it over the session bar.
+  const roundVerdict = huntRoundEnd && !showsVerdict && huntMode !== "intervalClick"
     ? {
         tone: ROUND_VERDICT_TONE[huntRoundEnd.kind],
-        strip: huntMode === "intervalClick"
-          ? <IntervalRoundStrip roundEnd={huntRoundEnd} isExamMode={isExamMode} onContinue={continueHunt} />
-          : <HuntRoundStrip roundEnd={huntRoundEnd} onContinue={continueHunt} />,
+        strip: <HuntRoundStrip roundEnd={huntRoundEnd} onContinue={continueHunt} />,
       }
     : isEarTrainingRiddle && isRiddleRevealed && !showsVerdict
       ? {
@@ -1781,7 +1799,15 @@ const PracticeSessionInner = ({
           intonation={hasTrackedPerformance && !isEarTrainingRiddle && !examMistakeFailed ? successSnapshot.intonation : null}
           intonationBiasCents={successSnapshot.intonationBiasCents ?? null}
           noteLog={hasTrackedPerformance && !isEarTrainingRiddle && !examMistakeFailed ? successSnapshot.noteLog : null}
-          failMessage={examMistakeFailed ? (t("exam_click_failed", { limit: CLICK_EXAM_MISTAKE_LIMIT }) as string) : undefined}
+          failMessage={
+            examFailReason === "timeUp"
+              ? (t("exam_click_time_up") as string)
+              : examFailReason === "mistakes"
+                ? (t("exam_click_failed", { limit: CLICK_EXAM_MISTAKE_LIMIT }) as string)
+                : isIntervalClickExam && (successSnapshot.solvedRounds ?? 0) < intervalClickMinRounds
+                  ? (t("exam_click_rounds_short", { solved: successSnapshot.solvedRounds ?? 0, min: intervalClickMinRounds }) as string)
+                  : undefined
+          }
           eyebrow={goalRun?.summaryEyebrow}
           extraContent={goalVerdict}
           offerRestart={isGoalMode}

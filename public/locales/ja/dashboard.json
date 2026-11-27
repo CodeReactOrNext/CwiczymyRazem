@@ -1,0 +1,250 @@
+{
+  "daily_quests": {
+    "title": "デイリークエスト",
+    "reward_hint": "{{total}}個すべてクリアで獲得",
+    "time_left": "残り{{time}}",
+    "new_in": "新しいクエストまで{{time}}",
+    "claim_reward": "報酬を受け取る",
+    "all_done": "今日はすべて完了",
+    "tasks": {
+      "rate_song": "曲を評価する",
+      "add_want_to_learn": "曲を「練習したい」に追加",
+      "practice_any_song": "好きな曲を練習する",
+      "healthy_habits": "健康的な習慣を2つ使う",
+      "auto_plan": "オートプランを作って練習する",
+      "practice_plan": "練習プランを1つ完了する",
+      "practice_total_time": "15分練習する",
+      "practice_technique_time": "テクニックを10分練習する",
+      "practice_specific_exercise": "練習：{{exercise}}",
+      "practice_theory_time": "理論を10分練習する",
+      "practice_hearing_time": "耳を10分鍛える",
+      "practice_creativity_time": "10分クリエイティブに弾く",
+      "creativity_focus": "クリエイティブに15分使う",
+      "long_session": "合計30分練習する",
+      "well_rounded": "3つの異なるカテゴリーを練習する",
+      "two_categories_min": "2つのカテゴリーをそれぞれ5分練習する",
+      "balanced_session": "1回のセッションでテクニックと理論を練習する",
+      "rate_multiple_songs": "曲を3つ評価する",
+      "complete_two_plans": "練習プランを2つ完了する",
+      "improve_skill": "どれかのスキルでポイントを獲得する",
+      "practice_three_exercises": "3つの異なるエクササイズを練習する",
+      "goal_run_other": "目標のエクササイズを{{count}}回弾く",
+      "calendar_tick": "カレンダーの項目をチェックするか、1つ予定を入れる",
+      "rotation_item_other": "ローテーションから{{count}}項目を弾く",
+      "journey_step": "ジャーニーのステップを1つ終える",
+      "roadmap_step": "ロードマップのステップを練習する",
+      "tempo_cleared": "ツリーでテンポを1つクリアする",
+      "daily_exercise": "今日のデイリーエクササイズを弾く",
+      "duel_run": "デュエルを1回プレイする",
+      "boss_attempt": "ボスに挑戦する",
+      "challenge_play": "今月のチャレンジ曲を練習する",
+      "guild_contribution": "ギルドに貢献する",
+      "ear_round": "Play by Earを1ラウンドプレイする"
+    },
+    "slot_discover": "あなたへの新提案",
+    "slot_comeback": "久しぶりの再挑戦",
+    "reroll": "このクエストを入れ替える",
+    "reroll_hint": "入れ替えは1日1回",
+    "swap": "入れ替え",
+    "swap_cancel": "キャンセル",
+    "swap_pick": "入れ替えるクエストを選んでください。入れ替えは1日1回です。"
+  },
+  "customize": {
+    "refreshing": "更新中…",
+    "hint": "カードをドラッグして並べ替え、不要なものは隠して、必要なものを追加しましょう。",
+    "add_widget": "ウィジェットを追加",
+    "reset": "リセット",
+    "done": "完了",
+    "customize": "カスタマイズ",
+    "empty_title": "まだ何もありません。",
+    "empty_editing": "ウィジェットを追加してこのスペースを埋めましょう。",
+    "empty_hint": "ホームをカスタマイズすると、ここにカードを戻せます。"
+  },
+  "widget_groups": {
+    "practice": "練習",
+    "progress": "進捗",
+    "milestones": "ウィークリー目標",
+    "community": "コミュニティ"
+  },
+  "widgets": {
+    "daily-quests": {
+      "title": "デイリークエスト",
+      "description": "今日の3つのタスクと受け取りボタン。"
+    },
+    "daily-exercise": {
+      "title": "今日のエクササイズ",
+      "description": "マイクで採点される全員共通のエクササイズ。毎日新しくなり、その日のトップ5も表示。"
+    },
+    "practice-stats": {
+      "title": "今週",
+      "description": "1日の目標に対する毎日の練習時間と連続記録。"
+    },
+    "streak": {
+      "title": "連続記録",
+      "description": "連続日数、それで得られるポイントボーナス、今日の練習が済んだかどうか。"
+    },
+    "shortcuts": {
+      "title": "ショートカット",
+      "description": "アプリのどこへでも行ける、自分だけのクイックリンク。"
+    },
+    "recent-sessions": {
+      "title": "最近のセッション",
+      "description": "直近10回の記録。その場で編集できます。"
+    },
+    "activity-log": {
+      "title": "アクティビティ",
+      "description": "今年練習した日ごとにマスが1つ。"
+    },
+    "level-rewards": {
+      "title": "レベル報酬",
+      "description": "次のレベルで解放されるものと、レベルアップで受け取ったもの。"
+    },
+    "songs": {
+      "title": "曲",
+      "description": "マスター済み・練習中・練習したい曲の数と、あなたの曲ティア。"
+    },
+    "rank": {
+      "title": "あなたの順位",
+      "description": "通算ランキングと、開催中のシーズンでの順位。"
+    },
+    "monthly-challenge": {
+      "title": "月間チャレンジ",
+      "description": "今月の5曲と、レコーディング済みの曲。"
+    }
+  },
+  "add_sheet": {
+    "title": "ホームに追加",
+    "description": "最初に見たいものを選びましょう。新しいカードは一番下に入るので、好きな場所へドラッグしてください。",
+    "empty": "すべてホームに表示されています。"
+  },
+  "frame": {
+    "move": "{{title}}を移動",
+    "drag": "ドラッグで移動",
+    "make_half": "{{title}}を半分の幅にする",
+    "make_full": "{{title}}を全幅にする",
+    "half": "半分の幅",
+    "full": "全幅",
+    "hide": "{{title}}を隠す",
+    "hide_from_home": "ホームから隠す",
+    "empty": "今は表示するものがありません。このカードは中身があるときだけ表示されます。"
+  },
+  "support": {
+    "title": "Riff Questづくりを応援する",
+    "body": "Riff Questは1人で作っている、無料でオープンなプロジェクトです。あなたの応援がそれを支えています。",
+    "cta": "応援する"
+  },
+  "shortcuts": {
+    "title": "ショートカット",
+    "tap_to_pin": "行き先をタップしてピン留め。",
+    "limit_reached": "これで満杯です — 入れ替えるには1つ外してください。",
+    "up_to": "最大{{count}}個まで。",
+    "empty": "ピン留めしたショートカットはまだありません。ホームをカスタマイズして追加しましょう。",
+    "custom": {
+      "title": "あなたのショートカット",
+      "hint": "エクササイズのページでフィルターを設定して、ここにピン留めできます。",
+      "remove": "{{label}}を削除"
+    },
+    "groups": {
+      "practice": "練習",
+      "songs": "曲",
+      "library": "マイページ",
+      "progress": "進捗",
+      "community": "コミュニティ",
+      "gear": "Arsenal",
+      "other": "その他"
+    },
+    "items": {
+      "practice-plans": "練習プラン",
+      "practice-auto": "オートプラン",
+      "practice-free-timer": "フリータイマー",
+      "practice-report": "手動で記録",
+      "practice-gp-tabs": "Guitar Proファイル",
+      "practice-skills": "スキル",
+      "practice-exercises": "エクササイズ",
+      "practice-roadmaps": "Mastery Roadmaps",
+      "practice-journey": "ラーニングパス",
+      "practice-scale-map": "スケールマップ",
+      "songs-board": "曲ボード",
+      "songs-explore": "曲を探す",
+      "songs-playlists": "プレイリスト",
+      "library-favorites": "お気に入り",
+      "library-plans": "マイプラン",
+      "library-exercises": "マイエクササイズ",
+      "library-create-plan": "プランを作成",
+      "library-create-exercise": "エクササイズを作成",
+      "progress-activity": "アクティビティ",
+      "progress-milestones": "マイルストーン",
+      "community-rankings": "ランキング",
+      "progress-challenges": "チャレンジ",
+      "recordings": "レコーディング",
+      "community-guilds": "ギルド",
+      "arsenal": "Arsenal",
+      "tone-studio": "Tone Studio",
+      "wiki": "ナレッジベース",
+      "settings": "設定"
+    }
+  },
+  "streak": {
+    "title": "連続記録",
+    "day": "日",
+    "days": "日",
+    "bonus": "毎回のセッションでポイント+{{pct}}%",
+    "done_today": "今日の分はばっちり。",
+    "not_yet": "今日はまだ記録がありません。短いセッションでも記録は続きます。",
+    "practice_now": "今すぐ練習",
+    "rest_free": "休息日が使えます。今週1日休んでも連続記録は途切れません。",
+    "rest_used": "今週の休息日は使用済みです。次は月曜日に使えます。",
+    "rest_yesterday": "昨日は休息日でした。今日弾けば連続記録が続きます。"
+  },
+  "rank": {
+    "title": "あなたの順位",
+    "rankings": "ランキング",
+    "all_time": "通算",
+    "not_on_board": "まだランキングに載っていません。",
+    "no_season_points": "今シーズンのポイントはまだありません。",
+    "this_season": "今シーズン",
+    "points_level": "ポイント · レベル{{level}}"
+  },
+  "challenge": {
+    "ends_today": "今日で終了",
+    "one_day_left": "残り1日",
+    "days_left": "残り{{count}}日",
+    "player": "プレイヤー",
+    "title": "月間チャレンジ",
+    "open": "チャレンジを開く",
+    "none": "開催中のチャレンジはありません。次のボードは新しい月に始まります。",
+    "practice_song": "{{artist}}の{{title}}を練習",
+    "recorded": "レコーディング済み",
+    "submit_song": "{{title}}のレコーディングを投稿",
+    "submit": "レコーディングを投稿",
+    "recorded_count": "{{count}}曲レコーディング済み",
+    "x_of_y": "{{done}} / {{total}}"
+  },
+  "songs": {
+    "title": "曲",
+    "board": "曲ボード",
+    "error": "曲を読み込めませんでした。"
+  },
+  "errors": {
+    "claim_failed": "受け取りに失敗しました",
+    "claim_success": "{{name}}から+{{reward}} Fame",
+    "layout_save": "ホームのレイアウトを保存できませんでした"
+  },
+  "daily_exercise": {
+    "open_spot": "空き枠",
+    "open_spot_hint": "弾いて獲得しよう",
+    "title": "今日のエクササイズ",
+    "none_today": "今日のエクササイズはありません。",
+    "beat_score": "自己ベストを更新",
+    "play": "プレイ",
+    "board_error": "ボードを読み込めませんでした。",
+    "prize": "1位の賞品",
+    "wins": "1位が獲得",
+    "mod": "{{label}} Mod",
+    "time_left": "残り{{time}}",
+    "your_best": "自己ベスト {{score}}",
+    "gap_to_first": "1位まであと{{gap}}",
+    "leading": "トップです",
+    "ahead_of_second": "2位と{{gap}}差"
+  }
+}

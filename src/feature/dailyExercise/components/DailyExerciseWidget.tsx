@@ -168,7 +168,7 @@ export const DailyExerciseWidget = () => {
         title={t("daily_exercise.title")}
         className='mb-6'
         action={
-          <span className='flex shrink-0 items-center gap-1.5 text-[13px] font-semibold tabular-nums text-orange-400'>
+          <span className='flex shrink-0 items-center gap-1.5 text-[13px] font-semibold tabular-nums text-white'>
             <Clock size={14} strokeWidth={2.5} aria-hidden />
             {t("daily_exercise.time_left", { time: formatTimeLeft(msLeft) })}
           </span>

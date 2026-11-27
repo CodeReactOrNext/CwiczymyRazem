@@ -1,3 +1,5 @@
+import { intervalClickLessonExercises } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickLessons";
+import { intervalClickWholeFretboardExercise } from "feature/exercisePlan/data/exerises/intervalClick/intervalClickWholeFretboard";
 import {
   intervalTuneExamBpm,
   intervalTuneExercises,
@@ -91,13 +93,18 @@ const baseStep = (content: StepContent, examGoal: string, defaultIcon: string) =
   contentBlocks: content.contentBlocks,
 });
 
-/** Answered on the fretboard diagram: place a root, click the interval. */
-const clickStep = (content: StepContent) =>
-  baseStep(
+const CLICK_EXERCISES = [...intervalClickLessonExercises, intervalClickWholeFretboardExercise];
+
+/** Answered on the fretboard diagram: place a root, click the interval. Passed
+ *  on hearts, see intervalClickExamAccuracy. */
+const clickStep = (content: StepContent) => {
+  const minutes = CLICK_EXERCISES.find((exercise) => exercise.id === content.exerciseId)?.timeInMinutes ?? 2;
+  return baseStep(
     content,
-    "Place each root and click the interval above it with at least 93% accuracy. The exam gives you 10 seconds a round, and three wrong clicks end it.",
+    `Place each root and click the interval above it, round after round, for ${minutes} minutes. Every round has to be answered within 10 seconds: a round that runs out ends the exam, and so do three wrong clicks. A cleaner run earns more stars.`,
     "Target",
   );
+};
 
 /** Answered by ear: the app plays, you name what you heard. */
 const earStep = (content: StepContent) =>

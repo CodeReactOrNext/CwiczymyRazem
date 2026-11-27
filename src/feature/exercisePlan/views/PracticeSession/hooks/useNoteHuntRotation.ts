@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { Exercise, HuntPrompt } from "../../../types/exercise.types";
 import { isClickAnsweredMode } from "../../../utils/huntModes";
+import { EXAM_CLICK_ROTATE_SECONDS } from "../helpers/clickExamGrade";
 
 export interface HuntTarget {
   goal: string;
@@ -50,12 +51,6 @@ export interface NoteHuntRotation {
 // Once the player has fully solved the current goal, fast-forward the countdown
 // to at most this many seconds so it advances to the next target quickly.
 const SOLVED_FASTFORWARD_SECONDS = 3;
-
-// Click-mode hunts (no mic, no physical constraint) get a much shorter rotation
-// in exam mode than in free practice — the wide-open practice window (25s) let
-// players brute-force every cell on the board with zero risk. 10s still allows a
-// careful scan but no longer tolerates aimlessly clicking the whole diagram.
-const EXAM_CLICK_ROTATE_SECONDS = 10;
 
 // "advanceOn: solved" pacing. The hold lets the reveal land before the next
 // target replaces it; the settle window keeps the guard closed a beat longer,
@@ -123,6 +118,10 @@ export function useNoteHuntRotation(
   // Click-answered rounds keep their verdict in exams: it doesn't stop the clock.
   const isClickAnswered = isClickAnsweredMode(exercise.noteHuntConfig?.mode);
   const endsOnVerdict = countsDown && (!isExamMode || isClickAnswered) && verdictAllowed && !!exercise.noteHuntConfig?.roundVerdict;
+  // Exam click rounds with no verdict of their own (the plain click drill) still
+  // can't run out unanswered: the miss reads as "timeUp", which ends the exam
+  // (PracticeSession). A solved round is moved on by its panel, as in practice.
+  const failsUnanswered = countsDown && isExamClickHunt && verdictAllowed && !endsOnVerdict;
 
   const [roundEnd, setRoundEnd] = useState<HuntRoundEnd | null>(null);
   const [streak, setStreak] = useState(0);
@@ -184,6 +183,12 @@ export function useNoteHuntRotation(
         endRound("timeUp", rotateSeconds);
         return;
       }
+      if (failsUnanswered && secondsRef.current <= 1 && !solvedRef?.current) {
+        secondsRef.current = 0;
+        setSecondsLeft(0);
+        endRound("timeUp", rotateSeconds);
+        return;
+      }
       // Goal complete → hurry to the next target.
       if (!endsOnVerdict && solvedRef?.current && secondsRef.current > SOLVED_FASTFORWARD_SECONDS) {
         secondsRef.current = SOLVED_FASTFORWARD_SECONDS;
@@ -197,7 +202,7 @@ export function useNoteHuntRotation(
       setSecondsLeft(secondsRef.current);
     }, 1000);
     return () => clearInterval(id);
-  }, [countsDown, isPlaying, isRoundOver, endsOnVerdict, endRound, rotateSeconds, solvedRef]);
+  }, [countsDown, isPlaying, isRoundOver, endsOnVerdict, failsUnanswered, endRound, rotateSeconds, solvedRef]);
 
   // Bar-locked pacing: the change lands on the bar line, and the countdown shows
   // the time left in the current group of bars.

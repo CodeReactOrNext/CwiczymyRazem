@@ -1,0 +1,446 @@
+{
+  "tabs": {
+    "my_plans": "マイプラン",
+    "library": "エクササイズライブラリ",
+    "practice": "練習"
+  },
+  "filters": {
+    "all": "すべて",
+    "difficulty": "難易度",
+    "category": "カテゴリー",
+    "categories": {
+      "technique": "テクニック",
+      "theory": "理論",
+      "creativity": "クリエイティブ",
+      "hearing": "耳コピ",
+      "mixed": "ミックス"
+    }
+  },
+  "library": {
+    "title": "エクササイズライブラリ",
+    "search_placeholder": "エクササイズを検索...",
+    "no_exercises": "エクササイズが見つかりません",
+    "add_exercise": "エクササイズを追加",
+    "recommended": "あなたへのおすすめ",
+    "all_exercises": "すべてのエクササイズ",
+    "fetch_error": "エクササイズを読み込めませんでした",
+    "no_exercises_yet": "まだエクササイズを作っていません",
+    "create_first": "最初のエクササイズを作る",
+    "no_matches": "フィルターに一致するエクササイズはありません"
+  },
+  "practice": {
+    "start": "練習を始める",
+    "pause": "一時停止",
+    "resume": "再開",
+    "next": "次のエクササイズ",
+    "finish": "セッションを終える",
+    "notes": "練習メモ",
+    "metronome": {
+      "title": "メトロノーム",
+      "bpm": "BPM",
+      "start": "開始",
+      "target": "目標",
+      "max": "最大"
+    }
+  },
+  "my_plans": {
+    "title": "マイ練習プラン",
+    "create_new": "新しいプランを作成",
+    "start": "スタート",
+    "edit": "編集",
+    "delete": "削除",
+    "no_plans": "練習プランはまだありません",
+    "create_dialog": {
+      "title": "新しいエクササイズプランを作成",
+      "description": "新しいエクササイズプランを作って、練習ルーティンを整理しましょう",
+      "plan_title": "プランのタイトル",
+      "plan_description": "プランの説明",
+      "exercises": "エクササイズを選ぶ",
+      "add_exercise": "エクササイズを追加",
+      "exercise": "エクササイズ",
+      "exercise_title": "エクササイズのタイトル",
+      "exercise_description": "エクササイズの説明",
+      "duration": "長さ（分）",
+      "metronome": "メトロノームの設定",
+      "min_bpm": "最小BPM",
+      "max_bpm": "最大BPM",
+      "recommended_bpm": "おすすめBPM",
+      "order_exercises": "エクササイズの順番",
+      "order_description": "エクササイズをドラッグして順番を変えましょう。ウォームアップから始めて、難しいエクササイズで終えるのがおすすめです。",
+      "selected_exercises": "選んだエクササイズ（{{count}}）",
+      "select_exercises_description": "プランに追加したいエクササイズを選んでください"
+    },
+    "form": {
+      "title": "プランのタイトル",
+      "title_placeholder": "プランのタイトルを入力...",
+      "description": "説明",
+      "description_placeholder": "練習プランについて書いてください...",
+      "difficulty": "難易度",
+      "category": "メインの焦点",
+      "create": "プランを作成"
+    },
+    "create_success": "プランを作成しました",
+    "create_success_description": "練習プランが作成されました",
+    "create_error": "プランを作成できませんでした",
+    "create_error_description": "プランの作成中に問題が発生しました。もう一度試してください。",
+    "empty_state": "練習プランはまだありません",
+    "custom_plans": "カスタムプラン",
+    "custom_plans_description": "あなた専用の練習プラン",
+    "predefined_plans": "既製のプラン",
+    "predefined_plans_description": "私たちが用意した練習プラン",
+    "create_plan": "プランを作成",
+    "create_first": "最初のプランを作る",
+    "no_custom_plans": "カスタムの練習プランはまだありません",
+    "update_success": "プランを保存しました",
+    "update_error": "プランを保存できませんでした"
+  },
+  "categories": {
+    "technique": "テクニック",
+    "theory": "理論",
+    "creativity": "クリエイティブ",
+    "hearing": "耳コピ",
+    "mixed": "ミックス"
+  },
+  "difficulty": {
+    "beginner": "入門",
+    "easy": "やさしい",
+    "medium": "ふつう",
+    "hard": "難しい"
+  },
+  "common": {
+    "duration": "{{minutes}}分",
+    "exercises": "エクササイズ",
+    "difficulty": "難易度",
+    "category": "カテゴリー",
+    "skills": "スキル",
+    "instructions": "やり方",
+    "tips": "コツ",
+    "min": "分",
+    "cancel": "キャンセル",
+    "create": "作成",
+    "edit": "編集",
+    "preview": "プレビュー",
+    "save": "変更を保存",
+    "back_to_edit": "編集に戻る",
+    "back": "戻る",
+    "selected": "選択中",
+    "recommended": "おすすめ",
+    "more": "さらに",
+    "loading": "読み込み中...",
+    "next": "次へ"
+  },
+  "practice_session": {
+    "title": "練習セッション",
+    "current_exercise": "今のエクササイズ",
+    "next_up": "次は",
+    "complete": "エクササイズを完了",
+    "skip": "次へ",
+    "finish": "セッションを終える",
+    "metronome": "メトロノーム",
+    "notes": "練習メモ",
+    "save_note": "メモを保存",
+    "time_practiced": "練習した時間",
+    "streak": "現在の連続記録",
+    "next_milestone": "次のマイルストーン",
+    "no_exercise": "エクササイズが見つかりません",
+    "exit": "セッションを抜ける",
+    "load_error": "練習プランを読み込めませんでした",
+    "plan_not_found": "練習プランが見つかりません",
+    "total_progress": "全体の進み具合",
+    "exercises": "エクササイズ",
+    "session_time": "セッション時間",
+    "total_duration": "合計時間",
+    "tablature": "TAB譜",
+    "fullscreen": "全画面の切り替え",
+    "zoom_in": "拡大",
+    "zoom_out": "縮小",
+    "reset_zoom": "ズームをリセット",
+    "timer": "タイマー",
+    "start_timer": "タイマーを開始",
+    "pause_timer": "タイマーを一時停止",
+    "time_left": "残り時間"
+  },
+  "exercise_cards": {
+    "beginner_fingerpicking": {
+      "title": "初心者のフィンガーピッキング",
+      "description": "初心者に欠かせないフィンガーピッキングのパターン"
+    },
+    "scale_mastery": {
+      "title": "スケールマスター：ペンタトニックの基礎",
+      "description": "欠かせないペンタトニックスケールのパターンをマスター"
+    },
+    "rhythm_mastery": {
+      "title": "リズムマスター：ストロークパターン",
+      "description": "いろいろなジャンルに欠かせないストロークパターン"
+    },
+    "music_theory": {
+      "title": "音楽理論の基礎",
+      "description": "ギタリストに欠かせない音楽理論の考え方"
+    }
+  },
+  "skills": {
+    "fingerpicking": "フィンガーピッキング",
+    "scales": "スケール",
+    "chords": "コード",
+    "rhythm": "リズム",
+    "theory": "理論",
+    "ear_training": "耳トレ",
+    "sight_reading": "初見演奏",
+    "improvisation": "アドリブ",
+    "technique": "テクニック",
+    "music_theory": "音楽理論"
+  },
+  "exercise": {
+    "create_dialog": {
+      "title": "新しいエクササイズを作成",
+      "description": "練習プランに追加できる新しいエクササイズを作ります",
+      "details": "詳細",
+      "start_practice": "練習を始める",
+      "exercise_title": "エクササイズのタイトル",
+      "exercise_description": "エクササイズの説明",
+      "metronome_settings": "メトロノームの設定",
+      "min_bpm": "最小BPM",
+      "max_bpm": "最大BPM",
+      "recommended_bpm": "おすすめBPM",
+      "media": "メディア",
+      "video_url": "動画のURL（YouTube、Vimeoなど）",
+      "notation_url": "楽譜／TAB譜のURL",
+      "attachments": "添付ファイル",
+      "tabs": {
+        "basic": "基本情報",
+        "details": "詳細",
+        "media": "メディア"
+      },
+      "instructions_placeholder": "エクササイズのステップごとのやり方...",
+      "tips_placeholder": "練習に役立つコツ...",
+      "skills_select": "このエクササイズで伸ばすスキルを選んでください",
+      "settings_description": "エクササイズの設定",
+      "metronome_description": "このエクササイズのテンポの範囲を設定します"
+    },
+    "edit_dialog": {
+      "title": "エクササイズを編集",
+      "description": "エクササイズの詳細を変更します"
+    },
+    "create_success": "エクササイズを作成しました",
+    "create_error": "エクササイズを作成できませんでした",
+    "create_success_description": "エクササイズが作成され、ライブラリに追加されました",
+    "create_error_description": "エクササイズの作成中に問題が発生しました。もう一度試してください。",
+    "focus_areas": "重点分野",
+    "category": "カテゴリー",
+    "related_skills": "関連スキル",
+    "instructions": "やり方",
+    "tips": "コツ",
+    "metronome": "メトロノームの設定",
+    "min_bpm": "最小BPM",
+    "recommended_bpm": "おすすめBPM",
+    "max_bpm": "最大BPM",
+    "practice_speed": "練習の速さ",
+    "start_at": "開始",
+    "target": "目標",
+    "max": "最大",
+    "bpm": "BPM",
+    "next": "次のエクササイズ",
+    "finish": "セッションを終える",
+    "go_to_report": "記録へ",
+    "tab": "TAB譜"
+  },
+  "welcome": {
+    "title": "ギター練習へようこそ",
+    "description": "ギターの上達を助ける、あなた専用の練習アシスタント",
+    "quick_start": "クイックスタートガイド",
+    "get_started": "今すぐ始める",
+    "features": {
+      "library": {
+        "title": "エクササイズライブラリ",
+        "description": "あらゆるレベル向けに作られたエクササイズのコレクションを見てみましょう",
+        "action": "ライブラリを見る"
+      },
+      "plans": {
+        "title": "練習プラン",
+        "description": "目標を達成するための、自分だけの練習ルーティンを作りましょう",
+        "action": "プランを作成"
+      },
+      "progress": {
+        "title": "進捗を記録",
+        "description": "上達を確認して、やる気を保ちましょう",
+        "action": "進捗を見る"
+      }
+    },
+    "steps": {
+      "browse": "エクササイズライブラリを見て、自分のレベルに合うエクササイズを見つける",
+      "create": "練習プランを作るか、ルーティンに個別のエクササイズを追加する",
+      "practice": "内蔵のメトロノームとタイマーで練習を始める",
+      "track": "進捗を記録して、上達を祝う"
+    }
+  },
+  "tooltips": {
+    "metronome": "メトロノームでリズムを保ち、少しずつ速くしていきましょう",
+    "timer": "練習時間を決めると集中しやすく、練習時間の記録にもなります",
+    "difficulty": "今のレベルに合うエクササイズから始めましょう",
+    "skills": "特定のギターのテクニックを伸ばすエクササイズに集中しましょう"
+  },
+  "empty_states": {
+    "no_exercises": {
+      "title": "ギターのエクササイズを見つけよう",
+      "description": "厳選したギターのエクササイズのコレクションで始めるか、自分で作りましょう",
+      "browse": "ライブラリを見る",
+      "create": "エクササイズを作成",
+      "features": {
+        "browse": "エクササイズを探す",
+        "browse_desc": "自分のレベルと興味に合うエクササイズを見つけましょう",
+        "create": "カスタムエクササイズ",
+        "create_desc": "自分の練習用エクササイズを作って共有しましょう"
+      }
+    },
+    "no_plans": {
+      "title": "ギターの旅を始めよう",
+      "description": "最初の練習プランを作って、ギターの腕を伸ばしましょう",
+      "action": "最初のプランを作る",
+      "features": {
+        "practice": "体系的な練習",
+        "practice_desc": "カスタマイズしたプランで練習ルーティンを整理しましょう",
+        "learn": "進捗を記録",
+        "learn_desc": "進捗の記録で上達を確認して、やる気を保ちましょう"
+      }
+    }
+  },
+  "help": {
+    "title": "ヘルプとはじめ方",
+    "description": "エクササイズ機能を上手に使う方法",
+    "need_help": "お困りですか？",
+    "watch_video": "チュートリアルを見る",
+    "getting_started": {
+      "title": "はじめに",
+      "content": "エクササイズプランの作り方と進め方の基本"
+    },
+    "creating_plans": {
+      "title": "練習プランを作る",
+      "content": "目標に合った効果的な練習プランの作り方"
+    }
+  },
+  "goals": {
+    "current_streak": "現在の連続記録",
+    "best_streak": "最高の連続記録",
+    "days": "日",
+    "weekly_goal": "今週の目標",
+    "minutes": "分",
+    "keep_going": "その調子！　うまくいっています！",
+    "almost_there": "あと少し！",
+    "goal_reached": "目標達成！ 🎉"
+  },
+  "progression": {
+    "level_up": "レベルアップ！",
+    "new_milestone": "新しいマイルストーンに到達",
+    "next_milestone": "次のマイルストーン",
+    "mastery": "習熟度",
+    "difficulty": "現在の難易度"
+  },
+  "quick_practice": {
+    "title": "クイック練習セッション",
+    "description": "使える時間に合わせて、ランダムな練習プランを作ります",
+    "duration": "使える時間",
+    "difficulty": "レベル",
+    "focus": "練習の焦点",
+    "generate": "プランを作る",
+    "no_exercises": "この条件に合うエクササイズが見つかりません",
+    "shortcuts": {
+      "title": "キーボードショートカット",
+      "duration": "長さを調整",
+      "difficulty": "難易度を選ぶ",
+      "category": "カテゴリーを選ぶ",
+      "generate": "プランを作る",
+      "close": "ダイアログを閉じる"
+    }
+  },
+  "plan": {
+    "create_title": "新しい練習プランを作成",
+    "create_description": "エクササイズを選んで好きな順番に並べ、自分だけの練習プランを作りましょう。",
+    "title": "プランのタイトル",
+    "title_placeholder": "例：毎日のフィンガーピッキング練習",
+    "description": "プランの説明",
+    "description_placeholder": "練習プランについて書いてください...",
+    "exercises": "選んだエクササイズ",
+    "add_exercise": "エクササイズを追加",
+    "select_exercises": "エクササイズを選ぶ",
+    "create_success": "練習プランを作成しました",
+    "total_duration": "合計時間：{{duration}}分",
+    "steps": {
+      "details": "詳細",
+      "exercises": "エクササイズを選ぶ",
+      "order": "順番"
+    },
+    "categories": "カテゴリー",
+    "selected_exercises": "選んだエクササイズ：{{count}}",
+    "tips": {
+      "good_description": "良い説明があると、あとでこの練習プランの目的を思い出しやすくなります",
+      "exercise_order": "エクササイズをドラッグして順番を変えましょう。ウォームアップから始めて、難しいエクササイズで終えるのがおすすめです。"
+    },
+    "summary": "プランのまとめ",
+    "total_exercises": "エクササイズの数",
+    "total_duration_label": "合計時間",
+    "create": "プランを作成"
+  },
+  "errors": {
+    "auth_required": "プランを作るにはログインが必要です",
+    "create_plan_failed": "練習プランを作成できませんでした",
+    "load_plan_failed": "練習プランを読み込めませんでした",
+    "load_plans_failed": "プランを読み込めませんでした"
+  },
+  "exercise_complete": {
+    "title": "エクササイズ完了！",
+    "duration": "長さ：{{duration}}分",
+    "repeat": "エクササイズをくり返す",
+    "continue": "続ける"
+  },
+  "metronome": {
+    "recommended_tempo": "おすすめテンポ",
+    "start": "スタート",
+    "stop": "ストップ"
+  },
+  "instructions": "やり方",
+  "hints": "ヒント",
+  "no_instructions": "説明はありません。",
+  "auto_plan": {
+    "title": "自動作成の練習プラン",
+    "description": "使える時間に合わせて、ランダムな練習プランを作ります",
+    "duration": "使える時間",
+    "difficulty": "レベル",
+    "focus": "練習の焦点",
+    "generate": "プランを作る",
+    "generated_plan": "作成したプラン",
+    "no_exercises": "この条件に合うエクササイズが見つかりません"
+  },
+  "plans": {
+    "title": "練習プランを選ぶ",
+    "description": "いちばん合うプランを選んでください",
+    "exercises_count": "{{count}}エクササイズ",
+    "exercises_count_one": "{{count}}エクササイズ"
+  },
+  "custom_exercise": {
+    "title": "カスタムエクササイズを作成",
+    "description": "プランに特定のエクササイズを追加します。",
+    "exercise_title": "タイトル",
+    "exercise_desc": "説明",
+    "duration": "長さ（分）",
+    "category": "カテゴリー",
+    "difficulty": "難易度",
+    "title_required": "タイトルは必須です",
+    "created_success": "カスタムエクササイズを追加しました",
+    "edit_success": "カスタムエクササイズを更新しました",
+    "clone_success": "カスタムエクササイズを複製しました",
+    "button_label": "カスタムエクササイズを追加",
+    "edit_button": "編集",
+    "clone_button": "複製",
+    "save_button": "変更を保存",
+    "instructions": "やり方",
+    "tips": "コツとヒント",
+    "add_instruction_placeholder": "ステップを追加（Enterで確定）",
+    "add_tip_placeholder": "コツを追加（Enterで確定）",
+    "no_instructions_hint": "説明はまだ追加されていません。",
+    "no_tips_hint": "コツはまだ追加されていません。",
+    "use_metronome": "メトロノーム",
+    "video_url": "YouTubeのリンク",
+    "image_url": "画像のURL（TAB譜／楽譜）",
+    "invalid_image": "画像のURLが正しくありません"
+  }
+}

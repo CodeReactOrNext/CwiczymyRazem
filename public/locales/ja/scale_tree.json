@@ -1,0 +1,107 @@
+{
+  "view": {
+    "close_sidebar": "サイドバーを閉じる",
+    "open_selector": "スケールの選択を開く",
+    "scales": "スケール",
+    "back_to_practice": "練習に戻る",
+    "practice": "練習"
+  },
+  "scales": {
+    "minor_pentatonic": "マイナーペンタトニック",
+    "major_pentatonic": "メジャーペンタトニック",
+    "minor": "ナチュラルマイナー",
+    "major": "メジャースケール",
+    "dorian": "ドリアン",
+    "phrygian": "フリジアン",
+    "mixolydian": "ミクソリディアン",
+    "lydian": "リディアン",
+    "locrian": "ロクリアン"
+  },
+  "families": {
+    "pentatonic": {
+      "tree": "ペンタトニックのツリー",
+      "label": "ペンタトニック",
+      "group": "ペンタトニック"
+    },
+    "diatonic": {
+      "tree": "ダイアトニックのツリー",
+      "label": "ダイアトニックスケール",
+      "group": "ダイアトニック"
+    },
+    "mode": {
+      "tree": "モードのツリー",
+      "label": "モード",
+      "group": "モード"
+    }
+  },
+  "grid": {
+    "title": "{{root}} {{scale}}",
+    "done": "完了",
+    "key": "キー"
+  },
+  "shape": {
+    "box": "ボックス{{n}}",
+    "fret": "{{n}}フレット",
+    "fret_lc": "{{n}}フレット"
+  },
+  "patterns": {
+    "ascending": "上昇",
+    "descending": "下降",
+    "ascending_descending": "上昇＋下降",
+    "intervals_thirds": "3度",
+    "intervals_fourths": "4度",
+    "sequence_3_notes": "3音シーケンス",
+    "sequence_4_notes": "4音シーケンス"
+  },
+  "patterns_short": {
+    "ascending": "上昇",
+    "descending": "下降",
+    "ascending_descending": "上昇・下降",
+    "intervals_thirds": "3度",
+    "intervals_fourths": "4度",
+    "sequence_3_notes": "3音シーケンス",
+    "sequence_4_notes": "4音シーケンス"
+  },
+  "node": {
+    "record": "記録：{{bpm}} BPM",
+    "reward": "報酬",
+    "single_string": "1本の弦",
+    "single_string_cap": "1本の弦"
+  },
+  "reward": {
+    "collected": "ボックスの報酬は受け取り済み",
+    "collect": "ボックスをクリア — 受け取ろう",
+    "left_final": "残り{{count}}つの形 — このボックスでツリーが完成します",
+    "left_final_one": "残り1つの形 — このボックスでツリーが完成します",
+    "left": "このボックスの残り{{count}}つの形",
+    "left_one": "このボックスの残り1つの形"
+  },
+  "modal": {
+    "close": "閉じる",
+    "string": "{{n}}弦",
+    "frets": "{{low}}〜{{high}}フレット",
+    "key_of": "キー：{{root}}",
+    "locked": "解放するには、必要なエクササイズを完了してください",
+    "practice": "練習",
+    "retake": "受け直す",
+    "exam": "試験",
+    "record_run": "記録に挑戦",
+    "no_record": "まだ記録はありません",
+    "lower_tempo": "目標テンポを下げる",
+    "raise_tempo": "目標テンポを上げる",
+    "beat_it": "記録を超える",
+    "set_record": "記録を作る",
+    "clean_run": "数えられるのはクリーンな演奏だけです — 最後までテンポをキープすれば、いちばん速いものが残ります。",
+    "pass_exam": "試験に合格すると、{{bpm}} BPMを超える記録挑戦が開きます。"
+  },
+  "sidebar": {
+    "title": "スケールの選択",
+    "body": "スケールを選ぶと、そのツリーと形が表示されます。"
+  },
+  "toast": {
+    "new_record": "新記録：{{bpm}} BPM",
+    "new_record_was": "新記録：{{bpm}} BPM（以前は{{previous}}）",
+    "record_stands": "クリーンな演奏でしたが、記録は{{bpm}} BPMのままです",
+    "no_record": "記録なし — 数えられるには正確さ{{accuracy}}%が必要です"
+  }
+}

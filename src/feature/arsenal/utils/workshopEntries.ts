@@ -6,6 +6,8 @@ import {
   getItemCondition,
   getItemLevel,
 } from "../data/itemStats";
+import type { ResolvedTrait } from "../data/traits";
+import { getItemTraits } from "../data/traits";
 import type { WorkshopSubject } from "../data/workshop";
 import { getEffectSubject, getGuitarSubject } from "../data/workshop";
 import type {
@@ -47,6 +49,8 @@ export interface WorkshopEntry {
    * in the stash does nothing for the Rig Level being ranked.
    */
   uses: ItemUse[];
+  /** Fame/h traits the item carries — read on the bench, never changed by it. */
+  traits: ResolvedTrait[];
 }
 
 /**
@@ -87,6 +91,7 @@ export const getWorkshopEntries = (
       restored: item.restored ?? false,
       subject: getGuitarSubject(item, def),
       uses: getItemUses(data, item.id),
+      traits: getItemTraits(item),
     });
   }
 
@@ -110,6 +115,7 @@ export const getWorkshopEntries = (
       restored: item.restored ?? false,
       subject: getEffectSubject(item, def),
       uses: getItemUses(data, item.id),
+      traits: getItemTraits(item),
     });
   }
 

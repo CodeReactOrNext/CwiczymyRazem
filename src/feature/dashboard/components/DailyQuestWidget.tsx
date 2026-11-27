@@ -4,7 +4,10 @@ import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { useClientNow } from "components/ResetClock/ResetClock";
 import { getQuestTaskHref } from "feature/user/store/dailyQuest.routes";
-import { selectDailyQuest, selectIsUserSnapshot } from "feature/user/store/userSlice";
+import {
+  selectDailyQuest,
+  selectIsUserSnapshot,
+} from "feature/user/store/userSlice";
 import {
   claimQuestRewardAction,
   DAILY_QUEST_FAME_REWARD,
@@ -15,7 +18,7 @@ import {
 import { useTranslation } from "hooks/useTranslation";
 import { Check, ChevronRight, Clock, Gift, RefreshCw } from "lucide-react";
 import Router from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { DailyQuestTask } from "types/api.types";
 import { formatTimeLeft, getLocalDayEnd } from "utils/gameLogic/resetSchedule";
@@ -23,27 +26,25 @@ import { formatTimeLeft, getLocalDayEnd } from "utils/gameLogic/resetSchedule";
 const DailyQuestSkeleton = () => {
   const { t } = useTranslation("dashboard");
   return (
-    <Card className='flex flex-col gap-7 p-5 sm:p-6'>
-      <div className='flex flex-col gap-4'>
-        <h3 className='text-base font-semibold text-zinc-100'>
-          {t("daily_quests.title")}
-        </h3>
-        <Skeleton className='h-11 rounded-lg' />
-      </div>
-      <div className='flex flex-col gap-5' aria-busy='true'>
+    <Card className='flex flex-col gap-6 p-5 sm:p-6'>
+      <h3 className='text-base font-semibold text-zinc-100'>
+        {t("daily_quests.title")}
+      </h3>
+      <div className='flex flex-col gap-6 py-2.5' aria-busy='true'>
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className='flex items-center gap-3.5'>
             <Skeleton className='h-6 w-6 shrink-0 rounded-full' />
-            <div className='flex-1 space-y-2'>
-              <Skeleton className='h-3 w-40' />
-              <Skeleton className='h-3.5 rounded-full' />
-            </div>
+            <Skeleton className='h-3 w-48' />
           </div>
         ))}
       </div>
+      <Skeleton className='h-12 rounded-lg' />
     </Card>
   );
 };
+
+/** The clock turns orange only for the last hours of the day. */
+const HURRY_MS = 3 * 60 * 60 * 1000;
 
 const progressPercent = (task: DailyQuestTask) =>
   Math.min(100, (task.progress / Math.max(1, task.target)) * 100);
@@ -51,8 +52,7 @@ const progressPercent = (task: DailyQuestTask) =>
 /** The set's reward, in the colours of the two currencies it pays out. */
 const RewardAmounts = ({ plain = false }: { plain?: boolean }) => (
   <span className='flex items-center gap-2.5 font-bold tabular-nums'>
-    <span
-      className={cn("flex items-center gap-1", !plain && "text-cyan-400")}>
+    <span className={cn("flex items-center gap-1", !plain && "text-cyan-400")}>
       +{DAILY_QUEST_POINTS_REWARD}
       <img
         src='/images/tokens/pick.png'
@@ -60,8 +60,7 @@ const RewardAmounts = ({ plain = false }: { plain?: boolean }) => (
         className='h-[18px] w-[18px] object-contain'
       />
     </span>
-    <span
-      className={cn("flex items-center gap-1", !plain && "text-amber-400")}>
+    <span className={cn("flex items-center gap-1", !plain && "text-amber-400")}>
       +{DAILY_QUEST_FAME_REWARD}
       <img
         src='/images/tokens/coin.png'
@@ -87,6 +86,9 @@ export const DailyQuestWidget = () => {
   const isUserSnapshot = useAppSelector(selectIsUserSnapshot);
   // The quest rolls over at the player's own midnight, not the server's.
   const now = useClientNow();
+  // One swap a day, so a single key in the header arms it and the next quest
+  // tapped is the one swapped, instead of a swap key on every row.
+  const [swapMode, setSwapMode] = useState(false);
 
   // Only rolls the quest over when it is missing or from an earlier day.
   // useAuthSync already drew and synced it at login, and useDailyQuestSync
@@ -103,9 +105,8 @@ export const DailyQuestWidget = () => {
   const done = dailyQuest.tasks.filter((task) => task.isCompleted).length;
   const allCompleted = done === total;
   const isClaimed = dailyQuest.isRewardClaimed;
-  const timeLeft = now
-    ? formatTimeLeft(getLocalDayEnd(now) - now.getTime())
-    : null;
+  const msLeft = now ? getLocalDayEnd(now) - now.getTime() : null;
+  const timeLeft = msLeft !== null ? formatTimeLeft(msLeft) : null;
 
   const handleClaim = () => {
     if (allCompleted && !isClaimed) {
@@ -138,173 +139,200 @@ export const DailyQuestWidget = () => {
         ? t("daily_quests.slot_comeback")
         : null;
 
-  const canReroll = !dailyQuest.rerolled;
+  const canReroll = !dailyQuest.rerolled && !allCompleted;
+  const isSwapping = swapMode && canReroll;
+  // The clock stays quiet most of the day and only warns in the last hours.
+  const isRunningOut = msLeft !== null && msLeft < HURRY_MS;
 
   const header = (
     <div className='flex items-center justify-between gap-3'>
-      <h3 className='text-base font-semibold text-zinc-100'>
+      <h3 className='flex items-baseline gap-2.5 text-base font-semibold text-zinc-100'>
         {t("daily_quests.title")}
+        {!isClaimed && (
+          <span className='text-[13px] font-semibold tabular-nums text-zinc-500'>
+            {done} / {total}
+          </span>
+        )}
       </h3>
-      {timeLeft && (
-        <span
-          className={cn(
-            "flex shrink-0 items-center gap-1.5 text-[13px] tabular-nums",
-            isClaimed
-              ? "font-medium text-zinc-400"
-              : "font-semibold text-orange-400",
-          )}>
-          <Clock size={14} strokeWidth={2.5} aria-hidden />
-          {isClaimed
-            ? t("daily_quests.new_in", { time: timeLeft })
-            : t("daily_quests.time_left", { time: timeLeft })}
-        </span>
-      )}
+      <div className='flex shrink-0 items-center gap-3'>
+        {timeLeft && (
+          <span
+            className={cn(
+              "flex items-center gap-1.5 text-[13px] tabular-nums",
+              isRunningOut && !isClaimed
+                ? "font-semibold text-orange-400"
+                : "font-medium text-zinc-400",
+            )}>
+            <Clock size={14} strokeWidth={2.5} aria-hidden />
+            {isClaimed
+              ? t("daily_quests.new_in", { time: timeLeft })
+              : t("daily_quests.time_left", { time: timeLeft })}
+          </span>
+        )}
+        {!isClaimed && canReroll && (
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={() => setSwapMode((on) => !on)}
+            aria-pressed={isSwapping}
+            title={t("daily_quests.reroll_hint")}
+            className={cn(
+              isSwapping &&
+                "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200",
+            )}>
+            <RefreshCw aria-hidden />
+            {isSwapping
+              ? t("daily_quests.swap_cancel")
+              : t("daily_quests.swap")}
+          </Button>
+        )}
+      </div>
     </div>
   );
 
   // Claimed: nothing left to do today, so the card folds down to a receipt.
   if (isClaimed) {
     return (
-      <Card className='flex flex-col gap-7 p-5 sm:p-6'>
-        <div className='flex flex-col gap-4'>
-          {header}
-          <div className='flex flex-wrap items-center justify-between gap-x-3.5 gap-y-2 rounded-lg bg-emerald-500/10 px-4 py-3.5 text-sm'>
-            <span className='flex items-center gap-3 font-semibold text-emerald-400'>
-              <DoneMark />
-              {t("daily_quests.all_done")}
-            </span>
-            <RewardAmounts />
-          </div>
+      <Card className='flex flex-col gap-6 p-5 sm:p-6'>
+        {header}
+        <div className='flex flex-wrap items-center justify-between gap-x-3.5 gap-y-2 rounded-lg bg-emerald-500/10 px-4 py-3.5 text-sm'>
+          <span className='flex items-center gap-3 font-semibold text-emerald-400'>
+            <DoneMark />
+            {t("daily_quests.all_done")}
+          </span>
+          <RewardAmounts />
         </div>
-        <ul className='flex flex-col gap-4'>
-          {dailyQuest.tasks.map((task) => (
-            <li
-              key={task.id}
-              className='flex items-center gap-3 text-sm font-medium text-zinc-400'>
-              <Check
-                size={16}
-                strokeWidth={3}
-                className='shrink-0 text-emerald-400'
-                aria-hidden
-              />
-              {taskLabel(task)}
-            </li>
-          ))}
-        </ul>
       </Card>
     );
   }
 
+  const swapTask = (task: DailyQuestTask) => {
+    setSwapMode(false);
+    dispatch(rerollQuestTaskAction(task.id));
+  };
+
   return (
     <Card className='flex flex-col gap-6 p-5 sm:p-6'>
-      <div className='flex flex-col gap-4'>
-        {header}
+      {header}
 
-        {/* The reward is for the whole set, so it sits under the title rather
-            than on any one quest. The rows below already show the progress. */}
-        {allCompleted ? (
-          <Button
-            size='xl'
-            onClick={handleClaim}
-            className='w-full gap-3 border-b-amber-700 bg-amber-400 text-zinc-950 hover:bg-amber-300'>
-            <Gift aria-hidden />
-            {t("daily_quests.claim_reward")}
-            <RewardAmounts plain />
-          </Button>
-        ) : (
-          <div className='flex flex-wrap items-center justify-between gap-x-3.5 gap-y-2 rounded-lg bg-amber-500/10 px-4 py-3 text-sm'>
-            <span className='text-zinc-200'>
-              {t("daily_quests.reward_hint", { total })}
-            </span>
-            <RewardAmounts />
-          </div>
-        )}
-      </div>
+      {isSwapping && (
+        <p className='-mt-2 text-[13px] text-zinc-400'>
+          {t("daily_quests.swap_pick")}
+        </p>
+      )}
 
       <div className='flex flex-col gap-1.5'>
         {dailyQuest.tasks.map((task) => {
+          // A one-off quest is done or not: the circle already says so, and a
+          // bar or "0 / 1" beside it only repeated it.
+          const isCounted = task.target > 1;
           const body = (
             <span className='flex min-w-0 flex-col gap-2'>
               <span className='flex items-baseline justify-between gap-3'>
                 <span
                   className={cn(
                     "text-sm font-semibold",
-                    task.isCompleted ? "text-zinc-400" : "text-zinc-100",
+                    task.isCompleted ? "text-zinc-500" : "text-zinc-100",
                   )}>
                   {taskLabel(task)}
-                  {slotNote(task) && (
+                  {!task.isCompleted && slotNote(task) && (
                     <span className='mt-0.5 block text-xs font-medium text-zinc-400'>
                       {slotNote(task)}
                     </span>
                   )}
                 </span>
-                <span
-                  className={cn(
-                    "shrink-0 text-[13px] font-semibold tabular-nums",
-                    task.isCompleted
-                      ? "text-emerald-400"
-                      : task.progress > 0
-                        ? "text-zinc-100"
-                        : "text-zinc-400",
-                  )}>
-                  {task.progress} / {task.target}
+                {isCounted && (
+                  <span
+                    className={cn(
+                      "shrink-0 text-[13px] font-semibold tabular-nums",
+                      task.isCompleted
+                        ? "text-emerald-400"
+                        : task.progress > 0
+                          ? "text-zinc-100"
+                          : "text-zinc-500",
+                    )}>
+                    {task.progress} / {task.target}
+                  </span>
+                )}
+              </span>
+              {isCounted && !task.isCompleted && (
+                <span className='block h-2.5 overflow-hidden rounded-full bg-zinc-700/50'>
+                  <span
+                    className={cn(
+                      "block h-full rounded-full bg-cyan-400 transition-[width] duration-slow",
+                      task.progress > 0 && "bar-shine",
+                    )}
+                    style={{ width: `${progressPercent(task)}%` }}
+                  />
                 </span>
-              </span>
-              <span className='block h-3.5 overflow-hidden rounded-full bg-zinc-700/50'>
-                <span
-                  className={cn(
-                    "block h-full rounded-full transition-[width] duration-slow",
-                    task.isCompleted
-                      ? "bg-emerald-500"
-                      : "bar-shine bg-cyan-400",
-                  )}
-                  style={{ width: `${progressPercent(task)}%` }}
-                />
-              </span>
+              )}
             </span>
           );
 
           const rowClass =
-            "grid grid-cols-[24px_minmax(0,1fr)_16px] items-center gap-x-3.5 rounded-lg px-2 py-2 -mx-2";
+            "-mx-2 grid grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-x-3.5 rounded-lg px-2 py-2.5";
 
-          return task.isCompleted ? (
-            <div key={task.id} className={rowClass}>
-              <DoneMark />
-              {body}
-            </div>
-          ) : (
-            <div key={task.id} className='flex items-center gap-2'>
-              <button
-                type='button'
-                onClick={() => openTask(task)}
-                className={cn(
-                  rowClass,
-                  "min-w-0 flex-1 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:bg-zinc-800/40",
-                )}>
-                <span className='h-6 w-6 rounded-full ring-2 ring-inset ring-zinc-600' />
+          if (task.isCompleted) {
+            return (
+              <div key={task.id} className={rowClass}>
+                <DoneMark />
                 {body}
+                <span />
+              </div>
+            );
+          }
+
+          return (
+            <button
+              key={task.id}
+              type='button'
+              onClick={() => (isSwapping ? swapTask(task) : openTask(task))}
+              aria-label={isSwapping ? t("daily_quests.reroll") : undefined}
+              className={cn(
+                rowClass,
+                "text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500",
+                isSwapping
+                  ? "bg-zinc-800/40 hover:bg-zinc-700/50"
+                  : "hover:bg-zinc-800/40",
+              )}>
+              <span className='h-6 w-6 rounded-full ring-2 ring-inset ring-zinc-600' />
+              {body}
+              {isSwapping ? (
+                <span className='flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-700 text-zinc-100'>
+                  <RefreshCw size={16} aria-hidden />
+                </span>
+              ) : (
                 <ChevronRight
                   size={16}
                   strokeWidth={2.5}
-                  className='text-zinc-400'
+                  className='text-zinc-500'
                   aria-hidden
                 />
-              </button>
-              {canReroll && (
-                <Button
-                  variant='ghost'
-                  size='icon-sm'
-                  onClick={() => dispatch(rerollQuestTaskAction(task.id))}
-                  aria-label={t("daily_quests.reroll")}
-                  title={t("daily_quests.reroll_hint")}
-                  className='shrink-0'>
-                  <RefreshCw aria-hidden />
-                </Button>
               )}
-            </div>
+            </button>
           );
         })}
       </div>
+
+      {/* The reward is for the whole set, so it closes the list: first the
+          quests, then what they pay. The claim key takes the same spot. */}
+      {allCompleted ? (
+        <Button
+          size='xl'
+          onClick={handleClaim}
+          className='w-full gap-3 border-b-amber-700 bg-amber-400 text-zinc-950 hover:bg-amber-300'>
+          <Gift aria-hidden />
+          {t("daily_quests.claim_reward")}
+          <RewardAmounts plain />
+        </Button>
+      ) : (
+        <div className='flex flex-wrap items-center justify-between gap-x-3.5 gap-y-2 rounded-lg bg-zinc-800/50 px-4 py-3.5 text-sm'>
+          <span className='font-medium text-zinc-300'>
+            {t("daily_quests.reward_hint", { total })}
+          </span>
+          <RewardAmounts />
+        </div>
+      )}
     </Card>
   );
 };

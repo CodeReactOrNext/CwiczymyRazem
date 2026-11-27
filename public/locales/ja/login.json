@@ -1,0 +1,31 @@
+{
+  "subtitlebar_text": "練習して、記録して、ポイントを貯めよう！",
+  "slogan_line_1": "RIFF",
+  "slogan_line_2": "QUEST",
+  "title": "おかえりなさい",
+  "subtitle": "ログインして続きから",
+  "email_label": "メールアドレス",
+  "password_label": "パスワード",
+  "google_button": "Googleで続ける",
+  "or_continue_with": "または",
+  "not_have_account": "まだアカウントがありませんか？",
+  "signup_link": "アカウントを作成",
+  "submit_button": "ログイン",
+  "forgot_password": "パスワードを忘れましたか？",
+  "reset_password_success": "パスワードのリセットメールを送りました。受信トレイを確認してください。",
+  "reset_password_error": "パスワードのリセットメールの送信中にエラーが発生しました。メールアドレスが正しいか確認してください。",
+  "enter_email_error": "先にメールアドレスを入力してください。",
+  "desktop": {
+    "title": "riff.questアプリにサインイン",
+    "subtitle": "Googleはデスクトップアプリの中でのサインインを許可していないので、ここ、ブラウザでサインインします。アプリはそのあとすぐにそれを受け取ります。",
+    "continue_as": "{{name}}として続ける",
+    "other_account": "別のGoogleアカウントを使う",
+    "done_title": "サインインしました",
+    "done_body": "riff.questアプリに戻ってください。このタブは閉じてかまいません。",
+    "invalid_title": "このサインインのリンクは使えません",
+    "invalid_body": "riff.questアプリからもう一度サインインを始めてください。",
+    "error": "サインインできませんでした。もう一度試してください。",
+    "waiting": "ブラウザでサインインを完了してください。",
+    "cancel": "キャンセル"
+  }
+}

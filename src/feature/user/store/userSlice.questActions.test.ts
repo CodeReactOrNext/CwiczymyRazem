@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
 
 import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
-import { getDocFromCache, runTransaction, updateDoc } from "firebase/firestore";
+import { runTransaction, updateDoc } from "firebase/firestore";
 import posthog from "posthog-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getQuestDayKey } from "./questDay";
+import { forgetStoredQuest, rememberStoredQuest } from "./storedQuest";
 import { setDailyQuest } from "./userSlice";
 import {
   claimQuestRewardAction,
@@ -18,7 +19,6 @@ const FAME_INCREMENT = Symbol("fame-increment");
 
 vi.mock("firebase/firestore", () => ({
   doc: vi.fn(() => ({ __userRef: true })),
-  getDocFromCache: vi.fn(),
   increment: vi.fn((value: number) => ({ __increment: value })),
   runTransaction: vi.fn(),
   updateDoc: vi.fn(),
@@ -182,6 +182,7 @@ const cachedSnapshot = (progress: number) => ({
 describe("syncDailyQuestAction", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    forgetStoredQuest();
     vi.mocked(updateDoc).mockResolvedValue(undefined);
   });
 
@@ -189,7 +190,7 @@ describe("syncDailyQuestAction", () => {
     vi.mocked(runTransaction).mockRejectedValue(
       new Error("Daily quest sync timed out"),
     );
-    vi.mocked(getDocFromCache).mockResolvedValue(cachedSnapshot(5) as never);
+    rememberStoredQuest("user1", buildQuest(5) as never);
 
     await runSync(10);
 
@@ -205,9 +206,9 @@ describe("syncDailyQuestAction", () => {
     );
   });
 
-  it("pulls newer cached progress into the store instead of writing it back", async () => {
+  it("pulls newer stored progress into the store instead of writing it back", async () => {
     vi.mocked(runTransaction).mockRejectedValue(new Error("Connection failed."));
-    vi.mocked(getDocFromCache).mockResolvedValue(cachedSnapshot(12) as never);
+    rememberStoredQuest("user1", buildQuest(12) as never);
 
     const dispatch = await runSync(4);
 
@@ -220,12 +221,9 @@ describe("syncDailyQuestAction", () => {
     expect(dispatch).toHaveBeenCalledWith({ type: "user/setDailyQuest" });
   });
 
-  it("refuses a blind overwrite when nothing is cached and reports the failure", async () => {
+  it("refuses a blind overwrite when no stored copy is known and reports the failure", async () => {
     vi.mocked(runTransaction).mockRejectedValue(
       new Error("Daily quest sync timed out"),
-    );
-    vi.mocked(getDocFromCache).mockRejectedValue(
-      new Error("Failed to get document from cache."),
     );
 
     await runSync(10);
@@ -233,9 +231,47 @@ describe("syncDailyQuestAction", () => {
     expect(updateDoc).not.toHaveBeenCalled();
     expect(posthog.capture).toHaveBeenCalledWith("daily_quest_sync_failed", {
       message: "Daily quest sync timed out",
-      fallbackMessage: "Failed to get document from cache.",
+      fallbackMessage: "No stored daily quest to merge against",
       stage: "fallback",
     });
+  });
+
+  it("never merges against a copy remembered for another account", async () => {
+    vi.mocked(runTransaction).mockRejectedValue(
+      new Error("Daily quest sync timed out"),
+    );
+    rememberStoredQuest("someone-else", buildQuest(5) as never);
+
+    await runSync(10);
+
+    expect(updateDoc).not.toHaveBeenCalled();
+  });
+
+  it("merges a later fallback against what the last transaction stored", async () => {
+    vi.mocked(runTransaction).mockImplementationOnce(async (_db, updateFn: any) =>
+      updateFn({ get: async () => cachedSnapshot(5), update: vi.fn() }),
+    );
+    // Writes 10 over the stored 5.
+    await runSync(10);
+
+    vi.mocked(runTransaction).mockRejectedValue(new Error("Connection failed."));
+    await runSync(10);
+
+    // The server already holds 10, so there is nothing to queue.
+    expect(updateDoc).not.toHaveBeenCalled();
+    expect(posthog.capture).toHaveBeenCalledWith("daily_quest_sync_fallback", {
+      reason: "Connection failed.",
+    });
+  });
+
+  it("remembers a queued fallback write as stored", async () => {
+    vi.mocked(runTransaction).mockRejectedValue(new Error("Connection failed."));
+    rememberStoredQuest("user1", buildQuest(5) as never);
+
+    await runSync(10);
+    await runSync(10);
+
+    expect(updateDoc).toHaveBeenCalledTimes(1);
   });
 
   it("keeps progress completed while the transaction was in flight", async () => {
@@ -272,7 +308,6 @@ describe("syncDailyQuestAction", () => {
 
     await runSync(10);
 
-    expect(getDocFromCache).not.toHaveBeenCalled();
     expect(updateDoc).not.toHaveBeenCalled();
     expect(posthog.capture).not.toHaveBeenCalled();
   });

@@ -36,6 +36,8 @@ export interface IntervalClickState {
   mistakeCount: number;
   /** Correct clicks across the whole exercise — two per solved round. */
   correctClicks: number;
+  /** Rounds answered in full across the whole exercise. */
+  solvedRounds: number;
   /** Both clicks of the current prompt landed. */
   complete: boolean;
 }
@@ -51,6 +53,7 @@ interface BuildArgs {
   correctClicks: number;
   bankedTotal: number;
   mistakeCount: number;
+  solvedRounds: number;
 }
 
 function buildState({
@@ -62,6 +65,7 @@ function buildState({
   correctClicks,
   bankedTotal,
   mistakeCount,
+  solvedRounds,
 }: BuildArgs): IntervalClickState {
   // A window with no root at all (unknown note name) has nothing to place, so
   // the round opens on step 2 rather than deadlocking on step 1.
@@ -71,11 +75,16 @@ function buildState({
   const roundFound = (anchor ? 1 : 0) + (foundIntervalKey ? 1 : 0);
 
   // Graded across every prompt rotated through this session, not just the current
-  // one: correct clicks over the clicks the session asked for (two per prompt
-  // presented) plus every wrong click. Both halves matter — skipping rounds
-  // leaves asked-for clicks unanswered, and brute-forcing the board inflates the
+  // one: correct clicks over the clicks the session asked for (two per finished
+  // prompt) plus every wrong click. Both halves matter — skipping rounds leaves
+  // asked-for clicks unanswered, and brute-forcing the board inflates the
   // denominator, so neither route reaches a good grade.
-  const cumulativeTotal = bankedTotal + roundTotal + mistakeCount;
+  //
+  // The round still on the board counts only the clicks already given: when the
+  // exercise clock runs out mid-round it was the clock that cut it off, not the
+  // player, and counting its open clicks failed clean exams by a hair. A round
+  // that runs out by itself is banked in full on rotation, so it still counts.
+  const cumulativeTotal = bankedTotal + roundFound + mistakeCount;
 
   return {
     phase: rootDone ? "interval" : "root",
@@ -97,6 +106,7 @@ function buildState({
     maxCombo: correctClicks,
     mistakeCount,
     correctClicks,
+    solvedRounds,
     complete: rootDone && foundIntervalKey !== null,
   };
 }
@@ -155,6 +165,7 @@ export function useIntervalClickHunt(
   // Never cleared on rotation — an exam's mistake limit has to see every wrong
   // click since the exam started, not just the current prompt's.
   const mistakeCountRef = useRef(0);
+  const solvedRoundsRef = useRef(0);
   // When the current STEP started, so each correct click can report how long it
   // took. Set for real by the retarget effect below (which also runs on mount) —
   // 0 here is just a placeholder so nothing calls Date.now() during render.
@@ -170,6 +181,7 @@ export function useIntervalClickHunt(
       correctClicks: 0,
       bankedTotal: 0,
       mistakeCount: 0,
+      solvedRounds: 0,
     }),
   );
 
@@ -182,6 +194,7 @@ export function useIntervalClickHunt(
       correctClicksRef.current = 0;
       bankedTotalRef.current = 0;
       mistakeCountRef.current = 0;
+      solvedRoundsRef.current = 0;
     } else if (!firstPromptRef.current) {
       bankedTotalRef.current += (rootsRef.current.length > 0 ? 1 : 0) + 1;
     }
@@ -203,6 +216,7 @@ export function useIntervalClickHunt(
         correctClicks: correctClicksRef.current,
         bankedTotal: bankedTotalRef.current,
         mistakeCount: mistakeCountRef.current,
+        solvedRounds: solvedRoundsRef.current,
       }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -246,6 +260,7 @@ export function useIntervalClickHunt(
       correct = true;
       elapsedSeconds = (Date.now() - stepStartRef.current) / 1000;
       foundIntervalRef.current = key;
+      solvedRoundsRef.current += 1;
     }
 
     if (correct) correctClicksRef.current += 1;
@@ -261,6 +276,7 @@ export function useIntervalClickHunt(
         correctClicks: correctClicksRef.current,
         bankedTotal: bankedTotalRef.current,
         mistakeCount: mistakeCountRef.current,
+        solvedRounds: solvedRoundsRef.current,
       }),
     );
   }, []);

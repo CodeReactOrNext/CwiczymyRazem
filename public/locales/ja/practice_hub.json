@@ -1,0 +1,142 @@
+{
+  "title": "練習",
+  "loading": "読み込み中...",
+  "any_part": "どのパートでも",
+  "sections": {
+    "all": "すべての練習方法",
+    "log_time": "時間を記録",
+    "my_stuff": "マイページ",
+    "create_plan": "プランを作成",
+    "create_exercise": "エクササイズを作成"
+  },
+  "groups": {
+    "today": "今日のセッション",
+    "courses": "長めのコース",
+    "music": "音楽",
+    "technique": "テクニック",
+    "versus": "対戦"
+  },
+  "modes": {
+    "routine": {
+      "title": "練習プラン",
+      "description": "既製のものか自分のもの、1回1セッション"
+    },
+    "manual_log": {
+      "title": "手動記録",
+      "description": "7日前まで"
+    },
+    "free_timer": {
+      "title": "フリータイマー",
+      "description": "弾きながらストップウォッチ"
+    },
+    "songs": {
+      "title": "曲",
+      "description": "あなたのレパートリー"
+    },
+    "auto": {
+      "title": "オートプラン",
+      "description": "あなたの時間に合わせてその場で作成"
+    },
+    "gp": {
+      "title": "Guitar Proファイル",
+      "description": "あなたのTAB譜を再生付きで"
+    },
+    "learning_path": {
+      "title": "ラーニングパス",
+      "description": "基本から1レッスンずつ"
+    },
+    "roadmaps": {
+      "title": "Mastery Roadmaps",
+      "description": "1つの目標に向かう何週間ものステップ"
+    },
+    "scales": {
+      "title": "スケールマップ",
+      "description": "スケールの形をボックスごとに"
+    },
+    "bosses": {
+      "title": "ボス戦",
+      "description": "弾いてボスを倒す"
+    },
+    "duels": {
+      "title": "デュエル",
+      "description": "同じエクササイズで1対1"
+    },
+    "skills": {
+      "title": "スキル",
+      "description": "テクニックごとの進捗"
+    },
+    "exercises": {
+      "title": "エクササイズ",
+      "description": "カタログ全体"
+    },
+    "favorites": {
+      "title": "お気に入り"
+    },
+    "rotation": {
+      "title": "ローテーション"
+    },
+    "calendar": {
+      "title": "カレンダー"
+    },
+    "my_plans": {
+      "title": "マイプラン"
+    },
+    "my_exercises": {
+      "title": "マイエクササイズ"
+    },
+    "player_roadmaps": {
+      "title": "プレイヤーのロードマップ"
+    },
+    "goals": {
+      "title": "目標"
+    }
+  },
+  "progress": {
+    "all_modules": "すべてのモジュールを完了",
+    "first_lesson": "最初のレッスンから始めよう",
+    "next_roadmap": "次のロードマップを選ぼう",
+    "first_roadmap": "最初のロードマップを選ぼう",
+    "scale_one": "1スケール完了",
+    "scale_many": "{{count}}スケール完了",
+    "first_scale": "最初のスケールから始めよう",
+    "exercise_one": "1エクササイズ完了",
+    "exercise_many": "{{count}}エクササイズ完了",
+    "first_technique": "始めるテクニックを選ぼう"
+  },
+  "plans": {
+    "open_plan": "プランを開く",
+    "featured": "注目",
+    "playalongs": "プレイアロング",
+    "playalongs_tooltip": "実際の曲に合わせて、自分のペースで練習",
+    "my_plans": "マイプラン",
+    "community": "コミュニティ"
+  },
+  "auto": {
+    "regenerate": "作り直す",
+    "of_target": "/ {{minutes}}分",
+    "exercise_one": "1エクササイズ",
+    "exercise_many": "{{count}}エクササイズ",
+    "pick_hint": "カテゴリーごとに難易度を選ぶか、空のままにしてライブラリ全体から選ばせましょう。",
+    "select_all": "すべて選択",
+    "clear_all": "すべて解除",
+    "toggle_difficulty": "すべてのカテゴリーで{{difficulty}}を切り替え",
+    "toggle_category": "{{category}}のすべての難易度を切り替え",
+    "none_available": "（該当なし）",
+    "reorder": "{{title}}を並べ替え",
+    "drag_to_reorder": "ドラッグで並べ替え",
+    "playalong": "プレイアロング",
+    "video": "動画",
+    "options_for": "{{title}}のオプション",
+    "options": "オプション",
+    "swap": "別のものに入れ替え",
+    "move_up": "上へ",
+    "move_down": "下へ",
+    "matches_one": "エクササイズが選択に一致",
+    "matches_other": "エクササイズが選択に一致"
+  },
+  "back": "戻る",
+  "no_community_plans": "コミュニティのプランはまだ公開されていません。",
+  "publish_hint": "マイプランで自分のプランを公開すると、ここで共有されます。",
+  "time_splitter_practiced": "{{song}}を{{time}}練習しました。",
+  "which_part": "どのパートを弾きましたか？"
+}

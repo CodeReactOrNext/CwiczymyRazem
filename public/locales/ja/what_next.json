@@ -1,0 +1,193 @@
+{
+  "page": {
+    "title": "次にやること",
+    "subtitle": "次のステップを1本の道に。"
+  },
+  "widget": {
+    "title": "次にやること",
+    "open": "道全体"
+  },
+  "road": {
+    "start": "スタート",
+    "play": "プレイ",
+    "open": "開く",
+    "not_today": "今日はパス",
+    "play_all": "道を丸ごと弾く · {{count}}分",
+    "nothing_to_play": "道の中に、まだセッションとして弾けるものはありません",
+    "session_title": "あなたの道"
+  },
+  "perks": {
+    "streak_one": "{{count}}日の連続記録を守る",
+    "streak_other": "{{count}}日の連続記録を守る",
+    "quest": "今日のデイリークエストに数えられる"
+  },
+  "discover": {
+    "title": "アプリを発見する",
+    "hint": "レッスンではありません — アプリの別の部分をちょっとのぞくだけです。",
+    "to_case_one": "無料ケースまであと{{count}}つ",
+    "to_case_other": "無料ケースまであと{{count}}つ",
+    "case_tomorrow": "無料ケースの準備ができました — 明日収納に届きます（1日1つ）",
+    "case_collected_one": "無料ケースを追加しました。Arsenalで開けましょう",
+    "case_collected_other": "無料ケースを{{count}}個追加しました。Arsenalで開けましょう",
+    "items": {
+      "first_session": "最初のセッションを弾く",
+      "first_guitar": "最初のギターを手に入れる",
+      "first_song": "学びたい曲を追加する",
+      "tempo_goal": "テンポの目標を設定する",
+      "second_day": "2日目も来る",
+      "practice_plan": "既製のプランを弾く",
+      "journey_step": "ジャーニーのステップを1つ終える",
+      "play_song": "曲を練習する",
+      "daily_exercise": "今日のエクササイズを弾く",
+      "auto_plan": "オートプランを作って弾く",
+      "all_categories": "理論、耳トレ、クリエイティブを試す",
+      "open_case": "Arsenalでケースを開ける",
+      "weekly_goal": "ウィークリー目標を受け取る",
+      "favorite": "何かをお気に入りに追加する",
+      "customize": "ホームかプロフィールをカスタマイズする",
+      "skill_tree": "スキルツリーで最初のテンポをクリアする",
+      "scale_tree": "スケールツリーで最初の形をクリアする",
+      "calendar": "カレンダーで1週間を計画する",
+      "rotation": "ローテーションに何かを追加する",
+      "own_plan": "自分のプランを作る",
+      "own_exercise": "自分のエクササイズを書く",
+      "boss": "ボスに挑む",
+      "rig": "Tone Studioでリグを組む",
+      "achievement": "最初のバッジを解放する",
+      "duel": "最初のデュエルをプレイする",
+      "challenge": "月間チャレンジに参加する：投票か録音",
+      "guild": "ギルドに参加する"
+    },
+    "go": "やってみる",
+    "later": "今週はパス"
+  },
+  "goals": {
+    "title": "{{title}}：{{bpm}} → {{target}} BPM",
+    "title_final": "{{title}}：{{target}} BPM",
+    "reason_one": "次のマイルストーンまで、{{bpm}} BPMでクリーンな演奏あと{{count}}回",
+    "reason_other": "次のマイルストーンまで、{{bpm}} BPMでクリーンな演奏あと{{count}}回",
+    "reason_final_one": "最後のマイルストーン：{{bpm}} BPMでクリーンな演奏あと{{count}}回",
+    "reason_final_other": "最後のマイルストーン：{{bpm}} BPMでクリーンな演奏あと{{count}}回",
+    "create": {
+      "title": "テンポの目標を設定する",
+      "reason": "エクササイズと目指すテンポを選びましょう。届くマイルストーンに分けられます。"
+    }
+  },
+  "empty": {
+    "title": "今日はすべて完了",
+    "body": "待っているものはありません。好きなものを弾きましょう。"
+  },
+  "onboarding": {
+    "first_session": {
+      "title": "最初のセッションを弾く",
+      "reason": "10分で十分です。連続記録と、無料ケースへの最初の目標が始まります。"
+    }
+  },
+  "streak": {
+    "title_one": "{{count}}日の連続記録を守る",
+    "title_other": "{{count}}日の連続記録を守る",
+    "reason": "今日どんなセッションでも続きます"
+  },
+  "daily_quest": {
+    "reason": "デイリークエスト · {{progress}}/{{target}}"
+  },
+  "daily_exercise": {
+    "title": "今日のエクササイズ：{{title}}",
+    "play": "今日は{{players}}人がプレイ。1位には賞品があります。",
+    "play_first": "今日はまだ誰もプレイしていません。1位には賞品があります。",
+    "improve": "{{players}}人中{{rank}}位です。自分のスコアを超えよう。"
+  },
+  "calendar": {
+    "today": {
+      "title": "今日のプラン：{{total}}個中{{done}}個完了",
+      "reason": "残り{{minutes}}分、1つのセッションで"
+    },
+    "plan": {
+      "title": "1週間を計画する",
+      "reason": "プランナーが目標、曲、ロードマップから1週間を埋めてくれます"
+    }
+  },
+  "duels": {
+    "title": "デュエル：あなたの番",
+    "not_played": "デュエルが終わる前にエクササイズを弾こう",
+    "lock_in": "満足できたらベストのスコアを確定しよう",
+    "opponent_ready": "相手は確定しました。あなたが終わらせる番です。"
+  },
+  "journey": {
+    "title": "ジャーニー：{{step}}",
+    "reason": "{{module}} · {{total}}ステップ中{{index}}ステップ目"
+  },
+  "roadmap": {
+    "title": "{{step}}",
+    "reason": "ロードマップ：{{roadmap}}"
+  },
+  "skill_tree": {
+    "title": "スキルツリー：{{title}}",
+    "reason": "{{branch}}の枝の次 · このステージで{{total}}個中{{done}}個"
+  },
+  "scale_tree": {
+    "title": "スケール：{{title}}",
+    "reason": "{{total}}個中{{done}}個の形をクリア"
+  },
+  "songs": {
+    "title": "{{title}}",
+    "never": "{{artist}} · まだ練習していません",
+    "stale_one": "{{artist}} · {{count}}日弾いていません",
+    "stale_other": "{{artist}} · {{count}}日弾いていません",
+    "wish": "{{artist}} · 学びたいリストから。練習を始めましょう。"
+  },
+  "rotation": {
+    "title_one": "ローテーションにさびついてきた項目が{{count}}個",
+    "title_other": "ローテーションにさびついてきた項目が{{count}}個",
+    "reason": "忘れてしまう前に、いちばん古いものを弾こう"
+  },
+  "plan": {
+    "title": "{{title}}",
+    "reason": "前回弾いたプラン。もう一度弾こう。"
+  },
+  "milestones": {
+    "title": "ウィークリー目標：{{name}}",
+    "reason": "{{req}} · 今週{{value}}/{{max}}"
+  },
+  "challenge": {
+    "title": "月間チャレンジ：{{total}}曲中{{cleared}}曲",
+    "reason_one": "残りを録音できるのはあと{{count}}日",
+    "reason_other": "残りを録音できるのはあと{{count}}日"
+  },
+  "season": {
+    "title": "{{name}}を抜くまであと{{gap}}ポイント",
+    "reason": "今シーズンは{{place}}位です",
+    "reason_paid": "今シーズンは{{place}}位です。トップ10にはFameがもらえます。"
+  },
+  "balance": {
+    "technique": "今週はテクニックなし",
+    "theory": "今週は理論なし",
+    "hearing": "今週は耳トレなし",
+    "creativity": "今週はクリエイティブなし",
+    "reason": "{{title}}を試してみよう"
+  },
+  "guilds": {
+    "title": "ギルドクエスト：{{name}}",
+    "reason": "あなたの分：{{mine}}/{{target}}",
+    "applications_one": "{{count}}人がギルドへの参加を希望しています",
+    "applications_other": "{{count}}人がギルドへの参加を希望しています"
+  },
+  "progression": {
+    "title": "レベル{{lvl}}",
+    "unlock_one": "あと{{count}}ポイント。{{feature}}が解放されます。",
+    "unlock_other": "あと{{count}}ポイント。{{feature}}が解放されます。",
+    "reward_one": "あと{{count}}ポイントで、報酬が待っています",
+    "reward_other": "あと{{count}}ポイントで、報酬が待っています"
+  },
+  "achievements": {
+    "title": "バッジ：{{name}}",
+    "ready": "次にセッションを記録すると解放されます",
+    "reason": "{{value}}/{{max}}"
+  },
+  "bosses": {
+    "first": "{{name}}に挑む",
+    "first_reason": "ボス戦で練習がバトルになります",
+    "next": "{{name}}：フェーズ{{phase}}に到達",
+    "next_reason": "次の戦いのための新しいセーブポイントが開きます"
+  }
+}

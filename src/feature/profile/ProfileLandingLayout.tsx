@@ -35,7 +35,6 @@ import { useMemo, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { convertMsToHM } from "utils/converter";
-import { getReconciledStreak, hasRestDays } from "utils/gameLogic";
 
 /**
  * How far the stage's wash goes into the rarity colour. The hue already says
@@ -111,33 +110,13 @@ const ProfileLandingLayout = ({
     !userStats?.lastReportDate &&
     !isTodayCompleted;
 
-  // The same reconciliation as the Streak and This week cards: the activity
-  // log is the timezone-correct source, the stored counter fills in until it loads.
-  const { dayWithoutBreak } = getReconciledStreak({
-    actualDayWithoutBreak: userStats?.actualDayWithoutBreak ?? 0,
-    lastReportDate: userStats?.lastReportDate ?? "",
-    reportDates: reportList.map((report) => report.date),
-    restDays: userStats ? hasRestDays(userStats) : false,
-  });
-
-  // One fact under the title. After the session: what today came to. Before
-  // it: the streak a session keeps alive. Never both, and nothing when there
-  // is neither.
+  // One fact under the title, and only after the session: what today came to.
+  // The streak sits in the top bar already, so the hero does not repeat it.
   const todayMs = todayReport?.timeSumary.sumTime ?? 0;
-  const fact = hasNeverPracticed
-    ? null
-    : isTodayCompleted
-      ? todayMs > 0
-        ? {
-            text: t("week_widget.practiced", { time: convertMsToHM(todayMs) }),
-          }
-        : null
-      : dayWithoutBreak > 0
-        ? {
-            text: t("score_tooltip.streak", { count: dayWithoutBreak }),
-            isStreak: true,
-          }
-        : null;
+  const fact =
+    !hasNeverPracticed && isTodayCompleted && todayMs > 0
+      ? { text: t("week_widget.practiced", { time: convertMsToHM(todayMs) }) }
+      : null;
 
   const totalTimeValue = userStats
     ? convertMsToHM(

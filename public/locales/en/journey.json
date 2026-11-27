@@ -61,8 +61,6 @@
     "create_title": "Create your own roadmap",
     "create_body": "Tell the coach what you want to play — it builds a step-by-step path with exercises, songs and lessons just for you.",
     "create_cta": "Create",
-    "suggest": "Suggest a learning path",
-    "missing_coming": "Missing a topic? {{topics}} are coming next — let us know what else you'd like to see.",
-    "missing": "Missing a topic? Let us know what you'd like to see next."
+    "coming_soon": "Coming soon"
   }
 }

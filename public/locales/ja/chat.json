@@ -1,0 +1,86 @@
+{
+  "send": "送信",
+  "send_placeholder": "メッセージを入力...",
+  "like": "いいね",
+  "validation_too_long": "メッセージは2000文字以内にしてください。",
+  "error": "メッセージを送信できませんでした",
+  "empty_room": {
+    "title": "まだ誰も話していません",
+    "guild": "最初の1人になろう — ギルドにあいさつしてみて。",
+    "everyone": "最初の1人になろう — みんなにあいさつしてみて。",
+    "say_hi": "あいさつする 👋"
+  },
+  "greetings": {
+    "welcome": "ようこそ！ 👋",
+    "hi_guild": "ギルドのみんな、こんにちは！ 👋",
+    "hi_everyone": "みなさん、こんにちは！ 👋"
+  },
+  "welcome_goal": {
+    "plan_named": "{{plan}}プランから始めています",
+    "plan": "練習プランから始めています",
+    "songs": "曲を覚えに来ました",
+    "roadmap": "練習のロードマップを作っています",
+    "journey": "ジャーニーを始めています",
+    "log": "練習を記録しに来ました"
+  },
+  "system": {
+    "and": "と",
+    "and_other": "とほか{{count}}人",
+    "and_others": "とほか{{count}}人",
+    "said_hi": "があいさつしました",
+    "say_hi": "あいさつする",
+    "joined_with": "Riff Questに参加、{{phrase}}",
+    "joined": "Riff Questに参加しました",
+    "reached_level": "がレベル到達",
+    "cleared": "クリア：{{quests}}",
+    "joined_guild": "ギルドに参加しました"
+  },
+  "attachment": {
+    "kinds": {
+      "exercise": "エクササイズ",
+      "plan": "プラン",
+      "song": "曲",
+      "recording": "録音"
+    },
+    "play": "弾く",
+    "open": "開く",
+    "watch": "見る",
+    "guitar": "ギター",
+    "pedal": "エフェクター",
+    "share_title": "チャットに共有",
+    "tabs": {
+      "exercise": "エクササイズ",
+      "plan": "プラン",
+      "song": "自分の曲",
+      "recording": "自分の録音",
+      "item": "自分の機材"
+    },
+    "search": "検索…",
+    "loading": "読み込み中…",
+    "empty": "ここで共有できるものはまだありません。"
+  },
+  "composer": {
+    "replying_to": "返信先",
+    "cancel_reply": "返信をやめる",
+    "sharing": "共有中",
+    "remove_attachment": "添付を外す",
+    "mention": "誰かをメンション",
+    "share": "エクササイズ、曲、アイテムを共有",
+    "send": "送信",
+    "message_label": "メッセージ"
+  },
+  "reactions": {
+    "react_with": "{{emoji}}でリアクション",
+    "reply": "返信"
+  },
+  "menu": {
+    "copy": "テキストをコピー",
+    "copied": "コピーしました",
+    "copy_failed": "コピーできませんでした",
+    "more": "メッセージの操作"
+  },
+  "time": {
+    "today": "今日",
+    "yesterday": "昨日"
+  }
+}

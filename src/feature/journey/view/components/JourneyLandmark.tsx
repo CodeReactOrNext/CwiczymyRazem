@@ -872,5 +872,28 @@ export const JourneyLandmark = ({
   );
 };
 
+/**
+ * A section's scene on its own, unpositioned: the picture on a module's card
+ * in the module list, sized by the caller.
+ */
+export const LandmarkScene = ({
+  moduleId,
+  stageId,
+  className,
+}: {
+  moduleId: string;
+  stageId: string;
+  className?: string;
+}) => {
+  const landmark = LANDMARKS[`${moduleId}:${stageId}`];
+  if (!landmark) return null;
+  const { Scene } = landmark;
+  return (
+    <div aria-hidden className={className}>
+      <Scene />
+    </div>
+  );
+};
+
 /** Every scene by key, for the render check in JourneyLandmark.test. */
 export const landmarkScenes = LANDMARKS;

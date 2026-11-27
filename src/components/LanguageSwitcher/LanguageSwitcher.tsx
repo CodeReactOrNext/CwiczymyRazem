@@ -41,6 +41,13 @@ const Flag = ({ locale, className }: { locale: AppLocale; className?: string }) 
           <rect y='3.5' width='20' height='7' fill='#f1bf00' />
         </svg>
       );
+    case "ja":
+      return (
+        <svg viewBox='0 0 20 14' className={box} aria-hidden>
+          <rect width='20' height='14' fill='#fff' />
+          <circle cx='10' cy='7' r='4.2' fill='#bc002d' />
+        </svg>
+      );
     default:
       return (
         <svg viewBox='0 0 60 42' className={box} aria-hidden>

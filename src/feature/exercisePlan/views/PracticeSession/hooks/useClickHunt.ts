@@ -47,8 +47,13 @@ function buildState(
   // exercise timer, not the per-note countdown) would grade on whatever
   // fraction of the CURRENT note happens to be found, ignoring every note
   // already solved 100% before it. Same fix as the accumulating hunt's banked set.
+  //
+  // The note still on the board counts only the positions already found: when
+  // the exercise clock runs out mid-note it was the clock that cut it off, not
+  // the player. A note that runs out by itself is banked in full on rotation, so
+  // its missed positions still count.
   const cumulativeFound = bankedFound + foundCount;
-  const cumulativeTotal = bankedTotal + targetPositions.length;
+  const cumulativeTotal = bankedTotal + foundCount;
   return {
     targetPositions,
     foundKeys: Array.from(found),

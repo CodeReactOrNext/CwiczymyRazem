@@ -46,7 +46,10 @@
     "slot_discover": "New for you",
     "slot_comeback": "Back after a while",
     "reroll": "Swap this quest",
-    "reroll_hint": "One swap a day"
+    "reroll_hint": "One swap a day",
+    "swap": "Swap",
+    "swap_cancel": "Cancel",
+    "swap_pick": "Pick the quest you want to swap. You get one swap a day."
   },
   "customize": {
     "refreshing": "Updating…",

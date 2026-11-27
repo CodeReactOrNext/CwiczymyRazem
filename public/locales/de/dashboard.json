@@ -46,7 +46,10 @@
     "slot_discover": "Neu für dich",
     "slot_comeback": "Zurück nach einer Pause",
     "reroll": "Quest tauschen",
-    "reroll_hint": "Ein Tausch pro Tag"
+    "reroll_hint": "Ein Tausch pro Tag",
+    "swap": "Tauschen",
+    "swap_cancel": "Abbrechen",
+    "swap_pick": "Wähle die Quest, die du tauschen willst. Du hast einen Tausch pro Tag."
   },
   "customize": {
     "refreshing": "Wird aktualisiert…",

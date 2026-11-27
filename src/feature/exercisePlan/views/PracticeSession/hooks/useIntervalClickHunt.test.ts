@@ -126,12 +126,46 @@ describe("useIntervalClickHunt", () => {
 
     rerender({ r: "C", t: "G" });
     expect(result.current.state.gameState.score).toBe(bankedScore);
-    // 2 clicks landed out of the 2 the finished round asked for plus the 2 the
-    // fresh prompt just asked for — accuracy always counts the round in progress.
-    expect(result.current.state.accuracy).toBe(50);
+    // The fresh prompt hasn't asked anything of the player yet: if the clock
+    // ran out right now, the run was spotless.
+    expect(result.current.state.accuracy).toBe(100);
 
     act(() => result.current.registerClick(5, 3)); // C on the A string
     expect(result.current.state.gameState.score).toBeGreaterThan(bankedScore);
+    expect(result.current.state.accuracy).toBe(100);
+  });
+
+  it("counts a round that ran out unanswered as missed clicks", () => {
+    const { rerender, result } = setup();
+
+    act(() => result.current.registerClick(6, 5));
+    act(() => result.current.registerClick(5, 7));
+    rerender({ r: "C", t: "G" });
+    act(() => result.current.registerClick(5, 3)); // root placed, interval never found
+    rerender({ r: "A", t: "E" });
+    // 3 landed of the 4 the two finished rounds asked for.
+    expect(result.current.state.accuracy).toBe(75);
+  });
+
+  it("counts solved rounds across prompts and starts them over on a new run", () => {
+    let runKey = 0;
+    const { rerender, result } = renderHook(({ r, t }) => useIntervalClickHunt(r, t, 0, 12, [5, 6], runKey), {
+      initialProps: { r: "A", t: "E" },
+    });
+
+    act(() => result.current.registerClick(6, 5));
+    act(() => result.current.registerClick(5, 7));
+    expect(result.current.state.solvedRounds).toBe(1);
+
+    rerender({ r: "C", t: "G" });
+    act(() => result.current.registerClick(5, 3));
+    expect(result.current.state.solvedRounds).toBe(1);
+    act(() => result.current.registerClick(6, 3));
+    expect(result.current.state.solvedRounds).toBe(2);
+
+    runKey = 1;
+    rerender({ r: "C", t: "G" });
+    expect(result.current.state.solvedRounds).toBe(0);
   });
 
   it("builds one multiplier across rounds instead of restarting it every prompt", () => {

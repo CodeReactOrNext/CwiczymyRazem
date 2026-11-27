@@ -1,0 +1,118 @@
+{
+  "view": {
+    "ballot_eyebrow": "コミュニティ投票",
+    "monthly": "月間チャレンジ",
+    "vote_title": "来月のボードを選ぶ",
+    "archive_title": "チャレンジのアーカイブ",
+    "vote_subtitle": "{{month}}の投票の上位{{count}}曲が次のボードになります。",
+    "archive_subtitle": "終わったすべてのボード — 今も見られて、弾けます。",
+    "board_subtitle": "毎月コミュニティの投票で選ばれる5曲。すべて録音するとクリアです。",
+    "tabs": {
+      "board": "今月",
+      "vote": "投票",
+      "archive": "アーカイブ"
+    },
+    "not_up_title": "今月のボードはまだ公開されていません",
+    "not_up_body": "ボードはコミュニティの投票から選ばれます。投票へ行って曲を推薦してください。",
+    "open_ballot": "投票を開く",
+    "back_to_archive": "アーカイブに戻る"
+  },
+  "hero": {
+    "live_subtitle": "コミュニティの投票で選ばれました — {{count}}曲すべて録音するとクリア",
+    "closed_subtitle": "終了 — 演奏はボードに載りますが、ポイントもFameももらえません",
+    "closes_today": "今日終了",
+    "day_left": "残り{{count}}日",
+    "days_left": "残り{{count}}日",
+    "closed": "終了",
+    "points_per_run": "演奏ごとのポイント",
+    "fame_per_run": "演奏ごとのFame",
+    "fame_full_board": "ボードを埋めたときのFame",
+    "your_runs": "あなたの演奏",
+    "player": "{{count}}人",
+    "players": "{{count}}人",
+    "cleared": "{{count}}人がクリア"
+  },
+  "board": {
+    "listen": "{{artist}}の{{title}}を聴く",
+    "vote": "{{count}}票",
+    "votes": "{{count}}票",
+    "done": "完了",
+    "submit": "提出",
+    "cleared": "ボードをクリア",
+    "final_stop": "最後の1曲",
+    "bonus_yours": "全曲録音 — {{bonus}} Fameのボーナスはあなたのものです。",
+    "clean_sweep": "全曲録音 — アーカイブを完全制覇。",
+    "one_more_month": "今月のクリアまであと{{count}}曲",
+    "more_month": "今月のクリアまであと{{count}}曲",
+    "one_more_board": "このボードのクリアまであと{{count}}曲",
+    "more_board": "このボードのクリアまであと{{count}}曲"
+  },
+  "archive": {
+    "empty_title": "アーカイブはまだありません",
+    "empty_body": "今月が終わると、ボードに載ったすべての演奏と一緒にここに入ります。",
+    "songs_runs": "{{songs}}曲 · {{runs}}演奏",
+    "cleared_it": "{{count}}人がクリア"
+  },
+  "submit": {
+    "title": "演奏を提出",
+    "youtube_link": "YouTubeのリンク",
+    "bad_link": "YouTubeのリンクではないようです — youtube.com/watch?v=… や youtu.be/… の形にしてください",
+    "link_hint": "youtube.com/watch?v=… や youtu.be/… の形 — 限定公開の動画はOK、非公開の動画はほかの人には再生されません。",
+    "title_label": "タイトル",
+    "notes": "メモ",
+    "optional": "任意",
+    "notes_placeholder": "機材、テンポ、苦労したところ…",
+    "points": "ポイント",
+    "fame": "Fame",
+    "clear_bonus": "クリアボーナス",
+    "last_song": "これがボードであなたの最後の1曲です。",
+    "closed_board": "このボードは終了しているので、この演奏は{{none}} — アーカイブに並ぶだけです。",
+    "no_rewards": "ポイントもFameももらえません",
+    "visibility": "この曲の演奏一覧、アクティビティフィード、あなたのレコーディングで、誰でも見られます。1曲につき1演奏なので、満足できるテイクを送りましょう。",
+    "cancel": "キャンセル",
+    "submit_run": "演奏を提出"
+  },
+  "runs": {
+    "nobody": "まだ誰も挑戦していません — 最初の1人になろう。",
+    "count_one": "{{artist}}の演奏{{count}}件",
+    "count": "{{artist}}の演奏{{count}}件",
+    "you": "あなた",
+    "tap_hint": "演奏をタップすると、見たり、コメントしたり、いいねしたりできます。",
+    "empty": "まだ演奏はありません。録音してリンクを投稿し、最初の枠を取りましょう。",
+    "open_song": "曲ボードで「{{title}}」を開く"
+  },
+  "preview": {
+    "no_spotify": "この曲はSpotifyにありません — YouTubeで探してください",
+    "backed": "応援済み",
+    "back": "この曲を応援",
+    "open_board": "曲ボードで開く"
+  },
+  "ballot": {
+    "put_up_by": "推薦：{{name}}",
+    "voted_by": "投票した人：",
+    "out_of_votes": "今月の{{count}}票をすべて使いました。",
+    "rules": "1か月に{{votes}}があります。曲を推薦するか、すでに投票にある曲を応援してください — 推薦にも1票使います。月が変わると、上位{{top}}曲が新しいチャレンジになります。同票なら、先に推薦した人のものが選ばれます。",
+    "votes_count": "{{count}}票",
+    "nominate": "曲を推薦",
+    "votes_left_of": "{{total}}票中残り{{left}}票",
+    "sign_in": "投票するにはサインインしてください",
+    "empty_title": "投票は空です",
+    "empty_body": "{{month}}にはまだ何も推薦されていません。最初の推薦が流れを決めます。",
+    "below_cut": "ボーダーより下 — ボードに入るにはもっと票が必要です",
+    "vote_left": "残り{{count}}票",
+    "votes_left": "残り{{count}}票",
+    "pick_existing": "すでに投票にある曲を選ぶと、あなたの票が加わるだけです。"
+  },
+  "toast": {
+    "archive_cleared": "アーカイブのボードをクリア！　遅れた演奏ではポイントもFameももらえません。",
+    "archive_added": "演奏をアーカイブに追加しました — 終了したボードなので、ポイントもFameもありません。",
+    "accepted_fame_only": "録音を承認しました — +{{fame}} Fame。ポイントは1つのボードで{{count}}曲までです。",
+    "board_cleared": "ボードをクリア！ +{{points}}ポイント、+{{fame}} Fame",
+    "accepted": "録音を承認しました — +{{points}}ポイント、+{{fame}} Fame",
+    "already_submitted": "その曲にはすでに録音があります。",
+    "submit_failed": "録音を提出できませんでした。もう一度試してください。",
+    "nominated": "推薦しました — あなたの票が入っています。",
+    "nominate_failed": "その推薦を追加できませんでした。",
+    "vote_failed": "投票を登録できませんでした。"
+  }
+}

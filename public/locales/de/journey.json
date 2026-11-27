@@ -61,8 +61,6 @@
     "create_title": "Erstelle deine eigene Roadmap",
     "create_body": "Sag dem Coach, was du spielen willst — er baut dir einen Weg Schritt für Schritt mit Übungen, Songs und Lektionen.",
     "create_cta": "Erstellen",
-    "suggest": "Einen Lernpfad vorschlagen",
-    "missing_coming": "Fehlt ein Thema? Als Nächstes kommen {{topics}} — sag uns, was du sonst noch sehen möchtest.",
-    "missing": "Fehlt ein Thema? Sag uns, was du als Nächstes sehen möchtest."
+    "coming_soon": "Demnächst"
   }
 }

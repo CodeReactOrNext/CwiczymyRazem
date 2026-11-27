@@ -45,6 +45,7 @@ describe("the locale list", () => {
       "Polski",
       "Deutsch",
       "Español",
+      "日本語",
     ]);
   });
 

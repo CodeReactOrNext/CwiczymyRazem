@@ -1,0 +1,18 @@
+{
+  "select_practice_mode": "練習モードを選ぶ",
+  "select": "選ぶ",
+  "modes": {
+    "timer": {
+      "title": "通常の練習",
+      "description": "選んだスキルを自由に練習して、進捗を記録します"
+    },
+    "plan": {
+      "title": "エクササイズプラン",
+      "description": "既製のエクササイズプランを選んで、それに沿って練習します"
+    },
+    "auto": {
+      "title": "オートプラン",
+      "description": "あなたの時間に合わせたプランを作ります"
+    }
+  }
+}

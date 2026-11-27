@@ -3,7 +3,6 @@ import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoin
 import {
   doc,
   type DocumentReference,
-  getDocFromCache,
   increment,
   runTransaction,
   updateDoc,
@@ -24,6 +23,7 @@ import { levelUpUser } from "utils/gameLogic/levelUpUser";
 import { QUEST_TYPE_FEATURE } from "./dailyQuest.features";
 import { isSameQuest, mergeDailyQuests } from "./dailyQuest.merge";
 import { getQuestDayKey, isQuestDrawnFor } from "./questDay";
+import { recallStoredQuest, rememberStoredQuest } from "./storedQuest";
 import {
   claimQuestReward,
   completeQuestTask,
@@ -51,7 +51,7 @@ let pendingSyncs = 0;
 /**
  * A transaction needs the network, and with no connection it can sit unresolved
  * for a long time. Give up on it rather than letting it block every later sync,
- * and hand the merge to `syncFromCache` instead.
+ * and hand the merge to `syncFromLastStored` instead.
  */
 const SYNC_TIMEOUT = 15_000;
 
@@ -70,30 +70,35 @@ const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
 
 /**
- * The fallback when the transaction cannot finish: merge against the copy the
- * local cache holds and publish it as a plain write.
+ * The fallback when the transaction cannot finish: merge against the last copy
+ * this tab saw stored (see `storedQuest`) and publish it as a plain write.
  *
  * A transaction is network-only. On a flaky connection — a phone waking up, a
  * tab resumed after hours, the first seconds after a page load — its reads keep
  * retrying with backoff well past the timeout, and the progress it carried
  * never left the tab. That was ~90% of `daily_quest_sync_failed`. An ordinary
- * write does not need the network to be accepted: the SDK queues it in the
- * persistent cache and delivers it once the connection is back.
+ * write does not need the network to be accepted: the SDK queues it and
+ * delivers it once the connection is back (while the tab stays open — the
+ * cache is in memory).
  *
  * It is still a merge, never the blind overwrite the transaction replaced. With
- * no cached copy to merge against it refuses to write at all.
+ * no stored copy to merge against it refuses to write at all.
  */
-const syncFromCache = async (
+const syncFromLastStored = (
+  userId: string,
   userRef: DocumentReference,
   localQuest: DailyQuest | null,
   today: string
-): Promise<DailyQuest | null> => {
-  const snapshot = await getDocFromCache(userRef);
-  const remoteQuest = (snapshot.data()?.statistics?.dailyQuest ??
-    null) as DailyQuest | null;
+): DailyQuest | null => {
+  const stored = recallStoredQuest(userId);
+  if (!stored) throw new Error("No stored daily quest to merge against");
+
+  const remoteQuest = stored.quest;
   const result = mergeDailyQuests(localQuest, remoteQuest, today);
 
   if (result && !isSameQuest(result, remoteQuest)) {
+    // Queued below, so it is what the server will hold.
+    rememberStoredQuest(userId, result);
     // Not awaited: the promise settles only when the server acknowledges the
     // write, which on the connection that just failed can take minutes. The
     // write is already queued once `updateDoc` returns.
@@ -154,21 +159,24 @@ export const syncDailyQuestAction = createAsyncThunk(
       let merged: DailyQuest | null;
 
       try {
-        merged = await withTimeout(runTransaction(db, async (transaction) => {
+        const synced = await withTimeout(runTransaction(db, async (transaction) => {
           const snapshot = await transaction.get(userRef);
           const remoteQuest = (snapshot.data()?.statistics?.dailyQuest ??
             null) as DailyQuest | null;
           const result = mergeDailyQuests(localQuest, remoteQuest, today);
+          const writes = !!result && !isSameQuest(result, remoteQuest);
 
-          if (result && !isSameQuest(result, remoteQuest)) {
+          if (writes) {
             transaction.update(userRef, { "statistics.dailyQuest": result });
           }
 
-          return result;
+          return { result, stored: writes ? result : remoteQuest };
         }));
+        rememberStoredQuest(userId, synced.stored);
+        merged = synced.result;
       } catch (transactionError) {
         try {
-          merged = await syncFromCache(userRef, localQuest, today);
+          merged = syncFromLastStored(userId, userRef, localQuest, today);
           posthog.capture("daily_quest_sync_fallback", {
             reason: errorMessage(transactionError),
           });

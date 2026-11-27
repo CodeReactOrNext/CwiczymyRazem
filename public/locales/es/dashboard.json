@@ -46,7 +46,10 @@
     "slot_discover": "Nuevo para ti",
     "slot_comeback": "De vuelta tras un tiempo",
     "reroll": "Cambiar esta misión",
-    "reroll_hint": "Un cambio al día"
+    "reroll_hint": "Un cambio al día",
+    "swap": "Cambiar",
+    "swap_cancel": "Cancelar",
+    "swap_pick": "Elige la misión que quieres cambiar. Tienes un cambio al día."
   },
   "customize": {
     "refreshing": "Actualizando…",

@@ -1,0 +1,118 @@
+{
+  "levels": {
+    "1": {
+      "name": "Spark",
+      "req": "今週、15分以上練習した日が1日"
+    },
+    "2": {
+      "name": "Groove",
+      "req": "今週、20分以上の日が3日"
+    },
+    "3": {
+      "name": "Hot Streak",
+      "req": "毎日15分以上で3日連続"
+    },
+    "4": {
+      "name": "Momentum",
+      "req": "今週、15分以上の日が5日"
+    },
+    "5": {
+      "name": "Unstoppable",
+      "req": "毎日15分以上で7日連続"
+    },
+    "6": {
+      "name": "All-Rounder",
+      "req": "今週、4つのカテゴリーすべてを15分以上やった日が3日"
+    },
+    "7": {
+      "name": "In the Zone",
+      "short": "Zone",
+      "req": "4つのカテゴリーすべてを15分以上で3日連続"
+    },
+    "8": {
+      "name": "Shredder",
+      "req": "4つのカテゴリーすべてを15分以上で5日連続"
+    },
+    "9": {
+      "name": "Virtuoso",
+      "req": "4つのカテゴリーすべてを15分以上で7日連続"
+    }
+  },
+  "card": {
+    "opens_at": "レベル{{lvl}}で開放",
+    "unlock": "解放 · {{cost}} Fame",
+    "claiming": "受け取り中…",
+    "claim": "+{{reward}}を受け取る",
+    "claimed": "受け取り済み",
+    "reward": "+{{reward}} Fame"
+  },
+  "page": {
+    "title": "マイルストーン",
+    "subtitle": "練習の目標を達成すると毎週もらえる報酬 — {{date}}",
+    "eyebrow": "練習",
+    "prev_level": "前のレベル",
+    "next_level": "次のレベル",
+    "reached_lc": "達成",
+    "locked_lc": "ロック中",
+    "in_progress_lc": "進行中",
+    "reward_ready": "報酬を受け取れます",
+    "reward_claimed": "報酬は受け取り済み",
+    "days_left": "あと{{count}}日",
+    "days_left_one": "あと1日",
+    "reached": "達成",
+    "current_goal": "今の目標",
+    "locked": "ロック中",
+    "reached_of": "{{total}}個中{{done}}個達成",
+    "all_unlocked": "すべてのレベルを解放 — あなたはVirtuosoです！",
+    "unlocks_at": "レベル{{lvl}}で解放",
+    "you_are_level": "あなたはレベル{{lvl}}です。練習で上がります。",
+    "you_are_level_cost": "あなたはレベル{{lvl}}です。練習で上がり — そのあと解放に{{cost}} Fameかかります。",
+    "unlock_once": "一度だけ払って解放：",
+    "need_more": "（あと{{count}}必要）",
+    "claim_reward": "報酬を受け取る",
+    "claimed_line": "{{reward}}を受け取りました — このレベルは来週もまた払われます。",
+    "reward_line": "報酬：{{reward}} — 目標を達成したら受け取りましょう。",
+    "goal_complete": "目標達成",
+    "goal_this_week": "今週の目標",
+    "claim": "受け取る",
+    "cost_once": "1回{{cost}}",
+    "per_week": "／週",
+    "percent_done": "{{percent}}%完了",
+    "min_goal": "目標{{min}}分",
+    "min_plus": "{{min}}分以上",
+    "bars_hint": "{{min}}練習した日がそれぞれ数えられます — 緑のバーは達成した日です。",
+    "streak_hint": "{{rule}}練習しましょう — 1日休むと連続はリセットされます。",
+    "streak_rule": "毎日続けて15分以上",
+    "cats_hint": "{{rule}}ときだけ、その日が数えられます。",
+    "cats_rule": "4つのカテゴリーすべてが15分以上になった",
+    "streak_cats_hint": "バーは1本が1カテゴリーです — {{rule}}埋めましょう。",
+    "streak_cats_rule": "4つすべてを毎日続けて15分以上",
+    "investment": "1回きりの投資です。{{weeks}}で元が取れ、そのあとは目標を達成するたびに{{reward}}をずっと受け取れます。",
+    "weeks": "{{count}}週間",
+    "weeks_one": "1週間",
+    "reward_weekly": "毎週+{{reward}} Fame",
+    "dismiss": "閉じる",
+    "how_it_works": "しくみ",
+    "rules": {
+      "0": {
+        "title": "到達したら、一度だけ解放",
+        "desc": "各レベルはあなた自身の練習レベルで開き、一度だけFameがかかります — そのあとはずっとあなたのもの。最初のレベルは無料です。"
+      },
+      "1": {
+        "title": "練習",
+        "desc": "そのレベルの毎週の目標を達成しましょう。"
+      },
+      "2": {
+        "title": "受け取り",
+        "desc": "Fameの報酬を受け取りましょう — 目標を達成した週ごとに何度でも。"
+      }
+    },
+    "example": "例：Grooveは解放に1回40 Fameかかり、毎週+30もらえるので、2週目で元が取れます。目標と受け取りは毎週リセットされます — 1レベルにつき週1回、上のレベルほど多くもらえます。",
+    "toast_locked": "{{name}}はレベル{{lvl}}で解放 — あなたはレベル{{player}}です",
+    "toast_no_fame": "Fameが足りません（必要{{cost}}、所持{{fame}}）",
+    "toast_unlocked": "{{name}}を解放しました！",
+    "toast_purchase_failed": "購入できませんでした",
+    "toast_claimed": "{{name}}から+{{reward}} Fame",
+    "toast_claim_failed": "受け取れませんでした"
+  }
+}

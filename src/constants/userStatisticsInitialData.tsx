@@ -1,4 +1,3 @@
-import { Timestamp } from "firebase/firestore";
 import type { StatisticsDataInterface } from "types/api.types";
 
 export const statisticsInitial: StatisticsDataInterface = {
@@ -24,6 +23,9 @@ export const statisticsInitial: StatisticsDataInterface = {
     learned: [],
     learning: [],
   },
-  guitarStartDate: Timestamp.now(),
+  // A plain value, never a Firestore Timestamp: this object goes into Redux
+  // (restartUserStats, dev previews), which only holds serializable data. The
+  // player's real start date lives on the user document, not in statistics.
+  guitarStartDate: null,
   fame: 0,
 };

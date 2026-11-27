@@ -1,0 +1,476 @@
+{
+  "cta_button": "参加しよう！",
+  "hero_line_1": "ランキングを駆け上がろう。",
+  "hero_line_2": "練習の統計を集めよう。",
+  "hero_line_3": "毎日の練習でポイントを貯めよう。",
+  "hero_line_4": "参加して、ギターを弾くやる気を手に入れよう！",
+  "subtitlebar_text": "練習して、記録して、ポイントを貯めよう！",
+  "slogan_line_1": "RIFF",
+  "slogan_line_2": "QUEST",
+  "technique": "テクニック",
+  "theory": "理論",
+  "hearing": "耳コピ",
+  "creativity": "クリエイティブ",
+  "lvl_short": "Lv",
+  "your_level": "レベル",
+  "points": "ポイント",
+  "points_short": "pt",
+  "profile": "プロフィール",
+  "statistics": "統計",
+  "band": "バンド：",
+  "joined": "参加日：",
+  "stats": {
+    "spent_time": "合計時間",
+    "num_sessions": "セッション",
+    "num_points": "ポイント",
+    "num_habbits": "健康的な習慣",
+    "num_achievements": "実績",
+    "longest_session": "最長セッション",
+    "consecutive days": "最長連続記録",
+    "max_points": "最高スコア",
+    "learned_music": "マスターした曲"
+  },
+  "nav": {
+    "overview": "概要",
+    "activity": "アクティビティ",
+    "songs": "曲",
+    "skills": "スキル",
+    "exercises": "エクササイズ"
+  },
+  "cards": {
+    "practice": {
+      "title": "練習",
+      "description": "定期的に練習して、ギターの腕を上げましょう。",
+      "choose": "エクササイズを選ぶ",
+      "report": "記録"
+    },
+    "songs": {
+      "title": "曲",
+      "description": "練習中の曲や練習したい曲を管理します。"
+    },
+    "skills": {
+      "title": "スキル",
+      "description": "進捗を確認して、ギターのスキルを伸ばしましょう。"
+    },
+    "library": {
+      "title": "エクササイズライブラリ",
+      "description": "ギターの上達に役立つさまざまなエクササイズを見つけましょう。"
+    }
+  },
+  "yearsOfPlaying": "ギター歴：",
+  "practice_insights": "練習の分析",
+  "insights": {
+    "avg_session": "セッションの平均の長さ",
+    "avg_session_desc": "ふだんの練習セッションの長さ",
+    "points_per_hour": "1時間あたりのポイント",
+    "points_per_hour_desc": "練習の効率のスコア",
+    "strongest_area": "いちばん強い分野",
+    "strongest_area_desc": "いちばん長く練習している分野",
+    "focus_suggestion": "重点のおすすめ",
+    "focus_suggestion_desc": "もう少し手をかけるとよさそうな分野",
+    "focus_technique": "テクニックの練習に力を入れよう",
+    "focus_theory": "音楽理論に力を入れよう",
+    "focus_hearing": "耳トレに力を入れよう",
+    "focus_creativity": "クリエイティブなエクササイズに力を入れよう",
+    "focus_balanced": "今のバランスの良い練習を続けよう",
+    "advice": {
+      "first_steps": "すべての分野で練習時間を記録し始めると、あなた向けの分析が表示されます",
+      "complement_technique": "テクニックの土台はしっかりしています。理論と耳トレをもっと取り入れましょう",
+      "complement_theory": "理論の知識を、実践的なエクササイズと耳トレで使ってみましょう",
+      "complement_hearing": "耳トレの力を、テクニックの練習と理論につなげましょう",
+      "complement_creativity": "クリエイティブな練習と、テクニックのエクササイズや理論の勉強のバランスを取りましょう",
+      "balance_early_technique": "しっかりした土台を作るため、ルーティンにテクニックの練習をもっと入れましょう",
+      "balance_early_theory": "練習していることを理解するため、理論の勉強を少し加えましょう",
+      "balance_early_hearing": "練習のルーティンに耳トレのエクササイズを入れましょう",
+      "balance_early_creativity": "練習のルーティンにクリエイティブなエクササイズを少し加えましょう",
+      "increase_complexity": "練習のバランスは良好です。各分野で難しさを上げてみましょう",
+      "build_foundation": "良いバランスです！　継続を大事にして、少しずつ練習時間を増やしましょう",
+      "technique_foundation_needed": "しっかりした土台を作るため、テクニックのエクササイズを優先しましょう",
+      "theory_basics_needed": "練習を支えるため、理論の基本の勉強を入れましょう",
+      "steady_progress": "今のバランスの良いやり方を続けながら、少しずつ強度を上げましょう",
+      "mastery_level": "すべての分野で高いレベルに達しています。それらのスキルを、複雑な音楽のプロジェクトで組み合わせることに集中しましょう",
+      "apply_knowledge_creatively": "テクニックと理論の土台がしっかりしています。それを創造的な表現に注ぎましょう",
+      "technique_to_theoretical": "テクニックは上級です。理論を理解すると、それをもっとうまく活かせます",
+      "technique_specialist": "テクニックの練習は見事です。そのスキルを、より複雑な曲で活かすことに集中しましょう",
+      "theory_specialist": "理論の知識は上級です。作曲やアレンジでその知識を使ってみましょう",
+      "hearing_specialist": "耳の力は並外れています。採譜のプロジェクトや、耳を使った指導も考えてみましょう",
+      "creativity_specialist": "創造力が強みです。独自のスタイル作りや、オリジナル曲の作曲に集中しましょう",
+      "rapid_balanced_progress": "すべての分野でとても良く進んでいます。このバランスを保ちながら、難しさを上げていきましょう"
+    }
+  },
+  "seasonal_achievements": {
+    "title": "シーズン実績",
+    "points": "ポイント",
+    "no_achievements": "シーズン実績はまだありません",
+    "heading": "シーズン",
+    "best_place": "最高順位：{{place}}位",
+    "top_ten": "トップ10入り：{{count}}回",
+    "points_short": "pt",
+    "all_seasons": "全シーズン",
+    "show_all": "すべて表示（{{count}}）",
+    "show_less": "閉じる"
+  },
+  "activity": "アクティビティ",
+  "detailed_stats": {
+    "title": "詳細な統計",
+    "description": "実績と上達の全体像",
+    "songs_title": "曲",
+    "songs_description": "ライブラリ内の曲の習得状況",
+    "records_title": "記録と実績"
+  },
+  "no_songs_title": "まだ曲がありません",
+  "no_songs_description": "最初の曲をライブラリに追加して、進捗を記録しましょう。",
+  "browse_library": "ライブラリを見る",
+  "weekly_summary": "週間サマリー",
+  "sessions_this_week": "今週のセッション",
+  "recordings_hint": "演奏と練習のカバー",
+  "days_ago": {
+    "today": "今日",
+    "yesterday": "昨日",
+    "days": "{{count}}日前",
+    "month": "1か月前",
+    "months": "{{count}}か月前",
+    "year": "1年前",
+    "years": "{{count}}年前"
+  },
+  "layout": {
+    "sections": {
+      "trophies": {
+        "title": "トロフィーケース",
+        "description": "いちばん誇らしい実績を5つまで、その珍しさと一緒に。"
+      },
+      "signature-songs": {
+        "title": "代表曲",
+        "description": "知ってほしいマスター済みの曲を5曲まで。"
+      },
+      "about": {
+        "title": "自己紹介",
+        "description": "あなた自身、機材、目標についてひとこと。"
+      },
+      "insights": {
+        "title": "練習の分析",
+        "description": "セッションの平均の長さ、1時間あたりのポイント、いちばん強い分野。"
+      },
+      "activity": {
+        "title": "アクティビティ",
+        "description": "1年分の練習のヒートマップ。"
+      },
+      "statistics": {
+        "title": "統計",
+        "description": "合計時間、ポイント、セッション数、スキルの配分。"
+      },
+      "repertoire": {
+        "title": "曲のレパートリー",
+        "description": "マスター済みの曲を難易度ランクごとに。"
+      },
+      "learning": {
+        "title": "練習中",
+        "description": "今取り組んでいる曲。"
+      },
+      "skills": {
+        "title": "スキル",
+        "description": "解放したスキルとそのレベル。"
+      },
+      "rig": {
+        "title": "リグ",
+        "description": "あなたのギターとエフェクターボード。"
+      },
+      "recordings": {
+        "title": "レコーディング",
+        "description": "アップロードしたカバーや練習動画。"
+      },
+      "seasonal": {
+        "title": "シーズンの実績",
+        "description": "毎月のシーズンのバッジ。"
+      }
+    },
+    "facts": {
+      "last-practice": "最後の練習",
+      "streak": "連続記録",
+      "joined": "参加日",
+      "playing-for": "ギター歴",
+      "band": "バンド",
+      "guild": "ギルド",
+      "links": "YouTube / SoundCloud"
+    },
+    "badges": {
+      "level": "レベルのリング",
+      "song-tier": "曲のランク"
+    },
+    "accents": {
+      "cyan": "シアン",
+      "emerald": "エメラルド",
+      "amber": "アンバー",
+      "orange": "オレンジ",
+      "purple": "パープル"
+    },
+    "accent_unlocks": {
+      "cyan": "無料",
+      "emerald": "無料",
+      "orange": "15日の連続記録（無限）",
+      "amber": "ベリーレアの実績をどれか獲得",
+      "purple": "エピックの実績をどれか獲得"
+    },
+    "banners": {
+      "classic": {
+        "label": "クラシック",
+        "requirement": "無料"
+      },
+      "midnight": {
+        "label": "ミッドナイト",
+        "requirement": "無料"
+      },
+      "stage": {
+        "label": "ステージライト",
+        "requirement": "パフォーマンスのセッションを記録（ステージデビュー）、または100セッション"
+      },
+      "on-air": {
+        "label": "オンエア",
+        "requirement": "練習を録音（何かを録音した、またはアイデアを録音）"
+      },
+      "ember": {
+        "label": "エンバー",
+        "requirement": "1回の記録で60ポイント獲得（ギターパワー）"
+      },
+      "golden-hour": {
+        "label": "ゴールデンアワー",
+        "requirement": "100時間練習（1% — 1万時間の法則）"
+      },
+      "deep-water": {
+        "label": "ディープウォーター",
+        "requirement": "15日の連続記録、または100日練習"
+      },
+      "amethyst": {
+        "label": "アメジスト",
+        "requirement": "エピックの実績をどれか獲得"
+      }
+    },
+    "rarity": {
+      "common": "コモン",
+      "rare": "レア",
+      "veryRare": "ベリーレア",
+      "epic": "エピック"
+    },
+    "titles": {
+      "time_1": "努力家",
+      "time_2": "不屈の人",
+      "time_3": "1万時間の巡礼者",
+      "balance": "黄金の中庸",
+      "fire": "パワーハウス",
+      "health_habits": "健康第一",
+      "points_1": "表面をなでる者",
+      "points_2": "小鳥のコード弾き",
+      "points_3": "カエルの王",
+      "doctor": "ドクター",
+      "tired": "燃え尽きた人",
+      "diamond": "ダイヤモンドギターの主",
+      "scientist": "科学者",
+      "artist": "アーティスト",
+      "book": "博識",
+      "bigear": "大きな耳",
+      "wizard": "魔法使い",
+      "medal": "勲章持ち",
+      "day_1": "継続の人",
+      "day_2": "まる1週間",
+      "day_3": "止まらない人",
+      "session_1": "クリッカー",
+      "session_2": "旅人",
+      "session_3": "カウボーイ",
+      "ring": "弦の指輪の主",
+      "headphones": "よく聴く人",
+      "ninja": "テクニックの戦士",
+      "record": "録音する人",
+      "vinyl": "レコードに刻んだアイデア",
+      "rightway": "ウォームアップ済み",
+      "yolo": "向こう見ず",
+      "path": "計画家",
+      "dumbbel": "力持ち",
+      "vip": "Riff Questの建設者",
+      "short": "耐え抜く人",
+      "event": "イベントの常連",
+      "lvl100": "伝説のピック",
+      "fireSession": "完璧なセッション",
+      "batteryHearth": "バッテリーハート",
+      "100days": "100日の人",
+      "bomb": "連続記録の救い手",
+      "wannaLearn1": "孤高の戦士",
+      "wannaLearn2": "二刀流",
+      "wannaLearn3": "ノートを埋める人",
+      "wannaLearn10": "音符に迷子",
+      "wannaLearn30": "終わらないやりたいことリスト",
+      "learning1": "最初のひと持ち上げ",
+      "learning3": "バーを上げる人",
+      "learning5": "押しの強い人",
+      "learning10": "音楽の筋肉",
+      "learning20": "ジャグラー",
+      "learning30": "音楽のオーラ",
+      "learned1": "ハートの2",
+      "learned3": "ダイヤの3",
+      "learned5": "ダイヤの4",
+      "learned10": "ダイヤの5",
+      "learned20": "ダイヤの6",
+      "learned30": "ダイヤのジャック",
+      "learned50": "ダイヤのキング",
+      "learned100": "ダイヤのエース",
+      "performance": "ステージデビュー",
+      "rig_50": "シグナルパス",
+      "rig_150": "ステージ準備完了",
+      "rig_300": "スタジオの壁",
+      "rig_500": "ヘッドライナー",
+      "rig_800": "ウォール・オブ・サウンド",
+      "rig_1000": "4桁の大台",
+      "first_rare": "ちょっと特別",
+      "first_epic": "コレクター",
+      "first_legendary": "名器の持ち主",
+      "first_mythic": "聖杯の守り手",
+      "rarity_full_set": "全レアリティ制覇",
+      "museum_1": "学芸員",
+      "museum_5": "プライベートコレクション",
+      "serial_one": "ナンバーワン",
+      "globetrotter": "世界を旅した人",
+      "vintage_1970": "アンプより年上"
+    }
+  },
+  "card_sheet": {
+    "title": "プロフィールカード",
+    "description": "訪れた人が最初に見るものを決めましょう。変更は自動で保存されます。",
+    "tabs": {
+      "card": "カード",
+      "style": "スタイル",
+      "title": "称号",
+      "trophies": "トロフィー",
+      "songs": "曲"
+    },
+    "tagline": "キャッチフレーズ",
+    "tagline_placeholder": "200 bpmを追いかけるメタルのリズムギタリスト",
+    "tagline_hint": "名前の下に表示されます。",
+    "about": "自己紹介",
+    "about_placeholder": "弾いているもの、取り組んでいること、機材…",
+    "about_hint": "自己紹介のセクションに表示されます。",
+    "facts": "名前の下の情報",
+    "facts_settings_hint": "バンド、リンク、ギターを始めた年は、こちらで設定します：",
+    "settings_link": "設定",
+    "badges": "右側のバッジ",
+    "no_achievements": "まだ実績がありません。実績を1つ獲得するたびに、ここで選べる称号とトロフィーが増えます。",
+    "title_hint": "どの実績にも称号が付いてきます。名前の上に1つ掲げましょう — 珍しいものが先に並びます。",
+    "no_title": "称号なし",
+    "trophies_hint": "選んだ順に{{max}}個まで固定できます（{{count}}/{{max}}）。何も固定しなければ、いちばん珍しいものが表示されます。",
+    "no_songs": "曲ボードで曲をマスター済みにすると、ここに固定できるようになります。",
+    "songs_hint": "マスター済みの曲を選んだ順に{{max}}曲まで固定できます（{{count}}/{{max}}）。何も固定しなければ、いちばん難しい曲が表示されます。",
+    "background": "背景",
+    "background_hint": "ヘッダーの背景のシーン。どれも実績で手に入ります。",
+    "emblem": "エンブレム",
+    "emblem_hint": "実績のアイコンの1つを、レアリティの色でヘッダーの背景に大きく刻みます。",
+    "no_emblem": "エンブレムなし",
+    "none": "なし",
+    "accent": "アクセントカラー",
+    "accent_hint": "珍しい実績を獲得するにつれて、色が開いていきます。"
+  },
+  "sections": {
+    "slots": "{{count}}/{{max}}枠",
+    "edit_hint": "ドラッグで並べ替え、見せたくないものは隠せます。",
+    "add": "セクションを追加",
+    "reset": "リセット",
+    "done": "完了",
+    "customize": "プロフィールをカスタマイズ",
+    "empty_owner": "今のプロフィールにはカードしかありません。",
+    "empty_visitor": "このプレイヤーはプロフィールを短くしています。",
+    "add_title": "プロフィールに追加",
+    "add_description": "新しいセクションはいちばん下に入ります — 好きな場所へドラッグしてください。",
+    "add_empty": "すべてのセクションがすでにプロフィールにあります。",
+    "full": "プロフィールがいっぱいです — {{max}}枠中{{max}}枠を使用中。場所を空けるにはセクションを隠してください。"
+  },
+  "tile": {
+    "move": "{{title}}を移動",
+    "drag": "ドラッグで移動",
+    "move_up_aria": "{{title}}を上へ",
+    "move_up": "上へ",
+    "move_down_aria": "{{title}}を下へ",
+    "move_down": "下へ",
+    "make_half": "{{title}}を半分の幅にする",
+    "make_full": "{{title}}を全幅にする",
+    "half": "半分の幅",
+    "full": "全幅",
+    "hide_aria": "{{title}}を隠す",
+    "hide": "プロフィールから隠す"
+  },
+  "header": {
+    "not_yet": "まだなし",
+    "days": "{{count}}日",
+    "playing_guitar": "ギター歴",
+    "years": "{{count}}年",
+    "eyebrow": "プレイヤープロフィール",
+    "title_from": "実績で獲得した称号 · {{rarity}}"
+  },
+  "cases": {
+    "rarest": "レアな実績",
+    "hardest": "マスターした難しい曲",
+    "pin_hint": "「プロフィールをカスタマイズ → プロフィールカード」で自分で選べます。",
+    "players_rate": "プレイヤーの{{rate}}%",
+    "title": "称号：{{title}}",
+    "time_spent": "この曲の練習時間"
+  },
+  "tier_badge": {
+    "label": "曲ティア",
+    "unavailable": "利用不可",
+    "no_rated": "評価済みの曲がありません",
+    "more": "ほか{{count}}曲",
+    "loading": "曲ティアを読み込み中…",
+    "error": "曲を読み込めなかったため、ティアを表示できません。再読み込みでたいてい直ります。",
+    "how_it_works": "ティアは、マスターした難しい曲の加重平均で決まり、いちばん難しい曲の難易度が上限になります — 難しい曲が1曲だけでは高いティアには上がりません。",
+    "click_board": "クリックして曲ボードを見る。",
+    "learn_own": "あと{{count}}曲マスターするとティアが解放されます。",
+    "learn_other": "ティアの表示にはあと{{count}}曲のマスターが必要です。",
+    "none_rated_own": "マスターした曲にまだ評価がないため、ティアを算出できません。",
+    "none_rated_other": "マスターした曲にまだ評価がないため、ティアを算出できません。"
+  },
+  "score_tooltip": {
+    "streak": "{{count}}日連続",
+    "no_streak": "連続記録はまだありません",
+    "earn_now": "現在の獲得量",
+    "per_hour": "練習1時間あたり",
+    "per_habit": "習慣1つあたり",
+    "ladder": {
+      "0": "1日目",
+      "1": "2日目",
+      "2": "3日目",
+      "3": "4日目",
+      "4": "5日目以降"
+    },
+    "rest_day": "週に1日休んでも連続記録は途切れません。"
+  },
+  "repertoire": {
+    "empty_owner": "曲ボードでマスター済みにした曲がここに並びます。",
+    "empty_owner_learning": "曲ボードでマスター済みにした曲がここに並びます。{{count}}曲が練習中です。",
+    "empty_visitor": "マスター済みの曲はまだありません。",
+    "empty_visitor_learning": "マスター済みの曲はまだありません。{{count}}曲が練習中です。",
+    "learned": "{{count}}曲マスター",
+    "in_progress": "{{count}}曲練習中"
+  },
+  "week_widget": {
+    "this_week": "今週",
+    "total": "合計",
+    "practiced": "{{time}}練習"
+  },
+  "stats_section": {
+    "skills_hint": "カテゴリー別の練習時間の内訳"
+  },
+  "rig": {
+    "level": "リグレベル",
+    "level_hint": "リグの合計レベル（装備中のギター＋ペダルボード）",
+    "off_board": "ランク外"
+  },
+  "landing": {
+    "great_job": "今日もよく頑張りました！",
+    "last_session": "前回のセッション",
+    "continue": "続ける",
+    "your_progress": "あなたの進捗",
+    "start_today": "今日の練習を始める",
+    "practice": "練習",
+    "practice_more": "もっと練習する",
+    "level": "レベル",
+    "xp": "{{current}} / {{total}} XP",
+    "first_session": "最初のセッションを弾こう",
+    "start": "スタート"
+  }
+}

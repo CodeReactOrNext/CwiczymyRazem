@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import { TierScale } from "feature/songs/components/SongLearningStats/TierScale";
 import { TierPick } from "feature/songs/components/SongsGrid/TierBadge";
 import type { NextTierProgress } from "feature/songs/utils/difficulty.utils";
 import { MIN_LEARNED_SONGS_FOR_TIER } from "feature/songs/utils/difficulty.utils";
@@ -196,6 +197,15 @@ export const SkillPowerHero = ({
           />
         </span>
       </button>
+
+      {/* Where the score sits on the D → S ladder. Shown on a phone too: it is
+          the one thing the bare number does not say. */}
+      {!isTierLocked && (
+        <TierScale
+          skillPower={skillPower}
+          className='w-full lg:w-auto lg:min-w-[15rem] lg:max-w-sm lg:flex-1'
+        />
+      )}
 
       {/* Same rhythm as the score: label on top, value under it. */}
       <dl

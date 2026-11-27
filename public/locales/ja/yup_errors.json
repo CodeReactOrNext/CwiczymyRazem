@@ -1,0 +1,16 @@
+{
+  "valid_email": "正しいメールアドレスを入力してください",
+  "stronger_password": "もっと強いパスワードを入力してください",
+  "password_char_number": "パスワードは8文字以上にしてください",
+  "username_char_number": "ユーザー名は3文字以上にしてください",
+  "username_char_max_number": "ユーザー名は28文字以下にしてください",
+  "required": "必須",
+  "same_passwords": "パスワードが一致しません",
+  "no_ends_whitespace": "ユーザー名の最初と最後に空白は使えません",
+  "allowed_signs": "使えるのは文字、数字、- _ だけです",
+  "not_yt_link": "YouTubeチャンネルの正しいリンクではありません",
+  "not_sc_link": "SoundCloudの正しいリンクではありません",
+  "empty": "空にはできません",
+  "max_bands": "60文字以下にしてください",
+  "min_bands": "2文字以上にしてください"
+}

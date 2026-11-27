@@ -54,13 +54,15 @@ const formatMin = (ms: number) => {
   return rem > 0 ? `${h}h ${rem} min` : `${h}h`;
 };
 
+// Short form over the bars ("1h 5m"): "1h 5 min" ran into its neighbours on
+// narrow phone bars. The tooltip keeps the long form.
 const formatBarLabel = (ms: number) => {
   const m = Math.floor(ms / 60000);
   if (m === 0) return "";
-  if (m < 60) return `${m} min`;
+  if (m < 60) return `${m}m`;
   const h = Math.floor(m / 60);
   const rem = m % 60;
-  return rem > 0 ? `${h}h ${rem} min` : `${h}h`;
+  return rem > 0 ? `${h}h ${rem}m` : `${h}h`;
 };
 
 const CustomTooltip = ({ active, payload, goalMin }: any) => {
@@ -219,7 +221,7 @@ export const PracticeStatsWidget = ({
           <div className="flex items-center gap-3">
             {dayWithoutBreak > 0 && (
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold leading-none text-zinc-50 tabular-nums">{dayWithoutBreak}</span>
+                <span className="text-2xl font-bold leading-none text-zinc-50 tabular-nums">{dayWithoutBreak}</span>
                 <span className="text-sm font-medium text-zinc-400">{t("layout.facts.streak")}</span>
               </div>
             )}
@@ -341,7 +343,8 @@ export const PracticeStatsWidget = ({
                     fill = ink.empty;
                   }
 
-                  const labelColor = payload.isGoalMet ? ink.barLabelMet : ink.barLabel;
+                  // Only today's number is bright; the rest of the week reads as context.
+                  const labelColor = payload.isToday ? ink.barLabelMet : ink.barLabel;
                   const label = formatBarLabel(payload.totalMs);
 
                   return (

@@ -50,7 +50,10 @@
     "slot_discover": "Nowe dla ciebie",
     "slot_comeback": "Powrót po przerwie",
     "reroll": "Wymień to zadanie",
-    "reroll_hint": "Jedna wymiana dziennie"
+    "reroll_hint": "Jedna wymiana dziennie",
+    "swap": "Wymień",
+    "swap_cancel": "Anuluj",
+    "swap_pick": "Wybierz zadanie, które chcesz wymienić. Masz jedną wymianę dziennie."
   },
   "customize": {
     "refreshing": "Odświeżanie…",

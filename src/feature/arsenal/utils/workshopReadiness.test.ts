@@ -51,6 +51,7 @@ const entry = (over: Partial<WorkshopSubject> = {}): WorkshopEntry => {
     restored: false,
     subject: s,
     uses: [],
+    traits: [],
   };
 };
 

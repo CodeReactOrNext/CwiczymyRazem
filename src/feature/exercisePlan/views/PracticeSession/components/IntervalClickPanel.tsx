@@ -20,8 +20,10 @@ import { clickTargetKey, computeClickTargets, isWithinReach, reachZoneKeys, reve
 import { INTERVAL_PHRASE_HOLD_MS, playIntervalPhrase } from "../helpers/intervalPreview";
 import { ClickableFretboard, useShowFullNeck } from "./ClickableFretboard";
 import { HuntRoundBar } from "./HuntRoundBar";
+import { IntervalRoundStrip, ROUND_VERDICT_TONE } from "./HuntRoundStrip";
 import { HuntAsk, HuntStage, HuntViewMenu } from "./HuntStage";
 import { HuntSuccessBurst } from "./HuntSuccessBurst";
+import { VERDICT_GROUND } from "./SessionVerdict";
 
 interface IntervalClickPanelProps {
   /** Fallbacks for before the rotation hook has published its first prompt. */
@@ -381,15 +383,32 @@ export function IntervalClickPanel({
       awaitingStart={!isPlaying}
       onStart={onStart}
       stats={
-        <HuntRoundBar
-          mistakes={isExamMode ? { count: mistakeCount, limit: CLICK_EXAM_MISTAKE_LIMIT } : undefined}
-          streak={noteHuntStreak}
-          secondsLeft={isRotating ? noteHuntSecondsLeft : null}
-          secondsTotal={noteHuntSecondsTotal}
-          complete={complete}
-          onSkip={isRotating ? advanceHunt : undefined}
-          canSkip={!isRoundOver && !complete}
-        />
+        // The round's verdict stands over its own bar, at the top of the drill
+        // where the eyes already are, rather than at the foot of the screen. The
+        // bar keeps its place underneath, so the board doesn't jump every round.
+        <div className='relative'>
+          <div className={cn(noteHuntRoundEnd && "invisible")}>
+            <HuntRoundBar
+              mistakes={isExamMode ? { count: mistakeCount, limit: CLICK_EXAM_MISTAKE_LIMIT } : undefined}
+              streak={noteHuntStreak}
+              secondsLeft={isRotating ? noteHuntSecondsLeft : null}
+              secondsTotal={noteHuntSecondsTotal}
+              complete={complete}
+              // A skipped round is an unanswered one, and in an exam that ends it.
+              onSkip={isRotating && !isExamMode ? advanceHunt : undefined}
+              canSkip={!isRoundOver && !complete}
+            />
+          </div>
+          {noteHuntRoundEnd && (
+            <div
+              className={cn(
+                "absolute inset-x-0 top-1/2 z-10 flex -translate-y-1/2 items-center rounded-lg px-4 py-2 shortwide:py-1.5",
+                VERDICT_GROUND[ROUND_VERDICT_TONE[noteHuntRoundEnd.kind]],
+              )}>
+              <IntervalRoundStrip roundEnd={noteHuntRoundEnd} isExamMode={!!isExamMode} onContinue={advanceHunt} />
+            </div>
+          )}
+        </div>
       }
       prompt={
         // Sideways on a phone the verdict stands under the board and needs the

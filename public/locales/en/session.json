@@ -775,7 +775,16 @@
   },
   "click_hunt": {
     "play_note": "Play the note you are looking for",
-    "hear_it": "Hear it"
+    "hear_it": "Hear it",
+    "find_both_on_fret": "Find both {{note}}'s on fret {{fret}}",
+    "find_all_on_fret": "Find all {{count}} {{note}}'s on fret {{fret}}",
+    "to_find_one": "{{count}} position to find",
+    "to_find_other": "{{count}} positions to find",
+    "left_one": "{{count}} more to go",
+    "left_other": "{{count}} more to go",
+    "all_found": "All positions found",
+    "hint_scan": "Check every string, top to bottom.",
+    "hint_same_e": "The thin e string has the same notes as the thick E."
   },
   "strum": {
     "strum": "Strum",
@@ -979,6 +988,8 @@
     "untitled": "Recording"
   },
   "exam_click_failed": "{{limit}} wrong clicks — exam failed.",
+  "exam_click_time_up": "A round ran out unanswered — exam failed.",
+  "exam_click_rounds_short": "You solved {{solved}} rounds — the exam needs {{min}}.",
   "verdict": {
     "time": "{{minutes}} min done",
     "clean": "Clean run",

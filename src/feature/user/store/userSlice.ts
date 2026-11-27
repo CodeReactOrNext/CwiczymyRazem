@@ -97,11 +97,12 @@ const userSlice = createSlice({
     restoreUserSnapshot: (state, { payload }: PayloadAction<UserSnapshot>) => {
       if (state.userAuth) return;
       state.userAuth = payload.userAuth;
-      state.userInfo = payload.userInfo;
-      // TEMP: Unlock master for all users. Remove this block to restore Stripe/role-based access.
-      if (state.userInfo) {
-        state.userInfo.role = "master";
-      }
+      // A copy: a plain object assigned into an Immer draft is not drafted, so
+      // setting `role` on it wrote into (and froze) the caller's payload.
+      // TEMP: Unlock master for all users. Drop `role` to restore Stripe/role-based access.
+      state.userInfo = payload.userInfo
+        ? { ...payload.userInfo, role: "master" }
+        : null;
       state.currentUserStats = payload.currentUserStats;
       state.isUserSnapshot = true;
     },

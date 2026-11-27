@@ -1,0 +1,1012 @@
+{
+  "close": "閉じる",
+  "start": "スタート",
+  "cancel": "キャンセル",
+  "media": {
+    "guitar_off": "ギターオフ",
+    "guitar_on": "ギターオン",
+    "guitar": "ギター",
+    "tuning_locked": "このエクササイズではチューニングが固定されています",
+    "guitar_tuning": "ギターのチューニング",
+    "guitar_tuning_named": "ギターのチューニング：{{name}}",
+    "guitar_tuning_change": "ギターのチューニング — クリックで変更",
+    "pitch_required": "試験中はピッチ検出が必要です",
+    "pitch_on": "ピッチ検出オン",
+    "pitch_off": "ピッチ検出オフ",
+    "pitch_detect": "ピッチ検出",
+    "tuner": "チューナー",
+    "recalibrate": "入力設定",
+    "playback_off": "ギター再生オフ — クリックでTAB譜の音を聴く",
+    "playback_on": "ギター再生オン — クリックでTAB譜の音をミュート",
+    "playback": "ギター再生",
+    "mic_active": "マイク有効 — アプリがギターの音を聴いています",
+    "mic_enable": "マイクを有効にすると、弾いている音を検出できます",
+    "mic_tools_hint": "入力ツール：設定、チューナー、トラブルシューティング",
+    "mic_tools": "入力ツール",
+    "mic_not_working": "ギターが検出されない？",
+    "boost_hint": "Guitar Proの再生音が小さすぎる場合は、100%以上にブーストしてください。",
+    "bass_tuning": "ベースのチューニング",
+    "bass_tuning_named": "ベースのチューニング：{{name}}",
+    "bass_tuning_change": "ベースのチューニング — クリックで変更"
+  },
+  "mic_help": {
+    "title": "入力のトラブルシューティング",
+    "intro": "アプリがギターの音を拾えない、または違う音を検出する場合は、次の手順を順番に試してください。ほとんどの問題は、ブラウザの許可設定か、別のアプリがマイクを使っていることが原因です。",
+    "resetting": "リセット中…",
+    "reset": "マイク設定をリセットして再読み込み",
+    "reset_hint": "このアプリに保存されたキャリブレーションとマイク設定を消去して、ページを再読み込みします。",
+    "tips": {
+      "0": {
+        "title": "マイクへのアクセスを許可する",
+        "description": "ブラウザのアドレスバーにある鍵／マイクのアイコンをクリックし、このサイトにマイクの使用が許可されているか確認してください。誤ってブロックした場合は「許可」に戻して、ページを再読み込みしてください。"
+      },
+      "1": {
+        "title": "正しい入力デバイスを選ぶ",
+        "description": "マイクやオーディオインターフェースが複数ある場合は、入力設定を開いて正しいものを選んでください。次回からはアプリが覚えています。"
+      },
+      "2": {
+        "title": "マイクを空ける",
+        "description": "マイクを使っている可能性のある他のアプリ（Zoom、Discord、OBS、Teams、別のブラウザタブなど）を閉じてください。低遅延の入力を使えるのは一度に1つのアプリだけです。"
+      },
+      "3": {
+        "title": "入力設定をもう一度行う",
+        "description": "TAB譜の上にある入力設定を開いて、信号を確認し、感度を設定し直してください。機材や部屋を変えたあとにおすすめです。"
+      },
+      "4": {
+        "title": "音量とチューニングを確認する",
+        "description": "ギターのチューニングが合っていて、音量が十分か確認してください。マイクに近づき、入力ゲインを上げ、周りの雑音を減らしましょう。小さすぎる音や歪んだ音は検出が難しくなります。"
+      },
+      "5": {
+        "title": "OSのプライバシー設定を確認する",
+        "description": "Windows：設定 → プライバシーとセキュリティ → マイク で、ブラウザを許可します。macOS：システム設定 → プライバシーとセキュリティ → マイク。ここでもブラウザが有効になっている必要があります。"
+      },
+      "6": {
+        "title": "Cookieとサイトデータを消去する",
+        "description": "古い許可設定やキャッシュが原因で録音できないことがあります。ブラウザの設定でこのサイトのCookieとサイトデータを消去し、再読み込みしてからもう一度マイクを許可してください。（このアプリに保存されたマイク設定は、下のリセットボタンで消去できます。）"
+      },
+      "7": {
+        "title": "別のブラウザを試す",
+        "description": "オーディオ入力がいちばん安定しているのはChromeとEdgeです。ブラウザによっては、バックグラウンドのタブや安全でない接続でマイクを制限・ブロックします — このタブを前面に出し、httpsで開いてください。"
+      }
+    }
+  },
+  "timing": {
+    "title": "タイミングのキャリブレーション",
+    "intro": "スピーカー、ヘッドホン、オーディオインターフェースは、聞こえるクリックとアプリが拾う音との間にそれぞれ遅延を生みます。いくつかのクリックに合わせて弾けば遅延を測定し、タイミングの評価を聞こえ方に合わせます。",
+    "step1": "いつも練習で使うスピーカーかヘッドホンを使ってください。",
+    "step2": "クリックごとに、単音でもコードでも何か弾いてください。{{bpm}} BPM、準備に{{countIn}}クリック、そのあと{{clicks}}クリックを計測します。",
+    "step3": "クリックより先ではなく、クリックに合わせて弾きましょう。",
+    "now_using": "現在の設定",
+    "measured_here": "このブラウザで測定",
+    "measured_here_desktop": "デスクトップアプリで測定",
+    "estimate": "推定値（まだ未測定）",
+    "mic_first": "先にマイクをオンにしてください",
+    "forget": "測定結果を消して推定値に戻す",
+    "get_ready": "準備して。パルスを聴いて",
+    "pluck": "クリックごとに弾いて",
+    "fail": {
+      "too_few": "聞き取れたクリックが足りません",
+      "ahead": "音がクリックより先に来ました",
+      "spread": "ばらつきが大きすぎます",
+      "too_few_body": "{{total}}回中{{hits}}回を検出しました。最低{{min}}回必要です。もう少し強く弾き、ギターがつながっているマイクを選んでいるか確認してください。",
+      "ahead_body": "弾く前の音が届くことはないので、何か別の音を拾っています。クリックの間は弦をミュートせずに鳴らしたまま、クリックより先ではなくクリックに合わせて弾いてください。",
+      "spread_body": "約±{{spread}} msずれていて、これは機材よりも今回の演奏によるものです。クリックぴったりに弾き、弦を鳴らしたままにしてもう一度試してください。"
+    },
+    "try_again": "もう一度",
+    "measured_delay": "測定した遅延",
+    "heard": "{{total}}クリック中{{hits}}回を検出、ばらつき±{{spread}} ms以内",
+    "saved_before": "前回保存した値",
+    "estimated_before": "前回の推定値",
+    "use": "これでOK · {{ms}} ms",
+    "map": {
+      "title": "それぞれの音が入ったタイミング",
+      "click": "クリック",
+      "aria": "{{total}}回中{{hits}}回を検出、通常クリックの{{ms}} ms後"
+    }
+  },
+  "add_to_plan": "プランに追加",
+  "saving": "保存中…",
+  "finishing": {
+    "counting": "音を数えています…",
+    "crunching": "計算しています…",
+    "judging": "グルーヴを審査中…",
+    "asking": "メトロノームに聞いています…",
+    "polishing": "スコアを仕上げています…"
+  },
+  "scale_dialog": {
+    "title": "練習するスケールを選ぶ",
+    "description": "スケール練習の設定をします。TAB譜は自動で作成されます。",
+    "root": "ルート音",
+    "select_note": "音を選ぶ",
+    "scale_type": "スケールの種類",
+    "select_scale": "スケールを選ぶ",
+    "pattern": "練習パターン",
+    "select_pattern": "パターンを選ぶ",
+    "position": "指板のポジション",
+    "select_position": "ポジションを選ぶ",
+    "full_fretboard": "指板全体（全ポジション）",
+    "position_frets": "ポジション{{pos}}（{{from}}〜{{to}}フレット）",
+    "all_hint": "ネック全体の主要ポジションをすべてカバーする、長めのエクササイズを作成します",
+    "position_hint": "ポジションで、指板のどこでスケールを練習するかが決まります",
+    "preview_all": "全ポジション — 0〜15フレット",
+    "preview_position": "ポジション{{pos}} — {{from}}〜{{to}}フレット"
+  },
+  "chord_dialog": {
+    "title": "コード練習の設定",
+    "description": "エクササイズを組み立てましょう。最大8コードまで並べられます。",
+    "click_to_add": "下のコードをクリックして追加...",
+    "sequence": "コード進行（{{count}}/8）",
+    "remove_chord": "{{chord}}を削除",
+    "beginner": "初級",
+    "intermediate": "中級",
+    "advanced": "上級",
+    "frequency": "コードチェンジの頻度",
+    "every_bar": "1小節ごと",
+    "every_2_beats": "2拍ごと",
+    "every_beat": "1拍ごと",
+    "hide_tabs": "フレット番号を隠す",
+    "by_ear": "耳と記憶で弾く"
+  },
+  "toolbar": {
+    "play_tab": "TAB譜を再生",
+    "backing": "バッキング",
+    "standard_tuning": "Eスタンダード",
+    "mic_scoring": "マイク採点",
+    "mic_setup": "マイク設定",
+    "wait_mode": "待機モード",
+    "progress": "進捗",
+    "slow_down": "テンポを落とす"
+  },
+  "quick": {
+    "tempo_reset": "メトロノームのテンポ — 推奨値に戻す",
+    "slower_hint": "遅く（Shift：−5 BPM）",
+    "slower": "遅く",
+    "tempo_type": "テンポ（BPM） — クリックで数値を入力",
+    "edit_bpm": "BPMを編集",
+    "faster_hint": "速く（Shift：+5 BPM）",
+    "faster": "速く",
+    "subdivision_hint": "クリックの分割：4分、8分、3連符…",
+    "subdivision": "分割",
+    "accents_set": "アクセントはこのエクササイズで決まっています",
+    "beats_accents": "1小節の拍数とアクセント",
+    "beats_per_bar": "1小節の拍数"
+  },
+  "tab": {
+    "zoom_out_hint": "縮小 — エクササイズをもっと広く表示",
+    "zoom_out": "縮小",
+    "reset_zoom": "ズームをリセット",
+    "zoom_in_hint": "拡大 — 音符を大きく表示",
+    "zoom_in": "拡大",
+    "settings": "TAB譜の設定",
+    "look": "見た目",
+    "fullscreen": "全画面",
+    "exit_fullscreen": "全画面を終了",
+    "fullscreen_install_hint": "riff.questをホーム画面に追加すると、ブラウザのバーなしでTAB譜を全画面で表示できます。",
+    "remove_loop": "ループを解除",
+    "clear_loop": "ループを解除",
+    "loop_section": "区間をループ",
+    "loop_section_hint": "今いる区間をループする",
+    "calibrate_hint": "オーディオの遅延を測定して、タイミングの評価を聞こえ方に合わせます",
+    "minimap_hint": "小節をクリックでジャンプ · ドラッグで複数小節をループ",
+    "settings_description": "TAB譜の見た目をカスタマイズします。変更はすぐに反映され、このデバイスに保存されます。",
+    "rest": "休符",
+    "from_start": "最初から",
+    "resize_height": "表示の高さを変更",
+    "drag_resize": "ドラッグで高さを変更"
+  },
+  "note_hunt": {
+    "play_interval": "インターバルの先にある音を弾いて",
+    "needs_pitch": "ピッチ検出が必要です",
+    "turn_on": "下のコントロールでオンにすると、アプリがあなたの答えを聴き取れます — オフのままだと答えを表示することしかできません。",
+    "enable_mic": "下のコントロールでマイクを有効にすると自動で採点されます。手動でオクターブにチェックを入れることもできます。",
+    "starting_mic": "マイクを起動中…",
+    "wrong_octave": "音は合っていますが、オクターブが違います — 今のは{{note}}でした。",
+    "string_gives": "{{string}}弦で{{note}}が出ます。",
+    "stay_inside": "{{from}}〜{{to}}フレットの範囲内で弾いてください。",
+    "correct": "正解",
+    "find_target": "目標の音を見つけて",
+    "reveal": "答えを表示",
+    "strings": {
+      "1": "1弦（高いE）",
+      "2": "2弦（B）",
+      "3": "3弦（G）",
+      "4": "4弦（D）",
+      "5": "5弦（A）",
+      "6": "6弦（低いE）"
+    },
+    "find_every": "すべての{{note}}を見つけて",
+    "skip": "スキップ",
+    "gate_title": "すべての音を見つけよう",
+    "gate_detail": "合計{{minutes}}分、1音につき{{seconds}}秒。",
+    "round_solved": "{{seconds}}秒で{{total}}個すべて",
+    "round_next": "次の音が来ます",
+    "round_missed": "{{total}}個中{{found}}個を発見",
+    "round_missed_detail": "見逃した音：{{notes}}",
+    "tap_octaves": "見つけたオクターブをタップ",
+    "tap_octaves_region": "範囲内で見つけたオクターブをタップ"
+  },
+  "tools": {
+    "tempo": "テンポ",
+    "sound": "サウンド",
+    "info": "ガイド",
+    "tempo_settings": "テンポ設定",
+    "guitar_turn_on": "ギターをオン",
+    "guitar_turn_off": "ギターをオフ",
+    "pitch_turn_off": "ピッチ検出をオフ",
+    "pitch_turn_on": "ピッチ検出をオン",
+    "sound_settings": "サウンドと入力の設定",
+    "sound_input": "サウンドと入力",
+    "exercise_guide": "エクササイズガイド",
+    "close_settings": "設定を閉じる",
+    "open_panel": "エクササイズツールを表示",
+    "close_panel": "エクササイズツールを隠す"
+  },
+  "success": {
+    "correct": "正解",
+    "mastered": "マスター！",
+    "passed": "試験合格！",
+    "failed": "試験不合格",
+    "flawless": "完璧な演奏です。",
+    "nice_work": "いい感じ — あと何回か弾けば、全部の音を決められます。",
+    "missed_by": "合格に必要な正確さ93%まであと{{points}}。もう一度挑戦しよう！",
+    "total_score": "合計スコア",
+    "grade": "評価",
+    "accuracy": "正確さ",
+    "max_combo": "最大コンボ",
+    "score": "スコア",
+    "over_time": "演奏の推移",
+    "pass": "合格",
+    "back_to_menu": "メニューに戻る",
+    "intonation_over_time": "音程、1音ずつ",
+    "timing_over_time": "タイミング、1音ずつ",
+    "chart_sharp": "高い",
+    "chart_flat": "低い",
+    "chart_late_axis": "遅い",
+    "chart_early_axis": "早い",
+    "chart_note": "{{n}}音目",
+    "chart_on_beat": "ジャスト",
+    "chart_early": "{{ms}} ms早い",
+    "chart_late": "{{ms}} ms遅い",
+    "chart_notes_other": "{{count}}音",
+    "time": "時間",
+    "best_run": "ベストラン"
+  },
+  "quiz": {
+    "paused_note": "一時停止中。タイマーが動き出すと、また回答がカウントされます。",
+    "hear_it": "聴く",
+    "trust_ears": "数字なし、耳を信じて",
+    "thats_in_tune": "合っている",
+    "gate_detail": "{{minutes}}分。ヘッドホン推奨。",
+    "gate": {
+      "chordType": "聴こえたコードの種類を当てよう",
+      "progression": "聴こえたコード進行を組み立てよう",
+      "detune": "うなりを消そう",
+      "scaleMode": "聴こえたスケールを当てよう",
+      "interval": "聴こえたインターバルを当てよう"
+    },
+    "stop": "停止",
+    "play_again": "もう一度再生",
+    "play": "再生",
+    "correct": "正解",
+    "wrong": "不正解",
+    "next": "次へ",
+    "start_hint": "下の再生を押すとタイマーが始まります — クイズはもう回答できます",
+    "streak": "連続正解",
+    "best_streak": "ベスト",
+    "in_tune_mark": "合っている",
+    "which_progression": "これはどのコード進行？",
+    "play_progression": "コード進行を再生",
+    "hear_tonic": "Iのコードを聴く",
+    "slot_filled": "スロット{{n}}：{{chord}}、タップで消去",
+    "slot_empty": "スロット{{n}}：空",
+    "check": "答え合わせ",
+    "clear": "消去",
+    "heard_in": "使われている曲：{{songs}}",
+    "play_it_again": "もう一度再生",
+    "detune_in_tune": "合っています — {{cents}}セントのずれで、{{window}}セントの範囲内です。",
+    "detune_sharp": "{{cents}}セント高い — 範囲は{{window}}セントでした。",
+    "detune_flat": "{{cents}}セント低い — 範囲は{{window}}セントでした。",
+    "tune_second": "2つ目の音を1つ目に合わせよう",
+    "stop_notes": "音を止める",
+    "play_both": "両方の音を再生",
+    "second_pitch": "2つ目の音の高さ",
+    "flatter": "低く",
+    "sharper": "高く",
+    "no_beating": "うなりが聞こえなくなりました — これが音程の合った状態です。",
+    "beating": "これだけ離れた2つの音は、1秒に約{{beats}}回うなります。うなりがゆっくりになるほど近づいています。",
+    "detune_footnote": "本物のギターでも同じ方法が使えます：5フレットを押さえて、1本上の開放弦と比べてみましょう。",
+    "snap": "ぴったり合わせる",
+    "which_scale": "これはどのスケール？",
+    "play_scale": "スケールを再生",
+    "play_slowly": "ゆっくり再生",
+    "root": "ルート：{{root}}",
+    "root_held": "ルート音が下で鳴り続けます — すべての音をそれと比べて聴きましょう",
+    "hear_from_root": "{{root}}から{{name}}を聴く",
+    "which_chord": "これはどんなコード？",
+    "play_chord": "コードを再生",
+    "one_note": "1音ずつ",
+    "root_moves": "ルートは毎ラウンド変わります — 音の高さではなく響きの色を聴きましょう",
+    "formula": "構成音：{{formula}}",
+    "chords": {
+      "major": {
+        "name": "メジャー",
+        "character": "明るく安定している — シンプルで楽しげな三和音。"
+      },
+      "minor": {
+        "name": "マイナー",
+        "character": "メジャーより暗いけれど、同じくらい安定 — ♭3がその理由。"
+      },
+      "dom7": {
+        "name": "ドミナント7th",
+        "character": "どこかむずむずするメジャー — ブルージーで、解決したがっている。"
+      },
+      "maj7": {
+        "name": "メジャー7th",
+        "character": "夢見るように浮遊する — 7thがルートの半音下にある。"
+      },
+      "min7": {
+        "name": "マイナー7th",
+        "character": "なめらかでまろやか — 角の取れたマイナー。"
+      },
+      "dim": {
+        "name": "ディミニッシュ",
+        "character": "緊張して不安定 — つぶれた5thが切なさを生む。"
+      },
+      "sus4": {
+        "name": "sus4",
+        "character": "明るくも暗くもない — 3rdがないので宙に浮いている。"
+      },
+      "sus2": {
+        "name": "sus2",
+        "character": "開放的で軽やか — 3rdの代わりに2ndが入る。"
+      }
+    },
+    "scales": {
+      "ionian": {
+        "name": "アイオニアン（メジャー）",
+        "tell": "ナチュラルな4thと7th",
+        "character": "普通のメジャースケール — トニックに逆らう音がない。"
+      },
+      "dorian": {
+        "name": "ドリアン",
+        "tell": "ナチュラルな6th",
+        "character": "マイナーだけど、上がった6thが明るさを足す — ファンク、サンタナ、Moondance。"
+      },
+      "phrygian": {
+        "name": "フリジアン",
+        "tell": "ルートのすぐ上の♭2",
+        "character": "マイナー系モードでいちばん暗い — スパニッシュもメタルもここに住んでいる。"
+      },
+      "lydian": {
+        "name": "リディアン",
+        "tell": "上がった4th",
+        "character": "持ち上がったメジャー — 浮遊感があって映画的、重さがない。"
+      },
+      "mixolydian": {
+        "name": "ミクソリディアン",
+        "tell": "♭7",
+        "character": "♭7のメジャー — ロックとブルースのメジャー。"
+      },
+      "aeolian": {
+        "name": "エオリアン（ナチュラルマイナー）",
+        "tell": "♭6",
+        "character": "普通のナチュラルマイナー — 悲しげで落ち着いている。"
+      },
+      "locrian": {
+        "name": "ロクリアン",
+        "tell": "♭5 — 安定した着地点がない",
+        "character": "決して落ち着かない：5th自体が下がっている。"
+      },
+      "harmonicMinor": {
+        "name": "ハーモニックマイナー",
+        "tell": "♭6と7の間の大きな跳躍",
+        "character": "7thが上がったマイナー — 上のほうにエキゾチックな跳躍がある。"
+      }
+    },
+    "modes": {
+      "chordType": "コードの種類",
+      "progression": "コード進行",
+      "detune": "耳でチューニング",
+      "scaleMode": "スケールとモード",
+      "interval": "インターバル"
+    },
+    "key_of_build": "キー：{{key}} — 聴こえた度数を順番に並べよう",
+    "listen_for": "{{tell}}に注目 — {{formula}}",
+    "which_interval": "これはどのインターバル？",
+    "play_interval": "インターバルを再生",
+    "play_together": "同時に鳴らす",
+    "interval_hint": "最初の音は毎ラウンド変わります — 音の高さではなく距離を聴きましょう",
+    "interval_direction": {
+      "ascending": "上行",
+      "descending": "下行",
+      "harmonic": "同時"
+    },
+    "interval_frets_other": "同じ弦で{{root}}から{{count}}フレット",
+    "intervals": {
+      "m2": {
+        "name": "短2度",
+        "character": "1フレット差 — いちばん狭く、いちばん緊張感のある音程。"
+      },
+      "M2": {
+        "name": "長2度",
+        "character": "2フレット — スケールの隣り合う音どうしの普通の音程。"
+      },
+      "m3": {
+        "name": "短3度",
+        "character": "悲しげな3度 — すべてのマイナーコードの土台。"
+      },
+      "M3": {
+        "name": "長3度",
+        "character": "明るい3度 — すべてのメジャーコードの土台。"
+      },
+      "P4": {
+        "name": "完全4度",
+        "character": "開放的でどっしり — ほとんどの隣り合う弦の間の音程。"
+      },
+      "TT": {
+        "name": "トライトーン",
+        "character": "ちょうどオクターブの半分 — 落ち着かず、解決したがっている。"
+      },
+      "P5": {
+        "name": "完全5度",
+        "character": "パワーコード — 中が空っぽで力強く、完全に安定。"
+      },
+      "m6": {
+        "name": "短6度",
+        "character": "広く切ない跳躍 — 長3度をひっくり返したもの。"
+      },
+      "M6": {
+        "name": "長6度",
+        "character": "広く甘い跳躍 — 緊張より温かさ。"
+      },
+      "m7": {
+        "name": "短7度",
+        "character": "ブルージーな7度 — オクターブの2フレット手前。"
+      },
+      "M7": {
+        "name": "長7度",
+        "character": "オクターブの1フレット手前 — 鋭く、何かを求めている。"
+      },
+      "P8": {
+        "name": "オクターブ",
+        "character": "同じ音をもう一度、高く — 完全に溶け合う。"
+      }
+    },
+    "tune_interval": "2つ目の音を1つ目の{{interval}}上に合わせよう",
+    "interval_reference": "低い音：{{root}} — {{interval}}のうなりが止まるまで上の音をスライド",
+    "detune_interval_footnote": "隣の弦どうしをチューニングするのと同じ方法です：オクターブ、5度、4度は、2つの音の間のゆっくりしたうなりが止まったところで合っています。"
+  },
+  "backing": {
+    "required": "このエクササイズにはバッキングトラックが必要です",
+    "find_hint": "YouTubeで探して、合わせて弾きましょう",
+    "find": "YouTubeでバッキングトラックを探す",
+    "find_short": "YouTubeで探す",
+    "searching": "YouTubeを検索中...",
+    "search_again": "もう一度検索",
+    "change": "バッキングトラックを変更"
+  },
+  "ear": {
+    "listen_play_back": "聴いて、弾き返そう",
+    "missed_it": "外れ",
+    "next_melody_key": "次のメロディ",
+    "score": "スコア",
+    "correct": "正解 — ポイント獲得",
+    "next_melody": "次のメロディが来ます…",
+    "tab_shows": "下のTAB譜にメロディが表示されています。もう一度再生して比べてみましょう。",
+    "revealed": "答えを表示しました",
+    "compare": "下のTAB譜と比べてみよう — 正しく弾けた？",
+    "playing": "メロディを再生中…",
+    "plays_once": "1回だけ再生されて自動で止まります — そのあとはあなたの番です",
+    "listen_repeat": "聴いてくり返す",
+    "listen_repeat_caption": "メロディを再生して、ギターで探してみよう",
+    "listening": "あなたの答えを聴いています",
+    "listening_caption": "聴こえた音を弾いてください — 全部正しければ自動で次に進みます",
+    "your_turn": "あなたの番",
+    "your_turn_mic": "ギターで答えを弾くか、先にメロディをもう一度聴きましょう",
+    "your_turn_memory": "記憶をたよりに弾いて、答えを表示して確かめましょう",
+    "title": "耳トレ",
+    "new_best": "自己ベスト更新",
+    "best": "ベスト",
+    "replay": "もう一度",
+    "stuck_reveal": "わからない？ 答えを見る",
+    "show_answer": "答えを表示",
+    "replay_melody": "メロディをもう一度",
+    "had_it": "できた",
+    "self_marked_note": "リーダーボードに入るのはマイクが聴き取ったメロディだけです — 「できた」は自分の記録にだけ加算されます。"
+  },
+  "volume": {
+    "instruments": "楽器",
+    "title": "音量",
+    "hint": "音量：メトロノーム、ギター再生、トラック",
+    "metronome": "メトロノーム",
+    "muted": "ミュート中",
+    "unmute_metronome": "メトロノームのミュートを解除",
+    "mute_metronome": "メトロノームをミュート",
+    "boost": "音量をブースト",
+    "unmute": "ミュート解除",
+    "mute": "ミュート",
+    "main_instrument": "メイン楽器",
+    "mix": "ミックス"
+  },
+  "auto_backing": {
+    "toggle": "自動生成のバッキングトラック",
+    "description": "このエクササイズ用に作られたドラム、ベース、やわらかいパッド。キーもコードもエクササイズに合わせます。",
+    "drums_only": "ドラムのみ：音がすべてのフレットにわたるため、どんなコードでもぶつかってしまいます。",
+    "headphones": "マイクをオンにするときはヘッドホンを使ってください。そうしないと、マイクがバンドの音をあなたの演奏として拾ってしまいます。弾いていない音がカウントされたら、まずここを確認してください。",
+    "headphones_short": "マイクオン？ ヘッドホンを使おう。",
+    "groove": {
+      "rock": "ロック",
+      "pop": "ポップ",
+      "ballad": "バラード",
+      "shuffle": "シャッフル",
+      "metal": "メタル",
+      "doom": "ドゥーム",
+      "thrash": "スラッシュ",
+      "halftime": "ハーフタイム",
+      "compound": "6/8のノリ",
+      "waltz": "ワルツ",
+      "boss": "ボス戦"
+    },
+    "key": {
+      "major": "{{tonic}}メジャー",
+      "minor": "{{tonic}}マイナー",
+      "dorian": "{{tonic}}ドリアン",
+      "mixolydian": "{{tonic}}ミクソリディアン",
+      "phrygian": "{{tonic}}フリジアン",
+      "lydian": "{{tonic}}リディアン",
+      "harmonicMinor": "{{tonic}}ハーモニックマイナー",
+      "majorPentatonic": "{{tonic}}メジャーペンタトニック",
+      "minorPentatonic": "{{tonic}}マイナーペンタトニック",
+      "blues": "{{tonic}}ブルース",
+      "root": "ルート{{tonic}}"
+    },
+    "style": {
+      "label": "バンド",
+      "auto": "自動（{{style}}）",
+      "ambient": "アンビエント",
+      "lofi": "Lo-fi",
+      "synthwave": "シンセウェイブ",
+      "house": "ハウス",
+      "dark": "ダーク",
+      "garage": "ガレージバンド",
+      "juke": "ジューク・ジョイント・トリオ",
+      "neon": "ネオン・マシーンズ",
+      "porch": "ポーチ・バンド",
+      "forge": "ザ・フォージ",
+      "loft": "ロフト・カルテット",
+      "strut": "ザ・ストラット",
+      "yard": "ヤード・サウンド",
+      "tide": "タイド・ライダーズ",
+      "locked": "このセッションには専用のバンドがあります。変更できません。"
+    },
+    "track": {
+      "drums": "ドラム",
+      "bass": "ベース",
+      "keys": "パッド",
+      "arp": "アルペジオ",
+      "keys_ambient": "パッド",
+      "keys_lofi": "エレピ",
+      "keys_synthwave": "シンセ",
+      "keys_house": "スタブ",
+      "keys_dark": "ストリングス",
+      "keys_garage": "クランチギター",
+      "keys_juke": "オルガン",
+      "keys_neon": "ポリシンセ",
+      "keys_porch": "ストロークの弦楽器",
+      "keys_forge": "刻みギター",
+      "keys_strut": "クラビネット",
+      "keys_yard": "オルガンのカッティング",
+      "keys_tide": "トレモロギター",
+      "keys_loft": "FMピアノ"
+    },
+    "leak_notice": {
+      "title": "スピーカーで鳴らしていますか？",
+      "body": "バッキングトラックがオンになっていて、マイクがその音を拾っています。ヘッドホンを使えば入りません。弾いていない音がカウントされたり、弾いた音が拾われなかったりしたら、まずここを確認してください。",
+      "ok": "わかった",
+      "off": "バッキングをオフ"
+    }
+  },
+  "hunt": {
+    "seconds_left": "残り{{count}}秒",
+    "solved": "クリア",
+    "time_left": "このラウンドの残り時間",
+    "next": "次へ",
+    "view": "表示",
+    "play_notes": "音を再生"
+  },
+  "interval_click": {
+    "now_above": "その{{root}}の{{interval}}上",
+    "click_any": "どこかの{{note}}をクリック",
+    "on_highlighted": "ハイライトされた弦の上で",
+    "play_root": "インターバルの基準になるルート音を再生",
+    "hide_distance": "距離を隠す",
+    "how_far": "どれくらい離れている？",
+    "autoplay": "自動再生",
+    "anywhere": "{{from}}〜{{to}}フレットのどこでも",
+    "near_zone": "{{root}}の近く、明るい範囲の中で",
+    "near": "{{root}}から手の届く範囲で",
+    "solved": "{{root}} + {{interval}} = {{target}}",
+    "frets_up_other": "{{count}}フレット上",
+    "lives": "ライフ残り{{count}}/{{limit}}",
+    "time_up": "時間切れ",
+    "next_round": "次のラウンドが来ます",
+    "answer_was": "{{root}}の{{interval}}上は{{target}}です",
+    "wrong_note": "今のは{{note}}でした",
+    "wrong_interval": "今のは{{note}}、{{interval}}でした",
+    "too_far": "音は合っていますが、{{root}}から遠すぎます",
+    "same_string": "同じ弦",
+    "same_fret": "同じフレット",
+    "strings_higher_other": "{{count}}本高い弦",
+    "strings_lower_other": "{{count}}本低い弦",
+    "frets_down_other": "{{count}}フレット下"
+  },
+  "instructions": {
+    "support_author": "作者を応援",
+    "instructions": "やり方",
+    "why": "なぜ大切か",
+    "backing_recommended": "バッキングトラック推奨",
+    "backing_hint": "上のバッキングトラック検索を使って、合わせて弾きましょう。",
+    "pro_tips": "プロのコツ",
+    "difficulty": "難易度",
+    "reward": "獲得できる報酬",
+    "skill_labels": {
+      "technique": "テクニック",
+      "speed": "スピード",
+      "theory": "理論",
+      "rhythm": "リズム",
+      "earTraining": "耳トレ",
+      "knowledge": "知識"
+    }
+  },
+  "song_panel": {
+    "song": "曲",
+    "body": "いつものリハーサルと同じように弾きましょう — 暗譜でも、音源に合わせても、自分のTAB譜でも。この時間はセッションの時計がこの曲の練習としてカウントしています。",
+    "open": "曲を開く"
+  },
+  "hud": {
+    "idle_hint": "最初の音を弾くと正確さが表示されます",
+    "silent_hint": "ピッチ検出がまだ音を捉えていません — マイクがギターの音を拾っているか確認してください",
+    "no_notes": "音が聴こえません",
+    "streak": "連続",
+    "acc_short": "正確さ"
+  },
+  "fretboard": {
+    "whole_neck_hint": "探す範囲だけでなく、ネック全体を表示する",
+    "whole_neck": "ネック全体",
+    "lefty_hint": "左利きの視点でネックを反転 — ナットが右側",
+    "lefty": "左利き",
+    "aria_lefty": "クリックできる指板（左利き）",
+    "aria": "クリックできる指板",
+    "diagram": "指板図",
+    "diagram_lefty": "指板図（左利き）",
+    "scale_note": "スケールの音"
+  },
+  "exit": {
+    "title": "セッションを終了しますか？",
+    "too_short": "練習時間が20秒未満なので、まだ保存できる時間がありません。続けて弾いてこのセッションを記録するか、記録せずに終了してください。",
+    "not_saved": "練習時間はセッションを終えたときにだけ保存されます。今終了すると記録されません。",
+    "finish_save": "終了して時間を保存",
+    "exit": "終了",
+    "exit_no_save": "保存せずに終了",
+    "stay": "セッションに戻る"
+  },
+  "speed": {
+    "active_hint": "再生速度{{speed}} — クリックとバッキングトラックは{{base}}ではなく{{effective}} BPMで鳴ります",
+    "hint": "再生速度 — 難しいフレーズを覚えるために、クリックとバッキングトラックを遅くします",
+    "speed": "速度",
+    "title": "再生速度",
+    "subtitle": "クリックとバッキングトラックを設定したBPMより遅くします"
+  },
+  "update": {
+    "title": "アップデートの準備ができました",
+    "body": "riff.questの新しいバージョンをしばらく前からインストールできる状態です。練習を続けるにはアプリを再起動してください。",
+    "restart": "今すぐ再起動",
+    "return": "戻る"
+  },
+  "improv": {
+    "paused": "一時停止中 — 再生を押すとお題が始まります"
+  },
+  "loading": "読み込み中…",
+  "track": "トラック：",
+  "track_empty": "このトラックには音がありません",
+  "loading_track": "トラックを読み込み中…",
+  "loading_steps": {
+    "file": "TAB譜をダウンロード中",
+    "parse": "トラックを読み込み中",
+    "sound": "サウンドを読み込み中"
+  },
+  "timing_breakdown": {
+    "title": "タイミング",
+    "grades": {
+      "1": "ずれ",
+      "2": "惜しい",
+      "3": "ジャスト"
+    },
+    "share": "{{pct}}%がジャスト",
+    "note": "拍からずれた音もカウントされますが、点数は減ります：2なら3分の2、1なら3分の1のポイントが残ります。",
+    "lean_early": "早めが多い — 拍より約{{ms}} ms前",
+    "lean_late": "遅めが多い — 拍より約{{ms}} ms後"
+  },
+  "intonation_breakdown": {
+    "title": "音程",
+    "share": "{{pct}}%が正しい音程",
+    "grades": {
+      "1": "ずれ",
+      "2": "惜しい",
+      "3": "正確"
+    },
+    "note": "音程のずれた音やチョーキングもカウントされますが、点数は減ります：40セント以内なら3分の2、それ以上なら3分の1のポイントが残ります。",
+    "lean_flat": "低めが多い — 音が正しい音程より約{{cents}}セント低い",
+    "lean_sharp": "高めが多い — 音が正しい音程より約{{cents}}セント高い"
+  },
+  "shortcuts": {
+    "title": "キーボードショートカット",
+    "tempo": "テンポ",
+    "backing": "バッキングトラック",
+    "nav": {
+      "0": "再生／一時停止",
+      "1": "前のエクササイズ",
+      "2": "次のエクササイズ"
+    },
+    "tempo_rows": {
+      "0": "テンポ +1 BPM",
+      "1": "テンポ -1 BPM",
+      "2": "テンポ +5 BPM",
+      "3": "テンポ -5 BPM",
+      "4": "テンポを推奨値に戻す"
+    },
+    "backing_rows": {
+      "0": "バッキングトラックを20 ms早く",
+      "1": "バッキングトラックを20 ms遅く",
+      "2": "バッキングトラックを100 ms早く",
+      "3": "バッキングトラックを100 ms遅く"
+    }
+  },
+  "timer_section": {
+    "session": "セッション",
+    "exercise": "エクササイズ",
+    "total": "セッション合計"
+  },
+  "click_hunt": {
+    "play_note": "探している音を再生",
+    "hear_it": "聴く",
+    "find_both_on_fret": "{{fret}}フレットの{{note}}を2つとも見つけよう",
+    "find_all_on_fret": "{{fret}}フレットの{{note}}を{{count}}つすべて見つけよう",
+    "to_find_other": "見つける位置：{{count}}",
+    "left_other": "あと{{count}}",
+    "all_found": "すべての位置を見つけました",
+    "hint_scan": "上から下まで、すべての弦を確認しよう。",
+    "hint_same_e": "細いe弦は太いE弦と同じ音です。"
+  },
+  "strum": {
+    "strum": "ストローク",
+    "swing": "空振り、弦に当てない",
+    "muted": "ミュート",
+    "accent": "アクセント：強く弾く",
+    "fb_hit": "ヒット",
+    "fb_wrong": "休符で弾いた",
+    "fb_miss": "ミス",
+    "chords_per_loop": "1ループ{{count}}コード"
+  },
+  "open_exercise": {
+    "title": "自由形式のエクササイズ",
+    "no_tab": "このエクササイズにはTAB譜がありません — 自由形式です。",
+    "body": "TAB譜にできないエクササイズもあり、これもその1つです。下のステップに沿って、自分のペースで進めてください。",
+    "read": "下のやり方を読んで始めましょう"
+  },
+  "progress": {
+    "go_to": "{{label}}へ移動"
+  },
+  "controls": {
+    "resume": "再開",
+    "again": "もう一度",
+    "pause": "一時停止",
+    "restart": "エクササイズをやり直す"
+  },
+  "chord_hunt": {
+    "enable_mic": "下のコントロールでマイクを有効にすると構成音が光ります。？をタップして表示することもできます。",
+    "tap_tone": "構成音をタップして表示"
+  },
+  "tuning_modal": {
+    "description": "ギターのチューニングを選んでください — ピッチ検出とバッキングの音がこのチューニングに合わせられます。",
+    "instrument": "楽器",
+    "guitar": "ギター",
+    "bass": "ベース",
+    "strings": "弦の数",
+    "string_count": "{{count}}弦",
+    "tunings": "チューニング",
+    "bass_description": "ベースのチューニングを選んでください — ピッチ検出とバッキングの音がこのチューニングに合わせられます。",
+    "instrument_lock_bass": "このエクササイズはベース用です。",
+    "instrument_lock_guitar": "このエクササイズはギター用です。",
+    "file_tuning": "ファイルのチューニング",
+    "from_file": "ファイルから",
+    "file_description": "このTAB譜は{{name}}で書かれたGuitar Proファイルのものです。ギター全体を高く／低くチューニングしている場合はここで選んでください — フレットはそのままで、検出と再生があなたのチューニングに合わせます。",
+    "file_description_bass": "このTAB譜は{{name}}で書かれたGuitar Proファイルのものです。ベース全体を高く／低くチューニングしている場合はここで選んでください — フレットはそのままで、検出と再生があなたのチューニングに合わせます。",
+    "written_in": "記譜のチューニング",
+    "written_description": "このTAB譜は{{name}}（{{notation}}）用に書かれています。このチューニングにすれば書かれたとおりのフレットで弾けます — ギター全体を高く／低くしている場合はここで選べば、検出と再生がそれに合わせます。",
+    "written_description_bass": "このTAB譜は{{name}}（{{notation}}）用に書かれています。このチューニングにすれば書かれたとおりのフレットで弾けます — ベース全体を高く／低くしている場合はここで選べば、検出と再生がそれに合わせます。"
+  },
+  "header": {
+    "close_session": "セッションを閉じる",
+    "exercise_info": "エクササイズの情報",
+    "close_info": "閉じる"
+  },
+  "speeds_mastered": {
+    "hint": "このエクササイズでマスターしたテンポ",
+    "label": "マスターしたテンポ"
+  },
+  "video": {
+    "player": "YouTube動画プレーヤー",
+    "unavailable": "動画を再生できません",
+    "invalid": "無効なYouTube URL"
+  },
+  "image": {
+    "enlarge": "拡大"
+  },
+  "gap": {
+    "title": "ギャップテスト",
+    "head_idle": "無音のあとの最初の拍でタップ",
+    "sub_idle": "クリックが{{lead}}小節鳴ってから止まります。止まったときにタップせず、無音の間（{{bars}}小節）も数え続けて、そのあとに来る「1」で1回だけタップしてください。",
+    "head_listen": "聴いて",
+    "sub_listen": "パルスをつかんで。クリックに合わせて1-2-3-4と数えよう。",
+    "head_gap": "まだ — 先に無音を数えて",
+    "sub_gap": "頭の中で1-2-3-4を{{bars}}回数えて、次の「1」で1回タップ。",
+    "head_super": "完璧",
+    "sub_super": "{{ms}} ms以内。無音が{{bars}}小節に伸びます。",
+    "head_good": "惜しい",
+    "sub_good": "{{ms}} ms以内に入れば無音が伸びます。",
+    "head_early": "早い",
+    "head_late": "遅い",
+    "sub_bad": "拍から{{ms}} ms以上ずれました。同じ無音でもう一度。",
+    "head_miss": "タップなし",
+    "sub_miss": "タップしないまま「1」が過ぎました。もう一度。",
+    "step_listen": "聴く",
+    "step_listen_sub": "クリック{{bars}}小節",
+    "listen_bar": "{{bar}}/{{total}}小節",
+    "step_silence": "無音",
+    "silence_sub": "クリックなし — 頭の中で数えて",
+    "step_tap": "タップ",
+    "pad_wait": "無音を待って",
+    "pad_wait_sub": "まだタップはカウントされません",
+    "pad_tap": "無音のあとの「1」でタップ",
+    "key_space": "スペース",
+    "or": "または",
+    "ruler_early": "早い",
+    "ruler_on": "ジャスト",
+    "ruler_late": "遅い",
+    "level_up": "レベルアップ → 無音{{bars}}小節",
+    "reset": "レベルをリセット",
+    "recent": "最近",
+    "silent_bars": "無音の小節：{{bars}}",
+    "miss": "ミス",
+    "no_attempts": "まだ挑戦していません — スタートを押してください。",
+    "tap_sub": "無音のあとの「1」",
+    "head_soon": "早すぎ",
+    "sub_soon": "無音が終わる前にタップしました（{{early}}小節早い）。無音の間（{{bars}}小節）をすべて数えてから「1」でタップしてください。"
+  },
+  "tuning_lock": {
+    "gp": "この曲はGuitar Proからのインポートです — チューニングはファイルに保存されていて、ここでは変更できません。",
+    "exam": "試験中はチューニングが固定されます — 課題はスタンダードチューニング（E A D G B E）専用に作られています。"
+  },
+  "tuner": {
+    "enable_pitch": "チューナーを使うにはピッチ検出を有効にしてください",
+    "play_open": "開放弦を弾いて",
+    "in_tune": "合っています — そのまま",
+    "sharp": "{{cents}}¢高い — 下げて",
+    "flat": "{{cents}}¢低い — 上げて",
+    "string": "{{n}}弦 — {{name}}（{{hz}} Hz）",
+    "all_tuned": "すべての弦が合っています",
+    "title": "チューナー"
+  },
+  "playback_leak": {
+    "title": "マイクがギターの再生音を拾っています",
+    "body": "今回の演奏はリーダーボードに載りません。ヘッドホンを使うかギターの音をオフにして、最初からやり直してください。",
+    "mute": "ギターをオフ"
+  },
+  "learn": {
+    "button": "Learn",
+    "hint_off": "Learnモード：1音弾くたびにTAB譜が進みます",
+    "hint_on": "Learnモードがオンです。クリックでメトロノームに合わせた演奏に戻ります",
+    "hint_needs_mic": "1音ずつ覚えるにはピッチ検出をオンにしてください",
+    "title": "Learnモード",
+    "waiting": "ハイライトされた音を弾くと進みます",
+    "progress": "{{total}}音中{{current}}音目",
+    "passes_other": "{{count}}回通しで完了",
+    "skip": "この音をスキップ",
+    "restart": "最初から"
+  },
+  "bar": {
+    "more": "その他",
+    "time_only": "時間のみ",
+    "save": "セッションを保存"
+  },
+  "start_gate": {
+    "start": "スタート",
+    "count_in_short": "メトロノームがカウントを入れます",
+    "clock_short": "スタートで時計が動き出します",
+    "preview_first": "先にTAB譜を見る",
+    "hint_no_preview": "スタートを押すと時計と採点が始まります。",
+    "mic_label": "マイク",
+    "mic_on": "マイクありで弾く",
+    "mic_on_detail": "アプリが聴き取って演奏を採点します",
+    "mic_off": "マイクなしで弾く",
+    "mic_off_detail": "練習時間はちゃんとカウントされます"
+  },
+  "mic_open_failed": {
+    "title": "マイクがオンになりませんでした",
+    "action": "入力設定",
+    "denied": "このサイトはマイクの使用を許可されていません。",
+    "no_device": "オーディオ入力が見つかりません。インターフェースかマイクを接続してください。",
+    "busy": "別のプログラムがオーディオ入力を使用しています。",
+    "unsupported": "このブラウザではマイクを使えません。",
+    "unknown": "入力設定を開いて直してください。"
+  },
+  "takes": {
+    "title": "録音",
+    "short": "REC",
+    "stop": "録音を停止",
+    "starting": "開始中…",
+    "saving": "保存中…",
+    "mode_label": "録るもの",
+    "mode": {
+      "audio": "オーディオ",
+      "video": "ビデオ"
+    },
+    "about": {
+      "audio": "アンプから鳴るギターの音と、アプリが一緒に鳴らすすべての音。",
+      "video": "スコア付きのTAB譜と、ギターとバッキングの音。"
+    },
+    "split": "ギターとバッキングを別ファイルで",
+    "split_hint": {
+      "audio": "同じタイミングで始まる2つのWAVファイル。",
+      "video": "ビデオにはギターの音が入ります。バッキングは同じタイミングで始まるWAVとして横に保存されます。"
+    },
+    "start": "録音を開始",
+    "failure": {
+      "no_board": "ビデオにはTAB譜の表示が必要です。TAB譜のあるエクササイズを開くか、オーディオで録音してください。",
+      "failed": "録音を保存できませんでした。"
+    },
+    "no_guitar": "ギターが録音されませんでした。始める前にアンプかピッチ検出をオンにしてください。",
+    "trim": "ギターのタイミング",
+    "trim_hint": "録音でギターがバッキングより早い／遅い場合は、ここで調整してください。",
+    "recent": "録音",
+    "empty": "まだ何も録音していません。",
+    "open_folder": "フォルダーを開く",
+    "change_folder": "変更",
+    "play": "再生",
+    "show_in_folder": "フォルダーで表示",
+    "delete": "ごみ箱に移動",
+    "untitled": "録音"
+  },
+  "exam_click_failed": "{{limit}}回のミスクリック — 試験不合格。",
+  "exam_click_time_up": "時間内に答えられなかったラウンドがありました — 試験不合格。",
+  "exam_click_rounds_short": "解いたラウンドは{{solved}} — 試験には{{min}}ラウンド必要です。",
+  "verdict": {
+    "time": "{{minutes}}分 完了",
+    "clean": "クリーンな演奏",
+    "rough": "演奏終了",
+    "weak_bar": "{{bar}}小節目でつまずき",
+    "next": "次：{{title}}",
+    "stats": "{{accuracy}}%ヒット、{{count}}連続",
+    "again": "もう一度",
+    "drill": "{{bar}}小節目をゆっくり",
+    "continue": "続ける"
+  },
+  "drill": {
+    "title": "{{bar}}小節目をゆっくり",
+    "detail": "{{bpm}} BPMでクリーンに{{count}}回",
+    "done": "できた",
+    "done_detail": "{{bar}}小節目が{{bpm}} BPMでクリーンに弾けました",
+    "skip": "スキップ",
+    "passes": "クリーン{{done}}/{{total}}回"
+  },
+  "interlude": {
+    "halfway": "半分まで来ました。",
+    "done_of": "{{total}}個中{{done}}個完了。",
+    "streak": "{{streak}} {{progress}}",
+    "in_a_row": "{{count}}連続。"
+  },
+  "combo": {
+    "in_a_row": "{{count}}連続"
+  }
+}

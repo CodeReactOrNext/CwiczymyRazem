@@ -699,7 +699,16 @@
   },
   "click_hunt": {
     "play_note": "Reproduce la nota que buscas",
-    "hear_it": "Escuchar"
+    "hear_it": "Escuchar",
+    "find_both_on_fret": "Encuentra los dos {{note}} en el traste {{fret}}",
+    "find_all_on_fret": "Encuentra los {{count}} {{note}} en el traste {{fret}}",
+    "to_find_one": "{{count}} posición por encontrar",
+    "to_find_other": "{{count}} posiciones por encontrar",
+    "left_one": "Falta {{count}}",
+    "left_other": "Faltan {{count}}",
+    "all_found": "Todas las posiciones encontradas",
+    "hint_scan": "Revisa cada cuerda, de arriba abajo.",
+    "hint_same_e": "La cuerda e fina tiene las mismas notas que la E gruesa."
   },
   "strum": {
     "strum": "Rasguea",
@@ -890,6 +899,8 @@
     "untitled": "Grabación"
   },
   "exam_click_failed": "{{limit}} clics erróneos: examen suspendido.",
+  "exam_click_time_up": "Una ronda se agotó sin respuesta: examen suspendido.",
+  "exam_click_rounds_short": "Has resuelto {{solved}} rondas; el examen pide {{min}}.",
   "verdict": {
     "time": "{{minutes}} min hechos",
     "clean": "Toma limpia",

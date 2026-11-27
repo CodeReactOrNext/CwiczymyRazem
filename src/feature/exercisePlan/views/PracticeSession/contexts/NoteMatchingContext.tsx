@@ -144,6 +144,9 @@ export interface NoteMatchingSnapshot {
   maxCombo: number;
   maxPossibleScore: number;
   noteTimeline: ("hit" | "miss")[];
+  /** Rounds answered in full this run — interval-click hunts only, which pass
+   *  an exam on it (see intervalClickExamAccuracy). */
+  solvedRounds?: number | null;
   /** Slowest tempo a tab note was scored at this run; null for hunts,
    *  strumming, or a run with nothing scored yet. */
   minScoredBpm?: number | null;
@@ -643,7 +646,10 @@ export function NoteMatchingProvider({
 
   // Always-current ref so snapshot() never reads stale closure values
   const latestRef = useRef<NoteMatchingSnapshot>({ score: 0, accuracy: 100, maxCombo: 0, maxPossibleScore: 0, noteTimeline: [] });
-  latestRef.current = { score: gameState.score, accuracy: sessionAccuracy, maxCombo: effectiveMaxCombo, maxPossibleScore: effectiveMaxPossibleScore, noteTimeline };
+  latestRef.current = {
+    score: gameState.score, accuracy: sessionAccuracy, maxCombo: effectiveMaxCombo, maxPossibleScore: effectiveMaxPossibleScore, noteTimeline,
+    solvedRounds: isIntervalClickHunt ? intervalClickHunt.solvedRounds : null,
+  };
 
   // Where the exercise clock stood when the score last went to zero. The clock
   // only runs while the session plays — scoring needs it running — so the gap to

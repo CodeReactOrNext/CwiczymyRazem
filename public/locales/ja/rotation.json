@@ -1,0 +1,119 @@
+{
+  "page": {
+    "title": "ローテーション",
+    "subtitle": "手に残しておきたい曲、エクササイズ、スキル",
+    "eyebrow": "ライブラリ"
+  },
+  "add": "追加",
+  "list_title": "あなたのローテーション",
+  "spotlight": {
+    "label": "次はこれ",
+    "rusty": "おさらい待ち",
+    "all_fresh_title": "すべて新鮮です",
+    "all_fresh_body": "どれもこの1週間以内に弾いています。それでも弾きたければ、カードを引いてみましょう。",
+    "play_stalest_one": "いちばん古いものを弾く",
+    "play_stalest_other": "いちばん古い{{count}}つを弾く",
+    "minutes": "約{{count}}分",
+    "draw": "カードを引く"
+  },
+  "levels": {
+    "rusty": "さびついてきた",
+    "cooling": "冷めてきた",
+    "fresh": "新鮮"
+  },
+  "days": {
+    "never": "まだ弾いていない",
+    "today": "今日弾いた",
+    "yesterday": "昨日",
+    "ago_one": "{{count}}日前",
+    "ago_other": "{{count}}日前"
+  },
+  "types": {
+    "song": "曲",
+    "exercise": "エクササイズ",
+    "skill": "スキル",
+    "custom": "自分の項目"
+  },
+  "row": {
+    "play": "{{title}}を弾く",
+    "remove": "{{title}}をローテーションから外す",
+    "skill_hint": "そのエクササイズのどれかを弾きます",
+    "done": "{{title}}にチェック",
+    "open_link": "{{site}}を開く"
+  },
+  "empty": {
+    "title": "覚えたことを手に残しておこう",
+    "body": "忘れたくない曲、エクササイズ、スキルを追加しましょう。いちばん長く弾いていないものが先に出てきて、ワンタップでそれを使った短いセッションが始まります。",
+    "cta": "最初の項目を追加"
+  },
+  "picker": {
+    "title": "ローテーションに追加",
+    "description": "くり返し戻ってきたいものを選んでください。",
+    "tabs": {
+      "song": "曲",
+      "exercise": "エクササイズ",
+      "skill": "スキル",
+      "custom": "自分の項目"
+    },
+    "search": "検索",
+    "no_results": "一致するものはありません",
+    "no_songs": "曲ライブラリは空です。",
+    "find_songs": "曲を探す",
+    "add_item": "{{title}}を追加",
+    "remove_item": "{{title}}を外す",
+    "full": "ローテーションがいっぱいです（{{count}}項目）。先に何かを外してください。",
+    "done": "完了"
+  },
+  "draw": {
+    "title": "カードを引く",
+    "description": "しばらく弾いていないものが出やすい、ランダムな1枚。",
+    "play": "弾く",
+    "again": "もう1枚引く",
+    "done": "チェックする"
+  },
+  "toast": {
+    "error": "保存できませんでした。もう一度試してください。",
+    "nothing_to_play": "今ここで弾けるものはありません。",
+    "removed": "{{title}}を外しました",
+    "undo": "元に戻す",
+    "done": "チェックしました：{{title}}"
+  },
+  "custom": {
+    "examples_label": "例から始める",
+    "examples": {
+      "course": {
+        "title": "ブルース講座：次のレッスン",
+        "note": "見てから、身につくまで合わせて弾く"
+      },
+      "chord": {
+        "title": "1日1つ新しいコード",
+        "note": "覚えたら、コード進行の中で使う"
+      },
+      "transcribe": {
+        "title": "リックを1つ耳コピ",
+        "note": "まず耳で、TAB譜はあとで確認"
+      },
+      "jam": {
+        "title": "バッキングトラックでジャム",
+        "note": "キーを決めて、1曲分アドリブ"
+      }
+    },
+    "name_label": "名前",
+    "name_placeholder": "例：ブルース講座 レッスン4",
+    "note_label": "メモ（任意）",
+    "note_placeholder": "例：ターンアラウンドを80 BPMで練習",
+    "link_label": "リンク（任意）",
+    "link_placeholder": "例：講座のページや動画",
+    "link_invalid": "ウェブのリンクではないようです。",
+    "timer_label": "フリータイマーで時間を記録",
+    "timer_on": "弾くを押すとこの項目でフリータイマーが開き、時間はほかのセッションと同じように記録されます。",
+    "timer_off": "タイマーなし：終わったらチェックを付けます。何も記録されません。",
+    "category_label": "記録するカテゴリー",
+    "add": "ローテーションに追加",
+    "yours": "あなたの項目"
+  },
+  "timer": {
+    "from_rotation": "ローテーションから",
+    "open_link": "{{site}}を開く"
+  }
+}

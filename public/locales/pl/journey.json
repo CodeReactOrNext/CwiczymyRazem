@@ -67,8 +67,6 @@
     "create_title": "Stwórz własną roadmapę",
     "create_body": "Powiedz trenerowi, co chcesz grać — ułoży ci ścieżkę krok po kroku z ćwiczeniami, utworami i lekcjami.",
     "create_cta": "Stwórz",
-    "suggest": "Zaproponuj ścieżkę nauki",
-    "missing_coming": "Brakuje tematu? Następne będą: {{topics}} — daj znać, co jeszcze chciałbyś zobaczyć.",
-    "missing": "Brakuje tematu? Daj znać, co chciałbyś zobaczyć następne."
+    "coming_soon": "Wkrótce"
   }
 }

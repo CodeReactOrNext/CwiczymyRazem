@@ -221,27 +221,8 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
             className='mb-3 md:mb-6'
           />
 
+          {/* Title only: the road below already shows how far along it is. */}
           <PageTitle title={module.title} subtitle={module.subtitle} />
-
-          <div className='mt-3 flex items-center gap-3 md:mt-6'>
-            <div className='h-1.5 w-40 overflow-hidden rounded-full bg-zinc-800'>
-              <div
-                className='h-full rounded-full bg-cyan-500'
-                style={{
-                  width:
-                    module.totalCount > 0
-                      ? `${(module.completedCount / module.totalCount) * 100}%`
-                      : 0,
-                }}
-              />
-            </div>
-            <span className='text-xs text-zinc-500'>
-              {t("finish.steps", {
-                done: module.completedCount,
-                total: module.totalCount,
-              })}
-            </span>
-          </div>
         </div>
       </div>
 

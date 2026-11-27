@@ -93,18 +93,15 @@ export const StepBubble = ({
       <h3 className='font-display text-xl font-bold leading-tight text-zinc-50'>
         {text(action.title)}
       </h3>
-      {action.reason && (
-        <p className='mt-1.5 text-sm leading-relaxed text-zinc-400'>{text(action.reason)}</p>
-      )}
-      {perks.length > 0 && (
-        <ul className='mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1.5'>
+      {/* The why and what it also keeps going, as one line of small print. */}
+      {(action.reason || perks.length > 0) && (
+        <ul className='mt-1.5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm leading-relaxed text-zinc-400'>
+          {action.reason && <li>{text(action.reason)}</li>}
           {perks.map((perk) => {
             const look = PERK_ICONS[perk.key];
             const PerkIcon = look?.icon;
             return (
-              <li
-                key={perk.key}
-                className='flex items-center gap-1.5 text-xs text-zinc-300'>
+              <li key={perk.key} className='flex items-center gap-1.5'>
                 {PerkIcon && (
                   <PerkIcon size={14} className={look.className} aria-hidden />
                 )}

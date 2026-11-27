@@ -1,0 +1,356 @@
+{
+  "availablePoints": "使えるポイント",
+  "level": "レベル",
+  "progress": "進捗",
+  "maxed": "最大",
+  "click_for_details": "クリックで詳細",
+  "upgrade_skill": "このスキルを上げる",
+  "upgrade": "上げる",
+  "current_level": "現在のレベル",
+  "points_to_distribute": "振り分けられるポイント",
+  "skill_categories": "スキルのカテゴリー",
+  "categories_description": "下のカテゴリーを選んで、スキルポイントを振り分けましょう",
+  "no_skills_unlocked": "{{category}}のスキルはまだ解放されていません",
+  "unlock_skills_hint": "練習でポイントを貯めると、スキルが解放されます",
+  "no_skills_unlocked_yet": "まだスキルを解放していません",
+  "show_all_skills": "すべてのスキルを表示",
+  "available_points": "使えるポイント",
+  "point_usage_hint": "＋ボタンをクリックすると、これらのカテゴリーのスキルを上げられます",
+  "show_unlocked": "解放したスキルだけ表示",
+  "show_all": "すべてのスキルを表示",
+  "category_description": {
+    "technique": "ここにポイントを振ると、演奏のテクニックが上がります。エクササイズで得たポイントで、技術の伸びを追いかけられます。",
+    "theory": "ポイントを振って、音楽理論の知識を深めましょう。ほかの分野とバランスを取ると、まんべんなく成長できます。",
+    "hearing": "ポイントを振って、耳の力を伸ばしましょう。この大事なスキルをおろそかにしないよう、進み具合を確認しましょう。",
+    "creativity": "ポイントを使って、創造的な表現力を高めましょう。どの分野が伸びていて、どこに手をかけるべきかを追いかけましょう。"
+  },
+  "intro": {
+    "title": "ギタースキルを伸ばす",
+    "description": "練習セッションで得たスキルポイントを振り分けて、演奏の特定の分野を伸ばしましょう。",
+    "point1": "練習のエクササイズを終えるとスキルポイントがもらえます",
+    "point2": "伸ばしたい分野に合わせてポイントを振り分けます",
+    "point3": "進捗を見れば、どのスキルが伸びていて、どれをおろそかにしているかがわかります",
+    "got_it": "わかった"
+  },
+  "categories": {
+    "technique": "テクニック",
+    "theory": "理論",
+    "hearing": "耳コピ",
+    "creativity": "クリエイティブ"
+  },
+  "skills": {
+    "alternate_picking": {
+      "name": "オルタネイトピッキング",
+      "description": "ダウンとアップを交互にくり返す技術をマスター"
+    },
+    "legato": {
+      "name": "レガート",
+      "description": "ハンマリングとプリングを使ったなめらかな奏法"
+    },
+    "sweep_picking": {
+      "name": "スウィープピッキング",
+      "description": "アルペジオを弾くための上級ピッキング"
+    },
+    "chord_theory": {
+      "name": "コード理論",
+      "description": "コードの成り立ちとコード進行を理解する"
+    },
+    "scales": {
+      "name": "スケール",
+      "description": "ギターに欠かせないスケールを覚えてマスター"
+    },
+    "rhythm": {
+      "name": "リズム",
+      "description": "正確なタイミングとリズムのコントロールを身につける"
+    },
+    "finger_independence": {
+      "name": "指の独立性",
+      "description": "指をそれぞれ独立して動かせるようにする"
+    },
+    "phrasing": {
+      "name": "フレージング",
+      "description": "間、強弱、音選びでフレーズを形作る"
+    },
+    "articulation": {
+      "name": "アーティキュレーション",
+      "description": "さまざまな音の表情付けを身につけて、表現の幅を広げる"
+    },
+    "bending": {
+      "name": "チョーキング",
+      "description": "表情豊かな演奏のためのチョーキングをマスター"
+    },
+    "tapping": {
+      "name": "タッピング",
+      "description": "両手を指板で使う上級テクニック"
+    },
+    "string_skipping": {
+      "name": "弦飛び",
+      "description": "弦を飛ぶときの正確さと協調性を身につける"
+    },
+    "improvisation": {
+      "name": "アドリブ",
+      "description": "その場で音楽的なアイデアやソロを生み出す"
+    },
+    "ear_training": {
+      "name": "耳トレ",
+      "description": "音、インターバル、コードを耳で聴き分ける力を身につける"
+    },
+    "sight_reading": {
+      "name": "初見演奏",
+      "description": "楽譜をすらすら読んで弾けるようになる"
+    },
+    "fingerpicking": {
+      "name": "フィンガーピッキング",
+      "description": "フィンガースタイルのギター奏法をマスター"
+    },
+    "music_composition": {
+      "name": "作曲",
+      "description": "自分の音楽を書いてアレンジできるようになる"
+    },
+    "pitch_recognition": {
+      "name": "音感",
+      "description": "絶対音感と相対音感を身につける"
+    },
+    "harmony": {
+      "name": "ハーモニー",
+      "description": "複雑なコード進行とボイスリーディングをマスター"
+    },
+    "vibrato": {
+      "name": "ビブラート",
+      "description": "弦を揺らして表情を加える技術をマスター"
+    },
+    "music_theory": {
+      "name": "指板と理論",
+      "description": "ネック上のすべての音と、その裏にある理論を知る"
+    },
+    "rhythm_variations": {
+      "name": "上級リズム",
+      "description": "複雑な拍子とポリリズムをマスター"
+    },
+    "songwriting": {
+      "name": "ソングライティング",
+      "description": "歌詞とアレンジのある曲を丸ごと作る"
+    },
+    "slide_guitar": {
+      "name": "スライドギター",
+      "description": "スライドバーを使った奏法をマスター"
+    },
+    "modal_theory": {
+      "name": "モード理論",
+      "description": "音楽のモードを理解して使う"
+    },
+    "audio_production": {
+      "name": "音作り",
+      "description": "ギタートラックの録音と制作を学ぶ"
+    },
+    "hybrid_picking": {
+      "name": "ハイブリッドピッキング",
+      "description": "ピックと指弾きを組み合わせる"
+    },
+    "harmony-ear": {
+      "name": "和声の聴き取り",
+      "description": "コードとコード進行を耳で聴き分ける力を身につける"
+    },
+    "chords": {
+      "name": "コード",
+      "description": "コードの成り立ちとコード進行をマスター"
+    },
+    "transcription": {
+      "name": "採譜",
+      "description": "耳で聴いた音楽を、楽譜やTAB譜に書き起こせるようになる"
+    },
+    "picking": {
+      "name": "ピッキング",
+      "description": "基本のピッキングと正確に弦を弾く技術をマスター"
+    },
+    "basic_chords": {
+      "name": "基本のコード",
+      "description": "オープンコードとパワーコードの基礎"
+    },
+    "intermediate_chords": {
+      "name": "中級のコード",
+      "description": "バレーコードと複雑なボイシング"
+    },
+    "advanced_chords": {
+      "name": "上級のコード",
+      "description": "テンションと変化したコードのボイシング"
+    },
+    "basic_scales": {
+      "name": "基本のスケール",
+      "description": "メジャー、マイナー、ペンタトニック"
+    },
+    "intermediate_scales": {
+      "name": "中級のスケール",
+      "description": "モードのスケールと追加のパターン"
+    },
+    "advanced_scales": {
+      "name": "上級のスケール",
+      "description": "エキゾチックで複雑なスケール体系"
+    },
+    "rhythm_basics": {
+      "name": "リズムの基礎",
+      "description": "基本のストロークとタイミングのパターン"
+    },
+    "rhythm_intermediate": {
+      "name": "中級のリズム",
+      "description": "複雑なストロークとシンコペーション"
+    },
+    "rhythm_advanced": {
+      "name": "上級リズム",
+      "description": "ポリリズムと高度なタイミングの考え方"
+    },
+    "music_theory_basics": {
+      "name": "理論の基礎",
+      "description": "記譜とハーモニーの基本"
+    },
+    "music_theory_intermediate": {
+      "name": "中級の理論",
+      "description": "コード進行と高度なハーモニー"
+    },
+    "music_theory_advanced": {
+      "name": "上級の理論",
+      "description": "複雑な和声体系と分析"
+    },
+    "ear_training_basic": {
+      "name": "基本の耳トレ",
+      "description": "音とシンプルなインターバルの聴き分け"
+    },
+    "ear_training_intermediate": {
+      "name": "中級の耳トレ",
+      "description": "コードの聴き分けと採譜"
+    },
+    "ear_training_advanced": {
+      "name": "上級の耳トレ",
+      "description": "複雑なハーモニーとリズムの採譜"
+    },
+    "improvisation_basic": {
+      "name": "基本のアドリブ",
+      "description": "基本のコード進行の上でシンプルなメロディーのアドリブ"
+    },
+    "improvisation_intermediate": {
+      "name": "中級のアドリブ",
+      "description": "フレージングと、より複雑なアドリブの考え方"
+    },
+    "improvisation_advanced": {
+      "name": "上級のアドリブ",
+      "description": "自分だけの声と高度なテクニックを育てる"
+    },
+    "composition_basic": {
+      "name": "基本の作曲",
+      "description": "シンプルな曲作りとメロディーの展開"
+    },
+    "composition_intermediate": {
+      "name": "中級の作曲",
+      "description": "より複雑な曲の構成とアレンジ"
+    },
+    "composition_advanced": {
+      "name": "上級の作曲",
+      "description": "洗練された作曲のテクニック"
+    },
+    "composition": {
+      "name": "作曲",
+      "description": "自分の音楽を書いてアレンジできるようになる"
+    }
+  },
+  "roadmap": {
+    "aria": "スキルのロードマップ",
+    "bpm_stages": "BPMステージ {{done}} / {{total}}",
+    "lvl": "Lv {{level}}",
+    "done_of": "{{total}}中{{done}}",
+    "up_next": "次はこれ",
+    "start": "スタート",
+    "preview": "プレビュー",
+    "play_again": "もう一度弾く",
+    "skills_hidden_one": "{{count}}スキルを非表示",
+    "skills_hidden_other": "{{count}}スキルを非表示",
+    "hide_skills": "このステージのスキルを隠す",
+    "show_skills": "このステージのスキルを表示",
+    "legend_way_in": "スキルの次の一歩",
+    "legend_later": "あとで",
+    "exercises_done": "エクササイズ {{done}} / {{total}}",
+    "show_in_path": "このエクササイズを道のりで表示",
+    "jump_tier": "ステージへジャンプ",
+    "mastery": "マスタリー",
+    "mastery_done": "マスタリー — 道のりのエクササイズはすべて完了です。",
+    "mastery_left": "マスタリー · あと{{count}}エクササイズ",
+    "state": {
+      "completed": "完了",
+      "current": "次はこれ",
+      "available": "未着手",
+      "locked": "Proエクササイズ"
+    },
+    "tiers": {
+      "foundations": {
+        "title": "ファンデーション",
+        "subtitle": "ギターを手に取ろう。基本を固めよう。"
+      },
+      "technique": {
+        "title": "テクニック",
+        "subtitle": "正確さ、速さ、コントロール。"
+      },
+      "theory": {
+        "title": "理論と指板",
+        "subtitle": "ネックを知ろう。弾いているものに名前を付けよう。"
+      },
+      "rhythm": {
+        "title": "リズムとグルーヴ",
+        "subtitle": "ビートにぴったり乗ろう。"
+      },
+      "expression": {
+        "title": "表現とスタイル",
+        "subtitle": "1音1音を歌わせよう。"
+      },
+      "hearing": {
+        "title": "耳トレ",
+        "subtitle": "弾く前に聴こう。"
+      },
+      "creativity": {
+        "title": "クリエイティブ",
+        "subtitle": "自分だけの声を見つけよう。"
+      }
+    },
+    "branches": {
+      "getting_started": "はじめの一歩",
+      "clean_tone": "クリーンな音とミュート",
+      "first_scales": "最初のスケール",
+      "play_alongs": "プレイアロング",
+      "alternate_picking": "オルタネイトピッキング",
+      "finger_independence": "指の独立性",
+      "legato": "レガート",
+      "string_skipping": "弦飛び",
+      "spider_permutations": "スパイダーの組み合わせ",
+      "sweep_picking": "スウィープピッキング",
+      "tapping": "タッピング",
+      "hybrid_picking": "ハイブリッドピッキング",
+      "note_hunts": "ノートハント",
+      "click_hunts": "クリックハント",
+      "interval_clicks": "インターバルクリック",
+      "chords": "コード",
+      "harmony": "ハーモニー",
+      "strumming_styles": "ストローク",
+      "strumming_patterns": "ストロークパターン",
+      "timing_meter": "タイミングと拍子",
+      "bending": "チョーキング",
+      "vibrato": "ビブラート",
+      "phrasing": "フレージング",
+      "tone": "音作り",
+      "play_by_ear": "Play by Ear",
+      "ear_quizzes": "耳のクイズ",
+      "improvisation": "アドリブ",
+      "composition": "作曲"
+    }
+  },
+  "points_panel": {
+    "eyebrow": "スキルポイント",
+    "title": "あなたのスキル",
+    "subtitle": "エクササイズを終えるたびに、それが鍛えるスキルのレベルが上がります",
+    "total_label": "スキルポイント",
+    "started": "{{total}}スキル中{{started}}スキルに着手",
+    "pts": "pt",
+    "not_started": "未着手",
+    "nothing_yet": "ここはまだ何も練習していません。",
+    "lvl": "Lv",
+    "to_next": "Lv {{level}}まであと{{count}}",
+    "xp": "XP"
+  }
+}

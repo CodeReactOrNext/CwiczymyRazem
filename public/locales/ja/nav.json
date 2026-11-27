@@ -1,0 +1,147 @@
+{
+  "home": "ホーム",
+  "what_next": "次にやること",
+  "practice": "練習",
+  "songs": "曲",
+  "my_stuff": "マイページ",
+  "progress": "進捗",
+  "community": "コミュニティ",
+  "rankings": "ランキング",
+  "challenges": "チャレンジ",
+  "challenges_tooltip": "コミュニティの投票で選ばれた5曲を毎月レコーディング",
+  "duels": "デュエル",
+  "duels_tooltip": "同じエクササイズで匿名の1対1 — ELOランキング",
+  "improv": "アドリブ",
+  "improv_tooltip": "5日ごとに新しいバッキングトラック — 合わせて弾いて投稿しよう",
+  "recordings": "レコーディング",
+  "recordings_tooltip": "カバーを公開して、みんなの演奏を聴こう",
+  "guilds": "ギルド",
+  "guilds_tooltip": "仲間と一緒に練習 — チャットと毎週のチャレンジ",
+  "unlocks_at_level": "レベル{{lvl}}で解放",
+  "arsenal": "Arsenal",
+  "tone_studio": "Tone Studio",
+  "supporter": "サポーター",
+  "support": "サポート",
+  "supporter_tooltip": "アイデアを投稿して、次に作る機能に投票しよう",
+  "support_tooltip": "プロジェクトを支援すると得られるものと、その方法",
+  "knowledge_base": "ナレッジベース",
+  "knowledge_base_tooltip": "アプリの仕組みをわかりやすく解説",
+  "settings": "設定",
+  "discord": "Discord",
+  "discord_tooltip": "コミュニティサーバーに参加",
+  "learning_path": "ラーニングパス",
+  "unclaimed_reward": "未受け取りの報酬",
+  "collapse_section": "{{name}}を閉じる",
+  "expand_section": "{{name}}を開く",
+  "get_desktop_app": "デスクトップアプリを入手",
+  "sign_out": "サインアウト",
+  "sign_out_confirm": "本当にサインアウトしますか？",
+  "cancel": "キャンセル",
+  "log_out": "ログアウト",
+  "see_your_profile": "プロフィールを見る",
+  "account_menu": "アカウントメニュー",
+  "open_menu": "メニューを開く",
+  "close_menu": "メニューを閉じる",
+  "more": "その他",
+  "points_tooltip": "ポイントはエクササイズや練習セッションを終えると貯まります — 全体の上達の目安です。",
+  "weekday_letters": "月,火,水,木,金,土,日",
+  "search": {
+    "button": "検索...",
+    "title": "検索",
+    "description": "ページ、プラン、エクササイズ、曲を検索",
+    "placeholder": "ページ、プラン、エクササイズ、曲を検索...",
+    "start_typing": "入力すると、ページ、プラン、エクササイズ、曲を検索できます。",
+    "no_results": "「{{query}}」に一致する結果はありません。",
+    "group_pages": "ページ",
+    "group_plans": "プラン",
+    "group_exercises": "エクササイズ",
+    "group_songs": "曲"
+  },
+  "reset": {
+    "aria": "サーバー時刻と次のリセット",
+    "server_time_short": "サーバー時刻",
+    "scope_server": "サーバー",
+    "scope_local": "あなたの時刻",
+    "next_in": "{{label}}まで {{time}}",
+    "tooltip_hint": "ゲームの1日は全員共通でUTC 00:00に始まります。クリックで一覧を表示。",
+    "dialog_title": "サーバー時刻 · {{time}} UTC",
+    "dialog_description": "プレイヤー同士で共有するものはすべて同じ時計で動くので、締め切りはどこにいても同じ意味です。例外は練習の連続記録で、あなた自身の深夜0時に合わせます。",
+    "entries": {
+      "daily": {
+        "label": "デイリーリセット",
+        "detail": "毎日のFameボーナスが新しくなります。"
+      },
+      "trader": {
+        "label": "トレーダーの入荷",
+        "detail": "トレーダーがカウンターを片付けて、新しい品物を並べます。"
+      },
+      "case-pool": {
+        "label": "注目ケースの入れ替え",
+        "detail": "新しいギターとエフェクトがデイリーケースに入ります。"
+      },
+      "weekly": {
+        "label": "ウィークリー目標",
+        "detail": "コミュニティ目標とギルドチャレンジが新しい週を迎えます。"
+      },
+      "monthly": {
+        "label": "シーズンと月間チャレンジ",
+        "detail": "リーダーボードがリセットされ、新しいチャレンジが始まります。"
+      },
+      "streak": {
+        "label": "あなたの練習日",
+        "detail": "デイリークエストが新しくなり、それまでに1回練習すれば連続記録が続きます — これはサーバーではなく、あなたのタイムゾーンに合わせます。"
+      }
+    }
+  },
+  "page_tabs": {
+    "favorites": {
+      "label": "お気に入り"
+    },
+    "plans": {
+      "label": "マイプラン"
+    },
+    "rotation": {
+      "label": "ローテーション"
+    },
+    "calendar": {
+      "label": "カレンダー"
+    },
+    "my_exercises": {
+      "label": "マイエクササイズ"
+    },
+    "my_roadmaps": {
+      "label": "プレイヤーのロードマップ"
+    },
+    "profile_activity": {
+      "label": "アクティビティ"
+    },
+    "profile_skill_points": {
+      "label": "スキル"
+    },
+    "practice_log": {
+      "label": "練習ログ"
+    },
+    "profile_achievements": {
+      "label": "実績"
+    },
+    "seasons": {
+      "label": "シーズン"
+    },
+    "leaderboard": {
+      "label": "リーダーボード"
+    },
+    "leaderboard_gear": {
+      "label": "機材",
+      "tooltip": "練習スコアではなく、装備中のギターとリグのレベルで順位付け"
+    },
+    "summary": {
+      "label": "マイルストーン"
+    },
+    "goals": {
+      "label": "目標"
+    }
+  },
+  "language_wip": "翻訳は作業中です — 一部はまだ英語のままです。",
+  "streak_rest_day": "休息日：連続記録は守られています",
+  "take_tour": "ツアーを見る"
+}

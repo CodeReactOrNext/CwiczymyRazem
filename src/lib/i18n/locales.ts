@@ -9,7 +9,7 @@
  */
 export const DEFAULT_LOCALE = "en";
 
-export type AppLocale = "en" | "pl" | "de" | "es";
+export type AppLocale = "en" | "pl" | "de" | "es" | "ja";
 
 export interface LocaleDescriptor {
   code: AppLocale;
@@ -24,6 +24,7 @@ export const SUPPORTED_LOCALES: readonly LocaleDescriptor[] = [
   { code: "pl", label: "Polski", englishLabel: "Polish" },
   { code: "de", label: "Deutsch", englishLabel: "German" },
   { code: "es", label: "Español", englishLabel: "Spanish" },
+  { code: "ja", label: "日本語", englishLabel: "Japanese" },
 ];
 
 const LOCALE_CODES: readonly string[] = SUPPORTED_LOCALES.map(({ code }) => code);

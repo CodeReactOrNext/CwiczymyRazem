@@ -1,0 +1,148 @@
+{
+  "seconds": "秒",
+  "pause": "一時停止",
+  "start": "スタート",
+  "total_time": "合計時間：",
+  "currently_exercising": "現在練習中：",
+  "info_about_report": "時間を手動で入力するには、こちらへ：",
+  "end_button": "練習を終える",
+  "report_link": "記録",
+  "technique": "テクニック",
+  "theory": "理論",
+  "hearing": "耳コピ",
+  "creativity": "クリエイティブ",
+  "choose": "カテゴリーを選ぶ",
+  "select_practice_mode": "練習モードを選ぶ",
+  "choose_practice_description": "自分に合った練習方法を選びましょう",
+  "modes": {
+    "timer": {
+      "title": "通常の練習",
+      "description": "選んだスキルを自由に練習して、進捗を記録します"
+    },
+    "plan": {
+      "title": "エクササイズプラン",
+      "description": "用意されたプランを選んで、それに沿って練習します"
+    },
+    "auto": {
+      "title": "オートプラン",
+      "description": "あなたの時間に合わせたプランを作ります"
+    }
+  },
+  "time_splitter": {
+    "title": "セッションのまとめ",
+    "description": "<1>{{songTitle}}</1>を<3>{{time}}</3>練習しました。",
+    "question": "時間をどう使いましたか？",
+    "hearing": "耳コピ",
+    "technique": "テクニック",
+    "learned_title": "この曲をマスターした！",
+    "learned_description": "「マスター済み」にして完了に移動",
+    "already_learned_title": "マスター済み",
+    "already_learned_description": "この曲はマスター済みリストに入っています。",
+    "resume": "タイマーを再開",
+    "confirm": "確定して終了",
+    "saving": "保存中..."
+  },
+  "practice_session": "練習セッション",
+  "finish": "終了",
+  "youtube": {
+    "add_link": "YouTubeのリンクを貼り付け",
+    "change_link": "動画を変更",
+    "no_link": "まだ動画がリンクされていません"
+  },
+  "sections": {
+    "add": "セクションを追加",
+    "name_placeholder": "セクション名",
+    "mastery_0": "未習得",
+    "mastery_1": "苦手",
+    "mastery_2": "まあまあ",
+    "mastery_3": "マスター",
+    "mastery_4": "スキップ"
+  },
+  "rating_summary": "練習のまとめ",
+  "reset_button": "リセット",
+  "reset_dialog": {
+    "title": "タイマーをリセットしますか？",
+    "description": "このセッションのすべてのスキルで記録した時間が消去されます。元に戻すことはできません。",
+    "cancel": "キャンセル",
+    "confirm": "リセット"
+  },
+  "metronome": {
+    "title": "メトロノーム",
+    "start": "メトロノームを開始",
+    "stop": "メトロノームを停止"
+  },
+  "interval_alert": {
+    "title": "インターバル通知",
+    "description": "数分ごとにスキルを切り替える合図を出します",
+    "minutes_short": "{{minutes}}分",
+    "next_in": "次の通知まで{{time}}",
+    "enable": "通知を有効にする",
+    "disable": "通知を無効にする",
+    "toast": "切り替えの時間です！ {{minutes}}分経ちました",
+    "custom_placeholder": "カスタム",
+    "custom_aria": "カスタム間隔（分）"
+  },
+  "community_map": {
+    "banner_title": "コミュニティマップがあります",
+    "banner_description": "{{count}}人のミュージシャンがこのセクションのタイミングを確認しました。",
+    "explainer": "他のプレイヤーが、この同じYouTube動画を使って、イントロ、Aメロ、サビ、ソロなど曲の各パートの開始位置をマークしました。",
+    "disclaimer": "正確さは確認していません — たたき台として使ってください。セクションはあとから名前の変更、移動、削除ができ、内容はいつでも変わる可能性があります。",
+    "import": "セクションを取り込む",
+    "not_now": "今はしない"
+  },
+  "choose_practising": "練習する内容を選ぶ",
+  "back_to_practice": "練習に戻る",
+  "saving": "保存中...",
+  "practised_away": "タイマーなしで練習した？",
+  "log_manually": "時間を手動で記録",
+  "song_timer": {
+    "shortcuts": "ショートカット",
+    "key_space": "スペース",
+    "play_pause": "再生／一時停止",
+    "mark_section": "セクションをマーク",
+    "toggle_loop": "ループの切り替え",
+    "seek": "5秒移動",
+    "practice_notes": "練習メモ",
+    "lines": "{{count}} / 300行",
+    "notes_placeholder": "練習メモをここに追加...（例：設定、難しい部分のコツ、使った機材）",
+    "no_section": "動画を再生して、各パートの始まりをマークしましょう",
+    "looping": "ループ中",
+    "prev_section": "前のセクション",
+    "next_section": "次のセクション",
+    "play": "再生",
+    "pause": "一時停止",
+    "loop_short": "ループ",
+    "mark_short": "マーク",
+    "sections_title": "セクション",
+    "onboarding_title": "曲をマップして、難しいところをループしよう",
+    "onboarding_step_1": "動画を再生する",
+    "onboarding_step_2": "新しいパートが始まったらマークをタップして、名前を選ぶ",
+    "onboarding_step_3": "セクションをタップしてループする",
+    "section_options": "セクションのオプション",
+    "section_name": "名前",
+    "section_start": "開始位置",
+    "set_to_playhead": "{{time}}に設定",
+    "nudge_back": "1秒前へ",
+    "nudge_forward": "1秒後へ",
+    "mastery": "どれくらい弾ける？",
+    "delete_section": "セクションを削除",
+    "done": "完了",
+    "session_time": "セッション時間",
+    "pause_timer": "セッション時間を一時停止",
+    "resume_timer": "セッション時間を再開",
+    "mark_new_section": "新しいセクション",
+    "mark_undo": "マークを取り消す",
+    "nudge_back_n": "{{count}}秒前へ",
+    "nudge_forward_n": "{{count}}秒後へ"
+  },
+  "youtube_player": {
+    "paste_new": "新しいYouTubeリンクを貼り付け",
+    "paste": "YouTubeリンクを貼り付け",
+    "placeholder": "例：youtube.com/watch?v=…",
+    "save": "保存",
+    "suggestions": "候補から選ぶ",
+    "speed": "速度",
+    "unlock": "編集のロックを解除",
+    "lock": "編集をロック"
+  }
+}

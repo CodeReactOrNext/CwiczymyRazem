@@ -699,7 +699,16 @@
   },
   "click_hunt": {
     "play_note": "Gesuchten Ton abspielen",
-    "hear_it": "Anhören"
+    "hear_it": "Anhören",
+    "find_both_on_fret": "Finde beide {{note}} im {{fret}}. Bund",
+    "find_all_on_fret": "Finde alle {{count}} {{note}} im {{fret}}. Bund",
+    "to_find_one": "{{count}} Position zu finden",
+    "to_find_other": "{{count}} Positionen zu finden",
+    "left_one": "Noch {{count}}",
+    "left_other": "Noch {{count}}",
+    "all_found": "Alle Positionen gefunden",
+    "hint_scan": "Prüfe jede Saite, von oben nach unten.",
+    "hint_same_e": "Die dünne e-Saite hat dieselben Töne wie die dicke E-Saite."
   },
   "strum": {
     "strum": "Anschlagen",
@@ -890,6 +899,8 @@
     "untitled": "Aufnahme"
   },
   "exam_click_failed": "{{limit}} falsche Klicks – Prüfung nicht bestanden.",
+  "exam_click_time_up": "Eine Runde lief ohne Antwort ab – Prüfung nicht bestanden.",
+  "exam_click_rounds_short": "{{solved}} Runden gelöst – die Prüfung verlangt {{min}}.",
   "verdict": {
     "time": "{{minutes}} Min. geschafft",
     "clean": "Sauber gespielt",

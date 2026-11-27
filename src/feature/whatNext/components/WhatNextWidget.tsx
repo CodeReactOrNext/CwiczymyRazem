@@ -50,10 +50,13 @@ export const WhatNextRoadStrip = ({
   result,
   onOpen,
   playRoad,
+  showCaseProgress = true,
 }: {
   result: WhatNextResult;
-  /** Shown under the first step's button — "play the whole road", on the page. */
+  /** Shown under the first step's button. */
   playRoad?: ReactNode;
+  /** The page shows the free-case bar in a card of its own instead. */
+  showCaseProgress?: boolean;
   onOpen: (
     action: NextAction,
     placement: WhatNextPlacement,
@@ -106,7 +109,7 @@ export const WhatNextRoadStrip = ({
                 <span
                   aria-hidden
                   className={cn(
-                    "line-clamp-2 text-center text-xs font-semibold leading-snug text-zinc-400",
+                    "line-clamp-2 text-center text-xs font-medium leading-snug text-zinc-500",
                     isSelected && "invisible",
                   )}>
                   {stopLook.title}
@@ -133,7 +136,7 @@ export const WhatNextRoadStrip = ({
           }
         />
       )}
-      <CaseProgress className='mt-2' />
+      {showCaseProgress && <CaseProgress className='mt-6' />}
     </div>
   );
 };

@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
-import { journeyModules, placeholderModules } from "../data/journeyModules";
+import { journeyModules } from "../data/journeyModules";
 import {
   firebaseCompleteJourneyStep,
   firebaseGetJourneyProgress,
@@ -259,7 +259,6 @@ const JourneyView: React.FC = () => {
     return (
       <ModuleSelectionScreen
         modules={modulesWithStatus}
-        placeholders={placeholderModules}
         onSelectModule={(id) => {
           setSelectedModuleId(id);
           setShowModuleSelection(false);

@@ -152,6 +152,37 @@ describe("useNoteHuntRotation — rounds that end on a verdict", () => {
     expect(result.current.rotation.roundEnd?.kind).toBe("solved");
   });
 
+  it("ends an unanswered plain click round in an exam, after the exam's 10 s", () => {
+    const exercise = makeExercise({ rotateSeconds: 25, mode: "click" });
+    const { result } = renderHook(() => {
+      const solvedRef = useRef(false);
+      return useNoteHuntRotation(exercise, true, solvedRef, true);
+    });
+    expect(result.current.secondsTotal).toBe(10);
+    act(() => void vi.advanceTimersByTime(10_000));
+    expect(result.current.roundEnd).toEqual({ kind: "timeUp", seconds: 10 });
+  });
+
+  it("lets a solved plain click round rotate in an exam", () => {
+    const exercise = makeExercise({ rotateSeconds: 25, mode: "click" });
+    const { result } = renderHook(() => {
+      const solvedRef = useRef(true);
+      return useNoteHuntRotation(exercise, true, solvedRef, true);
+    });
+    act(() => void vi.advanceTimersByTime(10_000));
+    expect(result.current.roundEnd).toBeNull();
+  });
+
+  it("gives no plain click verdict once the exam's own clock is down", () => {
+    const exercise = makeExercise({ rotateSeconds: 25, mode: "click" });
+    const { result } = renderHook(() => {
+      const solvedRef = useRef(false);
+      return useNoteHuntRotation(exercise, true, solvedRef, true, undefined, false);
+    });
+    act(() => void vi.advanceTimersByTime(10_000));
+    expect(result.current.roundEnd).toBeNull();
+  });
+
   it("just rotates in an exam", () => {
     const exercise = verdictExercise();
     const { result } = renderHook(() => {

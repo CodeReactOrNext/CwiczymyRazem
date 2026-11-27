@@ -1,0 +1,18 @@
+{
+  "changelog": {
+    "empty": "今月の更新はありません",
+    "new": "新機能",
+    "bug_fix": "バグ修正",
+    "play_video": "動画を再生：{{title}}"
+  },
+  "open_in_practice_log": "練習ログで開く",
+  "activity": "アクティビティ",
+  "activity_details": "アクティビティの詳細",
+  "minutes_short": "{{minutes}}分",
+  "live_now": "ライブ中",
+  "close": "閉じる",
+  "using_desktop_app": "デスクトップアプリを使用中",
+  "free_cases": "無料ケース{{count}}個",
+  "free_case": "無料ケース",
+  "daily_practice": "毎日の練習"
+}

@@ -1,0 +1,144 @@
+{
+  "page": {
+    "title": "目標",
+    "subtitle": "エクササイズにテンポ目標を決めて、マイルストーンごとに近づいていこう",
+    "eyebrow": "あなたの目標",
+    "new_goal": "新しい目標"
+  },
+  "empty": {
+    "title": "まだ目標がありません",
+    "body": "エクササイズ、開始テンポ、到達したいテンポを選びましょう。道のりはマイルストーンに分けられ、それぞれ目標モードでクリーンに3回弾けばクリアです。",
+    "cta": "最初の目標を決める"
+  },
+  "active_title": "進行中",
+  "history_title": "達成済み",
+  "no_active": "進行中の目標はありません。新しく決めるか、達成した目標のハードルを上げましょう。",
+  "card": {
+    "rules": "正確さ{{accuracy}}% · {{counting}}",
+    "delete": "目標を削除",
+    "edit": "目標を編集",
+    "stage_of": "マイルストーン{{index}}/{{total}}",
+    "path_label": "目標までのマイルストーン",
+    "stage_done": "{{bpm}} BPM、クリア",
+    "stage_current": "{{bpm}} BPM、挑戦中",
+    "progress_at": "{{bpm}} BPMでクリーン{{count}}/{{total}}回",
+    "start_at": "{{bpm}} BPMで弾く"
+  },
+  "counting": {
+    "streak": "連続",
+    "total": "合計"
+  },
+  "strictness": {
+    "relaxed": "ゆるめ",
+    "standard": "標準",
+    "strict": "厳しめ"
+  },
+  "chart": {
+    "target": "目標 {{bpm}} BPM",
+    "practice_run": "練習",
+    "goal_run": "目標ラン",
+    "clean_goal_run": "クリーンな目標ラン",
+    "accuracy": "正確さ{{accuracy}}%",
+    "missed_goal_run": "目標ラン、クリーンではない",
+    "empty": "採点された演奏がここに表示され、目標テンポが到達ラインとして引かれます。",
+    "metric_label": "グラフの表示内容",
+    "metric_tempo": "テンポ",
+    "metric_timing": "タイミング",
+    "stage": "マイルストーン {{bpm}} BPM",
+    "empty_history": "マイクで採点された演奏が、それぞれ弾いたテンポでここに表示されます。",
+    "accuracy_line": "正確さ"
+  },
+  "create": {
+    "title": "新しい目標",
+    "description": "エクササイズ、開始テンポ、到達するテンポを選びましょう。道のりはマイルストーンに分けられ、それぞれ目標モードでクリーンに3回弾けばクリアです。",
+    "exercise_label": "エクササイズ",
+    "search": "エクササイズを検索",
+    "no_results": "一致するエクササイズがありません。",
+    "has_goal": "目標あり",
+    "bpm_range": "エクササイズの範囲 {{min}}〜{{max}} BPM",
+    "change_exercise": "変更",
+    "bpm_label": "目標テンポ",
+    "bpm_invalid": "{{min}}〜{{max}} BPMの間でテンポを選んでください。",
+    "strictness_label": "どれくらいクリーンに",
+    "strictness_hint": "演奏がカウントされる最低限の正確さ。",
+    "counting_label": "マイルストーンごとにクリーン3回",
+    "counting_hint_streak": "クリーンでない演奏があるとカウントがやり直しになります。",
+    "counting_hint_total": "間に何があっても、クリーンな演奏が積み上がります。",
+    "cancel": "今はしない",
+    "save": "目標を決める",
+    "reached_title": "目標達成！ ハードルを上げる？",
+    "raise_title": "ハードルを上げる",
+    "raise_description": "{{exercise}}を{{bpm}} BPMでクリーンに弾けました。次に目指すテンポを決めましょう。",
+    "counting_option": {
+      "streak": "連続",
+      "total": "合計"
+    },
+    "bpm_down": "5 BPM遅く",
+    "bpm_up": "5 BPM速く",
+    "start_label": "開始テンポ",
+    "start_above_target": "開始テンポは目標以下にしてください。",
+    "path_summary": "マイルストーン{{count}}個、それぞれクリーン{{runs}}回",
+    "source_label": "エクササイズの出どころ",
+    "source": {
+      "library": "ライブラリ",
+      "mine": "マイエクササイズ"
+    },
+    "mine_empty": "まだエクササイズを作っていません。Tab Editorで作ったものが、非公開のものも含めてここに表示されます。",
+    "mine_none_eligible": "目標を設定できるエクササイズがまだありません。目標にはTAB譜とテンポ範囲が必要です。",
+    "mine_left_out": "あなたのエクササイズのうち{{count}}個は、目標を設定するにはTAB譜とテンポ範囲が必要です。"
+  },
+  "edit": {
+    "title": "目標を編集",
+    "description": "{{exercise}}のテンポやルールを変更します。クリア済みのマイルストーンはそのままです。",
+    "save": "変更を保存",
+    "picks_up": "{{bpm}} BPMから再開します。",
+    "runs_kept": "そこでのクリーンな演奏（{{total}}回中{{runs}}回）は引き継がれます。",
+    "runs_reset": "これまでのクリーンな演奏（{{total}}回中{{runs}}回）はやり直しになります。"
+  },
+  "history": {
+    "title": "最近の演奏",
+    "hint": "このエクササイズでマイクが採点した直近{{count}}回の演奏。大きい点は目標で判定された演奏です。",
+    "loading": "演奏を読み込み中…"
+  },
+  "delete_confirm": {
+    "title": "この目標を削除しますか？",
+    "body": "演奏の記録はエクササイズのグラフに残ります。",
+    "cancel": "キャンセル",
+    "confirm": "削除"
+  },
+  "toast": {
+    "created": "目標を設定しました",
+    "deleted": "目標を削除しました",
+    "error": "問題が発生しました。もう一度お試しください。",
+    "updated": "目標を更新しました"
+  },
+  "verdict": {
+    "saving": "演奏を保存中…",
+    "not_scored": "この演奏はマイクで採点されていないので、目標にはカウントされません。",
+    "error": "演奏を保存できませんでした。もう一度お試しください。",
+    "completed": "目標達成！ {{bpm}} BPM、すべてのマイルストーンをクリアしました。",
+    "closed": "この目標はすでに達成しています。",
+    "clean": "クリーンな演奏",
+    "not_clean": "まだクリーンではありません",
+    "too_slow": "{{bpm}} BPMで演奏しました。このマイルストーンは{{target}} BPMです。",
+    "accuracy": "正確さ{{accuracy}}% — この目標には{{required}}%が必要です。",
+    "streak_reset": "カウントはやり直しです：この目標はクリーンな演奏が連続で必要です。",
+    "eyebrow": "目標 {{bpm}} BPM",
+    "stage_cleared": "マイルストーン {{bpm}} BPM クリア！",
+    "next_stage": "次は{{bpm}} BPM。メトロノームはもう合わせてあります。"
+  },
+  "timing": {
+    "offset": "拍から{{ms}} msずれ",
+    "centered": "拍の中心",
+    "ahead": "拍より{{ms}} ms早めになりがち",
+    "behind": "拍より{{ms}} ms遅めになりがち",
+    "tight_zone": "ジャスト（{{ms}} ms以内）",
+    "explainer": "各演奏で音が拍から通常どれくらいずれるか — グラフの上ほどタイトです。タイミングは遅延のキャリブレーションに左右されるので、毎回同じ方向にずれる場合は一度キャリブレーションしてください。",
+    "empty": "タイミングはマイクで採点した演奏のあとに表示されます。以前のセッションには記録されていません。"
+  },
+  "practice_run": {
+    "clean": "{{bpm}} BPMでクリーンな演奏 — 目標のマイルストーンまで{{required}}回中{{count}}回。",
+    "not_clean": "{{bpm}} BPMの演奏は、目標のクリーンな演奏としてカウントされませんでした。",
+    "next_stage": "次は{{bpm}} BPM。"
+  }
+}

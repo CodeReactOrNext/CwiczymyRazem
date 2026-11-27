@@ -125,7 +125,7 @@ describe("wiki content", () => {
    * differently from the one it translates.
    */
   describe("translations", () => {
-    const LOCALES: AppLocale[] = ["pl", "de", "es"];
+    const LOCALES: AppLocale[] = ["pl", "de", "es", "ja"];
     const cases = pages.flatMap((page) =>
       LOCALES.map((locale) => [page.slug, locale] as const),
     );
