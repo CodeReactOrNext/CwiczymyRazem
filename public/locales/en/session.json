@@ -528,7 +528,13 @@
     "unmute": "Unmute",
     "mute": "Mute",
     "main_instrument": "Main Instrument",
-    "mix": "Mix"
+    "mix": "Mix",
+    "your_guitar": "Your guitar",
+    "off": "Off",
+    "monitor_on": "Hear my guitar",
+    "monitor_off": "Stop hearing my guitar",
+    "monitor_hint": "Wear headphones. Through speakers the mic picks your guitar up again and it howls.",
+    "monitor_off_hint": "Hear your guitar in your headphones."
   },
   "auto_backing": {
     "toggle": "Generated backing track",

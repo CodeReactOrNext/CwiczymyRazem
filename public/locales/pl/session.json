@@ -532,7 +532,13 @@
     "unmute": "Włącz dźwięk",
     "mute": "Wycisz",
     "main_instrument": "Główny instrument",
-    "mix": "Miks"
+    "mix": "Miks",
+    "your_guitar": "Twoja gitara",
+    "off": "Wył.",
+    "monitor_on": "Słysz swoją gitarę",
+    "monitor_off": "Przestań słyszeć gitarę",
+    "monitor_hint": "Załóż słuchawki. Na głośnikach mikrofon łapie gitarę z powrotem i zaczyna piszczeć.",
+    "monitor_off_hint": "Słysz swoją gitarę w słuchawkach."
   },
   "auto_backing": {
     "toggle": "Generowany podkład",

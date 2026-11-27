@@ -452,7 +452,13 @@
     "unmute": "Activar sonido",
     "mute": "Silenciar",
     "main_instrument": "Instrumento principal",
-    "mix": "Mezcla"
+    "mix": "Mezcla",
+    "your_guitar": "Tu guitarra",
+    "off": "Apagado",
+    "monitor_on": "Oír mi guitarra",
+    "monitor_off": "Dejar de oír mi guitarra",
+    "monitor_hint": "Usa auriculares. Con altavoces el micro vuelve a captar la guitarra y se acopla.",
+    "monitor_off_hint": "Oye tu guitarra en los auriculares."
   },
   "auto_backing": {
     "toggle": "Acompañamiento generado",

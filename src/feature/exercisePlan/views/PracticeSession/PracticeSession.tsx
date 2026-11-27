@@ -47,6 +47,7 @@ import { EarRiddleStrip } from "./components/EarRiddleStrip";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
 import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
 import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
+import { selectGuitarMonitorLevel, useGuitarMonitorStore } from "./components/guitarMonitorStore";
 import { getRoundVerdictMs, HuntRoundStrip, ROUND_VERDICT_TONE } from "./components/HuntRoundStrip";
 import { OutputStalledNotice } from "./components/OutputStalledNotice";
 import { PlanInterlude } from "./components/PlanInterlude";
@@ -867,7 +868,9 @@ const PracticeSessionInner = ({
 
   // ── Calibration + mic ─────────────────────────────────────────────────────
 
-  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, getAttackLatencyMs, inputGain, setInputGain, isNative, selectDevice, selectChannel, webInput } = useGuitarAudioInput({ bass: isBass, strum: !!currentExercise.strummingPatterns?.length });
+  // Hearing your own guitar through the browser (web path; the desktop app has its amp).
+  const guitarMonitorLevel = useGuitarMonitorStore(selectGuitarMonitorLevel);
+  const { isListening, init: initAudio, close: closeAudio, audioRefs, getLatencyMs, getAttackLatencyMs, inputGain, setInputGain, isNative, selectDevice, selectChannel, webInput } = useGuitarAudioInput({ bass: isBass, strum: !!currentExercise.strummingPatterns?.length, monitorLevel: guitarMonitorLevel });
   // The player's measured latency for the input path in use — the browser and the
   // desktop app keep separate measurements (different capture chains).
   const calibratedLatencyMs = timingByPath[timingInputPath(isNative)].latencyMs;

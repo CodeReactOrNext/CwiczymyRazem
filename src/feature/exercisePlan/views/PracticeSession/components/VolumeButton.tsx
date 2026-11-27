@@ -4,12 +4,13 @@ import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { AutoBackingSection } from "feature/autoBacking/components/AutoBackingSection";
 import { useTranslation } from "hooks/useTranslation";
-import { AudioLines, ChevronDown, Mic, Volume2, VolumeX } from "lucide-react";
+import { AudioLines, ChevronDown, Headphones, Mic, Volume2, VolumeX } from "lucide-react";
 import type { ComponentType, Dispatch, ReactNode, SetStateAction } from "react";
 import { GiDrumKit, GiGuitar, GiGuitarBassHead, GiMetronome, GiPianoKeys } from "react-icons/gi";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import type { TabTrackType } from "../../../types/exercise.types";
+import { GUITAR_MONITOR_MAX, useGuitarMonitorStore } from "./guitarMonitorStore";
 import { SessionTooltip } from "./SessionTooltip";
 
 interface VolumeButtonProps {
@@ -33,6 +34,9 @@ interface VolumeButtonProps {
   labelled?: boolean;
   /** Full-width labelled trigger for the mobile/landscape-drawer toolbar layout. */
   mobile?: boolean;
+  /** Offer the "your guitar" row — hearing the input played back. Only while
+   *  the browser's own input is open (the desktop app has its amp for this). */
+  guitarMonitor?: boolean;
 }
 
 // One heading for every section of the menu.
@@ -122,8 +126,10 @@ export const VolumeButton = ({
   h = "h-12",
   labelled = false,
   mobile = false,
+  guitarMonitor = false,
 }: VolumeButtonProps) => {
   const { t } = useTranslation("session");
+  const monitor = useGuitarMonitorStore();
   const showMetronome = !!metronome && !!setIsMetronomeMuted && metronome.volume !== undefined;
   const showMasterVolume = masterVolume !== undefined && !!onMasterVolumeChange;
   // Shown whenever there's at least the main (backing) track — a GP file with
@@ -134,7 +140,7 @@ export const VolumeButton = ({
   // one is why players hunted for a way to silence "the guitar" and found none.
   const tracksLabel = (audioTracks?.length ?? 0) > 1 ? t("volume.instruments") : t("media.guitar");
 
-  if (!showMetronome && !showMasterVolume && !showTracks) return null;
+  if (!showMetronome && !showMasterVolume && !showTracks && !guitarMonitor) return null;
 
   const metronomeVolume = metronome?.volume ?? 0.5;
   const isBoosted = showMasterVolume && masterVolume! > 1;
@@ -267,6 +273,33 @@ export const VolumeButton = ({
                 </MixRow>
               );
             })}
+
+          {guitarMonitor && (
+            <MixRow
+              icon={Headphones}
+              name={t("volume.your_guitar")}
+              value={monitor.enabled ? `${Math.round(monitor.volume * 100)}%` : t("volume.off")}
+              muted={!monitor.enabled}
+              onToggleMute={() => monitor.setEnabled(!monitor.enabled)}
+              muteLabel={monitor.enabled ? t("volume.monitor_off") : t("volume.monitor_on")}>
+              <Slider
+                value={[monitor.enabled ? monitor.volume * 100 : 0]}
+                min={0}
+                max={GUITAR_MONITOR_MAX * 100}
+                step={5}
+                aria-label={t("volume.your_guitar")}
+                onValueChange={([v]) => {
+                  monitor.setVolume(v / 100);
+                  if (v > 0 && !monitor.enabled) monitor.setEnabled(true);
+                  if (v === 0 && monitor.enabled) monitor.setEnabled(false);
+                }}
+                className={faderClass}
+              />
+              <p className='mt-2 text-xs leading-relaxed text-zinc-500'>
+                {monitor.enabled ? t("volume.monitor_hint") : t("volume.monitor_off_hint")}
+              </p>
+            </MixRow>
+          )}
 
           {showMasterVolume && (
             <MixRow

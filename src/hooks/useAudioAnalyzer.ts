@@ -162,9 +162,16 @@ export interface GuitarAudioInputOptions {
   /** A strumming exercise is on — the only reader of lastSoftAttackMsRef, whose
    *  detector is otherwise left idle. Read live, like `bass`. */
   strum?: boolean;
+  /** Plays the input back through the output at this level (0 = silent, 1 =
+   *  as it comes in) — so a player on an interface with no direct monitoring
+   *  hears their guitar. Web path only; read live. */
+  monitorLevel?: number;
 }
 
-export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInputOptions = {}) => {
+/** Most channels a browser hands over from one device (Web Audio's own cap). */
+const MAX_MONITOR_CHANNELS = 32;
+
+export const useAudioAnalyzer = ({ bass = false, strum = false, monitorLevel = 0 }: GuitarAudioInputOptions = {}) => {
   const [state, setState] = useState<AudioAnalyzerState>({
     isListening: false,
     error: null,
@@ -225,6 +232,46 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
     dspRef.current?.configure({ bass, strum });
   }, [bass, strum]);
 
+  // ── Monitor: the input played back to the player ─────────────────────────
+  // One jack of the device (the one the detectors read), as mono into both
+  // ears — a guitar in input 1 of a two-input interface would otherwise sit in
+  // the left ear only.
+  const monitorSplitterRef = useRef<ChannelSplitterNode | null>(null);
+  const monitorGainRef = useRef<GainNode | null>(null);
+  const monitorChannelRef = useRef(0);
+  const monitorLevelRef = useRef(monitorLevel);
+  useEffect(() => {
+    monitorLevelRef.current = monitorLevel;
+    const gain = monitorGainRef.current;
+    const ctx = audioContextRef.current;
+    if (!gain || !ctx) return;
+    // A short ramp — a jump in level clicks.
+    gain.gain.setTargetAtTime(monitorLevel, ctx.currentTime, 0.015);
+  }, [monitorLevel]);
+
+  /** Points the monitor at another jack of the open device — with the device's
+   *  jack count when the worklet has told it (browsers don't always say up front). */
+  const routeMonitor = useCallback((channel: number, count?: number) => {
+    let splitter = monitorSplitterRef.current;
+    const gain = monitorGainRef.current;
+    const ctx = audioContextRef.current;
+    const source = sourceRef.current;
+    if (!splitter || !gain || !ctx || !source) return;
+    const wanted = Math.min(MAX_MONITOR_CHANNELS, Math.max(count ?? 0, channel + 1));
+    if (wanted > splitter.numberOfOutputs) {
+      splitter.disconnect();
+      try { source.disconnect(splitter); } catch { /* not connected */ }
+      splitter = ctx.createChannelSplitter(wanted);
+      source.connect(splitter);
+      monitorSplitterRef.current = splitter;
+    }
+    // Remembered as asked, so the worklet's next report of the same jack is
+    // not a reason to reconnect.
+    monitorChannelRef.current = channel;
+    splitter.disconnect();
+    splitter.connect(gain, Math.max(0, Math.min(splitter.numberOfOutputs - 1, channel)), 0);
+  }, []);
+
   /** Bumped by every init() and close() — see init(). */
   const generationRef = useRef(0);
 
@@ -247,6 +294,10 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
     }
     dspRef.current?.close();
     dspRef.current = null;
+    monitorSplitterRef.current?.disconnect();
+    monitorSplitterRef.current = null;
+    monitorGainRef.current?.disconnect();
+    monitorGainRef.current = null;
     if (analyserNodeRef.current) {
       analyserNodeRef.current.disconnect();
       analyserNodeRef.current = null;
@@ -529,6 +580,7 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
           return;
         }
         if (data?.type !== "channels") return;
+        if (data.active !== monitorChannelRef.current) routeMonitor(data.active, data.count);
         setState(prev =>
           prev.channelCount === data.count && prev.activeChannel === data.active
             ? prev
@@ -544,6 +596,21 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
       silentGain.gain.value = 0;
       workletNode.connect(silentGain);
       silentGain.connect(audioContext.destination);
+
+      // The monitor: built whether it is on or not, so turning it on mid-session
+      // is only a change of level. Mono on purpose (see monitorSplitterRef).
+      const monitorSplitter = audioContext.createChannelSplitter(
+        Math.max(1, Math.min(MAX_MONITOR_CHANNELS, settings.channelCount ?? 1)),
+      );
+      const monitorGain = audioContext.createGain();
+      monitorGain.channelCount = 1;
+      monitorGain.channelCountMode = "explicit";
+      monitorGain.gain.value = monitorLevelRef.current;
+      source.connect(monitorSplitter);
+      monitorGain.connect(audioContext.destination);
+      monitorSplitterRef.current = monitorSplitter;
+      monitorGainRef.current = monitorGain;
+      routeMonitor(manualChannelRef.current ?? 0);
 
       // Safety net: the context can be re-suspended mid-session (tab backgrounded,
       // OS audio-device switch, autoplay policy) — which silently kills the mic
@@ -568,7 +635,7 @@ export const useAudioAnalyzer = ({ bass = false, strum = false }: GuitarAudioInp
       releaseResources();
       return fail(classifyInputError(err), err?.message || "Microphone access denied");
     }
-  }, [releaseResources, refreshDevices]);
+  }, [releaseResources, refreshDevices, routeMonitor]);
   useEffect(() => { initRef.current = init; }, [init]);
 
   // Plugging an interface in or out: keep the picker current, and reopen the

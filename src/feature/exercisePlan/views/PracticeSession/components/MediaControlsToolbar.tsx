@@ -128,9 +128,16 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
   const showSpeedControl = showSpeed && !hideSpeed;
   const showBacking = !examMode || showBackingInExam;
   const showMasterVolume = masterVolume !== undefined && !!onMasterVolumeChange;
+  // Hearing your own guitar: the browser's input only, and only while it is open.
+  const showGuitarMonitor =
+    hasMicControls &&
+    isMicEnabled &&
+    typeof window !== "undefined" &&
+    !window.nativeAudio;
   const showVolumeButton =
     (hasMetronome && showSpeed && !!metronome && !!setIsMetronomeMuted) ||
     showMasterVolume ||
+    showGuitarMonitor ||
     (showBacking &&
       hasAudioTrack &&
       (audioTracks?.length ?? 0) > 0 &&
@@ -245,6 +252,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 showBacking && hasAudioTrack ? audioTracks : undefined
               }
               setTrackConfigs={setTrackConfigs}
+              guitarMonitor={showGuitarMonitor}
             />
           )}
         </div>
@@ -384,6 +392,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 showBacking && hasAudioTrack ? audioTracks : undefined
               }
               setTrackConfigs={setTrackConfigs}
+              guitarMonitor={showGuitarMonitor}
             />
           )}
 
@@ -565,6 +574,7 @@ export const MediaControlsToolbar = memo(function MediaControlsToolbar({
                 showBacking && hasAudioTrack ? audioTracks : undefined
               }
               setTrackConfigs={setTrackConfigs}
+              guitarMonitor={showGuitarMonitor}
             />
           )}
 

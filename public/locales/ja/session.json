@@ -526,7 +526,13 @@
     "unmute": "ミュート解除",
     "mute": "ミュート",
     "main_instrument": "メイン楽器",
-    "mix": "ミックス"
+    "mix": "ミックス",
+    "your_guitar": "自分のギター",
+    "off": "オフ",
+    "monitor_on": "自分のギターを聴く",
+    "monitor_off": "ギターのモニターを止める",
+    "monitor_hint": "ヘッドホンを使ってください。スピーカーだとマイクがギターの音を拾い直してハウリングします。",
+    "monitor_off_hint": "ヘッドホンで自分のギターを聴けます。"
   },
   "auto_backing": {
     "toggle": "自動生成のバッキングトラック",

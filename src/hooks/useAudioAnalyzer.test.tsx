@@ -25,11 +25,28 @@ interface FakeStream { id: number; stopped: boolean; getTracks: () => { stop: ()
 const streams: FakeStream[] = [];
 const contexts: FakeContext[] = [];
 const worklets: { onmessage: unknown; connected: boolean }[] = [];
+const splitters: FakeSplitter[] = [];
+const gains: FakeGain[] = [];
 let pendingGum: ((s: FakeStream) => void)[] = [];
 
 class FakeNode {
   connect() {}
   disconnect() {}
+}
+
+/** Records which of its outputs feeds what — the monitor picks one jack. */
+class FakeSplitter extends FakeNode {
+  routes: { output: number }[] = [];
+  constructor(public numberOfOutputs: number) { super(); splitters.push(this); }
+  override connect(_dest?: unknown, output = 0) { this.routes.push({ output }); }
+  override disconnect() { this.routes = []; }
+}
+
+class FakeGain extends FakeNode {
+  channelCount = 2;
+  channelCountMode = "max";
+  gain = { value: 1, setTargetAtTime: (v: number) => { this.gain.value = v; } };
+  constructor() { super(); gains.push(this); }
 }
 
 class FakeContext {
@@ -40,7 +57,9 @@ class FakeContext {
   constructor() { contexts.push(this); }
   createMediaStreamSource() { return new FakeNode(); }
   createAnalyser() { return Object.assign(new FakeNode(), { fftSize: 0, smoothingTimeConstant: 0 }); }
-  createGain() { return Object.assign(new FakeNode(), { gain: { value: 1 } }); }
+  currentTime = 0;
+  createGain() { return new FakeGain(); }
+  createChannelSplitter(n: number) { return new FakeSplitter(n); }
   async resume() { this.state = "running"; }
   close() { this.state = "closed"; return Promise.resolve(); }
 }
@@ -67,6 +86,8 @@ beforeEach(() => {
   streams.length = 0;
   contexts.length = 0;
   worklets.length = 0;
+  splitters.length = 0;
+  gains.length = 0;
   pendingGum = [];
   Object.defineProperty(navigator, "mediaDevices", {
     configurable: true,
@@ -261,5 +282,35 @@ describe("useAudioAnalyzer opening the input", () => {
     act(() => { result.current.webInput.selectChannel(null); });
     expect(localStorage.getItem("web_audio_input_channel")).toBeNull();
     expect(result.current.webInput.channel).toBeNull();
+  });
+});
+
+describe("useAudioAnalyzer monitor", () => {
+  /** The monitor's gain: the only mono one (the silent keep-alive is stereo). */
+  const monitorGain = () => gains.find(g => g.channelCount === 1);
+
+  it("plays the input back at the level asked for, live", async () => {
+    stubGetUserMedia(() => makeStream());
+    const { result, rerender } = renderHook(({ level }) => useAudioAnalyzer({ monitorLevel: level }), {
+      initialProps: { level: 0 },
+    });
+    await act(async () => { await result.current.init(); });
+    expect(monitorGain()?.gain.value).toBe(0);
+
+    rerender({ level: 1.5 });
+    expect(monitorGain()?.gain.value).toBe(1.5);
+  });
+
+  it("follows the jack the worklet reads", async () => {
+    stubGetUserMedia(() => makeStream());
+    const { result } = renderHook(() => useAudioAnalyzer({ monitorLevel: 1 }));
+    await act(async () => { await result.current.init(); });
+    expect(splitters[0].routes).toEqual([{ output: 0 }]);
+
+    const port = liveWorklets()[0] as unknown as { onmessage: (event: { data: unknown }) => void };
+    act(() => { port.onmessage({ data: { type: "channels", count: 2, active: 1 } }); });
+    // A device that didn't say it had two jacks gets a splitter that has.
+    expect(splitters.at(-1)!.numberOfOutputs).toBe(2);
+    expect(splitters.at(-1)!.routes).toEqual([{ output: 1 }]);
   });
 });

@@ -452,7 +452,13 @@
     "unmute": "Ton an",
     "mute": "Stumm",
     "main_instrument": "Hauptinstrument",
-    "mix": "Mix"
+    "mix": "Mix",
+    "your_guitar": "Deine Gitarre",
+    "off": "Aus",
+    "monitor_on": "Meine Gitarre hören",
+    "monitor_off": "Gitarre nicht mehr hören",
+    "monitor_hint": "Trag Kopfhörer. Über Lautsprecher nimmt das Mikro die Gitarre wieder auf und es pfeift.",
+    "monitor_off_hint": "Hör deine Gitarre in den Kopfhörern."
   },
   "auto_backing": {
     "toggle": "Generierter Backing Track",

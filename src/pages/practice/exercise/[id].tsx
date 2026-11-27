@@ -10,9 +10,11 @@ import { accuracyToStars, firebaseCompleteJourneyStepWithStars } from "feature/j
 import { firebaseAddExamPassedLog } from "feature/logs/services/addExamPassedLog.service";
 import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { useRequireUserAuth } from "hooks/useRequireUserAuth";
+import { useTranslation } from "hooks/useTranslation";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAppDispatch } from "store/hooks";
 
 export default function PracticeExercisePage() {
@@ -22,6 +24,7 @@ export default function PracticeExercisePage() {
   const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useRequireUserAuth();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation(["journey", "session"]);
 
   const isExamMode = mode === "exam";
   const examBpm = bpm ? parseInt(bpm as string, 10) : undefined;
@@ -54,26 +57,47 @@ export default function PracticeExercisePage() {
   const handleExamComplete = async (accuracy: number, onTimePct: number | null = null) => {
     const stars = accuracyToStars(accuracy, onTimePct);
     if (stars && userAuth && stepId && moduleId) {
-      await firebaseCompleteJourneyStepWithStars(
-        userAuth,
-        moduleId as string,
-        stepId as string,
-        stars
-      );
+      // A pass that didn't save must not look saved: stay here and say so, with
+      // a retry on the toast, instead of going back to a path that still has
+      // the step open.
+      try {
+        await firebaseCompleteJourneyStepWithStars(
+          userAuth,
+          moduleId as string,
+          stepId as string,
+          stars
+        );
+      } catch {
+        toast.error(t("journey:toast.save_failed"), {
+          id: "exam-save-failed",
+          duration: Infinity,
+          action: {
+            label: t("session:try_again"),
+            onClick: () => void handleExamComplete(accuracy, onTimePct),
+          },
+        });
+        return;
+      }
+      toast.dismiss("exam-save-failed");
       dispatch(updateQuestProgress({ type: "journey_step" }));
 
       const journeyModule = journeyModules.find((m) => m.id === moduleId);
       const step = journeyModule?.stages.flatMap((s) => s.steps).find((s) => s.id === stepId);
       if (journeyModule && step) {
-        await firebaseAddExamPassedLog(
-          userAuth,
-          journeyModule.id,
-          journeyModule.title,
-          step.id,
-          step.title,
-          stars,
-          accuracy
-        );
+        // The feed entry is a bonus: the step is already saved.
+        try {
+          await firebaseAddExamPassedLog(
+            userAuth,
+            journeyModule.id,
+            journeyModule.title,
+            step.id,
+            step.title,
+            stars,
+            accuracy
+          );
+        } catch {
+          // Not critical.
+        }
       }
     }
     router.push({ pathname: "/journey", query: { module: moduleId, step: stepId, examResult: stars ?? "fail", accuracy: Math.round(accuracy) } });
