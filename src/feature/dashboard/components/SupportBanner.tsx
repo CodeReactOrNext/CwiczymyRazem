@@ -40,9 +40,13 @@ export const SupportBanner = () => {
           request resolved. The actual status still lives in FundingStatusBlock. */}
       <div className='pointer-events-none absolute inset-0 light-hide bg-gradient-to-r from-orange-500/10 via-transparent to-transparent' />
       <div className='relative z-10 flex flex-wrap items-center gap-x-12 gap-y-6'>
-        {/* Full width until lg, same as RoadmapPitch — the shrink-0 CTA plus the
-            gap would otherwise leave the copy a couple of characters per line. */}
-        <div className='flex w-full min-w-0 items-center gap-4 lg:w-auto lg:flex-1'>
+        {/* Wraps on the banner's own width, not the viewport's: the dashboard
+            column next to the sidebar is narrow on a landscape tablet even past
+            lg, and a viewport breakpoint squeezed the copy to a word per line
+            there. The copy never goes below 26rem before the funding block and
+            the button drop to the next row; its huge grow keeps the funding
+            block at its basis when they share a row. */}
+        <div className='flex min-w-0 flex-[999_1_26rem] items-center gap-4'>
           <SupportHeart className='size-16 shrink-0 sm:size-20' />
           <div className='min-w-0'>
             <p className='text-sm font-semibold text-zinc-100 sm:text-base'>
@@ -54,12 +58,12 @@ export const SupportBanner = () => {
           </div>
         </div>
 
-        {/* Compact progress block: full-width row when stacked, fixed column on desktop */}
+        {/* Compact progress block: 18rem beside the copy, the full row when wrapped */}
         {/* While the funding request is in flight a placeholder of the same
             shape holds the block's space, so the banner doesn't grow and push
             the feed down when the numbers arrive. */}
         {isLoading ? (
-          <div aria-hidden className='w-full lg:w-80'>
+          <div aria-hidden className='min-w-0 flex-[1_1_18rem]'>
             <div className='flex h-4 items-center justify-between gap-4 sm:h-5'>
               <Skeleton className='h-3 w-40 sm:h-3.5' />
               <Skeleton className='h-3 w-14 sm:h-3.5' />
@@ -73,7 +77,7 @@ export const SupportBanner = () => {
           <FundingStatusBlock
             totalRaised={totalRaised}
             raisedThisMonth={raisedThisMonth}
-            className='w-full lg:w-80'
+            className='flex-[1_1_18rem]'
           />
         )}
 

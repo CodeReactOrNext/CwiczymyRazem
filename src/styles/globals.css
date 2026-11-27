@@ -48,6 +48,12 @@ html {
    sitting left of it. */
 html:has(main[data-app-shell]) {
   scrollbar-gutter: auto;
+  /* A swipe on something that doesn't scroll (or past the end of a list) is
+     handed to the viewport, which on a tablet dragged the whole shell off
+     screen, in both axes, into nothing. The shell never scrolls the window, so
+     the viewport gets no overscroll effect at all (this also drops
+     pull-to-refresh inside the app; public pages keep it). */
+  overscroll-behavior: none;
 }
 
 /* The desktop practice session takes over the screen from 768px, but the

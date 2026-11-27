@@ -35,10 +35,13 @@ const MainLoggedWrapper = ({ children }: { children: React.ReactNode }) => {
     return () => router.events.off("routeChangeComplete", resetScroll);
   }, [router.events]);
 
+  // overscroll-none: on touch devices hitting the end of the page stretched it
+  // (or bounced it) past its edge into the empty background; the shell is an
+  // app screen, so the end of the content is a hard stop.
   return (
     <div
       ref={scrollRef}
-      className='absolute left-0 top-0 bottom-0 flex w-full flex-col items-center overflow-y-auto overflow-x-hidden lg:mt-0'>
+      className='absolute left-0 top-0 bottom-0 flex w-full flex-col items-center overflow-y-auto overflow-x-hidden overscroll-none lg:mt-0'>
       {children}
     </div>
   );
