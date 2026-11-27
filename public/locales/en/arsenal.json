@@ -846,6 +846,7 @@
     "restored": "Restored"
   },
   "traits_ui": {
+    "amp_total": "Right now: ×{{count}} = {{total}} Fame/h",
     "more": "+{{count}} more"
   },
   "in_service": {
@@ -1446,7 +1447,10 @@
     "owned_one": "You have {{count}}",
     "owned_other": "You have {{count}}",
     "owned": "You have {{count}}",
-    "imprint_body": "A trait with its value intact. Put it into a guitar or pedal: it costs Fame, more for every trait the instrument already carries, and an instrument holds three at most.",
+    "imprint_body": {
+      "guitar": "A guitar trait with its value intact. It only goes into a guitar, never a pedal: it costs Fame, more for every trait the guitar already carries, and a guitar holds three at most.",
+      "effect": "A pedal trait with its value intact. It only goes into a pedal, never a guitar: it costs Fame, more for every trait the pedal already carries, and a pedal holds three at most."
+    },
     "extractor_body": "A one-use tool from the Parts Crate. Right-click an instrument with a trait and pick Extract trait: the trait comes out as an imprint you can sell, list or put into something else.",
     "insert_into": "Put into an instrument…",
     "insert_title": "Put the trait in",

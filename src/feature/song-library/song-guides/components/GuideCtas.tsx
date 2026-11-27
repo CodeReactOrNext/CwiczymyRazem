@@ -99,7 +99,7 @@ export const GuideInlineCta = ({ guide, coverUrl }: GuideCtaProps) => {
             ))}
           </ul>
           <Link href='/signup'>
-            <Button className='h-9 rounded-lg bg-cyan-500 px-5 text-sm font-bold text-black transition-colors hover:bg-cyan-400'>
+            <Button className='h-9 rounded-lg bg-white px-5 text-sm font-bold text-black transition-colors hover:bg-zinc-200'>
               Start free
               <ArrowRight className='h-4 w-4' />
             </Button>
@@ -142,7 +142,7 @@ export const GuideFinalCta = ({ guide, coverUrl }: GuideCtaProps) => {
         </p>
         <div className='flex flex-col items-center gap-3'>
           <Link href='/signup'>
-            <Button className='h-12 rounded-lg bg-cyan-500 px-8 text-base font-bold text-black transition-colors hover:bg-cyan-400'>
+            <Button className='h-12 rounded-lg bg-white px-8 text-base font-bold text-black transition-colors hover:bg-zinc-200'>
               Start tracking this song free
               <ArrowRight className='h-5 w-5' />
             </Button>

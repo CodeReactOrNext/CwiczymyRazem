@@ -847,6 +847,7 @@
     "restored": "Restaurado"
   },
   "traits_ui": {
+    "amp_total": "Ahora: ×{{count}} = {{total}} Fame/h",
     "more": "+{{count}} más"
   },
   "in_service": {
@@ -1447,7 +1448,10 @@
     "owned_one": "Tienes {{count}}",
     "owned_other": "Tienes {{count}}",
     "owned": "Tienes {{count}}",
-    "imprint_body": "Un rasgo con su valor intacto. Ponlo en una guitarra o un pedal: cuesta Fame, más por cada rasgo que ya tenga el instrumento, y un instrumento admite tres como máximo.",
+    "imprint_body": {
+      "guitar": "Un rasgo de guitarra con su valor intacto. Solo entra en una guitarra, nunca en un pedal: ponerlo cuesta Fame, más por cada rasgo que ya tenga la guitarra, y una guitarra admite tres como máximo.",
+      "effect": "Un rasgo de pedal con su valor intacto. Solo entra en un pedal, nunca en una guitarra: ponerlo cuesta Fame, más por cada rasgo que ya tenga el pedal, y un pedal admite tres como máximo."
+    },
     "extractor_body": "Herramienta de un solo uso de la Parts Crate. Haz clic derecho en un instrumento con un rasgo y elige Extraer rasgo: el rasgo sale como una huella que puedes vender, publicar o poner en otro.",
     "insert_into": "Poner en un instrumento…",
     "insert_title": "Poner el rasgo",

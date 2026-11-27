@@ -9,6 +9,7 @@ import { cn } from "assets/lib/utils";
 import type { TraitCardState } from "feature/arsenal/data/traitEval";
 import {
   buildRigTraitContext,
+  getAmpReach,
   getTraitCardState,
   getTraitUnits,
 } from "feature/arsenal/data/traitEval";
@@ -39,6 +40,11 @@ export interface TraitCardInfo {
    * advertises and what the rig actually pays.
    */
   units: number | null;
+  /**
+   * Trait lines an amplifier raises right now, or null when it is not one. Its
+   * rolled value is per line, so the card needs this to say what it adds up to.
+   */
+  reach: number | null;
 }
 
 export const useItemTraitStates = (
@@ -65,6 +71,7 @@ export const useItemTraitStates = (
       return {
         state: getTraitCardState(t.def, raw, self, rig),
         units: t.def.counter ? getTraitUnits(t.def, raw, self, rig) : null,
+        reach: t.def.amp ? getAmpReach(t.def, self, rig) : null,
       };
     });
   }, [data, itemId, traits]);
@@ -133,6 +140,7 @@ export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
         // no rig to measure against, the per-unit value is the honest one — it
         // is what the description promises.
         const units = info?.units ?? null;
+        const reach = info?.reach ?? null;
         const shown =
           units != null && units > 0 ? trait.value * units : trait.value;
 
@@ -167,6 +175,21 @@ export const CardTraits = ({ traits, states, maxVisible }: CardTraitsProps) => {
               style={{ color: readableText(unmet ? "#71717a" : "#a1a1aa") }}>
               {labels.traitDescription(trait)}
             </p>
+            {/* An amplifier's number is per trait it raises, and the description
+                says so ("this much more"), so the headline stays as rolled and
+                what it adds up to in this rig goes on a line of its own. */}
+            {reach != null && (
+              <p
+                className='font-mono pl-[19px] text-[11px] font-semibold tabular-nums'
+                style={{ color: readableText(unmet ? "#71717a" : "#6ee7b7") }}>
+                {labels.t("traits_ui.amp_total", {
+                  count: reach,
+                  total: formatTraitValue(
+                    Math.round(trait.value * reach * 10) / 10,
+                  ),
+                })}
+              </p>
+            )}
           </div>
         );
       })}

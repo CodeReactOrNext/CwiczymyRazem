@@ -50,7 +50,7 @@ export const LibraryGuidesSection = ({
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={coverUrl}
-                        alt=''
+                        alt={`${guide.title} cover`}
                         className='h-14 w-14 rounded-lg object-cover'
                       />
                     ) : (

@@ -7,7 +7,7 @@ export const hotelCalifornia: SongGuide = {
   artist: "Eagles",
   author: "Michael Apfel",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-09-15",
+  updatedAt: "2026-10-04",
   seo: {
     metaTitle: "How to Play Hotel California on Guitar: Chords, Capo & Solo",
     metaDescription:

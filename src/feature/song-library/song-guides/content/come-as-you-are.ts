@@ -7,7 +7,7 @@ export const comeAsYouAre: SongGuide = {
   artist: "Nirvana",
   author: "Michael Apfel",
   publishedAt: "2026-09-24",
-  updatedAt: "2026-09-24",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play Come As You Are on Guitar: Riff & Tuning",
     metaDescription:

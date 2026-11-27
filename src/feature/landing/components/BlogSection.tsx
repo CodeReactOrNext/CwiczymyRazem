@@ -8,15 +8,16 @@ interface BlogSectionProps {
   blogs: BlogFrontmatter[];
 }
 
-// The guitar-apps pillar earns the most search impressions site-wide; keep the
-// highest-authority page (homepage) permanently linking to it instead of letting
-// it rotate out as newer posts are published.
-const PINNED_SLUG = "best-app-for-guitar-practice";
+// The two guitar-apps posts earn the most search impressions site-wide (the
+// free-apps one alone had 26k in three months at position ~8, GSC 2026-11-27);
+// keep the highest-authority page (homepage) permanently linking to both instead
+// of letting them rotate out as newer posts are published.
+const PINNED_SLUGS = ["best-free-apps-to-learn-guitar", "best-app-for-guitar-practice"];
 
 export const BlogSection = ({ blogs }: BlogSectionProps) => {
-  const pinned = blogs.find((blog) => blog.slug === PINNED_SLUG);
-  const rest = blogs.filter((blog) => blog.slug !== PINNED_SLUG);
-  const latestBlogs = (pinned ? [pinned, ...rest] : blogs).slice(0, 4);
+  const pinned = PINNED_SLUGS.flatMap((slug) => blogs.find((blog) => blog.slug === slug) ?? []);
+  const rest = blogs.filter((blog) => !PINNED_SLUGS.includes(blog.slug));
+  const latestBlogs = [...pinned, ...rest].slice(0, 4);
 
   return (
     <section className='bg-zinc-950 py-20'>

@@ -7,7 +7,7 @@ export const sweetChildOMine: SongGuide = {
   artist: "Guns N' Roses",
   author: "Michael Apfel",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-07-20",
+  updatedAt: "2026-10-30",
   seo: {
     metaTitle: "How to Play Sweet Child O' Mine on Guitar: Intro Riff Tab",
     metaDescription:

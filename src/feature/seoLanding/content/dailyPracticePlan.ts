@@ -3,11 +3,11 @@ import type { SeoLandingConfig } from "../types/seoLanding.types";
 export const dailyPracticePlanConfig: SeoLandingConfig = {
   slug: "daily-guitar-practice-plan",
   title: "Daily Guitar Practice Plan: Routines for 15, 30 and 60 Minutes",
-  metaTitle: "Daily Guitar Practice Schedule & Routine + Free PDF",
+  metaTitle: "Guitar Practice Routine & Daily Schedule + Free PDF",
   metaDescription:
     "Free daily guitar practice routine PDF with 15, 30 and 60-minute schedules, a printable session log, and exercises to match each block.",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-10-16",
+  updatedAt: "2026-11-27",
   intro: [
     "Prefer paper? [Download the free daily guitar practice routine PDF](#download-the-daily-guitar-practice-routine-pdf) and keep the schedule beside your guitar. No signup required.",
     "A daily guitar practice plan needs to answer exactly two questions before you pick up the instrument: *what am I working on today* and *for how long*. Answer them in advance and practice happens; leave them for the moment you sit down and the session dissolves into noodling and YouTube.",
@@ -68,7 +68,7 @@ export const dailyPracticePlanConfig: SeoLandingConfig = {
       blocks: [
         {
           kind: "paragraph",
-          text: "The minimum effective dose, and the right starting point for every beginner guitar practice plan: warm-up, one technique, one dose of rhythm. It is deliberately repetitive — you will run the same 15 minutes for weeks, and that repetition is precisely what makes it work. If your first chord shapes are still the bottleneck, [practice these open chords](/blog/guitar-chords-for-beginners) in the main block.",
+          text: "The minimum effective dose, and the right starting point for every beginner guitar practice plan: warm-up, one technique, one dose of rhythm. It is deliberately repetitive — you will run the same 15 minutes for weeks, and that repetition is precisely what makes it work. The [guitar practice routine for beginners](/blog/guitar-practice-routine-builder) walks through the same 15 minutes block by block, with a week-by-week progression. If your first chord shapes are still the bottleneck, [practice these open chords](/blog/guitar-chords-for-beginners) in the main block.",
         },
         {
           kind: "schedule",

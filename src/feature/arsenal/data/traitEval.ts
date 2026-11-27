@@ -44,6 +44,7 @@ import { getEffectiveRarity, RARITY_LADDER } from "./itemStats";
 import { isPoweredIn } from "./powerSupply";
 import type {
   PracticeCategory,
+  TraitAmp,
   TraitCondition,
   TraitDef,
   TraitKind,
@@ -467,33 +468,6 @@ export const getTraitUnits = (
   }
 };
 
-// ─── Card state ──────────────────────────────────────────────────────────────
-
-/**
- * How a trait should read on a card the player owns and has in service.
- *
- * `unmet` is the only state worth colouring differently — it is the one the
- * player can fix right now by moving gear. `session` means the gear is right and
- * the rest is up to how they practise, which is not a failure and must not look
- * like one.
- */
-export type TraitCardState = "met" | "unmet" | "session";
-
-export const getTraitCardState = (
-  def: TraitDef,
-  trait: ItemTrait,
-  self: RigItem,
-  rig: RigTraitContext,
-): TraitCardState => {
-  // A counter at zero pays nothing, so it cannot read as satisfied — a
-  // `Boutique Row` lit up on a board with no Epic pedal is the card telling a
-  // lie about the one number the player is building around.
-  if (def.counter && getTraitUnits(def, trait, self, rig) === 0) return "unmet";
-  if (!def.condition) return "met";
-  if (!evaluateRigPart(def.condition, self, rig, trait)) return "unmet";
-  return hasSessionPart(def.condition) ? "session" : "met";
-};
-
 // ─── Rates ───────────────────────────────────────────────────────────────────
 
 export interface EvaluatedTrait {
@@ -537,6 +511,109 @@ const usesSkills = (def: TraitDef): boolean => {
 };
 
 /**
+ * Whether an amplifier on `carrier` raises a trait sitting on `targetItemId`.
+ * `highest` is not answered here: it picks one line by rate, not by where it is.
+ */
+const ampReaches = (
+  amp: TraitAmp,
+  carrier: RigItem,
+  targetItemId: string,
+  targetDef: TraitDef,
+  rig: RigTraitContext,
+): boolean => {
+  switch (amp.type) {
+    case "other-pedals":
+      return (
+        targetItemId !== carrier.itemId &&
+        rig.pedals.some((p) => p.itemId === targetItemId)
+      );
+    case "category-traits": {
+      const cats = getTraitCategories(targetDef);
+      return amp.categories.some((c) => cats.has(c));
+    }
+    case "skill-traits":
+      return usesSkills(targetDef);
+    case "pedals-downstream": {
+      const target = rig.pedals.find((p) => p.itemId === targetItemId);
+      return !!target && chainPos(target) > chainPos(carrier);
+    }
+    case "same-brand": {
+      const owner = [...rig.guitars, ...rig.pedals].find(
+        (i) => i.itemId === targetItemId,
+      );
+      return !!owner && owner.brand === carrier.brand;
+    }
+    default:
+      return false;
+  }
+};
+
+/**
+ * How many trait lines an amplifier raises in this rig, for the card.
+ *
+ * An amp's own line is always zero, so its rolled value alone never says what
+ * it is worth: `+1.7` over five traits and `+1.7` over none read the same. Like
+ * the rest of the card this judges gear only — a target whose rig condition is
+ * met counts, and its session gates are assumed to be met too.
+ */
+export const getAmpReach = (
+  def: TraitDef,
+  self: RigItem,
+  rig: RigTraitContext,
+): number => {
+  const amp = def.amp;
+  if (!amp) return 0;
+  let count = 0;
+  for (const item of [...rig.guitars, ...rig.pedals]) {
+    for (const trait of item.traits) {
+      const targetDef = TRAITS_BY_ID.get(trait.id);
+      if (!targetDef || targetDef.amp) continue;
+      if (
+        targetDef.condition &&
+        !evaluateRigPart(targetDef.condition, item, rig, trait)
+      )
+        continue;
+      if (
+        amp.type === "highest" ||
+        ampReaches(amp, self, item.itemId, targetDef, rig)
+      )
+        count++;
+    }
+  }
+  return amp.type === "highest" ? Math.min(1, count) : count;
+};
+
+// ─── Card state ──────────────────────────────────────────────────────────────
+
+/**
+ * How a trait should read on a card the player owns and has in service.
+ *
+ * `unmet` is the only state worth colouring differently — it is the one the
+ * player can fix right now by moving gear. `session` means the gear is right and
+ * the rest is up to how they practise, which is not a failure and must not look
+ * like one.
+ */
+export type TraitCardState = "met" | "unmet" | "session";
+
+export const getTraitCardState = (
+  def: TraitDef,
+  trait: ItemTrait,
+  self: RigItem,
+  rig: RigTraitContext,
+): TraitCardState => {
+  // A counter at zero pays nothing, so it cannot read as satisfied — a
+  // `Boutique Row` lit up on a board with no Epic pedal is the card telling a
+  // lie about the one number the player is building around.
+  if (def.counter && getTraitUnits(def, trait, self, rig) === 0) return "unmet";
+  // Same for an amplifier that reaches nothing — a `Patchbay` at the end of the
+  // chain pays zero, and moving it is the fix.
+  if (def.amp && getAmpReach(def, self, rig) === 0) return "unmet";
+  if (!def.condition) return "met";
+  if (!evaluateRigPart(def.condition, self, rig, trait)) return "unmet";
+  return hasSessionPart(def.condition) ? "session" : "met";
+};
+
+/**
  * Every trait in service, with the Fame/h it actually pays for this session.
  *
  * Amplifiers and penalties are deliberately not traits-that-pay: an amp
@@ -575,32 +652,10 @@ export const evaluateRigTraits = (
       const bonus = trait.value;
       const amp = def.amp;
 
-      const targets = entries.filter((e) => {
-        if (!e.active || e.def.amp) return false;
-        switch (amp.type) {
-          case "other-pedals":
-            return (
-              e.itemId !== item.itemId &&
-              rig.pedals.some((p) => p.itemId === e.itemId)
-            );
-          case "category-traits": {
-            const cats = getTraitCategories(e.def);
-            return amp.categories.some((c) => cats.has(c));
-          }
-          case "skill-traits":
-            return usesSkills(e.def);
-          case "pedals-downstream": {
-            const target = rig.pedals.find((p) => p.itemId === e.itemId);
-            return !!target && chainPos(target) > chainPos(item);
-          }
-          case "same-brand": {
-            const owner = all.find((i) => i.itemId === e.itemId);
-            return !!owner && owner.brand === item.brand;
-          }
-          default:
-            return false;
-        }
-      });
+      const targets = entries.filter(
+        (e) =>
+          e.active && !e.def.amp && ampReaches(amp, item, e.itemId, e.def, rig),
+      );
 
       if (amp.type === "highest") {
         const best = entries

@@ -7,7 +7,7 @@ export const houseOfTheRisingSun: SongGuide = {
   artist: "The Animals",
   author: "Michael Apfel",
   publishedAt: "2026-09-24",
-  updatedAt: "2026-09-24",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play House of the Rising Sun on Guitar: 6/8 Picking",
     metaDescription:

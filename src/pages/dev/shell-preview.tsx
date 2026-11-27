@@ -107,6 +107,9 @@ export default function ShellPreviewPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   useState(() => {
+    // Never during a production build: the store is shared by every page the
+    // build worker prerenders, and a seeded profile leaks into the public ones.
+    if (process.env.NODE_ENV === "production") return false;
     // The song board reads the player's own list; a fake uid has none, so a
     // few demo songs stand in for it (Board tab only, nothing is written).
     queryClient.setQueryDefaults(["user-songs", "dev-shell-preview"], { staleTime: Infinity });

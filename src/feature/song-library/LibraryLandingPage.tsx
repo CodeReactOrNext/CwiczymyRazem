@@ -3,6 +3,7 @@
 import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { CookieBanner } from "feature/landing/components/CookieBanner";
 import { Footer } from "feature/landing/components/Footer";
+import { jakartaLanding } from "feature/landing/lib/fonts";
 import { LibraryCTASection } from "feature/song-library/components/LibraryCTASection";
 import { LibraryFaqSection } from "feature/song-library/components/LibraryFaqSection";
 import { LibraryGuidesSection } from "feature/song-library/components/LibraryGuidesSection";
@@ -75,7 +76,7 @@ const LibraryLandingPage = ({
     <>
       <LibrarySEO songs={songs} totalSongs={totalSongs} faqQuestions={faqQuestions} />
       <MarketingNav current='/song-library' />
-      <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30 relative overflow-x-hidden">
+      <main className={`${jakartaLanding.variable} min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30 relative overflow-x-hidden`}>
 
         <LibraryHeroSection totalSongs={totalSongs} />
         <LibraryStatsBar totalSongs={totalSongs} />

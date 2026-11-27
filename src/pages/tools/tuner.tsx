@@ -1,5 +1,7 @@
 import { cn } from "assets/lib/utils";
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { Footer } from "feature/landing/components/Footer";
+import { jakartaLanding } from "feature/landing/lib/fonts";
 import { TunerPanel } from "feature/tuner/components/TunerPanel";
 import {
   DEFAULT_INSTRUMENT_ID,
@@ -9,7 +11,6 @@ import {
 } from "feature/tuner/instruments";
 import { ChevronRight } from "lucide-react";
 import Head from "next/head";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -191,31 +192,8 @@ const TunerPage = () => {
         />
       </Head>
 
-      <main className='min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-300'>
-        <nav className='fixed left-0 right-0 top-0 z-50 bg-zinc-950/90 backdrop-blur-sm'>
-          <div className='mx-auto flex h-16 max-w-4xl items-center justify-between px-6'>
-            <Link href='/' className='transition-opacity hover:opacity-70'>
-              <Image
-                src='/images/longlightlogo.svg'
-                alt='Riff Quest'
-                width={120}
-                height={32}
-                className='h-6 w-auto'
-                priority
-              />
-            </Link>
-            <div className='flex items-center gap-6'>
-              <Link href='/tools' className='text-sm text-zinc-400 transition-colors hover:text-white'>
-                Tools
-              </Link>
-              <Link
-                href='/signup'
-                className='text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300'>
-                Start Free →
-              </Link>
-            </div>
-          </div>
-        </nav>
+      <main className={`${jakartaLanding.variable} min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-300`}>
+        <MarketingNav />
 
         <div className='mx-auto max-w-3xl px-6 pb-24 pt-28'>
           {/* Nothing but a title above the tuner: the point of the page is to be
@@ -228,7 +206,7 @@ const TunerPage = () => {
             <span className='text-zinc-500'>Tuner</span>
           </div>
 
-          <h1 className='text-4xl font-black text-white'>Online guitar tuner</h1>
+          <h1 className='font-landingHeading text-4xl font-black text-white'>Online guitar tuner</h1>
           <p className='mt-3 text-zinc-400'>
             Tune by microphone, in cents. Guitar, bass, ukulele and more — Standard,
             Drop D, Open G, DADGAD and a dozen other tunings.
@@ -294,8 +272,8 @@ const TunerPage = () => {
               <Link
                 href='/signup'
                 className={cn(
-                  "rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-bold text-zinc-950",
-                  "transition-background hover:bg-cyan-400",
+                  "rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-zinc-950",
+                  "transition-background hover:bg-zinc-200",
                 )}>
                 Start practising free
               </Link>

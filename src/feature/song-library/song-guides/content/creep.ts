@@ -7,7 +7,7 @@ export const creep: SongGuide = {
   artist: "Radiohead",
   author: "Michael Apfel",
   publishedAt: "2026-09-24",
-  updatedAt: "2026-09-24",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play Creep on Guitar: 4 Chords, 2 Barres & Mutes",
     metaDescription:

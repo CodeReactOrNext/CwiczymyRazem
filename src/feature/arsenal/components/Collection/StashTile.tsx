@@ -131,6 +131,12 @@ interface StashTileProps {
   /** In use somewhere (profile, rig, pedalboard) — the plug mark, bottom-right. */
   inUse?: boolean;
   /**
+   * A mark of the piece's own in the bottom-right corner — an imprint says
+   * there whether it goes into guitars or pedals. Only for pieces that are
+   * never in use and never stack, which is whose corner this otherwise is.
+   */
+  cornerMark?: ReactNode;
+  /**
    * Where this model stands with the viewer, for a board that is not theirs —
    * the guild's shelf. A corner glyph: owned, or on the Dex.
    */
@@ -186,6 +192,7 @@ export const StashTile = ({
   isNew = false,
   locked = false,
   inUse = false,
+  cornerMark,
   dexStatus,
   ready = false,
   selected = false,
@@ -404,6 +411,10 @@ export const StashTile = ({
       {/* A corner of its own, so the hammer never covers it: the padlock skips
           gear in use, and only parts carry a stack size. */}
       {inUse && <InUseMark className='absolute bottom-1 right-1' />}
+
+      {cornerMark && !inUse && (
+        <span className='absolute bottom-1 right-1 flex'>{cornerMark}</span>
+      )}
 
       {dexStatus && (
         <DexCornerMark

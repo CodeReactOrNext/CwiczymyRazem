@@ -31,7 +31,7 @@ export const GuideRiffPreview = ({ riffPreview }: GuideRiffPreviewProps) => {
           <div className='flex flex-wrap items-center gap-3 pt-1'>
             <Link
               href={`/practice/exercise/${idToSlug(riffPreview.practiceExerciseId)}`}>
-              <Button className='h-9 rounded-lg bg-cyan-500 px-5 text-sm font-bold text-black transition-colors hover:bg-cyan-400'>
+              <Button className='h-9 rounded-lg bg-white px-5 text-sm font-bold text-black transition-colors hover:bg-zinc-200'>
                 Practice it with real-time scoring
                 <ArrowRight className='h-4 w-4' />
               </Button>

@@ -7,7 +7,7 @@ export const wishYouWereHere: SongGuide = {
   artist: "Pink Floyd",
   author: "Michael Apfel",
   publishedAt: "2026-09-05",
-  updatedAt: "2026-09-05",
+  updatedAt: "2026-10-04",
   seo: {
     metaTitle: "How to Play Wish You Were Here on Guitar: Riff & Chords",
     metaDescription:

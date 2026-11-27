@@ -7,7 +7,7 @@ export const seekAndDestroy: SongGuide = {
   artist: "Metallica",
   author: "Michael Apfel",
   publishedAt: "2026-09-24",
-  updatedAt: "2026-09-24",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play Seek & Destroy on Guitar: Riffs & Downpicking",
     metaDescription:

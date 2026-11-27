@@ -82,7 +82,12 @@ const AppLayout = ({
 
   // Public pages must render their content (and <Head> tags) during SSR/SSG,
   // where session status is always "loading" — otherwise crawlers get an empty page.
-  if (isPublic && !isAuthenticated) {
+  // On the server that holds whatever the store says: the Redux store is one
+  // module-level object shared by every page a build worker prerenders, so a
+  // page that seeded a profile into it (the /dev previews did) made every public
+  // page rendered after it look signed in, and they shipped the skeleton below
+  // instead of their content (SEO audit 2026-11-27: /faq, /wiki/*, the policies).
+  if (isPublic && (typeof window === "undefined" || !isAuthenticated)) {
     return <>{children}</>;
   }
 

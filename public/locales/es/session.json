@@ -549,7 +549,8 @@
     "time_left": "Tiempo restante de la ronda",
     "next": "Siguiente",
     "view": "Vista",
-    "play_notes": "Reproducir notas"
+    "play_notes": "Reproducir notas",
+    "show_notes": "Mostrar la nota en el mástil"
   },
   "interval_click": {
     "now_above": "{{interval}} por encima de ese {{root}}",

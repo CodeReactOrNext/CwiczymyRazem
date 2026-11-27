@@ -549,7 +549,8 @@
     "time_left": "Restzeit dieser Runde",
     "next": "Weiter",
     "view": "Ansicht",
-    "play_notes": "Töne abspielen"
+    "play_notes": "Töne abspielen",
+    "show_notes": "Ton auf dem Hals zeigen"
   },
   "interval_click": {
     "now_above": "{{interval}} über diesem {{root}}",

@@ -80,7 +80,7 @@ export const GuideHero = ({ guide, liveData }: GuideHeroProps) => {
                 Updated {updatedLabel}
               </time>
             </p>
-            <h1 className='font-display max-w-3xl text-balance text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl'>
+            <h1 className='max-w-3xl font-landingHeading text-balance text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl'>
               {guide.h1}
             </h1>
             {verdict && (
@@ -109,7 +109,7 @@ export const GuideHero = ({ guide, liveData }: GuideHeroProps) => {
             <div className='mt-8'>
               <Link
                 href='/signup'
-                className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300'>
+                className='inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-zinc-950 transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400'>
                 Track this song free
                 <ArrowRight className='h-4 w-4' aria-hidden='true' />
               </Link>

@@ -1,5 +1,7 @@
 import { cn } from "assets/lib/utils";
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { Footer } from "feature/landing/components/Footer";
+import { jakartaLanding } from "feature/landing/lib/fonts";
 import { AudioLines, Ear, ExternalLink, Gauge, Grid3x3, ListMusic, Rewind, Sparkles, Target, Timer } from "lucide-react";
 import Head from "next/head";
 import Image from "next/image";
@@ -452,22 +454,12 @@ const ToolsPage = () => {
         />
       </Head>
 
-      <main className="min-h-screen bg-zinc-950 text-zinc-300 overflow-x-hidden">
-        <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-zinc-950/90 backdrop-blur-sm">
-          <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-6">
-            <Link href="/" className="transition-opacity hover:opacity-70">
-              <Image src='/images/longlightlogo.svg' alt='Riff Quest' width={120} height={32} className='h-6 w-auto' priority />
-            </Link>
-            <div className="flex items-center gap-6">
-              <Link href="/login" className="text-sm text-zinc-400 hover:text-white transition-colors">Login</Link>
-              <Link href="/signup" className="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors">Start Free →</Link>
-            </div>
-          </div>
-        </nav>
+      <main className={`${jakartaLanding.variable} min-h-screen bg-zinc-950 text-zinc-300 overflow-x-hidden`}>
+        <MarketingNav />
 
         <div className="mx-auto max-w-5xl px-6 pb-24 pt-32">
           <div className="mb-10 max-w-2xl">
-            <h1 className="text-4xl font-black text-white mb-6">Guitar practice tools</h1>
+            <h1 className="font-landingHeading text-4xl font-black text-white mb-6">Guitar practice tools</h1>
             <p className="text-lg text-zinc-400 leading-relaxed">
               A catalogue of {totalTools} tools, grouped by what you would reach for them to do —
               starting with the{" "}
@@ -601,7 +593,7 @@ const ToolsPage = () => {
                                 : "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-zinc-100 p-2"
                             }>
                             {tool.logo ? (
-                              <Image src={tool.logo} alt="" width={28} height={28} className="h-full w-full object-contain" unoptimized />
+                              <Image src={tool.logo} alt={`${tool.name} logo`} width={28} height={28} className="h-full w-full object-contain" unoptimized />
                             ) : (
                               <span className="text-base font-black text-zinc-500">{tool.name.charAt(0)}</span>
                             )}

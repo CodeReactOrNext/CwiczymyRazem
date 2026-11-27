@@ -1,5 +1,6 @@
 "use client";
 
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { SectionSeam } from "components/SectionSeam/SectionSeam";
 import type {
   faqGroupInterface,
@@ -7,7 +8,6 @@ import type {
 } from "feature/faq/components/FaqLayout";
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
-import { LandingStickyNav } from "feature/landing/components/LandingStickyNav";
 import type { FeaturedGuideLink } from "feature/landing/data/featuredGuides";
 import { jakartaLanding } from "feature/landing/lib/fonts";
 import type { TabPreviewNote } from "feature/landing/lib/tabPreview";
@@ -158,7 +158,7 @@ const LandingPage = ({
       <LandingSEO faqQuestions={faqQuestions} />
       <main
         className={`${jakartaLanding.variable} relative min-h-screen overflow-x-hidden bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30`}>
-        <LandingStickyNav />
+        <MarketingNav />
         <HeroSection />
         <InteractiveExercisesSection />
         {spotlightExercises.length > 0 && (

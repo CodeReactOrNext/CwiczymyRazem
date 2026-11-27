@@ -258,6 +258,9 @@ function SummaryPreview() {
   const [client] = useState(() => seededClient(SCORED_RUNS));
   // Before the first render, so the cards that read the player find one.
   useState(() => {
+    // Never during a production build: the store is shared by every page the
+    // build worker prerenders, and a seeded profile leaks into the public ones.
+    if (process.env.NODE_ENV === "production") return false;
     dispatch(
       restoreUserSnapshot({
         userAuth: UID,

@@ -7,7 +7,7 @@ export const theTrooper: SongGuide = {
   artist: "Iron Maiden",
   author: "Michael Apfel",
   publishedAt: "2026-08-14",
-  updatedAt: "2026-08-14",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play The Trooper on Guitar: Gallop Riff & Twin Leads",
     metaDescription:

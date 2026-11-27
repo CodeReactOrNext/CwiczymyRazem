@@ -2,6 +2,7 @@
 
 import { cn } from "assets/lib/utils";
 import { YouTube } from "components/Blog/YouTube";
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { Footer } from "feature/landing/components/Footer";
 import {
   PlanDemo,
@@ -10,10 +11,10 @@ import {
 } from "feature/landing/components/howItWorks/StepDemos";
 import type { HowItWorksStats } from "feature/landing/data/howItWorksStats";
 import { PLAN_DEMO_PICKS } from "feature/landing/data/planDemoPicks";
+import { jakartaLanding } from "feature/landing/lib/fonts";
 import { m } from "framer-motion";
 import { useInView } from "framer-motion";
-import { ArrowRight, ChevronRight } from "lucide-react";
-import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
 
@@ -276,38 +277,13 @@ function StepSection({
 export const HowItWorksPage = ({ stats }: { stats: HowItWorksStats }) => {
   const steps = buildSteps(stats);
   return (
-    <div className='min-h-screen overflow-x-hidden bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/20'>
+    <div className={`${jakartaLanding.variable} min-h-screen overflow-x-hidden bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/20`}>
       {/* ── Nav ── */}
-      <nav className='sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl'>
-        <div className='mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-10'>
-          <Link href='/'>
-            <Image
-              src='/images/longlightlogo.svg'
-              alt='Riff Quest'
-              width={120}
-              height={32}
-              className='h-6 w-auto'
-              priority
-            />
-          </Link>
-          <div className='flex items-center gap-6'>
-            <Link
-              href='/'
-              className='hidden items-center gap-1 text-sm text-zinc-500 transition-colors hover:text-white sm:flex'>
-              <ChevronRight className='h-3 w-3 rotate-180' /> Back to home
-            </Link>
-            <Link
-              href='/signup'
-              className='rounded-md bg-white px-4 py-1.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-zinc-200'>
-              Start Free
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <MarketingNav current='/how-it-works' spacer />
 
       {/* ── Hero ── */}
-      <section className='border-b border-white/5 px-6 pb-16 pt-16 lg:px-10'>
-        <div className='mx-auto max-w-7xl'>
+      <section className='border-b border-white/5 pb-16 pt-16'>
+        <div className='mx-auto max-w-7xl px-6'>
           <m.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -317,7 +293,7 @@ export const HowItWorksPage = ({ stats }: { stats: HowItWorksStats }) => {
               <p className='mb-4 text-xs font-black text-zinc-600'>
                 How it works
               </p>
-              <h1 className='text-[clamp(2rem,5vw,3.75rem)] font-bold leading-[1.0] tracking-tight text-white'>
+              <h1 className='font-landingHeading text-[clamp(2rem,5vw,3.75rem)] font-bold leading-[1.0] tracking-tight text-white'>
                 Three steps.
                 <br />
                 <span className='text-zinc-500'>
@@ -342,8 +318,8 @@ export const HowItWorksPage = ({ stats }: { stats: HowItWorksStats }) => {
       </section>
 
       {/* ── Steps ── */}
-      <section className='px-6 pb-32 lg:px-10'>
-        <div className='mx-auto flex max-w-7xl flex-col gap-28'>
+      <section className='pb-32'>
+        <div className='mx-auto flex max-w-7xl flex-col gap-28 px-6'>
           {steps.map((step, i) => (
             <StepSection key={step.number} step={step} index={i} />
           ))}
@@ -351,8 +327,8 @@ export const HowItWorksPage = ({ stats }: { stats: HowItWorksStats }) => {
       </section>
 
       {/* ── Final CTA ── */}
-      <section className='border-t border-white/5 px-6 py-28 lg:px-10'>
-        <div className='mx-auto max-w-7xl'>
+      <section className='border-t border-white/5 py-28'>
+        <div className='mx-auto max-w-7xl px-6'>
           <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}

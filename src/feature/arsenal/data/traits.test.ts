@@ -13,6 +13,7 @@ import type { RigItem, TraitSessionContext } from "./traitEval";
 import {
   buildRigTraitContext,
   evaluateRigTraits,
+  getAmpReach,
   getRigTraitCategoryRates,
   getRigTraitPayout,
   getRigTraitShowcaseRate,
@@ -733,6 +734,37 @@ describe("card state", () => {
         rig,
       ),
     ).toBe(2);
+  });
+
+  it("counts the trait lines an amplifier reaches, and greys one reaching none", () => {
+    const self = pedal({
+      itemId: "patchbay",
+      x: 50,
+      traits: [{ id: "patchbay", value: 1.7 }],
+    });
+    const raw = { id: "patchbay", value: 1.7 };
+    const downstream = pedal({
+      itemId: "down",
+      x: 10,
+      traits: [
+        { id: "workhorse", value: 3 },
+        { id: "picking-bench", value: 10 },
+      ],
+    });
+    const upstream = pedal({
+      itemId: "up",
+      x: 80,
+      traits: [{ id: "workhorse", value: 3 }],
+    });
+
+    const reaching = rigWith([self, downstream, upstream], []);
+    expect(getAmpReach(def("patchbay"), self, reaching)).toBe(2);
+    expect(getTraitCardState(def("patchbay"), raw, self, reaching)).toBe("met");
+
+    // Last in the chain: nothing below it to pay into.
+    const last = rigWith([self, upstream], []);
+    expect(getAmpReach(def("patchbay"), self, last)).toBe(0);
+    expect(getTraitCardState(def("patchbay"), raw, self, last)).toBe("unmet");
   });
 
   it("stays unmet while the rig half of a mixed condition is wrong", () => {

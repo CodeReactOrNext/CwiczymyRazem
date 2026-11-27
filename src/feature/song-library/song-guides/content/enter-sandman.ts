@@ -7,7 +7,7 @@ export const enterSandman: SongGuide = {
   artist: "Metallica",
   author: "Michael Apfel",
   publishedAt: "2026-09-24",
-  updatedAt: "2026-09-24",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play Enter Sandman on Guitar: Riff, 3+1 Count & Solo",
     metaDescription:

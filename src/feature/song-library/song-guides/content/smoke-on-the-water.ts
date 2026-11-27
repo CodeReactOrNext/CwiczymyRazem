@@ -7,7 +7,7 @@ export const smokeOnTheWater: SongGuide = {
   artist: "Deep Purple",
   author: "Michael Apfel",
   publishedAt: "2026-08-25",
-  updatedAt: "2026-08-25",
+  updatedAt: "2026-10-30",
   seo: {
     metaTitle: "How to Play Smoke on the Water on Guitar: The Real Riff",
     metaDescription:

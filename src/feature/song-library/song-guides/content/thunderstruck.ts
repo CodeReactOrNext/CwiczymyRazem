@@ -7,7 +7,7 @@ export const thunderstruck: SongGuide = {
   artist: "AC/DC",
   author: "Michael Apfel",
   publishedAt: "2026-08-01",
-  updatedAt: "2026-08-01",
+  updatedAt: "2026-10-30",
   seo: {
     metaTitle: "How to Play Thunderstruck on Guitar: Intro Riff Tab",
     metaDescription:

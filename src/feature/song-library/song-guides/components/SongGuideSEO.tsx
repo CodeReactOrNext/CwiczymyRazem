@@ -51,7 +51,10 @@ export const SongGuideSEO = ({
 }: SongGuideSEOProps) => {
   const siteUrl = "https://riff.quest";
   const pageUrl = `${siteUrl}/song-library/${guide.slug}`;
-  const ogImageUrl = liveData.song?.coverUrl ?? `${siteUrl}/promo.png`;
+  // Our own 1200×630 card. This used to be the song's cover hotlinked from
+  // Spotify's CDN: square (cropped by every large-card preview) and gone the day
+  // that URL changes, on the pages that earn most of the site's impressions.
+  const ogImageUrl = `${siteUrl}/images/og-image.png`;
   const authorProfile = getAuthorProfile(guide.author);
 
   const useLookupSeo = LOOKUP_SEO_SLUGS.has(guide.slug);
@@ -179,6 +182,8 @@ export const SongGuideSEO = ({
       <meta property='og:title' content={metaTitle} />
       <meta property='og:description' content={metaDescription} />
       <meta property='og:image' content={ogImageUrl} />
+      <meta property='og:image:width' content='1200' />
+      <meta property='og:image:height' content='630' />
       <meta property='article:published_time' content={guide.publishedAt} />
       <meta property='article:modified_time' content={guide.updatedAt} />
       <meta property='article:author' content={guide.author || "Riff Quest"} />

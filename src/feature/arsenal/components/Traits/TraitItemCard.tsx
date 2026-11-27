@@ -17,6 +17,7 @@ import type { ReactNode } from "react";
 import { CardTraits } from "../CardTraits";
 import { FameCoin } from "../Workshop/FameCoin";
 import { GO_KEY } from "../Workshop/goKey";
+import { ImprintKindMark } from "./ImprintKindMark";
 import { ExtractorArt, ImprintArt } from "./TraitItemArt";
 
 type TraitItem =
@@ -70,9 +71,10 @@ export const TraitItemCard = ({
         <div className='flex min-w-0 flex-col gap-1'>
           <span
             className={cn(
-              "text-xs font-medium",
+              "flex items-center gap-2 text-xs font-medium",
               isImprint ? "text-emerald-300/80" : "text-amber-300/80",
             )}>
+            {isImprint && <ImprintKindMark kind={item.imprint.kind} />}
             {isImprint
               ? t(`trait_craft.imprint_caps.${item.imprint.kind}`)
               : t("trait_craft.extractor_caps")}
@@ -94,7 +96,7 @@ export const TraitItemCard = ({
 
       <p className='text-sm leading-relaxed text-zinc-400'>
         {isImprint
-          ? t("trait_craft.imprint_body")
+          ? t(`trait_craft.imprint_body.${item.imprint.kind}`)
           : t("trait_craft.extractor_body")}
       </p>
 

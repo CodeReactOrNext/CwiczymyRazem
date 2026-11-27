@@ -33,6 +33,9 @@ export default function HomePreviewPage() {
   const dispatch = useAppDispatch();
   // Before the first render, so LandingView never sits on its spinner.
   useState(() => {
+    // Never during a production build: the store is shared by every page the
+    // build worker prerenders, and a seeded profile leaks into the public ones.
+    if (process.env.NODE_ENV === "production") return false;
     dispatch(
       restoreUserSnapshot({
         userAuth: "dev-home-preview",

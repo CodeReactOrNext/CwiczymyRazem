@@ -1,10 +1,11 @@
 import { BlogCard } from 'components/Blog/BlogCard';
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { Footer } from 'feature/landing/components/Footer';
+import { jakartaLanding } from "feature/landing/lib/fonts";
 import type { BlogFrontmatter} from 'lib/blog';
 import {getAllBlogs } from 'lib/blog';
 import type { GetStaticProps } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
 import Link from 'next/link';
 
 
@@ -34,24 +35,44 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
         <meta name="twitter:title" content="Guitar Practice Blog | Riff Quest" />
         <meta name="twitter:description" content="Discover expert guitar practice tips, learning techniques, and motivation strategies." />
         <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Blog",
+              name: "Riff Quest Guitar Practice Blog",
+              url: "https://riff.quest/blog",
+              publisher: { "@type": "Organization", name: "Riff Quest", url: "https://riff.quest", logo: "https://riff.quest/favicon/apple-touch-icon.png" },
+              blogPost: blogs.map((blog) => ({
+                "@type": "BlogPosting",
+                headline: blog.title,
+                url: `https://riff.quest/blog/${blog.slug}`,
+                datePublished: blog.date,
+                dateModified: blog.updatedAt ?? blog.date,
+              })),
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://riff.quest" },
+                { "@type": "ListItem", position: 2, name: "Blog", item: "https://riff.quest/blog" },
+              ],
+            },
+          ],
+        }),
+          }}
+        />
       </Head>
 
-      <main className="min-h-screen bg-zinc-950 text-zinc-300 overflow-x-hidden">
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/90 backdrop-blur-sm">
-          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-            <Link href="/" className="transition-opacity hover:opacity-70">
-              <Image src='/images/longlightlogo.svg' alt='Riff Quest' width={120} height={32} className='h-6 w-auto' priority />
-            </Link>
-            <div className="flex items-center gap-6">
-              <Link href="/login" className="text-sm text-zinc-400 hover:text-white transition-colors">Login</Link>
-              <Link href="/signup" className="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors">Start Free →</Link>
-            </div>
-          </div>
-        </nav>
+      <main className={`${jakartaLanding.variable} min-h-screen bg-zinc-950 text-zinc-300 overflow-x-hidden`}>
+        <MarketingNav current='/blog' />
 
         <div className="pt-32 pb-24 mx-auto max-w-6xl px-4 sm:px-6 overflow-x-hidden min-w-0">
           <div className="mb-16 text-center">
-            <h1 className="mb-4 text-4xl font-bold text-white md:text-6xl tracking-tight leading-[1.1]">
+            <h1 className="mb-4 font-landingHeading text-4xl font-bold text-white md:text-6xl tracking-tight leading-[1.1]">
               Knowledge and <span className="text-cyan-400">Inspiration</span>
             </h1>
 

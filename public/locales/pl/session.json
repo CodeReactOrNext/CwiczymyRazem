@@ -629,7 +629,8 @@
     "time_left": "Czas do końca rundy",
     "next": "Dalej",
     "view": "Widok",
-    "play_notes": "Odtwarzaj dźwięki"
+    "play_notes": "Odtwarzaj dźwięki",
+    "show_notes": "Pokaż nutę na gryfie"
   },
   "interval_click": {
     "now_above": "{{interval}} nad tym {{root}}",

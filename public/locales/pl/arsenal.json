@@ -857,6 +857,7 @@
     "restored": "Odnowiony"
   },
   "traits_ui": {
+    "amp_total": "Teraz: ×{{count}} = {{total}} Fame/h",
     "more": "+{{count}} więcej"
   },
   "in_service": {
@@ -1483,7 +1484,10 @@
     "owned_many": "Masz {{count}}",
     "owned_other": "Masz {{count}}",
     "owned": "Masz {{count}}",
-    "imprint_body": "Cecha z nienaruszoną wartością. Włóż ją w gitarę albo pedał: kosztuje to Fame, tym więcej, im więcej cech instrument już ma, a jeden instrument mieści najwyżej trzy.",
+    "imprint_body": {
+      "guitar": "Cecha gitary z nienaruszoną wartością. Pasuje tylko do gitary, nigdy do pedału: włożenie kosztuje Fame, tym więcej, im więcej cech gitara już ma, a jedna gitara mieści najwyżej trzy.",
+      "effect": "Cecha pedału z nienaruszoną wartością. Pasuje tylko do pedału, nigdy do gitary: włożenie kosztuje Fame, tym więcej, im więcej cech pedał już ma, a jeden pedał mieści najwyżej trzy."
+    },
     "extractor_body": "Jednorazowe narzędzie ze skrzynki z częściami. Kliknij prawym instrument z cechą i wybierz Wyjmij cechę: cecha wyjdzie jako odcisk, który możesz sprzedać, wystawić albo włożyć w coś innego.",
     "insert_into": "Włóż w instrument…",
     "insert_title": "Włóż cechę",

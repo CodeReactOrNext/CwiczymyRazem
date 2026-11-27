@@ -82,7 +82,7 @@ export const GuideRiffPlayer = ({
         <button
           type='button'
           onClick={togglePlay}
-          className='flex h-9 items-center gap-2 rounded-lg bg-cyan-500 px-4 text-sm font-bold text-black transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400'>
+          className='flex h-9 items-center gap-2 rounded-lg bg-white px-4 text-sm font-bold text-black transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
           {isPlaying ? (
             <Pause className='h-4 w-4' aria-hidden='true' />
           ) : (

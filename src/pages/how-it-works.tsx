@@ -29,6 +29,29 @@ const HowItWorks: NextPage<{ stats: HowItWorksStats }> = ({ stats }) => {
           content="Stop guessing. See your progress."
         />
         <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebPage",
+              name: "How Riff Quest Works",
+              url: "https://riff.quest/how-it-works",
+              isPartOf: { "@type": "WebSite", name: "Riff Quest", url: "https://riff.quest" },
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://riff.quest" },
+                { "@type": "ListItem", position: 2, name: "How Riff Quest Works", item: "https://riff.quest/how-it-works" },
+              ],
+            },
+          ],
+        }),
+          }}
+        />
       </Head>
       <HowItWorksPage stats={stats} />
     </>

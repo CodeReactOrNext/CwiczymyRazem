@@ -7,7 +7,7 @@ export const doIWannaKnow: SongGuide = {
   artist: "Arctic Monkeys",
   author: "Michael Apfel",
   publishedAt: "2026-09-24",
-  updatedAt: "2026-09-24",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play Do I Wanna Know? on Guitar: Riff Feel & Slides",
     metaDescription:

@@ -146,7 +146,7 @@ export const ExerciseShowcase = ({
       <div className='mt-8'>
         <Link
           href={`/practice/exercise/${slug}`}
-          className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400'>
+          className='inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
           Practice this with real-time feedback
           <ArrowRight className='h-4 w-4' aria-hidden='true' />
         </Link>

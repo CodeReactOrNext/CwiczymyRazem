@@ -1,9 +1,10 @@
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { DISCORD_INVITE_URL } from "constants/community";
 import { Footer } from "feature/landing/components/Footer";
+import { jakartaLanding } from "feature/landing/lib/fonts";
 import AppLayout from "layouts/AppLayout";
 import { Mail } from "lucide-react";
 import Head from "next/head";
-import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import type { ReactElement } from "react";
@@ -60,42 +61,40 @@ const ContactPage: NextPageWithLayout = () => {
           name='twitter:image'
           content='https://riff.quest/images/og-image.png'
         />
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "ContactPage",
+              name: "Contact Riff Quest",
+              url: "https://riff.quest/contact",
+              mainEntity: { "@type": "Organization", name: "Riff Quest", url: "https://riff.quest", logo: "https://riff.quest/favicon/apple-touch-icon.png" },
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://riff.quest" },
+                { "@type": "ListItem", position: 2, name: "Contact Riff Quest", item: "https://riff.quest/contact" },
+              ],
+            },
+          ],
+        }),
+          }}
+        />
       </Head>
 
       <div
-        className={!isLogged ? "min-h-screen bg-zinc-950 text-zinc-100" : ""}>
+        className={!isLogged ? `${jakartaLanding.variable} min-h-screen bg-zinc-950 text-zinc-100` : ""}>
         {!isLogged && (
-          <nav className='bg-zinc-950/50 backdrop-blur-xl'>
-            <div className='mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8'>
-              <Link href='/' className='flex items-center gap-2'>
-                <Image
-                  src='/images/longlightlogo.svg'
-                  alt='Riff Quest'
-                  width={120}
-                  height={32}
-                  className='h-6 w-auto'
-                  priority
-                />
-              </Link>
-              <div className='flex items-center gap-4'>
-                <Link
-                  href='/login'
-                  className='text-sm font-medium text-zinc-400 transition-colors hover:text-white'>
-                  Login
-                </Link>
-                <Link
-                  href='/signup'
-                  className='rounded-full bg-cyan-500 px-4 py-1.5 text-sm font-bold text-black transition-colors hover:bg-cyan-400'>
-                  Start Free
-                </Link>
-              </div>
-            </div>
-          </nav>
+          <MarketingNav spacer />
         )}
 
         <div className='mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20'>
           <header className='max-w-2xl'>
-            <h1 className='text-3xl font-bold tracking-tight text-zinc-100 sm:text-4xl'>
+            <h1 className='font-landingHeading text-3xl font-bold tracking-tight text-zinc-100 sm:text-4xl'>
               Contact
             </h1>
             <p className='mt-6 text-lg leading-relaxed text-zinc-300'>

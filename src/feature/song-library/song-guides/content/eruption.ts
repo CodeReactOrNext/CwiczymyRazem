@@ -7,7 +7,7 @@ export const eruption: SongGuide = {
   artist: "Van Halen",
   author: "Michael Apfel",
   publishedAt: "2026-08-14",
-  updatedAt: "2026-08-14",
+  updatedAt: "2026-10-04",
   seo: {
     metaTitle: "How to Play Eruption on Guitar: Tapping, Part by Part",
     metaDescription:

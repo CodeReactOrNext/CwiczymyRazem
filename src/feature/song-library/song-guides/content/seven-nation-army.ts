@@ -7,7 +7,7 @@ export const sevenNationArmy: SongGuide = {
   artist: "The White Stripes",
   author: "Michael Apfel",
   publishedAt: "2026-07-30",
-  updatedAt: "2026-07-30",
+  updatedAt: "2026-10-30",
   seo: {
     metaTitle: "How to Play Seven Nation Army on Guitar: Riff Tab & Muting",
     metaDescription:

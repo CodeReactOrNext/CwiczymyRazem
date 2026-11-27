@@ -258,13 +258,16 @@ interface HuntViewMenuProps {
   /** The "play notes for me" preference, for the drills that have one. */
   noteSound?: boolean;
   onNoteSoundChange?: (next: boolean) => void;
+  /** "Show the note on the neck", for the drill that lets the answer be looked up. */
+  showNotes?: boolean;
+  onShowNotesChange?: (next: boolean) => void;
 }
 
 /**
  * Whole neck, left-handed and note sound — set once, not every round, so they
  * share one menu instead of three chips in the footer.
  */
-export function HuntViewMenu({ showFullNeck, onShowFullNeckChange, noteSound, onNoteSoundChange }: HuntViewMenuProps) {
+export function HuntViewMenu({ showFullNeck, onShowFullNeckChange, noteSound, onNoteSoundChange, showNotes, onShowNotesChange }: HuntViewMenuProps) {
   const { t } = useTranslation("session");
   const leftHanded = useIsLeftHanded();
   const setLeftHanded = useHandednessStore((state) => state.setLeftHanded);
@@ -286,6 +289,15 @@ export function HuntViewMenu({ showFullNeck, onShowFullNeckChange, noteSound, on
         // Clear the session's full-screen layer (z-[999999] desktop / z-[9999999]
         // mobile); the default z-50 would paint underneath it.
         className='z-[99999999] w-56'>
+        {showNotes !== undefined && onShowNotesChange && (
+          <DropdownMenuCheckboxItem
+            checked={showNotes}
+            onCheckedChange={(checked) => onShowNotesChange(checked === true)}
+            onSelect={keepOpen}
+            className={itemClass}>
+            {t("hunt.show_notes")}
+          </DropdownMenuCheckboxItem>
+        )}
         <DropdownMenuCheckboxItem
           checked={showFullNeck}
           onCheckedChange={(checked) => onShowFullNeckChange(checked === true)}

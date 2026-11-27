@@ -625,7 +625,8 @@
     "time_left": "Time left in this round",
     "next": "Next",
     "view": "View",
-    "play_notes": "Play notes"
+    "play_notes": "Play notes",
+    "show_notes": "Show the note on the neck"
   },
   "interval_click": {
     "now_above": "{{interval}} above that {{root}}",

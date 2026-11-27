@@ -71,6 +71,12 @@
     "again": "Draw another",
     "done": "Tick it off"
   },
+  "start": {
+    "title": "How long do you want to play?",
+    "description": "A set length runs each item on its clock. An open timer keeps counting until you finish, so you can work on parts and then play it through.",
+    "timed": "Set length",
+    "open": "Open timer"
+  },
   "toast": {
     "error": "Couldn't save that. Try again.",
     "nothing_to_play": "There's nothing here to play right now.",

@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { useNoteLearnerStore } from "feature/exercisePlan/data/exerises/noteLearner/noteLearnerStore";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Mic } from "lucide-react";
 import { useMemo } from "react";
@@ -81,6 +82,10 @@ export function NoteHuntDetector({
   const soleString = noteHuntStrings?.length === 1 ? noteHuntStrings[0] : null;
 
   const [showFullNeck, setShowFullNeck] = useShowFullNeck();
+  const showNotesPref = useNoteLearnerStore(state => state.showNotes);
+  const setShowNotes = useNoteLearnerStore(state => state.setShowNotes);
+  // Only the learning hunt offers it: everywhere else finding the spot is the drill.
+  const showNotes = pickTargets && showNotesPref;
 
   // Every fretboard cell the target lives on inside the region (and on the
   // strings in play). Found octaves map straight back onto cells because the mic
@@ -94,6 +99,20 @@ export function NoteHuntDetector({
     [targetNote, noteHuntRegion, noteHuntStrings],
   );
   const foundKeys = regionPositions.filter(p => foundOctaves.includes(p.octave)).map(p => `${p.string}-${p.fret}`);
+  // The spots still to play, drawn hollow under the note's name.
+  const foundOctavesKey = foundOctaves.join(",");
+  const hintKeys = useMemo(
+    () => {
+      if (!showNotes) return [];
+      const foundSet = new Set(foundOctavesKey.split(",").filter(Boolean).map(Number));
+      return regionPositions.filter(p => !foundSet.has(p.octave)).map(p => `${p.string}-${p.fret}`);
+    },
+    [showNotes, regionPositions, foundOctavesKey],
+  );
+  const hintLabels = useMemo(
+    () => Object.fromEntries(hintKeys.map(key => [key, targetNote])),
+    [hintKeys, targetNote],
+  );
   const liveCell = isMatch && detectedOctave !== null
     ? regionPositions.find(p => p.octave === detectedOctave)
     : undefined;
@@ -315,7 +334,12 @@ export function NoteHuntDetector({
         )
       )}
 
-      {noteHuntRegion && <HuntViewMenu showFullNeck={showFullNeck} onShowFullNeckChange={setShowFullNeck} />}
+      {noteHuntRegion && <HuntViewMenu
+          showFullNeck={showFullNeck}
+          onShowFullNeckChange={setShowFullNeck}
+          showNotes={pickTargets ? showNotesPref : undefined}
+          onShowNotesChange={pickTargets ? setShowNotes : undefined}
+        />}
 
       {/* Manual advance — works with or without the mic, and on the drills that
           wait for an answer rather than counting down (which have no timer to
@@ -389,6 +413,8 @@ export function NoteHuntDetector({
           totalTargets={regionPositions.length}
           lastClick={null}
           liveKey={liveCell ? `${liveCell.string}-${liveCell.fret}` : null}
+          revealKeys={hintKeys}
+          cellLabels={hintLabels}
           showFullNeck={showFullNeck}
         />
       }

@@ -147,7 +147,7 @@ const Block = ({
                 <Link
                   href='/signup'
                   onClick={() => trackSignupCtaClicked("guide_cta")}
-                  className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400'>
+                  className='inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
                   {block.ctaLabel ?? "Start free"}
                   <ArrowRight className='h-4 w-4' aria-hidden='true' />
                 </Link>
@@ -233,7 +233,7 @@ const Block = ({
           <a
             href={block.href}
             download
-            className='inline-flex shrink-0 items-center gap-2 self-start rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400 sm:self-auto'>
+            className='inline-flex shrink-0 items-center gap-2 self-start rounded-lg bg-white px-6 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200 sm:self-auto'>
             <Download className='h-4 w-4' aria-hidden='true' />
             Download the free practice PDF
             <span className='font-medium text-zinc-800'>({block.fileMeta})</span>
@@ -511,7 +511,7 @@ export const SeoLandingPage = ({
                   <Link
                     href='/signup'
                     onClick={() => trackSignupCtaClicked("guide_hero")}
-                    className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400'>
+                    className='inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
                     Start practicing free
                     <ArrowRight className='h-4 w-4' aria-hidden='true' />
                   </Link>

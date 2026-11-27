@@ -2,6 +2,7 @@ import { AuthorBio } from 'components/Blog/AuthorBio';
 import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
 import { ZoomableImages } from 'components/Blog/ZoomableImages';
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { exercisesAgregat } from 'feature/exercisePlan/data/exercisesAgregat';
 import { ExerciseCard } from 'feature/exercises/components/ExerciseCard/ExerciseCard';
 import { serializeExercises } from 'feature/exercises/lib/serializeExercise';
@@ -18,7 +19,6 @@ import { getPracticeLink } from 'lib/internalLinks';
 import { ChevronRight } from 'lucide-react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
 import Link from 'next/link';
 
 
@@ -181,17 +181,7 @@ const BlogPost = ({ frontmatter, contentHtml, relatedBlogs = [], headings = [], 
           style={{ scaleX }}
         />
 
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/90 backdrop-blur-sm">
-          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-            <Link href="/" className="transition-opacity hover:opacity-70">
-              <Image src='/images/longlightlogo.svg' alt='Riff Quest' width={120} height={32} className='h-6 w-auto' />
-            </Link>
-            <div className="flex items-center gap-6">
-              <Link href="/login" className="text-sm text-zinc-400 hover:text-white transition-colors">Login</Link>
-              <Link href="/signup" className="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors">Start Free →</Link>
-            </div>
-          </div>
-        </nav>
+        <MarketingNav current='/blog' />
 
         {/* The reading page is white: long-form text reads more easily dark on
             light. `light` switches the shared MDX components and cards to

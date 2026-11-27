@@ -7,7 +7,7 @@ export const stairwayToHeaven: SongGuide = {
   artist: "Led Zeppelin",
   author: "Michael Apfel",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-09-15",
+  updatedAt: "2026-10-04",
   seo: {
     metaTitle: "How to Play Stairway to Heaven on Guitar: 5-Stage Roadmap",
     metaDescription:

@@ -7,7 +7,7 @@ export const tornadoOfSouls: SongGuide = {
   artist: "Megadeth",
   author: "Michael Apfel",
   publishedAt: "2026-08-14",
-  updatedAt: "2026-08-14",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play Tornado of Souls on Guitar: Solo Tempo Ladder",
     metaDescription:

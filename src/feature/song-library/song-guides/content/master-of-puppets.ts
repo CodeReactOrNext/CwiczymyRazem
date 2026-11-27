@@ -7,7 +7,7 @@ export const masterOfPuppets: SongGuide = {
   artist: "Metallica",
   author: "Michael Apfel",
   publishedAt: "2026-07-20",
-  updatedAt: "2026-07-20",
+  updatedAt: "2026-10-30",
   seo: {
     metaTitle: "How to Play Master of Puppets on Guitar: Riff Tab & 212 BPM",
     metaDescription:

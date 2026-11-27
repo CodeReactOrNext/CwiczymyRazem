@@ -6,6 +6,7 @@ import { StatRow } from "components/Blog/StatRow";
 import { StepList } from "components/Blog/StepList";
 import { YouTube } from "components/Blog/YouTube";
 import { currencyProseComponents } from "components/CurrencyIcons/withCurrencyIcons";
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import {
   AppScreen,
   BoardPreview,
@@ -19,7 +20,6 @@ import {
   TierScale,
 } from "components/Wiki";
 import { Footer } from "feature/landing/components/Footer";
-import { WikiPublicNav } from "feature/wiki/components/WikiPublicNav";
 import { wikiSectionLabel } from "feature/wiki/sectionLabel";
 import WikiLayout from "feature/wiki/WikiLayout";
 import { useTranslation } from "hooks/useTranslation";
@@ -120,7 +120,7 @@ const WikiArticlePage: NextPageWithLayout<WikiArticleProps> = ({
 
       <div
         className={!isLogged ? "min-h-screen bg-zinc-950 text-zinc-100" : ""}>
-        {!isLogged && <WikiPublicNav />}
+        {!isLogged && <MarketingNav spacer />}
 
         <WikiLayout sections={sections}>
           <div className='p-4 sm:p-6'>

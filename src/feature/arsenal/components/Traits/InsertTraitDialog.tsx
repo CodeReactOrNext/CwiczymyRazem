@@ -26,6 +26,7 @@ import { useMemo, useState } from "react";
 
 import { getRarityColor } from "../RarityBadge";
 import { FameCoin } from "../Workshop/FameCoin";
+import { ImprintKindMark } from "./ImprintKindMark";
 import { ImprintArt } from "./TraitItemArt";
 
 interface InsertTraitDialogProps {
@@ -89,6 +90,10 @@ export const InsertTraitDialog = ({
               <ImprintArt />
             </div>
             <div className='min-w-0 flex-1'>
+              <p className='mb-1 flex items-center gap-2 text-xs font-medium text-emerald-300/80'>
+                <ImprintKindMark kind={imprint.kind} />
+                {t(`trait_craft.imprint_caps.${imprint.kind}`)}
+              </p>
               <p className='truncate text-sm font-semibold text-emerald-200'>
                 {labels.traitLabel(trait)}
               </p>

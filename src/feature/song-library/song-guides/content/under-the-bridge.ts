@@ -7,7 +7,7 @@ export const underTheBridge: SongGuide = {
   artist: "Red Hot Chili Peppers",
   author: "Michael Apfel",
   publishedAt: "2026-09-24",
-  updatedAt: "2026-09-24",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play Under the Bridge on Guitar: Intro & Chord Fills",
     metaDescription:

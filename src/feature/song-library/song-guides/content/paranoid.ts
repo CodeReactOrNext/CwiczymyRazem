@@ -7,7 +7,7 @@ export const paranoid: SongGuide = {
   artist: "Black Sabbath",
   author: "Michael Apfel",
   publishedAt: "2026-09-24",
-  updatedAt: "2026-09-24",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play Paranoid on Guitar: Riff & 163 BPM Stamina Plan",
     metaDescription:

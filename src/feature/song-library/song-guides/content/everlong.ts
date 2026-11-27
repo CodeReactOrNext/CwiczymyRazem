@@ -7,7 +7,7 @@ export const everlong: SongGuide = {
   artist: "Foo Fighters",
   author: "Michael Apfel",
   publishedAt: "2026-09-24",
-  updatedAt: "2026-09-24",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play Everlong on Guitar: Drop D Shapes & Strumming",
     metaDescription:

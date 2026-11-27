@@ -45,6 +45,7 @@ import { AddToRotationDialog } from "./AddToRotationDialog";
 import { DrawCardDialog } from "./DrawCardDialog";
 import { RotationRow } from "./RotationRow";
 import { RotationSpotlight } from "./RotationSpotlight";
+import { StartSessionDialog } from "./StartSessionDialog";
 
 const LEVEL_DOT: Record<FreshnessLevel, string> = {
   rusty: "bg-orange-400",
@@ -71,6 +72,12 @@ export const RotationView = () => {
   const [now] = useState(() => Date.now());
   const [dialog, setDialog] = useState<"add" | "draw" | null>(null);
   const [activePlan, setActivePlan] = useState<ExercisePlan | null>(null);
+  // A session picked but not yet started: the player still chooses its timer.
+  const [pending, setPending] = useState<{
+    plan: ExercisePlan;
+    source: SessionSource;
+  } | null>(null);
+  const [openTimer, setOpenTimer] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
 
   useEffect(() => {
@@ -115,12 +122,21 @@ export const RotationView = () => {
       toast.error(t("toast.nothing_to_play"));
       return;
     }
-    posthog.capture("rotation_session_started", {
-      source,
-      items: plan.exercises.length,
-    });
     setDialog(null);
-    setActivePlan(plan);
+    setPending({ plan, source });
+  };
+
+  /** The timer chosen: on the clock, or counting up until the player finishes. */
+  const beginSession = (open: boolean) => {
+    if (!pending) return;
+    posthog.capture("rotation_session_started", {
+      source: pending.source,
+      items: pending.plan.exercises.length,
+      timer: open ? "open" : "set",
+    });
+    setOpenTimer(open);
+    setActivePlan(pending.plan);
+    setPending(null);
   };
 
   const playItems = (picked: RotationItem[], source: SessionSource) =>
@@ -196,6 +212,7 @@ export const RotationView = () => {
             router.push("/report?returnTo=/rotation");
           }}
           isFinishing={isFinishing}
+          freeMode={openTimer}
         />
       </MainContainer>
     );
@@ -321,6 +338,13 @@ export const RotationView = () => {
           onPlay={(entry) => playEntry(entry, "draw")}
           onClose={() => setDialog(null)}
           isStarting={!!activePlan}
+        />
+      )}
+      {pending && (
+        <StartSessionDialog
+          minutes={planMinutes(pending.plan)}
+          onStart={beginSession}
+          onClose={() => setPending(null)}
         />
       )}
     </PageShell>

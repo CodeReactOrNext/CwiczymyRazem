@@ -1,6 +1,6 @@
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { HeroBanner, HeroPattern } from "components/UI/HeroBanner";
 import { Footer } from "feature/landing/components/Footer";
-import { WikiPublicNav } from "feature/wiki/components/WikiPublicNav";
 import { wikiSectionIntro, wikiSectionLabel } from "feature/wiki/sectionLabel";
 import WikiLayout from "feature/wiki/WikiLayout";
 import { useTranslation } from "hooks/useTranslation";
@@ -81,7 +81,7 @@ const WikiIndexPage: NextPageWithLayout<WikiIndexProps> = ({
         <meta name='twitter:description' content={DESCRIPTION} />
         <meta name='twitter:image' content={OG_IMAGE} />
       </Head>
-      {!isLogged && <WikiPublicNav />}
+      {!isLogged && <MarketingNav spacer />}
       <div className='flex min-h-screen flex-col overflow-visible rounded-xl border-none bg-second-600 shadow-sm'>
         <HeroBanner
           title='Wiki'

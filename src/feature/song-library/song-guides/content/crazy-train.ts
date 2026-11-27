@@ -7,7 +7,7 @@ export const crazyTrain: SongGuide = {
   artist: "Ozzy Osbourne",
   author: "Michael Apfel",
   publishedAt: "2026-08-06",
-  updatedAt: "2026-08-06",
+  updatedAt: "2026-10-30",
   seo: {
     metaTitle: "How to Play Crazy Train on Guitar: Riff Tab & Solo Map",
     metaDescription:

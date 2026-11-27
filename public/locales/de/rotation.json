@@ -71,6 +71,12 @@
     "again": "Noch eine ziehen",
     "done": "Abhaken"
   },
+  "start": {
+    "title": "Wie lange willst du spielen?",
+    "description": "Mit fester Länge läuft für jeden Eintrag seine Uhr ab. Der offene Timer zählt weiter, bis du fertig bist – so kannst du erst Teile üben und dann alles durchspielen.",
+    "timed": "Feste Länge",
+    "open": "Offener Timer"
+  },
   "toast": {
     "error": "Speichern fehlgeschlagen. Versuch es noch einmal.",
     "nothing_to_play": "Hier gibt es gerade nichts zu spielen.",

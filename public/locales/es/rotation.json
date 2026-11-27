@@ -71,6 +71,12 @@
     "again": "Sacar otra",
     "done": "Marcar como hecho"
   },
+  "start": {
+    "title": "¿Cuánto quieres tocar?",
+    "description": "Con duración fija, cada elemento corre con su reloj. El temporizador abierto sigue contando hasta que termines, así puedes trabajar partes y luego tocarlo entero.",
+    "timed": "Duración fija",
+    "open": "Temporizador abierto"
+  },
   "toast": {
     "error": "No se pudo guardar. Inténtalo de nuevo.",
     "nothing_to_play": "Ahora mismo no hay nada que tocar aquí.",

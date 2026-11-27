@@ -1,5 +1,6 @@
 import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { MarketingNav } from "components/MarketingNav/MarketingNav";
+import { jakartaLanding } from "feature/landing/lib/fonts";
 import { seoLandingConfigs } from "feature/seoLanding/content";
 import { collectExerciseIds } from "feature/seoLanding/lib/collectExerciseIds";
 import { ArrowRight, ChevronRight } from "lucide-react";
@@ -116,7 +117,7 @@ const GuidesPage: NextPage<GuidesPageProps> = ({ guides }) => {
         />
       </Head>
 
-      <main className='min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-300'>
+      <main className={`${jakartaLanding.variable} min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-300`}>
         <MarketingNav current='/guides' />
 
         <div className='relative overflow-hidden'>
@@ -132,7 +133,7 @@ const GuidesPage: NextPage<GuidesPageProps> = ({ guides }) => {
               <span className='text-zinc-400'>Practice guides</span>
             </div>
 
-            <h1 className='max-w-3xl text-4xl font-bold leading-tight text-white sm:text-5xl'>
+            <h1 className='max-w-3xl font-landingHeading text-4xl font-bold leading-tight text-white sm:text-5xl'>
               Guitar practice guides
             </h1>
             <p className='mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400'>

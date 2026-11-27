@@ -7,7 +7,7 @@ export const smellsLikeTeenSpirit: SongGuide = {
   artist: "Nirvana",
   author: "Michael Apfel",
   publishedAt: "2026-09-24",
-  updatedAt: "2026-09-24",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play Smells Like Teen Spirit on Guitar: Strum & Mutes",
     metaDescription:

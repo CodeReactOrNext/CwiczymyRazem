@@ -13,6 +13,7 @@ import { EffectStashTile } from "../GuitarInventory/EffectStashTile";
 import { GuitarStashTile } from "../GuitarInventory/GuitarStashTile";
 import { PartIcon } from "../Parts/PartIcon";
 import { getRarityColor } from "../RarityBadge";
+import { ImprintKindMark } from "../Traits/ImprintKindMark";
 import {
   EXTRACTOR_TILE_COLOR,
   ExtractorArt,
@@ -119,9 +120,10 @@ export const BoardPieceTile = ({
         {...placement}
         color={IMPRINT_TILE_COLOR}
         art={<ImprintArt className='p-[14%]' />}
-        label={`${labels.t("trait_craft.imprint_name")}: ${piece.name} +${piece.imprint.value}`}
+        label={`${labels.t(`trait_craft.imprint_caps.${piece.imprint.kind}`)}: ${piece.name} +${piece.imprint.value}`}
         level={piece.imprint.value}
         levelPrefix='+'
+        cornerMark={<ImprintKindMark kind={piece.imprint.kind} />}
         preview={<TraitItemCard item={{ kind: "imprint", imprint: piece.imprint }} />}
         previewFooter={previewFooter}
         onClick={onClick}

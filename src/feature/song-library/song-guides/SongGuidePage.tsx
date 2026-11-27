@@ -5,6 +5,7 @@ import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { CookieBanner } from "feature/landing/components/CookieBanner";
 import { FaqSection } from "feature/landing/components/FaqSection";
 import { Footer } from "feature/landing/components/Footer";
+import { jakartaLanding } from "feature/landing/lib/fonts";
 import type { SeoLandingGuideLink } from "feature/seoLanding/types/seoLanding.types";
 import { getAuthorProfile } from "lib/authors";
 import type { ReactNode } from "react";
@@ -129,7 +130,7 @@ const SongGuidePage = ({
       <MarketingNav current='/song-library' />
       <GuideProgressBar />
       <GuideToc guide={guide} />
-      <main className='relative min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30'>
+      <main className={`${jakartaLanding.variable} relative min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-cyan-500/30`}>
         <GuideHero guide={guide} liveData={liveData} />
         {guide.riffPreview && (
           <div id='riffPreview' className='scroll-mt-24'>

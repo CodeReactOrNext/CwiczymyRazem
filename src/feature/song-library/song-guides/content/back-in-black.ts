@@ -7,7 +7,7 @@ export const backInBlack: SongGuide = {
   artist: "AC/DC",
   author: "Michael Apfel",
   publishedAt: "2026-09-24",
-  updatedAt: "2026-09-24",
+  updatedAt: "2026-10-16",
   seo: {
     metaTitle: "How to Play Back in Black on Guitar: The Riff in 4 Moves",
     metaDescription:

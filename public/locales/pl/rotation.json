@@ -75,6 +75,12 @@
     "again": "Losuj dalej",
     "done": "Odhacz"
   },
+  "start": {
+    "title": "Jak długo chcesz grać?",
+    "description": "Ustalony czas odlicza każdą pozycję po kolei. Otwarty zegar liczy, dopóki nie skończysz, więc możesz poćwiczyć fragmenty, a potem zagrać całość.",
+    "timed": "Ustalony czas",
+    "open": "Otwarty zegar"
+  },
   "toast": {
     "error": "Nie udało się zapisać. Spróbuj jeszcze raz.",
     "nothing_to_play": "Nie ma tu teraz nic do zagrania.",

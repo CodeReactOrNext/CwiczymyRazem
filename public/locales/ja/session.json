@@ -623,7 +623,8 @@
     "time_left": "このラウンドの残り時間",
     "next": "次へ",
     "view": "表示",
-    "play_notes": "音を再生"
+    "play_notes": "音を再生",
+    "show_notes": "ネック上に音を表示"
   },
   "interval_click": {
     "now_above": "その{{root}}の{{interval}}上",

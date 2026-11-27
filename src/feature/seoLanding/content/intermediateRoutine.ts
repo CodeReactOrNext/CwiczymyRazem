@@ -391,7 +391,7 @@ export const intermediateRoutineConfig: SeoLandingConfig = {
         },
         {
           kind: "paragraph",
-          text: "When a plateau hits anyway, the cause is usually upstream: hand synchronization ([speed and sync exercises](/guitar-speed-hand-synchronization-exercises)), fretboard blind spots ([scale practice routine](/guitar-scale-practice-routine)), a week that never actually happened ([daily practice plan](/daily-guitar-practice-plan)), or simple under-recovery.",
+          text: "When a plateau hits anyway, the cause is usually upstream: hand synchronization ([speed and sync exercises](/guitar-speed-hand-synchronization-exercises)), fretboard blind spots ([scale practice routine](/guitar-scale-practice-routine)), a week that never actually happened ([daily guitar practice routine](/daily-guitar-practice-plan)), or simple under-recovery.",
         },
       ],
     },

@@ -119,7 +119,7 @@ const StartButton = ({
   <Link
     href={INTERACTIVE_PRACTICE_START_HREF}
     onClick={() => trackSignupCtaClicked(location)}
-    className='inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-300 hover:bg-cyan-400'>
+    className='inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-zinc-950 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 hover:bg-zinc-200'>
     {children}
     <ArrowRight className='h-4 w-4' aria-hidden='true' />
   </Link>

@@ -36,7 +36,7 @@ export const LibraryHeroSection = ({ totalSongs }: LibraryHeroSectionProps) => {
             Guitar Song Library
           </span>
 
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-white leading-[0.9] font-display mb-6">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-white leading-[0.9] font-landingHeading mb-6">
             Every guitar song
             <br />
             <span className="text-zinc-500">you want to learn.</span>
@@ -50,7 +50,7 @@ export const LibraryHeroSection = ({ totalSongs }: LibraryHeroSectionProps) => {
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Link href="/signup">
-              <Button className="h-12 px-8 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-lg transition-colors">
+              <Button className="h-12 px-8 bg-white hover:bg-zinc-200 text-black font-bold rounded-lg transition-colors">
                 Track Your Songs Free
                 <ArrowRight className="h-4 w-4" />
               </Button>

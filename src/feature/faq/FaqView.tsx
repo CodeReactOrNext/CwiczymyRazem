@@ -71,7 +71,7 @@ const FaqView = () => {
   return (
     <div className='mx-auto w-full max-w-4xl space-y-6 p-4 font-openSans md:p-8'>
       <div className='rounded-lg bg-zinc-900/40 p-6 sm:p-8'>
-        <h1 className='text-2xl font-bold text-zinc-100 md:text-4xl'>
+        <h1 className='font-landingHeading text-2xl font-bold text-zinc-100 md:text-4xl'>
           {t("faq")}
         </h1>
         <p className='mt-6 max-w-2xl text-base leading-relaxed text-zinc-300'>

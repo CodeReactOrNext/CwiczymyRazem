@@ -17,10 +17,10 @@ const BASE_URL = 'https://riff.quest';
  * dates stay declared here; bump one when you actually edit that page.
  */
 const INFO_PAGES = [
-  { path: '/', lastmod: '2026-09-05', changefreq: 'weekly', priority: '1.0' },
-  { path: '/about', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.5' },
-  { path: '/faq', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.5' },
-  { path: '/how-it-works', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.6' },
+  { path: '/', lastmod: '2026-11-27', changefreq: 'weekly', priority: '1.0' },
+  { path: '/about', lastmod: '2026-11-27', changefreq: 'monthly', priority: '0.5' },
+  { path: '/faq', lastmod: '2026-11-27', changefreq: 'monthly', priority: '0.5' },
+  { path: '/how-it-works', lastmod: '2026-11-27', changefreq: 'monthly', priority: '0.6' },
   { path: '/interactive-guitar-practice', lastmod: '2026-09-19', changefreq: 'monthly', priority: '0.8' },
   { path: '/guitar-practice-planner', lastmod: '2026-09-20', changefreq: 'monthly', priority: '0.8' },
   { path: '/features/guitar-learning-path', lastmod: '2026-09-28', changefreq: 'monthly', priority: '0.8' },
@@ -34,11 +34,11 @@ const INFO_PAGES = [
   { path: '/features/guitar-progress-tracker', lastmod: '2026-10-29', changefreq: 'monthly', priority: '0.8' },
   { path: '/features/guitar-boss-fights', lastmod: '2026-10-29', changefreq: 'monthly', priority: '0.8' },
   { path: '/features/ai-guitar-practice-assistant', lastmod: '2026-11-01', changefreq: 'monthly', priority: '0.8' },
-  { path: '/contact', lastmod: '2026-07-03', changefreq: 'monthly', priority: '0.5' },
-  { path: '/tools', lastmod: '2026-09-08', changefreq: 'monthly', priority: '0.6' },
+  { path: '/contact', lastmod: '2026-11-27', changefreq: 'monthly', priority: '0.5' },
+  { path: '/tools', lastmod: '2026-11-27', changefreq: 'monthly', priority: '0.6' },
   { path: '/tools/tuner', lastmod: '2026-09-08', changefreq: 'monthly', priority: '0.8' },
   { path: '/tools/metronome', lastmod: '2026-09-24', changefreq: 'monthly', priority: '0.8' },
-  { path: '/privacy-policy', lastmod: '2026-11-01', changefreq: 'monthly', priority: '0.3' },
+  { path: '/privacy-policy', lastmod: '2026-11-05', changefreq: 'monthly', priority: '0.3' },
   { path: '/terms-of-service', lastmod: '2026-11-01', changefreq: 'monthly', priority: '0.3' },
 ];
 

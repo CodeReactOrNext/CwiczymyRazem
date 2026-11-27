@@ -7,7 +7,7 @@ export const snowHeyOh: SongGuide = {
   artist: "Red Hot Chili Peppers",
   author: "Michael Apfel",
   publishedAt: "2026-08-14",
-  updatedAt: "2026-08-14",
+  updatedAt: "2026-10-04",
   seo: {
     metaTitle: "How to Play Snow (Hey Oh) on Guitar: Riff Shapes & Picking",
     metaDescription:

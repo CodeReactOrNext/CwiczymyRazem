@@ -1,8 +1,9 @@
 import { Button } from "assets/components/ui/button";
+import { MarketingNav } from "components/MarketingNav/MarketingNav";
 import { Footer } from "feature/landing/components/Footer";
+import { jakartaLanding } from "feature/landing/lib/fonts";
 import AppLayout from "layouts/AppLayout";
 import Head from "next/head";
-import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import type { ReactElement } from "react";
@@ -48,40 +49,35 @@ const AboutPage: NextPageWithLayout = () => {
           name='twitter:image'
           content='https://riff.quest/images/og-image.png'
         />
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "AboutPage",
+              name: "About Riff Quest",
+              url: "https://riff.quest/about",
+              mainEntity: { "@type": "Organization", name: "Riff Quest", url: "https://riff.quest", logo: "https://riff.quest/favicon/apple-touch-icon.png" },
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://riff.quest" },
+                { "@type": "ListItem", position: 2, name: "About Riff Quest", item: "https://riff.quest/about" },
+              ],
+            },
+          ],
+        }),
+          }}
+        />
       </Head>
 
       <div
-        className={!isLogged ? "min-h-screen bg-zinc-950 text-zinc-100" : ""}>
+        className={!isLogged ? `${jakartaLanding.variable} min-h-screen bg-zinc-950 text-zinc-100` : ""}>
         {!isLogged && (
-          <nav className='bg-zinc-950/50 backdrop-blur-xl'>
-            <div className='mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8'>
-              <Link
-                href='/'
-                className='flex items-center gap-2 rounded focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500'>
-                <Image
-                  src='/images/longlightlogo.svg'
-                  alt='Riff Quest'
-                  width={120}
-                  height={32}
-                  className='h-6 w-auto'
-                  priority
-                />
-              </Link>
-              <div className='flex items-center gap-4'>
-                <Link
-                  href='/login'
-                  className='rounded text-sm font-medium text-zinc-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 hover:text-white'>
-                  Login
-                </Link>
-                <Button
-                  asChild
-                  size='sm'
-                  className='rounded-full bg-cyan-500 text-black hover:bg-cyan-400'>
-                  <Link href='/signup'>Start Free</Link>
-                </Button>
-              </div>
-            </div>
-          </nav>
+          <MarketingNav spacer />
         )}
 
         <div className='mx-auto max-w-3xl px-6 py-20'>
@@ -89,7 +85,7 @@ const AboutPage: NextPageWithLayout = () => {
             <p className='mb-4 text-xs font-black tracking-[0.4em] text-cyan-500'>
               About
             </p>
-            <h1 className='mb-6 text-4xl font-black text-white'>
+            <h1 className='mb-6 font-landingHeading text-4xl font-black text-white'>
               Built by a guitarist,
               <br />
               for guitarists.
@@ -154,7 +150,13 @@ const AboutPage: NextPageWithLayout = () => {
                     className='font-semibold text-amber-400 underline underline-offset-2 hover:text-amber-300'>
                     Buy Me a Coffee
                   </Link>
-                  . If it helps your playing, chip in to keep it growing.
+                  . If it helps your playing, chip in to keep it growing.{" "}
+                  <Link
+                    href='/blog/why-riff-quest-is-free'
+                    className='font-semibold text-amber-400 underline underline-offset-2 hover:text-amber-300'>
+                    Why it is free
+                  </Link>
+                  .
                 </p>
               </div>
               <div className='rounded-lg bg-zinc-900/40 p-6'>

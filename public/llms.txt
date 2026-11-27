@@ -23,8 +23,7 @@
 - [Daily Guitar Practice Plan](https://riff.quest/daily-guitar-practice-plan) - Ready-made 15/30/60-minute daily routines and consistency systems.
 - [Song Library](https://riff.quest/song-library) - Community song library with difficulty ratings rated by real guitarists.
 - [Blog](https://riff.quest/blog) - Knowledge hub for guitarists, featuring technique tips and practice psychology.
-- [Practice Habits](https://riff.quest/blog/practice-habits) - Comprehensive guide on building effective guitar practice habits.
-- [Guitar Practice Routine](https://riff.quest/blog/guitar-practice-routine) - Expert advice on structuring your daily practice routine.
+- [Guitar Tuner](https://riff.quest/tools/tuner) and [Metronome](https://riff.quest/tools/metronome) - Free browser tools.
 - [Guitar Practice Tracker](https://riff.quest/blog/guitar-practice-tracker) - Detailed information on how to use the Riff Quest tracking features.
 - [FAQ](https://riff.quest/faq) - Answers to common questions about the platform.
 - [About](https://riff.quest/about) - Learn about the mission and vision behind Riff Quest.

@@ -847,6 +847,7 @@
     "restored": "Restauriert"
   },
   "traits_ui": {
+    "amp_total": "Aktuell: ×{{count}} = {{total}} Fame/h",
     "more": "+{{count}} weitere"
   },
   "in_service": {
@@ -1447,7 +1448,10 @@
     "owned_one": "Du hast {{count}}",
     "owned_other": "Du hast {{count}}",
     "owned": "Du hast {{count}}",
-    "imprint_body": "Ein Merkmal mit unverändertem Wert. Setz es in eine Gitarre oder ein Pedal ein: Das kostet Fame, mehr für jedes Merkmal, das das Instrument schon hat, und ein Instrument trägt höchstens drei.",
+    "imprint_body": {
+      "guitar": "Ein Gitarren-Merkmal mit unverändertem Wert. Es passt nur in eine Gitarre, nie in ein Pedal: Das Einsetzen kostet Fame, mehr für jedes Merkmal, das die Gitarre schon hat, und eine Gitarre trägt höchstens drei.",
+      "effect": "Ein Pedal-Merkmal mit unverändertem Wert. Es passt nur in ein Pedal, nie in eine Gitarre: Das Einsetzen kostet Fame, mehr für jedes Merkmal, das das Pedal schon hat, und ein Pedal trägt höchstens drei."
+    },
     "extractor_body": "Ein Einweg-Werkzeug aus der Parts Crate. Rechtsklick auf ein Instrument mit Merkmal und Merkmal extrahieren wählen: Das Merkmal kommt als Abdruck heraus, den du verkaufen, anbieten oder woanders einsetzen kannst.",
     "insert_into": "In ein Instrument einsetzen…",
     "insert_title": "Merkmal einsetzen",
