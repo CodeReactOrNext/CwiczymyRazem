@@ -43,13 +43,17 @@ import { RecordingViewModal } from "feature/recordings/components/RecordingViewM
 import { SupportAvatarRing } from "feature/supportTeam/components/SupportAvatarRing";
 import { SupportBadge } from "feature/supportTeam/components/SupportBadge";
 import { useSupportTeam } from "feature/supportTeam/hooks/useSupportTeam";
+import { m } from "framer-motion";
+import { useMediaQuery } from "hooks/useMediaQuery";
 import { useOnlineUsers } from "hooks/useOnlineUsers";
 import { useTranslation } from "hooks/useTranslation";
+import { isKeyboardOpen, useVisualViewport } from "hooks/useVisualViewport";
 import {
   type ActivityPreview,
   ActivityStartModal,
 } from "layouts/LogsBoxLayout/components/Logs/ActivityStartModal";
 import { useDateFnsLocale } from "lib/i18n/dateLocale";
+import { transitions } from "lib/motion/motion";
 import { ArrowDown, Ellipsis } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TOUCH_TARGET } from "utils/touchTarget";
@@ -63,6 +67,9 @@ const BOTTOM_SLACK_PX = 80;
  */
 const PRESSABLE =
   "[-webkit-touch-callout:none] [@media(hover:none)]:select-none";
+
+/** Your message rising into place as you send it: the app's spring, let to overshoot a touch. */
+const SEND_IN = { ...transitions.spring, damping: 24 };
 
 /** The words of a message, with the people it tagged picked out. */
 const MessageText = ({
@@ -184,6 +191,7 @@ const MessageRow = ({
   avatar,
   tagsMe,
   isFlashing,
+  isFresh,
   handlers,
 }: {
   msg: ChatMessageType;
@@ -192,6 +200,8 @@ const MessageRow = ({
   avatar: React.ReactNode;
   tagsMe: boolean;
   isFlashing: boolean;
+  /** Just sent from here — it rises in once; the history loads still. */
+  isFresh: boolean;
   handlers: MessageHandlers;
 }) => {
   const longPress = useLongPress(() => handlers.onOpenMenu(msg));
@@ -236,22 +246,26 @@ const MessageRow = ({
                 onReply={() => handlers.onReply(msg)}
                 className={cn("absolute -top-12", isMe ? "right-0" : "left-0")}
               />
-              <div
+              <m.div
+                initial={isFresh ? { opacity: 0, y: 14, scale: 0.94 } : false}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={SEND_IN}
+                style={{ transformOrigin: isMe ? "bottom right" : "bottom left" }}
                 className={cn(
-                  "flex flex-col gap-2.5 rounded-lg px-3.5 py-2.5 text-sm leading-relaxed transition-colors [overflow-wrap:anywhere] sm:px-4",
+                  "flex flex-col gap-2.5 rounded-[18px] px-3.5 py-2.5 text-[15px] leading-relaxed transition-colors [overflow-wrap:anywhere] sm:px-4",
                   isMe
                     ? "bg-cyan-500/20 text-cyan-50"
                     : tagsMe
                       ? "bg-amber-500/15 text-amber-50"
                       : "bg-white/5 text-zinc-100",
-                  isFirst && (isMe ? "rounded-tr" : "rounded-tl"),
+                  isFirst && (isMe ? "rounded-tr-md" : "rounded-tl-md"),
                   isFlashing && "bg-cyan-500/30",
                 )}>
                 {msg.replyTo && (
                   <button
                     type='button'
                     onClick={() => handlers.onJumpTo(msg.replyTo!.id)}
-                    className='flex min-w-0 max-w-full flex-col gap-0.5 rounded bg-white/5 px-3 py-2 text-left text-sm leading-snug transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'>
+                    className='flex min-w-0 max-w-full flex-col gap-0.5 rounded-xl bg-white/5 px-3 py-2 text-left text-sm leading-snug transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60'>
                     <span className='font-semibold text-zinc-200'>
                       ↪ {msg.replyTo.username}
                     </span>
@@ -274,7 +288,7 @@ const MessageRow = ({
                     />
                   </div>
                 )}
-              </div>
+              </m.div>
             </div>
             <MoreButton onClick={() => handlers.onOpenMenu(msg)} />
           </div>
@@ -386,6 +400,12 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
   const atBottomRef = useRef(true);
   const lastMessageIdRef = useRef<string | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
+  // While the keyboard is up on a phone the room is capped to what is left above it, so the
+  // composer sits on the keyboard and the newest messages stay in view right above it.
+  const isPhone = useMediaQuery("(max-width: 639px)");
+  const [isComposing, setIsComposing] = useState(false);
+  const viewport = useVisualViewport(isPhone && isComposing);
+  const keyboardOpen = isKeyboardOpen(viewport);
   // The newest message the player has had on screen — whatever came after it is "new".
   const [lastSeenId, setLastSeenId] = useState<string | null>(null);
 
@@ -416,6 +436,24 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
       el.scrollTop = el.scrollHeight;
     }
   }, [lastMessage, currentUserId]);
+
+  // The room shrinks when the keyboard opens (and grows when it closes): whoever was reading the
+  // newest messages keeps them, instead of the bottom of the room ending up under the composer.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver(() => {
+      if (atBottomRef.current) el.scrollTop = el.scrollHeight;
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Once the room has shrunk to fit above the keyboard, bring the field back into view if the
+  // browser had panned the page away from it.
+  useEffect(() => {
+    if (keyboardOpen) inputRef.current?.scrollIntoView({ block: "nearest" });
+  }, [keyboardOpen]);
 
   const handleScroll = () => {
     const el = scrollRef.current;
@@ -534,7 +572,15 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
   return (
     // On a phone the room already sits in the feed's card, so it drops its own surface there
     // rather than nesting a second card (and its padding) inside the first.
-    <div className='flex h-full flex-col overflow-hidden sm:rounded-lg sm:bg-zinc-950/40'>
+    <div
+      className='flex h-full flex-col overflow-hidden sm:rounded-lg sm:bg-zinc-950/40'
+      style={keyboardOpen && viewport ? { maxHeight: viewport.height } : undefined}
+      onFocus={(event) => {
+        if ((event.target as EventTarget) === inputRef.current) setIsComposing(true);
+      }}
+      onBlur={(event) => {
+        if ((event.target as EventTarget) === inputRef.current) setIsComposing(false);
+      }}>
       <div className='relative min-h-0 flex-1'>
         <div
           ref={scrollRef}
@@ -632,11 +678,14 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
                         tagsMe={
                           !isMe &&
                           !!(
-                            msg.mentions?.some((m) => m.id === currentUserId) ||
+                            msg.mentions?.some((mention) => mention.id === currentUserId) ||
                             msg.replyTo?.userId === currentUserId
                           )
                         }
                         isFlashing={flashMessageId === msg.id}
+                        // A write still on its way to the server has no timestamp yet: that is
+                        // the message just sent from here, not one loaded with the history.
+                        isFresh={isMe && !msg.timestamp}
                         handlers={handlers}
                       />
                     ))}
@@ -646,6 +695,15 @@ const Chat = ({ chatPath = GLOBAL_CHAT_PATH }: { chatPath?: string } = {}) => {
             </div>
           )}
         </div>
+
+        {/* On a phone "typing…" floats here rather than taking a line under the composer. */}
+        {typingNames.length > 0 && unseenCount === 0 && (
+          <p
+            aria-live='polite'
+            className='pointer-events-none absolute bottom-2 left-2 max-w-[70%] truncate rounded-full bg-zinc-900 px-3 py-1 text-xs text-zinc-400 sm:hidden'>
+            {typingLabel(typingNames)}
+          </p>
+        )}
 
         {unseenCount > 0 && (
           <Button

@@ -28,6 +28,8 @@ vi.mock("feature/chat/hooks/useChatTyping", () => ({
   }),
   typingLabel: () => null,
 }));
+// jsdom has no matchMedia; the room reads it only to size itself above a phone's keyboard.
+vi.mock("hooks/useMediaQuery", () => ({ useMediaQuery: () => false }));
 vi.mock("hooks/useOnlineUsers", () => ({
   useOnlineUsers: () => ({ onlineUsers: [], isDbEnabled: true }),
 }));

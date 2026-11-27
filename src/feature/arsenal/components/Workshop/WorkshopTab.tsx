@@ -5,8 +5,9 @@ import { useTranslation } from "hooks/useTranslation";
 import { useState } from "react";
 
 import { InServiceTags } from "../InServiceTags";
+import { Segment, SegmentGroup } from "../SegmentedControl";
+import { PartsForge } from "./PartsForge";
 import { ReadyMark } from "./ReadyMark";
-import { WalletStrip } from "./WalletStrip";
 import { WorkshopBench } from "./WorkshopBench";
 import { WorkshopRack } from "./WorkshopRack";
 
@@ -15,14 +16,22 @@ interface WorkshopTabProps {
   fame: number;
 }
 
+type WorkshopView = "gear" | "parts";
+
 /**
  * The crafting half of the scrap loop: spend salvaged parts to restore gear and
  * push its build level. There is no level cap — the cost curve in `data/workshop.ts`
  * is what stops you.
+ *
+ * Two rooms, one at a time: Gear is the bench with the instrument on it, Parts
+ * is the anvil where loose parts are reworked up a tier. Both used to share one
+ * screen with the whole parts bin unfolded above the bench, which was all of it
+ * at once and none of it clickable.
  */
 export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
-  const { entries, readyIds } = useBenchReadiness(data);
+  const { entries, readyIds, readyStacks } = useBenchReadiness(data);
   const { t } = useTranslation("arsenal");
+  const [view, setView] = useState<WorkshopView>("gear");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [rackOpen, setRackOpen] = useState(false);
 
@@ -32,10 +41,37 @@ export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
   const selected =
     entries.find((e) => e.id === selectedId) ?? entries[0] ?? null;
 
+  const switcher = (
+    <SegmentGroup aria-label={t("workshop.rooms.label")}>
+      <Segment active={view === "gear"} onClick={() => setView("gear")}>
+        {t("workshop.rooms.gear")}
+        {readyIds.size > 0 && <ReadyMark count={readyIds.size} />}
+      </Segment>
+      <Segment active={view === "parts"} onClick={() => setView("parts")}>
+        {t("workshop.rooms.parts")}
+        {readyStacks > 0 && <ReadyMark count={readyStacks} />}
+      </Segment>
+    </SegmentGroup>
+  );
+
+  if (view === "parts") {
+    return (
+      <div className='flex flex-col gap-6'>
+        {switcher}
+        <PartsForge wallet={data?.parts ?? []} fame={fame} />
+      </div>
+    );
+  }
+
   if (entries.length === 0) {
     return (
-      <div className='flex justify-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
-        <p className='max-w-sm text-sm text-zinc-400'>{t("workshop.empty")}</p>
+      <div className='flex flex-col gap-6'>
+        {switcher}
+        <div className='flex justify-center rounded-lg bg-zinc-900/40 px-6 py-20 text-center'>
+          <p className='max-w-sm text-sm text-zinc-400'>
+            {t("workshop.empty")}
+          </p>
+        </div>
       </div>
     );
   }
@@ -47,7 +83,7 @@ export const WorkshopTab = ({ data, fame }: WorkshopTabProps) => {
 
   return (
     <div className='flex flex-col gap-6'>
-      <WalletStrip parts={data?.parts ?? []} />
+      {switcher}
 
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] lg:items-start'>
         {/* Below lg the rack is a sheet: on a phone it used to sit above the

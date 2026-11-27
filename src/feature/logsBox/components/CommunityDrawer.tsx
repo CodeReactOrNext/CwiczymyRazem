@@ -1,8 +1,10 @@
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { useCommunityDrawer } from "feature/logsBox/hooks/useCommunityDrawer";
 import LogsBoxView from "feature/logsBox/view/LogsBoxView";
+import { useMediaQuery } from "hooks/useMediaQuery";
 import { useOnlineUsers } from "hooks/useOnlineUsers";
 import { useTranslation } from "hooks/useTranslation";
+import { useVisualViewport } from "hooks/useVisualViewport";
 import { Interpolate } from "lib/i18n/Interpolate";
 
 /**
@@ -51,12 +53,22 @@ export const CommunityDrawer = () => {
   const { t } = useTranslation("feed");
   const isOpen = useCommunityDrawer((state) => state.isOpen);
   const setOpen = useCommunityDrawer((state) => state.setOpen);
+  // On a phone the sheet is the whole screen, and the keyboard opens over its bottom — the
+  // chat's composer. Sized to what is left above the keyboard, the composer sits right on top
+  // of it and the header stays put, instead of the browser panning the whole sheet up.
+  const isPhone = useMediaQuery("(max-width: 639px)");
+  const viewport = useVisualViewport(isOpen && isPhone);
 
   return (
     <Sheet open={isOpen} onOpenChange={setOpen}>
       <SheetContent
         side='right'
         aria-describedby={undefined}
+        style={
+          viewport
+            ? { top: viewport.offsetTop, bottom: "auto", height: viewport.height }
+            : undefined
+        }
         // The sheet is portalled out of the themed wrapper, so it brings the theme along — otherwise
         // every themed colour in the feed (card backgrounds, muted text) silently resolves to nothing.
         className='dark-theme flex w-full flex-col gap-0 p-0 sm:max-w-xl'>

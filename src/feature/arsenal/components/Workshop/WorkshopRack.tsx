@@ -2,6 +2,7 @@ import { PRESSABLE } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { SearchInput } from "components/SearchInput/SearchInput";
 import { RARITY_STYLES } from "feature/arsenal/components/RarityBadge";
+import { MAX_ITEM_TRAITS } from "feature/arsenal/data/traitCraft";
 import type { WorkshopEntry } from "feature/arsenal/utils/workshopEntries";
 import { useTranslation } from "hooks/useTranslation";
 import { useMemo, useState } from "react";
@@ -69,7 +70,9 @@ export const WorkshopRack = ({
           <button
             key={f.id}
             onClick={() => setFilter(f.id)}
-            className={cn(PRESSABLE, "border-b-black/25", 
+            className={cn(
+              PRESSABLE,
+              "border-b-black/25",
               "flex flex-1 items-center justify-center gap-1.5 rounded px-2 py-1.5 text-xs font-semibold transition-colors",
               "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arsenal-accent/60",
               filter === f.id
@@ -135,8 +138,30 @@ export const WorkshopRack = ({
                 </span>
 
                 <span className='flex min-w-0 flex-1 flex-col gap-2'>
-                  <span className='truncate text-sm font-semibold leading-tight text-arsenal-text-primary'>
-                    {entry.name}
+                  <span className='flex min-w-0 items-center gap-2'>
+                    <span className='truncate text-sm font-semibold leading-tight text-arsenal-text-primary'>
+                      {entry.name}
+                    </span>
+                    {/* Trait sockets, filled or not — the bench's three stones in miniature. */}
+                    <span
+                      className='flex shrink-0 gap-1'
+                      title={t("trait_craft.slots", {
+                        count: entry.traits.length,
+                        max: MAX_ITEM_TRAITS,
+                      })}>
+                      {Array.from({ length: MAX_ITEM_TRAITS }, (_, i) => (
+                        <span
+                          key={i}
+                          aria-hidden
+                          className={cn(
+                            "h-[7px] w-[7px] rotate-45 rounded-[2px]",
+                            i < entry.traits.length
+                              ? "bg-emerald-400"
+                              : "bg-zinc-700",
+                          )}
+                        />
+                      ))}
+                    </span>
                   </span>
                   {/* Sits above the condition meter rather than off to the side:
                       the rack is scanned down the names, and this is part of

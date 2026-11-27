@@ -3,16 +3,20 @@
 import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
 import { Cookie } from "lucide-react";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
+/**
+ * On a phone the note is a low strip along the bottom edge: at the top it sat
+ * on the hero's headline, the first thing a visitor from an ad reads. From sm
+ * up it stays a small card in the top-right corner, clear of the headline.
+ */
 export const CookieBanner = () => {
   const { t } = useTranslation("common");
+  // Only ever turned on from the effect, so the server render has no banner.
   const [isVisible, setIsVisible] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const consent = localStorage.getItem("cookie-consent");
 
     if (!consent) {
@@ -21,6 +25,7 @@ export const CookieBanner = () => {
       }, 2000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, []);
 
   const handleAccept = () => {
@@ -28,32 +33,30 @@ export const CookieBanner = () => {
     setIsVisible(false);
   };
 
-  if (!mounted || !isVisible) return null;
+  if (!isVisible) return null;
 
   const content = (
-    <div className="fixed top-6 right-6 w-[280px] z-[2147483647] animate-in fade-in slide-in-from-right-5 duration-slow"
-    >
-      <div className="rounded-lg border border-white/10 bg-zinc-900 shadow-2xl p-4 backdrop-blur-md">
-        <div className="flex items-start gap-3 mb-3">
-          <Cookie className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-zinc-400 leading-relaxed">
+    <div className='fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] z-[2147483647] duration-slow animate-in fade-in slide-in-from-bottom-3 sm:inset-x-auto sm:bottom-auto sm:right-6 sm:top-6 sm:w-[280px] sm:slide-in-from-bottom-0 sm:slide-in-from-right-5'>
+      <div className='flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900 p-3 sm:flex-col sm:items-stretch sm:p-4'>
+        <div className='flex min-w-0 flex-1 items-start gap-3'>
+          <Cookie className='mt-0.5 hidden h-4 w-4 shrink-0 text-zinc-400 sm:block' />
+          <p className='text-[11px] leading-relaxed text-zinc-400'>
             {t("cookies.description") as string}
           </p>
         </div>
         <Button
           onClick={handleAccept}
-          size="sm"
-          className="w-full h-8 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-[11px] transition-all"
-        >
+          size='sm'
+          className='h-8 shrink-0 px-4 text-[11px] font-bold sm:w-full'>
           {t("cookies.accept") as string}
         </Button>
       </div>
     </div>
   );
 
-  const overlaysElement = typeof document !== 'undefined' ? document.getElementById("overlays") : null;
+  const overlaysElement =
+    typeof document !== "undefined"
+      ? document.getElementById("overlays")
+      : null;
   return overlaysElement ? createPortal(content, overlaysElement) : null;
 };
-
-
-

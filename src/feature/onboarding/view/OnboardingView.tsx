@@ -41,7 +41,6 @@ import {
   FIRST_HUNT_DURATION_LABEL,
   FIRST_HUNT_PREVIEWS,
   FIRST_RIFF_DURATION_LABEL,
-  FIRST_RIFF_IMAGE,
   getFirstHuntHref,
   getFirstRiffExercise,
   getFirstRiffHref,
@@ -51,6 +50,7 @@ import { firebaseSaveOnboarding } from "../services/onboarding.service";
 import { getTourHref } from "../tour/tourSteps";
 import type { OnboardingLevel, OnboardingPlayChoice } from "../types";
 import { HuntPreview } from "./HuntPreview";
+import { RiffPreview } from "./RiffPreview";
 
 const FOCUS_RING =
   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60";
@@ -363,7 +363,8 @@ const OnboardingView = () => {
   };
   const isPicked = (key: string) => picked === key;
   const isDimmed = (key: string) => busy && picked !== key;
-  const riffBpm = getFirstRiffExercise(level).metronomeSpeed?.recommended;
+  const riffExercise = getFirstRiffExercise(level);
+  const riffBpm = riffExercise.metronomeSpeed?.recommended;
   const huntPreview = FIRST_HUNT_PREVIEWS[level];
 
   return (
@@ -530,13 +531,7 @@ const OnboardingView = () => {
                     cornerClassName='left-2.5 top-auto bottom-2.5 right-auto sm:bottom-auto sm:left-auto sm:right-3 sm:top-3'
                     className='overflow-hidden sm:flex-col'>
                     <span className='relative block min-h-[128px] w-28 shrink-0 bg-zinc-950 sm:h-40 sm:w-full'>
-                      <Image
-                        src={FIRST_RIFF_IMAGE}
-                        alt=''
-                        fill
-                        sizes='(min-width: 640px) 440px, 112px'
-                        className='object-cover object-left'
-                      />
+                      <RiffPreview exercise={riffExercise} />
                     </span>
                     <FirstMinuteText
                       title={t("first_step.riff_title")}

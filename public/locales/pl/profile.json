@@ -474,6 +474,7 @@
     "level": "Poziom",
     "xp": "{{current}} / {{total}} XP",
     "first_session": "Zagraj pierwszą sesję",
+    "first_lesson": "Guitar Fundamentals · lekcja 1: Before You Begin",
     "start": "Start"
   }
 }

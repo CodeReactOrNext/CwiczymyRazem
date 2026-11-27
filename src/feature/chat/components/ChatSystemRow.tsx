@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
@@ -10,9 +11,6 @@ import type { ChatMessageType } from "feature/chat/types/chat.types";
 import { useTranslation } from "hooks/useTranslation";
 import { Hand, Shield } from "lucide-react";
 import type { ReactNode } from "react";
-
-const FOCUS_RING =
-  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/60";
 
 /** A quiet line in the middle of the room: an icon, what happened, sometimes a button. */
 const EventLine = ({
@@ -111,22 +109,16 @@ const JoinRow = ({
           {message.username}
         </span>
       </UserTooltip>
-      <p className='rounded-lg rounded-tl bg-white/5 px-3 py-2 text-sm text-zinc-300 sm:px-4'>
+      <p className='rounded-[18px] rounded-tl-md bg-white/5 px-3.5 py-2.5 text-[15px] text-zinc-300 sm:px-4'>
         {text}
       </p>
       {(onSayHi || greeters.length > 0) && (
         <div className='mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2'>
           {onSayHi && (
-            <button
-              type='button'
-              onClick={onSayHi}
-              className={cn(
-                "flex min-h-11 items-center gap-2 rounded-lg bg-cyan-500/15 px-4 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/25 active:click-behavior",
-                FOCUS_RING,
-              )}>
-              <Hand className='h-4 w-4' />
+            <Button type='button' size='touch' onClick={onSayHi}>
+              <Hand />
               {t("system.say_hi")}
-            </button>
+            </Button>
           )}
           {greeters.length > 0 && <Greeters greeters={greeters} />}
         </div>

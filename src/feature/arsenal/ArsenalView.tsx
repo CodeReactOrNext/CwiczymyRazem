@@ -105,8 +105,9 @@ import type {
 const ArsenalTabs = () => {
   const { t } = useTranslation("arsenal");
   const { data, isLoading } = useArsenalData();
-  // Gear with a bench job ready right now — counted on the Workshop tab.
-  const { readyIds: benchReadyIds } = useBenchReadiness(data);
+  // Bench jobs and part reworks ready right now — counted on the Workshop tab.
+  const { readyIds: benchReadyIds, readyStacks } = useBenchReadiness(data);
+  const benchReady = benchReadyIds.size + readyStacks;
   const { ref: railRef, edges: tabEdges } = useRailEdges<HTMLDivElement>();
   const userStats = useAppSelector(selectCurrentUserStats);
   const fame = userStats?.fame || 0;
@@ -262,8 +263,8 @@ const ArsenalTabs = () => {
                       )}
                     </span>
                     <span className="whitespace-nowrap">{t(`view.tabs.${tab}`)}</span>
-                    {tab === "workshop" && benchReadyIds.size > 0 && (
-                      <ReadyMark count={benchReadyIds.size} />
+                    {tab === "workshop" && benchReady > 0 && (
+                      <ReadyMark count={benchReady} />
                     )}
                   </TabsTrigger>
                 );

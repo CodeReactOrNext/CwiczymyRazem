@@ -227,7 +227,9 @@
     "cost_needed": "Faltan {{cost}}",
     "pity_new": "Garantía cumplida — un modelo que aún no estaba en el Dex",
     "pity_top": "Garantía cumplida — {{rarity}} o mejor",
-    "merge": "Fusionar con tu mejor copia · +{{gain}} niv. ({{before}} → {{after}})"
+    "merge": "Fusionar con tu mejor copia · +{{gain}} niv. ({{before}} → {{after}})",
+    "tap_to_stop": "Toca para detener",
+    "best_copy": "Tu mejor copia"
   },
   "builder": {
     "slots": {
@@ -977,7 +979,42 @@
     "job_with_gain": "{{job}} · +{{count}} niveles",
     "previous_instrument": "Instrumento anterior",
     "next_instrument": "Instrumento siguiente",
-    "n_of_total": "{{n}} de {{total}}"
+    "n_of_total": "{{n}} de {{total}}",
+    "rooms": {
+      "label": "Zona del taller",
+      "gear": "Equipo",
+      "parts": "Piezas"
+    },
+    "forge": {
+      "filter": "Mostrar piezas",
+      "filter_all": "Todas",
+      "filter_ready": "Listas",
+      "nothing_ready": "Ahora no se puede retrabajar nada.",
+      "group": {
+        "guitar": "Piezas de guitarra",
+        "pedal": "Piezas de pedal",
+        "shared": "Ambos"
+      },
+      "pick": "Elige un montón para ponerlo en el yunque.",
+      "top_tier": "Esta pieza ya está en lo más alto de su escalera.",
+      "make": "Forjar",
+      "forging": "Forjando…",
+      "more_needed": "Faltan {{count}}",
+      "fewer": "Menos",
+      "more": "Más",
+      "max": "Máx",
+      "can_make": "Hasta {{count}} con este montón",
+      "can_afford": "Fame para {{count}}",
+      "fame_short": "Faltan {{fame}} de Fame"
+    },
+    "gems": {
+      "title": "Rasgos",
+      "empty": "Vacío",
+      "add": "Añadir rasgo",
+      "socket": "Engaste {{n}} de {{max}}",
+      "no_imprint": "Los rasgos se insertan como impresiones. Consigue una usando un Extractor en otro instrumento.",
+      "add_body": "Elige una impresión para insertar. Cada rasgo que ya tiene sube el precio."
+    }
   },
   "mods": {
     "remove_aria": "Quitar este mod por {{fame}} Fame",

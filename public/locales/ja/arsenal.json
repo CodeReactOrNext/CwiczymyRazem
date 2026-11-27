@@ -227,7 +227,9 @@
     "cost_needed": "{{cost}}必要",
     "pity_new": "保証どおり — まだ見つけていなかったモデル",
     "pity_top": "保証どおり — {{rarity}}以上",
-    "merge": "いちばん良いものに合成 · +{{gain}} Lv（{{before}} → {{after}}）"
+    "merge": "いちばん良いものに合成 · +{{gain}} Lv（{{before}} → {{after}}）",
+    "tap_to_stop": "タップで止める",
+    "best_copy": "一番良い個体"
   },
   "builder": {
     "slots": {
@@ -976,7 +978,42 @@
     "job_with_gain": "{{job}} · +{{count}}レベル",
     "previous_instrument": "前の楽器",
     "next_instrument": "次の楽器",
-    "n_of_total": "{{total}}中{{n}}"
+    "n_of_total": "{{total}}中{{n}}",
+    "rooms": {
+      "label": "工房エリア",
+      "gear": "機材",
+      "parts": "パーツ"
+    },
+    "forge": {
+      "filter": "パーツ表示",
+      "filter_all": "すべて",
+      "filter_ready": "作成可能",
+      "nothing_ready": "今はリワークできるものがありません。",
+      "group": {
+        "guitar": "ギターパーツ",
+        "pedal": "ペダルパーツ",
+        "shared": "共通"
+      },
+      "pick": "スタックを選んで金床に置きましょう。",
+      "top_tier": "このパーツはすでに最上位です。",
+      "make": "鍛える",
+      "forging": "鍛造中…",
+      "more_needed": "あと{{count}}個必要",
+      "fewer": "減らす",
+      "more": "増やす",
+      "max": "最大",
+      "can_make": "このスタックから最大{{count}}個",
+      "can_afford": "Fameは{{count}}個分",
+      "fame_short": "Fameがあと{{fame}}必要"
+    },
+    "gems": {
+      "title": "特性",
+      "empty": "空き",
+      "add": "特性を追加",
+      "socket": "ソケット {{n}}/{{max}}",
+      "no_imprint": "特性はインプリントとして装着します。別の楽器にエクストラクターを使うと手に入ります。",
+      "add_body": "装着するインプリントを選んでください。すでに持っている特性が多いほど価格が上がります。"
+    }
   },
   "mods": {
     "remove_aria": "{{fame}} Fameでこのモッドを外す",

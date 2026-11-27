@@ -105,6 +105,7 @@ import {
   type LogActivityType,
   type LogGroup,
 } from "feature/logs/utils/groupConsecutiveLogs";
+import { groupFeedRuns } from "feature/logs/utils/groupFeedRuns";
 import {
   getGroupAwardedFame,
   getGroupReactionAnchor,
@@ -493,7 +494,7 @@ const LogItem = ({
   return (
     <div
       className={cn(
-        "my-3 flex flex-col flex-nowrap items-start rounded-lg px-4 py-4 transition-all duration-base sm:px-6 sm:py-5 lg:flex-row lg:items-center",
+        "my-4 flex flex-col flex-nowrap items-start rounded-[14px] px-4 py-4 transition-all duration-base sm:px-6 sm:py-5 lg:flex-row lg:items-center",
         banner && "relative overflow-hidden",
         // A painted banner keeps its card dark in both themes — the pictures
         // are night scenes — and opaque, so the page never shows through. A
@@ -782,6 +783,79 @@ type FeedStat =
   | null
   | undefined;
 
+/** Rows a table of runs shows before the rest fold behind "Show more". */
+const VISIBLE_RUN_ROWS = 3;
+
+/**
+ * The runs of one exercise as a table: each named number once at the top, then a row per run in
+ * the same fixed-width columns a single run uses. A column is there when any run has the number;
+ * a run without it shows a quiet dash. Only the newest few rows show until the player asks for
+ * the rest; the columns come from every run, so opening the list doesn't shift them.
+ */
+const FeedRunTable = ({ runs }: { runs: FeedStat[][] }) => {
+  const { t } = useTranslation("feed");
+  const [isExpanded, setIsExpanded] = useState(false);
+  const shownRuns = isExpanded ? runs : runs.slice(0, VISIBLE_RUN_ROWS);
+  const hiddenRuns = runs.length - shownRuns.length;
+  const slotCount = Math.max(...runs.map((run) => run.length));
+  const columns: { slot: number; label: string }[] = [];
+  for (let slot = 0; slot < slotCount; slot += 1) {
+    const named = runs
+      .map((run) => run[slot])
+      .find((stat): stat is { label: string; value: React.ReactNode } =>
+        Boolean(stat),
+      );
+    if (named) columns.push({ slot, label: named.label });
+  }
+
+  return (
+    <>
+      <table className='mt-2 w-full table-fixed border-separate border-spacing-y-1.5 sm:w-auto'>
+        <thead>
+          <tr>
+            {columns.map((column) => (
+              <th
+                key={column.slot}
+                scope='col'
+                className='truncate pb-0.5 text-left text-xs font-normal text-zinc-400 sm:w-[100px]'>
+                {column.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {shownRuns.map((run, index) => (
+            <tr key={index}>
+              {columns.map((column) => {
+                const stat = run[column.slot];
+                return (
+                  <td key={column.slot} className='p-0'>
+                    {stat ? (
+                      <span className='flex items-center gap-1 text-[13px] font-semibold tabular-nums text-zinc-100 sm:text-sm'>
+                        {stat.value}
+                      </span>
+                    ) : (
+                      <span className='text-sm text-zinc-600'>—</span>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {hiddenRuns > 0 && (
+        <button
+          type='button'
+          onClick={() => setIsExpanded(true)}
+          className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "mt-2")}>
+          {t("show_more_count", { count: hiddenRuns })}
+        </button>
+      )}
+    </>
+  );
+};
+
 /**
  * One activity in a feed card, always the same shape: a sentence naming the
  * thing, then its numbers as named columns underneath — what it paid first,
@@ -797,6 +871,7 @@ const FeedRow = ({
   title,
   facts = [],
   stats = [],
+  runs,
 }: {
   thumb?: React.ReactNode;
   title: React.ReactNode;
@@ -804,6 +879,11 @@ const FeedRow = ({
   facts?: React.ReactNode[];
   /** Named numbers under the sentence. Falsy entries are skipped. */
   stats?: FeedStat[];
+  /**
+   * Several runs of the same thing, one stats list each (same slots, newest first). Shown as one
+   * table — the names once, a row of numbers per run — in place of `stats`.
+   */
+  runs?: FeedStat[][];
 }) => {
   const shownFacts = facts.filter(
     (fact) =>
@@ -834,7 +914,9 @@ const FeedRow = ({
             </span>
           )}
         </p>
-      {(thumb || shownStats.length > 0) && (
+      {runs && runs.length > 1 ? (
+        <FeedRunTable runs={runs} />
+      ) : (thumb || shownStats.length > 0) && (
         <div className='mt-2 flex items-center gap-4'>
           {thumb}
           {shownStats.length > 0 && (
@@ -1450,6 +1532,7 @@ const ComponentRow = ({
 /** Renders one activity as feed rows — the avatar and the reaction live once on the group. */
 const GroupedLogLine = ({
   log,
+  runs,
   type,
   songTiers,
   onPreview,
@@ -1457,6 +1540,8 @@ const GroupedLogLine = ({
   onOpenLeaderboard,
 }: {
   log: AnyFirebaseLog;
+  /** Back-to-back runs of this same exercise, `log` first (see groupFeedRuns). */
+  runs?: AnyFirebaseLog[];
   type: LogActivityType;
   songTiers: Record<string, SongTierInfo>;
   onPreview: (preview: ActivityPreview) => void;
@@ -1848,7 +1933,6 @@ const GroupedLogLine = ({
         ]
       : [];
   })();
-  const sessionTimeMs = genericLog.timeSumary?.sumTime ?? 0;
 
   /**
    * The thing a session practiced, inside its sentence. It opens that plan,
@@ -2016,39 +2100,49 @@ const GroupedLogLine = ({
       value: ranked(`#${rank}`, t("feed:leaderboard_place_hint")),
     };
 
-  const mic =
-    genericLog.micPerformance && genericLog.micPerformance.score !== 0
-      ? genericLog.micPerformance
-      : null;
-  const ear =
-    genericLog.earTrainingPerformance &&
-    genericLog.earTrainingPerformance.score !== 0
-      ? genericLog.earTrainingPerformance
-      : null;
+  // Always in this order, so the eye finds the same number in the same column on every card —
+  // and in a table of runs, every run's numbers land in the same slots.
+  const statsFor = (session: FirebaseLogsInterface): FeedStat[] => {
+    const sessionTimeMs = session.timeSumary?.sumTime ?? 0;
+    const mic =
+      session.micPerformance && session.micPerformance.score !== 0
+        ? session.micPerformance
+        : null;
+    const ear =
+      session.earTrainingPerformance &&
+      session.earTrainingPerformance.score !== 0
+        ? session.earTrainingPerformance
+        : null;
 
-  // Always in this order, so the eye finds the same number in the same column on every card.
-  const sessionStats: FeedStat[] = [
-    pointsStat(genericLog.points, t("feed:stat.points")),
-    sessionTimeMs > 0 && {
-      label: t("feed:stat.time"),
-      value: (
-        <span title={t("feed:session_time_hint")}>
-          {formatSessionTime(sessionTimeMs)}
-        </span>
-      ),
-    },
-    mic && scoreStat(mic.score, mic.rank),
-    mic && { label: t("feed:stat.accuracy"), value: `${mic.accuracy}%` },
-    // Older logs and metronome-less exercises carry no tempo — say nothing rather than guess one.
-    mic &&
-      mic.bpm != null && {
-        label: t("feed:stat.tempo"),
-        value: `${mic.bpm} BPM`,
+    return [
+      pointsStat(session.points, t("feed:stat.points")),
+      sessionTimeMs > 0 && {
+        label: t("feed:stat.time"),
+        value: (
+          <span title={t("feed:session_time_hint")}>
+            {formatSessionTime(sessionTimeMs)}
+          </span>
+        ),
       },
-    mic && placeStat(mic.rank),
-    ear && scoreStat(ear.score, ear.rank),
-    ear && placeStat(ear.rank),
-  ];
+      mic && scoreStat(mic.score, mic.rank),
+      mic && { label: t("feed:stat.accuracy"), value: `${mic.accuracy}%` },
+      // Older logs and metronome-less exercises carry no tempo — say nothing rather than guess one.
+      mic &&
+        mic.bpm != null && {
+          label: t("feed:stat.tempo"),
+          value: `${mic.bpm} BPM`,
+        },
+      mic && placeStat(mic.rank),
+      ear && scoreStat(ear.score, ear.rank),
+      ear && placeStat(ear.rank),
+    ];
+  };
+
+  const sessionStats = statsFor(genericLog);
+  const runStats =
+    runs && runs.length > 1
+      ? runs.map((run) => statsFor(run as FirebaseLogsInterface))
+      : undefined;
 
   return (
     <>
@@ -2056,9 +2150,14 @@ const GroupedLogLine = ({
         <FeedRow
           key={index}
           title={subject.title}
-          facts={subject.facts}
+          facts={
+            index === 0 && runStats
+              ? [...(subject.facts ?? []), `×${runStats.length}`]
+              : subject.facts
+          }
           // The session's points, time and score belong to its first row.
           stats={index === 0 ? sessionStats : undefined}
+          runs={index === 0 ? runStats : undefined}
         />
       ))}
 
@@ -2132,10 +2231,12 @@ const GroupedLogItem = ({
 
   // A long run of the same player's activity folds after the newest few, so one busy evening
   // doesn't push everyone else out of the feed.
-  const visibleLogs = isExpanded
-    ? group.logs
-    : group.logs.slice(0, MAX_VISIBLE_LOGS);
-  const hiddenCount = group.logs.length - visibleLogs.length;
+  // Back-to-back runs of one exercise share a row (a table of their numbers) and count as one.
+  const runs = groupFeedRuns(group.logs);
+  const visibleRuns = isExpanded ? runs : runs.slice(0, MAX_VISIBLE_LOGS);
+  const hiddenCount = runs
+    .slice(visibleRuns.length)
+    .reduce((count, run) => count + run.length, 0);
 
   return (
     <LogItem bannerId={worn.banner}>
@@ -2167,6 +2268,7 @@ const GroupedLogItem = ({
               {formatLogTime(date, new Date(), {
                 locale: dateLocale,
                 justNow: t("just_now"),
+                short: true,
               })}
             </span>
           </span>
@@ -2186,13 +2288,14 @@ const GroupedLogItem = ({
         )}
 
         <div className='col-span-2 flex min-w-0 flex-col gap-5 sm:pl-14'>
-          {visibleLogs.map((log, index) => (
+          {visibleRuns.map(([log, ...rest], index) => (
             <GroupedLogLine
               key={
                 (log as { id?: string }).id ??
                 `${getLogTimestampMs(log)}-${index}`
               }
               log={log}
+              runs={rest.length > 0 ? [log, ...rest] : undefined}
               type={getLogActivityType(log)}
               songTiers={songTiers}
               onPreview={onPreview}

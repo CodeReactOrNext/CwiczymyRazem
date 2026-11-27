@@ -23,6 +23,7 @@ import {
 } from "feature/dashboard/context/DashboardContext";
 import { DuelEloBadge } from "feature/duels/components/DuelEloBadge";
 import { CUSTOM_IMAGE_PREFIX } from "feature/guitarBuilder/utils/customGuitar";
+import { LEARNING_PATH_FIRST_STEP_PATH } from "feature/landing/data/learningPath";
 import { HeroLevelStat } from "feature/profile/components/HeroLevelStat";
 import { HomeHero } from "feature/profile/components/HomeHero";
 import { SongTierBadge } from "feature/profile/components/SongTierBadge";
@@ -113,8 +114,12 @@ const ProfileLandingLayout = ({
   // One fact under the title, and only after the session: what today came to.
   // The streak sits in the top bar already, so the hero does not repeat it.
   const todayMs = todayReport?.timeSumary.sumTime ?? 0;
-  const fact =
-    !hasNeverPracticed && isTodayCompleted && todayMs > 0
+  // Before the first session the fact says where Start leads: the first lesson
+  // of the Learning Path, one road with one next step. The Practice tab's full
+  // menu was too many doors for someone who has not played yet.
+  const fact = hasNeverPracticed
+    ? { text: t("landing.first_lesson") }
+    : isTodayCompleted && todayMs > 0
       ? { text: t("week_widget.practiced", { time: convertMsToHM(todayMs) }) }
       : null;
 
@@ -226,7 +231,10 @@ const ProfileLandingLayout = ({
               ? t("landing.practice_more")
               : t("landing.practice"),
           isPrimary: !isTodayCompleted,
-          onClick: () => router.push("/timer"),
+          onClick: () =>
+            router.push(
+              hasNeverPracticed ? LEARNING_PATH_FIRST_STEP_PATH : "/timer",
+            ),
         }}
         guitar={
           isSpecialGuitar

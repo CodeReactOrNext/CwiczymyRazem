@@ -1,7 +1,5 @@
 import { DAILY_GOAL_OPTIONS } from "constants/dailyGoal";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { existsSync } from "fs";
-import { join } from "path";
 import { describe, expect, it } from "vitest";
 
 import type { OnboardingLevel } from "../types";
@@ -12,7 +10,6 @@ import {
   FIRST_HUNT_SECONDS,
   FIRST_RIFF_DURATION_LABEL,
   FIRST_RIFF_EXERCISE_IDS,
-  FIRST_RIFF_IMAGE,
   getFirstHuntExercise,
   getFirstHuntHref,
   getFirstRiffHref,
@@ -50,12 +47,6 @@ describe("DAILY_GOAL_CHOICES", () => {
 });
 
 describe("first riff", () => {
-  it("shows the riff with a screenshot that exists in public/", () => {
-    expect(existsSync(join(process.cwd(), "public", FIRST_RIFF_IMAGE))).toBe(
-      true,
-    );
-  });
-
   it("labels the riff the way the session timer shows 40 s", () => {
     expect(FIRST_RIFF_DURATION_LABEL).toBe("0:40");
   });

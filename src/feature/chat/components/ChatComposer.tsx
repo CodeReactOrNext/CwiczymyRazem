@@ -111,6 +111,8 @@ export const ChatComposer = ({
         .slice(0, MAX_SUGGESTIONS)
     : [];
   const showSuggestions = suggestions.length > 0;
+  // Send lights up once there is something to send — grey until then.
+  const canSend = value.trim().length > 0 || !!attachment;
 
   const readCaret = (text: string, caret: number | null) => {
     setMentionQuery(activeMentionQuery(text, caret ?? text.length));
@@ -248,7 +250,7 @@ export const ChatComposer = ({
           autoCapitalize='sentences'
           enterKeyHint='send'
           className={cn(
-            "min-h-12 flex-1 resize-none rounded-lg bg-zinc-950/50 px-3 py-3 text-base leading-6 text-zinc-100 transition-colors placeholder:text-zinc-400 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-700",
+            "min-h-12 flex-1 resize-none rounded-[14px] bg-zinc-950/50 px-4 py-3 text-base leading-6 text-zinc-100 transition-colors placeholder:text-zinc-400 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-700",
             "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/50",
           )}
           onChange={(event) => {
@@ -265,13 +267,23 @@ export const ChatComposer = ({
         <Button
           type='submit'
           size='icon'
+          variant={canSend ? "default" : "subtle"}
           aria-label={t("composer.send")}
+          // Keeps the field focused: on a phone a tap on Send used to blur it, so the keyboard
+          // dropped and came straight back up for the next message.
+          onMouseDown={(event) => event.preventDefault()}
           className='h-12 w-12 shrink-0 [&_svg]:size-5'>
           <SendHorizontal />
         </Button>
       </form>
 
-      <div className='flex min-h-4 items-center justify-between gap-3 px-1'>
+      {/* On a phone every line counts while the keyboard is up: there "typing…" floats over the
+          bottom of the room instead (Chat), and this row only shows for an error. */}
+      <div
+        className={cn(
+          "min-h-4 items-center justify-between gap-3 px-1",
+          error ? "flex" : "hidden sm:flex",
+        )}>
         <p aria-live='polite' className='truncate text-xs text-zinc-400'>
           {typingText}
         </p>

@@ -227,7 +227,9 @@
     "cost_needed": "{{cost}} needed",
     "pity_new": "Guarantee kept — a model you hadn't found yet",
     "pity_top": "Guarantee kept — {{rarity}} or better",
-    "merge": "Merge into your best copy · +{{gain}} lvl ({{before}} → {{after}})"
+    "merge": "Merge into your best copy · +{{gain}} lvl ({{before}} → {{after}})",
+    "tap_to_stop": "Tap to stop",
+    "best_copy": "Your best copy"
   },
   "builder": {
     "slots": {
@@ -976,7 +978,42 @@
     "job_with_gain": "{{job}} · +{{count}} levels",
     "previous_instrument": "Previous instrument",
     "next_instrument": "Next instrument",
-    "n_of_total": "{{n}} of {{total}}"
+    "n_of_total": "{{n}} of {{total}}",
+    "rooms": {
+      "label": "Workshop room",
+      "gear": "Gear",
+      "parts": "Parts"
+    },
+    "forge": {
+      "filter": "Show parts",
+      "filter_all": "All",
+      "filter_ready": "Ready",
+      "nothing_ready": "Nothing can be reworked right now.",
+      "group": {
+        "guitar": "Guitar parts",
+        "pedal": "Pedal parts",
+        "shared": "Both"
+      },
+      "pick": "Pick a stack to put it on the anvil.",
+      "top_tier": "This part is at the top of its ladder.",
+      "make": "Make",
+      "forging": "Forging…",
+      "more_needed": "{{count}} more needed",
+      "fewer": "Fewer",
+      "more": "More",
+      "max": "Max",
+      "can_make": "Up to {{count}} from this stack",
+      "can_afford": "Fame for {{count}}",
+      "fame_short": "{{fame}} more Fame needed"
+    },
+    "gems": {
+      "title": "Traits",
+      "empty": "Empty",
+      "add": "Add trait",
+      "socket": "Socket {{n}} of {{max}}",
+      "no_imprint": "Traits go in as imprints. Use a Trait Extractor on another instrument to get one.",
+      "add_body": "Pick an imprint to put in. Every trait it already carries raises the price."
+    }
   },
   "mods": {
     "remove_aria": "Take this mod off for {{fame}} Fame",

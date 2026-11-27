@@ -3,11 +3,9 @@ import { useMemo } from "react";
 import { useAppSelector } from "store/hooks";
 
 import type { ArsenalUserData } from "../types/arsenal.types";
+import { countReadyStacks } from "../utils/forgeShelves";
 import { getWorkshopEntries } from "../utils/workshopEntries";
-import {
-  getModTargets,
-  getReadyGearIds,
-} from "../utils/workshopReadiness";
+import { getModTargets, getReadyGearIds } from "../utils/workshopReadiness";
 
 /**
  * What the bench could do right now, worked out once for a whole screen: which
@@ -28,6 +26,8 @@ export const useBenchReadiness = (data: ArsenalUserData | undefined) => {
       fame,
       readyIds: getReadyGearIds(entries, wallet, fame, salvaged),
       modTargets: getModTargets(entries, wallet, fame, salvaged),
+      /** Part stacks the anvil could rework right now. */
+      readyStacks: countReadyStacks(wallet, fame),
     };
   }, [data, fame]);
 };

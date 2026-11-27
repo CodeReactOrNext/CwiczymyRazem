@@ -229,7 +229,9 @@
     "cost_needed": "Potrzeba {{cost}}",
     "pity_new": "Gwarancja zadziałała — model, którego jeszcze nie ma w Dexie",
     "pity_top": "Gwarancja zadziałała — {{rarity}} lub lepsza",
-    "merge": "Scal z najlepszą kopią · +{{gain}} lvl ({{before}} → {{after}})"
+    "merge": "Scal z najlepszą kopią · +{{gain}} lvl ({{before}} → {{after}})",
+    "tap_to_stop": "Stuknij, żeby zatrzymać",
+    "best_copy": "Twoja najlepsza kopia"
   },
   "builder": {
     "slots": {
@@ -1005,7 +1007,42 @@
     "job_with_gain": "{{job}} · +{{count}} poziomu",
     "previous_instrument": "Poprzedni instrument",
     "next_instrument": "Następny instrument",
-    "n_of_total": "{{n}} z {{total}}"
+    "n_of_total": "{{n}} z {{total}}",
+    "rooms": {
+      "label": "Część warsztatu",
+      "gear": "Sprzęt",
+      "parts": "Części"
+    },
+    "forge": {
+      "filter": "Pokaż części",
+      "filter_all": "Wszystkie",
+      "filter_ready": "Gotowe",
+      "nothing_ready": "Teraz nic nie da się przerobić.",
+      "group": {
+        "guitar": "Części gitar",
+        "pedal": "Części efektów",
+        "shared": "Wspólne"
+      },
+      "pick": "Wybierz stos, żeby położyć go na kowadle.",
+      "top_tier": "Ta część jest już na szczycie drabinki.",
+      "make": "Wykuj",
+      "forging": "Kucie…",
+      "more_needed": "Brakuje: {{count}}",
+      "fewer": "Mniej",
+      "more": "Więcej",
+      "max": "Max",
+      "can_make": "Z tego stosu do {{count}}",
+      "can_afford": "Fame starczy na {{count}}",
+      "fame_short": "Brakuje {{fame}} Fame"
+    },
+    "gems": {
+      "title": "Cechy",
+      "empty": "Puste",
+      "add": "Dodaj cechę",
+      "socket": "Gniazdo {{n}} z {{max}}",
+      "no_imprint": "Cechy wkłada się jako odciski. Zdobędziesz go, używając Ekstraktora na innym instrumencie.",
+      "add_body": "Wybierz odcisk do włożenia. Każda cecha, którą już ma, podnosi cenę."
+    }
   },
   "mods": {
     "remove_aria": "Zdejmij ten mod za {{fame}} Fame",

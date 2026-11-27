@@ -18,4 +18,19 @@ describe("formatLogTime", () => {
   it("falls back to a relative distance for older logs", () => {
     expect(formatLogTime(offset(-2 * 60 * 1000), now)).toBe("2 minutes ago");
   });
+
+  it("words the distance briefly in the short form", () => {
+    expect(formatLogTime(offset(-2 * 60 * 1000), now, { short: true })).toBe(
+      "2 min. ago",
+    );
+    expect(
+      formatLogTime(offset(-16 * 60 * 60 * 1000), now, { short: true }),
+    ).toBe("16 hr. ago");
+    expect(
+      formatLogTime(offset(-3 * 24 * 60 * 60 * 1000), now, { short: true }),
+    ).toBe("3 days ago");
+    expect(formatLogTime(offset(-20 * 1000), now, { short: true })).toBe(
+      "just now",
+    );
+  });
 });

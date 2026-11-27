@@ -69,12 +69,6 @@ export const DAILY_GOAL_CHOICES: {
 
 // ─── The first minute ──────────────────────────────────────────────────────────
 
-/**
- * A crop of the real practice screen (tabs-live-mobile.webp): coloured notes
- * on the strings, the same thing the first riff shows a moment later.
- */
-export const FIRST_RIFF_IMAGE = "/images/onboarding/first-riff-tab.webp";
-
 /** The 40-second first riff for each level (feature/exercisePlan/data/exerises/firstRiff). */
 export const FIRST_RIFF_EXERCISE_IDS: Record<OnboardingLevel, string> = {
   new: "first_riff_open_strings",

@@ -2,132 +2,69 @@
 
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { GuitarPatternBackground } from "components/GuitarPatternBackground/GuitarPatternBackground";
 import { FreeCaseIcon } from "components/Rewards/FreeCaseIcon";
 import { ExtractorArt } from "feature/arsenal/components/Traits/TraitItemArt";
-import { getDailyPool } from "feature/arsenal/data/dailyCase";
-import { EFFECTS_BY_ID, EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
+import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { getEffectValue } from "feature/arsenal/data/effectStats";
-import { DROPPABLE_GUITARS_BY_RARITY, GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { getItemValue } from "feature/arsenal/data/itemStats";
+import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
+import { getConditionGrade, getItemCondition, getItemValue } from "feature/arsenal/data/itemStats";
+import { getItemTraits } from "feature/arsenal/data/traits";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { useMergeScene } from "feature/arsenal/hooks/useMergeScene";
 import { useSellEffect } from "feature/arsenal/hooks/useSellEffect";
 import { useSellGuitar } from "feature/arsenal/hooks/useSellGuitar";
-import { GUITAR_CHANCE } from "feature/arsenal/utils/caseRoll";
 import { getEffectImageSrc } from "feature/arsenal/utils/effectImage";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import { isAtLeast } from "feature/arsenal/utils/pity";
 import { ComponentThumb } from "feature/guitarBuilder/components/ComponentThumb";
-import { COMPONENT_DEFS, SLOT_LABELS } from "feature/guitarBuilder/data/components";
-import type { ComponentDef } from "feature/guitarBuilder/types/guitarBuilder.types";
-import { AnimatePresence, motion } from "framer-motion";
+import { SLOT_LABELS } from "feature/guitarBuilder/data/components";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { readableText } from "lib/colorTheme/colorTheme";
+import { EASE } from "lib/motion/motion";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 
-import type { CaseDefinition, EffectDefinition, GuitarDefinition, GuitarRarity,OpenCaseResult } from "../../types/arsenal.types";
-import { EffectCard } from "../GuitarInventory/EffectCard";
-import { GuitarCard } from "../GuitarInventory/GuitarCard";
+import type { CaseDefinition, OpenCaseResult } from "../../types/arsenal.types";
+import { getCaseArt } from "../CaseShop/CaseCard";
 import { RARITY_STYLES } from "../RarityBadge";
+import { CaseReel } from "./CaseReel";
+import { buildRouletteStrip, REEL_WIN_INDEX, type StripItem } from "./reelMath";
 
-/** The reveal for a Guitar Builder part: the part, its slot and level. */
-const ComponentRevealCard = ({ def, level }: { def: ComponentDef; level: number }) => {
-  const labels = useArsenalLabels();
-  const color = RARITY_STYLES[def.rarity].baseColor;
-  return (
-    <div className="flex flex-col items-center gap-4 rounded-lg bg-zinc-900/80 px-6 py-8">
-      <ComponentThumb def={def} className="h-32 w-56" />
-      <div className="text-center">
-        <p className="font-display text-xl font-semibold text-zinc-50">{def.name}</p>
-        <p className="mt-1 text-sm text-zinc-400">
-          {labels.t(`builder.slots.${def.slot}`, SLOT_LABELS[def.slot])} ·{" "}
-          <span style={{ color }}>{labels.rarity(def.rarity)}</span> ·{" "}
-          {labels.t("common.lvl", { level })}
-        </p>
-      </div>
-    </div>
-  );
+/** What the pull is, as a reel item. */
+const winItemOf = (result: OpenCaseResult | null): StripItem | null => {
+  if (!result) return null;
+  if (result.type === "guitar" && result.guitar) {
+    const def = GUITARS_BY_ID.get(result.guitar.id);
+    return def ? { kind: "guitar", def } : null;
+  }
+  if (result.type === "effect" && result.effect) {
+    const def = EFFECTS_BY_ID.get(result.effect.id);
+    return def ? { kind: "effect", def } : null;
+  }
+  if (result.type === "component" && result.component) {
+    return { kind: "component", def: result.component };
+  }
+  return null;
 };
 
-const ITEM_WIDTH = 250;
-const VISIBLE_ITEMS = 60;
-const WIN_INDEX = 45;
+const subscribeToNothing = () => () => {};
 
-type StripItem =
-  | { kind: "guitar"; def: GuitarDefinition }
-  | { kind: "effect"; def: EffectDefinition }
-  | { kind: "component"; def: ComponentDef };
+/** The big picture on the reward screen. */
+const rewardImageOf = (item: StripItem | null): string | null =>
+  item?.kind === "guitar"
+    ? getRankBadgeSrc(item.def.imageId, "large")
+    : item?.kind === "effect"
+      ? getEffectImageSrc(item.def.imageId, "full")
+      : null;
 
-/** A random Guitar Builder part of a rarity, for the reel's fillers. */
-function randomComponent(rarity: GuitarRarity): StripItem | null {
-  const pool = COMPONENT_DEFS.filter((def) => def.rarity === rarity);
-  return pool.length
-    ? { kind: "component", def: pool[Math.floor(Math.random() * pool.length)] }
-    : null;
-}
-
-function buildRouletteStrip(caseDef: CaseDefinition, winItem: StripItem): StripItem[] {
-  const rarities = Object.entries(caseDef.probabilities) as [GuitarRarity, number][];
-  const strip: StripItem[] = [];
-
-  // Daily case can only drop today's featured pool, so the roulette fillers
-  // come from that pool too — the animation never teases an impossible item.
-  const dailyPool = caseDef.id === "daily" ? getDailyPool() : null;
-
-  for (let i = 0; i < VISIBLE_ITEMS; i++) {
-    if (i === WIN_INDEX) {
-      strip.push(winItem);
-      continue;
-    }
-
-    let roll = Math.random();
-    let chosen: GuitarRarity = "Common";
-    for (const [rarity, prob] of rarities) {
-      roll -= prob;
-      if (roll <= 0) { chosen = rarity; break; }
-    }
-
-    // The Parts Crate drops builder parts and nothing else, so its whole reel is
-    // parts; every other case drops gear only and never shows one.
-    if (caseDef.dropKind === "component") {
-      const part = randomComponent(chosen);
-      strip.push(part ?? winItem);
-      continue;
-    }
-
-    if (dailyPool) {
-      const candidates = dailyPool.filter((e) => e.def.rarity === chosen);
-      const pickFrom = candidates.length > 0 ? candidates : dailyPool;
-      strip.push(pickFrom[Math.floor(Math.random() * pickFrom.length)]);
-      continue;
-    }
-
-    // Guitar/effect-only cases (e.g. "Elite Guitar Case") must only fill the
-    // strip with items they can actually drop — otherwise the reel teases an
-    // impossible pull. Mixed cases keep the same guitar/effect split they roll.
-    const wantsGuitar = caseDef.dropKind ? caseDef.dropKind === "guitar" : Math.random() < GUITAR_CHANCE;
-
-    if (wantsGuitar) {
-      const pool = DROPPABLE_GUITARS_BY_RARITY[chosen];
-      if (pool && pool.length > 0) {
-        strip.push({ kind: "guitar", def: pool[Math.floor(Math.random() * pool.length)] });
-      } else {
-        strip.push(winItem);
-      }
-    } else {
-      const pool = EFFECTS_BY_RARITY[chosen] || EFFECTS_BY_RARITY["Common"] || [];
-      if (pool.length > 0) {
-        strip.push({ kind: "effect", def: pool[Math.floor(Math.random() * pool.length)] });
-      } else {
-        strip.push(winItem);
-      }
-    }
-  }
-
-  return strip;
-}
+/** One line of the reward screen arriving, a beat after the one above it. */
+const enter = (delay: number) => ({
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+  transition: { delay, duration: 0.38, ease: EASE.out },
+});
 
 /** How the same case can be opened once more, if at all. */
 export type OpenAgainPayment =
@@ -145,6 +82,16 @@ interface CaseOpeningModalProps {
   isOpeningAgain?: boolean;
 }
 
+/**
+ * A single case opening, in two screens.
+ *
+ * First the reel (`CaseReel`): the case rattles, bursts, and a drum of items
+ * spins onto the pull. Then the reward, on a screen of its own: the pull large
+ * in the middle, the one thing to do with it as the big key pinned at the
+ * bottom (keep it, or merge it into the copy already owned), opening another
+ * under that, and the item's own smaller actions (equip, sell) right under the
+ * item. A player who asked for less motion goes straight to the reward.
+ */
 export const CaseOpeningModal = ({
   result,
   caseDef,
@@ -153,8 +100,10 @@ export const CaseOpeningModal = ({
   openAgainPayment = null,
   isOpeningAgain = false,
 }: CaseOpeningModalProps) => {
-  const [phase, setPhase] = useState<"idle" | "spinning" | "reveal" | "done">("idle");
-  const [mounted, setMounted] = useState(false);
+  // Which pull has finished its reel. Keyed by the result itself, so "Open
+  // another" starts on the reel again without an effect resetting anything.
+  const [revealedFor, setRevealedFor] = useState<OpenCaseResult | null>(null);
+  const reduceMotion = useReducedMotion();
   const labels = useArsenalLabels();
   const { t } = labels;
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
@@ -166,509 +115,388 @@ export const CaseOpeningModal = ({
   const isMerging = merge.isActive;
   const isSelling = isSellingGuitar || isSellingEffect;
   const isBusy = isEquipping || isSelling || isMerging || isOpeningAgain;
-  const isOpen = result !== null;
   const router = useRouter();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const stripRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => setMounted(true), []);
+  // False on the server and in the hydrating render, true after: the portal
+  // needs `document`.
+  const mounted = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false,
+  );
 
-  const guitar = result?.type === "guitar" && result.guitar ? GUITARS_BY_ID.get(result.guitar.id) ?? null : null;
-  const effect = result?.type === "effect" && result.effect ? EFFECTS_BY_ID.get(result.effect.id) ?? null : null;
+  const winItem = useMemo(() => winItemOf(result), [result]);
+  // Built once per pull: a new strip mid-spin would swap every image on it.
+  const strip = useMemo(
+    () => (caseDef && winItem ? buildRouletteStrip(caseDef, winItem) : []),
+    [caseDef, winItem],
+  );
+  const rewardImage = rewardImageOf(winItem);
+  const isOpen = result !== null && winItem !== null;
+  const showReward = isOpen && (reduceMotion || revealedFor === result);
 
-  const component = result?.type === "component" ? (result.component ?? null) : null;
-
-  const winDef: StripItem | null = guitar
-    ? { kind: "guitar", def: guitar }
-    : effect
-    ? { kind: "effect", def: effect }
-    : component
-    ? { kind: "component", def: component }
-    : null;
-
-  const revealRarity = guitar?.rarity ?? effect?.rarity ?? component?.rarity ?? null;
-  const rarityStyles = revealRarity ? RARITY_STYLES[revealRarity] : null;
+  const guitar = winItem?.kind === "guitar" ? winItem.def : null;
+  const component = winItem?.kind === "component" ? winItem.def : null;
+  const rarity = winItem?.def.rarity ?? "Common";
+  const color = RARITY_STYLES[rarity].baseColor;
 
   // The same functions /api/arsenal/sell-guitar and sell-effect pay out with:
   // a guitar is worth its own rolled condition and year, not a flat rarity
   // price, so the reveal and the Arsenal quote the same number.
-  const sellValue = winDef
-    ? winDef.kind === "guitar"
+  const sellValue =
+    winItem?.kind === "guitar"
       ? result?.newItem
-        ? getItemValue(result.newItem, winDef.def)
+        ? getItemValue(result.newItem, winItem.def)
         : 0
-      : winDef.kind === "effect"
-        ? getEffectValue(winDef.def)
-        : 0
-    : 0;
+      : winItem?.kind === "effect"
+        ? getEffectValue(winItem.def)
+        : 0;
 
   // A duplicate with a copy to go into can be folded into it for a few levels.
   const mergeOffer = result?.merge ?? null;
   const handleMerge = () => {
-    if (!mergeOffer || isBusy || !winDef || winDef.kind === "component") return;
-    const itemId =
-      winDef.kind === "guitar" ? result?.newItem?.id : result?.effectItem?.id;
+    if (!mergeOffer || isBusy || !winItem || winItem.kind === "component") return;
+    const itemId = winItem.kind === "guitar" ? result?.newItem?.id : result?.effectItem?.id;
     if (!itemId) return;
-
-    merge.start({
-      kind: winDef.kind,
-      itemId,
-      def: winDef.def,
-      offer: mergeOffer,
-    });
+    merge.start({ kind: winItem.kind, itemId, def: winItem.def, offer: mergeOffer });
   };
 
-  const keepLabel =
-    winDef?.kind === "guitar"
-      ? t("opening.keep_in_arsenal")
-      : t("opening.add_to_collection");
-
   const handleSell = () => {
-    if (!winDef || isBusy) return;
-    if (winDef.kind === "guitar" && result?.newItem?.id) {
+    if (!winItem || isBusy) return;
+    if (winItem.kind === "guitar" && result?.newItem?.id) {
       sellGuitar(result.newItem.id, { onSuccess: onClose });
-    } else if (winDef.kind === "effect" && result?.effectItem?.id) {
+    } else if (winItem.kind === "effect" && result?.effectItem?.id) {
       sellEffect(result.effectItem.id, { onSuccess: onClose });
     }
   };
 
-  const strip = useMemo(() => {
-    if (!result || !caseDef || !winDef) return [];
-    return buildRouletteStrip(caseDef, winDef);
-  }, [result, caseDef]);
+  const openBuilder = () => {
+    onClose();
+    router.replace({ query: { ...router.query, tab: "builder" } }, undefined, { shallow: true });
+  };
 
+  // Escape leaves the reward screen as the big key would: the pull is already
+  // saved, so closing keeps it.
   useEffect(() => {
-    if (!isOpen || !winDef || !caseDef) {
-      setPhase("idle");
-      return;
-    }
-    setPhase("spinning");
-    const t1 = setTimeout(() => setPhase("reveal"), 5500);
-    const t2 = setTimeout(() => setPhase("done"), 7000);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [isOpen, result]);
+    if (!showReward) return undefined;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !isBusy) onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showReward, isBusy, onClose]);
 
-  const containerWidth = containerRef.current?.offsetWidth ?? 600;
-  const centerOffset = containerWidth / 2 - ITEM_WIDTH / 2;
-  const targetOffset = WIN_INDEX * ITEM_WIDTH - centerOffset;
+  const keepLabel =
+    winItem?.kind === "guitar" ? t("opening.keep_in_arsenal") : t("opening.add_to_collection");
+
+  // One line under the name: what the thing is, and the roll that sets it apart.
+  const meta = (() => {
+    if (!winItem) return "";
+    if (winItem.kind === "component") {
+      return [
+        t(`builder.slots.${winItem.def.slot}`, SLOT_LABELS[winItem.def.slot]),
+        result?.componentItem ? t("common.lvl", { level: result.componentItem.level }) : null,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+    }
+    if (winItem.kind === "effect") return labels.effectType(winItem.def.type);
+    const item = result?.newItem;
+    return [
+      winItem.def.brand,
+      item?.year,
+      item ? labels.condition(getConditionGrade(getItemCondition(item))) : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  })();
+
+  const traits = getItemTraits(result?.newItem ?? result?.effectItem)
+    .map((trait) => labels.traitLabel(trait))
+    .join(" · ");
 
   if (!mounted) return null;
 
   return (
     <>
-    {createPortal(
-    <AnimatePresence>
-      {isOpen && strip.length > 0 && (
-        <motion.div
-          // force-dark: the opening is a show on a black stage, in either theme.
-          className="force-dark fixed inset-0 z-[1000] flex flex-col items-center overflow-y-auto py-4 sm:py-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <motion.div
-            className="fixed inset-0 bg-black/95"
-            onClick={phase === "done" ? onClose : undefined}
-          />
-
-          {(phase === "reveal" || phase === "done") && rarityStyles && (
+      {createPortal(
+        <AnimatePresence>
+          {result && winItem && strip.length > 0 && (
             <motion.div
-              className="fixed inset-0 pointer-events-none"
+              // force-dark: the opening is a show on a black stage, in either theme.
+              className='force-dark fixed inset-0 z-[1000] bg-black'
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              style={{ background: `radial-gradient(circle at center, ${rarityStyles.baseColor}15 0%, transparent 70%)` }}
-            />
-          )}
+              exit={{ opacity: 0 }}>
+              <AnimatePresence mode='wait'>
+                {!showReward ? (
+                  <motion.div
+                    key={`reel-${result.newItem?.id ?? result.effectItem?.id ?? result.componentItem?.uid ?? "pull"}`}
+                    className='absolute inset-0'
+                    exit={{ opacity: 0, transition: { duration: 0.22 } }}>
+                    <CaseReel
+                      strip={strip}
+                      winIndex={REEL_WIN_INDEX}
+                      caseImage={caseDef ? getCaseArt(caseDef).image : undefined}
+                      rewardImage={rewardImage}
+                      onFinished={() => setRevealedFor(result)}
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key='reward'
+                    className='absolute inset-0 flex flex-col'
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0, transition: { duration: 0.15 } }}>
+                    <div className='flex min-h-0 flex-1 flex-col items-center justify-center gap-3 overflow-y-auto px-5 pb-4 pt-10 text-center'>
+                      <motion.span
+                        {...enter(0.14)}
+                        className='flex items-center gap-2 text-sm font-bold'
+                        style={{ color: readableText(color) }}>
+                        <span className='h-2 w-2 rounded-full' style={{ background: color }} />
+                        {labels.rarity(rarity)}
+                      </motion.span>
 
-          {/* One-shot screen flash the instant the roulette lands */}
-          {phase === "reveal" && rarityStyles && (
-            <motion.div
-              className="fixed inset-0 z-20 pointer-events-none"
-              initial={{ opacity: 0.4 }}
-              animate={{ opacity: 0 }}
-              transition={{ duration: 0.9, ease: "easeOut" }}
-              style={{
-                background: `radial-gradient(circle at center, ${rarityStyles.baseColor}66 0%, transparent 60%)`,
-              }}
-            />
-          )}
-
-          <div className="relative z-10 flex flex-col items-center gap-4 sm:gap-6 w-full max-w-4xl px-4 my-auto">
-            <motion.h2
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-2xl font-bold text-zinc-300"
-            >
-              {caseDef ? labels.caseName(caseDef) : t("opening.title")}
-            </motion.h2>
-
-            {/* Roulette */}
-            <div
-              ref={containerRef}
-              className="relative w-full overflow-hidden rounded-lg bg-zinc-950/90"
-              style={{ height: 220 }}
-            >
-              <GuitarPatternBackground opacity={0.03} />
-
-              {/* Center pointer: glowing line + carets top and bottom */}
-              <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 z-30 w-[2px] bg-gradient-to-b from-transparent via-amber-400 to-transparent shadow-[0_0_16px_rgba(251,191,36,0.8)]" />
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 z-30 h-0 w-0 border-x-8 border-t-8 border-x-transparent border-t-amber-400" />
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 h-0 w-0 border-x-8 border-b-8 border-x-transparent border-b-amber-400" />
-
-              <div className="absolute inset-y-0 left-0 w-40 z-20 bg-gradient-to-r from-zinc-950 to-transparent pointer-events-none" />
-              <div className="absolute inset-y-0 right-0 w-40 z-20 bg-gradient-to-l from-zinc-950 to-transparent pointer-events-none" />
-
-              {/* Keyed by the drop, so "Open another" remounts the reel at
-                  x: 0 — otherwise it already sits at the target offset and the
-                  second spin would not move at all. */}
-              <motion.div
-                key={result?.newItem?.id ?? result?.effectItem?.id ?? result?.componentItem?.uid ?? "strip"}
-                ref={stripRef}
-                className="flex items-center h-full"
-                initial={{ x: 0 }}
-                animate={phase !== "idle" ? { x: -targetOffset + (Math.random() * 20 - 10) } : { x: 0 }}
-                transition={phase !== "idle" ? { duration: 5, ease: [0.15, 0.0, 0.07, 1.0] } : undefined}
-              >
-                {strip.map((item, i) => {
-                  const rs = RARITY_STYLES[item.def.rarity];
-                  const isWinner = i === WIN_INDEX && (phase === "reveal" || phase === "done");
-                  return (
-                    <div
-                      key={i}
-                      className="flex-shrink-0 flex flex-col items-center justify-center gap-2 px-1"
-                      style={{ width: ITEM_WIDTH }}
-                    >
-                      <div
-                        className="relative flex items-center justify-center rounded-md w-[230px] h-[150px] overflow-hidden bg-zinc-900/60 transition-all duration-slow"
-                        style={{
-                          border: `1px solid ${rs.baseColor}55`,
-                          background: `radial-gradient(circle at center, ${rs.baseColor}26 0%, ${rs.baseColor}0d 45%, rgba(24,24,27,0.85) 85%)`,
-                          boxShadow: isWinner
-                            ? `0 0 34px ${rs.baseColor}99, inset 0 0 24px ${rs.baseColor}2e`
-                            : undefined,
-                        }}
-                      >
-                        {item.kind === "guitar" ? (
-                          <img
-                            src={getRankBadgeSrc(item.def.imageId, "small")}
-                            alt={item.def.name}
-                            className="relative z-10 h-[440px] w-[440px] -rotate-45 object-contain"
-                          />
-                        ) : item.kind === "component" ? (
-                          <ComponentThumb def={item.def} className="relative z-10 h-28 w-48" />
-                        ) : (
-                          <img
-                            src={getEffectImageSrc(item.def.imageId, "medium")}
-                            alt={item.def.name}
-                            className="relative z-10 h-32 w-32 object-contain"
+                      <div className='relative my-1 flex h-44 w-full max-w-sm items-center justify-center sm:h-56'>
+                        <div
+                          className='absolute h-48 w-48 rounded-full sm:h-60 sm:w-60'
+                          style={{
+                            background: `radial-gradient(closest-side, ${color}38, ${color}10 70%, transparent)`,
+                          }}
+                        />
+                        {isAtLeast(rarity, "Epic") && (
+                          <motion.span
+                            aria-hidden
+                            className='absolute h-48 w-48 rounded-full border-2 sm:h-60 sm:w-60'
+                            style={{ borderColor: color }}
+                            initial={{ opacity: 0.9, scale: 0.8 }}
+                            animate={{ opacity: 0, scale: 1.35 }}
+                            transition={{ delay: 0.26, duration: 0.7, ease: "easeOut" }}
                           />
                         )}
-                        {/* Rarity bar at the tile bottom, CS-case style */}
-                        <div
-                          className="absolute bottom-0 left-0 right-0 z-20 h-1"
-                          style={{ background: rs.baseColor, opacity: isWinner ? 1 : 0.75 }}
-                        />
-                      </div>
-                      <div className={cn("flex flex-col items-center transition-opacity duration-slow", isWinner ? "opacity-100" : "opacity-70")}>
-                        <span className="text-xs font-bold text-zinc-500 mb-0.5">
-                          {item.kind === "guitar"
-                            ? item.def.brand
-                            : item.kind === "effect"
-                              ? labels.effectType(item.def.type)
-                              : t("opening.part_of_slot", {
-                                  slot: t(`builder.slots.${item.def.slot}`, SLOT_LABELS[item.def.slot]),
-                                })}
-                        </span>
-                        <span className="text-[11px] font-bold text-center leading-tight truncate w-full" style={{ color: readableText(rs.baseColor) }}>
-                          {item.def.name}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </motion.div>
-            </div>
-
-            {/* Reveal */}
-            <AnimatePresence>
-              {(phase === "reveal" || phase === "done") && winDef && rarityStyles && (
-                <motion.div
-                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ type: "spring", stiffness: 180, damping: 20 }}
-                  className="flex flex-col items-center gap-3 w-full"
-                >
-                  {/* Rarity splash headline */}
-                  <motion.p
-                    initial={{ opacity: 0, y: 14, scale: 0.85 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ type: "spring", stiffness: 220, damping: 16, delay: 0.15 }}
-                    className="font-display text-3xl sm:text-4xl font-black tracking-wide"
-                    style={{
-                      color: readableText(rarityStyles.baseColor),
-                      textShadow: `0 0 32px ${rarityStyles.baseColor}88`,
-                    }}
-                  >
-                    {revealRarity && labels.rarity(revealRarity)}
-                  </motion.p>
-
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className={cn(
-                      "text-xs font-bold",
-                      result?.isNewToDex || component ? "text-amber-300" : "text-zinc-500"
-                    )}
-                  >
-                    {component
-                      ? t("opening.builder_part")
-                      : result?.isNewToDex
-                        ? t("opening.first_pull")
-                        : t("opening.duplicate")}
-                  </motion.p>
-
-                  {result?.pityHit && (
-                    <motion.p
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      className="text-xs font-medium text-amber-400">
-                      {result.pityHit === "top" && caseDef?.pity?.top
-                        ? t("opening.pity_top", { rarity: labels.rarity(caseDef.pity.top.rarity) })
-                        : t("opening.pity_new")}
-                    </motion.p>
-                  )}
-
-                  {/* The bonus a Parts Crate sometimes carries: it lands a beat
-                      after the part, so it reads as a second drop. */}
-                  {result?.extractor && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.6, y: 12 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      transition={{ delay: 1.1, type: "spring", stiffness: 420, damping: 16 }}
-                      className="flex items-center gap-3 rounded-lg bg-amber-500/15 px-4 py-2">
-                      <div className="h-9 w-9 shrink-0">
-                        <ExtractorArt />
-                      </div>
-                      <span className="text-sm font-bold text-amber-200">
-                        {t("trait_craft.bonus_extractor")}
-                      </span>
-                    </motion.div>
-                  )}
-
-                  <div className="relative flex items-center justify-center">
-                    {/* Slow-rotating light rays behind the card */}
-                    <motion.div
-                      className="pointer-events-none absolute h-[520px] w-[520px] rounded-full"
-                      style={{
-                        background: `repeating-conic-gradient(from 0deg, ${rarityStyles.baseColor}1f 0deg 10deg, transparent 10deg 22deg)`,
-                        WebkitMaskImage: "radial-gradient(circle, black 30%, transparent 68%)",
-                        maskImage: "radial-gradient(circle, black 30%, transparent 68%)",
-                      }}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1, rotate: 360 }}
-                      transition={{
-                        opacity: { duration: 0.6 },
-                        rotate: { duration: 46, repeat: Infinity, ease: "linear" },
-                      }}
-                    />
-
-                    {/* One-shot particle burst */}
-                    {Array.from({ length: 14 }).map((_, i) => {
-                      const angle = (i / 14) * Math.PI * 2;
-                      const dist = 150 + (i % 3) * 45;
-                      return (
-                        <motion.span
-                          key={i}
-                          className="pointer-events-none absolute z-20 h-1.5 w-1.5 rounded-full"
-                          style={{
-                            background: rarityStyles.baseColor,
-                            boxShadow: `0 0 10px ${rarityStyles.baseColor}`,
-                          }}
-                          initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-                          animate={{
-                            x: Math.cos(angle) * dist,
-                            y: Math.sin(angle) * dist,
-                            opacity: 0,
-                            scale: 0.3,
-                          }}
-                          transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 + (i % 5) * 0.04 }}
-                        />
-                      );
-                    })}
-
-                    <motion.div
-                      className="absolute w-44 h-44 sm:w-56 sm:h-56 rounded-full blur-[40px] will-change-[opacity,transform]"
-                      style={{ backgroundColor: `${rarityStyles.baseColor}33` }}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: [0.3, 0.5, 0.3] }}
-                      transition={{ scale: { duration: 0.8 }, opacity: { duration: 2.4, repeat: Infinity } }}
-                    />
-                    <div className="relative z-10" style={{ width: 280 }}>
-                      {winDef.kind === "guitar" && result?.newItem ? (
-                        <GuitarCard item={result.newItem} readOnly />
-                      ) : winDef.kind === "effect" && result?.effectItem ? (
-                        <EffectCard item={result.effectItem} readOnly />
-                      ) : winDef.kind === "component" && result?.componentItem ? (
-                        <ComponentRevealCard def={winDef.def} level={result.componentItem.level} />
-                      ) : null}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Buttons */}
-            <AnimatePresence>
-              {phase === "done" && winDef && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex w-full max-w-md flex-col gap-2 sm:gap-3"
-                >
-                  {winDef.kind === "component" ? (
-                  <div className="flex w-full flex-col gap-2 sm:gap-3">
-                    <Button
-                      onClick={() => {
-                        onClose();
-                        router.replace({ query: { ...router.query, tab: "builder" } }, undefined, { shallow: true });
-                      }}
-                      disabled={isBusy}
-                      size="lg"
-                      className="w-full"
-                    >
-                      {t("opening.open_in_builder")}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={onClose}
-                      disabled={isBusy}
-                      size="lg"
-                      className="w-full"
-                    >
-                      {t("opening.keep")}
-                    </Button>
-                  </div>
-                  ) : (
-                  <>
-                  {/* One full-width key: merge when there is a copy to merge
-                      into, otherwise carry on. Everything else is a quieter
-                      key under it. */}
-                  {mergeOffer ? (
-                    <Button
-                      onClick={handleMerge}
-                      disabled={isBusy}
-                      size="lg"
-                      className="w-full"
-                    >
-                      {isMerging
-                        ? t("pack.merging")
-                        : t("opening.merge", {
-                            gain: mergeOffer.gain,
-                            before: mergeOffer.levelBefore,
-                            after: mergeOffer.levelAfter,
-                          })}
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={onClose}
-                      disabled={isBusy}
-                      size="lg"
-                      className="w-full"
-                    >
-                      {keepLabel}
-                    </Button>
-                  )}
-                  <div className={cn("grid gap-2 sm:gap-3", (mergeOffer || guitar) && "grid-cols-2")}>
-                  {mergeOffer ? (
-                    <Button
-                      variant="ghost"
-                      onClick={onClose}
-                      disabled={isBusy}
-                      size="lg"
-                      className="px-3"
-                    >
-                      {keepLabel}
-                    </Button>
-                  ) : guitar ? (
-                    <Button
-                      variant="ghost"
-                      onClick={() => equip({ guitarId: guitar.id, year: result?.newItem?.year, country: result?.newItem?.country }, { onSuccess: onClose })}
-                      disabled={isBusy}
-                      size="lg"
-                      className="px-3"
-                    >
-                      {t("opening.equip_now")}
-                    </Button>
-                  ) : null}
-                  <Button
-                    variant="ghost"
-                    onClick={handleSell}
-                    disabled={isBusy}
-                    size="lg"
-                    className="px-3"
-                  >
-                    {isSelling ? (
-                      t("common.selling")
-                    ) : (
-                      <span className="flex items-center gap-3">
-                        <span>{t("common.sell")}</span>
-                        <span className="flex items-center gap-1.5 text-amber-400">
-                          <img src="/images/tokens/coin.png" alt="" className="h-5 w-5 object-contain" />
-                          {sellValue}
-                        </span>
-                      </span>
-                    )}
-                  </Button>
-                  </div>
-                  </>
-                  )}
-
-                  {onOpenAgain && caseDef && (
-                    <Button
-                      variant="ghost"
-                      onClick={() => onOpenAgain(openAgainPayment?.kind === "token")}
-                      disabled={isBusy || !openAgainPayment}
-                      size="lg"
-                      className="w-full"
-                    >
-                      {isOpeningAgain ? (
-                        t("cases.opening")
-                      ) : (
-                        <span className="flex items-center gap-3">
-                          <span>{t("opening.open_another", { name: labels.caseName(caseDef) })}</span>
-                          {openAgainPayment?.kind === "fame" ? (
-                            <span className="flex items-center gap-1.5 text-amber-400">
-                              <img src="/images/tokens/coin.png" alt="" className="h-5 w-5 object-contain" />
-                              {openAgainPayment.cost}
-                            </span>
-                          ) : openAgainPayment?.kind === "token" ? (
-                            <span className="flex items-center gap-1.5 text-emerald-400">
-                              <FreeCaseIcon size={20} />
-                              {t("view.free_cases", { count: 1 })}
-                            </span>
+                        <motion.div
+                          className='relative z-10 flex h-full w-full items-center justify-center'
+                          initial={{ opacity: 0, scale: 0.6 }}
+                          animate={{ opacity: 1, scale: [0.6, 1.05, 1] }}
+                          transition={{ duration: 0.56, ease: EASE.out }}>
+                          {component ? (
+                            <ComponentThumb def={component} className='h-32 w-56' />
                           ) : (
-                            <span className="flex items-center gap-1.5 text-zinc-500">
-                              <img src="/images/tokens/coin.png" alt="" className="h-5 w-5 object-contain opacity-50" />
-                              {t("opening.cost_needed", { cost: caseDef.fameCost })}
-                            </span>
+                            <img
+                              src={rewardImage ?? ""}
+                              alt={winItem.def.name}
+                              draggable={false}
+                              className={cn(
+                                "object-contain",
+                                guitar ? "max-h-full max-w-full" : "max-h-[75%] max-w-[60%]",
+                              )}
+                            />
                           )}
-                        </span>
+                        </motion.div>
+                      </div>
+
+                      <motion.h2
+                        {...enter(0.22)}
+                        className='text-balance font-display text-2xl font-extrabold leading-tight text-zinc-50 sm:text-3xl'>
+                        {winItem.def.name}
+                      </motion.h2>
+                      {meta && (
+                        <motion.p {...enter(0.28)} className='text-sm text-zinc-400'>
+                          {meta}
+                        </motion.p>
                       )}
-                    </Button>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
+                      {traits && (
+                        <motion.p {...enter(0.3)} className='max-w-sm text-xs font-medium text-zinc-300'>
+                          {traits}
+                        </motion.p>
+                      )}
+
+                      <motion.span
+                        {...enter(0.34)}
+                        className={cn(
+                          "rounded-full px-2.5 py-1 text-xs font-bold",
+                          result.isNewToDex || component
+                            ? "bg-amber-500/10 text-amber-300"
+                            : "bg-zinc-800/60 text-zinc-300",
+                        )}>
+                        {component
+                          ? t("opening.builder_part")
+                          : result.isNewToDex
+                            ? t("opening.first_pull")
+                            : t("opening.duplicate")}
+                      </motion.span>
+
+                      {result.pityHit && (
+                        <motion.p {...enter(0.38)} className='text-xs font-medium text-amber-400'>
+                          {result.pityHit === "top" && caseDef?.pity?.top
+                            ? t("opening.pity_top", { rarity: labels.rarity(caseDef.pity.top.rarity) })
+                            : t("opening.pity_new")}
+                        </motion.p>
+                      )}
+
+                      {/* The bonus a Parts Crate sometimes carries: it lands a beat
+                          after the part, so it reads as a second drop. */}
+                      {result.extractor && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.6, y: 12 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          transition={{ delay: 0.9, type: "spring", stiffness: 420, damping: 16 }}
+                          className='flex items-center gap-3 rounded-lg bg-amber-500/15 px-4 py-2'>
+                          <div className='h-9 w-9 shrink-0'>
+                            <ExtractorArt />
+                          </div>
+                          <span className='text-sm font-bold text-amber-200'>
+                            {t("trait_craft.bonus_extractor")}
+                          </span>
+                        </motion.div>
+                      )}
+
+                      {/* A duplicate: the copy it would go into, and how far it would take it. */}
+                      {mergeOffer && (
+                        <motion.div
+                          {...enter(0.42)}
+                          className='mt-1 flex w-full max-w-xs flex-col gap-2 rounded-xl bg-zinc-800/40 px-4 py-3 text-left'>
+                          <div className='flex items-baseline justify-between gap-3 text-sm'>
+                            <span className='font-semibold text-zinc-200'>{t("opening.best_copy")}</span>
+                            <span className='tabular-nums text-zinc-400'>
+                              <span className='font-bold text-zinc-50'>
+                                {t("common.lvl", { level: mergeOffer.levelBefore })}
+                              </span>{" "}
+                              → {mergeOffer.levelAfter}
+                            </span>
+                          </div>
+                          <div className='relative h-4 overflow-hidden rounded-full bg-zinc-800'>
+                            <div
+                              className='absolute inset-y-0 left-0 w-full rounded-full opacity-35'
+                              style={{ background: color }}
+                            />
+                            <motion.div
+                              className='absolute inset-y-0 left-0 rounded-full'
+                              style={{ background: color }}
+                              initial={{ width: 0 }}
+                              animate={{
+                                width: `${(mergeOffer.levelBefore / Math.max(1, mergeOffer.levelAfter)) * 100}%`,
+                              }}
+                              transition={{ delay: 0.5, duration: 0.6, ease: EASE.out }}>
+                              <span className='absolute inset-x-2 top-[3px] h-1 rounded-full bg-white/35' />
+                            </motion.div>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {!component && (
+                        <motion.div {...enter(0.48)} className='mt-1 flex flex-wrap justify-center gap-2'>
+                          {mergeOffer ? (
+                            <Button variant='ghost' size='sm' onClick={onClose} disabled={isBusy}>
+                              {keepLabel}
+                            </Button>
+                          ) : guitar ? (
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() =>
+                                equip(
+                                  {
+                                    guitarId: guitar.id,
+                                    year: result.newItem?.year,
+                                    country: result.newItem?.country,
+                                  },
+                                  { onSuccess: onClose },
+                                )
+                              }
+                              disabled={isBusy}>
+                              {t("opening.equip_now")}
+                            </Button>
+                          ) : null}
+                          <Button variant='ghost' size='sm' onClick={handleSell} disabled={isBusy}>
+                            {isSelling ? (
+                              t("common.selling")
+                            ) : (
+                              <>
+                                <span>{t("common.sell")}</span>
+                                <span className='flex items-center gap-1 text-amber-400'>
+                                  <img src='/images/tokens/coin.png' alt='' className='h-4 w-4 object-contain' />
+                                  {sellValue}
+                                </span>
+                              </>
+                            )}
+                          </Button>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {/* The one thing to do, pinned where the thumb is. */}
+                    <motion.div
+                      {...enter(0.56)}
+                      className='mx-auto flex w-full max-w-md shrink-0 flex-col gap-2.5 px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] pt-3'>
+                      {component ? (
+                        <>
+                          <Button size='xl' className='w-full' onClick={openBuilder} disabled={isBusy}>
+                            {t("opening.open_in_builder")}
+                          </Button>
+                          <Button variant='ghost' size='lg' className='w-full' onClick={onClose} disabled={isBusy}>
+                            {t("opening.keep")}
+                          </Button>
+                        </>
+                      ) : mergeOffer ? (
+                        <Button size='xl' className='w-full' onClick={handleMerge} disabled={isBusy}>
+                          {isMerging ? t("pack.merging") : t("stash.menu.merge", { gain: mergeOffer.gain })}
+                        </Button>
+                      ) : (
+                        <Button size='xl' className='w-full' onClick={onClose} disabled={isBusy}>
+                          {keepLabel}
+                        </Button>
+                      )}
+
+                      {onOpenAgain && caseDef && (
+                        <Button
+                          variant='ghost'
+                          size='lg'
+                          className='w-full'
+                          onClick={() => onOpenAgain(openAgainPayment?.kind === "token")}
+                          disabled={isBusy || !openAgainPayment}>
+                          {isOpeningAgain ? (
+                            t("cases.opening")
+                          ) : (
+                            <>
+                              <span className='truncate'>
+                                {t("opening.open_another", { name: labels.caseName(caseDef) })}
+                              </span>
+                              {openAgainPayment?.kind === "fame" ? (
+                                <span className='flex items-center gap-1.5 text-amber-400'>
+                                  <img src='/images/tokens/coin.png' alt='' className='h-5 w-5 object-contain' />
+                                  {openAgainPayment.cost}
+                                </span>
+                              ) : openAgainPayment?.kind === "token" ? (
+                                <span className='flex items-center gap-1.5 text-emerald-400'>
+                                  <FreeCaseIcon size={20} />
+                                  {t("view.free_cases", { count: 1 })}
+                                </span>
+                              ) : (
+                                <span className='flex items-center gap-1.5 text-zinc-500'>
+                                  <img
+                                    src='/images/tokens/coin.png'
+                                    alt=''
+                                    className='h-5 w-5 object-contain opacity-50'
+                                  />
+                                  {t("opening.cost_needed", { cost: caseDef.fameCost })}
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body,
       )}
-    </AnimatePresence>,
-    document.body
-    )}
-    {merge.element}
+      {merge.element}
     </>
   );
 };

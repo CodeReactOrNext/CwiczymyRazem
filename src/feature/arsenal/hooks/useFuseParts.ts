@@ -25,8 +25,13 @@ interface FusePartsInput {
 /**
  * Reworks a stack of parts up a tier. Counts and the Fame fee live in
  * `data/fusion.ts`; the server recomputes both before anything is spent.
+ *
+ * `scene: false` is for a caller that animates the job itself (the Workshop
+ * anvil): no full-screen scene and no toast, and the Fame and the refetch land
+ * at once — the caller draws its result from the mutation's answer, not from
+ * the refetched wallet.
  */
-export const useFuseParts = () => {
+export const useFuseParts = ({ scene: withScene = true } = {}) => {
   const { t } = useTranslation("arsenal");
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
@@ -35,9 +40,17 @@ export const useFuseParts = () => {
     mutationFn: ({ partId, tier, crafts }: FusePartsInput) =>
       fuseParts(partId, tier, crafts),
     onMutate: ({ partId, tier, crafts }) => ({
-      sceneId: beginScene({ type: "rework", partId, tier, crafts }),
+      sceneId: withScene
+        ? beginScene({ type: "rework", partId, tier, crafts })
+        : null,
     }),
     onSuccess: (data, _input, scene) => {
+      if (!withScene) {
+        dispatch(addFame(-data.fameSpent));
+        queryClient.invalidateQueries({ queryKey: ARSENAL_QUERY_KEY });
+        return;
+      }
+
       // Negative: the fee left the player's balance. Both wait for the scene
       // to go, so the tab re-renders off its frames and the wallet's count
       // plays where it can be seen.
@@ -53,7 +66,10 @@ export const useFuseParts = () => {
         t("toasts.reworked", {
           qty: data.produced.qty,
           part: t("labels.part_name", {
-            tier: t(`labels.part_tier.${data.produced.tier}`, data.produced.tier),
+            tier: t(
+              `labels.part_tier.${data.produced.tier}`,
+              data.produced.tier,
+            ),
             part: t(
               `labels.part.${data.produced.partId}`,
               getPartLabel(data.produced.partId),

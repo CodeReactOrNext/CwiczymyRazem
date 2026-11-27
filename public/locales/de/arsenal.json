@@ -227,7 +227,9 @@
     "cost_needed": "{{cost}} benötigt",
     "pity_new": "Garantie eingelöst — ein Modell, das noch nicht im Dex war",
     "pity_top": "Garantie eingelöst — {{rarity}} oder besser",
-    "merge": "Mit bester Kopie verschmelzen · +{{gain}} Lvl ({{before}} → {{after}})"
+    "merge": "Mit bester Kopie verschmelzen · +{{gain}} Lvl ({{before}} → {{after}})",
+    "tap_to_stop": "Tippen zum Anhalten",
+    "best_copy": "Dein bestes Exemplar"
   },
   "builder": {
     "slots": {
@@ -977,7 +979,42 @@
     "job_with_gain": "{{job}} · +{{count}} Level",
     "previous_instrument": "Vorheriges Instrument",
     "next_instrument": "Nächstes Instrument",
-    "n_of_total": "{{n}} von {{total}}"
+    "n_of_total": "{{n}} von {{total}}",
+    "rooms": {
+      "label": "Werkstattbereich",
+      "gear": "Ausrüstung",
+      "parts": "Teile"
+    },
+    "forge": {
+      "filter": "Teile zeigen",
+      "filter_all": "Alle",
+      "filter_ready": "Bereit",
+      "nothing_ready": "Gerade lässt sich nichts umarbeiten.",
+      "group": {
+        "guitar": "Gitarrenteile",
+        "pedal": "Pedalteile",
+        "shared": "Beide"
+      },
+      "pick": "Wähle einen Stapel und leg ihn auf den Amboss.",
+      "top_tier": "Dieses Teil ist schon ganz oben auf seiner Leiter.",
+      "make": "Schmieden",
+      "forging": "Wird geschmiedet…",
+      "more_needed": "Noch {{count}} nötig",
+      "fewer": "Weniger",
+      "more": "Mehr",
+      "max": "Max",
+      "can_make": "Bis zu {{count}} aus diesem Stapel",
+      "can_afford": "Fame reicht für {{count}}",
+      "fame_short": "Noch {{fame}} Fame nötig"
+    },
+    "gems": {
+      "title": "Eigenschaften",
+      "empty": "Leer",
+      "add": "Eigenschaft einsetzen",
+      "socket": "Fassung {{n}} von {{max}}",
+      "no_imprint": "Eigenschaften kommen als Abdrücke hinein. Einen bekommst du mit einem Extraktor an einem anderen Instrument.",
+      "add_body": "Wähle einen Abdruck zum Einsetzen. Jede Eigenschaft, die es schon hat, erhöht den Preis."
+    }
   },
   "mods": {
     "remove_aria": "Diesen Mod für {{fame}} Fame ausbauen",

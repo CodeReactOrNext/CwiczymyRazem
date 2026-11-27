@@ -22,7 +22,7 @@ import { readableText } from "lib/colorTheme/colorTheme";
 import { Hammer, Wrench } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { CardTraits, useItemTraitStates } from "../CardTraits";
+import { useItemTraitStates } from "../CardTraits";
 import { ConditionMeter } from "../ConditionMeter";
 import { InServiceTags } from "../InServiceTags";
 import { LevelEmblem } from "../LevelEmblem";
@@ -33,6 +33,7 @@ import { JobCard } from "./JobCard";
 import type { ModSlotTarget } from "./ModSlotDialog";
 import { ModSlotDialog } from "./ModSlotDialog";
 import { RarityPath } from "./RarityPath";
+import { TraitSockets } from "./TraitSockets";
 import type { WorkshopJob } from "./WorkshopJobModal";
 import { WorkshopJobModal } from "./WorkshopJobModal";
 
@@ -176,6 +177,10 @@ export const WorkshopBench = ({
           onOpenSlot={setSlot}
         />
 
+        {/* The trait sockets, under the instrument: all three, filled or not,
+            so an empty one says that traits can be added at all. */}
+        <TraitSockets entry={entry} states={traitStates} fame={fame} />
+
         {/* Status bar: the grade, spelled out, and the level beside it.
             Build level and promotions are not here on purpose — the build card
             says them in the words that matter ("Build 1 → 2 · 2 more to the
@@ -206,15 +211,6 @@ export const WorkshopBench = ({
             title={t("workshop.level")}
           />
         </div>
-
-        {/* What the item pays on top of its level. No bench job touches traits,
-            but this is where the player decides how much to sink into an item,
-            and a trait is often the reason it is worth it. */}
-        {entry.traits.length > 0 && (
-          <div className='relative mx-auto w-full max-w-md overflow-hidden rounded-lg'>
-            <CardTraits traits={entry.traits} states={traitStates} />
-          </div>
-        )}
       </div>
 
       {/* ─── The things you can do ─── */}
