@@ -45,6 +45,28 @@ describe("TimerLayout", () => {
     expect(timer.startTimer).toHaveBeenCalled();
   });
 
+  it("pauses from the running skill's row and switches from another one", () => {
+    const timer = makeTimer(true);
+    const choseSkillHandler = vi.fn();
+    render(
+      <TimerLayout
+        timer={timer}
+        timerData={{ ...zero, technique: 5000 } as never}
+        chosenSkill='technique'
+        timerSubmitHandler={vi.fn()}
+        choseSkillHandler={choseSkillHandler}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /technique/i, pressed: true }));
+    expect(timer.stopTimer).toHaveBeenCalled();
+    expect(choseSkillHandler).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: /theory/i }));
+    expect(choseSkillHandler).toHaveBeenCalledWith("theory");
+  });
+
   it("at 00:00 goes back to Practice instead of opening an empty report", () => {
     const onBack = vi.fn();
     const timerSubmitHandler = vi.fn();

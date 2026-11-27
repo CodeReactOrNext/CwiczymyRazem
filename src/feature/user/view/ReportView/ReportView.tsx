@@ -155,6 +155,9 @@ const ReportView = () => {
   );
   const [freeInput, setFreeInput] = useState<FreeInput>("categories");
   const [skillMinutes, setSkillMinutes] = useState<SkillMinutes>({});
+  // The skill picked last: on desktop its time block opens with the cursor in
+  // the minutes, so the next thing to do is right under the click.
+  const [focusSkillId, setFocusSkillId] = useState<string | null>(null);
   const autoApplyTimer = applyTimer === "true";
   // Phones and tablets answer the log as three questions, one per screen.
   // Desktop keeps the whole form on one page — players with a mouse found
@@ -368,8 +371,10 @@ const ReportView = () => {
 
   const toggleSkill = (skillId: string, setFieldValue: SetFieldValue) => {
     const next = { ...skillMinutes };
-    if (skillId in next) delete next[skillId];
+    const isPicked = skillId in next;
+    if (isPicked) delete next[skillId];
     else next[skillId] = 0;
+    setFocusSkillId(isPicked ? null : skillId);
     setSkillMinutes(next);
     if (Object.keys(next).length === 0) setStep("pick");
     applySkillTimes(next, setFieldValue);
@@ -654,6 +659,7 @@ const ReportView = () => {
     setSkillMinutes((skills) =>
       Object.fromEntries(Object.keys(skills).map((skillId) => [skillId, 0]))
     );
+    setFocusSkillId(null);
     setAcceptExceedingTime(false);
     setAcceptLongTime(false);
     setSubmittedValues(null);
@@ -964,8 +970,10 @@ const ReportView = () => {
                       />
                     )}
 
+                    {/* One column: in two, the steppers landed at four
+                        different spots and the blocks ran together. */}
                     {!isSongMode && !isBySkill && (
-                      <div className='grid grid-cols-1 gap-4 2xl:grid-cols-2'>
+                      <div className='flex flex-col gap-4'>
                         {categories.map(({ key, label, hint }) => {
                           const minutes = getCategoryMinutes(values, key);
                           return (
@@ -993,44 +1001,26 @@ const ReportView = () => {
                     )}
 
                     {isBySkill && (
-                      <>
-                        <SessionSkillPicker
-                          value={skillMinutes}
-                          onToggle={(skillId) => toggleSkill(skillId, setFieldValue)}
-                        />
-                        {pickedSkills.length > 0 && (
-                          <div className='flex flex-col gap-5'>
-                            <h3 className='text-base font-semibold text-zinc-300'>
-                              {t("flow.q_time")}
-                            </h3>
-                            <div className='grid grid-cols-1 gap-4 2xl:grid-cols-2'>
-                              {pickedSkills.map((skill) => {
-                                const minutes = skillMinutes[skill.id] ?? 0;
-                                return (
-                                  <TimeBlock
-                                    key={skill.id}
-                                    variant='row'
-                                    tone={categoryTone(skill.category)}
-                                    leading={
-                                      <CategoryBadge
-                                        category={skill.category}
-                                        active={minutes > 0}
-                                      />
-                                    }
-                                    title={tSkills(`skills.${skill.id}.name` as never)}
-                                    minutes={minutes}
-                                    max={MAX_SKILL_MINUTES}
-                                    onChange={(next) =>
-                                      setSkillMinutesFor(skill.id, next, setFieldValue)
-                                    }
-                                    onRemove={() => toggleSkill(skill.id, setFieldValue)}
-                                  />
-                                );
-                              })}
-                            </div>
-                          </div>
+                      <SessionSkillPicker
+                        value={skillMinutes}
+                        onToggle={(skillId) => toggleSkill(skillId, setFieldValue)}
+                        renderPicked={(skill) => (
+                          <TimeBlock
+                            key={skill.id}
+                            variant='row'
+                            sunk
+                            autoFocus={skill.id === focusSkillId}
+                            tone={categoryTone(skill.category)}
+                            title={tSkills(`skills.${skill.id}.name` as never)}
+                            minutes={skillMinutes[skill.id] ?? 0}
+                            max={MAX_SKILL_MINUTES}
+                            onChange={(next) =>
+                              setSkillMinutesFor(skill.id, next, setFieldValue)
+                            }
+                            onRemove={() => toggleSkill(skill.id, setFieldValue)}
+                          />
                         )}
-                      </>
+                      />
                     )}
 
                     {isSongMode && (

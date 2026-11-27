@@ -21,6 +21,9 @@ export const MAX_CATEGORY_MINUTES = 480;
 /** The session lengths worth one tap. Anything else is stepped or typed. */
 export const TIME_PRESETS = [10, 15, 20, 30, 45, 60];
 
+/** The shorter set a desktop row has room for, beside its stepper. */
+export const ROW_TIME_PRESETS = [15, 30, 45, 60];
+
 /** Snaps to the next/previous multiple of the step, so 7 → 10 → 5 → 0. */
 export const stepMinutesUp = (minutes: number, max: number) =>
   Math.min(max, (Math.floor(minutes / MINUTE_STEP) + 1) * MINUTE_STEP);

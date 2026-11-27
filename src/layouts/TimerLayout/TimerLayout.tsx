@@ -8,28 +8,22 @@ import { BackLink } from "components/BackLink/BackLink";
 import { ConfirmDialog } from "components/ConfirmDialog/ConfirmDialog";
 import MainContainer from "components/MainContainer";
 import { PAGE_CONTENT } from "components/PageShell/PageShell";
+import { StateDot } from "feature/exercisePlan/views/PracticeSession/components/StateDot";
 import { AmpSimButton } from "feature/toneStudio/components/AmpSimButton";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, Play, RotateCcw } from "lucide-react";
+import { ArrowRight, Pause, Play, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import type { TimerInterface } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
 import { calculatePercent, convertMsToHMS } from "utils/converter";
 
-import BlinkingDot from "./components/BlinkingDot";
 import CategoryBox from "./components/CategoryBox";
 import FreeTimerIntervalAlert from "./components/FreeTimerIntervalAlert";
 import FreeTimerMetronome from "./components/FreeTimerMetronome";
+import SkillRow from "./components/SkillRow";
 import { skillColors } from "./components/Stopwatch/Stopwatch";
-
-const TIMER_PARTICLES = Array.from({ length: 12 }, (_, i) => ({
-  x: `${50 + 45 * Math.cos(i * (Math.PI / 6))}%`,
-  y: `${50 + 45 * Math.sin(i * (Math.PI / 6))}%`,
-  delay: i * 0.15,
-}));
 
 interface TimerLayoutProps {
   timer: useTimerInterface;
@@ -42,220 +36,91 @@ interface TimerLayoutProps {
   isFinishing?: boolean;
 }
 
-// Komponent łączący animowaną tarczę z pierścieniami umiejętności
-const AnimatedTimerDisplay = ({
-  value,
+const RING_RADIUS = 120;
+const RING_GAP = 12;
+// A ring is full after half an hour on its skill.
+const RING_FULL_MS = 30 * 60 * 1000;
+
+type DialSkill = keyof typeof skillColors;
+
+// The clock with one ring per skill. Flat on purpose: no glow or particles,
+// the running skill is told apart by a thicker ring and the dimmed others.
+const TimerDial = ({
   text,
-  isPlaying,
-  size = "lg",
   activeSkill,
+  activeSkillName,
   timerData,
 }: {
-  value: number;
   text: string;
-  isPlaying: boolean;
-  size?: "sm" | "md" | "lg";
   activeSkill?: SkillsType | null;
-  timerData: {
-    creativity: number;
-    hearing: number;
-    technique: number;
-    theory: number;
-  };
-}) => {
-  const sizeClasses = {
-    sm: "h-40 w-40",
-    md: "h-52 w-52",
-    lg: "h-64 w-64",
-  };
+  activeSkillName?: string;
+  timerData: Record<DialSkill, number>;
+}) => (
+  // force-dark: the dial is a dark disc in either theme, and so is its text.
+  <div className='force-dark relative h-48 w-48 lg:h-64 lg:w-64'>
+    <svg
+      className='absolute inset-0 -rotate-90'
+      width='100%'
+      height='100%'
+      viewBox='0 0 264 264'>
+      <circle cx='132' cy='132' r='131' fill='black' />
+      {(Object.keys(skillColors) as DialSkill[]).map((skill, index) => {
+        const color = skillColors[skill];
+        const r = RING_RADIUS - RING_GAP * index;
+        const circumference = 2 * Math.PI * r;
+        const progress = Math.min(1, timerData[skill] / RING_FULL_MS);
+        const isActive = skill === activeSkill;
+        const width = !activeSkill ? 5 : isActive ? 7 : 4;
 
-  const getProgressColor = () => {
-    if (activeSkill) {
-      return skillColors[activeSkill];
-    }
-
-    if (value > 75) return "hsl(210, 90%, 60%)";
-    if (value > 50) return "hsl(260, 90%, 60%)";
-    if (value > 25) return "hsl(330, 90%, 60%)";
-    return "hsl(0, 90%, 60%)";
-  };
-
-  const progressColor = getProgressColor();
-  const glowColor = isPlaying ? progressColor : "hsl(var(--muted))";
-
-  // Parametry dla pierścieni umiejętności
-  const radius = 120;
-  const strokeWidth = 5;
-  const circumference = 2 * Math.PI * radius;
-  const gap = 12;
-
-  const getCircleOffset = (skillTime: number) => {
-    const progress = (skillTime / (30 * 60 * 1000)) * 100;
-    return circumference - (progress / 100) * circumference;
-  };
-
-  const getOpacity = (skill: string) => {
-    if (!activeSkill) return 0.2;
-    return skill === activeSkill ? 0.15 : 0.05;
-  };
-
-  const getStrokeOpacity = (skill: string) => {
-    if (!activeSkill) return 0.7;
-    return skill === activeSkill ? 1 : 0.2;
-  };
-
-  const getStrokeWidth = (skill: string) => {
-    if (!activeSkill) return strokeWidth;
-    return skill === activeSkill ? strokeWidth + 2 : strokeWidth - 2;
-  };
-
-  return (
-    // force-dark: the dial is a dark disc in either theme, and so is its text.
-    <div className='force-dark relative h-64 w-64'>
-      {/* Ciemne tło timera z kolorowym gradientem */}
-      <div
-        className='absolute inset-0 rounded-full bg-black/80'
-        style={{
-          background: activeSkill
-            ? `radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.95) 100%)`
-            : "black",
-          boxShadow: activeSkill
-            ? `0 0 40px 5px ${progressColor}30, inset 0 0 20px 0px ${progressColor}20`
-            : "none",
-        }}
-      />
-
-      {/* Efekt blasku pod tarczą */}
-      <div
-        className={cn(
-          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[30px] transition-all duration-slow",
-          sizeClasses[size]
-        )}
-        style={{
-          background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
-          opacity: isPlaying ? 0.15 : 0.05,
-        }}
-      />
-
-      {/* Pierścienie umiejętności */}
-      <svg
-        className='absolute inset-0 -rotate-90 transform'
-        width='100%'
-        height='100%'
-        viewBox='0 0 264 264'
-        style={{ zIndex: 10 }}>
-        {Object.keys(skillColors).map((skill, index) => {
-          const color = skillColors[skill as keyof typeof skillColors];
-          const r = radius - gap * index;
-          const isActive = skill === activeSkill;
-
-          const filterEffect =
-            isActive && activeSkill ? `drop-shadow(0 0 5px ${color})` : "none";
-
-          return (
-            <g key={skill} style={{ filter: filterEffect }}>
+        return (
+          <g key={skill}>
+            <circle
+              cx='132'
+              cy='132'
+              r={r}
+              stroke={color}
+              strokeWidth={width}
+              fill='none'
+              opacity={0.16}
+            />
+            {progress > 0 && (
               <circle
                 cx='132'
                 cy='132'
                 r={r}
                 stroke={color}
-                strokeWidth={getStrokeWidth(skill)}
-                fill='none'
-                opacity={getOpacity(skill)}
-                style={{
-                  transition: "opacity 0.5s ease, stroke-width 0.5s ease",
-                }}
-              />
-              <circle
-                cx='132'
-                cy='132'
-                r={r}
-                stroke={color}
-                strokeWidth={getStrokeWidth(skill)}
+                strokeWidth={width}
                 fill='none'
                 strokeLinecap='round'
+                opacity={!activeSkill || isActive ? 1 : 0.4}
                 style={{
                   strokeDasharray: circumference,
-                  strokeDashoffset: getCircleOffset(
-                    timerData[skill as keyof typeof timerData]
-                  ),
-                  transition: "all 0.5s ease",
-                  opacity: getStrokeOpacity(skill),
-                  filter: isActive ? "brightness(1.3)" : "brightness(0.8)",
+                  strokeDashoffset: circumference * (1 - progress),
+                  transition: "stroke-dashoffset 0.5s ease, opacity 0.5s ease",
                 }}
               />
-            </g>
-          );
-        })}
-      </svg>
+            )}
+          </g>
+        );
+      })}
+    </svg>
 
-      {/* Animowane elementy */}
-      <div
-        className={cn(
-          "relative rounded-full backdrop-blur-sm",
-          sizeClasses[size]
-        )}>
-        {isPlaying && (
-          <div className='absolute inset-0 z-20 overflow-hidden rounded-full'>
-            {TIMER_PARTICLES.map((particle, i) => (
-              <div
-                key={i}
-                className='absolute h-1 w-1 rounded-full bg-white animate-timer-particle'
-                style={{
-                  "--particle-x": particle.x,
-                  "--particle-y": particle.y,
-                  animationDelay: `${particle.delay}s`,
-                } as CSSProperties}
-              />
-            ))}
-          </div>
-        )}
-
-        <div
-          className={cn(
-            "absolute inset-[-2px] z-0 rounded-full",
-            isPlaying && "animate-[spin_8s_linear_infinite]"
-          )}
-          style={{
-            background: `conic-gradient(
-              from ${isPlaying ? 0 : 180}deg,
-              transparent,
-              ${glowColor},
-              transparent
-            )`,
-            opacity: 0.2,
-          }}
-        />
-
-        {/* Główny czas w środku */}
-        <div className='absolute inset-0 z-20 flex flex-col items-center justify-center rounded-full text-white'>
-          <div className='text-center'>
-            <p
-              translate="no"
-              className='font-sans text-5xl font-semibold tracking-wider'
-              style={{
-                textShadow: activeSkill
-                  ? `0 0 10px ${progressColor}50`
-                  : "none",
-              }}>
-              {text}
-            </p>
-          </div>
-        </div>
-
-        {isPlaying && (
-          <div
-            className='absolute inset-0 z-10 rounded-full border-[3px] animate-timer-pulse-glow'
-            style={{
-              borderColor: progressColor,
-              boxShadow: `0 0 5px ${progressColor}, inset 0 0 5px ${progressColor}`,
-            }}
-          />
-        )}
-      </div>
+    <div className='absolute inset-0 flex flex-col items-center justify-center gap-1 text-white'>
+      <p
+        translate='no'
+        className='font-sans text-4xl font-semibold tabular-nums tracking-wider lg:text-5xl'>
+        {text}
+      </p>
+      {/* Desktop names the skill right next to the dial; the phone has no
+          such line, so the dial carries it. */}
+      {activeSkillName && (
+        <p translate='no' className='text-xs font-medium text-zinc-400 lg:hidden'>
+          {activeSkillName}
+        </p>
+      )}
     </div>
-  );
-};
+  </div>
+);
 
 const TimerLayout = ({
   timer,
@@ -355,37 +220,59 @@ const TimerLayout = ({
         <Card size='sm'>
           <div className='flex flex-col gap-8 p-2 sm:p-4 lg:flex-row lg:items-center lg:gap-10'>
             <div className='flex shrink-0 justify-center'>
-              <AnimatedTimerDisplay
-                value={100 - (time / (30 * 60 * 1000)) * 100}
+              <TimerDial
                 text={formatTime(time)}
-                isPlaying={timerEnabled}
                 activeSkill={chosenSkill}
+                activeSkillName={chosenSkill ? getSkillName(chosenSkill) : undefined}
                 timerData={timerData}
               />
             </div>
 
             <div className='grid min-w-0 flex-1 grid-cols-1 gap-6 lg:content-center lg:gap-10'>
-              {chosenSkill ? (
-                <div>
-                  <p className='text-sm font-medium text-zinc-400'>
-                    {t("currently_exercising")}
-                  </p>
-                  <div className='mt-1.5 flex items-center gap-2.5'>
-                    <BlinkingDot isActive={timerEnabled} />
-                    <span translate="no" className='text-2xl font-bold text-white'>
-                      {getSkillName(chosenSkill)}
-                    </span>
+              <div className='flex flex-col gap-4'>
+                {chosenSkill ? (
+                  // Desktop: pause sits where the start was a moment ago.
+                  <div className='hidden flex-wrap items-end justify-between gap-x-8 gap-y-5 lg:flex'>
+                    <div>
+                      <p className='text-sm font-medium text-zinc-400'>
+                        {t("currently_exercising")}
+                      </p>
+                      <div className='mt-1.5 flex items-center gap-2.5'>
+                        <StateDot on={timerEnabled} className='h-2 w-2' />
+                        <span translate="no" className='text-2xl font-bold text-white'>
+                          {getSkillName(chosenSkill)}
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      size='lg'
+                      translate='no'
+                      className='min-w-[140px]'
+                      onClick={() => (timerEnabled ? stopTimer() : startTimer())}>
+                      {timerEnabled ? (
+                        <>
+                          <Pause fill='currentColor' />
+                          {t("pause")}
+                        </>
+                      ) : (
+                        <>
+                          <Play fill='currentColor' />
+                          {t("start")}
+                        </>
+                      )}
+                    </Button>
                   </div>
-                </div>
-              ) : (
-                <div className='space-y-4'>
+                ) : (
                   <p className='text-lg font-semibold text-white'>
                     {t("choose_practising")}
                   </p>
-                  {/* One column where this middle column gets squeezed between
-                      the clock and the metronome (lg), so labels never run
-                      into the neighbouring button. */}
-                  <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2'>
+                )}
+
+                {/* Desktop chooser. One column where this middle column gets
+                    squeezed between the clock and the metronome (lg), so labels
+                    never run into the neighbouring button. */}
+                {!chosenSkill && (
+                  <div className='hidden gap-2 lg:grid lg:grid-cols-1 xl:grid-cols-2'>
                     {skillsData.map((skill) => (
                       <button
                         key={skill.id}
@@ -397,8 +284,27 @@ const TimerLayout = ({
                       </button>
                     ))}
                   </div>
+                )}
+
+                {/* Phone: one list is the chooser, the summary and the pause,
+                    so nothing has to be scrolled to below the metronome. */}
+                <div className='flex flex-col gap-2 lg:hidden'>
+                  {skillsData.map((skill) => (
+                    <SkillRow
+                      key={skill.id}
+                      skillId={skill.id}
+                      title={skill.title}
+                      time={skill.time}
+                      percent={skill.percent}
+                      skillColor={skill.color}
+                      chosen={chosenSkill === skill.id}
+                      timerEnabled={timerEnabled}
+                      onStart={() => startSkill(skill.id)}
+                      onStop={() => stopTimer()}
+                    />
+                  ))}
                 </div>
-              )}
+              </div>
 
               <div>
                 <p className='text-sm font-medium text-zinc-400'>
@@ -421,7 +327,8 @@ const TimerLayout = ({
           </div>
         </Card>
 
-        <div className='grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4 lg:gap-6'>
+        {/* Desktop only: on the phone the list above already is the summary. */}
+        <div className='hidden gap-6 lg:grid lg:grid-cols-4'>
           {skillsData.map((skill) => (
             <CategoryBox
               key={skill.id}
@@ -430,11 +337,8 @@ const TimerLayout = ({
               time={skill.time}
               skillColor={skill.color}
               timerEnabled={timerEnabled}
-              onStart={() => {
-                choseSkillHandler(skill.id);
-                startTimer();
-              }}
-              onStop={stopTimer}
+              onStart={() => startSkill(skill.id)}
+              onStop={() => stopTimer()}
               percent={skill.percent}
               chosen={chosenSkill === skill.id}
               // Until a category is picked the chooser above is the one way

@@ -36,7 +36,10 @@ const FreeTimerMetronome = () => {
 
   return (
     <AccordionItem value='metronome' className='rounded-lg border-none bg-zinc-800/40'>
-      <AccordionTrigger className='px-4 py-3 hover:no-underline'>
+      {/* Tempo and play stay reachable while collapsed; the panel only holds
+          the settings. The key sits beside the trigger, not inside it. */}
+      <div className='flex items-center gap-2 pr-3 [&>h3]:min-w-0 [&>h3]:flex-1'>
+        <AccordionTrigger className='gap-2 py-3 pl-4 pr-1 hover:no-underline'>
         <div className='flex items-center gap-2'>
           <GiMetronome className='h-4 w-4 text-zinc-400' />
           <span className='text-sm font-medium text-zinc-300'>
@@ -53,13 +56,24 @@ const FreeTimerMetronome = () => {
                 : undefined
             }
           />
-          {metronome.isPlaying && (
-            <span translate='no' className='text-xs text-zinc-500'>
-              {metronome.bpm} BPM
-            </span>
-          )}
+          <span translate='no' className='text-xs tabular-nums text-zinc-500'>
+            {metronome.bpm} BPM
+          </span>
         </div>
-      </AccordionTrigger>
+        </AccordionTrigger>
+        <Button
+          onClick={handleTogglePlay}
+          variant='subtle'
+          size='icon-sm'
+          className={cn(
+            "shrink-0",
+            metronome.isPlaying &&
+              "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200"
+          )}
+          aria-label={metronome.isPlaying ? t("metronome.stop") : t("metronome.start")}>
+          {metronome.isPlaying ? <Pause fill='currentColor' /> : <Play fill='currentColor' />}
+        </Button>
+      </div>
 
       <AccordionContent className='flex flex-col gap-4 px-4 pb-4 pt-0'>
         <div className='[&>div]:bg-transparent [&>div]:p-0 [&>div]:shadow-none [&>div]:backdrop-blur-none'>

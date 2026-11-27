@@ -6,6 +6,7 @@ import { type ReactNode, useState } from "react";
 
 import { type BlockTone, TONE_CLASSES } from "./helpers/categoryTone";
 import {
+  ROW_TIME_PRESETS,
   stepMinutesDown,
   stepMinutesUp,
   TIME_PRESETS,
@@ -19,6 +20,10 @@ interface MinutesStepperProps {
   size?: "md" | "lg";
   /** Tints the number — for a block that lights up once it holds time. */
   tone?: BlockTone;
+  /** An empty field reads quieter, so the filled ones stand out in a list. */
+  dimZero?: boolean;
+  /** Puts the cursor in the field as it appears — for a block just added. */
+  autoFocus?: boolean;
   onChange: (minutes: number) => void;
 }
 
@@ -29,6 +34,8 @@ export const MinutesStepper = ({
   max,
   size = "md",
   tone,
+  dimZero,
+  autoFocus,
   onChange,
 }: MinutesStepperProps) => {
   const { t } = useTranslation("report");
@@ -52,6 +59,7 @@ export const MinutesStepper = ({
       <div className='flex items-baseline gap-2'>
         <input
           inputMode='numeric'
+          autoFocus={autoFocus}
           aria-label={t("flow.minutes_of", { label })}
           value={draft ?? String(minutes)}
           onChange={(event) => {
@@ -69,8 +77,12 @@ export const MinutesStepper = ({
           }}
           className={cn(
             "rounded-lg bg-zinc-950/60 text-center font-bold tabular-nums transition-colors duration-base focus:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-            size === "lg" ? "h-14 w-24 text-4xl" : "h-11 w-16 text-xl",
-            tone ? TONE_CLASSES[tone].number : "text-zinc-100",
+            size === "lg" ? "h-14 w-24 text-4xl" : "h-11 w-[4.5rem] text-2xl",
+            tone
+              ? TONE_CLASSES[tone].number
+              : dimZero && minutes === 0
+                ? "text-zinc-400"
+                : "text-zinc-100",
           )}
         />
         <span className='text-sm font-medium text-zinc-400'>
@@ -112,6 +124,13 @@ interface TimeBlockProps {
   children?: ReactNode;
   /** The colour a `row` block lights up in — its category's; songs stay emerald. */
   tone?: BlockTone;
+  /**
+   * A `row` block sitting inside another plate (a skill under its category):
+   * it sinks into the plate instead of rising off it.
+   */
+  sunk?: boolean;
+  /** Starts a `row` block with the cursor in its minutes. */
+  autoFocus?: boolean;
 }
 
 /**
@@ -130,6 +149,8 @@ export const TimeBlock = ({
   variant = "card",
   children,
   tone = "emerald",
+  sunk,
+  autoFocus,
 }: TimeBlockProps) => {
   const { t } = useTranslation("report");
 
@@ -140,49 +161,77 @@ export const TimeBlock = ({
       // out across the row, so the filled blocks read at a glance.
       <div
         className={cn(
-          "flex flex-col gap-5 rounded-lg p-5 ring-1 ring-inset transition-[background-color,box-shadow] duration-base xl:px-6",
+          "flex flex-col gap-5 rounded-lg ring-1 ring-inset transition-[background-color,box-shadow] duration-base",
+          sunk ? "px-5 py-4" : "px-6 py-5",
           isActive
             ? cn("bg-gradient-to-r", TONE_CLASSES[tone].row)
-            : "bg-zinc-950/30 ring-transparent",
+            : cn("ring-transparent", sunk ? "bg-zinc-950/40" : "bg-zinc-800/40"),
         )}>
-        <div className='flex flex-wrap items-center gap-x-8 gap-y-4'>
-          <div className='flex min-w-[12rem] flex-1 items-center gap-4'>
+        <div className='flex flex-wrap items-center gap-x-6 gap-y-4'>
+          <div className='flex min-w-[10rem] flex-1 items-center gap-4'>
             {leading}
             <div className='min-w-0 flex-1'>
               <p
                 translate={isName ? "no" : undefined}
                 className={cn(
-                  "truncate text-base font-semibold transition-colors duration-base",
-                  "text-zinc-100",
+                  "truncate font-semibold text-zinc-100",
+                  sunk ? "text-base" : "text-lg leading-snug",
                 )}>
                 {title}
               </p>
               {subtitle && (
                 <p
                   translate={isName ? "no" : undefined}
-                  className='truncate text-sm text-zinc-400'>
+                  className='mt-0.5 truncate text-sm text-zinc-400'>
                   {subtitle}
                 </p>
               )}
             </div>
           </div>
-          <MinutesStepper
-            label={title}
-            minutes={minutes}
-            max={max}
-            tone={isActive ? tone : undefined}
-            onChange={onChange}
-          />
-          {onRemove && (
-            <Button
-              type='button'
-              variant='ghost'
-              size='icon'
-              aria-label={t("flow.remove", { label: title })}
-              onClick={onRemove}>
-              <X />
-            </Button>
-          )}
+          {/* The presets, the stepper and the remove key wrap as one group and
+              the last two never part: a remove key alone on its own line
+              doubled the row's height. */}
+          <div className='ml-auto flex flex-wrap items-center justify-end gap-x-6 gap-y-3'>
+            <div className='flex shrink-0 gap-2'>
+              {ROW_TIME_PRESETS.map((preset) => (
+                <Button
+                  key={preset}
+                  type='button'
+                  variant='ghost'
+                  aria-pressed={minutes === preset}
+                  aria-label={`${title}: ${preset} ${t("flow.min")}`}
+                  onClick={() => onChange(preset)}
+                  className={cn(
+                    "min-w-11 px-3 tabular-nums",
+                    minutes === preset &&
+                      "bg-zinc-100 text-zinc-950 hover:bg-zinc-100 hover:text-zinc-950",
+                  )}>
+                  {preset}
+                </Button>
+              ))}
+            </div>
+            <div className='flex shrink-0 items-center gap-3'>
+              <MinutesStepper
+                label={title}
+                minutes={minutes}
+                max={max}
+                tone={isActive ? tone : undefined}
+                dimZero
+                autoFocus={autoFocus}
+                onChange={onChange}
+              />
+              {onRemove && (
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='icon'
+                  aria-label={t("flow.remove", { label: title })}
+                  onClick={onRemove}>
+                  <X />
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
         {children}
       </div>
