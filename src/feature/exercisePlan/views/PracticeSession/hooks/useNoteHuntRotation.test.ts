@@ -152,6 +152,19 @@ describe("useNoteHuntRotation — rounds that end on a verdict", () => {
     expect(result.current.rotation.roundEnd?.kind).toBe("solved");
   });
 
+  it("gives an interval-click exam round 15 s before it runs out", () => {
+    const exercise = makeExercise({ rotateSeconds: 45, mode: "intervalClick", roundVerdict: true });
+    const { result } = renderHook(() => {
+      const solvedRef = useRef(false);
+      return useNoteHuntRotation(exercise, true, solvedRef, true);
+    });
+    expect(result.current.secondsTotal).toBe(15);
+    act(() => void vi.advanceTimersByTime(14_000));
+    expect(result.current.roundEnd).toBeNull();
+    act(() => void vi.advanceTimersByTime(1_000));
+    expect(result.current.roundEnd).toEqual({ kind: "timeUp", seconds: 15 });
+  });
+
   it("ends an unanswered plain click round in an exam, after the exam's 10 s", () => {
     const exercise = makeExercise({ rotateSeconds: 25, mode: "click" });
     const { result } = renderHook(() => {

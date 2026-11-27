@@ -1,13 +1,25 @@
 import { accuracyToStars } from "feature/journey/utils/examStars";
 import { describe, expect, it } from "vitest";
 
-import { intervalClickExamAccuracy, intervalClickExamMinRounds } from "./clickExamGrade";
+import {
+  EXAM_CLICK_ROTATE_SECONDS,
+  examClickRotateSeconds,
+  intervalClickExamAccuracy,
+  intervalClickExamMinRounds,
+} from "./clickExamGrade";
+
+describe("examClickRotateSeconds", () => {
+  it("gives an interval-click round 15 s and a plain click round 10 s", () => {
+    expect(examClickRotateSeconds("intervalClick")).toBe(15);
+    expect(examClickRotateSeconds("click")).toBe(EXAM_CLICK_ROTATE_SECONDS);
+  });
+});
 
 describe("intervalClickExamMinRounds", () => {
-  it("asks for two thirds of the 10-second rounds the exam has time for", () => {
-    expect(intervalClickExamMinRounds(2)).toBe(8);
-    expect(intervalClickExamMinRounds(3)).toBe(12);
-    expect(intervalClickExamMinRounds(4)).toBe(16);
+  it("asks for two thirds of the 15-second rounds the exam has time for", () => {
+    expect(intervalClickExamMinRounds(2)).toBe(5);
+    expect(intervalClickExamMinRounds(3)).toBe(8);
+    expect(intervalClickExamMinRounds(4)).toBe(10);
   });
 });
 

@@ -101,7 +101,7 @@ const clickStep = (content: StepContent) => {
   const minutes = CLICK_EXERCISES.find((exercise) => exercise.id === content.exerciseId)?.timeInMinutes ?? 2;
   return baseStep(
     content,
-    `Place each root and click the interval above it, round after round, for ${minutes} minutes. Every round has to be answered within 10 seconds: a round that runs out ends the exam, and so do three wrong clicks. A cleaner run earns more stars.`,
+    `Place each root and click the interval above it, round after round, for ${minutes} minutes. Every round has to be answered within 15 seconds: a round that runs out ends the exam, and so do three wrong clicks. A cleaner run earns more stars.`,
     "Target",
   );
 };

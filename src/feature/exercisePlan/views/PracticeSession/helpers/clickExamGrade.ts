@@ -1,3 +1,4 @@
+import type { NoteHuntMode } from "feature/exercisePlan/utils/huntModes";
 import { EXAM_STAR_ACCURACY } from "feature/journey/utils/examStars";
 
 /**
@@ -6,6 +7,14 @@ import { EXAM_STAR_ACCURACY } from "feature/journey/utils/examStars";
  * cell on the board, and 10 s still allows a careful scan.
  */
 export const EXAM_CLICK_ROTATE_SECONDS = 10;
+
+/** An interval-click round asks for two clicks (the root, then the interval
+ *  above it), so its exam round gets more time than a single "find the note". */
+export const EXAM_INTERVAL_CLICK_ROTATE_SECONDS = 15;
+
+/** Round length of a click-answered exam round in this hunt mode. */
+export const examClickRotateSeconds = (mode: NoteHuntMode | undefined): number =>
+  mode === "intervalClick" ? EXAM_INTERVAL_CLICK_ROTATE_SECONDS : EXAM_CLICK_ROTATE_SECONDS;
 
 /**
  * Share of the exam's rounds that has to be solved, counting the rounds as if
@@ -17,7 +26,7 @@ const MIN_SOLVED_SHARE = 2 / 3;
 
 /** Rounds an interval-click exam of this length has to see solved to pass. */
 export const intervalClickExamMinRounds = (examMinutes: number): number =>
-  Math.max(1, Math.floor(((examMinutes * 60) / EXAM_CLICK_ROTATE_SECONDS) * MIN_SOLVED_SHARE));
+  Math.max(1, Math.floor(((examMinutes * 60) / EXAM_INTERVAL_CLICK_ROTATE_SECONDS) * MIN_SOLVED_SHARE));
 
 /**
  * The interval-click exam as an exam accuracy (0–100), the number its stars are

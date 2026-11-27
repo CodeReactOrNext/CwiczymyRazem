@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { Exercise, HuntPrompt } from "../../../types/exercise.types";
 import { isClickAnsweredMode } from "../../../utils/huntModes";
-import { EXAM_CLICK_ROTATE_SECONDS } from "../helpers/clickExamGrade";
+import { examClickRotateSeconds } from "../helpers/clickExamGrade";
 
 export interface HuntTarget {
   goal: string;
@@ -99,7 +99,9 @@ export function useNoteHuntRotation(
 ): NoteHuntRotation {
   const configuredRotateSeconds = exercise.noteHuntConfig?.rotateSeconds ?? 0;
   const isExamClickHunt = isExamMode && isClickAnsweredMode(exercise.noteHuntConfig?.mode);
-  const rotateSeconds = isExamClickHunt && configuredRotateSeconds > 0 ? EXAM_CLICK_ROTATE_SECONDS : configuredRotateSeconds;
+  const rotateSeconds = isExamClickHunt && configuredRotateSeconds > 0
+    ? examClickRotateSeconds(exercise.noteHuntConfig?.mode)
+    : configuredRotateSeconds;
   // Drills that wait for an answer carry no countdown at all, so they are enabled
   // by the flag rather than by a rotation length they don't have.
   const waitsForAnswer = exercise.noteHuntConfig?.advanceOn === "solved";
