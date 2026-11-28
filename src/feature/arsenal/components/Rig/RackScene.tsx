@@ -10,7 +10,7 @@ import { motion, useReducedMotion, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
 
 /** Fades a layer out toward the bottom-left and bottom-right of the beam. */
-const LAMP_MASK =
+export const LAMP_MASK =
   "radial-gradient(ellipse 34% 62% at 50% 0%, #000 0%, rgba(0,0,0,0.65) 45%, transparent 100%)";
 
 /** The corners of the niche, a touch darker than the photograph left them. */
@@ -18,7 +18,7 @@ const SCENE_VIGNETTE =
   "radial-gradient(100% 100% at 50% 42%, transparent 45%, rgba(0,0,0,0.55) 100%)";
 
 /** A reflection across a pane of glass: one bright streak and a faint second. */
-const GLASS_STREAK =
+export const GLASS_STREAK =
   "linear-gradient(112deg, transparent 22%, rgba(255,255,255,0.075) 28%, rgba(255,255,255,0.02) 36%, transparent 37%, transparent 63%, rgba(255,255,255,0.04) 66%, transparent 71%)";
 
 /** How the neon tube stutters every few seconds, as fractions of full light. */

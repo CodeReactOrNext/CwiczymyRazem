@@ -157,6 +157,13 @@ let noteTails = true;
  * a lower resolution and switches hit animations off (see liteTablatureStyle).
  */
 let lite = false;
+/**
+ * Tell the main thread where the cursor stands on the canvas (STYLE.reportCursor),
+ * for effects drawn over the board — stage mode's hit sparks. Off by default:
+ * nothing else needs it.
+ */
+let reportCursor = false;
+let reportedCursorX = -1;
 /** The lite board paints no more often than this — 30 frames a second. */
 const LITE_FRAME_MS = 1000 / 30;
 /** Rounding room, so a 60 Hz screen's every other frame (33.3 ms) gets through. */
@@ -3586,6 +3593,14 @@ function paintFrame(frameStamp?: number) {
   if (dispCursor > 0 || isPlaying) {
     // On a whole device pixel too, so the line stays one crisp stroke.
     const cursorX = Math.round(dispCursor * devicePx) / devicePx;
+    if (reportCursor) {
+      // CSS px from the canvas's left edge; vscale turns a note's world y into CSS px too.
+      const screenX = (contentLeft - scrollX + cursorX) * vscale;
+      if (Math.abs(screenX - reportedCursorX) >= 0.5) {
+        reportedCursorX = screenX;
+        self.postMessage({ type: 'CURSOR', x: screenX, scale: vscale });
+      }
+    }
     // Paused it is simply the board's ink — red read as an error. Learn mode
     // keeps no time, so there it rests on the target in the learn colour.
     ctx.strokeStyle = isPlaying ? CURSOR_COLOR : isLearning ? withAlpha(LEARN_COLOR, 0.6) : withAlpha(inkColor, 0.7);
@@ -4015,6 +4030,7 @@ self.onmessage = (e: MessageEvent) => {
       if (msg.showCounting !== undefined) showCounting = msg.showCounting;
       if (msg.showTechniqueLabels !== undefined) showTechniqueLabels = msg.showTechniqueLabels;
       if (msg.hitAnimations !== undefined) hitAnimations = msg.hitAnimations;
+      if (msg.reportCursor !== undefined) reportCursor = msg.reportCursor;
       if (msg.lite !== undefined && msg.lite !== lite) {
         lite = msg.lite;
         tailFades.clear();

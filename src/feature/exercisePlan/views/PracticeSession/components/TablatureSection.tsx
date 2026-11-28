@@ -3,7 +3,7 @@ import { cn } from "assets/lib/utils";
 import { BackingTrackButton } from "feature/backingTrack/components/BackingTrackButton";
 import type { BackingTrackStatus } from "feature/backingTrack/utils/backingTrackStatus";
 import { useTranslation } from "hooks/useTranslation";
-import { Repeat, Settings2, SlidersHorizontal, Timer, X, ZoomIn, ZoomOut } from "lucide-react";
+import { Clapperboard, Repeat, Settings2, SlidersHorizontal, Timer, X, ZoomIn, ZoomOut } from "lucide-react";
 import React, {
   memo,
   useCallback,
@@ -20,6 +20,9 @@ import { useSessionUI } from "../contexts/SessionUIContext";
 import { useTabOverlay } from "../contexts/TabOverlayContext";
 import { useTabPlayUntilStore } from "../hooks/tabPlayUntilStore";
 import { useFitTabHeight } from "../hooks/useFitTabHeight";
+import { type StageCursor, StageEffects } from "../stage/StageEffects";
+import { useStageTabHeight } from "../stage/stageModeStore";
+import { StageScore } from "../stage/StageScore";
 import { accuracyPerMeasure } from "../utils/measureAccuracy";
 import { buildTabSections } from "../utils/tabSections";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
@@ -80,6 +83,11 @@ interface TablatureSectionProps {
   /** Cinema mode: the backing video plays behind the notation, so the board
    *  turns translucent instead of hiding it. */
   cinema?: boolean;
+  /** Stage mode (desktop): the board alone, hanging in the studio room —
+   *  see StageRoom. Everything around it steps aside. */
+  stage?: boolean;
+  /** The way into stage mode; absent where the session cannot offer it. */
+  onEnterStage?: () => void;
   /** Song practice only: the backing track's state and the way into its
    *  editor, shown as a button under Calibrate timing. */
   backingTrackStatus?: BackingTrackStatus;
@@ -196,6 +204,8 @@ export const TablatureSection = memo(function TablatureSection({
   baseTempo,
   showAlphaTabScore,
   cinema = false,
+  stage = false,
+  onEnterStage,
   backingTrackStatus,
   onOpenBackingTrack,
   isAudioPlaying,
@@ -237,13 +247,20 @@ export const TablatureSection = memo(function TablatureSection({
   const { tuning, stringCount, pitchShift } = useGuitarTuningContext();
   const {
     settings,
-    palette,
-    isLightBoard,
+    palette: playerPalette,
+    isLightBoard: playerLightBoard,
     style: playerStyle,
   } = useTablatureStyle();
+  // The stage keeps the player's own colours; only a light board goes dark in the room.
+  const palette = playerPalette;
+  const isLightBoard = stage ? false : playerLightBoard;
   // Here only when the player picked it: "auto" leaves a desktop board alone.
   const lite = useTabLiteMode(false);
-  const tabStyle = useMemo(() => (lite ? liteTablatureStyle(playerStyle) : playerStyle), [lite, playerStyle]);
+  const tabStyle = useMemo(() => {
+    const base = lite ? liteTablatureStyle(playerStyle) : playerStyle;
+    // The stage's effects need to know where the cursor stands; nothing else does.
+    return { ...base, reportCursor: stage };
+  }, [lite, playerStyle, stage]);
   const renderData = useTablatureRenderData(
     activeTablature,
     palette,
@@ -302,8 +319,14 @@ export const TablatureSection = memo(function TablatureSection({
   const boardRef = useRef<HTMLDivElement>(null);
   // Untouched, the board takes the room there is; dragged, it is as tall as the
   // player made it, even when that pushes the keys under it off the screen.
-  const fitHeight = useFitTabHeight(boardRef, belowRef, !cinema && !gameMode);
-  const height = isCustom ? draggedHeight : (fitHeight ?? draggedHeight);
+  const fitHeight = useFitTabHeight(boardRef, belowRef, !cinema && !gameMode && !stage);
+  const stageHeight = useStageTabHeight(stage);
+  const height = stage ? stageHeight : isCustom ? draggedHeight : (fitHeight ?? draggedHeight);
+  // Where the board's cursor stands, for the stage's sparks — written by the worker, read on a hit.
+  const stageCursorRef = useRef<StageCursor | null>(null);
+  const handleStageCursor = useCallback((x: number, scale: number) => {
+    stageCursorRef.current = { x, scale };
+  }, []);
   const fitZoom = useAutoTabZoom({
     storageKey: exerciseId,
     measures: activeTablature,
@@ -457,7 +480,7 @@ export const TablatureSection = memo(function TablatureSection({
 
   // Song navigator strip — shared between the score (notation) view and the
   // canvas tab view, since both drive the same seek/loop wiring off `activeTablature`.
-  const minimapRow = (showMinimap || isMicEnabled || showBackingButton) && (
+  const minimapRow = !stage && (showMinimap || isMicEnabled || showBackingButton) && (
     <div
       className={cn(
         "flex items-center gap-6",
@@ -563,10 +586,13 @@ export const TablatureSection = memo(function TablatureSection({
         // Cinema pins the board to the bottom edge and drops its panel entirely,
         // so the picture owns the whole frame and only the notation sits on it.
         // pb clears the session's bottom bar (fixed, ~65px tall).
-        cinema
-          ? "fixed inset-x-0 bottom-0 z-20 mb-0 bg-transparent px-6 pb-[80px]"
-          // The board keeps its own (dark) look in the light theme too.
-          : "force-dark mb-4 bg-[#0f0f12]",
+        stage
+          // Stage: the whole screen, the board low in it over the room (StageRoom).
+          ? "force-dark pointer-events-none fixed inset-0 z-20 mb-0 rounded-none bg-transparent"
+          : cinema
+            ? "fixed inset-x-0 bottom-0 z-20 mb-0 bg-transparent px-6 pb-[80px]"
+            // The board keeps its own (dark) look in the light theme too.
+            : "force-dark mb-4 bg-[#0f0f12]",
       )}>
       {canShowAlphaTabScore && scoreEverShown && (
         <div
@@ -608,13 +634,32 @@ export const TablatureSection = memo(function TablatureSection({
           />
         </div>
       )}
+      {stage && !showAlphaTabScore && (
+        <StageEffects
+          boardRef={boardRef}
+          cursorRef={stageCursorRef}
+          hitNotes={hitNotes}
+          hitGlow={playerStyle.hitGlow ?? "#34d399"}
+          live={isMicEnabled}
+        />
+      )}
       {!showAlphaTabScore && (
-        <div className='px-2 pt-0'>
+        <div className={stage ? "absolute inset-x-0 bottom-[8vh] px-[1.5vw]" : "px-2 pt-0"}>
+          {/* The score stands right over the tab, where the eyes already are. */}
+          {stage && isMicEnabled && !gameMode && <StageScore className='mb-6' />}
           {minimapRow}
-          <LearnModeBar />
-          <div className='flex items-stretch gap-2'>
+          {!stage && <LearnModeBar />}
+          <div
+            className={cn(
+              "flex items-stretch gap-2",
+              // Flat and sharp, on one sheet of dark frosted glass: the room shows
+              // through, blurred, and a faint warm light — the lamp's — falls on its top. (The room's
+              // photographs are soft already — a depth of field that costs nothing.) It rises in
+              // when the stage opens.
+              stage && "pointer-events-auto rounded-2xl bg-zinc-950/55 bg-gradient-to-b from-amber-100/[0.05] to-transparent px-2 pb-1 pt-5 backdrop-blur-xl duration-slow animate-in fade-in slide-in-from-bottom-4",
+            )}>
           {/* The hand for the current grip — draws nothing unless the notes carry fingering. */}
-          {settings.showFingeringHand && !hideNotes && !cinema && !obscured && (
+          {settings.showFingeringHand && !hideNotes && !cinema && !stage && !obscured && (
             <FingeringHand
               measures={activeTablature}
               currentBeatRef={currentBeatRef}
@@ -661,13 +706,26 @@ export const TablatureSection = memo(function TablatureSection({
               tuningStrings={tuningStrings}
               stringCount={stringCount}
               style={tabStyle}
-              cinema={cinema}
+              cinema={cinema || stage}
+              bare={stage}
+              onCursor={stage ? handleStageCursor : undefined}
               maxDpr={lite ? LITE_MAX_DPR : undefined}
               ambientGlow={settings.ambientGlow && !lite}
               palette={palette}
               isLightBoard={isLightBoard}
             />
+            {!stage && (
             <div data-take-hide className='absolute bottom-3 right-3 z-20 flex items-center gap-2'>
+              {onEnterStage && !cinema && (
+                <button
+                  type='button'
+                  onClick={onEnterStage}
+                  title={t("tab.stage_hint")}
+                  className={cn(tabKey("default"), "h-9 gap-1.5 px-2.5")}>
+                  <Clapperboard className='h-3.5 w-3.5 shrink-0' />
+                  <span className='text-[11px] font-semibold'>{t("tab.stage")}</span>
+                </button>
+              )}
               <TablatureSettingsButton onOpen={() => setIsSettingsOpen(true)} />
               <TablatureZoomControl
                 zoom={zoom}
@@ -675,7 +733,8 @@ export const TablatureSection = memo(function TablatureSection({
                 onChange={handleZoomChange}
               />
             </div>
-            <TablatureResizeHandle height={height} onChange={setHeight} onReset={clearHeight} />
+            )}
+            {!stage && <TablatureResizeHandle height={height} onChange={setHeight} onReset={clearHeight} />}
           </div>
           </div>
         </div>

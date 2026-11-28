@@ -116,6 +116,10 @@ interface ExerciseContentAreaProps {
   /** Cinema mode — see BackingTrackBar. Turns this card translucent so the
    *  full-bleed video behind it is visible. */
   cinema?: boolean;
+  /** Stage mode — see StageRoom. Only the tab stays; the card around it goes. */
+  stage?: boolean;
+  /** The way into stage mode, where the session can offer it. */
+  onEnterStage?: () => void;
   /** The alignment screen is open over the session. Playback continues — that
    *  is the point of it — but the notation underneath stops drawing. */
   obscured?: boolean;
@@ -177,6 +181,8 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   onOpenBackingTrack,
   songSectionMapSlot,
   cinema = false,
+  stage = false,
+  onEnterStage,
   obscured = false,
   startGate,
 }: ExerciseContentAreaProps) {
@@ -198,7 +204,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   return (
     <div className={cn(
       "relative w-full overflow-hidden rounded-xl",
-      cinema ? "bg-transparent" : "bg-zinc-900 shadow-xl shadow-black/40"
+      cinema || stage ? "bg-transparent" : "bg-zinc-900 shadow-xl shadow-black/40"
     )}>
 
       {/* Tablature exercises dock the HUD next to their minimap; everything else gets it here.
@@ -310,12 +316,17 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         </div>
       ) : hasTablature ? (
         <>
-        {backingTrackSlot}
+        {/* The bar plays the backing track, so on stage it stays mounted and only leaves the picture. */}
+        <div className={stage ? "pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0" : "contents"}>
+          {backingTrackSlot}
+        </div>
         <div className='relative'>
         {startGate}
         {!suppressTablature && <TablatureSection
           exerciseId={currentExercise.id}
           cinema={cinema}
+          stage={stage}
+          onEnterStage={onEnterStage}
           backingTrackStatus={backingTrackStatus}
           onOpenBackingTrack={onOpenBackingTrack}
           activeTablature={activeTablature!}
@@ -400,13 +411,13 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
       )}
       
       <div ref={belowRef}>
-      {controlsSlot && !cinema && (
+      {controlsSlot && !cinema && !stage && (
         <div className="flex flex-row flex-wrap items-center justify-center gap-x-8 gap-y-3 px-4 pb-1 pt-5 [&>*]:!mb-0">
           {controlsSlot}
         </div>
       )}
 
-      {!gameMode && (
+      {!gameMode && !stage && (
         <ExerciseInstructionsInline
           exercise={activeExercise}
           rewardSkillId={rewardSkillId}

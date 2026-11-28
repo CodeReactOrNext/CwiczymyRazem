@@ -87,6 +87,9 @@ interface TablatureViewerProps {
    *  through. Only the CSS backdrop — the worker keeps painting the gutter and
    *  bend labels in the board colour, which is what makes them legible. */
   cinema?: boolean;
+  /** No backdrop at all: the surface under the board is its parent's (stage mode's glass).
+   *  The worker still paints in the board colour where legibility needs it. */
+  bare?: boolean;
   /** Highlights the beats/strings an editor has selected. Memoize it — a new
    *  object identity means a new message to the worker. */
   selection?: TablatureSelection | null;
@@ -107,6 +110,8 @@ interface TablatureViewerProps {
   maxDpr?: number;
   /** Called once if the board can't hold the frame rate while playing. Keep it stable. */
   onSlowFrames?: () => void;
+  /** Where the cursor stands on the canvas — see the bridge's `onCursor`. Keep it stable. */
+  onCursor?: (x: number, scale: number) => void;
 }
 
 const TablatureViewerInner = ({
@@ -143,6 +148,7 @@ const TablatureViewerInner = ({
   stringCount,
   style: baseStyle,
   cinema = false,
+  bare = false,
   selection,
   ambientGlow = true,
   palette,
@@ -151,6 +157,7 @@ const TablatureViewerInner = ({
   learnFocus = null,
   maxDpr,
   onSlowFrames,
+  onCursor,
 }: TablatureViewerProps) => {
   const { t } = useTranslation("session");
   const canvasRef      = useRef<HTMLCanvasElement>(null);
@@ -181,7 +188,7 @@ const TablatureViewerInner = ({
     hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef, hideNotes, hideDynamicsLane,
     measures, resetKey, audioContext, volumeRef, onSeek,
     loopStartBeat, loopEndBeat, playUntilBeat, zoom, tuningStrings, style, selection, obscured,
-    quarterTurned, learnFocus, maxDpr, onSlowFrames, perf,
+    quarterTurned, learnFocus, maxDpr, onSlowFrames, onCursor, perf,
   });
   const along = (pointer: { clientX: number; clientY: number }) =>
     pointerAlongBoard(pointer, quarterTurned);
@@ -244,6 +251,8 @@ const TablatureViewerInner = ({
         "w-full px-4 pb-4 pt-0 relative select-none overflow-hidden",
         // Square corners would give the wash away as a stray rectangle.
         cinema && "rounded-lg",
+        // On someone else's surface the parent owns the margins.
+        bare && "pb-0",
         !isPlaying && onSeek && "cursor-pointer",
         !isPlaying && !onSeek && "cursor-grab active:cursor-grabbing",
         className,
@@ -252,7 +261,7 @@ const TablatureViewerInner = ({
         height: heightPx,
         // Cinema keeps a thin black wash under the staff — enough to hold the
         // notes together over a moving picture without hiding it.
-        backgroundColor: cinema ? CINEMA_BOARD_WASH : style?.background ?? "#09090b",
+        backgroundColor: bare ? "transparent" : cinema ? CINEMA_BOARD_WASH : style?.background ?? "#09090b",
       }}
       ref={containerRef}
       onMouseDown={(e)  => handleDragStart(along(e))}
@@ -344,11 +353,13 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   // and volumeRef decides whether the mic glow is mounted under the staff —
   // without these a toggle while paused (nothing else changing) never showed.
   prev.cinema           === next.cinema             &&
+  prev.bare             === next.bare               &&
   prev.volumeRef        === next.volumeRef          &&
   prev.palette          === next.palette            &&
   prev.isLightBoard     === next.isLightBoard        &&
   prev.quarterTurned    === next.quarterTurned      &&
   prev.learnFocus       === next.learnFocus         &&
   prev.maxDpr           === next.maxDpr             &&
-  prev.onSlowFrames     === next.onSlowFrames
+  prev.onSlowFrames     === next.onSlowFrames       &&
+  prev.onCursor         === next.onCursor
 );

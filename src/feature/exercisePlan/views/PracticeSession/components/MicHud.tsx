@@ -6,15 +6,15 @@ import { useNoteScore } from "../contexts/NoteMatchingContext";
 import { getAccuracyDisplay } from "../hooks/noteMatchingFeedback";
 
 /** Mirrors the multiplier curve in useNoteMatching: min(8, floor(combo / 5) + 1). */
-const MAX_MULTIPLIER = 8;
-const COMBO_PER_MULTIPLIER = 5;
+export const MAX_MULTIPLIER = 8;
+export const COMBO_PER_MULTIPLIER = 5;
 
 const RING_RADIUS = 42;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 const RING_PX = 76;
 
 /** Ring warms up as the multiplier climbs: cyan -> amber -> orange. */
-const getMultiplierTier = (multiplier: number) => {
+export const getMultiplierTier = (multiplier: number) => {
   if (multiplier >= 6)
     return { from: "#fb923c", to: "#ea580c", text: "text-orange-400" };
   if (multiplier >= 3)

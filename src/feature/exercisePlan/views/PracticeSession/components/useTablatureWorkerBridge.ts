@@ -111,6 +111,9 @@ interface WorkerBridgeOptions {
   maxDpr?:         number;
   /** Called once if the board can't hold the screen's frame rate while playing. */
   onSlowFrames?:   () => void;
+  /** Where the cursor stands, in CSS px from the canvas's left edge, and the board's scale
+   *  (a note's world y × scale = its CSS px from the top). Only with STYLE.reportCursor. */
+  onCursor?:       (x: number, scale: number) => void;
   /** Ask the worker for its frame readout once a second (the ?tabperf=1 overlay). */
   perf?:           boolean;
 }
@@ -203,6 +206,8 @@ export interface TablatureStylePatch {
   timingHints?: boolean;
   /** The lite board — see `lite` in TablatureViewer.worker.ts. Leave it to liteTablatureStyle. */
   lite?: boolean;
+  /** Have the worker post where its cursor stands — see `reportCursor` in TablatureViewer.worker.ts. */
+  reportCursor?: boolean;
 }
 
 /** The marks the worker holds, as last sent to it; null where that isn't known. */
@@ -231,7 +236,7 @@ export function useTablatureWorkerBridge({
   hitNotes, missedNotes, noteTimings, livePitchRef, fillFeedRef = null, hideNotes, hideDynamicsLane,
   measures, resetKey, audioContext, volumeRef, onSeek,
   loopStartBeat, loopEndBeat, playUntilBeat = null, zoom = 1, tuningStrings, style, selection,
-  obscured = false, quarterTurned = false, learnFocus = null, maxDpr, onSlowFrames, perf = false,
+  obscured = false, quarterTurned = false, learnFocus = null, maxDpr, onSlowFrames, onCursor, perf = false,
 }: WorkerBridgeOptions) {
   const workerRef           = useRef<Worker | null>(null);
   const transferredRef      = useRef(false);
@@ -271,8 +276,10 @@ export function useTablatureWorkerBridge({
   const sentMarksRef = useRef<SentMarks>({ ...NOTHING_SENT });
   // The latest callback, for a worker that outlives any one render.
   const onSlowFramesRef = useRef(onSlowFrames);
+  const onCursorRef = useRef(onCursor);
   useEffect(() => {
     onSlowFramesRef.current = onSlowFrames;
+    onCursorRef.current = onCursor;
   });
 
   // Worker lifecycle
@@ -285,6 +292,7 @@ export function useTablatureWorkerBridge({
     worker.onmessage = (e: MessageEvent) => {
       if (e.data?.type === 'REST_ACTIVE') setIsRestActive(e.data.isRest);
       else if (e.data?.type === 'SLOW_FRAMES') onSlowFramesRef.current?.();
+      else if (e.data?.type === 'CURSOR') onCursorRef.current?.(e.data.x, e.data.scale);
       else if (e.data?.type === 'PERF_STATS') {
         setPerfStats(e.data.stats as TabPerfStats);
         // The dev recorder keeps every second of it (utils/audio/audioDebugLog.ts).

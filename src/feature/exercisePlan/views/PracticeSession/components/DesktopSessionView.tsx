@@ -13,6 +13,8 @@ import type { BackingTrack, TablatureMeasure } from "../../../types/exercise.typ
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useSessionUI } from "../contexts/SessionUIContext";
 import type { RiddleProgress } from "../hooks/useRiddleSequenceMatcher";
+import { useStageModeStore } from "../stage/stageModeStore";
+import { StageRoom } from "../stage/StageRoom";
 import { BackgroundAmbiance } from "./BackgroundAmbiance";
 import { ExerciseContentArea } from "./ExerciseContentArea";
 import { ExerciseHeroHeader } from "./ExerciseHeroHeader";
@@ -162,7 +164,28 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
   const startGate = useStartGate(p.isPlaying);
   const gateIntro = useGateIntro(p.currentExercise);
   const nextExercise = p.plan.exercises[p.currentExerciseIndex + 1];
-  const showStartGate = startGate.open && !isMobile && !learn?.enabled && !p.heroSlot
+
+  // Stage mode: only the tab and the score, in a room (StageRoom). A plain tab
+  // on a desktop screen can go there; a game mode, an exam, a lesson and the
+  // phone keep the session they have.
+  const stageRequested = useStageModeStore((s) => s.on);
+  const setStageRequested = useStageModeStore((s) => s.setOn);
+  const stageAvailable = !isMobile && !!p.activeTablature?.length && !p.showAlphaTabScore
+    && !p.backingCinema && !p.backingAligning && !p.setupOpen && !p.heroSlot
+    && !p.isExamMode && !learn?.enabled && !p.reportResult
+    && p.currentExercise.riddleConfig?.mode !== "sequenceRepeat";
+  // The end of a run is answered on the bottom bar, which the stage has put away.
+  const stageInterrupted = !stageAvailable || !!p.verdict || !!p.roundVerdict || p.isTimeUp;
+  const stage = stageRequested && !stageInterrupted;
+  React.useEffect(() => {
+    if (stageRequested && stageInterrupted) setStageRequested(false);
+  }, [stageRequested, stageInterrupted, setStageRequested]);
+  // The next session opens the ordinary way.
+  React.useEffect(() => () => setStageRequested(false), [setStageRequested]);
+  const enterStage = React.useCallback(() => setStageRequested(true), [setStageRequested]);
+  const exitStage = React.useCallback(() => setStageRequested(false), [setStageRequested]);
+
+  const showStartGate = startGate.open && !isMobile && !learn?.enabled && !p.heroSlot && !stage
     && !p.backingCinema && !p.backingAligning && !p.setupOpen && !p.reportResult
     // A riddle's tab is the answer — it only comes up to be read.
     && p.currentExercise.riddleConfig?.mode !== "sequenceRepeat";
@@ -274,8 +297,18 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
       // Hides MobileBottomNav on tablets, see globals.css.
       data-desktop-session={isMobile ? undefined : ""}
       data-session-scroller
-      className={cn(" fixed inset-0 z-[999999] bg-zinc-950", "overflow-y-auto", isMobile && "hidden")}>
-      <BackgroundAmbiance category={p.category as any} isPlayalong={p.currentExercise.isPlayalong} visible={!p.reportResult} />
+      className={cn(" fixed inset-0 z-[999999] bg-zinc-950", stage ? "overflow-hidden" : "overflow-y-auto", isMobile && "hidden")}>
+      <BackgroundAmbiance category={p.category as any} isPlayalong={p.currentExercise.isPlayalong} visible={!p.reportResult && !stage} />
+      {stage && (
+        <StageRoom
+          title={p.currentExercise.songData?.title ?? p.currentExercise.title}
+          isPlaying={p.isPlaying}
+          live={p.isMicEnabled}
+          belowTitlebar={isElectron}
+          onTogglePlay={p.handleToggleTimer}
+          onExit={exitStage}
+        />
+      )}
       <TooltipProvider>
         <div>
           <div className={cn("mx-auto max-w-[2400px] px-6 pb-64 pt-4 relative z-10", p.reportResult && "max-w-7xl px-4 pb-0 pt-2", isElectron && (p.reportResult ? "pt-[72px]" : "pt-[56px]"))}>
@@ -293,7 +326,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
             ) : (
               <>
                 {/* A game mode's arena carries the identity; the title row would repeat it. */}
-                {!p.backingCinema && !p.heroSlot && (
+                {!p.backingCinema && !p.heroSlot && !stage && (
                 <div className="mb-8 space-y-5">
                   <ExerciseProgress
                     plan={p.plan} currentExerciseIndex={p.currentExerciseIndex}
@@ -318,7 +351,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                   {!p.backingCinema && p.heroSlot && (
                     <div className="relative z-30 w-full">{p.heroSlot}</div>
                   )}
-                  {!p.backingCinema && !p.heroSlot && (
+                  {!p.backingCinema && !p.heroSlot && !stage && (
                     <ExerciseHeroHeader
                       variant="goals"
                       exercise={p.currentExercise}
@@ -326,7 +359,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                       plan={p.plan}
                     />
                   )}
-                  {p.allGpTracks && !p.showAlphaTabScore && !p.backingCinema && (
+                  {p.allGpTracks && !p.showAlphaTabScore && !p.backingCinema && !stage && (
                     <GpTrackSelector tracks={p.allGpTracks} selectedIdx={p.selectedGpTrackIdx} onChange={p.setSelectedGpTrackIdx} />
                   )}
                   <ExerciseContentArea
@@ -374,6 +407,8 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     onOpenBackingTrack={p.onOpenBackingTrack}
                     songSectionMapSlot={p.songSectionMapSlot}
                     cinema={p.backingCinema}
+                    stage={stage}
+                    onEnterStage={stageAvailable ? enterStage : undefined}
                     obscured={p.backingAligning || p.setupOpen}
                     startGate={showStartGate ? (
                       <StartGate
@@ -389,7 +424,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                   />
                 </div>
 
-                {!p.reportResult && (
+                {!p.reportResult && !stage && (
                   <SessionBottomBar
                     verdict={p.verdict}
                     roundVerdict={p.roundVerdict}
