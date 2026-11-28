@@ -17,10 +17,10 @@ const ART = "/static/images/session/stage-studio";
  * face, the back panel DEPTH behind it, four inner sides between them, glass in
  * front — so its sides show in perspective and it moves as a box, not a picture.
  */
-const WALL_Z = -70;
-const WALL_W = 150;
-const WALL_TOP = -28;
-const WALL_H = 48;
+export const WALL_Z = -70;
+export const WALL_W = 150;
+export const WALL_TOP = -28;
+export const WALL_H = 48;
 /** How deep a case goes into the wall. */
 const DEPTH = 7;
 /** How far in front of its back panel a guitar hangs: close, so it moves with the case's own scene. */
@@ -67,7 +67,7 @@ const LOOK_ASPECT = 3 / 4;
 const LOOK_TRIM = 0.42;
 
 /** Every surface of a case follows the room's light (StageRoom sets --stage-heat), and is as soft as the wall. */
-const surface = (brightness: number) =>
+export const surface = (brightness: number) =>
   `brightness(calc(${brightness.toFixed(3)} * (0.95 + var(--stage-heat) * 0.5))) blur(0.7px) saturate(0.85)`;
 
 interface Rect {
@@ -79,7 +79,7 @@ interface Rect {
 }
 
 /** A flat piece of the case, placed in 3D around the case's centre on the wall. */
-const Piece = ({
+export const Piece = ({
   x = 0,
   y = 0,
   z = 0,

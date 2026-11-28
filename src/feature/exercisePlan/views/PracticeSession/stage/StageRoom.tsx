@@ -15,6 +15,7 @@ import {
   STAGE_ORIGIN,
   STAGE_PERSPECTIVE,
 } from "./stageCamera";
+import { StageCoverFrame } from "./StageCoverFrame";
 import { caseSpots, StageWallCases, wallHolesMask } from "./StageWallCases";
 import { useStageGuitars } from "./useStageGuitars";
 
@@ -255,6 +256,8 @@ const FilmGrain = ({ still }: { still: boolean }) => {
 
 interface StageRoomProps {
   title: string;
+  /** The song's cover, framed on the back wall; absent — no frame. */
+  coverUrl?: string;
   isPlaying: boolean;
   /** The score is being kept (mic on) — the room's light follows it. */
   live: boolean;
@@ -271,6 +274,7 @@ interface StageRoomProps {
  */
 export const StageRoom = memo(function StageRoom({
   title,
+  coverUrl,
   isPlaying,
   live,
   belowTitlebar,
@@ -366,6 +370,9 @@ export const StageRoom = memo(function StageRoom({
             <div style={CORNER_LINE} />
           </div>
           <StageWallCases guitars={guitars} />
+          {coverUrl && (
+            <StageCoverFrame key={coverUrl} coverUrl={coverUrl} title={title} />
+          )}
           <div style={{ ...LEFT_WALL, ...light }}>
             <div style={LEFT_WALL_SHADE} />
             <div style={CORNER_LINE} />

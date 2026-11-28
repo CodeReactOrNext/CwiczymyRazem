@@ -302,6 +302,8 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
       {stage && (
         <StageRoom
           title={p.currentExercise.songData?.title ?? p.currentExercise.title}
+          // A song from the plan carries its cover; the song practice page puts it in imageUrl.
+          coverUrl={p.currentExercise.songData?.coverUrl ?? (p.plan.song ? p.currentExercise.imageUrl ?? undefined : undefined)}
           isPlaying={p.isPlaying}
           live={p.isMicEnabled}
           belowTitlebar={isElectron}
