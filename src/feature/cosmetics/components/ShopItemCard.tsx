@@ -1,7 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { SupportToken } from "components/UI/SupportToken/SupportToken";
-import { TOKENS_PER_DOLLAR } from "feature/supporterPanel/constants/supporterPanel.constants";
 import { Check } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -16,12 +15,6 @@ export interface ShopItemLabels {
   /** On the disabled button of something out of reach. */
   notEnough: string;
 }
-
-/** 45 tokens → "$4.50", 80 → "$8". */
-export const tokensInDollars = (tokens: number): string => {
-  const dollars = tokens / TOKENS_PER_DOLLAR;
-  return `$${Number.isInteger(dollars) ? dollars : dollars.toFixed(2)}`;
-};
 
 interface ShopItemCardProps {
   art: ReactNode;
@@ -90,13 +83,6 @@ export const ShopItemCard = ({
             )}>
             <SupportToken size={20} />
             {price}
-            {/* In the window only: what tells a visitor this is a currency
-                donations bring, not points earned by practising. */}
-            {preview && (
-              <span className='ml-1 text-sm font-normal text-zinc-400'>
-                {tokensInDollars(price)}
-              </span>
-            )}
           </p>
         )}
       </div>

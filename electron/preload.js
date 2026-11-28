@@ -284,6 +284,19 @@ contextBridge.exposeInMainWorld("gpLibrary", {
   deleteFile: (id) => ipcRenderer.invoke("gp:delete-file", id),
 });
 
+// Song packages (.psarc): the tab goes into the GP library above, the recording
+// into the backing tracks, both on this computer only (see electron/songPack;
+// feature/songPack on the renderer side).
+contextBridge.exposeInMainWorld("songPacks", {
+  isAvailable: true,
+
+  /** Unpacks a package the renderer holds in memory. Resolves
+   *  { ok: true, file, audioError } — `file` is the tab's GP-library entry,
+   *  `audioError` says why there is no recording when there is none — or
+   *  { ok: false, message }. */
+  importPack: (name, data) => ipcRenderer.invoke("songpack:import", name, data),
+});
+
 // App-shell integration: design-matched context menu + tray/dock quick actions
 // (see components/ElectronIntegrations on the renderer side).
 contextBridge.exposeInMainWorld("electronApp", {

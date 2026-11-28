@@ -27,13 +27,14 @@ import type {
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
 import { useSessionEntryGate } from "feature/sessionEntry/useSessionEntryGate";
+import { SONG_PACK_TAB_EXTENSION } from "feature/songPack/utils/songPackFiles";
 import { SongThumb } from "feature/songs/components/SongRow/SongRow";
 import {
   GP_EXTENSIONS,
   isGpFile,
   type ParsedGp,
-  parseGpFile,
 } from "feature/songs/services/gp5Parser.service";
+import { parseTabFile } from "feature/songs/services/tabFile.service";
 import {
   deleteUserGpFile,
   fetchGpFileAsFile,
@@ -316,7 +317,7 @@ const GpTabsPage: NextPageWithLayout = () => {
     setStaged(null);
     try {
       const rawFile = await fetchGpFileAsFile(file.downloadUrl, file.name);
-      const parsed = await parseGpFile(rawFile);
+      const parsed = await parseTabFile(rawFile);
       setStaged({ gpFile: file, rawFile, parsed, selectedTrackIndex: 0 });
       setShowConfigModal(true);
     } catch {
@@ -861,7 +862,7 @@ const GpTabsPage: NextPageWithLayout = () => {
             {/* Files */}
             {visibleFiles.map((file) => {
               const ext =
-                GP_EXTENSIONS.find((e) => file.name.toLowerCase().endsWith(e)) ?? ".gp";
+                [SONG_PACK_TAB_EXTENSION, ...GP_EXTENSIONS].find((e) => file.name.toLowerCase().endsWith(e)) ?? ".gp";
               const linked = linkedSongs[file.id] ?? [];
               const isDeleting = deletingId === file.id;
               const isThisLoading = loadingFileId === file.id;

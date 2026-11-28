@@ -91,12 +91,22 @@ const postSkinShop = async (
 export const fetchSkinShop = (): Promise<SkinShopState> =>
   postSkinShop({ action: "read" });
 
-/** Only the id travels: the price is the server's to look up. */
-export const buyBoardSkin = (skinId: string): Promise<SkinShopState> =>
-  postSkinShop({ action: "buy", skinId });
+/**
+ * Only the id travels: the price is the server's to look up. `bays` is for a
+ * display case — the bays of the guitar wall it goes straight into.
+ */
+export const buyBoardSkin = (
+  skinId: string,
+  bays?: number[],
+): Promise<SkinShopState> => postSkinShop({ action: "buy", skinId, bays });
 
-/** `null` goes back to the stock cable or the stock case. */
+/**
+ * `null` goes back to the stock cable, the stock case, or the stock niche in
+ * the `bays` named (every bay when none are).
+ */
 export const wearBoardSkin = (
   kind: SkinKind,
   skinId: string | null,
-): Promise<SkinShopState> => postSkinShop({ action: "wear", kind, skinId });
+  bays?: number[],
+): Promise<SkinShopState> =>
+  postSkinShop({ action: "wear", kind, skinId, bays });

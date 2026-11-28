@@ -785,6 +785,15 @@
     "boards_body": "Inny board pod Twoimi efektami. Układ, kable i bonusy zostają dokładnie takie, jakie są.",
     "cables_title": "Kable sygnałowe",
     "cables_body": "Z czego zrobiony jest kabel między efektami. Kabel wpięty odwrotnie dalej robi się czerwony.",
+    "racks_title": "Gabloty",
+    "racks_body": "Inne wnętrze za każdą gitarą na Twojej ścianie. Lampa zostaje w kolorze rzadkości gitary. Gablotę kupujesz raz i wieszasz w jednej niszy albo we wszystkich trzech.",
+    "rack_target": "Która nisza",
+    "rack_all": "Cała ściana",
+    "rack_try": "Przymierz",
+    "rack_on_wall": "Na ścianie",
+    "rack_in_use": "Na Twojej ścianie",
+    "rack_reset": "Wróć do swoich",
+    "rack_trying": "Przymierzasz: {{names}}. Na profilu nic się nie zmieni, dopóki jej nie kupisz.",
     "buy": "Kup",
     "confirm": "Potwierdź",
     "not_enough": "Za mało tokenów",
@@ -794,6 +803,7 @@
     "take_off": "Zdejmij",
     "load_failed": "Sklep się nie wczytał. Odśwież stronę, żeby spróbować ponownie.",
     "toast_bought": "{{name}} jest już na Twoim boardzie",
+    "toast_bought_rack": "{{name}} wisi już na Twojej ścianie",
     "toast_buy_failed": "Nie udało się kupić tego skina",
     "toast_wear_failed": "Nie udało się zmienić skina",
     "cosmetics": {
@@ -855,6 +865,7 @@
     "tabs": {
       "banners": "Bannery",
       "avatars": "Efekty awatara",
+      "racks": "Gabloty",
       "boards": "Pedalboardy",
       "cables": "Kable"
     }

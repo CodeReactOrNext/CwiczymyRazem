@@ -960,6 +960,31 @@
     "permanent": true
   },
   {
+    "source": "/exercises/pentatonic-diagonal-position-shifts",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/minor-scale-rhythm-pyramid",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/minor-scale-chord-tone-targets",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/arpeggios-diatonic-triads-g",
+    "destination": "/daily-guitar-practice-plan",
+    "permanent": true
+  },
+  {
+    "source": "/exercises/string-skipping-major-scale",
+    "destination": "/guitar-scale-practice-routine",
+    "permanent": true
+  },
+  {
     "source": "/exercises/bass-octave-groove",
     "destination": "/beginner-guitar-exercises",
     "permanent": true

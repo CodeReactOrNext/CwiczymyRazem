@@ -2,6 +2,8 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
+import { isSongPackImportAvailable } from "feature/songPack/services/songPackBridge";
+import { isSongPackFile, isSongPackSource, SONG_PACK_SOURCE_EXTENSION } from "feature/songPack/utils/songPackFiles";
 import { useInstrumentPreferenceStore } from "feature/tuner/store/instrumentPreferenceStore";
 import { useTranslation } from "hooks/useTranslation";
 import { Drum,FileMusic, Music as MusicIcon, Upload, Zap } from "lucide-react";
@@ -27,6 +29,13 @@ interface ImportTablatureProps {
     /** What the picked track is played on — a bass track's strings are 1 (G) … 4 (E). */
     instrument: Instrument
   ) => void;
+  /**
+   * Takes a song package (.psarc) dropped here, when the caller can keep one:
+   * its tab and recording stay on this computer, so only a place that never
+   * uploads or shares what it is given passes this. Everywhere else a dropped
+   * package is turned away with a note saying why.
+   */
+  onSongPack?: (file: File) => Promise<void>;
   className?: string;
 }
 
@@ -58,7 +67,7 @@ function buildBackingTracks(data: ParsedGp, selectedIdx: number): BackingTrack[]
 const instrumentOf = (track: ParsedGp["tracks"][number]): Instrument =>
   track.trackType === 'bass' ? 'bass' : 'guitar';
 
-export const ImportTablature = ({ onImported, className }: ImportTablatureProps) => {
+export const ImportTablature = ({ onImported, onSongPack, className }: ImportTablatureProps) => {
   const { t } = useTranslation("songs");
   const [isParsing, setIsParsing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -77,6 +86,28 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const selectedFile = acceptedFiles[0];
     if (!selectedFile) return;
+
+    if (isSongPackFile(selectedFile.name)) {
+      // Only the package itself can be taken in, and only where nothing it
+      // holds can end up uploaded or shared.
+      if (!onSongPack || !isSongPackSource(selectedFile.name)) {
+        toast.error(t("import_tab.song_pack_local_only"));
+        return;
+      }
+      if (!isSongPackImportAvailable()) {
+        toast.error(t("import_tab.song_pack_desktop_only"));
+        return;
+      }
+      setIsParsing(true);
+      try {
+        await onSongPack(selectedFile);
+      } catch (error) {
+        toast.error(error instanceof Error && error.message ? error.message : t("import_tab.song_pack_error"));
+      } finally {
+        setIsParsing(false);
+      }
+      return;
+    }
 
     if (!isGpFile(selectedFile.name)) {
       toast.error(t("import_tab.unsupported", { formats: GP_EXTENSIONS.join(", ") }));
@@ -103,7 +134,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
     } finally {
       setIsParsing(false);
     }
-  }, [onImported, preferredInstrument, t]);
+  }, [onImported, onSongPack, preferredInstrument, t]);
 
   const handleTrackSelect = (index: number) => {
     setSelectedTrackIndex(index);
@@ -116,7 +147,9 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'application/octet-stream': [...GP_EXTENSIONS],
+      // A package is let through to onDrop everywhere, so the places that
+      // cannot take one can say why instead of silently ignoring the file.
+      'application/octet-stream': [...GP_EXTENSIONS, SONG_PACK_SOURCE_EXTENSION],
     },
     multiple: false,
     disabled: isParsing
@@ -263,6 +296,11 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
               <div className="text-xs text-zinc-500">
                 Guitar Pro (Multi-Track)
               </div>
+              {onSongPack && isSongPackImportAvailable() && (
+                <p className="max-w-xs text-xs text-zinc-500">
+                  {t("import_tab.song_pack_note")}
+                </p>
+              )}
             </>
           )}
         </div>

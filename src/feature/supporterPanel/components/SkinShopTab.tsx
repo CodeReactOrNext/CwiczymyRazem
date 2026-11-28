@@ -14,7 +14,6 @@ import type {
   BoardSkin,
   BoardSkinState,
   CableSkin,
-  RigSkin,
 } from "feature/arsenal/data/boardSkins";
 import {
   BOARD_SKINS,
@@ -26,11 +25,13 @@ import {
 import { boardLookArt } from "feature/arsenal/utils/boardSkinArt";
 import { CosmeticsShop } from "feature/cosmetics/components/CosmeticsShop";
 import { ShopItemCard } from "feature/cosmetics/components/ShopItemCard";
+import { RackShelf } from "feature/supporterPanel/components/RackShelf";
 import { useBoardSkinShop } from "feature/supporterPanel/hooks/useBoardSkinShop";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Cable,
   CircleUser,
+  Guitar,
   Image as ImageIcon,
   LayoutPanelTop,
 } from "lucide-react";
@@ -40,6 +41,7 @@ import { useId, useMemo, useState } from "react";
 const SHELVES = [
   { id: "banners", icon: ImageIcon },
   { id: "avatars", icon: CircleUser },
+  { id: "racks", icon: Guitar },
   { id: "boards", icon: LayoutPanelTop },
   { id: "cables", icon: Cable },
 ] as const;
@@ -122,7 +124,8 @@ const BoardPreview = ({ skin }: { skin: BoardSkin }) => {
 };
 
 /**
- * The skin shop: cables and boards for the pedalboard, bought with tokens.
+ * The skin shop: display cases for the guitar wall, cables and boards for the
+ * pedalboard, bought with tokens.
  *
  * Buying takes two presses, because tokens are bought with real money and a
  * card grid is an easy place to press the wrong one. The second press is the
@@ -164,7 +167,7 @@ export const SkinShopTab = ({ enabled }: { enabled: boolean }) => {
   const section = (
     title: string,
     body: string,
-    skins: RigSkin[],
+    skins: (CableSkin | BoardSkin)[],
     columns: string,
   ) => (
     <section className='flex flex-col gap-5'>
@@ -196,7 +199,10 @@ export const SkinShopTab = ({ enabled }: { enabled: boolean }) => {
             labels={labels}
             onAskBuy={() => setConfirmingId(skin.id)}
             onBuy={() =>
-              buy.mutate(skin, { onSettled: () => setConfirmingId(null) })
+              buy.mutate(
+                { skin },
+                { onSettled: () => setConfirmingId(null) },
+              )
             }
             onToggleWear={() =>
               wear.mutate({
@@ -237,6 +243,16 @@ export const SkinShopTab = ({ enabled }: { enabled: boolean }) => {
           enabled={enabled}
           tokensLeft={tokensLeft}
           preview={preview}
+        />
+      </TabsContent>
+      <TabsContent value='racks' className='mt-0'>
+        <RackShelf
+          state={state}
+          tokensLeft={tokensLeft}
+          preview={preview}
+          labels={labels}
+          buy={buy}
+          wear={wear}
         />
       </TabsContent>
       <TabsContent value='boards' className='mt-0'>

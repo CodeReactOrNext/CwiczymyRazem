@@ -7,6 +7,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useResponsiveStore } from "store/useResponsiveStore";
 
+import { readBoardSkins, wornRackLooks } from "../../data/boardSkins";
 import { GUITARS_BY_ID } from "../../data/guitarDefinitions";
 import { useUpdatePedalboard } from "../../hooks/useUpdatePedalboard";
 import { useUpdateRig } from "../../hooks/useUpdateRig";
@@ -109,6 +110,7 @@ export const RigView = ({ data, fame }: RigViewProps) => {
         onRemove={handleGuitarRemove}
         onHover={handleHover}
         onShowCard={handleShowCard}
+        looks={wornRackLooks(readBoardSkins(data.boardSkins))}
       />
 
       {/* Pedalboard — its own heading, because the board actions ride on it. */}

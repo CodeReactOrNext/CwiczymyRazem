@@ -1,9 +1,9 @@
 /**
- * Skins for the pedalboard: what the signal cable is made of, and what the
- * board itself is built from.
+ * Skins for the rig: what the signal cable is made of, what the board itself
+ * is built from, and the display case each guitar hangs in.
  *
  * They are bought with supporter tokens in the supporter panel and change
- * nothing but how the board looks. The routing of the cable, the size of the
+ * nothing but how the rig looks. The routing of the cable, the size of the
  * deck and the verdict colours all stay where they are — a run wired backwards
  * is red on every cable in this file, which is why none of them is red or
  * emerald, and why orange is left to the power loom.
@@ -11,6 +11,8 @@
  * Prices are in tokens, ten to the dollar (`TOKENS_PER_DOLLAR`). A cable costs
  * what a couple of roadmap ideas do; a board costs about what a generated
  * roadmap does, because it redraws the whole object rather than one line on it.
+ * A display case starts where the boards end: it is the one skin a visitor to
+ * the profile sees first, and one purchase can hang in all three bays.
  */
 
 /** The jacket's gauge, in board units. `SignalCable` draws every run at it. */
@@ -80,8 +82,43 @@ export interface BoardSkin extends SkinBase {
   look: BoardLookId;
 }
 
-export type RigSkin = CableSkin | BoardSkin;
+/** One rendered scene per display case; the art lives in `rackLookArt`. */
+export type RackLookId =
+  | "studio"
+  | "gallery"
+  | "tokonoma"
+  | "lounge"
+  | "pod"
+  | "cathedral"
+  | "deco"
+  | "velvet"
+  | "sakura"
+  | "tubes"
+  | "frost"
+  | "neon"
+  | "abyss"
+  | "forge"
+  | "marble";
+
+/**
+ * A display case for one bay of the guitar wall: the wall behind the guitar,
+ * the lamp over it and the floor under it. The lamp keeps the guitar's rarity
+ * colour in every one of them — a case changes the room, not what the light
+ * means.
+ */
+export interface RackSkin extends SkinBase {
+  kind: "rack";
+  look: RackLookId;
+}
+
+export type RigSkin = CableSkin | BoardSkin | RackSkin;
 export type SkinKind = RigSkin["kind"];
+/** The kinds an account wears one of. A display case is chosen per bay. */
+export type WornKind = Exclude<SkinKind, "rack">;
+
+/** The guitar wall has three bays, and each picks its own display case. */
+export const RACK_BAY_COUNT = 3;
+export type RackBays = [string | null, string | null, string | null];
 
 /**
  * A two-colour braid: the light thread across the full width, then the dark
@@ -325,7 +362,40 @@ export const BOARD_SKINS: BoardSkin[] = [
   },
 ];
 
-export const RIG_SKINS: RigSkin[] = [...CABLE_SKINS, ...BOARD_SKINS];
+/**
+ * Every case has its own price, cheapest to dearest by how much the scene
+ * does: a quiet room first, then the ones with a light or a motion of their
+ * own, and the black marble hall last.
+ */
+export const RACK_SKINS: RackSkin[] = [
+  { id: "rack-studio", kind: "rack", name: "Studio A", price: 100, look: "studio" },
+  {
+    id: "rack-gallery",
+    kind: "rack",
+    name: "Concrete Gallery",
+    price: 110,
+    look: "gallery",
+  },
+  { id: "rack-tokonoma", kind: "rack", name: "Tokonoma", price: 120, look: "tokonoma" },
+  { id: "rack-lounge", kind: "rack", name: "Whisky Lounge", price: 130, look: "lounge" },
+  { id: "rack-pod", kind: "rack", name: "Stasis Pod", price: 140, look: "pod" },
+  { id: "rack-cathedral", kind: "rack", name: "Cathedral", price: 150, look: "cathedral" },
+  { id: "rack-deco", kind: "rack", name: "Art Deco", price: 160, look: "deco" },
+  { id: "rack-velvet", kind: "rack", name: "Velvet Museum", price: 170, look: "velvet" },
+  { id: "rack-sakura", kind: "rack", name: "Sakura", price: 180, look: "sakura" },
+  { id: "rack-tubes", kind: "rack", name: "Tube Glow", price: 190, look: "tubes" },
+  { id: "rack-frost", kind: "rack", name: "Frostbite", price: 200, look: "frost" },
+  { id: "rack-neon", kind: "rack", name: "Backstage Neon", price: 210, look: "neon" },
+  { id: "rack-abyss", kind: "rack", name: "The Abyss", price: 220, look: "abyss" },
+  { id: "rack-forge", kind: "rack", name: "The Forge", price: 240, look: "forge" },
+  { id: "rack-marble", kind: "rack", name: "Hall of Fame", price: 260, look: "marble" },
+];
+
+export const RIG_SKINS: RigSkin[] = [
+  ...CABLE_SKINS,
+  ...BOARD_SKINS,
+  ...RACK_SKINS,
+];
 
 export const SKINS_BY_ID: ReadonlyMap<string, RigSkin> = new Map(
   RIG_SKINS.map((skin) => [skin.id, skin]),
@@ -333,7 +403,8 @@ export const SKINS_BY_ID: ReadonlyMap<string, RigSkin> = new Map(
 
 /**
  * What an account holds: every skin it has bought, and the one of each kind it
- * is wearing. `null` is the stock cable or the stock flight case.
+ * is wearing. `null` is the stock cable, the stock flight case, or — per bay of
+ * the guitar wall — the stock dark niche.
  *
  * Stored at `arsenal.boardSkins` and written only by `/api/supporter/skins`.
  */
@@ -341,12 +412,15 @@ export interface BoardSkinState {
   owned: string[];
   cable: string | null;
   board: string | null;
+  /** The display case in each bay of the guitar wall, left to right. */
+  rack: RackBays;
 }
 
 export const EMPTY_BOARD_SKINS: BoardSkinState = {
   owned: [],
   cable: null,
   board: null,
+  rack: [null, null, null],
 };
 
 /**
@@ -374,12 +448,39 @@ export const readBoardSkins = (stored: unknown): BoardSkinState => {
       ? value
       : null;
 
+  // Accounts from before the display cases have no `rack` at all.
+  const bays: unknown[] = Array.isArray(raw.rack) ? raw.rack : [];
+
   return {
     owned,
     cable: worn(raw.cable, "cable"),
     board: worn(raw.board, "board"),
+    rack: [worn(bays[0], "rack"), worn(bays[1], "rack"), worn(bays[2], "rack")],
   };
 };
+
+/**
+ * Which bays a request is about: every bay when it names none, otherwise the
+ * distinct indexes it lists. `null` for anything that is not that.
+ */
+export const readRackBays = (input: unknown): number[] | null => {
+  if (input === undefined || input === null) return [0, 1, 2];
+  if (!Array.isArray(input) || input.length === 0) return null;
+  const bays = [...new Set(input)];
+  return bays.every(
+    (bay) => Number.isInteger(bay) && bay >= 0 && bay < RACK_BAY_COUNT,
+  )
+    ? (bays as number[]).sort()
+    : null;
+};
+
+/** The wall with `skinId` hung in `bays` — or those bays back to stock. */
+export const withRackOnBays = (
+  rack: RackBays,
+  skinId: string | null,
+  bays: number[],
+): RackBays =>
+  rack.map((id, bay) => (bays.includes(bay) ? skinId : id)) as RackBays;
 
 /** The cable an account is wearing, or `undefined` for the stock one. */
 export const wornCable = (state: BoardSkinState): CableSkin | undefined => {
@@ -395,12 +496,27 @@ export const wornBoardLook = (
   return skin?.kind === "board" ? skin.look : undefined;
 };
 
-/** The state after a purchase. A new skin goes straight on. */
+/** The display case in each bay, or `undefined` for the stock niche. */
+export const wornRackLooks = (
+  state: BoardSkinState,
+): (RackLookId | undefined)[] =>
+  state.rack.map((id) => {
+    const skin = id ? SKINS_BY_ID.get(id) : undefined;
+    return skin?.kind === "rack" ? skin.look : undefined;
+  });
+
+/**
+ * The state after a purchase. A new skin goes straight on — a display case in
+ * the bays it was bought for, every bay when none were named.
+ */
 export const withPurchase = (
   state: BoardSkinState,
   skin: RigSkin,
+  bays: number[] = [0, 1, 2],
 ): BoardSkinState => ({
   ...state,
   owned: [...state.owned, skin.id],
-  [skin.kind]: skin.id,
+  ...(skin.kind === "rack"
+    ? { rack: withRackOnBays(state.rack, skin.id, bays) }
+    : { [skin.kind]: skin.id }),
 });

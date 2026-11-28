@@ -7,10 +7,11 @@ import { requireSupporter } from "lib/support/supporterAuth";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 /**
- * The pedalboard skin shop. Supporters only: skins are bought with tokens.
+ * The rig skin shop. Supporters only: skins are bought with tokens.
  *
  * One route, three things it can be asked: what the account owns (`read`), to
- * buy a skin (`buy`), or to change which one the board wears (`wear`). Each
+ * buy a skin (`buy`), or to change which one is worn (`wear`) — for a display
+ * case, in which `bays` of the guitar wall. Each
  * answers with the wallet and the skins as they now stand, so the client
  * renders what came back instead of keeping a tally of its own.
  */
@@ -29,10 +30,11 @@ export default async function handler(
   const { uid } = authResult.session;
 
   try {
-    const { action, skinId, kind } = (req.body ?? {}) as {
+    const { action, skinId, kind, bays } = (req.body ?? {}) as {
       action?: string;
       skinId?: unknown;
       kind?: unknown;
+      bays?: unknown;
     };
 
     if (action === "read") {
@@ -44,8 +46,8 @@ export default async function handler(
 
     const result =
       action === "buy"
-        ? await buyBoardSkin(uid, skinId)
-        : await wearBoardSkin(uid, kind, skinId ?? null);
+        ? await buyBoardSkin(uid, skinId, bays)
+        : await wearBoardSkin(uid, kind, skinId ?? null, bays);
     if (!result.ok) {
       return res.status(result.status).json({ error: result.error });
     }

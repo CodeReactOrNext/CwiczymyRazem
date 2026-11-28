@@ -769,6 +769,15 @@
     "boards_body": "A different board under your pedals. The layout, the cables and the bonuses stay exactly as they are.",
     "cables_title": "Signal cables",
     "cables_body": "What the cable between your pedals is made of. A cable plugged in the wrong way round still turns red.",
+    "racks_title": "Display cases",
+    "racks_body": "A different room behind each guitar on your wall. The lamp keeps the colour of the guitar's rarity. Buy a case once and hang it in one bay or in all three.",
+    "rack_target": "Which bay",
+    "rack_all": "Whole wall",
+    "rack_try": "Try on",
+    "rack_on_wall": "On the wall",
+    "rack_in_use": "On your wall",
+    "rack_reset": "Back to yours",
+    "rack_trying": "Trying on: {{names}}. Nothing changes on your profile until you buy it.",
     "buy": "Buy",
     "confirm": "Confirm",
     "not_enough": "Not enough tokens",
@@ -778,6 +787,7 @@
     "take_off": "Take off",
     "load_failed": "The shop did not load. Refresh the page to try again.",
     "toast_bought": "{{name}} is on your board",
+    "toast_bought_rack": "{{name}} is on your wall",
     "toast_buy_failed": "Could not buy that skin",
     "toast_wear_failed": "Could not change the skin",
     "cosmetics": {
@@ -839,6 +849,7 @@
     "tabs": {
       "banners": "Banners",
       "avatars": "Avatar effects",
+      "racks": "Display cases",
       "boards": "Pedalboards",
       "cables": "Cables"
     }

@@ -1,3 +1,4 @@
+import { isSongPackFile, isSongPackTab, SongPackLocalOnlyError } from "feature/songPack/utils/songPackFiles";
 import { getIdToken } from "firebase/auth";
 import {
   addDoc,
@@ -78,6 +79,10 @@ export const uploadUserGpFile = async (
   file: File,
   { folderId = null, onProgress }: UploadUserGpFileOptions = {}
 ): Promise<UserGpFile> => {
+  // Whatever came out of a song package stays on the computer it was imported
+  // on. Every upload goes through here, so this is where that is held.
+  if (isSongPackFile(file.name)) throw new SongPackLocalOnlyError();
+
   const fileId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const storagePath = `gp5-files/${userId}/${fileId}/${file.name}`;
   const fileRef = ref(storage, storagePath);
@@ -215,8 +220,11 @@ const readLocalGpFile = async (id: string, fileName: string): Promise<File> => {
   if (!api) throw new Error("This file is only available in the desktop app");
   const stored = await api.readFile(id);
   if (!stored) throw new Error("Local GP file not found");
+  // A song package's tab is told from a Guitar Pro file by its name alone, and
+  // callers often make one up from a title — so it keeps the one it was stored under.
+  const name = isSongPackTab(stored.name) ? stored.name : fileName;
   // Copy into a fresh buffer: the IPC payload can be a view into a larger pooled one.
-  return new File([new Uint8Array(stored.data)], fileName, { type: "application/octet-stream" });
+  return new File([new Uint8Array(stored.data)], name, { type: "application/octet-stream" });
 };
 
 /** Fetch a stored GP file — off disk for local files, via a server-side proxy (CORS) for cloud ones. */

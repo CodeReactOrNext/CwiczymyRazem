@@ -1,4 +1,5 @@
-import { parseGpFile } from "feature/songs/services/gp5Parser.service";
+import { isSongPackTab } from "feature/songPack/utils/songPackFiles";
+import { parseTabFile } from "feature/songs/services/tabFile.service";
 import { fetchGpFileAsFile } from "feature/songs/services/userGpFiles.service";
 import { useEffect, useState } from "react";
 
@@ -29,10 +30,16 @@ export function useGpFileLoader({ rawGpFile, gpFileUrl, exerciseTitle }: UseGpFi
     return () => { isStale = true; };
   }, [gpFileUrl]);
 
-  const effectiveRawGpFile = rawGpFile ?? fetchedGpFile ?? undefined;
+  const tabFile = rawGpFile ?? fetchedGpFile ?? undefined;
+  // The tab of an imported song package is not a Guitar Pro file: it is read
+  // into the same tracks below, but there is nothing in it for AlphaTab to load
+  // or play — the package's own recording is the sound. So it is never handed
+  // on as a raw file; the session runs it like any tab it holds as measures.
+  const isRecordingTab = isSongPackTab(tabFile?.name);
+  const effectiveRawGpFile = isRecordingTab ? undefined : tabFile;
 
   const [parsed, setParsed] = useState<{ file: File; tracks: BackingTrack[] | null; tempo: number | null } | null>(null);
-  const isParsed = !!effectiveRawGpFile && parsed?.file === effectiveRawGpFile;
+  const isParsed = !!tabFile && parsed?.file === tabFile;
   const parsedGpTracks = isParsed ? parsed.tracks : null;
   // The score's own tempo, kept alongside the tracks: a backing recording of the
   // same song was almost certainly played at it, so it seeds the sync defaults
@@ -40,13 +47,13 @@ export function useGpFileLoader({ rawGpFile, gpFileUrl, exerciseTitle }: UseGpFi
   const gpTempo = isParsed ? parsed.tempo : null;
 
   useEffect(() => {
-    if (!effectiveRawGpFile) return;
+    if (!tabFile) return;
     let isStale = false;
-    parseGpFile(effectiveRawGpFile)
+    parseTabFile(tabFile)
       .then(data => {
         if (isStale) return;
         setParsed({
-          file: effectiveRawGpFile,
+          file: tabFile,
           tracks: data.tracks.map((t, idx) => ({
             id:        `track-${idx}`,
             name:      t.name,
@@ -59,11 +66,11 @@ export function useGpFileLoader({ rawGpFile, gpFileUrl, exerciseTitle }: UseGpFi
           tempo: data.tempo > 0 ? data.tempo : null,
         });
       })
-      .catch(() => { if (!isStale) setParsed({ file: effectiveRawGpFile, tracks: null, tempo: null }); });
+      .catch(() => { if (!isStale) setParsed({ file: tabFile, tracks: null, tempo: null }); });
     return () => { isStale = true; };
-  }, [effectiveRawGpFile]);
+  }, [tabFile]);
 
-  const isParsingGpFile = !!effectiveRawGpFile && !isParsed;
+  const isParsingGpFile = !!tabFile && !isParsed;
 
-  return { effectiveRawGpFile, isFetchingGpFile, isParsingGpFile, parsedGpTracks, gpTempo };
+  return { effectiveRawGpFile, isRecordingTab, isFetchingGpFile, isParsingGpFile, parsedGpTracks, gpTempo };
 }

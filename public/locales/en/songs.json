@@ -165,7 +165,12 @@
     "drop": "Drop file here",
     "import": "Import Tablature",
     "analyzing": "Analyzing tracks and tempo...",
-    "upload": "Upload GP3 / GP4 / GP5 / GPX / GP file"
+    "upload": "Upload GP3 / GP4 / GP5 / GPX / GP file",
+    "song_pack_note": "Song packages (.psarc) work too. The tab and the recording stay on this computer and can't be shared.",
+    "song_pack_local_only": "A song package can't be added here. Its tab and recording stay on your computer and can't be shared. Attach it to a song in the desktop app instead.",
+    "song_pack_desktop_only": "Song packages only open in the desktop app.",
+    "song_pack_error": "Couldn't read this song package.",
+    "song_pack_no_audio": "Tab imported. The recording in this package couldn't be read, so it plays without one."
   },
   "power": {
     "songs_learned": "{{done}}/{{total}} songs learned",

@@ -114,6 +114,43 @@ function importTrack(filePath) {
   return meta;
 }
 
+/**
+ * Stores a recording the app already holds in memory — the audio taken out of
+ * a song package (electron/songPack), which never exists as a file to copy.
+ * Same rules as importTrack: a container Chromium plays, within the size cap.
+ */
+function importTrackData(fileName, data) {
+  ensureTrackDir();
+
+  const safeName = path.basename(String(fileName ?? "")).trim();
+  const ext = path.extname(safeName).toLowerCase();
+  const mimeType = MIME_BY_EXT[ext];
+  if (!safeName || !mimeType) {
+    throw new Error(`Unsupported audio format "${ext || "(none)"}" — use ${SUPPORTED_EXTENSIONS.join(", ")}.`);
+  }
+
+  const bytes = Buffer.from(data ?? []);
+  if (bytes.length === 0) throw new Error(`"${safeName}" is empty.`);
+  if (bytes.length > MAX_TRACK_BYTES) {
+    throw new Error(`That recording is ${Math.round(bytes.length / 1024 / 1024)} MB — backing tracks are capped at ${MAX_TRACK_BYTES / 1024 / 1024} MB.`);
+  }
+
+  const id = `bt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const meta = {
+    id,
+    name: safeName.slice(0, safeName.length - ext.length),
+    fileName: safeName,
+    ext,
+    mimeType,
+    size: bytes.length,
+    importedAt: Date.now(),
+  };
+
+  fs.writeFileSync(trackDataPath(id, ext), bytes);
+  fs.writeFileSync(trackMetaPath(id), JSON.stringify(meta));
+  return meta;
+}
+
 function readTrackMeta(id) {
   try { return JSON.parse(fs.readFileSync(trackMetaPath(id), "utf8")); }
   catch { return null; }
@@ -290,6 +327,7 @@ module.exports = {
   MAX_STEMS,
   listTracks,
   importTrack,
+  importTrackData,
   readTrack,
   deleteTrack,
   getAssignment,

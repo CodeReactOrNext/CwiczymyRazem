@@ -29,6 +29,7 @@ const toneStore = require("./toneStore");
 const vstScanner = require("./vst/vstScanner");
 const backingTrackStore = require("./backingTrackStore");
 const gpFileStore = require("./gpFileStore");
+const { importSongPack } = require("./songPack/importSongPack");
 const { createTakeRecorder } = require("./takeRecorder");
 const { requireMicrophoneAccess } = require("./macPermissions");
 const desktopAuth = require("./desktopAuth");
@@ -742,6 +743,18 @@ ipcMain.handle("gp:save-file", (_e, name, data, folderId) => gpFileStore.saveFil
 ipcMain.handle("gp:read-file", (_e, id) => gpFileStore.readFile(id));
 ipcMain.handle("gp:move-file", (_e, id, folderId) => gpFileStore.moveFile(id, folderId));
 ipcMain.handle("gp:delete-file", (_e, id) => gpFileStore.deleteFile(id));
+
+// ── Song packages (songPack/) ────────────────────────────────────────────────
+// A package's tab and recording are unpacked into the two libraries above and
+// stay on this computer. One result object rather than a rejection, so the
+// window can show the reason as it is.
+ipcMain.handle("songpack:import", (_e, name, data) => {
+  try {
+    return { ok: true, ...importSongPack(name, data) };
+  } catch (error) {
+    return { ok: false, message: error?.message || "The song package could not be read." };
+  }
+});
 
 // ── Tray / dock integration ──────────────────────────────────────────────────
 function createTray() {

@@ -15,7 +15,7 @@ const at = ([string, fret]: Position) => note(string, fret);
 // ── Three notes per string ───────────────────────────────────────────────────
 
 /** G major, three notes on every string, from the low G up to the high C. */
-const THREE_PER_STRING: Position[] = [
+export const THREE_PER_STRING: Position[] = [
   [6, 3], [6, 5], [6, 7],
   [5, 3], [5, 5], [5, 7],
   [4, 4], [4, 5], [4, 7],
@@ -63,7 +63,7 @@ export const majorScaleThreePerStringExercise: Exercise = {
 // ── Sequences in one position ────────────────────────────────────────────────
 
 /** G major in second position, low G to the A on the high E string. */
-const SECOND_POSITION: Position[] = [
+export const SECOND_POSITION: Position[] = [
   [6, 3], [6, 5],
   [5, 2], [5, 3], [5, 5],
   [4, 2], [4, 4], [4, 5],

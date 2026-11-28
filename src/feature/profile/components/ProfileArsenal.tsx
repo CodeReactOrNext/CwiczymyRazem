@@ -18,6 +18,7 @@ import {
   readBoardSkins,
   wornBoardLook,
   wornCable,
+  wornRackLooks,
 } from "feature/arsenal/data/boardSkins";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
 import { readPowerState } from "feature/arsenal/data/powerSupply";
@@ -308,6 +309,7 @@ export const ProfileArsenal = ({ userAuth }: ProfileArsenalProps) => {
               setPinnedCard(content);
             }}
             switchOn
+            looks={wornRackLooks(skins)}
           />
         </div>
       )}

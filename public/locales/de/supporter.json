@@ -769,6 +769,15 @@
     "boards_body": "Ein anderes Board unter deinen Pedalen. Anordnung, Kabel und Boni bleiben genau so, wie sie sind.",
     "cables_title": "Signalkabel",
     "cables_body": "Woraus das Kabel zwischen deinen Pedalen besteht. Ein falsch herum gestecktes Kabel wird weiterhin rot.",
+    "racks_title": "Vitrinen",
+    "racks_body": "Ein anderer Raum hinter jeder Gitarre an deiner Wand. Die Lampe behält die Farbe der Seltenheit der Gitarre. Eine Vitrine kaufst du einmal und hängst sie in eine Nische oder in alle drei.",
+    "rack_target": "Welche Nische",
+    "rack_all": "Ganze Wand",
+    "rack_try": "Anprobieren",
+    "rack_on_wall": "An der Wand",
+    "rack_in_use": "An deiner Wand",
+    "rack_reset": "Zurück zu deinen",
+    "rack_trying": "Du probierst an: {{names}}. Auf deinem Profil ändert sich nichts, bis du sie kaufst.",
     "buy": "Kaufen",
     "confirm": "Bestätigen",
     "not_enough": "Zu wenige Tokens",
@@ -778,6 +787,7 @@
     "take_off": "Abnehmen",
     "load_failed": "Der Shop wurde nicht geladen. Lade die Seite neu, um es noch einmal zu versuchen.",
     "toast_bought": "{{name}} ist jetzt auf deinem Board",
+    "toast_bought_rack": "{{name}} hängt jetzt an deiner Wand",
     "toast_buy_failed": "Dieser Skin konnte nicht gekauft werden",
     "toast_wear_failed": "Der Skin konnte nicht gewechselt werden",
     "cosmetics": {
@@ -839,6 +849,7 @@
     "tabs": {
       "banners": "Banner",
       "avatars": "Avatar-Effekte",
+      "racks": "Vitrinen",
       "boards": "Pedalboards",
       "cables": "Kabel"
     }

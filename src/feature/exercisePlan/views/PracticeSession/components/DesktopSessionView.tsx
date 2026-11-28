@@ -60,6 +60,8 @@ interface DesktopSessionViewProps {
   setSelectedGpTrackIdx:    (idx: number) => void;
   handleToggleAlphaTabScore:() => void;
   effectiveRawGpFile:       File | undefined;
+  /** The tab came out of a song package: it has no note values to write as notation. */
+  isRecordingTab?:          boolean;
   activeTablature:          TablatureMeasure[] | undefined;
   isAudioPlaying:           boolean;
   metronomeStartTime:       number | null;
@@ -241,7 +243,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
               <TablatureViewMenu
                 showAlphaTabScore={p.showAlphaTabScore}
                 hasTablature={!!p.activeTablature?.length}
-                canNotation={!p.isExamMode && (!!p.effectiveRawGpFile || !!p.activeTablature?.length)}
+                canNotation={!p.isExamMode && !p.isRecordingTab && (!!p.effectiveRawGpFile || !!p.activeTablature?.length)}
                 onToggleNotation={p.handleToggleAlphaTabScore}
               />
             )}

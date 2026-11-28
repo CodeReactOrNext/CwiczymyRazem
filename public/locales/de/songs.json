@@ -164,7 +164,12 @@
     "drop": "Datei hier ablegen",
     "import": "Tabulatur importieren",
     "analyzing": "Spuren und Tempo werden analysiert...",
-    "upload": "GP3- / GP4- / GP5- / GPX- / GP-Datei hochladen"
+    "upload": "GP3- / GP4- / GP5- / GPX- / GP-Datei hochladen",
+    "song_pack_note": "Song-Pakete (.psarc) funktionieren auch. Tab und Aufnahme bleiben auf diesem Computer und können nicht geteilt werden.",
+    "song_pack_local_only": "Ein Song-Paket kann hier nicht hinzugefügt werden. Tab und Aufnahme bleiben auf deinem Computer und können nicht geteilt werden. Hänge es stattdessen in der Desktop-App an einen Song an.",
+    "song_pack_desktop_only": "Song-Pakete lassen sich nur in der Desktop-App öffnen.",
+    "song_pack_error": "Dieses Song-Paket konnte nicht gelesen werden.",
+    "song_pack_no_audio": "Tab importiert. Die Aufnahme in diesem Paket konnte nicht gelesen werden, deshalb läuft der Tab ohne sie."
   },
   "power": {
     "songs_learned": "{{done}}/{{total}} Songs gelernt",

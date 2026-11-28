@@ -352,7 +352,7 @@ const PracticeSessionInner = ({
   const songGpFile = useSongExerciseGpFile(songItemTabId, userId ?? null);
   const gpFileUrl = planExercise.gpFileUrl ?? songGpFile.gpFileUrl;
 
-  const { effectiveRawGpFile, isFetchingGpFile, isParsingGpFile, parsedGpTracks, gpTempo } = useGpFileLoader({
+  const { effectiveRawGpFile, isRecordingTab, isFetchingGpFile, isParsingGpFile, parsedGpTracks, gpTempo } = useGpFileLoader({
     rawGpFile, gpFileUrl, exerciseTitle: planExercise.title,
   });
 
@@ -384,10 +384,15 @@ const PracticeSessionInner = ({
   // ── Playback settings (Reducer) ──────────────────────────────────────────
 
   const {
-    isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore, selectedGpTrackIdx,
+    isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore: wantsAlphaTabScore, selectedGpTrackIdx,
     setIsAudioMuted, setIsMetronomeMuted, setSpeedMultiplier, setSelectedGpTrackIdx,
     setShowAlphaTabScore, toggleAlphaTabScore, resetForExercise
   } = usePlaybackReducer();
+  // A song package times its notes in seconds and has no note values, so what
+  // the tab holds for it cannot be written out as sheet music. The view menu
+  // does not offer notation there (see DesktopSessionView); this covers a
+  // session that would open on it through the default-view setting.
+  const showAlphaTabScore = wantsAlphaTabScore && !isRecordingTab;
 
   // ── Bar drill ─────────────────────────────────────────────────────────────
   // The run's weakest bar, looped on its own a little slower. It comes after the
@@ -629,7 +634,7 @@ const PracticeSessionInner = ({
       : undefined;
   // Locked to Standard for Guitar Pro imports (the file already encodes its own tuning)
   // and during exams (prepared only for standard tuning).
-  const isGpFile = !!effectiveRawGpFile || !!gpFileUrl;
+  const isGpFile = !!effectiveRawGpFile || !!gpFileUrl || isRecordingTab;
   const guitarTuning = useGuitarTuning({
     isGpFile, isExamMode, contentInstrument, contentStringCount: gpTrack?.stringCount,
     fileOpenStringMidi: gpTrack?.openStringMidi, fileTuningKey: currentExercise.id,
@@ -734,10 +739,13 @@ const PracticeSessionInner = ({
   const dynamicBackingTracks = useMemo(() => {
     // A backing plays the whole tab; under one bar of it, it would be the wrong bars.
     if (isDrilling) return undefined;
+    // A song package's other parts are already in its recording — playing them
+    // on the synth as well would double the band.
+    if (isRecordingTab) return undefined;
     if (parsedGpTracks && parsedGpTracks.length > 1) return parsedGpTracks.filter((_, idx) => idx !== gpTrackIdx);
     if (activeExercise.backingTracks?.length) return activeExercise.backingTracks;
     return autoBacking.tracks;
-  }, [isDrilling, parsedGpTracks, gpTrackIdx, activeExercise.backingTracks, autoBacking.tracks]);
+  }, [isDrilling, isRecordingTab, parsedGpTracks, gpTrackIdx, activeExercise.backingTracks, autoBacking.tracks]);
 
   // ── The tab's guitar starts off over a backing ────────────────────────────
   // With a band (generated, the exercise's own, a GP file's other tracks or the
@@ -1910,7 +1918,7 @@ const PracticeSessionInner = ({
         allGpTracks={parsedGpTracks} showAlphaTabScore={showAlphaTabScore}
         selectedGpTrackIdx={gpTrackIdx} setSelectedGpTrackIdx={setSelectedGpTrackIdx}
         handleToggleAlphaTabScore={handleToggleAlphaTabScore}
-        effectiveRawGpFile={effectiveRawGpFile} activeTablature={activeTablature}
+        effectiveRawGpFile={effectiveRawGpFile} isRecordingTab={isRecordingTab} activeTablature={activeTablature}
         isAudioPlaying={isAudioPlaying} metronomeStartTime={metronome.startTime}
         effectiveBpm={effectiveBpm} isAudioMuted={isAudioMuted}
         backingTrackSlot={backingTrack.enabled ? (

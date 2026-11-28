@@ -10,7 +10,11 @@ const { app } = require("electron");
 
 const FILE_DIR_NAME = "gp-files";
 
-const SUPPORTED_EXTENSIONS = [".gp3", ".gp4", ".gp5", ".gpx", ".gp"];
+// ".rqpack" is the tab of an imported song package (electron/songPack): not a
+// Guitar Pro file, but kept in the same library so a song attaches it the same way.
+const SONG_PACK_TAB_EXTENSION = ".rqpack";
+
+const SUPPORTED_EXTENSIONS = [".gp3", ".gp4", ".gp5", ".gpx", ".gp", SONG_PACK_TAB_EXTENSION];
 
 // Not a quota — a guard against a mistake (a video renamed to .gp). Real Guitar
 // Pro files with embedded audio top out around 20–30 MB, and the renderer holds
@@ -144,6 +148,7 @@ function deleteFile(id) {
 
 module.exports = {
   SUPPORTED_EXTENSIONS,
+  SONG_PACK_TAB_EXTENSION,
   MAX_FILE_BYTES,
   listFiles,
   saveFile,

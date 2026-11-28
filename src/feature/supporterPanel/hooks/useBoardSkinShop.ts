@@ -49,18 +49,30 @@ export const useBoardSkinShop = (enabled: boolean) => {
   };
 
   const buy = useMutation({
-    mutationFn: (skin: RigSkin) => buyBoardSkin(skin.id),
-    onSuccess: (state, skin) => {
+    mutationFn: ({ skin, bays }: { skin: RigSkin; bays?: number[] }) =>
+      buyBoardSkin(skin.id, bays),
+    onSuccess: (state, { skin }) => {
       apply(state);
-      toast.success(t("shop.toast_bought", { name: skin.name }));
+      toast.success(
+        t(skin.kind === "rack" ? "shop.toast_bought_rack" : "shop.toast_bought", {
+          name: skin.name,
+        }),
+      );
     },
     onError: (error) =>
       toast.error(errorMessage(error, t("shop.toast_buy_failed"))),
   });
 
   const wear = useMutation({
-    mutationFn: ({ kind, skinId }: { kind: SkinKind; skinId: string | null }) =>
-      wearBoardSkin(kind, skinId),
+    mutationFn: ({
+      kind,
+      skinId,
+      bays,
+    }: {
+      kind: SkinKind;
+      skinId: string | null;
+      bays?: number[];
+    }) => wearBoardSkin(kind, skinId, bays),
     onSuccess: apply,
     onError: (error) =>
       toast.error(errorMessage(error, t("shop.toast_wear_failed"))),

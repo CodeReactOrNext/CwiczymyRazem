@@ -4,12 +4,16 @@ import { Skeleton } from "assets/components/ui/skeleton";
 import { cn } from "assets/lib/utils";
 import { SegmentedControl } from "components/SegmentedControl/SegmentedControl";
 import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { alignSongPackRecording, importSongPack } from "feature/songPack/services/songPackBridge";
+import { isSongPackTab } from "feature/songPack/utils/songPackFiles";
 import { ArrangementPicker } from "feature/songs/components/Arrangements/ArrangementPicker";
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
 import {
+  fetchGpFileAsFile,
   getUserGpFiles,
   isLocalGpFileId,
   isLocalGpLibraryAvailable,
+  resolveUserGpFileUrl,
   saveUserGpFile,
   type UserGpFile,
 } from "feature/songs/services/userGpFiles.service";
@@ -65,8 +69,8 @@ export function SongPracticePickerModal({
   const [phase, setPhase] = useState<Phase>("pick");
   const [attachTab, setAttachTab] = useState<AttachTab>("library");
   const [isDetaching, setIsDetaching] = useState(false);
-  // Rocksmith-style: the part being played is picked before the mode, so every
-  // route below books its time on that arrangement. Starts on the last one played.
+  // The part being played is picked before the mode, so every route below
+  // books its time on that arrangement. Starts on the last one played.
   const [arrangement, setArrangement] = useState<SongArrangement | null>(
     progress?.lastArrangement ?? null
   );
@@ -121,6 +125,17 @@ export function SongPracticePickerModal({
 
   const handleFileAttached = async (gpFileId: string, gpFileName: string) => {
     await onAttachGpFile(song.id, gpFileId, gpFileName);
+    // A song package's tab brings its own recording: put it under the tab for
+    // this song, already lined up. Without it the tab still plays, so a
+    // recording that cannot be placed does not stop the attach.
+    if (isSongPackTab(gpFileName)) {
+      try {
+        const url = await resolveUserGpFileUrl(userId, gpFileId);
+        if (url) await alignSongPackRecording(await fetchGpFileAsFile(url, gpFileName), song.id);
+      } catch {
+        // The tab is attached; the recording can still be added by hand.
+      }
+    }
     toast.success(t("picker.attached"));
     onClose();
     router.push(`/songs/practice/${song.id}${arrangementQuery}`);
@@ -397,9 +412,22 @@ function GpFileImporter({
     }
   };
 
+  // A song package is unpacked by the desktop app straight into its local
+  // libraries — it never goes through the upload a Guitar Pro file can take.
+  const handleSongPack = async (source: File) => {
+    setIsSaving(true);
+    try {
+      const { file, audioError } = await importSongPack(source);
+      if (audioError) toast.warning(t("import_tab.song_pack_no_audio"));
+      await onAttached(file.id, file.name);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="relative">
-      <ImportTablature onImported={handleImported} />
+      <ImportTablature onImported={handleImported} onSongPack={handleSongPack} />
       {isSaving && (
         <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-zinc-950/80 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-2 text-zinc-400">

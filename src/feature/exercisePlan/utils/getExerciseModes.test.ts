@@ -60,8 +60,8 @@ describe("the real library", () => {
 
   it("matches the counts the browse filter advertises", () => {
     const count = (mode: string) => visible.filter(e => getExerciseModes(e).includes(mode as never)).length;
-    expect(count("bpm")).toBe(242);
-    expect(count("tab")).toBe(190);
+    expect(count("bpm")).toBe(247);
+    expect(count("tab")).toBe(195);
     expect(count("strum")).toBe(34);
     expect(count("fretboard")).toBe(54);
     expect(count("ear")).toBe(22);

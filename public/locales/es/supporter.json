@@ -769,6 +769,15 @@
     "boards_body": "Otra pedalera bajo tus pedales. La disposición, los cables y las bonificaciones se quedan exactamente como están.",
     "cables_title": "Cables de señal",
     "cables_body": "De qué está hecho el cable entre tus pedales. Un cable conectado al revés se sigue poniendo rojo.",
+    "racks_title": "Vitrinas",
+    "racks_body": "Una sala distinta detrás de cada guitarra de tu pared. La lámpara conserva el color de la rareza de la guitarra. Compras una vitrina una vez y la cuelgas en un hueco o en los tres.",
+    "rack_target": "Qué hueco",
+    "rack_all": "Toda la pared",
+    "rack_try": "Probar",
+    "rack_on_wall": "En la pared",
+    "rack_in_use": "En tu pared",
+    "rack_reset": "Volver a las tuyas",
+    "rack_trying": "Estás probando: {{names}}. Nada cambia en tu perfil hasta que la compres.",
     "buy": "Comprar",
     "confirm": "Confirmar",
     "not_enough": "No tienes suficientes tokens",
@@ -778,6 +787,7 @@
     "take_off": "Quitar",
     "load_failed": "La tienda no se ha cargado. Recarga la página para volver a intentarlo.",
     "toast_bought": "{{name}} ya está en tu pedalera",
+    "toast_bought_rack": "{{name}} ya está en tu pared",
     "toast_buy_failed": "No se ha podido comprar ese skin",
     "toast_wear_failed": "No se ha podido cambiar el skin",
     "cosmetics": {
@@ -839,6 +849,7 @@
     "tabs": {
       "banners": "Banners",
       "avatars": "Efectos de avatar",
+      "racks": "Vitrinas",
       "boards": "Pedaleras",
       "cables": "Cables"
     }

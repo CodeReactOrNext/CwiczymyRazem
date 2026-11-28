@@ -6,6 +6,8 @@ import { markStepPracticed } from "feature/aiCoach/utils/roadmapEstimate";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { isSongPackTab } from "feature/songPack/utils/songPackFiles";
+import { parseTabFile } from "feature/songs/services/tabFile.service";
 import { ensureSongIsLearning } from "feature/songs/services/udateSongStatus";
 import { fetchGpFileAsFile, resolveUserGpFileUrl } from "feature/songs/services/userGpFiles.service";
 import {
@@ -73,6 +75,18 @@ export default function SongPracticePage() {
           }
         }
 
+        // A song package's tab plays over the package's own recording, and the
+        // recording only sounds like itself at the tempo it was played at — so
+        // that is where the metronome starts, rather than at a stock 120.
+        let recordingTempo: number | null = null;
+        if (rawGpFile && isSongPackTab(rawGpFile.name)) {
+          try {
+            recordingTempo = (await parseTabFile(rawGpFile)).tempo;
+          } catch {
+            // The session reports an unreadable tab itself.
+          }
+        }
+
         const exercise: Exercise = {
           id: `song-${songId}`,
           title: song.title,
@@ -82,7 +96,11 @@ export default function SongPracticePage() {
           timeInMinutes: 10,
           instructions: [],
           tips: [],
-          metronomeSpeed: { min: 40, max: 240, recommended: 120 },
+          metronomeSpeed: {
+            min: 40,
+            max: Math.max(240, recordingTempo ?? 0),
+            recommended: recordingTempo ?? 120,
+          },
           relatedSkills: [],
           imageUrl: song.coverUrl || null,
         };

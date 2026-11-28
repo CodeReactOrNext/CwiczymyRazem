@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
+import type { RackLookId } from "feature/arsenal/data/boardSkins";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import {
   getConditionGrade,
@@ -15,6 +16,8 @@ import {
 } from "feature/arsenal/data/itemStats";
 import { useArsenalLabels } from "feature/arsenal/hooks/useArsenalLabels";
 import { getRankBadgeSrc } from "feature/arsenal/utils/guitarImage";
+import type { HookTones } from "feature/arsenal/utils/rackLookArt";
+import { RACK_LOOK_ART } from "feature/arsenal/utils/rackLookArt";
 import type { MotionValue } from "framer-motion";
 import {
   animate,
@@ -26,7 +29,7 @@ import {
 } from "framer-motion";
 import { readableText } from "lib/colorTheme/colorTheme";
 import { ArrowLeftRight, CirclePlus, MoreVertical, Trash2 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 
 import type {
   GuitarRarity,
@@ -37,6 +40,7 @@ import { ConditionMeter } from "../ConditionMeter";
 import { GuitarCard } from "../GuitarInventory/GuitarCard";
 import { LevelEmblem } from "../LevelEmblem";
 import { RARITY_STYLES } from "../RarityBadge";
+import { RackScene } from "./RackScene";
 
 /** Bays read as places, not indexes — "the second one", not "slot 1". */
 const BAY_NUMERALS = ["I", "II", "III"];
@@ -271,6 +275,19 @@ interface GuitarRackProps {
    * which they open far too often to sit through it.
    */
   switchOn?: boolean;
+  /**
+   * The display case in each bay, left to right; a gap is the stock niche. As
+   * soon as one bay has a case the whole wall is laid out by the photograph's
+   * proportions instead of a fixed height, so no scene is cropped.
+   */
+  looks?: (RackLookId | undefined)[];
+  /**
+   * Three bays side by side at any width and no plates under them — the wall
+   * as a fitting room, where it has to stay in sight next to the shelf.
+   */
+  strip?: boolean;
+  /** How hard an empty bay's lamp burns; the shop shows cases fully lit. */
+  emptyLamp?: number;
 }
 
 /**
@@ -286,6 +303,15 @@ const GUITAR_TOP = "top-[3.875rem]";
 const GUITAR_BOTTOM = "bottom-[1.5%]";
 
 /**
+ * The same box on a wall with display cases, where a bay is as tall as its
+ * width makes it: in fractions of the bay rather than rems. A stock niche
+ * keeps the proportions above; a case lifts the guitar clear of the floor
+ * ledge every photograph has along its bottom.
+ */
+const SCENIC_STOCK_BOX = "top-[10.8%] bottom-[1.5%]";
+const SCENIC_CASE_BOX = "top-[9%] bottom-[8%]";
+
+/**
  * The wall hanger every bay hangs its guitar on, all of it behind the guitar.
  *
  * A stem down the wall and a padded yoke at the height where the neck meets
@@ -294,18 +320,36 @@ const GUITAR_BOTTOM = "bottom-[1.5%]";
  * hanging rather than as a bracket laid over the tip. The yoke's height is
  * tuned to the nut of a guitar whose box starts at `GUITAR_TOP`.
  */
-const Hook = ({ lit }: { lit: boolean }) => {
-  const metal = lit ? "#3a3e45" : "#2a2d33";
-  const metalDark = lit ? "#1f2226" : "#17191d";
-  const pad = lit ? "#111214" : "#0d0e10";
-  const gradientId = `yoke-${lit ? "lit" : "dim"}`;
+const Hook = ({
+  lit,
+  tones,
+  inBox = false,
+}: {
+  lit: boolean;
+  /** A display case's own metal; the stock steel when absent. */
+  tones?: HookTones;
+  /**
+   * Placed inside the guitar's box and sized by it, for a wall whose bays have
+   * no fixed height. The fractions are the rem geometry above, divided out.
+   */
+  inBox?: boolean;
+}) => {
+  const metal = tones?.metal ?? (lit ? "#3a3e45" : "#2a2d33");
+  const metalDark = tones?.metalDark ?? (lit ? "#1f2226" : "#17191d");
+  const pad = tones?.pad ?? (lit ? "#111214" : "#0d0e10");
+  const gradientId = `yoke-${useId()}`;
   return (
     <>
       {/* The stem and the padded yoke. */}
       <svg
         aria-hidden
         viewBox='0 0 76 44'
-        className='pointer-events-none absolute left-1/2 top-[7rem] z-[5] h-11 w-[4.75rem] -translate-x-1/2'
+        className={cn(
+          "pointer-events-none absolute left-1/2 -translate-x-1/2",
+          inBox
+            ? "top-[9.8%] aspect-[76/44] h-[8.7%]"
+            : "top-[7rem] z-[5] h-11 w-[4.75rem]",
+        )}
         style={{ filter: "drop-shadow(0 4px 5px rgba(0,0,0,0.6))" }}>
         <defs>
           <linearGradient id={gradientId} x1='0' x2='0' y1='0' y2='1'>
@@ -344,6 +388,11 @@ interface BayProps {
   onShowCard?: GuitarRackProps["onShowCard"];
   /** See `GuitarRackProps.switchOn`. */
   switchOn?: boolean;
+  /** This bay's display case, if it has one. */
+  look?: RackLookId;
+  /** Some bay on this wall has a case: see `GuitarRackProps.looks`. */
+  scenic?: boolean;
+  emptyLamp?: number;
 }
 
 /** A dim lamp: white, only enough to find an empty bay's hook by. */
@@ -363,15 +412,26 @@ const Bay = ({
   onHover,
   onShowCard,
   switchOn = false,
+  look,
+  scenic = false,
+  emptyLamp = EMPTY_LAMP,
 }: BayProps) => {
   const guitar = item ? GUITARS_BY_ID.get(item.guitarId) : null;
   const hung = Boolean(item && guitar);
+  const hookTones = look ? RACK_LOOK_ART[look].hook : undefined;
+  const bayHeight = scenic ? "aspect-[3/4]" : "h-[26rem] md:h-[36rem]";
+  // Top and bottom of the guitar's box: see `SCENIC_STOCK_BOX`.
+  const guitarBox = !scenic
+    ? cn(GUITAR_TOP, GUITAR_BOTTOM)
+    : look
+      ? SCENIC_CASE_BOX
+      : SCENIC_STOCK_BOX;
   // Each bay watches for itself: on a phone they are stacked, and a lamp that
   // came on a screen below would be over before anybody saw it.
   const bayRef = useRef<HTMLDivElement>(null);
   const seen = useInView(bayRef, { once: true, amount: 0.5 });
   const light = useLampLevel(
-    hung ? 1 : EMPTY_LAMP,
+    hung ? 1 : emptyLamp,
     switchOn ? { on: seen, delay: index * BAY_STAGGER_S } : undefined,
   );
   // The guitar and its emblem are only seen by the lamp's light: dark before
@@ -391,19 +451,29 @@ const Bay = ({
         ref={bayRef}
         className={cn(
           // force-dark + rig-bay: see DisplayBay.
-          "force-dark rig-bay relative flex h-[26rem] flex-col items-center overflow-hidden md:row-start-1 md:h-[36rem]",
+          "force-dark rig-bay relative flex flex-col items-center overflow-hidden md:row-start-1",
+          bayHeight,
           BAY_COLUMN[index],
         )}
         style={{ background: WALL }}>
-        <Lamp color='#ffffff' level={light} />
-        <Hook lit={false} />
+        {look ? (
+          <RackScene look={look} level={light} />
+        ) : (
+          <Lamp color='#ffffff' level={light} />
+        )}
+        {scenic ? (
+          <div className={cn("pointer-events-none absolute inset-x-0", guitarBox)}>
+            <Hook lit={false} tones={hookTones} inBox />
+          </div>
+        ) : (
+          <Hook lit={false} />
+        )}
         {/* The one way to fill the bay, where the guitar's body would hang. */}
         {onOpenPicker && (
           <div
             className={cn(
-              "absolute inset-x-0 flex items-start justify-center",
-              GUITAR_TOP,
-              GUITAR_BOTTOM,
+              "absolute inset-x-0 z-20 flex items-start justify-center",
+              guitarBox,
             )}>
             <button
               type='button'
@@ -434,7 +504,8 @@ const Bay = ({
       ref={bayRef}
       className={cn(
         // force-dark + rig-bay: see DisplayBay.
-        "force-dark rig-bay group relative flex h-[26rem] flex-col items-center overflow-hidden md:row-start-1 md:h-[36rem]",
+        "force-dark rig-bay group relative flex flex-col items-center overflow-hidden md:row-start-1",
+        bayHeight,
         onShowCard ? "cursor-pointer" : "cursor-default",
         BAY_COLUMN[index],
       )}
@@ -445,13 +516,20 @@ const Bay = ({
       {/* The lamp: the rarity's colour poured down the back wall. Custom Shop
           gets its own ice-cyan light like any other rarity here — the bench's
           animated holo foil is a card treatment, not a wall one. */}
-      <Lamp color={rs.baseColor} level={light} />
+      {look ? (
+        <RackScene look={look} color={rs.baseColor} level={light} />
+      ) : (
+        <Lamp color={rs.baseColor} level={light} />
+      )}
 
-      <Hook lit />
+      {!scenic && <Hook lit />}
 
       {/* The level, in the same rarity-ringed emblem the card wears. */}
       <motion.div
-        className='absolute right-5 top-[4rem] z-20'
+        className={cn(
+          "absolute z-20",
+          scenic ? "right-[5%] top-[11%]" : "right-5 top-[4rem]",
+        )}
         style={{ opacity: emblemOpacity }}>
         <LevelEmblem
           level={level}
@@ -468,20 +546,24 @@ const Bay = ({
           trick). */}
       <div
         className={cn(
-          "absolute inset-x-0 flex items-center justify-center",
-          GUITAR_TOP,
-          GUITAR_BOTTOM,
+          "absolute inset-x-0 z-10 flex items-center justify-center",
+          guitarBox,
         )}>
+        {scenic && <Hook lit tones={hookTones} inBox />}
         {/* The guitar's shadow on the floor: a crisp ellipse, dark at the core
             with only a soft rim, so it reads as a contact shadow and not as a
-            smudge. Sits on the lit patch of floor, which is what makes it show. */}
-        <div
-          className='pointer-events-none absolute -bottom-[2%] left-1/2 h-[3.6%] w-[48%] -translate-x-1/2 rounded-[100%] blur-[3px]'
-          style={{
-            background:
-              "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.92) 55%, rgba(0,0,0,0.5) 100%)",
-          }}
-        />
+            smudge. Sits on the lit patch of floor, which is what makes it show.
+            A display case hangs the guitar clear of its floor, so there it has
+            no floor to land on. */}
+        {!look && (
+          <div
+            className='pointer-events-none absolute -bottom-[2%] left-1/2 h-[3.6%] w-[48%] -translate-x-1/2 rounded-[100%] blur-[3px]'
+            style={{
+              background:
+                "radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.92) 55%, rgba(0,0,0,0.5) 100%)",
+            }}
+          />
+        )}
         <motion.img
           src={getRankBadgeSrc(guitar.imageId, "large")}
           alt={guitar.name}
@@ -641,15 +723,25 @@ export const GuitarRack = ({
   onHover,
   onShowCard,
   switchOn = false,
+  looks,
+  strip = false,
+  emptyLamp,
 }: GuitarRackProps) => {
   const itemOf = (id: string | null) =>
     id ? (inventory.find((i) => i.id === id) ?? null) : null;
+  const scenic = looks?.some(Boolean) ?? false;
 
   return (
     <div
       className='rig-wall rounded-lg bg-arsenal-card p-1.5'
       style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)" }}>
-      <div className='rig-grid grid grid-cols-1 gap-px overflow-hidden rounded bg-black/60 md:grid-cols-3 md:grid-rows-[auto_auto]'>
+      <div
+        className={cn(
+          "rig-grid grid gap-px overflow-hidden rounded bg-black/60",
+          strip
+            ? "grid-cols-3"
+            : "grid-cols-1 md:grid-cols-3 md:grid-rows-[auto_auto]",
+        )}>
         {([0, 1, 2] as const).map((index) => {
           const item = itemOf(slots[index]);
           return [
@@ -661,24 +753,29 @@ export const GuitarRack = ({
               onHover={onHover}
               onShowCard={onShowCard}
               switchOn={switchOn}
+              look={looks?.[index]}
+              scenic={scenic}
+              emptyLamp={emptyLamp}
             />,
-            <div
-              key={`plate-${index}`}
-              className={cn(
-                "rig-plate bg-arsenal-section md:row-start-2",
-                BAY_COLUMN[index],
-              )}>
-              {onOpenPicker && onRemove ? (
-                <Plate
-                  index={index}
-                  item={item}
-                  onOpenPicker={onOpenPicker}
-                  onRemove={onRemove}
-                />
-              ) : (
-                <ShowcasePlate index={index} item={item} />
-              )}
-            </div>,
+            !strip && (
+              <div
+                key={`plate-${index}`}
+                className={cn(
+                  "rig-plate bg-arsenal-section md:row-start-2",
+                  BAY_COLUMN[index],
+                )}>
+                {onOpenPicker && onRemove ? (
+                  <Plate
+                    index={index}
+                    item={item}
+                    onOpenPicker={onOpenPicker}
+                    onRemove={onRemove}
+                  />
+                ) : (
+                  <ShowcasePlate index={index} item={item} />
+                )}
+              </div>
+            ),
           ];
         })}
       </div>

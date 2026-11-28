@@ -63,6 +63,7 @@ import { pentatonicPlayalongExercise } from "feature/exercisePlan/data/exerises/
 import { powerChordFirstShapesExercise, powerChordShiftsExercise } from "feature/exercisePlan/data/exerises/powerChords/powerChords";
 import { offBeatChopsExercise, palmMuteSixteenthChugExercise, powerChordStopsExercise } from "feature/exercisePlan/data/exerises/rhythmGuitar/rhythmGuitar";
 import { bluesScaleBoxExercise, majorPentatonicBoxExercise, majorScaleOpenPositionExercise, naturalMinorPositionExercise, seventhChordArpeggiosExercise } from "feature/exercisePlan/data/exerises/scalePositions/scalePositions";
+import { diatonicTriadArpeggiosExercise, minorScaleChordToneTargetsExercise, minorScaleRhythmPyramidExercise, pentatonicDiagonalShiftsExercise, stringSkippingMajorScaleExercise } from "feature/exercisePlan/data/exerises/scaleStudies/scaleStudies";
 import { sevenNationArmyRiffPreviewExercise } from "feature/exercisePlan/data/exerises/sevenNationArmyRiffPreview/sevenNationArmyRiffPreview";
 import { bluesTwelveBarShuffleExercise, shuffleBoogieRiffExercise } from "feature/exercisePlan/data/exerises/shuffleBlues/shuffleBlues";
 import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
@@ -274,6 +275,11 @@ const FREE_EXERCISE_IDS = new Set([
   "blues_scale_box_1",
   "major_pentatonic_g_box",
   "arpeggios_seventh_chords_c",
+  "pentatonic_diagonal_position_shifts",
+  "minor_scale_rhythm_pyramid",
+  "minor_scale_chord_tone_targets",
+  "arpeggios_diatonic_triads_g",
+  "string_skipping_major_scale",
   "bass_octave_groove",
   "bass_major_scale_one_octave",
   "bass_blues_walk_12_bar",
@@ -610,6 +616,11 @@ const rawExercises: Exercise[] = [
   bluesScaleBoxExercise,
   majorPentatonicBoxExercise,
   seventhChordArpeggiosExercise,
+  pentatonicDiagonalShiftsExercise,
+  minorScaleRhythmPyramidExercise,
+  minorScaleChordToneTargetsExercise,
+  diatonicTriadArpeggiosExercise,
+  stringSkippingMajorScaleExercise,
   bassOctaveGrooveExercise,
   bassMajorScaleExercise,
   bassBluesWalkExercise,

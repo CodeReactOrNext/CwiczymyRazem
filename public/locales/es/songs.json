@@ -164,7 +164,12 @@
     "drop": "Suelta el archivo aquí",
     "import": "Importar tablatura",
     "analyzing": "Analizando pistas y tempo...",
-    "upload": "Sube un archivo GP3 / GP4 / GP5 / GPX / GP"
+    "upload": "Sube un archivo GP3 / GP4 / GP5 / GPX / GP",
+    "song_pack_note": "Los paquetes de canción (.psarc) también funcionan. La tablatura y la grabación se quedan en este ordenador y no se pueden compartir.",
+    "song_pack_local_only": "Aquí no se puede añadir un paquete de canción. Su tablatura y su grabación se quedan en tu ordenador y no se pueden compartir. Adjúntalo a una canción en la app de escritorio.",
+    "song_pack_desktop_only": "Los paquetes de canción solo se abren en la app de escritorio.",
+    "song_pack_error": "No se pudo leer este paquete de canción.",
+    "song_pack_no_audio": "Tablatura importada. No se pudo leer la grabación de este paquete, así que suena sin ella."
   },
   "power": {
     "songs_learned": "{{done}}/{{total}} canciones aprendidas",

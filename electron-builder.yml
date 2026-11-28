@@ -35,6 +35,10 @@ files:
   - node_modules/audify/build/Release/**
   - node_modules/bindings/**
   - node_modules/file-uri-to-path/**
+  # Song packages: repackages the recording inside one as Ogg (songPack/). Pure
+  # JS, no dependencies of its own.
+  - node_modules/ww2ogg-ts/package.json
+  - node_modules/ww2ogg-ts/dist/**
   # electron-updater + its runtime deps (nested fs-extra/semver live inside
   # node_modules/electron-updater/node_modules and are covered by the first line).
   - node_modules/electron-updater/**

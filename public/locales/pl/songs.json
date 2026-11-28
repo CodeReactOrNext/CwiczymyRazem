@@ -164,7 +164,12 @@
     "drop": "Upuść plik tutaj",
     "import": "Importuj tabulaturę",
     "analyzing": "Analizuję ścieżki i tempo...",
-    "upload": "Wgraj plik GP3 / GP4 / GP5 / GPX / GP"
+    "upload": "Wgraj plik GP3 / GP4 / GP5 / GPX / GP",
+    "song_pack_note": "Paczki utworów (.psarc) też działają. Tab i nagranie zostają na tym komputerze i nie można ich udostępniać.",
+    "song_pack_local_only": "Paczki utworu nie da się tu dodać. Jej tab i nagranie zostają na Twoim komputerze i nie można ich udostępniać. Podepnij ją do utworu w aplikacji desktopowej.",
+    "song_pack_desktop_only": "Paczki utworów otwiera tylko aplikacja desktopowa.",
+    "song_pack_error": "Nie udało się odczytać tej paczki utworu.",
+    "song_pack_no_audio": "Tab zaimportowany. Nagrania z tej paczki nie udało się odczytać, więc gra bez niego."
   },
   "power": {
     "songs_learned": "Nauczone utwory: {{done}}/{{total}}",
